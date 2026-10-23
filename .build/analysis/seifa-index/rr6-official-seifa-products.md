@@ -201,6 +201,17 @@ rationale, and treat §9 as the build record.
   derivation, sourceProduct}` with derivation `published` (RR5 / APH Table
   2a slices) or `weighted` (the ABS 2039.0 §2.2 population-weighted recipe
   of §1).
+- **Single-file merge (2026-10-24, user call "yeah, single file")**: the
+  same cells feed the four-index store `data/division-seifa-indexes.json` —
+  `derive-irsad.py` also emits
+  `../seat-model/seifa-src/irsad-cells.json` (name/state-canonicalised
+  cells plus per-election `_meta`), which `extract-division-seifa.mjs`
+  splices in as its IRSAD lane (cell `{value, rank, rankDis: N+1−rank}`;
+  provenance keys `irsad-<derivation>-<census>[-e<edition>]`, the suffix
+  splitting same-census elections). This file stays the display store;
+  the merge is a splice, never a re-derivation —
+  `test-division-seifa.mjs` invariant 11 checks every merged cell back
+  against the rows here.
 - **Rank convention**: every row set — published and derived — is re-ranked
   on ingest so **rank 1 = most advantaged** (highest IRSAD); decile/quartile
   ascend with disadvantage. RR5's printed ranks (1 = most disadvantaged)

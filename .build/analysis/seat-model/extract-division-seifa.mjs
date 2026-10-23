@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* extract-division-seifa.mjs — per-division SEIFA indexes IRSD (pure
    disadvantage), IER (economic resources) and IEO (education & occupation)
-   per election, published-source layer. Sibling lane owns IRSAD (the AEC's
-   index); this store deliberately carries NO irsad key.
+   per election, published-source layer, plus IRSAD spliced from the sibling
+   pipeline's irsad-cells.json (derive-irsad.py's companion emit — the
+   combined store IS the single-file SEIFA-by-division record).
 
    Sources (all population-published per-division tables — ABS never prints a
    division score; the Parliamentary Library and AEC commissioned them):
@@ -59,6 +60,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 const SRC_DIR = ".build/analysis/seat-model/seifa-src";
 const APH_DIR = ".build/analysis/seifa-index/src/aph";
 const ABS_DERIVED = `${SRC_DIR}/abs-derived-3idx.json`; // derive-division-seifa-abs.py
+const IRSAD_CELLS = `${SRC_DIR}/irsad-cells.json`;       // derive-irsad.py (companion emit)
 const OUT_STORE = "data/division-seifa-indexes.json";
 const OUT_FIXTURE = `${SRC_DIR}/aph-fixtures.json`;
 
@@ -415,21 +417,27 @@ for (const cfg of PAPERS) fixtures[cfg.via] = parsePaper(cfg);
 writeFileSync(OUT_FIXTURE, JSON.stringify(fixtures, null, 2) + "\n");
 console.log(`wrote ${OUT_FIXTURE} (${Object.keys(fixtures).join(", ")})`);
 
-// Store: election blocks, division-keyed; my three indexes only.
+// Store: election blocks, division-keyed; irsd/ier/ieo from the two lanes
+// below, irsad from the sibling pipeline's cells fixture.
 const ABOUT =
-  "SEIFA (ABS Socio-Economic Indexes for Areas) per federal electoral division, published-source layer: " +
+  "SEIFA (ABS Socio-Economic Indexes for Areas) per federal electoral division, all four indexes: " +
   "IRSD = Index of Relative Socio-Economic Disadvantage (pure disadvantage; HIGH score = LESS disadvantaged), " +
-  "IER = Index of Economic Resources, IEO = Index of Education and Occupation. IRSAD (advantage/disadvantage) is " +
-  "the sibling pipeline's lane and is deliberately absent from this store. APH lanes carry scores/ranks as PRINTED " +
-  "by the papers; ABS lanes rank from their own carried scores. Rank 1 = most disadvantaged / lowest score. Indexes are re-derived " +
-  "by the ABS per census (PCA weights recomputed), so scores and ranks compare WITHIN a census year, never across " +
-  "them. Census-year and boundary-edition provenance ride each election block (_provenance). 2001-census-era elections " +
-  "(2001, 2004) have no published four-index per-division table (AEC RR5 att1 prints IRSAD only): 2001 is the ABS's own " +
-  "published 2001-CED cube (scores as printed, ranks computed from them); 2013-2025 are ABS-cube derivations per " +
-  "2039.0 (SA1 2011/2016 cubes x their CED allocation for 2013-2019, MB-level 2021 cube x allocation for 2022/2025), " +
-  "exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2004 needs a 2001-CD to 2003-edition " +
-  "concordance the ABS never published. 1987-1998 (five-index era) out of scope. Full map: " +
-  ".build/analysis/seifa-index/rr6-official-seifa-products.md.";
+  "IER = Index of Economic Resources, IEO = Index of Education and Occupation, IRSAD = Index of Relative " +
+  "Socio-Economic Advantage and Disadvantage. irsd/ier/ieo ranks run 1 = MOST disadvantaged (the APH tapes' own " +
+  "order); an irsad cell instead carries TWO ranks — `rank` = 1 most ADVANTAGED (the sibling pipeline's and the " +
+  "index's natural read), `rankDis` = 1 most disadvantaged (this store's convention, = N+1-rank). IRSAD lands " +
+  "from the sibling pipeline's irsad-cells.json (derive-irsad.py), which also owns the display store at " +
+  ".build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; " +
+  "ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights " +
+  "recomputed), so scores and ranks compare WITHIN a census year, never across them. Census-year and " +
+  "boundary-edition provenance ride each election block (_provenance). 2001-census-era elections (2001, 2004) " +
+  "have no published four-index per-division table (AEC RR5 att1 prints IRSAD only): 2001 is the ABS's own " +
+  "published 2001-CED cube (scores as printed, ranks computed from them); 2013-2025 are ABS-cube derivations " +
+  "per 2039.0 (SA1 2011/2016 cubes x their CED allocation for 2013-2019, MB-level 2021 cube x allocation for " +
+  "2022/2025), exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2004 needs a 2001-CD " +
+  "to 2003-edition concordance the ABS never published. 2028 is an irsad-only forward block (2021-census " +
+  "derivation on the 2025 gazetted boundaries; the other three indexes await a census). 1987-1998 " +
+  "(five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.";
 
 const provenance = {};
 const elections = {};
@@ -452,8 +460,7 @@ for (const cfg of PAPERS) {
 
 // ABS-derived lanes (derive-division-seifa-abs.py output; ranks computed
 // by that script from its 3dp values — the store's derived rule: APH lanes
-// carry printed ranks, ABS lanes compute). Rows carry no irsad key by the
-// same sibling-lane contract as the APH lanes.
+// carry printed ranks, ABS lanes compute). IRSAD arrives separately below.
 const ABS_VIA_BY_ELECTION = {
   2001: "absCed01", 2013: "absSa1Ced2011", 2016: "absSa1Ced2016",
   2019: "absSa1Ced2018", 2022: "absMbCed2021", 2025: "absMbCed2024",
@@ -475,6 +482,65 @@ const ABS_VIA_BY_ELECTION = {
     elections[y] = out;
     console.log(`${y}: ${Object.keys(out).length} divisions (via ${via})`);
   }
+}
+
+/* IRSAD splice — the store's own indexes rank 1 = MOST DISADVANTAGED (the
+   APH tapes' order), while a SEIFA IRSAD rank's natural read is 1 = most
+   ADVANTAGED, so the cell carries both: `rank` is the sibling pipeline's
+   rank-1-most-advantaged figure (descending score — matches an exact
+   descending recompute on every election, so no lane re-derives it), and
+   `rankDis` = N+1-rank puts the cell in the store's own convention for any
+   consumer lining IRSAD up against irsd/ier/ieo. Elections present in the
+   cells file but not yet in the store (the forward 2028 block) land as
+   irsad-only rows. test-division-seifa pins every piece of this. */
+{
+  const cells = JSON.parse(readFileSync(IRSAD_CELLS, "utf8"));
+  const forward = [];
+  for (const [y, block] of Object.entries(cells)) {
+    const meta = block._meta;
+    const names = Object.keys(block).filter((n) => n !== "_meta");
+    if (!meta?.provName) fail(`irsad-cells ${y}: no _meta provName`);
+    let provKey = meta.provName;
+    // Two blocks can share a census+derivation lane (2001 and 2004 both ride
+    // the 2001 census's published tables) — the editionInForce splits them.
+    if (provenance[provKey]) provKey = `${meta.provName}-e${meta.editionInForce}`;
+    if (provenance[provKey]) fail(`irsad-cells ${y}: provName ${provKey} collides`);
+    provenance[provKey] = {
+      title: `IRSAD lane — ${meta.sourceProduct}`,
+      censusYear: meta.censusYear,
+      editionInForce: meta.editionInForce,
+      derivation: meta.derivation,
+      sourceProduct: meta.sourceProduct,
+    };
+    if (meta.forward === true) {
+      if (elections[y]) fail(`irsad-cells ${y}: forward flag on a shared election`);
+      forward.push(y);
+    } else if (meta.forward !== undefined)
+      fail(`irsad-cells ${y}: unexpected forward ${JSON.stringify(meta.forward)}`);
+    const N = names.length;
+    const existing = elections[y] ? new Set(Object.keys(elections[y])) : null;
+    if (existing) {
+      const got = new Set(names);
+      const missing = [...existing].filter((n) => !got.has(n));
+      const extra = [...got].filter((n) => !existing.has(n));
+      if (missing.length || extra.length)
+        fail(`irsad-cells ${y}: name-set drift — missing ${JSON.stringify(missing)} extra ${JSON.stringify(extra)}`);
+    }
+    for (const n of names) {
+      const c = block[n];
+      const cell = { value: c.value, rank: c.rank, rankDis: N + 1 - c.rank };
+      if (existing) {
+        if (elections[y][n].state !== c.state)
+          fail(`irsad-cells ${y} ${n}: state ${c.state} != ${elections[y][n].state}`);
+        elections[y][n].irsad = cell;
+      } else {
+        (elections[y] ||= {})[n] = { state: c.state, irsad: cell, via: provKey };
+      }
+    }
+    if (!existing) console.log(`${y}: ${N} divisions (irsad-only forward block, via ${provKey})`);
+  }
+  if (forward.join(",") !== "2028")
+    fail(`irsad-cells forward flags = ${forward.join(",") || "(none)"}, expected exactly 2028`);
 }
 
 const YEARS = Object.keys(elections).sort();

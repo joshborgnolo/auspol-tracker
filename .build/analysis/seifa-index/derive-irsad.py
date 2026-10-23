@@ -36,6 +36,50 @@ DL = f"{PROJ}/.matilda/seifa-irsad-abs/dl"
 CUBES = f"{PROJ}/.matilda/seifa-irsad-abs"
 
 OUT_JSON = f"{ROOT}/irsad-by-division.json"
+# Cell-level fixture for extract-division-seifa.mjs, which splices IRSAD into
+# the combined data/division-seifa-indexes.json (this file stays the
+# IRSAD-only display store; the .mjs consumes the fixture, never the display
+# rows, so the two stores can only drift on field-set changes).
+OUT_CELLS = f"{PROJ}/.build/analysis/seat-model/seifa-src/irsad-cells.json"
+
+# Post-emit sink, wired in below main()'s assembly — same election dict it
+# just serialised to OUT_JSON, normalised into the sibling store's shapes.
+def emit_irsad_cells(elections):
+    # The store's canonical names/states: straight apostrophes (already the
+    # store norm), McX capitalisation, three-code states. The two published
+    # lanes and the weighted 2011-ABS cube print legacy forms.
+    RENAME = {"Kingston-Smith": "Kingsford Smith", "McEwan": "McEwen"}
+    STATES = {"Vic": "VIC", "Qld": "QLD", "Tas": "TAS",
+              "NSW": "NSW", "VIC": "VIC", "QLD": "QLD", "SA": "SA",
+              "WA": "WA", "TAS": "TAS", "NT": "NT", "ACT": "ACT"}
+    def canon(name):
+        n = name.strip().replace("’", "'").replace("‘", "'")
+        n = RENAME.get(n, n)
+        return re.sub(r"\bMc([a-z])", lambda m: "Mc" + m.group(1).upper(), n)
+    # _meta carries the election's provenance so extract-division-seifa can
+    # echo it into the combined store's _provenance under the provName key.
+    cells = {}
+    for y, e in elections.items():
+        block, seen = {}, set()
+        for r in e["rows"]:
+            n = canon(r["division"])
+            st = STATES[r["state"]]
+            assert n not in seen, f"irsad-cells e{y}: name collision at {n}"
+            seen.add(n)
+            block[n] = {"value": r["irsad"], "rank": r["rank"], "state": st}
+        meta = {"derivation": e["derivation"], "sourceProduct": e["sourceProduct"],
+                "censusYear": e["censusYear"], "editionInForce": str(e["editionInForce"]),
+                "provName": f"irsad-{e['derivation']}-{e['censusYear']}"}
+        if e.get("forward"):
+            meta["forward"] = True
+        block["_meta"] = meta
+        cells[str(y)] = block
+    import os
+    os.makedirs(os.path.dirname(OUT_CELLS), exist_ok=True)
+    with open(OUT_CELLS, "w", encoding="utf-8") as fh:
+        json.dump(cells, fh, ensure_ascii=False, indent=1, sort_keys=True)
+        fh.write("\n")
+    print("emitted", OUT_CELLS, {y: len(b) for y, b in cells.items()})
 
 # ---------------------------------------------------------------- helpers
 
@@ -639,6 +683,7 @@ def main():
         fh.write("\n")
     counts = {y: len(e["rows"]) for y, e in elections.items()}
     print("emitted", OUT_JSON, counts)
+    emit_irsad_cells(elections)
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "selftest":
     r5 = parse_rr5_att1(f"{ROOT}/cache/rr5.txt")
