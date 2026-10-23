@@ -24,6 +24,17 @@ Sources, by era:
              ALP/LNP House figures are the pin set). No per-state cut before
              2004 – the flow menu's per-state span matches it.
 
+Class cuts (fed.classes): the national House figures regrouped by seat type –
+"Federal, inner metro / outer metro / provincial / rural" – a division riding
+the election's own AEC Divisional Classifications block
+(data/division-classifications.json), so a recategorised seat moves classes
+with it. Eleven elections carry a block: 1996–2001 counted from the committed
+per-division candidate files (.build/aec-flow-src/hcands-*.txt, the AEC's
+pre-2004 abbreviation tokens); 2004–2025 from the per-division preference
+downloads (dop-*.csv.gz) at CountNumber 0 (= first preferences). The state-by-
+state and Senate sheets ship no division column, so House elections are the
+only base a seat-type class can cover – House-only, like the flows side.
+
 Buckets: alp, lnp (the whole Coalition block incl. joint Senate tickets,
 CLP and LNP – the poll rows' L/NP), grn, onp, dem (Australian Democrats),
 dlp (Democratic Labor – crosses the fold only in 1972), uap (Palmer United
@@ -43,7 +54,7 @@ copy/token decision, never an accident of the fold.
 Usage: python3 .build/aec-primary-history.py [--check]
   default writes data/primary-history.json; --check re-derives and compares.
 """
-import csv, io, json, os, sys, urllib.request
+import csv, gzip, io, json, os, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -78,16 +89,24 @@ STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
 # vocabulary (dumped from the caches 2026-10-23). Lowercased; matched exact.
 MAJ_ALP_NM = {"australian labor party", "labor", "a.l.p.",
               "australian labor party (act branch)", "australian labor party (alp)",
-              "australian labor party (northern territory) branch", "labor/country labor"}
+              "australian labor party (northern territory) branch", "labor/country labor",
+              # "Country Labor" -- Labor's rural-NSW banner in the per-division
+              # dop files (the fpv sheets print the joint "Labor/Country Labor"
+              # instead, so this token only ever fires on the class-cut path)
+              "country labor"}
 MAJ_COAL_NM = {"liberal", "the nationals", "national party", "nationals",
                "clp - the territory party", "clp-the territory party",
+               # 2007's per-division dop abbreviates the NT party "C.L.P."
+               "c.l.p.",
                "country liberal party (nt)", "country liberals", "country liberals (nt)",
                "nt clp", "northern territory country liberal party",
                "liberal national party", "liberal national party of queensland", "lnp",
                "liberal/nationals", "liberal/the nationals", "liberal & nationals",
                "liberal party of australia,nsw division-national party of australia nsw"}
 GRN_NM = {"the greens", "australian greens", "queensland greens",
-          "the greens (vic)", "the greens (wa)"}
+          "the greens (vic)", "the greens (wa)",
+          # 2025's per-division dop renames the WA branch "The Greens (WA) Inc"
+          "the greens (wa) inc"}
 ONP_NM = {"one nation", "pauline hanson's one nation",
           "pauline hanson's one nation (nsw division)", "one nation wa", "pauline"}
 DEM_NM = {"australian democrats", "democrats"}
@@ -289,6 +308,112 @@ def shares(votes_by_cut):
         cuts[cut] = (tot, pcts)
     return cuts
 
+# ---- class cuts -------------------------------------------------------------
+# key -> (label, short), in menu order; copy matches the flows chart's
+# fed.classes views, which the state-by-state menu shows beside these.
+CLASS_META = (("inner", "Inner metropolitan", "inner metro"),
+              ("outer", "Outer metropolitan", "outer metro"),
+              ("provincial", "Provincial", "provincial"),
+              ("rural", "Rural", "rural"))
+CLS_KEY = {"inner metropolitan": "inner", "outer metropolitan": "outer",
+           "provincial": "provincial", "rural": "rural"}
+# the years a Divisional Classifications block exists for: every AEC-download
+# election plus the three legacy years counted from hcands files.
+CLASS_YEARS = [1996, 1998, 2001] + sorted(EVENTS)
+
+# legacy hcands party tokens (the AEC's pre-2004 abbreviation set) -> bucket:
+# the flow side's map in aec-flow-history.py, widened with DEM/IND for the
+# primary chart. CLR is Country Labor (Labor's rural-NSW banner until 2013);
+# GWA/AGV/TG are the era's other greens parties; HAN is One Nation's token
+# (its 1998 recomposition lands on the documented 8.43% national share).
+LEGACY_PARTY = {
+    "ALP": "alp", "CLR": "alp",
+    "LP": "lnp", "NP": "lnp", "CLP": "lnp", "LNP": "lnp", "NAT": "lnp", "LIB": "lnp",
+    "GRN": "grn", "GWA": "grn", "AGV": "grn", "TG": "grn",
+    "HAN": "onp", "ON": "onp",
+    "DEM": "dem", "DLP": "dlp",
+    "IND": "ind", "OTH": "oth",
+}
+
+def hcands_class_votes(year):
+    """hcands-<year>.txt -> {division: {bucket: votes}} at first preferences."""
+    path = os.path.join(SRC, "..", f"hcands-{year}.txt")
+    votes = {}
+    with open(path, encoding="utf-8-sig") as f:
+        lines = f.read().splitlines()
+    head = lines[0].split(";")
+    dcol, pcol, vcol = head.index("Division"), head.index("Party"), head.index("Vote")
+    for ln in lines[1:]:
+        c = ln.split(";")
+        if len(c) <= vcol or not c[vcol].strip():
+            continue
+        tok = c[pcol].strip()
+        b = LEGACY_PARTY.get(tok)
+        if b is None and tok:
+            b = "oth"
+            UNMAPPED.append((tok, os.path.basename(path)))
+        elif b is None:
+            b = "oth"   # an unlabelled cell is an ungrouped candidate
+        div = c[dcol].strip()
+        votes.setdefault(div, {}).setdefault(b, 0.0)
+        votes[div][b] += float(c[vcol])
+    return votes
+
+def dop_class_votes(year):
+    """dop-<year>.csv.gz -> {division: {bucket: votes}}: the count-0 Preference
+       Count rows are each candidate's first preferences for their seat."""
+    path = os.path.join(SRC, "..", f"dop-{year}.csv.gz")
+    votes = {}
+    with gzip.open(path, "rt", encoding="utf-8-sig") as f:
+        rows = list(csv.reader(f))
+    hi = next(i for i, r in enumerate(rows) if r and r[0] == "StateAb")
+    h = {c: i for i, c in enumerate(rows[hi])}
+    ict, icn, idiv, ipty, ival = (h["CalculationType"], h["CountNumber"],
+                                  h["DivisionNm"], h["PartyNm"], h["CalculationValue"])
+    for r in rows[hi + 1:]:
+        if len(r) <= 1:
+            continue
+        if r[ict] != "Preference Count" or int(r[icn]) != 0:
+            continue
+        nm = r[ipty].strip().lower()
+        if nm:
+            b = FAMILY.get(nm)
+            if b is None:
+                b = "oth"
+                UNMAPPED.append((nm, os.path.basename(path)))
+        else:
+            b = "oth"   # ungrouped candidates carry an empty party cell
+        div = r[idiv].strip()
+        votes.setdefault(div, {}).setdefault(b, 0.0)
+        votes[div][b] += float(r[ival])
+    return votes
+
+def class_shares(blocks):
+    """Build {classKey: {year: pcts}} over CLASS_YEARS, joining each year's
+       per-division votes to that election's Divisional Classifications block.
+       The join is exact by construction (the blocks and the AEC division files
+       share namings), so a mismatch asserts rather than dropping a seat."""
+    out = {k: {} for k, _, _ in CLASS_META}
+    recon = {}   # year -> national pcts recomposed from the same ballots
+    for y in CLASS_YEARS:
+        blk = blocks.get(str(y))
+        if not blk:
+            continue
+        votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
+        assert set(votes) == set(blk), \
+            f"{y}: class join drifted - counted {sorted(set(votes) - set(blk))[:3]}, classified-only {sorted(set(blk) - set(votes))[:3]}"
+        per = {k: {} for k, _, _ in CLASS_META}
+        nat = {}
+        for div, bks in votes.items():
+            ck = CLS_KEY[blk[div]["classification"].lower()]
+            for b, v in bks.items():
+                per[ck][b] = per[ck].get(b, 0.0) + v
+                nat[b] = nat.get(b, 0.0) + v
+        recon[y] = nat
+        for ck, _, _ in CLASS_META:
+            out[ck][y] = shares({"c": per[ck]})["c"][1]
+    return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
+
 # ---- history-aware emit ------------------------------------------------------
 def fold_series(year_rows):
     """year_rows: {year: {bucket: pct}} with raw buckets (unaligned ok).
@@ -358,6 +483,25 @@ def build():
         assert abs(h["alp"] - a) < 0.005, f"{y} HISTORY ALP drifted"
         assert abs(h["lnp"] - l) < 0.005, f"{y} HISTORY L/NP drifted"
 
+    # class cuts: national first preferences regrouped by the election's own
+    # seat classifications (the fed.classes views the primary chart's "Federal,
+    # <class>" menu options read). Recomposition pins: the same ballots summed
+    # per class must re-derive the election's canonical national majors, plus
+    # the era checks the token maps hang on (the 1996/1998/2001 legacy
+    # abbreviation sets against HISTORY's typed grn/dem/onp figures).
+    cls_blocks = json.load(open(os.path.join(ROOT, "data", "division-classifications.json"), encoding="utf-8"))["elections"]
+    class_rows, class_recon = class_shares(cls_blocks)
+    assert [y for y, row in class_rows["inner"].items() if row] == CLASS_YEARS, \
+        "a classification block is missing for one of CLASS_YEARS"
+    for y in CLASS_YEARS:
+        p = class_recon[y]
+        canon = CANON.get(y) or HISTORY_CANON.get(y)
+        assert abs(p["alp"] - canon[0]) < 0.05, f"{y} class recomposition ALP {p['alp']:.3f} != {canon[0]}"
+        assert abs(p["lnp"] - canon[1]) < 0.05, f"{y} class recomposition L/NP {p['lnp']:.3f} != {canon[1]}"
+    assert abs(class_recon[1996]["grn"] - 2.92) < 0.05, "hcands greens token map"
+    assert abs(class_recon[1996]["dem"] - 6.76) < 0.05, "hcands Democrat token map"
+    assert abs(class_recon[1998]["onp"] - 8.43) < 0.02, "hcands One Nation (HAN) token map"
+
     house_nat_rows = {y: shares({"nat": aec_house_nat[y]})["nat"][1] for y in sorted(EVENTS)}
     # merge typed history
     for y, row in HISTORY["house"].items():
@@ -385,8 +529,10 @@ def build():
         sen_national[int(y)] = {b: v for b, v in row.items() if b in ALL_BUCKETS and v is not None}
     years_s, sen_nat = fold_series(sen_national)
 
-    def view(label, elections, years, series, states=None):
+    def view(label, elections, years, series, states=None, short=None):
         d = {"label": label, "elections": elections, "years": years}
+        if short:
+            d["short"] = short
         for b in ALL_BUCKETS:
             vals = series[b]
             if b in ("alp", "lnp", "oth") or any(v is not None for v in vals):
@@ -405,11 +551,15 @@ def build():
         sn_states[s] = view(STATE_FULL[s], STATE_FULL[s] + " Senate", ys, ser)
 
     doc = {
-        "_comment": "GENERATED by .build/aec-primary-history.py – primary-vote history behind the flows-explained chart's Primary votes view. Shares of formal first preferences; named minors present only where >= 4% of a view's vote (null otherwise, folded into oth). 2004-> from committed AEC caches (.build/aec-flow-src/fpv/); 1972–2001 typed in the script's HISTORY block.",
+        "_comment": "GENERATED by .build/aec-primary-history.py – primary-vote history behind the flows-explained chart's Primary votes view. Shares of formal first preferences; named minors present only where >= 4% of a view's vote (null otherwise, folded into oth). 2004-> from committed AEC caches (.build/aec-flow-src/fpv/); 1972–2001 typed in the script's HISTORY block. fed.classes = the House share regrouped by the AEC's per-election division classifications (1996–2025, House only – divisions have no Senate or state line).",
         "foldPt": FOLD_PT,
         "fed": view("Federal", "Australian federal elections", years_h, house_nat, states=hs_states),
     }
     doc["fed"]["sen"] = view("Federal Senate", "Australian Senate elections", years_s, sen_nat, states=sn_states)
+    doc["fed"]["classes"] = {}
+    for ck, label, short in CLASS_META:
+        ys, ser = fold_series(class_rows[ck])
+        doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats", ys, ser, short=short)
     return doc
 
 def main():

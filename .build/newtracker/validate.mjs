@@ -1156,6 +1156,10 @@ export function validatePrimaryHistory() {
   if (!S.fed.states || typeof S.fed.states !== "object") fail("primary-history.json", "primary-history-shape", "no fed.states");
   else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
   for (const [st, v] of Object.entries((S.fed.sen && S.fed.sen.states) || {})) checkView(`fed.sen.${st}`, v);
+  /* the four seat-class views (House only): a division rides its election's
+     own AEC classification, 1996–2025 */
+  if (!S.fed.classes || typeof S.fed.classes !== "object") fail("primary-history.json", "primary-history-shape", "no fed.classes");
+  else for (const [ck, v] of Object.entries(S.fed.classes)) checkView(`fed.${ck}`, v);
   return errors;
 }
 

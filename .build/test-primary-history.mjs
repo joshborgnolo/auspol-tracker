@@ -23,7 +23,12 @@
       cell is >= foldPt,
    and `oth` recombines as the residual of exactly the shown lines per year
    in every view (national, senate, all 16 state cuts);
-   3. the built data asset hands the chart the same document.
+   3. the built data asset hands the chart the same document;
+   4. the AEC division-classification cuts (fed.classes, 2026-10-23 – the
+      House's share regrouped by the AEC's own per-election division
+      classes; the Senate holds none) sit on the pinned span, copy and
+      per-cell figures recomputed from the committed sources, and ride the
+      same fold/recombination contract.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -126,6 +131,54 @@ STATES.forEach((s) => {
   assert.deepEqual(SEN.states[s].years, AEC_YEARS, `${s} senate: per-state span starts 2004`);
 });
 
+// ---- the AEC division-classification cuts (House only) ---------------------
+/* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
+   vote view - eg 'Federal, provincial'"): fed.classes regroups each House
+   election's divisions by the AEC's own classification of that election
+   (data/division-classifications.json; 1996/98/01 divisions counted off the
+   legacy hcands files, 2004 on off the dop caches). Divisions never exist
+   for the Senate, so fed.sen carries no classes. Menu order, copy and
+   per-cell pins below (the figures recompute from the committed sources –
+   the generator also asserts the classes' summed ballots recompose the
+   national ALP and Coalition shares within 0.05 every year). */
+const CLASSES = ["inner", "outer", "provincial", "rural"];
+const CLASS_YEARS = [1996, 1998, 2001, ...AEC_YEARS];
+assert.ok(FED.classes && !SEN.classes, "fed.classes exists; the Senate holds no classes");
+assert.deepEqual(Object.keys(FED.classes), CLASSES, "the four class cuts, in menu order");
+// the two per-cell readers shared by every pin section below
+const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
+const cell = (view, key, year) => view[key][view.years.indexOf(year)];
+const CLASS_COPY = {
+  inner: ["Inner metropolitan", "inner metro"],
+  outer: ["Outer metropolitan", "outer metro"],
+  provincial: ["Provincial", "provincial"],
+  rural: ["Rural", "rural"],
+};
+CLASSES.forEach((ck) => {
+  const v = FED.classes[ck];
+  assert.deepEqual(v.years, CLASS_YEARS, `${ck}: the eleven-classifications span`);
+  assert.equal(v.label, CLASS_COPY[ck][0], `${ck} label`);
+  assert.equal(v.short, CLASS_COPY[ck][1], `${ck} short`);
+  assert.equal(v.elections, `federal elections in ${CLASS_COPY[ck][1]} seats`, `${ck} elections copy`);
+});
+// the figure pins (each recomputed from the sources during the 2026-10-23
+// build: the state of play every class view tells its own way)
+assert.equal(cell(FED.classes.provincial, "alp", 2025), 35.19);
+assert.equal(cell(FED.classes.provincial, "lnp", 2025), 32.59);
+assert.equal(cell(FED.classes.rural, "lnp", 1996), 55.57);
+assert.equal(cell(FED.classes.rural, "alp", 1996), 32.19);
+assert.equal(cell(FED.classes.inner, "grn", 2025), 16.5);
+assert.equal(cell(FED.classes.inner, "ind", 2025), 9.14);
+assert.equal(cell(FED.classes.inner, "onp", 1998), 4.83);
+assert.equal(cell(FED.classes.inner, "dem", 1996), 6.59);
+assert.equal(cell(FED.classes.rural, "onp", 1998), 12.56);
+// One Nation's 1998 share rises down the urbanisation ladder
+assert.ok(FED.classes.inner.onp[1] < FED.classes.outer.onp[1]
+  && FED.classes.outer.onp[1] < FED.classes.provincial.onp[1]
+  && FED.classes.provincial.onp[1] < FED.classes.rural.onp[1],
+  "1998 ONP: inner < outer < provincial < rural");
+
+
 // ---- canonical national ALP / Coalition pins --------------------------------
 /* published AEC national House figures (the generator's CANON set; 2010
    Coalition 43.61 – the skill table's 43.32 is the Nats misprint) */
@@ -177,8 +230,6 @@ HIST_YEARS.forEach((y) => {
 });
 
 // ---- the fold's null map, pinned per named minor ---------------------------
-const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
-const cell = (view, key, year) => view[key][view.years.indexOf(year)];
 // House: One Nation's two runs (1998–2001, then 2022 on); UAP family only
 // 2013 and 2022; IND only 2022 on (its typed-era shares all sit sub-fold)
 assert.deepEqual(nulls(FED.onp, FED.years),
@@ -210,12 +261,15 @@ assert.deepEqual(SEN.states.qld.onp, [null, 4.37, null, null, 9.19, 10.27, 7.4, 
 // the Democrats cross the fold exactly once in the whole cache span
 // (4.73% NT senate 2004) and DLP never does
 assert.deepEqual(SEN.states.nt.dem, [4.73, null, null, null, null, null, null, null], "NT senate dem: 2004 alone");
-// over the whole document the Democrats live in exactly three views (the
-// typed era's two national views + NT senate 2004) and the DLP in one
-const allViews = [FED, SEN, ...STATES.map((s) => FED.states[s]), ...STATES.map((s) => SEN.states[s])];
+// over the whole document the Democrats live in seven views (the typed
+// era's two national views + NT senate 2004 + the four class cuts' typed-
+// era cells) and the DLP in one
+const allViews = [FED, SEN, ...STATES.map((s) => FED.states[s]), ...STATES.map((s) => SEN.states[s]),
+  ...CLASSES.map((c) => FED.classes[c])];
 allViews.forEach((v) => {
-  if (v.dem != null) assert.ok(v === FED || v === SEN || v === SEN.states.nt,
-    `${v.label}: dem lines are the typed-era national views + NT senate 2004`);
+  if (v.dem != null) assert.ok(v === FED || v === SEN || v === SEN.states.nt
+    || CLASSES.some((c) => FED.classes[c] === v),
+    `${v.label}: dem lines are the typed-era national views + NT senate 2004 + the class cuts' typed-era cells`);
   if (v.dlp != null) assert.equal(v, FED, `${v.label}: dlp is the national house's 1972 row alone`);
 });
 

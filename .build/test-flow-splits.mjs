@@ -352,7 +352,7 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
    emit), the menu's state-elections optgroup and the LC bank gate are now
    pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
    Nation sheds the Council only while its ON cut is absent */
-assert.ok(ap.includes('{primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} menu={headCtls} />')
+assert.ok(ap.includes('{primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} menu={headCtls} />')
     && ap.includes(': lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
     && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
     && ap.includes(': pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
@@ -387,12 +387,29 @@ assert.ok(!ap.includes('if (pair === "on") setPair("co");')
   "flipping houses never snaps the contest back (the ON bank rides along) - only a pick the ON bank can't carry (a class view, a non-fed state pick, a no-ON-ticket state) drops to federal; Lower never snaps");
 assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);')
     && ap.includes('{menuKeys.map((k) => <option key={k} value={"fed:" + k}>')
-    && ap.includes('{!primMode && house !== "sen" && classKeys.map(') && ap.includes('{!primMode && house !== "sen" && KEYS.length > 1 && ('),
-  "the elections menu re-reads the states from the operative bank under Upper (senOn's on the ON tab - never-on-ballot ACT out, the Coalition-only Council out) and sheds the House-only sections");
+    && ap.includes('{!primMode && house !== "sen" && KEYS.length > 1 && (')
+    && ap.includes('(primMode ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map((k) => <option key={"fedcl:" + k}'),
+  "the elections menu re-reads the states from the operative bank under Upper (senOn's on the ON tab - never-on-ballot ACT out, the Coalition-only Council out) and sheds the House-only sections; the seat-class options come from the current mode's bank");
+/* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
+   vote view - eg 'Federal, provincial'"): the primary view gains the same
+   four seat-class cuts off its OWN bank (PH_HIST.fed.classes, counted by
+   aec-primary-history.py; test-primary-history.mjs pins the figures) -
+   classBank switches PH_CLASSES/FED_CLASSES by mode, classKey resolves
+   over it, a class pick the mode's bank holds survives the View: flip,
+   and only a stale pick (badClass) still snaps to "fed" */
 assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
-    && ap.includes('const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;')
+    && ap.includes('const PH_CLASSES = (PH_HIST && PH_HIST.fed && PH_HIST.fed.classes) || {};')
+    && ap.includes('const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : FED_CLASSES;')
+    && ap.includes('const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;')
     && ap.includes('"fedcl:" + k'),
-  "the fedcl:<class> view ids resolve FH.fed.classes beside fed.states (FED_CLASSES, classKey, the menu's fedcl options)");
+  "the fedcl:<class> view ids resolve over the current mode's class bank (PH_CLASSES in primary, FED_CLASSES in flows; classKey, the menu's fedcl options)");
+assert.ok(ap.includes('...(house === "sen" ? [] : Object.keys(PH_CLASSES).map((k) => "fedcl:" + k))]')
+    && ap.includes('if (primMode && (badClass || lcView || !fedView)) setView("fed");')
+    && ap.includes('const badClass = view.startsWith("fedcl:") && !classKey;'),
+  "the primary view lists its own four seat-class cuts (never under Upper, whose bank has none) and only a class its bank doesn't hold snaps to federal");
+assert.ok(ap.includes('function ExplainedPrimaryChart({ house, stateKey, classKey, menu })')
+    && ap.includes('(classKey && house !== "sen" && ((PH.fed.classes || {})[classKey]))'),
+  "ExplainedPrimaryChart draws a class cut when one is picked (the Senate bank holds no classes)");
 assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"'),
   "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
 /* 2026-10-23 (user, quoting the shipped layout: "View: / Preference
@@ -409,8 +426,8 @@ assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{primMode ? null : share}</>
     && ap.includes('<span className="ex-fl-flips">{houseCtl}{primMode ? null : share}</span>')
     && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
   "View: out of the tab row and the phone head - House: and Share: keep both spots alone");
-assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-end;'),
-  "the View row's own right-aligned rule ships in rd.css");
+assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start;'),
+  "the View row's own left-aligned rule ships in rd.css (user 2026-10-23: 'make View: Primary votes ⇄ left-aligned')");
 /* 2026-10-23 (user: "y axis max should be 55, biggest recorded primary
    vote + however much to get to the nearest 5"): the primary view
    replaces the shared frame's 0-100 with its own axis, topped at the

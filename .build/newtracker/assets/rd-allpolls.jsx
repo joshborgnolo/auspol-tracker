@@ -6185,17 +6185,22 @@ const EX_PAIRS = [{ id: "co", label: "Labor v Coalition", short: "v Coalition" }
    SA, no Lambie outside Tas Senate). A null splits a line into runs, so
    a family's absence reads as a hole; a run of one election draws as its
    lone end dot (no zero-width-domain NaN). No flows' pair tabs, no Share
-   flip, no class/est layers: the elections menu and the House: flip pick
-   which bank, and both carry the national span so most picks survive the
-   flip (a state pick does too - both banks hold the same eight). "State
+   flip, no est layers: the elections menu and the House: flip pick which
+   bank, and both carry the national span so most picks survive the flip
+   (a state pick does too - both banks hold the same eight). The class
+   picks (user 2026-10-23 - "Federal, provincial" beside the flows card's
+   own class views) are House-election cuts by the AEC's per-division
+   classifications: divisions do not exist in the Senate, so the Upper
+   bank carries no class views and the menu hides them there. "State
    elections" is a flows-view section only (the data is all federal). */
-function ExplainedPrimaryChart({ house, stateKey, menu }) {
+function ExplainedPrimaryChart({ house, stateKey, classKey, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const PH = window.AUSPOL.primaryHistory || null;
   if (!PH || !PH.fed) return null;
   const bank = house === "sen" ? PH.fed.sen : PH.fed;
   if (!bank) return null;
-  const S = (stateKey && (bank.states || {})[stateKey]) || bank;
+  const S = (classKey && house !== "sen" && ((PH.fed.classes || {})[classKey]))
+    || (stateKey && (bank.states || {})[stateKey]) || bank;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   const foldPt = PH.foldPt || 4;
@@ -6229,7 +6234,9 @@ function ExplainedPrimaryChart({ house, stateKey, menu }) {
   const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (stateKey
+  const cap = (classKey && house !== "sen"
+    ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions."
+    : stateKey
     ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)."
     : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).")
     + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero."
@@ -6251,7 +6258,7 @@ function ExplainedPrimaryChart({ house, stateKey, menu }) {
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-prim-" + (house || "rep") + (stateKey || "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-prim-" + (house || "rep") + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         yDomain={[0, yMax]}
         yTicks={YT}
@@ -6316,7 +6323,6 @@ function RdExplained() {
   const lcView = view === "nswlc" && !!LC_BANK;
   const jur = fedView ? "fed" : lcView ? "nsw" : (FH[view] ? view : "fed");
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
-  const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
   /* the House: control (user 2026-10-22): "rep" reads the House banks,
      "sen" FH.fed.sen - the Senate's above-the-line flows, counted from the
      AEC's ballot-level files. The federal menu section stays live under
@@ -6338,17 +6344,26 @@ function RdExplained() {
      preference vote shares (window.AUSPOL.primaryHistory, validated, and
      null on a missing file - then this control never renders). In primary
      mode the pair tabs and Share: flip set aside (flows-only), the
-     elections menu loses its House-only sections (classes, nswlc, Labor-v-
-     One-Nation senate banks), and the House: flip picks which first-
-     preference bank (the national House or the Senate's ATL ballots). A
-     state pick survives - the primary data holds no classes and no per-
-     ballot records, but both national banks carry the same eight states.
-     The flows-mode state whose only data comes from a flow count (a class
-     pick, nswlc) drops to "fed" on the way in, and the flip is not a
-     return trip - flows restores its own defaults */
+     elections menu loses its flow-only sections (nswlc, the state
+     elections), and the House: flip picks which first-preference bank
+     (the national House or the Senate's ATL ballots). The class cuts
+     ride the primary menu too (user 2026-10-23: "add federal
+     demographic rating breakdowns to primary vote view") - the primary
+     bank's fed.classes counts the same per-division record as the flow
+     classes, a House feature on both sides: no division exists in the
+     Senate, so the Upper pick resolves no class */
   const PH_HIST = window.AUSPOL.primaryHistory || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
+  /* the class bank is figure-specific: the flows classes count ballots
+     through their final pair, the primary classes (PH_CLASSES) count
+     first preferences - both grouped by the election's own AEC division
+     classifications, both House-only. Upper resolves no class: a class
+     pick there reads badClass and the primary snap walks it to "fed" */
+  const PH_CLASSES = (PH_HIST && PH_HIST.fed && PH_HIST.fed.classes) || {};
+  const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : FED_CLASSES;
+  const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
+  const badClass = view.startsWith("fedcl:") && !classKey;
   const setFlowsFig = () => setFig((m) => (m === "flows" ? "primary" : "flows"));
   /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation. The One Nation card differs by
@@ -6368,7 +6383,11 @@ function RdExplained() {
   const flipHouse = () => {
     const next = house === "sen" ? "rep" : "sen";
     setHouse(next);
-    if (primMode) return;  /* both primary banks carry the same fed/fed:<key> picks - no snap */
+    /* both primary national banks carry the same fed/fed:<key> picks, and a
+       class pick needs no direct snap: the Upper bank has no classes, so
+       classKey reads null on the next render and the primary snap effect
+       below walks the stale pick to "fed" */
+    if (primMode) return;
     if (next === "sen") {
       if (view === "nsw" && LC_BANK) setView("nswlc");
       else if (classKey || !fedView || (pair === "on" && stateKey && !hasOnCells(stateKey))) setView("fed");
@@ -6515,9 +6534,10 @@ function RdExplained() {
      LC_ON_BANK, 2026-10-23). The One Nation tab's Upper view swaps the
      federal bank for senOn's but keeps the Council. In primary mode only
      the federal section renders: the data is all federal vote shares, no
-     classes or state elections */
+     state elections - but its classes ride beside its states */
   const VIEW_OPTS = primMode
-    ? ["fed", ...Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {}).map((k) => "fed:" + k)]
+    ? ["fed", ...Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {}).map((k) => "fed:" + k),
+       ...(house === "sen" ? [] : Object.keys(PH_CLASSES).map((k) => "fedcl:" + k))]
     : house === "sen"
     ? (pair === "on"
       ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])]
@@ -6526,15 +6546,17 @@ function RdExplained() {
       ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...classKeys.map((k) => "fedcl:" + k),
          ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
       : []);
-  /* entering the primary view snaps away the flows-only picks - a seat
-     class, the NSW Legislative Council, a state-election jurisdiction -
-     none of which the first-preference data holds (a fed:<key> pick
-     survives: both banks carry the same eight states). One direction, not
-     a round trip - going back to flows restores nothing, the flows
-     defaults stand */
+  /* entering the primary view snaps away the flows-only picks - the NSW
+     Legislative Council, a state-election jurisdiction - which the first-
+     preference data never holds (a fed:<key> pick survives, and a seat
+     class survives too: the primary bank counts its own). badClass covers
+     the one stale case - a class pick whose class the current mode's bank
+     has no cut for (the Senate primary bank, or a missing data file).
+     One direction, not a round trip - going back to flows restores
+     nothing, the flows defaults stand */
   React.useEffect(() => {
-    if (primMode && (classKey || lcView || !fedView)) setView("fed");
-  }, [primMode, classKey, lcView, fedView]);
+    if (primMode && (badClass || lcView || !fedView)) setView("fed");
+  }, [primMode, badClass, lcView, fedView]);
   /* Labor v One Nation's Lower view carries no menu (its counts are the
      measured contests alone) - every other view's menu shows the banks */
   const menuShow = primMode ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false
@@ -6545,12 +6567,12 @@ function RdExplained() {
     : house === "sen" ? (pair === "on" ? ON_SEN_STATES : SEN_STATES) : FED_STATES;
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
-            value={lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" && !primMode ? "fedcl:" + classKey : jur}
+            value={lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
             onChange={(e) => setView(e.target.value)}>
       <optgroup label="Federal elections">
         <option value="fed">Federal, national</option>
         {menuKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (menuBank[k].short || menuBank[k].label)}</option>)}
-        {!primMode && house !== "sen" && classKeys.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)}</option>)}
+        {(primMode ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}
       </optgroup>
       {!primMode && house !== "sen" && KEYS.length > 1 && (
         <optgroup label="State elections">
@@ -6644,9 +6666,9 @@ function RdExplained() {
               OWN One Nation cut, not the Senate's national view. In primary
               mode none of the flows' contest branches renders - one figure
               takes the card, the elections menu and House: flip still in
-              its head, and the cht classKey that only a flow-count holds
-              drops to "fed" through the guard below */}
-          {primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} menu={headCtls} />
+              its head; the classKey rides the primary bank's own classes
+              (a state-election pick still drops to "fed" on the way in) */}
+          {primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />
             : pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />

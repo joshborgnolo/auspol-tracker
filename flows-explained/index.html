@@ -6083,7 +6083,7 @@ body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
 body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
-body.rd .ex-fl-viewrow { display: flex; justify-content: flex-end; margin: 10px 0 0; }
+body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
 body.rd .ex-fl-adj { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); }
 body.rd .ex-fl-adj::before { content: ""; position: absolute; inset: -12px -6px; }
 body.rd .ex-fl-adj-tk { position: relative; flex-shrink: 0; width: 26px; height: 16px; border-radius: 8px; background: var(--ink-faint); transition: background .15s ease; }
@@ -9330,6 +9330,63 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
             "uap": [null, null, null, 7.14, null, 6.16, null, null],
             "oth": [0.91, 4.22, 11.44, 10.1, 15.36, 9.46, 23.07, 13.46]
           }
+        }
+      },
+      "classes": {
+        "inner": {
+          "label": "Inner metropolitan",
+          "elections": "federal elections in inner metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "inner metro",
+          "alp": [41.5, 43.74, 41.33, 41.6, 45.85, 38.32, 35.74, 34.86, 35.04, 35.65, 38.35],
+          "lnp": [42.93, 37.93, 39.69, 42.26, 38.87, 41.82, 43.38, 40.41, 39.69, 31.72, 27.98],
+          "grn": [null, null, 6.69, 9.96, 10.75, 15.71, 12.78, 14.59, 15.09, 16.62, 16.5],
+          "onp": [null, 4.83, null, null, null, null, null, null, null, null, null],
+          "dem": [6.59, 5.81, 6.76, null, null, null, null, null, null, null, null],
+          "ind": [null, null, null, null, null, null, null, null, null, 6.59, 9.14],
+          "oth": [8.98, 7.7, 5.52, 6.18, 4.52, 4.14, 8.1, 10.14, 10.18, 9.43, 8.03]
+        },
+        "outer": {
+          "label": "Outer metropolitan",
+          "elections": "federal elections in outer metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "outer metro",
+          "alp": [41.69, 43.68, 41.33, 40.43, 46.28, 41.99, 36.74, 40.19, 38.68, 37.08, 39.18],
+          "lnp": [43.49, 37.73, 41.64, 46.25, 41.45, 41.49, 44.34, 40.44, 40.16, 34.36, 30.13],
+          "grn": [null, null, 4.27, 6.28, 6.46, 10.99, 7.09, 8.82, 8.99, 11.37, 11.84],
+          "onp": [null, 6.79, null, null, null, null, null, null, null, 4.82, 6.16],
+          "dem": [8.07, 5.92, 5.99, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, null, null, 5.78, null, null, 5.01, null],
+          "ind": [null, null, null, null, null, null, null, null, null, null, 4.87],
+          "oth": [6.75, 5.88, 6.77, 7.05, 5.81, 5.52, 6.04, 10.55, 12.17, 7.36, 7.82]
+        },
+        "provincial": {
+          "label": "Provincial",
+          "elections": "federal elections in provincial seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "provincial",
+          "alp": [41.81, 42.17, 38.19, 40.64, 46.36, 42.06, 35.86, 38.3, 34.49, 33.23, 35.19],
+          "lnp": [45.34, 36.73, 44.09, 45.19, 39.77, 41.78, 42.16, 40.21, 39.58, 35.49, 32.59],
+          "grn": [null, null, 4.49, 7.36, 7.52, 10.85, 7.05, 8.75, 8.84, 10.84, 11.21],
+          "onp": [null, 10.33, 5.05, null, null, null, null, null, 5.07, 6.62, 8.01],
+          "dem": [6.52, 4.22, 4.16, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, null, null, 7.42, null, 4.22, 4.41, null],
+          "ind": [null, null, null, null, null, null, null, null, null, 4.07, 5.07],
+          "oth": [6.33, 6.56, 4.02, 6.82, 6.36, 5.3, 7.51, 12.74, 7.81, 5.33, 7.93]
+        },
+        "rural": {
+          "label": "Rural",
+          "elections": "federal elections in rural seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "rural",
+          "alp": [32.19, 32.33, 30.65, 29.99, 36.18, 31.24, 26.19, 26.67, 24.37, 23.46, 24.41],
+          "lnp": [55.57, 43.91, 47.32, 51.87, 47.31, 48.6, 50.8, 46.6, 46.14, 42.02, 37.68],
+          "grn": [null, null, 4.11, 5.45, 6.36, 9.17, 6.64, 7.85, 7.62, 9.1, 8.41],
+          "onp": [null, 12.56, 6.96, null, null, null, null, null, 4.8, 6.82, 8.94],
+          "dem": [5.77, 4.14, null, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, null, null, 7.04, null, 4.13, 4.14, null],
+          "ind": [null, null, 6.16, 5.81, 5.51, 6.79, null, 5.34, 5.68, 7.02, 9.42],
+          "oth": [6.47, 7.06, 4.8, 6.87, 4.64, 4.19, 9.33, 13.54, 7.25, 7.44, 11.14]
         }
       }
     }
@@ -144569,6 +144626,7 @@ const EX_PAIRS = [{
 function ExplainedPrimaryChart({
   house,
   stateKey,
+  classKey,
   menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
@@ -144576,7 +144634,7 @@ function ExplainedPrimaryChart({
   if (!PH || !PH.fed) return null;
   const bank = house === "sen" ? PH.fed.sen : PH.fed;
   if (!bank) return null;
-  const S = stateKey && (bank.states || {})[stateKey] || bank;
+  const S = classKey && house !== "sen" && (PH.fed.classes || {})[classKey] || stateKey && (bank.states || {})[stateKey] || bank;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   const foldPt = PH.foldPt || 4;
@@ -144615,7 +144673,7 @@ function ExplainedPrimaryChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
+  const cap = (classKey && house !== "sen" ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -144635,7 +144693,7 @@ function ExplainedPrimaryChart({
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-prim-" + (house || "rep") + (stateKey || "")
+    key: "ex-prim-" + (house || "rep") + (stateKey || "") + (classKey || "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     yDomain: [0, yMax],
@@ -144688,7 +144746,6 @@ function RdExplained() {
   const lcView = view === "nswlc" && !!LC_BANK;
   const jur = fedView ? "fed" : lcView ? "nsw" : FH[view] ? view : "fed";
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
-  const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
   const SEN_STATES = SEN_BANK && SEN_BANK.states || {};
   const [house, setHouse] = useState("rep");
   const onSenMode = house === "sen" && !!SEN_ON_BANK;
@@ -144696,6 +144753,10 @@ function RdExplained() {
   const PH_HIST = window.AUSPOL.primaryHistory || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
+  const PH_CLASSES = PH_HIST && PH_HIST.fed && PH_HIST.fed.classes || {};
+  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : FED_CLASSES;
+  const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
+  const badClass = view.startsWith("fedcl:") && !classKey;
   const setFlowsFig = () => setFig(m => m === "flows" ? "primary" : "flows");
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
@@ -144812,17 +144873,17 @@ function RdExplained() {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? [] : Object.keys(PH_CLASSES).map(k => "fedcl:" + k))] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
-    if (primMode && (classKey || lcView || !fedView)) setView("fed");
-  }, [primMode, classKey, lcView, fedView]);
+    if (primMode && (badClass || lcView || !fedView)) setView("fed");
+  }, [primMode, badClass, lcView, fedView]);
   const menuShow = primMode ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
   const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
   const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
-    value: lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" && !primMode ? "fedcl:" + classKey : jur,
+    value: lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
     onChange: e => setView(e.target.value)
   }, React.createElement("optgroup", {
     label: "Federal elections"
@@ -144831,10 +144892,10 @@ function RdExplained() {
   }, "Federal, national"), menuKeys.map(k => React.createElement("option", {
     key: k,
     value: "fed:" + k
-  }, "Federal, " + (menuBank[k].short || menuBank[k].label))), !primMode && house !== "sen" && classKeys.map(k => React.createElement("option", {
+  }, "Federal, " + (menuBank[k].short || menuBank[k].label))), (primMode ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
-  }, "Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)))), !primMode && house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
+  }, "Federal, " + (classBank[k].short || classBank[k].label)))), !primMode && house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
     label: "State elections"
   }, KEYS.filter(k => k !== "fed").map(k => React.createElement("option", {
     key: k,
@@ -144934,6 +144995,7 @@ function RdExplained() {
   }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, primMode ? null : share)), primMode ? React.createElement(ExplainedPrimaryChart, {
     house: house,
     stateKey: stateKey,
+    classKey: classKey,
     menu: headCtls
   }) : lcView && pair === "on" ? React.createElement(ExplainedFlowChart, {
     jur: "nsw",
