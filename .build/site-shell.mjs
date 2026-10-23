@@ -88,7 +88,7 @@ export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
-  { file: "LEF-performance/index.html" },                   // hand-maintained: bonham-lef-track-record.mjs written up
+  { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
   { file: "archives/newspoll/index.html", page: "archives" },
   { file: "archives/acnielsen/index.html", page: "archives" },

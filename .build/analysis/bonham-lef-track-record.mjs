@@ -37,7 +37,9 @@
    election's flow of the untracked rest - on party-level tables from
    bonham-party-flows.json (bonham-party-flows.py: AEC counts by party
    1996-2025, the pile-model estimate 1984-93). Only the second is his
-   test; the first is the site's.
+   test; the first is the site's. A third section reruns the site's tables
+   on the REAL final polls' primary votes (accuracy-panel scoring), the
+   comparand /lef-success/ quotes beside the 0.43.
 
    Run from the repo root: node .build/analysis/bonham-lef-track-record.mjs
    Exit code 1 if a re-derived error drifts from its committed bt, or a
@@ -45,7 +47,7 @@
 
 import { execSync } from "node:child_process";
 import fs from "node:fs";
-import { FLOW_ERAS } from "../newtracker/flows.mjs";
+import { FLOW_ERAS, FLOW_LEF, impliedLefAlp2pp } from "../newtracker/flows.mjs";
 
 const show = (p) => JSON.parse(execSync(`git show origin/main:${p}`, { maxBuffer: 1 << 28, encoding: "utf8" }));
 const D = show("data/polls.json");
@@ -287,6 +289,55 @@ bStat("last twelve as of 2025 (1993–2025)", bw(1993, 2025));
   const cya = BPF[2025].share["x:CYA"] ?? 0;
   const alt = r2(r25.err + cya * (r25.f.uap - r25.fOth));
   console.log(`  2025 sensitivity: Trumpet of Patriots (${cya.toFixed(1)}%) read at the UAP's 2022 flow (${(r25.f.uap * 100).toFixed(1)}) instead of Others (${(r25.fOth * 100).toFixed(1)}) moves 2025 from ${f2(r25.err)} to ${f2(alt)}.`);
+}
+
+/* ---- the real pollsters' primaries through the same tables -------------- */
+/* The article's imaginary pollster gets every primary exactly right, so its
+   misses are the flow drift's alone. The comparand the page quotes beside
+   it: the REAL final polls' primary votes, put through the same last-
+   election-flows engine, scored the site's accuracy-panel way (one final
+   poll per house within fourteen days of the election, house means equally
+   weighted, implied basis = primaries through the opening election's
+   FLOW_LEF table). Mirrors accuracyCycles in gen-data.mjs — the window,
+   the canon map and impliedLefAlp2pp all duplicate it, and drift between
+   the two should make you re-read this comment, not "fix" one side. */
+const ACC_WIN = 14; // gen-data.mjs ACC_WINDOW_DAYS
+const RENAME = { Morgan: "Roy Morgan", "Newspoll-YouGov": "Newspoll", "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater", "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre" }; // gen-data.mjs ACC_CANON
+{
+  const tables = Object.keys(FLOW_LEF).map(Number).sort((a, b) => a - b);
+  const closings = [...tables, 2025]; // each table is tested at the next election
+  const crow = [];
+  for (let i = 1; i < closings.length; i++) {
+    const cy = closings[i], oy = closings[i - 1];
+    const e = E[cy], t = FLOW_LEF[oy];
+    if (!t) continue; // 1987: no 1984 table committed
+    const eMs = new Date(e.date).getTime();
+    const win = (D.cyclePolls[cy] || []).filter((p) => {
+      if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
+      if (p.tpp_alp == null) return false;
+      if (p.dateApprox) return false;
+      const d = (eMs - new Date(p.date).getTime()) / 86400000;
+      return d >= 0 && d <= ACC_WIN;
+    });
+    const byHouse = new Map();
+    for (const p of [...win].sort((a, b) => a.date.localeCompare(b.date)))
+      byHouse.set(RENAME[p.firm] || p.firm, p);
+    const imps = [...byHouse.values()].map((p) => {
+      const imp = impliedLefAlp2pp(t, p);
+      return imp == null ? null : { firm: RENAME[p.firm] || p.firm, err: imp - e.tpp_alp };
+    }).filter(Boolean);
+    if (!imps.length) continue;
+    const err = mean(imps.map((h) => h.err));
+    crow.push({ cy, n: imps.length, houses: imps, err, abs: Math.abs(err) });
+  }
+  console.log("\nREAL FINAL POLLS' PRIMARIES through the same last-election-flows tables (accuracy-panel scoring: one poll per house ≤14 days out, house means equally weighted, implied basis)");
+  console.log("closing | houses | implied miss (house mean, ALP pts) | per-house misses");
+  for (const c of crow)
+    console.log(`${c.cy}   | ${String(c.n).padStart(6)} | ${f2(r2(c.err)).padStart(6)} | ${c.houses.map((h) => `${h.firm} ${f2(r2(h.err))}`).join(", ")}`);
+  const overall = mae(crow.map((c) => c.err));
+  console.log(`mean |miss| across the ${crow.length} scoreable closings (${crow[0].cy}–${crow[crow.length - 1].cy}): ${overall.toFixed(2)} ALP points — vs ${r2(mae(inWindow(crow[0].cy, 2025).map(errOf))).toFixed(2)} for the imaginary exact-primary pollster over the same elections`);
+  console.log(`signed mean miss: ${f2(r2(mean(crow.map((c) => c.err))))} (the flow assumption's own signed mean over the same closings is ${f2(r2(mean(inWindow(crow[0].cy, 2025).map(errOf))))})`);
+  console.log("  1987 has no score (no committed 1984 flow table) and 1990 none either (the committed finals carry no published 2PP, so they fall the accuracy panel's tpp_alp gate even though their primaries are on file); the poll rows here are the committed cyclePolls, same sets the accuracy panel reads.");
 }
 
 /* ---- verification -------------------------------------------------------- */

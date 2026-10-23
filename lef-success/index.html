@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How last-election preferences have performed – auspol tracker</title>
+<!-- Standalone page, hand-maintained: the write-up of
+     .build/analysis/bonham-lef-track-record.mjs (Kevin Bonham's 2015
+     last-election-preferences track record, re-conducted through 2025).
+     Every figure here is that script's output as at 23 October 2026 —
+     its "Bonham's rule" run on .build/analysis/bonham-party-flows.json
+     (bonham-party-flows.py), plus its final-polls-primaries section
+     (the 1.10 comparison); if either changes, re-sync this page by hand.
+     Styles: the feedback page's article column (fonts, palette, base), plus
+     the lp-* table rules. Shell (header/footer) filled by
+     node .build/site-shell.mjs. Unlisted: no page links here yet. -->
+<meta name="description" content="If a pollster had known every party's vote exactly and used the last election's preference flows, how close would its two-party figure have been? Kevin Bonham's 2015 test, re-run on the AEC's counts for every election from 1987 to 2025.">
+<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="How last-election preferences have performed – auspol tracker">
+<meta property="og:description" content="Kevin Bonham's 2015 test of last-election preference flows, re-run on the AEC's counts for every election from 1987 to 2025.">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://auspoltracker.com/lef-success/">
+<link rel="icon" href="/assets/favicon.svg">
+<style>
+/* ------- fonts: the two cuts the static article runs ------- */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------- palette: the editorial surfaces the live site runs in ------- */
+:root {
+  --bg:        oklch(0.975 0.009 80);
+  --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
+  --ink-3:     oklch(0.52 0.010 58);
+  --ink-faint: oklch(0.70 0.008 65);
+  --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
+  --accent:    oklch(0.50 0.070 205);
+  --mood-neg:  oklch(0.505 0.092 36);
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.sh-light) {
+    --bg:        oklch(0.205 0.010 65);
+    --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
+    --ink-3:     oklch(0.670 0.009 72);
+    --ink-faint: oklch(0.545 0.009 68);
+    --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
+    --accent:    oklch(0.70 0.080 205);
+    --mood-neg:  oklch(0.685 0.105 38);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ------- page frame: the shell's own frame, so the head lines up with
+   the masthead the way the main build's menu pages do (not the archives'
+   692px .frame-wrap column, whose 30px-regular heads are the archives') */
+.lp-page {
+  flex: 1; box-sizing: border-box; width: 100%;
+  max-width: calc(var(--sh-maxw, 1152px) + 2 * var(--sh-gutter, 20px)); margin: 0 auto;
+  padding: 28px var(--sh-gutter, 20px) calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ------- the head: rd.css's section anatomy (.rd-eyebrow/.rd-title/
+   .rd-meta, then the finding as .rd-hed and its .rd-dek), values verbatim */
+.lp-eyebrow {
+  display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
+  border-top: 2px solid var(--ink); padding-top: 12px;
+  font-size: 13px; color: var(--ink-3);
+}
+.lp-title {
+  margin: 0; font-family: var(--sans);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+}
+.lp-meta { font-size: 13px; color: var(--ink-3); }
+.lp-hed {
+  margin: 16px 0 0; max-width: 1000px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 46px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: pretty;
+}
+.lp-dek { margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+@media (max-width: 640px) {
+  .lp-eyebrow { flex-direction: column; align-items: flex-start; padding-top: 10px; font-size: 12px; }
+  .lp-title { font-size: 19px; }
+  .lp-meta { font-size: 12px; }
+  .lp-hed { margin-top: 14px; font-size: 30px; line-height: 1.1; }
+  .lp-dek { margin-top: 8px; font-size: 15px; line-height: 1.4; }
+}
+
+/* ------- the article: template.html's preference-flows explainer rules
+   (.ex-*), ported verbatim so the two articles read as one family */
+.ex-body { max-width: 66ch; }
+.ex-body h2 {
+  margin: 44px 0 10px; padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  font-family: var(--sans); font-size: 22px; font-weight: 600;
+  line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+  scroll-margin-top: 56px;
+}
+.ex-body p { margin: 0 0 14px; font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-body p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: wrap; }
+.ex-body strong { color: var(--ink); font-weight: 600; }
+.ex-body p a, .ex-body li a, .ex-body td a, .ex-body caption a {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+.ex-body p a:hover, .ex-body li a:hover, .ex-body td a:hover, .ex-body caption a:hover,
+.ex-body p a:focus-visible, .ex-body li a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.ex-feats { list-style: none; margin: 2px 0 14px; padding: 0; }
+.ex-feats li { padding: 10px 0; border-top: 1px solid var(--line-2); font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-feats li:first-child { border-top: 0; }
+.ex-feats strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.ex-twrap { overflow-x: auto; margin: 8px 0 10px; }
+.ex-table { width: 100%; min-width: 520px; border-collapse: collapse; }
+.ex-table caption { text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); padding: 0 0 8px; caption-side: top; }
+.ex-table th, .ex-table td { padding: 6px 8px; border-bottom: 1px solid var(--line-2); font-variant-numeric: tabular-nums; }
+.ex-table thead th {
+  font-size: 13px; font-weight: 600; color: var(--ink-3); text-align: right;
+  border-bottom: 1px solid var(--line); white-space: nowrap; letter-spacing: 0.02em;
+}
+.ex-table td { font-size: 13.5px; text-align: right; white-space: nowrap; }
+.ex-table .ex-l { text-align: left; }
+.ex-table td.ex-sum { font-weight: 600; color: var(--ink); }
+.ex-tnote { margin: 0 0 14px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.ex-src { margin: 8px 0 0; padding: 0 0 0 18px; list-style: disc; }
+.ex-src li { margin: 0 0 5px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.ex-body .ex-src a {
+  color: var(--ink-2); border-bottom: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklch, var(--ink-2) 45%, transparent);
+}
+.ex-body .ex-src a:hover, .ex-body .ex-src a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
+@media (max-width: 640px) {
+  .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
+}
+
+/* ------- this page's own: the results table's flows column wraps on a
+   wide screen and stays one line where it sits past the scroll edge;
+   an estimated row's election carries the footnote's asterisk */
+.ex-table td.lp-w { white-space: normal; min-width: 150px; }
+/* eight columns don't fit the 66ch prose column: the table runs on to the
+   right (the dek's measure) where the screen has room, and scrolls in its
+   wrapper only where it doesn't */
+.ex-body .lp-wide { width: min(760px, calc(100vw - 2 * var(--sh-gutter, 20px))); }
+.ex-table tr.lp-est td:first-child::after { content: "*"; color: var(--ink-3); }
+@media (max-width: 560px) { .ex-table td.lp-w { white-space: nowrap; } }
+.ex-body code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; }
+</style>
+<!--shell:head-->
+<link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site-shell.css?v=ae54365062">
+<script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
+<style>
+/* this page's dark-mode rules, for a reader who chose dark on a light device */
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --mood-neg: oklch(0.685 0.105 38); }
+</style>
+<!--/shell:head-->
+</head>
+<body>
+<!--shell:header-->
+<a class="sh-skip" href="#sh-content">Skip to content</a>
+<div class="sh-frame sh-top">
+  <header class="sh-head">
+    <div class="sh-brand">
+    <div class="sh-lockup">
+      <a class="wordmark stacked" href="/" title="The interactive tracker">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <span class="wm-sr">– Australian federal polling</span>
+      </a>
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-label="Wind the dial back through the term" aria-describedby="wm-action">
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian federal election, and for all since <span class="sh-past">1943</span>.</p>
+    <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>Latest poll</b> <span class="sh-latest"></span>, <span class="sh-rel"></span>, <span class="sh-npolls"></span> polls</span></p>
+    </div>
+    <div class="sh-right">
+    <div class="sh-meta" hidden>
+      <div class="sh-meta-item"><span class="sh-meta-k">Latest poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-latest"></span></span><span class="sh-meta-s">published <span class="sh-rel"></span></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">This term</span><span class="sh-meta-v sh-tracked"></span><span class="sh-meta-s sh-houses"></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span><span class="sh-meta-s sh-duein"></span></div>
+    </div>
+    <div class="sh-theme" role="group" aria-label="Colour theme">
+      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg></button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg></button>
+    </div>
+    </div>
+  </header>
+</div>
+<div class="sh-tabs-sentinel" aria-hidden="true"></div>
+<nav class="sh-tabs" aria-label="Site">
+  <div class="sh-frame">
+    <div class="sh-tabs-inner">
+      <div class="sh-tabs-set">
+        <a class="sh-tab" href="/">Now</a>
+        <a class="sh-tab" href="/cycles/"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
+        <a class="sh-tab" href="/allpolls/">All polls</a>
+        <a class="sh-tab sh-tab-pinhide" href="/info/">Info</a>
+        <button type="button" class="sh-tab sh-menu-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span><svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg><span class="sh-menu-lab">More</span><svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></button>
+      </div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
+      <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to Now"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+    </div>
+  </div>
+  <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
+</nav>
+<!--/shell:header-->
+<main id="sh-content" class="lp-page">
+  <header>
+    <div class="lp-eyebrow">
+      <h1 class="lp-title">How last-election preferences have performed</h1>
+      <span class="lp-meta">Kevin Bonham&#8217;s 2015 test, re-run on every election from 1987 to 2025</span>
+    </div>
+    <p class="lp-hed">Last-election flows have missed the two-party vote by less than half a point on average</p>
+    <p class="lp-dek">Most two-party figures, including this site&#8217;s, assume each party&#8217;s preferences will flow the way they did at the last election. Across 14 elections that assumption missed by 0.43 points on average (the final polls&#8217; own primary votes missed by 1.10 through the same tables, for comparison), and by a third of a point or less eight times. The big misses were 2013 and 2022, when Labor did about a point better, and 2019, when the Coalition did 0.8 better. The misses don&#8217;t lean one way.</p>
+  </header>
+
+  <div class="ex-body">
+  <h2>The test</h2>
+  <p>In <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">&#8220;Wonk Central: The Track Record Of Last-Election Preferences&#8221;</a> (September 2015, with updates for 2016, 2019 and 2022), Bonham imagined a pollster that gets every party&#8217;s first-preference vote exactly right, then estimates the two-party vote using the previous election&#8217;s preference flows. The gap between that estimate and the actual two-party result measures only how much preference flows changed between elections. Nothing else can go wrong.</p>
+  <p>His rule for which parties the pollster tracks:</p>
+  <ul class="ex-feats">
+    <li>Labor and the Coalition, plus every minor party that won at least 4% of the vote at the previous election. Each is read at its own flow from that election.</li>
+    <li>Everyone else, including a party standing for the first time, is &#8220;Others&#8221;: read at the previous election&#8217;s combined flow for all the minor parties and independents that weren&#8217;t tracked.</li>
+    <li>One exception: the Democrats stay tracked for 1996, though they won only 3.75% in 1993.</li>
+  </ul>
+  <p>So One Nation, new in 1998, was read as Others that year and tracked from 2001. The Greens were Others until 2004, the first election after they passed 4%.</p>
+
+  <h2>Method, step by step</h2>
+  <ol class="ex-feats">
+    <li><strong>Each election&#8217;s flows</strong>For every party, the share of its voters whose preferences ended with Labor rather than the Coalition. For Others, that share across all the untracked ballots combined.</li>
+    <li><strong>The table&#8217;s own correction</strong>Applying an election&#8217;s flows to its own first preferences doesn&#8217;t quite reproduce its official two-party result. Seats where the final two weren&#8217;t Labor and the Coalition, and Liberal-National contests, leave a small gap (under half a point, and 0.15 or less since 2004). The gap is carried forward as a fixed adjustment, the same way the AEC-based tables on the rest of the site do.</li>
+    <li><strong>The next election</strong>The flows plus the adjustment are applied to the next election&#8217;s actual first preferences, giving the two-party vote last-election flows implied.</li>
+    <li><strong>The miss</strong>That figure minus the official two-party result, in points of Labor&#8217;s two-party vote. A negative miss means Labor did better than its last-election flows implied.</li>
+  </ol>
+
+  <h2>Results</h2>
+  <div class="ex-twrap lp-wide">
+    <table class="ex-table">
+      <caption>Labor&#8217;s two-party vote, %. Flows are the share of each group&#8217;s ballots that ended with Labor.</caption>
+      <thead>
+        <tr><th class="ex-l" scope="col">Election</th><th scope="col">Implied</th><th scope="col">Actual</th><th scope="col">Miss</th><th scope="col">Bonham&#8217;s</th><th scope="col">Flows from</th><th class="ex-l lp-w" scope="col">Tracked parties&#8217; flows</th><th scope="col">Others&#8217; flow</th></tr>
+      </thead>
+      <tbody>
+        <tr class="lp-est"><td class="ex-l">1987</td><td>50.48</td><td>50.8</td><td class="ex-sum">−0.32</td><td>–</td><td>1984</td><td class="ex-l lp-w">Democrats 51.7</td><td>51.9</td></tr>
+        <tr class="lp-est"><td class="ex-l">1990</td><td>49.22</td><td>49.9</td><td class="ex-sum">−0.68</td><td>−1.1</td><td>1987</td><td class="ex-l lp-w">Democrats 57.0</td><td>49.9</td></tr>
+        <tr class="lp-est"><td class="ex-l">1993</td><td>51.42</td><td>51.4</td><td class="ex-sum">+0.02</td><td>–</td><td>1990</td><td class="ex-l lp-w">Democrats 61.9</td><td>56.8</td></tr>
+        <tr class="lp-est"><td class="ex-l">1996</td><td>47.03</td><td>46.37</td><td class="ex-sum">+0.66</td><td>–</td><td>1993</td><td class="ex-l lp-w">Democrats 56.3</td><td>57.8</td></tr>
+        <tr><td class="ex-l">1998</td><td>51.24</td><td>50.98</td><td class="ex-sum">+0.26</td><td>–</td><td>1996</td><td class="ex-l lp-w">Democrats 54.0</td><td>54.9</td></tr>
+        <tr><td class="ex-l">2001</td><td>48.56</td><td>49.05</td><td class="ex-sum">−0.49</td><td>–</td><td>1998</td><td class="ex-l lp-w">Democrats 56.7, One Nation 46.3</td><td>61.4</td></tr>
+        <tr><td class="ex-l">2004</td><td>47.16</td><td>47.26</td><td class="ex-sum">−0.10</td><td>–</td><td>2001</td><td class="ex-l lp-w">Democrats 64.1, Greens 74.8, One Nation 44.1</td><td>44.5</td></tr>
+        <tr><td class="ex-l">2007</td><td>52.72</td><td>52.70</td><td class="ex-sum">+0.02</td><td>–</td><td>2004</td><td class="ex-l lp-w">Greens 80.8</td><td>44.2</td></tr>
+        <tr><td class="ex-l">2010</td><td>50.43</td><td>50.12</td><td class="ex-sum">+0.31</td><td>–</td><td>2007</td><td class="ex-l lp-w">Greens 79.7</td><td>44.6</td></tr>
+        <tr><td class="ex-l">2013</td><td>45.47</td><td>46.51</td><td class="ex-sum">−1.04</td><td>−1.0</td><td>2010</td><td class="ex-l lp-w">Greens 78.8</td><td>41.7</td></tr>
+        <tr><td class="ex-l">2016</td><td>49.47</td><td>49.64</td><td class="ex-sum">−0.17</td><td>−0.17</td><td>2013</td><td class="ex-l lp-w">Greens 83.0, Palmer United 46.3</td><td>47.0</td></tr>
+        <tr><td class="ex-l">2019</td><td>49.29</td><td>48.47</td><td class="ex-sum">+0.82</td><td>+0.81</td><td>2016</td><td class="ex-l lp-w">Greens 81.9</td><td>49.2</td></tr>
+        <tr><td class="ex-l">2022</td><td>51.26</td><td>52.13</td><td class="ex-sum">−0.87</td><td>−0.99</td><td>2019</td><td class="ex-l lp-w">Greens 82.2</td><td>43.7</td></tr>
+        <tr><td class="ex-l">2025</td><td>55.54</td><td>55.22</td><td class="ex-sum">+0.32</td><td>–</td><td>2022</td><td class="ex-l lp-w">Greens 85.7, One Nation 35.7, UAP 38.1</td><td>54.7</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="ex-tnote">* Flows estimated from the counts, not counted by party (see below). Implied: the two-party vote last-election flows gave; Actual: the official result; Miss: implied minus actual. Bonham&#8217;s: the miss he published, where he published one, with his sign converted to match. On a phone, the flows themselves are to the right of the table.</p>
+  <p>The average miss was 0.43 points across all 14 elections and 0.42 across the last twelve (1993&#8211;2025). Bonham reported 0.3 for his last twelve, 1983&#8211;2013; on the elections from 1987 to 2013 this re-run averages 0.39. Minor parties now take a third of the vote, so the same flow shifts would move the two-party figure further today. At 2025&#8217;s level of minor-party voting, the average miss would have been about 0.76 points.</p>
+  <p>No real pollster gets first preferences exactly. Put the final polls&#8217; own published primaries through the same last-election tables &#8212; one poll per house, scored the way the main site&#8217;s accuracy panel scores them &#8212; and the twelve elections since 1993 miss by an average of 1.10 points. The imaginary exact-primary pollster misses 0.44 over the same twelve, so the flow assumption is the smaller part of a real poll&#8217;s miss.</p>
+
+  <h2>Where the numbers come from</h2>
+  <p>Every input is a published count, or an estimate built from one:</p>
+  <ul class="ex-feats">
+    <li><strong>2004&#8211;2025</strong>the AEC&#8217;s &#8220;two party preferred flow of preferences by state by party&#8221; for each election, from the <a href="https://results.aec.gov.au/">AEC Tally Room</a> downloads. These are counted flows for every party in every seat. First preferences and the official two-party vote come from the same file.</li>
+    <li><strong>1996&#8211;2001</strong>the AEC&#8217;s <a href="https://www.aec.gov.au/About_AEC/Publications/statistics/">official election statistics</a> packs: two-candidate preferred flows by party for every division. These are counted flows, but only for the seats where Labor and the Coalition were the final two (about nine seats in ten), because only those say where ballots ended between the two. First preferences come from the packs&#8217; candidate table, and the two-party vote from their national summary.</li>
+    <li><strong>1984&#8211;1993</strong>the AEC published no flows by party for these elections, only each seat&#8217;s count, exclusion by exclusion (1984&#8211;90 transcribed by <a href="http://psephos.adam-carr.net/countries/a/australia/">Adam Carr&#8217;s Psephos</a> from the AEC&#8217;s printed volumes; 1993 from the statistics pack). A count records where an excluded candidate&#8217;s whole pile went, including votes it had picked up from earlier exclusions. This site&#8217;s preference estimator works out how much of each pile was the candidate&#8217;s own voters, and so each party&#8217;s own flow. It is the same model behind this site&#8217;s state-election flows. Labor&#8217;s and the Coalition&#8217;s first preferences and the two-party results are the AEC&#8217;s national figures. The split of the rest between the Democrats, Greens and others comes from the seat counts.</li>
+    <li><strong>1983 and earlier</strong>left out. Counts then stopped as soon as a candidate passed half the vote, so most seats never reached a final two.</li>
+  </ul>
+
+  <h2>How much to trust it</h2>
+  <ul class="ex-feats">
+    <li><strong>The 1984&#8211;93 flows are estimates</strong>The model was checked on 1996&#8211;2001, where the AEC did count the Democrats by party. It put their flow to Labor 1.1 to 4.4 points too low (3.1 on average). Because the table&#8217;s own correction absorbs most of that, the effect on each miss is small: at most about 0.2 points (1990 and 1993).</li>
+    <li><strong>1996&#8211;2001 are counted, but over classic seats only</strong>The tenth of seats left out had other final pairs. The table&#8217;s correction covers the gap that leaves.</li>
+    <li><strong>One judgement call matters for 2025</strong>The UAP (4.1% in 2022) would be tracked, but it didn&#8217;t stand in 2025. Clive Palmer&#8217;s 2025 party was Trumpet of Patriots, a different registered party, so the strict rule reads its 1.9% as Others (54.7% to Labor). Reading it at the UAP&#8217;s 2022 flow instead (38.1%) moves the 2025 miss from +0.32 to 0.00.</li>
+    <li><strong>The pollster is imaginary</strong>Real polls get first preferences wrong too. This test isolates the preference assumption only; the real final polls&#8217; primaries are priced separately, in Results above (1.10 points on average since 1993).</li>
+  </ul>
+
+  <h2>Where it differs from Bonham&#8217;s figures</h2>
+  <p>For 2013, 2016 and 2019 the re-run matches his published misses to within 0.05 points. Two elections differ:</p>
+  <ul class="ex-feats">
+    <li><strong>1990</strong>&#8722;0.68 here against his &#8722;1.1. Both say Labor beat its 1987 flows, which he puts down to its courting of Greens preferences. The gap is at least partly the estimated Democrat flow for 1987 (see above). His 1987 flows were his own estimates from the same seat counts, so the rest of the gap is two different estimates of the same thing.</li>
+    <li><strong>2022</strong>&#8722;0.87 here against his &#8722;0.99. Under the 4% rule, One Nation (3.1%) and the UAP (3.4%) count as Others in 2019. His 2022 update names their flows separately, which suggests he tracked them. Reading both at their own 2019 flows gives &#8722;0.95 here, within 0.04 of his figure.</li>
+  </ul>
+  <p>The re-run doesn&#8217;t cover his elections before 1987. This site has flow tables for 1943&#8211;84, but their constants were fitted across whole decades of elections at once. Testing them on those same elections would flatter them.</p>
+
+  <h2>This site&#8217;s own tables</h2>
+  <p>The two-party figures on the rest of the site group voters differently: Greens, One Nation, and everyone else. That&#8217;s because those are the groups polls report. For 1987&#8211;93 they use one combined flow for all minor parties. Run through the same test, those tables average 0.42 points from 1990 to 2025, much the same as Bonham&#8217;s rule. Individual elections differ more: 1990 is &#8722;0.13 and 2025 is &#8722;0.39. So how voters are grouped matters at a given election, but the long-run record doesn&#8217;t depend on it.</p>
+
+  <h2>Does asking voters do better?</h2>
+  <p>Bonham argued that matching this record by asking respondents where their preferences would go would take a sample of about 15,000 minor-party voters per election. He didn&#8217;t show the working. A simple calculation from sampling error alone gives a much smaller number: about 400 minor-party voters at 2013&#8217;s level of minor-party voting, and about 950 at today&#8217;s. A 3,000-person poll now holds around 1,000. So sample size alone doesn&#8217;t rule respondent preferences out. The case against them is that respondents&#8217; answers have missed how they actually voted. In 2004 the major pollsters expected 69&#8211;74% of minor-party preferences to reach Labor; 61% did.</p>
+
+  <h2>Reproduce it</h2>
+  <p>The code and its inputs are in the site&#8217;s public repository:</p>
+  <ul class="ex-src">
+    <li><a href="https://github.com/joshborgnolo/auspol-tracker/blob/main/.build/analysis/bonham-party-flows.py"><code>bonham-party-flows.py</code></a> builds the flow tables by party (<a href="https://github.com/joshborgnolo/auspol-tracker/blob/main/.build/analysis/bonham-party-flows.json"><code>bonham-party-flows.json</code></a>) from the cached AEC files in <a href="https://github.com/joshborgnolo/auspol-tracker/tree/main/.build/aec-flow-src"><code>.build/aec-flow-src/</code></a>, about three minutes for the model fit.</li>
+    <li><a href="https://github.com/joshborgnolo/auspol-tracker/blob/main/.build/analysis/bonham-lef-track-record.mjs"><code>bonham-lef-track-record.mjs</code></a> runs the test both ways (Bonham&#8217;s rule and the site&#8217;s groups), reruns the real final polls&#8217; primaries through the same tables, and prints every figure on this page.</li>
+  </ul>
+  <p class="ss-note">Figures as at 23 October 2026.</p>
+  </div>
+</main>
+<!--shell:footer-->
+<div class="sh-frame">
+  <footer class="sh-foot">
+    <div class="sh-colo">
+      <div class="sh-about" data-nosnippet>
+        <p class="sh-lede">auspol tracker is an unofficial aggregator of published federal opinion polling.</p>
+        <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
+      </div>
+      <div class="sh-ways">
+        <p class="sh-fb">How the figures are built is in <a href="/info/">Info</a>. Spot an error, a missing poll, or have any other feedback? Please <a class="sh-fb-link" href="/feedback/">let me know</a>.</p>
+        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/newspoll/">here</a> for safekeeping and convenience.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+<div class="sh-band" aria-hidden="true"></div>
+<script src="/assets/site-shell.js?v=ae54365062" defer></script>
+<!--/shell:footer-->
+</body>
+</html>
