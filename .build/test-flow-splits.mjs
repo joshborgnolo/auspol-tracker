@@ -352,7 +352,7 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
    emit), the menu's state-elections optgroup and the LC bank gate are now
    pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
    Nation sheds the Council only while its ON cut is absent */
-assert.ok(ap.includes('{twoMode ? <Explained2ppChart stateKey={stateKey} classKey={classKey} menu={headCtls} />')
+assert.ok(ap.includes('{twoMode ? <Explained2ppChart stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />')
     && ap.includes(': primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />')
     && ap.includes(': lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
     && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
@@ -463,10 +463,10 @@ assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
     && ap.indexOf('className="ex-fl-viewrow"') < ap.indexOf('className="ex-fl-tabs"')
     && ap.includes('{viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}'),
   "the View: switch rides its own row above the contest tabs");
-assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{figView ? null : share}</>}')
-    && ap.includes('<span className="ex-fl-flips">{houseCtl}{figView ? null : share}</span>')
+assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{shareSlot}</>}')
+    && ap.includes('<span className="ex-fl-flips">{houseCtl}{shareSlot}</span>')
     && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
-  "View: out of the tab row and the phone head - House: and Share: keep both spots alone");
+  "View: out of the tab row and the phone head - House: and the mode's Share: slot keep both spots alone");
 assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start;')
     && !cssRd.includes('.ex-view + .ex-view'),
   "the View row's own left-aligned rule ships in rd.css (user 2026-10-23: 'make View: Primary votes ⇄ left-aligned'; the sibling-spacing rule went with the 2026-10-24 merge to one button)");
@@ -498,7 +498,7 @@ assert.ok(ap.includes('const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed
     && !ap.includes('setPrimaryFig') && !ap.includes('setTwoFig')
     && !ap.includes('aria-pressed={primMode}') && !ap.includes('aria-pressed={twoMode}'),
   "the ONE View: flip: label is the live figure, the press cycles to the next stop (no per-facet buttons left)");
-assert.ok(ap.includes('function Explained2ppChart({ stateKey, classKey, menu })')
+assert.ok(ap.includes('function Explained2ppChart({ stateKey, classKey, inv, menu })')
     && ap.includes('const TP = window.AUSPOL.twoPPHistory || null;')
     && ap.includes('(classKey && ((TP.fed.classes || {})[classKey]))')
     && ap.includes('|| (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed;'),
@@ -509,6 +509,30 @@ assert.ok(ap.includes('const houseCtl = SEN_BANK && !twoMode ? (')
 assert.ok(ap.includes('const hi = 100 - lo;')
     && ap.includes('if (!YT.includes(50))'),
   "the 2PP axis mirrors around the half and always ticks 50 (the pair sums to 100 by construction)");
+/* 2026-10-24 (user: "add a 'Share: Labor’s ⇄' toggle to 2pp view like
+   in preference flows view… it toggles which 2pp line is shown. also the
+   2pp view y-axis range should remain constant at all times"): the 2PP
+   chart draws ONE side's line at a time behind its own Share: twin -
+   the flows' Share: stays a separate state - the Space key follows the
+   visible control, and the axis prices the whole twoPP bank's furthest
+   cell from the half ONCE, so neither an elections pick nor the flip
+   ever moves it */
+assert.ok(ap.includes('const [twoInv, setTwoInv] = useState(false);')
+    && ap.includes('const share2pp = (')
+    && ap.includes('aria-pressed={twoInv}')
+    && ap.includes('{(twoInv ? "Coalition" : "Labor") + "’s"}')
+    && ap.includes('const shareSlot = primMode ? null : twoMode ? share2pp : share;')
+    && ap.includes('spaceShare.current = () => { if (twoMode) setTwoInv((v) => !v); else if (!figView) setInv((v) => !v); };'),
+  "the 2PP Share: twin (button names the drawn side, Space follows it, primary keeps none)");
+assert.ok(ap.includes('const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];')
+    && ap.includes('id: "share", label: active.name, color: active.color,')
+    && ap.includes('{"Two-party preferred, " + active.name + "’s share, %"}')
+    && ap.includes("the Share: flip's other side always sits at 100 minus the line on the chart"),
+  "ONE side's line at a time (the constant series id glides the flip to the mirror); head and caption name the drawn side");
+assert.ok(ap.includes('const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);')
+    && ap.includes('dev = Math.max(dev, Math.abs(x - 50))')
+    && ap.includes('[TP.fed, ...Object.keys(TP.fed.states || {}).map((k) => TP.fed.states[k]),'),
+  "the constant axis: the whole bank's furthest cell from 50, mirrored - never recomputed from the drawn view");
 /* 2026-10-23 (user: "y axis max should be 55, biggest recorded primary
    vote + however much to get to the nearest 5"): the primary view
    replaces the shared frame's 0-100 with its own axis, topped at the
@@ -544,7 +568,7 @@ assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}")
 assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 4
     && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2
     && (ap.match(/copy=\{\{ title: "First-preference vote shares by party, " \+/g) || []).length === 1
-    && (ap.match(/copy=\{\{ title: "Two-party-preferred shares, Labor v Coalition, " \+/g) || []).length === 1,
+    && (ap.match(/copy=\{\{ title: active\.name \+ "’s two-party-preferred share, "/g) || []).length === 1,
   "all four views share the px chart frame and carry a copy prop");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");

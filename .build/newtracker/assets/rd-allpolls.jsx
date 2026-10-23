@@ -6306,9 +6306,14 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, me
    1996, no?"). window.AUSPOL.twoPPHistory (validated; a missing file
    floors the handoff to null and the flip never renders). Simpler than the
    primary view by construction: every cell is a drawn number (no fold,
-   no gaps), and the two lines always sum to 100 - a two-party count has
-   no third choice, so the pair mirrors around the halfway tick, which
-   the tick set always includes. Divisions never exist in the Senate, so
+   no gaps), the pair always sums to 100 - a two-party count has no third
+   choice - and the chart draws ONE side's line at a time (2026-10-24,
+   user: a "Share: Labor’s ⇄" toggle "like in preference flows view… it
+   toggles which 2pp line is shown", and "the 2pp view y-axis range
+   should remain constant at all times"): the other side sits at 100
+   minus it, so the Share: flip draws the mirror, and the axis prices
+   the whole bank's furthest cell from the half once, never moving on a
+   pick or a flip. Divisions never exist in the Senate, so
    there is no House: ambiguity here: this view is House-only (the
    control sets aside), and state and class picks ride the same elections
    menu positions the other two modes teach. */
@@ -6316,7 +6321,7 @@ const TWO_PARTIES = [
   { id: "alp", name: "Labor",     color: "var(--alp)" },
   { id: "lnp", name: "Coalition", color: "var(--lnp)" },
 ];
-function Explained2ppChart({ stateKey, classKey, menu }) {
+function Explained2ppChart({ stateKey, classKey, inv, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const TP = window.AUSPOL.twoPPHistory || null;
   if (!TP || !TP.fed) return null;
@@ -6324,12 +6329,16 @@ function Explained2ppChart({ stateKey, classKey, menu }) {
     || (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
-  const series = TWO_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null)).map((p) => ({
-    id: p.id, label: p.name, color: p.color,
-    points: YEARS.map((x, i) => ({ x, y: S[p.id][i] })),
+  /* one side's line at a time - the other always sits at 100 minus it
+     (the two-party count has no third choice), so the constant series id
+     lets the Share: flip glide the line to its mirror */
+  const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];
+  const series = [{
+    id: "share", label: active.name, color: active.color,
+    points: YEARS.map((x, i) => ({ x, y: S[active.id][i] })),
     smooth: false, rdWidth: 2.5, endCap: true,
-    endLabel: !narrow ? p.name : null,
-  }));
+    endLabel: !narrow ? active.name : null,
+  }];
   const pad1 = YEARS.length > 1 ? 0 : 1;
   const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
@@ -6341,12 +6350,19 @@ function Explained2ppChart({ stateKey, classKey, menu }) {
     : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.")
     + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
     + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "")
-    + " The pair always sums to 100 - a two-party count has no third choice - so the two lines are each other's mirror, and the halfway mark is where the lead changes hands.";
-  /* symmetric around the half: the pair sums to 100, so the axis runs the
-     same distance either side of it (user 2026-10-23's cap rule applied
-     both ways), and 50 itself is always a tick - the yard a two-party
-     chart is read against */
-  const lo = Math.floor(series.reduce((m, s) => s.points.reduce((mm, p) => Math.min(mm, p.y), m), 100) / 5) * 5;
+    + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+  /* the constant axis (user 2026-10-24: the range "should remain
+     constant at all times"): the furthest cell of the WHOLE bank from
+     the half - national and every state and class cut, so no elections
+     pick ever moves it - mirrored on its other side, so the Share: flip
+     never moves it either (Labor's cells price both sides by the count's
+     sum). 50 itself stays a tick - the yard a two-party chart is read
+     against */
+  let dev = 0;
+  [TP.fed, ...Object.keys(TP.fed.states || {}).map((k) => TP.fed.states[k]),
+    ...Object.keys(TP.fed.classes || {}).map((k) => TP.fed.classes[k])].forEach((v) =>
+    (v.alp || []).forEach((x) => { if (x != null) dev = Math.max(dev, Math.abs(x - 50)); }));
+  const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
   const hi = 100 - lo;
   const yStep = hi - lo > 30 ? 10 : 5;
   const YT = []; for (let v = lo; v <= hi; v += yStep) YT.push(v);
@@ -6355,7 +6371,7 @@ function Explained2ppChart({ stateKey, classKey, menu }) {
   return (
     <>
       <div className="rd-chead ex-fl-head">
-        <span className="rd-chead-t">{"Two-party preferred, Labor v Coalition, %"}
+        <span className="rd-chead-t">{"Two-party preferred, " + active.name + "’s share, %"}
           <span className="rd-chead-meta">{scope}</span></span>
         {menu}
       </div>
@@ -6369,10 +6385,10 @@ function Explained2ppChart({ stateKey, classKey, menu }) {
         unit="%" fmt={(v) => v.toFixed(1)}
         series={series}
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
-        ariaLabel={"Two-party-preferred vote shares, Labor v Coalition, " + S.label + ", " + span}
-        copy={{ title: "Two-party-preferred shares, Labor v Coalition, " + (S.short || S.label),
+        ariaLabel={"Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span}
+        copy={{ title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
                 sub: rdCap(S.elections || S.label + " elections") + ". Official AEC counts.",
-                caption: "Official AEC counts; the two lines mirror around 50%, the half of the two-party count.",
+                caption: "Official AEC counts; the other side always sits at 100 minus this share - the two-party count has no third choice.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]} />
@@ -6460,9 +6476,10 @@ function RdExplained() {
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
   /* figView: either vote-share figure's controls displace the flows' -
-     the pair tabs and Share: flip set aside (House: in the 2PP view too:
-     no two-party count exists for the Senate), and the elections menu
-     loses every section the mode's bank never holds */
+     the pair tabs and Share: flip set aside (the 2PP view carries its own
+     Share: twin; House: sets aside there too: no two-party count exists
+     for the Senate), and the elections menu loses every section the
+     mode's bank never holds */
   const figView = primMode || twoMode;
   /* the class bank is figure-specific: the flows classes count ballots
      through their final pair, the primary classes (PH_CLASSES) count
@@ -6512,6 +6529,11 @@ function RdExplained() {
      tickets in) */
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
+  /* the 2PP view's own Share side (2026-10-24, user: a "Share: Labor’s
+     ⇄" toggle "like in preference flows view… it toggles which 2pp line
+     is shown") - kept out of the flows' inv, which the 2PP chart never
+     reads */
+  const [twoInv, setTwoInv] = useState(false);
   /* flipping to Upper snaps the House-only picks away (a class view, a
      state-election view other than NSW's), except a NSW state pick, which
      becomes its upper-house count; an ON-tab pick of a state with no One
@@ -6625,7 +6647,11 @@ function RdExplained() {
     };
   }, []);
   const spaceShare = React.useRef(null);
-  spaceShare.current = () => { if (!figView) setInv((v) => !v); };
+  /* Space flips the Share control while the figure is on screen (the
+     spacebar viewport-claim) - the 2PP view's own twin included, so the
+     key always follows the visible Share: button (primary mode keeps
+     none) */
+  spaceShare.current = () => { if (twoMode) setTwoInv((v) => !v); else if (!figView) setInv((v) => !v); };
   React.useEffect(() => {
     /* the claim is scoped to the CARD (the figure, wherever the article
        slot has mounted it), as the hero 2PP body's is - the explainer's
@@ -6775,6 +6801,23 @@ function RdExplained() {
       </button>
     </span>
   );
+  /* the 2PP view's twin of the same control (user 2026-10-24): same
+     label and current-side idiom, its press swapping which of the
+     two-party pair the chart draws - the other side always sits at 100
+     minus it */
+  const share2pp = (
+    <span className="rd-pl-ctl ex-share">
+      <span className="rd-pl-ctl-l">Share:</span>
+      <button type="button" className="rd-pl-flip" aria-pressed={twoInv}
+              title={twoInv ? "Switch to Labor’s two-party share" : "Switch to the Coalition’s two-party share (always 100 minus Labor’s)"}
+              onClick={() => setTwoInv(!twoInv)}>
+        <span className="rd-pl-flip-t">{(twoInv ? "Coalition" : "Labor") + "’s"}</span> <span aria-hidden="true">⇄</span>
+      </button>
+    </span>
+  );
+  /* which Share slot the row shows: primary keeps none, the 2PP view its
+     twin, everything else the flows' */
+  const shareSlot = primMode ? null : twoMode ? share2pp : share;
   /* the House: flip (user 2026-10-22), the same idiom beside Share: - the
      button shows the ACTIVE chamber ("Lower" reads the House banks' seat
      counts, "Upper" the Senate's above-the-line ballots). It rides the
@@ -6828,11 +6871,12 @@ function RdExplained() {
   ) : null;
   /* the phone's head span: the menu, then House and Share in ONE nowrap
      group, so the pair share a line when the row wraps instead of
-     splitting across two (user 2026-10-22). In a vote-share view Share:
-     sets aside (flows-only; House: in the 2PP view too - no Senate 2PP
+     splitting across two (user 2026-10-22). In a vote-share view the
+     flows' Share: sets aside (the primary keeps no share control; the
+     2PP view carries its twin - House: sets aside there: no Senate 2PP
      exists); View: rides the row above the tabs on every layout, so the
      phone head never carries it */
-  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{figView ? null : share}</span></span> : menu;
+  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{shareSlot}</span></span> : menu;
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -6847,7 +6891,7 @@ function RdExplained() {
           {viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}
           <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
                   options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
-            {narrow ? null : <>{houseCtl}{figView ? null : share}</>}
+            {narrow ? null : <>{houseCtl}{shareSlot}</>}
           </RdTabs>
           {/* ON-tab nswlc (2026-10-23): lcView holds under both contests -
               the ON branch must come before senOnView's catch-all so a
@@ -6858,7 +6902,7 @@ function RdExplained() {
               its head; the classKey rides the primary bank's own classes
               and stePrim its own state-election banks (a flows-side state
               pick still drops to "fed" on the way in) */}
-          {twoMode ? <Explained2ppChart stateKey={stateKey} classKey={classKey} menu={headCtls} />
+          {twoMode ? <Explained2ppChart stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />
             : primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />

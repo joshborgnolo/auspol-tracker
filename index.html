@@ -144858,6 +144858,7 @@ const TWO_PARTIES = [{
 function Explained2ppChart({
   stateKey,
   classKey,
+  inv,
   menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
@@ -144866,26 +144867,31 @@ function Explained2ppChart({
   const S = classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
-  const series = TWO_PARTIES.filter(p => (S[p.id] || []).some(v => v != null)).map(p => ({
-    id: p.id,
-    label: p.name,
-    color: p.color,
+  const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];
+  const series = [{
+    id: "share",
+    label: active.name,
+    color: active.color,
     points: YEARS.map((x, i) => ({
       x,
-      y: S[p.id][i]
+      y: S[active.id][i]
     })),
     smooth: false,
     rdWidth: 2.5,
     endCap: true,
-    endLabel: !narrow ? p.name : null
-  }));
+    endLabel: !narrow ? active.name : null
+  }];
   const pad1 = YEARS.length > 1 ? 0 : 1;
   const x0 = YEARS[0] - pad1,
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the two lines are each other's mirror, and the halfway mark is where the lead changes hands.";
-  const lo = Math.floor(series.reduce((m, s) => s.points.reduce((mm, p) => Math.min(mm, p.y), m), 100) / 5) * 5;
+  const cap = (classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+  let dev = 0;
+  [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k])].forEach(v => (v.alp || []).forEach(x => {
+    if (x != null) dev = Math.max(dev, Math.abs(x - 50));
+  }));
+  const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
   const hi = 100 - lo;
   const yStep = hi - lo > 30 ? 10 : 5;
   const YT = [];
@@ -144900,7 +144906,7 @@ function Explained2ppChart({
     className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, "Two-party preferred, Labor v Coalition, %", React.createElement("span", {
+  }, "Two-party preferred, " + active.name + "’s share, %", React.createElement("span", {
     className: "rd-chead-meta"
   }, scope)), menu), narrow && React.createElement(RdKey, {
     items: lines,
@@ -144920,11 +144926,11 @@ function Explained2ppChart({
     fmt: v => v.toFixed(1),
     series: series,
     tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
-    ariaLabel: "Two-party-preferred vote shares, Labor v Coalition, " + S.label + ", " + span,
+    ariaLabel: "Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span,
     copy: {
-      title: "Two-party-preferred shares, Labor v Coalition, " + (S.short || S.label),
+      title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
       sub: rdCap(S.elections || S.label + " elections") + ". Official AEC counts.",
-      caption: "Official AEC counts; the two lines mirror around 50%, the half of the two-party count.",
+      caption: "Official AEC counts; the other side always sits at 100 minus this share - the two-party count has no third choice.",
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -144989,6 +144995,7 @@ function RdExplained() {
   const stePrim = steLcView ? STE_LCS[steLcKey] : steKey ? STATE_PRIM[steKey] : null;
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
+  const [twoInv, setTwoInv] = useState(false);
   const flipHouse = () => {
     const next = house === "sen" ? "rep" : "sen";
     setHouse(next);
@@ -145069,7 +145076,7 @@ function RdExplained() {
   }, []);
   const spaceShare = React.useRef(null);
   spaceShare.current = () => {
-    if (!figView) setInv(v => !v);
+    if (twoMode) setTwoInv(v => !v);else if (!figView) setInv(v => !v);
   };
   React.useEffect(() => {
     const card = cardEl.current;
@@ -145168,6 +145175,22 @@ function RdExplained() {
   }, (inv ? rival : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
+  const share2pp = React.createElement("span", {
+    className: "rd-pl-ctl ex-share"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Share:"), React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": twoInv,
+    title: twoInv ? "Switch to Labor’s two-party share" : "Switch to the Coalition’s two-party share (always 100 minus Labor’s)",
+    onClick: () => setTwoInv(!twoInv)
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, (twoInv ? "Coalition" : "Labor") + "’s"), " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")));
+  const shareSlot = primMode ? null : twoMode ? share2pp : share;
   const houseCtl = SEN_BANK && !twoMode ? React.createElement("span", {
     className: "rd-pl-ctl ex-house"
   }, React.createElement("span", {
@@ -145215,7 +145238,7 @@ function RdExplained() {
     className: "ex-fl-ctls"
   }, menu, React.createElement("span", {
     className: "ex-fl-flips"
-  }, houseCtl, figView ? null : share)) : menu;
+  }, houseCtl, shareSlot)) : menu;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -145253,9 +145276,10 @@ function RdExplained() {
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, figView ? null : share)), twoMode ? React.createElement(Explained2ppChart, {
+  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
     stateKey: stateKey,
     classKey: classKey,
+    inv: twoInv,
     menu: headCtls
   }) : primMode ? React.createElement(ExplainedPrimaryChart, {
     house: house,

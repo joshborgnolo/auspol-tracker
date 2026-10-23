@@ -212,6 +212,18 @@ AEC_YEARS.forEach((y) => {
     `${y}: rural runs behind the national line`);
 });
 
+// ---- the constant y axis (user 2026-10-24) ----------------------------------
+/* "the 2pp view y-axis range should remain constant at all times":
+   Explained2ppChart prices the WHOLE bank's furthest cell from the half,
+   mirrored - never the drawn view's - so neither an elections pick nor
+   the Share: flip moves the axis. Recompute the band as the renderer
+   does and pin what the 2026-10-24 file prices it at */
+const DEV = Math.max(...allViews.flatMap((v) => v.alp.map((x) => Math.abs(x - 50))));
+const LO = Math.max(0, Math.floor((50 - DEV) / 5) * 5);
+assert.equal(DEV, cell(FED.states.act, "alp", 2025) - 50, "2025's ACT reading prices the band");
+assert.equal(LO, 25, `the band's floor (${(50 - DEV).toFixed(2)} floored to the next 5)`);
+assert.equal(100 - LO, 75, "mirrored at the half");
+
 // ---- gen-data + validate wiring --------------------------------------------
 const gen = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "gen-data.mjs"), "utf8");
 assert.ok(/const twoPPHistory = \$\{/.test(gen), "gen-data emits twoPPHistory into the data asset");
