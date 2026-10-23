@@ -14,7 +14,9 @@ far back can census-based SEIFA-by-division figures be derived, and from where?*
   Report 5 Attachment 1 — 150 rows, 2001 boundary set, four quartile bands,
   full index values — text already committed at `.build/analysis/seat-model/…`
   via cache/rr5.txt) **and 2001 + 2006 censuses** (Parliamentary Library
-  `researchers.xls` series — see §4). Nothing later from either body (§6).
+  four-paper series: 2001 census × 2003 boundaries, 1996 census × 2000
+  boundaries, and 2006 census × both 2006 and 2009 boundary sets — see §4).
+  Nothing later from either body (§6).
 - **From the 2006 census onward the ABS itself ships per-CED products**:
   "Commonwealth Electoral Division, Population Distributions" and (2011+)
   "CED, SA1 Distributions" xlsx for SEIFA 2006 (as 2007 tables), 2011, 2016,
@@ -91,23 +93,24 @@ Notes:
   unpublished RMANS refresh could exist internally; FOI-scale question, not
   web research.)
 
-## 4. Parliamentary Library series — THREE papers, series closed ~2010
+## 4. Parliamentary Library series — FOUR papers, series closed ~2010
 
 PDFs + pdftotext committed under `.build/analysis/seifa-index/src/aph/`:
 
 | Citation | Census | Boundaries | File |
 |---|---|---|---|
 | **Current Issues Brief no.13 2000–01** — Gerard Newman & Andrew Kopras, "Socioeconomic Indexes for Electoral Divisions (2000 Electoral Boundaries)", 3 Apr 2001, ISSN 1440-2009 | **1996** | 2000 | `aph-01cib13.pdf` / `.txt` |
+| **Current Issues Brief no.1 2004–05** — Gerard Newman & Andrew Kopras, "Socio-economic indexes for electoral divisions: 2001 Census (2003 boundaries)", 12 Jul 2004, ISSN 1449-8472 | **2001** | 2003 | `aph-05cib01.pdf` / `.txt` |
 | **Research Paper no.2 2008–09** — Paul Nelson, "Socio-economic indexes for electoral divisions: 2006 Census", 15 Aug 2008 | **2006** | 2006 | `aph-09rp02.pdf` / `.txt` |
 | **Research Paper no.1 2010–11** — Paul Nelson, "Socio-economic indexes for 2009 electoral divisions: 2006 Census", 28 Jul 2010, ISSN 1834-9854 | **2006** | 2009 | `aph-11rp01.pdf` / `.txt` + `aph-11rp01-page-2012.html` (pub page) |
 
 Findings verified by content this session:
-- **No APH paper for the 2001 census exists.** The CIB 13/00–01 paper (pre-dating 2001 election by 7 months) is explicitly "derived from the **1996** Census of Population and Housing" (p1: "This paper provides data on four summary indexes, derived from the 1996 Census of Population and Housing" + "the effects of the 1999–2000 electoral redistributions"). The repo's earlier "08rp01 = 2001 census" graffiti is wrong; AEC RR5 Attachment 1 remains the sole 2001-census per-division score source.
+- **A 2001-census APH paper EXISTS — found 2026-10-24** (this section's earlier draft, written 2026-10-23, wrongly recorded a verified-negative here). CIB no.1 2004–05 (05cib01) prints scores-and-ranks for all four indexes across the 150 divisions of the **2003 boundary set** — the set the 2004 election ran on — from the APH's own bespoke 2001-CD population weighting. The CIB 13/00–01 paper (pre-dating 2001 election by 7 months) is explicitly "derived from the **1996** Census of Population and Housing" (p1). So the 2001 census has TWO per-division prints on different editions: AEC RR5-Att1 (2001 boundaries) and APH 05cib01 (2003 boundaries).
 - The 09rp02 "…for electoral divisions: 2006 Census" edition is on the **2006 boundary set** (the election that was current at publication; the 2009 boundaries were promulgated mid-2009, after its Aug 2008 date). Its title omits a boundary year deliberately; 11rp01 carries the explicit "2009" in its title to mark the re-issue.
 - The 11rp01 re-issue paper cites the same Kopras "Electorate Rankings: Census 1996 (2000 Electoral Boundaries)" companion RP its 2001 sibling cites — that companion (census-variable rankings, not SEIFA) is out of scope for the SEIFA ladder but is referenced in `aph-01cib13.txt` line 445.
 - No 2011/2016/2021 edition of the series was found — series ends with 11rp01. The library's *census-rankings* line (RP no. 18 2009–10 "Electoral division rankings: Census 2006 (2009 boundaries)") continues separately and is a different product.
 
-Method note from 01cib13/09rp02/11rp01 §2: all three papers use the same population-weighted CD→CED aggregation the AEC/ABS guidance recommends, so cross-edition ranks are safe to compare within the four-index (2001-onwards) era and by rank/decile only against 1986–1996 five-index editions (§8).
+Method note from 01cib13/05cib01/09rp02/11rp01 §2: all four papers use the same population-weighted CD→CED aggregation the AEC/ABS guidance recommends (05cib01's own bespoke weighting onto the 2003 edition is exactly the concordance ABS/AEC never published), so cross-edition ranks are safe to compare within the four-index (2001-onwards) era and by rank/decile only against 1986–1996 five-index editions (§8).
 
 ## 5. Boundary geometry for arbitrary editions (AEC map proxy)
 
@@ -137,9 +140,9 @@ Method note from 01cib13/09rp02/11rp01 §2: all three papers use the same popula
 
 ## 6. Who else has done the division-level aggregation
 
-- AEC: RR5 att1 only (2001×2001).
-- Parliamentary Library: 2001 census + 2006 census files, plus a 2009-
-  boundary re-issue of the 2006 file (§4).
+- AEC: RR5 att1 only (2001 census × 2001 boundaries, IRSAD alone).
+- Parliamentary Library: four-paper series (§4) — 1996×2000, **2001×2003**
+  (05cib01), 2006×2006, 2006×2009 — all four indexes.
 - ABS itself: per-CED distributions 2006/2011/2016/2021 (§2), which are the
   sanctioned input for the same derivation; ABS Customised Data Services will
   also produce named-geography SEIFA outputs on commission.
@@ -162,7 +165,7 @@ sourced from ABS census geography units + boundary polygons).
 | 1996 | 1993 | 1996 (5 mo after) | SEIFA 1996 CD + concordances for 1993 edition | C/B |
 | 1998 | 1996 | 1996 (~2 y before) | SEIFA 1996 CD + 1996-edition concordances | B |
 | 2001 | 2000 | 2001 (3 mo before) | **AEC RR5 att1 (2001×2001 — printed)** + APH CIB 13/00–01 (1996 census on the SAME 2000 boundaries — the direct fallback) | **A** |
-| 2004 | 2003 | 2001 (~3.2 y before) | AEC RR5 att1 target is the 2001-boundary set — one edition behind. For exact 2003-edition SEIFA, derive from ABS 2001 CD cube + 2003-edition concordance (open item 3 **no longer blocks** the 2001/2010 rows; only this one pre-2004 row) | A/B |
+| 2004 | 2003 | 2001 (~3.2 y before) | **LANDED: APH CIB 1/2004–05** (05cib01, 2001 census × 2003-edition CEDs, all four indexes scores+ranks printed — the APH's own bespoke CD weighting; no ABS/AEC 2001-CD→2003-CED concordance exists). Feeds `data/division-seifa-indexes.json` via `aph05cib01` | **A** |
 | 2007 | 2006 | 2006 (15 mo before) | APH 2006 update + ABS 2007-CED population distributions xlsx | **A** |
 | 2010 | 2009 | 2006 (4 y before) | **APH RP 1/2010–11 (2006 census × 2009 divisions)** | **A** |
 | 2013 | 2010 | 2011 (23 mo before) | ABS SEIFA 2011 CED population/SA1 distributions → weighted derivation | B |
@@ -236,10 +239,12 @@ rationale, and treat §9 as the build record.
 
 ## Open items (if a workstream proceeds)
 
-1. ~~Fetch + commit the APH files~~ — **DONE 2026-10-23**: three-paper set
+1. ~~Fetch + commit the APH files~~ — **DONE 2026-10-23/24**: three-paper set
    (`aph-01cib13.{pdf,txt}` 1996×2000; `aph-09rp02.{pdf,txt}` 2006×2006;
-   `aph-11rp01.{pdf,txt}` 2006×2009) committed under `src/aph/`. No
-   2001-census APH edition exists.
+   `aph-11rp01.{pdf,txt}` 2006×2009) committed under `src/aph/`, joined
+   2026-10-24 by **`aph-05cib01.{pdf,txt}`** (2001×2003, CIB no.1 2004–05,
+   recovered via Wayback 20061208010454 capture of the aph.gov.au PDF). The
+   earlier "No 2001-census APH edition exists" note was wrong — see §4.
 2. ~~Verify which boundary edition the ABS 2016 CED distributions xlsx
    targets~~ — **DONE 2026-10-23**: both files downloaded to `src/abs/`
    (`abs-seifa-2016-ced-populations.xls` 439 KB, `abs-seifa-2016-

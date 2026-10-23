@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (RR5-Att1 is the ONLY published 2001-census per-division score; the APH trilogy = CIB13/2000-01 1996×2000 + RP09rp02 2006×2006 + RP11rp01 2006×2009, all three PDFs committed 53831398), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, elections 2001–2025 bar 2004).
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed later), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, all nine elections 2001–2025 incl. 2004).
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -42,15 +42,17 @@ The published-source **three-index** sibling store is **built and stored**:
 `.build/analysis/seat-model/extract-division-seifa.mjs` (fixture parsers +
 merge) consumes `.build/analysis/seat-model/derive-division-seifa-abs.py`
 (ABS lanes) and emits `data/division-seifa-indexes.json` — elections
-`{2001,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150}` = **1,202
-rows** of `{state, irsd, ier, ieo, via}`, pinned by
-`.build/analysis/seat-model/test-division-seifa.mjs` (8-election set,
-name-exact vs division-classifications, rank permutations, 18+ pinned
+`{2001,2004,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150}` =
+**1,352 rows** of `{state, irsd, ier, ieo, via}`, pinned by
+`.build/analysis/seat-model/test-division-seifa.mjs` (9-election set,
+name-exact vs division-classifications, rank permutations, 20+ pinned
 cells, provenance census-year pins). IRSAD stays deliberately absent —
 that's the sibling store's index. **Rank convention DANGER: this store's
 ranks are rank 1 = most DISadvantaged (the APH tapes' order, kept); the
 IRSAD sibling store re-based itself to rank 1 = most ADVANTAGED.** Lane
-map: 2007/2010 = APH printed tables (scores+ranks verbatim);
+map: **2004 = APH CIB 1/2004-05 printed tables** (2001 census × 2003
+boundaries — see the four-paper set below); 2007/2010 = APH printed
+tables (scores+ranks verbatim);
 **2001 = the ABS's own published 2001-CED cube** (`AUS_ced_s01.xls`,
 2001C×2000/01-edition CEDs, scores printed / ranks computed, IRSAD column
 verified 150/150 vs RR5-Att1 within printed rounding) — graded A after
@@ -61,10 +63,12 @@ ranks computed from 3dp scores. QA: 2013+2016 SA1-decile histograms per
 CED EXACT vs the ABS CED SA1-distributions cubes (3 indexes each);
 national decile pop-shares sanity **10%±2** (±0.5 is unattainable — ABS
 buckets SA1s by COUNT so IEO d1 sits at 8.8% of population in 2021).
-**2004 stays open** — the 2004 election ran on the 2003-edition boundaries
-(Bonython→Bonner, Burke→Gorton) and no official 2001-CD→2003-CED
-concordance exists (ABS 2905.0 Vol 2 approximates census-geographic CEDs
-at the 2001 census alone — web-checked again 2026-10-24).
+**2004 = LANDED (2026-10-24)** — the 2004 election ran on the 2003-edition
+boundaries (Bonython→Bonner, Burke→Gorton) and no official ABS/AEC
+2001-CD→2003-CED concordance exists (ABS 2905.0 Vol 2 approximates
+census-geographic CEDs at the 2001 census alone); the gap is filled by
+APH CIB 1/2004-05, which did its own bespoke CD weighting on exactly the
+2003-edition set (Bonner/Gorton in, Bonython/Burke out — verified 150).
 **ABS header-drift trap (now confirmed, not speculation)**: ABS swapped
 the IRSD/IRSAD lead-column order between SEIFA editions — 2011 SA1
 summary leads IRSAD, 2016+2021 lead **IRSD** — so positional column reads
@@ -112,15 +116,20 @@ the sibling lane's job.
   SEIFA/socio/advantage/census) and every post-2007 VTR
   HouseDivisionClassifications page shows the same geography-only columns.
   Treat RR5-Att1 as the AEC's *only* public SEIFA-by-division table.
-- **Parliamentary Library — THREE papers, series closed ~2010.** Recoverable
+- **Parliamentary Library — FOUR papers, series closed ~2010.** Recoverable
   **only** via Wayback (live aph.gov.au 403s every probes with a 411-byte
-  body). PDF + pdftotext committed `53831398` at
-  `.build/analysis/seifa-index/src/aph/`:
+  body). Three PDFs + pdftotext committed `53831398` and the fourth
+  (05cib01, found 2026-10-24 at Wayback
+  `…/web/20061208010454id_/http://www.aph.gov.au/library/pubs/cib/2004-05/05cib01.pdf`)
+  at `.build/analysis/seifa-index/src/aph/`:
   | Citation | Census × Boundaries | Repo file |
   |---|---|---|
   | **Current Issues Brief no.13 2000–01** — Newman & Kopras, "Socioeconomic
     Indexes for Electoral Divisions (2000 Electoral Boundaries)",
     3/04/2001, ISSN 1440-2009 | 1996 × 2000 | `aph-01cib13.{pdf,txt}` |
+  | **Current Issues Brief no.1 2004–05** — Newman & Kopras, "Socio-economic
+    indexes for electoral divisions: 2001 Census (2003 boundaries)",
+    12/07/2004, ISSN 1449-8472 | 2001 × 2003 | `aph-05cib01.{pdf,txt}` |
   | **Research Paper no.2 2008–09** — Nelson, "Socio-economic
     indexes for electoral divisions: 2006 Census", 15/08/2008 | 2006 × 2006
     | `aph-09rp02.{pdf,txt}` (Wayback
@@ -129,10 +138,13 @@ the sibling lane's job.
     indexes for **2009** electoral divisions: 2006 Census", 28/07/2010,
     ISSN 1834-9854 | 2006 × 2009 | `aph-11rp01.{pdf,txt}` +
     `aph-11rp01-page-2012.html` |
-  **Verified-negative**: no APH paper for the **2001 census** exists — CIB
-  13/00–01 is on the 1996 census ("…derived from the 1996 Census of
-  Population and Housing … the 1999–2000 electoral redistributions"). AEC
-  RR5 Att1 remains the sole published 2001-census per-division print.
+  The 2001 census has **two** published per-division prints on different
+  editions: AEC RR5-Att1 (2000/01 boundaries) and APH CIB 1/2004-05 (2003
+  boundaries — the 2004 election's set). This skill previously claimed no
+  APH 2001-census paper existed (verified-negative, wrong): CIB 13/00–01
+  is 1996-census but its successor 05cib01 was found on 2026-10-24. The
+  3-index store's 2004 lane is the CIB (landed); the IRSAD sibling's
+  2004 row moves from its caveated RR5 reuse to the CIB in tandem.
   **Earlier "08xp01 = 2006 update" graffiti was wrong** — the 09rp02 (Aug
   2008) paper IS the 2006-census APH edition; 11rp01 is its 2009-boundary
   re-issue with explicit-2009 in the title, published after the
@@ -140,8 +152,10 @@ the sibling lane's job.
   hard-reliance). Companion RP "Electorate Rankings: Census …" (Kopras) is
   a *different* product (census-variable rankings, not SEIFA) — citeable
   from `aph-01cib13.txt` line 445 fn3.
-  **Method constant** across all three papers: population-weighted average
-  of constituent CDs (= the AEC/ABS 2039.0 §2.2 recipe).
+  **Method constant** across all four papers: population-weighted average
+  of constituent CDs (= the AEC/ABS 2039.0 §2.2 recipe) — the APH did its
+  own bespoke 2001-CD weighting onto the 2003 boundaries for 05cib01, which
+  is precisely the concordance no ABS/AEC product ever published.
 - Academic practice (Keele/Jupp-class papers) does the same weighted-CD
   aggregation bespoke. ABS Customised Data Services will commission
   named-geography SEIFA outputs.
@@ -157,7 +171,8 @@ nearest by mere distance — check direction):
 | 1990/1993 | 1987/1990 | 1986→1991 | CD cubes + era concordances | C |
 | 1996 | 1993 | 1996 (6 wk after — use 1991? no: 1996 census too late; **1991**) | CD cubes | C |
 | 1998 | 1996 | 1996 | SEIFA-1996 CD + 1996-edition concordance | B |
-| 2001/2004 | 2000/2003 | 2001 | **2001 LANDED: ABS's own AUS_ced_s01.xls cube** (2000/01-edition CEDs) — no APH 2001-census paper exists (CIB13 is 1996-census); 2004 needs 2003-edition re-aggregation — NO official 2001-CD→2003-CED concordance, stays open | A / open |
+| 2001 | 2000 | 2001 | **2001 LANDED: ABS's own AUS_ced_s01.xls cube** (2000/01-edition CEDs) + AEC RR5-Att1 (same set, printed IRSAD); CIB13 is 1996-census so no APH paper covers this row | A |
+| 2004 | 2003 | 2001 | **LANDED: APH CIB 1/2004-05** (2001 census × 2003-edition CEDs, the APH's own bespoke CD weighting — no ABS/AEC 2001-CD→2003-CED concordance exists) | A |
 | 2007 | 2006 | 2006 | **APH RP09rp02 (2006×2006)** + ABS 2007-CED dist xlsx — LANDED | A |
 | 2010 | 2009 | 2006 | **APH RP11rp01 (2006×2009 re-issue)** — LANDED | A |
 | 2013/2016 | 2010/2016 | 2011/2016 | ABS CED Population/SA1 Distributions → weighted derivation — LANDED (SA1 cubes × CED memberships) | B |

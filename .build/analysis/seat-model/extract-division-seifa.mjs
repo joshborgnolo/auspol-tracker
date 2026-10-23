@@ -14,6 +14,14 @@
      aph01cib13 — parsed into the fixture as xcheck for the 2001-census
      derivation lane, never shipped into election rows (its census is 1996;
      the 2001-census lane derives those elections itself).
+   - APH CIB 1/2004-05 (Newman & Kopras): 2001 Census x 2003 boundaries ->
+     2004 election block, aph05cib01 — the ONLY published four-index
+     per-division table on the 2003 edition (closes the 2004 election's
+     lane; earlier notes wrongly claimed no 2001-census APH paper existed).
+     Prints NO alphabetical scores tables and NO summary table — only the
+     four ranked two-column tables (captions "Ranked by the Index of …" in
+     fixed IRSAD/IRSD/IER/IEO order). Scores are read from the ranked rows;
+     ranks are printed and authoritative.
    AEC RR5 att1 (2001 census, IR SAD only) is the gold standard the
    2001-census derivation cross-checks against — not a source here.
 
@@ -22,13 +30,15 @@
      ranked 2-column table, and (09rp02/11rp01 only) a joint "Summary of
      Index Rankings" table-5 with four rank columns in printed order
      Advantage/Disadvantage, Disadvantage, Economic Resources, Education &
-     Occupation. aph01cib13 instead names its eight tables in prose form
-     ("Index of Relative Socioeconomic Advantage by Electoral Division" etc;
-     note its IEO ranked caption lacks the word "the": "Ranked by Index of
-     Education and Occupation").
-   - 09rp02 scores are integers; 11rp01 and 01cib13 are one-decimal.
-   - 11rp01 abbreviates states as Vic./Tas. (dot); 09rp02/01cib13 as Vic/Tas.
-   - Party tokens: 09rp02/11rp01 ALP|LP|NP|Ind(+CLP); 01cib13 ALP|LIB|NP|IND.
+     Occupation. aph01cib13/aph05cib01 instead name their tables in prose
+     form ("Index of Relative Socioeconomic Advantage by Electoral Division"
+     etc; note its IEO ranked caption lacks the word "the": "Ranked by Index
+     of Education and Occupation"). aph05cib01 has four such captions,
+     "Ranked by the Index of …", in the fixed order above.
+   - 09rp02 scores are integers; 11rp01, 01cib13 and 05cib01 are one-decimal.
+   - 11rp01 abbreviates states as Vic./Tas. (dot); 09rp02/01cib13/05cib01 as Vic/Tas.
+   - Party tokens: 09rp02/11rp01 ALP|LP|NP|Ind(+CLP); 01cib13/05cib01
+     ALP|LIB|NP|IND(+GRN|CLP).
    - Table 5 clips long name cells at the column edge, EATING the closing
      " )" of the state abbreviation on two rows per paper (Kingsford Smith,
      Melbourne Ports) — row regexes therefore make that ')' optional.
@@ -58,7 +68,11 @@ const STATE_MAP = {
 };
 const ST = "NSW|Vic\\.?|Qld|SA|WA|Tas\\.?|NT|ACT";
 const PT = "ALP|LP|LIB|NP|CLP|KAP|Independents?|Ind|IND|GRN";
-const NUM = "\\d{3,4}(?:\\.\\d+)?";
+/* Index-score token: bare integer or one-decimal with optional thousands
+   separators (09rp02's integers, 11rp01/01cib13's one-decimal, 05cib01's
+   one-decimal with "1,000.5" commas). Number() strips nothing — use
+   .replace(/,/g, "") at the call-site conversion. */
+const NUM = "\\d{1,2}(?:,\\d{3})+(?:\\.\\d+)?|\\d{3,}(?:\\.\\d+)?";
 
 // scores row: Name (ST) PT VAL [  Name2 (ST) PT VAL]
 const A_ROW = new RegExp(
@@ -119,6 +133,19 @@ const PAPERS = [
     ],
     terminals: true, // its tables are FOLLOWED by an Appendix narrative
   },
+  {
+    via: "aph05cib01",
+    file: `${APH_DIR}/aph-05cib01.txt`,
+    title: "Socio-economic indexes for electoral divisions: 2001 Census (2003 boundaries) (APH CIB 1/2004-05, Newman & Kopras, 12 Jul 2004)",
+    censusYear: 2001, editionInForce: "2003", elections: ["2004"],
+    markers: [
+      T1("adv_a", "irsad", "scores"), T1("adv_b", "irsad", "ranked"),
+      T1("dis_a", "irsd", "scores"), T1("dis_b", "irsd", "ranked"),
+      T1("ier_a", "ier", "scores"), T1("ier_b", "ier", "ranked"),
+      T1("ieo_a", "ieo", "scores"), T1("ieo_b", "ieo", "ranked"),
+    ],
+    terminals: true, // Appendix narrative follows the IEO ranked table
+  },
 ];
 /* Marker discriminators: 09rp02/11rp01 anchor on "Table Na:/Nb:/N:" labels.
    01cib13 has no labels — its captions are unique full prose lines —
@@ -132,6 +159,22 @@ const CAPTIONS_01CIB13 = [
   /^Electoral Divisions Ranked by the Index of Economic Resources\s*$/,
   /^Index of Education and Occupation by Electoral Division\s*$/,
   /^Electoral Divisions Ranked by Index of Education and Occupation\s*$/,
+];
+/* 05cib01's layout: a TOC block (lines 82–97, captions carried with dot
+   leaders and repeated bare) — at LEAST one caption cycle must be consumed
+   before a "restart" can be taken seriously, so the restart gate requires
+   >0 collected rows; then four (scores, ranked) pairs in fixed index order
+   irsad→irsd→ier→ieo. Alpha scores captions are "Index of <name>" plain
+   lines; ranked captions are "Ranked by the Index of <name>". */
+const CAPTIONS_05CIB01 = [
+  /^Index of Relative Socio-Economic Advantage\/Disadvantage\s*$/,
+  /^Ranked by the Index of Relative Socio-Economic Advantage\/Disadvantage\s*$/,
+  /^Index of Relative Socio-Economic Disadvantage\s*$/,
+  /^Ranked by the Index of Relative Socio-Economic Disadvantage\s*$/,
+  /^Index of Economic Resources\s*$/,
+  /^Ranked by the Index of Economic Resources\s*$/,
+  /^Index of Education and Occupation\s*$/,
+  /^Ranked by the Index of Education and Occupation\s*$/,
 ];
 
 const HEADER_TOKENS = new Set([
@@ -159,6 +202,7 @@ const noiseLine = (line) => {
   let rest = ` ${t} `.replace(/\s+/g, " ");
   const STRIP = [
     "Socio-Demographic", "Seat Status", "Classification", "Electoral Division",
+    "Electoral division",
     "Division", "Party", "Rating", "Index", "Advantage/", "Disadvantage",
     "Economic", "Resources", "Education &", "Education & Occupation",
     "Occupation", "Rank", "Code", "Status", "Summary of Index Rankings",
@@ -181,14 +225,30 @@ const TERMINAL = /^Appendix\b|^Endnotes\b|^Bibliography\b|^Conclusion\b|^Sources
 function parsePaper(cfg) {
   const raw = readFileSync(cfg.file, "utf8").replace(/\f/g, "\n");
   const lines = raw.split(/\r?\n/).map((l) => l.replace(/\s+$/, ""));
-  const useCaptions = cfg.via === "aph01cib13";
+  const useCaptions = cfg.via === "aph01cib13" || cfg.via === "aph05cib01";
+  const CAPTIONS = cfg.via === "aph05cib01" ? CAPTIONS_05CIB01 : CAPTIONS_01CIB13;
   const numbered = !useCaptions;
 
   // Walk lines, assigning each to a block once a marker fires. A terminal
-  // heading (Appendix etc.) closes the current block permanently.
+  // heading (Appendix etc.) closes the current block permanently. For
+  // 01cib13 a caption is an exact trimmed line, matched in fixed printed
+  // order. For 05cib01 the same eight captions recur in prose (TOC with
+  // dot leaders, narrative section headings) so a caption only counts
+  // when the very next line is the table header (`Electoral division` for
+  // a scores page, `Rank` + `Electoral division` for a ranked page); each
+  // caption may match at most once.
   const blocks = new Map(); // tableId -> {idx, kind, rows:[]}
   let cur = null, captionPos = 0, closed = false;
-  const markerHits = [];
+  const headerAfter = (idx, li) => {
+    const NEXT = 5;
+    for (let k = li + 1; k < Math.min(lines.length, li + 1 + NEXT); k++) {
+      const tt = lines[k].trim();
+      if (!tt) continue;
+      if (idx === "scores") return /^Electoral division\b/.test(tt);
+      return /^Rank\b/.test(tt) && /Electoral division\b/.test(tt);
+    }
+    return false;
+  };
   for (let li = 0; li < lines.length; li++) {
     const line = lines[li], t = line.trim();
     if (cfg.terminals && cur && TERMINAL.test(t)) { closed = true; cur = null; continue; }
@@ -196,8 +256,16 @@ function parsePaper(cfg) {
     if (numbered) {
       const m = /^(?:Table\s+)?([1-4])([ab])\s*[:\.]/.exec(t) || (/^Table\s+5\s*[:\.]/.test(t) ? ["", "5", ""] : null);
       if (m) hit = `${m[1]}${m[2]}`.replace(/^5$/, "5");
-    } else if (captionPos < CAPTIONS_01CIB13.length && CAPTIONS_01CIB13[captionPos].test(t)) {
-      hit = cfg.markers[captionPos].id; captionPos++;
+    } else if (cfg.via === "aph01cib13") {
+      if (captionPos < CAPTIONS.length && CAPTIONS[captionPos].test(t)) { hit = cfg.markers[captionPos].id; captionPos++; }
+    } else {
+      for (let p = 0; p < CAPTIONS.length; p++) {
+        if (blocks.has(cfg.markers[p].id)) continue;
+        if (!CAPTIONS[p].test(t)) continue;
+        if (!headerAfter(cfg.markers[p].kind, li)) continue;
+        hit = cfg.markers[p].id; captionPos++;
+        break;
+      }
     }
     if (hit) {
       const desc = cfg.markers.find((mk) => mk.id === hit);
@@ -211,7 +279,6 @@ function parsePaper(cfg) {
         cur = { ...desc, rows: [] };
         blocks.set(hit, cur);
       }
-      markerHits.push(hit);
       continue;
     }
     if (cur && !closed) cur.rows.push({ line, li: li + 1 });
@@ -219,8 +286,8 @@ function parsePaper(cfg) {
   const expected = cfg.markers.map((m) => m.id);
   const missing = expected.filter((id) => !blocks.has(id));
   if (missing.length) fail(`${cfg.via}: missing tables ${missing.join(",")} (got ${[...blocks.keys()].join(",")})`);
-  if (useCaptions && captionPos !== CAPTIONS_01CIB13.length)
-    fail(`${cfg.via}: only ${captionPos}/${CAPTIONS_01CIB13.length} caption markers found — layout changed?`);
+  if (useCaptions && captionPos !== CAPTIONS.length)
+    fail(`${cfg.via}: caption cycle did not complete (matched ${captionPos}/${CAPTIONS.length}) — layout changed?`);
 
   // Parse rows inside each block.
   const scores = {}; // idx -> Map name -> {state, party, value}
@@ -228,14 +295,16 @@ function parsePaper(cfg) {
   const summary = new Map(); // name -> {state, party, rating, ranks:{irsad,irsd,ier,ieo}}
   const unparsed = [];
   const pushIdx = (tbl, name, st, party, value, rank) => {
-    const canonical = name.replace(/\s+/g, " ").trim();
+    // 05cib01's PDF sets O'Connor with a typographic apostrophe; every other
+    // paper (and data/division-classifications.json) uses the straight one.
+    const canonical = name.replace(/’/g, "'").replace(/\s+/g, " ").trim();
     const state = STATE_MAP[st];
     if (!state) fail(`${cfg.via}: unknown state '${st}' line ${name}`);
     const map = tbl === "scores" ? scores : tbl === "ranked" ? ranked : null;
     const idx = cur?.idx ?? null;
     const dict = map[idx] || (map[idx] = new Map());
     if (dict.has(canonical)) fail(`${cfg.via} ${cur.id}: duplicate row for '${canonical}'`);
-    dict.set(canonical, { state, party, value: Number(value), rank: rank ? Number(rank) : undefined });
+    dict.set(canonical, { state, party, value: Number(String(value).replace(/,/g, "")), rank: rank ? Number(rank) : undefined });
   };
 
   for (const [tid, blk] of blocks) {

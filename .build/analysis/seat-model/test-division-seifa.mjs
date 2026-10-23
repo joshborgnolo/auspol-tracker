@@ -3,9 +3,9 @@
    .build/analysis/seat-model/seifa-src/aph-fixtures.json
    (extract-division-seifa.mjs). Invariants:
 
-   1. Store elections are exactly the landed set {2001, 2007, 2010, 2013,
-      2016, 2019, 2022, 2025}, each N divisions (151 in 2019/2022, 150
-      otherwise), division-keyed, no others.
+   1. Store elections are exactly the landed set {2001, 2004, 2007, 2010,
+      2013, 2016, 2019, 2022, 2025}, each N divisions (151 in 2019/2022,
+      150 otherwise), division-keyed, no others.
    2. Division sets are NAME-EXACT against data/division-classifications.json's
       matching election blocks — joins must never miss (2001: 2000-edition
       set with Bonython/Burke, 2007: the 2006-edition set, 2010: the 2009
@@ -14,9 +14,9 @@
    3. Row shape is exactly {state, irsd, ier, ieo, via} — state one of the
       eight codes, each index {value: number, rank: int 1..N}; the IRSAD
       lane (sibling pipeline) keys NEVER appear in this store; via matches
-      the election's lane (2001=absCed01, 2007=aph09rp02, 2010=aph11rp01,
-      2013=absSa1Ced2011, 2016=absSa1Ced2016, 2019=absSa1Ced2018,
-      2022=absMbCed2021, 2025=absMbCed2024).
+      the election's lane (2001=absCed01, 2004=aph05cib01, 2007=aph09rp02,
+      2010=aph11rp01, 2013=absSa1Ced2011, 2016=absSa1Ced2016,
+      2019=absSa1Ced2018, 2022=absMbCed2021, 2025=absMbCed2024).
    4. Ranks per election x index are an exact permutation of 1..N (the APH
       prints a complete ranking; the ABS lanes compute one from their carried
       scores; ties are ordered, never shared).
@@ -76,13 +76,13 @@ const fixtures = JSON.parse(readFileSync(FIXTURE, "utf8"));
 
 const IDX = ["irsd", "ier", "ieo"]; // store indexes
 const IDX4 = ["irsad", "irsd", "ier", "ieo"]; // fixture indexes
-const COUNT_FOR = { 2001: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150 };
+const COUNT_FOR = { 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150 };
 const ELECTION_SET = Object.keys(COUNT_FOR);
 const VIA_FOR = {
-  2001: "absCed01", 2007: "aph09rp02", 2010: "aph11rp01", 2013: "absSa1Ced2011",
+  2001: "absCed01", 2004: "aph05cib01", 2007: "aph09rp02", 2010: "aph11rp01", 2013: "absSa1Ced2011",
   2016: "absSa1Ced2016", 2019: "absSa1Ced2018", 2022: "absMbCed2021", 2025: "absMbCed2024",
 };
-const CENSUS_FOR = { 2001: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021 };
+const CENSUS_FOR = { 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021 };
 const STATES = new Set(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]);
 
 // 1
@@ -157,6 +157,15 @@ pin("2010", "Lingiari", "irsd", 830.6, 1);
 pin("2010", "Lingiari", "ier", 856.1, 1);
 pin("2010", "North Sydney", "ieo", 1187.7, 150);
 pin("2010", "McMahon", "irsd", 967.1, 29);
+// 2004 (05cib01, 2001 census on 2003-edition boundaries)
+pin("2004", "Lingiari", "irsd", 901.2, 2);
+pin("2004", "Lingiari", "ier", 999.2, 82);
+pin("2004", "Lingiari", "ieo", 976.1, 68);
+pin("2004", "Bradfield", "irsd", 1139.2, 150);
+pin("2004", "Bradfield", "ier", 1218.4, 149);
+pin("2004", "Bradfield", "ieo", 1189.4, 149);
+pin("2004", "Bonner", "irsd", 1025.7, 110);
+pin("2004", "Gorton", "ieo", 928.6, 19);
 // ABS lanes
 pin("2001", "Bonython", "irsd", 888.213, 2);
 pin("2001", "Bradfield", "irsd", 1139.179, 150);
@@ -186,6 +195,9 @@ PIN.forEach(() => {});
   const b2001 = store.elections["2001"];
   for (const n of ["Bonython", "Burke"]) check(b2001[n], `2001: ${n} absent`);
   for (const n of ["Bonner", "Gorton"]) check(!b2001[n], `2001: ${n} should be absent`);
+  const b2004 = store.elections["2004"];
+  for (const n of ["Bonner", "Gorton"]) check(b2004[n], `2004: ${n} absent`);
+  for (const n of ["Bonython", "Burke"]) check(!b2004[n], `2004: ${n} should be absent`);
   check(store.elections["2019"].Macnamara, "2019: Macnamara absent");
   check(store.elections["2022"].Hawke, "2022: Hawke absent");
   check(store.elections["2025"].Bullwinkel, "2025: Bullwinkel absent");
@@ -220,18 +232,20 @@ check(fixtures.aph09rp02.tieRankConflicts.length === 18,
   `aph09rp02: ${fixtures.aph09rp02.tieRankConflicts.length} tie-band conflicts != 18`);
 check(fixtures.aph11rp01.tieRankConflicts.length === 22,
   `aph11rp01: ${fixtures.aph11rp01.tieRankConflicts.length} tie-band conflicts != 22`);
+check(fixtures.aph05cib01.tieRankConflicts.length === 0,
+  `aph05cib01: ${fixtures.aph05cib01.tieRankConflicts.length} tie-band conflicts != 0 (no Table 5 to differ from)`);
 
-// 9 — fixture rows carry the full four-index set + party + (paper>=2007) rating
+// 9 — fixture rows carry the full four-index set + party + (Table-5 papers) rating
 for (const via of Object.keys(fixtures)) {
   for (const [name, row] of Object.entries(fixtures[via].rows)) {
     for (const idx of IDX4)
       check(row[idx] && Number.isFinite(row[idx].value) && Number.isInteger(row[idx].rank),
         `${via} ${name}: fixture ${idx} cell broken`);
     check(typeof row.party === "string" && row.party.length, `${via} ${name}: no party`);
-    if (via !== "aph01cib13")
+    if (via === "aph09rp02" || via === "aph11rp01")
       check(typeof row.rating === "string", `${via} ${name}: no Table-5 rating`);
     else
-      check(row.rating === undefined, `${via} ${name}: unexpected rating on caption-only paper`);
+      check(row.rating === undefined, `${via} ${name}: unexpected rating on summary-table-less paper`);
   }
 }
 
