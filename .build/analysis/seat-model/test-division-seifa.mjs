@@ -3,12 +3,13 @@
    .build/analysis/seat-model/seifa-src/aph-fixtures.json
    (extract-division-seifa.mjs). Invariants:
 
-   1. Store elections are exactly the landed set {2001, 2004, 2007, 2010,
-      2013, 2016, 2019, 2022, 2025} plus the irsad-only forward block 2028,
-      each N divisions (151 in 2019/2022, 150 otherwise), division-keyed,
-      no others.
+   1. Store elections are exactly the landed set {1998, 2001, 2004, 2007,
+      2010, 2013, 2016, 2019, 2022, 2025} plus the irsad-only forward block
+      2028, each N divisions (148 in 1998, 151 in 2019/2022, 150
+      otherwise), division-keyed, no others.
    2. Division sets are NAME-EXACT against data/division-classifications.json's
-      matching election blocks — joins must never miss (2001: 2000-edition
+      matching election blocks — joins must never miss (1998: the
+      1997-in-force set, Blair in / Namadgi out; 2001: 2000-edition
       set with Bonython/Burke, 2007: the 2006-edition set, 2010: the 2009
       edition, 2019/2022: the 151-division editions with Macnamara and then
       Hawke, 2025: back to 150 with Bullwinkel; 2028's 150 are the
@@ -25,7 +26,11 @@
       2007=aph09rp02, 2010=aph11rp01, 2013=absSa1Ced2011,
       2016=absSa1Ced2016, 2019=absSa1Ced2018, 2022=absMbCed2021,
       2025=absMbCed2024). The 2028 forward block carries {state, irsad, via}
-      only — the other three indexes have no 2025-boundary product.
+      only — the other three indexes have no 2025-boundary product. The
+      1998 block mirrors that asymmetry the other way: {state, irsd, ier,
+      ieo, via} only — its paper predates IRSAD (a 2001-census invention)
+      and the five-index-era Advantage composite is no substitute (kept
+      fixture-only under the key `adv`).
    4. Ranks per election x index are an exact permutation of 1..N (the APH
       prints a complete ranking; the ABS lanes compute one from their carried
       scores; ties are ordered, never shared). For irsad BOTH rank keys are
@@ -64,13 +69,14 @@
       benign within-band rank reorderings between the per-index ranked table
       and Table 5 (Table-5 canonical in this store). The counts are pinned so
       a layout shift or silent parse gap can't masquerade as clean paper.
-   9. Every fixture row carries all four indexes plus party and the APH's
-      own geographic rating from Table 5 (01cib13 has no Table 5, so rating
-      is absent there by construction) — the sibling IRSAD pipeline reuses
-      this fixture and a row must never drop a column silently.
+   9. Every fixture row carries all four of its paper's indexes (98cib04
+      substitutes its era's Advantage composite for IRSAD under the key
+      `adv`) plus party and the APH's own geographic rating from Table 5
+      (01cib13/05cib01/98cib04 have no Table 5, so rating is absent there
+      by construction) — a row must never drop a column silently.
   10. Every election's via resolves to a _provenance entry whose censusYear
-      matches the election's census (2001- and 2016-census products back
-      two elections each) — an unregistered lane must fail loud here, never
+      matches the election's census (1996 backs 1998; 2001- and 2016-census
+      products back two elections each) — an unregistered lane must fail loud here, never
       surface as a silent "via unknown" downstream. For shared elections the
       irsad lane is registered per census+derivation (irsad-published-2001
       backs the 2001 rows, irsad-published-2001-e2003 the 2004 rows, …) and
@@ -80,6 +86,15 @@
       equals the matching row in .build/analysis/seifa-index/irsad-by-division.json
       (the single-file merge is a splice, never a re-derivation — drift
       between the two stores would quietly fork the site's IRSAD record).
+      1998 is exempt: IRSAD is a 2001-census invention, so its block
+      carries none to compare.
+  12. The 1998 block's exact-match oracle: every 1998 division whose state
+      sat unchanged between the two papers' boundary sets (VIC, QLD —
+      its 1997 amendment is already in both — and the two surviving ACT
+      seats, 66 divisions in all) carries byte-identical irsd/ier/ieo
+      VALUES in 98cib04 and the aph01cib13 xcheck fixture (same 1996
+      census, same boundaries, different papers). Values only — ranks move
+      between an N=148 and an N=150 ranking universe.
 
    The extractor runs standalone from the repo root:
      node .build/analysis/seat-model/extract-division-seifa.mjs
@@ -102,16 +117,17 @@ const fixtures = JSON.parse(readFileSync(FIXTURE, "utf8"));
 const sibling = JSON.parse(readFileSync(SIBLING, "utf8"));
 
 const IDX = ["irsd", "ier", "ieo"]; // store indexes
-const IDX4 = ["irsad", "irsd", "ier", "ieo"]; // fixture indexes
-const COUNT_FOR = { 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150, 2028: 150 };
+const IDX4 = ["irsad", "irsd", "ier", "ieo"]; // fixture indexes (98cib04 substitutes adv for irsad)
+const COUNT_FOR = { 1998: 148, 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150, 2028: 150 };
 const ELECTION_SET = Object.keys(COUNT_FOR);
 const SHARED_SET = ELECTION_SET.filter((y) => y !== "2028");
 const VIA_FOR = {
+  1998: "aph98cib04",
   2001: "absCed01", 2004: "aph05cib01", 2007: "aph09rp02", 2010: "aph11rp01", 2013: "absSa1Ced2011",
   2016: "absSa1Ced2016", 2019: "absSa1Ced2018", 2022: "absMbCed2021", 2025: "absMbCed2024",
   2028: "irsad-weighted-2021-e2025",
 };
-const CENSUS_FOR = { 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021, 2028: 2021 };
+const CENSUS_FOR = { 1998: 1996, 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021, 2028: 2021 };
 const IRSAD_PROV_FOR = {
   2001: "irsad-published-2001", 2004: "irsad-published-2001-e2003",
   2007: "irsad-published-2006", 2010: "irsad-published-2006-e2009",
@@ -155,7 +171,9 @@ for (const y of ELECTION_SET) {
     `${y}: division-set mismatch — missing ${JSON.stringify(missing)} extra ${JSON.stringify(extra)}`);
   // 3
   for (const [name, row] of Object.entries(blk)) {
-    const wantKeys = y === "2028" ? ["irsad", "state", "via"] : ["ieo", "ier", "irsad", "irsd", "state", "via"];
+    const wantKeys = y === "2028" ? ["irsad", "state", "via"]
+      : y === "1998" ? ["ieo", "ier", "irsd", "state", "via"]
+      : ["ieo", "ier", "irsad", "irsd", "state", "via"];
     check(JSON.stringify(Object.keys(row).sort()) === JSON.stringify(wantKeys),
       `${y} ${name}: row keys ${Object.keys(row)}`);
     check(STATES.has(row.state), `${y} ${name}: bad state ${row.state}`);
@@ -168,14 +186,16 @@ for (const y of ELECTION_SET) {
         check(cell.value > 700 && cell.value < 1400, `${y} ${name} ${idx}: value ${cell.value} outside sanity band`);
       }
     }
-    const cell = row.irsad;
-    check(cell && Number.isFinite(cell.value) && Number.isInteger(cell.rank) && Number.isInteger(cell.rankDis),
-      `${y} ${name} irsad: bad cell ${JSON.stringify(cell)}`);
-    check(cell.rank >= 1 && cell.rank <= N && cell.rankDis >= 1 && cell.rankDis <= N,
-      `${y} ${name} irsad: ranks ${cell.rank}/${cell.rankDis} out of 1..${N}`);
-    check(cell.rankDis === N + 1 - cell.rank,
-      `${y} ${name} irsad: rankDis ${cell.rankDis} != ${N + 1} - rank ${cell.rank}`);
-    check(cell.value > 700 && cell.value < 1400, `${y} ${name} irsad: value ${cell.value} outside sanity band`);
+    if (y !== "1998") {
+      const cell = row.irsad;
+      check(cell && Number.isFinite(cell.value) && Number.isInteger(cell.rank) && Number.isInteger(cell.rankDis),
+        `${y} ${name} irsad: bad cell ${JSON.stringify(cell)}`);
+      check(cell.rank >= 1 && cell.rank <= N && cell.rankDis >= 1 && cell.rankDis <= N,
+        `${y} ${name} irsad: ranks ${cell.rank}/${cell.rankDis} out of 1..${N}`);
+      check(cell.rankDis === N + 1 - cell.rank,
+        `${y} ${name} irsad: rankDis ${cell.rankDis} != ${N + 1} - rank ${cell.rank}`);
+      check(cell.value > 700 && cell.value < 1400, `${y} ${name} irsad: value ${cell.value} outside sanity band`);
+    }
     check(row.via === VIA_FOR[y], `${y} ${name}: via ${row.via} != ${VIA_FOR[y]}`);
   }
   // 4
@@ -184,7 +204,7 @@ for (const y of ELECTION_SET) {
     check(ranks.length === N && ranks.every((r, i) => r === i + 1),
       `${y} ${idx}: ranks are not a 1..${N} permutation`);
   }
-  for (const key of ["rank", "rankDis"]) {
+  if (y !== "1998") for (const key of ["rank", "rankDis"]) {
     const ranks = Object.values(blk).map((r) => r.irsad[key]).sort((a, b) => a - b);
     check(ranks.length === N && ranks.every((r, i) => r === i + 1),
       `${y} irsad.${key}: ranks are not a 1..${N} permutation`);
@@ -194,7 +214,7 @@ for (const y of ELECTION_SET) {
 // 10 — every lane is a registered, census-correct provenance entry (both
 // the three-index lanes and the spliced IRSAD lanes)
 for (const y of ELECTION_SET) {
-  for (const via of new Set([VIA_FOR[y], IRSAD_PROV_FOR[y]])) {
+  for (const via of new Set([VIA_FOR[y], IRSAD_PROV_FOR[y]].filter(Boolean))) {
     const prov = store._provenance[via];
     check(prov != null, `${y}: no _provenance entry for via ${via}`);
     if (prov) {
@@ -207,7 +227,8 @@ for (const y of ELECTION_SET) {
 }
 
 // 11 — merged irsad cells byte-faithful to the sibling display store
-for (const y of ELECTION_SET) {
+// (1998 carries no irsad — IRSAD is a 2001-census invention)
+for (const y of ELECTION_SET.filter((y) => y !== "1998")) {
   const srows = new Map(sibling.elections[y].rows.map((r) => [r.division, r]));
   const RENAME = { "Kingston-Smith": "Kingsford Smith", "McEwan": "McEwen" };
   const canon = (n) => {
@@ -259,6 +280,20 @@ pin("2004", "Bradfield", "ier", 1218.4, 149);
 pin("2004", "Bradfield", "ieo", 1189.4, 149);
 pin("2004", "Bonner", "irsd", 1025.7, 110);
 pin("2004", "Gorton", "ieo", 928.6, 19);
+// 1998 (aph98cib04, 1996 census on the 1997-in-force boundaries) —
+// terminals on all three indexes, plus the era's own boundary markers:
+// Blair (created by the 1997 Qld amendment), the still-hyphenated
+// Kingsford-Smith, and the single-member Northern Territory division
+// (its last election before the 2000-edition split).
+pin("1998", "Fowler", "irsd", 877.7, 1);
+pin("1998", "Bradfield", "irsd", 1169.7, 148);
+pin("1998", "Grey", "ier", 925.1, 1);
+pin("1998", "Bradfield", "ier", 1240.4, 148);
+pin("1998", "Bonython", "ieo", 868.1, 1);
+pin("1998", "Bradfield", "ieo", 1196.9, 148);
+pin("1998", "Blair", "irsd", 959.6, 26);
+pin("1998", "Kingsford-Smith", "irsd", 1007.9, 94);
+pin("1998", "Northern Territory", "ier", 947.5, 14);
 // ABS lanes
 pin("2001", "Bonython", "irsd", 888.213, 2);
 pin("2001", "Bradfield", "irsd", 1139.179, 150);
@@ -299,6 +334,10 @@ PIN.forEach(() => {});
   const b2004 = store.elections["2004"];
   for (const n of ["Bonner", "Gorton"]) check(b2004[n], `2004: ${n} absent`);
   for (const n of ["Bonython", "Burke"]) check(!b2004[n], `2004: ${n} should be absent`);
+  const b1998 = store.elections["1998"];
+  for (const n of ["Blair", "Kingsford-Smith", "Northern Territory"]) check(b1998[n], `1998: ${n} absent`);
+  for (const n of ["Namadgi", "Kingsford Smith", "Lingiari", "Solomon", "Hasluck"])
+    check(!b1998[n], `1998: ${n} should be absent`);
   check(store.elections["2019"].Macnamara, "2019: Macnamara absent");
   check(store.elections["2022"].Hawke, "2022: Hawke absent");
   check(store.elections["2025"].Bullwinkel, "2025: Bullwinkel absent");
@@ -338,11 +377,14 @@ check(fixtures.aph11rp01.tieRankConflicts.length === 22,
   `aph11rp01: ${fixtures.aph11rp01.tieRankConflicts.length} tie-band conflicts != 22`);
 check(fixtures.aph05cib01.tieRankConflicts.length === 0,
   `aph05cib01: ${fixtures.aph05cib01.tieRankConflicts.length} tie-band conflicts != 0 (no Table 5 to differ from)`);
+check(fixtures.aph98cib04.tieRankConflicts.length === 0,
+  `aph98cib04: ${fixtures.aph98cib04.tieRankConflicts.length} tie-band conflicts != 0 (no Table 5 to differ from)`);
 
-// 9 — fixture rows carry the full four-index set + party + (Table-5 papers) rating
+// 9 — fixture rows carry the paper's full index set + party + (Table-5 papers) rating
 for (const via of Object.keys(fixtures)) {
+  const FIDX = via === "aph98cib04" ? ["adv", "irsd", "ier", "ieo"] : IDX4;
   for (const [name, row] of Object.entries(fixtures[via].rows)) {
-    for (const idx of IDX4)
+    for (const idx of FIDX)
       check(row[idx] && Number.isFinite(row[idx].value) && Number.isInteger(row[idx].rank),
         `${via} ${name}: fixture ${idx} cell broken`);
     check(typeof row.party === "string" && row.party.length, `${via} ${name}: no party`);
@@ -351,6 +393,26 @@ for (const via of Object.keys(fixtures)) {
     else
       check(row.rating === undefined, `${via} ${name}: unexpected rating on summary-table-less paper`);
   }
+}
+
+// 12 — the 1998 exact-match oracle: same 1996 census, same boundaries as
+// the aph01cib13 fixture on every division whose state sat unchanged
+// between the two papers' boundary sets (VIC, QLD and the two surviving
+// ACT seats, 66 divisions) → irsd/ier/ieo VALUES byte-identical across
+// the two independently parsed papers.
+{
+  const xrows = fixtures.aph01cib13.rows;
+  let compared = 0;
+  for (const [name, row] of Object.entries(store.elections["1998"])) {
+    if (!["VIC", "QLD", "ACT"].includes(row.state)) continue;
+    const xr = xrows[name];
+    if (!xr) { failures.push(`1998 ${name}: absent from aph01cib13 fixture`); continue; }
+    compared++;
+    for (const idx of IDX)
+      check(row[idx].value === xr[idx].value,
+        `1998 ${name} ${idx}: 98cib04 ${row[idx].value} != 01cib13 ${xr[idx].value}`);
+  }
+  check(compared === 66, `98cib04∩01cib13 compared ${compared} divisions, want 66`);
 }
 
 die();

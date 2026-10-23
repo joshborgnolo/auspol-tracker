@@ -11,6 +11,9 @@ This note is the manifest to rebuild that cache from scratch.
 | Path | What |
 |---|---|
 | `.build/analysis/seifa-index/cache/rr5.txt` | AEC Research Report No.5 (2005) pdftotext — Attachment 1 ranks, `<https://www.aec.gov.au/About_AEC/research/files/research_paper5.pdf>` |
+| `.build/analysis/seifa-index/src/aph/aph-98cib04.htm` | APH CIB no.4 1998–99 (1996c × the 1997-in-force boundaries) — served as HTML, committed as the raw Wayback `id_` capture; consumed by the seat-model extractor (`aph98cib04` via `aphHtmlLines`), **not** derive-irsad.py. Five-index era: Advantage composite stays fixture-only as `adv`, the store block carries irsd/ier/ieo only |
+| `.build/analysis/seifa-index/src/aph/aph-01cib13.txt` | APH CIB no.13 2000–01 (1996c × 2000b) — 2001-row fallback + the 1998 block's cross-paper oracle (66 untouched divisions byte-identical) |
+| `.build/analysis/seifa-index/src/aph/aph-05cib01.txt` | APH CIB no.1 2004–05 (2001c × 2003b) — 2004-row source |
 | `.build/analysis/seifa-index/src/aph/aph-09rp02.txt` | APH RP no.2 2008–09, Table 2a (2006c×2006b) |
 | `.build/analysis/seifa-index/src/aph/aph-11rp01.txt` | APH RP no.1 2010–11, Table 2a (2006c×2009b) |
 | `.build/analysis/seifa-index/src/abs/abs-seifa-2011-ced-populations.xls` | ABS 2033.0.55.001 SEIFA 2011 — CED population distributions (2011-edition CEDs) |
@@ -30,6 +33,7 @@ This note is the manifest to rebuild that cache from scratch.
 | `abs-seifa-2016-sa1-indexes.xls` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012016?OpenDocument` → SA1 cube |
 | `abs-seifa-2021-sa1-indexes.xlsx` | SEIFA 2021 release page, "Index of Relative Socio-economic Advantage and Disadvantage" … `abs.gov.au` → SEIFA 2021 → Statistical Area Level 1 |
 | `dl/seifa2001-aus.zip` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012001?OpenDocument` — the "Commonwealth Electoral Division" cube set (`AUS_ced_s01.xls`, published per-division scores on 2000/01-edition CEDs; consumed by seat-model's 3-index pipeline) |
+| `dl/seifa1996-australia.zip` | ABS cat 2033.0.55.001 `DetailsPage/2033.0.55.0011996?OpenDocument` — per-state `XX SEIFA96.xls` CD-level cubes (five index columns + population). **Unparsed as of 2026-10-24**: the 1998-election need it was fetched for is satisfied at grade A by the published APH CIB no.4 1998–99 tables (`aph-98cib04.htm`); a CD→CED(1997-in-force) concordance was never sourced. Kept as the grade-B fallback for any 1996–2000 work (rr6 §7) |
 
 ### Allocation / membership + weights (`<root>/.matilda/seifa-irsad-abs/dl/`)
 
@@ -48,6 +52,10 @@ Fetch gotchas (all hit live during the 2026-10-23 build): spaces in
 subscriber.nsf query strings must be %-escaped or curl exits (3) "URL
 rejected"; abs.gov.au `subserv` endpoints 302 twice, so always `curl -L`;
 the subscriber `&`/query ampersands must stay inside a single-quoted URL.
+Dead ends checked (2026-10-24): ABS cat 2905.0/1996's PDF is image-only
+and its Appendix I is profile name lists only — no CD→CED concordance,
+kill it as a source; the ABS's own live catalogue page for the 1996
+SEIFA data serves the cube set above fine.
 
 ## QA gates the pipeline runs (fails loud)
 

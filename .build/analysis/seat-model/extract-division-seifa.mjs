@@ -23,6 +23,15 @@
      four ranked two-column tables (captions "Ranked by the Index of …" in
      fixed IRSAD/IRSD/IER/IEO order). Scores are read from the ranked rows;
      ranks are printed and authoritative.
+   - APH CIB 4/1998-99 (Newman & Kopras): 1996 Census x 1997 boundaries ->
+     1998 election block, aph98cib04 — the five-index-era paper. Its first
+     two tables carry the era's Urban+Rural "Advantage" composite, NOT the
+     2001-census-era IRSAD, so the fixture keeps them under an `adv` key
+     and the store drops them (1998 rows carry irsd/ier/ieo only — the
+     store's third row shape). The one committed source served as HTML
+     (Wayback id_ capture of the live APH page, fmt:"html" — converted to
+     the shared line grammar by aphHtmlLines): eight <h2>-captioned
+     tables, every <tr> two division packs split by an empty spacer <td>.
    AEC RR5 att1 (2001 census, IR SAD only) is the gold standard the
    2001-census derivation cross-checks against — not a source here.
 
@@ -43,6 +52,11 @@
    - Table 5 clips long name cells at the column edge, EATING the closing
      " )" of the state abbreviation on two rows per paper (Kingsford Smith,
      Melbourne Ports) — row regexes therefore make that ')' optional.
+   - 98cib04 is HTML: each table is headed by its <h2> caption followed by
+     the lines "1997 Electoral Boundaries" / "1996 Census of Population
+     and Housing" (bare text — aphHtmlLines never emits them), values
+     one-decimal with thousands separators, states "Vic"/"Tas" (no dot);
+     its ranked IEO caption drops "the", exactly like 01cib13's.
    - pdftotext form feeds (\f) prefix some rows; stripped before parsing.
 
    Doctrine: the store carries APH-PRINTED ranks verbatim (never recomputed —
@@ -148,6 +162,23 @@ const PAPERS = [
     ],
     terminals: true, // Appendix narrative follows the IEO ranked table
   },
+  {
+    via: "aph98cib04", fmt: "html",
+    file: `${APH_DIR}/aph-98cib04.htm`,
+    title: "Socio-Economic Indexes for Electoral Divisions, 1997 Electoral Boundaries, 1996 Census (APH CIB 4/1998-99, Newman & Kopras, 8 Dec 1998)",
+    censusYear: 1996, editionInForce: "1997", elections: ["1998"],
+    // Five-index-era paper: two of its eight tables carry the era's
+    // Urban+Rural Advantage composite (NOT the 2001-on IRSAD), so the
+    // fixture reads them under an `adv` key and the store never sees them.
+    indexes: ["adv", "irsd", "ier", "ieo"],
+    markers: [
+      T1("adv_a", "adv", "scores"), T1("adv_b", "adv", "ranked"),
+      T1("dis_a", "irsd", "scores"), T1("dis_b", "irsd", "ranked"),
+      T1("ier_a", "ier", "scores"), T1("ier_b", "ier", "ranked"),
+      T1("ieo_a", "ieo", "scores"), T1("ieo_b", "ieo", "ranked"),
+    ],
+    terminals: true, // Appendix follows the IEO ranked table
+  },
 ];
 /* Marker discriminators: 09rp02/11rp01 anchor on "Table Na:/Nb:/N:" labels.
    01cib13 has no labels — its captions are unique full prose lines —
@@ -177,6 +208,20 @@ const CAPTIONS_05CIB01 = [
   /^Ranked by the Index of Economic Resources\s*$/,
   /^Index of Education and Occupation\s*$/,
   /^Ranked by the Index of Education and Occupation\s*$/,
+];
+/* 98cib04's captions are the <h2> heads of the served HTML tables in fixed
+   order (its ranked IEO caption drops "the", exactly like 01cib13's). The
+   front-matter <h2>s (Introduction/Highlights/Appendix) never match — only
+   these eight do, once each, in this order. */
+const CAPTIONS_98CIB04 = [
+  /^Index of Relative Socio-Economic Advantage by Electoral Division\s*$/,
+  /^Electoral Divisions Ranked by the Index of Relative Socio-Economic Advantage\s*$/,
+  /^Index of Relative Socio-Economic Disadvantage by Electoral Division\s*$/,
+  /^Electoral Divisions Ranked by the Index of Relative Socio-Economic Disadvantage\s*$/,
+  /^Index of Economic Resources by Electoral Division\s*$/,
+  /^Electoral Divisions Ranked by the Index of Economic Resources\s*$/,
+  /^Index of Education and Occupation by Electoral Division\s*$/,
+  /^Electoral Divisions Ranked by Index of Education and Occupation\s*$/,
 ];
 
 const HEADER_TOKENS = new Set([
@@ -224,12 +269,44 @@ const fail = (msg) => { console.error(`\nFAIL: ${msg}`); process.exit(1); };
 
 const TERMINAL = /^Appendix\b|^Endnotes\b|^Bibliography\b|^Conclusion\b|^Sources\b/;
 
+/* 98cib04 is the one committed source captured as SERVED HTML (a Wayback
+   id_ snapshot of the live APH page), not a pdftotext dump. Reduce it to
+   the same line grammar the other papers use: every <h2> becomes its
+   caption line; every <tr> becomes one line, its two division packs
+   joined by three spaces where the empty spacer <td> sat. Header rows
+   reduce to furniture tokens and noiseLine drops them; the edition and
+   census lines between caption and table are bare text and never become
+   lines. A <tr> shapes out to exactly 6 (scores, 2 x 3) or 8 (ranked,
+   2 x 4) non-empty cells — anything else fails loudly as a layout shift. */
+const ENTITIES = { nbsp: "\xa0", amp: "&", lt: "<", gt: ">", quot: "\"" };
+const deEnt = (s) => s.replace(/&(nbsp|amp|lt|gt|quot);|&#(\d+);/gi, (m, n, d) =>
+  d ? String.fromCharCode(+d) : ENTITIES[n.toLowerCase()] ?? m);
+const cellText = (s) => deEnt(s.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+function aphHtmlLines(raw) {
+  const HALVES = { 6: 3, 8: 4 };
+  const lines = [];
+  for (const m of raw.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>|<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
+    if (m[1] != null) { lines.push(cellText(m[1])); continue; }
+    const cells = [...m[2].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)]
+      .map((c) => cellText(c[1])).filter(Boolean);
+    if (!cells.length) continue;
+    const w = HALVES[cells.length];
+    if (!w) fail(`aph98cib04: ${cells.length} cells in a <tr> — table layout changed?`);
+    lines.push(cells.slice(0, w).join(" ") + "   " + cells.slice(w).join(" "));
+  }
+  return lines;
+}
+
 function parsePaper(cfg) {
   const raw = readFileSync(cfg.file, "utf8").replace(/\f/g, "\n");
-  const lines = raw.split(/\r?\n/).map((l) => l.replace(/\s+$/, ""));
-  const useCaptions = cfg.via === "aph01cib13" || cfg.via === "aph05cib01";
-  const CAPTIONS = cfg.via === "aph05cib01" ? CAPTIONS_05CIB01 : CAPTIONS_01CIB13;
+  const lines = cfg.fmt === "html"
+    ? aphHtmlLines(raw)
+    : raw.split(/\r?\n/).map((l) => l.replace(/\s+$/, ""));
+  const useCaptions = cfg.via === "aph01cib13" || cfg.via === "aph05cib01" || cfg.via === "aph98cib04";
+  const CAPTIONS = cfg.via === "aph05cib01" ? CAPTIONS_05CIB01
+    : cfg.via === "aph98cib04" ? CAPTIONS_98CIB04 : CAPTIONS_01CIB13;
   const numbered = !useCaptions;
+  const IDX_LIST = cfg.indexes ?? INDEXES;
 
   // Walk lines, assigning each to a block once a marker fires. A terminal
   // heading (Appendix etc.) closes the current block permanently. For
@@ -258,7 +335,7 @@ function parsePaper(cfg) {
     if (numbered) {
       const m = /^(?:Table\s+)?([1-4])([ab])\s*[:\.]/.exec(t) || (/^Table\s+5\s*[:\.]/.test(t) ? ["", "5", ""] : null);
       if (m) hit = `${m[1]}${m[2]}`.replace(/^5$/, "5");
-    } else if (cfg.via === "aph01cib13") {
+    } else if (cfg.via === "aph01cib13" || cfg.via === "aph98cib04") {
       if (captionPos < CAPTIONS.length && CAPTIONS[captionPos].test(t)) { hit = cfg.markers[captionPos].id; captionPos++; }
     } else {
       for (let p = 0; p < CAPTIONS.length; p++) {
@@ -347,7 +424,7 @@ function parsePaper(cfg) {
   // (the papers never state a tie rule and the two printed tables were ranked
   // with different precision). Value-vs-rank cross computation never happens.
   const conflicts = [];
-  for (const idx of INDEXES) {
+  for (const idx of IDX_LIST) {
     const a = scores[idx], b = ranked[idx];
     if (!a.size) fail(`${cfg.via}: empty scores table for ${idx}`);
     if (a.size !== b.size) fail(`${cfg.via} ${idx}: scores n=${a.size} vs ranked n=${b.size}`);
@@ -358,7 +435,7 @@ function parsePaper(cfg) {
     }
   }
   if (summary.size) {
-    for (const idx of INDEXES) {
+    for (const idx of IDX_LIST) {
       for (const [name, r] of ranked[idx]) {
         const s5 = summary.get(name);
         if (!s5) fail(`${cfg.via} ${idx}: '${name}' ranked but absent from table 5`);
@@ -371,7 +448,7 @@ function parsePaper(cfg) {
     // Every rank conflict must be benign: all divisions sharing that rounded
     // score must hold, between them, THE SAME set of rank positions in both
     // printed tables (a pure within-band shuffle, not a real disagreement).
-    for (const idx of INDEXES) {
+    for (const idx of IDX_LIST) {
       const conflictValues = new Set(conflicts.filter((c) => c.idx === idx).map((c) => c.value));
       for (const value of conflictValues) {
         const band = [...ranked[idx].entries()].filter(([, r]) => r.value === value).map(([n]) => n);
@@ -395,7 +472,7 @@ function parsePaper(cfg) {
     if (party) row.party = party;
     const rating = summary.get(name)?.rating;
     if (rating) row.rating = rating;
-    for (const idx of INDEXES) {
+    for (const idx of IDX_LIST) {
       const s = scores[idx].get(name), r = ranked[idx].get(name);
       const rank = summary.size ? summary.get(name).ranks[idx] : r.rank;
       row[idx] = { value: s.value, rank };
@@ -403,7 +480,7 @@ function parsePaper(cfg) {
     }
     rows[name] = row;
   }
-  console.log(`${cfg.via}: ${names.length} divisions x ${INDEXES.length} indexes parsed (${cfg.title})`);
+  console.log(`${cfg.via}: ${names.length} divisions x ${IDX_LIST.length} indexes parsed (${cfg.title})`);
   return {
     via: cfg.via, title: cfg.title, censusYear: cfg.censusYear,
     editionInForce: cfg.editionInForce, xcheck: !!cfg.xcheck, tieRankConflicts: conflicts, rows,
@@ -430,14 +507,16 @@ const ABOUT =
   ".build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; " +
   "ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights " +
   "recomputed), so scores and ranks compare WITHIN a census year, never across them. Census-year and " +
-  "boundary-edition provenance ride each election block (_provenance). 2001-census-era elections (2001, 2004) " +
-  "have no published four-index per-division table (AEC RR5 att1 prints IRSAD only): 2001 is the ABS's own " +
-  "published 2001-CED cube (scores as printed, ranks computed from them); 2013-2025 are ABS-cube derivations " +
+  "boundary-edition provenance ride each election block (_provenance). APH-lane elections are 1998 " +
+  "(aph98cib04, 1996 census x the 1997-in-force boundaries) and 2004 (aph05cib01, 2001 census x the 2003 " +
+  "edition). 2001 is the ABS's own published 2001-CED cube (scores as printed, ranks computed from them; " +
+  "AEC RR5 att1 prints IRSAD only). 2013-2025 are ABS-cube derivations " +
   "per 2039.0 (SA1 2011/2016 cubes x their CED allocation for 2013-2019, MB-level 2021 cube x allocation for " +
-  "2022/2025), exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2004 needs a 2001-CD " +
-  "to 2003-edition concordance the ABS never published. 2028 is an irsad-only forward block (2021-census " +
-  "derivation on the 2025 gazetted boundaries; the other three indexes await a census). 1987-1998 " +
-  "(five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.";
+  "2022/2025), exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2028 is an " +
+  "irsad-only forward block (2021-census derivation on the 2025 gazetted boundaries; the other three " +
+  "indexes await a census), 1998 an irsd/ier/ieo-only one — IRSAD did not exist until the 2001 census and " +
+  "the five-index-era Advantage composite the paper prints is NOT IRSAD (fixture-only, key `adv`). " +
+  "1987-1993 (five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.";
 
 const provenance = {};
 const elections = {};

@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed 9cfc5df0), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json), MERGED the same day on the user's call ("yeah, single file") into the ONE four-index store data/division-seifa-indexes.json: 10 elections 2001→2028 (2028 irsad-only), 1,502 rows {state, irsd, ier, ieo, irsad, via}, irsad cells {value, rank 1=most advantaged, rankDis N+1−rank} plus an irsad-* provenance lane, spliced from the seifa-src/irsad-cells.json fixture derive-irsad.py emits (never re-derived); irsad-by-division.json stays the display store and splice fidelity to it is invariant 11 of test-division-seifa.mjs.
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH FIVE-paper set = CIB4/1998-99 1996×1997-in-force (five-index era, served as HTML) + CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed 9cfc5df0), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json), MERGED the same day on the user's call ("yeah, single file") into the ONE four-index store data/division-seifa-indexes.json, then extended to ELEVEN elections the same day with the 1998 block from the published CIB 4/1998-99 tables: 1998→2028, 1,650 rows {state, irsd, ier, ieo, irsad, via} (1998 rows irsd/ier/ieo-only, no irsad — the index did not exist before the 2001 census; the paper's Advantage composite is fixture-only as `adv`), irsad cells {value, rank 1=most advantaged, rankDis N+1−rank} plus an irsad-* provenance lane, spliced from the seifa-src/irsad-cells.json fixture derive-irsad.py emits (never re-derived); irsad-by-division.json stays the display store and splice fidelity to it is invariant 11 of test-division-seifa.mjs.
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -19,14 +19,19 @@ source-page caches in its `src/`, the 2019 pocketbook full-text in
 
 Yes — flat answer, no caveat: since the 2026-10-24 merge (user call
 "yeah, single file") **all four indexes per division per election live
-in ONE store, `data/division-seifa-indexes.json`** — 10 elections
-2001→2028, 1,502 rows of `{state, irsd, ier, ieo, irsad, via}` (1,352
-shared rows byte-faithful to the pre-merge store except the added irsad
-key; the 150-row 2028 forward block is irsad-only `{state, irsad, via}`
-— the other three indexes have no 2025-boundary product). The TWO-STORE
-SPLIT documented below as "deliberate" lasted one day: the IRSAD
-derived store `.build/analysis/seifa-index/irsad-by-division.json` is
-now the splice's SOURCE OF TRUTH (via the name-canonicalised
+in ONE store, `data/division-seifa-indexes.json`** and the same day's
+1998 extension covers **11 elections 1998→2028, 1,650 rows** of
+`{state, irsd, ier, ieo, irsad, via}` (1,352 shared rows byte-faithful
+to the pre-merge store except the added irsad key; the 150-row 2028
+forward block is irsad-only `{state, irsad, via}` — the other three
+indexes have no 2025-boundary product; the 148-row 1998 block mirrors
+that asymmetry the other way — `{state, irsd, ier, ieo, via}`, no
+irsad, because the index did not exist before the 2001 census and its
+paper's five-index-era Advantage composite is fixture-only as `adv`,
+never mapped to irsad). The TWO-STORE SPLIT documented below as
+"deliberate" lasted one day: the IRSAD derived store
+`.build/analysis/seifa-index/irsad-by-division.json` is now the
+splice's SOURCE OF TRUTH (via the name-canonicalised
 `.build/analysis/seat-model/seifa-src/irsad-cells.json` fixture
 derive-irsad.py emits beside it → extract-division-seifa.mjs's IRSAD
 lane) and stays the display store; the merge is a splice, never a
@@ -63,16 +68,23 @@ the "sibling store" split this section title-era described is one day
 stale): `.build/analysis/seat-model/extract-division-seifa.mjs` (fixture
 parsers + merge) consumes `.build/analysis/seat-model/derive-division-seifa-abs.py`
 (ABS lanes) and emits `data/division-seifa-indexes.json` — elections
-`{2001,2004,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150 ·
-2028: 150 irsad-only}` = **1,502 rows** of `{state, irsd, ier, ieo,
-irsad, via}` (2028 rows `{state, irsad, via}` — no 2025-boundary product
-for the other three indexes), pinned by
-`.build/analysis/seat-model/test-division-seifa.mjs` (10-election set,
+`{1998: 148 · 2001,2004,2007,2010,2013,2016: 150 · 2019,2022: 151 ·
+2025: 150 · 2028: 150 irsad-only}` = **1,650 rows** of `{state, irsd,
+ier, ieo, irsad, via}` (2028 rows `{state, irsad, via}` — no
+2025-boundary product for the other three indexes; 1998 rows `{state,
+irsd, ier, ieo, via}` — no IRSAD before the 2001 census), pinned by
+`.build/analysis/seat-model/test-division-seifa.mjs` (11-election set,
 name-exact vs division-classifications, rank permutations incl. both
-irsad rank keys, 20+ pinned cells, provenance census-year pins solving
+irsad rank keys — every irsad check guarded `y !== "1998"`, 49 pinned
+cells, provenance census-year pins solving
 BOTH lanes per election — the irsad lane's keys are
 `irsad-<derivation>-<census>`, `-e<edition>` suffixed where one census
-backs two elections). The "IRSAD stays deliberately absent" design this
+backs two elections). The 1998 block's verification is the strongest in
+the store (invariant 12): its same-census sibling 01cib13 (2000
+boundaries) doubles as an EXACT-match oracle — the 66 divisions
+untouched between the two editions (VIC 37 + QLD 27 + ACT 2) must print
+identical values on all three shared indexes (ranks move — N=148 vs
+150 universes). The "IRSAD stays deliberately absent" design this
 section documented lasted one day: the irsad cells were spliced in
 2026-10-24 from `seifa-src/irsad-cells.json` (names/state already
 canonicalised there; a splice of the sibling store's committed display
@@ -83,8 +95,14 @@ tapes' order, kept); the irsad cell carries BOTH —
 `rank` 1 = most ADVANTAGED (the sibling display store's natural read,
 == the descending-score recompute) and `rankDis` = N+1−rank, the store
 convention. Pick deliberately per consumer.** Lane
-map: **2004 = APH CIB 1/2004-05 printed tables** (2001 census × 2003
-boundaries — see the four-paper set below); 2007/2010 = APH printed
+map: **1998 = APH CIB no.4 1998–99 printed tables** (aph98cib04, 1996
+census × the 1997-in-force boundaries — the series' one served-as-HTML
+paper, committed as the raw Wayback `id_` capture `aph-98cib04.htm` and
+folded into the shared line grammar by the extractor's `aphHtmlLines`;
+five-index era — its Advantage composite rides the fixture as `adv` and
+never reaches the store, consumers key per-paper index lists);
+**2004 = APH CIB 1/2004-05 printed tables** (2001 census × 2003
+boundaries — see the five-paper set below); 2007/2010 = APH printed
 tables (scores+ranks verbatim);
 **2001 = the ABS's own published 2001-CED cube** (`AUS_ced_s01.xls`,
 2001C×2000/01-edition CEDs, scores printed / ranks computed, IRSAD column
@@ -151,14 +169,20 @@ order is Table1=IRSAD in 2011, Table1=IRSD in 2016 — same swap.
   SEIFA/socio/advantage/census) and every post-2007 VTR
   HouseDivisionClassifications page shows the same geography-only columns.
   Treat RR5-Att1 as the AEC's *only* public SEIFA-by-division table.
-- **Parliamentary Library — FOUR papers, series closed ~2010.** Recoverable
+- **Parliamentary Library — FIVE papers, series closed ~2010.** Recoverable
   **only** via Wayback (live aph.gov.au 403s every probes with a 411-byte
-  body). Three PDFs + pdftotext committed `53831398` and the fourth
+  body). Three PDFs + pdftotext committed `53831398`, the fourth
   (05cib01, found 2026-10-24 at Wayback
-  `…/web/20061208010454id_/http://www.aph.gov.au/library/pubs/cib/2004-05/05cib01.pdf`)
-  at `.build/analysis/seifa-index/src/aph/`:
+  `…/web/20061208010454id_/http://www.aph.gov.au/library/pubs/cib/2004-05/05cib01.pdf`),
+  and the fifth (98cib04 — served as HTML, committed as the raw Wayback
+  `id_` capture the day it landed) all at
+  `.build/analysis/seifa-index/src/aph/`:
   | Citation | Census × Boundaries | Repo file |
   |---|---|---|
+  | **Current Issues Brief no.4 1998–99** — Newman & Kopras, "Socio-Economic
+    Indexes for Electoral Divisions (1997 Electoral Boundaries)",
+    8/12/1998 — **five-index era** (Advantage composite + IRSD/IER/IEO,
+    no IRSAD) | 1996 × **1997 (in-force)** | `aph-98cib04.htm` (HTML) |
   | **Current Issues Brief no.13 2000–01** — Newman & Kopras, "Socioeconomic
     Indexes for Electoral Divisions (2000 Electoral Boundaries)",
     3/04/2001, ISSN 1440-2009 | 1996 × 2000 | `aph-01cib13.{pdf,txt}` |
@@ -202,7 +226,7 @@ order is Table1=IRSAD in 2011, Table1=IRSD in 2016 — same swap.
   hard-reliance). Companion RP "Electorate Rankings: Census …" (Kopras) is
   a *different* product (census-variable rankings, not SEIFA) — citeable
   from `aph-01cib13.txt` line 445 fn3.
-  **Method constant** across all four papers: population-weighted average
+  **Method constant** across all five papers: population-weighted average
   of constituent CDs (= the AEC/ABS 2039.0 §2.2 recipe) — the APH did its
   own bespoke 2001-CD weighting onto the 2003 boundaries for 05cib01, which
   is precisely the concordance no ABS/AEC product ever published.
@@ -220,7 +244,7 @@ nearest by mere distance — check direction):
 | 1987 | 1984 | 1986 | old-catalogue 1986 CED profile CDs (Unlodged 12N29.3M block) + CD cubes | C |
 | 1990/1993 | 1987/1990 | 1986→1991 | CD cubes + era concordances | C |
 | 1996 | 1993 | 1996 (6 wk after — use 1991? no: 1996 census too late; **1991**) | CD cubes | C |
-| 1998 | 1996 | 1996 | SEIFA-1996 CD + 1996-edition concordance | B |
+| 1998 | 1997 (in force) | 1996 | **LANDED: APH CIB no.4 1998–99** (aph98cib04; five-index era — Advantage composite fixture-only as `adv`; SEIFA-1996 CD cube `dl/seifa1996-australia.zip` kept as the grade-B fallback, unparsed) | A |
 | 2001 | 2000 | 2001 | **2001 LANDED: ABS's own AUS_ced_s01.xls cube** (2000/01-edition CEDs) + AEC RR5-Att1 (same set, printed IRSAD); CIB13 is 1996-census so no APH paper covers this row | A |
 | 2004 | 2003 | 2001 | **LANDED: APH CIB 1/2004-05** (2001 census × 2003-edition CEDs, the APH's own bespoke CD weighting — no ABS/AEC 2001-CD→2003-CED concordance exists) | A |
 | 2007 | 2006 | 2006 | **APH RP09rp02 (2006×2006)** + ABS 2007-CED dist xlsx — LANDED | A |

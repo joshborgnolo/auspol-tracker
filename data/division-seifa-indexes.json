@@ -1,5 +1,5 @@
 {
-  "_about": "SEIFA (ABS Socio-Economic Indexes for Areas) per federal electoral division, all four indexes: IRSD = Index of Relative Socio-Economic Disadvantage (pure disadvantage; HIGH score = LESS disadvantaged), IER = Index of Economic Resources, IEO = Index of Education and Occupation, IRSAD = Index of Relative Socio-Economic Advantage and Disadvantage. irsd/ier/ieo ranks run 1 = MOST disadvantaged (the APH tapes' own order); an irsad cell instead carries TWO ranks — `rank` = 1 most ADVANTAGED (the sibling pipeline's and the index's natural read), `rankDis` = 1 most disadvantaged (this store's convention, = N+1-rank). IRSAD lands from the sibling pipeline's irsad-cells.json (derive-irsad.py), which also owns the display store at .build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights recomputed), so scores and ranks compare WITHIN a census year, never across them. Census-year and boundary-edition provenance ride each election block (_provenance). 2001-census-era elections (2001, 2004) have no published four-index per-division table (AEC RR5 att1 prints IRSAD only): 2001 is the ABS's own published 2001-CED cube (scores as printed, ranks computed from them); 2013-2025 are ABS-cube derivations per 2039.0 (SA1 2011/2016 cubes x their CED allocation for 2013-2019, MB-level 2021 cube x allocation for 2022/2025), exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2004 needs a 2001-CD to 2003-edition concordance the ABS never published. 2028 is an irsad-only forward block (2021-census derivation on the 2025 gazetted boundaries; the other three indexes await a census). 1987-1998 (five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.",
+  "_about": "SEIFA (ABS Socio-Economic Indexes for Areas) per federal electoral division, all four indexes: IRSD = Index of Relative Socio-Economic Disadvantage (pure disadvantage; HIGH score = LESS disadvantaged), IER = Index of Economic Resources, IEO = Index of Education and Occupation, IRSAD = Index of Relative Socio-Economic Advantage and Disadvantage. irsd/ier/ieo ranks run 1 = MOST disadvantaged (the APH tapes' own order); an irsad cell instead carries TWO ranks — `rank` = 1 most ADVANTAGED (the sibling pipeline's and the index's natural read), `rankDis` = 1 most disadvantaged (this store's convention, = N+1-rank). IRSAD lands from the sibling pipeline's irsad-cells.json (derive-irsad.py), which also owns the display store at .build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights recomputed), so scores and ranks compare WITHIN a census year, never across them. Census-year and boundary-edition provenance ride each election block (_provenance). APH-lane elections are 1998 (aph98cib04, 1996 census x the 1997-in-force boundaries) and 2004 (aph05cib01, 2001 census x the 2003 edition). 2001 is the ABS's own published 2001-CED cube (scores as printed, ranks computed from them; AEC RR5 att1 prints IRSAD only). 2013-2025 are ABS-cube derivations per 2039.0 (SA1 2011/2016 cubes x their CED allocation for 2013-2019, MB-level 2021 cube x allocation for 2022/2025), exact-verified against the ABS CED SA1-distribution cubes for 2013/2016. 2028 is an irsad-only forward block (2021-census derivation on the 2025 gazetted boundaries; the other three indexes await a census), 1998 an irsd/ier/ieo-only one — IRSAD did not exist until the 2001 census and the five-index-era Advantage composite the paper prints is NOT IRSAD (fixture-only, key `adv`). 1987-1993 (five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.",
   "_provenance": {
     "aph09rp02": {
       "title": "Socio-economic indexes for electoral divisions: 2006 Census (APH RP 2/2008-09, Nelson, 15 Aug 2008)",
@@ -20,6 +20,11 @@
       "title": "Socio-economic indexes for electoral divisions: 2001 Census (2003 boundaries) (APH CIB 1/2004-05, Newman & Kopras, 12 Jul 2004)",
       "censusYear": 2001,
       "editionInForce": "2003"
+    },
+    "aph98cib04": {
+      "title": "Socio-Economic Indexes for Electoral Divisions, 1997 Electoral Boundaries, 1996 Census (APH CIB 4/1998-99, Newman & Kopras, 8 Dec 1998)",
+      "censusYear": 1996,
+      "editionInForce": "1997"
     },
     "absCed01": {
       "title": "ABS SEIFA 2001 per-division cube (AUS_ced_s01.xls, cat 2033.0.55.001 data-only reissue) — 2001 Census scores on the 2001 electoral divisions",
@@ -135,6 +140,2376 @@
     }
   },
   "elections": {
+    "1998": {
+      "Adelaide": {
+        "state": "SA",
+        "irsd": {
+          "value": 1017.7,
+          "rank": 99
+        },
+        "ier": {
+          "value": 987.7,
+          "rank": 66
+        },
+        "ieo": {
+          "value": 1079.3,
+          "rank": 126
+        },
+        "via": "aph98cib04"
+      },
+      "Hunter": {
+        "state": "NSW",
+        "irsd": {
+          "value": 960.3,
+          "rank": 29
+        },
+        "ier": {
+          "value": 995.4,
+          "rank": 72
+        },
+        "ieo": {
+          "value": 919.7,
+          "rank": 8
+        },
+        "via": "aph98cib04"
+      },
+      "Aston": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1074.3,
+          "rank": 130
+        },
+        "ier": {
+          "value": 1099.5,
+          "rank": 134
+        },
+        "ieo": {
+          "value": 1043.9,
+          "rank": 111
+        },
+        "via": "aph98cib04"
+      },
+      "Indi": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1002.5,
+          "rank": 91
+        },
+        "ier": {
+          "value": 973,
+          "rank": 42
+        },
+        "ieo": {
+          "value": 980.1,
+          "rank": 68
+        },
+        "via": "aph98cib04"
+      },
+      "Ballarat": {
+        "state": "VIC",
+        "irsd": {
+          "value": 988.3,
+          "rank": 67
+        },
+        "ier": {
+          "value": 975.8,
+          "rank": 44
+        },
+        "ieo": {
+          "value": 986.5,
+          "rank": 79
+        },
+        "via": "aph98cib04"
+      },
+      "Isaacs": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1014.1,
+          "rank": 96
+        },
+        "ier": {
+          "value": 1019.6,
+          "rank": 95
+        },
+        "ieo": {
+          "value": 984.3,
+          "rank": 74
+        },
+        "via": "aph98cib04"
+      },
+      "Banks": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1008.1,
+          "rank": 95
+        },
+        "ier": {
+          "value": 1039.2,
+          "rank": 110
+        },
+        "ieo": {
+          "value": 1009.5,
+          "rank": 100
+        },
+        "via": "aph98cib04"
+      },
+      "Jagajaga": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1068.8,
+          "rank": 128
+        },
+        "ier": {
+          "value": 1070.1,
+          "rank": 129
+        },
+        "ieo": {
+          "value": 1081.1,
+          "rank": 127
+        },
+        "via": "aph98cib04"
+      },
+      "Barker": {
+        "state": "SA",
+        "irsd": {
+          "value": 963.1,
+          "rank": 33
+        },
+        "ier": {
+          "value": 952.5,
+          "rank": 18
+        },
+        "ieo": {
+          "value": 923.6,
+          "rank": 13
+        },
+        "via": "aph98cib04"
+      },
+      "Kalgoorlie": {
+        "state": "WA",
+        "irsd": {
+          "value": 966.4,
+          "rank": 36
+        },
+        "ier": {
+          "value": 974.3,
+          "rank": 43
+        },
+        "ieo": {
+          "value": 951.5,
+          "rank": 33
+        },
+        "via": "aph98cib04"
+      },
+      "Barton": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1019.2,
+          "rank": 101
+        },
+        "ier": {
+          "value": 1041.1,
+          "rank": 114
+        },
+        "ieo": {
+          "value": 1025.2,
+          "rank": 108
+        },
+        "via": "aph98cib04"
+      },
+      "Kennedy": {
+        "state": "QLD",
+        "irsd": {
+          "value": 959.9,
+          "rank": 27
+        },
+        "ier": {
+          "value": 958.4,
+          "rank": 22
+        },
+        "ieo": {
+          "value": 930.8,
+          "rank": 18
+        },
+        "via": "aph98cib04"
+      },
+      "Bass": {
+        "state": "TAS",
+        "irsd": {
+          "value": 969.2,
+          "rank": 38
+        },
+        "ier": {
+          "value": 964.7,
+          "rank": 28
+        },
+        "ieo": {
+          "value": 964.2,
+          "rank": 53
+        },
+        "via": "aph98cib04"
+      },
+      "Kingsford-Smith": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1007.9,
+          "rank": 94
+        },
+        "ier": {
+          "value": 1008.4,
+          "rank": 88
+        },
+        "ieo": {
+          "value": 1045.3,
+          "rank": 112
+        },
+        "via": "aph98cib04"
+      },
+      "Batman": {
+        "state": "VIC",
+        "irsd": {
+          "value": 945.6,
+          "rank": 16
+        },
+        "ier": {
+          "value": 954.8,
+          "rank": 20
+        },
+        "ieo": {
+          "value": 981.3,
+          "rank": 70
+        },
+        "via": "aph98cib04"
+      },
+      "Kingston": {
+        "state": "SA",
+        "irsd": {
+          "value": 983.7,
+          "rank": 62
+        },
+        "ier": {
+          "value": 997.9,
+          "rank": 75
+        },
+        "ieo": {
+          "value": 952.1,
+          "rank": 35
+        },
+        "via": "aph98cib04"
+      },
+      "Bendigo": {
+        "state": "VIC",
+        "irsd": {
+          "value": 979.1,
+          "rank": 50
+        },
+        "ier": {
+          "value": 966.6,
+          "rank": 30
+        },
+        "ieo": {
+          "value": 975.1,
+          "rank": 65
+        },
+        "via": "aph98cib04"
+      },
+      "Kooyong": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1135.1,
+          "rank": 147
+        },
+        "ier": {
+          "value": 1116.4,
+          "rank": 139
+        },
+        "ieo": {
+          "value": 1189.2,
+          "rank": 147
+        },
+        "via": "aph98cib04"
+      },
+      "Bennelong": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1086.9,
+          "rank": 133
+        },
+        "ier": {
+          "value": 1082.8,
+          "rank": 132
+        },
+        "ieo": {
+          "value": 1117.8,
+          "rank": 135
+        },
+        "via": "aph98cib04"
+      },
+      "Lalor": {
+        "state": "VIC",
+        "irsd": {
+          "value": 998.4,
+          "rank": 84
+        },
+        "ier": {
+          "value": 1025.8,
+          "rank": 98
+        },
+        "ieo": {
+          "value": 961.8,
+          "rank": 50
+        },
+        "via": "aph98cib04"
+      },
+      "Berowra": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1127.7,
+          "rank": 145
+        },
+        "ier": {
+          "value": 1162,
+          "rank": 146
+        },
+        "ieo": {
+          "value": 1138.9,
+          "rank": 140
+        },
+        "via": "aph98cib04"
+      },
+      "La Trobe": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1058.7,
+          "rank": 125
+        },
+        "ier": {
+          "value": 1058.2,
+          "rank": 120
+        },
+        "ieo": {
+          "value": 1025,
+          "rank": 107
+        },
+        "via": "aph98cib04"
+      },
+      "Blair": {
+        "state": "QLD",
+        "irsd": {
+          "value": 959.6,
+          "rank": 26
+        },
+        "ier": {
+          "value": 978.6,
+          "rank": 48
+        },
+        "ieo": {
+          "value": 924.5,
+          "rank": 14
+        },
+        "via": "aph98cib04"
+      },
+      "Leichhardt": {
+        "state": "QLD",
+        "irsd": {
+          "value": 983,
+          "rank": 60
+        },
+        "ier": {
+          "value": 960.9,
+          "rank": 26
+        },
+        "ieo": {
+          "value": 986.9,
+          "rank": 81
+        },
+        "via": "aph98cib04"
+      },
+      "Blaxland": {
+        "state": "NSW",
+        "irsd": {
+          "value": 942.4,
+          "rank": 11
+        },
+        "ier": {
+          "value": 969.5,
+          "rank": 36
+        },
+        "ieo": {
+          "value": 953.7,
+          "rank": 38
+        },
+        "via": "aph98cib04"
+      },
+      "Lilley": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1001.3,
+          "rank": 88
+        },
+        "ier": {
+          "value": 1002.9,
+          "rank": 81
+        },
+        "ieo": {
+          "value": 1010.1,
+          "rank": 101
+        },
+        "via": "aph98cib04"
+      },
+      "Bonython": {
+        "state": "SA",
+        "irsd": {
+          "value": 878.3,
+          "rank": 2
+        },
+        "ier": {
+          "value": 937.8,
+          "rank": 5
+        },
+        "ieo": {
+          "value": 868.1,
+          "rank": 1
+        },
+        "via": "aph98cib04"
+      },
+      "Lindsay": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1025.1,
+          "rank": 107
+        },
+        "ier": {
+          "value": 1056.3,
+          "rank": 119
+        },
+        "ieo": {
+          "value": 995.5,
+          "rank": 89
+        },
+        "via": "aph98cib04"
+      },
+      "Boothby": {
+        "state": "SA",
+        "irsd": {
+          "value": 1047.5,
+          "rank": 118
+        },
+        "ier": {
+          "value": 1031,
+          "rank": 103
+        },
+        "ieo": {
+          "value": 1070.4,
+          "rank": 124
+        },
+        "via": "aph98cib04"
+      },
+      "Longman": {
+        "state": "QLD",
+        "irsd": {
+          "value": 951.6,
+          "rank": 19
+        },
+        "ier": {
+          "value": 982.1,
+          "rank": 58
+        },
+        "ieo": {
+          "value": 919.4,
+          "rank": 7
+        },
+        "via": "aph98cib04"
+      },
+      "Bowman": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1007.8,
+          "rank": 93
+        },
+        "ier": {
+          "value": 1036,
+          "rank": 106
+        },
+        "ieo": {
+          "value": 976.9,
+          "rank": 67
+        },
+        "via": "aph98cib04"
+      },
+      "Lowe": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1049.8,
+          "rank": 120
+        },
+        "ier": {
+          "value": 1063.6,
+          "rank": 125
+        },
+        "ieo": {
+          "value": 1082.8,
+          "rank": 128
+        },
+        "via": "aph98cib04"
+      },
+      "Braddon": {
+        "state": "TAS",
+        "irsd": {
+          "value": 943.9,
+          "rank": 14
+        },
+        "ier": {
+          "value": 951.6,
+          "rank": 17
+        },
+        "ieo": {
+          "value": 927.8,
+          "rank": 16
+        },
+        "via": "aph98cib04"
+      },
+      "Lyne": {
+        "state": "NSW",
+        "irsd": {
+          "value": 950.4,
+          "rank": 18
+        },
+        "ier": {
+          "value": 943.6,
+          "rank": 9
+        },
+        "ieo": {
+          "value": 947.5,
+          "rank": 30
+        },
+        "via": "aph98cib04"
+      },
+      "Bradfield": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1169.7,
+          "rank": 148
+        },
+        "ier": {
+          "value": 1240.4,
+          "rank": 148
+        },
+        "ieo": {
+          "value": 1196.9,
+          "rank": 148
+        },
+        "via": "aph98cib04"
+      },
+      "Lyons": {
+        "state": "TAS",
+        "irsd": {
+          "value": 956.3,
+          "rank": 21
+        },
+        "ier": {
+          "value": 958.5,
+          "rank": 23
+        },
+        "ieo": {
+          "value": 922.5,
+          "rank": 11
+        },
+        "via": "aph98cib04"
+      },
+      "Brand": {
+        "state": "WA",
+        "irsd": {
+          "value": 946.4,
+          "rank": 17
+        },
+        "ier": {
+          "value": 1012.1,
+          "rank": 91
+        },
+        "ieo": {
+          "value": 905.2,
+          "rank": 3
+        },
+        "via": "aph98cib04"
+      },
+      "Macarthur": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1026.4,
+          "rank": 108
+        },
+        "ier": {
+          "value": 1058.5,
+          "rank": 121
+        },
+        "ieo": {
+          "value": 994.2,
+          "rank": 88
+        },
+        "via": "aph98cib04"
+      },
+      "Brisbane": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1040.1,
+          "rank": 116
+        },
+        "ier": {
+          "value": 995.5,
+          "rank": 73
+        },
+        "ieo": {
+          "value": 1105.6,
+          "rank": 132
+        },
+        "via": "aph98cib04"
+      },
+      "Mackellar": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1096.6,
+          "rank": 135
+        },
+        "ier": {
+          "value": 1128.9,
+          "rank": 142
+        },
+        "ieo": {
+          "value": 1078.5,
+          "rank": 125
+        },
+        "via": "aph98cib04"
+      },
+      "Bruce": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1022.9,
+          "rank": 104
+        },
+        "ier": {
+          "value": 1054.9,
+          "rank": 118
+        },
+        "ieo": {
+          "value": 1011.7,
+          "rank": 103
+        },
+        "via": "aph98cib04"
+      },
+      "Macquarie": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1049.8,
+          "rank": 119
+        },
+        "ier": {
+          "value": 1040.5,
+          "rank": 113
+        },
+        "ieo": {
+          "value": 1048,
+          "rank": 114
+        },
+        "via": "aph98cib04"
+      },
+      "Burke": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1026.8,
+          "rank": 109
+        },
+        "ier": {
+          "value": 1039.1,
+          "rank": 109
+        },
+        "ieo": {
+          "value": 992.2,
+          "rank": 83
+        },
+        "via": "aph98cib04"
+      },
+      "Makin": {
+        "state": "SA",
+        "irsd": {
+          "value": 1018.8,
+          "rank": 100
+        },
+        "ier": {
+          "value": 1027.8,
+          "rank": 101
+        },
+        "ieo": {
+          "value": 986.1,
+          "rank": 78
+        },
+        "via": "aph98cib04"
+      },
+      "Calare": {
+        "state": "NSW",
+        "irsd": {
+          "value": 986.6,
+          "rank": 65
+        },
+        "ier": {
+          "value": 984.3,
+          "rank": 61
+        },
+        "ieo": {
+          "value": 974.2,
+          "rank": 63
+        },
+        "via": "aph98cib04"
+      },
+      "Mallee": {
+        "state": "VIC",
+        "irsd": {
+          "value": 989.8,
+          "rank": 69
+        },
+        "ier": {
+          "value": 953.2,
+          "rank": 19
+        },
+        "ieo": {
+          "value": 960.2,
+          "rank": 47
+        },
+        "via": "aph98cib04"
+      },
+      "Calwell": {
+        "state": "VIC",
+        "irsd": {
+          "value": 979.7,
+          "rank": 52
+        },
+        "ier": {
+          "value": 1027.6,
+          "rank": 100
+        },
+        "ieo": {
+          "value": 946.3,
+          "rank": 29
+        },
+        "via": "aph98cib04"
+      },
+      "Maranoa": {
+        "state": "QLD",
+        "irsd": {
+          "value": 965.2,
+          "rank": 34
+        },
+        "ier": {
+          "value": 945,
+          "rank": 10
+        },
+        "ieo": {
+          "value": 927.4,
+          "rank": 15
+        },
+        "via": "aph98cib04"
+      },
+      "Canberra": {
+        "state": "ACT",
+        "irsd": {
+          "value": 1102.5,
+          "rank": 139
+        },
+        "ier": {
+          "value": 1108.6,
+          "rank": 137
+        },
+        "ieo": {
+          "value": 1115.4,
+          "rank": 134
+        },
+        "via": "aph98cib04"
+      },
+      "Maribyrnong": {
+        "state": "VIC",
+        "irsd": {
+          "value": 975.2,
+          "rank": 46
+        },
+        "ier": {
+          "value": 1016,
+          "rank": 93
+        },
+        "ieo": {
+          "value": 958.2,
+          "rank": 45
+        },
+        "via": "aph98cib04"
+      },
+      "Canning": {
+        "state": "WA",
+        "irsd": {
+          "value": 972.9,
+          "rank": 43
+        },
+        "ier": {
+          "value": 1024.3,
+          "rank": 96
+        },
+        "ieo": {
+          "value": 923.3,
+          "rank": 12
+        },
+        "via": "aph98cib04"
+      },
+      "Mayo": {
+        "state": "SA",
+        "irsd": {
+          "value": 1063.1,
+          "rank": 126
+        },
+        "ier": {
+          "value": 1052.4,
+          "rank": 117
+        },
+        "ieo": {
+          "value": 1049.4,
+          "rank": 115
+        },
+        "via": "aph98cib04"
+      },
+      "Capricornia": {
+        "state": "QLD",
+        "irsd": {
+          "value": 973.7,
+          "rank": 45
+        },
+        "ier": {
+          "value": 972,
+          "rank": 39
+        },
+        "ieo": {
+          "value": 947.7,
+          "rank": 31
+        },
+        "via": "aph98cib04"
+      },
+      "McEwen": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1030.3,
+          "rank": 110
+        },
+        "ier": {
+          "value": 1027.4,
+          "rank": 99
+        },
+        "ieo": {
+          "value": 993.6,
+          "rank": 85
+        },
+        "via": "aph98cib04"
+      },
+      "Casey": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1055.3,
+          "rank": 123
+        },
+        "ier": {
+          "value": 1062.8,
+          "rank": 124
+        },
+        "ieo": {
+          "value": 1015.2,
+          "rank": 104
+        },
+        "via": "aph98cib04"
+      },
+      "McMillan": {
+        "state": "VIC",
+        "irsd": {
+          "value": 983.5,
+          "rank": 61
+        },
+        "ier": {
+          "value": 979.9,
+          "rank": 52
+        },
+        "ieo": {
+          "value": 967.6,
+          "rank": 58
+        },
+        "via": "aph98cib04"
+      },
+      "Charlton": {
+        "state": "NSW",
+        "irsd": {
+          "value": 981.4,
+          "rank": 56
+        },
+        "ier": {
+          "value": 1005.3,
+          "rank": 85
+        },
+        "ieo": {
+          "value": 966.4,
+          "rank": 54
+        },
+        "via": "aph98cib04"
+      },
+      "McPherson": {
+        "state": "QLD",
+        "irsd": {
+          "value": 979.8,
+          "rank": 53
+        },
+        "ier": {
+          "value": 987.4,
+          "rank": 64
+        },
+        "ieo": {
+          "value": 972.4,
+          "rank": 61
+        },
+        "via": "aph98cib04"
+      },
+      "Chifley": {
+        "state": "NSW",
+        "irsd": {
+          "value": 932.4,
+          "rank": 6
+        },
+        "ier": {
+          "value": 980.3,
+          "rank": 55
+        },
+        "ieo": {
+          "value": 922.5,
+          "rank": 10
+        },
+        "via": "aph98cib04"
+      },
+      "Melbourne": {
+        "state": "VIC",
+        "irsd": {
+          "value": 980.1,
+          "rank": 55
+        },
+        "ier": {
+          "value": 946.3,
+          "rank": 11
+        },
+        "ieo": {
+          "value": 1101.8,
+          "rank": 131
+        },
+        "via": "aph98cib04"
+      },
+      "Chisholm": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1054,
+          "rank": 121
+        },
+        "ier": {
+          "value": 1039.5,
+          "rank": 112
+        },
+        "ieo": {
+          "value": 1084.2,
+          "rank": 129
+        },
+        "via": "aph98cib04"
+      },
+      "Melbourne Ports": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1067.8,
+          "rank": 127
+        },
+        "ier": {
+          "value": 1002.8,
+          "rank": 80
+        },
+        "ieo": {
+          "value": 1147.7,
+          "rank": 141
+        },
+        "via": "aph98cib04"
+      },
+      "Cook": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1073.1,
+          "rank": 129
+        },
+        "ier": {
+          "value": 1111.7,
+          "rank": 138
+        },
+        "ieo": {
+          "value": 1061.5,
+          "rank": 119
+        },
+        "via": "aph98cib04"
+      },
+      "Menzies": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1099.8,
+          "rank": 137
+        },
+        "ier": {
+          "value": 1136.4,
+          "rank": 144
+        },
+        "ieo": {
+          "value": 1097.3,
+          "rank": 130
+        },
+        "via": "aph98cib04"
+      },
+      "Corangamite": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1032.7,
+          "rank": 112
+        },
+        "ier": {
+          "value": 1006.7,
+          "rank": 86
+        },
+        "ieo": {
+          "value": 1018.8,
+          "rank": 106
+        },
+        "via": "aph98cib04"
+      },
+      "Mitchell": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1126.1,
+          "rank": 144
+        },
+        "ier": {
+          "value": 1201.8,
+          "rank": 147
+        },
+        "ieo": {
+          "value": 1109.2,
+          "rank": 133
+        },
+        "via": "aph98cib04"
+      },
+      "Corio": {
+        "state": "VIC",
+        "irsd": {
+          "value": 961.7,
+          "rank": 30
+        },
+        "ier": {
+          "value": 976.4,
+          "rank": 45
+        },
+        "ieo": {
+          "value": 951.8,
+          "rank": 34
+        },
+        "via": "aph98cib04"
+      },
+      "Moncrieff": {
+        "state": "QLD",
+        "irsd": {
+          "value": 990,
+          "rank": 71
+        },
+        "ier": {
+          "value": 991.2,
+          "rank": 71
+        },
+        "ieo": {
+          "value": 986.7,
+          "rank": 80
+        },
+        "via": "aph98cib04"
+      },
+      "Cowan": {
+        "state": "WA",
+        "irsd": {
+          "value": 1021.9,
+          "rank": 103
+        },
+        "ier": {
+          "value": 1069.9,
+          "rank": 128
+        },
+        "ieo": {
+          "value": 982.6,
+          "rank": 72
+        },
+        "via": "aph98cib04"
+      },
+      "Moore": {
+        "state": "WA",
+        "irsd": {
+          "value": 1057,
+          "rank": 124
+        },
+        "ier": {
+          "value": 1101.2,
+          "rank": 135
+        },
+        "ieo": {
+          "value": 1016.8,
+          "rank": 105
+        },
+        "via": "aph98cib04"
+      },
+      "Cowper": {
+        "state": "NSW",
+        "irsd": {
+          "value": 943.1,
+          "rank": 12
+        },
+        "ier": {
+          "value": 931.5,
+          "rank": 3
+        },
+        "ieo": {
+          "value": 953.7,
+          "rank": 37
+        },
+        "via": "aph98cib04"
+      },
+      "Moreton": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1036.9,
+          "rank": 114
+        },
+        "ier": {
+          "value": 1035.2,
+          "rank": 105
+        },
+        "ieo": {
+          "value": 1054.2,
+          "rank": 116
+        },
+        "via": "aph98cib04"
+      },
+      "Cunningham": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1002,
+          "rank": 89
+        },
+        "ier": {
+          "value": 1002.8,
+          "rank": 79
+        },
+        "ieo": {
+          "value": 1034.1,
+          "rank": 109
+        },
+        "via": "aph98cib04"
+      },
+      "Murray": {
+        "state": "VIC",
+        "irsd": {
+          "value": 991.2,
+          "rank": 72
+        },
+        "ier": {
+          "value": 968.5,
+          "rank": 35
+        },
+        "ieo": {
+          "value": 958,
+          "rank": 44
+        },
+        "via": "aph98cib04"
+      },
+      "Curtin": {
+        "state": "WA",
+        "irsd": {
+          "value": 1100.6,
+          "rank": 138
+        },
+        "ier": {
+          "value": 1082.3,
+          "rank": 131
+        },
+        "ieo": {
+          "value": 1159.8,
+          "rank": 143
+        },
+        "via": "aph98cib04"
+      },
+      "Newcastle": {
+        "state": "NSW",
+        "irsd": {
+          "value": 968.1,
+          "rank": 37
+        },
+        "ier": {
+          "value": 967.1,
+          "rank": 32
+        },
+        "ieo": {
+          "value": 1010.5,
+          "rank": 102
+        },
+        "via": "aph98cib04"
+      },
+      "Dawson": {
+        "state": "QLD",
+        "irsd": {
+          "value": 975.9,
+          "rank": 48
+        },
+        "ier": {
+          "value": 980.2,
+          "rank": 54
+        },
+        "ieo": {
+          "value": 929.1,
+          "rank": 17
+        },
+        "via": "aph98cib04"
+      },
+      "New England": {
+        "state": "NSW",
+        "irsd": {
+          "value": 991.7,
+          "rank": 73
+        },
+        "ier": {
+          "value": 960,
+          "rank": 24
+        },
+        "ieo": {
+          "value": 993.6,
+          "rank": 86
+        },
+        "via": "aph98cib04"
+      },
+      "Deakin": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1055.2,
+          "rank": 122
+        },
+        "ier": {
+          "value": 1048.2,
+          "rank": 116
+        },
+        "ieo": {
+          "value": 1061.5,
+          "rank": 120
+        },
+        "via": "aph98cib04"
+      },
+      "North Sydney": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1132.5,
+          "rank": 146
+        },
+        "ier": {
+          "value": 1120.9,
+          "rank": 141
+        },
+        "ieo": {
+          "value": 1187.3,
+          "rank": 146
+        },
+        "via": "aph98cib04"
+      },
+      "Denison": {
+        "state": "TAS",
+        "irsd": {
+          "value": 1014.7,
+          "rank": 97
+        },
+        "ier": {
+          "value": 987.6,
+          "rank": 65
+        },
+        "ieo": {
+          "value": 1040.8,
+          "rank": 110
+        },
+        "via": "aph98cib04"
+      },
+      "Northern Territory": {
+        "state": "NT",
+        "irsd": {
+          "value": 962.1,
+          "rank": 32
+        },
+        "ier": {
+          "value": 947.5,
+          "rank": 14
+        },
+        "ieo": {
+          "value": 1003.2,
+          "rank": 95
+        },
+        "via": "aph98cib04"
+      },
+      "Dickson": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1045.3,
+          "rank": 117
+        },
+        "ier": {
+          "value": 1069.7,
+          "rank": 127
+        },
+        "ieo": {
+          "value": 1004.9,
+          "rank": 96
+        },
+        "via": "aph98cib04"
+      },
+      "O'Connor": {
+        "state": "WA",
+        "irsd": {
+          "value": 981.8,
+          "rank": 58
+        },
+        "ier": {
+          "value": 982.6,
+          "rank": 59
+        },
+        "ieo": {
+          "value": 933.1,
+          "rank": 20
+        },
+        "via": "aph98cib04"
+      },
+      "Dobell": {
+        "state": "NSW",
+        "irsd": {
+          "value": 981.7,
+          "rank": 57
+        },
+        "ier": {
+          "value": 1000.5,
+          "rank": 77
+        },
+        "ieo": {
+          "value": 966.7,
+          "rank": 56
+        },
+        "via": "aph98cib04"
+      },
+      "Oxley": {
+        "state": "QLD",
+        "irsd": {
+          "value": 933.9,
+          "rank": 7
+        },
+        "ier": {
+          "value": 972.3,
+          "rank": 40
+        },
+        "ieo": {
+          "value": 919,
+          "rank": 6
+        },
+        "via": "aph98cib04"
+      },
+      "Dunkley": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1015.4,
+          "rank": 98
+        },
+        "ier": {
+          "value": 1028.7,
+          "rank": 102
+        },
+        "ieo": {
+          "value": 1000.7,
+          "rank": 94
+        },
+        "via": "aph98cib04"
+      },
+      "Page": {
+        "state": "NSW",
+        "irsd": {
+          "value": 953.9,
+          "rank": 20
+        },
+        "ier": {
+          "value": 943.3,
+          "rank": 8
+        },
+        "ieo": {
+          "value": 955.5,
+          "rank": 40
+        },
+        "via": "aph98cib04"
+      },
+      "Eden-Monaro": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1006.6,
+          "rank": 92
+        },
+        "ier": {
+          "value": 972.6,
+          "rank": 41
+        },
+        "ieo": {
+          "value": 992.5,
+          "rank": 84
+        },
+        "via": "aph98cib04"
+      },
+      "Parkes": {
+        "state": "NSW",
+        "irsd": {
+          "value": 957.9,
+          "rank": 23
+        },
+        "ier": {
+          "value": 948.4,
+          "rank": 15
+        },
+        "ieo": {
+          "value": 956,
+          "rank": 41
+        },
+        "via": "aph98cib04"
+      },
+      "Fadden": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1020.1,
+          "rank": 102
+        },
+        "ier": {
+          "value": 1039.3,
+          "rank": 111
+        },
+        "ieo": {
+          "value": 984.7,
+          "rank": 75
+        },
+        "via": "aph98cib04"
+      },
+      "Parramatta": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1039.6,
+          "rank": 115
+        },
+        "ier": {
+          "value": 1045.7,
+          "rank": 115
+        },
+        "ieo": {
+          "value": 1061.4,
+          "rank": 118
+        },
+        "via": "aph98cib04"
+      },
+      "Fairfax": {
+        "state": "QLD",
+        "irsd": {
+          "value": 966.3,
+          "rank": 35
+        },
+        "ier": {
+          "value": 958.4,
+          "rank": 21
+        },
+        "ieo": {
+          "value": 952.7,
+          "rank": 36
+        },
+        "via": "aph98cib04"
+      },
+      "Paterson": {
+        "state": "NSW",
+        "irsd": {
+          "value": 972.5,
+          "rank": 42
+        },
+        "ier": {
+          "value": 982,
+          "rank": 57
+        },
+        "ieo": {
+          "value": 957.6,
+          "rank": 43
+        },
+        "via": "aph98cib04"
+      },
+      "Farrer": {
+        "state": "NSW",
+        "irsd": {
+          "value": 993.9,
+          "rank": 77
+        },
+        "ier": {
+          "value": 968.1,
+          "rank": 33
+        },
+        "ieo": {
+          "value": 969.2,
+          "rank": 59
+        },
+        "via": "aph98cib04"
+      },
+      "Pearce": {
+        "state": "WA",
+        "irsd": {
+          "value": 1031.4,
+          "rank": 111
+        },
+        "ier": {
+          "value": 1059.7,
+          "rank": 122
+        },
+        "ieo": {
+          "value": 996.8,
+          "rank": 91
+        },
+        "via": "aph98cib04"
+      },
+      "Fisher": {
+        "state": "QLD",
+        "irsd": {
+          "value": 971.8,
+          "rank": 41
+        },
+        "ier": {
+          "value": 970.1,
+          "rank": 37
+        },
+        "ieo": {
+          "value": 961.1,
+          "rank": 49
+        },
+        "via": "aph98cib04"
+      },
+      "Perth": {
+        "state": "WA",
+        "irsd": {
+          "value": 982.5,
+          "rank": 59
+        },
+        "ier": {
+          "value": 980,
+          "rank": 53
+        },
+        "ieo": {
+          "value": 1005.3,
+          "rank": 97
+        },
+        "via": "aph98cib04"
+      },
+      "Flinders": {
+        "state": "VIC",
+        "irsd": {
+          "value": 996.1,
+          "rank": 82
+        },
+        "ier": {
+          "value": 999.7,
+          "rank": 76
+        },
+        "ieo": {
+          "value": 966.6,
+          "rank": 55
+        },
+        "via": "aph98cib04"
+      },
+      "Petrie": {
+        "state": "QLD",
+        "irsd": {
+          "value": 996,
+          "rank": 80
+        },
+        "ier": {
+          "value": 1024.4,
+          "rank": 97
+        },
+        "ieo": {
+          "value": 981.4,
+          "rank": 71
+        },
+        "via": "aph98cib04"
+      },
+      "Forde": {
+        "state": "QLD",
+        "irsd": {
+          "value": 975.5,
+          "rank": 47
+        },
+        "ier": {
+          "value": 1003,
+          "rank": 82
+        },
+        "ieo": {
+          "value": 933.8,
+          "rank": 22
+        },
+        "via": "aph98cib04"
+      },
+      "Port Adelaide": {
+        "state": "SA",
+        "irsd": {
+          "value": 916.2,
+          "rank": 4
+        },
+        "ier": {
+          "value": 942.1,
+          "rank": 7
+        },
+        "ieo": {
+          "value": 937.2,
+          "rank": 24
+        },
+        "via": "aph98cib04"
+      },
+      "Forrest": {
+        "state": "WA",
+        "irsd": {
+          "value": 979.4,
+          "rank": 51
+        },
+        "ier": {
+          "value": 978.9,
+          "rank": 50
+        },
+        "ieo": {
+          "value": 944,
+          "rank": 28
+        },
+        "via": "aph98cib04"
+      },
+      "Prospect": {
+        "state": "NSW",
+        "irsd": {
+          "value": 957.3,
+          "rank": 22
+        },
+        "ier": {
+          "value": 1011.4,
+          "rank": 89
+        },
+        "ieo": {
+          "value": 940.2,
+          "rank": 27
+        },
+        "via": "aph98cib04"
+      },
+      "Fowler": {
+        "state": "NSW",
+        "irsd": {
+          "value": 877.7,
+          "rank": 1
+        },
+        "ier": {
+          "value": 941.5,
+          "rank": 6
+        },
+        "ieo": {
+          "value": 901.2,
+          "rank": 2
+        },
+        "via": "aph98cib04"
+      },
+      "Rankin": {
+        "state": "QLD",
+        "irsd": {
+          "value": 961.8,
+          "rank": 31
+        },
+        "ier": {
+          "value": 1001.5,
+          "rank": 78
+        },
+        "ieo": {
+          "value": 933.8,
+          "rank": 21
+        },
+        "via": "aph98cib04"
+      },
+      "Franklin": {
+        "state": "TAS",
+        "irsd": {
+          "value": 984.2,
+          "rank": 63
+        },
+        "ier": {
+          "value": 987.3,
+          "rank": 63
+        },
+        "ieo": {
+          "value": 980.7,
+          "rank": 69
+        },
+        "via": "aph98cib04"
+      },
+      "Reid": {
+        "state": "NSW",
+        "irsd": {
+          "value": 939.3,
+          "rank": 9
+        },
+        "ier": {
+          "value": 946.6,
+          "rank": 12
+        },
+        "ieo": {
+          "value": 960.4,
+          "rank": 48
+        },
+        "via": "aph98cib04"
+      },
+      "Fraser": {
+        "state": "ACT",
+        "irsd": {
+          "value": 1078.7,
+          "rank": 132
+        },
+        "ier": {
+          "value": 1061.4,
+          "rank": 123
+        },
+        "ieo": {
+          "value": 1125.9,
+          "rank": 137
+        },
+        "via": "aph98cib04"
+      },
+      "Richmond": {
+        "state": "NSW",
+        "irsd": {
+          "value": 959.3,
+          "rank": 25
+        },
+        "ier": {
+          "value": 949.9,
+          "rank": 16
+        },
+        "ieo": {
+          "value": 963.7,
+          "rank": 52
+        },
+        "via": "aph98cib04"
+      },
+      "Fremantle": {
+        "state": "WA",
+        "irsd": {
+          "value": 993.8,
+          "rank": 76
+        },
+        "ier": {
+          "value": 1018.6,
+          "rank": 94
+        },
+        "ieo": {
+          "value": 994.2,
+          "rank": 87
+        },
+        "via": "aph98cib04"
+      },
+      "Riverina": {
+        "state": "NSW",
+        "irsd": {
+          "value": 994.6,
+          "rank": 78
+        },
+        "ier": {
+          "value": 978.2,
+          "rank": 47
+        },
+        "ieo": {
+          "value": 972.6,
+          "rank": 62
+        },
+        "via": "aph98cib04"
+      },
+      "Gellibrand": {
+        "state": "VIC",
+        "irsd": {
+          "value": 914.4,
+          "rank": 3
+        },
+        "ier": {
+          "value": 947.2,
+          "rank": 13
+        },
+        "ieo": {
+          "value": 949.6,
+          "rank": 32
+        },
+        "via": "aph98cib04"
+      },
+      "Robertson": {
+        "state": "NSW",
+        "irsd": {
+          "value": 999.3,
+          "rank": 85
+        },
+        "ier": {
+          "value": 1003.3,
+          "rank": 83
+        },
+        "ieo": {
+          "value": 997.2,
+          "rank": 92
+        },
+        "via": "aph98cib04"
+      },
+      "Gilmore": {
+        "state": "NSW",
+        "irsd": {
+          "value": 980,
+          "rank": 54
+        },
+        "ier": {
+          "value": 976.5,
+          "rank": 46
+        },
+        "ieo": {
+          "value": 976.1,
+          "rank": 66
+        },
+        "via": "aph98cib04"
+      },
+      "Ryan": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1114,
+          "rank": 143
+        },
+        "ier": {
+          "value": 1118,
+          "rank": 140
+        },
+        "ieo": {
+          "value": 1148.2,
+          "rank": 142
+        },
+        "via": "aph98cib04"
+      },
+      "Gippsland": {
+        "state": "VIC",
+        "irsd": {
+          "value": 989.2,
+          "rank": 68
+        },
+        "ier": {
+          "value": 960.7,
+          "rank": 25
+        },
+        "ieo": {
+          "value": 970.3,
+          "rank": 60
+        },
+        "via": "aph98cib04"
+      },
+      "Scullin": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1000,
+          "rank": 86
+        },
+        "ier": {
+          "value": 1036.6,
+          "rank": 108
+        },
+        "ieo": {
+          "value": 958.3,
+          "rank": 46
+        },
+        "via": "aph98cib04"
+      },
+      "Goldstein": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1097.6,
+          "rank": 136
+        },
+        "ier": {
+          "value": 1086.9,
+          "rank": 133
+        },
+        "ieo": {
+          "value": 1125,
+          "rank": 136
+        },
+        "via": "aph98cib04"
+      },
+      "Shortland": {
+        "state": "NSW",
+        "irsd": {
+          "value": 960.2,
+          "rank": 28
+        },
+        "ier": {
+          "value": 989.3,
+          "rank": 68
+        },
+        "ieo": {
+          "value": 954,
+          "rank": 39
+        },
+        "via": "aph98cib04"
+      },
+      "Grayndler": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1002.4,
+          "rank": 90
+        },
+        "ier": {
+          "value": 988.9,
+          "rank": 67
+        },
+        "ieo": {
+          "value": 1058.1,
+          "rank": 117
+        },
+        "via": "aph98cib04"
+      },
+      "Stirling": {
+        "state": "WA",
+        "irsd": {
+          "value": 992.7,
+          "rank": 75
+        },
+        "ier": {
+          "value": 1012,
+          "rank": 90
+        },
+        "ieo": {
+          "value": 996.5,
+          "rank": 90
+        },
+        "via": "aph98cib04"
+      },
+      "Greenway": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1000.5,
+          "rank": 87
+        },
+        "ier": {
+          "value": 1032.3,
+          "rank": 104
+        },
+        "ieo": {
+          "value": 984.9,
+          "rank": 76
+        },
+        "via": "aph98cib04"
+      },
+      "Sturt": {
+        "state": "SA",
+        "irsd": {
+          "value": 1024.7,
+          "rank": 105
+        },
+        "ier": {
+          "value": 1004.2,
+          "rank": 84
+        },
+        "ieo": {
+          "value": 1069.4,
+          "rank": 122
+        },
+        "via": "aph98cib04"
+      },
+      "Grey": {
+        "state": "SA",
+        "irsd": {
+          "value": 940.6,
+          "rank": 10
+        },
+        "ier": {
+          "value": 925.1,
+          "rank": 1
+        },
+        "ieo": {
+          "value": 937.9,
+          "rank": 25
+        },
+        "via": "aph98cib04"
+      },
+      "Swan": {
+        "state": "WA",
+        "irsd": {
+          "value": 988.1,
+          "rank": 66
+        },
+        "ier": {
+          "value": 979.4,
+          "rank": 51
+        },
+        "ieo": {
+          "value": 1006.8,
+          "rank": 98
+        },
+        "via": "aph98cib04"
+      },
+      "Griffith": {
+        "state": "QLD",
+        "irsd": {
+          "value": 1035.2,
+          "rank": 113
+        },
+        "ier": {
+          "value": 1036.4,
+          "rank": 107
+        },
+        "ieo": {
+          "value": 1047.6,
+          "rank": 113
+        },
+        "via": "aph98cib04"
+      },
+      "Sydney": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1024.9,
+          "rank": 106
+        },
+        "ier": {
+          "value": 983,
+          "rank": 60
+        },
+        "ieo": {
+          "value": 1135.7,
+          "rank": 139
+        },
+        "via": "aph98cib04"
+      },
+      "Groom": {
+        "state": "QLD",
+        "irsd": {
+          "value": 995.8,
+          "rank": 79
+        },
+        "ier": {
+          "value": 990,
+          "rank": 69
+        },
+        "ieo": {
+          "value": 974.3,
+          "rank": 64
+        },
+        "via": "aph98cib04"
+      },
+      "Tangney": {
+        "state": "WA",
+        "irsd": {
+          "value": 1078.4,
+          "rank": 131
+        },
+        "ier": {
+          "value": 1107.1,
+          "rank": 136
+        },
+        "ieo": {
+          "value": 1069.9,
+          "rank": 123
+        },
+        "via": "aph98cib04"
+      },
+      "Gwydir": {
+        "state": "NSW",
+        "irsd": {
+          "value": 943.5,
+          "rank": 13
+        },
+        "ier": {
+          "value": 925.9,
+          "rank": 2
+        },
+        "ieo": {
+          "value": 939.3,
+          "rank": 26
+        },
+        "via": "aph98cib04"
+      },
+      "Throsby": {
+        "state": "NSW",
+        "irsd": {
+          "value": 936.3,
+          "rank": 8
+        },
+        "ier": {
+          "value": 978.8,
+          "rank": 49
+        },
+        "ieo": {
+          "value": 922.2,
+          "rank": 9
+        },
+        "via": "aph98cib04"
+      },
+      "Herbert": {
+        "state": "QLD",
+        "irsd": {
+          "value": 991.9,
+          "rank": 74
+        },
+        "ier": {
+          "value": 990.9,
+          "rank": 70
+        },
+        "ieo": {
+          "value": 985.3,
+          "rank": 77
+        },
+        "via": "aph98cib04"
+      },
+      "Wakefield": {
+        "state": "SA",
+        "irsd": {
+          "value": 969.7,
+          "rank": 39
+        },
+        "ier": {
+          "value": 968.2,
+          "rank": 34
+        },
+        "ieo": {
+          "value": 933.9,
+          "rank": 23
+        },
+        "via": "aph98cib04"
+      },
+      "Higgins": {
+        "state": "VIC",
+        "irsd": {
+          "value": 1104.6,
+          "rank": 140
+        },
+        "ier": {
+          "value": 1068.3,
+          "rank": 126
+        },
+        "ieo": {
+          "value": 1164.5,
+          "rank": 145
+        },
+        "via": "aph98cib04"
+      },
+      "Wannon": {
+        "state": "VIC",
+        "irsd": {
+          "value": 997.2,
+          "rank": 83
+        },
+        "ier": {
+          "value": 966.6,
+          "rank": 31
+        },
+        "ieo": {
+          "value": 966.7,
+          "rank": 57
+        },
+        "via": "aph98cib04"
+      },
+      "Hindmarsh": {
+        "state": "SA",
+        "irsd": {
+          "value": 989.9,
+          "rank": 70
+        },
+        "ier": {
+          "value": 970.5,
+          "rank": 38
+        },
+        "ieo": {
+          "value": 1008.8,
+          "rank": 99
+        },
+        "via": "aph98cib04"
+      },
+      "Warringah": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1113.6,
+          "rank": 142
+        },
+        "ier": {
+          "value": 1131.7,
+          "rank": 143
+        },
+        "ieo": {
+          "value": 1129.1,
+          "rank": 138
+        },
+        "via": "aph98cib04"
+      },
+      "Hinkler": {
+        "state": "QLD",
+        "irsd": {
+          "value": 944,
+          "rank": 15
+        },
+        "ier": {
+          "value": 963.7,
+          "rank": 27
+        },
+        "ieo": {
+          "value": 914,
+          "rank": 5
+        },
+        "via": "aph98cib04"
+      },
+      "Watson": {
+        "state": "NSW",
+        "irsd": {
+          "value": 977.2,
+          "rank": 49
+        },
+        "ier": {
+          "value": 986.8,
+          "rank": 62
+        },
+        "ieo": {
+          "value": 982.7,
+          "rank": 73
+        },
+        "via": "aph98cib04"
+      },
+      "Holt": {
+        "state": "VIC",
+        "irsd": {
+          "value": 969.9,
+          "rank": 40
+        },
+        "ier": {
+          "value": 1007.6,
+          "rank": 87
+        },
+        "ieo": {
+          "value": 932.9,
+          "rank": 19
+        },
+        "via": "aph98cib04"
+      },
+      "Wentworth": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1106.8,
+          "rank": 141
+        },
+        "ier": {
+          "value": 1078.5,
+          "rank": 130
+        },
+        "ieo": {
+          "value": 1161.3,
+          "rank": 144
+        },
+        "via": "aph98cib04"
+      },
+      "Hotham": {
+        "state": "VIC",
+        "irsd": {
+          "value": 996,
+          "rank": 81
+        },
+        "ier": {
+          "value": 1013.5,
+          "rank": 92
+        },
+        "ieo": {
+          "value": 990,
+          "rank": 82
+        },
+        "via": "aph98cib04"
+      },
+      "Werriwa": {
+        "state": "NSW",
+        "irsd": {
+          "value": 958.4,
+          "rank": 24
+        },
+        "ier": {
+          "value": 997,
+          "rank": 74
+        },
+        "ieo": {
+          "value": 956.1,
+          "rank": 42
+        },
+        "via": "aph98cib04"
+      },
+      "Hughes": {
+        "state": "NSW",
+        "irsd": {
+          "value": 1094.9,
+          "rank": 134
+        },
+        "ier": {
+          "value": 1146.1,
+          "rank": 145
+        },
+        "ieo": {
+          "value": 1065,
+          "rank": 121
+        },
+        "via": "aph98cib04"
+      },
+      "Wide Bay": {
+        "state": "QLD",
+        "irsd": {
+          "value": 923.9,
+          "rank": 5
+        },
+        "ier": {
+          "value": 932,
+          "rank": 4
+        },
+        "ieo": {
+          "value": 908.7,
+          "rank": 4
+        },
+        "via": "aph98cib04"
+      },
+      "Hume": {
+        "state": "NSW",
+        "irsd": {
+          "value": 984.5,
+          "rank": 64
+        },
+        "ier": {
+          "value": 964.9,
+          "rank": 29
+        },
+        "ieo": {
+          "value": 963.5,
+          "rank": 51
+        },
+        "via": "aph98cib04"
+      },
+      "Wills": {
+        "state": "VIC",
+        "irsd": {
+          "value": 972.9,
+          "rank": 44
+        },
+        "ier": {
+          "value": 980.3,
+          "rank": 56
+        },
+        "ieo": {
+          "value": 997.9,
+          "rank": 93
+        },
+        "via": "aph98cib04"
+      }
+    },
     "2001": {
       "Adelaide": {
         "state": "SA",
