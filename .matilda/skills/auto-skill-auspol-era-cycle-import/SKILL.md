@@ -88,7 +88,10 @@ within-Bonham-budget evidence that last-election flows is the right
 convention. Run this gate BEFORE shipping any future era extension;
 the numbers above are the recorded baseline (alternatives considered:
 published-TPP — none exists pre-1987; flat-average flows — strictly
-worse).
+worse). Note `+5.47` was the aeforecasts mirror's LAST 1977 wave
+(1977-11-20 primaries); restoring Morgan's true final 26–27 Nov wave
+(2026-10-23, The Bulletin's 10 Dec trend table) recomputes the 1977
+opening score to **+3.16** — the 6/7 verdict stands regardless.
 
 ## validate.mjs era lanes (all validatable, all shipped)
 
@@ -106,9 +109,15 @@ worse).
   unchanged (Newspoll-era card logic is already `[1987…].includes(yr)`
   style).
 - Accuracy panel: 12 → 18 elections; era misses scored −1.3, −2.5,
-  +1.4, +0.6, **+3.2 (1984, new worstCycle)**, +2.6 (1987). **1977 is
-  correctly excluded** — last Morgan wave 20 days pre-election,
-  outside ACC_WINDOW_DAYS=14. Hard-coded "twelve" count copy lived in
+  +1.4, +0.6, **+3.2 (1984, new worstCycle)**, +2.6 (1987). **1977 was
+  initially excluded** (the aeforecasts mirror ends 1977-11-20, 20 days
+  out), brought in same-day under a 21-day window override at +5.5,
+  then **restored at the standard 14-day window** when The Bulletin's
+  10 Dec 1977 trend table surfaced the mirror-missed final wave
+  (fieldwork 26–27 Nov, 13 days out, err +3.2 — ties with 1984's for
+  the record's worst, first-encountered wins) — the override is
+  retired, 1977 sits in `cyclePolls["1977"]` dated 1977-11-27.
+  Hard-coded "twelve" count copy lived in
   THREE comment homes (d1a1d215 asset ~:1952, gen-data.mjs ~:2076,
   template.html :2525) — see auspol-accuracy-panel for the list; grep
   before/after any cycle-count change.

@@ -5131,6 +5131,25 @@ const flowHistory = (() => {
   return h;
 })();
 
+/* primaryHistory – behind the explainer chart's "View: Primary votes" flip
+   (2026-10-23): every party family's share of the formal first-preference
+   vote at each federal election since 1972, national and per state, House
+   and Senate. data/primary-history.json, written by
+   .build/aec-primary-history.py from the committed AEC first-preference
+   downloads (.build/aec-flow-src/fpv/, 2004–2025) and its typed HISTORY
+   block (1972–2001). A named minor carries its own line only where the
+   view's vote reached the file's foldPt (4%) – below it the share folds
+   into oth and the line gaps (a null, never a zero). Federal data by
+   position: the Vic build carries it exactly like the flow history's
+   federal table. Guarded like the flow side stores: a missing file drops
+   the flip (the chart keeps Preference flows alone). */
+const primaryHistory = (() => {
+  try {
+    const { _comment, ...ph } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "primary-history.json"), "utf8"));
+    return ph;
+  } catch { return null; }
+})();
+
 /* ---- 7e. current primary = the 21-day nowcast, per party -----------------
    The reader-facing "current primary" is the headline construction itself –
    trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –
@@ -6839,13 +6858,14 @@ function sparseSeries(points, months, cap) {
    single-house era's miss folds poll error and flow-constant drift into one
    figure. Essential's undecided-inclusive pair is normalised
    first, the same way the trend series normalises it, or its 48/47 would score
-   as a 4-point miss that is really an arithmetic difference. 1977 is the one
-   exception to the window: F2F Morgan went quiet after its 20 November wave,
-   twenty days before polling day, so the cycle scores that wave under a
-   21-day net rather than dropping the only election the standard window
-   starves. */
+   as a 4-point miss that is really an arithmetic difference. A 1977 window
+   override once lived here: the aeforecasts mirror ends at Morgan's
+   20 November wave, twenty days out, and the cycle scored it at 21 days.
+   The campaign's actual final wave (fieldwork 26/27 Nov, printed in The
+   Bulletin's election-day issue) is restored in the data and lands 13 days
+   out, so 1977 is scored under the standard window like every other
+   election. */
 const ACC_WINDOW_DAYS = 14;
-const ACC_WINDOW_OVERRIDES = { 1977: 21 };
 /* Same operation, renamed on the letterhead. Only renames go in here - Galaxy
    and YouGov are NOT merged, because merging houses to build one longer record
    is a claim about continuity of method that this table is in no position to
@@ -6859,7 +6879,7 @@ const accCanon = (f) => ACC_CANON[f] || f;
 const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   const e = ELECTIONS["e" + c.src];
   const eMs = new Date(e.date).getTime();
-  const winDays = ACC_WINDOW_OVERRIDES[c.src] || ACC_WINDOW_DAYS;
+  const winDays = ACC_WINDOW_DAYS;
   const inWindow = (cyclePolls[c.src] || []).filter((p) => {
     if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
     if (p.tpp_alp == null) return false;
@@ -8311,6 +8331,11 @@ window.AUSPOL = (function () {
      folds Nationals into others (a jurisdiction that counts them apart sets
      it false and names the columns instead). */
   const flowHistory = ${JSON.stringify(flowHistory)};
+  /* The primary-vote history behind the explainer chart's View: Primary
+     votes flip – each party family's share of the formal first-preference
+     vote at each federal election, national and per state, House and
+     Senate; nulls are below the 4% fold, never zeros. */
+  const primaryHistory = ${JSON.stringify(primaryHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -8574,7 +8599,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

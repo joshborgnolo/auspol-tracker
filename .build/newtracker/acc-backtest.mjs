@@ -102,7 +102,6 @@ const HL_DEFF = 1.6;
 const HE_HALF = 90;
 const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
 const ACC_WINDOW_DAYS = 14;                       // gen-data's final-poll window
-const ACC_WINDOW_OVERRIDES = { 1977: 21 };        // gen-data's 1977 exception (last Morgan wave 20 days out)
 const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
 const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
 
@@ -206,7 +205,7 @@ function accRecord(before) {
     if (before != null && Number(src) >= Number(before)) continue;
     const e = D.elections["e" + src];
     const eMs = new Date(e.date).getTime();
-    const winDays = ACC_WINDOW_OVERRIDES[Number(src)] || ACC_WINDOW_DAYS;
+    const winDays = ACC_WINDOW_DAYS;
     const inWin = (D.cyclePolls[src] || []).filter((p) => {
       if (p.firm === "Election" || /exit/i.test(p.firm) || p.tpp_alp == null) return false;
       const d = ddays(eMs, new Date(p.date).getTime());

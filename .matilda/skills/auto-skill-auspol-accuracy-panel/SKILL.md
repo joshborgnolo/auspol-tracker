@@ -1,8 +1,9 @@
 ---
 name: auspol-accuracy-panel
-description: auspol-tracker — the "How the final polls did" AccuracyPanel end-to-end: gen-data.mjs accuracyCycles (~:1490-1550; ACC_WINDOW_DAYS=14, one final 2PP poll per house equally weighted, exit polls excluded, ACC_CANON renames-only, houses sorted by |err|; ACC_WINDOW_OVERRIDES={1977:21} is the ONE keyed exception) emits D.accuracy.cycles {year,eDate,result,mean,err,absErr,houses,n,sameSide,worst} + per-firm aggregates; renderer in the d1a1d215 asset (~:1956-2145) with Last-five/More split BY POSITION, lanesFor spread toggle, small .acc-dot per house + big .acc-mean average dot, "All one way" flag, bothWays hint paragraph, by-house grid for firms with n>1. Solo-rule (9c8c6ee + rebuild 83618e0): a one-house election (1993, 1996, 1977) draws ITS OWN poll as the big dot, never an average-of-one stacked on its own small dot. Era cycles (39de76c, 2026-09-12): 1974–1984 era buckets scored on implied LEF 2PP lifted the panel 12→18 cycles; the 1977 21-day window exception (user call 2026-10-23) brings it to 24 — see the era-cycles section for the copy-home list and the 1977 exception.
+description: auspol-tracker — the "How the final polls did" AccuracyPanel end-to-end: gen-data.mjs accuracyCycles (~:1490-1550; ACC_WINDOW_DAYS=14, one final 2PP poll per house equally weighted, exit polls excluded, ACC_CANON renames-only, houses sorted by |err|; NO window overrides — the 1977 21-day exception shipped and retired 2026-10-23 when Morgan's true final wave surfaced) emits D.accuracy.cycles {year,eDate,result,mean,err,absErr,houses,n,sameSide,worst} + per-firm aggregates; renderer in the d1a1d215 asset (~:1956-2145) with Last-five/More split BY POSITION, lanesFor spread toggle, small .acc-dot per house + big .acc-mean average dot, "All one way" flag, bothWays hint paragraph, by-house grid for firms with n>1. Solo-rule (9c8c6ee + rebuild 83618e0): a one-house election (1993, 1996, 1977) draws ITS OWN poll as the big dot, never an average-of-one stacked on its own small dot. Era cycles (39de76c, 2026-09-12): 1974–1984 era buckets scored on implied LEF 2PP lifted the panel 12→18 cycles; 1977 joined at the STANDARD 14-day window (2026-10-23), bringing it to 24 — see the era-cycles section for the copy-home list and the restored-wave provenance. The redesign branch (window.AP.rd) holds the published-vs-implied basis toggle and the rd-acc-stats "N's pollsters over their whole record" table (statHouses, 5-col; Ipsos pulled + YouGov admitted on one 2025 final poll by user call 7d3b8b30 2026-10-23 — the historical rd-acc-firms leaderboard n>1 grid keeps defunct houses); probe .matilda/probe/acc-basis.mjs pins the exact rendered rows on both bases (baseline-before-edit re-pin recipe; probe files are gitignored-but-tracked, git add -f).
 source: auto-skill
 extracted_at: '2026-09-04T07:32:32.121Z'
+updated_at: '2026-10-23'
 ---
 
 # auspol-accuracy-panel — "How the final polls did"
@@ -37,11 +38,11 @@ the on-page caveat and the reproducibility contract. Distilled:
   binds it as `A` (`A.cycles`, `A.windowDays`, `A.meanAbs`, `A.firms`,
   `A.oneSided`-derived flanking).
 - Cycle singletons: **1993, 1996 and 1977 have n=1** (1977 joined
-  2026-10-23 under the 21-day exception); the rest are n=3–11. For
+  2026-10-23 via Morgan's restored 26–27 Nov final wave); the rest are n=3–11. For
   singletons `c.err === c.houses[0].err` exactly, so any solo-aware
   display logic needs no arithmetic.
 
-## Era cycles in the panel (39de76c, 2026-09-12) — 12 → 18; 1977 exception (2026-10-23) → 24
+## Era cycles in the panel (39de76c, 2026-09-12) — 12 → 18; 1977 at the standard window (2026-10-23) → 24
 
 The 1974–1987 era buckets (see auspol-era-cycle-import) carry an
 IMPLIED last-election-flows 2PP (tpp_alp = alp + FLOW_ERAS shares of
@@ -50,20 +51,19 @@ exactly like modern cycles — one Morgan final poll per cycle, n=1.
 
 - Era misses scored: 1974 −1.3, 1975 −2.5, 1980 +1.4, 1983 +0.6,
   1984 +3.2 (1984's), 1987 +2.6.
-- **1977 is the ONE window exception** (`ACC_WINDOW_OVERRIDES =
-  { 1977: 21 }` beside ACC_WINDOW_DAYS in gen-data, mirrored verbatim
-  in test-acc-basis.mjs and acc-backtest.mjs; user call 2026-10-23,
-  "relax it for 1977 only — it seems exceptional"): Morgan's last
-  1977 wave ran 20 days before polling day (1977-11-20 → 1977-12-10),
-  and no pollster printed within the fortnight, so the cycle scores
-  that wave at +5.5 (50.9 vs 45.4) — making 1977 the record's
-  worstCycle (displacing 1984's +3.2), count 23 → 24, Roy Morgan's
-  firmsImp record stretches to 23 cycles (meanAbs 1.8). The RdFoot
-  gains the disclosure sentence and the probe
-  `.matilda/probe/cyc-early-terms.mjs` pins the row. Do NOT widen the
-  global window or add further overrides without a user call — a
-  keyed per-cycle override was chosen precisely so no other election
-  moves.
+- **1977 at the STANDARD 14-day window** (no override; the
+  2026-10-23-morning `ACC_WINDOW_OVERRIDES = { 1977: 21 }` was retired
+  the same day): the aeforecasts mirror ends 1977-11-20 (20 days out)
+  but The Bulletin's 10 Dec 1977 election-day trend table carries
+  Morgan's true final wave, fieldwork 26–27 Nov (committed
+  `cyclePolls["1977"]` row dated 1977-11-27, L-NCP 45 / ALP 43 / Dem
+  9 / DLP 1 / Oth 2, `tppEra: "1975"`; note on
+  `cyclePollBases["1977|Morgan"]`). Scored at **+3.2** (48.6 vs 45.4)
+  — the record stays 24 elections, worstCycle is **1977's +3.2** (ties
+  with 1984's; first-encountered wins), Roy Morgan's firms record runs 23 cycles (meanAbs 1.9). The
+  probe `.matilda/probe/cyc-early-terms.mjs` pins the row (n=1,
+  1977-11-27, err 3.2, standard window), and the skill's own former
+  21-day-exception text is superseded.
 - Provenance comments (not page copy) state pre-1993 rows score
   implied LEF 2PP so "a single-house era's miss folds poll error and
   flow-constant drift into one figure" — comment homes move together:
@@ -138,6 +138,75 @@ const accErr = solo ? solo.err : c.err;   // identical, but named
 - NO CSS change needed: `.acc-mean` was already a plain round dot.
   `.acc-err` already equals `solo.err` for singletons, so the side
   column needed no branch.
+
+## The redesign branch (basis toggle, stats table, firms grid)
+
+`if (window.AP.rd) { … }` inside `AccuracyPanel` (d1a1d215 asset,
+~:3038-3235) carries everything the classic branch lacks — edit THAT
+branch only; the classic one after it is archived per repo rule 5.
+
+- **Basis toggle** (`rd-acc-basis` chips): "Published two-party"
+  (`basis === "pub"`) vs "Primaries on last-election flows"
+  (`basis === "imp"`). Every figure runs through `errOf`/`alpOf`/
+  `hh(c)` and `firmsSrc` switches `A.firms` ↔ `A.firmsImp`, so the
+  whole panel — head, dek, all four summary cells, statHouses and the
+  dot board — re-derives with no render fork. `test-acc-basis.mjs`
+  (in npm test) pins the DATA side by replaying firmsImp and spots
+  (2025 YouGov implied 53.9 vs published 52.2): a renderer-only filter
+  change cannot trip it.
+- **The stats table** (`rd-acc-stats`, from `statHouses`): five
+  columns Pollster / Elections / Average miss / Average lean / Wrong
+  side ahead, caption "{last.year}'s pollsters over their whole
+  record", one row per `firmsSrc.filter(f.n > 1 && lastFirms.has(f.firm))`
+  sorted by miss asc. `lastFirms` = the houses with a final poll in
+  the last election's window, so ONLY that election's houses can ever
+  appear. A user-quoted row of five cells
+  ("Ipsos · 4 · 2.0 pts · 0.1 Coalition · 1 of 4") identifies THIS
+  table, not the firms grid (three fields: name, pts, "N elections").
+- **Ipsos-out / YouGov-in (7d3b8b30, 2026-10-23, user call)**: Ipsos
+  pulled and YouGov let in on its single 2025 final poll — filter is
+  now `f.firm !== "Ipsos" && (f.n > 1 || f.firm === "YouGov") &&
+  lastFirms.has(f.firm)`, with a dated user-call comment beside it.
+  The premise of the table is current houses (lean/wrong-side used to
+  judge today's figures), unlike the historical `rd-acc-firms` grid
+  below it, which still shows Ipsos alongside Galaxy/ACNielsen/
+  ReachTEL — defunct houses legitimately remain in THAT leaderboard.
+  Do NOT widen the carve-out into a general n≥1 rule: without the
+  gate, all of the last election's one-off houses (Spectre, RedBridge,
+  YouGov MRP, DemosAU, Freshwater) would join.
+- The `firms` grid (`rd-acc-firms`, n>1) drives `fHead`
+  ("X and Y have come closest; Z has missed by most") and `fDek` —
+  untouched by the 2026-10-23 call.
+- Sort stability trap: `statHouses` row order comes from
+  `Array.sort` on miss over `firmsSrc`'s `b.n - a.n` order — ties
+  (Essential vs Resolve on 1.6) render in firmsSrc order, which is
+  why the probe pin lists rows in an order that does not follow from
+  meanAbs alone. Pin rows from an ACTUAL rendered read, never from
+  arithmetic.
+
+## Probe: `.matilda/probe/acc-basis.mjs`
+
+Puppeteer probe over the served build (`/cycles/` route): chip
+defaults, both bases, summary-strip cells, and EXACT stats-table row
+strings on both bases, including an Ipsos-absent / YouGov-present
+guard since 7d3b8b30.
+
+- The pins break on every cycle-count change (the 1977 landing left it
+  red on 71→72 polls and Roy Morgan 22→23 cycles BEFORE the
+  7d3b8b30 edit; the same-day wave-restoration re-pin moved avg-miss
+  1.5→1.4, wrong-side 12→11, implied 15→14). RECIPE (worked
+  2026-10-23): run the probe on the
+  CURRENT build FIRST to harvest a pre-existing-drift baseline, make
+  the code change + rebuild, re-run, then re-pin only real rendered
+  strings — never pin from hand-computed rows.
+- `.matilda/probe/*` is gitignored-by-`.matilda/*` but TRACKED by
+  convention: `git add -f .matilda/probe/acc-basis.mjs` (the commit
+  otherwise silently lacks the probe; `git add` on it errors
+  "paths are ignored").
+- Payload cross-check without a browser: brace-match
+  `const accuracy = { … }` in built index.html, JSON.parse, read
+  `accuracy.firms` / cycle houses directly (see the era/Probe-path
+  note above).
 
 ## Editing cautions
 

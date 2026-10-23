@@ -3275,7 +3275,7 @@ function AccuracyPanel() {
           ))}
         </div>
         <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls have done" }}>
-          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. 1977 is the one exception to the {A.windowDays}-day window: no pollster printed within a fortnight of that election, so Morgan’s final poll, twenty days out, scores it. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
+          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
         </RdFoot>
       </RdSec>
     );

@@ -9,9 +9,10 @@
      accuracy record (.build/bootstrap-trove-final-waves.mjs: firm "Morgan",
      tppEra-tagged, no dateApprox; 1966/1969 stay out on month-placeholder
      finals) at err 1946 +0.7 / 1951 −1.5 / 1954 −1.9, 1949 scores on
-     its 1949-12-03 final, and 1977 joins on a 21-day window exception
-     (gen-data ACC_WINDOW_OVERRIDES: Morgan's 1977-11-20 final ran 20 days
-     out, scoring +5.5 – the record's worst cycle);
+     its 1949-12-03 final, and 1977 scores Morgan's restored final 26–27
+     Nov wave (the aeforecasts mirror dropped it; The Bulletin's 10 Dec
+     1977 election-day trend table carries it – note on 1977|Morgan) at
+     +3.2 on the standard 14-day window;
    - the source-polls CSV export marks month-placeholder dates in a
      date_approx column, fed by gen-data's dateApprox passthrough on the
      cycle-source rows;
@@ -92,13 +93,15 @@ for (const [y, date, err] of [[1946, "1946-09-27", 0.7], [1951, "1951-04-22", -1
   ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === date && c.houses[0].err === err,
      `${y} scores the Trove ${date} final at err ${err}`);
 }
-/* the 21-day 1977 exception (ACC_WINDOW_OVERRIDES): Morgan's last wave ran
-   20 days before polling day, so the standard 14-day net starved the cycle */
+/* 1977's restored final wave: the aeforecasts mirror ends 1977-11-20, but
+   The Bulletin's 10 Dec 1977 issue printed one more trend-table line for the
+   26–27 Nov fieldwork (filed by hand, note on 1977|Morgan); that lands in the
+   standard 14-day window 13 days out, so the day-old 21-day override is gone */
 {
   const c = acc.cycles.find((x) => x.year === 1977);
-  ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === "1977-11-20"
-       && c.houses[0].err === 5.5 && c.err === 5.5 && acc.worstCycle.year === 1977,
-     "1977 scores Morgan's 20-Nov wave at +5.5 under the 21-day exception, the record's worst cycle");
+  ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === "1977-11-27"
+       && c.houses[0].err === 3.2 && c.err === 3.2,
+     "1977 scores Morgan's restored 26–27 Nov wave at +3.2 on the standard window");
 }
 ok(years.includes(1949) && acc.cycles.find((c) => c.year === 1949).houses[0].date === "1949-12-03", "1949 scores on its 1949-12-03 final");
 const datesScored = new Set(acc.cycles.flatMap((c) => c.houses.map((h) => c.year + "|" + h.date)));

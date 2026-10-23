@@ -44,7 +44,6 @@ const r1 = (v) => Math.round(v * 10) / 10;
 const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tpp_alp / (p.tpp_alp + p.tpp_lnp)) * 100 : p.tpp_alp;
 const ddays = (a, b) => (a - b) / 86400000;
 const ACC_WINDOW_DAYS = 14;
-const ACC_WINDOW_OVERRIDES = { 1977: 21 }; // 1977's last Morgan wave ran 20 days out
 const ACC_CANON = {
   "Morgan": "Roy Morgan", "Newspoll-YouGov": "Newspoll",
   "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",
@@ -64,7 +63,7 @@ const lefFor = (calledYear) => {
 const replayCycle = (src) => {
   const e = ELECTIONS["e" + src];
   const eMs = new Date(e.date).getTime();
-  const winDays = ACC_WINDOW_OVERRIDES[Number(src)] || ACC_WINDOW_DAYS;
+  const winDays = ACC_WINDOW_DAYS;
   const inWindow = (cyclePolls[src] || []).filter((p) => {
     if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
     if (p.tpp_alp == null) return false;
