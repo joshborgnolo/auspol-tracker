@@ -3544,6 +3544,10 @@ body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 
 /* House and Share ride the phone's head as ONE nowrap group, so the pair
    share a wrapped line instead of splitting across two */
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
+/* the View: switch's own row above the contest tabs (user 2026-10-23 -
+   "should sit on top of 'Labor v Coalition / Labor v One Nation'") -
+   right-aligned, so on both layouts it keeps the flips' right edge */
+body.rd .ex-fl-viewrow { display: flex; justify-content: flex-end; margin: 10px 0 0; }
 /* the exhaustion-adjustment switch, the key row's last item (user 2026-10-22,
    resized 2026-10-23): a key-sized track where a swatch would sit, the words
    inside the one button; the 44px touch target is an invisible ::before, so

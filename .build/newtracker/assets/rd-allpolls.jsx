@@ -6235,6 +6235,14 @@ function ExplainedPrimaryChart({ house, stateKey, menu }) {
     + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero."
     + (house === "sen" ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
   const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
+  /* the y axis tops at the biggest share on the chart, rounded up to the
+     next 5 (user 2026-10-23: 55 stays the national top, the biggest
+     recorded share being 53.05) - the shared frame's 0-100 would flatten
+     every line. Ticks keep the flows' multiples-of-10 pace and leave the
+     unit on the top tick */
+  const yMax = Math.max(5, Math.ceil(series.reduce((m, s) => s.points.reduce((mm, p) => Math.max(mm, p.y), m), 0) / 5) * 5);
+  const yStep = yMax > 30 ? 10 : 5;
+  const YT = []; for (let v = 0; v + yStep <= yMax; v += yStep) YT.push(v);
   return (
     <>
       <div className="rd-chead ex-fl-head">
@@ -6245,6 +6253,9 @@ function ExplainedPrimaryChart({ house, stateKey, menu }) {
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
       <TrendChart key={"ex-prim-" + (house || "rep") + (stateKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
+        yDomain={[0, yMax]}
+        yTicks={YT}
+        yTickFmt={(v) => (v === YT[YT.length - 1] ? v + "%" : String(v))}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
         series={series}
@@ -6591,7 +6602,10 @@ function RdExplained() {
      where the build ships the data - gen-data's guarded handoff leaves
      window.AUSPOL.primaryHistory null on a missing file, the Vic page
      carries no federal primary-history - so a build without it draws no
-     control and no primary view */
+     control and no primary view. It rides its own row ABOVE the contest
+     tabs (user 2026-10-23: it "should sit on top of 'Labor v Coalition /
+     Labor v One Nation'") - never inside the tab row, and not in the
+     chart head, which only draws below the tabs on a phone */
   const viewCtl = (PH_HIST && PH_HIST.fed && PH_HIST.fed.sen) ? (
     <span className="rd-pl-ctl ex-view">
       <span className="rd-pl-ctl-l">View:</span>
@@ -6605,9 +6619,9 @@ function RdExplained() {
   /* the phone's head span: the menu, then House and Share in ONE nowrap
      group, so the pair share a line when the row wraps instead of
      splitting across two (user 2026-10-22). In primary mode Share: sets
-     aside (flows-only) and View: joins House:, so the pair still forms
-     one nowrap group on the phone's wrap */
-  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{primMode ? viewCtl : share}</span></span> : menu;
+     aside (flows-only); View: rides the row above the tabs on every
+     layout, so the phone head never carries it */
+  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{primMode ? null : share}</span></span> : menu;
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -6619,9 +6633,10 @@ function RdExplained() {
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
         <div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">
+          {viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}
           <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
                   options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
-            {narrow ? null : <>{viewCtl}{houseCtl}{primMode ? null : share}</>}
+            {narrow ? null : <>{houseCtl}{primMode ? null : share}</>}
           </RdTabs>
           {/* ON-tab nswlc (2026-10-23): lcView holds under both contests -
               the ON branch must come before senOnView's catch-all so a

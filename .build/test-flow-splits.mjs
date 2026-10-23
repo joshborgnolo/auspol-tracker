@@ -395,6 +395,29 @@ assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
   "the fedcl:<class> view ids resolve FH.fed.classes beside fed.states (FED_CLASSES, classKey, the menu's fedcl options)");
 assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"'),
   "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
+/* 2026-10-23 (user, quoting the shipped layout: "View: / Preference
+   flows / ⇄, should sit on top of 'Labor v Coalition / Labor v One
+   Nation'"): the flip rides its own row above the contest tabs on BOTH
+   layouts - never a tabs child, and not the phone's head span, which
+   only draws below the tabs. Desktop keeps House:/Share: as the tabs
+   children; the phone keeps them in the head */
+assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
+    && ap.indexOf('className="ex-fl-viewrow"') < ap.indexOf('className="ex-fl-tabs"')
+    && ap.includes('{viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}'),
+  "the View: switch rides its own row above the contest tabs");
+assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{primMode ? null : share}</>}')
+    && ap.includes('<span className="ex-fl-flips">{houseCtl}{primMode ? null : share}</span>')
+    && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
+  "View: out of the tab row and the phone head - House: and Share: keep both spots alone");
+assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-end;'),
+  "the View row's own right-aligned rule ships in rd.css");
+/* 2026-10-23 (user: "y axis max should be 55, biggest recorded primary
+   vote + however much to get to the nearest 5"): the primary view
+   replaces the shared frame's 0-100 with its own axis, topped at the
+   biggest share on the chart rounded up to the next 5 */
+assert.ok(ap.includes('const yMax = Math.max(5, Math.ceil(series.reduce((m, s) => s.points.reduce((mm, p) => Math.max(mm, p.y), m), 0) / 5) * 5);')
+    && ap.includes('yDomain={[0, yMax]}') && ap.includes('yTicks={YT}'),
+  "the primary view's y axis tops at the biggest recorded share rounded up to the next 5 (55 nationally)");
 assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elections"') && ap.includes('const [view, setView] = useState("fed");')
     && ap.includes('<optgroup label="Federal elections">') && ap.includes('<optgroup label="State elections">'),
   "one elections menu: federal national, federal by state, then each state's own elections");
