@@ -5763,6 +5763,10 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
      exhaustion switch can adjust, and the only ones it renders on */
   const opvYears = S.opv && S.opv.length ? S.opv : null;
   const parties = (onSen ? FLOW_ON_PARTIES : FLOW_PARTIES).filter((p) => (S[p.id] || []).some((v) => v != null));
+  /* the class views' fourth line (user 2026-10-23): every minor-party
+     voter taken together - the lumped minor cohort, classic-based ahead
+     of 2004 like the buckets */
+  if (S.fedClass && (S.lump || []).some((v) => v != null)) parties.push({ id: "lump", name: "All minor parties", color: "var(--ink-2)" });
   /* bars wherever a point carries an error: every state estimate, and the
      federal series' 1984-93 estimates ahead of its 1996-2025 counts (user
      2026-10-21) - the AEC counted no flow by party before 1996 */
@@ -5773,6 +5777,12 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
     const v = S[p.id] || [];
     const err = S[p.id + "Err"] || [];
     const exh = S[p.id + "Exh"] || [];
+    /* the class views' own per-cell facts (2026-10-23): the estimated
+       cells (a state whose crossbench seats spanned seat types that
+       year, gen-data's estGrn &c. arrays) draw the hollow diamonds, and
+       every point quotes its ballot base in the tooltip */
+    const cellEst = S["est" + p.id[0].toUpperCase() + p.id.slice(1)] || [];
+    const bal = (S.ballots || {})[p.id] || [];
     const runs = [];
     let cur = [];
     v.forEach((val, i) => {
@@ -5809,8 +5819,14 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
           sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null,
           !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted"
             + (exhAdj ? ", " + T(val).toFixed(1) + "% of the rest" : "") : null,
+          // a class view's estimated cell says so outright, then every
+          // class point quotes how many ballots stand behind it (the
+          // caption's thin-base warning: 1,508 One Nation ballots, inner
+          // metro, 2013)
+          cellEst[i] ? "estimated" : null,
+          bal[i] ? Math.round(bal[i][0] + bal[i][1]).toLocaleString("en-AU") + " ballots" : null,
           clsV != null ? "classic seats " + (T(clsV) * clsAdj).toFixed(1) + "%" : null].filter(Boolean).join(", ");
-        cur.push({ x: YEARS[i], y: T(val) * adj, ...(note ? { note } : null) });
+        cur.push({ x: YEARS[i], y: T(val) * adj, ...(cellEst[i] ? { est: true } : null), ...(note ? { note } : null) });
       }
     });
     if (cur.length) runs.push(cur);
@@ -5863,10 +5879,14 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
   if (!sen && !S.fedState) {
     series.forEach((s) => s.points.forEach((pt) => {
       if (S.hollowYears && S.hollowYears.includes(pt.x)) marks.push({ x: pt.x, y: pt.y, color: s.color });
+      /* a class view's estimated cell (user 2026-10-23): the third mark
+         shape, a hollow diamond, never confused with either basis */
+      else if (pt.est) marks.push({ x: pt.x, y: pt.y, color: s.color, diamond: true });
       else if (!fedEst || !fedEst.includes(pt.x)) marks.push({ x: pt.x, y: pt.y, color: s.color, solid: true });
     }));
   }
-  const hasRing = marks.some((m) => !m.solid), hasSolid = marks.some((m) => m.solid);
+  const hasRing = marks.some((m) => !m.solid && !m.diamond), hasSolid = marks.some((m) => m.solid),
+    hasEst = marks.some((m) => m.diamond);
   /* a view that rings only some years (the federal 1996-2001) names the
      basis in those years' readout titles; one that rings them all says it
      once, in the key */
@@ -5905,7 +5925,9 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
       + " is the NSW Parliamentary Library’s printed tally-sheet count — 73 of the 93 districts, their declaration forms mostly missing — before the ballot-level files begin."
       + " There’s no 2011 point — the Electoral Commission stopped running full preference counts for information that year, so no count of party-by-party flows exists."
     : "";
-  const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
+  const copyBasis = [hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "",
+    hasSolid ? "Solid dots: every seat." : "",
+    hasEst ? "Hollow diamonds: estimated, not counted." : ""].filter(Boolean).join(" ");
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
   /* the LC's One Nation cut quotes its "1 only" base over the pair's own
@@ -5952,7 +5974,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
         : S.fedClass
-          ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares."
+          ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). From 2004 the count covers every seat: the AEC’s two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher’s final pair are recovered state by state from its flow-by-state table — where a state’s crossbench seats spanned seat types the shares are apportioned over first preferences, and draw the hollow diamonds. Before 2004 — the rings — only the seats where Labor and the Coalition finished first and second count, the national series’ own early basis. The fourth line is all minor-party voters taken together. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares."
             + noBars
           : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
             + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter((w) => w.year < 2004).map((w, i, a) => (i ? (i === a.length - 1 ? " and " : ", ") : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("")
@@ -5997,7 +6019,8 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
       />
       <RdKey className="rd-ckey" items={(est ? [] : [{ kind: "line", color: "var(--ink-3)", label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election" }])
         .concat(hasRing ? [{ kind: "ring", color: "var(--ink)", label: "Labor-v-Coalition seats only" }] : [])
-        .concat(hasSolid ? [{ kind: "dot-solid", color: "var(--ink)", label: "Every seat" }] : [])}>
+        .concat(hasSolid ? [{ kind: "dot-solid", color: "var(--ink)", label: "Every seat" }] : [])
+        .concat(hasEst ? [{ kind: "diamond", color: "var(--ink)", label: "Estimated, not counted" }] : [])}>
         {hasErr && <span className="rd-key-item"><ExBarSwatch />{fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error"}</span>}
         {/* the exhaustion switch rides the key row as its last item (user
             2026-10-23: the full-size switch on a row of its own was bulky

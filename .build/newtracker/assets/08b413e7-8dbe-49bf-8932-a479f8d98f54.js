@@ -1791,7 +1791,14 @@ function TrendChart(props) {
             ) : (
               <path className="rd-cross" style={m.color ? { stroke: m.color } : null}
                     d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
-            )) : m.solid ? (
+            )) : m.diamond ? (
+              /* m.diamond: an estimated cell in a counted basis - the
+                 class views' apportioned-over-first-preferences shares
+                 (2026-10-23). Hollow like the ring, but a diamond, so it
+                 never reads as either counted basis */
+              <path className="rd-ring" style={m.color ? { stroke: m.color } : null}
+                    d={`M${x} ${y - h}L${x + h} ${y}L${x} ${y + h}L${x - h} ${y}Z`} />
+            ) : m.solid ? (
               /* m.solid: a small datum disc in the series' own colour -
                  the all-seats basis mark beside the classic-seats ring
                  (the explainer's state-flows chart; user 2026-10-22) */
