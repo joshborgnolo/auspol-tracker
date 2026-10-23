@@ -48,7 +48,7 @@ window.SM = window.RD_REDUCED_MOTION ? "auto" : "smooth";
    Non-party colours and anything that isn't a var() pass straight through. */
 window.inkOf = function inkOf(c) {
   return typeof c === "string"
-    ? c.replace(/var\(--(alp|lnp|grn|onp|oth)\)/g, "var(--$1-text)")
+    ? c.replace(/var\(--(alp|lnp|grn|onp|dem|dlp|uap|xnt|jln|oth)\)/g, "var(--$1-text)")
     : c;
 };
 

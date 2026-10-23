@@ -56,6 +56,15 @@
   --grn: oklch(0.60 0.120 150);  /* Greens       */
   --onp: oklch(0.66 0.130 58);   /* One Nation orange */
   --oth: oklch(0.64 0.018 70);   /* Others grey  */
+  /* the named minor families of the primary-vote history (the flows-explained
+     chart's "View: Primary votes" flip, 2026-10-23): hues fanned through the
+     free ranges of the wheel, one family one hue, marks only – a family
+     surfaces in a view solely where the view's vote clears the fold */
+  --dem: oklch(0.62 0.110 80);   /* Democrats gold */
+  --dlp: oklch(0.60 0.095 340);  /* Democratic Labor rose */
+  --uap: oklch(0.66 0.125 95);   /* United Australia yellow */
+  --xnt: oklch(0.62 0.085 185);  /* Xenophon teal */
+  --jln: oklch(0.60 0.105 280);  /* Lambie violet */
   /* /shell-copy */
   /* past-cycles band fills: halfway Labor→Coalition in oklch – one definition
      serves both themes because var() resolves --alp/--lnp at the use site,
@@ -75,6 +84,11 @@
   --grn-text: oklch(0.52 0.120 150);
   --onp-text: oklch(0.52 0.130 58);
   --oth-text: oklch(0.52 0.018 70);
+  --dem-text: oklch(0.52 0.110 80);
+  --dlp-text: oklch(0.52 0.095 340);
+  --uap-text: oklch(0.52 0.125 95);
+  --xnt-text: oklch(0.52 0.085 185);
+  --jln-text: oklch(0.52 0.105 280);
   /* /shell-copy */
 
   --accent: oklch(0.50 0.070 205);
@@ -188,6 +202,11 @@ body.dark {
   --grn: oklch(0.720 0.135 152);
   --onp: oklch(0.760 0.135 64);
   --oth: oklch(0.700 0.018 72);
+  --dem: oklch(0.730 0.115 82);
+  --dlp: oklch(0.710 0.105 342);
+  --uap: oklch(0.760 0.130 97);
+  --xnt: oklch(0.720 0.095 187);
+  --jln: oklch(0.720 0.110 282);
   /* /shell-copy */
 
   /* On dark the marks are already lifted well past the text threshold, so the
@@ -199,6 +218,11 @@ body.dark {
   --grn-text: var(--grn);
   --onp-text: var(--onp);
   --oth-text: var(--oth);
+  --dem-text: var(--dem);
+  --dlp-text: var(--dlp);
+  --uap-text: var(--uap);
+  --xnt-text: var(--xnt);
+  --jln-text: var(--jln);
   /* /shell-copy */
 
   --accent: oklch(0.70 0.080 205);
