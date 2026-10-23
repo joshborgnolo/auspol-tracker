@@ -1,5 +1,8 @@
 .DS_Store
-node_modules/
+# bare name (not node_modules/): the trailing-slash form matches directories
+# only, and a worktree's node_modules SYMLINK ("File removed before we read
+# it" killed the 3a9d717 Pages deploy) slips straight through it.
+node_modules
 
 # machine-local Claude Code settings (contains absolute paths)
 .claude/settings.local.json
