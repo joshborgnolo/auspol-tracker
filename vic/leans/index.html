@@ -65922,6 +65922,7 @@ function ExplainedPrimaryChart({
   house,
   stateKey,
   classKey,
+  statePrim,
   menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
@@ -65929,7 +65930,7 @@ function ExplainedPrimaryChart({
   if (!PH || !PH.fed) return null;
   const bank = house === "sen" ? PH.fed.sen : PH.fed;
   if (!bank) return null;
-  const S = classKey && house !== "sen" && (PH.fed.classes || {})[classKey] || stateKey && (bank.states || {})[stateKey] || bank;
+  const S = statePrim || classKey && house !== "sen" && (PH.fed.classes || {})[classKey] || stateKey && (bank.states || {})[stateKey] || bank;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   const foldPt = PH.foldPt || 4;
@@ -65968,7 +65969,7 @@ function ExplainedPrimaryChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (classKey && house !== "sen" ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
+  const cap = (statePrim ? statePrim.lc ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019." : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + "." : classKey && house !== "sen" ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" && !statePrim ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -65988,7 +65989,7 @@ function ExplainedPrimaryChart({
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-prim-" + (house || "rep") + (stateKey || "") + (classKey || "")
+    key: "ex-prim-" + (house || "rep") + (stateKey || "") + (classKey || "") + (statePrim ? "|" + S.label : "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     yDomain: [0, yMax],
@@ -66005,8 +66006,8 @@ function ExplainedPrimaryChart({
     ariaLabel: "First-preference vote shares by party, " + S.label + ", " + span,
     copy: {
       title: "First-preference vote shares by party, " + (S.short || S.label),
-      sub: rdCap(S.elections || S.label + " elections") + ". Official AEC results; a party under " + foldPt + "% joins Others, the remainder.",
-      caption: "Official AEC results; a party under " + foldPt + "% joins Others, the remainder.",
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (statePrim ? "From " + S.srcLine : "Official AEC results") + "; a party under " + foldPt + "% joins Others, the remainder.",
+      caption: (statePrim ? "From " + S.srcLine : "Official AEC results") + "; a party under " + foldPt + "% joins Others, the remainder.",
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -66052,13 +66053,25 @@ function RdExplained() {
   const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
+  const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
+  const STE_KEYS = Object.keys(STATE_PRIM);
+  const LC_PRIM = STATE_PRIM.nsw && STATE_PRIM.nsw.sen || null;
+  const steKey = view.startsWith("ste:") && STATE_PRIM[view.slice(4)] ? view.slice(4) : null;
+  const steLcView = view === "ste:nswlc" && !!LC_PRIM;
+  const steView = !!steKey || steLcView;
+  const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;
   const setFlowsFig = () => setFig(m => m === "flows" ? "primary" : "flows");
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
   const flipHouse = () => {
     const next = house === "sen" ? "rep" : "sen";
     setHouse(next);
-    if (primMode) return;
+    if (primMode) {
+      if (next === "sen") {
+        if (view === "ste:nsw" && LC_PRIM) setView("ste:nswlc");else if (steKey) setView("fed");
+      } else if (steLcView) setView("ste:nsw");
+      return;
+    }
     if (next === "sen") {
       if (view === "nsw" && LC_BANK) setView("nswlc");else if (classKey || !fedView || pair === "on" && stateKey && !hasOnCells(stateKey)) setView("fed");
     } else if (lcView) setView("nsw");
@@ -66168,17 +66181,18 @@ function RdExplained() {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? [] : Object.keys(PH_CLASSES).map(k => "fedcl:" + k))] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? LC_PRIM ? ["ste:nswlc"] : [] : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
-    if (primMode && (badClass || lcView || !fedView)) setView("fed");
-  }, [primMode, badClass, lcView, fedView]);
+    if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
+    if (!primMode && steView) setView("fed");
+  }, [primMode, badClass, lcView, fedView, steView]);
   const menuShow = primMode ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
   const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
   const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
-    value: lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
+    value: lcView && !senOnView ? "nswlc" : steLcView ? "ste:nswlc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
     onChange: e => setView(e.target.value)
   }, React.createElement("optgroup", {
     label: "Federal elections"
@@ -66199,7 +66213,16 @@ function RdExplained() {
     label: "State elections"
   }, React.createElement("option", {
     value: "nswlc"
-  }, (pair === "on" ? LC_ON_BANK : LC_BANK).label))) : null;
+  }, (pair === "on" ? LC_ON_BANK : LC_BANK).label)), primMode && house !== "sen" && STE_KEYS.length > 0 && React.createElement("optgroup", {
+    label: "State elections"
+  }, STE_KEYS.map(k => React.createElement("option", {
+    key: k,
+    value: "ste:" + k
+  }, (STATE_PRIM[k].short || STATE_PRIM[k].label) + " state elections"))), primMode && house === "sen" && LC_PRIM && React.createElement("optgroup", {
+    label: "State elections"
+  }, React.createElement("option", {
+    value: "ste:nswlc"
+  }, LC_PRIM.label))) : null;
   const share = React.createElement("span", {
     className: "rd-pl-ctl ex-share"
   }, React.createElement("span", {
@@ -66291,6 +66314,7 @@ function RdExplained() {
     house: house,
     stateKey: stateKey,
     classKey: classKey,
+    statePrim: stePrim,
     menu: headCtls
   }) : lcView && pair === "on" ? React.createElement(ExplainedFlowChart, {
     jur: "nsw",

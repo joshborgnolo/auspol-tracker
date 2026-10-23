@@ -5172,6 +5172,93 @@ const primaryHistory = (() => {
   } catch { return null; }
 })();
 
+/* primaryHistory.stateElections – the same chart's STATE-election views
+   (user 2026-10-23: "what about primary votes for state elections, lower
+   and upper houses"; scope: the six jurisdictions the flow bank covers
+   under Lower, the NSW Legislative Council alone under Upper – the flow
+   chart's Council note says why no other upper house can count one). The
+   assemblies' first preferences come from the state flow parsers' one CSV
+   (data/state-flows.csv, prim_share – the same vote figures their flows
+   are estimated from); the Council's family shares ride its own NSWEC
+   count bank (.build/nswec-lc-flow-src/counts.json, above-the-line papers
+   like the Senate view). The Coalition view merges the Liberal and
+   Nationals lines (Queensland's merger rows carry the lot under lib; the
+   NT's is the CLP whole), and a named minor folds under the same 4% as
+   the national views, its share joining Others. The srcLine map mirrors
+   the flowHistory JURIS credits – the primary view names the commission's
+   official results where the flows' srcAs names its distributions; both
+   homes move together. The jurisdiction meta mirrors the JURIS map's copy
+   too – the Territory's classic-seat tally sits under the flow
+   estimator's floor, so it never joins the flow history's menu, but its
+   first preferences stand on their own here (a primary chart needs no
+   classic-seat count). Federal-only by position: the Vic build returns
+   without them, as the flow history does. */
+if (primaryHistory && !JUR) {
+  const FOLD = primaryHistory.foldPt || 4;
+  const r2p = (v) => Math.round(v * 100) / 100;
+  const STE = [
+    ["vic", "Vic", "Victoria", "Victorian state elections", "the Victorian Electoral Commission’s official results"],
+    ["wa", "WA", "Western Australia", "Western Australian state elections", "the Western Australian Electoral Commission’s official results"],
+    ["sa", "SA", "South Australia", "South Australian state elections", "the Electoral Commission SA’s official results"],
+    ["qld", "Qld", "Queensland", "Queensland state elections", "the Electoral Commission of Queensland’s official results"],
+    ["nt", "NT", "Northern Territory", "Northern Territory elections", "the NT Electoral Commission’s official results"],
+    ["nsw", "NSW", "New South Wales", "New South Wales state elections", "the NSW Electoral Commission’s official results"],
+  ];
+  const ste = {};
+  try {
+    const STE_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+    const csvSTE = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8");
+    const bag = {};
+    csvSTE.split(/\r?\n/).slice(1).forEach((ln) => {
+      if (!ln.trim()) return;
+      const c = ln.split(",");
+      // jurisdiction,year,party,prim_votes,prim_share,… – nat merges into lib
+      ((bag[c[0]] ||= {})[+c[1]] ||= {})[c[2]] = +c[4];
+    });
+    for (const [jk, short, label, elections, srcLine] of STE) {
+      const byYear = bag[jk];
+      if (!byYear) continue;   // a jurisdiction the CSV never covers stays out
+      const years = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+      const lines = Object.fromEntries(STE_KEYS.map((k) => [k, []]));
+      years.forEach((y) => {
+        const row = byYear[y];
+        const cell = (k) => row[k] || 0;
+        const g = cell("grn"), o = cell("onp");
+        const gIn = g >= FOLD, oIn = o >= FOLD;
+        lines.alp.push(r2p(cell("alp")));
+        lines.lnp.push(r2p(cell("lib") + cell("nat")));
+        lines.grn.push(gIn ? r2p(g) : null);   // a sub-fold family gaps, never zeroes
+        lines.onp.push(oIn ? r2p(o) : null);
+        lines.oth.push(r2p(cell("oth") + (gIn ? 0 : g) + (oIn ? 0 : o)));
+      });
+      ste[jk] = { label, short, elections, srcLine,
+        years, alp: lines.alp, lnp: lines.lnp, grn: lines.grn, onp: lines.onp, oth: lines.oth };
+    }
+  } catch { /* no flows CSV: the national primary views still stand */ }
+  /* the NSW Legislative Council view, banked beside the Assembly's exactly
+     as the flow side banks FH.nsw.sen: the same committed NSWEC count
+     (atlByFamily shares of the above-the-line papers). PHON ran no Council
+     group before 2019 – a zero-ballot family is null, never a zero. */
+  try {
+    const lc = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "nswec-lc-flow-src", "counts.json"), "utf8"));
+    const years = Object.keys(lc.events || {}).map(Number).sort((a, b) => a - b);
+    if (ste.nsw && years.length) {
+      const fam = (y, k) => ((lc.events[y].atlByFamily || {})[k] || 0) / lc.events[y].atl * 100;
+      const gate = (y, k) => { const v = fam(y, k); return v >= FOLD ? r2p(v) : null; };
+      ste.nsw.sen = { label: "NSW Legislative Council", short: "NSW LC", lc: true,
+        elections: "NSW Legislative Council elections",
+        srcLine: "the NSW Electoral Commission’s ballot-level preference files",
+        years,
+        alp: years.map((y) => r2p(fam(y, "ALP"))),
+        lnp: years.map((y) => r2p(fam(y, "COAL"))),
+        grn: years.map((y) => gate(y, "GRN")),
+        onp: years.map((y) => gate(y, "PHON")),
+        oth: years.map((y) => r2p(fam(y, "OTHER") + (fam(y, "GRN") < FOLD ? fam(y, "GRN") : 0) + (fam(y, "PHON") < FOLD ? fam(y, "PHON") : 0))) };
+    }
+  } catch { /* counts bank missing: the Council view stays out */ }
+  if (Object.keys(ste).length) primaryHistory.stateElections = ste;
+}
+
 /* ---- 7e. current primary = the 21-day nowcast, per party -----------------
    The reader-facing "current primary" is the headline construction itself –
    trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –

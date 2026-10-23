@@ -352,7 +352,7 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
    emit), the menu's state-elections optgroup and the LC bank gate are now
    pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
    Nation sheds the Council only while its ON cut is absent */
-assert.ok(ap.includes('{primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} menu={headCtls} />')
+assert.ok(ap.includes('{primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} menu={headCtls} />')
     && ap.includes(': lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
     && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
     && ap.includes(': pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
@@ -403,13 +403,46 @@ assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
     && ap.includes('const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;')
     && ap.includes('"fedcl:" + k'),
   "the fedcl:<class> view ids resolve over the current mode's class bank (PH_CLASSES in primary, FED_CLASSES in flows; classKey, the menu's fedcl options)");
-assert.ok(ap.includes('...(house === "sen" ? [] : Object.keys(PH_CLASSES).map((k) => "fedcl:" + k))]')
-    && ap.includes('if (primMode && (badClass || lcView || !fedView)) setView("fed");')
+assert.ok(ap.includes('...Object.keys(PH_CLASSES).map((k) => "fedcl:" + k), ...STE_KEYS.map((k) => "ste:" + k)')
+    && ap.includes('if (primMode && (badClass || lcView || (!fedView && !steView))) setView("fed");')
+    && ap.includes('if (!primMode && steView) setView("fed");')
     && ap.includes('const badClass = view.startsWith("fedcl:") && !classKey;'),
-  "the primary view lists its own four seat-class cuts (never under Upper, whose bank has none) and only a class its bank doesn't hold snaps to federal");
-assert.ok(ap.includes('function ExplainedPrimaryChart({ house, stateKey, classKey, menu })')
+  "the primary view lists its own four seat-class cuts beside the state assemblies and snaps the picks its bank doesn't hold back to federal - class, flow-side and primary-state picks alike");
+assert.ok(ap.includes('function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, menu })')
     && ap.includes('(classKey && house !== "sen" && ((PH.fed.classes || {})[classKey]))'),
   "ExplainedPrimaryChart draws a class cut when one is picked (the Senate bank holds no classes)");
+/* 2026-10-23 (user: "what about primary votes for state elections, lower
+   and upper houses"): the primary view gains its own State elections
+   section off primaryHistory.stateElections (gen-data's build-time
+   derivation from the state-flow CSV and the NSWEC count bank; the figures
+   and folds are pinned in test-primary-history.mjs). The six assemblies
+   ride ste:<key> under Lower, NSW's Legislative Council ste:nswlc alone
+   under Upper (the flows card's one upper house is the primary card's
+   one), and NSW's pick twins across the House: flip the flows way */
+assert.ok(ap.includes('const STATE_PRIM = (PH_HIST && PH_HIST.stateElections) || {};')
+    && ap.includes('const LC_PRIM = (STATE_PRIM.nsw && STATE_PRIM.nsw.sen) || null;')
+    && ap.includes('const steKey = view.startsWith("ste:") && STATE_PRIM[view.slice(4)] ? view.slice(4) : null;')
+    && ap.includes('const steLcView = view === "ste:nswlc" && !!LC_PRIM;')
+    && ap.includes('const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;'),
+  "the primary state banks derive off primaryHistory.stateElections (ste:<state>, ste:nswlc beside the flows-side nswlc)");
+assert.ok(ap.includes('? (LC_PRIM ? ["ste:nswlc"] : [])')
+    && ap.includes('...STE_KEYS.map((k) => "ste:" + k)])]'),
+  "Lower's primary menu walks the six assemblies, Upper's the Council alone");
+assert.ok(ap.includes('if (view === "ste:nsw" && LC_PRIM) setView("ste:nswlc");')
+    && ap.includes('else if (steKey) setView("fed");')
+    && ap.includes('else if (steLcView) setView("ste:nsw");'),
+  "the House: flip twins NSW's assembly pick with its Council view; every other state pick is House-only");
+assert.ok(ap.includes('{STE_KEYS.map((k) => <option key={k} value={"ste:" + k}>{(STATE_PRIM[k].short || STATE_PRIM[k].label) + " state elections"}</option>)}')
+    && ap.includes('<option value="ste:nswlc">{LC_PRIM.label}</option>'),
+  "the State-elections optgroup rides the primary banks in both chambers (the Council's label from its bank)");
+assert.ok(ap.includes('value={lcView && !senOnView ? "nswlc" : steLcView ? "ste:nswlc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey'),
+  "the menu selects the primary state view ahead of the federal cuts");
+assert.ok(ap.includes('const S = statePrim')
+    && ap.includes('| (stateKey && (bank.states || {})[stateKey]) || bank'),
+  "ExplainedPrimaryChart resolves a state-election bank ahead of every federal S");
+assert.ok(ap.includes('every formal above-the-line vote from " + S.srcLine')
+    && ap.includes('One Nation ran no upper-house group in 2011 or 2015'),
+  "the Council's caption counts the ATL papers (below-the-line excluded, no-group years not zeroes)");
 assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"'),
   "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
 /* 2026-10-23 (user, quoting the shipped layout: "View: / Preference
