@@ -3556,6 +3556,18 @@ body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; ga
    left-aligned"). 2026-10-24: one cycling button covers all three views,
    so the row never holds siblings */
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
+/* a vote-share view sheds the contest tabs (user 2026-10-24: "'Labor v
+   Coalition / Labor v One Nation' menu bar should not be visible in 2pp
+   or primary view … should drift down towards that menu bar, taking the
+   position it would otherwise occupy"): the View: switch drifts down to
+   that slot, the trailing House:/Share: flips riding its right on a
+   laptop */
+body.rd .ex-fl-tabslot { margin-top: 0; min-height: 44px; align-items: center; gap: 0 16px; flex-wrap: wrap; }
+/* the drifted row lands exactly where the tabs sat (min-height matches the
+   .rd-tab 44-floor; the tabs row carried no margin): the vacated top row
+   keeps its own height under a visibility:hidden twin of the switch, so
+   nothing below moves when the figure changes */
+body.rd .ex-fl-vacate { visibility: hidden; }
 /* the exhaustion-adjustment switch, the key row's last item (user 2026-10-22,
    resized 2026-10-23): a key-sized track where a swatch would sit, the words
    inside the one button; the 44px touch target is an invisible ::before, so

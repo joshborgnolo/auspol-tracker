@@ -6884,17 +6884,19 @@ function RdExplained() {
       </button>
     </span>
   ) : null;
-  /* the View: flip rides its own row ABOVE the contest tabs (user
-     2026-10-23: it "should sit on top of 'Labor v Coalition / Labor v
-     One Nation'") - never inside the tab row, and not in the chart head,
-     which only draws below the tabs on a phone. ONE cycling button (the
-     2026-10-24 merge): its label is the figure ON the card, the House:/
-     Share: flips' own current-value idiom, and its press advances to the
-     next stop. A facet is a stop only where the build ships its data -
-     gen-data's guarded handoffs leave window.AUSPOL.primaryHistory /
-     window.AUSPOL.twoPPHistory null on a missing file (the Vic page
-     carries neither), and a build with neither keeps the flows with no
-     control at all */
+  /* the View: flip rides its own row ABOVE the contest tabs in the flows
+     view (user 2026-10-23: it "should sit on top of 'Labor v Coalition /
+     Labor v One Nation'") - never inside the tab row, and not in the
+     chart head, which only draws below the tabs on a phone. A vote-share
+     view sheds the tabs and the row drops to their slot instead (user
+     2026-10-24; the render branch at the card head owns the move). ONE
+     cycling button (the 2026-10-24 merge): its label is the figure ON
+     the card, the House:/Share: flips' own current-value idiom, and its
+     press advances to the next stop. A facet is a stop only where the
+     build ships its data - gen-data's guarded handoffs leave
+     window.AUSPOL.primaryHistory / window.AUSPOL.twoPPHistory null on a
+     missing file (the Vic page carries neither), and a build with
+     neither keeps the flows with no control at all */
   const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
   const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
   const FIG_LABELS = { flows: "Preference flows", primary: "Primary votes", "2pp": "2PP" };
@@ -6933,11 +6935,31 @@ function RdExplained() {
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
         <div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">
-          {viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}
-          <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
-                  options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
-            {narrow ? null : <>{houseCtl}{shareSlot}</>}
-          </RdTabs>
+          {/* a vote-share view sheds the contest tabs (user 2026-10-24:
+              "'Labor v Coalition / Labor v One Nation' menu bar should not
+              be visible in 2pp or primary view") and the View: switch drifts
+              down to the row they would sit on ("should drift down towards
+              that menu bar, taking the position it would otherwise occupy") -
+              a visibility:hidden twin keeps the vacated top row's height so
+              the chart below never moves, and the trailing House:/Share:
+              flips ride the drifted row on a laptop (a phone's pair stays
+              in the chart head via headCtls). The pairStep guard above
+              keeps <-/->'s scroll day job while no tabs render */}
+          {figView ? (
+            viewCtl ? <div className="ex-fl-viewrow ex-fl-vacate" aria-hidden="true">{viewCtl}</div> : null
+          ) : (
+            viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null
+          )}
+          {figView ? (
+            viewCtl ? <div className="ex-fl-viewrow ex-fl-tabslot">{viewCtl}
+              {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips">{houseCtl}{shareSlot}</span>}
+            </div> : null
+          ) : (
+            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
+                    options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
+              {narrow ? null : <>{houseCtl}{shareSlot}</>}
+            </RdTabs>
+          )}
           {/* ON-tab nswlc (2026-10-23): lcView holds under both contests -
               the ON branch must come before senOnView's catch-all so a
               Council pick kept across the contest flip draws the Council's

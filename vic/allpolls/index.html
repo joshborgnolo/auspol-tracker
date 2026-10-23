@@ -6078,6 +6078,8 @@ body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
+body.rd .ex-fl-tabslot { margin-top: 0; min-height: 44px; align-items: center; gap: 0 16px; flex-wrap: wrap; }
+body.rd .ex-fl-vacate { visibility: hidden; }
 body.rd .ex-fl-adj { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); }
 body.rd .ex-fl-adj::before { content: ""; position: absolute; inset: -12px -6px; }
 body.rd .ex-fl-adj-tk { position: relative; flex-shrink: 0; width: 26px; height: 16px; border-radius: 8px; background: var(--ink-faint); transition: background .15s ease; }
@@ -66702,9 +66704,16 @@ function RdExplained() {
     className: "card rd-card ex-fl-card",
     ref: cardMark,
     "data-rd-swipe-exact": ""
-  }, viewCtl ? React.createElement("div", {
+  }, figView ? viewCtl ? React.createElement("div", {
+    className: "ex-fl-viewrow ex-fl-vacate",
+    "aria-hidden": "true"
+  }, viewCtl) : null : viewCtl ? React.createElement("div", {
     className: "ex-fl-viewrow"
-  }, viewCtl) : null, React.createElement(RdTabs, {
+  }, viewCtl) : null, figView ? viewCtl ? React.createElement("div", {
+    className: "ex-fl-viewrow ex-fl-tabslot"
+  }, viewCtl, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
+    className: "ex-fl-flips"
+  }, houseCtl, shareSlot)) : null : React.createElement(RdTabs, {
     value: pair,
     onChange: onPairPick,
     ariaLabel: "Contest",

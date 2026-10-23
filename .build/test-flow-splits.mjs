@@ -458,11 +458,30 @@ assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} d
    Nation'"): the flip rides its own row above the contest tabs on BOTH
    layouts - never a tabs child, and not the phone's head span, which
    only draws below the tabs. Desktop keeps House:/Share: as the tabs
-   children; the phone keeps them in the head */
+   children; the phone keeps them in the head. (2026-10-24: in the
+   vote-share views the tabs shed and the row drops to their slot - the
+   next block pins that) */
 assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
     && ap.indexOf('className="ex-fl-viewrow"') < ap.indexOf('className="ex-fl-tabs"')
-    && ap.includes('{viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null}'),
-  "the View: switch rides its own row above the contest tabs");
+    && ap.includes('viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null'),
+  "the flows view keeps the View: switch on its own row above the contest tabs");
+/* 2026-10-24 (user: "'Labor v Coalition / Labor v One Nation' menu bar
+   should not be visible in 2pp or primary view … 'View: 2PP ⇄' should
+   drift down towards that menu bar, taking the position it would
+   otherwise occupy; same for 'View: Primary votes ⇄'"): a vote-share
+   view renders NO contest tabs, and the View: switch drops to their row
+   slot instead, the trailing House:/Share: flips riding its right on a
+   laptop (a phone's pair stays in the chart head). pairStep's figView
+   guard keeps <-/->'s scroll day job while no tabs exist to step. */
+assert.ok(ap.includes('<div className="ex-fl-viewrow ex-fl-tabslot">{viewCtl}')
+    && ap.includes('{narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips">{houseCtl}{shareSlot}</span>}')
+    && ap.indexOf('ex-fl-tabslot') < ap.indexOf('className="ex-fl-tabs"')
+    && ap.includes('<div className="ex-fl-viewrow ex-fl-vacate" aria-hidden="true">{viewCtl}</div>')
+    && ap.includes('if (figView) return false;'),
+  "a vote-share view sheds the contest tabs; View: drifts down to their row with the laptop's House:/Share: flips beside it, the vacated top row height-held by an invisible twin (pair walk guarded off)");
+assert.ok(cssRd.includes('body.rd .ex-fl-tabslot { margin-top: 0; min-height: 44px; align-items: center; gap: 0 16px; flex-wrap: wrap; }')
+    && cssRd.includes('body.rd .ex-fl-vacate { visibility: hidden; }'),
+  "the drift lands pixel-exact: tabslot at the tabs' floor with no margin, the vacate row invisible but height-keeping");
 assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{shareSlot}</>}')
     && ap.includes('<span className="ex-fl-flips">{houseCtl}{shareSlot}</span>')
     && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
