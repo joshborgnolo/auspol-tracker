@@ -1,0 +1,1611 @@
+                Parliament of Australia
+                Department of Parliamentary Services
+
+Parliamentary Library
+Information, analysis and advice for the Parliament                 RESEARCH PAPER
+www.aph.gov.au/library
+
+
+
+                                                          28 July 2010, no. 1, 2010–11, ISSN 1834-9854
+
+
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+Paul Nelson
+Statistics and Mapping Section
+
+Executive summary
+•   The Census collects data on a broad range of social and economic measures of the
+    Australian population. While it is possible to compare electoral divisions on individual
+    census data items, it is often more useful to compare divisions on the basis of a summary
+    of related social and economic data items. This paper provides data on the four separate
+    summary indexes derived from the 2006 Census of Population and Housing:
+
+    – Index of Relative Socio-economic Disadvantage,
+
+    – Index of Relative Socio-economic Advantage/Disadvantage,
+
+    – Index of Economic Resources, and
+
+    – Index of Education and Occupation.
+
+•   The paper shows each electoral division ranked on the basis of each index. The electoral
+    boundaries used in this paper are the boundaries that will be used in the upcoming federal
+    election. The paper is an updated version of an earlier paper that was based on the 2006
+    electoral division boundaries.
+
+•   The paper also includes colour coded thematic maps of electoral divisions for each index.
+Contents
+
+Introduction ................................................................................................................................. 1
+Description of the indexes .......................................................................................................... 2
+Data limitations ........................................................................................................................... 4
+Main features .............................................................................................................................. 5
+         Index of Relative Socio-economic Disadvantage.............................................................. 6
+         Index of Relative Socio-economic Advantage/Disadvantage ........................................... 6
+         Index of Economic Resources ........................................................................................... 7
+         Index of Education and Occupation .................................................................................. 8
+Conclusion .................................................................................................................................. 9
+Appendix ................................................................................................................................... 11
+
+
+List of tables
+
+Index of Relative Socio-economic Disadvantage
+Electoral divisions ranked by the Index of Relative Socio-economic Disadvantage
+Index of Relative Socio-economic Advantage/Disadvantage
+Electoral divisions ranked by the Index of Relative Socio-economic Advantage/Disadvantage
+Index of Economic Resources
+Electoral divisions ranked by the Index of Economic Resources
+Index of Education and Occupation
+Electoral divisions ranked by the Index of Education and Occupation
+Summary of Index Rankings
+
+
+List of maps
+
+Index of Relative Disadvantage
+Index of Relative Advantage/Disadvantage
+Index of Economic Resources
+Index of Education and Occupation
+                                        Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Introduction
+This paper provides data on four separate socio-economic summary indexes from the 2006
+Census of Population and Housing. These four indexes, referred to as Socio-Economic
+Indexes for Areas (SEIFA), measure different aspects of socio-economic conditions for
+individual Census Collection Districts (CCDs). Each SEIFA index can be aggregated for a
+broad range of different geographic areas and this paper reports on SEIFA data for
+Commonwealth electoral divisions.
+
+The electoral boundaries used in this paper incorporate the recent redistributions in New
+South Wales, Queensland, Western Australia and Tasmania. These boundaries will be used in
+the upcoming federal election on Saturday 21 August 2010. This paper is an updated version
+of an earlier paper 1 that was based on the 2006 electoral division boundaries. It uses the same
+CCD level census data for the four SEIFA indexes with the difference that each CCD is now
+classified to a 2009 electoral division of best fit.
+
+The Australian Bureau of Statistics (ABS) conducts a population census once every five
+years, collecting data on a broad range of social, economic and demographic aspects of the
+Australian population. For the 2006 Census, each household was required to answer sixty
+questions covering diverse topics such as birthplace, occupation, education, income,
+employment, family composition, housing, and motor vehicle ownership. While it is possible
+to compare electoral divisions on the basis of each census variable 2, it can be more useful to
+compare divisions on the basis of a summary measure of related census variables. The
+indexes shown in this paper have been created by the ABS for this purpose.
+
+This paper contains tables and maps of electoral divisions ranked on the basis of each of the
+four SEIFA indexes, together with a description of each index and some comments on the
+notable features of the electoral rankings. SEIFA data for electoral divisions are created as a
+population weighted average of the CCDs within each electoral division. All indexes are
+constructed so that relatively disadvantaged areas have low index values. A more detailed
+explanation of the indexes is available from an Information Paper and a Technical Paper
+published by the ABS. 3
+
+Data for each index are presented in Tables 1 to 4 and there are two versions of each table.
+The first version shows each electoral division in alphabetical order while the second version
+shows each electoral division ranked by the index score value (divisions are ranked from
+
+
+1.    P. Nelson, Socio-economic indexes for electoral divisions: 2006 Census, Research Paper No. 2
+      2008–09, Parliamentary Library, Canberra, 2008.
+2.    A paper comparing the new electoral divisions on the basis of a number of individual
+      2006 Census variables has been published recently by the Parliamentary Library.
+      P. Nelson, Electoral division rankings: Census 2006 (2009 boundaries), Research
+      Paper No. 18 2009–10, Parliamentary Library, Canberra, 2010.
+3.    Australian Bureau of Statistics, An introduction to socio-economic indexes for areas (SEIFA)
+      2006, Information Paper, cat. no. 2039.0 ABS Canberra, 2008. Australian Bureau of Statistics,
+      Socio-economic indexes for areas (SEIFA) – Technical Paper 2006, cat. no. 2039.0.55.001
+      ABS Canberra, 2008.
+
+
+                                                                                                      1
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+lowest index value to highest). For all of the indexes, a low index score indicates relative
+disadvantage.
+
+The political party that notionally holds each seat after recent redistributions is also shown in
+each table. There are six seats currently held by the Liberal Party that are considered to be
+notionally ALP seats based on an estimated two party preferred vote that incorporates the
+effect of redistributions. These six seats are Gilmore, Greenway and Macarthur in New
+South Wales, Dickson and Herbert in Queensland, and Swan in Western Australia. The new
+seats of Wright in Queensland and Durack in Western Australia are both notionally Liberal
+Party seats based on voting patterns at the 2007 election. The seat of Lyne is currently held
+by an independent member following a by-election in 2008. It is shown as an independent
+held seat in the tables since a meaningful two party preferred vote cannot be estimated for
+independent held seats. The seat of Ryan is shown as notionally a Liberal Party seat even
+though the sitting member was expelled from the party on 20 May 2010.
+
+Table 5 contains a summary of the rankings for each of the four indexes together with the
+demographic classification of each electoral division as defined by the Australian Electoral
+Commission. Each division is classified as being in one of four possible demographic
+categories:
+
+•   inner metropolitan divisions comprise well established built-up suburbs located in capital
+    cities
+
+•   outer metropolitan divisions comprise areas of more recent suburban expansion of capital
+    cities
+
+•   provincial divisions comprise areas with a majority of voters in major provincial cities, or
+    in non-metropolitan urban conglomerates, and
+
+•   rural divisions comprise areas without a majority of voters in major provincial cities.
+
+The paper includes colour coded thematic maps of electoral divisions for each of the four
+indexes. The five colours shown on each map represent area-based quintiles. This means that
+the 150 electoral divisions are ranked and then split into five groups (of 30 divisions each)
+and each group is shown in a different shade of green with the lightest colour representing the
+most disadvantaged areas. There is also an appendix containing a detailed list of the variables
+used to construct each index.
+
+Description of the indexes
+There are four indexes shown in this paper. Each index represents a different aspect of socio-
+economic disadvantage in electoral divisions. The indexes have been created by combining
+and summarising information from a variety of social and economic variables from the 2006
+Census. Each index uses a different set of underlying census variables. The appendix to this
+paper contains a detailed list of the variables included in each index.
+
+The four indexes are:
+
+•   Index of Relative Socio-economic Disadvantage
+
+
+2
+                                        Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+•   Index of Relative Socio-economic Advantage and Disadvantage
+
+•   Index of Economic Resources, and
+
+•   Index of Education and Occupation.
+
+All the indexes have been constructed so that relatively disadvantaged areas have low index
+values. To enable easy interpretation of relatively high and low scores, the index scores for
+Collection Districts have been standardised to have a mean of 1000 across all Collection
+Districts in Australia. It is not always meaningful to give a CCD a SEIFA score. Around three
+per cent of all CCDs do not have a SEIFA score and are omitted from calculations of SEIFA
+scores for larger geographic areas. The mean index score for electoral divisions (and other
+geographic aggregates of CCDs) does not necessarily have a mean value of exactly 1000,
+although the mean score will, in practice, be close to 1000.
+
+As a general rule, every effort is made by the ABS to keep the SEIFA indexes the same as the
+previous release (from the 2001 Census). However, some changes are important or
+unavoidable. The 2006 Census SEIFA indexes comprise the same four indexes as released for
+the 2001 Census SEIFA, although some of the variables used to construct each of the four
+indexes have changed since 2001.
+
+The Index of Relative Socio-economic Disadvantage includes variables that measure access
+to material and social resources of people and households. The index is designed to focus on
+disadvantage only. A low score on this index indicates a high proportion of relatively
+disadvantaged people in an area. You cannot conclude that an area with a very high score has
+a large proportion of relatively advantaged (‘well off’) people, as there are no variables in this
+index to indicate this. You can only conclude that such an area has a relatively low incidence
+of disadvantage. There are 17 indicators used to construct this index including topics such as
+income, education, occupation, employment status, family type, dwelling size and tenure,
+internet connection, English proficiency, motor vehicles, and marital status.
+
+The Index of Relative Socio-economic Advantage/Disadvantage includes variables that
+also measure access to material and social resources of people and households. This index
+includes measures of relative social and economic disadvantage as well as well-being. A low
+score indicates relatively greater disadvantage and a lack of advantage in general. A high
+score indicates a relative lack of disadvantage and greater advantage in general. There are 21
+indicators used to construct the index. There are eight indicators that measure relative
+advantage and 13 indicators that measure disadvantage. Of the 13 disadvantage indicators,
+12 are the same indicators used in the construction of the Disadvantage Index. The additional
+indicators of relative advantage in this index (compared with the Disadvantage Index) cover
+dwelling size, educational qualifications, mortgage and rent levels, occupation, internet, and
+income.
+
+The Index of Economic Resources includes variables that reflect the financial aspects of
+relative socio-economic advantage and disadvantage of households within an area. The
+variables in this index measure household incomes, expenditures and wealth. There are 15
+indicators used to construct the index covering mortgage and rental repayments, income, size
+of dwellings, and family type. Of the 15 indicators, six are the same indicators used in the
+Disadvantage Index while 10 are the same indicators used in the Advantage/Disadvantage
+
+
+                                                                                                      3
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Index. This index includes indicators of both high and low income, as well as variables
+correlated with high or low wealth. It does not include education or occupation measures. A
+low score indicates a relative lack of access to economic resources while a high score
+indicates relatively greater access to economic resources.
+
+The Index of Education and Occupation summarises variables relating exclusively to
+education, employment and occupation. There are nine indicators used in the index. Of these
+nine indicators, two are the same indicators used in the Disadvantage Index while four are the
+same indicators used in the Advantage/Disadvantage Index. The index includes both ‘low’
+and ‘high’ measures of education and occupation and it does not include any measures of
+income. A low score indicates relatively lower education and occupation status of people in
+an area while a high score indicates relatively higher education and occupation status of
+people in an area. This index is highly correlated with the Disadvantage Index and the
+Advantage/Disadvantage Index, but it has only a medium correlation with the Economic
+Resources index (which is not unexpected since these two indexes have only one indicator in
+common).
+
+Data limitations
+The indexes contained in this paper are subject to a number of limitations that should be
+borne in mind when they are used to compare electoral divisions, or other geographic
+boundaries.
+
+It is difficult to capture an abstract concept like socio-economic disadvantage and the SEIFA
+indexes only include some of the social and economic variables from the 2006 Census of
+Population and Housing. There are a number of social and economic indicators such as
+wealth, savings, health, remoteness, and access to infrastructure, that all affect the well-being
+of the population but are not collected in the census and therefore are not included in the
+indexes.
+
+The SEIFA indexes that have been produced for the 2006 Census are dependent upon the
+variables that have been included and the relative weights attached to each of those variables
+(see Appendix). The inclusion of different variables or different weighting patterns would
+result in different index scores. 4
+
+In addition to the above conceptual and methodological limitations, there are a number of
+technical limitations associated with use of the indexes. Non-response to individual census
+items may affect the accuracy of the indexes if there is a socio-economic bias to the non-
+response. Persons in non-private dwellings such as boarding houses are under-represented in
+the indexes as the indicators relating to families and dwellings include only occupied private
+dwellings.
+
+Other aspects of the indexes should be borne in mind when analysing and comparing the
+indexes for different electoral divisions:
+
+
+
+4.    This is discussed on page 3 of the ABS Technical Paper. See Socio-economic indexes for areas
+      (SEIFA) – Technical Paper 2006, cat. no. 2039.0.55.001 ABS Canberra, 2008.
+
+
+4
+                                        Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+•   The indexes are ‘ordinal measures’ and not ‘interval measures’. This means that the
+    indexes can be used to order the electoral divisions into a ranked order but cannot be used
+    to show that one division is twice as well-off if its score is twice that of another division.
+
+•   The indexes reflect the average socio-economic well-being of people and households in an
+    area, not information about an individual person or household in an area. If you have
+    person level data it is not valid to link it to SEIFA scores.
+
+•   SEIFA index scores are created at the CCD level because CCDs are the smallest census
+    geographic area that is currently available. Even though CCDs are small in size, people
+    and households within a CCD can be quite different to each other and SEIFA represents an
+    average of these different people. When SEIFA scores are created for larger areas such as
+    electoral divisions, these larger areas will have a greater diversity of people and
+    households. Care must be taken when interpreting the index scores for large geographic
+    areas because the index scores can be less meaningful.
+
+•   Partly because of the above factors, the interpretation of an index is more straightforward
+    for electoral divisions that have extreme values. It is difficult to draw comparisons
+    between electoral divisions with mid-ranked scores.
+
+•   Two areas may have a similar index score, but for very different reasons. For example, a
+    low score in one area may be due to a high proportion of low income households, while a
+    low score in a different area may instead be due to a high proportion of low-rent
+    households.
+
+It is recommended that users do not compare SEIFA scores over time for a geographic area.
+SEIFA is only a relative measure, not an absolute measure of socio-economic disadvantage.
+An area may have a higher or lower score than it did previously, however, this could be due
+to changes in other areas, rather than changes to that area. Although the ABS attempts to
+maintain consistency in SEIFA releases for each census, there are changes in the variables
+and their weights used to calculate each SEIFA index. An example of this is the inclusion of,
+for the first time, a question on broadband internet access. This variable has been included in
+the Advantage/Disadvantage Index.
+
+Main features
+The following section provides comment on the main features of each index. Because similar
+variables are used to construct each index, there are some similarities in the rankings of
+electoral divisions for the various indexes. For example, the ten divisions that are ranked
+highest for the Advantage/Disadvantage Index comprise nine of the same top ten divisions
+for the Disadvantage Index, seven of the top ten divisions for the Economic Resources Index,
+and seven of the top ten divisions for the Education and Occupation Index. At the other end
+of the rankings, the ten divisions that are ranked lowest for the Advantage/Disadvantage
+Index comprise seven of the bottom ten divisions for the Disadvantage Index, six of the
+bottom ten divisions for the Economic Resources Index, and seven of the bottom ten
+divisions for the Education and Occupation Index.
+
+
+
+
+                                                                                                      5
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Index of Relative Socio-economic Disadvantage
+
+The ranking of electoral divisions for this index displays a similar pattern to the ranking for
+the Advantage/Disadvantage Index. This is understandable since 12 of the 21 indicators in
+this index are also in the Advantage/Disadvantage Index.
+
+The electoral division with the highest index score is Bradfield, followed by Berowra and
+Mitchell. The five electoral divisions with the highest index scores are all on Sydney’s north
+shore.
+
+The top ten electoral divisions are all held by the Liberal Party. They comprise nine of the
+same top ten as for the Advantage/Disadvantage Index with seven of these divisions in New
+South Wales (Bradfield, Mitchell, Berowra, North Sydney, Warringah, Wentworth, and
+Mackellar), one in Queensland (Ryan), one in Victoria (Kooyong), and one in Western
+Australia (Tangney).
+
+Metropolitan divisions dominate the higher rankings. Of the 30 divisions with the highest
+ranking, 29 are inner metropolitan or outer metropolitan divisions. The highest ranked non-
+metropolitan electorates are Macquarie (ranked 30th highest) and McEwen (ranked 34th
+highest).
+
+The electoral division with the lowest index score is Lingiari, followed by Fowler and
+Blaxland. The ten divisions with the lowest ranking comprise four in New South Wales
+(Fowler, Blaxland, Chifley and Watson), three in South Australia (Wakefield, Port Adelaide
+and Grey), two in Tasmania (Braddon and Lyons), and one in the Northern Territory
+(Lingiari). Of these ten divisions, nine are held by the ALP and one is held by the Liberal
+Party.
+
+The bottom 20 ranked electoral divisions include 13 rural divisions, three inner metropolitan
+divisions, two outer metropolitan divisions, and two provincial divisions.
+
+The 41 inner metropolitan divisions have an average index score of 1031 which is above the
+overall average index score of 1005 (but not as relatively high as for the
+Advantage/Disadvantage Index). The 45 outer metropolitan divisions have an average index
+score of 1018 which is also above the overall average. Provincial and rural divisions each
+have an average index score below the overall average. The 21 provincial divisions have an
+average index score of 993, and the 43 rural divisions have an average index score of 972.
+
+There are some divisions that have a significantly different ranking for the Disadvantage
+Index compared with the Advantage/Disadvantage Index. Blaxland is ranked 3rd lowest
+division for the Disadvantage Index but is ranked 18th lowest for the Advantage/Disadvantage
+Index. Watson is ranked 10th lowest division for the Disadvantage Index compared with a
+ranking of the 54th lowest for the Advantage/Disadvantage Index.
+
+Index of Relative Socio-economic Advantage/Disadvantage
+
+The ranking of electoral divisions for this index displays a similar pattern to the ranking for
+the Disadvantage Index. This is understandable since 12 of the 17 indicators in this index are
+also in the Advantage/Disadvantage Index.
+
+
+6
+                                      Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+The electoral division with the highest index score is Bradfield, followed by North Sydney
+and Warringah.
+
+The six electoral divisions with the highest index scores are all metropolitan areas of Sydney
+and five of them are on the north shore with the remaining division in the eastern suburbs
+(Wentworth).
+
+The top ten electoral divisions are all held by the Liberal Party and they comprise seven
+divisions in New South Wales (Bradfield, North Sydney, Warringah, Berowra, Wentworth,
+Mitchell, and Mackellar), two in Victoria (Kooyong and Higgins), and Ryan in Queensland.
+
+Metropolitan electorates dominate the higher rankings. The top 34 ranked electorates are all
+metropolitan areas. The highest ranked non-metropolitan divisions are Macquarie (ranked
+35th highest) and the adjoining provincial divisions of McPherson (ranked 45th highest) and
+Moncrieff (ranked 46th highest) on the Gold Coast.
+
+The electoral division with the lowest index score is Wakefield, followed by Grey and Lyons.
+
+The five electoral divisions with the lowest index scores are all rural areas and the bottom 30
+ranked electoral divisions include 23 rural divisions. Only two of the bottom 30 ranked
+divisions are inner metropolitan divisions (Port Adelaide and Blaxland) and only two are
+outer metropolitan divisions (Fowler and Chifley).
+
+The ten divisions with the lowest rankings comprise four divisions in South Australia
+(Wakefield, Grey, Port Adelaide and Barker), two in Tasmania (Lyons and Braddon), two in
+Queensland (Hinkler and Maranoa), Lingiari in the Northern Territory, and Fowler in New
+South Wales.
+
+The 42 inner metropolitan divisions have an average index score of 1060 which is
+significantly above the overall average index score of 1006. The 45 outer metropolitan
+divisions have an average index score of 1019, also above the overall average. Provincial and
+rural divisions each have an average index score below the overall average. The 21 provincial
+divisions have an average index score of 982, and the 43 rural divisions have an average
+index score of 953.
+
+Index of Economic Resources
+
+The electoral division with the highest index score is Mitchell, followed by Berowra and
+Bradfield. The five electoral divisions with the highest index scores are all on Sydney’s north
+shore.
+
+The top ten ranked electoral divisions comprise seven divisions in New South Wales
+(Mitchell, Berowra, Bradfield, Mackellar, Warringah, North Sydney, and Cook), Moore in
+Western Australia, Ryan in Queensland, and Menzies in Victoria.
+
+The top 20 ranked electoral divisions consist of 19 divisions held by the Liberal Party and
+only the division of Canberra (ranked 17th highest) is held by the ALP.
+
+
+
+
+                                                                                                    7
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Metropolitan divisions dominate the higher rankings. Of the 30 electoral divisions with the
+highest index scores, 29 are inner metropolitan or outer metropolitan divisions. Wright,
+ranked 21st highest, is the highest ranked non-metropolitan division.
+
+The electoral division with the lowest index score is Lingiari, followed by Grey and Braddon.
+The 10 divisions with the lowest rankings comprise four divisions in New South Wales
+(Blaxland, Cowper, Fowler and Page), three in South Australia (Grey, Port Adelaide and
+Wakefield), two in Tasmania (Braddon and Bass), and Lingiari in the Northern Territory.
+
+Of the ten divisions with the lowest ranking, nine of them are also ranked in the bottom ten
+divisions for the Disadvantage Index, with the 10th lowest ranked division of Bass being
+ranked 21st lowest under the Disadvantage Index. The bottom ten ranked electoral divisions
+include six rural divisions. Eight of the bottom ten ranked divisions are held by the ALP.
+
+The 45 outer metropolitan divisions have an average index score of 1031, which is above the
+overall average index score of 1007. The 41 inner metropolitan divisions have an average
+index score of 1019 which is above the overall average index score of 1007 (but not as
+relatively high as for the other three indexes). The Economic Resources Index is the only one
+where inner metropolitan divisions do not have the highest average score. The 21 provincial
+divisions have an average index score of 992, and the 43 rural divisions have an average
+index score of 979.
+
+Two divisions have a significantly lower ranking for the Economic Resources Index
+compared with the other three indexes. The electoral division of Melbourne is ranked 15th
+lowest for the Economic Resource Index but is ranked 127th lowest for
+Advantage/Disadvantage, 92nd lowest for Disadvantage, and 140th lowest for Education and
+Occupation. Similarly, the electoral division of Newcastle is ranked 13th lowest for the
+Economic Resource Index but it is ranked 66th lowest for Advantage/Disadvantage, 38th
+lowest for Disadvantage, and 89th lowest for Education and Occupation.
+
+Index of Education and Occupation
+
+The electoral division with the highest index score is North Sydney, followed by Wentworth
+and Bradfield and all three are in inner metropolitan Sydney.
+
+The top ten electoral divisions comprise five divisions in New South Wales (North Sydney,
+Wentworth, Bradfield, Sydney, and Warringah), three in Victoria (Kooyong, Higgins, and
+Melbourne Ports), Curtin in Western Australia, and Ryan in Queensland. Eight of the top ten
+ranked divisions are held by the Liberal Party.
+
+The 30 electoral divisions with the highest index scores are all inner metropolitan or outer
+metropolitan area. Macquarie, ranked 40th highest, is the highest ranked non-metropolitan
+division.
+
+The electoral division of Sydney, ranked 8th highest, has a significantly higher ranking than
+for the Disadvantage Index (37th highest) and the Economic Resources Index (91st highest).
+
+The electoral division with the lowest ranking is Wakefield, followed by Braddon and Lyons.
+
+
+
+8
+                                      Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+The ten divisions with the lowest ranking comprise three divisions in South Australia
+(Wakefield, Grey, and Port Adelaide), three in New South Wales (Fowler, Chifley and
+Hunter), two in Tasmania (Braddon and Lyons), and two in Queensland (Hinkler and
+Longman).
+
+The bottom ten ranked electoral divisions include five rural divisions. Of the ten divisions
+with the lowest rankings, eight are ALP seats.
+
+The 41 inner metropolitan divisions have an average index score of 1075 which is
+significantly above the overall average index score of 998. The other three geographic
+categories have average index scores below the overall average. The 45 outer metropolitan
+divisions have an average index score of 992, the 21 provincial divisions have an average
+index score of 964, and the 43 rural divisions have an average index score of 946.
+
+The electoral division of Hunter is ranked 6th lowest, whereas its ranking for the other three
+indexes is significantly higher (ranked 29th lowest for Advantage/Disadvantage, 34th lowest
+for Disadvantage, and 55th lowest for Economic Resources).
+
+Conclusion
+Each index aims to capture a slightly different aspect of relative disadvantage and/or
+advantage and a number of variables are common to the four SEIFA indexes (with the
+exception that the Economic Resources Index and the Education and Occupation Index do
+not share any common variables). Consequently many electoral divisions have a broadly
+similar ranking for each of the four SEIFA indexes although there will always be some
+degree of variation reflecting the different variables used to construct each index.
+
+The 41 inner metropolitan electoral divisions have a higher than average index value for each
+of the four indexes while the 45 outer metropolitan division have a higher than average index
+value for three of the four indexes. In contrast, the group of 21 provincial divisions and the
+group of 43 rural divisions both have average SEIFA values below the overall average index
+value for each of the four indexes. The table below summarises these average index scores
+for each demographic classification. Figures in brackets show the number of seats in each
+demographic classification.
+
+                                                   Advantage/          Economic          Education &
+Demographic Rating             Disadvantage      Disadvantage          Resources         Occupation
+Inner Metropolitan (41)               1031              1060               1019                1075
+Outer Metropolitan (45)               1018              1019               1031                  992
+Provincial (21)                         993               982                992                 964
+Rural (43)                              972               953                979                 946
+Average (150)                         1005              1006               1007                  998
+
+
+ALP held seats have an average index score slightly below the national average for each of
+the four indexes whereas Liberal Party held seats have an average index score above the
+national average for each of the four indexes. This difference is most apparent when looking
+at the bottom and top of the rankings. The top ten ranked divisions for the
+Advantage/Disadvantage Index, the Disadvantage Index, and the Economic Resources Index
+
+
+                                                                                                    9
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+are all Liberal Party seats, while eight of the top ten ranked divisions for the Education and
+Occupation Index are held by the Liberal Party.
+
+The electoral divisions held by the Nationals have an average index score significantly below
+the national average for each of the four indexes. This reflects the fact that eight of the nine
+electoral divisions held by the Nationals are rural divisions and rural divisions have a lower
+than average index score for each of the four indexes.
+
+The table below summarises the average index scores for each political party for the 150
+electoral divisions based on the notional allocation of seats. Figures in brackets show the
+notional number of seats held.
+
+                                                      Advantage/   Economic         Education &
+ Political Party               Disadvantage         Disadvantage   Resources        Occupation
+ ALP (88)                               993                  998        994                990
+ Liberal Party (50)                    1037                 1038       1041               1024
+ Nationals (9)                          960                  936        965                938
+ Independents (3)                       957                  939        962                938
+ Average (150)                         1005                 1006       1007                998
+
+
+
+
+10
+                                       Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Appendix
+This appendix lists the census variables included in each SEIFA index. The list shows each
+variable together with its weight that indicates the contribution of each variable to the index.
+The variables are listed in ascending order of the weight from the largest negative weight to
+the largest positive weight.
+Index of Relative Socio-economic Disadvantage
+Percentage of occupied private dwellings with no internet connection (weight -0.33)
+Percentage of employed people classified as Labourers (weight -0.30)
+Percentage of people aged 15 years and over with no post-school qualifications (weight -
+   0.30)
+Percentage of people with stated annual household equivalised income between $13 000 and
+   $20 799 (approximately 2nd and 3rd deciles) (weight -0.30)
+Percentage of households renting from Government or Community organisation (weight -
+   0.27)
+Percentage of people (in the labour force) unemployed (weight -0.27)
+Percentage of one parent families with dependent offspring only (weight -0.26)
+Percentage of households paying rent less than $120 per week (excluding $0 per week)
+   (weight -0.26)
+Percentage of people aged under 70 who have a long-term health condition or disability and
+   need assistance with core activities (weight -0.24)
+Percentage of occupied private dwellings with no car (weight -0.22)
+Percentage of people who identified themselves as being of Aboriginal and/or Torres Strait
+   Islander origin (weight -0.20)
+Percentage of occupied private dwellings requiring one or more extra bedrooms (based on
+   Canadian National Occupancy Standard) (weight -0.20)
+Percentage of people aged 15 years and over who are separated or divorced (weight -0.20)
+   Percentage of employed people classified as Machinery Operators and Drivers (weight -
+   0.20)
+Percentage of people aged 15 years and over who did not go to school (weight -0.17)
+   Percentage of employed people classified as Low Skill Community and Personal Service
+   Workers (weight -0.17)
+Percentage of people who do not speak English well (weight -0.13)
+
+
+Index of Relative Socio-economic Advantage and Disadvantage
+Percentage of people aged 15 years and over with no post-school qualifications (weight -
+   0.29)
+Percentage of occupied private dwellings with no internet connection (weight -0.29)
+Percentage of people with stated annual household equivalised income between $13 000 and
+   $20 799 (approximately 2nd and 3rd deciles) (weight -0.28)
+
+
+                                                                                                    11
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Percentage of employed people classified as Labourers (weight -0.26)
+Percentage of households paying rent less than $120 per week (excluding $0 per week)
+   (weight -0.21)
+Percentage of people aged under 70 who have a long-term health condition or disability and
+   need assistance with core activities (weight -0.20)
+Percentage of employed people classified as Machinery Operators and Drivers (weight -0.20)
+Percentage of people (in the labour force) unemployed (weight -0.20)
+Percentage of one parent families with dependent offspring only (weight -0.19)
+Percentage of households renting from Government or Community organisation (weight -
+   0.17)
+Percentage of employed people classified as Low Skill Community and Personal Service
+   Workers (weight -0.13)
+Percentage of occupied private dwellings requiring one or more extra bedrooms (based on
+   Canadian National Occupancy Standard) (weight -0.11)
+Percentage of occupied private dwellings with no car               (weight -0.11)
+Percentage of occupied private dwellings with four or more bedrooms (weight 0.13)
+Percentage of people aged 15 years and over at university or other tertiary institution (weight
+   0.14)
+Percentage of households paying mortgage greater than $2 120 per month (weight 0.23)
+Percentage of households paying rent greater than $290 per week (weight 0.24)
+Percentage of people aged 15 years and over with an advanced diploma or diploma
+   qualification (weight 0.24)
+Percentage of employed people classified as Professionals (weight 0.24)
+Percentage of occupied private dwellings with a broadband internet connection (weight 0.26)
+Percentage of people with stated annual household equivalised income greater than $52 000
+   (approximately 9th and 10th deciles) (weight 0.29)
+
+
+Index of Economic Resources
+Percentage of people with stated annual household equivalised income between $13 000 and
+   $20 799 (approximately 2nd and 3rd deciles) (weight -0.31)
+Percentage of one parent families with dependent offspring only (weight -0.30)
+Percentage of occupied private dwellings with no car (weight -0.30)
+Percentage of households renting from Government or Community organisation (weight -
+   0.29)
+Percentage of households paying rent less than $120 per week (excluding $0 per week)
+   (weight -0.28)
+Percentage of people aged 15 years and over who are unemployed (weight -0.27)
+Percentage of households who are lone person households (weight -0.25)
+
+
+
+12
+                                      Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+Percentage of occupied private dwellings requiring one or more extra bedrooms (based on
+   Canadian National Occupancy Standard) (weight -0.20)
+Percentage of households owning the dwelling they occupy (without a mortgage) (weight
+   0.14)
+Percentage of dwellings with at least one person who is an owner of an unincorporated
+   enterprise (weight 0.20)
+Percentage of households paying mortgage greater than $2 120 per month (weight 0.23)
+Percentage of households owning the dwelling they occupy (with a mortgage) (weight 0.24)
+Percentage of households paying rent greater than $290 per week (weight 0.24)
+Percentage of people with stated annual household equivalised income greater than $52 000
+   (approximately 9th and 10th deciles) (weight 0.27)
+Percentage of occupied private dwellings with four or more bedrooms (weight 0.29)
+
+
+Index of Education and Occupation
+Percentage of people aged 15 years and over who left school at Year 11 or lower (weight -
+   0.41)
+Percentage of people aged 15 years and over with no post-school qualifications (weight -
+   0.40)
+Percentage of employed people who work in a Skill Level 5 occupation (weight -0.36)
+Percentage of employed people who work in a Skill Level 4 occupation (weight -0.31)
+Percentage of people (in the labour force) unemployed (weight -0.23)
+Percentage of people aged 15 years and over with a certificate qualification (weight -0.23)
+Percentage of people aged 15 years and over at university or other tertiary institution (weight
+   0.26)
+Percentage of people aged 15 years and over with an advanced diploma or diploma
+   qualification (weight 0.35)
+Percentage of employed people who work in a Skill Level 1 occupation (weight 0.39)
+
+
+
+
+                                                                                                   13
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+
+© Copyright Commonwealth of Australia 2010
+
+This work is copyright. Except to the extent of uses permitted by the Copyright Act 1968, no person may
+reproduce or transmit any part of this work by any process without the prior written consent of the
+Parliamentary Librarian. This requirement does not apply to members of the Parliament of Australia acting in
+the course of their official duties.
+
+This work has been prepared to support the work of the Australian Parliament using information available at the
+time of production. The views expressed do not reflect an official position of the Parliamentary Library, nor do
+they constitute professional legal opinion.
+
+Feedback is welcome and may be provided to: web.library@aph.gov.au. Any concerns or complaints should be
+directed to the Parliamentary Librarian. Parliamentary Library staff are available to discuss the contents of
+publications with Senators and Members and their staff. To access this service, clients may contact the author or
+the Library’s Central Entry Point for referral.
+
+
+
+
+14
+                                                   Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 1a: Index of Relative Socio-economic Disadvantage
+2009 Electoral Division          Party        Index                   2009 Electoral Division      Party      Index
+Adelaide (SA)                    ALP         1006.4                   Hume (NSW)                   LP          998.2
+Aston (Vic.)                     LP          1065.6                   Hunter (NSW)                 ALP         971.8
+Ballarat (Vic.)                  ALP           990.1                  Indi (Vic.)                  LP          990.4
+Banks (NSW)                      ALP        1005.4                    Isaacs (Vic.)                ALP        996.8
+Barker (SA)                      LP            961.3                  Jagajaga (Vic.)              ALP       1060.2
+Barton (NSW)                     ALP          999.2                   Kennedy (Qld)                Ind         947.7
+Bass (Tas.)                      ALP           960.4                  Kingsford Smith (NSW)        ALP       1020.4
+Batman (Vic.)                    ALP           971.6                  Kingston (SA)                ALP         984.5
+Bendigo (Vic.)                   ALP           977.2                  Kooyong (Vic.)               LP        1103.5
+Bennelong (NSW)                  ALP         1061.0                   La Trobe (Vic.)              LP        1051.4
+Berowra (NSW)                    LP          1117.0                   Lalor (Vic.)                 ALP       1005.9
+Blair (Qld)                      ALP           966.9                  Leichhardt (Qld)             ALP         959.3
+Blaxland (NSW)                   ALP           905.3                  Lilley (Qld)                 ALP       1022.7
+Bonner (Qld)                     ALP         1041.3                   Lindsay (NSW)                ALP         998.1
+Boothby (SA)                     LP          1038.4                   Lingiari (NT)                ALP         830.6
+Bowman (Qld)                     LP          1034.0                   Longman (Qld)                ALP         986.3
+Braddon (Tas.)                   ALP           933.4                  Lyne (NSW)                   Ind         962.6
+Bradfield (NSW)                  LP          1123.5                   Lyons (Tas.)                 ALP         935.2
+Brand (WA)                       ALP         1001.5                   Macarthur (NSW)              ALP       1008.6
+Brisbane (Qld)                   ALP         1067.7                   Mackellar (NSW)              LP        1093.0
+Bruce (Vic.)                     ALP           988.7                  Macquarie (NSW)              ALP       1043.0
+Calare (NSW)                     NP            976.2                  Makin (SA)                   ALP       1010.3
+Calwell (Vic.)                   ALP           965.1                  Mallee (Vic.)                NP          965.1
+Canberra (ACT)                   ALP         1074.7                   Maranoa (Qld)                NP          959.3
+Canning (WA)                     LP            992.9                  Maribyrnong (Vic.)           ALP         976.6
+Capricornia (Qld)                ALP           988.5                  Mayo (SA)                    LP        1035.1
+Casey (Vic.)                     LP          1045.5                   McEwen (Vic.)                LP        1037.7
+Charlton (NSW)                   ALP           995.8                  McMahon (NSW)                ALP         967.1
+Chifley (NSW)                    ALP           927.4                  McMillan (Vic.)              LP          983.8
+Chisholm (Vic.)                  ALP        1047.0                    McPherson (Qld)              LP        1023.7
+Cook (NSW)                       LP         1074.2                    Melbourne (Vic.)             ALP       1009.3
+Corangamite (Vic.)               ALP         1029.1                   Melbourne Ports (Vic.)       ALP       1075.6
+Corio (Vic.)                     ALP          968.4                   Menzies (Vic.)               LP        1083.0
+Cowan (WA)                       LP          1030.7                   Mitchell (NSW)               LP        1113.0
+Cowper (NSW)                     NP            937.9                  Moncrieff (Qld)              LP        1013.8
+Cunningham (NSW)                 ALP        1013.0                    Moore (WA)                   LP        1083.1
+Curtin (WA)                      LP          1090.3                   Moreton (Qld)                ALP       1034.9
+Dawson (Qld)                     ALP         1005.3                   Murray (Vic.)                LP          968.8
+Deakin (Vic.)                    ALP         1042.2                   New England (NSW)            Ind         960.1
+Denison (Tas.)                   ALP           989.4                  Newcastle (NSW)              ALP         976.2
+Dickson (Qld)                    ALP         1060.4                   North Sydney (NSW)           LP        1106.2
+Dobell (NSW)                     ALP           988.4                  O'Connor (WA)                LP          982.4
+Dunkley (Vic.)                   LP          1012.0                   Oxley (Qld)                  ALP         986.7
+Durack (WA)                      LP            953.8                  Page (NSW)                   ALP         944.8
+Eden-Monaro (NSW)                ALP        1000.5                    Parkes (NSW)                 NP          943.8
+Fadden (Qld)                     LP          1022.9                   Parramatta (NSW)             ALP         984.4
+Fairfax (Qld)                    LP          1018.9                   Paterson (NSW)               LP          981.5
+Farrer (NSW)                     LP           972.0                   Pearce (WA)                  LP        1028.6
+Fisher (Qld)                     LP          1007.4                   Perth (WA)                   ALP       1011.4
+Flinders (Vic.)                  LP         1012.6                    Petrie (Qld)                 ALP         989.0
+Flynn (Qld)                      ALP          983.7                   Port Adelaide (SA)           ALP         923.3
+Forde (Qld)                      ALP        1000.1                    Rankin (Qld)                 ALP         977.7
+Forrest (WA)                     LP          1008.3                   Reid (NSW)                   ALP       1011.7
+Fowler (NSW)                     ALP           865.5                  Richmond (NSW)               ALP         978.8
+Franklin (Tas.)                  ALP           999.4                  Riverina (NSW)               NP          979.7
+Fraser (ACT)                     ALP        1068.1                    Robertson (NSW)              ALP       1007.0
+Fremantle (WA)                   ALP        1018.4                    Ryan (Qld)                   LP        1101.1
+Gellibrand (Vic.)                ALP           978.1                  Scullin (Vic.)               ALP        981.9
+Gilmore (NSW)                    ALP          982.8                   Shortland (NSW)              ALP         981.8
+Gippsland (Vic.)                 NP            968.1                  Solomon (NT)                 ALP       1004.0
+Goldstein (Vic.)                 LP          1087.8                   Stirling (WA)                LP        1006.3
+Gorton (Vic.)                    ALP          973.5                   Sturt (SA)                   LP        1024.4
+Grayndler (NSW)                  ALP         1018.4                   Swan (WA)                    ALP       1003.2
+Greenway (NSW)                   ALP         1028.7                   Sydney (NSW)                 ALP       1034.4
+Grey (SA)                        LP            927.1                  Tangney (WA)                 LP        1091.1
+Griffith (Qld)                   ALP         1046.7                   Throsby (NSW)                ALP         965.8
+Groom (Qld)                      LP          1002.3                   Wakefield (SA)               ALP        922.1
+Hasluck (WA)                     ALP         1004.0                   Wannon (Vic.)                LP          981.6
+Herbert (Qld)                    ALP           993.2                  Warringah (NSW)              LP        1104.7
+Higgins (Vic.)                   LP          1089.6                   Watson (NSW)                 ALP         937.1
+Hindmarsh (SA)                   ALP         1000.9                   Wentworth (NSW)              LP        1093.3
+Hinkler (Qld)                    NP            947.1                  Werriwa (NSW)                ALP         966.7
+Holt (Vic.)                      ALP           995.8                  Wide Bay (Qld)               NP          961.8
+Hotham (Vic.)                    ALP        1000.0                    Wills (Vic.)                 ALP         991.7
+Hughes (NSW)                     LP          1057.4                   Wright (Qld)                 LP        1016.9
+
+                                                                                                                15
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 1b: Electoral divisions ranked by the Index of Relative Socio-economic Disadvantage
+ Rank 2009 Electoral Division         Party          Index             Rank        2009 Electoral Division   Party    Index
+  1      Lingiari (NT)                ALP            830.6                76       Eden-Monaro (NSW)         ALP     1000.5
+  2      Fowler (NSW)                 ALP            865.5                77       Hindmarsh (SA)            ALP     1000.9
+  3      Blaxland (NSW)               ALP             905.3               78       Brand (WA)                ALP     1001.5
+  4      Wakefield (SA)               ALP             922.1               79       Groom (Qld)               LP      1002.3
+  5      Port Adelaide (SA)           ALP            923.3                80       Swan (WA)                 ALP     1003.2
+  6      Grey (SA)                    LP             927.1                81       Hasluck (WA)              ALP     1004.0
+  7      Chifley (NSW)                ALP            927.4                82       Solomon (NT)              ALP     1004.0
+  8      Braddon (Tas.)               ALP            933.4                83       Dawson (Qld)              ALP     1005.3
+  9      Lyons (Tas.)                 ALP            935.2                84       Banks (NSW)               ALP     1005.4
+ 10      Watson (NSW)                 ALP            937.1                85       Lalor (Vic.)              ALP     1005.9
+ 11      Cowper (NSW)                 NP              937.9               86       Stirling (WA)             LP      1006.3
+ 12      Parkes (NSW)                 NP              943.8               87       Adelaide (SA)             ALP     1006.4
+ 13      Page (NSW)                   ALP            944.8                88       Robertson (NSW)           ALP     1007.0
+ 14      Hinkler (Qld)                NP              947.1               89       Fisher (Qld)              LP      1007.4
+ 15      Kennedy (Qld)                Ind            947.7                90       Forrest (WA)              LP      1008.3
+ 16      Durack (WA)                  LP              953.8               91       Macarthur (NSW)           ALP     1008.6
+ 17      Leichhardt (Qld)             ALP            959.3                92       Melbourne (Vic.)          ALP     1009.3
+ 18      Maranoa (Qld)                NP              959.3               93       Makin (SA)                ALP     1010.3
+ 19      New England (NSW)            Ind            960.1                94       Perth (WA)                ALP     1011.4
+ 20      Bass (Tas.)                  ALP            960.4                95       Reid (NSW)                ALP     1011.7
+ 21      Barker (SA)                  LP             961.3                96       Dunkley (Vic.)            LP      1012.0
+ 22      Wide Bay (Qld)               NP              961.8               97       Flinders (Vic.)           LP      1012.6
+ 23      Lyne (NSW)                   Ind            962.6                98       Cunningham (NSW)          ALP     1013.0
+ 24      Calwell (Vic.)               ALP            965.1                99       Moncrieff (Qld)           LP      1013.8
+ 25      Mallee (Vic.)                NP              965.1              100       Wright (Qld)              LP      1016.9
+ 26      Throsby (NSW)                ALP            965.8               101       Fremantle (WA)            ALP     1018.4
+ 27      Werriwa (NSW)                ALP            966.7               102       Grayndler (NSW)           ALP     1018.4
+ 28      Blair (Qld)                  ALP            966.9               103       Fairfax (Qld)             LP      1018.9
+ 29      McMahon (NSW)                ALP            967.1               104       Kingsford Smith (NSW)     ALP     1020.4
+ 30      Gippsland (Vic.)             NP              968.1              105       Lilley (Qld)              ALP     1022.7
+ 31      Corio (Vic.)                 ALP            968.4               106       Fadden (Qld)              LP      1022.9
+ 32      Murray (Vic.)                LP             968.8               107       McPherson (Qld)           LP      1023.7
+ 33      Batman (Vic.)                ALP            971.6               108       Sturt (SA)                LP      1024.4
+ 34      Hunter (NSW)                 ALP            971.8               109       Pearce (WA)               LP      1028.6
+ 35      Farrer (NSW)                 LP             972.0               110       Greenway (NSW)            ALP     1028.7
+ 36      Gorton (Vic.)                ALP            973.5               111       Corangamite (Vic.)        ALP     1029.1
+ 37      Calare (NSW)                 NP              976.2              112       Cowan (WA)                LP      1030.7
+ 38      Newcastle (NSW)              ALP            976.2               113       Bowman (Qld)              LP      1034.0
+ 39      Maribyrnong (Vic.)           ALP            976.6               114       Sydney (NSW)              ALP     1034.4
+ 40      Bendigo (Vic.)               ALP             977.2              115       Moreton (Qld)             ALP     1034.9
+ 41      Rankin (Qld)                 ALP            977.7               116       Mayo (SA)                 LP      1035.1
+ 42      Gellibrand (Vic.)            ALP            978.1               117       McEwen (Vic.)             LP      1037.7
+ 43      Richmond (NSW)               ALP            978.8               118       Boothby (SA)              LP      1038.4
+ 44      Riverina (NSW)               NP              979.7              119       Bonner (Qld)              ALP     1041.3
+ 45      Paterson (NSW)               LP              981.5              120       Deakin (Vic.)             ALP     1042.2
+ 46      Wannon (Vic.)                LP             981.6               121       Macquarie (NSW)           ALP     1043.0
+ 47      Shortland (NSW)              ALP            981.8               122       Casey (Vic.)              LP      1045.5
+ 48      Scullin (Vic.)               ALP            981.9               123       Griffith (Qld)            ALP     1046.7
+ 49      O'Connor (WA)                LP              982.4              124       Chisholm (Vic.)           ALP     1047.0
+ 50      Gilmore (NSW)                ALP            982.8               125       La Trobe (Vic.)           LP      1051.4
+ 51      Flynn (Qld)                  ALP            983.7               126       Hughes (NSW)              LP      1057.4
+ 52      McMillan (Vic.)              LP             983.8               127       Jagajaga (Vic.)           ALP     1060.2
+ 53      Parramatta (NSW)             ALP            984.4               128       Dickson (Qld)             ALP     1060.4
+ 54      Kingston (SA)                ALP            984.5               129       Bennelong (NSW)           ALP     1061.0
+ 55      Longman (Qld)                ALP            986.3               130       Aston (Vic.)              LP      1065.6
+ 56      Oxley (Qld)                  ALP            986.7               131       Brisbane (Qld)            ALP     1067.7
+ 57      Dobell (NSW)                 ALP            988.4               132       Fraser (ACT)              ALP     1068.1
+ 58      Capricornia (Qld)            ALP            988.5               133       Cook (NSW)                LP      1074.2
+ 59      Bruce (Vic.)                 ALP            988.7               134       Canberra (ACT)            ALP     1074.7
+ 60      Petrie (Qld)                 ALP            989.0               135       Melbourne Ports (Vic.)    ALP     1075.6
+ 61      Denison (Tas.)               ALP            989.4               136       Menzies (Vic.)            LP      1083.0
+ 62      Ballarat (Vic.)              ALP            990.1               137       Moore (WA)                LP      1083.1
+ 63      Indi (Vic.)                  LP              990.4              138       Goldstein (Vic.)          LP      1087.8
+ 64      Wills (Vic.)                 ALP            991.7               139       Higgins (Vic.)            LP      1089.6
+ 65      Canning (WA)                 LP             992.9               140       Curtin (WA)               LP      1090.3
+ 66      Herbert (Qld)                ALP            993.2               141       Tangney (WA)              LP      1091.1
+ 67      Charlton (NSW)               ALP            995.8               142       Mackellar (NSW)           LP      1093.0
+ 68      Holt (Vic.)                  ALP            995.8               143       Wentworth (NSW)           LP      1093.3
+ 69      Isaacs (Vic.)                ALP            996.8               144       Ryan (Qld)                LP      1101.1
+ 70      Lindsay (NSW)                ALP            998.1               145       Kooyong (Vic.)            LP      1103.5
+ 71      Hume (NSW)                   LP             998.2               146       Warringah (NSW)           LP      1104.7
+ 72      Barton (NSW)                 ALP            999.2               147       North Sydney (NSW)        LP      1106.2
+ 73      Franklin (Tas.)              ALP            999.4               148       Mitchell (NSW)            LP      1113.0
+ 74      Hotham (Vic.)                ALP           1000.0               149       Berowra (NSW)             LP      1117.0
+ 75      Forde (Qld)                  ALP           1000.1               150       Bradfield (NSW)           LP      1123.5
+
+
+
+
+16
+                                                  Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 2a: Index of Relative Socio-economic Advantage/Disadvantage
+2009 Electoral Division         Party        Index                   2009 Electoral Division     Party       Index
+Adelaide (SA)                   ALP         1028.8                   Hume (NSW)                  LP           974.8
+Aston (Vic.)                    LP          1057.3                   Hunter (NSW)                ALP          949.9
+Ballarat (Vic.)                 ALP          966.2                   Indi (Vic.)                 LP           959.1
+Banks (NSW)                     ALP         1037.8                   Isaacs (Vic.)               ALP          995.0
+Barker (SA)                     LP           918.9                   Jagajaga (Vic.)             ALP        1063.4
+Barton (NSW)                    ALP         1032.0                   Kennedy (Qld)               Ind          930.0
+Bass (Tas.)                     ALP          940.2                   Kingsford Smith (NSW)       ALP        1070.7
+Batman (Vic.)                   ALP          988.4                   Kingston (SA)               ALP          954.4
+Bendigo (Vic.)                  ALP           949.9                  Kooyong (Vic.)              LP         1141.3
+Bennelong (NSW)                 ALP         1104.4                   La Trobe (Vic.)             LP         1031.8
+Berowra (NSW)                   LP          1158.3                   Lalor (Vic.)                ALP          986.6
+Blair (Qld)                     ALP          945.6                   Leichhardt (Qld)            ALP          976.8
+Blaxland (NSW)                  ALP           938.7                  Lilley (Qld)                ALP        1021.0
+Bonner (Qld)                    ALP         1045.5                   Lindsay (NSW)               ALP          993.8
+Boothby (SA)                    LP          1034.0                   Lingiari (NT)               ALP          903.2
+Bowman (Qld)                    LP          1027.9                   Longman (Qld)               ALP          965.4
+Braddon (Tas.)                  ALP          906.7                   Lyne (NSW)                  Ind          944.8
+Bradfield (NSW)                 LP          1183.7                   Lyons (Tas.)                ALP          902.3
+Brand (WA)                      ALP           980.8                  Macarthur (NSW)             ALP        1010.8
+Brisbane (Qld)                  ALP         1102.0                   Mackellar (NSW)             LP         1134.7
+Bruce (Vic.)                    ALP         1000.4                   Macquarie (NSW)             ALP        1043.4
+Calare (NSW)                    NP            954.7                  Makin (SA)                  ALP          980.6
+Calwell (Vic.)                  ALP          957.7                   Mallee (Vic.)               NP           928.9
+Canberra (ACT)                  ALP         1099.7                   Maranoa (Qld)               NP           925.9
+Canning (WA)                    LP           971.5                   Maribyrnong (Vic.)          ALP          982.5
+Capricornia (Qld)               ALP          962.6                   Mayo (SA)                   LP         1005.0
+Casey (Vic.)                    LP          1022.6                   McEwen (Vic.)               LP         1012.9
+Charlton (NSW)                  ALP          980.4                   McMahon (NSW)               ALP          983.0
+Chifley (NSW)                   ALP          935.3                   McMillan (Vic.)             LP           949.5
+Chisholm (Vic.)                 ALP         1067.4                   McPherson (Qld)             LP         1027.0
+Cook (NSW)                      LP          1098.6                   Melbourne (Vic.)            ALP        1072.6
+Corangamite (Vic.)              ALP         1005.2                   Melbourne Ports (Vic.)      ALP        1117.1
+Corio (Vic.)                    ALP          952.5                   Menzies (Vic.)              LP         1097.1
+Cowan (WA)                      LP          1021.0                   Mitchell (NSW)              LP         1149.9
+Cowper (NSW)                    NP            929.0                  Moncrieff (Qld)             LP         1025.5
+Cunningham (NSW)                ALP         1024.3                   Moore (WA)                  LP         1082.1
+Curtin (WA)                     LP          1127.7                   Moreton (Qld)               ALP        1049.3
+Dawson (Qld)                    ALP          984.9                   Murray (Vic.)               LP           936.0
+Deakin (Vic.)                   ALP         1041.1                   New England (NSW)           Ind          940.9
+Denison (Tas.)                  ALP          988.7                   Newcastle (NSW)             ALP          983.6
+Dickson (Qld)                   ALP         1049.5                   North Sydney (NSW)          LP         1171.2
+Dobell (NSW)                    ALP          981.1                   O'Connor (WA)               LP           957.8
+Dunkley (Vic.)                  LP          1002.7                   Oxley (Qld)                 ALP          992.6
+Durack (WA)                     LP            961.9                  Page (NSW)                  ALP          928.6
+Eden-Monaro (NSW)               ALP          984.4                   Parkes (NSW)                NP           928.3
+Fadden (Qld)                    LP          1027.3                   Parramatta (NSW)            ALP        1016.9
+Fairfax (Qld)                   LP          1011.9                   Paterson (NSW)              LP           962.4
+Farrer (NSW)                    LP           945.4                   Pearce (WA)                 LP         1009.3
+Fisher (Qld)                    LP           998.1                   Perth (WA)                  ALP        1019.0
+Flinders (Vic.)                 LP            985.7                  Petrie (Qld)                ALP          980.5
+Flynn (Qld)                     ALP          954.6                   Port Adelaide (SA)          ALP          917.8
+Forde (Qld)                     ALP          989.7                   Rankin (Qld)                ALP          972.6
+Forrest (WA)                    LP            982.7                  Reid (NSW)                  ALP        1064.7
+Fowler (NSW)                    ALP          917.3                   Richmond (NSW)              ALP          974.5
+Franklin (Tas.)                 ALP          979.6                   Riverina (NSW)              NP           952.1
+Fraser (ACT)                    ALP         1093.9                   Robertson (NSW)             ALP        1008.9
+Fremantle (WA)                  ALP         1022.3                   Ryan (Qld)                  LP         1129.1
+Gellibrand (Vic.)               ALP           992.9                  Scullin (Vic.)              ALP          972.2
+Gilmore (NSW)                   ALP          969.1                   Shortland (NSW)             ALP          970.7
+Gippsland (Vic.)                NP            940.9                  Solomon (NT)                ALP        1024.4
+Goldstein (Vic.)                LP          1117.3                   Stirling (WA)               LP         1014.3
+Gorton (Vic.)                   ALP          969.1                   Sturt (SA)                  LP         1021.7
+Grayndler (NSW)                 ALP         1071.9                   Swan (WA)                   ALP        1013.7
+Greenway (NSW)                  ALP         1041.0                   Sydney (NSW)                ALP        1118.0
+Grey (SA)                       LP            901.4                  Tangney (WA)                LP         1100.0
+Griffith (Qld)                  ALP         1072.4                   Throsby (NSW)               ALP          959.2
+Groom (Qld)                     LP           981.1                   Wakefield (SA)              ALP          898.0
+Hasluck (WA)                    ALP           988.4                  Wannon (Vic.)               LP           944.5
+Herbert (Qld)                   ALP           986.8                  Warringah (NSW)             LP         1162.2
+Higgins (Vic.)                  LP          1128.2                   Watson (NSW)                ALP          977.0
+Hindmarsh (SA)                  ALP          992.3                   Wentworth (NSW)             LP         1158.1
+Hinkler (Qld)                   NP            925.4                  Werriwa (NSW)               ALP          977.1
+Holt (Vic.)                     ALP          976.8                   Wide Bay (Qld)              NP           942.4
+Hotham (Vic.)                   ALP         1009.1                   Wills (Vic.)                ALP          999.6
+Hughes (NSW)                    LP          1074.0                   Wright (Qld)                LP           992.3
+
+
+
+
+                                                                                                               17
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 2b: Electoral divisions ranked by the Index of Relative Socio-economic Advantage/Disadvantage
+ Rank 2009 Electoral Division        Party    Index                            Rank 2009 Electoral Division     Party    Index
+  1       Wakefield (SA)             ALP       898.0                           76      Hindmarsh (SA)           ALP      992.3
+  2       Grey (SA)                  LP        901.4                           77      Wright (Qld)             LP        992.3
+  3       Lyons (Tas.)               ALP       902.3                           78      Oxley (Qld)              ALP       992.6
+  4       Lingiari (NT)              ALP       903.2                           79      Gellibrand (Vic.)        ALP       992.9
+  5       Braddon (Tas.)             ALP       906.7                           80      Lindsay (NSW)            ALP       993.8
+  6       Fowler (NSW)               ALP       917.3                           81      Isaacs (Vic.)            ALP       995.0
+  7       Port Adelaide (SA)         ALP       917.8                           82      Fisher (Qld)             LP        998.1
+  8       Barker (SA)                LP        918.9                           83      Wills (Vic.)             ALP       999.6
+  9       Hinkler (Qld)              NP        925.4                           84      Bruce (Vic.)             ALP     1000.4
+ 10       Maranoa (Qld)              NP        925.9                           85      Dunkley (Vic.)           LP      1002.7
+ 11       Parkes (NSW)               NP        928.3                           86      Mayo (SA)                LP      1005.0
+ 12       Page (NSW)                 ALP       928.6                           87      Corangamite (Vic.)       ALP     1005.2
+ 13       Mallee (Vic.)              NP        928.9                           88      Robertson (NSW)          ALP     1008.9
+ 14       Cowper (NSW)               NP        929.0                           89      Hotham (Vic.)            ALP     1009.1
+ 15       Kennedy (Qld)              Ind       930.0                           90      Pearce (WA)              LP      1009.3
+ 16       Chifley (NSW)              ALP       935.3                           91      Macarthur (NSW)          ALP     1010.8
+ 17       Murray (Vic.)              LP        936.0                           92      Fairfax (Qld)            LP      1011.9
+ 18       Blaxland (NSW)             ALP       938.7                           93      McEwen (Vic.)            LP      1012.9
+ 19       Bass (Tas.)                ALP       940.2                           94      Swan (WA)                ALP     1013.7
+ 20       New England (NSW)          Ind       940.9                           95      Stirling (WA)            LP      1014.3
+ 21       Gippsland (Vic.)           NP        940.9                           96      Parramatta (NSW)         ALP     1016.9
+ 22       Wide Bay (Qld)             NP        942.4                           97      Perth (WA)               ALP     1019.0
+ 23       Wannon (Vic.)              LP        944.5                           98      Lilley (Qld)             ALP     1021.0
+ 24       Lyne (NSW)                 Ind       944.8                           99      Cowan (WA)               LP      1021.0
+ 25       Farrer (NSW)               LP        945.4                          100      Sturt (SA)               LP      1021.7
+ 26       Blair (Qld)                ALP       945.6                          101      Fremantle (WA)           ALP     1022.3
+ 27       McMillan (Vic.)            LP        949.5                          102      Casey (Vic.)             LP      1022.6
+ 28       Hunter (NSW)               ALP       949.9                          103      Cunningham (NSW)         ALP     1024.3
+ 29       Bendigo (Vic.)             ALP       949.9                          104      Solomon (NT)             ALP     1024.4
+ 30       Riverina (NSW)             NP        952.1                          105      Moncrieff (Qld)          LP      1025.5
+ 31       Corio (Vic.)               ALP       952.5                          106      McPherson (Qld)          LP      1027.0
+ 32       Kingston (SA)              ALP       954.4                          107      Fadden (Qld)             LP      1027.3
+ 33       Flynn (Qld)                ALP       954.6                          108      Bowman (Qld)             LP      1027.9
+ 34       Calare (NSW)               NP        954.7                          109      Adelaide (SA)            ALP     1028.8
+ 35       Calwell (Vic.)             ALP       957.7                          110      La Trobe (Vic.)          LP      1031.8
+ 36       O'Connor (WA)              LP        957.8                          111      Barton (NSW)             ALP     1032.0
+ 37       Indi (Vic.)                LP        959.1                          112      Boothby (SA)             LP      1034.0
+ 38       Throsby (NSW)              ALP       959.2                          113      Banks (NSW)              ALP     1037.8
+ 39       Durack (WA)                LP        961.9                          114      Greenway (NSW)           ALP     1041.0
+ 40       Paterson (NSW)             LP        962.4                          115      Deakin (Vic.)            ALP     1041.1
+ 41       Capricornia (Qld)          ALP       962.6                          116      Macquarie (NSW)          ALP     1043.4
+ 42       Longman (Qld)              ALP       965.4                          117      Bonner (Qld)             ALP     1045.5
+ 43       Ballarat (Vic.)            ALP       966.2                          118      Moreton (Qld)            ALP     1049.3
+ 44       Gorton (Vic.)              ALP       969.1                          119      Dickson (Qld)            ALP     1049.5
+ 45       Gilmore (NSW)              ALP       969.1                          120      Aston (Vic.)             LP      1057.3
+ 46       Shortland (NSW)            ALP       970.7                          121      Jagajaga (Vic.)          ALP     1063.4
+ 47       Canning (WA)               LP        971.5                          122      Reid (NSW)               ALP     1064.7
+ 48       Scullin (Vic.)             ALP       972.2                          123      Chisholm (Vic.)          ALP     1067.4
+ 49       Rankin (Qld)               ALP       972.6                          124      Kingsford Smith (NSW)    ALP     1070.7
+ 50       Richmond (NSW)             ALP       974.5                          125      Grayndler (NSW)          ALP     1071.9
+ 51       Hume (NSW)                 LP        974.8                          126      Griffith (Qld)           ALP     1072.4
+ 52       Leichhardt (Qld)           ALP       976.8                          127      Melbourne (Vic.)         ALP     1072.6
+ 53       Holt (Vic.)                ALP       976.8                          128      Hughes (NSW)             LP      1074.0
+ 54       Watson (NSW)               ALP       977.0                          129      Moore (WA)               LP      1082.1
+ 55       Werriwa (NSW)              ALP       977.1                          130      Fraser (ACT)             ALP     1093.9
+ 56       Franklin (Tas.)            ALP       979.6                          131      Menzies (Vic.)           LP      1097.1
+ 57       Charlton (NSW)             ALP       980.4                          132      Cook (NSW)               LP      1098.6
+ 58       Petrie (Qld)               ALP       980.5                          133      Canberra (ACT)           ALP     1099.7
+ 59       Makin (SA)                 ALP       980.6                          134      Tangney (WA)             LP      1100.0
+ 60       Brand (WA)                 ALP       980.8                          135      Brisbane (Qld)           ALP     1102.0
+ 61       Dobell (NSW)               ALP       981.1                          136      Bennelong (NSW)          ALP     1104.4
+ 62       Groom (Qld)                LP        981.1                          137      Melbourne Ports (Vic.)   ALP     1117.1
+ 63       Maribyrnong (Vic.)         ALP       982.5                          138      Goldstein (Vic.)         LP      1117.3
+ 64       Forrest (WA)               LP        982.7                          139      Sydney (NSW)             ALP     1118.0
+ 65       McMahon (NSW)              ALP       983.0                          140      Curtin (WA)              LP      1127.7
+ 66       Newcastle (NSW)            ALP       983.6                          141      Higgins (Vic.)           LP      1128.2
+ 67       Eden-Monaro (NSW)          ALP       984.4                          142      Ryan (Qld)               LP      1129.1
+ 68       Dawson (Qld)               ALP       984.9                          143      Mackellar (NSW)          LP      1134.7
+ 69       Flinders (Vic.)            LP        985.7                          144      Kooyong (Vic.)           LP      1141.3
+ 70       Lalor (Vic.)               ALP       986.6                          145      Mitchell (NSW)           LP      1149.9
+ 71       Herbert (Qld)              ALP       986.8                          146      Wentworth (NSW)          LP      1158.1
+ 72       Batman (Vic.)              ALP       988.4                          147      Berowra (NSW)            LP      1158.3
+ 73       Hasluck (WA)               ALP       988.4                          148      Warringah (NSW)          LP      1162.2
+ 74       Denison (Tas.)             ALP       988.7                          149      North Sydney (NSW)       LP      1171.2
+ 75       Forde (Qld)                ALP       989.7                          150      Bradfield (NSW)          LP      1183.7
+
+
+
+
+18
+                                                  Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 3a: Index of Economic Resources
+2009 Electoral Division        Party     Index                        2009 Electoral Division     Party      Index
+Adelaide (SA)                  ALP       970.7                        Hume (NSW)                  LP        1011.9
+Aston (Vic.)                   LP       1068.2                        Hunter (NSW)                ALP         988.3
+Ballarat (Vic.)                ALP       972.2                        Indi (Vic.)                 LP          981.3
+Banks (NSW)                    ALP      1012.4                        Isaacs (Vic.)               ALP       1003.9
+Barker (SA)                    LP        967.8                        Jagajaga (Vic.)             ALP       1039.9
+Barton (NSW)                   ALP      1016.6                        Kennedy (Qld)               Ind         963.6
+Bass (Tas.)                    ALP       944.6                        Kingsford Smith (NSW)       ALP       1016.3
+Batman (Vic.)                  ALP       960.8                        Kingston (SA)               ALP         976.9
+Bendigo (Vic.)                 ALP        959.3                       Kooyong (Vic.)              LP        1081.8
+Bennelong (NSW)                ALP      1054.8                        La Trobe (Vic.)             LP        1044.5
+Berowra (NSW)                  LP       1151.3                        Lalor (Vic.)                ALP       1012.4
+Blair (Qld)                    ALP       982.2                        Leichhardt (Qld)            ALP         959.5
+Blaxland (NSW)                 ALP        935.4                       Lilley (Qld)                ALP       1010.3
+Bonner (Qld)                   ALP      1043.4                        Lindsay (NSW)               ALP       1013.1
+Boothby (SA)                   LP       1011.7                        Lingiari (NT)               ALP         856.1
+Bowman (Qld)                   LP       1052.7                        Longman (Qld)               ALP       1012.9
+Braddon (Tas.)                 ALP        930.9                       Lyne (NSW)                  Ind         963.5
+Bradfield (NSW)                LP       1145.9                        Lyons (Tas.)                ALP         950.5
+Brand (WA)                     ALP      1027.8                        Macarthur (NSW)             ALP       1037.2
+Brisbane (Qld)                 ALP      1029.3                        Mackellar (NSW)             LP        1121.7
+Bruce (Vic.)                   ALP       998.8                        Macquarie (NSW)             ALP       1039.8
+Calare (NSW)                   NP         978.6                       Makin (SA)                  ALP       1000.1
+Calwell (Vic.)                 ALP       998.9                        Mallee (Vic.)               NP          960.2
+Canberra (ACT)                 ALP      1069.3                        Maranoa (Qld)               NP          978.7
+Canning (WA)                   LP       1022.9                        Maribyrnong (Vic.)          ALP         983.8
+Capricornia (Qld)              ALP       993.6                        Mayo (SA)                   LP        1028.3
+Casey (Vic.)                   LP       1041.6                        McEwen (Vic.)               LP        1040.8
+Charlton (NSW)                 ALP       995.4                        McMahon (NSW)               ALP       1013.3
+Chifley (NSW)                  ALP       945.6                        McMillan (Vic.)             LP          980.6
+Chisholm (Vic.)                ALP      1017.6                        McPherson (Qld)             LP        1032.2
+Cook (NSW)                     LP       1084.0                        Melbourne (Vic.)            ALP         956.3
+Corangamite (Vic.)             ALP      1013.0                        Melbourne Ports (Vic.)      ALP       1022.1
+Corio (Vic.)                   ALP       957.8                        Menzies (Vic.)              LP        1093.2
+Cowan (WA)                     LP       1065.7                        Mitchell (NSW)              LP        1154.3
+Cowper (NSW)                   NP         937.9                       Moncrieff (Qld)             LP        1016.6
+Cunningham (NSW)               ALP       998.2                        Moore (WA)                  LP        1101.9
+Curtin (WA)                    LP       1070.3                        Moreton (Qld)               ALP       1024.5
+Dawson (Qld)                   ALP      1019.3                        Murray (Vic.)               LP          975.7
+Deakin (Vic.)                  ALP      1015.5                        New England (NSW)           Ind         958.7
+Denison (Tas.)                 ALP       959.9                        Newcastle (NSW)             ALP         954.2
+Dickson (Qld)                  ALP      1072.4                        North Sydney (NSW)          LP        1091.9
+Dobell (NSW)                   ALP       996.3                        O'Connor (WA)               LP          991.8
+Dunkley (Vic.)                 LP       1004.3                        Oxley (Qld)                 ALP       1007.2
+Durack (WA)                    LP        963.5                        Page (NSW)                  ALP         943.9
+Eden-Monaro (NSW)              ALP       997.8                        Parkes (NSW)                NP          956.3
+Fadden (Qld)                   LP       1041.5                        Parramatta (NSW)            ALP         966.2
+Fairfax (Qld)                  LP       1020.5                        Paterson (NSW)              LP          985.4
+Farrer (NSW)                   LP         968.8                       Pearce (WA)                 LP        1054.2
+Fisher (Qld)                   LP       1014.4                        Perth (WA)                  ALP         997.8
+Flinders (Vic.)                LP       1013.9                        Petrie (Qld)                ALP         995.9
+Flynn (Qld)                    ALP      1004.1                        Port Adelaide (SA)          ALP         932.4
+Forde (Qld)                    ALP      1026.9                        Rankin (Qld)                ALP         995.9
+Forrest (WA)                   LP       1025.5                        Reid (NSW)                  ALP       1020.0
+Fowler (NSW)                   ALP       942.8                        Richmond (NSW)              ALP         981.8
+Franklin (Tas.)                ALP       988.6                        Riverina (NSW)              NP          980.4
+Fraser (ACT)                   ALP      1051.1                        Robertson (NSW)             ALP       1002.7
+Fremantle (WA)                 ALP      1024.2                        Ryan (Qld)                  LP        1085.0
+Gellibrand (Vic.)              ALP        968.0                       Scullin (Vic.)              ALP       1012.5
+Gilmore (NSW)                  ALP       984.4                        Shortland (NSW)             ALP         980.4
+Gippsland (Vic.)               NP         958.0                       Solomon (NT)                ALP         996.6
+Goldstein (Vic.)               LP       1073.6                        Stirling (WA)               LP        1003.1
+Gorton (Vic.)                  ALP      1009.1                        Sturt (SA)                  LP        1002.6
+Grayndler (NSW)                ALP      1006.2                        Swan (WA)                   ALP         981.0
+Greenway (NSW)                 ALP      1043.4                        Sydney (NSW)                ALP         993.9
+Grey (SA)                      LP         928.4                       Tangney (WA)                LP        1098.1
+Griffith (Qld)                 ALP      1011.8                        Throsby (NSW)               ALP         981.1
+Groom (Qld)                    LP         999.6                       Wakefield (SA)              ALP         941.2
+Hasluck (WA)                   ALP      1029.4                        Wannon (Vic.)               LP          978.7
+Herbert (Qld)                  ALP       987.3                        Warringah (NSW)             LP        1106.7
+Higgins (Vic.)                 LP       1054.8                        Watson (NSW)                ALP         960.5
+Hindmarsh (SA)                 ALP       968.9                        Wentworth (NSW)             LP        1068.2
+Hinkler (Qld)                  NP         958.0                       Werriwa (NSW)               ALP         992.4
+Holt (Vic.)                    ALP      1014.5                        Wide Bay (Qld)              NP          973.3
+Hotham (Vic.)                  ALP      1002.6                        Wills (Vic.)                ALP         977.6
+Hughes (NSW)                   LP       1078.0                        Wright (Qld)                LP        1055.0
+
+
+
+
+                                                                                                               19
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 3b: Electoral divisions ranked by the Index of Economic Resources
+ Rank 2009 Electoral Division        Party     Index                       Rank   2009 Electoral Division   Party    Index
+  1      Lingiari (NT)               ALP       856.1                       76     Stirling (WA)             LP      1003.1
+  2      Grey (SA)                   LP         928.4                      77     Isaacs (Vic.)             ALP     1003.9
+  3      Braddon (Tas.)              ALP       930.9                       78     Flynn (Qld)               ALP     1004.1
+  4      Port Adelaide (SA)          ALP       932.4                       79     Dunkley (Vic.)            LP      1004.3
+  5      Blaxland (NSW)              ALP       935.4                       80     Grayndler (NSW)           ALP     1006.2
+  6      Cowper (NSW)                NP         937.9                      81     Oxley (Qld)               ALP     1007.2
+  7      Wakefield (SA)              ALP       941.2                       82     Gorton (Vic.)             ALP     1009.1
+  8      Fowler (NSW)                ALP        942.8                      83     Lilley (Qld)              ALP     1010.3
+  9      Page (NSW)                  ALP       943.9                       84     Boothby (SA)              LP      1011.7
+ 10      Bass (Tas.)                 ALP        944.6                      85     Griffith (Qld)            ALP     1011.8
+ 11      Chifley (NSW)               ALP       945.6                       86     Hume (NSW)                LP      1011.9
+ 12      Lyons (Tas.)                ALP       950.5                       87     Lalor (Vic.)              ALP     1012.4
+ 13      Newcastle (NSW)             ALP       954.2                       88     Banks (NSW)               ALP     1012.4
+ 14      Parkes (NSW)                NP         956.3                      89     Scullin (Vic.)            ALP     1012.5
+ 15      Melbourne (Vic.)            ALP       956.3                       90     Longman (Qld)             ALP     1012.9
+ 16      Corio (Vic.)                ALP       957.8                       91     Corangamite (Vic.)        ALP     1013.0
+ 17      Hinkler (Qld)               NP         958.0                      92     Lindsay (NSW)             ALP     1013.1
+ 18      Gippsland (Vic.)            NP         958.0                      93     McMahon (NSW)             ALP     1013.3
+ 19      New England (NSW)           Ind       958.7                       94     Flinders (Vic.)           LP      1013.9
+ 20      Bendigo (Vic.)              ALP       959.3                       95     Fisher (Qld)              LP      1014.4
+ 21      Leichhardt (Qld)            ALP       959.5                       96     Holt (Vic.)               ALP     1014.5
+ 22      Denison (Tas.)              ALP       959.9                       97     Deakin (Vic.)             ALP     1015.5
+ 23      Mallee (Vic.)               NP         960.2                      98     Kingsford Smith (NSW)     ALP     1016.3
+ 24      Watson (NSW)                ALP        960.5                      99     Moncrieff (Qld)           LP      1016.6
+ 25      Batman (Vic.)               ALP       960.8                      100     Barton (NSW)              ALP     1016.6
+ 26      Lyne (NSW)                  Ind       963.5                      101     Chisholm (Vic.)           ALP     1017.6
+ 27      Durack (WA)                 LP        963.5                      102     Dawson (Qld)              ALP     1019.3
+ 28      Kennedy (Qld)               Ind       963.6                      103     Reid (NSW)                ALP     1020.0
+ 29      Parramatta (NSW)            ALP       966.2                      104     Fairfax (Qld)             LP      1020.5
+ 30      Barker (SA)                 LP         967.8                     105     Melbourne Ports (Vic.)    ALP     1022.1
+ 31      Gellibrand (Vic.)           ALP       968.0                      106     Canning (WA)              LP      1022.9
+ 32      Farrer (NSW)                LP         968.8                     107     Fremantle (WA)            ALP     1024.2
+ 33      Hindmarsh (SA)              ALP       968.9                      108     Moreton (Qld)             ALP     1024.5
+ 34      Adelaide (SA)               ALP       970.7                      109     Forrest (WA)              LP      1025.5
+ 35      Ballarat (Vic.)             ALP       972.2                      110     Forde (Qld)               ALP     1026.9
+ 36      Wide Bay (Qld)              NP         973.3                     111     Brand (WA)                ALP     1027.8
+ 37      Murray (Vic.)               LP        975.7                      112     Mayo (SA)                 LP      1028.3
+ 38      Kingston (SA)               ALP       976.9                      113     Brisbane (Qld)            ALP     1029.3
+ 39      Wills (Vic.)                ALP       977.6                      114     Hasluck (WA)              ALP     1029.4
+ 40      Calare (NSW)                NP         978.6                     115     McPherson (Qld)           LP      1032.2
+ 41      Maranoa (Qld)               NP         978.7                     116     Macarthur (NSW)           ALP     1037.2
+ 42      Wannon (Vic.)               LP        978.7                      117     Macquarie (NSW)           ALP     1039.8
+ 43      Riverina (NSW)              NP         980.4                     118     Jagajaga (Vic.)           ALP     1039.9
+ 44      Shortland (NSW)             ALP       980.4                      119     McEwen (Vic.)             LP      1040.8
+ 45      McMillan (Vic.)             LP         980.6                     120     Fadden (Qld)              LP      1041.5
+ 46      Swan (WA)                   ALP       981.0                      121     Casey (Vic.)              LP      1041.6
+ 47      Throsby (NSW)               ALP       981.1                      122     Greenway (NSW)            ALP     1043.4
+ 48      Indi (Vic.)                 LP        981.3                      123     Bonner (Qld)              ALP     1043.4
+ 49      Richmond (NSW)              ALP        981.8                     124     La Trobe (Vic.)           LP      1044.5
+ 50      Blair (Qld)                 ALP       982.2                      125     Fraser (ACT)              ALP     1051.1
+ 51      Maribyrnong (Vic.)          ALP        983.8                     126     Bowman (Qld)              LP      1052.7
+ 52      Gilmore (NSW)               ALP       984.4                      127     Pearce (WA)               LP      1054.2
+ 53      Paterson (NSW)              LP         985.4                     128     Bennelong (NSW)           ALP     1054.8
+ 54      Herbert (Qld)               ALP       987.3                      129     Higgins (Vic.)            LP      1054.8
+ 55      Hunter (NSW)                ALP        988.3                     130     Wright (Qld)              LP      1055.0
+ 56      Franklin (Tas.)             ALP       988.6                      131     Cowan (WA)                LP      1065.7
+ 57      O'Connor (WA)               LP         991.8                     132     Aston (Vic.)              LP      1068.2
+ 58      Werriwa (NSW)               ALP       992.4                      133     Wentworth (NSW)           LP      1068.2
+ 59      Capricornia (Qld)           ALP       993.6                      134     Canberra (ACT)            ALP     1069.3
+ 60      Sydney (NSW)                ALP       993.9                      135     Curtin (WA)               LP      1070.3
+ 61      Charlton (NSW)              ALP       995.4                      136     Dickson (Qld)             ALP     1072.4
+ 62      Rankin (Qld)                ALP       995.9                      137     Goldstein (Vic.)          LP      1073.6
+ 63      Petrie (Qld)                ALP       995.9                      138     Hughes (NSW)              LP      1078.0
+ 64      Dobell (NSW)                ALP       996.3                      139     Kooyong (Vic.)            LP      1081.8
+ 65      Solomon (NT)                ALP       996.6                      140     Cook (NSW)                LP      1084.0
+ 66      Eden-Monaro (NSW)           ALP       997.8                      141     Ryan (Qld)                LP      1085.0
+ 67      Perth (WA)                  ALP       997.8                      142     North Sydney (NSW)        LP      1091.9
+ 68      Cunningham (NSW)            ALP       998.2                      143     Menzies (Vic.)            LP      1093.2
+ 69      Bruce (Vic.)                ALP       998.8                      144     Tangney (WA)              LP      1098.1
+ 70      Calwell (Vic.)              ALP       998.9                      145     Moore (WA)                LP      1101.9
+ 71      Groom (Qld)                 LP         999.6                     146     Warringah (NSW)           LP      1106.7
+ 72      Makin (SA)                  ALP      1000.1                      147     Mackellar (NSW)           LP      1121.7
+ 73      Hotham (Vic.)               ALP      1002.6                      148     Bradfield (NSW)           LP      1145.9
+ 74      Sturt (SA)                  LP       1002.6                      149     Berowra (NSW)             LP      1151.3
+ 75      Robertson (NSW)             ALP      1002.7                      150     Mitchell (NSW)            LP      1154.3
+
+
+
+
+20
+                                                     Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 4a: Index of Education and Occupation
+2009 Electoral Division        Party        Index                        2009 Electoral Division     Party      Index
+Adelaide (SA)                  ALP         1080.9                        Hume (NSW)                  LP          962.5
+Aston (Vic.)                   LP          1019.6                        Hunter (NSW)                ALP         911.1
+Ballarat (Vic.)                ALP          974.0                        Indi (Vic.)                 LP          964.5
+Banks (NSW)                    ALP         1026.7                        Isaacs (Vic.)               ALP         977.8
+Barker (SA)                    LP            923.1                       Jagajaga (Vic.)             ALP       1068.9
+Barton (NSW)                   ALP         1018.2                        Kennedy (Qld)               Ind         927.4
+Bass (Tas.)                    ALP          942.8                        Kingsford Smith (NSW)       ALP       1074.3
+Batman (Vic.)                  ALP         1021.7                        Kingston (SA)               ALP         933.8
+Bendigo (Vic.)                 ALP           958.0                       Kooyong (Vic.)              LP        1172.4
+Bennelong (NSW)                ALP         1109.7                        La Trobe (Vic.)             LP        1000.8
+Berowra (NSW)                  LP          1119.4                        Lalor (Vic.)                ALP         946.8
+Blair (Qld)                    ALP          923.2                        Leichhardt (Qld)            ALP         974.2
+Blaxland (NSW)                 ALP           938.4                       Lilley (Qld)                ALP       1011.5
+Bonner (Qld)                   ALP         1023.0                        Lindsay (NSW)               ALP         936.1
+Boothby (SA)                   LP          1060.5                        Lingiari (NT)               ALP         941.1
+Bowman (Qld)                   LP            978.3                       Longman (Qld)               ALP         921.5
+Braddon (Tas.)                 ALP           901.8                       Lyne (NSW)                  Ind         932.0
+Bradfield (NSW)                LP          1177.6                        Lyons (Tas.)                ALP         905.8
+Brand (WA)                     ALP           931.0                       Macarthur (NSW)             ALP         952.4
+Brisbane (Qld)                 ALP         1128.3                        Mackellar (NSW)             LP        1090.0
+Bruce (Vic.)                   ALP         1003.1                        Macquarie (NSW)             ALP       1024.8
+Calare (NSW)                   NP            950.1                       Makin (SA)                  ALP         958.8
+Calwell (Vic.)                 ALP          923.9                        Mallee (Vic.)               NP          946.7
+Canberra (ACT)                 ALP         1101.7                        Maranoa (Qld)               NP          937.3
+Canning (WA)                   LP            931.8                       Maribyrnong (Vic.)          ALP         983.6
+Capricornia (Qld)              ALP          935.0                        Mayo (SA)                   LP        1012.0
+Casey (Vic.)                   LP           988.4                        McEwen (Vic.)               LP          991.2
+Charlton (NSW)                 ALP          948.6                        McMahon (NSW)               ALP         936.5
+Chifley (NSW)                  ALP          910.7                        McMillan (Vic.)             LP          945.4
+Chisholm (Vic.)                ALP         1099.0                        McPherson (Qld)             LP          984.2
+Cook (NSW)                     LP          1051.6                        Melbourne (Vic.)            ALP       1140.6
+Corangamite (Vic.)             ALP         1007.1                        Melbourne Ports (Vic.)      ALP       1164.6
+Corio (Vic.)                   ALP          944.3                        Menzies (Vic.)              LP        1080.1
+Cowan (WA)                     LP           975.1                        Mitchell (NSW)              LP        1090.9
+Cowper (NSW)                   NP            927.8                       Moncrieff (Qld)             LP          998.1
+Cunningham (NSW)               ALP         1020.7                        Moore (WA)                  LP        1033.9
+Curtin (WA)                    LP          1165.4                        Moreton (Qld)               ALP       1057.7
+Dawson (Qld)                   ALP           944.3                       Murray (Vic.)               LP          938.3
+Deakin (Vic.)                  ALP         1053.7                        New England (NSW)           Ind         956.0
+Denison (Tas.)                 ALP         1017.6                        Newcastle (NSW)             ALP         995.1
+Dickson (Qld)                  ALP         1003.7                        North Sydney (NSW)          LP        1187.7
+Dobell (NSW)                   ALP          943.1                        O'Connor (WA)               LP          961.5
+Dunkley (Vic.)                 LP            982.0                       Oxley (Qld)                 ALP         975.3
+Durack (WA)                    LP            949.1                       Page (NSW)                  ALP         931.6
+Eden-Monaro (NSW)              ALP          977.7                        Parkes (NSW)                NP          941.0
+Fadden (Qld)                   LP            976.8                       Parramatta (NSW)            ALP       1032.9
+Fairfax (Qld)                  LP            986.4                       Paterson (NSW)              LP          938.7
+Farrer (NSW)                   LP            944.5                       Pearce (WA)                 LP          977.0
+Fisher (Qld)                   LP            967.9                       Perth (WA)                  ALP       1034.3
+Flinders (Vic.)                LP            966.4                       Petrie (Qld)                ALP         951.4
+Flynn (Qld)                    ALP          924.6                        Port Adelaide (SA)          ALP         920.2
+Forde (Qld)                    ALP          936.2                        Rankin (Qld)                ALP         936.8
+Forrest (WA)                   LP            952.7                       Reid (NSW)                  ALP       1068.9
+Fowler (NSW)                   ALP          905.9                        Richmond (NSW)              ALP         968.5
+Franklin (Tas.)                ALP          982.0                        Riverina (NSW)              NP          947.2
+Fraser (ACT)                   ALP         1116.0                        Robertson (NSW)             ALP         984.8
+Fremantle (WA)                 ALP         1018.6                        Ryan (Qld)                  LP        1145.4
+Gellibrand (Vic.)              ALP         1009.2                        Scullin (Vic.)              ALP         945.3
+Gilmore (NSW)                  ALP          952.2                        Shortland (NSW)             ALP         938.6
+Gippsland (Vic.)               NP            941.6                       Solomon (NT)                ALP       1016.6
+Goldstein (Vic.)               LP          1132.9                        Stirling (WA)               LP        1026.5
+Gorton (Vic.)                  ALP           943.3                       Sturt (SA)                  LP        1046.1
+Grayndler (NSW)                ALP         1097.1                        Swan (WA)                   ALP       1039.5
+Greenway (NSW)                 ALP         1000.4                        Sydney (NSW)                ALP       1161.8
+Grey (SA)                      LP            919.6                       Tangney (WA)                LP        1084.9
+Griffith (Qld)                 ALP         1094.9                        Throsby (NSW)               ALP         927.2
+Groom (Qld)                    LP            975.6                       Wakefield (SA)              ALP         889.3
+Hasluck (WA)                   ALP           952.5                       Wannon (Vic.)               LP          959.8
+Herbert (Qld)                  ALP           968.9                       Warringah (NSW)             LP        1158.9
+Higgins (Vic.)                 LP          1165.3                        Watson (NSW)                ALP         987.6
+Hindmarsh (SA)                 ALP         1008.9                        Wentworth (NSW)             LP        1182.5
+Hinkler (Qld)                  NP            912.6                       Werriwa (NSW)               ALP         941.6
+Holt (Vic.)                    ALP          937.1                        Wide Bay (Qld)              NP          937.4
+Hotham (Vic.)                  ALP         1010.9                        Wills (Vic.)                ALP       1021.2
+Hughes (NSW)                   LP          1016.0                        Wright (Qld)                LP          953.8
+
+
+
+
+                                                                                                                  21
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 4b: Electoral divisions ranked by the Index of Education and Occupation
+ Rank 2009 Electoral Division Party Index                                  Rank    2009 Electoral Division   Party    Index
+  1      Wakefield (SA)            ALP       889.3                            76   Pearce (WA)               LP        977.0
+  2      Braddon (Tas.)            ALP       901.8                            77   Eden-Monaro (NSW)         ALP       977.7
+  3      Lyons (Tas.)              ALP       905.8                            78   Isaacs (Vic.)             ALP       977.8
+  4      Fowler (NSW)              ALP       905.9                            79   Bowman (Qld)              LP        978.3
+  5      Chifley (NSW)             ALP       910.7                            80   Franklin (Tas.)           ALP       982.0
+  6      Hunter (NSW)              ALP       911.1                            81   Dunkley (Vic.)            LP        982.0
+  7      Hinkler (Qld)             NP        912.6                            82   Maribyrnong (Vic.)        ALP       983.6
+  8      Grey (SA)                 LP        919.6                            83   McPherson (Qld)           LP       984.2
+  9      Port Adelaide (SA)        ALP       920.2                            84   Robertson (NSW)           ALP       984.8
+10       Longman (Qld)             ALP       921.5                            85   Fairfax (Qld)             LP        986.4
+11       Barker (SA)               LP        923.1                            86   Watson (NSW)              ALP       987.6
+12       Blair (Qld)               ALP       923.2                            87   Casey (Vic.)              LP        988.4
+13       Calwell (Vic.)            ALP       923.9                            88   McEwen (Vic.)             LP        991.2
+14       Flynn (Qld)               ALP       924.6                            89   Newcastle (NSW)           ALP       995.1
+15       Throsby (NSW)             ALP       927.2                            90   Moncrieff (Qld)           LP        998.1
+16       Kennedy (Qld)             Ind       927.4                            91   Greenway (NSW)            ALP     1000.4
+17       Cowper (NSW)              NP        927.8                            92   La Trobe (Vic.)           LP      1000.8
+18       Brand (WA)                ALP       931.0                            93   Bruce (Vic.)              ALP     1003.1
+19       Page (NSW)                ALP       931.6                            94   Dickson (Qld)             ALP     1003.7
+20       Canning (WA)              LP        931.8                            95   Corangamite (Vic.)        ALP     1007.1
+21       Lyne (NSW)                Ind       932.0                            96   Hindmarsh (SA)            ALP     1008.9
+22       Kingston (SA)             ALP       933.8                            97   Gellibrand (Vic.)         ALP     1009.2
+23       Capricornia (Qld)         ALP       935.0                            98   Hotham (Vic.)             ALP     1010.9
+24       Lindsay (NSW)             ALP       936.1                            99   Lilley (Qld)              ALP     1011.5
+25       Forde (Qld)               ALP       936.2                           100   Mayo (SA)                 LP      1012.0
+26       McMahon (NSW)             ALP       936.5                           101   Hughes (NSW)              LP      1016.0
+27       Rankin (Qld)              ALP       936.8                           102   Solomon (NT)              ALP     1016.6
+28       Holt (Vic.)               ALP       937.1                           103   Denison (Tas.)            ALP     1017.6
+29       Maranoa (Qld)             NP        937.3                           104   Barton (NSW)              ALP     1018.2
+30       Wide Bay (Qld)            NP        937.4                           105   Fremantle (WA)            ALP     1018.6
+31       Murray (Vic.)             LP        938.3                           106   Aston (Vic.)              LP      1019.6
+32       Blaxland (NSW)            ALP       938.4                           107   Cunningham (NSW)          ALP     1020.7
+33       Shortland (NSW)           ALP       938.6                           108   Wills (Vic.)              ALP     1021.2
+34       Paterson (NSW)            LP        938.7                           109   Batman (Vic.)             ALP     1021.7
+35       Parkes (NSW)              NP        941.0                           110   Bonner (Qld)              ALP     1023.0
+36       Lingiari (NT)             ALP       941.1                           111   Macquarie (NSW)           ALP     1024.8
+37       Gippsland (Vic.)          NP        941.6                           112   Stirling (WA)             LP      1026.5
+38       Werriwa (NSW)             ALP       941.6                           113   Banks (NSW)               ALP     1026.7
+39       Bass (Tas.)               ALP       942.8                           114   Parramatta (NSW)          ALP     1032.9
+40       Dobell (NSW)              ALP       943.1                           115   Moore (WA)                LP      1033.9
+41       Gorton (Vic.)             ALP       943.3                           116   Perth (WA)                ALP     1034.3
+42       Corio (Vic.)              ALP       944.3                           117   Swan (WA)                 ALP     1039.5
+43       Dawson (Qld)              ALP       944.3                           118   Sturt (SA)                LP      1046.1
+44       Farrer (NSW)              LP        944.5                           119   Cook (NSW)                LP      1051.6
+45       Scullin (Vic.)            ALP       945.3                           120   Deakin (Vic.)             ALP     1053.7
+46       McMillan (Vic.)           LP        945.4                           121   Moreton (Qld)             ALP     1057.7
+47       Mallee (Vic.)             NP        946.7                           122   Boothby (SA)              LP      1060.5
+48       Lalor (Vic.)              ALP       946.8                           123   Reid (NSW)                ALP     1068.9
+49       Riverina (NSW)            NP        947.2                           124   Jagajaga (Vic.)           ALP     1068.9
+50       Charlton (NSW)            ALP       948.6                           125   Kingsford Smith (NSW)     ALP     1074.3
+51       Durack (WA)               LP        949.1                           126   Menzies (Vic.)            LP      1080.1
+52       Calare (NSW)              NP        950.1                           127   Adelaide (SA)             ALP     1080.9
+53       Petrie (Qld)              ALP       951.4                           128   Tangney (WA)              LP      1084.9
+54       Gilmore (NSW)             ALP       952.2                           129   Mackellar (NSW)           LP      1090.0
+55       Macarthur (NSW)           ALP       952.4                           130   Mitchell (NSW)            LP      1090.9
+56       Hasluck (WA)              ALP       952.5                           131   Griffith (Qld)            ALP     1094.9
+57       Forrest (WA)              LP        952.7                           132   Grayndler (NSW)           ALP     1097.1
+58       Wright (Qld)              LP        953.8                           133   Chisholm (Vic.)           ALP     1099.0
+59       New England (NSW)         Ind       956.0                           134   Canberra (ACT)            ALP     1101.7
+60       Bendigo (Vic.)            ALP       958.0                           135   Bennelong (NSW)           ALP     1109.7
+61       Makin (SA)                ALP       958.8                           136   Fraser (ACT)              ALP     1116.0
+62       Wannon (Vic.)             LP        959.8                           137   Berowra (NSW)             LP      1119.4
+63       O'Connor (WA)             LP        961.5                           138   Brisbane (Qld)            ALP     1128.3
+64       Hume (NSW)                LP        962.5                           139   Goldstein (Vic.)          LP      1132.9
+65       Indi (Vic.)               LP        964.5                           140   Melbourne (Vic.)          ALP     1140.6
+66       Flinders (Vic.)           LP        966.4                           141   Ryan (Qld)                LP      1145.4
+67       Fisher (Qld)              LP        967.9                           142   Warringah (NSW)           LP      1158.9
+68       Richmond (NSW)            ALP       968.5                           143   Sydney (NSW)              ALP     1161.8
+69       Herbert (Qld)             ALP       968.9                           144   Melbourne Ports (Vic.)    ALP     1164.6
+70       Ballarat (Vic.)           ALP       974.0                           145   Higgins (Vic.)            LP      1165.3
+71       Leichhardt (Qld)          ALP       974.2                           146   Curtin (WA)               LP      1165.4
+72       Cowan (WA)                LP        975.1                           147   Kooyong (Vic.)            LP      1172.4
+73       Oxley (Qld)               ALP       975.3                           148   Bradfield (NSW)           LP      1177.6
+74       Groom (Qld)               LP        975.6                           149   Wentworth (NSW)           LP      1182.5
+75       Fadden (Qld)              LP        976.8                           150   North Sydney (NSW)        LP      1187.7
+
+
+
+
+22
+                                                  Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 5: Summary of Index Rankings
+                                                              Advantage/                   Economic    Education &
+2009 Electoral Division    Party     Rating                 Disadvantage   Disadvantage    Resources    Occupation
+Adelaide (SA)              ALP       Inner Metropolitan              109              87          34           127
+Aston (Vic.)               LP        Outer Metropolitan              120            130          132           106
+Ballarat (Vic.)            ALP       Provincial                       43              62          35            70
+Banks (NSW)                ALP       Inner Metropolitan              113              84          87           113
+Barker (SA)                LP        Rural                             8              21          30            11
+Barton (NSW)               ALP       Inner Metropolitan              111              72          99           104
+Bass (Tas.)                ALP       Provincial                       19              20          10            39
+Batman (Vic.)              ALP       Inner Metropolitan               72              33          25           109
+Bendigo (Vic.)             ALP       Provincial                       28              40          20            60
+Bennelong (NSW)            ALP       Inner Metropolitan              136            129          128           135
+Berowra (NSW)              LP        Outer Metropolitan              147            149          149           137
+Blair (Qld)                ALP       Rural                            26              28          50            12
+Blaxland (NSW)             ALP       Inner Metropolitan               18               3           5            32
+Bonner (Qld)               ALP       Outer Metropolitan              117             119         123           110
+Boothby (SA)               LP        Outer Metropolitan              112            118           84           122
+Bowman (Qld)               LP        Outer Metropolitan              108            113         126             79
+Braddon (Tas.)             ALP       Rural                             5               8           3             2
+Bradfield (NSW)            LP        Inner Metropolitan              150            150         148            148
+Brand (WA)                 ALP       Provincial                       60              78         111            18
+Brisbane (Qld)             ALP       Inner Metropolitan              135            131         113            138
+Bruce (Vic.)               ALP       Outer Metropolitan               84              59          69            93
+Calare (NSW)               NP        Rural                            34              37          40            52
+Calwell (Vic.)             ALP       Outer Metropolitan               35              25          70            13
+Canberra (ACT)             ALP       Inner Metropolitan              133            134         134            134
+Canning (WA)               LP        Outer Metropolitan               47              65        106             20
+Capricornia (Qld)          ALP       Provincial                       41              58          59            23
+Casey (Vic.)               LP        Outer Metropolitan              102            122         121             87
+Charlton (NSW)             ALP       Provincial                       57              68          61            50
+Chifley (NSW)              ALP       Outer Metropolitan               16               7          11             5
+Chisholm (Vic.)            ALP       Inner Metropolitan              123            124         101            133
+Cook (NSW)                 LP        Inner Metropolitan              132            133          140           119
+Corangamite (Vic.)         ALP       Provincial                       87            111           91            95
+Corio (Vic.)               ALP       Provincial                       31              31          16            42
+Cowan (WA)                 LP        Outer Metropolitan               98            112         131             72
+Cowper (NSW)               NP        Rural                            14              11           6            17
+Cunningham (NSW)           ALP       Provincial                      103              98          68           107
+Curtin (WA)                LP        Inner Metropolitan              140            140         135            146
+Dawson (Qld)               ALP       Rural                            68              83         102            43
+Deakin (Vic.)              ALP       Outer Metropolitan              115            120           97           120
+Denison (Tas.)             ALP       Inner Metropolitan               74              61          22           103
+Dickson (Qld)              ALP       Outer Metropolitan              119            128         136             94
+Dobell (NSW)               ALP       Provincial                       61              57          64            40
+Dunkley (Vic.)             LP        Outer Metropolitan               85              96          79            81
+Durack (WA)                LP        Rural                            39              16          26            51
+Eden-Monaro (NSW)          ALP       Rural                            67              76          66            77
+Fadden (Qld)               LP        Outer Metropolitan              107            106         120             75
+Fairfax (Qld)              LP        Rural                            92            103         104             85
+Farrer (NSW)               LP        Rural                            25              35          32            44
+Fisher (Qld)               LP        Rural                            82              89          95            67
+Flinders (Vic.)            LP        Rural                            69              97          94            66
+Flynn (Qld)                ALP       Rural                            33              51          78            14
+Forde (Qld)                ALP       Rural                            75              75        110             25
+Forrest (WA)               LP        Rural                            64              90        109             57
+Fowler (NSW)               ALP       Outer Metropolitan                6               2           8             4
+Franklin (Tas.)            ALP       Outer Metropolitan               56              73          56            80
+Fraser (ACT)               ALP       Inner Metropolitan              130            132         125            136
+Fremantle (WA)             ALP       Inner Metropolitan              101            101         107            105
+Gellibrand (Vic.)          ALP       Inner Metropolitan               79              42          31            97
+Gilmore (NSW)              ALP       Rural                            44              50          52            54
+Gippsland (Vic.)           NP        Rural                            20              30          18            37
+Goldstein (Vic.)           LP        Inner Metropolitan              138            138         137            139
+Gorton (Vic.)              ALP       Outer Metropolitan               45              36          82            41
+Grayndler (NSW)            ALP       Inner Metropolitan              125            102           80           132
+Greenway (NSW)             ALP       Outer Metropolitan              114            110         122             91
+Grey (SA)                  LP        Rural                             2               6           2             8
+Griffith (Qld)             ALP       Outer Metropolitan              126            123           85           131
+Groom (Qld)                LP        Provincial                       62              79          71            74
+Hasluck (WA)               ALP       Outer Metropolitan               73              81         114            56
+Herbert (Qld)              ALP       Provincial                       71              66          54            69
+Higgins (Vic.)             LP        Inner Metropolitan              141            139          129           145
+Hindmarsh (SA)             ALP       Inner Metropolitan               76              77          33            96
+Hinkler (Qld)              NP        Provincial                        9              14          17             7
+Holt (Vic.)                ALP       Outer Metropolitan               52              67          96            28
+Hotham (Vic.)              ALP       Outer Metropolitan               89              74          73            98
+Hughes (NSW)               LP        Outer Metropolitan              128             126         138           101
+Hume (NSW)                 LP        Rural                            51              71          86            64
+Hunter (NSW)               ALP       Rural                            29              34          55             6
+                                                                                                               23
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+Table 5: Summary of Index Rankings
+                                                            Advantage/                   Economic    Education &
+2009 Electoral Division    Party     Rating               Disadvantage   Disadvantage    Resources    Occupation
+Indi (Vic.)                LP        Rural                          37              63          48            65
+Isaacs (Vic.)              ALP       Outer Metropolitan             81              69          77            78
+Jagajaga (Vic.)            ALP       Outer Metropolitan            121            127          118           124
+Kennedy (Qld)              Ind       Rural                          15              15          28            16
+Kingsford Smith (NSW)      ALP       Inner Metropolitan            124            104           98           125
+Kingston (SA)              ALP       Outer Metropolitan             32              54          38            22
+Kooyong (Vic.)             LP        Inner Metropolitan            144             145         139           147
+La Trobe (Vic.)            LP        Outer Metropolitan            110            125          124            92
+Lalor (Vic.)               ALP       Outer Metropolitan             70              85          88            48
+Leichhardt (Qld)           ALP       Rural                          53              18          21            71
+Lilley (Qld)               ALP       Inner Metropolitan             99             105          83            99
+Lindsay (NSW)              ALP       Outer Metropolitan             80              70          92            24
+Lingiari (NT)              ALP       Rural                           4               1           1            36
+Longman (Qld)              ALP       Provincial                     42              55          90            10
+Lyne (NSW)                 Ind       Rural                          24              23          27            21
+Lyons (Tas.)               ALP       Rural                           3               9          12             3
+Macarthur (NSW)            ALP       Outer Metropolitan             91              91         116            55
+Mackellar (NSW)            LP        Outer Metropolitan            143            142          147           129
+Macquarie (NSW)            ALP       Provincial                    116             121         117           111
+Makin (SA)                 ALP       Outer Metropolitan             59              93          72            61
+Mallee (Vic.)              NP        Rural                          13              24          23            47
+Maranoa (Qld)              NP        Rural                          10              17          41            29
+Maribyrnong (Vic.)         ALP       Outer Metropolitan             63              39          51            82
+Mayo (SA)                  LP        Rural                          86            116          112           100
+McEwen (Vic.)              LP        Rural                          93            117          119            88
+McMahon (NSW)              ALP       Outer Metropolitan             65              29          93            26
+McMillan (Vic.)            LP        Rural                          27              52          45            46
+McPherson (Qld)            LP        Provincial                    106             107         115            83
+Melbourne (Vic.)           ALP       Inner Metropolitan            127              92          15           140
+Melbourne Ports (Vic.)     ALP       Inner Metropolitan            137             135         105           144
+Menzies (Vic.)             LP        Outer Metropolitan            131            136          143           126
+Mitchell (NSW)             LP        Outer Metropolitan            145            148          150           130
+Moncrieff (Qld)            LP        Provincial                    105              99         100            90
+Moore (WA)                 LP        Outer Metropolitan            129            137          145           115
+Moreton (Qld)              ALP       Inner Metropolitan            118            115          108           121
+Murray (Vic.)              LP        Rural                          17              32          37            31
+New England (NSW)          Ind       Rural                          21              19          19            59
+Newcastle (NSW)            ALP       Provincial                     66              38          13            89
+North Sydney (NSW)         LP        Inner Metropolitan            149            147          142           150
+O'Connor (WA)              LP        Rural                          36              49          57            63
+Oxley (Qld)                ALP       Outer Metropolitan             78              56          81            73
+Page (NSW)                 ALP       Rural                          12              13           9            19
+Parkes (NSW)               NP        Rural                          11              12          14            35
+Parramatta (NSW)           ALP       Inner Metropolitan             96              53          29           114
+Paterson (NSW)             LP        Rural                          40              45          53            34
+Pearce (WA)                LP        Outer Metropolitan             90            109          127            76
+Perth (WA)                 ALP       Inner Metropolitan             97              94          67           116
+Petrie (Qld)               ALP       Outer Metropolitan             58              60          63            53
+Port Adelaide (SA)         ALP       Inner Metropolitan              7               5           4             9
+Rankin (Qld)               ALP       Outer Metropolitan             49              41          62            27
+Reid (NSW)                 ALP       Inner Metropolitan            122              95         103           123
+Richmond (NSW)             ALP       Rural                          50              43          49            68
+Riverina (NSW)             NP        Rural                          30              44          43            49
+Robertson (NSW)            ALP       Provincial                     88              88          75            84
+Ryan (Qld)                 LP        Outer Metropolitan            142            144          141           141
+Scullin (Vic.)             ALP       Outer Metropolitan             48              48          89            45
+Shortland (NSW)            ALP       Provincial                     46              47          44            33
+Solomon (NT)               ALP       Inner Metropolitan            104              82          65           102
+Stirling (WA)              LP        Inner Metropolitan             95              86          76           112
+Sturt (SA)                 LP        Inner Metropolitan            100            108           74           118
+Swan (WA)                  ALP       Inner Metropolitan             94              80          46           117
+Sydney (NSW)               ALP       Inner Metropolitan            139            114           60           143
+Tangney (WA)               LP        Inner Metropolitan            134             141         144           128
+Throsby (NSW)              ALP       Provincial                     38              26          47            15
+Wakefield (SA)             ALP       Rural                           1               4           7             1
+Wannon (Vic.)              LP        Rural                          23              46          42            62
+Warringah (NSW)            LP        Inner Metropolitan            148            146          146           142
+Watson (NSW)               ALP       Inner Metropolitan             54              10          24            86
+Wentworth (NSW)            LP        Inner Metropolitan            146            143          133           149
+Werriwa (NSW)              ALP       Outer Metropolitan             55              27          58            38
+Wide Bay (Qld)             NP        Rural                          22              22          36            30
+Wills (Vic.)               ALP       Inner Metropolitan             83              64          39           108
+Wright (Qld)               LP        Rural                          77            100          130            58
+
+
+
+
+24
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+
+                                                             25
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+
+26
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+
+                                                             27
+Socio-economic indexes for 2009 electoral divisions: 2006 Census
+
+
+
+
+28
+
