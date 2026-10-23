@@ -1,0 +1,7603 @@
+{
+ "2001": {
+  "Adelaide": {
+   "rank": 35,
+   "state": "SA",
+   "value": 1053
+  },
+  "Aston": {
+   "rank": 33,
+   "state": "VIC",
+   "value": 1055
+  },
+  "Ballarat": {
+   "rank": 99,
+   "state": "VIC",
+   "value": 963
+  },
+  "Banks": {
+   "rank": 46,
+   "state": "NSW",
+   "value": 1020
+  },
+  "Barker": {
+   "rank": 144,
+   "state": "SA",
+   "value": 923
+  },
+  "Barton": {
+   "rank": 40,
+   "state": "NSW",
+   "value": 1038
+  },
+  "Bass": {
+   "rank": 117,
+   "state": "TAS",
+   "value": 947
+  },
+  "Batman": {
+   "rank": 74,
+   "state": "VIC",
+   "value": 989
+  },
+  "Bendigo": {
+   "rank": 115,
+   "state": "VIC",
+   "value": 948
+  },
+  "Bennelong": {
+   "rank": 17,
+   "state": "NSW",
+   "value": 1114
+  },
+  "Berowra": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1140
+  },
+  "Blair": {
+   "rank": 137,
+   "state": "QLD",
+   "value": 932
+  },
+  "Blaxland": {
+   "rank": 108,
+   "state": "NSW",
+   "value": 951
+  },
+  "Bonython": {
+   "rank": 150,
+   "state": "SA",
+   "value": 882
+  },
+  "Boothby": {
+   "rank": 34,
+   "state": "SA",
+   "value": 1054
+  },
+  "Bowman": {
+   "rank": 59,
+   "state": "QLD",
+   "value": 1002
+  },
+  "Braddon": {
+   "rank": 147,
+   "state": "TAS",
+   "value": 908
+  },
+  "Bradfield": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1204
+  },
+  "Brand": {
+   "rank": 136,
+   "state": "WA",
+   "value": 933
+  },
+  "Brisbane": {
+   "rank": 18,
+   "state": "QLD",
+   "value": 1103
+  },
+  "Bruce": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1017
+  },
+  "Burke": {
+   "rank": 71,
+   "state": "VIC",
+   "value": 991
+  },
+  "Calare": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 963
+  },
+  "Calwell": {
+   "rank": 93,
+   "state": "VIC",
+   "value": 968
+  },
+  "Canberra": {
+   "rank": 14,
+   "state": "ACT",
+   "value": 1123
+  },
+  "Canning": {
+   "rank": 86,
+   "state": "WA",
+   "value": 976
+  },
+  "Capricornia": {
+   "rank": 97,
+   "state": "QLD",
+   "value": 965
+  },
+  "Casey": {
+   "rank": 47,
+   "state": "VIC",
+   "value": 1020
+  },
+  "Charlton": {
+   "rank": 92,
+   "state": "NSW",
+   "value": 969
+  },
+  "Chifley": {
+   "rank": 134,
+   "state": "NSW",
+   "value": 933
+  },
+  "Chisholm": {
+   "rank": 26,
+   "state": "VIC",
+   "value": 1077
+  },
+  "Cook": {
+   "rank": 24,
+   "state": "NSW",
+   "value": 1085
+  },
+  "Corangamite": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1004
+  },
+  "Corio": {
+   "rank": 113,
+   "state": "VIC",
+   "value": 949
+  },
+  "Cowan": {
+   "rank": 61,
+   "state": "WA",
+   "value": 1002
+  },
+  "Cowper": {
+   "rank": 145,
+   "state": "NSW",
+   "value": 922
+  },
+  "Cunningham": {
+   "rank": 43,
+   "state": "NSW",
+   "value": 1029
+  },
+  "Curtin": {
+   "rank": 7,
+   "state": "WA",
+   "value": 1150
+  },
+  "Dawson": {
+   "rank": 118,
+   "state": "QLD",
+   "value": 947
+  },
+  "Deakin": {
+   "rank": 31,
+   "state": "VIC",
+   "value": 1057
+  },
+  "Denison": {
+   "rank": 53,
+   "state": "TAS",
+   "value": 1008
+  },
+  "Dickson": {
+   "rank": 42,
+   "state": "QLD",
+   "value": 1029
+  },
+  "Dobell": {
+   "rank": 85,
+   "state": "NSW",
+   "value": 977
+  },
+  "Dunkley": {
+   "rank": 58,
+   "state": "VIC",
+   "value": 1003
+  },
+  "Eden-Monaro": {
+   "rank": 78,
+   "state": "NSW",
+   "value": 986
+  },
+  "Fadden": {
+   "rank": 66,
+   "state": "QLD",
+   "value": 997
+  },
+  "Fairfax": {
+   "rank": 111,
+   "state": "QLD",
+   "value": 950
+  },
+  "Farrer": {
+   "rank": 105,
+   "state": "NSW",
+   "value": 956
+  },
+  "Fisher": {
+   "rank": 94,
+   "state": "QLD",
+   "value": 967
+  },
+  "Flinders": {
+   "rank": 87,
+   "state": "VIC",
+   "value": 973
+  },
+  "Forde": {
+   "rank": 106,
+   "state": "QLD",
+   "value": 953
+  },
+  "Forrest": {
+   "rank": 104,
+   "state": "WA",
+   "value": 958
+  },
+  "Fowler": {
+   "rank": 149,
+   "state": "NSW",
+   "value": 891
+  },
+  "Franklin": {
+   "rank": 95,
+   "state": "TAS",
+   "value": 967
+  },
+  "Fraser": {
+   "rank": 15,
+   "state": "ACT",
+   "value": 1121
+  },
+  "Fremantle": {
+   "rank": 54,
+   "state": "WA",
+   "value": 1008
+  },
+  "Gellibrand": {
+   "rank": 91,
+   "state": "VIC",
+   "value": 970
+  },
+  "Gilmore": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 961
+  },
+  "Gippsland": {
+   "rank": 121,
+   "state": "VIC",
+   "value": 946
+  },
+  "Goldstein": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1127
+  },
+  "Grayndler": {
+   "rank": 25,
+   "state": "NSW",
+   "value": 1082
+  },
+  "Greenway": {
+   "rank": 50,
+   "state": "NSW",
+   "value": 1016
+  },
+  "Grey": {
+   "rank": 140,
+   "state": "SA",
+   "value": 927
+  },
+  "Griffith": {
+   "rank": 29,
+   "state": "QLD",
+   "value": 1064
+  },
+  "Groom": {
+   "rank": 89,
+   "state": "QLD",
+   "value": 972
+  },
+  "Gwydir": {
+   "rank": 138,
+   "state": "NSW",
+   "value": 929
+  },
+  "Hasluck": {
+   "rank": 88,
+   "state": "WA",
+   "value": 973
+  },
+  "Herbert": {
+   "rank": 69,
+   "state": "QLD",
+   "value": 993
+  },
+  "Higgins": {
+   "rank": 5,
+   "state": "VIC",
+   "value": 1162
+  },
+  "Hindmarsh": {
+   "rank": 62,
+   "state": "SA",
+   "value": 1000
+  },
+  "Hinkler": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 925
+  },
+  "Holt": {
+   "rank": 126,
+   "state": "VIC",
+   "value": 942
+  },
+  "Hotham": {
+   "rank": 63,
+   "state": "VIC",
+   "value": 1000
+  },
+  "Hughes": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1093
+  },
+  "Hume": {
+   "rank": 76,
+   "state": "NSW",
+   "value": 988
+  },
+  "Hunter": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 943
+  },
+  "Indi": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 965
+  },
+  "Isaacs": {
+   "rank": 64,
+   "state": "VIC",
+   "value": 999
+  },
+  "Jagajaga": {
+   "rank": 27,
+   "state": "VIC",
+   "value": 1076
+  },
+  "Kalgoorlie": {
+   "rank": 75,
+   "state": "WA",
+   "value": 989
+  },
+  "Kennedy": {
+   "rank": 129,
+   "state": "QLD",
+   "value": 939
+  },
+  "Kingsford Smith": {
+   "rank": 28,
+   "state": "NSW",
+   "value": 1069
+  },
+  "Kingston": {
+   "rank": 122,
+   "state": "SA",
+   "value": 946
+  },
+  "Kooyong": {
+   "rank": 4,
+   "state": "VIC",
+   "value": 1175
+  },
+  "La Trobe": {
+   "rank": 44,
+   "state": "VIC",
+   "value": 1028
+  },
+  "Lalor": {
+   "rank": 84,
+   "state": "VIC",
+   "value": 979
+  },
+  "Leichhardt": {
+   "rank": 73,
+   "state": "QLD",
+   "value": 990
+  },
+  "Lilley": {
+   "rank": 45,
+   "state": "QLD",
+   "value": 1021
+  },
+  "Lindsay": {
+   "rank": 52,
+   "state": "NSW",
+   "value": 1014
+  },
+  "Lingiari": {
+   "rank": 77,
+   "state": "NT",
+   "value": 987
+  },
+  "Longman": {
+   "rank": 139,
+   "state": "QLD",
+   "value": 928
+  },
+  "Lowe": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1095
+  },
+  "Lyne": {
+   "rank": 142,
+   "state": "NSW",
+   "value": 925
+  },
+  "Lyons": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 908
+  },
+  "Macarthur": {
+   "rank": 65,
+   "state": "NSW",
+   "value": 997
+  },
+  "Mackellar": {
+   "rank": 16,
+   "state": "NSW",
+   "value": 1115
+  },
+  "Macquarie": {
+   "rank": 39,
+   "state": "NSW",
+   "value": 1043
+  },
+  "Makin": {
+   "rank": 81,
+   "state": "SA",
+   "value": 985
+  },
+  "Mallee": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 943
+  },
+  "Maranoa": {
+   "rank": 128,
+   "state": "QLD",
+   "value": 939
+  },
+  "Maribyrnong": {
+   "rank": 103,
+   "state": "VIC",
+   "value": 959
+  },
+  "Mayo": {
+   "rank": 41,
+   "state": "SA",
+   "value": 1035
+  },
+  "McEwen": {
+   "rank": 70,
+   "state": "VIC",
+   "value": 991
+  },
+  "McMillan": {
+   "rank": 109,
+   "state": "VIC",
+   "value": 951
+  },
+  "McPherson": {
+   "rank": 80,
+   "state": "QLD",
+   "value": 985
+  },
+  "Melbourne": {
+   "rank": 20,
+   "state": "VIC",
+   "value": 1095
+  },
+  "Melbourne Ports": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1144
+  },
+  "Menzies": {
+   "rank": 19,
+   "state": "VIC",
+   "value": 1101
+  },
+  "Mitchell": {
+   "rank": 8,
+   "state": "NSW",
+   "value": 1145
+  },
+  "Moncrieff": {
+   "rank": 68,
+   "state": "QLD",
+   "value": 994
+  },
+  "Moore": {
+   "rank": 30,
+   "state": "WA",
+   "value": 1064
+  },
+  "Moreton": {
+   "rank": 32,
+   "state": "QLD",
+   "value": 1055
+  },
+  "Murray": {
+   "rank": 123,
+   "state": "VIC",
+   "value": 944
+  },
+  "New England": {
+   "rank": 110,
+   "state": "NSW",
+   "value": 950
+  },
+  "Newcastle": {
+   "rank": 72,
+   "state": "NSW",
+   "value": 990
+  },
+  "North Sydney": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1204
+  },
+  "O'Connor": {
+   "rank": 120,
+   "state": "WA",
+   "value": 946
+  },
+  "Oxley": {
+   "rank": 133,
+   "state": "QLD",
+   "value": 935
+  },
+  "Page": {
+   "rank": 143,
+   "state": "NSW",
+   "value": 923
+  },
+  "Parkes": {
+   "rank": 127,
+   "state": "NSW",
+   "value": 940
+  },
+  "Parramatta": {
+   "rank": 37,
+   "state": "NSW",
+   "value": 1052
+  },
+  "Paterson": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 938
+  },
+  "Pearce": {
+   "rank": 82,
+   "state": "WA",
+   "value": 984
+  },
+  "Perth": {
+   "rank": 51,
+   "state": "WA",
+   "value": 1015
+  },
+  "Petrie": {
+   "rank": 67,
+   "state": "QLD",
+   "value": 997
+  },
+  "Port Adelaide": {
+   "rank": 131,
+   "state": "SA",
+   "value": 936
+  },
+  "Prospect": {
+   "rank": 90,
+   "state": "NSW",
+   "value": 971
+  },
+  "Rankin": {
+   "rank": 119,
+   "state": "QLD",
+   "value": 947
+  },
+  "Reid": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 949
+  },
+  "Richmond": {
+   "rank": 116,
+   "state": "NSW",
+   "value": 948
+  },
+  "Riverina": {
+   "rank": 102,
+   "state": "NSW",
+   "value": 959
+  },
+  "Robertson": {
+   "rank": 60,
+   "state": "NSW",
+   "value": 1002
+  },
+  "Ryan": {
+   "rank": 12,
+   "state": "QLD",
+   "value": 1135
+  },
+  "Scullin": {
+   "rank": 96,
+   "state": "VIC",
+   "value": 967
+  },
+  "Shortland": {
+   "rank": 114,
+   "state": "NSW",
+   "value": 948
+  },
+  "Solomon": {
+   "rank": 36,
+   "state": "NT",
+   "value": 1052
+  },
+  "Stirling": {
+   "rank": 55,
+   "state": "WA",
+   "value": 1005
+  },
+  "Sturt": {
+   "rank": 38,
+   "state": "SA",
+   "value": 1052
+  },
+  "Swan": {
+   "rank": 48,
+   "state": "WA",
+   "value": 1018
+  },
+  "Sydney": {
+   "rank": 10,
+   "state": "NSW",
+   "value": 1140
+  },
+  "Tangney": {
+   "rank": 23,
+   "state": "WA",
+   "value": 1086
+  },
+  "Throsby": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 933
+  },
+  "Wakefield": {
+   "rank": 132,
+   "state": "SA",
+   "value": 935
+  },
+  "Wannon": {
+   "rank": 107,
+   "state": "VIC",
+   "value": 952
+  },
+  "Warringah": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1152
+  },
+  "Watson": {
+   "rank": 79,
+   "state": "NSW",
+   "value": 985
+  },
+  "Wentworth": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1182
+  },
+  "Werriwa": {
+   "rank": 83,
+   "state": "NSW",
+   "value": 979
+  },
+  "Wide Bay": {
+   "rank": 148,
+   "state": "QLD",
+   "value": 906
+  },
+  "Wills": {
+   "rank": 56,
+   "state": "VIC",
+   "value": 1004
+  },
+  "_meta": {
+   "censusYear": 2001,
+   "derivation": "published",
+   "editionInForce": "2000",
+   "provName": "irsad-published-2001",
+   "sourceProduct": "AEC Research Report No. 5 (2005), Attachment 1 — 2001 Census, 2001 boundaries"
+  }
+ },
+ "2004": {
+  "Adelaide": {
+   "rank": 31,
+   "state": "SA",
+   "value": 1059.3
+  },
+  "Aston": {
+   "rank": 33,
+   "state": "VIC",
+   "value": 1054.6
+  },
+  "Ballarat": {
+   "rank": 95,
+   "state": "VIC",
+   "value": 968.9
+  },
+  "Banks": {
+   "rank": 45,
+   "state": "NSW",
+   "value": 1019.5
+  },
+  "Barker": {
+   "rank": 140,
+   "state": "SA",
+   "value": 924.6
+  },
+  "Barton": {
+   "rank": 40,
+   "state": "NSW",
+   "value": 1037.7
+  },
+  "Bass": {
+   "rank": 121,
+   "state": "TAS",
+   "value": 946.8
+  },
+  "Batman": {
+   "rank": 73,
+   "state": "VIC",
+   "value": 989.2
+  },
+  "Bendigo": {
+   "rank": 111,
+   "state": "VIC",
+   "value": 950.5
+  },
+  "Bennelong": {
+   "rank": 17,
+   "state": "NSW",
+   "value": 1114.5
+  },
+  "Berowra": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1140.1
+  },
+  "Blair": {
+   "rank": 136,
+   "state": "QLD",
+   "value": 931.6
+  },
+  "Blaxland": {
+   "rank": 110,
+   "state": "NSW",
+   "value": 950.8
+  },
+  "Bonner": {
+   "rank": 42,
+   "state": "QLD",
+   "value": 1028.7
+  },
+  "Boothby": {
+   "rank": 34,
+   "state": "SA",
+   "value": 1054.1
+  },
+  "Bowman": {
+   "rank": 62,
+   "state": "QLD",
+   "value": 1002.1
+  },
+  "Braddon": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 908.2
+  },
+  "Bradfield": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1203.7
+  },
+  "Brand": {
+   "rank": 133,
+   "state": "WA",
+   "value": 933.0
+  },
+  "Brisbane": {
+   "rank": 20,
+   "state": "QLD",
+   "value": 1097.1
+  },
+  "Bruce": {
+   "rank": 64,
+   "state": "VIC",
+   "value": 1000.5
+  },
+  "Calare": {
+   "rank": 99,
+   "state": "NSW",
+   "value": 962.8
+  },
+  "Calwell": {
+   "rank": 108,
+   "state": "VIC",
+   "value": 952.9
+  },
+  "Canberra": {
+   "rank": 14,
+   "state": "ACT",
+   "value": 1123.1
+  },
+  "Canning": {
+   "rank": 87,
+   "state": "WA",
+   "value": 976.4
+  },
+  "Capricornia": {
+   "rank": 100,
+   "state": "QLD",
+   "value": 961.5
+  },
+  "Casey": {
+   "rank": 47,
+   "state": "VIC",
+   "value": 1019.3
+  },
+  "Charlton": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 969.1
+  },
+  "Chifley": {
+   "rank": 134,
+   "state": "NSW",
+   "value": 933.0
+  },
+  "Chisholm": {
+   "rank": 27,
+   "state": "VIC",
+   "value": 1078.1
+  },
+  "Cook": {
+   "rank": 24,
+   "state": "NSW",
+   "value": 1085.3
+  },
+  "Corangamite": {
+   "rank": 60,
+   "state": "VIC",
+   "value": 1002.6
+  },
+  "Corio": {
+   "rank": 115,
+   "state": "VIC",
+   "value": 949.6
+  },
+  "Cowan": {
+   "rank": 61,
+   "state": "WA",
+   "value": 1002.2
+  },
+  "Cowper": {
+   "rank": 143,
+   "state": "NSW",
+   "value": 922.0
+  },
+  "Cunningham": {
+   "rank": 41,
+   "state": "NSW",
+   "value": 1029.2
+  },
+  "Curtin": {
+   "rank": 8,
+   "state": "WA",
+   "value": 1149.7
+  },
+  "Dawson": {
+   "rank": 122,
+   "state": "QLD",
+   "value": 946.6
+  },
+  "Deakin": {
+   "rank": 32,
+   "state": "VIC",
+   "value": 1055.7
+  },
+  "Denison": {
+   "rank": 54,
+   "state": "TAS",
+   "value": 1007.6
+  },
+  "Dickson": {
+   "rank": 44,
+   "state": "QLD",
+   "value": 1025.7
+  },
+  "Dobell": {
+   "rank": 86,
+   "state": "NSW",
+   "value": 976.7
+  },
+  "Dunkley": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1002.7
+  },
+  "Eden-Monaro": {
+   "rank": 79,
+   "state": "NSW",
+   "value": 986.3
+  },
+  "Fadden": {
+   "rank": 88,
+   "state": "QLD",
+   "value": 973.0
+  },
+  "Fairfax": {
+   "rank": 104,
+   "state": "QLD",
+   "value": 958.8
+  },
+  "Farrer": {
+   "rank": 107,
+   "state": "NSW",
+   "value": 955.6
+  },
+  "Fisher": {
+   "rank": 90,
+   "state": "QLD",
+   "value": 972.5
+  },
+  "Flinders": {
+   "rank": 92,
+   "state": "VIC",
+   "value": 971.2
+  },
+  "Forde": {
+   "rank": 117,
+   "state": "QLD",
+   "value": 948.1
+  },
+  "Forrest": {
+   "rank": 105,
+   "state": "WA",
+   "value": 958.1
+  },
+  "Fowler": {
+   "rank": 150,
+   "state": "NSW",
+   "value": 890.9
+  },
+  "Franklin": {
+   "rank": 96,
+   "state": "TAS",
+   "value": 967.0
+  },
+  "Fraser": {
+   "rank": 15,
+   "state": "ACT",
+   "value": 1120.9
+  },
+  "Fremantle": {
+   "rank": 53,
+   "state": "WA",
+   "value": 1008.4
+  },
+  "Gellibrand": {
+   "rank": 76,
+   "state": "VIC",
+   "value": 987.8
+  },
+  "Gilmore": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 960.9
+  },
+  "Gippsland": {
+   "rank": 114,
+   "state": "VIC",
+   "value": 949.7
+  },
+  "Goldstein": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1127.1
+  },
+  "Gorton": {
+   "rank": 106,
+   "state": "VIC",
+   "value": 957.1
+  },
+  "Grayndler": {
+   "rank": 25,
+   "state": "NSW",
+   "value": 1081.6
+  },
+  "Greenway": {
+   "rank": 49,
+   "state": "NSW",
+   "value": 1015.7
+  },
+  "Grey": {
+   "rank": 144,
+   "state": "SA",
+   "value": 920.6
+  },
+  "Griffith": {
+   "rank": 28,
+   "state": "QLD",
+   "value": 1071.0
+  },
+  "Groom": {
+   "rank": 91,
+   "state": "QLD",
+   "value": 972.2
+  },
+  "Gwydir": {
+   "rank": 137,
+   "state": "NSW",
+   "value": 929.1
+  },
+  "Hasluck": {
+   "rank": 89,
+   "state": "WA",
+   "value": 973.0
+  },
+  "Herbert": {
+   "rank": 69,
+   "state": "QLD",
+   "value": 995.4
+  },
+  "Higgins": {
+   "rank": 5,
+   "state": "VIC",
+   "value": 1162.0
+  },
+  "Hindmarsh": {
+   "rank": 55,
+   "state": "SA",
+   "value": 1006.2
+  },
+  "Hinkler": {
+   "rank": 142,
+   "state": "QLD",
+   "value": 922.7
+  },
+  "Holt": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 964.5
+  },
+  "Hotham": {
+   "rank": 65,
+   "state": "VIC",
+   "value": 999.8
+  },
+  "Hughes": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1092.5
+  },
+  "Hume": {
+   "rank": 75,
+   "state": "NSW",
+   "value": 988.5
+  },
+  "Hunter": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 943.4
+  },
+  "Indi": {
+   "rank": 97,
+   "state": "VIC",
+   "value": 966.9
+  },
+  "Isaacs": {
+   "rank": 74,
+   "state": "VIC",
+   "value": 988.5
+  },
+  "Jagajaga": {
+   "rank": 26,
+   "state": "VIC",
+   "value": 1078.7
+  },
+  "Kalgoorlie": {
+   "rank": 72,
+   "state": "WA",
+   "value": 989.3
+  },
+  "Kennedy": {
+   "rank": 129,
+   "state": "QLD",
+   "value": 941.3
+  },
+  "Kingsford Smith": {
+   "rank": 29,
+   "state": "NSW",
+   "value": 1069.5
+  },
+  "Kingston": {
+   "rank": 112,
+   "state": "SA",
+   "value": 949.7
+  },
+  "Kooyong": {
+   "rank": 4,
+   "state": "VIC",
+   "value": 1174.6
+  },
+  "La Trobe": {
+   "rank": 43,
+   "state": "VIC",
+   "value": 1027.7
+  },
+  "Lalor": {
+   "rank": 84,
+   "state": "VIC",
+   "value": 980.1
+  },
+  "Leichhardt": {
+   "rank": 70,
+   "state": "QLD",
+   "value": 990.5
+  },
+  "Lilley": {
+   "rank": 46,
+   "state": "QLD",
+   "value": 1019.3
+  },
+  "Lindsay": {
+   "rank": 51,
+   "state": "NSW",
+   "value": 1014.1
+  },
+  "Lingiari": {
+   "rank": 78,
+   "state": "NT",
+   "value": 987.0
+  },
+  "Longman": {
+   "rank": 139,
+   "state": "QLD",
+   "value": 924.7
+  },
+  "Lowe": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1095.4
+  },
+  "Lyne": {
+   "rank": 138,
+   "state": "NSW",
+   "value": 925.4
+  },
+  "Lyons": {
+   "rank": 147,
+   "state": "TAS",
+   "value": 907.5
+  },
+  "Macarthur": {
+   "rank": 68,
+   "state": "NSW",
+   "value": 996.5
+  },
+  "Mackellar": {
+   "rank": 16,
+   "state": "NSW",
+   "value": 1114.8
+  },
+  "Macquarie": {
+   "rank": 38,
+   "state": "NSW",
+   "value": 1043.4
+  },
+  "Makin": {
+   "rank": 80,
+   "state": "SA",
+   "value": 984.8
+  },
+  "Mallee": {
+   "rank": 128,
+   "state": "VIC",
+   "value": 941.4
+  },
+  "Maranoa": {
+   "rank": 130,
+   "state": "QLD",
+   "value": 940.6
+  },
+  "Maribyrnong": {
+   "rank": 77,
+   "state": "VIC",
+   "value": 987.4
+  },
+  "Mayo": {
+   "rank": 52,
+   "state": "SA",
+   "value": 1008.8
+  },
+  "McEwen": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1005.1
+  },
+  "McMillan": {
+   "rank": 118,
+   "state": "VIC",
+   "value": 947.9
+  },
+  "McPherson": {
+   "rank": 83,
+   "state": "QLD",
+   "value": 983.0
+  },
+  "Melbourne": {
+   "rank": 19,
+   "state": "VIC",
+   "value": 1097.5
+  },
+  "Melbourne Ports": {
+   "rank": 10,
+   "state": "VIC",
+   "value": 1143.5
+  },
+  "Menzies": {
+   "rank": 18,
+   "state": "VIC",
+   "value": 1101.4
+  },
+  "Mitchell": {
+   "rank": 9,
+   "state": "NSW",
+   "value": 1145.3
+  },
+  "Moncrieff": {
+   "rank": 58,
+   "state": "QLD",
+   "value": 1004.3
+  },
+  "Moore": {
+   "rank": 30,
+   "state": "WA",
+   "value": 1064.1
+  },
+  "Moreton": {
+   "rank": 35,
+   "state": "QLD",
+   "value": 1053.5
+  },
+  "Murray": {
+   "rank": 125,
+   "state": "VIC",
+   "value": 943.8
+  },
+  "New England": {
+   "rank": 113,
+   "state": "NSW",
+   "value": 949.7
+  },
+  "Newcastle": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 989.8
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1203.6
+  },
+  "O'Connor": {
+   "rank": 123,
+   "state": "WA",
+   "value": 946.3
+  },
+  "Oxley": {
+   "rank": 124,
+   "state": "QLD",
+   "value": 945.0
+  },
+  "Page": {
+   "rank": 141,
+   "state": "NSW",
+   "value": 922.9
+  },
+  "Parkes": {
+   "rank": 131,
+   "state": "NSW",
+   "value": 940.4
+  },
+  "Parramatta": {
+   "rank": 36,
+   "state": "NSW",
+   "value": 1052.0
+  },
+  "Paterson": {
+   "rank": 132,
+   "state": "NSW",
+   "value": 937.8
+  },
+  "Pearce": {
+   "rank": 82,
+   "state": "WA",
+   "value": 983.9
+  },
+  "Perth": {
+   "rank": 50,
+   "state": "WA",
+   "value": 1015.3
+  },
+  "Petrie": {
+   "rank": 66,
+   "state": "QLD",
+   "value": 998.4
+  },
+  "Port Adelaide": {
+   "rank": 145,
+   "state": "SA",
+   "value": 910.8
+  },
+  "Prospect": {
+   "rank": 93,
+   "state": "NSW",
+   "value": 970.8
+  },
+  "Rankin": {
+   "rank": 127,
+   "state": "QLD",
+   "value": 942.2
+  },
+  "Reid": {
+   "rank": 116,
+   "state": "NSW",
+   "value": 948.8
+  },
+  "Richmond": {
+   "rank": 119,
+   "state": "NSW",
+   "value": 947.9
+  },
+  "Riverina": {
+   "rank": 103,
+   "state": "NSW",
+   "value": 959.2
+  },
+  "Robertson": {
+   "rank": 63,
+   "state": "NSW",
+   "value": 1001.8
+  },
+  "Ryan": {
+   "rank": 7,
+   "state": "QLD",
+   "value": 1150.7
+  },
+  "Scullin": {
+   "rank": 102,
+   "state": "VIC",
+   "value": 960.7
+  },
+  "Shortland": {
+   "rank": 120,
+   "state": "NSW",
+   "value": 947.8
+  },
+  "Solomon": {
+   "rank": 37,
+   "state": "NT",
+   "value": 1051.6
+  },
+  "Stirling": {
+   "rank": 56,
+   "state": "WA",
+   "value": 1005.2
+  },
+  "Sturt": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1039.0
+  },
+  "Swan": {
+   "rank": 48,
+   "state": "WA",
+   "value": 1018.1
+  },
+  "Sydney": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1139.6
+  },
+  "Tangney": {
+   "rank": 23,
+   "state": "WA",
+   "value": 1085.7
+  },
+  "Throsby": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 933.0
+  },
+  "Wakefield": {
+   "rank": 149,
+   "state": "SA",
+   "value": 895.8
+  },
+  "Wannon": {
+   "rank": 109,
+   "state": "VIC",
+   "value": 951.9
+  },
+  "Warringah": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1152.2
+  },
+  "Watson": {
+   "rank": 81,
+   "state": "NSW",
+   "value": 984.8
+  },
+  "Wentworth": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1181.9
+  },
+  "Werriwa": {
+   "rank": 85,
+   "state": "NSW",
+   "value": 978.6
+  },
+  "Wide Bay": {
+   "rank": 148,
+   "state": "QLD",
+   "value": 902.3
+  },
+  "Wills": {
+   "rank": 67,
+   "state": "VIC",
+   "value": 998.0
+  },
+  "_meta": {
+   "censusYear": 2001,
+   "derivation": "published",
+   "editionInForce": "2003",
+   "provName": "irsad-published-2001",
+   "sourceProduct": "APH Current Issues Brief no.1 2004-05 (2001 Census, 2003 boundaries) — Index of Relative Socio-Economic Advantage/Disadvantage table"
+  }
+ },
+ "2007": {
+  "Adelaide": {
+   "rank": 44,
+   "state": "SA",
+   "value": 1029.0
+  },
+  "Aston": {
+   "rank": 32,
+   "state": "VIC",
+   "value": 1057.0
+  },
+  "Ballarat": {
+   "rank": 106,
+   "state": "VIC",
+   "value": 966.0
+  },
+  "Banks": {
+   "rank": 61,
+   "state": "NSW",
+   "value": 1009.0
+  },
+  "Barker": {
+   "rank": 144,
+   "state": "SA",
+   "value": 919.0
+  },
+  "Barton": {
+   "rank": 34,
+   "state": "NSW",
+   "value": 1046.0
+  },
+  "Bass": {
+   "rank": 132,
+   "state": "TAS",
+   "value": 940.0
+  },
+  "Batman": {
+   "rank": 78,
+   "state": "VIC",
+   "value": 988.0
+  },
+  "Bendigo": {
+   "rank": 123,
+   "state": "VIC",
+   "value": 950.0
+  },
+  "Bennelong": {
+   "rank": 15,
+   "state": "NSW",
+   "value": 1104.0
+  },
+  "Berowra": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1155.0
+  },
+  "Blair": {
+   "rank": 130,
+   "state": "QLD",
+   "value": 942.0
+  },
+  "Blaxland": {
+   "rank": 142,
+   "state": "NSW",
+   "value": 924.0
+  },
+  "Bonner": {
+   "rank": 35,
+   "state": "QLD",
+   "value": 1046.0
+  },
+  "Boothby": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1034.0
+  },
+  "Bowman": {
+   "rank": 45,
+   "state": "QLD",
+   "value": 1028.0
+  },
+  "Braddon": {
+   "rank": 147,
+   "state": "TAS",
+   "value": 911.0
+  },
+  "Bradfield": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1182.0
+  },
+  "Brand": {
+   "rank": 101,
+   "state": "WA",
+   "value": 972.0
+  },
+  "Brisbane": {
+   "rank": 21,
+   "state": "QLD",
+   "value": 1092.0
+  },
+  "Bruce": {
+   "rank": 69,
+   "state": "VIC",
+   "value": 1000.0
+  },
+  "Calare": {
+   "rank": 133,
+   "state": "NSW",
+   "value": 937.0
+  },
+  "Calwell": {
+   "rank": 111,
+   "state": "VIC",
+   "value": 958.0
+  },
+  "Canberra": {
+   "rank": 16,
+   "state": "ACT",
+   "value": 1100.0
+  },
+  "Canning": {
+   "rank": 62,
+   "state": "WA",
+   "value": 1009.0
+  },
+  "Capricornia": {
+   "rank": 113,
+   "state": "QLD",
+   "value": 957.0
+  },
+  "Casey": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1023.0
+  },
+  "Charlton": {
+   "rank": 93,
+   "state": "NSW",
+   "value": 980.0
+  },
+  "Chifley": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 935.0
+  },
+  "Chisholm": {
+   "rank": 29,
+   "state": "VIC",
+   "value": 1067.0
+  },
+  "Cook": {
+   "rank": 18,
+   "state": "NSW",
+   "value": 1097.0
+  },
+  "Corangamite": {
+   "rank": 67,
+   "state": "VIC",
+   "value": 1005.0
+  },
+  "Corio": {
+   "rank": 117,
+   "state": "VIC",
+   "value": 953.0
+  },
+  "Cowan": {
+   "rank": 47,
+   "state": "WA",
+   "value": 1025.0
+  },
+  "Cowper": {
+   "rank": 138,
+   "state": "NSW",
+   "value": 929.0
+  },
+  "Cunningham": {
+   "rank": 52,
+   "state": "NSW",
+   "value": 1021.0
+  },
+  "Curtin": {
+   "rank": 10,
+   "state": "WA",
+   "value": 1129.0
+  },
+  "Dawson": {
+   "rank": 95,
+   "state": "QLD",
+   "value": 978.0
+  },
+  "Deakin": {
+   "rank": 37,
+   "state": "VIC",
+   "value": 1041.0
+  },
+  "Denison": {
+   "rank": 80,
+   "state": "TAS",
+   "value": 987.0
+  },
+  "Dickson": {
+   "rank": 36,
+   "state": "QLD",
+   "value": 1044.0
+  },
+  "Dobell": {
+   "rank": 89,
+   "state": "NSW",
+   "value": 981.0
+  },
+  "Dunkley": {
+   "rank": 68,
+   "state": "VIC",
+   "value": 1003.0
+  },
+  "Eden-Monaro": {
+   "rank": 84,
+   "state": "NSW",
+   "value": 983.0
+  },
+  "Fadden": {
+   "rank": 43,
+   "state": "QLD",
+   "value": 1030.0
+  },
+  "Fairfax": {
+   "rank": 60,
+   "state": "QLD",
+   "value": 1012.0
+  },
+  "Farrer": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 946.0
+  },
+  "Fisher": {
+   "rank": 74,
+   "state": "QLD",
+   "value": 994.0
+  },
+  "Flinders": {
+   "rank": 81,
+   "state": "VIC",
+   "value": 986.0
+  },
+  "Flynn": {
+   "rank": 112,
+   "state": "QLD",
+   "value": 958.0
+  },
+  "Forde": {
+   "rank": 85,
+   "state": "QLD",
+   "value": 982.0
+  },
+  "Forrest": {
+   "rank": 96,
+   "state": "WA",
+   "value": 978.0
+  },
+  "Fowler": {
+   "rank": 120,
+   "state": "NSW",
+   "value": 952.0
+  },
+  "Franklin": {
+   "rank": 107,
+   "state": "TAS",
+   "value": 965.0
+  },
+  "Fraser": {
+   "rank": 20,
+   "state": "ACT",
+   "value": 1094.0
+  },
+  "Fremantle": {
+   "rank": 50,
+   "state": "WA",
+   "value": 1022.0
+  },
+  "Gellibrand": {
+   "rank": 75,
+   "state": "VIC",
+   "value": 993.0
+  },
+  "Gilmore": {
+   "rank": 114,
+   "state": "NSW",
+   "value": 957.0
+  },
+  "Gippsland": {
+   "rank": 131,
+   "state": "VIC",
+   "value": 941.0
+  },
+  "Goldstein": {
+   "rank": 14,
+   "state": "VIC",
+   "value": 1117.0
+  },
+  "Gorton": {
+   "rank": 105,
+   "state": "VIC",
+   "value": 969.0
+  },
+  "Grayndler": {
+   "rank": 27,
+   "state": "NSW",
+   "value": 1072.0
+  },
+  "Greenway": {
+   "rank": 33,
+   "state": "NSW",
+   "value": 1050.0
+  },
+  "Grey": {
+   "rank": 149,
+   "state": "SA",
+   "value": 901.0
+  },
+  "Griffith": {
+   "rank": 28,
+   "state": "QLD",
+   "value": 1072.0
+  },
+  "Groom": {
+   "rank": 92,
+   "state": "QLD",
+   "value": 981.0
+  },
+  "Hasluck": {
+   "rank": 86,
+   "state": "WA",
+   "value": 982.0
+  },
+  "Herbert": {
+   "rank": 72,
+   "state": "QLD",
+   "value": 995.0
+  },
+  "Higgins": {
+   "rank": 11,
+   "state": "VIC",
+   "value": 1128.0
+  },
+  "Hindmarsh": {
+   "rank": 76,
+   "state": "SA",
+   "value": 992.0
+  },
+  "Hinkler": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 925.0
+  },
+  "Holt": {
+   "rank": 97,
+   "state": "VIC",
+   "value": 977.0
+  },
+  "Hotham": {
+   "rank": 64,
+   "state": "VIC",
+   "value": 1009.0
+  },
+  "Hughes": {
+   "rank": 24,
+   "state": "NSW",
+   "value": 1078.0
+  },
+  "Hume": {
+   "rank": 77,
+   "state": "NSW",
+   "value": 991.0
+  },
+  "Hunter": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 950.0
+  },
+  "Indi": {
+   "rank": 110,
+   "state": "VIC",
+   "value": 959.0
+  },
+  "Isaacs": {
+   "rank": 71,
+   "state": "VIC",
+   "value": 995.0
+  },
+  "Jagajaga": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1063.0
+  },
+  "Kalgoorlie": {
+   "rank": 104,
+   "state": "WA",
+   "value": 970.0
+  },
+  "Kennedy": {
+   "rank": 136,
+   "state": "QLD",
+   "value": 931.0
+  },
+  "Kingsford Smith": {
+   "rank": 26,
+   "state": "NSW",
+   "value": 1072.0
+  },
+  "Kingston": {
+   "rank": 116,
+   "state": "SA",
+   "value": 954.0
+  },
+  "Kooyong": {
+   "rank": 7,
+   "state": "VIC",
+   "value": 1141.0
+  },
+  "La Trobe": {
+   "rank": 40,
+   "state": "VIC",
+   "value": 1032.0
+  },
+  "Lalor": {
+   "rank": 79,
+   "state": "VIC",
+   "value": 987.0
+  },
+  "Leichhardt": {
+   "rank": 98,
+   "state": "QLD",
+   "value": 976.0
+  },
+  "Lilley": {
+   "rank": 46,
+   "state": "QLD",
+   "value": 1026.0
+  },
+  "Lindsay": {
+   "rank": 73,
+   "state": "NSW",
+   "value": 994.0
+  },
+  "Lingiari": {
+   "rank": 148,
+   "state": "NT",
+   "value": 903.0
+  },
+  "Longman": {
+   "rank": 115,
+   "state": "QLD",
+   "value": 955.0
+  },
+  "Lowe": {
+   "rank": 17,
+   "state": "NSW",
+   "value": 1097.0
+  },
+  "Lyne": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 946.0
+  },
+  "Lyons": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 913.0
+  },
+  "Macarthur": {
+   "rank": 58,
+   "state": "NSW",
+   "value": 1013.0
+  },
+  "Mackellar": {
+   "rank": 9,
+   "state": "NSW",
+   "value": 1134.0
+  },
+  "Macquarie": {
+   "rank": 55,
+   "state": "NSW",
+   "value": 1016.0
+  },
+  "Makin": {
+   "rank": 88,
+   "state": "SA",
+   "value": 981.0
+  },
+  "Mallee": {
+   "rank": 137,
+   "state": "VIC",
+   "value": 929.0
+  },
+  "Maranoa": {
+   "rank": 143,
+   "state": "QLD",
+   "value": 924.0
+  },
+  "Maribyrnong": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 983.0
+  },
+  "Mayo": {
+   "rank": 66,
+   "state": "SA",
+   "value": 1005.0
+  },
+  "McEwen": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1013.0
+  },
+  "McMillan": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 950.0
+  },
+  "McPherson": {
+   "rank": 41,
+   "state": "QLD",
+   "value": 1030.0
+  },
+  "Melbourne": {
+   "rank": 25,
+   "state": "VIC",
+   "value": 1073.0
+  },
+  "Melbourne Ports": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1117.0
+  },
+  "Menzies": {
+   "rank": 19,
+   "state": "VIC",
+   "value": 1097.0
+  },
+  "Mitchell": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1155.0
+  },
+  "Moncrieff": {
+   "rank": 42,
+   "state": "QLD",
+   "value": 1030.0
+  },
+  "Moore": {
+   "rank": 22,
+   "state": "WA",
+   "value": 1087.0
+  },
+  "Moreton": {
+   "rank": 31,
+   "state": "QLD",
+   "value": 1063.0
+  },
+  "Murray": {
+   "rank": 134,
+   "state": "VIC",
+   "value": 936.0
+  },
+  "New England": {
+   "rank": 129,
+   "state": "NSW",
+   "value": 943.0
+  },
+  "Newcastle": {
+   "rank": 82,
+   "state": "NSW",
+   "value": 985.0
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1176.0
+  },
+  "O'Connor": {
+   "rank": 118,
+   "state": "WA",
+   "value": 953.0
+  },
+  "Oxley": {
+   "rank": 90,
+   "state": "QLD",
+   "value": 981.0
+  },
+  "Page": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 929.0
+  },
+  "Parkes": {
+   "rank": 140,
+   "state": "NSW",
+   "value": 929.0
+  },
+  "Parramatta": {
+   "rank": 38,
+   "state": "NSW",
+   "value": 1036.0
+  },
+  "Paterson": {
+   "rank": 108,
+   "state": "NSW",
+   "value": 962.0
+  },
+  "Pearce": {
+   "rank": 65,
+   "state": "WA",
+   "value": 1008.0
+  },
+  "Perth": {
+   "rank": 53,
+   "state": "WA",
+   "value": 1019.0
+  },
+  "Petrie": {
+   "rank": 56,
+   "state": "QLD",
+   "value": 1016.0
+  },
+  "Port Adelaide": {
+   "rank": 145,
+   "state": "SA",
+   "value": 918.0
+  },
+  "Prospect": {
+   "rank": 91,
+   "state": "NSW",
+   "value": 981.0
+  },
+  "Rankin": {
+   "rank": 109,
+   "state": "QLD",
+   "value": 961.0
+  },
+  "Reid": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 973.0
+  },
+  "Richmond": {
+   "rank": 99,
+   "state": "NSW",
+   "value": 975.0
+  },
+  "Riverina": {
+   "rank": 119,
+   "state": "NSW",
+   "value": 953.0
+  },
+  "Robertson": {
+   "rank": 63,
+   "state": "NSW",
+   "value": 1009.0
+  },
+  "Ryan": {
+   "rank": 8,
+   "state": "QLD",
+   "value": 1139.0
+  },
+  "Scullin": {
+   "rank": 102,
+   "state": "VIC",
+   "value": 972.0
+  },
+  "Shortland": {
+   "rank": 103,
+   "state": "NSW",
+   "value": 971.0
+  },
+  "Solomon": {
+   "rank": 48,
+   "state": "NT",
+   "value": 1024.0
+  },
+  "Stirling": {
+   "rank": 57,
+   "state": "WA",
+   "value": 1016.0
+  },
+  "Sturt": {
+   "rank": 51,
+   "state": "SA",
+   "value": 1022.0
+  },
+  "Swan": {
+   "rank": 54,
+   "state": "WA",
+   "value": 1019.0
+  },
+  "Sydney": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1119.0
+  },
+  "Tangney": {
+   "rank": 23,
+   "state": "WA",
+   "value": 1085.0
+  },
+  "Throsby": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 951.0
+  },
+  "Wakefield": {
+   "rank": 150,
+   "state": "SA",
+   "value": 898.0
+  },
+  "Wannon": {
+   "rank": 128,
+   "state": "VIC",
+   "value": 945.0
+  },
+  "Warringah": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1163.0
+  },
+  "Watson": {
+   "rank": 87,
+   "state": "NSW",
+   "value": 982.0
+  },
+  "Wentworth": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1158.0
+  },
+  "Werriwa": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 980.0
+  },
+  "Wide Bay": {
+   "rank": 127,
+   "state": "QLD",
+   "value": 946.0
+  },
+  "Wills": {
+   "rank": 70,
+   "state": "VIC",
+   "value": 1000.0
+  },
+  "_meta": {
+   "censusYear": 2006,
+   "derivation": "published",
+   "editionInForce": "2006",
+   "provName": "irsad-published-2006",
+   "sourceProduct": "APH Research Paper no.2 2008-09, Table 2a — 2006 Census, 2006 boundaries"
+  }
+ },
+ "2010": {
+  "Adelaide": {
+   "rank": 42,
+   "state": "SA",
+   "value": 1028.8
+  },
+  "Aston": {
+   "rank": 31,
+   "state": "VIC",
+   "value": 1057.3
+  },
+  "Ballarat": {
+   "rank": 108,
+   "state": "VIC",
+   "value": 966.2
+  },
+  "Banks": {
+   "rank": 38,
+   "state": "NSW",
+   "value": 1037.8
+  },
+  "Barker": {
+   "rank": 143,
+   "state": "SA",
+   "value": 918.9
+  },
+  "Barton": {
+   "rank": 40,
+   "state": "NSW",
+   "value": 1032.0
+  },
+  "Bass": {
+   "rank": 132,
+   "state": "TAS",
+   "value": 940.2
+  },
+  "Batman": {
+   "rank": 78,
+   "state": "VIC",
+   "value": 988.4
+  },
+  "Bendigo": {
+   "rank": 123,
+   "state": "VIC",
+   "value": 949.9
+  },
+  "Bennelong": {
+   "rank": 15,
+   "state": "NSW",
+   "value": 1104.4
+  },
+  "Berowra": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1158.3
+  },
+  "Blair": {
+   "rank": 125,
+   "state": "QLD",
+   "value": 945.6
+  },
+  "Blaxland": {
+   "rank": 133,
+   "state": "NSW",
+   "value": 938.7
+  },
+  "Bonner": {
+   "rank": 34,
+   "state": "QLD",
+   "value": 1045.5
+  },
+  "Boothby": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1034.0
+  },
+  "Bowman": {
+   "rank": 43,
+   "state": "QLD",
+   "value": 1027.9
+  },
+  "Braddon": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 906.7
+  },
+  "Bradfield": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1183.7
+  },
+  "Brand": {
+   "rank": 91,
+   "state": "WA",
+   "value": 980.8
+  },
+  "Brisbane": {
+   "rank": 16,
+   "state": "QLD",
+   "value": 1102.0
+  },
+  "Bruce": {
+   "rank": 67,
+   "state": "VIC",
+   "value": 1000.4
+  },
+  "Calare": {
+   "rank": 117,
+   "state": "NSW",
+   "value": 954.7
+  },
+  "Calwell": {
+   "rank": 116,
+   "state": "VIC",
+   "value": 957.7
+  },
+  "Canberra": {
+   "rank": 18,
+   "state": "ACT",
+   "value": 1099.7
+  },
+  "Canning": {
+   "rank": 104,
+   "state": "WA",
+   "value": 971.5
+  },
+  "Capricornia": {
+   "rank": 110,
+   "state": "QLD",
+   "value": 962.6
+  },
+  "Casey": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1022.6
+  },
+  "Charlton": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 980.4
+  },
+  "Chifley": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 935.3
+  },
+  "Chisholm": {
+   "rank": 28,
+   "state": "VIC",
+   "value": 1067.4
+  },
+  "Cook": {
+   "rank": 19,
+   "state": "NSW",
+   "value": 1098.6
+  },
+  "Corangamite": {
+   "rank": 64,
+   "state": "VIC",
+   "value": 1005.2
+  },
+  "Corio": {
+   "rank": 120,
+   "state": "VIC",
+   "value": 952.5
+  },
+  "Cowan": {
+   "rank": 53,
+   "state": "WA",
+   "value": 1021.0
+  },
+  "Cowper": {
+   "rank": 137,
+   "state": "NSW",
+   "value": 929.0
+  },
+  "Cunningham": {
+   "rank": 48,
+   "state": "NSW",
+   "value": 1024.3
+  },
+  "Curtin": {
+   "rank": 11,
+   "state": "WA",
+   "value": 1127.7
+  },
+  "Dawson": {
+   "rank": 83,
+   "state": "QLD",
+   "value": 984.9
+  },
+  "Deakin": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1041.1
+  },
+  "Denison": {
+   "rank": 77,
+   "state": "TAS",
+   "value": 988.7
+  },
+  "Dickson": {
+   "rank": 32,
+   "state": "QLD",
+   "value": 1049.5
+  },
+  "Dobell": {
+   "rank": 89,
+   "state": "NSW",
+   "value": 981.1
+  },
+  "Dunkley": {
+   "rank": 66,
+   "state": "VIC",
+   "value": 1002.7
+  },
+  "Durack": {
+   "rank": 112,
+   "state": "WA",
+   "value": 961.9
+  },
+  "Eden-Monaro": {
+   "rank": 84,
+   "state": "NSW",
+   "value": 984.4
+  },
+  "Fadden": {
+   "rank": 44,
+   "state": "QLD",
+   "value": 1027.3
+  },
+  "Fairfax": {
+   "rank": 59,
+   "state": "QLD",
+   "value": 1011.9
+  },
+  "Farrer": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 945.4
+  },
+  "Fisher": {
+   "rank": 69,
+   "state": "QLD",
+   "value": 998.1
+  },
+  "Flinders": {
+   "rank": 82,
+   "state": "VIC",
+   "value": 985.7
+  },
+  "Flynn": {
+   "rank": 118,
+   "state": "QLD",
+   "value": 954.6
+  },
+  "Forde": {
+   "rank": 76,
+   "state": "QLD",
+   "value": 989.7
+  },
+  "Forrest": {
+   "rank": 87,
+   "state": "WA",
+   "value": 982.7
+  },
+  "Fowler": {
+   "rank": 145,
+   "state": "NSW",
+   "value": 917.3
+  },
+  "Franklin": {
+   "rank": 95,
+   "state": "TAS",
+   "value": 979.6
+  },
+  "Fraser": {
+   "rank": 21,
+   "state": "ACT",
+   "value": 1093.9
+  },
+  "Fremantle": {
+   "rank": 50,
+   "state": "WA",
+   "value": 1022.3
+  },
+  "Gellibrand": {
+   "rank": 72,
+   "state": "VIC",
+   "value": 992.9
+  },
+  "Gilmore": {
+   "rank": 106,
+   "state": "NSW",
+   "value": 969.1
+  },
+  "Gippsland": {
+   "rank": 131,
+   "state": "VIC",
+   "value": 940.9
+  },
+  "Goldstein": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1117.3
+  },
+  "Gorton": {
+   "rank": 107,
+   "state": "VIC",
+   "value": 969.1
+  },
+  "Grayndler": {
+   "rank": 26,
+   "state": "NSW",
+   "value": 1071.9
+  },
+  "Greenway": {
+   "rank": 37,
+   "state": "NSW",
+   "value": 1041.0
+  },
+  "Grey": {
+   "rank": 149,
+   "state": "SA",
+   "value": 901.4
+  },
+  "Griffith": {
+   "rank": 25,
+   "state": "QLD",
+   "value": 1072.4
+  },
+  "Groom": {
+   "rank": 90,
+   "state": "QLD",
+   "value": 981.1
+  },
+  "Hasluck": {
+   "rank": 79,
+   "state": "WA",
+   "value": 988.4
+  },
+  "Herbert": {
+   "rank": 80,
+   "state": "QLD",
+   "value": 986.8
+  },
+  "Higgins": {
+   "rank": 10,
+   "state": "VIC",
+   "value": 1128.2
+  },
+  "Hindmarsh": {
+   "rank": 74,
+   "state": "SA",
+   "value": 992.3
+  },
+  "Hinkler": {
+   "rank": 142,
+   "state": "QLD",
+   "value": 925.4
+  },
+  "Holt": {
+   "rank": 99,
+   "state": "VIC",
+   "value": 976.8
+  },
+  "Hotham": {
+   "rank": 62,
+   "state": "VIC",
+   "value": 1009.1
+  },
+  "Hughes": {
+   "rank": 23,
+   "state": "NSW",
+   "value": 1074.0
+  },
+  "Hume": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 974.8
+  },
+  "Hunter": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 949.9
+  },
+  "Indi": {
+   "rank": 114,
+   "state": "VIC",
+   "value": 959.1
+  },
+  "Isaacs": {
+   "rank": 70,
+   "state": "VIC",
+   "value": 995.0
+  },
+  "Jagajaga": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1063.4
+  },
+  "Kennedy": {
+   "rank": 136,
+   "state": "QLD",
+   "value": 930.0
+  },
+  "Kingsford Smith": {
+   "rank": 27,
+   "state": "NSW",
+   "value": 1070.7
+  },
+  "Kingston": {
+   "rank": 119,
+   "state": "SA",
+   "value": 954.4
+  },
+  "Kooyong": {
+   "rank": 7,
+   "state": "VIC",
+   "value": 1141.3
+  },
+  "La Trobe": {
+   "rank": 41,
+   "state": "VIC",
+   "value": 1031.8
+  },
+  "Lalor": {
+   "rank": 81,
+   "state": "VIC",
+   "value": 986.6
+  },
+  "Leichhardt": {
+   "rank": 98,
+   "state": "QLD",
+   "value": 976.8
+  },
+  "Lilley": {
+   "rank": 52,
+   "state": "QLD",
+   "value": 1021.0
+  },
+  "Lindsay": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 993.8
+  },
+  "Lingiari": {
+   "rank": 147,
+   "state": "NT",
+   "value": 903.2
+  },
+  "Longman": {
+   "rank": 109,
+   "state": "QLD",
+   "value": 965.4
+  },
+  "Lyne": {
+   "rank": 127,
+   "state": "NSW",
+   "value": 944.8
+  },
+  "Lyons": {
+   "rank": 148,
+   "state": "TAS",
+   "value": 902.3
+  },
+  "Macarthur": {
+   "rank": 60,
+   "state": "NSW",
+   "value": 1010.8
+  },
+  "Mackellar": {
+   "rank": 8,
+   "state": "NSW",
+   "value": 1134.7
+  },
+  "Macquarie": {
+   "rank": 35,
+   "state": "NSW",
+   "value": 1043.4
+  },
+  "Makin": {
+   "rank": 92,
+   "state": "SA",
+   "value": 980.6
+  },
+  "Mallee": {
+   "rank": 138,
+   "state": "VIC",
+   "value": 928.9
+  },
+  "Maranoa": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 925.9
+  },
+  "Maribyrnong": {
+   "rank": 88,
+   "state": "VIC",
+   "value": 982.5
+  },
+  "Mayo": {
+   "rank": 65,
+   "state": "SA",
+   "value": 1005.0
+  },
+  "McEwen": {
+   "rank": 58,
+   "state": "VIC",
+   "value": 1012.9
+  },
+  "McMahon": {
+   "rank": 86,
+   "state": "NSW",
+   "value": 983.0
+  },
+  "McMillan": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 949.5
+  },
+  "McPherson": {
+   "rank": 45,
+   "state": "QLD",
+   "value": 1027.0
+  },
+  "Melbourne": {
+   "rank": 24,
+   "state": "VIC",
+   "value": 1072.6
+  },
+  "Melbourne Ports": {
+   "rank": 14,
+   "state": "VIC",
+   "value": 1117.1
+  },
+  "Menzies": {
+   "rank": 20,
+   "state": "VIC",
+   "value": 1097.1
+  },
+  "Mitchell": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1149.9
+  },
+  "Moncrieff": {
+   "rank": 46,
+   "state": "QLD",
+   "value": 1025.5
+  },
+  "Moore": {
+   "rank": 22,
+   "state": "WA",
+   "value": 1082.1
+  },
+  "Moreton": {
+   "rank": 33,
+   "state": "QLD",
+   "value": 1049.3
+  },
+  "Murray": {
+   "rank": 134,
+   "state": "VIC",
+   "value": 936.0
+  },
+  "New England": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 940.9
+  },
+  "Newcastle": {
+   "rank": 85,
+   "state": "NSW",
+   "value": 983.6
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1171.2
+  },
+  "O'Connor": {
+   "rank": 115,
+   "state": "WA",
+   "value": 957.8
+  },
+  "Oxley": {
+   "rank": 73,
+   "state": "QLD",
+   "value": 992.6
+  },
+  "Page": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 928.6
+  },
+  "Parkes": {
+   "rank": 140,
+   "state": "NSW",
+   "value": 928.3
+  },
+  "Parramatta": {
+   "rank": 55,
+   "state": "NSW",
+   "value": 1016.9
+  },
+  "Paterson": {
+   "rank": 111,
+   "state": "NSW",
+   "value": 962.4
+  },
+  "Pearce": {
+   "rank": 61,
+   "state": "WA",
+   "value": 1009.3
+  },
+  "Perth": {
+   "rank": 54,
+   "state": "WA",
+   "value": 1019.0
+  },
+  "Petrie": {
+   "rank": 93,
+   "state": "QLD",
+   "value": 980.5
+  },
+  "Port Adelaide": {
+   "rank": 144,
+   "state": "SA",
+   "value": 917.8
+  },
+  "Rankin": {
+   "rank": 102,
+   "state": "QLD",
+   "value": 972.6
+  },
+  "Reid": {
+   "rank": 29,
+   "state": "NSW",
+   "value": 1064.7
+  },
+  "Richmond": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 974.5
+  },
+  "Riverina": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 952.1
+  },
+  "Robertson": {
+   "rank": 63,
+   "state": "NSW",
+   "value": 1008.9
+  },
+  "Ryan": {
+   "rank": 9,
+   "state": "QLD",
+   "value": 1129.1
+  },
+  "Scullin": {
+   "rank": 103,
+   "state": "VIC",
+   "value": 972.2
+  },
+  "Shortland": {
+   "rank": 105,
+   "state": "NSW",
+   "value": 970.7
+  },
+  "Solomon": {
+   "rank": 47,
+   "state": "NT",
+   "value": 1024.4
+  },
+  "Stirling": {
+   "rank": 56,
+   "state": "WA",
+   "value": 1014.3
+  },
+  "Sturt": {
+   "rank": 51,
+   "state": "SA",
+   "value": 1021.7
+  },
+  "Swan": {
+   "rank": 57,
+   "state": "WA",
+   "value": 1013.7
+  },
+  "Sydney": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1118.0
+  },
+  "Tangney": {
+   "rank": 17,
+   "state": "WA",
+   "value": 1100.0
+  },
+  "Throsby": {
+   "rank": 113,
+   "state": "NSW",
+   "value": 959.2
+  },
+  "Wakefield": {
+   "rank": 150,
+   "state": "SA",
+   "value": 898.0
+  },
+  "Wannon": {
+   "rank": 128,
+   "state": "VIC",
+   "value": 944.5
+  },
+  "Warringah": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1162.2
+  },
+  "Watson": {
+   "rank": 97,
+   "state": "NSW",
+   "value": 977.0
+  },
+  "Wentworth": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1158.1
+  },
+  "Werriwa": {
+   "rank": 96,
+   "state": "NSW",
+   "value": 977.1
+  },
+  "Wide Bay": {
+   "rank": 129,
+   "state": "QLD",
+   "value": 942.4
+  },
+  "Wills": {
+   "rank": 68,
+   "state": "VIC",
+   "value": 999.6
+  },
+  "Wright": {
+   "rank": 75,
+   "state": "QLD",
+   "value": 992.3
+  },
+  "_meta": {
+   "censusYear": 2006,
+   "derivation": "published",
+   "editionInForce": "2009",
+   "provName": "irsad-published-2006",
+   "sourceProduct": "APH Research Paper no.1 2010-11, Table 2a — 2006 Census, 2009 boundaries"
+  }
+ },
+ "2013": {
+  "Adelaide": {
+   "rank": 55,
+   "state": "SA",
+   "value": 1015.9
+  },
+  "Aston": {
+   "rank": 24,
+   "state": "VIC",
+   "value": 1056.5
+  },
+  "Ballarat": {
+   "rank": 100,
+   "state": "VIC",
+   "value": 976.0
+  },
+  "Banks": {
+   "rank": 57,
+   "state": "NSW",
+   "value": 1011.4
+  },
+  "Barker": {
+   "rank": 138,
+   "state": "SA",
+   "value": 934.3
+  },
+  "Barton": {
+   "rank": 59,
+   "state": "NSW",
+   "value": 1009.8
+  },
+  "Bass": {
+   "rank": 132,
+   "state": "TAS",
+   "value": 940.4
+  },
+  "Batman": {
+   "rank": 76,
+   "state": "VIC",
+   "value": 994.8
+  },
+  "Bendigo": {
+   "rank": 117,
+   "state": "VIC",
+   "value": 961.7
+  },
+  "Bennelong": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1071.9
+  },
+  "Berowra": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1124.4
+  },
+  "Blair": {
+   "rank": 125,
+   "state": "QLD",
+   "value": 949.3
+  },
+  "Blaxland": {
+   "rank": 147,
+   "state": "NSW",
+   "value": 903.0
+  },
+  "Bonner": {
+   "rank": 29,
+   "state": "QLD",
+   "value": 1047.8
+  },
+  "Boothby": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1037.4
+  },
+  "Bowman": {
+   "rank": 42,
+   "state": "QLD",
+   "value": 1030.5
+  },
+  "Braddon": {
+   "rank": 144,
+   "state": "TAS",
+   "value": 916.3
+  },
+  "Bradfield": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1133.2
+  },
+  "Brand": {
+   "rank": 69,
+   "state": "WA",
+   "value": 998.8
+  },
+  "Brisbane": {
+   "rank": 18,
+   "state": "QLD",
+   "value": 1084.0
+  },
+  "Bruce": {
+   "rank": 89,
+   "state": "VIC",
+   "value": 986.0
+  },
+  "Calare": {
+   "rank": 115,
+   "state": "NSW",
+   "value": 962.7
+  },
+  "Calwell": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 950.3
+  },
+  "Canberra": {
+   "rank": 16,
+   "state": "ACT",
+   "value": 1088.5
+  },
+  "Canning": {
+   "rank": 84,
+   "state": "WA",
+   "value": 989.8
+  },
+  "Capricornia": {
+   "rank": 92,
+   "state": "QLD",
+   "value": 983.8
+  },
+  "Casey": {
+   "rank": 43,
+   "state": "VIC",
+   "value": 1029.3
+  },
+  "Charlton": {
+   "rank": 93,
+   "state": "NSW",
+   "value": 982.8
+  },
+  "Chifley": {
+   "rank": 143,
+   "state": "NSW",
+   "value": 916.9
+  },
+  "Chisholm": {
+   "rank": 28,
+   "state": "VIC",
+   "value": 1051.9
+  },
+  "Cook": {
+   "rank": 20,
+   "state": "NSW",
+   "value": 1075.6
+  },
+  "Corangamite": {
+   "rank": 54,
+   "state": "VIC",
+   "value": 1018.5
+  },
+  "Corio": {
+   "rank": 122,
+   "state": "VIC",
+   "value": 953.8
+  },
+  "Cowan": {
+   "rank": 32,
+   "state": "WA",
+   "value": 1041.5
+  },
+  "Cowper": {
+   "rank": 141,
+   "state": "NSW",
+   "value": 922.3
+  },
+  "Cunningham": {
+   "rank": 58,
+   "state": "NSW",
+   "value": 1011.2
+  },
+  "Curtin": {
+   "rank": 7,
+   "state": "WA",
+   "value": 1111.9
+  },
+  "Dawson": {
+   "rank": 70,
+   "state": "QLD",
+   "value": 998.6
+  },
+  "Deakin": {
+   "rank": 33,
+   "state": "VIC",
+   "value": 1040.3
+  },
+  "Denison": {
+   "rank": 97,
+   "state": "TAS",
+   "value": 980.5
+  },
+  "Dickson": {
+   "rank": 27,
+   "state": "QLD",
+   "value": 1054.7
+  },
+  "Dobell": {
+   "rank": 105,
+   "state": "NSW",
+   "value": 968.7
+  },
+  "Dunkley": {
+   "rank": 65,
+   "state": "VIC",
+   "value": 1001.6
+  },
+  "Durack": {
+   "rank": 103,
+   "state": "WA",
+   "value": 969.9
+  },
+  "Eden-Monaro": {
+   "rank": 79,
+   "state": "NSW",
+   "value": 991.1
+  },
+  "Fadden": {
+   "rank": 53,
+   "state": "QLD",
+   "value": 1020.2
+  },
+  "Fairfax": {
+   "rank": 60,
+   "state": "QLD",
+   "value": 1007.4
+  },
+  "Farrer": {
+   "rank": 127,
+   "state": "NSW",
+   "value": 947.5
+  },
+  "Fisher": {
+   "rank": 72,
+   "state": "QLD",
+   "value": 997.2
+  },
+  "Flinders": {
+   "rank": 77,
+   "state": "VIC",
+   "value": 993.0
+  },
+  "Flynn": {
+   "rank": 95,
+   "state": "QLD",
+   "value": 981.1
+  },
+  "Forde": {
+   "rank": 87,
+   "state": "QLD",
+   "value": 987.8
+  },
+  "Forrest": {
+   "rank": 73,
+   "state": "WA",
+   "value": 996.9
+  },
+  "Fowler": {
+   "rank": 149,
+   "state": "NSW",
+   "value": 882.4
+  },
+  "Franklin": {
+   "rank": 86,
+   "state": "TAS",
+   "value": 988.9
+  },
+  "Fraser": {
+   "rank": 14,
+   "state": "ACT",
+   "value": 1091.0
+  },
+  "Fremantle": {
+   "rank": 31,
+   "state": "WA",
+   "value": 1041.6
+  },
+  "Gellibrand": {
+   "rank": 74,
+   "state": "VIC",
+   "value": 996.7
+  },
+  "Gilmore": {
+   "rank": 107,
+   "state": "NSW",
+   "value": 967.8
+  },
+  "Gippsland": {
+   "rank": 126,
+   "state": "VIC",
+   "value": 948.4
+  },
+  "Goldstein": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1097.1
+  },
+  "Gorton": {
+   "rank": 99,
+   "state": "VIC",
+   "value": 976.4
+  },
+  "Grayndler": {
+   "rank": 30,
+   "state": "NSW",
+   "value": 1044.8
+  },
+  "Greenway": {
+   "rank": 37,
+   "state": "NSW",
+   "value": 1038.0
+  },
+  "Grey": {
+   "rank": 142,
+   "state": "SA",
+   "value": 920.6
+  },
+  "Griffith": {
+   "rank": 22,
+   "state": "QLD",
+   "value": 1069.2
+  },
+  "Groom": {
+   "rank": 91,
+   "state": "QLD",
+   "value": 984.5
+  },
+  "Hasluck": {
+   "rank": 61,
+   "state": "WA",
+   "value": 1005.7
+  },
+  "Herbert": {
+   "rank": 80,
+   "state": "QLD",
+   "value": 990.1
+  },
+  "Higgins": {
+   "rank": 12,
+   "state": "VIC",
+   "value": 1099.0
+  },
+  "Hindmarsh": {
+   "rank": 66,
+   "state": "SA",
+   "value": 1001.1
+  },
+  "Hinkler": {
+   "rank": 146,
+   "state": "QLD",
+   "value": 915.2
+  },
+  "Holt": {
+   "rank": 96,
+   "state": "VIC",
+   "value": 980.8
+  },
+  "Hotham": {
+   "rank": 62,
+   "state": "VIC",
+   "value": 1005.7
+  },
+  "Hughes": {
+   "rank": 26,
+   "state": "NSW",
+   "value": 1054.7
+  },
+  "Hume": {
+   "rank": 90,
+   "state": "NSW",
+   "value": 985.7
+  },
+  "Hunter": {
+   "rank": 120,
+   "state": "NSW",
+   "value": 959.8
+  },
+  "Indi": {
+   "rank": 106,
+   "state": "VIC",
+   "value": 968.5
+  },
+  "Isaacs": {
+   "rank": 68,
+   "state": "VIC",
+   "value": 999.5
+  },
+  "Jagajaga": {
+   "rank": 25,
+   "state": "VIC",
+   "value": 1055.6
+  },
+  "Kennedy": {
+   "rank": 137,
+   "state": "QLD",
+   "value": 934.4
+  },
+  "Kingsford Smith": {
+   "rank": 36,
+   "state": "NSW",
+   "value": 1038.6
+  },
+  "Kingston": {
+   "rank": 111,
+   "state": "SA",
+   "value": 965.3
+  },
+  "Kooyong": {
+   "rank": 6,
+   "state": "VIC",
+   "value": 1113.1
+  },
+  "La Trobe": {
+   "rank": 35,
+   "state": "VIC",
+   "value": 1039.3
+  },
+  "Lalor": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 989.8
+  },
+  "Leichhardt": {
+   "rank": 121,
+   "state": "QLD",
+   "value": 953.9
+  },
+  "Lilley": {
+   "rank": 45,
+   "state": "QLD",
+   "value": 1028.8
+  },
+  "Lindsay": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 982.1
+  },
+  "Lingiari": {
+   "rank": 150,
+   "state": "NT",
+   "value": 864.1
+  },
+  "Longman": {
+   "rank": 109,
+   "state": "QLD",
+   "value": 966.3
+  },
+  "Lyne": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 937.4
+  },
+  "Lyons": {
+   "rank": 145,
+   "state": "TAS",
+   "value": 915.9
+  },
+  "Macarthur": {
+   "rank": 67,
+   "state": "NSW",
+   "value": 1001.1
+  },
+  "Mackellar": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1100.3
+  },
+  "Macquarie": {
+   "rank": 46,
+   "state": "NSW",
+   "value": 1028.7
+  },
+  "Makin": {
+   "rank": 82,
+   "state": "SA",
+   "value": 989.8
+  },
+  "Mallee": {
+   "rank": 133,
+   "state": "VIC",
+   "value": 939.3
+  },
+  "Maranoa": {
+   "rank": 128,
+   "state": "QLD",
+   "value": 946.1
+  },
+  "Maribyrnong": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 978.8
+  },
+  "Mayo": {
+   "rank": 50,
+   "state": "SA",
+   "value": 1021.3
+  },
+  "McEwen": {
+   "rank": 47,
+   "state": "VIC",
+   "value": 1028.2
+  },
+  "McMahon": {
+   "rank": 119,
+   "state": "NSW",
+   "value": 960.4
+  },
+  "McMillan": {
+   "rank": 108,
+   "state": "VIC",
+   "value": 967.2
+  },
+  "McPherson": {
+   "rank": 56,
+   "state": "QLD",
+   "value": 1013.6
+  },
+  "Melbourne": {
+   "rank": 41,
+   "state": "VIC",
+   "value": 1031.1
+  },
+  "Melbourne Ports": {
+   "rank": 17,
+   "state": "VIC",
+   "value": 1085.4
+  },
+  "Menzies": {
+   "rank": 19,
+   "state": "VIC",
+   "value": 1082.8
+  },
+  "Mitchell": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1125.5
+  },
+  "Moncrieff": {
+   "rank": 71,
+   "state": "QLD",
+   "value": 998.1
+  },
+  "Moore": {
+   "rank": 15,
+   "state": "WA",
+   "value": 1089.3
+  },
+  "Moreton": {
+   "rank": 34,
+   "state": "QLD",
+   "value": 1039.5
+  },
+  "Murray": {
+   "rank": 131,
+   "state": "VIC",
+   "value": 941.2
+  },
+  "New England": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 944.3
+  },
+  "Newcastle": {
+   "rank": 88,
+   "state": "NSW",
+   "value": 986.8
+  },
+  "North Sydney": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1118.8
+  },
+  "O'Connor": {
+   "rank": 102,
+   "state": "WA",
+   "value": 973.3
+  },
+  "Oxley": {
+   "rank": 81,
+   "state": "QLD",
+   "value": 989.9
+  },
+  "Page": {
+   "rank": 140,
+   "state": "NSW",
+   "value": 923.0
+  },
+  "Parkes": {
+   "rank": 136,
+   "state": "NSW",
+   "value": 934.8
+  },
+  "Parramatta": {
+   "rank": 78,
+   "state": "NSW",
+   "value": 992.4
+  },
+  "Paterson": {
+   "rank": 116,
+   "state": "NSW",
+   "value": 961.8
+  },
+  "Pearce": {
+   "rank": 40,
+   "state": "WA",
+   "value": 1031.5
+  },
+  "Perth": {
+   "rank": 48,
+   "state": "WA",
+   "value": 1028.2
+  },
+  "Petrie": {
+   "rank": 85,
+   "state": "QLD",
+   "value": 988.9
+  },
+  "Port Adelaide": {
+   "rank": 139,
+   "state": "SA",
+   "value": 928.8
+  },
+  "Rankin": {
+   "rank": 104,
+   "state": "QLD",
+   "value": 969.5
+  },
+  "Reid": {
+   "rank": 44,
+   "state": "NSW",
+   "value": 1028.9
+  },
+  "Richmond": {
+   "rank": 113,
+   "state": "NSW",
+   "value": 964.2
+  },
+  "Riverina": {
+   "rank": 118,
+   "state": "NSW",
+   "value": 960.5
+  },
+  "Robertson": {
+   "rank": 75,
+   "state": "NSW",
+   "value": 996.2
+  },
+  "Ryan": {
+   "rank": 8,
+   "state": "QLD",
+   "value": 1109.5
+  },
+  "Scullin": {
+   "rank": 101,
+   "state": "VIC",
+   "value": 974.2
+  },
+  "Shortland": {
+   "rank": 110,
+   "state": "NSW",
+   "value": 965.8
+  },
+  "Solomon": {
+   "rank": 38,
+   "state": "NT",
+   "value": 1038.0
+  },
+  "Stirling": {
+   "rank": 49,
+   "state": "WA",
+   "value": 1024.8
+  },
+  "Sturt": {
+   "rank": 51,
+   "state": "SA",
+   "value": 1020.8
+  },
+  "Swan": {
+   "rank": 52,
+   "state": "WA",
+   "value": 1020.3
+  },
+  "Sydney": {
+   "rank": 23,
+   "state": "NSW",
+   "value": 1059.1
+  },
+  "Tangney": {
+   "rank": 10,
+   "state": "WA",
+   "value": 1100.7
+  },
+  "Throsby": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 953.8
+  },
+  "Wakefield": {
+   "rank": 148,
+   "state": "SA",
+   "value": 902.3
+  },
+  "Wannon": {
+   "rank": 114,
+   "state": "VIC",
+   "value": 963.6
+  },
+  "Warringah": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1118.6
+  },
+  "Watson": {
+   "rank": 129,
+   "state": "NSW",
+   "value": 946.1
+  },
+  "Wentworth": {
+   "rank": 9,
+   "state": "NSW",
+   "value": 1106.7
+  },
+  "Werriwa": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 965.0
+  },
+  "Wide Bay": {
+   "rank": 134,
+   "state": "QLD",
+   "value": 937.8
+  },
+  "Wills": {
+   "rank": 64,
+   "state": "VIC",
+   "value": 1002.5
+  },
+  "Wright": {
+   "rank": 63,
+   "state": "QLD",
+   "value": 1003.4
+  },
+  "_meta": {
+   "censusYear": 2011,
+   "derivation": "weighted",
+   "editionInForce": "2010",
+   "provName": "irsad-weighted-2011",
+   "sourceProduct": "ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations (ABS 2039.0 §2.2 weighted derivation)"
+  }
+ },
+ "2016": {
+  "Adelaide": {
+   "rank": 43,
+   "state": "SA",
+   "value": 1030.4
+  },
+  "Aston": {
+   "rank": 42,
+   "state": "VIC",
+   "value": 1035.2
+  },
+  "Ballarat": {
+   "rank": 95,
+   "state": "VIC",
+   "value": 973.1
+  },
+  "Banks": {
+   "rank": 46,
+   "state": "NSW",
+   "value": 1027.0
+  },
+  "Barker": {
+   "rank": 142,
+   "state": "SA",
+   "value": 923.2
+  },
+  "Barton": {
+   "rank": 48,
+   "state": "NSW",
+   "value": 1025.1
+  },
+  "Bass": {
+   "rank": 136,
+   "state": "TAS",
+   "value": 932.1
+  },
+  "Batman": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1024.6
+  },
+  "Bendigo": {
+   "rank": 93,
+   "state": "VIC",
+   "value": 974.0
+  },
+  "Bennelong": {
+   "rank": 17,
+   "state": "NSW",
+   "value": 1090.0
+  },
+  "Berowra": {
+   "rank": 7,
+   "state": "NSW",
+   "value": 1124.2
+  },
+  "Blair": {
+   "rank": 131,
+   "state": "QLD",
+   "value": 935.4
+  },
+  "Blaxland": {
+   "rank": 140,
+   "state": "NSW",
+   "value": 927.4
+  },
+  "Bonner": {
+   "rank": 33,
+   "state": "QLD",
+   "value": 1049.8
+  },
+  "Boothby": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1037.9
+  },
+  "Bowman": {
+   "rank": 55,
+   "state": "QLD",
+   "value": 1015.2
+  },
+  "Braddon": {
+   "rank": 147,
+   "state": "TAS",
+   "value": 903.7
+  },
+  "Bradfield": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1147.4
+  },
+  "Brand": {
+   "rank": 89,
+   "state": "WA",
+   "value": 980.1
+  },
+  "Brisbane": {
+   "rank": 15,
+   "state": "QLD",
+   "value": 1098.0
+  },
+  "Bruce": {
+   "rank": 77,
+   "state": "VIC",
+   "value": 992.4
+  },
+  "Burt": {
+   "rank": 79,
+   "state": "WA",
+   "value": 990.1
+  },
+  "Calare": {
+   "rank": 113,
+   "state": "NSW",
+   "value": 956.0
+  },
+  "Calwell": {
+   "rank": 127,
+   "state": "VIC",
+   "value": 941.3
+  },
+  "Canberra": {
+   "rank": 18,
+   "state": "ACT",
+   "value": 1090.0
+  },
+  "Canning": {
+   "rank": 91,
+   "state": "WA",
+   "value": 978.2
+  },
+  "Capricornia": {
+   "rank": 110,
+   "state": "QLD",
+   "value": 959.4
+  },
+  "Casey": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1009.1
+  },
+  "Chifley": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 937.3
+  },
+  "Chisholm": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1056.4
+  },
+  "Cook": {
+   "rank": 26,
+   "state": "NSW",
+   "value": 1076.7
+  },
+  "Corangamite": {
+   "rank": 51,
+   "state": "VIC",
+   "value": 1022.5
+  },
+  "Corio": {
+   "rank": 116,
+   "state": "VIC",
+   "value": 951.3
+  },
+  "Cowan": {
+   "rank": 73,
+   "state": "WA",
+   "value": 1000.5
+  },
+  "Cowper": {
+   "rank": 132,
+   "state": "NSW",
+   "value": 935.0
+  },
+  "Cunningham": {
+   "rank": 64,
+   "state": "NSW",
+   "value": 1006.2
+  },
+  "Curtin": {
+   "rank": 8,
+   "state": "WA",
+   "value": 1121.4
+  },
+  "Dawson": {
+   "rank": 101,
+   "state": "QLD",
+   "value": 966.8
+  },
+  "Deakin": {
+   "rank": 35,
+   "state": "VIC",
+   "value": 1046.6
+  },
+  "Denison": {
+   "rank": 87,
+   "state": "TAS",
+   "value": 980.9
+  },
+  "Dickson": {
+   "rank": 41,
+   "state": "QLD",
+   "value": 1035.7
+  },
+  "Dobell": {
+   "rank": 108,
+   "state": "NSW",
+   "value": 961.3
+  },
+  "Dunkley": {
+   "rank": 72,
+   "state": "VIC",
+   "value": 1002.0
+  },
+  "Durack": {
+   "rank": 107,
+   "state": "WA",
+   "value": 962.0
+  },
+  "Eden-Monaro": {
+   "rank": 65,
+   "state": "NSW",
+   "value": 1005.0
+  },
+  "Fadden": {
+   "rank": 68,
+   "state": "QLD",
+   "value": 1003.2
+  },
+  "Fairfax": {
+   "rank": 66,
+   "state": "QLD",
+   "value": 1004.8
+  },
+  "Farrer": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 948.0
+  },
+  "Fenner": {
+   "rank": 19,
+   "state": "ACT",
+   "value": 1087.4
+  },
+  "Fisher": {
+   "rank": 76,
+   "state": "QLD",
+   "value": 992.5
+  },
+  "Flinders": {
+   "rank": 78,
+   "state": "VIC",
+   "value": 992.4
+  },
+  "Flynn": {
+   "rank": 118,
+   "state": "QLD",
+   "value": 949.1
+  },
+  "Forde": {
+   "rank": 99,
+   "state": "QLD",
+   "value": 967.7
+  },
+  "Forrest": {
+   "rank": 88,
+   "state": "WA",
+   "value": 980.9
+  },
+  "Fowler": {
+   "rank": 148,
+   "state": "NSW",
+   "value": 900.7
+  },
+  "Franklin": {
+   "rank": 82,
+   "state": "TAS",
+   "value": 984.9
+  },
+  "Fremantle": {
+   "rank": 37,
+   "state": "WA",
+   "value": 1039.5
+  },
+  "Gellibrand": {
+   "rank": 63,
+   "state": "VIC",
+   "value": 1006.3
+  },
+  "Gilmore": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 959.0
+  },
+  "Gippsland": {
+   "rank": 128,
+   "state": "VIC",
+   "value": 939.0
+  },
+  "Goldstein": {
+   "rank": 10,
+   "state": "VIC",
+   "value": 1115.5
+  },
+  "Gorton": {
+   "rank": 102,
+   "state": "VIC",
+   "value": 965.8
+  },
+  "Grayndler": {
+   "rank": 14,
+   "state": "NSW",
+   "value": 1105.1
+  },
+  "Greenway": {
+   "rank": 34,
+   "state": "NSW",
+   "value": 1049.3
+  },
+  "Grey": {
+   "rank": 144,
+   "state": "SA",
+   "value": 910.0
+  },
+  "Griffith": {
+   "rank": 20,
+   "state": "QLD",
+   "value": 1087.2
+  },
+  "Groom": {
+   "rank": 92,
+   "state": "QLD",
+   "value": 977.6
+  },
+  "Hasluck": {
+   "rank": 69,
+   "state": "WA",
+   "value": 1003.2
+  },
+  "Herbert": {
+   "rank": 105,
+   "state": "QLD",
+   "value": 964.4
+  },
+  "Higgins": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1115.9
+  },
+  "Hindmarsh": {
+   "rank": 67,
+   "state": "SA",
+   "value": 1003.9
+  },
+  "Hinkler": {
+   "rank": 145,
+   "state": "QLD",
+   "value": 909.3
+  },
+  "Holt": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 968.2
+  },
+  "Hotham": {
+   "rank": 62,
+   "state": "VIC",
+   "value": 1007.3
+  },
+  "Hughes": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1087.1
+  },
+  "Hume": {
+   "rank": 56,
+   "state": "NSW",
+   "value": 1012.9
+  },
+  "Hunter": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 946.8
+  },
+  "Indi": {
+   "rank": 104,
+   "state": "VIC",
+   "value": 965.3
+  },
+  "Isaacs": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1011.6
+  },
+  "Jagajaga": {
+   "rank": 28,
+   "state": "VIC",
+   "value": 1068.0
+  },
+  "Kennedy": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 924.7
+  },
+  "Kingsford Smith": {
+   "rank": 27,
+   "state": "NSW",
+   "value": 1073.9
+  },
+  "Kingston": {
+   "rank": 121,
+   "state": "SA",
+   "value": 948.0
+  },
+  "Kooyong": {
+   "rank": 6,
+   "state": "VIC",
+   "value": 1125.0
+  },
+  "La Trobe": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1040.4
+  },
+  "Lalor": {
+   "rank": 74,
+   "state": "VIC",
+   "value": 999.1
+  },
+  "Leichhardt": {
+   "rank": 114,
+   "state": "QLD",
+   "value": 954.6
+  },
+  "Lilley": {
+   "rank": 40,
+   "state": "QLD",
+   "value": 1035.7
+  },
+  "Lindsay": {
+   "rank": 84,
+   "state": "NSW",
+   "value": 984.1
+  },
+  "Lingiari": {
+   "rank": 150,
+   "state": "NT",
+   "value": 887.0
+  },
+  "Longman": {
+   "rank": 124,
+   "state": "QLD",
+   "value": 945.6
+  },
+  "Lyne": {
+   "rank": 134,
+   "state": "NSW",
+   "value": 933.7
+  },
+  "Lyons": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 908.1
+  },
+  "Macarthur": {
+   "rank": 97,
+   "state": "NSW",
+   "value": 970.3
+  },
+  "Mackellar": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1108.2
+  },
+  "Macquarie": {
+   "rank": 44,
+   "state": "NSW",
+   "value": 1029.7
+  },
+  "Makin": {
+   "rank": 86,
+   "state": "SA",
+   "value": 981.2
+  },
+  "Mallee": {
+   "rank": 135,
+   "state": "VIC",
+   "value": 933.0
+  },
+  "Maranoa": {
+   "rank": 133,
+   "state": "QLD",
+   "value": 934.3
+  },
+  "Maribyrnong": {
+   "rank": 81,
+   "state": "VIC",
+   "value": 988.2
+  },
+  "Mayo": {
+   "rank": 58,
+   "state": "SA",
+   "value": 1009.3
+  },
+  "McEwen": {
+   "rank": 60,
+   "state": "VIC",
+   "value": 1008.3
+  },
+  "McMahon": {
+   "rank": 119,
+   "state": "NSW",
+   "value": 949.0
+  },
+  "McMillan": {
+   "rank": 111,
+   "state": "VIC",
+   "value": 959.0
+  },
+  "McPherson": {
+   "rank": 53,
+   "state": "QLD",
+   "value": 1017.4
+  },
+  "Melbourne": {
+   "rank": 29,
+   "state": "VIC",
+   "value": 1057.3
+  },
+  "Melbourne Ports": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1107.2
+  },
+  "Menzies": {
+   "rank": 25,
+   "state": "VIC",
+   "value": 1077.3
+  },
+  "Mitchell": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1125.2
+  },
+  "Moncrieff": {
+   "rank": 75,
+   "state": "QLD",
+   "value": 997.9
+  },
+  "Moore": {
+   "rank": 23,
+   "state": "WA",
+   "value": 1081.8
+  },
+  "Moreton": {
+   "rank": 38,
+   "state": "QLD",
+   "value": 1038.4
+  },
+  "Murray": {
+   "rank": 129,
+   "state": "VIC",
+   "value": 938.2
+  },
+  "New England": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 943.3
+  },
+  "Newcastle": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 1002.6
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1149.1
+  },
+  "O'Connor": {
+   "rank": 109,
+   "state": "WA",
+   "value": 960.1
+  },
+  "Oxley": {
+   "rank": 90,
+   "state": "QLD",
+   "value": 978.7
+  },
+  "Page": {
+   "rank": 138,
+   "state": "NSW",
+   "value": 928.4
+  },
+  "Parkes": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 928.1
+  },
+  "Parramatta": {
+   "rank": 54,
+   "state": "NSW",
+   "value": 1015.4
+  },
+  "Paterson": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 944.5
+  },
+  "Pearce": {
+   "rank": 61,
+   "state": "WA",
+   "value": 1007.3
+  },
+  "Perth": {
+   "rank": 31,
+   "state": "WA",
+   "value": 1056.3
+  },
+  "Petrie": {
+   "rank": 85,
+   "state": "QLD",
+   "value": 981.6
+  },
+  "Port Adelaide": {
+   "rank": 143,
+   "state": "SA",
+   "value": 912.5
+  },
+  "Rankin": {
+   "rank": 115,
+   "state": "QLD",
+   "value": 953.2
+  },
+  "Reid": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1084.3
+  },
+  "Richmond": {
+   "rank": 96,
+   "state": "NSW",
+   "value": 972.2
+  },
+  "Riverina": {
+   "rank": 117,
+   "state": "NSW",
+   "value": 950.7
+  },
+  "Robertson": {
+   "rank": 70,
+   "state": "NSW",
+   "value": 1002.8
+  },
+  "Ryan": {
+   "rank": 12,
+   "state": "QLD",
+   "value": 1108.1
+  },
+  "Scullin": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 984.8
+  },
+  "Shortland": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 973.2
+  },
+  "Solomon": {
+   "rank": 32,
+   "state": "NT",
+   "value": 1049.9
+  },
+  "Stirling": {
+   "rank": 52,
+   "state": "WA",
+   "value": 1019.8
+  },
+  "Sturt": {
+   "rank": 47,
+   "state": "SA",
+   "value": 1026.9
+  },
+  "Swan": {
+   "rank": 50,
+   "state": "WA",
+   "value": 1024.2
+  },
+  "Sydney": {
+   "rank": 16,
+   "state": "NSW",
+   "value": 1093.9
+  },
+  "Tangney": {
+   "rank": 24,
+   "state": "WA",
+   "value": 1079.9
+  },
+  "Wakefield": {
+   "rank": 149,
+   "state": "SA",
+   "value": 894.8
+  },
+  "Wannon": {
+   "rank": 120,
+   "state": "VIC",
+   "value": 948.1
+  },
+  "Warringah": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1144.5
+  },
+  "Watson": {
+   "rank": 106,
+   "state": "NSW",
+   "value": 963.5
+  },
+  "Wentworth": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1149.9
+  },
+  "Werriwa": {
+   "rank": 103,
+   "state": "NSW",
+   "value": 965.4
+  },
+  "Whitlam": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 967.7
+  },
+  "Wide Bay": {
+   "rank": 137,
+   "state": "QLD",
+   "value": 929.7
+  },
+  "Wills": {
+   "rank": 45,
+   "state": "VIC",
+   "value": 1028.2
+  },
+  "Wright": {
+   "rank": 80,
+   "state": "QLD",
+   "value": 988.9
+  },
+  "_meta": {
+   "censusYear": 2016,
+   "derivation": "weighted",
+   "editionInForce": "2016",
+   "provName": "irsad-weighted-2016",
+   "sourceProduct": "ABS SEIFA 2016 SA1 cube × CED_2016_AUST allocations"
+  }
+ },
+ "2019": {
+  "Adelaide": {
+   "rank": 72,
+   "state": "SA",
+   "value": 1001.9
+  },
+  "Aston": {
+   "rank": 45,
+   "state": "VIC",
+   "value": 1031.7
+  },
+  "Ballarat": {
+   "rank": 95,
+   "state": "VIC",
+   "value": 971.7
+  },
+  "Banks": {
+   "rank": 48,
+   "state": "NSW",
+   "value": 1027.0
+  },
+  "Barker": {
+   "rank": 137,
+   "state": "SA",
+   "value": 929.2
+  },
+  "Barton": {
+   "rank": 52,
+   "state": "NSW",
+   "value": 1025.1
+  },
+  "Bass": {
+   "rank": 135,
+   "state": "TAS",
+   "value": 930.3
+  },
+  "Bean": {
+   "rank": 27,
+   "state": "ACT",
+   "value": 1075.4
+  },
+  "Bendigo": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 970.7
+  },
+  "Bennelong": {
+   "rank": 18,
+   "state": "NSW",
+   "value": 1090.0
+  },
+  "Berowra": {
+   "rank": 7,
+   "state": "NSW",
+   "value": 1124.2
+  },
+  "Blair": {
+   "rank": 127,
+   "state": "QLD",
+   "value": 941.1
+  },
+  "Blaxland": {
+   "rank": 141,
+   "state": "NSW",
+   "value": 927.4
+  },
+  "Bonner": {
+   "rank": 33,
+   "state": "QLD",
+   "value": 1049.8
+  },
+  "Boothby": {
+   "rank": 51,
+   "state": "SA",
+   "value": 1025.1
+  },
+  "Bowman": {
+   "rank": 61,
+   "state": "QLD",
+   "value": 1015.2
+  },
+  "Braddon": {
+   "rank": 148,
+   "state": "TAS",
+   "value": 907.1
+  },
+  "Bradfield": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1147.4
+  },
+  "Brand": {
+   "rank": 88,
+   "state": "WA",
+   "value": 980.1
+  },
+  "Brisbane": {
+   "rank": 16,
+   "state": "QLD",
+   "value": 1098.7
+  },
+  "Bruce": {
+   "rank": 143,
+   "state": "VIC",
+   "value": 925.2
+  },
+  "Burt": {
+   "rank": 78,
+   "state": "WA",
+   "value": 990.1
+  },
+  "Calare": {
+   "rank": 114,
+   "state": "NSW",
+   "value": 956.0
+  },
+  "Calwell": {
+   "rank": 134,
+   "state": "VIC",
+   "value": 933.6
+  },
+  "Canberra": {
+   "rank": 11,
+   "state": "ACT",
+   "value": 1109.7
+  },
+  "Canning": {
+   "rank": 89,
+   "state": "WA",
+   "value": 978.2
+  },
+  "Capricornia": {
+   "rank": 112,
+   "state": "QLD",
+   "value": 959.3
+  },
+  "Casey": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1016.6
+  },
+  "Chifley": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 937.3
+  },
+  "Chisholm": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1063.1
+  },
+  "Clark": {
+   "rank": 85,
+   "state": "TAS",
+   "value": 980.9
+  },
+  "Cook": {
+   "rank": 26,
+   "state": "NSW",
+   "value": 1076.7
+  },
+  "Cooper": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1025.9
+  },
+  "Corangamite": {
+   "rank": 55,
+   "state": "VIC",
+   "value": 1022.4
+  },
+  "Corio": {
+   "rank": 107,
+   "state": "VIC",
+   "value": 963.7
+  },
+  "Cowan": {
+   "rank": 73,
+   "state": "WA",
+   "value": 1000.5
+  },
+  "Cowper": {
+   "rank": 131,
+   "state": "NSW",
+   "value": 935.0
+  },
+  "Cunningham": {
+   "rank": 65,
+   "state": "NSW",
+   "value": 1006.2
+  },
+  "Curtin": {
+   "rank": 8,
+   "state": "WA",
+   "value": 1121.4
+  },
+  "Dawson": {
+   "rank": 102,
+   "state": "QLD",
+   "value": 966.4
+  },
+  "Deakin": {
+   "rank": 38,
+   "state": "VIC",
+   "value": 1041.2
+  },
+  "Dickson": {
+   "rank": 42,
+   "state": "QLD",
+   "value": 1039.0
+  },
+  "Dobell": {
+   "rank": 110,
+   "state": "NSW",
+   "value": 961.3
+  },
+  "Dunkley": {
+   "rank": 76,
+   "state": "VIC",
+   "value": 997.9
+  },
+  "Durack": {
+   "rank": 109,
+   "state": "WA",
+   "value": 962.0
+  },
+  "Eden-Monaro": {
+   "rank": 66,
+   "state": "NSW",
+   "value": 1005.0
+  },
+  "Fadden": {
+   "rank": 68,
+   "state": "QLD",
+   "value": 1003.2
+  },
+  "Fairfax": {
+   "rank": 67,
+   "state": "QLD",
+   "value": 1004.4
+  },
+  "Farrer": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 948.0
+  },
+  "Fenner": {
+   "rank": 22,
+   "state": "ACT",
+   "value": 1083.3
+  },
+  "Fisher": {
+   "rank": 77,
+   "state": "QLD",
+   "value": 993.4
+  },
+  "Flinders": {
+   "rank": 74,
+   "state": "VIC",
+   "value": 998.3
+  },
+  "Flynn": {
+   "rank": 120,
+   "state": "QLD",
+   "value": 949.1
+  },
+  "Forde": {
+   "rank": 100,
+   "state": "QLD",
+   "value": 967.7
+  },
+  "Forrest": {
+   "rank": 86,
+   "state": "WA",
+   "value": 980.9
+  },
+  "Fowler": {
+   "rank": 149,
+   "state": "NSW",
+   "value": 900.7
+  },
+  "Franklin": {
+   "rank": 82,
+   "state": "TAS",
+   "value": 983.9
+  },
+  "Fraser": {
+   "rank": 144,
+   "state": "VIC",
+   "value": 924.3
+  },
+  "Fremantle": {
+   "rank": 41,
+   "state": "WA",
+   "value": 1039.5
+  },
+  "Gellibrand": {
+   "rank": 37,
+   "state": "VIC",
+   "value": 1041.4
+  },
+  "Gilmore": {
+   "rank": 113,
+   "state": "NSW",
+   "value": 959.0
+  },
+  "Gippsland": {
+   "rank": 128,
+   "state": "VIC",
+   "value": 938.6
+  },
+  "Goldstein": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1115.5
+  },
+  "Gorton": {
+   "rank": 93,
+   "state": "VIC",
+   "value": 972.6
+  },
+  "Grayndler": {
+   "rank": 15,
+   "state": "NSW",
+   "value": 1105.1
+  },
+  "Greenway": {
+   "rank": 34,
+   "state": "NSW",
+   "value": 1049.3
+  },
+  "Grey": {
+   "rank": 145,
+   "state": "SA",
+   "value": 917.0
+  },
+  "Griffith": {
+   "rank": 19,
+   "state": "QLD",
+   "value": 1088.2
+  },
+  "Groom": {
+   "rank": 90,
+   "state": "QLD",
+   "value": 977.6
+  },
+  "Hasluck": {
+   "rank": 69,
+   "state": "WA",
+   "value": 1003.2
+  },
+  "Herbert": {
+   "rank": 106,
+   "state": "QLD",
+   "value": 964.4
+  },
+  "Higgins": {
+   "rank": 10,
+   "state": "VIC",
+   "value": 1113.7
+  },
+  "Hindmarsh": {
+   "rank": 91,
+   "state": "SA",
+   "value": 976.2
+  },
+  "Hinkler": {
+   "rank": 147,
+   "state": "QLD",
+   "value": 909.2
+  },
+  "Holt": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 983.2
+  },
+  "Hotham": {
+   "rank": 47,
+   "state": "VIC",
+   "value": 1029.3
+  },
+  "Hughes": {
+   "rank": 20,
+   "state": "NSW",
+   "value": 1087.1
+  },
+  "Hume": {
+   "rank": 62,
+   "state": "NSW",
+   "value": 1012.9
+  },
+  "Hunter": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 946.8
+  },
+  "Indi": {
+   "rank": 104,
+   "state": "VIC",
+   "value": 964.8
+  },
+  "Isaacs": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1043.2
+  },
+  "Jagajaga": {
+   "rank": 31,
+   "state": "VIC",
+   "value": 1060.1
+  },
+  "Kennedy": {
+   "rank": 142,
+   "state": "QLD",
+   "value": 927.2
+  },
+  "Kingsford Smith": {
+   "rank": 28,
+   "state": "NSW",
+   "value": 1073.9
+  },
+  "Kingston": {
+   "rank": 105,
+   "state": "SA",
+   "value": 964.4
+  },
+  "Kooyong": {
+   "rank": 6,
+   "state": "VIC",
+   "value": 1124.8
+  },
+  "La Trobe": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1017.4
+  },
+  "Lalor": {
+   "rank": 80,
+   "state": "VIC",
+   "value": 984.9
+  },
+  "Leichhardt": {
+   "rank": 116,
+   "state": "QLD",
+   "value": 954.4
+  },
+  "Lilley": {
+   "rank": 44,
+   "state": "QLD",
+   "value": 1032.3
+  },
+  "Lindsay": {
+   "rank": 81,
+   "state": "NSW",
+   "value": 984.1
+  },
+  "Lingiari": {
+   "rank": 150,
+   "state": "NT",
+   "value": 896.5
+  },
+  "Longman": {
+   "rank": 124,
+   "state": "QLD",
+   "value": 945.6
+  },
+  "Lyne": {
+   "rank": 133,
+   "state": "NSW",
+   "value": 933.7
+  },
+  "Lyons": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 911.5
+  },
+  "Macarthur": {
+   "rank": 99,
+   "state": "NSW",
+   "value": 970.3
+  },
+  "Mackellar": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1108.2
+  },
+  "Macnamara": {
+   "rank": 14,
+   "state": "VIC",
+   "value": 1107.0
+  },
+  "Macquarie": {
+   "rank": 46,
+   "state": "NSW",
+   "value": 1029.7
+  },
+  "Makin": {
+   "rank": 97,
+   "state": "SA",
+   "value": 971.5
+  },
+  "Mallee": {
+   "rank": 139,
+   "state": "VIC",
+   "value": 928.3
+  },
+  "Maranoa": {
+   "rank": 132,
+   "state": "QLD",
+   "value": 934.3
+  },
+  "Maribyrnong": {
+   "rank": 39,
+   "state": "VIC",
+   "value": 1040.3
+  },
+  "Mayo": {
+   "rank": 64,
+   "state": "SA",
+   "value": 1006.8
+  },
+  "McEwen": {
+   "rank": 54,
+   "state": "VIC",
+   "value": 1023.6
+  },
+  "McMahon": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 949.0
+  },
+  "McPherson": {
+   "rank": 58,
+   "state": "QLD",
+   "value": 1017.4
+  },
+  "Melbourne": {
+   "rank": 29,
+   "state": "VIC",
+   "value": 1065.0
+  },
+  "Menzies": {
+   "rank": 23,
+   "state": "VIC",
+   "value": 1083.2
+  },
+  "Mitchell": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1125.2
+  },
+  "Monash": {
+   "rank": 115,
+   "state": "VIC",
+   "value": 954.9
+  },
+  "Moncrieff": {
+   "rank": 75,
+   "state": "QLD",
+   "value": 998.1
+  },
+  "Moore": {
+   "rank": 24,
+   "state": "WA",
+   "value": 1081.8
+  },
+  "Moreton": {
+   "rank": 40,
+   "state": "QLD",
+   "value": 1039.6
+  },
+  "New England": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 943.3
+  },
+  "Newcastle": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 1002.6
+  },
+  "Nicholls": {
+   "rank": 129,
+   "state": "VIC",
+   "value": 938.6
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1149.1
+  },
+  "O'Connor": {
+   "rank": 111,
+   "state": "WA",
+   "value": 960.1
+  },
+  "Oxley": {
+   "rank": 87,
+   "state": "QLD",
+   "value": 980.4
+  },
+  "Page": {
+   "rank": 138,
+   "state": "NSW",
+   "value": 928.4
+  },
+  "Parkes": {
+   "rank": 140,
+   "state": "NSW",
+   "value": 928.1
+  },
+  "Parramatta": {
+   "rank": 60,
+   "state": "NSW",
+   "value": 1015.4
+  },
+  "Paterson": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 944.5
+  },
+  "Pearce": {
+   "rank": 63,
+   "state": "WA",
+   "value": 1007.3
+  },
+  "Perth": {
+   "rank": 32,
+   "state": "WA",
+   "value": 1056.3
+  },
+  "Petrie": {
+   "rank": 84,
+   "state": "QLD",
+   "value": 981.6
+  },
+  "Rankin": {
+   "rank": 118,
+   "state": "QLD",
+   "value": 953.2
+  },
+  "Reid": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1084.3
+  },
+  "Richmond": {
+   "rank": 94,
+   "state": "NSW",
+   "value": 972.2
+  },
+  "Riverina": {
+   "rank": 119,
+   "state": "NSW",
+   "value": 950.7
+  },
+  "Robertson": {
+   "rank": 70,
+   "state": "NSW",
+   "value": 1002.8
+  },
+  "Ryan": {
+   "rank": 13,
+   "state": "QLD",
+   "value": 1107.9
+  },
+  "Scullin": {
+   "rank": 96,
+   "state": "VIC",
+   "value": 971.5
+  },
+  "Shortland": {
+   "rank": 92,
+   "state": "NSW",
+   "value": 973.2
+  },
+  "Solomon": {
+   "rank": 35,
+   "state": "NT",
+   "value": 1047.7
+  },
+  "Spence": {
+   "rank": 151,
+   "state": "SA",
+   "value": 870.3
+  },
+  "Stirling": {
+   "rank": 56,
+   "state": "WA",
+   "value": 1019.8
+  },
+  "Sturt": {
+   "rank": 43,
+   "state": "SA",
+   "value": 1035.3
+  },
+  "Swan": {
+   "rank": 53,
+   "state": "WA",
+   "value": 1024.2
+  },
+  "Sydney": {
+   "rank": 17,
+   "state": "NSW",
+   "value": 1093.9
+  },
+  "Tangney": {
+   "rank": 25,
+   "state": "WA",
+   "value": 1079.9
+  },
+  "Wannon": {
+   "rank": 117,
+   "state": "VIC",
+   "value": 953.2
+  },
+  "Warringah": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1144.5
+  },
+  "Watson": {
+   "rank": 108,
+   "state": "NSW",
+   "value": 963.5
+  },
+  "Wentworth": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1149.9
+  },
+  "Werriwa": {
+   "rank": 103,
+   "state": "NSW",
+   "value": 965.4
+  },
+  "Whitlam": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 967.7
+  },
+  "Wide Bay": {
+   "rank": 136,
+   "state": "QLD",
+   "value": 930.0
+  },
+  "Wills": {
+   "rank": 50,
+   "state": "VIC",
+   "value": 1025.1
+  },
+  "Wright": {
+   "rank": 79,
+   "state": "QLD",
+   "value": 988.9
+  },
+  "_meta": {
+   "censusYear": 2016,
+   "derivation": "weighted",
+   "editionInForce": "2018",
+   "provName": "irsad-weighted-2016",
+   "sourceProduct": "ABS SEIFA 2016 SA1 cube × CED_2018_AUST allocations"
+  }
+ },
+ "2022": {
+  "Adelaide": {
+   "rank": 60,
+   "state": "SA",
+   "value": 1012.9
+  },
+  "Aston": {
+   "rank": 48,
+   "state": "VIC",
+   "value": 1028.7
+  },
+  "Ballarat": {
+   "rank": 90,
+   "state": "VIC",
+   "value": 970.3
+  },
+  "Banks": {
+   "rank": 45,
+   "state": "NSW",
+   "value": 1034.7
+  },
+  "Barker": {
+   "rank": 143,
+   "state": "SA",
+   "value": 919.7
+  },
+  "Barton": {
+   "rank": 42,
+   "state": "NSW",
+   "value": 1038.6
+  },
+  "Bass": {
+   "rank": 137,
+   "state": "TAS",
+   "value": 929.6
+  },
+  "Bean": {
+   "rank": 26,
+   "state": "ACT",
+   "value": 1072.9
+  },
+  "Bendigo": {
+   "rank": 94,
+   "state": "VIC",
+   "value": 966.9
+  },
+  "Bennelong": {
+   "rank": 18,
+   "state": "NSW",
+   "value": 1099.6
+  },
+  "Berowra": {
+   "rank": 10,
+   "state": "NSW",
+   "value": 1124.4
+  },
+  "Blair": {
+   "rank": 130,
+   "state": "QLD",
+   "value": 934.4
+  },
+  "Blaxland": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 925.9
+  },
+  "Bonner": {
+   "rank": 35,
+   "state": "QLD",
+   "value": 1050.6
+  },
+  "Boothby": {
+   "rank": 47,
+   "state": "SA",
+   "value": 1029.2
+  },
+  "Bowman": {
+   "rank": 68,
+   "state": "QLD",
+   "value": 1003.2
+  },
+  "Braddon": {
+   "rank": 147,
+   "state": "TAS",
+   "value": 902.1
+  },
+  "Bradfield": {
+   "rank": 4,
+   "state": "NSW",
+   "value": 1146.4
+  },
+  "Brand": {
+   "rank": 107,
+   "state": "WA",
+   "value": 958.8
+  },
+  "Brisbane": {
+   "rank": 17,
+   "state": "QLD",
+   "value": 1104.0
+  },
+  "Bruce": {
+   "rank": 97,
+   "state": "VIC",
+   "value": 963.7
+  },
+  "Burt": {
+   "rank": 119,
+   "state": "WA",
+   "value": 950.5
+  },
+  "Calare": {
+   "rank": 106,
+   "state": "NSW",
+   "value": 959.0
+  },
+  "Calwell": {
+   "rank": 125,
+   "state": "VIC",
+   "value": 937.1
+  },
+  "Canberra": {
+   "rank": 11,
+   "state": "ACT",
+   "value": 1122.7
+  },
+  "Canning": {
+   "rank": 110,
+   "state": "WA",
+   "value": 956.5
+  },
+  "Capricornia": {
+   "rank": 118,
+   "state": "QLD",
+   "value": 951.0
+  },
+  "Casey": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1014.4
+  },
+  "Chifley": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 955.9
+  },
+  "Chisholm": {
+   "rank": 28,
+   "state": "VIC",
+   "value": 1072.2
+  },
+  "Clark": {
+   "rank": 75,
+   "state": "TAS",
+   "value": 993.7
+  },
+  "Cook": {
+   "rank": 23,
+   "state": "NSW",
+   "value": 1084.3
+  },
+  "Cooper": {
+   "rank": 38,
+   "state": "VIC",
+   "value": 1046.4
+  },
+  "Corangamite": {
+   "rank": 50,
+   "state": "VIC",
+   "value": 1027.6
+  },
+  "Corio": {
+   "rank": 88,
+   "state": "VIC",
+   "value": 973.8
+  },
+  "Cowan": {
+   "rank": 105,
+   "state": "WA",
+   "value": 960.4
+  },
+  "Cowper": {
+   "rank": 127,
+   "state": "NSW",
+   "value": 936.5
+  },
+  "Cunningham": {
+   "rank": 56,
+   "state": "NSW",
+   "value": 1018.6
+  },
+  "Curtin": {
+   "rank": 13,
+   "state": "WA",
+   "value": 1115.1
+  },
+  "Dawson": {
+   "rank": 108,
+   "state": "QLD",
+   "value": 958.5
+  },
+  "Deakin": {
+   "rank": 40,
+   "state": "VIC",
+   "value": 1044.3
+  },
+  "Dickson": {
+   "rank": 53,
+   "state": "QLD",
+   "value": 1025.0
+  },
+  "Dobell": {
+   "rank": 102,
+   "state": "NSW",
+   "value": 961.6
+  },
+  "Dunkley": {
+   "rank": 72,
+   "state": "VIC",
+   "value": 998.1
+  },
+  "Durack": {
+   "rank": 114,
+   "state": "WA",
+   "value": 954.3
+  },
+  "Eden-Monaro": {
+   "rank": 63,
+   "state": "NSW",
+   "value": 1008.4
+  },
+  "Fadden": {
+   "rank": 74,
+   "state": "QLD",
+   "value": 995.4
+  },
+  "Fairfax": {
+   "rank": 67,
+   "state": "QLD",
+   "value": 1003.5
+  },
+  "Farrer": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 944.7
+  },
+  "Fenner": {
+   "rank": 25,
+   "state": "ACT",
+   "value": 1077.0
+  },
+  "Fisher": {
+   "rank": 73,
+   "state": "QLD",
+   "value": 998.0
+  },
+  "Flinders": {
+   "rank": 65,
+   "state": "VIC",
+   "value": 1003.8
+  },
+  "Flynn": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 922.9
+  },
+  "Forde": {
+   "rank": 115,
+   "state": "QLD",
+   "value": 953.3
+  },
+  "Forrest": {
+   "rank": 95,
+   "state": "WA",
+   "value": 965.3
+  },
+  "Fowler": {
+   "rank": 150,
+   "state": "NSW",
+   "value": 895.0
+  },
+  "Franklin": {
+   "rank": 76,
+   "state": "TAS",
+   "value": 988.7
+  },
+  "Fraser": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 963.7
+  },
+  "Fremantle": {
+   "rank": 46,
+   "state": "WA",
+   "value": 1031.1
+  },
+  "Gellibrand": {
+   "rank": 39,
+   "state": "VIC",
+   "value": 1045.2
+  },
+  "Gilmore": {
+   "rank": 96,
+   "state": "NSW",
+   "value": 964.2
+  },
+  "Gippsland": {
+   "rank": 136,
+   "state": "VIC",
+   "value": 930.2
+  },
+  "Goldstein": {
+   "rank": 12,
+   "state": "VIC",
+   "value": 1120.1
+  },
+  "Gorton": {
+   "rank": 81,
+   "state": "VIC",
+   "value": 982.5
+  },
+  "Grayndler": {
+   "rank": 7,
+   "state": "NSW",
+   "value": 1125.5
+  },
+  "Greenway": {
+   "rank": 32,
+   "state": "NSW",
+   "value": 1058.5
+  },
+  "Grey": {
+   "rank": 146,
+   "state": "SA",
+   "value": 908.6
+  },
+  "Griffith": {
+   "rank": 19,
+   "state": "QLD",
+   "value": 1094.5
+  },
+  "Groom": {
+   "rank": 101,
+   "state": "QLD",
+   "value": 962.6
+  },
+  "Hasluck": {
+   "rank": 70,
+   "state": "WA",
+   "value": 1001.3
+  },
+  "Hawke": {
+   "rank": 104,
+   "state": "VIC",
+   "value": 960.9
+  },
+  "Herbert": {
+   "rank": 111,
+   "state": "QLD",
+   "value": 956.3
+  },
+  "Higgins": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1124.6
+  },
+  "Hindmarsh": {
+   "rank": 78,
+   "state": "SA",
+   "value": 986.1
+  },
+  "Hinkler": {
+   "rank": 148,
+   "state": "QLD",
+   "value": 902.1
+  },
+  "Holt": {
+   "rank": 91,
+   "state": "VIC",
+   "value": 969.5
+  },
+  "Hotham": {
+   "rank": 79,
+   "state": "VIC",
+   "value": 983.7
+  },
+  "Hughes": {
+   "rank": 24,
+   "state": "NSW",
+   "value": 1084.2
+  },
+  "Hume": {
+   "rank": 64,
+   "state": "NSW",
+   "value": 1007.5
+  },
+  "Hunter": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 945.9
+  },
+  "Indi": {
+   "rank": 99,
+   "state": "VIC",
+   "value": 963.4
+  },
+  "Isaacs": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1047.7
+  },
+  "Jagajaga": {
+   "rank": 29,
+   "state": "VIC",
+   "value": 1071.1
+  },
+  "Kennedy": {
+   "rank": 142,
+   "state": "QLD",
+   "value": 921.5
+  },
+  "Kingsford Smith": {
+   "rank": 20,
+   "state": "NSW",
+   "value": 1091.2
+  },
+  "Kingston": {
+   "rank": 113,
+   "state": "SA",
+   "value": 954.5
+  },
+  "Kooyong": {
+   "rank": 6,
+   "state": "VIC",
+   "value": 1128.2
+  },
+  "La Trobe": {
+   "rank": 61,
+   "state": "VIC",
+   "value": 1011.6
+  },
+  "Lalor": {
+   "rank": 80,
+   "state": "VIC",
+   "value": 983.4
+  },
+  "Leichhardt": {
+   "rank": 117,
+   "state": "QLD",
+   "value": 952.2
+  },
+  "Lilley": {
+   "rank": 44,
+   "state": "QLD",
+   "value": 1035.1
+  },
+  "Lindsay": {
+   "rank": 83,
+   "state": "NSW",
+   "value": 980.6
+  },
+  "Lingiari": {
+   "rank": 149,
+   "state": "NT",
+   "value": 898.1
+  },
+  "Longman": {
+   "rank": 134,
+   "state": "QLD",
+   "value": 932.2
+  },
+  "Lyne": {
+   "rank": 131,
+   "state": "NSW",
+   "value": 933.1
+  },
+  "Lyons": {
+   "rank": 145,
+   "state": "TAS",
+   "value": 912.3
+  },
+  "Macarthur": {
+   "rank": 82,
+   "state": "NSW",
+   "value": 981.6
+  },
+  "Mackellar": {
+   "rank": 14,
+   "state": "NSW",
+   "value": 1110.5
+  },
+  "Macnamara": {
+   "rank": 15,
+   "state": "VIC",
+   "value": 1110.5
+  },
+  "Macquarie": {
+   "rank": 51,
+   "state": "NSW",
+   "value": 1026.2
+  },
+  "Makin": {
+   "rank": 103,
+   "state": "SA",
+   "value": 961.3
+  },
+  "Mallee": {
+   "rank": 140,
+   "state": "VIC",
+   "value": 924.6
+  },
+  "Maranoa": {
+   "rank": 144,
+   "state": "QLD",
+   "value": 919.6
+  },
+  "Maribyrnong": {
+   "rank": 34,
+   "state": "VIC",
+   "value": 1050.7
+  },
+  "Mayo": {
+   "rank": 71,
+   "state": "SA",
+   "value": 998.4
+  },
+  "McEwen": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1028.2
+  },
+  "McMahon": {
+   "rank": 128,
+   "state": "NSW",
+   "value": 936.0
+  },
+  "McPherson": {
+   "rank": 52,
+   "state": "QLD",
+   "value": 1026.1
+  },
+  "Melbourne": {
+   "rank": 21,
+   "state": "VIC",
+   "value": 1090.4
+  },
+  "Menzies": {
+   "rank": 27,
+   "state": "VIC",
+   "value": 1072.2
+  },
+  "Mitchell": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1130.1
+  },
+  "Monash": {
+   "rank": 116,
+   "state": "VIC",
+   "value": 953.2
+  },
+  "Moncrieff": {
+   "rank": 66,
+   "state": "QLD",
+   "value": 1003.7
+  },
+  "Moore": {
+   "rank": 30,
+   "state": "WA",
+   "value": 1069.4
+  },
+  "Moreton": {
+   "rank": 43,
+   "state": "QLD",
+   "value": 1038.4
+  },
+  "New England": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 936.8
+  },
+  "Newcastle": {
+   "rank": 57,
+   "state": "NSW",
+   "value": 1018.4
+  },
+  "Nicholls": {
+   "rank": 133,
+   "state": "VIC",
+   "value": 932.3
+  },
+  "North Sydney": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1156.6
+  },
+  "O'Connor": {
+   "rank": 120,
+   "state": "WA",
+   "value": 949.0
+  },
+  "Oxley": {
+   "rank": 89,
+   "state": "QLD",
+   "value": 973.1
+  },
+  "Page": {
+   "rank": 135,
+   "state": "NSW",
+   "value": 931.9
+  },
+  "Parkes": {
+   "rank": 129,
+   "state": "NSW",
+   "value": 935.8
+  },
+  "Parramatta": {
+   "rank": 55,
+   "state": "NSW",
+   "value": 1022.2
+  },
+  "Paterson": {
+   "rank": 124,
+   "state": "NSW",
+   "value": 942.2
+  },
+  "Pearce": {
+   "rank": 69,
+   "state": "WA",
+   "value": 1001.5
+  },
+  "Perth": {
+   "rank": 33,
+   "state": "WA",
+   "value": 1052.1
+  },
+  "Petrie": {
+   "rank": 84,
+   "state": "QLD",
+   "value": 979.2
+  },
+  "Rankin": {
+   "rank": 132,
+   "state": "QLD",
+   "value": 932.4
+  },
+  "Reid": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1089.9
+  },
+  "Richmond": {
+   "rank": 77,
+   "state": "NSW",
+   "value": 986.8
+  },
+  "Riverina": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 946.4
+  },
+  "Robertson": {
+   "rank": 62,
+   "state": "NSW",
+   "value": 1010.1
+  },
+  "Ryan": {
+   "rank": 16,
+   "state": "QLD",
+   "value": 1106.0
+  },
+  "Scullin": {
+   "rank": 92,
+   "state": "VIC",
+   "value": 969.1
+  },
+  "Shortland": {
+   "rank": 85,
+   "state": "NSW",
+   "value": 975.1
+  },
+  "Solomon": {
+   "rank": 54,
+   "state": "NT",
+   "value": 1023.4
+  },
+  "Spence": {
+   "rank": 151,
+   "state": "SA",
+   "value": 864.2
+  },
+  "Sturt": {
+   "rank": 41,
+   "state": "SA",
+   "value": 1040.7
+  },
+  "Swan": {
+   "rank": 58,
+   "state": "WA",
+   "value": 1017.3
+  },
+  "Sydney": {
+   "rank": 8,
+   "state": "NSW",
+   "value": 1124.9
+  },
+  "Tangney": {
+   "rank": 31,
+   "state": "WA",
+   "value": 1066.4
+  },
+  "Wannon": {
+   "rank": 109,
+   "state": "VIC",
+   "value": 957.8
+  },
+  "Warringah": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1152.4
+  },
+  "Watson": {
+   "rank": 93,
+   "state": "NSW",
+   "value": 969.1
+  },
+  "Wentworth": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1167.6
+  },
+  "Werriwa": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 962.7
+  },
+  "Whitlam": {
+   "rank": 87,
+   "state": "NSW",
+   "value": 974.3
+  },
+  "Wide Bay": {
+   "rank": 138,
+   "state": "QLD",
+   "value": 928.1
+  },
+  "Wills": {
+   "rank": 37,
+   "state": "VIC",
+   "value": 1046.5
+  },
+  "Wright": {
+   "rank": 86,
+   "state": "QLD",
+   "value": 974.3
+  },
+  "_meta": {
+   "censusYear": 2021,
+   "derivation": "weighted",
+   "editionInForce": "2021",
+   "provName": "irsad-weighted-2021",
+   "sourceProduct": "ABS SEIFA 2021 SA1 cube × CED_2021_AUST MB allocations + 2021 census MB counts"
+  }
+ },
+ "2025": {
+  "Adelaide": {
+   "rank": 58,
+   "state": "SA",
+   "value": 1012.9
+  },
+  "Aston": {
+   "rank": 48,
+   "state": "VIC",
+   "value": 1028.7
+  },
+  "Ballarat": {
+   "rank": 92,
+   "state": "VIC",
+   "value": 970.0
+  },
+  "Banks": {
+   "rank": 42,
+   "state": "NSW",
+   "value": 1034.6
+  },
+  "Barker": {
+   "rank": 142,
+   "state": "SA",
+   "value": 919.7
+  },
+  "Barton": {
+   "rank": 44,
+   "state": "NSW",
+   "value": 1033.2
+  },
+  "Bass": {
+   "rank": 136,
+   "state": "TAS",
+   "value": 929.6
+  },
+  "Bean": {
+   "rank": 26,
+   "state": "ACT",
+   "value": 1072.9
+  },
+  "Bendigo": {
+   "rank": 94,
+   "state": "VIC",
+   "value": 965.7
+  },
+  "Bennelong": {
+   "rank": 8,
+   "state": "NSW",
+   "value": 1117.7
+  },
+  "Berowra": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1114.9
+  },
+  "Blair": {
+   "rank": 129,
+   "state": "QLD",
+   "value": 934.4
+  },
+  "Blaxland": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 923.8
+  },
+  "Bonner": {
+   "rank": 34,
+   "state": "QLD",
+   "value": 1050.6
+  },
+  "Boothby": {
+   "rank": 47,
+   "state": "SA",
+   "value": 1029.2
+  },
+  "Bowman": {
+   "rank": 65,
+   "state": "QLD",
+   "value": 1003.2
+  },
+  "Braddon": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 902.1
+  },
+  "Bradfield": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1157.4
+  },
+  "Brand": {
+   "rank": 118,
+   "state": "WA",
+   "value": 951.0
+  },
+  "Brisbane": {
+   "rank": 15,
+   "state": "QLD",
+   "value": 1104.0
+  },
+  "Bruce": {
+   "rank": 84,
+   "state": "VIC",
+   "value": 975.3
+  },
+  "Bullwinkel": {
+   "rank": 70,
+   "state": "WA",
+   "value": 997.8
+  },
+  "Burt": {
+   "rank": 113,
+   "state": "WA",
+   "value": 953.7
+  },
+  "Calare": {
+   "rank": 106,
+   "state": "NSW",
+   "value": 959.0
+  },
+  "Calwell": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 936.8
+  },
+  "Canberra": {
+   "rank": 7,
+   "state": "ACT",
+   "value": 1122.7
+  },
+  "Canning": {
+   "rank": 117,
+   "state": "WA",
+   "value": 951.7
+  },
+  "Capricornia": {
+   "rank": 119,
+   "state": "QLD",
+   "value": 951.0
+  },
+  "Casey": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1017.0
+  },
+  "Chifley": {
+   "rank": 111,
+   "state": "NSW",
+   "value": 954.1
+  },
+  "Chisholm": {
+   "rank": 17,
+   "state": "VIC",
+   "value": 1095.8
+  },
+  "Clark": {
+   "rank": 74,
+   "state": "TAS",
+   "value": 993.7
+  },
+  "Cook": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1087.6
+  },
+  "Cooper": {
+   "rank": 35,
+   "state": "VIC",
+   "value": 1050.5
+  },
+  "Corangamite": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1027.3
+  },
+  "Corio": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 976.0
+  },
+  "Cowan": {
+   "rank": 90,
+   "state": "WA",
+   "value": 971.3
+  },
+  "Cowper": {
+   "rank": 128,
+   "state": "NSW",
+   "value": 934.6
+  },
+  "Cunningham": {
+   "rank": 62,
+   "state": "NSW",
+   "value": 1006.7
+  },
+  "Curtin": {
+   "rank": 10,
+   "state": "WA",
+   "value": 1115.3
+  },
+  "Dawson": {
+   "rank": 107,
+   "state": "QLD",
+   "value": 958.5
+  },
+  "Deakin": {
+   "rank": 33,
+   "state": "VIC",
+   "value": 1052.0
+  },
+  "Dickson": {
+   "rank": 53,
+   "state": "QLD",
+   "value": 1025.0
+  },
+  "Dobell": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 961.4
+  },
+  "Dunkley": {
+   "rank": 73,
+   "state": "VIC",
+   "value": 994.4
+  },
+  "Durack": {
+   "rank": 108,
+   "state": "WA",
+   "value": 956.7
+  },
+  "Eden-Monaro": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 997.6
+  },
+  "Fadden": {
+   "rank": 72,
+   "state": "QLD",
+   "value": 995.4
+  },
+  "Fairfax": {
+   "rank": 64,
+   "state": "QLD",
+   "value": 1003.5
+  },
+  "Farrer": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 944.7
+  },
+  "Fenner": {
+   "rank": 24,
+   "state": "ACT",
+   "value": 1077.0
+  },
+  "Fisher": {
+   "rank": 69,
+   "state": "QLD",
+   "value": 998.0
+  },
+  "Flinders": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1012.5
+  },
+  "Flynn": {
+   "rank": 140,
+   "state": "QLD",
+   "value": 922.9
+  },
+  "Forde": {
+   "rank": 114,
+   "state": "QLD",
+   "value": 953.3
+  },
+  "Forrest": {
+   "rank": 95,
+   "state": "WA",
+   "value": 965.5
+  },
+  "Fowler": {
+   "rank": 149,
+   "state": "NSW",
+   "value": 896.8
+  },
+  "Franklin": {
+   "rank": 75,
+   "state": "TAS",
+   "value": 988.7
+  },
+  "Fraser": {
+   "rank": 89,
+   "state": "VIC",
+   "value": 971.8
+  },
+  "Fremantle": {
+   "rank": 45,
+   "state": "WA",
+   "value": 1030.6
+  },
+  "Gellibrand": {
+   "rank": 38,
+   "state": "VIC",
+   "value": 1043.7
+  },
+  "Gilmore": {
+   "rank": 97,
+   "state": "NSW",
+   "value": 964.3
+  },
+  "Gippsland": {
+   "rank": 135,
+   "state": "VIC",
+   "value": 930.2
+  },
+  "Goldstein": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1115.9
+  },
+  "Gorton": {
+   "rank": 80,
+   "state": "VIC",
+   "value": 982.4
+  },
+  "Grayndler": {
+   "rank": 16,
+   "state": "NSW",
+   "value": 1102.4
+  },
+  "Greenway": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1085.5
+  },
+  "Grey": {
+   "rank": 145,
+   "state": "SA",
+   "value": 908.6
+  },
+  "Griffith": {
+   "rank": 18,
+   "state": "QLD",
+   "value": 1094.5
+  },
+  "Groom": {
+   "rank": 99,
+   "state": "QLD",
+   "value": 962.6
+  },
+  "Hasluck": {
+   "rank": 79,
+   "state": "WA",
+   "value": 983.8
+  },
+  "Hawke": {
+   "rank": 103,
+   "state": "VIC",
+   "value": 961.1
+  },
+  "Herbert": {
+   "rank": 109,
+   "state": "QLD",
+   "value": 956.3
+  },
+  "Hindmarsh": {
+   "rank": 77,
+   "state": "SA",
+   "value": 986.1
+  },
+  "Hinkler": {
+   "rank": 147,
+   "state": "QLD",
+   "value": 902.1
+  },
+  "Holt": {
+   "rank": 93,
+   "state": "VIC",
+   "value": 966.4
+  },
+  "Hotham": {
+   "rank": 51,
+   "state": "VIC",
+   "value": 1026.6
+  },
+  "Hughes": {
+   "rank": 37,
+   "state": "NSW",
+   "value": 1046.8
+  },
+  "Hume": {
+   "rank": 43,
+   "state": "NSW",
+   "value": 1033.9
+  },
+  "Hunter": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 943.5
+  },
+  "Indi": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 963.4
+  },
+  "Isaacs": {
+   "rank": 66,
+   "state": "VIC",
+   "value": 1001.4
+  },
+  "Jagajaga": {
+   "rank": 27,
+   "state": "VIC",
+   "value": 1071.5
+  },
+  "Kennedy": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 921.5
+  },
+  "Kingsford Smith": {
+   "rank": 23,
+   "state": "NSW",
+   "value": 1081.5
+  },
+  "Kingston": {
+   "rank": 110,
+   "state": "SA",
+   "value": 954.5
+  },
+  "Kooyong": {
+   "rank": 4,
+   "state": "VIC",
+   "value": 1131.0
+  },
+  "La Trobe": {
+   "rank": 61,
+   "state": "VIC",
+   "value": 1008.5
+  },
+  "Lalor": {
+   "rank": 85,
+   "state": "VIC",
+   "value": 975.1
+  },
+  "Leichhardt": {
+   "rank": 116,
+   "state": "QLD",
+   "value": 952.2
+  },
+  "Lilley": {
+   "rank": 41,
+   "state": "QLD",
+   "value": 1035.1
+  },
+  "Lindsay": {
+   "rank": 82,
+   "state": "NSW",
+   "value": 976.3
+  },
+  "Lingiari": {
+   "rank": 148,
+   "state": "NT",
+   "value": 898.1
+  },
+  "Longman": {
+   "rank": 134,
+   "state": "QLD",
+   "value": 932.2
+  },
+  "Lyne": {
+   "rank": 132,
+   "state": "NSW",
+   "value": 933.1
+  },
+  "Lyons": {
+   "rank": 144,
+   "state": "TAS",
+   "value": 912.3
+  },
+  "Macarthur": {
+   "rank": 91,
+   "state": "NSW",
+   "value": 970.7
+  },
+  "Mackellar": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1112.2
+  },
+  "Macnamara": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1109.4
+  },
+  "Macquarie": {
+   "rank": 50,
+   "state": "NSW",
+   "value": 1026.9
+  },
+  "Makin": {
+   "rank": 102,
+   "state": "SA",
+   "value": 961.3
+  },
+  "Mallee": {
+   "rank": 138,
+   "state": "VIC",
+   "value": 924.6
+  },
+  "Maranoa": {
+   "rank": 143,
+   "state": "QLD",
+   "value": 919.6
+  },
+  "Maribyrnong": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1049.5
+  },
+  "Mayo": {
+   "rank": 67,
+   "state": "SA",
+   "value": 998.4
+  },
+  "McEwen": {
+   "rank": 46,
+   "state": "VIC",
+   "value": 1030.3
+  },
+  "McMahon": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 953.9
+  },
+  "McPherson": {
+   "rank": 52,
+   "state": "QLD",
+   "value": 1026.1
+  },
+  "Melbourne": {
+   "rank": 20,
+   "state": "VIC",
+   "value": 1089.5
+  },
+  "Menzies": {
+   "rank": 25,
+   "state": "VIC",
+   "value": 1073.0
+  },
+  "Mitchell": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1130.7
+  },
+  "Monash": {
+   "rank": 115,
+   "state": "VIC",
+   "value": 953.2
+  },
+  "Moncrieff": {
+   "rank": 63,
+   "state": "QLD",
+   "value": 1003.7
+  },
+  "Moore": {
+   "rank": 28,
+   "state": "WA",
+   "value": 1071.4
+  },
+  "Moreton": {
+   "rank": 40,
+   "state": "QLD",
+   "value": 1038.4
+  },
+  "New England": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 934.2
+  },
+  "Newcastle": {
+   "rank": 55,
+   "state": "NSW",
+   "value": 1017.7
+  },
+  "Nicholls": {
+   "rank": 127,
+   "state": "VIC",
+   "value": 935.2
+  },
+  "O'Connor": {
+   "rank": 120,
+   "state": "WA",
+   "value": 950.0
+  },
+  "Oxley": {
+   "rank": 87,
+   "state": "QLD",
+   "value": 973.1
+  },
+  "Page": {
+   "rank": 131,
+   "state": "NSW",
+   "value": 933.9
+  },
+  "Parkes": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 935.6
+  },
+  "Parramatta": {
+   "rank": 32,
+   "state": "NSW",
+   "value": 1053.5
+  },
+  "Paterson": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 949.7
+  },
+  "Pearce": {
+   "rank": 68,
+   "state": "WA",
+   "value": 998.2
+  },
+  "Perth": {
+   "rank": 31,
+   "state": "WA",
+   "value": 1058.2
+  },
+  "Petrie": {
+   "rank": 81,
+   "state": "QLD",
+   "value": 979.2
+  },
+  "Rankin": {
+   "rank": 133,
+   "state": "QLD",
+   "value": 932.4
+  },
+  "Reid": {
+   "rank": 19,
+   "state": "NSW",
+   "value": 1089.9
+  },
+  "Richmond": {
+   "rank": 76,
+   "state": "NSW",
+   "value": 986.8
+  },
+  "Riverina": {
+   "rank": 105,
+   "state": "NSW",
+   "value": 960.5
+  },
+  "Robertson": {
+   "rank": 60,
+   "state": "NSW",
+   "value": 1010.2
+  },
+  "Ryan": {
+   "rank": 14,
+   "state": "QLD",
+   "value": 1106.0
+  },
+  "Scullin": {
+   "rank": 96,
+   "state": "VIC",
+   "value": 964.4
+  },
+  "Shortland": {
+   "rank": 88,
+   "state": "NSW",
+   "value": 973.0
+  },
+  "Solomon": {
+   "rank": 54,
+   "state": "NT",
+   "value": 1023.4
+  },
+  "Spence": {
+   "rank": 150,
+   "state": "SA",
+   "value": 864.2
+  },
+  "Sturt": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1040.7
+  },
+  "Swan": {
+   "rank": 56,
+   "state": "WA",
+   "value": 1017.1
+  },
+  "Sydney": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1128.2
+  },
+  "Tangney": {
+   "rank": 29,
+   "state": "WA",
+   "value": 1070.8
+  },
+  "Wannon": {
+   "rank": 104,
+   "state": "VIC",
+   "value": 961.0
+  },
+  "Warringah": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1159.0
+  },
+  "Watson": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 936.5
+  },
+  "Wentworth": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1163.4
+  },
+  "Werriwa": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 961.4
+  },
+  "Whitlam": {
+   "rank": 78,
+   "state": "NSW",
+   "value": 985.5
+  },
+  "Wide Bay": {
+   "rank": 137,
+   "state": "QLD",
+   "value": 928.1
+  },
+  "Wills": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1059.7
+  },
+  "Wright": {
+   "rank": 86,
+   "state": "QLD",
+   "value": 974.3
+  },
+  "_meta": {
+   "censusYear": 2021,
+   "derivation": "weighted",
+   "editionInForce": "2024",
+   "provName": "irsad-weighted-2021",
+   "sourceProduct": "ABS SEIFA 2021 SA1 cube × CED_2024_AUST MB allocations + 2021 census MB counts"
+  }
+ },
+ "2028": {
+  "Adelaide": {
+   "rank": 58,
+   "state": "SA",
+   "value": 1012.9
+  },
+  "Aston": {
+   "rank": 48,
+   "state": "VIC",
+   "value": 1028.7
+  },
+  "Ballarat": {
+   "rank": 92,
+   "state": "VIC",
+   "value": 970.0
+  },
+  "Banks": {
+   "rank": 42,
+   "state": "NSW",
+   "value": 1034.6
+  },
+  "Barker": {
+   "rank": 142,
+   "state": "SA",
+   "value": 919.7
+  },
+  "Barton": {
+   "rank": 44,
+   "state": "NSW",
+   "value": 1033.2
+  },
+  "Bass": {
+   "rank": 136,
+   "state": "TAS",
+   "value": 929.6
+  },
+  "Bean": {
+   "rank": 26,
+   "state": "ACT",
+   "value": 1072.9
+  },
+  "Bendigo": {
+   "rank": 94,
+   "state": "VIC",
+   "value": 965.7
+  },
+  "Bennelong": {
+   "rank": 8,
+   "state": "NSW",
+   "value": 1117.7
+  },
+  "Berowra": {
+   "rank": 11,
+   "state": "NSW",
+   "value": 1114.9
+  },
+  "Blair": {
+   "rank": 129,
+   "state": "QLD",
+   "value": 934.4
+  },
+  "Blaxland": {
+   "rank": 139,
+   "state": "NSW",
+   "value": 923.8
+  },
+  "Bonner": {
+   "rank": 34,
+   "state": "QLD",
+   "value": 1050.6
+  },
+  "Boothby": {
+   "rank": 47,
+   "state": "SA",
+   "value": 1029.2
+  },
+  "Bowman": {
+   "rank": 65,
+   "state": "QLD",
+   "value": 1003.2
+  },
+  "Braddon": {
+   "rank": 146,
+   "state": "TAS",
+   "value": 902.1
+  },
+  "Bradfield": {
+   "rank": 3,
+   "state": "NSW",
+   "value": 1157.4
+  },
+  "Brand": {
+   "rank": 118,
+   "state": "WA",
+   "value": 951.0
+  },
+  "Brisbane": {
+   "rank": 15,
+   "state": "QLD",
+   "value": 1104.0
+  },
+  "Bruce": {
+   "rank": 84,
+   "state": "VIC",
+   "value": 975.3
+  },
+  "Bullwinkel": {
+   "rank": 70,
+   "state": "WA",
+   "value": 997.8
+  },
+  "Burt": {
+   "rank": 113,
+   "state": "WA",
+   "value": 953.7
+  },
+  "Calare": {
+   "rank": 106,
+   "state": "NSW",
+   "value": 959.0
+  },
+  "Calwell": {
+   "rank": 124,
+   "state": "VIC",
+   "value": 936.8
+  },
+  "Canberra": {
+   "rank": 7,
+   "state": "ACT",
+   "value": 1122.7
+  },
+  "Canning": {
+   "rank": 117,
+   "state": "WA",
+   "value": 951.7
+  },
+  "Capricornia": {
+   "rank": 119,
+   "state": "QLD",
+   "value": 951.0
+  },
+  "Casey": {
+   "rank": 57,
+   "state": "VIC",
+   "value": 1017.0
+  },
+  "Chifley": {
+   "rank": 111,
+   "state": "NSW",
+   "value": 954.1
+  },
+  "Chisholm": {
+   "rank": 17,
+   "state": "VIC",
+   "value": 1095.8
+  },
+  "Clark": {
+   "rank": 74,
+   "state": "TAS",
+   "value": 993.7
+  },
+  "Cook": {
+   "rank": 21,
+   "state": "NSW",
+   "value": 1087.6
+  },
+  "Cooper": {
+   "rank": 35,
+   "state": "VIC",
+   "value": 1050.5
+  },
+  "Corangamite": {
+   "rank": 49,
+   "state": "VIC",
+   "value": 1027.3
+  },
+  "Corio": {
+   "rank": 83,
+   "state": "VIC",
+   "value": 976.0
+  },
+  "Cowan": {
+   "rank": 90,
+   "state": "WA",
+   "value": 971.3
+  },
+  "Cowper": {
+   "rank": 128,
+   "state": "NSW",
+   "value": 934.6
+  },
+  "Cunningham": {
+   "rank": 62,
+   "state": "NSW",
+   "value": 1006.7
+  },
+  "Curtin": {
+   "rank": 10,
+   "state": "WA",
+   "value": 1115.3
+  },
+  "Dawson": {
+   "rank": 107,
+   "state": "QLD",
+   "value": 958.5
+  },
+  "Deakin": {
+   "rank": 33,
+   "state": "VIC",
+   "value": 1052.0
+  },
+  "Dickson": {
+   "rank": 53,
+   "state": "QLD",
+   "value": 1025.0
+  },
+  "Dobell": {
+   "rank": 101,
+   "state": "NSW",
+   "value": 961.4
+  },
+  "Dunkley": {
+   "rank": 73,
+   "state": "VIC",
+   "value": 994.4
+  },
+  "Durack": {
+   "rank": 108,
+   "state": "WA",
+   "value": 956.7
+  },
+  "Eden-Monaro": {
+   "rank": 71,
+   "state": "NSW",
+   "value": 997.6
+  },
+  "Fadden": {
+   "rank": 72,
+   "state": "QLD",
+   "value": 995.4
+  },
+  "Fairfax": {
+   "rank": 64,
+   "state": "QLD",
+   "value": 1003.5
+  },
+  "Farrer": {
+   "rank": 122,
+   "state": "NSW",
+   "value": 944.7
+  },
+  "Fenner": {
+   "rank": 24,
+   "state": "ACT",
+   "value": 1077.0
+  },
+  "Fisher": {
+   "rank": 69,
+   "state": "QLD",
+   "value": 998.0
+  },
+  "Flinders": {
+   "rank": 59,
+   "state": "VIC",
+   "value": 1012.5
+  },
+  "Flynn": {
+   "rank": 140,
+   "state": "QLD",
+   "value": 922.9
+  },
+  "Forde": {
+   "rank": 114,
+   "state": "QLD",
+   "value": 953.3
+  },
+  "Forrest": {
+   "rank": 95,
+   "state": "WA",
+   "value": 965.5
+  },
+  "Fowler": {
+   "rank": 148,
+   "state": "NSW",
+   "value": 896.8
+  },
+  "Franklin": {
+   "rank": 75,
+   "state": "TAS",
+   "value": 988.7
+  },
+  "Fraser": {
+   "rank": 89,
+   "state": "VIC",
+   "value": 971.8
+  },
+  "Fremantle": {
+   "rank": 45,
+   "state": "WA",
+   "value": 1030.6
+  },
+  "Gellibrand": {
+   "rank": 38,
+   "state": "VIC",
+   "value": 1043.7
+  },
+  "Gilmore": {
+   "rank": 97,
+   "state": "NSW",
+   "value": 964.3
+  },
+  "Gippsland": {
+   "rank": 135,
+   "state": "VIC",
+   "value": 930.2
+  },
+  "Goldstein": {
+   "rank": 9,
+   "state": "VIC",
+   "value": 1115.9
+  },
+  "Gorton": {
+   "rank": 80,
+   "state": "VIC",
+   "value": 982.4
+  },
+  "Grayndler": {
+   "rank": 16,
+   "state": "NSW",
+   "value": 1102.4
+  },
+  "Greenway": {
+   "rank": 22,
+   "state": "NSW",
+   "value": 1085.5
+  },
+  "Grey": {
+   "rank": 145,
+   "state": "SA",
+   "value": 908.6
+  },
+  "Griffith": {
+   "rank": 18,
+   "state": "QLD",
+   "value": 1094.5
+  },
+  "Groom": {
+   "rank": 99,
+   "state": "QLD",
+   "value": 962.6
+  },
+  "Hasluck": {
+   "rank": 79,
+   "state": "WA",
+   "value": 983.8
+  },
+  "Hawke": {
+   "rank": 103,
+   "state": "VIC",
+   "value": 961.1
+  },
+  "Herbert": {
+   "rank": 109,
+   "state": "QLD",
+   "value": 956.3
+  },
+  "Hindmarsh": {
+   "rank": 77,
+   "state": "SA",
+   "value": 986.1
+  },
+  "Hinkler": {
+   "rank": 147,
+   "state": "QLD",
+   "value": 902.1
+  },
+  "Holt": {
+   "rank": 93,
+   "state": "VIC",
+   "value": 966.4
+  },
+  "Hotham": {
+   "rank": 51,
+   "state": "VIC",
+   "value": 1026.6
+  },
+  "Hughes": {
+   "rank": 37,
+   "state": "NSW",
+   "value": 1046.8
+  },
+  "Hume": {
+   "rank": 43,
+   "state": "NSW",
+   "value": 1033.9
+  },
+  "Hunter": {
+   "rank": 123,
+   "state": "NSW",
+   "value": 943.5
+  },
+  "Indi": {
+   "rank": 98,
+   "state": "VIC",
+   "value": 963.4
+  },
+  "Isaacs": {
+   "rank": 66,
+   "state": "VIC",
+   "value": 1001.4
+  },
+  "Jagajaga": {
+   "rank": 27,
+   "state": "VIC",
+   "value": 1071.5
+  },
+  "Kennedy": {
+   "rank": 141,
+   "state": "QLD",
+   "value": 921.5
+  },
+  "Kingsford Smith": {
+   "rank": 23,
+   "state": "NSW",
+   "value": 1081.5
+  },
+  "Kingston": {
+   "rank": 110,
+   "state": "SA",
+   "value": 954.5
+  },
+  "Kooyong": {
+   "rank": 4,
+   "state": "VIC",
+   "value": 1131.0
+  },
+  "La Trobe": {
+   "rank": 61,
+   "state": "VIC",
+   "value": 1008.5
+  },
+  "Lalor": {
+   "rank": 85,
+   "state": "VIC",
+   "value": 975.1
+  },
+  "Leichhardt": {
+   "rank": 116,
+   "state": "QLD",
+   "value": 952.2
+  },
+  "Lilley": {
+   "rank": 41,
+   "state": "QLD",
+   "value": 1035.1
+  },
+  "Lindsay": {
+   "rank": 82,
+   "state": "NSW",
+   "value": 976.3
+  },
+  "Lingiari": {
+   "rank": 149,
+   "state": "NT",
+   "value": 886.9
+  },
+  "Longman": {
+   "rank": 134,
+   "state": "QLD",
+   "value": 932.2
+  },
+  "Lyne": {
+   "rank": 132,
+   "state": "NSW",
+   "value": 933.1
+  },
+  "Lyons": {
+   "rank": 144,
+   "state": "TAS",
+   "value": 912.3
+  },
+  "Macarthur": {
+   "rank": 91,
+   "state": "NSW",
+   "value": 970.7
+  },
+  "Mackellar": {
+   "rank": 12,
+   "state": "NSW",
+   "value": 1112.2
+  },
+  "Macnamara": {
+   "rank": 13,
+   "state": "VIC",
+   "value": 1109.4
+  },
+  "Macquarie": {
+   "rank": 50,
+   "state": "NSW",
+   "value": 1026.9
+  },
+  "Makin": {
+   "rank": 102,
+   "state": "SA",
+   "value": 961.3
+  },
+  "Mallee": {
+   "rank": 138,
+   "state": "VIC",
+   "value": 924.6
+  },
+  "Maranoa": {
+   "rank": 143,
+   "state": "QLD",
+   "value": 919.6
+  },
+  "Maribyrnong": {
+   "rank": 36,
+   "state": "VIC",
+   "value": 1049.5
+  },
+  "Mayo": {
+   "rank": 67,
+   "state": "SA",
+   "value": 998.4
+  },
+  "McEwen": {
+   "rank": 46,
+   "state": "VIC",
+   "value": 1030.3
+  },
+  "McMahon": {
+   "rank": 112,
+   "state": "NSW",
+   "value": 953.9
+  },
+  "McPherson": {
+   "rank": 52,
+   "state": "QLD",
+   "value": 1026.1
+  },
+  "Melbourne": {
+   "rank": 20,
+   "state": "VIC",
+   "value": 1089.5
+  },
+  "Menzies": {
+   "rank": 25,
+   "state": "VIC",
+   "value": 1073.0
+  },
+  "Mitchell": {
+   "rank": 5,
+   "state": "NSW",
+   "value": 1130.7
+  },
+  "Monash": {
+   "rank": 115,
+   "state": "VIC",
+   "value": 953.2
+  },
+  "Moncrieff": {
+   "rank": 63,
+   "state": "QLD",
+   "value": 1003.7
+  },
+  "Moore": {
+   "rank": 28,
+   "state": "WA",
+   "value": 1071.4
+  },
+  "Moreton": {
+   "rank": 40,
+   "state": "QLD",
+   "value": 1038.4
+  },
+  "New England": {
+   "rank": 130,
+   "state": "NSW",
+   "value": 934.2
+  },
+  "Newcastle": {
+   "rank": 55,
+   "state": "NSW",
+   "value": 1017.7
+  },
+  "Nicholls": {
+   "rank": 127,
+   "state": "VIC",
+   "value": 935.2
+  },
+  "O'Connor": {
+   "rank": 120,
+   "state": "WA",
+   "value": 950.0
+  },
+  "Oxley": {
+   "rank": 87,
+   "state": "QLD",
+   "value": 973.1
+  },
+  "Page": {
+   "rank": 131,
+   "state": "NSW",
+   "value": 933.9
+  },
+  "Parkes": {
+   "rank": 126,
+   "state": "NSW",
+   "value": 935.6
+  },
+  "Parramatta": {
+   "rank": 32,
+   "state": "NSW",
+   "value": 1053.5
+  },
+  "Paterson": {
+   "rank": 121,
+   "state": "NSW",
+   "value": 949.7
+  },
+  "Pearce": {
+   "rank": 68,
+   "state": "WA",
+   "value": 998.2
+  },
+  "Perth": {
+   "rank": 31,
+   "state": "WA",
+   "value": 1058.2
+  },
+  "Petrie": {
+   "rank": 81,
+   "state": "QLD",
+   "value": 979.2
+  },
+  "Rankin": {
+   "rank": 133,
+   "state": "QLD",
+   "value": 932.4
+  },
+  "Reid": {
+   "rank": 19,
+   "state": "NSW",
+   "value": 1089.9
+  },
+  "Richmond": {
+   "rank": 76,
+   "state": "NSW",
+   "value": 986.8
+  },
+  "Riverina": {
+   "rank": 105,
+   "state": "NSW",
+   "value": 960.5
+  },
+  "Robertson": {
+   "rank": 60,
+   "state": "NSW",
+   "value": 1010.2
+  },
+  "Ryan": {
+   "rank": 14,
+   "state": "QLD",
+   "value": 1106.0
+  },
+  "Scullin": {
+   "rank": 96,
+   "state": "VIC",
+   "value": 964.4
+  },
+  "Shortland": {
+   "rank": 88,
+   "state": "NSW",
+   "value": 973.0
+  },
+  "Solomon": {
+   "rank": 54,
+   "state": "NT",
+   "value": 1024.9
+  },
+  "Spence": {
+   "rank": 150,
+   "state": "SA",
+   "value": 864.2
+  },
+  "Sturt": {
+   "rank": 39,
+   "state": "SA",
+   "value": 1040.7
+  },
+  "Swan": {
+   "rank": 56,
+   "state": "WA",
+   "value": 1017.1
+  },
+  "Sydney": {
+   "rank": 6,
+   "state": "NSW",
+   "value": 1128.2
+  },
+  "Tangney": {
+   "rank": 29,
+   "state": "WA",
+   "value": 1070.8
+  },
+  "Wannon": {
+   "rank": 104,
+   "state": "VIC",
+   "value": 961.0
+  },
+  "Warringah": {
+   "rank": 2,
+   "state": "NSW",
+   "value": 1159.0
+  },
+  "Watson": {
+   "rank": 125,
+   "state": "NSW",
+   "value": 936.5
+  },
+  "Wentworth": {
+   "rank": 1,
+   "state": "NSW",
+   "value": 1163.4
+  },
+  "Werriwa": {
+   "rank": 100,
+   "state": "NSW",
+   "value": 961.4
+  },
+  "Whitlam": {
+   "rank": 78,
+   "state": "NSW",
+   "value": 985.5
+  },
+  "Wide Bay": {
+   "rank": 137,
+   "state": "QLD",
+   "value": 928.1
+  },
+  "Wills": {
+   "rank": 30,
+   "state": "VIC",
+   "value": 1059.7
+  },
+  "Wright": {
+   "rank": 86,
+   "state": "QLD",
+   "value": 974.3
+  },
+  "_meta": {
+   "censusYear": 2021,
+   "derivation": "weighted",
+   "editionInForce": "2025",
+   "forward": true,
+   "provName": "irsad-weighted-2021",
+   "sourceProduct": "ABS SEIFA 2021 SA1 cube × CED_2025_AUST MB allocations + 2021 census MB counts"
+  }
+ }
+}

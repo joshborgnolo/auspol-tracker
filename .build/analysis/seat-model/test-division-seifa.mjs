@@ -4,22 +4,32 @@
    (extract-division-seifa.mjs). Invariants:
 
    1. Store elections are exactly the landed set {2001, 2004, 2007, 2010,
-      2013, 2016, 2019, 2022, 2025}, each N divisions (151 in 2019/2022,
-      150 otherwise), division-keyed, no others.
+      2013, 2016, 2019, 2022, 2025} plus the irsad-only forward block 2028,
+      each N divisions (151 in 2019/2022, 150 otherwise), division-keyed,
+      no others.
    2. Division sets are NAME-EXACT against data/division-classifications.json's
       matching election blocks — joins must never miss (2001: 2000-edition
       set with Bonython/Burke, 2007: the 2006-edition set, 2010: the 2009
       edition, 2019/2022: the 151-division editions with Macnamara and then
-      Hawke, 2025: back to 150 with Bullwinkel).
-   3. Row shape is exactly {state, irsd, ier, ieo, via} — state one of the
-      eight codes, each index {value: number, rank: int 1..N}; the IRSAD
-      lane (sibling pipeline) keys NEVER appear in this store; via matches
-      the election's lane (2001=absCed01, 2004=aph05cib01, 2007=aph09rp02,
-      2010=aph11rp01, 2013=absSa1Ced2011, 2016=absSa1Ced2016,
-      2019=absSa1Ced2018, 2022=absMbCed2021, 2025=absMbCed2024).
+      Hawke, 2025: back to 150 with Bullwinkel; 2028's 150 are the
+      2025-edition set with Bullwinkel retained and every 2025 name kept
+      except the redistributed pairs — checked against the classifications
+      block 2028 where present, else the cells file's own set NAMED here).
+   3. Row shape per election block: the 2001-2025 blocks carry exactly
+      {state, irsd, ier, ieo, irsad, via} — state one of the eight codes;
+      irsd/ier/ieo {value: number, rank: int 1..N}; irsad
+      {value: number, rank: int 1..N, rankDis: int 1..N} with
+      rankDis = N+1-rank (rank runs 1 = MOST ADVANTAGED, the natural IRSAD
+      read, unlike the other three where 1 = most disadvantaged); via
+      matches the election's lane (2001=absCed01, 2004=aph05cib01,
+      2007=aph09rp02, 2010=aph11rp01, 2013=absSa1Ced2011,
+      2016=absSa1Ced2016, 2019=absSa1Ced2018, 2022=absMbCed2021,
+      2025=absMbCed2024). The 2028 forward block carries {state, irsad, via}
+      only — the other three indexes have no 2025-boundary product.
    4. Ranks per election x index are an exact permutation of 1..N (the APH
       prints a complete ranking; the ABS lanes compute one from their carried
-      scores; ties are ordered, never shared).
+      scores; ties are ordered, never shared). For irsad BOTH rank keys are
+      permutations, and rankDis is the exact complement.
    5. Known cells, spread across elections, indexes, states and rankings —
       APH cells read straight off the printed tables, ABS cells recomputed
       against the ABS cubes: 2007 Lingiari is last on Disadv (831/rank 1)
@@ -33,11 +43,18 @@
       Macnamara ranks 135/151 on Disadv (1074.079); 2022's new Hawke 51st
       (982.037); 2025's Bullwinkel enters at 97 (1022.497) with Lingiari
       identical to its 2022 self on unchanged NT boundaries (834.708/2).
+      IRSAD cells pinned against the sibling pipeline's committed display
+      rows: 2001 North Sydney most advantaged (1204/rank 1) and Bonython
+      most disadvantaged (882/150, rankDis 1); 2007 Bradfield leads again
+      at 1182; 2019 Macnamara is high-IRSAD despite its low-IRSD pockets
+      (1107/rank 14, rankDis 138); 2025 Bullwinkel enters just under the
+      median (997.8/70, rankDis 81) and forward-block Lingiari sits
+      second-most-disadvantaged (886.9/rank 149, rankDis 2).
    6. Printed-score means: unweighted mean across divisions of each index
-      rounds to the papers' printed "overall average" figures 1005/1006/1007/
-      998 (IRSD/IRSAD/IER/IEO) for BOTH the 2006- and 2009-boundary papers —
-      an end-to-end checksum over every parsed score (irsad lives in the
-      fixture, not the store).
+      rounds to the papers' printed "overall average" figures 1005/1006/
+      1007/998 (IRSD/IRSAD/IER/IEO) for BOTH the 2006- and 2009-boundary
+      papers — an end-to-end checksum over every parsed score (fixture
+      lane, the same figure the store's spliced cells derive from).
    7. The 01cib13 xcheck fixture (1996 census x 2000 boundaries, never a
       store input) parses to exactly 150 divisions with complete 1..150 rank
       permutations on each of its four indexes — its use is downstream
@@ -54,7 +71,15 @@
   10. Every election's via resolves to a _provenance entry whose censusYear
       matches the election's census (2001- and 2016-census products back
       two elections each) — an unregistered lane must fail loud here, never
-      surface as a silent "via unknown" downstream.
+      surface as a silent "via unknown" downstream. For shared elections the
+      irsad lane is registered per census+derivation (irsad-published-2001
+      backs the 2001 rows, irsad-published-2001-e2003 the 2004 rows, …) and
+      its provenance censusYear likewise matches.
+  11. The combined store stays byte-faithful to the sibling display store:
+      for every election and division, the merged irsad cell's value+rank
+      equals the matching row in .build/analysis/seifa-index/irsad-by-division.json
+      (the single-file merge is a splice, never a re-derivation — drift
+      between the two stores would quietly fork the site's IRSAD record).
 
    The extractor runs standalone from the repo root:
      node .build/analysis/seat-model/extract-division-seifa.mjs
@@ -65,6 +90,7 @@ import { readFileSync } from "node:fs";
 const SEIFA = "data/division-seifa-indexes.json";
 const CLASS = "data/division-classifications.json";
 const FIXTURE = ".build/analysis/seat-model/seifa-src/aph-fixtures.json";
+const SIBLING = ".build/analysis/seifa-index/irsad-by-division.json";
 
 let failures = [];
 const check = (ok, msg) => { if (!ok) failures.push(msg); };
@@ -73,16 +99,41 @@ const die = () => { for (const f of failures) console.error(`  FAIL ${f}`); if (
 const store = JSON.parse(readFileSync(SEIFA, "utf8"));
 const klass = JSON.parse(readFileSync(CLASS, "utf8")).elections;
 const fixtures = JSON.parse(readFileSync(FIXTURE, "utf8"));
+const sibling = JSON.parse(readFileSync(SIBLING, "utf8"));
 
 const IDX = ["irsd", "ier", "ieo"]; // store indexes
 const IDX4 = ["irsad", "irsd", "ier", "ieo"]; // fixture indexes
-const COUNT_FOR = { 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150 };
+const COUNT_FOR = { 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150, 2028: 150 };
 const ELECTION_SET = Object.keys(COUNT_FOR);
+const SHARED_SET = ELECTION_SET.filter((y) => y !== "2028");
 const VIA_FOR = {
   2001: "absCed01", 2004: "aph05cib01", 2007: "aph09rp02", 2010: "aph11rp01", 2013: "absSa1Ced2011",
   2016: "absSa1Ced2016", 2019: "absSa1Ced2018", 2022: "absMbCed2021", 2025: "absMbCed2024",
+  2028: "irsad-weighted-2021-e2025",
 };
-const CENSUS_FOR = { 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021 };
+const CENSUS_FOR = { 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021, 2028: 2021 };
+const IRSAD_PROV_FOR = {
+  2001: "irsad-published-2001", 2004: "irsad-published-2001-e2003",
+  2007: "irsad-published-2006", 2010: "irsad-published-2006-e2009",
+  2013: "irsad-weighted-2011", 2016: "irsad-weighted-2016",
+  2019: "irsad-weighted-2016-e2018", 2022: "irsad-weighted-2021",
+  2025: "irsad-weighted-2021-e2024", 2028: "irsad-weighted-2021-e2025",
+};
+const NAMES_2025_EDITION = ["Adelaide","Aston","Ballarat","Banks","Barker","Barton","Bass","Bean",
+"Bendigo","Bennelong","Berowra","Blair","Blaxland","Bonner","Boothby","Bowman","Braddon","Bradfield",
+"Brand","Brisbane","Bruce","Bullwinkel","Burt","Calare","Calwell","Canberra","Canning","Capricornia",
+"Casey","Chifley","Chisholm","Clark","Cook","Cooper","Corangamite","Corio","Cowan","Cowper","Cunningham",
+"Curtin","Dawson","Deakin","Dickson","Dobell","Dunkley","Durack","Eden-Monaro","Fadden","Fairfax","Farrer",
+"Fenner","Fisher","Flinders","Flynn","Forde","Forrest","Fowler","Franklin","Fraser","Fremantle","Gellibrand",
+"Gilmore","Gippsland","Goldstein","Gorton","Grayndler","Greenway","Grey","Griffith","Groom","Hasluck",
+"Hawke","Herbert","Hindmarsh","Hinkler","Holt","Hotham","Hughes","Hume","Hunter","Indi","Isaacs","Jagajaga",
+"Kennedy","Kingsford Smith","Kingston","Kooyong","La Trobe","Lalor","Leichhardt","Lilley","Lindsay",
+"Lingiari","Longman","Lyne","Lyons","Macarthur","Mackellar","Macnamara","Macquarie","Makin","Mallee",
+"Maranoa","Maribyrnong","Mayo","McEwen","McMahon","McPherson","Melbourne","Menzies","Mitchell","Monash",
+"Moncrieff","Moore","Moreton","New England","Newcastle","Nicholls","O'Connor","Oxley","Page","Parkes",
+"Parramatta","Paterson","Pearce","Perth","Petrie","Rankin","Reid","Richmond","Riverina","Robertson","Ryan",
+"Scullin","Shortland","Solomon","Spence","Sturt","Swan","Sydney","Tangney","Wannon","Warringah","Watson",
+"Wentworth","Werriwa","Whitlam","Wide Bay","Wills","Wright"];
 const STATES = new Set(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]);
 
 // 1
@@ -93,45 +144,81 @@ for (const y of ELECTION_SET) {
   const N = COUNT_FOR[y];
   const blk = store.elections[y];
   check(Object.keys(blk).length === N, `${y}: ${Object.keys(blk).length} divisions != ${N}`);
-  // 2 — name-exact division set against classifications
+  // 2 — name-exact division set against classifications (2028 pins against
+  // its 2025-edition reference names; a classifications 2028 block landing
+  // later must agree)
   const mine = new Set(Object.keys(blk));
-  const theirs = new Set(Object.keys(klass[y]));
+  const theirs = y === "2028" && !klass[y] ? new Set(NAMES_2025_EDITION) : new Set(Object.keys(klass[y] || {}));
   const missing = [...theirs].filter((n) => !mine.has(n));
   const extra = [...mine].filter((n) => !theirs.has(n));
   check(missing.length === 0 && extra.length === 0,
-    `${y}: division-set mismatch vs classifications — missing ${JSON.stringify(missing)} extra ${JSON.stringify(extra)}`);
+    `${y}: division-set mismatch — missing ${JSON.stringify(missing)} extra ${JSON.stringify(extra)}`);
   // 3
   for (const [name, row] of Object.entries(blk)) {
-    check(JSON.stringify(Object.keys(row).sort()) === JSON.stringify(["ieo", "ier", "irsd", "state", "via"]),
+    const wantKeys = y === "2028" ? ["irsad", "state", "via"] : ["ieo", "ier", "irsad", "irsd", "state", "via"];
+    check(JSON.stringify(Object.keys(row).sort()) === JSON.stringify(wantKeys),
       `${y} ${name}: row keys ${Object.keys(row)}`);
     check(STATES.has(row.state), `${y} ${name}: bad state ${row.state}`);
-    for (const idx of IDX) {
-      const cell = row[idx];
-      check(Number.isFinite(cell.value) && Number.isInteger(cell.rank),
-        `${y} ${name} ${idx}: bad cell ${JSON.stringify(cell)}`);
-      check(cell.rank >= 1 && cell.rank <= N, `${y} ${name} ${idx}: rank ${cell.rank} out of 1..${N}`);
-      check(cell.value > 700 && cell.value < 1400, `${y} ${name} ${idx}: value ${cell.value} outside sanity band`);
+    if (y !== "2028") {
+      for (const idx of IDX) {
+        const cell = row[idx];
+        check(Number.isFinite(cell.value) && Number.isInteger(cell.rank),
+          `${y} ${name} ${idx}: bad cell ${JSON.stringify(cell)}`);
+        check(cell.rank >= 1 && cell.rank <= N, `${y} ${name} ${idx}: rank ${cell.rank} out of 1..${N}`);
+        check(cell.value > 700 && cell.value < 1400, `${y} ${name} ${idx}: value ${cell.value} outside sanity band`);
+      }
     }
+    const cell = row.irsad;
+    check(cell && Number.isFinite(cell.value) && Number.isInteger(cell.rank) && Number.isInteger(cell.rankDis),
+      `${y} ${name} irsad: bad cell ${JSON.stringify(cell)}`);
+    check(cell.rank >= 1 && cell.rank <= N && cell.rankDis >= 1 && cell.rankDis <= N,
+      `${y} ${name} irsad: ranks ${cell.rank}/${cell.rankDis} out of 1..${N}`);
+    check(cell.rankDis === N + 1 - cell.rank,
+      `${y} ${name} irsad: rankDis ${cell.rankDis} != ${N + 1} - rank ${cell.rank}`);
+    check(cell.value > 700 && cell.value < 1400, `${y} ${name} irsad: value ${cell.value} outside sanity band`);
     check(row.via === VIA_FOR[y], `${y} ${name}: via ${row.via} != ${VIA_FOR[y]}`);
-    check(!("irsad" in row), `${y} ${name}: irsad key leaked into sibling lane store`);
   }
   // 4
-  for (const idx of IDX) {
+  for (const idx of y === "2028" ? [] : IDX) {
     const ranks = Object.values(blk).map((r) => r[idx].rank).sort((a, b) => a - b);
     check(ranks.length === N && ranks.every((r, i) => r === i + 1),
       `${y} ${idx}: ranks are not a 1..${N} permutation`);
   }
+  for (const key of ["rank", "rankDis"]) {
+    const ranks = Object.values(blk).map((r) => r.irsad[key]).sort((a, b) => a - b);
+    check(ranks.length === N && ranks.every((r, i) => r === i + 1),
+      `${y} irsad.${key}: ranks are not a 1..${N} permutation`);
+  }
 }
 
-// 10 — every election's lane is a registered, census-correct provenance entry
+// 10 — every lane is a registered, census-correct provenance entry (both
+// the three-index lanes and the spliced IRSAD lanes)
 for (const y of ELECTION_SET) {
-  const prov = store._provenance[VIA_FOR[y]];
-  check(prov != null, `${y}: no _provenance entry for via ${VIA_FOR[y]}`);
-  if (prov) {
-    check(prov.censusYear === CENSUS_FOR[y],
-      `${y} via ${VIA_FOR[y]}: censusYear ${prov.censusYear} != ${CENSUS_FOR[y]}`);
-    check(typeof prov.editionInForce === "string" && prov.editionInForce.length > 0,
-      `${y} via ${VIA_FOR[y]}: no editionInForce`);
+  for (const via of new Set([VIA_FOR[y], IRSAD_PROV_FOR[y]])) {
+    const prov = store._provenance[via];
+    check(prov != null, `${y}: no _provenance entry for via ${via}`);
+    if (prov) {
+      check(prov.censusYear === CENSUS_FOR[y],
+        `${y} via ${via}: censusYear ${prov.censusYear} != ${CENSUS_FOR[y]}`);
+      check(typeof prov.editionInForce === "string" && prov.editionInForce.length > 0,
+        `${y} via ${via}: no editionInForce`);
+    }
+  }
+}
+
+// 11 — merged irsad cells byte-faithful to the sibling display store
+for (const y of ELECTION_SET) {
+  const srows = new Map(sibling.elections[y].rows.map((r) => [r.division, r]));
+  const RENAME = { "Kingston-Smith": "Kingsford Smith", "McEwan": "McEwen" };
+  const canon = (n) => {
+    const t = n.trim().replace(/[’‘]/g, "'");
+    return (RENAME[t] ?? t).replace(/\bMc([a-z])/g, (m, c) => "Mc" + c.toUpperCase());
+  };
+  for (const [name, row] of Object.entries(store.elections[y])) {
+    const srow = [...sibling.elections[y].rows].find((r) => canon(r.division) === name);
+    if (!srow) { failures.push(`${y} ${name}: no sibling row`); continue; }
+    check(row.irsad.value === srow.irsad && row.irsad.rank === srow.rank,
+      `${y} ${name} irsad: merged ${row.irsad.value}/rank ${row.irsad.rank} != sibling ${srow.irsad}/rank ${srow.rank}`);
   }
 }
 
@@ -142,6 +229,12 @@ const pin = (y, name, idx, value, rank) => {
   if (!cell) { failures.push(`${y} ${name}: absent`); return; }
   check(cell.value === value && cell.rank === rank,
     `${y} ${name} ${idx}: got ${cell.value}/rank ${cell.rank}, want ${value}/rank ${rank}`);
+};
+const pinDis = (y, name, value, rank, rankDis) => {
+  const cell = store.elections[y]?.[name]?.irsad;
+  if (!cell) { failures.push(`${y} ${name}: irsad absent`); return; }
+  check(cell.value === value && cell.rank === rank && cell.rankDis === rankDis,
+    `${y} ${name} irsad: got ${cell.value}/rank ${cell.rank}/rankDis ${cell.rankDis}, want ${value}/${rank}/${rankDis}`);
 };
 pin("2007", "Lingiari", "irsd", 831, 1);
 pin("2007", "Lingiari", "ier", 856, 1);
@@ -185,6 +278,14 @@ pin("2022", "Lingiari", "irsd", 834.708, 2);
 pin("2025", "Bullwinkel", "irsd", 1022.497, 97);
 pin("2025", "Lingiari", "irsd", 834.708, 2);
 pin("2025", "Bradfield", "ier", 1085.551, 145);
+// IRSAD pins (sibling pipeline's committed display rows, RR5/APH-printed or
+// ABS-derived per lane)
+pinDis("2001", "North Sydney", 1204, 1, 150);
+pinDis("2001", "Bonython", 882, 150, 1);
+pinDis("2007", "Bradfield", 1182, 1, 150);
+pinDis("2019", "Macnamara", 1107, 14, 138);
+pinDis("2025", "Bullwinkel", 997.8, 70, 81);
+pinDis("2028", "Lingiari", 886.9, 149, 2);
 PIN.forEach(() => {});
 {
   const b2010 = store.elections["2010"];
@@ -201,6 +302,9 @@ PIN.forEach(() => {});
   check(store.elections["2019"].Macnamara, "2019: Macnamara absent");
   check(store.elections["2022"].Hawke, "2022: Hawke absent");
   check(store.elections["2025"].Bullwinkel, "2025: Bullwinkel absent");
+  const b2028 = store.elections["2028"];
+  check(b2028.Bullwinkel && !b2028["North Sydney"] && b2028.Higgins === undefined && b2028.Lingiari,
+    "2028: 2025-edition name set wrong");
 }
 
 // 6 — the papers' printed overall averages (population-weighted means) are

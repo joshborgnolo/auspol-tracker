@@ -1,6 +1,6 @@
 {
  "product": "irsad-by-division",
- "generated": "2026-10-24T08:36:59",
+ "generated": "2026-10-24T09:08:56",
  "description": "IRSAD per Commonwealth electoral division per election — published tables (AEC RR5 Att1; APH CIB 1/2004-05 and the 2008/2010 research papers) plus ABS-cube population-weighted derivations (ABS guidance 2039.0 §2.2).",
  "comparability": "Index definitions are recomputed each census — compare across eras via rank/decile/quartile only, never raw scores.",
  "rankConvention": "rank 1 = most advantaged (highest IRSAD score); decile/quartile ascend with disadvantage. RR5's printed ranks (1 = most disadvantaged) are re-ranked by score on ingest.",

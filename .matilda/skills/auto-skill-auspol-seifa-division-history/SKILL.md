@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed 9cfc5df0), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, all nine elections 2001–2025 incl. 2004).
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed 9cfc5df0), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json), MERGED the same day on the user's call ("yeah, single file") into the ONE four-index store data/division-seifa-indexes.json: 10 elections 2001→2028 (2028 irsad-only), 1,502 rows {state, irsd, ier, ieo, irsad, via}, irsad cells {value, rank 1=most advantaged, rankDis N+1−rank} plus an irsad-* provenance lane, spliced from the seifa-src/irsad-cells.json fixture derive-irsad.py emits (never re-derived); irsad-by-division.json stays the display store and splice fidelity to it is invariant 11 of test-division-seifa.mjs.
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -14,6 +14,25 @@ released 24/11/1988, five-index variant series). Nothing earlier exists; do
 not extrapolate backward. Full note: `.build/analysis/seifa-index/rr6-official-seifa-products.md`;
 source-page caches in its `src/`, the 2019 pocketbook full-text in
 `pocketbook/`, RR5 pdftotext in `cache/rr5.txt`.
+
+## Inventory at a glance (the "are all four indexes there?" question)
+
+Yes — flat answer, no caveat: since the 2026-10-24 merge (user call
+"yeah, single file") **all four indexes per division per election live
+in ONE store, `data/division-seifa-indexes.json`** — 10 elections
+2001→2028, 1,502 rows of `{state, irsd, ier, ieo, irsad, via}` (1,352
+shared rows byte-faithful to the pre-merge store except the added irsad
+key; the 150-row 2028 forward block is irsad-only `{state, irsad, via}`
+— the other three indexes have no 2025-boundary product). The TWO-STORE
+SPLIT documented below as "deliberate" lasted one day: the IRSAD
+derived store `.build/analysis/seifa-index/irsad-by-division.json` is
+now the splice's SOURCE OF TRUTH (via the name-canonicalised
+`.build/analysis/seat-model/seifa-src/irsad-cells.json` fixture
+derive-irsad.py emits beside it → extract-division-seifa.mjs's IRSAD
+lane) and stays the display store; the merge is a splice, never a
+re-derivation, and invariant 11 of test-division-seifa.mjs checks every
+merged irsad value+rank back against the sibling rows. Original stores
+merged to main 2026-10-24 (`5ecb9864`).
 
 ## Landed: the IRSAD store (2026-10-24)
 
@@ -38,18 +57,32 @@ population shares within 10%±0.5%.
 
 ## Landed: the IRSD/IER/IEO store (2026-10-24)
 
-The published-source **three-index** sibling store is **built and stored**:
-`.build/analysis/seat-model/extract-division-seifa.mjs` (fixture parsers +
-merge) consumes `.build/analysis/seat-model/derive-division-seifa-abs.py`
+The published-source **three-index** lane's stores became the **single
+four-index store** with the same day's irsad splice (see Inventory —
+the "sibling store" split this section title-era described is one day
+stale): `.build/analysis/seat-model/extract-division-seifa.mjs` (fixture
+parsers + merge) consumes `.build/analysis/seat-model/derive-division-seifa-abs.py`
 (ABS lanes) and emits `data/division-seifa-indexes.json` — elections
-`{2001,2004,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150}` =
-**1,352 rows** of `{state, irsd, ier, ieo, via}`, pinned by
-`.build/analysis/seat-model/test-division-seifa.mjs` (9-election set,
-name-exact vs division-classifications, rank permutations, 20+ pinned
-cells, provenance census-year pins). IRSAD stays deliberately absent —
-that's the sibling store's index. **Rank convention DANGER: this store's
-ranks are rank 1 = most DISadvantaged (the APH tapes' order, kept); the
-IRSAD sibling store re-based itself to rank 1 = most ADVANTAGED.** Lane
+`{2001,2004,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150 ·
+2028: 150 irsad-only}` = **1,502 rows** of `{state, irsd, ier, ieo,
+irsad, via}` (2028 rows `{state, irsad, via}` — no 2025-boundary product
+for the other three indexes), pinned by
+`.build/analysis/seat-model/test-division-seifa.mjs` (10-election set,
+name-exact vs division-classifications, rank permutations incl. both
+irsad rank keys, 20+ pinned cells, provenance census-year pins solving
+BOTH lanes per election — the irsad lane's keys are
+`irsad-<derivation>-<census>`, `-e<edition>` suffixed where one census
+backs two elections). The "IRSAD stays deliberately absent" design this
+section documented lasted one day: the irsad cells were spliced in
+2026-10-24 from `seifa-src/irsad-cells.json` (names/state already
+canonicalised there; a splice of the sibling store's committed display
+rows, never a re-derivation — fidelity check = invariant 11). **Rank
+convention DANGER: irsd/ier/ieo ranks are rank 1 = most DISadvantaged
+(the APH
+tapes' order, kept); the irsad cell carries BOTH —
+`rank` 1 = most ADVANTAGED (the sibling display store's natural read,
+== the descending-score recompute) and `rankDis` = N+1−rank, the store
+convention. Pick deliberately per consumer.** Lane
 map: **2004 = APH CIB 1/2004-05 printed tables** (2001 census × 2003
 boundaries — see the four-paper set below); 2007/2010 = APH printed
 tables (scores+ranks verbatim);
