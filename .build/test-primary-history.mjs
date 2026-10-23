@@ -1,20 +1,26 @@
 /* test-primary-history.mjs – pins the /flows-explained/ "View: Primary votes"
    flip's data end-to-end: data/primary-history.json (built by
    .build/aec-primary-history.py from the committed AEC first-preference
-   downloads in .build/aec-flow-src/fpv/), its fold-at-4% contract (user
-   2026-10-23: "below 4% just displays others and above 4% displays as its own
-   points"), and the gen-data handoff into the built data asset
-   (window.AUSPOL.primaryHistory). CHECKS:
+   downloads in .build/aec-flow-src/fpv/ plus its typed 1972–2001 HISTORY
+   block), its fold-at-4% contract (user 2026-10-23: "below 4% just displays
+   others and above 4% displays as its own points"), and the gen-data
+   handoff into the built data asset (window.AUSPOL.primaryHistory). CHECKS:
    1. the JSON's national ALP and Coalition cells recompute from the
       committed caches (vote sums by fixed party-code sets – this file's own
       arithmetic, not the generator's), and sit on the canonical published
       House figures the generator pins (incl. the 2010 Coalition 43.61
       correction – the aus-house-primary-history skill's 43.32 is a
-      Wikipedia-propagated typo);
-   2. the fold's NULL MAP is pinned per named minor (One Nation shows only
-      2022–25 in the House view but 2016→ in the Senate; the United
-      Australia/Palmer family only 2013 and 2022; Xenophon only SA 2016–19;
-      Lambie only Tas Senate 2016→), every displayed minor cell is >= foldPt,
+      Wikipedia-propagated typo); the typed era's majors sit on the
+      generator's HISTORY_CANON pins (five AEC-record corrections over the
+      skill's table: 1977 L/NP 48.11, 1983 L/NP 43.61, 1987 ALP 45.90,
+      1996 ALP 38.75, 1998 L/NP 39.51);
+   2. the fold's NULL MAP is pinned per named minor across both eras (the
+      DLP crosses only in 1972; the Democrats' era is 1977–2001 nationally –
+      1993's 3.75 folds – plus a lone NT-senate 2004 cell; One Nation runs
+      1998–2001 then returns 2016 Senate/2022 House; Greens first shown
+      2001; the United Australia/Palmer family only 2013 and 2022; Xenophon
+      only SA 2016–19; Lambie only Tas Senate 2016→), every displayed minor
+      cell is >= foldPt,
    and `oth` recombines as the residual of exactly the shown lines per year
    in every view (national, senate, all 16 state cuts);
    3. the built data asset hands the chart the same document.
@@ -29,6 +35,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const FPV = path.join(ROOT, ".build", "aec-flow-src", "fpv");
 
 const AEC_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+// the typed pre-AEC era (the generator's HISTORY block; no 1972 national
+// Senate election, so the senate span starts 1974)
+const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
+const HIST_SEN_YEARS = HIST_YEARS.filter((y) => y !== 1972);
 const STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
 /* fixed code vocab (enumerated from the committed caches 2026-10-23;
    complementary to the generator's name sets – a drift in either trips) */
@@ -107,10 +117,10 @@ const FED = doc.fed, SEN = doc.fed.sen;
 assert.ok(FED && SEN, "fed and fed.sen views");
 assert.deepEqual(Object.keys(FED.states), STATES, "the eight state house cuts");
 assert.deepEqual(Object.keys(SEN.states), STATES, "the eight state senate cuts");
-// the AEC-cache span is exactly the trailing eight elections (typed 1972–2001
-// history, when it lands, prepends to the national views only)
-assert.deepEqual(FED.years.slice(-AEC_YEARS.length), AEC_YEARS, "fed years end in the AEC span");
-assert.deepEqual(SEN.years.slice(-AEC_YEARS.length), AEC_YEARS, "senate years end in the AEC span");
+// the typed 1972–2001 history prepends the national views exactly; the
+// per-state cuts stay the AEC-cache span (no per-state cut before 2004)
+assert.deepEqual(FED.years, [...HIST_YEARS, ...AEC_YEARS], "fed years: history prepended to the AEC span");
+assert.deepEqual(SEN.years, [...HIST_SEN_YEARS, ...AEC_YEARS], "senate years: history (no 1972) prepended");
 STATES.forEach((s) => {
   assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s} house: per-state span starts 2004`);
   assert.deepEqual(SEN.states[s].years, AEC_YEARS, `${s} senate: per-state span starts 2004`);
@@ -148,23 +158,50 @@ AEC_YEARS.forEach((y) => {
   });
 });
 
+// ---- typed 1972–2001 era: pinned majors ------------------------------------
+/* the generator's HISTORY_CANON: the aus-house-primary-history skill table
+   with five AEC-record corrections, votes-verified 2026-10-23 */
+const CANON_HOUSE_HISTORY = {
+  1972: [49.59, 41.48], 1974: [49.3, 45.73], 1975: [42.84, 53.05],
+  1977: [39.65, 48.11], 1980: [45.15, 46.4], 1983: [49.48, 43.61],
+  1984: [47.55, 45.01], 1987: [45.9, 45.9], 1990: [39.44, 43.46],
+  1993: [44.92, 44.27], 1996: [38.75, 47.25], 1998: [40.1, 39.51],
+  2001: [37.84, 43.01],
+};
+HIST_YEARS.forEach((y) => {
+  const i = FED.years.indexOf(y);
+  assert.ok(Math.abs(FED.alp[i] - CANON_HOUSE_HISTORY[y][0]) <= 0.005,
+    `${y} fed alp: history pin (${FED.alp[i]} v ${CANON_HOUSE_HISTORY[y][0]})`);
+  assert.ok(Math.abs(FED.lnp[i] - CANON_HOUSE_HISTORY[y][1]) <= 0.005,
+    `${y} fed lnp: history pin (${FED.lnp[i]} v ${CANON_HOUSE_HISTORY[y][1]})`);
+});
+
 // ---- the fold's null map, pinned per named minor ---------------------------
 const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
 const cell = (view, key, year) => view[key][view.years.indexOf(year)];
-// House: One Nation only 2022 on; UAP family only 2013 and 2022; IND only 2022 on
-assert.deepEqual(nulls(FED.onp, FED.years), AEC_YEARS.filter((y) => y < 2022), "house ONP: 2022–25 only");
-assert.deepEqual(nulls(FED.uap, FED.years), AEC_YEARS.filter((y) => ![2013, 2022].includes(y)), "house UAP: 2013 & 2022 only");
-assert.deepEqual(nulls(FED.ind, FED.years), AEC_YEARS.filter((y) => y < 2022), "house IND: 2022–25 only");
+// House: One Nation's two runs (1998–2001, then 2022 on); UAP family only
+// 2013 and 2022; IND only 2022 on (its typed-era shares all sit sub-fold)
+assert.deepEqual(nulls(FED.onp, FED.years),
+  [...HIST_YEARS.filter((y) => y < 1998), ...AEC_YEARS.filter((y) => y < 2022)], "house ONP: 1998–2001 + 2022 on");
+assert.deepEqual(nulls(FED.uap, FED.years),
+  [...HIST_YEARS, ...AEC_YEARS.filter((y) => ![2013, 2022].includes(y))], "house UAP: 2013 & 2022 only");
+assert.deepEqual(nulls(FED.ind, FED.years),
+  [...HIST_YEARS, ...AEC_YEARS.filter((y) => y < 2022)], "house IND: 2022–25 only");
+assert.equal(cell(FED, "onp", 1998), 8.43); assert.equal(cell(FED, "onp", 2001), 4.34);
 assert.equal(cell(FED, "onp", 2022), 4.96); assert.equal(cell(FED, "onp", 2025), 6.4);
 assert.equal(cell(FED, "uap", 2013), 5.49); assert.equal(cell(FED, "uap", 2022), 4.12);
 assert.equal(cell(FED, "ind", 2022), 5.3); assert.equal(cell(FED, "ind", 2025), 7.36);
-// Senate: One Nation from 2016, UAP 2013 alone, and NO ind/dem/dlp/xnt/jln lines
-assert.deepEqual(nulls(SEN.onp, SEN.years), AEC_YEARS.filter((y) => y < 2016), "senate ONP: 2016 on");
-assert.deepEqual(nulls(SEN.uap, SEN.years), AEC_YEARS.filter((y) => y !== 2013), "senate UAP: 2013 only");
+// Senate: One Nation 1998/2001 then 2016 on, UAP 2013 alone, and NO
+// ind/dlp/xnt/jln lines (the typed era's Democrats do surface - below)
+assert.deepEqual(nulls(SEN.onp, SEN.years),
+  [...HIST_SEN_YEARS.filter((y) => y < 1998), ...AEC_YEARS.filter((y) => y < 2016)], "senate ONP: 1998, 2001, 2016 on");
+assert.deepEqual(nulls(SEN.uap, SEN.years),
+  [...HIST_SEN_YEARS, ...AEC_YEARS.filter((y) => y !== 2013)], "senate UAP: 2013 only");
+assert.equal(cell(SEN, "onp", 1998), 8.99); assert.equal(cell(SEN, "onp", 2001), 5.54);
 assert.equal(cell(SEN, "onp", 2016), 4.28); assert.equal(cell(SEN, "uap", 2013), 4.91);
-["ind", "dem", "dlp", "xnt", "jln"].forEach((k) => assert.equal(SEN[k], undefined, `no national senate ${k} line`));
+["ind", "dlp", "xnt", "jln"].forEach((k) => assert.equal(SEN[k], undefined, `no national senate ${k} line`));
 // state cuts: Xenophon SA-only 2016–19; Lambie Tas-senate-only 2016 on;
-// Democrats nowhere >= fold across the cache span (so no dem key anywhere yet)
+// Democrats nowhere >= fold across the cache span but for one NT-senate cell
 assert.deepEqual(FED.states.sa.xnt, [null, null, null, null, 21.26, 4.38, null, null], "SA xnt: 2016–19 only");
 assert.ok(STATES.filter((s) => s !== "sa").every((s) => FED.states[s].xnt === undefined), "xnt house cuts: SA only");
 assert.deepEqual(SEN.states.tas.jln, [null, null, null, null, 8.3, 8.92, 8.64, 7.28], "Tas senate jln: 2016 on");
@@ -173,11 +210,31 @@ assert.deepEqual(SEN.states.qld.onp, [null, 4.37, null, null, 9.19, 10.27, 7.4, 
 // the Democrats cross the fold exactly once in the whole cache span
 // (4.73% NT senate 2004) and DLP never does
 assert.deepEqual(SEN.states.nt.dem, [4.73, null, null, null, null, null, null, null], "NT senate dem: 2004 alone");
+// over the whole document the Democrats live in exactly three views (the
+// typed era's two national views + NT senate 2004) and the DLP in one
 const allViews = [FED, SEN, ...STATES.map((s) => FED.states[s]), ...STATES.map((s) => SEN.states[s])];
 allViews.forEach((v) => {
-  if (v.dem != null) assert.equal(v, SEN.states.nt, `${v.label}: the document's only dem line`);
-  assert.equal(v.dlp, undefined, `${v.label}: no dlp line across the cache span`);
+  if (v.dem != null) assert.ok(v === FED || v === SEN || v === SEN.states.nt,
+    `${v.label}: dem lines are the typed-era national views + NT senate 2004`);
+  if (v.dlp != null) assert.equal(v, FED, `${v.label}: dlp is the national house's 1972 row alone`);
 });
+
+// ---- the typed era's minor lines: each family's era boundary -----------------
+// the DLP's only national fold crossing (5.25% in 1972); the Democrats run
+// 1977–2001 (1993's 3.75 folds); the Greens first clear the fold in 2001;
+// oth is always the residual of exactly the shown lines (folded families in)
+assert.equal(cell(FED, "dlp", 1972), 5.25);
+assert.deepEqual(nulls(FED.dlp, FED.years), FED.years.filter((y) => y !== 1972), "house dlp: 1972 alone");
+assert.deepEqual(nulls(FED.dem, FED.years), [1972, 1974, 1975, 1993, ...AEC_YEARS], "house dem: 1977–2001, 1993 folded");
+assert.equal(cell(FED, "dem", 1990), 11.26);
+assert.deepEqual(nulls(FED.grn, FED.years), HIST_YEARS.filter((y) => y !== 2001), "house grn: first shown 2001");
+assert.equal(cell(FED, "grn", 2001), 4.96);
+assert.deepEqual(nulls(SEN.dem, SEN.years), [1974, 1975, ...AEC_YEARS], "senate dem: 1977–2001");
+assert.equal(cell(SEN, "dem", 1977), 11.13); assert.equal(cell(SEN, "dem", 1990), 12.63);
+assert.deepEqual(nulls(SEN.grn, SEN.years), HIST_SEN_YEARS.filter((y) => y !== 2001), "senate grn: first shown 2001");
+assert.equal(cell(SEN, "grn", 2001), 4.94);
+assert.equal(cell(FED, "oth", 1972), 3.68); // 2.72 table residual + ind 0.96 folded
+assert.equal(cell(SEN, "oth", 1987), 6.67); // 4.16 table residual + dlp/grn/ind folded
 /* and the nulls are the fold's fault, not missing data: recompute each
    sub-fold share from the caches */
 AEC_YEARS.forEach((y) => {

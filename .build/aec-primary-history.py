@@ -116,13 +116,115 @@ ALL_BUCKETS = ["alp", "lnp"] + GATED + ["oth"]
 # that exists but sits under FOLD_PT is still recorded raw - the fold is
 # applied uniformly at emit, so the 2001 One Nation (4.34) and the 1996
 # Democrats (6.76) both reach the display exactly as later rows do.
+# The DLP row is None (not 0) where the national table keeps the party in
+# its Others lump (1993H/1996H/1998H/2001H, 1983S) - it never clears the
+# fold after 1972's 5.25 anyway. No 1972 senate row: no national Senate
+# election that year (half-Senate cycle; only a Queensland casual-vacancy
+# by-election was held).
 HISTORY = {
     "house": {
-        # filled from the verified per-election results tables (see header
-        # note): {year: {"alp":…,"lnp":…,"grn":|None,"onp":|None,"dem":|None,
-        #                "dlp":|None,"ind":|None}}
+        1972: {"alp": 49.59, "lnp": 41.48, "dlp": 5.25, "ind": 0.96},
+        1974: {"alp": 49.30, "lnp": 45.73, "dlp": 1.42, "ind": 0.40},
+        1975: {"alp": 42.84, "lnp": 53.05, "dlp": 1.32, "ind": 0.82},
+        1977: {"alp": 39.65, "lnp": 48.11, "dem": 9.38, "dlp": 1.43, "ind": 0.63},
+        1980: {"alp": 45.15, "lnp": 46.40, "dem": 6.57, "dlp": 0.31, "ind": 0.70},
+        1983: {"alp": 49.48, "lnp": 43.61, "dem": 5.03, "dlp": 0.20, "grn": 0.10, "ind": 0.59},
+        1984: {"alp": 47.55, "lnp": 45.01, "dem": 5.45, "dlp": 0.57, "ind": 1.04},
+        1987: {"alp": 45.90, "lnp": 45.90, "dem": 6.00, "dlp": 0.04, "ind": 1.66},
+        1990: {"alp": 39.44, "lnp": 43.46, "dem": 11.26, "dlp": 0.03, "grn": 1.37, "ind": 2.60},
+        1993: {"alp": 44.92, "lnp": 44.27, "dem": 3.75, "grn": 1.85, "ind": 3.11},
+        1996: {"alp": 38.75, "lnp": 47.25, "dem": 6.76, "grn": 2.92, "ind": 2.41},
+        1998: {"alp": 40.10, "lnp": 39.51, "dem": 5.13, "grn": 2.62, "onp": 8.43, "ind": 1.76},
+        2001: {"alp": 37.84, "lnp": 43.01, "dem": 5.41, "grn": 4.96, "onp": 4.34, "ind": 2.89},
     },
     "senate": {
+        1974: {"alp": 47.29, "lnp": 43.88, "dlp": 3.56, "ind": 2.12},
+        1975: {"alp": 40.91, "lnp": 51.74, "dlp": 2.67, "ind": 1.60},
+        1977: {"alp": 36.76, "lnp": 45.56, "dem": 11.13, "dlp": 1.67, "ind": 1.73},
+        1980: {"alp": 42.25, "lnp": 43.58, "dem": 9.25, "dlp": 0.41, "ind": 1.13},
+        1983: {"alp": 45.49, "lnp": 39.97, "dem": 9.57, "ind": 2.42},
+        1984: {"alp": 42.17, "lnp": 39.54, "dem": 7.62, "dlp": 0.37, "ind": 0.39},
+        1987: {"alp": 42.83, "lnp": 42.03, "dem": 8.47, "dlp": 0.54, "grn": 0.43, "ind": 1.54},
+        1990: {"alp": 38.41, "lnp": 41.92, "dem": 12.63, "dlp": 0.15, "grn": 2.10, "ind": 0.30},
+        1993: {"alp": 43.50, "lnp": 43.05, "dem": 5.31, "dlp": 0.36, "grn": 2.95, "ind": 1.13},
+        1996: {"alp": 36.15, "lnp": 43.97, "dem": 10.82, "dlp": 0.33, "grn": 3.17, "ind": 0.38},
+        1998: {"alp": 37.31, "lnp": 37.70, "dem": 8.45, "dlp": 0.27, "grn": 2.72, "onp": 8.99, "ind": 0.52},
+        2001: {"alp": 34.32, "lnp": 41.83, "dem": 7.25, "dlp": 0.57, "grn": 4.94, "onp": 5.54, "ind": 0.69},
+    },
+}
+
+# Records behind every typed HISTORY row, read 2026-10-23: the AEC-sourced
+# per-election results tables and Adam Carr's AEC-mirror Psephos .txt
+# summaries, every bucket vote-checked (buckets sum to the formal total ±
+# rounding). Reconciliations, never averaged:
+#   1974S lnp 43.88 keeps WA's National Alliance (0.84) inside the Coalition
+#         - the merged CP+DLP ticket's senator sat with the Country Party,
+#         per the election table's own footnote; Psephos's narrower lump
+#         prints 43.58.
+#   1983S/2001S: the two references' formal totals sit a few hundred votes
+#         apart (7,995,045 v 7,997,549; 11,627,529 v 11,627,805) - the
+#         results-table prints are typed; bucket shifts are <=0.01 at 2dp
+#         (1983S alp/lnp alternates 45.48/39.96).
+#   1987S lnp 42.03 includes the NT Nationals per the APH convention the
+#         table follows (Psephos's narrower convention prints 41.94).
+#   Table misprints corrected from the vote counts (2001H Others 1.64->1.55,
+#   1977S Call to Australia 1.12->0.67) sit only inside lump rows the fold
+#   absorbs, so no typed cell is affected.
+HISTORY_SOURCES = {
+    "house": {
+        1972: ["https://en.wikipedia.org/wiki/1972_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1972/1972reps1.txt"],
+        1974: ["https://en.wikipedia.org/wiki/1974_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1974/1974reps1.txt"],
+        1975: ["https://en.wikipedia.org/wiki/1975_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1975/1975reps1.txt"],
+        1977: ["https://en.wikipedia.org/wiki/1977_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1977/1977reps1.txt"],
+        1980: ["https://en.wikipedia.org/wiki/1980_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1980/1980reps1.txt"],
+        1983: ["https://en.wikipedia.org/wiki/1983_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1983/1983reps1.txt"],
+        1984: ["https://en.wikipedia.org/wiki/1984_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1984/1984reps1.txt"],
+        1987: ["https://en.wikipedia.org/wiki/1987_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1987/1987reps1.txt"],
+        1990: ["https://en.wikipedia.org/wiki/1990_Australian_federal_election",
+               "https://en.wikipedia.org/wiki/1990_Australian_House_of_Representatives_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1990/1990reps1.txt"],
+        1993: ["https://en.wikipedia.org/wiki/1993_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1993/1993reps1.txt"],
+        1996: ["https://en.wikipedia.org/wiki/1996_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1996/1996reps1.txt"],
+        1998: ["https://en.wikipedia.org/wiki/1998_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1998/1998reps1.txt"],
+        2001: ["https://en.wikipedia.org/wiki/2001_Australian_federal_election",
+               "https://psephos.adam-carr.net/countries/a/australia/2001/2001reps1.txt"],
+    },
+    "senate": {
+        1974: ["https://en.wikipedia.org/wiki/1974_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1974/1974senate1.txt"],
+        1975: ["https://en.wikipedia.org/wiki/1975_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1975/1975senate1.txt"],
+        1977: ["https://en.wikipedia.org/wiki/1977_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1977/1977senate1.txt"],
+        1980: ["https://en.wikipedia.org/wiki/1980_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1980/1980senate1.txt"],
+        1983: ["https://en.wikipedia.org/wiki/1983_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1983/1983senate1.txt"],
+        1984: ["https://en.wikipedia.org/wiki/1984_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1984/1984senate1.txt"],
+        1987: ["https://en.wikipedia.org/wiki/1987_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1987/1987senate1.txt"],
+        1990: ["https://en.wikipedia.org/wiki/1990_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1990/1990senate1.txt"],
+        1993: ["https://en.wikipedia.org/wiki/1993_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1993/1993senate1.txt"],
+        1996: ["https://en.wikipedia.org/wiki/1996_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1996/1996senate1.txt"],
+        1998: ["https://en.wikipedia.org/wiki/1998_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/1998/1998senate1.txt"],
+        2001: ["https://en.wikipedia.org/wiki/2001_Australian_Senate_election",
+               "https://psephos.adam-carr.net/countries/a/australia/2001/2001senate1.txt"],
     },
 }
 
@@ -233,6 +335,28 @@ def build():
         p = aec_house_nat[y]
         assert abs(100 * p["alp"] / sum(p.values()) - a) < 0.03, f"{y} ALP"
         assert abs(100 * p["lnp"] / sum(p.values()) - l) < 0.03, f"{y} L/NP"
+
+    # Pinned canonical ALP/LNP House figures 1972-2001, guarding the typed
+    # HISTORY block: the aus-house-primary-history skill's table, with FIVE
+    # AEC-record corrections (same doctrine as the 2010 exception above),
+    # each votes-verified 2026-10-23 against the AEC-sourced results tables:
+    #   1977 L/NP 48.20 -> 48.11   (3,811,340 / 7,922,854  = 48.105)
+    #   1983 L/NP 43.57 -> 43.61   (3,787,151 / 8,684,862  = 43.607 - 43.57 is
+    #     the Coalition-article table, whose own component sum contradicts it)
+    #   1987 ALP 45.76 -> 45.90    (4,238,663 / 9,235,086  = 45.898 - the
+    #     summary-table trap the skill's trap-1 documents, on the ALP row too)
+    #   1996 ALP 38.69 -> 38.75    (4,217,765 / 10,883,852 = 38.752 - 38.69 is
+    #     the Liberal row's own share, transposed)
+    #   1998 L/NP 39.52 -> 39.51   (4,388,809 / 11,109,063 = 39.5052)
+    HISTORY_CANON = {1972: (49.59, 41.48), 1974: (49.30, 45.73), 1975: (42.84, 53.05),
+                     1977: (39.65, 48.11), 1980: (45.15, 46.40), 1983: (49.48, 43.61),
+                     1984: (47.55, 45.01), 1987: (45.90, 45.90), 1990: (39.44, 43.46),
+                     1993: (44.92, 44.27), 1996: (38.75, 47.25), 1998: (40.10, 39.51),
+                     2001: (37.84, 43.01)}
+    for y, (a, l) in HISTORY_CANON.items():
+        h = HISTORY["house"][y]
+        assert abs(h["alp"] - a) < 0.005, f"{y} HISTORY ALP drifted"
+        assert abs(h["lnp"] - l) < 0.005, f"{y} HISTORY L/NP drifted"
 
     house_nat_rows = {y: shares({"nat": aec_house_nat[y]})["nat"][1] for y in sorted(EVENTS)}
     # merge typed history
