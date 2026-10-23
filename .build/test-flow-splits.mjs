@@ -462,30 +462,37 @@ assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{figView ? null : share}</>}
     && ap.includes('<span className="ex-fl-flips">{houseCtl}{figView ? null : share}</span>')
     && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
   "View: out of the tab row and the phone head - House: and Share: keep both spots alone");
-assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start;'),
-  "the View row's own left-aligned rule ships in rd.css (user 2026-10-23: 'make View: Primary votes ⇄ left-aligned')");
-assert.ok(cssRd.includes('body.rd .ex-fl-viewrow > .ex-view + .ex-view { margin-left: 12px; }'),
-  "sibling View: facet controls keep the tab-row controls' 12px spacing");
-/* 2026-10-23 (user: "work on the two-party preferred facet … add
-   another like 'View: Preference flows ⇄', 'View: 2PP'"): a second View:
-   flip beside Primary votes swaps the flows history for Labor v Coalition
-   two-party shares (window.AUSPOL.twoPPHistory; test-2pp-history.mjs pins
-   the data and the handoff). One "View:"-labelled constant-name button
-   per facet, pressed where its figure is on, a press from either facet
-   jumping straight to the other (figView displaces the flows-only
-     controls in either vote-share view; House: sets aside in 2PP mode -
-   no Senate 2PP exists - and the view snaps an Upper pick to Lower) */
+assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start;')
+    && !cssRd.includes('.ex-view + .ex-view'),
+  "the View row's own left-aligned rule ships in rd.css (user 2026-10-23: 'make View: Primary votes ⇄ left-aligned'; the sibling-spacing rule went with the 2026-10-24 merge to one button)");
+/* 2026-10-23/24 (user: "work on the two-party preferred facet … add
+   another like 'View: Preference flows ⇄', 'View: 2PP'", then "view 2pp
+   should be part of the existing view preferences/primary vote toggle …
+   when its all 1 toggle button"): the View: row is ONE cycling flip -
+   its label the figure on the card, each press advancing to the next
+   stop the build carries (flows → primary → 2pp → flows). That view
+   swaps the flows history for the vote-share figures
+   (window.AUSPOL.twoPPHistory; test-2pp-history.mjs pins the data and
+   the handoff). figView displaces the flows-only controls in either
+   vote-share view; House: sets aside in 2PP mode - no Senate 2PP exists
+   - and the view snaps an Upper pick to Lower */
 assert.ok(ap.includes('const TP_HIST = window.AUSPOL.twoPPHistory || null;')
     && ap.includes('const twoMode = figMode === "2pp"')
-    && ap.includes('const figView = primMode || twoMode;')
-    && ap.includes('const setTwoFig = () => setFig((m) => (m === "2pp" ? "flows" : "2pp"));'),
+    && ap.includes('const figView = primMode || twoMode;'),
   "the 2PP view rides the flows/primary/2PP mode state (figView = either vote-share figure)");
+assert.ok(ap.includes('const FIG_LABELS = { flows: "Preference flows", primary: "Primary votes", "2pp": "2PP" };')
+    && ap.includes('const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : [])];')
+    && ap.includes('const nextFig = FIG_STOPS[(FIG_STOPS.indexOf(figMode) + 1) % FIG_STOPS.length];')
+    && ap.includes('const viewCtl = FIG_STOPS.length > 1 ? ('),
+  "one cycling stop list: flows → primary → 2pp, each facet a stop only where its data shipped, no control with fewer than two");
 assert.ok(ap.includes('const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);')
-    && ap.includes('<span className="rd-pl-flip-t">Primary votes</span>')
-    && ap.includes('<span className="rd-pl-flip-t">2PP</span>')
-    && ap.includes('aria-pressed={twoMode}')
-    && ap.includes('"Switch to two-party preferred shares at every election"'),
-  "a 'View:'-labelled constant-name button per facet (Primary votes, 2PP), pressed where its figure is on, missing-data facets absent");
+    && ap.includes('onClick={() => setFig(nextFig)}')
+    && ap.includes('<span className="rd-pl-flip-t">{FIG_LABELS[figMode]}</span>')
+    && ap.includes('title={FIG_TITLES[nextFig]}')
+    && ap.includes('"2pp": "Switch to two-party preferred shares at every election"')
+    && !ap.includes('setPrimaryFig') && !ap.includes('setTwoFig')
+    && !ap.includes('aria-pressed={primMode}') && !ap.includes('aria-pressed={twoMode}'),
+  "the ONE View: flip: label is the live figure, the press cycles to the next stop (no per-facet buttons left)");
 assert.ok(ap.includes('function Explained2ppChart({ stateKey, classKey, menu })')
     && ap.includes('const TP = window.AUSPOL.twoPPHistory || null;')
     && ap.includes('(classKey && ((TP.fed.classes || {})[classKey]))')

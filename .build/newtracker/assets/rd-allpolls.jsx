@@ -6481,14 +6481,12 @@ function RdExplained() {
   const steLcView = view === "ste:nswlc" && !!LC_PRIM;
   const steView = !!steKey || steLcView;
   const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;
-  /* the two View: flips (user 2026-10-23): each button swaps the explainer's
-     preference-flow history for its own vote-share figure - Primary votes
-     (the sibling session's first-preference shares) or 2PP (Labor v
-     Coalition two-party shares, "add another beside Primary votes"). A
-     press from either facet jumps straight to the other; a press on the
-     active one returns to the flows */
-  const setPrimaryFig = () => setFig((m) => (m === "primary" ? "flows" : "primary"));
-  const setTwoFig = () => setFig((m) => (m === "2pp" ? "flows" : "2pp"));
+  /* the ONE cycling View: flip (2026-10-24, user: "view 2pp should be
+     part of the existing view preferences/primary vote toggle … when its
+     all 1 toggle button"): each press moves the card's figure to the
+     next stop the build carries - Preference flows → Primary votes →
+     2PP → back to the flows. The control and its stop list sit at the
+     viewrow below */
   /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation. The One Nation card differs by
      house: Lower reads the measured flowForced.bys contests (the crosses
@@ -6782,41 +6780,35 @@ function RdExplained() {
       </button>
     </span>
   ) : null;
-  /* the View: flips (user 2026-10-23): each swaps the explainer's
-     preference-flow history for its AEC vote-share figure - a button per
-     facet, its label constant (the facet's name), pressed where its
-     figure is on. The primary facet renders only where the build ships
-     the data - gen-data's guarded handoff leaves
-     window.AUSPOL.primaryHistory null on a missing file, the Vic page
-     carries no federal primary-history - and the 2PP facet's the same on
-     window.AUSPOL.twoPPHistory: a build without one file keeps its flows
-     with no control and no view. They ride their own row ABOVE the
-     contest tabs (user 2026-10-23: it "should sit on top of 'Labor v
-     Coalition / Labor v One Nation'") - never inside the tab row, and
-     not in the chart head, which only draws below the tabs on a phone */
+  /* the View: flip rides its own row ABOVE the contest tabs (user
+     2026-10-23: it "should sit on top of 'Labor v Coalition / Labor v
+     One Nation'") - never inside the tab row, and not in the chart head,
+     which only draws below the tabs on a phone. ONE cycling button (the
+     2026-10-24 merge): its label is the figure ON the card, the House:/
+     Share: flips' own current-value idiom, and its press advances to the
+     next stop. A facet is a stop only where the build ships its data -
+     gen-data's guarded handoffs leave window.AUSPOL.primaryHistory /
+     window.AUSPOL.twoPPHistory null on a missing file (the Vic page
+     carries neither), and a build with neither keeps the flows with no
+     control at all */
   const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
   const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
-  const viewCtl = (phViewOk || tpViewOk) ? (
-    <>
-      {phViewOk && (
-      <span className="rd-pl-ctl ex-view">
-        <span className="rd-pl-ctl-l">View:</span>
-        <button type="button" className="rd-pl-flip" aria-pressed={primMode}
-                title={primMode ? "Switch to the preference-flow history" : "Switch to first-preference vote shares at every election"}
-                onClick={setPrimaryFig}>
-          <span className="rd-pl-flip-t">Primary votes</span> <span aria-hidden="true">⇄</span>
-        </button>
-      </span>)}
-      {tpViewOk && (
-      <span className="rd-pl-ctl ex-view">
-        <span className="rd-pl-ctl-l">View:</span>
-        <button type="button" className="rd-pl-flip" aria-pressed={twoMode}
-                title={twoMode ? "Switch to the preference-flow history" : "Switch to two-party preferred shares at every election"}
-                onClick={setTwoFig}>
-          <span className="rd-pl-flip-t">2PP</span> <span aria-hidden="true">⇄</span>
-        </button>
-      </span>)}
-    </>
+  const FIG_LABELS = { flows: "Preference flows", primary: "Primary votes", "2pp": "2PP" };
+  const FIG_TITLES = {
+    flows: "Switch to the preference-flow history",
+    primary: "Switch to first-preference vote shares at every election",
+    "2pp": "Switch to two-party preferred shares at every election",
+  };
+  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : [])];
+  const nextFig = FIG_STOPS[(FIG_STOPS.indexOf(figMode) + 1) % FIG_STOPS.length];
+  const viewCtl = FIG_STOPS.length > 1 ? (
+    <span className="rd-pl-ctl ex-view">
+      <span className="rd-pl-ctl-l">View:</span>
+      <button type="button" className="rd-pl-flip" title={FIG_TITLES[nextFig]}
+              onClick={() => setFig(nextFig)}>
+        <span className="rd-pl-flip-t">{FIG_LABELS[figMode]}</span> <span aria-hidden="true">⇄</span>
+      </button>
+    </span>
   ) : null;
   /* the phone's head span: the menu, then House and Share in ONE nowrap
      group, so the pair share a line when the row wraps instead of
