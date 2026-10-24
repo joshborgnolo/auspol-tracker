@@ -44,10 +44,27 @@ active pipelines: consumers key every file by explicit year.
   packs carry per-PP DoP cascades and HTPP only), so booth-flows.json starts
   at 2004.
 
+## Vote-type oracle lane (validation inputs, not a presentation product)
+
+- oracle/fpvvt-<year>.csv.gz (2004-2025) — VTR
+  `Downloads/HouseFirstPrefsByCandidateByVoteTypeDownload-<EVENT>.csv`; per
+  (division, candidate, shown-as-party) OrdinaryVotes the fpv/<year>-<ST>
+  per-booth files must recompose exactly.
+- oracle/tppvt-<year>.csv.gz (2016-2025) — VTR
+  `Downloads/HouseTppByDivisionByVoteTypeDownload-<EVENT>.csv`; per-division
+  ordinary TPP by pair member.
+- oracle/tcpcvt-<year>.csv.gz (2004-2013) — no TPP-by-vote-type product
+  exists for those events; the VTR
+  `Downloads/HouseTcpByCandidateByVoteTypeDownload-<EVENT>.csv` classic rows
+  stand in.
+- The division-level TCP-flow oracles (../tcpflow-<year>.csv.gz, 2025 =
+  ../../../data/aec-2025-tcp-flow-by-division.csv) are committed with the
+  parent directory's flow lanes, not duplicated here.
+
 ## Integrity
 
 sha256s of every committed gz are recorded in sha256-manifest.txt in this
-directory (regenerate: `shasum -a 256 fpv/*.gz tpp-pp/*.gz tcf/*.gz`).
+directory (regenerate: `shasum -a 256 fpv/*.gz tpp-pp/*.gz tcf/*.gz oracle/*.gz`).
 A clean-room re-run of the harvest script reproduces the same row counts;
 the VTR occasionally serves Content-Length drift, so compare by row count +
 decompressed sha on any refetch before trusting a redownload.

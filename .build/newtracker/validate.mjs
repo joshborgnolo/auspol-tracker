@@ -1276,6 +1276,90 @@ export function validate2ppHistory() {
   return errors;
 }
 
+/* The three per-polling-place stores (.build/aec-booth.py, re-derivation
+   pinned by .build/test-aec-booth.mjs). This gate is shape-only: the
+   numbers themselves are the test's business. */
+export function validateBooth() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  const STREAMS = ["ord", "pp", "abs", "post", "prov"];
+  const CUTS = ["nat", "nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt",
+    "inner", "outer", "provincial", "rural", ...STREAMS];
+  const checkDoc = (name, { buckets, years, cellKeys }) => {
+    let S = null;
+    try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", name), "utf8")); }
+    catch { fail(name, "booth-shape", "missing or unparseable"); return; }
+    if (JSON.stringify(S.years) !== JSON.stringify(years))
+      fail(name, "booth-shape", `years ${JSON.stringify(S.years)}, expected ${JSON.stringify(years)}`);
+    if (buckets !== null && JSON.stringify(S.buckets) !== JSON.stringify(buckets))
+      fail(name, "booth-shape", `buckets ${JSON.stringify(S.buckets)}, expected ${JSON.stringify(buckets)}`);
+    if (!Array.isArray(S.streams) || JSON.stringify(S.streams.map((s) => s[0])) !== JSON.stringify(STREAMS))
+      fail(name, "booth-shape", "streams not the five ord/pp/abs/post/prov lanes in order");
+    if (!S.cuts || typeof S.cuts !== "object") { fail(name, "booth-shape", "no cuts object"); return; }
+    if (JSON.stringify(Object.keys(S.cuts).sort()) !== JSON.stringify([...CUTS].sort()))
+      fail(name, "booth-shape", `cuts ${JSON.stringify(Object.keys(S.cuts).sort())}, expected nat + 8 states + 4 classes + 5 streams`);
+    const keys = cellKeys || buckets.map((b) => (Array.isArray(b) ? b[0] : b));
+    for (const [cut, perYear] of Object.entries(S.cuts || {})) {
+      for (const [y, row] of Object.entries(perYear)) {
+        if (!years.includes(y)) fail(name, "booth-shape", `${cut} ${y}: a year outside the manifest span`);
+        if (!row || typeof row !== "object") { fail(name, "booth-shape", `${cut} ${y}: not a series row`); continue; }
+        for (const k of Object.keys(row))
+          if (!keys.includes(k))
+            fail(name, "booth-shape", `${cut} ${y}: series key ${JSON.stringify(k)} outside ${JSON.stringify(keys)}`);
+        for (const [k, d] of Object.entries(row)) {
+          if (!d || typeof d !== "object") { fail(name, "booth-shape", `${cut} ${y} ${k}: not a dist cell`); continue; }
+          if (!Number.isInteger(d.n) || d.n <= 0) fail(name, "booth-range", `${cut} ${y} ${k}: n=${d.n}`);
+          for (const q of ["med", "p25", "p75"]) {
+            if (typeof d[q] !== "number" || d[q] < 0 || d[q] > 100)
+              fail(name, "booth-range", `${cut} ${y} ${k}: ${q}=${d[q]} (a share in percent)`);
+          }
+          if (typeof d.med === "number" && typeof d.p25 === "number" && typeof d.p75 === "number" &&
+              !(d.p25 <= d.med && d.med <= d.p75))
+            fail(name, "booth-order", `${cut} ${y} ${k}: p25 ${d.p25} ≤ med ${d.med} ≤ p75 ${d.p75} broken`);
+        }
+      }
+    }
+    return S;
+  };
+  const prim = checkDoc("booth-primary.json", {
+    buckets: [["alp", "Labor"], ["lnp", "Coalition"], ["grn", "Greens"],
+      ["onp", "One Nation"], ["oth", "Others"]],
+    years: ["1993", "1996", "1998", "2001", "2004", "2007", "2010", "2013",
+      "2016", "2019", "2022", "2025"],
+    cellKeys: ["alp", "lnp", "grn", "onp", "oth"],
+  });
+  if (prim) {
+    // One Nation's first federal run is 1998: no "onp" cell may sit in the
+    // 1993/1996 rows, and from 1998 on the nat row carries all five buckets.
+    for (const [y, row] of Object.entries(prim.cuts.nat)) {
+      if (Number(y) < 1998 && "onp" in row)
+        fail("booth-primary.json", "booth-shape", `${y}: an onp cell before One Nation's first federal run`);
+      if (Number(y) >= 1998 && Object.keys(row).length !== 5)
+        fail("booth-primary.json", "booth-shape", `${y}: nat row ${JSON.stringify(Object.keys(row))}, expected all five buckets`);
+    }
+  }
+  checkDoc("booth-tpp.json", {
+    buckets: null,
+    years: ["1996", "1998", "2001", "2004", "2007", "2010", "2013", "2016",
+      "2019", "2022", "2025"],
+    cellKeys: ["alp"],
+  });
+  const flows = checkDoc("booth-flows.json", {
+    buckets: ["grn", "onp", "oth"],
+    years: ["2004", "2007", "2010", "2013", "2016", "2019", "2022", "2025"],
+    cellKeys: ["grn", "onp", "oth"],
+  });
+  if (flows) {
+    const cd = flows.classicDivisions;
+    const want = { 2004: 146, 2007: 147, 2010: 142, 2013: 139, 2016: 133,
+      2019: 136, 2022: 124, 2025: 115 };
+    if (JSON.stringify(cd) !== JSON.stringify(want))
+      fail("booth-flows.json", "booth-shape",
+        `classicDivisions ${JSON.stringify(cd)} ‑ expected the pinned ${JSON.stringify(want)}`);
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -1284,6 +1368,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   errors.push(...validateChangelog());
   errors.push(...validatePrimaryHistory());
   errors.push(...validate2ppHistory());
+  errors.push(...validateBooth());
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());

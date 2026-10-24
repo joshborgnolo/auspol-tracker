@@ -97,6 +97,41 @@ PYEOF
   done
 done
 
+# --- recompose oracles: the vote-type download family -----------------------
+# The per-polling-place lanes carry ORDINARY votes (incl. PPVC pseudo rows);
+# absent/postal/provisional/(pre-2004-era prepoll) declaration votes exist
+# only in the vote-type products. These are the committed oracles the
+# generator recomposes booth sums against.
+#   fpvvt: HouseFirstPrefsByCandidateByVoteTypeDownload (all events, 2004+)
+#   tppvt: HouseTppByDivisionByVoteTypeDownload (2016+; 404s before 20499)
+#   tcpcvt: HouseTcpByCandidateByVoteTypeDownload (2004-2013 only, for the
+#           classic-division TPP recompose - 2016+ uses tppvt instead)
+mkdir -p "$BOOTH/oracle"
+for spec in $MOD; do
+  yr="${spec%%:*}"; rest="${spec#*:}"; ev="${rest%%:*}"; kind="${rest##*:}"
+  base="https://results.aec.gov.au/$ev/$kind"
+
+  t="$BOOTH/oracle/fpvvt-$yr.csv.gz"
+  if want "$t"; then
+    echo "oracle fpvvt $yr"
+    fetch "$base/Downloads/HouseFirstPrefsByCandidateByVoteTypeDownload-$ev.csv" "$t" || FAILS="$FAILS oracle/fpvvt-$yr"
+  fi
+
+  if [ "$ev" -ge 20499 ]; then
+    t="$BOOTH/oracle/tppvt-$yr.csv.gz"
+    if want "$t"; then
+      echo "oracle tppvt $yr"
+      fetch "$base/Downloads/HouseTppByDivisionByVoteTypeDownload-$ev.csv" "$t" || FAILS="$FAILS oracle/tppvt-$yr"
+    fi
+  else
+    t="$BOOTH/oracle/tcpcvt-$yr.csv.gz"
+    if want "$t"; then
+      echo "oracle tcpcvt $yr"
+      fetch "$base/Downloads/HouseTcpByCandidateByVoteTypeDownload-$ev.csv" "$t" || FAILS="$FAILS oracle/tcpcvt-$yr"
+    fi
+  fi
+done
+
 # --- stats era: FPV-by-PP = count-1 rows of the committed HPPDOP cascades ---
 FORCE="$FORCE" python3 - <<'PYEOF' || FAILS="$FAILS stats-fpv"
 import csv, gzip, os
