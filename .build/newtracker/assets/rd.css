@@ -3556,6 +3556,15 @@ body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; ga
    left-aligned"). 2026-10-24: one cycling button covers all three views,
    so the row never holds siblings */
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
+/* three contest tabs outrun a phone's card once the third (Coalition v
+   One Nation, 2026-10-24) lands - let the group drop to a second line */
+body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }
+/* just above the phone rung the full-length labels plus the House:/Share:
+   flips outrun the card: wrap the row so the flips drop whole onto a line
+   of their own (same recipe as .rd-tpp-chart's 641-700 band) */
+@media (min-width: 641px) and (max-width: 700px) {
+  body.rd .ex-fl-tabs { flex-wrap: wrap; }
+}
 /* a vote-share view sheds the contest tabs (user 2026-10-24: "'Labor v
    Coalition / Labor v One Nation' menu bar should not be visible in 2pp
    or primary view … should drift down towards that menu bar, taking the

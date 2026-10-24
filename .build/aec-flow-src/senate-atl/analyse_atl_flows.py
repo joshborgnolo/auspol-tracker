@@ -19,7 +19,9 @@ two-party-preferred flow convention -- vs Coalition-before-ALP vs neither
 family listed; (2) the exit destination: the first family listed that is not
 the ballot's own; (3) the Labor-v-One-Nation pair: restricted to {ALP, PHON},
 which family is listed first, or only one listed, or neither ("pa" counts --
-the explainer's Labor v One Nation Senate bank). BTL ballots (and mixed
+the explainer's Labor v One Nation Senate bank); (4) the Coalition-v-One-
+Nation pair: restricted to {COAL, PHON} likewise ("pc" counts -- the
+explainer's Coalition v One Nation Senate bank). BTL ballots (and mixed
 papers under the savings provisions) are excluded from the ATL tallies, and
 their first preferences join the first-prefs reconciliation only.
 
@@ -32,10 +34,14 @@ counters here.
 Cross-checks: row counts vs each state's DoP TotalFormalPapers; family
 first-preference totals vs SenateFirstPrefsByStateByGroupByVoteTypeDownload;
 the national COAL pair cells against the previously verified figures
-(ORACLE_ON below). Any check failure aborts before output is written.
+(ORACLE_ON below) and the national ALP Coalition-v-One-Nation pair cells
+against the pinned ORACLE_CON. Any check failure aborts before output is
+written.
 
 Writes atl_flow_results-<EVENT>.json (AEC_RESULTS_DIR, default this script's
-dir). merge_pa_counts.py folds the four events' results into counts.json.
+dir). merge_pa_counts.py folds the pa blocks of the four events' results
+into counts.json, merge_pc_counts.py the pc blocks (each recomputes the
+committed blocks byte-for-byte before folding its own in).
 """
 import csv, json, sys, os, glob, zipfile
 
@@ -77,6 +83,7 @@ def family(group_name: str) -> str:
 DESTS = ["toALP", "toCOAL", "neither"]
 FAMILIES = ["ALP", "COAL", "GRN", "PHON", "OTHER"]
 PA = ["ALP_first", "ALP_only", "PHON_first", "PHON_only", "neither"]
+PC = ["COAL_first", "COAL_only", "PHON_first", "PHON_only", "neither"]
 
 # previously verified national COAL-pair figures (share = ALP-first of the
 # COAL ballots naming at least one of the pair; nei = share of ALL COAL ATL
@@ -84,8 +91,14 @@ PA = ["ALP_first", "ALP_only", "PHON_first", "PHON_only", "neither"]
 ORACLE_ON = {"20499": (61.17, 61.12), "24310": (47.63, 53.46),
              "27966": (42.51, 38.4), "31496": (25.27, 13.0)}
 
+# national ALP-pair Coalition-v-One-Nation figures, computed from this very
+# run and pinned (share = COAL-first of the ALP ballots naming at least one
+# of the pair; nei = share of ALL ALP ATL ballots naming neither party).
+ORACLE_CON = {"20499": (62.74, 58.33), "24310": (72.97, 55.95),
+              "27966": (69.95, 56.64), "31496": (73.34, 46.99)}
 
-def tally_atl(seq_fams, counts, exitc, pax, atl_first):
+
+def tally_atl(seq_fams, counts, exitc, pax, pcx, atl_first):
     """One ATL ballot: the family sequence in ballot order (duplicates kept).
     Returns nothing; updates the shared counters in place."""
     src = seq_fams[0]
@@ -108,6 +121,17 @@ def tally_atl(seq_fams, counts, exitc, pax, atl_first):
         srcpa["PHON_only"] += 1
     else:
         srcpa["neither"] += 1
+    # the third tally (pc): the SAME ballot's Coalition-v-One-Nation pair -
+    # the explainer's Coalition v One Nation Senate bank
+    srcpc = pcx[src]
+    if rco is not None and rph is not None:
+        srcpc["COAL_first" if rco < rph else "PHON_first"] += 1
+    elif rco is not None:
+        srcpc["COAL_only"] += 1
+    elif rph is not None:
+        srcpc["PHON_only"] += 1
+    else:
+        srcpc["neither"] += 1
     if ralp is not None and (rco is None or ralp < rco):
         counts[src]["toALP"] += 1
     elif rco is not None:
@@ -120,6 +144,7 @@ def blank_state():
     return {"counts": {fam: {d: 0 for d in DESTS} for fam in FAMILIES},
             "exit": {fam: {d: 0 for d in FAMILIES + ["none"]} for fam in FAMILIES},
             "pa": {fam: {d: 0 for d in PA} for fam in FAMILIES},
+            "pc": {fam: {d: 0 for d in PC} for fam in FAMILIES},
             "atl_first": {fam: 0 for fam in FAMILIES}, "btl_first": {fam: 0 for fam in FAMILIES},
             "atl": 0, "btl": 0, "rows": 0, "mixed": 0, "dupe_atl": 0}
 
@@ -159,7 +184,7 @@ def parse_column_state(st, cand):
                  "n_candidates": len(cand_cols)}
         assert len(cand_cols) == len(cand.get(st, set())), f"{st}: candidate col count mismatch"
 
-        counts, exitc, pax = res["counts"], res["exit"], res["pa"]
+        counts, exitc, pax, pcx = res["counts"], res["exit"], res["pa"], res["pc"]
         atl_first, btl_first = res["atl_first"], res["btl_first"]
         for row in r:
             if not row:
@@ -193,7 +218,7 @@ def parse_column_state(st, cand):
             nums = [n for n, _ in gseq]
             if len(nums) != len(set(nums)):
                 res["dupe_atl"] += 1
-            tally_atl([fams[l] for _, l in gseq], counts, exitc, pax, atl_first)
+            tally_atl([fams[l] for _, l in gseq], counts, exitc, pax, pcx, atl_first)
     return res, audit
 
 
@@ -228,7 +253,7 @@ def parse_positional_state(st, candinfo):
                 else:
                     raise AssertionError(f"{st}: surprise token {tok!r} in {s!r}")
         first_checked = False
-        counts, exitc, pax = res["counts"], res["exit"], res["pa"]
+        counts, exitc, pax, pcx = res["counts"], res["exit"], res["pa"], res["pc"]
         atl_first, btl_first = res["atl_first"], res["btl_first"]
         for row in r:
             if not row or len(row) < 6:
@@ -262,7 +287,7 @@ def parse_positional_state(st, candinfo):
             nums = [n for n, _ in gseq]
             if len(nums) != len(set(nums)):
                 res["dupe_atl"] += 1
-            tally_atl([gfam[l] for _, l in gseq], counts, exitc, pax, atl_first)
+            tally_atl([gfam[l] for _, l in gseq], counts, exitc, pax, pcx, atl_first)
     return res, {"groups": [{"letter": l, "family": gfam[l]} for l in groups],
                  "n_candidates": len(cands)}
 
@@ -344,6 +369,7 @@ def main():
     recon_first = {}   # state -> family -> ATL+BTL first prefs
     atl_btl = {}
     pa_by_state = {}
+    pc_by_state = {}
 
     for st in STATES:
         if POS:
@@ -357,10 +383,14 @@ def main():
             continue
         audit[st] = aud
         pa_by_state[st] = res["pa"]
-        results[st] = {"counts": res["counts"], "exit": res["exit"], "pa": res["pa"],
+        pc_by_state[st] = res["pc"]
+        results[st] = {"counts": res["counts"], "exit": res["exit"], "pa": res["pa"], "pc": res["pc"],
                        "atl": res["atl"], "btl": res["btl"], "rows": res["rows"],
                        "mixed": res["mixed"], "dupe_atl": res["dupe_atl"],
                        "coal_pa": res["pa"]["COAL"]}
+        for fam in FAMILIES:
+            assert sum(res["pc"][fam].values()) == res["atl_first"][fam], \
+                f"{st} {fam}: pc cells do not sum to the family's ATL ballots"
         atl_btl[st] = {"atl": res["atl"], "btl": res["btl"]}
         recon_first[st] = {fam: res["atl_first"][fam] + res["btl_first"][fam] for fam in FAMILIES}
         exp = formal_total.get(st)
@@ -393,6 +423,7 @@ def main():
     nat_counts = {fam: {d: 0 for d in DESTS} for fam in FAMILIES}
     nat_exit = {fam: {d: 0 for d in FAMILIES + ["none"]} for fam in FAMILIES}
     nat_pax = {fam: {d: 0 for d in PA} for fam in FAMILIES}
+    nat_pcx = {fam: {d: 0 for d in PC} for fam in FAMILIES}
     for st, res in results.items():
         for fam in FAMILIES:
             for d in DESTS:
@@ -401,19 +432,36 @@ def main():
                 nat_exit[fam][d] += res["exit"][fam][d]
             for d in PA:
                 nat_pax[fam][d] += res["pa"][fam][d]
+            for d in PC:
+                nat_pcx[fam][d] += res["pc"][fam][d]
 
     # oracle: the national COAL Labor-v-One-Nation pair must sit at the
     # previously verified figures (within published-rounding)
-    pc = nat_pax["COAL"]
-    num = pc["ALP_first"] + pc["ALP_only"]
-    den = num + pc["PHON_first"] + pc["PHON_only"]
-    tot = den + pc["neither"]
+    on = nat_pax["COAL"]
+    num = on["ALP_first"] + on["ALP_only"]
+    den = num + on["PHON_first"] + on["PHON_only"]
+    tot = den + on["neither"]
     oshare, onei = ORACLE_ON[EVENT]
     share = 100 * num / den
-    nei = 100 * pc["neither"] / tot
+    nei = 100 * on["neither"] / tot
     assert abs(share - oshare) < 0.05, f"COAL pair ALP share {share:.2f} != verified {oshare}"
     assert abs(nei - onei) < 0.15, f"COAL pair named-neither {nei:.2f} != verified {onei}"
     print(f"\noracle OK: COAL pair ALP {share:.2f}% (verified {oshare}), named neither {nei:.2f}% (verified {onei})")
+
+    # the Coalition-v-One-Nation pair pins against ORACLE_CON (its figures
+    # were computed from these verified ballots; once pinned, a drift in the
+    # tally aborts the run before any output lands)
+    ccx = nat_pcx["ALP"]
+    num2 = ccx["COAL_first"] + ccx["COAL_only"]
+    den2 = num2 + ccx["PHON_first"] + ccx["PHON_only"]
+    tot2 = den2 + ccx["neither"]
+    cshare, cnei = ORACLE_CON[EVENT]
+    share2 = 100 * num2 / den2
+    nei2 = 100 * ccx["neither"] / tot2
+    if cshare is not None:
+        assert abs(share2 - cshare) < 0.05, f"ALP pair COAL share {share2:.2f} != pinned {cshare}"
+        assert abs(nei2 - cnei) < 0.15, f"ALP pair named-neither {nei2:.2f} != pinned {cnei}"
+    print(f"coalition-v-ON pair: ALP ballots COAL-first {share2:.2f}%, PHON-first {100 * ccx['PHON_first'] / tot2 + 100 * ccx['PHON_only'] / tot2:.2f}%, named neither {nei2:.2f}% (to pin in ORACLE_CON: ({share2:.2f}, {nei2:.2f}))")
 
     def table(cc):
         out = []
@@ -472,6 +520,22 @@ def main():
             if st in results:
                 parow(st, pa_by_state[st][srcfam])
 
+    def pcrow(name, cc):
+        n = sum(cc.values())
+        if n == 0:
+            print(f"{name:>5} | (no ballots)")
+            return
+        cells = " | ".join(f"{cc[d]/n*100:8.2f}%" for d in PC)
+        print(f"{name:>5} | {cells} | {n}")
+
+    for srcfam in ["ALP", "GRN", "OTHER"]:
+        print(f"\n== {srcfam} ATL ballots: Coalition v One Nation pair (first-listed; '_only' = the other named nowhere) ==")
+        print(f"{'scope':>5} | {'COAL<PHON':>9} | {'COAL only':>9} | {'PHON<COAL':>9} | {'PHON only':>10} | {'neither':>8} | N")
+        pcrow("NAT", nat_pcx[srcfam])
+        for st in STATES:
+            if st in results:
+                pcrow(st, pc_by_state[st][srcfam])
+
     print("\n== group->family audit ==")
     for st in STATES:
         if st in audit:
@@ -482,6 +546,7 @@ def main():
         json.dump({"event": EVENT, "year": YEAR, "results": results, "national": nat_counts,
                    "national_exit": nat_exit, "audit": audit,
                    "pa": {"national": nat_pax, "states": pa_by_state},
+                   "pc": {"national": nat_pcx, "states": pc_by_state},
                    "atl_btl": atl_btl, "recon_first": recon_first, "aec_first": fp_tot}, f, indent=1)
     print(f"\nwrote {out_path}")
 

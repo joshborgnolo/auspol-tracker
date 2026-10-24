@@ -23,12 +23,17 @@ one-column-per-group CSV and `SenateCandidatesDownload-<EVENT>.csv`.)
   counters (`pa`, the second tally the analyser always takes now) into
   `counts.json`'s `pa`/`paStates` blocks. Recomputes every committed
   `counts` block byte-for-byte first: nothing is written on a mismatch.
+- `merge_pc_counts.py` — same job for the third tally (`pc`, the
+  Coalition-v-One-Nation pair counters), folding into `counts.json`'s
+  `pc`/`pcStates` blocks under the same byte-for-byte guards.
 - `counts.json` — the four events' national + per-state ATL counts,
   verbatim: for each of the five average-group families (ALP, COAL, GRN,
   PHON, OTHER), `toALP` / `toCOAL` / `neither` ballot counts (the Labor-v-
   Coalition cut), and under `pa`/`paStates` the pair counters of the
   Labor-v-One-Nation cut (`ALP_first`, `ALP_only`, `PHON_first`,
-  `PHON_only`, `neither`), BTL papers excluded throughout.
+  `PHON_only`, `neither`), with `pc`/`pcStates` carrying the
+  Coalition-v-One-Nation cut's pair counters (`COAL_first`, `COAL_only`,
+  `PHON_first`, `PHON_only`, `neither`), BTL papers excluded throughout.
 
 ## What the site draws
 
@@ -57,6 +62,20 @@ against the `pa` blocks):
   still elects someone
 - the same all-null rule marks a state-year with no One Nation ticket;
   the ACT sits out that menu
+
+And the Coalition v One Nation tab's Upper view of the same ballots
+(FLOW_HISTORY_SENATE_CON, pinned by `.build/test-senate-atl-con-flows.mjs`
+against the `pc` blocks):
+
+- **share** = `100 · (COAL_first + COAL_only) / (COAL_first + COAL_only +
+  PHON_first + PHON_only)` for the three cohort families (ALP, GRN,
+  OTHER) — of the cohort's ATL ballots naming either party, the share
+  ranking the Coalition ahead
+- **named neither** = `100 · neither / (the five cells' sum)`
+- the null map is the CONTEST's: a state whose count never saw a One
+  Nation ATL ballot nulls all three cohorts (the ACT in all four
+  elections, the NT until 2025) — a pair nobody could rank is a gap,
+  never a zero; the Coalition's side never zeroed
 
 The territories elect only two senators each from small fields, so their
 "neither" shares are tiny (single digits) and their shares sit far closer to

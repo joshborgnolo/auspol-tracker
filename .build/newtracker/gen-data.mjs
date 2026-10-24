@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_SENATE_CON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON, FLOW_HISTORY_NSW_LC_CON } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4894,6 +4894,28 @@ const flowHistory = (() => {
         coal: [...s.coal], coalNei: [...s.coalNei],
         grn: [...s.grn], grnNei: [...s.grnNei],
         oth: [...s.oth], othNei: [...s.othNei] }])) };
+  /* fed.senCon: the same Senate ballots' THIRD cut (user 2026-10-24, the
+     explainer's Coalition v One Nation tab under House: Upper) —
+     FLOW_HISTORY_SENATE_CON in flows.mjs, from the pc blocks of the same
+     committed counts (.build/aec-flow-src/senate-atl/counts.json, folded
+     in by merge_pc_counts.py). The Coalition is a contest side here, so
+     the cohorts are Labor / Greens / others and a draw cell is the share
+     ranking the COALITION ahead of One Nation, of the cohort's ATL
+     ballots naming either (a ballot naming only one of the pair counts
+     its way); the nei triples hold its "named neither" share. Nulls mark
+     a state-year the count never saw One Nation ATL ballots in (the ACT:
+     all four — the menu drops it). Federal-only like the rest. */
+  h.fed.senCon = { label: "Senate", short: "Senate", senateCon: true, elections: "Australian Senate elections",
+    years: [...FLOW_HISTORY_SENATE_CON.years],
+    alp: [...FLOW_HISTORY_SENATE_CON.alp], alpNei: [...FLOW_HISTORY_SENATE_CON.alpNei],
+    grn: [...FLOW_HISTORY_SENATE_CON.grn], grnNei: [...FLOW_HISTORY_SENATE_CON.grnNei],
+    oth: [...FLOW_HISTORY_SENATE_CON.oth], othNei: [...FLOW_HISTORY_SENATE_CON.othNei],
+    states: Object.fromEntries(Object.entries(FLOW_HISTORY_SENATE_CON.states).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "Senate elections in " + s.label, senStateCon: true,
+        years: [...FLOW_HISTORY_SENATE_CON.years],
+        alp: [...s.alp], alpNei: [...s.alpNei],
+        grn: [...s.grn], grnNei: [...s.grnNei],
+        oth: [...s.oth], othNei: [...s.othNei] }])) };
   /* nsw.sen: the NSW LEGISLATIVE COUNCIL's flows beside the Assembly's —
      the one state upper house whose commission publishes the ballots (NSW
      abolished group tickets in 1999), so the explainer's Upper view shows
@@ -4922,6 +4944,19 @@ const flowHistory = (() => {
     grn: [...FLOW_HISTORY_NSW_LC_ON.grn], grnNei: [...FLOW_HISTORY_NSW_LC_ON.grnNei],
     oth: [...FLOW_HISTORY_NSW_LC_ON.oth], othNei: [...FLOW_HISTORY_NSW_LC_ON.othNei],
     oneOnly: [...FLOW_HISTORY_NSW_LC_ON.oneOnly] };
+  /* nsw.senCon: the SAME Council ballots' Coalition-v-One-Nation cut
+     (2026-10-24, FLOW_HISTORY_NSW_LC_CON in flows.mjs, from the pc blocks
+     of the same NSWEC counts) — the explainer's Coalition v One Nation
+     tab under Upper. 2011/2015 are null: One Nation ran no LC group
+     either year, a gap never a zero. Same position rule as the rest:
+     declared after the JUR return (never in the Vic build), attached
+     after the JURIS loop below. */
+  const NSW_SEN_CON = { label: "NSW Legislative Council", short: "NSW LC", senateCon: true, lc: true, elections: "NSW Legislative Council elections",
+    years: [...FLOW_HISTORY_NSW_LC_CON.years],
+    alp: [...FLOW_HISTORY_NSW_LC_CON.alp], alpNei: [...FLOW_HISTORY_NSW_LC_CON.alpNei],
+    grn: [...FLOW_HISTORY_NSW_LC_CON.grn], grnNei: [...FLOW_HISTORY_NSW_LC_CON.grnNei],
+    oth: [...FLOW_HISTORY_NSW_LC_CON.oth], othNei: [...FLOW_HISTORY_NSW_LC_CON.othNei],
+    oneOnly: [...FLOW_HISTORY_NSW_LC_CON.oneOnly] };
   /* fed.states: the same counts split by state, for the explainer's
      Federal sub-row (user 2026-10-21): data/fed-state-flows.json, written by
      .build/fed-state-flows.py from the AEC's per-state TPP flow downloads
@@ -5091,8 +5126,8 @@ const flowHistory = (() => {
   } catch { /* not yet written */ }
   // NSW's Upper house rides beside its Assembly lines (declared above, after
   // the JUR return, so the Vic build never carries it; see NSW_SEN there) —
-  // both pairings (sen / senOn) in the one slot
-  if (h.nsw) { h.nsw.sen = NSW_SEN; h.nsw.senOn = NSW_SEN_ON; }
+  // all three pairings (sen / senOn / senCon) in the one slot
+  if (h.nsw) { h.nsw.sen = NSW_SEN; h.nsw.senOn = NSW_SEN_ON; h.nsw.senCon = NSW_SEN_CON; }
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)
   const mae = (b, k, from = 0) => {

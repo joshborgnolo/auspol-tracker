@@ -63,8 +63,9 @@ reports are committed in `published/` (below).
   exactly with the official per-group ATL first preferences (17, 24, 20,
   21 groups — 2011 additionally carries `groupSatl`/`groupRatl` re-pinned
   against the printed BP table), the five families' `toALP` / `toCOAL` /
-  `neither` counts, their `pa` blocks (below), and `oneOnly` — how many
-  of each family's ATL ballots numbered just the one box.
+  `neither` counts, their `pa` and `pc` blocks (both below), and
+  `oneOnly` — how many of each family's ATL ballots numbered just the
+  one box.
 
 ## The second tally (`pa`, added 2026-10-23)
 
@@ -79,6 +80,20 @@ already pin the ATL totals, so the pa blocks sit on the same reconciled
 ballot set. One Nation ran no LC group in 2011 or 2015, so those years'
 PHON cells are zero and the site's display series nulls them (a pair
 nobody could rank is a gap, never a zero).
+
+## The third tally (`pc`, added 2026-10-24)
+
+Both analysers also take a **third tally** of the same verified ballots,
+restricted to {Coalition, PHON} — the twin of the federal
+`analyse_atl_flows.py` third tally. Each ballot's group sequence is
+checked for the Coalition and One Nation: per first-preference family it
+files `COAL_first` / `COAL_only` / `PHON_first` / `PHON_only` /
+`neither` (a ballot naming only one of the pair still counts its way).
+The five cells per family sum exactly to that family's ATL count — the
+run's own guards already pin the ATL totals, so the pc blocks sit on
+the same reconciled ballot set. As with `pa`, 2011 and 2015 have no One
+Nation LC group: those years' PHON cells are zero and the site's display
+series nulls them.
 
 ## What the site draws
 
@@ -108,4 +123,16 @@ The One Nation tab draws the same NSW pick through
   or One Nation, the share ranking Labor ahead
 - **named neither** = `100 · neither / (the five cells)`
 - **coal / grn / oth** cohorts only (no ALP or PHON self-cohorts); 2011
+  and 2015 are all-null (no One Nation LC group ran)
+
+The Coalition v One Nation tab draws the same NSW pick through
+`FLOW_HISTORY_NSW_LC_CON` (pinned by
+`.build/test-nsw-lc-atl-con-flows.mjs` against this folder's `pc`
+blocks):
+
+- **share** = `100 · (COAL_first + COAL_only) / (COAL_first + COAL_only +
+  PHON_first + PHON_only)` — of that family's ATL ballots naming the
+  Coalition or One Nation, the share ranking the Coalition ahead
+- **named neither** = `100 · neither / (the five cells)`
+- **alp / grn / oth** cohorts only (no COAL or PHON self-cohorts); 2011
   and 2015 are all-null (no One Nation LC group ran)
