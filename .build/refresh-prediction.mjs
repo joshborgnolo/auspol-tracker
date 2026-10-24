@@ -337,7 +337,9 @@ const html = `<!DOCTYPE html>
 <meta property="og:description" content="${S.metaDesc}">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/prediction/">
-<link rel="icon" href="/assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/favicon-192.png">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <style>
 /* ------- fonts: the two cuts the static article runs ------- */
 @font-face {

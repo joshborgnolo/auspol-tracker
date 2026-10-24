@@ -17,7 +17,11 @@ SECOND tally (pa) of the same ballots, restricted to {ALP, PHON} instead:
 per family, ALP_first / ALP_only / PHON_first / PHON_only / neither (a
 ballot naming only one of the pair still counts its way). This feeds the
 explainer's NSW Legislative Council Labor-v-One-Nation view; the display
-series nulls the years One Nation fielded no LC ticket (2011, 2015).
+series nulls the years One Nation fielded no LC ticket (2011, 2015). A
+THIRD tally (pc), restricted to {COAL, PHON} with cells COAL_first /
+COAL_only / PHON_first / PHON_only / neither, feeds the NSW LC
+Coalition-v-One-Nation view; each family's five pc cells are asserted to
+sum to its ATL count.
 
 The authoritative sequence is the PreferenceNumber column: the NSWEC records
 it only for marks forming a valid consecutive run from 1, so a gap or
@@ -108,6 +112,7 @@ OFFICIAL = {
 
 FAMILIES = ["ALP", "COAL", "GRN", "PHON", "OTHER"]
 PA = ["ALP_first", "ALP_only", "PHON_first", "PHON_only", "neither"]
+PC = ["COAL_first", "COAL_only", "PHON_first", "PHON_only", "neither"]
 
 
 def family(label):
@@ -131,6 +136,7 @@ def analyse(year, zpath):
 
     counts = {fam: collections.Counter() for fam in FAMILIES}
     pa = {fam: collections.Counter() for fam in FAMILIES}
+    pc = {fam: collections.Counter() for fam in FAMILIES}
     fam_oneonly = collections.Counter()
     fam_atl = collections.Counter()
     group_first = collections.Counter()
@@ -188,6 +194,15 @@ def analyse(year, zpath):
             srcpa["PHON_only"] += 1
         else:
             srcpa["neither"] += 1
+        srcpc = pc[src]
+        if rco is not None and rph is not None:
+            srcpc["COAL_first" if rco < rph else "PHON_first"] += 1
+        elif rco is not None:
+            srcpc["COAL_only"] += 1
+        elif rph is not None:
+            srcpc["PHON_only"] += 1
+        else:
+            srcpc["neither"] += 1
         if ralp is not None and (rco is None or ralp < rco):
             counts[src]["toALP"] += 1
         elif rco is not None:
@@ -226,8 +241,14 @@ def analyse(year, zpath):
     def full_pa(counter):
         return {k: counter.get(k, 0) for k in PA}
 
+    def full_pc(counter):
+        return {k: counter.get(k, 0) for k in PC}
+
     atl_total = sum(fam_atl.values())
     one_total = sum(fam_oneonly.values())
+    for fam in FAMILIES:
+        assert sum(pc[fam].values()) == fam_atl.get(fam, 0), \
+            f"{year}: pc cells for {fam} sum {sum(pc[fam].values())} != ATL {fam_atl.get(fam, 0)}"
     print(f"{year}: formal {formal:,} (= official); ATL {atl_total:,} "
           f"({rollup['SATL_ballots']:,} single-'1', {rollup['RATL_ballots']:,} multi); "
           f"BTL {rollup['BTL_ballots']:,}")
@@ -239,6 +260,7 @@ def analyse(year, zpath):
         "atlOneOnly": one_total,
         "counts": {fam: full(counts[fam]) for fam in FAMILIES},
         "pa": {fam: full_pa(pa[fam]) for fam in FAMILIES},
+        "pc": {fam: full_pc(pc[fam]) for fam in FAMILIES},
         "oneOnly": {fam: fam_oneonly.get(fam, 0) for fam in FAMILIES},
         "atlByFamily": {fam: fam_atl.get(fam, 0) for fam in FAMILIES},
         "groupFirst": {g: group_first.get(g, 0) for g in sorted(labels)},

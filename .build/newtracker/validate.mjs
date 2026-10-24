@@ -1136,12 +1136,15 @@ export function validatePrimaryHistory() {
         if (typeof x !== "number" || x < 0 || x > 100) fail(where, "range", `${k}[${ys[i]}] = ${x} (must be a 0–100 number — only lines above the fold gap)`);
       });
     }
+    const foldHere = (typeof v.foldPt === "number" && v.foldPt > 0 && v.foldPt <= 20) ? v.foldPt : FOLD;
+    if (v.foldPt != null && foldHere !== v.foldPt) fail(where, "primary-history-shape", `bad record foldPt ${v.foldPt}`);
+    if (v.seifa === true && v.foldPt == null) fail(where, "primary-history-shape", "a seifa fifth record carries no foldPt — its halved fold gate must be explicit");
     for (const k of GATED) {
       if (v[k] == null) continue;
       if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "primary-history-shape", `${k} not aligned to years`); continue; }
       v[k].forEach((x, i) => {
         if (x == null) return;
-        if (FOLD != null && (typeof x !== "number" || x < FOLD - 0.005 || x > 100)) fail(where, "fold", `${k}[${ys[i]}] = ${x} (below the fold—fold to null, never a sub-fold count or 0)`);
+        if (foldHere != null && (typeof x !== "number" || x < foldHere - 0.005 || x > 100)) fail(where, "fold", `${k}[${ys[i]}] = ${x} (below the fold—fold to null, never a sub-fold count or 0)`);
       });
     }
     ys.forEach((y, i) => {
@@ -1156,6 +1159,204 @@ export function validatePrimaryHistory() {
   if (!S.fed.states || typeof S.fed.states !== "object") fail("primary-history.json", "primary-history-shape", "no fed.states");
   else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
   for (const [st, v] of Object.entries((S.fed.sen && S.fed.sen.states) || {})) checkView(`fed.sen.${st}`, v);
+  /* the seat-class views (House only): four AEC classifications riding
+     the divisions' 1996–2025 span, plus the five IRSAD fifths on the index
+     series' own 2001–2025 — a division rides its election's own grouping */
+  if (!S.fed.classes || typeof S.fed.classes !== "object") fail("primary-history.json", "primary-history-shape", "no fed.classes");
+  else for (const [ck, v] of Object.entries(S.fed.classes)) {
+    checkView(`fed.${ck}`, v);
+    if (Array.isArray(v.years) && v.years.length) {
+      const span0 = v.seifa ? 2001 : 1996;
+      if (v.years[0] !== span0 || v.years[v.years.length - 1] !== 2025)
+        fail(`primary-history.json fed.${ck}`, "primary-history-shape", `class span ${v.years[0]}–${v.years[v.years.length - 1]}, expected ${span0}–2025`);
+    }
+    if (v.seifa === true && typeof v.short !== "string")
+      fail(`primary-history.json fed.${ck}`, "primary-history-shape", "seifa record short is not a string");
+  }
+  return errors;
+}
+
+/* 2pp-history.json — the shares behind the flows-explained chart's "View:
+   2PP" flip (2026-10-23). Shape only (the figures' AEC recomposition is
+   pinned at generation by aec-2pp-history.py and by test-2pp-history.mjs):
+   every view's years ascend with alp/lnp drawn as 0–100 numbers that
+   recommbine to 100 per year (the file emits Labor's cell; the Coalition
+   cell is by construction 100 minus it — no third share exists in a
+   two-party count). fed.sen is the IMPLIED senate two-party (no official
+   one exists — the AEC counts no 2PP in the Senate): ATL tallies only,
+   the four post-GVT events 2016–2025, national plus the eight states,
+   no classes, and it must carry implied: true so no reader takes an
+   estimate for a record. nswLc is its only state-upper-house sibling
+   (2026-10-24): the implied NSW Legislative Council two-party over the
+   NSWEC ballot record, 2011–2023 — the same implied:true contract, one
+   jurisdiction, no state or class cuts. National spans 1972–2025 (canonical election
+   records), the state and class cuts the AEC counts' 1996–2025 span
+   (tppdiv downloads 2004 on; the statistics packs' HTPP tables
+   1996–2001). */
+export function validate2ppHistory() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "2pp-history.json"), "utf8")); }
+  catch { fail("2pp-history.json", "2pp-history-shape", "missing or unparseable"); return errors; }
+  const checkView = (where, v) => {
+    if (!v || typeof v !== "object") { fail(where, "2pp-history-shape", "view is not an object"); return; }
+    if (typeof v.label !== "string" || typeof v.elections !== "string") fail(where, "2pp-history-shape", "no label/elections copy");
+    const ys = v.years;
+    if (!Array.isArray(ys) || !ys.length || !ys.every((y) => Number.isInteger(y))) { fail(where, "2pp-history-shape", "bad years"); return; }
+    if (!ys.every((y, i) => i === 0 || y > ys[i - 1])) fail(where, "2pp-history-shape", "years out of order");
+    for (const k of ["alp", "lnp"]) {
+      if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "2pp-history-shape", `${k} not aligned to years`); continue; }
+      v[k].forEach((x, i) => {
+        if (typeof x !== "number" || x < 0 || x > 100) fail(where, "range", `${k}[${ys[i]}] = ${x} (must be a 0–100 number)`);
+      });
+    }
+    if (Array.isArray(v.alp) && Array.isArray(v.lnp) && v.alp.length === ys.length && v.lnp.length === ys.length)
+      ys.forEach((y, i) => {
+        if (Math.abs(v.alp[i] + v.lnp[i] - 100) > 0.02)
+          fail(where, "reconcile", `${y}: alp ${v.alp[i]} + lnp ${v.lnp[i]} ≠ 100 (a two-party pair sums to the count)`);
+      });
+  };
+  if (!S.fed || typeof S.fed !== "object") { fail("2pp-history.json", "2pp-history-shape", "no fed view"); return errors; }
+  checkView("fed", S.fed);
+  if (S.fed.years && S.fed.years.length >= 2) {
+    if (S.fed.years[0] !== 1972 || S.fed.years[S.fed.years.length - 1] !== 2025)
+      fail("2pp-history.json", "2pp-history-shape", `national span ${S.fed.years[0]}–${S.fed.years[S.fed.years.length - 1]}, expected 1972–2025`);
+  }
+  for (const sect of ["states", "classes"]) {
+    if (!S.fed[sect] || typeof S.fed[sect] !== "object") { fail("2pp-history.json", "2pp-history-shape", `no fed.${sect}`); continue; }
+    for (const [k, v] of Object.entries(S.fed[sect])) {
+      checkView(`fed.${k}`, v);
+      /* the IRSAD fifths ride the classes bank on the index series' own
+         2001–2025 span; every other cut joins the AEC counts at 1996 */
+      const cutStart = v.seifa ? 2001 : 1996;
+      if (v.seifa === true && sect !== "classes")
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa flag outside the classes bank");
+      if (sect === "classes" && v.seifa === true && v.short !== undefined && typeof v.short !== "string")
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa record short is not a string");
+      if (Array.isArray(v.years) && v.years.length && (v.years[0] !== cutStart || v.years[v.years.length - 1] !== 2025))
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected ${v.seifa ? "the index series' 2001–2025" : "the AEC counts' 1996–2025"}`);
+    }
+  }
+  // fed.sen: the implied Senate two-party (never counted — pinned hard so no
+  // reader mistakes the estimate for a record, and no classes are ever cut
+  // from a chamber the classifications don't join to).
+  const SEN_YRS = [2016, 2019, 2022, 2025];
+  const SEN_STATE_KEYS = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
+  const sen = S.fed.sen;
+  if (!sen || typeof sen !== "object") { fail("2pp-history.json", "2pp-history-shape", "no fed.sen implied view"); return errors; }
+  if (sen.implied !== true) fail("2pp-history.json fed.sen", "2pp-history-shape", "senate view must carry implied: true — it is an estimate, not a count");
+  if (sen.classes) fail("2pp-history.json fed.sen", "2pp-history-shape", "no division-class cuts exist for the Senate");
+  checkView("fed.sen", sen);
+  if (JSON.stringify(sen.years) !== JSON.stringify(SEN_YRS))
+    fail("2pp-history.json fed.sen", "2pp-history-shape", `senate years ${JSON.stringify(sen.years)}, expected the post-GVT events [2016,2019,2022,2025]`);
+  const senStates = sen.states && typeof sen.states === "object" ? sen.states : null;
+  if (!senStates || JSON.stringify(Object.keys(senStates).sort()) !== JSON.stringify([...SEN_STATE_KEYS].sort())) {
+    fail("2pp-history.json fed.sen", "2pp-history-shape", "senate view must hold exactly the eight state cuts");
+  } else {
+    for (const [k, v] of Object.entries(senStates)) {
+      if (typeof v.short !== "string" || !v.short) fail(`2pp-history.json fed.sen.${k}`, "2pp-history-shape", "state cut carries no short name");
+      checkView(`fed.sen.${k}`, v);
+      if (JSON.stringify(v.years) !== JSON.stringify(SEN_YRS))
+        fail(`2pp-history.json fed.sen.${k}`, "2pp-history-shape", `state cut years ${JSON.stringify(v.years)}, expected [2016,2019,2022,2025]`);
+    }
+  }
+  // nswLc: the implied senate view's only state-upper-house sibling (the
+  // NSWEC's ballot-level record is the only state upper-house count of
+  // voters' own preferences) — the same implied:true contract, one
+  // jurisdiction's view, no state or class cuts beside it.
+  const LC_YRS = [2011, 2015, 2019, 2023];
+  const lc = S.nswLc;
+  if (!lc || typeof lc !== "object") { fail("2pp-history.json", "2pp-history-shape", "no nswLc implied view"); return errors; }
+  if (lc.implied !== true) fail("2pp-history.json nswLc", "2pp-history-shape", "the council view must carry implied: true — it is an estimate, not a count");
+  if (lc.states || lc.classes) fail("2pp-history.json nswLc", "2pp-history-shape", "one jurisdiction's implied view: no state or class cuts");
+  checkView("nswLc", lc);
+  if (JSON.stringify(lc.years) !== JSON.stringify(LC_YRS))
+    fail("2pp-history.json nswLc", "2pp-history-shape", `council years ${JSON.stringify(lc.years)}, expected the banked elections [2011,2015,2019,2023]`);
+  return errors;
+}
+
+/* The three per-polling-place stores (.build/aec-booth.py, re-derivation
+   pinned by .build/test-aec-booth.mjs). This gate is shape-only: the
+   numbers themselves are the test's business. */
+export function validateBooth() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  const STREAMS = ["ord", "pp", "abs", "post", "prov"];
+  const CUTS = ["nat", "nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt",
+    "inner", "outer", "provincial", "rural", ...STREAMS];
+  const checkDoc = (name, { buckets, years, cellKeys }) => {
+    let S = null;
+    try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", name), "utf8")); }
+    catch { fail(name, "booth-shape", "missing or unparseable"); return; }
+    if (JSON.stringify(S.years) !== JSON.stringify(years))
+      fail(name, "booth-shape", `years ${JSON.stringify(S.years)}, expected ${JSON.stringify(years)}`);
+    if (buckets !== null && JSON.stringify(S.buckets) !== JSON.stringify(buckets))
+      fail(name, "booth-shape", `buckets ${JSON.stringify(S.buckets)}, expected ${JSON.stringify(buckets)}`);
+    if (!Array.isArray(S.streams) || JSON.stringify(S.streams.map((s) => s[0])) !== JSON.stringify(STREAMS))
+      fail(name, "booth-shape", "streams not the five ord/pp/abs/post/prov lanes in order");
+    if (!S.cuts || typeof S.cuts !== "object") { fail(name, "booth-shape", "no cuts object"); return; }
+    if (JSON.stringify(Object.keys(S.cuts).sort()) !== JSON.stringify([...CUTS].sort()))
+      fail(name, "booth-shape", `cuts ${JSON.stringify(Object.keys(S.cuts).sort())}, expected nat + 8 states + 4 classes + 5 streams`);
+    const keys = cellKeys || buckets.map((b) => (Array.isArray(b) ? b[0] : b));
+    for (const [cut, perYear] of Object.entries(S.cuts || {})) {
+      for (const [y, row] of Object.entries(perYear)) {
+        if (!years.includes(y)) fail(name, "booth-shape", `${cut} ${y}: a year outside the manifest span`);
+        if (!row || typeof row !== "object") { fail(name, "booth-shape", `${cut} ${y}: not a series row`); continue; }
+        for (const k of Object.keys(row))
+          if (!keys.includes(k))
+            fail(name, "booth-shape", `${cut} ${y}: series key ${JSON.stringify(k)} outside ${JSON.stringify(keys)}`);
+        for (const [k, d] of Object.entries(row)) {
+          if (!d || typeof d !== "object") { fail(name, "booth-shape", `${cut} ${y} ${k}: not a dist cell`); continue; }
+          if (!Number.isInteger(d.n) || d.n <= 0) fail(name, "booth-range", `${cut} ${y} ${k}: n=${d.n}`);
+          for (const q of ["med", "p25", "p75"]) {
+            if (typeof d[q] !== "number" || d[q] < 0 || d[q] > 100)
+              fail(name, "booth-range", `${cut} ${y} ${k}: ${q}=${d[q]} (a share in percent)`);
+          }
+          if (typeof d.med === "number" && typeof d.p25 === "number" && typeof d.p75 === "number" &&
+              !(d.p25 <= d.med && d.med <= d.p75))
+            fail(name, "booth-order", `${cut} ${y} ${k}: p25 ${d.p25} ≤ med ${d.med} ≤ p75 ${d.p75} broken`);
+        }
+      }
+    }
+    return S;
+  };
+  const prim = checkDoc("booth-primary.json", {
+    buckets: [["alp", "Labor"], ["lnp", "Coalition"], ["grn", "Greens"],
+      ["onp", "One Nation"], ["oth", "Others"]],
+    years: ["1993", "1996", "1998", "2001", "2004", "2007", "2010", "2013",
+      "2016", "2019", "2022", "2025"],
+    cellKeys: ["alp", "lnp", "grn", "onp", "oth"],
+  });
+  if (prim) {
+    // One Nation's first federal run is 1998: no "onp" cell may sit in the
+    // 1993/1996 rows, and from 1998 on the nat row carries all five buckets.
+    for (const [y, row] of Object.entries(prim.cuts.nat)) {
+      if (Number(y) < 1998 && "onp" in row)
+        fail("booth-primary.json", "booth-shape", `${y}: an onp cell before One Nation's first federal run`);
+      if (Number(y) >= 1998 && Object.keys(row).length !== 5)
+        fail("booth-primary.json", "booth-shape", `${y}: nat row ${JSON.stringify(Object.keys(row))}, expected all five buckets`);
+    }
+  }
+  checkDoc("booth-tpp.json", {
+    buckets: null,
+    years: ["1996", "1998", "2001", "2004", "2007", "2010", "2013", "2016",
+      "2019", "2022", "2025"],
+    cellKeys: ["alp"],
+  });
+  const flows = checkDoc("booth-flows.json", {
+    buckets: ["grn", "onp", "oth"],
+    years: ["2004", "2007", "2010", "2013", "2016", "2019", "2022", "2025"],
+    cellKeys: ["grn", "onp", "oth"],
+  });
+  if (flows) {
+    const cd = flows.classicDivisions;
+    const want = { 2004: 146, 2007: 147, 2010: 142, 2013: 139, 2016: 133,
+      2019: 136, 2022: 124, 2025: 115 };
+    if (JSON.stringify(cd) !== JSON.stringify(want))
+      fail("booth-flows.json", "booth-shape",
+        `classicDivisions ${JSON.stringify(cd)} ‑ expected the pinned ${JSON.stringify(want)}`);
+  }
   return errors;
 }
 
@@ -1166,6 +1367,8 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());
   errors.push(...validatePrimaryHistory());
+  errors.push(...validate2ppHistory());
+  errors.push(...validateBooth());
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());

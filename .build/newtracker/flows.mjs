@@ -455,6 +455,36 @@ export const FLOW_HISTORY_NSW_LC_ON = Object.freeze({
   oneOnly: [84.0, 84.4, 71.6, 62.3],
 });
 
+/* FLOW_HISTORY_NSW_LC_CON – the same NSW Legislative Council ballot files
+   cut the third way: rank between THE COALITION and ONE NATION, by the
+   Labor/Greens/others cohorts – the explainer's Coalition v One Nation
+   tab's one state upper house under House: Upper, alongside the two
+   Labor-side cuts above. Same guard-verified ballot set, same elections,
+   same ATL-only estimand, only the pair flipped: the analysers' THIRD
+   tally (the pc block, COAL_first / COAL_only / PHON_first / PHON_only /
+   neither per family) of the same counts.json, folded in with the pa
+   blocks. A cohort family's cell is 100·(COAL_first+COAL_only)/(the four
+   rank cells) – of its ATL papers naming either the Coalition or One
+   Nation, the share ranking THE COALITION ahead (a paper naming only one
+   of the pair still counts its way); each *Nei array is 100·neither/(the
+   five cells) – "named neither", never "exhausted". The null map is again
+   the CONTEST's, not the cohort's: One Nation ran no LC group in 2011 or
+   2015, so all three cohorts null those two years even though the
+   Coalition's side of the pair stood – a pair nobody could rank is a gap,
+   never a zero, exactly as FLOW_HISTORY_NSW_LC_ON's table does.
+   test-nsw-lc-atl-con-flows.mjs recomputes EVERY cell from counts.json's
+   pc blocks; the test file's header documents the exact derivation.
+   oneOnly repeats FLOW_HISTORY_NSW_LC's whole-population series (the
+   caption quotes it on every tab). Display history, NOT an estimator
+   input. */
+export const FLOW_HISTORY_NSW_LC_CON = Object.freeze({
+  years: [2011, 2015, 2019, 2023],
+  alp: [null, null, 69.7, 73.0], alpNei: [null, null, 93.1, 89.4],
+  grn: [null, null, 83.8, 81.9], grnNei: [null, null, 89.9, 87.4],
+  oth: [null, null, 62.3, 53.9], othNei: [null, null, 84.5, 80.9],
+  oneOnly: [84.0, 84.4, 71.6, 62.3],
+});
+
 /* FLOW_HISTORY_SENATE_ON – the same Senate ballots cut the OTHER way: rank
    between Labor and ONE NATION, by the Coalition/Greens/others cohorts –
    FLOW_HISTORY_SENATE's sibling contest, the explainer's One Nation tab
@@ -510,5 +540,67 @@ export const FLOW_HISTORY_SENATE_ON = Object.freeze({
            coal: [null, null, null, 29.4], coalNei: [null, null, null, 1.9],
            grn: [null, null, null, 88.7], grnNei: [null, null, null, 1.6],
            oth: [null, null, null, 65.7], othNei: [null, null, null, 3.2] },
+  }),
+});
+
+/* FLOW_HISTORY_SENATE_CON – the same Senate ballots cut the third way:
+   rank between THE COALITION and ONE NATION, by the Labor/Greens/others
+   cohorts – the explainer's Coalition v One Nation tab under House:
+   Upper, FLOW_HISTORY_SENATE_ON's mirror contest (the Coalition is a
+   contest side here, so the Labor cohort replaces it). Same four
+   post-GVT Senate elections, same ballot set (above-the-line only),
+   same counts provenance (.build/aec-flow-src/senate-atl/counts.json's
+   pc/pcStates blocks, folded in by merge_pc_counts.py from
+   analyse_atl_flows.py's third tally; test-senate-atl-con-flows.mjs
+   recomputes EVERY cell from them, and the test file's header documents
+   the exact derivation). The estimand, pinned: a cohort family's cell is
+   100·(COAL_first+COAL_only)/(the four rank cells) – of its ATL papers
+   naming either the Coalition or One Nation, the share ranking THE
+   COALITION ahead (a paper naming only one of the pair still counts its
+   way); each *Nei array is 100·neither/(the five cells) – "named
+   neither", never "exhausted". The null map is the CONTEST's, not the
+   cohort's: a state whose count never saw a One Nation (or Coalition)
+   ATL ballot nulls ALL THREE cohorts (the ACT in all four elections, the
+   NT until 2025 – the Coalition's side never zeroed) – a pair nobody
+   could rank is a gap, never a zero. Display history, NOT an estimator
+   input. */
+export const FLOW_HISTORY_SENATE_CON = Object.freeze({
+  years: [2016, 2019, 2022, 2025],
+  alp: [62.7, 73.0, 70.0, 73.3], alpNei: [58.3, 56.0, 56.6, 47.0],
+  grn: [87.9, 89.4, 84.9, 82.8], grnNei: [69.0, 62.4, 65.6, 61.8],
+  oth: [61.4, 57.0, 47.1, 47.6], othNei: [41.2, 37.9, 35.1, 31.1],
+  states: Object.freeze({
+    nsw: { label: "New South Wales",            short: "NSW",
+           alp: [55.1, 69.2, 66.9, 68.8], alpNei: [62.3, 66.0, 59.8, 51.8],
+           grn: [87.0, 88.4, 85.2, 81.9], grnNei: [73.7, 72.8, 68.0, 66.6],
+           oth: [65.0, 57.4, 44.9, 43.4], othNei: [41.9, 43.7, 37.6, 32.9] },
+    vic: { label: "Victoria",                   short: "Vic",
+           alp: [66.8, 72.2, 74.2, 74.3], alpNei: [72.5, 64.4, 61.7, 51.9],
+           grn: [91.7, 93.1, 88.6, 84.7], grnNei: [76.6, 70.8, 71.9, 67.9],
+           oth: [61.1, 60.1, 43.5, 47.5], othNei: [51.9, 43.4, 35.8, 39.7] },
+    qld: { label: "Queensland",                 short: "Qld",
+           alp: [50.1, 63.6, 62.3, 70.7], alpNei: [56.3, 53.8, 54.5, 46.9],
+           grn: [79.2, 84.0, 79.9, 77.9], grnNei: [71.2, 60.0, 63.7, 62.6],
+           oth: [48.7, 46.1, 41.2, 39.1], othNei: [40.1, 32.2, 35.9, 28.5] },
+    wa:  { label: "Western Australia",          short: "WA",
+           alp: [77.4, 82.7, 68.6, 78.4], alpNei: [26.9, 27.4, 53.5, 38.5],
+           grn: [87.9, 89.6, 82.0, 86.2], grnNei: [51.4, 50.3, 59.1, 49.4],
+           oth: [66.4, 66.9, 46.2, 51.0], othNei: [28.3, 28.0, 32.6, 28.1] },
+    sa:  { label: "South Australia",            short: "SA",
+           alp: [63.8, 68.0, 77.1, 79.9], alpNei: [50.9, 48.4, 46.6, 37.8],
+           grn: [84.7, 85.5, 87.3, 84.5], grnNei: [59.4, 49.2, 55.8, 51.7],
+           oth: [66.2, 56.9, 59.6, 53.7], othNei: [27.2, 24.2, 26.4, 22.0] },
+    tas: { label: "Tasmania",                   short: "Tas",
+           alp: [51.9, 70.0, 56.9, 62.5], alpNei: [35.4, 24.9, 36.1, 25.9],
+           grn: [79.9, 89.8, 76.8, 71.9], grnNei: [59.3, 44.3, 56.6, 47.6],
+           oth: [48.7, 53.7, 51.2, 43.2], othNei: [28.0, 13.3, 24.0, 19.0] },
+    act: { label: "Australian Capital Territory", short: "ACT",
+           alp: [null, null, null, null], alpNei: [null, null, null, null],
+           grn: [null, null, null, null], grnNei: [null, null, null, null],
+           oth: [null, null, null, null], othNei: [null, null, null, null] },
+    nt:  { label: "Northern Territory",         short: "NT",
+           alp: [null, null, null, 77.4], alpNei: [null, null, null, 6.9],
+           grn: [null, null, null, 75.6], grnNei: [null, null, null, 11.3],
+           oth: [null, null, null, 64.1], othNei: [null, null, null, 5.4] },
   }),
 });

@@ -109,7 +109,9 @@ const page = `<!DOCTYPE html>
 <meta property="og:description" content="Galaxy Research's federal polls from 2004 to 2010, from the sources that outlived its website.">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/archives/galaxy/">
-<link rel="icon" href="/assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/favicon-192.png">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <style>
 @font-face { font-family: 'Crimson Text'; font-style: normal; font-weight: 400; font-display: swap;
   src: url("/assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');

@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_SENATE_CON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON, FLOW_HISTORY_NSW_LC_CON } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4894,6 +4894,28 @@ const flowHistory = (() => {
         coal: [...s.coal], coalNei: [...s.coalNei],
         grn: [...s.grn], grnNei: [...s.grnNei],
         oth: [...s.oth], othNei: [...s.othNei] }])) };
+  /* fed.senCon: the same Senate ballots' THIRD cut (user 2026-10-24, the
+     explainer's Coalition v One Nation tab under House: Upper) —
+     FLOW_HISTORY_SENATE_CON in flows.mjs, from the pc blocks of the same
+     committed counts (.build/aec-flow-src/senate-atl/counts.json, folded
+     in by merge_pc_counts.py). The Coalition is a contest side here, so
+     the cohorts are Labor / Greens / others and a draw cell is the share
+     ranking the COALITION ahead of One Nation, of the cohort's ATL
+     ballots naming either (a ballot naming only one of the pair counts
+     its way); the nei triples hold its "named neither" share. Nulls mark
+     a state-year the count never saw One Nation ATL ballots in (the ACT:
+     all four — the menu drops it). Federal-only like the rest. */
+  h.fed.senCon = { label: "Senate", short: "Senate", senateCon: true, elections: "Australian Senate elections",
+    years: [...FLOW_HISTORY_SENATE_CON.years],
+    alp: [...FLOW_HISTORY_SENATE_CON.alp], alpNei: [...FLOW_HISTORY_SENATE_CON.alpNei],
+    grn: [...FLOW_HISTORY_SENATE_CON.grn], grnNei: [...FLOW_HISTORY_SENATE_CON.grnNei],
+    oth: [...FLOW_HISTORY_SENATE_CON.oth], othNei: [...FLOW_HISTORY_SENATE_CON.othNei],
+    states: Object.fromEntries(Object.entries(FLOW_HISTORY_SENATE_CON.states).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "Senate elections in " + s.label, senStateCon: true,
+        years: [...FLOW_HISTORY_SENATE_CON.years],
+        alp: [...s.alp], alpNei: [...s.alpNei],
+        grn: [...s.grn], grnNei: [...s.grnNei],
+        oth: [...s.oth], othNei: [...s.othNei] }])) };
   /* nsw.sen: the NSW LEGISLATIVE COUNCIL's flows beside the Assembly's —
      the one state upper house whose commission publishes the ballots (NSW
      abolished group tickets in 1999), so the explainer's Upper view shows
@@ -4922,6 +4944,19 @@ const flowHistory = (() => {
     grn: [...FLOW_HISTORY_NSW_LC_ON.grn], grnNei: [...FLOW_HISTORY_NSW_LC_ON.grnNei],
     oth: [...FLOW_HISTORY_NSW_LC_ON.oth], othNei: [...FLOW_HISTORY_NSW_LC_ON.othNei],
     oneOnly: [...FLOW_HISTORY_NSW_LC_ON.oneOnly] };
+  /* nsw.senCon: the SAME Council ballots' Coalition-v-One-Nation cut
+     (2026-10-24, FLOW_HISTORY_NSW_LC_CON in flows.mjs, from the pc blocks
+     of the same NSWEC counts) — the explainer's Coalition v One Nation
+     tab under Upper. 2011/2015 are null: One Nation ran no LC group
+     either year, a gap never a zero. Same position rule as the rest:
+     declared after the JUR return (never in the Vic build), attached
+     after the JURIS loop below. */
+  const NSW_SEN_CON = { label: "NSW Legislative Council", short: "NSW LC", senateCon: true, lc: true, elections: "NSW Legislative Council elections",
+    years: [...FLOW_HISTORY_NSW_LC_CON.years],
+    alp: [...FLOW_HISTORY_NSW_LC_CON.alp], alpNei: [...FLOW_HISTORY_NSW_LC_CON.alpNei],
+    grn: [...FLOW_HISTORY_NSW_LC_CON.grn], grnNei: [...FLOW_HISTORY_NSW_LC_CON.grnNei],
+    oth: [...FLOW_HISTORY_NSW_LC_CON.oth], othNei: [...FLOW_HISTORY_NSW_LC_CON.othNei],
+    oneOnly: [...FLOW_HISTORY_NSW_LC_CON.oneOnly] };
   /* fed.states: the same counts split by state, for the explainer's
      Federal sub-row (user 2026-10-21): data/fed-state-flows.json, written by
      .build/fed-state-flows.py from the AEC's per-state TPP flow downloads
@@ -4965,24 +5000,34 @@ const flowHistory = (() => {
   try {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     const CLASS_CUT = 2004;
-    h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => {
-      /* the all-seats block sits beside classes at the store's top */
-      const A = (fcf.allSeats || {})[k] || {};
-      const pick = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
-      const est = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
-      const ballots = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
-      const buckets = ["grn", "onp", "oth"];
-      /* the lump is estimated any year ANY bucket is */
-      const estLump = fcf.years.map((y, i) => buckets.some((b) => est(b)[i]));
-      return [k,
-        { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
-          hollowYears: fcf.years.filter((y) => y < CLASS_CUT),
-          years: [...fcf.years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
-          lump: A.lump ? [...A.lump] : null,
-          estGrn: est("grn"), estOnp: est("onp"), estOth: est("oth"), estLump,
-          ballots: Object.fromEntries([...buckets, "lump"].map((b) => [b,
-            b === "lump" ? (A.lumpVotes ? [...A.lumpVotes] : fcf.years.map(() => null)) : ballots(b)])) }];
-    }));
+    /* the lane reader: the four seat types (store classes/allSeats over
+       fcf.years) and the five IRSAD fifths (store seifa.classes/
+       seifa.allSeats over seifa.years — emitted into the SAME bank with
+       a seifa marker so the chart captions fork on S.seifa; every other
+       consumer sees one flat list of class views) run one mapping over
+       their own year arrays */
+    const laneClasses = (classes, all, years, seifa) =>
+      Object.fromEntries(Object.entries(classes).map(([k, s]) => {
+        const A = (all || {})[k] || {};
+        const pick = (b) => years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
+        const est = (b) => years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
+        const ballots = (b) => years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
+        const buckets = ["grn", "onp", "oth"];
+        const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
+        return [k,
+          { label: s.label, short: s.short,
+            elections: seifa ? "federal elections in the " + s.desc + " of seats by IRSAD rank"
+                             : "federal elections in " + s.short + " seats",
+            fedClass: true, ...(seifa ? { seifa: true } : {}),
+            hollowYears: years.filter((y) => y < CLASS_CUT),
+            years: [...years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
+            lump: A.lump ? [...A.lump] : null,
+            estGrn: est("grn"), estOnp: est("onp"), estOth: est("oth"), estLump,
+            ballots: Object.fromEntries([...buckets, "lump"].map((b) => [b,
+              b === "lump" ? (A.lumpVotes ? [...A.lumpVotes] : years.map(() => null)) : ballots(b)])) }];
+      }));
+    h.fed.classes = { ...laneClasses(fcf.classes, fcf.allSeats, fcf.years, false),
+                      ...(fcf.seifa ? laneClasses(fcf.seifa.classes, fcf.seifa.allSeats, fcf.seifa.years, true) : {}) };
   } catch { /* not yet written */ }
   let csv = null, bt = null;
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
@@ -5091,8 +5136,8 @@ const flowHistory = (() => {
   } catch { /* not yet written */ }
   // NSW's Upper house rides beside its Assembly lines (declared above, after
   // the JUR return, so the Vic build never carries it; see NSW_SEN there) —
-  // both pairings (sen / senOn) in the one slot
-  if (h.nsw) { h.nsw.sen = NSW_SEN; h.nsw.senOn = NSW_SEN_ON; }
+  // all three pairings (sen / senOn / senCon) in the one slot
+  if (h.nsw) { h.nsw.sen = NSW_SEN; h.nsw.senOn = NSW_SEN_ON; h.nsw.senCon = NSW_SEN_CON; }
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)
   const mae = (b, k, from = 0) => {
@@ -5169,6 +5214,151 @@ const primaryHistory = (() => {
   try {
     const { _comment, ...ph } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "primary-history.json"), "utf8"));
     return ph;
+  } catch { return null; }
+})();
+
+/* primaryHistory.stateElections – the same chart's STATE-election views
+   (user 2026-10-23: "what about primary votes for state elections, lower
+   and upper houses"; scope: the six jurisdictions the flow bank covers
+   under Lower, plus the NSW, Vic, SA and WA Legislative Councils under
+   Upper – the chambers whose official counts let the bank book every
+   family's share; Tas's fifteen-by-five-member Hare-Clark Council sits
+   out for the same reason the flow chart's Council note gives). The
+   assemblies' first preferences come from the state flow parsers' one CSV
+   (data/state-flows.csv, prim_share – the same vote figures their flows
+   are estimated from); the Council's family shares ride its own NSWEC
+   count bank (.build/nswec-lc-flow-src/counts.json, above-the-line papers
+   like the Senate view). The Coalition view merges the Liberal and
+   Nationals lines (Queensland's merger rows carry the lot under lib; the
+   NT's is the CLP whole), and a named minor folds under the same 4% as
+   the national views, its share joining Others. The srcLine map mirrors
+   the flowHistory JURIS credits – the primary view names the commission's
+   official results where the flows' srcAs names its distributions; both
+   homes move together. The jurisdiction meta mirrors the JURIS map's copy
+   too – the Territory's classic-seat tally sits under the flow
+   estimator's floor, so it never joins the flow history's menu, but its
+   first preferences stand on their own here (a primary chart needs no
+   classic-seat count). Federal-only by position: the Vic build returns
+   without them, as the flow history does. */
+if (primaryHistory && !JUR) {
+  const FOLD = primaryHistory.foldPt || 4;
+  const r2p = (v) => Math.round(v * 100) / 100;
+  const STE = [
+    ["vic", "Vic", "Victoria", "Victorian state elections", "the Victorian Electoral Commission’s official results"],
+    ["wa", "WA", "Western Australia", "Western Australian state elections", "the Western Australian Electoral Commission’s official results"],
+    ["sa", "SA", "South Australia", "South Australian state elections", "the Electoral Commission SA’s official results"],
+    ["qld", "Qld", "Queensland", "Queensland state elections", "the Electoral Commission of Queensland’s official results"],
+    ["nt", "NT", "Northern Territory", "Northern Territory elections", "the NT Electoral Commission’s official results"],
+    ["nsw", "NSW", "New South Wales", "New South Wales state elections", "the NSW Electoral Commission’s official results"],
+  ];
+  const ste = {};
+  try {
+    const STE_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+    const csvSTE = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8");
+    const bag = {};
+    csvSTE.split(/\r?\n/).slice(1).forEach((ln) => {
+      if (!ln.trim()) return;
+      const c = ln.split(",");
+      // jurisdiction,year,party,prim_votes,prim_share,… – nat merges into lib
+      ((bag[c[0]] ||= {})[+c[1]] ||= {})[c[2]] = +c[4];
+    });
+    for (const [jk, short, label, elections, srcLine] of STE) {
+      const byYear = bag[jk];
+      if (!byYear) continue;   // a jurisdiction the CSV never covers stays out
+      const years = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+      const lines = Object.fromEntries(STE_KEYS.map((k) => [k, []]));
+      years.forEach((y) => {
+        const row = byYear[y];
+        const cell = (k) => row[k] || 0;
+        const g = cell("grn"), o = cell("onp");
+        const gIn = g >= FOLD, oIn = o >= FOLD;
+        lines.alp.push(r2p(cell("alp")));
+        lines.lnp.push(r2p(cell("lib") + cell("nat")));
+        lines.grn.push(gIn ? r2p(g) : null);   // a sub-fold family gaps, never zeroes
+        lines.onp.push(oIn ? r2p(o) : null);
+        lines.oth.push(r2p(cell("oth") + (gIn ? 0 : g) + (oIn ? 0 : o)));
+      });
+      ste[jk] = { label, short, elections, srcLine,
+        years, alp: lines.alp, lnp: lines.lnp, grn: lines.grn, onp: lines.onp, oth: lines.oth };
+    }
+  } catch { /* no flows CSV: the national primary views still stand */ }
+  /* the NSW Legislative Council view, banked beside the Assembly's exactly
+     as the flow side banks FH.nsw.sen: the same committed NSWEC count
+     (atlByFamily shares of the above-the-line papers). PHON ran no Council
+     group before 2019 – a zero-ballot family is null, never a zero. */
+  try {
+    const lc = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "nswec-lc-flow-src", "counts.json"), "utf8"));
+    const years = Object.keys(lc.events || {}).map(Number).sort((a, b) => a - b);
+    if (ste.nsw && years.length) {
+      const fam = (y, k) => ((lc.events[y].atlByFamily || {})[k] || 0) / lc.events[y].atl * 100;
+      const gate = (y, k) => { const v = fam(y, k); return v >= FOLD ? r2p(v) : null; };
+      ste.nsw.sen = { label: "NSW Legislative Council", short: "NSW LC", lc: true,
+        elections: "NSW Legislative Council elections",
+        srcLine: "the NSW Electoral Commission’s ballot-level preference files",
+        years,
+        alp: years.map((y) => r2p(fam(y, "ALP"))),
+        lnp: years.map((y) => r2p(fam(y, "COAL"))),
+        grn: years.map((y) => gate(y, "GRN")),
+        onp: years.map((y) => gate(y, "PHON")),
+        oth: years.map((y) => r2p(fam(y, "OTHER") + (fam(y, "GRN") < FOLD ? fam(y, "GRN") : 0) + (fam(y, "PHON") < FOLD ? fam(y, "PHON") : 0))) };
+    }
+  } catch { /* counts bank missing: the Council view stays out */ }
+  /* the Vic, SA and WA Legislative Councils (2026-10-24, user "why only
+     nsw state upper house?… yes"): full-formal banks parsed per
+     commission in .build/state-lc-primaries/ (parse-<jur>-lc.py, {jur}.json
+     – byFamily shares of EVERY formal first preference, so no ATL
+     qualifier rides these the way NSW's ballot-paper count's does).
+     WAEC party codes are year-qualified ({code}:{year}) in the parser, so
+     a recycled code can never silently mis-map here. A jurisdiction the
+     Assembly CSV never covered keeps no Council view either. */
+  const LC_SRC = {
+    vic: ["Victorian Legislative Council", "Vic LC", "the Victorian Electoral Commission’s official results"],
+    sa: ["South Australian Legislative Council", "SA LC", "the Electoral Commission SA’s official results"],
+    wa: ["Western Australian Legislative Council", "WA LC", "the Western Australian Electoral Commission’s official results"],
+  };
+  for (const [jk, [label, short, srcLine]] of Object.entries(LC_SRC)) {
+    try {
+      const lc = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "state-lc-primaries", `${jk}.json`), "utf8"));
+      const years = Object.keys(lc.events || {}).map(Number).sort((a, b) => a - b);
+      if (!ste[jk] || !years.length) continue;
+      const fam = (y, k) => ((lc.events[y].byFamily || {})[k] || 0) / lc.events[y].formal * 100;
+      const gate = (y, k) => { const v = fam(y, k); return v >= FOLD ? r2p(v) : null; };
+      ste[jk].sen = { label, short, lc: true,
+        elections: `${label} elections`,
+        srcLine,
+        years,
+        alp: years.map((y) => r2p(fam(y, "ALP"))),
+        lnp: years.map((y) => r2p(fam(y, "COAL"))),
+        grn: years.map((y) => gate(y, "GRN")),
+        onp: years.map((y) => gate(y, "ONP")),
+        oth: years.map((y) => r2p(fam(y, "OTHER") + (fam(y, "GRN") < FOLD ? fam(y, "GRN") : 0) + (fam(y, "ONP") < FOLD ? fam(y, "ONP") : 0))) };
+    } catch { /* bank missing: that Council view stays out */ }
+  }
+  if (Object.keys(ste).length) primaryHistory.stateElections = ste;
+}
+
+/* twoPPHistory – behind the explainer chart's "View: 2PP" flip (2026-10-23,
+   the facets the user asked for beside the sibling "View: Primary votes":
+   national, each state and territory, and the AEC demographic-rating seat
+   classifications). data/2pp-history.json, written by .build/aec-2pp-history.py:
+   Labor's and the Coalition's two-party-preferred shares at each federal
+   election – national 1972–2025 (polls.json's canonical election records,
+   the same figures every past-cycle panel quotes), states and the four
+   seat classes 1996–2025 (the AEC's per-division notional counts summed:
+   TPP-by-division downloads 2004 on, statistics-pack HTPP tables before).
+   fed.sen rides the House: control's Upper (2026-10-24): the IMPLIED
+   Senate two-party from the committed ATL tallies, national and the eight
+   states 2016–2025 – an estimate, never a count, and no classes (the
+   Senate has no divisions). nswLc rides beside it as the Upper menu's one
+   banked state council (2026-10-24, user "add it"): the implied NSW
+   Legislative Council two-party from the committed NSWEC ballot record,
+   2011–2023 – the same implied estimation, one jurisdiction's view.
+   Guarded like the primary
+   lane: a missing file drops the flip. */
+const twoPPHistory = (() => {
+  try {
+    const { _comment, ...tp } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "2pp-history.json"), "utf8"));
+    return tp;
   } catch { return null; }
 })();
 
@@ -8358,6 +8548,14 @@ window.AUSPOL = (function () {
      vote at each federal election, national and per state, House and
      Senate; nulls are below the 4% fold, never zeros. */
   const primaryHistory = ${JSON.stringify(primaryHistory)};
+  /* The two-party-preferred history behind the explainer chart's View: 2PP
+     flip – Labor's and the Coalition's 2PP shares at each federal election,
+     national since 1972, per state and per seat class 1996–2025; the pair
+     sums to 100 by construction. fed.sen is the IMPLIED Senate two-party
+     (no official one exists – the AEC counts no 2PP in the Senate): ATL
+     tallies only, the four post-GVT events 2016–2025, national plus the
+     eight states, no classes, implied: true. */
+  const twoPPHistory = ${JSON.stringify(twoPPHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -8621,7 +8819,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

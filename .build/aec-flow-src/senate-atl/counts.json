@@ -580,6 +580,341 @@
       "neither": 9921
      }
     }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 92813,
+     "COAL_only": 916352,
+     "PHON_first": 87280,
+     "PHON_only": 511987,
+     "neither": 2251101
+    },
+    "COAL": {
+     "COAL_first": 820288,
+     "COAL_only": 3826202,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 14396,
+     "COAL_only": 270747,
+     "PHON_first": 9949,
+     "PHON_only": 29395,
+     "neither": 722698
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 188866,
+     "PHON_only": 359817,
+     "neither": 0
+    },
+    "OTHER": {
+     "COAL_first": 170707,
+     "COAL_only": 810235,
+     "PHON_first": 151784,
+     "PHON_only": 464581,
+     "neither": 1118411
+    }
+   },
+   "pcStates": {
+    "ACT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 47184,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 34376
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 77262,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 17944,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 12612
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 18411,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 6717
+     }
+    },
+    "NT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 32078,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 2798
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 35034,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 8868,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 586
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 11427,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 842
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "COAL_first": 25169,
+      "COAL_only": 249859,
+      "PHON_first": 24382,
+      "PHON_only": 199292,
+      "neither": 824738
+     },
+     "COAL": {
+      "COAL_first": 285396,
+      "COAL_only": 1249673,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 3026,
+      "COAL_only": 66248,
+      "PHON_first": 2393,
+      "PHON_only": 7985,
+      "neither": 223448
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 57475,
+      "PHON_only": 115092,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 53142,
+      "COAL_only": 274348,
+      "PHON_first": 37384,
+      "PHON_only": 138664,
+      "neither": 363602
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "COAL_first": 10620,
+      "COAL_only": 176948,
+      "PHON_first": 11382,
+      "PHON_only": 81951,
+      "neither": 742189
+     },
+     "COAL": {
+      "COAL_first": 115664,
+      "COAL_only": 1012540,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 2903,
+      "COAL_only": 69893,
+      "PHON_first": 1524,
+      "PHON_only": 5102,
+      "neither": 259472
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 17101,
+      "PHON_only": 42993,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 31676,
+      "COAL_only": 184231,
+      "PHON_first": 28730,
+      "PHON_only": 108612,
+      "neither": 381366
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "COAL_first": 19599,
+      "COAL_only": 129584,
+      "PHON_first": 18590,
+      "PHON_only": 129991,
+      "neither": 383358
+     },
+     "COAL": {
+      "COAL_first": 221546,
+      "COAL_only": 698269,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 2158,
+      "COAL_only": 35843,
+      "PHON_first": 2020,
+      "PHON_only": 7973,
+      "neither": 118854
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 74869,
+      "PHON_only": 151866,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 33983,
+      "COAL_only": 124842,
+      "PHON_first": 43013,
+      "PHON_only": 124300,
+      "neither": 218642
+     }
+    },
+    "WA": {
+     "ALP": {
+      "COAL_first": 20018,
+      "COAL_only": 186858,
+      "PHON_first": 17886,
+      "PHON_only": 42680,
+      "neither": 98666
+     },
+     "COAL": {
+      "COAL_first": 100384,
+      "COAL_only": 440262,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 4018,
+      "COAL_only": 49811,
+      "PHON_first": 2483,
+      "PHON_only": 4941,
+      "neither": 64797
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 25666,
+      "PHON_only": 26488,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 16006,
+      "COAL_only": 77841,
+      "PHON_first": 16755,
+      "PHON_only": 30783,
+      "neither": 55731
+     }
+    },
+    "SA": {
+     "ALP": {
+      "COAL_first": 10748,
+      "COAL_only": 72830,
+      "PHON_first": 9036,
+      "PHON_only": 38401,
+      "neither": 135793
+     },
+     "COAL": {
+      "COAL_first": 69931,
+      "COAL_only": 257683,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 1458,
+      "COAL_only": 15971,
+      "PHON_first": 887,
+      "PHON_only": 2271,
+      "neither": 30131
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 10693,
+      "PHON_only": 18915,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 31005,
+      "COAL_only": 107545,
+      "PHON_first": 20635,
+      "PHON_only": 50140,
+      "neither": 78336
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "COAL_first": 6659,
+      "COAL_only": 21011,
+      "PHON_first": 6004,
+      "PHON_only": 19672,
+      "neither": 29183
+     },
+     "COAL": {
+      "COAL_first": 27367,
+      "COAL_only": 55479,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 833,
+      "COAL_only": 6169,
+      "PHON_first": 642,
+      "PHON_only": 1123,
+      "neither": 12798
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 3062,
+      "PHON_only": 4463,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 4895,
+      "COAL_only": 11590,
+      "PHON_first": 5267,
+      "PHON_only": 12082,
+      "neither": 13175
+     }
+    }
    }
   },
   "2019": {
@@ -1160,6 +1495,341 @@
       "PHON_first": 8588,
       "PHON_only": 11922,
       "neither": 7409
+     }
+    }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 167422,
+     "COAL_only": 1096681,
+     "PHON_first": 118644,
+     "PHON_only": 349528,
+     "neither": 2200405
+    },
+    "COAL": {
+     "COAL_first": 1460224,
+     "COAL_only": 3718448,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 41301,
+     "COAL_only": 392063,
+     "PHON_first": 16079,
+     "PHON_only": 35394,
+     "neither": 806239
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 367522,
+     "PHON_only": 364439,
+     "neither": 0
+    },
+    "OTHER": {
+     "COAL_first": 225772,
+     "COAL_only": 581414,
+     "PHON_first": 218163,
+     "PHON_only": 390518,
+     "neither": 862363
+    }
+   },
+   "pcStates": {
+    "ACT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 79905,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 3456
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 75810,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 33367,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 827
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 13793,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 717
+     }
+    },
+    "NT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 31092,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 4420
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 36037,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 8208,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 1118
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 11704,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 1992
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "COAL_first": 34284,
+      "COAL_only": 278711,
+      "PHON_first": 22501,
+      "PHON_only": 116731,
+      "neither": 878638
+     },
+     "COAL": {
+      "COAL_first": 412603,
+      "COAL_only": 1209402,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 7721,
+      "COAL_only": 83169,
+      "PHON_first": 2575,
+      "PHON_only": 9364,
+      "neither": 275152
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 94125,
+      "PHON_only": 124411,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 60063,
+      "COAL_only": 189010,
+      "PHON_first": 55191,
+      "PHON_only": 129612,
+      "neither": 337075
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "COAL_first": 23924,
+      "COAL_only": 258064,
+      "PHON_first": 17373,
+      "PHON_only": 91253,
+      "neither": 707376
+     },
+     "COAL": {
+      "COAL_first": 260580,
+      "COAL_only": 1032902,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 5115,
+      "COAL_only": 88031,
+      "PHON_first": 1710,
+      "PHON_only": 5172,
+      "neither": 242065
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 42777,
+      "PHON_only": 57762,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 49143,
+      "COAL_only": 175403,
+      "PHON_first": 41171,
+      "PHON_only": 107619,
+      "neither": 286531
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "COAL_first": 46698,
+      "COAL_only": 135178,
+      "PHON_first": 32936,
+      "PHON_only": 71257,
+      "neither": 333257
+     },
+     "COAL": {
+      "COAL_first": 449810,
+      "COAL_only": 625365,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 11443,
+      "COAL_only": 73197,
+      "PHON_first": 5365,
+      "PHON_only": 10787,
+      "neither": 150994
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 145388,
+      "PHON_only": 129451,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 58697,
+      "COAL_only": 85459,
+      "PHON_first": 71595,
+      "PHON_only": 97113,
+      "neither": 148332
+     }
+    },
+    "WA": {
+     "ALP": {
+      "COAL_first": 30523,
+      "COAL_only": 195857,
+      "PHON_first": 20938,
+      "PHON_only": 26464,
+      "neither": 103106
+     },
+     "COAL": {
+      "COAL_first": 168423,
+      "COAL_only": 422182,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 8690,
+      "COAL_only": 58862,
+      "PHON_first": 3337,
+      "PHON_only": 4472,
+      "neither": 76288
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 51871,
+      "PHON_only": 26745,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 27167,
+      "COAL_only": 49627,
+      "PHON_first": 18571,
+      "PHON_only": 19470,
+      "neither": 44716
+     }
+    },
+    "SA": {
+     "ALP": {
+      "COAL_first": 21585,
+      "COAL_only": 87837,
+      "PHON_first": 16561,
+      "PHON_only": 34819,
+      "neither": 151041
+     },
+     "COAL": {
+      "COAL_first": 125960,
+      "COAL_only": 266404,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 6386,
+      "COAL_only": 36338,
+      "PHON_first": 2464,
+      "PHON_only": 4771,
+      "neither": 48418
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 26315,
+      "PHON_only": 22883,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 22504,
+      "COAL_only": 42826,
+      "PHON_first": 20658,
+      "PHON_only": 28887,
+      "neither": 36765
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "COAL_first": 10408,
+      "COAL_only": 30037,
+      "PHON_first": 8335,
+      "PHON_only": 9004,
+      "neither": 19111
+     },
+     "COAL": {
+      "COAL_first": 42848,
+      "COAL_only": 50346,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 1946,
+      "COAL_only": 10891,
+      "PHON_first": 628,
+      "PHON_only": 828,
+      "neither": 11377
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 7046,
+      "PHON_only": 3187,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 8198,
+      "COAL_only": 13592,
+      "PHON_first": 10977,
+      "PHON_only": 7817,
+      "neither": 6235
      }
     }
    }
@@ -1744,6 +2414,341 @@
       "neither": 10987
      }
     }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 186003,
+     "COAL_only": 1111577,
+     "PHON_first": 145788,
+     "PHON_only": 411561,
+     "neither": 2422562
+    },
+    "COAL": {
+     "COAL_first": 2018498,
+     "COAL_only": 2898414,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 46838,
+     "COAL_only": 456748,
+     "PHON_first": 27511,
+     "PHON_only": 62093,
+     "neither": 1131972
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 244551,
+     "PHON_only": 327426,
+     "neither": 0
+    },
+    "OTHER": {
+     "COAL_first": 186172,
+     "COAL_only": 568528,
+     "PHON_first": 238743,
+     "PHON_only": 607288,
+     "neither": 865007
+    }
+   },
+   "pcStates": {
+    "ACT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 39824,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 36378
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 63260,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 10449,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 13259
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 40637,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 25476
+     }
+    },
+    "NT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 26692,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 4124
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 28779,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 9562,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 1789
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 17532,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 2716
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "COAL_first": 48606,
+      "COAL_only": 324328,
+      "PHON_first": 40305,
+      "PHON_only": 144087,
+      "neither": 828212
+     },
+     "COAL": {
+      "COAL_first": 610172,
+      "COAL_only": 1079414,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 12364,
+      "COAL_only": 125788,
+      "PHON_first": 6648,
+      "PHON_only": 17334,
+      "neither": 344991
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 70037,
+      "PHON_only": 110430,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 49231,
+      "COAL_only": 158402,
+      "PHON_first": 67989,
+      "PHON_only": 187230,
+      "neither": 279334
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "COAL_first": 40296,
+      "COAL_only": 286212,
+      "PHON_first": 24961,
+      "PHON_only": 88854,
+      "neither": 709186
+     },
+     "COAL": {
+      "COAL_first": 320439,
+      "COAL_only": 870848,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 7847,
+      "COAL_only": 112321,
+      "PHON_first": 4551,
+      "PHON_only": 10903,
+      "neither": 347148
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 40519,
+      "PHON_only": 61918,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 43451,
+      "COAL_only": 141691,
+      "PHON_first": 57650,
+      "PHON_only": 182816,
+      "neither": 237676
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "COAL_first": 46955,
+      "COAL_only": 154085,
+      "PHON_first": 41181,
+      "PHON_only": 80564,
+      "neither": 386309
+     },
+     "COAL": {
+      "COAL_first": 745954,
+      "COAL_only": 263081,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 13643,
+      "COAL_only": 86239,
+      "PHON_first": 7930,
+      "PHON_only": 17200,
+      "neither": 219148
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 88533,
+      "PHON_only": 100658,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 51897,
+      "COAL_only": 88905,
+      "PHON_first": 62922,
+      "PHON_only": 137659,
+      "neither": 191334
+     }
+    },
+    "WA": {
+     "ALP": {
+      "COAL_first": 22360,
+      "COAL_only": 139606,
+      "PHON_first": 17534,
+      "PHON_only": 56507,
+      "neither": 271222
+     },
+     "COAL": {
+      "COAL_first": 195620,
+      "COAL_only": 275369,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 5837,
+      "COAL_only": 60586,
+      "PHON_first": 4083,
+      "PHON_only": 10489,
+      "neither": 117262
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 18864,
+      "PHON_only": 29835,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 17886,
+      "COAL_only": 49923,
+      "PHON_first": 23180,
+      "PHON_only": 55679,
+      "neither": 70933
+     }
+    },
+    "SA": {
+     "ALP": {
+      "COAL_first": 18788,
+      "COAL_only": 121024,
+      "PHON_first": 14052,
+      "PHON_only": 27518,
+      "neither": 158519
+     },
+     "COAL": {
+      "COAL_first": 92336,
+      "COAL_only": 281037,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 3918,
+      "COAL_only": 43044,
+      "PHON_first": 2362,
+      "PHON_only": 4481,
+      "neither": 67996
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 21673,
+      "PHON_only": 19090,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 14019,
+      "COAL_only": 57831,
+      "PHON_first": 18330,
+      "PHON_only": 30399,
+      "neither": 43185
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "COAL_first": 8998,
+      "COAL_only": 19806,
+      "PHON_first": 7755,
+      "PHON_only": 14031,
+      "neither": 28612
+     },
+     "COAL": {
+      "COAL_first": 53977,
+      "COAL_only": 36626,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 3229,
+      "COAL_only": 8759,
+      "PHON_first": 1937,
+      "PHON_only": 1686,
+      "neither": 20379
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 4925,
+      "PHON_only": 5495,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 9688,
+      "COAL_only": 13607,
+      "PHON_first": 8672,
+      "PHON_only": 13505,
+      "neither": 14353
+     }
+    }
    }
   },
   "2025": {
@@ -2324,6 +3329,341 @@
       "PHON_first": 13162,
       "PHON_only": 12134,
       "neither": 6999
+     }
+    }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 419725,
+     "COAL_only": 1643944,
+     "PHON_first": 266508,
+     "PHON_only": 483785,
+     "neither": 2494470
+    },
+    "COAL": {
+     "COAL_first": 3285352,
+     "COAL_only": 1275128,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 88724,
+     "COAL_only": 450531,
+     "PHON_first": 51361,
+     "PHON_only": 60783,
+     "neither": 1052224
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 576208,
+     "PHON_only": 265365,
+     "neither": 0
+    },
+    "OTHER": {
+     "COAL_first": 279055,
+     "COAL_only": 541369,
+     "PHON_first": 407761,
+     "PHON_only": 495272,
+     "neither": 777303
+    }
+   },
+   "pcStates": {
+    "ACT": {
+     "ALP": {
+      "COAL_first": 0,
+      "COAL_only": 69099,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 10979
+     },
+     "COAL": {
+      "COAL_first": 0,
+      "COAL_only": 46727,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 0,
+      "COAL_only": 16372,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 2832
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 0,
+      "COAL_only": 86239,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 9862
+     }
+    },
+    "NT": {
+     "ALP": {
+      "COAL_first": 15476,
+      "COAL_only": 8979,
+      "PHON_first": 5575,
+      "PHON_only": 1554,
+      "neither": 2356
+     },
+     "COAL": {
+      "COAL_first": 29330,
+      "COAL_only": 2776,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 3953,
+      "COAL_only": 2406,
+      "PHON_first": 1620,
+      "PHON_only": 433,
+      "neither": 1072
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 7099,
+      "PHON_only": 518,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 5321,
+      "COAL_only": 1682,
+      "PHON_first": 3107,
+      "PHON_only": 809,
+      "neither": 619
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "COAL_first": 108175,
+      "COAL_only": 484554,
+      "PHON_first": 73405,
+      "PHON_only": 195269,
+      "neither": 924053
+     },
+     "COAL": {
+      "COAL_first": 1023815,
+      "COAL_only": 391787,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 22591,
+      "COAL_only": 119948,
+      "PHON_first": 12913,
+      "PHON_only": 18626,
+      "neither": 347875
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 182926,
+      "PHON_only": 100596,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 76145,
+      "COAL_only": 131448,
+      "PHON_first": 124144,
+      "PHON_only": 147099,
+      "neither": 235039
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "COAL_first": 92269,
+      "COAL_only": 394769,
+      "PHON_first": 52846,
+      "PHON_only": 115227,
+      "neither": 706879
+     },
+     "COAL": {
+      "COAL_first": 861920,
+      "COAL_only": 376409,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 18089,
+      "COAL_only": 110091,
+      "PHON_first": 9981,
+      "PHON_only": 13153,
+      "neither": 320577
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 118132,
+      "PHON_only": 54412,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 65398,
+      "COAL_only": 113647,
+      "PHON_first": 81955,
+      "PHON_only": 115962,
+      "neither": 247807
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "COAL_first": 82099,
+      "COAL_only": 271361,
+      "PHON_first": 55621,
+      "PHON_only": 90963,
+      "neither": 442018
+     },
+     "COAL": {
+      "COAL_first": 752896,
+      "COAL_only": 212047,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 14722,
+      "COAL_only": 75979,
+      "PHON_first": 10974,
+      "PHON_only": 14697,
+      "neither": 194591
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 142678,
+      "PHON_only": 71615,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 70792,
+      "COAL_only": 101441,
+      "PHON_first": 107591,
+      "PHON_only": 160125,
+      "neither": 175590
+     }
+    },
+    "WA": {
+     "ALP": {
+      "COAL_first": 58435,
+      "COAL_only": 215537,
+      "PHON_first": 40144,
+      "PHON_only": 35434,
+      "neither": 218942
+     },
+     "COAL": {
+      "COAL_first": 342529,
+      "COAL_only": 133823,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 14128,
+      "COAL_only": 70500,
+      "PHON_first": 7600,
+      "PHON_only": 5971,
+      "neither": 96004
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 70788,
+      "PHON_only": 19917,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 28284,
+      "COAL_only": 53085,
+      "PHON_first": 46665,
+      "PHON_only": 31571,
+      "neither": 62418
+     }
+    },
+    "SA": {
+     "ALP": {
+      "COAL_first": 41420,
+      "COAL_only": 169762,
+      "PHON_first": 24382,
+      "PHON_only": 28818,
+      "neither": 160377
+     },
+     "COAL": {
+      "COAL_first": 216958,
+      "COAL_only": 94319,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 9857,
+      "COAL_only": 45078,
+      "PHON_first": 4704,
+      "PHON_only": 5396,
+      "neither": 69621
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 43487,
+      "PHON_only": 14228,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 23289,
+      "COAL_only": 43618,
+      "PHON_first": 31020,
+      "PHON_only": 26679,
+      "neither": 35096
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "COAL_first": 21851,
+      "COAL_only": 29883,
+      "PHON_first": 14535,
+      "PHON_only": 16520,
+      "neither": 28866
+     },
+     "COAL": {
+      "COAL_first": 57904,
+      "COAL_only": 17240,
+      "PHON_first": 0,
+      "PHON_only": 0,
+      "neither": 0
+     },
+     "GRN": {
+      "COAL_first": 5384,
+      "COAL_only": 10157,
+      "PHON_first": 3569,
+      "PHON_only": 2507,
+      "neither": 19652
+     },
+     "PHON": {
+      "COAL_first": 0,
+      "COAL_only": 0,
+      "PHON_first": 11098,
+      "PHON_only": 4079,
+      "neither": 0
+     },
+     "OTHER": {
+      "COAL_first": 9826,
+      "COAL_only": 10209,
+      "PHON_first": 13279,
+      "PHON_only": 13027,
+      "neither": 10872
      }
     }
    }

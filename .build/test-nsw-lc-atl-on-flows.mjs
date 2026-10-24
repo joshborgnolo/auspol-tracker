@@ -168,10 +168,10 @@ assert.ok(!Object.keys(FH).includes("nswlc"), "the LC banks nest under nsw, neve
 /* the series is federal-page-only: its attach must sit AFTER gen-data's
    `if (JUR) return h;` in the flowHistory block, so the Vic bundle (JUR=vic)
    never carries it, AND after the JURIS jurisdiction loop that rebuilds
-   h.nsw from the estimate CSV, or the attach is clobbered — the two emits
-   share one attach line so they always ride together (the explainer's
-   lcView gates on the co bank; its ON sibling must exist whenever nswlc
-   stays selected across a contest flip). */
+   h.nsw from the estimate CSV, or the attach is clobbered — the three
+   emits share one attach line so they always ride together (the explainer's
+   lcView gates on the co bank; its ON and CON siblings must exist whenever
+   nswlc stays selected across a contest flip). */
 const genSrc = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "gen-data.mjs"), "utf8");
 const jurAt = genSrc.indexOf("if (JUR) return h;");
 const jurisAt = genSrc.indexOf("Object.entries(JURIS)");
@@ -182,7 +182,7 @@ assert.ok(jurisAt > jurAt, "the JURIS loop follows the JUR return");
 assert.ok(nswSenOnAt > jurAt, "h.nsw.senOn attaches after the JUR return (Vic bundle stays LC-free)");
 assert.ok(nswSenOnAt > jurisAt, "h.nsw.senOn attaches after the JURIS loop (the h.nsw rebuild can't clobber it)");
 assert.ok(nswSenAt > 0 && nswSenAt > nswSenOnAt / 2, "the co attach is present too");
-assert.ok(genSrc.match(/\{ h\.nsw\.sen = NSW_SEN; h\.nsw\.senOn = NSW_SEN_ON; \}/),
-  "the two cuts attach in the one slot (neither bank ever ships alone)");
+assert.ok(genSrc.match(/\{ h\.nsw\.sen = NSW_SEN; h\.nsw\.senOn = NSW_SEN_ON; h\.nsw\.senCon = NSW_SEN_CON; \}/),
+  "the three cuts attach in the one slot (no bank ever ships alone — the con twin landed 2026-10-24)");
 
 console.log("test-nsw-lc-atl-on-flows: all assertions passed");

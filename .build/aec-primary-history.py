@@ -1,6 +1,11 @@
 """aec-primary-history.py – the national + per-state PRIMARY-VOTE history
 behind the /flows-explained/ chart's "View: Primary votes" flip.
 
+IRSAD fifths 2001–2025 ride beside the class cuts in fed.classes
+(seifa_quintiles membership; the quintile cell of a flow-history class is
+the mean of its division cells, so this script's per-division votes roll
+up the same way).
+
 One series per party family at every federal election, as % of formal first
 preferences: two majors always drawn, the era's named minors drawn only
 where they polled at least FOLD_PT (4%) in that view that election, in
@@ -24,6 +29,17 @@ Sources, by era:
              ALP/LNP House figures are the pin set). No per-state cut before
              2004 – the flow menu's per-state span matches it.
 
+Class cuts (fed.classes): the national House figures regrouped by seat type –
+"Federal, inner metro / outer metro / provincial / rural" – a division riding
+the election's own AEC Divisional Classifications block
+(data/division-classifications.json), so a recategorised seat moves classes
+with it. Eleven elections carry a block: 1996–2001 counted from the committed
+per-division candidate files (.build/aec-flow-src/hcands-*.txt, the AEC's
+pre-2004 abbreviation tokens); 2004–2025 from the per-division preference
+downloads (dop-*.csv.gz) at CountNumber 0 (= first preferences). The state-by-
+state and Senate sheets ship no division column, so House elections are the
+only base a seat-type class can cover – House-only, like the flows side.
+
 Buckets: alp, lnp (the whole Coalition block incl. joint Senate tickets,
 CLP and LNP – the poll rows' L/NP), grn, onp, dem (Australian Democrats),
 dlp (Democratic Labor – crosses the fold only in 1972), uap (Palmer United
@@ -43,7 +59,9 @@ copy/token decision, never an accident of the fold.
 Usage: python3 .build/aec-primary-history.py [--check]
   default writes data/primary-history.json; --check re-derives and compares.
 """
-import csv, io, json, os, sys, urllib.request
+import csv, gzip, io, json, os, sys, urllib.request
+
+from seifa_quintiles import QUINT_META, SEIFA_YEARS, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -71,6 +89,10 @@ STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"]
 STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
               "wa": "Western Australia", "sa": "South Australia", "tas": "Tasmania",
               "act": "Australian Capital Territory", "nt": "Northern Territory"}
+# the flow-history states' short forms — the explainer menus and tooltips
+# show these ("Federal, NT"), never the full name spelt out
+STATE_SHORT = {"nsw": "NSW", "vic": "Vic", "qld": "Qld", "wa": "WA",
+               "sa": "SA", "tas": "Tas", "act": "ACT", "nt": "NT"}
 
 # ---- party families ---------------------------------------------------------
 # Every PartyNm (House files) and GroupNm (Senate files) in the committed
@@ -78,16 +100,24 @@ STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
 # vocabulary (dumped from the caches 2026-10-23). Lowercased; matched exact.
 MAJ_ALP_NM = {"australian labor party", "labor", "a.l.p.",
               "australian labor party (act branch)", "australian labor party (alp)",
-              "australian labor party (northern territory) branch", "labor/country labor"}
+              "australian labor party (northern territory) branch", "labor/country labor",
+              # "Country Labor" -- Labor's rural-NSW banner in the per-division
+              # dop files (the fpv sheets print the joint "Labor/Country Labor"
+              # instead, so this token only ever fires on the class-cut path)
+              "country labor"}
 MAJ_COAL_NM = {"liberal", "the nationals", "national party", "nationals",
                "clp - the territory party", "clp-the territory party",
+               # 2007's per-division dop abbreviates the NT party "C.L.P."
+               "c.l.p.",
                "country liberal party (nt)", "country liberals", "country liberals (nt)",
                "nt clp", "northern territory country liberal party",
                "liberal national party", "liberal national party of queensland", "lnp",
                "liberal/nationals", "liberal/the nationals", "liberal & nationals",
                "liberal party of australia,nsw division-national party of australia nsw"}
 GRN_NM = {"the greens", "australian greens", "queensland greens",
-          "the greens (vic)", "the greens (wa)"}
+          "the greens (vic)", "the greens (wa)",
+          # 2025's per-division dop renames the WA branch "The Greens (WA) Inc"
+          "the greens (wa) inc"}
 ONP_NM = {"one nation", "pauline hanson's one nation",
           "pauline hanson's one nation (nsw division)", "one nation wa", "pauline"}
 DEM_NM = {"australian democrats", "democrats"}
@@ -289,10 +319,149 @@ def shares(votes_by_cut):
         cuts[cut] = (tot, pcts)
     return cuts
 
+# ---- class cuts -------------------------------------------------------------
+# key -> (label, short), in menu order; copy matches the flows chart's
+# fed.classes views, which the state-by-state menu shows beside these.
+CLASS_META = (("inner", "Inner metropolitan", "inner metro"),
+              ("outer", "Outer metropolitan", "outer metro"),
+              ("provincial", "Provincial", "provincial"),
+              ("rural", "Rural", "rural"))
+CLS_KEY = {"inner metropolitan": "inner", "outer metropolitan": "outer",
+           "provincial": "provincial", "rural": "rural"}
+# the years a Divisional Classifications block exists for: every AEC-download
+# election plus the three legacy years counted from hcands files.
+CLASS_YEARS = [1996, 1998, 2001] + sorted(EVENTS)
+
+# legacy hcands party tokens (the AEC's pre-2004 abbreviation set) -> bucket:
+# the flow side's map in aec-flow-history.py, widened with DEM/IND for the
+# primary chart. CLR is Country Labor (Labor's rural-NSW banner until 2013);
+# GWA/AGV/TG are the era's other greens parties; HAN is One Nation's token
+# (its 1998 recomposition lands on the documented 8.43% national share).
+LEGACY_PARTY = {
+    "ALP": "alp", "CLR": "alp",
+    "LP": "lnp", "NP": "lnp", "CLP": "lnp", "LNP": "lnp", "NAT": "lnp", "LIB": "lnp",
+    "GRN": "grn", "GWA": "grn", "AGV": "grn", "TG": "grn",
+    "HAN": "onp", "ON": "onp",
+    "DEM": "dem", "DLP": "dlp",
+    "IND": "ind", "OTH": "oth",
+}
+
+def hcands_class_votes(year):
+    """hcands-<year>.txt -> {division: {bucket: votes}} at first preferences."""
+    path = os.path.join(SRC, "..", f"hcands-{year}.txt")
+    votes = {}
+    with open(path, encoding="utf-8-sig") as f:
+        lines = f.read().splitlines()
+    head = lines[0].split(";")
+    dcol, pcol, vcol = head.index("Division"), head.index("Party"), head.index("Vote")
+    for ln in lines[1:]:
+        c = ln.split(";")
+        if len(c) <= vcol or not c[vcol].strip():
+            continue
+        tok = c[pcol].strip()
+        b = LEGACY_PARTY.get(tok)
+        if b is None and tok:
+            b = "oth"
+            UNMAPPED.append((tok, os.path.basename(path)))
+        elif b is None:
+            b = "oth"   # an unlabelled cell is an ungrouped candidate
+        div = c[dcol].strip()
+        votes.setdefault(div, {}).setdefault(b, 0.0)
+        votes[div][b] += float(c[vcol])
+    return votes
+
+def dop_class_votes(year):
+    """dop-<year>.csv.gz -> {division: {bucket: votes}}: the count-0 Preference
+       Count rows are each candidate's first preferences for their seat."""
+    path = os.path.join(SRC, "..", f"dop-{year}.csv.gz")
+    votes = {}
+    with gzip.open(path, "rt", encoding="utf-8-sig") as f:
+        rows = list(csv.reader(f))
+    hi = next(i for i, r in enumerate(rows) if r and r[0] == "StateAb")
+    h = {c: i for i, c in enumerate(rows[hi])}
+    ict, icn, idiv, ipty, ival = (h["CalculationType"], h["CountNumber"],
+                                  h["DivisionNm"], h["PartyNm"], h["CalculationValue"])
+    for r in rows[hi + 1:]:
+        if len(r) <= 1:
+            continue
+        if r[ict] != "Preference Count" or int(r[icn]) != 0:
+            continue
+        nm = r[ipty].strip().lower()
+        if nm:
+            b = FAMILY.get(nm)
+            if b is None:
+                b = "oth"
+                UNMAPPED.append((nm, os.path.basename(path)))
+        else:
+            b = "oth"   # ungrouped candidates carry an empty party cell
+        div = r[idiv].strip()
+        votes.setdefault(div, {}).setdefault(b, 0.0)
+        votes[div][b] += float(r[ival])
+    return votes
+
+def class_shares(blocks):
+    """Build {classKey: {year: pcts}} over CLASS_YEARS, joining each year's
+       per-division votes to that election's Divisional Classifications block.
+       The join is exact by construction (the blocks and the AEC division files
+       share namings), so a mismatch asserts rather than dropping a seat."""
+    out = {k: {} for k, _, _ in CLASS_META}
+    recon = {}   # year -> national pcts recomposed from the same ballots
+    for y in CLASS_YEARS:
+        blk = blocks.get(str(y))
+        if not blk:
+            continue
+        votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
+        assert set(votes) == set(blk), \
+            f"{y}: class join drifted - counted {sorted(set(votes) - set(blk))[:3]}, classified-only {sorted(set(blk) - set(votes))[:3]}"
+        per = {k: {} for k, _, _ in CLASS_META}
+        nat = {}
+        for div, bks in votes.items():
+            ck = CLS_KEY[blk[div]["classification"].lower()]
+            for b, v in bks.items():
+                per[ck][b] = per[ck].get(b, 0.0) + v
+                nat[b] = nat.get(b, 0.0) + v
+        recon[y] = nat
+        for ck, _, _ in CLASS_META:
+            out[ck][y] = shares({"c": per[ck]})["c"][1]
+    return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
+
+def quint_shares():
+    """({quintKey: {year: pcts}}, {year: nat pcts}) over SEIFA_YEARS: the
+       same hcands/dop per-division first preferences regrouped by
+       seifa_quintiles' membership (rankDis 1 = most disadvantaged). 2001
+       rides hcands, the downloads era the same dop read the class lane
+       uses; the join asserts exact like the class lane's, and recon must
+       equal the class lane's nat sums – the same ballots partitioned two
+       ways."""
+    out = {q: {} for q, _, _, _ in QUINT_META}
+    recon = {}
+    for y in SEIFA_YEARS:
+        mem = seifa_membership(y)
+        votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
+        assert set(votes) == set(mem), \
+            f"{y}: IRSAD-quintile join drifted - counted {sorted(set(votes) - set(mem))[:3]}, quintilised-only {sorted(set(mem) - set(votes))[:3]}"
+        per = {q: {} for q, _, _, _ in QUINT_META}
+        nat = {}
+        for div, bks in votes.items():
+            qk = mem[div]["classification"]
+            for b, v in bks.items():
+                per[qk][b] = per[qk].get(b, 0.0) + v
+                nat[b] = nat.get(b, 0.0) + float(v)
+        recon[y] = nat
+        for qk, _, _, _ in QUINT_META:
+            out[qk][y] = shares({"q": per[qk]})["q"][1]
+    return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
+
 # ---- history-aware emit ------------------------------------------------------
-def fold_series(year_rows):
+def fold_series(year_rows, fold_pt=FOLD_PT):
     """year_rows: {year: {bucket: pct}} with raw buckets (unaligned ok).
-       Returns (years, {bucket: [values|None aligned to years]})."""
+       Returns (years, {bucket: [values|None aligned to years]}).
+       fold_pt is FOLD_PT everywhere but the IRSAD-fifth lane: a fifth is
+       30-31 seats where a bucket polling ~4% nationally lands 1.7–9%, so
+       the shared 4% gate would knock out cells a class view of the same
+       size draws; the lane passes FOLD_PT/2 (quintile cells of a class
+       view must fold to the class view's nulls, and the national gate
+       stays untouched)."""
     years = sorted(year_rows)
     out = {b: [] for b in ALL_BUCKETS}
     for y in years:
@@ -300,7 +469,7 @@ def fold_series(year_rows):
         shown = {"alp", "lnp"}
         for g in GATED:
             v = row.get(g)
-            if v is not None and v >= FOLD_PT:
+            if v is not None and v >= fold_pt:
                 shown.add(g)
         for b in ALL_BUCKETS:
             if b == "oth":
@@ -358,6 +527,25 @@ def build():
         assert abs(h["alp"] - a) < 0.005, f"{y} HISTORY ALP drifted"
         assert abs(h["lnp"] - l) < 0.005, f"{y} HISTORY L/NP drifted"
 
+    # class cuts: national first preferences regrouped by the election's own
+    # seat classifications (the fed.classes views the primary chart's "Federal,
+    # <class>" menu options read). Recomposition pins: the same ballots summed
+    # per class must re-derive the election's canonical national majors, plus
+    # the era checks the token maps hang on (the 1996/1998/2001 legacy
+    # abbreviation sets against HISTORY's typed grn/dem/onp figures).
+    cls_blocks = json.load(open(os.path.join(ROOT, "data", "division-classifications.json"), encoding="utf-8"))["elections"]
+    class_rows, class_recon = class_shares(cls_blocks)
+    assert [y for y, row in class_rows["inner"].items() if row] == CLASS_YEARS, \
+        "a classification block is missing for one of CLASS_YEARS"
+    for y in CLASS_YEARS:
+        p = class_recon[y]
+        canon = CANON.get(y) or HISTORY_CANON.get(y)
+        assert abs(p["alp"] - canon[0]) < 0.05, f"{y} class recomposition ALP {p['alp']:.3f} != {canon[0]}"
+        assert abs(p["lnp"] - canon[1]) < 0.05, f"{y} class recomposition L/NP {p['lnp']:.3f} != {canon[1]}"
+    assert abs(class_recon[1996]["grn"] - 2.92) < 0.05, "hcands greens token map"
+    assert abs(class_recon[1996]["dem"] - 6.76) < 0.05, "hcands Democrat token map"
+    assert abs(class_recon[1998]["onp"] - 8.43) < 0.02, "hcands One Nation (HAN) token map"
+
     house_nat_rows = {y: shares({"nat": aec_house_nat[y]})["nat"][1] for y in sorted(EVENTS)}
     # merge typed history
     for y, row in HISTORY["house"].items():
@@ -385,8 +573,10 @@ def build():
         sen_national[int(y)] = {b: v for b, v in row.items() if b in ALL_BUCKETS and v is not None}
     years_s, sen_nat = fold_series(sen_national)
 
-    def view(label, elections, years, series, states=None):
+    def view(label, elections, years, series, states=None, short=None):
         d = {"label": label, "elections": elections, "years": years}
+        if short:
+            d["short"] = short
         for b in ALL_BUCKETS:
             vals = series[b]
             if b in ("alp", "lnp", "oth") or any(v is not None for v in vals):
@@ -398,18 +588,46 @@ def build():
     hs_states = {}
     for s in STATES:
         ys, ser = fold_series(house_state_rows[s])
-        hs_states[s] = view(STATE_FULL[s], STATE_FULL[s] + " electorates at federal elections", ys, ser)
+        hs_states[s] = view(STATE_FULL[s], STATE_FULL[s] + " electorates at federal elections", ys, ser,
+                            short=STATE_SHORT[s])
     sn_states = {}
     for s in STATES:
         ys, ser = fold_series(sen_state_rows[s])
-        sn_states[s] = view(STATE_FULL[s], STATE_FULL[s] + " Senate", ys, ser)
+        sn_states[s] = view(STATE_FULL[s], STATE_FULL[s] + " Senate", ys, ser,
+                            short=STATE_SHORT[s])
 
     doc = {
-        "_comment": "GENERATED by .build/aec-primary-history.py – primary-vote history behind the flows-explained chart's Primary votes view. Shares of formal first preferences; named minors present only where >= 4% of a view's vote (null otherwise, folded into oth). 2004-> from committed AEC caches (.build/aec-flow-src/fpv/); 1972–2001 typed in the script's HISTORY block.",
+        "_comment": "GENERATED by .build/aec-primary-history.py – primary-vote history behind the flows-explained chart's Primary votes view. Shares of formal first preferences; named minors present only where >= 4% of a view's vote (null otherwise, folded into oth). 2004-> from committed AEC caches (.build/aec-flow-src/fpv/); 1972–2001 typed in the script's HISTORY block. fed.classes = the House share regrouped by the AEC's per-election division classifications (1996–2025, House only – divisions have no Senate or state line).",
         "foldPt": FOLD_PT,
         "fed": view("Federal", "Australian federal elections", years_h, house_nat, states=hs_states),
     }
     doc["fed"]["sen"] = view("Federal Senate", "Australian Senate elections", years_s, sen_nat, states=sn_states)
+    doc["fed"]["classes"] = {}
+    for ck, label, short in CLASS_META:
+        ys, ser = fold_series(class_rows[ck])
+        doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats", ys, ser, short=short)
+    # The IRSAD fifths file as five more entries in the SAME classes bank,
+    # after the four classifications (the explainer menu reads the bank
+    # straight; the charts fork their captions on the seifa flag). Their
+    # fold gate is halved: a fifth prices 30-31 seats against a class
+    # view's 20-50, so the quarters the national gate nulls in a 150-seat
+    # view are still drawn here (foldSeries' docstring).
+    quint_rows, quint_recon = quint_shares()
+    assert [y for y, row in quint_rows["q1"].items() if row] == list(SEIFA_YEARS), \
+        "a seifa membership block is missing for one of SEIFA_YEARS"
+    # recomposition: the fifths partition the same ballots the class lane
+    # partitions, so their nat sums must equal the class lane's exactly
+    # (both are sums of the same per-division votes)
+    for y in SEIFA_YEARS:
+        for b in ALL_BUCKETS:
+            qa = quint_recon[y].get(b, 0.0)
+            ca = class_recon[y].get(b, 0.0)
+            assert abs(qa - ca) < 0.001, f"{y} {b} quintile recomposition {qa} != class {ca}"
+    for q, qlbl, qshort, qdesc in QUINT_META:
+        ys, ser = fold_series(quint_rows[q], fold_pt=FOLD_PT / 2)
+        doc["fed"]["classes"][q] = {"seifa": True, "foldPt": FOLD_PT / 2,
+                                    **view(qlbl, f"federal elections in the {qdesc} of seats by IRSAD rank",
+                                           ys, ser, short=qshort)}
     return doc
 
 def main():

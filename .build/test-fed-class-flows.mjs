@@ -4,7 +4,10 @@
    extent aec seat classification data is available", extended the same day
    to 2001 — "there's 2001 seat classification data too" — to 2004 — "there's
    2004 data in repo now" — and, once the 1996/1998 classification blocks
-   landed, to 1996):
+   landed, to 1996; the five IRSAD fifths q1..q5 joined the classes bank
+   2026-10-24 — user: display the ABS SEIFA data beside the AEC's division
+   classifications in the explainer menu views, decisions: quintile bands
+   of thirty seats, IRSAD only, all three measures):
    data/fed-class-flows.json, computed by .build/fed-class-flows.py from
    the committed AEC "two-candidate-preferred flow of preferences by
    division" tables (.build/aec-flow-src/tcp-{1996,1998,2001}.json.gz —
@@ -63,6 +66,17 @@
    merged per-bucket series, hollowYears = 1996–2001, the lumped line
    (allSeats.lump verbatim), the boolean est flags, and ballots's four
    cohorts (grn/onp/oth/lump — vote pairs behind every figure).
+   2026-10-24 (user IRSAD-fifths ask, above): the store's seifa block
+   beside classes mirrors both lanes on the index series' own span,
+   2001–2025 (the seifa store's 2028 cells score unelected boundaries —
+   never a cut year; pre-2001 holds no IRSAD block). Its membership is
+   probed from data/division-seifa-indexes.json here (thirty seats a
+   fifth by rankDis, the 151-seat chambers' spare to q5; name anchors
+   Bonython/North Sydney 2001, Lingiari/Banks 2025), both lanes recompute
+   from the same AEC caches keyed by fifth (the leftover engine's census
+   alone switches grouping), and the built-asset pins assert the merged
+   bank (classes then q1..q5), hollowYears = [2001], the seifa flag and
+   the per-fifth elections copy gen-data composes from each desc.
    Runs after the build in npm test's chain (the data asset only reflects
    the current dataset post-build). */
 import assert from "node:assert/strict";
@@ -535,7 +549,183 @@ CLASS_IDS.forEach((k) => {
   assert.deepEqual(data.allSeats[k].lumpVotes, expectedAll[k].lumpVotes, `allSeats ${k} lump ballots`);
 });
 
-// ---- the mixed-cell est roster is deliberate --------------------------------
+// ---- the IRSAD fifths (q1..q5): the seifa classes/allSeats lanes -------------
+/* 2026-10-24 (user: show the ABS SEIFA data beside the AEC's division
+   classifications in the flows-explained menu; decisions: fifths of thirty
+   seats, IRSAD only, flows + 2PP + primary — these two lanes are the flows
+   side). The store's seifa block mirrors the class lanes with the quintile
+   membership of data/division-seifa-indexes.json standing in for the
+   classification store: rankDis ranks the chamber most-disadvantaged-first,
+   and ceil(rankDis/30) is the fifth (the 151-seat chambers' spare seat
+   lands in q5, the advantaged end). The lanes run the index series' own
+   span 2001–2025 — the block's 2028 forward cells score unelected
+   boundaries, and the hollow column is 2001 alone (from 2004 the count
+   covers every seat, exactly as the class lanes). */
+const QUINT_IDS = ["q1", "q2", "q3", "q4", "q5"];
+const SEIFA_YEARS = YEARS.filter((y) => y >= 2001);
+const QUINT_META = {  // id -> [label, short, desc]: mirrors seifa_quintiles.py's QUINT_META
+  q1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
+  q2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  q3: ["Middle fifth", "Middle fifth", "middle fifth"],
+  q4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
+  q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
+};
+const quintOf = (rd) => `q${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+const seifaIdx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+/* the membership this lane grouped by, probed from the seifa store: every
+   fifth is thirty seats (the 151-seat 2019/2022 chambers' spare joins q5),
+   rankDis is a permutation of 1..N, and the named anchors stay on rung */
+const quintCell = {};                            // year -> division name -> {q, state}
+SEIFA_YEARS.forEach((y) => {
+  const blk = seifaIdx[String(y)];
+  assert.ok(blk, `${y}: an IRSAD block`);
+  const ents = Object.entries(blk), n = ents.length;
+  assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
+  const sizes = Object.fromEntries(QUINT_IDS.map((q) => [q, 0]));
+  const ranks = [];
+  quintCell[y] = {};
+  ents.forEach(([nm, cell]) => {
+    const rd = cell.irsad.rankDis;
+    assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
+    ranks.push(rd);
+    const q = quintOf(rd);
+    sizes[q] += 1;
+    quintCell[y][nm] = { q, state: cell.state };
+  });
+  assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
+    `${y}: rankDis is a permutation of 1..${n}`);
+  assert.deepEqual(sizes, { q1: 30, q2: 30, q3: 30, q4: 30, q5: n - 120 },
+    `${y}: thirty seats a fifth, q5 the 151-seat balance`);
+});
+assert.equal(quintCell["2001"]["Bonython"].q, "q1", "2001 Bonython: the most-disadvantaged fifth");
+assert.equal(quintCell["2001"]["North Sydney"].q, "q5", "2001 North Sydney: the most-advantaged fifth");
+assert.equal(quintCell["2025"]["Lingiari"].q, "q1", "2025 Lingiari: the most-disadvantaged fifth");
+assert.equal(quintCell["2025"]["Banks"].q, "q4", "2025 Banks: the second-most-advantaged fifth");
+
+// the classic-basis lane recompute, keyed by the IRSAD fifths (same engines
+// and filters as the class block's — only the grouping map changes)
+const freshQ = {};
+QUINT_IDS.forEach((q) => { freshQ[q] = { grn: [], onp: [], oth: [], votes: { grn: [], onp: [], oth: [] } }; });
+SEIFA_YEARS.forEach((y, qi) => {
+  const byDiv = new Map();
+  tcpRows(y).forEach((r) => { (byDiv.get(r.div) ?? byDiv.set(r.div, []).get(r.div)).push(r); });
+  const acc = {};
+  for (const [name, rows] of byDiv) {
+    if (!isClassic(rows)) continue;
+    const cell = quintCell[y][name];
+    assert.ok(cell, `${y}: classic division ${name} matches an IRSAD row`);
+    for (const r of rows) {
+      if (r.fid === "0" || LABOR.has(r.frm) || COAL.has(r.frm)) continue;
+      const t = ((acc[cell.q] ||= {})[bucketOf(r.frm)] ||= [0, 0]);
+      t[LABOR.has(r.to) ? 0 : 1] += r.n;
+    }
+  }
+  QUINT_IDS.forEach((q) => BUCKETS.forEach((b) => {
+    const [a, l] = ((acc[q] || {})[b]) || [0, 0];
+    freshQ[q][b][qi] = a + l ? Math.round(1000 * a / (a + l)) / 10 : null;
+    freshQ[q].votes[b][qi] = a + l ? [a, l] : null;
+  }));
+});
+// the all-seats lane recompute: the class block's leftover engine with its
+// non-classic census keyed by IRSAD fifth; the lump runs the classic basis
+// at the hollow 2001 column, mirroring the class lanes' merged run
+const freshQAll = {};
+QUINT_IDS.forEach((q) => { freshQAll[q] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
+SEIFA_YEARS.forEach((y, qi) => {
+  if (y < 2004) {
+    QUINT_IDS.forEach((q) => {
+      let a = 0, l = 0;
+      BUCKETS.forEach((b) => { freshQAll[q][b][qi] = null; freshQAll[q].votes[b][qi] = null; freshQAll[q].est[b][qi] = false; const v = freshQ[q].votes[b][qi]; if (v) { a += v[0]; l += v[1]; } });
+      freshQAll[q].lump[qi] = a + l ? pyr1(100 * a / (a + l)) : null;
+      freshQAll[q].lumpVotes[qi] = a + l ? [pyr(a), pyr(l)] : null;
+    });
+    return;
+  }
+  const { flow } = tcpFlowByDiv(y);
+  const fpd = dopFirstPrefs(y);
+  const tpp = tppdivTotals(y);
+  const { per: sf } = stateFlowTable(y);
+  const leftover = {};
+  Object.entries(sf).forEach(([st, m]) => { leftover[st] = { grn: [...(m.grn || [0, 0])], onp: [...(m.onp || [0, 0])], oth: [...(m.oth || [0, 0])] }; });
+  const classicQ = {};
+  flow.forEach((b, name) => {
+    const cell = quintCell[y][name];
+    assert.ok(cell, `${y}: classic division ${name} matches an IRSAD row`);
+    BUCKETS.forEach((bk) => {
+      leftover[cell.state][bk][0] -= b[bk][0];
+      leftover[cell.state][bk][1] -= b[bk][1];
+      const t = (classicQ[cell.q] ??= { grn: [0, 0], onp: [0, 0], oth: [0, 0] })[bk];
+      t[0] += b[bk][0]; t[1] += b[bk][1];
+    });
+  });
+  Object.entries(leftover).forEach(([st, m]) => BUCKETS.forEach((bk) => {
+    assert.ok(Math.min(...m[bk]) >= -0.75, `${y}: ${st} ${bk} non-classic leftover negative: ${m[bk]}`);
+  }));
+  const ncQ = {};
+  tpp.forEach((_, name) => {
+    if (flow.has(name)) return;
+    const cell = quintCell[y][name];
+    assert.ok(cell, `${y}: non-classic division ${name} matches an IRSAD row`);
+    ((ncQ[cell.state] ??= {})[cell.q] ??= []).push(name);
+  });
+  const accQ = {}, estQ = {};
+  QUINT_IDS.forEach((q) => { accQ[q] = { grn: [0, 0], onp: [0, 0], oth: [0, 0] }; estQ[q] = new Set(); });
+  Object.entries(ncQ).forEach(([st, byq]) => {
+    const ks = Object.keys(byq);
+    if (ks.length === 1) {
+      BUCKETS.forEach((bk) => { accQ[ks[0]][bk][0] += leftover[st][bk][0]; accQ[ks[0]][bk][1] += leftover[st][bk][1]; });
+    } else {
+      BUCKETS.forEach((bk) => {
+        const w = {}, tot = ks.reduce((s, k) => s + (w[k] = byq[k].reduce((z, d) => z + fpd.get(d)[bk], 0)), 0);
+        const [la, ll] = leftover[st][bk];
+        if (la + ll <= 0.5) return;
+        assert.ok(tot > 0, `${y}: ${st} ${bk} leftover ${la}+${ll} with no first-preference base`);
+        ks.forEach((k) => {
+          if (w[k] <= 0) return;
+          accQ[k][bk][0] += la * w[k] / tot; accQ[k][bk][1] += ll * w[k] / tot;
+          estQ[k].add(bk);
+        });
+      });
+    }
+  });
+  QUINT_IDS.forEach((q) => {
+    let la = 0, ll = 0;
+    BUCKETS.forEach((b) => {
+      const a = (classicQ[q]?.[b][0] || 0) + accQ[q][b][0], l = (classicQ[q]?.[b][1] || 0) + accQ[q][b][1];
+      freshQAll[q][b][qi] = a + l ? pyr1(100 * a / (a + l)) : null;
+      freshQAll[q].votes[b][qi] = a + l ? [pyr(a), pyr(l)] : null;
+      freshQAll[q].est[b][qi] = estQ[q].has(b);
+      la += a; ll += l;
+    });
+    freshQAll[q].lump[qi] = pyr1(100 * la / (la + ll));
+    freshQAll[q].lumpVotes[qi] = [pyr(la), pyr(ll)];
+  });
+});
+// the store's seifa lanes match both recomputes
+assert.ok(data.seifa && data.seifa.classes && data.seifa.allSeats, "the store carries the IRSAD-fifths lanes");
+assert.deepEqual(data.seifa.years, SEIFA_YEARS, "the index series' own span (2001–2025; the 2028 cells score unelected boundaries)");
+assert.deepEqual(Object.keys(data.seifa.classes), QUINT_IDS, "q1..q5, most-disadvantaged first");
+assert.deepEqual(Object.keys(data.seifa.allSeats), QUINT_IDS, "the all-seats lane covers the same five");
+QUINT_IDS.forEach((q) => {
+  const [label, short, desc] = QUINT_META[q];
+  const c = data.seifa.classes[q];
+  assert.equal(c.label, label, `${q}: label`);
+  assert.equal(c.short, short, `${q}: the menu's "Federal, …" face names the index`);
+  assert.equal(c.desc, desc, `${q}: the descriptor the elections copy composes`);
+  assert.deepEqual(Object.keys(c).sort(), ["desc", "grn", "label", "onp", "oth", "short", "votes"].sort(),
+    `${q} classes: the lane's own keys`);
+  const A = data.seifa.allSeats[q];
+  BUCKETS.forEach((b) => {
+    assert.deepEqual(c[b], freshQ[q][b], `seifa ${q} ${b}: classic basis matches the AEC caches`);
+    assert.deepEqual(c.votes[b], freshQ[q].votes[b], `seifa ${q} ${b}: classic ballots match the caches`);
+    assert.deepEqual(A[b], freshQAll[q][b], `seifa allSeats ${q} ${b}: all-seats shares match the caches`);
+    assert.deepEqual(A.votes[b], freshQAll[q].votes[b], `seifa allSeats ${q} ${b}: all-seats ballots match`);
+    assert.deepEqual(A.est[b], freshQAll[q].est[b], `seifa allSeats ${q} ${b}: the est roster`);
+  });
+  assert.deepEqual(A.lump, freshQAll[q].lump, `seifa allSeats ${q}: every non-major ballot (classic basis at 2001)`);
+  assert.deepEqual(A.lumpVotes, freshQAll[q].lumpVotes, `seifa allSeats ${q}: lump ballots`);
+});
+
 /* A state-year's non-classic seats spanning classes forces the leftover
    allocation (and the est flag); the roster is pinned so a redistribution
    or a new crossbench era changes it by conscious edit, never silently. */
@@ -585,10 +775,12 @@ const sandbox = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", asset[0]), "utf8"), sandbox, { filename: asset[0] });
 const FH = sandbox.window.AUSPOL.flowHistory;
 assert.ok(FH.fed.classes, "flowHistory.fed.classes in the built data asset");
-assert.deepEqual(Object.keys(FH.fed.classes), CLASS_IDS, "fed.classes carries the four");
+assert.deepEqual(Object.keys(FH.fed.classes), [...CLASS_IDS, ...QUINT_IDS],
+  "fed.classes carries the four class cuts, then the five IRSAD fifths");
 CLASS_IDS.forEach((k) => {
   const got = FH.fed.classes[k];
   assert.equal(got.fedClass, true, `${k}: marked a federal class view`);
+  assert.equal(got.seifa, undefined, `${k}: a class cut carries no seifa flag`);
   assert.deepEqual([...got.years], YEARS, `${k}: years`);
   /* classic seats only until 2004 (hollow rings); all-seats from 2004 */
   assert.deepEqual([...got.hollowYears], [...YEARS.slice(0, 3)], `${k}: classic-seats rings stop at 2001`);
@@ -607,6 +799,31 @@ CLASS_IDS.forEach((k) => {
   assert.deepEqual(Object.keys(got).sort(), ["ballots", "elections", "estGrn", "estLump", "estOnp", "estOth", "fedClass", "grn", "hollowYears", "label", "lump", "onp", "oth", "short", "years"].sort(),
     `${k}: shares and estimate flags, no Err arrays`);
   assert.equal(got.elections, `federal elections in ${CLASS_SHORTS[k]} seats`, `${k}: the chart head's scope line`);
+});
+/* the IRSAD fifths ride the same emit machinery on the index series' own
+   span: hollow 2001 ring only (the series' floor — from 2004 the count
+   covers every seat), plus the seifa flag the three charts fork their
+   captions on */
+QUINT_IDS.forEach((q) => {
+  const got = FH.fed.classes[q];
+  assert.equal(got.fedClass, true, `${q}: marked a federal class view`);
+  assert.equal(got.seifa, true, `${q}: the seifa flag the captions fork on`);
+  assert.deepEqual([...got.years], SEIFA_YEARS, `${q}: the index series' span`);
+  assert.deepEqual([...got.hollowYears], [2001], `${q}: only the series-floor 2001 ring is hollow`);
+  assert.equal(got.short, QUINT_META[q][1], `${q}: the menu face`);
+  assert.equal(got.elections, `federal elections in the ${QUINT_META[q][2]} of seats by IRSAD rank`,
+    `${q}: the chart head's scope line names the grouping`);
+  const allSeats = data.seifa.allSeats[q];
+  BUCKETS.forEach((b) => {
+    const merged = SEIFA_YEARS.map((y, yi) => (yi < 1 ? data.seifa.classes[q][b][yi] : allSeats[b][yi]));
+    assert.deepEqual([...got[b]], merged, `${q} ${b} merges classic 2001 with all-seats 2004+`);
+    assert.equal(typeof got["est" + b[0].toUpperCase() + b.slice(1)][0], "boolean", `${q} est${b} reaches the asset as booleans`);
+  });
+  assert.deepEqual([...got.lump], [...allSeats.lump], `${q} lump is the store's merged 9-year run`);
+  assert.deepEqual(Object.keys(got.ballots).sort(), ["grn", "lump", "onp", "oth"].sort(), `${q}: ballots carries the four cohorts`);
+  assert.deepEqual(Object.keys(got).sort(),
+    ["ballots", "elections", "estGrn", "estLump", "estOnp", "estOth", "fedClass", "grn", "hollowYears", "label", "lump", "onp", "oth", "seifa", "short", "years"].sort(),
+    `${q}: the class-cut record plus the seifa flag`);
 });
 assert.ok(!Object.keys(FH).includes("classes"), "classes nests under fed, never a chip key of its own");
 

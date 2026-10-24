@@ -197,6 +197,43 @@
      "PHON_only": 0,
      "neither": 0
     }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 0,
+     "COAL_only": 28890,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 924527
+    },
+    "COAL": {
+     "COAL_first": 0,
+     "COAL_only": 1923914,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 0,
+     "COAL_only": 36009,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 404749
+    },
+    "OTHER": {
+     "COAL_first": 0,
+     "COAL_only": 76260,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 590247
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    }
    }
   },
   "2015": {
@@ -334,6 +371,43 @@
      "PHON_only": 0,
      "neither": 0
     }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 0,
+     "COAL_only": 43213,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 1282546
+    },
+    "COAL": {
+     "COAL_first": 0,
+     "COAL_only": 1825480,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 0,
+     "COAL_only": 30107,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 382553
+    },
+    "OTHER": {
+     "COAL_first": 0,
+     "COAL_only": 64774,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 614956
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    }
    }
   },
   "2019": {
@@ -461,6 +535,43 @@
      "ALP_only": 0,
      "PHON_first": 14966,
      "PHON_only": 273185,
+     "neither": 0
+    }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 18937,
+     "COAL_only": 43423,
+     "PHON_first": 8934,
+     "PHON_only": 18213,
+     "neither": 1207261
+    },
+    "COAL": {
+     "COAL_first": 63175,
+     "COAL_only": 1467367,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 14581,
+     "COAL_only": 20799,
+     "PHON_first": 3382,
+     "PHON_only": 3452,
+     "neither": 374052
+    },
+    "OTHER": {
+     "COAL_first": 24337,
+     "COAL_only": 53131,
+     "PHON_first": 16828,
+     "PHON_only": 30118,
+     "neither": 676171
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 23701,
+     "PHON_only": 264450,
      "neither": 0
     }
    }
@@ -592,6 +703,43 @@
      "ALP_only": 0,
      "PHON_first": 17862,
      "PHON_only": 243050,
+     "neither": 0
+    }
+   },
+   "pc": {
+    "ALP": {
+     "COAL_first": 40644,
+     "COAL_only": 88014,
+     "PHON_first": 22605,
+     "PHON_only": 25069,
+     "neither": 1490559
+    },
+    "COAL": {
+     "COAL_first": 76480,
+     "COAL_only": 1285183,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "GRN": {
+     "COAL_first": 19820,
+     "COAL_only": 22055,
+     "PHON_first": 6101,
+     "PHON_only": 3173,
+     "neither": 356203
+    },
+    "OTHER": {
+     "COAL_first": 30006,
+     "COAL_only": 53617,
+     "PHON_first": 25320,
+     "PHON_only": 46283,
+     "neither": 658224
+    },
+    "PHON": {
+     "COAL_first": 0,
+     "COAL_only": 0,
+     "PHON_first": 39360,
+     "PHON_only": 221552,
      "neither": 0
     }
    }

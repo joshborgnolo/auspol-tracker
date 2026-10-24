@@ -38,8 +38,10 @@
    bonham-party-flows.json (bonham-party-flows.py: AEC counts by party
    1996-2025, the pile-model estimate 1984-93). Only the second is his
    test; the first is the site's. A third section reruns the site's tables
-   on the REAL final polls' primary votes (accuracy-panel scoring), the
-   comparand /lef-success/ quotes beside the 0.43.
+   on the REAL final polls' primary votes (accuracy-panel scoring) - both
+   through last-election flows and through each election's OWN counted
+   flows, isolating the pollsters' primary-vote error; the comparand
+   /lef-success/ quotes beside the 0.43.
 
    Run from the repo root: node .build/analysis/bonham-lef-track-record.mjs
    Exit code 1 if a re-derived error drifts from its committed bt, or a
@@ -294,15 +296,43 @@ bStat("last twelve as of 2025 (1993–2025)", bw(1993, 2025));
 /* ---- the real pollsters' primaries through the same tables -------------- */
 /* The article's imaginary pollster gets every primary exactly right, so its
    misses are the flow drift's alone. The comparand the page quotes beside
-   it: the REAL final polls' primary votes, put through the same last-
-   election-flows engine, scored the site's accuracy-panel way (one final
-   poll per house within fourteen days of the election, house means equally
-   weighted, implied basis = primaries through the opening election's
-   FLOW_LEF table). Mirrors accuracyCycles in gen-data.mjs — the window,
-   the canon map and impliedLefAlp2pp all duplicate it, and drift between
-   the two should make you re-read this comment, not "fix" one side. */
+   it: the REAL final polls' primary votes, scored the site's accuracy-panel
+   way (one final poll per house within fourteen days of the election,
+   house means equally weighted), run two ways:
+   - through the same last-election-flows engine (the opening election's
+     FLOW_LEF table) — flow drift and poll error combined;
+   - through the CLOSING election's own counted table (data/flow-lef.json's
+     entry for the election itself, flows f + anchor), where the flow
+     drift is right by construction, so what remains is the pollsters'
+     primary-vote error. That is the 0.xx the page quotes.
+   Mirrors accuracyCycles in gen-data.mjs — the window, the canon map and
+   impliedLefAlp2pp all duplicate it, and drift between the two should make
+   you re-read this comment, not "fix" one side. */
 const ACC_WIN = 14; // gen-data.mjs ACC_WINDOW_DAYS
 const RENAME = { Morgan: "Roy Morgan", "Newspoll-YouGov": "Newspoll", "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater", "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre" }; // gen-data.mjs ACC_CANON
+/* impliedLefAlp2pp applied to the LEF store's own shape: the closing
+   election's counted table t = LEF[year] ({cut, f, fMinor, share, anchor}).
+   Same rescale/fold rules as flows.mjs: a declared-basis set (Σ≠100±2 with
+   oth present) rescales to 100; an un-itemised bucket reads at the election
+   share-weighted oth mix; a share-below-0.05% bucket folds into oth. */
+const impliedAtOwnTable = (y, p) => {
+  const t = LEF[String(y)];
+  if (!t || p.alp == null || p.lnp == null) return null;
+  const COLS = ["alp", "lnp", "grn", "onp", "oth"];
+  const sum = COLS.reduce((s, k) => s + (p[k] ?? 0), 0);
+  const k = p.oth != null && Math.abs(sum - 100) > 2 ? 100 / sum : 1;
+  const v = (c) => (p[c] == null ? null : p[c] * k);
+  const alp = v("alp"), lnp = v("lnp");
+  const anchor = t.anchor ?? 0;
+  if (t.cut === "lumped") return alp + (100 - alp - lnp) * t.fMinor + anchor;
+  const grn = v("grn"), onp = v("onp");
+  const oth = p.oth != null ? v("oth") : Math.max(0, 100 - alp - lnp - (grn ?? 0) - (onp ?? 0));
+  const f = (b) => (t.f[b] != null && t.share[b] >= 0.05 ? t.f[b] : t.f.oth);
+  const folded = ["oth", ...(grn == null ? ["grn"] : []), ...(onp == null ? ["onp"] : [])];
+  const w = folded.reduce((s, b) => s + t.share[b], 0);
+  const fOth = w ? folded.reduce((s, b) => s + f(b) * t.share[b], 0) / w : t.f.oth;
+  return alp + (grn != null ? f("grn") * grn : 0) + (onp != null ? f("onp") * onp : 0) + fOth * oth + anchor;
+};
 {
   const tables = Object.keys(FLOW_LEF).map(Number).sort((a, b) => a - b);
   const closings = [...tables, 2025]; // each table is tested at the next election
@@ -322,21 +352,25 @@ const RENAME = { Morgan: "Roy Morgan", "Newspoll-YouGov": "Newspoll", "Resolve S
     const byHouse = new Map();
     for (const p of [...win].sort((a, b) => a.date.localeCompare(b.date)))
       byHouse.set(RENAME[p.firm] || p.firm, p);
-    const imps = [...byHouse.values()].map((p) => {
-      const imp = impliedLefAlp2pp(t, p);
-      return imp == null ? null : { firm: RENAME[p.firm] || p.firm, err: imp - e.tpp_alp };
+    const houses = [...byHouse.values()].map((p) => {
+      const lef = impliedLefAlp2pp(t, p);
+      const own = impliedAtOwnTable(cy, p);
+      return lef == null || own == null ? null : { firm: RENAME[p.firm] || p.firm, lef: lef - e.tpp_alp, own: own - e.tpp_alp };
     }).filter(Boolean);
-    if (!imps.length) continue;
-    const err = mean(imps.map((h) => h.err));
-    crow.push({ cy, n: imps.length, houses: imps, err, abs: Math.abs(err) });
+    if (!houses.length) continue;
+    crow.push({ cy, houses, lef: mean(houses.map((h) => h.lef)), own: mean(houses.map((h) => h.own)) });
   }
-  console.log("\nREAL FINAL POLLS' PRIMARIES through the same last-election-flows tables (accuracy-panel scoring: one poll per house ≤14 days out, house means equally weighted, implied basis)");
-  console.log("closing | houses | implied miss (house mean, ALP pts) | per-house misses");
-  for (const c of crow)
-    console.log(`${c.cy}   | ${String(c.n).padStart(6)} | ${f2(r2(c.err)).padStart(6)} | ${c.houses.map((h) => `${h.firm} ${f2(r2(h.err))}`).join(", ")}`);
-  const overall = mae(crow.map((c) => c.err));
-  console.log(`mean |miss| across the ${crow.length} scoreable closings (${crow[0].cy}–${crow[crow.length - 1].cy}): ${overall.toFixed(2)} ALP points — vs ${r2(mae(inWindow(crow[0].cy, 2025).map(errOf))).toFixed(2)} for the imaginary exact-primary pollster over the same elections`);
-  console.log(`signed mean miss: ${f2(r2(mean(crow.map((c) => c.err))))} (the flow assumption's own signed mean over the same closings is ${f2(r2(mean(inWindow(crow[0].cy, 2025).map(errOf))))})`);
+  console.log("\nREAL FINAL POLLS' PRIMARIES through the flow tables (accuracy-panel scoring: one poll per house ≤14 days out, house means equally weighted, implied basis)");
+  console.log("closing | houses | miss via last-election flows | miss via this election's own flows (the pollsters' primary error, ALP pts)");
+  for (const c of crow) {
+    const per = c.houses.map((h) => `${h.firm} ${f2(r2(h.lef))}/${f2(r2(h.own))}`).join(", ");
+    console.log(`${c.cy}   | ${String(c.houses.length).padStart(6)} | ${f2(r2(c.lef)).padStart(6)} | ${f2(r2(c.own)).padStart(6)}   (${per})`);
+  }
+  const span = inWindow(crow[0].cy, 2025).map(errOf);
+  console.log(`mean |miss| across the ${crow.length} scoreable closings (${crow[0].cy}–${crow[crow.length - 1].cy}):`);
+  console.log(`  via last-election flows: ${mae(crow.map((c) => c.lef)).toFixed(2)} ALP points — the flow drift and the poll error together (the exact-primary pollster's ${r2(mae(span)).toFixed(2)} over the same elections is the whole drift term)`);
+  console.log(`  via this election's own flows: ${mae(crow.map((c) => c.own)).toFixed(2)} ALP points — the pollsters' primary-vote error alone, the figure the page quotes beside the 0.43`);
+  console.log(`  signed means: ${f2(r2(mean(crow.map((c) => c.lef))))} (last-election flows) / ${f2(r2(mean(crow.map((c) => c.own))))} (own flows); the flow assumption's own signed mean is ${f2(r2(mean(span)))}`);
   console.log("  1987 has no score (no committed 1984 flow table) and 1990 none either (the committed finals carry no published 2PP, so they fall the accuracy panel's tpp_alp gate even though their primaries are on file); the poll rows here are the committed cyclePolls, same sets the accuracy panel reads.");
 }
 

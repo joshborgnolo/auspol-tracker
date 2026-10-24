@@ -519,6 +519,7 @@ export const shellCopy = (name) => {
 export function shellCss() {
   const ss3 = fontUrl("sourcesans3-");
   const crimsonIt = fontUrl("crimsontext-italic-700-");
+  const crimson700 = fontUrl("crimsontext-700-");
   const TOKENS = shellCopy("tokens"), TOKENS_DARK = shellCopy("tokens-dark");
   const DARK_TOKENS = `${TOKENS_DARK.replace(/^/gm, "  ")}
   --sh-surface: oklch(0.252 0.011 66); --sh-surface-2: oklch(0.292 0.012 66);
@@ -540,6 +541,11 @@ ${ss3 ? `@font-face {
 @font-face {
   font-family: "Crimson Text"; font-style: italic; font-weight: 700; font-display: swap;
   src: url("${crimsonIt}") format("woff2");
+}
+` : ""}${crimson700 ? `/* the article head's headline (.sh-hed): the main page's .rd-hed weight */
+@font-face {
+  font-family: "Crimson Text"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("${crimson700}") format("woff2");
 }
 ` : ""}:root {
   /* the main page's party tokens, lifted verbatim from its template
@@ -969,6 +975,41 @@ nav.tabs[aria-label="Poll archives"] {
   box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
   margin: 0 calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-right, 0px)) 22px
           calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-left, 0px));
+}
+
+/* the article head of a prose satellite (/lef-success/, /feedback/, the
+   404): the main build's section anatomy, rd.css's .rd-eyebrow / .rd-title /
+   .rd-meta, then the finding as .rd-hed and its .rd-dek, values verbatim, so
+   these pages open the way the ☰ menu's pages do. .sh-page is the shell's
+   own frame, its text edge on the masthead's. (The archives keep
+   .frame-wrap's 692px column and its regular-weight heads.) */
+.sh-page {
+  flex: 1; box-sizing: border-box; width: 100%;
+  max-width: calc(var(--sh-maxw) + 2 * var(--sh-gutter)); margin: 0 auto;
+  padding: 28px calc(var(--sh-gutter) + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(var(--sh-gutter) + env(safe-area-inset-left, 0px));
+}
+.sh-arow {
+  display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
+  border-top: 2px solid var(--ink); padding-top: 12px;
+  font-size: 13px; color: var(--ink-3);
+}
+.sh-atitle {
+  margin: 0; font-family: var(--sans);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+}
+.sh-ameta { font-size: 13px; color: var(--ink-3); }
+.sh-hed {
+  margin: 16px 0 0; max-width: 1000px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 46px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: pretty;
+}
+.sh-dek { margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+@media (max-width: 640px) {
+  .sh-arow { flex-direction: column; align-items: flex-start; padding-top: 10px; font-size: 12px; }
+  .sh-atitle { font-size: 19px; }
+  .sh-ameta { font-size: 12px; }
+  .sh-hed { margin-top: 14px; font-size: 30px; line-height: 1.1; }
+  .sh-dek { margin-top: 8px; font-size: 15px; line-height: 1.4; }
 }
 
 /* the colophon (.method .colophon): identity left, ways in right */

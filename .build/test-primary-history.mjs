@@ -23,7 +23,27 @@
       cell is >= foldPt,
    and `oth` recombines as the residual of exactly the shown lines per year
    in every view (national, senate, all 16 state cuts);
-   3. the built data asset hands the chart the same document.
+   3. the built data asset hands the chart the same document;
+   4. the AEC division-classification cuts (fed.classes, 2026-10-23 – the
+      House's share regrouped by the AEC's own per-election division
+      classes; the Senate holds none) sit on the pinned span, copy and
+      per-cell figures recomputed from the committed sources, and ride the
+      same fold/recombination contract; beside them the five IRSAD fifths
+      (q1..q5, 2026-10-24 – each seat filed to a fifth of the chamber by
+      its IRSAD rank at THAT election, the ABS's socio-economic index of
+      advantage and disadvantage with the most-disadvantaged seat ranked
+      first, thirty seats a fifth and the 151-seat chambers' spare to the
+      most-advantaged) run the index series' own 2001–2025 span, ride
+      their own foldPt 2 and seifa flag, their membership probed here from
+      data/division-seifa-indexes.json (thirty a fifth, rankDis a
+      permutation, named anchors) and their cells pinned, ladder-checked
+      and fold-checked like the classes';
+   5. gen-data's build-time stateElections derivation (2026-10-23, user:
+      "what about primary votes for state elections, lower and upper
+      houses"): the six assemblies' figures recompute independently from
+      data/state-flows.csv (lnp = lib + nat, the fold applying to grn/onp
+      alone), the NSW Legislative Council's from the committed NSWEC count
+      bank, all on the same fold/recombination contract as the file's.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -40,6 +60,10 @@ const AEC_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
 const HIST_SEN_YEARS = HIST_YEARS.filter((y) => y !== 1972);
 const STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
+/* the explainer menu shows the flow-history short forms ("Federal, NT") -
+   never the full name spelt out (2026-10-24, user: "the view dropdown menu
+   is inconsistent (eg northen territory vs NT)") */
+const STATE_SHORT = { nsw: "NSW", vic: "Vic", qld: "Qld", wa: "WA", sa: "SA", tas: "Tas", act: "ACT", nt: "NT" };
 /* fixed code vocab (enumerated from the committed caches 2026-10-23;
    complementary to the generator's name sets – a drift in either trips) */
 const CODES = {
@@ -124,7 +148,152 @@ assert.deepEqual(SEN.years, [...HIST_SEN_YEARS, ...AEC_YEARS], "senate years: hi
 STATES.forEach((s) => {
   assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s} house: per-state span starts 2004`);
   assert.deepEqual(SEN.states[s].years, AEC_YEARS, `${s} senate: per-state span starts 2004`);
+  assert.equal(FED.states[s].short, STATE_SHORT[s], `${s} house: the menu short label`);
+  assert.equal(SEN.states[s].short, STATE_SHORT[s], `${s} senate: the menu short label`);
 });
+
+// ---- the AEC division-classification cuts (House only) ---------------------
+/* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
+   vote view - eg 'Federal, provincial'"): fed.classes regroups each House
+   election's divisions by the AEC's own classification of that election
+   (data/division-classifications.json; 1996/98/01 divisions counted off the
+   legacy hcands files, 2004 on off the dop caches). Divisions never exist
+   for the Senate, so fed.sen carries no classes. Menu order, copy and
+   per-cell pins below (the figures recompute from the committed sources –
+   the generator also asserts the classes' summed ballots recompose the
+   national ALP and Coalition shares within 0.05 every year). */
+const CLASSES = ["inner", "outer", "provincial", "rural"];
+const CLASS_YEARS = [1996, 1998, 2001, ...AEC_YEARS];
+/* 2026-10-24 (user: show the ABS SEIFA data beside the AEC's division
+   classes in the explainer menu views; decisions: fifths of thirty seats,
+   IRSAD only, flows + 2PP + primary): q1..q5 regroup the same House
+   figures by where each seat's IRSAD rank put it at THAT election – a
+   seat whose standing moved between elections moved fifths with it.
+   QUINT_COPY mirrors seifa_quintiles.py's QUINT_META (label, short, desc);
+   SEIFA_YEARS is the index series' own span (the store's 2028 block
+   scores the coming boundaries – never a counted history – and no IRSAD
+   block exists before 2001) */
+const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
+const SEIFA_YEARS = [2001, ...AEC_YEARS];
+const QUINT_COPY = {
+  q1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
+  q2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  q3: ["Middle fifth", "Middle fifth", "middle fifth"],
+  q4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
+  q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
+};
+assert.ok(FED.classes && !SEN.classes, "fed.classes exists; the Senate holds no classes");
+assert.deepEqual(Object.keys(FED.classes), [...CLASSES, ...QUINTS],
+  "the four class cuts, then the five IRSAD fifths, in menu order");
+CLASSES.forEach((ck) => assert.equal(FED.classes[ck].seifa, undefined, `${ck}: a class cut carries no seifa flag`));
+// the two per-cell readers shared by every pin section below
+const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
+const cell = (view, key, year) => view[key][view.years.indexOf(year)];
+const CLASS_COPY = {
+  inner: ["Inner metropolitan", "inner metro"],
+  outer: ["Outer metropolitan", "outer metro"],
+  provincial: ["Provincial", "provincial"],
+  rural: ["Rural", "rural"],
+};
+CLASSES.forEach((ck) => {
+  const v = FED.classes[ck];
+  assert.deepEqual(v.years, CLASS_YEARS, `${ck}: the eleven-classifications span`);
+  assert.equal(v.label, CLASS_COPY[ck][0], `${ck} label`);
+  assert.equal(v.short, CLASS_COPY[ck][1], `${ck} short`);
+  assert.equal(v.elections, `federal elections in ${CLASS_COPY[ck][1]} seats`, `${ck} elections copy`);
+});
+// the figure pins (each recomputed from the sources during the 2026-10-23
+// build: the state of play every class view tells its own way)
+assert.equal(cell(FED.classes.provincial, "alp", 2025), 35.19);
+assert.equal(cell(FED.classes.provincial, "lnp", 2025), 32.59);
+assert.equal(cell(FED.classes.rural, "lnp", 1996), 55.57);
+assert.equal(cell(FED.classes.rural, "alp", 1996), 32.19);
+assert.equal(cell(FED.classes.inner, "grn", 2025), 16.5);
+assert.equal(cell(FED.classes.inner, "ind", 2025), 9.14);
+assert.equal(cell(FED.classes.inner, "onp", 1998), 4.83);
+assert.equal(cell(FED.classes.inner, "dem", 1996), 6.59);
+assert.equal(cell(FED.classes.rural, "onp", 1998), 12.56);
+// One Nation's 1998 share rises down the urbanisation ladder
+assert.ok(FED.classes.inner.onp[1] < FED.classes.outer.onp[1]
+  && FED.classes.outer.onp[1] < FED.classes.provincial.onp[1]
+  && FED.classes.provincial.onp[1] < FED.classes.rural.onp[1],
+  "1998 ONP: inner < outer < provincial < rural");
+
+// ---- the IRSAD fifths (q1..q5) ------------------------------------------
+/* shape and copy first, then the membership probe (this file's own
+   reading of the seifa store, never the writers') and the per-cell pins */
+QUINTS.forEach((q) => {
+  const v = FED.classes[q];
+  assert.deepEqual(v.years, SEIFA_YEARS, `${q}: the index series' own span`);
+  assert.equal(v.seifa, true, `${q}: the seifa flag the renderers gate on`);
+  assert.equal(v.foldPt, 2, `${q}: a fifth carries its own 2% fold (thirtieths, not sixteenths)`);
+  assert.equal(v.label, QUINT_COPY[q][0], `${q} label`);
+  assert.equal(v.short, QUINT_COPY[q][1], `${q} short (the menu face names the index)`);
+  assert.equal(v.elections, `federal elections in the ${QUINT_COPY[q][2]} of seats by IRSAD rank`,
+    `${q} elections copy`);
+});
+/* the seifa store's rankDis ranks each division 1..N most-disadvantaged-
+   first across THAT election's chamber; ceil(rankDis/30) is the fifth, so
+   every fifth is thirty seats and the 151-seat 2019/2022 chambers' spare
+   lands in q5 (user call 2026-10-24) */
+const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+const quintOf = (rd) => `q${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+SEIFA_YEARS.forEach((y) => {
+  const blk = SEIFA[String(y)];
+  assert.ok(blk, `${y}: an IRSAD block`);
+  const names = Object.keys(blk), n = names.length;
+  assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
+  const sizes = Object.fromEntries(QUINTS.map((q) => [q, 0]));
+  const ranks = [];
+  names.forEach((nm) => {
+    const rd = blk[nm].irsad.rankDis;
+    assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
+    ranks.push(rd);
+    sizes[quintOf(rd)] += 1;
+  });
+  assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
+    `${y}: rankDis is a permutation of 1..${n}`);
+  assert.deepEqual(sizes, { q1: 30, q2: 30, q3: 30, q4: 30, q5: n - 120 },
+    `${y}: thirty seats a fifth, q5 the 151-seat balance`);
+});
+// named anchors (the store's own pins against the wrong-index /
+// wrong-direction misreads: rankDis 1 is the MOST disadvantaged seat)
+assert.equal(quintOf(SEIFA["2001"]["Bonython"].irsad.rankDis), "q1", "2001 Bonython: the most-disadvantaged fifth");
+assert.equal(quintOf(SEIFA["2001"]["North Sydney"].irsad.rankDis), "q5", "2001 North Sydney: the most-advantaged fifth");
+assert.equal(quintOf(SEIFA["2025"]["Lingiari"].irsad.rankDis), "q1", "2025 Lingiari: the most-disadvantaged fifth");
+assert.equal(quintOf(SEIFA["2025"]["Banks"].irsad.rankDis), "q4", "2025 Banks: the second-most-advantaged fifth");
+// per-cell pins (recomputed from the committed sources at build; the
+// writer's own join and recomposition asserts gate the lane every run)
+assert.equal(cell(FED.classes.q1, "alp", 2025), 29.47);
+assert.equal(cell(FED.classes.q4, "alp", 2025), 38.99);
+assert.equal(cell(FED.classes.q5, "alp", 2025), 33.88);
+assert.equal(cell(FED.classes.q1, "lnp", 2001), 41.2);
+assert.equal(cell(FED.classes.q5, "lnp", 2001), 46.85);
+assert.equal(cell(FED.classes.q1, "grn", 2001), 3.38);
+assert.equal(cell(FED.classes.q5, "grn", 2025), 15.84);
+assert.equal(cell(FED.classes.q1, "onp", 2025), 9.18);
+assert.equal(cell(FED.classes.q5, "ind", 2025), 11.63);
+assert.equal(cell(FED.classes.q5, "dem", 2001), 6.81);
+// 2025 told across the fifths: Labor climbs with advantage to the second-
+// most-advantaged fifth then dips in the most-advantaged (the teal
+// seats'); the Greens rise down the ladder and One Nation falls with it
+assert.ok(FED.classes.q1.alp[8] < FED.classes.q2.alp[8] && FED.classes.q2.alp[8] < FED.classes.q4.alp[8]
+  && FED.classes.q4.alp[8] > FED.classes.q5.alp[8] && FED.classes.q5.alp[8] > FED.classes.q1.alp[8],
+  "2025 ALP: rises with advantage to q4, dips in the most-advantaged fifth");
+assert.ok(FED.classes.q1.grn[8] < FED.classes.q2.grn[8] && FED.classes.q2.grn[8] < FED.classes.q3.grn[8]
+  && FED.classes.q3.grn[8] < FED.classes.q4.grn[8] && FED.classes.q4.grn[8] < FED.classes.q5.grn[8],
+  "2025 GRN: rises with advantage, most-disadvantaged to most-advantaged");
+assert.ok(FED.classes.q1.onp[8] > FED.classes.q2.onp[8] && FED.classes.q2.onp[8] > FED.classes.q3.onp[8]
+  && FED.classes.q3.onp[8] > FED.classes.q4.onp[8] && FED.classes.q4.onp[8] > FED.classes.q5.onp[8],
+  "2025 ONP: falls with advantage");
+/* the tenth-fold at work: q5's One Nation 2022 (2.10) and 2025 (2.69),
+   q4's One Nation 2001 (2.98) and q2's Democrats 2001 (3.87) all display
+   at 2% where the rest of the page's 4% default would null them */
+assert.equal(FED.classes.q5.onp[7], 2.1, "q5 ONP 2022: under 4%, shown at the fifths' fold");
+assert.equal(FED.classes.q5.onp[8], 2.69, "q5 ONP 2025: under 4%, shown");
+assert.equal(FED.classes.q4.onp[0], 2.98, "q4 ONP 2001: under 4%, shown");
+assert.equal(FED.classes.q2.dem[0], 3.87, "q2 dem 2001: under 4%, shown");
+
 
 // ---- canonical national ALP / Coalition pins --------------------------------
 /* published AEC national House figures (the generator's CANON set; 2010
@@ -177,8 +346,6 @@ HIST_YEARS.forEach((y) => {
 });
 
 // ---- the fold's null map, pinned per named minor ---------------------------
-const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
-const cell = (view, key, year) => view[key][view.years.indexOf(year)];
 // House: One Nation's two runs (1998–2001, then 2022 on); UAP family only
 // 2013 and 2022; IND only 2022 on (its typed-era shares all sit sub-fold)
 assert.deepEqual(nulls(FED.onp, FED.years),
@@ -210,12 +377,15 @@ assert.deepEqual(SEN.states.qld.onp, [null, 4.37, null, null, 9.19, 10.27, 7.4, 
 // the Democrats cross the fold exactly once in the whole cache span
 // (4.73% NT senate 2004) and DLP never does
 assert.deepEqual(SEN.states.nt.dem, [4.73, null, null, null, null, null, null, null], "NT senate dem: 2004 alone");
-// over the whole document the Democrats live in exactly three views (the
-// typed era's two national views + NT senate 2004) and the DLP in one
-const allViews = [FED, SEN, ...STATES.map((s) => FED.states[s]), ...STATES.map((s) => SEN.states[s])];
+// over the whole document the Democrats live in twelve views (the typed
+// era's two national views + NT senate 2004 + the nine class-and-fifth
+// cuts' 2001-era cells) and the DLP in one
+const allViews = [FED, SEN, ...STATES.map((s) => FED.states[s]), ...STATES.map((s) => SEN.states[s]),
+  ...Object.values(FED.classes)];
 allViews.forEach((v) => {
-  if (v.dem != null) assert.ok(v === FED || v === SEN || v === SEN.states.nt,
-    `${v.label}: dem lines are the typed-era national views + NT senate 2004`);
+  if (v.dem != null) assert.ok(v === FED || v === SEN || v === SEN.states.nt
+    || Object.values(FED.classes).includes(v),
+    `${v.label}: dem lines are the typed-era national views + NT senate 2004 + the class and fifth cuts' typed-era cells`);
   if (v.dlp != null) assert.equal(v, FED, `${v.label}: dlp is the national house's 1972 row alone`);
 });
 
@@ -254,6 +424,11 @@ AEC_YEARS.forEach((y) => {
 // ---- every view: fold contract + recombination ------------------------------
 allViews.forEach((v) => {
   const n = v.years.length;
+  // a record may carry its own fold (the IRSAD fifths ride foldPt 2 – a
+  // thirtieth of the chamber would null buckets at the page's 4% default)
+  const foldHere = typeof v.foldPt === "number" ? v.foldPt : doc.foldPt;
+  if (v.foldPt != null) assert.ok(v.seifa === true && v.foldPt < doc.foldPt,
+    `${v.label}: a bespoke fold belongs only to an IRSAD fifth, below the page fold`);
   assert.ok(v.label && v.elections, `${v.label}: label + elections copy`);
   ["alp", "lnp", "oth"].forEach((k) => {
     assert.ok(Array.isArray(v[k]) && v[k].length === n, `${v.label} ${k}: aligned`);
@@ -265,7 +440,7 @@ allViews.forEach((v) => {
     assert.equal(v[k].length, n, `${v.label} ${k}: aligned`);
     v[k].forEach((x, i) => {
       if (x == null) return; // folded: a gap, never a zero
-      assert.ok(x >= 4 - 0.005 && x <= 100, `${v.label} ${k} ${v.years[i]}: at or above the fold (${x})`);
+      assert.ok(x >= foldHere - 0.005 && x <= 100, `${v.label} ${k} ${v.years[i]}: at or above the view's fold (${x})`);
       assert.ok(x !== 0, `${v.label} ${k} ${v.years[i]}: a folded share is null, never 0`);
     });
   });
@@ -284,6 +459,8 @@ allViews.forEach((v) => {
 // ---- gen-data wiring + the template tokens ----------------------------------
 const gen = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "gen-data.mjs"), "utf8");
 assert.ok(/const primaryHistory = \$\{/.test(gen), "gen-data emits primaryHistory into the data asset");
+assert.ok(/if \(primaryHistory && !JUR\)/.test(gen) && /primaryHistory\.stateElections = ste/.test(gen),
+  "stateElections is gen-data's build-time derivation, federal-only like the flow history's (the Vic build's JUR path skips it)");
 assert.ok(/validatePrimaryHistory\(\)/.test(fs.readFileSync(
   path.join(ROOT, ".build", "newtracker", "validate.mjs"), "utf8")), "validate.mjs checks primaryHistory");
 const tmpl = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "template.html"), "utf8");
@@ -303,10 +480,157 @@ vm.runInNewContext(fs.readFileSync(path.join(assetDir, bundle), "utf8"), sandbox
 const PH = sandbox.window.AUSPOL.primaryHistory;
 assert.ok(PH, "window.AUSPOL.primaryHistory reaches the chart");
 assert.equal(PH.foldPt, doc.foldPt, "fold threshold intact");
+const { stateElections: PH_STE_RAW, ...assetRest } = PH;
 const wanted = { ...doc };
 delete wanted._comment;
 // the vm realm's Array/Object prototypes differ – re-serialise before comparing
-assert.deepEqual(JSON.parse(JSON.stringify(PH)), wanted, "the asset carries the data file verbatim");
+assert.deepEqual(JSON.parse(JSON.stringify(assetRest)), wanted,
+  "the asset carries the data file verbatim (the state elections ride beside it)");
+const PH_STE = PH_STE_RAW && JSON.parse(JSON.stringify(PH_STE_RAW));
+
+// ---- stateElections: the six assemblies + the banked Legislative Councils ----
+/* 2026-10-23 (user: "what about primary votes for state elections, lower and
+   upper houses"): gen-data derives these banks at BUILD time; the data file
+   knows nothing of them. The assemblies' cells recompute independently from
+   the state-flow CSV here (the parser's committed prim_share figures; lnp =
+   lib + nat – Queensland's pre-merger years carry both rows, the merged
+   years zero nat), the fold is the file's own 4% applied to grn/onp alone,
+   and the Council's family shares recompute from the NSWEC's committed
+   ballot-level count bank (above-the-line papers, as the flows side's). */
+assert.ok(PH_STE && typeof PH_STE === "object", "the asset carries the state-election primary banks");
+assert.deepEqual(Object.keys(PH_STE), ["vic", "wa", "sa", "qld", "nt", "nsw"],
+  "the six assemblies, in the flow bank's menu order");
+const STE_YEARS = {
+  nsw: [2015, 2019, 2023],
+  vic: [2006, 2010, 2014, 2018, 2022],
+  wa: [2001, 2005, 2008, 2013, 2017, 2021, 2025],
+  sa: [2022, 2026],
+  qld: [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2024],
+  nt: [2016, 2020, 2024],
+};
+const stCsv = {};
+fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8")
+  .split(/\r?\n/).slice(1).forEach((ln) => {
+    if (!ln.trim()) return;
+    const c = ln.split(",");
+    ((stCsv[c[0]] ||= {})[+c[1]] ||= {})[c[2]] = +c[4];
+  });
+const r2p = (v) => Math.round(v * 100) / 100;
+Object.keys(STE_YEARS).forEach((jk) => {
+  const v = PH_STE[jk];
+  assert.deepEqual(v.years, STE_YEARS[jk], `${jk}: the covered election years`);
+  assert.ok(v.label && v.short && v.elections && v.srcLine, `${jk}: label/short/elections/srcLine copy`);
+  STE_YEARS[jk].forEach((y, i) => {
+    const row = stCsv[jk][y];
+    const g = row.grn || 0, o = row.onp || 0;
+    assert.equal(v.alp[i], r2p(row.alp || 0), `${jk} ${y} alp`);
+    assert.equal(v.lnp[i], r2p((row.lib || 0) + (row.nat || 0)), `${jk} ${y} lnp = lib + nat`);
+    assert.equal(v.grn[i], g >= 4 ? r2p(g) : null, `${jk} ${y} grn ${g >= 4 ? "shown" : "folds"}`);
+    assert.equal(v.onp[i], o >= 4 ? r2p(o) : null, `${jk} ${y} onp ${o >= 4 ? "shown" : "folds"}`);
+    assert.equal(v.oth[i], r2p((row.oth || 0) + (g >= 4 ? 0 : g) + (o >= 4 ? 0 : o)), `${jk} ${y} oth = others + folds`);
+    ["alp", "lnp", "oth"].forEach((k) => assert.ok(typeof v[k][i] === "number", `${jk} ${y} ${k}: always drawn`));
+    const shown = v.alp[i] + v.lnp[i] + (v.grn[i] ?? 0) + (v.onp[i] ?? 0) + v.oth[i];
+    assert.ok(Math.abs(shown - 100) <= 0.06, `${jk} ${y}: lines + oth recombine (${shown.toFixed(2)})`);
+  });
+  // only the views' own keys – the national minor families never leak in
+  const surplus = Object.keys(v).filter((k) =>
+    !["label", "short", "elections", "srcLine", "years", "alp", "lnp", "grn", "onp", "oth", "sen"].includes(k));
+  assert.deepEqual(surplus, [], `${jk}: no keys beside the bank's own`);
+});
+/* canonical typed pins (a source shift still has to out-argue these – the
+   recompute above and gen-data read the same files) */
+const cellSt = (jk, key, year) => PH_STE[jk][key][PH_STE[jk].years.indexOf(year)];
+assert.equal(cellSt("qld", "lnp", 2004), 35.3, "qld 2004 lnp: the pre-merger Liberal + Nationals sum");
+assert.equal(cellSt("qld", "lnp", 2009), 41.6, "qld 2009 lnp: the merged LNP rides lib alone");
+assert.equal(cellSt("nt", "lnp", 2024), 48.89, "nt 2024 lnp: the CLP whole");
+assert.equal(cellSt("wa", "onp", 2021), null, "wa 2021 onp folds (1.26%)");
+assert.equal(cellSt("wa", "onp", 2025), 4, "wa 2025 onp stands (4.0036%)");
+assert.equal(cellSt("wa", "oth", 2021), 7.86, "wa 2021 oth absorbs the fold");
+assert.equal(cellSt("nt", "grn", 2016), null, "nt 2016 grn folds (2.87%)");
+assert.equal(cellSt("nt", "oth", 2016), 26, "nt 2016 oth absorbs the fold");
+assert.equal(cellSt("nsw", "lnp", 2015), 45.63, "nsw 2015 lnp: Liberal + Nationals");
+assert.equal(cellSt("sa", "onp", 2026), 22.88, "sa 2026 onp: the big debut");
+assert.equal(cellSt("vic", "alp", 2006), 43.06, "vic 2006 alp: Bracks's last");
+
+// the NSW Legislative Council: banked beside the Assembly's exactly as the
+// flow side banks FH.nsw.sen; the same committed NSWEC counts, ATL papers
+const LC = PH_STE.nsw.sen;
+assert.ok(LC, "the NSW Legislative Council view banks beside the Assembly's");
+assert.deepEqual({ label: LC.label, short: LC.short, elections: LC.elections, lc: LC.lc },
+  { label: "NSW Legislative Council", short: "NSW LC", elections: "NSW Legislative Council elections", lc: true },
+  "the Council view's copy and marker");
+assert.ok(!PH_STE.nsw.senOn, "no One Nation pair cut on the primary side");
+assert.deepEqual(LC.years, [2011, 2015, 2019, 2023], "the Council's four ballot-record elections");
+const lcCounts = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "nswec-lc-flow-src", "counts.json"), "utf8"));
+const fam = (y, k) => ((lcCounts.events[y].atlByFamily || {})[k] || 0) / lcCounts.events[y].atl * 100;
+LC.years.forEach((y, i) => {
+  assert.equal(LC.alp[i], r2p(fam(y, "ALP")), `LC ${y} ALP share of the ATL papers`);
+  assert.equal(LC.lnp[i], r2p(fam(y, "COAL")), `LC ${y} Coalition share of the ATL papers`);
+  assert.equal(LC.grn[i], r2p(fam(y, "GRN")), `LC ${y} Greens share (never sub-fold)`);
+  const p = fam(y, "PHON");
+  assert.equal(LC.onp[i], p >= 4 ? r2p(p) : null, `LC ${y} One Nation ${p >= 4 ? "shown" : "no Council group"}`);
+  const shown = LC.alp[i] + LC.lnp[i] + LC.grn[i] + (LC.onp[i] ?? 0) + LC.oth[i];
+  assert.ok(Math.abs(shown - 100) <= 0.06, `LC ${y}: ATL families + oth recombine (${shown.toFixed(2)})`);
+});
+assert.deepEqual(LC.onp, [null, null, r2p(fam(2019, "PHON")), r2p(fam(2023, "PHON"))],
+  "One Nation ran no Council group in 2011 or 2015: nulls, never zeros");
+// its typed pins (the count bank is committed, but these stand against it)
+assert.equal(cellSt("nsw", "alp", 2019), 33.31, "assembly nsw 2019 alp (the Council's twin guards the file)");
+assert.equal(LC.lnp[0], 48.28, "LC 2011 Coalition: the O'Farrell landslide's ATL papers");
+assert.equal(LC.oth[2], 18.48, "LC 2019 Others share of ATL");
+
+// the Vic, SA and WA Legislative Councils (2026-10-24, user: "why only nsw
+// state upper house?" → "yes"): full-formal banks, parsed per commission
+// into .build/state-lc-primaries/<jur>.json – byFamily shares of EVERY
+// formal first preference, no ATL qualifier. The shares recompute here
+// from the committed banks exactly as the assemblies recompute from the
+// flow CSV; the fold is the same 4%, grn/onp alone.
+const LC_FULL = {
+  vic: { short: "Vic LC", label: "Victorian Legislative Council", srcLine: "the Victorian Electoral Commission’s official results" },
+  sa: { short: "SA LC", label: "South Australian Legislative Council", srcLine: "the Electoral Commission SA’s official results" },
+  wa: { short: "WA LC", label: "Western Australian Legislative Council", srcLine: "the Western Australian Electoral Commission’s official results" },
+};
+for (const [jk, meta] of Object.entries(LC_FULL)) {
+  const S = PH_STE[jk].sen;
+  assert.ok(S, `${jk}: the Legislative Council view banks beside the Assembly's`);
+  assert.equal(S.short, meta.short, `${jk} LC: short name`);
+  assert.equal(S.label, meta.label, `${jk} LC: label`);
+  assert.equal(S.elections, meta.label + " elections", `${jk} LC: elections wording`);
+  assert.equal(S.srcLine, meta.srcLine, `${jk} LC: the commission's credit`);
+  assert.equal(S.lc, true, `${jk} LC: the lc marker`);
+  assert.ok(!PH_STE[jk].senOn, `${jk}: no One Nation pair cut on the primary side`);
+  const bank = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "state-lc-primaries", jk + ".json"), "utf8"));
+  const years = Object.keys(bank.events).map(Number).sort((a, b) => a - b);
+  assert.deepEqual(S.years, years, `${jk} LC: the banked election years`);
+  const sfam = (y, k) => ((bank.events[y].byFamily || {})[k] || 0) / bank.events[y].formal * 100;
+  S.years.forEach((y, i) => {
+    assert.equal(S.alp[i], r2p(sfam(y, "ALP")), `${jk} LC ${y} ALP share of the formal vote`);
+    assert.equal(S.lnp[i], r2p(sfam(y, "COAL")), `${jk} LC ${y} Coalition share of the formal vote`);
+    const g = sfam(y, "GRN"), p = sfam(y, "ONP");
+    assert.equal(S.grn[i], g >= 4 ? r2p(g) : null, `${jk} LC ${y} Greens ${g >= 4 ? "shown" : "fold"}`);
+    assert.equal(S.onp[i], p >= 4 ? r2p(p) : null, `${jk} LC ${y} One Nation ${p >= 4 ? "shown" : "folds or no ballot line"}`);
+    const shown = S.alp[i] + S.lnp[i] + (S.grn[i] ?? 0) + (S.onp[i] ?? 0) + S.oth[i];
+    assert.ok(Math.abs(shown - 100) <= 0.06, `${jk} LC ${y}: families + oth recombine (${shown.toFixed(2)})`);
+    for (const k of ["alp", "lnp", "grn", "onp", "oth"]) {
+      const v = S[k][i];
+      assert.ok(v === null || Math.abs(v) >= 0.01 || v === 0, `${jk} LC ${y} ${k}: no phantom near-zero`);
+    }
+  });
+}
+// their typed pins (the banks are committed; these stand against a silent
+// re-parse or a family-map slip)
+const cellLc = (jk, key, year) => PH_STE[jk].sen[key][PH_STE[jk].sen.years.indexOf(year)];
+assert.equal(cellLc("vic", "alp", 2006), 41.45, "vic LC 2006 alp: Bracks's last");
+assert.equal(cellLc("vic", "oth", 2018), 22.09, "vic LC 2018 oth: the minor-party ballot");
+assert.equal(cellLc("vic", "onp", 2022), null, "vic LC 2022 onp folds (2.04%)");
+assert.equal(cellLc("sa", "onp", 2022), 4.23, "sa LC 2022 onp stands (just over the fold)");
+assert.equal(cellLc("sa", "onp", 2026), 24.43, "sa LC 2026 onp: the surge");
+assert.equal(cellLc("sa", "lnp", 2026), 18.17, "sa LC 2026 lnp: the collapse");
+assert.equal(cellLc("wa", "onp", 2001), 10.68, "wa LC 2001 onp: One Nation's debut");
+assert.equal(cellLc("wa", "onp", 2005), null, "wa LC 2005 onp: One Nation (WA)'s split books OTHER, never PHON's line");
+assert.equal(cellLc("wa", "onp", 2025), null, "wa LC 2025 onp folds (3.82%)");
+assert.equal(cellLc("wa", "alp", 2021), 60.34, "wa LC 2021 alp: the McGowan landslide");
+assert.equal(cellLc("wa", "lnp", 2013), 52.51, "wa LC 2013 lnp: Liberal + Nationals");
 
 // ---- the View flip's renderer wiring shipped in the built page ------------
 /* build.mjs inlines every layer into index.html (transpiled); the uuid-named

@@ -42,6 +42,8 @@ ballots, restricted to {ALP, PHON} instead of {ALP, COAL}: per family,
 ALP_first / ALP_only / PHON_first / PHON_only / neither, a ballot naming
 only one of the pair counting its way. 2011's PHON cells all stay zero
 (no One Nation group ran) — the display series nulls the year downstream.
+The third tally (pc), restricted to {COAL, PHON}, is likewise taken; 2011's
+pc cells all stay zero for the same reason (no PHON ballots to pair with).
 
 Merges events["2011"] into counts.json (the 2015-23 events stand as they
 are). Run: python3 analyse_nsw_lc_2011.py <dir-holding-the-zip>  (stdlib only)
@@ -89,6 +91,7 @@ OFFICIAL_GROUP_ATL = {g: OFFICIAL_SATL[g] + OFFICIAL_RATL[g] for g in GROUP_LABE
 
 FAMILIES = ["ALP", "COAL", "GRN", "PHON", "OTHER"]
 PA = ["ALP_first", "ALP_only", "PHON_first", "PHON_only", "neither"]
+PC = ["COAL_first", "COAL_only", "PHON_first", "PHON_only", "neither"]
 
 
 def family(label):
@@ -129,6 +132,7 @@ def main():
 
     counts = {fam: collections.Counter() for fam in FAMILIES}
     pa = {fam: collections.Counter() for fam in FAMILIES}
+    pc = {fam: collections.Counter() for fam in FAMILIES}
     fam_oneonly = collections.Counter()
     fam_atl = collections.Counter()
     group_first = collections.Counter()
@@ -162,6 +166,15 @@ def main():
             srcpa["PHON_only"] += 1
         else:
             srcpa["neither"] += 1
+        srcpc = pc[src]
+        if rco is not None and rph is not None:
+            srcpc["COAL_first" if rco < rph else "PHON_first"] += 1
+        elif rco is not None:
+            srcpc["COAL_only"] += 1
+        elif rph is not None:
+            srcpc["PHON_only"] += 1
+        else:
+            srcpc["neither"] += 1
         if ralp is not None and (rco is None or ralp < rco):
             counts[src]["toALP"] += 1
         elif rco is not None:
@@ -236,8 +249,14 @@ def main():
     def full_pa(counter):
         return {k: counter.get(k, 0) for k in PA}
 
+    def full_pc(counter):
+        return {k: counter.get(k, 0) for k in PC}
+
     atl_total = sum(fam_atl.values())
     one_total = sum(fam_oneonly.values())
+    for fam in FAMILIES:
+        assert sum(pc[fam].values()) == fam_atl.get(fam, 0), \
+            f"2011: pc cells for {fam} sum {sum(pc[fam].values())} != ATL {fam_atl.get(fam, 0)}"
     print(f"2011: formal {formal:,} (= official); ATL {atl_total:,} "
           f"({rollup['SATL_ballots']:,} single-'1', {rollup['RATL_ballots']:,} multi); "
           f"BTL {rollup['BTL_ballots']:,}")
@@ -249,6 +268,7 @@ def main():
         "atlOneOnly": one_total,
         "counts": {fam: full(counts[fam]) for fam in FAMILIES},
         "pa": {fam: full_pa(pa[fam]) for fam in FAMILIES},
+        "pc": {fam: full_pc(pc[fam]) for fam in FAMILIES},
         "oneOnly": {fam: fam_oneonly.get(fam, 0) for fam in FAMILIES},
         "atlByFamily": {fam: fam_atl.get(fam, 0) for fam in FAMILIES},
         "groupFirst": {g: group_first.get(g, 0) for g in sorted(GROUP_LABELS)},

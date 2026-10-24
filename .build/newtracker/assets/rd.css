@@ -255,6 +255,12 @@ body.rd .refline { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 
 body.rd .rd-base { stroke: var(--ink-faint); stroke-width: 1; }
 body.rd .axis-label { font-weight: 400; }
 body.rd .axis-label.y, body.rd .axis-label.x { font-weight: 400; font-variant-numeric: tabular-nums; }
+/* an emphatic y tick (TrendChart's yTickEmph, the two-party chart's halfway
+   mark 50; user 2026-10-24): must sit in THIS sheet - the body.rd-prefixed
+   clamps above tie-and-late an un-prefixed .tick-emph rule into a no-op.
+   The rule also thickens a third (user same day: "emphasised 30% more") */
+body.rd .grid.tick-emph { stroke: var(--line); stroke-width: 1.3; }
+body.rd .axis-label.tick-emph { font-weight: 700; }
 body.rd .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 1 3; opacity: 0.8; }
 body.rd .evt-conn { opacity: 0.8; }
 body.rd .evt-label { font-weight: 500; fill: var(--ink-2); }
@@ -3544,6 +3550,42 @@ body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 
 /* House and Share ride the phone's head as ONE nowrap group, so the pair
    share a wrapped line instead of splitting across two */
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
+/* the View: switch's own row above the contest tabs (user 2026-10-23 -
+   "should sit on top of 'Labor v Coalition / Labor v One Nation'";
+   left-aligned later the same day: "make 'View: Primary votes ⇄'
+   left-aligned"). 2026-10-24: one cycling button covers all three views,
+   so the row never holds siblings */
+body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
+/* three contest tabs outrun a phone's card once the third (Coalition v
+   One Nation, 2026-10-24) lands - let the group drop to a second line */
+body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }
+/* 2026-10-24 (user: "MORE COMPACT - LESS IN-BETWEEN WHITESPACE, so that
+   it fits on same row on my laptop … decrease in-between whitespace by
+   20%, to start with") - the row's horizontal whitespace at 80% of the
+   shared rungs, scoped to this card so the other rd-tabs-sm/rd-pl-ctl
+   homes hold their measure: tab sides 10->8px, container gap 4->3px,
+   House:/Share: label gaps and the flip texts' arrow gaps 6->5px */
+body.rd .ex-fl-tabs { gap: 3px; }
+body.rd .ex-fl-tabs .rd-tab { padding: 0 8px; }
+body.rd .ex-fl-tabs .rd-pl-ctl, body.rd .ex-fl-tabs .rd-pl-flip { gap: 5px; }
+/* just above the phone rung the full-length labels plus the House:/Share:
+   flips outrun the card: wrap the row so the flips drop whole onto a line
+   of their own (same recipe as .rd-tpp-chart's 641-700 band) */
+@media (min-width: 641px) and (max-width: 700px) {
+  body.rd .ex-fl-tabs { flex-wrap: wrap; }
+}
+/* a vote-share view sheds the contest tabs (user 2026-10-24: "'Labor v
+   Coalition / Labor v One Nation' menu bar should not be visible in 2pp
+   or primary view … should drift down towards that menu bar, taking the
+   position it would otherwise occupy"): the View: switch drifts down to
+   that slot, the trailing House:/Share: flips riding its right on a
+   laptop */
+body.rd .ex-fl-tabslot { margin-top: 0; min-height: 44px; align-items: center; gap: 0 16px; flex-wrap: wrap; }
+/* the drifted row lands exactly where the tabs sat (min-height matches the
+   .rd-tab 44-floor; the tabs row carried no margin): the vacated top row
+   keeps its own height under a visibility:hidden twin of the switch, so
+   nothing below moves when the figure changes */
+body.rd .ex-fl-vacate { visibility: hidden; }
 /* the exhaustion-adjustment switch, the key row's last item (user 2026-10-22,
    resized 2026-10-23): a key-sized track where a swatch would sit, the words
    inside the one button; the 44px touch target is an invisible ::before, so
