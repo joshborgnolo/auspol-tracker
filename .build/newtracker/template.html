@@ -5404,6 +5404,10 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 }
 @page { margin: 14mm 12mm; }
 
+/* shell-copy:exbody */   /* .build/site-shell.mjs ships this whole family to
+   the satellites (the /archives/* pages and /lef-success/ compose their bodies
+   from it), so unlike the other satellite-facing families ANY edit here moves
+   the site's article body everywhere at the next build + shell re-apply. */
 /* ---------- the preference-flows explainer's article (.ex-*) ----------
    One fragment (explained-article.html) renders twice on the flows-explained
    menu page – as the static summary and, after hydration, inside the live
@@ -5491,6 +5495,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
 }
+/* /shell-copy */
 
 /* ---------- Public opinion (.btv-* and its static twin .btv-ss-*) ----------
    The ☰ menu's issues page renders twice, the explainer pattern: the live

@@ -186,7 +186,7 @@ function renderPage(sections, fetchedIso) {
     day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Sydney",
   });
   const secHtml = sections.map((sec) => `
-  <section class="rm-sec" id="${sec.slug}">
+  <section class="sh-wide" id="${sec.slug}">
     <h2>${esc(sec.heading)}</h2>
     <p class="rm-sub">${esc(sec.sub)} — <a href="${sec.url}">roymorgan.com/morgan-poll/${esc(sec.slug)}</a></p>
     ${sec.tables.map((t, i) => `
@@ -204,9 +204,9 @@ function renderPage(sections, fetchedIso) {
      The Roy Morgan reference tables (two-party-preferred + primary voting
      intention, current series and long-term trends) transcribed verbatim
      into data/roymorgan/*.csv and rendered here table-for-table, mirroring
-     the way roymorgan.com stores them. Chrome is the main site's
-     static-article view (its no-JS static summary): Crimson Text headings
-     over IBM Plex Sans body, the site's shared header and footer (.build/site-shell.mjs). -->
+     the way roymorgan.com stores them. Chrome is the site's shared shell
+     (.build/site-shell.mjs): the sh-page article anatomy, the lifted
+     .ex-body article family, and the shell-emitted archives switcher. -->
 <meta name="description" content="Roy Morgan's two-party preferred and primary vote tables, including the long-term trends back to 1901, copied cell for cell from roymorgan.com.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -291,61 +291,20 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- archive tabs: the static page's article-column width ------- */
-.tabs {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  max-width: var(--maxw); margin: 40px auto 0;
-  padding: 0 28px; border-bottom: 1px solid var(--line);
-}
-.tab {
-  display: inline-block;
-  font-weight: 600; font-size: 14px;
-  color: var(--ink-3);
-  padding: 8px 12px 10px; margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  text-decoration: none;
-}
-.tab:hover { color: var(--ink); }
-.tab.active { color: var(--ink); border-bottom-color: var(--ink); }
-
-/* ------- body: the static summary's type rhythm (verbatim tables stay wide) --- */
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  max-width: var(--maxw); margin: 0 auto;
-  padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
-}
-.frame-wrap h1 {
-  font-family: var(--serif); font-size: 34px; font-weight: 600;
-  letter-spacing: -0.01em; margin: 0 0 6px;
-}
-/* .ss-sub/.ss-note copy the static page's RENDERED values, not the source
-   rules: on the live page .static-summary p outranks both, so the sub and
-   the footer note actually run at body-copy 14.5px/1.6 ink-2. */
-.ss-sub { margin: 0 0 4px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-.ss-sub a { color: inherit; }
-.credit {
-  font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-top: 16px; margin-bottom: 12px;
-}
-.credit a { color: inherit; }
-.ss-note { margin-top: 20px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-.ss-note a { color: var(--ink-2); }
-.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+/* the page: the shell's article frame and head anatomy (.sh-page, .sh-arow,
+   .sh-hed, .sh-dek) and its lifted .ex-body article family, both from
+   site-shell.css, and the archives switcher the shell emits (ARCHIVE_TABS) —
+   2026-10-24 restructure. Only the replicated tables, their captions and the
+   intro keep page-local styles; the sections escape the 66ch prose measure
+   via the shell's .sh-wide. */
 
 /* ------- replicated tables ------- */
-.rm-sec { margin-top: 28px; }
-.rm-sec h2 {
-  font-family: var(--serif); font-size: 20px; font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
-}
-.rm-sec:first-of-type h2 { border-top: 0; padding-top: 0; }
 .rm-sub { font-size: 12.5px; color: var(--ink-3); margin: 0 0 4px; }
-.rm-sub a { color: inherit; }
 .rm-cap {
   font-size: 12.5px; font-weight: 600; color: var(--ink-3);
   margin: 14px 0 2px; font-variant-numeric: tabular-nums;
 }
-.rm-cap a { font-weight: 400; color: var(--ink-2); }
+.rm-cap a { font-weight: 400; }
 .rm-scroll { overflow-x: auto; }
 table.rm {
   border-collapse: collapse; width: 100%;
@@ -371,21 +330,20 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 </style>
 </head>
 <body>
-<nav class="tabs" aria-label="Poll archives">
-  <a class="tab" href="/archives/newspoll/">Newspoll</a>
-  <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
-  <a class="tab active" aria-current="page" href="/archives/morgan/">Morgan</a>
-  <a class="tab" href="/archives/galaxy/">Galaxy</a>
-  <a class="tab" href="/archives/aeforecasts/">AE Forecasts</a>
-  <a class="tab" href="/archives/trove/">Trove</a>
-</nav>
-<main class="frame-wrap">
-  <h1>Morgan Poll archive</h1>
-  <p class="ss-sub">Roy Morgan's published voting-intention tables, copied here as they appear on its site.</p>
+<main class="sh-page">
+  <header>
+    <div class="sh-arow">
+      <h1 class="sh-atitle">Morgan Poll archive</h1>
+      <span class="sh-ameta">Roy Morgan&rsquo;s four voting-intention tables &middot; 1901 to today</span>
+    </div>
+    <p class="sh-hed">Roy Morgan&rsquo;s voting-intention tables, cell for cell.</p>
+    <p class="sh-dek">Roy Morgan publishes four tables: two-party preferred and primary vote, each as a current series and as a long-term trend back to 1901. They are copied below cell for cell, as they appear on its site, and each table links its own CSV file.</p>
+  </header>
 
-  <p class="credit">Roy Morgan publishes four voting-intention tables: two-party preferred and primary vote, each as a current series and as a long-term trend back to 1901. They are copied below cell for cell, and each table links its own CSV file. Source: <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a>, last copied ${esc(fetched)}. Roy Morgan's own markings are kept: "&lt;0.5" for a minor party under half a per cent, and "##" for elections before preferential voting, which have no two-party figure.</p>
+  <div class="ex-body">
+    <p>Source: <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a>, last copied ${esc(fetched)}. Roy Morgan&rsquo;s own markings are kept: "&lt;0.5" for a minor party under half a per cent, and "##" for elections before preferential voting, which have no two-party figure.</p>
 ${secHtml}
-
+  </div>
 </main>
 </body>
 </html>

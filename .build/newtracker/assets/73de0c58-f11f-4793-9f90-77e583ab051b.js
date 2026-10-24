@@ -1918,7 +1918,7 @@ function MethodNote({ onInfo }) {
           {!J ? (
           <p className="colo-arch">
             Federal polling archives I’ve located are stored{" "}
-            <a className="colo-link" href="/archives/newspoll/">
+            <a className="colo-link" href="/archives/">
               here<span className="plink-mark" aria-hidden="true">↗</span>
             </a>{" "}
             for safekeeping and convenience.

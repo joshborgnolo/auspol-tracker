@@ -8532,7 +8532,7 @@ function infoTerms(D) {
       <p className="info-about-p"><b>Feedback.</b> Spot a wrong number or have any other feedback?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept
-      {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
+      {" "}<a className="fb-link" href="/archives/">here</a> for safekeeping.</p>
     </>
   );
   /* /vic/ (window.JUR): the same Info tab in Victoria's words. The method

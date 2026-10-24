@@ -79,23 +79,43 @@ export const ROOT = path.resolve(HERE, "..");
    the satellites each being a page of their own in the colophon), `page`
    for the colophon's two self-references (the feedback page doesn't invite
    feedback on itself; an archive page doesn't point at the archives). The
-   four redirect stubs (archives/index.html, newspoll-archive/index.html,
+   three redirect stubs (newspoll-archive/index.html,
    preference-flows/index.html, ad-hocs/index.html) redirect before paint
    and carry nothing – preference-flows became one on 2026-10-15 when the
    explainer moved into the main build as the /flows-explained/ tab page,
-   ad-hocs on 2026-10-18 when its catalogue became /beyond-the-vote/. */
+   ad-hocs on 2026-10-18 when its catalogue became /beyond-the-vote/.
+   archives/index.html left that set on 2026-10-24: it is the archives' own
+   hub page now (archivesTab's first entry), not a redirect. */
 export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
   { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
+  { file: "archives/index.html", page: "archives" },          // hand-maintained: the archives hub (replaced the redirect stub 2026-10-24)
   { file: "archives/newspoll/index.html", page: "archives" },
   { file: "archives/acnielsen/index.html", page: "archives" },
   { file: "archives/morgan/index.html", page: "archives" },   // refresh-morgan-archive.mjs
   { file: "archives/galaxy/index.html", page: "archives" },   // refresh-galaxy-archive.mjs
   { file: "archives/aeforecasts/index.html", page: "archives" }, // refresh-aeforecasts-archive.mjs
   { file: "archives/trove/index.html", page: "archives" },    // refresh-trove-archive.mjs
+];
+
+/* The /archives/* pages' own switcher, emitted by shellHeader after the site
+   tab bar (markup order is visual order). THIS list is the switcher's only
+   home: the six-ish copies once hand-synced across the two hand pages and
+   the refresh-*-archive.mjs templates (a strip that silently froze whenever
+   an archive joined – the Morgan template shipped without the Trove tab for
+   a while) are stripped by applyShell, so an archive joins the row by
+   landing here and nowhere else. */
+export const ARCHIVE_TABS = [
+  { file: "archives/index.html",            href: "/archives/",             label: "All archives" },
+  { file: "archives/newspoll/index.html",   href: "/archives/newspoll/",    label: "Newspoll" },
+  { file: "archives/acnielsen/index.html",  href: "/archives/acnielsen/",   label: "AC Nielsen" },
+  { file: "archives/morgan/index.html",     href: "/archives/morgan/",      label: "Morgan" },
+  { file: "archives/galaxy/index.html",     href: "/archives/galaxy/",      label: "Galaxy" },
+  { file: "archives/aeforecasts/index.html", href: "/archives/aeforecasts/", label: "AE Forecasts" },
+  { file: "archives/trove/index.html",      href: "/archives/trove/",       label: "Trove" },
 ];
 export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) || {};
 
@@ -307,7 +327,15 @@ function shellMenu(menu) {
     + pages.map(item).join("")
     + `</div></div>`;
 }
-export function shellHeader({ tab, menu } = {}) {
+/* The archives' own switcher (ARCHIVE_TABS is its one home). The current
+   page's own tab carries `active` + aria-current off SHELL_PAGES' file key;
+   a caller that isn't one of the archive pages' files gets the plain strip. */
+function shellArchTabs(file) {
+  return `<nav class="tabs" aria-label="Poll archives">\n`
+    + ARCHIVE_TABS.map((t) => `  <a class="tab${t.file === file ? " active" : ""}"${t.file === file ? ' aria-current="page"' : ""} href="${t.href}">${t.label}</a>`).join("\n")
+    + `\n</nav>`;
+}
+export function shellHeader({ tab, menu, page, file } = {}) {
   const tabs = TABS.filter((t) => !t.menu).map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
     + `${t.id === tab ? ' aria-current="page"' : ""}>`
     + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
@@ -376,7 +404,7 @@ export function shellHeader({ tab, menu } = {}) {
     </div>
   </div>
   ${shellMenu(menu)}
-</nav>`;
+</nav>${page === "archives" ? `\n${shellArchTabs(file)}` : ""}`;
 }
 
 /* The main page's colophon (73de0c58…js MethodNote): its words are CHROME's,
@@ -460,6 +488,12 @@ const BACK_PILL = /\n?<a class="ss-back" href="\/">[^<]*<\/a>\n?/g;
 // each rule, and the blank line closing the block (as the generators' templates dropped it)
 const BACK_PILL_CSS = /^[ \t]*\.ss-back[^{\n]*\{[^}]*\}[ \t]*\n(?:[ \t]*\n)?/gm;
 const BACK_PILL_NOTE = /^[ \t]*\/\* -+ back to the interactive tracker \(the static page's \.ss-back pill\) \*\/[ \t]*\n/gm;
+/* The archives' switcher retired into the shell (2026-10-24): every copy
+   hand-synced into a hand page or a refresh-*-archive.mjs template goes –
+   shellHeader emits the one canonical strip (ARCHIVE_TABS) into the header
+   region below. Safe on re-apply: the emitted copy sits inside the header
+   region, which is regenerated wholesale right after anyway. */
+const ARCH_STRIP = /\n?<nav class="tabs" aria-label="Poll archives">[\s\S]*?<\/nav>\n?/g;
 const SAT_NOTE = /([ \t]*)<p class="ss-note">(?:This is (?:a satellite (?:archive |analysis )?page|the feedback page)|This page belongs to) (?:of |to )?<a href="\/">auspol tracker<\/a>, an unofficial aggregator of published federal opinion polling\.(?: The live(?:, interactive)? tracker (?:carries|has) the current [^<.]*\.)?\s*([^<]*(?:<(?!\/p>)[^<]*)*)<\/p>\n?/g;
 
 /* The four faces every satellite paints above the fold – the lockup's Source
@@ -476,6 +510,7 @@ const fontPreloads = () => ["ibmplexsans-", "crimsontext-400-", "crimsontext-600
    output changes nothing, which is what --check and build.mjs test. */
 export function applyShell(html, opts = {}) {
   let h = html.replace(BACK_PILL, "\n").replace(BACK_PILL_NOTE, "").replace(BACK_PILL_CSS, "")
+    .replace(ARCH_STRIP, "\n")
     .replace(SAT_NOTE, (all, ind, rest) => (rest.trim() ? `${ind}<p class="ss-note">${rest.trim()}</p>\n` : ""));
   const scoped = scopeDarkRules(h.replace(new RegExp("\\n?" + REGION("head").source), ""));
   h = scoped.html;
@@ -934,15 +969,16 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
   .sh-tabs-set, .sh-tabs::after, .sh-score, .sh-next { transition: none; }
 }
 
-/* the page's own column sits where the main page's Info column does: on the
+/* prediction's column sits where the main page's Info column does: on the
    frame's left edge at the Info measure (.info's 66ch, 692px), rather than
-   centred on a column of its own – and the archives' switcher with it. The
-   tab bar's margin is now the gap above it, as on the main page. margin-left
-   lands the article text on the frame's content edge (frame-left + gutter,
-   less this column's own 28px padding). max-width caps at that margin: a
-   page that pairs this rule with its own width:100% (or whose content's
-   max-content pins the flex item, auto margins killing stretch) must never
-   stick past the viewport's right edge. */
+   centred on a column of its own. The tab bar's margin is now the gap above
+   it, as on the main page. margin-left lands the article text on the frame's
+   content edge (frame-left + gutter, less this column's own 28px padding).
+   max-width caps at that margin: a page that pairs this rule with its own
+   width:100% (or whose content's max-content pins the flex item, auto
+   margins killing stretch) must never stick past the viewport's right edge.
+   (The /archives/* pages used this column too until 2026-10-24; they compose
+   with .sh-page + shell-copy:exbody now.) */
 .frame-wrap {
   --sh-fw-ml: max(0px, calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) - 28px));
   max-width: min(calc(692px + 56px), calc(100% - var(--sh-fw-ml)));
@@ -954,7 +990,7 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
    whole, that cost a phone-class CPU 350–550ms before the page settled.
    A table off screen now skips layout and paint until it nears the
    viewport, and remembers its real height once seen (auto). */
-.frame-wrap .rm-scroll { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+.sh-page .rm-scroll { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 /* the page's headings in the main page's editorial voice: a view's title is
    30px regular Crimson (.card-title under body.editorial), not 34px bold,
    and a section head keeps that weight a step down */
@@ -967,22 +1003,24 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
 .frame-wrap a:hover { color: var(--ink); }
 .frame-wrap .toc a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
 .frame-wrap .toc a:hover, .frame-wrap .toc a:focus-visible { text-decoration-color: currentColor; }
-/* the archives' switcher on the same edge; its underline is drawn across its
-   own box, so the frame's inset is margin here, not padding – the rule
-   starts where the text does. The edge is the frame's content edge: its own
-   gutter below the 1152px column's width, (100% − maxw)/2 once it floats. */
+/* the archives' switcher, emitted by shellHeader right under the site tab
+   bar on the /archives/* pages (ARCHIVE_TABS), spans the frame edge to edge
+   like the bar above it; its underline is drawn across its own box, so the
+   frame's inset is margin here, not padding. The edge is the frame's
+   content edge: its own gutter below the 1152px column's width,
+   (100% − maxw)/2 once it floats. */
 nav.tabs[aria-label="Poll archives"] {
-  box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
-  margin: 0 calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-right, 0px)) 22px
+  box-sizing: border-box; padding-left: 0; padding-right: 0;
+  margin: 0 calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-right, 0px)) 0
           calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-left, 0px));
 }
 
 /* the article head of a prose satellite (/lef-success/, /feedback/, the
-   404): the main build's section anatomy, rd.css's .rd-eyebrow / .rd-title /
-   .rd-meta, then the finding as .rd-hed and its .rd-dek, values verbatim, so
-   these pages open the way the ☰ menu's pages do. .sh-page is the shell's
-   own frame, its text edge on the masthead's. (The archives keep
-   .frame-wrap's 692px column and its regular-weight heads.) */
+   404, and since 2026-10-24 the seven /archives/* pages): the main build's
+   section anatomy, rd.css's .rd-eyebrow / .rd-title / .rd-meta, then the
+   finding as .rd-hed and its .rd-dek, values verbatim, so these pages open
+   the way the ☰ menu's pages do. .sh-page is the shell's own frame, its
+   text edge on the masthead's. */
 .sh-page {
   flex: 1; box-sizing: border-box; width: 100%;
   max-width: calc(var(--sh-maxw) + 2 * var(--sh-gutter)); margin: 0 auto;
@@ -1011,6 +1049,19 @@ nav.tabs[aria-label="Poll archives"] {
   .sh-hed { margin-top: 14px; font-size: 30px; line-height: 1.1; }
   .sh-dek { margin-top: 8px; font-size: 15px; line-height: 1.4; }
 }
+
+/* the satellite article body (the /archives/* pages, /lef-success/): the
+   main build's own explainer family (.ex-*), LIFTED from template.html by
+   shellCopy("exbody") – it has one home and changes propagate like every
+   other shell-copy block. It follows .sh-page because the two compose: the
+   head above, the 66ch prose measure and its tables/lists below. */
+${shellCopy("exbody")}
+
+/* and its one satellite-side companion: archive content that needs the
+   frame's full width, not the 66ch prose measure (the Morgan/Trove/Galaxy
+   table wrappers, the Newspoll/AE Forecasts chart holders). /lef-success/
+   keeps its own lp-wide rung at 760px. */
+.ex-body .sh-wide { width: min(var(--sh-maxw, 1152px), calc(100vw - 2 * var(--sh-gutter, 20px))); }
 
 /* the colophon (.method .colophon): identity left, ways in right */
 .sh-foot { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); font-family: var(--sans); }
