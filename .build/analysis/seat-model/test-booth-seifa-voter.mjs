@@ -36,6 +36,17 @@
       Provisional), cohort vocab, state-of-division, sorted.
    8. Provenance: _provenance.files keys name the votes input, the
       venue store (and the 2022 crosswalk only in 2022).
+   9. Demo block (the 2026-10-24 add-on: 2021-census GCP G01 aged/lang
+      folded by the same per-SA1 vote weights — Ed3 basis on every
+      lane; age shares renormalised over the 11 bands because G01
+      excludes age-not-stated, same ex-not-stated basis as langOther's
+      eng+oth denominator): counts.demo exact per year (its rows span
+      booth + cohort rows); every votes>=1 booth row and every cohort
+      carries demo; noVotesRows/zeroVotes rows carry demo:null; age
+      shares span the 11 bands and sum ~1 (persons>0); the one
+      zero-persons row (2019 O'Connor Other Mobile Team 2, a mobile
+      team whose SA1 string maps onto unpopulated SA1s) carries null
+      lang/age; the max-language exemplar per year.
 */
 
 import { readFileSync } from "node:fs";
@@ -77,6 +88,9 @@ const YEARS = {
     maxs: { irsd: 1143.9, irsad: 1178, ier: 1229.1, ieo: 1216 },
     sentinelIds: "9999901",
     zeroVotes: ["Brand|65161"],
+    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, age0_14: 0.1805, age65ov: 0.1823 } },
+    demoMaxLang: ["Lingiari", "Home Island", 0.9804],
+    demoEmpties: [],
     spots: [
       ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1052.9, 1069.2, 1060, 1072.4], cov: [1, 1, 1, 1] }],
       ["Melbourne", "Collingwood", { votes: 1668, seifa: [883, null, null, null] }],
@@ -102,6 +116,9 @@ const YEARS = {
     maxs: { irsd: 1144.4, irsad: 1193.9, ier: 1212.2, ieo: 1209.7 },
     sentinelIds: null,
     zeroVotes: [],
+    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, age0_14: 0.1825, age65ov: 0.1789 } },
+    demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.9425],
+    demoEmpties: ["O'Connor|65160"],
     spots: [
       ["Brisbane", "Brisbane City BRISBANE PPVC", { votes: 8690, sa1s: 358, seifa: [1068.3, 1099.7, 963.1, 1134.3], cov: [0.9995, 0.9995, 0.9995, 0.9995] }],
       ["Melbourne", "Ascot Vale (Melbourne)", { votes: 22, seifa: [858.3, null, null, null] }],
@@ -127,6 +144,9 @@ const YEARS = {
     maxs: { irsd: 1135.4, irsad: 1196.2, ier: 1181.6, ieo: 1207.8 },
     sentinelIds: null,
     zeroVotes: ["Tangney|65478"],
+    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, age0_14: 0.1835, age65ov: 0.1761 } },
+    demoMaxLang: ["Lingiari", "Home Island PPVC", 0.9695],
+    demoEmpties: [],
     spots: [
       ["Melbourne", "Northcote MELBOURNE PPVC", { votes: 838, sa1s: 305, seifa: [1066, 1121.2, 951.6, 1167.1], cov: [0.9988, 0.9988, 0.9988, 0.9988] }],
       ["Sydney", "Eastlakes SYDNEY PPVC", { votes: 2405, seifa: [1044.2, null, null, null] }],
@@ -152,6 +172,9 @@ const YEARS = {
     maxs: { irsd: 1135.1, irsad: 1196.1, ier: 1183.6, ieo: 1202.8 },
     sentinelIds: null,
     zeroVotes: ["Page|123920"],
+    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, age0_14: 0.1855, age65ov: 0.1728 } },
+    demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.942],
+    demoEmpties: [],
     spots: [
       ["Curtin", "Perth CURTIN PPVC", { votes: 2509, sa1s: 340, seifa: [1084.3, 1118.2, 1049.4, 1142.6], cov: [0.9936, 0.9936, 0.9936, 0.9936] }],
       ["Oxley", "Acacia Ridge South (Oxley)", { votes: 283, seifa: [1023.8, 1025.2, 1062.3, 1017.5], cov: [1, 1, 1, 1] }],
@@ -282,9 +305,65 @@ for (const [ys, w] of Object.entries(YEARS)) {
   }
   for (const dv of divs) eq(perDiv[dv], 4, tag(`cohorts == 4 in ${dv}`));
 
-  // spot cells
   const byKey = new Map();
   for (const b of d.booths) byKey.set(`${b.div}|${b.booth}`, b);
+
+  // demo block: 2021-census GCP G01 folded by the same vote weights
+  eq(d.counts.demo, w.demo, tag("counts.demo"));
+  ok(d.demoBasis && d.demoBasis.includes("2021 Census GCP G01"), tag("demoBasis"));
+  ok(d._about.includes("GCP G01"), tag("_about names GCP G01"));
+  const BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
+                 "55_64", "65_74", "75_84", "85ov"];
+  let demoRowCount = 0;
+  const demoEmpties = [];
+  for (const b of d.booths) {
+    const k = `${b.div}|${b.boothId}`;
+    if (b.note === "noVotesRows" || b.votes === 0) {
+      eq(b.demo, null, tag(`demo null on noVotes/zeroVotes ${k}`));
+      continue;
+    }
+    const dm = b.demo;
+    ok(dm, tag(`demo present ${k}`));
+    if (!dm) continue;
+    demoRowCount++;
+    ok(dm.persons >= 0, tag(`demo persons >= 0 ${k}`));
+    ok(dm.cov >= 0 && dm.cov <= 1, tag(`demo cov range ${k}`));
+    if (dm.persons === 0) {
+      // zero mapped persons (2019 O'Connor mobile team): null shares
+      eq(dm.langOther, null, tag(`demo empty lang null ${k}`));
+      eq(dm.age, null, tag(`demo empty age null ${k}`));
+      demoEmpties.push(k);
+      continue;
+    }
+    ok(dm.langOther >= 0 && dm.langOther <= 1, tag(`demo lang range ${k}`));
+    eq(Object.keys(dm.age), BANDS, tag(`demo age bands ${k}`));
+    const sum = BANDS.reduce((s, x) => s + dm.age[x], 0);
+    ok(Math.abs(sum - 1) < 0.005, tag(`demo age sum ${k} ${sum}`));
+  }
+  eq(demoEmpties, w.demoEmpties, tag("demo zero-persons rows"));
+  let coDemoRows = 0;
+  for (const c of d.cohorts) {
+    ok(c.demo, tag(`cohort demo ${c.div} ${c.cohort}`));
+    if (!c.demo) continue;
+    coDemoRows++;
+    ok(c.demo.persons >= 0, tag(`cohort demo persons ${c.div} ${c.cohort}`));
+    if (c.demo.persons > 0) {
+      eq(Object.keys(c.demo.age), BANDS, tag(`cohort demo bands ${c.div} ${c.cohort}`));
+      const s = BANDS.reduce((a, x) => a + c.demo.age[x], 0);
+      ok(Math.abs(s - 1) < 0.005, tag(`cohort demo age sum ${c.div} ${c.cohort}`));
+    }
+  }
+  // counts.demo.rows spans BOTH the booth rows and the cohort rows
+  eq(demoRowCount + coDemoRows, w.demo.rows, tag("demo rows == booths + cohorts"));
+  eq(coDemoRows, w.cohorts, tag("every cohort row carries demo"));
+  {
+    const [div, booth, want] = w.demoMaxLang;
+    const b = byKey.get(`${div}|${booth}`);
+    ok(b && b.demo, tag(`demo max-lang row ${div}|${booth}`));
+    if (b && b.demo) eq(b.demo.langOther, want, tag(`demo max-lang ${booth}`));
+  }
+
+  // spot cells
   for (const [div, booth, want] of w.spots) {
     const b = byKey.get(`${div}|${booth}`);
     ok(b, tag(`spot row ${div}|${booth}`));

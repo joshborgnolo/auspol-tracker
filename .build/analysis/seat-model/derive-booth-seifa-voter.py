@@ -38,6 +38,11 @@ re-fetch manifest on missing):
         sheet "HouseCatchment (2016FE)")
   2022: CG_SA1_2016_SA1_2021.csv — ABS ASGS Ed3 correspondences page
         https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_SA1_2016_SA1_2021.csv
+  demo: cache/gcp-sa1-2021.zip — ABS datapacks page
+        download/2021_GCP_SA1_for_AUS_short-header.zip (G01 SA1 table:
+        age bands + language spoken at home, every lane's demo basis;
+        2016 lane's votes also walk .matilda/seifa-irsad-abs/dl/
+        CG_SA1_2011_SA1_2016.xlsx — ABS ASGS Ed2 correspondences page)
 Plus committed/held: data/booth-seifa-YYYY.json (booth universe + venue
 scores), .build/aec-flow-src/booth/fpv/YYYY-<ST>.csv.gz (reconcile),
 .matilda/seifa-irsad-abs/abs-seifa-{2011,2016}-sa1-indexes.xls +
@@ -52,6 +57,7 @@ Test: node .build/analysis/seat-model/test-booth-seifa-voter.mjs
 import csv
 import gzip
 import importlib.util
+import io
 import json
 import statistics
 import struct
@@ -208,6 +214,194 @@ def load_xwalk():
         fail(f"CG csv drifted: rows {nrows}, sources {len(x)}, ratio-bad {bad}")
     print(f"crosswalk: {len(x)} SA1_2016 sources -> SA1_CODE_2021")
     return x
+
+
+# ------------------------------------------------------------- demo (GCP G01)
+# The demo block: 2021-census GCP G01 (SA1) age bands + language spoken
+# at home, folded by the same per-SA1 vote weights. EVERY lane lands on
+# the Ed3/2021-census table; older votes are chain-walked into Ed3 first
+# (2019 & 2022 via CG_SA1_2016_SA1_2021; 2016 via CG_SA1_2011_SA1_2016
+# composed with it), so the demo basis is the SAME census in all stores.
+DEMO_BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
+              "55_64", "65_74", "75_84", "85ov"]
+GCP_ZIP = CACHE / "gcp-sa1-2021.zip"
+GCP_MEMBER = ("2021 Census GCP Statistical Area 1 for AUS/"
+              "2021Census_G01_AUST_SA1.csv")
+GCP_ROWS = 61844
+XW11_ROWS = 58769
+XW11_SOURCES = 54805
+XW11_SHORT = {"31501140101", "31501140102", "31501140104",
+              "50806121812", "60203106418"}
+DEMO_BASIS = ("2021 Census GCP G01 @ SA1 (Ed3); every lane's votes are "
+              "in Ed3 space before folding, walking older geographies "
+              "via ABS correspondences")
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01 SA1 table "
+              "(age-band structure; language spoken at home English-only "
+              "vs other) by the same per-SA1 vote weights — age shares "
+              "renormalise over the 11 bands, which exclude "
+              "age-not-stated; persons are a "
+              "vote-weighted pseudo-population, never a headcount, and "
+              "demo figures describe where the booth's voters lived in "
+              "2021, never who the voters themselves were — the "
+              "ecological transport is the point of the weighting and "
+              "its limit. Walk used for this lane: ")
+DEMO_ABOUT = {
+    2025: _DEMO_TAIL + "none needed (votes are already Ed3).",
+    2022: _DEMO_TAIL + "CG_SA1_2016_SA1_2021 (same as the SEIFA lane).",
+    2019: _DEMO_TAIL + "CG_SA1_2016_SA1_2021 (the SEIFA lane for this "
+                       "year is SEIFA-2016-direct; demo is 2021-census "
+                       "based instead).",
+    2016: _DEMO_TAIL + "CG_SA1_2011_SA1_2016 composed with "
+                       "CG_SA1_2016_SA1_2021 (the SEIFA lane for this "
+                       "year is SEIFA-2011-direct; demo is 2021-census "
+                       "based instead).",
+}
+
+_GCP = None
+_XW11 = None
+
+
+def load_gcp21():
+    global _GCP
+    if _GCP is not None:
+        return _GCP
+    if not GCP_ZIP.exists():
+        fail(f"missing GCP input {GCP_ZIP} (see docstring refetch)")
+    agecols = [f"Age_{b}_yr_P" for b in DEMO_BANDS[:-1]] + ["Age_85ov_P"]
+    want = ["SA1_CODE_2021", "Tot_P_P", "Lang_used_home_Eng_only_P",
+            "Lang_used_home_Oth_Lang_P", *agecols]
+    out = {}
+    z = zipfile.ZipFile(GCP_ZIP)
+    if GCP_MEMBER not in z.namelist():
+        fail(f"GCP zip lacks {GCP_MEMBER}")
+    with io.TextIOWrapper(z.open(GCP_MEMBER), encoding="utf-8-sig") as fh:
+        rdr = csv.DictReader(fh)
+        miss = [c for c in want if c not in (rdr.fieldnames or [])]
+        if miss:
+            fail(f"GCP G01 header drift, missing {miss}")
+        n = 0
+        for row in rdr:
+            n += 1
+            code = row["SA1_CODE_2021"]
+            if code in out:
+                fail(f"GCP G01 dup code {code}")
+            out[code] = (int(row["Tot_P_P"]),
+                         int(row["Lang_used_home_Eng_only_P"]),
+                         int(row["Lang_used_home_Oth_Lang_P"]),
+                         tuple(int(row[c]) for c in agecols))
+    if n != GCP_ROWS:
+        fail(f"GCP G01 rows {n} != pin {GCP_ROWS}")
+    print(f"GCP demo: G01 SA1, {n} rows")
+    _GCP = out
+    return out
+
+
+def load_xwalk11():
+    """SA1_MAINCODE_2011 -> [(SA1_CODE21, ratio)], composed Ed1->Ed2->Ed3."""
+    global _XW11
+    if _XW11 is not None:
+        return _XW11
+    path = ABS / "dl/CG_SA1_2011_SA1_2016.xlsx"
+    if not path.exists():
+        fail(f"missing correspondence {path} (ABS ASGS Ed2 correspondences)")
+    src = defaultdict(list)
+    n = 0
+    wb = openpyxl.load_workbook(path, read_only=True)
+    ws = wb["Table 3"]
+    for row in ws.iter_rows(values_only=True):
+        c0 = row[0]
+        if isinstance(c0, int) and 10**10 <= c0 < 10**11:
+            c0 = str(c0)
+        if not (isinstance(c0, str) and len(c0) == 11 and c0.isdigit()):
+            continue
+        n += 1
+        if row[2] in (None, "") or row[4] in (None, 0):
+            continue  # "null to" shares (Table 4 family) never map
+        src[c0].append((str(row[2]), float(row[4])))
+    short = [c for c, ts in src.items()
+             if not 0.999 <= sum(r for _, r in ts) <= 1.001]
+    if n != XW11_ROWS or len(src) != XW11_SOURCES \
+            or set(short) != XW11_SHORT:
+        fail(f"CG_SA1_2011_SA1_2016 drifted: rows {n}, sources {len(src)}, "
+             f"short {sorted(short)}")
+    x16 = load_xwalk()
+    out = {}
+    for c11, t16 in src.items():
+        acc = defaultdict(float)
+        for c16, r1 in t16:
+            for c21, r2 in x16.get(c16, ()):
+                acc[c21] += r1 * r2
+        if acc:
+            out[c11] = [(c, r) for c, r in acc.items()]
+    _XW11 = out
+    print(f"crosswalk 11->21: composed {len(out)} SA1_2011 sources "
+          f"(rows {n})")
+    return out
+
+
+def units_to_ed3(units, conf, dec, xw):
+    """Walk a direct lane's 7-digit-keyed vote units into Ed3 space."""
+    out = {}
+    drop = 0.0
+    for key, kv in units.items():
+        acc = Counter()
+        for ccd, w in kv.items():
+            full = dec.get(ccd)
+            ts = xw.get(full) if full is not None else None
+            if not ts:
+                drop += w
+                continue
+            for code, r in ts:
+                acc[code] += w * r
+        out[key] = acc
+    return out, round(drop)
+
+
+def demo_units(units21, gcp):
+    """Per unit: the GCP G01 demo block + the national accumulators."""
+    nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
+           "bands": [0.0] * len(DEMO_BANDS)}
+    out = {}
+    for key, kv in units21.items():
+        tot = sum(kv.values())
+        if tot <= 0:
+            out[key] = None
+            continue
+        cov = pers = eng = oth = 0.0
+        bands = [0.0] * len(DEMO_BANDS)
+        for code, w in kv.items():
+            r = gcp.get(code)
+            if r is None:
+                continue
+            cov += w
+            pers += w * r[0]
+            eng += w * r[1]
+            oth += w * r[2]
+            ages = r[3]
+            for i in range(len(DEMO_BANDS)):
+                bands[i] += w * ages[i]
+        cov /= tot
+        nat["votes"] += tot
+        nat["pers"] += pers
+        nat["eng"] += eng
+        nat["oth"] += oth
+        for i in range(len(DEMO_BANDS)):
+            nat["bands"][i] += bands[i]
+        # G01's 11 age bands exclude age-not-stated (no NS column; the
+        # residual against Tot_P_P runs anywhere up to ~5% per SA1), so
+        # the age shares renormalise on the band sum — the same
+        # ex-not-stated basis langOther uses (eng+oth, not Tot_P_P).
+        bsum = sum(bands)
+        out[key] = {
+            "persons": int(round(pers)),
+            "cov": round(cov, 4),
+            "langOther":
+                round(oth / (eng + oth), 4) if eng + oth > 0 else None,
+            "age": ({b: round(bands[i] / bsum, 4)
+                     for i, b in enumerate(DEMO_BANDS)}
+                    if bsum > 0 else None),
+        }
+    return out, nat
 
 
 # ------------------------------------------------------------- votes files
@@ -400,6 +594,16 @@ def build(year):
     stats = score_units(units, cube)
     fpv = load_fpv(conf["fpv"])
 
+    gcp = load_gcp21()
+    if conf["mode"] in ("direct21", "xwalk21"):
+        units21, demo_drop = units, 0
+    else:
+        xw_d = load_xwalk() if conf["ed"] == "Ed2" else load_xwalk11()
+        units21, demo_drop = units_to_ed3(units, conf, _CC[conf["ed"]], xw_d)
+    demo_map, demo_nat = demo_units(units21, gcp)
+    if demo_drop:
+        print(f"{year} demo: {demo_drop} votes land on no Ed3 target")
+
     venue_by = {(b["div"], b["boothId"]): b for b in venue_rows}
     vote_keys = {(k[0], k[2]) for k in stats if k[1] == "booth"}
     if {b["div"] for b in venue_rows} != {k[0] for k in vote_keys}:
@@ -450,6 +654,7 @@ def build(year):
             rec["votes"] = None
             rec["note"] = "noVotesRows"
             rec["seifa"] = None
+            rec["demo"] = None
         else:
             seifa = st["seifa"] if any(
                 v is not None for v in st["seifa"].values()) else None
@@ -457,6 +662,7 @@ def build(year):
             rec["sa1s"] = st["sa1s"]
             rec["cov"] = st["cov"]
             rec["seifa"] = seifa
+            rec["demo"] = demo_map.get((vb["div"], "booth", vb["boothId"]))
             if seifa:
                 scored += 1
             if vseifa and seifa:
@@ -474,7 +680,8 @@ def build(year):
                         "cov": st["cov"],
                         "seifa": st["seifa"] if any(
                             v is not None for v in st["seifa"].values())
-                        else None})
+                        else None,
+                        "demo": demo_map.get((div, "cohort", name))})
     cohorts.sort(key=lambda c: (STATE_ORDER[c["state"]], c["div"], c["cohort"]))
 
     diverge = {}
@@ -509,6 +716,24 @@ def build(year):
     if drop_xw:
         counts["votesDroppedXwalk"] = drop_xw
 
+    demo_rows = sum(1 for v in demo_map.values() if v)
+    cov_demo = round(sum(demo_map[k]["cov"] * stats[k]["votes"]
+                         for k in bkeys if demo_map.get(k)) / vtot_b, 4)
+    nat_b = sum(demo_nat["bands"]) or 1
+    nat_eo = demo_nat["eng"] + demo_nat["oth"]
+    counts["demo"] = {
+        "rows": demo_rows,
+        "coverage": cov_demo,
+        **({"votesDroppedWalk": demo_drop} if demo_drop else {}),
+        "national": {
+            "langOther": round(demo_nat["oth"] / nat_eo, 4)
+            if nat_eo else None,
+            "age0_14": round(
+                (demo_nat["bands"][0] + demo_nat["bands"][1]) / nat_b, 4),
+            "age65ov": round(sum(demo_nat["bands"][8:]) / nat_b, 4),
+        },
+    }
+
     mode_note = {
         "direct": f". Scores are SEIFA {conf['seifa']} joined direct on the cube's 7-digit key",
         "direct21": ". Scores are SEIFA 2021, the 7-digit ccd decoded to "
@@ -531,7 +756,7 @@ def build(year):
             "declaration cohorts (Postal/Pre-Poll/Absent/Provisional), "
             "emitted per division, not per booth. Booths the votes file "
             "never lists (unused PPVCs, cancelled mobile teams) carry "
-            "votes:null and note:noVotesRows."),
+            "votes:null and note:noVotesRows.") + DEMO_ABOUT[year],
         "_provenance": {
             "sourceUrls": {
                 "votes": {2016: "AEC 2016 downloads, Votes by SA1 (xlsx)",
@@ -539,15 +764,23 @@ def build(year):
                           2022: "AEC 2022 downloads, Votes by SA1",
                           2025: "AEC fe25 downloads-statistics, Votes by SA1 – national"}[year],
                 "fpvOracle": "VTR HouseStateFirstPrefsByPollingPlaceDownload",
+                "gcp": "ABS 2021 Census GCP datapack (SA1, G01)",
                 **({"crosswalk": "ABS CG_SA1_2016_SA1_2021 (ASGS Ed3 correspondences page)"}
                    if conf["mode"] == "xwalk21" else {}),
+                **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
+                   if year == 2016 else {}),
             },
             "files": {
                 str(conf["file"].relative_to(ROOT)): hash16(conf["file"]),
                 str(vpath.relative_to(ROOT)): hash16(vpath),
+                str(GCP_ZIP.relative_to(ROOT)): hash16(GCP_ZIP),
                 **({str((VDIR / "CG_SA1_2016_SA1_2021.csv").relative_to(ROOT)):
                         hash16(VDIR / "CG_SA1_2016_SA1_2021.csv")}
                    if conf["mode"] == "xwalk21" else {}),
+                **({str((ABS / "dl/CG_SA1_2011_SA1_2016.xlsx")
+                        .relative_to(ROOT)): hash16(
+                            ABS / "dl/CG_SA1_2011_SA1_2016.xlsx")}
+                   if year == 2016 else {}),
             },
             "extractedAt": str(date.today()),
         },
@@ -557,6 +790,7 @@ def build(year):
                            "Ed2": "SA1 (ASGS 2016, 7-digit)",
                            "Ed3": "SA1 (ASGS Ed3 2021, 7-digit ccd)"}[conf["ed"]],
         "indexes": list(INDEXES),
+        "demoBasis": DEMO_BASIS,
         "counts": counts,
         "cohorts": cohorts,
         "booths": out_booths,

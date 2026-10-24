@@ -1,6 +1,6 @@
 ---
 name: auspol-abs-census-datapack
-description: ABS 2021 Census GCP datapack anatomy for seat-model demographic frames (W1) — G01 age-band columns are Age_*_yr_M/F/P EXCEPT Age_85ov_{M,F,P}, the weekly-income histogram splits across G17B (up to $649) and G17C ($650 up), column-header probing before extraction, ABS cell randomisation means component sums drift from published totals (observed <=8 gender / <=15 tenure / <=26 income -> flat TOL=30 in invariant tests), and the G01 education-attendance column gotcha (worked 2026-10-08, commit ab615d1, .build/analysis/seat-model/extract-census-frame.mjs).
+description: ABS 2021 Census GCP datapack anatomy for seat-model demographic frames (W1) — G01 age-band columns are Age_*_yr_M/F/P EXCEPT Age_85ov_{M,F,P} and the 11 bands exclude age-not-stated (NO NS column in G01; renormalise age shares over the band sum, never ÷Tot_P_P — up to ~4-5% off per SA1), the weekly-income histogram splits across G17B (up to $649) and G17C ($650 up), column-header probing before extraction, ABS cell randomisation means component sums drift from published totals (observed <=8 gender / <=15 tenure / <=26 income -> flat TOL=30 in invariant tests), and the G01 education-attendance column gotcha (worked 2026-10-08, commit ab615d1, .build/analysis/seat-model/extract-census-frame.mjs; SA1-edition G01 demo fold in derive-booth-seifa-voter.py 2026-10-24).
 source: auto-skill
 extracted_at: '2026-10-08T02:28:12.447Z'
 ---
@@ -30,6 +30,16 @@ BOTH sides).
   column-name filter keyed on the `Age_` prefix alone collects them and
   double-counts. Filter tighter (require the `_yr_M/_yr_F/_yr_P` tail or the
   explicit band list).
+- **G01's 11 age bands do NOT sum to `Tot_P_P`** — the table has NO
+  age-not-stated column, and the residual runs up to ~4–5% per small
+  area (worked 2026-10-24 on the SA1 edition: see
+  auto-skill-auspol-votes-sa1-footprint). Age-band shares must
+  renormalise over the band sum (ex-not-stated basis), the same
+  treatment the G01 language question needs (`Lang_used_home_Oth_Lang_P
+  / (Lang_used_home_Eng_only_P + Oth_Lang_P)`, never ÷ Tot_P_P). A
+  sum-to-1 invariant pinned against `Tot_P_P`-based shares fires in
+  bulk on small geographies like SA1 (division-level frames mostly mask
+  it — don't be reassured).
 - **Income histogram spans TWO tables**: G17B has 6 columns from
   `Neg_Nil_income` through `500_649`; G17C has the 9 higher bands
   (`650_799` … `3500_more`) plus the not-stated and total columns. Read
