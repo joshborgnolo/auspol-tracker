@@ -1,6 +1,6 @@
 ---
 name: auspol-branch-merge-land-race
-description: auspol-tracker — landing YOUR committed worktree ship-branch into the shared main checkout after a sibling land-race (worked 2026-10-11, tab-pages branch 87524cb merged as 4291be9). Local main is N commits behind origin and your ship branch is based on the OLD tip: park the sibling-dirty files blocking `git merge --ff-only origin/main` by MEASURED distance (git diff origin/main -- <file>; 0 diff-lines = landed duplicate → git restore; unique WIP → named "hold:" stash, never silently discard), rm stale UNTRACKED generated dirs the branch adds (allpolls/ cycles/ info/) or the merge aborts, resolve generated-file conflicts by REGENERATING (federal + BUILD_JUR=vic + site-shell), UNION-merge probe conflicts (keep origin's restructure + re-apply your conversion over it), then full npm test on the merged tree BEFORE pushing. PLUS the worktree-direct variant (worked 2026-10-22, direction-merged-groups 65511a95→3aeb91ae): a plain `git push origin HEAD:main` from the worktree is the fast land, but verify `git ls-remote origin main` right before — a `+old…new forced` push over sibling commits means you just clobbered them, and the recovery is merge-the-clobbered-sha-back + regenerate + amend + re-test + fast-forward push. Companion: auspol-clean-artifact-commit (the pre-merge slice/park step), ci-main-writer-races (push side).
+description: auspol-tracker — landing YOUR committed worktree ship-branch into the shared main checkout after a sibling land-race (worked 2026-10-11, tab-pages branch 87524cb merged as 4291be9). Local main is N commits behind origin and your ship branch is based on the OLD tip: park the sibling-dirty files blocking `git merge --ff-only origin/main` by MEASURED distance (git diff origin/main -- <file>; 0 diff-lines = landed duplicate → git restore; unique WIP → named "hold:" stash, never silently discard), rm stale UNTRACKED generated dirs the branch adds (allpolls/ cycles/ info/) or the merge aborts, resolve generated-file conflicts by REGENERATING (federal + BUILD_JUR=vic + site-shell), UNION-merge probe conflicts (keep origin's restructure + re-apply your conversion over it), then full npm test on the merged tree BEFORE pushing. PLUS the worktree-direct variant (worked 2026-10-22, direction-merged-groups 65511a95→3aeb91ae): a plain `git push origin HEAD:main` from the worktree is the fast land, but verify `git ls-remote origin main` right before — a `+old…new forced` push over sibling commits means you just clobbered them, and the recovery is merge-the-clobbered-sha-back + regenerate + amend + re-test + fast-forward push. PLUS the ORIGIN-IN-BRANCH lane (worked 2026-10-24, pcti regen land 11bacefc): you already merged origin/main INTO your branch, so merge-base(HEAD, origin/main)==origin tip and the whole land IS `git push origin HEAD:<branch>` + `git push origin HEAD:main` — no main checkout, no sibling-dirt parking, tests run where you stand. PLUS the MID-MERGE CONCLUSION entry into that lane (worked 2026-10-24, merge 47ffe8ed): a sibling can leave .git/MERGE_HEAD + the full resolution STAGED but never committed — "fatal: cannot do a partial commit during a merge" blocks any commit of only your files, so verify the staged resolution, conclude with a plain `git commit` (git reuses MERGE_MSG), and re-check `git log` for followers (11bacefc landed mid-gate) before staging anything. Companion: auspol-clean-artifact-commit (the pre-merge slice/park step), ci-main-writer-races (push side).
 source: auto-skill
 extracted_at: '2026-10-11T00:00:00.000Z'
 ---
@@ -151,6 +151,103 @@ pushing. The sibling's two commits dated the same minute as my push — a
 ~30 s race window decided it. And never add `+` to the refSpec "just in
 case": a plain push REFUSES non-ff and forces you to look, which is the
 safety you want.
+
+## Origin-in-branch lane: the land is a push (worked 2026-10-24, 11bacefc)
+
+The cleanest endgame is reached when the LAND phase's merges all happened
+on YOUR branch: you ran `git fetch && git merge origin/main` on the branch,
+resolved, regenerated + tested there, and left local main wherever it is.
+Then `git merge-base HEAD origin/main` == the origin tip, and
+`git push origin HEAD:main` is a plain fast-forward — **the land is the
+push**. No main checkout, no ff-only dance, no parking of main-checkout
+sibling dirt (steps 1–2 above never happen), and the npm-suite gate runs
+on the same working tree you're standing in. Sequence:
+
+1. Resume / verify state FIRST — don't re-do work the merge commit already
+   holds. `git merge-base HEAD origin/main | xargs git log --oneline -1`
+   (if that IS the origin tip, you're in this lane), `git log --oneline
+   -6`, then read what the merge commit itself resolved:
+   `git show <merge-sha>:.build/<source> | grep -n <feature>`. Worked case:
+   post-compaction, the pcti re-base looked uncommitted — but `47ffe8ed`'s
+   conflict resolution already carried the re-based source lane; only the
+   DOWNSTREAM regenerated artefacts (data stores, built pages, test
+   mirrors) were uncommitted dirty. Re-deriving the sources would have
+   double-patched them.
+2. `npm test` + `validate.mjs` on the dirty tree (it IS the candidate).
+3. Commit ONLY owned paths — explicit pathspecs, never `-A`; sibling WIP
+   lanes (here: the seat-model voter-footprint files) stay dirty. Traps
+   that surfaced: `.build/vic/out/` is a gitignored dir with force-tracked
+   members and appears as pre-staged `M ` — it is NOT in `git-push-main.sh`'s
+   SITE_FILES (writers never commit it), so `git restore --staged` it and
+   leave it dirty; and `git commit -m "$(cat <<'EOF'…)"` leaked the
+   terminator into the message (step 4's -F rule — fix with `git commit
+   --amend -m "…"` while the sha is still unpushed).
+4. Push branch first, race-check, push main:
+   `git push origin HEAD:allseats-class-flows` → `git ls-remote origin
+   main` (must still be the merge-base; anything else = sibling landed,
+   back to fetch+merge) → `git push origin HEAD:main`. Output line
+   `faa48108..11bacefc  HEAD -> main` with no `forced` = clean land.
+5. Live smoke by BYTE-EQUALITY, stronger than a 200: Pages deploys in
+   ~90 s (a standalone `sleep 90` call with the intentional-sleep
+   comment), then `curl -s https://auspoltracker.com/ | shasum -a 256`
+   vs `shasum -a 256 index.html` — identical hashes prove the deploy IS
+   your commit. Then 200-probe the feature's pages
+   (`/flows-explained/`, `/vic/`).
+
+## Concluding a sibling's ABANDONED mid-merge state (worked 2026-10-24, 47ffe8ed)
+
+The other 2026-10-24 entry into the origin-in-branch lane: you resume
+(post-compaction or fresh session) and find the branch mid-merge —
+`.git/MERGE_HEAD` + `.git/MERGE_MSG` present, the full conflict resolution
+STAGED (41 files +32k/−3.9k here), but the merge commit never written: the
+sibling session died between resolve and commit. Symptoms:
+
+- `git commit -o -- <only-my-unstaged-files>` → "fatal: cannot do a partial
+  commit during a merge". NOTHING about your files can bypass the in-flight
+  merge; -o pathspec commits are legal again only after it's concluded.
+- `git log --oneline HEAD..MERGE_HEAD` shows what's being pulled in;
+  `.git/MERGE_MSG` carries the conflicted-path list verbatim.
+
+Procedure (verify-then-conclude — the user's approved option wording):
+
+1. **Verify the staged resolution IS consistent before writing anything.**
+   Run validate.mjs plus every test suite named by the conflicted paths
+   (watch subdirs: test-booth-seifa-voter.mjs lives in
+   `.build/analysis/seat-model/`, a bare `node .build/<name>` is
+   MODULE_NOT_FOUND and a `node a && node b && …` chain reports the FIRST
+   failure's exit code only). The check that counts: `node
+   .build/newtracker/build.mjs` + `BUILD_JUR=vic node …`, then
+   `git status --porcelain` — if the REBUILT generated pages come back
+   byte-identical to the STAGED ones, the sibling resolved generated files
+   by regenerating on merged sources (trustworthy). In the worked run the
+   tree instead held regenerated data stores + test mirrors UNSTAGED beyond
+   the staged set — the sibling's downstream regen still in flight: run
+   the suites against that combined tree and expect it to land as a
+   follow-up commit (it did — 11bacefc, six minutes later). Sibling
+   untracked corpora are huge (~600 state-flow-src `??` lines here); filter
+   with `git status --porcelain | grep -v '^??'` before any judgement.
+2. **Conclude with a plain `git commit`** (or `-m "Merge remote-tracking
+   branch 'origin/main' into <branch>"`): git reuses `.git/MERGE_MSG`'s
+   exact text and MERGE_HEAD becomes second parent. Keep the standard
+   message — 44aae9a/dcdd3042/47ffe8ed all read the same line, and the
+   repair/land scripts pattern-match merge subjects.
+3. **Re-check `git log --oneline -6` before your next stage/commit** —
+   sessions overlap by minutes, and a follower can land DURING your npm
+   test gate (here the sibling's regen follow-up 11bacefc arrived between
+   my verify and my commit). Consequences: (a) if what you meant to fold
+   into the merge commit is now ITS OWN commit on top, amend nothing —
+   stacking beats rewriting a merge commit anything else already builds on;
+   `git log <merge>^..HEAD --oneline` shows descendants at a glance. (b)
+   Reclassify leftover unstaged files against the merge's PARENTS before
+   claiming them: `git diff <merge>^1 <merge> -- <file>` then `^2` — debris
+   of resolution shows as merge-included, fresh WIP shows as extra.
+4. Now `-o`/pathspec commits work again: `git add` only your own
+   unstaged files (terminal six were committed with explicit pathspecs as
+   3d74d6aa), leave sibling WIP (modified SKILL.md notes, the vic/out
+   force-tracked bundle) dirty, run the FULL npm suite on the final tree,
+   and land with the origin-in-branch push sequence above (push branch →
+   `git ls-remote origin main` race-check → `git push origin HEAD:main` —
+   `11bacefc..3d74d6aa HEAD -> main` with no `forced`).
 
 ## Related
 

@@ -84,15 +84,17 @@ export const ROOT = path.resolve(HERE, "..");
    and carry nothing – preference-flows became one on 2026-10-15 when the
    explainer moved into the main build as the /flows-explained/ tab page,
    ad-hocs on 2026-10-18 when its catalogue became /beyond-the-vote/.
-   archives/index.html left that set on 2026-10-24: it is the archives' own
-   hub page now (archivesTab's first entry), not a redirect. */
+   archives/index.html left that set on 2026-10-24 when it became the
+   archives' own hub page (archivesTab's first entry), not a redirect –
+   and rejoined it the same day when the hub moved to /provenance/ as the
+   renamed "Provenance" page and archives/ reverted to a stub. */
 export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
   { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
-  { file: "archives/index.html", page: "archives" },          // hand-maintained: the archives hub (replaced the redirect stub 2026-10-24)
+  { file: "provenance/index.html", page: "archives" },        // hand-maintained: the Provenance hub (moved from /archives/ 2026-10-24, which reverted to a redirect stub)
   { file: "archives/newspoll/index.html", page: "archives" },
   { file: "archives/acnielsen/index.html", page: "archives" },
   { file: "archives/morgan/index.html", page: "archives" },   // refresh-morgan-archive.mjs
@@ -109,7 +111,7 @@ export const SHELL_PAGES = [
    a while) are stripped by applyShell, so an archive joins the row by
    landing here and nowhere else. */
 export const ARCHIVE_TABS = [
-  { file: "archives/index.html",            href: "/archives/",             label: "All archives" },
+  { file: "provenance/index.html",          href: "/provenance/",           label: "Provenance" },
   { file: "archives/newspoll/index.html",   href: "/archives/newspoll/",    label: "Newspoll" },
   { file: "archives/acnielsen/index.html",  href: "/archives/acnielsen/",   label: "AC Nielsen" },
   { file: "archives/morgan/index.html",     href: "/archives/morgan/",      label: "Morgan" },

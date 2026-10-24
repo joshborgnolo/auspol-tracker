@@ -20,7 +20,7 @@ const srv = http.createServer((req, res) => {
 await new Promise(r => srv.listen(0, "127.0.0.1", r));
 const port = srv.address().port;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
-const docs = ["/archives/", "/archives/acnielsen/", "/archives/aeforecasts/", "/archives/galaxy/", "/archives/morgan/", "/archives/newspoll/", "/archives/trove/"];
+const docs = ["/provenance/", "/archives/acnielsen/", "/archives/aeforecasts/", "/archives/galaxy/", "/archives/morgan/", "/archives/newspoll/", "/archives/trove/"];
 const widths = [320, 360, 390, 641, 700];
 let fails = 0;
 for (const d of docs) {

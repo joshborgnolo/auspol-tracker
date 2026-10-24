@@ -964,7 +964,7 @@ ${ssAboutBlock(L, prim, acc)}
       <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
-        I&#8217;ve located are stored <a href="https://auspoltracker.com/archives/">here</a> for
+        I&#8217;ve located are stored <a href="https://auspoltracker.com/provenance/">here</a> for
         safekeeping and convenience.</p>
     </article>`;
 }
@@ -1109,7 +1109,7 @@ function ssTail(esc, sources) {
       <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
-        I&#8217;ve located are stored <a href="https://auspoltracker.com/archives/">here</a> for
+        I&#8217;ve located are stored <a href="https://auspoltracker.com/provenance/">here</a> for
         safekeeping and convenience.</p>`;
 }
 
@@ -1942,10 +1942,11 @@ writeAtomic(path.join(ROOT, "feed.xml"), feed);
    file, so every rebuild dropped them again; they live here now. Their
    lastmod is a fixed date — the build can't know when those pages last
    changed, so anyone touching them bumps ARCHIVE_STAMP. /newspoll-archive/
-   itself is only a redirect stub to /archives/newspoll/ and stays OUT of the
-   sitemap (canonical entry points belong to the real pages). /archives/ is
-   a real hub page in its own right since the 2026-10-24 shared-shell
-   restructure, so it carries an entry of its own. */
+   is only a redirect stub to /archives/newspoll/ and stays OUT of the
+   sitemap (canonical entry points belong to the real pages). The hub page
+   moved to /provenance/ on 2026-10-24 (Provenance, where the site's data
+   has been sourced); /archives/ itself reverted to a redirect stub and
+   stays OUT, while /provenance/ carries the hub's entry. */
 const ARCHIVE_STAMP = "2026-10-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
@@ -1999,7 +2000,7 @@ ${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explai
     <lastmod>${tabLastmod(id)}</lastmod>
   </url>`).join("\n")}
   <url>
-    <loc>${SITE_URL}archives/</loc>
+    <loc>${SITE_URL}provenance/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>

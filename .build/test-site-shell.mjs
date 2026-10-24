@@ -26,7 +26,7 @@ for (const p of SHELL_PAGES) {
 // ---- the markup's variants ----------------------------------------------------------
 assert.ok(!/href="\/feedback\/"/.test(shellFooter({ page: "feedback" })), "the feedback page doesn't invite feedback on itself");
 assert.ok(/href="\/feedback\/"/.test(shellFooter({})), "every other page does");
-assert.ok(!/stored <a href="\/archives\/">here<\/a>/.test(shellFooter({ page: "archives" })), "an archive page doesn't point at the archives");
+assert.ok(!/stored <a href="\/(archives|provenance)\/">here<\/a>/.test(shellFooter({ page: "archives" })), "an archive page doesn't point at the archives/provenance hub");
 assert.ok(/estimates only\./.test(shellFooter({})), "the disclaimer rides the colophon");
 assert.equal((shellHeader({}).match(/<a class="sh-tab[" ]/g) || []).length, 4, "the four views on the bar, and nothing else");
 // the ☰ menu: the main page's menu pages, Info for the pinned phone bar – the
