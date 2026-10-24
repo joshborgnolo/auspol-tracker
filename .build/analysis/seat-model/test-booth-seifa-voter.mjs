@@ -47,6 +47,16 @@
       zero-persons row (2019 O'Connor Other Mobile Team 2, a mobile
       team whose SA1 string maps onto unpopulated SA1s) carries null
       lang/age; the max-language exemplar per year.
+   10. Divisions block (the division-level add-on: every unit's
+      per-SA1 demo tallies re-pooled by division — one language/age
+      reading per division, shares from its own pooled sum, never an
+      average of the rounded row shares): one row per division,
+      state-order sorted; division votes + votesSentinel reconcile to
+      votesTotal exactly; person-weighting the division rows
+      reproduces counts.demo.national (tolerance 0.0005 — 4dp share
+      rounding); per-row cov >= 0.999; anchors per year: Fowler max
+      language share and Lyne min; Lyne oldest and Lingiari youngest;
+      the Lingiari row printed in full.
 */
 
 import { readFileSync } from "node:fs";
@@ -90,6 +100,9 @@ const YEARS = {
     zeroVotes: ["Brand|65161"],
     demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, age0_14: 0.1805, age65ov: 0.1823 } },
     demoMaxLang: ["Lingiari", "Home Island", 0.9804],
+    demoDivs: { langMax: ["Fowler", 0.7328], langMin: ["Lyne", 0.0296],
+                oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.0777],
+                lingiari: { votes: 46505, persons: 24323385, lang: 0.5239 } },
     demoEmpties: [],
     spots: [
       ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1052.9, 1069.2, 1060, 1072.4], cov: [1, 1, 1, 1] }],
@@ -118,6 +131,9 @@ const YEARS = {
     zeroVotes: [],
     demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, age0_14: 0.1825, age65ov: 0.1789 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.9425],
+    demoDivs: { langMax: ["Fowler", 0.7327], langMin: ["Lyne", 0.0297],
+                oldMax: ["Lyne", 0.3099], oldMin: ["Lingiari", 0.0758],
+                lingiari: { votes: 51053, persons: 26655725, lang: 0.489 } },
     demoEmpties: ["O'Connor|65160"],
     spots: [
       ["Brisbane", "Brisbane City BRISBANE PPVC", { votes: 8690, sa1s: 358, seifa: [1068.3, 1099.7, 963.1, 1134.3], cov: [0.9995, 0.9995, 0.9995, 0.9995] }],
@@ -146,6 +162,9 @@ const YEARS = {
     zeroVotes: ["Tangney|65478"],
     demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, age0_14: 0.1835, age65ov: 0.1761 } },
     demoMaxLang: ["Lingiari", "Home Island PPVC", 0.9695],
+    demoDivs: { langMax: ["Fowler", 0.7335], langMin: ["Lyne", 0.0297],
+                oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.077],
+                lingiari: { votes: 49428, persons: 25871026, lang: 0.4686 } },
     demoEmpties: [],
     spots: [
       ["Melbourne", "Northcote MELBOURNE PPVC", { votes: 838, sa1s: 305, seifa: [1066, 1121.2, 951.6, 1167.1], cov: [0.9988, 0.9988, 0.9988, 0.9988] }],
@@ -174,6 +193,9 @@ const YEARS = {
     zeroVotes: ["Page|123920"],
     demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, age0_14: 0.1855, age65ov: 0.1728 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.942],
+    demoDivs: { langMax: ["Fowler", 0.7295], langMin: ["Lyne", 0.0295],
+                oldMax: ["Lyne", 0.309], oldMin: ["Lingiari", 0.079],
+                lingiari: { votes: 47812, persons: 25598620, lang: 0.4985 } },
     demoEmpties: [],
     spots: [
       ["Curtin", "Perth CURTIN PPVC", { votes: 2509, sa1s: 340, seifa: [1084.3, 1118.2, 1049.4, 1142.6], cov: [0.9936, 0.9936, 0.9936, 0.9936] }],
@@ -361,6 +383,75 @@ for (const [ys, w] of Object.entries(YEARS)) {
     const b = byKey.get(`${div}|${booth}`);
     ok(b && b.demo, tag(`demo max-lang row ${div}|${booth}`));
     if (b && b.demo) eq(b.demo.langOther, want, tag(`demo max-lang ${booth}`));
+  }
+
+  // divisions block: the per-SA1 tallies re-pooled by division
+  eq(d.divisions.length, w.divs, tag("divisions count"));
+  ok(d._about.includes("divisions array"), tag("_about documents divisions"));
+  {
+    const a65 = (r) => r.age["65_74"] + r.age["75_84"] + r.age["85ov"];
+    const a014 = (r) => r.age["0_4"] + r.age["5_14"];
+    let dvotes = 0;
+    let dprev = null;
+    let ppers = 0;
+    let plang = 0;
+    let p0 = 0;
+    let p65 = 0;
+    const langSorted = [];
+    const oldSorted = [];
+    for (const r of d.divisions) {
+      eq(STATE_ORDER.includes(r.state), true, tag(`division state ${r.div}`));
+      ok(r.votes >= 1, tag(`division votes ${r.div}`));
+      ok(r.persons > 0, tag(`division persons ${r.div}`));
+      ok(r.cov >= 0.999, tag(`division cov ${r.div} ${r.cov}`));
+      ok(r.langOther >= 0 && r.langOther <= 1,
+         tag(`division lang range ${r.div}`));
+      eq(Object.keys(r.age), BANDS, tag(`division age bands ${r.div}`));
+      const s = BANDS.reduce((a, x) => a + r.age[x], 0);
+      ok(Math.abs(s - 1) < 0.005, tag(`division age sum ${r.div} ${s}`));
+      const k = [STATE_ORDER.indexOf(r.state), r.div];
+      if (dprev) {
+        ok(k[0] > dprev[0] || (k[0] === dprev[0] && k[1] > dprev[1]),
+           tag(`division sort ${r.div}`));
+      }
+      dprev = k;
+      dvotes += r.votes;
+      ppers += r.persons;
+      plang += r.persons * r.langOther;
+      p0 += r.persons * a014(r);
+      p65 += r.persons * a65(r);
+      langSorted.push([r.langOther, r.div]);
+      oldSorted.push([Number(a65(r).toFixed(4)), r.div]);
+    }
+    eq(dvotes + d.counts.votesSentinel + (d.counts.votesDroppedXwalk || 0),
+       w.votesTotal, tag("division votes + sentinel == votesTotal"));
+    ok(Math.abs(plang / ppers - w.demo.national.langOther) < 0.0005,
+       tag("divisions recompose national langOther"));
+    ok(Math.abs(p0 / ppers - w.demo.national.age0_14) < 0.0005,
+       tag("divisions recompose national age0_14"));
+    ok(Math.abs(p65 / ppers - w.demo.national.age65ov) < 0.0005,
+       tag("divisions recompose national age65ov"));
+    langSorted.sort((a, b) => b[0] - a[0]);
+    oldSorted.sort((a, b) => b[0] - a[0]);
+    eq([langSorted[0][1], langSorted[0][0]], w.demoDivs.langMax,
+       tag("division lang max"));
+    eq([langSorted[langSorted.length - 1][1],
+        langSorted[langSorted.length - 1][0]], w.demoDivs.langMin,
+       tag("division lang min"));
+    eq([oldSorted[0][1], oldSorted[0][0]], w.demoDivs.oldMax,
+       tag("division age65 max"));
+    eq([oldSorted[oldSorted.length - 1][1],
+        oldSorted[oldSorted.length - 1][0]], w.demoDivs.oldMin,
+       tag("division age65 min"));
+    const lg = d.divisions.find((r) => r.div === "Lingiari");
+    ok(lg, tag("Lingiari row"));
+    if (lg) {
+      eq(lg.votes, w.demoDivs.lingiari.votes, tag("Lingiari votes"));
+      eq(lg.persons, w.demoDivs.lingiari.persons, tag("Lingiari persons"));
+      eq(lg.langOther, w.demoDivs.lingiari.lang, tag("Lingiari lang"));
+      eq(Number(a65(lg).toFixed(4)), w.demoDivs.oldMin[1],
+         tag("Lingiari age65"));
+    }
   }
 
   // spot cells

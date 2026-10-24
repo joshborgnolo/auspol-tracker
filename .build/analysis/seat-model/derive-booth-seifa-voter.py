@@ -358,9 +358,10 @@ def units_to_ed3(units, conf, dec, xw):
 
 
 def demo_units(units21, gcp):
-    """Per unit: the GCP G01 demo block + the national accumulators."""
+    """Per unit: the GCP G01 demo block + the div/national accumulators."""
     nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
            "bands": [0.0] * len(DEMO_BANDS)}
+    divs = {}
     out = {}
     for key, kv in units21.items():
         tot = sum(kv.values())
@@ -380,6 +381,16 @@ def demo_units(units21, gcp):
             ages = r[3]
             for i in range(len(DEMO_BANDS)):
                 bands[i] += w * ages[i]
+        dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
+                                      "pers": 0.0, "eng": 0.0, "oth": 0.0,
+                                      "bands": [0.0] * len(DEMO_BANDS)})
+        dv["votes"] += tot
+        dv["cov"] += cov
+        dv["pers"] += pers
+        dv["eng"] += eng
+        dv["oth"] += oth
+        for i in range(len(DEMO_BANDS)):
+            dv["bands"][i] += bands[i]
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -401,7 +412,7 @@ def demo_units(units21, gcp):
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
         }
-    return out, nat
+    return out, nat, divs
 
 
 # ------------------------------------------------------------- votes files
@@ -600,7 +611,7 @@ def build(year):
     else:
         xw_d = load_xwalk() if conf["ed"] == "Ed2" else load_xwalk11()
         units21, demo_drop = units_to_ed3(units, conf, _CC[conf["ed"]], xw_d)
-    demo_map, demo_nat = demo_units(units21, gcp)
+    demo_map, demo_nat, demo_div = demo_units(units21, gcp)
     if demo_drop:
         print(f"{year} demo: {demo_drop} votes land on no Ed3 target")
 
@@ -734,6 +745,31 @@ def build(year):
         },
     }
 
+    # the division level: the same per-SA1 tallies re-pooled by division
+    # (one pass over the div accumulators — a division's shares come from
+    # its own SA1 sum, never from averaging rounded row shares). votes is
+    # the stats count (booth + cohort rows), cov the share of its
+    # demo-weights that mapped onto populated SA1s.
+    div_votes = defaultdict(int)
+    for (div, _, _), st in stats.items():
+        div_votes[div] += st["votes"]
+    divisions = []
+    for div in sorted(demo_div, key=lambda nm: (STATE_ORDER[divstate[nm]], nm)):
+        dv = demo_div[div]
+        tot = dv["votes"]
+        bsum = sum(dv["bands"])
+        divisions.append({
+            "div": div, "state": divstate[div],
+            "votes": div_votes.get(div, int(round(tot))),
+            "persons": int(round(dv["pers"])),
+            "cov": round(dv["cov"] / tot, 4) if tot > 0 else None,
+            "langOther": round(dv["oth"] / (dv["eng"] + dv["oth"]), 4)
+                if dv["eng"] + dv["oth"] > 0 else None,
+            "age": ({b: round(dv["bands"][i] / bsum, 4)
+                     for i, b in enumerate(DEMO_BANDS)}
+                    if bsum > 0 else None),
+        })
+
     mode_note = {
         "direct": f". Scores are SEIFA {conf['seifa']} joined direct on the cube's 7-digit key",
         "direct21": ". Scores are SEIFA 2021, the 7-digit ccd decoded to "
@@ -756,7 +792,11 @@ def build(year):
             "declaration cohorts (Postal/Pre-Poll/Absent/Provisional), "
             "emitted per division, not per booth. Booths the votes file "
             "never lists (unused PPVCs, cancelled mobile teams) carry "
-            "votes:null and note:noVotesRows.") + DEMO_ABOUT[year],
+            "votes:null and note:noVotesRows. The divisions array "
+            "re-pools every unit's per-SA1 demo tallies by division: one "
+            "language/age reading per division, its shares from its own "
+            "pooled sum, never from averaging the row-level rounded "
+            "shares.") + DEMO_ABOUT[year],
         "_provenance": {
             "sourceUrls": {
                 "votes": {2016: "AEC 2016 downloads, Votes by SA1 (xlsx)",
@@ -792,6 +832,7 @@ def build(year):
         "indexes": list(INDEXES),
         "demoBasis": DEMO_BASIS,
         "counts": counts,
+        "divisions": divisions,
         "cohorts": cohorts,
         "booths": out_booths,
     }
