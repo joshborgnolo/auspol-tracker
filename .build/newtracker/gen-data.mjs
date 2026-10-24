@@ -5219,6 +5219,18 @@ const primaryHistory = (() => {
   } catch { return null; }
 })();
 
+/* informal-history.json – the explainer chart's View: Informal votes
+   flip; informal ballots as a share of ballots cast per federal
+   election, national + states + House and Senate, plus federal seat
+   classes and IRSAD/IEO quintiles. Same guarded-read posture: a missing
+   file drops the flip, never the build. */
+const informalHistory = (() => {
+  try {
+    const { _comment, ...ih } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "informal-history.json"), "utf8"));
+    return ih;
+  } catch { return null; }
+})();
+
 /* primaryHistory.stateElections – the same chart's STATE-election views
    (user 2026-10-23: "what about primary votes for state elections, lower
    and upper houses"; scope: the six jurisdictions the flow bank covers
@@ -8558,6 +8570,13 @@ window.AUSPOL = (function () {
      tallies only, the four post-GVT events 2016–2025, national plus the
      eight states, no classes, implied: true. */
   const twoPPHistory = ${JSON.stringify(twoPPHistory)};
+  /* The informal-vote history behind the explainer chart's View: Informal
+     votes flip – informal ballots as a share of ballots cast (informal ÷
+     formal+informal), per cent, per federal election. House national
+     1901–2025 and per state; Senate 1903–2022 (no AEC machine-readable
+     2025 Senate informal product yet); federal House by AEC seat class
+     1996–2025 and by IRSAD and IEO quintile 2001–2025. */
+  const informalHistory = ${JSON.stringify(informalHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -8821,7 +8840,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

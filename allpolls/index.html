@@ -10168,6 +10168,257 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "short": "NSW LC"
     }
   };
+  const informalHistory = {
+    "fed": {
+      "label": "Federal",
+      "elections": "Australian federal elections",
+      "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+      "inf": [1.6, 2.5, 3.7, 2, 2.8, 2.3, 2.6, 3.5, 4.5, 2.4, 4.9, 2.6, 3.5, 3.4, 2.6, 2.6, 2.9, 2.5, 2, 1.9, 1.3, 2.9, 2.9, 2.6, 1.8, 3.1, 2.5, 2.2, 1.9, 1.9, 2.5, 2.4, 2.1, 6.8, 4.9, 3.2, 3, 3.2, 3.8, 4.8, 5.18, 3.95, 5.55, 5.91, 5.05, 5.54, 5.19, 5.6],
+      "states": {
+        "nsw": {
+          "label": "New South Wales",
+          "elections": "New South Wales electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "NSW",
+          "inf": [1.9, 2.8, 3.3, 1.6, 3.1, 2.4, 3, 3.8, 4.5, 1.9, 4.8, 2.8, 3.6, 3.3, 2.3, 2.9, 3.1, 2.5, 2, 1.9, 1.3, 2.8, 2.8, 2.4, 1.6, 3.2, 2.3, 1.9, 1.7, 1.9, 2.3, 2.4, 2.2, 6.2, 4.6, 3.1, 3.1, 3.6, 4, 5.4, 6.12, 4.95, 6.83, 7.59, 6.17, 7.01, 6.22, 8.06]
+        },
+        "vic": {
+          "label": "Victoria",
+          "elections": "Victoria electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Vic",
+          "inf": [0.8, 1.8, 3.8, 1.6, 2, 1.8, 2.1, 2.4, 3.2, 1.6, 3.2, 1.4, 2.8, 3, 1.9, 1.8, 2.7, 2, 1.6, 1.6, 1.2, 2.6, 2.4, 2.3, 1.5, 3.7, 3.3, 2.3, 2.1, 2, 2.8, 2.7, 2.2, 8.2, 5.2, 3.5, 2.8, 2.9, 3.5, 4, 4.1, 3.25, 4.5, 5.19, 4.77, 4.66, 4.71, 4.24]
+        },
+        "qld": {
+          "label": "Queensland",
+          "elections": "Queensland electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Qld",
+          "inf": [2.5, 2.6, 4.2, 3, 2.7, 2.7, 2.1, 3.3, 4.8, 3.3, 5.5, 4, 2.9, 2.6, 2.6, 2.2, 2.3, 2.7, 2.1, 1.9, 1.1, 2.2, 3, 2.7, 2.2, 1.8, 1.3, 2, 1.4, 1.3, 1.5, 1.8, 1.3, 4.7, 3.4, 2.2, 2.6, 2.6, 3.3, 4.8, 5.16, 3.56, 5.45, 5.13, 4.7, 4.95, 4.17, 4.93]
+        },
+        "wa": {
+          "label": "Western Australia",
+          "elections": "Western Australia electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "WA",
+          "inf": [1, 4.9, 4.2, 2.1, 3.1, 3.2, 3.6, 3.8, 6.3, 3.1, 3.8, 2.3, 3.5, 3.7, 3.5, 3, 3.5, 2.9, 2.3, 2.5, 1.7, 3.5, 3.6, 3.2, 2.4, 4, 2.6, 2.6, 2.5, 2.3, 3.3, 2.7, 2, 7.4, 6.6, 3.7, 2.5, 3.2, 4.2, 4.9, 5.32, 3.85, 4.82, 5.38, 3.99, 5.44, 5.52, 3.95]
+        },
+        "sa": {
+          "label": "South Australia",
+          "elections": "South Australia electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "SA",
+          "inf": [1.6, 2.7, 5, 5, 4.8, 2.3, 3.5, 5.4, 6.7, 4.3, 9.4, 4.1, 5.3, 6.3, 5, 3.6, 3, 3.1, 2.2, 2.1, 2.5, 4.1, 3.3, 3.1, 2.7, 2.9, 3.4, 2.6, 2.8, 2.4, 3.4, 2.8, 2.7, 8.7, 6.8, 3.7, 4.1, 4.1, 4.5, 5.5, 5.56, 3.78, 5.46, 4.85, 4.18, 4.81, 5.12, 5.26]
+        },
+        "tas": {
+          "label": "Tasmania",
+          "elections": "Tasmania electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Tas",
+          "inf": [2.9, 3.1, 3.9, 2.5, 3.2, 2.4, 3.1, 5, 6.5, 4.9, 6.5, 1.9, 4.7, 3.9, 2.8, 3.1, 3.6, 2.6, 2.6, 3.1, 1, 4.2, 4.1, 3.2, 1.2, 1.5, 1.7, 1.6, 1.8, 1.9, 2.6, 2.6, 2.3, 6.1, 4.9, 3.3, 2.7, 2.4, 3.1, 3.4, 3.59, 2.92, 4.04, 4.04, 3.98, 4.39, 5.85, 4.25]
+        },
+        "act": {
+          "label": "Australian Capital Territory",
+          "elections": "Australian Capital Territory electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "ACT",
+          "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.6, 0.6, 0.8, 0.8, 1.3, 1.3, 2.1, 1.7, 1.8, 2.3, 1.3, 1.7, 2.4, 2.1, 2.2, 5.1, 3.5, 3, 3.4, 2.8, 2.9, 3.5, 3.44, 2.31, 4.66, 3.83, 2.76, 3.49, 2.46, 2.43]
+        },
+        "nt": {
+          "label": "Northern Territory",
+          "elections": "Northern Territory electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "NT",
+          "inf": [null, null, null, null, null, null, null, null, 3.1, 1.8, 3.3, null, 2.4, 1.9, 1.3, 2.1, 2.3, 1, 2.3, 1.9, 2.2, null, 3.8, 3.6, null, 3.5, 3.5, 4.6, 2.8, 3.3, 3.5, 4.9, 4.4, 4.9, 5.8, 3.4, 3.1, 3.4, 4.2, 4.6, 4.45, 3.85, 6.19, 6.3, 7.35, 4.69, 5.31, 3.99]
+        }
+      },
+      "sen": {
+        "label": "Federal Senate",
+        "elections": "Australian Senate elections",
+        "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+        "short": "Senate",
+        "inf": [3.6, 6.4, 4.6, 5.7, 4.2, 3.9, 8.6, 9.4, 7, 9.9, 9.6, 11.3, 10.6, 9.6, 9.7, 8, 10.8, 7.1, 4.6, 9.6, 10.3, 10.6, 7, 6.1, 9.4, 10.8, 9.1, 9, 9.6, 9.9, 4.3, 4.1, 3.4, 2.6, 3.5, 3.2, 3.9, 3.8, 2.6, 3.8, 3, null, 3.9, 3.8, 3.4],
+        "states": {
+          "nsw": {
+            "label": "New South Wales",
+            "elections": "New South Wales Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "NSW",
+            "inf": [4.9, 7.4, 4.7, 6.7, 5, 3.8, 9.4, 10, 6.4, 8.8, 9.4, 13.2, 8.9, 11.6, 12, 8.4, 12, 7.9, 4, 8.8, 12.5, 12.7, 6.2, 6.9, 10.1, 12.3, 9.7, 9.6, 9.4, 11.1, 5.2, 4.9, 4.2, 2.7, 3.8, 3.3, 3.5, 3.5, 2.2, 4.2, 3.3, null, 4.5, 4.3, 3.9]
+          },
+          "vic": {
+            "label": "Victoria",
+            "elections": "Victoria Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Vic",
+            "inf": [2.2, 6.2, 4.6, 4.5, 3.3, 3.2, 7.8, 7.9, 7.6, 10, 9, 9.7, 13.4, 8.9, 8.6, 7.3, 10.7, 6.8, 5.6, 13.5, 9.9, 10.7, 8.4, 6.7, 11.4, 11.1, 8.1, 9.1, 11.1, 10.7, 3.7, 4, 3.6, 3.1, 3.6, 3.8, 5.6, 5.1, 3.3, 3.9, 3.4, null, 4.2, 4, 3.5]
+          },
+          "qld": {
+            "label": "Queensland",
+            "elections": "Queensland Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Qld",
+            "inf": [3.7, 5.9, 5.2, 5.1, 4.2, 4.8, 8, 10.8, 6.4, 8.8, 8.6, 5.5, 6.9, 5.3, 7.3, 6.7, 7.1, 4.7, 2.6, 4.1, 7.2, 8.5, 7.1, 3.1, 7.2, 6, 8.3, 8, 9.2, 8.6, 2.7, 3.1, 2.5, 2, 3.3, 3, 3, 2.8, 2.3, 3.5, 2.2, null, 3.4, 3.3, 3.1]
+          },
+          "wa": {
+            "label": "Western Australia",
+            "elections": "Western Australia Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "WA",
+            "inf": [6, 6.7, 5.4, 6.2, 5.3, 5.2, 9, 9.2, 7.4, 12.3, 9.4, 12.8, 12.7, 9.5, 8, 7.7, 10, 8.9, 7.2, 10, 9.4, 10, 6, 6.7, 7.6, 10.4, 10.8, 8.2, 9.9, 8.1, 4.2, 3.3, 2.9, 2.1, 3.5, 2.7, 3.6, 3.5, 2.4, 3.2, 2.9, 2.5, 3.4, 3.4, 2.9]
+          },
+          "sa": {
+            "label": "South Australia",
+            "elections": "South Australia Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "SA",
+            "inf": [2.2, 3.9, 3.3, 5.7, 3.8, 4.4, 9.1, 9.3, 6, 11.9, 12.6, 14.6, 13.4, 8.2, 7.4, 9.1, 11.6, 5.8, 4.9, 8.9, 7.7, 5.6, 7.5, 5.8, 6.9, 11.4, 9.9, 10.4, 8.7, 8.8, 5, 3.8, 2.5, 2.3, 3.3, 2.8, 3.1, 3.5, 2.4, 3.1, 2.7, null, 3.3, 3.5, 2.9]
+          },
+          "tas": {
+            "label": "Tasmania",
+            "elections": "Tasmania Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Tas",
+            "inf": [3.9, 4.5, 3.3, 6.2, 4.7, 3.7, 9.7, 9.3, 11.3, 15.7, 13.9, 16.3, 12.6, 13, 13.5, 11.8, 10.5, 11.6, 5.1, 12.6, 11.2, 10, 3.5, 5, 6.2, 11.2, 9.9, 7.1, 7.4, 7.4, 5.7, 3.8, 3.1, 2.6, 3.2, 3.1, 3.3, 3.4, 2.6, 3.2, 2.5, null, 3.5, 3.6, 3.2]
+          },
+          "act": {
+            "label": "Australian Capital Territory",
+            "elections": "Australian Capital Territory Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "ACT",
+            "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.7, 3.1, 2.8, 3.3, 3.1, 2.4, 2.4, 1.6, 2.5, 2, 2.3, 2.5, 1.7, 2.6, 2, null, 2.2, 2.3, 1.7]
+          },
+          "nt": {
+            "label": "Northern Territory",
+            "elections": "Northern Territory Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "NT",
+            "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 7.2, 6.5, 7.3, 4.7, 2.8, 3.7, 2.8, 2.8, 2.8, 2, 2.8, 3.1, 1.9, 3.7, 2.7, null, 3.3, 3.6, 3]
+          }
+        }
+      },
+      "classes": {
+        "inner": {
+          "label": "Inner metropolitan",
+          "elections": "federal elections in inner metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "inner metro",
+          "inf": [3.65, 3.94, 4.92, 5.48, 4.19, 5.63, 5.99, 4.7, 4.66, 4.55, 4.47]
+        },
+        "outer": {
+          "label": "Outer metropolitan",
+          "elections": "federal elections in outer metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "outer metro",
+          "inf": [3.44, 3.84, 5.09, 5.44, 3.98, 5.93, 6.34, 5.17, 5.85, 5.36, 6.03]
+        },
+        "provincial": {
+          "label": "Provincial",
+          "elections": "federal elections in provincial seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "provincial",
+          "inf": [2.79, 3.48, 4.56, 4.79, 3.71, 5.49, 5.71, 5.13, 5.78, 5.28, 5.66]
+        },
+        "rural": {
+          "label": "Rural",
+          "elections": "federal elections in rural seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "rural",
+          "inf": [2.73, 3.67, 4.51, 4.8, 3.8, 5.08, 5.48, 5.27, 6.01, 5.69, 6.32]
+        },
+        "q1": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "inf": [5.18, 5.43, 4.25, 5.86, 6.87, 5.98, 7.16, 6.21, 7.61]
+        },
+        "q2": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "inf": [4.97, 4.94, 4.32, 5.98, 6.24, 5.5, 6.22, 5.86, 6.58]
+        },
+        "q3": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "inf": [5.18, 5.55, 3.97, 5.57, 5.79, 4.97, 5.44, 5.33, 5.13]
+        },
+        "q4": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "inf": [4.79, 5.45, 3.75, 5.66, 5.88, 4.92, 4.86, 4.91, 4.86]
+        },
+        "q5": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "inf": [4, 4.55, 3.47, 4.72, 4.83, 3.93, 4.02, 3.7, 3.93]
+        },
+        "e1": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "inf": [5.53, 5.75, 4.69, 6.34, 6.34, 5.99, 7.31, 5.99, 6.46]
+        },
+        "e2": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "inf": [5.06, 5.16, 3.97, 5.85, 6.79, 5.49, 6.19, 5.99, 7.46]
+        },
+        "e3": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "inf": [4.66, 5.21, 3.96, 5.46, 5.53, 5.03, 5.38, 5.42, 5.45]
+        },
+        "e4": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "inf": [4.79, 5.34, 3.74, 5.5, 5.92, 4.91, 4.81, 4.75, 4.85]
+        },
+        "e5": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "inf": [4.08, 4.45, 3.4, 4.64, 5.02, 3.88, 4.01, 3.83, 3.86]
+        }
+      }
+    }
+  };
   const adjusted = {
     "tpp": true,
     "primary": true,
@@ -101324,6 +101575,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     flowHistory,
     primaryHistory,
     twoPPHistory,
+    informalHistory,
     adjusted,
     houseEffects,
     houseLean,
@@ -145632,6 +145884,110 @@ function Explained2ppChart({
     }
   }, cap));
 }
+function ExplainedInformalChart(props) {
+  const {
+    house,
+    stateKey,
+    classKey,
+    menu
+  } = props;
+  const narrow = useNarrow(window.MQ_PHONE);
+  const IH = window.AUSPOL.informalHistory || null;
+  if (!IH || !IH.fed) return null;
+  const bank = house === "sen" ? IH.fed.sen : IH.fed;
+  if (!bank) return null;
+  const S = classKey && house !== "sen" && (IH.fed.classes || {})[classKey] || stateKey && (bank.states || {})[stateKey] || bank;
+  const YEARS = S.years || [];
+  if (!YEARS.length) return null;
+  const vals = S.inf || [];
+  const runs = [];
+  let cur = [];
+  vals.forEach((v, i) => {
+    if (v == null) {
+      if (cur.length) runs.push(cur);
+      cur = [];
+    } else cur.push({
+      x: YEARS[i],
+      y: v
+    });
+  });
+  if (cur.length) runs.push(cur);
+  const series = [];
+  runs.forEach((points, i) => {
+    const tail = i === runs.length - 1;
+    series.push({
+      id: "inf" + i,
+      label: "Informal",
+      color: "var(--ink)",
+      points,
+      smooth: false,
+      rdWidth: 2.5,
+      endCap: tail || points.length === 1,
+      endLabel: null
+    });
+  });
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1,
+    x1 = YEARS[YEARS.length - 1] + pad1;
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
+  const cap = (classKey && house !== "sen" ? S.seifa ? "Informal ballots as a share of all ballots cast at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + " - " + (S.ix === "ieo" ? "IEO is the ABS's index of education and occupation" : "IRSAD is the ABS's socio-economic index of advantage and disadvantage") + ", the most-disadvantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it). Counted from the AEC's own per-division results." : "Informal ballots as a share of all ballots cast at the " + span + " federal elections in " + (S.short || S.label) + " seats, each seat grouped by the AEC's own classification for that election's divisions. Counted from the AEC's per-division results (the statistics packs' polling-place tables to 2001, the vote-type downloads from 2004)." : stateKey ? "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections in " + (S.short || S.label) + ", from the handbook's appendix tables before 2004 and the AEC's own published figures since." : "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the Parliamentary Handbook's appendix tables before 2004 and the AEC's own published figures since (the House figures from its vote-type downloads, the Senate's from its informality summary).") + " The Senate series ends at 2022 - the AEC's informality summary, its only machine-readable Senate informal publication, has no 2025 line yet." + (classKey && house !== "sen" && !S.seifa ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own two-party table omits it." : "") + " A territory not yet represented draws a gap, never a zero.";
+  let pk = 0;
+  [IH.fed, ...Object.keys(IH.fed.states || {}).map(k => IH.fed.states[k]), ...Object.keys(IH.fed.classes || {}).map(k => IH.fed.classes[k]), ...(IH.fed.sen ? [IH.fed.sen, ...Object.keys(IH.fed.sen.states || {}).map(k => IH.fed.sen.states[k])] : [])].forEach(v => (v.inf || []).forEach(x => {
+    if (x != null) pk = Math.max(pk, x);
+  }));
+  const yMax = Math.max(5, Math.ceil(pk / 5) * 5);
+  const YT = [];
+  for (let v = 0; v <= yMax; v += 5) YT.push(v);
+  const lines = [{
+    kind: "line",
+    color: "var(--ink)",
+    label: "Informal share of ballots cast"
+  }];
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-chead ex-fl-head"
+  }, React.createElement("span", {
+    className: "rd-chead-t"
+  }, "Informal votes, % of ballots cast", React.createElement("span", {
+    className: "rd-chead-meta"
+  }, scope)), menu), narrow && React.createElement(RdKey, {
+    items: lines,
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, _extends({
+    key: "ex-inf-" + (house || "rep") + (stateKey || "") + (classKey || "")
+  }, exFrame(narrow), {
+    xDomain: [x0, x1],
+    yDomain: [0, yMax],
+    yTicks: YT,
+    yTickFmt: v => v === YT[YT.length - 1] ? v + "%" : String(v),
+    xTicks: YEARS.map(x => ({
+      x,
+      label: String(x)
+    })),
+    unit: "%",
+    fmt: v => v.toFixed(1),
+    series: series,
+    spine: YEARS.map(x => ({
+      x
+    })),
+    tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
+    ariaLabel: "Informal share of ballots cast, " + S.label + ", " + span,
+    copy: {
+      title: "Informal share of ballots cast, " + (S.short || S.label),
+      sub: rdCap(S.elections || S.label + " elections") + ". From the Parliamentary Handbook's historical tables and the AEC's own published figures.",
+      caption: "From the Parliamentary Handbook's tables and the AEC's published figures; informal ÷ (formal + informal) ballots.",
+      legend: narrow ? lines : []
+    }
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: []
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "flow-history",
+      from: "Preference flows explained"
+    }
+  }, cap));
+}
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
@@ -145673,10 +146029,14 @@ function RdExplained() {
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
-  const figView = primMode || twoMode;
+  const IH_HIST = window.AUSPOL.informalHistory || null;
+  const IH_SEN = IH_HIST && IH_HIST.fed && IH_HIST.fed.sen || null;
+  const infMode = figMode === "informal" && !!(IH_HIST && IH_HIST.fed && IH_SEN && IH_HIST.fed.classes);
+  const figView = primMode || twoMode || infMode;
   const PH_CLASSES = PH_HIST && PH_HIST.fed && PH_HIST.fed.classes || {};
   const TP_CLASSES = TP_HIST && TP_HIST.fed && TP_HIST.fed.classes || {};
-  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? house === "sen" ? {} : TP_CLASSES : FED_CLASSES;
+  const IH_CLASSES = IH_HIST && IH_HIST.fed && IH_HIST.fed.classes || {};
+  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? house === "sen" ? {} : TP_CLASSES : infMode ? house === "sen" ? {} : IH_CLASSES : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
@@ -145709,6 +146069,10 @@ function RdExplained() {
     }
     if (twoMode) {
       if (classKey || lcView) setView("fed");
+      return;
+    }
+    if (infMode) {
+      if (classKey) setView("fed");
       return;
     }
     if (next === "sen") {
@@ -145827,17 +146191,19 @@ function RdExplained() {
       if (!(view === "fed" || lcView && LC_CON_BANK || stateKey && hasConCells(stateKey))) setView("fed");
     }
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : pair === "con" ? [...(SEN_CON_BANK ? ["fed", ...senConStateKeys.map(k => "fed:" + k)] : []), ...(LC_CON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : infMode ? house === "sen" ? ["fed", ...Object.keys(IH_SEN && IH_SEN.states || {}).map(k => "fed:" + k)] : ["fed", ...Object.keys(IH_HIST.fed && IH_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(IH_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : pair === "con" ? [...(SEN_CON_BANK ? ["fed", ...senConStateKeys.map(k => "fed:" + k)] : []), ...(LC_CON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
     if (twoMode && (badClass || lcView && house !== "sen" || !fedView && !lcView)) setView("fed");
     if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
-  }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
+    if (infMode && (badClass || lcView || steView || !fedView)) setView("fed");
+    if (infMode && house === "sen" && !IH_SEN) setHouse("rep");
+  }, [primMode, twoMode, infMode, badClass, lcView, fedView, steView, house]);
   const onConPair = pair === "on" || pair === "con";
   const menuShow = figView ? VIEW_OPTS.length > 0 : onConPair && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (onConPair ? 0 : 1) : VIEW_OPTS.length > 0;
-  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? lcView ? [] : tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : pair === "con" ? senConStateKeys : senStateKeys : stateKeys;
-  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? lcView ? {} : TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : pair === "con" ? CON_SEN_STATES : SEN_STATES : FED_STATES;
+  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? lcView ? [] : tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : infMode ? house === "sen" ? Object.keys(IH_SEN && IH_SEN.states || {}) : Object.keys(IH_HIST.fed && IH_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : pair === "con" ? senConStateKeys : senStateKeys : stateKeys;
+  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? lcView ? {} : TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : infMode ? house === "sen" ? IH_SEN && IH_SEN.states || {} : IH_HIST.fed && IH_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : pair === "con" ? CON_SEN_STATES : SEN_STATES : FED_STATES;
   const lcBank = pair === "on" ? LC_ON_BANK : pair === "con" ? LC_CON_BANK : LC_BANK;
   const menuClassKeys = figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys;
   const menuClassSeat = menuClassKeys.filter(k => !classBank[k].seifa);
@@ -145922,8 +146288,8 @@ function RdExplained() {
   }, (twoInv ? "Coalition" : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
-  const shareSlot = primMode ? null : twoMode ? share2pp : share;
-  const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK && (primMode || pair !== "con")) ? React.createElement("span", {
+  const shareSlot = primMode || infMode ? null : twoMode ? share2pp : share;
+  const houseCtl = (twoMode ? !!TP_SEN : infMode ? !!IH_SEN : SEN_BANK && (primMode || pair !== "con")) ? React.createElement("span", {
     className: "rd-pl-ctl ex-house"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -145931,7 +146297,7 @@ function RdExplained() {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": house === "sen",
-    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : twoMode ? house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
+    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : twoMode ? house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)" : infMode ? house === "sen" ? "Switch to House of Representatives informal shares" : "Switch to Senate informal shares (informal ballots over the whole chamber)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
     onClick: flipHouse
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
@@ -145940,17 +146306,20 @@ function RdExplained() {
   }, "\u21C4"))) : null;
   const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
   const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
+  const infViewOk = !!(IH_HIST && IH_HIST.fed && IH_HIST.fed.sen && IH_HIST.fed.classes);
   const FIG_LABELS = {
     flows: "Preference flows",
     primary: "Primary votes",
-    "2pp": "2PP"
+    "2pp": "2PP",
+    informal: "Informal votes"
   };
   const FIG_TITLES = {
     flows: "Switch to the preference-flow history",
     primary: "Switch to first-preference vote shares at every election",
-    "2pp": "Switch to two-party preferred shares at every election"
+    "2pp": "Switch to two-party preferred shares at every election",
+    informal: "Switch to informal ballots’ share of the vote at every election"
   };
-  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : [])];
+  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : []), ...(infViewOk ? ["informal"] : [])];
   const nextFig = FIG_STOPS[(FIG_STOPS.indexOf(figMode) + 1) % FIG_STOPS.length];
   const viewCtl = FIG_STOPS.length > 1 ? React.createElement("span", {
     className: "rd-pl-ctl ex-view"
@@ -146017,7 +146386,12 @@ function RdExplained() {
     }))
   }, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
     className: "ex-fl-vstack"
-  }, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
+  }, houseCtl, shareSlot)), infMode ? React.createElement(ExplainedInformalChart, {
+    house: house,
+    stateKey: stateKey,
+    classKey: classKey,
+    menu: headCtls
+  }) : twoMode ? React.createElement(Explained2ppChart, {
     house: house,
     stateKey: stateKey,
     classKey: classKey,
