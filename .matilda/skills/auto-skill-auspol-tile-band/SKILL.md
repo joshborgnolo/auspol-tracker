@@ -1,6 +1,6 @@
 ---
 name: auspol-tile-band
-description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes; canvas twin on html shipped 41bc58c, now a THREE-layer composite with --tide-fade/--tide-ground): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; strip painted TWICE coincident (html canvas for rubber-band overscroll + in-flow band), SVG art in --tile-art (light) / --tile-art-dark (dark is a REDRAWN palette, no multiply-dim anywhere since the ground scheme shipped); cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks; PLUS the boot-order lesson (73fb846): body.js must be added only by App's first-commit layout effect — set earlier it collapses the document and splash-paints the canvas tide art across the viewport on refresh; headless-Chrome pixel + rAF-cadence verification and the giant-line edit/probe gotchas
+description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes; canvas twin on html shipped 41bc58c, now a THREE-layer composite with --tide-fade/--tide-ground, gated behind html:has(body) since b865aa1a): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; strip painted TWICE coincident (html canvas for rubber-band overscroll + in-flow band), SVG art in --tile-art (light) / --tile-art-dark (dark is a REDRAWN palette, no multiply-dim anywhere since the ground scheme shipped); cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks; PLUS the boot-order lesson (73fb846): body.js must be added only by App's first-commit layout effect — set earlier it collapses the document and splash-paints the canvas tide art across the viewport on refresh; PLUS the pre-body parse-window lesson (b865aa1a): bare html's both-axes repeat is live before <body> exists, so the composite waits on html:has(body); headless-Chrome pixel + rAF-cadence verification and the giant-line edit/probe gotchas
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
@@ -17,13 +17,17 @@ files. Rebuild (`node .build/newtracker/build.mjs`) after editing.
 
 - CSS block at the very end of the template's main stylesheet (just before
   the final `</style>`): a descriptive comment, an **`html` rule** (declares
-  the `--tile-art` ~43KB data-URI line + `--tide-fade` + the three-layer
-  canvas composite — see "Canvas twin" below), `html:has(body.dark)` (dark
+  the `--tile-art` ~43KB data-URI line + `--tide-fade`/`--tide-ground` +
+  the solid ground colour and colour transition ONLY — since b865aa1a the
+  three-layer canvas composite itself hangs off a sibling `html:has(body)`
+  rule, because a frame painting between stylesheet parse and `<body>` has
+  no opaque body box to mask the both-axes repeat and the tide flashes
+  full-viewport; see "Canvas twin" below), `html:has(body.dark)` (dark
   ground/fade colours + `--tile-art-dark` swap), `.tile-band` (in-flow copy
   of the same strip), `.tile-band::before` melt gradient,
   `body.dark .tile-band { background-image: var(--tile-art-dark) }`, phone
-  media query (overrides BOTH html's middle-layer and the band's
-  `background-size: auto 320px`).
+  media query (overrides BOTH html:has(body)'s middle-layer and the band's
+  `background-size: auto 320px`, keeping the same gate selector).
 - One element in `<body>` **after `</noscript>`**:
   `<div class="tile-band" aria-hidden="true"></div>`. Body-level placement is
   deliberate; do NOT wrap it in a max-width container. Keep `aria-hidden`.
@@ -39,9 +43,28 @@ exist) — and body's opaque box is what hides it above the page end. Any
 state that shortens body below the viewport exposes tiled tide art across
 the screen; that is exactly what the boot-order bug below did.
 
-The current `html` rule is a THREE-layer composite over
-`background-color: var(--tide-ground)` (with a .35s background-color
-transition):
+**Since b865aa1a (2026-10-25) the composite hangs off `html:has(body)`, not
+bare `html`** — the second tide-flash class, beside the boot-order one
+below. Bare `html` paints from stylesheet parse, and until `<body>` parses
+there IS no opaque body box to mask the both-axes repeat, so a frame
+landing in the parse window drew the tide across the whole viewport (the
+intermittent "bunch of mostly blue lines" refresh flash; timing-dependent,
+so most probes never caught a frame). Bare `html` keeps only
+`--tile-art`/`--tile-art-dark`/`--tide-fade`/`--tide-ground`, the solid
+`background-color: var(--tide-ground)` and its .35s transition; the
+three-layer composite + its phone background-size override wait for
+`<body>`. No-JS still gets the art (body always exists); pre-`:has()`
+browsers lose only the overscroll art beneath the page box. Verifier:
+`.matilda/verify-tide-flash/pre-body-probe.mjs` (uncommitted) — serves
+HEAD and the working tree over a 4KB/15ms-trickled server and samples
+`getComputedStyle(documentElement).backgroundImage` at macrotask cadence
+from document-start: HEAD shows the tide in 174/414 pre-body samples, the
+gated tree in 0/423, and the composite still reaches steady state after
+the boot script's inline `h.style.background` cover clears. Pinned in
+`.build/test-ss-heights.mjs` (bare rule carries no composite, the gate
+does, the 640px override keeps the selector, both builds compile it).
+
+The three-layer composite itself (over the ground colour):
 
 - layer 1: `linear-gradient(--tide-fade,--tide-fade)` at
   `left top -3000px, 100% 3000px, no-repeat` — a plain ground block sitting
