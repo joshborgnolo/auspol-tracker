@@ -91,22 +91,23 @@ THE SEIFA-FIFTHS LANES (2026-10-24, user: add the ABS socio-economic
 cuts beside the AEC classifications in the explainer menu views;
 approved decisions: quintile bands, all three measures – this is the
 flows measure; IEO joined IRSAD the same day on "do what you did for
-irsad to ieo"): the same two counted products regrouped by the fifth of
+irsad to ieo", and IER later on "do the same for IER: 'Federal, by IER
+quintile'"): the same two counted products regrouped by the fifth of
 seats each election's ABS SEIFA ranks place a division in, one lane per
 index – seifa_quintiles.membership(y, ix) reads each index's
-disadvantage-ordered rank (IRSAD's rankDis, IEO's print-order rank),
-thirty seats a fifth, the 151-seat 2019/2022 chambers giving the spare
-seat to the most-advantaged fifth. The quintiles sit in the store's
-`seifa` block beside `classes`, in the same shapes
+advantage-ordered rank (IRSAD's rank, IEO's and IER's print-order ranks
+reflected), thirty seats a fifth, the 151-seat 2019/2022 chambers giving
+the spare seat to the most-disadvantaged fifth. The quintiles sit in the
+store's `seifa` block beside `classes`, in the same shapes
 (classes/allSeats over years 2001–2025 – the seifa store's floor), and
 gen-data merges them into the flowHistory classes bank after the four
 classification views, where every chart and menu reads them untouched
 (the fedClass machinery – classic rings before 2004, est diamonds – is
 shared at gen-data emit; only the captions fork on the record's seifa
-marker; each record carries its index as ix so the menu splits the two
-optgroups and the captions name the right index). The grouping functions
-parse()/allseats_for_year() take a label set as of the same change, so
-the lanes run the byte-identical derivation, never a clone.
+marker; each record carries its index as ix so the menu splits the
+three optgroups and the captions name the right index). The grouping
+functions parse()/allseats_for_year() take a label set as of the same
+change, so the lanes run the byte-identical derivation, never a clone.
 
 Writes data/fed-class-flows.json:
 { "source": …, "years": […], "classes": { "inner": { "label", "short",
@@ -122,8 +123,8 @@ null-free from 2004; its 1996–2001 per-bucket cells are null and its lump
 cells sum the classic buckets (no all-seats product exists for those
 years). Key order is the chart's: inner, outer, provincial, rural. The
 seifa block's classes/allSeats mirror those two shapes exactly, keyed
-q1..q5 (IRSAD) then e1..e5 (IEO) – ix tags each record's index – years
-2001–2025.
+q1..q5 (IRSAD) then e1..e5 (IEO) then r1..r5 (IER) – ix tags each
+record's index – years 2001–2025.
 
 Pinned by .build/test-fed-class-flows.mjs.
 """
@@ -230,7 +231,7 @@ def parse(year, class_of, labels=CLASSES):
     """Per-class bucket ballots: {class: {bucket: [to_alp, to_coalition]}}
     for the year's classic divisions; also (classic, total) division counts.
     labels is the grouping's label set – the AEC four classes by default;
-    main()'s IRSAD-fifth lane passes its quintile keys instead."""
+    main()'s SEIFA-fifth lanes pass their index's quintile keys instead."""
     per = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
     classic = 0
     if year <= 2001:

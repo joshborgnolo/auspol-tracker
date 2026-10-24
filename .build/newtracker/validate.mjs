@@ -1139,7 +1139,7 @@ export function validatePrimaryHistory() {
     const foldHere = (typeof v.foldPt === "number" && v.foldPt > 0 && v.foldPt <= 20) ? v.foldPt : FOLD;
     if (v.foldPt != null && foldHere !== v.foldPt) fail(where, "primary-history-shape", `bad record foldPt ${v.foldPt}`);
     if (v.seifa === true && v.foldPt == null) fail(where, "primary-history-shape", "a seifa fifth record carries no foldPt — its halved fold gate must be explicit");
-    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo") fail(where, "primary-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo)");
+    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier") fail(where, "primary-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
     for (const k of GATED) {
       if (v[k] == null) continue;
       if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "primary-history-shape", `${k} not aligned to years`); continue; }
@@ -1161,9 +1161,10 @@ export function validatePrimaryHistory() {
   else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
   for (const [st, v] of Object.entries((S.fed.sen && S.fed.sen.states) || {})) checkView(`fed.sen.${st}`, v);
   /* the seat-class views (House only): four AEC classifications riding
-     the divisions' 1996–2025 span, plus the ten SEIFA fifths (five per
-     index, IRSAD then IEO, each ix-tagged) on the index series' own
-     2001–2025 — a division rides its election's own grouping */
+     the divisions' 1996–2025 span, plus the fifteen SEIFA fifths (five
+     per index, IRSAD then IEO then IER, each ix-tagged) on the index
+     series' own 2001–2025 — a division rides its election's own
+     grouping */
   if (!S.fed.classes || typeof S.fed.classes !== "object") fail("primary-history.json", "primary-history-shape", "no fed.classes");
   else for (const [ck, v] of Object.entries(S.fed.classes)) {
     checkView(`fed.${ck}`, v);
@@ -1237,8 +1238,8 @@ export function validate2ppHistory() {
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa flag outside the classes bank");
       if (sect === "classes" && v.seifa === true && v.short !== undefined && typeof v.short !== "string")
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa record short is not a string");
-      if (sect === "classes" && v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo")
-        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo)");
+      if (sect === "classes" && v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier")
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
       if (Array.isArray(v.years) && v.years.length && (v.years[0] !== cutStart || v.years[v.years.length - 1] !== 2025))
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected ${v.seifa ? "the index series' 2001–2025" : "the AEC counts' 1996–2025"}`);
     }

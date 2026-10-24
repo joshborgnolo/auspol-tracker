@@ -74,9 +74,11 @@
    store's 2028 cells score unelected boundaries — never a cut year;
    pre-2001 holds no IRSAD or IEO block). Each index's membership is
    probed from data/division-seifa-indexes.json here (thirty seats a
-   fifth by rankDis — the IEO cells' plain rank keeps the same
-   1 = most-disadvantaged print order, no rankDis twin — the 151-seat
-   chambers' spare to the most-advantaged fifth; name anchors Bonython/
+   fifth by advantage-ordered rank — IRSAD's `rank` is already
+   advantaged-first; the IEO cells' plain rank keeps the
+   1 = most-disadvantaged print order, so it reflects n+1−rank — the
+   151-seat chambers' spare to the most-disadvantaged fifth; name
+   anchors Bonython/
    North Sydney 2001 on both, Lingiari/Banks 2025 on IRSAD plus IEO's
    own corner cases the same year), both lanes recompute from the same AEC caches
    keyed by each fifth (the leftover engine's census alone switches
@@ -564,40 +566,43 @@ CLASS_IDS.forEach((k) => {
    the IEO index's e1..e5 riding the same lanes). The store's seifa block
    mirrors the class lanes with each index's quintile membership of
    data/division-seifa-indexes.json standing in for the classification
-   store: the disadvantage-ranked cell (IRSAD's rankDis; the IEO cells'
-   plain rank keeps the same print order, 1 = most disadvantaged, and
-   carries no rankDis twin) ranks the chamber most-disadvantaged-first,
-   and ceil(rank/30) is the fifth (the 151-seat chambers' spare seat lands
-   in the most-advantaged fifth). The lanes run the index series' own
+   store: the advantage-ordered rank (IRSAD's `rank`, stored
+   advantaged-first; the IEO and IER cells' plain ranks keep the
+   1 = most-disadvantaged print order, reflected n+1−rank) ranks the
+   chamber most-advantaged-first, and ceil(rank/30) is the fifth (the
+   151-seat chambers' spare seat lands in the most-disadvantaged fifth).
+   The lanes run the index series' own
    span 2001–2025 — the block's 2028 forward cells score unelected
    boundaries, and the hollow column is 2001 alone (from 2004 the count
    covers every seat, exactly as the class lanes). */
-const QIDXES = { irsad: "q", ieo: "e" };   // index -> its keys' leading letter
+const QIDXES = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading letter
 const QUINT_IDS = ["q1", "q2", "q3", "q4", "q5"];
 const EOCTA_IDS = ["e1", "e2", "e3", "e4", "e5"];
-const SEIFA_IDS = [...QUINT_IDS, ...EOCTA_IDS];
+const RESOURCE_IDS = ["r1", "r2", "r3", "r4", "r5"];
+const SEIFA_IDS = [...QUINT_IDS, ...EOCTA_IDS, ...RESOURCE_IDS];
 const SEIFA_YEARS = YEARS.filter((y) => y >= 2001);
 /* id -> [label, short, desc]: the copy is shared between the indexes —
    mirrors seifa_quintiles.py's INDEX_META meta tuples; the index itself
    rides each record's ix tag and composes into the elections copy */
 const QUINT_META = {
-  1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
-  2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  1: ["Most-advantaged fifth", "Top fifth", "most-advantaged fifth"],
+  2: ["Second-most-advantaged fifth", "2nd fifth", "second-most-advantaged fifth"],
   3: ["Middle fifth", "Middle fifth", "middle fifth"],
-  4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
-  5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
+  4: ["Second-most-disadvantaged fifth", "4th fifth", "second-most-disadvantaged fifth"],
+  5: ["Most-disadvantaged fifth", "Bottom fifth", "most-disadvantaged fifth"],
 };
-const IDX_OF = (id) => id[0] === "q" ? "irsad" : "ieo";
-const IX_NAME = { irsad: "IRSAD", ieo: "IEO" };
-/* a cell's disadvantage-ordered rank: IRSAD's rankDis twin, or the plain
-   rank the IEO (and the store's rank-1-most-disadvantaged convention)
-   already prints */
-const rankDisOf = (ix, cell) => (ix === "irsad" ? cell.irsad.rankDis : cell[ix].rank);
-const fifthOf = (rd, ix) => `${QIDXES[ix]}${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+const IDX_OF = (id) => Object.keys(QIDXES).find((ix) => QIDXES[ix] === id[0]);
+const IX_NAME = { irsad: "IRSAD", ieo: "IEO", ier: "IER" };
+/* a cell's advantage-ordered rank: IRSAD stores its `rank` advantaged-
+   first (the rankDis twin is the misread the anchors pin against); the
+   IEO and IER cells print the 1-most-disadvantaged convention, so
+   reflect it (n+1−rank) */
+const rankAdvOf = (ix, cell, n) => (ix === "irsad" ? cell.irsad.rank : n + 1 - cell[ix].rank);
+const fifthOf = (ra, ix) => `${QIDXES[ix]}${Math.min(Math.floor((ra - 1) / 30) + 1, 5)}`;
 const seifaIdx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
 /* each index's membership, probed from the seifa store: every fifth is
    thirty seats (the 151-seat 2019/2022 chambers' spare joins the most-
-   advantaged fifth), the ranks are a permutation of 1..N, and the named
+   disadvantaged fifth), the ranks are a permutation of 1..N, and the named
    anchors stay on rung */
 const quintCell = {};        // ix -> year -> division name -> {id, state}
 for (const ix of Object.keys(QIDXES)) {
@@ -613,28 +618,40 @@ for (const ix of Object.keys(QIDXES)) {
     quintCell[ix][y] = {};
     ents.forEach(([nm, cell]) => {
       assert.ok(cell[ix] && cell[ix].rank != null, `${y} ${nm}: a ${IX_NAME[ix]} cell`);
-      const rd = rankDisOf(ix, cell);
-      assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: ${IX_NAME[ix]} rank in 1..${n}`);
-      ranks.push(rd);
-      const q = fifthOf(rd, ix);
+      const ra = rankAdvOf(ix, cell, n);
+      assert.ok(Number.isInteger(ra) && ra >= 1 && ra <= n, `${y} ${nm}: ${IX_NAME[ix]} rank in 1..${n}`);
+      ranks.push(ra);
+      const q = fifthOf(ra, ix);
       sizes[q] += 1;
       quintCell[ix][y][nm] = { id: q, state: cell.state };
     });
     assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
       `${y}: ${IX_NAME[ix]} ranks are a permutation of 1..${n}`);
     const want = {}; ids.forEach((q, i) => { want[q] = i === 4 ? n - 120 : 30; });
-    assert.deepEqual(sizes, want, `${y}: thirty seats a ${IX_NAME[ix]} fifth, the advantaged end the 151-seat balance`);
+    assert.deepEqual(sizes, want, `${y}: thirty seats a ${IX_NAME[ix]} fifth, the disadvantaged end the 151-seat balance`);
   });
-  const m1 = `${QIDXES[ix]}1`, m5 = `${QIDXES[ix]}5`, m4 = `${QIDXES[ix]}4`;
-  assert.equal(quintCell[ix]["2001"]["Bonython"].id, m1, `2001 Bonython: the most-disadvantaged ${IX_NAME[ix]} fifth`);
-  assert.equal(quintCell[ix]["2001"]["North Sydney"].id, m5, `2001 North Sydney: the most-advantaged ${IX_NAME[ix]} fifth`);
-  if (ix === "irsad") {
-    assert.equal(quintCell[ix]["2025"]["Lingiari"].id, m1, "2025 Lingiari: the most-disadvantaged IRSAD fifth");
+  const m1 = `${QIDXES[ix]}1`, m5 = `${QIDXES[ix]}5`, m2 = `${QIDXES[ix]}2`;
+  assert.equal(quintCell[ix]["2001"]["Bonython"].id, m5, `2001 Bonython: the most-disadvantaged ${IX_NAME[ix]} fifth`);
+  assert.equal(quintCell[ix]["2001"]["North Sydney"].id, m1, `2001 North Sydney: the most-advantaged ${IX_NAME[ix]} fifth`);
+  if (ix === "ieo") {
+    assert.equal(quintCell[ix]["2025"]["Lingiari"].id, `${QIDXES[ix]}4`, "2025 Lingiari: the second-most-disadvantaged IEO fifth");
   } else {
-    assert.equal(quintCell[ix]["2025"]["Lingiari"].id, `${QIDXES[ix]}2`, "2025 Lingiari: the second-most-disadvantaged IEO fifth");
+    assert.equal(quintCell[ix]["2025"]["Lingiari"].id, m5, `2025 Lingiari: the most-disadvantaged ${IX_NAME[ix]} fifth`);
   }
-  assert.equal(quintCell[ix]["2025"]["Banks"].id, m4, `2025 Banks: the second-most-advantaged ${IX_NAME[ix]} fifth`);
+  assert.equal(quintCell[ix]["2025"]["Banks"].id, m2, `2025 Banks: the second-most-advantaged ${IX_NAME[ix]} fifth`);
 }
+/* the IER lane's own anchors (the same pins seifa_quintiles.py's INDEX_META
+   gates the generator's membership on): Wide Bay, not Bonython, is 2001's
+   most-disadvantaged IER seat — the anchors differ per index precisely so
+   a cross-index rank read fails loudly; the 2025 Barker/Swan pair is the
+   boundary pin, dis-ranks 30/31 reflecting to the last two advantage
+   ranks (121/120) of the fourth fifth, so Barker closes the
+   most-disadvantaged fifth from above while Swan keeps the fourth — the
+   reflected read does NOT mirror the cut points seat-for-seat */
+assert.equal(quintCell.ier["2001"]["Wide Bay"].id, "r5", "2001 Wide Bay: IER's most-disadvantaged division (not Bonython, as IRSAD's)");
+assert.equal(quintCell.ier["2025"]["Barker"].id, "r5", "2025 Barker: the reflected rank-30 closes the most-disadvantaged IER fifth from above");
+assert.equal(quintCell.ier["2025"]["Swan"].id, "r4", "2025 Swan: the reflected rank-31 keeps the fourth IER fifth");
+assert.equal(quintCell.ier["2025"]["Mitchell"].id, "r1", "2025 Mitchell: IER's most-advantaged division");
 
 // the classic-basis lane recompute, keyed by each index's fifths (same
 // engines and filters as the class block's — only the grouping map changes)
@@ -753,8 +770,8 @@ SEIFA_YEARS.forEach((y, qi) => {
 // the store's seifa lanes match both recomputes, each index's fifths
 assert.ok(data.seifa && data.seifa.classes && data.seifa.allSeats, "the store carries the SEIFA-fifths lanes");
 assert.deepEqual(data.seifa.years, SEIFA_YEARS, "the index series' own span (2001–2025; the 2028 cells score unelected boundaries)");
-assert.deepEqual(Object.keys(data.seifa.classes), SEIFA_IDS, "IRSAD's q1..q5 then IEO's e1..e5, most-disadvantaged first");
-assert.deepEqual(Object.keys(data.seifa.allSeats), SEIFA_IDS, "the all-seats lane covers the same ten");
+assert.deepEqual(Object.keys(data.seifa.classes), SEIFA_IDS, "IRSAD's q1..q5, then IEO's e1..e5, then IER's r1..r5, most-advantaged first");
+assert.deepEqual(Object.keys(data.seifa.allSeats), SEIFA_IDS, "the all-seats lane covers the same fifteen");
 SEIFA_IDS.forEach((q) => {
   const ix = IDX_OF(q);
   const [label, short, desc] = QUINT_META[q[1]];
@@ -827,7 +844,7 @@ vm.runInNewContext(fs.readFileSync(path.join(ROOT, ".build", "newtracker", "asse
 const FH = sandbox.window.AUSPOL.flowHistory;
 assert.ok(FH.fed.classes, "flowHistory.fed.classes in the built data asset");
 assert.deepEqual(Object.keys(FH.fed.classes), [...CLASS_IDS, ...SEIFA_IDS],
-  "fed.classes carries the four class cuts, then the ten SEIFA fifths (IRSAD then IEO)");
+  "fed.classes carries the four class cuts, then the fifteen SEIFA fifths (IRSAD, then IEO, then IER)");
 CLASS_IDS.forEach((k) => {
   const got = FH.fed.classes[k];
   assert.equal(got.fedClass, true, `${k}: marked a federal class view`);
@@ -880,8 +897,15 @@ SEIFA_IDS.forEach((q) => {
 });
 /* the IEO fifths' own Green-flow runs, merged classic 2001 + all-seats
    2004+ exactly as the renderer draws them */
-assert.deepEqual([...FH.fed.classes.e1.grn], [64.7, 73.6, 73.7, 74.9, 77.7, 77, 76.2, 80.9, 82.9], "e1 Green flow (IEO most-disadvantaged fifth)");
-assert.deepEqual([...FH.fed.classes.e5.grn], [79.6, 84.2, 83.4, 81.9, 85.1, 84.1, 85, 88.5, 90.3], "e5 Green flow (IEO most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e1.grn], [79.6, 84.2, 83.4, 81.9, 85.1, 84.1, 85.1, 88.5, 90.3], "e1 Green flow (IEO most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e5.grn], [64.7, 73.6, 73.7, 74.9, 77.7, 77, 76.3, 80.9, 82.9], "e5 Green flow (IEO most-disadvantaged fifth)");
+/* the IER fifths' own Green-flow runs (economic resources beside the
+   education-and-occupation ladder), merged classic 2001 + all-seats 2004+
+   — the 2019/2022 values are the regenerated store's own, NOT a naive
+   swap of the shipped day's pair: a reflected fifth boundary moves one
+   151st seat, so the mirror trap bites at indices 6/7 here too */
+assert.deepEqual([...FH.fed.classes.r1.grn], [79.1, 83.8, 79.8, 78.9, 82.7, 81.2, 82, 85.6, 88.7], "r1 Green flow (IER most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.r5.grn], [73, 78.6, 79.9, 79.3, 83.9, 83.2, 83.8, 86.5, 87.5], "r5 Green flow (IER most-disadvantaged fifth)");
 assert.ok(!Object.keys(FH).includes("classes"), "classes nests under fed, never a chip key of its own");
 
 console.log("test-fed-class-flows: all assertions passed");

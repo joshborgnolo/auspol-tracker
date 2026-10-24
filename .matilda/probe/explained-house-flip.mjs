@@ -138,10 +138,11 @@ const SEN_META = "Australian Senate elections, 2016–2025";
        return h.bottom <= s.top + 1 && Math.abs(h.right - s.right) < 2;
      }));
   const m = await menuInfo(page);
-  ok("the menu carries the class entries, the IRSAD and IEO fifths and the state elections under Lower",
-     m.groups.length === 4 && m.groups[0] === "Federal elections" && m.groups[1] === "Federal, by IRSAD quintile"
-       && m.groups[2] === "Federal, by IEO quintile" && m.groups[3] === "State elections"
-       && m.options.filter((v) => v.startsWith("fedcl:")).length >= 5, JSON.stringify(m.groups) + " · " + m.options.length + " options");
+  ok("the menu carries the class entries, all three indexes' fifths and the state elections under Lower",
+     m.groups.length === 5 && m.groups[0] === "Federal elections" && m.groups[1] === "Federal, by IRSAD quintile"
+       && m.groups[2] === "Federal, by IEO quintile" && m.groups[3] === "Federal, by IER quintile"
+       && m.groups[4] === "State elections"
+       && m.options.filter((v) => v.startsWith("fedcl:")).length >= 10, JSON.stringify(m.groups) + " · " + m.options.length + " options");
   ok("…and the Legislative Council never appears under Lower", !m.options.includes("nswlc"), m.options.join(" "));
   ok("…and the eight federal states", (m.options.filter((v) => v.startsWith("fed:"))).length === 8,
      m.options.filter((v) => v.startsWith("fed:")).join(" "));
