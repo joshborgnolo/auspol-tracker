@@ -503,8 +503,8 @@ assert.ok(ap.includes('? lcKey === "nsw"')
     && ap.includes('One Nation ran no upper-house group in 2011 or 2015')
     && ap.includes('", every formal vote from " + S.srcLine + "."'),
   "NSW's Council caption keeps its ATL wording (below-the-line excluded, no-group years not zeroes); the full-formal banks name every formal vote");
-assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs rd-tabs-sm"'),
-  "the figure is a chart card opening on contest tabs (the compact rd-tabs-sm rung, 14px/0-10px), as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
+assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"'),
+  "the figure is a chart card opening on contest tabs (the DEFAULT rd-tabs rung - c6bd7f64's rd-tabs-sm compact rung reverted same-day, user: reverse the point-size decrease), as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
 /* 2026-10-23 (user, quoting the shipped layout: "View: / Preference
    flows / ⇄, should sit on top of 'Labor v Coalition / Labor v One
    Nation'"): the flip rides its own row above the contest tabs on BOTH
@@ -514,7 +514,7 @@ assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} d
    vote-share views the tabs shed and the row drops to their slot - the
    next block pins that) */
 assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
-    && ap.indexOf('className="ex-fl-viewrow"') < ap.indexOf('className="ex-fl-tabs rd-tabs-sm"')
+    && ap.indexOf('className="ex-fl-viewrow"') < ap.indexOf('className="ex-fl-tabs"')
     && ap.includes('viewCtl ? <div className="ex-fl-viewrow">{viewCtl}</div> : null'),
   "the flows view keeps the View: switch on its own row above the contest tabs");
 /* 2026-10-24 (user: "'Labor v Coalition / Labor v One Nation' menu bar
@@ -527,7 +527,7 @@ assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
    guard keeps <-/->'s scroll day job while no tabs exist to step. */
 assert.ok(ap.includes('<div className="ex-fl-viewrow ex-fl-tabslot">{viewCtl}')
     && ap.includes('{narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>}')
-    && ap.indexOf('ex-fl-tabslot') < ap.indexOf('className="ex-fl-tabs rd-tabs-sm"')
+    && ap.indexOf('ex-fl-tabslot') < ap.indexOf('className="ex-fl-tabs"')
     && ap.includes('<div className="ex-fl-viewrow ex-fl-vacate" aria-hidden="true">{viewCtl}</div>')
     && ap.includes('if (figView) return false;'),
   "a vote-share view sheds the contest tabs; View: drifts down to their row with the laptop's House:/Share: flips stacked beside it, the vacated top row height-held by an invisible twin (pair walk guarded off)");

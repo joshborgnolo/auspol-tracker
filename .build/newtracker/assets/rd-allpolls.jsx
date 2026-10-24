@@ -7238,7 +7238,7 @@ function RdExplained() {
               {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>}
             </div> : null
           ) : (
-            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs rd-tabs-sm"
+            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
                     options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
               {/* a laptop carries the pair as a two-line stack (House
                   directly above Share) at the row's right - 2026-10-24
