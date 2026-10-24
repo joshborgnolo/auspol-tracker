@@ -1,10 +1,10 @@
 """aec-primary-history.py – the national + per-state PRIMARY-VOTE history
 behind the /flows-explained/ chart's "View: Primary votes" flip.
 
-IRSAD and IEO fifths 2001–2025 ride beside the class cuts in fed.classes
-(seifa_quintiles membership, one lane per index; the quintile cell of a
-flow-history class is the mean of its division cells, so this script's
-per-division votes roll up the same way).
+IRSAD, IEO and IER fifths 2001–2025 ride beside the class cuts in
+fed.classes (seifa_quintiles membership, one lane per index; the quintile
+cell of a flow-history class is the mean of its division cells, so this
+script's per-division votes roll up the same way).
 
 One series per party family at every federal election, as % of formal first
 preferences: two majors always drawn, the era's named minors drawn only
@@ -463,10 +463,10 @@ def quint_shares():
 def fold_series(year_rows, fold_pt=FOLD_PT):
     """year_rows: {year: {bucket: pct}} with raw buckets (unaligned ok).
        Returns (years, {bucket: [values|None aligned to years]}).
-       fold_pt is FOLD_PT everywhere but the IRSAD-fifth lane: a fifth is
+       fold_pt is FOLD_PT everywhere but the SEIFA-fifth lanes: a fifth is
        30-31 seats where a bucket polling ~4% nationally lands 1.7–9%, so
        the shared 4% gate would knock out cells a class view of the same
-       size draws; the lane passes FOLD_PT/2 (quintile cells of a class
+       size draws; the lanes pass FOLD_PT/2 (quintile cells of a class
        view must fold to the class view's nulls, and the national gate
        stays untouched)."""
     years = sorted(year_rows)

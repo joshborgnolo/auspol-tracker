@@ -179,9 +179,11 @@ const CLASS_YEARS = [1996, 1998, 2001, ...AEC_YEARS];
    counted history – and neither index has a block before 2001) */
 const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
 const EOCTAS = ["e1", "e2", "e3", "e4", "e5"];
-const FIFTHS = [...QUINTS, ...EOCTAS];
-const IDX_OF = (id) => (id[0] === "q" ? "irsad" : "ieo");
-const IX_NAME = { irsad: "IRSAD", ieo: "IEO" };
+const RESOS = ["r1", "r2", "r3", "r4", "r5"];
+const FIFTHS = [...QUINTS, ...EOCTAS, ...RESOS];
+const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading letter
+const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
+const IX_NAME = { irsad: "IRSAD", ieo: "IEO", ier: "IER" };
 const SEIFA_YEARS = [2001, ...AEC_YEARS];
 const QUINT_COPY = {
   1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
@@ -192,7 +194,7 @@ const QUINT_COPY = {
 };
 assert.ok(FED.classes && !SEN.classes, "fed.classes exists; the Senate holds no classes");
 assert.deepEqual(Object.keys(FED.classes), [...CLASSES, ...FIFTHS],
-  "the four class cuts, then the IRSAD and IEO fifths, in menu order");
+  "the four class cuts, then the IRSAD, IEO and IER fifths, in menu order");
 CLASSES.forEach((ck) => assert.equal(FED.classes[ck].seifa, undefined, `${ck}: a class cut carries no seifa flag`));
 // the two per-cell readers shared by every pin section below
 const nulls = (arr, years) => years.filter((_, i) => arr[i] == null);
@@ -227,7 +229,7 @@ assert.ok(FED.classes.inner.onp[1] < FED.classes.outer.onp[1]
   && FED.classes.provincial.onp[1] < FED.classes.rural.onp[1],
   "1998 ONP: inner < outer < provincial < rural");
 
-// ---- the SEIFA fifths (IRSAD q1..q5, IEO e1..e5) --------------------------
+// ---- the SEIFA fifths (IRSAD q1..q5, IEO e1..e5, IER r1..r5) ----------
 /* shape and copy first (the ix tag names each lane's index), then the
    membership probe (this file's own reading of the seifa store, never
    the writers') and the per-cell pins */
@@ -243,22 +245,22 @@ FIFTHS.forEach((q) => {
   assert.equal(v.elections, `federal elections in the ${QUINT_COPY[q[1]][2]} of seats by ${IX_NAME[ix]} rank`,
     `${q} elections copy names the index`);
 });
-/* each index's disadvantage-order rank (IRSAD's rankDis twin; the IEO
-   cells' plain rank prints in the same 1 = most-disadvantaged order and
-   carries no rankDis twin) ranks each division 1..N most-disadvantaged-
+/* each index's disadvantage-order rank (IRSAD's rankDis twin; the IEO and
+   IER cells' plain rank prints in the same 1 = most-disadvantaged order
+   and carries no rankDis twin) ranks each division 1..N most-disadvantaged-
    first across THAT election's chamber; ceil(rank/30) is the fifth, so
    every fifth is thirty seats and the 151-seat 2019/2022 chambers' spare
    lands in the most-advantaged fifth (user call 2026-10-24) */
 const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
 const rankDisOf = (ix, cell) => (ix === "irsad" ? cell.irsad.rankDis : cell[ix].rank);
-const fifthOf = (ix, rd) => `${ix === "irsad" ? "q" : "e"}${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+const fifthOf = (ix, rd) => `${LANE[ix]}${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
 SEIFA_YEARS.forEach((y) => {
   const blk = SEIFA[String(y)];
   assert.ok(blk, `${y}: a seifa block`);
   const names = Object.keys(blk), n = names.length;
   assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
-  for (const ix of ["irsad", "ieo"]) {
-    const ids = ix === "irsad" ? QUINTS : EOCTAS;
+  for (const ix of Object.keys(LANE)) {
+    const ids = FIFTHS.filter((q) => IDX_OF(q) === ix);
     const sizes = Object.fromEntries(ids.map((q) => [q, 0]));
     const ranks = [];
     names.forEach((nm) => {
@@ -284,6 +286,16 @@ assert.equal(fifthOf("irsad", SEIFA["2025"]["Lingiari"].irsad.rankDis), "q1", "2
 assert.equal(fifthOf("irsad", SEIFA["2025"]["Banks"].irsad.rankDis), "q4", "2025 Banks: the second-most-advantaged IRSAD fifth");
 assert.equal(fifthOf("ieo", SEIFA["2001"]["Bonython"].ieo.rank), "e1", "2001 Bonython: the most-disadvantaged IEO fifth");
 assert.equal(fifthOf("ieo", SEIFA["2001"]["North Sydney"].ieo.rank), "e5", "2001 North Sydney: the most-advantaged IEO fifth");
+// the IER lane's own anchors (the pins seifa_quintiles.py gates the
+// generator on): Wide Bay, not Bonython, is 2001's most-disadvantaged
+// IER seat; the 2025 Barker/Swan pair is the boundary pin
+assert.equal(fifthOf("ier", SEIFA["2001"]["Wide Bay"].ier.rank), "r1", "2001 Wide Bay: the most-disadvantaged IER fifth");
+assert.equal(fifthOf("ier", SEIFA["2001"]["North Sydney"].ier.rank), "r5", "2001 North Sydney: the most-advantaged IER fifth");
+assert.equal(fifthOf("ier", SEIFA["2025"]["Lingiari"].ier.rank), "r1", "2025 Lingiari: the most-disadvantaged IER fifth (as IRSAD's, unlike IEO's second)");
+assert.equal(fifthOf("ier", SEIFA["2025"]["Banks"].ier.rank), "r4", "2025 Banks: the second-most-advantaged IER fifth");
+assert.equal(fifthOf("ier", SEIFA["2025"]["Barker"].ier.rank), "r1", "2025 Barker: rank 30 closes the most-disadvantaged IER fifth");
+assert.equal(fifthOf("ier", SEIFA["2025"]["Swan"].ier.rank), "r2", "2025 Swan: rank 31 opens the second IER fifth");
+assert.equal(fifthOf("ier", SEIFA["2025"]["Mitchell"].ier.rank), "r5", "2025 Mitchell: the most-advantaged IER fifth");
 // per-cell pins (recomputed from the committed sources at build; the
 // writer's own join and recomposition asserts gate the lane every run)
 assert.equal(cell(FED.classes.q1, "alp", 2025), 29.47);
@@ -344,6 +356,34 @@ assert.ok(FED.classes.e1.onp[8] > FED.classes.e2.onp[8] && FED.classes.e2.onp[8]
 // and 2025 (2.72) display at 2% where the page default would null them
 assert.equal(FED.classes.e5.onp[7], 2.02, "e5 ONP 2022: under 4%, shown at the fifths' fold");
 assert.equal(FED.classes.e5.onp[8], 2.72, "e5 ONP 2025: under 4%, shown");
+
+// ---- the IER fifths' own per-cell pins (recomputed from the committed
+//      sources at the same build) --------------------------------------
+assert.equal(cell(FED.classes.r1, "alp", 2025), 32.53);
+assert.equal(cell(FED.classes.r5, "alp", 2025), 31.3);
+assert.equal(cell(FED.classes.r1, "alp", 2001), 32.94);
+assert.equal(cell(FED.classes.r1, "lnp", 2001), 45.7);
+assert.equal(cell(FED.classes.r5, "lnp", 2001), 46.84);
+assert.equal(cell(FED.classes.r1, "grn", 2001), 4.08);
+assert.equal(cell(FED.classes.r5, "grn", 2025), 11.37);
+assert.equal(cell(FED.classes.r1, "onp", 2025), 7.21);
+assert.equal(cell(FED.classes.r5, "ind", 2025), 10.59);
+assert.equal(cell(FED.classes.r5, "dem", 2001), 6.85);
+// 2025 told across the IER fifths: economic resources draw no clean Labor
+// ladder (Labor peaks in the second-most-disadvantaged fifth at 37.75 and
+// its most-advantaged cell is the lowest, 31.3) — but the Coalition's and
+// One Nation's ladders are as strict as the other two indexes'
+assert.ok(FED.classes.r5.lnp[8] > FED.classes.r1.lnp[8] && FED.classes.r1.lnp[8] > FED.classes.r2.lnp[8]
+  && FED.classes.r5.lnp[8] - FED.classes.r2.lnp[8] > 6,
+  "2025 L/NP (IER): strongest in the most-advantaged fifth");
+assert.ok(FED.classes.r1.onp[8] > FED.classes.r2.onp[8] && FED.classes.r2.onp[8] > FED.classes.r3.onp[8]
+  && FED.classes.r3.onp[8] > FED.classes.r4.onp[8] && FED.classes.r4.onp[8] > FED.classes.r5.onp[8],
+  "2025 ONP (IER): falls with advantage");
+assert.ok(Math.min(FED.classes.r1.grn[8], FED.classes.r2.grn[8]) > Math.max(FED.classes.r3.grn[8], FED.classes.r4.grn[8], FED.classes.r5.grn[8]),
+  "2025 GRN (IER): strongest in the two most-disadvantaged fifths");
+// the tenth-fold at work on the IER side too: r5's One Nation 2022 (3.80)
+// displays at 2% where the page default would null it
+assert.equal(FED.classes.r5.onp[7], 3.8, "r5 ONP 2022: under 4%, shown at the fifths' fold");
 
 
 // ---- canonical national ALP / Coalition pins --------------------------------

@@ -419,23 +419,29 @@ assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(
 /* 2026-10-24 (user: show the ABS SEIFA data beside the AEC's class
    views; decisions: IRSAD fifths of thirty seats, all three measures;
    same day, "do what you did for irsad to ieo": the IEO index's same
-   five): the menu's class slice splits at the grouping change - seat
-   types stay in the federal optgroup and each index's fifths ride their
-   own optgroup ("Federal, by IRSAD quintile" / "Federal, by IEO
-   quintile"; the fifths' option faces are the bare positional names
-   "Top fifth" … "Bottom fifth" - the group label carries the index),
-   all three filtered off the same menuClassKeys the arrow walk steps */
+   five, then "do the same for IER": the IER index's five): the menu's
+   class slice splits at the grouping change - seat types stay in the
+   federal optgroup and each index's fifths ride their own optgroup
+   ("Federal, by IRSAD quintile" / "Federal, by IEO quintile" /
+   "Federal, by IER quintile"; the fifths' option faces are the bare
+   positional names "Top fifth" … "Bottom fifth" - the group label
+   carries the index), all four filtered off the same menuClassKeys the
+   arrow walk steps */
 assert.ok(ap.includes('const menuClassSeat = menuClassKeys.filter((k) => !classBank[k].seifa);')
     && ap.includes('const menuClassIrsad = menuClassKeys.filter((k) => classBank[k].ix === "irsad");')
     && ap.includes('const menuClassIeo = menuClassKeys.filter((k) => classBank[k].ix === "ieo");')
+    && ap.includes('const menuClassIer = menuClassKeys.filter((k) => classBank[k].ix === "ier");')
     && ap.includes('{menuClassSeat.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}')
     && ap.includes('{menuClassIrsad.length > 0 && (')
     && ap.includes('<optgroup label="Federal, by IRSAD quintile">')
     && ap.includes('{menuClassIrsad.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}')
     && ap.includes('{menuClassIeo.length > 0 && (')
     && ap.includes('<optgroup label="Federal, by IEO quintile">')
-    && ap.includes('{menuClassIeo.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}'),
-  "the class slice splits into the seat-types-in-federal list and one quintile optgroup per index (bare positional option faces), all three filtered off the one menuClassKeys the arrow walk steps");
+    && ap.includes('{menuClassIeo.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}')
+    && ap.includes('{menuClassIer.length > 0 && (')
+    && ap.includes('<optgroup label="Federal, by IER quintile">')
+    && ap.includes('{menuClassIer.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}'),
+  "the class slice splits into the seat-types-in-federal list and one quintile optgroup per index (bare positional option faces), all four filtered off the one menuClassKeys the arrow walk steps");
 /* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
    vote view - eg 'Federal, provincial'"): the primary view gains the same
    four seat-class cuts off its OWN bank (PH_HIST.fed.classes, counted by
