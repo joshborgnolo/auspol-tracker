@@ -5001,11 +5001,13 @@ const flowHistory = (() => {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     const CLASS_CUT = 2004;
     /* the lane reader: the four seat types (store classes/allSeats over
-       fcf.years) and the five IRSAD fifths (store seifa.classes/
-       seifa.allSeats over seifa.years — emitted into the SAME bank with
-       a seifa marker so the chart captions fork on S.seifa; every other
-       consumer sees one flat list of class views) run one mapping over
-       their own year arrays */
+       fcf.years) and the ten SEIFA fifths (store seifa.classes/
+       seifa.allSeats over seifa.years — five per index, each record's ix
+       tagging it "irsad"/"ieo" so the menu splits its two optgroups and
+       the captions name the right index — emitted into the SAME bank
+       with a seifa marker so the chart captions fork on S.seifa; every
+       other consumer sees one flat list of class views) run one mapping
+       over their own year arrays */
     const laneClasses = (classes, all, years, seifa) =>
       Object.fromEntries(Object.entries(classes).map(([k, s]) => {
         const A = (all || {})[k] || {};
@@ -5016,9 +5018,9 @@ const flowHistory = (() => {
         const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
         return [k,
           { label: s.label, short: s.short,
-            elections: seifa ? "federal elections in the " + s.desc + " of seats by IRSAD rank"
+            elections: seifa ? "federal elections in the " + s.desc + " of seats by " + s.ix.toUpperCase() + " rank"
                              : "federal elections in " + s.short + " seats",
-            fedClass: true, ...(seifa ? { seifa: true } : {}),
+            fedClass: true, ...(seifa ? { seifa: true, ix: s.ix } : {}),
             hollowYears: years.filter((y) => y < CLASS_CUT),
             years: [...years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
             lump: A.lump ? [...A.lump] : null,
