@@ -44,13 +44,26 @@ v(C) = sum(score * w) / sum(w), per index independently (units without a
 score drop out of BOTH numerator and denominator for that index only).
 
 Interpolable elections are the six bracketed-in-time ones: 2004, 2007,
-2010, 2013, 2016, 2019. This build covers the CONCORDANCE lanes — 2013,
-2016, 2019 —; the CD-era elections 2004/2007/2010 (c1 = 2006c/2011c
-against 2003/2006/2009-edition CEDs) additionally need CED-edition
-polygons, gated on map-api.aec.gov.au DNS recovery (outage 2026-10-23+),
-and keep their oracle lanes (2006c x 2006ed vs APH RP09rp02; the
-2011c x 2010-edition recon) with them — emitted placeholders for those
-three elections say why, never fake values.
+2010, 2013, 2016, 2019. The 2013/2016/2019 CONCORDANCE lanes above are
+joined by the CD-era lanes (2026-10-25), whose c1 sides ride the era
+polygon sets staged and verified by derive-ced-era-alloc.py (AEC Wayback
+"Election 2003 boundary set" COM20040430_elb.zip, "January 2007"
+COM20070521_elb.zip, live "National / 2010" national-esri-2010.zip) — no
+ABS product ever shipped census units on those editions, so the
+allocations are computed spatially (6x6 grid majority, group-plurality
+rescue of coast-clipped island units):
+
+  2004 (2004-10-09; CED 2003 edition; store c0 = aph05cib01, 2001c)
+    c1 2006c — the 2006 CD SEIFA cube whole-allocated to the 2003-edition
+      CEDs (seifa-src/cd-2006-ced-2003ed.json), weighted by each CD's
+      usual-resident population.
+  2007 (2007-11-24; CED 2006 edition; store c0 = aph09rp02, 2006c)
+    c1 2011c — the 2011 SA1 cube whole-allocated to the 2006-edition
+      CEDs (seifa-src/sa1-2011-ced-2006ed.json), weighted by urp2011.
+  2010 (2010-08-21; CED 2010 set; store c0 = aph11rp01, 2006c)
+    c1 2011c — the 2011 SA1 cube whole-allocated to the 2010-election
+      boundary set (seifa-src/sa1-2011-ced-2010ed.json), weighted by
+      urp2011.
 
 CG layout (verified 2026-10-24 against the staged files in
 .matilda/seifa-irsad-abs/dl): ABS banner rows sit above the real header,
@@ -87,6 +100,7 @@ import json
 import math
 
 import openpyxl
+import xlrd
 
 HERE = __file__.rsplit("/seat-model/", 1)[0] + "/seat-model"
 PROJ = HERE.rsplit("/.build/", 1)[0]
@@ -117,18 +131,12 @@ CENSUS_NIGHT = {2001: datetime.date(2001, 8, 7),
                 2021: datetime.date(2021, 8, 10)}
 
 ELECTIONS = {
+    "2004": {"date": datetime.date(2004, 10, 9), "c0": 2001, "c1": 2006},
+    "2007": {"date": datetime.date(2007, 11, 24), "c0": 2006, "c1": 2011},
+    "2010": {"date": datetime.date(2010, 8, 21), "c0": 2006, "c1": 2011},
     "2013": {"date": datetime.date(2013, 9, 7), "c0": 2011, "c1": 2016},
     "2016": {"date": datetime.date(2016, 7, 2), "c0": 2011, "c1": 2016},
     "2019": {"date": datetime.date(2019, 5, 18), "c0": 2016, "c1": 2021},
-}
-
-PENDING_POLYGONS = {
-    "2004": "c1 = 2006 census x 2003-edition CEDs — needs the 2003 "
-            "redistribution polygons (map-api.aec.gov.au DNS outage, watch running)",
-    "2007": "c1 = 2011 census x 2006-edition CEDs — needs the 2006 "
-            "redistribution polygons (same outage)",
-    "2010": "c1 = 2011 census x 2009-edition CEDs — needs the 2010 "
-            "boundary-set polygons (same outage)",
 }
 
 
@@ -193,6 +201,57 @@ def read_cg_csv_16_21(path):
                     (row["SA1_CODE_2021"], r))
     print(f"cg {path.rsplit('/', 1)[-1]} -> {len(out)} from-keys, "
           f"{sum(len(v) for v in out.values())} links")
+    return out
+
+
+# ------------------------------------------------------------- 2006 CD cube
+
+def load_cd_cube2006():
+    """2001/2006-era CD SEIFA cube (Table 1, xlrd .xls) ->
+    {7digit CD code: {idx: (score|None, decile|None), 'urp': float}}.
+    Columns resolved by printed title, the ABS-lane rule — never
+    positional (editions reshuffle the index lead)."""
+    wb = xlrd.open_workbook(f"{ABS_CACHE}/abs-seifa-2006-cd-indexes.xls")
+    sh = wb.sheet_by_name("Table 1")
+    title_row = sh.row_values(4)
+    cols = ablane.resolve_cols(title_row, IDX)
+    urp_col = next(i for i, t in enumerate(title_row)
+                   if t and "USUAL RESIDENT POPULATION"
+                   in " ".join(str(t).upper().split()))
+    out = {}
+    for r in range(6, sh.nrows):
+        v = sh.row_values(r)
+        if len(v) <= urp_col or not isinstance(v[0], float):
+            continue
+        rec = {"urp": float(v[urp_col]) if isinstance(v[urp_col], float) else 0.0}
+        for idx in IDX:
+            rec[idx] = (v[cols[idx][0]] if isinstance(v[cols[idx][0]], float) else None,
+                        v[cols[idx][1]] if isinstance(v[cols[idx][1]], float) else None)
+        out[str(int(v[0]))] = rec
+    print(f"seifa2006 CD cube (Table 1): {len(out)} rows, columns resolved by title")
+    return out
+
+
+# -------------------------------------------------------- era-alloc lanes
+
+def era_links(alloc_file, pop_of):
+    """A whole-unit era allocation JSON (derive-ced-era-alloc.py:
+    {unit: division name}) -> links {unit: [(division name, 1.0)]},
+    populated units only — a zero-population island/balancing unit would
+    divide its division's numerator by nothing downstream."""
+    with open(f"{HERE}/seifa-src/{alloc_file}") as fh:
+        alloc = json.load(fh)["alloc"]
+    return {u: [(nm, 1.0)] for u, nm in alloc.items() if pop_of(u) > 0}
+
+
+def name_rows(means, klass_year, tag):
+    """Division-NAME keyed lattice rows (era allocations carry names,
+    never codes) -> NAME-EXACT joined against the election's
+    classification block before any emit, the same law the code-keyed
+    concordance lanes carry."""
+    out = {ablane.MC_NORM.get(nm, nm): vals for nm, vals in means.items()}
+    assert len(out) == len(means), f"{tag}: MC-normalisation collision"
+    ablane.name_join(tag, out, klass_year)
     return out
 
 
@@ -413,34 +472,70 @@ def main():
     pct_19c1 = {idx: rank_pct({d: vals[idx] for d, vals in rows19c1.items()}, "e2019c1")
                 for idx in IDX}
 
+    # ------------------------------------------------ 2004 c1 — 2006 CD cube x 2003-edition CEDs
+    cube06 = load_cd_cube2006()
+    urp06 = {u: rec["urp"] for u, rec in cube06.items()}
+    links_04c1 = era_links("cd-2006-ced-2003ed.json", lambda u: urp06.get(u, 0.0))
+    means_04c1, dec_04c1 = weighted_means(cube06.get, lambda u: urp06.get(u, 0.0),
+                                          links_04c1, "e2004c1")
+    national_decile_sanity("e2004c1", dec_04c1)
+    rows04c1 = name_rows(means_04c1, klass["2004"], "e2004c1")
+    gross_shape("e2004c1", rows04c1, lambda k: k)
+    pct_04c1 = {idx: rank_pct({d: vals[idx] for d, vals in rows04c1.items()}, "e2004c1")
+                for idx in IDX}
+
+    # ------------------------------------------------ 2007 c1 — 2011 SA1 cube x 2006-edition CEDs
+    links_07c1 = era_links("sa1-2011-ced-2006ed.json", lambda u: urp11.get(u, 0.0))
+    means_07c1, dec_07c1 = weighted_means(scores11, lambda u: urp11.get(u, 0.0),
+                                          links_07c1, "e2007c1")
+    national_decile_sanity("e2007c1", dec_07c1)
+    rows07c1 = name_rows(means_07c1, klass["2007"], "e2007c1")
+    gross_shape("e2007c1", rows07c1, lambda k: k)
+    pct_07c1 = {idx: rank_pct({d: vals[idx] for d, vals in rows07c1.items()}, "e2007c1")
+                for idx in IDX}
+
+    # ------------------------------------------------ 2010 c1 — 2011 SA1 cube x 2010-election set
+    links_10c1 = era_links("sa1-2011-ced-2010ed.json", lambda u: urp11.get(u, 0.0))
+    means_10c1, dec_10c1 = weighted_means(scores11, lambda u: urp11.get(u, 0.0),
+                                          links_10c1, "e2010c1")
+    national_decile_sanity("e2010c1", dec_10c1)
+    rows10c1 = name_rows(means_10c1, klass["2010"], "e2010c1")
+    gross_shape("e2010c1", rows10c1, lambda k: k)
+    pct_10c1 = {idx: rank_pct({d: vals[idx] for d, vals in rows10c1.items()}, "e2010c1")
+                for idx in IDX}
+
     # ------------------------------------------------ measured sides (from the store)
+    pct_04c0 = {idx: measured_pct(store["2004"], idx) for idx in IDX}
+    pct_07c0 = {idx: measured_pct(store["2007"], idx) for idx in IDX}
+    pct_10c0 = {idx: measured_pct(store["2010"], idx) for idx in IDX}
     pct_13c0 = {idx: measured_pct(store["2013"], idx) for idx in IDX}
     pct_16c1 = {idx: measured_pct(store["2016"], idx) for idx in IDX}
     pct_19c0 = {idx: measured_pct(store["2019"], idx) for idx in IDX}
 
     # ------------------------------------------------ assemble + emit
-    f13 = interp_f(ELECTIONS["2013"]["date"], 2011, 2016)
-    f16 = interp_f(ELECTIONS["2016"]["date"], 2011, 2016)
-    f19 = interp_f(ELECTIONS["2019"]["date"], 2016, 2021)
+    lanerows = {
+        "2004": (pct_04c0, pct_04c1), "2007": (pct_07c0, pct_07c1),
+        "2010": (pct_10c0, pct_10c1), "2013": (pct_13c0, pct_13c1),
+        "2016": (pct_16c0, pct_16c1), "2019": (pct_19c0, pct_19c1),
+    }
+    measured_side = {"2004": pct_04c0, "2007": pct_07c0, "2010": pct_10c0,
+                     "2013": pct_13c0, "2016": pct_16c1, "2019": pct_19c0}
     elections, sizes = {}, {}
-    blk, n = election_block("2013", pct_13c0, pct_13c1, f13, None, None,
-                            klass["2013"], "e2013")
-    elections["2013"], sizes["2013"] = blk, n
-    blk, n = election_block("2016", pct_16c0, pct_16c1, f16, None, None,
-                            klass["2016"], "e2016")
-    elections["2016"], sizes["2016"] = blk, n
-    blk, n = election_block("2019", pct_19c0, pct_19c1, f19, None, None,
-                            klass["2019"], "e2019")
-    elections["2019"], sizes["2019"] = blk, n
+    for y in sorted(lanerows):
+        p0, p1 = lanerows[y]
+        f = interp_f(ELECTIONS[y]["date"], ELECTIONS[y]["c0"], ELECTIONS[y]["c1"])
+        blk, n = election_block(y, p0, p1, f, None, None, klass[y], f"e{y}")
+        elections[y], sizes[y] = blk, n
 
-    assert sizes == {"2013": 150, "2016": 150, "2019": 151}, \
-        f"division counts {sizes} — expected 150/150/151"
+    assert sizes == {"2004": 150, "2007": 150, "2010": 150,
+                     "2013": 150, "2016": 150, "2019": 151}, \
+        f"division counts {sizes} — expected 150/150/150/150/150/151"
 
     # rank-delta logging: pcti vs the store's measured pct — the movement
     # the interpolation proposes, surfaced so the tests (and a reviewer)
     # can pin the shape. Median and top-3 movers per election per index.
-    for y, side_measured in (("2013", pct_13c0), ("2016", pct_16c1),
-                             ("2019", pct_19c0)):
+    for y in sorted(elections):
+        side_measured = measured_side[y]
         for idx in IDX:
             deltas = sorted(
                 ((abs(elections[y][d][idx]["pcti"] - side_measured[idx][d]), d)
@@ -458,17 +553,39 @@ def main():
                        "SEIFA standing. pct(idx) = within-chamber percentile rank "
                        "(rankDis/N, 1/N = most disadvantaged) computed on each "
                        "bracketing census' own geometry, blended by census-night "
-                       "distance, pcti = (1-f)*pct0 + f*pct1. The c0 side is the "
-                       "measured store row (read back, never re-derived); the c1 "
-                       "side is the new concordance lattice. Measured-only "
-                       "elections (2001/2022/2025) carry no pcti. Regenerate: "
+                       "distance, pcti = (1-f)*pct0 + f*pct1. One side of each "
+                       "election is the measured store row, read back and never "
+                       "re-derived (the c0 side for 2004/2007/2010/2013/2019, the "
+                       "c1 side for 2016, whose census sat five weeks after "
+                       "election day); the other side is the new lattice "
+                       "(concordance-based for the 2013/2016/2019 lanes, "
+                       "era-polygon whole-unit allocations for 2004/2007/2010 — "
+                       "derive-ced-era-alloc.py). Measured-only elections "
+                       "(1998/2001/2022/2025/2028) carry no pcti. Regenerate: "
                        "python3 .build/analysis/seat-model/derive-division-seifa-interp.py",
-            "percentile": "rankDis/N — 1/N = MOST disadvantaged, N/N = most ",
+            "percentile": "rankDis/N — 1/N = MOST disadvantaged, N/N = most "
+                          "advantaged",
             "censusNights": {str(y): CENSUS_NIGHT[y].isoformat()
-                              for y in (2011, 2016, 2021)},
+                              for y in sorted(CENSUS_NIGHT)},
         },
-        "_pending": {"elections": PENDING_POLYGONS},
         "_provenance": {
+            "e2004c1": {"title": "2006 CD SEIFA cube whole-allocated to the "
+                                 "2003-edition CEDs (derive-ced-era-alloc.py "
+                                 "cd-2006-ced-2003ed.json — the AEC 'Election "
+                                 "2003 boundary set' COM20040430_elb.zip via "
+                                 "Wayback), weighted by CD usual-resident "
+                                 "population"},
+            "e2007c1": {"title": "SA1 2011 SEIFA cube whole-allocated to the "
+                                 "2006-edition CEDs (derive-ced-era-alloc.py "
+                                 "sa1-2011-ced-2006ed.json — the AEC January "
+                                 "2007 national set COM20070521_elb.zip via "
+                                 "Wayback), weighted by urp2011"},
+            "e2010c1": {"title": "SA1 2011 SEIFA cube whole-allocated to the "
+                                 "2010-election CEDs (derive-ced-era-alloc.py "
+                                 "sa1-2011-ced-2010ed.json — the live GIS "
+                                 "page's national-esri-2010.zip; ABS CED_2011 "
+                                 "oracle-agreeing bar 69 straddler SA1s), "
+                                 "weighted by urp2011"},
             "e2013c1": {"title": "SA1 2016 SEIFA cube composed into CED_2011 via "
                                  "CG_SA1_2011_SA1_2016 x CG ratios weighted by "
                                  "urp2011, CED membership 1270055003_ced_2011"},
@@ -480,11 +597,9 @@ def main():
                                  "on 2016 census counts; division grain absorbs it)",
                         "files": ["CG_SA1_2016_SA1_2021.csv", "1270055003_ced_2018"]},
         },
-        "factors": {
-            "2013": {"date": "2013-09-07", "c0": 2011, "c1": 2016, "f": f_desc("2013")},
-            "2016": {"date": "2016-07-02", "c0": 2011, "c1": 2016, "f": f_desc("2016")},
-            "2019": {"date": "2019-05-18", "c0": 2016, "c1": 2021, "f": f_desc("2019")},
-        },
+        "factors": {y: {"date": ELECTIONS[y]["date"].isoformat(),
+                        "c0": ELECTIONS[y]["c0"], "c1": ELECTIONS[y]["c1"],
+                        "f": f_desc(y)} for y in sorted(ELECTIONS)},
         "elections": elections,
     }
     with open(OUT_JSON, "w", encoding="utf-8") as fh:

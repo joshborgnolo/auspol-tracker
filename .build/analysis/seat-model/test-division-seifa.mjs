@@ -96,28 +96,32 @@
       census, same boundaries, different papers). Values only — ranks move
       between an N=148 and an N=150 ranking universe.
   13. The percentile layer (2026-10-24 pcti directive): EVERY index cell of
-      every election carries pct = rankDis/N rounded to 6dp, and the three
-      shipped interp elections (2013/2016/2019 — their bracketing censuses
-      are SA1-era; the CD-era 2004/2007/2010 division lanes wait on banned
-      redistribution polygons) additionally carry pcti on all four
-      indexes, no other election any. f recomputes from census-night
-      daycounts; the measured side (2016's is pct1 — the census sat five
-      weeks AFTER election day) matches rankDis/N on the nose; pcti
-      re-derives bit-exact from the lattice's r6 cells at f and sits in
-      (0,1]; store cells match .build/analysis/seat-model/seifa-src/
-      div-interp.json cell-for-cell. Booth lanes cover the full 2004–2019
-      span (test-booth-seifa-hist.mjs), which is why the five remaining
-      division lanes stay exotic here.
-  14. Literal pcti anchors: seven cells (Dawson's mining-boom fade 2013,
-      Solomon 2019's IER slide, Lingiari 2019 terminal on both census
-      sides, Macnamara 2019 stable) pinned to the lattice's first green
-      run — a lattice swap re-derives a self-consistent but wrong pct set,
-      so these moves are deliberate re-pinning only.
+      every election carries pct = rankDis/N rounded to 6dp, and the six
+      census-bracketed elections (2004/2007/2010 on the CD-polygon era
+      lanes plus 2013/2016/2019 on the SA1 concordance lanes) additionally
+      carry pcti on all four indexes, no other election any. f recomputes
+      from census-night daycounts; the measured side (2016's is pct1 —
+      the census sat five weeks AFTER election day) matches rankDis/N on
+      the nose; pcti re-derives bit-exact from the lattice's r6 cells at
+      f and sits in (0,1]; store cells match .build/analysis/seat-model/
+      seifa-src/div-interp.json cell-for-cell. Booth lanes cover the full
+      2004–2019 span (test-booth-seifa-hist.mjs).
+  14. Literal pcti anchors: eleven cells (Lingiari 2004 irsd both-sides-
+      terminal, Melbourne 2004's IER flip, Solomon 2007, Moncrieff 2010,
+      Dawson's mining-boom fade 2013, Solomon 2019's IER slide, Lingiari
+      2019 terminal on both census sides, Macnamara 2019 stable) pinned
+      to the lattice's green runs — a lattice swap re-derives a self-
+      consistent but wrong pct set, so these moves are deliberate
+      re-pinning only.
   15. Rank-delta bands: interpolation must move the median division only a
-      little (median |pcti − measured side| < 0.03, max < 0.25) except the
-      2016 lane, whose census sat five weeks out (< 0.002 / < 0.015) —
-      real movement (growth suburbs, mining seats) may be large, silent
-      formula drift may not be.
+      little, while real movement (growth suburbs, mining seats) may be
+      large. The SA1-concordance lanes (2013/2019) hold median |pcti −
+      measured side| < 0.03, max < 0.25; 2016's census sat five weeks out
+      (< 0.002 / < 0.015); the CD-era lanes (2004/2007/2010) run wider
+      (< 0.08 / < 0.50) — whole-unit CD/SA1-to-era-polygon allocation is
+      coarser than concordance weighting and their f leans away from the
+      measured side, so their honest deltas are bigger; the bands still
+      catch silent formula drift.
 
    The extractor runs standalone from the repo root:
      node .build/analysis/seat-model/extract-division-seifa.mjs
@@ -440,22 +444,22 @@ for (const via of Object.keys(fixtures)) {
 
 // 13 — the percentile layer (2026-10-24 pcti directive). EVERY index cell in
 // every election carries pct = rankDis/N rounded to 6dp (rankDis is the
-// store convention, 1/N most disadvantaged). The three shipped interp lanes
-// (2013/2016/2019) additionally carry pcti on all four indexes; NO other
-// election carries pcti (the CD-era 2004/2007/2010 wait on polygons), and
-// wherever div-interp.json's measured side is, pct side == rankDis/N on the
-// nose. pcti itself is recomputed here from the LATTICE file's own cells and
+// store convention, 1/N most disadvantaged). The six shipped interp lanes
+// (2004/2007/2010 CD-era plus 2013/2016/2019 SA1-era) additionally carry
+// pcti on all four indexes; NO other election carries pcti, and wherever
+// div-interp.json's measured side is, pct side == rankDis/N on the nose.
+// pcti itself is recomputed here from the LATTICE file's own cells and
 // f — a splice defect in the extractor (wrong division, wrong side, wrong
 // election) surfaces as a pcti mismatch; a wholesale lattice drift surfaces
 // as a literal-pin break in invariant 14.
 const INTERP_SRC = ".build/analysis/seat-model/seifa-src/div-interp.json";
 const interp = JSON.parse(readFileSync(INTERP_SRC, "utf8"));
-const INTERP_YEARS = ["2013", "2016", "2019"];
-const MEASURED = { 2013: "pct0", 2016: "pct1", 2019: "pct0" };
-const CENSUS_DATE = { 2011: Date.UTC(2011, 7, 9), 2016: Date.UTC(2016, 7, 9), 2021: Date.UTC(2021, 7, 10) };
-const ELEC_DATE = { 2013: Date.UTC(2013, 8, 7), 2016: Date.UTC(2016, 6, 2), 2019: Date.UTC(2019, 4, 18) };
+const INTERP_YEARS = ["2004", "2007", "2010", "2013", "2016", "2019"];
+const MEASURED = { 2004: "pct0", 2007: "pct0", 2010: "pct0", 2013: "pct0", 2016: "pct1", 2019: "pct0" };
+const CENSUS_DATE = { 2001: Date.UTC(2001, 7, 7), 2006: Date.UTC(2006, 7, 8), 2011: Date.UTC(2011, 7, 9), 2016: Date.UTC(2016, 7, 9), 2021: Date.UTC(2021, 7, 10) };
+const ELEC_DATE = { 2004: Date.UTC(2004, 9, 9), 2007: Date.UTC(2007, 10, 24), 2010: Date.UTC(2010, 7, 21), 2013: Date.UTC(2013, 8, 7), 2016: Date.UTC(2016, 6, 2), 2019: Date.UTC(2019, 4, 18) };
 check(JSON.stringify(Object.keys(interp.elections).sort()) === JSON.stringify(INTERP_YEARS),
-  `div-interp elections ${Object.keys(interp.elections)} != [2013, 2016, 2019] (CD-era lanes must land here, not silently)`);
+  `div-interp elections ${Object.keys(interp.elections)} != [2004, 2007, 2010, 2013, 2016, 2019] (a lane must land here, never silently)`);
 {
   const DAY = 86400000;
   const F_WANT = {};
@@ -502,15 +506,22 @@ for (const y of ELECTION_SET) {
   }
 }
 
-// 14 — literal pcti anchors, transcribed from the lattice's first green run
-// (2026-10-24): the movement-shaped cells (Dawson's mining-boom fade 2013,
-// Solomon 2019), a both-ranks-terminal cell (Lingiari 2019, most
-// disadvantaged on both census sides, pcti exactly pct), and a stable cell
-// (Macnamara 2019: both sides rank 135/151). These catch lattice drift the
-// formula checks above are blind to (a lattice swap re-derives a self-
-// consistent but wrong pct set — these literals must not move without a
-// deliberate re-pinning).
+// 14 — literal pcti anchors, transcribed from the lattice's green runs
+// (2013/2016/2019 cells from the first run 2026-10-24; the CD-era cells
+// added 2026-10-25 with the era lanes): the movement-shaped cells
+// (Lingiari 2004 falling to 1/150 by the 2006 census lattice, Melbourne
+// 2004's IER slide out of the top decile, Solomon 2007, Moncrieff 2010,
+// Dawson's mining-boom fade 2013, Solomon 2019), a both-ranks-terminal
+// cell (Lingiari 2019, most disadvantaged on both census sides, pcti
+// exactly pct), and a stable cell (Macnamara 2019: both sides rank
+// 135/151). These catch lattice drift the formula checks above are blind
+// to (a lattice swap re-derives a self-consistent but wrong pct set —
+// these literals must not move without a deliberate re-pinning).
 const PCTI_PIN = [
+  ["2004", "Lingiari", "irsd", 0.013333, 0.006667, 0.009104],
+  ["2004", "Melbourne", "ier", 0.833333, 0.113333, 0.376584],
+  ["2007", "Solomon", "irsd", 0.526667, 0.726667, 0.578446],
+  ["2010", "Moncrieff", "ier", 0.666667, 0.246667, 0.327816],
   ["2013", "Dawson", "irsd", 0.626667, 0.4, 0.532378],
   ["2013", "Dawson", "ier", 0.746667, 0.4, 0.60246],
   ["2016", "Gellibrand", "irsad", 0.38, 0.586667, 0.582369],
@@ -531,9 +542,16 @@ for (const [y, name, idx, pct0, pct1, pcti] of PCTI_PIN) {
 // 15 — rank-delta band: interpolation must move the median division only a
 // little (the census sides drift years apart, never contests), while real
 // movement (growth suburbs, mining seats) may be large. Bands chosen from
-// the first green run's medians ×3 head-room; the 2016 census sat five
-// weeks after the election, so that lane's whole move is bounded tiny.
+// the green runs' medians ×3 head-room; the 2016 census sat five weeks
+// after the election, so that lane's whole move is bounded tiny. The
+// CD-era lanes (2004/2007/2010) run wider bands than the SA1-concordance
+// lanes: whole-unit CD/SA1-to-era-polygon allocation is coarser than
+// concordance weighting, and 2004 (f=0.634) / 2010 (f=0.807) lean away
+// from their measured side, so honest deltas reach ~0.072 median and
+// ~0.457 max (2004:ier Melbourne); 2007 (f=0.259) stays close to its
+// measured side. First-era-run medians/maxes sit under these bands.
 {
+  const isEraLane = (y) => y === "2004" || y === "2007" || y === "2010";
   const deltasPer = (y, idx, side) => Object.keys(interp.elections[y])
     .map((n) => Math.abs(interp.elections[y][n][idx].pcti - interp.elections[y][n][idx][side]));
   for (const y of INTERP_YEARS) {
@@ -541,8 +559,8 @@ for (const [y, name, idx, pct0, pct1, pcti] of PCTI_PIN) {
     for (const idx of IDX4) {
       const ds = deltasPer(y, idx, side).sort((a, b) => a - b);
       const median = ds[Math.floor(ds.length / 2)], max = ds[ds.length - 1];
-      const medBand = y === "2016" ? 0.002 : 0.03;
-      const maxBand = y === "2016" ? 0.015 : 0.25;
+      const medBand = y === "2016" ? 0.002 : isEraLane(y) ? 0.08 : 0.03;
+      const maxBand = y === "2016" ? 0.015 : isEraLane(y) ? 0.5 : 0.25;
       check(median < medBand, `${y} ${idx}: median |pcti-${side}| ${median.toFixed(4)} outside ${medBand}`);
       check(max < maxBand, `${y} ${idx}: max |pcti-${side}| ${max.toFixed(4)} outside ${maxBand}`);
     }

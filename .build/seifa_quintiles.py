@@ -25,12 +25,12 @@ straight:
   linearly interpolated between the bracketing censuses at the election
   date (cell pcti = (1−f)·pct0 + f·pct1, f the election's day-share of
   the census-to-census interval) – wherever the store ships one (the
-  store's _pcti factor years, 2013/2016/2019 today; the CD-era
-  2004/2007/2010 division lanes join here when their banned-period CED
-  polygons land). Those years the membership ranks pcti DESCENDING
-  (the most advantaged percentile files the advantage-ordered rank 1);
-  the other elections fall back to their census-filed `rank` – the
-  recorded observation.
+  store's _pcti factor years: the six census-bracketed elections
+  2004–2019, the CD-era 2004/2007/2010 lanes landed 2026-10-25 once
+  the banned-period CED polygons were derived by allocation). Those
+  years the membership ranks pcti DESCENDING (the most advantaged
+  percentile files the advantage-ordered rank 1); the other elections
+  fall back to their census-filed `rank` – the recorded observation.
 - IEO and IER (like IRSD in the same store) keep only the APH print
   order: `rank` 1 = MOST disadvantaged, so their lanes REFLECT it
   (n+1−rank) to land on advantage order.
@@ -51,8 +51,12 @@ seats a fifth at 2013 and 10 at 2019 (the 151-seat chamber's spare
 sits at the disadvantaged end post-flip, so the advantaged-first
 cut points land one seat in from the shipped day's – the same pair
 counted 12 there pre-flip) and none at 2016 (the census fell five
-weeks after that election, so pcti is pct1's) – rank_membership()
-keeps the all-recorded-observation cut for exactly that comparison.
+weeks after that election, so pcti is pct1's). The landed CD-era
+lanes cut coarser – whole-unit CED polygon allocation with an f
+aiming away from the measured census moves 21 IRSAD seats at 2004,
+8 at 2007 and 30 at 2010 (66 IER seats at 2004, the year's IER
+reshuffle) – rank_membership() keeps the all-recorded-observation
+cut for exactly that comparison.
 
 Used by the three store writers that regroup the AEC's per-division
 products by grouping: fed-class-flows.py (preference flows),
@@ -159,11 +163,18 @@ SEIFA_META = tuple((*m, ix) for ix in QIDXES for m in INDEX_META[ix]["meta"])
 # the interpolated-percentile lane's own named anchors: Lingiari is the
 # pcti-most-disadvantaged seat of 2013 and 2016 (Spence in 2019);
 # Bradfield edges North Sydney to the 2013 pcti advantaged pole,
-# Wentworth holds it 2016 and 2019. Checked by the pcti lane alone –
+# Wentworth holds it 2016 and 2019. The CD-era lanes landed 2026-10-25
+# pin Fowler and Wakefield to their census-year tail poles (each is
+# ALSO its census-rank tail), and 2010's Lingiari tail pole – the
+# census sits on Wakefield but the interpolated lattice moves Lingiari
+# to the floor between the censuses. Checked by the pcti lane alone –
 # the census `rank` read at these years need not file them identically
 # (Bradfield edges North Sydney to the 2013 pcti pole, not the census
-# pole).
-_PCTI_PINS = {2013: (("Lingiari", "q5"), ("Bradfield", "q1")),
+# pole; Lingiari supplants Wakefield at the 2010 pcti tail).
+_PCTI_PINS = {2004: (("Fowler", "q5"), ("Bradfield", "q1")),
+              2007: (("Wakefield", "q5"), ("Bradfield", "q1")),
+              2010: (("Lingiari", "q5"), ("Bradfield", "q1")),
+              2013: (("Lingiari", "q5"), ("Bradfield", "q1")),
               2016: (("Lingiari", "q5"), ("Wentworth", "q1")),
               2019: (("Spence", "q5"), ("Wentworth", "q1"))}
 # the history elections a quintile block exists for (all three indexes
@@ -206,9 +217,9 @@ def store():
 
 def interp_years():
     """The elections whose irsad cells carry an interpolated-percentile
-    pcti – the store's own _pcti factor years (2013/2016/2019 today; the
-    CD-era 2004/2007/2010 division lanes join here when their polygons
-    land, and these menus interpolate from then on)."""
+    pcti – the store's own _pcti factor years (the six census-bracketed
+    elections 2004–2019, the CD-era lanes landed 2026-10-25; has always
+    auto-shipped whatever years the store's factor keys carry)."""
     global _INTERP_YEARS
     if _INTERP_YEARS is None:
         _INTERP_YEARS = frozenset(int(y) for y in
@@ -217,10 +228,10 @@ def interp_years():
 
 
 def interp_label():
-    """The pcti factor years as a human list, "2013, 2016 and 2019" – the
-    interpolation window the elections-strings name. Derived from the
-    store's own _pcti factors so the CD-era lanes join the copy the day
-    they land."""
+    """The pcti factor years as a human list, "2004, 2007, 2010, 2013,
+    2016 and 2019" – the interpolation window the elections-strings
+    name. Derived from the store's own _pcti factors so a new lane
+    joins the copy the day the store carries it."""
     ys = sorted(interp_years())
     if len(ys) <= 1:
         return str(ys[0]) if ys else ""

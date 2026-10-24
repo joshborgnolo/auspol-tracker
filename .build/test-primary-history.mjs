@@ -304,9 +304,12 @@ ALL_SEIFA_YEARS.forEach((y) => {
       /* the interpolation's footprint: twelve seats move fifths at 2013,
          ten at 2019 (the 151-seat spare-seat rung shifts the advantaged-
          first cut points), none at 2016 (its census sat five weeks after
-         election day, so pcti ≈ rank) */
+         election day, so pcti ≈ rank); the CD-era lanes cut coarser —
+         whole-unit polygon allocation, and 2004/2010's f leans far from
+         the measured census (2004 21/14/66 by index, 2007 8/2/12,
+         2010 30/8/39) */
       const moved = names.filter((nm) => fifthOf(ix, raOf.get(nm)) !== fifthOf(ix, rankAdvOf(ix, blk[nm], n))).length;
-      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 8, 2016: 0, 2019: 14 }, ier: { 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2004: 21, 2007: 8, 2010: 30, 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2004: 14, 2007: 2, 2010: 8, 2013: 8, 2016: 0, 2019: 14 }, ier: { 2004: 66, 2007: 12, 2010: 39, 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
       names.forEach((nm) => {
         assert.ok(blk[nm][ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);

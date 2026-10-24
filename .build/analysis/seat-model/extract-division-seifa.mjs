@@ -506,8 +506,8 @@ const ABOUT =
   "cell ALSO carries pct, its within-census percentile rank (rankDis/N), and the bracketed-in-time elections " +
   "additionally carry pcti, the census-night-distance interpolation of the two bracketing censuses' pct — " +
   "the cross-census comparable quantity (percentiles are; raw scores never are, ABS re-deriving the indexes " +
-  "per census). pcti lanes shipped: 2013/2016/2019 (concordance-based); 2004/2007/2010 await the CD-era CED " +
-  "polygons (see _pcti.pending). IRSAD lands " +
+  "per census). pcti lanes shipped: 2004/2007/2010 (whole-unit era-polygon allocations, derive-ced-era-alloc.py) " +
+  "and 2013/2016/2019 (concordance-based). IRSAD lands " +
   "from the sibling pipeline's irsad-cells.json (derive-irsad.py), which also owns the display store at " +
   ".build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; " +
   "ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights " +
@@ -632,19 +632,21 @@ const ABS_VIA_BY_ELECTION = {
    cross-census-comparable quantity, since ABS re-derives the indexes per
    census). pct = rankDis/N for EVERY cell every election (rankDis is the
    store convention: 1/N = most disadvantaged, N/N = most advantaged).
-   Bracketed-in-time elections (2004/2007/2010 CD-era pending polygons;
-   2013/2016/2019 concordance lanes, derive-division-seifa-interp.py) add
-   pcti, the census-night-distance interpolation of the two sides' pct —
-   div-interp.json's pct0/pct1 must equal THIS store's pct on whichever
-   side is the measured one (asserted per cell: 2013's c0, 2016's c1,
-   2019's c0 are the measured sides). */
+   Bracketed-in-time elections (2004/2007/2010 era-polygon whole-unit
+   allocation lanes; 2013/2016/2019 concordance lanes — all built by
+   derive-division-seifa-interp.py) add pcti, the census-night-distance
+   interpolation of the two sides' pct — div-interp.json's pct0/pct1 must
+   equal THIS store's pct on whichever side is the measured one (asserted
+   per cell: 2004/2007/2010/2013/2019's c0 and 2016's c1 are the measured
+   sides). */
 const PCTI = `${SRC_DIR}/div-interp.json`;
 const interpOf = {};
 const _pcti = {
   method: "pct = rankDis/N per cell (1/N most disadvantaged … N/N most advantaged); " +
           "pcti = (1-f)*pct(c0) + f*pct(c1) on the two bracketing censuses' own " +
           "geometries, f by census-night distance (derive-division-seifa-interp.py; " +
-          "c0 side always the measured store row)",
+          "one side of each election is the measured store row, read back — the c0 side " +
+          "for 2004/2007/2010/2013/2019, the c1 side for 2016)",
 };
 {
   const d = JSON.parse(readFileSync(PCTI, "utf8"));
@@ -655,16 +657,17 @@ const _pcti = {
   for (const [y, block] of Object.entries(d.elections)) interpOf[y] = block;
   provenance.pcti = {
     title: "Between-census percentile interpolation (derive-division-seifa-interp.py): " +
-           "pcti = (1-f)*pct(c0) + f*pct(c1), f by census-night distance (2011-08-09, " +
-           "2016-08-09, 2021-08-10); c0 side always the measured store row. CD-era " +
-           `elections pending CED polygons: ${JSON.stringify(d._pending.elections)}`,
+           "pcti = (1-f)*pct(c0) + f*pct(c1), f by census-night distance; one side of " +
+           "each election is the measured store row, read back (c0 for " +
+           "2004/2007/2010/2013/2019, c1 for 2016 — its census sat five weeks after " +
+           "election day)",
     censusYear: null,
   };
   _pcti.factors = factors;
-  _pcti.pending = d._pending.elections;
 }
 
-const MEASURED_SIDE = { 2013: "pct0", 2016: "pct1", 2019: "pct0" };
+const MEASURED_SIDE = { 2004: "pct0", 2007: "pct0", 2010: "pct0",
+                        2013: "pct0", 2016: "pct1", 2019: "pct0" };
 let pctCells = 0, pctiCells = 0;
 for (const [y, block] of Object.entries(elections)) {
   const N = Object.keys(block).length;

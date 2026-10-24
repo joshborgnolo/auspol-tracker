@@ -249,7 +249,10 @@ AEC_YEARS.forEach((y) => {
       /* IRSAD at a pcti factor year ranks the interpolated percentile
          (most-first, distinct – no tie rule), never the recorded rank;
          the interpolation moves twelve seats at 2013, ten at 2019 (the
-         spare-seat rung shifts the cut points), none at 2016 */
+         spare-seat rung shifts the cut points), none at 2016; the
+         CD-era lanes move more — coarser polygon allocation and an f
+         farther from the measured census (2004 21/14/66, 2007 8/2/12,
+         2010 30/8/39 by index) */
       let pctiRa = null;
       if (INTERP_YEARS.has(y)) {
         const pcts = Object.entries(mem).map(([d, c]) => {
@@ -260,7 +263,7 @@ AEC_YEARS.forEach((y) => {
         assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
         pctiRa = pctiRankOf(mem, ix);
         const moved = Object.keys(mem).filter((d) => fifthOf(ix, pctiRa.get(d)) !== fifthOf(ix, rankAdvOf(ix, mem[d], n))).length;
-        assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 8, 2016: 0, 2019: 14 }, ier: { 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+        assert.equal(moved, { irsad: { 2004: 21, 2007: 8, 2010: 30, 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2004: 14, 2007: 2, 2010: 8, 2013: 8, 2016: 0, 2019: 14 }, ier: { 2004: 66, 2007: 12, 2010: 39, 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
       } else {
         Object.entries(mem).forEach(([d, c]) => {
           assert.ok(c[ix].pcti === undefined, `${y} ${d}: no pcti outside the factor years`);
