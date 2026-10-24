@@ -1,8 +1,8 @@
 {
- "generated": "2026-10-17",
+ "generated": "2026-10-25",
  "series": "Newspoll / Pyxis Polling & Insights — The Australian (federal)",
- "scope": "Special and one-off questions across the 19 Newspoll VI waves of the 2025–26 term (2025-07-17 … 2026-10-08) plus the midweek one-off stories found on the paper's Newspoll topic page (one recovered: the 2026-09-17 wave's immigration special). The standing battery asked every wave is excluded: primary voting intention ('If a federal election for the House of Representatives was held today, which one of the following would you vote for? …'), PM and opposition-leader satisfaction ('Are you satisfied or dissatisfied with the way … is doing his/her job?'), better PM ('Who do you think would make the better Prime Minister?'), and its 2026 extensions — Hanson's own satisfaction series ('… the way Pauline Hanson is doing her job as Leader of One Nation'), the three-way ranked preferred-PM ('Please rank the following three people … highest preference to lowest preference') and the forced Albanese-v-Hanson 'distributed between top two leaders' pairing. Those are already channelled into polls.json (polls[] primaries, approval[19], ppm[19], ppmHeadToHead[3] carries the distributed pairing for three waves). The 2026-02-08 wave's Liberals-15/Nationals-3 split is a reporting detail of the standing VI row (recorded as an 18 Coalition primary), not a separate question. Historical waves before this term are out of scope.",
- "sources": "Every wave's story re-fetched from its canonical polls.json url through the user's logged-in Chrome (.build/chrome-article.mjs) plus every per-story Infogram embed re-downloaded; the Newspoll topic page was swept once for unmatched stories (kit: .matilda/np-questions/, per-wave cached dumps; three waves file through secondary coverage — 2025-08-14 thenewdaily.com.au, 2025-09-11 thenightly.com.au, 2026-02-26 pollbludger.net — all battery-only). Tables are the embeds' chart rows verbatim — table 2 of each entry in the traits entries is a live-updated project where noted — and prose entries quote The Australian's own paragraphs verbatim (its copy spells some numbers as words). Question wordings are article-prose paraphrase unless marked infogram-*; The Australian does not print verbatim questionnaires. The 2026-09-17 'PM popularity slides' embed (TAD-2641) is editorial context charting, not survey data, and is excluded.",
+ "scope": "Special and one-off questions across the 19 Newspoll VI waves of the 2025–26 term (2025-07-17 … 2026-10-08) plus the midweek one-off stories that sit outside the wave's own weekend story (two immigration specials recovered: 2026-09-17's from its midweek story on the topic page, and 2025-10-30's from syndicated coverage — The Australian's original story had left the topic page before this corpus was built). The standing battery asked every wave is excluded: primary voting intention ('If a federal election for the House of Representatives was held today, which one of the following would you vote for? …'), PM and opposition-leader satisfaction ('Are you satisfied or dissatisfied with the way … is doing his/her job?'), better PM ('Who do you think would make the better Prime Minister?'), and its 2026 extensions — Hanson's own satisfaction series ('… the way Pauline Hanson is doing her job as Leader of One Nation'), the three-way ranked preferred-PM ('Please rank the following three people … highest preference to lowest preference') and the forced Albanese-v-Hanson 'distributed between top two leaders' pairing. Those are already channelled into polls.json (polls[] primaries, approval[19], ppm[19], ppmHeadToHead[3] carries the distributed pairing for three waves). The 2026-02-08 wave's Liberals-15/Nationals-3 split is a reporting detail of the standing VI row (recorded as an 18 Coalition primary), not a separate question. Historical waves before this term are out of scope.",
+ "sources": "Every wave's story re-fetched from its canonical polls.json url through the user's logged-in Chrome (.build/chrome-article.mjs) plus every per-story Infogram embed re-downloaded; the Newspoll topic page was swept once for unmatched stories (kit: .matilda/np-questions/, per-wave cached dumps; three waves file through secondary coverage — 2025-08-14 thenewdaily.com.au, 2025-09-11 thenightly.com.au, 2026-02-26 pollbludger.net — all battery-only). Tables are the embeds' chart rows verbatim — table 2 of each entry in the traits entries is a live-updated project where noted — and prose entries quote The Australian's own paragraphs verbatim (its copy spells some numbers as words). Question wordings are article-prose paraphrase unless marked infogram-*; The Australian does not print verbatim questionnaires. The 2026-09-17 'PM popularity slides' embed (TAD-2641) is editorial context charting, not survey data, and is excluded. ONE pair of entries reads secondary coverage instead: the 2025-10-30 wave's immigration levels+impact pair quotes Daily Mail Australia's 3 Nov 2025 write-up verbatim (wordingSource 'secondary-coverage'; The Australian's original midweek story had left the topic page before this corpus was built), every headline figure independently corroborated by The Australian's own Sep-2026 retrospective, which quotes the identical 64/10/26.",
  "one_offs": [
   {
    "id": "preferred-coalition-leader",
@@ -2145,7 +2145,7 @@
      "A total of 47 per cent of Labor voters and 56 per cent of Greens voters supported maintaining the same number of immigrants, compared with 20 per cent of Coalition voters, 2 per cent of One Nation supporters and 34 per cent of Australians who supported minor parties and independents."
     ]
    },
-   "note": "Reported in a midweek follow-up story to the 2026-09-17 wave (same 1244-voter sample), not the wave's weekend story. 37 a lot fewer + 29 fewer (66% total), 28 same, 4 more, 2 a lot more. Fewer-endorsement by party: One Nation 95, Coalition 76, minor/independent 60, Labor 44, Greens 29; 'keep the same': Labor 47, Greens 56, Coalition 20, One Nation 2. The prior Newspoll read (Oct 2025: 64 fewer/10 more/26 same) is quoted from this story; its own article is no longer on the topic page and is outside this corpus."
+   "note": "Reported in a midweek follow-up story to the 2026-09-17 wave (same 1244-voter sample), not the wave's weekend story. 37 a lot fewer + 29 fewer (66% total), 28 same, 4 more, 2 a lot more. Fewer-endorsement by party: One Nation 95, Coalition 76, minor/independent 60, Labor 44, Greens 29; 'keep the same': Labor 47, Greens 56, Coalition 20, One Nation 2. The prior Newspoll read (Oct 2025: 64 fewer/10 more/26 same) is quoted from this story; its own midweek story is no longer on the topic page, so it is filed here as this store's 2025-10-30 wave entries, from syndicated coverage (every topline corroborated by this story's retrospective line)."
   },
   {
    "id": "immigration-impact",
@@ -2168,6 +2168,82 @@
     ]
    },
    "note": "52% say a mix of benefit and harm overall. 'Beneficial for most Australians' by party: Greens 51, Labor 42, Coalition 20, One Nation 3."
+  },
+  {
+   "id": "immigration-levels",
+   "waveDate": "2025-10-30",
+   "fieldwork": {
+    "start": "2025-10-27",
+    "end": "2025-10-30"
+   },
+   "sample": 1265,
+   "published": "2025-11-02T20:00",
+   "question": "Should the number of immigrants allowed into Australia be a lot fewer, fewer, about the same, more, or a lot more than now?",
+   "questionWordingSource": "secondary-coverage",
+   "responseOptions": [
+    "A lot fewer",
+    "Fewer",
+    "About the same",
+    "More",
+    "A lot more"
+   ],
+   "articleUrl": "https://www.dailymail.co.uk/news/article-15253095/Australia-anti-immigration-One-Nation.html",
+   "data": {
+    "tables": [
+     {
+      "rows": [
+       [
+        "Fewer (total)",
+        64
+       ],
+       [
+        "About the same",
+        26
+       ],
+       [
+        "More",
+        7
+       ],
+       [
+        "A lot more",
+        3
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "An astonishing 64 per cent of those interviewed wanted fewer people permanently moving to Australia, a jump that coincided with increased support for anti-immigration hardliner Pauline Hanson's One Nation Party.",
+     "Of the 64 per cent of voters who wanted fewer immigrants, 39 per cent said they wanted 'a lot fewer'.",
+     "Only three per cent of voters wanted a lot more immigrants, seven per cent supported more immigration and 26 per cent were satisfied with current levels.",
+     "As for immigration opinions across political parties, 78 per cent of Coalition supporters back immigration cuts along with 94 per cent of One Nation voters.",
+     "Among Labor voters, almost 50 per cent wanted less immigrants compared to just 10 per cent who were in favour of boosting immigration.",
+     "Greens voters were more closely divided but the majority of 32 per cent want less immigration and 27 per cent want more.",
+     "An overwhelming majority of voters aged over 50 supported reduced immigration, followed by 61 per cent aged between 35 and 49, and roughly 50 per cent of those aged 18 and 34 years old."
+    ]
+   },
+   "note": "Asked in the 27–30 Oct 2025 wave (the 'Coalition hits historic low' wave) but reported in a separate midweek immigration special, as with the 2026 read. 64% wanted fewer (of them, the Mail's '39 per cent … a lot fewer' is ambiguous between 39% of all voters and 39% of the 64% — not filed), 26% same, 7% more, 3% a lot more. Wanting fewer by party: One Nation 94, Coalition 78, Labor 'almost 50', Greens 32 (27% of Greens want more). By age: most over-50s ('overwhelming'), 61 of 35–49s, 'roughly 50' of 18–34s. Figures are Daily Mail Australia's 3 Nov 2025 report; every headline figure is independently corroborated by The Australian's Sep-2026 retrospective, which quotes the same 64/10/26."
+  },
+  {
+   "id": "immigration-impact",
+   "waveDate": "2025-10-30",
+   "fieldwork": {
+    "start": "2025-10-27",
+    "end": "2025-10-30"
+   },
+   "sample": 1265,
+   "published": "2025-11-02T20:00",
+   "question": "Does immigration bring mainly benefit, mainly harm, or a mix of benefit and harm for most Australians?",
+   "questionWordingSource": "secondary-coverage",
+   "responseOptions": null,
+   "articleUrl": "https://www.dailymail.co.uk/news/article-15253095/Australia-anti-immigration-One-Nation.html",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Of the 1,265 people surveyed, 55 per cent believed immigration had both beneficial and harmful effects, 23 per cent thought immigration was beneficial and 20 per cent saw it as having a negative effect.",
+     "Support for immigration was also limited across all education levels with only 32 per cent of university educate Aussies viewing it in a positive light, followed by 19 per cent of those with TAFE qualifications and 13 per cent with no tertiary education."
+    ]
+   },
+   "note": "Reported beside the levels question in the same special: 55% said immigration had both beneficial and harmful effects, 23% beneficial, 20% negative (the remainder is not stated in the coverage). Viewing immigration in a 'positive light' by education: university 32, TAFE 19, no tertiary 13. Source caveat as for the levels entry (secondary coverage)."
   }
  ]
 }
