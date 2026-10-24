@@ -5315,21 +5315,33 @@ html {
      point of the probe - and it keeps a laptop pull from opening on a hard
      line where the ground changes. */
   --tide-fade: var(--bg);
-  /* Tiling is the only way to fill the gutter below, and background-repeat has
-     no one-way setting - a repeating layer runs off BOTH ends of its anchor,
-     so the tide also climbed into the pull-down gutter above the masthead,
-     where a tide makes no sense. The first layer caps it: a block of plain
-     ground sitting entirely above the document, hiding the upward run. Its
-     3000px is a ceiling, not a measurement - further than any rubber band
-     stretches, and a flat gradient costs nothing at any size. */
+  background-color: var(--tide-ground);
+  transition: background-color .35s ease;
+}
+/* Tiling is the only way to fill the gutter below, and background-repeat has
+   no one-way setting - a repeating layer runs off BOTH ends of its anchor,
+   so the tide also climbed into the pull-down gutter above the masthead,
+   where a tide makes no sense. The first layer caps it: a block of plain
+   ground sitting entirely above the document, hiding the upward run. Its
+   3000px is a ceiling, not a measurement - further than any rubber band
+   stretches, and a flat gradient costs nothing at any size.
+   These layers wait for <body> to exist BECAUSE of that two-way tiling:
+   with no body there is no opaque box to contain them, so the whole canvas
+   ripples. Every load carried that plain-html state across one window -
+   from this stylesheet's parse until the body-top boot script armed
+   html.boot and laid the inline paper - and nothing gated the art out of
+   it: a refresh that painted inside it flashed the line art across the
+   screen. On html:has(body) the window is unreachable - the boot script
+   runs in the same parser step as body's creation, long before any frame.
+   A browser too old for :has() loses only this overscroll copy; the
+   page-bottom band is body's own. */
+html:has(body) {
   background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
                     var(--tile-art),
                     linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
   background-position: left top -3000px, center bottom, left bottom -180px;
   background-size: 100% 3000px, auto 400px, 100% 180px;
   background-repeat: no-repeat, repeat, no-repeat;
-  background-color: var(--tide-ground);
-  transition: background-color .35s ease;
 }
 html:has(body.dark) {
   background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
@@ -5361,7 +5373,7 @@ html:has(body.dark) {
 }
 body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
-  html { background-size: 100% 3000px, auto 320px, 100% 180px; }
+  html:has(body) { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
   /* the floor follows the shorter band: 190+8 here, 240+12 above. dvh twin:
      iOS's dynamic toolbar leaves dead scroll slack under 100vh */

@@ -19,6 +19,15 @@
       transient frame can leave the document shorter than the window at
       all (the 640px rung follows the shorter tile band).
 
+   Same family, second fix (2026-10-25): the tide composite lived on bare
+   `html`, which paints from stylesheet parse until <body> exists. With no
+   body there is no opaque box to mask the art, and the art repeats on BOTH
+   axes (that's what fills the overscroll gutter), so a frame landing in
+   the parse window drew the whole viewport in tide lines - the "bunch of
+   mostly blue lines" flash on some refreshes. The composite now hangs off
+   html:has(body), so nothing paints until <body> lands; the 640px
+   background-size override carries the same gate.
+
    Runs after the build in npm test's chain: asserts the sources AND their
    compiled presence in the built documents. */
 import assert from "node:assert/strict";
@@ -72,6 +81,26 @@ const tpl = read(path.join(".build", "newtracker", "template.html"));
     "the pull-up keeps its no-var fallback");
   assert.ok(tpl.includes("max-height: var(--app-h, none);"),
     "the article cap keeps its no-var fallback");
+  {
+    // the tide composite waits for <body>: a frame painting between
+    // stylesheet parse and <body> has no opaque box masking the two-way
+    // tiling, so the whole viewport drew tide lines
+    const bare = tpl.indexOf("html {\n  --tile-art:");
+    assert.ok(bare >= 0, "the tide vars still live on the bare html rule");
+    const bareBlock = tpl.slice(bare, tpl.indexOf("}", bare));
+    assert.ok(!bareBlock.includes("background-image") && !bareBlock.includes("background-size")
+      && !bareBlock.includes("background-position") && !bareBlock.includes("background-repeat"),
+      "the bare html rule keeps only vars, the solid tide-ground and the transition");
+    const gate = tpl.indexOf("html:has(body) {");
+    assert.ok(gate >= 0, "the tide composite is gated on the body's presence");
+    const gateBlock = tpl.slice(gate, tpl.indexOf("}", gate));
+    assert.ok(gateBlock.includes("background-image:") && gateBlock.includes("background-repeat: no-repeat, repeat, no-repeat;"),
+      "the gated rule carries the full tide composite (art still repeating on both axes)");
+    assert.ok(tpl.includes("html:has(body) { background-size: 100% 3000px, auto 320px, 100% 180px; }"),
+      "the 640px background-size override keeps the same gate");
+    assert.ok(tpl.indexOf("html:has(body.dark) {", gate) > 0,
+      "the dark override still rides beside the gate");
+  }
 }
 
 // ---- 3. the fix made the build ------------------------------------------------------------
@@ -81,6 +110,8 @@ for (const doc of ["index.html", path.join("vic", "index.html")]) {
     `${doc}: the viewport floor compiled in`);
   assert.ok(html.includes("syncHeights"),
     `${doc}: the atomic height sync compiled in`);
+  assert.ok(html.includes("html:has(body) {"),
+    `${doc}: the tide composite's body gate compiled in`);
 }
 
-console.log("PASS: ss-heights – one syncHeights owns --app-h/--ss-h, #root floor at both rungs, fallbacks held, both builds carry it");
+console.log("PASS: ss-heights – one syncHeights owns --app-h/--ss-h, #root floor at both rungs, fallbacks held, tide composite gated on html:has(body), both builds carry it");
