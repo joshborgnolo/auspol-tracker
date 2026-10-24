@@ -4,10 +4,12 @@
 
    1. Universe: 8,940 booth records, election 2025, seifaEdition 2021,
       SA1 geography. Per-state histogram and the exact note/flag
-      vocabulary match the measured first green run (2026-10-24):
-      scored 8,085 / seifaSuppressed 269 / mapped_sa1 8,354 /
-      noCoords 584 / badCoords 2 / otTerritory 4, pointOutside zero,
-      stateFlagBooths empty.
+      vocabulary match the measured run with the two user-supplied
+      coordinate overrides in place (2026-10-24): scored 8,087 /
+      seifaSuppressed 269 / mapped_sa1 8,356 / noCoords 584 /
+      coordOverride 2 / otTerritory 4 / badCoords zero, pointOutside
+      zero, stateFlagBooths empty. (The overrides replace the AEC's
+      (0,0) coordinates on Henty and Carlingford North.)
    2. Keys + shape: (divId, boothId) unique; 150 divisions; every record
       carries the base fields; type in the five-name taxonomy; sa1 an
       11-digit code or null; sa1 null exactly on the noted rows;
@@ -21,7 +23,8 @@
    4. Spot cells across states and booth kinds (all verified against the
       cube/geometry on the first green run): Toorak and Mosman in the
       top metro band; Hobart SA1 60105102717; the Waverley WENTWORTH
-      PPVC; the two badCoords rows (Henty 0,0; Carlingford North 0,0);
+      PPVC; the two coordOverride rows (Henty, Carlingford North —
+      user-supplied coordinates replacing the AEC's (0,0));
       a remote-mobile noCoords row; Barton Kogarah East as the
       seifaSuppressed exemplar (SA1 carries no scores in the cube);
       the four Other-Territories SA1 hits (Norfolk Island x2 on Bean,
@@ -34,7 +37,8 @@
       and the committed vendored AEC CSV re-hashes to its recorded
       sha256-16 (the two git-ignored caches are re-fetchable per the
       extractor's docstring manifest, so they are pinned by hash
-      string only, not re-computed here).
+      string only, not re-computed here). _provenance.userOverrides
+      records the two coordinate corrections.
 */
 
 import { readFileSync } from "node:fs";
@@ -48,7 +52,7 @@ const STATE_HIST = { ACT: 147, NSW: 3028, NT: 89, QLD: 1626, SA: 750, TAS: 329, 
 const TYPE_NAMES = new Set(["Polling place", "Special hospital", "Remote mobile", "Mobile team", "PPVC"]);
 const NOTES = new Set(["noCoords", "badCoords", "pointOutside", "seifaSuppressed"]);
 const IDX = ["irsd", "irsad", "ier", "ieo"];
-const COUNTS = { scored: 8085, seifaSuppressed: 269, otTerritory: 4, noCoords: 584, badCoords: 2, mapped_sa1: 8354 };
+const COUNTS = { scored: 8087, seifaSuppressed: 269, otTerritory: 4, noCoords: 584, coordOverride: 2, mapped_sa1: 8356 };
 
 let failures = [];
 const check = (ok, msg) => { if (!ok) failures.push(msg); };
@@ -76,7 +80,7 @@ check(JSON.stringify(hist, Object.keys(hist).sort()) === JSON.stringify(STATE_HI
 const noteCount = {};
 for (const b of B) if (b.note) noteCount[b.note] = (noteCount[b.note] || 0) + 1;
 check(noteCount.noCoords === 584, `noCoords ${noteCount.noCoords} != 584`);
-check(noteCount.badCoords === 2, `badCoords ${noteCount.badCoords} != 2`);
+check(noteCount.badCoords === undefined, "badCoords present (both (0,0) rows now overridden)");
 check(noteCount.seifaSuppressed === 269, `seifaSuppressed ${noteCount.seifaSuppressed} != 269`);
 check(noteCount.pointOutside === undefined, "pointOutside present in store");
 
@@ -120,8 +124,8 @@ for (const b of B) {
   }
 }
 check(divs.size === 150, `division count ${divs.size} != 150`);
-check(sa1Null === 8940 - 8354, `sa1-null rows ${sa1Null} != 586`);
-check(seifaNull === 855, `seifa-null rows ${seifaNull} != 855 (584 noCoords + 2 badCoords + 269 suppressed)`);
+check(sa1Null === 584, `sa1-null rows ${sa1Null} != 584 (${sa1Null} == noCoords only)`);
+check(seifaNull === 853, `seifa-null rows ${seifaNull} != 853 (584 noCoords + 269 suppressed)`);
 check(partial === 17, `partially-suppressed cube rows ${partial} != 17`);
 
 // -- 3. sort order
@@ -156,8 +160,19 @@ cell("Wentworth", "Waverley WENTWORTH PPVC", { sa1: "11801134124", type: "PPVC",
 cell("Fenner", "Throsby", { sa1: "80104112206", irsad: 1273.0, ier: 1315.1 });
 cell("Maribyrnong", "Ascot Vale", { sa1: "20603111321", irsd: 266.6, irsad: 496.7 });
 cell("Farrer", "Remote Mobile Team 1", { note: "noCoords", type: "Remote mobile", sa1: null });
-cell("Farrer", "Henty", { note: "badCoords", sa1: null });
-cell("Parramatta", "Carlingford North", { note: "badCoords", sa1: null });
+{
+  // coordOverride rows — user-supplied coordinates replace the AEC's (0,0),
+  // 2026-10-24; pinned from the measured run
+  const h = cell("Farrer", "Henty", { sa1: "10901117528", type: "Polling place", irsd: 891.0, irsad: 878.0 });
+  if (h) check(h.seifa.dec.irsd === 2 && h.seifa.dec.ier === 3, `Henty deciles ${JSON.stringify(h.seifa.dec)}`);
+  const c = cell("Parramatta", "Carlingford North", { sa1: "12502171236", type: "Polling place", irsd: 1095.1, irsad: 1116.9 });
+  if (c) check(c.seifa.dec.irsd === 9 && c.seifa.dec.ieo === 9, `Carlingford North deciles ${JSON.stringify(c.seifa.dec)}`);
+  for (const [dv, nm, la, lo] of [["Farrer", "Henty", -35.517122, 147.031154], ["Parramatta", "Carlingford North", -33.770147, 151.037565]]) {
+    const b = byKey.get(`${dv}|${nm}`);
+    check(b.lat === la && b.lon === lo, `${nm} override coords ${b.lat},${b.lon} != ${la},${lo}`);
+    check(b.note === undefined, `${nm} carries note ${b.note}`);
+  }
+}
 cell("Barton", "Kogarah East", { note: "seifaSuppressed", sa1: "11904137812" });
 {
   const b = cell("Blaxland", "Wetherill Park BLAXLAND PPVC", { sa1: "12702152101", type: "PPVC" });
@@ -187,7 +202,15 @@ cell("Barton", "Kogarah East", { note: "seifaSuppressed", sa1: "11904137812" });
     const h = createHash("sha256").update(readFileSync(AEC)).digest("hex").slice(0, 16);
     check(h === files[AEC], `AEC CSV hash ${h} != provenance ${files[AEC]}`);
   }
+  const uo = d._provenance && d._provenance.userOverrides;
+  check(Array.isArray(uo) && uo.length === 2, `userOverrides ${JSON.stringify(uo)}`);
+  if (Array.isArray(uo) && uo.length === 2) {
+    check(uo.some((u) => u.div === "Farrer" && u.booth === "Henty" && u.lat === -35.517122 && u.lon === 147.031154),
+      "userOverrides lacks the Henty entry");
+    check(uo.some((u) => u.div === "Parramatta" && u.booth === "Carlingford North" && u.lat === -33.770147 && u.lon === 151.037565),
+      "userOverrides lacks the Carlingford North entry");
+  }
 }
 
 die();
-console.log(`booth-seifa: ok — 8,940 booths, 150 divisions, 8,085 scored, 269 suppressed, 586 uncoordinated, 4 OT, 17 partial; 16 spot cells + hash green`);
+console.log(`booth-seifa: ok — 8,940 booths, 150 divisions, 8,087 scored, 269 suppressed, 584 uncoordinated, 2 coordOverride, 4 OT, 17 partial; spot cells + hash green`);

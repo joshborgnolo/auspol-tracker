@@ -62,6 +62,15 @@ STATE_HIST = {"ACT": 147, "NSW": 3028, "NT": 89, "QLD": 1626, "SA": 750,
               "TAS": 329, "VIC": 2072, "WA": 899}
 TYPE_NAME = {1: "Polling place", 2: "Special hospital", 3: "Remote mobile",
              4: "Mobile team", 5: "PPVC"}
+
+# The AEC file ships (0,0) coordinates for these two booths; the true premises
+# coordinates were supplied by the user 2026-10-24. Applied before the
+# sanity-band check so the rows land SA1s and scores. Recorded in
+# _provenance.userOverrides.
+COORD_OVERRIDES = {
+    ("Farrer", "Henty"): (-35.517122, 147.031154),
+    ("Parramatta", "Carlingford North"): (-33.770147, 151.037565),
+}
 STATE_ORDER = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]
 STE_OF_DIGIT = {"1": "NSW", "2": "VIC", "3": "QLD", "4": "SA", "5": "WA",
                 "6": "TAS", "7": "NT", "8": "ACT", "9": "OT"}
@@ -331,6 +340,11 @@ def main():
             b["note"] = "noCoords"
             counts["noCoords"] += 1
             continue
+        ov = COORD_OVERRIDES.get((b["div"], b["booth"]))
+        if ov is not None and (b["lat"], b["lon"]) == (0.0, 0.0):
+            b["lat"], b["lon"] = ov
+            counts["coordOverride"] += 1
+            b["override"] = True
         if not (-55.0 < b["lat"] < -9.0 and 95.0 < b["lon"] < 169.5):
             b["note"] = "badCoords"
             counts["badCoords"] += 1
@@ -391,7 +405,9 @@ def main():
                    "are rank/decile only, and the 2021 census vintage leads "
                    "the 2025 election by ~3.7 years. Coordinate-less mobile/"
                    "hospital teams carry note=noCoords; rows with (0,0) AEC "
-                   "coordinates carry note=badCoords; SA1s score-suppressed "
+                   "coordinates carry note=badCoords unless a corrected "
+                   "coordinate is on file (see _provenance.userOverrides); "
+                   "SA1s score-suppressed "
                    "in the cube carry note=seifaSuppressed with seifa:null. "
                    "stateFlag is only a guard report (premises state vs SA1 "
                    "state); the physical premises location wins."),
@@ -409,6 +425,11 @@ def main():
                     hash16(SA1_ZIP),
             },
             "extractedAt": str(date.today()),
+            "userOverrides": [
+                {"div": d, "booth": nm, "lat": la, "lon": lo,
+                 "supplied": "2026-10-24 (user; AEC ships (0,0))"}
+                for (d, nm), (la, lo) in COORD_OVERRIDES.items()
+            ],
         },
         "election": 2025,
         "seifaEdition": 2021,

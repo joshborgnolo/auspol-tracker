@@ -1,5 +1,5 @@
 {
-  "_about": "W-analysis store: one record per 2025 federal polling place keyed to the four SEIFA 2021 indexes (irsd/irsad/ier/ieo scores + ABS-published national deciles) via the SA1 polygon containing the booth's premises coordinates. The SA1 is the SA1 OF THE PREMISES — a geographic proxy for the catchment's SES, not an aggregate of catchment voters; SEIFA is area-derived, cross-time comparisons are rank/decile only, and the 2021 census vintage leads the 2025 election by ~3.7 years. Coordinate-less mobile/hospital teams carry note=noCoords; rows with (0,0) AEC coordinates carry note=badCoords; SA1s score-suppressed in the cube carry note=seifaSuppressed with seifa:null. stateFlag is only a guard report (premises state vs SA1 state); the physical premises location wins.",
+  "_about": "W-analysis store: one record per 2025 federal polling place keyed to the four SEIFA 2021 indexes (irsd/irsad/ier/ieo scores + ABS-published national deciles) via the SA1 polygon containing the booth's premises coordinates. The SA1 is the SA1 OF THE PREMISES — a geographic proxy for the catchment's SES, not an aggregate of catchment voters; SEIFA is area-derived, cross-time comparisons are rank/decile only, and the 2021 census vintage leads the 2025 election by ~3.7 years. Coordinate-less mobile/hospital teams carry note=noCoords; rows with (0,0) AEC coordinates carry note=badCoords unless a corrected coordinate is on file (see _provenance.userOverrides); SA1s score-suppressed in the cube carry note=seifaSuppressed with seifa:null. stateFlag is only a guard report (premises state vs SA1 state); the physical premises location wins.",
   "_provenance": {
     "sourceUrls": {
       "aec": "https://results.aec.gov.au/31496/Website/Downloads/GeneralPollingPlacesDownload-31496.csv",
@@ -11,7 +11,23 @@
       ".matilda/seifa-irsad-abs/abs-seifa-2021-sa1-indexes.xlsx": "598cf9c360a69220",
       ".build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip": "177adac8fcc93135"
     },
-    "extractedAt": "2026-10-24"
+    "extractedAt": "2026-10-24",
+    "userOverrides": [
+      {
+        "div": "Farrer",
+        "booth": "Henty",
+        "lat": -35.517122,
+        "lon": 147.031154,
+        "supplied": "2026-10-24 (user; AEC ships (0,0))"
+      },
+      {
+        "div": "Parramatta",
+        "booth": "Carlingford North",
+        "lat": -33.770147,
+        "lon": 151.037565,
+        "supplied": "2026-10-24 (user; AEC ships (0,0))"
+      }
+    ]
   },
   "election": 2025,
   "seifaEdition": 2021,
@@ -24,12 +40,12 @@
   ],
   "stateFlagBooths": [],
   "counts": {
-    "scored": 8085,
+    "scored": 8087,
     "seifaSuppressed": 269,
     "otTerritory": 4,
     "noCoords": 584,
-    "badCoords": 2,
-    "mapped_sa1": 8354
+    "coordOverride": 2,
+    "mapped_sa1": 8356
   },
   "booths": [
     {
@@ -22862,11 +22878,21 @@
       "suburb": "HENTY",
       "premisesState": "NSW",
       "postcode": "2658",
-      "lat": 0.0,
-      "lon": 0.0,
-      "note": "badCoords",
-      "sa1": null,
-      "seifa": null
+      "lat": -35.517122,
+      "lon": 147.031154,
+      "sa1": "10901117528",
+      "seifa": {
+        "irsd": 891.0,
+        "irsad": 878.0,
+        "ier": 926.7,
+        "ieo": 888.2,
+        "dec": {
+          "irsd": 2,
+          "irsad": 2,
+          "ier": 3,
+          "ieo": 2
+        }
+      }
     },
     {
       "div": "Farrer",
@@ -57815,11 +57841,21 @@
       "suburb": "CARLINGFORD",
       "premisesState": "NSW",
       "postcode": "2118",
-      "lat": 0.0,
-      "lon": 0.0,
-      "note": "badCoords",
-      "sa1": null,
-      "seifa": null
+      "lat": -33.770147,
+      "lon": 151.037565,
+      "sa1": "12502171236",
+      "seifa": {
+        "irsd": 1095.1,
+        "irsad": 1116.9,
+        "ier": 1112.8,
+        "ieo": 1115.4,
+        "dec": {
+          "irsd": 9,
+          "irsad": 9,
+          "ier": 9,
+          "ieo": 9
+        }
+      }
     },
     {
       "div": "Parramatta",
