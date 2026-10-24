@@ -5014,11 +5014,13 @@ const flowHistory = (() => {
     const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the "
       + interpYs + " elections, the census rank otherwise)";
     /* the lane reader: the four seat types (store classes/allSeats over
-       fcf.years) and the five IRSAD fifths (store seifa.classes/
-       seifa.allSeats over seifa.years — emitted into the SAME bank with
-       a seifa marker so the chart captions fork on S.seifa; every other
-       consumer sees one flat list of class views) run one mapping over
-       their own year arrays */
+       fcf.years) and the fifteen SEIFA fifths (store seifa.classes/
+       seifa.allSeats over seifa.years — five per index, each record's ix
+       tagging it "irsad"/"ieo"/"ier" so the menu splits its three
+       optgroups and the captions name the right index — emitted into the
+       SAME bank with a seifa marker so the chart captions fork on
+       S.seifa; every other consumer sees one flat list of class views)
+       run one mapping over their own year arrays */
     const laneClasses = (classes, all, years, seifa) =>
       Object.fromEntries(Object.entries(classes).map(([k, s]) => {
         const A = (all || {})[k] || {};
@@ -5029,9 +5031,14 @@ const flowHistory = (() => {
         const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
         return [k,
           { label: s.label, short: s.short,
-            elections: seifa ? "federal elections in the " + s.desc + " " + ELECTIONS_SUFFIX
+            /* the record's own scope copy — the IRSAD lane names its
+               interpolated-percentile basis, the other two indexes the
+               census-printed rank */
+            elections: seifa ? "federal elections in the " + s.desc + " "
+                             + (s.ix === "irsad" ? ELECTIONS_SUFFIX
+                                : "of seats by " + s.ix.toUpperCase() + " rank")
                              : "federal elections in " + s.short + " seats",
-            fedClass: true, ...(seifa ? { seifa: true } : {}),
+            fedClass: true, ...(seifa ? { seifa: true, ix: s.ix } : {}),
             hollowYears: years.filter((y) => y < CLASS_CUT),
             years: [...years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
             lump: A.lump ? [...A.lump] : null,
@@ -5227,6 +5234,18 @@ const primaryHistory = (() => {
   try {
     const { _comment, ...ph } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "primary-history.json"), "utf8"));
     return ph;
+  } catch { return null; }
+})();
+
+/* informal-history.json – the explainer chart's View: Informal votes
+   flip; informal ballots as a share of ballots cast per federal
+   election, national + states + House and Senate, plus federal seat
+   classes and IRSAD/IEO quintiles. Same guarded-read posture: a missing
+   file drops the flip, never the build. */
+const informalHistory = (() => {
+  try {
+    const { _comment, ...ih } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "informal-history.json"), "utf8"));
+    return ih;
   } catch { return null; }
 })();
 
@@ -8569,6 +8588,13 @@ window.AUSPOL = (function () {
      tallies only, the four post-GVT events 2016–2025, national plus the
      eight states, no classes, implied: true. */
   const twoPPHistory = ${JSON.stringify(twoPPHistory)};
+  /* The informal-vote history behind the explainer chart's View: Informal
+     votes flip – informal ballots as a share of ballots cast (informal ÷
+     formal+informal), per cent, per federal election. House national
+     1901–2025 and per state; Senate 1903–2022 (no AEC machine-readable
+     2025 Senate informal product yet); federal House by AEC seat class
+     1996–2025 and by IRSAD and IEO quintile 2001–2025. */
+  const informalHistory = ${JSON.stringify(informalHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -8832,7 +8858,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

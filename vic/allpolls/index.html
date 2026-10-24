@@ -6079,9 +6079,8 @@ body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
 body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }
-body.rd .ex-fl-tabs { gap: 3px; }
-body.rd .ex-fl-tabs .rd-tab { padding: 0 8px; }
-body.rd .ex-fl-tabs .rd-pl-ctl, body.rd .ex-fl-tabs .rd-pl-flip { gap: 5px; }
+body.rd .ex-fl-vstack { display: flex; flex-direction: column; align-items: flex-end; gap: 0; white-space: nowrap; }
+body.rd .ex-fl-vstack .rd-pl-flip { min-height: 22px; }
 @media (min-width: 641px) and (max-width: 700px) {
   body.rd .ex-fl-tabs { flex-wrap: wrap; }
 }
@@ -9108,85 +9107,264 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         },
         "q1": {
           "seifa": true,
+          "ix": "irsad",
           "foldPt": 2,
-          "label": "Most-disadvantaged fifth",
-          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
           "short": "Top fifth",
-          "alp": [37.24, 36.16, 39.45, 34.2, 32.88, 33.54, 31.45, 27.72, 29.47],
-          "lnp": [41.2, 47.41, 42.82, 44.69, 45.9, 40.38, 40.96, 39.52, 34.36],
-          "grn": [3.38, 5.12, 6.04, 8.41, 5.39, 6.26, 6.37, 7.62, 8.32],
-          "onp": [7.55, 2.22, null, null, null, 3.1, 4.83, 7.33, 9.18],
-          "dem": [4.49, null, null, null, null, null, null, null, null],
-          "uap": [null, null, null, null, 6.45, null, 4.45, 4.94, null],
-          "xnt": [null, null, null, null, null, 4.02, null, null, null],
-          "ind": [4.15, 3.75, 6.73, 8.45, null, 4.52, 5.79, 6.86, 7.97],
-          "oth": [1.99, 5.34, 4.95, 4.26, 9.37, 8.17, 6.15, 6.01, 10.7]
+          "alp": [34.1, 35.37, 39.64, 32.76, 29.3, 28.25, 28.43, 29, 33.88],
+          "lnp": [46.85, 47.69, 44.92, 47.53, 51.14, 47.9, 45.64, 36.36, 32.04],
+          "grn": [7.21, 10.89, 11.12, 16.15, 12.36, 15.26, 15.58, 16.64, 15.84],
+          "onp": [null, null, null, null, null, null, null, 2.1, 2.69],
+          "dem": [6.81, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 3.3, null, null, 2.64, null],
+          "ind": [null, null, null, null, null, 2.91, 4.65, 10.54, 11.63],
+          "oth": [5.03, 6.05, 4.32, 3.56, 3.9, 5.68, 5.7, 2.73, 3.92]
         },
         "q2": {
           "seifa": true,
+          "ix": "irsad",
           "foldPt": 2,
-          "label": "Second-most-disadvantaged fifth",
-          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
           "short": "2nd fifth",
-          "alp": [38.95, 38.03, 47.8, 43.79, 35.82, 38.37, 36.66, 34.3, 33.14],
-          "lnp": [41, 45.41, 39.36, 40.1, 42.73, 40.99, 38.17, 35.21, 32.09],
-          "grn": [4.23, 5.83, 6.31, 10.06, 6.23, 7.88, 7.93, 9.23, 8.98],
-          "onp": [4.78, null, null, null, null, null, 4.24, 6.3, 8.33],
-          "dem": [3.87, null, null, null, null, null, null, null, null],
-          "uap": [null, null, null, null, 5.91, null, 4.79, 4.27, null],
-          "ind": [5.49, 4.34, null, null, 2.93, 2.96, 3.06, 5, 7.97],
-          "oth": [1.68, 6.39, 6.53, 6.06, 6.38, 9.8, 5.15, 5.69, 9.49]
+          "alp": [38.97, 37.62, 42.71, 37.11, 33.47, 35.03, 37.66, 37.81, 38.99],
+          "lnp": [42.96, 47.56, 44.46, 45.58, 45.21, 41.34, 40.7, 32.99, 31.19],
+          "grn": [5.2, 7.43, 7.68, 12.02, 10.37, 11.67, 12.06, 15.86, 14.41],
+          "onp": [2.98, null, null, null, null, null, null, 3.56, 4.96],
+          "dem": [6.85, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 5.68, null, 2.77, 3.79, null],
+          "xnt": [null, null, null, null, null, 3.3, null, null, null],
+          "ind": [null, null, null, null, null, null, null, null, 4.31],
+          "oth": [3.05, 7.39, 5.15, 5.29, 5.27, 8.66, 6.8, 5.99, 6.14]
         },
         "q3": {
           "seifa": true,
+          "ix": "irsad",
           "foldPt": 2,
           "label": "Middle fifth",
           "elections": "federal elections in the middle fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
           "short": "Middle fifth",
-          "alp": [40.12, 41.14, 47.3, 42.24, 35.62, 38.57, 32.66, 34.13, 37.05],
-          "lnp": [42.81, 45.41, 38.92, 40.01, 42.5, 39.4, 41.52, 34.26, 29.59],
-          "grn": [4.63, 6.55, 7.68, 11.96, 8.59, 9.9, 9.95, 11.72, 13.04],
-          "onp": [4.69, null, null, null, null, null, 3.93, 5.65, 7.16],
+          "alp": [40.12, 41.14, 47.3, 42.24, 35.62, 38.57, 32.05, 33.68, 37.05],
+          "lnp": [42.81, 45.41, 38.92, 40.01, 42.5, 39.4, 41.95, 34.75, 29.59],
+          "grn": [4.63, 6.55, 7.68, 11.96, 8.59, 9.9, 9.98, 11.79, 13.04],
+          "onp": [4.69, null, null, null, null, null, 4.2, 5.65, 7.16],
           "dem": [4.91, null, null, null, null, null, null, null, null],
-          "uap": [null, null, null, null, 6.25, null, 3.44, 4.94, null],
-          "ind": [null, null, null, null, null, 2.36, 2.64, 3.13, 4.41],
-          "oth": [2.83, 6.9, 6.11, 5.79, 7.03, 9.77, 5.85, 6.17, 8.75]
+          "uap": [null, null, null, null, 6.25, null, 3.42, 4.86, null],
+          "ind": [null, null, null, null, null, 2.36, 2.65, 3.04, 4.41],
+          "oth": [2.83, 6.9, 6.11, 5.79, 7.03, 9.77, 5.75, 6.23, 8.75]
         },
         "q4": {
           "seifa": true,
+          "ix": "irsad",
           "foldPt": 2,
-          "label": "Second-most-advantaged fifth",
-          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
           "short": "4th fifth",
-          "alp": [38.97, 37.62, 42.71, 37.11, 33.47, 35.03, 37.13, 37.43, 38.99],
-          "lnp": [42.96, 47.56, 44.46, 45.58, 45.21, 41.34, 41.05, 33.13, 31.19],
-          "grn": [5.2, 7.43, 7.68, 12.02, 10.37, 11.67, 11.99, 15.85, 14.41],
-          "onp": [2.98, null, null, null, null, null, null, 3.66, 4.96],
-          "dem": [6.85, null, null, null, null, null, null, null, null],
-          "uap": [null, null, null, null, 5.68, null, 2.77, 3.96, null],
-          "xnt": [null, null, null, null, null, 3.3, null, null, null],
-          "ind": [null, null, null, null, null, null, null, null, 4.31],
-          "oth": [3.05, 7.39, 5.15, 5.29, 5.27, 8.66, 7.07, 5.97, 6.14]
+          "alp": [38.95, 38.03, 47.8, 43.79, 35.82, 38.37, 36.62, 34.97, 33.14],
+          "lnp": [41, 45.41, 39.36, 40.1, 42.73, 40.99, 38.26, 34.65, 32.09],
+          "grn": [4.23, 5.83, 6.31, 10.06, 6.23, 7.88, 8.13, 9.3, 8.98],
+          "onp": [4.78, null, null, null, null, null, 3.97, 6.19, 8.33],
+          "dem": [3.87, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 5.91, null, 4.8, 4.49, null],
+          "ind": [5.49, 4.34, null, null, 2.93, 2.96, 3.04, 5.02, 7.97],
+          "oth": [1.68, 6.39, 6.53, 6.06, 6.38, 9.8, 5.19, 5.38, 9.49]
         },
         "q5": {
           "seifa": true,
+          "ix": "irsad",
           "foldPt": 2,
-          "label": "Most-advantaged fifth",
-          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
           "short": "Bottom fifth",
-          "alp": [34.1, 35.37, 39.64, 32.76, 29.3, 28.25, 28.88, 29.32, 33.88],
-          "lnp": [46.85, 47.69, 44.92, 47.53, 51.14, 47.9, 45.41, 36.49, 32.04],
-          "grn": [7.21, 10.89, 11.12, 16.15, 12.36, 15.26, 15.54, 16.48, 15.84],
-          "onp": [null, null, null, null, null, null, null, 2.1, 2.69],
-          "dem": [6.81, null, null, null, null, null, null, null, null],
-          "uap": [null, null, null, null, 3.3, null, null, 2.6, null],
-          "ind": [null, null, null, null, null, 2.91, 4.49, 10.17, 11.63],
-          "oth": [5.03, 6.05, 4.32, 3.56, 3.9, 5.68, 5.68, 2.85, 3.92]
+          "alp": [37.24, 36.16, 39.45, 34.2, 32.88, 33.54, 31.89, 27.48, 29.47],
+          "lnp": [41.2, 47.41, 42.82, 44.69, 45.9, 40.38, 40.73, 39.76, 34.36],
+          "grn": [3.38, 5.12, 6.04, 8.41, 5.39, 6.26, 6.33, 7.58, 8.32],
+          "onp": [7.55, 2.22, null, null, null, 3.1, 4.93, 7.35, 9.18],
+          "dem": [4.49, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 6.45, null, 4.43, 4.86, null],
+          "xnt": [null, null, null, null, null, 4.02, null, null, null],
+          "ind": [4.15, 3.75, 6.73, 8.45, null, 4.52, 5.62, 6.72, 7.97],
+          "oth": [1.99, 5.34, 4.95, 4.26, 9.37, 8.17, 6.08, 6.25, 10.7]
+        },
+        "e1": {
+          "seifa": true,
+          "ix": "ieo",
+          "foldPt": 2,
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "alp": [33.68, 36.12, 40.22, 33.51, 30.54, 28.58, 29.36, 30.27, 34.45],
+          "lnp": [46.64, 47.03, 44.03, 46.35, 49.01, 46.41, 44.31, 33.73, 30.88],
+          "grn": [7.23, 10.92, 11.33, 16.67, 13.99, 15.53, 16.16, 18.18, 16.83],
+          "onp": [null, null, null, null, null, null, null, 2, 2.72],
+          "dem": [7.79, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 2.54, null, null, 2.49, null],
+          "ind": [null, null, null, null, null, 2.83, 4.57, 10, 11.46],
+          "oth": [4.66, 5.93, 4.42, 3.47, 3.91, 6.65, 5.6, 3.33, 3.67]
+        },
+        "e2": {
+          "seifa": true,
+          "ix": "ieo",
+          "foldPt": 2,
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "alp": [40.37, 39.17, 45.58, 40.27, 35.92, 35.39, 37.93, 36.5, 39.41],
+          "lnp": [41.83, 45.7, 40.17, 41.35, 43.37, 40.18, 40.14, 35.16, 30.86],
+          "grn": [5.52, 8.15, 8.9, 12.63, 10.21, 12.16, 12.13, 14.35, 14.21],
+          "onp": [3.13, null, null, null, null, null, null, 3.64, 4.84],
+          "dem": [6, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 4.15, null, 2.75, 3.85, null],
+          "xnt": [null, null, null, null, null, 2.7, null, null, null],
+          "ind": [null, null, null, null, null, 2.58, null, 2.36, 4.48],
+          "oth": [3.15, 6.97, 5.36, 5.75, 6.35, 7, 7.06, 4.15, 6.2]
+        },
+        "e3": {
+          "seifa": true,
+          "ix": "ieo",
+          "foldPt": 2,
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "alp": [37.23, 37.21, 42.3, 36.66, 32.03, 36.85, 31.26, 35.99, 36.51],
+          "lnp": [45.44, 49.39, 45.12, 46.17, 45.47, 41.67, 42.28, 33.09, 30.51],
+          "grn": [4.76, 6.53, 7.15, 11.35, 7.66, 9.41, 9.89, 12.42, 12.17],
+          "onp": [4.67, null, null, null, null, null, 3.93, 4.97, 6.6],
+          "dem": [4.78, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 7.31, null, 3.68, 5.13, null],
+          "ind": [2, null, null, null, 2.01, 2.67, 2.67, null, 5.05],
+          "oth": [1.12, 6.88, 5.44, 5.82, 5.51, 9.4, 6.29, 8.4, 9.15]
+        },
+        "e4": {
+          "seifa": true,
+          "ix": "ieo",
+          "foldPt": 2,
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "alp": [37.95, 34.95, 40.52, 38.45, 33.84, 33.14, 33.58, 32.2, 33.72],
+          "lnp": [41.64, 47.91, 42.76, 43.85, 46.16, 45.36, 42.22, 36.74, 30.22],
+          "grn": [4.03, 5.46, 5.91, 8.72, 5.75, 7.8, 7.53, 8.42, 9.02],
+          "onp": [5.17, null, null, null, null, null, 2.1, 6.39, 7.62],
+          "dem": [3.76, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 6.06, null, 4.52, 4.59, null],
+          "ind": [5.36, 5.17, 6.12, 4.52, null, 3.77, 5.26, 6.87, 10.6],
+          "oth": [2.07, 6.51, 4.68, 4.47, 8.19, 9.94, 4.79, 4.78, 8.82]
+        },
+        "e5": {
+          "seifa": true,
+          "ix": "ieo",
+          "foldPt": 2,
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "alp": [40.21, 40.77, 48.43, 41.25, 34.77, 39.95, 34.69, 28.11, 28.62],
+          "lnp": [39.25, 43.53, 38.3, 40.21, 43.54, 36.33, 38.21, 39.7, 36.68],
+          "grn": [3.09, 4.74, 5.51, 9.22, 5.26, 6.06, 6.34, 7.94, 8.46],
+          "onp": [7.25, 2.02, null, null, null, 3.66, 7.61, 7.76, 10.44],
+          "dem": [4.53, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 7.56, null, 4.41, 4.57, null],
+          "xnt": [null, null, null, null, null, 3.4, null, null, null],
+          "ind": [3.6, 3.49, 2.44, 4.52, null, 2.19, 2.39, 5.25, 4.75],
+          "oth": [2.07, 5.44, 5.31, 4.79, 8.87, 8.4, 6.36, 6.68, 11.05]
+        },
+        "r1": {
+          "seifa": true,
+          "ix": "ier",
+          "foldPt": 2,
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "alp": [34.01, 35.21, 36.56, 30.44, 28.75, 29.14, 28.24, 28.38, 31.3],
+          "lnp": [46.84, 48.13, 49.78, 51.89, 51.02, 49.13, 48.39, 39.57, 36.15],
+          "grn": [7.15, 10.76, 8.87, 13.41, 10.23, 11.35, 10.94, 11.85, 11.37],
+          "onp": [null, null, null, null, null, null, 2.15, 3.74, 4.62],
+          "dem": [6.85, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 4.99, null, 2.53, 3.68, null],
+          "ind": [null, null, null, null, null, 2.97, 3.89, 9.43, 10.59],
+          "oth": [5.15, 5.9, 4.78, 4.26, 5.01, 7.41, 3.85, 3.36, 5.98]
+        },
+        "r2": {
+          "seifa": true,
+          "ix": "ier",
+          "foldPt": 2,
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "alp": [38.37, 39.08, 43.77, 37.88, 33.41, 36.65, 33.44, 34.19, 37.35],
+          "lnp": [44.35, 47.14, 42.74, 44.4, 45.49, 42.26, 41.75, 35.25, 30.79],
+          "grn": [4.43, 6.61, 7.82, 12.64, 7.9, 9.67, 10.5, 11.68, 11.31],
+          "onp": [3.43, null, null, null, null, null, 2.7, 4.63, 6.38],
+          "dem": [6.28, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 6.61, null, 3.14, 4.59, null],
+          "xnt": [null, null, null, null, null, 2, null, null, null],
+          "ind": [null, null, null, null, null, null, 2.86, 3.57, 5.57],
+          "oth": [3.14, 7.17, 5.67, 5.08, 6.59, 9.42, 5.61, 6.1, 8.6]
+        },
+        "r3": {
+          "seifa": true,
+          "ix": "ier",
+          "foldPt": 2,
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "alp": [44.34, 42.02, 48.95, 44.85, 36.54, 38.38, 37.65, 35.32, 33.86],
+          "lnp": [38.75, 43.96, 38.57, 38.5, 43.95, 40, 39.01, 33.62, 30.3],
+          "grn": [4.9, 6.59, 6.66, 10.93, 7.67, 9.96, 10.27, 12.9, 11.74],
+          "onp": [3.66, null, null, null, null, null, 4.68, 5.65, 6.89],
+          "dem": [5.49, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 5.53, null, 3.51, 4.12, null],
+          "ind": [null, null, null, null, null, null, null, 3.83, 9.55],
+          "oth": [2.87, 7.42, 5.82, 5.71, 6.3, 11.66, 4.88, 4.56, 7.66]
+        },
+        "r4": {
+          "seifa": true,
+          "ix": "ier",
+          "foldPt": 2,
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "alp": [39.56, 39.51, 45.27, 39.24, 33.61, 33.91, 31.25, 33.51, 37.75],
+          "lnp": [39.31, 42.99, 41.26, 43.41, 44.42, 42.32, 42.5, 35.44, 30.09],
+          "grn": [4.15, 6.4, 7.95, 10.8, 8.85, 9.29, 9.17, 12.48, 13.7],
+          "onp": [5.82, null, null, null, null, 2.04, 3.83, 5.62, 7.04],
+          "dem": [4.41, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 5.24, null, 3.99, 3.82, null],
+          "ind": [5.03, 4.25, null, 2.57, null, 4.56, 4.19, 3.95, 3.87],
+          "oth": [1.74, 6.86, 5.53, 3.98, 7.89, 7.86, 5.08, 5.18, 7.55]
+        },
+        "r5": {
+          "seifa": true,
+          "ix": "ier",
+          "foldPt": 2,
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "alp": [32.94, 32.51, 42.51, 37.77, 34.94, 35.7, 36.29, 31.48, 32.53],
+          "lnp": [45.7, 51.2, 37.77, 39.43, 42.45, 36.04, 35.34, 34.55, 31.64],
+          "grn": [4.08, 5.53, 7.63, 10.95, 8.51, 10.93, 11.19, 12.36, 12.99],
+          "onp": [7.06, null, null, null, null, null, null, 5.19, 7.21],
+          "dem": [3.9, null, null, null, null, null, null, null, null],
+          "uap": [null, null, null, null, 5.08, null, 3.98, 4.43, null],
+          "xnt": [null, null, null, null, null, 4, null, null, null],
+          "ind": [4.72, 3.79, 7.2, 7.99, 2.78, 3.49, 4.78, 5.68, 6.56],
+          "oth": [1.6, 6.97, 4.88, 3.86, 6.24, 9.85, 8.42, 6.32, 9.06]
         }
       }
     }
@@ -9299,47 +9477,152 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         },
         "q1": {
           "seifa": true,
-          "label": "Most-disadvantaged fifth",
-          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
+          "ix": "irsad",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-          "alp": [48.12, 44.64, 48.88, 45.53, 44.35, 48.4, 45.11, 44.25, 47.96],
-          "lnp": [51.88, 55.36, 51.12, 54.47, 55.65, 51.6, 54.89, 55.75, 52.04],
+          "alp": [46.93, 47.35, 51.04, 47.48, 43.04, 44.89, 47.04, 54.1, 59.08],
+          "lnp": [53.07, 52.65, 48.96, 52.52, 56.96, 55.11, 52.96, 45.9, 40.92],
           "short": "Top fifth"
         },
         "q2": {
           "seifa": true,
-          "label": "Second-most-disadvantaged fifth",
-          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
+          "ix": "irsad",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-          "alp": [50.3, 47.81, 56.03, 54.44, 48.77, 51.38, 50.3, 51.7, 52.11],
-          "lnp": [49.7, 52.19, 43.97, 45.56, 51.23, 48.62, 49.7, 48.3, 47.89],
+          "alp": [49.88, 47.13, 51.09, 48.93, 47.14, 50.88, 52.15, 57.55, 59.2],
+          "lnp": [50.12, 52.87, 48.91, 51.07, 52.86, 49.12, 47.85, 42.45, 40.8],
           "short": "2nd fifth"
         },
         "q3": {
           "seifa": true,
+          "ix": "irsad",
           "label": "Middle fifth",
           "elections": "federal elections in the middle fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-          "alp": [50.1, 49.39, 56.42, 54.27, 49.32, 52.78, 47.93, 53.08, 57.14],
-          "lnp": [49.9, 50.61, 43.58, 45.73, 50.68, 47.22, 52.07, 46.92, 42.86],
+          "alp": [50.1, 49.39, 56.42, 54.27, 49.32, 52.78, 47.32, 52.6, 57.14],
+          "lnp": [49.9, 50.61, 43.58, 45.73, 50.68, 47.22, 52.68, 47.4, 42.86],
           "short": "Middle fifth"
         },
         "q4": {
           "seifa": true,
-          "label": "Second-most-advantaged fifth",
-          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
+          "ix": "irsad",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-          "alp": [49.88, 47.13, 51.09, 48.93, 47.14, 50.88, 51.57, 57.23, 59.2],
-          "lnp": [50.12, 52.87, 48.91, 51.07, 52.86, 49.12, 48.43, 42.77, 40.8],
+          "alp": [50.3, 47.81, 56.03, 54.44, 48.77, 51.38, 50.35, 52.43, 52.11],
+          "lnp": [49.7, 52.19, 43.97, 45.56, 51.23, 48.62, 49.65, 47.57, 47.89],
           "short": "4th fifth"
         },
         "q5": {
           "seifa": true,
-          "label": "Most-advantaged fifth",
-          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
+          "ix": "irsad",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
           "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-          "alp": [46.93, 47.35, 51.04, 47.48, 43.04, 44.89, 47.36, 54.04, 59.08],
-          "lnp": [53.07, 52.65, 48.96, 52.52, 56.96, 55.11, 52.64, 45.96, 40.92],
+          "alp": [48.12, 44.64, 48.88, 45.53, 44.35, 48.4, 45.46, 43.95, 47.96],
+          "lnp": [51.88, 55.36, 51.12, 54.47, 55.65, 51.6, 54.54, 56.05, 52.04],
+          "short": "Bottom fifth"
+        },
+        "e1": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [47.03, 48.16, 51.92, 48.72, 45.51, 46.2, 48.49, 56.91, 60.67],
+          "lnp": [52.97, 51.84, 48.08, 51.28, 54.49, 53.8, 51.51, 43.09, 39.33],
+          "short": "Top fifth"
+        },
+        "e2": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [51.17, 49.12, 55.28, 53.13, 49.57, 51.85, 52.96, 55.22, 59.21],
+          "lnp": [48.83, 50.88, 44.72, 46.87, 50.43, 48.15, 47.04, 44.78, 40.79],
+          "short": "2nd fifth"
+        },
+        "e3": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [47.46, 45.33, 50.42, 48.07, 45.64, 50.93, 46.61, 54.71, 56.74],
+          "lnp": [52.54, 54.67, 49.58, 51.93, 54.36, 49.07, 53.39, 45.29, 43.26],
+          "short": "Middle fifth"
+        },
+        "e4": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [49.19, 44.92, 49.72, 48.85, 45.43, 46.13, 47, 49.67, 53.68],
+          "lnp": [50.81, 55.08, 50.28, 51.15, 54.57, 53.87, 53, 50.33, 46.32],
+          "short": "4th fifth"
+        },
+        "e5": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [50.52, 48.69, 56.24, 51.89, 46.43, 53.3, 47.38, 44.34, 45.42],
+          "lnp": [49.48, 51.31, 43.76, 48.11, 53.57, 46.7, 52.62, 55.66, 54.58],
+          "short": "Bottom fifth"
+        },
+        "r1": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [46.81, 47.04, 45.8, 42.69, 41.77, 42.97, 43.08, 49.25, 52.58],
+          "lnp": [53.19, 52.96, 54.2, 57.31, 58.23, 57.03, 56.92, 50.75, 47.42],
+          "short": "Top fifth"
+        },
+        "r2": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [48.49, 47.58, 52.67, 49.87, 46.27, 50.22, 48.64, 52.93, 56.78],
+          "lnp": [51.51, 52.42, 47.33, 50.13, 53.73, 49.78, 51.36, 47.07, 43.22],
+          "short": "2nd fifth"
+        },
+        "r3": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [54.67, 50.54, 57.19, 56.16, 48.55, 52.41, 51.29, 54.44, 55.19],
+          "lnp": [45.33, 49.46, 42.81, 43.84, 51.45, 47.59, 48.71, 45.56, 44.81],
+          "short": "Middle fifth"
+        },
+        "r4": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [50.57, 49.78, 54.24, 50.77, 47.5, 48.97, 45.84, 52.06, 57.23],
+          "lnp": [49.43, 50.22, 45.76, 49.23, 52.5, 51.03, 54.16, 47.94, 42.77],
+          "short": "4th fifth"
+        },
+        "r5": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [44.69, 41.44, 53.86, 51.42, 48.8, 54.04, 53.73, 51.99, 54.34],
+          "lnp": [55.31, 58.56, 46.14, 48.58, 51.2, 45.96, 46.27, 48.01, 45.66],
           "short": "Bottom fifth"
         }
       },
@@ -9426,6 +9709,302 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "alp": [34.11, 43.57, 48.32, 57.44],
       "lnp": [65.89, 56.43, 51.68, 42.56],
       "short": "NSW LC"
+    }
+  };
+  const informalHistory = {
+    "fed": {
+      "label": "Federal",
+      "elections": "Australian federal elections",
+      "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+      "inf": [1.6, 2.5, 3.7, 2, 2.8, 2.3, 2.6, 3.5, 4.5, 2.4, 4.9, 2.6, 3.5, 3.4, 2.6, 2.6, 2.9, 2.5, 2, 1.9, 1.3, 2.9, 2.9, 2.6, 1.8, 3.1, 2.5, 2.2, 1.9, 1.9, 2.5, 2.4, 2.1, 6.8, 4.9, 3.2, 3, 3.2, 3.8, 4.8, 5.18, 3.95, 5.55, 5.91, 5.05, 5.54, 5.19, 5.6],
+      "states": {
+        "nsw": {
+          "label": "New South Wales",
+          "elections": "New South Wales electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "NSW",
+          "inf": [1.9, 2.8, 3.3, 1.6, 3.1, 2.4, 3, 3.8, 4.5, 1.9, 4.8, 2.8, 3.6, 3.3, 2.3, 2.9, 3.1, 2.5, 2, 1.9, 1.3, 2.8, 2.8, 2.4, 1.6, 3.2, 2.3, 1.9, 1.7, 1.9, 2.3, 2.4, 2.2, 6.2, 4.6, 3.1, 3.1, 3.6, 4, 5.4, 6.12, 4.95, 6.83, 7.59, 6.17, 7.01, 6.22, 8.06]
+        },
+        "vic": {
+          "label": "Victoria",
+          "elections": "Victoria electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Vic",
+          "inf": [0.8, 1.8, 3.8, 1.6, 2, 1.8, 2.1, 2.4, 3.2, 1.6, 3.2, 1.4, 2.8, 3, 1.9, 1.8, 2.7, 2, 1.6, 1.6, 1.2, 2.6, 2.4, 2.3, 1.5, 3.7, 3.3, 2.3, 2.1, 2, 2.8, 2.7, 2.2, 8.2, 5.2, 3.5, 2.8, 2.9, 3.5, 4, 4.1, 3.25, 4.5, 5.19, 4.77, 4.66, 4.71, 4.24]
+        },
+        "qld": {
+          "label": "Queensland",
+          "elections": "Queensland electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Qld",
+          "inf": [2.5, 2.6, 4.2, 3, 2.7, 2.7, 2.1, 3.3, 4.8, 3.3, 5.5, 4, 2.9, 2.6, 2.6, 2.2, 2.3, 2.7, 2.1, 1.9, 1.1, 2.2, 3, 2.7, 2.2, 1.8, 1.3, 2, 1.4, 1.3, 1.5, 1.8, 1.3, 4.7, 3.4, 2.2, 2.6, 2.6, 3.3, 4.8, 5.16, 3.56, 5.45, 5.13, 4.7, 4.95, 4.17, 4.93]
+        },
+        "wa": {
+          "label": "Western Australia",
+          "elections": "Western Australia electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "WA",
+          "inf": [1, 4.9, 4.2, 2.1, 3.1, 3.2, 3.6, 3.8, 6.3, 3.1, 3.8, 2.3, 3.5, 3.7, 3.5, 3, 3.5, 2.9, 2.3, 2.5, 1.7, 3.5, 3.6, 3.2, 2.4, 4, 2.6, 2.6, 2.5, 2.3, 3.3, 2.7, 2, 7.4, 6.6, 3.7, 2.5, 3.2, 4.2, 4.9, 5.32, 3.85, 4.82, 5.38, 3.99, 5.44, 5.52, 3.95]
+        },
+        "sa": {
+          "label": "South Australia",
+          "elections": "South Australia electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "SA",
+          "inf": [1.6, 2.7, 5, 5, 4.8, 2.3, 3.5, 5.4, 6.7, 4.3, 9.4, 4.1, 5.3, 6.3, 5, 3.6, 3, 3.1, 2.2, 2.1, 2.5, 4.1, 3.3, 3.1, 2.7, 2.9, 3.4, 2.6, 2.8, 2.4, 3.4, 2.8, 2.7, 8.7, 6.8, 3.7, 4.1, 4.1, 4.5, 5.5, 5.56, 3.78, 5.46, 4.85, 4.18, 4.81, 5.12, 5.26]
+        },
+        "tas": {
+          "label": "Tasmania",
+          "elections": "Tasmania electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Tas",
+          "inf": [2.9, 3.1, 3.9, 2.5, 3.2, 2.4, 3.1, 5, 6.5, 4.9, 6.5, 1.9, 4.7, 3.9, 2.8, 3.1, 3.6, 2.6, 2.6, 3.1, 1, 4.2, 4.1, 3.2, 1.2, 1.5, 1.7, 1.6, 1.8, 1.9, 2.6, 2.6, 2.3, 6.1, 4.9, 3.3, 2.7, 2.4, 3.1, 3.4, 3.59, 2.92, 4.04, 4.04, 3.98, 4.39, 5.85, 4.25]
+        },
+        "act": {
+          "label": "Australian Capital Territory",
+          "elections": "Australian Capital Territory electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "ACT",
+          "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.6, 0.6, 0.8, 0.8, 1.3, 1.3, 2.1, 1.7, 1.8, 2.3, 1.3, 1.7, 2.4, 2.1, 2.2, 5.1, 3.5, 3, 3.4, 2.8, 2.9, 3.5, 3.44, 2.31, 4.66, 3.83, 2.76, 3.49, 2.46, 2.43]
+        },
+        "nt": {
+          "label": "Northern Territory",
+          "elections": "Northern Territory electorates at federal elections",
+          "years": [1901, 1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1929, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1954, 1955, 1958, 1961, 1963, 1966, 1969, 1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "NT",
+          "inf": [null, null, null, null, null, null, null, null, 3.1, 1.8, 3.3, null, 2.4, 1.9, 1.3, 2.1, 2.3, 1, 2.3, 1.9, 2.2, null, 3.8, 3.6, null, 3.5, 3.5, 4.6, 2.8, 3.3, 3.5, 4.9, 4.4, 4.9, 5.8, 3.4, 3.1, 3.4, 4.2, 4.6, 4.45, 3.85, 6.19, 6.3, 7.35, 4.69, 5.31, 3.99]
+        }
+      },
+      "sen": {
+        "label": "Federal Senate",
+        "elections": "Australian Senate elections",
+        "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+        "short": "Senate",
+        "inf": [3.6, 6.4, 4.6, 5.7, 4.2, 3.9, 8.6, 9.4, 7, 9.9, 9.6, 11.3, 10.6, 9.6, 9.7, 8, 10.8, 7.1, 4.6, 9.6, 10.3, 10.6, 7, 6.1, 9.4, 10.8, 9.1, 9, 9.6, 9.9, 4.3, 4.1, 3.4, 2.6, 3.5, 3.2, 3.9, 3.8, 2.6, 3.8, 3, null, 3.9, 3.8, 3.4],
+        "states": {
+          "nsw": {
+            "label": "New South Wales",
+            "elections": "New South Wales Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "NSW",
+            "inf": [4.9, 7.4, 4.7, 6.7, 5, 3.8, 9.4, 10, 6.4, 8.8, 9.4, 13.2, 8.9, 11.6, 12, 8.4, 12, 7.9, 4, 8.8, 12.5, 12.7, 6.2, 6.9, 10.1, 12.3, 9.7, 9.6, 9.4, 11.1, 5.2, 4.9, 4.2, 2.7, 3.8, 3.3, 3.5, 3.5, 2.2, 4.2, 3.3, null, 4.5, 4.3, 3.9]
+          },
+          "vic": {
+            "label": "Victoria",
+            "elections": "Victoria Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Vic",
+            "inf": [2.2, 6.2, 4.6, 4.5, 3.3, 3.2, 7.8, 7.9, 7.6, 10, 9, 9.7, 13.4, 8.9, 8.6, 7.3, 10.7, 6.8, 5.6, 13.5, 9.9, 10.7, 8.4, 6.7, 11.4, 11.1, 8.1, 9.1, 11.1, 10.7, 3.7, 4, 3.6, 3.1, 3.6, 3.8, 5.6, 5.1, 3.3, 3.9, 3.4, null, 4.2, 4, 3.5]
+          },
+          "qld": {
+            "label": "Queensland",
+            "elections": "Queensland Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Qld",
+            "inf": [3.7, 5.9, 5.2, 5.1, 4.2, 4.8, 8, 10.8, 6.4, 8.8, 8.6, 5.5, 6.9, 5.3, 7.3, 6.7, 7.1, 4.7, 2.6, 4.1, 7.2, 8.5, 7.1, 3.1, 7.2, 6, 8.3, 8, 9.2, 8.6, 2.7, 3.1, 2.5, 2, 3.3, 3, 3, 2.8, 2.3, 3.5, 2.2, null, 3.4, 3.3, 3.1]
+          },
+          "wa": {
+            "label": "Western Australia",
+            "elections": "Western Australia Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "WA",
+            "inf": [6, 6.7, 5.4, 6.2, 5.3, 5.2, 9, 9.2, 7.4, 12.3, 9.4, 12.8, 12.7, 9.5, 8, 7.7, 10, 8.9, 7.2, 10, 9.4, 10, 6, 6.7, 7.6, 10.4, 10.8, 8.2, 9.9, 8.1, 4.2, 3.3, 2.9, 2.1, 3.5, 2.7, 3.6, 3.5, 2.4, 3.2, 2.9, 2.5, 3.4, 3.4, 2.9]
+          },
+          "sa": {
+            "label": "South Australia",
+            "elections": "South Australia Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "SA",
+            "inf": [2.2, 3.9, 3.3, 5.7, 3.8, 4.4, 9.1, 9.3, 6, 11.9, 12.6, 14.6, 13.4, 8.2, 7.4, 9.1, 11.6, 5.8, 4.9, 8.9, 7.7, 5.6, 7.5, 5.8, 6.9, 11.4, 9.9, 10.4, 8.7, 8.8, 5, 3.8, 2.5, 2.3, 3.3, 2.8, 3.1, 3.5, 2.4, 3.1, 2.7, null, 3.3, 3.5, 2.9]
+          },
+          "tas": {
+            "label": "Tasmania",
+            "elections": "Tasmania Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "Tas",
+            "inf": [3.9, 4.5, 3.3, 6.2, 4.7, 3.7, 9.7, 9.3, 11.3, 15.7, 13.9, 16.3, 12.6, 13, 13.5, 11.8, 10.5, 11.6, 5.1, 12.6, 11.2, 10, 3.5, 5, 6.2, 11.2, 9.9, 7.1, 7.4, 7.4, 5.7, 3.8, 3.1, 2.6, 3.2, 3.1, 3.3, 3.4, 2.6, 3.2, 2.5, null, 3.5, 3.6, 3.2]
+          },
+          "act": {
+            "label": "Australian Capital Territory",
+            "elections": "Australian Capital Territory Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "ACT",
+            "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.7, 3.1, 2.8, 3.3, 3.1, 2.4, 2.4, 1.6, 2.5, 2, 2.3, 2.5, 1.7, 2.6, 2, null, 2.2, 2.3, 1.7]
+          },
+          "nt": {
+            "label": "Northern Territory",
+            "elections": "Northern Territory Senate",
+            "years": [1903, 1906, 1910, 1913, 1914, 1917, 1919, 1922, 1925, 1928, 1931, 1934, 1937, 1940, 1943, 1946, 1949, 1951, 1953, 1955, 1958, 1961, 1964, 1967, 1970, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2014, 2016, 2019, 2022],
+            "short": "NT",
+            "inf": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 7.2, 6.5, 7.3, 4.7, 2.8, 3.7, 2.8, 2.8, 2.8, 2, 2.8, 3.1, 1.9, 3.7, 2.7, null, 3.3, 3.6, 3]
+          }
+        }
+      },
+      "classes": {
+        "inner": {
+          "label": "Inner metropolitan",
+          "elections": "federal elections in inner metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "inner metro",
+          "inf": [3.65, 3.94, 4.92, 5.48, 4.19, 5.63, 5.99, 4.7, 4.66, 4.55, 4.47]
+        },
+        "outer": {
+          "label": "Outer metropolitan",
+          "elections": "federal elections in outer metro seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "outer metro",
+          "inf": [3.44, 3.84, 5.09, 5.44, 3.98, 5.93, 6.34, 5.17, 5.85, 5.36, 6.03]
+        },
+        "provincial": {
+          "label": "Provincial",
+          "elections": "federal elections in provincial seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "provincial",
+          "inf": [2.79, 3.48, 4.56, 4.79, 3.71, 5.49, 5.71, 5.13, 5.78, 5.28, 5.66]
+        },
+        "rural": {
+          "label": "Rural",
+          "elections": "federal elections in rural seats",
+          "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "rural",
+          "inf": [2.73, 3.67, 4.51, 4.8, 3.8, 5.08, 5.48, 5.27, 6.01, 5.69, 6.32]
+        },
+        "q1": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "inf": [4, 4.55, 3.47, 4.72, 4.83, 3.93, 4.04, 3.7, 3.93]
+        },
+        "q2": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "inf": [4.79, 5.45, 3.75, 5.66, 5.88, 4.92, 4.85, 4.88, 4.86]
+        },
+        "q3": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "inf": [5.18, 5.55, 3.97, 5.57, 5.79, 4.97, 5.41, 5.27, 5.13]
+        },
+        "q4": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "inf": [4.97, 4.94, 4.32, 5.98, 6.24, 5.5, 5.97, 5.83, 6.58]
+        },
+        "q5": {
+          "seifa": true,
+          "ix": "irsad",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "inf": [5.18, 5.43, 4.25, 5.86, 6.87, 5.98, 7.31, 6.25, 7.61]
+        },
+        "e1": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "inf": [4.08, 4.45, 3.4, 4.64, 5.02, 3.88, 3.94, 3.76, 3.86]
+        },
+        "e2": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "inf": [4.79, 5.34, 3.74, 5.5, 5.92, 4.91, 4.81, 4.75, 4.85]
+        },
+        "e3": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "inf": [4.66, 5.21, 3.96, 5.46, 5.53, 5.03, 5.45, 5.38, 5.45]
+        },
+        "e4": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "inf": [5.06, 5.16, 3.97, 5.85, 6.79, 5.49, 6.1, 6.08, 7.46]
+        },
+        "e5": {
+          "seifa": true,
+          "ix": "ieo",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IEO rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "inf": [5.53, 5.75, 4.69, 6.34, 6.34, 5.99, 7.3, 5.93, 6.46]
+        },
+        "r1": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Most-advantaged fifth",
+          "elections": "federal elections in the most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Top fifth",
+          "inf": [4.09, 4.66, 3.51, 4.77, 5, 4.25, 4.65, 4.25, 4.41]
+        },
+        "r2": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Second-most-advantaged fifth",
+          "elections": "federal elections in the second-most-advantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "2nd fifth",
+          "inf": [5.05, 5.56, 3.47, 5.68, 5.62, 5.08, 5.32, 5.42, 5.59]
+        },
+        "r3": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Middle fifth",
+          "elections": "federal elections in the middle fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Middle fifth",
+          "inf": [5.19, 5.71, 4.29, 5.77, 6.3, 4.89, 5.18, 4.85, 5.56]
+        },
+        "r4": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Second-most-disadvantaged fifth",
+          "elections": "federal elections in the second-most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "4th fifth",
+          "inf": [4.9, 5.23, 3.99, 5.51, 5.81, 5.37, 6.14, 5.61, 5.84]
+        },
+        "r5": {
+          "seifa": true,
+          "ix": "ier",
+          "label": "Most-disadvantaged fifth",
+          "elections": "federal elections in the most-disadvantaged fifth of seats by IER rank",
+          "years": [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "short": "Bottom fifth",
+          "inf": [4.86, 4.75, 4.51, 6.06, 6.89, 5.72, 6.37, 5.86, 6.72]
+        }
+      }
     }
   };
   const adjusted = {
@@ -22120,6 +22699,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     flowHistory,
     primaryHistory,
     twoPPHistory,
+    informalHistory,
     adjusted,
     houseEffects,
     houseLean,
@@ -65891,6 +66471,11 @@ const exFrame = narrow => ({
   yTickFmt: exTickFmt,
   baseline: true
 });
+const SEIFA_IX_DESC = {
+  irsad: "the ABS's socio-economic index of advantage and disadvantage",
+  ieo: "the ABS's index of education and occupation",
+  ier: "the ABS's index of economic resources"
+};
 const ExHollowX = () => React.createElement("svg", {
   width: "11",
   height: "11",
@@ -66090,7 +66675,7 @@ function ExplainedFlowChart({
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
   const oneOnlyOn = lcBank ? (S.oneOnly || []).map((v, i) => (S[onCon ? "alp" : "coal"] || [])[i] != null ? Math.round(v) + "% in " + YEARS[i] : null).filter(Boolean).join(", ") : null;
-  const cap = lcBank ? onSen || onCon ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others) — a pair nobody could rank is a gap, never a zero — so the lines open in 2019. Most NSW upper-house voters number just one box above the line — " + oneOnlyOn + " — so most ballots rank neither of the pair; each share is of the cohort’s ballots that went on to rank " + (onCon ? "the Coalition or One Nation" : "Labor or One Nation") + " (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names neither of the pair mostly still counts for a minor group. It is the only state upper house this pair can be counted in: Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices, Western Australia’s tickets ended a year earlier with no ballot-level record since, and the rest publish none. NSW’s ballot record is the only state upper-house count of voters’ own preferences." : "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices. Western Australia’s tickets ended a year earlier — its last ticket count was 2021 — and its first no-ticket election, the statewide count of 2025, published count sheets but no ballot-level record; South Australia’s and Tasmania’s commissions publish none either. NSW’s ballot record is the only state upper-house count of voters’ own preferences." : onCon ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked the Coalition or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Labor voters barely moved: 62.7% named the Coalition ahead of One Nation in 2016, 73.3% by 2025 — Greens voters named the Coalition ahead throughout (82.8% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateCon ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + (exhAdj ? ", so those years’ shares count each party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings." : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.") : "") + nswGap : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district." + tallySheetNote + " NSW voters may stop numbering, so each share " + (exhAdj ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else." : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? (S.seifa ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to a fifth of the chamber by its IRSAD rank at that election — the ABS's socio-economic index of advantage and disadvantage, the most-disadvantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it, so a kink never comes from sliding boundaries — each election rides its own index). From 2004 the count covers every seat: the AEC's two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher's final pair are recovered state by state from its flow-by-state table — where a state's crossbench seats spanned fifths the shares are apportioned over first preferences, and draw the hollow diamonds. The 2001 ring — the index series' floor — counts only the seats where Labor and the Coalition finished first and second. The fourth line is all minor-party voters taken together. A gap in One Nation's line is an election its ballots in the fifth never reached the AEC's table — the party stood in hardly any of the most-advantaged seats through the early 2010s, so the fifths null there; a thin base can still swing a point, so read a null as a missing count, not a zero." : "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). From 2004 the count covers every seat: the AEC’s two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher’s final pair are recovered state by state from its flow-by-state table — where a state’s crossbench seats spanned seat types the shares are apportioned over first preferences, and draw the hollow diamonds. Before 2004 — the rings — only the seats where Labor and the Coalition finished first and second count, the national series’ own early basis. The fourth line is all minor-party voters taken together. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares.") + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "") + markNote;
+  const cap = lcBank ? onSen || onCon ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others) — a pair nobody could rank is a gap, never a zero — so the lines open in 2019. Most NSW upper-house voters number just one box above the line — " + oneOnlyOn + " — so most ballots rank neither of the pair; each share is of the cohort’s ballots that went on to rank " + (onCon ? "the Coalition or One Nation" : "Labor or One Nation") + " (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names neither of the pair mostly still counts for a minor group. It is the only state upper house this pair can be counted in: Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices, Western Australia’s tickets ended a year earlier with no ballot-level record since, and the rest publish none. NSW’s ballot record is the only state upper-house count of voters’ own preferences." : "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices. Western Australia’s tickets ended a year earlier — its last ticket count was 2021 — and its first no-ticket election, the statewide count of 2025, published count sheets but no ballot-level record; South Australia’s and Tasmania’s commissions publish none either. NSW’s ballot record is the only state upper-house count of voters’ own preferences." : onCon ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked the Coalition or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Labor voters barely moved: 62.7% named the Coalition ahead of One Nation in 2016, 73.3% by 2025 — Greens voters named the Coalition ahead throughout (82.8% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateCon ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + (exhAdj ? ", so those years’ shares count each party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings." : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.") : "") + nswGap : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district." + tallySheetNote + " NSW voters may stop numbering, so each share " + (exhAdj ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else." : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? (S.seifa ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to a fifth of the chamber by its " + S.ix.toUpperCase() + " rank at that election — " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it, so a kink never comes from sliding boundaries — each election rides its own index). From 2004 the count covers every seat: the AEC's two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher's final pair are recovered state by state from its flow-by-state table — where a state's crossbench seats spanned fifths the shares are apportioned over first preferences, and draw the hollow diamonds. The 2001 ring — the index series' floor — counts only the seats where Labor and the Coalition finished first and second. The fourth line is all minor-party voters taken together. A gap in One Nation's line is an election its ballots in the fifth never reached the AEC's table — the party stood in hardly any of the most-disadvantaged seats through the early 2010s, so the fifths null there; a thin base can still swing a point, so read a null as a missing count, not a zero." : "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). From 2004 the count covers every seat: the AEC’s two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher’s final pair are recovered state by state from its flow-by-state table — where a state’s crossbench seats spanned seat types the shares are apportioned over first preferences, and draw the hollow diamonds. Before 2004 — the rings — only the seats where Labor and the Coalition finished first and second count, the national series’ own early basis. The fourth line is all minor-party voters taken together. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares.") + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "") + markNote;
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -66387,7 +66972,7 @@ function ExplainedPrimaryChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (statePrim ? statePrim.lc ? lcKey === "nsw" ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019." : "First preferences by party at the " + span + " " + S.elections + ", every formal vote from " + S.srcLine + "." : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + "." : classKey && house !== "sen" ? S.seifa ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - IRSAD is the ABS's socio-economic index of advantage and disadvantage, the most-disadvantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it)." : "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" && !statePrim ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
+  const cap = (statePrim ? statePrim.lc ? lcKey === "nsw" ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019." : "First preferences by party at the " + span + " " + S.elections + ", every formal vote from " + S.srcLine + "." : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + "." : classKey && house !== "sen" ? S.seifa ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)." : "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" && !statePrim ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -66485,7 +67070,7 @@ function Explained2ppChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (lcBank ? "Implied two-party shares of the formal above-the-line New South Wales Legislative Council ballots at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. Counted from the Electoral Commission's own ballot-level record: it is the only state upper house this pair can be counted in (Victoria's council ran party tickets to 2022, Western Australia's first ticket-free count prints no ballot record, and South Australia's and Tasmania's commissions publish none). Most council papers rank just one group above the line - roughly a ballot in four names neither major - so each figure stands on the papers that went on to rank one of the pair. IMPLIED, never an official count: no two-party figure is tallied for the council." : senBank ? "Implied two-party shares of the formal above-the-line Senate ballots" + (stateKey ? " in " + (S.short || S.label) : "") + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter." : classKey ? S.seifa ? "Two-party-preferred shares at the " + span + " federal elections, every division's notional Labor-v-Coalition count summed across the seats of each IRSAD fifth - the ABS's socio-economic index of advantage and disadvantage, the most-disadvantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it)." : "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (!senBank && (classKey && !S.seifa || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (!senBank && (classKey && !S.seifa || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+  const cap = (lcBank ? "Implied two-party shares of the formal above-the-line New South Wales Legislative Council ballots at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. Counted from the Electoral Commission's own ballot-level record: it is the only state upper house this pair can be counted in (Victoria's council ran party tickets to 2022, Western Australia's first ticket-free count prints no ballot record, and South Australia's and Tasmania's commissions publish none). Most council papers rank just one group above the line - roughly a ballot in four names neither major - so each figure stands on the papers that went on to rank one of the pair. IMPLIED, never an official count: no two-party figure is tallied for the council." : senBank ? "Implied two-party shares of the formal above-the-line Senate ballots" + (stateKey ? " in " + (S.short || S.label) : "") + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter." : classKey ? S.seifa ? "Two-party-preferred shares at the " + span + " federal elections, every division's notional Labor-v-Coalition count summed across the seats of each " + S.ix.toUpperCase() + " fifth - " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)." : "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (!senBank && (classKey && !S.seifa || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (!senBank && (classKey && !S.seifa || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
   let dev = 0;
   [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k]), ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map(k => senAll.states[k])] : []), ...(lcAll ? [lcAll] : [])].forEach(v => (v.alp || []).forEach(x => {
     if (x != null) dev = Math.max(dev, Math.abs(x - 50));
@@ -66543,6 +67128,110 @@ function Explained2ppChart({
     }
   }, cap));
 }
+function ExplainedInformalChart(props) {
+  const {
+    house,
+    stateKey,
+    classKey,
+    menu
+  } = props;
+  const narrow = useNarrow(window.MQ_PHONE);
+  const IH = window.AUSPOL.informalHistory || null;
+  if (!IH || !IH.fed) return null;
+  const bank = house === "sen" ? IH.fed.sen : IH.fed;
+  if (!bank) return null;
+  const S = classKey && house !== "sen" && (IH.fed.classes || {})[classKey] || stateKey && (bank.states || {})[stateKey] || bank;
+  const YEARS = S.years || [];
+  if (!YEARS.length) return null;
+  const vals = S.inf || [];
+  const runs = [];
+  let cur = [];
+  vals.forEach((v, i) => {
+    if (v == null) {
+      if (cur.length) runs.push(cur);
+      cur = [];
+    } else cur.push({
+      x: YEARS[i],
+      y: v
+    });
+  });
+  if (cur.length) runs.push(cur);
+  const series = [];
+  runs.forEach((points, i) => {
+    const tail = i === runs.length - 1;
+    series.push({
+      id: "inf" + i,
+      label: "Informal",
+      color: "var(--ink)",
+      points,
+      smooth: false,
+      rdWidth: 2.5,
+      endCap: tail || points.length === 1,
+      endLabel: null
+    });
+  });
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1,
+    x1 = YEARS[YEARS.length - 1] + pad1;
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
+  const cap = (classKey && house !== "sen" ? S.seifa ? "Informal ballots as a share of all ballots cast at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + " - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it). Counted from the AEC's own per-division results." : "Informal ballots as a share of all ballots cast at the " + span + " federal elections in " + (S.short || S.label) + " seats, each seat grouped by the AEC's own classification for that election's divisions. Counted from the AEC's per-division results (the statistics packs' polling-place tables to 2001, the vote-type downloads from 2004)." : stateKey ? "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections in " + (S.short || S.label) + ", from the handbook's appendix tables before 2004 and the AEC's own published figures since." : "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the Parliamentary Handbook's appendix tables before 2004 and the AEC's own published figures since (the House figures from its vote-type downloads, the Senate's from its informality summary).") + " The Senate series ends at 2022 - the AEC's informality summary, its only machine-readable Senate informal publication, has no 2025 line yet." + (classKey && house !== "sen" && !S.seifa ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own two-party table omits it." : "") + " A territory not yet represented draws a gap, never a zero.";
+  let pk = 0;
+  [IH.fed, ...Object.keys(IH.fed.states || {}).map(k => IH.fed.states[k]), ...Object.keys(IH.fed.classes || {}).map(k => IH.fed.classes[k]), ...(IH.fed.sen ? [IH.fed.sen, ...Object.keys(IH.fed.sen.states || {}).map(k => IH.fed.sen.states[k])] : [])].forEach(v => (v.inf || []).forEach(x => {
+    if (x != null) pk = Math.max(pk, x);
+  }));
+  const yMax = Math.max(5, Math.ceil(pk / 5) * 5);
+  const YT = [];
+  for (let v = 0; v <= yMax; v += 5) YT.push(v);
+  const lines = [{
+    kind: "line",
+    color: "var(--ink)",
+    label: "Informal share of ballots cast"
+  }];
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-chead ex-fl-head"
+  }, React.createElement("span", {
+    className: "rd-chead-t"
+  }, "Informal votes, % of ballots cast", React.createElement("span", {
+    className: "rd-chead-meta"
+  }, scope)), menu), narrow && React.createElement(RdKey, {
+    items: lines,
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, _extends({
+    key: "ex-inf-" + (house || "rep") + (stateKey || "") + (classKey || "")
+  }, exFrame(narrow), {
+    xDomain: [x0, x1],
+    yDomain: [0, yMax],
+    yTicks: YT,
+    yTickFmt: v => v === YT[YT.length - 1] ? v + "%" : String(v),
+    xTicks: YEARS.map(x => ({
+      x,
+      label: String(x)
+    })),
+    unit: "%",
+    fmt: v => v.toFixed(1),
+    series: series,
+    spine: YEARS.map(x => ({
+      x
+    })),
+    tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
+    ariaLabel: "Informal share of ballots cast, " + S.label + ", " + span,
+    copy: {
+      title: "Informal share of ballots cast, " + (S.short || S.label),
+      sub: rdCap(S.elections || S.label + " elections") + ". From the Parliamentary Handbook's historical tables and the AEC's own published figures.",
+      caption: "From the Parliamentary Handbook's tables and the AEC's published figures; informal ÷ (formal + informal) ballots.",
+      legend: narrow ? lines : []
+    }
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: []
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "flow-history",
+      from: "Preference flows explained"
+    }
+  }, cap));
+}
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
@@ -66584,10 +67273,14 @@ function RdExplained() {
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
-  const figView = primMode || twoMode;
+  const IH_HIST = window.AUSPOL.informalHistory || null;
+  const IH_SEN = IH_HIST && IH_HIST.fed && IH_HIST.fed.sen || null;
+  const infMode = figMode === "informal" && !!(IH_HIST && IH_HIST.fed && IH_SEN && IH_HIST.fed.classes);
+  const figView = primMode || twoMode || infMode;
   const PH_CLASSES = PH_HIST && PH_HIST.fed && PH_HIST.fed.classes || {};
   const TP_CLASSES = TP_HIST && TP_HIST.fed && TP_HIST.fed.classes || {};
-  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? house === "sen" ? {} : TP_CLASSES : FED_CLASSES;
+  const IH_CLASSES = IH_HIST && IH_HIST.fed && IH_HIST.fed.classes || {};
+  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? house === "sen" ? {} : TP_CLASSES : infMode ? house === "sen" ? {} : IH_CLASSES : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
@@ -66620,6 +67313,10 @@ function RdExplained() {
     }
     if (twoMode) {
       if (classKey || lcView) setView("fed");
+      return;
+    }
+    if (infMode) {
+      if (classKey) setView("fed");
       return;
     }
     if (next === "sen") {
@@ -66738,21 +67435,25 @@ function RdExplained() {
       if (!(view === "fed" || lcView && LC_CON_BANK || stateKey && hasConCells(stateKey))) setView("fed");
     }
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : pair === "con" ? [...(SEN_CON_BANK ? ["fed", ...senConStateKeys.map(k => "fed:" + k)] : []), ...(LC_CON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : infMode ? house === "sen" ? ["fed", ...Object.keys(IH_SEN && IH_SEN.states || {}).map(k => "fed:" + k)] : ["fed", ...Object.keys(IH_HIST.fed && IH_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(IH_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : pair === "con" ? [...(SEN_CON_BANK ? ["fed", ...senConStateKeys.map(k => "fed:" + k)] : []), ...(LC_CON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
     if (twoMode && (badClass || lcView && house !== "sen" || !fedView && !lcView)) setView("fed");
     if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
-  }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
+    if (infMode && (badClass || lcView || steView || !fedView)) setView("fed");
+    if (infMode && house === "sen" && !IH_SEN) setHouse("rep");
+  }, [primMode, twoMode, infMode, badClass, lcView, fedView, steView, house]);
   const onConPair = pair === "on" || pair === "con";
   const menuShow = figView ? VIEW_OPTS.length > 0 : onConPair && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (onConPair ? 0 : 1) : VIEW_OPTS.length > 0;
-  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? lcView ? [] : tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : pair === "con" ? senConStateKeys : senStateKeys : stateKeys;
-  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? lcView ? {} : TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : pair === "con" ? CON_SEN_STATES : SEN_STATES : FED_STATES;
+  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? lcView ? [] : tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : infMode ? house === "sen" ? Object.keys(IH_SEN && IH_SEN.states || {}) : Object.keys(IH_HIST.fed && IH_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : pair === "con" ? senConStateKeys : senStateKeys : stateKeys;
+  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? lcView ? {} : TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : infMode ? house === "sen" ? IH_SEN && IH_SEN.states || {} : IH_HIST.fed && IH_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : pair === "con" ? CON_SEN_STATES : SEN_STATES : FED_STATES;
   const lcBank = pair === "on" ? LC_ON_BANK : pair === "con" ? LC_CON_BANK : LC_BANK;
   const menuClassKeys = figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys;
   const menuClassSeat = menuClassKeys.filter(k => !classBank[k].seifa);
-  const menuClassSeifa = menuClassKeys.filter(k => classBank[k].seifa);
+  const menuClassIrsad = menuClassKeys.filter(k => classBank[k].ix === "irsad");
+  const menuClassIeo = menuClassKeys.filter(k => classBank[k].ix === "ieo");
+  const menuClassIer = menuClassKeys.filter(k => classBank[k].ix === "ier");
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -66768,9 +67469,19 @@ function RdExplained() {
   }, "Federal, " + (menuBank[k].short || menuBank[k].label))), menuClassSeat.map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
-  }, "Federal, " + (classBank[k].short || classBank[k].label)))), menuClassSeifa.length > 0 && React.createElement("optgroup", {
+  }, "Federal, " + (classBank[k].short || classBank[k].label)))), menuClassIrsad.length > 0 && React.createElement("optgroup", {
     label: "Federal, by IRSAD quintile"
-  }, menuClassSeifa.map(k => React.createElement("option", {
+  }, menuClassIrsad.map(k => React.createElement("option", {
+    key: "fedcl:" + k,
+    value: "fedcl:" + k
+  }, classBank[k].short || classBank[k].label))), menuClassIeo.length > 0 && React.createElement("optgroup", {
+    label: "Federal, by IEO quintile"
+  }, menuClassIeo.map(k => React.createElement("option", {
+    key: "fedcl:" + k,
+    value: "fedcl:" + k
+  }, classBank[k].short || classBank[k].label))), menuClassIer.length > 0 && React.createElement("optgroup", {
+    label: "Federal, by IER quintile"
+  }, menuClassIer.map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
   }, classBank[k].short || classBank[k].label))), !figView && house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
@@ -66827,8 +67538,8 @@ function RdExplained() {
   }, (twoInv ? "Coalition" : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
-  const shareSlot = primMode ? null : twoMode ? share2pp : share;
-  const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK && (primMode || pair !== "con")) ? React.createElement("span", {
+  const shareSlot = primMode || infMode ? null : twoMode ? share2pp : share;
+  const houseCtl = (twoMode ? !!TP_SEN : infMode ? !!IH_SEN : SEN_BANK && (primMode || pair !== "con")) ? React.createElement("span", {
     className: "rd-pl-ctl ex-house"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -66836,7 +67547,7 @@ function RdExplained() {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": house === "sen",
-    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : twoMode ? house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
+    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : twoMode ? house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)" : infMode ? house === "sen" ? "Switch to House of Representatives informal shares" : "Switch to Senate informal shares (informal ballots over the whole chamber)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
     onClick: flipHouse
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
@@ -66845,17 +67556,20 @@ function RdExplained() {
   }, "\u21C4"))) : null;
   const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
   const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
+  const infViewOk = !!(IH_HIST && IH_HIST.fed && IH_HIST.fed.sen && IH_HIST.fed.classes);
   const FIG_LABELS = {
     flows: "Preference flows",
     primary: "Primary votes",
-    "2pp": "2PP"
+    "2pp": "2PP",
+    informal: "Informal votes"
   };
   const FIG_TITLES = {
     flows: "Switch to the preference-flow history",
     primary: "Switch to first-preference vote shares at every election",
-    "2pp": "Switch to two-party preferred shares at every election"
+    "2pp": "Switch to two-party preferred shares at every election",
+    informal: "Switch to informal ballots’ share of the vote at every election"
   };
-  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : [])];
+  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : []), ...(infViewOk ? ["informal"] : [])];
   const nextFig = FIG_STOPS[(FIG_STOPS.indexOf(figMode) + 1) % FIG_STOPS.length];
   const viewCtl = FIG_STOPS.length > 1 ? React.createElement("span", {
     className: "rd-pl-ctl ex-view"
@@ -66910,17 +67624,24 @@ function RdExplained() {
   }, viewCtl) : null, figView ? viewCtl ? React.createElement("div", {
     className: "ex-fl-viewrow ex-fl-tabslot"
   }, viewCtl, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
-    className: "ex-fl-flips"
+    className: "ex-fl-flips ex-fl-vstack"
   }, houseCtl, shareSlot)) : null : React.createElement(RdTabs, {
     value: pair,
     onChange: onPairPick,
     ariaLabel: "Contest",
-    className: "ex-fl-tabs rd-tabs-sm",
+    className: "ex-fl-tabs",
     options: EX_PAIRS.map(p => ({
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
+  }, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
+    className: "ex-fl-vstack"
+  }, houseCtl, shareSlot)), infMode ? React.createElement(ExplainedInformalChart, {
+    house: house,
+    stateKey: stateKey,
+    classKey: classKey,
+    menu: headCtls
+  }) : twoMode ? React.createElement(Explained2ppChart, {
     house: house,
     stateKey: stateKey,
     classKey: classKey,

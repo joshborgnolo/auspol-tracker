@@ -1139,6 +1139,7 @@ export function validatePrimaryHistory() {
     const foldHere = (typeof v.foldPt === "number" && v.foldPt > 0 && v.foldPt <= 20) ? v.foldPt : FOLD;
     if (v.foldPt != null && foldHere !== v.foldPt) fail(where, "primary-history-shape", `bad record foldPt ${v.foldPt}`);
     if (v.seifa === true && v.foldPt == null) fail(where, "primary-history-shape", "a seifa fifth record carries no foldPt — its halved fold gate must be explicit");
+    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier") fail(where, "primary-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
     for (const k of GATED) {
       if (v[k] == null) continue;
       if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "primary-history-shape", `${k} not aligned to years`); continue; }
@@ -1160,8 +1161,10 @@ export function validatePrimaryHistory() {
   else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
   for (const [st, v] of Object.entries((S.fed.sen && S.fed.sen.states) || {})) checkView(`fed.sen.${st}`, v);
   /* the seat-class views (House only): four AEC classifications riding
-     the divisions' 1996–2025 span, plus the five IRSAD fifths on the index
-     series' own 2001–2025 — a division rides its election's own grouping */
+     the divisions' 1996–2025 span, plus the fifteen SEIFA fifths (five
+     per index, IRSAD then IEO then IER, each ix-tagged) on the index
+     series' own 2001–2025 — a division rides its election's own
+     grouping */
   if (!S.fed.classes || typeof S.fed.classes !== "object") fail("primary-history.json", "primary-history-shape", "no fed.classes");
   else for (const [ck, v] of Object.entries(S.fed.classes)) {
     checkView(`fed.${ck}`, v);
@@ -1227,13 +1230,16 @@ export function validate2ppHistory() {
     if (!S.fed[sect] || typeof S.fed[sect] !== "object") { fail("2pp-history.json", "2pp-history-shape", `no fed.${sect}`); continue; }
     for (const [k, v] of Object.entries(S.fed[sect])) {
       checkView(`fed.${k}`, v);
-      /* the IRSAD fifths ride the classes bank on the index series' own
-         2001–2025 span; every other cut joins the AEC counts at 1996 */
+      /* the SEIFA fifths (five per index) ride the classes bank on the
+         index series' own 2001–2025 span; every other cut joins the AEC
+         counts at 1996 */
       const cutStart = v.seifa ? 2001 : 1996;
       if (v.seifa === true && sect !== "classes")
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa flag outside the classes bank");
       if (sect === "classes" && v.seifa === true && v.short !== undefined && typeof v.short !== "string")
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa record short is not a string");
+      if (sect === "classes" && v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier")
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
       if (Array.isArray(v.years) && v.years.length && (v.years[0] !== cutStart || v.years[v.years.length - 1] !== 2025))
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected ${v.seifa ? "the index series' 2001–2025" : "the AEC counts' 1996–2025"}`);
     }
@@ -1273,6 +1279,70 @@ export function validate2ppHistory() {
   checkView("nswLc", lc);
   if (JSON.stringify(lc.years) !== JSON.stringify(LC_YRS))
     fail("2pp-history.json nswLc", "2pp-history-shape", `council years ${JSON.stringify(lc.years)}, expected the banked elections [2011,2015,2019,2023]`);
+  return errors;
+}
+
+/* informal-history.json — the shares behind the flows-explained chart's
+   "View: Informal votes" flip (2026-10-24, .build/aec-informal-history.py;
+   the figures' recomposition of the printed AEC/APH figures is pinned at
+   generation and by test-informal-history.mjs). Shape only: every view's
+   years ascend, inf aligned as 0–100 numbers-or-nulls (a territory not
+   yet represented is a gap, never a zero), House national 1901–2025,
+   Senate 1903–2022 (the AEC informality summary's 2022 floor — no 2025
+   Senate informal figure exists in any machine-readable publication),
+   classes 1996–2025 and the SEIFA fifths 2001–2025, House-only. */
+export function validateInformalHistory() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "informal-history.json"), "utf8")); }
+  catch { fail("informal-history.json", "informal-history-shape", "missing or unparseable"); return errors; }
+  const checkView = (where, v) => {
+    if (!v || typeof v !== "object") { fail(where, "informal-history-shape", "view is not an object"); return; }
+    if (typeof v.label !== "string" || typeof v.elections !== "string") fail(where, "informal-history-shape", "no label/elections copy");
+    const ys = v.years;
+    if (!Array.isArray(ys) || !ys.length || !ys.every((y) => Number.isInteger(y))) { fail(where, "informal-history-shape", "bad years"); return; }
+    if (!ys.every((y, i) => i === 0 || y > ys[i - 1])) fail(where, "informal-history-shape", "years out of order");
+    if (!Array.isArray(v.inf) || v.inf.length !== ys.length) { fail(where, "informal-history-shape", "inf not aligned to years"); return; }
+    v.inf.forEach((x, i) => {
+      if (x == null) return;
+      if (typeof x !== "number" || x <= 0 || x > 25) fail(where, "range", `inf[${ys[i]}] = ${x} (an informal share sits inside 0–25%)`);
+    });
+  };
+  if (!S.fed || typeof S.fed !== "object") { fail("informal-history.json", "informal-history-shape", "no fed view"); return errors; }
+  checkView("fed", S.fed);
+  if (S.fed.years && S.fed.years.length >= 2) {
+    if (S.fed.years[0] !== 1901 || S.fed.years[S.fed.years.length - 1] !== 2025)
+      fail("informal-history.json", "informal-history-shape", `House national span ${S.fed.years[0]}–${S.fed.years[S.fed.years.length - 1]}, expected 1901–2025`);
+  }
+  if (!S.fed.states || typeof S.fed.states !== "object") fail("informal-history.json", "informal-history-shape", "no fed.states");
+  else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
+  // fed.sen: the OFFICIAL Senate figures (nothing implied here) — the
+  // handbook's tables to 1975, the AEC informality summary from 1977,
+  // whose 2022 line is the floor until the AEC publishes a 2025 one.
+  const sen = S.fed.sen;
+  if (!sen || typeof sen !== "object") { fail("informal-history.json", "informal-history-shape", "no fed.sen view"); return errors; }
+  checkView("fed.sen", sen);
+  if (sen.implied === true) fail("informal-history.json fed.sen", "informal-history-shape", "the senate informal series is an official count — no implied flag belongs here");
+  if (sen.classes) fail("informal-history.json fed.sen", "informal-history-shape", "no division-class cuts exist for the Senate");
+  if (Array.isArray(sen.years) && sen.years.length >= 2) {
+    if (sen.years[0] !== 1903 || sen.years[sen.years.length - 1] !== 2022)
+      fail("informal-history.json fed.sen", "informal-history-shape", `senate span ${sen.years[0]}–${sen.years[sen.years.length - 1]}, expected 1903–2022 (the AEC summary's floor)`);
+  }
+  for (const [st, v] of Object.entries((sen && sen.states) || {})) checkView(`fed.sen.${st}`, v);
+  if (!S.fed.classes || typeof S.fed.classes !== "object") fail("informal-history.json", "informal-history-shape", "no fed.classes");
+  else for (const [ck, v] of Object.entries(S.fed.classes)) {
+    checkView(`fed.${ck}`, v);
+    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier")
+      fail(`informal-history.json fed.${ck}`, "informal-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
+    if (v.seifa === true && typeof v.short !== "string")
+      fail(`informal-history.json fed.${ck}`, "informal-history-shape", "seifa record short is not a string");
+    if (Array.isArray(v.years) && v.years.length) {
+      const span0 = v.seifa ? 2001 : 1996;
+      if (v.years[0] !== span0 || v.years[v.years.length - 1] !== 2025)
+        fail(`informal-history.json fed.${ck}`, "informal-history-shape", `class span ${v.years[0]}–${v.years[v.years.length - 1]}, expected ${span0}–2025`);
+    }
+  }
   return errors;
 }
 
@@ -1368,6 +1438,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   errors.push(...validateChangelog());
   errors.push(...validatePrimaryHistory());
   errors.push(...validate2ppHistory());
+  errors.push(...validateInformalHistory());
   errors.push(...validateBooth());
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());

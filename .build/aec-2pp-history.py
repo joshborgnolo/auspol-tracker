@@ -34,19 +34,32 @@ preferred vote at each federal election:
                        HTPP tables were in the statistics zips all along
                        (1993's is informal votes only, so 1996 is the
                        true floor).
-  IRSAD fifths 2001–2025
-             the same counts again, files as q1..q5 beside the four
-                       classes in fed.classes with the seifa marker the
-                       charts fork their captions on (2026-10-24, the user-
-                       approved ABS-SEIFA addition: quintile bands, IRSAD
-                       only, all three measures). data/division-seifa-
-                       indexes.json's census-interpolated percentile where
-                       the store carries one (2013, 2016, 2019), the
-                       recorded rankDis otherwise (1 = most disadvantaged),
-                       thirty seats a fifth – the 151-seat 2019/2022
-                       chambers give the spare seat to the most-advantaged
-                       fifth. seifa_quintiles.py is the vote; the floor is
-                       the seifa store's own (2001, via the HTPP table).
+  IRSAD/IEO/IER fifths 2001–2025
+             the same counts again, files as q1..q5 (IRSAD), e1..e5
+                       (IEO) and r1..r5 (IER) beside the four classes in
+                       fed.classes with
+                       the seifa marker the charts fork their captions
+                       on and each record's ix naming its index (2026-10-24,
+                       the user-approved ABS-SEIFA addition: quintile
+                       bands, all three measures; IEO joined IRSAD the
+                       same day on "do what you did for irsad to ieo",
+                       and IER later on "do the same for IER: 'Federal,
+                       by IER quintile'"; the interpolated percentile
+                       became the IRSAD lane's default ranking basis on
+                       the same day's "add an interpolated percentile
+                       observation… used by default, and used in the
+                       flow chart?").
+                       data/division-seifa-indexes.json's census-
+                       interpolated IRSAD percentile where the store
+                       ships one (the _pcti factor years 2013/2016/2019),
+                       every cell's recorded advantage-ordered rank
+                       otherwise (the census-filed `rank`; IEO's and
+                       IER's print-order ranks reflected; 1 = most
+                       advantaged), thirty
+                       seats a fifth – the 151-seat 2019/2022 chambers
+                       give the spare seat to the most-disadvantaged fifth.
+                       seifa_quintiles.py is the vote; the floor is the
+                       seifa store's own (2001, via the HTPP table).
   senate   2016–2025   IMPLIED, never counted – no official two-party
                        exists for the chamber seats are not filled from.
                        From the committed ATL tallies
@@ -87,7 +100,7 @@ Usage: python3 .build/aec-2pp-history.py [--check]
 """
 import csv, json, os, sys
 
-from seifa_quintiles import QUINT_META, SEIFA_YEARS, elections_suffix, membership as seifa_membership
+from seifa_quintiles import INDEX_META, QIDXES, SEIFA_YEARS, elections_suffix, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -285,7 +298,7 @@ def build():
 
     per_state = {s: {} for s in STATES}     # st -> {year: (alp, lnp) shares}
     per_class = {k: {} for k, _, _ in CLASS_META}
-    per_quint = {q: {} for q, _, _, _ in QUINT_META}
+    per_quint = {ix: {m[0]: {} for m in INDEX_META[ix]["meta"]} for ix in QIDXES}
     for y in YEARS:
         v = tppdiv_votes(y)
         derived = alp_share(v["nat"])
@@ -308,20 +321,23 @@ def build():
             a = alp_share(sums[ck])
             per_class[ck][y] = (a, 100.0 - a)
         if y in SEIFA_YEARS:
-            # the IRSAD-fifth regrouping of the very same per-division
-            # counts (seifa_quintiles.membership marks every division one
-            # of q1..q5 by that election's IRSAD percentile)
-            mem = seifa_membership(y)
-            assert set(mem) == set(v["perDiv"]), \
-                f"{y}: IRSAD-quintile join drifted - quintilised {sorted(set(mem) - set(v['perDiv']))[:3]}, counted-only {sorted(set(v['perDiv']) - set(mem))[:3]}"
-            qs = {q: [0.0, 0.0] for q, _, _, _ in QUINT_META}
-            for div, pair in v["perDiv"].items():
-                qk = mem[div]["classification"]
-                qs[qk][0] += pair[0]
-                qs[qk][1] += pair[1]
-            for qk, _, _, _ in QUINT_META:
-                a = alp_share(qs[qk])
-                per_quint[qk][y] = (a, 100.0 - a)
+            # the SEIFA-fifth regroupings of the very same per-division
+            # counts, one lane per index (seifa_quintiles.membership
+            # marks every division one fifth by that election's index
+            # rank – IRSAD's interpolated percentile where the store
+            # ships one, the census-filed rank otherwise)
+            for ix in QIDXES:
+                mem = seifa_membership(y, ix)
+                assert set(mem) == set(v["perDiv"]), \
+                    f"{y} {ix}: quintile join drifted - quintilised {sorted(set(mem) - set(v['perDiv']))[:3]}, counted-only {sorted(set(v['perDiv']) - set(mem))[:3]}"
+                qs = {m[0]: [0.0, 0.0] for m in INDEX_META[ix]["meta"]}
+                for div, pair in v["perDiv"].items():
+                    qk = mem[div]["classification"]
+                    qs[qk][0] += pair[0]
+                    qs[qk][1] += pair[1]
+                for qk, _, _, _ in INDEX_META[ix]["meta"]:
+                    a = alp_share(qs[qk])
+                    per_quint[ix][qk][y] = (a, 100.0 - a)
     for y in HTT_YEARS:
         v = htpp_votes(y)["perDiv"]
         blk = cls_blocks.get(str(y))
@@ -353,19 +369,21 @@ def build():
             a = alp_share(per_cl[ck])
             per_class[ck][y] = (a, 100.0 - a)
         if y in SEIFA_YEARS:    # 2001 - the HTPP era's one seifa year
-            mem = seifa_membership(y)
-            assert set(mem) == set(v), \
-                f"{y}: IRSAD-quintile HTPP join drifted - quintilised {sorted(set(mem) - set(v))[:3]}, counted-only {sorted(set(v) - set(mem))[:3]}"
-            qk_sums = {q: [0.0, 0.0] for q, _, _, _ in QUINT_META}
-            for div, pair in v.items():
-                qk_sums[mem[div]["classification"]][0] += pair[0]
-                qk_sums[mem[div]["classification"]][1] += pair[1]
-            for qk, _, _, _ in QUINT_META:
-                a = alp_share(qk_sums[qk])
-                per_quint[qk][y] = (a, 100.0 - a)
-    for q, _, _, _ in QUINT_META:
-        assert sorted(per_quint[q]) == list(SEIFA_YEARS), \
-            f"{q}: quintile cut misses a seifa year: {sorted(per_quint[q])}"
+            for ix in QIDXES:
+                mem = seifa_membership(y, ix)
+                assert set(mem) == set(v), \
+                    f"{y} {ix}: quintile HTPP join drifted - quintilised {sorted(set(mem) - set(v))[:3]}, counted-only {sorted(set(v) - set(mem))[:3]}"
+                qk_sums = {m[0]: [0.0, 0.0] for m in INDEX_META[ix]["meta"]}
+                for div, pair in v.items():
+                    qk_sums[mem[div]["classification"]][0] += pair[0]
+                    qk_sums[mem[div]["classification"]][1] += pair[1]
+                for qk, _, _, _ in INDEX_META[ix]["meta"]:
+                    a = alp_share(qk_sums[qk])
+                    per_quint[ix][qk][y] = (a, 100.0 - a)
+    for ix in QIDXES:
+        for q, _, _, _ in INDEX_META[ix]["meta"]:
+            assert sorted(per_quint[ix][q]) == list(SEIFA_YEARS), \
+                f"{ix} {q}: quintile cut misses a seifa year: {sorted(per_quint[ix][q])}"
 
     def view(label, elections_copy, rows, short=None):
         d = {"label": label, "elections": elections_copy,
@@ -377,7 +395,7 @@ def build():
         return d
 
     doc = {
-        "_comment": "GENERATED by .build/aec-2pp-history.py – Labor v Coalition two-party-preferred shares behind the flows-explained chart's 2PP view. National cells are data/polls.json's canonical election records verbatim; state and class cuts are the AEC's own per-division two-party counts summed per state, or per AEC division classification or ABS IRSAD fifth (fed.classes – the fifths are seifa:true entries riding the same bank, .build/seifa_quintiles.py the membership) – the TPP By Division downloads 2004–2025 (tppdiv-*.csv), extended to 1996 by the statistics packs' House TPP By Polling Place tables (htpp-*.txt; 1998 counts 147 divisions, the AEC's table omitting Newcastle's Labor-v-independent pair). The Coalition cell is 100 minus Labor's. fed.sen is the IMPLIED Senate two-party (no official one exists – the AEC counts no 2PP in the chamber seats are not filled from): the share of above-the-line papers naming a major party that name Labor first, computed from the committed ATL tallies, 2016 on. nswLc is the IMPLIED New South Wales Legislative Council two-party, the same naming-a-major share over the council's 2011–2023 ballots from the committed NSWEC counts – the only state upper house with a published ballot-level record.",
+        "_comment": "GENERATED by .build/aec-2pp-history.py – Labor v Coalition two-party-preferred shares behind the flows-explained chart's 2PP view. National cells are data/polls.json's canonical election records verbatim; state and class cuts are the AEC's own per-division two-party counts summed per state, or per AEC division classification or ABS IRSAD/IEO/IER fifth (fed.classes – the fifths are seifa:true, ix-tagged entries riding the same bank, .build/seifa_quintiles.py the memberships) – the TPP By Division downloads 2004–2025 (tppdiv-*.csv), extended to 1996 by the statistics packs' House TPP By Polling Place tables (htpp-*.txt; 1998 counts 147 divisions, the AEC's table omitting Newcastle's Labor-v-independent pair). The Coalition cell is 100 minus Labor's. fed.sen is the IMPLIED Senate two-party (no official one exists – the AEC counts no 2PP in the chamber seats are not filled from): the share of above-the-line papers naming a major party that name Labor first, computed from the committed ATL tallies, 2016 on. nswLc is the IMPLIED New South Wales Legislative Council two-party, the same naming-a-major share over the council's 2011–2023 ballots from the committed NSWEC counts – the only state upper house with a published ballot-level record.",
         "fed": view("Federal", "Australian federal elections", nat_rows,
                     ),
     }
@@ -390,15 +408,20 @@ def build():
     for ck, label, short in CLASS_META:
         doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats",
                                          per_class[ck], short=short)
-    # The IRSAD fifths file as five more entries in the SAME classes bank,
-    # after the four classifications (the explainer's "Federal elections"
-    # optgroup reads the bank straight; the charts fork their captions on
-    # the seifa flag, and each record's own elections copy says what the
-    # grouping is)
-    for q, label, short, desc in QUINT_META:
-        doc["fed"]["classes"][q] = {"seifa": True,
-                                    **view(label, f"federal elections in the {desc} {elections_suffix()}",
-                                           per_quint[q], short=short)}
+    # The SEIFA fifths file as fifteen more entries in the SAME classes
+    # bank, after the four classifications - five per index, each record's
+    # ix naming its index (the explainer's menu reads the bank straight;
+    # the charts fork their captions on the seifa flag + ix, and each
+    # record's own elections copy says what the grouping is; the IRSAD
+    # lane's copy names the interpolated-percentile basis where the
+    # store ships one)
+    for ix in QIDXES:
+        basis = elections_suffix() if ix == "irsad" \
+            else f"of seats by {ix.upper()} rank"
+        for q, label, short, desc in INDEX_META[ix]["meta"]:
+            doc["fed"]["classes"][q] = {"seifa": True, "ix": ix,
+                                        **view(label, f"federal elections in the {desc} {basis}",
+                                               per_quint[ix][q], short=short)}
 
     sen = senate_implied()
     sen_nat = {y: sen[y]["nat"] for y in SEN_YEARS}

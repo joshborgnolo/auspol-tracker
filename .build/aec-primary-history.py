@@ -1,10 +1,10 @@
 """aec-primary-history.py – the national + per-state PRIMARY-VOTE history
 behind the /flows-explained/ chart's "View: Primary votes" flip.
 
-IRSAD fifths 2001–2025 ride beside the class cuts in fed.classes
-(seifa_quintiles membership; the quintile cell of a flow-history class is
-the mean of its division cells, so this script's per-division votes roll
-up the same way).
+IRSAD, IEO and IER fifths 2001–2025 ride beside the class cuts in
+fed.classes (seifa_quintiles membership, one lane per index; the quintile
+cell of a flow-history class is the mean of its division cells, so this
+script's per-division votes roll up the same way).
 
 One series per party family at every federal election, as % of formal first
 preferences: two majors always drawn, the era's named minors drawn only
@@ -61,7 +61,7 @@ Usage: python3 .build/aec-primary-history.py [--check]
 """
 import csv, gzip, io, json, os, sys, urllib.request
 
-from seifa_quintiles import QUINT_META, SEIFA_YEARS, elections_suffix, membership as seifa_membership
+from seifa_quintiles import INDEX_META, QIDXES, SEIFA_YEARS, elections_suffix, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -426,42 +426,49 @@ def class_shares(blocks):
     return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
 
 def quint_shares():
-    """({quintKey: {year: pcts}}, {year: nat pcts}) over SEIFA_YEARS: the
-       same hcands/dop per-division first preferences regrouped by
-       seifa_quintiles' membership (the census-interpolated percentile
-       where the seifa store carries one, rankDis 1 = most disadvantaged
-       otherwise). 2001
-       rides hcands, the downloads era the same dop read the class lane
-       uses; the join asserts exact like the class lane's, and recon must
-       equal the class lane's nat sums – the same ballots partitioned two
-       ways."""
-    out = {q: {} for q, _, _, _ in QUINT_META}
+    """({index: {quintKey: {year: pcts}}}, {year: nat pcts}) over
+       SEIFA_YEARS: the same hcands/dop per-division first preferences
+       regrouped by seifa_quintiles' memberships, one lane per index
+       (each index read advantage-ordered, 1 = most advantaged – IRSAD on
+       the store's census-interpolated percentile where it ships one, the
+       census-filed rank otherwise). 2001 rides hcands,
+       the downloads era the same dop read the class lane uses; the join
+       asserts exact like the class lane's, and recon must equal the
+       class lane's nat sums – the same ballots partitioned two ways,
+       and every index's nat sums must tally identical ballots."""
+    out = {ix: {m[0]: {} for m in INDEX_META[ix]["meta"]} for ix in QIDXES}
     recon = {}
     for y in SEIFA_YEARS:
-        mem = seifa_membership(y)
         votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
-        assert set(votes) == set(mem), \
-            f"{y}: IRSAD-quintile join drifted - counted {sorted(set(votes) - set(mem))[:3]}, quintilised-only {sorted(set(mem) - set(votes))[:3]}"
-        per = {q: {} for q, _, _, _ in QUINT_META}
-        nat = {}
-        for div, bks in votes.items():
-            qk = mem[div]["classification"]
-            for b, v in bks.items():
-                per[qk][b] = per[qk].get(b, 0.0) + v
-                nat[b] = nat.get(b, 0.0) + float(v)
-        recon[y] = nat
-        for qk, _, _, _ in QUINT_META:
-            out[qk][y] = shares({"q": per[qk]})["q"][1]
+        for ix in QIDXES:
+            mem = seifa_membership(y, ix)
+            assert set(votes) == set(mem), \
+                f"{y} {ix}: quintile join drifted - counted {sorted(set(votes) - set(mem))[:3]}, quintilised-only {sorted(set(mem) - set(votes))[:3]}"
+            per = {m[0]: {} for m in INDEX_META[ix]["meta"]}
+            nat = {}
+            for div, bks in votes.items():
+                qk = mem[div]["classification"]
+                for b, v in bks.items():
+                    per[qk][b] = per[qk].get(b, 0.0) + v
+                    nat[b] = nat.get(b, 0.0) + float(v)
+            if ix == QIDXES[0]:
+                recon[y] = nat
+            else:  # the same ballots under the second index's partition
+                for b, v in nat.items():
+                    assert abs(v - recon[y].get(b, 0.0)) < 0.001, \
+                        f"{y} {b}: {ix} nat sum {v} != {QIDXES[0]}'s {recon[y].get(b)}"
+            for qk, _, _, _ in INDEX_META[ix]["meta"]:
+                out[ix][qk][y] = shares({"q": per[qk]})["q"][1]
     return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
 
 # ---- history-aware emit ------------------------------------------------------
 def fold_series(year_rows, fold_pt=FOLD_PT):
     """year_rows: {year: {bucket: pct}} with raw buckets (unaligned ok).
        Returns (years, {bucket: [values|None aligned to years]}).
-       fold_pt is FOLD_PT everywhere but the IRSAD-fifth lane: a fifth is
+       fold_pt is FOLD_PT everywhere but the SEIFA-fifth lanes: a fifth is
        30-31 seats where a bucket polling ~4% nationally lands 1.7–9%, so
        the shared 4% gate would knock out cells a class view of the same
-       size draws; the lane passes FOLD_PT/2 (quintile cells of a class
+       size draws; the lanes pass FOLD_PT/2 (quintile cells of a class
        view must fold to the class view's nulls, and the national gate
        stays untouched)."""
     years = sorted(year_rows)
@@ -608,15 +615,18 @@ def build():
     for ck, label, short in CLASS_META:
         ys, ser = fold_series(class_rows[ck])
         doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats", ys, ser, short=short)
-    # The IRSAD fifths file as five more entries in the SAME classes bank,
-    # after the four classifications (the explainer menu reads the bank
-    # straight; the charts fork their captions on the seifa flag). Their
-    # fold gate is halved: a fifth prices 30-31 seats against a class
-    # view's 20-50, so the quarters the national gate nulls in a 150-seat
-    # view are still drawn here (foldSeries' docstring).
+    # The SEIFA fifths file as ten more entries in the SAME classes bank,
+    # after the four classifications - five per index (the explainer menu
+    # reads the bank straight; the charts fork their captions on the
+    # seifa flag and each record's ix names its index). Their fold gate
+    # is halved: a fifth prices 30-31 seats against a class view's 20-50,
+    # so the quarters the national gate nulls in a 150-seat view are
+    # still drawn here (foldSeries' docstring).
     quint_rows, quint_recon = quint_shares()
-    assert [y for y, row in quint_rows["q1"].items() if row] == list(SEIFA_YEARS), \
-        "a seifa membership block is missing for one of SEIFA_YEARS"
+    for ix in QIDXES:
+        first = INDEX_META[ix]["meta"][0][0]
+        assert [y for y, row in quint_rows[ix][first].items() if row] == list(SEIFA_YEARS), \
+            f"a seifa membership block is missing for one of SEIFA_YEARS ({ix})"
     # recomposition: the fifths partition the same ballots the class lane
     # partitions, so their nat sums must equal the class lane's exactly
     # (both are sums of the same per-division votes)
@@ -625,11 +635,17 @@ def build():
             qa = quint_recon[y].get(b, 0.0)
             ca = class_recon[y].get(b, 0.0)
             assert abs(qa - ca) < 0.001, f"{y} {b} quintile recomposition {qa} != class {ca}"
-    for q, qlbl, qshort, qdesc in QUINT_META:
-        ys, ser = fold_series(quint_rows[q], fold_pt=FOLD_PT / 2)
-        doc["fed"]["classes"][q] = {"seifa": True, "foldPt": FOLD_PT / 2,
-                                    **view(qlbl, f"federal elections in the {qdesc} {elections_suffix()}",
-                                           ys, ser, short=qshort)}
+    # per index, five fifths in the SAME classes bank, each record's ix
+    # naming its index; the IRSAD lane's elections copy names the
+    # interpolated-percentile basis where the store ships one
+    for ix in QIDXES:
+        basis = elections_suffix() if ix == "irsad" \
+            else f"of seats by {ix.upper()} rank"
+        for q, qlbl, qshort, qdesc in INDEX_META[ix]["meta"]:
+            ys, ser = fold_series(quint_rows[ix][q], fold_pt=FOLD_PT / 2)
+            doc["fed"]["classes"][q] = {"seifa": True, "ix": ix, "foldPt": FOLD_PT / 2,
+                                        **view(qlbl, f"federal elections in the {qdesc} {basis}",
+                                               ys, ser, short=qshort)}
     return doc
 
 def main():

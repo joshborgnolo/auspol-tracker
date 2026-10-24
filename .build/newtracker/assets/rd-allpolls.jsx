@@ -5725,6 +5725,15 @@ const exFrame = (narrow) => ({
   padPx: narrow ? { l: 34, r: 16, t: 14, b: 28 } : { l: 40, r: 12, t: 16, b: 30 },
   yDomain: [0, 100], yTicks: EX_TICKS, yTickFmt: exTickFmt, baseline: true,
 });
+/* the SEIFA index a fifths view's caption names, spelt out once per
+   caption — the record's ix tag is the lookup (IRSAD first; IEO and IER
+   joined through it 2026-10-24, the captions composing off the tag
+   rather than a ternary chain) */
+const SEIFA_IX_DESC = {
+  irsad: "the ABS's socio-economic index of advantage and disadvantage",
+  ieo: "the ABS's index of education and occupation",
+  ier: "the ABS's index of economic resources",
+};
 /* a count of part of the vote in the key: TrendChart's m.hollow cross
    (stroked in its colour, then cut through in the chart's background) */
 const ExHollowX = () => (
@@ -6020,7 +6029,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
         : S.fedClass
           ? (S.seifa
-            ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to a fifth of the chamber by its IRSAD percentile at that election — the ABS's socio-economic index of advantage and disadvantage, interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise, thirty seats a fifth counting up from the most-disadvantaged (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it, so a kink never comes from sliding boundaries — each election rides its own index). From 2004 the count covers every seat: the AEC's two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher's final pair are recovered state by state from its flow-by-state table — where a state's crossbench seats spanned fifths the shares are apportioned over first preferences, and draw the hollow diamonds. The 2001 ring — the index series' floor — counts only the seats where Labor and the Coalition finished first and second. The fourth line is all minor-party voters taken together. A gap in One Nation's line is an election its ballots in the fifth never reached the AEC's table — the party stood in hardly any of the most-advantaged seats through the early 2010s, so the fifths null there; a thin base can still swing a point, so read a null as a missing count, not a zero."
+            ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to a fifth of the chamber by its " + (S.ix === "irsad" ? "IRSAD percentile" : S.ix.toUpperCase() + " rank") + " at that election — " + SEIFA_IX_DESC[S.ix] + (S.ix === "irsad" ? ", interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise" : "") + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it, so a kink never comes from sliding boundaries — each election rides its own index). From 2004 the count covers every seat: the AEC's two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher's final pair are recovered state by state from its flow-by-state table — where a state's crossbench seats spanned fifths the shares are apportioned over first preferences, and draw the hollow diamonds. The 2001 ring — the index series' floor — counts only the seats where Labor and the Coalition finished first and second. The fourth line is all minor-party voters taken together. A gap in One Nation's line is an election its ballots in the fifth never reached the AEC's table — the party stood in hardly any of the most-disadvantaged seats through the early 2010s, so the fifths null there; a thin base can still swing a point, so read a null as a missing count, not a zero."
             : "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). From 2004 the count covers every seat: the AEC’s two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher’s final pair are recovered state by state from its flow-by-state table — where a state’s crossbench seats spanned seat types the shares are apportioned over first preferences, and draw the hollow diamonds. Before 2004 — the rings — only the seats where Labor and the Coalition finished first and second count, the national series’ own early basis. The fourth line is all minor-party voters taken together. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares.")
             + noBars
           : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
@@ -6281,7 +6290,7 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, me
       : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + ".")
     : classKey && house !== "sen"
     ? (S.seifa
-      ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - IRSAD is the ABS's socio-economic index of advantage and disadvantage, thirty seats a fifth counting up from the most-disadvantaged (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it)."
+      ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)."
       : "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions.")
     : stateKey
     ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)."
@@ -6400,7 +6409,7 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
       + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter.")
     : classKey
     ? (S.seifa
-      ? "Two-party-preferred shares at the " + span + " federal elections, every division's notional Labor-v-Coalition count summed across the seats of each IRSAD fifth - the ABS's socio-economic index of advantage and disadvantage, interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise, thirty seats a fifth counting up from the most-disadvantaged (the 151-seat 2019 and 2022 chambers give the spare seat to the most-advantaged fifth; a seat whose standing moved between elections moved fifths with it)."
+      ? "Two-party-preferred shares at the " + span + " federal elections, every division's notional Labor-v-Coalition count summed across the seats of each " + S.ix.toUpperCase() + " fifth - " + SEIFA_IX_DESC[S.ix] + (S.ix === "irsad" ? ", interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise" : "") + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)."
       : "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions.")
     : stateKey
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed."
@@ -6453,6 +6462,113 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
         copy={{ title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
                 sub: rdCap(S.elections || S.label + " elections") + (lcBank ? ". Counted from the NSW Electoral Commission's ballot-level record of the council's formal above-the-line ballots - no official two-party count exists for that chamber." : senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
                 caption: (lcBank ? "Implied from the NSW Electoral Commission's ballot-level record; " : senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
+                legend: narrow ? lines : [] }}
+      />
+      <RdKey className="rd-ckey" items={[]} />
+      <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{cap}</RdFoot>
+    </>
+  );
+}
+/* the View: Informal votes flip's chart (2026-10-24, the fourth stop on
+   the ONE cycling View: button - user: "add to this toggle: … 'View:
+   Informal votes' - get informal voting data for each federal election
+   as far back as possible, split also by state/territory, lower and
+   upper house"; then "aec seat classification (demographic rating), and
+   IRSAD index quintile (for federal)"; "and ieo quintile"). Informal
+   ballots as a share of all ballots cast, per election: House national
+   1901–2025 and per state, Senate national 1903–2022 and per state (its
+   figures are OFFICIAL - no implied series here), and the House again
+   by AEC seat class 1996–2025 and by IRSAD and IEO fifth 2001–2025
+   (divisions never exist in the Senate, so the class cuts stay
+   House-only). window.AUSPOL.informalHistory (validated; a missing
+   file floors the handoff to null and the stop never joins the cycle).
+   ONE line at a time - the informal share is a single number per
+   election - and the y axis is priced once over the WHOLE bank (the 2PP
+   view's constant-axis idiom), so neither a menu pick nor the House:
+   flip ever moves it. */
+function ExplainedInformalChart(props) {
+  const { house, stateKey, classKey, menu } = props;
+  const narrow = useNarrow(window.MQ_PHONE);
+  const IH = window.AUSPOL.informalHistory || null;
+  if (!IH || !IH.fed) return null;
+  const bank = house === "sen" ? IH.fed.sen : IH.fed;
+  if (!bank) return null;
+  const S = (classKey && house !== "sen" && ((IH.fed.classes || {})[classKey]))
+    || (stateKey && (bank.states || {})[stateKey]) || bank;
+  const YEARS = S.years || [];
+  if (!YEARS.length) return null;
+  /* one colour, no party: the flows card's all-pollsters ink */
+  const vals = S.inf || [];
+  const runs = [];
+  let cur = [];
+  vals.forEach((v, i) => {
+    /* a null is a gap, never a zero: the territory was not yet
+       represented that year, and joining across it would draw informal
+       ballots nobody cast */
+    if (v == null) { if (cur.length) runs.push(cur); cur = []; }
+    else cur.push({ x: YEARS[i], y: v });
+  });
+  if (cur.length) runs.push(cur);
+  const series = [];
+  runs.forEach((points, i) => {
+    const tail = i === runs.length - 1;
+    series.push({
+      id: "inf" + i, label: "Informal", color: "var(--ink)", points,
+      smooth: false, rdWidth: 2.5, endCap: tail || points.length === 1,
+      endLabel: null,
+    });
+  });
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
+  const cap = (classKey && house !== "sen"
+    ? (S.seifa
+      ? "Informal ballots as a share of all ballots cast at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + " - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it). Counted from the AEC's own per-division results."
+      : "Informal ballots as a share of all ballots cast at the " + span + " federal elections in " + (S.short || S.label) + " seats, each seat grouped by the AEC's own classification for that election's divisions. Counted from the AEC's per-division results (the statistics packs' polling-place tables to 2001, the vote-type downloads from 2004).")
+    : stateKey
+    ? "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections in " + (S.short || S.label) + ", from the handbook's appendix tables before 2004 and the AEC's own published figures since."
+    : "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the Parliamentary Handbook's appendix tables before 2004 and the AEC's own published figures since (the House figures from its vote-type downloads, the Senate's from its informality summary).")
+    + " The Senate series ends at 2022 - the AEC's informality summary, its only machine-readable Senate informal publication, has no 2025 line yet."
+    + (classKey && house !== "sen" && !S.seifa ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own two-party table omits it." : "")
+    + " A territory not yet represented draws a gap, never a zero.";
+  /* the constant axis (the 2PP view's idiom): the highest cell across
+     the WHOLE store - House national and states and classes, Senate
+     national and states - so neither a menu pick nor the House: flip
+     ever moves it */
+  let pk = 0;
+  [IH.fed, ...Object.keys(IH.fed.states || {}).map((k) => IH.fed.states[k]),
+    ...Object.keys(IH.fed.classes || {}).map((k) => IH.fed.classes[k]),
+    ...(IH.fed.sen ? [IH.fed.sen, ...Object.keys(IH.fed.sen.states || {}).map((k) => IH.fed.sen.states[k])] : [])].forEach((v) =>
+    (v.inf || []).forEach((x) => { if (x != null) pk = Math.max(pk, x); }));
+  const yMax = Math.max(5, Math.ceil(pk / 5) * 5);
+  const YT = []; for (let v = 0; v <= yMax; v += 5) YT.push(v);
+  const lines = [{ kind: "line", color: "var(--ink)", label: "Informal share of ballots cast" }];
+  return (
+    <>
+      <div className="rd-chead ex-fl-head">
+        <span className="rd-chead-t">{"Informal votes, % of ballots cast"}
+          <span className="rd-chead-meta">{scope}</span></span>
+        {menu}
+      </div>
+      {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
+      <TrendChart key={"ex-inf-" + (house || "rep") + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
+        xDomain={[x0, x1]}
+        yDomain={[0, yMax]}
+        yTicks={YT}
+        yTickFmt={(v) => (v === YT[YT.length - 1] ? v + "%" : String(v))}
+        xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
+        unit="%" fmt={(v) => v.toFixed(1)}
+        /* the year spine is EVERY election, not series[0]: the runs split at
+           a territory's unrepresented years, and a spine read off the first
+           run would title every year-card off that run's offsets (a 1901
+           hover naming 1922's 3.1 "1901") — the flow chart's spine idiom */
+        series={series} spine={YEARS.map((x) => ({ x }))}
+        tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
+        ariaLabel={"Informal share of ballots cast, " + S.label + ", " + span}
+        copy={{ title: "Informal share of ballots cast, " + (S.short || S.label),
+                sub: rdCap(S.elections || S.label + " elections") + ". From the Parliamentary Handbook's historical tables and the AEC's own published figures.",
+                caption: "From the Parliamentary Handbook's tables and the AEC's published figures; informal ÷ (formal + informal) ballots.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]} />
@@ -6566,12 +6682,24 @@ function RdExplained() {
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
+  /* the informal-vote bank (2026-10-24, the View: flip's fourth stop -
+     user: "add to this toggle … 'View: Informal votes' - get informal
+     voting data for each federal election as far back as possible,
+     split also by state/territory, lower and upper house"; then "aec
+     seat classification … IRSAD index quintile … and ieo quintile") -
+     window.AUSPOL.informalHistory, null on a missing file exactly like
+     the primary and 2PP banks. Its Senate lane is the one real Senate
+     informal series (official figures, never implied), so House: Upper
+     is a first-class stop here */
+  const IH_HIST = window.AUSPOL.informalHistory || null;
+  const IH_SEN = (IH_HIST && IH_HIST.fed && IH_HIST.fed.sen) || null;
+  const infMode = figMode === "informal" && !!(IH_HIST && IH_HIST.fed && IH_SEN && IH_HIST.fed.classes);
   /* figView: either vote-share figure's controls displace the flows' -
      the pair tabs and Share: flip set aside (the 2PP view carries its own
      Share: twin; its House: flip reads the implied Senate bank TP_SEN),
      and the elections menu loses every section the mode's bank never
      holds */
-  const figView = primMode || twoMode;
+  const figView = primMode || twoMode || infMode;
   /* the class bank is figure-specific: the flows classes count ballots
      through their final pair, the primary classes (PH_CLASSES) count
      first preferences - both grouped by the election's own AEC division
@@ -6580,7 +6708,8 @@ function RdExplained() {
      badClass and the snap walks it to "fed" */
   const PH_CLASSES = (PH_HIST && PH_HIST.fed && PH_HIST.fed.classes) || {};
   const TP_CLASSES = (TP_HIST && TP_HIST.fed && TP_HIST.fed.classes) || {};
-  const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : twoMode ? (house === "sen" ? {} : TP_CLASSES) : FED_CLASSES;
+  const IH_CLASSES = (IH_HIST && IH_HIST.fed && IH_HIST.fed.classes) || {};
+  const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : twoMode ? (house === "sen" ? {} : TP_CLASSES) : infMode ? (house === "sen" ? {} : IH_CLASSES) : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   /* the primary view's own state banks (user 2026-10-23: "what about
@@ -6665,6 +6794,13 @@ function RdExplained() {
          Council bank sits in Upper alone) - both drop to the national
          series on the flip */
       if (classKey || lcView) setView("fed");
+      return;
+    }
+    if (infMode) {
+      /* both chambers' informal banks carry the national series and the
+         same eight states, so only a class pick (House-only) needs the
+         snap */
+      if (classKey) setView("fed");
       return;
     }
     if (next === "sen") {
@@ -6847,6 +6983,11 @@ function RdExplained() {
       ? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])]
       : ["fed", ...Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}).map((k) => "fed:" + k),
          ...Object.keys(TP_CLASSES).map((k) => "fedcl:" + k)])
+    : infMode
+    ? (house === "sen"
+      ? ["fed", ...Object.keys((IH_SEN && IH_SEN.states) || {}).map((k) => "fed:" + k)]
+      : ["fed", ...Object.keys((IH_HIST.fed && IH_HIST.fed.states) || {}).map((k) => "fed:" + k),
+         ...Object.keys(IH_CLASSES).map((k) => "fedcl:" + k)])
     : house === "sen"
     ? (pair === "on"
       ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])]
@@ -6876,7 +7017,12 @@ function RdExplained() {
     /* entering the 2PP view always lands on Lower; Upper is live there
        only while the implied Senate bank shipped with the build */
     if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
-  }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
+    /* the informal menu's legal picks: the federal sections alone (no
+       Council, no state elections). badClass covers a stale class pick -
+       a Senate one (its bank holds no divisions) or a missing file */
+    if (infMode && (badClass || lcView || steView || !fedView)) setView("fed");
+    if (infMode && house === "sen" && !IH_SEN) setHouse("rep");
+  }, [primMode, twoMode, infMode, badClass, lcView, fedView, steView, house]);
   /* Labor v One Nation's and Coalition v One Nation's Lower views carry no
      menu ("on"'s counts are the measured contests alone, "con" has no Lower
      count at all) - every other view's menu shows the banks */
@@ -6885,21 +7031,28 @@ function RdExplained() {
     : house === "sen" ? VIEW_OPTS.length > (onConPair ? 0 : 1) : VIEW_OPTS.length > 0;
   const menuKeys = primMode ? Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {})
     : twoMode ? (house === "sen" ? (lcView ? [] : tpSenStateKeys) : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))
+    : infMode ? (house === "sen" ? Object.keys((IH_SEN && IH_SEN.states) || {}) : Object.keys((IH_HIST.fed && IH_HIST.fed.states) || {}))
     : house === "sen" ? (pair === "on" ? senOnStateKeys : pair === "con" ? senConStateKeys : senStateKeys) : stateKeys;
   const menuBank = primMode ? (PH_HIST.fed && PH_HIST.fed.states) || {}
     : twoMode ? (house === "sen" ? (lcView ? {} : (TP_SEN.states || {})) : (TP_HIST.fed && TP_HIST.fed.states) || {})
+    : infMode ? (house === "sen" ? ((IH_SEN && IH_SEN.states) || {}) : (IH_HIST.fed && IH_HIST.fed.states) || {})
     : house === "sen" ? (pair === "on" ? ON_SEN_STATES : pair === "con" ? CON_SEN_STATES : SEN_STATES) : FED_STATES;
   /* the contest tab's own Legislative Council cut (the NSW count by each
      tab's pair) */
   const lcBank = pair === "on" ? LC_ON_BANK : pair === "con" ? LC_CON_BANK : LC_BANK;
   /* the class slice of the federal menu, same keys the arrow walk
-     steps (order kept: seat types first, IRSAD fifths after). The two
-     optgroups split it where the grouping changes - the fifths' option
-     faces are the bare positional names ("Top fifth" … "Bottom fifth",
-     user rename 2026-10-24), the index named by their group's label */
+     steps (order kept: seat types first, then IRSAD's fifths, IEO's, then
+     IER's — the second index joined the first lane the same day, "do what
+     you did for irsad to ieo", the third later on, "do the same for
+     IER"). The four optgroups split it where the grouping changes — the
+     fifths' option faces are the bare positional names ("Top fifth" …
+     "Bottom fifth", user rename 2026-10-24), each group's label naming
+     its index */
   const menuClassKeys = figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys;
   const menuClassSeat = menuClassKeys.filter((k) => !classBank[k].seifa);
-  const menuClassSeifa = menuClassKeys.filter((k) => classBank[k].seifa);
+  const menuClassIrsad = menuClassKeys.filter((k) => classBank[k].ix === "irsad");
+  const menuClassIeo = menuClassKeys.filter((k) => classBank[k].ix === "ieo");
+  const menuClassIer = menuClassKeys.filter((k) => classBank[k].ix === "ier");
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
             value={lcView && !senOnView ? "nswlc" : steLcView ? "ste:" + steLcKey + "lc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
@@ -6909,9 +7062,19 @@ function RdExplained() {
         {menuKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (menuBank[k].short || menuBank[k].label)}</option>)}
         {menuClassSeat.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}
       </optgroup>
-      {menuClassSeifa.length > 0 && (
+      {menuClassIrsad.length > 0 && (
         <optgroup label="Federal, by IRSAD quintile">
-          {menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}
+          {menuClassIrsad.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}
+        </optgroup>
+      )}
+      {menuClassIeo.length > 0 && (
+        <optgroup label="Federal, by IEO quintile">
+          {menuClassIeo.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}
+        </optgroup>
+      )}
+      {menuClassIer.length > 0 && (
+        <optgroup label="Federal, by IER quintile">
+          {menuClassIer.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}
         </optgroup>
       )}
       {!figView && house !== "sen" && KEYS.length > 1 && (
@@ -6969,9 +7132,10 @@ function RdExplained() {
       </button>
     </span>
   );
-  /* which Share slot the row shows: primary keeps none, the 2PP view its
+  /* which Share slot the row shows: primary keeps none, the informal
+     view none (one series - there is no side to flip), the 2PP view its
      twin, everything else the flows' */
-  const shareSlot = primMode ? null : twoMode ? share2pp : share;
+  const shareSlot = primMode || infMode ? null : twoMode ? share2pp : share;
   /* the House: flip (user 2026-10-22), the same idiom beside Share: - the
      button shows the ACTIVE chamber ("Lower" reads the House banks' seat
      counts, "Upper" the Senate's above-the-line ballots). It rides the
@@ -6985,7 +7149,7 @@ function RdExplained() {
      count, and only while the build ships TP_SEN. Hidden under the
      Coalition v One Nation tab: that pair has no Lower view to flip to
      (the pick snaps its house state to Upper) */
-  const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK && (primMode || pair !== "con")) ? (
+  const houseCtl = (twoMode ? !!TP_SEN : infMode ? !!IH_SEN : SEN_BANK && (primMode || pair !== "con")) ? (
     <span className="rd-pl-ctl ex-house">
       <span className="rd-pl-ctl-l">House:</span>
       <button type="button" className="rd-pl-flip" aria-pressed={house === "sen"}
@@ -6993,6 +7157,8 @@ function RdExplained() {
                 ? (house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)")
                 : twoMode
                 ? (house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)")
+                : infMode
+                ? (house === "sen" ? "Switch to House of Representatives informal shares" : "Switch to Senate informal shares (informal ballots over the whole chamber)")
                 : (house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)")}
               onClick={flipHouse}>
         <span className="rd-pl-flip-t">{house === "sen" ? "Upper" : "Lower"}</span> <span aria-hidden="true">⇄</span>
@@ -7014,13 +7180,15 @@ function RdExplained() {
      neither keeps the flows with no control at all */
   const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
   const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
-  const FIG_LABELS = { flows: "Preference flows", primary: "Primary votes", "2pp": "2PP" };
+  const infViewOk = !!(IH_HIST && IH_HIST.fed && IH_HIST.fed.sen && IH_HIST.fed.classes);
+  const FIG_LABELS = { flows: "Preference flows", primary: "Primary votes", "2pp": "2PP", informal: "Informal votes" };
   const FIG_TITLES = {
     flows: "Switch to the preference-flow history",
     primary: "Switch to first-preference vote shares at every election",
     "2pp": "Switch to two-party preferred shares at every election",
+    informal: "Switch to informal ballots’ share of the vote at every election",
   };
-  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : [])];
+  const FIG_STOPS = ["flows", ...(phViewOk ? ["primary"] : []), ...(tpViewOk ? ["2pp"] : []), ...(infViewOk ? ["informal"] : [])];
   const nextFig = FIG_STOPS[(FIG_STOPS.indexOf(figMode) + 1) % FIG_STOPS.length];
   const viewCtl = FIG_STOPS.length > 1 ? (
     <span className="rd-pl-ctl ex-view">
@@ -7070,7 +7238,7 @@ function RdExplained() {
               {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>}
             </div> : null
           ) : (
-            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs rd-tabs-sm"
+            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
                     options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
               {/* a laptop carries the pair as a two-line stack (House
                   directly above Share) at the row's right - 2026-10-24
@@ -7087,7 +7255,8 @@ function RdExplained() {
               its head; the classKey rides the primary bank's own classes
               and stePrim its own state-election banks (a flows-side state
               pick still drops to "fed" on the way in) */}
-          {twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} lc={lcView} />
+          {infMode ? <ExplainedInformalChart house={house} stateKey={stateKey} classKey={classKey} menu={headCtls} />
+            : twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} lc={lcView} />
             : primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : lcView && pair === "con" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onCon />

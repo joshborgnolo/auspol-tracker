@@ -51,7 +51,7 @@ const ok = (name, pass, detail) => {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const PORT = 9292;
+const PORT = +(process.env.PROBE_PORT || 9292);
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json",
                ".css": "text/css", ".woff2": "font/woff2", ".svg": "image/svg+xml", ".xml": "application/xml" };
 const server = createServer(async (req, res) => {
@@ -67,6 +67,20 @@ await new Promise((r) => server.listen(PORT, r));
 const browser = await puppeteer.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new" });
+/* a mid-probe crash must not orphan the port server: without this the
+   process outlives the exception (the listen handle keeps it alive) and
+   the next run dies on EADDRINUSE */
+server.unref();
+process.once("uncaughtException", async (e) => {
+  console.error("probe crashed:", e && e.message);
+  try { await browser.close(); } catch {}
+  process.exit(1);
+});
+process.once("unhandledRejection", async (e) => {
+  console.error("probe crashed:", e && e.message);
+  try { await browser.close(); } catch {}
+  process.exit(1);
+});
 
 const pageErrors = [];
 const wire = (page) => page.on("pageerror", (e) => pageErrors.push(String(e).slice(0, 160)));
@@ -714,6 +728,272 @@ console.log("== desktop: the Coalition v One Nation tab — Upper only (user 202
   }
 }
 
+console.log("== desktop: the View: cycle — flows → primary → 2pp → informal (user 2026-10-24) ==");
+/* the fourth stop on the ONE cycling View: button. The informal data is
+   data/informal-history.json (written by .build/aec-informal-history.py,
+   pinned by test-informal-history): the House national/state series
+   1901–2025, the Senate's OFFICIAL 1903–2022, and the House again by
+   AEC seat class 1996–2025 and by IRSAD and IEO fifth 2001–2025 (the
+   class cuts stay House-only — a Senate has no divisions). The chart:
+   ONE ink line (nulls run as gaps, never zeros), the constant 0–20%
+   axis priced once over the whole store (the peak is TAS Senate 1934's
+   16.3), every election year a literal x tick, no Share control (one
+   series - no side to flip), and the House: flip cutting to the
+   Senate's informal shares. The View: row renders TWICE in a figure
+   view (the aria-hidden vacate twin keeps the top row's height), so
+   every read/click here takes the copy NOT inside .ex-fl-vacate. */
+const viewState = (p) => p.evaluate(() => {
+  const bs = [...document.querySelectorAll(".ex-fl-card .ex-view .rd-pl-flip")];
+  const b = bs.find((x) => !x.closest(".ex-fl-vacate")) || bs[0];
+  return b ? { t: b.querySelector(".rd-pl-flip-t").textContent.trim(), title: b.title, n: bs.length } : null;
+});
+const clickView = (p) => p.evaluate(() => {
+  const bs = [...document.querySelectorAll(".ex-fl-card .ex-view .rd-pl-flip")];
+  (bs.find((x) => !x.closest(".ex-fl-vacate")) || bs[0]).click();
+});
+const infYTicks = (p) => p.$$eval(".ex-fl-card svg text", (ts) =>
+  ts.map((t) => t.textContent.trim()).filter((t) => /^\d{1,2}%?$/.test(t)));
+/* the year-bearing assertion pair: every election year gets its tick MARK
+   (the vertical rd-base lines under the axis), while the LABELS thin by
+   the engine's k-stride (48 labels never fit 948 units; at 1280px the
+   informal view draws its every-fourth set 1901…2016). Aim by the drawn
+   year labels, never by the caller's xDomain: the engine divides padPx
+   through cw/1000 at draw time (40/12 SCREEN px become 63.1/18.9 viewBox
+   units on a 633px card), so a domain read puts 1922 at user-200.5 where
+   the chart actually draws it at 218.6 — the labels are the one mapping
+   the page itself guarantees */
+const xMarks = (p) => p.$$eval(".ex-fl-card svg line.rd-base", (ls) =>
+  ls.filter((l) => l.getAttribute("x1") === l.getAttribute("x2")).length);
+const dotAtInf = (p, year, v, sen) => p.evaluate(({ year, v, sen }) => {
+  const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+  const r = svg.getBoundingClientRect();
+  const labs = [...svg.querySelectorAll("text")]
+    .map((t) => ({ u: +t.getAttribute("x"), y: t.textContent.trim() }))
+    .filter((t) => /^\d{4}$/.test(t.y) && Number.isFinite(t.u) && t.u > 0)
+    .sort((a, b) => +a.y - +b.y);
+  if (labs.length >= 2) {
+    const a = labs[0], b = labs[labs.length - 1];
+    const ux = a.u + ((year - +a.y) / (+b.y - +a.y)) * (b.u - a.u);
+    return { x: r.left + ux * (r.width / 1000),
+             y: r.top + 16 + (1 - v / 20) * (r.height - 46) };
+  }
+  /* no labels to fit — fall back to the domain read in SCREEN px (padPx
+     is screen-side, so the domain maps onto the rect minus 40/12px) */
+  const ys = sen ? window.AUSPOL.informalHistory.fed.sen.years : window.AUSPOL.informalHistory.fed.years;
+  return { x: r.left + 40 + ((year - ys[0]) / (ys[ys.length - 1] - ys[0])) * (r.width - 52),
+           y: r.top + 16 + (1 - v / 20) * (r.height - 46) };
+}, { year, v, sen });
+const INF_Y = ["0", "5", "10", "15", "20%"];
+{
+  let vs = await viewState(page);
+  ok("the View: control opens on Preference flows (one row, no vacate twin)",
+     vs.n === 1 && vs.t === "Preference flows" && vs.title === "Switch to first-preference vote shares at every election",
+     JSON.stringify(vs));
+  await clickView(page); await sleep(700);
+  vs = await viewState(page);
+  ok("one press lands on Primary votes, its title the 2PP destination",
+     vs.t === "Primary votes" && vs.title === "Switch to two-party preferred shares at every election", JSON.stringify(vs));
+  await clickView(page); await sleep(700);
+  vs = await viewState(page);
+  ok("a second lands on 2PP, its title the informal destination",
+     vs.t === "2PP" && vs.title === "Switch to informal ballots’ share of the vote at every election", JSON.stringify(vs));
+  await clickView(page); await sleep(800);
+  vs = await viewState(page);
+  ok("a third lands on Informal votes (vacate twin joins, title the flows destination)",
+     vs.n === 2 && vs.t === "Informal votes" && vs.title === "Switch to the preference-flow history", JSON.stringify(vs));
+}
+console.log("== desktop: the informal stop — national, states, classes, Senate ==");
+const IH_FED_META = "Australian federal elections, 1901–2025";
+const IH_SEN_META = "Australian Senate elections, 1903–2022";
+{
+  ok("the head title is the informal share line",
+     (await scopeTitle(page)) === "Informal votes, % of ballots cast", await scopeTitle(page));
+  ok("the scope is the House series 1901–2025", (await meta(page)) === IH_FED_META, await meta(page));
+  const yt = await yearTicks(page);
+  ok("all 48 election years carry their tick marks (labels thinned by the engine, first 1901)",
+     (await xMarks(page)) === 48 && yt[0] === "1901" && yt.every((y) => +y >= 1901 && +y <= 2025),
+     yt.length + " labels over " + (await xMarks(page)) + " marks, first " + yt[0]);
+  const m = await menuInfo(page);
+  ok("the menu is the federal sections and classes alone (8 states, 4 seat classes, 5 IRSAD fifths, 5 IEO fifths, 5 IER fifths)",
+     JSON.stringify(m.groups) === JSON.stringify(["Federal elections", "Federal, by IRSAD quintile", "Federal, by IEO quintile", "Federal, by IER quintile"])
+       && m.options.length === 28 && m.options[0] === "fed"
+       && m.options.filter((v) => v.startsWith("fed:")).length === 8
+       && m.options.filter((v) => v.startsWith("fedcl:")).length === 19,
+     JSON.stringify(m.groups) + " · " + m.options.length + " options");
+  ok("…no Council, no state-elections entry, no State elections optgroup",
+     !m.options.includes("nswlc") && !m.options.some((v) => v.startsWith("ste:"))
+       && m.groups.every((g) => g !== "State elections"), m.options.join(" "));
+  ok("the Share control sits out (one series — no side to flip)",
+     (await page.$(".ex-fl-card .ex-share")) === null);
+  const h = await houseState(page);
+  ok("the House: flip stands, open Lower, its title the Senate informal destination",
+     h.t === "Lower ⇄" && h.pressed === "false"
+       && h.title === "Switch to Senate informal shares (informal ballots over the whole chamber)", JSON.stringify(h));
+  ok("the constant axis is 0–20% by fives (the whole-store peak, TAS Senate 1934's 16.3)",
+     JSON.stringify(await infYTicks(page)) === JSON.stringify(INF_Y), (await infYTicks(page)).join("/"));
+  const foot = await footText(page);
+  ok("the caption runs handbook→AEC provenance, the Senate-2022 gap, and the territory gap rule",
+     foot.startsWith("Informal ballots as a share of all ballots cast at the 1901–2025 federal elections")
+       && foot.includes("The Senate series ends at 2022") && foot.endsWith("A territory not yet represented draws a gap, never a zero."),
+     foot.slice(0, 80) + "…" + foot.slice(-50));
+  /* the 2025 national dot reads 5.6 (the AEC's own 2025 figure) */
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(400);
+  let pt = await dotAtInf(page, 2025, 5.6);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  let tip = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 2025 national dot tips 5.6%, titled '2025 · Federal'",
+     !!tip && tip.includes("2025 · Federal") && tip.includes("5.6"),
+     tip ? tip.slice(0, 110) : "no tooltip");
+  await page.mouse.move(pt.x, pt.y - 200);
+}
+console.log("== desktop: the informal stops' states and class cuts ==");
+{
+  await pickMenu(page, "fed:vic"); await sleep(700);
+  ok("a state pick re-scopes to it", (await meta(page)) === "Victoria electorates at federal elections, 1901–2025", await meta(page));
+  ok("…and the axis never moves", JSON.stringify(await infYTicks(page)) === JSON.stringify(INF_Y));
+  await pickMenu(page, "fed:nt"); await sleep(700);
+  const ntFoot = await footText(page);
+  ok("the NT view captions its pre-1922 hole as a gap, never a zero",
+     ntFoot.endsWith("A territory not yet represented draws a gap, never a zero."), ntFoot.slice(-55));
+  ok("…its tick row still opens 1901 (the hole is a run break, not dropped years)",
+     (await xMarks(page)) === 48 && (await yearTicks(page))[0] === "1901");
+  /* the gap in the card itself: the 1901 hover answers a bare year card */
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(300);
+  let pt = await dotAtInf(page, 1901, 2);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  let tip = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 1901 NT hover is a bare year card — titled, no figure (the territory's first run opens 1922)",
+     !!tip && tip.includes("1901") && !tip.includes("%"), tip ? tip.slice(0, 90) : "no tooltip");
+  /* and the year AFTER the gap titles itself — the regression pin for the
+     run-split spine (a spine read off the first run named 1922's 3.1 "1901") */
+  pt = await dotAtInf(page, 1922, 3.1);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  tip = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the NT run's opener titles its own year (1922 · NT, 3.1%)",
+     !!tip && tip.includes("1922 · NT") && tip.includes("3.1"), tip ? tip.slice(0, 90) : "no tooltip");
+  await page.mouse.move(pt.x, pt.y + 160);
+  /* the class cuts: a seat class, an IRSAD fifth, an IEO fifth — each
+     carrying its own provenance sentence (the ABS index named in the
+     fifths' captions; the Newcastle 1998 aside on the seat classes) */
+  await pickMenu(page, "fedcl:inner"); await sleep(700);
+  const innerFoot = await footText(page);
+  ok("the seat-class cut captions the AEC classification and the Newcastle 1998 aside",
+     innerFoot.includes("each seat grouped by the AEC's own classification")
+       && innerFoot.includes("Newcastle's pair ran Labor v independent"),
+     innerFoot.slice(120, 280));
+  await pickMenu(page, "fedcl:q1"); await sleep(700);
+  const q1Foot = await footText(page);
+  ok("an IRSAD fifth names the index (most-advantaged fifth, thirty seats a fifth)",
+     q1Foot.includes("IRSAD is the ABS's socio-economic index of advantage and disadvantage")
+       && q1Foot.includes("the most-advantaged fifth"),
+     q1Foot.slice(60, 240));
+  await pickMenu(page, "fedcl:e1"); await sleep(700);
+  ok("an IEO fifth re-scopes the meta and names the index",
+     (await meta(page)) === "Federal elections in the most-advantaged fifth of seats by IEO rank, 2001–2025"
+       && (await footText(page)).includes("IEO is the ABS's index of education and occupation"),
+     await meta(page));
+  ok("…and the fifths' axis is still the constant 0–20%",
+     JSON.stringify(await infYTicks(page)) === JSON.stringify(INF_Y));
+}
+console.log("== desktop: informal Upper — the Senate's official series, then home ==");
+{
+  await clickHouse(page); await sleep(800);   // a class view snaps to federal national
+  ok("flipping to Upper off a class pick snaps the menu to federal national",
+     (await menuInfo(page)).value === "fed", (await menuInfo(page)).value);
+  ok("the head title holds, the scope cuts to the Senate's official 1903–2022",
+     (await scopeTitle(page)) === "Informal votes, % of ballots cast" && (await meta(page)) === IH_SEN_META,
+     await meta(page));
+  const mu = await menuInfo(page);
+  ok("the Upper menu is national and the eight states alone (no classes, no Council, one optgroup)",
+     mu.options.length === 9 && mu.options[0] === "fed"
+       && JSON.stringify(mu.groups) === JSON.stringify(["Federal elections"])
+       && !mu.options.some((v) => v.startsWith("fedcl:") || v === "nswlc"),
+     mu.options.join(" "));
+  const hu = await houseState(page);
+  ok("the flip names Upper, its title the House informal destination",
+     hu.t === "Upper ⇄" && hu.pressed === "true" && hu.title === "Switch to House of Representatives informal shares",
+     JSON.stringify(hu));
+  ok("…and even the chamber swap never moves the axis",
+     JSON.stringify(await infYTicks(page)) === JSON.stringify(INF_Y));
+  ok("…and the Senate's own election years all carry their marks",
+     (await xMarks(page)) === await page.evaluate(() => window.AUSPOL.informalHistory.fed.sen.years.length),
+     (await xMarks(page)) + " marks");
+  /* the Senate's post-war high era: the 1975 national dot reads 9.1 */
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(300);
+  const pt = await dotAtInf(page, 1975, 9.1, true);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 1975 Senate dot tips 9.1%, titled '1975 · Senate'",
+     !!tip && tip.includes("1975 · Senate") && tip.includes("9.1"), tip ? tip.slice(0, 110) : "no tooltip");
+  await page.mouse.move(pt.x, pt.y - 200);
+  await clickHouse(page); await sleep(700);
+  ok("flipping back restores the House 1901–2025 series", (await meta(page)) === IH_FED_META, await meta(page));
+  await clickView(page); await sleep(800);
+  const v4 = await viewState(page);
+  ok("a fourth press closes the cycle back at Preference flows (the vacate twin sheds)",
+     v4.n === 1 && v4.t === "Preference flows" && v4.title === "Switch to first-preference vote shares at every election",
+     JSON.stringify(v4));
+  ok("…the flow-history card back up on federal national",
+     (await scopeTitle(page)) === "Preferences to Labor over the Coalition, %" && (await meta(page)).startsWith("Australian federal elections"),
+     await meta(page));
+  const mf = await menuInfo(page);
+  ok("…and the flows menu carries its State elections optgroup again",
+     mf.groups.includes("State elections") && mf.value === "fed", mf.groups.join(" | "));
+}
+console.log("== phone 390: the informal stop never overflows ==");
+{
+  const ph = await browser.newPage();
+  wire(ph);
+  await ph.setViewport({ width: 390, height: 780, isMobile: true, hasTouch: true });
+  await ph.goto(`http://127.0.0.1:${PORT}/flows-explained/`, { waitUntil: "domcontentloaded" });
+  await ph.waitForSelector(".ex-fl-card .ex-view .rd-pl-flip", { timeout: 20000 });
+  await sleep(800);
+  await clickView(ph); await sleep(600);
+  await clickView(ph); await sleep(600);
+  await clickView(ph); await sleep(800);
+  const vs = await viewState(ph);
+  ok("three presses on the phone land on Informal votes", vs.t === "Informal votes", JSON.stringify(vs));
+  ok("…the House: flip rides the phone's chart head",
+     await ph.evaluate(() => !!document.querySelector(".ex-fl-card .ex-fl-ctls .ex-house .rd-pl-flip")));
+  const g = await cardOverflow(ph, 390);
+  const vb = await ph.evaluate((vw) => {
+    const b = [...document.querySelectorAll(".ex-fl-card .ex-view .rd-pl-flip")]
+      .find((x) => !x.closest(".ex-fl-vacate"));
+    const r = b.getBoundingClientRect();
+    return r.left >= -1 && r.right <= vw + 1;
+  }, 390);
+  ok("at 390px informal: no document overflow, every control (View button included) within the viewport",
+     g.doc <= 0 && g.els === 0 && vb, `doc ${g.doc}px, ${g.els} stray, viewBtn ${vb}`);
+  await ph.close();
+}
 console.log("== width sweep: the head controls never overflow (Lower and Upper) ==");
 const widths = [320, 360, 414, 561, 640, 700];
 const sweep = await browser.newPage();
