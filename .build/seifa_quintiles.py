@@ -171,6 +171,20 @@ _PCTI_PINS = {2013: (("Lingiari", "q5"), ("Bradfield", "q1")),
 # the NEW boundaries for the coming election – no counted product exists
 # for it anywhere in this repo – so it is never a cut year.)
 SEIFA_YEARS = (2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
+# each index's own span (2026-10-25, flows-explained review): the store's
+# 1998 block (APH CIB 4/1998-99 – 1996 census, the 148 divisions of the
+# 1998 election) prints IRSD, IER and IEO but no IRSAD, so the IEO and IER
+# lanes open at 1998 while IRSAD's opens at 2001. ALL_SEIFA_YEARS is their
+# union, the grid the writers walk.
+INDEX_YEARS = {"irsad": SEIFA_YEARS,
+               "ieo": (1998,) + SEIFA_YEARS,
+               "ier": (1998,) + SEIFA_YEARS}
+ALL_SEIFA_YEARS = tuple(sorted(set().union(*INDEX_YEARS.values())))
+
+
+def years_of(index_name):
+    """The elections an index's fifths exist for."""
+    return INDEX_YEARS[index_name]
 
 _STORE = None
 _INTERP_YEARS = None
@@ -304,12 +318,12 @@ def membership(year, index_name):
     with a missing/non-numeric/repeated pcti fails the run, as does a
     named anchor filed to the wrong fifth."""
     assert index_name in INDEX_META, f"unknown SEIFA index {index_name!r}"
-    assert year in SEIFA_YEARS, \
-        f"{year}: no quintile block (the seifa store covers {SEIFA_YEARS})"
+    assert year in years_of(index_name), \
+        f"{year}: no {index_name} quintile block (its fifths cover {years_of(index_name)})"
     blk = store()[str(year)]
     n = len(blk)
-    assert n in (150, 151), \
-        f"{year}: {n} divisions – the thirty-a-fifth cut prices a 150 or 151 seat chamber"
+    assert n in (148, 150, 151), \
+        f"{year}: {n} divisions – the thirty-a-fifth cut prices a 148, 150 or 151 seat chamber"
     if year in interp_years():
         meta = INDEX_META[index_name]["meta"]
         keys = tuple(m[0] for m in meta)

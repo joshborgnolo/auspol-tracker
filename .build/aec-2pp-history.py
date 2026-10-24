@@ -102,7 +102,7 @@ Usage: python3 .build/aec-2pp-history.py [--check]
 """
 import csv, json, os, sys
 
-from seifa_quintiles import INDEX_META, QIDXES, SEIFA_YEARS, elections_suffix, membership as seifa_membership
+from seifa_quintiles import ALL_SEIFA_YEARS, INDEX_META, QIDXES, SEIFA_YEARS, elections_suffix, membership as seifa_membership, years_of
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -372,9 +372,13 @@ def build():
         for ck, _, _ in CLASS_META:
             a = alp_share(per_cl[ck])
             per_class[ck][y] = (a, 100.0 - a)
-        if y in SEIFA_YEARS:    # 2001 - the HTPP era's one seifa year
+        if y in ALL_SEIFA_YEARS:    # 2001 for every index, 1998 for IEO/IER
             for ix in QIDXES:
+                if y not in years_of(ix):
+                    continue
                 mem = seifa_membership(y, ix)
+                # 1998's Newcastle sits in a fifth but has no HTPP count
+                mem = {d: r for d, r in mem.items() if d not in excl}
                 assert set(mem) == set(v), \
                     f"{y} {ix}: quintile HTPP join drifted - quintilised {sorted(set(mem) - set(v))[:3]}, counted-only {sorted(set(v) - set(mem))[:3]}"
                 qk_sums = {m[0]: [0.0, 0.0] for m in INDEX_META[ix]["meta"]}
@@ -386,7 +390,7 @@ def build():
                     per_quint[ix][qk][y] = (a, 100.0 - a)
     for ix in QIDXES:
         for q, _, _, _ in INDEX_META[ix]["meta"]:
-            assert sorted(per_quint[ix][q]) == list(SEIFA_YEARS), \
+            assert sorted(per_quint[ix][q]) == list(years_of(ix)), \
                 f"{ix} {q}: quintile cut misses a seifa year: {sorted(per_quint[ix][q])}"
 
     def view(label, elections_copy, rows, short=None):

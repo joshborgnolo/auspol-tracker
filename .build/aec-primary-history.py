@@ -61,7 +61,7 @@ Usage: python3 .build/aec-primary-history.py [--check]
 """
 import csv, gzip, io, json, os, sys, urllib.request
 
-from seifa_quintiles import INDEX_META, QIDXES, SEIFA_YEARS, elections_suffix, membership as seifa_membership
+from seifa_quintiles import ALL_SEIFA_YEARS, INDEX_META, QIDXES, elections_suffix, membership as seifa_membership, years_of
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -438,9 +438,11 @@ def quint_shares():
        and every index's nat sums must tally identical ballots."""
     out = {ix: {m[0]: {} for m in INDEX_META[ix]["meta"]} for ix in QIDXES}
     recon = {}
-    for y in SEIFA_YEARS:
+    for y in ALL_SEIFA_YEARS:
         votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
         for ix in QIDXES:
+            if y not in years_of(ix):
+                continue  # IRSAD has no 1998 block
             mem = seifa_membership(y, ix)
             assert set(votes) == set(mem), \
                 f"{y} {ix}: quintile join drifted - counted {sorted(set(votes) - set(mem))[:3]}, quintilised-only {sorted(set(mem) - set(votes))[:3]}"
@@ -451,12 +453,12 @@ def quint_shares():
                 for b, v in bks.items():
                     per[qk][b] = per[qk].get(b, 0.0) + v
                     nat[b] = nat.get(b, 0.0) + float(v)
-            if ix == QIDXES[0]:
+            if y not in recon:
                 recon[y] = nat
-            else:  # the same ballots under the second index's partition
+            else:  # the same ballots under another index's partition
                 for b, v in nat.items():
                     assert abs(v - recon[y].get(b, 0.0)) < 0.001, \
-                        f"{y} {b}: {ix} nat sum {v} != {QIDXES[0]}'s {recon[y].get(b)}"
+                        f"{y} {b}: {ix} nat sum {v} != the first index's {recon[y].get(b)}"
             for qk, _, _, _ in INDEX_META[ix]["meta"]:
                 out[ix][qk][y] = shares({"q": per[qk]})["q"][1]
     return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
@@ -625,12 +627,12 @@ def build():
     quint_rows, quint_recon = quint_shares()
     for ix in QIDXES:
         first = INDEX_META[ix]["meta"][0][0]
-        assert [y for y, row in quint_rows[ix][first].items() if row] == list(SEIFA_YEARS), \
-            f"a seifa membership block is missing for one of SEIFA_YEARS ({ix})"
+        assert [y for y, row in quint_rows[ix][first].items() if row] == list(years_of(ix)), \
+            f"a seifa membership block is missing for one of {ix}'s years"
     # recomposition: the fifths partition the same ballots the class lane
     # partitions, so their nat sums must equal the class lane's exactly
     # (both are sums of the same per-division votes)
-    for y in SEIFA_YEARS:
+    for y in ALL_SEIFA_YEARS:
         for b in ALL_BUCKETS:
             qa = quint_recon[y].get(b, 0.0)
             ca = class_recon[y].get(b, 0.0)

@@ -6052,7 +6052,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         : S.fedClass
           ? (S.seifa
             ? "Counted from the AEC’s per-seat results, each seat placed in a fifth by its " + S.ix.toUpperCase() + " standing at that election — " + SEIFA_IX_DESC[S.ix] + "."
-              + " From 2004 every seat counts; the 2001 ring counts only the seats where Labor and the Coalition finished first and second."
+              + " From 2004 every seat counts; " + ((S.hollowYears || []).length > 1 ? "the " + S.hollowYears.join(" and ") + " rings count" : "the 2001 ring counts") + " only the seats where Labor and the Coalition finished first and second."
               + (hasEst ? " Where a state’s crossbench seats fall in more than one fifth, the split between Greens, One Nation and Others in those seats is fitted to each seat’s own counts and drawn as a hollow diamond" + lumpEstNote + "." : "")
               + " A whole seat sits in one fifth by its average, so a seat that mixes rich and poor suburbs counts entirely in one."
             : "Counted from the AEC’s per-seat results, each seat grouped by the AEC’s own classification at that election."
@@ -6443,7 +6443,7 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed."
     : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.")
     + (!senBank && ((classKey && !S.seifa) || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
-    + (!senBank && ((classKey && !S.seifa) || stateKey) ? " 1998 counts 147 divisions: Newcastle went to a supplementary election the Liberals didn't contest, so it has no Labor-v-Coalition count." : "")
+    + (!senBank && ((classKey && (!S.seifa || YEARS.includes(1998))) || stateKey) ? " 1998 counts 147 divisions: Newcastle went to a supplementary election the Liberals didn't contest, so it has no Labor-v-Coalition count." : "")
     + " Above 50, " + active.name + " leads.";
   /* the constant axis (user 2026-10-24: the range "should remain
      constant at all times"): the furthest cell of the WHOLE bank from

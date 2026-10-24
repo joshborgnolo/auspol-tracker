@@ -1163,13 +1163,13 @@ export function validatePrimaryHistory() {
   /* the seat-class views (House only): four AEC classifications riding
      the divisions' 1996–2025 span, plus the fifteen SEIFA fifths (five
      per index, IRSAD then IEO then IER, each ix-tagged) on the index
-     series' own 2001–2025 — a division rides its election's own
+     series' own span (IRSAD 2001, IEO/IER 1998, to 2025) — a division rides its election's own
      grouping */
   if (!S.fed.classes || typeof S.fed.classes !== "object") fail("primary-history.json", "primary-history-shape", "no fed.classes");
   else for (const [ck, v] of Object.entries(S.fed.classes)) {
     checkView(`fed.${ck}`, v);
     if (Array.isArray(v.years) && v.years.length) {
-      const span0 = v.seifa ? 2001 : 1996;
+      const span0 = v.seifa ? (v.ix === "irsad" ? 2001 : 1998) : 1996;
       if (v.years[0] !== span0 || v.years[v.years.length - 1] !== 2025)
         fail(`primary-history.json fed.${ck}`, "primary-history-shape", `class span ${v.years[0]}–${v.years[v.years.length - 1]}, expected ${span0}–2025`);
     }
@@ -1231,9 +1231,9 @@ export function validate2ppHistory() {
     for (const [k, v] of Object.entries(S.fed[sect])) {
       checkView(`fed.${k}`, v);
       /* the SEIFA fifths (five per index) ride the classes bank on the
-         index series' own 2001–2025 span; every other cut joins the AEC
+         index series' own span (IRSAD 2001–2025, IEO/IER 1998–2025); every other cut joins the AEC
          counts at 1996 */
-      const cutStart = v.seifa ? 2001 : 1996;
+      const cutStart = v.seifa ? (v.ix === "irsad" ? 2001 : 1998) : 1996;
       if (v.seifa === true && sect !== "classes")
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "seifa flag outside the classes bank");
       if (sect === "classes" && v.seifa === true && v.short !== undefined && typeof v.short !== "string")
@@ -1241,7 +1241,7 @@ export function validate2ppHistory() {
       if (sect === "classes" && v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier")
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
       if (Array.isArray(v.years) && v.years.length && (v.years[0] !== cutStart || v.years[v.years.length - 1] !== 2025))
-        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected ${v.seifa ? "the index series' 2001–2025" : "the AEC counts' 1996–2025"}`);
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected ${v.seifa ? "the index series' " + cutStart + "–2025" : "the AEC counts' 1996–2025"}`);
     }
   }
   // fed.sen: the implied Senate two-party (never counted — pinned hard so no
@@ -1290,7 +1290,7 @@ export function validate2ppHistory() {
    yet represented is a gap, never a zero), House national 1901–2025,
    Senate 1903–2022 (the AEC informality summary's 2022 floor — no 2025
    Senate informal figure exists in any machine-readable publication),
-   classes 1996–2025 and the SEIFA fifths 2001–2025, House-only. */
+   classes 1996–2025 and the SEIFA fifths (IRSAD 2001–2025, IEO/IER 1998–2025), House-only. */
 export function validateInformalHistory() {
   const errors = [];
   const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
@@ -1338,7 +1338,7 @@ export function validateInformalHistory() {
     if (v.seifa === true && typeof v.short !== "string")
       fail(`informal-history.json fed.${ck}`, "informal-history-shape", "seifa record short is not a string");
     if (Array.isArray(v.years) && v.years.length) {
-      const span0 = v.seifa ? 2001 : 1996;
+      const span0 = v.seifa ? (v.ix === "irsad" ? 2001 : 1998) : 1996;
       if (v.years[0] !== span0 || v.years[v.years.length - 1] !== 2025)
         fail(`informal-history.json fed.${ck}`, "informal-history-shape", `class span ${v.years[0]}–${v.years[v.years.length - 1]}, expected ${span0}–2025`);
     }

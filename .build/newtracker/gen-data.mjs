@@ -5010,8 +5010,11 @@ const flowHistory = (() => {
        SAME bank with a seifa marker so the chart captions fork on
        S.seifa; every other consumer sees one flat list of class views)
        run one mapping over their own year arrays */
-    const laneClasses = (classes, all, years, seifa) =>
+    const laneClasses = (classes, all, laneYears, seifa) =>
       Object.fromEntries(Object.entries(classes).map(([k, s]) => {
+        /* a SEIFA record may carry its own span (IEO and IER open at
+           1998, IRSAD at 2001 - 2026-10-25) */
+        const years = s.years || laneYears;
         const A = (all || {})[k] || {};
         const pick = (b) => years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
         const est = (b) => years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));

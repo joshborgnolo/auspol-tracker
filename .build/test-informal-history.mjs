@@ -272,8 +272,8 @@ CLASSES.forEach((k) => {
 FIFTHS.forEach((q) => {
   const [label, short, phrase] = QUINT_COPY[q[1]];
   const v = CLB[q];
-  assert.deepEqual(v.years, [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
-    `${q}: the index series' own span`);
+  assert.deepEqual(v.years, (IDX_OF(q) === "irsad" ? [] : [1998]).concat([2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]),
+    `${q}: the index series' own span (IEO/IER from 1998)`);
   assert.equal(v.seifa, true, `${q}: the seifa flag`);
   assert.equal(v.ix, IDX_OF(q), `${q}: the index tag`);
   assert.equal(v.label, label, `${q}: label`);

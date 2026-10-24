@@ -115,7 +115,8 @@ reflected, 1 = most advantaged), thirty seats a fifth, the 151-seat
 2019/2022 chambers giving the spare seat to the most-disadvantaged
 fifth. The quintiles sit in the
 store's `seifa` block beside `classes`, in the same shapes
-(classes/allSeats over years 2001–2025 – the seifa store's floor), and
+(classes/allSeats over each index's own years – IRSAD 2001–2025, IEO and
+IER 1998–2025 since 2026-10-25, each record carrying its years), and
 gen-data merges them into the flowHistory classes bank after the four
 classification views, where every chart and menu reads them untouched
 (the fedClass machinery – classic rings before 2004, est diamonds – is
@@ -140,13 +141,13 @@ cells sum the classic buckets (no all-seats product exists for those
 years). Key order is the chart's: inner, outer, provincial, rural. The
 seifa block's classes/allSeats mirror those two shapes exactly, keyed
 q1..q5 (IRSAD) then e1..e5 (IEO) then r1..r5 (IER) – ix tags each
-record's index – years 2001–2025.
+record's index – each record's own years (seifa.years is their union).
 
 Pinned by .build/test-fed-class-flows.mjs.
 """
 import collections, csv, gzip, json, os
 
-from seifa_quintiles import INDEX_META, QIDXES, SEIFA_META, SEIFA_YEARS, membership as seifa_membership
+from seifa_quintiles import ALL_SEIFA_YEARS, INDEX_META, QIDXES, SEIFA_META, membership as seifa_membership, years_of
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "aec-flow-src")
@@ -636,15 +637,17 @@ def main():
     # SEIFA_KEYS (both indexes' quintile keys) as labels arms parse()'s
     # and allseats_for_year()'s group checks
     SEIFA_KEYS = {m[0]: None for m in SEIFA_META}
-    quint = {m[0]: {"label": m[1], "short": m[2], "desc": m[3], "ix": m[4],
+    quint = {m[0]: {"label": m[1], "short": m[2], "desc": m[3], "ix": m[4], "years": list(years_of(m[4])),
                     **{b: [] for b in BUCKETS}, "votes": {b: [] for b in BUCKETS}}
              for m in SEIFA_META}
     quint_all = {m[0]: {"lump": [], "lumpVotes": [], "lumpEst": [],
                         **{b: {"share": [], "votes": [], "est": []} for b in BUCKETS}}
                  for m in SEIFA_META}
     q_ballots = {m[0]: collections.defaultdict(list) for m in SEIFA_META}
-    for y in SEIFA_YEARS:
+    for y in ALL_SEIFA_YEARS:
         for ix in QIDXES:
+            if y not in years_of(ix):
+                continue  # IRSAD has no 1998 block
             mem = seifa_membership(y, ix)
             class_of = {n: r["classification"] for n, r in mem.items()}
             per, _, _ = parse(y, class_of, labels=SEIFA_KEYS)
@@ -689,7 +692,7 @@ def main():
                "lumpVotes": allseats[cls]["lumpVotes"], "lumpEst": allseats[cls]["lumpEst"],
                "est": {b: allseats[cls][b]["est"] for b in BUCKETS}}
                for cls in CLASSES},
-           "seifa": {"years": list(SEIFA_YEARS),
+           "seifa": {"years": list(ALL_SEIFA_YEARS),
                      "classes": {m[0]: quint[m[0]] for m in SEIFA_META},
                      "allSeats": {m[0]: {
                          "grn": quint_all[m[0]]["grn"]["share"], "onp": quint_all[m[0]]["onp"]["share"],

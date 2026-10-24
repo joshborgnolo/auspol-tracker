@@ -185,6 +185,11 @@ const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading
 const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
 const IX_NAME = { irsad: "IRSAD", ieo: "IEO", ier: "IER" };
 const SEIFA_YEARS = [2001, ...AEC_YEARS];
+
+/* each index's own span (2026-10-25): IEO and IER open at 1998 (the
+   store's APH CIB 4/1998-99 block prints no IRSAD) */
+const IX_YEARS = { irsad: SEIFA_YEARS, ieo: [1998, ...SEIFA_YEARS], ier: [1998, ...SEIFA_YEARS] };
+const ALL_SEIFA_YEARS = [1998, ...SEIFA_YEARS];
 const QUINT_COPY = {
   1: ["Most-advantaged fifth", "Top fifth", "most-advantaged fifth"],
   2: ["Second-most-advantaged fifth", "2nd fifth", "second-most-advantaged fifth"],
@@ -245,7 +250,7 @@ const ELECTIONS_SUFFIX = (ix) => `of seats by ${ix.toUpperCase()}`;
 FIFTHS.forEach((q) => {
   const ix = IDX_OF(q);
   const v = FED.classes[q];
-  assert.deepEqual(v.years, SEIFA_YEARS, `${q}: the index series' own span`);
+  assert.deepEqual(v.years, IX_YEARS[ix], `${q}: the index series' own span`);
   assert.equal(v.seifa, true, `${q}: the seifa flag the renderers gate on`);
   assert.equal(v.ix, ix, `${q}: the index tag`);
   assert.equal(v.foldPt, 2, `${q}: a fifth carries its own 2% fold (thirtieths, not sixteenths)`);
@@ -273,12 +278,13 @@ const pctiRank = (y, nm) => {
   const blk = SEIFA[String(y)];
   return Object.keys(blk).sort((a, b) => blk[b].irsad.pcti - blk[a].irsad.pcti).indexOf(nm) + 1;
 };
-SEIFA_YEARS.forEach((y) => {
+ALL_SEIFA_YEARS.forEach((y) => {
   const blk = SEIFA[String(y)];
   assert.ok(blk, `${y}: a seifa block`);
   const names = Object.keys(blk), n = names.length;
-  assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
+  assert.ok(n === 148 || n === 150 || n === 151, `${y}: ${n} divisions (a 148, 150 or 151 seat chamber)`);
   for (const ix of Object.keys(LANE)) {
+    if (!IX_YEARS[ix].includes(y)) continue;   // IRSAD has no 1998 block
     const ids = FIFTHS.filter((q) => IDX_OF(q) === ix);
     const sizes = Object.fromEntries(ids.map((q) => [q, 0]));
     /* each division's advantage-ordered rank on THIS year's basis: IRSAD
@@ -399,19 +405,19 @@ assert.equal(cell(FED.classes.e1, "dem", 2001), 7.79);
 // 2025 told across the IEO fifths: Labor rises to e2 then falls down the
 // ladder, the Greens fall with disadvantage and One Nation rises with it —
 // the same story as IRSAD's, by the education-and-occupation read
-assert.ok(FED.classes.e1.alp[8] < FED.classes.e2.alp[8] && FED.classes.e2.alp[8] > FED.classes.e3.alp[8]
-  && FED.classes.e3.alp[8] > FED.classes.e4.alp[8] && FED.classes.e4.alp[8] > FED.classes.e5.alp[8],
+assert.ok(cell(FED.classes.e1, "alp", 2025) < cell(FED.classes.e2, "alp", 2025) && cell(FED.classes.e2, "alp", 2025) > cell(FED.classes.e3, "alp", 2025)
+  && cell(FED.classes.e3, "alp", 2025) > cell(FED.classes.e4, "alp", 2025) && cell(FED.classes.e4, "alp", 2025) > cell(FED.classes.e5, "alp", 2025),
   "2025 ALP (IEO): rises to e2 then falls down the ladder");
-assert.ok(FED.classes.e1.grn[8] > FED.classes.e2.grn[8] && FED.classes.e2.grn[8] > FED.classes.e3.grn[8]
-  && FED.classes.e3.grn[8] > FED.classes.e4.grn[8] && FED.classes.e4.grn[8] > FED.classes.e5.grn[8],
+assert.ok(cell(FED.classes.e1, "grn", 2025) > cell(FED.classes.e2, "grn", 2025) && cell(FED.classes.e2, "grn", 2025) > cell(FED.classes.e3, "grn", 2025)
+  && cell(FED.classes.e3, "grn", 2025) > cell(FED.classes.e4, "grn", 2025) && cell(FED.classes.e4, "grn", 2025) > cell(FED.classes.e5, "grn", 2025),
   "2025 GRN (IEO): falls with disadvantage, most-advantaged to most-disadvantaged");
-assert.ok(FED.classes.e1.onp[8] < FED.classes.e2.onp[8] && FED.classes.e2.onp[8] < FED.classes.e3.onp[8]
-  && FED.classes.e3.onp[8] < FED.classes.e4.onp[8] && FED.classes.e4.onp[8] < FED.classes.e5.onp[8],
+assert.ok(cell(FED.classes.e1, "onp", 2025) < cell(FED.classes.e2, "onp", 2025) && cell(FED.classes.e2, "onp", 2025) < cell(FED.classes.e3, "onp", 2025)
+  && cell(FED.classes.e3, "onp", 2025) < cell(FED.classes.e4, "onp", 2025) && cell(FED.classes.e4, "onp", 2025) < cell(FED.classes.e5, "onp", 2025),
   "2025 ONP (IEO): rises with disadvantage");
 // the tenth-fold at work on the IEO side too: e1's One Nation 2022 (2.0)
 // and 2025 (2.72) display at 2% where the page default would null them
-assert.equal(FED.classes.e1.onp[7], 2, "e1 ONP 2022: under 4%, shown at the fifths' fold");
-assert.equal(FED.classes.e1.onp[8], 2.72, "e1 ONP 2025: under 4%, shown");
+assert.equal(cell(FED.classes.e1, "onp", 2022), 2, "e1 ONP 2022: under 4%, shown at the fifths' fold");
+assert.equal(cell(FED.classes.e1, "onp", 2025), 2.72, "e1 ONP 2025: under 4%, shown");
 
 // ---- the IER fifths' own per-cell pins (recomputed from the committed
 //      sources at the same build) --------------------------------------
@@ -429,19 +435,19 @@ assert.equal(cell(FED.classes.r1, "dem", 2001), 6.85);
 // ladder (Labor peaks in the second-most-disadvantaged fifth at 37.75 and
 // its most-advantaged cell is the lowest, 31.3) — but the Coalition's and
 // One Nation's ladders are as strict as the other two indexes'
-assert.ok(FED.classes.r1.lnp[8] > FED.classes.r5.lnp[8] && FED.classes.r5.lnp[8] > FED.classes.r4.lnp[8]
-  && FED.classes.r1.lnp[8] - FED.classes.r4.lnp[8] > 6,
+assert.ok(cell(FED.classes.r1, "lnp", 2025) > cell(FED.classes.r5, "lnp", 2025) && cell(FED.classes.r5, "lnp", 2025) > cell(FED.classes.r4, "lnp", 2025)
+  && cell(FED.classes.r1, "lnp", 2025) - cell(FED.classes.r4, "lnp", 2025) > 6,
   "2025 L/NP (IER): strongest in the most-advantaged fifth");
-assert.ok(FED.classes.r1.onp[8] < FED.classes.r2.onp[8] && FED.classes.r2.onp[8] < FED.classes.r3.onp[8]
-  && FED.classes.r3.onp[8] < FED.classes.r4.onp[8] && FED.classes.r4.onp[8] < FED.classes.r5.onp[8],
+assert.ok(cell(FED.classes.r1, "onp", 2025) < cell(FED.classes.r2, "onp", 2025) && cell(FED.classes.r2, "onp", 2025) < cell(FED.classes.r3, "onp", 2025)
+  && cell(FED.classes.r3, "onp", 2025) < cell(FED.classes.r4, "onp", 2025) && cell(FED.classes.r4, "onp", 2025) < cell(FED.classes.r5, "onp", 2025),
   "2025 ONP (IER): rises with disadvantage");
-assert.ok(Math.min(FED.classes.r4.grn[8], FED.classes.r5.grn[8]) > Math.max(FED.classes.r1.grn[8], FED.classes.r2.grn[8], FED.classes.r3.grn[8]),
+assert.ok(Math.min(cell(FED.classes.r4, "grn", 2025), cell(FED.classes.r5, "grn", 2025)) > Math.max(cell(FED.classes.r1, "grn", 2025), cell(FED.classes.r2, "grn", 2025), cell(FED.classes.r3, "grn", 2025)),
   "2025 GRN (IER): strongest in the two most-disadvantaged fifths");
 // the tenth-fold at work on the IER side too: r1's One Nation 2022 (3.74)
 // displays at 2% where the page default would null it (the 151-seat year's
 // spare reallocates the disadvantaged fifth — the dis-first store's r5 cell
 // is NOT this pin's mirror)
-assert.equal(FED.classes.r1.onp[7], 3.74, "r1 ONP 2022: under 4%, shown at the fifths' fold");
+assert.equal(cell(FED.classes.r1, "onp", 2022), 3.74, "r1 ONP 2022: under 4%, shown at the fifths' fold");
 
 
 // ---- canonical national ALP / Coalition pins --------------------------------

@@ -107,6 +107,11 @@ const FIFTH_SHORT = {
 const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading letter
 const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
 const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+
+/* each index's own span (2026-10-25): IEO and IER open at 1998 (the
+   store's APH CIB 4/1998-99 block prints no IRSAD) */
+const IX_YEARS = { irsad: SEIFA_YEARS, ieo: [1998, ...SEIFA_YEARS], ier: [1998, ...SEIFA_YEARS] };
+const ALL_SEIFA_YEARS = [1998, ...SEIFA_YEARS];
 const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
 const SEIFA = SEIFA_DOC.elections;
 /* the elections whose IRSAD fifths cut on the census-interpolated
@@ -226,15 +231,18 @@ AEC_YEARS.forEach((y) => {
   }
   rec[y] = { nat: share(nat), perState: Object.fromEntries(STATES.map((s) => [s, share(perState[s])])),
     perClass: Object.fromEntries(CLASSES.map((c) => [c, share(perClass[c])])) };
-  if (SEIFA_YEARS.includes(y)) {
+  if (ALL_SEIFA_YEARS.includes(y)) {
     /* each index's fifth regrouping of the very same per-division counts,
        by this probe's own membership read of the seifa store */
     const mem = SEIFA[String(y)];
     assert.ok(mem, `${y}: a seifa elections block`);
-    assert.deepEqual(Object.keys(perDiv).filter((d) => !(HTT_EXCLUDED[y] || []).includes(d)).sort(),
-      Object.keys(mem).sort(), `${y}: the seifa block names the counted divisions`);
+    /* 1998's Newcastle sits in a fifth (the cut prices all 148 seats)
+       but has no HTPP count */
+    assert.deepEqual(Object.keys(perDiv).sort(),
+      Object.keys(mem).filter((d) => !(HTT_EXCLUDED[y] || []).includes(d)).sort(), `${y}: the seifa block names the counted divisions`);
     rec[y].perQuint = {};
     for (const ix of Object.keys(LANE)) {
+      if (!IX_YEARS[ix].includes(y)) continue;   // IRSAD has no 1998 block
       const ids = FIFTHS.filter((q) => IDX_OF(q) === ix);
       const qs = Object.fromEntries(ids.map((q) => [q, [0, 0]]));
       const n = Object.keys(mem).length;
@@ -311,7 +319,7 @@ STATES.forEach((s) => assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s}: th
 STATES.forEach((s) => assert.equal(FED.states[s].short, STATE_SHORT[s], `${s}: the menu short label`));
 CLASSES.forEach((c) => assert.deepEqual(FED.classes[c].years, AEC_YEARS, `${c}: the downloads' span`));
 CLASSES.forEach((c) => assert.equal(FED.classes[c].seifa, undefined, `${c}: a seat-type cut carries no seifa flag`));
-FIFTHS.forEach((q) => assert.deepEqual(FED.classes[q].years, SEIFA_YEARS, `${q}: the index series' own span`));
+FIFTHS.forEach((q) => assert.deepEqual(FED.classes[q].years, IX_YEARS[IDX_OF(q)], `${q}: the index series' own span`));
 FIFTHS.forEach((q) => assert.equal(FED.classes[q].seifa, true, `${q}: the seifa flag the captions fork on`));
 FIFTHS.forEach((q) => assert.equal(FED.classes[q].ix, IDX_OF(q), `${q}: the index tag`));
 FIFTHS.forEach((q) => assert.equal(FED.classes[q].short, FIFTH_SHORT[q[1]], `${q}: the menu short`));
@@ -353,7 +361,7 @@ AEC_YEARS.forEach((y) => {
   CLASSES.forEach((c) => assert.ok(Math.abs(rec[y].perClass[c] - cell(FED.classes[c], "alp", y)) < 0.005,
     `${y} ${c}: ${rec[y].perClass[c].toFixed(2)} v cell ${cell(FED.classes[c], "alp", y)}`));
   if (rec[y].perQuint)
-    FIFTHS.forEach((q) => assert.ok(Math.abs(rec[y].perQuint[q] - cell(FED.classes[q], "alp", y)) < 0.005,
+    FIFTHS.filter((q) => IX_YEARS[IDX_OF(q)].includes(y)).forEach((q) => assert.ok(Math.abs(rec[y].perQuint[q] - cell(FED.classes[q], "alp", y)) < 0.005,
       `${y} ${q}: ${IDX_OF(q)}-fifth recompute ${rec[y].perQuint[q].toFixed(2)} v cell ${cell(FED.classes[q], "alp", y)}`));
 });
 

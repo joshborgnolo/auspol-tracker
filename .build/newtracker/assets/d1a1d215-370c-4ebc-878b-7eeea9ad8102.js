@@ -7819,7 +7819,9 @@ function infoTerms(D) {
           profile pages. The fifths rank every seat on one of three ABS indexes: IRSAD (advantage and
           disadvantage), IEO (education and occupation) or IER (economic resources). The most-advantaged
           30 seats form the top fifth, and so on down; in the 151-seat chambers of 2019 and 2022 the
-          spare seat goes to the bottom fifth. At 2013, 2016 and 2019 each seat’s percentile is
+          spare seat goes to the bottom fifth, and in 1998’s 148-seat chamber the bottom fifth holds 28.
+          IEO and IER start in 1998, from the Parliamentary Library’s 1996-census figures for that
+          election’s seats; IRSAD starts in 2001. At 2013, 2016 and 2019 each seat’s percentile is
           interpolated between the censuses either side of election day; other years use the census
           ranking published for that election’s boundaries. Each election is ranked afresh, so a seat
           whose standing changed can change fifths. A whole seat sits in one fifth by its average, so a
