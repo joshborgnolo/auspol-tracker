@@ -118,6 +118,33 @@ body.rd .content { gap: 0; }
    72px scroll-margin in the template */
 body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; scroll-margin-top: 56px; }
 body.rd .rd-sec + .rd-sec { padding-top: var(--rd-sec-pad); }
+/* Off-screen sections skip their own layout and paint until they near the
+   viewport (25 of 28 cards mount >2 viewports deep - 2026-10-25 perf
+   audit). contain-intrinsic-size holds a placeholder height while a
+   section is skipped (1200px = the measured desktop band, Now/cycles
+   sections run 921-1628px); `auto` then switches to its remembered real
+   height after the first render. overflow-clip-margin widens paint
+   containment's clip box 12px past the padding edge so the design's
+   intentional overhangs survive (.chart-copy-btn right:-4px, .rd-evlist-b
+   margin:0 -4px, viewport-nudged .rd-qpanel, rightmost chart tips) - and
+   the whole rule is @supports-gated on it so a cv-browser WITHOUT it
+   (Safari 18.x) keeps exactly today's rendering rather than clipping
+   accents. Charts measure 0-width while skipped and self-correct via the
+   TrendChart ResizeObserver on reveal; rdHoldSection's inline min-height
+   still wins over the placeholder during glides. */
+@supports ((overflow-clip-margin: 12px) and (contain-intrinsic-size: auto 100px)) {
+  body.rd .rd-sec {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
+    overflow-clip-margin: 12px;
+  }
+  /* the two heavy archives get class-tuned placeholders (measured
+     2026-10-25: final-polls 2647px, the all-polls table 2955px) */
+  body.rd .rd-sec.rd-acc { contain-intrinsic-size: auto 2400px; }
+  body.rd .rd-sec.rd-ap { contain-intrinsic-size: auto 2900px; }
+  /* skipped content must not be skipped on the printed page */
+  @media print { body.rd .rd-sec { content-visibility: visible; } }
+}
 body.rd .rd-eyebrow {
   display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
   border-top: 2px solid var(--rd-rule); padding-top: 12px;

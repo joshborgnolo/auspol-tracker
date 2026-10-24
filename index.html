@@ -3655,6 +3655,16 @@ body.rd .page {
 body.rd .content { gap: 0; }
 body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; scroll-margin-top: 56px; }
 body.rd .rd-sec + .rd-sec { padding-top: var(--rd-sec-pad); }
+@supports ((overflow-clip-margin: 12px) and (contain-intrinsic-size: auto 100px)) {
+  body.rd .rd-sec {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
+    overflow-clip-margin: 12px;
+  }
+  body.rd .rd-sec.rd-acc { contain-intrinsic-size: auto 2400px; }
+  body.rd .rd-sec.rd-ap { contain-intrinsic-size: auto 2900px; }
+  @media print { body.rd .rd-sec { content-visibility: visible; } }
+}
 body.rd .rd-eyebrow {
   display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
   border-top: 2px solid var(--rd-rule); padding-top: 12px;
