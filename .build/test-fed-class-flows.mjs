@@ -51,7 +51,7 @@
    (per-state classic sums are exact for the five jurisdictions with no
    non-classic final; NSW/QLD/SA are residual by their IND-final seats),
    the thin 2013 inner-metro One Nation base is the 1,508 ballots the
-   chart's caption quotes, the 2025 column reconciles with the elec2025r
+   chart's caption derives (its thinnest-base note reads the record), the 2025 column reconciles with the elec2025r
    region carriers gen-data types from the same source table (cross-checked
    there against the vendored DoP), and the built data asset hands the
    chart the classes under flowHistory.fed.classes with no error bars.
@@ -242,9 +242,18 @@ CLASS_IDS.forEach((k) => BUCKETS.forEach((b) => data.classes[k][b].forEach((v, y
 })));
 /* every share shown is the share of whatever ballots exist (user 2026-10-22:
    number the points for whatever data exists for each) — the caption carries
-   the small-base caveat, and it quotes the thinnest of them */
+   the small-base caveat, computed from the record's own thinnest base */
 const thin = data.classes.inner.votes.onp[6];
-assert.equal(thin[0] + thin[1], 1508, "the caption's 1,508-ballot inner-metro 2013 One Nation base");
+assert.equal(thin[0] + thin[1], 1508, "the 1,508-ballot inner-metro 2013 One Nation classic base");
+/* the One Nation caveats are composed from the record shown (2026-10-25:
+   the static sentence named the wrong end of the SEIFA ladder) */
+{
+  const jsxSrc = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
+  assert.ok(jsxSrc.includes("const onpGapYears = S.fedClass ? YEARS.filter((y, i) => y >= 1998 && (S.onp || [])[i] == null) : [];")
+      && jsxSrc.includes("+ onpGapNote + thinNote")
+      && !jsxSrc.includes("stood in hardly any of the most-disadvantaged seats"),
+    "the class captions read One Nation's gaps and thinnest base off the record");
+}
 
 // ---- the 1996–2001 columns recombine to flow-lef.json's own national votes --
 /* the four classes' counted ballots must sum to exactly the national classic
@@ -405,10 +414,75 @@ const dopFirstPrefs = (y) => {
     if (c[CN].trim() !== "0" || !t.includes("preference") || !t.includes("count")) return;
     const p = c[PA].trim();
     const key = LABOR.has(p) ? "alp" : COAL.has(p) ? "coal" : bucketOf(p);
-    const rec = per.get(c[D].trim()) ?? per.set(c[D].trim(), { alp: 0, coal: 0, grn: 0, onp: 0, oth: 0 }).get(c[D].trim());
+    const rec = per.get(c[D].trim()) ?? per.set(c[D].trim(), { alp: 0, coal: 0, grn: 0, onp: 0, oth: 0, coalC: [] }).get(c[D].trim());
     rec[key] += +c[CV];
+    if (key === "coal") rec.coalC.push(+c[CV]);
   });
+  /* coal2: Coalition first preferences outside the leading Coalition
+     candidate – nonzero only in three-cornered seats */
+  per.forEach((rec) => { rec.coal2 = rec.coalC.length ? rec.coalC.reduce((s, v) => s + v, 0) - Math.max(...rec.coalC) : 0; });
   return per;
+};
+/* fed-class-flows.py's fit_mixed_state, line for line: a mixed state's
+   non-classic leftover split to division x bucket by proportional fitting
+   to each seat's bucket first preferences, each seat's minor ballots to
+   Labor (TPP Labor less Labor first preferences, drift off) and each
+   bucket's state leftover. Returns {cells: Map("div|bk" -> [a, l]),
+   driftEst: Set(div)} */
+const IPF_ITERS = 400;
+const fitMixedState = (y, st, divs, fpd, tpp, left, ncDrift) => {
+  const tri = divs.filter((d) => (fpd.get(d).coal2 || 0) > 0);
+  const driftD = Object.fromEntries(divs.map((d) => [d, 0]));
+  let driftEst = new Set();
+  if (Math.abs(ncDrift) > 0.5) {
+    assert.ok(tri.length, `${y}: ${st} non-classic drift ${ncDrift} with no three-cornered seat`);
+    const w = tri.reduce((s, d) => s + fpd.get(d).coal2, 0);
+    tri.forEach((d) => { driftD[d] = ncDrift * fpd.get(d).coal2 / w; });
+    if (tri.length > 1) driftEst = new Set(tri);
+  }
+  const row = {};
+  divs.forEach((d) => {
+    const tot = BUCKETS.reduce((s, bk) => s + fpd.get(d)[bk], 0);
+    const a = Math.min(Math.max(tpp.get(d)[1] - fpd.get(d).alp - driftD[d], 0), tot);
+    row[d] = [a, tot - a];
+  });
+  const x = new Map();
+  BUCKETS.forEach((bk) => {
+    const [la, ll] = left[bk];
+    const r = la + ll > 0 ? la / (la + ll) : 0;
+    divs.forEach((d) => x.set(d + "|" + bk, [fpd.get(d)[bk] * r, fpd.get(d)[bk] * (1 - r)]));
+  });
+  for (let it = 0; it < IPF_ITERS; it++) {
+    divs.forEach((d) => [0, 1].forEach((i) => {
+      const s = BUCKETS.reduce((z, bk) => z + x.get(d + "|" + bk)[i], 0);
+      if (s > 0) { const f = row[d][i] / s; BUCKETS.forEach((bk) => { x.get(d + "|" + bk)[i] *= f; }); }
+    }));
+    BUCKETS.forEach((bk) => [0, 1].forEach((i) => {
+      const s = divs.reduce((z, d) => z + x.get(d + "|" + bk)[i], 0);
+      if (s > 0) { const f = left[bk][i] / s; divs.forEach((d) => { x.get(d + "|" + bk)[i] *= f; }); }
+    }));
+    divs.forEach((d) => BUCKETS.forEach((bk) => {
+      const c = x.get(d + "|" + bk), s = c[0] + c[1];
+      if (s > 0) { const f = fpd.get(d)[bk] / s; c[0] *= f; c[1] *= f; }
+    }));
+  }
+  const worst = Math.max(...divs.map((d) => Math.abs(BUCKETS.reduce((z, bk) => z + x.get(d + "|" + bk)[0], 0) - row[d][0])),
+    ...BUCKETS.map((bk) => Math.abs(divs.reduce((z, d) => z + x.get(d + "|" + bk)[0], 0) - left[bk][0])));
+  assert.ok(worst <= 2, `${y}: ${st} count-anchored fit missed a margin by ${worst.toFixed(1)} ballots`);
+  return { cells: x, driftEst };
+};
+/* a mixed state's fitted cells summed into its groups; the lump flags
+   where a spread drift crossed groups */
+const assignMixed = (y, st, bygrp, fpd, tpp, left, ncDrift, acc, est, lumpEst) => {
+  const divs = Object.values(bygrp).flat().sort();
+  const { cells, driftEst } = fitMixedState(y, st, divs, fpd, tpp, left, ncDrift);
+  Object.entries(bygrp).forEach(([k, ds]) => ds.forEach((d) => BUCKETS.forEach((bk) => {
+    const [a, l] = cells.get(d + "|" + bk);
+    if (a + l <= 0) return;
+    acc[k][bk][0] += a; acc[k][bk][1] += l; est[k].add(bk);
+  })));
+  const hit = Object.keys(bygrp).filter((k) => bygrp[k].some((d) => driftEst.has(d)));
+  if (hit.length > 1) hit.forEach((k) => lumpEst.add(k));
 };
 const tppdivTotals = (y) => {
   /* Map(name -> [toCOAL, toALP]) over every division of the chamber */
@@ -451,7 +525,7 @@ const stateFlowTable = (y) => {
   return { per, drift };
 };
 const expectedAll = {};
-CLASS_IDS.forEach((k) => { expectedAll[k] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
+CLASS_IDS.forEach((k) => { expectedAll[k] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], lumpEst: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
 const mixedRoster = {};                        // {year: {state: [class ids]}} over multi-class state cells
 const census = [];                             // every (year,state) cell with its classes, for the exact-side pin
 YEARS.forEach((y, yi) => {
@@ -461,6 +535,7 @@ YEARS.forEach((y, yi) => {
       BUCKETS.forEach((b) => { expectedAll[k][b][yi] = null; expectedAll[k].votes[b][yi] = null; expectedAll[k].est[b][yi] = false; const v = fresh[k].votes[b][yi]; if (v) { a += v[0]; l += v[1]; } });
       expectedAll[k].lump[yi] = a + l ? pyr1(100 * a / (a + l)) : null;
       expectedAll[k].lumpVotes[yi] = a + l ? [pyr(a), pyr(l)] : null;
+      expectedAll[k].lumpEst[yi] = false;
     });
     return;
   }
@@ -513,25 +588,15 @@ YEARS.forEach((y, yi) => {
     assert.ok(Math.abs(lv[0] + ncDrift - mn[0]) <= 1, `${y}: ${st} leftover ${lv[0].toFixed(0)} + drift ${ncDrift} != per-division minors ${mn[0].toFixed(0)} (ALP side)`);
     assert.ok(Math.abs(lv[1] - ncDrift - mn[1]) <= 1, `${y}: ${st} leftover ${lv[1].toFixed(0)} - drift ${ncDrift} != per-division minors ${mn[1].toFixed(0)} (Coalition side)`);
   });
-  // assign: exact for single-class states, allocated over bucket first prefs otherwise
-  const acc = {}, est = {};
+  // assign: exact for single-class states, the count-anchored fit otherwise
+  const acc = {}, est = {}, lumpEst = new Set();
   CLASS_IDS.forEach((k) => { acc[k] = { grn: [0, 0], onp: [0, 0], oth: [0, 0] }; est[k] = new Set(); });
   Object.entries(nc).forEach(([st, bycls]) => {
     const ks = Object.keys(bycls);
     if (ks.length === 1) {
       BUCKETS.forEach((bk) => { acc[ks[0]][bk][0] += leftover[st][bk][0]; acc[ks[0]][bk][1] += leftover[st][bk][1]; });
     } else {
-      BUCKETS.forEach((bk) => {
-        const w = {}, tot = ks.reduce((s, k) => s + (w[k] = bycls[k].reduce((z, d) => z + fpd.get(d)[bk], 0)), 0);
-        const [la, ll] = leftover[st][bk];
-        if (la + ll <= 0.5) return;
-        assert.ok(tot > 0, `${y}: ${st} ${bk} leftover ${la}+${ll} with no first-preference base`);
-        ks.forEach((k) => {
-          if (w[k] <= 0) return;
-          acc[k][bk][0] += la * w[k] / tot; acc[k][bk][1] += ll * w[k] / tot;
-          est[k].add(bk);
-        });
-      });
+      assignMixed(y, st, bycls, fpd, tpp, leftover[st], (drift[st] || 0) - (crossByState[st] || 0), acc, est, lumpEst);
     }
   });
   CLASS_IDS.forEach((k) => {
@@ -545,6 +610,7 @@ YEARS.forEach((y, yi) => {
     });
     expectedAll[k].lump[yi] = pyr1(100 * la / (la + ll));
     expectedAll[k].lumpVotes[yi] = [pyr(la), pyr(ll)];
+    expectedAll[k].lumpEst[yi] = lumpEst.has(k);
   });
 });
 assert.deepEqual(data.allSeats ? Object.keys(data.allSeats) : [], CLASS_IDS, "allSeats carries the four classes in chart order");
@@ -556,6 +622,7 @@ CLASS_IDS.forEach((k) => {
   });
   assert.deepEqual(data.allSeats[k].lump, expectedAll[k].lump, `allSeats ${k} lump: every non-major ballot`);
   assert.deepEqual(data.allSeats[k].lumpVotes, expectedAll[k].lumpVotes, `allSeats ${k} lump ballots`);
+  assert.deepEqual(data.allSeats[k].lumpEst, expectedAll[k].lumpEst, `allSeats ${k} lump: counted unless a drift spread crossed classes`);
 });
 
 // ---- the SEIFA fifths (IRSAD q1..q5, IEO e1..e5): the seifa classes/allSeats lanes
@@ -612,7 +679,7 @@ const seifaIdx = SEIFA_DOC.elections;
    store's current window. A new pcti factor year goes red here: that is
    a copy change wanting a human, never a silent re-pin */
 const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
-const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)";
+const ELECTIONS_SUFFIX = (ix) => `of seats by ${IX_NAME[ix]}`;
 /* each index's membership, probed from the seifa store: every fifth is
    thirty seats (the 151-seat 2019/2022 chambers' spare joins the most-
    disadvantaged fifth), the ranks are a permutation of 1..N, and the named
@@ -630,20 +697,20 @@ for (const ix of Object.keys(QIDXES)) {
     const ranks = [];
     quintCell[ix][y] = {};
     /* each division's advantage-ordered rank on THIS election's basis:
-       IRSAD at a pcti factor year ranks the census-interpolated
-       percentile descending (highest percentile = advantage-rank 1;
+       every index at a pcti factor year ranks the census-interpolated
+       percentile descending (IEO and IER since 2026-10-25) (highest percentile = advantage-rank 1;
        the percentiles are distinct, so the cut has no tie rule); every
        other cell reads the recorded rank */
     const raOf = new Map();
-    if (ix === "irsad" && INTERP_YEARS.has(y)) {
+    if (INTERP_YEARS.has(y)) {
       const pcts = [];
       ents.forEach(([nm, cell]) => {
-        const p = cell.irsad.pcti;
+        const p = cell[ix].pcti;
         assert.ok(typeof p === "number" && p > 0 && p <= 1, `${y} ${nm}: an interpolated percentile in (0, 1]`);
         pcts.push(p);
       });
       assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
-      [...ents].sort((a, b) => b[1].irsad.pcti - a[1].irsad.pcti)
+      [...ents].sort((a, b) => b[1][ix].pcti - a[1][ix].pcti)
         .forEach(([nm], i) => raOf.set(nm, i + 1));
       /* the interpolation's footprint against the recorded-rank cut:
          twelve seats move fifths at 2013, ten at 2019 (the 151-seat
@@ -651,10 +718,10 @@ for (const ix of Object.keys(QIDXES)) {
          points), none at 2016 — its census sat five weeks after
          election day, so pcti ≈ rank */
       const moved = ents.filter(([nm, cell]) => fifthOf(raOf.get(nm), ix) !== fifthOf(rankAdvOf(ix, cell, n), ix)).length;
-      assert.equal(moved, { 2013: 12, 2016: 0, 2019: 10 }[y], `${y}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
       ents.forEach(([nm, cell]) => {
-        if (ix === "irsad") assert.ok(cell.irsad.pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
+        assert.ok(cell[ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
         raOf.set(nm, rankAdvOf(ix, cell, n));
       });
     }
@@ -736,7 +803,7 @@ SEIFA_YEARS.forEach((y, qi) => {
 // classic basis at the hollow 2001 column, mirroring the class lanes'
 // merged run
 const freshQAll = {};
-SEIFA_IDS.forEach((q) => { freshQAll[q] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
+SEIFA_IDS.forEach((q) => { freshQAll[q] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], lumpEst: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
 SEIFA_YEARS.forEach((y, qi) => {
   if (y < 2004) {
     SEIFA_IDS.forEach((q) => {
@@ -744,13 +811,16 @@ SEIFA_YEARS.forEach((y, qi) => {
       BUCKETS.forEach((b) => { freshQAll[q][b][qi] = null; freshQAll[q].votes[b][qi] = null; freshQAll[q].est[b][qi] = false; const v = freshQ[q].votes[b][qi]; if (v) { a += v[0]; l += v[1]; } });
       freshQAll[q].lump[qi] = a + l ? pyr1(100 * a / (a + l)) : null;
       freshQAll[q].lumpVotes[qi] = a + l ? [pyr(a), pyr(l)] : null;
+      freshQAll[q].lumpEst[qi] = false;
     });
     return;
   }
-  const { flow } = tcpFlowByDiv(y);
+  const { flow, cross } = tcpFlowByDiv(y);
   const fpd = dopFirstPrefs(y);
   const tpp = tppdivTotals(y);
-  const { per: sf } = stateFlowTable(y);
+  const { per: sf, drift } = stateFlowTable(y);
+  const crossByState = {};
+  flow.forEach((_, name) => { const st = classesOf[String(y)][name].state; crossByState[st] = (crossByState[st] || 0) + (cross.get(name) || 0); });
   const leftover = {};
   Object.entries(sf).forEach(([st, m]) => { leftover[st] = { grn: [...(m.grn || [0, 0])], onp: [...(m.onp || [0, 0])], oth: [...(m.oth || [0, 0])] }; });
   /* the classic seats come out of the state tables ONCE, ahead of the
@@ -785,24 +855,14 @@ SEIFA_YEARS.forEach((y, qi) => {
       assert.ok(cell, `${y}: non-classic division ${name} matches a ${IX_NAME[ix]} row`);
       ((ncQ[cell.state] ??= {})[cell.id] ??= []).push(name);
     });
-    const accQ = {}, estQ = {};
+    const accQ = {}, estQ = {}, lumpEstQ = new Set();
     ids.forEach((q) => { accQ[q] = { grn: [0, 0], onp: [0, 0], oth: [0, 0] }; estQ[q] = new Set(); });
     Object.entries(ncQ).forEach(([st, byq]) => {
       const ks = Object.keys(byq);
       if (ks.length === 1) {
         BUCKETS.forEach((bk) => { accQ[ks[0]][bk][0] += leftover[st][bk][0]; accQ[ks[0]][bk][1] += leftover[st][bk][1]; });
       } else {
-        BUCKETS.forEach((bk) => {
-          const w = {}, tot = ks.reduce((s, k) => s + (w[k] = byq[k].reduce((z, d) => z + fpd.get(d)[bk], 0)), 0);
-          const [la, ll] = leftover[st][bk];
-          if (la + ll <= 0.5) return;
-          assert.ok(tot > 0, `${y}: ${st} ${bk} leftover ${la}+${ll} with no first-preference base`);
-          ks.forEach((k) => {
-            if (w[k] <= 0) return;
-            accQ[k][bk][0] += la * w[k] / tot; accQ[k][bk][1] += ll * w[k] / tot;
-            estQ[k].add(bk);
-          });
-        });
+        assignMixed(y, st, byq, fpd, tpp, leftover[st], (drift[st] || 0) - (crossByState[st] || 0), accQ, estQ, lumpEstQ);
       }
     });
     ids.forEach((q) => {
@@ -816,6 +876,7 @@ SEIFA_YEARS.forEach((y, qi) => {
       });
       freshQAll[q].lump[qi] = pyr1(100 * la / (la + ll));
       freshQAll[q].lumpVotes[qi] = [pyr(la), pyr(ll)];
+      freshQAll[q].lumpEst[qi] = lumpEstQ.has(q);
     });
   }
 });
@@ -844,10 +905,11 @@ SEIFA_IDS.forEach((q) => {
   });
   assert.deepEqual(A.lump, freshQAll[q].lump, `seifa allSeats ${q}: every non-major ballot (classic basis at 2001)`);
   assert.deepEqual(A.lumpVotes, freshQAll[q].lumpVotes, `seifa allSeats ${q}: lump ballots`);
+  assert.deepEqual(A.lumpEst, freshQAll[q].lumpEst, `seifa allSeats ${q}: lump counted unless a drift spread crossed fifths`);
 });
 
-/* A state-year's non-classic seats spanning classes forces the leftover
-   allocation (and the est flag); the roster is pinned so a redistribution
+/* A state-year's non-classic seats spanning classes forces the count-
+   anchored fit (and the est flag); the roster is pinned so a redistribution
    or a new crossbench era changes it by conscious edit, never silently. */
 assert.deepEqual(mixedRoster, {
   2010: { NSW: ["inner", "rural"] },
@@ -915,6 +977,7 @@ CLASS_IDS.forEach((k) => {
      allSeats.lump already carries the classic-basis lump pre-2004 and
      the all-seats lump from 2004, so the emitted series passes through */
   assert.deepEqual([...got.lump], [...allSeats.lump], `${k} lump is the store's merged 11-year run`);
+  assert.deepEqual([...got.estLump], [...allSeats.lumpEst], `${k} estLump is the store's lumpEst (a count unless a drift spread crossed classes)`);
   assert.deepEqual(Object.keys(got.ballots).sort(), ["grn", "lump", "onp", "oth"].sort(), `${k}: ballots carries the four cohorts`);
   assert.deepEqual(Object.keys(got).sort(), ["ballots", "elections", "estGrn", "estLump", "estOnp", "estOth", "fedClass", "grn", "hollowYears", "label", "lump", "onp", "oth", "short", "years"].sort(),
     `${k}: shares and estimate flags, no Err arrays`);
@@ -933,11 +996,9 @@ SEIFA_IDS.forEach((q) => {
   assert.deepEqual([...got.years], SEIFA_YEARS, `${q}: the index series' span`);
   assert.deepEqual([...got.hollowYears], [2001], `${q}: only the series-floor 2001 ring is hollow`);
   assert.equal(got.short, QUINT_META[q[1]][1], `${q}: the menu face`);
-  /* the IRSAD lane names its interpolated-percentile basis; IEO and IER
-     ride the plain rank phrase */
-  const wantEls = ix === "irsad"
-    ? `federal elections in the ${QUINT_META[q[1]][2]} ${ELECTIONS_SUFFIX}`
-    : `federal elections in the ${QUINT_META[q[1]][2]} of seats by ${IX_NAME[ix]} rank`;
+  /* every index rides one basis, so the scope line names just the
+     index (the interpolation window lives in How it's built) */
+  const wantEls = `federal elections in the ${QUINT_META[q[1]][2]} ${ELECTIONS_SUFFIX(ix)}`;
   assert.equal(got.elections, wantEls,
     `${q}: the chart head's scope line names the grouping and index`);
   const allSeats = data.seifa.allSeats[q];
@@ -947,22 +1008,24 @@ SEIFA_IDS.forEach((q) => {
     assert.equal(typeof got["est" + b[0].toUpperCase() + b.slice(1)][0], "boolean", `${q} est${b} reaches the asset as booleans`);
   });
   assert.deepEqual([...got.lump], [...allSeats.lump], `${q} lump is the store's merged 9-year run`);
+  assert.deepEqual([...got.estLump], [...allSeats.lumpEst], `${q} estLump is the store's lumpEst`);
   assert.deepEqual(Object.keys(got.ballots).sort(), ["grn", "lump", "onp", "oth"].sort(), `${q}: ballots carries the four cohorts`);
   assert.deepEqual(Object.keys(got).sort(),
     ["ballots", "elections", "estGrn", "estLump", "estOnp", "estOth", "fedClass", "grn", "hollowYears", "ix", "label", "lump", "onp", "oth", "seifa", "short", "years"].sort(),
     `${q}: the class-cut record plus the seifa flag and ix tag`);
 });
 /* the IEO fifths' own Green-flow runs, merged classic 2001 + all-seats
-   2004+ exactly as the renderer draws them */
-assert.deepEqual([...FH.fed.classes.e1.grn], [79.6, 84.2, 83.4, 81.9, 85.1, 84.1, 85.1, 88.5, 90.3], "e1 Green flow (IEO most-advantaged fifth)");
-assert.deepEqual([...FH.fed.classes.e5.grn], [64.7, 73.6, 73.7, 74.9, 77.7, 77, 76.3, 80.9, 82.9], "e5 Green flow (IEO most-disadvantaged fifth)");
+   2004+ exactly as the renderer draws them (the count-anchored fit's
+   values since 2026-10-25) */
+assert.deepEqual([...FH.fed.classes.e1.grn], [79.6, 84.2, 83.4, 82.1, 85.1, 84.1, 85.4, 89, 91.2], "e1 Green flow (IEO most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e5.grn], [64.7, 73.6, 73.7, 74.8, 77.3, 76.9, 76.7, 80.3, 82.3], "e5 Green flow (IEO most-disadvantaged fifth)");
 /* the IER fifths' own Green-flow runs (economic resources beside the
    education-and-occupation ladder), merged classic 2001 + all-seats 2004+
    — the 2019/2022 values are the regenerated store's own, NOT a naive
    swap of the shipped day's pair: a reflected fifth boundary moves one
    151st seat, so the mirror trap bites at indices 6/7 here too */
-assert.deepEqual([...FH.fed.classes.r1.grn], [79.1, 83.8, 79.8, 78.9, 82.7, 81.2, 82, 85.6, 88.7], "r1 Green flow (IER most-advantaged fifth)");
-assert.deepEqual([...FH.fed.classes.r5.grn], [73, 78.6, 79.9, 79.3, 83.9, 83.2, 83.8, 86.5, 87.5], "r5 Green flow (IER most-disadvantaged fifth)");
+assert.deepEqual([...FH.fed.classes.r1.grn], [79.1, 83.8, 79.8, 78.9, 83.1, 81.2, 81.9, 85.7, 88.8], "r1 Green flow (IER most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.r5.grn], [73, 78.5, 79.9, 79, 83.8, 83.3, 83, 86.6, 87.6], "r5 Green flow (IER most-disadvantaged fifth)");
 assert.ok(!Object.keys(FH).includes("classes"), "classes nests under fed, never a chip key of its own");
 
 console.log("test-fed-class-flows: all assertions passed");

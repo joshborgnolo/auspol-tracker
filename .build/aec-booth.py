@@ -16,7 +16,7 @@ Three stores, three committed source lanes (.build/aec-flow-src/booth/):
                       1996–2025 – modern era from HouseTppByPollingPlace
                       (tpp-pp/<year>.csv.gz), 1996–2001 from the committed
                       HTPP tables (../htpp-<year>.txt – 1998's table omits
-                      Newcastle whose final pair ran Labor v independent;
+                      Newcastle, a supplementary election with no Coalition candidate;
                       1993's HTPP table is informal-votes-only, so 1996 is
                       the floor, exactly as in aec-2pp-history.py).
   booth-flows.json    per-booth ALP share of each voter bucket's counted
@@ -73,7 +73,7 @@ BOOTH = os.path.join(SRC, "booth")
 MOD = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
 STATS = [1993, 1996, 1998, 2001]     # statistics era (HPPDOP workbench)
 HTT = [1996, 1998, 2001]             # the HTPP per-place years
-# 1998's HTPP table omits Newcastle (final pair Labor v independent) – the
+# 1998's HTPP table omits Newcastle (supplementary election, Labor v Greens) – the
 # AEC's own table, so the exclusion is the product's, never ours
 HTT_EXCLUDED = {1998: {"Newcastle"}}
 # the 1996–2001 TPP guard: national per-booth sums against the canonical

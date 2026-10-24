@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-interp-percentile
-description: "auspol-tracker — the census-INTERPOLATED-percentile (pcti) basis for the IRSAD fifth lanes, switched to the DEFAULT dividing observation 2026-10-24 (commit fdb013d0, branch allseats-class-flows): pcti = (1−f)·pct0 + f·pct1 day-weighted between bracketing censuses, shipped by division-seifa-indexes.json `_pcti.factors` (2013/2016/2019 division lanes CD-era 2004/2007/2010 pending banned-period CED polygons) + booth-seifa-{2013,2016,2019}.json pcti cells beside irsad/rankDis. seifa_quintiles.membership() dual-basis (pcti ascending at interp years — 0 = MOST disadvantaged, q5 takes the 151-seat spare — rankDis rank lane otherwise, rank_membership() retains the raw observation), INTERP_YEARS derived from the store's own factor keys by every consumer/test, ELECTIONS_SUFFIX copy window string derived likewise (a new pcti year's copy pins go red BY DESIGN for a deliberate review). Covers the 12/0/12 seat-movement measurement, the ten named anchors, the test-mirror triple (test-primary-history / test-2pp-history / test-fed-class-flows pin the suffix literally), the invariants (pcti ∈ (0,1] all-distinct per year — no tie rule; int-1 trap for a perfect percentile), the stale-built-asset failure signature cured by rebuild, and the 39-file explicit-stage land (git add refuses .build/vic/out + .matilda/probe pathspecs as ignored even though tracked — they DO stage; verify with git diff --cached)."
+description: "auspol-tracker — the census-INTERPOLATED-percentile (pcti) basis for the IRSAD fifth lanes, switched to the DEFAULT dividing observation 2026-10-24 (commit fdb013d0, branch allseats-class-flows): pcti = (1−f)·pct0 + f·pct1 day-weighted between bracketing censuses, shipped by division-seifa-indexes.json `_pcti.factors` (2013/2016/2019 division lanes CD-era 2004/2007/2010 pending banned-period CED polygons) + booth-seifa-{2013,2016,2019}.json pcti cells beside irsad/rankDis. seifa_quintiles.membership() dual-basis (SINCE 2026-10-25 every index — IRSAD, IEO, IER — ranks pcti DESCENDING at interp years, advantage-rank 1 = q1, the bottom fifth takes the 151-seat spare; census advantage-rank otherwise; rank_membership() retains the raw IRSAD observation), INTERP_YEARS derived from the store's own factor keys by every consumer/test, ELECTIONS_SUFFIX is now just 'of seats by <IX>' (the interpolation window moved to the flow-history How it's built entry 2026-10-25). Covers the per-index seat-movement measurement (irsad 12/0/10, ieo 10/0/14, ier 16/0/18 at 2013/2016/2019), the ten named anchors, the test-mirror triple (test-primary-history / test-2pp-history / test-fed-class-flows pin the suffix literally), the invariants (pcti ∈ (0,1] all-distinct per year — no tie rule; int-1 trap for a perfect percentile), the stale-built-asset failure signature cured by rebuild, and the 39-file explicit-stage land (git add refuses .build/vic/out + .matilda/probe pathspecs as ignored even though tracked — they DO stage; verify with git diff --cached)."
 source: auto-skill
 extracted_at: '2026-10-24T09:06:28.201Z'
 ---
@@ -56,12 +56,14 @@ the store ships the finished pcti ∈ (0,1]).
    carry the suffix sentence.
 5. Test mirrors — `.build/test-primary-history.mjs`,
    `.build/test-2pp-history.mjs`, `.build/test-fed-class-flows.mjs` each
-   pin ELECTIONS_SUFFIX **literally**: `of seats by IRSAD percentile
-   (interpolated at the 2013, 2016 and 2019 elections, the census rank
-   otherwise)`. Membership probes branch on INTERP_YEARS: interp years
+   pin ELECTIONS_SUFFIX as `of seats by ${IX}` for all three indexes
+   (until 2026-10-25 IRSAD carried the long interpolation-window phrase
+   and IEO/IER "… rank"; the flows-explained review unified the basis).
+   Membership probes branch on INTERP_YEARS for EVERY index: interp years
    assert pcti window/distinctness/pcti-sorted positions and the
-   movement count {2013: 12, 2016: 0, 2019: 12} seats changing fifths
-   vs the rank observation; rank years assert the rankDis permutation.
+   per-index movement count vs the census-rank cut — irsad
+   {2013: 12, 2016: 0, 2019: 10}, ieo {10, 0, 14}, ier {16, 0, 18};
+   rank years assert the permutation.
    2016 moves nothing because the census fell five weeks after the
    election (pcti ≈ pct1's exact reading).
 

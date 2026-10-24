@@ -25,7 +25,7 @@
       pages re-parsed independently (a regex table walker, not the
       builder's HTMLParser), the fpvvt downloads re-summed (Informal
       pseudo-rows vs candidate rows), the legacy tables re-joined
-      (1998 Newcastle's 147-division base respected), the SEIFA
+      (1998 Newcastle filed from its supplementary page), the SEIFA
       memberships recomputed from data/division-seifa-indexes.json
       (rank 1 = MOST-advantaged, thirty a fifth, the 2026-10-24
       renumbering), and the AEC summary page
@@ -147,7 +147,9 @@ const fpvvt = (year) => {
 };
 
 /* the statistics-era lane: htpp's Informal Vote + hcands' formal Vote per
-   division (1998 Newcastle stands outside the htpp product – 147 bases) */
+   division (1998 Newcastle stands outside the htpp product - its
+   supplementary election's informal count is the AEC page's 3,347, and
+   hcands' formal sum must match the page's 65,223) */
 const legacyVotes = (year) => {
   const votes = {};
   const htpp = fs.readFileSync(path.join(FLOWSRC, `htpp-${year}.txt`), "utf8").replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
@@ -171,10 +173,11 @@ const legacyVotes = (year) => {
     if (!(div in votes)) {
       assert.ok(year === 1998 && div === "Newcastle",
         `${year} ${div}: a formal vote with no htpp row (1998 Newcastle alone is exempt)`);
-      return;
+      votes[div] = { f: 0, i: 3347 };
     }
     votes[div].f += +c[cvote];
   });
+  if (year === 1998) assert.equal(votes.Newcastle.f, 65223, "1998 Newcastle: hcands' formal sum is the AEC supplementary page's 65,223");
   return votes;
 };
 const r2 = (x) => Math.round(x * 100) / 100;
@@ -276,7 +279,7 @@ FIFTHS.forEach((q) => {
   assert.equal(v.label, label, `${q}: label`);
   assert.equal(v.short, short, `${q}: short`);
   assert.equal(v.elections,
-    `federal elections in the ${phrase} of seats by ${IDX_OF(q).toUpperCase()} rank`,
+    `federal elections in the ${phrase} of seats by ${IDX_OF(q).toUpperCase()}`,
     `${q}: elections copy names the index`);
 });
 
@@ -385,9 +388,10 @@ assert.equal(APH_SENATE[1977].nat, AEC_SEN[1977].nat,
 [1996, 1998, 2001].forEach((y) => {
   const votes = legacyVotes(y);
   const n = Object.keys(votes).length;
-  // 148 seats at 1996/1998 (1998's Newcastle absent from the htpp lane);
-  // 150 at 2001 (Kalgoorlie's last election + the NT's second seat)
-  assert.equal(n, y === 1998 ? 147 : y === 2001 ? 150 : 148,
+  // 148 seats at 1996/1998 (1998's Newcastle filed from its
+  // supplementary page); 150 at 2001 (Kalgoorlie's last election + the
+  // NT's second seat)
+  assert.equal(n, y === 2001 ? 150 : 148,
     `${y}: the division base (${n})`);
   const clsShares = groupShares(votes, (d) => CLASS_FROM_PRINT[CLSC[String(y)][d].classification.toLowerCase()]);
   CLASSES.forEach((k) => assert.equal(clsShares[k], cell(CLB[k], y),

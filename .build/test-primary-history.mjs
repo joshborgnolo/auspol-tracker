@@ -241,7 +241,7 @@ assert.ok(FED.classes.inner.onp[1] < FED.classes.outer.onp[1]
    never a silent re-pin */
 const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
 const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
-const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)";
+const ELECTIONS_SUFFIX = (ix) => `of seats by ${ix.toUpperCase()}`;
 FIFTHS.forEach((q) => {
   const ix = IDX_OF(q);
   const v = FED.classes[q];
@@ -251,11 +251,8 @@ FIFTHS.forEach((q) => {
   assert.equal(v.foldPt, 2, `${q}: a fifth carries its own 2% fold (thirtieths, not sixteenths)`);
   assert.equal(v.label, QUINT_COPY[q[1]][0], `${q} label`);
   assert.equal(v.short, QUINT_COPY[q[1]][1], `${q} short (the bare positional menu face)`);
-  /* the IRSAD lane names its interpolated-percentile basis; IEO and IER
-     ride the plain rank phrase */
-  const wantEls = ix === "irsad"
-    ? `federal elections in the ${QUINT_COPY[q[1]][2]} ${ELECTIONS_SUFFIX}`
-    : `federal elections in the ${QUINT_COPY[q[1]][2]} of seats by ${IX_NAME[ix]} rank`;
+  /* every index rides one basis, so the scope line names just the index */
+  const wantEls = `federal elections in the ${QUINT_COPY[q[1]][2]} ${ELECTIONS_SUFFIX(ix)}`;
   assert.equal(v.elections, wantEls, `${q} elections copy names the index`);
 });
 /* each index's advantage-order rank (IRSAD's `rank`, stored
@@ -289,24 +286,24 @@ SEIFA_YEARS.forEach((y) => {
        (highest = advantage-rank 1; distinct, no tie rule); every other
        cell reads the recorded rank */
     let raOf;
-    if (ix === "irsad" && INTERP_YEARS.has(y)) {
+    if (INTERP_YEARS.has(y)) {
       const pcts = [];
       names.forEach((nm) => {
-        const p = blk[nm].irsad.pcti;
+        const p = blk[nm][ix].pcti;
         assert.ok(typeof p === "number" && p > 0 && p <= 1, `${y} ${nm}: an interpolated percentile in (0, 1]`);
         pcts.push(p);
       });
       assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
-      raOf = new Map([...names].sort((a, b) => blk[b].irsad.pcti - blk[a].irsad.pcti).map((nm, i) => [nm, i + 1]));
+      raOf = new Map([...names].sort((a, b) => blk[b][ix].pcti - blk[a][ix].pcti).map((nm, i) => [nm, i + 1]));
       /* the interpolation's footprint: twelve seats move fifths at 2013,
          ten at 2019 (the 151-seat spare-seat rung shifts the advantaged-
          first cut points), none at 2016 (its census sat five weeks after
          election day, so pcti ≈ rank) */
       const moved = names.filter((nm) => fifthOf(ix, raOf.get(nm)) !== fifthOf(ix, rankAdvOf(ix, blk[nm], n))).length;
-      assert.equal(moved, { 2013: 12, 2016: 0, 2019: 10 }[y], `${y}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
-      if (ix === "irsad") names.forEach((nm) => {
-        assert.ok(blk[nm].irsad.pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
+      names.forEach((nm) => {
+        assert.ok(blk[nm][ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
       });
       raOf = new Map(names.map((nm) => [nm, rankAdvOf(ix, blk[nm], n)]));
     }

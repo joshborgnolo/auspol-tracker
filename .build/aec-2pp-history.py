@@ -20,9 +20,11 @@ preferred vote at each federal election:
                        division, summed per state via the Divisional
                        Classifications blocks' state field, the file itself
                        carrying no state column). 1998 counts 147
-                       divisions: Newcastle's final pair ran Labor v
-                       independent (Morris), so the AEC's own table omits
-                       it – that exclusion is the product's, never ours.
+                       divisions: Newcastle's poll was deferred to a
+                       supplementary election (21 Nov 1998) the Liberals
+                       did not contest – Labor v Greens at the finish – so
+                       no Labor-v-Coalition count exists and the AEC's own
+                       table omits it; the exclusion is the product's.
   classes  1996–2025   the same per-division counts regrouped by the
                        election's own AEC Divisional Classifications block
                        (data/division-classifications.json), so a
@@ -122,9 +124,10 @@ LC_YEARS = [2011, 2015, 2019, 2023]   # the NSWEC council bank's events
 LC_PINS = {2011: 34.11, 2015: 43.57, 2019: 48.32, 2023: 57.44}
 HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993,
               1996, 1998, 2001]   # national only, from the canonical records
-# divisions a statistics pack's own HTPP table omits: 1998's Newcastle ran
-# its final pair Labor v independent (Allan Morris held it 1983–2001), so
-# no Labor-v-Coalition count exists for it in the AEC's table
+# divisions a statistics pack's own HTPP table omits: 1998's Newcastle went
+# to a supplementary election (21 Nov 1998, the Democrats candidate having
+# died) with no Liberal standing; Allan Morris (Labor) beat Carrie Jacobi
+# (Greens), so no Labor-v-Coalition count exists for it in the AEC's table
 HTT_EXCLUDED = {1998: {"Newcastle"}}
 STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"]
 STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
@@ -180,8 +183,9 @@ def htpp_votes(year):
        CSV, one notional Labor-v-Coalition count per division summed from
        its polling places). No state column in the file – state and class
        both come from the classifications block it joins below. 1998
-       omits Newcastle (its final pair ran Labor v independent) – the
-       AEC's own table, so the exclusion is the product's, never ours."""
+       omits Newcastle (a supplementary election with no Coalition
+       candidate) – the AEC's own table, so the exclusion is the
+       product's, never ours."""
     path = os.path.join(SRC, f"htpp-{year}.txt")
     with open(path, encoding="utf-8-sig") as f:
         rows = list(csv.reader(f, delimiter=";"))
@@ -416,8 +420,7 @@ def build():
     # lane's copy names the interpolated-percentile basis where the
     # store ships one)
     for ix in QIDXES:
-        basis = elections_suffix() if ix == "irsad" \
-            else f"of seats by {ix.upper()} rank"
+        basis = elections_suffix(ix)
         for q, label, short, desc in INDEX_META[ix]["meta"]:
             doc["fed"]["classes"][q] = {"seifa": True, "ix": ix,
                                         **view(label, f"federal elections in the {desc} {basis}",

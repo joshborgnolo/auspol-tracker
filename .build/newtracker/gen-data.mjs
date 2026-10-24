@@ -4994,25 +4994,14 @@ const flowHistory = (() => {
      (the store's allSeats block; the lump line sums the buckets so the
      three-cornered Coalition drift never touches it). Cells whose
      state's crossbench seats span seat types are the allSeats.est
-     estimates (diamonds on the page). The user's lumped minor line —
+     estimates (diamonds on the page) - fitted to each seat's counted
+     minor-party total since 2026-10-25, so the lump line stays a count
+     there (allSeats.lumpEst names the few drift-spread exceptions). The user's lumped minor line —
      the 4th line — runs 1996–2025, classic-based ahead of 2004 like
      the buckets. */
   try {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     const CLASS_CUT = 2004;
-    /* the IRSAD scope line's interpolation window, derived from the seifa
-       store's own _pcti factors (mirrors seifa_quintiles.interp_label() —
-       2013, 2016 and 2019 today; the CD-era division lanes join the copy
-       the day their polygons land). The {ys} placeholder is filled
-       wherever the quintile scope line renders. */
-    let interpYs = "2013, 2016 and 2019";
-    try {
-      const fact = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"))
-        ._pcti.factors, ys = Object.keys(fact).map(Number).sort((a, b) => a - b);
-      interpYs = ys.length > 1 ? ys.slice(0, -1).join(", ") + " and " + ys[ys.length - 1] : String(ys[0]);
-    } catch { /* keep the pinned window */ }
-    const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the "
-      + interpYs + " elections, the census rank otherwise)";
     /* the lane reader: the four seat types (store classes/allSeats over
        fcf.years) and the fifteen SEIFA fifths (store seifa.classes/
        seifa.allSeats over seifa.years — five per index, each record's ix
@@ -5028,15 +5017,16 @@ const flowHistory = (() => {
         const est = (b) => years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
         const ballots = (b) => years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
         const buckets = ["grn", "onp", "oth"];
-        const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
+        /* the lump is a count wherever the store says so (the 2026-10-25
+           count-anchored fit honours every seat's own minor total); only a
+           three-cornered drift spread across groups flags it */
+        const estLump = years.map((y, i) => (y >= CLASS_CUT && A.lumpEst ? !!A.lumpEst[i] : false));
         return [k,
           { label: s.label, short: s.short,
-            /* the record's own scope copy — the IRSAD lane names its
-               interpolated-percentile basis, the other two indexes the
-               census-printed rank */
-            elections: seifa ? "federal elections in the " + s.desc + " "
-                             + (s.ix === "irsad" ? ELECTIONS_SUFFIX
-                                : "of seats by " + s.ix.toUpperCase() + " rank")
+            /* the record's own scope copy — the grouping and its index;
+               every index ranks on one basis (the interpolated percentile
+               inside the census window), which How it's built explains */
+            elections: seifa ? "federal elections in the " + s.desc + " of seats by " + s.ix.toUpperCase()
                              : "federal elections in " + s.short + " seats",
             fedClass: true, ...(seifa ? { seifa: true, ix: s.ix } : {}),
             hollowYears: years.filter((y) => y < CLASS_CUT),

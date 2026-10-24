@@ -7808,8 +7808,42 @@ function infoTerms(D) {
           <span className="info-p"><b>Federal: counted.</b> The Australian Electoral Commission
           follows every ballot to the final two and publishes where each party’s voters ended up.
           From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final
-          two, 142 to 145 of the 148 to 150. Since 2004 it covers every seat: the Commission sorts every
-          ballot between Labor and the Coalition, even where someone else made the final two.</span>
+          two, 142 to 145 of the 148 to 150. Since 2004 it covers every seat, nationally and by state:
+          the Commission sorts every ballot between Labor and the Coalition, even where someone else
+          made the final two. The seat-type and socio-economic views below take one estimated step.</span>
+          <span className="info-p"><b>Seat types and socio-economic fifths.</b> The seat-type views
+          group each seat by the Commission’s own classification at that election (inner metro, outer
+          metro, provincial or rural), so a seat that was reclassified moves with it. The 1996 and 1998
+          ratings come from the Commission’s whole-chamber tables of those years, 2001’s from its
+          division profiles (three unrated seats from its research report) and 2004’s from its
+          profile pages. The fifths rank every seat on one of three ABS indexes: IRSAD (advantage and
+          disadvantage), IEO (education and occupation) or IER (economic resources). The most-advantaged
+          30 seats form the top fifth, and so on down; in the 151-seat chambers of 2019 and 2022 the
+          spare seat goes to the bottom fifth. At 2013, 2016 and 2019 each seat’s percentile is
+          interpolated between the censuses either side of election day; other years use the census
+          ranking published for that election’s boundaries. Each election is ranked afresh, so a seat
+          whose standing changed can change fifths. A whole seat sits in one fifth by its average, so a
+          seat that mixes rich and poor suburbs counts entirely in one.</span>
+          <span className="info-p"><b>Seats where a crossbencher made the final two.</b> Before 2004
+          these seats are left out, and the points are drawn as hollow rings. From 2004 the
+          Commission’s state table of flows by party, less the seats where Labor and the Coalition
+          were the final two, gives each party’s flow across a state’s crossbench seats. Where those
+          seats all sit in one seat type or fifth, that is a count. Where they are spread across
+          several, the split between groups is fitted to three counts: each seat’s first preferences by
+          party, each seat’s minor-party ballots that ended with Labor (its two-party Labor total less
+          Labor’s own first preferences), and each party’s state total. The split between Greens, One
+          Nation and Others inside those seats is still an estimate, drawn as a hollow diamond, but the
+          all-minor-parties line stays a count. The one exception is a state where Liberal and National
+          candidates both stood in more than one such seat: the ballots of the beaten Coalition
+          candidate that ended with Labor are known only for the state, so they are shared between those
+          seats, and a diamond marks the all-minor-parties point too.</span>
+          <span className="info-p"><b>First preferences, two-party and informal views.</b> All three
+          are the Commission’s per-seat counts summed over each group. The first-preference view folds
+          small parties into Others. The two-party view sums the Commission’s
+          Labor-v-Coalition count in every seat; 1998’s Newcastle is missing from it, because its poll
+          was deferred to a supplementary election the Liberals didn’t contest. Its informal count
+          comes from that supplementary election’s published result. The Senate’s informal series stops
+          at 2022, because the Commission hasn’t yet published its 2025 Senate informality summary.</span>
           {FHB && FHB.fedEst ? (
             <span className="info-p"><b>Federal before 1996: estimated.</b> The Commission published no
             flows by party before 1996, but it has distributed every seat&rsquo;s preferences in full

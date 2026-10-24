@@ -16,8 +16,8 @@
       exactly 1996–2025 (the AEC's floor and ceiling: 1993's table counts
       informal votes only), and every emitted pair sums to 100 (the file
       emits Labor's cell; the Coalition cell is by construction 100 minus
-      it). 1998 counts 147 divisions: Newcastle's final pair ran Labor v
-      independent, so the AEC's own table omits it.
+      it). 1998 counts 147 divisions: Newcastle went to a supplementary
+      election the Liberals didn't contest, so the AEC's own table omits it.
    3. The SEIFA fifths ride the SAME classes bank after the four classes
       (IRSAD's q1..q5, IEO's e1..e5, IER's r1..r5 — the user-approved
       2026-10-24 "do what you did for irsad to ieo" generalisation and
@@ -67,8 +67,9 @@ const SRC = path.join(ROOT, ".build", "aec-flow-src");
 const HTT_YEARS = [1996, 1998, 2001];   // the statistics packs' HTPP tables
 const DL_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const AEC_YEARS = [...HTT_YEARS, ...DL_YEARS];
-/* 1998's table omits Newcastle - its final pair ran Labor v independent
-   (Morris), so the AEC's own product counts no Labor-v-Coalition for it */
+/* 1998's table omits Newcastle - a supplementary election the Liberals
+   did not contest (Labor v Greens at the finish), so the AEC's own
+   product counts no Labor-v-Coalition for it */
 const HTT_EXCLUDED = { 1998: ["Newcastle"] };
 const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
 const NAT_YEARS = [...HIST_YEARS, ...DL_YEARS];
@@ -124,8 +125,8 @@ const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
 const rankAdvOf = (ix, cell, n) => (ix === "irsad" ? cell.irsad.rank : n + 1 - cell[ix].rank);
 const fifthOf = (ix, rk) => LANE[ix] + Math.min(Math.floor((rk - 1) / 30) + 1, 5);
 // a division's advantage-rank at an interpolation year (pcti, most-first)
-const pctiRankOf = (mem) => new Map(Object.keys(mem)
-  .sort((a, b) => mem[b].irsad.pcti - mem[a].irsad.pcti).map((nm, i) => [nm, i + 1]));
+const pctiRankOf = (mem, ix) => new Map(Object.keys(mem)
+  .sort((a, b) => mem[b][ix].pcti - mem[a][ix].pcti).map((nm, i) => [nm, i + 1]));
 /* the implied Senate two-party: the four post-GVT events (group tickets
    kept no per-ballot record before 2016), and the family rows this
    probe's own recompute sums - the same five the generator allowlists */
@@ -242,19 +243,19 @@ AEC_YEARS.forEach((y) => {
          the interpolation moves twelve seats at 2013, ten at 2019 (the
          spare-seat rung shifts the cut points), none at 2016 */
       let pctiRa = null;
-      if (ix === "irsad" && INTERP_YEARS.has(y)) {
+      if (INTERP_YEARS.has(y)) {
         const pcts = Object.entries(mem).map(([d, c]) => {
-          assert.ok(typeof c.irsad.pcti === "number" && c.irsad.pcti > 0 && c.irsad.pcti <= 1,
+          assert.ok(typeof c[ix].pcti === "number" && c[ix].pcti > 0 && c[ix].pcti <= 1,
             `${y} ${d}: an interpolated percentile in (0, 1]`);
-          return c.irsad.pcti;
+          return c[ix].pcti;
         });
         assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
-        pctiRa = pctiRankOf(mem);
+        pctiRa = pctiRankOf(mem, ix);
         const moved = Object.keys(mem).filter((d) => fifthOf(ix, pctiRa.get(d)) !== fifthOf(ix, rankAdvOf(ix, mem[d], n))).length;
-        assert.equal(moved, { 2013: 12, 2016: 0, 2019: 10 }[y], `${y}: pcti v rank movement`);
-      } else if (ix === "irsad") {
+        assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+      } else {
         Object.entries(mem).forEach(([d, c]) => {
-          assert.ok(c.irsad.pcti === undefined, `${y} ${d}: no pcti outside the factor years`);
+          assert.ok(c[ix].pcti === undefined, `${y} ${d}: no pcti outside the factor years`);
         });
       }
       for (const [div, pair] of Object.entries(perDiv)) {

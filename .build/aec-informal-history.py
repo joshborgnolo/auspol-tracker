@@ -36,9 +36,12 @@ records the fetches, seams and divergences):
     data/division-classifications.json block - 1996–2001 counted from the
     committed statistics-era tables (htpp-<year>.txt's Informal Vote
     over hcands-<year>.txt's formal first preferences); 2004–2025 the
-    fpvvt lane above. 1998 covers 147 of 148 divisions (Newcastle's
-    Labor-v-independent contest is absent from the HTPP product; the
-    national/year cell stands on 147).
+    fpvvt lane above. 1998's Newcastle is absent from the HTPP product -
+    its poll was deferred to a supplementary election on 21 November 1998
+    after the Democrats candidate died, and the packs' polling-place table
+    never carried it - so its informal count is filed from the AEC's own
+    supplementary-election result page (NEWCASTLE_1998 below) and all
+    148 divisions stand behind the 1998 cells.
   SEIFA quintiles — IRSAD q1..q5, IEO e1..e5, IER r1..r5, 2001–2025:
     the same divisions' votes regrouped by
     seifa_quintiles.membership(year, ix) — the class bank's FIFTEEN
@@ -71,6 +74,12 @@ OUT = os.path.join(ROOT, "data", "informal-history.json")
 
 EVENTS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
 LEGACY_YEARS = [1996, 1998, 2001]
+# 1998 Newcastle's supplementary election (21 Nov 1998: Liberals did not
+# stand, Labor's Allan Morris beat the Greens' Carrie Jacobi 67.33-32.67),
+# from https://aec.gov.au/elections/supplementary_by_elections/1998/newcastle.htm
+# - the HTPP polling-place table omits the division; hcands carries its
+# first preferences, which must sum to the page's formal figure
+NEWCASTLE_1998 = {"formal": 65223, "informal": 3347}
 CLASS_YEARS = LEGACY_YEARS + EVENTS
 
 STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"]
@@ -216,14 +225,17 @@ def legacy_votes(year):
         if len(c) <= hvote or not c[hvote].strip():
             continue
         div = c[hdiv].strip()
-        # 1998 Newcastle ran Labor v independent, so it is absent from the
-        # two-party HTPP product: the only hcands division without an htpp
-        # informal row, and the reason the 1998 lanes carry 147 divisions.
-        if year == 1998 and div == "Newcastle":
-            continue
+        # 1998 Newcastle (a supplementary election, Labor v Greens) is
+        # absent from the HTPP product: its informal count comes from the
+        # AEC's supplementary result page
+        if year == 1998 and div == "Newcastle" and div not in votes:
+            votes[div] = (0, NEWCASTLE_1998["informal"])
         assert div in votes, f"{year} {div}: a formal vote with no htpp informal row"
         fr, inf = votes[div]
         votes[div] = (fr + int(c[hvote].strip()), inf)
+    if year == 1998:
+        assert votes["Newcastle"][0] == NEWCASTLE_1998["formal"], \
+            f"1998 Newcastle: hcands formal {votes['Newcastle'][0]} != the AEC page's 65,223"
     return votes
 
 def cut_shares(votes, to_cut):
@@ -362,13 +374,12 @@ def build():
         assert str(y) in cls_blocks, f"{y}: no division-classifications block"
         votes = legacy_votes(y) if y < 2004 else fpvvt_votes(y)[0]
         blk = cls_blocks[str(y)]
-        # the join is exact by construction - 1998's Newcastle alone is
-        # absent from the HTPP product (its non-classic contest counted
-        # no informal row there), the documented one-division gap
+        # the join is exact by construction (1998's Newcastle filled from
+        # its supplementary-election page)
         missing = sorted(set(blk) - set(votes))
         assert not sorted(set(votes) - set(blk)), \
             f"{y}: counted divisions the class block never heard of - {sorted(set(votes) - set(blk))[:3]}"
-        assert missing == (["Newcastle"] if y == 1998 else []), \
+        assert missing == [], \
             f"{y}: class join missing {missing[:3]}"
         shares = cut_shares(votes, lambda d: CLS_KEY[blk[d]["classification"].lower()])
         for ck, _, _ in CLASS_META:
@@ -421,7 +432,7 @@ def build():
         for q, qlbl, qshort, qdesc in INDEX_META[ix]["meta"]:
             ys = sorted(quint_rows[ix][q])
             doc["fed"]["classes"][q] = {"seifa": True, "ix": ix,
-                                        **view(qlbl, f"federal elections in the {qdesc} of seats by {ix.upper()} rank",
+                                        **view(qlbl, f"federal elections in the {qdesc} of seats by {ix.upper()}",
                                                ys, [r2(quint_rows[ix][q][y]) for y in ys], short=qshort)}
     return doc
 

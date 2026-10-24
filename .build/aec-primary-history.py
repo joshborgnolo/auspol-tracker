@@ -639,8 +639,7 @@ def build():
     # naming its index; the IRSAD lane's elections copy names the
     # interpolated-percentile basis where the store ships one
     for ix in QIDXES:
-        basis = elections_suffix() if ix == "irsad" \
-            else f"of seats by {ix.upper()} rank"
+        basis = elections_suffix(ix)
         for q, qlbl, qshort, qdesc in INDEX_META[ix]["meta"]:
             ys, ser = fold_series(quint_rows[ix][q], fold_pt=FOLD_PT / 2)
             doc["fed"]["classes"][q] = {"seifa": True, "ix": ix, "foldPt": FOLD_PT / 2,

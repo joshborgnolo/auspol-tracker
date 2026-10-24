@@ -218,12 +218,15 @@ def interp_label():
 # " + this): percentile basis, interpolated inside the census window,
 # recorded census rank outside it. The JS-side twin emitted for the
 # menus' captions lives in gen-data.mjs.
-ELECTIONS_SUFFIX = ("of seats by IRSAD percentile (interpolated at the "
-                    "{ys} elections, the census rank otherwise)")
+ELECTIONS_SUFFIX = "of seats by {ix}"
 
 
-def elections_suffix():
-    return ELECTIONS_SUFFIX.replace("{ys}", interp_label())
+def elections_suffix(ix="irsad"):
+    """The scope line's basis phrase – the bare index name since
+    2026-10-25 (the flows-explained review moved the interpolation
+    window into How it's built; every index now ranks the same way, so
+    the line no longer forks)."""
+    return ELECTIONS_SUFFIX.replace("{ix}", ix.upper())
 
 
 def quintile_of(rank_adv):
@@ -289,10 +292,15 @@ def _rank_cut(year, index_name):
 def membership(year, index_name):
     """{division: {"classification": quintile key, "state": "VIC"}} for one
     SEIFA_YEARS election and one index ("irsad"/"ieo"/"ier"), on the
-    default basis: IRSAD ranks the store's interpolated pcti descending
-    (the most advantaged percentile files the advantage-ordered rank 1,
-    thirty seats a fifth) wherever the store ships one, and every other
-    cell files the recorded census advantage-rank. A pcti-year block
+    default basis: every index ranks the store's interpolated pcti
+    descending (the most advantaged percentile files the advantage-
+    ordered rank 1, thirty seats a fifth) at the _pcti factor years, and
+    every other year files the recorded census advantage-rank. (IEO and
+    IER joined the pcti basis 2026-10-25 – the flows-explained review
+    found the three index lanes ranked on different bases at the same
+    elections; the store had always carried their pcti. Their pct runs
+    ascending with advantage exactly as IRSAD's does, so the one
+    descending sort serves all three.) A pcti-year block
     with a missing/non-numeric/repeated pcti fails the run, as does a
     named anchor filed to the wrong fifth."""
     assert index_name in INDEX_META, f"unknown SEIFA index {index_name!r}"
@@ -302,25 +310,26 @@ def membership(year, index_name):
     n = len(blk)
     assert n in (150, 151), \
         f"{year}: {n} divisions – the thirty-a-fifth cut prices a 150 or 151 seat chamber"
-    if index_name == "irsad" and year in interp_years():
-        meta = INDEX_META["irsad"]["meta"]
+    if year in interp_years():
+        meta = INDEX_META[index_name]["meta"]
         keys = tuple(m[0] for m in meta)
+        qpre = keys[0][0]
         pcts = []
         for name, cell in blk.items():
-            p = cell["irsad"].get("pcti")
+            p = cell[index_name].get("pcti")
             assert isinstance(p, (int, float)) and 0.0 < p <= 1.0, \
                 f"{year} {name}: pcti {p!r} – the interpolated percentile must be in (0,1]"
             pcts.append(p)
         assert len(set(pcts)) == n, \
             f"{year}: pcti is not one-per-division – the thirty-a-fifth cut has no tie rule"
-        order = sorted(blk, key=lambda nm: blk[nm]["irsad"]["pcti"],
+        order = sorted(blk, key=lambda nm: blk[nm][index_name]["pcti"],
                        reverse=True)
         out = {name: {"classification":
-                          "q" + str(quintile_of(i + 1)),
+                          qpre + str(quintile_of(i + 1)),
                       "state": blk[name]["state"]}
                for i, name in enumerate(order)}
         _check(year, index_name, out, keys, "pcti basis")
-        for name, q in _PCTI_PINS.get(year, ()):
+        for name, q in (_PCTI_PINS.get(year, ()) if index_name == "irsad" else ()):
             assert out[name]["classification"] == q, \
                 f"{year} {name}: fifth {out[name]['classification']} != pinned {q}"
         return out

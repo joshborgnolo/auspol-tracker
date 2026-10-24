@@ -5994,6 +5994,28 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
      info, explain why there is no labor-versus-one-nation data for any of
      the upper house states") carries the why-no-other-state sentence as
      the co pairing's caption does for itself, with the same sibling roll */
+  /* the class and fifth views' data-driven caveats (2026-10-25 review:
+     the static One Nation sentence named the wrong end of the ladder):
+     the lump's own estimate years, One Nation's gap years and its
+     thinnest counted base, read off the record shown */
+  const lumpEstYears = S.fedClass ? YEARS.filter((y, i) => (S.estLump || [])[i]) : [];
+  const lumpEstNote = !S.fedClass ? "" : lumpEstYears.length
+    ? "; the all-minor-parties line stays a count, except in " + lumpEstYears.join(" and ") + ", when the Labor-bound ballots of a beaten Coalition candidate had to be shared between seats"
+    : "; the all-minor-parties line stays a count";
+  const onpGapYears = S.fedClass ? YEARS.filter((y, i) => y >= 1998 && (S.onp || [])[i] == null) : [];
+  const onpGapNote = !S.fedClass ? "" : (YEARS[0] < 1998 ? " One Nation’s line opens in 1998, its first federal election." : "")
+    + (onpGapYears.length ? " One Nation’s line breaks in " + onpGapYears.join(" and ") + ": it had no " + (onpGapYears.every((y) => y >= 2004) ? "candidate in these seats" : "ballots in the counted seats") + (onpGapYears.length > 1 ? " in those years." : " that year.") : "");
+  const onpThin = (() => {
+    if (!S.fedClass) return null;
+    let lo = null;
+    ((S.ballots || {}).onp || []).forEach((b, i) => {
+      if (!b || (S.onp || [])[i] == null) return;
+      const n = Math.round(b[0] + b[1]);
+      if (!lo || n < lo.n) lo = { n, y: YEARS[i] };
+    });
+    return lo && lo.n < 5000 ? lo : null;
+  })();
+  const thinNote = onpThin ? " Small bases swing: One Nation’s " + onpThin.y + " point rests on " + onpThin.n.toLocaleString("en-AU") + " ballots (each point’s tooltip gives its base)." : "";
   const cap = lcBank
     ? (onSen || onCon
       ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others) — a pair nobody could rank is a gap, never a zero — so the lines open in 2019. Most NSW upper-house voters number just one box above the line — " + oneOnlyOn + " — so most ballots rank neither of the pair; each share is of the cohort’s ballots that went on to rank " + (onCon ? "the Coalition or One Nation" : "Labor or One Nation") + " (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names neither of the pair mostly still counts for a minor group. It is the only state upper house this pair can be counted in: Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices, Western Australia’s tickets ended a year earlier with no ballot-level record since, and the rest publish none. NSW’s ballot record is the only state upper-house count of voters’ own preferences."
@@ -6029,9 +6051,15 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
         : S.fedClass
           ? (S.seifa
-            ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to a fifth of the chamber by its " + (S.ix === "irsad" ? "IRSAD percentile" : S.ix.toUpperCase() + " rank") + " at that election — " + SEIFA_IX_DESC[S.ix] + (S.ix === "irsad" ? ", interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise" : "") + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it, so a kink never comes from sliding boundaries — each election rides its own index). From 2004 the count covers every seat: the AEC's two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher's final pair are recovered state by state from its flow-by-state table — where a state's crossbench seats spanned fifths the shares are apportioned over first preferences, and draw the hollow diamonds. The 2001 ring — the index series' floor — counts only the seats where Labor and the Coalition finished first and second. The fourth line is all minor-party voters taken together. A gap in One Nation's line is an election its ballots in the fifth never reached the AEC's table — the party stood in hardly any of the most-disadvantaged seats through the early 2010s, so the fifths null there; a thin base can still swing a point, so read a null as a missing count, not a zero."
-            : "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). From 2004 the count covers every seat: the AEC’s two-party-preferred table pairs Labor with the Coalition in every division, and the ballots sitting on a crossbencher’s final pair are recovered state by state from its flow-by-state table — where a state’s crossbench seats spanned seat types the shares are apportioned over first preferences, and draw the hollow diamonds. Before 2004 — the rings — only the seats where Labor and the Coalition finished first and second count, the national series’ own early basis. The fourth line is all minor-party voters taken together. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares.")
-            + noBars
+            ? "Counted from the AEC’s per-seat results, each seat placed in a fifth by its " + S.ix.toUpperCase() + " standing at that election — " + SEIFA_IX_DESC[S.ix] + "."
+              + " From 2004 every seat counts; the 2001 ring counts only the seats where Labor and the Coalition finished first and second."
+              + (hasEst ? " Where a state’s crossbench seats fall in more than one fifth, the split between Greens, One Nation and Others in those seats is fitted to each seat’s own counts and drawn as a hollow diamond" + lumpEstNote + "." : "")
+              + " A whole seat sits in one fifth by its average, so a seat that mixes rich and poor suburbs counts entirely in one."
+            : "Counted from the AEC’s per-seat results, each seat grouped by the AEC’s own classification at that election."
+              + " Before 2004 (the rings) only the seats where Labor and the Coalition finished first and second count; from 2004 every seat does."
+              + (hasEst ? " Where a state’s crossbench seats span seat types, the split between Greens, One Nation and Others in those seats is fitted to each seat’s own counts and drawn as a hollow diamond" + lumpEstNote + "." : ""))
+            + onpGapNote + thinNote
+            + (hasEst ? "" : noBars)
           : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
             + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter((w) => w.year < 2004).map((w, i, a) => (i ? (i === a.length - 1 ? " and " : ", ") : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("")
             + " The AEC counted no flows by party before 1996. " : "")
@@ -6290,7 +6318,7 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, me
       : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + ".")
     : classKey && house !== "sen"
     ? (S.seifa
-      ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)."
+      ? "First preferences by party at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + ", from the AEC's official results - " + SEIFA_IX_DESC[S.ix] + "."
       : "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions.")
     : stateKey
     ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)."
@@ -6409,14 +6437,14 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
       + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter.")
     : classKey
     ? (S.seifa
-      ? "Two-party-preferred shares at the " + span + " federal elections, every division's notional Labor-v-Coalition count summed across the seats of each " + S.ix.toUpperCase() + " fifth - " + SEIFA_IX_DESC[S.ix] + (S.ix === "irsad" ? ", interpolated between the bracketing censuses at the 2013, 2016 and 2019 elections, the recorded census rank otherwise" : "") + ", the most-advantaged seat ranked first, thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it)."
+      ? "Two-party-preferred shares at the " + span + " federal elections, every division's Labor-v-Coalition count summed across the seats of each " + S.ix.toUpperCase() + " fifth - " + SEIFA_IX_DESC[S.ix] + ". A whole seat sits in one fifth by its average standing."
       : "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions.")
     : stateKey
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed."
     : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.")
     + (!senBank && ((classKey && !S.seifa) || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
-    + (!senBank && ((classKey && !S.seifa) || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "")
-    + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+    + (!senBank && ((classKey && !S.seifa) || stateKey) ? " 1998 counts 147 divisions: Newcastle went to a supplementary election the Liberals didn't contest, so it has no Labor-v-Coalition count." : "")
+    + " Above 50, " + active.name + " leads.";
   /* the constant axis (user 2026-10-24: the range "should remain
      constant at all times"): the furthest cell of the WHOLE bank from
      the half - national and every state and class cut, PLUS the implied
@@ -6443,7 +6471,7 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
   return (
     <>
       <div className="rd-chead ex-fl-head">
-        <span className="rd-chead-t">{(impBank ? "Implied classic two-party preferred, " : "Classic two-party preferred, ") + active.name + "’s share, %"}
+        <span className="rd-chead-t">{(impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}
           <span className="rd-chead-meta">{scope}</span></span>
         {menu}
       </div>
@@ -6524,13 +6552,12 @@ function ExplainedInformalChart(props) {
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
   const cap = (classKey && house !== "sen"
     ? (S.seifa
-      ? "Informal ballots as a share of all ballots cast at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + " - " + S.ix.toUpperCase() + " is " + SEIFA_IX_DESC[S.ix] + ", the most-advantaged seat ranked first and thirty seats a fifth (the 151-seat 2019 and 2022 chambers give the spare seat to the most-disadvantaged fifth; a seat whose standing moved between elections moved fifths with it). Counted from the AEC's own per-division results."
+      ? "Informal ballots as a share of all ballots cast at the " + span + " federal elections in the " + (S.elections.startsWith("federal elections in the ") ? S.elections.slice("federal elections in the ".length) : S.short || S.label) + " - " + SEIFA_IX_DESC[S.ix] + ". Counted from the AEC's own per-division results."
       : "Informal ballots as a share of all ballots cast at the " + span + " federal elections in " + (S.short || S.label) + " seats, each seat grouped by the AEC's own classification for that election's divisions. Counted from the AEC's per-division results (the statistics packs' polling-place tables to 2001, the vote-type downloads from 2004).")
     : stateKey
     ? "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections in " + (S.short || S.label) + ", from the handbook's appendix tables before 2004 and the AEC's own published figures since."
     : "Informal ballots as a share of all ballots cast at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the Parliamentary Handbook's appendix tables before 2004 and the AEC's own published figures since (the House figures from its vote-type downloads, the Senate's from its informality summary).")
-    + " The Senate series ends at 2022 - the AEC's informality summary, its only machine-readable Senate informal publication, has no 2025 line yet."
-    + (classKey && house !== "sen" && !S.seifa ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own two-party table omits it." : "")
+    + (house === "sen" ? " The Senate series ends at 2022: the AEC hasn't yet published its 2025 Senate informality summary." : "")
     + " A territory not yet represented draws a gap, never a zero.";
   /* the constant axis (the 2PP view's idiom): the highest cell across
      the WHOLE store - House national and states and classes, Senate

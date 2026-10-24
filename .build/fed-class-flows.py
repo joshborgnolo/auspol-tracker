@@ -57,25 +57,35 @@ reads them by header name) and the distribution of preferences
     bucket's ALP v Coalition split over ALL the state's seats; subtracting
     the classic seats' TCP flows (above) leaves the bucket's flow over
     that state's NON-classic seats. Where those seats share one class the
-    leftover lands exactly in it; where they span classes it is allocated
-    over the seats' bucket first-preference shares and flagged est (the
-    chart draws those points as estimated). A state-year with no
-    non-classic seat at all contributes nothing – that class-year's
-    all-seats figure is its classic one, exactly.
-  LUMPED minors = the three buckets summed (they partition the non-major
-    ballot space, so the lump inherits the buckets' exactness and est
-    flags). A TPP-pair-minus-first-preferences lump per division is NOT
-    used: in seats fought by two Coalition candidates ("three-cornered"),
-    the losing Coalition candidate's ballots that end with Labor (Barker
-    2004's NP→ALP 1,890; the 1,570 Coalition-to-ALP ballots inside NSW
-    2004's non-classic pair Calare/New England) ride that difference,
-    and those are not minor-party ballots. The state table's major-source
-    rows name the drift per state, so a state-level consistency guard
-    holds the products to each other (to the vote): over each state's
-    non-classic seats, TPP-minus-first-preferences per side must equal
-    the bucket leftovers adjusted by that drift. The tppdiv product's
-    parse (column order read per year) stays pinned by the Grayndler
-    2022 oracle (74,571 ALP v 20,002 Coalition) in the test.
+    leftover lands exactly in it. Where they span classes (2026-10-25,
+    the flows-explained review: "estimates where there should be
+    counts") it is split by fit_mixed_state – iterative proportional
+    fitting to three counted margins: each seat's bucket first
+    preferences, each seat's minor-party ballots to Labor (its TPP Labor
+    total less Labor's first preferences) and each bucket's state
+    leftover. The old allocation (state rate x first preferences) is the
+    seed, so the fit only moves it as far as the seat counts demand. Those
+    bucket cells stay flagged est (hollow diamonds); the 2025 top IRSAD
+    fifth's Others moved 61.1 -> 64.9, the rural class's 52.1 -> 49.6.
+  LUMPED minors = the three buckets summed. Because the fit honours every
+    seat's own minor-party total, the lump of a mixed state's group is a
+    COUNT, not an allocation – save for three-cornered drift: in seats
+    fought by both Coalition parties the losing Coalition candidate's
+    ballots that end with Labor (Barker 2004's NP->ALP 1,890; the 1,570
+    inside NSW 2004's Calare/New England) ride the TPP-minus-first-
+    preferences difference, and those are not minor-party ballots. The
+    state table's Coalition-source rows give the drift per state; the fit
+    takes it off the three-cornered seat (coal2 > 0) before fitting – whole
+    where the state has one, spread over runner-up Coalition first
+    preferences where it has several. When that spread crosses groups the
+    lump is flagged lumpEst (VIC 2016/2022's Indi with Murray/Nicholls,
+    WA 2013's Durack/O'Connor, NSW 2004's Calare/New England, by fifth).
+    A state-level consistency guard holds the products to each other (to
+    the vote): over each state's non-classic seats, TPP-minus-first-
+    preferences per side must equal the bucket leftovers adjusted by that
+    drift. The tppdiv product's parse (column order read per year) stays
+    pinned by the Grayndler 2022 oracle (74,571 ALP v 20,002 Coalition)
+    in the test.
 
 Buckets and nulls mirror fed-state-flows.py: grn (every Greens party), onp
 (One Nation: HAN in 1998–2001, ON from 2004; the party stood federally for
@@ -118,7 +128,7 @@ change, so the lanes run the byte-identical derivation, never a clone.
 Writes data/fed-class-flows.json:
 { "source": …, "years": […], "classes": { "inner": { "label", "short",
   "grn", "onp", "oth", "votes" }, … }, "allSeats": { "inner": { "grn",
-  "onp", "oth", "lump", "votes", "lumpVotes", "est" }, … },
+  "onp", "oth", "lump", "votes", "lumpVotes", "est", "lumpEst" }, … },
   "seifa": { "years": […], "classes": { "q1": { "label", "short", "desc",
   "ix", "grn", "onp", "oth", "votes" }, … }, "allSeats": { "q1": { …same
   minus the copy… } }, }, "classicSeats": […], "divisions": […] }
@@ -310,6 +320,7 @@ def first_prefs_by_div(year):
     if not os.path.exists(path):
         raise FileNotFoundError(f"no distribution-of-preferences cache for {year} in {SRC}")
     per = collections.defaultdict(lambda: collections.defaultdict(float))
+    coal_cands = collections.defaultdict(list)
     for r in rows_of(path):
         t = r["CalculationType"].strip().lower()
         if r["CountNumber"].strip() != "0" or "preference" not in t or "count" not in t:
@@ -317,6 +328,13 @@ def first_prefs_by_div(year):
         p = r["PartyAb"].strip()
         key = "alp" if p in LABOR else "coal" if p in COAL else bucket(p)
         per[r["DivisionNm"].strip()][key] += float(r["CalculationValue"])
+        if key == "coal":
+            coal_cands[r["DivisionNm"].strip()].append(float(r["CalculationValue"]))
+    # "coal2": the Coalition first preferences outside the seat's leading
+    # Coalition candidate – nonzero only where both Coalition parties
+    # stood, the one place three-cornered drift can arise
+    for name, v in coal_cands.items():
+        per[name]["coal2"] = sum(v) - max(v)
     return per
 
 
@@ -367,6 +385,81 @@ def state_bucket_flows(year):
     return per, drift
 
 
+IPF_ITERS = 400   # proportional-fitting sweeps; converged to well under a ballot by ~100
+
+
+def fit_mixed_state(year, st, divs, fp, minor, leftover, nc_drift):
+    """The non-classic leftover of a state whose crossbench seats span
+    groups, split to division x bucket by iterative proportional fitting
+    on three counted margins:
+      - each division's bucket first preferences (DoP count 0);
+      - each division's minor ballots to Labor: its TPP Labor total less
+        Labor's first preferences (exact, bar three-cornered drift);
+      - each bucket's state leftover to Labor (state table less classic
+        seats).
+    The seed is each bucket's state leftover rate times the division's
+    first preferences – the old allocation – so the fit moves it only as
+    far as the per-division counts demand. A group's lump (the buckets
+    summed) is therefore a count; its per-bucket split stays an estimate.
+    The state's non-classic drift belongs to the seats where both
+    Coalition parties stood (coal2 > 0): one such seat takes it whole,
+    several share it over their runner-up Coalition first preferences –
+    returned as drift_est so the caller can flag the lump where that
+    spread crosses groups.
+    Returns ({(div, bucket): [toALP, toCoalition]}, drift_est)."""
+    tri = [d for d in divs if fp[d].get("coal2", 0.0) > 0]
+    drift_d = {d: 0.0 for d in divs}
+    drift_est = set()
+    if abs(nc_drift) > 0.5:
+        if not tri:
+            raise SystemExit(f"{year}: {st} non-classic drift {nc_drift:.0f} with no three-cornered seat")
+        w = sum(fp[d]["coal2"] for d in tri)
+        for d in tri:
+            drift_d[d] = nc_drift * fp[d]["coal2"] / w
+        if len(tri) > 1:
+            drift_est = set(tri)
+    row = {}
+    for d in divs:
+        tot = sum(fp[d][bk] for bk in BUCKETS)
+        a = min(max(minor[d][0] - drift_d[d], 0.0), tot)
+        row[d] = (a, tot - a)
+    col = {bk: tuple(leftover[bk]) for bk in BUCKETS}
+    x = {}
+    for bk in BUCKETS:
+        la, ll = col[bk]
+        r = la / (la + ll) if la + ll > 0 else 0.0
+        for d in divs:
+            x[(d, bk)] = [fp[d][bk] * r, fp[d][bk] * (1.0 - r)]
+    for _ in range(IPF_ITERS):
+        for d in divs:                       # division margins, per side
+            for i in (0, 1):
+                s = sum(x[(d, bk)][i] for bk in BUCKETS)
+                if s > 0:
+                    f = row[d][i] / s
+                    for bk in BUCKETS:
+                        x[(d, bk)][i] *= f
+        for bk in BUCKETS:                   # bucket margins, per side
+            for i in (0, 1):
+                s = sum(x[(d, bk)][i] for d in divs)
+                if s > 0:
+                    f = col[bk][i] / s
+                    for d in divs:
+                        x[(d, bk)][i] *= f
+        for d in divs:                       # cell totals = first preferences
+            for bk in BUCKETS:
+                c = x[(d, bk)]
+                s = c[0] + c[1]
+                if s > 0:
+                    f = fp[d][bk] / s
+                    c[0] *= f
+                    c[1] *= f
+    worst = max([abs(sum(x[(d, bk)][0] for bk in BUCKETS) - row[d][0]) for d in divs]
+                + [abs(sum(x[(d, bk)][0] for d in divs) - col[bk][0]) for bk in BUCKETS])
+    if worst > 2.0:
+        raise SystemExit(f"{year}: {st} count-anchored fit missed a margin by {worst:.1f} ballots")
+    return x, drift_est
+
+
 def allseats_for_year(year, class_of, labels=CLASSES):
     """The year's all-seats class figures, 2004 on:
     {class: {"votes": {bucket: [toALP,toCOAL]|None}, "lump": [toALP,toCOAL],
@@ -386,11 +479,12 @@ def allseats_for_year(year, class_of, labels=CLASSES):
             raise SystemExit(f"{year}: division {name!r} matches no classification row")
         if rec["classification"] not in labels:
             raise SystemExit(f"{year}: {name!r} group {rec['classification']!r} is not one of the grouping labels")
-    # per-division TPP pair minus the majors' first preferences – a
-    # drift-loaded cross-check figure (it carries Coalition→ALP
-    # three-cornered ballots), so it feeds only the consistency guard,
-    # never the published lumps. The ALP side of it can only ever gain
-    # ballots; the Coalition side can lose up to the seat's drift.
+    # per-division TPP pair minus the majors' first preferences – each
+    # seat's minor-party ballots by side, loaded with any Coalition→ALP
+    # three-cornered drift: the consistency guard checks it against the
+    # state table, and fit_mixed_state anchors the mixed states' split to
+    # it once the drift is taken off. The ALP side of it can only ever
+    # gain ballots; the Coalition side can lose up to the seat's drift.
     minor = {}
     for name, (toc, toa) in tpp.items():
         p = fp.get(name)
@@ -443,31 +537,33 @@ def allseats_for_year(year, class_of, labels=CLASSES):
             raise SystemExit(f"{year}: {st} non-classic leftover {lv[1]:.0f} - drift "
                              f"{nc_drift:.0f} != per-division minors {mn[1]:.0f} (side 1)")
     # assign the leftovers to classes – exactly for single-class states,
-    # over bucket first preferences otherwise
+    # by the count-anchored fit (fit_mixed_state) otherwise
     acc = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in labels}
     est = {cls: set() for cls in labels}
+    lump_est = set()
     for st, bycls in nc.items():
         if len(bycls) == 1:
             cls = next(iter(bycls))
             for bk in BUCKETS:
                 acc[cls][bk][0] += leftover[st][bk][0]
                 acc[cls][bk][1] += leftover[st][bk][1]
-        else:
-            for bk in BUCKETS:
-                w = {cls: sum(fp[d][bk] for d in ds) for cls, ds in bycls.items()}
-                tot = sum(w.values())
-                la, ll = leftover[st][bk]
-                if la + ll <= 0.5:
-                    continue  # nothing of the bucket flowed outside classic seats
-                if tot <= 0:
-                    raise SystemExit(f"{year}: {st} {bk} leftover {la:.0f}+{ll:.0f} "
-                                     f"with no first-preference base")
-                for cls, wv in w.items():
-                    if wv <= 0:
+            continue
+        divs = sorted(d for ds in bycls.values() for d in ds)
+        nc_drift = drift.get(st, 0.0) - cross_by_state[st]
+        cells, drift_est = fit_mixed_state(year, st, divs, fp, minor, leftover[st], nc_drift)
+        for cls, ds in bycls.items():
+            for d in ds:
+                for bk in BUCKETS:
+                    a, l = cells[(d, bk)]
+                    if a + l <= 0:
                         continue
-                    acc[cls][bk][0] += la * wv / tot
-                    acc[cls][bk][1] += ll * wv / tot
+                    acc[cls][bk][0] += a
+                    acc[cls][bk][1] += l
                     est[cls].add(bk)
+        # the lump is a count unless the state's drift had to be spread
+        # over three-cornered seats in more than one group
+        if len({c for c, ds in bycls.items() if set(ds) & drift_est}) > 1:
+            lump_est.update(c for c, ds in bycls.items() if set(ds) & drift_est)
     # classic + assigned = all seats; the lump is the buckets summed (they
     # partition the non-major ballot space)
     classic_sums = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in labels}
@@ -487,7 +583,7 @@ def allseats_for_year(year, class_of, labels=CLASSES):
             vote[bk] = [a, l] if a + l else None
             lump[0] += a
             lump[1] += l
-        out[cls] = {"votes": vote, "lump": lump, "est": est[cls]}
+        out[cls] = {"votes": vote, "lump": lump, "est": est[cls], "lumpEst": cls in lump_est}
     return out
 
 
@@ -498,7 +594,7 @@ def main():
     for c in classes.values():
         for b in BUCKETS: c[b] = []
         c["votes"] = {b: [] for b in BUCKETS}
-    allseats = {cls: {"lump": [], "lumpVotes": [],
+    allseats = {cls: {"lump": [], "lumpVotes": [], "lumpEst": [],
                       **{b: {"share": [], "votes": [], "est": []} for b in BUCKETS}}
                 for cls in CLASSES}
     n_classic, n_divs = [], []
@@ -517,6 +613,7 @@ def main():
                 ballots[cls][b].append(round(a + l))
             if cells is not None:
                 lump = cells[cls]["lump"]
+                allseats[cls]["lumpEst"].append(cells[cls]["lumpEst"])
                 for b in BUCKETS:
                     v = cells[cls]["votes"][b]
                     allseats[cls][b]["share"].append(round(100 * v[0] / (v[0] + v[1]), 1) if v else None)
@@ -529,6 +626,7 @@ def main():
                     allseats[cls][b]["share"].append(None)
                     allseats[cls][b]["votes"].append(None)
                     allseats[cls][b]["est"].append(False)
+                allseats[cls]["lumpEst"].append(False)
             allseats[cls]["lump"].append(round(100 * lump[0] / (lump[0] + lump[1]), 1)
                                          if lump[0] + lump[1] else None)
             allseats[cls]["lumpVotes"].append([round(lump[0]),
@@ -541,7 +639,7 @@ def main():
     quint = {m[0]: {"label": m[1], "short": m[2], "desc": m[3], "ix": m[4],
                     **{b: [] for b in BUCKETS}, "votes": {b: [] for b in BUCKETS}}
              for m in SEIFA_META}
-    quint_all = {m[0]: {"lump": [], "lumpVotes": [],
+    quint_all = {m[0]: {"lump": [], "lumpVotes": [], "lumpEst": [],
                         **{b: {"share": [], "votes": [], "est": []} for b in BUCKETS}}
                  for m in SEIFA_META}
     q_ballots = {m[0]: collections.defaultdict(list) for m in SEIFA_META}
@@ -560,6 +658,7 @@ def main():
                     q_ballots[q][b].append(round(a + l))
                 if cells is not None:
                     lump = cells[q]["lump"]
+                    quint_all[q]["lumpEst"].append(cells[q]["lumpEst"])
                     for b in BUCKETS:
                         v = cells[q]["votes"][b]
                         quint_all[q][b]["share"].append(round(100 * v[0] / (v[0] + v[1]), 1) if v else None)
@@ -572,6 +671,7 @@ def main():
                         quint_all[q][b]["share"].append(None)
                         quint_all[q][b]["votes"].append(None)
                         quint_all[q][b]["est"].append(False)
+                    quint_all[q]["lumpEst"].append(False)
                 quint_all[q]["lump"].append(round(100 * lump[0] / (lump[0] + lump[1]), 1)
                                             if lump[0] + lump[1] else None)
                 quint_all[q]["lumpVotes"].append([round(lump[0]),
@@ -579,14 +679,14 @@ def main():
     out = {"source": "AEC two-candidate-preferred flow of preferences by division, 1996–2025, "
                      "grouped by the AEC's own per-election division classifications (classic seats); "
                      "allSeats block counted from the TPP-by-division, first-preference and "
-                     "TPP-flow-by-state products, 2004–2025 (est cells allocated over first prefs)",
+                     "TPP-flow-by-state products, 2004–2025 (est cells fitted to per-division counts)",
            "years": list(YEARS),
            "classes": {CLASS_IDS[cls]: classes[cls] for cls in CLASSES},
            "allSeats": {CLASS_IDS[cls]: {
                "grn": allseats[cls]["grn"]["share"], "onp": allseats[cls]["onp"]["share"],
                "oth": allseats[cls]["oth"]["share"], "lump": allseats[cls]["lump"],
                "votes": {b: allseats[cls][b]["votes"] for b in BUCKETS},
-               "lumpVotes": allseats[cls]["lumpVotes"],
+               "lumpVotes": allseats[cls]["lumpVotes"], "lumpEst": allseats[cls]["lumpEst"],
                "est": {b: allseats[cls][b]["est"] for b in BUCKETS}}
                for cls in CLASSES},
            "seifa": {"years": list(SEIFA_YEARS),
@@ -595,7 +695,7 @@ def main():
                          "grn": quint_all[m[0]]["grn"]["share"], "onp": quint_all[m[0]]["onp"]["share"],
                          "oth": quint_all[m[0]]["oth"]["share"], "lump": quint_all[m[0]]["lump"],
                          "votes": {b: quint_all[m[0]][b]["votes"] for b in BUCKETS},
-                         "lumpVotes": quint_all[m[0]]["lumpVotes"],
+                         "lumpVotes": quint_all[m[0]]["lumpVotes"], "lumpEst": quint_all[m[0]]["lumpEst"],
                          "est": {b: quint_all[m[0]][b]["est"] for b in BUCKETS}}
                          for m in SEIFA_META}},
            "classicSeats": n_classic, "divisions": n_divs}
