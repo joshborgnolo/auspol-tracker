@@ -25,9 +25,9 @@
   "absSa1Ced2011": {
    "censusYear": 2011,
    "derivation": "weighted",
-   "editionInForce": "2010",
+   "editionInForce": "2011",
    "recons": "SA1 decile counts per CED EXACT vs ABS 2011 CED SA1 Distributions (irsd/ier/ieo)",
-   "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, population-weighted (2039.0 §2.2)"
+   "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, SA re-cut to the AEC's 16 Dec 2011 redistribution, population-weighted (2039.0 §2.2)"
   },
   "absSa1Ced2016": {
    "censusYear": 2016,
@@ -2301,15 +2301,15 @@
    "Adelaide": {
     "ieo": {
      "rank": 127,
-     "value": 1086.154
+     "value": 1086.272
     },
     "ier": {
-     "rank": 18,
-     "value": 953.564
+     "rank": 19,
+     "value": 954.564
     },
     "irsd": {
-     "rank": 89,
-     "value": 1007.133
+     "rank": 91,
+     "value": 1007.905
     },
     "state": "SA"
    },
@@ -2361,15 +2361,15 @@
    "Barker": {
     "ieo": {
      "rank": 8,
-     "value": 917.764
+     "value": 916.044
     },
     "ier": {
-     "rank": 32,
-     "value": 967.434
+     "rank": 31,
+     "value": 965.266
     },
     "irsd": {
      "rank": 19,
-     "value": 950.523
+     "value": 948.253
     },
     "state": "SA"
    },
@@ -2394,7 +2394,7 @@
      "value": 941.392
     },
     "ier": {
-     "rank": 15,
+     "rank": 14,
      "value": 947.226
     },
     "irsd": {
@@ -2420,7 +2420,7 @@
    },
    "Bendigo": {
     "ieo": {
-     "rank": 65,
+     "rank": 64,
      "value": 968.98
     },
     "ier": {
@@ -2465,7 +2465,7 @@
    },
    "Blair": {
     "ieo": {
-     "rank": 12,
+     "rank": 13,
      "value": 921.211
     },
     "ier": {
@@ -2503,23 +2503,23 @@
      "value": 1037.144
     },
     "irsd": {
-     "rank": 121,
+     "rank": 120,
      "value": 1041.937
     },
     "state": "QLD"
    },
    "Boothby": {
     "ieo": {
-     "rank": 122,
-     "value": 1067.367
+     "rank": 119,
+     "value": 1061.477
     },
     "ier": {
-     "rank": 103,
-     "value": 1013.818
+     "rank": 108,
+     "value": 1019.562
     },
     "irsd": {
-     "rank": 120,
-     "value": 1040.154
+     "rank": 121,
+     "value": 1042.833
     },
     "state": "SA"
    },
@@ -2544,11 +2544,11 @@
      "value": 902.998
     },
     "ier": {
-     "rank": 11,
+     "rank": 10,
      "value": 945.112
     },
     "irsd": {
-     "rank": 10,
+     "rank": 11,
      "value": 932.211
     },
     "state": "TAS"
@@ -2570,7 +2570,7 @@
    },
    "Brand": {
     "ieo": {
-     "rank": 21,
+     "rank": 22,
      "value": 934.679
     },
     "ier": {
@@ -2630,7 +2630,7 @@
    },
    "Calwell": {
     "ieo": {
-     "rank": 18,
+     "rank": 19,
      "value": 932.347
     },
     "ier": {
@@ -2660,7 +2660,7 @@
    },
    "Canning": {
     "ieo": {
-     "rank": 17,
+     "rank": 18,
      "value": 931.719
     },
     "ier": {
@@ -2675,7 +2675,7 @@
    },
    "Capricornia": {
     "ieo": {
-     "rank": 19,
+     "rank": 20,
      "value": 933.203
     },
     "ier": {
@@ -2709,7 +2709,7 @@
      "value": 953.457
     },
     "ier": {
-     "rank": 91,
+     "rank": 90,
      "value": 1006.752
     },
     "irsd": {
@@ -2724,11 +2724,11 @@
      "value": 904.589
     },
     "ier": {
-     "rank": 13,
+     "rank": 12,
      "value": 946.694
     },
     "irsd": {
-     "rank": 5,
+     "rank": 4,
      "value": 916.306
     },
     "state": "NSW"
@@ -2750,7 +2750,7 @@
    },
    "Cook": {
     "ieo": {
-     "rank": 119,
+     "rank": 120,
      "value": 1061.606
     },
     "ier": {
@@ -2810,15 +2810,15 @@
    },
    "Cowper": {
     "ieo": {
-     "rank": 16,
+     "rank": 17,
      "value": 930.484
     },
     "ier": {
-     "rank": 12,
+     "rank": 11,
      "value": 945.811
     },
     "irsd": {
-     "rank": 8,
+     "rank": 9,
      "value": 930.208
     },
     "state": "NSW"
@@ -2870,7 +2870,7 @@
    },
    "Deakin": {
     "ieo": {
-     "rank": 120,
+     "rank": 121,
      "value": 1064.531
     },
     "ier": {
@@ -2889,7 +2889,7 @@
      "value": 1017.746
     },
     "ier": {
-     "rank": 19,
+     "rank": 18,
      "value": 954.107
     },
     "irsd": {
@@ -2934,11 +2934,11 @@
      "value": 993.211
     },
     "ier": {
-     "rank": 90,
+     "rank": 89,
      "value": 1006.214
     },
     "irsd": {
-     "rank": 96,
+     "rank": 95,
      "value": 1010.349
     },
     "state": "VIC"
@@ -2949,7 +2949,7 @@
      "value": 954.679
     },
     "ier": {
-     "rank": 30,
+     "rank": 32,
      "value": 965.318
     },
     "irsd": {
@@ -2998,7 +2998,7 @@
      "value": 1011.843
     },
     "irsd": {
-     "rank": 98,
+     "rank": 97,
      "value": 1012.786
     },
     "state": "QLD"
@@ -3009,7 +3009,7 @@
      "value": 944.197
     },
     "ier": {
-     "rank": 29,
+     "rank": 30,
      "value": 965.259
     },
     "irsd": {
@@ -3039,22 +3039,22 @@
      "value": 972.554
     },
     "ier": {
-     "rank": 106,
+     "rank": 105,
      "value": 1018.145
     },
     "irsd": {
-     "rank": 92,
+     "rank": 93,
      "value": 1008.618
     },
     "state": "VIC"
    },
    "Flynn": {
     "ieo": {
-     "rank": 13,
+     "rank": 14,
      "value": 923.554
     },
     "ier": {
-     "rank": 107,
+     "rank": 106,
      "value": 1018.668
     },
     "irsd": {
@@ -3065,11 +3065,11 @@
    },
    "Forde": {
     "ieo": {
-     "rank": 22,
+     "rank": 23,
      "value": 934.984
     },
     "ier": {
-     "rank": 105,
+     "rank": 104,
      "value": 1017.91
     },
     "irsd": {
@@ -3099,7 +3099,7 @@
      "value": 906.069
     },
     "ier": {
-     "rank": 6,
+     "rank": 7,
      "value": 936.803
     },
     "irsd": {
@@ -3189,7 +3189,7 @@
      "value": 940.567
     },
     "ier": {
-     "rank": 33,
+     "rank": 34,
      "value": 967.787
     },
     "irsd": {
@@ -3219,7 +3219,7 @@
      "value": 954.736
     },
     "ier": {
-     "rank": 104,
+     "rank": 103,
      "value": 1014.565
     },
     "irsd": {
@@ -3260,15 +3260,15 @@
    },
    "Grey": {
     "ieo": {
-     "rank": 11,
+     "rank": 12,
      "value": 921.189
     },
     "ier": {
-     "rank": 8,
+     "rank": 9,
      "value": 942.235
     },
     "irsd": {
-     "rank": 11,
+     "rank": 12,
      "value": 932.261
     },
     "state": "SA"
@@ -3313,18 +3313,18 @@
      "value": 1038.782
     },
     "irsd": {
-     "rank": 91,
+     "rank": 92,
      "value": 1007.985
     },
     "state": "WA"
    },
    "Herbert": {
     "ieo": {
-     "rank": 66,
+     "rank": 65,
      "value": 969.902
     },
     "ier": {
-     "rank": 58,
+     "rank": 59,
      "value": 988.15
     },
     "irsd": {
@@ -3350,16 +3350,16 @@
    },
    "Hindmarsh": {
     "ieo": {
-     "rank": 101,
-     "value": 1024.666
+     "rank": 98,
+     "value": 1020.754
     },
     "ier": {
-     "rank": 35,
-     "value": 968.724
+     "rank": 29,
+     "value": 964.745
     },
     "irsd": {
-     "rank": 95,
-     "value": 1010.336
+     "rank": 87,
+     "value": 1005.427
     },
     "state": "SA"
    },
@@ -3369,11 +3369,11 @@
      "value": 909.689
     },
     "ier": {
-     "rank": 17,
+     "rank": 16,
      "value": 947.963
     },
     "irsd": {
-     "rank": 6,
+     "rank": 7,
      "value": 924.915
     },
     "state": "QLD"
@@ -3395,7 +3395,7 @@
    },
    "Hotham": {
     "ieo": {
-     "rank": 98,
+     "rank": 99,
      "value": 1022.17
     },
     "ier": {
@@ -3410,7 +3410,7 @@
    },
    "Hughes": {
     "ieo": {
-     "rank": 100,
+     "rank": 101,
      "value": 1023.512
     },
     "ier": {
@@ -3425,11 +3425,11 @@
    },
    "Hume": {
     "ieo": {
-     "rank": 63,
+     "rank": 62,
      "value": 964.885
     },
     "ier": {
-     "rank": 108,
+     "rank": 107,
      "value": 1018.928
     },
     "irsd": {
@@ -3455,7 +3455,7 @@
    },
    "Indi": {
     "ieo": {
-     "rank": 64,
+     "rank": 63,
      "value": 967.365
     },
     "ier": {
@@ -3463,7 +3463,7 @@
      "value": 983.33
     },
     "irsd": {
-     "rank": 52,
+     "rank": 53,
      "value": 982.575
     },
     "state": "VIC"
@@ -3474,7 +3474,7 @@
      "value": 995.595
     },
     "ier": {
-     "rank": 96,
+     "rank": 95,
      "value": 1008.242
     },
     "irsd": {
@@ -3500,7 +3500,7 @@
    },
    "Kennedy": {
     "ieo": {
-     "rank": 10,
+     "rank": 11,
      "value": 920.987
     },
     "ier": {
@@ -3530,16 +3530,16 @@
    },
    "Kingston": {
     "ieo": {
-     "rank": 29,
-     "value": 939.975
+     "rank": 24,
+     "value": 935.492
     },
     "ier": {
-     "rank": 59,
-     "value": 988.632
+     "rank": 56,
+     "value": 984.729
     },
     "irsd": {
-     "rank": 55,
-     "value": 985.838
+     "rank": 52,
+     "value": 982.121
     },
     "state": "SA"
    },
@@ -3609,7 +3609,7 @@
      "value": 1027.897
     },
     "ier": {
-     "rank": 89,
+     "rank": 88,
      "value": 1006.151
     },
     "irsd": {
@@ -3620,11 +3620,11 @@
    },
    "Lindsay": {
     "ieo": {
-     "rank": 28,
+     "rank": 29,
      "value": 937.962
     },
     "ier": {
-     "rank": 97,
+     "rank": 96,
      "value": 1008.596
     },
     "irsd": {
@@ -3654,7 +3654,7 @@
      "value": 918.061
     },
     "ier": {
-     "rank": 95,
+     "rank": 94,
      "value": 1008.222
     },
     "irsd": {
@@ -3665,7 +3665,7 @@
    },
    "Lyne": {
     "ieo": {
-     "rank": 24,
+     "rank": 26,
      "value": 936.039
     },
     "ier": {
@@ -3688,7 +3688,7 @@
      "value": 962.93
     },
     "irsd": {
-     "rank": 9,
+     "rank": 10,
      "value": 930.587
     },
     "state": "TAS"
@@ -3725,7 +3725,7 @@
    },
    "Macquarie": {
     "ieo": {
-     "rank": 99,
+     "rank": 100,
      "value": 1023.105
     },
     "ier": {
@@ -3740,16 +3740,16 @@
    },
    "Makin": {
     "ieo": {
-     "rank": 61,
-     "value": 962.604
+     "rank": 66,
+     "value": 971.53
     },
     "ier": {
-     "rank": 88,
-     "value": 1006.047
+     "rank": 97,
+     "value": 1009.317
     },
     "irsd": {
-     "rank": 93,
-     "value": 1009.35
+     "rank": 98,
+     "value": 1014.49
     },
     "state": "SA"
    },
@@ -3770,7 +3770,7 @@
    },
    "Maranoa": {
     "ieo": {
-     "rank": 20,
+     "rank": 21,
      "value": 934.672
     },
     "ier": {
@@ -3801,15 +3801,15 @@
    "Mayo": {
     "ieo": {
      "rank": 95,
-     "value": 1014.385
+     "value": 1014.907
     },
     "ier": {
      "rank": 121,
-     "value": 1038.421
+     "value": 1037.239
     },
     "irsd": {
      "rank": 116,
-     "value": 1033.634
+     "value": 1031.653
     },
     "state": "SA"
    },
@@ -3853,7 +3853,7 @@
      "value": 994.325
     },
     "irsd": {
-     "rank": 54,
+     "rank": 55,
      "value": 983.23
     },
     "state": "VIC"
@@ -3883,7 +3883,7 @@
      "value": 896.965
     },
     "irsd": {
-     "rank": 87,
+     "rank": 88,
      "value": 1006.002
     },
     "state": "VIC"
@@ -3965,7 +3965,7 @@
    },
    "Moreton": {
     "ieo": {
-     "rank": 121,
+     "rank": 122,
      "value": 1065.015
     },
     "ier": {
@@ -3980,7 +3980,7 @@
    },
    "Murray": {
     "ieo": {
-     "rank": 27,
+     "rank": 28,
      "value": 937.7
     },
     "ier": {
@@ -4063,22 +4063,22 @@
      "value": 1005.216
     },
     "irsd": {
-     "rank": 53,
+     "rank": 54,
      "value": 982.946
     },
     "state": "QLD"
    },
    "Page": {
     "ieo": {
-     "rank": 14,
+     "rank": 15,
      "value": 928.277
     },
     "ier": {
-     "rank": 14,
+     "rank": 13,
      "value": 946.708
     },
     "irsd": {
-     "rank": 12,
+     "rank": 13,
      "value": 933.33
     },
     "state": "NSW"
@@ -4104,7 +4104,7 @@
      "value": 1039.438
     },
     "ier": {
-     "rank": 16,
+     "rank": 15,
      "value": 947.372
     },
     "irsd": {
@@ -4119,7 +4119,7 @@
      "value": 940.933
     },
     "ier": {
-     "rank": 57,
+     "rank": 58,
      "value": 988.066
     },
     "irsd": {
@@ -4175,22 +4175,22 @@
    },
    "Port Adelaide": {
     "ieo": {
-     "rank": 25,
-     "value": 936.286
+     "rank": 10,
+     "value": 920.147
     },
     "ier": {
-     "rank": 9,
-     "value": 943.636
+     "rank": 6,
+     "value": 934.876
     },
     "irsd": {
-     "rank": 13,
-     "value": 934.184
+     "rank": 5,
+     "value": 919.857
     },
     "state": "SA"
    },
    "Rankin": {
     "ieo": {
-     "rank": 26,
+     "rank": 27,
      "value": 937.124
     },
     "ier": {
@@ -4284,7 +4284,7 @@
      "value": 952.977
     },
     "ier": {
-     "rank": 92,
+     "rank": 91,
      "value": 1007.303
     },
     "irsd": {
@@ -4299,7 +4299,7 @@
      "value": 941.804
     },
     "ier": {
-     "rank": 56,
+     "rank": 57,
      "value": 986.442
     },
     "irsd": {
@@ -4314,7 +4314,7 @@
      "value": 1029.701
     },
     "ier": {
-     "rank": 93,
+     "rank": 92,
      "value": 1008.098
     },
     "irsd": {
@@ -4329,7 +4329,7 @@
      "value": 1037.769
     },
     "ier": {
-     "rank": 94,
+     "rank": 93,
      "value": 1008.16
     },
     "irsd": {
@@ -4341,15 +4341,15 @@
    "Sturt": {
     "ieo": {
      "rank": 118,
-     "value": 1053.516
+     "value": 1055.424
     },
     "ier": {
      "rank": 70,
-     "value": 994.816
+     "value": 994.788
     },
     "irsd": {
      "rank": 104,
-     "value": 1023.745
+     "value": 1024.225
     },
     "state": "SA"
    },
@@ -4363,7 +4363,7 @@
      "value": 978.416
     },
     "irsd": {
-     "rank": 97,
+     "rank": 96,
      "value": 1011.023
     },
     "state": "WA"
@@ -4400,7 +4400,7 @@
    },
    "Throsby": {
     "ieo": {
-     "rank": 15,
+     "rank": 16,
      "value": 928.461
     },
     "ier": {
@@ -4416,21 +4416,21 @@
    "Wakefield": {
     "ieo": {
      "rank": 1,
-     "value": 885.324
+     "value": 892.493
     },
     "ier": {
-     "rank": 10,
-     "value": 944.455
+     "rank": 17,
+     "value": 952.763
     },
     "irsd": {
-     "rank": 4,
-     "value": 910.722
+     "rank": 6,
+     "value": 920.456
     },
     "state": "SA"
    },
    "Wannon": {
     "ieo": {
-     "rank": 62,
+     "rank": 61,
      "value": 963.139
     },
     "ier": {
@@ -4464,11 +4464,11 @@
      "value": 993.147
     },
     "ier": {
-     "rank": 7,
+     "rank": 8,
      "value": 939.327
     },
     "irsd": {
-     "rank": 7,
+     "rank": 8,
      "value": 927.827
     },
     "state": "NSW"
@@ -4505,11 +4505,11 @@
    },
    "Wide Bay": {
     "ieo": {
-     "rank": 23,
+     "rank": 25,
      "value": 935.939
     },
     "ier": {
-     "rank": 31,
+     "rank": 33,
      "value": 966.341
     },
     "irsd": {
@@ -4524,7 +4524,7 @@
      "value": 1045.983
     },
     "ier": {
-     "rank": 34,
+     "rank": 35,
      "value": 968.047
     },
     "irsd": {
@@ -4543,7 +4543,7 @@
      "value": 1054.365
     },
     "irsd": {
-     "rank": 88,
+     "rank": 89,
      "value": 1006.364
     },
     "state": "QLD"

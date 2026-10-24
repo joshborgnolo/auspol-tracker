@@ -718,7 +718,7 @@ for (const ix of Object.keys(QIDXES)) {
          points), none at 2016 — its census sat five weeks after
          election day, so pcti ≈ rank */
       const moved = ents.filter(([nm, cell]) => fifthOf(raOf.get(nm), ix) !== fifthOf(rankAdvOf(ix, cell, n), ix)).length;
-      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 8, 2016: 0, 2019: 14 }, ier: { 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
       ents.forEach(([nm, cell]) => {
         assert.ok(cell[ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
@@ -1017,8 +1017,8 @@ SEIFA_IDS.forEach((q) => {
 /* the IEO fifths' own Green-flow runs, merged classic 2001 + all-seats
    2004+ exactly as the renderer draws them (the count-anchored fit's
    values since 2026-10-25) */
-assert.deepEqual([...FH.fed.classes.e1.grn], [79.6, 84.2, 83.4, 82.1, 85.1, 84.1, 85.4, 89, 91.2], "e1 Green flow (IEO most-advantaged fifth)");
-assert.deepEqual([...FH.fed.classes.e5.grn], [64.7, 73.6, 73.7, 74.8, 77.3, 76.9, 76.7, 80.3, 82.3], "e5 Green flow (IEO most-disadvantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e1.grn], [79.6, 84.2, 83.4, 82.1, 85.4, 84.1, 85.4, 89, 91.2], "e1 Green flow (IEO most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e5.grn], [64.7, 73.6, 73.7, 74.8, 77.1, 76.9, 76.7, 80.3, 82.3], "e5 Green flow (IEO most-disadvantaged fifth)");
 /* the IER fifths' own Green-flow runs (economic resources beside the
    education-and-occupation ladder), merged classic 2001 + all-seats 2004+
    — the 2019/2022 values are the regenerated store's own, NOT a naive

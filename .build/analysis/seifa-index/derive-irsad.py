@@ -459,10 +459,37 @@ def derive_sa1_weighted(seifa, cedmap, sa1_key_of, tag):
     pops = {code: w for (code, _n), (_s, w) in accum.items()}
     return rows, dec_counts, pops
 
-def derive_2011():
+SA_CED2013 = f"{PROJ}/.build/analysis/seat-model/seifa-src/sa1-2011-sa-ced2013.json"
+
+
+def ced_2013(ced):
+    """CED_2011's SA1 allocation re-cut to the 2013 election's boundaries
+    (2026-10-25, flows-explained review): CED_2011 is the edition in force
+    at the August 2011 census, which is every state's 2013 edition EXCEPT
+    South Australia, redistributed 16 Dec 2011. SA's SA1s take the
+    divisions of seat-model/derive-sa-ced2013.py's allocation (the AEC's
+    own sa-esri-16122011 boundaries); division codes are the CED_2011
+    codes of the same names (no SA name changed). Returns a new map – the
+    cached CED_2011 load stays the ABS's own."""
+    sa = json.load(open(SA_CED2013))["sa1"]
+    code_of = {nm: code for code, nm in ced.values() if not PSEUDO.search(nm)}
+    out = dict(ced)
+    for main, nm in sa.items():
+        if main not in ced:
+            sys.exit(f"ced_2013: SA1 {main} is not in CED_2011's allocation")
+        out[main] = (code_of[nm], nm)
+    return out
+
+
+def derive_2011(edition_2013=True):
+    """The 2013 row (edition_2013, the default: SA re-cut to its 2011
+    redistribution) or the raw CED_2011 cut the ABS distributions cube
+    reconciles against (edition_2013=False)."""
     seifa = load_seifa2011()
     keys = load_mb_sa1_keys(2011)                 # 7d -> maincode
     ced = load_ced_csv_zip("2011", 2011)          # maincode -> CED
+    if edition_2013:
+        ced = ced_2013(ced)
     return derive_sa1_weighted(seifa, ced, lambda main: keys.get(main), "2013-row")
 
 def derive_2016(edition):
@@ -597,8 +624,11 @@ def main():
     assert_names("e2013", d13, inside=["Wright", "Charlton", "Hunter", "Fraser",
                                        "Throsby"],
                  outside=["Fenner", "Whitlam"], count=150)
+    # the ABS distributions cube is on CED_2011 itself, so the exact recon
+    # runs on the raw cut; the shipped 2013 row re-cuts SA (ced_2013)
+    _raw13, dec11, _pop11 = derive_2011(edition_2013=False)
     recon_sa1_deciles("2011ced", f"{ROOT}/src/abs/abs-seifa-2011-ced-sa1-distributions.xls",
-                      3, dec13, 2011)
+                      3, dec11, 2011)
     d16, dec16, pop16 = derive_2016(2016)
     assert_names("e2016set", d16, inside=["Burt", "Fenner", "Whitlam", "Hunter"],
                  outside=["Charlton", "Throsby", "Fraser"], count=150)
@@ -644,8 +674,8 @@ def main():
         2010: dict(censusYear=2006, editionInForce=2009, derivation="published",
                    sourceProduct="APH Research Paper no.1 2010-11, Table 2a — 2006 Census, 2009 boundaries",
                    rows=ranks_for(aph10)),
-        2013: dict(censusYear=2011, editionInForce=2010, derivation="weighted",
-                   sourceProduct="ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations (ABS 2039.0 §2.2 weighted derivation)",
+        2013: dict(censusYear=2011, editionInForce=2011, derivation="weighted",
+                   sourceProduct="ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations, South Australia re-cut to the AEC's 16 Dec 2011 redistribution (ABS 2039.0 §2.2 weighted derivation)",
                    rows=d13),
         2016: dict(censusYear=2016, editionInForce=2016, derivation="weighted",
                    sourceProduct="ABS SEIFA 2016 SA1 cube × CED_2016_AUST allocations",

@@ -10,9 +10,11 @@ Elections
          published for the 2001 electoral divisions; a DIRECT published row
          set, no weighting). Cross-checked against AEC RR5 Attachment 1
          (IRSAD) — 150/150 within printed rounding.
-  2013 — SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations (2010-edition
-         boundaries), population-weighted mean of constituent SA1 scores
-         per ABS 2039.0 §2.2.
+  2013 — SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations (the boundaries
+         at the 2011 census), South Australia's SA1s re-cut to the AEC's
+         16 Dec 2011 redistribution – the 2013 election's SA lines – by
+         derive-sa-ced2013.py (2026-10-25); population-weighted mean of
+         constituent SA1 scores per ABS 2039.0 §2.2.
   2016 — SEIFA 2016 SA1 cube x CED_2016_AUST.
   2019 — SEIFA 2016 SA1 cube x CED_2018_AUST.
   2022 — SEIFA 2021 SA1 cube x CED_2021 MB allocations + 2021 MB counts.
@@ -98,8 +100,8 @@ PROVENANCE = {
         "recons": "irsad column vs AEC RR5 Attachment 1 (150/150 within printed rounding)",
     },
     "absSa1Ced2011": {
-        "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, population-weighted (2039.0 §2.2)",
-        "censusYear": 2011, "editionInForce": "2010", "derivation": "weighted",
+        "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, SA re-cut to the AEC's 16 Dec 2011 redistribution, population-weighted (2039.0 §2.2)",
+        "censusYear": 2011, "editionInForce": "2011", "derivation": "weighted",
         "recons": "SA1 decile counts per CED EXACT vs ABS 2011 CED SA1 Distributions (irsd/ier/ieo)",
     },
     "absSa1Ced2016": {
@@ -453,9 +455,14 @@ def main():
         name_join(tag, rows, klass[tag.lstrip("e")])
         return rank_and_round(rows), dec_counts, dec_pops
 
-    # ---- 2013 — 2011c x CED_2011
-    elections["2013"], dec13, decp13 = lane(
-        seifa11, di.load_ced_csv_zip("2011", 2011),
+    # ---- 2013 — 2011c x CED_2011, South Australia re-cut to its Dec 2011
+    # redistribution (di.ced_2013); the exact recon below runs on the raw
+    # CED_2011 cut, the geometry the ABS distributions cube was built on
+    _raw13, dec13, _decp11 = derive_weighted(
+        seifa11, di.load_ced_csv_zip("2011", 2011), lambda main: mb11.get(main),
+        lambda m: seifa11.get(mb11.get(m), {}).get("urp", 0.0), "e2013raw")
+    elections["2013"], _dec13sa, decp13 = lane(
+        seifa11, di.ced_2013(di.load_ced_csv_zip("2011", 2011)),
         lambda main: mb11.get(main),
         lambda m: seifa11.get(mb11.get(m), {}).get("urp", 0.0), "e2013")
 

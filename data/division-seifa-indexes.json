@@ -48,9 +48,9 @@
       "recons": "national decile pop-share sanity only (ABS ships no 2024-edition distributions cube)"
     },
     "absSa1Ced2011": {
-      "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, population-weighted (2039.0 §2.2)",
+      "title": "ABS SEIFA 2011 SA1 cube x CED_2011_AUST SA1 allocations, SA re-cut to the AEC's 16 Dec 2011 redistribution, population-weighted (2039.0 §2.2)",
       "censusYear": 2011,
-      "editionInForce": "2010",
+      "editionInForce": "2011",
       "derivation": "weighted",
       "recons": "SA1 decile counts per CED EXACT vs ABS 2011 CED SA1 Distributions (irsd/ier/ieo)"
     },
@@ -97,11 +97,11 @@
       "sourceProduct": "APH Research Paper no.1 2010-11, Table 2a — 2006 Census, 2009 boundaries"
     },
     "irsad-weighted-2011": {
-      "title": "IRSAD lane — ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations (ABS 2039.0 §2.2 weighted derivation)",
+      "title": "IRSAD lane — ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations, South Australia re-cut to the AEC's 16 Dec 2011 redistribution (ABS 2039.0 §2.2 weighted derivation)",
       "censusYear": 2011,
-      "editionInForce": "2010",
+      "editionInForce": "2011",
       "derivation": "weighted",
-      "sourceProduct": "ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations (ABS 2039.0 §2.2 weighted derivation)"
+      "sourceProduct": "ABS SEIFA 2011 SA1 cube × CED_2011_AUST allocations, South Australia re-cut to the AEC's 16 Dec 2011 redistribution (ABS 2039.0 §2.2 weighted derivation)"
     },
     "irsad-weighted-2016": {
       "title": "IRSAD lane — ABS SEIFA 2016 SA1 cube × CED_2016_AUST allocations",
@@ -18018,29 +18018,29 @@
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 89,
-          "value": 1007.133,
-          "pct": 0.593333,
-          "pcti": 0.604426
+          "rank": 91,
+          "value": 1007.905,
+          "pct": 0.606667,
+          "pcti": 0.61776
         },
         "ier": {
-          "rank": 18,
-          "value": 953.564,
-          "pct": 0.12,
-          "pcti": 0.136639
+          "rank": 19,
+          "value": 954.564,
+          "pct": 0.126667,
+          "pcti": 0.140533
         },
         "ieo": {
           "rank": 127,
-          "value": 1086.154,
+          "value": 1086.272,
           "pct": 0.846667,
           "pcti": 0.84112
         },
         "irsad": {
-          "value": 1015.9,
+          "value": 1016.6,
           "rank": 55,
           "rankDis": 96,
           "pct": 0.64,
-          "pcti": 0.673279
+          "pcti": 0.676052
         }
       },
       "Aston": {
@@ -18085,7 +18085,7 @@
           "rank": 46,
           "value": 979.51,
           "pct": 0.306667,
-          "pcti": 0.306667
+          "pcti": 0.30944
         },
         "ieo": {
           "rank": 77,
@@ -18108,7 +18108,7 @@
           "rank": 74,
           "value": 998.476,
           "pct": 0.493333,
-          "pcti": 0.504426
+          "pcti": 0.501653
         },
         "ier": {
           "rank": 62,
@@ -18120,7 +18120,7 @@
           "rank": 108,
           "value": 1031.749,
           "pct": 0.72,
-          "pcti": 0.703361
+          "pcti": 0.706134
         },
         "irsad": {
           "value": 1011.4,
@@ -18135,28 +18135,28 @@
         "via": "absSa1Ced2011",
         "irsd": {
           "rank": 19,
-          "value": 950.523,
+          "value": 948.253,
           "pct": 0.126667,
-          "pcti": 0.12944
+          "pcti": 0.123894
         },
         "ier": {
-          "rank": 32,
-          "value": 967.434,
-          "pct": 0.213333,
-          "pcti": 0.213333
+          "rank": 31,
+          "value": 965.266,
+          "pct": 0.206667,
+          "pcti": 0.206667
         },
         "ieo": {
           "rank": 8,
-          "value": 917.764,
+          "value": 916.044,
           "pct": 0.053333,
-          "pcti": 0.056106
+          "pcti": 0.053333
         },
         "irsad": {
-          "value": 934.3,
+          "value": 932,
           "rank": 138,
           "rankDis": 13,
           "pct": 0.086667,
-          "pcti": 0.078347
+          "pcti": 0.08112
         }
       },
       "Barton": {
@@ -18195,13 +18195,13 @@
           "rank": 22,
           "value": 952.903,
           "pct": 0.146667,
-          "pcti": 0.135574
+          "pcti": 0.138347
         },
         "ier": {
-          "rank": 15,
+          "rank": 14,
           "value": 947.226,
-          "pct": 0.1,
-          "pcti": 0.083361
+          "pct": 0.093333,
+          "pcti": 0.079467
         },
         "ieo": {
           "rank": 33,
@@ -18240,10 +18240,10 @@
         },
         "irsad": {
           "value": 994.8,
-          "rank": 76,
-          "rankDis": 75,
-          "pct": 0.5,
-          "pcti": 0.563784
+          "rank": 77,
+          "rankDis": 74,
+          "pct": 0.493333,
+          "pcti": 0.55989
         }
       },
       "Bendigo": {
@@ -18259,20 +18259,20 @@
           "rank": 40,
           "value": 970.892,
           "pct": 0.266667,
-          "pcti": 0.255574
+          "pcti": 0.258347
         },
         "ieo": {
-          "rank": 65,
+          "rank": 64,
           "value": 968.98,
-          "pct": 0.433333,
-          "pcti": 0.43888
+          "pct": 0.426667,
+          "pcti": 0.434987
         },
         "irsad": {
           "value": 961.7,
-          "rank": 117,
-          "rankDis": 34,
-          "pct": 0.226667,
-          "pcti": 0.243306
+          "rank": 116,
+          "rankDis": 35,
+          "pct": 0.233333,
+          "pcti": 0.247199
         }
       },
       "Bennelong": {
@@ -18346,13 +18346,13 @@
           "rank": 48,
           "value": 980.101,
           "pct": 0.32,
-          "pcti": 0.289495
+          "pcti": 0.292268
         },
         "ieo": {
-          "rank": 12,
+          "rank": 13,
           "value": 921.211,
-          "pct": 0.08,
-          "pcti": 0.082773
+          "pct": 0.086667,
+          "pcti": 0.08944
         },
         "irsad": {
           "value": 949.3,
@@ -18385,20 +18385,20 @@
         },
         "irsad": {
           "value": 903,
-          "rank": 147,
-          "rankDis": 4,
-          "pct": 0.026667,
-          "pcti": 0.03776
+          "rank": 148,
+          "rankDis": 3,
+          "pct": 0.02,
+          "pcti": 0.036639
         }
       },
       "Bonner": {
         "state": "QLD",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 121,
+          "rank": 120,
           "value": 1041.937,
-          "pct": 0.806667,
-          "pcti": 0.80944
+          "pct": 0.8,
+          "pcti": 0.805546
         },
         "ier": {
           "rank": 120,
@@ -18424,29 +18424,29 @@
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 120,
-          "value": 1040.154,
-          "pct": 0.8,
-          "pcti": 0.794454
+          "rank": 121,
+          "value": 1042.833,
+          "pct": 0.806667,
+          "pcti": 0.803894
         },
         "ier": {
-          "rank": 103,
-          "value": 1013.818,
-          "pct": 0.686667,
-          "pcti": 0.686667
+          "rank": 108,
+          "value": 1019.562,
+          "pct": 0.72,
+          "pcti": 0.72832
         },
         "ieo": {
-          "rank": 122,
-          "value": 1067.367,
-          "pct": 0.813333,
-          "pcti": 0.813333
+          "rank": 119,
+          "value": 1061.477,
+          "pct": 0.793333,
+          "pcti": 0.79888
         },
         "irsad": {
-          "value": 1037.4,
-          "rank": 39,
-          "rankDis": 112,
-          "pct": 0.746667,
-          "pcti": 0.754987
+          "value": 1038.4,
+          "rank": 37,
+          "rankDis": 114,
+          "pct": 0.76,
+          "pcti": 0.76
         }
       },
       "Bowman": {
@@ -18482,16 +18482,16 @@
         "state": "TAS",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 10,
-          "value": 932.211,
-          "pct": 0.066667,
-          "pcti": 0.058347
-        },
-        "ier": {
           "rank": 11,
-          "value": 945.112,
+          "value": 932.211,
           "pct": 0.073333,
           "pcti": 0.065013
+        },
+        "ier": {
+          "rank": 10,
+          "value": 945.112,
+          "pct": 0.066667,
+          "pcti": 0.06112
         },
         "ieo": {
           "rank": 3,
@@ -18501,10 +18501,10 @@
         },
         "irsad": {
           "value": 916.3,
-          "rank": 144,
-          "rankDis": 7,
-          "pct": 0.046667,
-          "pcti": 0.038347
+          "rank": 143,
+          "rankDis": 8,
+          "pct": 0.053333,
+          "pcti": 0.04224
         }
       },
       "Bradfield": {
@@ -18549,20 +18549,20 @@
           "rank": 123,
           "value": 1040.71,
           "pct": 0.82,
-          "pcti": 0.781175
+          "pcti": 0.778402
         },
         "ieo": {
-          "rank": 21,
+          "rank": 22,
           "value": 934.679,
-          "pct": 0.14,
-          "pcti": 0.128907
+          "pct": 0.146667,
+          "pcti": 0.135574
         },
         "irsad": {
           "value": 998.8,
-          "rank": 69,
-          "rankDis": 82,
-          "pct": 0.546667,
-          "pcti": 0.469017
+          "rank": 68,
+          "rankDis": 83,
+          "pct": 0.553333,
+          "pcti": 0.47291
         }
       },
       "Brisbane": {
@@ -18601,13 +18601,13 @@
           "rank": 49,
           "value": 980.548,
           "pct": 0.326667,
-          "pcti": 0.323894
+          "pcti": 0.326667
         },
         "ier": {
           "rank": 49,
           "value": 980.714,
           "pct": 0.326667,
-          "pcti": 0.332213
+          "pcti": 0.334987
         },
         "ieo": {
           "rank": 90,
@@ -18636,7 +18636,7 @@
           "rank": 54,
           "value": 984.002,
           "pct": 0.36,
-          "pcti": 0.348907
+          "pcti": 0.35168
         },
         "ieo": {
           "rank": 49,
@@ -18646,10 +18646,10 @@
         },
         "irsad": {
           "value": 962.7,
-          "rank": 115,
-          "rankDis": 36,
-          "pct": 0.24,
-          "pcti": 0.242773
+          "rank": 114,
+          "rankDis": 37,
+          "pct": 0.246667,
+          "pcti": 0.246667
         }
       },
       "Calwell": {
@@ -18668,10 +18668,10 @@
           "pcti": 0.483948
         },
         "ieo": {
-          "rank": 18,
+          "rank": 19,
           "value": 932.347,
-          "pct": 0.12,
-          "pcti": 0.108907
+          "pct": 0.126667,
+          "pcti": 0.115574
         },
         "irsad": {
           "value": 950.3,
@@ -18717,7 +18717,7 @@
           "rank": 66,
           "value": 992.186,
           "pct": 0.44,
-          "pcti": 0.395628
+          "pcti": 0.398402
         },
         "ier": {
           "rank": 116,
@@ -18726,10 +18726,10 @@
           "pcti": 0.76224
         },
         "ieo": {
-          "rank": 17,
+          "rank": 18,
           "value": 931.719,
-          "pct": 0.113333,
-          "pcti": 0.107787
+          "pct": 0.12,
+          "pcti": 0.114454
         },
         "irsad": {
           "value": 989.8,
@@ -18746,7 +18746,7 @@
           "rank": 73,
           "value": 998.43,
           "pct": 0.486667,
-          "pcti": 0.42011
+          "pcti": 0.422883
         },
         "ier": {
           "rank": 98,
@@ -18755,10 +18755,10 @@
           "pcti": 0.539631
         },
         "ieo": {
-          "rank": 19,
+          "rank": 20,
           "value": 933.203,
-          "pct": 0.126667,
-          "pcti": 0.118347
+          "pct": 0.133333,
+          "pcti": 0.125013
         },
         "irsad": {
           "value": 983.8,
@@ -18807,10 +18807,10 @@
           "pcti": 0.452213
         },
         "ier": {
-          "rank": 91,
+          "rank": 90,
           "value": 1006.752,
-          "pct": 0.606667,
-          "pcti": 0.598347
+          "pct": 0.6,
+          "pcti": 0.594454
         },
         "ieo": {
           "rank": 52,
@@ -18830,16 +18830,16 @@
         "state": "NSW",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 5,
+          "rank": 4,
           "value": 916.306,
-          "pct": 0.033333,
-          "pcti": 0.041653
+          "pct": 0.026667,
+          "pcti": 0.040533
         },
         "ier": {
-          "rank": 13,
+          "rank": 12,
           "value": 946.694,
-          "pct": 0.086667,
-          "pcti": 0.106079
+          "pct": 0.08,
+          "pcti": 0.102186
         },
         "ieo": {
           "rank": 4,
@@ -18849,10 +18849,10 @@
         },
         "irsad": {
           "value": 916.9,
-          "rank": 143,
-          "rankDis": 8,
-          "pct": 0.053333,
-          "pcti": 0.072746
+          "rank": 142,
+          "rankDis": 9,
+          "pct": 0.06,
+          "pcti": 0.076639
         }
       },
       "Chisholm": {
@@ -18862,7 +18862,7 @@
           "rank": 119,
           "value": 1039.346,
           "pct": 0.793333,
-          "pcti": 0.796106
+          "pcti": 0.793333
         },
         "ier": {
           "rank": 63,
@@ -18900,10 +18900,10 @@
           "pcti": 0.923306
         },
         "ieo": {
-          "rank": 119,
+          "rank": 120,
           "value": 1061.606,
-          "pct": 0.793333,
-          "pcti": 0.804426
+          "pct": 0.8,
+          "pcti": 0.80832
         },
         "irsad": {
           "value": 1075.6,
@@ -19004,29 +19004,29 @@
         "state": "NSW",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 8,
+          "rank": 9,
           "value": 930.208,
-          "pct": 0.053333,
-          "pcti": 0.069972
+          "pct": 0.06,
+          "pcti": 0.073866
         },
         "ier": {
-          "rank": 12,
+          "rank": 11,
           "value": 945.811,
-          "pct": 0.08,
-          "pcti": 0.107732
+          "pct": 0.073333,
+          "pcti": 0.103839
         },
         "ieo": {
-          "rank": 16,
+          "rank": 17,
           "value": 930.484,
-          "pct": 0.106667,
-          "pcti": 0.139946
+          "pct": 0.113333,
+          "pcti": 0.143839
         },
         "irsad": {
           "value": 922.3,
-          "rank": 141,
-          "rankDis": 10,
-          "pct": 0.066667,
-          "pcti": 0.06944
+          "rank": 140,
+          "rankDis": 11,
+          "pct": 0.073333,
+          "pcti": 0.076106
         }
       },
       "Cunningham": {
@@ -19110,10 +19110,10 @@
         },
         "irsad": {
           "value": 998.6,
-          "rank": 70,
-          "rankDis": 81,
-          "pct": 0.54,
-          "pcti": 0.451257
+          "rank": 69,
+          "rankDis": 82,
+          "pct": 0.546667,
+          "pcti": 0.455151
         }
       },
       "Deakin": {
@@ -19129,13 +19129,13 @@
           "rank": 100,
           "value": 1013.184,
           "pct": 0.666667,
-          "pcti": 0.683306
+          "pcti": 0.680533
         },
         "ieo": {
-          "rank": 120,
+          "rank": 121,
           "value": 1064.531,
-          "pct": 0.8,
-          "pcti": 0.802773
+          "pct": 0.806667,
+          "pcti": 0.80944
         },
         "irsad": {
           "value": 1040.3,
@@ -19155,10 +19155,10 @@
           "pcti": 0.389972
         },
         "ier": {
-          "rank": 19,
+          "rank": 18,
           "value": 954.107,
-          "pct": 0.126667,
-          "pcti": 0.118347
+          "pct": 0.12,
+          "pcti": 0.114454
         },
         "ieo": {
           "rank": 97,
@@ -19236,16 +19236,16 @@
         "state": "VIC",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 96,
+          "rank": 95,
           "value": 1010.349,
-          "pct": 0.64,
-          "pcti": 0.651093
+          "pct": 0.633333,
+          "pcti": 0.647199
         },
         "ier": {
-          "rank": 90,
+          "rank": 89,
           "value": 1006.214,
-          "pct": 0.6,
-          "pcti": 0.630505
+          "pct": 0.593333,
+          "pcti": 0.626612
         },
         "ieo": {
           "rank": 82,
@@ -19271,16 +19271,16 @@
           "pcti": 0.208907
         },
         "ier": {
-          "rank": 30,
+          "rank": 32,
           "value": 965.318,
-          "pct": 0.2,
-          "pcti": 0.163948
+          "pct": 0.213333,
+          "pcti": 0.171735
         },
         "ieo": {
           "rank": 54,
           "value": 954.679,
           "pct": 0.36,
-          "pcti": 0.332268
+          "pcti": 0.335041
         },
         "irsad": {
           "value": 969.9,
@@ -19313,10 +19313,10 @@
         },
         "irsad": {
           "value": 991.1,
-          "rank": 79,
-          "rankDis": 72,
-          "pct": 0.48,
-          "pcti": 0.482773
+          "rank": 80,
+          "rankDis": 71,
+          "pct": 0.473333,
+          "pcti": 0.47888
         }
       },
       "Fadden": {
@@ -19332,7 +19332,7 @@
           "rank": 113,
           "value": 1021.698,
           "pct": 0.753333,
-          "pcti": 0.736694
+          "pcti": 0.733921
         },
         "ieo": {
           "rank": 75,
@@ -19342,26 +19342,26 @@
         },
         "irsad": {
           "value": 1020.2,
-          "rank": 53,
-          "rankDis": 98,
-          "pct": 0.653333,
-          "pcti": 0.622828
+          "rank": 52,
+          "rankDis": 99,
+          "pct": 0.66,
+          "pcti": 0.626721
         }
       },
       "Fairfax": {
         "state": "QLD",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 98,
+          "rank": 97,
           "value": 1012.786,
-          "pct": 0.653333,
-          "pcti": 0.661653
+          "pct": 0.646667,
+          "pcti": 0.65776
         },
         "ier": {
           "rank": 99,
           "value": 1011.843,
           "pct": 0.66,
-          "pcti": 0.684959
+          "pcti": 0.682186
         },
         "ieo": {
           "rank": 83,
@@ -19387,16 +19387,16 @@
           "pcti": 0.20832
         },
         "ier": {
-          "rank": 29,
+          "rank": 30,
           "value": 965.259,
-          "pct": 0.193333,
-          "pcti": 0.193333
+          "pct": 0.2,
+          "pcti": 0.197227
         },
         "ieo": {
           "rank": 39,
           "value": 944.197,
           "pct": 0.26,
-          "pcti": 0.276639
+          "pcti": 0.279413
         },
         "irsad": {
           "value": 947.5,
@@ -19429,26 +19429,26 @@
         },
         "irsad": {
           "value": 997.2,
-          "rank": 72,
-          "rankDis": 79,
-          "pct": 0.526667,
-          "pcti": 0.526667
+          "rank": 71,
+          "rankDis": 80,
+          "pct": 0.533333,
+          "pcti": 0.53056
         }
       },
       "Flinders": {
         "state": "VIC",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 92,
+          "rank": 93,
           "value": 1008.618,
-          "pct": 0.613333,
-          "pcti": 0.621653
+          "pct": 0.62,
+          "pcti": 0.62832
         },
         "ier": {
-          "rank": 106,
+          "rank": 105,
           "value": 1018.145,
-          "pct": 0.706667,
-          "pcti": 0.731626
+          "pct": 0.7,
+          "pcti": 0.727732
         },
         "ieo": {
           "rank": 67,
@@ -19458,10 +19458,10 @@
         },
         "irsad": {
           "value": 993,
-          "rank": 77,
-          "rankDis": 74,
-          "pct": 0.493333,
-          "pcti": 0.504426
+          "rank": 78,
+          "rankDis": 73,
+          "pct": 0.486667,
+          "pcti": 0.500533
         }
       },
       "Flynn": {
@@ -19474,16 +19474,16 @@
           "pcti": 0.34235
         },
         "ier": {
-          "rank": 107,
+          "rank": 106,
           "value": 1018.668,
-          "pct": 0.713333,
-          "pcti": 0.577446
+          "pct": 0.706667,
+          "pcti": 0.573553
         },
         "ieo": {
-          "rank": 13,
+          "rank": 14,
           "value": 923.554,
-          "pct": 0.086667,
-          "pcti": 0.072801
+          "pct": 0.093333,
+          "pcti": 0.079467
         },
         "irsad": {
           "value": 981.1,
@@ -19503,16 +19503,16 @@
           "pcti": 0.396694
         },
         "ier": {
-          "rank": 105,
+          "rank": 104,
           "value": 1017.91,
-          "pct": 0.7,
-          "pcti": 0.675041
+          "pct": 0.693333,
+          "pcti": 0.671147
         },
         "ieo": {
-          "rank": 22,
+          "rank": 23,
           "value": 934.984,
-          "pct": 0.146667,
-          "pcti": 0.146667
+          "pct": 0.153333,
+          "pcti": 0.15056
         },
         "irsad": {
           "value": 987.8,
@@ -19535,7 +19535,7 @@
           "rank": 114,
           "value": 1031.339,
           "pct": 0.76,
-          "pcti": 0.75168
+          "pcti": 0.748907
         },
         "ieo": {
           "rank": 40,
@@ -19545,10 +19545,10 @@
         },
         "irsad": {
           "value": 996.9,
-          "rank": 73,
-          "rankDis": 78,
-          "pct": 0.52,
-          "pcti": 0.475628
+          "rank": 72,
+          "rankDis": 79,
+          "pct": 0.526667,
+          "pcti": 0.479522
         }
       },
       "Fowler": {
@@ -19561,16 +19561,16 @@
           "pcti": 0.013333
         },
         "ier": {
-          "rank": 6,
+          "rank": 7,
           "value": 936.803,
-          "pct": 0.04,
-          "pcti": 0.053866
+          "pct": 0.046667,
+          "pcti": 0.05776
         },
         "ieo": {
           "rank": 5,
           "value": 906.069,
           "pct": 0.033333,
-          "pcti": 0.025013
+          "pcti": 0.02224
         },
         "irsad": {
           "value": 882.4,
@@ -19587,13 +19587,13 @@
           "rank": 83,
           "value": 1002.859,
           "pct": 0.553333,
-          "pcti": 0.545013
+          "pcti": 0.54224
         },
         "ier": {
           "rank": 77,
           "value": 999.042,
           "pct": 0.513333,
-          "pcti": 0.51888
+          "pcti": 0.516106
         },
         "ieo": {
           "rank": 79,
@@ -19645,7 +19645,7 @@
           "rank": 115,
           "value": 1031.337,
           "pct": 0.766667,
-          "pcti": 0.747254
+          "pcti": 0.750028
         },
         "ier": {
           "rank": 124,
@@ -19657,7 +19657,7 @@
           "rank": 107,
           "value": 1030.936,
           "pct": 0.713333,
-          "pcti": 0.70224
+          "pcti": 0.705013
         },
         "irsad": {
           "value": 1041.6,
@@ -19680,7 +19680,7 @@
           "rank": 37,
           "value": 968.843,
           "pct": 0.246667,
-          "pcti": 0.274399
+          "pcti": 0.277172
         },
         "ieo": {
           "rank": 110,
@@ -19690,10 +19690,10 @@
         },
         "irsad": {
           "value": 996.7,
-          "rank": 74,
-          "rankDis": 77,
-          "pct": 0.513333,
-          "pcti": 0.577117
+          "rank": 73,
+          "rankDis": 78,
+          "pct": 0.52,
+          "pcti": 0.581011
         }
       },
       "Gilmore": {
@@ -19715,7 +19715,7 @@
           "rank": 58,
           "value": 958.252,
           "pct": 0.386667,
-          "pcti": 0.403306
+          "pcti": 0.400533
         },
         "irsad": {
           "value": 967.8,
@@ -19735,10 +19735,10 @@
           "pcti": 0.203894
         },
         "ier": {
-          "rank": 33,
+          "rank": 34,
           "value": 967.787,
-          "pct": 0.22,
-          "pcti": 0.21168
+          "pct": 0.226667,
+          "pcti": 0.215574
         },
         "ieo": {
           "rank": 30,
@@ -19793,10 +19793,10 @@
           "pcti": 0.285013
         },
         "ier": {
-          "rank": 104,
+          "rank": 103,
           "value": 1014.565,
-          "pct": 0.693333,
-          "pcti": 0.662828
+          "pct": 0.686667,
+          "pcti": 0.658935
         },
         "ieo": {
           "rank": 55,
@@ -19819,7 +19819,7 @@
           "rank": 105,
           "value": 1024.741,
           "pct": 0.7,
-          "pcti": 0.738825
+          "pcti": 0.736052
         },
         "ier": {
           "rank": 43,
@@ -19864,39 +19864,39 @@
         },
         "irsad": {
           "value": 1038,
-          "rank": 37,
-          "rankDis": 114,
-          "pct": 0.76,
-          "pcti": 0.765546
+          "rank": 38,
+          "rankDis": 113,
+          "pct": 0.753333,
+          "pcti": 0.761653
         }
       },
       "Grey": {
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 11,
+          "rank": 12,
           "value": 932.261,
-          "pct": 0.073333,
-          "pcti": 0.059467
+          "pct": 0.08,
+          "pcti": 0.066134
         },
         "ier": {
-          "rank": 8,
+          "rank": 9,
           "value": 942.235,
-          "pct": 0.053333,
-          "pcti": 0.047787
+          "pct": 0.06,
+          "pcti": 0.054454
         },
         "ieo": {
-          "rank": 11,
+          "rank": 12,
           "value": 921.189,
-          "pct": 0.073333,
-          "pcti": 0.07056
+          "pct": 0.08,
+          "pcti": 0.077227
         },
         "irsad": {
           "value": 920.6,
-          "rank": 142,
-          "rankDis": 9,
-          "pct": 0.06,
-          "pcti": 0.054454
+          "rank": 141,
+          "rankDis": 10,
+          "pct": 0.066667,
+          "pcti": 0.058347
         }
       },
       "Griffith": {
@@ -19961,10 +19961,10 @@
         "state": "WA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 91,
+          "rank": 92,
           "value": 1007.985,
-          "pct": 0.606667,
-          "pcti": 0.553976
+          "pct": 0.613333,
+          "pcti": 0.557869
         },
         "ier": {
           "rank": 122,
@@ -19976,7 +19976,7 @@
           "rank": 53,
           "value": 954.492,
           "pct": 0.353333,
-          "pcti": 0.314508
+          "pcti": 0.317282
         },
         "irsad": {
           "value": 1005.7,
@@ -19996,23 +19996,23 @@
           "pcti": 0.396804
         },
         "ier": {
-          "rank": 58,
+          "rank": 59,
           "value": 988.15,
-          "pct": 0.386667,
-          "pcti": 0.284058
+          "pct": 0.393333,
+          "pcti": 0.287951
         },
         "ieo": {
-          "rank": 66,
+          "rank": 65,
           "value": 969.902,
-          "pct": 0.44,
-          "pcti": 0.426134
+          "pct": 0.433333,
+          "pcti": 0.419467
         },
         "irsad": {
           "value": 990.1,
-          "rank": 80,
-          "rankDis": 71,
-          "pct": 0.473333,
-          "pcti": 0.395683
+          "rank": 81,
+          "rankDis": 70,
+          "pct": 0.466667,
+          "pcti": 0.39179
         }
       },
       "Higgins": {
@@ -20028,7 +20028,7 @@
           "rank": 102,
           "value": 1013.685,
           "pct": 0.68,
-          "pcti": 0.702186
+          "pcti": 0.699413
         },
         "ieo": {
           "rank": 145,
@@ -20048,45 +20048,45 @@
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 95,
-          "value": 1010.336,
-          "pct": 0.633333,
-          "pcti": 0.636106
+          "rank": 87,
+          "value": 1005.427,
+          "pct": 0.58,
+          "pcti": 0.591093
         },
         "ier": {
-          "rank": 35,
-          "value": 968.724,
-          "pct": 0.233333,
-          "pcti": 0.241653
+          "rank": 29,
+          "value": 964.745,
+          "pct": 0.193333,
+          "pcti": 0.209972
         },
         "ieo": {
-          "rank": 101,
-          "value": 1024.666,
-          "pct": 0.673333,
-          "pcti": 0.681653
+          "rank": 98,
+          "value": 1020.754,
+          "pct": 0.653333,
+          "pcti": 0.65888
         },
         "irsad": {
-          "value": 1001.1,
-          "rank": 66,
-          "rankDis": 85,
-          "pct": 0.566667,
-          "pcti": 0.574987
+          "value": 996.7,
+          "rank": 74,
+          "rankDis": 77,
+          "pct": 0.513333,
+          "pcti": 0.543839
         }
       },
       "Hinkler": {
         "state": "QLD",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 6,
+          "rank": 7,
           "value": 924.915,
-          "pct": 0.04,
-          "pcti": 0.037227
+          "pct": 0.046667,
+          "pcti": 0.043894
         },
         "ier": {
-          "rank": 17,
+          "rank": 16,
           "value": 947.963,
-          "pct": 0.113333,
-          "pcti": 0.099467
+          "pct": 0.106667,
+          "pcti": 0.095574
         },
         "ieo": {
           "rank": 7,
@@ -20096,10 +20096,10 @@
         },
         "irsad": {
           "value": 915.2,
-          "rank": 146,
-          "rankDis": 5,
-          "pct": 0.033333,
-          "pcti": 0.033333
+          "rank": 145,
+          "rankDis": 6,
+          "pct": 0.04,
+          "pcti": 0.037227
         }
       },
       "Holt": {
@@ -20109,7 +20109,7 @@
           "rank": 60,
           "value": 990.151,
           "pct": 0.4,
-          "pcti": 0.377814
+          "pcti": 0.380587
         },
         "ier": {
           "rank": 109,
@@ -20147,10 +20147,10 @@
           "pcti": 0.509385
         },
         "ieo": {
-          "rank": 98,
+          "rank": 99,
           "value": 1022.17,
-          "pct": 0.653333,
-          "pcti": 0.647787
+          "pct": 0.66,
+          "pcti": 0.65168
         },
         "irsad": {
           "value": 1005.7,
@@ -20176,10 +20176,10 @@
           "pcti": 0.932213
         },
         "ieo": {
-          "rank": 100,
+          "rank": 101,
           "value": 1023.512,
-          "pct": 0.666667,
-          "pcti": 0.666667
+          "pct": 0.673333,
+          "pcti": 0.673333
         },
         "irsad": {
           "value": 1054.7,
@@ -20199,23 +20199,23 @@
           "pcti": 0.461065
         },
         "ier": {
-          "rank": 108,
+          "rank": 107,
           "value": 1018.928,
-          "pct": 0.72,
-          "pcti": 0.744959
+          "pct": 0.713333,
+          "pcti": 0.741065
         },
         "ieo": {
-          "rank": 63,
+          "rank": 62,
           "value": 964.885,
-          "pct": 0.42,
-          "pcti": 0.42832
+          "pct": 0.413333,
+          "pcti": 0.421653
         },
         "irsad": {
           "value": 985.7,
           "rank": 90,
           "rankDis": 61,
           "pct": 0.406667,
-          "pcti": 0.428853
+          "pcti": 0.426079
         }
       },
       "Hunter": {
@@ -20251,10 +20251,10 @@
         "state": "VIC",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 52,
+          "rank": 53,
           "value": 982.575,
-          "pct": 0.346667,
-          "pcti": 0.360533
+          "pct": 0.353333,
+          "pcti": 0.364426
         },
         "ier": {
           "rank": 53,
@@ -20263,10 +20263,10 @@
           "pcti": 0.35888
         },
         "ieo": {
-          "rank": 64,
+          "rank": 63,
           "value": 967.365,
-          "pct": 0.426667,
-          "pcti": 0.443306
+          "pct": 0.42,
+          "pcti": 0.439413
         },
         "irsad": {
           "value": 968.5,
@@ -20286,10 +20286,10 @@
           "pcti": 0.545546
         },
         "ier": {
-          "rank": 96,
+          "rank": 95,
           "value": 1008.242,
-          "pct": 0.64,
-          "pcti": 0.64832
+          "pct": 0.633333,
+          "pcti": 0.644426
         },
         "ieo": {
           "rank": 84,
@@ -20299,10 +20299,10 @@
         },
         "irsad": {
           "value": 999.5,
-          "rank": 68,
-          "rankDis": 83,
-          "pct": 0.553333,
-          "pcti": 0.556106
+          "rank": 67,
+          "rankDis": 84,
+          "pct": 0.56,
+          "pcti": 0.56
         }
       },
       "Jagajaga": {
@@ -20350,17 +20350,17 @@
           "pcti": 0.125601
         },
         "ieo": {
-          "rank": 10,
+          "rank": 11,
           "value": 920.987,
-          "pct": 0.066667,
-          "pcti": 0.072213
+          "pct": 0.073333,
+          "pcti": 0.07888
         },
         "irsad": {
           "value": 934.4,
           "rank": 137,
           "rankDis": 14,
           "pct": 0.093333,
-          "pcti": 0.087787
+          "pcti": 0.09056
         }
       },
       "Kingsford Smith": {
@@ -20396,29 +20396,29 @@
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 55,
-          "value": 985.838,
-          "pct": 0.366667,
-          "pcti": 0.366667
+          "rank": 52,
+          "value": 982.121,
+          "pct": 0.346667,
+          "pcti": 0.335574
         },
         "ier": {
-          "rank": 59,
-          "value": 988.632,
-          "pct": 0.393333,
-          "pcti": 0.376694
+          "rank": 56,
+          "value": 984.729,
+          "pct": 0.373333,
+          "pcti": 0.342828
         },
         "ieo": {
-          "rank": 29,
-          "value": 939.975,
-          "pct": 0.193333,
-          "pcti": 0.243251
+          "rank": 24,
+          "value": 935.492,
+          "pct": 0.16,
+          "pcti": 0.201598
         },
         "irsad": {
-          "value": 965.3,
-          "rank": 111,
-          "rankDis": 40,
-          "pct": 0.266667,
-          "pcti": 0.252801
+          "value": 961.3,
+          "rank": 117,
+          "rankDis": 34,
+          "pct": 0.226667,
+          "pcti": 0.218347
         }
       },
       "Kooyong": {
@@ -20547,10 +20547,10 @@
           "pcti": 0.764426
         },
         "ier": {
-          "rank": 89,
+          "rank": 88,
           "value": 1006.151,
-          "pct": 0.593333,
-          "pcti": 0.615519
+          "pct": 0.586667,
+          "pcti": 0.611626
         },
         "ieo": {
           "rank": 103,
@@ -20576,23 +20576,23 @@
           "pcti": 0.411626
         },
         "ier": {
-          "rank": 97,
+          "rank": 96,
           "value": 1008.596,
-          "pct": 0.646667,
-          "pcti": 0.638347
+          "pct": 0.64,
+          "pcti": 0.634454
         },
         "ieo": {
-          "rank": 28,
+          "rank": 29,
           "value": 937.962,
-          "pct": 0.186667,
-          "pcti": 0.214399
+          "pct": 0.193333,
+          "pcti": 0.218292
         },
         "irsad": {
           "value": 982.1,
           "rank": 94,
           "rankDis": 57,
           "pct": 0.38,
-          "pcti": 0.404959
+          "pcti": 0.402186
         }
       },
       "Lingiari": {
@@ -20614,14 +20614,14 @@
           "rank": 46,
           "value": 948.779,
           "pct": 0.306667,
-          "pcti": 0.292801
+          "pcti": 0.295574
         },
         "irsad": {
           "value": 864.1,
           "rank": 150,
           "rankDis": 1,
           "pct": 0.006667,
-          "pcti": 0.00944
+          "pcti": 0.006667
         }
       },
       "Longman": {
@@ -20634,16 +20634,16 @@
           "pcti": 0.255574
         },
         "ier": {
-          "rank": 95,
+          "rank": 94,
           "value": 1008.222,
-          "pct": 0.633333,
-          "pcti": 0.597282
+          "pct": 0.626667,
+          "pcti": 0.593388
         },
         "ieo": {
           "rank": 9,
           "value": 918.061,
           "pct": 0.06,
-          "pcti": 0.065546
+          "pcti": 0.06832
         },
         "irsad": {
           "value": 966.3,
@@ -20666,13 +20666,13 @@
           "rank": 25,
           "value": 962.907,
           "pct": 0.166667,
-          "pcti": 0.194399
+          "pcti": 0.197172
         },
         "ieo": {
-          "rank": 24,
+          "rank": 26,
           "value": 936.039,
-          "pct": 0.16,
-          "pcti": 0.209918
+          "pct": 0.173333,
+          "pcti": 0.220478
         },
         "irsad": {
           "value": 937.4,
@@ -20686,10 +20686,10 @@
         "state": "TAS",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 9,
+          "rank": 10,
           "value": 930.587,
-          "pct": 0.06,
-          "pcti": 0.06
+          "pct": 0.066667,
+          "pcti": 0.066667
         },
         "ier": {
           "rank": 26,
@@ -20705,10 +20705,10 @@
         },
         "irsad": {
           "value": 915.9,
-          "rank": 145,
-          "rankDis": 6,
-          "pct": 0.04,
-          "pcti": 0.04
+          "rank": 144,
+          "rankDis": 7,
+          "pct": 0.046667,
+          "pcti": 0.043894
         }
       },
       "Macarthur": {
@@ -20734,10 +20734,10 @@
         },
         "irsad": {
           "value": 1001.1,
-          "rank": 67,
-          "rankDis": 84,
-          "pct": 0.56,
-          "pcti": 0.532268
+          "rank": 66,
+          "rankDis": 85,
+          "pct": 0.566667,
+          "pcti": 0.536161
         }
       },
       "Mackellar": {
@@ -20785,10 +20785,10 @@
           "pcti": 0.815519
         },
         "ieo": {
-          "rank": 99,
+          "rank": 100,
           "value": 1023.105,
-          "pct": 0.66,
-          "pcti": 0.665546
+          "pct": 0.666667,
+          "pcti": 0.672213
         },
         "irsad": {
           "value": 1028.7,
@@ -20802,29 +20802,29 @@
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 93,
-          "value": 1009.35,
-          "pct": 0.62,
-          "pcti": 0.575628
+          "rank": 98,
+          "value": 1014.49,
+          "pct": 0.653333,
+          "pcti": 0.603415
         },
         "ier": {
-          "rank": 88,
-          "value": 1006.047,
-          "pct": 0.586667,
-          "pcti": 0.558935
+          "rank": 97,
+          "value": 1009.317,
+          "pct": 0.646667,
+          "pcti": 0.596749
         },
         "ieo": {
-          "rank": 61,
-          "value": 962.604,
-          "pct": 0.406667,
-          "pcti": 0.403894
+          "rank": 66,
+          "value": 971.53,
+          "pct": 0.44,
+          "pcti": 0.44
         },
         "irsad": {
-          "value": 989.8,
-          "rank": 82,
-          "rankDis": 69,
-          "pct": 0.46,
-          "pcti": 0.448907
+          "value": 996.5,
+          "rank": 75,
+          "rankDis": 76,
+          "pct": 0.506667,
+          "pcti": 0.487254
         }
       },
       "Mallee": {
@@ -20846,7 +20846,7 @@
           "rank": 45,
           "value": 947.989,
           "pct": 0.3,
-          "pcti": 0.286134
+          "pcti": 0.288907
         },
         "irsad": {
           "value": 939.3,
@@ -20872,10 +20872,10 @@
           "pcti": 0.305601
         },
         "ieo": {
-          "rank": 20,
+          "rank": 21,
           "value": 934.672,
-          "pct": 0.133333,
-          "pcti": 0.147199
+          "pct": 0.14,
+          "pcti": 0.151093
         },
         "irsad": {
           "value": 946.1,
@@ -20892,7 +20892,7 @@
           "rank": 42,
           "value": 975.485,
           "pct": 0.28,
-          "pcti": 0.310505
+          "pcti": 0.313279
         },
         "ier": {
           "rank": 41,
@@ -20919,28 +20919,28 @@
         "via": "absSa1Ced2011",
         "irsd": {
           "rank": 116,
-          "value": 1033.634,
+          "value": 1031.653,
           "pct": 0.773333,
-          "pcti": 0.753921
+          "pcti": 0.751147
         },
         "ier": {
           "rank": 121,
-          "value": 1038.421,
+          "value": 1037.239,
           "pct": 0.806667,
           "pcti": 0.806667
         },
         "ieo": {
           "rank": 95,
-          "value": 1014.385,
+          "value": 1014.907,
           "pct": 0.633333,
-          "pcti": 0.62224
+          "pcti": 0.627787
         },
         "irsad": {
-          "value": 1021.3,
-          "rank": 50,
-          "rankDis": 101,
-          "pct": 0.673333,
-          "pcti": 0.640054
+          "value": 1019.7,
+          "rank": 53,
+          "rankDis": 98,
+          "pct": 0.653333,
+          "pcti": 0.628374
         }
       },
       "McEwen": {
@@ -20979,7 +20979,7 @@
           "rank": 18,
           "value": 948.188,
           "pct": 0.12,
-          "pcti": 0.122773
+          "pcti": 0.125546
         },
         "ier": {
           "rank": 81,
@@ -20991,7 +20991,7 @@
           "rank": 37,
           "value": 942.939,
           "pct": 0.246667,
-          "pcti": 0.193976
+          "pcti": 0.196749
         },
         "irsad": {
           "value": 960.4,
@@ -21005,10 +21005,10 @@
         "state": "VIC",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 54,
+          "rank": 55,
           "value": 983.23,
-          "pct": 0.36,
-          "pcti": 0.337814
+          "pct": 0.366667,
+          "pcti": 0.341708
         },
         "ier": {
           "rank": 69,
@@ -21020,7 +21020,7 @@
           "rank": 43,
           "value": 947.552,
           "pct": 0.286667,
-          "pcti": 0.294987
+          "pcti": 0.29776
         },
         "irsad": {
           "value": 967.2,
@@ -21037,19 +21037,19 @@
           "rank": 99,
           "value": 1014.615,
           "pct": 0.66,
-          "pcti": 0.682186
+          "pcti": 0.679413
         },
         "ier": {
           "rank": 84,
           "value": 1003.609,
           "pct": 0.56,
-          "pcti": 0.618237
+          "pcti": 0.615464
         },
         "ieo": {
           "rank": 85,
           "value": 995.6,
           "pct": 0.566667,
-          "pcti": 0.588853
+          "pcti": 0.586079
         },
         "irsad": {
           "value": 1013.6,
@@ -21063,10 +21063,10 @@
         "state": "VIC",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 87,
+          "rank": 88,
           "value": 1006.002,
-          "pct": 0.58,
-          "pcti": 0.58832
+          "pct": 0.586667,
+          "pcti": 0.592213
         },
         "ier": {
           "rank": 2,
@@ -21101,7 +21101,7 @@
           "rank": 44,
           "value": 977.385,
           "pct": 0.293333,
-          "pcti": 0.304426
+          "pcti": 0.307199
         },
         "ieo": {
           "rank": 146,
@@ -21198,10 +21198,10 @@
         },
         "irsad": {
           "value": 998.1,
-          "rank": 71,
-          "rankDis": 80,
-          "pct": 0.533333,
-          "pcti": 0.536106
+          "rank": 70,
+          "rankDis": 81,
+          "pct": 0.54,
+          "pcti": 0.54
         }
       },
       "Moore": {
@@ -21249,17 +21249,17 @@
           "pcti": 0.561653
         },
         "ieo": {
-          "rank": 121,
+          "rank": 122,
           "value": 1065.015,
-          "pct": 0.806667,
-          "pcti": 0.80112
+          "pct": 0.813333,
+          "pcti": 0.805013
         },
         "irsad": {
           "value": 1039.5,
           "rank": 34,
           "rankDis": 117,
           "pct": 0.78,
-          "pcti": 0.77168
+          "pcti": 0.774454
         }
       },
       "Murray": {
@@ -21278,10 +21278,10 @@
           "pcti": 0.24224
         },
         "ieo": {
-          "rank": 27,
+          "rank": 28,
           "value": 937.7,
-          "pct": 0.18,
-          "pcti": 0.185546
+          "pct": 0.186667,
+          "pcti": 0.18944
         },
         "irsad": {
           "value": 941.2,
@@ -21304,7 +21304,7 @@
           "rank": 28,
           "value": 963.987,
           "pct": 0.186667,
-          "pcti": 0.194987
+          "pcti": 0.19776
         },
         "ieo": {
           "rank": 47,
@@ -21339,7 +21339,7 @@
           "rank": 92,
           "value": 1010.419,
           "pct": 0.613333,
-          "pcti": 0.613333
+          "pcti": 0.61056
         },
         "irsad": {
           "value": 986.8,
@@ -21385,7 +21385,7 @@
           "rank": 51,
           "value": 981.496,
           "pct": 0.34,
-          "pcti": 0.34
+          "pcti": 0.342773
         },
         "ier": {
           "rank": 68,
@@ -21411,10 +21411,10 @@
         "state": "QLD",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 53,
+          "rank": 54,
           "value": 982.946,
-          "pct": 0.353333,
-          "pcti": 0.331147
+          "pct": 0.36,
+          "pcti": 0.335041
         },
         "ier": {
           "rank": 87,
@@ -21426,43 +21426,43 @@
           "rank": 73,
           "value": 977.353,
           "pct": 0.486667,
-          "pcti": 0.464481
+          "pcti": 0.461708
         },
         "irsad": {
           "value": 989.9,
-          "rank": 81,
-          "rankDis": 70,
-          "pct": 0.466667,
-          "pcti": 0.46112
+          "rank": 82,
+          "rankDis": 69,
+          "pct": 0.46,
+          "pcti": 0.454454
         }
       },
       "Page": {
         "state": "NSW",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 12,
+          "rank": 13,
           "value": 933.33,
-          "pct": 0.08,
-          "pcti": 0.08
+          "pct": 0.086667,
+          "pcti": 0.083894
         },
         "ier": {
-          "rank": 14,
+          "rank": 13,
           "value": 946.708,
-          "pct": 0.093333,
-          "pcti": 0.104426
+          "pct": 0.086667,
+          "pcti": 0.100533
         },
         "ieo": {
-          "rank": 14,
+          "rank": 15,
           "value": 928.277,
-          "pct": 0.093333,
-          "pcti": 0.118292
+          "pct": 0.1,
+          "pcti": 0.122186
         },
         "irsad": {
           "value": 923,
-          "rank": 140,
-          "rankDis": 11,
-          "pct": 0.073333,
-          "pcti": 0.067787
+          "rank": 139,
+          "rankDis": 12,
+          "pct": 0.08,
+          "pcti": 0.074454
         }
       },
       "Parkes": {
@@ -21504,10 +21504,10 @@
           "pcti": 0.377705
         },
         "ier": {
-          "rank": 16,
+          "rank": 15,
           "value": 947.372,
-          "pct": 0.106667,
-          "pcti": 0.10112
+          "pct": 0.1,
+          "pcti": 0.097227
         },
         "ieo": {
           "rank": 112,
@@ -21517,10 +21517,10 @@
         },
         "irsad": {
           "value": 992.4,
-          "rank": 78,
-          "rankDis": 73,
-          "pct": 0.486667,
-          "pcti": 0.533811
+          "rank": 79,
+          "rankDis": 72,
+          "pct": 0.48,
+          "pcti": 0.529918
         }
       },
       "Paterson": {
@@ -21533,10 +21533,10 @@
           "pcti": 0.256106
         },
         "ier": {
-          "rank": 57,
+          "rank": 58,
           "value": 988.066,
-          "pct": 0.38,
-          "pcti": 0.399413
+          "pct": 0.386667,
+          "pcti": 0.403306
         },
         "ieo": {
           "rank": 31,
@@ -21546,10 +21546,10 @@
         },
         "irsad": {
           "value": 961.8,
-          "rank": 116,
-          "rankDis": 35,
-          "pct": 0.233333,
-          "pcti": 0.22224
+          "rank": 115,
+          "rankDis": 36,
+          "pct": 0.24,
+          "pcti": 0.228907
         }
       },
       "Pearce": {
@@ -21559,7 +21559,7 @@
           "rank": 107,
           "value": 1027.771,
           "pct": 0.713333,
-          "pcti": 0.671735
+          "pcti": 0.674508
         },
         "ier": {
           "rank": 143,
@@ -21571,7 +21571,7 @@
           "rank": 70,
           "value": 974.833,
           "pct": 0.466667,
-          "pcti": 0.444481
+          "pcti": 0.441708
         },
         "irsad": {
           "value": 1031.5,
@@ -21607,7 +21607,7 @@
           "rank": 48,
           "rankDis": 103,
           "pct": 0.686667,
-          "pcti": 0.703306
+          "pcti": 0.700533
         }
       },
       "Petrie": {
@@ -21629,43 +21629,43 @@
           "rank": 60,
           "value": 960.582,
           "pct": 0.4,
-          "pcti": 0.40832
+          "pcti": 0.405546
         },
         "irsad": {
           "value": 988.9,
           "rank": 85,
           "rankDis": 66,
           "pct": 0.44,
-          "pcti": 0.442773
+          "pcti": 0.44
         }
       },
       "Port Adelaide": {
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 13,
-          "value": 934.184,
-          "pct": 0.086667,
-          "pcti": 0.078347
+          "rank": 5,
+          "value": 919.857,
+          "pct": 0.033333,
+          "pcti": 0.033333
         },
         "ier": {
-          "rank": 9,
-          "value": 943.636,
-          "pct": 0.06,
-          "pcti": 0.062773
+          "rank": 6,
+          "value": 934.876,
+          "pct": 0.04,
+          "pcti": 0.04
         },
         "ieo": {
-          "rank": 25,
-          "value": 936.286,
-          "pct": 0.166667,
-          "pcti": 0.150028
+          "rank": 10,
+          "value": 920.147,
+          "pct": 0.066667,
+          "pcti": 0.066667
         },
         "irsad": {
-          "value": 928.8,
-          "rank": 139,
-          "rankDis": 12,
-          "pct": 0.08,
-          "pcti": 0.082773
+          "value": 913.9,
+          "rank": 146,
+          "rankDis": 5,
+          "pct": 0.033333,
+          "pcti": 0.041653
         }
       },
       "Rankin": {
@@ -21681,20 +21681,20 @@
           "rank": 66,
           "value": 992.269,
           "pct": 0.44,
-          "pcti": 0.392856
+          "pcti": 0.395628
         },
         "ieo": {
-          "rank": 26,
+          "rank": 27,
           "value": 937.124,
-          "pct": 0.173333,
-          "pcti": 0.159467
+          "pct": 0.18,
+          "pcti": 0.163361
         },
         "irsad": {
           "value": 969.5,
           "rank": 104,
           "rankDis": 47,
           "pct": 0.313333,
-          "pcti": 0.277282
+          "pcti": 0.280054
         }
       },
       "Reid": {
@@ -21710,7 +21710,7 @@
           "rank": 47,
           "value": 979.756,
           "pct": 0.313333,
-          "pcti": 0.307787
+          "pcti": 0.31056
         },
         "ieo": {
           "rank": 124,
@@ -21749,10 +21749,10 @@
         },
         "irsad": {
           "value": 964.2,
-          "rank": 113,
-          "rankDis": 38,
-          "pct": 0.253333,
-          "pcti": 0.322663
+          "rank": 112,
+          "rankDis": 39,
+          "pct": 0.26,
+          "pcti": 0.326557
         }
       },
       "Riverina": {
@@ -21768,20 +21768,20 @@
           "rank": 51,
           "value": 982.207,
           "pct": 0.34,
-          "pcti": 0.342773
+          "pcti": 0.345546
         },
         "ieo": {
           "rank": 42,
           "value": 946.413,
           "pct": 0.28,
-          "pcti": 0.282773
+          "pcti": 0.285546
         },
         "irsad": {
           "value": 960.5,
           "rank": 118,
           "rankDis": 33,
           "pct": 0.22,
-          "pcti": 0.22
+          "pcti": 0.222773
         }
       },
       "Robertson": {
@@ -21791,7 +21791,7 @@
           "rank": 80,
           "value": 1001.784,
           "pct": 0.533333,
-          "pcti": 0.563839
+          "pcti": 0.566612
         },
         "ier": {
           "rank": 76,
@@ -21807,10 +21807,10 @@
         },
         "irsad": {
           "value": 996.2,
-          "rank": 75,
-          "rankDis": 76,
-          "pct": 0.506667,
-          "pcti": 0.526079
+          "rank": 76,
+          "rankDis": 75,
+          "pct": 0.5,
+          "pcti": 0.522186
         }
       },
       "Ryan": {
@@ -21852,10 +21852,10 @@
           "pcti": 0.313333
         },
         "ier": {
-          "rank": 92,
+          "rank": 91,
           "value": 1007.303,
-          "pct": 0.613333,
-          "pcti": 0.580054
+          "pct": 0.606667,
+          "pcti": 0.576161
         },
         "ieo": {
           "rank": 51,
@@ -21878,13 +21878,13 @@
           "rank": 45,
           "value": 976.461,
           "pct": 0.3,
-          "pcti": 0.324959
+          "pcti": 0.327732
         },
         "ier": {
-          "rank": 56,
+          "rank": 57,
           "value": 986.442,
-          "pct": 0.373333,
-          "pcti": 0.406612
+          "pct": 0.38,
+          "pcti": 0.410505
         },
         "ieo": {
           "rank": 35,
@@ -21910,10 +21910,10 @@
           "pcti": 0.737227
         },
         "ier": {
-          "rank": 93,
+          "rank": 92,
           "value": 1008.098,
-          "pct": 0.62,
-          "pcti": 0.617227
+          "pct": 0.613333,
+          "pcti": 0.613333
         },
         "ieo": {
           "rank": 104,
@@ -21923,10 +21923,10 @@
         },
         "irsad": {
           "value": 1038,
-          "rank": 38,
-          "rankDis": 113,
-          "pct": 0.753333,
-          "pcti": 0.764426
+          "rank": 39,
+          "rankDis": 112,
+          "pct": 0.746667,
+          "pcti": 0.760533
         }
       },
       "Stirling": {
@@ -21939,10 +21939,10 @@
           "pcti": 0.663894
         },
         "ier": {
-          "rank": 94,
+          "rank": 93,
           "value": 1008.16,
-          "pct": 0.626667,
-          "pcti": 0.62944
+          "pct": 0.62,
+          "pcti": 0.625546
         },
         "ieo": {
           "rank": 111,
@@ -21963,38 +21963,38 @@
         "via": "absSa1Ced2011",
         "irsd": {
           "rank": 104,
-          "value": 1023.745,
+          "value": 1024.225,
           "pct": 0.693333,
-          "pcti": 0.69888
+          "pcti": 0.701653
         },
         "ier": {
           "rank": 70,
-          "value": 994.816,
+          "value": 994.788,
           "pct": 0.466667,
           "pcti": 0.486079
         },
         "ieo": {
           "rank": 118,
-          "value": 1053.516,
+          "value": 1055.424,
           "pct": 0.786667,
           "pcti": 0.786667
         },
         "irsad": {
-          "value": 1020.8,
-          "rank": 51,
-          "rankDis": 100,
-          "pct": 0.666667,
-          "pcti": 0.680533
+          "value": 1021.5,
+          "rank": 50,
+          "rankDis": 101,
+          "pct": 0.673333,
+          "pcti": 0.684426
         }
       },
       "Swan": {
         "state": "WA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 97,
+          "rank": 96,
           "value": 1011.023,
-          "pct": 0.646667,
-          "pcti": 0.613388
+          "pct": 0.64,
+          "pcti": 0.609495
         },
         "ier": {
           "rank": 45,
@@ -22010,10 +22010,10 @@
         },
         "irsad": {
           "value": 1020.3,
-          "rank": 52,
-          "rankDis": 99,
-          "pct": 0.66,
-          "pcti": 0.654454
+          "rank": 51,
+          "rankDis": 100,
+          "pct": 0.666667,
+          "pcti": 0.658347
         }
       },
       "Sydney": {
@@ -22090,46 +22090,46 @@
           "pcti": 0.371626
         },
         "ieo": {
-          "rank": 15,
+          "rank": 16,
           "value": 928.461,
-          "pct": 0.1,
-          "pcti": 0.124959
+          "pct": 0.106667,
+          "pcti": 0.128853
         },
         "irsad": {
           "value": 953.8,
           "rank": 123,
           "rankDis": 28,
           "pct": 0.186667,
-          "pcti": 0.19776
+          "pcti": 0.200533
         }
       },
       "Wakefield": {
         "state": "SA",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 4,
-          "value": 910.722,
-          "pct": 0.026667,
-          "pcti": 0.026667
+          "rank": 6,
+          "value": 920.456,
+          "pct": 0.04,
+          "pcti": 0.034454
         },
         "ier": {
-          "rank": 10,
-          "value": 944.455,
-          "pct": 0.066667,
-          "pcti": 0.058347
+          "rank": 17,
+          "value": 952.763,
+          "pct": 0.113333,
+          "pcti": 0.093921
         },
         "ieo": {
           "rank": 1,
-          "value": 885.324,
+          "value": 892.493,
           "pct": 0.006667,
-          "pcti": 0.006667
+          "pcti": 0.00944
         },
         "irsad": {
-          "value": 902.3,
-          "rank": 148,
-          "rankDis": 3,
-          "pct": 0.02,
-          "pcti": 0.014454
+          "value": 911.3,
+          "rank": 147,
+          "rankDis": 4,
+          "pct": 0.026667,
+          "pcti": 0.02112
         }
       },
       "Wannon": {
@@ -22148,17 +22148,17 @@
           "pcti": 0.363894
         },
         "ieo": {
-          "rank": 62,
+          "rank": 61,
           "value": 963.139,
-          "pct": 0.413333,
-          "pcti": 0.40224
+          "pct": 0.406667,
+          "pcti": 0.398347
         },
         "irsad": {
           "value": 963.6,
-          "rank": 114,
-          "rankDis": 37,
-          "pct": 0.246667,
-          "pcti": 0.252213
+          "rank": 113,
+          "rankDis": 38,
+          "pct": 0.253333,
+          "pcti": 0.256106
         }
       },
       "Warringah": {
@@ -22194,16 +22194,16 @@
         "state": "NSW",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 7,
+          "rank": 8,
           "value": 927.827,
-          "pct": 0.046667,
-          "pcti": 0.068853
+          "pct": 0.053333,
+          "pcti": 0.072746
         },
         "ier": {
-          "rank": 7,
+          "rank": 8,
           "value": 939.327,
-          "pct": 0.046667,
-          "pcti": 0.068853
+          "pct": 0.053333,
+          "pcti": 0.072746
         },
         "ieo": {
           "rank": 81,
@@ -22232,7 +22232,7 @@
           "rank": 82,
           "value": 1001.711,
           "pct": 0.546667,
-          "pcti": 0.607677
+          "pcti": 0.604904
         },
         "ieo": {
           "rank": 149,
@@ -22271,10 +22271,10 @@
         },
         "irsad": {
           "value": 965,
-          "rank": 112,
-          "rankDis": 39,
-          "pct": 0.26,
-          "pcti": 0.282186
+          "rank": 111,
+          "rankDis": 40,
+          "pct": 0.266667,
+          "pcti": 0.286079
         }
       },
       "Wide Bay": {
@@ -22287,16 +22287,16 @@
           "pcti": 0.106667
         },
         "ier": {
-          "rank": 31,
+          "rank": 33,
           "value": 966.341,
-          "pct": 0.206667,
-          "pcti": 0.212213
+          "pct": 0.22,
+          "pcti": 0.22
         },
         "ieo": {
-          "rank": 23,
+          "rank": 25,
           "value": 935.939,
-          "pct": 0.153333,
-          "pcti": 0.164426
+          "pct": 0.166667,
+          "pcti": 0.172213
         },
         "irsad": {
           "value": 937.8,
@@ -22316,10 +22316,10 @@
           "pcti": 0.576585
         },
         "ier": {
-          "rank": 34,
+          "rank": 35,
           "value": 968.047,
-          "pct": 0.226667,
-          "pcti": 0.246079
+          "pct": 0.233333,
+          "pcti": 0.249972
         },
         "ieo": {
           "rank": 114,
@@ -22339,10 +22339,10 @@
         "state": "QLD",
         "via": "absSa1Ced2011",
         "irsd": {
-          "rank": 88,
+          "rank": 89,
           "value": 1006.364,
-          "pct": 0.586667,
-          "pcti": 0.561708
+          "pct": 0.593333,
+          "pcti": 0.562828
         },
         "ier": {
           "rank": 132,

@@ -300,7 +300,7 @@ SEIFA_YEARS.forEach((y) => {
          first cut points), none at 2016 (its census sat five weeks after
          election day, so pcti ≈ rank) */
       const moved = names.filter((nm) => fifthOf(ix, raOf.get(nm)) !== fifthOf(ix, rankAdvOf(ix, blk[nm], n))).length;
-      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 8, 2016: 0, 2019: 14 }, ier: { 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
       names.forEach((nm) => {
         assert.ok(blk[nm][ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);

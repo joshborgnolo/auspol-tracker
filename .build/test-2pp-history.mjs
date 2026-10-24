@@ -252,7 +252,7 @@ AEC_YEARS.forEach((y) => {
         assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
         pctiRa = pctiRankOf(mem, ix);
         const moved = Object.keys(mem).filter((d) => fifthOf(ix, pctiRa.get(d)) !== fifthOf(ix, rankAdvOf(ix, mem[d], n))).length;
-        assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 10, 2016: 0, 2019: 14 }, ier: { 2013: 16, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+        assert.equal(moved, { irsad: { 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2013: 8, 2016: 0, 2019: 14 }, ier: { 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
       } else {
         Object.entries(mem).forEach(([d, c]) => {
           assert.ok(c[ix].pcti === undefined, `${y} ${d}: no pcti outside the factor years`);
