@@ -87,21 +87,45 @@ and per-state series' gaps – counted figures are shown for every base that
 exists, as the per-state series does; the printed ballots table beside each
 column says how wide the base is (eyeball small numbers as such).
 
+THE IRSAD-FIFTH LANE (2026-10-24, user: add the ABS socio-economic cuts
+beside the AEC classifications in the explainer menu views; approved
+decisions: quintile bands, IRSAD only, all three measures – this is the
+flows measure): the same two counted products regrouped by the fifth of
+seats each election's ABS SEIFA IRSAD rank places a division in –
+seifa_quintiles.membership() reads the store's rankDis (rank 1 = MOST
+disadvantaged), thirty seats a fifth, the 151-seat 2019/2022 chambers
+giving the spare seat to the most-advantaged fifth. The quintiles sit in
+the store's `seifa` block beside `classes`, in the same shapes
+(classes/allSeats over years 2001–2025 – the seifa store's floor), and
+gen-data merges them into the flowHistory classes bank after the four
+classification views, where every chart and menu reads them untouched
+(the fedClass machinery – classic rings before 2004, est diamonds – is
+shared at gen-data emit; only the captions fork on the record's seifa
+marker). The grouping functions parse()/allseats_for_year() take a
+label set as of the same change, so the lane runs the byte-identical
+derivation, never a clone.
+
 Writes data/fed-class-flows.json:
 { "source": …, "years": […], "classes": { "inner": { "label", "short",
   "grn", "onp", "oth", "votes" }, … }, "allSeats": { "inner": { "grn",
   "onp", "oth", "lump", "votes", "lumpVotes", "est" }, … },
-  "classicSeats": […], "divisions": […] }
+  "seifa": { "years": […], "classes": { "q1": { "label", "short", "desc",
+  "grn", "onp", "oth", "votes" }, … }, "allSeats": { "q1": { …same… } },
+  }, "classicSeats": […], "divisions": […] }
 Shares are per cent to 0.1; votes are each bucket's [to-ALP, to-Coalition]
 ballot counts (the test re-combines the four classes into the same files'
 national totals; gen-data emits the shares alone). The allSeats block is
 null-free from 2004; its 1996–2001 per-bucket cells are null and its lump
 cells sum the classic buckets (no all-seats product exists for those
-years). Key order is the chart's: inner, outer, provincial, rural.
+years). Key order is the chart's: inner, outer, provincial, rural. The
+seifa block's classes/allSeats mirror those two shapes exactly, keyed
+q1..q5, years 2001–2025.
 
 Pinned by .build/test-fed-class-flows.mjs.
 """
 import collections, csv, gzip, json, os
+
+from seifa_quintiles import QUINT_META, QUINTS, SEIFA_YEARS, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "aec-flow-src")
@@ -198,9 +222,11 @@ def tcp_classic_flows(year):
     return out, len(divs), cross
 
 
-def parse(year, class_of):
+def parse(year, class_of, labels=CLASSES):
     """Per-class bucket ballots: {class: {bucket: [to_alp, to_coalition]}}
-    for the year's classic divisions; also (classic, total) division counts."""
+    for the year's classic divisions; also (classic, total) division counts.
+    labels is the grouping's label set – the AEC four classes by default;
+    main()'s IRSAD-fifth lane passes its quintile keys instead."""
     per = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
     classic = 0
     if year <= 2001:
@@ -216,8 +242,8 @@ def parse(year, class_of):
             cls = class_of.get(name)
             if cls is None:
                 raise SystemExit(f"{year}: division {name!r} matches no classification row")
-            if cls not in CLASSES:
-                raise SystemExit(f"{year}: {name!r} class {cls!r} is not an AEC four-class label")
+            if cls not in labels:
+                raise SystemExit(f"{year}: {name!r} group {cls!r} is not one of the grouping labels")
             classic += 1
             ai = 0 if pair[0] in LABOR else 1
             for party, n1, n2 in d["from"]:
@@ -231,8 +257,8 @@ def parse(year, class_of):
         cls = class_of.get(name)
         if cls is None:
             raise SystemExit(f"{year}: division {name!r} matches no classification row")
-        if cls not in CLASSES:
-            raise SystemExit(f"{year}: {name!r} class {cls!r} is not an AEC four-class label")
+        if cls not in labels:
+            raise SystemExit(f"{year}: {name!r} group {cls!r} is not one of the grouping labels")
         classic += 1
         for bk in BUCKETS:
             a, l = b.get(bk, (0.0, 0.0))
@@ -330,14 +356,15 @@ def state_bucket_flows(year):
     return per, drift
 
 
-def allseats_for_year(year, class_of):
+def allseats_for_year(year, class_of, labels=CLASSES):
     """The year's all-seats class figures, 2004 on:
     {class: {"votes": {bucket: [toALP,toCOAL]|None}, "lump": [toALP,toCOAL],
              "est": {bucket}} – the per-bucket split over every seat,
     exact where a state's non-classic seats share a class and allocated
     over bucket first preferences (flagged est) where they span them; the
     lump is the buckets summed. Breaching a product-consistency guard
-    exits the run – a wall of data is better than a quiet wrong figure."""
+    exits the run – a wall of data is better than a quiet wrong figure.
+    labels is the grouping's label set (see parse())."""
     classic_flows, _, cross = tcp_classic_flows(year)
     fp = first_prefs_by_div(year)
     tpp = tppdiv_totals(year)
@@ -346,8 +373,8 @@ def allseats_for_year(year, class_of):
         rec = class_of.get(name)
         if rec is None:
             raise SystemExit(f"{year}: division {name!r} matches no classification row")
-        if rec["classification"] not in CLASSES:
-            raise SystemExit(f"{year}: {name!r} class {rec['classification']!r} is not an AEC four-class label")
+        if rec["classification"] not in labels:
+            raise SystemExit(f"{year}: {name!r} group {rec['classification']!r} is not one of the grouping labels")
     # per-division TPP pair minus the majors' first preferences – a
     # drift-loaded cross-check figure (it carries Coalition→ALP
     # three-cornered ballots), so it feeds only the consistency guard,
@@ -406,8 +433,8 @@ def allseats_for_year(year, class_of):
                              f"{nc_drift:.0f} != per-division minors {mn[1]:.0f} (side 1)")
     # assign the leftovers to classes – exactly for single-class states,
     # over bucket first preferences otherwise
-    acc = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in CLASSES}
-    est = {cls: set() for cls in CLASSES}
+    acc = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in labels}
+    est = {cls: set() for cls in labels}
     for st, bycls in nc.items():
         if len(bycls) == 1:
             cls = next(iter(bycls))
@@ -432,7 +459,7 @@ def allseats_for_year(year, class_of):
                     est[cls].add(bk)
     # classic + assigned = all seats; the lump is the buckets summed (they
     # partition the non-major ballot space)
-    classic_sums = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in CLASSES}
+    classic_sums = {cls: collections.defaultdict(lambda: [0.0, 0.0]) for cls in labels}
     for name, b in classic_flows.items():
         cls = class_of[name]["classification"]
         for bk in BUCKETS:
@@ -440,7 +467,7 @@ def allseats_for_year(year, class_of):
             classic_sums[cls][bk][0] += a
             classic_sums[cls][bk][1] += l
     out = {}
-    for cls in CLASSES:
+    for cls in labels:
         lump = [0.0, 0.0]
         vote = {}
         for bk in BUCKETS:
@@ -495,6 +522,47 @@ def main():
                                          if lump[0] + lump[1] else None)
             allseats[cls]["lumpVotes"].append([round(lump[0]),
                                                round(lump[1])] if lump[0] + lump[1] else None)
+    # the IRSAD-fifth lane: the same two derivations with the quintile
+    # membership as the grouping; QUINT_KEYS as labels arms parse()'s and
+    # allseats_for_year()'s group checks for the quintile keys
+    QUINT_KEYS = {q: None for q in QUINTS}
+    quint = {q: {"label": lbl, "short": short, "desc": desc,
+                 **{b: [] for b in BUCKETS}, "votes": {b: [] for b in BUCKETS}}
+             for q, lbl, short, desc in QUINT_META}
+    quint_all = {q: {"lump": [], "lumpVotes": [],
+                     **{b: {"share": [], "votes": [], "est": []} for b in BUCKETS}}
+                 for q in QUINTS}
+    q_ballots = {q: collections.defaultdict(list) for q in QUINTS}
+    for y in SEIFA_YEARS:
+        mem = seifa_membership(y)
+        class_of = {n: r["classification"] for n, r in mem.items()}
+        per, _, _ = parse(y, class_of, labels=QUINT_KEYS)
+        cells = allseats_for_year(y, mem, labels=QUINT_KEYS) if y >= ALLSEAT_FROM else None
+        for q in QUINTS:
+            got = per.get(q, {})
+            for b in BUCKETS:
+                a, l = got.get(b, (0.0, 0.0))
+                quint[q][b].append(round(100 * a / (a + l), 1) if a + l else None)
+                quint[q]["votes"][b].append([round(a), round(l)] if a + l else None)
+                q_ballots[q][b].append(round(a + l))
+            if cells is not None:
+                lump = cells[q]["lump"]
+                for b in BUCKETS:
+                    v = cells[q]["votes"][b]
+                    quint_all[q][b]["share"].append(round(100 * v[0] / (v[0] + v[1]), 1) if v else None)
+                    quint_all[q][b]["votes"].append([round(v[0]), round(v[1])] if v else None)
+                    quint_all[q][b]["est"].append(b in cells[q]["est"])
+            else:
+                lump = [sum(got.get(b, (0.0, 0.0))[0] for b in BUCKETS),
+                        sum(got.get(b, (0.0, 0.0))[1] for b in BUCKETS)]  # classic lumps
+                for b in BUCKETS:
+                    quint_all[q][b]["share"].append(None)
+                    quint_all[q][b]["votes"].append(None)
+                    quint_all[q][b]["est"].append(False)
+            quint_all[q]["lump"].append(round(100 * lump[0] / (lump[0] + lump[1]), 1)
+                                        if lump[0] + lump[1] else None)
+            quint_all[q]["lumpVotes"].append([round(lump[0]),
+                                              round(lump[1])] if lump[0] + lump[1] else None)
     out = {"source": "AEC two-candidate-preferred flow of preferences by division, 1996–2025, "
                      "grouped by the AEC's own per-election division classifications (classic seats); "
                      "allSeats block counted from the TPP-by-division, first-preference and "
@@ -508,6 +576,15 @@ def main():
                "lumpVotes": allseats[cls]["lumpVotes"],
                "est": {b: allseats[cls][b]["est"] for b in BUCKETS}}
                for cls in CLASSES},
+           "seifa": {"years": list(SEIFA_YEARS),
+                     "classes": {q: quint[q] for q in QUINTS},
+                     "allSeats": {q: {
+                         "grn": quint_all[q]["grn"]["share"], "onp": quint_all[q]["onp"]["share"],
+                         "oth": quint_all[q]["oth"]["share"], "lump": quint_all[q]["lump"],
+                         "votes": {b: quint_all[q][b]["votes"] for b in BUCKETS},
+                         "lumpVotes": quint_all[q]["lumpVotes"],
+                         "est": {b: quint_all[q][b]["est"] for b in BUCKETS}}
+                         for q in QUINTS}},
            "classicSeats": n_classic, "divisions": n_divs}
     dest = os.path.join(ROOT, "data", "fed-class-flows.json")
     with open(dest, "w") as f:
@@ -530,6 +607,17 @@ def main():
             row = "  ".join("   –   " if v is None else f"{v:5.1f}" for v in allseats[cls][b]["share"])
             est = "".join("*" if e else " " for e in allseats[cls][b]["est"])
             print(f"  {CLASSES[cls][0] + ' ' + b:<20} {row}   est: {est}")
+    print("\nIRSAD fifths, classic seats (share to ALP, %):")
+    for q, lbl, _, _ in QUINT_META:
+        c = quint[q]
+        for b in BUCKETS:
+            cells = "  ".join("   –   " if v is None else f"{v:5.1f}" for v in c[b])
+            print(f"{lbl + ' ' + b:<34} {cells}   ballots: "
+                  + ",".join(str(n) for n in q_ballots[q][b]))
+    print("IRSAD fifths, all-seats 2004 on (share to ALP, %):")
+    for q, lbl, _, _ in QUINT_META:
+        row = "  ".join("   –   " if v is None else f"{v:5.1f}" for v in quint_all[q]["lump"])
+        print(f"  {lbl + ' lump':<32} {row}")
     print(f"wrote {dest}")
 
 

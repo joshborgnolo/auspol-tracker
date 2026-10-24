@@ -1,6 +1,11 @@
 """aec-primary-history.py – the national + per-state PRIMARY-VOTE history
 behind the /flows-explained/ chart's "View: Primary votes" flip.
 
+IRSAD fifths 2001–2025 ride beside the class cuts in fed.classes
+(seifa_quintiles membership; the quintile cell of a flow-history class is
+the mean of its division cells, so this script's per-division votes roll
+up the same way).
+
 One series per party family at every federal election, as % of formal first
 preferences: two majors always drawn, the era's named minors drawn only
 where they polled at least FOLD_PT (4%) in that view that election, in
@@ -55,6 +60,8 @@ Usage: python3 .build/aec-primary-history.py [--check]
   default writes data/primary-history.json; --check re-derives and compares.
 """
 import csv, gzip, io, json, os, sys, urllib.request
+
+from seifa_quintiles import QUINT_META, SEIFA_YEARS, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -418,10 +425,43 @@ def class_shares(blocks):
             out[ck][y] = shares({"c": per[ck]})["c"][1]
     return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
 
+def quint_shares():
+    """({quintKey: {year: pcts}}, {year: nat pcts}) over SEIFA_YEARS: the
+       same hcands/dop per-division first preferences regrouped by
+       seifa_quintiles' membership (rankDis 1 = most disadvantaged). 2001
+       rides hcands, the downloads era the same dop read the class lane
+       uses; the join asserts exact like the class lane's, and recon must
+       equal the class lane's nat sums – the same ballots partitioned two
+       ways."""
+    out = {q: {} for q, _, _, _ in QUINT_META}
+    recon = {}
+    for y in SEIFA_YEARS:
+        mem = seifa_membership(y)
+        votes = hcands_class_votes(y) if y < 2004 else dop_class_votes(y)
+        assert set(votes) == set(mem), \
+            f"{y}: IRSAD-quintile join drifted - counted {sorted(set(votes) - set(mem))[:3]}, quintilised-only {sorted(set(mem) - set(votes))[:3]}"
+        per = {q: {} for q, _, _, _ in QUINT_META}
+        nat = {}
+        for div, bks in votes.items():
+            qk = mem[div]["classification"]
+            for b, v in bks.items():
+                per[qk][b] = per[qk].get(b, 0.0) + v
+                nat[b] = nat.get(b, 0.0) + float(v)
+        recon[y] = nat
+        for qk, _, _, _ in QUINT_META:
+            out[qk][y] = shares({"q": per[qk]})["q"][1]
+    return out, {y: shares({"n": nat})["n"][1] for y, nat in recon.items()}
+
 # ---- history-aware emit ------------------------------------------------------
-def fold_series(year_rows):
+def fold_series(year_rows, fold_pt=FOLD_PT):
     """year_rows: {year: {bucket: pct}} with raw buckets (unaligned ok).
-       Returns (years, {bucket: [values|None aligned to years]})."""
+       Returns (years, {bucket: [values|None aligned to years]}).
+       fold_pt is FOLD_PT everywhere but the IRSAD-fifth lane: a fifth is
+       30-31 seats where a bucket polling ~4% nationally lands 1.7–9%, so
+       the shared 4% gate would knock out cells a class view of the same
+       size draws; the lane passes FOLD_PT/2 (quintile cells of a class
+       view must fold to the class view's nulls, and the national gate
+       stays untouched)."""
     years = sorted(year_rows)
     out = {b: [] for b in ALL_BUCKETS}
     for y in years:
@@ -429,7 +469,7 @@ def fold_series(year_rows):
         shown = {"alp", "lnp"}
         for g in GATED:
             v = row.get(g)
-            if v is not None and v >= FOLD_PT:
+            if v is not None and v >= fold_pt:
                 shown.add(g)
         for b in ALL_BUCKETS:
             if b == "oth":
@@ -566,6 +606,28 @@ def build():
     for ck, label, short in CLASS_META:
         ys, ser = fold_series(class_rows[ck])
         doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats", ys, ser, short=short)
+    # The IRSAD fifths file as five more entries in the SAME classes bank,
+    # after the four classifications (the explainer menu reads the bank
+    # straight; the charts fork their captions on the seifa flag). Their
+    # fold gate is halved: a fifth prices 30-31 seats against a class
+    # view's 20-50, so the quarters the national gate nulls in a 150-seat
+    # view are still drawn here (foldSeries' docstring).
+    quint_rows, quint_recon = quint_shares()
+    assert [y for y, row in quint_rows["q1"].items() if row] == list(SEIFA_YEARS), \
+        "a seifa membership block is missing for one of SEIFA_YEARS"
+    # recomposition: the fifths partition the same ballots the class lane
+    # partitions, so their nat sums must equal the class lane's exactly
+    # (both are sums of the same per-division votes)
+    for y in SEIFA_YEARS:
+        for b in ALL_BUCKETS:
+            qa = quint_recon[y].get(b, 0.0)
+            ca = class_recon[y].get(b, 0.0)
+            assert abs(qa - ca) < 0.001, f"{y} {b} quintile recomposition {qa} != class {ca}"
+    for q, qlbl, qshort, qdesc in QUINT_META:
+        ys, ser = fold_series(quint_rows[q], fold_pt=FOLD_PT / 2)
+        doc["fed"]["classes"][q] = {"seifa": True, "foldPt": FOLD_PT / 2,
+                                    **view(qlbl, f"federal elections in the {qdesc} of seats by IRSAD rank",
+                                           ys, ser, short=qshort)}
     return doc
 
 def main():

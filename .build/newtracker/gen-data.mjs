@@ -5000,24 +5000,34 @@ const flowHistory = (() => {
   try {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     const CLASS_CUT = 2004;
-    h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => {
-      /* the all-seats block sits beside classes at the store's top */
-      const A = (fcf.allSeats || {})[k] || {};
-      const pick = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
-      const est = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
-      const ballots = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
-      const buckets = ["grn", "onp", "oth"];
-      /* the lump is estimated any year ANY bucket is */
-      const estLump = fcf.years.map((y, i) => buckets.some((b) => est(b)[i]));
-      return [k,
-        { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
-          hollowYears: fcf.years.filter((y) => y < CLASS_CUT),
-          years: [...fcf.years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
-          lump: A.lump ? [...A.lump] : null,
-          estGrn: est("grn"), estOnp: est("onp"), estOth: est("oth"), estLump,
-          ballots: Object.fromEntries([...buckets, "lump"].map((b) => [b,
-            b === "lump" ? (A.lumpVotes ? [...A.lumpVotes] : fcf.years.map(() => null)) : ballots(b)])) }];
-    }));
+    /* the lane reader: the four seat types (store classes/allSeats over
+       fcf.years) and the five IRSAD fifths (store seifa.classes/
+       seifa.allSeats over seifa.years — emitted into the SAME bank with
+       a seifa marker so the chart captions fork on S.seifa; every other
+       consumer sees one flat list of class views) run one mapping over
+       their own year arrays */
+    const laneClasses = (classes, all, years, seifa) =>
+      Object.fromEntries(Object.entries(classes).map(([k, s]) => {
+        const A = (all || {})[k] || {};
+        const pick = (b) => years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
+        const est = (b) => years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
+        const ballots = (b) => years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
+        const buckets = ["grn", "onp", "oth"];
+        const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
+        return [k,
+          { label: s.label, short: s.short,
+            elections: seifa ? "federal elections in the " + s.desc + " of seats by IRSAD rank"
+                             : "federal elections in " + s.short + " seats",
+            fedClass: true, ...(seifa ? { seifa: true } : {}),
+            hollowYears: years.filter((y) => y < CLASS_CUT),
+            years: [...years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
+            lump: A.lump ? [...A.lump] : null,
+            estGrn: est("grn"), estOnp: est("onp"), estOth: est("oth"), estLump,
+            ballots: Object.fromEntries([...buckets, "lump"].map((b) => [b,
+              b === "lump" ? (A.lumpVotes ? [...A.lumpVotes] : years.map(() => null)) : ballots(b)])) }];
+      }));
+    h.fed.classes = { ...laneClasses(fcf.classes, fcf.allSeats, fcf.years, false),
+                      ...(fcf.seifa ? laneClasses(fcf.seifa.classes, fcf.seifa.allSeats, fcf.seifa.years, true) : {}) };
   } catch { /* not yet written */ }
   let csv = null, bt = null;
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }

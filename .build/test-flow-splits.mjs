@@ -414,8 +414,22 @@ assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(
     && ap.includes('const onConPair = pair === "on" || pair === "con";')
     && ap.includes('{menuKeys.map((k) => <option key={k} value={"fed:" + k}>')
     && ap.includes('{!figView && house !== "sen" && KEYS.length > 1 && (')
-    && ap.includes('(figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map((k) => <option key={"fedcl:" + k}'),
+    && ap.includes('const menuClassKeys = figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys;'),
   "the elections menu re-reads the states from the operative bank under Upper (senOn's on the ON tab - never-on-ballot ACT out, the Coalition-only Council out) and sheds the House-only sections; the seat-class options come from the current mode's bank");
+/* 2026-10-24 (user: show the ABS SEIFA data beside the AEC's class
+   views; decisions: IRSAD fifths of thirty seats, all three measures):
+   the menu's class slice splits at the grouping change - seat types stay
+   in the federal optgroup and the five IRSAD fifths ride their own
+   "Federal, by IRSAD fifth" optgroup (each fifth's short names the index,
+   so the group label only adds the grouping word), both filtered off the
+   same menuClassKeys the arrow walk steps */
+assert.ok(ap.includes('const menuClassSeat = menuClassKeys.filter((k) => !classBank[k].seifa);')
+    && ap.includes('const menuClassSeifa = menuClassKeys.filter((k) => classBank[k].seifa);')
+    && ap.includes('{menuClassSeat.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}')
+    && ap.includes('{menuClassSeifa.length > 0 && (')
+    && ap.includes('<optgroup label="Federal, by IRSAD fifth">')
+    && ap.includes('{menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>'),
+  "the class slice splits into the seat-types-in-federal list and the IRSAD-fifths optgroup, both filtered off the one menuClassKeys the arrow walk steps");
 /* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
    vote view - eg 'Federal, provincial'"): the primary view gains the same
    four seat-class cuts off its OWN bank (PH_HIST.fed.classes, counted by

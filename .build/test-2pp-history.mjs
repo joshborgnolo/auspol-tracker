@@ -18,9 +18,18 @@
       emits Labor's cell; the Coalition cell is by construction 100 minus
       it). 1998 counts 147 divisions: Newcastle's final pair ran Labor v
       independent, so the AEC's own table omits it.
-   3. The story pins hold: the canonical records' extremes, and the urban-
-      ladder readings behind "Federal, inner metro" & "Federal, rural".
-   4. fed.sen is the IMPLIED Senate two-party (user 2026-10-24: "add House:
+   3. The IRSAD fifths ride the SAME classes bank after the four classes
+      (q1..q5, seifa: true): the same per-division counts regrouped by
+      data/division-seifa-indexes.json's rankDis (1 = most disadvantaged;
+      thirty seats a fifth, q5 taking the 151-seat years' spare), on the
+      index series' own 2001–2025 span (2001 via the HTPP table). This
+      probe recomputes the membership from the seifa store's OWN cells and
+      re-sums the downloads' counts, never seifa_quintiles.py's answer.
+   4. The story pins hold: the canonical records' extremes, the urban-
+      ladder readings behind "Federal, inner metro" & "Federal, rural",
+      and the fifths' 2025 ladder (most-disadvantaged 47.96 to most-
+      advantaged 59.08).
+   5. fed.sen is the IMPLIED Senate two-party (user 2026-10-24: "add House:
       Lower ⇄ to 2pp view (adding upper house data)") - an estimate, never
       a count: the AEC tallies no two-party figure for the Senate. This
       probe's own sums over the committed ATL tallies (.build/aec-flow-src/
@@ -30,14 +39,14 @@
       the four post-GVT events 2016–2025 and no classes (the Senate has no
       divisions), and the constant y axis prices its cells too so the
       House: flip never moves the band.
-      4b. nswLc is its ONE state-council twin (user 2026-10-24: "what about
+      5b. nswLc is its ONE state-council twin (user 2026-10-24: "what about
       state-level upper house 2pps" / "add it") - the only state upper
       house whose ballot record can be counted: the committed NSWEC
       family tallies (.build/nswec-lc-flow-src/counts.json, the same
       five family rows) recompose its four cells (2011–2023) by the same
       estimand, and the view is a top-level bank - it carries neither
       states nor classes.
-   5. gen-data emits twoPPHistory into the data asset, validate.mjs gates
+   6. gen-data emits twoPPHistory into the data asset, validate.mjs gates
       the file's shape, and the built page carries the flip wiring. */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -63,6 +72,26 @@ const STATE_SHORT = { nsw: "NSW", vic: "Vic", qld: "Qld", wa: "WA", sa: "SA", ta
 const CLASSES = ["inner", "outer", "provincial", "rural"];
 const CLS_KEY = { "inner metropolitan": "inner", "outer metropolitan": "outer",
   "provincial": "provincial", "rural": "rural" };
+/* the IRSAD fifths file as five more entries in the SAME classes bank,
+   after the four classes (2026-10-24, the user-approved ABS-SEIFA
+   addition): q1 the most-disadvantaged fifth, q5 the most-advantaged,
+   thirty seats a fifth (q5 taking the 151-seat years' spare). Span: the
+   index series' own 2001–2025 – the seifa store's floor, never the AEC
+   counts' 1996 */
+const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
+const QUINT_SHORT = {
+  q1: "most-disadvantaged IRSAD fifth",
+  q2: "second-most-disadvantaged IRSAD fifth",
+  q3: "middle IRSAD fifth",
+  q4: "second-most-advantaged IRSAD fifth",
+  q5: "most-advantaged IRSAD fifth",
+};
+const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+/* the probe's OWN quintile membership: rankDis (1 = most disadvantaged)
+   ceil-divided thirty seats a fifth, the 151-seat chambers' spare landing
+   in q5 – mirroring seifa_quintiles.quintile_of, independently */
+const quintOf = (rankDis) => "q" + Math.min(Math.floor((rankDis - 1) / 30) + 1, 5);
 /* the implied Senate two-party: the four post-GVT events (group tickets
    kept no per-ballot record before 2016), and the family rows this
    probe's own recompute sums - the same five the generator allowlists */
@@ -162,6 +191,27 @@ AEC_YEARS.forEach((y) => {
   }
   rec[y] = { nat: share(nat), perState: Object.fromEntries(STATES.map((s) => [s, share(perState[s])])),
     perClass: Object.fromEntries(CLASSES.map((c) => [c, share(perClass[c])])) };
+  if (SEIFA_YEARS.includes(y)) {
+    /* the fifth regrouping of the very same per-division counts, by this
+       probe's own membership read of the seifa store */
+    const mem = SEIFA[String(y)];
+    assert.ok(mem, `${y}: an IRSAD elections block`);
+    assert.deepEqual(Object.keys(perDiv).filter((d) => !(HTT_EXCLUDED[y] || []).includes(d)).sort(),
+      Object.keys(mem).sort(), `${y}: the IRSAD block names the counted divisions`);
+    const qs = Object.fromEntries(QUINTS.map((q) => [q, [0, 0]]));
+    for (const [div, pair] of Object.entries(perDiv)) {
+      const cell2 = mem[div];
+      assert.ok(cell2 && cell2.irsad, `${y}: ${div} carries an IRSAD cell`);
+      const q = quintOf(cell2.irsad.rankDis);
+      assert.ok(QUINTS.includes(q), `${y}: ${div} quintile ${q} in range`);
+      qs[q][0] += pair[0]; qs[q][1] += pair[1];
+    }
+    // the fifths partition the same ballots the national sum counts
+    assert.deepEqual(
+      [qs.q1[0] + qs.q2[0] + qs.q3[0] + qs.q4[0] + qs.q5[0], qs.q1[1] + qs.q2[1] + qs.q3[1] + qs.q4[1] + qs.q5[1]],
+      [nat[0], nat[1]], `${y}: the fifths recompose the national two-party count`);
+    rec[y].perQuint = Object.fromEntries(QUINTS.map((q) => [q, share(qs[q])]));
+  }
 });
 
 // ---- the data file ----------------------------------------------------------
@@ -195,17 +245,22 @@ assert.equal(LC.states, undefined, "a state election has no state cuts");
 assert.deepEqual(LC.years, LC_YEARS, "the council span: the NSWEC ballot record's four events, 2011-2023");
 assert.equal(LC.short, "NSW LC", "the menu short label");
 assert.deepEqual(Object.keys(FED.states), STATES, "the eight state cuts");
-assert.deepEqual(Object.keys(FED.classes), CLASSES, "the four class cuts, in menu order");
+assert.deepEqual(Object.keys(FED.classes), [...CLASSES, ...QUINTS], "the four class cuts then the IRSAD fifths, in menu order");
 assert.deepEqual(FED.years, NAT_YEARS, "national span: 1972–2025");
 STATES.forEach((s) => assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s}: the downloads' span`));
 STATES.forEach((s) => assert.equal(FED.states[s].short, STATE_SHORT[s], `${s}: the menu short label`));
 CLASSES.forEach((c) => assert.deepEqual(FED.classes[c].years, AEC_YEARS, `${c}: the downloads' span`));
+CLASSES.forEach((c) => assert.equal(FED.classes[c].seifa, undefined, `${c}: a seat-type cut carries no seifa flag`));
+QUINTS.forEach((q) => assert.deepEqual(FED.classes[q].years, SEIFA_YEARS, `${q}: the index series' own span`));
+QUINTS.forEach((q) => assert.equal(FED.classes[q].seifa, true, `${q}: the seifa flag the captions fork on`));
+QUINTS.forEach((q) => assert.equal(FED.classes[q].short, QUINT_SHORT[q], `${q}: the menu short`));
 const cell = (v, k, y) => v[k][v.years.indexOf(y)];
 
 /* every view: the two-line contract - numeric cells, aligned to years, and
    the pair summing to the count (the implied Senate bank's pair too: the
    estimand keeps the count's shape) */
 const allViews = [FED, ...STATES.map((s) => FED.states[s]), ...CLASSES.map((c) => FED.classes[c]),
+  ...QUINTS.map((q) => FED.classes[q]),
   SEN, ...STATES.map((s) => SEN.states[s]), LC];
 allViews.forEach((v) => {
   assert.ok(v.label && v.elections, `${v.label}: label + elections copy`);
@@ -236,6 +291,9 @@ AEC_YEARS.forEach((y) => {
     `${y} ${s}: ${rec[y].perState[s].toFixed(2)} v cell ${cell(FED.states[s], "alp", y)}`));
   CLASSES.forEach((c) => assert.ok(Math.abs(rec[y].perClass[c] - cell(FED.classes[c], "alp", y)) < 0.005,
     `${y} ${c}: ${rec[y].perClass[c].toFixed(2)} v cell ${cell(FED.classes[c], "alp", y)}`));
+  if (rec[y].perQuint)
+    QUINTS.forEach((q) => assert.ok(Math.abs(rec[y].perQuint[q] - cell(FED.classes[q], "alp", y)) < 0.005,
+      `${y} ${q}: IRSAD-fifth recompute ${rec[y].perQuint[q].toFixed(2)} v cell ${cell(FED.classes[q], "alp", y)}`));
 });
 
 /* the implied Senate cells recompute from the committed ATL tallies - this
@@ -302,6 +360,16 @@ AEC_YEARS.forEach((y) => {
   assert.ok(cell(FED.classes.rural, "alp", y) < cell(FED, "alp", y),
     `${y}: rural runs behind the national line`);
 });
+/* the fifths' ladder: the 2025 spread runs 47.96 (most-disadvantaged) to
+   59.08 (most-advantaged); the ladder has steepened since 2001, when the
+   two ends sat 48.12 v 46.93 - and every year's fifths pin exactly */
+assert.equal(cell(FED.classes.q1, "alp", 2001), 48.12, "2001's most-disadvantaged fifth (HTPP era)");
+assert.equal(cell(FED.classes.q5, "alp", 2001), 46.93, "2001's most-advantaged fifth (HTPP era)");
+assert.equal(cell(FED.classes.q1, "alp", 2025), 47.96, "2025's most-disadvantaged fifth");
+assert.equal(cell(FED.classes.q2, "alp", 2025), 52.11, "2025's second-most-disadvantaged fifth");
+assert.equal(cell(FED.classes.q3, "alp", 2025), 57.14, "2025's middle fifth");
+assert.equal(cell(FED.classes.q4, "alp", 2025), 59.2, "2025's second-most-advantaged fifth");
+assert.equal(cell(FED.classes.q5, "alp", 2025), 59.08, "2025's most-advantaged fifth");
 /* the implied Senate pins (recomputed from the tallies 2026-10-24): Labor's
    implied line crosses the Coalition's between 2019 and 2022, and the
    ACT's 2025 cell is the whole bank's furthest from the half */
