@@ -35,6 +35,18 @@ This note is the manifest to rebuild that cache from scratch.
 | `dl/seifa2001-aus.zip` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012001?OpenDocument` — the "Commonwealth Electoral Division" cube set (`AUS_ced_s01.xls`, published per-division scores on 2000/01-edition CEDs; consumed by seat-model's 3-index pipeline) |
 | `dl/seifa1996-australia.zip` | ABS cat 2033.0.55.001 `DetailsPage/2033.0.55.0011996?OpenDocument` — per-state `XX SEIFA96.xls` CD-level cubes (five index columns + population). **Unparsed as of 2026-10-24**: the 1998-election need it was fetched for is satisfied at grade A by the published APH CIB no.4 1998–99 tables (`aph-98cib04.htm`); a CD→CED(1997-in-force) concordance was never sourced. Kept as the grade-B fallback for any 1996–2000 work (rr6 §7) |
 
+### Booth-hist pipeline inputs (`.matilda/seifa-irsad-abs/dl/`, consumed by `../../seat-model/derive-booth-seifa-hist.py`)
+
+| File | Source |
+|---|---|
+| `asgc2001.gpkg` | data.gov.au mirror of the ABS ASGC (2001 Edition) CD boundaries (`data.gov.au/data/dataset/asgc-2001` — CD (2001) GeoPackage resource, GDA94); read by raw sqlite + WKB parse |
+| `1259030002_cd06a<nsw,vic,qld,sa,wa,tas,nt,act,ot>_shape.zip` ×9 | ABS cat 1259.0.30.002 (ASGC 2006 digital boundaries), `DetailsPage/1259.0.30.0022006?OpenDocument` → "CD 2006 … <State>" shape zip per state incl. Other Territories; 38,704 CD polygons total |
+| `1270055001_sa1_2011_aust_shape.zip` | ASGS Vol 1 July 2011 page → "SA1 2011 … AUST" shape zip (DBF 54,805, key `SA1_7DIG11`) |
+| `1270055001_sa1_2016_aust_shape.zip` | ASGS Vol 1 July 2016 page → SA1 shape zip (DBF 57,523, key `SA1_MAIN16`) |
+| `seifa2006-cd.xls` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012006?OpenDocument` → the CD-level SEIFA cube |
+| `seifa2001-aus.zip` | (already in the cube manifest above — `AUS/AUS_cd_s01.xls` is the booth pipeline's 2001 cube, same zip as the division pipeline's CED cube) |
+| `SA1_2021_AUST_SHP_GDA2020.zip` | (already committed under `../../seat-model/cache/` — the 2025 booth pipeline's own zip, reused for the 2022 store) |
+
 ### Allocation / membership + weights (`<root>/.matilda/seifa-irsad-abs/dl/`)
 
 | File | Source |
