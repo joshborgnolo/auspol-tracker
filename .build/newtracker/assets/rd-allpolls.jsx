@@ -7070,7 +7070,7 @@ function RdExplained() {
               {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips">{houseCtl}{shareSlot}</span>}
             </div> : null
           ) : (
-            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
+            <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs rd-tabs-sm"
                     options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
               {narrow ? null : <>{houseCtl}{shareSlot}</>}
             </RdTabs>

@@ -112,9 +112,9 @@ const SEN_META = "Australian Senate elections, 2016–2025";
        return !!(tabs && tabs.querySelector(".ex-house") && tabs.querySelector(".ex-share"));
      }));
   const m = await menuInfo(page);
-  ok("the menu carries the class entries and the state elections under Lower",
-     m.groups.length === 2 && m.groups[0] === "Federal elections" && m.groups[1] === "State elections"
-       && m.options.some((v) => v.startsWith("fedcl:")), JSON.stringify(m.groups) + " · " + m.options.length + " options");
+  ok("the menu carries the class entries, the IRSAD fifths and the state elections under Lower",
+     m.groups.length === 3 && m.groups[0] === "Federal elections" && m.groups[1] === "Federal, by IRSAD fifth" && m.groups[2] === "State elections"
+       && m.options.filter((v) => v.startsWith("fedcl:")).length >= 5, JSON.stringify(m.groups) + " · " + m.options.length + " options");
   ok("…and the Legislative Council never appears under Lower", !m.options.includes("nswlc"), m.options.join(" "));
   ok("…and the eight federal states", (m.options.filter((v) => v.startsWith("fed:"))).length === 8,
      m.options.filter((v) => v.startsWith("fed:")).join(" "));
