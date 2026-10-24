@@ -39,10 +39,13 @@ records the fetches, seams and divergences):
     fpvvt lane above. 1998 covers 147 of 148 divisions (Newcastle's
     Labor-v-independent contest is absent from the HTPP product; the
     national/year cell stands on 147).
-  IRSAD quintiles q1..q5 and IEO e1..e5, 2001–2025: the same divisions'
-    votes regrouped by seifa_quintiles.membership(year, ix) - the
-    class bank's ten seifa records, ix-tagged exactly like the primary
-    lane's.
+  SEIFA quintiles — IRSAD q1..q5, IEO e1..e5, IER r1..r5, 2001–2025:
+    the same divisions' votes regrouped by
+    seifa_quintiles.membership(year, ix) — the class bank's FIFTEEN
+    seifa records, ix-tagged exactly like the primary lane's. Numbered
+    along the advantage ladder like every lane sibling (q1/e1/r1 most
+    ADVANTAGED … q5/e5/r5 most-disadvantaged, the 2026-10-24 sitewide
+    renumbering the informal lane absorbed on its IER addition).
 
 Printed-source divergences the merges take a side on (both figures
 official, listed for audit): the AEC summary page and the APH appendix

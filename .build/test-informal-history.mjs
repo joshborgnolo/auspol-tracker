@@ -17,16 +17,18 @@
       truncation), the territories' pre-representation cells nulls never
       zeros; the Senate national + states 1903–2022 (no 2025 Senate
       informal product exists, so the Senate lane floors a year short of
-      the House's); the four AEC class lanes 1996–2025 and the ten SEIFA
-      fifths (IRSAD q1..q5 + IEO e1..e5, ix-tagged exactly as the primary
-      and 2PP lanes carry them) 2001–2025;
+      the House's); the four AEC class lanes 1996–2025 and the FIFTEEN
+      SEIFA fifths (IRSAD q1..q5 + IEO e1..e5 + IER r1..r5, ix-tagged
+      exactly as the primary, 2PP and preference-flow lanes carry them)
+      2001–2025;
    2. the headline cells, re-derived by THIS file's own readers: the APH
       pages re-parsed independently (a regex table walker, not the
       builder's HTMLParser), the fpvvt downloads re-summed (Informal
       pseudo-rows vs candidate rows), the legacy tables re-joined
       (1998 Newcastle's 147-division base respected), the SEIFA
-      memberships recomputed from data/division-seifa-indexes.json (rank
-      1 = most-disadvantaged, thirty a fifth), and the AEC summary page
+      memberships recomputed from data/division-seifa-indexes.json
+      (rank 1 = MOST-advantaged, thirty a fifth, the 2026-10-24
+      renumbering), and the AEC summary page
       re-read as the cross-check the builder treats it (the derivation
       governs the House lane; the page's Senate cells it EXACTLY files);
    3. the tenancy guard rails: every cell null or 0 < x ≤ 25, years
@@ -67,14 +69,16 @@ const CLASS_FROM_PRINT = { "inner metropolitan": "inner", "outer metropolitan": 
   provincial: "provincial", rural: "rural" };
 const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
 const EOCTAS = ["e1", "e2", "e3", "e4", "e5"];
-const FIFTHS = [...QUINTS, ...EOCTAS];
-const IDX_OF = (id) => (id[0] === "q" ? "irsad" : "ieo");
+const RESRCS = ["r1", "r2", "r3", "r4", "r5"];
+const FIFTHS = [...QUINTS, ...EOCTAS, ...RESRCS];
+const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading letter
+const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
 const QUINT_COPY = {
-  1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
-  2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  1: ["Most-advantaged fifth", "Top fifth", "most-advantaged fifth"],
+  2: ["Second-most-advantaged fifth", "2nd fifth", "second-most-advantaged fifth"],
   3: ["Middle fifth", "Middle fifth", "middle fifth"],
-  4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
-  5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
+  4: ["Second-most-disadvantaged fifth", "4th fifth", "second-most-disadvantaged fifth"],
+  5: ["Most-disadvantaged fifth", "Bottom fifth", "most-disadvantaged fifth"],
 };
 
 // ---- independent readers of the committed sources ---------------------------
@@ -185,11 +189,14 @@ const groupShares = (votes, cutOf) => {
   return Object.fromEntries(Object.entries(agg).map(([c, a]) => [c, r2(share(a))]));
 };
 /* SEIFA fifths, recomputed from the display store exactly as the primary
-   test pins them: rank 1 = MOST-disadvantaged on the read index */
+   test pins them: numbered along ADVANTAGE (q1/e1/r1 the most-advantaged
+   fifth, thirty seats a piece), IRSAD's dual-convention cells read
+   `rank` (1 = most-advantaged) as-is while IEO/IER's dis-first prints
+   reflect (n+1−rank) */
 const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
 const CLSC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-classifications.json"), "utf8")).elections;
-const rankDis = (ix, cellX) => (ix === "irsad" ? cellX.irsad.rankDis : cellX[ix].rank);
-const fifthOf = (ix, rd) => `${ix === "irsad" ? "q" : "e"}${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+const rankAdvOf = (ix, cellX, n) => (ix === "irsad" ? cellX.irsad.rank : n + 1 - cellX[ix].rank);
+const fifthOf = (ix, ra) => `${LANE[ix]}${Math.min(Math.floor((ra - 1) / 30) + 1, 5)}`;
 
 // ---- the store --------------------------------------------------------------
 const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "informal-history.json"), "utf8"));
@@ -249,7 +256,7 @@ STATES.forEach((s) => {
 
 // ---- the class and fifth lanes ----------------------------------------------
 assert.deepEqual(Object.keys(CLB), [...CLASSES, ...FIFTHS],
-  "four classes then the IRSAD and IEO fifths, in menu order");
+  "four classes then the IRSAD, IEO and IER fifths, in menu order");
 CLASSES.forEach((k) => {
   const v = CLB[k];
   assert.deepEqual(v.years, [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
@@ -269,7 +276,7 @@ FIFTHS.forEach((q) => {
   assert.equal(v.label, label, `${q}: label`);
   assert.equal(v.short, short, `${q}: short`);
   assert.equal(v.elections,
-    `federal elections in the ${phrase} of seats by ${IDX_OF(q) === "irsad" ? "IRSAD" : "IEO"} rank`,
+    `federal elections in the ${phrase} of seats by ${IDX_OF(q).toUpperCase()} rank`,
     `${q}: elections copy names the index`);
 });
 
@@ -295,23 +302,33 @@ assert.equal(cell(CLB.inner, 1996), 3.65); assert.equal(cell(CLB.outer, 1996), 3
 assert.equal(cell(CLB.provincial, 1996), 2.79); assert.equal(cell(CLB.rural, 1996), 2.73);
 assert.equal(cell(CLB.inner, 2025), 4.47); assert.equal(cell(CLB.outer, 2025), 6.03);
 assert.equal(cell(CLB.provincial, 2025), 5.66); assert.equal(cell(CLB.rural, 2025), 6.32);
-assert.equal(cell(CLB.q1, 2001), 5.18); assert.equal(cell(CLB.q5, 2001), 4.0);
-assert.equal(cell(CLB.q1, 2025), 7.61); assert.equal(cell(CLB.q2, 2025), 6.58);
-assert.equal(cell(CLB.q3, 2025), 5.13); assert.equal(cell(CLB.q4, 2025), 4.86);
-assert.equal(cell(CLB.q5, 2025), 3.93);
-assert.equal(cell(CLB.e1, 2001), 5.53); assert.equal(cell(CLB.e1, 2025), 6.46);
-assert.equal(cell(CLB.e2, 2025), 7.46); assert.equal(cell(CLB.e3, 2025), 5.45);
-assert.equal(cell(CLB.e4, 2025), 4.85); assert.equal(cell(CLB.e5, 2025), 3.86);
+assert.equal(cell(CLB.q1, 2001), 4.0); assert.equal(cell(CLB.q5, 2001), 5.18);
+assert.equal(cell(CLB.q1, 2025), 3.93); assert.equal(cell(CLB.q2, 2025), 4.86);
+assert.equal(cell(CLB.q3, 2025), 5.13); assert.equal(cell(CLB.q4, 2025), 6.58);
+assert.equal(cell(CLB.q5, 2025), 7.61);
+assert.equal(cell(CLB.e1, 2001), 4.08); assert.equal(cell(CLB.e5, 2001), 5.53);
+assert.equal(cell(CLB.e1, 2025), 3.86); assert.equal(cell(CLB.e2, 2025), 4.85);
+assert.equal(cell(CLB.e3, 2025), 5.45); assert.equal(cell(CLB.e4, 2025), 7.46);
+assert.equal(cell(CLB.e5, 2025), 6.46);
+assert.equal(cell(CLB.r1, 2001), 4.09); assert.equal(cell(CLB.r2, 2001), 5.05);
+assert.equal(cell(CLB.r3, 2001), 5.19); assert.equal(cell(CLB.r4, 2001), 4.9);
+assert.equal(cell(CLB.r5, 2001), 4.86);
+assert.equal(cell(CLB.r1, 2025), 4.41); assert.equal(cell(CLB.r2, 2025), 5.59);
+assert.equal(cell(CLB.r3, 2025), 5.56); assert.equal(cell(CLB.r4, 2025), 5.84);
+assert.equal(cell(CLB.r5, 2025), 6.72);
 /* the shape of the story: informality falls with advantage. The IRSAD
-   ladder is strictly monotone in 2025; the most-advantaged fifth stays at
-   or under the most-disadvantaged in every year on both indexes */
-assert.ok(CLB.q1.inf.at(-1) > CLB.q2.inf.at(-1) && CLB.q2.inf.at(-1) > CLB.q3.inf.at(-1)
-  && CLB.q3.inf.at(-1) > CLB.q4.inf.at(-1) && CLB.q4.inf.at(-1) > CLB.q5.inf.at(-1),
-  "2025 IRSAD ladder: q1 > q2 > q3 > q4 > q5");
+   ladder is strictly ascending in 2025; the most-advantaged fifth stays at
+   or under the most-disadvantaged in every year on all three indexes (the
+   IEO and IER ladders themselves are not monotone end to end) */
+assert.ok(CLB.q1.inf.at(-1) < CLB.q2.inf.at(-1) && CLB.q2.inf.at(-1) < CLB.q3.inf.at(-1)
+  && CLB.q3.inf.at(-1) < CLB.q4.inf.at(-1) && CLB.q4.inf.at(-1) < CLB.q5.inf.at(-1),
+  "2025 IRSAD ladder: q1 < q2 < q3 < q4 < q5");
 CLB.q1.years.forEach((y, i) => {
-  assert.ok(CLB.q5.inf[i] <= CLB.q1.inf[i], `IRSAD ${y}: most-advantaged ≤ most-disadvantaged`);
-  assert.ok(CLB.e5.inf[i] <= CLB.e1.inf[i],
-    `IEO ${y}: e5 ≤ e1 (${CLB.e5.inf[i]} v ${CLB.e1.inf[i]})`);
+  assert.ok(CLB.q1.inf[i] <= CLB.q5.inf[i], `IRSAD ${y}: most-advantaged ≤ most-disadvantaged`);
+  assert.ok(CLB.e1.inf[i] <= CLB.e5.inf[i],
+    `IEO ${y}: e1 ≤ e5 (${CLB.e1.inf[i]} v ${CLB.e5.inf[i]})`);
+  assert.ok(CLB.r1.inf[i] <= CLB.r5.inf[i],
+    `IER ${y}: r1 ≤ r5 (${CLB.r1.inf[i]} v ${CLB.r5.inf[i]})`);
 });
 
 // ---- independent re-reads of the committed sources --------------------------
@@ -356,9 +373,9 @@ assert.equal(APH_SENATE[1977].nat, AEC_SEN[1977].nat,
   CLASSES.forEach((k) => assert.equal(clsShares[k], cell(CLB[k], 2025),
     `2025 ${k}: the class cell recomposes (${clsShares[k]})`));
   const blk = SEIFA["2025"];
-  ["irsad", "ieo"].forEach((ix) => {
-    const shares = groupShares(votes, (d) => fifthOf(ix, rankDis(ix, blk[d])));
-    (ix === "irsad" ? QUINTS : EOCTAS).forEach((q) => assert.equal(shares[q], cell(CLB[q], 2025),
+  ["irsad", "ieo", "ier"].forEach((ix) => {
+    const shares = groupShares(votes, (d) => fifthOf(ix, rankAdvOf(ix, blk[d], Object.keys(blk).length)));
+    FIFTHS.filter((q) => IDX_OF(q) === ix).forEach((q) => assert.equal(shares[q], cell(CLB[q], 2025),
       `2025 ${q}: the fifth cell recomposes (${shares[q]})`));
   });
 }
@@ -379,9 +396,9 @@ assert.equal(APH_SENATE[1977].nat, AEC_SEN[1977].nat,
 { // 2001's fifths ride the legacy lane (the index series' floor year)
   const votes = legacyVotes(2001);
   const blk = SEIFA["2001"];
-  ["irsad", "ieo"].forEach((ix) => {
-    const shares = groupShares(votes, (d) => fifthOf(ix, rankDis(ix, blk[d])));
-    (ix === "irsad" ? QUINTS : EOCTAS).forEach((q) => assert.equal(shares[q], cell(CLB[q], 2001),
+  ["irsad", "ieo", "ier"].forEach((ix) => {
+    const shares = groupShares(votes, (d) => fifthOf(ix, rankAdvOf(ix, blk[d], Object.keys(blk).length)));
+    FIFTHS.filter((q) => IDX_OF(q) === ix).forEach((q) => assert.equal(shares[q], cell(CLB[q], 2001),
       `2001 ${q}: the fifth cell recomposes (${shares[q]})`));
   });
 }

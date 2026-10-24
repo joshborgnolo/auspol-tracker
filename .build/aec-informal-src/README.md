@@ -50,8 +50,9 @@ Derivation lanes the builder reads elsewhere in the repo (none fetched here):
   exclusion is the whole gap. All three years recompose the APH national
   figures at 1dp.
 - `data/division-classifications.json` (per-election AEC seat-class
-  blocks, 1996–2025) and `.build/seifa_quintiles.py` (IRSAD/IEO
-  fifth-of-seats memberships, 2001–2025) — the grouping lanes.
+  blocks, 1996–2025) and `.build/seifa_quintiles.py` (IRSAD/IEO/IER
+  fifth-of-seats memberships, 2001–2025, most-advantaged fifth first) —
+  the grouping lanes.
 
 SENATE 2025 floor: no AEC machine-readable 2025 Senate informal figure is
 committed (the summary page stops at 2022; the committed Senate

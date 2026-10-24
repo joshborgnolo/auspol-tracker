@@ -1333,8 +1333,8 @@ export function validateInformalHistory() {
   if (!S.fed.classes || typeof S.fed.classes !== "object") fail("informal-history.json", "informal-history-shape", "no fed.classes");
   else for (const [ck, v] of Object.entries(S.fed.classes)) {
     checkView(`fed.${ck}`, v);
-    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo")
-      fail(`informal-history.json fed.${ck}`, "informal-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo)");
+    if (v.seifa === true && v.ix !== "irsad" && v.ix !== "ieo" && v.ix !== "ier")
+      fail(`informal-history.json fed.${ck}`, "informal-history-shape", "a seifa fifth record carries no ix index tag (irsad/ieo/ier)");
     if (v.seifa === true && typeof v.short !== "string")
       fail(`informal-history.json fed.${ck}`, "informal-history-shape", "seifa record short is not a string");
     if (Array.isArray(v.years) && v.years.length) {

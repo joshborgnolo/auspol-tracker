@@ -814,11 +814,11 @@ const IH_SEN_META = "Australian Senate elections, 1903–2022";
      (await xMarks(page)) === 48 && yt[0] === "1901" && yt.every((y) => +y >= 1901 && +y <= 2025),
      yt.length + " labels over " + (await xMarks(page)) + " marks, first " + yt[0]);
   const m = await menuInfo(page);
-  ok("the menu is the federal sections and classes alone (8 states, 4 seat classes, 5 IRSAD fifths, 5 IEO fifths)",
-     JSON.stringify(m.groups) === JSON.stringify(["Federal elections", "Federal, by IRSAD quintile", "Federal, by IEO quintile"])
-       && m.options.length === 23 && m.options[0] === "fed"
+  ok("the menu is the federal sections and classes alone (8 states, 4 seat classes, 5 IRSAD fifths, 5 IEO fifths, 5 IER fifths)",
+     JSON.stringify(m.groups) === JSON.stringify(["Federal elections", "Federal, by IRSAD quintile", "Federal, by IEO quintile", "Federal, by IER quintile"])
+       && m.options.length === 28 && m.options[0] === "fed"
        && m.options.filter((v) => v.startsWith("fed:")).length === 8
-       && m.options.filter((v) => v.startsWith("fedcl:")).length === 14,
+       && m.options.filter((v) => v.startsWith("fedcl:")).length === 19,
      JSON.stringify(m.groups) + " · " + m.options.length + " options");
   ok("…no Council, no state-elections entry, no State elections optgroup",
      !m.options.includes("nswlc") && !m.options.some((v) => v.startsWith("ste:"))
@@ -903,13 +903,13 @@ console.log("== desktop: the informal stops' states and class cuts ==");
      innerFoot.slice(120, 280));
   await pickMenu(page, "fedcl:q1"); await sleep(700);
   const q1Foot = await footText(page);
-  ok("an IRSAD fifth names the index (most-disadvantaged fifth, thirty seats a fifth)",
+  ok("an IRSAD fifth names the index (most-advantaged fifth, thirty seats a fifth)",
      q1Foot.includes("IRSAD is the ABS's socio-economic index of advantage and disadvantage")
-       && q1Foot.includes("the most-disadvantaged fifth"),
+       && q1Foot.includes("the most-advantaged fifth"),
      q1Foot.slice(60, 240));
   await pickMenu(page, "fedcl:e1"); await sleep(700);
   ok("an IEO fifth re-scopes the meta and names the index",
-     (await meta(page)) === "Federal elections in the most-disadvantaged fifth of seats by IEO rank, 2001–2025"
+     (await meta(page)) === "Federal elections in the most-advantaged fifth of seats by IEO rank, 2001–2025"
        && (await footText(page)).includes("IEO is the ABS's index of education and occupation"),
      await meta(page));
   ok("…and the fifths' axis is still the constant 0–20%",
