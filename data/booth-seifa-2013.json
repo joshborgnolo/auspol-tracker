@@ -9,7 +9,16 @@
       ".matilda/seifa-irsad-abs/dl/1270055001_sa1_2011_aust_shape.zip": "8cf89d2c820e409b",
       ".matilda/seifa-irsad-abs/abs-seifa-2011-sa1-indexes.xls": "26dd02d8d54c5d98"
     },
-    "extractedAt": "2026-10-24"
+    "extractedAt": "2026-10-24",
+    "userOverrides": [
+      {
+        "div": "Solomon",
+        "booth": "BLV Solomon PPVC",
+        "lat": -12.46057,
+        "lon": 130.837729,
+        "note": "AEC file shipped (0,0); premises coords supplied by the user 2026-10-24"
+      }
+    ]
   },
   "election": 2013,
   "seifaEdition": 2011,
@@ -26,13 +35,12 @@
     "Lingiari|Larapinta"
   ],
   "counts": {
-    "scored": 8319,
+    "scored": 8320,
     "seifaSuppressed": 245,
     "pointOutside": 3,
     "noCoords": 578,
     "otTerritory": 7,
-    "badCoords": 1,
-    "mapped_geo": 8564
+    "mapped_geo": 8565
   },
   "booths": [
     {
@@ -234978,11 +234986,21 @@
       "suburb": "DARWIN",
       "premisesState": "NT",
       "postcode": "0800",
-      "lat": 0.0,
-      "lon": 0.0,
-      "note": "badCoords",
-      "geo": null,
-      "seifa": null
+      "lat": -12.46057,
+      "lon": 130.837729,
+      "geo": "7100203",
+      "seifa": {
+        "irsd": 1056.1,
+        "irsad": 1064.9,
+        "ier": 944.5,
+        "ieo": 1065.9,
+        "dec": {
+          "irsd": 7,
+          "irsad": 8,
+          "ier": 3,
+          "ieo": 8
+        }
+      }
     },
     {
       "div": "Canberra",

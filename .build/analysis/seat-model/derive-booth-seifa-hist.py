@@ -90,6 +90,16 @@ TYPE_NAME = {1: "Polling place", 2: "Special hospital", 3: "Remote mobile",
 IDXS = ["irsd", "irsad", "ier", "ieo"]
 
 CD2006_STATES = ["nsw", "vic", "qld", "sa", "wa", "tas", "nt", "act", "ot"]
+
+# The AEC file ships (0,0) coordinates for these booths; the true premises
+# coordinates were supplied by the user 2026-10-24. Applied before the
+# sanity-band check so the rows land geos and scores. Recorded in
+# _provenance.userOverrides. Keyed (election, division, booth).
+COORD_OVERRIDES = {
+    (2013, "Solomon", "BLV Solomon PPVC"): (-12.460570, 130.837729),
+    (2022, "Sydney", "Surry Hills"): (-33.886970, 151.212524),
+    (2022, "Sydney", "Darlinghurst South"): (-33.875983, 151.215258),
+}
 CD2006_ROWS = {"nsw": 11966, "vic": 9310, "qld": 7672, "sa": 3246,
                "wa": 4370, "tas": 1068, "nt": 510, "act": 547, "ot": 15}
 
@@ -685,6 +695,20 @@ def emit(year):
     booths = read_booths(year)
     if e.get("coords") == "carry2007":
         carry_2007_coords(booths)
+    applied_overrides = []
+    for b in booths:
+        key = (year, b["div"], b["booth"])
+        if key not in COORD_OVERRIDES:
+            continue
+        if b["lat"] != 0.0 or b["lon"] != 0.0:
+            fail(f"override {key}: AEC row no longer ships (0,0) — "
+                 "drop the stale override")
+        b["lat"], b["lon"] = COORD_OVERRIDES[key]
+        applied_overrides.append(key)
+    if [k for k in COORD_OVERRIDES if k[0] == year
+            and k not in applied_overrides]:
+        fail(f"{year}: overrides unmatched "
+             f"{[k for k in COORD_OVERRIDES if k[0] == year and k not in applied_overrides]}")
     seifa = get_cube(cube_kind)
     locate, polys, null_codes = build_locate(geo_kind)
 
@@ -817,6 +841,15 @@ def emit(year):
                     "then (state,div,premises,suburb) onto 2007 rows with "
                     "non-(0,0) coords",
         }
+
+    if applied_overrides:
+        out["_provenance"]["userOverrides"] = [
+            {"div": k[1], "booth": k[2], "lat": COORD_OVERRIDES[k][0],
+             "lon": COORD_OVERRIDES[k][1],
+             "note": "AEC file shipped (0,0); premises coords supplied by "
+                     "the user 2026-10-24"}
+            for k in applied_overrides
+        ]
 
     for b in booths:
         rec = {"div": b["div"], "divId": b["divId"], "state": b["state"],

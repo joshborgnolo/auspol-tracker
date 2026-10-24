@@ -9,7 +9,23 @@
       ".build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip": "177adac8fcc93135",
       ".matilda/seifa-irsad-abs/abs-seifa-2021-sa1-indexes.xlsx": "598cf9c360a69220"
     },
-    "extractedAt": "2026-10-24"
+    "extractedAt": "2026-10-24",
+    "userOverrides": [
+      {
+        "div": "Sydney",
+        "booth": "Darlinghurst South",
+        "lat": -33.875983,
+        "lon": 151.215258,
+        "note": "AEC file shipped (0,0); premises coords supplied by the user 2026-10-24"
+      },
+      {
+        "div": "Sydney",
+        "booth": "Surry Hills",
+        "lat": -33.88697,
+        "lon": 151.212524,
+        "note": "AEC file shipped (0,0); premises coords supplied by the user 2026-10-24"
+      }
+    ]
   },
   "election": 2022,
   "seifaEdition": 2021,
@@ -24,12 +40,11 @@
     "Grey|Leigh Creek"
   ],
   "counts": {
-    "scored": 8196,
+    "scored": 8198,
     "otTerritory": 5,
     "seifaSuppressed": 217,
     "noCoords": 64,
-    "badCoords": 2,
-    "mapped_geo": 8413
+    "mapped_geo": 8415
   },
   "booths": [
     {
@@ -69134,11 +69149,21 @@
       "suburb": "Surry Hills",
       "premisesState": "NSW",
       "postcode": "2010",
-      "lat": 0.0,
-      "lon": 0.0,
-      "note": "badCoords",
-      "geo": null,
-      "seifa": null
+      "lat": -33.88697,
+      "lon": 151.212524,
+      "geo": "11703133602",
+      "seifa": {
+        "irsd": 1105.5,
+        "irsad": 1179.6,
+        "ier": 957.0,
+        "ieo": 1207.1,
+        "dec": {
+          "irsd": 10,
+          "irsad": 10,
+          "ier": 4,
+          "ieo": 10
+        }
+      }
     },
     {
       "div": "Sydney",
@@ -69529,11 +69554,21 @@
       "suburb": "DARLINGHURST",
       "premisesState": "NSW",
       "postcode": "2010",
-      "lat": 0.0,
-      "lon": 0.0,
-      "note": "badCoords",
-      "geo": null,
-      "seifa": null
+      "lat": -33.875983,
+      "lon": 151.215258,
+      "geo": "11703132919",
+      "seifa": {
+        "irsd": 1083.2,
+        "irsad": 1174.7,
+        "ier": 934.9,
+        "ieo": 1174.8,
+        "dec": {
+          "irsd": 9,
+          "irsad": 10,
+          "ier": 3,
+          "ieo": 10
+        }
+      }
     },
     {
       "div": "Sydney",

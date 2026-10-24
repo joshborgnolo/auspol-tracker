@@ -23,8 +23,9 @@ them too). Per-era measured universes are pinned in the test's `YEARS`
 table (rows/scored/noCoords/seifaSuppressed/pointOutside/otTerritory —
 badCoords only where noted): 2004: 8,234/6,663/1,382/185/4/3; 2007:
 8,235/7,631/512/88/4/3; 2010: 8,951/8,171/592/181/7/4; 2013:
-9,146/8,319/578/245/3/7 (+1 badCoords); 2016: 8,328/7,534/587/206/1/7;
-2019: 8,875/8,045/571/258/1/2; 2022: 8,479/8,196/64/217/0/5 (+2 badCoords).
+9,146/8,320/578/245/3/7; 2016: 8,328/7,534/587/206/1/7;
+2019: 8,875/8,045/571/258/1/2; 2022: 8,479/8,198/64/217/0/5.
+No store currently carries a single badCoords row (see the gotcha below).
 Divisions are 150 everywhere except 151 in 2019/2022 (the House genuinely
 expanded). Partial per-index suppression exists only in the SA1-era cubes:
 13 in 2013, 27 in 2016, 43 in 2019, 25 in 2022 (CD cubes are complete).
@@ -99,9 +100,15 @@ cells** (abs err ≤ 1e-4) and the **4 prose medians** of Details.rtf
   the House itself growing (Bean 2019, Hawke 2022), and the guard is
   per-era, never a blanket 150.
 - `badCoords` = coords outside the sanity band (-55..-9 lat, 95..169.5
-  lon — 169.5 keeps Norfolk Island legit); rows are KEPT raw with the
-  note (2013: 1, 2022: 2, others 0). There is no remap dictionary —
-  nothing is silently corrected.
+  lon — 169.5 keeps Norfolk Island legit). Three rows ever shipped the
+  AEC's (0,0): 2013 "BLV Solomon PPVC" and 2022 "Surry Hills" +
+  "Darlinghurst South" — all three now carry user-supplied premises
+  coords via the extractor's `COORD_OVERRIDES` (2026-10-24; recorded in
+  `_provenance.userOverrides`, applications pinned as test spots), so
+  no store carries a badCoords row today. The override fails loud both
+  ways — an unmatched key, or a row that no longer ships (0,0) — so a
+  correction can never silently rot. Overrides are the ONLY coord
+  edits; nothing else is remapped.
 - Premises-state v polygon-state disagreements are a GUARD REPORT ONLY
   (`stateFlagBooths`, list pinned in the test per year: 5/3/2/3/2/3/1
   across 2004..2022) — **the physical premises location wins**, no
@@ -137,11 +144,10 @@ and `.build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip`
 
 ## Measured universe (first green run 2026-10-24 — the test pins these)
 
-8,940 booths → 8,354 mapped to an SA1, **zero pointOutside**, zero
-premises-state/SA1-state mismatches. 8,085 scored (**96.78%** of
+8,940 booths → 8,356 mapped to an SA1, **zero pointOutside**, zero
+premises-state/SA1-state mismatches. 8,087 scored (**96.78%** of
 coord-holding); 269 in score-suppressed SA1s (genuine ABS suppression, see
-below); 584 `note=noCoords` (mobile/hospital teams); 2 `note=badCoords`
-(Henty/Farrer + Carlingford North/Parramatta, AEC ships (0,0)); 4
+below); 584 `note=noCoords` (mobile/hospital teams); 4
 Other-Territories SA1 hits (Norfolk Island + NI PPVC on Bean
 90104100404, Jervis Bay + Other Mobile Team 1 on Fenner); 17 booths on cube
 rows with PARTIAL per-index suppression (Wetherill Park BLAXLAND PPVC has
@@ -185,7 +191,10 @@ Banner line 0, header line 1, 8,940 data rows, no quoted fields. Key
 4:Mobile team ×114, 5:PPVC ×1299 (all no-coords rows are type 2/3/4 — 584
 rows). 4 out-of-band coords: Norfolk Island + NI PPVC are LEGIT (lon
 167.95 — sanity band must reach 169.5, not 160); Henty + Carlingford North
-are (0,0) garbage → `badCoords`. More on the CSV family:
+ship AEC (0,0) — the OTHER pair (see the badCoords gotcha above): both now
+carry user-supplied premises coords via this extractor's own
+`COORD_OVERRIDES` (keyed `(div, booth)`; `_provenance.userOverrides`), so
+the 2025 store carries no badCoords row either. More on the CSV family:
 auto-skill-auspol-aec-event-downloads.
 
 ## SEIFA 2021 SA1 cube ground truths (guards must be pinned to MEASURED)
@@ -215,11 +224,13 @@ spot cells across states/kinds/extremes — here: Toorak & Mosman top band,
 Hobart SA1 60105102717, Waverley PPVC, cube-max SA1 80104112206 (ANU
 campus — irsad 1273.0/ier 1315.1 BOTH global maxima), floor SA1
 20603111321 (Ascot Vale public housing — irsd 266.6, all four decile-1),
-one noCoords remote-mobile, both badCoords, one seifaSuppressed, the
+one noCoords remote-mobile, both coord-override rows (Henty SA1
+10901117528; Carlingford North SA1 12502171236 — scores now land through
+them), one seifaSuppressed, the
 partial row, all 4 OT booths. Test re-hashes the COMMITTED AEC CSV
 against `_provenance.files.<path>` (sha256-16); git-ignored caches are
-hash-string pinned only. Coord-band checks must skip deliberately-kept
-raw badCoords rows (their (0,0) is filed in the store by design).
+hash-string pinned only. Coord-band checks need no badCoords exception —
+no store carries a raw (0,0) row any more.
 Commit discipline: explicit-path `git add`/`git commit` (shared dirty
 worktree — see auto-skill-shared-repo-session-race); validate.mjs exit 0
 gate before commit per auto-skill-auspol-seat-model conventions.
