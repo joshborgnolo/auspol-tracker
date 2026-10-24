@@ -23,19 +23,20 @@
       2026-10-24 "do what you did for irsad to ieo" generalisation and
       its "do the same for IER" follow-up the same day — seifa: true,
       ix-tagged): the same per-division counts regrouped by
-      data/division-seifa-indexes.json's disadvantage-order rank (IRSAD's
-      rankDis twin; the IEO and IER cells' plain rank keeps the same 1 =
-      most disadvantaged print order — thirty seats a fifth, the most-
-      advantaged fifth taking the 151-seat years' spare), on the index
-      series' own 2001–2025 span (2001 via the HTPP table). This probe
+      data/division-seifa-indexes.json's advantage-order rank (IRSAD's
+      own advantaged-first `rank`; the IEO and IER cells' plain ranks
+      keep the 1 = most-disadvantaged print order, reflected n+1−rank —
+      thirty seats a fifth, the most-disadvantaged fifth taking the
+      151-seat years' spare), on the index series' own 2001–2025 span
+      (2001 via the HTPP table). This probe
       recomputes each index's membership from the seifa store's OWN cells
       and re-sums the downloads' counts, never seifa_quintiles.py's
       answer.
    4. The story pins hold: the canonical records' extremes, the urban-
       ladder readings behind "Federal, inner metro" & "Federal, rural",
-      and the fifths' 2025 ladders (IRSAD most-disadvantaged 47.96 to
-      most-advantaged 59.08; IEO 45.42 to 60.67; IER inverts the climb –
-      most-advantaged is Labor's lowest at 52.58).
+      and the fifths' 2025 ladders (IRSAD most-advantaged 59.08 to
+      most-disadvantaged 47.96; IEO 60.67 to 45.42; IER inverts the
+      climb – most-advantaged is Labor's lowest at 52.58).
    5. fed.sen is the IMPLIED Senate two-party (user 2026-10-24: "add House:
       Lower ⇄ to 2pp view (adding upper house data)") - an estimate, never
       a count: the AEC tallies no two-party figure for the Senate. This
@@ -84,8 +85,8 @@ const CLS_KEY = { "inner metropolitan": "inner", "outer metropolitan": "outer",
    addition, generalised to the IEO and IER indexes the same day — "do
    what you did for irsad to ieo", then "do the same for IER"): IRSAD's
    q1..q5 then IEO's e1..e5 then IER's r1..r5, the 1-keys the
-   most-disadvantaged fifth, the 5-keys the most-advantaged, thirty seats
-   a fifth (the 151-seat years' spare to the advantaged end). Span: the
+   most-advantaged fifth, the 5-keys the most-disadvantaged, thirty seats
+   a fifth (the 151-seat years' spare to the disadvantaged end). Span: the
    index series' own 2001–2025 – the seifa store's floor, never the AEC
    counts' 1996 */
 const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
@@ -106,12 +107,13 @@ const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading
 const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
 const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
-/* the probe's OWN fifth membership: the disadvantage-order rank (IRSAD's
-   rankDis twin, or the IEO/IER cells' plain rank – the same 1 = most
-   disadvantaged print order, no rankDis twin) ceil-divided thirty seats
-   a fifth, the 151-seat chambers' spare landing in the most-advantaged
-   fifth – mirroring seifa_quintiles.quintile_of, independently */
-const rankDisOf = (ix, cell) => (ix === "irsad" ? cell.irsad.rankDis : cell[ix].rank);
+/* the probe's OWN fifth membership: the advantage-order rank (IRSAD's
+   advantaged-first `rank`; the IEO/IER cells' plain ranks keep the 1 =
+   most disadvantaged print order, reflected n+1−rank) ceil-divided
+   thirty seats a fifth, the 151-seat chambers' spare landing in the
+   most-disadvantaged fifth – mirroring seifa_quintiles.quintile_of,
+   independently */
+const rankAdvOf = (ix, cell, n) => (ix === "irsad" ? cell.irsad.rank : n + 1 - cell[ix].rank);
 const fifthOf = (ix, rk) => LANE[ix] + Math.min(Math.floor((rk - 1) / 30) + 1, 5);
 /* the implied Senate two-party: the four post-GVT events (group tickets
    kept no per-ballot record before 2016), and the family rows this
@@ -223,10 +225,11 @@ AEC_YEARS.forEach((y) => {
     for (const ix of Object.keys(LANE)) {
       const ids = FIFTHS.filter((q) => IDX_OF(q) === ix);
       const qs = Object.fromEntries(ids.map((q) => [q, [0, 0]]));
+      const n = Object.keys(mem).length;
       for (const [div, pair] of Object.entries(perDiv)) {
         const cell2 = mem[div];
         assert.ok(cell2 && cell2[ix], `${y}: ${div} carries a ${ix} cell`);
-        const q = fifthOf(ix, rankDisOf(ix, cell2));
+        const q = fifthOf(ix, rankAdvOf(ix, cell2, n));
         assert.ok(ids.includes(q), `${y}: ${div} fifth ${q} in range`);
         qs[q][0] += pair[0]; qs[q][1] += pair[1];
       }
@@ -386,40 +389,41 @@ AEC_YEARS.forEach((y) => {
   assert.ok(cell(FED.classes.rural, "alp", y) < cell(FED, "alp", y),
     `${y}: rural runs behind the national line`);
 });
-/* the IRSAD fifths' ladder: the 2025 spread runs 47.96 (most-
-   disadvantaged) to 59.08 (most-advantaged); the ladder has steepened
-   since 2001, when the two ends sat 48.12 v 46.93 - and every year's
+/* the IRSAD fifths' ladder: the 2025 spread runs 59.08 (most-
+   advantaged) to 47.96 (most-disadvantaged); the ladder has steepened
+   since 2001, when the two ends sat 46.93 v 48.12 - and every year's
    fifths pin exactly */
-assert.equal(cell(FED.classes.q1, "alp", 2001), 48.12, "2001's most-disadvantaged fifth (HTPP era)");
-assert.equal(cell(FED.classes.q5, "alp", 2001), 46.93, "2001's most-advantaged fifth (HTPP era)");
-assert.equal(cell(FED.classes.q1, "alp", 2025), 47.96, "2025's most-disadvantaged fifth");
-assert.equal(cell(FED.classes.q2, "alp", 2025), 52.11, "2025's second-most-disadvantaged fifth");
+assert.equal(cell(FED.classes.q1, "alp", 2001), 46.93, "2001's most-advantaged fifth (HTPP era)");
+assert.equal(cell(FED.classes.q5, "alp", 2001), 48.12, "2001's most-disadvantaged fifth (HTPP era)");
+assert.equal(cell(FED.classes.q1, "alp", 2025), 59.08, "2025's most-advantaged fifth");
+assert.equal(cell(FED.classes.q2, "alp", 2025), 59.2, "2025's second-most-advantaged fifth");
 assert.equal(cell(FED.classes.q3, "alp", 2025), 57.14, "2025's middle fifth");
-assert.equal(cell(FED.classes.q4, "alp", 2025), 59.2, "2025's second-most-advantaged fifth");
-assert.equal(cell(FED.classes.q5, "alp", 2025), 59.08, "2025's most-advantaged fifth");
+assert.equal(cell(FED.classes.q4, "alp", 2025), 52.11, "2025's second-most-disadvantaged fifth");
+assert.equal(cell(FED.classes.q5, "alp", 2025), 47.96, "2025's most-disadvantaged fifth");
 /* the IEO ladder beside it: education-and-occupation advantage draws the
-   steeper 2025 spread, 45.42 (most-disadvantaged) to 60.67 */
-assert.equal(cell(FED.classes.e1, "alp", 2001), 50.52, "2001's most-disadvantaged IEO fifth (HTPP era)");
-assert.equal(cell(FED.classes.e5, "alp", 2001), 47.03, "2001's most-advantaged IEO fifth (HTPP era)");
-assert.equal(cell(FED.classes.e1, "alp", 2025), 45.42, "2025's most-disadvantaged IEO fifth");
-assert.equal(cell(FED.classes.e2, "alp", 2025), 53.68, "2025's second-most-disadvantaged IEO fifth");
+   steeper 2025 spread, 60.67 (most-advantaged) to 45.42 (most-
+   disadvantaged) */
+assert.equal(cell(FED.classes.e1, "alp", 2001), 47.03, "2001's most-advantaged IEO fifth (HTPP era)");
+assert.equal(cell(FED.classes.e5, "alp", 2001), 50.52, "2001's most-disadvantaged IEO fifth (HTPP era)");
+assert.equal(cell(FED.classes.e1, "alp", 2025), 60.67, "2025's most-advantaged IEO fifth");
+assert.equal(cell(FED.classes.e2, "alp", 2025), 59.21, "2025's second-most-advantaged IEO fifth");
 assert.equal(cell(FED.classes.e3, "alp", 2025), 56.74, "2025's middle IEO fifth");
-assert.equal(cell(FED.classes.e4, "alp", 2025), 59.21, "2025's second-most-advantaged IEO fifth");
-assert.equal(cell(FED.classes.e5, "alp", 2025), 60.67, "2025's most-advantaged IEO fifth");
+assert.equal(cell(FED.classes.e4, "alp", 2025), 53.68, "2025's second-most-disadvantaged IEO fifth");
+assert.equal(cell(FED.classes.e5, "alp", 2025), 45.42, "2025's most-disadvantaged IEO fifth");
 /* the IER ladder inverts the other two indexes: economic resources draw no
    clean Labor climb — the most-advantaged fifth is Labor's LOWEST (52.58 in
    2025; resource-rich regional seats run Coalition, where IRSAD/IEO's
    most-advantaged fifths are Labor's highest) and the ladder is not
    monotonic, so these pins are per-cell only */
-assert.equal(cell(FED.classes.r1, "alp", 2001), 44.69, "2001's most-disadvantaged IER fifth (HTPP era)");
-assert.equal(cell(FED.classes.r5, "alp", 2001), 46.81, "2001's most-advantaged IER fifth (HTPP era)");
-assert.equal(cell(FED.classes.r1, "alp", 2025), 54.34, "2025's most-disadvantaged IER fifth");
-assert.equal(cell(FED.classes.r2, "alp", 2025), 57.23, "2025's second-most-disadvantaged IER fifth");
+assert.equal(cell(FED.classes.r5, "alp", 2001), 44.69, "2001's most-disadvantaged IER fifth (HTPP era)");
+assert.equal(cell(FED.classes.r1, "alp", 2001), 46.81, "2001's most-advantaged IER fifth (HTPP era)");
+assert.equal(cell(FED.classes.r5, "alp", 2025), 54.34, "2025's most-disadvantaged IER fifth");
+assert.equal(cell(FED.classes.r4, "alp", 2025), 57.23, "2025's second-most-disadvantaged IER fifth");
 assert.equal(cell(FED.classes.r3, "alp", 2025), 55.19, "2025's middle IER fifth");
-assert.equal(cell(FED.classes.r4, "alp", 2025), 56.78, "2025's second-most-advantaged IER fifth");
-assert.equal(cell(FED.classes.r5, "alp", 2025), 52.58, "2025's most-advantaged IER fifth: the ladder's floor");
-assert.ok(cell(FED.classes.r5, "alp", 2025) < cell(FED.classes.r1, "alp", 2025)
-  && cell(FED.classes.r2, "alp", 2025) > Math.max(cell(FED.classes.r1, "alp", 2025), cell(FED.classes.r3, "alp", 2025), cell(FED.classes.r4, "alp", 2025)),
+assert.equal(cell(FED.classes.r2, "alp", 2025), 56.78, "2025's second-most-advantaged IER fifth");
+assert.equal(cell(FED.classes.r1, "alp", 2025), 52.58, "2025's most-advantaged IER fifth: the ladder's floor");
+assert.ok(cell(FED.classes.r1, "alp", 2025) < cell(FED.classes.r5, "alp", 2025)
+  && cell(FED.classes.r4, "alp", 2025) > Math.max(cell(FED.classes.r5, "alp", 2025), cell(FED.classes.r3, "alp", 2025), cell(FED.classes.r2, "alp", 2025)),
   "2025 IER: the most-advantaged fifth is Labor's weakest, the second-most-disadvantaged his strongest");
 /* the implied Senate pins (recomputed from the tallies 2026-10-24): Labor's
    implied line crosses the Coalition's between 2019 and 2022, and the

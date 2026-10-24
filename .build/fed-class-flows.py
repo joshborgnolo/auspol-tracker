@@ -95,9 +95,9 @@ irsad to ieo", and IER later on "do the same for IER: 'Federal, by IER
 quintile'"): the same two counted products regrouped by the fifth of
 seats each election's ABS SEIFA ranks place a division in, one lane per
 index – seifa_quintiles.membership(y, ix) reads each index's
-disadvantage-ordered rank (IRSAD's rankDis, the others' print-order
-rank), thirty seats a fifth, the 151-seat 2019/2022 chambers giving the
-spare seat to the most-advantaged fifth. The quintiles sit in the
+advantage-ordered rank (IRSAD's rank, IEO's and IER's print-order ranks
+reflected), thirty seats a fifth, the 151-seat 2019/2022 chambers giving
+the spare seat to the most-disadvantaged fifth. The quintiles sit in the
 store's `seifa` block beside `classes`, in the same shapes
 (classes/allSeats over years 2001–2025 – the seifa store's floor), and
 gen-data merges them into the flowHistory classes bank after the four

@@ -45,12 +45,12 @@ preferred vote at each federal election:
                        same day on "do what you did for irsad to ieo",
                        and IER later on "do the same for IER: 'Federal,
                        by IER quintile'").
-                       data/division-seifa-indexes.json's
-                       disadvantage-ordered ranks (IRSAD's rankDis, IEO's
-                       and IER's print-order rank; 1 = most
-                       disadvantaged), thirty
+                       data/division-seifa-indexes.json's ranks, read
+                       advantaged-first (IRSAD's rank; IEO's and IER's
+                       print-order ranks reflected; 1 = most
+                       advantaged), thirty
                        seats a fifth – the 151-seat 2019/2022 chambers
-                       give the spare seat to the most-advantaged fifth.
+                       give the spare seat to the most-disadvantaged fifth.
                        seifa_quintiles.py is the vote; the floor is the
                        seifa store's own (2001, via the HTPP table).
   senate   2016–2025   IMPLIED, never counted – no official two-party

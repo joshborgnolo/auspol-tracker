@@ -429,7 +429,7 @@ def quint_shares():
     """({index: {quintKey: {year: pcts}}}, {year: nat pcts}) over
        SEIFA_YEARS: the same hcands/dop per-division first preferences
        regrouped by seifa_quintiles' memberships, one lane per index
-       (each index's rank 1 = most disadvantaged). 2001 rides hcands,
+       (each index's rank 1 = most advantaged). 2001 rides hcands,
        the downloads era the same dop read the class lane uses; the join
        asserts exact like the class lane's, and recon must equal the
        class lane's nat sums – the same ballots partitioned two ways,
