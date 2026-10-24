@@ -640,7 +640,7 @@
      55.75,
      52.04
     ],
-    "short": "most-disadvantaged IRSAD fifth"
+    "short": "Top fifth"
    },
    "q2": {
     "seifa": true,
@@ -679,7 +679,7 @@
      48.3,
      47.89
     ],
-    "short": "second-most-disadvantaged IRSAD fifth"
+    "short": "2nd fifth"
    },
    "q3": {
     "seifa": true,
@@ -718,7 +718,7 @@
      46.92,
      42.86
     ],
-    "short": "middle IRSAD fifth"
+    "short": "Middle fifth"
    },
    "q4": {
     "seifa": true,
@@ -757,7 +757,7 @@
      42.77,
      40.8
     ],
-    "short": "second-most-advantaged IRSAD fifth"
+    "short": "4th fifth"
    },
    "q5": {
     "seifa": true,
@@ -796,7 +796,7 @@
      45.96,
      40.92
     ],
-    "short": "most-advantaged IRSAD fifth"
+    "short": "Bottom fifth"
    }
   },
   "sen": {

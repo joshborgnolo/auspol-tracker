@@ -32,17 +32,19 @@ ROOT = os.path.dirname(HERE)
 
 # key -> (label, short, descriptor), in menu order: most disadvantaged
 # first. Label is a view title ("Most-disadvantaged fifth"), short the
-# "Federal, …" menu face with the index named, desc the phrase the copy
-# slots compose sentences from ("in the <desc> of seats by IRSAD rank").
+# bare menu face (the positional name alone – "Top fifth" through
+# "Bottom fifth", user rename 2026-10-24; the optgroup's own label
+# supplies the index), desc the phrase the copy slots compose sentences
+# from ("in the <desc> of seats by IRSAD rank").
 QUINT_META = (
-    ("q1", "Most-disadvantaged fifth", "most-disadvantaged IRSAD fifth",
+    ("q1", "Most-disadvantaged fifth", "Top fifth",
      "most-disadvantaged fifth"),
-    ("q2", "Second-most-disadvantaged fifth", "second-most-disadvantaged IRSAD fifth",
+    ("q2", "Second-most-disadvantaged fifth", "2nd fifth",
      "second-most-disadvantaged fifth"),
-    ("q3", "Middle fifth", "middle IRSAD fifth", "middle fifth"),
-    ("q4", "Second-most-advantaged fifth", "second-most-advantaged IRSAD fifth",
+    ("q3", "Middle fifth", "Middle fifth", "middle fifth"),
+    ("q4", "Second-most-advantaged fifth", "4th fifth",
      "second-most-advantaged fifth"),
-    ("q5", "Most-advantaged fifth", "most-advantaged IRSAD fifth",
+    ("q5", "Most-advantaged fifth", "Bottom fifth",
      "most-advantaged fifth"),
 )
 QUINTS = tuple(m[0] for m in QUINT_META)

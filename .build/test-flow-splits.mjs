@@ -420,16 +420,17 @@ assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(
    views; decisions: IRSAD fifths of thirty seats, all three measures):
    the menu's class slice splits at the grouping change - seat types stay
    in the federal optgroup and the five IRSAD fifths ride their own
-   "Federal, by IRSAD fifth" optgroup (each fifth's short names the index,
-   so the group label only adds the grouping word), both filtered off the
-   same menuClassKeys the arrow walk steps */
+   "Federal, by IRSAD quintile" optgroup (user rename, same day: the
+   fifths' option faces are the bare positional names "Top fifth" …
+   "Bottom fifth" - the group label carries the index), both filtered
+   off the same menuClassKeys the arrow walk steps */
 assert.ok(ap.includes('const menuClassSeat = menuClassKeys.filter((k) => !classBank[k].seifa);')
     && ap.includes('const menuClassSeifa = menuClassKeys.filter((k) => classBank[k].seifa);')
     && ap.includes('{menuClassSeat.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}')
     && ap.includes('{menuClassSeifa.length > 0 && (')
-    && ap.includes('<optgroup label="Federal, by IRSAD fifth">')
-    && ap.includes('{menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>'),
-  "the class slice splits into the seat-types-in-federal list and the IRSAD-fifths optgroup, both filtered off the one menuClassKeys the arrow walk steps");
+    && ap.includes('<optgroup label="Federal, by IRSAD quintile">')
+    && ap.includes('{menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}'),
+  "the class slice splits into the seat-types-in-federal list and the IRSAD-fifths optgroup (bare positional option faces), both filtered off the one menuClassKeys the arrow walk steps");
 /* 2026-10-23 (user: "add federal demographic rating breakdowns to primary
    vote view - eg 'Federal, provincial'"): the primary view gains the same
    four seat-class cuts off its OWN bank (PH_HIST.fed.classes, counted by

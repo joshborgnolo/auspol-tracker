@@ -564,11 +564,11 @@ CLASS_IDS.forEach((k) => {
 const QUINT_IDS = ["q1", "q2", "q3", "q4", "q5"];
 const SEIFA_YEARS = YEARS.filter((y) => y >= 2001);
 const QUINT_META = {  // id -> [label, short, desc]: mirrors seifa_quintiles.py's QUINT_META
-  q1: ["Most-disadvantaged fifth", "most-disadvantaged IRSAD fifth", "most-disadvantaged fifth"],
-  q2: ["Second-most-disadvantaged fifth", "second-most-disadvantaged IRSAD fifth", "second-most-disadvantaged fifth"],
-  q3: ["Middle fifth", "middle IRSAD fifth", "middle fifth"],
-  q4: ["Second-most-advantaged fifth", "second-most-advantaged IRSAD fifth", "second-most-advantaged fifth"],
-  q5: ["Most-advantaged fifth", "most-advantaged IRSAD fifth", "most-advantaged fifth"],
+  q1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
+  q2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  q3: ["Middle fifth", "Middle fifth", "middle fifth"],
+  q4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
+  q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
 };
 const quintOf = (rd) => `q${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
 const seifaIdx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;

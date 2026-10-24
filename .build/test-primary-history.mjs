@@ -176,11 +176,11 @@ const CLASS_YEARS = [1996, 1998, 2001, ...AEC_YEARS];
 const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
 const SEIFA_YEARS = [2001, ...AEC_YEARS];
 const QUINT_COPY = {
-  q1: ["Most-disadvantaged fifth", "most-disadvantaged IRSAD fifth", "most-disadvantaged fifth"],
-  q2: ["Second-most-disadvantaged fifth", "second-most-disadvantaged IRSAD fifth", "second-most-disadvantaged fifth"],
-  q3: ["Middle fifth", "middle IRSAD fifth", "middle fifth"],
-  q4: ["Second-most-advantaged fifth", "second-most-advantaged IRSAD fifth", "second-most-advantaged fifth"],
-  q5: ["Most-advantaged fifth", "most-advantaged IRSAD fifth", "most-advantaged fifth"],
+  q1: ["Most-disadvantaged fifth", "Top fifth", "most-disadvantaged fifth"],
+  q2: ["Second-most-disadvantaged fifth", "2nd fifth", "second-most-disadvantaged fifth"],
+  q3: ["Middle fifth", "Middle fifth", "middle fifth"],
+  q4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
+  q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
 };
 assert.ok(FED.classes && !SEN.classes, "fed.classes exists; the Senate holds no classes");
 assert.deepEqual(Object.keys(FED.classes), [...CLASSES, ...QUINTS],

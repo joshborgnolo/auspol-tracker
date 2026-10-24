@@ -1762,7 +1762,7 @@
   "classes": {
    "q1": {
     "label": "Most-disadvantaged fifth",
-    "short": "most-disadvantaged IRSAD fifth",
+    "short": "Top fifth",
     "desc": "most-disadvantaged fifth",
     "grn": [
      68.4,
@@ -1916,7 +1916,7 @@
    },
    "q2": {
     "label": "Second-most-disadvantaged fifth",
-    "short": "second-most-disadvantaged IRSAD fifth",
+    "short": "2nd fifth",
     "desc": "second-most-disadvantaged fifth",
     "grn": [
      74.8,
@@ -2070,7 +2070,7 @@
    },
    "q3": {
     "label": "Middle fifth",
-    "short": "middle IRSAD fifth",
+    "short": "Middle fifth",
     "desc": "middle fifth",
     "grn": [
      70.8,
@@ -2224,7 +2224,7 @@
    },
    "q4": {
     "label": "Second-most-advantaged fifth",
-    "short": "second-most-advantaged IRSAD fifth",
+    "short": "4th fifth",
     "desc": "second-most-advantaged fifth",
     "grn": [
      76.2,
@@ -2375,7 +2375,7 @@
    },
    "q5": {
     "label": "Most-advantaged fifth",
-    "short": "most-advantaged IRSAD fifth",
+    "short": "Bottom fifth",
     "desc": "most-advantaged fifth",
     "grn": [
      79.2,

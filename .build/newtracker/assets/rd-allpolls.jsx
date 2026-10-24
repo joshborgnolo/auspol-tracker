@@ -6894,9 +6894,9 @@ function RdExplained() {
   const lcBank = pair === "on" ? LC_ON_BANK : pair === "con" ? LC_CON_BANK : LC_BANK;
   /* the class slice of the federal menu, same keys the arrow walk
      steps (order kept: seat types first, IRSAD fifths after). The two
-     optgroups split it where the grouping changes - the fifths name the
-     ABS index in their short, so their group's label only adds the
-     grouping word */
+     optgroups split it where the grouping changes - the fifths' option
+     faces are the bare positional names ("Top fifth" … "Bottom fifth",
+     user rename 2026-10-24), the index named by their group's label */
   const menuClassKeys = figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys;
   const menuClassSeat = menuClassKeys.filter((k) => !classBank[k].seifa);
   const menuClassSeifa = menuClassKeys.filter((k) => classBank[k].seifa);
@@ -6910,8 +6910,8 @@ function RdExplained() {
         {menuClassSeat.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}
       </optgroup>
       {menuClassSeifa.length > 0 && (
-        <optgroup label="Federal, by IRSAD fifth">
-          {menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (classBank[k].short || classBank[k].label)}</option>)}
+        <optgroup label="Federal, by IRSAD quintile">
+          {menuClassSeifa.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{classBank[k].short || classBank[k].label}</option>)}
         </optgroup>
       )}
       {!figView && house !== "sen" && KEYS.length > 1 && (

@@ -79,12 +79,14 @@ const CLS_KEY = { "inner metropolitan": "inner", "outer metropolitan": "outer",
    index series' own 2001–2025 – the seifa store's floor, never the AEC
    counts' 1996 */
 const QUINTS = ["q1", "q2", "q3", "q4", "q5"];
+/* the menu faces (user rename 2026-10-24): the bare positional names,
+   the optgroup label carrying the index ("Federal, by IRSAD quintile") */
 const QUINT_SHORT = {
-  q1: "most-disadvantaged IRSAD fifth",
-  q2: "second-most-disadvantaged IRSAD fifth",
-  q3: "middle IRSAD fifth",
-  q4: "second-most-advantaged IRSAD fifth",
-  q5: "most-advantaged IRSAD fifth",
+  q1: "Top fifth",
+  q2: "2nd fifth",
+  q3: "Middle fifth",
+  q4: "4th fifth",
+  q5: "Bottom fifth",
 };
 const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
