@@ -106,15 +106,26 @@ const FIFTH_SHORT = {
 const LANE = { irsad: "q", ieo: "e", ier: "r" };   // index -> its keys' leading letter
 const IDX_OF = (id) => Object.keys(LANE).find((ix) => LANE[ix] === id[0]);
 const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
-const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
+const SEIFA = SEIFA_DOC.elections;
+/* the elections whose IRSAD fifths cut on the census-interpolated
+   percentile (the store's `_pcti.factors`; mirrors
+   seifa_quintiles.interp_years()) */
+const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
 /* the probe's OWN fifth membership: the advantage-order rank (IRSAD's
    advantaged-first `rank`; the IEO/IER cells' plain ranks keep the 1 =
    most disadvantaged print order, reflected n+1−rank) ceil-divided
    thirty seats a fifth, the 151-seat chambers' spare landing in the
    most-disadvantaged fifth – mirroring seifa_quintiles.quintile_of,
-   independently */
+   independently. IRSAD alone upgrades to the census-INTERPOLATED
+   percentile at the factor years (2013/2016/2019 – the interpolated
+   basis is the default, user call 2026-10-24), ranked most-first on the
+   same cut */
 const rankAdvOf = (ix, cell, n) => (ix === "irsad" ? cell.irsad.rank : n + 1 - cell[ix].rank);
 const fifthOf = (ix, rk) => LANE[ix] + Math.min(Math.floor((rk - 1) / 30) + 1, 5);
+// a division's advantage-rank at an interpolation year (pcti, most-first)
+const pctiRankOf = (mem) => new Map(Object.keys(mem)
+  .sort((a, b) => mem[b].irsad.pcti - mem[a].irsad.pcti).map((nm, i) => [nm, i + 1]));
 /* the implied Senate two-party: the four post-GVT events (group tickets
    kept no per-ballot record before 2016), and the family rows this
    probe's own recompute sums - the same five the generator allowlists */
@@ -226,10 +237,30 @@ AEC_YEARS.forEach((y) => {
       const ids = FIFTHS.filter((q) => IDX_OF(q) === ix);
       const qs = Object.fromEntries(ids.map((q) => [q, [0, 0]]));
       const n = Object.keys(mem).length;
+      /* IRSAD at a pcti factor year ranks the interpolated percentile
+         (most-first, distinct – no tie rule), never the recorded rank;
+         the interpolation moves twelve seats at 2013, ten at 2019 (the
+         spare-seat rung shifts the cut points), none at 2016 */
+      let pctiRa = null;
+      if (ix === "irsad" && INTERP_YEARS.has(y)) {
+        const pcts = Object.entries(mem).map(([d, c]) => {
+          assert.ok(typeof c.irsad.pcti === "number" && c.irsad.pcti > 0 && c.irsad.pcti <= 1,
+            `${y} ${d}: an interpolated percentile in (0, 1]`);
+          return c.irsad.pcti;
+        });
+        assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
+        pctiRa = pctiRankOf(mem);
+        const moved = Object.keys(mem).filter((d) => fifthOf(ix, pctiRa.get(d)) !== fifthOf(ix, rankAdvOf(ix, mem[d], n))).length;
+        assert.equal(moved, { 2013: 12, 2016: 0, 2019: 10 }[y], `${y}: pcti v rank movement`);
+      } else if (ix === "irsad") {
+        Object.entries(mem).forEach(([d, c]) => {
+          assert.ok(c.irsad.pcti === undefined, `${y} ${d}: no pcti outside the factor years`);
+        });
+      }
       for (const [div, pair] of Object.entries(perDiv)) {
         const cell2 = mem[div];
         assert.ok(cell2 && cell2[ix], `${y}: ${div} carries a ${ix} cell`);
-        const q = fifthOf(ix, rankAdvOf(ix, cell2, n));
+        const q = fifthOf(ix, pctiRa ? pctiRa.get(div) : rankAdvOf(ix, cell2, n));
         assert.ok(ids.includes(q), `${y}: ${div} fifth ${q} in range`);
         qs[q][0] += pair[0]; qs[q][1] += pair[1];
       }

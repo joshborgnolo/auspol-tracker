@@ -571,6 +571,10 @@ CLASS_IDS.forEach((k) => {
    1 = most-disadvantaged print order, reflected n+1−rank) ranks the
    chamber most-advantaged-first, and ceil(rank/30) is the fifth (the
    151-seat chambers' spare seat lands in the most-disadvantaged fifth).
+   IRSAD alone upgrades to the census-INTERPOLATED percentile where the
+   seifa store ships its `_pcti` factors (2013/2016/2019 today — user
+   call 2026-10-24: the interpolated basis is the default), ranked
+   most-first on the same thirty-a-fifth cut.
    The lanes run the index series' own
    span 2001–2025 — the block's 2028 forward cells score unelected
    boundaries, and the hollow column is 2001 alone (from 2004 the count
@@ -599,7 +603,16 @@ const IX_NAME = { irsad: "IRSAD", ieo: "IEO", ier: "IER" };
    reflect it (n+1−rank) */
 const rankAdvOf = (ix, cell, n) => (ix === "irsad" ? cell.irsad.rank : n + 1 - cell[ix].rank);
 const fifthOf = (ra, ix) => `${QIDXES[ix]}${Math.min(Math.floor((ra - 1) / 30) + 1, 5)}`;
-const seifaIdx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
+const seifaIdx = SEIFA_DOC.elections;
+/* the elections whose IRSAD fifths cut on the census-interpolated
+   percentile (the store's `_pcti.factors`; mirrors
+   seifa_quintiles.interp_years()), and the basis phrase the IRSAD lanes'
+   scope lines carry — mirrors seifa_quintiles.elections_suffix() on the
+   store's current window. A new pcti factor year goes red here: that is
+   a copy change wanting a human, never a silent re-pin */
+const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
+const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)";
 /* each index's membership, probed from the seifa store: every fifth is
    thirty seats (the 151-seat 2019/2022 chambers' spare joins the most-
    disadvantaged fifth), the ranks are a permutation of 1..N, and the named
@@ -616,9 +629,38 @@ for (const ix of Object.keys(QIDXES)) {
     const sizes = Object.fromEntries(ids.map((q) => [q, 0]));
     const ranks = [];
     quintCell[ix][y] = {};
+    /* each division's advantage-ordered rank on THIS election's basis:
+       IRSAD at a pcti factor year ranks the census-interpolated
+       percentile descending (highest percentile = advantage-rank 1;
+       the percentiles are distinct, so the cut has no tie rule); every
+       other cell reads the recorded rank */
+    const raOf = new Map();
+    if (ix === "irsad" && INTERP_YEARS.has(y)) {
+      const pcts = [];
+      ents.forEach(([nm, cell]) => {
+        const p = cell.irsad.pcti;
+        assert.ok(typeof p === "number" && p > 0 && p <= 1, `${y} ${nm}: an interpolated percentile in (0, 1]`);
+        pcts.push(p);
+      });
+      assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct`);
+      [...ents].sort((a, b) => b[1].irsad.pcti - a[1].irsad.pcti)
+        .forEach(([nm], i) => raOf.set(nm, i + 1));
+      /* the interpolation's footprint against the recorded-rank cut:
+         twelve seats move fifths at 2013, ten at 2019 (the 151-seat
+         chamber's spare-seat rung shifts the advantaged-first cut
+         points), none at 2016 — its census sat five weeks after
+         election day, so pcti ≈ rank */
+      const moved = ents.filter(([nm, cell]) => fifthOf(raOf.get(nm), ix) !== fifthOf(rankAdvOf(ix, cell, n), ix)).length;
+      assert.equal(moved, { 2013: 12, 2016: 0, 2019: 10 }[y], `${y}: pcti v rank movement`);
+    } else {
+      ents.forEach(([nm, cell]) => {
+        if (ix === "irsad") assert.ok(cell.irsad.pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
+        raOf.set(nm, rankAdvOf(ix, cell, n));
+      });
+    }
     ents.forEach(([nm, cell]) => {
       assert.ok(cell[ix] && cell[ix].rank != null, `${y} ${nm}: a ${IX_NAME[ix]} cell`);
-      const ra = rankAdvOf(ix, cell, n);
+      const ra = raOf.get(nm);
       assert.ok(Number.isInteger(ra) && ra >= 1 && ra <= n, `${y} ${nm}: ${IX_NAME[ix]} rank in 1..${n}`);
       ranks.push(ra);
       const q = fifthOf(ra, ix);
@@ -652,6 +694,16 @@ assert.equal(quintCell.ier["2001"]["Wide Bay"].id, "r5", "2001 Wide Bay: IER's m
 assert.equal(quintCell.ier["2025"]["Barker"].id, "r5", "2025 Barker: the reflected rank-30 closes the most-disadvantaged IER fifth from above");
 assert.equal(quintCell.ier["2025"]["Swan"].id, "r4", "2025 Swan: the reflected rank-31 keeps the fourth IER fifth");
 assert.equal(quintCell.ier["2025"]["Mitchell"].id, "r1", "2025 Mitchell: IER's most-advantaged division");
+/* the pcti lane's own anchors (the interpolation years' ends of the
+   ladder, cut on the percentile itself): Lingiari closes the
+   most-disadvantaged IRSAD fifth at all three, Spence's 151st rank is
+   the 2019 spare, and Bradfield/Wentworth head the most-advantaged */
+assert.equal(quintCell.irsad["2013"]["Lingiari"].id, "q5", "2013 Lingiari: the most-disadvantaged IRSAD fifth (interpolated)");
+assert.equal(quintCell.irsad["2013"]["Bradfield"].id, "q1", "2013 Bradfield: the most-advantaged IRSAD fifth (interpolated)");
+assert.equal(quintCell.irsad["2016"]["Lingiari"].id, "q5", "2016 Lingiari: the most-disadvantaged IRSAD fifth (interpolated)");
+assert.equal(quintCell.irsad["2016"]["Wentworth"].id, "q1", "2016 Wentworth: the most-advantaged IRSAD fifth (interpolated)");
+assert.equal(quintCell.irsad["2019"]["Spence"].id, "q5", "2019 Spence: the most-disadvantaged IRSAD fifth (the 151-seat spare, interpolated)");
+assert.equal(quintCell.irsad["2019"]["Wentworth"].id, "q1", "2019 Wentworth: the most-advantaged IRSAD fifth (interpolated)");
 
 // the classic-basis lane recompute, keyed by each index's fifths (same
 // engines and filters as the class block's — only the grouping map changes)
@@ -881,7 +933,12 @@ SEIFA_IDS.forEach((q) => {
   assert.deepEqual([...got.years], SEIFA_YEARS, `${q}: the index series' span`);
   assert.deepEqual([...got.hollowYears], [2001], `${q}: only the series-floor 2001 ring is hollow`);
   assert.equal(got.short, QUINT_META[q[1]][1], `${q}: the menu face`);
-  assert.equal(got.elections, `federal elections in the ${QUINT_META[q[1]][2]} of seats by ${IX_NAME[ix]} rank`,
+  /* the IRSAD lane names its interpolated-percentile basis; IEO and IER
+     ride the plain rank phrase */
+  const wantEls = ix === "irsad"
+    ? `federal elections in the ${QUINT_META[q[1]][2]} ${ELECTIONS_SUFFIX}`
+    : `federal elections in the ${QUINT_META[q[1]][2]} of seats by ${IX_NAME[ix]} rank`;
+  assert.equal(got.elections, wantEls,
     `${q}: the chart head's scope line names the grouping and index`);
   const allSeats = data.seifa.allSeats[q];
   BUCKETS.forEach((b) => {
