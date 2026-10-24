@@ -40,7 +40,9 @@ preferred vote at each federal election:
                        charts fork their captions on (2026-10-24, the user-
                        approved ABS-SEIFA addition: quintile bands, IRSAD
                        only, all three measures). data/division-seifa-
-                       indexes.json's rankDis (1 = most disadvantaged),
+                       indexes.json's census-interpolated percentile where
+                       the store carries one (2013, 2016, 2019), the
+                       recorded rankDis otherwise (1 = most disadvantaged),
                        thirty seats a fifth – the 151-seat 2019/2022
                        chambers give the spare seat to the most-advantaged
                        fifth. seifa_quintiles.py is the vote; the floor is
@@ -85,7 +87,7 @@ Usage: python3 .build/aec-2pp-history.py [--check]
 """
 import csv, json, os, sys
 
-from seifa_quintiles import QUINT_META, SEIFA_YEARS, membership as seifa_membership
+from seifa_quintiles import QUINT_META, SEIFA_YEARS, elections_suffix, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -308,7 +310,7 @@ def build():
         if y in SEIFA_YEARS:
             # the IRSAD-fifth regrouping of the very same per-division
             # counts (seifa_quintiles.membership marks every division one
-            # of q1..q5 by that election's IRSAD rankDis)
+            # of q1..q5 by that election's IRSAD percentile)
             mem = seifa_membership(y)
             assert set(mem) == set(v["perDiv"]), \
                 f"{y}: IRSAD-quintile join drifted - quintilised {sorted(set(mem) - set(v['perDiv']))[:3]}, counted-only {sorted(set(v['perDiv']) - set(mem))[:3]}"
@@ -395,7 +397,7 @@ def build():
     # grouping is)
     for q, label, short, desc in QUINT_META:
         doc["fed"]["classes"][q] = {"seifa": True,
-                                    **view(label, f"federal elections in the {desc} of seats by IRSAD rank",
+                                    **view(label, f"federal elections in the {desc} {elections_suffix()}",
                                            per_quint[q], short=short)}
 
     sen = senate_implied()

@@ -606,7 +606,7 @@
    "q1": {
     "seifa": true,
     "label": "Most-disadvantaged fifth",
-    "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD rank",
+    "elections": "federal elections in the most-disadvantaged fifth of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)",
     "years": [
      2001,
      2004,
@@ -623,9 +623,9 @@
      44.64,
      48.88,
      45.53,
-     44.35,
+     44.28,
      48.4,
-     45.11,
+     45.58,
      44.25,
      47.96
     ],
@@ -634,9 +634,9 @@
      55.36,
      51.12,
      54.47,
-     55.65,
+     55.72,
      51.6,
-     54.89,
+     54.42,
      55.75,
      52.04
     ],
@@ -645,7 +645,7 @@
    "q2": {
     "seifa": true,
     "label": "Second-most-disadvantaged fifth",
-    "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD rank",
+    "elections": "federal elections in the second-most-disadvantaged fifth of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)",
     "years": [
      2001,
      2004,
@@ -662,9 +662,9 @@
      47.81,
      56.03,
      54.44,
-     48.77,
+     48.06,
      51.38,
-     50.3,
+     48.36,
      51.7,
      52.11
     ],
@@ -673,9 +673,9 @@
      52.19,
      43.97,
      45.56,
-     51.23,
+     51.94,
      48.62,
-     49.7,
+     51.64,
      48.3,
      47.89
     ],
@@ -684,7 +684,7 @@
    "q3": {
     "seifa": true,
     "label": "Middle fifth",
-    "elections": "federal elections in the middle fifth of seats by IRSAD rank",
+    "elections": "federal elections in the middle fifth of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)",
     "years": [
      2001,
      2004,
@@ -701,9 +701,9 @@
      49.39,
      56.42,
      54.27,
-     49.32,
+     49.0,
      52.78,
-     47.93,
+     48.59,
      53.08,
      57.14
     ],
@@ -712,9 +712,9 @@
      50.61,
      43.58,
      45.73,
-     50.68,
+     51.0,
      47.22,
-     52.07,
+     51.41,
      46.92,
      42.86
     ],
@@ -723,7 +723,7 @@
    "q4": {
     "seifa": true,
     "label": "Second-most-advantaged fifth",
-    "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD rank",
+    "elections": "federal elections in the second-most-advantaged fifth of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)",
     "years": [
      2001,
      2004,
@@ -740,9 +740,9 @@
      47.13,
      51.09,
      48.93,
-     47.14,
+     47.94,
      50.88,
-     51.57,
+     52.4,
      57.23,
      59.2
     ],
@@ -751,9 +751,9 @@
      52.87,
      48.91,
      51.07,
-     52.86,
+     52.06,
      49.12,
-     48.43,
+     47.6,
      42.77,
      40.8
     ],
@@ -762,7 +762,7 @@
    "q5": {
     "seifa": true,
     "label": "Most-advantaged fifth",
-    "elections": "federal elections in the most-advantaged fifth of seats by IRSAD rank",
+    "elections": "federal elections in the most-advantaged fifth of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)",
     "years": [
      2001,
      2004,
@@ -779,7 +779,7 @@
      47.35,
      51.04,
      47.48,
-     43.04,
+     43.34,
      44.89,
      47.36,
      54.04,
@@ -790,7 +790,7 @@
      52.65,
      48.96,
      52.52,
-     56.96,
+     56.66,
      55.11,
      52.64,
      45.96,

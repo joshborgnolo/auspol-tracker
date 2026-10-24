@@ -5000,6 +5000,19 @@ const flowHistory = (() => {
   try {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     const CLASS_CUT = 2004;
+    /* the IRSAD scope line's interpolation window, derived from the seifa
+       store's own _pcti factors (mirrors seifa_quintiles.interp_label() —
+       2013, 2016 and 2019 today; the CD-era division lanes join the copy
+       the day their polygons land). The {ys} placeholder is filled
+       wherever the quintile scope line renders. */
+    let interpYs = "2013, 2016 and 2019";
+    try {
+      const fact = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"))
+        ._pcti.factors, ys = Object.keys(fact).map(Number).sort((a, b) => a - b);
+      interpYs = ys.length > 1 ? ys.slice(0, -1).join(", ") + " and " + ys[ys.length - 1] : String(ys[0]);
+    } catch { /* keep the pinned window */ }
+    const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the "
+      + interpYs + " elections, the census rank otherwise)";
     /* the lane reader: the four seat types (store classes/allSeats over
        fcf.years) and the five IRSAD fifths (store seifa.classes/
        seifa.allSeats over seifa.years — emitted into the SAME bank with
@@ -5016,7 +5029,7 @@ const flowHistory = (() => {
         const estLump = years.map((y, i) => buckets.some((b) => est(b)[i]));
         return [k,
           { label: s.label, short: s.short,
-            elections: seifa ? "federal elections in the " + s.desc + " of seats by IRSAD rank"
+            elections: seifa ? "federal elections in the " + s.desc + " " + ELECTIONS_SUFFIX
                              : "federal elections in " + s.short + " seats",
             fedClass: true, ...(seifa ? { seifa: true } : {}),
             hollowYears: years.filter((y) => y < CLASS_CUT),

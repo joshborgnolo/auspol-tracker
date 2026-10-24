@@ -71,7 +71,8 @@
    2001–2025 (the seifa store's 2028 cells score unelected boundaries —
    never a cut year; pre-2001 holds no IRSAD block). Its membership is
    probed from data/division-seifa-indexes.json here (thirty seats a
-   fifth by rankDis, the 151-seat chambers' spare to q5; name anchors
+   fifth by census-interpolated percentile where the store carries one,
+   rankDis otherwise, the 151-seat chambers' spare to q5; name anchors
    Bonython/North Sydney 2001, Lingiari/Banks 2025), both lanes recompute
    from the same AEC caches keyed by fifth (the leftover engine's census
    alone switches grouping), and the built-asset pins assert the merged
@@ -555,12 +556,17 @@ CLASS_IDS.forEach((k) => {
    seats, IRSAD only, flows + 2PP + primary — these two lanes are the flows
    side). The store's seifa block mirrors the class lanes with the quintile
    membership of data/division-seifa-indexes.json standing in for the
-   classification store: rankDis ranks the chamber most-disadvantaged-first,
-   and ceil(rankDis/30) is the fifth (the 151-seat chambers' spare seat
-   lands in q5, the advantaged end). The lanes run the index series' own
-   span 2001–2025 — the block's 2028 forward cells score unelected
-   boundaries, and the hollow column is 2001 alone (from 2004 the count
-   covers every seat, exactly as the class lanes). */
+   classification store. THE BASIS: the interpolated percentile pcti (0 =
+   most disadvantaged, linearly interpolated between the bracketing
+   censuses at the election date) where the seifa store's own _pcti
+   factors ship one — 2013/2016/2019 today — sorted ascending thirty
+   seats a fifth; every other election keeps the recorded census rankDis
+   (1..N most-disadvantaged-first; ceil(rankDis/30) the fifth). Either
+   way the 151-seat chambers' spare seat lands in q5, the advantaged end.
+   The lanes run the index series' own span 2001–2025 — the block's 2028
+   forward cells score unelected boundaries, and the hollow column is
+   2001 alone (from 2004 the count covers every seat, exactly as the
+   class lanes). */
 const QUINT_IDS = ["q1", "q2", "q3", "q4", "q5"];
 const SEIFA_YEARS = YEARS.filter((y) => y >= 2001);
 const QUINT_META = {  // id -> [label, short, desc]: mirrors seifa_quintiles.py's QUINT_META
@@ -571,10 +577,18 @@ const QUINT_META = {  // id -> [label, short, desc]: mirrors seifa_quintiles.py'
   q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
 };
 const quintOf = (rd) => `q${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
-const seifaIdx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
+const seifaIdx = SEIFA_DOC.elections;
+const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
+/* the basis phrase the quintile scope lines carry — mirrors
+   seifa_quintiles.elections_suffix() on the store's current interpolation
+   window (2013, 2016 and 2019); a new pcti factor year goes red here */
+const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)";
 /* the membership this lane grouped by, probed from the seifa store: every
    fifth is thirty seats (the 151-seat 2019/2022 chambers' spare joins q5),
-   rankDis is a permutation of 1..N, and the named anchors stay on rung */
+   on the pcti basis where the factors ship one (pcti distinct, in (0,1])
+   and the rankDis permutation otherwise, and the named anchors stay on
+   rung. */
 const quintCell = {};                            // year -> division name -> {q, state}
 SEIFA_YEARS.forEach((y) => {
   const blk = seifaIdx[String(y)];
@@ -582,23 +596,50 @@ SEIFA_YEARS.forEach((y) => {
   const ents = Object.entries(blk), n = ents.length;
   assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
   const sizes = Object.fromEntries(QUINT_IDS.map((q) => [q, 0]));
-  const ranks = [];
   quintCell[y] = {};
-  ents.forEach(([nm, cell]) => {
-    const rd = cell.irsad.rankDis;
-    assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
-    ranks.push(rd);
-    const q = quintOf(rd);
-    sizes[q] += 1;
-    quintCell[y][nm] = { q, state: cell.state };
-  });
-  assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
-    `${y}: rankDis is a permutation of 1..${n}`);
+  if (INTERP_YEARS.has(y)) {
+    const names = ents.map(([nm]) => nm);
+    assert.ok(names.every((nm) => typeof blk[nm].irsad.pcti === "number"
+      && blk[nm].irsad.pcti > 0 && blk[nm].irsad.pcti <= 1), `${y}: every cell carries pcti in (0,1]`);
+    assert.equal(new Set(names.map((nm) => blk[nm].irsad.pcti)).size, n,
+      `${y}: pcti is one-per-division (the thirty-a-fifth cut has no tie rule)`);
+    names.sort((a, b) => blk[a].irsad.pcti - blk[b].irsad.pcti);
+    names.forEach((nm, i) => {
+      const q = `q${Math.min(Math.floor(i / 30) + 1, 5)}`;
+      sizes[q] += 1;
+      quintCell[y][nm] = { q, state: blk[nm].state };
+    });
+    /* the interpolation's own footprint against the recorded-rank cut —
+       12 seats moved fifths at 2013 and 2019, none at 2016 (its pcti
+       ratio sits five weeks short of the census it measures) */
+    const moved = names.filter((nm) => quintCell[y][nm].q !== quintOf(blk[nm].irsad.rankDis)).length;
+    assert.equal(moved, { 2013: 12, 2016: 0, 2019: 12 }[y] ?? moved,
+      `${y}: pcti v rankDis movement`);
+  } else {
+    const ranks = [];
+    ents.forEach(([nm, cell]) => {
+      const rd = cell.irsad.rankDis;
+      assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
+      assert.ok(cell.irsad.pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
+      ranks.push(rd);
+      const q = quintOf(rd);
+      sizes[q] += 1;
+      quintCell[y][nm] = { q, state: cell.state };
+    });
+    assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
+      `${y}: rankDis is a permutation of 1..${n}`);
+  }
   assert.deepEqual(sizes, { q1: 30, q2: 30, q3: 30, q4: 30, q5: n - 120 },
     `${y}: thirty seats a fifth, q5 the 151-seat balance`);
 });
 assert.equal(quintCell["2001"]["Bonython"].q, "q1", "2001 Bonython: the most-disadvantaged fifth");
 assert.equal(quintCell["2001"]["North Sydney"].q, "q5", "2001 North Sydney: the most-advantaged fifth");
+assert.equal(quintCell["2013"]["Lingiari"].q, "q1", "2013 Lingiari: the most-disadvantaged fifth");
+assert.equal(quintCell["2013"]["Bradfield"].q, "q5", "2013 Bradfield: the pcti year's most-advantaged fifth");
+assert.equal(quintCell["2016"]["Lingiari"].q, "q1", "2016 Lingiari: the most-disadvantaged fifth");
+assert.equal(quintCell["2016"]["Wentworth"].q, "q5", "2016 Wentworth: the pcti year's most-advantaged fifth");
+assert.equal(quintCell["2019"]["Spence"].q, "q1", "2019 Spence: the pcti year's most-disadvantaged fifth");
+assert.equal(quintCell["2019"]["Wentworth"].q, "q5", "2019 Wentworth: the most-advantaged fifth");
 assert.equal(quintCell["2025"]["Lingiari"].q, "q1", "2025 Lingiari: the most-disadvantaged fifth");
 assert.equal(quintCell["2025"]["Banks"].q, "q4", "2025 Banks: the second-most-advantaged fifth");
 
@@ -811,8 +852,8 @@ QUINT_IDS.forEach((q) => {
   assert.deepEqual([...got.years], SEIFA_YEARS, `${q}: the index series' span`);
   assert.deepEqual([...got.hollowYears], [2001], `${q}: only the series-floor 2001 ring is hollow`);
   assert.equal(got.short, QUINT_META[q][1], `${q}: the menu face`);
-  assert.equal(got.elections, `federal elections in the ${QUINT_META[q][2]} of seats by IRSAD rank`,
-    `${q}: the chart head's scope line names the grouping`);
+  assert.equal(got.elections, `federal elections in the ${QUINT_META[q][2]} ${ELECTIONS_SUFFIX}`,
+    `${q}: the chart head's scope line names the grouping and its basis`);
   const allSeats = data.seifa.allSeats[q];
   BUCKETS.forEach((b) => {
     const merged = SEIFA_YEARS.map((y, yi) => (yi < 1 ? data.seifa.classes[q][b][yi] : allSeats[b][yi]));

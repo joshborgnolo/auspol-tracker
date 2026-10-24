@@ -20,11 +20,13 @@
       independent, so the AEC's own table omits it.
    3. The IRSAD fifths ride the SAME classes bank after the four classes
       (q1..q5, seifa: true): the same per-division counts regrouped by
-      data/division-seifa-indexes.json's rankDis (1 = most disadvantaged;
-      thirty seats a fifth, q5 taking the 151-seat years' spare), on the
-      index series' own 2001–2025 span (2001 via the HTPP table). This
-      probe recomputes the membership from the seifa store's OWN cells and
-      re-sums the downloads' counts, never seifa_quintiles.py's answer.
+      data/division-seifa-indexes.json's interpolated IRSAD percentile
+      where the store carries one (2013, 2016 and 2019), the recorded
+      census rankDis otherwise (1 = most disadvantaged; thirty seats a
+      fifth, q5 taking the 151-seat years' spare), on the index series'
+      own 2001–2025 span (2001 via the HTPP table). This probe recomputes
+      the membership from the seifa store's OWN cells and re-sums the
+      downloads' counts, never seifa_quintiles.py's answer.
    4. The story pins hold: the canonical records' extremes, the urban-
       ladder readings behind "Federal, inner metro" & "Federal, rural",
       and the fifths' 2025 ladder (most-disadvantaged 47.96 to most-
@@ -89,11 +91,23 @@ const QUINT_SHORT = {
   q5: "Bottom fifth",
 };
 const SEIFA_YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
-const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
-/* the probe's OWN quintile membership: rankDis (1 = most disadvantaged)
-   ceil-divided thirty seats a fifth, the 151-seat chambers' spare landing
-   in q5 – mirroring seifa_quintiles.quintile_of, independently */
+const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
+const SEIFA = SEIFA_DOC.elections;
+const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
+/* the probe's OWN quintile membership, dual-basis: thirty seats a fifth
+   cut on the census-interpolated percentile where a pcti factor year
+   exists, else rankDis (1 = most disadvantaged) ceil-divided, q5 taking
+   the 151-seat chambers' spare – mirroring seifa_quintiles.membership,
+   independently */
 const quintOf = (rankDis) => "q" + Math.min(Math.floor((rankDis - 1) / 30) + 1, 5);
+const quintOfDiv = (y, div) => {
+  const blk = SEIFA[String(y)], cell = blk[div].irsad;
+  if (INTERP_YEARS.has(y)) {
+    const pos = Object.keys(blk).sort((a, b) => blk[a].irsad.pcti - blk[b].irsad.pcti);
+    return "q" + Math.min(Math.floor(pos.indexOf(div) / 30) + 1, 5);
+  }
+  return quintOf(cell.rankDis);
+};
 /* the implied Senate two-party: the four post-GVT events (group tickets
    kept no per-ballot record before 2016), and the family rows this
    probe's own recompute sums - the same five the generator allowlists */
@@ -204,7 +218,7 @@ AEC_YEARS.forEach((y) => {
     for (const [div, pair] of Object.entries(perDiv)) {
       const cell2 = mem[div];
       assert.ok(cell2 && cell2.irsad, `${y}: ${div} carries an IRSAD cell`);
-      const q = quintOf(cell2.irsad.rankDis);
+      const q = quintOfDiv(y, div);
       assert.ok(QUINTS.includes(q), `${y}: ${div} quintile ${q} in range`);
       qs[q][0] += pair[0]; qs[q][1] += pair[1];
     }

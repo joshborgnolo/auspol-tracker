@@ -60,6 +60,35 @@ This note is the manifest to rebuild that cache from scratch.
 | `mbcounts-2011.csv` | ABS cat 2074.0 `DetailsPage/2074.02011?OpenDocument` (Mesh Block Counts, Persons_Usually_Resident col) |
 | `mbcounts-2016.csv` | ABS cat 2074.0 `DetailsPage/2074.02016?OpenDocument` (Person col) |
 
+### ASGS correspondence files (`<root>/.matilda/seifa-irsad-abs/dl/`, consumed by the interp pipeline `../../seat-model/derive-division-seifa-interp.py`)
+
+Published ABS population-weighted concordances — the c0/c1 census
+geometries the percentile interpolation keys to. Every workbook carries
+ABS banner rows; the Correspondence sheet's real header is ALWAYS row 6
+(0-index row 5), data from row 8, schema
+`<FROM key>(,dup), <TO key>(,dup)(, TO name), RATIO, PERCENTAGE` where
+RATIO = population share of the FROM unit falling in the TO unit (the
+2039.0 §2.2 weight). CED_2018's file is legacy `.xls` (xlrd); the rest
+openpyxl. The two CD files split their correspondence over Sheets
+"Table 3a"+"Table 3b" (row-count split, BOTH concat, identical schema).
+Excel ships keys as floats ("101.0") in the .xls — cast via int.
+
+| File | sha256 (first 16) | Sheets / keys | Source |
+|---|---|---|---|
+| `CG_SA1_2011_SA1_2016.xlsx` | 826c8606e87245ed | Table 3 (~57.9k rows): SA1_MAINCODE_2011 → SA1_MAINCODE_2016 | ABS ASGS Ed 2 "Correspondences 2016" bundle — `data.gov.au` dataset "ASGS 2016 correspondences", resource zip `asgs2016correspondences.zip` |
+| `CG_SA1_2011_CED_2016.xlsx` | a69848f99d8fc568 | Table 3: SA1_MAINCODE_2011 → CED_CODE_2016 | same zip (the ready-made 2016-election c0 side) |
+| `CG_SA1_2011_CED_2017.xlsx` | 125e7c8e0aa45aa5 | Table 3: SA1_MAINCODE_2011 → CED_CODE_2017 | same zip |
+| `CG_SA1_2011_CED_2018.xls` | 6ca47e5d4f338ba2 | Sheet "Table 3" (54.8k rows): SA1_MAINCODE_2011 → CED_CODE_2018 | same zip |
+| `CG_CD_2001_SA1_2016.xlsx` | 25be38bc7e6b2155 | Tables 3a+3b concat: CD_CODE_2001 → SA1_MAINCODE_2016 | same zip |
+| `CG_CD_2006_SA1_2016.xlsx` | 7b6bd6337f37a00b | Tables 3a+3b concat (~114.9k rows): CD_CODE_2006 → SA1_MAINCODE_2016 | same zip |
+| `CG_SA1_2016_CED_2021.csv` | 1f312d4a44f63468 (57,830 lines + header) | SA1_MAINCODE_2016 → CED_CODE_2021, `RATIO_FROM_TO`, quality cols | ABS Ed 3 "Correspondences" page: `abs.gov.au/statistics/statistical-geography/australian-statistical-geography-standard-asgs-edition-3/{jul2021-jun2026}/access-and-downloads/correspondences/CG_SA1_2016_CED_2021.csv` |
+| `CG_SA1_2016_SA1_2021.csv` | 0bf756c16a267c67 (62,081 lines + header) | SA1_MAINCODE_2016 → SA1_CODE_2021, `RATIO_FROM_TO` | same Ed 3 page |
+
+data.gov.au gotchas (hit live 2026-10-24): the CKAN action API is under
+`/data/api/3/action` (NOT `/api/3/action`); the resource "down" link
+returns a 17.8kB Drupal HTML page unless the URL path ends
+`/download/asgs2016correspondences.zip`.
+
 Fetch gotchas (all hit live during the 2026-10-23 build): spaces in
 subscriber.nsf query strings must be %-escaped or curl exits (3) "URL
 rejected"; abs.gov.au `subserv` endpoints 302 twice, so always `curl -L`;

@@ -91,10 +91,12 @@ THE IRSAD-FIFTH LANE (2026-10-24, user: add the ABS socio-economic cuts
 beside the AEC classifications in the explainer menu views; approved
 decisions: quintile bands, IRSAD only, all three measures – this is the
 flows measure): the same two counted products regrouped by the fifth of
-seats each election's ABS SEIFA IRSAD rank places a division in –
-seifa_quintiles.membership() reads the store's rankDis (rank 1 = MOST
-disadvantaged), thirty seats a fifth, the 151-seat 2019/2022 chambers
-giving the spare seat to the most-advantaged fifth. The quintiles sit in
+seats each election's ABS SEIFA IRSAD standing places a division in –
+seifa_quintiles.membership() cuts on the store's census-interpolated
+percentile where it carries one (2013, 2016, 2019), the recorded rankDis
+(rank 1 = MOST disadvantaged) otherwise, thirty seats a fifth, the
+151-seat 2019/2022 chambers giving the spare seat to the most-advantaged
+fifth. The quintiles sit in
 the store's `seifa` block beside `classes`, in the same shapes
 (classes/allSeats over years 2001–2025 – the seifa store's floor), and
 gen-data merges them into the flowHistory classes bank after the four

@@ -8,14 +8,28 @@ attaches all four SEIFA indexes (irsd/irsad/ier/ieo scores + national
 deciles) from that census's index cube. Emits one data/booth-seifa-YYYY.json
 per election.
 
-Census pairing (mirrors the division store — no temporal interpolation):
+Measured census pairing (the committed measured-side observation):
   2004 -> SEIFA 2001 (CD geography)        coords carried from the 2007 file
   2007 -> SEIFA 2006 (CD)                  (2004 csv ships no coord columns)
   2010 -> SEIFA 2006 (CD)
   2013 -> SEIFA 2011 (SA1)
-  2016 -> SEIFA 2016 (SA1)
+  2016 -> SEIFA 2016 (SA1)                 (census 5 wks AFTER election day)
   2019 -> SEIFA 2016 (SA1)
   2022 -> SEIFA 2021 (SA1)
+
+Percentile interpolation (user directive 2026-10-25): on 2004..2019 each
+scored booth ALSO carries seifa.pct (its area's score percentile among all
+scored areas of the measured cube) and, when the far-side join lands, a
+seifaInterp block per index {pct0, pct1, pcti}: pct is re-derived inside
+the second census's cube at the SAME premises point (dual-era point-in-
+polygon against both bracketing census-era geometries), and pcti =
+(1-f)*pct0 + f*pct1 with f the day-share of the intercensal span elapsed
+at election day — the same convention as division-seifa-indexes.json's
+_pcti (rank-percentiles interpolate ABSOLUTE SES POSITION, which raw
+scores/deciles cannot do across re-based editions). 2016's measured side
+is pct1 (2016c) since the census sat five weeks after election day; the
+other lanes measure pct0. 2022/2025 carry no pct/seifaInterp (no 2026
+census yet brackets them) — those two stores stay byte-identical.
 
 Geometry sources (git-ignored caches, re-fetch: docs/abs-input-sources.md):
   CD 2001 : .matilda/seifa-irsad-abs/dl/asgc2001.gpkg  (data.gov.au mirror of
@@ -44,6 +58,7 @@ Guards fail loud; universe facts were measured against the vendored inputs
 on 2026-10-24. Test: node .build/analysis/seat-model/test-booth-seifa-hist.mjs
 """
 
+import bisect
 import csv
 import hashlib
 import io
@@ -163,6 +178,69 @@ CUBE_ROWS = {"cd2001": 35695, "cd2006": 37457, "sa1-2011": 52678,
 GEO_LABEL = {"cd2001": "CD (ASGC 2001, GDA94)", "cd2006": "CD (ASGC 2006)",
              "sa1-2011": "SA1 (ASGS 2011)", "sa1-2016": "SA1 (ASGS 2016)",
              "sa1-2021": "SA1 (ASGS Ed3 2021, GDA2020)"}
+GEO_FILES = {
+    "cd2001": [".matilda/seifa-irsad-abs/dl/asgc2001.gpkg"],
+    "cd2006": [f".matilda/seifa-irsad-abs/dl/1259030002_cd06a{s}_shape.zip"
+               for s in CD2006_STATES],
+    "sa1-2011": [".matilda/seifa-irsad-abs/dl/1270055001_sa1_2011_aust_shape.zip"],
+    "sa1-2016": [".matilda/seifa-irsad-abs/dl/1270055001_sa1_2016_aust_shape.zip"],
+    "sa1-2021": [".build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip"],
+}
+
+# ------------------------------------------------- percentile interpolation
+# The interp lane: for elections bracketed by two censuses, each scored
+# booth's premises point is joined into BOTH census-era geometries and
+# rank-percentiled inside both cubes; pcti mixes them at f, the day-share
+# of the intercensal span elapsed at election day. "measured" records
+# which side the committed seifa scores already carry (2016's is pct1:
+# the census sat five weeks AFTER 2016-07-02). 2022/2025 are absent —
+# nothing brackets them yet — so their stores stay byte-identical.
+INTERP = {
+    2004: {"c0": "cd2001", "c1": "cd2006", "measured": "pct0"},
+    2007: {"c0": "cd2006", "c1": "sa1-2011", "measured": "pct0"},
+    2010: {"c0": "cd2006", "c1": "sa1-2011", "measured": "pct0"},
+    2013: {"c0": "sa1-2011", "c1": "sa1-2016", "measured": "pct0"},
+    2016: {"c0": "sa1-2011", "c1": "sa1-2016", "measured": "pct1"},
+    2019: {"c0": "sa1-2016", "c1": "sa1-2021", "measured": "pct0"},
+}
+CUBE_CENSUS = {"cd2001": 2001, "cd2006": 2006, "sa1-2011": 2011,
+               "sa1-2016": 2016, "sa1-2021": 2021}
+# census nights + election days (derive-division-seifa-interp.py carries
+# the 2013/2016/2019 lanes of this same map — f must match its store's
+# _pcti.factors to the last decimal; the test asserts the cross-read)
+CENSUS_NIGHT = {2001: date(2001, 8, 7), 2006: date(2006, 8, 8),
+                2011: date(2011, 8, 9), 2016: date(2016, 8, 9),
+                2021: date(2021, 8, 10)}
+ELECTION_DAY = {2004: date(2004, 10, 9), 2007: date(2007, 11, 24),
+                2010: date(2010, 8, 21), 2013: date(2013, 9, 7),
+                2016: date(2016, 7, 2), 2019: date(2019, 5, 18)}
+
+
+def r6(x):
+    """Half-up 6dp — the store's rounding rule everywhere pct/pcti/f
+    appear; identical to derive-division-seifa-interp.py's r6 (Python's
+    round() is banker's and diverges from JS Math.round on near-ties)."""
+    return math.floor(x * 1e6 + 0.5) / 1e6
+
+
+def interp_f(year, c0_census, c1_census):
+    """Day-share of the c0..c1 intercensal span elapsed at election day."""
+    return r6((ELECTION_DAY[year] - CENSUS_NIGHT[c0_census]).days
+              / (CENSUS_NIGHT[c1_census] - CENSUS_NIGHT[c0_census]).days)
+
+
+def rank_basis(cube):
+    """Per-index sorted score ladder of the cube's scored areas — the pct
+    rank basis. Arrays are sorted ascending; ties keep min-rank
+    (bisect_left), so pct = (1 + count of areas scoring BELOW) / N:
+    lowest-score -> 1/N (most disadvantaged), highest -> N/N."""
+    return {k: sorted(v[k] for v in cube.values() if v[k] is not None)
+            for k in IDXS}
+
+
+def pct_of(ladder, idx, score):
+    r = bisect.bisect_left(ladder[idx], score)
+    return r6((r + 1) / len(ladder[idx]))
 
 
 # ---------------------------------------------------------------- AEC booths
@@ -688,10 +766,18 @@ def emit(year):
     e = ELECTIONS[year]
     cube_kind = e["cube"]
     geo_kind = cube_kind  # geometry follows the census era
+    interp = INTERP.get(year)
     for p, hint in ((Path(f'atlas/data/aec-{year}'), "git checkout"),
                     (CUBE_PATHS[cube_kind], "docs/abs-input-sources.md")):
         if not (ROOT / p).exists():
             fail(f"missing input {p} ({hint})")
+    if interp is not None:
+        far_kind_check = interp["c0"] if interp["measured"] == "pct1" \
+            else interp["c1"]
+        for p in GEO_FILES[far_kind_check] + [CUBE_PATHS[far_kind_check]]:
+            if not (ROOT / p).exists():
+                fail(f"missing far-side interp input {p} "
+                     "(docs/abs-input-sources.md)")
     booths = read_booths(year)
     if e.get("coords") == "carry2007":
         carry_2007_coords(booths)
@@ -711,6 +797,23 @@ def emit(year):
              f"{[k for k in COORD_OVERRIDES if k[0] == year and k not in applied_overrides]}")
     seifa = get_cube(cube_kind)
     locate, polys, null_codes = build_locate(geo_kind)
+
+    pct_ctx = None
+    drop_outside, drop_supp = [], []
+    if interp is not None:
+        far_kind = interp["far"] = interp["c0"] \
+            if interp["measured"] == "pct1" else interp["c1"]
+        interp["f"] = interp_f(year, CUBE_CENSUS[interp["c0"]],
+                               CUBE_CENSUS[interp["c1"]])
+        far_cube = get_cube(far_kind)
+        pct_ctx = {
+            "meas_ladder": rank_basis(seifa),
+            "far_ladder": rank_basis(far_cube),
+            "far_cube": far_cube,
+            "far_locate": build_locate(far_kind)[0],
+            "f": interp["f"],
+            "measured": interp["measured"],
+        }
 
     counts = Counter()
     mism = []
@@ -748,6 +851,33 @@ def emit(year):
                                   "ier": rec["ier_d"],
                                   "ieo": rec["ieo_d"]}}
             counts["scored"] += 1
+            if pct_ctx is not None:
+                pct = {k: pct_of(pct_ctx["meas_ladder"], k, rec[k])
+                       for k in IDXS if rec[k] is not None}
+                b["pct"] = pct
+                fcode = pct_ctx["far_locate"](b["lon"], b["lat"])
+                frec = pct_ctx["far_cube"].get(fcode) if fcode else None
+                valid = {}
+                if frec is not None:
+                    for k in pct:
+                        if frec[k] is None:
+                            continue
+                        p_far = pct_of(pct_ctx["far_ladder"], k, frec[k])
+                        p0, p1 = (pct[k], p_far) \
+                            if pct_ctx["measured"] == "pct0" \
+                            else (p_far, pct[k])
+                        valid[k] = {"pct0": p0, "pct1": p1,
+                                    "pcti": r6((1 - pct_ctx["f"]) * p0
+                                               + pct_ctx["f"] * p1)}
+                if valid:
+                    b["interp"] = valid
+                    counts["interp"] += 1
+                elif fcode is None:
+                    counts["interpFarOutside"] += 1
+                    drop_outside.append(f'{b["div"]}|{b["booth"]}')
+                else:
+                    counts["interpFarSuppressed"] += 1
+                    drop_supp.append(f'{b["div"]}|{b["booth"]}')
     counts["mapped_geo"] = sum(1 for b in booths if b.get("geo"))
     print(f"{year} counts:", dict(counts))
     if counts["pointOutside"]:
@@ -784,6 +914,13 @@ def emit(year):
         "published state quantile cell in the cube and the release's "
         "prose medians."
         if cube_kind == "cd2001" else "")
+    pcti_note = (
+        " Each scored booth also carries seifa.pct (its area's score "
+        "percentile inside the measured census's cube) and seifaInterp, an "
+        "interpolated percentile between this election's two bracketing "
+        "censuses (day-shared; method and factors in _pcti) — the "
+        "comparable-across-vintages field."
+        if interp is not None else "")
     out = {
         "_about": ("W-analysis store: one record per "
                    f"{year} federal polling place keyed to the four SEIFA "
@@ -793,7 +930,7 @@ def emit(year):
                    "the area OF THE PREMISES — a geographic proxy for the "
                    "catchment's SES, not an aggregate of catchment voters; "
                    "compare across census vintages by decile only."
-                   + carry_note + decile_note +
+                   + carry_note + decile_note + pcti_note +
                    " Coordinate-less mobile/hospital teams carry "
                    "note=noCoords; cube-suppressed areas carry "
                    "note=seifaSuppressed with seifa:null. stateFlag is a "
@@ -819,18 +956,54 @@ def emit(year):
         "counts": dict(counts),
         "booths": [],
     }
-    geo_files = {
-        "cd2001": [".matilda/seifa-irsad-abs/dl/asgc2001.gpkg"],
-        "cd2006": [f".matilda/seifa-irsad-abs/dl/1259030002_cd06a{s}_shape.zip"
-                   for s in CD2006_STATES],
-        "sa1-2011": [".matilda/seifa-irsad-abs/dl/1270055001_sa1_2011_aust_shape.zip"],
-        "sa1-2016": [".matilda/seifa-irsad-abs/dl/1270055001_sa1_2016_aust_shape.zip"],
-        "sa1-2021": [".build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip"],
-    }[cube_kind]
-    for rel in geo_files + [
-            str(CUBE_PATHS[cube_kind].relative_to(ROOT)),
-            *( [ "atlas/data/aec-2007/GeneralPollingPlacesDownload-13745.csv"]
-               if e.get("coords") == "carry2007" else [])]:
+    if interp is not None:
+        c0c, c1c = CUBE_CENSUS[interp["c0"]], CUBE_CENSUS[interp["c1"]]
+        far_kind = interp["far"]
+        # which cube kind each side's percentiles are ranked inside
+        side_kind = {"pct0": interp["c0"], "pct1": interp["c1"]}
+        out["_pcti"] = {
+            "method": ("seifa.pct = the prePrefs area's score percentile "
+                       "among all scored areas of the measured cube "
+                       "(ascending score, min-rank on ties, most-"
+                       "disadvantaged low; r6 half-up). seifaInterp keys a "
+                       "second point-in-polygon join of the same premises "
+                       "coords against the OTHER bracketing census-era "
+                       "geometry; pcti = (1-f)*pct0 + f*pct1 computed from "
+                       "the emitted r6-rounded pct0/pct1/f (the file re-"
+                       "derives its own pcti). Rank percentiles interpolate "
+                       "absolute SES position across re-based editions; "
+                       "raw scores never do. Booths whose far-side point "
+                       "lands outside any polygon (interpFarOutside) or in "
+                       "a score-suppressed area (interpFarSuppressed) carry "
+                       "pct only."),
+            "c0": c0c, "c1": c1c,
+            "date": ELECTION_DAY[year].isoformat(),
+            "f": interp["f"],
+            "measured": interp["measured"],
+            "pct0Label": GEO_LABEL[side_kind["pct0"]],
+            "pct1Label": GEO_LABEL[side_kind["pct1"]],
+            "geometries": {side_kind["pct0"]: GEO_LABEL[interp["c0"]],
+                           side_kind["pct1"]: GEO_LABEL[interp["c1"]]},
+            "booths": counts.get("interp", 0),
+            "dropped": {
+                "interpFarOutside": drop_outside,
+                "interpFarSuppressed": drop_supp,
+            },
+            "censusNights": {str(c0c): CENSUS_NIGHT[c0c].isoformat(),
+                             str(c1c): CENSUS_NIGHT[c1c].isoformat()},
+        }
+        meas_geo, far_geo = GEO_FILES[cube_kind], GEO_FILES[far_kind]
+        geo_files = meas_geo + [g for g in far_geo if g not in meas_geo]
+    else:
+        geo_files = GEO_FILES[cube_kind]
+    cube_paths = [str(CUBE_PATHS[cube_kind].relative_to(ROOT))]
+    if interp is not None:
+        far_rel = str(CUBE_PATHS[far_kind].relative_to(ROOT))
+        if far_rel not in cube_paths:
+            cube_paths.append(far_rel)
+    for rel in geo_files + cube_paths + [
+            *(["atlas/data/aec-2007/GeneralPollingPlacesDownload-13745.csv"]
+              if e.get("coords") == "carry2007" else [])]:
         out["_provenance"]["files"][rel] = hash16(ROOT / rel)
 
     if e.get("coords") == "carry2007":
@@ -865,6 +1038,10 @@ def emit(year):
             rec["note"] = b["note"]
         rec["geo"] = b.get("geo") or None
         rec["seifa"] = b.get("seifa")
+        if pct_ctx is not None and b.get("seifa"):
+            rec["seifa"]["pct"] = b["pct"]
+            if b.get("interp"):
+                rec["seifaInterp"] = b["interp"]
         out["booths"].append(rec)
     opath = ROOT / f"data/booth-seifa-{year}.json"
     opath.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n",

@@ -30,14 +30,17 @@
       per-cell figures recomputed from the committed sources, and ride the
       same fold/recombination contract; beside them the five IRSAD fifths
       (q1..q5, 2026-10-24 – each seat filed to a fifth of the chamber by
-      its IRSAD rank at THAT election, the ABS's socio-economic index of
-      advantage and disadvantage with the most-disadvantaged seat ranked
-      first, thirty seats a fifth and the 151-seat chambers' spare to the
-      most-advantaged) run the index series' own 2001–2025 span, ride
+      its IRSAD standing at THAT election: the census-interpolated
+      percentile where the store carries one (2013, 2016 and 2019), the
+      recorded census rank otherwise, the ABS's socio-economic index of
+      advantage and disadvantage with the most-disadvantaged seat
+      counted first, thirty seats a fifth and the 151-seat chambers'
+      spare to the most-advantaged) run the index series' own 2001–2025
+      span, ride
       their own foldPt 2 and seifa flag, their membership probed here from
-      data/division-seifa-indexes.json (thirty a fifth, rankDis a
-      permutation, named anchors) and their cells pinned, ladder-checked
-      and fold-checked like the classes';
+      data/division-seifa-indexes.json (thirty a fifth, the interpolation
+      window's movers counted, named anchors) and their cells pinned,
+      ladder-checked and fold-checked like the classes';
    5. gen-data's build-time stateElections derivation (2026-10-23, user:
       "what about primary votes for state elections, lower and upper
       houses"): the six assemblies' figures recompute independently from
@@ -167,8 +170,10 @@ const CLASS_YEARS = [1996, 1998, 2001, ...AEC_YEARS];
 /* 2026-10-24 (user: show the ABS SEIFA data beside the AEC's division
    classes in the explainer menu views; decisions: fifths of thirty seats,
    IRSAD only, flows + 2PP + primary): q1..q5 regroup the same House
-   figures by where each seat's IRSAD rank put it at THAT election – a
-   seat whose standing moved between elections moved fifths with it.
+   figures by where each seat's IRSAD standing put it at THAT election –
+   the census-interpolated percentile where the store carries one, the
+   recorded census rank otherwise (user direction 2026-10-24). A seat
+   whose standing moved between elections moved fifths with it.
    QUINT_COPY mirrors seifa_quintiles.py's QUINT_META (label, short, desc);
    SEIFA_YEARS is the index series' own span (the store's 2028 block
    scores the coming boundaries – never a counted history – and no IRSAD
@@ -182,6 +187,10 @@ const QUINT_COPY = {
   q4: ["Second-most-advantaged fifth", "4th fifth", "second-most-advantaged fifth"],
   q5: ["Most-advantaged fifth", "Bottom fifth", "most-advantaged fifth"],
 };
+/* mirrors seifa_quintiles.ELECTIONS_SUFFIX: pinned literally so a new
+   pcti factor year in the store turns this suite red for a deliberate
+   copy review instead of silently rewording every menu */
+const ELECTIONS_SUFFIX = "of seats by IRSAD percentile (interpolated at the 2013, 2016 and 2019 elections, the census rank otherwise)";
 assert.ok(FED.classes && !SEN.classes, "fed.classes exists; the Senate holds no classes");
 assert.deepEqual(Object.keys(FED.classes), [...CLASSES, ...QUINTS],
   "the four class cuts, then the five IRSAD fifths, in menu order");
@@ -229,39 +238,75 @@ QUINTS.forEach((q) => {
   assert.equal(v.foldPt, 2, `${q}: a fifth carries its own 2% fold (thirtieths, not sixteenths)`);
   assert.equal(v.label, QUINT_COPY[q][0], `${q} label`);
   assert.equal(v.short, QUINT_COPY[q][1], `${q} short (the menu face names the index)`);
-  assert.equal(v.elections, `federal elections in the ${QUINT_COPY[q][2]} of seats by IRSAD rank`,
+  assert.equal(v.elections, `federal elections in the ${QUINT_COPY[q][2]} ${ELECTIONS_SUFFIX}`,
     `${q} elections copy`);
 });
-/* the seifa store's rankDis ranks each division 1..N most-disadvantaged-
-   first across THAT election's chamber; ceil(rankDis/30) is the fifth, so
-   every fifth is thirty seats and the 151-seat 2019/2022 chambers' spare
-   lands in q5 (user call 2026-10-24) */
-const SEIFA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8")).elections;
+/* membership = seifa_quintiles.membership, mirrored independently here.
+   Interpolated-percentile years (the store's `_pcti.factors` keys):
+   thirty seats a fifth cut on the census-interpolated IRSAD percentile;
+   every other election falls back to rankDis (1 = most disadvantaged),
+   ceil(rankDis/30), the 151-seat chambers' spare in q5 (user calls
+   2026-10-24). The pinned suffix string goes red when the interpolation
+   window moves – that is a copy change wanting a human, never a silent
+   re-pin */
+const SEIFA_DOC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-seifa-indexes.json"), "utf8"));
+const SEIFA = SEIFA_DOC.elections;
+const INTERP_YEARS = new Set(Object.keys(SEIFA_DOC._pcti.factors).map(Number));
 const quintOf = (rd) => `q${Math.min(Math.floor((rd - 1) / 30) + 1, 5)}`;
+const quintKey = (blk, nm) => `q${Math.min(Math.floor(blk[nm]._seifaPos / 30) + 1, 5)}`;
 SEIFA_YEARS.forEach((y) => {
   const blk = SEIFA[String(y)];
   assert.ok(blk, `${y}: an IRSAD block`);
   const names = Object.keys(blk), n = names.length;
   assert.ok(n === 150 || n === 151, `${y}: ${n} divisions (a 150 or 151 seat chamber)`);
   const sizes = Object.fromEntries(QUINTS.map((q) => [q, 0]));
-  const ranks = [];
-  names.forEach((nm) => {
-    const rd = blk[nm].irsad.rankDis;
-    assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
-    ranks.push(rd);
-    sizes[quintOf(rd)] += 1;
-  });
-  assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
-    `${y}: rankDis is a permutation of 1..${n}`);
+  if (INTERP_YEARS.has(y)) {
+    const pcts = [];
+    names.forEach((nm) => {
+      const cell = blk[nm].irsad;
+      assert.ok(typeof cell.pcti === "number" && cell.pcti > 0 && cell.pcti <= 1,
+        `${y} ${nm}: an interpolated percentile in (0, 1]`);
+      pcts.push(cell.pcti);
+    });
+    assert.equal(new Set(pcts).size, n, `${y}: the interpolated percentiles are all distinct (no tie rule)`);
+    const pos = Object.fromEntries([...names].sort((a, b) => blk[a].irsad.pcti - blk[b].irsad.pcti)
+      .map((nm, i) => [nm, i]));
+    names.forEach((nm) => { blk[nm]._seifaPos = pos[nm]; sizes[quintKey(blk, nm)] += 1; });
+    /* the window's movement against the census rank: 2013 and 2019 see
+       twelve seats land in a different fifth, 2016 none at all (its
+       census sat five weeks after election day, so pcti ≈ pct1) */
+    const moved = names.filter((nm) => quintKey(blk, nm) !== quintOf(blk[nm].irsad.rankDis)).length;
+    assert.equal(moved, { 2013: 12, 2016: 0, 2019: 12 }[y], `${y}: %d seats move fifths on interpolated percentiles`, moved);
+  } else {
+    const ranks = [];
+    names.forEach((nm) => {
+      const cell = blk[nm].irsad;
+      assert.equal(cell.pcti, undefined, `${y} ${nm}: no interpolated percentile outside the interpolation window`);
+      const rd = cell.rankDis;
+      assert.ok(Number.isInteger(rd) && rd >= 1 && rd <= n, `${y} ${nm}: rankDis in 1..${n}`);
+      ranks.push(rd);
+      blk[nm]._seifaPos = rd - 1;
+      sizes[quintOf(rd)] += 1;
+    });
+    assert.deepEqual([...ranks].sort((a, b) => a - b), Array.from({ length: n }, (_, i) => i + 1),
+      `${y}: rankDis is a permutation of 1..${n}`);
+  }
   assert.deepEqual(sizes, { q1: 30, q2: 30, q3: 30, q4: 30, q5: n - 120 },
     `${y}: thirty seats a fifth, q5 the 151-seat balance`);
 });
 // named anchors (the store's own pins against the wrong-index /
-// wrong-direction misreads: rankDis 1 is the MOST disadvantaged seat)
-assert.equal(quintOf(SEIFA["2001"]["Bonython"].irsad.rankDis), "q1", "2001 Bonython: the most-disadvantaged fifth");
-assert.equal(quintOf(SEIFA["2001"]["North Sydney"].irsad.rankDis), "q5", "2001 North Sydney: the most-advantaged fifth");
-assert.equal(quintOf(SEIFA["2025"]["Lingiari"].irsad.rankDis), "q1", "2025 Lingiari: the most-disadvantaged fifth");
-assert.equal(quintOf(SEIFA["2025"]["Banks"].irsad.rankDis), "q4", "2025 Banks: the second-most-advantaged fifth");
+// wrong-direction misreads: most-disadvantaged is q1, pcti or rankDis)
+const A1 = (y, nm) => quintKey(SEIFA[String(y)], nm);
+assert.equal(A1(2001, "Bonython"), "q1", "2001 Bonython: the most-disadvantaged fifth");
+assert.equal(A1(2001, "North Sydney"), "q5", "2001 North Sydney: the most-advantaged fifth");
+assert.equal(A1(2013, "Lingiari"), "q1", "2013 Lingiari: the most-disadvantaged fifth (interpolated)");
+assert.equal(A1(2013, "Bradfield"), "q5", "2013 Bradfield: the most-advantaged fifth (interpolated; edges North Sydney on pcti)");
+assert.equal(A1(2016, "Lingiari"), "q1", "2016 Lingiari: the most-disadvantaged fifth (interpolated)");
+assert.equal(A1(2016, "Wentworth"), "q5", "2016 Wentworth: the most-advantaged fifth (interpolated)");
+assert.equal(A1(2019, "Spence"), "q1", "2019 Spence: the most-disadvantaged fifth (interpolated)");
+assert.equal(A1(2019, "Wentworth"), "q5", "2019 Wentworth: the most-advantaged fifth (interpolated)");
+assert.equal(A1(2025, "Lingiari"), "q1", "2025 Lingiari: the most-disadvantaged fifth");
+assert.equal(A1(2025, "Banks"), "q4", "2025 Banks: the second-most-advantaged fifth");
 // per-cell pins (recomputed from the committed sources at build; the
 // writer's own join and recomposition asserts gate the lane every run)
 assert.equal(cell(FED.classes.q1, "alp", 2025), 29.47);

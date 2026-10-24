@@ -61,7 +61,7 @@ Usage: python3 .build/aec-primary-history.py [--check]
 """
 import csv, gzip, io, json, os, sys, urllib.request
 
-from seifa_quintiles import QUINT_META, SEIFA_YEARS, membership as seifa_membership
+from seifa_quintiles import QUINT_META, SEIFA_YEARS, elections_suffix, membership as seifa_membership
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -428,7 +428,9 @@ def class_shares(blocks):
 def quint_shares():
     """({quintKey: {year: pcts}}, {year: nat pcts}) over SEIFA_YEARS: the
        same hcands/dop per-division first preferences regrouped by
-       seifa_quintiles' membership (rankDis 1 = most disadvantaged). 2001
+       seifa_quintiles' membership (the census-interpolated percentile
+       where the seifa store carries one, rankDis 1 = most disadvantaged
+       otherwise). 2001
        rides hcands, the downloads era the same dop read the class lane
        uses; the join asserts exact like the class lane's, and recon must
        equal the class lane's nat sums – the same ballots partitioned two
@@ -626,7 +628,7 @@ def build():
     for q, qlbl, qshort, qdesc in QUINT_META:
         ys, ser = fold_series(quint_rows[q], fold_pt=FOLD_PT / 2)
         doc["fed"]["classes"][q] = {"seifa": True, "foldPt": FOLD_PT / 2,
-                                    **view(qlbl, f"federal elections in the {qdesc} of seats by IRSAD rank",
+                                    **view(qlbl, f"federal elections in the {qdesc} {elections_suffix()}",
                                            ys, ser, short=qshort)}
     return doc
 

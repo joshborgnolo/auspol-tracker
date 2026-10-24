@@ -240,3 +240,20 @@ alone does NOT touch vic pages. `npm run build:vic` rebuilt them and the
 federal twin says `releases`). Probes in `.matilda/probe/` take `SUB=vic/`
 to re-verify the second jurisdiction — always probe both before telling
 the user a shared-view fix is live.
+
+## Convention flips are their own ladder (2026-10-24, SEIFA q1↔q5 instance)
+
+Seventh "still broken" report — user: top fifth "still \"most
+disadvantaged\"" right after the advantaged-first renumbering ace20ca5
+landed. A flip has N independent label copies (stores, generators,
+hardcoded renderer captions) to be missed individually, so BEFORE giving
+the standard max-age=600 / hard-refresh answer run the per-lane audit in
+`auspol-convention-flip-audit`: check origin head for sibling absorbs
+(your pushed sha is rarely head an hour later), dump every store blob's
+labels AND one figure-orientation read per lane, grep renderer caption
+templates, then the decisive NEGATIVE test on the SERVED page
+(`curl -s https://auspoltracker.com/` + contradiction regexes — old-word
+counts must be zero; positive-marker counts alone are necessary-not-
+sufficient since old and new strings coexist when exactly one lane was
+missed). Worked instance: all layers clean → cache answer, with the
+measured counts as evidence.

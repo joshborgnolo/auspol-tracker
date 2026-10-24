@@ -108,7 +108,11 @@ cells** (abs err ≤ 1e-4) and the **4 prose medians** of Details.rtf
   no store carries a badCoords row today. The override fails loud both
   ways — an unmatched key, or a row that no longer ships (0,0) — so a
   correction can never silently rot. Overrides are the ONLY coord
-  edits; nothing else is remapped.
+  edits; nothing else is remapped. When an override round regenerates
+  with `--year=` for affected elections only, record md5s of ALL stores
+  first; afterwards the untouched years must be byte-identical (a drift
+  there means an input moved, halt and diagnose) — worked 2026-10-24,
+  the three-booth round left 6 of 8 stores bit-for-bit stable.
 - Premises-state v polygon-state disagreements are a GUARD REPORT ONLY
   (`stateFlagBooths`, list pinned in the test per year: 5/3/2/3/2/3/1
   across 2004..2022) — **the physical premises location wins**, no
@@ -234,3 +238,13 @@ no store carries a raw (0,0) row any more.
 Commit discipline: explicit-path `git add`/`git commit` (shared dirty
 worktree — see auto-skill-shared-repo-session-race); validate.mjs exit 0
 gate before commit per auto-skill-auspol-seat-model conventions.
+
+## Sibling: voter-footprint (votes-by-SA1) store
+
+These venue-proxy stores (SA1 of the PREMISES) have a complement under
+prototyping: AEC "Votes by SA1" roll-mark-off data → vote-weighted SEIFA
+of where each booth's voters LIVE (2025 prototype 2026-10-24: 99.79%
+coverage, 582 noCoords booths newly covered, all 150 EAVs honest) — see
+auto-skill-auspol-votes-sa1-footprint for the 7-digit compression
+(ccd = code11[0]+code11[5:11]), availability (2016/2019/2022/2025 only),
+pseudo-row anatomy and the FPV reconciliation oracle.

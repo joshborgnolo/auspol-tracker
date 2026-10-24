@@ -95,6 +95,29 @@
       VALUES in 98cib04 and the aph01cib13 xcheck fixture (same 1996
       census, same boundaries, different papers). Values only — ranks move
       between an N=148 and an N=150 ranking universe.
+  13. The percentile layer (2026-10-24 pcti directive): EVERY index cell of
+      every election carries pct = rankDis/N rounded to 6dp, and the three
+      shipped interp elections (2013/2016/2019 — their bracketing censuses
+      are SA1-era; the CD-era 2004/2007/2010 division lanes wait on banned
+      redistribution polygons) additionally carry pcti on all four
+      indexes, no other election any. f recomputes from census-night
+      daycounts; the measured side (2016's is pct1 — the census sat five
+      weeks AFTER election day) matches rankDis/N on the nose; pcti
+      re-derives bit-exact from the lattice's r6 cells at f and sits in
+      (0,1]; store cells match .build/analysis/seat-model/seifa-src/
+      div-interp.json cell-for-cell. Booth lanes cover the full 2004–2019
+      span (test-booth-seifa-hist.mjs), which is why the five remaining
+      division lanes stay exotic here.
+  14. Literal pcti anchors: seven cells (Dawson's mining-boom fade 2013,
+      Solomon 2019's IER slide, Lingiari 2019 terminal on both census
+      sides, Macnamara 2019 stable) pinned to the lattice's first green
+      run — a lattice swap re-derives a self-consistent but wrong pct set,
+      so these moves are deliberate re-pinning only.
+  15. Rank-delta bands: interpolation must move the median division only a
+      little (median |pcti − measured side| < 0.03, max < 0.25) except the
+      2016 lane, whose census sat five weeks out (< 0.002 / < 0.015) —
+      real movement (growth suburbs, mining seats) may be large, silent
+      formula drift may not be.
 
    The extractor runs standalone from the repo root:
      node .build/analysis/seat-model/extract-division-seifa.mjs
@@ -413,6 +436,117 @@ for (const via of Object.keys(fixtures)) {
         `1998 ${name} ${idx}: 98cib04 ${row[idx].value} != 01cib13 ${xr[idx].value}`);
   }
   check(compared === 66, `98cib04∩01cib13 compared ${compared} divisions, want 66`);
+}
+
+// 13 — the percentile layer (2026-10-24 pcti directive). EVERY index cell in
+// every election carries pct = rankDis/N rounded to 6dp (rankDis is the
+// store convention, 1/N most disadvantaged). The three shipped interp lanes
+// (2013/2016/2019) additionally carry pcti on all four indexes; NO other
+// election carries pcti (the CD-era 2004/2007/2010 wait on polygons), and
+// wherever div-interp.json's measured side is, pct side == rankDis/N on the
+// nose. pcti itself is recomputed here from the LATTICE file's own cells and
+// f — a splice defect in the extractor (wrong division, wrong side, wrong
+// election) surfaces as a pcti mismatch; a wholesale lattice drift surfaces
+// as a literal-pin break in invariant 14.
+const INTERP_SRC = ".build/analysis/seat-model/seifa-src/div-interp.json";
+const interp = JSON.parse(readFileSync(INTERP_SRC, "utf8"));
+const INTERP_YEARS = ["2013", "2016", "2019"];
+const MEASURED = { 2013: "pct0", 2016: "pct1", 2019: "pct0" };
+const CENSUS_DATE = { 2011: Date.UTC(2011, 7, 9), 2016: Date.UTC(2016, 7, 9), 2021: Date.UTC(2021, 7, 10) };
+const ELEC_DATE = { 2013: Date.UTC(2013, 8, 7), 2016: Date.UTC(2016, 6, 2), 2019: Date.UTC(2019, 4, 18) };
+check(JSON.stringify(Object.keys(interp.elections).sort()) === JSON.stringify(INTERP_YEARS),
+  `div-interp elections ${Object.keys(interp.elections)} != [2013, 2016, 2019] (CD-era lanes must land here, not silently)`);
+{
+  const DAY = 86400000;
+  const F_WANT = {};
+  for (const y of INTERP_YEARS) {
+    const fc = interp.factors[y];
+    const num = (ELEC_DATE[y] - CENSUS_DATE[fc.c0]) / DAY;
+    const den = (CENSUS_DATE[fc.c1] - CENSUS_DATE[fc.c0]) / DAY;
+    F_WANT[y] = Math.round((num / den) * 1e6) / 1e6;
+    check(fc.f === F_WANT[y], `${y}: f ${fc.f} != recomputed ${F_WANT[y]} (${num}/${den} days)`);
+  }
+  for (const y of INTERP_YEARS) {
+    const N = COUNT_FOR[y];
+    const meKey = MEASURED[y];
+    const f = interp.factors[y].f;
+    for (const [name, row] of Object.entries(store.elections[y])) {
+      const irow = interp.elections[y][name];
+      check(irow != null, `${y} ${name}: absent from div-interp.json`);
+      if (!irow) continue;
+      for (const idx of IDX4) {
+        const cell = row[idx], icell = irow[idx];
+        check(cell.pct === icell[meKey],
+          `${y} ${name} ${idx}: interp ${meKey} ${icell[meKey]} != store pct ${cell.pct}`);
+        const recomputed = Math.round(((1 - f) * icell.pct0 + f * icell.pct1) * 1e6) / 1e6;
+        check(icell.pcti === recomputed,
+          `${y} ${name} ${idx}: file pcti ${icell.pcti} != recompute ${recomputed}`);
+        check(cell.pcti === icell.pcti, `${y} ${name} ${idx}: store pcti ${cell.pcti} != lattice ${icell.pcti}`);
+        check(cell.pcti > 0 && cell.pcti <= 1, `${y} ${name} ${idx}: pcti ${cell.pcti} outside (0,1]`);
+      }
+    }
+  }
+}
+for (const y of ELECTION_SET) {
+  const N = COUNT_FOR[y];
+  for (const [name, row] of Object.entries(store.elections[y])) {
+    for (const idx of IDX4.filter((k) => row[k])) {
+      const cell = row[idx];
+      const rankDis = idx === "irsad" ? cell.rankDis : cell.rank;
+      const wantPct = Math.round((rankDis / N) * 1e6) / 1e6;
+      check(cell.pct === wantPct, `${y} ${name} ${idx}: pct ${cell.pct} != rankDis/N ${wantPct}`);
+      check(cell.pct > 0 && cell.pct <= 1, `${y} ${name} ${idx}: pct ${cell.pct} outside (0,1]`);
+      if (!INTERP_YEARS.includes(y))
+        check(cell.pcti === undefined, `${y} ${name} ${idx}: pcti outside the shipped lanes`);
+    }
+  }
+}
+
+// 14 — literal pcti anchors, transcribed from the lattice's first green run
+// (2026-10-24): the movement-shaped cells (Dawson's mining-boom fade 2013,
+// Solomon 2019), a both-ranks-terminal cell (Lingiari 2019, most
+// disadvantaged on both census sides, pcti exactly pct), and a stable cell
+// (Macnamara 2019: both sides rank 135/151). These catch lattice drift the
+// formula checks above are blind to (a lattice swap re-derives a self-
+// consistent but wrong pct set — these literals must not move without a
+// deliberate re-pinning).
+const PCTI_PIN = [
+  ["2013", "Dawson", "irsd", 0.626667, 0.4, 0.532378],
+  ["2013", "Dawson", "ier", 0.746667, 0.4, 0.60246],
+  ["2016", "Gellibrand", "irsad", 0.38, 0.586667, 0.582369],
+  ["2016", "McMahon", "ieo", 0.246667, 0.12, 0.122635],
+  ["2019", "Solomon", "ier", 0.602649, 0.311258, 0.441243],
+  ["2019", "Lingiari", "irsd", 0.006623, 0.006623, 0.006623],
+  ["2019", "Macnamara", "irsd", 0.89404, 0.89404, 0.89404],
+];
+for (const [y, name, idx, pct0, pct1, pcti] of PCTI_PIN) {
+  const icell = interp.elections[y]?.[name]?.[idx];
+  const scell = store.elections[y]?.[name]?.[idx];
+  if (!icell || !scell) { failures.push(`${y} ${name} ${idx}: pcti anchor absent`); continue; }
+  check(icell.pct0 === pct0 && icell.pct1 === pct1 && icell.pcti === pcti,
+    `${y} ${name} ${idx}: lattice ${JSON.stringify(icell)} moved off the pinned ${pct0}/${pct1}/${pcti}`);
+  check(scell.pcti === pcti, `${y} ${name} ${idx}: store pcti ${scell.pcti} != pinned ${pcti}`);
+}
+
+// 15 — rank-delta band: interpolation must move the median division only a
+// little (the census sides drift years apart, never contests), while real
+// movement (growth suburbs, mining seats) may be large. Bands chosen from
+// the first green run's medians ×3 head-room; the 2016 census sat five
+// weeks after the election, so that lane's whole move is bounded tiny.
+{
+  const deltasPer = (y, idx, side) => Object.keys(interp.elections[y])
+    .map((n) => Math.abs(interp.elections[y][n][idx].pcti - interp.elections[y][n][idx][side]));
+  for (const y of INTERP_YEARS) {
+    const side = MEASURED[y];
+    for (const idx of IDX4) {
+      const ds = deltasPer(y, idx, side).sort((a, b) => a - b);
+      const median = ds[Math.floor(ds.length / 2)], max = ds[ds.length - 1];
+      const medBand = y === "2016" ? 0.002 : 0.03;
+      const maxBand = y === "2016" ? 0.015 : 0.25;
+      check(median < medBand, `${y} ${idx}: median |pcti-${side}| ${median.toFixed(4)} outside ${medBand}`);
+      check(max < maxBand, `${y} ${idx}: max |pcti-${side}| ${max.toFixed(4)} outside ${maxBand}`);
+    }
+  }
 }
 
 die();
