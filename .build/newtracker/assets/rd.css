@@ -3559,15 +3559,15 @@ body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10p
 /* three contest tabs outrun a phone's card once the third (Coalition v
    One Nation, 2026-10-24) lands - let the group drop to a second line */
 body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }
-/* 2026-10-24 (user: "MORE COMPACT - LESS IN-BETWEEN WHITESPACE, so that
-   it fits on same row on my laptop … decrease in-between whitespace by
-   20%, to start with") - the row's horizontal whitespace at 80% of the
-   shared rungs, scoped to this card so the other rd-tabs-sm/rd-pl-ctl
-   homes hold their measure: tab sides 10->8px, container gap 4->3px,
-   House:/Share: label gaps and the flip texts' arrow gaps 6->5px */
-body.rd .ex-fl-tabs { gap: 3px; }
-body.rd .ex-fl-tabs .rd-tab { padding: 0 8px; }
-body.rd .ex-fl-tabs .rd-pl-ctl, body.rd .ex-fl-tabs .rd-pl-flip { gap: 5px; }
+/* 2026-10-24 (user: "just move 'House: Lower ⇄' to directly above
+   'Share: Labor's ⇄' … rather than just to the left"; REVERTS the
+   df964b66 20%-whitespace trim that answered the same fit) - a laptop
+   carries the House/Share pair as a TWO-LINE stack at the row's right,
+   House over Share, so the row's width need is the tabs plus the wider
+   of the two control labels alone; the flips' 44px tap height splits
+   into two 22px lines and the row keeps its 44px measure */
+body.rd .ex-fl-vstack { display: flex; flex-direction: column; align-items: flex-end; gap: 0; white-space: nowrap; }
+body.rd .ex-fl-vstack .rd-pl-flip { min-height: 22px; }
 /* just above the phone rung the full-length labels plus the House:/Share:
    flips outrun the card: wrap the row so the flips drop whole onto a line
    of their own (same recipe as .rd-tpp-chart's 641-700 band) */

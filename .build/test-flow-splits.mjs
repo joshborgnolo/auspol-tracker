@@ -514,21 +514,34 @@ assert.ok(ap.indexOf('className="ex-fl-viewrow"') > -1
    laptop (a phone's pair stays in the chart head). pairStep's figView
    guard keeps <-/->'s scroll day job while no tabs exist to step. */
 assert.ok(ap.includes('<div className="ex-fl-viewrow ex-fl-tabslot">{viewCtl}')
-    && ap.includes('{narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips">{houseCtl}{shareSlot}</span>}')
+    && ap.includes('{narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>}')
     && ap.indexOf('ex-fl-tabslot') < ap.indexOf('className="ex-fl-tabs rd-tabs-sm"')
     && ap.includes('<div className="ex-fl-viewrow ex-fl-vacate" aria-hidden="true">{viewCtl}</div>')
     && ap.includes('if (figView) return false;'),
-  "a vote-share view sheds the contest tabs; View: drifts down to their row with the laptop's House:/Share: flips beside it, the vacated top row height-held by an invisible twin (pair walk guarded off)");
+  "a vote-share view sheds the contest tabs; View: drifts down to their row with the laptop's House:/Share: flips stacked beside it, the vacated top row height-held by an invisible twin (pair walk guarded off)");
 assert.ok(cssRd.includes('body.rd .ex-fl-tabslot { margin-top: 0; min-height: 44px; align-items: center; gap: 0 16px; flex-wrap: wrap; }')
     && cssRd.includes('body.rd .ex-fl-vacate { visibility: hidden; }'),
   "the drift lands pixel-exact: tabslot at the tabs' floor with no margin, the vacate row invisible but height-keeping");
 assert.ok(cssRd.includes('body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }')
     && cssRd.includes('body.rd .ex-fl-tabs { flex-wrap: wrap; }'),
   "three contest tabs fit a 320px phone (group wraps) and the 641-700 band (flips drop whole onto their own line) - the 2026-10-24 width-sweep overflows");
-assert.ok(ap.includes('{narrow ? null : <>{houseCtl}{shareSlot}</>}')
-    && ap.includes('<span className="ex-fl-flips">{houseCtl}{shareSlot}</span>')
+assert.ok(ap.includes('{narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-vstack">{houseCtl}{shareSlot}</span>}')
+    && ap.includes('<span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>')
     && !ap.includes('{viewCtl}{houseCtl}') && !ap.includes('{primMode ? viewCtl : share}'),
   "View: out of the tab row and the phone head - House: and the mode's Share: slot keep both spots alone");
+/* 2026-10-24 (user: "just move 'House: Lower ⇄' to directly above
+   'Share: Labor's ⇄' … rather than just to the left"; the df964b66
+   20%-whitespace trim reverted with it): a laptop carries the pair as a
+   TWO-LINE stack at the row's right on either desktop row (the tabs
+   children, or the drifted tabslot's ex-fl-flips span) - the .ex-fl-vstack
+   column rule splits the flips' 44px tap height into two 22px lines, so
+   the row keeps its 44px measure while its width need drops to the tabs
+   plus the wider of the two control labels */
+assert.ok(cssRd.includes('body.rd .ex-fl-vstack { display: flex; flex-direction: column; align-items: flex-end; gap: 0; white-space: nowrap; }')
+    && cssRd.includes('body.rd .ex-fl-vstack .rd-pl-flip { min-height: 22px; }')
+    && !cssRd.includes('body.rd .ex-fl-tabs { gap: 3px; }')
+    && !cssRd.includes('body.rd .ex-fl-tabs .rd-tab { padding: 0 8px; }'),
+  "the laptop's House/Share pair stacks House over Share in two 22px lines; the 20%-whitespace trim rules are gone (reverted)");
 assert.ok(cssRd.includes('body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start;')
     && !cssRd.includes('.ex-view + .ex-view'),
   "the View row's own left-aligned rule ships in rd.css (user 2026-10-23: 'make View: Primary votes ⇄ left-aligned'; the sibling-spacing rule went with the 2026-10-24 merge to one button)");
