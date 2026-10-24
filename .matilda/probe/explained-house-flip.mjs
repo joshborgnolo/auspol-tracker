@@ -111,9 +111,21 @@ const SEN_META = "Australian Senate elections, 2016–2025";
        const tabs = document.querySelector(".ex-fl-card .ex-fl-tabs");
        return !!(tabs && tabs.querySelector(".ex-house") && tabs.querySelector(".ex-share"));
      }));
+  /* 2026-10-24 (user: "move 'House: Lower ⇄' to directly above
+     'Share: Labor's ⇄' rather than just to the left"): the pair is a
+     two-line stack - House's line ends where Share's begins, both
+     right-ended */
+  ok("…stacked at the row's right, House directly above Share",
+     await page.evaluate(() => {
+       const w = document.querySelector(".ex-fl-card .ex-fl-tabs .ex-fl-vstack");
+       if (!w) return "no stack span";
+       const h = w.querySelector(".ex-house").getBoundingClientRect();
+       const s = w.querySelector(".ex-share").getBoundingClientRect();
+       return h.bottom <= s.top + 1 && Math.abs(h.right - s.right) < 2;
+     }));
   const m = await menuInfo(page);
   ok("the menu carries the class entries, the IRSAD fifths and the state elections under Lower",
-     m.groups.length === 3 && m.groups[0] === "Federal elections" && m.groups[1] === "Federal, by IRSAD fifth" && m.groups[2] === "State elections"
+     m.groups.length === 3 && m.groups[0] === "Federal elections" && m.groups[1] === "Federal, by IRSAD quintile" && m.groups[2] === "State elections"
        && m.options.filter((v) => v.startsWith("fedcl:")).length >= 5, JSON.stringify(m.groups) + " · " + m.options.length + " options");
   ok("…and the Legislative Council never appears under Lower", !m.options.includes("nswlc"), m.options.join(" "));
   ok("…and the eight federal states", (m.options.filter((v) => v.startsWith("fed:"))).length === 8,

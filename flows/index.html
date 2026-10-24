@@ -6087,9 +6087,8 @@ body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
 body.rd .ex-fl-tabs > [role="group"] { flex-wrap: wrap; }
-body.rd .ex-fl-tabs { gap: 3px; }
-body.rd .ex-fl-tabs .rd-tab { padding: 0 8px; }
-body.rd .ex-fl-tabs .rd-pl-ctl, body.rd .ex-fl-tabs .rd-pl-flip { gap: 5px; }
+body.rd .ex-fl-vstack { display: flex; flex-direction: column; align-items: flex-end; gap: 0; white-space: nowrap; }
+body.rd .ex-fl-vstack .rd-pl-flip { min-height: 22px; }
 @media (min-width: 641px) and (max-width: 700px) {
   body.rd .ex-fl-tabs { flex-wrap: wrap; }
 }
@@ -145668,7 +145667,7 @@ function RdExplained() {
   }, viewCtl) : null, figView ? viewCtl ? React.createElement("div", {
     className: "ex-fl-viewrow ex-fl-tabslot"
   }, viewCtl, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
-    className: "ex-fl-flips"
+    className: "ex-fl-flips ex-fl-vstack"
   }, houseCtl, shareSlot)) : null : React.createElement(RdTabs, {
     value: pair,
     onChange: onPairPick,
@@ -145678,7 +145677,9 @@ function RdExplained() {
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
+  }, narrow || !houseCtl && !shareSlot ? null : React.createElement("span", {
+    className: "ex-fl-vstack"
+  }, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
     house: house,
     stateKey: stateKey,
     classKey: classKey,

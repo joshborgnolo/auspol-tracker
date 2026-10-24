@@ -7067,12 +7067,15 @@ function RdExplained() {
           )}
           {figView ? (
             viewCtl ? <div className="ex-fl-viewrow ex-fl-tabslot">{viewCtl}
-              {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips">{houseCtl}{shareSlot}</span>}
+              {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-flips ex-fl-vstack">{houseCtl}{shareSlot}</span>}
             </div> : null
           ) : (
             <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs rd-tabs-sm"
                     options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
-              {narrow ? null : <>{houseCtl}{shareSlot}</>}
+              {/* a laptop carries the pair as a two-line stack (House
+                  directly above Share) at the row's right - 2026-10-24
+                  user call, "rather than just to the left" */}
+              {narrow || (!houseCtl && !shareSlot) ? null : <span className="ex-fl-vstack">{houseCtl}{shareSlot}</span>}
             </RdTabs>
           )}
           {/* ON-tab nswlc (2026-10-23): lcView holds under both contests -
