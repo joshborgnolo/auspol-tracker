@@ -15,8 +15,13 @@ exists only for 2016+ — the AEC published no SA1/CCD product earlier).
 Concordance: the file's 7-digit ccd_id/SA1_id IS the 11-digit SA1 code
 with the SA4+SA3 digits dropped (code[0] + code[5:11]) — verified
 injective on all three ASGS editions (pins below). The 2019 lane joins
-the 2016-census cube DIRECTLY on its 7-digit key column; the 2016 lane
-the 2011 cube likewise. The 2025 lane decodes to SA1_CODE21 first; the
+the 2016-census cube DIRECTLY on its 7-digit key column. The 2016 lane's
+votes sit on ASGS 2011 SA1s, but the election (2 July 2016) fell five
+weeks before the 2016 census, so since 2026-10-25 (flows-explained
+review: the division store and the venue store both read 2016 against
+the 2016 census) its scores walk each 2011 SA1's votes onto 2016 SA1s by
+the ABS CG_SA1_2011_SA1_2016 correspondence and join the 2016 cube; its
+demo block keeps the Ed1->Ed3 walk. The 2025 lane decodes to SA1_CODE21 first; the
 2022 lane decodes to SA1_MAIN16 then redistributes via the ABS Ed2->Ed3
 correspondence (RATIO_FROM_TO shares) to reach the same 2021-census cube.
 Per-index SEIFA suppression is partial within an SA1, so each index
@@ -174,12 +179,7 @@ def cube21():
 
 def cube_for(year, mode):
     """year -> {sa1_join_key: {idx: score|None}}, keyed per the lane."""
-    if mode == "direct" and year == 2016:
-        m = hist._cube_xls_table1(ABS / "abs-seifa-2011-sa1-indexes.xls",
-                                  code_col=0, code_len=7,
-                                  data_rows=hist.CUBE_ROWS["sa1-2011"])
-        return {c: {i: v[i] for i in INDEXES} for c, v in m.items()}
-    if mode == "direct" and year == 2019:
+    if (mode == "xwalk16" and year == 2016) or (mode == "direct" and year == 2019):
         m = hist._cube_xls_table1(ABS / "abs-seifa-2016-sa1-indexes.xls",
                                   code_col=0, code_len=7,
                                   data_rows=hist.CUBE_ROWS["sa1-2016"],
@@ -253,8 +253,8 @@ DEMO_ABOUT = {
                        "based instead).",
     2016: _DEMO_TAIL + "CG_SA1_2011_SA1_2016 composed with "
                        "CG_SA1_2016_SA1_2021 (the SEIFA lane for this "
-                       "year is SEIFA-2011-direct; demo is 2021-census "
-                       "based instead).",
+                       "year walks onto 2016 SA1s for the 2016 census; "
+                       "demo is 2021-census based instead).",
 }
 
 _GCP = None
@@ -334,9 +334,46 @@ def load_xwalk11():
         if acc:
             out[c11] = [(c, r) for c, r in acc.items()]
     _XW11 = out
+    global _XW1116
+    _XW1116 = {c11: [(c16[0] + c16[5:], r) for c16, r in t16]
+               for c11, t16 in src.items()}
     print(f"crosswalk 11->21: composed {len(out)} SA1_2011 sources "
           f"(rows {n})")
     return out
+
+
+_XW1116 = None
+
+
+def load_xwalk1116():
+    """SA1_MAINCODE_2011 -> [(2016 7-digit cube key, ratio)] – the
+    CG_SA1_2011_SA1_2016 shares load_xwalk11 composes from, keyed for the
+    2016 cube."""
+    if _XW1116 is None:
+        load_xwalk11()
+    return _XW1116
+
+
+def units_to_ed2(units, dec, xw):
+    """Walk the 2016 lane's Ed1 7-digit vote units onto 2016 SA1s (the
+    2016 cube's 7-digit keys) for scoring."""
+    out = {}
+    drop = 0.0
+    for key, kv in units.items():
+        acc = Counter()
+        for ccd, w in kv.items():
+            full = dec.get(ccd)
+            ts = xw.get(full) if full is not None else None
+            if not ts:
+                drop += w
+                continue
+            for code, r in ts:
+                acc[code] += w * r
+            short = 1.0 - sum(r for _, r in ts)
+            if short > 0.001:
+                drop += w * short
+        out[key] = acc
+    return out, round(drop)
 
 
 def units_to_ed3(units, conf, dec, xw):
@@ -428,7 +465,7 @@ LANES = {
            "fpv": "2019", "seifa": 2016},
     2016: {"file": VDIR / "votes-sa1-2016.xlsx",
            "fmt": "xlsx", "idcol": "SA1_id", "ed": "Ed1", "mode": "direct",
-           "fpv": "2016", "seifa": 2011},
+           "score": "xwalk16", "fpv": "2016", "seifa": 2016},
 }
 # data rows only (2016 xlsx counts the header separately: sheet total 934,147)
 VOTES_ROWS = {2025: 1064065, 2022: 1000189, 2019: 1003235, 2016: 934146}
@@ -598,11 +635,26 @@ _CC = None
 def build(year):
     conf = LANES[year]
     vpath, venue_rows = load_venue(year)
-    cube = cube_for(year, conf["mode"])
+    cube = cube_for(year, conf.get("score", conf["mode"]))
     xwalk = load_xwalk() if conf["mode"] == "xwalk21" else None
     units, sent_ids, drop_xw = load_votes(year, conf, _CC[conf["ed"]], xwalk)
     sent_votes = sum(sent_ids.values())
-    stats = score_units(units, cube)
+    if conf.get("score") == "xwalk16":
+        units16, drop16 = units_to_ed2(units, _CC[conf["ed"]], load_xwalk1116())
+        print(f"{year} scores: walked onto 2016 SA1s, {drop16} votes on no 2016 target")
+        stats = score_units(units16, cube)
+        # the unit's own vote total stays the file's (the walk only moves
+        # weights between SA1 editions); sa1s counts the file's SA1s
+        for key, st in stats.items():
+            tot0, tot16 = sum(units[key].values()), sum(units16[key].values())
+            st["votes"] = int(round(tot0))
+            st["sa1s"] = len(units[key])
+            # coverage stays a share of the file's votes: a vote the walk
+            # could not place counts as uncovered
+            f = tot16 / tot0 if tot0 else 0
+            st["cov"] = {i: round(c * f, 4) for i, c in st["cov"].items()}
+    else:
+        stats = score_units(units, cube)
     fpv = load_fpv(conf["fpv"])
 
     gcp = load_gcp21()
@@ -771,13 +823,17 @@ def build(year):
         })
 
     mode_note = {
+        "xwalk16": ". Scores are SEIFA 2016: each 2011 SA1's votes are "
+            "redistributed over 2016 SA1s by the ABS CG_SA1_2011_SA1_2016 "
+            "correspondence (its population ratios) – the election fell five "
+            "weeks before the 2016 census",
         "direct": f". Scores are SEIFA {conf['seifa']} joined direct on the cube's 7-digit key",
         "direct21": ". Scores are SEIFA 2021, the 7-digit ccd decoded to "
             "SA1_CODE21 and joined to the 2021-census cube",
         "xwalk21": ". Scores are SEIFA 2021: each 2016 SA1's votes are "
             "redistributed over SA1_CODE21 targets by the ABS "
             "CG_SA1_2016_SA1_2021 correspondence (RATIO_FROM_TO shares)",
-    }[conf["mode"]]
+    }[conf.get("score", conf["mode"])]
     out = {
         "_about": (
             "Voter-footprint SEIFA per federal booth: vote-weighted mean "

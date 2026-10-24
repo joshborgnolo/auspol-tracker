@@ -85,17 +85,20 @@ const YEARS = {
     hist: { NSW: 2747, VIC: 1909, QLD: 1614, SA: 728, WA: 835, TAS: 310, NT: 82, ACT: 103 },
     scored: 8195, noVotes: 132, noVotesFirst: ["Adelaide|30170", "Adelaide|65965"],
     cohorts: 600, sentinel: 404, votesTotal: 14278637,
-    coverage: { irsd: 0.9968, irsad: 0.9968, ier: 0.9969, ieo: 0.997 },
+    coverage: { irsd: 0.9979, irsad: 0.9979, ier: 0.9981, ieo: 0.9981 },
     recon: { matched: 8196, missing: 0, medianAbsPct: 0.12, p95AbsPct: 0.83,
              maxAbs: 236, maxAbsBooth: "Canberra|65739|sa1file vs fpv diff -236" },
     delta: {
-      irsd: { compared: 7454, medianAbs: 29.4, p95Abs: 130, moved100: 725 },
-      irsad: { compared: 7454, medianAbs: 31.7, p95Abs: 118.4, moved100: 621 },
-      ier: { compared: 7454, medianAbs: 38, p95Abs: 166.6, moved100: 1120 },
-      ieo: { compared: 7477, medianAbs: 26.8, p95Abs: 99.3, moved100: 367 },
+      /* scored on the 2016 census since 2026-10-25 (the venue store's
+         census too), so the gap to the venue proxy narrowed: irsd median
+         29.4 -> 26.0 against the old 2011-cube scores */
+      irsd: { compared: 7454, medianAbs: 26, p95Abs: 123.7, moved100: 628 },
+      irsad: { compared: 7454, medianAbs: 25.7, p95Abs: 107.2, moved100: 453 },
+      ier: { compared: 7454, medianAbs: 34.3, p95Abs: 160, moved100: 1024 },
+      ieo: { compared: 7477, medianAbs: 23.8, p95Abs: 95.8, moved100: 334 },
     },
-    mins: { irsd: 437.4, irsad: 554.7, ier: 483, ieo: 691.1 },
-    maxs: { irsd: 1143.9, irsad: 1178, ier: 1229.1, ieo: 1216 },
+    mins: { irsd: 433, irsad: 585.1, ier: 510.6, ieo: 681 },
+    maxs: { irsd: 1143.7, irsad: 1192.8, ier: 1209.4, ieo: 1209.6 },
     sentinelIds: "9999901",
     zeroVotes: ["Brand|65161"],
     demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, age0_14: 0.1805, age65ov: 0.1823 } },
@@ -105,8 +108,8 @@ const YEARS = {
                 lingiari: { votes: 46505, persons: 24323385, lang: 0.5239 } },
     demoEmpties: [],
     spots: [
-      ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1052.9, 1069.2, 1060, 1072.4], cov: [1, 1, 1, 1] }],
-      ["Melbourne", "Collingwood", { votes: 1668, seifa: [883, null, null, null] }],
+      ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1081.7, 1101.5, 1131.4, 1107.9], cov: [0.9685, 0.9685, 0.9685, 0.9685] }],
+      ["Melbourne", "Collingwood", { votes: 1668, seifa: [887.8, null, null, null] }],
     ],
     cohortSpot: null,
     xwalk: false,
