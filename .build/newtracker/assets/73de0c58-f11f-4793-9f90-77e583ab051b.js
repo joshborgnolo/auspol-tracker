@@ -2221,6 +2221,14 @@ function warmSections(delay) {
   };
   warmTimer = setTimeout(() => idle(next), delay);
 }
+/* A parked panel - a visited tab behind `hidden` - is invisible, so the
+   app's re-renders pass it by: every tab tap re-rendered every mounted
+   view (the Now tab's latest-polls table and All polls' rows among them,
+   ~30ms at 4x CPU of a ~100ms tap). It renders again the moment it is
+   shown, with whatever the props are by then, and on the render that
+   parks it. Its own state (the Now tail's stages, a view's timers) still
+   updates it while parked: memo stops only the renders from above. */
+const ParkedPanel = React.memo(({ render }) => render(), (prev, next) => !prev.active && !next.active);
 /* One page load arms the snapshot tail exactly once - see SnapshotView -
    and the tail lands in this many stages. */
 let snapshotTailArmed = false;
@@ -3084,6 +3092,7 @@ function App() {
                onBlur={(e) => {
                  if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
                }}>
+            <ParkedPanel active={id === tab} render={() => (
             <ViewBoundary active={id === tab}>
               {id === "now" && (
                 <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
@@ -3104,6 +3113,7 @@ function App() {
                 onBack={focusTerm ? backFromTerm : null}
                 backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
             </ViewBoundary>
+            )} />
           </div>
         ))}
         <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} key={"foot-" + rd} />

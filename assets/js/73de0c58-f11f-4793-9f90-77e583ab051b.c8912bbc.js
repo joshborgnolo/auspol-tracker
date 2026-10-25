@@ -1852,6 +1852,9 @@ function warmSections(delay) {
   };
   warmTimer = setTimeout(() => idle(next), delay);
 }
+const ParkedPanel = React.memo(({
+  render
+}) => render(), (prev, next) => !prev.active && !next.active);
 let snapshotTailArmed = false;
 const SNAP_TAIL_ALL = 6;
 let lateDone = !(window.AP_LATE && window.AP_LATE.length);
@@ -2577,40 +2580,43 @@ function App() {
     onBlur: e => {
       if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
     }
-  }), React.createElement(ViewBoundary, {
-    active: id === tab
-  }, id === "now" && React.createElement(SnapshotView, {
-    rangeId: rangeId,
-    setRangeId: setRangeId,
-    showScatter: t.showScatter,
-    tppMatchup: tppMatchup,
-    setTppMatchup: setTppMatchup,
-    tppBasis: tppBasis,
-    setTppBasis: setTppBasis
-  }), id !== "now" && !late && React.createElement("div", {
-    className: "late-wait",
-    "aria-busy": "true",
-    style: {
-      minHeight: "70vh"
-    }
-  }), id === "cycles" && late && React.createElement(PastCyclesView, null), id === "allpolls" && late && React.createElement(AllPollsView, {
-    focus: focusPoll,
-    onBack: focusPoll ? backFromPoll : null,
-    backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
-    tppBasis: tppBasis,
-    setTppBasis: setTppBasis
-  }), termPop && id === tab && late && React.createElement(TermPop, {
-    id: termPop.id,
-    onClose: () => setTermPop(null),
-    onMore: () => window.AP.openTermPage(termPop.id, termPop.from)
-  }), TAB_MENU[id] && late && React.createElement(MenuPageView, {
-    id: id,
-    tppBasis: tppBasis
-  }), id === "info" && late && React.createElement(InfoView, {
-    focus: focusTerm ? focusTerm.id : null,
-    onBack: focusTerm ? backFromTerm : null,
-    backLabel: focusTerm && focusTerm.back ? focusTerm.back.from : null
-  })))), React.createElement(MethodNote, {
+  }), React.createElement(ParkedPanel, {
+    active: id === tab,
+    render: () => React.createElement(ViewBoundary, {
+      active: id === tab
+    }, id === "now" && React.createElement(SnapshotView, {
+      rangeId: rangeId,
+      setRangeId: setRangeId,
+      showScatter: t.showScatter,
+      tppMatchup: tppMatchup,
+      setTppMatchup: setTppMatchup,
+      tppBasis: tppBasis,
+      setTppBasis: setTppBasis
+    }), id !== "now" && !late && React.createElement("div", {
+      className: "late-wait",
+      "aria-busy": "true",
+      style: {
+        minHeight: "70vh"
+      }
+    }), id === "cycles" && late && React.createElement(PastCyclesView, null), id === "allpolls" && late && React.createElement(AllPollsView, {
+      focus: focusPoll,
+      onBack: focusPoll ? backFromPoll : null,
+      backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
+      tppBasis: tppBasis,
+      setTppBasis: setTppBasis
+    }), termPop && id === tab && late && React.createElement(TermPop, {
+      id: termPop.id,
+      onClose: () => setTermPop(null),
+      onMore: () => window.AP.openTermPage(termPop.id, termPop.from)
+    }), TAB_MENU[id] && late && React.createElement(MenuPageView, {
+      id: id,
+      tppBasis: tppBasis
+    }), id === "info" && late && React.createElement(InfoView, {
+      focus: focusTerm ? focusTerm.id : null,
+      onBack: focusTerm ? backFromTerm : null,
+      backLabel: focusTerm && focusTerm.back ? focusTerm.back.from : null
+    }))
+  }))), React.createElement(MethodNote, {
     onInfo: tab === "info" ? null : () => goTab("info"),
     key: "foot-" + rd
   })), keySheet && React.createElement("div", {
