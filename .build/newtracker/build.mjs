@@ -1648,15 +1648,60 @@ if (!VIC) {
    siblings (tab clicks never fetch). One source: the string here and the
    static article of the /flows-explained/ document (buildTabSummary) are the
    same file. /vic/ has no explainer tab and ships no copy. */
-if (!VIC) parts.push(`<script>window.EXPLAINED_ARTICLE=${inlineJs(JSON.stringify(fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8")))};<\/script>`);
+/* Every layer beyond the two per-document constants above ships as a hashed
+   EXTERNAL file, not an inline script. The app used to ride inside the
+   document – 3.9MB of JS repeated in every one of the nine tab documents,
+   re-downloaded and re-parsed by every visitor every time a single poll row
+   moved the dataset. Each layer is now a file of its own under assets/js/,
+   named by a hash of its own bytes like the fonts, the cycle source and the
+   one-offs sidecar: the classic parser-blocking <script src> tags execute in
+   exactly the order the inlined blocks did, with the same one-global-scope
+   semantics (nothing reads a comment or a sourceURL out of the built page);
+   the preload scanner fetches the whole set in parallel as the shell HTML
+   arrives; and a data refresh re-downloads only data.<hash>.js plus the
+   small document shells instead of the whole application.
+   DATASET's base carries the jurisdiction (data / data-vic) so a /vic/ build
+   never sweeps the federal dataset file, and the GC below deletes only
+   prefixes this build itself writes – it leaves the other jurisdiction's
+   data file alone, exactly like the cycle-source sweep above.
+   The external bytes are NOT inlineJs-escaped: that escape exists only to
+   keep a literal "</script" out of an inline block, and applied to a file it
+   would corrupt the string. */
+const JS_DIR = path.join(ROOT, "assets", "js");
+fs.mkdirSync(JS_DIR, { recursive: true });
+const jsKeep = new Set();
+const jsBases = [];
+const emitJs = (base, code) => {
+  const name = `${base}.${hash8(Buffer.from(code, "utf8"))}.js`;
+  jsKeep.add(name);
+  if (!jsBases.includes(base)) jsBases.push(base);
+  writeAtomic(path.join(JS_DIR, name), code);
+  return `<script src="assets/js/${name}"></script>`;
+};
+if (!VIC) parts.push(emitJs("explained", `window.EXPLAINED_ARTICLE=${JSON.stringify(fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8"))};`));
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
-  parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
+  parts.push(emitJs(f.replace(/\.production\.min\.js$/, ""), fs.readFileSync(path.join(HERE, "vendor", f), "utf8")));
 for (const f of PLAIN)
-  parts.push(`<script>${inlineJs(stripJs(fs.readFileSync(f === DATASET ? DA(f) : A(f), "utf8"), f))}</script>`);
+  parts.push(emitJs(f === DATASET ? (VIC ? "data-vic" : "data") : f.replace(/\.js$/, ""),
+    stripJs(fs.readFileSync(f === DATASET ? DA(f) : A(f), "utf8"), f)));
 for (const f of JSX)
-  parts.push(`<script>${inlineJs(transpile(fs.readFileSync(A(f), "utf8"), f))}</script>`);
+  parts.push(emitJs(f.replace(/\.jsx?$/, ""), transpile(fs.readFileSync(A(f), "utf8"), f)));
+/* a hashed name changes when the bytes do, so sweep the ones nothing points
+   at – but only names whose base this build owns (the jurisdiction sweep
+   above is why explained/data.* survive a /vic/ build) */
+{
+  let swept = 0;
+  for (const old of fs.readdirSync(JS_DIR)) {
+    if (!/\.[0-9a-f]{8}\.js$/.test(old)) continue;
+    const base = old.replace(/\.[0-9a-f]{8}\.js$/, "");
+    if (!jsBases.includes(base) || jsKeep.has(old)) continue;
+    fs.unlinkSync(path.join(JS_DIR, old));
+    swept++;
+  }
+  if (swept) console.log(`  + assets/js · swept ${swept} stale hashed file(s)`);
+}
 
-/* Splice the inlined scripts in at an explicit marker.
+/* Splice the script tags in at an explicit marker.
    This used to find the first <script src="{uuid}"> and cut to the LAST
    </script> in the file, which silently depended on every script tag being
    uuid-named and on none of them being the last tag for any other reason. */
@@ -1667,8 +1712,10 @@ if (!html.includes("<!--SCRIPTS-->")) throw new Error("SCRIPTS marker not found 
 html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close) =>
   open + css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\n[ \t]*(?=\n)/g, "").replace(/\n{2,}/g, "\n") + close);
 html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
-/* /vic/ sits one folder down: the shared fonts are site-root assets */
-if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
+/* /vic/ sits one folder down: the shared fonts and the hashed js files are
+   site-root assets. Relative, never /assets/…: a saved file:// copy must
+   still boot, and an absolute path resolves to the filesystem root there. */
+if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/').replace(/src="assets\//g, 'src="../assets/');
 
 /* ---- 5a. every tab is also its own page --------------------------------
    The tabs are one document's views of the same data, but a URL each lets
@@ -1735,6 +1782,11 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       /<script type="application\/ld\+json">\{"@context":"https:\/\/schema\.org","@type":"WebPage"[\s\S]*?<\/script>/,
       () => vicPageJsonLdFor(`${BRAND} tracker – ${t.label}`, url, t.desc));
     if (!VIC) doc = doc.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
+    /* the hashed js files ride one level up per folder: a tab document sits
+       a folder down from its root page (Vic's two, since vic/ itself sits a
+       folder down), so its script srcs re-root accordingly */
+    doc = doc.replace(/src="assets\//g, 'src="../assets/');
+    if (VIC) doc = doc.replace(/src="\.\.\/assets\//g, 'src="../../assets/');
     fs.mkdirSync(path.join(BASE_DIR, t.id), { recursive: true });
     writeAtomic(path.join(BASE_DIR, t.id, "index.html"), doc);
   }
