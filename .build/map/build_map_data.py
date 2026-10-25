@@ -14,8 +14,9 @@ House since the 2025 election.
              2CP + flows (TCF by polling place), 2PP + swing (TPP by
              polling place), coordinates, premises, SEIFA decile at the
              venue, SEIFA decile of where its voters live (2016+), and the
-             census people around it (2011 census of the venue's own SA1,
-             2013; 2021 census of where its voters live, 2016+)
+             census people around it (2006 census of the venue's own CD,
+             2007-2010; 2011 census of its own SA1, 2013; 2021 census of
+             where its voters live, 2016+)
 
 Every booth sum is checked against the division's ordinary-vote oracle
 before anything is written (the repo's recompose doctrine), and the
@@ -241,8 +242,9 @@ def dec_of_pct(p):
 
 
 # census people measures: 2016+ the 2021 census of where a place's voters
-# live (vote-weighted); 2013 the 2011 census of the SA1 the venue itself
-# stands in (a venue proxy — the AEC's Votes-by-SA1 product starts 2016):
+# live (vote-weighted); 2007-2013 the venue proxy — 2006 census of the CD
+# the venue itself stands in (2007/2010), 2011 census of its SA1 (2013),
+# the AEC's Votes-by-SA1 product starting 2016:
 # [language other than English at home, aged 65 and over, aged 20 to 34,
 #  born overseas, university educated, blue-collar occupation], each a
 # share of residents (uni of the aged-15+ basis, blue of employed people
@@ -335,10 +337,11 @@ def build_year(year, hist, base2001):
     vstore = json.load(open(vpath)) if os.path.exists(vpath) else None
     census_basis = "voter"
     if vstore is None:
-        # 2013 predates the AEC's Votes-by-SA1 product, so no voter
+        # 2007-2013 predate the AEC's Votes-by-SA1 product, so no voter
         # footprint exists: read the venue-proxy store instead — a booth's
-        # figures are the 2011 census SA1 its premises stand in, a seat's
-        # the exact census sum over its SA1s (real headcounts, never
+        # figures are the census area its premises stand in (2006 census
+        # CD at 2007/2010, 2011 census SA1 at 2013), a seat's the exact
+        # census sum over its areas (real headcounts, never
         # vote-weighted pseudo-populations)
         p = REPO + f"/data/booth-demo-{year}.json"
         if os.path.exists(p):

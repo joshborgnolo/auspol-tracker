@@ -155,14 +155,15 @@ const IX_NAME = { irsad: "Advantage and disadvantage", irsd: "Disadvantage", ier
 const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
 // the census tab's people measures: shares of residents, from the 2021 census
 // counted where each polling place's voters live (the AEC records that from
-// 2016 on); at 2013 the 2011 census of the areas the places stand in
+// 2016 on); 2007–2013 read the census of the areas the places stand in
+// (the 2006 census at 2007 and 2010, the 2011 census at 2013)
 const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue"];
 const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers" };
 const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar" };
 const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work" };
 const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48] };
 const isDemo = () => DM.includes(S.index);
-const DEMO_FROM = 2013;
+const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "now"];
@@ -2398,14 +2399,15 @@ function areaHedDek(m, st) {
 
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"] };
-// the measures' census basis as copy: 2013 reads the census areas the polling
-// places stand in (2011 census — the AEC's where-voters-live record begins
-// 2016); 2016 on reads where their voters live (2021 census)
+// the measures' census basis as copy: 2007–2013 read the census areas the
+// polling places stand in (2006 census at 2007 and 2010, 2011 at 2013 — the
+// AEC's where-voters-live record begins 2016); 2016 on reads where their
+// voters live (2021 census)
 const DB = {
   venue: {
-    seats: "From the 2011 census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.",
+    seats: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
     who: "of residents of the census area it stands in",
-    note: "From the 2011 census, of the census areas the polling places stand in.",
+    note: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
   },
   voter: {
     seats: "From the 2021 census, counted where each seat’s voters live.",
@@ -2413,8 +2415,11 @@ const DB = {
     note: "From the 2021 census, counted where its voters live.",
   },
 };
-const demoCopy = (m) => DB[m.demoBasis === "venue" ? "venue" : "voter"];
-const DEMO_EARLY = { hed: "Census figures start at the 2013 election", dek: "2013 is counted from the census areas the polling places stand in (the 2011 census — the AEC’s record of where voters live begins in 2016); from 2016 the figures follow the voters. Choose 2013 or later on the timeline." };
+const demoCopy = (m) => {
+  const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
+  return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, note: db.note(m.year) } : db;
+};
+const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
@@ -3053,7 +3058,7 @@ function valueText(v, kind) {
     switch (S.lens) {
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
-      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2013 on" : "No census figure here") : "No score here";
+      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2007 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
     }
@@ -3227,7 +3232,7 @@ function legendHTML(m) {
         const [lo, hi] = DM_RANGE[S.index], early = m.year !== "now" && m.year < DEMO_FROM;
         if (!early) h += legendHist(m, lo, hi);
         h += `<div class="lg-ramp" style="background:${grad(RAMP.demo[S.index], 0, 100)}">${early || !aus.demo ? "" : mark(aus.demo[S.index], lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 2013 election: 2013 reads the census areas the polling places stand in (2011 census); from 2016 they follow the voters (2021 census)." : `${m.demoBasis === "venue" ? `Share of residents, 2011 census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `Share of residents, 2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2007 election: 2007 and 2010 read the census areas the polling places stand in (2006 census), 2013 on the 2011 census; from 2016 they follow the voters (2021 census)." : `${m.demoBasis === "venue" ? `Share of residents, ${m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `Share of residents, 2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;

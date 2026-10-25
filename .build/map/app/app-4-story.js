@@ -282,14 +282,15 @@ function areaHedDek(m, st) {
 
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"] };
-// the measures' census basis as copy: 2013 reads the census areas the polling
-// places stand in (2011 census — the AEC's where-voters-live record begins
-// 2016); 2016 on reads where their voters live (2021 census)
+// the measures' census basis as copy: 2007–2013 read the census areas the
+// polling places stand in (2006 census at 2007 and 2010, 2011 at 2013 — the
+// AEC's where-voters-live record begins 2016); 2016 on reads where their
+// voters live (2021 census)
 const DB = {
   venue: {
-    seats: "From the 2011 census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.",
+    seats: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
     who: "of residents of the census area it stands in",
-    note: "From the 2011 census, of the census areas the polling places stand in.",
+    note: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
   },
   voter: {
     seats: "From the 2021 census, counted where each seat’s voters live.",
@@ -297,8 +298,11 @@ const DB = {
     note: "From the 2021 census, counted where its voters live.",
   },
 };
-const demoCopy = (m) => DB[m.demoBasis === "venue" ? "venue" : "voter"];
-const DEMO_EARLY = { hed: "Census figures start at the 2013 election", dek: "2013 is counted from the census areas the polling places stand in (the 2011 census — the AEC’s record of where voters live begins in 2016); from 2016 the figures follow the voters. Choose 2013 or later on the timeline." };
+const demoCopy = (m) => {
+  const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
+  return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, note: db.note(m.year) } : db;
+};
+const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
