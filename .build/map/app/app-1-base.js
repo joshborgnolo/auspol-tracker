@@ -188,10 +188,11 @@ function walkLens(dir) {
   if (b) b.scrollIntoView({ block: "nearest", inline: "nearest" });
 }
 // a horizontal swipe with no other claim on it (vertical drags belong to the
-// page): one walk per gesture, and never mid-pinch
-function swipeWatch(el, onSwipe) {
+// page): one walk per gesture, and never mid-pinch; `want` can turn a touch
+// down by its start target (native controls keep their gestures)
+function swipeWatch(el, onSwipe, want) {
   let g = null;
-  el.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { const t = e.touches[0]; g = { x: t.clientX, y: t.clientY, at: performance.now() }; } else g = null; }, { passive: true });
+  el.addEventListener("touchstart", (e) => { if (e.touches.length === 1 && (!want || want(e.target))) { const t = e.touches[0]; g = { x: t.clientX, y: t.clientY, at: performance.now() }; } else g = null; }, { passive: true });
   el.addEventListener("touchmove", (e) => { if (g && e.touches.length !== 1) g = null; }, { passive: true });
   el.addEventListener("touchend", (e) => {
     if (!g) return;

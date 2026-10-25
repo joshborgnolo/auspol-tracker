@@ -567,10 +567,12 @@ canvas.addEventListener("touchmove", (e) => {
 }, { passive: false });
 canvas.addEventListener("touchend", (e) => { if (e.touches.length < 2) homePinch = null; });
 canvas.addEventListener("touchcancel", () => { homePinch = null; });
-// a swipe on the canvas, where the page's fit means the map can't use it,
-// cycles the years: on the chamber always, on the map at the whole-country
-// fit (a zoomed-in map pans instead)
-swipeWatch(canvas, (dir) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) walkYear(dir, true); });
+// a swipe anywhere in the map figure — the canvas, its overlays, the
+// timeline, the story — cycles the years: on the chamber always, on the map
+// at the whole-country fit (a zoomed-in map pans instead). Native controls
+// keep their own gestures (zoom and city buttons, form fields, links), and
+// the list view's own rows
+swipeWatch($(".mp-fig"), (dir) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) walkYear(dir, true); }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
 // Safari's own pinch events
 let gestureK = 1;
 canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
