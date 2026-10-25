@@ -480,13 +480,25 @@ const fillBooth = (m, j) => (fade && m.prevBoothCol ? mixC(m.prevBoothCol[j], m.
 const canvas = $("#cv"), ctx = canvas.getContext("2d");
 const hitCtx = document.createElement("canvas").getContext("2d");
 let Wpx = 0, Hpx = 0, dpr = 1, T = d3.zoomIdentity, HOME = d3.zoomIdentity;
+// touch: a touch scroll belongs to the page where the map can't take it — on
+// the chamber always, and on the map while it sits at the whole-country fit.
+// Only a zoomed-in map claims finger gestures (pinch, pan) from the page.
+function updateTouch() {
+  const ta = S.view === "map" && T.k > HOME.k * 1.001 ? "none" : "pan-y";
+  if (canvas.style.touchAction !== ta) canvas.style.touchAction = ta;
+}
 const zoom = d3.zoom().scaleExtent([0.5, 2600]).clickDistance(6)
-  // the wheel is ours (pan on a trackpad, zoom on a mouse wheel or a pinch)
-  .filter((e) => S.view === "map" && e.type !== "wheel" && !e.button && !(e.type === "dblclick"))
+  // the wheel is ours (pan on a trackpad, zoom on a mouse wheel or a pinch).
+  // At the whole-country fit d3 sits touch out entirely — its preventDefault
+  // on touchmove would steal the page scroll it can't use; pinch-in from
+  // there is the small handler below
+  .filter((e) => S.view === "map" && e.type !== "wheel" && !e.button && !(e.type === "dblclick")
+    && !(e.type === "touchstart" && T.k <= HOME.k * 1.001))
   .on("start", (e) => { if (e.sourceEvent && e.sourceEvent.type === "mousedown") canvas.classList.add("grabbing"); })
-  .on("zoom", (e) => { T = e.transform; schedule(); updateHint(); legendIfChanged(); })
+  .on("zoom", (e) => { T = e.transform; schedule(); updateHint(); legendIfChanged(); updateTouch(); })
   .on("end", () => canvas.classList.remove("grabbing"));
 d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+updateTouch();
 
 let hatchCanvas = null;
 function hatch() {
@@ -821,6 +833,7 @@ function setExtent() {
   HOME = fitTransform(homeBox(m));
   zoom.translateExtent([[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]])
     .scaleExtent([HOME.k, 2600]).extent([[0, 0], [Wpx, Hpx]]);
+  updateTouch();
 }
 function selectionBox() {
   const m = M(), g = m.geo;
@@ -915,6 +928,31 @@ canvas.addEventListener("wheel", (e) => {
     zoomAt(px, py, Math.pow(2, -e.deltaY * unit * 0.002));
   }
 }, { passive: false });
+// pinch-in from the whole-country fit, where d3's touch sits out so a lone
+// finger scrolls the page: two fingers still zoom the map
+let homePinch = null;
+canvas.addEventListener("touchstart", (e) => {
+  if (S.view !== "map" || T.k > HOME.k * 1.001) return;
+  if (e.touches.length !== 2) { homePinch = null; return; }
+  // from the second finger on, the gesture is the map's: cancel the page
+  // actions up front or the first move under touch-action: pan-y can start a
+  // scroll the touchmove preventDefault then can't take back
+  if (e.cancelable) e.preventDefault();
+  const p = e.touches[0], q = e.touches[1];
+  homePinch = { d: Math.hypot(p.clientX - q.clientX, p.clientY - q.clientY), k: T.k };
+}, { passive: false });
+canvas.addEventListener("touchmove", (e) => {
+  if (!homePinch || S.view !== "map" || e.touches.length !== 2) return;
+  const p = e.touches[0], q = e.touches[1];
+  const d = Math.hypot(p.clientX - q.clientX, p.clientY - q.clientY);
+  if (!d || !homePinch.d) return;
+  if (e.cancelable) e.preventDefault();
+  const r = canvas.getBoundingClientRect(), mx = (p.clientX + q.clientX) / 2 - r.left, my = (p.clientY + q.clientY) / 2 - r.top;
+  d3.select(canvas).interrupt();
+  zoom.scaleTo(d3.select(canvas), homePinch.k * d / homePinch.d, [mx, my]);
+}, { passive: false });
+canvas.addEventListener("touchend", (e) => { if (e.touches.length < 2) homePinch = null; });
+canvas.addEventListener("touchcancel", () => { homePinch = null; });
 // Safari's own pinch events
 let gestureK = 1;
 canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
@@ -2790,6 +2828,7 @@ function setView(v, quiet) {
   for (const id of ["#cities", "#zoomer", "#hint"]) $(id).hidden = v !== "map";
   canvas.style.visibility = list ? "hidden" : "visible";
   canvas.classList.toggle("grab", v === "map");
+  updateTouch();
   hideTip(); S.hover = null;
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
@@ -2954,7 +2993,14 @@ canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); sched
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
-  if (!h) { if (S.sel.level !== "aus" && S.view === "map" && T.k < HOME.k * 1.4) goAus(); return; }
+  if (!h) {
+    // a miss lets the selection go — on the map only near the whole-country
+    // fit (a zoomed miss is a pan mis-tap); the chamber has no camera, so a
+    // click away from the seats always deselects
+    if (S.sel.level === "aus") return;
+    if (S.view === "chamber" || (S.view === "map" && T.k < HOME.k * 1.4)) goAus();
+    return;
+  }
   if (h.kind === "booth") goBooth(h.i);
   else goDiv(h.i, { fly: S.view === "map" });
 });

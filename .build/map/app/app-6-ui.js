@@ -313,6 +313,7 @@ function setView(v, quiet) {
   for (const id of ["#cities", "#zoomer", "#hint"]) $(id).hidden = v !== "map";
   canvas.style.visibility = list ? "hidden" : "visible";
   canvas.classList.toggle("grab", v === "map");
+  updateTouch();
   hideTip(); S.hover = null;
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
@@ -477,7 +478,14 @@ canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); sched
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
-  if (!h) { if (S.sel.level !== "aus" && S.view === "map" && T.k < HOME.k * 1.4) goAus(); return; }
+  if (!h) {
+    // a miss lets the selection go — on the map only near the whole-country
+    // fit (a zoomed miss is a pan mis-tap); the chamber has no camera, so a
+    // click away from the seats always deselects
+    if (S.sel.level === "aus") return;
+    if (S.view === "chamber" || (S.view === "map" && T.k < HOME.k * 1.4)) goAus();
+    return;
+  }
   if (h.kind === "booth") goBooth(h.i);
   else goDiv(h.i, { fly: S.view === "map" });
 });
