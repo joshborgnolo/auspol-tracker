@@ -182,7 +182,7 @@ const LENSES = [
 /* =============================== state =============================== */
 const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
-  view: "map", sel: { level: "aus" }, hover: null,
+  view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
   dist: null,
