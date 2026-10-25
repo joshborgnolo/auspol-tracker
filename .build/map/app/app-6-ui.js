@@ -375,13 +375,26 @@ function lensParamChanged() {
   startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
   if (S.view === "list") renderList(true);
 }
+/* the wait for an election's data: a ring, centred on the map; on the chamber, in the aisle
+   between the Hansard desk and the back rows. Words only when the data fails */
+function showLoading(on, msg) {
+  const el = $("#loading");
+  el.hidden = !on; el.classList.toggle("err", !!msg); el.textContent = msg || "";
+  el.setAttribute("aria-label", msg ? "" : "Loading");
+  el.style.left = el.style.top = "";
+  if (!on || msg || S.view !== "chamber") return;
+  const r = $("#stage").getBoundingClientRect();
+  if (!r.width) return;
+  const F = chamberFrame(chamberGeom(), r.width, r.height, chamberPads(r.width));
+  el.style.left = F.X(0) + "px"; el.style.top = F.Yp(CH_AISLE) + "px";
+}
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
   const from = S.year, a = M();
-  $("#loading").hidden = false; $("#loading").textContent = `Loading ${yearLabel(y)}`;
-  try { await loadYear(y); } catch (e) { $("#loading").textContent = "That election didn’t load. Try again."; return; }
-  $("#loading").hidden = true;
+  showLoading(true);
+  try { await loadYear(y); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
+  showLoading(false);
   const b = Y[y];
   // carry the selection across by seat name and polling-place ID
   const s = S.sel;
@@ -630,8 +643,9 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
   $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
   getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }).catch(() => {});
-  try { await loadYear(S.year); } catch (err) { $("#loading").textContent = "The map’s data didn’t load. Reload the page to try again."; return; }
-  $("#loading").hidden = true;
+  showLoading(true);
+  try { await loadYear(S.year); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);
   resize();

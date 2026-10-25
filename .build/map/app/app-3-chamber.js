@@ -243,6 +243,8 @@ function drawChair(g, x, y, fa, w, d, fill, backFill, alpha) {
   g.fillStyle = backFill; g.fill();
   g.restore();
 }
+// the open aisle on the centre line, between the Hansard desk and the back rows' inner ends
+const CH_AISLE = 52 / CU;
 const SPEAKER_AT = [0, -365 / CU, Math.PI / 2, 0, 27 / CU, 24 / CU];
 
 /* the room: the floor, the benches and their empty seats, the dais, the table, the officers' chairs */
@@ -473,19 +475,17 @@ function drawChamber(g, m, w, h, opts) {
       blocLabel(oppName, String(ch.nOpp + (spFam === ch.opp ? 1 : 0)), ch.opp, "Opposition", X(rO + 0.95), "left");
     }
     if (ch.nCross) {
-      // the crossbench's name and make-up beside its chairs, outside the curve, towards where they sit
+      // the crossbench's name and make-up in the column beside the chamber, on the side its chairs
+      // lean to, under that side's bloc label; never under the chamber, so where they sit can't
+      // change the room the chamber is drawn in
       let mx = 0, my = 0, n = 0;
       for (const i of ch.order) { const d = m.divs[i]; if (holdFam(d.hold) === ch.gov || holdFam(d.hold) === ch.opp) continue; const c = geom.seats[ch.at.get(i)]; mx += c.x; my += c.y; n++; }
       mx /= n; my /= n;
-      let pt;
-      if (my > 0) { const l = Math.hypot(mx, my) || 1; pt = [(mx / l) * (rO + 1.25), (my / l) * (rO + 1.25)]; }
-      else pt = [Math.sign(mx || 1) * (rO + 1.25), my];
-      // never centred: at the foot of the chamber the majority label takes one side, this the other
-      const side0 = pt[0] < -1.2 ? "right" : "left";
+      const side0 = mx < 0 ? "right" : "left";
       // wrap the make-up to the room on that side, and find where the block's box falls
       const lay = (side, by, mode) => {
-        const bx = X(pt[0]) + (side === "left" ? (Math.abs(pt[0]) <= 1.2 ? 16 : 4) : -4);
-        const maxW = Math.max(120, side === "left" ? F.ox + (geom.box.x1 + 6) * s - bx : bx - 10);
+        const bx = X(side === "left" ? rO + 0.95 : -rO - 0.95);
+        const maxW = Math.max(120, side === "left" ? w - bx - 4 : bx - 4);
         g.font = `400 12px ${SANS}`;
         // one middot-joined line if the whole make-up fits; otherwise a
         // stacked list, one party to a line — packing two to a line leaves a
@@ -515,10 +515,12 @@ function drawChamber(g, m, w, h, opts) {
           && ![[x0, by], [x0 + wMax, by], [x0, by + ht], [x0 + wMax, by + ht], [x0 + wMax / 2, by], [x0, by + ht / 2], [x0 + wMax, by + ht / 2]].some(([px, py]) => onFloor(px, py));
         return { side, bx, by, lines, wMax, ht, room, clear };
       };
-      const by0 = Yp(pt[1]) + (pt[1] > rO * 0.6 ? 6 : 0);
-      // beside its chairs if that's clear of the majority label, else the other side, else lower down
+      // level with its chairs, but no higher than just under the bloc label; nudged up or down if
+      // the majority label is in the way, else the other side
+      const top = yMid + 40, by0 = Math.max(Yp(my) - 8, top);
       const other = side0 === "left" ? "right" : "left";
-      const spots = [[side0, by0], [other, by0], ...[1, 2, 3].map((k) => [side0, by0 + k * 18])];
+      const steps = [0, -1, 1, -2, 2, -3, 3, -4, 4, 5, 6].map((k) => by0 + k * 18).filter((by) => by >= top);
+      const spots = [...steps.map((by) => [side0, by]), ...steps.map((by) => [other, by])];
       const tries = ["one", "stack", "pack"].flatMap((mode) => spots.map(([sd, by]) => lay(sd, by, mode))).filter(Boolean);
       const L = tries.find((c) => c.room && c.clear);
       if (L) {
@@ -647,7 +649,7 @@ function chamberHit(m, px, py) {
   return best == null ? null : { kind: "div", i: best };
 }
 // a phone has no room beside the chamber: it fills the width, its bloc labels in a band above
-function chamberPads() { return isPhone() ? (Wpx < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 52, l: 10 }) : { t: 34, r: 150, b: 66, l: 150 }; }
+function chamberPads(w = Wpx) { return isPhone() ? (w < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 36, l: 10 }) : { t: 34, r: 150, b: 36, l: 150 }; }
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sd = selDiv();

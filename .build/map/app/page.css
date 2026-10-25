@@ -92,7 +92,22 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
 .mp-stage canvas.grab { cursor: grab; }
 .mp-stage canvas.grabbing { cursor: grabbing; }
-.mp-loading { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; color: var(--ink-3); pointer-events: none; }
+/* the wait for an election: a ring, centred on the map, in the chamber's aisle (app-6 places it);
+   words only when the data fails */
+.mp-loading {
+  position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; box-sizing: border-box;
+  border-radius: 50%; border: 2px solid color-mix(in oklch, var(--ink-3) 26%, transparent); border-top-color: var(--ink-2);
+  pointer-events: none; animation: mp-spin .9s linear infinite, mp-in .2s .15s both;
+}
+/* over the map's fills the ring sits on a disc of paper */
+.mp-view:not(.v-chamber) .mp-loading:not(.err) { background: var(--bg); box-shadow: 0 0 0 8px var(--bg), 0 1px 10px 8px color-mix(in oklch, var(--ink) 14%, transparent); }
+.mp-loading.err {
+  inset: 0; width: auto; height: auto; margin: 0; border: 0; border-radius: 0; animation: none;
+  display: grid; place-items: center; font-size: 13px; color: var(--ink-3);
+}
+@keyframes mp-spin { to { transform: rotate(1turn); } }
+@keyframes mp-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .mp-loading { animation-duration: 2.4s, .2s; } }
 
 /* overlays on the stage */
 /* the cities run the width of the stage, clear of the zoom buttons */
