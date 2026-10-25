@@ -180,12 +180,12 @@ const LENSES = [
   { id: "cls", label: "Seat type" },
   { id: "seifa", label: "Census" },
 ];
-// the arrow-key walks, shared by the keyboard and the phone's swipes;
-// the keyboard stops at the ends, a swipe cycles all the way around.
-// The All-polls fixed-view walk's contract here: the element at the
-// interaction point holds its viewport position (the figure and lens row sit
-// above the story's reflow, and scrollY never compensates), and a walk has
-// no scroll side effects of its own
+// the arrow-key walks: the year walk is shared by the keyboard and the phone's
+// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
+// only — a phone scrolls the lens row itself. The All-polls fixed-view walk's
+// contract here: the element at the interaction point holds its viewport
+// position (the figure and lens row sit above the story's reflow, and scrollY
+// never compensates), and a walk has no scroll side effects of its own
 function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
@@ -3388,11 +3388,10 @@ q.addEventListener("keydown", (e) => {
 });
 q.addEventListener("focus", () => { if (S.q.trim().length >= 2 && S.view !== "list") runSearch(); });
 // with the pointer over the lens row the arrows walk the lenses, not the years;
-// on a phone a swipe on the row cycles them (the row itself never scrolls)
+// on a phone the row scrolls horizontally, the All-polls menubar way
 let lensHover = false;
 $("#lenses").addEventListener("pointerenter", () => { lensHover = true; });
 $("#lenses").addEventListener("pointerleave", () => { lensHover = false; });
-swipeWatch($("#lenses"), (dir) => { if (isPhone()) walkLens(dir); });
 document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }

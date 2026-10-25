@@ -401,8 +401,6 @@ button { cursor: pointer; background: none; border: 0; }
   :root { --pin-top: 0px; }
   .mp-sec { padding-top: 14px; }
   .mp-lensrow { flex-wrap: wrap; }
-  /* a swipe on the lens row cycles the lenses; the row itself never scrolls */
-  .mp-lensrow .mp-lenses { overflow-x: hidden; }
   .mp-search { order: -1; width: 100%; margin: 0 0 10px; }
   /* under 16px iOS zooms the page to a focused field — keep the page at 1x */
   .mp-search input { font-size: 16px; }
