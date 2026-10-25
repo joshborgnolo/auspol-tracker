@@ -79,8 +79,8 @@ function readTheme() {
   const T = {};
   for (const k in L) T[k] = lch(...L[k]);
   const P = dk
-    ? { alp: "#e45e51", lnp: "#4092e7", grn: "#5dc47e", onp: "#f69828", ind: "#79c7e7", csa: "#3cc7ae", oth: "#a790a4" }
-    : { alp: "#af3d36", lnp: "#386695", grn: "#50a064", onp: "#d27306", ind: "#42acd2", csa: "#0d7f74", oth: "#977b9d" };
+    ? { alp: "#e45e51", lnp: "#4092e7", grn: "#5dc47e", onp: "#f69828", ind: "#ba96bf", csa: "#3cc7ae", oth: "#a69d93" }
+    : { alp: "#af3d36", lnp: "#386695", grn: "#50a064", onp: "#d27306", ind: "#977b9d", csa: "#0d7f74", oth: "#938a81" };
   T.party = {}; for (const k in P) T.party[k] = hex(P[k]);
   T.dark = dk;
   T.mid = dk ? lch(0.36, 0.008, 66) : lch(0.905, 0.006, 78);
@@ -107,7 +107,7 @@ function buildRamps() {
     // Labor at the low end of the index and the Coalition at the high end: the
     // site's own reading order ("◀ Labor ahead … Coalition ahead ▶")
     div: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
-    fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(225, 0.10), oth: seq(315, 0.09) },
+    fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
     loss: seq(70, 0.025),
