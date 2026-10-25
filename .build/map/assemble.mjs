@@ -5,7 +5,7 @@
      app-1-base.js     helpers, colour, the theme's tokens, the data loaders,
                        the "Now" overlay (Farrer by-election, changes of party)
      app-2-map.js      lens values and colours, the canvas map, zoom and pan
-     app-3-chamber.js  the House as a horseshoe of chairs, and the morph
+     app-3-chamber.js  the House in its chamber, seat by seat, and the morph
      app-4-story.js    the story column: rule-written heads for every lens
      app-5-list.js     the list, its filters and the column distributions
      app-6-ui.js       legend, timeline, tooltip, search, URL, events, boot

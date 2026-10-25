@@ -355,13 +355,16 @@ function applyNow(m, now) {
   m.asOf = now.asOf;
 }
 
+// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs)
+const SEATED = new Set(["now"]);
 async function loadYear(year) {
   if (Y[year]) return Y[year].ready;
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
-    const [res, lo, now] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null]);
+    const [res, lo, now, seating] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
+      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null]);
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.date = res.date;
@@ -370,6 +373,7 @@ async function loadYear(year) {
     for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     if (now) applyNow(m, now);
     m.speaker = m.byName.get(res.speaker);
+    m.seating = seating;
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);
     m.booth = deriveBooths(m.res.booths, m);

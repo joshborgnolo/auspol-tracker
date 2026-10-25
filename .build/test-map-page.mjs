@@ -72,7 +72,17 @@ for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
 }
 const now = JSON.parse(R("map/data/data-now.json"));
 assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the Now overlay carries the Farrer by-election");
+// the chamber seats Now's members where the Parliament's seating plan puts them (node .build/map/seating.mjs)
+{
+  const seats = JSON.parse(R("map/data/seats-now.json")), res = JSON.parse(R("map/data/res-2025.json"));
+  const ids = Object.values(seats.at), names = new Set(res.divs.map((d) => d.n));
+  assert.equal(ids.length, res.divs.length - 1, "the seating plan seats every member but the Speaker");
+  assert.equal(new Set(ids).size, ids.length, "no two members share a seat");
+  assert.ok(Object.keys(seats.at).every((n) => names.has(n)) && !(res.speaker in seats.at), "the plan's seats are the House's divisions, the Speaker in the chair");
+  const cells = new Function(`${part("app-3-chamber.js").match(/@cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @cells-end/)[1]}; return chamberCells().map((c) => c.id);`)();
+  assert.ok(ids.every((id) => cells.includes(id)), "every seat id is one of the chamber's seats");
+}
 assert.ok(/<loc>https:\/\/auspoltracker\.com\/map\/<\/loc>/.test(R("sitemap.xml")), "the sitemap lists /map/");
 assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|atlas|vic)\//.test(page), "the map links none of the unlisted pages");
 
-console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, in the sitemap");
+console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, Now seated by the plan, in the sitemap");
