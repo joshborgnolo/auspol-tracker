@@ -178,6 +178,29 @@ const LENSES = [
   { id: "cls", label: "Seat type" },
   { id: "seifa", label: "Census" },
 ];
+// the arrow-key walks, shared by the keyboard and the phone's swipes;
+// the keyboard stops at the ends, a swipe cycles all the way around
+function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
+function walkLens(dir) {
+  const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
+  setLens(LENSES[k].id);
+  const b = $(`#lenses [data-lens="${LENSES[k].id}"]`);
+  if (b) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+// a horizontal swipe with no other claim on it (vertical drags belong to the
+// page): one walk per gesture, and never mid-pinch
+function swipeWatch(el, onSwipe) {
+  let g = null;
+  el.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { const t = e.touches[0]; g = { x: t.clientX, y: t.clientY, at: performance.now() }; } else g = null; }, { passive: true });
+  el.addEventListener("touchmove", (e) => { if (g && e.touches.length !== 1) g = null; }, { passive: true });
+  el.addEventListener("touchend", (e) => {
+    if (!g) return;
+    const t = e.changedTouches[0], dx = t.clientX - g.x, dy = t.clientY - g.y, quick = performance.now() - g.at < 900;
+    g = null;
+    if (quick && Math.abs(dx) >= 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) onSwipe(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  el.addEventListener("touchcancel", () => { g = null; }, { passive: true });
+}
 
 /* =============================== state =============================== */
 const S = {

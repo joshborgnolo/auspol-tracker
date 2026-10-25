@@ -50,7 +50,7 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-views .rd-tab svg { margin-right: 7px; opacity: .8; }
 
 .mp-lensrow { margin-top: 18px; }
-.mp-lensrow .mp-lenses { display: flex; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.mp-lensrow .mp-lenses { display: flex; flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .mp-lensrow .mp-lenses::-webkit-scrollbar { display: none; }
 .mp-lenses .rd-tab:first-child { padding-left: 0; }
 .mp-lenses .rd-tab:first-child::after { left: 0; }
@@ -399,6 +399,8 @@ button { cursor: pointer; background: none; border: 0; }
   :root { --pin-top: 0px; }
   .mp-sec { padding-top: 14px; }
   .mp-lensrow { flex-wrap: wrap; }
+  /* a swipe on the lens row cycles the lenses; the row itself never scrolls */
+  .mp-lensrow .mp-lenses { overflow-x: hidden; }
   .mp-search { order: -1; width: 100%; margin: 0 0 10px; }
   .mp-fig { grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
   /* the stage keeps one height whatever the lens: the key below it grows the view, never

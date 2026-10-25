@@ -353,7 +353,9 @@ function setView(v, quiet) {
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
     if ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map")) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
-    if (v === "map" && prev === "list") fitSelection(0);
+    // the map always opens at its fit — the transform persists across views,
+    // and an unfitted one lands on the country's north-west corner
+    if (v === "map" && prev !== "map") fitSelection(0);
   }
   renderLegend(); renderFilterPill(); updateHint(); writeURL();
   if (!quiet) renderStory(true);
@@ -592,12 +594,18 @@ q.addEventListener("keydown", (e) => {
   else if (e.key === "Escape") { el.hidden = true; q.blur(); }
 });
 q.addEventListener("focus", () => { if (S.q.trim().length >= 2 && S.view !== "list") runSearch(); });
+// with the pointer over the lens row the arrows walk the lenses, not the years;
+// on a phone a swipe on the row cycles them (the row itself never scrolls)
+let lensHover = false;
+$("#lenses").addEventListener("pointerenter", () => { lensHover = true; });
+$("#lenses").addEventListener("pointerleave", () => { lensHover = false; });
+swipeWatch($("#lenses"), (dir) => { if (isPhone()) walkLens(dir); });
 document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") goUp();
-  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { const k = YEARS.indexOf(S.year) + (e.key === "ArrowRight" ? 1 : -1); if (YEARS[k] != null) { e.preventDefault(); setYear(YEARS[k]); } }
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -629,9 +637,10 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
+  morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });
-  fitSelection(0);
+  fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });

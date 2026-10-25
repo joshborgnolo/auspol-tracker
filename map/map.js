@@ -180,6 +180,29 @@ const LENSES = [
   { id: "cls", label: "Seat type" },
   { id: "seifa", label: "Census" },
 ];
+// the arrow-key walks, shared by the keyboard and the phone's swipes;
+// the keyboard stops at the ends, a swipe cycles all the way around
+function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
+function walkLens(dir) {
+  const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
+  setLens(LENSES[k].id);
+  const b = $(`#lenses [data-lens="${LENSES[k].id}"]`);
+  if (b) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+// a horizontal swipe with no other claim on it (vertical drags belong to the
+// page): one walk per gesture, and never mid-pinch
+function swipeWatch(el, onSwipe) {
+  let g = null;
+  el.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { const t = e.touches[0]; g = { x: t.clientX, y: t.clientY, at: performance.now() }; } else g = null; }, { passive: true });
+  el.addEventListener("touchmove", (e) => { if (g && e.touches.length !== 1) g = null; }, { passive: true });
+  el.addEventListener("touchend", (e) => {
+    if (!g) return;
+    const t = e.changedTouches[0], dx = t.clientX - g.x, dy = t.clientY - g.y, quick = performance.now() - g.at < 900;
+    g = null;
+    if (quick && Math.abs(dx) >= 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) onSwipe(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  el.addEventListener("touchcancel", () => { g = null; }, { passive: true });
+}
 
 /* =============================== state =============================== */
 const S = {
@@ -830,9 +853,14 @@ function homeBox(m) { return unionBB(m.geo.bb); }
 // further out: at that zoom nothing moves, so a scroll there scrolls the page
 function setExtent() {
   const m = M(); if (!m || !Wpx) return;
+  // outside the map view the transform always rides the whole-country fit:
+  // the insets grow the box after the first draw, and a transform pinned to
+  // the early smaller box would later open the map on the north-west corner
+  const rides = S.view !== "map";
   HOME = fitTransform(homeBox(m));
   zoom.translateExtent([[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]])
     .scaleExtent([HOME.k, 2600]).extent([[0, 0], [Wpx, Hpx]]);
+  if (rides) { lastFit = HOME; d3.select(canvas).call(zoom.transform, HOME); }
   updateTouch();
 }
 function selectionBox() {
@@ -853,8 +881,8 @@ function selectionBox() {
 // the last view the page framed by itself, to tell it from one the reader has moved
 let lastFit = null;
 const atLastFit = () => lastFit && Math.abs(T.k / lastFit.k - 1) < 0.01 && Math.hypot(T.x - lastFit.x, T.y - lastFit.y) < 2;
-function fitSelection(dur) {
-  if (!M() || !Wpx || S.view !== "map") return;
+function fitSelection(dur, force) {
+  if (!M() || !Wpx || (S.view !== "map" && !force)) return;
   const t = fitTransform(selectionBox());
   lastFit = t;
   const s = d3.select(canvas);
@@ -953,6 +981,10 @@ canvas.addEventListener("touchmove", (e) => {
 }, { passive: false });
 canvas.addEventListener("touchend", (e) => { if (e.touches.length < 2) homePinch = null; });
 canvas.addEventListener("touchcancel", () => { homePinch = null; });
+// a swipe on the canvas, where the page's fit means the map can't use it,
+// cycles the years: on the chamber always, on the map at the whole-country
+// fit (a zoomed-in map pans instead)
+swipeWatch(canvas, (dir) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) walkYear(dir, true); });
 // Safari's own pinch events
 let gestureK = 1;
 canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
@@ -2944,7 +2976,9 @@ function setView(v, quiet) {
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
     if ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map")) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
-    if (v === "map" && prev === "list") fitSelection(0);
+    // the map always opens at its fit — the transform persists across views,
+    // and an unfitted one lands on the country's north-west corner
+    if (v === "map" && prev !== "map") fitSelection(0);
   }
   renderLegend(); renderFilterPill(); updateHint(); writeURL();
   if (!quiet) renderStory(true);
@@ -3183,12 +3217,18 @@ q.addEventListener("keydown", (e) => {
   else if (e.key === "Escape") { el.hidden = true; q.blur(); }
 });
 q.addEventListener("focus", () => { if (S.q.trim().length >= 2 && S.view !== "list") runSearch(); });
+// with the pointer over the lens row the arrows walk the lenses, not the years;
+// on a phone a swipe on the row cycles them (the row itself never scrolls)
+let lensHover = false;
+$("#lenses").addEventListener("pointerenter", () => { lensHover = true; });
+$("#lenses").addEventListener("pointerleave", () => { lensHover = false; });
+swipeWatch($("#lenses"), (dir) => { if (isPhone()) walkLens(dir); });
 document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") goUp();
-  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { const k = YEARS.indexOf(S.year) + (e.key === "ArrowRight" ? 1 : -1); if (YEARS[k] != null) { e.preventDefault(); setYear(YEARS[k]); } }
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -3220,9 +3260,10 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
+  morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });
-  fitSelection(0);
+  fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });

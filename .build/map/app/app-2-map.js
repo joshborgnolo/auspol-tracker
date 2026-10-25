@@ -439,9 +439,14 @@ function homeBox(m) { return unionBB(m.geo.bb); }
 // further out: at that zoom nothing moves, so a scroll there scrolls the page
 function setExtent() {
   const m = M(); if (!m || !Wpx) return;
+  // outside the map view the transform always rides the whole-country fit:
+  // the insets grow the box after the first draw, and a transform pinned to
+  // the early smaller box would later open the map on the north-west corner
+  const rides = S.view !== "map";
   HOME = fitTransform(homeBox(m));
   zoom.translateExtent([[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]])
     .scaleExtent([HOME.k, 2600]).extent([[0, 0], [Wpx, Hpx]]);
+  if (rides) { lastFit = HOME; d3.select(canvas).call(zoom.transform, HOME); }
   updateTouch();
 }
 function selectionBox() {
@@ -462,8 +467,8 @@ function selectionBox() {
 // the last view the page framed by itself, to tell it from one the reader has moved
 let lastFit = null;
 const atLastFit = () => lastFit && Math.abs(T.k / lastFit.k - 1) < 0.01 && Math.hypot(T.x - lastFit.x, T.y - lastFit.y) < 2;
-function fitSelection(dur) {
-  if (!M() || !Wpx || S.view !== "map") return;
+function fitSelection(dur, force) {
+  if (!M() || !Wpx || (S.view !== "map" && !force)) return;
   const t = fitTransform(selectionBox());
   lastFit = t;
   const s = d3.select(canvas);
@@ -562,6 +567,10 @@ canvas.addEventListener("touchmove", (e) => {
 }, { passive: false });
 canvas.addEventListener("touchend", (e) => { if (e.touches.length < 2) homePinch = null; });
 canvas.addEventListener("touchcancel", () => { homePinch = null; });
+// a swipe on the canvas, where the page's fit means the map can't use it,
+// cycles the years: on the chamber always, on the map at the whole-country
+// fit (a zoomed-in map pans instead)
+swipeWatch(canvas, (dir) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) walkYear(dir, true); });
 // Safari's own pinch events
 let gestureK = 1;
 canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
