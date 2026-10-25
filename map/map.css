@@ -182,6 +182,26 @@ button { cursor: pointer; background: none; border: 0; }
 .lg-seat button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .lg-seat button:hover { color: var(--ink); }
 .lg-seat span { font-size: 12px; }
+/* the chamber view's chamber: the House or the Senate, a row of its own above the key */
+.mp-legend > .lg-house { grid-column: 1 / -1; }
+.lg-house { display: flex; flex-wrap: wrap; gap: 2px 18px; margin-bottom: 9px; font-size: 13px; }
+.lg-house button { display: inline-grid; padding: 0 0 3px; color: var(--ink-3); border-bottom: 1.5px solid transparent; }
+.lg-house button::after { content: attr(data-t); font-weight: 600; height: 0; visibility: hidden; overflow: hidden; }
+.lg-house button, .lg-house button::after { grid-area: 1 / 1; }
+.lg-house button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.lg-house button:hover { color: var(--ink); }
+.mp-legend > .lg-house + .lg-t + * { margin-top: 0; }
+/* the Senate's story: the 76 as one bar, the 39 marked; swatches in its tables and lists */
+.sn-bar { position: relative; margin-top: 12px; padding-bottom: 20px; }
+.sn-track { position: relative; height: 14px; border-radius: 2px; overflow: hidden; background: var(--line-2); }
+.sn-track i { position: absolute; top: 0; bottom: 0; box-shadow: inset -1px 0 0 var(--bg); }
+.sn-maj { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); box-shadow: 0 0 0 1.5px var(--bg); }
+.sn-majlab { position: absolute; top: 19px; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.st-p { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.tbl td .sw, .sn-list .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: 0; }
+.changes.sn-list button { grid-template-columns: 18px 1fr; padding: 6px 0; }
+.sn-list .dt { padding-top: 0; }
+
 /* the street tiles' credit, shown while they are */
 .mp-credit { position: absolute; right: 2px; bottom: 2px; z-index: 3; max-width: calc(100% - 8px); text-align: right;
   font-size: 10.5px; line-height: 1.3; color: var(--ink-3); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }

@@ -115,7 +115,7 @@ function buildRamps() {
     loss: seq(70, 0.025),
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
-    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12),
+    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
       loinc: seq(20, 0.13), hiinc: seq(275, 0.12) },
   };
 }
@@ -136,17 +136,17 @@ const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Natio
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+const PARTY = { ALP: "Labor", LP: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
-const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team" };
+const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network" };
 const theParty = (ab, pn) => { const n = partyName(ab, pn); return THE[n] || n; };
 // whose: "One Nation’s preferences", "the Greens’ primary vote"
 const POSS = { alp: "Labor’s", lnp: "the Coalition’s", grn: "the Greens’", onp: "One Nation’s", ind: "independents’", oth: "other candidates’" };
 const Poss = (f) => POSS[f][0].toUpperCase() + POSS[f].slice(1);
 const ORDW = ["", "", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
 const ordw = (n) => ORDW[n] || ord(n);
-const partyShort = (ab, pn) => { const n = partyName(ab, pn); return { "Liberal National": "LNP", "Katter’s Australian": "Katter", "Shooters, Fishers and Farmers": "Shooters", "Country Liberal": "CLP" }[n] || n; };
+const partyShort = (ab, pn) => { const n = partyName(ab, pn); return { "Liberal National": "LNP", "Katter’s Australian": "Katter", "Shooters, Fishers and Farmers": "Shooters", "Country Liberal": "CLP", "Jacqui Lambie Network": "Lambie Network" }[n] || n; };
 const CLS = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };
 const CLS_LOWER = { "Inner Metropolitan": "inner-metropolitan", "Outer Metropolitan": "outer-metropolitan", Provincial: "provincial", Rural: "rural" };
@@ -157,12 +157,13 @@ const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
 // the census tab's people measures: shares of residents (the two income
 // lanes are shares of an area's ADULTS), from the 2021 census counted
 // where each polling place's voters live (the AEC records that from
-// 2016 on); at 2013 the 2011 census of the areas the places stand in
-const DM = ["lang", "a65", "a2034", "fborn", "uni", "loinc", "hiinc"];
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", loinc: "Lower income", hiinc: "Higher income" };
-const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], loinc: [10, 45], hiinc: [0, 50] };
+// 2016 on); 2007–2013 read the census of the areas the places stand in
+// (the 2006 census at 2007 and 2010, the 2011 census at 2013)
+const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc"];
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", loinc: "Lower income", hiinc: "Higher income" };
+const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work" };
+const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], loinc: [10, 45], hiinc: [0, 50] };
 const isDemo = () => DM.includes(S.index);
 // the income lanes name their own definitions: the year's national
 // weekly cut in the census year's dollars, as each year's incomeCuts
@@ -175,7 +176,12 @@ const DM_VERB_INC = {
   hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incDollars(m)}`,
 };
 const dmVerb = (m, k) => (isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
-const DEMO_FROM = 2013;
+// a year carries the income lanes only when its demo store records the cuts
+// (2013 on); 2007 and 2010 stop at the six people measures
+const hasInc = (m) => !!(m && m.incomeCuts);
+const DM_ALL = DM;
+const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
+const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "now"];
@@ -200,6 +206,7 @@ const LENSES = [
 // view fixed (walkHold below), and has no scroll side effects of its own
 function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
+  if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
   setLens(LENSES[k].id);
   const b = $(`#lenses [data-lens="${LENSES[k].id}"]`);
@@ -325,6 +332,8 @@ const S = {
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
   dist: null,
+  // the chamber view's chamber: the House ("reps") or the Senate, with the Senate's own lens and selection
+  house: "reps", senLens: "party", ssel: { level: "aus" },
 };
 const Y = {};
 let proj = null;
@@ -604,10 +613,11 @@ const lensNumeric = () => !(S.lens === "winner" || S.lens === "cls");
 /* =============================== colours per year =============================== */
 let fade = null, fadeT = 1;
 function recolor(animate) {
-  for (const m of Object.values(Y)) {
-    if (!m.divs) continue;
+  for (const m of [...Object.values(Y), SENM]) {
+    if (!m || !m.divs) continue;
     if (animate && m.divCol && !reduceMotion) { m.prevDivCol = m.divCol; m.prevBoothCol = m.boothCol; }
     else { m.prevDivCol = null; m.prevBoothCol = null; }
+    if (m.house === "senate") { m.divCol = m.divs.map((d) => senateColor(m, d)); continue; }
     m.divCol = m.divs.map((d) => colorOf(divValue(m, d.i)));
     const bc = new Array(m.booth.n);
     for (let j = 0; j < m.booth.n; j++) bc[j] = colorOf(boothValue(m, j));
@@ -1387,7 +1397,7 @@ canvas.addEventListener("gestureend", (e) => e.preventDefault());
 /* ----- hit testing ----- */
 function hitTest(px, py) {
   const m = M(); if (!m) return null;
-  if (S.view === "chamber") return chamberHit(m, px, py);
+  if (S.view === "chamber") { const c = CM(); return c ? chamberHit(c, px, py) : null; }
   if (S.view !== "map") return null;
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {
@@ -1460,12 +1470,18 @@ const SERJEANT = "Rc5d1"; // the Serjeant-at-Arms's chair, in the curve's last r
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 const CHK = 6;
+const benchS = (x, y) => (y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y);
+/* a chamber's geometry: its seats in bench order (s, then row), its rows, the box it's framed in,
+   and what differs between the House and the Senate — the presiding officer's chair, the table's
+   two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
+   senateGeom (app-3b-senate.js) */
 let chGeomC = null;
-function chamberGeom() {
+const chamberGeom = (m) => (m && m.house === "senate" ? senateGeom() : houseGeom());
+function houseGeom() {
   if (chGeomC) return chGeomC;
   const all = chamberCells().map((c) => {
     const x = c.x / CU, y = c.y / CU;
-    const s = y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y;
+    const s = benchS(x, y);
     // each chair as wide as its seat allows (3pt clear of the next), as deep as its bench
     const W = clamp(c.w - 3, 13.5, 30) / CU, D = (c.row === 1 && y < 0 ? 24 : 23) / CU;
     return { id: c.id, x, y, fa: c.fa, row: c.row, s, W, D };
@@ -1474,9 +1490,11 @@ function chamberGeom() {
   const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
   seats.forEach((c, k) => { c.k = k; c.u = (c.s - s0) / (s1 - s0); });
   const rows = [0, 1, 2, 3, 4, 5].map((r) => seats.filter((c) => c.row === r));
-  chGeomC = { seats, rows, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
+  chGeomC = { seats, rows, nRows: 5, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
     serjeant: all.find((c) => c.id === SERJEANT), rOut: CHB.R[4] / CU,
-    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 } };
+    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 },
+    arms: true, table: ["Lt0", "Rt0"], chairAt: SPEAKER_AT, aisle: CH_AISLE, yMid: -6.6,
+    benchPt, benchOut, furniture: drawChamberFurniture };
   return chGeomC;
 }
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
@@ -1521,16 +1539,17 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
-const seatMode = (m) => (!m.seating ? "sort" : S.seat || (S.lens === "winner" ? "plan" : "sort"));
+const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
   if (m._chKey === key) return m._ch;
-  const geom = chamberGeom();
+  const geom = chamberGeom(m);
+  const keyOf = m.house === "senate" ? senateKey : chamberKey;
   const { gov, opp, cross } = chamberBlocs(m);
   const members = m.divs.filter((d) => d.i !== m.speaker);
   const byKey = (bloc) => (p, q) => {
-    const a = chamberKey(m, p, bloc), b = chamberKey(m, q, bloc);
+    const a = keyOf(m, p, bloc), b = keyOf(m, q, bloc);
     if (a == null && b == null) return p.n.localeCompare(q.n);
     if (a == null) return 1;
     if (b == null) return -1;
@@ -1546,8 +1565,8 @@ function chamberOrder(m) {
     C.push(...xs);
   }
   // the leaders, each at their side's table chair (when they lead the bloc on that side)
-  const table = [geom.byId.get("Lt0"), geom.byId.get("Rt0")];
-  const lead = (LEADERS[m.year] || []).map((n, s) => { const i = m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
+  const table = geom.table.map((id) => geom.byId.get(id));
+  const lead = (m.leaders || LEADERS[m.year] || []).map((n, s) => { const i = typeof n === "number" ? n : m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
   // each member's seat (an index into geom.seats)
   const at = new Map();
   if (plan) {
@@ -1589,7 +1608,7 @@ function majorityCuts(ch, geom) {
   if (ch.majAt <= 0 || ch.majAt >= sat.length) return null;
   const inside = new Set(sat.slice(0, ch.majAt).map((c) => c.k)), sStar = sat[ch.majAt - 1].s;
   const cuts = [];
-  for (let r = 1; r <= 5; r++) {
+  for (let r = 1; r <= geom.nRows; r++) {
     const row = geom.rows[r];
     let L = -1;
     row.forEach((c, j) => { if (inside.has(c.k)) L = j; });
@@ -1617,7 +1636,7 @@ function chamberPositions(m, geom) {
   const arms = { L: [], R: [] };
   for (const [i, k] of ch.at) {
     const st = geom.seats[k];
-    if (/^[LR]a\d/.test(st.id)) { arms[st.id[0]].push([i, st]); continue; }
+    if (geom.arms && /^[LR]a\d/.test(st.id)) { arms[st.id[0]].push([i, st]); continue; }
     pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u, st.W, st.D]);
   }
   // the front bench's arm is one long bench: whoever sits there spreads evenly along it, in order,
@@ -1730,7 +1749,7 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
 
 // draw the whole chamber into a context already scaled to CSS pixels
 function drawChamber(g, m, w, h, opts) {
-  const geom = chamberGeom();
+  const geom = chamberGeom(m);
   const pad = opts.pad || { t: 8, r: 8, b: 8, l: 8 };
   const F = chamberFrame(geom, w, h, pad);
   const th = TH, s = F.s, now = performance.now();
@@ -1750,9 +1769,10 @@ function drawChamber(g, m, w, h, opts) {
   const X = F.X, Yp = F.Yp, rO = geom.rOut;
   g.save();
   g.globalAlpha = opts.alpha ?? 1;
-  drawChamberFurniture(g, F, geom, { ...opts, occupied: chAnim ? null : new Set(ch.at.values()) });
+  geom.furniture(g, F, geom, { ...opts, occupied: chAnim ? null : new Set(ch.at.values()) });
   // the chairs
-  const filt = filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
+  // the list's filters are the House's seats'; the Senate answers only to the chosen state
+  const filt = m.house !== "senate" && filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
   const pat = opts.pattern;
   const backOf = (c) => towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22);
   const drawn = [];
@@ -1771,8 +1791,9 @@ function drawChamber(g, m, w, h, opts) {
     const p = pos(m.divs[i].n); if (!p) return;
     paint(i, X(p[0]), Yp(p[1]), p[2], p[4] * s, p[5] * s);
   });
-  // the Speaker's chair, on the dais at the head of the table, facing down the chamber
-  if (m.speaker != null) paint(m.speaker, X(SPEAKER_AT[0]), Yp(SPEAKER_AT[1]), SPEAKER_AT[2], SPEAKER_AT[4] * s, SPEAKER_AT[5] * s, true);
+  // the Speaker's (the President's) chair, at the head of the table, facing down the chamber
+  const CA = geom.chairAt;
+  if (m.speaker != null) paint(m.speaker, X(CA[0]), Yp(CA[1]), CA[2], CA[4] * s, CA[5] * s, true);
   // rings for the hovered and chosen seats
   const ring = (i, lw) => { const q = drawn.find((x) => x.i === i); if (!q) return; g.save(); g.translate(q.x, q.y); g.rotate(q.fa); g.beginPath(); const pd = 2.2; if (g.roundRect) g.roundRect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd, 3); else g.rect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd); g.lineWidth = lw; g.strokeStyle = css(th.ink); g.stroke(); g.restore(); };
   if (hv != null && hv !== sd) ring(hv, 1.4);
@@ -1791,11 +1812,11 @@ function drawChamber(g, m, w, h, opts) {
   if (cuts) {
     const pts = [];
     cuts.forEach((c, k) => {
-      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(benchPt(lerp(cp, c, j / n), k)); }
-      else pts.push(benchPt(c, 0));
-      pts.push(benchPt(c, k + 1));
+      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(geom.benchPt(lerp(cp, c, j / n), k)); }
+      else pts.push(geom.benchPt(c, 0));
+      pts.push(geom.benchPt(c, k + 1));
     });
-    const c5 = cuts[4], o = benchOut(c5), e = benchPt(c5, 5), ext = opts.big ? 0.45 : 0.2;
+    const c5 = cuts[cuts.length - 1], o = geom.benchOut(c5), e = geom.benchPt(c5, geom.nRows), ext = opts.big ? 0.45 : 0.2;
     pts.push([e[0] + o[0] * ext, e[1] + o[1] * ext]);
     g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash(opts.big ? [4, 3] : [3, 2]); g.lineJoin = "round";
     g.beginPath(); pts.forEach(([x, y], j) => (j ? g.lineTo(X(x), Yp(y)) : g.moveTo(X(x), Yp(y)))); g.stroke(); g.setLineDash([]);
@@ -1837,7 +1858,7 @@ function drawChamber(g, m, w, h, opts) {
     const fig = (txt, col, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `500 30px ${SANS}`; g.fillStyle = css(col); g.fillText(txt, x, y); };
     const lab = (txt, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `600 13px ${SANS}`; g.fillStyle = css(th.ink); g.fillText(txt, x, y); };
     const govName = blocName(m, ch.gov), oppName = blocName(m, ch.opp);
-    const yMid = Yp(-6.6);
+    const yMid = Yp(geom.yMid);
     const room = X(-rO - 0.8);
     // no room beside the benches: the blocs head the chamber, either side of the Speaker
     let bandRoom = null;
@@ -1847,7 +1868,7 @@ function drawChamber(g, m, w, h, opts) {
       const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
       // the roles go first when the Speaker's name would touch them
       g.font = `400 12px ${SANS}`;
-      const half = X(0) - X(geom.box.x0), need = (g.measureText(speakerName(m) || "").width) / 2 + 10;
+      const half = X(0) - X(geom.box.x0), need = (g.measureText(presiding(m).name || "").width) / 2 + 10;
       const nGov = String(ch.nGov + (spFam === ch.gov ? 1 : 0)), nOpp = String(ch.nOpp + (spFam === ch.opp ? 1 : 0));
       g.font = `500 24px ${SANS}`; const wNum = Math.max(g.measureText(nGov).width, g.measureText(nOpp).width);
       g.font = `400 12px ${SANS}`; const withRole = half - wNum - 5 - g.measureText("Government").width >= need;
@@ -1937,19 +1958,19 @@ function drawChamber(g, m, w, h, opts) {
         claim(L.bx, L.by, L.wMax, L.ht, L.side, "top");
       }
     }
-    // the Speaker, named above the dais
-    const sp = m.divs[m.speaker];
+    // the Speaker (the President), named above the chair
+    const sp = m.divs[m.speaker], pr = presiding(m);
     if (sp && bandRoom != null) {
       // between the blocs' labels: two lines, the seat dropped if the name alone fits
       const y = Yp(geom.box.y0);
       g.textBaseline = "alphabetic"; g.textAlign = "center";
-      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText("Speaker", X(0), y - 34);
+      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText(pr.role, X(0), y - 34);
       g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
-      const full = `${speakerName(m)}, ${sp.n}`, nm = g.measureText(full).width <= bandRoom ? full : speakerName(m);
+      const full = `${pr.name}, ${pr.place}`, nm = g.measureText(full).width <= bandRoom ? full : pr.name;
       g.fillText(nm, X(0), y - 12);
       claim(X(0), y - 48, Math.max(g.measureText(nm).width, 50), 44, "center", "top");
     } else if (sp) {
-      const a = "Speaker", b = `  ${speakerName(m)}, ${sp.n}`, y = Yp(geom.box.y0) - 9;
+      const a = pr.role, b = `  ${pr.name}, ${pr.place}`, y = Yp(geom.box.y0) - 9;
       g.textBaseline = "middle"; g.textAlign = "left";
       g.font = `600 12px ${SANS}`; const wa = g.measureText(a).width;
       g.font = `400 12px ${SANS}`; const wb = g.measureText(b).width;
@@ -2045,21 +2066,23 @@ function crossLabel(h) {
 }
 const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick" };
 const speakerName = (m) => SPEAKERS[m.year];
+// the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
+const presiding = (m) => (m.house === "senate" ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });
 
 let chMain = null; // the last full-size draw: chairs on screen, for hit tests and the morph
 function chamberHit(m, px, py) {
   if (!chMain) return null;
   let best = null, bd = Infinity;
   for (const q of chMain.drawn) { const d = Math.hypot(px - q.x, py - q.y); if (d < q.r + 3 && d < bd) { bd = d; best = q.i; } }
-  return best == null ? null : { kind: "div", i: best };
+  return best == null ? null : { kind: m.house === "senate" ? "sen" : "div", i: best };
 }
 // a phone has no room beside the chamber: it fills the width, its bloc labels in a band above
 function chamberPads(w = Wpx) { return isPhone() ? (w < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 36, l: 10 }) : { t: 34, r: 150, b: 36, l: 150 }; }
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const sd = selDiv();
-  chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sd, hover: S.hover && S.hover.kind === "div" ? S.hover.i : null,
-    state: S.sel.level === "state" ? S.sel.st : null, pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
+  const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;
+  chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sen ? (sel.level === "sen" ? sel.i : null) : selDiv(), hover: S.hover && S.hover.kind === (sen ? "sen" : "div") ? S.hover.i : null,
+    state: sel.level === "state" ? sel.st : null, pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
   ctx.restore();
 }
 
@@ -2067,7 +2090,7 @@ function drawChamberMain(m, alpha) {
 let morph = null; // { to: "chamber" | "map", t0, dur }
 function drawMorph(m, p) {
   const th = TH;
-  const geom = chamberGeom();
+  const geom = houseGeom();
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
@@ -2112,7 +2135,7 @@ function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
   const w = c.clientWidth || 300;
-  const geom = chamberGeom();
+  const geom = houseGeom();
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);
@@ -2130,6 +2153,377 @@ function miniHit(px, py) {
   let best = null, bd = Infinity;
   for (const q of miniCh.drawn) { const d = Math.hypot(px - q.x, py - q.y); if (d < q.r + 2 && d < bd) { bd = d; best = q.i; } }
   return best;
+}
+
+/* =============================== the Senate ===============================
+   The Senate as it sits today, after the Parliament's Senate seating plan (map/data/senate-now.json
+   and the floor it names, senate-floor-<plan>.json, both from .build/map/senate.mjs). It is drawn by
+   the House's renderer (drawChamber) on its own floor: the President's chair at the head of the
+   table, the leaders at the table's two chairs, three rows of desks down either side and round the
+   far curve, the government on the President's right (the reader's left). Seventy-six senators,
+   each a chair; a bill needs 39 votes, the President's among them (the President votes, and a tie
+   fails). A senator's term is the AEC's: six years from the July after their election for a state,
+   to the next election for a territory; a casual senator serves out the term of the one they
+   replaced. Only today's Senate is drawn: picking an election on the timeline returns to the House. */
+const SEN_LENSES = [
+  { id: "party", label: "Party" },
+  { id: "term", label: "Next election" },
+];
+const SU = 38.4; // the plan's units to a chamber unit: the Senate's floor is as wide as the House's
+let SENM = null, senFloor = null, senFloorP = null;
+const senOn = () => S.view === "chamber" && S.house === "senate" && !!SENM;
+// the model the chamber view draws: the House's year, or the Senate
+const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && senFloor ? SENM : null) : M());
+function senateModel(raw) {
+  const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab), fam: FAM(x.ab) } }));
+  const role = (r) => divs.findIndex((d) => d.sen.role === r);
+  return {
+    house: "senate", year: "now", asOf: raw.asOf, floor: raw.floor, divs, byName: new Map(divs.map((d) => [d.n, d.i])),
+    speaker: role("president"), leaders: [role("leader"), role("oppLeader")], gov: "alp",
+    seating: { plan: longDate(raw.asOf), at: Object.fromEntries(divs.map((d) => [d.n, d.sen.seat])) },
+  };
+}
+function loadSenate() {
+  if (SENM) return Promise.resolve(SENM);
+  return getJSON("/map/data/senate-now.json").then((raw) => { SENM = senateModel(raw); recolor(false); return SENM; });
+}
+function loadSenateFloor() {
+  return (senFloorP ??= loadSenate().then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
+}
+
+/* ----- the floor ----- */
+let senGeomC = null;
+function senateGeom() {
+  if (senGeomC) return senGeomC;
+  const F = senFloor, P = (v) => v / SU;
+  const all = F.seats.filter((c) => c.row >= 0).map((c) => {
+    // the chair fills its seat's outline, a hair short of its neighbours (the plan's units draw at about
+    // 0.7 of the House's points on screen, so the House's chair sizes in these units came out two-thirds
+    // the House's area); the curve's long desks hold a chair as big as the straight benches' best
+    // (the table's two chairs are drawn narrow on the plan, 25 across: square them up to their depth)
+    const D = Math.min(c.D - 2, 32), W = c.row === 0 ? D : Math.min(c.W - 3, 34), back = Math.max(0, (c.D - D) / 2);
+    const x = P(c.x - Math.cos(c.fa) * back), y = P(c.y - Math.sin(c.fa) * back);
+    return { id: c.id, x, y, fa: c.fa, row: c.row, s: benchS(x, y), W: P(W), D: P(D), raw: c };
+  });
+  const seats = all.sort((p, q) => p.s - q.s || p.row - q.row);
+  const bench = seats.filter((c) => c.row > 0), s0 = bench[0].s, s1 = bench[bench.length - 1].s;
+  seats.forEach((c, k) => { c.k = k; c.u = clamp((c.s - s0) / (s1 - s0), 0, 1); });
+  const rows = [0, 1, 2, 3].map((r) => seats.filter((c) => c.row === r));
+  // the walkways the majority line threads: inside the front row, between rows, outside the back
+  // row, on the straight benches (their distance from the centre line) and round the curve (radius)
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const rowX = [1, 2, 3].map((r) => mean(rows[r].filter((c) => c.y < 0).map((c) => Math.abs(c.x))));
+  const rowR = [1, 2, 3].map((r) => mean(rows[r].filter((c) => c.y > 0).map((c) => Math.hypot(c.x, c.y))));
+  const walk = (v) => [v[0] - (v[1] - v[0]) / 2, (v[0] + v[1]) / 2, (v[1] + v[2]) / 2, v[2] + (v[2] - v[1]) / 2];
+  const GS = walk(rowX), GC = walk(rowR);
+  const benchPt = (s, k) => {
+    if (s <= 0) return [-GS[k], s];
+    if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
+    const a = s / CHK; return [-GC[k] * Math.cos(a), GC[k] * Math.sin(a)];
+  };
+  const pres = F.seats.find((c) => c.id === "president");
+  const [bx0, by0, bx1, by1] = F.box.map(P);
+  senGeomC = {
+    seats, rows, nRows: 3, bench, byId: new Map(seats.map((c) => [c.id, c.k])),
+    rOut: rowR[2], box: { x0: Math.min(bx0, -bx1), x1: Math.max(bx1, -bx0), y0: by0, y1: by1 },
+    arms: false, table: ["leader_of_the_government", "leader_of_the_opposition"],
+    chairAt: [P(pres.x), P(pres.y), Math.PI / 2, 0, P(36), P(32)],
+    aisle: P(46), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
+    benchPt, benchOut, furniture: drawSenateFurniture,
+  };
+  return senGeomC;
+}
+// the floor's outlines as canvas paths, made once
+let senPaths = null;
+function senateFurniturePaths() {
+  if (senPaths) return senPaths;
+  const mk = (list) => list.map((p) => ({ p: new Path2D(p.d), t: p.t, cls: p.cls || "" }));
+  const F = senFloor.furniture;
+  senPaths = { table: mk(F.table), hansard: mk(F.hansard), desk: mk(F.desk), advisers: mk(F.advisers), benches: senBenches() };
+  return senPaths;
+}
+/* the benches as the House draws its own, a bench's colour with a margin round its chairs: down the
+   straight sides the seats run in touching pairs, one block a pair; round the curve each desk is a
+   block of its own, turned to face the table (the plan's curve desks aren't concentric, so they are
+   drawn as they stand, not as sectors of one circle) */
+const BENCH_PAD = 2.5;
+function senBenches() {
+  const all = [...senFloor.seats.filter((c) => c.row > 0), ...senFloor.furniture.blackRod];
+  // a column is one x extent; down it, a seat whose top meets the last one's foot joins its block
+  const cols = new Map();
+  for (const c of all.filter((c) => c.box)) { const k = `${Math.round(c.box[0])}|${Math.round(c.box[2])}`; if (!cols.has(k)) cols.set(k, []); cols.get(k).push(c.box.slice()); }
+  const blocks = [];
+  for (const list of cols.values()) {
+    list.sort((p, q) => p[1] - q[1]);
+    let cur = null;
+    for (const b of list) { if (cur && b[1] - cur[3] < 3) cur[3] = Math.max(cur[3], b[3]); else blocks.push((cur = b)); }
+  }
+  const desks = all.filter((c) => !c.box).map((c) => [c.x, c.y, c.fa, c.D, c.W]);
+  return { blocks, desks };
+}
+/* the room, in the House's drawing: the floor, the benches (each seat's own outline on the plan, a
+   bench's colour and a line's edge, as the House's blocks), the table with the President's desk at its
+   head and Hansard's at its foot, the advisers' boxes as the House's officials' boxes, the officers'
+   chairs, and the empty seats (outlined only). The plan's desks are left out, as the House's are */
+function drawSenateFurniture(g, F, geom, opts = {}) {
+  const th = TH, X = F.X, Yp = F.Yp, s = F.s, k = s / SU;
+  const bench = css(mixC(th.floor, th.ink, th.dark ? 0.08 : 0.05)), wood = css(mixC(th.floor, th.ink, th.dark ? 0.15 : 0.11));
+  const officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
+  const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
+  const P = senateFurniturePaths();
+  // the floor: straight sides down from the President's end, the far curve round the back row
+  const FR = Math.max(-geom.box.x0, geom.box.x1, geom.box.y1), top = geom.box.y0;
+  g.beginPath(); g.moveTo(X(-FR), Yp(top)); g.lineTo(X(-FR), Yp(0)); g.arc(X(0), Yp(0), FR * s, Math.PI, 0, true); g.lineTo(X(FR), Yp(top)); g.closePath();
+  g.fillStyle = css(th.floor); g.fill();
+  // the plan's shapes, in its own units
+  g.save(); g.translate(X(0), Yp(0)); g.scale(k, k);
+  const hair = 1 / k;
+  const draw = (list, fill, stroke, lw = hair) => {
+    for (const q of list) {
+      g.save(); g.translate(q.t[0], q.t[1]);
+      if (fill) { g.fillStyle = fill; g.fill(q.p); }
+      if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(q.p); }
+      g.restore();
+    }
+  };
+  g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
+  const rb = (x, y, w, h) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, 3); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
+  const pd = BENCH_PAD;
+  for (const [x0, y0, x1, y1] of P.benches.blocks) rb(x0 - pd, y0 - pd, x1 - x0 + 2 * pd, y1 - y0 + 2 * pd);
+  for (const [x, y, fa, D, W] of P.benches.desks) { g.save(); g.translate(x, y); g.rotate(fa); rb(-D / 2 - pd, -W / 2 - pd, D + 2 * pd, W + 2 * pd); g.restore(); }
+  draw(P.advisers, bench, css(th.line));
+  draw(P.table, bench, wood, Math.max(hair, 0.05 * s / k));
+  draw(P.desk, wood, css(th.line));
+  draw(P.hansard, wood, css(th.line));
+  g.restore();
+  // the empty seats, outlined only, so they never read as a senator's chair (a dimmed one is filled)
+  g.strokeStyle = css(mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24)); g.lineWidth = 1;
+  for (const c of geom.seats) {
+    if (opts.occupied && opts.occupied.has(c.k)) continue;
+    const w = c.W * s, d = c.D * s, r = Math.min(w, d) * 0.24;
+    g.save(); g.translate(X(c.x), Yp(c.y)); g.rotate(c.fa);
+    g.beginPath(); if (g.roundRect) g.roundRect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1, r); else g.rect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1);
+    g.stroke(); g.restore();
+  }
+  // the officers: the Clerk, the Chair of Committees and the Deputy Clerk; Hansard's reporters; Black Rod
+  for (const o of senFloor.officers) {
+    const W = (Math.min(o.W, 28) / SU) * s, D = (Math.min(o.D, 24) / SU) * s;
+    drawChair(g, X(o.x / SU), Yp(o.y / SU), o.fa, W, D, css(officer), back(officer, 0.18), 1);
+  }
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  if (opts.big && s >= 16) {
+    g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
+    const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
+    put("The table", 0, -320 / SU, 110 / SU);
+    put("Hansard", 0, -148 / SU, 86 / SU);
+  }
+}
+
+/* ----- the lenses: party, and who faces the voters next ----- */
+const upNext = (d) => d.sen.term !== 2031;
+const SEN_STAY = (th) => (th.dark ? lch(0.45, 0.008, 66) : lch(0.83, 0.006, 75));
+function senateColor(m, d) {
+  const c = TH.party[holdFam(d.hold)];
+  if (S.senLens === "term" && !upNext(d)) return SEN_STAY(TH);
+  return c;
+}
+// the sorted chamber's order within a bloc: by party, then (on the term lens) those up next first, then by state
+const SEN_PARTY_ORDER = ["ALP", "LP", "LNP", "NP", "CLP", "GRN", "IND", "JLN", "AV", "UAPP", "ON"];
+function senateKey(m, d, bloc) {
+  const p = SEN_PARTY_ORDER.indexOf(d.hold.ab), st = STATES.indexOf(d.st);
+  const term = S.senLens === "term" ? (upNext(d) ? 0 : 1) : 0;
+  return -(term * 1000 + (p < 0 ? 99 : p) * 10 + st / 10);
+}
+const senLensOf = () => SEN_LENSES.find((l) => l.id === S.senLens);
+
+/* ----- the counts the legend and the story read ----- */
+function senCounts(m, pred = () => true) {
+  const c = {};
+  for (const d of m.divs) if (pred(d)) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
+  return c;
+}
+const SEN_FAMS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+// the crossbench by party, the way a sentence names them: "the Greens’ 10", "One Nation’s four"
+function senCross(m) {
+  const by = new Map();
+  for (const d of m.divs) {
+    const f = holdFam(d.hold); if (f === "alp" || f === "lnp") continue;
+    const k = f === "ind" ? "IND" : d.hold.ab;
+    if (!by.has(k)) by.set(k, { k, fam: f, n: 0, names: [] });
+    const g = by.get(k); g.n++; g.names.push(d.n);
+  }
+  return [...by.values()].sort((a, b) => b.n - a.n || a.k.localeCompare(b.k));
+}
+const crossName = (g) => (g.k === "IND" ? (g.n === 1 ? "an independent" : "independents") : g.k === "GRN" ? "the Greens" : g.k === "JLN" ? "the Jacqui Lambie Network" : partyName(g.k));
+const crossPoss = (g) => (g.k === "IND" ? `the ${words(g.n)} independents’` : g.k === "GRN" ? "the Greens’" : g.k === "JLN" ? "the Lambie Network’s" : `${partyName(g.k)}’s`);
+
+/* ----- the key ----- */
+function houseSwitchHTML() {
+  return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="House of Representatives" aria-pressed="${S.house !== "senate"}">House of Representatives</button><button type="button" data-house="senate" data-t="Senate" aria-pressed="${S.house === "senate"}">Senate</button></div>`;
+}
+function senateLegendHTML(m) {
+  const cats = (cnt, list) => `<div class="lg-cats">${list.filter((f) => cnt[f]).map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("")}`;
+  let h = houseSwitchHTML();
+  if (S.senLens === "term") {
+    const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
+    h += `<div class="lg-t">Who faces the voters at the next election</div>`;
+    h += `${cats(up, SEN_FAMS)}<span><i style="background:${css(SEN_STAY(TH))}"></i>Sits until 2031 <b>${stay}</b></span></div>`;
+    h += `<div class="lg-note">Each state elects half its 12 senators at a time; the territories’ four are elected every time.</div>`;
+  } else {
+    h += `<div class="lg-t">Who sits in the Senate today</div>`;
+    h += `${cats(senCounts(m), SEN_FAMS)}</div>`;
+  }
+  const md = seatMode(m);
+  h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s Senate seating plan of ${m.seating.plan}.` : `By ${S.senLens === "term" ? "who is up next, then party" : "party"}, each side from the President’s end.`}</span></div>`;
+  return h;
+}
+
+/* ----- the story ----- */
+const TERM_END = { 2028: "30 June 2028", 2031: "30 June 2031" };
+function senUpLink() {
+  const s = S.ssel; if (s.level === "aus") return "";
+  const label = s.level === "state" ? "The Senate" : STATE_TITLE[s.st];
+  const go = s.level === "state" ? "aus" : `state:${s.st}`;
+  return `<button type="button" class="st-up" data-sgo="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(label)}</button>`;
+}
+function senHead(title, meta, hed, dek) {
+  return `${senUpLink()}<div class="st-head"><h2>${esc(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+}
+/* the balance of power, in rules: how many votes the government is short of the 39, which crossbench
+   groups could supply them alone, and what it would take without them */
+function senBalance(m) {
+  const N = m.divs.length, maj = Math.floor(N / 2) + 1, cnt = senCounts(m);
+  const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp", G = cnt[gov] || 0, O = cnt[opp] || 0;
+  const cross = senCross(m), C = N - G - O, need = maj - G;
+  const enough = cross.filter((g) => g.n >= need);
+  return { N, maj, G, O, C, need, cross, enough, gov, opp };
+}
+function senHedDek(m) {
+  const b = senBalance(m), GN = blocName(m, b.gov), ON = blocName(m, b.opp), oppThe = b.opp === "lnp" ? "the Coalition" : "Labor";
+  const pres = m.divs[m.speaker], presOwn = holdFam(pres.hold) === b.gov;
+  const holds = `${GN} holds ${b.G} of the ${b.N} seats${presOwn ? ", the President’s among them" : ""}`;
+  if (b.need <= 0) return { hed: `${GN} holds a majority in the Senate`, dek: `${holds}, ${b.G - b.maj + 1 > 1 ? `${words(b.G - b.maj + 1)} more than` : "one more than"} the ${b.maj} a bill needs. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
+  const short = `${words(b.need)} short of the ${b.maj} votes a bill needs`;
+  if (b.enough.length === 1) {
+    const g = b.enough[0], rest = b.cross.filter((x) => x !== g), restN = rest.reduce((a, x) => a + x.n, 0);
+    const name = crossName(g);
+    const hed = `${GN} needs ${name} to pass a bill ${oppThe} opposes`;
+    let dek = `${holds}, ${short}. ${cap(crossPoss(g))} ${words(g.n)} take it to ${b.G + g.n}. `;
+    if (restN >= b.need) {
+      // a party of several by its count, everyone else (independents among them) by name
+      const who = [...rest.filter((x) => x.n > 1 && x.k !== "IND").map((x) => `${crossPoss(x)} ${words(x.n)}`), ...rest.filter((x) => x.n === 1 || x.k === "IND").flatMap((x) => x.names)];
+      dek += `Without them it would need ${restN === b.need ? `all ${words(restN)} other crossbenchers` : `${words(b.need)} of the other ${words(restN)} crossbenchers`}: ${listAnd(who)}.`;
+    } else dek += `No mix of the other ${words(restN)} crossbenchers is enough without them.`;
+    return { hed, dek: dek.trim() + ` ${cap(oppThe)} holds ${b.O}.` };
+  }
+  if (b.enough.length > 1) {
+    const names = b.enough.map(crossName);
+    return { hed: `${GN} can pass a bill with ${listAnd(names).replace(/ and /, " or ")}`, dek: `${holds}, ${short}. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
+  }
+  return { hed: `${GN} needs two or more crossbench parties to pass a bill ${oppThe} opposes`, dek: `${holds}, ${short}; no single crossbench party has ${words(b.need)}. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
+}
+// the 76 as one bar, the government first and the opposition last, the 39 marked
+function senBar(m) {
+  const b = senBalance(m), cnt = senCounts(m);
+  const order = [b.gov, ...chamberBlocs(m).cross, b.opp].filter((f) => cnt[f]);
+  let acc = 0;
+  const segs = order.map((f) => { const x = (100 * acc) / b.N, w = (100 * cnt[f]) / b.N; acc += cnt[f]; return `<i style="left:${x}%;width:${w}%;${swc(f)}" title="${FAM_LEG[f]} ${cnt[f]}"></i>`; }).join("");
+  const mx = (100 * b.maj) / b.N;
+  const lab = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("");
+  return `<div class="sn-bar" role="img" aria-label="${order.map((f) => `${FAM_LEG[f]} ${cnt[f]}`).join(", ")}; ${b.maj} for a majority"><div class="sn-track">${segs}<span class="sn-maj" style="left:${mx}%"></span></div><div class="sn-majlab" style="left:${mx}%">${b.maj} to pass a bill</div></div><div class="counts">${lab}</div>`;
+}
+function storySenate(m) {
+  const s = S.ssel;
+  if (s.level === "sen") return storySenator(m, s.i);
+  if (s.level === "state") return storySenState(m, s.st);
+  const { hed, dek } = senHedDek(m);
+  let h = senHead("The Senate today", `Senators as at ${longDate(m.asOf)}`, hed, dek);
+  h += `<div class="st-sec"><h3>The balance of power <small>${senBalance(m).maj} of ${m.divs.length} votes pass a bill</small></h3>${senBar(m)}</div>`;
+  // who faces the voters next
+  const up = m.divs.filter(upNext), upC = senCounts(m, upNext), stayC = senCounts(m, (d) => !upNext(d));
+  const nUp = up.length, nTerr = up.filter((d) => d.sen.term === "next").length;
+  const upOrder = SEN_FAMS.filter((f) => upC[f] || stayC[f]);
+  h += `<div class="st-sec"><h3>At the next election <small>${nUp} seats up, ${m.divs.length - nUp} sit to 2031</small></h3><p class="st-p">The next election fills ${nUp} seats: each state’s six elected in 2022 and the ${words(nTerr)} territory senators. ${senDefends(m, upC)}</p><table class="tbl"><thead><tr><th>Party</th><th>Up next</th><th>To 2031</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${FAM_LEG[f]}</td><td>${upC[f] || 0}</td><td>${stayC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
+  // the states
+  h += `<div class="st-sec"><h3>By state <small>12 senators a state, two a territory</small></h3><table class="tbl"><thead><tr><th>State</th><th>Senators</th><th>Up next</th></tr></thead><tbody>${STATES.map((st) => {
+    const ds = m.divs.filter((d) => d.st === st), c = {}; for (const d of ds) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
+    const bar = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((f) => c[f]).map((f) => `<i style="width:${(100 * c[f]) / ds.length}%;${swc(f)}"></i>`).join("");
+    return `<tr data-sgo="state:${st}"><td>${STATE_TITLE[st].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${ds.length}<span class="seatbar">${bar}</span></td><td>${ds.filter(upNext).length}</td></tr>`;
+  }).join("")}</tbody></table></div>`;
+  // since the elections: changes of party, and casual vacancies
+  const moved = m.divs.filter((d) => d.sen.electedAs), casual = m.divs.filter((d) => d.sen.casual);
+  if (moved.length || casual.length) {
+    const row = (d, tx) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${esc(d.n)}.</b> ${esc(tx)}.</span></button>`;
+    h += `<div class="st-sec"><h3>Not as elected <small>${moved.length} changed party, ${casual.length} filled a vacancy</small></h3><div class="changes">${moved.map((d) => row(d, `Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; now ${d.hold.fam === "ind" ? "sits as an independent" : `sits for ${theParty(d.hold.ab)}`}`)).join("")}${casual.map((d) => row(d, d.sen.casual.for ? `Filled ${d.sen.casual.for}’s vacancy for ${theParty(d.hold.ab)}, to ${termWords(d)}` : `Filled a ${partyName(d.hold.ab)} vacancy, to ${termWords(d)}`)).join("")}</div></div>`;
+  }
+  h += senFoot(m);
+  return h;
+}
+const termWords = (d) => (d.sen.term === "next" ? "the next election" : TERM_END[d.sen.term]);
+// "Labor defends 15 of them, the Coalition 15, the Greens six …"
+function senDefends(m, upC) {
+  const parts = SEN_FAMS.filter((f) => upC[f]).sort((a, b) => upC[b] - upC[a]);
+  if (!parts.length) return "";
+  const [first, ...rest] = parts;
+  return `${cap(FAM_PL[first])} defends ${words(upC[first])} of them${rest.length ? `, ${listAnd(rest.map((f) => `${FAM_PL[f]} ${words(upC[f])}`))}` : ""}.`;
+}
+function storySenState(m, st) {
+  const ds = m.divs.filter((d) => d.st === st), c = {}; for (const d of ds) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
+  const order = SEN_FAMS.filter((f) => c[f]).sort((a, b) => c[b] - c[a]);
+  const top = order[0], tie = order[1] && c[order[1]] === c[top];
+  const terr = st === "ACT" || st === "NT";
+  const hed = tie ? `${cap(FAM_PL[top])} and ${FAM_PL[order[1]]} hold ${words(c[top])} seats each` : `${cap(FAM_PL[top])} holds ${words(c[top])} of ${STATE_POSS[st]} ${words(ds.length)} seats`;
+  const up = ds.filter(upNext);
+  const dek = terr ? `Territory senators serve until the next election, so both seats are up then.` : `${cap(words(up.length))} of the ${words(ds.length)}, elected in 2022, are up at the next election; the other ${words(ds.length - up.length)} sit until 2031.`;
+  let h = senHead(STATE_TITLE[st], `${ds.length} senators`, hed, dek);
+  ds.sort(senOrder);
+  const row = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${esc(d.n)}</b> ${esc(partyName(d.hold.ab))}${d.sen.role ? ` · ${ROLE_NAME[d.sen.role]}` : ""}</span></button>`;
+  if (!terr) {
+    h += `<div class="st-sec"><h3>Up at the next election <small>${up.length}, elected in 2022</small></h3><div class="changes sn-list">${up.map(row).join("")}</div></div>`;
+    h += `<div class="st-sec"><h3>Sitting until 2031 <small>${ds.length - up.length}, elected in 2025</small></h3><div class="changes sn-list">${ds.filter((d) => !upNext(d)).map(row).join("")}</div></div>`;
+  } else h += `<div class="st-sec"><h3>Senators <small>elected in 2025</small></h3><div class="changes sn-list">${ds.map(row).join("")}</div></div>`;
+  h += senFoot(m);
+  return h;
+}
+// a list of senators: those up next first, then by party, then by name
+const senOrder = (a, b) => (upNext(b) - upNext(a)) || SEN_PARTY_ORDER.indexOf(a.hold.ab) - SEN_PARTY_ORDER.indexOf(b.hold.ab) || a.n.localeCompare(b.n);
+const ROLE_NAME = { president: "President of the Senate", leader: "Leader of the Government in the Senate", oppLeader: "Leader of the Opposition in the Senate" };
+function storySenator(m, i) {
+  const d = m.divs[i], x = d.sen, party = partyName(d.hold.ab);
+  const hed = x.role ? ROLE_NAME[x.role] : d.hold.fam === "ind" ? `Independent senator for ${STATE_NAME[x.st]}` : `${party} senator for ${STATE_NAME[x.st]}`;
+  const terr = x.term === "next";
+  let dek;
+  if (x.casual) dek = `${x.casual.for ? `Filled ${x.casual.for}’s vacancy` : "Filled a casual vacancy"} for the rest of a term ${x.term === 2031 ? "won at the 2025 election" : "won at the 2022 election"}, which ends on ${TERM_END[x.term]}.`;
+  else if (terr) dek = `Elected in 2025. A territory senator’s term runs with the House’s, so the seat is up at the next election.`;
+  else dek = `Elected${x.electedAs ? ` for ${theParty(x.electedAs)}` : ""} in ${x.elected}, to a term that ends on ${TERM_END[x.term]}${x.term === 2028 ? ": the seat is up at the next election" : ", so the seat sits out the next election"}.`;
+  if (x.electedAs) dek += ` Now ${d.hold.fam === "ind" ? "sits as an independent" : `sits for ${theParty(d.hold.ab)}`}.`;
+  if (x.role) dek = `${party} senator for ${STATE_NAME[x.st]}. ${dek}`;
+  let h = senHead(d.n, `Senator for ${STATE_TITLE[x.st]}`, hed, dek);
+  const mates = m.divs.filter((y) => y.st === x.st && y.i !== i).sort(senOrder);
+  const row = (y) => `<button type="button" data-sgo="sen:${y.i}"><span class="dt"><i class="sw" style="${swc(holdFam(y.hold))}"></i></span><span class="tx"><b>${esc(y.n)}</b> ${esc(partyName(y.hold.ab))}${upNext(y) ? "" : " · to 2031"}</span></button>`;
+  h += `<div class="st-sec"><h3>${STATE_POSS[x.st].replace(/^the /, "The ")} other senators <small>${mates.length}</small></h3><div class="changes sn-list">${mates.map(row).join("")}</div></div>`;
+  h += senFoot(m);
+  return h;
+}
+function senFoot(m) {
+  return `<p class="st-foot">The Parliament’s Senate seating plan as at ${longDate(m.asOf)}; terms from the AEC’s Senators Elected lists for 2022 and 2025.</p>`;
+}
+
+/* ----- selection, search and the tooltip ----- */
+function selectSen(sel) {
+  S.ssel = sel; S.hover = null; hideTip();
+  renderStory(true); renderTimeline(); writeURL(); schedule();
+}
+function senTip(m, i) {
+  const d = m.divs[i], x = d.sen;
+  const term = x.term === "next" ? "Up at the next election" : x.term === 2028 ? "Up at the next election (term to 2028)" : "Sits until 2031";
+  return `<div class="tn">${esc(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab))}</div><div class="ts">${esc(term)}</div>`;
+}
+function senSearchItems(m) {
+  const items = [];
+  for (const st of STATES) items.push({ k: "state", st, t: STATE_TITLE[st], s: `${m.divs.filter((d) => d.st === st).length} senators`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 });
+  for (const d of m.divs) items.push({ k: "sen", i: d.i, t: d.n, s: `Senator for ${STATE_SHORT[d.st]}, ${partyName(d.hold.ab)}`, h: norm(d.n), rank: 1 });
+  return items;
 }
 
 /* =============================== the story column ===============================
@@ -2415,16 +2809,17 @@ function areaHedDek(m, st) {
 }
 
 // the census people measures, area level: who holds the fifth of seats at each end
-const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"] };
-// the measures' census basis as copy: 2013 reads the census areas the polling
-// places stand in (2011 census — the AEC's where-voters-live record begins
-// 2016); 2016 on reads where their voters live (2021 census)
+const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"] };
+// the measures' census basis as copy: 2007–2013 read the census areas the
+// polling places stand in (2006 census at 2007 and 2010, 2011 at 2013 — the
+// AEC's where-voters-live record begins 2016); 2016 on reads where their
+// voters live (2021 census); the income lanes (2013 on) count adults
 const DB = {
   venue: {
-    seats: "From the 2011 census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.",
+    seats: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
     who: "of residents of the census area it stands in",
     whoAdults: "of the adults of the census area it stands in",
-    note: "From the 2011 census, of the census areas the polling places stand in.",
+    note: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
   },
   voter: {
     seats: "From the 2021 census, counted where each seat’s voters live.",
@@ -2433,7 +2828,10 @@ const DB = {
     note: "From the 2021 census, counted where its voters live.",
   },
 };
-const demoCopy = (m) => DB[m.demoBasis === "venue" ? "venue" : "voter"];
+const demoCopy = (m) => {
+  const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
+  return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, whoAdults: db.whoAdults, note: db.note(m.year) } : db;
+};
 // one income sentence for a seat or place facts list: both band shares,
 // then the household median, in the census year's own dollars; "" when
 // the place carries no income lane at all
@@ -2450,7 +2848,7 @@ function incFact(m, dm) {
   if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
-const DEMO_EARLY = { hed: "Census figures start at the 2013 election", dek: "2013 is counted from the census areas the polling places stand in (the 2011 census — the AEC’s record of where voters live begins in 2016); from 2016 the figures follow the voters. Choose 2013 or later on the timeline." };
+const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
@@ -2622,7 +3020,7 @@ function storyDiv(m, i) {
   }
   h += `<div class="st-sec"><h3>Informal</h3><div class="big"><span class="v">${f1(d.infPct)}%</span><span class="l">of ballots · Australia ${f1(m.areas.AUS.infPct)}%</span></div>${d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : ""}</div>`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
-  h += `<div class="st-sec"><h3>The seat <small>AEC type · ABS census and SEIFA, deciles among seats</small></h3>${d.cls ? `<dl class="facts"><dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>${d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : ""}</dl>` : ""}${decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec)}<p class="st-note">${demoCopy(m).note} 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.</p></div>`;
+  h += `<div class="st-sec"><h3>The seat <small>AEC type · ABS census and SEIFA, deciles among seats</small></h3>${d.cls ? `<dl class="facts"><dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>${d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : ""}</dl>` : ""}${decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec)}<p class="st-note">${demoCopy(m).note} 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.</p></div>`;
   h += historyChart(d);
   // polling places
   const b = m.booth, js = b.byDiv[i];
@@ -2703,8 +3101,8 @@ function storyBooth(m, j) {
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoCopy(m);
-  const incRow = dr ? incFact(m, { loinc: dr[5], hiinc: dr[6] }) : "";
-  const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${f0(100 * dr[3])}% ${DM_VERB.fborn}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
+  const incRow = dr ? incFact(m, { loinc: dr[6], hiinc: dr[7] }) : "";
+  const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${f0(100 * dr[3])}% ${DM_VERB.fborn}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
   h += `<div class="st-sec"><h3>The neighbourhood <small>ABS census and SEIFA, national deciles</small></h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in. From 2016, where the AEC records it, “its voters” scores the areas its voters live in.</p>${demoRows}</div>`;
   h += `<div class="act"><button type="button" data-go="div:${D.i}">Back to ${esc(D.n)}</button><button type="button" data-listbooths>All places in ${esc(D.n)}</button></div>`;
   h += foot(m);
@@ -2719,6 +3117,14 @@ let storyKey = "";
 function renderStory(force) {
   const m = M(); if (!m) return;
   const s = S.sel;
+  if (S.view === "chamber" && S.house === "senate") {
+    if (!SENM) return;
+    const ss = S.ssel, key = ["senate", S.senLens, ss.level, ss.st, ss.i].join("|");
+    if (!force && key === storyKey) return;
+    storyKey = key;
+    $("#story").innerHTML = storySenate(SENM);
+    return;
+  }
   const key = [S.year, S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;
@@ -3091,7 +3497,7 @@ function valueText(v, kind) {
     switch (S.lens) {
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
-      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2013 on" : "No census figure here") : "No score here";
+      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2007 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
     }
@@ -3109,14 +3515,19 @@ function valueText(v, kind) {
 }
 
 /* =============================== the lens tabs =============================== */
+// the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
-  $("#lenses").innerHTML = LENSES.map((l) => `<button type="button" class="rd-tab" role="tab" data-lens="${l.id}" aria-selected="${S.lens === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
+  const sen = S.view === "chamber" && S.house === "senate";
+  const list = sen ? SEN_LENSES : LENSES, cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
+  $("#lenses").innerHTML = list.map((l) => `<button type="button" class="rd-tab" role="tab" ${attr}="${l.id}" aria-selected="${cur === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
+  $("#lenses").setAttribute("aria-label", sen ? "Colour the senators by" : "Colour the seats by");
+  $("#q").placeholder = sen ? "Search a senator or state" : "Search a seat, member or place";
 }
 
 /* =============================== the legend =============================== */
 let legendKey = "";
 const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.year, S.seat, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -3130,7 +3541,8 @@ const RANGE = () => {
 };
 function legendHist(m, lo, hi) {
   const vals = m.divs.map((d) => divValue(m, d.i)).filter((v) => v != null);
-  if (vals.length < 10) return "";
+  // a stand-in year (holdLegendHeight) keeps the bars' room even where the loaded year has no values
+  if (vals.length < 10) return m.standIn ? '<div class="lg-hist" aria-hidden="true"></div>' : "";
   const dec = S.lens === "seifa" && !isDemo();
   const n = dec ? 10 : 20, w = (hi - lo) / n, counts = new Array(n).fill(0);
   for (const v of vals) counts[clamp(Math.floor((v - lo) / w + (dec ? 0.5 : 0)), 0, n - 1)]++;
@@ -3142,39 +3554,91 @@ function renderLegend() {
   const el = $("#legend"), m = M();
   if (!m || S.view === "list") { el.hidden = true; return; }
   el.hidden = false;
-  el.innerHTML = legendHTML(m);
+  el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   holdLegendHeight(m);
 }
-/* the key holds the height of its tallest lens, so changing lens never moves the figure
-   (the stage below it on a wide screen, the timeline below it on a phone) */
+/* the key holds the height of its tallest lens in its tallest election, so neither changing lens
+   nor changing year moves the figure (the stage below it on a wide screen, the timeline below it
+   on a phone). A year not loaded yet is measured on a stand-in: the loaded year's figures with that
+   year's own words (its seat counts, seating-plan note, census basis) */
 const legendHeights = new Map();
+const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
+let legendMeta = null;
+function loadLegendMeta() {
+  return (legendMeta ??= Promise.all([
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
+    // the Senate's senators (not its floor): its key is measured with the House's, so switching chamber moves nothing
+    loadSenate(),
+    ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
+  ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
+}
+function legendStandIn(m, y) {
+  if (Y[y] && Y[y].search) return Y[y];
+  const st = Object.create(m);
+  st.year = y; st.standIn = true;
+  st.seating = SEATED.has(y) ? SEAT_META.get(y) || null : null;
+  st.demoBasis = y === 2013 ? "venue" : null;
+  const c = S.lens === "winner" && SUM && SUM.seats[y] && SUM.seats[y].AUS;
+  if (c) st.divs = Object.entries(c).flatMap(([fam, n]) => Array.from({ length: n }, () => ({ hold: { fam } })));
+  return st;
+}
+function legendHeightOf(m, y, w, probe) {
+  const real = !!(Y[y] && Y[y].search);
+  const key = [w, S.view, y, real, boothsShown()].join("|");
+  if (!legendHeights.has(key)) {
+    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index, year: S.year };
+    let hMax = 0;
+    try {
+      S.year = y;
+      for (const lens of LENSES.map((l) => l.id))
+        for (const mode of lens === "tpp" || lens === "fp" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null]) {
+          Object.assign(S, { lens });
+          if (lens === "tpp") S.tppMode = mode;
+          if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
+          if (lens === "seifa") S.index = mode;
+          const my = legendStandIn(m, y);
+          for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
+            S.seat = seat;
+            probe.innerHTML = legendHTML(my);
+            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+          }
+        }
+    } finally { Object.assign(S, keep); }
+    legendHeights.set(key, Math.ceil(hMax));
+  }
+  return legendHeights.get(key);
+}
 function holdLegendHeight(m) {
   const el = $("#legend"), w = el.clientWidth;
   if (!w) return;
-  const key = [w, S.view, m.year, boothsShown()].join("|");
+  const probe = el.cloneNode(false);
+  probe.removeAttribute("id"); probe.removeAttribute("hidden");
+  probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
+  el.parentNode.appendChild(probe);
+  let h = 0;
+  try {
+    for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe));
+    if (S.view === "chamber" && SENM) h = Math.max(h, senLegendHeight(w, probe));
+  } finally { probe.remove(); }
+  el.style.minHeight = h + "px";
+  el.style.boxSizing = "border-box";
+}
+// the Senate's key at its tallest: each lens, as seated and sorted
+function senLegendHeight(w, probe) {
+  const key = `senate|${w}`;
   if (!legendHeights.has(key)) {
-    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index };
-    const probe = el.cloneNode(false);
-    probe.removeAttribute("id"); probe.removeAttribute("hidden");
-    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
-    el.parentNode.appendChild(probe);
+    const keep = { senLens: S.senLens, seat: S.seat };
     let hMax = 0;
     try {
-      for (const lens of LENSES.map((l) => l.id))
-        for (const mode of lens === "tpp" || lens === "fp" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null])
-          for (const seat of S.view === "chamber" && m.seating ? ["plan", "sort"] : [S.seat]) {
-            Object.assign(S, { lens, seat });
-            if (lens === "tpp") S.tppMode = mode;
-            if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
-            if (lens === "seifa") S.index = mode;
-            probe.innerHTML = legendHTML(m);
-            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
-          }
-    } finally { Object.assign(S, keep); probe.remove(); }
+      for (const l of SEN_LENSES) for (const seat of ["plan", "sort"]) {
+        S.senLens = l.id; S.seat = seat;
+        probe.innerHTML = senateLegendHTML(SENM);
+        hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+      }
+    } finally { Object.assign(S, keep); }
     legendHeights.set(key, Math.ceil(hMax));
   }
-  el.style.boxSizing = "border-box";
-  el.style.minHeight = legendHeights.get(key) + "px";
+  return legendHeights.get(key);
 }
 function legendHTML(m) {
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
@@ -3185,7 +3649,8 @@ function legendHTML(m) {
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
   const partyOpts = FAMS.map((f) => [f, FAM_LEG[f]]);
-  let h = "";
+  // the chamber view chooses its chamber first
+  let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
@@ -3229,15 +3694,18 @@ function legendHTML(m) {
     case "seifa": {
       // one picker for the census: the ABS's advantage indexes, then the people measures
       const og = (label, list) => `<optgroup label="${label}">${list.map(([v, t]) => `<option value="${v}"${S.index === v ? " selected" : ""}>${t}</option>`).join("")}</optgroup>`;
-      h += `<div class="lg-t"><select data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", DM.map((x) => [x, DM_NAME[x]]))}</select></div>`;
+      h += `<div class="lg-t"><select data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", dmFor(m).map((x) => [x, DM_NAME[x]]))}</select></div>`;
       if (isDemo()) {
         const [lo, hi] = DM_RANGE[S.index], early = m.year !== "now" && m.year < DEMO_FROM;
+        // an income lane can arrive by hash on a year whose store carries
+        // none (income starts 2013); it reads as its own kind of early
+        const noInc = isInc(S.index) && !hasInc(m);
         if (!early) h += legendHist(m, lo, hi);
-        h += `<div class="lg-ramp" style="background:${grad(RAMP.demo[S.index], 0, 100)}">${early || !aus.demo ? "" : mark(aus.demo[S.index], lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
+        h += `<div class="lg-ramp" style="background:${grad(RAMP.demo[S.index], 0, 100)}">${early || !aus.demo || aus.demo[S.index] == null ? "" : mark(aus.demo[S.index], lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
         // the income lanes' note names their own cut in the census
         // year's dollars, then the same census-basis tail
         const incNote = `Share of adults in households earning ${S.index === "loinc" ? `under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)}` : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more`} a week${m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 2013 election: 2013 reads the census areas the polling places stand in (2011 census); from 2016 they follow the voters (2021 census)." : `${isDemo() && isInc(S.index) ? incNote : "Share of residents"}, ${m.demoBasis === "venue" ? `2011 census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2007 election: 2007 and 2010 read the census areas the polling places stand in (2006 census), 2013 on the 2011 census; from 2016 they follow the voters (2021 census)." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : "Share of residents"}, ${m.demoBasis === "venue" ? `${m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo && aus.demo[S.index] != null ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
@@ -3282,12 +3750,14 @@ function renderTimeline() {
     }
     if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
-    const st = S.sel.level === "state" ? S.sel.st : "AUS";
+    // in the Senate's chamber the House's elections stay faint, and Now reads the Senate's make-up
+    const sen = senOn();
+    const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
     for (const y of YEARS) {
-      const s = SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
+      const s = sen && y === "now" ? senCounts(SENM, (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
       const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
       let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : sen ? 0.22 : 0.62}"/>`; acc += w; }
     }
   }
   for (const y of YEARS) {
@@ -3311,6 +3781,7 @@ function showTipAt(html, cx, cy) {
   tip.style.transform = `translate(${Math.max(6, tx)}px, ${Math.max(6, ty)}px)`;
 }
 function tipFor(h) {
+  if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
   if (h.kind === "div") {
     const d = m.divs[h.i];
@@ -3367,39 +3838,40 @@ function updateHint() {
 /* =============================== search =============================== */
 let sugg = [], suggAt = -1;
 function runSearch() {
-  const m = M(), el = $("#sugg"), q = S.q.trim();
+  const m = M(), el = $("#sugg"), q = S.q.trim(), sen = senOn();
   if (S.view === "list") { el.hidden = true; renderList(); return; }
   if (!m || q.length < 2) { el.hidden = true; sugg = []; $("#q").setAttribute("aria-expanded", "false"); return; }
   const toks = norm(q).split(/\s+/).filter(Boolean);
   const scored = [];
-  for (const it of m.search.items) {
+  for (const it of sen ? (SENM.search ??= senSearchItems(SENM)) : m.search.items) {
     const h = it.h; let ok = true, score = it.rank * 10;
     for (const t of toks) { const p = h.indexOf(t); if (p < 0) { ok = false; break; } if (p === 0) score -= 4; else if (h[p - 1] === " ") score -= 2; }
     if (ok) scored.push([score, it]);
     if (scored.length > 4000) break;
   }
   scored.sort((a, b) => a[0] - b[0]);
-  const groups = { state: [], div: [], mp: [], cand: [], booth: [] };
-  for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" ? 6 : 4)) g.push(it); }
-  sugg = [...groups.state, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
+  const groups = { state: [], sen: [], div: [], mp: [], cand: [], booth: [] };
+  for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" || it.k === "sen" ? 6 : 4)) g.push(it); }
+  sugg = [...groups.state, ...groups.sen, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
   suggAt = sugg.length ? 0 : -1;
-  const label = { state: "States and territories", div: "Seats", mp: isNow() ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
+  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNow() ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
   let html = "", n = 0;
-  for (const k of ["state", "div", "mp", "cand", "booth"]) {
+  for (const k of ["state", "sen", "div", "mp", "cand", "booth"]) {
     if (!groups[k].length) continue;
     html += `<div class="g">${label[k]}</div>`;
     for (const it of groups[k]) {
-      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : colCss(m.divCol[it.i]);
+      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
       html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw" style="background:${color}"></i><span class="t">${esc(it.t)}</span><span class="s">${esc(it.s)}</span></button>`;
       n++;
     }
   }
-  el.innerHTML = html || `<div class="none">No seat, member or place matches “${esc(q)}”.</div>`;
+  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, member or place"} matches “${esc(q)}”.</div>`;
   el.hidden = false; $("#q").setAttribute("aria-expanded", "true");
 }
 function chooseSugg(k) {
   const it = sugg[k]; if (!it) return;
   $("#sugg").hidden = true; $("#q").value = ""; S.q = ""; $("#q").blur();
+  if (senOn()) { selectSen(it.k === "state" ? { level: "state", st: it.st } : { level: "sen", st: SENM.divs[it.i].st, i: it.i }); return; }
   const view = it.k === "booth" && S.view === "chamber" ? "map" : undefined;
   if (it.k === "state") goState(it.st, { view });
   else if (it.k === "div" || it.k === "mp" || it.k === "cand") goDiv(it.i, { view });
@@ -3410,8 +3882,11 @@ function chooseSugg(k) {
 function setView(v, quiet) {
   if (v === S.view) return;
   const prev = S.view;
+  // the Senate has no map: into or out of its chamber the view changes without the morph
+  const senate = S.house === "senate" && (prev === "chamber" || v === "chamber");
   S.view = v;
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
+  if (senate) { renderLenses(); $("#mp-meta").textContent = metaLine(); if (v === "chamber") needSenateFloor(); }
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
@@ -3422,7 +3897,7 @@ function setView(v, quiet) {
   hideTip(); S.hover = null;
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
-    if ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map")) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
+    if (!senate && ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map"))) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
     // the map always opens at its fit — the transform persists across views,
     // and an unfitted one lands on the country's north-west corner
     if (v === "map" && prev !== "map") fitSelection(0);
@@ -3442,6 +3917,41 @@ function setLens(id) {
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
+function setSenLens(id) {
+  if (S.senLens === id) return;
+  const hold = walkHold(takeSpot());
+  S.senLens = id;
+  $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.slens === id)));
+  startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
+  if (hold) hold.land();
+}
+/* the chamber view's chamber: the House or the Senate. The Senate is today's, so choosing it from an
+   election moves the timeline to Now; the two cross-fade, the chairs being different people */
+let houseFade = null;
+async function setHouse(h) {
+  if (h === S.house) return;
+  const spot = takeSpot(), from = CM();
+  if (h === "senate" && S.year !== "now") await setYear("now");
+  if (h === "senate" && !senFloor) {
+    showLoading(true);
+    try { await loadSenateFloor(); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
+    showLoading(false);
+  }
+  const hold = walkHold(spot);
+  S.house = h; S.hover = null; hideTip();
+  chAnim = null; chLast.clear();
+  houseFade = from && !reduceMotion && S.view === "chamber" ? { from, t0: performance.now(), dur: 420 } : null;
+  renderLenses(); renderLegend(); renderStory(true); renderTimeline(); writeURL();
+  $("#mp-meta").textContent = metaLine();
+  if (hold) hold.land();
+  schedule();
+}
+// the Senate's floor, fetched the first time its chamber is shown
+function needSenateFloor() {
+  if (senFloor) return;
+  showLoading(true);
+  loadSenateFloor().then(() => { showLoading(false); renderStory(true); schedule(); }).catch(() => showLoading(true, "The Senate didn’t load. Try again."));
+}
 function lensParamChanged() {
   const hold = walkHold(takeSpot());
   S.sort = null; if (S.f.range && S.f.range.key === "lens") S.f.range = null;
@@ -3459,12 +3969,15 @@ function showLoading(on, msg) {
   if (!on || msg || S.view !== "chamber") return;
   const r = $("#stage").getBoundingClientRect();
   if (!r.width) return;
-  const F = chamberFrame(chamberGeom(), r.width, r.height, chamberPads(r.width));
-  el.style.left = F.X(0) + "px"; el.style.top = F.Yp(CH_AISLE) + "px";
+  const geom = chamberGeom(S.house === "senate" && senFloor ? SENM : null);
+  const F = chamberFrame(geom, r.width, r.height, chamberPads(r.width));
+  el.style.left = F.X(0) + "px"; el.style.top = F.Yp(geom.aisle) + "px";
 }
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
+  // the Senate is drawn as it sits today: an election on the timeline is the House's
+  if (S.house === "senate" && y !== "now") { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // the spot is taken now, while it's fresh: the election may take a while to load
   const from = S.year, a = M(), spot = takeSpot();
   showLoading(true);
@@ -3493,6 +4006,7 @@ async function setYear(y) {
 }
 function metaLine() {
   const m = M(); if (!m) return "";
+  if (senOn()) return `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 
@@ -3519,7 +4033,12 @@ function frame(ts) {
     drawGeo(m, yearFade ? yf : 1, streetK());
     drawFocus(m); drawBooths(m); drawLabels(m);
   } else if (S.view === "chamber") {
-    drawChamberMain(m, 1);
+    const c = CM();
+    if (houseFade) {
+      const t = clamp((ts - houseFade.t0) / houseFade.dur, 0, 1), e = ease(t);
+      if (t < 1) { again = true; drawChamberMain(houseFade.from, 1 - e); } else houseFade = null;
+      if (c) drawChamberMain(c, houseFade ? e : 1);
+    } else if (c) drawChamberMain(c, 1);
   }
   showCredit(!morph && S.view === "map" && streetK() > 0.02);
   if (miniCh.canvas && (fade || chAnim || again || miniCh.dirty)) { paintMiniChamber(); miniCh.dirty = false; }
@@ -3561,6 +4080,13 @@ function writeURL() {
   if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); }
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
+  if (S.house === "senate") {
+    p.set("c", "senate");
+    if (S.senLens !== "party") p.set("sl", S.senLens);
+    const ss = S.ssel;
+    if (ss.level === "state") p.set("ss", ss.st);
+    else if (ss.level === "sen" && SENM) p.set("ss", SENM.divs[ss.i].n);
+  }
   if (m) {
     const s = S.sel;
     if (s.level === "state") p.set("s", s.st);
@@ -3580,7 +4106,16 @@ function readURL() {
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
+  // the Senate is today's alone
+  if (p.get("c") === "senate" && S.year === "now") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
   return p.get("s");
+}
+let senFromURL = null;
+function applySenFromURL() {
+  const v = senFromURL; senFromURL = null;
+  if (!v || !SENM) return;
+  if (STATES.includes(v)) S.ssel = { level: "state", st: v };
+  else { const i = SENM.byName.get(v); if (i != null) S.ssel = { level: "sen", st: SENM.divs[i].st, i }; }
 }
 function applySelFromURL(sv) {
   const m = M(); if (!m || !sv) return false;
@@ -3605,6 +4140,8 @@ canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); sched
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
+  if (h && h.kind === "sen") { selectSen({ level: "sen", st: SENM.divs[h.i].st, i: h.i }); return; }
+  if (!h && senOn()) { if (S.ssel.level !== "aus") selectSen({ level: "aus" }); return; }
   if (!h) {
     // a miss lets the selection go — on the map only near the whole-country
     // fit (a zoomed miss is a pan mis-tap); the chamber has no camera, so a
@@ -3638,7 +4175,7 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
-  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat]");
+  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
@@ -3649,8 +4186,11 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (t.dataset.lens) { setLens(t.dataset.lens); return; }
+  if (t.dataset.house) { setHouse(t.dataset.house); return; }
+  if (t.dataset.slens) { setSenLens(t.dataset.slens); return; }
+  if (t.dataset.sgo && SENM) { const [k, v] = t.dataset.sgo.split(":"); selectSen(k === "aus" ? { level: "aus" } : k === "state" ? { level: "state", st: v } : { level: "sen", st: SENM.divs[+v].st, i: +v }); return; }
   if (t.dataset.view) { setView(t.dataset.view); return; }
-  if (t.dataset.seat) { if (t.dataset.seat !== seatMode(M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
+  if (t.dataset.seat) { if (t.dataset.seat !== seatMode(CM() || M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
   if (t.dataset.flip === "tpp") { S.tppMode = S.tppMode === "swing" ? "share" : "swing"; lensParamChanged(); return; }
   if (t.dataset.flip === "fp") { S.fpMode = S.fpMode === "change" ? "share" : "change"; lensParamChanged(); return; }
   if (t.dataset.dist) { S.dist = S.dist === t.dataset.dist ? null : t.dataset.dist; renderList(true); return; }
@@ -3695,7 +4235,10 @@ document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.key === "Escape") goUp();
+  if (e.key === "Escape") {
+    if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
+    else goUp();
+  }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
@@ -3721,14 +4264,16 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
   $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
-  getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }).catch(() => {});
+  const meta = loadLegendMeta();
   showLoading(true);
-  try { await loadYear(S.year); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  if (S.house === "senate") { try { await loadSenateFloor(); applySenFromURL(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
+  renderLenses();
   morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });

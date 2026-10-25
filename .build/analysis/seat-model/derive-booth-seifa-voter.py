@@ -222,10 +222,12 @@ def load_xwalk():
     return x
 
 
-# ------------------------------------------------- demo (GCP G01/G09/G49B)
+# ------------------------------------------ demo (GCP G01/G09/G49B/G60B)
 # The demo block: 2021-census GCP (SA1) — G01 age bands + language spoken
 # at home, G09F/G09H country of birth, G49B highest non-school
-# qualification — folded by the same per-SA1 vote weights. EVERY lane
+# qualification, G60B occupation — folded by the same per-SA1 vote weights
+# (the emitted tuple gains blue-collar count + stated-occupation total at
+# indexes 9 and 10). EVERY lane
 # lands on the Ed3/2021-census table; older votes are chain-walked into
 # Ed3 first
 # (2019 & 2022 via CG_SA1_2016_SA1_2021; 2016 via CG_SA1_2011_SA1_2016
@@ -247,6 +249,16 @@ GCP_MEMBER_G32 = ("2021 Census GCP Statistical Area 1 for AUS/"
                   "2021Census_G32_AUST_SA1.csv")
 GCP_MEMBER_G33 = ("2021 Census GCP Statistical Area 1 for AUS/"
                   "2021Census_G33_AUST_SA1.csv")
+GCP_MEMBER_G60B = ("2021 Census GCP Statistical Area 1 for AUS/"
+                   "2021Census_G60B_AUST_SA1.csv")
+# the eight stated ANZSCO occupation major groups (G60B P_Tot_*), in
+# file order; blue-collar = trades + machinery operators & drivers +
+# labourers, shared over the stated set (inadequately-described/
+# not-stated excluded)
+GCP_G60B_OCCS = ["P_Tot_Managers", "P_Tot_Professionals",
+                 "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
+                 "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
+                 "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
 GCP_ROWS = 61844
 # household weekly income bands ($2021), G33/G32 grid: (lo, hi) inclusive;
 # the top band is open. Negative/Nil folds into the first band. Partial-
@@ -269,13 +281,13 @@ XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H, G49B and G32/G33 @ SA1 "
-              "(Ed3); "
+DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H, G49B, G32/G33 and G60B "
+              "@ SA1 (Ed3); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
 _DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H, "
-              "G49B and G32/G33 SA1 tables (G01: age-band structure; language "
+              "G49B, G32/G33 and G60B SA1 tables (G01: age-band structure; language "
               "spoken at home English-only vs other. G09: country of "
               "birth — the overseas-born share excludes "
               "country-of-birth-not-stated. G49B: highest non-school "
@@ -293,7 +305,12 @@ _DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H, "
               "median weekly household income in 2021 dollars on the "
               "HOUSEHOLD basis (ABS's own published-median basis — the "
               "adults-weighted histogram would read ~$300 higher, skewed "
-              "by couples) — all by the same per-SA1 vote "
+              "by couples). G60B: occupation of "
+              "employed persons — the blue-collar share counts the "
+              "technicians-and-trades, machinery-operators-and-drivers "
+              "and labourers major groups over the eight stated "
+              "occupation groups, excluding inadequately-described/"
+              "not-stated) — all by the same per-SA1 vote "
               "weights — age shares "
               "renormalise over the 11 bands, which exclude "
               "age-not-stated; persons are a "
@@ -520,6 +537,7 @@ def load_gcp21():
                                    "P_GradDip_and_GradCert_Total",
                                    "P_BachDeg_Total",
                                    "P_Lev_Edu_NS_Total"]),
+        ("G60B", GCP_MEMBER_G60B, GCP_G60B_OCCS),
     ):
         if member not in z.namelist():
             fail(f"GCP zip lacks {member}")
@@ -549,10 +567,13 @@ def load_gcp21():
         h09 = extra["G09H"].get(code)
         e49 = extra["G49B"].get(code)
         ir = inc.get(code)
-        if f09 is None or h09 is None or e49 is None or ir is None:
-            fail(f"GCP G09/G49B/G33 SA1 set mismatch at {code}")
+        o60 = extra["G60B"].get(code)
+        if f09 is None or h09 is None or e49 is None or ir is None \
+                or o60 is None:
+            fail(f"GCP G09/G49B/G32/G33/G60B SA1 set mismatch at {code}")
         out[code] = r + (f09[0], h09[0], h09[1],
-                         e49[0] + e49[1] + e49[2], e49[3]) + ir
+                         e49[0] + e49[1] + e49[2], e49[3],
+                         o60[2] + o60[6] + o60[7], sum(o60)) + ir
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -664,6 +685,7 @@ def demo_units(units21, gcp):
     nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
            "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
            "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
+           "bluen": 0.0, "occd": 0.0,
            "inct": 0.0, "incl": 0.0, "inch": 0.0,
            "incb": [0.0] * len(INC_BANDS),
            "incbh": [0.0] * len(INC_BANDS)}
@@ -676,6 +698,7 @@ def demo_units(units21, gcp):
             continue
         cov = pers = eng = oth = 0.0
         aust = totc = cobns = uni = eduns = pop15 = 0.0
+        bluen = occd = 0.0
         inct = incl = inch = 0.0
         bands = [0.0] * len(DEMO_BANDS)
         incb = [0.0] * len(INC_BANDS)
@@ -696,19 +719,22 @@ def demo_units(units21, gcp):
             cobns += w * r[6]
             uni += w * r[7]
             eduns += w * r[8]
+            bluen += w * r[9]
+            occd += w * r[10]
             pop15 += w * (r[0] - ages[0] - ages[1])
-            inct += w * r[9]
-            incl += w * r[10]
-            inch += w * r[11]
+            inct += w * r[11]
+            incl += w * r[12]
+            inch += w * r[13]
             for i in range(len(INC_BANDS)):
-                incb[i] += w * r[12][i]
-                incbh[i] += w * r[13][i]
+                incb[i] += w * r[14][i]
+                incbh[i] += w * r[15][i]
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0, "oth": 0.0,
                                       "bands": [0.0] * len(DEMO_BANDS),
                                       "aust": 0.0, "totc": 0.0,
                                       "cobns": 0.0, "uni": 0.0,
                                       "eduns": 0.0, "pop15": 0.0,
+                                      "bluen": 0.0, "occd": 0.0,
                                       "inct": 0.0, "incl": 0.0,
                                       "inch": 0.0,
                                       "incb": [0.0] * len(INC_BANDS),
@@ -722,6 +748,7 @@ def demo_units(units21, gcp):
             dv["bands"][i] += bands[i]
         for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
                      ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             dv[k] += v
         for i in range(len(INC_BANDS)):
@@ -736,6 +763,7 @@ def demo_units(units21, gcp):
             nat["bands"][i] += bands[i]
         for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
                      ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             nat[k] += v
         for i in range(len(INC_BANDS)):
@@ -763,6 +791,8 @@ def demo_units(units21, gcp):
                 round((fb_den - aust) / fb_den, 4) if fb_den > 0 else None,
             "uni":
                 round(uni / uni_den, 4) if uni_den > 0 else None,
+            "blue":
+                round(bluen / occd, 4) if occd > 0 else None,
             "age": ({b: round(bands[i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
@@ -1135,6 +1165,8 @@ def build(year):
             if nat_fbd > 0 else None,
             "uni": round(demo_nat["uni"] / nat_unid, 4)
             if nat_unid > 0 else None,
+            "blue": round(demo_nat["bluen"] / demo_nat["occd"], 4)
+            if demo_nat["occd"] > 0 else None,
             "age0_14": round(
                 (demo_nat["bands"][0] + demo_nat["bands"][1]) / nat_b, 4),
             "age65ov": round(sum(demo_nat["bands"][8:]) / nat_b, 4),
@@ -1172,6 +1204,8 @@ def build(year):
                 if fb_den > 0 else None,
             "uni": round(dv["uni"] / uni_den, 4)
                 if uni_den > 0 else None,
+            "blue": round(dv["bluen"] / dv["occd"], 4)
+                if dv["occd"] > 0 else None,
             "age": ({b: round(dv["bands"][i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
@@ -1210,8 +1244,8 @@ def build(year):
             "never lists (unused PPVCs, cancelled mobile teams) carry "
             "votes:null and note:noVotesRows. The divisions array "
             "re-pools every unit's per-SA1 demo tallies by division: one "
-            "language/foreign-born/university/age/income reading per "
-            "division, "
+            "language/foreign-born/university/blue-collar/age/income "
+            "reading per division, "
             "its shares from its own pooled sum, never from averaging "
             "the row-level rounded shares.") + DEMO_ABOUT[year],
         "_provenance": {
@@ -1222,7 +1256,7 @@ def build(year):
                           2025: "AEC fe25 downloads-statistics, Votes by SA1 – national"}[year],
                 "fpvOracle": "VTR HouseStateFirstPrefsByPollingPlaceDownload",
                 "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G09/G49B/"
-                       "G32/G33)",
+                       "G32/G33/G60B)",
                 **({"crosswalk": "ABS CG_SA1_2016_SA1_2021 (ASGS Ed3 correspondences page)"}
                    if conf["mode"] == "xwalk21" else {}),
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}

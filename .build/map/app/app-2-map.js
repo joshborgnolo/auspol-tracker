@@ -70,10 +70,11 @@ const lensNumeric = () => !(S.lens === "winner" || S.lens === "cls");
 /* =============================== colours per year =============================== */
 let fade = null, fadeT = 1;
 function recolor(animate) {
-  for (const m of Object.values(Y)) {
-    if (!m.divs) continue;
+  for (const m of [...Object.values(Y), SENM]) {
+    if (!m || !m.divs) continue;
     if (animate && m.divCol && !reduceMotion) { m.prevDivCol = m.divCol; m.prevBoothCol = m.boothCol; }
     else { m.prevDivCol = null; m.prevBoothCol = null; }
+    if (m.house === "senate") { m.divCol = m.divs.map((d) => senateColor(m, d)); continue; }
     m.divCol = m.divs.map((d) => colorOf(divValue(m, d.i)));
     const bc = new Array(m.booth.n);
     for (let j = 0; j < m.booth.n; j++) bc[j] = colorOf(boothValue(m, j));
@@ -853,7 +854,7 @@ canvas.addEventListener("gestureend", (e) => e.preventDefault());
 /* ----- hit testing ----- */
 function hitTest(px, py) {
   const m = M(); if (!m) return null;
-  if (S.view === "chamber") return chamberHit(m, px, py);
+  if (S.view === "chamber") { const c = CM(); return c ? chamberHit(c, px, py) : null; }
   if (S.view !== "map") return null;
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {

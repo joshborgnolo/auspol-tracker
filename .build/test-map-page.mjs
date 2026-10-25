@@ -67,7 +67,7 @@ assert.ok(page.includes(`href="/map/map.css?v=${hs("map.css")}"`), "the page's m
 // rebase landed <<<<<<< HEAD above the footer, 2026-10-26)
 assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git conflict-marker lines");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 assert.equal(R("map/map.js"), `/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, "map/map.js is current (node .build/map/assemble.mjs)");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
 for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {

@@ -14,8 +14,9 @@ House since the 2025 election.
              2CP + flows (TCF by polling place), 2PP + swing (TPP by
              polling place), coordinates, premises, SEIFA decile at the
              venue, SEIFA decile of where its voters live (2016+), and the
-             census people around it (2011 census of the venue's own SA1,
-             2013; 2021 census of where its voters live, 2016+)
+             census people around it (2006 census of the venue's own CD,
+             2007-2010; 2011 census of its own SA1, 2013; 2021 census of
+             where its voters live, 2016+)
 
 Every booth sum is checked against the division's ordinary-vote oracle
 before anything is written (the repo's recompose doctrine), and the
@@ -241,12 +242,15 @@ def dec_of_pct(p):
 
 
 # census people measures: 2016+ the 2021 census of where a place's voters
-# live (vote-weighted); 2013 the 2011 census of the SA1 the venue itself
-# stands in (a venue proxy — the AEC's Votes-by-SA1 product starts 2016):
+# live (vote-weighted); 2007-2013 the venue proxy — 2006 census of the CD
+# the venue itself stands in (2007/2010), 2011 census of its SA1 (2013),
+# the AEC's Votes-by-SA1 product starting 2016:
 # [language other than English at home, aged 65 and over, aged 20 to 34,
-#  born overseas, university educated, low-household-income share, top-
-# band household-income share], each a share of residents (uni of the
-# aged-15+ basis, the income shares of ADULTS in income-stated
+#  born overseas, university educated, blue-collar occupation,
+#  low-household-income share, top-band household-income share], each a
+# share of residents (uni of the aged-15+ basis, blue of employed people
+# with a stated occupation — trades + drivers + labourers of the eight
+# stated ANZSCO major groups — the income shares of ADULTS in income-stated
 # households); all ex-not-stated. The income cells keep their own nulls
 # per row (tiny census areas the ABS perturbs the tables out of) — a
 # null there never sinks the row's other lanes. The year's cuts and
@@ -254,11 +258,12 @@ def dec_of_pct(p):
 # the top of the data-<year>.json this builds.
 def demo_cells(dm):
     if not dm or dm.get("langOther") is None or dm.get("fborn") is None \
-            or dm.get("uni") is None or not dm.get("age"):
+            or dm.get("uni") is None or dm.get("blue") is None \
+            or not dm.get("age"):
         return None
     a = dm["age"]
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
-            dm["fborn"], dm["uni"], dm.get("loinc"), dm.get("hiinc")]
+            dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc")]
 
 
 def seifa_cells(sf):
@@ -338,10 +343,11 @@ def build_year(year, hist, base2001):
     vstore = json.load(open(vpath)) if os.path.exists(vpath) else None
     census_basis = "voter"
     if vstore is None:
-        # 2013 predates the AEC's Votes-by-SA1 product, so no voter
+        # 2007-2013 predate the AEC's Votes-by-SA1 product, so no voter
         # footprint exists: read the venue-proxy store instead — a booth's
-        # figures are the 2011 census SA1 its premises stand in, a seat's
-        # the exact census sum over its SA1s (real headcounts, never
+        # figures are the census area its premises stand in (2006 census
+        # CD at 2007/2010, 2011 census SA1 at 2013), a seat's the exact
+        # census sum over its areas (real headcounts, never
         # vote-weighted pseudo-populations)
         p = REPO + f"/data/booth-demo-{year}.json"
         if os.path.exists(p):
@@ -428,11 +434,11 @@ def build_year(year, hist, base2001):
             if dc:
                 # p: the store's pool weight — vote-weighted pseudo-population
                 # on the voter store, real census headcount on the venue proxy.
-                # The income shares are per-adult (they ride as cells 5/6);
+                # The income shares are per-adult (they ride as cells 6/7);
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
-                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "p": dd["persons"],
-                               "loinc": dc[5], "hiinc": dc[6], "medIncWeekly": dd.get("incMed")}
+                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
+                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dd.get("incMed")}
         div_index[d] = len(D)
         D.append(rec)
 

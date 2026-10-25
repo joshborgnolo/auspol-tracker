@@ -55,12 +55,18 @@ const SERJEANT = "Rc5d1"; // the Serjeant-at-Arms's chair, in the curve's last r
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 const CHK = 6;
+const benchS = (x, y) => (y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y);
+/* a chamber's geometry: its seats in bench order (s, then row), its rows, the box it's framed in,
+   and what differs between the House and the Senate — the presiding officer's chair, the table's
+   two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
+   senateGeom (app-3b-senate.js) */
 let chGeomC = null;
-function chamberGeom() {
+const chamberGeom = (m) => (m && m.house === "senate" ? senateGeom() : houseGeom());
+function houseGeom() {
   if (chGeomC) return chGeomC;
   const all = chamberCells().map((c) => {
     const x = c.x / CU, y = c.y / CU;
-    const s = y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y;
+    const s = benchS(x, y);
     // each chair as wide as its seat allows (3pt clear of the next), as deep as its bench
     const W = clamp(c.w - 3, 13.5, 30) / CU, D = (c.row === 1 && y < 0 ? 24 : 23) / CU;
     return { id: c.id, x, y, fa: c.fa, row: c.row, s, W, D };
@@ -69,9 +75,11 @@ function chamberGeom() {
   const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
   seats.forEach((c, k) => { c.k = k; c.u = (c.s - s0) / (s1 - s0); });
   const rows = [0, 1, 2, 3, 4, 5].map((r) => seats.filter((c) => c.row === r));
-  chGeomC = { seats, rows, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
+  chGeomC = { seats, rows, nRows: 5, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
     serjeant: all.find((c) => c.id === SERJEANT), rOut: CHB.R[4] / CU,
-    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 } };
+    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 },
+    arms: true, table: ["Lt0", "Rt0"], chairAt: SPEAKER_AT, aisle: CH_AISLE, yMid: -6.6,
+    benchPt, benchOut, furniture: drawChamberFurniture };
   return chGeomC;
 }
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
@@ -116,16 +124,17 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
-const seatMode = (m) => (!m.seating ? "sort" : S.seat || (S.lens === "winner" ? "plan" : "sort"));
+const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
   if (m._chKey === key) return m._ch;
-  const geom = chamberGeom();
+  const geom = chamberGeom(m);
+  const keyOf = m.house === "senate" ? senateKey : chamberKey;
   const { gov, opp, cross } = chamberBlocs(m);
   const members = m.divs.filter((d) => d.i !== m.speaker);
   const byKey = (bloc) => (p, q) => {
-    const a = chamberKey(m, p, bloc), b = chamberKey(m, q, bloc);
+    const a = keyOf(m, p, bloc), b = keyOf(m, q, bloc);
     if (a == null && b == null) return p.n.localeCompare(q.n);
     if (a == null) return 1;
     if (b == null) return -1;
@@ -141,8 +150,8 @@ function chamberOrder(m) {
     C.push(...xs);
   }
   // the leaders, each at their side's table chair (when they lead the bloc on that side)
-  const table = [geom.byId.get("Lt0"), geom.byId.get("Rt0")];
-  const lead = (LEADERS[m.year] || []).map((n, s) => { const i = m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
+  const table = geom.table.map((id) => geom.byId.get(id));
+  const lead = (m.leaders || LEADERS[m.year] || []).map((n, s) => { const i = typeof n === "number" ? n : m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
   // each member's seat (an index into geom.seats)
   const at = new Map();
   if (plan) {
@@ -184,7 +193,7 @@ function majorityCuts(ch, geom) {
   if (ch.majAt <= 0 || ch.majAt >= sat.length) return null;
   const inside = new Set(sat.slice(0, ch.majAt).map((c) => c.k)), sStar = sat[ch.majAt - 1].s;
   const cuts = [];
-  for (let r = 1; r <= 5; r++) {
+  for (let r = 1; r <= geom.nRows; r++) {
     const row = geom.rows[r];
     let L = -1;
     row.forEach((c, j) => { if (inside.has(c.k)) L = j; });
@@ -212,7 +221,7 @@ function chamberPositions(m, geom) {
   const arms = { L: [], R: [] };
   for (const [i, k] of ch.at) {
     const st = geom.seats[k];
-    if (/^[LR]a\d/.test(st.id)) { arms[st.id[0]].push([i, st]); continue; }
+    if (geom.arms && /^[LR]a\d/.test(st.id)) { arms[st.id[0]].push([i, st]); continue; }
     pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u, st.W, st.D]);
   }
   // the front bench's arm is one long bench: whoever sits there spreads evenly along it, in order,
@@ -325,7 +334,7 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
 
 // draw the whole chamber into a context already scaled to CSS pixels
 function drawChamber(g, m, w, h, opts) {
-  const geom = chamberGeom();
+  const geom = chamberGeom(m);
   const pad = opts.pad || { t: 8, r: 8, b: 8, l: 8 };
   const F = chamberFrame(geom, w, h, pad);
   const th = TH, s = F.s, now = performance.now();
@@ -345,9 +354,10 @@ function drawChamber(g, m, w, h, opts) {
   const X = F.X, Yp = F.Yp, rO = geom.rOut;
   g.save();
   g.globalAlpha = opts.alpha ?? 1;
-  drawChamberFurniture(g, F, geom, { ...opts, occupied: chAnim ? null : new Set(ch.at.values()) });
+  geom.furniture(g, F, geom, { ...opts, occupied: chAnim ? null : new Set(ch.at.values()) });
   // the chairs
-  const filt = filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
+  // the list's filters are the House's seats'; the Senate answers only to the chosen state
+  const filt = m.house !== "senate" && filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
   const pat = opts.pattern;
   const backOf = (c) => towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22);
   const drawn = [];
@@ -366,8 +376,9 @@ function drawChamber(g, m, w, h, opts) {
     const p = pos(m.divs[i].n); if (!p) return;
     paint(i, X(p[0]), Yp(p[1]), p[2], p[4] * s, p[5] * s);
   });
-  // the Speaker's chair, on the dais at the head of the table, facing down the chamber
-  if (m.speaker != null) paint(m.speaker, X(SPEAKER_AT[0]), Yp(SPEAKER_AT[1]), SPEAKER_AT[2], SPEAKER_AT[4] * s, SPEAKER_AT[5] * s, true);
+  // the Speaker's (the President's) chair, at the head of the table, facing down the chamber
+  const CA = geom.chairAt;
+  if (m.speaker != null) paint(m.speaker, X(CA[0]), Yp(CA[1]), CA[2], CA[4] * s, CA[5] * s, true);
   // rings for the hovered and chosen seats
   const ring = (i, lw) => { const q = drawn.find((x) => x.i === i); if (!q) return; g.save(); g.translate(q.x, q.y); g.rotate(q.fa); g.beginPath(); const pd = 2.2; if (g.roundRect) g.roundRect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd, 3); else g.rect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd); g.lineWidth = lw; g.strokeStyle = css(th.ink); g.stroke(); g.restore(); };
   if (hv != null && hv !== sd) ring(hv, 1.4);
@@ -386,11 +397,11 @@ function drawChamber(g, m, w, h, opts) {
   if (cuts) {
     const pts = [];
     cuts.forEach((c, k) => {
-      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(benchPt(lerp(cp, c, j / n), k)); }
-      else pts.push(benchPt(c, 0));
-      pts.push(benchPt(c, k + 1));
+      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(geom.benchPt(lerp(cp, c, j / n), k)); }
+      else pts.push(geom.benchPt(c, 0));
+      pts.push(geom.benchPt(c, k + 1));
     });
-    const c5 = cuts[4], o = benchOut(c5), e = benchPt(c5, 5), ext = opts.big ? 0.45 : 0.2;
+    const c5 = cuts[cuts.length - 1], o = geom.benchOut(c5), e = geom.benchPt(c5, geom.nRows), ext = opts.big ? 0.45 : 0.2;
     pts.push([e[0] + o[0] * ext, e[1] + o[1] * ext]);
     g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash(opts.big ? [4, 3] : [3, 2]); g.lineJoin = "round";
     g.beginPath(); pts.forEach(([x, y], j) => (j ? g.lineTo(X(x), Yp(y)) : g.moveTo(X(x), Yp(y)))); g.stroke(); g.setLineDash([]);
@@ -432,7 +443,7 @@ function drawChamber(g, m, w, h, opts) {
     const fig = (txt, col, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `500 30px ${SANS}`; g.fillStyle = css(col); g.fillText(txt, x, y); };
     const lab = (txt, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `600 13px ${SANS}`; g.fillStyle = css(th.ink); g.fillText(txt, x, y); };
     const govName = blocName(m, ch.gov), oppName = blocName(m, ch.opp);
-    const yMid = Yp(-6.6);
+    const yMid = Yp(geom.yMid);
     const room = X(-rO - 0.8);
     // no room beside the benches: the blocs head the chamber, either side of the Speaker
     let bandRoom = null;
@@ -442,7 +453,7 @@ function drawChamber(g, m, w, h, opts) {
       const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
       // the roles go first when the Speaker's name would touch them
       g.font = `400 12px ${SANS}`;
-      const half = X(0) - X(geom.box.x0), need = (g.measureText(speakerName(m) || "").width) / 2 + 10;
+      const half = X(0) - X(geom.box.x0), need = (g.measureText(presiding(m).name || "").width) / 2 + 10;
       const nGov = String(ch.nGov + (spFam === ch.gov ? 1 : 0)), nOpp = String(ch.nOpp + (spFam === ch.opp ? 1 : 0));
       g.font = `500 24px ${SANS}`; const wNum = Math.max(g.measureText(nGov).width, g.measureText(nOpp).width);
       g.font = `400 12px ${SANS}`; const withRole = half - wNum - 5 - g.measureText("Government").width >= need;
@@ -532,19 +543,19 @@ function drawChamber(g, m, w, h, opts) {
         claim(L.bx, L.by, L.wMax, L.ht, L.side, "top");
       }
     }
-    // the Speaker, named above the dais
-    const sp = m.divs[m.speaker];
+    // the Speaker (the President), named above the chair
+    const sp = m.divs[m.speaker], pr = presiding(m);
     if (sp && bandRoom != null) {
       // between the blocs' labels: two lines, the seat dropped if the name alone fits
       const y = Yp(geom.box.y0);
       g.textBaseline = "alphabetic"; g.textAlign = "center";
-      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText("Speaker", X(0), y - 34);
+      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText(pr.role, X(0), y - 34);
       g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
-      const full = `${speakerName(m)}, ${sp.n}`, nm = g.measureText(full).width <= bandRoom ? full : speakerName(m);
+      const full = `${pr.name}, ${pr.place}`, nm = g.measureText(full).width <= bandRoom ? full : pr.name;
       g.fillText(nm, X(0), y - 12);
       claim(X(0), y - 48, Math.max(g.measureText(nm).width, 50), 44, "center", "top");
     } else if (sp) {
-      const a = "Speaker", b = `  ${speakerName(m)}, ${sp.n}`, y = Yp(geom.box.y0) - 9;
+      const a = pr.role, b = `  ${pr.name}, ${pr.place}`, y = Yp(geom.box.y0) - 9;
       g.textBaseline = "middle"; g.textAlign = "left";
       g.font = `600 12px ${SANS}`; const wa = g.measureText(a).width;
       g.font = `400 12px ${SANS}`; const wb = g.measureText(b).width;
@@ -640,21 +651,23 @@ function crossLabel(h) {
 }
 const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick" };
 const speakerName = (m) => SPEAKERS[m.year];
+// the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
+const presiding = (m) => (m.house === "senate" ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });
 
 let chMain = null; // the last full-size draw: chairs on screen, for hit tests and the morph
 function chamberHit(m, px, py) {
   if (!chMain) return null;
   let best = null, bd = Infinity;
   for (const q of chMain.drawn) { const d = Math.hypot(px - q.x, py - q.y); if (d < q.r + 3 && d < bd) { bd = d; best = q.i; } }
-  return best == null ? null : { kind: "div", i: best };
+  return best == null ? null : { kind: m.house === "senate" ? "sen" : "div", i: best };
 }
 // a phone has no room beside the chamber: it fills the width, its bloc labels in a band above
 function chamberPads(w = Wpx) { return isPhone() ? (w < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 36, l: 10 }) : { t: 34, r: 150, b: 36, l: 150 }; }
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const sd = selDiv();
-  chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sd, hover: S.hover && S.hover.kind === "div" ? S.hover.i : null,
-    state: S.sel.level === "state" ? S.sel.st : null, pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
+  const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;
+  chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sen ? (sel.level === "sen" ? sel.i : null) : selDiv(), hover: S.hover && S.hover.kind === (sen ? "sen" : "div") ? S.hover.i : null,
+    state: sel.level === "state" ? sel.st : null, pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
   ctx.restore();
 }
 
@@ -662,7 +675,7 @@ function drawChamberMain(m, alpha) {
 let morph = null; // { to: "chamber" | "map", t0, dur }
 function drawMorph(m, p) {
   const th = TH;
-  const geom = chamberGeom();
+  const geom = houseGeom();
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
@@ -707,7 +720,7 @@ function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
   const w = c.clientWidth || 300;
-  const geom = chamberGeom();
+  const geom = houseGeom();
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);
