@@ -235,4 +235,60 @@ assert.equal(r.st.defects.length, 1, "only the masked MRP wave is a defect: " + 
 assert.match(r.st.defects[0], /2026-09-14\s+DemosAU \(MRP\) — listed by the witness/, r.st.defects[0]);
 assert.doesNotMatch(r.out, /\(MRP\) \(MRP\)/, "the (MRP) suffix does not double up on a named variant");
 
+// ---- non-VI tables fused with a following VI opener ----------------------
+// A table's LAST row carries no |- separator of its own before the |}
+// closer, so it shares a chunk with the next table's {| opener + headers
+// (chunks split on |- lines). When that next table is a VI table (the live
+// article's Hypothetical-scenarios table), the fused tail of the NON-VI
+// table used to inherit the in-scope flip and parse as a wave: the
+// National-direction table's closing "7–11 May 2025" Essential row became a
+// phantom missing VI wave (Oct 2026). The row parse starts at the new
+// table's {| line, so the old table's tail is never scanned.
+const fusedWiki = wiki.replace("|}\n", `|}
+
+==National direction polling==
+{| class="wikitable"
+! Date
+! Polling firm
+! Right direction
+! Wrong direction
+|-
+| style="text-align:right;" | 1–5 May
+| [[Essential Media Communications|Essential]]<ref>x</ref>
+| 40%
+| 45%
+|-
+| style="text-align:right;" | 10–14 May
+| [[Essential Media Communications|Essential]]<ref>y</ref>
+| 39%
+| 44%
+|}
+
+==Hypothetical scenarios==
+{| class="wikitable sortable mw-datatable"
+! Date
+! Polling firm
+! colspan="6" | Primary vote
+! colspan="3" |[[Two-party-preferred vote|2PP vote]]
+|-
+| style="text-align:right;" | 11–15 Sept
+| align="left" | [[Essential Media Communications|Essential]]<ref>z</ref>
+| 27%
+|-
+|}
+`);
+
+// 13. the fused direction-table tail yields NO wave (the witness gains only
+// the hypothetical table's own real row), so nothing phantom is missing
+writeFileSync(WIKI, fusedWiki + "x".repeat(60_000));
+D2 = base();
+D2.polls.push(poll("Essential", "2026-09-15"));
+write(D2);
+c = check();
+assert.equal(c.code, 0, "no phantom wave from the fused table boundary: " + JSON.stringify(c.st.missing));
+assert.equal(c.st.witness_waves, 24, "23 VI rows + the hypothetical table's own row: " + c.st.witness_waves);
+assert.ok(!JSON.stringify(c.st).includes("2026-05-14"), "the direction-table closing row never parses as a wave");
+r = doctor();
+assert.equal(r.code, 0, r.out);
+
 console.log("test-coverage: ok");
