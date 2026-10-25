@@ -162,6 +162,7 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-credit { position: absolute; right: 2px; bottom: 2px; z-index: 3; max-width: calc(100% - 8px); text-align: right;
   font-size: 10.5px; line-height: 1.3; color: var(--ink-3); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }
 .mp-credit[hidden] { display: none; }
+@media (max-width: 560px) { .mp-credit { white-space: nowrap; } .mp-credit-long { display: none; } }
 .mp-credit a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 2px; }
 .mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: 0 0 4px var(--bg); }
 
