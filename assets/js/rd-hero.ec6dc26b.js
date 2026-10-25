@@ -126,7 +126,7 @@ function RdLeadGauge({
     style: hop ? {
       left: P,
       background: col,
-      "--hop": hop.big ? 10 : 1,
+      "--hop": hop.big ? 100 : 1,
       "--hopdur": (hop.big ? 1.1 : 0.62) + "s"
     } : {
       left: P,

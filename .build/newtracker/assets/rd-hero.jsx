@@ -75,8 +75,9 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const col = lead >= 0 ? aColor : bColor;
   const L = settled ? X(hi) : cx, R = settled ? X(lo) : cx, P = settled ? X(lead) : cx;
   /* idle-click Easter egg: the dot hops on a click; about one click in 150
-     sends it ten times the usual height. The count keys the span so every
-     click remounts it and re-fires the CSS animation. */
+     sends it a hundred times the usual height, straight off the chart. The
+     count keys the span so every click remounts it and re-fires the CSS
+     animation. */
   const [hop, setHop] = React.useState(null);
   const boing = () => {
     if (REDUCED_MOTION) return;
@@ -102,7 +103,7 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
         key={hop ? "hop" + hop.n : "hop0"}
         className={"rd-lg-dot" + (hop ? " hop" : "")}
         style={hop
-          ? { left: P, background: col, "--hop": hop.big ? 10 : 1, "--hopdur": (hop.big ? 1.1 : 0.62) + "s" }
+          ? { left: P, background: col, "--hop": hop.big ? 100 : 1, "--hopdur": (hop.big ? 1.1 : 0.62) + "s" }
           : { left: P, background: col }}
         onClick={boing}
         role="button" tabIndex={0} aria-label="Bounce"

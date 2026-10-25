@@ -901,10 +901,10 @@ body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot {
 }
 body.rd .rd-lg-span { top: 28px; height: 16px; border-radius: 2px; opacity: 0.2; }
 body.rd .rd-lg-cap { top: 28px; height: 16px; width: 2px; transform: translateX(-1px); }
-body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); box-shadow: 0 0 0 2px var(--bg); cursor: pointer; }
+body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-lg-dot:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 2px; }
 /* the click hop; --hop carries the height multiplier (the 1-in-150 click
-   flies ten times as high), --hopdur the timing for that flight */
+   flies a hundred times as high), --hopdur the timing for that flight */
 body.rd .rd-lg-dot.hop { animation: rd-lg-hop var(--hopdur, 0.62s) ease; }
 @keyframes rd-lg-hop {
   0% { transform: translate(-8px, 0); }
