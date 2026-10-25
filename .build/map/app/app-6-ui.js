@@ -363,17 +363,21 @@ function setView(v, quiet) {
 }
 function setLens(id) {
   if (S.lens === id) return;
+  const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
   if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
 }
 function lensParamChanged() {
+  const hold = walkHold(takeSpot());
   S.sort = null; if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
 }
 /* the wait for an election's data: a ring, centred on the map; on the chamber, in the aisle
    between the Hansard desk and the back rows. Words only when the data fails */
@@ -391,7 +395,8 @@ function showLoading(on, msg) {
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
-  const from = S.year, a = M();
+  // the spot is taken now, while it's fresh: the election may take a while to load
+  const from = S.year, a = M(), spot = takeSpot();
   showLoading(true);
   try { await loadYear(y); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
   showLoading(false);
@@ -404,6 +409,7 @@ async function setYear(y) {
     else if (s.level === "booth") { const id = a.booth.id[s.booth]; const nj = b.booth.byDiv[ni].find((j) => b.booth.id[j] === id); S.sel = nj != null ? { level: "booth", st: s.st, div: ni, booth: nj } : { level: "div", st: s.st, div: ni }; }
     else S.sel = { level: "div", st: s.st, div: ni };
   }
+  const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
   recolor(false);
@@ -412,6 +418,7 @@ async function setYear(y) {
   renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); writeURL();
   $("#mp-meta").textContent = metaLine();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
   schedule();
 }
 function metaLine() {
@@ -553,6 +560,8 @@ $("#story").addEventListener("click", (e) => {
   if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
   const g = e.target.closest("g[data-year]"); if (g) { setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); }
 });
+// a tap names the fixed view's spot before any handler acts on it
+document.addEventListener("click", (e) => walkAim(e.clientY), true);
 $("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-year]"); if (g) setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); });
 // a stop under the pointer starts loading its election, so the click finds it ready
 $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = g.dataset.year === "now" ? "now" : +g.dataset.year; if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });

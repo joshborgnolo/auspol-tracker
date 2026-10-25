@@ -182,10 +182,8 @@ const LENSES = [
 ];
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens walk is keyboard
-// only — a phone scrolls the lens row itself. The All-polls fixed-view walk's
-// contract here: the element at the interaction point holds its viewport
-// position (the figure and lens row sit above the story's reflow, and scrollY
-// never compensates), and a walk has no scroll side effects of its own
+// only — a phone scrolls the lens row itself. On the phone a walk keeps the
+// view fixed (walkHold below), and has no scroll side effects of its own
 function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
@@ -204,11 +202,106 @@ function swipeWatch(el, onSwipe, want) {
   el.addEventListener("touchmove", (e) => { if (g && e.touches.length !== 1) g = null; }, { passive: true });
   el.addEventListener("touchend", (e) => {
     if (!g) return;
-    const t = e.changedTouches[0], dx = t.clientX - g.x, dy = t.clientY - g.y, quick = performance.now() - g.at < 900;
+    const t = e.changedTouches[0], dx = t.clientX - g.x, dy = t.clientY - g.y, quick = performance.now() - g.at < 900, y0 = g.y;
     g = null;
-    if (quick && Math.abs(dx) >= 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) onSwipe(dx < 0 ? 1 : -1);
+    if (quick && Math.abs(dx) >= 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) onSwipe(dx < 0 ? 1 : -1, y0);
   }, { passive: true });
   el.addEventListener("touchcancel", () => { g = null; }, { passive: true });
+}
+
+/* the fixed view — the All-polls walk contract (rdPinScroll's): on the phone
+   layout, where the figure and the story stack in the page's flow, a walk
+   keeps the block the reader touched where it was on screen, and whatever
+   changes above it gives way. The gesture names the spot (walkAim: the lens
+   row, the map, its key, the timeline, or a story block); the render that
+   follows holds it (walkHold: measured just before the DOM changes, put back
+   with one scrollBy straight after, in the same task so before any paint);
+   then for a moment a ResizeObserver catches the late reflows — the story's
+   charts hydrate a frame on — before they paint. A scroll by the reader in
+   that moment folds into the target, and a jump of a screen or more ends the
+   hold. The story is rewritten on every walk, so its blocks are found again
+   by what they are (a section by its heading), and a block the new story
+   lacks hands the hold to the next one below it. A wide screen keeps the
+   story in its own column beside a sticky figure, so the hold is the phone
+   layout's only */
+const PHONE = matchMedia("(max-width: 860px)");
+let walkSpot = null;
+const FIXED_SPOTS = ["#lenses", "#stage", "#legend", "#time"];
+function blockKey(el) {
+  if (el.matches(".st-sec")) {
+    if (el.querySelector("#minich")) return "sec:chamber";
+    const h = el.querySelector("h3");
+    return "sec:" + (h && h.firstChild ? h.firstChild.textContent.trim() : "");
+  }
+  // a note has no identity of its own across stories
+  return el.matches(".st-note") ? null : el.className || el.tagName;
+}
+// the story's blocks with their keys, a repeated key numbered; keyless blocks are left out
+function storyBlocks() {
+  const seen = new Map(), out = [];
+  for (const el of $("#story").children) {
+    let k = blockKey(el);
+    if (!k) continue;
+    const n = seen.get(k) || 0;
+    seen.set(k, n + 1);
+    out.push([el, n ? `${k}#${n}` : k]);
+  }
+  return out;
+}
+// a gesture at viewport y names the block under it (a note's spot goes to the keyed block below it)
+function walkAim(y) {
+  walkSpot = null;
+  if (!PHONE.matches || y == null) return;
+  for (const sel of FIXED_SPOTS) {
+    const el = $(sel), r = el && !el.hidden && el.getBoundingClientRect();
+    if (r && y >= r.top && y < r.bottom) { walkSpot = { el, at: performance.now() }; return; }
+  }
+  const hit = storyBlocks().find(([el]) => el.getBoundingClientRect().bottom > y);
+  if (hit) walkSpot = { key: hit[1], at: performance.now() };
+}
+// the spot a render may hold: only a fresh one (a gesture that changed nothing leaves a stale spot behind)
+function takeSpot() { const s = walkSpot; walkSpot = null; return s && performance.now() - s.at < 1000 ? s : null; }
+let holdEnd = null;
+function walkHold(spot) {
+  if (!spot || !PHONE.matches) return null;
+  if (holdEnd) holdEnd();
+  let cands;
+  if (spot.el) cands = [{ el: spot.el, key: null }];
+  else {
+    const kids = storyBlocks(), i = kids.findIndex(([, k]) => k === spot.key);
+    if (i < 0) return null;
+    cands = kids.slice(i).map(([el, key]) => ({ el, key }));
+  }
+  for (const c of cands) c.top = c.el.getBoundingClientRect().top;
+  return {
+    land() {
+      let el = null, want = 0;
+      for (const c of cands) {
+        const hit = c.key == null ? (c.el.isConnected ? [c.el] : null) : storyBlocks().find(([, k]) => k === c.key);
+        if (hit) { el = hit[0]; want = c.top; break; }
+      }
+      if (!el) return;
+      const html = document.documentElement, anchorWas = html.style.overflowAnchor;
+      // the browser's own scroll anchoring would move the page under the hold's feet
+      html.style.overflowAnchor = "none";
+      let lastY = window.scrollY, timer = 0;
+      const fix = () => {
+        if (!el.isConnected) return end();
+        const dy = window.scrollY - lastY;
+        if (Math.abs(dy) > window.innerHeight) return end();
+        want -= dy;
+        const drift = el.getBoundingClientRect().top - want;
+        if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
+        lastY = window.scrollY;
+      };
+      const ro = new ResizeObserver(fix);
+      const end = () => { if (holdEnd !== end) return; holdEnd = null; ro.disconnect(); clearTimeout(timer); html.style.overflowAnchor = anchorWas; };
+      holdEnd = end;
+      fix();
+      for (const sel of [".mp-sec > .rd-eyebrow", "#view", "#story"]) { const o = $(sel); if (o) ro.observe(o); }
+      timer = setTimeout(end, 700);
+    },
+  };
 }
 
 /* =============================== state =============================== */
@@ -1137,7 +1230,7 @@ canvas.addEventListener("touchcancel", () => { homePinch = null; });
 // at the whole-country fit (a zoomed-in map pans instead). Native controls
 // keep their own gestures (zoom and city buttons, form fields, links), and
 // the list view's own rows
-swipeWatch($(".mp-fig"), (dir) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) walkYear(dir, true); }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
+swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
 // Safari's own pinch events
 let gestureK = 1;
 canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
@@ -3158,17 +3251,21 @@ function setView(v, quiet) {
 }
 function setLens(id) {
   if (S.lens === id) return;
+  const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
   if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
 }
 function lensParamChanged() {
+  const hold = walkHold(takeSpot());
   S.sort = null; if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
 }
 /* the wait for an election's data: a ring, centred on the map; on the chamber, in the aisle
    between the Hansard desk and the back rows. Words only when the data fails */
@@ -3186,7 +3283,8 @@ function showLoading(on, msg) {
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
-  const from = S.year, a = M();
+  // the spot is taken now, while it's fresh: the election may take a while to load
+  const from = S.year, a = M(), spot = takeSpot();
   showLoading(true);
   try { await loadYear(y); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
   showLoading(false);
@@ -3199,6 +3297,7 @@ async function setYear(y) {
     else if (s.level === "booth") { const id = a.booth.id[s.booth]; const nj = b.booth.byDiv[ni].find((j) => b.booth.id[j] === id); S.sel = nj != null ? { level: "booth", st: s.st, div: ni, booth: nj } : { level: "div", st: s.st, div: ni }; }
     else S.sel = { level: "div", st: s.st, div: ni };
   }
+  const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
   recolor(false);
@@ -3207,6 +3306,7 @@ async function setYear(y) {
   renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); writeURL();
   $("#mp-meta").textContent = metaLine();
   if (S.view === "list") renderList(true);
+  if (hold) hold.land();
   schedule();
 }
 function metaLine() {
@@ -3348,6 +3448,8 @@ $("#story").addEventListener("click", (e) => {
   if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
   const g = e.target.closest("g[data-year]"); if (g) { setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); }
 });
+// a tap names the fixed view's spot before any handler acts on it
+document.addEventListener("click", (e) => walkAim(e.clientY), true);
 $("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-year]"); if (g) setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); });
 // a stop under the pointer starts loading its election, so the click finds it ready
 $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = g.dataset.year === "now" ? "now" : +g.dataset.year; if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });

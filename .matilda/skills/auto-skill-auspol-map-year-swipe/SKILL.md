@@ -1,6 +1,6 @@
 ---
 name: auspol-map-year-swipe
-description: "auspol-tracker — the /map/ year/lens WALK machinery (desktop arrow keys, phone swipes) end-to-end: walkYear/walkLens + swipeWatch (with start-target `want` predicate) in app-1-base.js, the year-swipe listener bound to the WHOLE .mp-fig figure — canvas, overlays, election timeline, story — with the native-control exclusion (widened from canvas-only in c28e1b65, 2026-10-26), the keyboard lensHover switch in app-6-ui.js plus the phone lens-ROW SCROLL (81d233eb, 2026-10-26: overflow-x:auto at all widths, the All-polls-menubar way; the old lens-row swipe-to-cycle double-fired the walk), the FIXED-VIEW WALK contract (15a48d60: interaction-point element held by LAYOUT, no scroll compensation exists or is possible — interior story kids churn in opposite directions — walkLens reveals chips horizontally in-row, never scrollIntoView), and the headless touch-probe traps: scrollIntoView + re-fetch centres before EVERY dispatch (off-viewport coordinates send NO touch events and negative assertions pass vacuously), elementFromPoint-verify exclusion spots."
+description: "auspol-tracker — the /map/ year/lens WALK machinery (desktop arrow keys, phone swipes) end-to-end: walkYear/walkLens + swipeWatch (with start-target `want` predicate) in app-1-base.js, the year-swipe listener bound to the WHOLE .mp-fig figure — canvas, overlays, election timeline, story — with the native-control exclusion (widened from canvas-only in c28e1b65, 2026-10-26), the keyboard lensHover switch in app-6-ui.js plus the phone lens-ROW SCROLL (81d233eb, 2026-10-26: overflow-x:auto at all widths, the All-polls-menubar way; the old lens-row swipe-to-cycle double-fired the walk), the FIXED-VIEW WALK hold (2026-10-26, superseding 15a48d60's 'no compensation possible' verdict: on the ≤860px layout walkAim names the touched block — lens row, stage, legend, timeline or a story block keyed by its heading — and walkHold measures it before the render, scrollBys it back in the same task, then a 700ms ResizeObserver catches the hydrateDists reflow pre-paint; walkLens still reveals chips horizontally in-row, never scrollIntoView), and the headless touch-probe traps: scrollIntoView + re-fetch centres before EVERY dispatch (off-viewport coordinates send NO touch events and negative assertions pass vacuously), elementFromPoint-verify exclusion spots."
 source: auto-skill
 extracted_at: '2026-10-26T11:30:00.000Z'
 ---
@@ -76,49 +76,60 @@ gesture double-fired the walk).
 page.css, probe-pinned. Neither conflicts with the swipe: vertical
 dominance still hands drags to the page.
 
-## The fixed-view walk contract (15a48d60) — why /map/ has NO scroll compensation
+## The fixed-view walk hold (2026-10-26) — walkAim / walkHold in app-1-base.js
 
-User request: "implement fixed-view swipe just like in eg all polls
-table". The All-polls rdPinScroll contract transplants as TWO
-properties: the element AT THE INTERACTION POINT holds a constant
-viewport position through the walk, and a walk has zero scroll side
-effects of its own. Measured verdict: the map ALREADY satisfied the
-first by layout (the figure, lens row and election timeline — every
-swipe surface — sit ABOVE the story column's reflow, and no walk path
-ever touches scrollY), so the whole landing was the second: removing
-walkLens's scrollIntoView page-yank. A full scroll-compensation hold
-was built, instrumented, and ABANDONED as unsound — record the reasons
-so nobody rebuilds it:
+User, on 15a48d60's layout-only version: "it's not very fixed. bring it
+in line with the standard in eg all polls … this really only applies to
+small screens". 15a48d60 measured the figure, lens row and timeline
+(they do hold by layout: 0px through every walk) but wrongly concluded
+the story could not be held. Measured with Safari's missing
+overflow-anchor simulated (`* { overflow-anchor: none !important }`), a
+year swipe on a story block moved it 18–507px, in TWO steps (the render,
+then hydrateDists a frame later). Its reasons were anchor-choice errors,
+not impossibilities:
 
-1. **The story column's top edge is layout-pinned.** `#story` hangs off
-   `#time`'s bottom + a margin-top, so kid0's viewport top never moves
-   on a walk (measured dy≈0 every rAF tick) — any anchor on the topmost
-   child can never fire a correction. Don't read "no correction" as
-   "held"; the anchor was inert.
-2. **Interior children genuinely move, in OPPOSITE directions on one
-   walk** (kid2 +29.2 while kid3 −87.1 in one capture) — real content
-   height churn from the new year's copy, not compensable jolt. No
-   single scrollBy can pin all visible elements, so compensation is
-   unsound in principle here. This is the walk-floor lesson
-   (auspol-walk-floor: kill the reflow, never chase scroll corrections)
-   one step further: some layouts can't be corrected at all — measure
-   whether the INTERACTION POINT moves before building machinery, and
-   treat interior churn as content, not defect.
-3. **Element refs can't survive a walk anyway.** renderStory rewrites
-   `#story` via innerHTML every year change, so any captured `el`
-   detaches (`isConnected === false`); a hold would need child-INDEX
-   anchoring, and (1) makes the index trivially motionless.
+1. "kid0 never moves" — right, which is why the anchor must be the block
+   UNDER THE FINGER, not the story's top.
+2. "interior kids move in opposite directions" — irrelevant: like
+   All-polls, hold the touched block; everything else gives way.
+3. "element refs die (innerHTML)" and child INDEX shifts between years
+   (Now adds "Since the election" + a note) — so blocks are found again
+   by KEY: `blockKey` = `sec:<h3 first text>` (`sec:chamber` for the
+   #minich section, whose heading differs Now v elections), else the
+   className; `.st-note` is keyless; repeats get `#n`. A key the new
+   story lacks hands the hold to the next keyed block below it.
 
-Diagnostics that paid off in an IIFE bundle (map.js exposes nothing but
-`window.__map` to page.evaluate): monkey-patch scroll APIs into a page
-array from evaluate (`window.__log` + wrapped scrollBy/scrollTo — zero
-calls logged across all four walk scenarios was the proof), and for
-in-bundle state drop temporary `if (window.__log) window.__log.push(…)`
-lines into the app sources (assemble, probe, revert — never commit).
-`.matilda/map-walk-drift-probe.mjs` (uncommitted, same MAP_ROOT env
-pattern as the keys probe) asserts `scrollY` Δ0 across year
-keyboard-walk, year swipe, lens row swipe and lens keyboard-walk;
-interior story churn is asserted only as notes.
+Machinery (phone layout only: `PHONE = matchMedia("(max-width: 860px)")`
+— wide screens keep the story in its own column beside a sticky figure):
+
+- `walkAim(y)` — the gesture names the spot: a FIXED_SPOTS element
+  (`#lenses #stage #legend #time`) spanning y, else the first story
+  block whose bottom is below y. Called by the year swipe (swipeWatch
+  now passes the touchstart y as onSwipe's 2nd arg) and by a
+  CAPTURE-phase document click listener (every tap, before any
+  handler). `takeSpot()` only returns a spot < 1000ms old (a tap that
+  changed nothing leaves a stale one).
+- `walkHold(spot)` → `{ land() }`. setYear takes the spot BEFORE its
+  `await loadYear` (it may be slow) and calls walkHold after it, so
+  the measurement is the pre-swap position; setLens and
+  lensParamChanged wrap their renders the same way. `land()` re-finds
+  the block, `scrollBy`s the drift in the same task (pre-paint), sets
+  `overflow-anchor: none` on <html> (Chrome's anchoring would move the
+  page under the hold and read as a reader scroll), and for 700ms a
+  ResizeObserver on the eyebrow, #view and #story re-runs `fix()`:
+  reader scroll folds in (`want -= dy`, the 4ad3144 sign), a jump of a
+  screen or more ends the hold, a new hold ends the old one.
+
+Probe: `.matilda/map-walk-hold-probe.mjs` (uncommitted scratch,
+`MAP_ROOT=<tree> [W=… ANCHOR=1 SC2=1 V=1] node …`) — per-rAF trajectory
+of the touched element (story blocks tracked by the same key rule)
+through map/timeline/story/chamber swipes, a timeline tap and lens taps;
+max |Δ| ≤ 1.5px. Samples are rAF-start so they approximate painted
+frames (the pre-fix two-step −507/−248 showed up). SC2=1 checks a reader
+scroll 150px mid-hold lands exactly 150px on. Probe traps: pass setup
+functions as source and INVOKE them (`(${src})()`); stop each run's rAF
+recorder (old loops pushed into the next run's trace — fake alternating
+0/612px traces); a repeat tap on the selected year changes nothing.
 
 ## Headless probe — `.matilda/map-keys-swipe-probe.mjs`
 
