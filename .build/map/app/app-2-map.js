@@ -124,7 +124,9 @@ function quietness(i, now) {
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
   return all;
 }
-function drawGeo(m, alpha) {
+// streetA: how strongly the streets show between the fills and the borders
+// (only for the year in view; the frame passes it once per paint)
+function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -143,6 +145,7 @@ function drawGeo(m, alpha) {
     ctx.fill(g.paths[i]);
     if (filt && !passes(m, i)) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
   }
+  if (streetA > 0) drawStreets(streetA);
   ctx.lineJoin = "round"; ctx.lineCap = "round";
   ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k; ctx.stroke(g.meshDiv);
   ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.meshState);
@@ -267,6 +270,128 @@ function drawLabels(m) {
     }
   }
   ctx.restore();
+}
+
+/* ----- the streets -----
+   From suburb zoom in, Esri's grey canvas tiles show the streets through the
+   seat fills. The tiles are Web Mercator and the map is a conic projection, so
+   each tile goes down as an affine fit to its four corners carried through
+   the map's projection (off by a fifth of a pixel at most at the zooms they
+   show at). They are drawn on a canvas of their own, their plain land taken
+   to nothing, and laid over the fills - multiplied on paper, screened on the
+   dark page - so the seat colours stay where they were and only the streets,
+   blocks and water mark them. */
+const STREETS = { k0: 45, k1: 110, zMin: 3, zMax: 16, cap: 360, live: 12 };
+// the plain land of each sheet, taken to white (paper) or black (dark page)
+const STREET_LAND = { light: 239, dark: 71 };
+const streetURL = (dark, z, x, y) => `https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark ? "Dark" : "Light"}_Gray_Base/MapServer/tile/${z}/${y}/${x}`;
+const streetK = () => smooth(STREETS.k0, STREETS.k1, T.k);
+const tiles = new Map();
+let streetCv = null, streetUse = 0, streetLive = 0;
+// lon/lat to Web Mercator's unit square, and back
+const merc = (ll) => { const s = Math.sin((ll[1] * Math.PI) / 180); return [(ll[0] + 180) / 360, 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)]; };
+const unmerc = (x, y) => [x * 360 - 180, (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI];
+function tileAt(dark, z, x, y, want) {
+  const key = (dark ? "d" : "l") + z + "/" + x + "/" + y;
+  let t = tiles.get(key);
+  if (!t && want && streetLive < STREETS.live) {
+    t = { img: new Image(), ready: 0, failed: false, used: 0 };
+    tiles.set(key, t); streetLive++;
+    t.img.crossOrigin = "anonymous";
+    t.img.src = streetURL(dark, z, x, y);
+    t.img.decode().then(() => { t.ready = performance.now(); }, () => { t.failed = true; })
+      .finally(() => { streetLive--; schedule(); });
+    if (tiles.size > STREETS.cap) pruneTiles();
+  }
+  if (t) t.used = streetUse;
+  return t;
+}
+function pruneTiles() {
+  const old = [...tiles].filter(([, t]) => (t.ready || t.failed) && t.used < streetUse).sort((a, b) => a[1].used - b[1].used);
+  for (const [k] of old.slice(0, tiles.size - Math.round(STREETS.cap * 0.75))) tiles.delete(k);
+}
+// a tile's corners on the canvas, in device pixels: top-left, top-right, bottom-left, bottom-right
+function tileQuad(z, x, y) {
+  const n = 2 ** z, out = [];
+  for (const [u, v] of [[x, y], [x + 1, y], [x, y + 1], [x + 1, y + 1]]) {
+    const p = proj(unmerc(u / n, v / n));
+    out.push([(p[0] * T.k + T.x) * dpr, (p[1] * T.k + T.y) * dpr]);
+  }
+  return out;
+}
+// an image (or the part of it at sx, sy, sw square) laid on a quad by the
+// affine that best fits its four corners, half a pixel over its edges so no
+// seam opens between neighbours
+function drawQuad(g, img, sx, sy, sw, q, alpha) {
+  const [a, b, c, d] = q;
+  const B = [(b[0] - a[0] + d[0] - c[0]) / 2, (b[1] - a[1] + d[1] - c[1]) / 2];
+  const C = [(c[0] - a[0] + d[0] - b[0]) / 2, (c[1] - a[1] + d[1] - b[1]) / 2];
+  const o = [(a[0] + b[0] + c[0] + d[0]) / 4 - (B[0] + C[0]) / 2, (a[1] + b[1] + c[1] + d[1]) / 4 - (B[1] + C[1]) / 2];
+  const e = 0.5 / Math.max(1, Math.min(Math.hypot(B[0], B[1]), Math.hypot(C[0], C[1])));
+  g.globalAlpha = alpha;
+  g.setTransform(B[0], B[1], C[0], C[1], o[0], o[1]);
+  g.drawImage(img, sx, sy, sw, sw, -e, -e, 1 + 2 * e, 1 + 2 * e);
+}
+function drawStreets(alpha) {
+  if (!proj || alpha <= 0.004) return;
+  const dark = TH.dark, W = canvas.width, H = canvas.height, now = performance.now();
+  streetUse++;
+  const inv = (sx, sy) => merc(proj.invert([(sx - T.x) / T.k, (sy - T.y) / T.k]));
+  // the zoom whose pixels match the screen's, read at the middle of the view
+  const m0 = inv(Wpx / 2, Hpx / 2), m1 = inv(Wpx / 2 + 64, Hpx / 2);
+  const per = Math.hypot(m1[0] - m0[0], m1[1] - m0[1]) / 64;
+  const z = clamp(Math.round(Math.log2(dpr / (per * 256)) - 0.2), STREETS.zMin, STREETS.zMax), n = 2 ** z;
+  // the tiles under the view: its rim carried into Mercator
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [u, v] of [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5]]) {
+    const p = inv(u * Wpx, v * Hpx);
+    x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
+  }
+  const tx0 = Math.floor(x0 * n), tx1 = Math.floor(x1 * n), ty0 = Math.floor(y0 * n), ty1 = Math.floor(y1 * n);
+  if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 400) return; // never at these zooms; a guard
+  if (!streetCv) streetCv = document.createElement("canvas");
+  if (streetCv.width !== W || streetCv.height !== H) { streetCv.width = W; streetCv.height = H; }
+  const g = streetCv.getContext("2d"), land = dark ? STREET_LAND.dark : STREET_LAND.light;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "source-over"; g.globalAlpha = 1;
+  g.fillStyle = `rgb(${land},${land},${land})`; g.fillRect(0, 0, W, H);
+  for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+    const q = tileQuad(z, tx, ty);
+    if (Math.max(q[0][0], q[1][0], q[2][0], q[3][0]) < 0 || Math.min(q[0][0], q[1][0], q[2][0], q[3][0]) > W
+      || Math.max(q[0][1], q[1][1], q[2][1], q[3][1]) < 0 || Math.min(q[0][1], q[1][1], q[2][1], q[3][1]) > H) continue;
+    const t = tileAt(dark, z, tx, ty, true);
+    const f = t && t.ready ? clamp((now - t.ready) / 200, 0, 1) : 0;
+    if (f < 1) {
+      // until it arrives (and while it fades in): the nearest coarser tile on hand,
+      // else the finer ones of the zoom just left
+      let held = false;
+      for (let up = 1; up <= 6 && z - up >= STREETS.zMin && !held; up++) {
+        const s = 2 ** up, px = tx >> up, py = ty >> up, pt = tileAt(dark, z - up, px, py, false);
+        if (pt && pt.ready) { const w = 256 / s; drawQuad(g, pt.img, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true; }
+      }
+      if (!held && z < STREETS.zMax) for (let k = 0; k < 4; k++) {
+        const cx = 2 * tx + (k & 1), cy = 2 * ty + (k >> 1), ct = tileAt(dark, z + 1, cx, cy, false);
+        if (ct && ct.ready) drawQuad(g, ct.img, 0, 0, 256, tileQuad(z + 1, cx, cy), 1);
+      }
+      if (t && t.ready) needFrame = true;
+    }
+    if (f > 0) drawQuad(g, t.img, 0, 0, 256, q, f);
+  }
+  // the plain land to nothing: lifted to white on paper, differenced to black on the dark page
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+  g.globalCompositeOperation = dark ? "difference" : "lighter";
+  const lift = dark ? land : 255 - land;
+  g.fillStyle = `rgb(${lift},${lift},${lift})`; g.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha * (dark ? 0.85 : 1);
+  ctx.globalCompositeOperation = dark ? "screen" : "multiply";
+  ctx.drawImage(streetCv, 0, 0);
+  ctx.restore();
+}
+let creditOn = false;
+function showCredit(on) {
+  if (on === creditOn) return;
+  creditOn = on; $("#credit").hidden = !on;
 }
 
 /* ----- framing ----- */

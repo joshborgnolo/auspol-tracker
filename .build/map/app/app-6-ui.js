@@ -383,11 +383,12 @@ function frame(ts) {
     if (t < 1) again = true; else { morph = null; again = true; }
   } else if (S.view === "map") {
     if (yearFade && Y[yearFade.from] && Y[yearFade.from].divs) drawGeo(Y[yearFade.from], 1 - yf);
-    drawGeo(m, yearFade ? yf : 1);
+    drawGeo(m, yearFade ? yf : 1, streetK());
     drawFocus(m); drawBooths(m); drawLabels(m);
   } else if (S.view === "chamber") {
     drawChamberMain(m, 1);
   }
+  showCredit(!morph && S.view === "map" && streetK() > 0.02);
   if (miniCh.canvas && (fade || chAnim || again || miniCh.dirty)) { paintMiniChamber(); miniCh.dirty = false; }
   if (needFrame) { again = true; needFrame = false; }
   if (again) schedule();
