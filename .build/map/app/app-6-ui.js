@@ -75,6 +75,41 @@ function renderLegend() {
   const el = $("#legend"), m = M();
   if (!m || S.view === "list") { el.hidden = true; return; }
   el.hidden = false;
+  el.innerHTML = legendHTML(m);
+  holdLegendHeight(m);
+}
+/* the key holds the height of its tallest lens, so changing lens never moves the figure
+   (the stage below it on a wide screen, the timeline below it on a phone) */
+const legendHeights = new Map();
+function holdLegendHeight(m) {
+  const el = $("#legend"), w = el.clientWidth;
+  if (!w) return;
+  const key = [w, S.view, m.year, boothsShown()].join("|");
+  if (!legendHeights.has(key)) {
+    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index };
+    const probe = el.cloneNode(false);
+    probe.removeAttribute("id"); probe.removeAttribute("hidden");
+    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
+    el.parentNode.appendChild(probe);
+    let hMax = 0;
+    try {
+      for (const lens of LENSES.map((l) => l.id))
+        for (const mode of lens === "tpp" || lens === "fp" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null])
+          for (const seat of S.view === "chamber" && m.seating ? ["plan", "sort"] : [S.seat]) {
+            Object.assign(S, { lens, seat });
+            if (lens === "tpp") S.tppMode = mode;
+            if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
+            if (lens === "seifa") S.index = mode;
+            probe.innerHTML = legendHTML(m);
+            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+          }
+    } finally { Object.assign(S, keep); probe.remove(); }
+    legendHeights.set(key, Math.ceil(hMax));
+  }
+  el.style.boxSizing = "border-box";
+  el.style.minHeight = legendHeights.get(key) + "px";
+}
+function legendHTML(m) {
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
   const grad = (tbl, from, to) => { const st = []; for (let k = 0; k <= 10; k++) st.push(`${css(tbl[Math.round(lerp(from, to, k / 10))])} ${k * 10}%`); return `linear-gradient(90deg, ${st.join(",")})`; };
   const ticks = (vals, lo, hi, fmt) => `<div class="lg-ticks">${vals.map((v) => `<span style="left:${(100 * (v - lo)) / (hi - lo)}%">${fmt(v)}</span>`).join("")}</div>`;
@@ -147,7 +182,7 @@ function renderLegend() {
     h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s seating plan of ${m.seating.plan}${m.seating.note ? `, ${m.seating.note}` : ""}.` : `By ${by}, each side from the Speaker’s end.`}</span></div>`;
   }
   if (boothsOn) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
-  el.innerHTML = h;
+  return h;
 }
 
 /* =============================== the timeline =============================== */

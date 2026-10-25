@@ -401,7 +401,11 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-lensrow { flex-wrap: wrap; }
   .mp-search { order: -1; width: 100%; margin: 0 0 10px; }
   .mp-fig { grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
-  .mp-view { position: relative; top: 0; grid-column: 1; grid-row: 1; height: min(72vh, 620px); min-height: 400px; }
+  /* the stage keeps one height whatever the lens: the key below it grows the view, never
+     shrinks the figure; tall enough for the chamber to fill the width (its 19.1 x 22.8 box,
+     plus the bloc labels above and the majority label below) */
+  .mp-view { position: relative; top: 0; grid-column: 1; grid-row: 1; height: auto; min-height: 0; max-height: none; container-type: inline-size; }
+  .mp-stage { flex: none; height: min(68svh, 560px); height: clamp(320px, calc(1.194 * 100cqw + 76px), min(68svh, 620px)); }
   .mp-story { grid-column: 1; grid-row: 2; margin-top: 18px; }
   .mp-views { margin-bottom: 0; }
   .mp-notes .cols { grid-template-columns: minmax(0, 1fr); gap: 4px; }
@@ -419,7 +423,6 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-views .rd-tab svg { margin: 0; width: 18px; height: 18px; }
   .rd-eyebrow .rd-meta { order: 4; flex-basis: 100%; }
   .mp-lenses .rd-tab { padding: 0 10px; font-size: 14.5px; }
-  .mp-view { height: min(64vh, 520px); min-height: 360px; }
   .mp-time { height: 58px; }
   .st-hed { font-size: 27px; }
   .hero-num { font-size: 44px; }

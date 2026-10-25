@@ -388,9 +388,18 @@ function drawChamber(g, m, w, h, opts) {
     if (opts.big) {
       g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2);
       g.textAlign = p2[0] < -0.5 ? "right" : p2[0] > 0.5 ? "left" : below ? "right" : "center"; g.textBaseline = below ? "top" : "middle";
-      const mt = `${ch.maj} for a majority`, mx = X(p2[0]) + (below && Math.abs(p2[0]) <= 0.5 ? -6 : 0), my = Yp(p2[1]);
+      const mt = `${ch.maj} for a majority`, tw = g.measureText(mt).width;
+      let mx = X(p2[0]) + (below && Math.abs(p2[0]) <= 0.5 ? -6 : 0), my = Yp(p2[1]);
+      // a chamber filling the width (a phone): kept on screen, slid down off the floor
+      const x0 = () => (g.textAlign === "right" ? mx - tw : g.textAlign === "center" ? mx - tw / 2 : mx);
+      if (x0() < 4) {
+        mx += 4 - x0();
+        const floor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v > 0 && Math.hypot(u, v) <= rO + 0.5; };
+        const top = g.textBaseline === "top" ? 0 : -8;
+        while (my < h - 18 && [x0(), x0() + tw / 2, x0() + tw].some((px) => floor(px, my + top) || floor(px, my + top + 15))) my += 2;
+      }
       g.fillText(mt, mx, my);
-      claim(mx, my, g.measureText(mt).width, 16, g.textAlign, g.textBaseline);
+      claim(mx, my, tw, 16, g.textAlign, g.textBaseline);
       // the dashed line itself, beyond the benches
       const ex = X(e[0]), ey = Yp(e[1]), fx = X(p2[0]), fy = Yp(p2[1]);
       occ.push({ x0: Math.min(ex, fx) - 3, y0: Math.min(ey, fy) - 3, x1: Math.max(ex, fx) + 3, y1: Math.max(ey, fy) + 3 });
@@ -403,6 +412,33 @@ function drawChamber(g, m, w, h, opts) {
     const govName = blocName(m, ch.gov), oppName = blocName(m, ch.opp);
     const yMid = Yp(-6.6);
     const room = X(-rO - 0.8);
+    // no room beside the benches: the blocs head the chamber, either side of the Speaker
+    let bandRoom = null;
+    const band = room <= 70 && F.oy + geom.box.y0 * s >= 56;
+    if (band) {
+      const y0 = Yp(geom.box.y0);
+      const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
+      // the roles go first when the Speaker's name would touch them
+      g.font = `400 12px ${SANS}`;
+      const half = X(0) - X(geom.box.x0), need = (g.measureText(speakerName(m) || "").width) / 2 + 10;
+      const nGov = String(ch.nGov + (spFam === ch.gov ? 1 : 0)), nOpp = String(ch.nOpp + (spFam === ch.opp ? 1 : 0));
+      g.font = `500 24px ${SANS}`; const wNum = Math.max(g.measureText(nGov).width, g.measureText(nOpp).width);
+      g.font = `400 12px ${SANS}`; const withRole = half - wNum - 5 - g.measureText("Government").width >= need;
+      const bandLabel = (name, n, fam, role, x, align) => {
+        if (!withRole) role = "";
+        lab(name, x, y0 - 34, align);
+        g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `500 24px ${SANS}`; g.fillStyle = css(th.party[fam]); g.fillText(n, x, y0 - 9);
+        const wn = g.measureText(n).width;
+        g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3); g.fillText(role, align === "left" ? x + wn + 5 : x - wn - 5, y0 - 9);
+        const wr = g.measureText(role).width;
+        g.font = `600 13px ${SANS}`; const wd = Math.max(g.measureText(name).width, wn + 5 + wr);
+        claim(x, y0 - 48, wd, 44, align, "top");
+        return wd;
+      };
+      const wl = bandLabel(govName, nGov, ch.gov, "Government", X(geom.box.x0), "left");
+      const wr = bandLabel(oppName, nOpp, ch.opp, "Opposition", X(geom.box.x1), "right");
+      bandRoom = Math.min(X(0) - X(geom.box.x0) - wl, X(geom.box.x1) - X(0) - wr) * 2 - 16;
+    }
     if (room > 70) {
       const blocLabel = (name, n, fam, role, x, align) => {
         lab(name, x, yMid - 34, align); fig(n, th.party[fam], x, yMid, align);
@@ -445,7 +481,7 @@ function drawChamber(g, m, w, h, opts) {
         const room = side === "left" ? w - bx >= 150 : bx >= 150;
         // clear of the other labels, and off the chamber's floor (a phone has no room beside it)
         const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= rO + 0.5 : Math.hypot(u, v) <= rO + 0.5; };
-        const clear = !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
+        const clear = by + ht <= h - 2 && !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
           && ![[x0, by], [x0 + wMax, by], [x0, by + ht], [x0 + wMax, by + ht], [x0 + wMax / 2, by], [x0, by + ht / 2], [x0 + wMax, by + ht / 2]].some(([px, py]) => onFloor(px, py));
         return { side, bx, by, lines, wMax, ht, room, clear };
       };
@@ -465,7 +501,16 @@ function drawChamber(g, m, w, h, opts) {
     }
     // the Speaker, named above the dais
     const sp = m.divs[m.speaker];
-    if (sp) {
+    if (sp && bandRoom != null) {
+      // between the blocs' labels: two lines, the seat dropped if the name alone fits
+      const y = Yp(geom.box.y0);
+      g.textBaseline = "alphabetic"; g.textAlign = "center";
+      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText("Speaker", X(0), y - 34);
+      g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
+      const full = `${speakerName(m)}, ${sp.n}`, nm = g.measureText(full).width <= bandRoom ? full : speakerName(m);
+      g.fillText(nm, X(0), y - 12);
+      claim(X(0), y - 48, Math.max(g.measureText(nm).width, 50), 44, "center", "top");
+    } else if (sp) {
       const a = "Speaker", b = `  ${speakerName(m)}, ${sp.n}`, y = Yp(geom.box.y0) - 9;
       g.textBaseline = "middle"; g.textAlign = "left";
       g.font = `600 12px ${SANS}`; const wa = g.measureText(a).width;
@@ -570,7 +615,8 @@ function chamberHit(m, px, py) {
   for (const q of chMain.drawn) { const d = Math.hypot(px - q.x, py - q.y); if (d < q.r + 3 && d < bd) { bd = d; best = q.i; } }
   return best == null ? null : { kind: "div", i: best };
 }
-function chamberPads() { return isPhone() ? { t: 30, r: 10, b: 52, l: 10 } : { t: 34, r: 150, b: 66, l: 150 }; }
+// a phone has no room beside the chamber: it fills the width, its bloc labels in a band above
+function chamberPads() { return isPhone() ? (Wpx < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 52, l: 10 }) : { t: 34, r: 150, b: 66, l: 150 }; }
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sd = selDiv();
