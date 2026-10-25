@@ -1711,9 +1711,11 @@ function RdApDetail({
     if (!isDem || !p.grp) return null;
     const G = D.demoGroups || [];
     const raw = Object.values(p.grp.d || {}).flatMap(rows => rows.map(r => r[0]));
-    const pooled = (p.grp.v || []).map((v, i) => v ? G[i] : null).filter(Boolean);
+    const ar = p.grp.ar || [];
+    const pooled = (p.grp.v || []).map((v, i) => v && !ar.includes(G[i]) ? G[i] : null).filter(Boolean);
     const MERGED = ["Below Year 12", "Year 12", "School", "TAFE", "TAFE or college", "SA", "WA", "ACT/NT/Tas"];
-    const alone = raw.filter(l => !pooled.includes(l) && !MERGED.includes(l));
+    const ageRead = ar.length ? (p.grp.d.age || []).map(r => r[0]) : [];
+    const alone = raw.filter(l => !pooled.includes(l) && !MERGED.includes(l) && !ageRead.includes(l));
     const T = D.demographics || {};
     const base = n => n === "RedBridge" ? "RedBridge/Accent" : n;
     const inWin = (T.polls || []).some(q => base(q.pollster) === p.pollster && q.dateLabel === p.field);
@@ -1722,7 +1724,7 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "Printed"), React.createElement("span", null, raw.length, " groups across ", rdNumWord(nCuts), " breakdown", nCuts === 1 ? "" : "s", ", ", p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table", "."), React.createElement("span", {
       className: "rd-apd-k"
-    }, "In Who votes for whom"), p.grp.x === "reuse" ? React.createElement("span", null, "None of its groups joins the pooled figures: its fieldwork contains ", p.pollster.replace(/ \(MRP\)$/, ""), "\u2019s own regular polls, whose groups already count, and it is taken to reuse their respondents.") : React.createElement("span", null, pooled.length ? React.createElement(React.Fragment, null, pooled.length, " of its groups join") : "None of its groups joins", " the pooled figures", alone.length ? React.createElement(React.Fragment, null, "; ", rdApLdJoin(alone), " ", alone.length === 1 ? "stays" : "stay", " here alone, since no other pollster draws ", alone.length === 1 ? "that group" : "those groups", " the same way") : "", "."), T.window && React.createElement(React.Fragment, null, React.createElement("span", {
+    }, "In Who votes for whom"), p.grp.x === "reuse" ? React.createElement("span", null, "None of its groups joins the pooled figures: its fieldwork contains ", p.pollster.replace(/ \(MRP\)$/, ""), "\u2019s own regular polls, whose groups already count, and it is taken to reuse their respondents.") : React.createElement("span", null, pooled.length ? React.createElement(React.Fragment, null, pooled.length, " of its groups join") : "None of its groups joins", " the pooled figures", ar.length ? React.createElement(React.Fragment, null, pooled.length ? ", and" : ", but", " its age bands give estimates for ", rdApLdJoin(ar), ", the groups other pollsters print") : "", alone.length ? React.createElement(React.Fragment, null, "; ", rdApLdJoin(alone), " ", alone.length === 1 ? "stays" : "stay", " here alone, since no other pollster draws ", alone.length === 1 ? "that group" : "those groups", " the same way") : "", "."), T.window && React.createElement(React.Fragment, null, React.createElement("span", {
       className: "rd-apd-k"
     }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
   })();

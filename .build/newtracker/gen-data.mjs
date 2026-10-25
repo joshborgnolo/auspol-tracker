@@ -62,7 +62,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
 import { fieldTbcUrl } from "./field-tbc.mjs";
-import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, INCOME_POOL_BASES, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize as harmonizeRaw, ageStandardise, INCOME_GRIDS, INCOME_STD_BANDS, INCOME_POOL_BASES, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -3533,6 +3533,16 @@ const INCOME_DIST = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "income-dist.json"), "utf8")); }
   catch { return null; }
 })();
+/* adults by single year of age, along which a house's age bands are read
+   at the common 18–34 / 35–54 / 55+ it doesn't print (§7g-age; built by
+   .build/extract-age-dist.mjs). Every harmonize here reads through it, so
+   the pools, the group-view dots, the export and the roster agree. */
+const AGE_DIST = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "age-dist.json"), "utf8")); }
+  catch { return null; }
+})();
+const harmonize = (w) => harmonizeRaw(w, { ageDist: AGE_DIST });
 // the wave's poll row: its own date, or – Resolve's series date sits a day or
 // so off its polls.json row – the nearest row of that house within four days
 const demoPollOf = (w) => {
@@ -3673,6 +3683,11 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   const n = DEMO_GROUPS.map((g) => Math.round(rowN(p) * DEMO_SHARE[g]));
   while (v.length && v[v.length - 1] == null) { v.pop(); n.pop(); }
   const tot = demoTotalOf(w, p);
+  /* the age groups read off the house's own bands rather than printed
+     (§7g-age): the facet keeps to printed pairs and the opened poll says
+     which of its groups count as estimates */
+  const ag = reuse ? null : ageStandardise(w.dims && w.dims.age, AGE_DIST);
+  const ar = ag ? ag.read.filter((g) => v[DEMO_GROUPS.indexOf(g)]) : [];
   const d = Object.fromEntries(DEMO_RAW_DIMS.filter((k) => w.dims && w.dims[k]).map((k) => [k,
     Object.entries(w.dims[k]).map(([g, s]) => [g, ["alp", "lnp", "grn", "onp", "oth"].map((q) => (s[q] != null ? r1(+s[q]) : null))])]));
   /* a pooled release's parts (pooledParts), where its groups reach the
@@ -3685,7 +3700,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   // a wave everything harmonised out of (the pooled birth-country release
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, d, n, ...(reuse ? { x: "reuse" } : {}), ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
+    { r: w.read, v, d, n, ...(reuse ? { x: "reuse" } : {}), ...(ar.length ? { ar } : {}), ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
       ...(pp ? { sp: pp.map((q) => ({ x: mx(ymOf(q.date)) + (dayOf(q.date) - 15) / 365, ym: ymOf(q.date), k: rowN(q) / rowN(p), l: fwLabel(q.dateStart, q.date) })) } : {}) });
 }
 /* Solo single-territory readings for the ACT/NT/Tas group. Displayed on the
@@ -5717,6 +5732,7 @@ const { demo: demographics, income: demoIncome } = (() => {
   const iRows = {}, iRowsM = {}, iRowsT = {};
   const inWindow = [];                            // the waves the window holds, for the credits
   const incInWindow = [];                         // the income tab's own, keeping the shares apart
+  const ageEst = new Map();                       // house -> the age groups its in-window waves had read, not printed
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot) continue;
@@ -5796,6 +5812,10 @@ const { demo: demographics, income: demoIncome } = (() => {
     // in the window when any part is; ranked by its newest
     const ds = reads.map((r) => ddays(refNow, r.mid)).filter((d) => d >= 0 && d <= SPARSE_K.window);
     if (used && ds.length) inWindow.push({ w, p, d: Math.min(...ds) });
+    /* §7g-age: a house whose age groups in the window are read off its own
+       bands, and which groups – the Age tab's dek says whose are estimates */
+    const agR = used && ds.length ? ageStandardise(w.dims && w.dims.age, AGE_DIST) : null;
+    if (agR) for (const g of agR.read) if (h.age && h.age[g]) (ageEst.get(w.pollster) || ageEst.set(w.pollster, new Set()).get(w.pollster)).add(g);
     if (iUsed && ds.length) incInWindow.push({ w, p, d: Math.min(...ds), band: inc ? inc.band : null });
   }
   const sets = demoBuild(rows, rowsM, DEMO_SETS.map((s) => ({ tab: s.tab, id: s.id, label: s.label, groups: s.groups })), allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
@@ -5817,6 +5837,13 @@ const { demo: demographics, income: demoIncome } = (() => {
     const rowsTg = Object.fromEntries(DEMO_KEYS.map((k) => [k, iRowsT["income|" + grp + "|" + k] || []]));
     DEMO_TEST_MONTHLY.set("income|" + grp, testMonthly(rowsTg));
   }
+  /* the age set's estimated figures: the houses in pooling order, the
+     groups in the set's own order */
+  const ageSet = sets.find((s) => s.id === "age");
+  if (ageSet && ageEst.size) ageSet.est = {
+    houses: ageSet.houses.filter((h) => ageEst.has(h)),
+    groups: ageSet.groups.map((g) => g.label).filter((g) => [...ageEst.values()].some((x) => x.has(g))),
+  };
   const tabs = DEMO_TABS.map((t) => ({ ...t, sets: sets.filter((s) => s.tab === t.id).map(({ tab, ...s }) => s) }))
     .filter((t) => t.sets.length);
   if (!tabs.length) return { demo: null, income: null };

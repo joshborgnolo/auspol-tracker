@@ -300,7 +300,7 @@ function RdPrimary({
           label: p.name,
           meta: demoPartMeta(q, s),
           party: p.id,
-          sub: demoPartSub(q, s, q.grp.n && q.grp.n[gi])
+          sub: demoReadSub(q, sel.label, demoPartSub(q, s, q.grp.n && q.grp.n[gi]))
         };
       }).filter(Boolean);
     }).concat(inDom(q.x) ? soloDotsOf(q) : []);
@@ -2959,6 +2959,11 @@ function rdDemoDek(T, tab, party) {
       out.push("The two splits disagree here: " + short(up) + " sit above all voters but " + short(dn) + " below" + (apart ? ", and different pollsters ask each" : "") + ".");
     }
   }
+  const est = tab.id === "age" && (tab.sets.find(s => s.est) || {}).est;
+  if (est && est.houses.length && est.groups.length) {
+    const and = a => a.length < 3 ? a.join(" and ") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+    out.push(and(est.houses.map(h => demoHouse(h) + "’s")) + " figures for " + and(est.groups) + " are estimated from " + (est.houses.length === 1 ? "its" : "their") + " own age bands.");
+  }
   return out.join(" ");
 }
 const RD_GEN_BORN = {
@@ -3951,9 +3956,11 @@ function RdDemographics({
           label: l.g.label,
           meta: demoPartMeta(q, s),
           ...(s.part != null ? {
-            part: s.part,
-            sub: demoPartSub(q, s)
-          } : {})
+            part: s.part
+          } : {}),
+          ...(sub => sub ? {
+            sub
+          } : {})(demoReadSub(q, l.g.label, s.part != null ? demoPartSub(q, s) : undefined))
         } : null;
       }).filter(Boolean)));
       const solo = st.id === "state" ? D.individualPolls.filter(q => q.solo && q.x >= x0 && q.x <= x1).flatMap(q => q.solo.flatMap(e => {

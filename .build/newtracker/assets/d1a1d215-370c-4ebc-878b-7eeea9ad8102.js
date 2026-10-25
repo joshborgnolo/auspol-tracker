@@ -4104,7 +4104,8 @@ function demGroupsOf(p) {
   const m = {};
   for (const rows of Object.values(g.d || {})) for (const [lab, v] of rows) m[lab] = Object.fromEntries(DEM_KEYS.map((k, i) => [k, v[i]]));
   const G = window.AUSPOL.demoGroups || [];
-  (g.v || []).forEach((v, i) => { if (v && !m[G[i]]) m[G[i]] = Object.fromEntries(DEM_KEYS.map((k, j) => [k, v[j]])); });
+  // an age group read off the house's own bands (g.ar, gen-data §7g-age) is no printed pair
+  (g.v || []).forEach((v, i) => { if (v && !m[G[i]] && !(g.ar || []).includes(G[i])) m[G[i]] = Object.fromEntries(DEM_KEYS.map((k, j) => [k, v[j]])); });
   return m;
 }
 /* the split a row draws: { a, b, lab, loCap, hiCap, A, B, gap }, gap = A − B
@@ -8194,7 +8195,12 @@ function infoTerms(D) {
         {working(<>
           <span className="info-p"><b>Which pollsters count where.</b> A pollster counts for a
           group only where it draws the group the same way as the others; the table below lists
-          who counts for each. YouGov’s age bands are 35–49 and 50+, so it counts at 18–34 alone.
+          who counts for each. Age is the exception: a pollster whose bands differ (YouGov’s 35–49 and
+          50+, Newspoll’s and Roy Morgan’s 35–49, 50–64 and 65+) counts at 35–54 and 55+ through
+          estimates. Its bands are laid along Australia’s adults by single year of age, and only
+          the slivers between its edges and the common ones (the 50–54s inside a 50–64 band, say)
+          are filled in, by a smooth curve through its printed bands. A band a pollster prints
+          counts exactly as printed.
           {" "}{xref("generations", "who votes for whom", "Generations")} come from the pollsters
           that name them. RedBridge’s two school rows are combined in proportion to its own group
           sizes, and YouGov’s SA, WA, and ACT/NT/Tas columns into the non-eastern mainland at their

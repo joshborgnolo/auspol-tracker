@@ -2202,6 +2202,10 @@ const demoGrpAt = (q) => (q.grp && q.grp.sp ? q.grp.sp.map((s, i) => ({ ...s, pa
 const demoPartMeta = (q, s) => (s.part == null ? q : { ...q, dateLabel: s.l });
 const demoPartSub = (q, s, n) => (s.part == null ? (n ? "n ≈ " + n.toLocaleString() : undefined)
   : (n ? "n ≈ " + Math.round(n * s.k).toLocaleString() + " · " : "") + "one of " + s.of + " polls in the " + q.field + " tables");
+/* a group's dot read off the poll's own age bands (grp.ar, gen-data §7g-age)
+   says so after the rest of its tip, never passing for a printed figure */
+const demoReadSub = (q, label, sub) => (q.grp && q.grp.ar && q.grp.ar.includes(label)
+  ? (sub ? sub + " · " : "") + "estimated from its own age bands" : sub);
 /* A set's groups as a ramp of the party's colour, first group full strength
    shading towards the page's own ink – dark on the light theme, pale on the
    dark one, so the ends of the ramp part in both and neither is mistaken for
@@ -2448,7 +2452,7 @@ function DemographicsPanel({ rangeId = "all" }) {
       const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
       return sum > 0 && p.grp.t[gpi] > 0
         ? { x: s.x, y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: demoPartMeta(p, s),
-            ...(s.part != null ? { sub: demoPartSub(p, s) } : {}) } : null;
+            ...((sub) => (sub ? { sub } : {}))(demoReadSub(p, l.g.label, s.part != null ? demoPartSub(p, s) : undefined)) } : null;
     }).filter(Boolean)));
     // a share can't fall below zero, so neither can a band's floor fall below −100%
     const areas = drawn.map((l) => ({ id: "ci-" + l.g.label, color: l.color, className: "ci-band", edge: false,
@@ -2619,7 +2623,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         </p>
         <p className="table-hint">
           Groups pool only where pollsters cut them the same way
-          {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34"
+          {tab.id === "age" ? ", except age: a pollster whose bands differ (YouGov’s 35–49 and 50+, Newspoll’s and Roy Morgan’s 35–49, 50–64 and 65+) counts at 35–54 and 55+ through estimates from its own bands, filling in only the slivers between its edges and the common ones"
             : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
             : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
             : ""}.
