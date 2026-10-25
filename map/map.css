@@ -16,6 +16,8 @@ body {
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
+  /* pan and pinch only: no double-tap smart zoom when a view tap lands twice */
+  touch-action: manipulation;
 }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
@@ -402,6 +404,8 @@ button { cursor: pointer; background: none; border: 0; }
   /* a swipe on the lens row cycles the lenses; the row itself never scrolls */
   .mp-lensrow .mp-lenses { overflow-x: hidden; }
   .mp-search { order: -1; width: 100%; margin: 0 0 10px; }
+  /* under 16px iOS zooms the page to a focused field — keep the page at 1x */
+  .mp-search input { font-size: 16px; }
   .mp-fig { grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
   /* the stage keeps one height whatever the lens: the key below it grows the view, never
      shrinks the figure; tall enough for the chamber to fill the width (its 19.1 x 22.8 box,
