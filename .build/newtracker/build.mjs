@@ -248,11 +248,15 @@ const FONTS = [
      static cuts only (there is no variable cut), so the serif range is
      carried by one file per weight per style. */
   { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400", preload: true },
-  { file: "crimsontext-600-latin.woff2",        family: "Crimson Text", style: "normal", weight: "600", preload: true },
-  /* 700 normal is not preloaded: its only serif-context consumer is the
-     leadership note's strong emphasis, below the fold on every viewport, so
-     it can arrive with the page instead of queueing ahead of the hero. */
-  { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700" },
+  /* 600 normal is no longer preloaded (2026-10-25): no element of the
+     default design sets in it - only the archived ?design=old view does,
+     which can wait for it the way it waits for everything else. */
+  { file: "crimsontext-600-latin.woff2",        family: "Crimson Text", style: "normal", weight: "600" },
+  /* 700 normal IS preloaded (2026-10-25): every tab's headline (.rd-hed)
+     sets in it on the first screen. Discovered only when the app rendered,
+     it swapped in 0.6-1.2s into a load at 4x CPU and its taller ascent
+     dropped the headline's glyphs 4px - a layout shift on every cold load. */
+  { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700", preload: true },
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   /* italic-600 had no consumer (italic serif runs at 400 or 700 on the
      live page); the subset stays in fonts/ so re-registering it is one line. */
@@ -260,10 +264,13 @@ const FONTS = [
   /* Source Serif 4 retired Sep 2026: the tab labels and docked score set in
      Crimson Text, the page's one serif. The source subset stays in fonts/. */
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
-  /* Source Sans 3 has one caller: the .wordmark lockup. It paints the first
-     screen, but the stack falls back to system sans in the moment before it
-     lands, which is cheaper than a preload. */
-  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
+  /* Source Sans 3 sets the .wordmark lockup at the top of the first screen,
+     so it IS preloaded (2026-10-25). Left to be discovered when the app
+     rendered, it landed ~800ms in at 4x CPU and the system-sans fallback's
+     taller line moved the wordmark and every line under it up 4-5px on
+     every cold load - the page's only layout shift. The satellites' shell
+     already preloaded it (site-shell.mjs fontPreloads). */
+  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
@@ -288,9 +295,8 @@ const faceCss = FONTS.map((f) => {
   if (f.pageOnly) return null;
   const href = `assets/fonts/${name}`;
   /* Only the faces that paint text on the way in are preloaded. The italic
-     serif sets a handful of small labels, and Source Sans 3 waits for the
-     expanded breakdown, so both can arrive with the rest of the page rather
-     than competing with it for the first connections. */
+     serif sets a handful of small labels, so it can arrive with the rest of
+     the page rather than competing with it for the first connections. */
   if (f.preload) fontLinks.push(`<link rel="preload" href="${href}" as="font" type="font/woff2" crossorigin>`);
   return `@font-face {
   font-family: '${f.family}';

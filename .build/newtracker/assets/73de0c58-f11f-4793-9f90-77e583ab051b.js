@@ -2082,17 +2082,35 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
      on that first commit, and rendering the primary-vote panel plus all
      six analysis sections inside it kept that one commit above 200ms of
      main-thread work: that is the refresh-time window in which the
-     static page sits on screen. Commit just the hero, latest-polls table
-     and next-polls ticker first, have the rest follow in the very next
-     pass, and the window more than halves; everything deferred lies
+     static page sits on screen. Commit just the hero (and the header's
+     next-polls ticker) first, have the rest follow, and the window more
+     than halves; everything deferred lies
      below the fold, so the second commit has landed long before the
      reader scrolls to it. snapshotTailArmed pins the deferral to FIRST
      mount only - tab switches and design flips remount this view, and
-     those paths must draw whole, not pop. */
-  const [tail, setTail] = useState(snapshotTailArmed);
+     those paths must draw whole, not pop.
+     The tail itself lands in stages, one per painted frame (2026-10-25):
+     as one commit it was a 400-485ms task at 4x CPU on a phone, straight
+     after the first paint, the page deaf to a tap for half a second. Each
+     stage now waits for the frame after the last one painted (an effect's
+     setState alone can run before the paint). A hash on the URL draws the
+     whole tail at once, so whatever it names exists to land on. */
+  const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
   React.useEffect(() => {
-    if (!snapshotTailArmed) { snapshotTailArmed = true; setTail(true); }
-  }, []);
+    if (tail >= SNAP_TAIL_ALL) return undefined;
+    if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
+      snapshotTailArmed = true;
+      setTail(SNAP_TAIL_ALL);
+      return undefined;
+    }
+    snapshotTailArmed = true;
+    /* the first stage too: scheduled straight from this effect it could
+       still run before the first frame painted, holding the app's first
+       paint back behind the primary-vote section */
+    let t = 0;
+    const raf = requestAnimationFrame(() => { t = setTimeout(() => setTail((n) => Math.max(n, tail + 1)), 0); });
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
+  }, [tail]);
   return (
     <>
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
@@ -2101,24 +2119,34 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
       {/* the primary-vote chart joins the pass-late set: at half the first
           commit's DOM it was worth as much to the static-article window as
           the whole six-section tail did */}
-      {tail && <PrimaryVoteMemo rangeId={heroRange} setRangeId={setRangeId} />}
-      <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
-                     tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
-      {/* when the next ones land, straight after the latest ones - it sat
-          between National direction and the vote-by-group analysis, a
-          schedule in the middle of the reading */}
-      <NextPollsMemo />
-      {tail && <>
+      {tail >= 1 && <PrimaryVoteMemo rangeId={heroRange} setRangeId={setRangeId} />}
+      {/* the latest-polls table joined the staged tail too (2026-10-25): it
+          starts below y=1540 at every viewport up to 2560x1440 - the hero
+          fills the first screen - and it was ~700 of the first commit's
+          nodes */}
+      {tail >= 2 && <>
+        <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
+                       tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
+        {/* when the next ones land, straight after the latest ones - it sat
+            between National direction and the vote-by-group analysis, a
+            schedule in the middle of the reading */}
+        <NextPollsMemo />
+      </>}
+      {tail >= 3 && <>
         <LeadershipMemo rangeId={rangeId} />
         <DirectionMemo rangeId={rangeId} />
-        {/* who votes for whom: age, gender, education, place, and home */}
-        <DemographicsMemo rangeId={rangeId} />
+      </>}
+      {/* who votes for whom: age, gender, education, place, and home */}
+      {tail >= 4 && <DemographicsMemo rangeId={rangeId} />}
+      {tail >= 5 && <>
         {/* who One Nation's surge is made of */}
         <OnSourcesMemo rangeId={rangeId} />
         {/* what voters say matters, and which party they trust with it -
             the reasons behind the vote, before the page turns to those who
             haven't settled on one */}
         <IssuesMemo rangeId={rangeId} />
+      </>}
+      {tail >= 6 && <>
         {/* closes the page: the electorate's mood rather than its party
             choice - how many can't say who they would vote for */}
         <UndecidedMemo rangeId={rangeId} />
@@ -2130,8 +2158,10 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
   );
 }
 
-/* One page load arms the snapshot tail exactly once - see SnapshotView. */
+/* One page load arms the snapshot tail exactly once - see SnapshotView -
+   and the tail lands in this many stages. */
 let snapshotTailArmed = false;
+const SNAP_TAIL_ALL = 6;
 
 /* Error boundaries. Before these, ANY render throw anywhere in the tree
    unmounted the whole createRoot root, leaving the reader a blank page
@@ -2250,8 +2280,14 @@ function App() {
      together, so no frame exists in between. The same commit lifts html.boot
      (the body-start script in template.html hides the page until now), so
      the first frame the reader sees is the app itself, never the article. */
+  /* The pull-up lands in the same step (window.apSyncHeights, the boot
+     block below). Left to the height observer, the first visible layout
+     still had #root standing under the whole article, and the observer
+     hauled it to the top a beat later - unseen, but a layout shift of 1.0
+     (the full viewport) on every load, which is what field CLS scores. */
   React.useLayoutEffect(() => {
     document.body.classList.add("js");
+    if (window.apSyncHeights) window.apSyncHeights();
     if (window.apBootDone) window.apBootDone();
   }, []);
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -2556,9 +2592,16 @@ function App() {
      generous scroll-margin-top (see .next-polls) keeps the panel's heading
      clear of the pinned tab bar. */
   const npJumpRef = useRef(false);
+  /* the section mounts with the Now tab's staged tail (SnapshotView), so a
+     jump in the load's first moments waits for it like the other seeks */
   const npScrollNow = () => {
-    const el = document.querySelector("section.next-polls, section.rd-polls");
-    if (el) el.scrollIntoView({ block: "start", behavior: "auto" });
+    let tries = 0;
+    const seek = () => {
+      const el = document.querySelector("section.next-polls, section.rd-polls");
+      if (el) { el.scrollIntoView({ block: "start", behavior: "auto" }); return; }
+      if (++tries < 40) setTimeout(seek, 75);
+    };
+    seek();
   };
   const swScrollNow = () => {
     const el = document.getElementById("switching");
@@ -2999,6 +3042,7 @@ if (staticSummary) {
     if (ssH !== lastSs) appRoot.style.setProperty("--ss-h", (lastSs = ssH) + "px");
   };
   syncHeights();
+  window.apSyncHeights = syncHeights;
   /* one observer for both, so a frame that resizes both runs one callback:
      webfonts swap in after mount and re-lay the article out (the pull-up
      must follow its height or a seam opens where it stood), and the app's

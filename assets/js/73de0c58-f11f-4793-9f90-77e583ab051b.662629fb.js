@@ -1745,13 +1745,24 @@ function SnapshotView({
   setTppBasis
 }) {
   const rangeId = window.AP.rd ? "all" : heroRange;
-  const [tail, setTail] = useState(snapshotTailArmed);
+  const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
   React.useEffect(() => {
-    if (!snapshotTailArmed) {
+    if (tail >= SNAP_TAIL_ALL) return undefined;
+    if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
       snapshotTailArmed = true;
-      setTail(true);
+      setTail(SNAP_TAIL_ALL);
+      return undefined;
     }
-  }, []);
+    snapshotTailArmed = true;
+    let t = 0;
+    const raf = requestAnimationFrame(() => {
+      t = setTimeout(() => setTail(n => Math.max(n, tail + 1)), 0);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [tail]);
   return React.createElement(React.Fragment, null, React.createElement(Hero, {
     rangeId: heroRange,
     setRangeId: setRangeId,
@@ -1760,31 +1771,32 @@ function SnapshotView({
     setMatchup: setTppMatchup,
     basis: tppBasis,
     setBasis: setTppBasis
-  }), tail && React.createElement(PrimaryVoteMemo, {
+  }), tail >= 1 && React.createElement(PrimaryVoteMemo, {
     rangeId: heroRange,
     setRangeId: setRangeId
-  }), React.createElement(PollsterTable, {
+  }), tail >= 2 && React.createElement(React.Fragment, null, React.createElement(PollsterTable, {
     tppBasis: tppBasis,
     setTppBasis: setTppBasis,
     tppMatchup: tppMatchup,
     setTppMatchup: setTppMatchup
-  }), React.createElement(NextPollsMemo, null), tail && React.createElement(React.Fragment, null, React.createElement(LeadershipMemo, {
+  }), React.createElement(NextPollsMemo, null)), tail >= 3 && React.createElement(React.Fragment, null, React.createElement(LeadershipMemo, {
     rangeId: rangeId
   }), React.createElement(DirectionMemo, {
     rangeId: rangeId
-  }), React.createElement(DemographicsMemo, {
+  })), tail >= 4 && React.createElement(DemographicsMemo, {
     rangeId: rangeId
-  }), React.createElement(OnSourcesMemo, {
+  }), tail >= 5 && React.createElement(React.Fragment, null, React.createElement(OnSourcesMemo, {
     rangeId: rangeId
   }), React.createElement(IssuesMemo, {
     rangeId: rangeId
-  }), React.createElement(UndecidedMemo, {
+  })), tail >= 6 && React.createElement(React.Fragment, null, React.createElement(UndecidedMemo, {
     rangeId: rangeId
   }), React.createElement(MoodMemo, {
     rangeId: rangeId
   })));
 }
 let snapshotTailArmed = false;
+const SNAP_TAIL_ALL = 6;
 class ViewBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -1917,6 +1929,7 @@ function useTweaks(defaults) {
 function App() {
   React.useLayoutEffect(() => {
     document.body.classList.add("js");
+    if (window.apSyncHeights) window.apSyncHeights();
     if (window.apBootDone) window.apBootDone();
   }, []);
   const TWEAK_DEFAULTS = {
@@ -2140,11 +2153,19 @@ function App() {
   }, []);
   const npJumpRef = useRef(false);
   const npScrollNow = () => {
-    const el = document.querySelector("section.next-polls, section.rd-polls");
-    if (el) el.scrollIntoView({
-      block: "start",
-      behavior: "auto"
-    });
+    let tries = 0;
+    const seek = () => {
+      const el = document.querySelector("section.next-polls, section.rd-polls");
+      if (el) {
+        el.scrollIntoView({
+          block: "start",
+          behavior: "auto"
+        });
+        return;
+      }
+      if (++tries < 40) setTimeout(seek, 75);
+    };
+    seek();
   };
   const swScrollNow = () => {
     const el = document.getElementById("switching");
@@ -2523,6 +2544,7 @@ if (staticSummary) {
     if (ssH !== lastSs) appRoot.style.setProperty("--ss-h", (lastSs = ssH) + "px");
   };
   syncHeights();
+  window.apSyncHeights = syncHeights;
   const hro = new ResizeObserver(syncHeights);
   for (const kid of staticSummary.children) hro.observe(kid);
   if (appRoot) hro.observe(appRoot);
