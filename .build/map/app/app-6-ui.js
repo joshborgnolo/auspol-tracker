@@ -11,6 +11,14 @@ function lensShort() {
   }
   return "";
 }
+/* the lens as a list-table column head: every party coded, all of one register */
+function lensHead() {
+  switch (S.lens) {
+    case "fp": return S.fpMode === "change" ? `${FAM_CODE[S.party]} change` : `${FAM_CODE[S.party]} primary`;
+    case "flow": return `${FAM_CODE[S.from]} to Labor`;
+    default: return lensShort();
+  }
+}
 function valueText(v, kind) {
   if (v == null) {
     switch (S.lens) {

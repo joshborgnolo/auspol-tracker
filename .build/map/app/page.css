@@ -342,7 +342,7 @@ button { cursor: pointer; background: none; border: 0; }
 .ls-csv:hover { color: var(--ink); }
 .ls-grid { position: relative; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; border-top: 1px solid var(--line); }
 .ls-head { position: sticky; top: 0; z-index: 2; display: grid; align-items: end; padding: 10px 0 6px; background: var(--bg); border-bottom: 1px solid var(--ink-faint); }
-.ls-head button { font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; padding: 0 8px 0 0; }
+.ls-head button { font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; padding: 0 8px 0 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .ls-head button.r { text-align: right; padding: 0 0 0 8px; }
 .ls-head button:hover { color: var(--ink); }
 .ls-head button[aria-sort] { color: var(--ink); }
@@ -353,7 +353,11 @@ button { cursor: pointer; background: none; border: 0; }
 .ls-row.on { background: color-mix(in oklch, var(--ink) 6%, transparent); }
 .ls-row > div { min-width: 0; padding-right: 8px; }
 .ls-row > div.r { text-align: right; padding: 0 0 0 8px; font-variant-numeric: tabular-nums; }
-.ls-row .c1 { font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* the cells are inline <span>s, so these need blockify to ever truncate */
+.ls-row .c1 { display: block; font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* polling-place names run to a second line rather than off the column;
+   ROW_H("booths") in app-5-list.js pairs with this */
+.ls-row.booths .c1 { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .ls-row .c2 { display: block; font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ls-row .fig { font-size: 14px; font-weight: 600; white-space: nowrap; }
 .ls-row .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: 0; }
