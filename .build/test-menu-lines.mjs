@@ -130,11 +130,26 @@ const fresh = (mutate) => {
   assert.equal(flat.fig, null, "not half a figure");
 }
 
+/* ---- Election map: the House today (/map/'s data, gen-data's house) */
+{
+  const line = (H) => J(fresh((D) => { D.house = H; }).menuLines().map || null);
+  const H0 = { asOf: "2026-10-25", total: 150, seats: { alp: 94, lnp: 41, grn: 1, onp: 2, ind: 10, oth: 2 }, changed: 4 };
+  assert.deepEqual(line(H0), { head: "Labor holds 94 of the 150 seats; four have changed hands or party since the election",
+    fig: { v: "94", cap: "Labor seats", tone: "alp" } }, "the largest party's seats, and the seats changed since");
+  assert.equal(line({ ...H0, changed: 1 }).head, "Labor holds 94 of the 150 seats; one has changed hands or party since the election");
+  assert.equal(line({ ...H0, changed: 0 }).head, "Labor holds 94 of the 150 seats", "no change, no clause");
+  assert.deepEqual(line({ ...H0, seats: { alp: 60, lnp: 80, grn: 2, onp: 1, ind: 6, oth: 1 }, changed: 0 }),
+    { head: "The Coalition holds 80 of the 150 seats", fig: { v: "80", cap: "Coalition seats", tone: "lnp" } }, "the Coalition when it holds most");
+  assert.equal(line(null), null, "no House data (the /vic/ page), no line: the tip stands");
+  const built = fresh().menuLines().map;
+  assert.ok(built && /^(Labor|The Coalition) holds \d+ of the \d+ seats/.test(built.head), "the built dataset carries the House");
+}
+
 /* ---- the menu's lines, and the satellites' copy of them */
 {
   const AP = fresh();
   const L = AP.menuLines();
-  for (const id of ["disagreement", "leans", "flows", "flows-explained", "public-opinion", "changelog", "info"]) assert.ok(L[id] && L[id].head, id + " has its line");
+  for (const id of ["disagreement", "leans", "flows", "flows-explained", "map", "public-opinion", "changelog", "info"]) assert.ok(L[id] && L[id].head, id + " has its line");
   assert.equal(L["flows-explained"].head, AP.PAGE_HEAD["flows-explained"]);
   assert.match(L["public-opinion"].fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);
   assert.equal(L["public-opinion"].fig.cap, "Latest entry");

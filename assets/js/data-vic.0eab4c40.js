@@ -15633,6 +15633,7 @@ window.AUSPOL = function () {
   }];
   const beyondTopics = null;
   const beyondLatest = null;
+  const house = null;
   const beyondByRow = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
@@ -15838,6 +15839,7 @@ window.AUSPOL = function () {
     beyondTopics,
     beyondLatest,
     beyondByRow,
+    house,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,

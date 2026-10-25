@@ -239,14 +239,19 @@ function Tabs({
     }
     const pp = b.querySelector(".tab-menu-paper");
     const pr = pp ? pp.getBoundingClientRect() : br;
-    const w0 = Math.min(492, vw - 16);
-    let L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)),
+    const two = vw >= 1060;
+    const fr = two && n.querySelector(".tabs-inner") ? n.querySelector(".tabs-inner").getBoundingClientRect() : null;
+    const lo = fr ? fr.left : 8,
+      hi = fr ? fr.right : vw - 8;
+    const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
+    let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)),
       R = L + w0;
     if (pr.left - L < 16) L = Math.round(pr.left);
     if (R - pr.right < 16) R = Math.round(pr.right);
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuAt({
+      two,
       top: Math.round(br.bottom - nr.top),
       left: L - Math.round(nr.left),
       width: w,
@@ -334,8 +339,13 @@ function Tabs({
   const menuLines = React.useMemo(() => menuOpen && rdMenu && window.AP.menuLines ? window.AP.menuLines({
     pub: tppBasis === "resp"
   }) : null, [menuOpen, rdMenu, tppBasis]);
+  const menuHref = t => t.ext ? "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id;
   const menuPick = id => e => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if ((tabs.find(t => t.id === id) || {}).ext) {
+      setMenuOpen(false);
+      return;
+    }
     e.preventDefault();
     setMenuOpen(false);
     onChange(id);
@@ -571,7 +581,7 @@ function Tabs({
     matchup: tppMatchup,
     tppBasis: tppBasis
   })), menuOpen && (rdMenu ? React.createElement("div", {
-    className: "tab-menu-pop",
+    className: "tab-menu-pop" + (menuAt && menuAt.two ? " tab-menu-two" : ""),
     id: "tab-menu-pop",
     role: "menu",
     "aria-label": "More pages",
@@ -592,7 +602,15 @@ function Tabs({
     style: menuAt && menuAt.maxH ? {
       maxHeight: menuAt.maxH + "px"
     } : null
-  }, [...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
+  }, (rowEls => {
+    if (!(menuAt && menuAt.two)) return rowEls;
+    const k = Math.ceil(menuTabs.length / 2);
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "tab-menu-col"
+    }, rowEls.slice(0, k)), React.createElement("div", {
+      className: "tab-menu-col"
+    }, rowEls.slice(k)));
+  })([...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
     const ln = menuLines && menuLines[t.id];
     const fig = ln && ln.fig;
     const rows = fig && fig.rows;
@@ -601,7 +619,7 @@ function Tabs({
       role: "menuitem",
       tabIndex: -1,
       className: "tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : ""),
-      href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
+      href: menuHref(t),
       "aria-current": active === t.id ? "page" : undefined,
       onClick: menuPick(t.id)
     }, React.createElement("span", {
@@ -632,7 +650,7 @@ function Tabs({
     }, fig.v), React.createElement("span", {
       className: "tab-menu-c"
     }, fig.cap.replace("/", "/\u200b"))) : null));
-  }))) : React.createElement("div", {
+  })))) : React.createElement("div", {
     className: "tab-menu-pop",
     id: "tab-menu-pop",
     role: "menu",
@@ -656,7 +674,7 @@ function Tabs({
     role: "menuitem",
     tabIndex: -1,
     className: "tab-menu-item" + (active === t.id ? " on" : ""),
-    href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
+    href: menuHref(t),
     "aria-current": active === t.id ? "page" : undefined,
     onClick: menuPick(t.id)
   }, React.createElement("span", {

@@ -356,13 +356,19 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
        has room for (maxH); an unpinned bar's sheet scrolls with the page */
     const pp = b.querySelector(".tab-menu-paper");
     const pr = pp ? pp.getBoundingClientRect() : br;
-    const w0 = Math.min(492, vw - 16);
-    let L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+    /* two columns from 1060px (2026-10-25): seven pages in one column ran
+       past the foot of a laptop screen; the wider sheet keeps to the page's
+       own frame (the bar's inner box) */
+    const two = vw >= 1060;
+    const fr = two && n.querySelector(".tabs-inner") ? n.querySelector(".tabs-inner").getBoundingClientRect() : null;
+    const lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
+    const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
+    let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
     if (pr.left - L < 16) L = Math.round(pr.left);
     if (R - pr.right < 16) R = Math.round(pr.right);
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
-    setMenuAt({ top: Math.round(br.bottom - nr.top), left: L - Math.round(nr.left), width: w,
+    setMenuAt({ two, top: Math.round(br.bottom - nr.top), left: L - Math.round(nr.left), width: w,
                 gapA: Math.max(0, pr.left - L + 1), gapB: Math.min(w, pr.right - L - 1),
                 maxH: stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) : null });
   };
@@ -436,9 +442,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   const rdMenu = !!window.AP.rd;
   const menuLines = React.useMemo(() => (menuOpen && rdMenu && window.AP.menuLines
     ? window.AP.menuLines({ pub: tppBasis === "resp" }) : null), [menuOpen, rdMenu, tppBasis]);
-  /* a menu page swaps in place like a tab; a modified click opens its document */
+  /* a menu page swaps in place like a tab; a modified click opens its document.
+     An ext entry (the Election map, a page outside this build) is a plain
+     link: the browser follows its href */
+  const menuHref = (t) => (t.ext ? "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id);
   const menuPick = (id) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if ((tabs.find((t) => t.id === id) || {}).ext) { setMenuOpen(false); return; }
     e.preventDefault();
     setMenuOpen(false);
     onChange(id);
@@ -714,14 +724,26 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
              for the explainer), Info last where the phone bar has dropped
              its tab. The rows scroll inside the sheet on a short screen,
              so the sheet's own edges - the open top under the tab - stay put */
-          <div className="tab-menu-pop" id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
+          <div className={"tab-menu-pop" + (menuAt && menuAt.two ? " tab-menu-two" : "")} id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
                style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto", width: menuAt.width + "px",
                                  "--gap-a": menuAt.gapA + "px", "--gap-b": menuAt.gapB + "px",
                                  borderTopLeftRadius: menuAt.gapA <= 1.5 ? 0 : undefined,
                                  borderTopRightRadius: menuAt.gapB >= menuAt.width - 1.5 ? 0 : undefined } : null}
                onKeyDown={onMenuKey}>
             <div className="tab-menu-list" style={menuAt && menuAt.maxH ? { maxHeight: menuAt.maxH + "px" } : null}>
-              {[...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
+              {((rowEls) => {
+                /* on a wide screen the pages sit in two columns, read down the
+                   first and then the second (the numbers and the arrow keys
+                   both run that way), each column a sheet of its own so the
+                   menu takes the shape of its pages; Info, hidden at these
+                   widths, rides the second column's foot */
+                if (!(menuAt && menuAt.two)) return rowEls;
+                const k = Math.ceil(menuTabs.length / 2);
+                return <>
+                  <div className="tab-menu-col">{rowEls.slice(0, k)}</div>
+                  <div className="tab-menu-col">{rowEls.slice(k)}</div>
+                </>;
+              })([...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
                 const ln = menuLines && menuLines[t.id];
                 const fig = ln && ln.fig;
                 /* the flows explainer's twin-row figure (menu-lines.js): a
@@ -731,7 +753,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                 return (
                   <a key={t.id} role="menuitem" tabIndex={-1}
                      className={"tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : "")}
-                     href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
+                     href={menuHref(t)}
                      aria-current={active === t.id ? "page" : undefined}
                      onClick={menuPick(t.id)}>
                     <span className="tab-menu-n" aria-hidden="true">{i + 1}</span>
@@ -757,7 +779,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                     </span>
                   </a>
                 );
-              })}
+              }))}
             </div>
           </div>
           ) : (
@@ -772,7 +794,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
             )}
             {menuTabs.map((t) => (
               <a key={t.id} role="menuitem" tabIndex={-1} className={"tab-menu-item" + (active === t.id ? " on" : "")}
-                 href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
+                 href={menuHref(t)}
                  aria-current={active === t.id ? "page" : undefined}
                  onClick={menuPick(t.id)}>
                 <span className="tab-menu-t">{t.label}</span>

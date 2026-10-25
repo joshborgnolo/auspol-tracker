@@ -1668,6 +1668,12 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
+  id: "map",
+  label: "Election map",
+  menu: true,
+  ext: true,
+  tip: "Every federal seat and polling place since 2004, on the map and in the chamber"
+}, {
   id: "public-opinion",
   label: "Public opinion",
   menu: true,
@@ -1687,8 +1693,9 @@ if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t =>
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
-const TAB_IDS = TABS.map(t => t.id);
-const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "map"), 1);
+const TAB_IDS = TABS.filter(t => !t.ext).map(t => t.id);
+const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu && !t.ext).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";
 const tabToPath = id => id === "now" ? TAB_BASE : TAB_BASE + id + "/";
 const pathToTab = () => {
@@ -2085,7 +2092,7 @@ function App() {
         tab: cur,
         goTab: go
       } = swipeRef.current;
-      const ids = TABS.map(x => x.id);
+      const ids = TAB_IDS;
       go(ids[(ids.indexOf(cur) + dir + ids.length) % ids.length]);
     };
     document.addEventListener("touchstart", onStart, {
@@ -2120,7 +2127,7 @@ function App() {
         tab: cur,
         goTab: go
       } = swipeRef.current;
-      const ids = TABS.map(x => x.id);
+      const ids = TAB_IDS;
       const next = ids[(ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
       if (next) {
         e.preventDefault();

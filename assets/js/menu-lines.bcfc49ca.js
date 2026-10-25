@@ -356,6 +356,27 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
         })
       };
     });
+    put("map", () => {
+      const H = D.house;
+      if (!H) return null;
+      const [lead, n] = Object.entries(H.seats).sort((a, b) => b[1] - a[1])[0];
+      const who = {
+        alp: "Labor",
+        lnp: "The Coalition"
+      }[lead];
+      if (!who) return null;
+      const W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+      const k = H.changed,
+        kw = W[k] || String(k);
+      return {
+        head: `${who} holds ${n} of the ${H.total} seats` + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
+        fig: {
+          v: String(n),
+          cap: lead === "alp" ? "Labor seats" : "Coalition seats",
+          tone: lead
+        }
+      };
+    });
     put("public-opinion", () => {
       if (!D.beyondLatest) return {
         head: AP.PAGE_HEAD["public-opinion"],

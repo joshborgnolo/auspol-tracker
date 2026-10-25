@@ -337,6 +337,8 @@ window.AUSPOL = (function () {
   const beyondTopics = 10;
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
   const beyondLatest = "2026-10-22";
+  /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
+  const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -388,7 +390,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, beyondTopics, beyondLatest, beyondByRow,
+    loadOneOffs, beyondTopics, beyondLatest, beyondByRow, house,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };

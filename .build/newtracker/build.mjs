@@ -23,6 +23,7 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
+import { rewriteTideArt } from "./tide-art.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
@@ -197,6 +198,27 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
+
+/* -- the tide band's weekly vote-weighted recolour --------------------------
+   The thirty traces closing the page are re-coloured by chance against the
+   CURRENT primary vote (gen-data's latest.primary, read from the dataset it
+   just wrote), the draw seeded by the Sydney ISO week – re-shuffled on the
+   first build after Monday 12am, stable within the week, weights always
+   live. Geometry and washed palette come out of the template's committed
+   art (its single home); a null draw (empty estimator window) leaves the
+   template art untouched. Federal also refreshes the satellites' /assets
+   files from the same draw. See tide-art.mjs. */
+{
+  const src = fs.readFileSync(DA(DATASET), "utf8");
+  const i = src.indexOf("const latest = ");
+  const latest = i >= 0 ? JSON.parse(src.slice(i + 15, src.indexOf("\n", i)).replace(/;$/, "")) : null;
+  const tide = rewriteTideArt(html, latest && latest.primary);
+  html = tide.html;
+  if (!VIC && tide.svgLight) {
+    writeAtomic(path.join(ROOT, "assets", "tile-art.svg"), tide.svgLight + "\n");
+    writeAtomic(path.join(ROOT, "assets", "tile-art-dark.svg"), tide.svgDark + "\n");
+  }
+}
 
 /* -- fonts: one hashed, cache-forever file per latin-subset face ------------
    These used to be base64'd into the stylesheet. woff2 is already compressed,
@@ -2003,7 +2025,10 @@ const ARCHIVE_STAMP = "2026-10-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-10-24";
+const PREDICTION_STAMP = "2026-10-25";
+/* map/ is hand-built (.build/map/): its data is the House as at this date (the
+   "Now" overlay's asOf); bump it with each rebuild of map/data */
+const MAP_STAMP = "2026-10-25";
 /* Tab pages are born the day the build first emits them; a page younger
    than the data it carries must not be dated before it existed, so their
    lastmod is the later of the go-live stamp and the data stamp (the
@@ -2086,6 +2111,10 @@ ${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explai
   <url>
     <loc>${SITE_URL}feedback/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}map/</loc>
+    <lastmod>${MAP_STAMP}</lastmod>
   </url>
   <url>
     <loc>${SITE_URL}prediction/</loc>

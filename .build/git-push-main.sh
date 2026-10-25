@@ -308,6 +308,11 @@ freshness_sync() {
 # the list like preference-flows/ (a quiet refresh writes the same bytes).
 # On 2026-10-21 the URL moved to public-opinion/index.html and
 # beyond-the-vote/index.html became a hand-kept redirect stub in its turn.
+# assets/tile-art*.svg joined 2026-10-25: the tide band's recolour is
+# computed at build time (build.mjs + tide-art.mjs, weekly vote-weighted
+# draw) and the federal build rewrites both files, so a refresh commit that
+# carried the rebuilt index.html but not them would split the two copies
+# of the art (main page inline, satellites via these files).
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html
@@ -318,7 +323,8 @@ SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   changelog/index.html
   data/changelog.json data/income-dist.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
-  assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
+  assets/favicon.svg assets/favicon-192.png assets/favicon-192.json
+  assets/tile-art.svg assets/tile-art-dark.svg)
 # vic/cycles/index.html joins the list only once it EXISTS: the vic build
 # (build.mjs's 5a block) emits the page as soon as the Vic data records a
 # past term, and the sitemap's VIC_TAB_IDS lists it from the same day — so a

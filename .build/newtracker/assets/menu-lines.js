@@ -38,6 +38,10 @@
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
+     Election map        the seats the largest party holds today, in its
+                         tone, under "Labor holds 94 of the 150 seats" (and
+                         how many seats have changed hands or party since
+                         the election, where any have)
      Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
@@ -359,6 +363,21 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     put("flows-explained", () => {
       const fig = AP.flowsExplainedFig();
       return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
+    });
+    /* the House today (/map/, a page outside this build): the largest party's
+       seats out of the chamber's, and the seats that have changed hands or
+       party since the election by by-election or defection */
+    put("map", () => {
+      const H = D.house;
+      if (!H) return null;
+      const [lead, n] = Object.entries(H.seats).sort((a, b) => b[1] - a[1])[0];
+      const who = { alp: "Labor", lnp: "The Coalition" }[lead];
+      if (!who) return null;
+      const W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+      const k = H.changed, kw = W[k] || String(k);
+      return { head: `${who} holds ${n} of the ${H.total} seats`
+          + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
+        fig: { v: String(n), cap: lead === "alp" ? "Labor seats" : "Coalition seats", tone: lead } };
     });
     /* the catalogue's newest wave as a date figure, as the changelog row's */
     put("public-opinion", () => {

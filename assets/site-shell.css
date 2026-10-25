@@ -470,6 +470,24 @@ body { height: auto; }
   mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
 }
 .sh-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+/* two columns from 1060px (site-shell.js mPlace, the main page's menu's
+   twin): each column a sheet of its own, so the menu ends under each
+   column's last page; the bare pop keeps the top edge (::after) and lends
+   the columns its top corners, squared where the tab meets them */
+.sh-menu.sh-menu-two { background: none; border: 0; box-shadow: none; }
+.sh-menu.sh-menu-two::after { inset: 0; }
+.sh-menu.sh-menu-two .sh-menu-list { display: flex; align-items: flex-start; padding: 0; border-radius: inherit; }
+.sh-menu-col {
+  flex: 1 1 0; min-width: 0; padding: 6px 0; box-sizing: border-box;
+  background: var(--sh-surface); border: 1px solid var(--line); border-top-color: transparent;
+  box-shadow: 0 6px 0 -3px var(--sh-tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--sh-tm-sheet-2), 0 12px 0 -6px var(--line), var(--sh-tm-shadow);
+}
+.sh-menu-col:first-child { position: relative; z-index: 1; border-radius: 0 0 8px 8px; border-top-left-radius: inherit; }
+.sh-menu-col:last-child { border-left: 0; border-radius: 0 0 8px 0; border-top-right-radius: inherit; }
+/* the page this satellite is, when it is a menu page (the main page's .tab-menu-item.on) */
+.sh-menu-item.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+.sh-menu-item.on .sh-menu-t { font-weight: 600; }
 .sh-menu-item {
   position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
   padding: 13px 20px 14px 0; color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;

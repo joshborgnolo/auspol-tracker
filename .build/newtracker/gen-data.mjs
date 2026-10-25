@@ -8428,6 +8428,33 @@ const beyondLatest = oneOffsSource
       .at(-1) ?? null
   : null;
 
+/* the House as it stands, for the More menu's Election map line (/map/): who
+   holds each seat today - the 2025 count's winners, then every change since
+   (the Farrer by-election, members who changed party), read off the map's own
+   committed data (map/data, built by .build/map/). Seats by party family as
+   the map colours them (Community Strong with the independents), and how many
+   seats have changed hands or party since the election. Federal only; null
+   when the map's data is absent */
+const house = (() => {
+  if (JUR) return null;
+  try {
+    const res = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "res-2025.json"), "utf8"));
+    const now = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "data-now.json"), "utf8"));
+    const fam = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn"
+      : ab === "ON" || ab === "HAN" ? "onp" : ["IND", "", "NAFD", "CSA"].includes(ab) ? "ind" : "oth");
+    const seats = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
+    let changed = 0;
+    for (const d of res.divs) {
+      const won = d.c.find((c) => c[6]);
+      const h = now.holders[d.n];
+      const ab = h ? h.ab : won[1];
+      if (h && (h.n !== won[0] || h.ab !== won[1])) changed++;
+      seats[fam(ab)]++;
+    }
+    return { asOf: now.asOf, total: res.divs.length, seats, changed };
+  } catch (e) { console.warn("gen-data: the map's House data is unreadable (" + e.message + ")"); return null; }
+})();
+
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
    Generated from ${JUR ? "data/vic-polls.json (via .build/vic/to-main-schema.mjs)" : "data/polls.json"} by .build/newtracker/gen-data.mjs – do
@@ -8809,6 +8836,8 @@ window.AUSPOL = (function () {
   const beyondTopics = ${JSON.stringify(beyondTopics)};
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
   const beyondLatest = ${JSON.stringify(beyondLatest)};
+  /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
+  const house = ${JSON.stringify(house)};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -8860,7 +8889,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, beyondTopics, beyondLatest, beyondByRow,
+    loadOneOffs, beyondTopics, beyondLatest, beyondByRow, house,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)

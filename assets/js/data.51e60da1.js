@@ -94344,6 +94344,19 @@ window.AUSPOL = function () {
   }];
   const beyondTopics = 10;
   const beyondLatest = "2026-10-22";
+  const house = {
+    "asOf": "2026-10-25",
+    "total": 150,
+    "seats": {
+      "alp": 94,
+      "lnp": 41,
+      "grn": 1,
+      "onp": 2,
+      "ind": 10,
+      "oth": 2
+    },
+    "changed": 4
+  };
   const beyondByRow = {
     "YouGov|2026-01-27": {
       "h": "news24",
@@ -94995,6 +95008,7 @@ window.AUSPOL = function () {
     beyondTopics,
     beyondLatest,
     beyondByRow,
+    house,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
