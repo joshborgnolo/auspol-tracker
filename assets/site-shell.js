@@ -757,6 +757,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
      arrow keys walk it, Escape or a press outside closes it ------------- */
   var mBtn = document.querySelector(".sh-menu-btn"), mPop = document.getElementById("sh-menu");
   if (nav && mBtn && mPop) {
+    var mAll = null;
     var mItems = function () {
       var all = mPop.querySelectorAll('[role="menuitem"]'), out = [];
       for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
@@ -769,8 +770,27 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     var mPlace = function () {
       var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect(), vw = window.innerWidth;
       var pp = mBtn.querySelector(".sh-menu-paper"), pr = pp ? pp.getBoundingClientRect() : br;
-      var w0 = Math.min(492, vw - 16);
-      var L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+      /* two columns from 1060px, as the main page's menu (2026-10-25): each
+         column a sheet of its own, read down the first and then the second;
+         the wider sheet keeps to the page's frame (the bar's inner box) */
+      var two = vw >= 1060, list0 = mPop.querySelector(".sh-menu-list"), fin = nav.querySelector(".sh-tabs-inner");
+      mPop.classList.toggle("sh-menu-two", two);
+      if (list0) {
+        if (!mAll) mAll = Array.prototype.slice.call(mPop.querySelectorAll(".sh-menu-item"));
+        var cols = list0.querySelectorAll(".sh-menu-col");
+        if (two) {
+          var c1 = cols[0], c2 = cols[1];
+          if (!c1) { c1 = document.createElement("div"); c2 = document.createElement("div"); c1.className = c2.className = "sh-menu-col"; list0.appendChild(c1); list0.appendChild(c2); }
+          var pages = mAll.filter(function (el) { return !el.classList.contains("sh-menu-info"); }), k = Math.ceil(pages.length / 2);
+          mAll.forEach(function (el) { var at = pages.indexOf(el); (at > -1 && at < k ? c1 : c2).appendChild(el); });
+        } else if (cols.length) {
+          mAll.forEach(function (el) { list0.appendChild(el); });
+          for (var ci = cols.length - 1; ci >= 0; ci--) list0.removeChild(cols[ci]);
+        }
+      }
+      var fr = two && fin ? fin.getBoundingClientRect() : null, lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
+      var w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
+      var L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
       if (pr.left - L < 16) L = Math.round(pr.left);
       if (R - pr.right < 16) R = Math.round(pr.right);
       var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);

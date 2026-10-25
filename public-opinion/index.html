@@ -4066,6 +4066,23 @@ body.rd .tab-menu-pop::after {
   mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
 }
 body.rd .tab-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+body.rd .tab-menu-pop.tab-menu-two { background: none; border: 0; box-shadow: none; }
+body.rd .tab-menu-pop.tab-menu-two::after { inset: 0; }
+body.rd .tab-menu-two .tab-menu-list { display: flex; align-items: flex-start; padding: 0; border-radius: inherit; }
+body.rd .tab-menu-col {
+  flex: 1 1 0; min-width: 0; padding: 6px 0; box-sizing: border-box;
+  background: var(--surface); border: 1px solid var(--line); border-top-color: transparent;
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
+}
+body.rd.dark .tab-menu-col {
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+}
+body.rd .tab-menu-col:first-child { position: relative; z-index: 1; border-radius: 0 0 8px 8px; border-top-left-radius: inherit; }
+body.rd .tab-menu-col:last-child { border-left: 0; border-radius: 0 0 8px 0; border-top-right-radius: inherit; }
 body.rd .tab-menu-item {
   position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
   padding: 13px 20px 14px 0; border-radius: 0;
@@ -101490,6 +101507,19 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   }];
   const beyondTopics = 10;
   const beyondLatest = "2026-10-22";
+  const house = {
+    "asOf": "2026-10-25",
+    "total": 150,
+    "seats": {
+      "alp": 94,
+      "lnp": 41,
+      "grn": 1,
+      "onp": 2,
+      "ind": 10,
+      "oth": 2
+    },
+    "changed": 4
+  };
   const beyondByRow = {
     "YouGov|2026-01-27": {
       "h": "news24",
@@ -102141,6 +102171,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     beyondTopics,
     beyondLatest,
     beyondByRow,
+    house,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
@@ -104084,6 +104115,27 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
         ...(fig ? {} : {
           chip: "Explainer"
         })
+      };
+    });
+    put("map", () => {
+      const H = D.house;
+      if (!H) return null;
+      const [lead, n] = Object.entries(H.seats).sort((a, b) => b[1] - a[1])[0];
+      const who = {
+        alp: "Labor",
+        lnp: "The Coalition"
+      }[lead];
+      if (!who) return null;
+      const W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+      const k = H.changed,
+        kw = W[k] || String(k);
+      return {
+        head: `${who} holds ${n} of the ${H.total} seats` + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
+        fig: {
+          v: String(n),
+          cap: lead === "alp" ? "Labor seats" : "Coalition seats",
+          tone: lead
+        }
       };
     });
     put("public-opinion", () => {
@@ -113162,14 +113214,19 @@ function Tabs({
     }
     const pp = b.querySelector(".tab-menu-paper");
     const pr = pp ? pp.getBoundingClientRect() : br;
-    const w0 = Math.min(492, vw - 16);
-    let L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)),
+    const two = vw >= 1060;
+    const fr = two && n.querySelector(".tabs-inner") ? n.querySelector(".tabs-inner").getBoundingClientRect() : null;
+    const lo = fr ? fr.left : 8,
+      hi = fr ? fr.right : vw - 8;
+    const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
+    let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)),
       R = L + w0;
     if (pr.left - L < 16) L = Math.round(pr.left);
     if (R - pr.right < 16) R = Math.round(pr.right);
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuAt({
+      two,
       top: Math.round(br.bottom - nr.top),
       left: L - Math.round(nr.left),
       width: w,
@@ -113257,8 +113314,13 @@ function Tabs({
   const menuLines = React.useMemo(() => menuOpen && rdMenu && window.AP.menuLines ? window.AP.menuLines({
     pub: tppBasis === "resp"
   }) : null, [menuOpen, rdMenu, tppBasis]);
+  const menuHref = t => t.ext ? "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id;
   const menuPick = id => e => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if ((tabs.find(t => t.id === id) || {}).ext) {
+      setMenuOpen(false);
+      return;
+    }
     e.preventDefault();
     setMenuOpen(false);
     onChange(id);
@@ -113494,7 +113556,7 @@ function Tabs({
     matchup: tppMatchup,
     tppBasis: tppBasis
   })), menuOpen && (rdMenu ? React.createElement("div", {
-    className: "tab-menu-pop",
+    className: "tab-menu-pop" + (menuAt && menuAt.two ? " tab-menu-two" : ""),
     id: "tab-menu-pop",
     role: "menu",
     "aria-label": "More pages",
@@ -113515,7 +113577,15 @@ function Tabs({
     style: menuAt && menuAt.maxH ? {
       maxHeight: menuAt.maxH + "px"
     } : null
-  }, [...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
+  }, (rowEls => {
+    if (!(menuAt && menuAt.two)) return rowEls;
+    const k = Math.ceil(menuTabs.length / 2);
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "tab-menu-col"
+    }, rowEls.slice(0, k)), React.createElement("div", {
+      className: "tab-menu-col"
+    }, rowEls.slice(k)));
+  })([...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
     const ln = menuLines && menuLines[t.id];
     const fig = ln && ln.fig;
     const rows = fig && fig.rows;
@@ -113524,7 +113594,7 @@ function Tabs({
       role: "menuitem",
       tabIndex: -1,
       className: "tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : ""),
-      href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
+      href: menuHref(t),
       "aria-current": active === t.id ? "page" : undefined,
       onClick: menuPick(t.id)
     }, React.createElement("span", {
@@ -113555,7 +113625,7 @@ function Tabs({
     }, fig.v), React.createElement("span", {
       className: "tab-menu-c"
     }, fig.cap.replace("/", "/\u200b"))) : null));
-  }))) : React.createElement("div", {
+  })))) : React.createElement("div", {
     className: "tab-menu-pop",
     id: "tab-menu-pop",
     role: "menu",
@@ -113579,7 +113649,7 @@ function Tabs({
     role: "menuitem",
     tabIndex: -1,
     className: "tab-menu-item" + (active === t.id ? " on" : ""),
-    href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
+    href: menuHref(t),
     "aria-current": active === t.id ? "page" : undefined,
     onClick: menuPick(t.id)
   }, React.createElement("span", {
@@ -150138,6 +150208,12 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
+  id: "map",
+  label: "Election map",
+  menu: true,
+  ext: true,
+  tip: "Every federal seat and polling place since 2004, on the map and in the chamber"
+}, {
   id: "public-opinion",
   label: "Public opinion",
   menu: true,
@@ -150157,8 +150233,9 @@ if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t =>
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
-const TAB_IDS = TABS.map(t => t.id);
-const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "map"), 1);
+const TAB_IDS = TABS.filter(t => !t.ext).map(t => t.id);
+const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu && !t.ext).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";
 const tabToPath = id => id === "now" ? TAB_BASE : TAB_BASE + id + "/";
 const pathToTab = () => {
@@ -150533,7 +150610,7 @@ function App() {
         tab: cur,
         goTab: go
       } = swipeRef.current;
-      const ids = TABS.map(x => x.id);
+      const ids = TAB_IDS;
       go(ids[(ids.indexOf(cur) + dir + ids.length) % ids.length]);
     };
     document.addEventListener("touchstart", onStart, {
@@ -150568,7 +150645,7 @@ function App() {
         tab: cur,
         goTab: go
       } = swipeRef.current;
-      const ids = TABS.map(x => x.id);
+      const ids = TAB_IDS;
       const next = ids[(ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
       if (next) {
         e.preventDefault();

@@ -705,6 +705,28 @@ body.rd .tab-menu-pop::after {
 }
 /* the rows scroll inside the sheet where the screen is short */
 body.rd .tab-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+/* two columns from 1060px (Tabs' placeMenu, 2026-10-25): each column a sheet
+   of its own, so the menu ends under each column's last page rather than
+   squaring off over an empty cell. The pop itself goes bare; its top edge
+   (::after, the tab's opening) still runs across both. The columns take the
+   pop's top corners, which placeMenu squares where the tab meets them */
+body.rd .tab-menu-pop.tab-menu-two { background: none; border: 0; box-shadow: none; }
+body.rd .tab-menu-pop.tab-menu-two::after { inset: 0; }
+body.rd .tab-menu-two .tab-menu-list { display: flex; align-items: flex-start; padding: 0; border-radius: inherit; }
+body.rd .tab-menu-col {
+  flex: 1 1 0; min-width: 0; padding: 6px 0; box-sizing: border-box;
+  background: var(--surface); border: 1px solid var(--line); border-top-color: transparent;
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
+}
+body.rd.dark .tab-menu-col {
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+}
+body.rd .tab-menu-col:first-child { position: relative; z-index: 1; border-radius: 0 0 8px 8px; border-top-left-radius: inherit; }
+body.rd .tab-menu-col:last-child { border-left: 0; border-radius: 0 0 8px 0; border-top-right-radius: inherit; }
 
 /* the ledger's rows: numeral, page and headline, figure */
 body.rd .tab-menu-item {

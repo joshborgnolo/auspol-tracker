@@ -1952,6 +1952,9 @@ const ARCHIVE_STAMP = "2026-10-24";
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
 const PREDICTION_STAMP = "2026-10-24";
+/* map/ is hand-built (.build/map/): its data is the House as at this date (the
+   "Now" overlay's asOf); bump it with each rebuild of map/data */
+const MAP_STAMP = "2026-10-25";
 /* Tab pages are born the day the build first emits them; a page younger
    than the data it carries must not be dated before it existed, so their
    lastmod is the later of the go-live stamp and the data stamp (the
@@ -2034,6 +2037,10 @@ ${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explai
   <url>
     <loc>${SITE_URL}feedback/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}map/</loc>
+    <lastmod>${MAP_STAMP}</lastmod>
   </url>
   <url>
     <loc>${SITE_URL}prediction/</loc>

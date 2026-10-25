@@ -1971,6 +1971,13 @@ const TABS = [
     tip: "Where minor-party preferences are flowing now, against the last election" },
   { id: "flows-explained", label: "Preference flows explained", menu: true,
     tip: "How preferences decide the two-party figure" },
+  /* Election map (2026-10-25): every federal seat and polling place since
+     2004, on the map, in the chamber and in a list - a page OUTSIDE this
+     build (ext), the satellite at /map/ (.build/map/). The menu links it;
+     it has no view here, so it takes no path of this page's, no stop on the
+     page turn and no menu-page view, and build.mjs emits no document for it */
+  { id: "map", label: "Election map", menu: true, ext: true,
+    tip: "Every federal seat and polling place since 2004, on the map and in the chamber" },
   /* Public opinion, the ☰ menu's fifth page: what the pollsters ask
      beyond voting intention, by topic, the recurring questions charted
      across pollsters. It was the /ad-hocs/ catalogue of every one-off
@@ -2004,8 +2011,11 @@ if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);
-const TAB_IDS = TABS.map((t) => t.id);
-const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu).map((t) => [t.id, t]));
+/* the map is federal: /vic/'s menu never holds it */
+if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "map"), 1);
+/* this page's own views: an ext entry is a link out, never a view */
+const TAB_IDS = TABS.filter((t) => !t.ext).map((t) => t.id);
+const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu && !t.ext).map((t) => [t.id, t]));
 
 /* Every tab is also a path of its own: Now is the site root (/vic/ for that
    jurisdiction's page), the others one segment under it, and build.mjs emits
@@ -2463,7 +2473,7 @@ function App() {
         return;                                  // a row's last view doesn't turn the page
       }
       const { tab: cur, goTab: go } = swipeRef.current;
-      const ids = TABS.map((x) => x.id);
+      const ids = TAB_IDS;
       go(ids[(ids.indexOf(cur) + dir + ids.length) % ids.length]);
     };
     document.addEventListener("touchstart", onStart, { passive: true });
@@ -2495,7 +2505,7 @@ function App() {
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const { tab: cur, goTab: go } = swipeRef.current;
-      const ids = TABS.map((x) => x.id);
+      const ids = TAB_IDS;
       const next = ids[(ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
       if (next) { e.preventDefault(); go(next); }
     };

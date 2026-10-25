@@ -92,7 +92,8 @@ export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
-  { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
+  { file: "lef-success/index.html" },
+  { file: "map/index.html", menu: "map" },                  // the Election map: built by .build/map/assemble.mjs, a ☰ menu page outside the main build (TABS' ext entry)                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
   { file: "provenance/index.html", page: "archives" },        // hand-maintained: the Provenance hub (moved from /archives/ 2026-10-24, which reverted to a redirect stub)
   { file: "archives/newspoll/index.html", page: "archives" },
@@ -318,10 +319,13 @@ const SHELL_MENU_CHEV = '<svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" 
    no-JS read); site-shell.js swaps in the headline and the figure from
    auspol-now.json's menu block, which build.mjs writes from the main
    page's own findings (menu-lines.js), so they follow every build. */
+/* `menu` is the id of the menu page this satellite IS (the Election map, a
+   ☰ page outside the main build): its row is marked current, as the main
+   page marks its own menu pages' rows */
 function shellMenu(menu) {
   const info = TABS.find((t) => t.pinHide && !t.menu);
   const pages = [...TABS.filter((t) => t.menu), ...(info ? [info] : [])];
-  const item = (t, i) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${t === info ? " sh-menu-info" : ""}" href="${t.href}" data-id="${t.id}">`
+  const item = (t, i) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${t === info ? " sh-menu-info" : ""}${t.id === menu ? " on" : ""}" href="${t.href}" data-id="${t.id}"${t.id === menu ? ' aria-current="page"' : ""}>`
     + `<span class="sh-menu-n" aria-hidden="true">${i + 1}</span>`
     + `<span class="sh-menu-txt"><span class="sh-menu-t">${t.label}</span>${t.tip ? `<span class="sh-menu-d">${t.tip}</span>` : ""}</span>`
     + `<span class="sh-menu-f"></span></a>`;
@@ -338,6 +342,8 @@ function shellArchTabs(file) {
     + `\n</nav>`;
 }
 export function shellHeader({ tab, menu, page, file } = {}) {
+  /* a menu page's button wears its page's name, as the main page's does */
+  const menuPage = menu ? TABS.find((t) => t.id === menu && t.menu) : null;
   const tabs = TABS.filter((t) => !t.menu).map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
     + `${t.id === tab ? ' aria-current="page"' : ""}>`
     + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
@@ -399,7 +405,7 @@ export function shellHeader({ tab, menu, page, file } = {}) {
     <div class="sh-tabs-inner">
       <div class="sh-tabs-set">
         ${tabs}
-        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span>${SHELL_MENU_ICON}<span class="sh-menu-lab">More</span>${SHELL_MENU_CHEV}</button>
+        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="${menuPage ? `More pages – on ${menuPage.label}` : "More pages"}" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span>${SHELL_MENU_ICON}<span class="sh-menu-lab">${menuPage ? menuPage.label : "More"}</span>${SHELL_MENU_CHEV}</button>
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
@@ -871,6 +877,24 @@ body { height: auto; }
   mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
 }
 .sh-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+/* two columns from 1060px (site-shell.js mPlace, the main page's menu's
+   twin): each column a sheet of its own, so the menu ends under each
+   column's last page; the bare pop keeps the top edge (::after) and lends
+   the columns its top corners, squared where the tab meets them */
+.sh-menu.sh-menu-two { background: none; border: 0; box-shadow: none; }
+.sh-menu.sh-menu-two::after { inset: 0; }
+.sh-menu.sh-menu-two .sh-menu-list { display: flex; align-items: flex-start; padding: 0; border-radius: inherit; }
+.sh-menu-col {
+  flex: 1 1 0; min-width: 0; padding: 6px 0; box-sizing: border-box;
+  background: var(--sh-surface); border: 1px solid var(--line); border-top-color: transparent;
+  box-shadow: 0 6px 0 -3px var(--sh-tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--sh-tm-sheet-2), 0 12px 0 -6px var(--line), var(--sh-tm-shadow);
+}
+.sh-menu-col:first-child { position: relative; z-index: 1; border-radius: 0 0 8px 8px; border-top-left-radius: inherit; }
+.sh-menu-col:last-child { border-left: 0; border-radius: 0 0 8px 0; border-top-right-radius: inherit; }
+/* the page this satellite is, when it is a menu page (the main page's .tab-menu-item.on) */
+.sh-menu-item.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+.sh-menu-item.on .sh-menu-t { font-weight: 600; }
 .sh-menu-item {
   position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
   padding: 13px 20px 14px 0; color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
@@ -1232,6 +1256,7 @@ ${npProjectSrc()}
      arrow keys walk it, Escape or a press outside closes it ------------- */
   var mBtn = document.querySelector(".sh-menu-btn"), mPop = document.getElementById("sh-menu");
   if (nav && mBtn && mPop) {
+    var mAll = null;
     var mItems = function () {
       var all = mPop.querySelectorAll('[role="menuitem"]'), out = [];
       for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
@@ -1244,8 +1269,27 @@ ${npProjectSrc()}
     var mPlace = function () {
       var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect(), vw = window.innerWidth;
       var pp = mBtn.querySelector(".sh-menu-paper"), pr = pp ? pp.getBoundingClientRect() : br;
-      var w0 = Math.min(492, vw - 16);
-      var L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+      /* two columns from 1060px, as the main page's menu (2026-10-25): each
+         column a sheet of its own, read down the first and then the second;
+         the wider sheet keeps to the page's frame (the bar's inner box) */
+      var two = vw >= 1060, list0 = mPop.querySelector(".sh-menu-list"), fin = nav.querySelector(".sh-tabs-inner");
+      mPop.classList.toggle("sh-menu-two", two);
+      if (list0) {
+        if (!mAll) mAll = Array.prototype.slice.call(mPop.querySelectorAll(".sh-menu-item"));
+        var cols = list0.querySelectorAll(".sh-menu-col");
+        if (two) {
+          var c1 = cols[0], c2 = cols[1];
+          if (!c1) { c1 = document.createElement("div"); c2 = document.createElement("div"); c1.className = c2.className = "sh-menu-col"; list0.appendChild(c1); list0.appendChild(c2); }
+          var pages = mAll.filter(function (el) { return !el.classList.contains("sh-menu-info"); }), k = Math.ceil(pages.length / 2);
+          mAll.forEach(function (el) { var at = pages.indexOf(el); (at > -1 && at < k ? c1 : c2).appendChild(el); });
+        } else if (cols.length) {
+          mAll.forEach(function (el) { list0.appendChild(el); });
+          for (var ci = cols.length - 1; ci >= 0; ci--) list0.removeChild(cols[ci]);
+        }
+      }
+      var fr = two && fin ? fin.getBoundingClientRect() : null, lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
+      var w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
+      var L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
       if (pr.left - L < 16) L = Math.round(pr.left);
       if (R - pr.right < 16) R = Math.round(pr.right);
       var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
