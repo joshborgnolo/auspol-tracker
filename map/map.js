@@ -714,18 +714,22 @@ function drawLabels(m) {
 }
 
 /* ----- the streets -----
-   From suburb zoom in, Esri's grey canvas tiles show the streets through the
-   seat fills. The tiles are Web Mercator and the map is a conic projection, so
-   each tile goes down as an affine fit to its four corners carried through
-   the map's projection (off by a fifth of a pixel at most at the zooms they
-   show at). They are drawn on a canvas of their own, their plain land taken
-   to nothing, and laid over the fills - multiplied on paper, screened on the
-   dark page - so the seat colours stay where they were and only the streets,
-   blocks and water mark them. */
-const STREETS = { k0: 45, k1: 110, zMin: 3, zMax: 16, cap: 360, live: 12 };
+   Esri's World_Basemap_v2 vector tiles show the streets through the seat
+   fills from suburb zoom in. Each PBF tile is read once, drawn to a tile
+   canvas in the palette the old grey-canvas sheets carried, and from there
+   the pipeline is the raster one: Web Mercator affine-fitted through the
+   conic projection, plain land taken to nothing, then multiplied on paper
+   and screened on the dark page - so the seat colours stay where they were
+   and only the streets, blocks and water mark them. */
+const STREETS = { k0: 45, k1: 110, zMin: 3, zMax: 17, live: 12 };
 // the plain land of each sheet, taken to white (paper) or black (dark page)
 const STREET_LAND = { light: 239, dark: 71 };
-const streetURL = (dark, z, x, y) => `https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark ? "Dark" : "Light"}_Gray_Base/MapServer/tile/${z}/${y}/${x}`;
+// tile artworks render at one 256-px block per dpr step so they stay sharp
+// on retina (the raster sheets were fixed 256 and blurred there); dpr is a
+// boot-time value, so both read live
+const tilePx = () => Math.max(256, Math.min(512, Math.round(256 * dpr)));
+const streetCap = () => (tilePx() > 256 ? 220 : 360);
+const SVC_T = "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile";
 const streetK = () => smooth(STREETS.k0, STREETS.k1, T.k);
 const tiles = new Map();
 let streetCv = null, streetUse = 0, streetLive = 0;
@@ -736,20 +740,158 @@ function tileAt(dark, z, x, y, want) {
   const key = (dark ? "d" : "l") + z + "/" + x + "/" + y;
   let t = tiles.get(key);
   if (!t && want && streetLive < STREETS.live) {
-    t = { img: new Image(), ready: 0, failed: false, used: 0 };
+    t = { cv: null, ready: 0, failed: false, used: 0 };
     tiles.set(key, t); streetLive++;
-    t.img.crossOrigin = "anonymous";
-    t.img.src = streetURL(dark, z, x, y);
-    t.img.decode().then(() => { t.ready = performance.now(); }, () => { t.failed = true; })
+    fetch(`${SVC_T}/${z}/${y}/${x}.pbf`)
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then((b) => { t.cv = renderTile(mvtParse(new Uint8Array(b)), dark, z, tilePx()); t.ready = performance.now(); })
+      .catch(() => { t.failed = true; })
       .finally(() => { streetLive--; schedule(); });
-    if (tiles.size > STREETS.cap) pruneTiles();
+    if (tiles.size > streetCap()) pruneTiles();
   }
   if (t) t.used = streetUse;
   return t;
 }
 function pruneTiles() {
   const old = [...tiles].filter(([, t]) => (t.ready || t.failed) && t.used < streetUse).sort((a, b) => a[1].used - b[1].used);
-  for (const [k] of old.slice(0, tiles.size - Math.round(STREETS.cap * 0.75))) tiles.delete(k);
+  for (const [k] of old.slice(0, tiles.size - Math.round(streetCap() * 0.75))) tiles.delete(k);
+}
+/* the tile reaches us as a protobuf of layers of tagged line/polygon
+   geometry (the Mapbox vector-tile layout): varint-framed fields, packed
+   zig-zag coordinate deltas against a 4096 extent. mvtParse keeps only the
+   layers the street sheet draws. */
+const TXT = new TextDecoder();
+function mvtParse(buf) {
+  const vint = (b, st) => { let x = 0, s = 0; for (;;) { const v = b[st.i++]; x += (v & 127) * 2 ** s; s += 7; if (!(v & 128)) return x; } };
+  const packed = (b) => { const st = { i: 0 }, out = []; while (st.i < b.length) out.push(vint(b, st)); return out; };
+  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] } };
+  for (let i = 0; i <= 10; i++) { out.roads.push([]); out.tuns.push([]); }
+  const FILL_OF = { "Urban area": "urban", "Park or farming": "park", "Golf course": "park", Airport: "park", Zoo: "park", "Marine area": "water", "Water area": "water" };
+  const root = { i: 0 };
+  while (root.i < buf.length) {
+    const tag = vint(buf, root), no = tag >> 3, wire = tag & 7;
+    if (wire === 2) { const n = vint(buf, root); const layer = buf.subarray(root.i, root.i + n); root.i += n; if (no === 3) mvtLayer(layer); }
+    else if (wire === 0) vint(buf, root);
+    else break;
+  }
+  return out;
+  function mvtLayer(lb) {
+    const st = { i: 0 };
+    const L = { name: "", keys: [], valsr: [], extent: 4096, raw: [] };
+    while (st.i < lb.length) {
+      const tag = vint(lb, st), no = tag >> 3, wire = tag & 7;
+      if (wire === 2) { const n = vint(lb, st), v = lb.subarray(st.i, st.i + n); st.i += n;
+        if (no === 1) L.name = TXT.decode(v); else if (no === 2) L.raw.push(v); else if (no === 3) L.keys.push(TXT.decode(v)); else if (no === 4) L.valsr.push(v);
+      } else if (wire === 0) { const n = vint(lb, st); if (no === 5) L.extent = n; }
+    }
+    const kind = FILL_OF[L.name], isRoad = L.name === "Road" || L.name === "Road tunnel";
+    if (!kind && !isRoad && L.name !== "Railroad" && L.name !== "Water line") return;
+    const vals = L.valsr.map((v) => {
+      const vs = { i: 0 }; let o = null;
+      while (vs.i < v.length) { const t = vint(v, vs), no = t >> 3, w = t & 7;
+        if (w === 2) { const n = vint(v, vs); const s = v.subarray(vs.i, vs.i + n); vs.i += n; if (no === 1) o = TXT.decode(s); }
+        else if (w === 0) { const n = vint(v, vs); o = no === 7 ? !!n : n; }
+        else if (w === 1) vs.i += 8; else if (w === 5) vs.i += 4; }
+      return o;
+    });
+    for (const fb of L.raw) {
+      const f = { tags: [], geom: [] };
+      const fs = { i: 0 };
+      while (fs.i < fb.length) { const t = vint(fb, fs), no = t >> 3, w = t & 7;
+        if (w === 2) { const n = vint(fb, fs), v = fb.subarray(fs.i, fs.i + n); fs.i += n;
+          if (no === 2) f.tags = packed(v); else if (no === 4) f.geom = packed(v); }
+        else if (w === 0) vint(fb, fs); }
+      const tags = {};
+      for (let i = 0; i + 1 < f.tags.length; i += 2) tags[L.keys[f.tags[i]]] = vals[f.tags[i + 1]];
+      const parts = decodeParts(f.geom);
+      if (!parts.length) continue;
+      if (kind) { out.fills[kind].push({ ext: L.extent, parts }); continue; }
+      if (L.name === "Railroad") { out.rail.push({ ext: L.extent, parts }); continue; }
+      if (L.name === "Water line") { out.waterL.push({ ext: L.extent, parts }); continue; }
+      if (tags.Viz === 3) continue; // Esri's suppression lane
+      const cls = typeof tags._symbol === "number" ? tags._symbol >> 1 : -1;
+      if (cls < 0 || cls > 10 || (tags._symbol & 1)) continue;
+      (L.name === "Road" ? out.roads : out.tuns)[cls].push({ ext: L.extent, parts });
+    }
+  }
+}
+// command streams to flat [x0,y0,x1,y1,...] parts; rings remembered as closed
+const zig = (v) => (v >> 1) ^ -(v & 1);
+function decodeParts(geom) {
+  const parts = []; let x = 0, y = 0, i = 0, cur = null;
+  while (i < geom.length) {
+    const cmd = geom[i++], id = cmd & 7, n = cmd >> 3;
+    if (id === 7) { if (cur) cur.closed = true; continue; }
+    for (let k = 0; k < n; k++) {
+      x += zig(geom[i++]); y += zig(geom[i++]);
+      if (id === 1) { cur = [x, y]; parts.push(cur); } else if (cur) cur.push(x, y);
+    }
+  }
+  return parts;
+}
+/* and the sheet back out of it: grey-canvas colours measured off the raster
+   sheets themselves (land exactly STREET_LAND so the land-lift still reads
+   plain land), road width by class against zoom in tile-256 px */
+const SHEET = {
+  light: { land: "#efefef", urban: "#dfe0e2", water: "#d0cfd4", park: "#e3e8e2", line: "#ffffff", case: "#d3d4d6", tcase: "#dedfe1", tline: "#fcfcfc", rail: "#c9cacc", railBox: "#f7f7f7" },
+  dark: { land: "#474749", urban: "#505052", water: "#232227", park: "#4a4c4b", line: "#666668", case: "#3a3b3d", tcase: "#434446", tline: "#5c5c5f", rail: "#5e5e60", railBox: "#383839" },
+};
+// fwy, hwy, fwy-ramp, major, major-ramp, minor, minor-ramp, local, service, walking, 4wd
+const RW = [
+  [[12, 1.0], [14, 2.8], [16, 5.5], [18, 16]], [[12, 0.9], [14, 2.6], [16, 5.0], [18, 15]],
+  [[12, 0.5], [14, 1.4], [16, 2.8], [18, 8]], [[12, 0.8], [14, 2.4], [16, 4.6], [18, 13]],
+  [[12, 0.5], [14, 1.2], [16, 2.4], [18, 7]], [[12, 0.6], [14, 2.0], [16, 3.8], [18, 11]],
+  [[12, 0.4], [14, 1.0], [16, 2.0], [18, 6]], [[13, 0.6], [15, 1.6], [16, 2.4], [18, 9]],
+  [[14, 0.6], [16, 1.6], [18, 6]], [[15, 0.8], [16, 1.2], [18, 5]], [[14, 0.5], [16, 1.2], [18, 4]],
+];
+const ROAD_ORDER = [10, 9, 8, 7, 6, 5, 4, 3, 1, 0, 2]; // the little roads go under the big ones
+const SWT = (stops, z) => {
+  if (z <= stops[0][0]) return stops[0][1];
+  for (let i = 1; i < stops.length; i++) { const [z1, w1] = stops[i], [z0, w0] = stops[i - 1]; if (z <= z1) return w0 + ((w1 - w0) * (z - z0)) / (z1 - z0); }
+  return stops[stops.length - 1][1];
+};
+function renderTile(parsed, dark, z, px) {
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = px;
+  const g = cv.getContext("2d"), pal = dark ? SHEET.dark : SHEET.light, W256 = px / 256;
+  g.lineJoin = g.lineCap = "round";
+  g.fillStyle = pal.land; g.fillRect(0, 0, px, px);
+  const fillParts = (bkt) => {
+    const k = px / bkt.ext;
+    g.beginPath();
+    for (const r of bkt.parts) { g.moveTo(r[0] * k, r[1] * k); for (let i = 2; i < r.length; i += 2) g.lineTo(r[i] * k, r[i + 1] * k); g.closePath(); }
+    g.fill();
+  };
+  const strokeParts = (bkt, w) => {
+    const k = px / bkt.ext;
+    g.lineWidth = w;
+    g.beginPath();
+    for (const r of bkt.parts) { g.moveTo(r[0] * k, r[1] * k); for (let i = 2; i < r.length; i += 2) g.lineTo(r[i] * k, r[i + 1] * k); if (r.closed) g.closePath(); }
+    g.stroke();
+  };
+  for (const key of ["urban", "park", "water"]) { g.fillStyle = pal[key]; for (const bkt of parsed.fills[key]) fillParts(bkt); }
+  if (parsed.waterL.length) { g.strokeStyle = pal.water; for (const bkt of parsed.waterL) strokeParts(bkt, Math.max(0.8 * W256, SWT([[11, 1], [14, 1.4], [17, 2.5]], z) * W256)); }
+  if (parsed.rail.length) {
+    g.strokeStyle = pal.railBox; for (const bkt of parsed.rail) strokeParts(bkt, SWT([[11, 1.2], [14, 1.8], [18, 3]], z) * W256);
+    g.strokeStyle = pal.rail; for (const bkt of parsed.rail) strokeParts(bkt, SWT([[11, 0.7], [14, 0.9], [18, 1.2]], z) * W256);
+  }
+  for (const cls of ROAD_ORDER) { // tunnels first, every casing under every line
+    const w = SWT(RW[cls], z); if (w <= 0) continue;
+    g.strokeStyle = pal.tcase; for (const bkt of parsed.tuns[cls]) strokeParts(bkt, (w + 1.6) * W256);
+  }
+  for (const cls of ROAD_ORDER) {
+    const w = SWT(RW[cls], z); if (w <= 0) continue;
+    g.strokeStyle = pal.tline; for (const bkt of parsed.tuns[cls]) strokeParts(bkt, w * W256);
+  }
+  for (const cls of ROAD_ORDER) {
+    const w = SWT(RW[cls], z); if (w <= 0) continue;
+    g.strokeStyle = pal.case; for (const bkt of parsed.roads[cls]) strokeParts(bkt, (w + (cls <= 8 ? 1.6 : 0)) * W256);
+  }
+  for (const cls of ROAD_ORDER) {
+    const w = SWT(RW[cls], z); if (w <= 0) continue;
+    g.strokeStyle = pal.line; for (const bkt of parsed.roads[cls]) strokeParts(bkt, w * W256);
+  }
+  return cv;
 }
 // a tile's corners on the canvas, in device pixels: top-left, top-right, bottom-left, bottom-right
 function tileQuad(z, x, y) {
@@ -781,7 +923,9 @@ function drawStreets(alpha) {
   // the zoom whose pixels match the screen's, read at the middle of the view
   const m0 = inv(Wpx / 2, Hpx / 2), m1 = inv(Wpx / 2 + 64, Hpx / 2);
   const per = Math.hypot(m1[0] - m0[0], m1[1] - m0[1]) / 64;
-  const z = clamp(Math.round(Math.log2(dpr / (per * 256)) - 0.2), STREETS.zMin, STREETS.zMax), n = 2 ** z;
+  // z against the tile's CSS size (256): per-tile art is tilePx() wide so the
+  // 512-px artwork still meets the screen 1:1 on a dpr-2 display
+  const z = clamp(Math.round(-Math.log2(per * 256) - 0.2), STREETS.zMin, STREETS.zMax), n = 2 ** z;
   // the tiles under the view: its rim carried into Mercator
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const [u, v] of [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5]]) {
@@ -807,15 +951,15 @@ function drawStreets(alpha) {
       let held = false;
       for (let up = 1; up <= 6 && z - up >= STREETS.zMin && !held; up++) {
         const s = 2 ** up, px = tx >> up, py = ty >> up, pt = tileAt(dark, z - up, px, py, false);
-        if (pt && pt.ready) { const w = 256 / s; drawQuad(g, pt.img, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true; }
+        if (pt && pt.ready) { const w = pt.cv.width / s; drawQuad(g, pt.cv, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true; }
       }
       if (!held && z < STREETS.zMax) for (let k = 0; k < 4; k++) {
         const cx = 2 * tx + (k & 1), cy = 2 * ty + (k >> 1), ct = tileAt(dark, z + 1, cx, cy, false);
-        if (ct && ct.ready) drawQuad(g, ct.img, 0, 0, 256, tileQuad(z + 1, cx, cy), 1);
+        if (ct && ct.ready) drawQuad(g, ct.cv, 0, 0, ct.cv.width, tileQuad(z + 1, cx, cy), 1);
       }
       if (t && t.ready) needFrame = true;
     }
-    if (f > 0) drawQuad(g, t.img, 0, 0, 256, q, f);
+    if (f > 0) drawQuad(g, t.cv, 0, 0, t.cv.width, q, f);
   }
   // the plain land to nothing: lifted to white on paper, differenced to black on the dark page
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
