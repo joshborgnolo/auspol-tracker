@@ -213,6 +213,17 @@ function parseWitness(text) {
     else if (/\|\}/.test(chunk)) inVi = false;
     if (!inVi) continue;
 
+    /* Chunks are bounded by |- row separators, so when a table's LAST row
+       has no |- of its own the chunk fuses that row + the |} closer + the
+       next table's {| opener and headers — and the in-scope flip above then
+       licenses the row scan to read the OLD table's tail as rows of the new
+       one (the National-direction table's closing "7–11 May 2025" Essential
+       row rode the Hypothetical-scenarios VI opener into a phantom missing
+       2025-05-11 wave, Oct 2026). Rows of the new table can only exist from
+       its {| line onward: scan that suffix, never the fused prefix. */
+    const openAt = chunk.search(/^\{\|/m);
+    const body = openAt >= 0 ? chunk.slice(openAt) : chunk;
+
     // Pollster: the first wikilink that maps to a house we track, matched on
     // the link target OR its piped display text ([[Resolve (poll)|Resolve]],
     // [[The Sydney Morning Herald#resolve|Resolve Political Monitor]] — the
@@ -222,7 +233,7 @@ function parseWitness(text) {
     // <ref> tags and the downstream client cell: the citation's own
     // publisher/work links ([[Nine Entertainment]], [[News Corp Australia]])
     // and the client column are not the pollster.
-    const refStripped = chunk.replace(/<ref\b[\s\S]*?(?:<\/ref>|$)/g, "").replace(/<ref\b[^>]*\/>/g, "");
+    const refStripped = body.replace(/<ref\b[\s\S]*?(?:<\/ref>|$)/g, "").replace(/<ref\b[^>]*\/>/g, "");
     const lines = refStripped.split("\n");
     let date = null, dateLine = -1;
     for (let i = 0; i < lines.length; i++) {
@@ -258,7 +269,7 @@ function parseWitness(text) {
       const hit = HOUSE[houseKey(firm)] ?? (base !== firm ? HOUSE[houseKey(base)] : undefined);
       if (hit) { house = hit; wikiName = firm; }
     }
-    const isMrp = /\bMRP\b/.test(chunk);
+    const isMrp = /\bMRP\b/.test(body);
 
     if (!house) {
       /* First-contact candidate: only a row with vote figures is a poll
@@ -267,7 +278,7 @@ function parseWitness(text) {
          but never a % figure, and were the false candidates here until
          this gate. The name is the firm cell's own — link display, link
          target, or plain text for a firm the table never linked. */
-      if (/%/.test(chunk) && firm) unknowns.push({ name: firm, date, refs: refsOf(chunk) });
+      if (/%/.test(body) && firm) unknowns.push({ name: firm, date, refs: refsOf(body) });
       continue;
     }
     waves.push({ date, house, wikiName, mrp: isMrp });
