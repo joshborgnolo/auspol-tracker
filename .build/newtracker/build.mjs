@@ -200,6 +200,60 @@ const stripJs = (code, name) => babelCached("plain", code, name, {});
    build checks it below). A line that isn't strict JSON (a function, a
    computed value) is left to the printer as before. No "__proto__" key can
    ride along: a literal would set the prototype where JSON.parse sets a key. */
+/* The dataset in two halves. The first screen (the hero, the header, the
+   next-polls ticker) reads a handful of tables; the rest - and the bulk of
+   each poll row (its group breakdowns, links, change notes, yardsticks,
+   issue and direction readings) - only the sections and views that load
+   after the first paint read (loadLate, 73de0c58). Measured 2026-10-25 by
+   instrumenting every table and poll field: none of these is read before
+   the late modules land, at desktop or phone width. They ship as
+   data[-vic]-late.<hash>.js, which patches window.AUSPOL in place - the
+   tables by name (each is referenced only by the IIFE's return object, so
+   the main half declares it undefined), the poll fields by row index.
+   Root documents load it first in the late list; tab documents load it as
+   a plain script straight after the dataset. The More menu's own tables
+   (houseLean, flowDrift) stay in the main half: the menu can open first. */
+const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory"];
+const LATE_POLL_FIELDS = ["grp", "links", "chg", "yd", "url", "ldYd", "iss", "dir"];
+const splitDataset = (code) => {
+  const tables = {};
+  let rows = [];
+  const lines = code.split("\n");
+  const ret = lines.map((l) => /^\s*return \{/.test(l)).lastIndexOf(true);
+  const main = lines.map((line, at) => {
+    const m = /^(\s*)const ([\w$]+) = (.+);\s*$/.exec(line);
+    if (!m) return line;
+    const [, ind, name, rhs] = m;
+    if (LATE_TABLES.includes(name)) {
+      /* only the return object may read it: nothing between its
+         declaration and the return statement can, while the IIFE runs */
+      const re = new RegExp(`\\b${name}\\b`);
+      const early = lines.slice(at + 1, ret).filter((l) => re.test(l)).length;
+      if (ret < 0 || early) throw new Error(`dataset split: ${name} is read ${early} time(s) before the return object`);
+      tables[name] = JSON.parse(rhs);
+      return `${ind}const ${name} = undefined;`;
+    }
+    if (name === "individualPolls") {
+      const polls = JSON.parse(rhs);
+      rows = polls.map((p, i) => {
+        const moved = {};
+        for (const k of LATE_POLL_FIELDS) if (k in p) { moved[k] = p[k]; delete p[k]; }
+        return Object.keys(moved).length ? [i, moved] : null;
+      }).filter(Boolean);
+      return `${ind}const ${name} = ${JSON.stringify(polls)};`;
+    }
+    return line;
+  }).join("\n");
+  const payload = JSON.stringify({ t: tables, f: rows }).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  const late = `/* the dataset's late half - see splitDataset in build.mjs */
+(function () {
+  var A = window.AUSPOL, L = JSON.parse(${JSON.stringify(payload).replace(/[\u007f-\uffff]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"))});
+  for (var k in L.t) A[k] = L.t[k];
+  var P = A.individualPolls;
+  L.f.forEach(function (e) { var o = P[e[0]]; for (var f in e[1]) o[f] = e[1][f]; });
+})();`;
+  return { main, late };
+};
 const jsonParseLiterals = (code) => code.split("\n").map((line) => {
   const m = /^(\s*(?:const|let|var)\s+[\w$]+\s*=\s*)(.+);\s*$/.exec(line);
   if (!m || m[2].length < 10240 || m[2].includes('"__proto__"')) return line;
@@ -1730,11 +1784,17 @@ for (const f of PLAIN) {
     continue;
   }
   const src = fs.readFileSync(DA(f), "utf8");
-  const out = stripJs(jsonParseLiterals(src), f);
-  /* the JSON.parse form must build exactly the dataset the literals did */
-  const run = (code) => { const w = {}; vm.runInNewContext(code, { window: w }); return JSON.stringify(w.AUSPOL); };
-  if (run(out) !== run(src)) throw new Error("dataset: JSON.parse literals changed window.AUSPOL");
+  const { main, late } = splitDataset(src);
+  const out = stripJs(jsonParseLiterals(main), f);
+  /* the JSON.parse form plus the late half must build exactly the dataset the
+     literals did (keys compared sorted: a merged poll carries its late fields
+     last, and nothing reads a poll's keys in order) */
+  const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === "object"
+    ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
+  const run = (...codes) => { const ctx = vm.createContext({ window: {} }); for (const c of codes) vm.runInContext(c, ctx); return JSON.stringify(sorted(ctx.window.AUSPOL)); };
+  if (run(out, late) !== run(src)) throw new Error("dataset: the split or the JSON.parse literals changed window.AUSPOL");
   parts.push(emitJs(VIC ? "data-vic" : "data", out));
+  parts.push(emitJs(VIC ? "data-vic-late" : "data-late", late));
 }
 for (const f of JSX)
   parts.push(emitJs(f.replace(/\.jsx?$/, ""), transpile(fs.readFileSync(A(f), "utf8"), f)));
@@ -1851,7 +1911,7 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
    documents above were cut from the full tag list - each renders its own
    tab first and needs its module from the start. Order is kept: the late
    list runs in the order the tags did. */
-const LATE_MODULES = ["copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
+const LATE_MODULES = ["data-late", "data-vic-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
 {
   const late = [];
   html = html.replace(/\n?[ \t]*<script src="((?:\.\.\/)*assets\/js\/([\w-]+)\.[0-9a-f]{8}\.js)"><\/script>/g,

@@ -1762,10 +1762,29 @@ function SnapshotView({
       if (landing) requestAnimationFrame(() => {
         const id = decodeURIComponent((window.location.hash || "").slice(1));
         const el = id && document.getElementById(id);
-        if (el && window.scrollY < 4) el.scrollIntoView({
-          block: "start",
-          behavior: "instant"
-        });
+        if (!el || window.scrollY >= 4) return;
+        const land = () => {
+          const pad = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+          window.scrollTo({
+            top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - pad),
+            behavior: "instant"
+          });
+        };
+        const root = document.getElementById("root");
+        const ro = typeof ResizeObserver !== "undefined" && root ? new ResizeObserver(land) : null;
+        const evs = ["wheel", "touchstart", "keydown", "pointerdown"];
+        const stop = () => {
+          if (ro) ro.disconnect();
+          evs.forEach(e => window.removeEventListener(e, stop, true));
+          clearTimeout(t);
+        };
+        const t = setTimeout(stop, 1500);
+        evs.forEach(e => window.addEventListener(e, stop, {
+          capture: true,
+          passive: true
+        }));
+        land();
+        if (ro) ro.observe(root);
       });
       return undefined;
     }

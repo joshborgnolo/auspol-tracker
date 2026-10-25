@@ -2109,10 +2109,27 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
       /* the browser's own jump to the hash found nothing - the section it
          names arrives with the late modules - so land it here, once it
          exists, unless the reader has already scrolled */
+      /* Land it, then hold it there while the page settles: the sections
+         above it draw at their real heights over the next frames (skipped
+         ones keep a placeholder until then), so a one-shot landing came to
+         rest hundreds of px off. Each change to the app's height re-lands
+         it, until the reader scrolls, taps or presses a key, or 1.5s pass. */
       if (landing) requestAnimationFrame(() => {
         const id = decodeURIComponent((window.location.hash || "").slice(1));
         const el = id && document.getElementById(id);
-        if (el && window.scrollY < 4) el.scrollIntoView({ block: "start", behavior: "instant" });
+        if (!el || window.scrollY >= 4) return;
+        const land = () => {
+          const pad = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+          window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - pad), behavior: "instant" });
+        };
+        const root = document.getElementById("root");
+        const ro = typeof ResizeObserver !== "undefined" && root ? new ResizeObserver(land) : null;
+        const evs = ["wheel", "touchstart", "keydown", "pointerdown"];
+        const stop = () => { if (ro) ro.disconnect(); evs.forEach((e) => window.removeEventListener(e, stop, true)); clearTimeout(t); };
+        const t = setTimeout(stop, 1500);
+        evs.forEach((e) => window.addEventListener(e, stop, { capture: true, passive: true }));
+        land();
+        if (ro) ro.observe(root);
       });
       return undefined;
     }
