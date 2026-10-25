@@ -352,7 +352,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           // the group's estimated subsample (gen-data's wave n × the group's
           // share of voters) overrides the tip's whole-wave n, as the rug does
           return { x: s.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: demoPartMeta(q, s), party: p.id,
-                   sub: demoPartSub(q, s, q.grp.n && q.grp.n[gi]) };
+                   sub: demoReadSub(q, sel.label, demoPartSub(q, s, q.grp.n && q.grp.n[gi])) };
         }).filter(Boolean);
       }).concat(inDom(q.x) ? soloDotsOf(q) : []);
     }), [T, G, xDomain[0], xDomain[1], hvKey]);
@@ -2376,6 +2376,14 @@ function rdDemoDek(T, tab, party) {
       out.push("The two splits disagree here: " + short(up) + " sit above all voters but " + short(dn) + " below" + (apart ? ", and different pollsters ask each" : "") + ".");
     }
   }
+  /* the Age tab's estimated figures (gen-data §7g-age): whose groups were
+     read off their own age bands rather than printed, whatever the finding */
+  const est = tab.id === "age" && (tab.sets.find((s) => s.est) || {}).est;
+  if (est && est.houses.length && est.groups.length) {
+    const and = (a) => (a.length < 3 ? a.join(" and ") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]);
+    out.push(and(est.houses.map((h) => demoHouse(h) + "’s"))
+      + " figures for " + and(est.groups) + " are estimated from " + (est.houses.length === 1 ? "its" : "their") + " own age bands.");
+  }
   return out.join(" ");
 }
 /* the usual (Pew) birth years behind the polls' generation labels: neither
@@ -3245,7 +3253,8 @@ function RdDemographics({ rangeId = "all" }) {
         // v[gpi] null: the wave printed no such party - an Others fold isn't a zero
         return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null
           ? { x: s.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: demoPartMeta(q, s),
-              ...(s.part != null ? { part: s.part, sub: demoPartSub(q, s) } : {}) } : null;
+              ...(s.part != null ? { part: s.part } : {}),
+              ...((sub) => (sub ? { sub } : {}))(demoReadSub(q, l.g.label, s.part != null ? demoPartSub(q, s) : undefined)) } : null;
       }).filter(Boolean)));
       /* the trio panel's open rings: single-territory readings (Roy Morgan's
          Tas cut, DemosAU (MRP)'s three rows, EMRS's whole-territory polls),

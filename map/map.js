@@ -342,7 +342,11 @@ const yearLabel = (y) => (y === "now" ? "Now" : String(y));
 const xOfYear = (y) => (y === "now" ? YEAR_X.now : y);
 
 /* =============================== data =============================== */
-const getJSON = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+// each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
+// names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
+// pairs with a cached older copy
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","geo-2004-hi.json":"fc0a3808","geo-2004-lo.json":"f19e03b5","geo-2007-hi.json":"a812ca6d","geo-2007-lo.json":"404a85e3","geo-2010-hi.json":"7f425bed","geo-2010-lo.json":"df8243d3","geo-2013-hi.json":"d8edb706","geo-2013-lo.json":"e376c26b","geo-2016-hi.json":"c7d53e04","geo-2016-lo.json":"368a2458","geo-2019-hi.json":"7437a3a7","geo-2019-lo.json":"3bc9da66","geo-2022-hi.json":"8e72e277","geo-2022-lo.json":"a52c9996","geo-2025-hi.json":"ef2c6466","geo-2025-lo.json":"fd7736d4","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"88d40233","res-2007.json":"668bf7e3","res-2010.json":"1e8e0f2a","res-2013.json":"86fc8dbc","res-2016.json":"68089d09","res-2019.json":"cef435fd","res-2022.json":"f05a0395","res-2025.json":"dacac17f","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","summary.json":"06f08fb1"};
+const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
   let s = name.replace(new RegExp("\\s*\\(" + div.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\)$"), "");
@@ -387,9 +391,11 @@ function deriveDiv(d, i, year) {
   };
 }
 
+// an island's polling places stay off the map's own plane (x, y NaN): they
+// are drawn in the island's inset box (app-2-map.js), so isl marks which
 function deriveBooths(B, m) {
   const n = B.id.length;
-  const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B,
+  const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B, isl: new Int8Array(n).fill(-1),
     name: new Array(n), x: new Float32Array(n).fill(NaN), y: new Float32Array(n).fill(NaN), votes: new Float32Array(n), formal: new Float32Array(n),
     infPct: new Float32Array(n).fill(NaN), tpp: new Float32Array(n).fill(NaN), tppSw: new Float32Array(n).fill(NaN), lead: new Array(n).fill(null), leadPct: new Float32Array(n).fill(NaN),
     fp: {}, flowAlp: {}, byDiv: m.divs.map(() => []) };
@@ -398,7 +404,9 @@ function deriveBooths(B, m) {
     const D = m.divs[B.d[j]];
     o.byDiv[B.d[j]].push(j);
     o.name[j] = cleanBooth(B.n[j], D.n, B.ty[j]);
-    if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
+    const k = B.lat[j] == null ? -1 : m.isl.findIndex((s) => B.lon[j] >= s.near[0] && B.lon[j] <= s.near[2] && B.lat[j] >= s.near[1] && B.lat[j] <= s.near[3]);
+    if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
+    else if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
     o.formal[j] = formal; o.votes[j] = formal + B.inf[j];
     if (o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
@@ -449,6 +457,30 @@ function buildGeo(topo, m) {
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
   };
+}
+
+/* the islands off the mainland frame (map/data/islands.json, from
+   .build/map/islands_build.mjs): each one's coast as a path of its own,
+   north up in local degrees (x by the cosine of its latitude), its seat in
+   this election (owner: the seat its boundary holds it in, null where none
+   does - Norfolk Island before 2016) and the seat its polling places count
+   in (seat: the owner, else the places' own) */
+let islandsP = null;
+const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
+function buildIslands(data, m) {
+  if (!data) return [];
+  const own = data.owner[m.year === "now" ? 2025 : m.year] || {};
+  return data.islands.map((s) => {
+    let lon0 = Infinity, lat0 = Infinity, lon1 = -Infinity, lat1 = -Infinity;
+    for (const r of s.rings) for (const [x, y] of r) { lon0 = Math.min(lon0, x); lon1 = Math.max(lon1, x); lat0 = Math.min(lat0, y); lat1 = Math.max(lat1, y); }
+    const cos = Math.cos((((lat0 + lat1) / 2) * Math.PI) / 180);
+    const path = new Path2D();
+    for (const r of s.rings) { r.forEach(([x, y], i) => (i ? path.lineTo : path.moveTo).call(path, (x - lon0) * cos, lat1 - y)); path.closePath(); }
+    const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
+    // a polling place counts as the island's within a few km of its frame
+    const near = [s.box[0] - 0.05, s.box[1] - 0.05, s.box[2] + 0.05, s.box[3] + 0.05];
+    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [] };
+  });
 }
 
 const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ");
@@ -515,8 +547,8 @@ async function loadYear(year) {
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
-    const [res, lo, now, seating] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null]);
+    const [res, lo, now, seating, islands] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
+      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null, loadIslands()]);
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.demoBasis = res.demoBasis || null;
@@ -530,7 +562,9 @@ async function loadYear(year) {
     m.seating = seating;
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);
+    m.isl = buildIslands(islands, m);
     m.booth = deriveBooths(m.res.booths, m);
+    for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     m.search = buildSearch(m);
     getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { m.geoHi = buildGeo(hi, m); schedule(); }).catch(() => {});
@@ -789,7 +823,7 @@ function drawBooths(m) {
 }
 
 function drawLabels(m) {
-  const th = TH, placed = [], now = performance.now();
+  const th = TH, placed = islDrawn.map((c) => c.box), now = performance.now();
   ctx.save();
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
@@ -1230,13 +1264,224 @@ function showCredit(on) {
   creditOn = on; $("#credit").hidden = !on;
 }
 
+/* ----- the islands -----
+   Norfolk, Lord Howe, Christmas and the Cocos (Keeling) Islands lie hundreds
+   to thousands of km past the mainland frame the seats are clipped to, so
+   each is drawn in a box of its own, north up at its own scale, the way
+   printed maps inset them. At the country view a box sits in the sea on its
+   own side of the continent (the Indian Ocean pair off the north-west, the
+   Tasman pair off the south-east) and moves with the map. When the selection
+   holds its seat (Bean, Sydney or Lingiari, or their state) the box docks,
+   larger, beside the seat in room the fit keeps clear, with its polling
+   places drawn and live; it glides between the two, and fades as the reader
+   zooms well past the docked fit. */
+// the boxes at sea go in two pairs, each a diagonal as the islands lie (Christmas
+// north-east of Cocos, Norfolk north-east of Lord Howe), the pair's middle at a
+// fraction of the home box: in the sea inside it where the stage is wider than
+// the map (side), else in the room the stage leaves above and below the map
+// (stacked) - off the north-west and south-east coasts either way
+const ISL_PAIRS = [["christmas", "cocos"], ["norfolk", "lordhowe"]];
+const ISL_AT = { side: [[0.14, 0.145], [1.015, 0.78]], stacked: [[0.2, -0.15], [0.86, 1.07]] };
+const ISL_SHORT = { cocos: "Cocos Islands" };
+// the caption's line under a box at sea, and its band inside a docked box; the room between docked boxes
+const ISL_CAP = 15, ISL_DCAP = 20, ISL_GAP = 10;
+const islSea = () => clamp(HOME.k * 96, 42, 64);
+const islDock = () => (isPhone() ? 92 : 124);
+let dock = null; // { side: "left" | "bottom", k }: the docked fit fitSelection last made, else null
+const islAnim = new Map();
+let islDrawn = [];
+// the islands the selection holds: its seat's, or (a state) its seats'
+function heldIslands(m) {
+  if (!m || !m.isl) return [];
+  const sd = selDiv();
+  if (sd != null) return m.isl.filter((s) => s.seat === sd);
+  if (S.sel.level === "state") return m.isl.filter((s) => s.seat != null && m.divs[s.seat].st === S.sel.st);
+  return [];
+}
+// docked boxes: a column up from the stage's foot at its left, or a row along the foot
+function dockRects(n, side) {
+  const p = stagePads(), D = islDock(), out = [];
+  for (let i = 0; i < n; i++) {
+    const h = D + ISL_DCAP;
+    if (side === "left") out.push({ x: p.l, y: Hpx - p.b - h - (n - 1 - i) * (h + ISL_GAP), w: D, h });
+    else out.push({ x: p.l + i * (D + ISL_GAP), y: Hpx - p.b - h, w: D, h });
+  }
+  return out;
+}
+// the fit of a selection that holds islands keeps their docked boxes clear,
+// in a column at the left or a row along the foot, whichever leaves the seat larger
+function dockedFit(box, n) {
+  const D = islDock(), p = stagePads(), opts = [];
+  if (n * (D + ISL_DCAP) + (n - 1) * ISL_GAP <= Hpx - p.t - p.b) opts.push(["left", fitTransform(box, 0, { l: D + ISL_GAP + 4 })]);
+  if (n * D + (n - 1) * ISL_GAP <= Wpx - p.l - p.r) opts.push(["bottom", fitTransform(box, 0, { b: D + ISL_DCAP + ISL_GAP })]);
+  if (!opts.length) return { t: fitTransform(box), side: null };
+  opts.sort((a, b) => b[1].k - a[1].k);
+  return { t: opts[0][1], side: opts[0][0] };
+}
+// each box's centre at the country fit, in stage px: a pair's two boxes a box
+// and a caption apart down the diagonal, the pair shifted whole onto the stage
+// (captions and all) and below the cities and the hint over its top. The
+// stacked places once the stage leaves the pair room above the map
+// (the hint empties and the cities hide once a seat is chosen, so their foot is
+// measured while they show and remembered for the stage's width)
+let seaMemo = null, seaTop = { w: 0, top: 4 };
+function seaSpots(m, hb, A, p) {
+  const cities = $("#cities"), hint = $("#hint");
+  if (cities && !cities.hidden && hint && hint.textContent) {
+    const st = $("#stage").getBoundingClientRect();
+    let top = 4;
+    for (const el of [cities, hint]) if (el.offsetHeight) top = Math.max(top, el.getBoundingClientRect().bottom - st.top + 6);
+    seaTop = { w: Wpx, top };
+  }
+  const top = seaTop.w === Wpx ? seaTop.top : isPhone() ? 4 : p.t + 22;
+  const memo = [m.year, Wpx, Hpx, HOME.k, HOME.x, HOME.y, top].join();
+  if (seaMemo && seaMemo.memo === memo) return seaMemo.out;
+  const room = Hpx - p.t - p.b - (hb[1][1] - hb[0][1]) * HOME.k, at = ISL_AT[room >= 2 * (A + ISL_CAP + 8) ? "stacked" : "side"];
+  const dx = A * 0.62, dy = (A + ISL_CAP) / 2 + 4, out = {};
+  ctx.font = `400 10.5px ${SANS}`;
+  ISL_PAIRS.forEach(([ne, sw], k) => {
+    const f = at[k], mx = (hb[0][0] + f[0] * (hb[1][0] - hb[0][0])) * HOME.k + HOME.x, my = (hb[0][1] + f[1] * (hb[1][1] - hb[0][1])) * HOME.k + HOME.y;
+    const c = { [ne]: [mx + dx, my - dy], [sw]: [mx - dx, my + dy] };
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const key of [ne, sw]) {
+      const isl = m.isl.find((q) => q.key === key), name = ISL_SHORT[key] || (isl ? isl.name : "");
+      const [x, y] = c[key], half = Math.max(A, ctx.measureText(name).width + 6) / 2;
+      x0 = Math.min(x0, x - half); x1 = Math.max(x1, x + half); y0 = Math.min(y0, y - A / 2); y1 = Math.max(y1, y + A / 2 + ISL_CAP);
+    }
+    const sx = x0 < 4 ? 4 - x0 : x1 > Wpx - 4 ? Wpx - 4 - x1 : 0, sy = y0 < top ? top - y0 : y1 > Hpx - 4 ? Hpx - 4 - y1 : 0;
+    for (const key of [ne, sw]) out[key] = [c[key][0] + sx, c[key][1] + sy];
+  });
+  seaMemo = { memo, out };
+  return out;
+}
+function islandCards(m) {
+  if (!m.isl || !m.isl.length || !Wpx) return [];
+  const held = heldIslands(m), now = performance.now(), out = [], A = islSea(), hb = homeBox(m), p = stagePads();
+  const docked = dock && held.length ? dockRects(held.length, dock.side) : null;
+  const sea = seaSpots(m, hb, A, p);
+  const dockA = dock ? 1 - smooth(2.2, 3.6, T.k / dock.k) : 1;
+  for (const s of m.isl) {
+    const hi = docked ? held.indexOf(s) : -1, mode = hi >= 0 ? "dock" : "sea";
+    let r;
+    if (hi >= 0) r = docked[hi];
+    else {
+      // placed at the country fit and carried by the map from there
+      const [hx, hy] = sea[s.key] || [Wpx / 2, Hpx / 2];
+      const cx = ((hx - HOME.x) / HOME.k) * T.k + T.x, cy = ((hy - HOME.y) / HOME.k) * T.k + T.y;
+      r = { x: cx - A / 2, y: cy - A / 2, w: A, h: A };
+    }
+    // the glide between the sea and the dock, from no further out than just off the stage
+    let a = islAnim.get(s.key);
+    if (!a || a.mode !== mode) {
+      const l = a && a.last;
+      a = { mode, t0: now, from: l && !reduceMotion ? { ...l, x: clamp(l.x, -l.w, Wpx), y: clamp(l.y, -l.h, Hpx) } : null };
+      islAnim.set(s.key, a);
+    }
+    if (a.from) {
+      const u = clamp((now - a.t0) / 650, 0, 1), e = ease(u);
+      if (u < 1) { needFrame = true; r = { x: lerp(a.from.x, r.x, e), y: lerp(a.from.y, r.y, e), w: lerp(a.from.w, r.w, e), h: lerp(a.from.h, r.h, e) }; }
+      else a.from = null;
+    }
+    a.last = r;
+    const alpha = mode === "dock" ? dockA : 1;
+    if (alpha <= 0.01 || r.x > Wpx || r.y > Hpx || r.x + r.w < 0 || r.y + r.h + ISL_CAP < 0) continue;
+    out.push({ s, r, docked: mode === "dock", alpha });
+  }
+  return out;
+}
+function drawIslands(m, alpha = 1) {
+  const cards = islandCards(m);
+  islDrawn = [];
+  if (!cards.length) return;
+  const th = TH, sd = selDiv(), b = m.booth, now = performance.now(), pat = hatch();
+  const rf = S.f.range && S.listUnit === "booths" ? S.f.range : null;
+  ctx.save();
+  ctx.lineJoin = "round";
+  for (const c of cards) {
+    const { s, r } = c, a = alpha * c.alpha, own = s.owner;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalAlpha = a;
+    // the box: paper over whatever lies under it, a hairline frame
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1, 3); else ctx.rect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+    ctx.fillStyle = css(th.bg); ctx.fill();
+    ctx.lineWidth = 1; ctx.strokeStyle = css(th.ink3, 0.32); ctx.stroke();
+    // the island, north up, filling the box less a margin; its seat's colour,
+    // quieted, veiled and filtered as the map's own shapes are (an island in no
+    // seat that year is plain land)
+    // (a docked box's name heads it, so the island sits under that band)
+    const pad = c.docked ? 9 : Math.max(4, r.w * 0.09), top = c.docked ? ISL_DCAP - 4 : 0;
+    const k = Math.min((r.w - 2 * pad) / s.w, (r.h - top - 2 * pad) / s.h);
+    const ox = r.x + (r.w - s.w * k) / 2, oy = r.y + top + (r.h - top - s.h * k) / 2;
+    const places = c.docked && sd != null && s.seat === sd && s.booths.length > 0;
+    let col = own == null ? th.nodata : fillDiv(m, own);
+    if (col && own != null) {
+      if (own === sd) col = towards(col, th.bg, quietness(own, now));
+      if (sd != null && own !== sd) col = towards(col, th.bg, th.veil);
+      else if (S.sel.level === "state" && m.divs[own].st !== S.sel.st) col = towards(col, th.bg, th.veil * 0.85);
+      if (filtersOn() && !passes(m, own)) col = towards(col, th.bg, 0.8);
+    }
+    ctx.save();
+    ctx.beginPath(); ctx.rect(r.x + 1, r.y + 1, r.w - 2, r.h - 2); ctx.clip();
+    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * ox, dpr * oy);
+    if (col) ctx.fillStyle = css(col);
+    else { pat.setTransform(new DOMMatrix().scale(1 / (dpr * k))); ctx.fillStyle = pat; }
+    ctx.fill(s.path);
+    ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / k; ctx.stroke(s.path);
+    const hov = own != null && S.hover && S.hover.kind === "div" && S.hover.i === own;
+    if (own != null && (own === sd || hov)) { ctx.strokeStyle = css(th.ink, own === sd ? 1 : 0.9); ctx.lineWidth = (own === sd ? 1.8 : 1.4) / k; ctx.stroke(s.path); }
+    ctx.restore();
+    // the polling places, biggest first; two at one spot (a polling place and
+    // its early-voting centre) sit side by side
+    const dots = [];
+    if (places) {
+      for (const j of s.booths.slice().sort((p, q) => b.votes[q] - b.votes[p])) {
+        const rr = clamp(3.4 * voteScale(b.votes[j]), 2.6, 8);
+        let x = ox + (b.raw.lon[j] - s.lon0) * s.cos * k, y = oy + (s.lat1 - b.raw.lat[j]) * k;
+        for (const d of dots) if (Math.hypot(d.x - x, d.y - y) < d.r + rr) x = d.x + d.r + rr + 2;
+        dots.push({ j, x: clamp(x, r.x + rr + 3, r.x + r.w - rr - 3), y: clamp(y, r.y + rr + 3, r.y + r.h - rr - 3), r: rr });
+      }
+      pat.setTransform(new DOMMatrix().scale(1 / dpr));
+      for (const d of dots) {
+        ctx.globalAlpha = a * (rf && !inRange(boothColValue(m, d.j, rf.key), rf) ? 0.2 : 1);
+        boothShape(ctx, b.ty[d.j], d.x, d.y, d.r + halo(d.r)); ctx.fillStyle = css(th.bg); ctx.fill();
+        const bc = fillBooth(m, d.j);
+        boothShape(ctx, b.ty[d.j], d.x, d.y, d.r); ctx.fillStyle = bc ? css(bc) : pat; ctx.fill();
+      }
+      ctx.globalAlpha = a;
+      for (const d of dots) {
+        const on = S.sel.level === "booth" && S.sel.booth === d.j, hv = S.hover && S.hover.kind === "booth" && S.hover.i === d.j;
+        if (on || hv) { boothShape(ctx, b.ty[d.j], d.x, d.y, d.r + 2.4); ctx.lineWidth = on ? 2.4 : 1.6; ctx.strokeStyle = css(th.ink); ctx.stroke(); }
+      }
+    }
+    // the name: heading a docked box, under a box at sea
+    ctx.textBaseline = "middle";
+    if (c.docked) {
+      ctx.font = `500 11px ${SANS}`;
+      const name = ctx.measureText(s.name).width > r.w - 16 && ISL_SHORT[s.key] ? ISL_SHORT[s.key] : s.name;
+      ctx.textAlign = "left"; ctx.fillStyle = css(th.ink2); ctx.fillText(name, r.x + 8, r.y + 12);
+      islDrawn.push({ s, r, dots, box: [r.x, r.y, r.x + r.w, r.y + r.h] });
+    } else {
+      const name = ISL_SHORT[s.key] || s.name, cx = r.x + r.w / 2, cy = r.y + r.h + 8.5;
+      ctx.font = `400 10.5px ${SANS}`; ctx.textAlign = "center";
+      ctx.lineWidth = 2.6; ctx.strokeStyle = css(th.bg, 0.85); ctx.strokeText(name, cx, cy);
+      ctx.fillStyle = css(th.ink3); ctx.fillText(name, cx, cy);
+      const tw = ctx.measureText(name).width / 2 + 3;
+      islDrawn.push({ s, r, dots, box: [Math.min(r.x, cx - tw), r.y, Math.max(r.x + r.w, cx + tw), cy + 7] });
+    }
+  }
+  ctx.restore();
+}
+
 /* ----- framing ----- */
 function stagePads() {
   const phone = isPhone();
   return { t: phone ? 12 : 36, b: phone ? 12 : 18, l: phone ? 8 : 12, r: phone ? 44 : 50 };
 }
-function fitTransform(bb, maxK) {
+// res: room kept clear at the stage's left (l) or foot (b), for docked island boxes
+function fitTransform(bb, maxK, res) {
   const p = stagePads();
+  if (res) { p.l += res.l || 0; p.b += res.b || 0; }
   const [[x0, y0], [x1, y1]] = bb;
   const w = Math.max(x1 - x0, 0.05), h = Math.max(y1 - y0, 0.05);
   const k = Math.min((Wpx - p.l - p.r) / w, (Hpx - p.t - p.b) / h, maxK || 2400);
@@ -1277,22 +1522,38 @@ function selectionBox() {
 // the last view the page framed by itself, to tell it from one the reader has moved
 let lastFit = null;
 const atLastFit = () => lastFit && Math.abs(T.k / lastFit.k - 1) < 0.01 && Math.hypot(T.x - lastFit.x, T.y - lastFit.y) < 2;
+// the page's own flight to a fit, while it lasts: its redo frames it again. A
+// first seat chosen from the country view grows the key mid-flight, and the
+// stage's resize must take that for the page's view, not one the reader moved
+let flight = null;
+function fly(t, dur, redo) {
+  const s = d3.select(canvas), me = { redo };
+  flight = me;
+  s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t)
+    .on("end.flight interrupt.flight", () => { if (flight === me) flight = null; });
+}
 function fitSelection(dur, force) {
   if (!M() || !Wpx || (S.view !== "map" && !force)) return;
-  const t = fitTransform(selectionBox());
+  const n = heldIslands(M()).length;
+  let t;
+  if (n) { const f = dockedFit(selectionBox(), n); t = f.t; dock = f.side ? { side: f.side, k: t.k } : null; }
+  else { t = fitTransform(selectionBox()); dock = null; }
   lastFit = t;
   const s = d3.select(canvas);
-  if (!dur || reduceMotion) { s.interrupt(); s.call(zoom.transform, t); }
-  else s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t);
+  if (!dur || reduceMotion) { flight = null; s.interrupt(); s.call(zoom.transform, t); }
+  else fly(t, dur, () => fitSelection(Math.min(dur, 320)));
 }
 function flyToCity(k) {
   const [, st, ll] = CITIES[k];
   const a = proj(ll[0]), b = proj(ll[1]);
   select({ level: "state", st }, { fly: false });
-  const t = fitTransform([[Math.min(a[0], b[0]), Math.min(a[1], b[1])], [Math.max(a[0], b[0]), Math.max(a[1], b[1])]]);
-  lastFit = t;
-  const s = d3.select(canvas);
-  if (reduceMotion) s.call(zoom.transform, t); else s.transition().duration(900).ease(d3.easeCubicInOut).call(zoom.transform, t);
+  dock = null; // a city's view keeps no room for its state's islands
+  const go = (dur) => {
+    const t = fitTransform([[Math.min(a[0], b[0]), Math.min(a[1], b[1])], [Math.max(a[0], b[0]), Math.max(a[1], b[1])]]);
+    lastFit = t;
+    if (reduceMotion) { flight = null; d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
+  };
+  go(900);
 }
 function zoomBy(f) { if (S.view === "map") d3.select(canvas).transition().duration(reduceMotion ? 0 : 280).call(zoom.scaleBy, f); }
 
@@ -1399,6 +1660,15 @@ function hitTest(px, py) {
   const m = M(); if (!m) return null;
   if (S.view === "chamber") { const c = CM(); return c ? chamberHit(c, px, py) : null; }
   if (S.view !== "map") return null;
+  // an island's box is on top of the map: its places, else its seat (an island in no seat is nobody's)
+  for (let k = islDrawn.length - 1; k >= 0; k--) {
+    const c = islDrawn[k], r = c.r;
+    if (px < r.x || px > r.x + r.w || py < r.y || py > r.y + r.h) continue;
+    let cj = null, cd = Infinity;
+    for (const d of c.dots) { const dd = Math.hypot(px - d.x, py - d.y); if (dd <= Math.max(d.r + 3, 8) && dd < cd) { cd = dd; cj = d.j; } }
+    if (cj != null) return { kind: "booth", i: cj };
+    return c.s.owner != null ? { kind: "div", i: c.s.owner, isl: c.s.name } : null;
+  }
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, dd = Math.hypot(px - x, py - y);
@@ -2094,7 +2364,7 @@ function drawMorph(m, p) {
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
-  if (p < 0.55) { drawGeo(m, 1 - p / 0.55, (1 - p / 0.55) * streetK()); }
+  if (p < 0.55) { drawGeo(m, 1 - p / 0.55, (1 - p / 0.55) * streetK()); drawIslands(m, 1 - p / 0.55); }
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (p > 0.45) {
     ctx.globalAlpha = clamp((p - 0.45) / 0.55, 0, 1);
@@ -2248,7 +2518,8 @@ function senateFurniturePaths() {
    drawn as they stand, not as sectors of one circle) */
 const BENCH_PAD = 2.5;
 function senBenches() {
-  const all = [...senFloor.seats.filter((c) => c.row > 0), ...senFloor.furniture.blackRod];
+  // (a floor filed before Black Rod's bench was drawn has none)
+  const all = [...senFloor.seats.filter((c) => c.row > 0), ...(senFloor.furniture.blackRod || [])];
   // a column is one x extent; down it, a seat whose top meets the last one's foot joins its block
   const cols = new Map();
   for (const c of all.filter((c) => c.box)) { const k = `${Math.round(c.box[0])}|${Math.round(c.box[2])}`; if (!cols.has(k)) cols.set(k, []); cols.get(k).push(c.box.slice()); }
@@ -3788,7 +4059,7 @@ function tipFor(h) {
     const v = divValue(m, h.i);
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
-    return `<div class="tn">${esc(d.n)}<span>${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${esc(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
+    return `<div class="tn">${esc(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${esc(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -4031,7 +4302,7 @@ function frame(ts) {
   } else if (S.view === "map") {
     if (yearFade && Y[yearFade.from] && Y[yearFade.from].divs) drawGeo(Y[yearFade.from], 1 - yf);
     drawGeo(m, yearFade ? yf : 1, streetK());
-    drawFocus(m); drawBooths(m); drawLabels(m);
+    drawFocus(m); drawBooths(m); drawIslands(m); drawLabels(m);
   } else if (S.view === "chamber") {
     const c = CM();
     if (houseFade) {
@@ -4055,12 +4326,13 @@ function resize() {
   // only the height moved (the key above the stage grew or shrank): a view the page framed
   // glides to the new fit; one the reader has moved keeps its zoom, centred as before
   const dh = r.height - Hpx, keyOnly = !first && Math.abs(Wpx - r.width) <= 0.5 && changed && S.view === "map";
-  const moved = keyOnly && !atLastFit();
+  const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
   if (M()) {
     setExtent();
     if (moved) d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(T.x, T.y + dh / 2).scale(T.k));
+    else if (flight && keyOnly) flight.redo();
     else if (first || changed) fitSelection(keyOnly && !reduceMotion ? 320 : 0);
   }
   renderTimeline();
@@ -4282,6 +4554,7 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   renderLegend(); updateHint(); renderTimeline();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
   window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+    get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); } };
 })();

@@ -16,6 +16,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { SHELL_PAGES, shellHeader, shellCss, shellJs } from "./site-shell.mjs";
+import { dataStamps, stampData } from "./map/data-stamp.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
@@ -68,10 +69,19 @@ assert.ok(page.includes(`href="/map/map.css?v=${hs("map.css")}"`), "the page's m
 assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git conflict-marker lines");
 const part = (f) => R(".build/map/app/" + f);
 const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
-assert.equal(R("map/map.js"), `/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, "map/map.js is current (node .build/map/assemble.mjs)");
+// the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
+assert.equal(R("map/map.js"), stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
+assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
 for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+}
+// the islands past the mainland frame, drawn in inset boxes (node .build/map/islands_build.mjs)
+{
+  const isl = JSON.parse(R("map/data/islands.json"));
+  assert.deepEqual(isl.islands.map((s) => s.key), ["norfolk", "lordhowe", "christmas", "cocos"], "islands.json holds the four inset islands");
+  assert.ok(isl.islands.every((s) => s.rings.length), "every inset island has a coast");
+  assert.equal(isl.owner[2025].norfolk, "Bean", "Norfolk Island is in Bean in 2025");
 }
 const now = JSON.parse(R("map/data/data-now.json"));
 assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the Now overlay carries the Farrer by-election");

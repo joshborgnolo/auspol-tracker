@@ -13,7 +13,7 @@ import {
   essentialWaves, essentialMatch,
   sharesProblem, dimsProblem, totalProblem,
 } from "./crosstab-parse.mjs";
-import { harmonize, DEMO_SETS, DEMO_SHARE } from "./newtracker/demo-groups.mjs";
+import { harmonize, ageStandardise, DEMO_SETS, DEMO_SHARE } from "./newtracker/demo-groups.mjs";
 
 const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).polls;
 const poll = (house, date) => polls.find((p) => p.pollster === house && p.date === date);
@@ -617,6 +617,40 @@ assert.deepEqual(julFold.gender.Women, { alp: 36, lnp: 30, onp: null, grn: 13, o
 // a printed zero is a real figure and stays one
 const printedZero = harmonize({ pollster: "YouGov", dims: { age: { "18–34": { alp: 30, lnp: 12, onp: 0, grn: 26, oth: 17 } } } });
 assert.deepEqual(printedZero.age["18–34"], sh(30, 12, 0, 26, 17), "a party that printed 0 keeps 0");
+
+// §7g-age: with the census age table, a house's bands are read at the common groups
+{
+  const ageDist = JSON.parse(readFileSync(path.join(ROOT, "data", "age-dist.json"), "utf8"));
+  const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} v ${b}`);
+  const ygA = harmonize({ pollster: "YouGov", dims: { age: {
+    "18–34": sh(30, 12, 15, 26, 17), "35–49": sh(32, 19, 26, 13, 10), "50+": sh(27, 27, 33, 4, 9) } } }, { ageDist });
+  assert.deepEqual(Object.keys(ygA.age), ["18–34", "35–54", "55+"], "YouGov's 35–49 and 50+ read at 35–54 and 55+");
+  assert.deepEqual(ygA.age["18–34"], sh(30, 12, 15, 26, 17), "a printed band joins as printed");
+  // 35–54 is mostly its 35–49, 55+ mostly its 50+; each sits between its neighbours
+  for (const k of ["alp", "lnp", "onp", "grn", "oth"]) {
+    const a = [32, 19, 26, 13, 10][["alp", "lnp", "onp", "grn", "oth"].indexOf(k)], b = [27, 27, 33, 4, 9][["alp", "lnp", "onp", "grn", "oth"].indexOf(k)];
+    assert.ok(ygA.age["35–54"][k] >= Math.min(a, b) - 0.5 && ygA.age["35–54"][k] <= Math.max(a, b) + 0.5, `35–54 ${k} between 35–49 and 50+`);
+    near(ygA.age["35–54"][k], a, Math.abs(b - a) * 0.5, `35–54 ${k} nearer 35–49`);
+  }
+  // where a house's edges ARE the common ones the read is exact (five bands to 18–34; 50–64 + 65+ = 50+)
+  const five = { "18–24": sh(36, 13, 6, 34, 11), "25–34": sh(32, 14, 17, 23, 14), "35–54": sh(32, 20, 22, 13, 13), "55+": sh(29, 31, 26, 4, 10) };
+  const r5 = ageStandardise(five, ageDist);
+  assert.deepEqual(r5.read, ["18–34"], "only the unprinted group is read");
+  const A = ageDist.adults, w1 = A.slice(0, 7).reduce((x, y) => x + y, 0), w2 = A.slice(7, 17).reduce((x, y) => x + y, 0);
+  near(r5.shares["18–34"].grn, (34 * w1 + 23 * w2) / (w1 + w2), 1e-9, "18–34 from 18–24 and 25–34 is their adults-weighted mean");
+  // a monotone read never leaves the printed range of a party's cells
+  const np = ageStandardise({ "18–34": sh(32, 16, 15, 26, 11), "35–49": sh(33, 21, 22, 13, 11), "50–64": sh(30, 24, 28, 7, 11), "65+": sh(29, 34, 25, 3, 9) }, ageDist);
+  assert.deepEqual(np.read, ["35–54", "55+"]);
+  near(np.shares["55+"].grn, 4.5, 1.5, "55+ Greens between 50–64's 7 and 65+'s 3, nearer 65+");
+  // gaps, a closed top or an unknown label read nothing; an unprinted party is read in no group
+  assert.equal(ageStandardise({ "18–34": sh(30, 12, 15, 26, 17), "50+": sh(27, 27, 33, 4, 9) }, ageDist), null, "a gap reads nothing");
+  assert.equal(ageStandardise({ "18–34": sh(30, 12, 15, 26, 17), "35–64": sh(27, 27, 33, 4, 9) }, ageDist), null, "a closed top reads nothing");
+  assert.equal(ageStandardise({ "Under 35": sh(30, 12, 15, 26, 17), "35+": sh(27, 27, 33, 4, 9) }, ageDist), null);
+  const fold = ageStandardise({ "18–34": { alp: 40, lnp: 20, grn: 20, oth: 20 }, "35–49": { alp: 38, lnp: 26, grn: 10, oth: 26 }, "50+": { alp: 36, lnp: 40, grn: 3, oth: 21 } }, ageDist);
+  assert.equal(fold.shares["55+"].onp, undefined, "a party the table folds away is read nowhere");
+  // without the table, harmonize is as before §7g-age
+  assert.deepEqual(Object.keys(harmonize({ dims: { age: { "18–34": sh(30, 12, 15, 26, 17), "35–49": sh(32, 19, 26, 13, 10), "50+": sh(27, 27, 33, 4, 9) } } }).age), ["18–34"]);
+}
 
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);

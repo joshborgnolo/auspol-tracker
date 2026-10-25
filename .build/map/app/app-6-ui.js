@@ -315,7 +315,7 @@ function tipFor(h) {
     const v = divValue(m, h.i);
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
-    return `<div class="tn">${esc(d.n)}<span>${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${esc(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
+    return `<div class="tn">${esc(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${esc(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -558,7 +558,7 @@ function frame(ts) {
   } else if (S.view === "map") {
     if (yearFade && Y[yearFade.from] && Y[yearFade.from].divs) drawGeo(Y[yearFade.from], 1 - yf);
     drawGeo(m, yearFade ? yf : 1, streetK());
-    drawFocus(m); drawBooths(m); drawLabels(m);
+    drawFocus(m); drawBooths(m); drawIslands(m); drawLabels(m);
   } else if (S.view === "chamber") {
     const c = CM();
     if (houseFade) {
@@ -582,12 +582,13 @@ function resize() {
   // only the height moved (the key above the stage grew or shrank): a view the page framed
   // glides to the new fit; one the reader has moved keeps its zoom, centred as before
   const dh = r.height - Hpx, keyOnly = !first && Math.abs(Wpx - r.width) <= 0.5 && changed && S.view === "map";
-  const moved = keyOnly && !atLastFit();
+  const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
   if (M()) {
     setExtent();
     if (moved) d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(T.x, T.y + dh / 2).scale(T.k));
+    else if (flight && keyOnly) flight.redo();
     else if (first || changed) fitSelection(keyOnly && !reduceMotion ? 320 : 0);
   }
   renderTimeline();
@@ -809,6 +810,7 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   renderLegend(); updateHint(); renderTimeline();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
   window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+    get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); } };
 })();

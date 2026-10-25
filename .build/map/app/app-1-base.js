@@ -340,7 +340,11 @@ const yearLabel = (y) => (y === "now" ? "Now" : String(y));
 const xOfYear = (y) => (y === "now" ? YEAR_X.now : y);
 
 /* =============================== data =============================== */
-const getJSON = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+// each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
+// names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
+// pairs with a cached older copy
+const DATA_V = /*@data-stamps*/{};
+const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
   let s = name.replace(new RegExp("\\s*\\(" + div.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\)$"), "");
@@ -385,9 +389,11 @@ function deriveDiv(d, i, year) {
   };
 }
 
+// an island's polling places stay off the map's own plane (x, y NaN): they
+// are drawn in the island's inset box (app-2-map.js), so isl marks which
 function deriveBooths(B, m) {
   const n = B.id.length;
-  const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B,
+  const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B, isl: new Int8Array(n).fill(-1),
     name: new Array(n), x: new Float32Array(n).fill(NaN), y: new Float32Array(n).fill(NaN), votes: new Float32Array(n), formal: new Float32Array(n),
     infPct: new Float32Array(n).fill(NaN), tpp: new Float32Array(n).fill(NaN), tppSw: new Float32Array(n).fill(NaN), lead: new Array(n).fill(null), leadPct: new Float32Array(n).fill(NaN),
     fp: {}, flowAlp: {}, byDiv: m.divs.map(() => []) };
@@ -396,7 +402,9 @@ function deriveBooths(B, m) {
     const D = m.divs[B.d[j]];
     o.byDiv[B.d[j]].push(j);
     o.name[j] = cleanBooth(B.n[j], D.n, B.ty[j]);
-    if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
+    const k = B.lat[j] == null ? -1 : m.isl.findIndex((s) => B.lon[j] >= s.near[0] && B.lon[j] <= s.near[2] && B.lat[j] >= s.near[1] && B.lat[j] <= s.near[3]);
+    if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
+    else if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
     o.formal[j] = formal; o.votes[j] = formal + B.inf[j];
     if (o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
@@ -447,6 +455,30 @@ function buildGeo(topo, m) {
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
   };
+}
+
+/* the islands off the mainland frame (map/data/islands.json, from
+   .build/map/islands_build.mjs): each one's coast as a path of its own,
+   north up in local degrees (x by the cosine of its latitude), its seat in
+   this election (owner: the seat its boundary holds it in, null where none
+   does - Norfolk Island before 2016) and the seat its polling places count
+   in (seat: the owner, else the places' own) */
+let islandsP = null;
+const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
+function buildIslands(data, m) {
+  if (!data) return [];
+  const own = data.owner[m.year === "now" ? 2025 : m.year] || {};
+  return data.islands.map((s) => {
+    let lon0 = Infinity, lat0 = Infinity, lon1 = -Infinity, lat1 = -Infinity;
+    for (const r of s.rings) for (const [x, y] of r) { lon0 = Math.min(lon0, x); lon1 = Math.max(lon1, x); lat0 = Math.min(lat0, y); lat1 = Math.max(lat1, y); }
+    const cos = Math.cos((((lat0 + lat1) / 2) * Math.PI) / 180);
+    const path = new Path2D();
+    for (const r of s.rings) { r.forEach(([x, y], i) => (i ? path.lineTo : path.moveTo).call(path, (x - lon0) * cos, lat1 - y)); path.closePath(); }
+    const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
+    // a polling place counts as the island's within a few km of its frame
+    const near = [s.box[0] - 0.05, s.box[1] - 0.05, s.box[2] + 0.05, s.box[3] + 0.05];
+    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [] };
+  });
 }
 
 const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ");
@@ -513,8 +545,8 @@ async function loadYear(year) {
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
-    const [res, lo, now, seating] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null]);
+    const [res, lo, now, seating, islands] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
+      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null, loadIslands()]);
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.demoBasis = res.demoBasis || null;
@@ -528,7 +560,9 @@ async function loadYear(year) {
     m.seating = seating;
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);
+    m.isl = buildIslands(islands, m);
     m.booth = deriveBooths(m.res.booths, m);
+    for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     m.search = buildSearch(m);
     getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { m.geoHi = buildGeo(hi, m); schedule(); }).catch(() => {});

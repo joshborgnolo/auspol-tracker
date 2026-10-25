@@ -1198,9 +1198,14 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     if (!isDem || !p.grp) return null;
     const G = D.demoGroups || [];
     const raw = Object.values(p.grp.d || {}).flatMap((rows) => rows.map((r) => r[0]));
-    const pooled = (p.grp.v || []).map((v, i) => (v ? G[i] : null)).filter(Boolean);
+    /* age groups read off its own bands (gen-data §7g-age) aren't groups it
+       printed: they're counted apart, and the bands they came from don't
+       stay alone */
+    const ar = p.grp.ar || [];
+    const pooled = (p.grp.v || []).map((v, i) => (v && !ar.includes(G[i]) ? G[i] : null)).filter(Boolean);
     const MERGED = ["Below Year 12", "Year 12", "School", "TAFE", "TAFE or college", "SA", "WA", "ACT/NT/Tas"];
-    const alone = raw.filter((l) => !pooled.includes(l) && !MERGED.includes(l));
+    const ageRead = ar.length ? (p.grp.d.age || []).map((r) => r[0]) : [];
+    const alone = raw.filter((l) => !pooled.includes(l) && !MERGED.includes(l) && !ageRead.includes(l));
     const T = D.demographics || {};
     const base = (n) => (n === "RedBridge" ? "RedBridge/Accent" : n);
     const inWin = (T.polls || []).some((q) => base(q.pollster) === p.pollster && q.dateLabel === p.field);
@@ -1213,7 +1218,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
           joins nothing for that reason, not for how it cuts its groups */}
       {p.grp.x === "reuse"
         ? <span>None of its groups joins the pooled figures: its fieldwork contains {p.pollster.replace(/ \(MRP\)$/, "")}’s own regular polls, whose groups already count, and it is taken to reuse their respondents.</span>
-        : <span>{pooled.length ? <>{pooled.length} of its groups join</> : "None of its groups joins"} the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>}
+        : <span>{pooled.length ? <>{pooled.length} of its groups join</> : "None of its groups joins"} the pooled figures{ar.length ? <>{pooled.length ? ", and" : ", but"} its age bands give estimates for {rdApLdJoin(ar)}, the groups other pollsters print</> : ""}{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>}
       {T.window && <>
         <span className="rd-apd-k">In today’s figures</span>
         <span>{inWin ? <>One of the polls the panel’s current figures draw on (the last {T.window}).</> : <>Outside the {T.window} the panel’s current figures draw on.</>}</span>

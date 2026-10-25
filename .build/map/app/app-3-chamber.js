@@ -679,7 +679,7 @@ function drawMorph(m, p) {
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
-  if (p < 0.55) { drawGeo(m, 1 - p / 0.55, (1 - p / 0.55) * streetK()); }
+  if (p < 0.55) { drawGeo(m, 1 - p / 0.55, (1 - p / 0.55) * streetK()); drawIslands(m, 1 - p / 0.55); }
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (p > 0.45) {
     ctx.globalAlpha = clamp((p - 0.45) / 0.55, 0, 1);

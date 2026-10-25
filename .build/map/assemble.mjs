@@ -14,17 +14,21 @@
    This writes map/map.js (one closure, so nothing leaks to window but the
    __map test hook) and map/map.css. Run after editing a part:
      node .build/map/assemble.mjs
-   The data in map/data comes from build_map_data.py and geo_build.mjs. */
+   The data in map/data comes from build_map_data.py, geo_build.mjs and
+   islands_build.mjs (the islands past the mainland frame, drawn inset); each tracked file's hash
+   is stamped into map.js (data-stamp.mjs), so re-run this after rebuilding any data file. */
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { dataStamps, stampData } from "./data-stamp.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
 const app = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
-const js = `/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`;
+// each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
+const js = stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`, dataStamps(ROOT));
 const css = part("page.css");
 const write = (rel, body) => {
   const p = path.join(ROOT, rel);

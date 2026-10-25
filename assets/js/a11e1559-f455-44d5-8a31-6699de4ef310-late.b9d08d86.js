@@ -2073,6 +2073,7 @@ const demoPartMeta = (q, s) => s.part == null ? q : {
   dateLabel: s.l
 };
 const demoPartSub = (q, s, n) => s.part == null ? n ? "n ≈ " + n.toLocaleString() : undefined : (n ? "n ≈ " + Math.round(n * s.k).toLocaleString() + " · " : "") + "one of " + s.of + " polls in the " + q.field + " tables";
+const demoReadSub = (q, label, sub) => q.grp && q.grp.ar && q.grp.ar.includes(label) ? (sub ? sub + " · " : "") + "estimated from its own age bands" : sub;
 const demoRamp = (color, n, i) => n < 2 ? color : `color-mix(in oklch, ${color} ${Math.round(100 - i * 60 / (n - 1))}%, var(--ink))`;
 const DEMO_WHO = {
   "18–34": "voters aged 18–34",
@@ -2421,9 +2422,9 @@ function DemographicsPanel({
         color: l.color,
         label: l.g.label,
         meta: demoPartMeta(p, s),
-        ...(s.part != null ? {
-          sub: demoPartSub(p, s)
-        } : {})
+        ...(sub => sub ? {
+          sub
+        } : {})(demoReadSub(p, l.g.label, s.part != null ? demoPartSub(p, s) : undefined))
       } : null;
     }).filter(Boolean)));
     const areas = drawn.map(l => ({
@@ -2614,7 +2615,7 @@ function DemographicsPanel({
     className: "table-hint"
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
-  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ", except age: a pollster whose bands differ (YouGov’s 35–49 and 50+, Newspoll’s and Roy Morgan’s 35–49, 50–64 and 65+) counts at 35–54 and 55+ through estimates from its own bands, filling in only the slivers between its edges and the common ones" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
     className: "table-hint"
   }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("a", {
     className: "hi-term",

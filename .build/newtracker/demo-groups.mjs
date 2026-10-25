@@ -4,9 +4,13 @@
 
    A house's group joins a common one only where it is the same people:
      gender      Men, Women – every house.
-     age         18–34 – Resolve, DemosAU and YouGov all cut there. 35–54 and
-                 55+ – Resolve and DemosAU. YouGov's 35–49 and 50+ (earlier
-                 50–64 and 65+) hold other people, so they don't join.
+     age         18–34, 35–54 and 55+ – Resolve, DemosAU and Essential print
+                 them. Every other house's bands are read at them along
+                 the adults' age distribution (ageStandardise, §7g-age):
+                 Newspoll's, Roy Morgan's and Fox & Hedgehog's 35–49,
+                 50–64 and 65+, YouGov's 35–49 and 50+ (earlier 50–64 and
+                 65+, or five bands from 18–24), Freshwater's 18–35, 36–53
+                 and 54+. A band a house prints joins as printed.
      generation  Gen Z, Millennials, Gen X, Boomers – YouGov and RedBridge.
                  YouGov's Silent generation (RedBridge prints none) doesn't.
      education   three levels of highest qualification. DemosAU's School,
@@ -311,6 +315,102 @@ export function incomeFit(cells, dim) {
   return { fits: out, support: Object.fromEntries(keys.map((k) => [k, support(k)])) };
 }
 
+/* §7g-age: the common age groups as edges in years, the open top null */
+export const AGE_STD_BANDS = [
+  { group: "18–34", lo: 18, hi: 35 },
+  { group: "35–54", lo: 35, hi: 55 },
+  { group: "55+", lo: 55, hi: null },
+];
+// a printed age label as [lo, hi) in years ("65+" → [65, null]), else null
+const ageEdges = (lab) => {
+  let m = /^(\d+)\s*[–-]\s*(\d+)$/.exec(lab);
+  if (m) return [+m[1], +m[2] + 1];
+  m = /^(\d+)\+$/.exec(lab);
+  return m ? [+m[1], null] : null;
+};
+/* Fritsch–Carlson monotone cubic through (xs, ys), at x: a non-decreasing
+   ys stays non-decreasing between knots, so no read goes below zero */
+function pchip(xs, ys, x) {
+  const n = xs.length, h = [], dl = [];
+  for (let i = 0; i < n - 1; i++) { h[i] = xs[i + 1] - xs[i]; dl[i] = (ys[i + 1] - ys[i]) / h[i]; }
+  const m = new Array(n).fill(0);
+  if (n === 2) m[0] = m[1] = dl[0];
+  else {
+    // the three-point end slopes, held to the shape of the end interval
+    const end = (h0, h1, d0, d1) => {
+      const s = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
+      if (Math.sign(s) !== Math.sign(d0)) return 0;
+      return Math.sign(d0) !== Math.sign(d1) && Math.abs(s) > 3 * Math.abs(d0) ? 3 * d0 : s;
+    };
+    m[0] = end(h[0], h[1], dl[0], dl[1]);
+    m[n - 1] = end(h[n - 2], h[n - 3], dl[n - 2], dl[n - 3]);
+    for (let i = 1; i < n - 1; i++) {
+      if (dl[i - 1] * dl[i] <= 0) continue;
+      const w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1];
+      m[i] = (w1 + w2) / (w1 / dl[i - 1] + w2 / dl[i]);
+    }
+  }
+  let i = 0;
+  while (i < n - 2 && x > xs[i + 1]) i++;
+  const t = (x - xs[i]) / h[i], t2 = t * t, t3 = t2 * t;
+  return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * m[i]
+    + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h[i] * m[i + 1];
+}
+
+/* ageStandardise(dim, dist): a wave's age table read at the common groups
+   it doesn't print. The bands must tile adulthood – 18 to an open top, no
+   gaps – or nothing is read. Each age maps to its share of adults below it
+   (dist: data/age-dist.json, adults by single year, built by
+   .build/extract-age-dist.mjs), and per party the cumulative vote, known
+   exactly at every printed edge, is drawn between edges by a monotone
+   cubic; a group's share is the vote it gains across the group over the
+   adults it spans. A printed band reads back exactly as printed, so only
+   the slivers between a house's edges and the common ones are estimated
+   (Newspoll's 50–64 split at 55; YouGov's 50+ at 55). A straight line
+   over the axis, the income tab's fit, is no use here: age bends the vote
+   (Greens fall steeply then flatten, One Nation peaks at 50–64), and on
+   2026-10-26 holdouts – each of 25 four-band waves rebuilt with an edge
+   removed – the line missed by 2.0 points where this missed 1.3–1.6, of
+   which ~1.1 is the cells' own sampling. Read at the common groups, the
+   four-band houses' 35–54 and 55+ move under half a point between this
+   and a flat split. Generations stay their own set: rebuilt from age
+   tables, Gen Z read 3 points high on One Nation, and the Silent row sits
+   past every printed edge.
+   Returns { shares: {group: {party: share}}, read: [groups] } for the
+   groups it read (printed groups are harmonize's own), or null. A party
+   any cell leaves unprinted is read in no group. */
+export function ageStandardise(dim, dist) {
+  if (!dim || !dist || !Array.isArray(dist.adults)) return null;
+  const cells = Object.entries(dim).map(([lab, sh]) => { const e = ageEdges(lab); return e && { lab, lo: e[0], hi: e[1], sh }; });
+  if (!cells.length || cells.some((c) => !c)) return null;
+  cells.sort((a, b) => a.lo - b.lo);
+  if (cells[0].lo !== 18 || cells.at(-1).hi != null) return null;
+  for (let i = 1; i < cells.length; i++) if (cells[i].lo !== cells[i - 1].hi) return null;
+  const todo = AGE_STD_BANDS.filter((b) => !dim[b.group]);
+  if (!todo.length || cells.length < 2) return null;
+  // share of adults younger than age a; the open top is everyone
+  const from = dist.from || 18, A = dist.adults, all = A.reduce((s, x) => s + x, 0);
+  const U = (a) => {
+    if (a == null) return 1;
+    let s = 0;
+    for (let y = from; y < a && y - from < A.length; y++) s += A[y - from];
+    return s / all;
+  };
+  const xs = [0, ...cells.map((c) => U(c.hi))];
+  const shares = {};
+  for (const k of KEYS) {
+    if (cells.some((c) => c.sh[k] == null)) continue;
+    const ys = [0];
+    cells.forEach((c, i) => ys.push(ys[i] + (xs[i + 1] - xs[i]) * (+c.sh[k] || 0)));
+    for (const b of todo) {
+      const u0 = U(b.lo), u1 = U(b.hi);
+      (shares[b.group] ||= {})[k] = (pchip(xs, ys, u1) - pchip(xs, ys, u0)) / (u1 - u0);
+    }
+  }
+  const read = todo.map((b) => b.group).filter((g) => shares[g]);
+  return read.length ? { shares, read } : null;
+}
+
 const KEYS = ["alp", "lnp", "onp", "grn", "oth"];
 const RB_SCHOOL = [["Below Year 12", 0.39], ["Year 12", 0.61]];
 /* YouGov's three smaller regions as shares of their combined 2025 formal
@@ -328,15 +428,19 @@ const MRP_TRIO = [["Tas", 0.481], ["ACT", 0.3805], ["NT", 0.1385]];
    A party that printed a zero (a segment that rounded to nothing) stays 0;
    a key ABSENT from the printed table stays null – RedBridge's July 2025
    AFR table folds One Nation into Others, and reading that fold as a zero
-   share would pollute every One Nation pool the wave's groups join. */
-export function harmonize(w) {
+   share would pollute every One Nation pool the wave's groups join.
+   With opts.ageDist (data/age-dist.json) an age table whose bands miss the
+   common ones is read at them (ageStandardise); without it only printed
+   bands join, as before §7g-age. */
+export function harmonize(w, opts) {
   const d = (w && w.dims) || {}, out = {};
   const put = (set, group, sh) => {
     if (sh) (out[set] ||= {})[group] = Object.fromEntries(KEYS.map((k) => [k, sh[k] == null ? null : (+sh[k] || 0)]));
   };
   for (const g of ["Men", "Women"]) put("gender", g, d.gender && d.gender[g]);
-  // only the bands whose edges match join: YouGov's 35–49 and 50+ find no key here
-  for (const g of ["18–34", "35–54", "55+"]) put("age", g, d.age && d.age[g]);
+  // a printed band joins as printed; one the table lacks is read off its own bands
+  const ag = opts && opts.ageDist ? ageStandardise(d.age, opts.ageDist) : null;
+  for (const g of ["18–34", "35–54", "55+"]) put("age", g, (d.age && d.age[g]) || (ag && ag.shares[g]));
   for (const g of ["Gen Z", "Millennials", "Gen X", "Boomers"]) put("generation", g, d.generation && d.generation[g]);
   const e = d.education;
   if (e) {
