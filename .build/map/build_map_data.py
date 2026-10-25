@@ -244,15 +244,18 @@ def dec_of_pct(p):
 # live (vote-weighted); 2013 the 2011 census of the SA1 the venue itself
 # stands in (a venue proxy — the AEC's Votes-by-SA1 product starts 2016):
 # [language other than English at home, aged 65 and over, aged 20 to 34,
-#  born overseas, university educated], each a share of residents (the
-# last one of the aged-15+ basis); all ex-not-stated
+#  born overseas, university educated, blue-collar occupation], each a
+# share of residents (uni of the aged-15+ basis, blue of employed people
+# with a stated occupation — trades + drivers + labourers of the eight
+# stated ANZSCO major groups); all ex-not-stated
 def demo_cells(dm):
     if not dm or dm.get("langOther") is None or dm.get("fborn") is None \
-            or dm.get("uni") is None or not dm.get("age"):
+            or dm.get("uni") is None or dm.get("blue") is None \
+            or not dm.get("age"):
         return None
     a = dm["age"]
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
-            dm["fborn"], dm["uni"]]
+            dm["fborn"], dm["uni"], dm["blue"]]
 
 
 def seifa_cells(sf):
@@ -422,7 +425,7 @@ def build_year(year, hist, base2001):
             if dc:
                 # p: the store's pool weight — vote-weighted pseudo-population
                 # on the voter store, real census headcount on the venue proxy
-                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "p": dd["persons"]}
+                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"]}
         div_index[d] = len(D)
         D.append(rec)
 

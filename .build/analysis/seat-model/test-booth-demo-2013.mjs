@@ -23,8 +23,10 @@
    4. Division anchors: Sydney/Melbourne/Fowler/Lyne/Lingiari row
       figures; division extrema (Watson max language-other, Lyons min;
       Bruce max overseas-born, Parkes min; North Sydney max
-      university, Wakefield min; Lyne oldest, Lingiari youngest); the
-      Lingiari row printed in full.
+      university, Wakefield min; Flynn max blue-collar (B45B: trades +
+      drivers + labourers over the stated occupation groups), North
+      Sydney min; Lyne oldest, Lingiari youngest); the Lingiari row
+      printed in full.
    5. Reconciliation: sum over divisions of persons == the national
       persons exactly (integer count, not share arithmetic).
    6. Provenance: _provenance.files names the BCP zip, the CED zip and
@@ -71,7 +73,7 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
 {
   const keys = new Set();
   let nulls = 0;
-  const laneNull = { langOther: 0, fborn: 0, uni: 0, age: 0 };
+  const laneNull = { langOther: 0, fborn: 0, uni: 0, blue: 0, age: 0 };
   for (const b of d.booths) {
     const k = b.divId + "|" + b.boothId;
     ok(!keys.has(k), `dup booth key ${k}`);
@@ -79,7 +81,7 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
     if (b.demo === null) { nulls++; continue; }
     const dm = b.demo;
     ok(dm.persons >= 1 && dm.cov === 1.0, `demo pers/cov ${k}`);
-    for (const f of ["langOther", "fborn", "uni"]) {
+    for (const f of ["langOther", "fborn", "uni", "blue"]) {
       ok(dm[f] === null || (dm[f] >= 0 && dm[f] <= 1), `share range ${f} ${k}`);
       if (dm[f] === null) laneNull[f]++;
     }
@@ -95,7 +97,7 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
   // the age:1 is Casey Warburton PPVC: venue SA1 2128609 carries 3
   // perturbed persons but all-zero age cells (BCP perturbation on a
   // tiny SA1 — null, never a made-up structure)
-  eq(laneNull, { langOther: 21, fborn: 9, uni: 25, age: 1 },
+  eq(laneNull, { langOther: 21, fborn: 9, uni: 25, blue: 53, age: 1 },
     "lane nulls (tiny-SA1 BCP perturbation)");
 }
 
@@ -105,6 +107,7 @@ eq(d.counts.national, {
   langOther: 0.1917,
   fborn: 0.2606,
   uni: 0.2082,
+  blue: 0.307,
   age0_14: 0.1929,
   age65ov: 0.1401,
 }, "counts.national");
@@ -114,18 +117,20 @@ eq(d.counts.national, {
   const divs = new Map(d.divisions.map((x) => [x.div, x]));
   eq(divs.get("Sydney"), {
     div: "Sydney", state: "NSW", persons: 170700, cov: 1,
-    langOther: 0.3277, fborn: 0.4686, uni: 0.4751,
+    langOther: 0.3277, fborn: 0.4686, uni: 0.4751, blue: 0.1316,
     age: divs.get("Sydney").age,
   }, "Sydney row");
   const M = divs.get("Melbourne");
-  eq([M.persons, M.langOther, M.fborn, M.uni], [177628, 0.3484, 0.4153, 0.477],
+  eq([M.persons, M.langOther, M.fborn, M.uni, M.blue],
+    [177628, 0.3484, 0.4153, 0.477, 0.1314],
     "Melbourne figures");
   const F = divs.get("Fowler");
-  eq([F.persons, F.langOther, F.fborn, F.uni], [148973, 0.7084, 0.528, 0.098],
+  eq([F.persons, F.langOther, F.fborn, F.uni, F.blue],
+    [148973, 0.7084, 0.528, 0.098, 0.4582],
     "Fowler figures");
   eq(divs.get("Lingiari"), {
     div: "Lingiari", state: "NT", persons: 109461, cov: 1,
-    langOther: 0.4016, fborn: 0.1179, uni: 0.1317,
+    langOther: 0.4016, fborn: 0.1179, uni: 0.1317, blue: 0.3522,
     age: divs.get("Lingiari").age,
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(divs.get("Lingiari")));
@@ -141,6 +146,10 @@ eq(d.counts.national, {
   const byUni = [...d.divisions].sort((a, b) => b.uni - a.uni);
   eq([byUni[0].div, byUni[0].uni], ["North Sydney", 0.491], "max university");
   eq([byUni.at(-1).div, byUni.at(-1).uni], ["Wakefield", 0.0732], "min university");
+  const byBlue = [...d.divisions].sort((a, b) => b.blue - a.blue);
+  eq([byBlue[0].div, byBlue[0].blue], ["Flynn", 0.4812], "max blue-collar");
+  eq([byBlue.at(-1).div, byBlue.at(-1).blue], ["North Sydney", 0.1014],
+    "min blue-collar");
   const byAge = [...d.divisions].sort((a, b) => a65(b) - a65(a));
   eq([byAge[0].div, +a65(byAge[0]).toFixed(4)], ["Lyne", 0.2365], "oldest");
   eq([byAge.at(-1).div, +a65(byAge.at(-1)).toFixed(4)], ["Lingiari", 0.0511],

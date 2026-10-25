@@ -76,6 +76,8 @@ BCP_B09 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
            "2011Census_B09_AUST_SA1_short.csv")
 BCP_B40B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
             "2011Census_B40B_AUST_SA1_short.csv")
+BCP_B45B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B45B_AUST_SA1_short.csv")
 CED_ZIP = ABS / "dl/1270055003_ced_2011_aust_csv.zip"
 VENUE = ROOT / "data/booth-seifa-2013.json"
 
@@ -85,6 +87,14 @@ AGECOLS = [f"Age_{b}_yr_P" for b in BANDS[:-1]] + ["Age_85ov_P"]
 B09_COLS = ["Australia_P", "Country_birth_not_stated_P", "Tot_P"]
 B40_COLS = ["P_PGrad_Deg_Total", "P_GradDip_and_GradCert_Total",
             "P_BachDeg_Total", "P_Lev_Edu_NS_Total"]
+# the eight stated ANZSCO occupation major groups (B45B P_Tot_*), in
+# file order; blue-collar = trades + machinery operators & drivers +
+# labourers, shared over the stated set (inadequately-described/
+# not-stated excluded)
+B45_COLS = ["P_Tot_Managers", "P_Tot_Professionals",
+            "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
+            "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
+            "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
 RENAME = {"Mcewen": "McEwen", "Mcmillan": "McMillan",
           "Mcpherson": "McPherson"}
 STATE_ORDER = {s: i for i, s in
@@ -135,10 +145,12 @@ def load_bcp():
                      "Lang_spoken_home_Oth_Lang_P"], 54805, 54805)
     b09 = bcp_table(z, BCP_B09, "region_id", B09_COLS, 54800, 54805)
     b40 = bcp_table(z, BCP_B40B, "region_id", B40_COLS, 54800, 54805)
+    b45 = bcp_table(z, BCP_B45B, "region_id", B45_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
         aus, cobns, totc = b09.get(code, (None, None, None))
         pg, gd, ba, eduns = b40.get(code, (None, None, None, None))
+        occ = b45.get(code)
         out[code] = {
             "pers": g[0],
             "ages": g[1:12],
@@ -146,11 +158,16 @@ def load_bcp():
             "aus": aus, "totc": totc, "cobns": cobns,
             "uni": (pg + gd + ba) if pg is not None else None,
             "eduns": eduns,
+            "bluen": (occ[2] + occ[6] + occ[7]) if occ is not None
+                     else None,
+            "occd": sum(occ) if occ is not None else None,
             "pop15": g[0] - g[1] - g[2],
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
-    print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40})")
+    n45 = sum(1 for c in out.values() if c["occd"] is None)
+    print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40}, "
+          f"B45B short {n45})")
     return out
 
 
@@ -213,6 +230,7 @@ def shares(rec):
                          else rec["totc"] - rec["cobns"] - rec["aus"],
                          fb_den),
         "uni": bounded(rec["uni"], uni_den),
+        "blue": bounded(rec["bluen"], rec["occd"]),
         "age": ({b: round(rec["bands"][i] / bsum, 4)
                  for i, b in enumerate(BANDS)} if bsum > 0 else None),
     }
@@ -232,10 +250,11 @@ def main():
     if mapped != set(divs_hist):
         fail(f"division drift: ced-only {sorted(mapped - set(divs_hist))} "
              f"venue-only {sorted(set(divs_hist) - mapped)}")
-    # every division SA1 needs its three BCP tables
+    # every division SA1 needs its four BCP tables
     short = {k for k in ced
              if sa1.get(k, {}).get("aus") is None
-             or sa1.get(k, {}).get("uni") is None}
+             or sa1.get(k, {}).get("uni") is None
+             or sa1.get(k, {}).get("occd") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -243,7 +262,7 @@ def main():
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * len(BANDS),
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
                                   "cobns": 0, "uni": 0, "eduns": 0,
-                                  "pop15": 0})
+                                  "bluen": 0, "occd": 0, "pop15": 0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -252,7 +271,8 @@ def main():
             acc["bands"][i] += r["ages"][i]
         acc["eng"] += r["eng"]
         acc["oth"] += r["oth"]
-        for k in ("aus", "totc", "cobns", "uni", "eduns", "pop15"):
+        for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
+                  "occd", "pop15"):
             acc[k] += r[k]
 
     out_booths = []
@@ -277,14 +297,15 @@ def main():
                 "eng": row["eng"], "oth": row["oth"],
                 "aus": row["aus"], "totc": row["totc"],
                 "cobns": row["cobns"], "uni": row["uni"],
-                "eduns": row["eduns"], "pop15": row["pop15"]})
+                "eduns": row["eduns"], "bluen": row["bluen"],
+                "occd": row["occd"], "pop15": row["pop15"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
     # the venue SA1s — a national reading of the election's geography
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "pop15"):
+                  "eduns", "bluen", "occd", "pop15"):
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
@@ -313,6 +334,8 @@ def main():
             "fborn": round((nat_fbd - nat["aus"]) / nat_fbd, 4)
             if nat_fbd > 0 else None,
             "uni": round(nat["uni"] / nat_unid, 4) if nat_unid > 0 else None,
+            "blue": round(nat["bluen"] / nat["occd"], 4)
+            if nat["occd"] > 0 else None,
             "age0_14": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
             "age65ov": round(sum(nat[b] for b in BANDS[8:]) / nat_b, 4),
         },
@@ -338,7 +361,11 @@ def main():
             "over English-only + other; overseas-born over "
             "country-of-birth stated; university (bachelor and above) "
             "per the aged-15+ population less "
-            "level-of-education-not-stated. The national row pools the "
+            "level-of-education-not-stated; blue-collar (technicians/"
+            "trades + machinery operators/drivers + labourers of B45B "
+            "the ANZSCO occupation major groups) over the eight stated "
+            "occupation groups, inadequately-described and not-stated "
+            "occupations out of the frame. The national row pools the "
             "division sums. A booth whose venue SA1 records no "
             "residents (commercial/industrial blocks; "
             "counts.boothsGeoEmpty) carries demo:null, as does one "
@@ -352,7 +379,8 @@ def main():
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2011 Census Basic Community Profile, SA1 for "
-                       "AUST (B01/B09/B40B), abs.gov.au census datapacks",
+                       "AUST (B01/B09/B40B/B45B), abs.gov.au census "
+                       "datapacks",
                 "ced": "ABS ASGS Vol 3 July 2011, CED to SA1 allocation "
                        "(1270055003_ced_2011_aust_csv.zip)",
                 "venue": "data/booth-seifa-2013.json",
