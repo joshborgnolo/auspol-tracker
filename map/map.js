@@ -1417,7 +1417,13 @@ function drawChamber(g, m, w, h, opts) {
     if (!opts.big && s > 6) {
       g.font = `600 11px ${SANS}`; g.fillStyle = css(th.ink2);
       g.textAlign = p2[0] < -0.5 ? "right" : p2[0] > 0.5 ? "left" : "center"; g.textBaseline = below ? "top" : "middle";
-      g.fillText(`${ch.maj} for a majority`, X(p2[0]), Yp(p2[1]));
+      // a chamber filling the width (a phone): shift sideways to stay on the canvas
+      const mt = `${ch.maj} for a majority`, tw = g.measureText(mt).width;
+      let mx = X(p2[0]);
+      if (g.textAlign === "left") mx = Math.min(mx, w - 4 - tw);
+      else if (g.textAlign === "right") mx = Math.max(mx, 4 + tw);
+      else mx = Math.min(Math.max(mx, 4 + tw / 2), w - 4 - tw / 2);
+      g.fillText(mt, mx, Yp(p2[1]));
     }
     if (opts.big) {
       g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2);
