@@ -81,8 +81,8 @@ function readTheme() {
   const T = {};
   for (const k in L) T[k] = lch(...L[k]);
   const P = dk
-    ? { alp: "#e45e51", lnp: "#4092e7", grn: "#5dc47e", onp: "#f69828", ind: "#79c7e7", oth: "#a790a4" }
-    : { alp: "#af3d36", lnp: "#386695", grn: "#50a064", onp: "#d27306", ind: "#42acd2", oth: "#977b9d" };
+    ? { alp: "#e45e51", lnp: "#4092e7", grn: "#5dc47e", onp: "#f69828", ind: "#79c7e7", csa: "#3cc7ae", oth: "#a790a4" }
+    : { alp: "#af3d36", lnp: "#386695", grn: "#50a064", onp: "#d27306", ind: "#42acd2", csa: "#0d7f74", oth: "#977b9d" };
   T.party = {}; for (const k in P) T.party[k] = hex(P[k]);
   T.dark = dk;
   T.mid = dk ? lch(0.36, 0.008, 66) : lch(0.905, 0.006, 78);
@@ -126,9 +126,12 @@ const STATE_TITLE = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland"
 const STATE_SHORT = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
 const STATE_POSS = { NSW: "New South Wales’s", VIC: "Victoria’s", QLD: "Queensland’s", WA: "Western Australia’s", SA: "South Australia’s", TAS: "Tasmania’s", ACT: "the ACT’s", NT: "the Northern Territory’s" };
 const FAMS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
-const FAM_NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independent", oth: "Other" };
-const FAM_PL = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", ind: "independents", oth: "others" };
-const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", oth: "Others" };
+const FAM_NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independent", csa: "Community Strong", oth: "Other" };
+const FAM_PL = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", ind: "independents", csa: "Community Strong", oth: "others" };
+// the family a seat's holder reads as in "now": Community Strong's pair get
+// their own colour, while the vote tallies keep them in the independent family
+const holdFam = (h) => (h.ab === "CSA" ? "csa" : h.fam);
+const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", csa: "Community Strong", oth: "Others" };
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
@@ -387,7 +390,7 @@ const prevYearOf = (y) => (y === "now" ? 2025 : y === 2004 ? 2001 : YEARS[YEARS.
 function divValue(m, i) {
   const d = m.divs[i];
   switch (S.lens) {
-    case "winner": return d.hold.fam;
+    case "winner": return holdFam(d.hold);
     case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "flow": return d.classic ? nn(d.flowAlp[S.from]) : null;
@@ -976,7 +979,7 @@ function uPoint(geom, u, r) {
 // blocs, in the order they sit from the Speaker's right round to the left
 function chamberBlocs(m) {
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
-  const cross = gov === "alp" ? ["grn", "ind", "oth", "onp"] : ["onp", "oth", "ind", "grn"];
+  const cross = gov === "alp" ? ["grn", "ind", "csa", "oth", "onp"] : ["onp", "oth", "csa", "ind", "grn"];
   return { gov, opp, cross };
 }
 // the lens's ordering key, read from the bloc's own side
@@ -1004,12 +1007,12 @@ function chamberOrder(m) {
     if (b == null) return dir > 0 ? 1 : -1;
     return dir < 0 ? b - a : a - b;
   };
-  const G = members.filter((d) => d.hold.fam === gov).sort(byKey(gov, -1));
-  const O = members.filter((d) => d.hold.fam === opp).sort(byKey(opp, 1));
+  const G = members.filter((d) => holdFam(d.hold) === gov).sort(byKey(gov, -1));
+  const O = members.filter((d) => holdFam(d.hold) === opp).sort(byKey(opp, 1));
   const C = [];
   const groups = [];
   for (const f of cross) {
-    const xs = members.filter((d) => d.hold.fam === f).sort(byKey(f, -1));
+    const xs = members.filter((d) => holdFam(d.hold) === f).sort(byKey(f, -1));
     if (xs.length) groups.push({ fam: f, n: xs.length });
     C.push(...xs);
   }
@@ -1017,7 +1020,7 @@ function chamberOrder(m) {
   const sp = m.divs[m.speaker];
   const N = m.divs.length, maj = Math.floor(N / 2) + 1;
   m._ch = { order, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj,
-    majAt: maj - (sp && sp.hold.fam === gov ? 1 : 0) };
+    majAt: maj - (sp && holdFam(sp.hold) === gov ? 1 : 0) };
   m._chKey = key;
   return m._ch;
 }
@@ -1188,7 +1191,7 @@ function drawChamber(g, m, w, h, opts) {
         g.font = `400 12px ${SANS}`; wd = Math.max(wd, g.measureText(role).width);
         claim(x, yMid - 48, wd, 72, align, "top");
       };
-      const spFam = m.divs[m.speaker] && m.divs[m.speaker].hold.fam;
+      const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
       blocLabel(govName, String(ch.nGov + (spFam === ch.gov ? 1 : 0)), ch.gov, "Government", X(-rO - 0.95), "right");
       blocLabel(oppName, String(ch.nOpp + (spFam === ch.opp ? 1 : 0)), ch.opp, "Opposition", X(rO + 0.95), "left");
     }
@@ -1541,7 +1544,7 @@ function historyChart(d) {
 /* ----- the national and state stories ----- */
 function areaStats(m, st) {
   const A = m.areas[st], idx = A.idx, N = idx.length;
-  const cnt = {}; for (const i of idx) { const f = m.divs[i].hold.fam; cnt[f] = (cnt[f] || 0) + 1; }
+  const cnt = {}; for (const i of idx) { const f = holdFam(m.divs[i].hold); cnt[f] = (cnt[f] || 0) + 1; }
   return { A, idx, N, cnt };
 }
 // the crossbench in words: "eight independents, two from One Nation and one each from the Greens and Katter’s Australian"
@@ -1726,7 +1729,7 @@ function storyArea(m, st) {
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats
   if (S.view !== "chamber") {
-    const order = ["alp", "lnp", "grn", "ind", "onp", "oth"].filter((f) => cnt[f]);
+    const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
     const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("");
     h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="The House of Representatives, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
@@ -1740,7 +1743,7 @@ function storyArea(m, st) {
   h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes · change on ${prev}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `Australia ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   if (aus) {
-    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = m.divs[i].hold.fam; sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${sgn(a.tppSw)}</td></tr>`; }).join("")}</tbody></table></div>`;
+    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${sgn(a.tppSw)}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;
@@ -1980,7 +1983,7 @@ function passes(m, i, skipRange) {
   const d = m.divs[i];
   if (S.f.st && d.st !== S.f.st) return false;
   if (S.f.cls && d.cls !== S.f.cls) return false;
-  if (S.f.win && d.hold.fam !== S.f.win) return false;
+  if (S.f.win && holdFam(d.hold) !== S.f.win) return false;
   if (S.f.margin) { const [a, b] = MARGINS[S.f.margin]; if (d.margin < a || d.margin >= b) return false; }
   if (!skipRange && S.f.range && S.f.range.unit === "seats" && !inRange(seatColValue(m, d, S.f.range.key), S.f.range)) return false;
   return true;
@@ -2016,7 +2019,7 @@ function seatCols(m) {
   const now = m.year === "now";
   const cols = [
     { key: "name", label: "Seat", get: (d) => d.n, txt: true, w: "minmax(140px,1.25fr)", html: (d) => `<span class="c1">${ds(d.n)}</span><span class="c2">${STATE_SHORT[d.st]}${d.cls ? " · " + esc(CLS_SHORT[d.cls]) : ""}</span>` },
-    { key: "win", label: now ? "Held by" : "Won by", get: (d) => d.hold.fam + d.hold.n, txt: true, w: "minmax(150px,1.35fr)", cat: true, html: (d) => `<span class="c1"><span class="sw" style="${swc(d.hold.fam)}"></span>${ds(d.hold.n)}</span><span class="c2">${ds(leaderName(d.hold))}${now && (d.hold.n !== d.win.n || d.hold.ab !== d.win.ab) ? (d.by ? " · by-election" : " · changed party") : ""}</span>` },
+    { key: "win", label: now ? "Held by" : "Won by", get: (d) => holdFam(d.hold) + d.hold.n, txt: true, w: "minmax(150px,1.35fr)", cat: true, html: (d) => `<span class="c1"><span class="sw" style="${swc(holdFam(d.hold))}"></span>${ds(d.hold.n)}</span><span class="c2">${ds(leaderName(d.hold))}${now && (d.hold.n !== d.win.n || d.hold.ab !== d.win.ab) ? (d.by ? " · by-election" : " · changed party") : ""}</span>` },
     { key: "final", label: "Final count", short: "Winning share", get: (d) => d.winPct, num: true, w: "112px", dist: true, fmt: f1, html: (d) => `${fig2(d.winPct, d.win.fam, 100 - d.winPct, d.run.fam)}<span class="c2">${ds(surname(d.win.n))} v ${ds(surname(d.run.n))}</span>` },
     { key: "tpp", label: "Labor 2PP", get: (d) => nn(d.tpp), num: true, w: "86px", dist: true, fmt: f1, color: (v) => RAMP.div[dIdx((50 - v) / 20)], ref: (a) => a.tpp, html: (d) => d.tpp == null ? `<span class="c2">–</span>` : `<span class="fig ${d.tpp >= 50 ? "t-alp" : "t-lnp"}">${f1(d.tpp)}</span>` },
     { key: "swing", label: "Swing", short: "Swing to Labor", get: (d) => nn(d.tppSw), num: true, w: "78px", dist: true, fmt: sgn, color: (v) => RAMP.div[dIdx(-v / 10)], ref: (a) => a.tppSw, zero: true, html: (d) => d.tppSw == null ? `<span class="c2">–</span>` : `<span class="fig ${d.tppSw >= 0 ? "t-alp" : "t-lnp"}">${sgn(d.tppSw)}</span>` },
@@ -2051,7 +2054,7 @@ function compactCols(m, unit, cols) {
   const lensCol = cols.find((c) => c.lens && c.num) || cols.find((c) => c.key === (unit === "seats" ? "final" : "lead"));
   const b = m.booth;
   const first = unit === "seats"
-    ? { ...cols[0], w: "minmax(0,1fr)", html: (d) => `<span class="c1"><span class="sw" style="${swc(d.hold.fam)}"></span>${ds(d.n)}</span><span class="c2">${STATE_SHORT[d.st]} · ${ds(d.hold.n)}, ${esc(partyShort(d.hold.ab, d.hold.pn))}</span>` }
+    ? { ...cols[0], w: "minmax(0,1fr)", html: (d) => `<span class="c1"><span class="sw" style="${swc(holdFam(d.hold))}"></span>${ds(d.n)}</span><span class="c2">${STATE_SHORT[d.st]} · ${ds(d.hold.n)}, ${esc(partyShort(d.hold.ab, d.hold.pn))}</span>` }
     : { ...cols[0], w: "minmax(0,1fr)", html: (j) => `<span class="c1">${ds(b.name[j])}</span><span class="c2">${ds(m.divs[b.d[j]].n)} · ${int(b.votes[j])} votes</span>` };
   return [first, { ...lensCol, w: "104px" }];
 }
@@ -2109,8 +2112,8 @@ function distSVG(D, W, H, opts) {
     if (stack) {
       // a tenth of the seats each, so the bar's height is fixed: who holds them is the reading
       let acc = H - padB;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) {
-        const nf = D.members[k].filter((d) => d.hold.fam === f).length; if (!nf) continue;
+      for (const f of ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"]) {
+        const nf = D.members[k].filter((d) => holdFam(d.hold) === f).length; if (!nf) continue;
         const hh = (nf / max) * (H - padT - padB);
         acc -= hh;
         s += `<rect x="${bx}" y="${acc.toFixed(1)}" width="${bwd}" height="${Math.max(0.5, hh - 1).toFixed(1)}" fill="var(--m-${f})" opacity="${on ? 1 : 0.22}" data-bin="${k}"/>`;
@@ -2255,7 +2258,7 @@ function renderList(keepScroll) {
   if (unit === "booths" && sd != null) bar += `<button type="button" class="ls-chip" data-unseat title="Show every polling place">In ${ds(m.divs[sd].n)} ✕</button>`;
   else {
     bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
-    bar += sel(m.year === "now" ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "onp", "oth"].filter((f) => m.divs.some((d) => d.hold.fam === f)).map((f) => [f, FAM_LEG[f]]), S.f.win);
+    bar += sel(m.year === "now" ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, FAM_LEG[f]]), S.f.win);
     bar += sel("Seat type", "cls", CLS.map((c) => [c, CLS_SHORT[c]]), S.f.cls);
     bar += sel("Margin", "margin", Object.entries(MARGINS).map(([k, v]) => [k, v[2]]), S.f.margin);
   }
@@ -2397,10 +2400,9 @@ function renderLegend() {
   let h = "";
   switch (S.lens) {
     case "winner": {
-      const cnt = {}; for (const d of m.divs) cnt[d.hold.fam] = (cnt[d.hold.fam] || 0) + 1;
+      const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${m.year}`}</div>`;
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
-      if (isNow() && !boothsOn) h += `<div class="lg-note">Independents include Community Strong’s two members.</div>`;
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
@@ -2481,7 +2483,7 @@ function renderTimeline() {
       const cy = r[1] != null ? yv(r[1]) : yv(50);
       g += `<circle cx="${X(yr)}" cy="${cy}" r="${yr === cur ? 5 : 3.6}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="1.5"><title>${r[4] ? "By-election" : r[0]}: ${esc(r[3])} (${esc(partyName(r[2]))})${r[1] != null ? `, Labor two-party ${f1(r[1])}` : ""}</title></circle>`;
     }
-    if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${m.divs[sd].hold.fam})" stroke="var(--bg)" stroke-width="1.5"/>`; }
+    if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
     const st = S.sel.level === "state" ? S.sel.st : "AUS";
     for (const y of YEARS) {

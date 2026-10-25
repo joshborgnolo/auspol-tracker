@@ -3,7 +3,7 @@
 function divValue(m, i) {
   const d = m.divs[i];
   switch (S.lens) {
-    case "winner": return d.hold.fam;
+    case "winner": return holdFam(d.hold);
     case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "flow": return d.classic ? nn(d.flowAlp[S.from]) : null;

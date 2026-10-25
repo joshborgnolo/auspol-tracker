@@ -126,7 +126,7 @@ function historyChart(d) {
 /* ----- the national and state stories ----- */
 function areaStats(m, st) {
   const A = m.areas[st], idx = A.idx, N = idx.length;
-  const cnt = {}; for (const i of idx) { const f = m.divs[i].hold.fam; cnt[f] = (cnt[f] || 0) + 1; }
+  const cnt = {}; for (const i of idx) { const f = holdFam(m.divs[i].hold); cnt[f] = (cnt[f] || 0) + 1; }
   return { A, idx, N, cnt };
 }
 // the crossbench in words: "eight independents, two from One Nation and one each from the Greens and Katter’s Australian"
@@ -311,7 +311,7 @@ function storyArea(m, st) {
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats
   if (S.view !== "chamber") {
-    const order = ["alp", "lnp", "grn", "ind", "onp", "oth"].filter((f) => cnt[f]);
+    const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
     const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("");
     h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="The House of Representatives, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
@@ -325,7 +325,7 @@ function storyArea(m, st) {
   h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes · change on ${prev}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `Australia ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   if (aus) {
-    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = m.divs[i].hold.fam; sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${sgn(a.tppSw)}</td></tr>`; }).join("")}</tbody></table></div>`;
+    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${sgn(a.tppSw)}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;

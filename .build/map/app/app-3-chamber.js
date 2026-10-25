@@ -50,7 +50,7 @@ function uPoint(geom, u, r) {
 // blocs, in the order they sit from the Speaker's right round to the left
 function chamberBlocs(m) {
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
-  const cross = gov === "alp" ? ["grn", "ind", "oth", "onp"] : ["onp", "oth", "ind", "grn"];
+  const cross = gov === "alp" ? ["grn", "ind", "csa", "oth", "onp"] : ["onp", "oth", "csa", "ind", "grn"];
   return { gov, opp, cross };
 }
 // the lens's ordering key, read from the bloc's own side
@@ -78,12 +78,12 @@ function chamberOrder(m) {
     if (b == null) return dir > 0 ? 1 : -1;
     return dir < 0 ? b - a : a - b;
   };
-  const G = members.filter((d) => d.hold.fam === gov).sort(byKey(gov, -1));
-  const O = members.filter((d) => d.hold.fam === opp).sort(byKey(opp, 1));
+  const G = members.filter((d) => holdFam(d.hold) === gov).sort(byKey(gov, -1));
+  const O = members.filter((d) => holdFam(d.hold) === opp).sort(byKey(opp, 1));
   const C = [];
   const groups = [];
   for (const f of cross) {
-    const xs = members.filter((d) => d.hold.fam === f).sort(byKey(f, -1));
+    const xs = members.filter((d) => holdFam(d.hold) === f).sort(byKey(f, -1));
     if (xs.length) groups.push({ fam: f, n: xs.length });
     C.push(...xs);
   }
@@ -91,7 +91,7 @@ function chamberOrder(m) {
   const sp = m.divs[m.speaker];
   const N = m.divs.length, maj = Math.floor(N / 2) + 1;
   m._ch = { order, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj,
-    majAt: maj - (sp && sp.hold.fam === gov ? 1 : 0) };
+    majAt: maj - (sp && holdFam(sp.hold) === gov ? 1 : 0) };
   m._chKey = key;
   return m._ch;
 }
@@ -262,7 +262,7 @@ function drawChamber(g, m, w, h, opts) {
         g.font = `400 12px ${SANS}`; wd = Math.max(wd, g.measureText(role).width);
         claim(x, yMid - 48, wd, 72, align, "top");
       };
-      const spFam = m.divs[m.speaker] && m.divs[m.speaker].hold.fam;
+      const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
       blocLabel(govName, String(ch.nGov + (spFam === ch.gov ? 1 : 0)), ch.gov, "Government", X(-rO - 0.95), "right");
       blocLabel(oppName, String(ch.nOpp + (spFam === ch.opp ? 1 : 0)), ch.opp, "Opposition", X(rO + 0.95), "left");
     }
