@@ -335,7 +335,7 @@ button { cursor: pointer; background: none; border: 0; }
 
 /* ------- the list view ------- */
 .mp-list { position: absolute; inset: 0; display: flex; flex-direction: column; }
-.ls-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding-bottom: 12px; }
+.ls-bar { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding-bottom: 12px; }
 .ls-unit { display: inline-flex; border-bottom: 1px solid var(--line); margin-right: 6px; }
 .ls-unit .rd-tab { height: 34px; font-size: 14px; padding: 0 10px; }
 .ls-unit .rd-tab:first-child { padding-left: 0; }
