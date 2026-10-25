@@ -4621,17 +4621,22 @@ function clockLabel(mins) {
   const c = clockParts(mins);
   return `${c.num} ${c.ap}`;
 }
-const EASTERN_TZ = (() => {
-  try {
-    return new Intl.DateTimeFormat("en-AU", {
-      timeZone: "Australia/Sydney",
-      timeZoneName: "short"
-    });
-  } catch (e) {
-    return null;
+let easternTz;
+const easternTzFmt = () => {
+  if (easternTz === undefined) {
+    try {
+      easternTz = new Intl.DateTimeFormat("en-AU", {
+        timeZone: "Australia/Sydney",
+        timeZoneName: "short"
+      });
+    } catch (e) {
+      easternTz = null;
+    }
   }
-})();
+  return easternTz;
+};
 function easternAbbr(ms) {
+  const EASTERN_TZ = easternTzFmt();
   if (!EASTERN_TZ || ms == null || !isFinite(ms)) return "AEST";
   try {
     const z = EASTERN_TZ.formatToParts(new Date(ms + 2 * 3600000)).find(x => x.type === "timeZoneName");

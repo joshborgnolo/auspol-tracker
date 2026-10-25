@@ -3053,7 +3053,8 @@ function AccuracyPanel() {
     const measure = () => { if (el.clientWidth) setTrackW(el.clientWidth); };
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    measure();
+    // a skipped section's track is measured by the observer on approach (cvSkipped)
+    if (!cvSkipped(el)) measure();
     return () => ro.disconnect();
   }, []);
   /* These dots are read by tapping them, and a tap has no leave event - so a

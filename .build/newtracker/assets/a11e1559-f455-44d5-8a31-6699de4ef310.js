@@ -4297,13 +4297,21 @@ function clockLabel(mins) {
    other half - so "8 pm" alone names two different moments depending on when
    you read it. Resolved through Intl rather than by hardcoding the first
    Sundays of October and April, so it keeps being right if the rule moves. */
-const EASTERN_TZ = (() => {
-  try {
-    return new Intl.DateTimeFormat("en-AU",
-      { timeZone: "Australia/Sydney", timeZoneName: "short" });
-  } catch (e) { return null; }
-})();
+/* Built on first use, not at load: a time-zoned formatter loads the zone
+   data, ~45ms of this script's evaluation at 4x CPU, ahead of the first
+   paint - and nothing on the first screen prints a zoned hour. */
+let easternTz;
+const easternTzFmt = () => {
+  if (easternTz === undefined) {
+    try {
+      easternTz = new Intl.DateTimeFormat("en-AU",
+        { timeZone: "Australia/Sydney", timeZoneName: "short" });
+    } catch (e) { easternTz = null; }
+  }
+  return easternTz;
+};
 function easternAbbr(ms) {
+  const EASTERN_TZ = easternTzFmt();
   if (!EASTERN_TZ || ms == null || !isFinite(ms)) return "AEST";
   try {
     // dates here are UTC midnight; +2h lands at midday in Sydney on the same

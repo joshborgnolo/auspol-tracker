@@ -2440,7 +2440,7 @@ function AccuracyPanel() {
     };
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    measure();
+    if (!cvSkipped(el)) measure();
     return () => ro.disconnect();
   }, []);
   window.useDismissOutside(rowsRef, !!hov, () => setHov(null));

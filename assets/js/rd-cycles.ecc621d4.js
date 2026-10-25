@@ -695,22 +695,33 @@ function RdPastCycles(p) {
     if (el) chipmoveEls.current[i] = el;
   };
   React.useLayoutEffect(() => {
-    const fitBand = band => {
-      const sec = band.closest(".rd-sec");
-      const prev = sec && sec.previousElementSibling;
-      if (!sec || !prev) return;
-      sec.style.removeProperty("--cyc-chip-pad");
-      sec.style.removeProperty("padding-top");
-      const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
-      const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
-      const gap = sec.getBoundingClientRect().top - prevBtm;
-      const need = Math.ceil(band.offsetHeight) + 19 - gap;
-      if (need > base + 0.5) {
-        sec.style.setProperty("--cyc-chip-pad", need + "px");
-        sec.style.paddingTop = need + "px";
-      }
+    const fit = () => {
+      const bands = chipmoveEls.current.filter(band => band && !cvSkipped(band));
+      const secs = bands.map(band => {
+        const sec = band.closest(".rd-sec");
+        return sec && sec.previousElementSibling ? sec : null;
+      });
+      secs.forEach(sec => {
+        if (!sec) return;
+        sec.style.removeProperty("--cyc-chip-pad");
+        sec.style.removeProperty("padding-top");
+      });
+      const needs = bands.map((band, i) => {
+        const sec = secs[i];
+        if (!sec) return null;
+        const prev = sec.previousElementSibling;
+        const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
+        const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
+        const gap = sec.getBoundingClientRect().top - prevBtm;
+        const need = Math.ceil(band.offsetHeight) + 19 - gap;
+        return need > base + 0.5 ? need : null;
+      });
+      needs.forEach((need, i) => {
+        if (need == null) return;
+        secs[i].style.setProperty("--cyc-chip-pad", need + "px");
+        secs[i].style.paddingTop = need + "px";
+      });
     };
-    const fit = () => chipmoveEls.current.filter(Boolean).forEach(fitBand);
     fit();
     window.addEventListener("resize", fit);
     if (typeof ResizeObserver === "undefined") return () => window.removeEventListener("resize", fit);

@@ -495,22 +495,40 @@ function RdPastCycles(p) {
   const chipmoveEls = React.useRef([]);
   const chipmoveRef = (i) => (el) => { if (el) chipmoveEls.current[i] = el; };
   React.useLayoutEffect(() => {
-    const fitBand = (band) => {
-      const sec = band.closest(".rd-sec");
-      const prev = sec && sec.previousElementSibling;
-      if (!sec || !prev) return;
-      sec.style.removeProperty("--cyc-chip-pad");
-      sec.style.removeProperty("padding-top");
-      const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
-      const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
-      const gap = sec.getBoundingClientRect().top - prevBtm;
-      const need = Math.ceil(band.offsetHeight) + 19 - gap; /* 12 above the rule + 1 anchor + 8 spared, less the gap ahead of the section */
-      if (need > base + 0.5) {
-        sec.style.setProperty("--cyc-chip-pad", need + "px");
-        sec.style.paddingTop = need + "px";
-      }
+    /* All the clears, then all the reads, then all the writes: band by band
+       each read came straight after the previous band's write and forced a
+       fresh layout of the page, one per band. A band's measures are its own
+       height and the margins between its section and the one above, which
+       no other band's padding moves, so the batched pass lands the same
+       figures. A band in a section content-visibility is still skipping is
+       left for its observer to fit on approach (cvSkipped). */
+    const fit = () => {
+      const bands = chipmoveEls.current.filter((band) => band && !cvSkipped(band));
+      const secs = bands.map((band) => {
+        const sec = band.closest(".rd-sec");
+        return sec && sec.previousElementSibling ? sec : null;
+      });
+      secs.forEach((sec) => {
+        if (!sec) return;
+        sec.style.removeProperty("--cyc-chip-pad");
+        sec.style.removeProperty("padding-top");
+      });
+      const needs = bands.map((band, i) => {
+        const sec = secs[i];
+        if (!sec) return null;
+        const prev = sec.previousElementSibling;
+        const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
+        const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
+        const gap = sec.getBoundingClientRect().top - prevBtm;
+        const need = Math.ceil(band.offsetHeight) + 19 - gap; /* 12 above the rule + 1 anchor + 8 spared, less the gap ahead of the section */
+        return need > base + 0.5 ? need : null;
+      });
+      needs.forEach((need, i) => {
+        if (need == null) return;
+        secs[i].style.setProperty("--cyc-chip-pad", need + "px");
+        secs[i].style.paddingTop = need + "px";
+      });
     };
-    const fit = () => chipmoveEls.current.filter(Boolean).forEach(fitBand);
     fit();
     window.addEventListener("resize", fit);
     if (typeof ResizeObserver === "undefined") return () => window.removeEventListener("resize", fit);
