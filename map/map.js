@@ -357,16 +357,13 @@ function applyNow(m, now) {
   m.asOf = now.asOf;
 }
 
-// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs)
-const SEATED = new Set(["now"]);
 async function loadYear(year) {
   if (Y[year]) return Y[year].ready;
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
-    const [res, lo, now, seating] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null]);
+    const [res, lo, now] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null]);
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.date = res.date;
@@ -375,7 +372,6 @@ async function loadYear(year) {
     for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     if (now) applyNow(m, now);
     m.speaker = m.byName.get(res.speaker);
-    m.seating = seating;
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);
     m.booth = deriveBooths(m.res.booths, m);
@@ -946,92 +942,54 @@ function hitTest(px, py) {
 }
 
 /* =============================== the chamber ===============================
-   The House of Representatives as the chamber is built, after the
-   Parliament's seating plan (aph.gov.au): the Speaker's chair on its dais at
-   the head of the table, the Clerk and Deputy Clerk below it, the T-shaped
-   table with two chairs a side, Hansard's desk at its foot. The front benches
-   run down either side of the table; behind them four rows of two-seat
-   blocks, then five rows round the far curve, cut by aisles. The government
-   sits on the Speaker's right (the reader's left, the Speaker facing down
-   the page). Where a seating plan is filed (map/data/seats-<year>.json, from
-   .build/map/seating.mjs) every member sits where the plan puts them;
-   otherwise each bloc fills the benches from its Speaker's end in the lens's
-   order, so on the two-party lens the House reads as a pendulum bent round
-   the table. Each member is a chair; empty seats stay empty. The Speaker's
-   own seat takes the Speaker's chair. */
-const CU = 30; // plan points to a chamber unit
-/* @cells-begin – shared with .build/map/seating.mjs, which reads this block as is.
-   The chamber's seats in plan points about the centre of the far curve (y down,
-   the government's side at negative x), each { id, x, y, fa (the way it faces),
-   row (0 the table, 1 the front bench … 5) }. Ids: side L|R, then a<i> the
-   front bench's straight arm, t<i> the table, b<row><slot> the side blocks,
-   c<row><sector><i> round the curve. */
-const CHB = {
-  arm: { x: 110, y0: -362, pitch: 21.38, n: 16 },
-  table: { x: 49.6, ys: [-182, -142] },
-  blockX: [138, 181, 223, 264], // rows 2 to 5
-  tierY: [[-282, -256], [-214, -188], [-146, -120], [-68, -42]], // two seats a block
-  R: [91, 138, 180, 222, 264], // the curve's rows
-  // each row's sectors round a quarter of the curve: [from, to] degrees below the horizontal, seats
-  sectors: [[[4, 82, 6]], [[4, 42, 3], [47, 83, 3]],
-    [[3, 22, 2], [25, 43, 2], [47.5, 65.5, 2], [68, 86, 2]],
-    [[3, 22, 2], [25, 43, 2], [47.5, 65.5, 2], [68, 86, 2]],
-    [[3, 22, 3], [25, 43, 3], [47.5, 65.5, 3], [68, 86, 3]]],
-};
-function chamberCells() {
-  const cells = [], D = Math.PI / 180;
-  for (const side of [0, 1]) {
-    const sx = side ? 1 : -1, P = side ? "R" : "L", fa = side ? Math.PI : 0;
-    for (let i = 0; i < CHB.arm.n; i++) cells.push({ id: `${P}a${i}`, x: sx * CHB.arm.x, y: CHB.arm.y0 + CHB.arm.pitch * i, fa, row: 1 });
-    CHB.table.ys.forEach((y, i) => cells.push({ id: `${P}t${i}`, x: sx * CHB.table.x, y, fa, row: 0 }));
-    CHB.blockX.forEach((bx, k) => CHB.tierY.flat().forEach((y, j) => cells.push({ id: `${P}b${k + 2}${j}`, x: sx * bx, y, fa, row: k + 2 })));
-    CHB.sectors.forEach((secs, k) => secs.forEach(([a0, a1, n], q) => {
-      for (let i = 0; i < n; i++) {
-        const a = (a0 + ((i + 0.5) * (a1 - a0)) / n) * D, r = CHB.R[k];
-        const x = sx * r * Math.cos(a), y = r * Math.sin(a);
-        cells.push({ id: `${P}c${k + 1}${"abcd"[q]}${i}`, x, y, fa: Math.atan2(-y, -x), row: k + 1 });
-      }
-    }));
-  }
-  return cells;
-}
-const SERJEANT = "Rc5d1"; // the Serjeant-at-Arms's chair, in the curve's last row by the centre aisle
-/* @cells-end */
-
-// position along the benches: down the government's side, round the curve, up the opposition's
-const CHK = 6;
-let chGeomC = null;
-function chamberGeom() {
-  if (chGeomC) return chGeomC;
-  const all = chamberCells().map((c) => {
-    const x = c.x / CU, y = c.y / CU;
-    const s = y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y;
-    return { id: c.id, x, y, fa: c.fa, row: c.row, s };
+   The House of Representatives as it sits: a horseshoe opening to the
+   Speaker's chair, the government on the Speaker's right (the reader's left,
+   the Speaker facing down the page), the opposition across the table, the
+   crossbench round the curve. Each member is a chair. Inside each bloc the
+   chairs are ordered by the lens, strongest at the Speaker's end, so on the
+   two-party lens the House reads as a pendulum bent round the table: the
+   seats that would fall first sit nearest the crossbench. The Speaker's own
+   seat takes the Speaker's chair. */
+const CH = { rows: 5, g: 1.22, r0: 3.55, Ls: 7.4 };
+const chGeomCache = new Map();
+function chamberGeom(n) {
+  if (chGeomCache.has(n)) return chGeomCache.get(n);
+  const { rows, g, r0, Ls } = CH;
+  const radii = Array.from({ length: rows }, (_, i) => r0 + i * g);
+  const lens = radii.map((r) => 2 * Ls + Math.PI * r);
+  const tot = sum(lens);
+  // seats per row in proportion to the row's length, largest remainders
+  const raw = lens.map((L) => (n * L) / tot);
+  const cnt = raw.map(Math.floor);
+  let left = n - sum(cnt);
+  raw.map((v, i) => [v - Math.floor(v), i]).sort((a, b) => b[0] - a[0]).slice(0, left).forEach(([, i]) => cnt[i]++);
+  const rMid = radii[Math.floor(rows / 2)], a = Ls / (2 * Ls + Math.PI * rMid);
+  const seats = [];
+  radii.forEach((r, i) => {
+    const L = lens[i], k = cnt[i];
+    for (let q = 0; q < k; q++) {
+      const s = ((q + 0.5) * L) / k;
+      let x, y, fa, u;
+      if (s <= Ls) { x = -r; y = s; fa = 0; u = a * (y / Ls); }
+      else if (s <= Ls + Math.PI * r) { const phi = Math.PI - (s - Ls) / r; x = r * Math.cos(phi); y = Ls + r * Math.sin(phi); fa = phi + Math.PI; u = a + (1 - 2 * a) * ((Math.PI - phi) / Math.PI); }
+      else { x = r; y = Ls - (s - Ls - Math.PI * r); fa = Math.PI; u = 1 - a * (y / Ls); }
+      seats.push({ x, y, fa, u, row: i, pitch: L / k });
+    }
   });
-  const seats = all.filter((c) => c.id !== SERJEANT).sort((p, q) => p.s - q.s || p.row - q.row);
-  const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
-  seats.forEach((c, k) => { c.k = k; c.u = (c.s - s0) / (s1 - s0); });
-  const rows = [0, 1, 2, 3, 4, 5].map((r) => seats.filter((c) => c.row === r));
-  chGeomC = { seats, rows, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
-    serjeant: all.find((c) => c.id === SERJEANT), rOut: CHB.R[4] / CU, W: 19 / CU, D: 16.5 / CU,
-    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 } };
-  return chGeomC;
-}
-// the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
-const CH_GS = [96, 124, 159.5, 202, 243.5, 279].map((v) => v / CU);
-const CH_GC = [77, 114.5, 159, 201, 243, 279].map((v) => v / CU);
-function benchPt(s, k) {
-  if (s <= 0) return [-CH_GS[k], s];
-  if (s >= Math.PI * CHK) return [CH_GS[k], Math.PI * CHK - s];
-  const a = s / CHK; return [-CH_GC[k] * Math.cos(a), CH_GC[k] * Math.sin(a)];
-}
-// outward from the benches at position s
-function benchOut(s) {
-  if (s <= 0) return [-1, 0];
-  if (s >= Math.PI * CHK) return [1, 0];
-  const a = s / CHK; return [-Math.cos(a), Math.sin(a)];
+  seats.sort((p, q) => p.u - q.u || p.row - q.row);
+  const rOut = radii[rows - 1];
+  const geom = { n, seats, radii, rOut, Ls, a, pitch: tot / n,
+    box: { x0: -rOut - 0.75, x1: rOut + 0.75, y0: -3.1, y1: Ls + rOut + 0.75 } };
+  chGeomCache.set(n, geom);
+  return geom;
 }
 
+function uPoint(geom, u, r) {
+  const a = geom.a, Ls = geom.Ls;
+  if (u <= a) return [-r, (u / a) * Ls];
+  if (u >= 1 - a) return [r, ((1 - u) / a) * Ls];
+  const phi = Math.PI - ((u - a) / (1 - 2 * a)) * Math.PI; return [r * Math.cos(phi), Ls + r * Math.sin(phi)];
+}
 // blocs, in the order they sit from the Speaker's right round to the left
 function chamberBlocs(m) {
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
@@ -1052,72 +1010,33 @@ function chamberKey(m, d, bloc) {
   }
 }
 function chamberOrder(m) {
-  const plan = m.seating;
-  const key = plan ? `${m.year}|plan` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
+  const key = `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
   if (m._chKey === key) return m._ch;
-  const geom = chamberGeom();
   const { gov, opp, cross } = chamberBlocs(m);
   const members = m.divs.filter((d) => d.i !== m.speaker);
-  const byKey = (bloc) => (p, q) => {
+  const byKey = (bloc, dir) => (p, q) => {
     const a = chamberKey(m, p, bloc), b = chamberKey(m, q, bloc);
     if (a == null && b == null) return p.n.localeCompare(q.n);
-    if (a == null) return 1;
-    if (b == null) return -1;
-    return b - a;
+    if (a == null) return dir > 0 ? -1 : 1;
+    if (b == null) return dir > 0 ? 1 : -1;
+    return dir < 0 ? b - a : a - b;
   };
-  const G = members.filter((d) => holdFam(d.hold) === gov).sort(byKey(gov));
-  const O = members.filter((d) => holdFam(d.hold) === opp).sort(byKey(opp));
+  const G = members.filter((d) => holdFam(d.hold) === gov).sort(byKey(gov, -1));
+  const O = members.filter((d) => holdFam(d.hold) === opp).sort(byKey(opp, 1));
   const C = [];
   const groups = [];
   for (const f of cross) {
-    const xs = members.filter((d) => holdFam(d.hold) === f).sort(byKey(f));
+    const xs = members.filter((d) => holdFam(d.hold) === f).sort(byKey(f, -1));
     if (xs.length) groups.push({ fam: f, n: xs.length });
     C.push(...xs);
-  }
-  // each member's seat (an index into geom.seats)
-  const at = new Map();
-  if (plan) {
-    const taken = new Set();
-    for (const d of members) { const k = geom.byId.get(plan.at[d.n]); if (k != null && !taken.has(k)) { at.set(d.i, k); taken.add(k); } }
-    // anyone the plan doesn't seat takes the first free bench seat from their side's Speaker end
-    const B = geom.bench;
-    for (const d of members) if (!at.has(d.i)) {
-      const back = holdFam(d.hold) === opp;
-      for (let j = 0; j < B.length; j++) { const c = B[back ? B.length - 1 - j : j]; if (!taken.has(c.k)) { at.set(d.i, c.k); taken.add(c.k); break; } }
-    }
-  } else {
-    // no plan: the government from its Speaker's end, the opposition from the other, the crossbench
-    // round the curve beside the opposition, as the House has seated it; the empty seats fall between
-    const B = geom.bench;
-    G.forEach((d, k) => at.set(d.i, B[k].k));
-    C.forEach((d, k) => at.set(d.i, B[B.length - O.length - C.length + k].k));
-    O.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];
   const N = m.divs.length, maj = Math.floor(N / 2) + 1;
-  m._ch = { order, at, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj, plan: !!plan,
+  m._ch = { order, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj,
     majAt: maj - (sp && holdFam(sp.hold) === gov ? 1 : 0) };
   m._chKey = key;
   return m._ch;
-}
-/* the majority line: the first majAt members along the benches (front row first where rows sit
-   level) hold the government's majority; in each row the line passes through the gap after the
-   last of them, so it runs between chairs, never across one. Returns each row's cut position. */
-function majorityCuts(ch, geom) {
-  const sat = [...ch.at.values()].map((k) => geom.seats[k]).sort((p, q) => p.s - q.s || p.row - q.row);
-  if (ch.majAt <= 0 || ch.majAt >= sat.length) return null;
-  const inside = new Set(sat.slice(0, ch.majAt).map((c) => c.k)), sStar = sat[ch.majAt - 1].s;
-  const cuts = [];
-  for (let r = 1; r <= 5; r++) {
-    const row = geom.rows[r];
-    let L = -1;
-    row.forEach((c, j) => { if (inside.has(c.k)) L = j; });
-    if (L < 0) row.forEach((c, j) => { if (c.s < sStar) L = j; });
-    const a = row[L], b = row[L + 1];
-    cuts.push(a && b ? (a.s + b.s) / 2 : a ? a.s + 0.4 : b.s - 0.4);
-  }
-  return cuts;
 }
 
 /* screen placement of the chamber in a w x h box */
@@ -1134,7 +1053,7 @@ const chLast = new Map();
 function chamberPositions(m, geom) {
   const ch = chamberOrder(m);
   const pos = new Map();
-  for (const [i, k] of ch.at) { const st = geom.seats[k]; pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u]); }
+  ch.order.forEach((i, k) => { const st = geom.seats[k]; pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u]); });
   return pos;
 }
 function startChamberGlide() {
@@ -1144,8 +1063,17 @@ function startChamberGlide() {
 }
 const angLerp = (a, b, t) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return a + d * t; };
 
+function seatPath(g, x, y, fa, w, d, back) {
+  // a chair seen from above: the cushion, and a backrest on the side away from the table
+  g.save(); g.translate(x, y); g.rotate(fa);
+  g.beginPath();
+  const r = Math.min(w, d) * 0.22;
+  if (g.roundRect) g.roundRect(-d / 2, -w / 2, d, w, r); else g.rect(-d / 2, -w / 2, d, w);
+  g.restore();
+  if (back) { back.x = x; back.y = y; back.fa = fa; }
+}
 function drawChair(g, x, y, fa, w, d, fill, backFill, alpha) {
-  g.save(); g.translate(x, y); g.rotate(fa); g.globalAlpha *= alpha;
+  g.save(); g.translate(x, y); g.rotate(fa); g.globalAlpha = alpha;
   const r = Math.min(w, d) * 0.24;
   g.beginPath(); if (g.roundRect) g.roundRect(-d / 2, -w / 2, d, w, r); else g.rect(-d / 2, -w / 2, d, w);
   g.fillStyle = fill; g.fill();
@@ -1155,79 +1083,10 @@ function drawChair(g, x, y, fa, w, d, fill, backFill, alpha) {
   g.fillStyle = backFill; g.fill();
   g.restore();
 }
-const SPEAKER_AT = [0, -365 / CU, Math.PI / 2];
-
-/* the room: the floor, the benches and their empty seats, the dais, the table, the officers' chairs */
-function drawChamberFurniture(g, F, geom, opts = {}) {
-  const th = TH, X = F.X, Yp = F.Yp, s = F.s, P = (v) => v / CU;
-  const rr = (x0, y0, x1, y1, r) => { g.beginPath(); if (g.roundRect) g.roundRect(X(P(x0)), Yp(P(y0)), P(x1 - x0) * s, P(y1 - y0) * s, r); else g.rect(X(P(x0)), Yp(P(y0)), P(x1 - x0) * s, P(y1 - y0) * s); };
-  const bench = css(mixC(th.floor, th.ink, th.dark ? 0.08 : 0.05)), wood = css(mixC(th.floor, th.ink, th.dark ? 0.15 : 0.11));
-  const empty = mixC(th.floor, th.ink, th.dark ? 0.12 : 0.08), officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
-  const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
-  g.lineWidth = 1; g.strokeStyle = css(th.line);
-  // the floor
-  const FR = P(282), top = P(-380);
-  g.beginPath(); g.moveTo(X(-FR), Yp(top)); g.lineTo(X(-FR), Yp(0)); g.arc(X(0), Yp(0), FR * s, Math.PI, 0, true); g.lineTo(X(FR), Yp(top)); g.closePath();
-  g.fillStyle = css(th.floor); g.fill();
-  // the benches
-  g.fillStyle = bench;
-  const D = Math.PI / 180;
-  for (const sx of [-1, 1]) {
-    const lo = (a, b) => [Math.min(a, b), Math.max(a, b)];
-    { const [x0, x1] = lo(sx * (CHB.arm.x - 11), sx * (CHB.arm.x + 11)); rr(x0, CHB.arm.y0 - 11, x1, CHB.arm.y0 + CHB.arm.pitch * (CHB.arm.n - 1) + 11, 2); g.fill(); g.stroke(); }
-    for (const bx of CHB.blockX) for (const [t0, t1] of CHB.tierY) { const [x0, x1] = lo(sx * (bx - 12), sx * (bx + 12)); rr(x0, t0 - 13, x1, t1 + 13, 2); g.fill(); g.stroke(); }
-    CHB.sectors.forEach((secs, k) => secs.forEach(([a0, a1]) => {
-      const r0 = P(CHB.R[k] - 12) * s, r1 = P(CHB.R[k] + 12) * s;
-      // angles on the canvas: the government's quarter runs from pi back towards pi/2, the opposition's from 0 to pi/2
-      const A0 = sx < 0 ? Math.PI - a0 * D : a0 * D, A1 = sx < 0 ? Math.PI - a1 * D : a1 * D;
-      g.beginPath(); g.arc(X(0), Yp(0), r1, A0, A1, sx < 0); g.arc(X(0), Yp(0), r0, A1, A0, sx > 0); g.closePath(); g.fill(); g.stroke();
-    }));
-    // the officials' boxes behind the front bench, on a rail
-    for (const cx of [222.9, 189.6, 147.7]) { const [x0, x1] = lo(sx * (cx - 12), sx * (cx + 12)); rr(x0, -373, x1, -322, 2); g.fill(); g.stroke(); }
-    g.beginPath(); g.moveTo(X(P(sx * 236)), Yp(P(-318))); g.lineTo(X(P(sx * 121)), Yp(P(-318))); g.lineWidth = Math.max(1, s * 0.07); g.strokeStyle = wood; g.stroke(); g.lineWidth = 1; g.strokeStyle = css(th.line);
-  }
-  // the Speaker's dais, raised above the floor, its step drawn inside
-  const dais = (inset) => { const w = 34 - inset, yt = -393 + inset, yc = -349; g.beginPath(); g.moveTo(X(P(-w)), Yp(P(yt))); g.lineTo(X(P(w)), Yp(P(yt))); g.lineTo(X(P(w)), Yp(P(yc))); g.arc(X(0), Yp(P(yc)), P(w) * s, 0, Math.PI); g.closePath(); };
-  dais(0); g.fillStyle = wood; g.fill(); g.stroke();
-  dais(5); g.fillStyle = bench; g.fill();
-  // the table: a T, the wider head towards the Speaker; its panels, and the mace
-  g.beginPath();
-  for (const [x, y] of [[-45.8, -268.6], [44.3, -268.6], [44.3, -215.2], [35, -215.2], [35, -110], [-36.6, -110], [-36.6, -215.2], [-45.8, -215.2]]) g.lineTo(X(P(x)), Yp(P(y)));
-  g.closePath(); g.fillStyle = bench; g.fill(); g.lineWidth = Math.max(1, s * 0.05); g.strokeStyle = wood; g.stroke();
-  g.lineWidth = 1; g.strokeStyle = css(th.line);
-  g.beginPath();
-  for (const x of [-15.5, 14.5]) { g.moveTo(X(P(x)), Yp(P(-266))); g.lineTo(X(P(x)), Yp(P(-218))); }
-  g.moveTo(X(P(-0.8)), Yp(P(-212))); g.lineTo(X(P(-0.8)), Yp(P(-113)));
-  for (const y of [-180, -145]) { g.moveTo(X(P(-34)), Yp(P(y))); g.lineTo(X(P(32.5)), Yp(P(y))); }
-  g.stroke();
-  if (s > 9) {
-    g.strokeStyle = css(th.faint); g.lineWidth = Math.max(1, s * 0.07); g.lineCap = "round";
-    g.beginPath(); g.moveTo(X(P(-19)), Yp(P(-123))); g.lineTo(X(P(17)), Yp(P(-123))); g.stroke();
-    g.beginPath(); g.arc(X(P(-19)), Yp(P(-123)), s * 0.12, 0, Math.PI * 2); g.fillStyle = css(th.faint); g.fill();
-    g.lineCap = "butt"; g.lineWidth = 1; g.strokeStyle = css(th.line);
-  }
-  // Hansard's desk at the table's foot
-  rr(-31.5, -63, 31.5, -34, 2); g.fillStyle = wood; g.fill(); g.stroke();
-  // every seat, empty until a member's chair is painted over it
-  const W = geom.W * s, Dp = geom.D * s;
-  for (const c of geom.seats) drawChair(g, X(c.x), Yp(c.y), c.fa, W, Dp, css(empty), back(empty, 0.12), 1);
-  // the officers: Clerk and Deputy Clerk at the table's head, Hansard's two reporters, the Serjeant-at-Arms
-  const sj = geom.serjeant;
-  for (const [x, y, fa] of [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2], [-19.7, -21.5, -Math.PI / 2], [18.2, -21.5, -Math.PI / 2], [sj.x * CU, sj.y * CU, sj.fa]])
-    drawChair(g, X(P(x)), Yp(P(y)), fa, W * 1.05, Dp * 1.05, css(officer), back(officer, 0.18), 1);
-  // the furniture's names, where they fit
-  if (opts.big && s >= 16) {
-    g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
-    const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
-    put("The table", 0, P(-196), P(66));
-    put("Hansard", 0, P(-48.5), P(58));
-  }
-}
-const SPEAKER_SCALE = 1.42;
 
 // draw the whole chamber into a context already scaled to CSS pixels
 function drawChamber(g, m, w, h, opts) {
-  const geom = chamberGeom();
+  const geom = chamberGeom(m.divs.length - (m.speaker != null ? 1 : 0));
   const pad = opts.pad || { t: 8, r: 8, b: 8, l: 8 };
   const F = chamberFrame(geom, w, h, pad);
   const th = TH, s = F.s, now = performance.now();
@@ -1244,14 +1103,31 @@ function drawChamber(g, m, w, h, opts) {
     const q = easeOut(clamp((t - lag * 0.5) / (1 - lag * 0.5), 0, 1));
     return [lerp(fr[0], to[0], q), lerp(fr[1], to[1], q), angLerp(fr[2], to[2], q), to[3]];
   };
-  const X = F.X, Yp = F.Yp, rO = geom.rOut;
+  // the floor, the benches, the table
+  const X = F.X, Yp = F.Yp, rO = geom.rOut, Ls = geom.Ls;
   g.save();
   g.globalAlpha = opts.alpha ?? 1;
-  drawChamberFurniture(g, F, geom, opts);
+  const U = (r, y0) => { // a U-shaped path at radius r, from the top left round to the top right
+    g.moveTo(X(-r), Yp(y0)); g.lineTo(X(-r), Yp(Ls)); g.arc(X(0), Yp(Ls), r * s, Math.PI, 0, true); g.lineTo(X(r), Yp(y0));
+  };
+  g.beginPath(); U(rO + 0.72, -0.5); g.closePath(); g.fillStyle = css(th.floor); g.fill();
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  for (let i = 0; i <= CH.rows; i++) { const r = CH.r0 + (i - 0.52) * CH.g; g.beginPath(); U(r, -0.1); g.stroke(); }
+  // the table, its despatch boxes and the mace
+  const tw = CH.r0 - 1.15;
+  g.beginPath(); if (g.roundRect) g.roundRect(X(-tw), Yp(0.45), 2 * tw * s, (Ls + CH.r0 * 0.5 - 0.45) * s, 0.5 * s); else g.rect(X(-tw), Yp(0.45), 2 * tw * s, (Ls + CH.r0 * 0.5 - 0.45) * s);
+  g.fillStyle = css(mixC(th.floor, th.ink, th.dark ? 0.06 : 0.035)); g.fill(); g.stroke();
+  g.fillStyle = css(th.line);
+  for (const sx of [-1, 1]) { g.beginPath(); if (g.roundRect) g.roundRect(X(sx * (tw - 0.95) - 0.42), Yp(1.15), 0.84 * s, 0.62 * s, 0.12 * s); else g.rect(X(sx * (tw - 0.95) - 0.42), Yp(1.15), 0.84 * s, 0.62 * s); g.fill(); }
+  if (s > 9) {
+    g.strokeStyle = css(th.faint); g.lineWidth = Math.max(1, s * 0.08); g.lineCap = "round";
+    g.beginPath(); g.moveTo(X(0), Yp(Ls * 0.42)); g.lineTo(X(0), Yp(Ls * 0.42 + 2.2)); g.stroke();
+    g.beginPath(); g.arc(X(0), Yp(Ls * 0.42), s * 0.2, 0, Math.PI * 2); g.fillStyle = css(th.faint); g.fill();
+  }
   // the chairs
   const filt = filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
   const pat = opts.pattern;
-  const chairW = geom.W * s, chairD = geom.D * s;
+  const chairW = geom.pitch * 0.8 * s, chairD = CH.g * 0.74 * s;
   const backOf = (c) => towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22);
   const drawn = [];
   const paint = (i, x, y, fa, scale, sp) => {
@@ -1270,56 +1146,55 @@ function drawChamber(g, m, w, h, opts) {
     const p = pos(m.divs[i].n); if (!p) return;
     paint(i, X(p[0]), Yp(p[1]), p[2], 1);
   });
-  // the Speaker's chair, on the dais at the head of the table, facing down the chamber
-  if (m.speaker != null) paint(m.speaker, X(SPEAKER_AT[0]), Yp(SPEAKER_AT[1]), SPEAKER_AT[2], SPEAKER_SCALE, true);
+  // the Speaker's chair, at the head of the table, facing down the chamber
+  if (m.speaker != null) paint(m.speaker, X(0), Yp(-1.75), Math.PI / 2, 1.42, true);
   // rings for the hovered and chosen seats
   const ring = (i, lw) => { const q = drawn.find((x) => x.i === i); if (!q) return; g.save(); g.translate(q.x, q.y); g.rotate(q.fa); g.beginPath(); const pd = 2.2; if (g.roundRect) g.roundRect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd, 3); else g.rect(-q.D / 2 - pd, -q.W / 2 - pd, q.D + 2 * pd, q.W + 2 * pd); g.lineWidth = lw; g.strokeStyle = css(th.ink); g.stroke(); g.restore(); };
   if (hv != null && hv !== sd) ring(hv, 1.4);
   if (sd != null) ring(sd, 2.2);
-  // every label drawn round the chamber claims its box, so the chosen seat's name can find a free spot
+  // every label drawn round the horseshoe claims its box, so the chosen seat's name can find a free spot
   const occ = (opts.keepOut || []).slice();
   const claim = (x, y, wd, ht, align, base) => {
     const x0 = align === "right" ? x - wd : align === "center" ? x - wd / 2 : x;
     const y0 = base === "top" ? y : base === "middle" ? y - ht / 2 : y - ht;
     occ.push({ x0, y0, x1: x0 + wd, y1: y0 + ht });
   };
-  // the majority line, threaded between the chairs from the front bench to the back row
-  const cuts = opts.labels !== false ? majorityCuts(ch, geom) : null;
-  if (cuts) {
-    const pts = [];
-    cuts.forEach((c, k) => {
-      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(benchPt(lerp(cp, c, j / n), k)); }
-      else pts.push(benchPt(c, 0));
-      pts.push(benchPt(c, k + 1));
-    });
-    const c5 = cuts[4], o = benchOut(c5), e = benchPt(c5, 5), ext = opts.big ? 0.45 : 0.2;
-    pts.push([e[0] + o[0] * ext, e[1] + o[1] * ext]);
-    g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash(opts.big ? [4, 3] : [3, 2]); g.lineJoin = "round";
-    g.beginPath(); pts.forEach(([x, y], j) => (j ? g.lineTo(X(x), Yp(y)) : g.moveTo(X(x), Yp(y)))); g.stroke(); g.setLineDash([]);
-    const p2 = [e[0] + o[0] * (opts.big ? 0.8 : 0.45), e[1] + o[1] * (opts.big ? 0.8 : 0.45)];
-    const below = p2[1] > 1;
+  // the majority line: the seat that gives the government its 76th vote
+  if (opts.labels !== false && ch.majAt > 0 && ch.majAt < geom.seats.length) {
+    const a0 = geom.seats[ch.majAt - 1], a1 = geom.seats[ch.majAt];
+    const um = (a0.u + a1.u) / 2;
+    const at = (r) => { // the point at "angle" um on radius r
+      const a = geom.a;
+      if (um <= a) return [-r, (um / a) * Ls];
+      if (um >= 1 - a) return [r, ((1 - um) / a) * Ls];
+      const phi = Math.PI - ((um - a) / (1 - 2 * a)) * Math.PI; return [r * Math.cos(phi), Ls + r * Math.sin(phi)];
+    };
+    const p0 = at(CH.r0 - 0.62 * CH.g), p1 = at(rO + 0.62 * CH.g + (opts.big ? 0.5 : 0.15));
+    g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash(opts.big ? [4, 3] : [3, 2]);
+    g.beginPath(); g.moveTo(X(p0[0]), Yp(p0[1])); g.lineTo(X(p1[0]), Yp(p1[1])); g.stroke(); g.setLineDash([]);
     if (!opts.big && s > 6) {
-      g.font = `600 11px ${SANS}`; g.fillStyle = css(th.ink2);
-      g.textAlign = p2[0] < -0.5 ? "right" : p2[0] > 0.5 ? "left" : "center"; g.textBaseline = below ? "top" : "middle";
-      g.fillText(`${ch.maj} for a majority`, X(p2[0]), Yp(p2[1]));
+      const p2 = at(rO + 1.2);
+      g.font = `600 11px ${SANS}`; g.fillStyle = css(th.ink2); g.textAlign = "center"; g.textBaseline = "top";
+      g.fillText(`${ch.maj} for a majority`, X(p2[0]), Yp(p2[1]) + 2);
     }
     if (opts.big) {
+      const p2 = at(rO + 1.35);
       g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2);
+      const below = p2[1] > Ls + 1;
       g.textAlign = p2[0] < -0.5 ? "right" : p2[0] > 0.5 ? "left" : below ? "right" : "center"; g.textBaseline = below ? "top" : "middle";
-      const mt = `${ch.maj} for a majority`, mx = X(p2[0]) + (below && Math.abs(p2[0]) <= 0.5 ? -6 : 0), my = Yp(p2[1]);
+      const mt = `${ch.maj} for a majority`, mx = X(p2[0]) + (below && Math.abs(p2[0]) <= 0.5 ? -6 : 0), my = Yp(p2[1]) + (below ? 4 : 0);
       g.fillText(mt, mx, my);
       claim(mx, my, g.measureText(mt).width, 16, g.textAlign, g.textBaseline);
-      // the dashed line itself, beyond the benches
-      const ex = X(e[0]), ey = Yp(e[1]), fx = X(p2[0]), fy = Yp(p2[1]);
-      occ.push({ x0: Math.min(ex, fx) - 3, y0: Math.min(ey, fy) - 3, x1: Math.max(ex, fx) + 3, y1: Math.max(ey, fy) + 3 });
+      // the dashed line itself
+      occ.push({ x0: Math.min(X(p0[0]), X(p1[0])) - 3, y0: Math.min(Yp(p0[1]), Yp(p1[1])) - 3, x1: Math.max(X(p0[0]), X(p1[0])) + 3, y1: Math.max(Yp(p0[1]), Yp(p1[1])) + 3 });
     }
   }
-  // the blocs' names and numbers, outside the benches
+  // the blocs' names and numbers, outside the horseshoe
   if (opts.big) {
     const fig = (txt, col, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `500 30px ${SANS}`; g.fillStyle = css(col); g.fillText(txt, x, y); };
     const lab = (txt, x, y, align) => { g.textAlign = align; g.textBaseline = "alphabetic"; g.font = `600 13px ${SANS}`; g.fillStyle = css(th.ink); g.fillText(txt, x, y); };
     const govName = blocName(m, ch.gov), oppName = blocName(m, ch.opp);
-    const yMid = Yp(-6.6);
+    const yMid = Yp(Ls * 0.42);
     const room = X(-rO - 0.8);
     if (room > 70) {
       const blocLabel = (name, n, fam, role, x, align) => {
@@ -1335,17 +1210,13 @@ function drawChamber(g, m, w, h, opts) {
       blocLabel(oppName, String(ch.nOpp + (spFam === ch.opp ? 1 : 0)), ch.opp, "Opposition", X(rO + 0.95), "left");
     }
     if (ch.nCross) {
-      // the crossbench's name and make-up beside its chairs, outside the curve, towards where they sit
-      let mx = 0, my = 0, n = 0;
-      for (const i of ch.order) { const d = m.divs[i]; if (holdFam(d.hold) === ch.gov || holdFam(d.hold) === ch.opp) continue; const c = geom.seats[ch.at.get(i)]; mx += c.x; my += c.y; n++; }
-      mx /= n; my /= n;
-      let pt;
-      if (my > 0) { const l = Math.hypot(mx, my) || 1; pt = [(mx / l) * (rO + 1.25), (my / l) * (rO + 1.25)]; }
-      else pt = [Math.sign(mx || 1) * (rO + 1.25), my];
-      // never centred: at the foot of the chamber the majority label takes one side, this the other
+      // the crossbench's name and make-up beside its chairs, outside the curve
+      const um = (ch.nGov + ch.nCross / 2) / geom.seats.length;
+      const pt = uPoint(geom, um, rO + 1.25);
+      // never centred: at the foot of the horseshoe the majority label takes the left, this the right
       const side = pt[0] < -1.2 ? "right" : "left";
-      const bx = X(pt[0]) + (side === "left" ? (Math.abs(pt[0]) <= 1.2 ? 16 : 4) : -4), by = Yp(pt[1]) + (pt[1] > rO * 0.6 ? 6 : 0);
-      // no room beside the chamber on a narrow screen: the key below gives the counts
+      const bx = X(pt[0]) + (side === "left" ? (Math.abs(pt[0]) <= 1.2 ? 16 : 4) : -4), by = Yp(pt[1]) + (pt[1] > Ls + rO * 0.6 ? 6 : 0);
+      // no room beside the horseshoe on a narrow screen: the key below gives the counts
       const room = side === "left" ? w - bx >= 150 : bx >= 150;
       if (room) {
       g.textAlign = side; g.textBaseline = "top";
@@ -1353,7 +1224,7 @@ function drawChamber(g, m, w, h, opts) {
       g.fillText(`Crossbench ${ch.nCross}`, bx, by);
       g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
       const parts = crossParts(m, ch).split(" · ");
-      const maxW = Math.max(120, side === "left" ? F.ox + (geom.box.x1 + 6) * s - bx : bx - 10);
+      const maxW = side === "center" ? 360 : Math.max(120, side === "left" ? F.ox + (geom.box.x1 + 6) * s - bx : bx - 10);
       let line = "", ly = by + 17, wMax = g.measureText(`Crossbench ${ch.nCross}`).width + 10;
       for (const p of parts) {
         const t = line ? line + " · " + p : p;
@@ -1363,17 +1234,15 @@ function drawChamber(g, m, w, h, opts) {
       claim(bx, by, wMax, ly + 15 - by, side, "top");
       }
     }
-    // the Speaker, named above the dais
+    // the Speaker
     const sp = m.divs[m.speaker];
     if (sp) {
-      const a = "Speaker", b = `  ${speakerName(m)}, ${sp.n}`, y = Yp(geom.box.y0) - 9;
-      g.textBaseline = "middle"; g.textAlign = "left";
-      g.font = `600 12px ${SANS}`; const wa = g.measureText(a).width;
-      g.font = `400 12px ${SANS}`; const wb = g.measureText(b).width;
-      const x0 = X(0) - (wa + wb) / 2;
-      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText(a, x0, y);
-      g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3); g.fillText(b, x0 + wa, y);
-      claim(x0, y - 8, wa + wb, 16, "left", "top");
+      g.textAlign = "left"; g.textBaseline = "middle"; g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2);
+      g.fillText("Speaker", X(1.35), Yp(-1.75) - 7);
+      g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
+      const spt = `${speakerName(m)}, ${sp.n}`;
+      g.fillText(spt, X(1.35), Yp(-1.75) + 8);
+      claim(X(1.35), Yp(-1.75) - 15, g.measureText(spt).width, 31, "left", "top");
     }
     // the chosen seat's name, out beyond the benches on a leader line, at the nearest free spot
     if (sd != null) {
@@ -1388,17 +1257,17 @@ function drawChamber(g, m, w, h, opts) {
     const cx = (q.x - F.ox) / s, cy = (q.y - F.oy) / s;
     // outward: sideways off the straight benches, along the radius round the curve
     let dx, dy;
-    if (cy <= 0) { dx = cx < 0 ? -1 : 1; dy = 0; } else { const l = Math.hypot(cx, cy) || 1; dx = cx / l; dy = cy / l; }
+    if (cy <= Ls) { dx = cx < 0 ? -1 : 1; dy = 0; } else { const l = Math.hypot(cx, cy - Ls) || 1; dx = cx / l; dy = (cy - Ls) / l; }
     // the name hangs where the bloc labels do, just beyond the benches
     const R = rO + 0.95, Rk = rO + 0.6;
-    const ax = X(dx * R), ay = cy <= 0 ? q.y : Yp(dy * R);
-    const kx = X(dx * Rk), ky = cy <= 0 ? q.y : Yp(dy * Rk);
+    const ax = X(dx * R), ay = cy <= Ls ? q.y : Yp(Ls + dy * R);
+    const kx = X(dx * Rk), ky = cy <= Ls ? q.y : Yp(Ls + dy * Rk);
     g.font = `600 13px ${SANS}`;
     const tw = g.measureText(txt).width, th2 = 16;
     const side = Math.abs(dx) >= 0.42;
     const align = side ? (dx < 0 ? "right" : "left") : "center";
     const floorR = rO + 0.5; // the outer chairs' backs
-    const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
+    const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= Ls ? v >= -0.6 && Math.abs(u) <= floorR : Math.hypot(u, v - Ls) <= floorR; };
     const boxAt = (lx, ly) => {
       const x0 = align === "right" ? lx - 6 - tw : align === "center" ? lx - tw / 2 : lx + 6;
       const y0 = side ? ly - th2 / 2 : ly + 5;
@@ -1432,7 +1301,7 @@ function drawChamber(g, m, w, h, opts) {
     const tx = align === "right" ? box.x1 + 4 : align === "left" ? box.x0 - 4 : (box.x0 + box.x1) / 2, ty = side ? my : box.y0 - 3;
     g.lineCap = "round"; g.lineJoin = "round";
     g.beginPath(); g.moveTo(ex, ey); g.lineTo(kx, ky);
-    if (side && cy <= 0) g.lineTo(kx, ty);
+    if (side && cy <= Ls) g.lineTo(kx, ty);
     g.lineTo(tx, ty);
     g.lineWidth = 3.4; g.strokeStyle = css(th.floor); g.stroke();
     g.lineWidth = 1.2; g.strokeStyle = css(th.ink); g.stroke();
@@ -1470,7 +1339,7 @@ function chamberHit(m, px, py) {
   for (const q of chMain.drawn) { const d = Math.hypot(px - q.x, py - q.y); if (d < q.r + 3 && d < bd) { bd = d; best = q.i; } }
   return best == null ? null : { kind: "div", i: best };
 }
-function chamberPads() { return isPhone() ? { t: 30, r: 10, b: 52, l: 10 } : { t: 34, r: 150, b: 66, l: 150 }; }
+function chamberPads() { return isPhone() ? { t: 30, r: 10, b: 52, l: 10 } : { t: 24, r: 150, b: 66, l: 150 }; }
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sd = selDiv();
@@ -1483,7 +1352,7 @@ function drawChamberMain(m, alpha) {
 let morph = null; // { to: "chamber" | "map", t0, dur }
 function drawMorph(m, p) {
   const th = TH;
-  const geom = chamberGeom();
+  const geom = chamberGeom(m.divs.length - 1);
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
@@ -1491,13 +1360,13 @@ function drawMorph(m, p) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (p > 0.45) {
     ctx.globalAlpha = clamp((p - 0.45) / 0.55, 0, 1);
-    drawChamberFurniture(ctx, F, geom);
+    drawChamberFurniture(ctx, m, F, geom);
   }
   ctx.restore();
   const g = geoOf(m);
-  const chairW = geom.W * F.s, chairD = geom.D * F.s;
+  const chairW = geom.pitch * 0.8 * F.s, chairD = CH.g * 0.74 * F.s;
   for (const d of m.divs) {
-    const tgt = d.i === m.speaker ? SPEAKER_AT : target.get(d.n);
+    const tgt = d.i === m.speaker ? [0, -1.75, Math.PI / 2] : target.get(d.n);
     if (!tgt) continue;
     const gx = d.lpx * T.k + T.x, gy = d.lpy * T.k + T.y;
     const cx = F.X(tgt[0]), cy = F.Yp(tgt[1]);
@@ -1518,19 +1387,30 @@ function drawMorph(m, p) {
     const cs = smooth(0.35, 1, e);
     if (cs > 0.01) {
       ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const sp = d.i === m.speaker ? SPEAKER_SCALE : 1;
+      const sp = d.i === m.speaker ? 1.42 : 1;
       drawChair(ctx, x, y, lerp(0, tgt[2], e), chairW * sp * cs, chairD * sp * cs, css(c), css(towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22)), 1);
       ctx.restore();
     }
   }
 }
+function drawChamberFurniture(g, m, F, geom) {
+  const th = TH, X = F.X, Yp = F.Yp, s = F.s, rO = geom.rOut, Ls = geom.Ls;
+  const U = (r, y0) => { g.moveTo(X(-r), Yp(y0)); g.lineTo(X(-r), Yp(Ls)); g.arc(X(0), Yp(Ls), r * s, Math.PI, 0, true); g.lineTo(X(r), Yp(y0)); };
+  g.beginPath(); U(rO + 0.72, -0.5); g.closePath(); g.fillStyle = css(th.floor); g.fill();
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  for (let i = 0; i <= CH.rows; i++) { const r = CH.r0 + (i - 0.52) * CH.g; g.beginPath(); U(r, -0.1); g.stroke(); }
+  const tw = CH.r0 - 1.15;
+  g.beginPath(); if (g.roundRect) g.roundRect(X(-tw), Yp(0.45), 2 * tw * s, (Ls + CH.r0 * 0.5 - 0.45) * s, 0.5 * s); else g.rect(X(-tw), Yp(0.45), 2 * tw * s, (Ls + CH.r0 * 0.5 - 0.45) * s);
+  g.fillStyle = css(mixC(th.floor, th.ink, th.dark ? 0.06 : 0.035)); g.fill(); g.stroke();
+}
+
 /* ----- the small chamber in the story column ----- */
 const miniCh = { canvas: null, drawn: null, F: null };
 function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
   const w = c.clientWidth || 300;
-  const geom = chamberGeom();
+  const geom = chamberGeom(m.divs.length - 1);
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);
