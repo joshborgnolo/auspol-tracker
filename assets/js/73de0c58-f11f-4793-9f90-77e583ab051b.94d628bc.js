@@ -2172,13 +2172,13 @@ function App() {
         return;
       }
       const own = e.target && e.target.closest && e.target.closest(".chart") ? e.target.closest("[data-rd-swipe-exact]") : null;
-      if (!own && claimsSideways(e.target)) return;
       g = {
         x: t.clientX,
         y: t.clientY,
         t: Date.now(),
         sy: window.scrollY,
-        row: own || rowAt(t.clientY)
+        row: own,
+        target: own ? null : e.target
       };
     };
     const onMove = e => {
@@ -2199,6 +2199,10 @@ function App() {
       if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (s.target) {
+        if (claimsSideways(s.target)) return;
+        s.row = rowAt(s.y - (window.scrollY - s.sy));
+      }
       const dir = dx < 0 ? 1 : -1;
       if (s.row) {
         if (s.row.isConnected && s.row.__rdSwipe) s.row.__rdSwipe(dir);

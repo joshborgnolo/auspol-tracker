@@ -2645,8 +2645,14 @@ function App() {
          like anywhere else */
       const own = e.target && e.target.closest && e.target.closest(".chart")
         ? e.target.closest("[data-rd-swipe-exact]") : null;
-      if (!own && claimsSideways(e.target)) return;
-      g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: own || rowAt(t.clientY) };
+      /* The sideways claims and the row under the finger are judged at the
+         END, once the gesture is a swipe: measured here they forced a layout
+         of the page on every touch - 105ms at 4x CPU in front of each tap on
+         a tab (rowAt reads every row's rect, and a row in a section
+         content-visibility skips lays that section out). A swipe the end
+         accepts moved the page under 12px, so the start's y, shifted by
+         that scroll, still names the same row. */
+      g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: own, target: own ? null : e.target };
     };
     const onMove = (e) => { if (g && e.touches.length > 1) g = null; };
     const onCancel = () => { g = null; };
@@ -2661,6 +2667,10 @@ function App() {
       if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;       // the finger was selecting text
+      if (s.target) {
+        if (claimsSideways(s.target)) return;
+        s.row = rowAt(s.y - (window.scrollY - s.sy));
+      }
       const dir = dx < 0 ? 1 : -1;               // right-to-left = next
       if (s.row) {
         if (s.row.isConnected && s.row.__rdSwipe) s.row.__rdSwipe(dir);
