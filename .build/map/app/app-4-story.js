@@ -569,6 +569,14 @@ let storyKey = "";
 function renderStory(force) {
   const m = M(); if (!m) return;
   const s = S.sel;
+  if (S.view === "chamber" && S.house === "senate") {
+    if (!SENM) return;
+    const ss = S.ssel, key = ["senate", S.senLens, ss.level, ss.st, ss.i].join("|");
+    if (!force && key === storyKey) return;
+    storyKey = key;
+    $("#story").innerHTML = storySenate(SENM);
+    return;
+  }
   const key = [S.year, S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;

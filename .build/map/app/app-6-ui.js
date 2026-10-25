@@ -42,14 +42,19 @@ function valueText(v, kind) {
 }
 
 /* =============================== the lens tabs =============================== */
+// the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
-  $("#lenses").innerHTML = LENSES.map((l) => `<button type="button" class="rd-tab" role="tab" data-lens="${l.id}" aria-selected="${S.lens === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
+  const sen = S.view === "chamber" && S.house === "senate";
+  const list = sen ? SEN_LENSES : LENSES, cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
+  $("#lenses").innerHTML = list.map((l) => `<button type="button" class="rd-tab" role="tab" ${attr}="${l.id}" aria-selected="${cur === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
+  $("#lenses").setAttribute("aria-label", sen ? "Colour the senators by" : "Colour the seats by");
+  $("#q").placeholder = sen ? "Search a senator or state" : "Search a seat, member or place";
 }
 
 /* =============================== the legend =============================== */
 let legendKey = "";
 const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.year, S.seat, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -76,7 +81,7 @@ function renderLegend() {
   const el = $("#legend"), m = M();
   if (!m || S.view === "list") { el.hidden = true; return; }
   el.hidden = false;
-  el.innerHTML = legendHTML(m);
+  el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   holdLegendHeight(m);
 }
 /* the key holds the height of its tallest lens in its tallest election, so neither changing lens
@@ -89,6 +94,8 @@ let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
     SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
+    // the Senate's senators (not its floor): its key is measured with the House's, so switching chamber moves nothing
+    loadSenate(),
     ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
@@ -136,9 +143,29 @@ function holdLegendHeight(m) {
   probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
   el.parentNode.appendChild(probe);
   let h = 0;
-  try { for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe)); } finally { probe.remove(); }
+  try {
+    for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe));
+    if (S.view === "chamber" && SENM) h = Math.max(h, senLegendHeight(w, probe));
+  } finally { probe.remove(); }
   el.style.minHeight = h + "px";
   el.style.boxSizing = "border-box";
+}
+// the Senate's key at its tallest: each lens, as seated and sorted
+function senLegendHeight(w, probe) {
+  const key = `senate|${w}`;
+  if (!legendHeights.has(key)) {
+    const keep = { senLens: S.senLens, seat: S.seat };
+    let hMax = 0;
+    try {
+      for (const l of SEN_LENSES) for (const seat of ["plan", "sort"]) {
+        S.senLens = l.id; S.seat = seat;
+        probe.innerHTML = senateLegendHTML(SENM);
+        hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+      }
+    } finally { Object.assign(S, keep); }
+    legendHeights.set(key, Math.ceil(hMax));
+  }
+  return legendHeights.get(key);
 }
 function legendHTML(m) {
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
@@ -149,7 +176,8 @@ function legendHTML(m) {
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
   const partyOpts = FAMS.map((f) => [f, FAM_LEG[f]]);
-  let h = "";
+  // the chamber view chooses its chamber first
+  let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
@@ -243,12 +271,14 @@ function renderTimeline() {
     }
     if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
-    const st = S.sel.level === "state" ? S.sel.st : "AUS";
+    // in the Senate's chamber the House's elections stay faint, and Now reads the Senate's make-up
+    const sen = senOn();
+    const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
     for (const y of YEARS) {
-      const s = SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
+      const s = sen && y === "now" ? senCounts(SENM, (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
       const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
       let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : sen ? 0.22 : 0.62}"/>`; acc += w; }
     }
   }
   for (const y of YEARS) {
@@ -272,6 +302,7 @@ function showTipAt(html, cx, cy) {
   tip.style.transform = `translate(${Math.max(6, tx)}px, ${Math.max(6, ty)}px)`;
 }
 function tipFor(h) {
+  if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
   if (h.kind === "div") {
     const d = m.divs[h.i];
@@ -328,39 +359,40 @@ function updateHint() {
 /* =============================== search =============================== */
 let sugg = [], suggAt = -1;
 function runSearch() {
-  const m = M(), el = $("#sugg"), q = S.q.trim();
+  const m = M(), el = $("#sugg"), q = S.q.trim(), sen = senOn();
   if (S.view === "list") { el.hidden = true; renderList(); return; }
   if (!m || q.length < 2) { el.hidden = true; sugg = []; $("#q").setAttribute("aria-expanded", "false"); return; }
   const toks = norm(q).split(/\s+/).filter(Boolean);
   const scored = [];
-  for (const it of m.search.items) {
+  for (const it of sen ? (SENM.search ??= senSearchItems(SENM)) : m.search.items) {
     const h = it.h; let ok = true, score = it.rank * 10;
     for (const t of toks) { const p = h.indexOf(t); if (p < 0) { ok = false; break; } if (p === 0) score -= 4; else if (h[p - 1] === " ") score -= 2; }
     if (ok) scored.push([score, it]);
     if (scored.length > 4000) break;
   }
   scored.sort((a, b) => a[0] - b[0]);
-  const groups = { state: [], div: [], mp: [], cand: [], booth: [] };
-  for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" ? 6 : 4)) g.push(it); }
-  sugg = [...groups.state, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
+  const groups = { state: [], sen: [], div: [], mp: [], cand: [], booth: [] };
+  for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" || it.k === "sen" ? 6 : 4)) g.push(it); }
+  sugg = [...groups.state, ...groups.sen, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
   suggAt = sugg.length ? 0 : -1;
-  const label = { state: "States and territories", div: "Seats", mp: isNow() ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
+  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNow() ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
   let html = "", n = 0;
-  for (const k of ["state", "div", "mp", "cand", "booth"]) {
+  for (const k of ["state", "sen", "div", "mp", "cand", "booth"]) {
     if (!groups[k].length) continue;
     html += `<div class="g">${label[k]}</div>`;
     for (const it of groups[k]) {
-      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : colCss(m.divCol[it.i]);
+      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
       html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw" style="background:${color}"></i><span class="t">${esc(it.t)}</span><span class="s">${esc(it.s)}</span></button>`;
       n++;
     }
   }
-  el.innerHTML = html || `<div class="none">No seat, member or place matches “${esc(q)}”.</div>`;
+  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, member or place"} matches “${esc(q)}”.</div>`;
   el.hidden = false; $("#q").setAttribute("aria-expanded", "true");
 }
 function chooseSugg(k) {
   const it = sugg[k]; if (!it) return;
   $("#sugg").hidden = true; $("#q").value = ""; S.q = ""; $("#q").blur();
+  if (senOn()) { selectSen(it.k === "state" ? { level: "state", st: it.st } : { level: "sen", st: SENM.divs[it.i].st, i: it.i }); return; }
   const view = it.k === "booth" && S.view === "chamber" ? "map" : undefined;
   if (it.k === "state") goState(it.st, { view });
   else if (it.k === "div" || it.k === "mp" || it.k === "cand") goDiv(it.i, { view });
@@ -371,8 +403,11 @@ function chooseSugg(k) {
 function setView(v, quiet) {
   if (v === S.view) return;
   const prev = S.view;
+  // the Senate has no map: into or out of its chamber the view changes without the morph
+  const senate = S.house === "senate" && (prev === "chamber" || v === "chamber");
   S.view = v;
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
+  if (senate) { renderLenses(); $("#mp-meta").textContent = metaLine(); if (v === "chamber") needSenateFloor(); }
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
@@ -383,7 +418,7 @@ function setView(v, quiet) {
   hideTip(); S.hover = null;
   if (list) { $("#sugg").hidden = true; renderList(); }
   else {
-    if ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map")) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
+    if (!senate && ((prev === "map" && v === "chamber") || (prev === "chamber" && v === "map"))) morph = reduceMotion ? null : { t0: performance.now(), dur: 1000, to: v };
     // the map always opens at its fit — the transform persists across views,
     // and an unfitted one lands on the country's north-west corner
     if (v === "map" && prev !== "map") fitSelection(0);
@@ -403,6 +438,41 @@ function setLens(id) {
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
+function setSenLens(id) {
+  if (S.senLens === id) return;
+  const hold = walkHold(takeSpot());
+  S.senLens = id;
+  $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.slens === id)));
+  startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
+  if (hold) hold.land();
+}
+/* the chamber view's chamber: the House or the Senate. The Senate is today's, so choosing it from an
+   election moves the timeline to Now; the two cross-fade, the chairs being different people */
+let houseFade = null;
+async function setHouse(h) {
+  if (h === S.house) return;
+  const spot = takeSpot(), from = CM();
+  if (h === "senate" && S.year !== "now") await setYear("now");
+  if (h === "senate" && !senFloor) {
+    showLoading(true);
+    try { await loadSenateFloor(); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
+    showLoading(false);
+  }
+  const hold = walkHold(spot);
+  S.house = h; S.hover = null; hideTip();
+  chAnim = null; chLast.clear();
+  houseFade = from && !reduceMotion && S.view === "chamber" ? { from, t0: performance.now(), dur: 420 } : null;
+  renderLenses(); renderLegend(); renderStory(true); renderTimeline(); writeURL();
+  $("#mp-meta").textContent = metaLine();
+  if (hold) hold.land();
+  schedule();
+}
+// the Senate's floor, fetched the first time its chamber is shown
+function needSenateFloor() {
+  if (senFloor) return;
+  showLoading(true);
+  loadSenateFloor().then(() => { showLoading(false); renderStory(true); schedule(); }).catch(() => showLoading(true, "The Senate didn’t load. Try again."));
+}
 function lensParamChanged() {
   const hold = walkHold(takeSpot());
   S.sort = null; if (S.f.range && S.f.range.key === "lens") S.f.range = null;
@@ -420,12 +490,15 @@ function showLoading(on, msg) {
   if (!on || msg || S.view !== "chamber") return;
   const r = $("#stage").getBoundingClientRect();
   if (!r.width) return;
-  const F = chamberFrame(chamberGeom(), r.width, r.height, chamberPads(r.width));
-  el.style.left = F.X(0) + "px"; el.style.top = F.Yp(CH_AISLE) + "px";
+  const geom = chamberGeom(S.house === "senate" && senFloor ? SENM : null);
+  const F = chamberFrame(geom, r.width, r.height, chamberPads(r.width));
+  el.style.left = F.X(0) + "px"; el.style.top = F.Yp(geom.aisle) + "px";
 }
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
+  // the Senate is drawn as it sits today: an election on the timeline is the House's
+  if (S.house === "senate" && y !== "now") { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // the spot is taken now, while it's fresh: the election may take a while to load
   const from = S.year, a = M(), spot = takeSpot();
   showLoading(true);
@@ -454,6 +527,7 @@ async function setYear(y) {
 }
 function metaLine() {
   const m = M(); if (!m) return "";
+  if (senOn()) return `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 
@@ -480,7 +554,12 @@ function frame(ts) {
     drawGeo(m, yearFade ? yf : 1, streetK());
     drawFocus(m); drawBooths(m); drawLabels(m);
   } else if (S.view === "chamber") {
-    drawChamberMain(m, 1);
+    const c = CM();
+    if (houseFade) {
+      const t = clamp((ts - houseFade.t0) / houseFade.dur, 0, 1), e = ease(t);
+      if (t < 1) { again = true; drawChamberMain(houseFade.from, 1 - e); } else houseFade = null;
+      if (c) drawChamberMain(c, houseFade ? e : 1);
+    } else if (c) drawChamberMain(c, 1);
   }
   showCredit(!morph && S.view === "map" && streetK() > 0.02);
   if (miniCh.canvas && (fade || chAnim || again || miniCh.dirty)) { paintMiniChamber(); miniCh.dirty = false; }
@@ -522,6 +601,13 @@ function writeURL() {
   if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); }
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
+  if (S.house === "senate") {
+    p.set("c", "senate");
+    if (S.senLens !== "party") p.set("sl", S.senLens);
+    const ss = S.ssel;
+    if (ss.level === "state") p.set("ss", ss.st);
+    else if (ss.level === "sen" && SENM) p.set("ss", SENM.divs[ss.i].n);
+  }
   if (m) {
     const s = S.sel;
     if (s.level === "state") p.set("s", s.st);
@@ -541,7 +627,16 @@ function readURL() {
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
+  // the Senate is today's alone
+  if (p.get("c") === "senate" && S.year === "now") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
   return p.get("s");
+}
+let senFromURL = null;
+function applySenFromURL() {
+  const v = senFromURL; senFromURL = null;
+  if (!v || !SENM) return;
+  if (STATES.includes(v)) S.ssel = { level: "state", st: v };
+  else { const i = SENM.byName.get(v); if (i != null) S.ssel = { level: "sen", st: SENM.divs[i].st, i }; }
 }
 function applySelFromURL(sv) {
   const m = M(); if (!m || !sv) return false;
@@ -566,6 +661,8 @@ canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); sched
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
+  if (h && h.kind === "sen") { selectSen({ level: "sen", st: SENM.divs[h.i].st, i: h.i }); return; }
+  if (!h && senOn()) { if (S.ssel.level !== "aus") selectSen({ level: "aus" }); return; }
   if (!h) {
     // a miss lets the selection go — on the map only near the whole-country
     // fit (a zoomed miss is a pan mis-tap); the chamber has no camera, so a
@@ -599,7 +696,7 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
-  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat]");
+  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
@@ -610,8 +707,11 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (t.dataset.lens) { setLens(t.dataset.lens); return; }
+  if (t.dataset.house) { setHouse(t.dataset.house); return; }
+  if (t.dataset.slens) { setSenLens(t.dataset.slens); return; }
+  if (t.dataset.sgo && SENM) { const [k, v] = t.dataset.sgo.split(":"); selectSen(k === "aus" ? { level: "aus" } : k === "state" ? { level: "state", st: v } : { level: "sen", st: SENM.divs[+v].st, i: +v }); return; }
   if (t.dataset.view) { setView(t.dataset.view); return; }
-  if (t.dataset.seat) { if (t.dataset.seat !== seatMode(M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
+  if (t.dataset.seat) { if (t.dataset.seat !== seatMode(CM() || M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
   if (t.dataset.flip === "tpp") { S.tppMode = S.tppMode === "swing" ? "share" : "swing"; lensParamChanged(); return; }
   if (t.dataset.flip === "fp") { S.fpMode = S.fpMode === "change" ? "share" : "change"; lensParamChanged(); return; }
   if (t.dataset.dist) { S.dist = S.dist === t.dataset.dist ? null : t.dataset.dist; renderList(true); return; }
@@ -656,7 +756,10 @@ document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.key === "Escape") goUp();
+  if (e.key === "Escape") {
+    if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
+    else goUp();
+  }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
@@ -685,11 +788,13 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  if (S.house === "senate") { try { await loadSenateFloor(); applySenFromURL(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
+  renderLenses();
   morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });

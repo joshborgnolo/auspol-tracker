@@ -6,6 +6,7 @@
                        the "Now" overlay (Farrer by-election, changes of party)
      app-2-map.js      lens values and colours, the canvas map, zoom and pan
      app-3-chamber.js  the House in its chamber, seat by seat, and the morph
+     app-3b-senate.js  the Senate as it sits, drawn by the same renderer
      app-4-story.js    the story column: rule-written heads for every lens
      app-5-list.js     the list, its filters and the column distributions
      app-6-ui.js       legend, timeline, tooltip, search, URL, events, boot
@@ -22,7 +23,7 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
-const app = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
+const app = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 const js = `/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`;
 const css = part("page.css");
 const write = (rel, body) => {
