@@ -23,6 +23,7 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
+import { rewriteTideArt } from "./tide-art.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
@@ -197,6 +198,27 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
+
+/* -- the tide band's weekly vote-weighted recolour --------------------------
+   The thirty traces closing the page are re-coloured by chance against the
+   CURRENT primary vote (gen-data's latest.primary, read from the dataset it
+   just wrote), the draw seeded by the Sydney ISO week – re-shuffled on the
+   first build after Monday 12am, stable within the week, weights always
+   live. Geometry and washed palette come out of the template's committed
+   art (its single home); a null draw (empty estimator window) leaves the
+   template art untouched. Federal also refreshes the satellites' /assets
+   files from the same draw. See tide-art.mjs. */
+{
+  const src = fs.readFileSync(DA(DATASET), "utf8");
+  const i = src.indexOf("const latest = ");
+  const latest = i >= 0 ? JSON.parse(src.slice(i + 15, src.indexOf("\n", i)).replace(/;$/, "")) : null;
+  const tide = rewriteTideArt(html, latest && latest.primary);
+  html = tide.html;
+  if (!VIC && tide.svgLight) {
+    writeAtomic(path.join(ROOT, "assets", "tile-art.svg"), tide.svgLight + "\n");
+    writeAtomic(path.join(ROOT, "assets", "tile-art-dark.svg"), tide.svgDark + "\n");
+  }
+}
 
 /* -- fonts: one hashed, cache-forever file per latin-subset face ------------
    These used to be base64'd into the stylesheet. woff2 is already compressed,
