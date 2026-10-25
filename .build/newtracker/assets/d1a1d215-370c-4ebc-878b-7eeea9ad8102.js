@@ -3027,9 +3027,11 @@ function AccuracyPanel() {
   React.useEffect(() => {
     const el = rowsRef.current && rowsRef.current.querySelector(".acc-track");
     if (!el || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => setTrackW(el.clientWidth));
+    // 0 = a parked (hidden) tab, not a zero track: keep the lanes as packed
+    const measure = () => { if (el.clientWidth) setTrackW(el.clientWidth); };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setTrackW(el.clientWidth);
+    measure();
     return () => ro.disconnect();
   }, []);
   /* These dots are read by tapping them, and a tap has no leave event - so a

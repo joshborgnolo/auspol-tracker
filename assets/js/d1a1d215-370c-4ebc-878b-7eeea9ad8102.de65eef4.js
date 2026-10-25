@@ -2419,9 +2419,12 @@ function AccuracyPanel() {
   React.useEffect(() => {
     const el = rowsRef.current && rowsRef.current.querySelector(".acc-track");
     if (!el || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => setTrackW(el.clientWidth));
+    const measure = () => {
+      if (el.clientWidth) setTrackW(el.clientWidth);
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setTrackW(el.clientWidth);
+    measure();
     return () => ro.disconnect();
   }, []);
   window.useDismissOutside(rowsRef, !!hov, () => setHov(null));

@@ -311,7 +311,8 @@ function TrendChart(props) {
     const el = ref.current;
     const update = () => {
       svgRect.current = null;
-      setCw(el.getBoundingClientRect().width || VB.W);
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) setCw(w);
     };
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);

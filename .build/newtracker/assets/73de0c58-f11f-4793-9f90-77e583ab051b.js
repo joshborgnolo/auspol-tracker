@@ -1472,6 +1472,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     const el = hiRef.current;
     if (!el || !el.parentElement) return;
     const fit = () => {
+      /* a parked (hidden) tab measures 0 wide, which would shrink the strip
+         to the 8px floor and paint that on the way back in */
+      if (!el.clientWidth) return;
       const setFs = (v) => {
         const s = v + "px";
         if (el.style.getPropertyValue("--hi-fs") !== s)

@@ -1272,6 +1272,7 @@ function Hero({
     const el = hiRef.current;
     if (!el || !el.parentElement) return;
     const fit = () => {
+      if (!el.clientWidth) return;
       const setFs = v => {
         const s = v + "px";
         if (el.style.getPropertyValue("--hi-fs") !== s) el.style.setProperty("--hi-fs", s);

@@ -460,7 +460,17 @@ function TrendChart(props) {
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const update = () => { svgRect.current = null; setCw(el.getBoundingClientRect().width || VB.W); };
+    /* A zero width is a chart that is not rendered - its tab panel parked
+       behind `hidden`, or (first pass only) a skipped content-visibility
+       section - not a chart that is zero wide. Keep the last real width:
+       falling back to the viewBox there painted a returning tab's charts at
+       the wrong width for a frame, and every label and margin slid sideways
+       into place when the observer caught up. */
+    const update = () => {
+      svgRect.current = null;
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) setCw(w);
+    };
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
