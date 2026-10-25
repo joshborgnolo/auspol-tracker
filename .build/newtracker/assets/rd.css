@@ -901,11 +901,25 @@ body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot {
 }
 body.rd .rd-lg-span { top: 28px; height: 16px; border-radius: 2px; opacity: 0.2; }
 body.rd .rd-lg-cap { top: 28px; height: 16px; width: 2px; transform: translateX(-1px); }
-body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); box-shadow: 0 0 0 2px var(--bg); cursor: pointer; }
+body.rd .rd-lg-dot:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 2px; }
+/* the click hop; --hop carries the height multiplier (the 1-in-150 click
+   flies ten times as high), --hopdur the timing for that flight */
+body.rd .rd-lg-dot.hop { animation: rd-lg-hop var(--hopdur, 0.62s) ease; }
+@keyframes rd-lg-hop {
+  0% { transform: translate(-8px, 0); }
+  35% { transform: translate(-8px, calc(var(--hop, 1) * -10px)); }
+  55% { transform: translate(-8px, 0); }
+  72% { transform: translate(-8px, calc(var(--hop, 1) * -4px)); }
+  85% { transform: translate(-8px, 0); }
+  93% { transform: translate(-8px, calc(var(--hop, 1) * -1.5px)); }
+  100% { transform: translate(-8px, 0); }
+}
 body.rd .rd-lg-tick { top: 64px; line-height: 16px; color: var(--ink-3); transform: translateX(-50%); white-space: nowrap; }
 body.rd .rd-lg-tied { font-weight: 600; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot, body.rd .rd-tpp-dot { transition: none; }
+  body.rd .rd-lg-dot.hop { animation: none; }
 }
 body.rd .rd-sens { opacity: 0.1; }
 

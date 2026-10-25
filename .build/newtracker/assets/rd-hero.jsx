@@ -74,6 +74,14 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const lo = margin != null ? lead - margin : lead, hi = margin != null ? lead + margin : lead;
   const col = lead >= 0 ? aColor : bColor;
   const L = settled ? X(hi) : cx, R = settled ? X(lo) : cx, P = settled ? X(lead) : cx;
+  /* idle-click Easter egg: the dot hops on a click; about one click in 150
+     sends it ten times the usual height. The count keys the span so every
+     click remounts it and re-fires the CSS animation. */
+  const [hop, setHop] = React.useState(null);
+  const boing = () => {
+    if (REDUCED_MOTION) return;
+    setHop((h) => ({ n: (h ? h.n : 0) + 1, big: Math.random() < 1 / 150 }));
+  };
   const sideX = Math.max(0, cx - 10 * unit - 56);
   const say = aName + (lead >= 0 ? " ahead by " : " behind by ") + Math.abs(lead).toFixed(1) + " points"
     + (margin != null ? ", give or take " + margin.toFixed(1) + (lo <= 0 && hi >= 0 ? ": a tie is inside that range." : ": a tie is outside that range.") : ".");
@@ -90,7 +98,16 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
           <span className="rd-lg-cap" style={{ left: R, background: col }}></span>
         </>
       )}
-      <span className="rd-lg-dot" style={{ left: P, background: col }}></span>
+      <span
+        key={hop ? "hop" + hop.n : "hop0"}
+        className={"rd-lg-dot" + (hop ? " hop" : "")}
+        style={hop
+          ? { left: P, background: col, "--hop": hop.big ? 10 : 1, "--hopdur": (hop.big ? 1.1 : 0.62) + "s" }
+          : { left: P, background: col }}
+        onClick={boing}
+        role="button" tabIndex={0} aria-label="Bounce"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); boing(); } }}
+      ></span>
       {[-10, -5, 5, 10].map((v) => (
         <span key={"t" + v} className="rd-lg-tick" style={{ left: X(v) }}>{Math.abs(v) === 10 && unit >= 20 ? "10 pts" : Math.abs(v)}</span>
       ))}
