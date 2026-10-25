@@ -18,6 +18,25 @@ function textWidth(str, size, weight) {
   _measCache.set(key, w);
   return w;
 }
+function cvSkipped(el) {
+  return !!(el && el.checkVisibility) && !el.checkVisibility({
+    contentVisibilityAuto: true
+  });
+}
+let rectEpoch = 0;
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  const bump = () => {
+    rectEpoch++;
+  };
+  window.addEventListener("scroll", bump, {
+    capture: true,
+    passive: true
+  });
+  window.addEventListener("resize", bump);
+  const host = document.getElementById("root") || document.body;
+  if (host && typeof ResizeObserver !== "undefined") new ResizeObserver(bump).observe(host);
+})();
 function wrapText(str, size, weight, w, max) {
   const words = str.split(/ +/).filter(Boolean);
   const wide = ln => textWidth(ln, size, weight);
@@ -309,21 +328,15 @@ function TrendChart(props) {
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const update = () => {
+    const update = entries => {
       svgRect.current = null;
-      const w = el.getBoundingClientRect().width;
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      const w = box ? box.inlineSize : el.getBoundingClientRect().width;
       if (w > 0) setCw(w);
     };
-    if (widthSeed == null) update();
+    if (widthSeed == null && !cvSkipped(el)) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    const drop = () => {
-      svgRect.current = null;
-    };
-    window.addEventListener("scroll", drop, true);
-    window.addEventListener("resize", drop);
-    const bro = new ResizeObserver(drop);
-    bro.observe(document.body);
     const mo = new MutationObserver(() => setCopyTick(t => t + 1));
     mo.observe(el, {
       attributes: true,
@@ -332,9 +345,6 @@ function TrendChart(props) {
     return () => {
       ro.disconnect();
       mo.disconnect();
-      bro.disconnect();
-      window.removeEventListener("scroll", drop, true);
-      window.removeEventListener("resize", drop);
     };
   }, []);
   const k0 = cw / VB.W;
@@ -456,7 +466,11 @@ function TrendChart(props) {
   };
   const spinePts = spine || (series[0] ? series[0].points : []);
   const toVB = e => {
-    const rect = svgRect.current || (svgRect.current = ref.current.querySelector("svg").getBoundingClientRect());
+    const hit = svgRect.current && svgRect.current.e === rectEpoch ? svgRect.current : null;
+    const rect = (hit || (svgRect.current = {
+      r: ref.current.querySelector("svg").getBoundingClientRect(),
+      e: rectEpoch
+    })).r;
     return {
       x: (e.clientX - rect.left) / rect.width * W,
       y: (e.clientY - rect.top) / rect.height * H,

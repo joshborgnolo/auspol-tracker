@@ -1329,6 +1329,8 @@ function BtvFindings({
     className: "btv-fm"
   }, t.finding.meta)))) : null)));
 }
+const BTV_FIRST = 2,
+  BTV_STEP = 2;
 function BtvBody() {
   const {
     D
@@ -1369,7 +1371,7 @@ function BtvBody() {
     return () => cancelAnimationFrame(raf);
   }, [src, jump]);
   const onGo = id => {
-    if (sort === "issue") return;
+    if (sort === "issue" && shown >= list.length) return;
     setSort("issue");
     setJump({
       id: "btv-" + id
@@ -1388,6 +1390,27 @@ function BtvBody() {
   }, []);
   const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
   const groups = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : sort === "pollster" ? btvByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
+  const list = groups || topics;
+  const [fill, setFill] = btvUseState({
+    sort,
+    n: BTV_FIRST
+  });
+  const filled = fill.sort === sort ? fill.n : BTV_FIRST;
+  const shown = jump || /^#btv-/.test(window.location.hash || "") ? Infinity : filled;
+  btvUseEffect(() => {
+    if (!src || shown >= list.length) return undefined;
+    let t = 0;
+    const raf = requestAnimationFrame(() => {
+      t = setTimeout(() => setFill(f => ({
+        sort,
+        n: (f.sort === sort ? f.n : BTV_FIRST) + BTV_STEP
+      })), 0);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [src, sort, shown, list.length]);
   if (failed) {
     return React.createElement("div", {
       className: "btv"
@@ -1421,12 +1444,12 @@ function BtvBody() {
     onSort: setSort
   }), React.createElement("p", {
     className: "btv-scope"
-  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), groups ? groups.map(g => React.createElement(BtvGroup, {
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), groups ? groups.slice(0, shown).map(g => React.createElement(BtvGroup, {
     key: g.id,
     g: g,
     houses: houses,
     byHouse: sort === "pollster"
-  })) : topics.map((t, i) => React.createElement(BtvTopic, {
+  })) : topics.slice(0, shown).map((t, i) => React.createElement(BtvTopic, {
     key: t.id,
     t: t,
     n: btvNo(i),

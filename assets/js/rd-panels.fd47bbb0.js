@@ -711,7 +711,7 @@ function RdHeadBar({
       }).map(s => s.name).join("|");
       setTight(prev => prev === out ? prev : out);
     };
-    fit();
+    if (!cvSkipped(el)) fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
@@ -3104,7 +3104,7 @@ function WvRug({
       const nextRing = g.px[party].map(x => x != null && Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
       setRings(prev => prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing);
     };
-    compute();
+    if (!cvSkipped(el)) compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
@@ -3287,7 +3287,7 @@ function DpRug({
       });
       setUps(prev => prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next);
     };
-    compute();
+    if (!cvSkipped(el)) compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
@@ -4595,8 +4595,11 @@ function useRdWidth(ref, fallback) {
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    const fit = () => setW(el.getBoundingClientRect().width || fallback || 800);
-    fit();
+    const fit = entries => {
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      setW((box ? box.inlineSize : el.getBoundingClientRect().width) || fallback || 800);
+    };
+    if (!cvSkipped(el)) fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();

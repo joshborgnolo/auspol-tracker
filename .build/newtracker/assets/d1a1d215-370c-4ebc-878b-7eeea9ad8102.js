@@ -1691,7 +1691,30 @@ function cycShapes(shown) {
 // Morrison term's first reading is month 2, and its 2016 predecessor's opens
 // on the election), and those months stay null rather than borrowing the
 // first reading.
+/* Memoised on the source arrays: Past cycles asks for the same term's grid
+   once per month per row (rdCycPeers takes one month of it each time), 40ms
+   of a 4x-throttled first visit spent rebuilding identical grids. Every
+   caller only reads the result. A series built fresh per call (the
+   combined Coalition+ON line) simply misses the cache. */
+const toMonthlyMemo = new WeakMap();
 function toMonthly(months, vals, maxM) {
+  if (!vals || typeof vals !== "object" || !months || typeof months !== "object") return toMonthlyGrid(months, vals, maxM);
+  let byMonths = toMonthlyMemo.get(vals);
+  const hit = byMonths && byMonths.get(months);
+  if (hit && hit.maxM === maxM) return hit.out;
+  const out = toMonthlyGrid(months, vals, maxM);
+  if (!byMonths) toMonthlyMemo.set(vals, (byMonths = new WeakMap()));
+  byMonths.set(months, { maxM, out });
+  return out;
+}
+/* "3 May 2025". One formatter for every call: toLocaleDateString with
+   options builds a fresh Intl formatter each time (the final-polls table
+   formats a date per row per render). Same output - toLocaleDateString IS
+   a DateTimeFormat's format() with these arguments. */
+let cycLongDayF = null;
+const cycLongDay = (iso) => (cycLongDayF || (cycLongDayF = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric" })))
+  .format(new Date(iso + "T00:00:00"));
+function toMonthlyGrid(months, vals, maxM) {
   const anchors = [];
   for (let i = 0; i < months.length; i++) {
     if (vals[i] != null) anchors.push({ m: months[i], v: vals[i] });
@@ -1819,8 +1842,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       .map((p) => p.released)
       .sort();
     if (!dates.length) return null;
-    return new Date(dates[0] + "T00:00:00")
-      .toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+    return cycLongDay(dates[0]);
   })() : null;
 
   // build a monthly series per drawn cycle. Past cycles that DO draw
@@ -3079,8 +3101,7 @@ function AccuracyPanel() {
   const sgn = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
   const lean = (err) => (err > 0 ? "Labor overstated" :
                          err < 0 ? "Labor understated" : "Exactly on the result");
-  const fmtDay = (iso) => new Date(iso + "T00:00:00")
-    .toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+  const fmtDay = cycLongDay;
   /* Clamp to the dot's OWN track, the way the chart clamps its readout to the
      plot: a house four points out sits against the rail, and an unclamped
      panel would hang over the error column beside it. The flip is for the

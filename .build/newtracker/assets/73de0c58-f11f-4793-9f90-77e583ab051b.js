@@ -2980,21 +2980,38 @@ if (staticSummary) {
      pull-up gets min(full, cap) without the second cascade round that
      produced the broken frame. No var before appRoot exists: the
      consumers' fallbacks (0px, none) cover the no-JS and pre-mount
-     window. */
+     window.
+     Each var sits on the one element that reads it (--ss-h on #root,
+     --app-h on the article; template.html registers both non-inheriting).
+     On <html> they restyled the whole document every time the app changed
+     height - 56ms at 4x CPU while the Now tab's tail mounted, and again on
+     every tab swap or opened row. Both heights are read BEFORE either var
+     is written (the article's scrollHeight, which the cap cannot change,
+     was read after the write and forced that restyle mid-callback), and an
+     unchanged value is not rewritten. */
+  let lastApp = null, lastSs = null;
   const syncHeights = () => {
-    if (!appRoot || !appRoot.offsetHeight) return;
+    if (!appRoot) return;
     const appH = appRoot.offsetHeight;
-    const se = document.documentElement.style;
-    se.setProperty("--app-h", appH + "px");
-    se.setProperty("--ss-h", Math.min(staticSummary.scrollHeight, appH) + "px");
+    if (!appH) return;
+    const ssH = Math.min(staticSummary.scrollHeight, appH);
+    if (appH !== lastApp) staticSummary.style.setProperty("--app-h", (lastApp = appH) + "px");
+    if (ssH !== lastSs) appRoot.style.setProperty("--ss-h", (lastSs = ssH) + "px");
   };
   syncHeights();
-  /* webfonts swap in after mount and re-lay the article out; the pull-up
-     must follow its height or a seam opens where it stood */
-  new ResizeObserver(syncHeights).observe(staticSummary);
-  /* the app's own height caps the article's (template.html: a tab swap
-     keeps the loaded page's article, which can outrun a shorter view) */
-  if (appRoot) new ResizeObserver(syncHeights).observe(appRoot);
+  /* one observer for both, so a frame that resizes both runs one callback:
+     webfonts swap in after mount and re-lay the article out (the pull-up
+     must follow its height or a seam opens where it stood), and the app's
+     own height caps the article's (template.html: a tab swap keeps the
+     loaded page's article, which can outrun a shorter view). The article is
+     watched through its children, whose heights are its natural height and
+     which the cap never resizes: watching the article itself, the cap this
+     callback writes resized a box the observer had just reported, inside
+     its own delivery - an undelivered-notification loop on every swap to a
+     short page. */
+  const hro = new ResizeObserver(syncHeights);
+  for (const kid of staticSummary.children) hro.observe(kid);
+  if (appRoot) hro.observe(appRoot);
   /* opacity:0 hides it from EYES and from nothing else. A screen reader still
      walked the whole article - 3,690 characters, seven headings and a second
      <h1> - and then walked the app and heard every figure again. The comment

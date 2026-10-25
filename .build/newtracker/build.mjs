@@ -191,6 +191,21 @@ const babelCached = (mode, code, name, extra) => {
 };
 const transpile = (code, name) => babelCached("jsx", code, name, { presets: [["react", { runtime: "classic" }]] });
 const stripJs = (code, name) => babelCached("plain", code, name, {});
+/* gen-data writes each big table as one `const name = <JSON>;` line. Through
+   Babel's printer those came out as 95,000 lines of indented object literal
+   (1.74MB in, 2.65MB out), and V8 builds a large literal far slower than it
+   parses the same text as JSON. Each such line >= 10KB is shipped as
+   JSON.parse('…') instead: dataset eval 42 -> 17ms in node (more on a
+   throttled phone), ~17KB less gzipped, and window.AUSPOL deep-equal (the
+   build checks it below). A line that isn't strict JSON (a function, a
+   computed value) is left to the printer as before. No "__proto__" key can
+   ride along: a literal would set the prototype where JSON.parse sets a key. */
+const jsonParseLiterals = (code) => code.split("\n").map((line) => {
+  const m = /^(\s*(?:const|let|var)\s+[\w$]+\s*=\s*)(.+);\s*$/.exec(line);
+  if (!m || m[2].length < 10240 || m[2].includes('"__proto__"')) return line;
+  try { JSON.parse(m[2]); } catch { return line; }
+  return `${m[1]}JSON.parse(${JSON.stringify(m[2])});`;
+}).join("\n");
 
 /* An inline <script> ends at the first literal "</script", wherever it appears
    – including inside a JS string. Escaping the slash is inert in JS. */
@@ -1703,9 +1718,18 @@ const emitJs = (base, code) => {
 if (!VIC) parts.push(emitJs("explained", `window.EXPLAINED_ARTICLE=${JSON.stringify(fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8"))};`));
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(emitJs(f.replace(/\.production\.min\.js$/, ""), fs.readFileSync(path.join(HERE, "vendor", f), "utf8")));
-for (const f of PLAIN)
-  parts.push(emitJs(f === DATASET ? (VIC ? "data-vic" : "data") : f.replace(/\.js$/, ""),
-    stripJs(fs.readFileSync(f === DATASET ? DA(f) : A(f), "utf8"), f)));
+for (const f of PLAIN) {
+  if (f !== DATASET) {
+    parts.push(emitJs(f.replace(/\.js$/, ""), stripJs(fs.readFileSync(A(f), "utf8"), f)));
+    continue;
+  }
+  const src = fs.readFileSync(DA(f), "utf8");
+  const out = stripJs(jsonParseLiterals(src), f);
+  /* the JSON.parse form must build exactly the dataset the literals did */
+  const run = (code) => { const w = {}; vm.runInNewContext(code, { window: w }); return JSON.stringify(w.AUSPOL); };
+  if (run(out) !== run(src)) throw new Error("dataset: JSON.parse literals changed window.AUSPOL");
+  parts.push(emitJs(VIC ? "data-vic" : "data", out));
+}
 for (const f of JSX)
   parts.push(emitJs(f.replace(/\.jsx?$/, ""), transpile(fs.readFileSync(A(f), "utf8"), f)));
 /* a hashed name changes when the bytes do, so sweep the ones nothing points

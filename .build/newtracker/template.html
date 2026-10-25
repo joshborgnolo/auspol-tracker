@@ -447,6 +447,13 @@ body.js .static-summary {
   opacity: 0;
   pointer-events: none;
 }
+/* The mount script sets --ss-h on #root and --app-h on the article, the
+   only element that reads each. Registered non-inheriting, a height change
+   restyles that one element instead of every descendant (on <html> each
+   write restyled the whole document). No initial value: unset, var()
+   falls back to the 0px / none below exactly as before. */
+@property --ss-h { syntax: "*"; inherits: false; }
+@property --app-h { syntax: "*"; inherits: false; }
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }

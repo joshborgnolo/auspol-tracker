@@ -44,14 +44,21 @@ const asset = read(path.join(".build", "newtracker", "assets", "73de0c58-f11f-47
     "the mount tail owns a syncHeights callback");
   const fn = asset.slice(asset.indexOf("const syncHeights = () => {"));
   const body = fn.slice(0, fn.indexOf("};"));
-  assert.ok(body.includes('setProperty("--app-h", appH + "px")'),
+  assert.ok(body.includes('setProperty("--app-h", (lastApp = appH) + "px")'),
     "syncHeights sets --app-h from the app's height");
-  assert.ok(body.includes('setProperty("--ss-h", Math.min(staticSummary.scrollHeight, appH) + "px")'),
+  assert.ok(body.includes("const ssH = Math.min(staticSummary.scrollHeight, appH);")
+    && body.includes('setProperty("--ss-h", (lastSs = ssH) + "px")'),
     "syncHeights sets --ss-h from min(scrollHeight, app) in the same read");
   const between = body.indexOf('setProperty("--app-h"') < body.indexOf('setProperty("--ss-h"');
   assert.ok(between, "--app-h and --ss-h are written by the same function, same round");
-  assert.ok((asset.match(/new ResizeObserver\(syncHeights\)/g) || []).length >= 2,
-    "both the article and the app root feed the one callback");
+  /* 2026-10-25 perf: a read after either write forced a whole-document
+     restyle (the vars sit on <html>), so every read precedes the first write */
+  assert.ok(body.lastIndexOf("scrollHeight") < body.indexOf("setProperty(")
+    && body.lastIndexOf("offsetHeight") < body.indexOf("setProperty("),
+    "both heights are read before either var is written");
+  const hro = asset.match(/const (\w+) = new ResizeObserver\(syncHeights\);/);
+  assert.ok(hro && asset.includes(`for (const kid of staticSummary.children) ${hro[1]}.observe(kid);`) && asset.includes(`${hro[1]}.observe(appRoot)`),
+    "both the article (through its children, which the cap never resizes) and the app root feed the one callback, through one observer");
   assert.ok(!asset.includes("setStaticSummaryHeight"),
     "the old per-var setter is gone (no bookmark back to the two-phase update)");
 }

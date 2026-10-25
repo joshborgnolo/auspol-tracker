@@ -46,7 +46,12 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
-    const fit = () => setW(Math.min(760, el.parentElement.getBoundingClientRect().width || 760));
+    /* the observer's own measurement, not a rect read: a read here forced
+       a layout whenever an earlier callback in the delivery had written */
+    const fit = (entries) => {
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      setW(Math.min(760, (box ? box.inlineSize : el.parentElement.getBoundingClientRect().width) || 760));
+    };
     /* no synchronous fit() here - reading the parent's rect inside the
        first commit forces a full-document layout. Any seed correction the
        observer's initial callback carries lands one frame later instead. */

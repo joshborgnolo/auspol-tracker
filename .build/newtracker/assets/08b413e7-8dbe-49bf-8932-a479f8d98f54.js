@@ -26,6 +26,37 @@ function textWidth(str, size, weight) {
   _measCache.set(key, w);
   return w;
 }
+/* True while `el` sits inside a section content-visibility is skipping
+   (rd.css's off-screen .rd-sec). A mount-time measurement there is not free:
+   reading a rect or a clientWidth inside a skipped section forces the browser
+   to style and lay out that whole section on the spot, and the Now tab's
+   deferred tail paid ~530ms of exactly that in one task at 4x CPU (eight
+   sections forced one after another, 2026-10-25 trace). A measurer that also
+   runs a ResizeObserver can skip its in-effect read here - the observer's
+   first delivery comes when the section nears the viewport, before it paints.
+   Browsers without checkVisibility never skip, so they measure as before. */
+function cvSkipped(el) {
+  return !!(el && el.checkVisibility) && !el.checkVisibility({ contentVisibilityAuto: true });
+}
+/* Every chart caches its svg's viewport rect for pointer maths (toVB), and
+   anything that can move a rect bumps this one counter: scrolling (capture
+   phase, so the pinned strips' inner scrolls count), a window resize, and
+   the app growing or shrinking (an expanded poll above a chart moves it
+   without a scroll). It used to be three listeners and a ResizeObserver on
+   <body> PER CHART - dozens of observers on the one box the static-article
+   height sync resizes by design, so each sync left their notifications
+   undelivered ("ResizeObserver loop completed...", 9-15 times a tab tour)
+   and the observers behind them caught up a frame late. #root is the app's
+   own box, which that sync never resizes. */
+let rectEpoch = 0;
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  const bump = () => { rectEpoch++; };
+  window.addEventListener("scroll", bump, { capture: true, passive: true });
+  window.addEventListener("resize", bump);
+  const host = document.getElementById("root") || document.body;
+  if (host && typeof ResizeObserver !== "undefined") new ResizeObserver(bump).observe(host);
+})();
 /* The fewest lines no wider than `w` px that hold `str`, split as evenly as
    they go: a note wrapped into a gap breaks "Three-way questions / began in
    January 2026", not "Three-way questions began in / January 2026". null
@@ -442,8 +473,8 @@ function TrendChart(props) {
 
   const ref = useRef(null);
   /* toVB's measured viewport rect, held between events: it moves only when
-     the page scrolls or the layout can have shifted the svg, and the
-     invalidators below drop it then */
+     the page scrolls or the layout can have shifted the svg - rectEpoch
+     (above) counts those, and the chart's own resize drops it below */
   const svgRect = useRef(null);
   const badgeAt = useRef({});                // the redesign's spread event badges, by event
   const labOff = useRef(new Map());          // each end name's dodge, eased mid-switch
@@ -466,23 +497,20 @@ function TrendChart(props) {
        falling back to the viewBox there painted a returning tab's charts at
        the wrong width for a frame, and every label and margin slid sideways
        into place when the observer caught up. */
-    const update = () => {
+    /* The observer hands over the border box it measured, so its callback
+       reads nothing: a rect read there forced a fresh layout whenever an
+       earlier callback in the same delivery had written to the page. */
+    const update = (entries) => {
       svgRect.current = null;
-      const w = el.getBoundingClientRect().width;
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      const w = box ? box.inlineSize : el.getBoundingClientRect().width;
       if (w > 0) setCw(w);
     };
-    if (widthSeed == null) update();
+    /* a chart in a skipped section is off screen: its observer measures it
+       on approach, and reading it here would lay the section out now */
+    if (widthSeed == null && !cvSkipped(el)) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    /* scrolling moves every rect in the viewport, and content changing
-       height above the chart (an expanded poll) moves this one without a
-       scroll – a body resize sees that. The scroll listener runs in the
-       capture phase so the pinned strips' inner scrolls drop it too. */
-    const drop = () => { svgRect.current = null; };
-    window.addEventListener("scroll", drop, true);
-    window.addEventListener("resize", drop);
-    const bro = new ResizeObserver(drop);
-    bro.observe(document.body);
     /* copy-chart.js flags the host data-copying for an image's layout. A
        chart already 1120px wide gets no resize from that, and rendered
        without the flag it kept the screen's tight event spacing in the copy,
@@ -490,9 +518,7 @@ function TrendChart(props) {
     const mo = new MutationObserver(() => setCopyTick((t) => t + 1));
     mo.observe(el, { attributes: true, attributeFilter: ["data-copying"] });
     return () => {
-      ro.disconnect(); mo.disconnect(); bro.disconnect();
-      window.removeEventListener("scroll", drop, true);
-      window.removeEventListener("resize", drop);
+      ro.disconnect(); mo.disconnect();
     };
   }, []);
   const k0 = cw / VB.W;
@@ -662,9 +688,10 @@ function TrendChart(props) {
   const toVB = (e) => {
     /* cached: a pointermove reads this every frame, and reading it back
        then forced a layout flush on the DOM state the previous move had
-       just dirtied. The invalidators above re-measure the moment the rect
-       can actually have moved. */
-    const rect = svgRect.current || (svgRect.current = ref.current.querySelector("svg").getBoundingClientRect());
+       just dirtied. It is re-measured the moment the rect can actually
+       have moved (rectEpoch, or the chart's own resize). */
+    const hit = svgRect.current && svgRect.current.e === rectEpoch ? svgRect.current : null;
+    const rect = (hit || (svgRect.current = { r: ref.current.querySelector("svg").getBoundingClientRect(), e: rectEpoch })).r;
     return {
       x: ((e.clientX - rect.left) / rect.width) * W,
       y: ((e.clientY - rect.top) / rect.height) * H,

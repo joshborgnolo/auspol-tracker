@@ -34,7 +34,10 @@ function RdLeadGauge({
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
-    const fit = () => setW(Math.min(760, el.parentElement.getBoundingClientRect().width || 760));
+    const fit = entries => {
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      setW(Math.min(760, (box ? box.inlineSize : el.parentElement.getBoundingClientRect().width) || 760));
+    };
     const ro = new ResizeObserver(fit);
     ro.observe(el.parentElement);
     return () => ro.disconnect();

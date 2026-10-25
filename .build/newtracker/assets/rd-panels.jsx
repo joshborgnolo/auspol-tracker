@@ -772,7 +772,8 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
       }).map((s) => s.name).join("|");
       setTight((prev) => (prev === out ? prev : out));
     };
-    fit();
+    // a skipped section's bar is fitted by the observer on approach (cvSkipped)
+    if (!cvSkipped(el)) fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
@@ -2541,7 +2542,8 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
       const nextRing = g.px[party].map((x) => x != null && Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
       setRings((prev) => (prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing));
     };
-    compute();
+    // a skipped section's rug is packed by the observer on approach (cvSkipped)
+    if (!cvSkipped(el)) compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
@@ -2676,7 +2678,8 @@ function DpRug({ items, color, dxp, fmt }) {
       });
       setUps((prev) => (prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next));
     };
-    compute();
+    // a skipped section's rug is packed by the observer on approach (cvSkipped)
+    if (!cvSkipped(el)) compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
@@ -3658,8 +3661,13 @@ function useRdWidth(ref, fallback) {
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    const fit = () => setW(el.getBoundingClientRect().width || fallback || 800);
-    fit();
+    /* the observer passes the box it measured (no read in its callback); a
+       skipped section's drawing is sized by it on approach (cvSkipped) */
+    const fit = (entries) => {
+      const box = entries && entries[0] && entries[0].borderBoxSize && entries[0].borderBoxSize[0];
+      setW((box ? box.inlineSize : el.getBoundingClientRect().width) || fallback || 800);
+    };
+    if (!cvSkipped(el)) fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();

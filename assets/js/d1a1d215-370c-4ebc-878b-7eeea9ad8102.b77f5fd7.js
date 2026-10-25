@@ -1459,7 +1459,27 @@ function cycShapes(shown) {
   }
   return out;
 }
+const toMonthlyMemo = new WeakMap();
 function toMonthly(months, vals, maxM) {
+  if (!vals || typeof vals !== "object" || !months || typeof months !== "object") return toMonthlyGrid(months, vals, maxM);
+  let byMonths = toMonthlyMemo.get(vals);
+  const hit = byMonths && byMonths.get(months);
+  if (hit && hit.maxM === maxM) return hit.out;
+  const out = toMonthlyGrid(months, vals, maxM);
+  if (!byMonths) toMonthlyMemo.set(vals, byMonths = new WeakMap());
+  byMonths.set(months, {
+    maxM,
+    out
+  });
+  return out;
+}
+let cycLongDayF = null;
+const cycLongDay = iso => (cycLongDayF || (cycLongDayF = new Intl.DateTimeFormat("en-AU", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}))).format(new Date(iso + "T00:00:00"));
+function toMonthlyGrid(months, vals, maxM) {
   const anchors = [];
   for (let i = 0; i < months.length; i++) {
     if (vals[i] != null) anchors.push({
@@ -1568,11 +1588,7 @@ function CycleChart({
   const hanFrom = hanAvail ? (() => {
     const dates = D.individualPolls.filter(p => p.appr && p.appr.hansonNet != null && (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav")).map(p => p.released).sort();
     if (!dates.length) return null;
-    return new Date(dates[0] + "T00:00:00").toLocaleDateString("en-AU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
+    return cycLongDay(dates[0]);
   })() : null;
   const colorOf = c => isOpp ? D.PARTIES[c.opp].color : c.color;
   const shown = cycles.filter(c => !hidden.has(c.year));
@@ -2477,11 +2493,7 @@ function AccuracyPanel() {
   const TIP_W = 184;
   const sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
   const lean = err => err > 0 ? "Labor overstated" : err < 0 ? "Labor understated" : "Exactly on the result";
-  const fmtDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("en-AU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
+  const fmtDay = cycLongDay;
   const open = (e, raw, tip) => {
     const w = (e.currentTarget.parentElement || {}).clientWidth || 1;
     const half = Math.min(TIP_W, w) / 2 / w * 100;

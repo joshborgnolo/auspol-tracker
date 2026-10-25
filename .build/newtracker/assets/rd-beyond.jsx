@@ -936,6 +936,8 @@ function BtvFindings({ topics, onGo }) {
   );
 }
 
+/* the first topics drawn, and how many more each painted frame adds */
+const BTV_FIRST = 2, BTV_STEP = 2;
 function BtvBody() {
   const { D } = window.AP;
   const [src, setSrc] = btvUseState(null);
@@ -976,7 +978,9 @@ function BtvBody() {
   /* the link still sets its hash as ever; the topic it names exists only
      once the issues are back */
   const onGo = (id) => {
-    if (sort === "issue") return;
+    /* by issue the link's own jump lands it - once its topic is drawn (a
+       finding picked while the page is still filling in lands by setJump) */
+    if (sort === "issue" && shown >= list.length) return;
     setSort("issue");
     setJump({ id: "btv-" + id });
   };
@@ -991,6 +995,27 @@ function BtvBody() {
   const topics = btvUseMemo(() => (src ? src.topics.filter((t) => t.blocks.length || t.more.length) : []), [src]);
   const groups = btvUseMemo(() => (sort === "recent" ? btvByMonth(topics)
     : sort === "pollster" ? btvByPollster(topics, (src && src.houses) || {}) : null), [topics, sort, src]);
+  /* The topics are drawn a few at a time, one batch a painted frame. Every
+     topic in one commit cost a 360ms task at 4x CPU on a phone (most of
+     a 36,000px page, the tap that opened it frozen till the end); the first
+     two fill the screen and the rest land below it, long before a reader
+     scrolls there. A jump (a hash, a finding picked mid-fill, a cross-tab
+     trip) draws the lot at once so its target exists, and a new order
+     starts filling afresh. The next batch waits for the frame after this
+     commit has painted - an effect's setState alone would run inside the
+     same task. */
+  const list = groups || topics;
+  const [fill, setFill] = btvUseState({ sort, n: BTV_FIRST });
+  const filled = fill.sort === sort ? fill.n : BTV_FIRST;
+  const shown = jump || /^#btv-/.test(window.location.hash || "") ? Infinity : filled;
+  btvUseEffect(() => {
+    if (!src || shown >= list.length) return undefined;
+    let t = 0;
+    const raf = requestAnimationFrame(() => {
+      t = setTimeout(() => setFill((f) => ({ sort, n: (f.sort === sort ? f.n : BTV_FIRST) + BTV_STEP })), 0);
+    });
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
+  }, [src, sort, shown, list.length]);
 
   if (failed) {
     return (
@@ -1012,8 +1037,8 @@ function BtvBody() {
         {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
         {" "}since {btvMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
       </p>
-      {groups ? groups.map((g) => <BtvGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} />)
-        : topics.map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
+      {groups ? groups.slice(0, shown).map((g) => <BtvGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} />)
+        : topics.slice(0, shown).map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
       <div className="btv-how">
         <p><b>How the findings are called.</b> Each topic opens with what its first chart or question found. A side is said
           to lead only where the gap clears the poll’s 95% margin of error, and to be a majority only where its share clears

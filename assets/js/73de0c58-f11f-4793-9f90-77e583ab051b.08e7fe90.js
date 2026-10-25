@@ -2512,16 +2512,20 @@ function App() {
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
   const appRoot = document.getElementById("root");
+  let lastApp = null,
+    lastSs = null;
   const syncHeights = () => {
-    if (!appRoot || !appRoot.offsetHeight) return;
+    if (!appRoot) return;
     const appH = appRoot.offsetHeight;
-    const se = document.documentElement.style;
-    se.setProperty("--app-h", appH + "px");
-    se.setProperty("--ss-h", Math.min(staticSummary.scrollHeight, appH) + "px");
+    if (!appH) return;
+    const ssH = Math.min(staticSummary.scrollHeight, appH);
+    if (appH !== lastApp) staticSummary.style.setProperty("--app-h", (lastApp = appH) + "px");
+    if (ssH !== lastSs) appRoot.style.setProperty("--ss-h", (lastSs = ssH) + "px");
   };
   syncHeights();
-  new ResizeObserver(syncHeights).observe(staticSummary);
-  if (appRoot) new ResizeObserver(syncHeights).observe(appRoot);
+  const hro = new ResizeObserver(syncHeights);
+  for (const kid of staticSummary.children) hro.observe(kid);
+  if (appRoot) hro.observe(appRoot);
   staticSummary.setAttribute("aria-hidden", "true");
   staticSummary.inert = true;
 }
