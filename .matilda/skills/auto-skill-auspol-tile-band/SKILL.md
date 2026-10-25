@@ -1,6 +1,6 @@
 ---
 name: auspol-tile-band
-description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes; canvas twin on html shipped 41bc58c, now a THREE-layer composite with --tide-fade/--tide-ground, gated behind html:has(body) since b865aa1a): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; strip painted TWICE coincident (html canvas for rubber-band overscroll + in-flow band), SVG art in --tile-art (light) / --tile-art-dark (dark is a REDRAWN palette, no multiply-dim anywhere since the ground scheme shipped); cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks; PLUS the boot-order lesson (73fb846): body.js must be added only by App's first-commit layout effect — set earlier it collapses the document and splash-paints the canvas tide art across the viewport on refresh; PLUS the pre-body parse-window lesson (b865aa1a): bare html's both-axes repeat is live before <body> exists, so the composite waits on html:has(body); headless-Chrome pixel + rAF-cadence verification and the giant-line edit/probe gotchas
+description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes; each trace recoloured weekly at build time by chance weighted on the live primary vote — tide-art.mjs, Sydney ISO-week seed, Monday-12am roll, assets/tile-art*.svg ride along for satellites; canvas twin on html shipped 41bc58c, now a THREE-layer composite with --tide-fade/--tide-ground, gated behind html:has(body) since b865aa1a): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; strip painted TWICE coincident (html canvas for rubber-band overscroll + in-flow band), SVG art in --tile-art (light) / --tile-art-dark (dark is a REDRAWN palette, no multiply-dim anywhere since the ground scheme shipped); cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks; PLUS the boot-order lesson (73fb846): body.js must be added only by App's first-commit layout effect — set earlier it collapses the document and splash-paints the canvas tide art across the viewport on refresh; PLUS the pre-body parse-window lesson (b865aa1a): bare html's both-axes repeat is live before <body> exists, so the composite waits on html:has(body); headless-Chrome pixel + rAF-cadence verification and the giant-line edit/probe gotchas
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
@@ -9,9 +9,12 @@ extracted_at: '2026-09-03T00:00:00.000Z'
 
 The site closes with a full-bleed band of stacked wave traces under the last
 text — like seismograph or plotter trendlines: calm ripples up high, wilder
-swell at depth, every fifth trace tinted. It is **entirely in
-`.build/newtracker/template.html`** — no asset JS, no React, no fetched
-files. Rebuild (`node .build/newtracker/build.mjs`) after editing.
+swell at depth. **Since 823d81d4 (2026-10-25) each trace's colour is a
+weekly re-rolled lottery against the live primary vote** — see "Weekly
+vote-weighted recolour" below. It is **entirely in
+`.build/newtracker/template.html` + `.build/newtracker/tide-art.mjs`** — no
+asset JS, no React, no fetched files. Rebuild
+(`node .build/newtracker/build.mjs`) after editing.
 
 ## Structure
 
@@ -141,6 +144,60 @@ html:has(body.dark) override).
   .tile-band — a px-valued background-size does not rescale with a height
   change, so shrinking without it would silently crop the art (and
   silently desync the canvas twin).
+
+## Weekly vote-weighted recolour (823d81d4, 2026-10-25)
+
+User call ("each line has a 26.7% chance of being labor-coloured…
+recomputed every monday 12 am"): at BUILD time every trace's party is
+drawn by chance against the CURRENT primary vote, the draw seeded by the
+Australia/Sydney ISO week — **the shuffle re-rolls on the first build
+after Monday 12am, proportions track the live `latest.primary` at every
+build**. A mid-week wave can (rarely) recolour a boundary trace; that is
+the intended semantics (user picked "shuffle weekly, live weights" over
+the frozen-week state file).
+
+- `.build/newtracker/tide-art.mjs` — the whole machine:
+  - `extractTide(html)` reads geometry + washed palette FROM the
+    template's committed `--tile-art`/`--tile-art-dark` blobs (their
+    single home — never re-derive) and hard-asserts the shape: 30 traces,
+    identical light/dark geometry, the five-party palette laid out as
+    base grey + four-tint cycle on every fifth trace, and that plain
+    `encodeURIComponent(svg)` byte-reproduces the committed blobs (the
+    blobs keep `'` RAW; a `+'%27'` variant would fail this). A hand-edit
+    of the art trips the build loudly.
+  - `isoWeekSeed(now, "Australia/Sydney")` = isoYear*100+ISO week on the
+    Sydney civil date (Monday 12am boundary), computed in UTC so GitHub
+    runners and the laptop agree.
+  - `assignLines(weights, seed)` — absent/null/NaN/negative shares count
+    as 0 and the rest renormalise (a Vic-shaped object missing `onp`
+    just draws no orange); an all-zero/undefined weights object returns
+    **null → the build keeps the template's committed art untouched**.
+  - `rewriteTideArt(html, weights, now)` splices the recoloured,
+    re-encoded blobs back via a `replace` with `$1`/`$2` captures and
+    returns `{html, svgLight, svgDark}`.
+- build.mjs, immediately after the template read (~:200): reads
+  `const latest = ` off the gen-data dataset asset (same indexOf+slice
+  read-back pattern as buildFavicon), calls rewriteTideArt, and for the
+  federal build (`!VIC`) ALSO writeAtomic's
+  `assets/tile-art.svg` / `assets/tile-art-dark.svg` (decoded svg +
+  trailing newline) — the satellite pages' copies, so they follow the
+  same weekly draw. Vic builds splice the band with VIC weights but
+  never write the assets.
+- `SITE_FILES` in `.build/git-push-main.sh` carries the two asset files
+  (comment block dated 2026-10-25) so refresh_site/updaters commit them.
+- Determinism contract, pinned by `.build/test-tide-art.mjs` (in npm
+  test, runs after the federal build): same week + same weights →
+  byte-identical rebuilds (no same-week churn of the 43KB lines, html
+  and asset files never part); golden draw for the live shares at seed
+  202644; extraction guards on the template; built `index.html` inline
+  art == trimmed `assets/tile-art*.svg`.
+- Light and dark always carry THE SAME draw — trace i is the same party
+  in both themes, only the palette differs (the test pins the
+  colour-masked svgs being identical).
+- Editing a trace colour set = edit the template's committed art ONLY;
+  extraction re-reads it every build. The palette-meaning map is
+  positional (alp=tint[0], lnp=tint[1], grn=tint[2], onp=tint[3],
+  oth=base grey) as pinned in test-tide-art.
 
 ## Boot order: body.js is the "app has mounted" flag (fixed 73fb846)
 
