@@ -20,7 +20,9 @@ const CU = 30; // plan points to a chamber unit
    front bench's straight arm, t<i> the table, b<row><slot> the side blocks,
    c<row><sector><i> round the curve. */
 const CHB = {
-  arm: { x: 110, y0: -362, pitch: 21.38, n: 16 },
+  // the front bench's straight arm is one long bench; 20 places along it, room for the most a
+  // plan has seated there (19, the opposition in March 2021)
+  arm: { x: 110, y0: -362, pitch: 16.9, n: 20 },
   table: { x: 49.6, ys: [-182, -142] },
   blockX: [138, 181, 223, 264], // rows 2 to 5
   tierY: [[-282, -256], [-214, -188], [-146, -120], [-68, -42]], // two seats a block
@@ -60,7 +62,7 @@ function chamberGeom() {
     const x = c.x / CU, y = c.y / CU;
     const s = y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y;
     // each chair as wide as its seat allows (3pt clear of the next), as deep as its bench
-    const W = clamp(c.w - 3, 17, 30) / CU, D = (c.row === 1 && y < 0 ? 24 : 23) / CU;
+    const W = clamp(c.w - 3, 13.5, 30) / CU, D = (c.row === 1 && y < 0 ? 24 : 23) / CU;
     return { id: c.id, x, y, fa: c.fa, row: c.row, s, W, D };
   });
   const seats = all.filter((c) => c.id !== SERJEANT).sort((p, q) => p.s - q.s || p.row - q.row);
@@ -193,7 +195,20 @@ const chLast = new Map();
 function chamberPositions(m, geom) {
   const ch = chamberOrder(m);
   const pos = new Map();
-  for (const [i, k] of ch.at) { const st = geom.seats[k]; pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u, st.W, st.D]); }
+  const arms = { L: [], R: [] };
+  for (const [i, k] of ch.at) {
+    const st = geom.seats[k];
+    if (/^[LR]a\d/.test(st.id)) { arms[st.id[0]].push([i, st]); continue; }
+    pos.set(m.divs[i].n, [st.x, st.y, st.fa, st.u, st.W, st.D]);
+  }
+  // the front bench's arm is one long bench: whoever sits there spreads evenly along it, in order,
+  // each chair as wide as the share allows, as the plans print them
+  const A = CHB.arm, top = A.y0 - A.pitch / 2, len = A.pitch * A.n;
+  for (const list of Object.values(arms)) {
+    list.sort((a, b) => a[1].y - b[1].y);
+    const p = len / Math.max(list.length, 1), W = clamp(p - 3, 13.5, 21) / CU;
+    list.forEach(([i, st], j) => pos.set(m.divs[i].n, [st.x, (top + p * (j + 0.5)) / CU, st.fa, st.u, W, st.D]));
+  }
   return pos;
 }
 function startChamberGlide() {
@@ -270,7 +285,8 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   // the empty seats, outlined only, so they never read as a member's chair (a dimmed one is filled)
   g.strokeStyle = css(mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24)); g.lineWidth = 1;
   for (const c of geom.seats) {
-    if (opts.occupied && opts.occupied.has(c.k)) continue;
+    // the front bench's arms are one long bench, not places: only the seats elsewhere stand empty
+    if ((opts.occupied && opts.occupied.has(c.k)) || /^[LR]a\d/.test(c.id)) continue;
     const w = c.W * s, d = c.D * s, r = Math.min(w, d) * 0.24;
     g.save(); g.translate(X(c.x), Yp(c.y)); g.rotate(c.fa);
     g.beginPath(); if (g.roundRect) g.roundRect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1, r); else g.rect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1);
