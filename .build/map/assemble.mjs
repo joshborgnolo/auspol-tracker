@@ -14,7 +14,8 @@
    This writes map/map.js (one closure, so nothing leaks to window but the
    __map test hook) and map/map.css. Run after editing a part:
      node .build/map/assemble.mjs
-   The data in map/data comes from build_map_data.py and geo_build.mjs. */
+   The data in map/data comes from build_map_data.py, geo_build.mjs and
+   islands_build.mjs (the islands past the mainland frame, drawn inset). */
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";

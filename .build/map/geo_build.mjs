@@ -1,4 +1,6 @@
 // Boundaries + label anchors for every election the page loads.
+// (The islands that frame leaves out - Norfolk, Lord Howe, Christmas, Cocos -
+// are drawn in inset boxes from map/data/islands.json, islands_build.mjs.)
 //  1. mapshaper: clip to the mainland frame, simplify to two absolute
 //     tolerances (lo for the country, hi once zoomed past a state), drop
 //     specks, write TopoJSON (object "divs", properties name, st);

@@ -73,6 +73,13 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
 for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
 }
+// the islands past the mainland frame, drawn in inset boxes (node .build/map/islands_build.mjs)
+{
+  const isl = JSON.parse(R("map/data/islands.json"));
+  assert.deepEqual(isl.islands.map((s) => s.key), ["norfolk", "lordhowe", "christmas", "cocos"], "islands.json holds the four inset islands");
+  assert.ok(isl.islands.every((s) => s.rings.length), "every inset island has a coast");
+  assert.equal(isl.owner[2025].norfolk, "Bean", "Norfolk Island is in Bean in 2025");
+}
 const now = JSON.parse(R("map/data/data-now.json"));
 assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the Now overlay carries the Farrer by-election");
 // the chamber seats each year's members where the Parliament's seating plan puts them (node .build/map/seating.mjs)
