@@ -50,7 +50,7 @@
   <link rel="preload" href="assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.82aa3269.js" as="script">
   <link rel="preload" href="assets/js/rd.4f929cab.js" as="script">
-  <link rel="preload" href="assets/js/rd-hero.ec6dc26b.js" as="script">
+  <link rel="preload" href="assets/js/rd-hero.3bd6f0f0.js" as="script">
   <link rel="preload" href="assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.65dcc75e.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 21 October 2026, Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.4), from 182 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
@@ -2113,23 +2113,25 @@ body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot {
 }
 body.rd .rd-lg-span { top: 28px; height: 16px; border-radius: 2px; opacity: 0.2; }
 body.rd .rd-lg-cap { top: 28px; height: 16px; width: 2px; transform: translateX(-1px); }
-body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-lg-dot { top: 28px; width: 16px; height: 16px; border-radius: 8px; transform: translateX(-8px); transform-origin: 0 100%; box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-lg-dot:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 2px; }
-body.rd .rd-lg-dot.hop { animation: rd-lg-hop var(--hopdur, 0.62s) ease; }
-@keyframes rd-lg-hop {
-  0% { transform: translate(-8px, 0); }
-  35% { transform: translate(-8px, calc(var(--hop, 1) * -10px)); }
-  55% { transform: translate(-8px, 0); }
-  72% { transform: translate(-8px, calc(var(--hop, 1) * -4px)); }
-  85% { transform: translate(-8px, 0); }
-  93% { transform: translate(-8px, calc(var(--hop, 1) * -1.5px)); }
-  100% { transform: translate(-8px, 0); }
-}
+body.rd .rd-chute { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; overflow: hidden; contain: strict; }
+body.rd .rd-chute svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+body.rd .rd-chute-body, body.rd .rd-chute-halo { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+body.rd .rd-chute-body { stroke: var(--chute); stroke-width: 2.4; }
+body.rd .rd-chute-halo { stroke: var(--bg); stroke-width: 5.6; }
+body.rd .rd-chute-head { fill: var(--chute); }
+body.rd .rd-chute-ring { fill: var(--bg); }
+body.rd .rd-chute-gore { fill: var(--chute); stroke: var(--chute); stroke-width: 0.8; stroke-linejoin: round; }
+body.rd .rd-chute-gore.alt { fill: color-mix(in oklab, var(--chute) 28%, var(--bg)); }
+body.rd .rd-chute-lines { fill: none; stroke: var(--ink-3); stroke-width: 0.8; }
+body.rd .rd-chute-dust { fill: var(--ink-3); }
+body.rd .rd-chute-streak { stroke: var(--ink-3); stroke-width: 1; stroke-linecap: round; }
+body.rd .rd-chute-ripple { fill: none; stroke: var(--chute); }
 body.rd .rd-lg-tick { top: 64px; line-height: 16px; color: var(--ink-3); transform: translateX(-50%); white-space: nowrap; }
 body.rd .rd-lg-tied { font-weight: 600; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot, body.rd .rd-tpp-dot { transition: none; }
-  body.rd .rd-lg-dot.hop { animation: none; }
 }
 body.rd .rd-sens { opacity: 0.1; }
 @media (max-width: 700px) {
@@ -2489,7 +2491,7 @@ body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outlin
   <script src="assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.82aa3269.js"></script>
   <script src="assets/js/rd.4f929cab.js"></script>
-  <script src="assets/js/rd-hero.ec6dc26b.js"></script>
+  <script src="assets/js/rd-hero.3bd6f0f0.js"></script>
   <script src="assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.65dcc75e.js"></script>
 
 
