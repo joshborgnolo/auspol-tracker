@@ -2520,7 +2520,11 @@ function App() {
       window.removeEventListener("hashchange", onUrl);
     };
   }, []);
-  /* A visit mounts the tab, a departure never unmounts it. */
+  /* A visit mounts the tab, a departure never unmounts it. The panels drawn
+     include the tab being switched to in the same render that hides the old
+     one: left to the effect below, the switch committed a frame with no
+     panel at all, and the footer's rule flashed up under the tab bar. */
+  const panels = mounted.indexOf(tab) === -1 ? mounted.concat([tab]) : mounted;
   React.useEffect(() => {
     setMounted((m) => (m.indexOf(tab) === -1 ? m.concat([tab]) : m));
     // the Now tab warms its own sections once its staged tail is in
@@ -3072,7 +3076,7 @@ function App() {
             a drag's catch keeps its park while the selection lives — keystrokes
             are vetoed under a live selection anyway). A poke on a hidden
             panel is impossible, so the handling is identical per panel. */}
-        {mounted.map((id) => (
+        {panels.map((id) => (
           <div className={entered === id ? "view-enter content" : "content"} key={id}
                role="tabpanel" id={"panel-" + id} hidden={id !== tab}
                /* a menu page has no tab in the bar to be labelled by */

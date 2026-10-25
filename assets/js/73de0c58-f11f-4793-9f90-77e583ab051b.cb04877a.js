@@ -2088,6 +2088,7 @@ function App() {
       window.removeEventListener("hashchange", onUrl);
     };
   }, []);
+  const panels = mounted.indexOf(tab) === -1 ? mounted.concat([tab]) : mounted;
   React.useEffect(() => {
     setMounted(m => m.indexOf(tab) === -1 ? m.concat([tab]) : m);
     if (tab !== "now") {
@@ -2552,7 +2553,7 @@ function App() {
     className: "content",
     id: "main-content",
     tabIndex: -1
-  }, mounted.map(id => React.createElement("div", _extends({
+  }, panels.map(id => React.createElement("div", _extends({
     className: entered === id ? "view-enter content" : "content",
     key: id,
     role: "tabpanel",
