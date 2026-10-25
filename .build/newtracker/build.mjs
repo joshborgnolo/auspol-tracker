@@ -1841,6 +1841,19 @@ html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
    still boot, and an absolute path resolves to the filesystem root there. */
 if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/').replace(/src="assets\//g, 'src="../assets/');
 
+/* Every <script src> a document keeps is also announced in <head> as a
+   preload. The tags sit at the foot of the body, behind ~490KB of inline CSS
+   and the static article, so the preload scanner met them only once the
+   whole document had arrived (~1.2s into a slow-4G load); announced up top,
+   they download while the document is still streaming. Same URLs as the
+   tags, so each response is the one its tag runs: slow 4G 3.22 -> 3.04s,
+   3G-like 6.61 -> 6.27s to the app on screen (390px, 4x CPU). */
+const withScriptPreloads = (doc) => {
+  const srcs = [...doc.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
+  const at = doc.indexOf('<link rel="preload"');
+  if (at < 0 || !srcs.length) return doc;
+  return doc.slice(0, at) + srcs.map((u) => `<link rel="preload" href="${u}" as="script">\n  `).join("") + doc.slice(at);
+};
 /* ---- 5a. every tab is also its own page --------------------------------
    The tabs are one document's views of the same data, but a URL each lets
    the archive, the past cycles and the method page be linked, crawled and
@@ -1912,7 +1925,7 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
     doc = doc.replace(/src="assets\//g, 'src="../assets/');
     if (VIC) doc = doc.replace(/src="\.\.\/assets\//g, 'src="../../assets/');
     fs.mkdirSync(path.join(BASE_DIR, t.id), { recursive: true });
-    writeAtomic(path.join(BASE_DIR, t.id, "index.html"), doc);
+    writeAtomic(path.join(BASE_DIR, t.id, "index.html"), withScriptPreloads(doc));
   }
   console.log(`  + ${tabs.map((t) => (VIC ? "vic/" : "") + t.id + "/").join(", ")} · one document per tab`);
 }
@@ -1933,6 +1946,7 @@ const LATE_MODULES = ["data-late", "data-vic-late", "a11e1559-f455-44d5-8a31-669
   if (!html.includes("<script>window.AP_CYCLE_SRC=")) throw new Error("late modules: AP_CYCLE_SRC anchor missing");
   html = html.replace("<script>window.AP_CYCLE_SRC=", `<script>window.AP_LATE=${JSON.stringify(late)};<\/script>\n  <script>window.AP_CYCLE_SRC=`);
 }
+html = withScriptPreloads(html);
 writeAtomic(OUT, html);
 if (VIC) {
   const vsize = fs.statSync(OUT).size;
