@@ -120,7 +120,7 @@ const selDiv = () => (S.sel.level === "div" || S.sel.level === "booth" ? S.sel.d
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 let quietSince = 0, needFrame = false;
 function quietness(i, now) {
-  const all = 0.72 * smooth(K_ALL * 0.85, K_ALL * 1.7, T.k);
+  const all = 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k);
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
   return all;
 }
@@ -172,8 +172,22 @@ function drawFocus(m) {
   ctx.restore();
 }
 
-const zf = () => clamp(0.66 + 0.12 * Math.log2(Math.max(T.k, 1) / 12), 0.6, 1.3);
-const rad = (votes) => clamp(1.5 + 0.2 * Math.sqrt(votes), 2.4, 17) * zf();
+// A booth's dot. Its size is a 1,000-vote booth's radius times the square
+// root of its votes over 1,000 (area true), damped to a fourth root past
+// 4,000 so the biggest early-voting centres stay on the map, capped at 2.5x
+// (9,800 votes). That base radius tracks how far apart the inner cities'
+// booths sit on screen (BOOTH_GAP, the 2025 inner-metropolitan median
+// distance to the nearest booth, in map units): small dots at city zoom,
+// where the booths crowd, growing to 9px from suburb zoom in. Below city
+// zoom only an opened seat's booths show, with room to spare, so the floors
+// rise there and a rural seat's small booths stay visible.
+const BOOTH_GAP = 0.158;
+const roomy = () => 1 - smooth(K_ALL * 0.4, K_ALL * 0.9, T.k);
+const dotBase = () => Math.min(9, Math.max(2.6 + 1.9 * roomy(), 0.34 * BOOTH_GAP * T.k));
+const voteScale = (v) => Math.min(2.5, v <= 4000 ? Math.sqrt(v / 1000) : 2 * Math.pow(v / 4000, 0.25));
+const rad = (votes) => Math.max(1.6 + 0.6 * roomy(), dotBase() * voteScale(votes));
+// the paper ring that parts overlapping dots, thinner on the small ones
+const halo = (r) => clamp(0.18 * r + 0.5, 0.8, 1.6);
 function visibleBooths(m) {
   const b = m.booth, out = [], sd = selDiv();
   if (sd == null && T.k < K_ALL) return out;
@@ -207,7 +221,7 @@ function drawBooths(m) {
     let a = sd != null && b.d[j] !== sd ? 0.5 : 1;
     if (rf && !inRange(boothColValue(m, j, rf.key), rf)) a *= 0.2;
     ctx.globalAlpha = a;
-    boothShape(ctx, b.ty[j], x, y, r + 1.6); ctx.fillStyle = css(th.bg); ctx.fill();
+    boothShape(ctx, b.ty[j], x, y, r + halo(r)); ctx.fillStyle = css(th.bg); ctx.fill();
     const c = fillBooth(m, j);
     boothShape(ctx, b.ty[j], x, y, r); ctx.fillStyle = c ? css(c) : pat; ctx.fill();
   }
