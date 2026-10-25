@@ -12,7 +12,12 @@
 // (national-esri-16122011), 2019, 2022 and 2025 from the national files at
 // aec.gov.au/electorates/gis, and 2016 as the 2013 file with that year's
 // NSW, WA and ACT files swapped in; each reduced to a name per feature as
-// n-YYYY.geojson. Needs mapshaper on PATH (or MAPSHAPER) and the npm
+// n-YYYY.geojson. From the 2017 redistribution the AEC draws Queensland's
+// coastal seats out to sea (Leichhardt's west edge a straight line down the
+// Gulf, Dawson and Capricornia far onto the reef), so in SEA_YEARS the
+// Queensland seats are clipped to the land of the 2013 file (one national
+// file, so no slivers between states, and the same Queensland coast as
+// 2004-16); the other states' coasts already match and stay as drawn. Needs mapshaper on PATH (or MAPSHAPER) and the npm
 // packages topojson-client, d3 and polylabel.
 // usage: node .build/map/geo_build.mjs <srcDir with n-YYYY.geojson> <dataDir with data-YYYY.json> map/data
 import fs from "fs";
@@ -25,15 +30,22 @@ const [, , srcDir, dataDir, outDir] = process.argv;
 const MS = process.env.MAPSHAPER || "mapshaper";
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const LEVELS = { lo: 1000, hi: 60 };
+const SEA_YEARS = new Set([2019, 2022, 2025]);
 const key = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
+
+const land = `${outDir}/tmp-land.json`;
+execFileSync(MS, ["-i", `${srcDir}/n-2013.geojson`, "snap-interval=0.00002", "-clean", "-dissolve", "-clean", "gap-fill-area=100km2", "-o", land, "format=geojson"], { stdio: ["ignore", "ignore", "pipe"] });
 
 for (const y of YEARS) {
   const data = JSON.parse(fs.readFileSync(`${dataDir}/data-${y}.json`, "utf8"));
   const byKey = new Map(data.divs.map((d) => [key(d.n), d]));
+  const qld = JSON.stringify(data.divs.filter((d) => d.st === "QLD").map((d) => key(d.n)));
+  const toLand = SEA_YEARS.has(y) ? ["-each", `q=${qld}.indexOf(name.toLowerCase().replace(/[^a-z]/g, "")) > -1`, "-split", "q",
+    "-clip", land, "target=true", "-merge-layers", "target=*", "force", "name=divs", "-drop", "fields=q"] : [];
   let topoLo = null;
   for (const [lvl, iv] of Object.entries(LEVELS)) {
     const tmp = `${outDir}/tmp-${y}-${lvl}.json`;
-    execFileSync(MS, ["-i", `${srcDir}/n-${y}.geojson`, "snap-interval=0.00002", "-clean", "gap-fill-area=0.5km2", "-clip", "bbox=112,-44.5,154.5,-9",
+    execFileSync(MS, ["-i", `${srcDir}/n-${y}.geojson`, "name=divs", "snap-interval=0.00002", "-clean", "gap-fill-area=0.5km2", ...toLand, "-clip", "bbox=112,-44.5,154.5,-9",
       "-simplify", "weighted", `interval=${iv}`, "keep-shapes", "-filter-islands", "min-area=2km2", "remove-empty",
       "-rename-layers", "divs", "-o", tmp, "format=topojson", "quantization=100000"], { stdio: ["ignore", "ignore", "pipe"] });
     const topo = JSON.parse(fs.readFileSync(tmp, "utf8"));
@@ -71,3 +83,4 @@ for (const y of YEARS) {
   const sz = (f) => fs.statSync(`${outDir}/${f}`).size;
   console.log(y, "lo", sz(`geo-${y}-lo.json`), "hi", sz(`geo-${y}-hi.json`), "res", sz(`res-${y}.json`));
 }
+fs.unlinkSync(land);
