@@ -91,7 +91,8 @@ function senateFurniturePaths() {
    drawn as they stand, not as sectors of one circle) */
 const BENCH_PAD = 2.5;
 function senBenches() {
-  const all = [...senFloor.seats.filter((c) => c.row > 0), ...senFloor.furniture.blackRod];
+  // (a floor filed before Black Rod's bench was drawn has none)
+  const all = [...senFloor.seats.filter((c) => c.row > 0), ...(senFloor.furniture.blackRod || [])];
   // a column is one x extent; down it, a seat whose top meets the last one's foot joins its block
   const cols = new Map();
   for (const c of all.filter((c) => c.box)) { const k = `${Math.round(c.box[0])}|${Math.round(c.box[2])}`; if (!cols.has(k)) cols.set(k, []); cols.get(k).push(c.box.slice()); }

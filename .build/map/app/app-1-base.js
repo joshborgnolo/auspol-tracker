@@ -322,7 +322,11 @@ const yearLabel = (y) => (y === "now" ? "Now" : String(y));
 const xOfYear = (y) => (y === "now" ? YEAR_X.now : y);
 
 /* =============================== data =============================== */
-const getJSON = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+// each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
+// names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
+// pairs with a cached older copy
+const DATA_V = /*@data-stamps*/{};
+const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
   let s = name.replace(new RegExp("\\s*\\(" + div.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\)$"), "");

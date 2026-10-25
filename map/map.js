@@ -324,7 +324,11 @@ const yearLabel = (y) => (y === "now" ? "Now" : String(y));
 const xOfYear = (y) => (y === "now" ? YEAR_X.now : y);
 
 /* =============================== data =============================== */
-const getJSON = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+// each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
+// names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
+// pairs with a cached older copy
+const DATA_V = /*@data-stamps*/{"data-now.json":"75dc8f7d","geo-2004-hi.json":"fc0a3808","geo-2004-lo.json":"f19e03b5","geo-2007-hi.json":"a812ca6d","geo-2007-lo.json":"404a85e3","geo-2010-hi.json":"7f425bed","geo-2010-lo.json":"df8243d3","geo-2013-hi.json":"d8edb706","geo-2013-lo.json":"e376c26b","geo-2016-hi.json":"c7d53e04","geo-2016-lo.json":"368a2458","geo-2019-hi.json":"7437a3a7","geo-2019-lo.json":"3bc9da66","geo-2022-hi.json":"8e72e277","geo-2022-lo.json":"a52c9996","geo-2025-hi.json":"ef2c6466","geo-2025-lo.json":"fd7736d4","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"6423a44c","res-2007.json":"0398884f","res-2010.json":"619b76f6","res-2013.json":"4dcf8396","res-2016.json":"3469eaf6","res-2019.json":"09a52527","res-2022.json":"f083d4f3","res-2025.json":"d5d53dbc","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","summary.json":"06f08fb1"};
+const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
   let s = name.replace(new RegExp("\\s*\\(" + div.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\)$"), "");
@@ -2491,7 +2495,8 @@ function senateFurniturePaths() {
    drawn as they stand, not as sectors of one circle) */
 const BENCH_PAD = 2.5;
 function senBenches() {
-  const all = [...senFloor.seats.filter((c) => c.row > 0), ...senFloor.furniture.blackRod];
+  // (a floor filed before Black Rod's bench was drawn has none)
+  const all = [...senFloor.seats.filter((c) => c.row > 0), ...(senFloor.furniture.blackRod || [])];
   // a column is one x extent; down it, a seat whose top meets the last one's foot joins its block
   const cols = new Map();
   for (const c of all.filter((c) => c.box)) { const k = `${Math.round(c.box[0])}|${Math.round(c.box[2])}`; if (!cols.has(k)) cols.set(k, []); cols.get(k).push(c.box.slice()); }
