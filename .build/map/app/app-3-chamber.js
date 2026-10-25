@@ -108,6 +108,12 @@ function chamberKey(m, d, bloc) {
     default: return d.winPct;
   }
 }
+/* the Prime Minister and the Leader of the Opposition sit at the table, government side and
+   opposition side, as the House sat after each election (the 2013 and 2016 plans print them on the
+   front bench instead and leave the table's chairs empty; March 2021's has only Morrison there) */
+const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"], 2010: ["Lalor", "Warringah"],
+  2013: ["Warringah", "Maribyrnong"], 2016: ["Wentworth", "Maribyrnong"], 2019: ["Cook", "Grayndler"],
+  2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || (S.lens === "winner" ? "plan" : "sort"));
@@ -134,6 +140,9 @@ function chamberOrder(m) {
     if (xs.length) groups.push({ fam: f, n: xs.length });
     C.push(...xs);
   }
+  // the leaders, each at their side's table chair (when they lead the bloc on that side)
+  const table = [geom.byId.get("Lt0"), geom.byId.get("Rt0")];
+  const lead = (LEADERS[m.year] || []).map((n, s) => { const i = m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
   // each member's seat (an index into geom.seats)
   const at = new Map();
   if (plan) {
@@ -145,14 +154,19 @@ function chamberOrder(m) {
       const back = holdFam(d.hold) === opp;
       for (let j = 0; j < B.length; j++) { const c = B[back ? B.length - 1 - j : j]; if (!taken.has(c.k)) { at.set(d.i, c.k); taken.add(c.k); break; } }
     }
+    // a leader the plan prints on the bench moves to their table chair, if the plan left it empty
+    lead.forEach((i, s) => { if (i != null && at.get(i) !== table[s] && !taken.has(table[s])) at.set(i, table[s]); });
   } else {
     // no plan: the government from its Speaker's end, the crossbench after it, the opposition from
     // the other end; the empty seats fall between the crossbench and the opposition, so the
     // majority line never has to cross them
-    const B = geom.bench;
-    G.forEach((d, k) => at.set(d.i, B[k].k));
-    C.forEach((d, k) => at.set(d.i, B[G.length + k].k));
-    O.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
+    // the leaders at the table
+    const B = geom.bench, onBench = (d) => !lead.includes(d.i);
+    lead.forEach((i, s) => { if (i != null) at.set(i, table[s]); });
+    const Gb = G.filter(onBench), Ob = O.filter(onBench);
+    Gb.forEach((d, k) => at.set(d.i, B[k].k));
+    C.forEach((d, k) => at.set(d.i, B[Gb.length + k].k));
+    Ob.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];
