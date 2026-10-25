@@ -21,9 +21,15 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const DATA = path.join(ROOT, "map", "data");
 // the 46th Parliament's earliest archived plan is March 2021's (none survives from 2019)
-const PLANS = { now: "2026-08-13", 2025: "2025-10-27", 2022: "2022-07-29", 2019: "2021-03", 2016: "2016-08-31", 2013: "2013-11-12" };
+const PLANS = { now: "2026-08-13", 2025: "2025-10-27", 2022: "2022-07-29", 2019: "2021-03", 2016: "2016-08-31", 2013: "2013-11-12", 2010: "2012-02-27" };
 // what the legend adds after the plan's date, where the plan isn't the term's first
-const NOTES = { 2019: "the earliest archived for this Parliament" };
+const NOTES = { 2019: "the earliest archived for this Parliament",
+  2010: "the earliest archived for this Parliament; Slipper, then Speaker, is placed on the opposition benches" };
+// a plan printed after the Speaker changed: its chair holds a member who, as elected, sat on the
+// benches. The map's view keeps the elected Speaker in the chair (their printed bench seat left
+// empty) and places the plan's Speaker in the free seat on their own side, off the front bench,
+// nearest the chair
+const LATER_SPEAKER = { 2010: { div: "Fisher", side: "R" } };
 
 // the seats, from the app's own geometry
 const src = fs.readFileSync(path.join(HERE, "app", "app-3-chamber.js"), "utf8");
@@ -54,7 +60,8 @@ for (const [key, date] of Object.entries(PLANS)) {
     // the label's middle: about 2.1pt a character across, the name and division lines 16pt deep
     raw.push({ div: s.division, label: s.label, row: r.row, x: s.x + 2.1 * s.label.length, y: s.y + 8 });
   }
-  if (speaker && speaker.division !== R.speaker) throw new Error(`${date}: the plan's Speaker sits for ${speaker.division}, the data's for ${R.speaker}`);
+  const later = LATER_SPEAKER[key];
+  if (speaker && speaker.division !== R.speaker && !(later && later.div === speaker.division)) throw new Error(`${date}: the plan's Speaker sits for ${speaker.division}, the data's for ${R.speaker}`);
   const chair = plan.officials && plan.officials.speakerChair, serj = plan.officials && plan.officials.serjeantAtArms;
   if (!chair || !serj) throw new Error(`${date}: the plan's officials give no Speaker's chair or Serjeant-at-Arms to place the page by`);
   // each year's page draws the same chamber at its own size and place: start from the printed
@@ -113,6 +120,13 @@ for (const [key, date] of Object.entries(PLANS)) {
     worst = Math.max(worst, d);
     at[m.div] = cells[j].id;
   });
+  if (later) {
+    const used = new Set(Object.values(at));
+    const chairAt = [0, -365], gap = (c) => Math.hypot(c.x - chairAt[0], c.y - chairAt[1]);
+    const free = cells.filter((c) => c.id[0] === later.side && c.row > 1 && !used.has(c.id)).sort((a, b) => gap(a) - gap(b));
+    if (!free.length) throw new Error(`${date}: no free seat for ${later.div}`);
+    at[later.div] = free[0].id;
+  }
   const out = { plan: plan.meta.planDate, ...(NOTES[key] ? { note: NOTES[key] } : {}), source: "https://www.aph.gov.au/About_Parliament/House_of_Representatives/House_of_Representatives_Seating_Plan", at };
   if (process.env.SEATING_FIT) fs.appendFileSync(process.env.SEATING_FIT, JSON.stringify({ key, k, tx, ty }) + "\n");
   const file = path.join(DATA, `seats-${key}.json`);
