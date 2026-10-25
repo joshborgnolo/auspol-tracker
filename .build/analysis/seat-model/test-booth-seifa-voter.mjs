@@ -36,7 +36,8 @@
       Provisional), cohort vocab, state-of-division, sorted.
    8. Provenance: _provenance.files keys name the votes input, the
       venue store (and the 2022 crosswalk only in 2022).
-   9. Demo block (the 2026-10-24 add-on: 2021-census GCP G01 aged/lang
+   9. Demo block (the 2026-10-24 add-on: 2021-census GCP G01 aged/lang,
+      G09 foreign-born and G49B university
       folded by the same per-SA1 vote weights — Ed3 basis on every
       lane; age shares renormalised over the 11 bands because G01
       excludes age-not-stated, same ex-not-stated basis as langOther's
@@ -101,11 +102,14 @@ const YEARS = {
     maxs: { irsd: 1143.7, irsad: 1192.8, ier: 1209.4, ieo: 1209.6 },
     sentinelIds: "9999901",
     zeroVotes: ["Brand|65161"],
-    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, age0_14: 0.1805, age65ov: 0.1823 } },
+    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, fborn: 0.278, uni: 0.2823, age0_14: 0.1805, age65ov: 0.1823 } },
     demoMaxLang: ["Lingiari", "Home Island", 0.9804],
     demoDivs: { langMax: ["Fowler", 0.7328], langMin: ["Lyne", 0.0296],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.0777],
-                lingiari: { votes: 46505, persons: 24323385, lang: 0.5239 } },
+                fbMax: ["Fowler", 0.5786], fbMin: ["Parkes", 0.0742],
+                uniMax: ["North Sydney", 0.5873], uniMin: ["Wakefield", 0.1088],
+                lingiari: { votes: 46505, persons: 24323385, lang: 0.5239,
+                            fborn: 0.1211, uni: 0.1501 } },
     demoEmpties: [],
     spots: [
       ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1081.7, 1101.5, 1131.4, 1107.9], cov: [0.9685, 0.9685, 0.9685, 0.9685] }],
@@ -132,11 +136,14 @@ const YEARS = {
     maxs: { irsd: 1144.4, irsad: 1193.9, ier: 1212.2, ieo: 1209.7 },
     sentinelIds: null,
     zeroVotes: [],
-    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, age0_14: 0.1825, age65ov: 0.1789 } },
+    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, fborn: 0.2804, uni: 0.284, age0_14: 0.1825, age65ov: 0.1789 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.9425],
     demoDivs: { langMax: ["Fowler", 0.7327], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3099], oldMin: ["Lingiari", 0.0758],
-                lingiari: { votes: 51053, persons: 26655725, lang: 0.489 } },
+                fbMax: ["Fowler", 0.5786], fbMin: ["Parkes", 0.0752],
+                uniMax: ["North Sydney", 0.5884], uniMin: ["Spence", 0.103],
+                lingiari: { votes: 51053, persons: 26655725, lang: 0.489,
+                            fborn: 0.1357, uni: 0.1596 } },
     demoEmpties: ["O'Connor|65160"],
     spots: [
       ["Brisbane", "Brisbane City BRISBANE PPVC", { votes: 8690, sa1s: 358, seifa: [1068.3, 1099.7, 963.1, 1134.3], cov: [0.9995, 0.9995, 0.9995, 0.9995] }],
@@ -163,11 +170,14 @@ const YEARS = {
     maxs: { irsd: 1135.4, irsad: 1196.2, ier: 1181.6, ieo: 1207.8 },
     sentinelIds: null,
     zeroVotes: ["Tangney|65478"],
-    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, age0_14: 0.1835, age65ov: 0.1761 } },
+    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, fborn: 0.2834, uni: 0.2861, age0_14: 0.1835, age65ov: 0.1761 } },
     demoMaxLang: ["Lingiari", "Home Island PPVC", 0.9695],
     demoDivs: { langMax: ["Fowler", 0.7335], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.077],
-                lingiari: { votes: 49428, persons: 25871026, lang: 0.4686 } },
+                fbMax: ["Fowler", 0.5797], fbMin: ["Parkes", 0.0754],
+                uniMax: ["Melbourne", 0.5954], uniMin: ["Spence", 0.1062],
+                lingiari: { votes: 49428, persons: 25871026, lang: 0.4686,
+                            fborn: 0.1441, uni: 0.1645 } },
     demoEmpties: [],
     spots: [
       ["Melbourne", "Northcote MELBOURNE PPVC", { votes: 838, sa1s: 305, seifa: [1066, 1121.2, 951.6, 1167.1], cov: [0.9988, 0.9988, 0.9988, 0.9988] }],
@@ -194,11 +204,14 @@ const YEARS = {
     maxs: { irsd: 1135.1, irsad: 1196.1, ier: 1183.6, ieo: 1202.8 },
     sentinelIds: null,
     zeroVotes: ["Page|123920"],
-    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, age0_14: 0.1855, age65ov: 0.1728 } },
+    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, fborn: 0.2869, uni: 0.2871, age0_14: 0.1855, age65ov: 0.1728 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.942],
     demoDivs: { langMax: ["Fowler", 0.7295], langMin: ["Lyne", 0.0295],
                 oldMax: ["Lyne", 0.309], oldMin: ["Lingiari", 0.079],
-                lingiari: { votes: 47812, persons: 25598620, lang: 0.4985 } },
+                fbMax: ["Fowler", 0.5796], fbMin: ["Parkes", 0.0755],
+                uniMax: ["Melbourne", 0.5901], uniMin: ["Spence", 0.1095],
+                lingiari: { votes: 47812, persons: 25598620, lang: 0.4985,
+                            fborn: 0.1243, uni: 0.1514 } },
     demoEmpties: [],
     spots: [
       ["Curtin", "Perth CURTIN PPVC", { votes: 2509, sa1s: 340, seifa: [1084.3, 1118.2, 1049.4, 1142.6], cov: [0.9936, 0.9936, 0.9936, 0.9936] }],
@@ -356,11 +369,15 @@ for (const [ys, w] of Object.entries(YEARS)) {
     if (dm.persons === 0) {
       // zero mapped persons (2019 O'Connor mobile team): null shares
       eq(dm.langOther, null, tag(`demo empty lang null ${k}`));
+      eq(dm.fborn, null, tag(`demo empty fborn null ${k}`));
+      eq(dm.uni, null, tag(`demo empty uni null ${k}`));
       eq(dm.age, null, tag(`demo empty age null ${k}`));
       demoEmpties.push(k);
       continue;
     }
     ok(dm.langOther >= 0 && dm.langOther <= 1, tag(`demo lang range ${k}`));
+    ok(dm.fborn >= 0 && dm.fborn <= 1, tag(`demo fborn range ${k}`));
+    ok(dm.uni >= 0 && dm.uni <= 1, tag(`demo uni range ${k}`));
     eq(Object.keys(dm.age), BANDS, tag(`demo age bands ${k}`));
     const sum = BANDS.reduce((s, x) => s + dm.age[x], 0);
     ok(Math.abs(sum - 1) < 0.005, tag(`demo age sum ${k} ${sum}`));
@@ -409,6 +426,8 @@ for (const [ys, w] of Object.entries(YEARS)) {
       ok(r.cov >= 0.999, tag(`division cov ${r.div} ${r.cov}`));
       ok(r.langOther >= 0 && r.langOther <= 1,
          tag(`division lang range ${r.div}`));
+      ok(r.fborn >= 0 && r.fborn <= 1, tag(`division fborn range ${r.div}`));
+      ok(r.uni >= 0 && r.uni <= 1, tag(`division uni range ${r.div}`));
       eq(Object.keys(r.age), BANDS, tag(`division age bands ${r.div}`));
       const s = BANDS.reduce((a, x) => a + r.age[x], 0);
       ok(Math.abs(s - 1) < 0.005, tag(`division age sum ${r.div} ${s}`));
@@ -446,12 +465,26 @@ for (const [ys, w] of Object.entries(YEARS)) {
     eq([oldSorted[oldSorted.length - 1][1],
         oldSorted[oldSorted.length - 1][0]], w.demoDivs.oldMin,
        tag("division age65 min"));
+    const byFb = d.divisions.map((r) => [r.fborn, r.div])
+      .sort((a, b) => b[0] - a[0]);
+    const byUni = d.divisions.map((r) => [r.uni, r.div])
+      .sort((a, b) => b[0] - a[0]);
+    eq([byFb[0][1], byFb[0][0]], w.demoDivs.fbMax,
+       tag("division fborn max"));
+    eq([byFb[byFb.length - 1][1], byFb[byFb.length - 1][0]],
+       w.demoDivs.fbMin, tag("division fborn min"));
+    eq([byUni[0][1], byUni[0][0]], w.demoDivs.uniMax,
+       tag("division uni max"));
+    eq([byUni[byUni.length - 1][1], byUni[byUni.length - 1][0]],
+       w.demoDivs.uniMin, tag("division uni min"));
     const lg = d.divisions.find((r) => r.div === "Lingiari");
     ok(lg, tag("Lingiari row"));
     if (lg) {
       eq(lg.votes, w.demoDivs.lingiari.votes, tag("Lingiari votes"));
       eq(lg.persons, w.demoDivs.lingiari.persons, tag("Lingiari persons"));
       eq(lg.langOther, w.demoDivs.lingiari.lang, tag("Lingiari lang"));
+      eq(lg.fborn, w.demoDivs.lingiari.fborn, tag("Lingiari fborn"));
+      eq(lg.uni, w.demoDivs.lingiari.uni, tag("Lingiari uni"));
       eq(Number(a65(lg).toFixed(4)), w.demoDivs.oldMin[1],
          tag("Lingiari age65"));
     }

@@ -14,7 +14,8 @@ House since the 2025 election.
              2CP + flows (TCF by polling place), 2PP + swing (TPP by
              polling place), coordinates, premises, SEIFA decile at the
              venue, SEIFA decile of where its voters live (2016+), and the
-             language and ages of where its voters live (2021 census, 2016+)
+             census people around it (2011 census of the venue's own SA1,
+             2013; 2021 census of where its voters live, 2016+)
 
 Every booth sum is checked against the division's ordinary-vote oracle
 before anything is written (the repo's recompose doctrine), and the
@@ -239,13 +240,19 @@ def dec_of_pct(p):
     return min(10, max(1, int(-(-p * 10 // 1))))
 
 
-# census people measures, 2021 census, weighted by where a place's voters live (2016+):
-# [language other than English at home, aged 65 and over, aged 20 to 34], each a share of residents
+# census people measures: 2016+ the 2021 census of where a place's voters
+# live (vote-weighted); 2013 the 2011 census of the SA1 the venue itself
+# stands in (a venue proxy — the AEC's Votes-by-SA1 product starts 2016):
+# [language other than English at home, aged 65 and over, aged 20 to 34,
+#  born overseas, university educated], each a share of residents (the
+# last one of the aged-15+ basis); all ex-not-stated
 def demo_cells(dm):
-    if not dm or dm.get("langOther") is None or not dm.get("age"):
+    if not dm or dm.get("langOther") is None or dm.get("fborn") is None \
+            or dm.get("uni") is None or not dm.get("age"):
         return None
     a = dm["age"]
-    return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4)]
+    return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
+            dm["fborn"], dm["uni"]]
 
 
 def seifa_cells(sf):
@@ -323,6 +330,17 @@ def build_year(year, hist, base2001):
     bseifa = {(b["divId"], b["boothId"]): b for b in json.load(open(REPO + f"/data/booth-seifa-{year}.json"))["booths"]}
     vpath = REPO + f"/data/booth-seifa-voter-{year}.json"
     vstore = json.load(open(vpath)) if os.path.exists(vpath) else None
+    census_basis = "voter"
+    if vstore is None:
+        # 2013 predates the AEC's Votes-by-SA1 product, so no voter
+        # footprint exists: read the venue-proxy store instead — a booth's
+        # figures are the 2011 census SA1 its premises stand in, a seat's
+        # the exact census sum over its SA1s (real headcounts, never
+        # vote-weighted pseudo-populations)
+        p = REPO + f"/data/booth-demo-{year}.json"
+        if os.path.exists(p):
+            vstore = json.load(open(p))
+            census_basis = "venue"
     bvoter = {(b["divId"], b["boothId"]): b for b in vstore["booths"]} if vstore else {}
     if prev >= 2004:
         prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
@@ -402,8 +420,9 @@ def build_year(year, hist, base2001):
             dd = next((x for x in vstore.get("divisions", []) if x.get("div") == name), None)
             dc = demo_cells(dd)
             if dc:
-                # p: the store's vote-weighted pseudo-population, to pool states and the nation
-                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "p": dd["persons"]}
+                # p: the store's pool weight — vote-weighted pseudo-population
+                # on the voter store, real census headcount on the venue proxy
+                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "p": dd["persons"]}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -452,7 +471,7 @@ def build_year(year, hist, base2001):
         B["demo"].append(demo_cells((bvoter.get((d, pp)) or {}).get("demo")))
 
     if not any(B["demo"]):
-        del B["demo"]  # no voter footprint before 2016
+        del B["demo"]  # no census-people store before 2013
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -493,7 +512,10 @@ def build_year(year, hist, base2001):
 
     A = {st: agg(st) for st in ["AUS"] + STATES}
     out = {"year": year, "event": EVENT[year], "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
-           "agg": A, "divs": D, "booths": B, "seifaCuts": cuts}
+           "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,
+           # what a demo row describes: where voters live (2016+) vs the
+           # venue's own census neighbourhood (2013) — null when no lane
+           "demoBasis": census_basis if vstore else None}
     names = {x["n"] for x in D}
     assert SPEAKER[year] in names, f"{year}: speaker seat {SPEAKER[year]} not in the House"
     p = os.path.join(OUT, f"data-{year}.json")

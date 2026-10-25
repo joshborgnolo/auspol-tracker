@@ -113,7 +113,7 @@ function buildRamps() {
     loss: seq(70, 0.025),
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
-    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12) },
+    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12) },
   };
 }
 
@@ -151,15 +151,16 @@ const CLS_DEF = { "Inner Metropolitan": "Settled, well-established suburbs of a 
 const IX = ["irsad", "irsd", "ier", "ieo"];
 const IX_NAME = { irsad: "Advantage and disadvantage", irsd: "Disadvantage", ier: "Economic resources", ieo: "Education and occupation" };
 const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
-// the census tab's people measures: shares of residents, from the 2021 census, counted
-// where each polling place's voters live (the AEC records that from 2016 on)
-const DM = ["lang", "a65", "a2034"];
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34" };
-const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40] };
+// the census tab's people measures: shares of residents, from the 2021 census
+// counted where each polling place's voters live (the AEC records that from
+// 2016 on); at 2013 the 2011 census of the areas the places stand in
+const DM = ["lang", "a65", "a2034", "fborn", "uni"];
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University" };
+const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification" };
+const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55] };
 const isDemo = () => DM.includes(S.index);
-const DEMO_FROM = 2016;
+const DEMO_FROM = 2013;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "now"];
@@ -490,6 +491,7 @@ async function loadYear(year) {
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null]);
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
+    m.demoBasis = res.demoBasis || null;
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));

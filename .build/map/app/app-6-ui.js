@@ -24,7 +24,7 @@ function valueText(v, kind) {
     switch (S.lens) {
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
-      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2016 on" : "No census figure here") : "No score here";
+      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2013 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
     }
@@ -167,7 +167,7 @@ function legendHTML(m) {
         const [lo, hi] = DM_RANGE[S.index], early = m.year !== "now" && m.year < DEMO_FROM;
         if (!early) h += legendHist(m, lo, hi);
         h += `<div class="lg-ramp" style="background:${grad(RAMP.demo[S.index], 0, 100)}">${early || !aus.demo ? "" : mark(aus.demo[S.index], lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
-        h += `<div class="lg-note">${early ? "Counted from the 2016 election on: earlier elections don’t record where voters live." : `Share of residents, 2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.${aus.demo ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2013 election: 2013 reads the census areas the polling places stand in (2011 census); from 2016 they follow the voters (2021 census)." : `${m.demoBasis === "venue" ? `Share of residents, 2011 census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `Share of residents, 2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;

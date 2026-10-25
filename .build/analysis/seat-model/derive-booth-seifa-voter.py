@@ -45,7 +45,8 @@ re-fetch manifest on missing):
         https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_SA1_2016_SA1_2021.csv
   demo: cache/gcp-sa1-2021.zip — ABS datapacks page
         download/2021_GCP_SA1_for_AUS_short-header.zip (G01 SA1 table:
-        age bands + language spoken at home, every lane's demo basis;
+        age bands + language spoken at home; G09: country of birth;
+        G49B: highest non-school qualification — every lane's demo basis;
         2016 lane's votes also walk .matilda/seifa-irsad-abs/dl/
         CG_SA1_2011_SA1_2016.xlsx — ABS ASGS Ed2 correspondences page)
 Plus committed/held: data/booth-seifa-YYYY.json (booth universe + venue
@@ -216,10 +217,12 @@ def load_xwalk():
     return x
 
 
-# ------------------------------------------------------------- demo (GCP G01)
-# The demo block: 2021-census GCP G01 (SA1) age bands + language spoken
-# at home, folded by the same per-SA1 vote weights. EVERY lane lands on
-# the Ed3/2021-census table; older votes are chain-walked into Ed3 first
+# ------------------------------------------------- demo (GCP G01/G09/G49B)
+# The demo block: 2021-census GCP (SA1) — G01 age bands + language spoken
+# at home, G09F/G09H country of birth, G49B highest non-school
+# qualification — folded by the same per-SA1 vote weights. EVERY lane
+# lands on the Ed3/2021-census table; older votes are chain-walked into
+# Ed3 first
 # (2019 & 2022 via CG_SA1_2016_SA1_2021; 2016 via CG_SA1_2011_SA1_2016
 # composed with it), so the demo basis is the SAME census in all stores.
 DEMO_BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
@@ -227,17 +230,32 @@ DEMO_BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
 GCP_ZIP = CACHE / "gcp-sa1-2021.zip"
 GCP_MEMBER = ("2021 Census GCP Statistical Area 1 for AUS/"
               "2021Census_G01_AUST_SA1.csv")
+# country of birth (G09 is split by sex × country-group; the persons
+# block is F-H) and highest non-school qualification
+GCP_MEMBER_G09F = ("2021 Census GCP Statistical Area 1 for AUS/"
+                   "2021Census_G09F_AUST_SA1.csv")
+GCP_MEMBER_G09H = ("2021 Census GCP Statistical Area 1 for AUS/"
+                   "2021Census_G09H_AUST_SA1.csv")
+GCP_MEMBER_G49B = ("2021 Census GCP Statistical Area 1 for AUS/"
+                   "2021Census_G49B_AUST_SA1.csv")
 GCP_ROWS = 61844
 XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01 @ SA1 (Ed3); every lane's votes are "
+DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H and G49B @ SA1 (Ed3); "
+              "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
-_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01 SA1 table "
-              "(age-band structure; language spoken at home English-only "
-              "vs other) by the same per-SA1 vote weights — age shares "
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H "
+              "and G49B SA1 tables (G01: age-band structure; language "
+              "spoken at home English-only vs other. G09: country of "
+              "birth — the overseas-born share excludes "
+              "country-of-birth-not-stated. G49B: highest non-school "
+              "qualification — the bachelor-and-above share is of the "
+              "G01 aged-15-and-over population, excluding "
+              "level-of-education-not-stated) by the same per-SA1 vote "
+              "weights — age shares "
               "renormalise over the 11 bands, which exclude "
               "age-not-stated; persons are a "
               "vote-weighted pseudo-population, never a headcount, and "
@@ -270,7 +288,7 @@ def load_gcp21():
     agecols = [f"Age_{b}_yr_P" for b in DEMO_BANDS[:-1]] + ["Age_85ov_P"]
     want = ["SA1_CODE_2021", "Tot_P_P", "Lang_used_home_Eng_only_P",
             "Lang_used_home_Oth_Lang_P", *agecols]
-    out = {}
+    base = {}
     z = zipfile.ZipFile(GCP_ZIP)
     if GCP_MEMBER not in z.namelist():
         fail(f"GCP zip lacks {GCP_MEMBER}")
@@ -283,14 +301,52 @@ def load_gcp21():
         for row in rdr:
             n += 1
             code = row["SA1_CODE_2021"]
-            if code in out:
+            if code in base:
                 fail(f"GCP G01 dup code {code}")
-            out[code] = (int(row["Tot_P_P"]),
-                         int(row["Lang_used_home_Eng_only_P"]),
-                         int(row["Lang_used_home_Oth_Lang_P"]),
-                         tuple(int(row[c]) for c in agecols))
+            base[code] = (int(row["Tot_P_P"]),
+                          int(row["Lang_used_home_Eng_only_P"]),
+                          int(row["Lang_used_home_Oth_Lang_P"]),
+                          tuple(int(row[c]) for c in agecols))
     if n != GCP_ROWS:
         fail(f"GCP G01 rows {n} != pin {GCP_ROWS}")
+    extra = {}
+    for tag, member, cols in (
+        ("G09F", GCP_MEMBER_G09F, ["P_Australia_Tot"]),
+        ("G09H", GCP_MEMBER_G09H, ["P_Tot_Tot", "P_COB_NS_Tot"]),
+        ("G49B", GCP_MEMBER_G49B, ["P_PGrad_Deg_Total",
+                                   "P_GradDip_and_GradCert_Total",
+                                   "P_BachDeg_Total",
+                                   "P_Lev_Edu_NS_Total"]),
+    ):
+        if member not in z.namelist():
+            fail(f"GCP zip lacks {member}")
+        d = {}
+        with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+            rdr = csv.DictReader(fh)
+            miss = [c for c in ["SA1_CODE_2021", *cols]
+                    if c not in (rdr.fieldnames or [])]
+            if miss:
+                fail(f"GCP {tag} header drift, missing {miss}")
+            m = 0
+            for row in rdr:
+                m += 1
+                code = row["SA1_CODE_2021"]
+                if code in d:
+                    fail(f"GCP {tag} dup code {code}")
+                d[code] = tuple(int(row[c]) for c in cols)
+        if m != GCP_ROWS:
+            fail(f"GCP {tag} rows {m} != pin {GCP_ROWS}")
+        extra[tag] = d
+        print(f"GCP demo: {tag} SA1, {m} rows")
+    out = {}
+    for code, r in base.items():
+        f09 = extra["G09F"].get(code)
+        h09 = extra["G09H"].get(code)
+        e49 = extra["G49B"].get(code)
+        if f09 is None or h09 is None or e49 is None:
+            fail(f"GCP G09/G49B SA1 set mismatch at {code}")
+        out[code] = r + (f09[0], h09[0], h09[1],
+                         e49[0] + e49[1] + e49[2], e49[3])
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = out
     return out
@@ -395,9 +451,10 @@ def units_to_ed3(units, conf, dec, xw):
 
 
 def demo_units(units21, gcp):
-    """Per unit: the GCP G01 demo block + the div/national accumulators."""
+    """Per unit: the GCP demo block + the div/national accumulators."""
     nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
-           "bands": [0.0] * len(DEMO_BANDS)}
+           "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
+           "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0}
     divs = {}
     out = {}
     for key, kv in units21.items():
@@ -406,6 +463,7 @@ def demo_units(units21, gcp):
             out[key] = None
             continue
         cov = pers = eng = oth = 0.0
+        aust = totc = cobns = uni = eduns = pop15 = 0.0
         bands = [0.0] * len(DEMO_BANDS)
         for code, w in kv.items():
             r = gcp.get(code)
@@ -418,9 +476,18 @@ def demo_units(units21, gcp):
             ages = r[3]
             for i in range(len(DEMO_BANDS)):
                 bands[i] += w * ages[i]
+            aust += w * r[4]
+            totc += w * r[5]
+            cobns += w * r[6]
+            uni += w * r[7]
+            eduns += w * r[8]
+            pop15 += w * (r[0] - ages[0] - ages[1])
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0, "oth": 0.0,
-                                      "bands": [0.0] * len(DEMO_BANDS)})
+                                      "bands": [0.0] * len(DEMO_BANDS),
+                                      "aust": 0.0, "totc": 0.0,
+                                      "cobns": 0.0, "uni": 0.0,
+                                      "eduns": 0.0, "pop15": 0.0})
         dv["votes"] += tot
         dv["cov"] += cov
         dv["pers"] += pers
@@ -428,6 +495,9 @@ def demo_units(units21, gcp):
         dv["oth"] += oth
         for i in range(len(DEMO_BANDS)):
             dv["bands"][i] += bands[i]
+        for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15)):
+            dv[k] += v
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -435,16 +505,29 @@ def demo_units(units21, gcp):
         nat["oth"] += oth
         for i in range(len(DEMO_BANDS)):
             nat["bands"][i] += bands[i]
+        for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15)):
+            nat[k] += v
         # G01's 11 age bands exclude age-not-stated (no NS column; the
         # residual against Tot_P_P runs anywhere up to ~5% per SA1), so
         # the age shares renormalise on the band sum — the same
         # ex-not-stated basis langOther uses (eng+oth, not Tot_P_P).
+        # Foreign-born follows the census's ex-not-stated share too
+        # (overseas-stated over country-stated); university is per the
+        # G01 aged-15+ population less level-of-education-not-stated
+        # (G49B's own not-stated column).
         bsum = sum(bands)
+        fb_den = totc - cobns
+        uni_den = pop15 - eduns
         out[key] = {
             "persons": int(round(pers)),
             "cov": round(cov, 4),
             "langOther":
                 round(oth / (eng + oth), 4) if eng + oth > 0 else None,
+            "fborn":
+                round((fb_den - aust) / fb_den, 4) if fb_den > 0 else None,
+            "uni":
+                round(uni / uni_den, 4) if uni_den > 0 else None,
             "age": ({b: round(bands[i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
@@ -784,6 +867,8 @@ def build(year):
                          for k in bkeys if demo_map.get(k)) / vtot_b, 4)
     nat_b = sum(demo_nat["bands"]) or 1
     nat_eo = demo_nat["eng"] + demo_nat["oth"]
+    nat_fbd = demo_nat["totc"] - demo_nat["cobns"]
+    nat_unid = demo_nat["pop15"] - demo_nat["eduns"]
     counts["demo"] = {
         "rows": demo_rows,
         "coverage": cov_demo,
@@ -791,6 +876,10 @@ def build(year):
         "national": {
             "langOther": round(demo_nat["oth"] / nat_eo, 4)
             if nat_eo else None,
+            "fborn": round((nat_fbd - demo_nat["aust"]) / nat_fbd, 4)
+            if nat_fbd > 0 else None,
+            "uni": round(demo_nat["uni"] / nat_unid, 4)
+            if nat_unid > 0 else None,
             "age0_14": round(
                 (demo_nat["bands"][0] + demo_nat["bands"][1]) / nat_b, 4),
             "age65ov": round(sum(demo_nat["bands"][8:]) / nat_b, 4),
@@ -810,6 +899,8 @@ def build(year):
         dv = demo_div[div]
         tot = dv["votes"]
         bsum = sum(dv["bands"])
+        fb_den = dv["totc"] - dv["cobns"]
+        uni_den = dv["pop15"] - dv["eduns"]
         divisions.append({
             "div": div, "state": divstate[div],
             "votes": div_votes.get(div, int(round(tot))),
@@ -817,6 +908,10 @@ def build(year):
             "cov": round(dv["cov"] / tot, 4) if tot > 0 else None,
             "langOther": round(dv["oth"] / (dv["eng"] + dv["oth"]), 4)
                 if dv["eng"] + dv["oth"] > 0 else None,
+            "fborn": round((fb_den - dv["aust"]) / fb_den, 4)
+                if fb_den > 0 else None,
+            "uni": round(dv["uni"] / uni_den, 4)
+                if uni_den > 0 else None,
             "age": ({b: round(dv["bands"][i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
@@ -850,9 +945,9 @@ def build(year):
             "never lists (unused PPVCs, cancelled mobile teams) carry "
             "votes:null and note:noVotesRows. The divisions array "
             "re-pools every unit's per-SA1 demo tallies by division: one "
-            "language/age reading per division, its shares from its own "
-            "pooled sum, never from averaging the row-level rounded "
-            "shares.") + DEMO_ABOUT[year],
+            "language/foreign-born/university/age reading per division, "
+            "its shares from its own pooled sum, never from averaging "
+            "the row-level rounded shares.") + DEMO_ABOUT[year],
         "_provenance": {
             "sourceUrls": {
                 "votes": {2016: "AEC 2016 downloads, Votes by SA1 (xlsx)",
@@ -860,7 +955,7 @@ def build(year):
                           2022: "AEC 2022 downloads, Votes by SA1",
                           2025: "AEC fe25 downloads-statistics, Votes by SA1 – national"}[year],
                 "fpvOracle": "VTR HouseStateFirstPrefsByPollingPlaceDownload",
-                "gcp": "ABS 2021 Census GCP datapack (SA1, G01)",
+                "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G09/G49B)",
                 **({"crosswalk": "ABS CG_SA1_2016_SA1_2021 (ASGS Ed3 correspondences page)"}
                    if conf["mode"] == "xwalk21" else {}),
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
