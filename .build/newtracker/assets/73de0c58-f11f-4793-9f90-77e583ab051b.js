@@ -298,6 +298,7 @@ function Header({ isDark, onToggleTheme, rd }) {
      The origin rect is handed over so the overlay can fly out of the masthead
      instead of appearing on top of it. */
   const [story, setStory] = useState(null);
+  const late = useLateReady();   // the dial replay is a late module (loadLate)
   const glyphRef = useRef(null);
   /* Closing hands focus back to whichever element opened the overlay - the
      whole lockup is the way in today, but the return is kept generic so a
@@ -308,6 +309,7 @@ function Header({ isDark, onToggleTheme, rd }) {
   const openStory = (e) => {
     openerRef.current = (e && e.currentTarget) || glyphRef.current;
     const el = glyphRef.current;
+    loadLate();
     setStory({ rect: el ? el.getBoundingClientRect() : null });
   };
   /* The freshness dot in the meta line doubles as a switch: press it and the
@@ -538,7 +540,7 @@ function Header({ isDark, onToggleTheme, rd }) {
           </button>
         </div>
       </div>
-      {story && <DialStory originRect={story.rect}
+      {story && late && <DialStory originRect={story.rect}
         onClose={() => { setStory(null); requestAnimationFrame(() => {
           const back = openerRef.current || glyphRef.current;
           back && back.focus && back.focus();
@@ -2095,12 +2097,23 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
      stage now waits for the frame after the last one painted (an effect's
      setState alone can run before the paint). A hash on the URL draws the
      whole tail at once, so whatever it names exists to land on. */
-  const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
+  const [tail, setTail] = useState(snapshotTailArmed && lateDone ? SNAP_TAIL_ALL : 0);
+  const late = useLateReady();
   React.useEffect(() => {
     if (tail >= SNAP_TAIL_ALL) { warmSections(1000); return undefined; }
+    if (!late) return undefined;
     if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
+      const landing = !snapshotTailArmed;
       snapshotTailArmed = true;
       setTail(SNAP_TAIL_ALL);
+      /* the browser's own jump to the hash found nothing - the section it
+         names arrives with the late modules - so land it here, once it
+         exists, unless the reader has already scrolled */
+      if (landing) requestAnimationFrame(() => {
+        const id = decodeURIComponent((window.location.hash || "").slice(1));
+        const el = id && document.getElementById(id);
+        if (el && window.scrollY < 4) el.scrollIntoView({ block: "start", behavior: "instant" });
+      });
       return undefined;
     }
     snapshotTailArmed = true;
@@ -2110,7 +2123,7 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
     let t = 0;
     const raf = requestAnimationFrame(() => { t = setTimeout(() => setTail((n) => Math.max(n, tail + 1)), 0); });
     return () => { cancelAnimationFrame(raf); clearTimeout(t); };
-  }, [tail]);
+  }, [tail, late]);
   return (
     <>
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
@@ -2191,6 +2204,60 @@ function warmSections(delay) {
    and the tail lands in this many stages. */
 let snapshotTailArmed = false;
 const SNAP_TAIL_ALL = 6;
+
+/* The modules the first screen does not draw arrive after it. The root
+   document's build lists them in window.AP_LATE instead of as <script> tags
+   (build.mjs: the Now tab's analysis sections, the latest-polls table, the
+   other tabs' views, the dial replay, the copy-as-image scripts - ~270KB of
+   the ~1.08MB a cold load fetched before anything showed). They are
+   requested once the app has painted, in their original order (async=false
+   keeps a dynamic script list ordered), so the first screen has the whole
+   connection to itself: on a 1.6Mbps phone link the app stood 6.1s from a
+   blank page. Whatever needs them waits on useLateReady() - the Now tail's
+   stages, every other tab's panel, the dial replay - and a tab switch or a
+   dial press before the paint asks for them at once. The tab documents
+   (/allpolls/ and the rest) render their own tab first, so their build keeps
+   every module a plain <script>, AP_LATE stays unset and nothing waits. */
+let lateDone = !(window.AP_LATE && window.AP_LATE.length);
+/* the srcs are document-relative (a saved file:// copy still boots), and a
+   tab switch moves the document's URL with pushState - /disagreement/ would
+   resolve "assets/js/..." a folder down - so they resolve against the URL
+   the page loaded at */
+const lateBase = document.baseURI;
+let lateAsked = lateDone;
+const lateSubs = new Set();
+function loadLate() {
+  if (lateAsked) return;
+  lateAsked = true;
+  const srcs = window.AP_LATE;
+  let left = srcs.length;
+  /* a script that fails still counts: the view that needed it then throws
+     inside its ViewBoundary, the notice and retry the site already has */
+  const one = () => {
+    if (--left > 0) return;
+    lateDone = true;
+    lateSubs.forEach((f) => f());
+    lateSubs.clear();
+  };
+  for (const src of srcs) {
+    const el = document.createElement("script");
+    el.src = new URL(src, lateBase).href;
+    el.async = false;
+    el.onload = one;
+    el.onerror = one;
+    document.body.appendChild(el);
+  }
+}
+function useLateReady() {
+  const [ready, setReady] = useState(lateDone);
+  React.useEffect(() => {
+    if (lateDone) { setReady(true); return undefined; }
+    const f = () => setReady(true);
+    lateSubs.add(f);
+    return () => { lateSubs.delete(f); };
+  }, []);
+  return ready;
+}
 
 /* Error boundaries. Before these, ANY render throw anywhere in the tree
    unmounted the whole createRoot root, leaving the reader a blank page
@@ -2318,7 +2385,10 @@ function App() {
     document.body.classList.add("js");
     if (window.apSyncHeights) window.apSyncHeights();
     if (window.apBootDone) window.apBootDone();
+    // the late modules, once this first frame has painted (see loadLate)
+    requestAnimationFrame(() => setTimeout(loadLate, 0));
   }, []);
+  const late = useLateReady();
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "layout": "editorial",
     "theme": "auto",
@@ -2425,7 +2495,7 @@ function App() {
   React.useEffect(() => {
     setMounted((m) => (m.indexOf(tab) === -1 ? m.concat([tab]) : m));
     // the Now tab warms its own sections once its staged tail is in
-    if (tab !== "now") warmSections(1500);
+    if (tab !== "now") { loadLate(); warmSections(1500); }
   }, [tab]);
   React.useEffect(() => {
     if (entered == null) return undefined;
@@ -2989,14 +3059,17 @@ function App() {
                               tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}
                               tppBasis={tppBasis} setTppBasis={setTppBasis} />
               )}
-              {id === "cycles" && <PastCyclesView />}
-              {id === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
+              {/* a tab opened before its modules have landed holds its
+                  space (no footer jumping up and back) until they do */}
+              {id !== "now" && !late && <div className="late-wait" aria-busy="true" style={{ minHeight: "70vh" }} />}
+              {id === "cycles" && late && <PastCyclesView />}
+              {id === "allpolls" && late && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
                 backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
                 tppBasis={tppBasis} setTppBasis={setTppBasis} />}
               {termPop && id === tab && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
                 onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
-              {TAB_MENU[id] && <MenuPageView id={id} tppBasis={tppBasis} />}
-              {id === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
+              {TAB_MENU[id] && late && <MenuPageView id={id} tppBasis={tppBasis} />}
+              {id === "info" && late && <InfoView focus={focusTerm ? focusTerm.id : null}
                 onBack={focusTerm ? backFromTerm : null}
                 backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
             </ViewBoundary>

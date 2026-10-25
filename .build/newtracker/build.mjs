@@ -1845,6 +1845,22 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
   console.log(`  + ${tabs.map((t) => (VIC ? "vic/" : "") + t.id + "/").join(", ")} · one document per tab`);
 }
 
+/* The root document starts its first screen with only the modules that
+   screen draws; the rest load once the app has painted (loadLate, the
+   73de0c58 asset), so the critical ones get the whole connection. The tab
+   documents above were cut from the full tag list - each renders its own
+   tab first and needs its module from the start. Order is kept: the late
+   list runs in the order the tags did. */
+const LATE_MODULES = ["copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
+{
+  const late = [];
+  html = html.replace(/\n?[ \t]*<script src="((?:\.\.\/)*assets\/js\/([\w-]+)\.[0-9a-f]{8}\.js)"><\/script>/g,
+    (tag, src, base) => (LATE_MODULES.includes(base) ? (late.push(src), "") : tag));
+  const want = LATE_MODULES.filter((b) => jsBases.includes(b));
+  if (late.length !== want.length) throw new Error(`late modules: found ${late.length} of ${want.length}`);
+  if (!html.includes("<script>window.AP_CYCLE_SRC=")) throw new Error("late modules: AP_CYCLE_SRC anchor missing");
+  html = html.replace("<script>window.AP_CYCLE_SRC=", `<script>window.AP_LATE=${JSON.stringify(late)};<\/script>\n  <script>window.AP_CYCLE_SRC=`);
+}
 writeAtomic(OUT, html);
 if (VIC) {
   const vsize = fs.statSync(OUT).size;

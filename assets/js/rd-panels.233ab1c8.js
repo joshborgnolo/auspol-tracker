@@ -21,29 +21,6 @@ const RD_PARTY_IN = {
 const rdPartyIn = id => RD_PARTY_IN[id] || id;
 const rdPartyStart = id => rdCap(rdPartyIn(id));
 const rdPlural = id => id === "grn" || id === "oth";
-function rdElectionTicks(x0, x1, narrow, elecX) {
-  const span = x1 - x0;
-  const t = rdXTicks(x0, x1, narrow, {
-    step: span > 2.5 ? 12 : span > 1.1 ? narrow ? 4 : 2 : undefined
-  });
-  if (elecX == null || elecX < x0 - 0.01) return t;
-  const rest = t.filter(k => k.x - elecX > Math.max(0.1, span * 0.06));
-  const ey = String(Math.floor(elecX));
-  if (rest.length) {
-    const lab = rest[0].label;
-    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" ’" + ey.slice(2)) ? 4 : 0;
-    if (cut) rest[0] = {
-      ...rest[0],
-      label: lab.slice(0, -cut)
-    };
-  }
-  return [{
-    x: elecX,
-    label: "Election",
-    strong: true,
-    short: "E"
-  }, ...rest];
-}
 const RD_ELECTION_LEAD = "0.5 4";
 function RdPrimary({
   rangeId,

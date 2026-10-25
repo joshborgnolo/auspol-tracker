@@ -259,11 +259,13 @@ function Header({
     };
   }, []);
   const [story, setStory] = useState(null);
+  const late = useLateReady();
   const glyphRef = useRef(null);
   const openerRef = useRef(null);
   const openStory = e => {
     openerRef.current = e && e.currentTarget || glyphRef.current;
     const el = glyphRef.current;
+    loadLate();
     setStory({
       rect: el ? el.getBoundingClientRect() : null
     });
@@ -503,7 +505,7 @@ function Header({
     "aria-hidden": "true"
   }, React.createElement("path", {
     d: "M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"
-  }))))), story && React.createElement(DialStory, {
+  }))))), story && late && React.createElement(DialStory, {
     originRect: story.rect,
     onClose: () => {
       setStory(null);
@@ -1745,15 +1747,26 @@ function SnapshotView({
   setTppBasis
 }) {
   const rangeId = window.AP.rd ? "all" : heroRange;
-  const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
+  const [tail, setTail] = useState(snapshotTailArmed && lateDone ? SNAP_TAIL_ALL : 0);
+  const late = useLateReady();
   React.useEffect(() => {
     if (tail >= SNAP_TAIL_ALL) {
       warmSections(1000);
       return undefined;
     }
+    if (!late) return undefined;
     if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
+      const landing = !snapshotTailArmed;
       snapshotTailArmed = true;
       setTail(SNAP_TAIL_ALL);
+      if (landing) requestAnimationFrame(() => {
+        const id = decodeURIComponent((window.location.hash || "").slice(1));
+        const el = id && document.getElementById(id);
+        if (el && window.scrollY < 4) el.scrollIntoView({
+          block: "start",
+          behavior: "instant"
+        });
+      });
       return undefined;
     }
     snapshotTailArmed = true;
@@ -1765,7 +1778,7 @@ function SnapshotView({
       cancelAnimationFrame(raf);
       clearTimeout(t);
     };
-  }, [tail]);
+  }, [tail, late]);
   return React.createElement(React.Fragment, null, React.createElement(Hero, {
     rangeId: heroRange,
     setRangeId: setRangeId,
@@ -1821,6 +1834,45 @@ function warmSections(delay) {
 }
 let snapshotTailArmed = false;
 const SNAP_TAIL_ALL = 6;
+let lateDone = !(window.AP_LATE && window.AP_LATE.length);
+const lateBase = document.baseURI;
+let lateAsked = lateDone;
+const lateSubs = new Set();
+function loadLate() {
+  if (lateAsked) return;
+  lateAsked = true;
+  const srcs = window.AP_LATE;
+  let left = srcs.length;
+  const one = () => {
+    if (--left > 0) return;
+    lateDone = true;
+    lateSubs.forEach(f => f());
+    lateSubs.clear();
+  };
+  for (const src of srcs) {
+    const el = document.createElement("script");
+    el.src = new URL(src, lateBase).href;
+    el.async = false;
+    el.onload = one;
+    el.onerror = one;
+    document.body.appendChild(el);
+  }
+}
+function useLateReady() {
+  const [ready, setReady] = useState(lateDone);
+  React.useEffect(() => {
+    if (lateDone) {
+      setReady(true);
+      return undefined;
+    }
+    const f = () => setReady(true);
+    lateSubs.add(f);
+    return () => {
+      lateSubs.delete(f);
+    };
+  }, []);
+  return ready;
+}
 class ViewBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -1955,7 +2007,9 @@ function App() {
     document.body.classList.add("js");
     if (window.apSyncHeights) window.apSyncHeights();
     if (window.apBootDone) window.apBootDone();
+    requestAnimationFrame(() => setTimeout(loadLate, 0));
   }, []);
+  const late = useLateReady();
   const TWEAK_DEFAULTS = {
     "layout": "editorial",
     "theme": "auto",
@@ -2013,7 +2067,10 @@ function App() {
   }, []);
   React.useEffect(() => {
     setMounted(m => m.indexOf(tab) === -1 ? m.concat([tab]) : m);
-    if (tab !== "now") warmSections(1500);
+    if (tab !== "now") {
+      loadLate();
+      warmSections(1500);
+    }
   }, [tab]);
   React.useEffect(() => {
     if (entered == null) return undefined;
@@ -2503,7 +2560,13 @@ function App() {
     setTppMatchup: setTppMatchup,
     tppBasis: tppBasis,
     setTppBasis: setTppBasis
-  }), id === "cycles" && React.createElement(PastCyclesView, null), id === "allpolls" && React.createElement(AllPollsView, {
+  }), id !== "now" && !late && React.createElement("div", {
+    className: "late-wait",
+    "aria-busy": "true",
+    style: {
+      minHeight: "70vh"
+    }
+  }), id === "cycles" && late && React.createElement(PastCyclesView, null), id === "allpolls" && late && React.createElement(AllPollsView, {
     focus: focusPoll,
     onBack: focusPoll ? backFromPoll : null,
     backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
@@ -2513,10 +2576,10 @@ function App() {
     id: termPop.id,
     onClose: () => setTermPop(null),
     onMore: () => window.AP.openTermPage(termPop.id, termPop.from)
-  }), TAB_MENU[id] && React.createElement(MenuPageView, {
+  }), TAB_MENU[id] && late && React.createElement(MenuPageView, {
     id: id,
     tppBasis: tppBasis
-  }), id === "info" && React.createElement(InfoView, {
+  }), id === "info" && late && React.createElement(InfoView, {
     focus: focusTerm ? focusTerm.id : null,
     onBack: focusTerm ? backFromTerm : null,
     backLabel: focusTerm && focusTerm.back ? focusTerm.back.from : null

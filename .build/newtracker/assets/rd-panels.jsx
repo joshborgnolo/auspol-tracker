@@ -24,29 +24,6 @@ const rdPartyIn = (id) => RD_PARTY_IN[id] || id;
 const rdPartyStart = (id) => rdCap(rdPartyIn(id));
 const rdPlural = (id) => id === "grn" || id === "oth";
 
-/* month ticks that open on the election itself. The tick carries a `short`
-   the chart may fall back to when the word cannot sit between its neighbours -
-   a small multiple's election tick never has room for "Election" */
-function rdElectionTicks(x0, x1, narrow, elecX) {
-  /* a window past two and a half years (/vic/'s four-year term) ticks each
-     January, which carries its year: finer steps had the chart thin out
-     alternate labels, and the Januaries went with them ("E, Jul, Jul") */
-  const span = x1 - x0;
-  const t = rdXTicks(x0, x1, narrow, { step: span > 2.5 ? 12 : span > 1.1 ? (narrow ? 4 : 2) : undefined });
-  if (elecX == null || elecX < x0 - 0.01) return t;
-  /* a tick crowding the election's own leaves it the room: on a long window
-     (/vic/'s November election, then January) the axis's thinning otherwise
-     drops every other label to fit the pair, Januaries and all */
-  const rest = t.filter((k) => k.x - elecX > Math.max(0.1, span * 0.06));
-  /* "Election" already dates the axis, so the next tick drops a repeat of its year */
-  const ey = String(Math.floor(elecX));
-  if (rest.length) {
-    const lab = rest[0].label;
-    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" ’" + ey.slice(2)) ? 4 : 0;
-    if (cut) rest[0] = { ...rest[0], label: lab.slice(0, -cut) };
-  }
-  return [{ x: elecX, label: "Election", strong: true, short: "E" }, ...rest];
-}
 
 /* the dotted stroke of a lead-in segment bridging an election mark to the
    first month a chart actually polled - interpolation, drawn as the month's
