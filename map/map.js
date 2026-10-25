@@ -1494,22 +1494,32 @@ function drawChamber(g, m, w, h, opts) {
       // never centred: at the foot of the chamber the majority label takes one side, this the other
       const side0 = pt[0] < -1.2 ? "right" : "left";
       // wrap the make-up to the room on that side, and find where the block's box falls
-      const lay = (side, by) => {
+      const lay = (side, by, mode) => {
         const bx = X(pt[0]) + (side === "left" ? (Math.abs(pt[0]) <= 1.2 ? 16 : 4) : -4);
         const maxW = Math.max(120, side === "left" ? F.ox + (geom.box.x1 + 6) * s - bx : bx - 10);
         g.font = `400 12px ${SANS}`;
         // one middot-joined line if the whole make-up fits; otherwise a
         // stacked list, one party to a line — packing two to a line leaves a
-        // ragged ladder ("Centre Alliance 1 · Greens 1" under two lone lines)
+        // ragged ladder ("Centre Alliance 1 · Greens 1" under two lone lines),
+        // so it's the last resort, for when the stack is too tall to fit
         const parts = crossParts(m, ch);
         const one = parts.join(" · ");
-        const lines = g.measureText(one).width <= maxW ? [one] : parts;
+        let lines;
+        if (mode === "one") lines = g.measureText(one).width <= maxW ? [one] : null;
+        else if (mode === "stack") lines = parts.length > 1 ? parts : null;
+        else {
+          lines = []; let line = "";
+          for (const p of parts) { const t = line ? line + " · " + p : p; if (g.measureText(t).width > maxW && line) { lines.push(line); line = p; } else line = t; }
+          if (line) lines.push(line);
+          if (lines.length < 2 || lines.length >= parts.length) lines = null;
+        }
+        if (!lines) return null;
         let wMax = 0;
         for (const l of lines) wMax = Math.max(wMax, g.measureText(l).width);
         g.font = `600 13px ${SANS}`; wMax = Math.max(wMax, g.measureText(`Crossbench ${ch.nCross}`).width + 10);
         const x0 = side === "left" ? bx : bx - wMax, ht = 17 + lines.length * 15;
         // no room beside the chamber on a narrow screen: the key below gives the counts
-        const room = side === "left" ? w - bx >= 150 : bx >= 150;
+        const room = (side === "left" ? w - bx : bx) >= wMax + 4;
         // clear of the other labels, and off the chamber's floor (a phone has no room beside it)
         const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= rO + 0.5 : Math.hypot(u, v) <= rO + 0.5; };
         const clear = by + ht <= h - 2 && !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
@@ -1519,7 +1529,8 @@ function drawChamber(g, m, w, h, opts) {
       const by0 = Yp(pt[1]) + (pt[1] > rO * 0.6 ? 6 : 0);
       // beside its chairs if that's clear of the majority label, else the other side, else lower down
       const other = side0 === "left" ? "right" : "left";
-      const tries = [lay(side0, by0), lay(other, by0), ...[1, 2, 3].map((k) => lay(side0, by0 + k * 18))];
+      const spots = [[side0, by0], [other, by0], ...[1, 2, 3].map((k) => [side0, by0 + k * 18])];
+      const tries = ["one", "stack", "pack"].flatMap((mode) => spots.map(([sd, by]) => lay(sd, by, mode))).filter(Boolean);
       const L = tries.find((c) => c.room && c.clear);
       if (L) {
         g.textAlign = L.side; g.textBaseline = "top";
