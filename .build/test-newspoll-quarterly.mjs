@@ -153,7 +153,11 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   // validate.mjs's main block gates these data files (its run is the sandbox
   // gate): keep this list beside its data-parsing checks or Linux CI fails
   // the step-8/sandboxed validate on "missing or unparseable".
-  for (const f of ["demographics.json", "changelog.json", "pew-econ-sentiment.json", "roymorgan-direction-groups.json", "sec-direction-states.json"])
+  for (const f of ["demographics.json", "changelog.json", "pew-econ-sentiment.json",
+    "roymorgan-direction-groups.json", "sec-direction-states.json",
+    "essential-direction-groups.json", "redbridge-direction-groups.json",
+    "primary-history.json", "2pp-history.json", "informal-history.json",
+    "booth-primary.json", "booth-tpp.json", "booth-flows.json"])
     fs.copyFileSync(path.join(ROOT, "data", f), path.join(sb, "data", f));
   for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs", "field-tbc.mjs"])
     fs.copyFileSync(path.join(ROOT, ".build", "newtracker", f), path.join(sb, ".build", "newtracker", f));
@@ -198,7 +202,12 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
     try {
       execFileSync(process.execPath, [path.join(sb, ".build", "newtracker", "validate.mjs")], { stdio: "pipe" });
       return true;
-    } catch (e) { return e.stdout; }
+    } catch (e) {
+      // cap the operand the failing assert.equal(out, true) renders: a 63KB
+      // Buffer here blew into a multi-GB allocation on the 2026-10-12 red
+      // train (and again 2026-10-23), surfacing in CI as a bare "canceled"
+      return `validate child failed: ${String(e.stdout).slice(-2000)}`;
+    }
   };
   return { sb, ctx, validate,
     polls: () => JSON.parse(fs.readFileSync(path.join(sb, "data", "polls.json"), "utf8")).polls,
