@@ -142,18 +142,18 @@ function chair(s) {
   const dc = (d0 + d1) / 2, wc = (w0 + w1) / 2;
   return { x: R2(dc * ux - wc * uy), y: R2(dc * uy + wc * ux), fa: Math.round(fa * 1000) / 1000, D: R2(d1 - d0), W: R2(w1 - w0) };
 }
+// a straight bench seat's box, for drawing the benches the House's way (round the curve the seat's
+// own frame, x y fa D W, serves)
+function extent(s) {
+  if (s.kind === "path") return {};
+  const [x, y, w, h] = mid(s.pts); return { box: [R2(x - w / 2 - CX), R2(y - h / 2 - CY), R2(x + w / 2 - CX), R2(y + h / 2 - CY)] };
+}
 const seats = raw.seats.map((s) => {
   const c = chair(s);
   const row = s.id === "president" ? -1 : /^leader/.test(s.id) ? 0 : ROW[s.id[0]];
-  return { id: s.id, row, ...c, d: s.path.d, t: [R2(s.path.t[0] - CX), R2(s.path.t[1] - CY)] };
+  return { id: s.id, row, ...c, ...(row > 0 ? extent(s) : {}), d: s.path.d, t: [R2(s.path.t[0] - CX), R2(s.path.t[1] - CY)] };
 });
 const shift = (list) => list.map((p) => ({ d: p.d, t: [R2(p.t[0] - CX), R2(p.t[1] - CY)], ...(p.open ? { open: true } : {}), ...(p.cls ? { cls: p.cls } : {}) }));
-// the benches' and desks' drawn lines, 1,200 strokes of one weight: one path per shared offset
-function merged(list) {
-  const by = new Map();
-  for (const p of shift(list)) { const k = p.t.join(","); if (!by.has(k)) by.set(k, { t: p.t, d: "" }); by.get(k).d += p.d; }
-  return [...by.values()].map((g) => ({ ...g, open: true }));
-}
 // the officers' chairs, drawn as the app draws every chair: the Clerk and Deputy Clerk either side of
 // the Chair of Committees at the table's head, facing down the chamber; Hansard's two reporters at
 // its foot, facing up it; Black Rod in the government side's back corner
@@ -181,7 +181,11 @@ const floor = {
   // Black Rod's chair is a seat of the plan's (C01), left out of the senators' seats
   seats: seats.filter((c) => c.id !== "C01"),
   officers,
-  furniture: { table: shift(raw.table.filter((p) => p.cls !== "cls-8")), hansard: shift(raw.hansard.filter((p) => !isPath(p))), desk: shift(raw.desk), advisers: shift(raw.advisers), outlines: merged(raw.outlines.filter((p) => !p.cls.startsWith("label"))) },
+  // drawn in the House's manner: the seats' extents make the benches (Black Rod's among them), the
+  // advisers' compartments boxes like the House's officials'; the plan's line work (its desks' and
+  // seats' brackets) is left out, as the House's drawing leaves out its desks
+  furniture: { table: shift(raw.table.filter((p) => p.cls !== "cls-8")), hansard: shift(raw.hansard.filter((p) => !isPath(p))), desk: shift(raw.desk),
+    advisers: shift(raw.advisers.filter((p) => p.cls === "cls-6")), blackRod: seats.filter((c) => c.id === "C01").map((c) => ({ box: c.box })) },
 };
 const out = {
   asOf: AS_OF,

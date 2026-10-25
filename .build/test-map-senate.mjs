@@ -51,6 +51,9 @@ assert.equal(floor.seats.filter((c) => c.row === 0).length, 2, "the table's two 
 assert.equal(floor.seats.filter((c) => c.row === -1).length, 1, "the President's chair");
 assert.deepEqual(floor.officers.map((o) => o.k).sort(), ["blackRod", "chair", "clerk", "clerk", "hansard", "hansard"], "the officers' six chairs");
 for (const c of floor.seats) assert.ok(Number.isFinite(c.x) && Number.isFinite(c.y) && Number.isFinite(c.fa) && c.W > 0 && c.D > 0 && /^M/.test(c.d), `seat ${c.id} has a chair and an outline`);
+for (const c of floor.seats.filter((c) => c.row > 0 && c.fa % Math.PI === 0)) assert.ok(c.box && c.box.length === 4, `straight bench seat ${c.id} has its box, for the benches`);
+assert.ok(floor.furniture.blackRod.length === 1 && floor.furniture.blackRod[0].box, "Black Rod's bench");
+assert.ok(!floor.furniture.outlines, "the plan's line work left out, as the House's drawing leaves out its desks");
 
 // ---- the app
 const js = R("map/map.js");

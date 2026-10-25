@@ -2174,9 +2174,11 @@ function senateGeom() {
   if (senGeomC) return senGeomC;
   const F = senFloor, P = (v) => v / SU;
   const all = F.seats.filter((c) => c.row >= 0).map((c) => {
-    // the chair at the back of its outline (the plan draws the desk's lip in front of it); as wide as
-    // its seat allows, short of the curve's long desks, as deep as the House's
-    const D = 24, W = Math.min(c.W - 4, 30), back = Math.max(0, (c.D - D) / 2);
+    // the chair fills its seat's outline, a hair short of its neighbours (the plan's units draw at about
+    // 0.7 of the House's points on screen, so the House's chair sizes in these units came out two-thirds
+    // the House's area); the curve's long desks hold a chair as big as the straight benches' best
+    // (the table's two chairs are drawn narrow on the plan, 25 across: square them up to their depth)
+    const D = Math.min(c.D - 2, 32), W = c.row === 0 ? D : Math.min(c.W - 3, 34), back = Math.max(0, (c.D - D) / 2);
     const x = P(c.x - Math.cos(c.fa) * back), y = P(c.y - Math.sin(c.fa) * back);
     return { id: c.id, x, y, fa: c.fa, row: c.row, s: benchS(x, y), W: P(W), D: P(D), raw: c };
   });
@@ -2202,7 +2204,7 @@ function senateGeom() {
     seats, rows, nRows: 3, bench, byId: new Map(seats.map((c) => [c.id, c.k])),
     rOut: rowR[2], box: { x0: Math.min(bx0, -bx1), x1: Math.max(bx1, -bx0), y0: by0, y1: by1 },
     arms: false, table: ["leader_of_the_government", "leader_of_the_opposition"],
-    chairAt: [P(pres.x), P(pres.y), Math.PI / 2, 0, P(28), P(26)],
+    chairAt: [P(pres.x), P(pres.y), Math.PI / 2, 0, P(36), P(32)],
     aisle: P(46), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
     benchPt, benchOut, furniture: drawSenateFurniture,
   };
@@ -2214,12 +2216,32 @@ function senateFurniturePaths() {
   if (senPaths) return senPaths;
   const mk = (list) => list.map((p) => ({ p: new Path2D(p.d), t: p.t, cls: p.cls || "" }));
   const F = senFloor.furniture;
-  senPaths = { table: mk(F.table), hansard: mk(F.hansard), desk: mk(F.desk), advisers: mk(F.advisers), outlines: mk(F.outlines),
-    seats: senFloor.seats.filter((c) => c.row > 0).map((c) => ({ id: c.id, p: new Path2D(c.d), t: c.t })) };
+  senPaths = { table: mk(F.table), hansard: mk(F.hansard), desk: mk(F.desk), advisers: mk(F.advisers), benches: senBenches() };
   return senPaths;
 }
-/* the room: the floor, the desks, the table with the President's desk at its head and Hansard's at its
-   foot, the advisers' boxes, the officers' chairs, and the empty seats (outlined only, as the House's) */
+/* the benches as the House draws its own, a bench's colour with a margin round its chairs: down the
+   straight sides the seats run in touching pairs, one block a pair; round the curve each desk is a
+   block of its own, turned to face the table (the plan's curve desks aren't concentric, so they are
+   drawn as they stand, not as sectors of one circle) */
+const BENCH_PAD = 2.5;
+function senBenches() {
+  const all = [...senFloor.seats.filter((c) => c.row > 0), ...senFloor.furniture.blackRod];
+  // a column is one x extent; down it, a seat whose top meets the last one's foot joins its block
+  const cols = new Map();
+  for (const c of all.filter((c) => c.box)) { const k = `${Math.round(c.box[0])}|${Math.round(c.box[2])}`; if (!cols.has(k)) cols.set(k, []); cols.get(k).push(c.box.slice()); }
+  const blocks = [];
+  for (const list of cols.values()) {
+    list.sort((p, q) => p[1] - q[1]);
+    let cur = null;
+    for (const b of list) { if (cur && b[1] - cur[3] < 3) cur[3] = Math.max(cur[3], b[3]); else blocks.push((cur = b)); }
+  }
+  const desks = all.filter((c) => !c.box).map((c) => [c.x, c.y, c.fa, c.D, c.W]);
+  return { blocks, desks };
+}
+/* the room, in the House's drawing: the floor, the benches (each seat's own outline on the plan, a
+   bench's colour and a line's edge, as the House's blocks), the table with the President's desk at its
+   head and Hansard's at its foot, the advisers' boxes as the House's officials' boxes, the officers'
+   chairs, and the empty seats (outlined only). The plan's desks are left out, as the House's are */
 function drawSenateFurniture(g, F, geom, opts = {}) {
   const th = TH, X = F.X, Yp = F.Yp, s = F.s, k = s / SU;
   const bench = css(mixC(th.floor, th.ink, th.dark ? 0.08 : 0.05)), wood = css(mixC(th.floor, th.ink, th.dark ? 0.15 : 0.11));
@@ -2241,11 +2263,12 @@ function drawSenateFurniture(g, F, geom, opts = {}) {
       g.restore();
     }
   };
-  // the seats' own outlines, a bench's colour; the desks' and benches' drawn lines over them
-  draw(P.seats, bench, null);
-  draw(P.outlines, null, css(mixC(th.floor, th.ink, th.dark ? 0.2 : 0.15)));
-  draw(P.advisers.filter((q) => q.cls === "cls-5"), bench, css(th.line));
-  draw(P.advisers.filter((q) => q.cls !== "cls-5"), wood, null);
+  g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
+  const rb = (x, y, w, h) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, 3); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
+  const pd = BENCH_PAD;
+  for (const [x0, y0, x1, y1] of P.benches.blocks) rb(x0 - pd, y0 - pd, x1 - x0 + 2 * pd, y1 - y0 + 2 * pd);
+  for (const [x, y, fa, D, W] of P.benches.desks) { g.save(); g.translate(x, y); g.rotate(fa); rb(-D / 2 - pd, -W / 2 - pd, D + 2 * pd, W + 2 * pd); g.restore(); }
+  draw(P.advisers, bench, css(th.line));
   draw(P.table, bench, wood, Math.max(hair, 0.05 * s / k));
   draw(P.desk, wood, css(th.line));
   draw(P.hansard, wood, css(th.line));
