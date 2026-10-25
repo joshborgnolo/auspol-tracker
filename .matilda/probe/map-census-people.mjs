@@ -199,6 +199,60 @@ ok("2013 booth facts show an Income row", /Income/.test(booth.story) && /househo
 ok("booth Income row has NO median (booths carry none)", !/median weekly household income/.test(booth.story));
 ok("no story renders 'undefined'", !/undefined/.test(y2013.story) && !/undefined/.test(booth.story));
 
+mark("section 5 done");
+// 6. hover tooltip on an income lane names the income wording, never "undefined":
+// goDiv flies the seat into view, then a real pointer sweep over the canvas
+// lands on it (hitTest is not exported, so this must drive real mouse events).
+async function tipAfterHover(year, index) {
+  const seatName = year === "now" ? "Grayndler" : "Watson";
+  await page.evaluate(async (yr, idx, nm) => {
+    const m = window.__map;
+    m.setYear(yr);
+    m.setLens("seifa");
+    await m.Y[yr].ready;
+    const sel = document.querySelector('select[data-opt="index"]');
+    sel.value = idx;
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 400));
+    m.goDiv(m.Y[yr].byName.get(nm), { fly: true, dur: 0 });
+  }, year, index, seatName);
+  await wait(700);
+  const grid = await page.evaluate(() => {
+    const canvas = document.querySelector("canvas");
+    const r = canvas.getBoundingClientRect();
+    return { left: r.left, top: r.top, w: r.width, h: r.height };
+  });
+  let found = "";
+  outer: for (let gy = 0.15; gy <= 0.9; gy += 0.05) {
+    for (let gx = 0.15; gx <= 0.9; gx += 0.05) {
+      await page.mouse.move(grid.left + grid.w * gx, grid.top + grid.h * gy, { steps: 2 });
+      await wait(30);
+      const t = await page.evaluate(() => {
+        const tip = document.querySelector("#tip");
+        return tip && !tip.hidden ? tip.innerText : "";
+      });
+      if (t && t.includes(seatName)) { found = t; break outer; }
+    }
+  }
+  return found;
+}
+const tipNow = await tipAfterHover("now", "hiinc");
+ok("now hiinc tip found over Grayndler", tipNow.length > 0, tipNow.slice(0, 140));
+ok("now hiinc tip has no 'undefined'", !/undefined/.test(tipNow), tipNow.slice(0, 140));
+const nowCuts = await page.evaluate(() => window.__map.Y.now.incomeCuts);
+ok("now hiinc tip names its cut in 2021 dollars",
+  nowCuts && new RegExp(`%\\s+live in households earning \\$${nowCuts.hiEdgeWeekly.toLocaleString("en-AU")} or more a week in ${nowCuts.dollarsYear} dollars`).test(tipNow),
+  tipNow.slice(0, 160));
+const tip2013 = await tipAfterHover(2013, "loinc");
+ok("2013 loinc tip found over Watson", tip2013.length > 0, tip2013.slice(0, 140));
+ok("2013 loinc tip has no 'undefined'", !/undefined/.test(tip2013), tip2013.slice(0, 140));
+const cuts13 = await page.evaluate(() => window.__map.Y[2013].incomeCuts);
+ok("2013 loinc tip names its cut in 2011 dollars",
+  cuts13 && new RegExp(`%\\s+live in households earning under \\$${cuts13.loCutWeekly.toLocaleString("en-AU")} a week in ${cuts13.dollarsYear} dollars`).test(tip2013),
+  tip2013.slice(0, 160));
+const tipFborn = await tipAfterHover(2013, "fborn");
+ok("2013 fborn tip carries the non-income verb", /%\s+were born overseas/.test(tipFborn), tipFborn.slice(0, 140));
+
 await browser.close();
 console.log(fails.length ? `FAIL ${fails.length}` : "ALL OK");
 process.exit(fails.length ? 1 : 0);

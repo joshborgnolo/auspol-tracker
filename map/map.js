@@ -3780,7 +3780,7 @@ function valueText(v, kind) {
     case "flow": return `${f0(v)}% of ${FAM_LEG[S.from]} preferences to Labor`;
     case "informal": return `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? `${f1(v)}% ${DM_VERB[S.index]}` : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? `${f1(v)}% ${dmVerb(M(), S.index)}` : `Decile ${v} of 10`;
   }
   return "";
 }
