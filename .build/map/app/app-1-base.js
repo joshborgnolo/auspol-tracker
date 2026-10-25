@@ -179,13 +179,19 @@ const LENSES = [
   { id: "seifa", label: "Census" },
 ];
 // the arrow-key walks, shared by the keyboard and the phone's swipes;
-// the keyboard stops at the ends, a swipe cycles all the way around
+// the keyboard stops at the ends, a swipe cycles all the way around.
+// The All-polls fixed-view walk's contract here: the element at the
+// interaction point holds its viewport position (the figure and lens row sit
+// above the story's reflow, and scrollY never compensates), and a walk has
+// no scroll side effects of its own
 function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
   setLens(LENSES[k].id);
   const b = $(`#lenses [data-lens="${LENSES[k].id}"]`);
-  if (b) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+  // the row reveals the chip horizontally itself — the scrollIntoView this
+  // replaced could also scroll the PAGE vertically, a walk side effect
+  if (b) { const row = $("#lenses"); row.scrollLeft += b.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - b.offsetWidth) / 2; }
 }
 // a horizontal swipe with no other claim on it (vertical drags belong to the
 // page): one walk per gesture, and never mid-pinch; `want` can turn a touch
