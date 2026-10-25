@@ -5,10 +5,29 @@
    strings – enough that labels with room to spare were being dropped as
    collisions. Canvas measureText with the page's own font gets within a unit
    or two. Measured at 100px and scaled, so rounding at ~8px doesn't bite.
-   Memoised: the same dozen strings are re-measured on every render. */
+   Memoised: the same dozen strings are re-measured on every render.
+   Only once the face itself has loaded, though: a measure taken in the
+   fallback font was cached for good, and a cold first visit (the preloaded
+   faces still decoding when the first charts drew, 4 of 23 measures on a
+   fresh browser, 2026-10-26) kept the fallback's widths - its charts laid
+   out ~2px off a reload's for the life of the page. Such a measure is used
+   but not kept, and when the fonts settle the cache is dropped and every
+   chart redraws once (fontSubs), in the frame the text itself swaps face. */
 const _measCtx = typeof document !== "undefined" && document.createElement("canvas").getContext("2d");
 const _measCache = new Map();
 let _measFam = null;
+let _measEarly = false;
+const fontSubs = new Set();
+if (typeof document !== "undefined" && document.fonts && document.fonts.addEventListener) {
+  const settle = () => {
+    if (!_measEarly || document.fonts.status !== "loaded") return;
+    _measEarly = false;
+    _measCache.clear();
+    fontSubs.forEach((f) => f());
+  };
+  document.fonts.addEventListener("loadingdone", settle);
+  if (document.fonts.ready) document.fonts.ready.then(settle);
+}
 function textWidth(str, size, weight) {
   weight = weight || 600;
   const key = weight + "|" + size.toFixed(2) + "|" + str;
@@ -20,6 +39,10 @@ function textWidth(str, size, weight) {
       _measFam = getComputedStyle(document.body).getPropertyValue("--sans").trim() || "system-ui, sans-serif";
     _measCtx.font = weight + " 100px " + _measFam;
     w = (_measCtx.measureText(str).width / 100) * size;
+    if (document.fonts && document.fonts.check && !document.fonts.check(_measCtx.font)) {
+      _measEarly = true;
+      return w;
+    }
   } else {
     w = str.length * size * 0.55;   // headless fallback
   }
@@ -482,6 +505,13 @@ function TrendChart(props) {
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(widthSeed || VB.W);
   const [, setCopyTick] = useState(0);       // see the copy flag's observer below
+  // one redraw when the fonts settle, if any label was measured before (textWidth)
+  const [, setFontTick] = useState(0);
+  React.useEffect(() => {
+    const f = () => setFontTick((t) => t + 1);
+    fontSubs.add(f);
+    return () => { fontSubs.delete(f); };
+  }, []);
   /* measured before the chart is first painted (a LAYOUT effect): measured
      after it, a chart that mounts - a second chart under "Both", a tab
      opening - painted once at the viewBox's width, a third of its height on

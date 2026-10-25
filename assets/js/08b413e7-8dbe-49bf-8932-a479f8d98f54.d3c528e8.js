@@ -2,6 +2,18 @@ function _extends() { return _extends = Object.assign ? Object.assign.bind() : f
 const _measCtx = typeof document !== "undefined" && document.createElement("canvas").getContext("2d");
 const _measCache = new Map();
 let _measFam = null;
+let _measEarly = false;
+const fontSubs = new Set();
+if (typeof document !== "undefined" && document.fonts && document.fonts.addEventListener) {
+  const settle = () => {
+    if (!_measEarly || document.fonts.status !== "loaded") return;
+    _measEarly = false;
+    _measCache.clear();
+    fontSubs.forEach(f => f());
+  };
+  document.fonts.addEventListener("loadingdone", settle);
+  if (document.fonts.ready) document.fonts.ready.then(settle);
+}
 function textWidth(str, size, weight) {
   weight = weight || 600;
   const key = weight + "|" + size.toFixed(2) + "|" + str;
@@ -12,6 +24,10 @@ function textWidth(str, size, weight) {
     if (_measFam == null) _measFam = getComputedStyle(document.body).getPropertyValue("--sans").trim() || "system-ui, sans-serif";
     _measCtx.font = weight + " 100px " + _measFam;
     w = _measCtx.measureText(str).width / 100 * size;
+    if (document.fonts && document.fonts.check && !document.fonts.check(_measCtx.font)) {
+      _measEarly = true;
+      return w;
+    }
   } else {
     w = str.length * size * 0.55;
   }
@@ -325,6 +341,14 @@ function TrendChart(props) {
   const labOff = useRef(new Map());
   const [cw, setCw] = useState(widthSeed || VB.W);
   const [, setCopyTick] = useState(0);
+  const [, setFontTick] = useState(0);
+  React.useEffect(() => {
+    const f = () => setFontTick(t => t + 1);
+    fontSubs.add(f);
+    return () => {
+      fontSubs.delete(f);
+    };
+  }, []);
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;

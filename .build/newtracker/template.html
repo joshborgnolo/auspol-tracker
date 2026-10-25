@@ -426,6 +426,11 @@ body.dark { color-scheme: dark; }
   margin: 0;
 }
 /* /shell-copy */
+/* This page draws the lockup from its own preloaded subset first (build.mjs
+   FONTS: "Source Sans 3 Mark", the lockup's letters only, 3.2KB); any other
+   character falls through to the full face. Outside the shell-copy block on
+   purpose: the satellites keep the shell's own stack and fonts. */
+.wordmark { font-family: "Source Sans 3 Mark", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif; }
 /* visually-hidden: the wordmark's expansion for screen readers / document
    outline and the charts' live readout (see .chart-svg below). It is a
    clip, never display:none: reader engines and assistive tech ignore

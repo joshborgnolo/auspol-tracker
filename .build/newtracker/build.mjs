@@ -213,8 +213,9 @@ const stripJs = (code, name) => babelCached("plain", code, name, {});
    Root documents load it first in the late list; tab documents load it as
    a plain script straight after the dataset. The More menu's own tables
    (houseLean, flowDrift) stay in the main half: the menu can open first. */
-const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory"];
-const LATE_POLL_FIELDS = ["grp", "links", "chg", "yd", "url", "ldYd", "iss", "dir"];
+const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory",
+  "twoPPHistory", "informalHistory", "yardLine", "ldYardLine"];
+const LATE_POLL_FIELDS = ["grp", "links", "chg", "yd", "url", "ldYd", "iss", "dir", "pyd", "peff", "eff", "methodUrl"];
 const splitDataset = (code) => {
   const tables = {};
   let rows = [];
@@ -319,12 +320,21 @@ const FONTS = [
      Crimson Text, the page's one serif. The source subset stays in fonts/. */
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 sets the .wordmark lockup at the top of the first screen,
-     so it IS preloaded (2026-10-25). Left to be discovered when the app
+     so its letters ARE preloaded (2026-10-25; the subset below). Left to be discovered when the app
      rendered, it landed ~800ms in at 4x CPU and the system-sans fallback's
      taller line moved the wordmark and every line under it up 4-5px on
      every cold load - the page's only layout shift. The satellites' shell
      already preloaded it (site-shell.mjs fontPreloads). */
-  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
+  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
+  /* ...and what is preloaded is the lockup's own letters: Source Sans 3
+     subset to "auspol", "vicpol" and "tracker" (pyftsubset --text, every
+     layout feature and the weight axis kept, so the words draw exactly as
+     the full face draws them), 3.2KB in place of the full face's 28.8KB on
+     the first screen's path. Its unicode-range names only those letters, so
+     any other character the lockup ever sets falls through to the full face
+     above, which now loads only if something asks for it. */
+  { file: "ss3mark-wordmark.woff2",             family: "Source Sans 3 Mark", style: "normal", weight: "400 800", preload: true,
+    range: "U+0020, U+0061, U+0063, U+0065, U+0069, U+006B, U+006C, U+006F, U+0070, U+0072, U+0073, U+0074, U+0075, U+0076" },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
@@ -358,7 +368,7 @@ const faceCss = FONTS.map((f) => {
   font-weight: ${f.weight};
   font-display: swap;
   src: url("${href}") format('woff2');
-  unicode-range: ${LATIN};
+  unicode-range: ${f.range || LATIN};
 }`;
 }).filter(Boolean).join("\n");
 // a hashed name changes when the bytes do, so sweep the ones nothing points at
@@ -1850,9 +1860,17 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
    3G-like 6.61 -> 6.27s to the app on screen (390px, 4x CPU). */
 const withScriptPreloads = (doc) => {
   const srcs = [...doc.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
-  const at = doc.indexOf('<link rel="preload"');
-  if (at < 0 || !srcs.length) return doc;
-  return doc.slice(0, at) + srcs.map((u) => `<link rel="preload" href="${u}" as="script">\n  `).join("") + doc.slice(at);
+  /* after the font preloads, not before: listed first, the scripts took the
+     bandwidth and the faces landed ~220ms after the app on a cold fast-4G
+     visit - the text painted in the fallback, swapped, and the charts
+     re-measured (textWidth). The faces are ~80KB; ahead of the scripts they
+     are in by the first paint. */
+  const fontAt = doc.lastIndexOf('as="font"');
+  const at = fontAt < 0 ? doc.indexOf('<link rel="preload"') : doc.indexOf("\n", fontAt) + 1;
+  if (at <= 0 || !srcs.length) return doc;
+  const tags = srcs.map((u) => `<link rel="preload" href="${u}" as="script">`);
+  return fontAt < 0 ? doc.slice(0, at) + tags.map((t) => t + "\n  ").join("") + doc.slice(at)
+    : doc.slice(0, at) + tags.map((t) => "  " + t + "\n").join("") + doc.slice(at);
 };
 /* ---- 5a. every tab is also its own page --------------------------------
    The tabs are one document's views of the same data, but a URL each lets
@@ -1936,7 +1954,7 @@ const withScriptPreloads = (doc) => {
    documents above were cut from the full tag list - each renders its own
    tab first and needs its module from the start. Order is kept: the late
    list runs in the order the tags did. */
-const LATE_MODULES = ["data-late", "data-vic-late", "a11e1559-f455-44d5-8a31-6699de4ef310-late", "d1a1d215-370c-4ebc-878b-7eeea9ad8102-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
+const LATE_MODULES = ["data-late", "data-vic-late", "pv-agg", "a11e1559-f455-44d5-8a31-6699de4ef310-late", "d1a1d215-370c-4ebc-878b-7eeea9ad8102-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
 {
   const late = [];
   html = html.replace(/\n?[ \t]*<script src="((?:\.\.\/)*assets\/js\/([\w-]+)\.[0-9a-f]{8}\.js)"><\/script>/g,
@@ -1945,6 +1963,98 @@ const LATE_MODULES = ["data-late", "data-vic-late", "a11e1559-f455-44d5-8a31-669
   if (late.length !== want.length) throw new Error(`late modules: found ${late.length} of ${want.length}`);
   if (!html.includes("<script>window.AP_CYCLE_SRC=")) throw new Error("late modules: AP_CYCLE_SRC anchor missing");
   html = html.replace("<script>window.AP_CYCLE_SRC=", `<script>window.AP_LATE=${JSON.stringify(late)};<\/script>\n  <script>window.AP_CYCLE_SRC=`);
+}
+/* The root documents' CSS splits the same way. A rule whose every selector
+   names a class only late code ever writes cannot match anything before the
+   late modules run - every element carrying such a class is made by them -
+   so those rules (~half the CSS) ride in late-css.<hash>.js, first in the
+   late list, which appends them as a <style> at the end of <body>, ahead of
+   any late code rendering. A class counts as late only when its name occurs
+   in a late chunk and nowhere in the document's own markup or a critical
+   chunk; a class built at runtime from pieces is found nowhere and stays
+   critical. Tab documents keep every rule inline. Moved rules now come after
+   the kept ones, so the cascade was checked by computed style, element by
+   element, on every view reached from the root (1380/390, light/dark). */
+{
+  const markup = html.replace(/<style[^>]*>[\s\S]*?<\/style>/g, "");
+  const lateSrcs = JSON.parse(html.match(/window\.AP_LATE=(\[[^\]]*\])/)[1]).map((s) => s.replace(/^(\.\.\/)*/, ""));
+  const crit = [markup], late = [];
+  for (const m of html.matchAll(/<script src="((?:\.\.\/)*assets\/js\/[^"]+)"><\/script>/g))
+    crit.push(fs.readFileSync(path.join(ROOT, m[1].replace(/^(\.\.\/)*/, "")), "utf8"));
+  for (const s of lateSrcs) late.push(fs.readFileSync(path.join(ROOT, s), "utf8"));
+  const critText = crit.join("\n"), lateText = late.join("\n");
+  const kind = new Map();
+  const isLate = (c) => {
+    if (!kind.has(c)) {
+      const re = new RegExp(`(?<![\\w-])${c.replace(/-/g, "\\-")}(?![\\w-])`);
+      kind.set(c, !re.test(critText) && re.test(lateText));
+    }
+    return kind.get(c);
+  };
+  const rules = (css) => {
+    const out = [];
+    for (let i = 0; i < css.length;) {
+      const j = css.indexOf("{", i);
+      if (j < 0) { if (css.slice(i).trim()) out.push({ raw: css.slice(i) }); break; }
+      let depth = 1, k = j + 1;
+      while (depth && k < css.length) { if (css[k] === "{") depth++; else if (css[k] === "}") depth--; k++; }
+      out.push({ pre: css.slice(i, j).trim(), lead: css.slice(i, j), body: css.slice(j + 1, k - 1), whole: css.slice(i, k) });
+      i = k;
+    }
+    return out;
+  };
+  /* each top-level rule (an @media/@supports block split into its own kept
+     and moved halves) tagged keep or move, in source order */
+  const parts = (css) => {
+    const out = [];
+    for (const r of rules(css)) {
+      if (r.raw != null) { out.push({ move: false, text: r.raw }); continue; }
+      if (/^@(media|supports)\b/.test(r.pre)) {
+        /* the block's own text as it stood, around each run of kept or
+           moved rules inside it */
+        const runs = [];
+        for (const q of parts(r.body)) {
+          if (runs.length && runs[runs.length - 1].move === q.move) runs[runs.length - 1].text += q.text;
+          else runs.push({ move: q.move, text: q.text });
+        }
+        for (const q of runs) out.push({ move: q.move, text: `${r.lead}{${q.text}\n}` });
+        continue;
+      }
+      const sels = r.pre.startsWith("@") ? [] : r.pre.split(",");
+      const lateRule = sels.length && sels.every((sl) => (sl.match(/\.([\w-]+)/g) || []).some((c) => isLate(c.slice(1))));
+      out.push({ move: !!lateRule, text: r.whole });
+    }
+    return out;
+  };
+  /* The cascade keeps its order exactly: each run of moved rules leaves an
+     empty <style data-lc="n"> where it stood, and the late script fills
+     those in place. (One stylesheet appended at the end let a moved rule
+     overtake a kept one of equal weight after it - the classic design's
+     issue hints lost 4px of margin that way.) */
+  const moved = [];
+  html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close) => {
+    let out = open, inMove = false;
+    for (const q of parts(css)) {
+      if (q.move) {
+        if (!inMove) { out += close + `<style data-lc="${moved.length}"></style>` + open; moved.push(""); inMove = true; }
+        moved[moved.length - 1] += q.text;
+      } else { out += q.text; inMove = false; }
+    }
+    return (out + close).split(open + close).join("");
+  });
+  if (moved.length) {
+    const esc = JSON.stringify(moved).replace(/[\u007f-￿]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+    const src = emitJs(VIC ? "late-css-vic" : "late-css",
+      `(function () { var t = ${esc}; for (var i = 0; i < t.length; i++) { var s = document.querySelector('style[data-lc="' + i + '"]'); if (s) s.textContent = t[i]; } })();`)
+      .match(/src="([^"]+)"/)[1];
+    /* emitted after the hashed-file sweep above ran, so it sweeps its own
+       stale copies - this jurisdiction's base only */
+    const cssBase = VIC ? "late-css-vic" : "late-css";
+    for (const old of fs.readdirSync(JS_DIR))
+      if (new RegExp(`^${cssBase}\\.[0-9a-f]{8}\\.js$`).test(old) && !src.endsWith(old)) fs.unlinkSync(path.join(JS_DIR, old));
+    const rel = VIC ? "../" + src : src;
+    html = html.replace(/window\.AP_LATE=\[/, `window.AP_LATE=[${JSON.stringify(rel)},`);
+  }
 }
 html = withScriptPreloads(html);
 writeAtomic(OUT, html);
