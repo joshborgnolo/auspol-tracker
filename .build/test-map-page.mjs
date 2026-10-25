@@ -13,6 +13,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { SHELL_PAGES, shellHeader, shellCss, shellJs } from "./site-shell.mjs";
 
@@ -57,6 +58,11 @@ for (const src of ["/map/vendor/d3-7.9.0.min.js", "/map/vendor/topojson-client-3
   assert.ok(page.includes(src), "the page loads " + src);
   assert.ok(fs.existsSync(path.join(ROOT, src.slice(1))), src + " exists");
 }
+// the asset URLs carry assemble.mjs's content hash, so a browser cache
+// holding an old map.js can't survive a release (phone stuck 2026-10-25)
+const hs = (f) => crypto.createHash("sha1").update(fs.readFileSync(path.join(ROOT, "map", f))).digest("hex").slice(0, 8);
+assert.ok(page.includes(`src="/map/map.js?v=${hs("map.js")}"`), "the page's map.js URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
+assert.ok(page.includes(`href="/map/map.css?v=${hs("map.css")}"`), "the page's map.css URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
 const part = (f) => R(".build/map/app/" + f);
 const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 assert.equal(R("map/map.js"), `/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, "map/map.js is current (node .build/map/assemble.mjs)");

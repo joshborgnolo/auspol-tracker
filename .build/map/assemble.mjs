@@ -16,6 +16,7 @@
    The data in map/data comes from build_map_data.py and geo_build.mjs. */
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -32,3 +33,16 @@ const write = (rel, body) => {
 };
 write("map/map.js", js);
 write("map/map.css", css);
+
+/* the page's asset URLs take a short content hash (?v=): Pages serves the
+   unqueried files with only a short TTL, but a phone's heuristic cache can
+   hold them long past a release (bit on 2026-10-25 – new build invisible on
+   a phone that had the old map.js pinned). */
+{
+  const hs = { "map.js": crypto.createHash("sha1").update(js).digest("hex").slice(0, 8), "map.css": crypto.createHash("sha1").update(css).digest("hex").slice(0, 8) };
+  const ip = path.join(ROOT, "map", "index.html");
+  const html = fs.readFileSync(ip, "utf8");
+  const stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
+  if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("map/index.html stamped", hs["map.js"], hs["map.css"]); }
+  else console.log("map/index.html stamps current");
+}
