@@ -2124,10 +2124,12 @@ let snapshotTailArmed = false;
    unmounted the whole createRoot root, leaving the reader a blank page
    over a faded static summary - and the data pipeline (a wave landing at
    06:00 via CI) is exactly when nobody is watching. Two rings:
-   ViewBoundary wraps the tab panel, so a bad view is a notice in that
-   tab while the strip and the other tabs keep working; the keyed
-   .view-enter wrapper above it remounts it per tab, so switching views
-   clears the error. RootBoundary wraps App at the mount call; its catch
+   ViewBoundary wraps each tab panel, so a bad view is a notice in that
+   tab while the strip and the other tabs keep working; a switch used to
+   clear the error by remount, which the kept-mounted panels took away -
+   so the boundary itself clears the error when its tab is left (`active`
+   below), and coming back gives the view a fresh try as before.
+   RootBoundary wraps App at the mount call; its catch
    undoes precisely what mount did - body.js off, the aria-hidden and
    inert put back - so the static summary steps back up as the page,
    the same degradation every no-JS reader already gets. */
@@ -2135,6 +2137,9 @@ class ViewBoundary extends React.Component {
   constructor(props) { super(props); this.state = { err: null }; }
   static getDerivedStateFromError(err) { return { err }; }
   componentDidCatch(err) { console.error("view render failed:", err); }
+  componentDidUpdate(prev) {
+    if (prev.active && !this.props.active && this.state.err) this.setState({ err: null });
+  }
   render() {
     if (this.state.err) {
       return (
@@ -2301,6 +2306,20 @@ function App() {
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
   const [focusTerm, setFocusTerm] = useState(null);   // the glossary entry a link sent us to
   const [termPop, setTermPop] = useState(null);       // a definition open over the page
+  /* Tabs a reader has visited stay MOUNTED (hidden), so walking back never
+     rebuilds a view from scratch: remounting the now tab cost ~700ms of
+     script + layout + style on a 4x-throttled phone (CDP-attributed
+     2026-10-25), and a Now -> Cycles -> Now stroll paid it every time.
+     First activation still pays the mount - moved from "every switch" to
+     "once per tab per page load". `entered` marks only the panel a switch
+     just arrived on, for the view-enter animation; it is cleared after the
+     animation's window so a later render never replays it. The ref is the
+     current tab for the once-bound URL listener below (its closure would
+     otherwise hold the first render's tab forever). */
+  const [mounted, setMounted] = useState(() => [tab]);
+  const [entered, setEntered] = useState(null);
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
   React.useEffect(() => {
     /* The address bar names the view. A legacy #tab hash is rewritten to its
        path on mount (the search string carried: ?design=old and the archive's
@@ -2312,7 +2331,11 @@ function App() {
       const t = TAB_IDS.includes(TAB_HASH[h]) ? TAB_HASH[h] : null;
       urlWrite("replaceState", (t ? tabToPath(t) : window.location.pathname) + window.location.search);
     }
-    const onUrl = () => setTab(readLocation());
+    const onUrl = () => {
+      const t = readLocation();
+      if (t !== tabRef.current) setEntered(t);
+      setTab(t);
+    };
     window.addEventListener("popstate", onUrl);
     window.addEventListener("hashchange", onUrl);
     return () => {
@@ -2320,6 +2343,15 @@ function App() {
       window.removeEventListener("hashchange", onUrl);
     };
   }, []);
+  /* A visit mounts the tab, a departure never unmounts it. */
+  React.useEffect(() => {
+    setMounted((m) => (m.indexOf(tab) === -1 ? m.concat([tab]) : m));
+  }, [tab]);
+  React.useEffect(() => {
+    if (entered == null) return undefined;
+    const tm = setTimeout(() => setEntered(null), 450);
+    return () => clearTimeout(tm);
+  }, [entered]);
   /* Whatever set the tab, the path ends up naming it. This is a GUARD, not
      the writer: the entry points pushState, and the archive's query-string
      writers then own the parameters on top of it. Off every tab path (a
@@ -2337,6 +2369,7 @@ function App() {
      search string so a ?design= or a filter survives the crossing; neither
      touches history off a tab path. */
   const navTab = (id, push) => {
+    if (id !== tabRef.current) setEntered(id);
     setTab(id);
     if (push && window.location.pathname.startsWith(TAB_BASE) && pathToTab() !== id)
       urlWrite("pushState", tabToPath(id) + window.location.search);
@@ -2707,14 +2740,10 @@ function App() {
      until the app paints (html.boot), so the old frame showed every heading in
      place and the new one showed them 7px low, sliding back up. The panel the
      page opens on gets no entrance; the first switch away retires the
-     exemption, so coming back to that tab rises in like any other. Keyed by
-     panel rather than a flag, so a re-render never adds the class to a
-     standing panel (which would start the animation on it). */
-  const panelKey = tab + (rd ? "-rd" : "");
-  const loadPanel = useRef(panelKey);
-  useEffect(() => {
-    if (panelKey !== loadPanel.current) loadPanel.current = null;
-  }, [panelKey]);
+     exemption, so coming back to that tab rises in like any other. The mark
+     is now `entered` — set with the tab when a walk points elsewhere, cleared
+     450ms on, above — so a re-render never replays the animation on a
+     standing panel either. */
   React.useEffect(() => {
     // nothing to change – a re-render that re-runs this effect must not animate
     if (!Object.keys(want).some((c) => document.body.classList.contains(c) !== want[c])) return;
@@ -2824,11 +2853,15 @@ function App() {
       <Header isDark={isDark} onToggleTheme={cycleTheme} rd={rd} key={"head-" + rd} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} key={"tabs-" + rd} />
       <main className="content" id="main-content" tabIndex={-1}>
-        {/* The panel the tab strip points at. There was no role="tabpanel" on
-            the page at all, so aria-controls had no target and a screen reader
-            that moved to the "tab panel" landed nowhere. tabIndex=0 makes the
-            panel itself focusable, which is what the pattern asks for when the
-            panel's first child isn't.
+        {/* The panels the tab strip points at. Only the current tab's is
+            ever shown — `hidden` parks the rest in the DOM mounted (the
+            switch machinery above), and the template's .content[hidden]
+            rule supplies the display:none the author-level .content
+            display would otherwise override. There was no role="tabpanel"
+            on the page at all, so aria-controls had no target and a screen
+            reader that moved to the "tab panel" landed nowhere. tabIndex=0
+            makes the panel itself focusable, which is what the pattern
+            asks for when the panel's first child isn't.
             But tabIndex=0 also makes the panel the nearest focusable ancestor
             of every inert pointer click inside it: click a heading or blank
             space in a view and Chrome focuses the whole panel, and every
@@ -2841,44 +2874,47 @@ function App() {
             selected no text blurs back to BODY (keyboard-arrival carries no
             poke, so the ARIA panel-in-tab-order keeps focus through clicks;
             a drag's catch keeps its park while the selection lives — keystrokes
-            are vetoed under a live selection anyway). */}
-        <div className={panelKey === loadPanel.current ? "content" : "view-enter content"} key={panelKey}
-             role="tabpanel" id={"panel-" + tab}
-             /* a menu page has no tab in the bar to be labelled by */
-             {...(TAB_MENU[tab] ? { "aria-label": TAB_MENU[tab].label } : { "aria-labelledby": "tab-" + tab })}
-             tabIndex={0}
-             onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
-             onPointerUpCapture={(e) => {
-               viewPanelPokedAt = Date.now();
-               const el = e.currentTarget;
-               setTimeout(() => {
-                 if (viewPanelFocusIsPointer && document.activeElement === el && window.getSelection().isCollapsed) el.blur();
-               }, 0);
-             }}
-             onFocus={(e) => {
-               viewPanelFocusIsPointer = e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400;
-             }}
-             onBlur={(e) => {
-               if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
-             }}>
-          <ViewBoundary>
-            {tab === "now" && (
-              <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
-                            tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}
-                            tppBasis={tppBasis} setTppBasis={setTppBasis} />
-            )}
-            {tab === "cycles" && <PastCyclesView />}
-            {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
-              backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
-              tppBasis={tppBasis} setTppBasis={setTppBasis} />}
-            {termPop && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
-              onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
-            {TAB_MENU[tab] && <MenuPageView id={tab} tppBasis={tppBasis} />}
-            {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
-              onBack={focusTerm ? backFromTerm : null}
-              backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
-          </ViewBoundary>
-        </div>
+            are vetoed under a live selection anyway). A poke on a hidden
+            panel is impossible, so the handling is identical per panel. */}
+        {mounted.map((id) => (
+          <div className={entered === id ? "view-enter content" : "content"} key={id}
+               role="tabpanel" id={"panel-" + id} hidden={id !== tab}
+               /* a menu page has no tab in the bar to be labelled by */
+               {...(TAB_MENU[id] ? { "aria-label": TAB_MENU[id].label } : { "aria-labelledby": "tab-" + id })}
+               tabIndex={0}
+               onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
+               onPointerUpCapture={(e) => {
+                 viewPanelPokedAt = Date.now();
+                 const el = e.currentTarget;
+                 setTimeout(() => {
+                   if (viewPanelFocusIsPointer && document.activeElement === el && window.getSelection().isCollapsed) el.blur();
+                 }, 0);
+               }}
+               onFocus={(e) => {
+                 viewPanelFocusIsPointer = e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400;
+               }}
+               onBlur={(e) => {
+                 if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
+               }}>
+            <ViewBoundary active={id === tab}>
+              {id === "now" && (
+                <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
+                              tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}
+                              tppBasis={tppBasis} setTppBasis={setTppBasis} />
+              )}
+              {id === "cycles" && <PastCyclesView />}
+              {id === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
+                backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
+                tppBasis={tppBasis} setTppBasis={setTppBasis} />}
+              {termPop && id === tab && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
+                onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
+              {TAB_MENU[id] && <MenuPageView id={id} tppBasis={tppBasis} />}
+              {id === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
+                onBack={focusTerm ? backFromTerm : null}
+                backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
+            </ViewBoundary>
+          </div>
+        ))}
         <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} key={"foot-" + rd} />
       </main>
 

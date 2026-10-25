@@ -1051,6 +1051,10 @@ a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::a
 
 /* ---------- layout ---------- */
 .content { display: flex; flex-direction: column; gap: 22px; }
+/* Visited tab panels stay mounted but `hidden`; the UA [hidden] rule loses
+   to the author display above, so the hide is restated one specificity
+   point up. Without it every visited tab renders at once. */
+.content[hidden] { display: none; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 
 /* ---------- leadership pair: expand one side to full width ----------

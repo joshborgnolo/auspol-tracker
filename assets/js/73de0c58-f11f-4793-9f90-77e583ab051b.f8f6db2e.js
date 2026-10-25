@@ -1792,6 +1792,11 @@ class ViewBoundary extends React.Component {
   componentDidCatch(err) {
     console.error("view render failed:", err);
   }
+  componentDidUpdate(prev) {
+    if (prev.active && !this.props.active && this.state.err) this.setState({
+      err: null
+    });
+  }
   render() {
     if (this.state.err) {
       return React.createElement("div", {
@@ -1939,13 +1944,21 @@ function App() {
   const [focusPoll, setFocusPoll] = useState(null);
   const [focusTerm, setFocusTerm] = useState(null);
   const [termPop, setTermPop] = useState(null);
+  const [mounted, setMounted] = useState(() => [tab]);
+  const [entered, setEntered] = useState(null);
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
   React.useEffect(() => {
     const h = (window.location.hash || "").replace(/^#/, "");
     if (h && TAB_HASH[h]) {
       const t = TAB_IDS.includes(TAB_HASH[h]) ? TAB_HASH[h] : null;
       urlWrite("replaceState", (t ? tabToPath(t) : window.location.pathname) + window.location.search);
     }
-    const onUrl = () => setTab(readLocation());
+    const onUrl = () => {
+      const t = readLocation();
+      if (t !== tabRef.current) setEntered(t);
+      setTab(t);
+    };
     window.addEventListener("popstate", onUrl);
     window.addEventListener("hashchange", onUrl);
     return () => {
@@ -1954,10 +1967,19 @@ function App() {
     };
   }, []);
   React.useEffect(() => {
+    setMounted(m => m.indexOf(tab) === -1 ? m.concat([tab]) : m);
+  }, [tab]);
+  React.useEffect(() => {
+    if (entered == null) return undefined;
+    const tm = setTimeout(() => setEntered(null), 450);
+    return () => clearTimeout(tm);
+  }, [entered]);
+  React.useEffect(() => {
     if (!window.location.pathname.startsWith(TAB_BASE)) return;
     if (window.location.pathname !== tabToPath(tab)) urlWrite("replaceState", tabToPath(tab) + window.location.search);
   }, [tab]);
   const navTab = (id, push) => {
+    if (id !== tabRef.current) setEntered(id);
     setTab(id);
     if (push && window.location.pathname.startsWith(TAB_BASE) && pathToTab() !== id) urlWrite("pushState", tabToPath(id) + window.location.search);
   };
@@ -2292,11 +2314,6 @@ function App() {
     chromeSettled = true;
     applyChrome();
   }, []);
-  const panelKey = tab + (rd ? "-rd" : "");
-  const loadPanel = useRef(panelKey);
-  useEffect(() => {
-    if (panelKey !== loadPanel.current) loadPanel.current = null;
-  }, [panelKey]);
   React.useEffect(() => {
     if (!Object.keys(want).some(c => document.body.classList.contains(c) !== want[c])) return;
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2394,15 +2411,16 @@ function App() {
     className: "content",
     id: "main-content",
     tabIndex: -1
-  }, React.createElement("div", _extends({
-    className: panelKey === loadPanel.current ? "content" : "view-enter content",
-    key: panelKey,
+  }, mounted.map(id => React.createElement("div", _extends({
+    className: entered === id ? "view-enter content" : "content",
+    key: id,
     role: "tabpanel",
-    id: "panel-" + tab
-  }, TAB_MENU[tab] ? {
-    "aria-label": TAB_MENU[tab].label
+    id: "panel-" + id,
+    hidden: id !== tab
+  }, TAB_MENU[id] ? {
+    "aria-label": TAB_MENU[id].label
   } : {
-    "aria-labelledby": "tab-" + tab
+    "aria-labelledby": "tab-" + id
   }, {
     tabIndex: 0,
     onPointerDownCapture: () => {
@@ -2421,7 +2439,9 @@ function App() {
     onBlur: e => {
       if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
     }
-  }), React.createElement(ViewBoundary, null, tab === "now" && React.createElement(SnapshotView, {
+  }), React.createElement(ViewBoundary, {
+    active: id === tab
+  }, id === "now" && React.createElement(SnapshotView, {
     rangeId: rangeId,
     setRangeId: setRangeId,
     showScatter: t.showScatter,
@@ -2429,24 +2449,24 @@ function App() {
     setTppMatchup: setTppMatchup,
     tppBasis: tppBasis,
     setTppBasis: setTppBasis
-  }), tab === "cycles" && React.createElement(PastCyclesView, null), tab === "allpolls" && React.createElement(AllPollsView, {
+  }), id === "cycles" && React.createElement(PastCyclesView, null), id === "allpolls" && React.createElement(AllPollsView, {
     focus: focusPoll,
     onBack: focusPoll ? backFromPoll : null,
     backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
     tppBasis: tppBasis,
     setTppBasis: setTppBasis
-  }), termPop && React.createElement(TermPop, {
+  }), termPop && id === tab && React.createElement(TermPop, {
     id: termPop.id,
     onClose: () => setTermPop(null),
     onMore: () => window.AP.openTermPage(termPop.id, termPop.from)
-  }), TAB_MENU[tab] && React.createElement(MenuPageView, {
-    id: tab,
+  }), TAB_MENU[id] && React.createElement(MenuPageView, {
+    id: id,
     tppBasis: tppBasis
-  }), tab === "info" && React.createElement(InfoView, {
+  }), id === "info" && React.createElement(InfoView, {
     focus: focusTerm ? focusTerm.id : null,
     onBack: focusTerm ? backFromTerm : null,
     backLabel: focusTerm && focusTerm.back ? focusTerm.back.from : null
-  }))), React.createElement(MethodNote, {
+  })))), React.createElement(MethodNote, {
     onInfo: tab === "info" ? null : () => goTab("info"),
     key: "foot-" + rd
   })), keySheet && React.createElement("div", {

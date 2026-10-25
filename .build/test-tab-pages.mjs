@@ -137,7 +137,8 @@ assert.ok(hdr.includes('const TAB_HASH = { snapshot: "now", now: "now", cycles: 
 }
 /* the search string survives every URL write: ?design=old and the archive's
    filters live in it */
-assert.ok(hdr.includes("const onUrl = () => setTab(readLocation());")
+assert.ok(hdr.includes("const onUrl = () => {") && hdr.includes("const t = readLocation();")
+  && hdr.includes("setTab(t);")
   && hdr.includes('"popstate", onUrl') && hdr.includes('"hashchange", onUrl'),
   "back/forward and a hand-typed hash re-read the location");
 /* every history write rides urlWrite's try/catch: under file:// (a saved
