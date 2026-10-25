@@ -48,6 +48,18 @@
       zero-persons row (2019 O'Connor Other Mobile Team 2, a mobile
       team whose SA1 string maps onto unpopulated SA1s) carries null
       lang/age; the max-language exemplar per year.
+   9b. Income lanes (the 2026-10-26 add-on: GCP G32/G33 households by
+      weekly income band at SA1, family/non-family split re-weighted to
+      ADULTS at the data/income-dist.json factors): loinc = adult share
+      below the national 25th-percentile cut the store-level incomeCuts
+      record carries ($1,078.87/wk, identical on all four lanes — one
+      2021-census basis), hiinc = adult share in the $4,000+ band;
+      incMed (divisions only) is the band-interpolated median on the
+      HOUSEHOLD basis (ABS's published-median basis — the adults
+      histogram would read ~+$300). counts.demo.national carries
+      loinc/hiinc/incMed exact per year; division anchors pinned
+      (Hinkler is the lo-income/median floor, the hi-income ceiling is
+      Wentworth except 2025's Bradfield on the new boundaries).
    10. Divisions block (the division-level add-on: every unit's
       per-SA1 demo tallies re-pooled by division — one language/age
       reading per division, shares from its own pooled sum, never an
@@ -102,7 +114,7 @@ const YEARS = {
     maxs: { irsd: 1143.7, irsad: 1192.8, ier: 1209.4, ieo: 1209.6 },
     sentinelIds: "9999901",
     zeroVotes: ["Brand|65161"],
-    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, fborn: 0.278, uni: 0.2823, age0_14: 0.1805, age65ov: 0.1823 } },
+    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, fborn: 0.278, uni: 0.2823, age0_14: 0.1805, age65ov: 0.1823, loinc: 0.2537, hiinc: 0.1651, incMed: 1758 } },
     demoMaxLang: ["Lingiari", "Home Island", 0.9804],
     demoDivs: { langMax: ["Fowler", 0.7328], langMin: ["Lyne", 0.0296],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.0777],
@@ -110,6 +122,10 @@ const YEARS = {
                 uniMax: ["North Sydney", 0.5873], uniMin: ["Wakefield", 0.1088],
                 lingiari: { votes: 46505, persons: 24323385, lang: 0.5239,
                             fborn: 0.1211, uni: 0.1501 } },
+    demoInc: { loMax: ["Hinkler", 0.4221], loMin: ["Warringah", 0.1215],
+               hiMax: ["Wentworth", 0.4476], hiMin: ["Lyons", 0.0514],
+               medMin: ["Hinkler", 1133], medMax: ["Wentworth", 2943] },
+    incLingiari: { lo: 0.2671, hi: 0.1389, med: 1825 },
     demoEmpties: [],
     spots: [
       ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1081.7, 1101.5, 1131.4, 1107.9], cov: [0.9685, 0.9685, 0.9685, 0.9685] }],
@@ -136,7 +152,7 @@ const YEARS = {
     maxs: { irsd: 1144.4, irsad: 1193.9, ier: 1212.2, ieo: 1209.7 },
     sentinelIds: null,
     zeroVotes: [],
-    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, fborn: 0.2804, uni: 0.284, age0_14: 0.1825, age65ov: 0.1789 } },
+    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, fborn: 0.2804, uni: 0.284, age0_14: 0.1825, age65ov: 0.1789, loinc: 0.2502, hiinc: 0.1649, incMed: 1775 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.9425],
     demoDivs: { langMax: ["Fowler", 0.7327], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3099], oldMin: ["Lingiari", 0.0758],
@@ -144,6 +160,10 @@ const YEARS = {
                 uniMax: ["North Sydney", 0.5884], uniMin: ["Spence", 0.103],
                 lingiari: { votes: 51053, persons: 26655725, lang: 0.489,
                             fborn: 0.1357, uni: 0.1596 } },
+    demoInc: { loMax: ["Hinkler", 0.417], loMin: ["Canberra", 0.1168],
+               hiMax: ["Wentworth", 0.4483], hiMin: ["Spence", 0.0435],
+               medMin: ["Hinkler", 1147], medMax: ["Wentworth", 2944] },
+    incLingiari: { lo: 0.247, hi: 0.1441, med: 1910 },
     demoEmpties: ["O'Connor|65160"],
     spots: [
       ["Brisbane", "Brisbane City BRISBANE PPVC", { votes: 8690, sa1s: 358, seifa: [1068.3, 1099.7, 963.1, 1134.3], cov: [0.9995, 0.9995, 0.9995, 0.9995] }],
@@ -170,7 +190,7 @@ const YEARS = {
     maxs: { irsd: 1135.4, irsad: 1196.2, ier: 1181.6, ieo: 1207.8 },
     sentinelIds: null,
     zeroVotes: ["Tangney|65478"],
-    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, fborn: 0.2834, uni: 0.2861, age0_14: 0.1835, age65ov: 0.1761 } },
+    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, fborn: 0.2834, uni: 0.2861, age0_14: 0.1835, age65ov: 0.1761, loinc: 0.2474, hiinc: 0.1643, incMed: 1788 } },
     demoMaxLang: ["Lingiari", "Home Island PPVC", 0.9695],
     demoDivs: { langMax: ["Fowler", 0.7335], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.077],
@@ -178,6 +198,10 @@ const YEARS = {
                 uniMax: ["Melbourne", 0.5954], uniMin: ["Spence", 0.1062],
                 lingiari: { votes: 49428, persons: 25871026, lang: 0.4686,
                             fborn: 0.1441, uni: 0.1645 } },
+    demoInc: { loMax: ["Hinkler", 0.4141], loMin: ["Canberra", 0.117],
+               hiMax: ["Wentworth", 0.4462], hiMin: ["Spence", 0.0446],
+               medMin: ["Hinkler", 1156], medMax: ["Wentworth", 2926] },
+    incLingiari: { lo: 0.2363, hi: 0.1486, med: 1956 },
     demoEmpties: [],
     spots: [
       ["Melbourne", "Northcote MELBOURNE PPVC", { votes: 838, sa1s: 305, seifa: [1066, 1121.2, 951.6, 1167.1], cov: [0.9988, 0.9988, 0.9988, 0.9988] }],
@@ -204,7 +228,7 @@ const YEARS = {
     maxs: { irsd: 1135.1, irsad: 1196.1, ier: 1183.6, ieo: 1202.8 },
     sentinelIds: null,
     zeroVotes: ["Page|123920"],
-    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, fborn: 0.2869, uni: 0.2871, age0_14: 0.1855, age65ov: 0.1728 } },
+    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, fborn: 0.2869, uni: 0.2871, age0_14: 0.1855, age65ov: 0.1728, loinc: 0.2443, hiinc: 0.1625, incMed: 1801 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.942],
     demoDivs: { langMax: ["Fowler", 0.7295], langMin: ["Lyne", 0.0295],
                 oldMax: ["Lyne", 0.309], oldMin: ["Lingiari", 0.079],
@@ -212,6 +236,10 @@ const YEARS = {
                 uniMax: ["Melbourne", 0.5901], uniMin: ["Spence", 0.1095],
                 lingiari: { votes: 47812, persons: 25598620, lang: 0.4985,
                             fborn: 0.1243, uni: 0.1514 } },
+    demoInc: { loMax: ["Hinkler", 0.4127], loMin: ["Greenway", 0.1113],
+               hiMax: ["Bradfield", 0.4369], hiMin: ["Spence", 0.0449],
+               medMin: ["Hinkler", 1161], medMax: ["Bradfield", 2964] },
+    incLingiari: { lo: 0.2653, hi: 0.1414, med: 1834 },
     demoEmpties: [],
     spots: [
       ["Curtin", "Perth CURTIN PPVC", { votes: 2509, sa1s: 340, seifa: [1084.3, 1118.2, 1049.4, 1142.6], cov: [0.9936, 0.9936, 0.9936, 0.9936] }],
@@ -350,6 +378,12 @@ for (const [ys, w] of Object.entries(YEARS)) {
   eq(d.counts.demo, w.demo, tag("counts.demo"));
   ok(d.demoBasis && d.demoBasis.includes("2021 Census GCP G01"), tag("demoBasis"));
   ok(d._about.includes("GCP G01"), tag("_about names GCP G01"));
+  eq(d.incomeCuts, {
+    loQuantile: 0.25, loCutWeekly: 1078.87, hiEdgeWeekly: 4000,
+    hiNationalShare: 0.156571, dollarsYear: 2021,
+    adultsWeights: "data/income-dist.json",
+    medianBasis: "households (shares are per-adult)",
+  }, tag("incomeCuts"));
   const BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
                  "55_64", "65_74", "75_84", "85ov"];
   let demoRowCount = 0;
@@ -372,6 +406,8 @@ for (const [ys, w] of Object.entries(YEARS)) {
       eq(dm.fborn, null, tag(`demo empty fborn null ${k}`));
       eq(dm.uni, null, tag(`demo empty uni null ${k}`));
       eq(dm.age, null, tag(`demo empty age null ${k}`));
+      eq(dm.loinc, null, tag(`demo empty loinc null ${k}`));
+      eq(dm.hiinc, null, tag(`demo empty hiinc null ${k}`));
       demoEmpties.push(k);
       continue;
     }
@@ -381,6 +417,13 @@ for (const [ys, w] of Object.entries(YEARS)) {
     eq(Object.keys(dm.age), BANDS, tag(`demo age bands ${k}`));
     const sum = BANDS.reduce((s, x) => s + dm.age[x], 0);
     ok(Math.abs(sum - 1) < 0.005, tag(`demo age sum ${k} ${sum}`));
+    // income: adult shares; envelopes pinned looser than the measured
+    // extrema (lo 0.769 Special Hospital Team 2022; hi 0.645-0.65
+    // Longueville every year)
+    ok(dm.loinc != null && dm.loinc >= 0 && dm.loinc <= 0.8,
+       tag(`demo loinc range ${k} ${dm.loinc}`));
+    ok(dm.hiinc != null && dm.hiinc >= 0 && dm.hiinc <= 0.7,
+       tag(`demo hiinc range ${k} ${dm.hiinc}`));
   }
   eq(demoEmpties, w.demoEmpties, tag("demo zero-persons rows"));
   let coDemoRows = 0;
@@ -393,6 +436,8 @@ for (const [ys, w] of Object.entries(YEARS)) {
       eq(Object.keys(c.demo.age), BANDS, tag(`cohort demo bands ${c.div} ${c.cohort}`));
       const s = BANDS.reduce((a, x) => a + c.demo.age[x], 0);
       ok(Math.abs(s - 1) < 0.005, tag(`cohort demo age sum ${c.div} ${c.cohort}`));
+      ok(c.demo.loinc != null, tag(`cohort demo loinc ${c.div} ${c.cohort}`));
+      ok(c.demo.hiinc != null, tag(`cohort demo hiinc ${c.div} ${c.cohort}`));
     }
   }
   // counts.demo.rows spans BOTH the booth rows and the cohort rows
@@ -417,8 +462,13 @@ for (const [ys, w] of Object.entries(YEARS)) {
     let plang = 0;
     let p0 = 0;
     let p65 = 0;
+    let plo = 0;
+    let phi = 0;
     const langSorted = [];
     const oldSorted = [];
+    const loSorted = [];
+    const hiSorted = [];
+    const medSorted = [];
     for (const r of d.divisions) {
       eq(STATE_ORDER.includes(r.state), true, tag(`division state ${r.div}`));
       ok(r.votes >= 1, tag(`division votes ${r.div}`));
@@ -431,6 +481,12 @@ for (const [ys, w] of Object.entries(YEARS)) {
       eq(Object.keys(r.age), BANDS, tag(`division age bands ${r.div}`));
       const s = BANDS.reduce((a, x) => a + r.age[x], 0);
       ok(Math.abs(s - 1) < 0.005, tag(`division age sum ${r.div} ${s}`));
+      ok(r.loinc != null && r.loinc >= 0 && r.loinc <= 0.6,
+         tag(`division loinc range ${r.div} ${r.loinc}`));
+      ok(r.hiinc != null && r.hiinc >= 0 && r.hiinc <= 0.6,
+         tag(`division hiinc range ${r.div} ${r.hiinc}`));
+      ok(typeof r.incMed === "number" && r.incMed >= 1000 &&
+         r.incMed <= 3200, tag(`division incMed range ${r.div} ${r.incMed}`));
       const k = [STATE_ORDER.indexOf(r.state), r.div];
       if (dprev) {
         ok(k[0] > dprev[0] || (k[0] === dprev[0] && k[1] > dprev[1]),
@@ -442,8 +498,13 @@ for (const [ys, w] of Object.entries(YEARS)) {
       plang += r.persons * r.langOther;
       p0 += r.persons * a014(r);
       p65 += r.persons * a65(r);
+      plo += r.persons * r.loinc;
+      phi += r.persons * r.hiinc;
       langSorted.push([r.langOther, r.div]);
       oldSorted.push([Number(a65(r).toFixed(4)), r.div]);
+      loSorted.push([r.loinc, r.div]);
+      hiSorted.push([r.hiinc, r.div]);
+      medSorted.push([r.incMed, r.div]);
     }
     eq(dvotes + d.counts.votesSentinel + (d.counts.votesDroppedXwalk || 0),
        w.votesTotal, tag("division votes + sentinel == votesTotal"));
@@ -453,6 +514,13 @@ for (const [ys, w] of Object.entries(YEARS)) {
        tag("divisions recompose national age0_14"));
     ok(Math.abs(p65 / ppers - w.demo.national.age65ov) < 0.0005,
        tag("divisions recompose national age65ov"));
+    // income recompositions are genuinely person-weighted here while the
+    // lanes are adult-weighted (income-dist factors vary by division) —
+    // measured gaps: lo <= 0.0007, hi <= 0.0023 across the four years
+    ok(Math.abs(plo / ppers - w.demo.national.loinc) < 0.001,
+       tag("divisions recompose national loinc (person-weighted)"));
+    ok(Math.abs(phi / ppers - w.demo.national.hiinc) < 0.003,
+       tag("divisions recompose national hiinc (person-weighted)"));
     langSorted.sort((a, b) => b[0] - a[0]);
     oldSorted.sort((a, b) => b[0] - a[0]);
     eq([langSorted[0][1], langSorted[0][0]], w.demoDivs.langMax,
@@ -477,6 +545,26 @@ for (const [ys, w] of Object.entries(YEARS)) {
        tag("division uni max"));
     eq([byUni[byUni.length - 1][1], byUni[byUni.length - 1][0]],
        w.demoDivs.uniMin, tag("division uni min"));
+    // income anchors: the two-share envelope faces plus the
+    // household-basis median extremes
+    loSorted.sort((a, b) => b[0] - a[0]);
+    hiSorted.sort((a, b) => b[0] - a[0]);
+    medSorted.sort((a, b) => b[0] - a[0]);
+    eq([loSorted[0][1], loSorted[0][0]], w.demoInc.loMax,
+       tag("division loinc max"));
+    eq([loSorted[loSorted.length - 1][1],
+        loSorted[loSorted.length - 1][0]], w.demoInc.loMin,
+       tag("division loinc min"));
+    eq([hiSorted[0][1], hiSorted[0][0]], w.demoInc.hiMax,
+       tag("division hiinc max"));
+    eq([hiSorted[hiSorted.length - 1][1],
+        hiSorted[hiSorted.length - 1][0]], w.demoInc.hiMin,
+       tag("division hiinc min"));
+    eq([medSorted[0][1], medSorted[0][0]], w.demoInc.medMax,
+       tag("division incMed max"));
+    eq([medSorted[medSorted.length - 1][1],
+        medSorted[medSorted.length - 1][0]], w.demoInc.medMin,
+       tag("division incMed min"));
     const lg = d.divisions.find((r) => r.div === "Lingiari");
     ok(lg, tag("Lingiari row"));
     if (lg) {
@@ -487,6 +575,9 @@ for (const [ys, w] of Object.entries(YEARS)) {
       eq(lg.uni, w.demoDivs.lingiari.uni, tag("Lingiari uni"));
       eq(Number(a65(lg).toFixed(4)), w.demoDivs.oldMin[1],
          tag("Lingiari age65"));
+      eq(lg.loinc, w.incLingiari.lo, tag("Lingiari loinc"));
+      eq(lg.hiinc, w.incLingiari.hi, tag("Lingiari hiinc"));
+      eq(lg.incMed, w.incLingiari.med, tag("Lingiari incMed"));
     }
   }
 

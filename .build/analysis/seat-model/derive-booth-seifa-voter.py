@@ -46,7 +46,11 @@ re-fetch manifest on missing):
   demo: cache/gcp-sa1-2021.zip — ABS datapacks page
         download/2021_GCP_SA1_for_AUS_short-header.zip (G01 SA1 table:
         age bands + language spoken at home; G09: country of birth;
-        G49B: highest non-school qualification — every lane's demo basis;
+        G49B: highest non-school qualification; G33 households by weekly
+        income × family/non-family + G32 family mix by income band —
+        the low-/high-household-income lanes, adults-weighted by the
+        factors data/income-dist.json carries for the Who-votes income
+        facet; every lane's demo basis;
         2016 lane's votes also walk .matilda/seifa-irsad-abs/dl/
         CG_SA1_2011_SA1_2016.xlsx — ABS ASGS Ed2 correspondences page)
 Plus committed/held: data/booth-seifa-YYYY.json (booth universe + venue
@@ -65,6 +69,7 @@ import gzip
 import importlib.util
 import io
 import json
+import re
 import statistics
 import struct
 import sys
@@ -238,23 +243,57 @@ GCP_MEMBER_G09H = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G09H_AUST_SA1.csv")
 GCP_MEMBER_G49B = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G49B_AUST_SA1.csv")
+GCP_MEMBER_G32 = ("2021 Census GCP Statistical Area 1 for AUS/"
+                  "2021Census_G32_AUST_SA1.csv")
+GCP_MEMBER_G33 = ("2021 Census GCP Statistical Area 1 for AUS/"
+                  "2021Census_G33_AUST_SA1.csv")
 GCP_ROWS = 61844
+# household weekly income bands ($2021), G33/G32 grid: (lo, hi) inclusive;
+# the top band is open. Negative/Nil folds into the first band. Partial-
+# stated and all-not-stated households are EXCLUDED from every lane basis
+# (the facet does the same).
+INC_BANDS = [(1, 149), (150, 299), (300, 399), (400, 499), (500, 649),
+             (650, 799), (800, 999), (1000, 1249), (1250, 1499),
+             (1500, 1749), (1750, 1999), (2000, 2499), (2500, 2999),
+             (3000, 3499), (3500, 3999), (4000, None)]
+INC_LO_Q = 0.25  # low lane: adults below the national 25th percentile
+# hi lane: share of adults in the grid's top open band. It lands on the
+# same national share as the Who-votes facet's top-15% reading to within
+# a hair (top-15% cut interpolates to ~$4,134 inside the 4000+ band, so
+# the two measures differ only by one constant scale factor everywhere)
+# — the snapped edge keeps every figure a count the census printed, no
+# tail model; the label carries the real national share
+INC_HI_GUARD = (0.13, 0.19)  # national adults share of the top band
+INC_LO_GUARD = (900, 1250)  # plausible $ for the 2021 national 25% cut
 XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H and G49B @ SA1 (Ed3); "
+DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H, G49B and G32/G33 @ SA1 "
+              "(Ed3); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
-_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H "
-              "and G49B SA1 tables (G01: age-band structure; language "
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H, "
+              "G49B and G32/G33 SA1 tables (G01: age-band structure; language "
               "spoken at home English-only vs other. G09: country of "
               "birth — the overseas-born share excludes "
               "country-of-birth-not-stated. G49B: highest non-school "
               "qualification — the bachelor-and-above share is of the "
               "G01 aged-15-and-over population, excluding "
-              "level-of-education-not-stated) by the same per-SA1 vote "
+              "level-of-education-not-stated. G33 households by weekly "
+              "income are re-weighted to ADULTS at the data/income-dist.json "
+              "factors — each band's family households at that band's G32 "
+              "family mix in the SA1 (national mix as fallback), non-family "
+              "households at the national mean; loinc is the adult share "
+              "below the national 25th-percentile weekly household-income "
+              "cut the store-level incomeCuts record carries (the national "
+              "histogram's cut band split linearly), hiinc the adult share "
+              "in the $4,000-and-top band, incMed the band-interpolated "
+              "median weekly household income in 2021 dollars on the "
+              "HOUSEHOLD basis (ABS's own published-median basis — the "
+              "adults-weighted histogram would read ~$300 higher, skewed "
+              "by couples) — all by the same per-SA1 vote "
               "weights — age shares "
               "renormalise over the 11 bands, which exclude "
               "age-not-stated; persons are a "
@@ -277,6 +316,170 @@ DEMO_ABOUT = {
 
 _GCP = None
 _XW11 = None
+
+
+# ------------------------------------------------- income lanes (G32/G33)
+def income_factors():
+    """Adults-per-household factors from data/income-dist.json — the
+    Who-votes income facet's national histogram store, whose G27/G32/G35-
+    derived adultsPer factors are the GCP's canon in this repo (the GCP
+    carries no persons-by-household-income table). Grids must match
+    INC_BANDS or the facet file has moved on: fail loud, never reuse a
+    stale grid."""
+    path = ROOT / "data/income-dist.json"
+    if not path.exists():
+        fail("missing data/income-dist.json (run node .build/extract-income-dist.mjs)")
+    ax = json.loads(path.read_text(encoding="utf-8"))["axes"]["household"]
+    ap = ax["adultsPer"]
+    for (lo, hi), b in zip(INC_BANDS, ax["bands"]):
+        if b["lo"] != (lo if lo > 1 else 0) or b["hi"] != hi:
+            fail(f"income-dist grid drift at [{lo},{hi}] vs {b}")
+    return ((ap["coupleNoChildren"], ap["coupleWithChildren"],
+             ap["oneParent"], ap["otherFamily"]), ap["nonFamily"], path)
+
+
+def income_gcp(z, factors, nonfam):
+    """Per SA1: (incTot, loMass, hiMass, bands16 adults) — G33's per-band
+    Tot households re-weighted to adults: the band's FAMILY share from
+    G32's FI Tot (fam share over the SA1's G32 type mix at the income-
+    dist factors, national mix as fallback), the rest non-family at the
+    national mean. The household mass rides the Tot columns, never the
+    G33 fam/non columns: at SA1 scale ABS perturbs each cell
+    independently and G33's own fam/non columns sum ~3% under their
+    Tot columns nationally, while the Tot columns agree with the CED
+    pack that income-dist.json's national histograms come from (within
+    ~1%). loMass splits the cut band linearly at the national
+    25th-percentile dollar. Per-SA1 value: (adult total, adult loMass,
+    adult hi-band mass, 16 adult band masses, 16 raw household masses) —
+    the median lane is read off the household histogram, so incMed sits
+    on ABS's published-median basis while loinc/hiinc sit on the
+    adults (poll-frame) basis."""
+    ad = factors
+    def cols_of(member):
+        if member not in z.namelist():
+            fail(f"GCP zip lacks {member}")
+        with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+            rdr = csv.DictReader(fh)
+            head = rdr.fieldnames or []
+            rows = {}
+            for row in rdr:
+                c = row["SA1_CODE_2021"]
+                if c in rows:
+                    fail(f"{member} dup code {c}")
+                rows[c] = row
+            if len(rows) != GCP_ROWS:
+                fail(f"{member} rows {len(rows)} != pin {GCP_ROWS}")
+        return head, rows
+
+    h33, g33 = cols_of(GCP_MEMBER_G33)
+    h32, g32 = cols_of(GCP_MEMBER_G32)
+    neg33 = "Negative_Nil_income_Tot"
+    neg32tot = "Neg_Nil_inc_Tot"
+    neg32 = ("Neg_Nil_inc_cpl_fam_no_child", "Neg_Nil_inc_cpl_fam_wth_chld",
+             "Neg_Nil_inc_One_parent_fam", "Neg_Nil_inc_Other_fam")
+    if neg33 not in h33:
+        fail("GCP G33 lacks the Negative_Nil Tot column")
+    plan = []
+    for i, (lo, hi) in enumerate(INC_BANDS):
+        hi_tot = f"HI_{lo}_{hi if hi is not None else 'more'}_Tot"
+        fi_tot = f"FI_{lo}_{hi if hi is not None else 'more'}_Tot"
+        if hi_tot not in h33:
+            fail(f"GCP G33 lacks {hi_tot}")
+        if fi_tot not in h32:
+            fail(f"GCP G32 lacks {fi_tot}")
+        fstem = f"FI_{lo}_{hi if hi is not None else 'more'}"
+        types = []
+        for want in (r"cpl_fam_no_child$", r"cpl_fam_(with|wth)_ch",
+                     r"One_parent_fam$", r"Other_fam$"):
+            c = next((h for h in h32
+                      if h.startswith(f"{fstem}_") and re.search(want, h)),
+                     None)
+            if c is None:
+                fail(f"GCP G32 lacks {fstem} {want}")
+            types.append(c)
+        if i == 0 and (neg32tot not in h32 or
+                       any(c not in h32 for c in neg32)):
+            fail("GCP G32 lacks the Neg_Nil columns")
+        plan.append((hi_tot, fi_tot, types))
+    # national per-band family mix (the per-SA1 mix's fallback + the cut)
+    nat = {"b": [0.0] * 16, "fi": [0.0] * 16,
+           "mix": [[0] * 4 for _ in range(16)]}
+    for code in g33:
+        r33, r32 = g33[code], g32.get(code)
+        if r32 is None:
+            fail(f"G33 SA1 {code} missing from G32")
+        for i, (hc, fc, tc) in enumerate(plan):
+            ne = i == 0
+            nat["b"][i] += float(r33[hc]) + (float(r33[neg33]) if ne else 0.0)
+            nat["fi"][i] += float(r32[fc]) + (float(r32[neg32tot])
+                                              if ne else 0.0)
+            for k, t in enumerate(tc):
+                nat["mix"][i][k] += float(r32[t]) + (
+                    float(r32[neg32[k]]) if ne else 0.0)
+    nat_famper = []
+    nat_fams = []
+    for i in range(16):
+        mixn = sum(nat["mix"][i])
+        if mixn <= 0 or nat["b"][i] <= 0:
+            fail(f"national income mix empty in band {INC_BANDS[i]}")
+        nat_famper.append(sum(m * a for m, a in zip(nat["mix"][i], ad)) / mixn)
+        nat_fams.append(min(1.0, nat["fi"][i] / nat["b"][i]))
+    nat_adults = [nat["b"][i] * (nat_fams[i] * nat_famper[i]
+                                 + (1 - nat_fams[i]) * nonfam)
+                  for i in range(16)]
+    nat_tot = sum(nat_adults)
+    cum, cut25 = 0.0, None
+    for i, (lo, hi) in enumerate(INC_BANDS):
+        cum += nat_adults[i] / nat_tot
+        if cum >= INC_LO_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (INC_LO_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                fail("income 25% cut lands in the open top band")
+            cut25 = lo + f * (hi - lo + 1)
+            break
+    if not cut25 or not INC_LO_GUARD[0] <= cut25 <= INC_LO_GUARD[1]:
+        fail(f"income 25% cut {cut25} outside guard {INC_LO_GUARD}")
+    hi_share = nat_adults[-1] / nat_tot
+    if not INC_HI_GUARD[0] <= hi_share <= INC_HI_GUARD[1]:
+        fail(f"top-band national share {hi_share:.4f} outside {INC_HI_GUARD}")
+    print(f"income: national 25% cut ${cut25:.0f}/wk (adults, 2021 $); "
+          f"top band {hi_share:.4f} of adults")
+
+    out = {}
+    for code in g33:
+        r33, r32 = g33[code], g32[code]
+        bands = []      # adults per band (loinc/hiinc basis)
+        hh = []         # raw households per band (incMed basis)
+        for i, (hc, fc, tc) in enumerate(plan):
+            ne = i == 0
+            tot = float(r33[hc]) + (float(r33[neg33]) if ne else 0.0)
+            fi = float(r32[fc]) + (float(r32[neg32tot]) if ne else 0.0)
+            mix = [float(r32[t]) + (float(r32[neg32[k]]) if ne else 0.0)
+                   for k, t in enumerate(tc)]
+            mixn = sum(mix)
+            famper = (sum(m * a for m, a in zip(mix, ad)) / mixn
+                      if mixn > 0 else nat_famper[i])
+            # fam share of the band's households, clamped: an SA1 cell's
+            # independently perturbed G32 FI Tot can momentarily exceed
+            # the G33 HI Tot it shares its basis with
+            fams = min(1.0, fi / tot) if tot > 0 else nat_fams[i]
+            bands.append(tot * (fams * famper + (1 - fams) * nonfam))
+            hh.append(tot)
+        tsum = sum(bands)
+        lo_mass = 0.0
+        for i, (lo, hi) in enumerate(INC_BANDS):
+            if cut25 <= lo:
+                continue
+            if hi is not None and cut25 > hi:
+                lo_mass += bands[i]
+                continue
+            lo_mass += bands[i] * (cut25 - lo) / (hi - lo + 1)
+            break
+        out[code] = (tsum, lo_mass, bands[-1], tuple(bands), tuple(hh))
+    print(f"income: G32/G33 SA1, {len(out)} rows (factors from "
+          f"data/income-dist.json)")
+    return out, round(cut25, 2), round(hi_share, 6)
 
 
 def load_gcp21():
@@ -338,18 +541,24 @@ def load_gcp21():
             fail(f"GCP {tag} rows {m} != pin {GCP_ROWS}")
         extra[tag] = d
         print(f"GCP demo: {tag} SA1, {m} rows")
+    ad4, nonfam, inc_path = income_factors()
+    inc, inc_cut, inc_hishare = income_gcp(z, ad4, nonfam)
     out = {}
     for code, r in base.items():
         f09 = extra["G09F"].get(code)
         h09 = extra["G09H"].get(code)
         e49 = extra["G49B"].get(code)
-        if f09 is None or h09 is None or e49 is None:
-            fail(f"GCP G09/G49B SA1 set mismatch at {code}")
+        ir = inc.get(code)
+        if f09 is None or h09 is None or e49 is None or ir is None:
+            fail(f"GCP G09/G49B/G33 SA1 set mismatch at {code}")
         out[code] = r + (f09[0], h09[0], h09[1],
-                         e49[0] + e49[1] + e49[2], e49[3])
+                         e49[0] + e49[1] + e49[2], e49[3]) + ir
     print(f"GCP demo: G01 SA1, {n} rows")
-    _GCP = out
-    return out
+    _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
+                  "hiNationalShare": inc_hishare,
+                  "loQuantile": INC_LO_Q, "dollarsYear": 2021,
+                  "factors": str(inc_path.relative_to(ROOT))})
+    return _GCP
 
 
 def load_xwalk11():
@@ -454,7 +663,10 @@ def demo_units(units21, gcp):
     """Per unit: the GCP demo block + the div/national accumulators."""
     nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
            "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
-           "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0}
+           "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
+           "inct": 0.0, "incl": 0.0, "inch": 0.0,
+           "incb": [0.0] * len(INC_BANDS),
+           "incbh": [0.0] * len(INC_BANDS)}
     divs = {}
     out = {}
     for key, kv in units21.items():
@@ -464,7 +676,10 @@ def demo_units(units21, gcp):
             continue
         cov = pers = eng = oth = 0.0
         aust = totc = cobns = uni = eduns = pop15 = 0.0
+        inct = incl = inch = 0.0
         bands = [0.0] * len(DEMO_BANDS)
+        incb = [0.0] * len(INC_BANDS)
+        incbh = [0.0] * len(INC_BANDS)
         for code, w in kv.items():
             r = gcp.get(code)
             if r is None:
@@ -482,12 +697,22 @@ def demo_units(units21, gcp):
             uni += w * r[7]
             eduns += w * r[8]
             pop15 += w * (r[0] - ages[0] - ages[1])
+            inct += w * r[9]
+            incl += w * r[10]
+            inch += w * r[11]
+            for i in range(len(INC_BANDS)):
+                incb[i] += w * r[12][i]
+                incbh[i] += w * r[13][i]
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0, "oth": 0.0,
                                       "bands": [0.0] * len(DEMO_BANDS),
                                       "aust": 0.0, "totc": 0.0,
                                       "cobns": 0.0, "uni": 0.0,
-                                      "eduns": 0.0, "pop15": 0.0})
+                                      "eduns": 0.0, "pop15": 0.0,
+                                      "inct": 0.0, "incl": 0.0,
+                                      "inch": 0.0,
+                                      "incb": [0.0] * len(INC_BANDS),
+                                      "incbh": [0.0] * len(INC_BANDS)})
         dv["votes"] += tot
         dv["cov"] += cov
         dv["pers"] += pers
@@ -496,8 +721,12 @@ def demo_units(units21, gcp):
         for i in range(len(DEMO_BANDS)):
             dv["bands"][i] += bands[i]
         for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
-                     ("uni", uni), ("eduns", eduns), ("pop15", pop15)):
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("inct", inct), ("incl", incl), ("inch", inch)):
             dv[k] += v
+        for i in range(len(INC_BANDS)):
+            dv["incb"][i] += incb[i]
+            dv["incbh"][i] += incbh[i]
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -506,8 +735,12 @@ def demo_units(units21, gcp):
         for i in range(len(DEMO_BANDS)):
             nat["bands"][i] += bands[i]
         for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
-                     ("uni", uni), ("eduns", eduns), ("pop15", pop15)):
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("inct", inct), ("incl", incl), ("inch", inch)):
             nat[k] += v
+        for i in range(len(INC_BANDS)):
+            nat["incb"][i] += incb[i]
+            nat["incbh"][i] += incbh[i]
         # G01's 11 age bands exclude age-not-stated (no NS column; the
         # residual against Tot_P_P runs anywhere up to ~5% per SA1), so
         # the age shares renormalise on the band sum — the same
@@ -515,7 +748,9 @@ def demo_units(units21, gcp):
         # Foreign-born follows the census's ex-not-stated share too
         # (overseas-stated over country-stated); university is per the
         # G01 aged-15+ population less level-of-education-not-stated
-        # (G49B's own not-stated column).
+        # (G49B's own not-stated column). Income shares are of the
+        # adults-weighted total across G33's stated bands — partial-
+        # stated and all-not-stated households sit outside the basis.
         bsum = sum(bands)
         fb_den = totc - cobns
         uni_den = pop15 - eduns
@@ -531,8 +766,27 @@ def demo_units(units21, gcp):
             "age": ({b: round(bands[i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
+            "loinc": round(incl / inct, 4) if inct > 0 else None,
+            "hiinc": round(inch / inct, 4) if inct > 0 else None,
         }
     return out, nat, divs
+
+
+def band_median(masses):
+    """Interpolated median weekly income ($) of a pooled band histogram:
+    linear inside the median band; None when the basis is empty or the
+    median lands in the open top band (never plausible here)."""
+    tot = sum(masses)
+    if tot <= 0:
+        return None
+    cum = 0.0
+    for (lo, hi), m in zip(INC_BANDS, masses):
+        if cum + m >= tot / 2.0:
+            if hi is None or m <= 0:
+                return None
+            return round(lo + (tot / 2.0 - cum) / m * (hi - lo + 1))
+        cum += m
+    return None
 
 
 # ------------------------------------------------------------- votes files
@@ -740,7 +994,7 @@ def build(year):
         stats = score_units(units, cube)
     fpv = load_fpv(conf["fpv"])
 
-    gcp = load_gcp21()
+    gcp, gcp_meta = load_gcp21()
     if conf["mode"] in ("direct21", "xwalk21"):
         units21, demo_drop = units, 0
     else:
@@ -869,6 +1123,7 @@ def build(year):
     nat_eo = demo_nat["eng"] + demo_nat["oth"]
     nat_fbd = demo_nat["totc"] - demo_nat["cobns"]
     nat_unid = demo_nat["pop15"] - demo_nat["eduns"]
+    nat_inc = demo_nat["inct"]
     counts["demo"] = {
         "rows": demo_rows,
         "coverage": cov_demo,
@@ -883,6 +1138,11 @@ def build(year):
             "age0_14": round(
                 (demo_nat["bands"][0] + demo_nat["bands"][1]) / nat_b, 4),
             "age65ov": round(sum(demo_nat["bands"][8:]) / nat_b, 4),
+            "loinc": round(demo_nat["incl"] / nat_inc, 4)
+            if nat_inc > 0 else None,
+            "hiinc": round(demo_nat["inch"] / nat_inc, 4)
+            if nat_inc > 0 else None,
+            "incMed": band_median(demo_nat["incbh"]),
         },
     }
 
@@ -915,6 +1175,11 @@ def build(year):
             "age": ({b: round(dv["bands"][i] / bsum, 4)
                      for i, b in enumerate(DEMO_BANDS)}
                     if bsum > 0 else None),
+            "loinc": round(dv["incl"] / dv["inct"], 4)
+                if dv["inct"] > 0 else None,
+            "hiinc": round(dv["inch"] / dv["inct"], 4)
+                if dv["inct"] > 0 else None,
+            "incMed": band_median(dv["incbh"]),
         })
 
     mode_note = {
@@ -945,7 +1210,8 @@ def build(year):
             "never lists (unused PPVCs, cancelled mobile teams) carry "
             "votes:null and note:noVotesRows. The divisions array "
             "re-pools every unit's per-SA1 demo tallies by division: one "
-            "language/foreign-born/university/age reading per division, "
+            "language/foreign-born/university/age/income reading per "
+            "division, "
             "its shares from its own pooled sum, never from averaging "
             "the row-level rounded shares.") + DEMO_ABOUT[year],
         "_provenance": {
@@ -955,7 +1221,8 @@ def build(year):
                           2022: "AEC 2022 downloads, Votes by SA1",
                           2025: "AEC fe25 downloads-statistics, Votes by SA1 – national"}[year],
                 "fpvOracle": "VTR HouseStateFirstPrefsByPollingPlaceDownload",
-                "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G09/G49B)",
+                "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G09/G49B/"
+                       "G32/G33)",
                 **({"crosswalk": "ABS CG_SA1_2016_SA1_2021 (ASGS Ed3 correspondences page)"}
                    if conf["mode"] == "xwalk21" else {}),
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
@@ -982,6 +1249,15 @@ def build(year):
                            "Ed3": "SA1 (ASGS Ed3 2021, 7-digit ccd)"}[conf["ed"]],
         "indexes": list(INDEXES),
         "demoBasis": DEMO_BASIS,
+        "incomeCuts": {
+            "loQuantile": gcp_meta["loQuantile"],
+            "loCutWeekly": gcp_meta["loCutWeekly"],
+            "hiEdgeWeekly": gcp_meta["hiEdgeWeekly"],
+            "hiNationalShare": gcp_meta["hiNationalShare"],
+            "dollarsYear": gcp_meta["dollarsYear"],
+            "adultsWeights": gcp_meta["factors"],
+            "medianBasis": "households (shares are per-adult)",
+        },
         "counts": counts,
         "divisions": divisions,
         "cohorts": cohorts,

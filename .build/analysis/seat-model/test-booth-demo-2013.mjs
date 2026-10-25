@@ -23,12 +23,29 @@
    4. Division anchors: Sydney/Melbourne/Fowler/Lyne/Lingiari row
       figures; division extrema (Watson max language-other, Lyons min;
       Bruce max overseas-born, Parkes min; North Sydney max
-      university, Wakefield min; Lyne oldest, Lingiari youngest); the
-      Lingiari row printed in full.
+      university, Wakefield min; Lyne oldest, Lingiari youngest; the
+      income envelope faces Hinkler/Mitchell, North Sydney/Lyons,
+      Bradfield/Hinkler); the Lingiari row printed in full.
    5. Reconciliation: sum over divisions of persons == the national
       persons exactly (integer count, not share arithmetic).
    6. Provenance: _provenance.files names the BCP zip, the CED zip and
       the venue store.
+   7. Income lanes (B26/B28, the 2011 G32/G33 counterparts): loinc/
+      hiinc are adult shares of the adults-weighted B28 household
+      income mass (B26 family mix, national fallback), incMed the
+      band-interpolated median weekly household income on the RAW
+      household histogram (ABS's published-median basis); all three in
+      2011 dollars/basis. The store-level incomeCuts record pins the
+      national 25th-percentile cut ($738/wk linear-in-band) and the
+      $4,000+ top band's national adult share (0.044354). National
+      incMed 1235 sits one dollar off ABS's published 2011 median
+      weekly household income ($1,234, ex-not-stated residual);
+      national loinc 0.2517 lofts the 0.25 quantile cut by ~0.2pt
+      because the 150-division pool drops the pseudo SA1s the cut was
+      read over. Booth income nulls (81/81/83 of 8452 geo-carrying
+      rows) are tiny-SA1 perturbation nulling; venue-proxy extreme
+      SA1s legitimately read 1.0 (eight booths) and 0.6859 (Allambie)
+      at the two lane faces, 100–3250 on the median.
 */
 
 import { readFileSync } from "node:fs";
@@ -71,7 +88,8 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
 {
   const keys = new Set();
   let nulls = 0;
-  const laneNull = { langOther: 0, fborn: 0, uni: 0, age: 0 };
+  const laneNull = { langOther: 0, fborn: 0, uni: 0, age: 0,
+    loinc: 0, hiinc: 0, incMed: 0 };
   for (const b of d.booths) {
     const k = b.divId + "|" + b.boothId;
     ok(!keys.has(k), `dup booth key ${k}`);
@@ -89,13 +107,23 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
       const s = BANDS.reduce((t, x) => t + dm.age[x], 0);
       ok(Math.abs(s - 1) < 0.01, `age sums ~1 ${k}: ${s}`);
     }
+    for (const f of ["loinc", "hiinc"]) {
+      ok(dm[f] === null || (dm[f] >= 0 && dm[f] <= 1),
+        `income share range ${f} ${k}`);
+      if (dm[f] === null) laneNull[f]++;
+    }
+    ok(dm.incMed === null || (dm.incMed >= 100 && dm.incMed <= 4200),
+      `incMed range ${k}`);
+    if (dm.incMed === null) laneNull.incMed++;
   }
   eq(nulls, d.counts.boothsGeoMissing + d.counts.boothsGeoEmpty,
     "null demo == geo missing + geo empty");
   // the age:1 is Casey Warburton PPVC: venue SA1 2128609 carries 3
   // perturbed persons but all-zero age cells (BCP perturbation on a
-  // tiny SA1 — null, never a made-up structure)
-  eq(laneNull, { langOther: 21, fborn: 9, uni: 25, age: 1 },
+  // tiny SA1 — null, never a made-up structure); the income nulls are
+  // the same null-not-clamp route on B26/B28
+  eq(laneNull, { langOther: 21, fborn: 9, uni: 25, age: 1,
+    loinc: 81, hiinc: 81, incMed: 83 },
     "lane nulls (tiny-SA1 BCP perturbation)");
 }
 
@@ -107,6 +135,9 @@ eq(d.counts.national, {
   uni: 0.2082,
   age0_14: 0.1929,
   age65ov: 0.1401,
+  loinc: 0.2517,
+  hiinc: 0.043,
+  incMed: 1235,
 }, "counts.national");
 
 // 4. division anchors
@@ -116,17 +147,21 @@ eq(d.counts.national, {
     div: "Sydney", state: "NSW", persons: 170700, cov: 1,
     langOther: 0.3277, fborn: 0.4686, uni: 0.4751,
     age: divs.get("Sydney").age,
+    loinc: 0.2038, hiinc: 0.1164, incMed: 1730,
   }, "Sydney row");
   const M = divs.get("Melbourne");
-  eq([M.persons, M.langOther, M.fborn, M.uni], [177628, 0.3484, 0.4153, 0.477],
+  eq([M.persons, M.langOther, M.fborn, M.uni, M.loinc, M.hiinc, M.incMed],
+    [177628, 0.3484, 0.4153, 0.477, 0.2579, 0.0821, 1411],
     "Melbourne figures");
   const F = divs.get("Fowler");
-  eq([F.persons, F.langOther, F.fborn, F.uni], [148973, 0.7084, 0.528, 0.098],
+  eq([F.persons, F.langOther, F.fborn, F.uni, F.loinc, F.hiinc, F.incMed],
+    [148973, 0.7084, 0.528, 0.098, 0.3204, 0.0225, 1040],
     "Fowler figures");
   eq(divs.get("Lingiari"), {
     div: "Lingiari", state: "NT", persons: 109461, cov: 1,
     langOther: 0.4016, fborn: 0.1179, uni: 0.1317,
     age: divs.get("Lingiari").age,
+    loinc: 0.1977, hiinc: 0.0449, incMed: 1504,
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(divs.get("Lingiari")));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
@@ -145,6 +180,20 @@ eq(d.counts.national, {
   eq([byAge[0].div, +a65(byAge[0]).toFixed(4)], ["Lyne", 0.2365], "oldest");
   eq([byAge.at(-1).div, +a65(byAge.at(-1)).toFixed(4)], ["Lingiari", 0.0511],
     "youngest");
+  const byLo = [...d.divisions].sort((a, b) => b.loinc - a.loinc);
+  eq([byLo[0].div, byLo[0].loinc], ["Hinkler", 0.4051], "max low-income");
+  eq([byLo.at(-1).div, byLo.at(-1).loinc], ["Mitchell", 0.125],
+    "min low-income");
+  const byHi = [...d.divisions].sort((a, b) => b.hiinc - a.hiinc);
+  eq([byHi[0].div, byHi[0].hiinc], ["North Sydney", 0.1551],
+    "max top-band income");
+  eq([byHi.at(-1).div, byHi.at(-1).hiinc], ["Lyons", 0.0067],
+    "min top-band income");
+  const byMed = [...d.divisions].sort((a, b) => b.incMed - a.incMed);
+  eq([byMed[0].div, byMed[0].incMed], ["Bradfield", 2135],
+    "max median income");
+  eq([byMed.at(-1).div, byMed.at(-1).incMed], ["Hinkler", 800],
+    "min median income");
   // sort-order: state order then div, non-decreasing
   const ORD = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"].indexOf
     .bind(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]);
@@ -168,6 +217,18 @@ eq(d.divisions.reduce((t, x) => t + x.persons, 0),
   ok(Object.keys(f).some((k) => k.endsWith("data/booth-seifa-2013.json")),
     "prov venue");
 }
+
+// 7. income meta record (2011 dollars; the res-YYYY.json builder reads
+// this verbatim into the app layer)
+eq(d.incomeCuts, {
+  loQuantile: 0.25,
+  loCutWeekly: 738,
+  hiEdgeWeekly: 4000,
+  hiNationalShare: 0.044354,
+  dollarsYear: 2011,
+  adultsWeights: "data/income-dist.json",
+  medianBasis: "households (shares are per-adult)",
+}, "incomeCuts record");
 
 if (failures) {
   console.error(`\n${failures} FAILURES`);

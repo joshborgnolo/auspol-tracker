@@ -27,9 +27,16 @@ Inputs (re-fetchable):
       short-header CSVs (abs.gov.au census datapacks 2011_BCP_SA1;
       B01: persons + 11 age bands + inline English-only/other language;
       B09: country of birth; B40B: highest non-school qualification,
-      persons block)
+      persons block; B26: family income by composition × the 14-band
+      grid — the 2011 counterpart of 2021's G32 (B27 is intact/step/
+      blended family FORM, not an income mix, and plays no role here);
+      B28: household income by the same 14 bands — the G33 counterpart)
   data/booth-seifa-2013.json — committed: the 2013 booth universe and
       each booth's geo SA1 key
+  data/income-dist.json — the Who-votes income facet's national store:
+      adults-per-household factors by family composition (2021-GCP
+      derived, the only adults factors in the repo; the AEC/census
+      publishes no persons-by-household-income table)
   .matilda/seifa-irsad-abs/dl/1270055003_ced_2011_aust_csv.zip — ABS
       ASGS Vol 3 July 2011, CED to SA1 allocation (SA1_MAINCODE_2011,
       CED_CODE/NAME incl. the 9 migratory/offshore + 9 no-usual-address
@@ -49,6 +56,7 @@ import csv
 import importlib.util
 import io
 import json
+import re
 import sys
 import zipfile
 from collections import defaultdict
@@ -74,10 +82,28 @@ BCP_B01 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
            "2011Census_B01_AUST_SA1_short.csv")
 BCP_B09 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
            "2011Census_B09_AUST_SA1_short.csv")
+BCP_B26 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B26_AUST_SA1_short.csv")
+BCP_B28 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B28_AUST_SA1_short.csv")
 BCP_B40B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
             "2011Census_B40B_AUST_SA1_short.csv")
 CED_ZIP = ABS / "dl/1270055003_ced_2011_aust_csv.zip"
 VENUE = ROOT / "data/booth-seifa-2013.json"
+
+# household weekly income bands ($2011), B26/B28 grid: (lo, hi)
+# inclusive; the top band is open ("FI_4000_more_*"), Negative/Nil folds
+# into the first band, and partial-stated and all-not-stated households
+# are EXCLUDED from every lane basis (the facet does the same).
+INC_BANDS14 = [(1, 199), (200, 299), (300, 399), (400, 599), (600, 799),
+               (800, 999), (1000, 1249), (1250, 1499), (1500, 1999),
+               (2000, 2499), (2500, 2999), (3000, 3499), (3500, 3999),
+               (4000, None)]
+INC_LO_Q = 0.25  # low lane: adults below the national 25th percentile
+# top band = $4,000+/wk in 2011 dollars — the same dollar edge the 2021
+# lanes pin; what moves per census year is the national share of it
+INC_LO_GUARD_2011 = (650, 850)  # plausible $ for the 2011 25% cut
+INC_HI_GUARD_2011 = (0.03, 0.06)  # national adults share of the top band
 
 BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
          "55_64", "65_74", "75_84", "85ov"]
@@ -154,6 +180,194 @@ def load_bcp():
     return out
 
 
+# ------------------------------------------- income lanes (B26/B28, 2011)
+def income_factors():
+    """Adults-per-household factors from data/income-dist.json (the
+    Who-votes income facet's national histogram store), mirroring
+    derive-booth-seifa-voter.py's loader — the same 16-band 2021-GCP
+    provenance check even though these lanes weight the BCP's 14-band
+    2011 grid: the factors are per family-composition type, not per
+    band, so the check only pins WHICH histogram the file's numbers
+    came from (a moved facet file fails loud, never silently reused)."""
+    path = ROOT / "data/income-dist.json"
+    if not path.exists():
+        fail("missing data/income-dist.json "
+             "(run node .build/extract-income-dist.mjs)")
+    ax = json.loads(path.read_text(encoding="utf-8"))["axes"]["household"]
+    ap = ax["adultsPer"]
+    grid16 = [((0 if i == 0 else lo), hi) for i, (lo, hi) in enumerate(
+        [(1, 149), (150, 299), (300, 399), (400, 499), (500, 649),
+         (650, 799), (800, 999), (1000, 1249), (1250, 1499),
+         (1500, 1749), (1750, 1999), (2000, 2499), (2500, 2999),
+         (3000, 3499), (3500, 3999), (4000, None)])]
+    for (lo, hi), b in zip(grid16, ax["bands"]):
+        if b["lo"] != lo or b["hi"] != hi:
+            fail(f"income-dist grid drift at [{lo},{hi}] vs {b}")
+    return ((ap["coupleNoChildren"], ap["coupleWithChildren"],
+             ap["oneParent"], ap["otherFamily"]), ap["nonFamily"])
+
+
+def income_bcp(z, ad, nonfam):
+    """Per SA1: (adult total, adult loMass, adult hiMass, 14 adult band
+    masses, 14 raw household masses) — the B28 household-income bands
+    re-weighted to adults at the SA1's B26 family mix (national mix as
+    fallback; non-family households at the national mean), mirroring
+    income_gcp in derive-booth-seifa-voter.py on the BCP's own tables:
+    B26 family income × composition is the 2011 counterpart of the
+    2021 GCP's G32, B28 household income the G33 counterpart, so
+    household mass rides the Tot columns (never B28's fam/non columns
+    — same small-SA1 perturbation finding as the GCP lanes) and
+    partial-stated/all-not-stated stay outside the basis. Returns the
+    per-SA1 map plus the national 25%-cut dollar and the national
+    top-band adult share. The median lane is read off the RAW
+    household histogram, so incMed sits on ABS's published-median
+    basis while loinc/hiinc sit on the adults (poll-frame) basis —
+    the same split the 2016+ stores pin."""
+    def head_of(member):
+        if member not in z.namelist():
+            fail(f"BCP zip lacks {member}")
+        with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+            return [h.strip() for h in next(csv.reader(fh))]
+
+    h28 = head_of(BCP_B28)
+    h26 = head_of(BCP_B26)
+    negh = "Negative_Nil_income_Tot"
+    negf = "Neg_Nil_inc_Tot"
+    neg_types = ("Neg_Nil_inc_cpl_fam_no_child",
+                 "Neg_Nil_inc_cpl_fam_wth_chld",
+                 "Neg_Nil_inc_One_parent_fam",
+                 "Neg_Nil_inc_Other_fam")
+    if negh not in h28:
+        fail("BCP B28 lacks the Negative_Nil Tot column")
+    if negf not in h26 or any(c not in h26 for c in neg_types):
+        fail("BCP B26 lacks the Neg_Nil columns")
+    plan = []
+    for lo, hi in INC_BANDS14:
+        stem = f"{lo}_{hi if hi is not None else 'more'}"
+        hi_tot, fi_tot = f"HI_{stem}_Tot", f"FI_{stem}_Tot"
+        if hi_tot not in h28:
+            fail(f"BCP B28 lacks {hi_tot}")
+        if fi_tot not in h26:
+            fail(f"BCP B26 lacks {fi_tot}")
+        fstem = f"FI_{stem}"
+        types = []
+        for want in (r"cpl_fam_no_child$", r"cpl_fam_(with|wth)_ch",
+                     r"One_parent_fam$", r"Other_fam$"):
+            c = next((h for h in h26
+                      if h.startswith(f"{fstem}_") and re.search(want, h)),
+                     None)
+            if c is None:
+                fail(f"BCP B26 lacks {fstem} {want}")
+            types.append(c)
+        plan.append((hi_tot, fi_tot, types))
+    cols28 = [negh] + [p[0] for p in plan]
+    cols26 = [negf, *neg_types] + [c for p in plan for c in (p[1], *p[2])]
+    b28 = bcp_table(z, BCP_B28, "region_id", cols28, 54805, 54805)
+    b26 = bcp_table(z, BCP_B26, "region_id", cols26, 54805, 54805)
+    if set(b26) != set(b28):
+        fail("BCP B26/B28 SA1 sets diverge")
+    # col order: r28 = (neg, HI band Tots x14); r26 = (neg Tot, 4 neg
+    # types, then per band (FI Tot, 4 family-type counts))
+    nat = {"b": [0.0] * 14, "fi": [0.0] * 14,
+           "mix": [[0.0] * 4 for _ in range(14)]}
+    for code, r28 in b28.items():
+        r26 = b26[code]
+        for i in range(14):
+            ne = i == 0
+            nat["b"][i] += float(r28[i + 1]) + (float(r28[0]) if ne
+                                                else 0.0)
+            nat["fi"][i] += float(r26[5 + i * 5]) + (float(r26[0]) if ne
+                                                     else 0.0)
+            for k in range(4):
+                nat["mix"][i][k] += float(r26[6 + i * 5 + k]) + (
+                    float(r26[1 + k]) if ne else 0.0)
+    nat_famper, nat_fams = [], []
+    for i in range(14):
+        mixn = sum(nat["mix"][i])
+        if mixn <= 0 or nat["b"][i] <= 0:
+            fail(f"national income mix empty in band {INC_BANDS14[i]}")
+        nat_famper.append(sum(m * a for m, a in zip(nat["mix"][i], ad))
+                          / mixn)
+        nat_fams.append(min(1.0, nat["fi"][i] / nat["b"][i]))
+    nat_adults = [nat["b"][i] * (nat_fams[i] * nat_famper[i]
+                                 + (1 - nat_fams[i]) * nonfam)
+                  for i in range(14)]
+    nat_tot = sum(nat_adults)
+    cum, cut25 = 0.0, None
+    for i, (lo, hi) in enumerate(INC_BANDS14):
+        cum += nat_adults[i] / nat_tot
+        if cum >= INC_LO_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (INC_LO_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                fail("income 25% cut lands in the open top band")
+            cut25 = lo + f * (hi - lo + 1)
+            break
+    if not cut25 or not INC_LO_GUARD_2011[0] <= cut25 <= INC_LO_GUARD_2011[1]:
+        fail(f"income 25% cut {cut25} outside guard {INC_LO_GUARD_2011}")
+    hi_share = nat_adults[-1] / nat_tot
+    if not INC_HI_GUARD_2011[0] <= hi_share <= INC_HI_GUARD_2011[1]:
+        fail(f"top-band national share {hi_share:.4f} outside "
+             f"{INC_HI_GUARD_2011}")
+    print(f"income: national 25% cut ${cut25:.0f}/wk (adults, 2011 $); "
+          f"top band {hi_share:.4f} of adults")
+
+    out = {}
+    for code, r28 in b28.items():
+        r26 = b26[code]
+        bands = []      # adults per band (loinc/hiinc basis)
+        hh = []         # raw households per band (incMed basis)
+        for i in range(14):
+            ne = i == 0
+            tot = float(r28[i + 1]) + (float(r28[0]) if ne else 0.0)
+            fi = float(r26[5 + i * 5]) + (float(r26[0]) if ne else 0.0)
+            mix = [float(r26[6 + i * 5 + k]) + (float(r26[1 + k]) if ne
+                                                else 0.0)
+                   for k in range(4)]
+            mixn = sum(mix)
+            famper = (sum(m * a for m, a in zip(mix, ad)) / mixn
+                      if mixn > 0 else nat_famper[i])
+            # fam share of the band's households, clamped: an SA1 cell's
+            # independently perturbed B26 FI Tot can momentarily exceed
+            # the B28 HI Tot it shares its basis with
+            fams = min(1.0, fi / tot) if tot > 0 else nat_fams[i]
+            bands.append(tot * (fams * famper + (1 - fams) * nonfam))
+            hh.append(tot)
+        tsum = sum(bands)
+        lo_mass = 0.0
+        for i, (lo, hi) in enumerate(INC_BANDS14):
+            if cut25 <= lo:
+                continue
+            if hi is not None and cut25 > hi:
+                lo_mass += bands[i]
+                continue
+            lo_mass += bands[i] * (cut25 - lo) / (hi - lo + 1)
+            break
+        out[code] = (tsum, lo_mass, bands[-1], tuple(bands), tuple(hh))
+    print(f"income: B26/B28 SA1, {len(out)} rows (factors from "
+          f"data/income-dist.json)")
+    return out, round(cut25, 2), round(hi_share, 6)
+
+
+def band_median14(masses):
+    """Interpolated median weekly income ($) of a pooled household band
+    histogram on INC_BANDS14 — the 14-band-grid counterpart of
+    derive-booth-seifa-voter.py's band_median: linear inside the median
+    band; None when the basis is empty or the median lands in the open
+    top band (never plausible at division scale)."""
+    tot = sum(masses)
+    if tot <= 0:
+        return None
+    cum = 0.0
+    for (lo, hi), m in zip(INC_BANDS14, masses):
+        if cum + m >= tot / 2.0:
+            if hi is None or m <= 0:
+                return None
+            return round(lo + (tot / 2.0 - cum) / m * (hi - lo + 1))
+        cum += m
+    return None
+
+
 def load_ced():
     """7-digit SA1 -> division name, on the 150-division set only."""
     if not CED_ZIP.exists():
@@ -201,11 +415,14 @@ def bounded(num, den):
 
 
 def shares(rec):
-    """The 2013 stores' demo block shape (voter-store demo shape parity)."""
+    """The 2013 stores' demo block shape (voter-store demo shape parity
+    plus the income lanes): income keys sit in the rec only when the
+    source carries the B26/B28 histogram for it — every division row
+    does; a venue booth's row does only when its geo SA1 does."""
     bsum = sum(rec["bands"])
     fb_den = None if rec["totc"] is None else rec["totc"] - rec["cobns"]
     uni_den = None if rec["uni"] is None else rec["pop15"] - rec["eduns"]
-    return {
+    out = {
         "persons": rec["pers"],
         "cov": 1.0,
         "langOther": bounded(rec["oth"], rec["eng"] + rec["oth"]),
@@ -216,6 +433,11 @@ def shares(rec):
         "age": ({b: round(rec["bands"][i] / bsum, 4)
                  for i, b in enumerate(BANDS)} if bsum > 0 else None),
     }
+    if rec.get("inct") is not None:
+        out["loinc"] = bounded(rec["incl"], rec["inct"])
+        out["hiinc"] = bounded(rec["inch"], rec["inct"])
+        out["incMed"] = band_median14(rec["incbh"])
+    return out
 
 
 def main():
@@ -224,6 +446,12 @@ def main():
     if not booths or "geo" not in booths[0]:
         fail(f"{VENUE.name}: booth geo keys missing")
     sa1 = load_bcp()
+    z_bcp = zipfile.ZipFile(BCP_ZIP)
+    inc_fac, inc_nonfam = income_factors()
+    inc, inc_cut, inc_hishare = income_bcp(z_bcp, inc_fac, inc_nonfam)
+    z_bcp.close()
+    if set(inc) != set(sa1):
+        fail("B01/B28 SA1 universes diverge")
     ced, ced_skipped = load_ced()
     divs_hist = sorted({b["div"] for b in booths})
     mapped = set(ced.values())
@@ -243,9 +471,12 @@ def main():
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * len(BANDS),
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
                                   "cobns": 0, "uni": 0, "eduns": 0,
-                                  "pop15": 0})
+                                  "pop15": 0,
+                                  "inct": 0.0, "incl": 0.0, "inch": 0.0,
+                                  "incbh": [0.0] * len(INC_BANDS14)})
     for key, dv in ced.items():
         r = sa1[key]
+        ir = inc[key]
         acc = divsum[dv]
         acc["pers"] += r["pers"]
         for i in range(len(BANDS)):
@@ -254,6 +485,11 @@ def main():
         acc["oth"] += r["oth"]
         for k in ("aus", "totc", "cobns", "uni", "eduns", "pop15"):
             acc[k] += r[k]
+        acc["inct"] += ir[0]
+        acc["incl"] += ir[1]
+        acc["inch"] += ir[2]
+        for i in range(len(INC_BANDS14)):
+            acc["incbh"][i] += ir[4][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -272,12 +508,15 @@ def main():
             geo_empty += 1
             rec["demo"] = None
         else:
+            ir = inc[vb["geo"]]
             rec["demo"] = shares({
                 "pers": row["pers"], "bands": list(row["ages"]),
                 "eng": row["eng"], "oth": row["oth"],
                 "aus": row["aus"], "totc": row["totc"],
                 "cobns": row["cobns"], "uni": row["uni"],
-                "eduns": row["eduns"], "pop15": row["pop15"]})
+                "eduns": row["eduns"], "pop15": row["pop15"],
+                "inct": ir[0], "incl": ir[1], "inch": ir[2],
+                "incbh": list(ir[4])})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
@@ -288,6 +527,11 @@ def main():
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
+        for k in ("inct", "incl", "inch"):
+            nat[k] += dv[k]
+        for i in range(len(INC_BANDS14)):
+            nat.setdefault("incbh", [0.0] * len(INC_BANDS14))
+            nat["incbh"][i] += dv["incbh"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -315,6 +559,11 @@ def main():
             "uni": round(nat["uni"] / nat_unid, 4) if nat_unid > 0 else None,
             "age0_14": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
             "age65ov": round(sum(nat[b] for b in BANDS[8:]) / nat_b, 4),
+            "loinc": round(nat["incl"] / nat["inct"], 4)
+            if nat["inct"] else None,
+            "hiinc": round(nat["inch"] / nat["inct"], 4)
+            if nat["inct"] else None,
+            "incMed": band_median14(nat["incbh"]),
         },
     }
     out = {
@@ -338,7 +587,27 @@ def main():
             "over English-only + other; overseas-born over "
             "country-of-birth stated; university (bachelor and above) "
             "per the aged-15+ population less "
-            "level-of-education-not-stated. The national row pools the "
+            "level-of-education-not-stated. Income lanes mirror the "
+            "voter stores on the BCP's own tables: B28 households by "
+            "the 14-band weekly household-income grid are re-weighted "
+            "to ADULTS at the data/income-dist.json factors (each "
+            "band's family share from B26's family-income Tot over its "
+            "family-composition mix in the SA1 — national mix as "
+            "fallback — the rest non-family at the national mean; "
+            "household mass rides the Tot columns, never the B28 "
+            "fam/non columns, small-SA1 perturbation independently "
+            "shaving the splits; partial-stated and all-not-stated "
+            "households sit outside the basis). loinc is the adult "
+            "share below the national 25th-percentile weekly "
+            "household-income cut the store-level incomeCuts record "
+            "carries (the BCP national adults histogram's cut band "
+            "split linearly, in 2011 dollars), hiinc the adult share "
+            "in the $4,000-and-top band, incMed the band-interpolated "
+            "median weekly household income in 2011 dollars on the "
+            "HOUSEHOLD basis (ABS's own published-median basis — the "
+            "adults-weighted histogram would read a few hundred "
+            "dollars higher, skewed by couples). The national row "
+            "pools the "
             "division sums. A booth whose venue SA1 records no "
             "residents (commercial/industrial blocks; "
             "counts.boothsGeoEmpty) carries demo:null, as does one "
@@ -352,7 +621,8 @@ def main():
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2011 Census Basic Community Profile, SA1 for "
-                       "AUST (B01/B09/B40B), abs.gov.au census datapacks",
+                       "AUST (B01/B09/B26/B28/B40B), abs.gov.au census "
+                       "datapacks",
                 "ced": "ABS ASGS Vol 3 July 2011, CED to SA1 allocation "
                        "(1270055003_ced_2011_aust_csv.zip)",
                 "venue": "data/booth-seifa-2013.json",
@@ -368,6 +638,15 @@ def main():
         "censusEdition": 2011,
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
+        "incomeCuts": {
+            "loQuantile": INC_LO_Q,
+            "loCutWeekly": inc_cut,
+            "hiEdgeWeekly": 4000,
+            "hiNationalShare": inc_hishare,
+            "dollarsYear": 2011,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+        },
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

@@ -113,7 +113,8 @@ function buildRamps() {
     loss: seq(70, 0.025),
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
-    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12) },
+    demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12),
+      loinc: seq(20, 0.13), hiinc: seq(275, 0.12) },
   };
 }
 
@@ -151,15 +152,27 @@ const CLS_DEF = { "Inner Metropolitan": "Settled, well-established suburbs of a 
 const IX = ["irsad", "irsd", "ier", "ieo"];
 const IX_NAME = { irsad: "Advantage and disadvantage", irsd: "Disadvantage", ier: "Economic resources", ieo: "Education and occupation" };
 const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
-// the census tab's people measures: shares of residents, from the 2021 census
-// counted where each polling place's voters live (the AEC records that from
+// the census tab's people measures: shares of residents (the two income
+// lanes are shares of an area's ADULTS), from the 2021 census counted
+// where each polling place's voters live (the AEC records that from
 // 2016 on); at 2013 the 2011 census of the areas the places stand in
-const DM = ["lang", "a65", "a2034", "fborn", "uni"];
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University" };
+const DM = ["lang", "a65", "a2034", "fborn", "uni", "loinc", "hiinc"];
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", loinc: "Lower income", hiinc: "Higher income" };
 const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55] };
+const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], loinc: [10, 45], hiinc: [0, 50] };
 const isDemo = () => DM.includes(S.index);
+// the income lanes name their own definitions: the year's national
+// weekly cut in the census year's dollars, as each year's incomeCuts
+// record carries them (2013 reads 2011 dollars, 2016 on 2021 dollars)
+const isInc = (k) => k === "loinc" || k === "hiinc";
+const mny = (v) => (v == null ? "–" : `$${int(Math.round(v))}`);
+const incDollars = (m) => (m.incomeCuts && m.incomeCuts.dollarsYear ? ` in ${m.incomeCuts.dollarsYear} dollars` : "");
+const DM_VERB_INC = {
+  loinc: (m) => `live in households earning under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)} a week${incDollars(m)}`,
+  hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incDollars(m)}`,
+};
+const dmVerb = (m, k) => (isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
 const DEMO_FROM = 2013;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
@@ -397,7 +410,11 @@ function deriveAreas(res, m) {
     // census shares pooled over the seats' vote-weighted populations, in percent
     let demo = null;
     const ds = idx.map((i) => m.divs[i].demo).filter((x) => x && x.p);
-    if (ds.length) { const P = sum(ds.map((x) => x.p)); demo = {}; for (const k of DM) demo[k] = (100 * sum(ds.map((x) => x.p * x[k]))) / P; }
+    if (ds.length) {
+      demo = {};
+      // a lane's null rows sit that lane's pool out, both sides of the line
+      for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
     out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), idx, formal: a.formal, demo };
   }
   return out;
@@ -492,6 +509,7 @@ async function loadYear(year) {
     if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.demoBasis = res.demoBasis || null;
+    m.incomeCuts = res.incomeCuts || null;
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));

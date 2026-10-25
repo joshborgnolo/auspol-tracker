@@ -244,15 +244,21 @@ def dec_of_pct(p):
 # live (vote-weighted); 2013 the 2011 census of the SA1 the venue itself
 # stands in (a venue proxy — the AEC's Votes-by-SA1 product starts 2016):
 # [language other than English at home, aged 65 and over, aged 20 to 34,
-#  born overseas, university educated], each a share of residents (the
-# last one of the aged-15+ basis); all ex-not-stated
+#  born overseas, university educated, low-household-income share, top-
+# band household-income share], each a share of residents (uni of the
+# aged-15+ basis, the income shares of ADULTS in income-stated
+# households); all ex-not-stated. The income cells keep their own nulls
+# per row (tiny census areas the ABS perturbs the tables out of) — a
+# null there never sinks the row's other lanes. The year's cuts and
+# dollar epoch ride the store's incomeCuts record, echoed per year at
+# the top of the data-<year>.json this builds.
 def demo_cells(dm):
     if not dm or dm.get("langOther") is None or dm.get("fborn") is None \
             or dm.get("uni") is None or not dm.get("age"):
         return None
     a = dm["age"]
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
-            dm["fborn"], dm["uni"]]
+            dm["fborn"], dm["uni"], dm.get("loinc"), dm.get("hiinc")]
 
 
 def seifa_cells(sf):
@@ -421,8 +427,12 @@ def build_year(year, hist, base2001):
             dc = demo_cells(dd)
             if dc:
                 # p: the store's pool weight — vote-weighted pseudo-population
-                # on the voter store, real census headcount on the venue proxy
-                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "p": dd["persons"]}
+                # on the voter store, real census headcount on the venue proxy.
+                # The income shares are per-adult (they ride as cells 5/6);
+                # medIncWeekly is the household-basis band-interpolated median
+                # — medians don't pool, so it never joins a state aggregate
+                rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "p": dd["persons"],
+                               "loinc": dc[5], "hiinc": dc[6], "medIncWeekly": dd.get("incMed")}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -515,7 +525,12 @@ def build_year(year, hist, base2001):
            "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,
            # what a demo row describes: where voters live (2016+) vs the
            # venue's own census neighbourhood (2013) — null when no lane
-           "demoBasis": census_basis if vstore else None}
+           "demoBasis": census_basis if vstore else None,
+           # the income lanes' own definitions (national low cut in
+           # weekly dollars, top-band edge and epoch year) from the
+           # store that year read — verbatim, so the app's copy always
+           # names the same cuts the numbers were built on
+           "incomeCuts": vstore.get("incomeCuts") if vstore else None}
     names = {x["n"] for x in D}
     assert SPEAKER[year] in names, f"{year}: speaker seat {SPEAKER[year]} not in the House"
     p = os.path.join(OUT, f"data-{year}.json")
