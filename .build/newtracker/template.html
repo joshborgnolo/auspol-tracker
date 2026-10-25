@@ -347,6 +347,16 @@ body.dark { color-scheme: dark; }
   font-family: var(--serif); font-size: 19px; font-weight: 600;
   margin: 28px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
+/* While the app owns the page the article is unseen (html.boot hides the
+   body, then body.js fades it out) but still laid out - and its headings
+   were the only text setting Crimson Text 600, so every load fetched that
+   17KB face alongside the first screen's scripts. Weight 700, preloaded
+   for the headlines, stands in until the article is itself the page: no
+   JS, the plain-text view (ss-view), or the app failing (bail and
+   RootBoundary drop boot and body.js). The override runs unbroken from
+   the article's first layout through the takeover, so its height never
+   changes at the swap. */
+html.boot .static-summary :is(h1, h2), body.js:not(.ss-view) .static-summary :is(h1, h2) { font-weight: 700; }
 .ss-sub { margin: 0 0 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .ss-lead { font-size: 22px; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
 .static-summary p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
@@ -431,6 +441,10 @@ body.dark { color-scheme: dark; }
    character falls through to the full face. Outside the shell-copy block on
    purpose: the satellites keep the shell's own stack and fonts. */
 .wordmark { font-family: "Source Sans 3 Mark", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif; }
+/* the lockup's spoken expansion is clipped to a pixel, never seen - in the
+   lockup's face it was the one text asking for the full Source Sans 3
+   (28KB on every load); the page's own sans is already in */
+.wordmark .wm-sr { font-family: var(--sans); }
 /* visually-hidden: the wordmark's expansion for screen readers / document
    outline and the charts' live readout (see .chart-svg below). It is a
    clip, never display:none: reader engines and assistive tech ignore
