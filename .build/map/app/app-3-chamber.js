@@ -431,13 +431,13 @@ function drawChamber(g, m, w, h, opts) {
         const bx = X(pt[0]) + (side === "left" ? (Math.abs(pt[0]) <= 1.2 ? 16 : 4) : -4);
         const maxW = Math.max(120, side === "left" ? F.ox + (geom.box.x1 + 6) * s - bx : bx - 10);
         g.font = `400 12px ${SANS}`;
-        const lines = [];
-        let line = "", wMax = 0;
-        for (const p of crossParts(m, ch).split(" · ")) {
-          const t = line ? line + " · " + p : p;
-          if (g.measureText(t).width > maxW && line) { lines.push(line); line = p; } else line = t;
-        }
-        if (line) lines.push(line);
+        // one middot-joined line if the whole make-up fits; otherwise a
+        // stacked list, one party to a line — packing two to a line leaves a
+        // ragged ladder ("Centre Alliance 1 · Greens 1" under two lone lines)
+        const parts = crossParts(m, ch);
+        const one = parts.join(" · ");
+        const lines = g.measureText(one).width <= maxW ? [one] : parts;
+        let wMax = 0;
         for (const l of lines) wMax = Math.max(wMax, g.measureText(l).width);
         g.font = `600 13px ${SANS}`; wMax = Math.max(wMax, g.measureText(`Crossbench ${ch.nCross}`).width + 10);
         const x0 = side === "left" ? bx : bx - wMax, ht = 17 + lines.length * 15;
@@ -550,7 +550,7 @@ const blocName = (m, fam) => (fam === "alp" ? "Labor" : "Coalition");
 function crossParts(m, ch) {
   const cnt = {};
   for (const i of ch.order) { const d = m.divs[i]; if (d.hold.fam === ch.gov || d.hold.fam === ch.opp) continue; const k = crossLabel(d.hold); cnt[k] = (cnt[k] || 0) + 1; }
-  return Object.entries(cnt).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([k, n]) => `${k} ${n}`).join(" · ");
+  return Object.entries(cnt).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([k, n]) => `${k} ${n}`);
 }
 function crossLabel(h) {
   if (h.ab === "CSA") return "Community Strong";
