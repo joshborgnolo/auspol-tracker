@@ -214,13 +214,25 @@ const stripJs = (code, name) => babelCached("plain", code, name, {});
    a plain script straight after the dataset. The More menu's own tables
    (houseLean, flowDrift) stay in the main half: the menu can open first. */
 const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory",
-  "twoPPHistory", "informalHistory", "yardLine", "ldYardLine"];
+  "twoPPHistory", "informalHistory", "yardLine", "ldYardLine", "confidence", "undecided", "demographics", "issues"];
 const LATE_POLL_FIELDS = ["grp", "links", "chg", "yd", "url", "ldYd", "iss", "dir", "pyd", "peff", "eff", "methodUrl"];
 const splitDataset = (code) => {
   const tables = {};
   let rows = [];
   const lines = code.split("\n");
   const ret = lines.map((l) => /^\s*return \{/.test(l)).lastIndexOf(true);
+  /* the lines that are code: not inside a comment, and not another table's
+     JSON (a key or a word in either is no read) */
+  let inComment = false;
+  const isCode = lines.map((l) => {
+    const t = l.trim();
+    if (inComment) { if (t.includes("*/")) inComment = false; return false; }
+    if (t.startsWith("/*")) { inComment = !t.includes("*/"); return false; }
+    if (t.startsWith("//")) return false;
+    const m = /^const [\w$]+ = (.+);$/.exec(t);
+    if (m) { try { JSON.parse(m[1]); return false; } catch {} }
+    return true;
+  });
   const main = lines.map((line, at) => {
     const m = /^(\s*)const ([\w$]+) = (.+);\s*$/.exec(line);
     if (!m) return line;
@@ -229,10 +241,13 @@ const splitDataset = (code) => {
       /* only the return object may read it: nothing between its
          declaration and the return statement can, while the IIFE runs */
       const re = new RegExp(`\\b${name}\\b`);
-      const early = lines.slice(at + 1, ret).filter((l) => re.test(l)).length;
+      const early = lines.slice(at + 1, ret).filter((l, k) => isCode[at + 1 + k] && re.test(l)).length;
       if (ret < 0 || early) throw new Error(`dataset split: ${name} is read ${early} time(s) before the return object`);
       tables[name] = JSON.parse(rhs);
-      return `${ind}const ${name} = undefined;`;
+      /* a same-shaped stand-in until the late half lands, so a reader's
+         "is there one" (the hero's section links) answers as it always did */
+      const v = tables[name];
+      return `${ind}const ${name} = ${Array.isArray(v) ? "[]" : v && typeof v === "object" ? "{}" : JSON.stringify(v)};`;
     }
     if (name === "individualPolls") {
       const polls = JSON.parse(rhs);
