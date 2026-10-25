@@ -2097,7 +2097,7 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
      whole tail at once, so whatever it names exists to land on. */
   const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
   React.useEffect(() => {
-    if (tail >= SNAP_TAIL_ALL) return undefined;
+    if (tail >= SNAP_TAIL_ALL) { warmSections(1000); return undefined; }
     if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
       snapshotTailArmed = true;
       setTail(SNAP_TAIL_ALL);
@@ -2158,6 +2158,35 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
   );
 }
 
+/* Lay out the sections content-visibility is still skipping, one per idle
+   moment, once a view has settled. Skipped, a section does its style and
+   layout the frame it first nears the viewport - on the Now tab that was a
+   100-146ms frame at 4x CPU on the reader's first scroll (latest polls,
+   ~700 nodes). Reading a rect inside it does that work now instead, while
+   the page is idle, so the scroll only paints. Panels parked behind
+   `hidden` and sections already drawn are passed over, and so is any
+   section too big for one idle slice (Public opinion is one section of
+   ~36,000px): those keep laying out on approach as before. Browsers
+   without the skip (Safari's @supports gate) find nothing to do. */
+const warmDone = new WeakSet();
+let warmTimer = 0;
+function warmSections(delay) {
+  clearTimeout(warmTimer);
+  const idle = (fn) => (typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 50));
+  const next = () => {
+    for (const sec of document.querySelectorAll("#root .rd-sec")) {
+      if (warmDone.has(sec)) continue;
+      const kid = sec.lastElementChild;
+      if (!kid || !sec.checkVisibility || !sec.checkVisibility()) continue;
+      warmDone.add(sec);
+      if (!cvSkipped(kid) || sec.getElementsByTagName("*").length > 3000) continue;
+      kid.getBoundingClientRect();
+      idle(next);
+      return;
+    }
+  };
+  warmTimer = setTimeout(() => idle(next), delay);
+}
 /* One page load arms the snapshot tail exactly once - see SnapshotView -
    and the tail lands in this many stages. */
 let snapshotTailArmed = false;
@@ -2395,6 +2424,8 @@ function App() {
   /* A visit mounts the tab, a departure never unmounts it. */
   React.useEffect(() => {
     setMounted((m) => (m.indexOf(tab) === -1 ? m.concat([tab]) : m));
+    // the Now tab warms its own sections once its staged tail is in
+    if (tab !== "now") warmSections(1500);
   }, [tab]);
   React.useEffect(() => {
     if (entered == null) return undefined;

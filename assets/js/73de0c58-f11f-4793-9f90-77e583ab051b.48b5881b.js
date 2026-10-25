@@ -1747,7 +1747,10 @@ function SnapshotView({
   const rangeId = window.AP.rd ? "all" : heroRange;
   const [tail, setTail] = useState(snapshotTailArmed ? SNAP_TAIL_ALL : 0);
   React.useEffect(() => {
-    if (tail >= SNAP_TAIL_ALL) return undefined;
+    if (tail >= SNAP_TAIL_ALL) {
+      warmSections(1000);
+      return undefined;
+    }
     if (tail === 0 && (snapshotTailArmed || /^#./.test(window.location.hash || ""))) {
       snapshotTailArmed = true;
       setTail(SNAP_TAIL_ALL);
@@ -1794,6 +1797,27 @@ function SnapshotView({
   }), React.createElement(MoodMemo, {
     rangeId: rangeId
   })));
+}
+const warmDone = new WeakSet();
+let warmTimer = 0;
+function warmSections(delay) {
+  clearTimeout(warmTimer);
+  const idle = fn => typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(fn, {
+    timeout: 2000
+  }) : setTimeout(fn, 50);
+  const next = () => {
+    for (const sec of document.querySelectorAll("#root .rd-sec")) {
+      if (warmDone.has(sec)) continue;
+      const kid = sec.lastElementChild;
+      if (!kid || !sec.checkVisibility || !sec.checkVisibility()) continue;
+      warmDone.add(sec);
+      if (!cvSkipped(kid) || sec.getElementsByTagName("*").length > 3000) continue;
+      kid.getBoundingClientRect();
+      idle(next);
+      return;
+    }
+  };
+  warmTimer = setTimeout(() => idle(next), delay);
 }
 let snapshotTailArmed = false;
 const SNAP_TAIL_ALL = 6;
@@ -1989,6 +2013,7 @@ function App() {
   }, []);
   React.useEffect(() => {
     setMounted(m => m.indexOf(tab) === -1 ? m.concat([tab]) : m);
+    if (tab !== "now") warmSections(1500);
   }, [tab]);
   React.useEffect(() => {
     if (entered == null) return undefined;
