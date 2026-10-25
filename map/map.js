@@ -3092,7 +3092,8 @@ const RANGE = () => {
 };
 function legendHist(m, lo, hi) {
   const vals = m.divs.map((d) => divValue(m, d.i)).filter((v) => v != null);
-  if (vals.length < 10) return "";
+  // a stand-in year (holdLegendHeight) keeps the bars' room even where the loaded year has no values
+  if (vals.length < 10) return m.standIn ? '<div class="lg-hist" aria-hidden="true"></div>' : "";
   const dec = S.lens === "seifa" && !isDemo();
   const n = dec ? 10 : 20, w = (hi - lo) / n, counts = new Array(n).fill(0);
   for (const v of vals) counts[clamp(Math.floor((v - lo) / w + (dec ? 0.5 : 0)), 0, n - 1)]++;
@@ -3107,36 +3108,66 @@ function renderLegend() {
   el.innerHTML = legendHTML(m);
   holdLegendHeight(m);
 }
-/* the key holds the height of its tallest lens, so changing lens never moves the figure
-   (the stage below it on a wide screen, the timeline below it on a phone) */
+/* the key holds the height of its tallest lens in its tallest election, so neither changing lens
+   nor changing year moves the figure (the stage below it on a wide screen, the timeline below it
+   on a phone). A year not loaded yet is measured on a stand-in: the loaded year's figures with that
+   year's own words (its seat counts, seating-plan note, census basis) */
 const legendHeights = new Map();
+const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
+let legendMeta = null;
+function loadLegendMeta() {
+  return (legendMeta ??= Promise.all([
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
+    ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
+  ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
+}
+function legendStandIn(m, y) {
+  if (Y[y] && Y[y].search) return Y[y];
+  const st = Object.create(m);
+  st.year = y; st.standIn = true;
+  st.seating = SEATED.has(y) ? SEAT_META.get(y) || null : null;
+  st.demoBasis = y === 2013 ? "venue" : null;
+  const c = S.lens === "winner" && SUM && SUM.seats[y] && SUM.seats[y].AUS;
+  if (c) st.divs = Object.entries(c).flatMap(([fam, n]) => Array.from({ length: n }, () => ({ hold: { fam } })));
+  return st;
+}
+function legendHeightOf(m, y, w, probe) {
+  const real = !!(Y[y] && Y[y].search);
+  const key = [w, S.view, y, real, boothsShown()].join("|");
+  if (!legendHeights.has(key)) {
+    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index, year: S.year };
+    let hMax = 0;
+    try {
+      S.year = y;
+      for (const lens of LENSES.map((l) => l.id))
+        for (const mode of lens === "tpp" || lens === "fp" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null]) {
+          Object.assign(S, { lens });
+          if (lens === "tpp") S.tppMode = mode;
+          if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
+          if (lens === "seifa") S.index = mode;
+          const my = legendStandIn(m, y);
+          for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
+            S.seat = seat;
+            probe.innerHTML = legendHTML(my);
+            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+          }
+        }
+    } finally { Object.assign(S, keep); }
+    legendHeights.set(key, Math.ceil(hMax));
+  }
+  return legendHeights.get(key);
+}
 function holdLegendHeight(m) {
   const el = $("#legend"), w = el.clientWidth;
   if (!w) return;
-  const key = [w, S.view, m.year, boothsShown()].join("|");
-  if (!legendHeights.has(key)) {
-    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index };
-    const probe = el.cloneNode(false);
-    probe.removeAttribute("id"); probe.removeAttribute("hidden");
-    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
-    el.parentNode.appendChild(probe);
-    let hMax = 0;
-    try {
-      for (const lens of LENSES.map((l) => l.id))
-        for (const mode of lens === "tpp" || lens === "fp" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null])
-          for (const seat of S.view === "chamber" && m.seating ? ["plan", "sort"] : [S.seat]) {
-            Object.assign(S, { lens, seat });
-            if (lens === "tpp") S.tppMode = mode;
-            if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
-            if (lens === "seifa") S.index = mode;
-            probe.innerHTML = legendHTML(m);
-            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
-          }
-    } finally { Object.assign(S, keep); probe.remove(); }
-    legendHeights.set(key, Math.ceil(hMax));
-  }
+  const probe = el.cloneNode(false);
+  probe.removeAttribute("id"); probe.removeAttribute("hidden");
+  probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
+  el.parentNode.appendChild(probe);
+  let h = 0;
+  try { for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe)); } finally { probe.remove(); }
+  el.style.minHeight = h + "px";
   el.style.boxSizing = "border-box";
-  el.style.minHeight = legendHeights.get(key) + "px";
 }
 function legendHTML(m) {
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
@@ -3680,9 +3711,9 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
   $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
-  getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }).catch(() => {});
+  const meta = loadLegendMeta();
   showLoading(true);
-  try { await loadYear(S.year); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);
