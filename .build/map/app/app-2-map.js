@@ -295,6 +295,16 @@ function drawLabels(m) {
       if (put(b.name[j].replace(" early voting centre", " (early)"), x, y - rad(b.votes[j]) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
     }
   }
+  // the streets' own names last, clear of every label above and every booth
+  const sA = streetK();
+  if (sA > 0.02 && streetDrawn.length) {
+    const obst = [];
+    for (const j of m._vis || []) {
+      const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]) + 2;
+      if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
+    }
+    drawStreetNames(placed, obst, sA);
+  }
   ctx.restore();
 }
 
@@ -318,6 +328,8 @@ const SVC_T = "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2
 const streetK = () => smooth(STREETS.k0, STREETS.k1, T.k);
 const tiles = new Map();
 let streetCv = null, streetUse = 0, streetLive = 0;
+// the tiles laid at the view's own zoom on the last paint, for the names
+const streetDrawn = [];
 // lon/lat to Web Mercator's unit square, and back
 const merc = (ll) => { const s = Math.sin((ll[1] * Math.PI) / 180); return [(ll[0] + 180) / 360, 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)]; };
 const unmerc = (x, y) => [x * 360 - 180, (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI];
@@ -329,7 +341,7 @@ function tileAt(dark, z, x, y, want) {
     tiles.set(key, t); streetLive++;
     fetch(`${SVC_T}/${z}/${y}/${x}.pbf`)
       .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then((b) => { t.cv = renderTile(mvtParse(new Uint8Array(b)), dark, z, tilePx()); t.ready = performance.now(); })
+      .then((b) => { const pr = mvtParse(new Uint8Array(b)); t.cv = renderTile(pr, dark, z, tilePx()); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); })
       .catch(() => { t.failed = true; })
       .finally(() => { streetLive--; schedule(); });
     if (tiles.size > streetCap()) pruneTiles();
@@ -346,10 +358,15 @@ function pruneTiles() {
    zig-zag coordinate deltas against a 4096 extent. mvtParse keeps only the
    layers the street sheet draws. */
 const TXT = new TextDecoder();
+// the label layers read for names: a road's label class to its rank (0 the
+// freeways, 4 the lanes; Esri's classes as its own style sorts them), and
+// the point layers that name parks and water
+const ROAD_RANK = { 0: 0, 1: 0, 75: 0, 2: 1, 3: 1, 150: 1, 4: 2, 10: 3, 5: 3, 12: 4, 6: 4 };
+const SPOT_OF = (n) => (n === "Park or farming/label" ? "park" : n === "Water point" || /^(Water area|Marine area|Marine waterbody)(\/| ).*label/.test(n) ? "water" : null);
 function mvtParse(buf) {
   const vint = (b, st) => { let x = 0, s = 0; for (;;) { const v = b[st.i++]; x += (v & 127) * 2 ** s; s += 7; if (!(v & 128)) return x; } };
   const packed = (b) => { const st = { i: 0 }, out = []; while (st.i < b.length) out.push(vint(b, st)); return out; };
-  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] } };
+  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] }, names: [], spots: [] };
   for (let i = 0; i <= 10; i++) { out.roads.push([]); out.tuns.push([]); }
   const FILL_OF = { "Urban area": "urban", "Park or farming": "park", "Golf course": "park", Airport: "park", Zoo: "park", "Marine area": "water", "Water area": "water" };
   const root = { i: 0 };
@@ -370,7 +387,8 @@ function mvtParse(buf) {
       } else if (wire === 0) { const n = vint(lb, st); if (no === 5) L.extent = n; }
     }
     const kind = FILL_OF[L.name], isRoad = L.name === "Road" || L.name === "Road tunnel";
-    if (!kind && !isRoad && L.name !== "Railroad" && L.name !== "Water line") return;
+    const spot = SPOT_OF(L.name);
+    if (!kind && !isRoad && !spot && L.name !== "Road/label" && L.name !== "Railroad" && L.name !== "Water line") return;
     const vals = L.valsr.map((v) => {
       const vs = { i: 0 }; let o = null;
       while (vs.i < v.length) { const t = vint(v, vs), no = t >> 3, w = t & 7;
@@ -380,17 +398,29 @@ function mvtParse(buf) {
       return o;
     });
     for (const fb of L.raw) {
-      const f = { tags: [], geom: [] };
+      const f = { tags: [], geom: [], type: 0 };
       const fs = { i: 0 };
       while (fs.i < fb.length) { const t = vint(fb, fs), no = t >> 3, w = t & 7;
         if (w === 2) { const n = vint(fb, fs), v = fb.subarray(fs.i, fs.i + n); fs.i += n;
           if (no === 2) f.tags = packed(v); else if (no === 4) f.geom = packed(v); }
-        else if (w === 0) vint(fb, fs); }
+        else if (w === 0) { const v = vint(fb, fs); if (no === 3) f.type = v; } }
       const tags = {};
       for (let i = 0; i + 1 < f.tags.length; i += 2) tags[L.keys[f.tags[i]]] = vals[f.tags[i + 1]];
       const parts = decodeParts(f.geom);
       if (!parts.length) continue;
       if (kind) { out.fills[kind].push({ ext: L.extent, parts }); continue; }
+      // names: a road's along its label line (route shields carry only _name - left out),
+      // a park's or a water's at its label point
+      if (L.name === "Road/label") {
+        const name = tags._name_global;
+        if (name && f.type === 2 && tags.Viz !== 3) for (const pt of parts) out.names.push({ name, rank: /\b(Lane|Place|Mews)\b/.test(name) ? 4 : ROAD_RANK[tags._label_class] ?? 3, ext: L.extent, pts: pt });
+        continue;
+      }
+      if (spot) {
+        const name = tags._name_global || tags._name;
+        if (name && f.type === 1) for (const pt of parts) out.spots.push({ name, kind: spot, ext: L.extent, x: pt[0], y: pt[1] });
+        continue;
+      }
       if (L.name === "Railroad") { out.rail.push({ ext: L.extent, parts }); continue; }
       if (L.name === "Water line") { out.waterL.push({ ext: L.extent, parts }); continue; }
       if (tags.Viz === 3) continue; // Esri's suppression lane
@@ -418,7 +448,9 @@ function decodeParts(geom) {
    sheets themselves (land exactly STREET_LAND so the land-lift still reads
    plain land), road width by class against zoom in tile-256 px */
 const SHEET = {
-  light: { land: "#efefef", urban: "#dfe0e2", water: "#d0cfd4", park: "#e3e8e2", line: "#ffffff", case: "#d3d4d6", tcase: "#dedfe1", tline: "#fcfcfc", rail: "#c9cacc", railBox: "#f7f7f7" },
+  // (on paper the built-up tint is left out: under a multiply it greyed every
+  // city seat's colour for no information the streets don't already give)
+  light: { land: "#efefef", urban: "#efefef", water: "#d0cfd4", park: "#e3e8e2", line: "#ffffff", case: "#d3d4d6", tcase: "#dedfe1", tline: "#fcfcfc", rail: "#c9cacc", railBox: "#f7f7f7" },
   dark: { land: "#474749", urban: "#505052", water: "#232227", park: "#4a4c4b", line: "#666668", case: "#3a3b3d", tcase: "#434446", tline: "#5c5c5f", rail: "#5e5e60", railBox: "#383839" },
 };
 // fwy, hwy, fwy-ramp, major, major-ramp, minor, minor-ramp, local, service, walking, 4wd
@@ -501,6 +533,7 @@ function drawQuad(g, img, sx, sy, sw, q, alpha) {
   g.drawImage(img, sx, sy, sw, sw, -e, -e, 1 + 2 * e, 1 + 2 * e);
 }
 function drawStreets(alpha) {
+  streetDrawn.length = 0;
   if (!proj || alpha <= 0.004) return;
   const dark = TH.dark, W = canvas.width, H = canvas.height, now = performance.now();
   streetUse++;
@@ -544,7 +577,7 @@ function drawStreets(alpha) {
       }
       if (t && t.ready) needFrame = true;
     }
-    if (f > 0) drawQuad(g, t.cv, 0, 0, t.cv.width, q, f);
+    if (f > 0) { drawQuad(g, t.cv, 0, 0, t.cv.width, q, f); streetDrawn.push({ t, z, tx, ty, f }); }
   }
   // the plain land to nothing: lifted to white on paper, differenced to black on the dark page
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
@@ -553,10 +586,99 @@ function drawStreets(alpha) {
   g.fillStyle = `rgb(${lift},${lift},${lift})`; g.fillRect(0, 0, W, H);
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.globalAlpha = alpha * (dark ? 0.85 : 1);
+  // on paper the streets come in at half strength over a seat's opening view
+  // and reach full strength at street zoom, so a city seat still reads as its
+  // colour first; on the dark page they are quiet already
+  ctx.globalAlpha = alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k));
   ctx.globalCompositeOperation = dark ? "screen" : "multiply";
   ctx.drawImage(streetCv, 0, 0);
   ctx.restore();
+}
+/* the names: streets along their own line, parks and water level, read from
+   the same tiles and set on the screen after the map's own labels, so a seat,
+   booth or dot never gives way to one. A street's name turns with the street
+   as it lies on this map, and a park's sits level - the sheet's lettering
+   never rides the tile's tilt through the projection. */
+// the tile zoom each road rank is named from: nothing at a seat's opening
+// view (z13 for a city seat), where the booths' names already fill it
+const NAME_Z = [14, 14, 15, 15, 17];
+const NAME_GAP = 240; // px between two labels of one name
+function tileLabels(e) {
+  const t = e.t;
+  if (t.lab) return t.lab;
+  const n = 2 ** e.z, at = (px, py, ext) => proj(unmerc((e.tx + px / ext) / n, (e.ty + py / ext) / n));
+  const roads = (t.names || []).map((r) => {
+    const q = new Float64Array(r.pts.length);
+    for (let i = 0; i < r.pts.length; i += 2) { const p = at(r.pts[i], r.pts[i + 1], r.ext); q[i] = p[0]; q[i + 1] = p[1]; }
+    return { name: r.name, rank: r.rank, q };
+  });
+  const spots = (t.spots || []).map((s) => { const p = at(s.x, s.y, s.ext); return { name: s.name, kind: s.kind, x: p[0], y: p[1] }; });
+  return (t.lab = { roads, spots });
+}
+function drawStreetNames(placed, obst, alpha) {
+  if (!proj || alpha <= 0.02 || !streetDrawn.length) return;
+  const th = TH, dark = th.dark, z = streetDrawn[0].z, seen = new Map();
+  const hits = (r) => { for (const q of placed) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; for (const q of obst) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; return false; };
+  const near = (name, x, y) => { const l = seen.get(name); if (!l) return false; for (const [a, b] of l) if (Math.hypot(a - x, b - y) < NAME_GAP) return true; return false; };
+  const note = (name, x, y) => { if (!seen.has(name)) seen.set(name, []); seen.get(name).push([x, y]); };
+  const roads = [], spots = [];
+  for (const e of streetDrawn) {
+    const lab = tileLabels(e);
+    for (const r of lab.roads) if (z >= NAME_Z[r.rank]) roads.push({ r, f: e.f });
+    for (const s of lab.spots) spots.push({ s, f: e.f });
+  }
+  roads.sort((a, b) => a.r.rank - b.r.rank || b.r.q.length - a.r.q.length);
+  ctx.lineJoin = "round"; ctx.textBaseline = "middle"; ctx.textAlign = "center";
+  const ink = css(th.ink3), halo = dark ? "rgba(0,0,0,0.4)" : css(th.bg, 0.8);
+  const draw = (txt, x, y, ang, f) => {
+    ctx.save();
+    ctx.globalAlpha = alpha * f;
+    ctx.translate(x, y); if (ang) ctx.rotate(ang);
+    ctx.lineWidth = 2.6; ctx.strokeStyle = halo; ctx.strokeText(txt, 0, 0);
+    ctx.fillStyle = ink; ctx.fillText(txt, 0, 0);
+    ctx.restore();
+  };
+  // a street: the straightest run of its line at its middle (or a third of the
+  // way either side) long enough for the name, the text turned to it and kept
+  // reading left to right; its room is a row of squares along it
+  let n = 0;
+  for (const { r, f } of roads) {
+    if (n >= 48) break;
+    ctx.font = `${r.rank <= 1 ? 600 : 500} ${r.rank <= 1 ? 10.5 : 10}px ${SANS}`;
+    const w = ctx.measureText(r.name).width, h = 12, q = r.q, m = q.length / 2;
+    if (m < 2) continue;
+    const X = new Float64Array(m), Yp = new Float64Array(m), L = new Float64Array(m);
+    for (let i = 0; i < m; i++) { X[i] = q[2 * i] * T.k + T.x; Yp[i] = q[2 * i + 1] * T.k + T.y; if (i) L[i] = L[i - 1] + Math.hypot(X[i] - X[i - 1], Yp[i] - Yp[i - 1]); }
+    const len = L[m - 1];
+    if (len < w + 16) continue;
+    const ptAt = (d) => { let i = 1; while (i < m - 1 && L[i] < d) i++; const u = (d - L[i - 1]) / (L[i] - L[i - 1] || 1); return [X[i - 1] + (X[i] - X[i - 1]) * u, Yp[i - 1] + (Yp[i] - Yp[i - 1]) * u]; };
+    for (const at of [0.5, 0.3, 0.7]) {
+      const c = len * at; if (c - w / 2 < 0 || c + w / 2 > len) continue;
+      const a = ptAt(c - w / 2), b = ptAt(c + w / 2);
+      if (Math.hypot(b[0] - a[0], b[1] - a[1]) < w * 0.96) continue;
+      const cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2;
+      if (cx < 4 || cy < 4 || cx > Wpx - 4 || cy > Hpx - 4) continue;
+      if (near(r.name, cx, cy)) break;
+      let ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      if (ang > Math.PI / 2) ang -= Math.PI; else if (ang < -Math.PI / 2) ang += Math.PI;
+      const k = Math.max(1, Math.ceil(w / h)), boxes = [];
+      for (let j = 0; j < k; j++) { const d = ((j + 0.5) / k - 0.5) * w, x = cx + Math.cos(ang) * d, y = cy + Math.sin(ang) * d; boxes.push([x - h / 2, y - h / 2, x + h / 2, y + h / 2]); }
+      if (boxes.some((bx) => bx[0] < 2 || bx[1] < 2 || bx[2] > Wpx - 2 || bx[3] > Hpx - 2 || hits(bx))) continue;
+      placed.push(...boxes); note(r.name, cx, cy); n++;
+      draw(r.name, cx, cy, ang, f);
+      break;
+    }
+  }
+  // parks and water: level, italic, from the same zoom as the minor roads
+  if (z >= NAME_Z[2]) for (const { s, f } of spots) {
+    const x = s.x * T.k + T.x, y = s.y * T.k + T.y;
+    if (x < 0 || y < 0 || x > Wpx || y > Hpx || near(s.name, x, y)) continue;
+    ctx.font = `italic ${s.kind === "water" ? 500 : 400} 10.5px ${SANS}`;
+    const w = ctx.measureText(s.name).width, bx = [x - w / 2 - 2, y - 7, x + w / 2 + 2, y + 7];
+    if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2 || hits(bx)) continue;
+    placed.push(bx); note(s.name, x, y);
+    draw(s.name, x, y, 0, f);
+  }
 }
 let creditOn = false;
 function showCredit(on) {
