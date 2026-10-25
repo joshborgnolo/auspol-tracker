@@ -2062,15 +2062,19 @@ window.AP.tabToPath = tabToPath;
    rebuilt the whole page - every chart in every section - inside the press,
    about 70ms on a phone, before the chart that was asked to move could start
    moving. Their only prop is the range, which in the redesign is fixed. */
-const PrimaryVoteMemo = React.memo(PrimaryVotePanel);
-const NextPollsMemo = React.memo(NextPollsPanel);
-const LeadershipMemo = React.memo(LeadershipSection);
-const DirectionMemo = React.memo(DirectionPanel);
-const DemographicsMemo = React.memo(DemographicsPanel);
-const OnSourcesMemo = React.memo(OnSourcesPanel);
-const IssuesMemo = React.memo(IssuesPanel);
-const UndecidedMemo = React.memo(UndecidedPanel);
-const MoodMemo = React.memo(MoodPanel);
+/* The panels live below the panels module's late split (loadLate), so each
+   memo names its panel at render, not here at load: these lines run before
+   that half of the module exists. */
+const lateMemo = (get) => React.memo((props) => React.createElement(get(), props));
+const PrimaryVoteMemo = lateMemo(() => PrimaryVotePanel);
+const NextPollsMemo = lateMemo(() => NextPollsPanel);
+const LeadershipMemo = lateMemo(() => LeadershipSection);
+const DirectionMemo = lateMemo(() => DirectionPanel);
+const DemographicsMemo = lateMemo(() => DemographicsPanel);
+const OnSourcesMemo = lateMemo(() => OnSourcesPanel);
+const IssuesMemo = lateMemo(() => IssuesPanel);
+const UndecidedMemo = lateMemo(() => UndecidedPanel);
+const MoodMemo = lateMemo(() => MoodPanel);
 
 function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
   /* The redesign sets its range tabs over the two-party and primary-vote
@@ -2761,7 +2765,7 @@ function App() {
     window.AP.openTerm = (id, from) => {
       if (!id) return;
       if (readLocation() === "info") openTermPage(id, from);
-      else setTermPop({ id, from });
+      else { loadLate(); setTermPop({ id, from }); }   // the pop-up is a late module (loadLate)
     };
     window.AP.openTermPage = openTermPage;
     /* The navbar "Next" label jumps straight to the NextPollsPanel on the
@@ -3083,7 +3087,7 @@ function App() {
               {id === "allpolls" && late && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
                 backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
                 tppBasis={tppBasis} setTppBasis={setTppBasis} />}
-              {termPop && id === tab && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
+              {termPop && id === tab && late && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
                 onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
               {TAB_MENU[id] && late && <MenuPageView id={id} tppBasis={tppBasis} />}
               {id === "info" && late && <InfoView focus={focusTerm ? focusTerm.id : null}

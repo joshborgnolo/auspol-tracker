@@ -1796,8 +1796,20 @@ for (const f of PLAIN) {
   parts.push(emitJs(VIC ? "data-vic" : "data", out));
   parts.push(emitJs(VIC ? "data-vic-late" : "data-late", late));
 }
-for (const f of JSX)
-  parts.push(emitJs(f.replace(/\.jsx?$/, ""), transpile(fs.readFileSync(A(f), "utf8"), f)));
+/* A module carrying a "@late-split" comment ships in two files: the code
+   above the marker (what the first screen runs) under its own name, the rest
+   as <name>-late, which LATE_MODULES sends after the first paint. Both are
+   classic scripts in one global scope, so the halves see each other exactly
+   as the one file's top level did; tab documents load both, in order. */
+const LATE_SPLIT = /\n\/\* @late-split\b[\s\S]*?\*\/\n/;
+for (const f of JSX) {
+  const base = f.replace(/\.jsx?$/, "");
+  const code = fs.readFileSync(A(f), "utf8");
+  const cut = code.match(LATE_SPLIT);
+  if (!cut) { parts.push(emitJs(base, transpile(code, f))); continue; }
+  parts.push(emitJs(base, transpile(code.slice(0, cut.index), f)));
+  parts.push(emitJs(base + "-late", transpile(code.slice(cut.index + cut[0].length), f)));
+}
 /* a hashed name changes when the bytes do, so sweep the ones nothing points
    at – but only names whose base this build owns (the jurisdiction sweep
    above is why explained/data.* survive a /vic/ build) */
@@ -1911,7 +1923,7 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
    documents above were cut from the full tag list - each renders its own
    tab first and needs its module from the start. Order is kept: the late
    list runs in the order the tags did. */
-const LATE_MODULES = ["data-late", "data-vic-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
+const LATE_MODULES = ["data-late", "data-vic-late", "a11e1559-f455-44d5-8a31-6699de4ef310-late", "d1a1d215-370c-4ebc-878b-7eeea9ad8102-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
 {
   const late = [];
   html = html.replace(/\n?[ \t]*<script src="((?:\.\.\/)*assets\/js\/([\w-]+)\.[0-9a-f]{8}\.js)"><\/script>/g,

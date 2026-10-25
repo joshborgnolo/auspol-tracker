@@ -225,6 +225,8 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
   );
 }
 
+/* @late-split - everything below loads after the first paint (build.mjs
+   LATE_SPLIT): the first screen runs only the code above this line */
 // ---- Primary vote ---------------------------------------------------
 function PrimaryVotePanel({ rangeId, setRangeId }) {
   if (window.AP.rd) return <RdPrimary rangeId={rangeId} setRangeId={setRangeId} />;

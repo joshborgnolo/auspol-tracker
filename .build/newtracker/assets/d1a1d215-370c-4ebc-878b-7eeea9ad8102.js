@@ -809,6 +809,8 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   );
 }
 
+/* @late-split - everything below loads after the first paint (build.mjs
+   LATE_SPLIT): the first screen runs only the code above this line */
 // ====================================================================
 // PAST CYCLES – every term aligned to its election day
 // ====================================================================

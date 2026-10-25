@@ -1728,15 +1728,16 @@ const readLocation = () => {
   return TAB_IDS.includes(window.AP_INITIAL_TAB) ? window.AP_INITIAL_TAB : "now";
 };
 window.AP.tabToPath = tabToPath;
-const PrimaryVoteMemo = React.memo(PrimaryVotePanel);
-const NextPollsMemo = React.memo(NextPollsPanel);
-const LeadershipMemo = React.memo(LeadershipSection);
-const DirectionMemo = React.memo(DirectionPanel);
-const DemographicsMemo = React.memo(DemographicsPanel);
-const OnSourcesMemo = React.memo(OnSourcesPanel);
-const IssuesMemo = React.memo(IssuesPanel);
-const UndecidedMemo = React.memo(UndecidedPanel);
-const MoodMemo = React.memo(MoodPanel);
+const lateMemo = get => React.memo(props => React.createElement(get(), props));
+const PrimaryVoteMemo = lateMemo(() => PrimaryVotePanel);
+const NextPollsMemo = lateMemo(() => NextPollsPanel);
+const LeadershipMemo = lateMemo(() => LeadershipSection);
+const DirectionMemo = lateMemo(() => DirectionPanel);
+const DemographicsMemo = lateMemo(() => DemographicsPanel);
+const OnSourcesMemo = lateMemo(() => OnSourcesPanel);
+const IssuesMemo = lateMemo(() => IssuesPanel);
+const UndecidedMemo = lateMemo(() => UndecidedPanel);
+const MoodMemo = lateMemo(() => MoodPanel);
 function SnapshotView({
   rangeId: heroRange,
   setRangeId,
@@ -2305,10 +2306,13 @@ function App() {
     };
     window.AP.openTerm = (id, from) => {
       if (!id) return;
-      if (readLocation() === "info") openTermPage(id, from);else setTermPop({
-        id,
-        from
-      });
+      if (readLocation() === "info") openTermPage(id, from);else {
+        loadLate();
+        setTermPop({
+          id,
+          from
+        });
+      }
     };
     window.AP.openTermPage = openTermPage;
     window.AP.gotoNextPolls = () => {
@@ -2591,7 +2595,7 @@ function App() {
     backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
     tppBasis: tppBasis,
     setTppBasis: setTppBasis
-  }), termPop && id === tab && React.createElement(TermPop, {
+  }), termPop && id === tab && late && React.createElement(TermPop, {
     id: termPop.id,
     onClose: () => setTermPop(null),
     onMore: () => window.AP.openTermPage(termPop.id, termPop.from)
