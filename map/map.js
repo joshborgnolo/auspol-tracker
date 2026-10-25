@@ -358,7 +358,7 @@ function applyNow(m, now) {
 }
 
 // the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs)
-const SEATED = new Set(["now"]);
+const SEATED = new Set(["now", 2025, 2022]);
 async function loadYear(year) {
   if (Y[year]) return Y[year].ready;
   const m = { year, ready: null };

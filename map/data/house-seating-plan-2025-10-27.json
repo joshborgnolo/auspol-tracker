@@ -1,0 +1,1588 @@
+{
+ "meta": {
+  "title": "Seating plan - House of Representatives chamber, 48th Parliament",
+  "planDate": "27 October 2025",
+  "source": "aph.gov.au/-/media/05_About_Parliament/53_HoR/531_About_HoR/Chamber_seating_plans/Seating_Plan.pdf (PDF created 28 October 2025), retrieved via the Internet Archive Wayback Machine capture of 2025-11-04 00:02:27 (web.archive.org/web/20251104000227), the first archived revision of the first seating plan of the 48th Parliament, i.e. the chamber as composed at the 2025 federal election before any by-elections or party changes",
+  "harvested": "2026-10-25",
+  "method": "PDF text layer (pdftotext -bbox-layout) parsed into surname/electorate label pairs by edge alignment; every label cross-verified against (a) a macOS Vision OCR pass of the rasterised page (150/150 agreement after high-resolution crop closures of twelve edge labels; a crop confirms the 'Mackelllar' misprint is in the source) and (b) the 2025-election roster in this repo (map/data/res-2025.json, year=2025 entries only - no subsequent movement overrides) for full names and election-night parties (150/150 match).",
+  "page": "A4 portrait, 595.276 x 841.89 pt; the chamber is drawn with the Speaker's chair at the top (north), the table running south from it, the government on the Speaker's right (the page's LEFT), the opposition on the left (page RIGHT), crossbench around the far (south) curve. (The PDF's second page is a portrait alphabetical 'CHAIR LISTING' member index, not a state summary table as in the 47th plan.)",
+  "geometry": "Five concentric rows of seats about a centre near (297.6, 536); row radii 86.79, 136.56, 180.39, 220.75, 265.39 pt. Arms run roughly north-south at x ~ 25..50 (government) and 534..559 (opposition) on the inner rows. The front row's arms extend furthest north toward the Speaker. Seat coordinates below give the surname label's north-west corner in page points, y increasing downward.",
+  "ordering": "Within each row, 'seat' numbers run from the northern (Speaker) end of the government side, around the far (south) curve, up to the northern end of the opposition side."
+ },
+ "officials": {
+  "speakerChair": {
+   "label": "SPEAKER",
+   "x": 285.6,
+   "y": 194.4,
+   "sits": "The Speaker in the chair above the table"
+  },
+  "officialsBoxes": "six 'Officials' advisers' boxes flanking the Speaker's chair at y≈178, three on each side (x≈74, 117, 160 left; x≈426, 467, 511 right)",
+  "clerks": [
+   {
+    "label": "Clerk",
+    "x": 272.1,
+    "y": 248.2
+   },
+   {
+    "label": "Deputy Clerk",
+    "x": 305.8,
+    "y": 243.0
+   }
+  ],
+  "table": {
+   "label": "THE TABLE",
+   "x": 283.6,
+   "y": 334.4
+  },
+  "hansard": {
+   "label": "Hansard",
+   "x": 285.7,
+   "y": 481.9
+  },
+  "serjeantAtArms": {
+   "label": "Serjeant-at-Arms",
+   "x": 317.8,
+   "y": 802.2,
+   "note": "printed beside the plan date '27 October 2025', bottom right"
+  }
+ },
+ "rows": [
+  {
+   "row": 1,
+   "seats": [
+    {
+     "seat": 1,
+     "side": "speaker",
+     "member": "Milton Dick",
+     "party": "ALP",
+     "label": "Dick",
+     "division": "Oxley",
+     "x": 291.4747,
+     "y": 161.4382,
+     "chair": "Speaker's chair"
+    },
+    {
+     "seat": 2,
+     "side": "government",
+     "member": "Pat Conroy",
+     "party": "ALP",
+     "label": "Conroy",
+     "division": "Shortland",
+     "x": 197.4468,
+     "y": 164.9033
+    },
+    {
+     "seat": 3,
+     "side": "government",
+     "member": "Madeleine King",
+     "party": "ALP",
+     "label": "King M",
+     "division": "Brand",
+     "x": 197.6568,
+     "y": 186.5185
+    },
+    {
+     "seat": 4,
+     "side": "government",
+     "member": "Jason Clare",
+     "party": "ALP",
+     "label": "Clare",
+     "division": "Blaxland",
+     "x": 197.6568,
+     "y": 207.7755
+    },
+    {
+     "seat": 5,
+     "side": "government",
+     "member": "Michelle Rowland",
+     "party": "ALP",
+     "label": "Rowland",
+     "division": "Greenway",
+     "x": 197.6568,
+     "y": 229.2116
+    },
+    {
+     "seat": 6,
+     "side": "government",
+     "member": "Mark Butler",
+     "party": "ALP",
+     "label": "Butler",
+     "division": "Hindmarsh",
+     "x": 197.653,
+     "y": 250.6477
+    },
+    {
+     "seat": 7,
+     "side": "government",
+     "member": "Julie Collins",
+     "party": "ALP",
+     "label": "Collins",
+     "division": "Franklin",
+     "x": 197.6568,
+     "y": 272.0838
+    },
+    {
+     "seat": 8,
+     "side": "government",
+     "member": "Tony Burke",
+     "party": "ALP",
+     "label": "Burke",
+     "division": "Watson",
+     "x": 197.6568,
+     "y": 293.5199
+    },
+    {
+     "seat": 9,
+     "side": "government",
+     "member": "Richard Marles",
+     "party": "ALP",
+     "label": "Marles",
+     "division": "Corio",
+     "x": 197.6568,
+     "y": 313.4219
+    },
+    {
+     "seat": 10,
+     "side": "government",
+     "member": "Jim Chalmers",
+     "party": "ALP",
+     "label": "Chalmers",
+     "division": "Rankin",
+     "x": 197.3446,
+     "y": 334.4359
+    },
+    {
+     "seat": 11,
+     "side": "government",
+     "member": "Anthony Albanese",
+     "party": "ALP",
+     "label": "Albanese",
+     "division": "Grayndler",
+     "x": 240.8074,
+     "y": 344.5496
+    },
+    {
+     "seat": 12,
+     "side": "government",
+     "member": "Catherine King",
+     "party": "ALP",
+     "label": "King C",
+     "division": "Ballarat",
+     "x": 197.6568,
+     "y": 357.8281
+    },
+    {
+     "seat": 13,
+     "side": "government",
+     "member": "Amanda Rishworth",
+     "party": "ALP",
+     "label": "Rishworth",
+     "division": "Kingston",
+     "x": 197.3446,
+     "y": 379.2642
+    },
+    {
+     "seat": 14,
+     "side": "government",
+     "member": "Chris Bowen",
+     "party": "ALP",
+     "label": "Bowen",
+     "division": "McMahon",
+     "x": 197.9431,
+     "y": 400.7003
+    },
+    {
+     "seat": 15,
+     "side": "government",
+     "member": "Tanya Plibersek",
+     "party": "ALP",
+     "label": "Plibersek",
+     "division": "Sydney",
+     "x": 197.9431,
+     "y": 420.6242
+    },
+    {
+     "seat": 16,
+     "side": "government",
+     "member": "Clare O'Neil",
+     "party": "ALP",
+     "label": "O’Neil",
+     "division": "Hotham",
+     "x": 197.653,
+     "y": 443.5724
+    },
+    {
+     "seat": 17,
+     "side": "government",
+     "member": "Anika Wells",
+     "party": "ALP",
+     "label": "Wells",
+     "division": "Lilley",
+     "x": 197.9431,
+     "y": 465.1876
+    },
+    {
+     "seat": 18,
+     "side": "government",
+     "member": "Anne Aly",
+     "party": "ALP",
+     "label": "Aly",
+     "division": "Cowan",
+     "x": 197.3445,
+     "y": 485.588659
+    },
+    {
+     "seat": 19,
+     "side": "government",
+     "member": "Matt Keogh",
+     "party": "ALP",
+     "label": "Keogh",
+     "division": "Burt",
+     "x": 200.9606,
+     "y": 547.2498
+    },
+    {
+     "seat": 20,
+     "side": "government",
+     "member": "Kristy McBain",
+     "party": "ALP",
+     "label": "McBain",
+     "division": "Eden-Monaro",
+     "x": 204.2159,
+     "y": 564.7428
+    },
+    {
+     "seat": 21,
+     "side": "government",
+     "member": "Andrew Giles",
+     "party": "ALP",
+     "label": "Giles",
+     "division": "Scullin",
+     "x": 214.7689,
+     "y": 586.8853
+    },
+    {
+     "seat": 22,
+     "side": "government",
+     "member": "Daniel Mulino",
+     "party": "ALP",
+     "label": "Mulino",
+     "division": "Fraser",
+     "x": 233.1295,
+     "y": 606.8713
+    },
+    {
+     "seat": 23,
+     "side": "government",
+     "member": "Sam Rae",
+     "party": "ALP",
+     "label": "Rae",
+     "division": "Hawke",
+     "x": 258.4668,
+     "y": 620.0586
+    },
+    {
+     "seat": 24,
+     "side": "opposition",
+     "member": "Scott Buchholz",
+     "party": "LNP",
+     "label": "Buchholz",
+     "division": "Wright",
+     "x": 372.2063,
+     "y": 485.588659
+    },
+    {
+     "seat": 25,
+     "side": "opposition",
+     "member": "Tim Wilson",
+     "party": "LP",
+     "label": "Wilson T",
+     "division": "Goldstein",
+     "x": 373.8783,
+     "y": 459.9709
+    },
+    {
+     "seat": 26,
+     "side": "opposition",
+     "member": "Melissa Price",
+     "party": "LP",
+     "label": "Price",
+     "division": "Durack",
+     "x": 382.9989,
+     "y": 437.1374
+    },
+    {
+     "seat": 27,
+     "side": "opposition",
+     "member": "Angus Taylor",
+     "party": "LP",
+     "label": "Taylor",
+     "division": "Hume",
+     "x": 380.1257,
+     "y": 412.3943
+    },
+    {
+     "seat": 28,
+     "side": "opposition",
+     "member": "Dan Tehan",
+     "party": "LP",
+     "label": "Tehan",
+     "division": "Wannon",
+     "x": 381.252,
+     "y": 387.4941
+    },
+    {
+     "seat": 29,
+     "side": "opposition",
+     "member": "Melissa McIntosh",
+     "party": "LP",
+     "label": "McIntosh",
+     "division": "Lindsay",
+     "x": 371.6174,
+     "y": 362.9081
+    },
+    {
+     "seat": 30,
+     "side": "opposition",
+     "member": "Sussan Ley",
+     "party": "LP",
+     "label": "Ley",
+     "division": "Farrer",
+     "x": 343.7359,
+     "y": 344.5496
+    },
+    {
+     "seat": 31,
+     "side": "opposition",
+     "member": "David Littleproud",
+     "party": "LNP",
+     "label": "Littleproud",
+     "division": "Maranoa",
+     "x": 366.6707,
+     "y": 338.165
+    },
+    {
+     "seat": 32,
+     "side": "opposition",
+     "member": "Ted O'Brien",
+     "party": "LNP",
+     "label": "O’Brien T",
+     "division": "Fairfax",
+     "x": 372.4591,
+     "y": 313.4219
+    },
+    {
+     "seat": 33,
+     "side": "opposition",
+     "member": "Alex Hawke",
+     "party": "LP",
+     "label": "Hawke",
+     "division": "Mitchell",
+     "x": 377.8902,
+     "y": 288.6788
+    },
+    {
+     "seat": 34,
+     "side": "opposition",
+     "member": "Angie Bell",
+     "party": "LNP",
+     "label": "Bell",
+     "division": "Moncrieff",
+     "x": 385.6763,
+     "y": 263.9357
+    },
+    {
+     "seat": 35,
+     "side": "opposition",
+     "member": "Kevin Hogan",
+     "party": "NP",
+     "label": "Hogan",
+     "division": "Page",
+     "x": 378.5276,
+     "y": 237.4415
+    },
+    {
+     "seat": 36,
+     "side": "opposition",
+     "member": "Andrew Wallace",
+     "party": "LNP",
+     "label": "Wallace",
+     "division": "Fisher",
+     "x": 375.878,
+     "y": 214.6285
+    },
+    {
+     "seat": 37,
+     "side": "opposition",
+     "member": "Julian Leeser",
+     "party": "LP",
+     "label": "Leeser",
+     "division": "Berowra",
+     "x": 379.0039,
+     "y": 189.7063
+    },
+    {
+     "seat": 38,
+     "side": "opposition",
+     "member": "Darren Chester",
+     "party": "NP",
+     "label": "Chester",
+     "division": "Gippsland",
+     "x": 376.7197,
+     "y": 164.9033
+    }
+   ]
+  },
+  {
+   "row": 2,
+   "seats": [
+    {
+     "seat": 1,
+     "side": "government",
+     "member": "Zhi Soon",
+     "party": "ALP",
+     "label": "Soon",
+     "division": "Banks",
+     "x": 149.5272,
+     "y": 245.774
+    },
+    {
+     "seat": 2,
+     "side": "government",
+     "member": "Jess Teesdale",
+     "party": "ALP",
+     "label": "Teesdale",
+     "division": "Bass",
+     "x": 149.5268,
+     "y": 272.0838
+    },
+    {
+     "seat": 3,
+     "side": "government",
+     "member": "Ali France",
+     "party": "ALP",
+     "label": "France",
+     "division": "Dickson",
+     "x": 149.5268,
+     "y": 313.4219
+    },
+    {
+     "seat": 4,
+     "side": "government",
+     "member": "Emma Comer",
+     "party": "ALP",
+     "label": "Comer",
+     "division": "Petrie",
+     "x": 149.5268,
+     "y": 340.8873
+    },
+    {
+     "seat": 5,
+     "side": "government",
+     "member": "Sarah Witty",
+     "party": "ALP",
+     "label": "Witty",
+     "division": "Melbourne",
+     "x": 149.5268,
+     "y": 381.8125
+    },
+    {
+     "seat": 6,
+     "side": "government",
+     "member": "Trish Cook",
+     "party": "ALP",
+     "label": "Cook T",
+     "division": "Bullwinkel",
+     "x": 149.5268,
+     "y": 408.308
+    },
+    {
+     "seat": 7,
+     "side": "government",
+     "member": "Fiona Phillips",
+     "party": "ALP",
+     "label": "Phillips",
+     "division": "Gilmore",
+     "x": 150.052,
+     "y": 459.9709
+    },
+    {
+     "seat": 8,
+     "side": "government",
+     "member": "Rowan Holzberger",
+     "party": "ALP",
+     "label": "Holzberger",
+     "division": "Forde",
+     "x": 150.052,
+     "y": 485.588659
+    },
+    {
+     "seat": 9,
+     "side": "government",
+     "member": "Zaneta Mascarenhas",
+     "party": "ALP",
+     "label": "Mascarenhas",
+     "division": "Swan",
+     "x": 153.9875,
+     "y": 553.9978
+    },
+    {
+     "seat": 10,
+     "side": "government",
+     "member": "Ed Husic",
+     "party": "ALP",
+     "label": "Husic",
+     "division": "Chifley",
+     "x": 162.1443,
+     "y": 583.4867
+    },
+    {
+     "seat": 11,
+     "side": "government",
+     "member": "Julie-Ann Campbell",
+     "party": "ALP",
+     "label": "Campbell",
+     "division": "Moreton",
+     "x": 173.6982,
+     "y": 609.9694
+    },
+    {
+     "seat": 12,
+     "side": "government",
+     "member": "Julian Hill",
+     "party": "ALP",
+     "label": "Hill",
+     "division": "Bruce",
+     "x": 199.6253,
+     "y": 638.1579
+    },
+    {
+     "seat": 13,
+     "side": "government",
+     "member": "Peter Khalil",
+     "party": "ALP",
+     "label": "Khalil",
+     "division": "Wills",
+     "x": 228.2469,
+     "y": 655.4582
+    },
+    {
+     "seat": 14,
+     "side": "government",
+     "member": "Rebecca White",
+     "party": "ALP",
+     "label": "White",
+     "division": "Lyons",
+     "x": 259.1868,
+     "y": 666.8803
+    },
+    {
+     "seat": 15,
+     "side": "government",
+     "member": "Matt Thistlethwaite",
+     "party": "ALP",
+     "label": "Thistlethwaite",
+     "division": "Kingsford Smith",
+     "x": 297.3467,
+     "y": 666.8803
+    },
+    {
+     "seat": 16,
+     "side": "government",
+     "member": "Emma McBride",
+     "party": "ALP",
+     "label": "McBride",
+     "division": "Dobell",
+     "x": 344.9474,
+     "y": 655.4582
+    },
+    {
+     "seat": 17,
+     "side": "crossbench",
+     "member": "Andrew Wilkie",
+     "party": "IND",
+     "label": "Wilkie",
+     "division": "Clark",
+     "x": 400.2129,
+     "y": 612.6843
+    },
+    {
+     "seat": 18,
+     "side": "crossbench",
+     "member": "Rebekha Sharkie",
+     "party": "XEN",
+     "label": "Sharkie",
+     "division": "Mayo",
+     "x": 411.5621,
+     "y": 583.4867
+    },
+    {
+     "seat": 19,
+     "side": "crossbench",
+     "member": "Elizabeth Watson-Brown",
+     "party": "GRN",
+     "label": "Watson-Brown",
+     "division": "Ryan",
+     "x": 436.6573,
+     "y": 578.6554
+    },
+    {
+     "seat": 20,
+     "side": "crossbench",
+     "member": "Bob Katter",
+     "party": "KAP",
+     "label": "Katter",
+     "division": "Kennedy",
+     "x": 422.1254,
+     "y": 551.3509
+    },
+    {
+     "seat": 21,
+     "side": "opposition",
+     "member": "Jamie Chaffey",
+     "party": "NP",
+     "label": "Chaffey",
+     "division": "Parkes",
+     "x": 424.9768,
+     "y": 485.588659
+    },
+    {
+     "seat": 22,
+     "side": "opposition",
+     "member": "Andrew Willcox",
+     "party": "LNP",
+     "label": "Willcox",
+     "division": "Dawson",
+     "x": 425.844,
+     "y": 459.9709
+    },
+    {
+     "seat": 23,
+     "side": "opposition",
+     "member": "Pat Conaghan",
+     "party": "NP",
+     "label": "Conaghan",
+     "division": "Cowper",
+     "x": 419.1317,
+     "y": 408.308
+    },
+    {
+     "seat": 24,
+     "side": "opposition",
+     "member": "Jason Wood",
+     "party": "LP",
+     "label": "Wood",
+     "division": "La Trobe",
+     "x": 430.1646,
+     "y": 379.2642
+    },
+    {
+     "seat": 25,
+     "side": "opposition",
+     "member": "Anne Webster",
+     "party": "NP",
+     "label": "Webster",
+     "division": "Mallee",
+     "x": 423.8409,
+     "y": 338.165
+    },
+    {
+     "seat": 26,
+     "side": "opposition",
+     "member": "Zoe McKenzie",
+     "party": "LP",
+     "label": "McKenzie",
+     "division": "Flinders",
+     "x": 420.4665,
+     "y": 313.4219
+    },
+    {
+     "seat": 27,
+     "side": "opposition",
+     "member": "Mary Aldred",
+     "party": "LP",
+     "label": "Aldred",
+     "division": "Monash",
+     "x": 428.1588,
+     "y": 272.0838
+    },
+    {
+     "seat": 28,
+     "side": "opposition",
+     "member": "Phillip Thompson",
+     "party": "LNP",
+     "label": "Thompson",
+     "division": "Herbert",
+     "x": 417.8992,
+     "y": 243.0243
+    }
+   ]
+  },
+  {
+   "row": 3,
+   "seats": [
+    {
+     "seat": 1,
+     "side": "government",
+     "member": "Kara Cook",
+     "party": "ALP",
+     "label": "Cook K",
+     "division": "Bonner",
+     "x": 105.8238,
+     "y": 245.774
+    },
+    {
+     "seat": 2,
+     "side": "government",
+     "member": "Matt Gregg",
+     "party": "ALP",
+     "label": "Gregg",
+     "division": "Deakin",
+     "x": 105.8252,
+     "y": 272.0838
+    },
+    {
+     "seat": 3,
+     "side": "government",
+     "member": "Gabriel Ng",
+     "party": "ALP",
+     "label": "Ng",
+     "division": "Menzies",
+     "x": 105.8238,
+     "y": 313.4219
+    },
+    {
+     "seat": 4,
+     "side": "government",
+     "member": "Claire Clutterham",
+     "party": "ALP",
+     "label": "Clutterham",
+     "division": "Sturt",
+     "x": 105.8238,
+     "y": 340.8873
+    },
+    {
+     "seat": 5,
+     "side": "government",
+     "member": "Renee Coffey",
+     "party": "ALP",
+     "label": "Coffey",
+     "division": "Griffith",
+     "x": 105.8238,
+     "y": 381.8125
+    },
+    {
+     "seat": 6,
+     "side": "government",
+     "member": "Marion Scrymgour",
+     "party": "ALP",
+     "label": "Scrymgour",
+     "division": "Lingiari",
+     "x": 105.8238,
+     "y": 408.308
+    },
+    {
+     "seat": 7,
+     "side": "government",
+     "member": "Basem Abdo",
+     "party": "ALP",
+     "label": "Abdo",
+     "division": "Calwell",
+     "x": 105.8238,
+     "y": 459.9709
+    },
+    {
+     "seat": 8,
+     "side": "government",
+     "member": "Susan Templeman",
+     "party": "ALP",
+     "label": "Templeman",
+     "division": "Macquarie",
+     "x": 105.8238,
+     "y": 485.588659
+    },
+    {
+     "seat": 9,
+     "side": "government",
+     "member": "Luke John Gosling",
+     "party": "ALP",
+     "label": "Gosling",
+     "division": "Solomon",
+     "x": 114.9995,
+     "y": 551.3509
+    },
+    {
+     "seat": 10,
+     "side": "government",
+     "member": "Jerome Laxale",
+     "party": "ALP",
+     "label": "Laxale",
+     "division": "Bennelong",
+     "x": 118.7094,
+     "y": 578.6554
+    },
+    {
+     "seat": 11,
+     "side": "government",
+     "member": "Carol Berry",
+     "party": "ALP",
+     "label": "Berry",
+     "division": "Whitlam",
+     "x": 131.9155,
+     "y": 616.1961
+    },
+    {
+     "seat": 12,
+     "side": "government",
+     "member": "Rob Mitchell",
+     "party": "ALP",
+     "label": "Mitchell",
+     "division": "McEwen",
+     "x": 146.3944,
+     "y": 642.2419
+    },
+    {
+     "seat": 13,
+     "side": "government",
+     "member": "Gordon Reid",
+     "party": "ALP",
+     "label": "Reid",
+     "division": "Robertson",
+     "x": 173.2501,
+     "y": 670.3072
+    },
+    {
+     "seat": 14,
+     "side": "government",
+     "member": "Kate Thwaites",
+     "party": "ALP",
+     "label": "Thwaites",
+     "division": "Jagajaga",
+     "x": 197.2014,
+     "y": 690.153
+    },
+    {
+     "seat": 15,
+     "side": "government",
+     "member": "Josh Wilson",
+     "party": "ALP",
+     "label": "Wilson J",
+     "division": "Fremantle",
+     "x": 229.1689,
+     "y": 704.4471
+    },
+    {
+     "seat": 16,
+     "side": "government",
+     "member": "Andrew Charlton",
+     "party": "ALP",
+     "label": "Charlton",
+     "division": "Parramatta",
+     "x": 258.4668,
+     "y": 714.0012
+    },
+    {
+     "seat": 17,
+     "side": "government",
+     "member": "Ged Kearney",
+     "party": "ALP",
+     "label": "Kearney",
+     "division": "Cooper",
+     "x": 315.7687,
+     "y": 711.3554
+    },
+    {
+     "seat": 18,
+     "side": "government",
+     "member": "Patrick Gorman",
+     "party": "ALP",
+     "label": "Gorman",
+     "division": "Perth",
+     "x": 341.8885,
+     "y": 704.4471
+    },
+    {
+     "seat": 19,
+     "side": "government",
+     "member": "Andrew Leigh",
+     "party": "ALP",
+     "label": "Leigh",
+     "division": "Fenner",
+     "x": 381.9373,
+     "y": 690.153
+    },
+    {
+     "seat": 20,
+     "side": "crossbench",
+     "member": "Helen Haines",
+     "party": "IND",
+     "label": "Haines",
+     "division": "Indi",
+     "x": 429.9461,
+     "y": 642.2419
+    },
+    {
+     "seat": 21,
+     "side": "crossbench",
+     "member": "Zali Steggall",
+     "party": "IND",
+     "label": "Steggall",
+     "division": "Warringah",
+     "x": 440.3452,
+     "y": 616.1961
+    },
+    {
+     "seat": 22,
+     "side": "opposition",
+     "member": "Rick Wilson",
+     "party": "LP",
+     "label": "Wilson R",
+     "division": "O'Connor",
+     "x": 462.6338,
+     "y": 408.308
+    },
+    {
+     "seat": 23,
+     "side": "opposition",
+     "member": "Ben Small",
+     "party": "LP",
+     "label": "Small",
+     "division": "Forrest",
+     "x": 470.4283,
+     "y": 379.2642
+    },
+    {
+     "seat": 24,
+     "side": "opposition",
+     "member": "Alison Penfold",
+     "party": "NP",
+     "label": "Penfold",
+     "division": "Lyne",
+     "x": 465.0478,
+     "y": 338.165
+    },
+    {
+     "seat": 25,
+     "side": "opposition",
+     "member": "Leon Rebello",
+     "party": "LNP",
+     "label": "Rebello",
+     "division": "McPherson",
+     "x": 465.5919,
+     "y": 313.4219
+    },
+    {
+     "seat": 26,
+     "side": "opposition",
+     "member": "Simon Kennedy",
+     "party": "LP",
+     "label": "Kennedy",
+     "division": "Cook",
+     "x": 461.8061,
+     "y": 272.0838
+    },
+    {
+     "seat": 27,
+     "side": "opposition",
+     "member": "Sam Birrell",
+     "party": "NP",
+     "label": "Birrell",
+     "division": "Nicholls",
+     "x": 469.5786,
+     "y": 243.0243
+    }
+   ]
+  },
+  {
+   "row": 4,
+   "seats": [
+    {
+     "seat": 1,
+     "side": "government",
+     "member": "Lisa Chesters",
+     "party": "ALP",
+     "label": "Chesters",
+     "division": "Bendigo",
+     "x": 65.1249,
+     "y": 245.774
+    },
+    {
+     "seat": 2,
+     "side": "government",
+     "member": "Tom French",
+     "party": "ALP",
+     "label": "French",
+     "division": "Moore",
+     "x": 65.1245,
+     "y": 272.0838
+    },
+    {
+     "seat": 3,
+     "side": "government",
+     "member": "Ash Ambihaipahar",
+     "party": "ALP",
+     "label": "Ambihaipahar",
+     "division": "Barton",
+     "x": 65.3195,
+     "y": 313.4219
+    },
+    {
+     "seat": 4,
+     "side": "government",
+     "member": "Alice Jordan-Baird",
+     "party": "ALP",
+     "label": "Jordan-Baird",
+     "division": "Gorton",
+     "x": 65.3195,
+     "y": 340.8873
+    },
+    {
+     "seat": 5,
+     "side": "government",
+     "member": "Mary Doyle",
+     "party": "ALP",
+     "label": "Doyle",
+     "division": "Aston",
+     "x": 65.3195,
+     "y": 381.8125
+    },
+    {
+     "seat": 6,
+     "side": "government",
+     "member": "Jo Briskey",
+     "party": "ALP",
+     "label": "Briskey",
+     "division": "Maribyrnong",
+     "x": 65.3195,
+     "y": 408.308
+    },
+    {
+     "seat": 7,
+     "side": "government",
+     "member": "Louise Miller-Frost",
+     "party": "ALP",
+     "label": "Miller-Frost",
+     "division": "Boothby",
+     "x": 65.3195,
+     "y": 459.9709
+    },
+    {
+     "seat": 8,
+     "side": "government",
+     "member": "Mark Dreyfus",
+     "party": "ALP",
+     "label": "Dreyfus",
+     "division": "Isaacs",
+     "x": 65.1245,
+     "y": 485.588659
+    },
+    {
+     "seat": 9,
+     "side": "government",
+     "member": "Carina Garland",
+     "party": "ALP",
+     "label": "Garland",
+     "division": "Chisholm",
+     "x": 74.3666,
+     "y": 553.9978
+    },
+    {
+     "seat": 10,
+     "side": "government",
+     "member": "Josh Burns",
+     "party": "ALP",
+     "label": "Burns",
+     "division": "Macnamara",
+     "x": 78.3239,
+     "y": 591.7166
+    },
+    {
+     "seat": 11,
+     "side": "government",
+     "member": "Madonna Jarrett",
+     "party": "ALP",
+     "label": "Jarrett",
+     "division": "Brisbane",
+     "x": 95.2923,
+     "y": 638.1579
+    },
+    {
+     "seat": 12,
+     "side": "government",
+     "member": "Sally Sitou",
+     "party": "ALP",
+     "label": "Sitou",
+     "division": "Reid",
+     "x": 112.0713,
+     "y": 666.8803
+    },
+    {
+     "seat": 13,
+     "side": "government",
+     "member": "Tim Watts",
+     "party": "ALP",
+     "label": "Watts",
+     "division": "Gellibrand",
+     "x": 149.4427,
+     "y": 704.4471
+    },
+    {
+     "seat": 14,
+     "side": "government",
+     "member": "Alison Byrnes",
+     "party": "ALP",
+     "label": "Byrnes",
+     "division": "Cunningham",
+     "x": 179.2823,
+     "y": 728.7209
+    },
+    {
+     "seat": 15,
+     "side": "government",
+     "member": "Tania Lawrence",
+     "party": "ALP",
+     "label": "Lawrence",
+     "division": "Hasluck",
+     "x": 215.8392,
+     "y": 745.3705
+    },
+    {
+     "seat": 16,
+     "side": "government",
+     "member": "Steve Georganas",
+     "party": "ALP",
+     "label": "Georganas",
+     "division": "Adelaide",
+     "x": 251.9599,
+     "y": 755.6822
+    },
+    {
+     "seat": 17,
+     "side": "crossbench",
+     "member": "Sophie Scamps",
+     "party": "IND",
+     "label": "Scamps",
+     "division": "Mackellar",
+     "x": 461.9382,
+     "y": 666.8803,
+     "note": "division misprinted 'Mackelllar' in the source plan (normalised to Mackellar)"
+    },
+    {
+     "seat": 18,
+     "side": "crossbench",
+     "member": "Monique Ryan",
+     "party": "IND",
+     "label": "Ryan M",
+     "division": "Kooyong",
+     "x": 479.3451,
+     "y": 638.1579
+    },
+    {
+     "seat": 19,
+     "side": "crossbench",
+     "member": "Allegra Spender",
+     "party": "IND",
+     "label": "Spender",
+     "division": "Wentworth",
+     "x": 493.4198,
+     "y": 591.7166
+    },
+    {
+     "seat": 20,
+     "side": "crossbench",
+     "member": "Kate Chaney",
+     "party": "IND",
+     "label": "Chaney",
+     "division": "Curtin",
+     "x": 501.06,
+     "y": 556.5129
+    },
+    {
+     "seat": 21,
+     "side": "opposition",
+     "member": "Barnaby Joyce",
+     "party": "NP",
+     "label": "Joyce",
+     "division": "New England",
+     "x": 513.2465,
+     "y": 485.588659
+    },
+    {
+     "seat": 22,
+     "side": "opposition",
+     "member": "Colin Boyce",
+     "party": "LNP",
+     "label": "Boyce",
+     "division": "Flynn",
+     "x": 512.6335,
+     "y": 459.9709
+    },
+    {
+     "seat": 23,
+     "side": "opposition",
+     "member": "Llew O'Brien",
+     "party": "LNP",
+     "label": "O’Brien L",
+     "division": "Wide Bay",
+     "x": 505.106,
+     "y": 408.308
+    },
+    {
+     "seat": 24,
+     "side": "opposition",
+     "member": "Michael McCormack",
+     "party": "NP",
+     "label": "McCormack",
+     "division": "Riverina",
+     "x": 498.4929,
+     "y": 379.2642
+    },
+    {
+     "seat": 25,
+     "side": "opposition",
+     "member": "Terry Young",
+     "party": "LNP",
+     "label": "Young",
+     "division": "Longman",
+     "x": 511.5834,
+     "y": 313.4219
+    },
+    {
+     "seat": 26,
+     "side": "opposition",
+     "member": "Cameron Caldwell",
+     "party": "LNP",
+     "label": "Caldwell",
+     "division": "Fadden",
+     "x": 506.4145,
+     "y": 272.0838
+    },
+    {
+     "seat": 27,
+     "side": "opposition",
+     "member": "Tom Venning",
+     "party": "LP",
+     "label": "Venning",
+     "division": "Grey",
+     "x": 507.0095,
+     "y": 243.0243
+    }
+   ]
+  },
+  {
+   "row": 5,
+   "seats": [
+    {
+     "seat": 1,
+     "side": "government",
+     "member": "Sam Lim",
+     "party": "ALP",
+     "label": "Lim",
+     "division": "Tangney",
+     "x": 24.9417,
+     "y": 245.774
+    },
+    {
+     "seat": 2,
+     "side": "government",
+     "member": "David Moncrieff",
+     "party": "ALP",
+     "label": "Moncrieff",
+     "division": "Hughes",
+     "x": 24.9418,
+     "y": 272.0838
+    },
+    {
+     "seat": 3,
+     "side": "government",
+     "member": "Dan Repacholi",
+     "party": "ALP",
+     "label": "Repacholi",
+     "division": "Hunter",
+     "x": 24.9418,
+     "y": 313.4219
+    },
+    {
+     "seat": 4,
+     "side": "government",
+     "member": "Matt Smith",
+     "party": "ALP",
+     "label": "Smith M",
+     "division": "Leichhardt",
+     "x": 24.9417,
+     "y": 340.8873
+    },
+    {
+     "seat": 5,
+     "side": "government",
+     "member": "Tracey Roberts",
+     "party": "ALP",
+     "label": "Roberts",
+     "division": "Pearce",
+     "x": 24.9417,
+     "y": 381.8125
+    },
+    {
+     "seat": 6,
+     "side": "government",
+     "member": "Anne Urquhart",
+     "party": "ALP",
+     "label": "Urquhart",
+     "division": "Braddon",
+     "x": 24.9418,
+     "y": 408.308
+    },
+    {
+     "seat": 7,
+     "side": "government",
+     "member": "Meryl Swanson",
+     "party": "ALP",
+     "label": "Swanson",
+     "division": "Paterson",
+     "x": 24.9417,
+     "y": 459.9709
+    },
+    {
+     "seat": 8,
+     "side": "government",
+     "member": "Sharon Claydon",
+     "party": "ALP",
+     "label": "Claydon",
+     "division": "Newcastle",
+     "x": 24.9771,
+     "y": 485.588659
+    },
+    {
+     "seat": 9,
+     "side": "government",
+     "member": "Joanne Ryan",
+     "party": "ALP",
+     "label": "Ryan J",
+     "division": "Lalor",
+     "x": 32.2979,
+     "y": 551.3509
+    },
+    {
+     "seat": 10,
+     "side": "government",
+     "member": "David Smith",
+     "party": "ALP",
+     "label": "Smith D",
+     "division": "Bean",
+     "x": 34.3796,
+     "y": 578.6554
+    },
+    {
+     "seat": 11,
+     "side": "government",
+     "member": "Anne Maree Stanley",
+     "party": "ALP",
+     "label": "Stanley",
+     "division": "Werriwa",
+     "x": 40.4073,
+     "y": 609.9694
+    },
+    {
+     "seat": 12,
+     "side": "government",
+     "member": "Matt Burnell",
+     "party": "ALP",
+     "label": "Burnell",
+     "division": "Spence",
+     "x": 53.8693,
+     "y": 646.3878
+    },
+    {
+     "seat": 13,
+     "side": "government",
+     "member": "Jodie Belyea",
+     "party": "ALP",
+     "label": "Belyea",
+     "division": "Dunkley",
+     "x": 67.3393,
+     "y": 674.5536
+    },
+    {
+     "seat": 14,
+     "side": "government",
+     "member": "Cassandra Fernando",
+     "party": "ALP",
+     "label": "Fernando",
+     "division": "Holt",
+     "x": 84.8092,
+     "y": 698.3829
+    },
+    {
+     "seat": 15,
+     "side": "government",
+     "member": "Shayne Neumann",
+     "party": "ALP",
+     "label": "Neumann",
+     "division": "Blair",
+     "x": 118.2345,
+     "y": 733.3096
+    },
+    {
+     "seat": 16,
+     "side": "government",
+     "member": "Tony Zappia",
+     "party": "ALP",
+     "label": "Zappia",
+     "division": "Makin",
+     "x": 138.8911,
+     "y": 753.1751
+    },
+    {
+     "seat": 17,
+     "side": "government",
+     "member": "Justine Elliot",
+     "party": "ALP",
+     "label": "Elliot",
+     "division": "Richmond",
+     "x": 162.1443,
+     "y": 768.1642
+    },
+    {
+     "seat": 18,
+     "side": "government",
+     "member": "Mike Freelander",
+     "party": "ALP",
+     "label": "Freelander",
+     "division": "Macarthur",
+     "x": 197.2014,
+     "y": 781.416
+    },
+    {
+     "seat": 19,
+     "side": "government",
+     "member": "Libby Coker",
+     "party": "ALP",
+     "label": "Coker",
+     "division": "Corangamite",
+     "x": 227.1742,
+     "y": 793.637
+    },
+    {
+     "seat": 20,
+     "side": "government",
+     "member": "Alicia Payne",
+     "party": "ALP",
+     "label": "Payne",
+     "division": "Canberra",
+     "x": 262.8842,
+     "y": 798.0656
+    },
+    {
+     "seat": 21,
+     "side": "crossbench",
+     "member": "Nicolette Boele",
+     "party": "IND",
+     "label": "Boele",
+     "division": "Bradfield",
+     "x": 496.567,
+     "y": 698.3829
+    },
+    {
+     "seat": 22,
+     "side": "crossbench",
+     "member": "Dai Le",
+     "party": "IND",
+     "label": "Le",
+     "division": "Fowler",
+     "x": 534.0473,
+     "y": 650.2306
+    },
+    {
+     "seat": 23,
+     "side": "crossbench",
+     "member": "Andrew Gee",
+     "party": "IND",
+     "label": "Gee",
+     "division": "Calare",
+     "x": 542.0294,
+     "y": 609.9694
+    },
+    {
+     "seat": 24,
+     "side": "opposition",
+     "member": "Aaron Violi",
+     "party": "LP",
+     "label": "Violi",
+     "division": "Casey",
+     "x": 559.1447,
+     "y": 485.588659
+    },
+    {
+     "seat": 25,
+     "side": "opposition",
+     "member": "Michelle Landry",
+     "party": "LNP",
+     "label": "Landry",
+     "division": "Capricornia",
+     "x": 551.4756,
+     "y": 408.308
+    },
+    {
+     "seat": 26,
+     "side": "opposition",
+     "member": "David Batt",
+     "party": "LNP",
+     "label": "Batt",
+     "division": "Hinkler",
+     "x": 558.8783,
+     "y": 379.2642
+    },
+    {
+     "seat": 27,
+     "side": "opposition",
+     "member": "Andrew Hastie",
+     "party": "LP",
+     "label": "Hastie",
+     "division": "Canning",
+     "x": 553.4612,
+     "y": 338.165
+    },
+    {
+     "seat": 28,
+     "side": "opposition",
+     "member": "Tony Pasin",
+     "party": "LP",
+     "label": "Pasin",
+     "division": "Barker",
+     "x": 556.0818,
+     "y": 313.4219
+    },
+    {
+     "seat": 29,
+     "side": "opposition",
+     "member": "Garth Hamilton",
+     "party": "LNP",
+     "label": "Hamilton",
+     "division": "Groom",
+     "x": 545.5334,
+     "y": 272.0838
+    },
+    {
+     "seat": 30,
+     "side": "opposition",
+     "member": "Henry Pike",
+     "party": "LNP",
+     "label": "Pike",
+     "division": "Bowman",
+     "x": 558.9464,
+     "y": 243.0243
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "ALP": 94,
+  "NP": 9,
+  "LP": 18,
+  "LNP": 16,
+  "KAP": 1,
+  "IND": 10,
+  "GRN": 1,
+  "XEN": 1
+ }
+}
