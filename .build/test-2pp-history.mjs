@@ -523,11 +523,16 @@ delete wanted._comment;
 // the vm realm's Array/Object prototypes differ – re-serialise before comparing
 assert.deepEqual(JSON.parse(JSON.stringify(TP)), wanted, "the asset carries the data file verbatim");
 
-// ---- the View flip's renderer wiring shipped in the built page ------------
-const page = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-assert.ok(page.includes("Explained2ppChart") && page.includes("twoPPHistory"),
-  "the 2PP-history view wiring is built into the page");
-assert.ok(page.includes("2PP") && page.includes("Switch to two-party preferred shares at every election"),
-  "the View: 2PP flip label and title are built into the page");
+// ---- the View flip's renderer wiring shipped in the served js chunks -------
+// (the app's JSX was externalised to hashed assets/js chunks in 059c2621;
+// the docs no longer carry these strings)
+const jsChunks2 = fs.readdirSync(path.join(ROOT, "assets", "js"))
+  .map((f) => path.join(ROOT, "assets", "js", f))
+  .filter((f) => f.endsWith(".js"))
+  .map((f) => fs.readFileSync(f, "utf8"));
+assert.ok(jsChunks2.some((s) => s.includes("Explained2ppChart") && s.includes("twoPPHistory")),
+  "the 2PP-history view wiring is built into a served js chunk");
+assert.ok(jsChunks2.some((s) => s.includes("2PP") && s.includes("Switch to two-party preferred shares at every election")),
+  "the View: 2PP flip label and title are built into a served js chunk");
 
 console.log("test-2pp-history: all assertions passed");

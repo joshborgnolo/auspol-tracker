@@ -104,12 +104,17 @@ const tpl = read(path.join(".build", "newtracker", "template.html"));
 }
 
 // ---- 3. the fix made the build ------------------------------------------------------------
+// (the app's JS was externalised to hashed assets/js chunks in 059c2621:
+// syncHeights rides the 73de0c58 app chunk, the CSS stays inline in the docs)
+const jsChunks = fs.readdirSync(path.join(ROOT, "assets", "js"))
+  .filter((f) => f.endsWith(".js"))
+  .map((f) => fs.readFileSync(path.join(ROOT, "assets", "js", f), "utf8"));
+assert.ok(jsChunks.some((s) => s.includes("syncHeights")),
+  "the atomic height sync compiled into a served js chunk");
 for (const doc of ["index.html", path.join("vic", "index.html")]) {
   const html = read(doc);
   assert.ok(html.includes("min-height:calc(100vh - 252px)") || html.includes("min-height: calc(100vh - 252px)"),
     `${doc}: the viewport floor compiled in`);
-  assert.ok(html.includes("syncHeights"),
-    `${doc}: the atomic height sync compiled in`);
   assert.ok(html.includes("html:has(body) {"),
     `${doc}: the tide composite's body gate compiled in`);
 }

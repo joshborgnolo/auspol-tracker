@@ -199,7 +199,12 @@ assert.ok(clPage.includes('window.AP_INITIAL_TAB="changelog";'), "changelog page
 const clTimes = [...clPage.matchAll(/<time class="cl-date(?: cl-rep)?" datetime="([^"]+)">([^<]+)<\/time>/g)];
 assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, e.date]),
   "changelog page lists every entry of data/changelog.json as ISO-date console rows, newest first");
-for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
+/* the static console lights figures and arrows like syntax (build.mjs's
+   lit), so an entry's text matches its lit form, not the bare text */
+const clLit = (s) => hesc(s)
+  .replace(/(\d[\d,]*(?:\.\d+)?%?)/g, '<span class="cl-n">$1</span>')
+  .replace(/→/g, '<span class="cl-ar">→</span>');
+for (const e of clEntries) assert.ok(clPage.includes(clLit(e.text)), `changelog page carries the ${e.date} entry's text`);
 const clTags = [...clPage.matchAll(/<span class="cl-tag">([^<]+)<\/span>/g)].map((m) => m[1]);
 assert.deepEqual(clTags, [...clEntries].reverse().map((e) =>
   ({ poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start", conf: "conf" })[e.kind] || "headline"),
@@ -224,7 +229,12 @@ const rootDocs = ["index.html", "cycles/index.html", "allpolls/index.html", "inf
 for (const f of rootDocs) {
   const doc = fs.readFileSync(path.join(ROOT, f), "utf8");
   assert.ok(!/href[:=]\s*"feed\.xml"/.test(doc), `${f}: no relative feed.xml link`);
-  assert.ok(doc.includes('href: "/feed.xml"'), `${f}: the app's Info copy links /feed.xml`);
 }
+// the app's Info copy links /feed.xml from the views chunk (since the JS was
+// externalised the docs no longer carry the JSX – assert the asset does)
+const jsDir = path.join(ROOT, "assets", "js");
+const feedHit = fs.readdirSync(jsDir).some((f) =>
+  /^d1a1d215-.*\.js$/.test(f) && fs.readFileSync(path.join(jsDir, f), "utf8").includes('href: "/feed.xml"'));
+assert.ok(feedHit, "the served d1a1d215 views chunk links /feed.xml");
 
 console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted, the chrome contract lifted, changelog page ${clEntries.length} entries, feed links absolute`);

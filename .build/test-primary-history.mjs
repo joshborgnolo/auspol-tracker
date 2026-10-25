@@ -790,13 +790,16 @@ assert.equal(cellLc("wa", "onp", 2025), null, "wa LC 2025 onp folds (3.82%)");
 assert.equal(cellLc("wa", "alp", 2021), 60.34, "wa LC 2021 alp: the McGowan landslide");
 assert.equal(cellLc("wa", "lnp", 2013), 52.51, "wa LC 2013 lnp: Liberal + Nationals");
 
-// ---- the View flip's renderer wiring shipped in the built page ------------
-/* build.mjs inlines every layer into index.html (transpiled); the uuid-named
-   d1a1d215 source in assets/ is NOT what the page executes, so the wiring is
-   asserted on the built document itself */
-const page = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-assert.ok(page.includes("Primary votes"), "the View: Primary votes flip label is built into the page");
-assert.ok(page.includes("ExplainedPrimaryChart") && page.includes("primaryHistory"),
-  "the primary-history view wiring is built into the page");
+// ---- the View flip's renderer wiring shipped in the served chunks ---------
+/* build.mjs externalises the app as hashed chunks under assets/js (inlined
+   before 059c2621); the wiring is asserted on the chunks the page actually
+   loads – the uuid-named rd-allpolls renderer carries both the flip label
+   and the component wiring */
+const jsChunksDir = path.join(ROOT, "assets", "js");
+const jsChunks = fs.readdirSync(jsChunksDir)
+  .filter((f) => f.endsWith(".js"))
+  .map((f) => fs.readFileSync(path.join(jsChunksDir, f), "utf8"));
+assert.ok(jsChunks.some((s) => s.includes("Primary votes") && s.includes("ExplainedPrimaryChart") && s.includes("primaryHistory")),
+  "the primary-history view wiring (flip label, ExplainedPrimaryChart) is built into a served js chunk");
 
 console.log("test-primary-history: all assertions passed");

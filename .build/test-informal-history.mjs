@@ -424,9 +424,14 @@ assert.ok(/const informalHistory = \(\(\) => \{/.test(gen), "gen-data's guarded 
 assert.ok(/const informalHistory = \$\{/.test(gen), "gen-data emits informalHistory into the data asset");
 const val = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "validate.mjs"), "utf8");
 assert.ok(/validateInformalHistory\(\)/.test(val), "validate.mjs runs the invariant block");
-const page = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-assert.ok(page.includes("Informal votes"), "the View: Informal votes stop is labelled in the built page");
-assert.ok(page.includes("ExplainedInformalChart"), "the informal view's renderer is built into the page");
+// the app's JSX was externalised to hashed assets/js chunks in 059c2621 – the
+// view wiring lives in a served chunk now, not the built document
+const chunks = fs.readdirSync(path.join(ROOT, "assets", "js"))
+  .map((f) => path.join(ROOT, "assets", "js", f))
+  .filter((f) => f.endsWith(".js"))
+  .map((f) => fs.readFileSync(f, "utf8"));
+assert.ok(chunks.some((s) => s.includes("Informal votes") && s.includes("ExplainedInformalChart")),
+  "the View: Informal votes stop and its renderer are built into a served js chunk");
 
 // ---- what the chart is handed ------------------------------------------------
 const assetDir = path.join(ROOT, ".build", "newtracker", "assets");
