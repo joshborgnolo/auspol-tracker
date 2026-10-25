@@ -1301,6 +1301,9 @@ const famText = (fam) => `var(--${fam}-text)`;
 const famFill = (fam) => `var(--${fam})`;
 const thePartyFam = (fam) => FAM_PL[fam];
 const leaderName = (h) => (h.ab === "CSA" ? "Community Strong" : partyName(h.ab, h.pn));
+// the "now" view: today’s holder won the last count under another banner — the
+// winner’s row in the count stays historical but earns a "· now X" note
+const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
 function swingPhrase(sw, prev) {
   if (sw == null) return "";
   if (Math.abs(sw) < 0.05) return `no swing since ${prev}`;
@@ -1350,12 +1353,13 @@ function marginBar(aName, aFam, bName, bFam, lead, span) {
 }
 function statusOf(winPct) { return winPct < 56 ? "marginal" : winPct < 60 ? "fairly safe" : "safe"; }
 
-function candRows(cands, formal, cmp, limit, swingOf) {
+function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
   const sorted = [...cands].sort((a, b) => b.v - a.v);
   const top = Math.max(30, (100 * sorted[0].v) / formal);
+  const pOf = partyOf || ((c) => partyName(c.ab, c.pn));
   const rows = sorted.map((c, k) => {
     const p = (100 * c.v) / formal, tick = cmp ? cmp(c) : null, sw0 = swingOf ? swingOf(c) : c.sw;
-    return `<div class="row"${limit && k >= limit ? " data-extra hidden" : ""}><div class="nm" title="${esc(c.n)}, ${esc(partyName(c.ab, c.pn))}">${esc(c.n)}${c.el ? `<span class="el">elected</span>` : ""}<small>${esc(partyName(c.ab, c.pn))}</small></div><div class="bar"><i style="width:${(100 * p) / top}%;${swc(c.fam)}"></i>${tick != null ? `<u style="left:${clamp((100 * tick) / top, 0, 100)}%" title="Across the seat: ${f1(tick)}%"></u>` : ""}</div><div class="v">${f1(p)}</div><div class="d">${sw0 == null ? "" : sgn(sw0)}</div></div>`;
+    return `<div class="row"${limit && k >= limit ? " data-extra hidden" : ""}><div class="nm" title="${esc(c.n)}, ${esc(pOf(c))}">${esc(c.n)}${c.el ? `<span class="el">elected</span>` : ""}<small>${esc(pOf(c))}</small></div><div class="bar"><i style="width:${(100 * p) / top}%;${swc(c.fam)}"></i>${tick != null ? `<u style="left:${clamp((100 * tick) / top, 0, 100)}%" title="Across the seat: ${f1(tick)}%"></u>` : ""}</div><div class="v">${f1(p)}</div><div class="d">${sw0 == null ? "" : sgn(sw0)}</div></div>`;
   });
   const more = limit && sorted.length > limit ? `<button type="button" class="more" data-more>All ${sorted.length} candidates</button>` : "";
   return `<div class="rows">${rows.join("")}</div>${more}`;
@@ -1728,7 +1732,9 @@ function storyDiv(m, i) {
   h += `<div class="st-sec"><h3>Final count <small>${d.by ? "the by-election’s" : "two candidates"}</small></h3><div class="hero">${heroPair(wn, d.winPct, d.win.fam, rn, 100 - d.winPct, d.run.fam)}${marginBar(wn, d.win.fam, rn, d.run.fam, 2 * d.winPct - 100)}<p class="hero-verdict"><b>${esc(wn)}</b> by ${int(d.votesMargin)} votes · ${statusOf(d.winPct)}</p></div></div>`;
   if (d.tpp != null && !d.classic) h += `<div class="st-sec"><h3>Two-party preferred <small>the AEC’s notional count</small></h3><div class="hero">${heroPair("Labor", d.tpp, "alp", "Coalition", 100 - d.tpp, "lnp")}</div><p class="st-note">${swingPhrase(d.tppSw, prev).replace(/^./, (c) => c.toUpperCase())}.</p></div>`;
   const prevDiv = d.by ? d.by.prev : null;
-  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? " on 2025" : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null)}</div>`;
+  const moved = movedTo(m, d);
+  const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
+  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? " on 2025" : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
   if (d.vt) {
@@ -1811,7 +1817,10 @@ function storyBooth(m, j) {
   if (!Number.isNaN(b.tpp[j])) { const s0 = nn(b.tppSw[j]); h += `<p class="st-note">${s0 == null ? "This place wasn’t used at the previous election, so it has no swing." : Math.abs(s0) < 0.05 ? "No two-party swing here." : `A two-party swing of ${pts(s0)} to ${s0 > 0 ? "Labor" : "the Coalition"} here.`}</p>`; }
   const cands = D.c.map((c, k) => ({ ...c, v: raw.v[j][k], el: false }));
   const pf = raw.prevFp ? raw.prevFp[j] : null;
-  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? " · change on 2025 here" : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null)}</div>`;
+  const moved = movedTo(m, D);
+  const wk = D.c.indexOf(D.win);
+  const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
+  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? " · change on 2025 here" : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j];
