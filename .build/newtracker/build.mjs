@@ -317,7 +317,16 @@ const FONTS = [
   /* The text faces are self-hosted latin subsets. Crimson Text ships as
      static cuts only (there is no variable cut), so the serif range is
      carried by one file per weight per style. */
-  { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400", preload: true },
+  { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400" },
+  /* What the first screen sets in 400 - the tagline (and the colophon's
+     line, the classic design's one heading) - is a fixed handful of
+     letters: they ship as a 5.4KB subset (pyftsubset, layout kept) that is
+     preloaded in place of the 16.7KB face. Same family, declared after the
+     full face: where two faces of a family cover a character the later one
+     answers, so these letters come from the subset and anything else falls
+     to the full face, fetched only if something asks. */
+  { file: "lede-crimson400.woff2",              family: "Crimson Text", style: "normal", weight: "400", preload: true,
+    range: "U+0020, U+002C, U+002E, U+0030, U+0031, U+0032, U+0033, U+0034, U+0035, U+0036, U+0037, U+0038, U+0039, U+0041, U+004C, U+0056, U+0061, U+0062, U+0063, U+0064, U+0065, U+0066, U+0067, U+0068, U+0069, U+006B, U+006C, U+006E, U+006F, U+0070, U+0072, U+0073, U+0074, U+0075, U+0076, U+0078" },
   /* 600 normal is no longer preloaded (2026-10-25): no element of the
      default design sets in it - only the archived ?design=old view does,
      which can wait for it the way it waits for everything else. */
