@@ -526,7 +526,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes('const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;'), "readURL refuses a federal-only lens on an SA deep link");
   assert.ok(js.includes('if (SA_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";'), "setYear drops a federal-only lens on the walk into an SA frame");
   assert.ok(js.includes("if (FED_LENS.has(id) && SA_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on an SA frame outright");
-  assert.ok(js.includes("for (const lens of yearLenses(y).map((l) => l.id))"), "the legend-height probe measures only the year's own lenses");
+  // the legend-height probe used to sweep every lens for a global max; since the
+  // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens
+  // above keep that lens one the year can show
+  assert.ok(js.includes("const my = legendStandIn(m, y);") && !js.includes("for (const lens of yearLenses(y).map("), "the legend-height probe measures the current lens's stand-in (no lens sweep)");
+  assert.ok(js.includes("boothsShown(), S.lens, S.tppMode"), "the legend-height hold key carries the lens and its mode");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

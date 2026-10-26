@@ -481,6 +481,15 @@ function drawChamber(g, m, w, h, opts) {
       const wl = bandLabel(govName, nGov, ch.gov, "Government", X(geom.box.x0), "left");
       const wr = bandLabel(oppName, nOpp, ch.opp, "Opposition", X(geom.box.x1), "right");
       bandRoom = Math.min(X(0) - X(geom.box.x0) - wl, X(geom.box.x1) - X(0) - wr) * 2 - 16;
+      // the phone band holds no side column: name the crossbench over the Speaker's block —
+      // it can outnumber the opposition and the key below was never meant to carry it alone
+      if (ch.nCross) {
+        const ct = `Crossbench ${ch.nCross}`;
+        g.textAlign = "center"; g.textBaseline = "alphabetic";
+        g.font = `600 11px ${SANS}`; g.fillStyle = css(th.ink2);
+        g.fillText(ct, X(0), y0 - 46);
+        claim(X(0), y0 - 58, Math.max(g.measureText(ct).width, 40), 14, "center", "top");
+      }
     }
     if (room > 70) {
       const blocLabel = (name, n, fam, role, x, align) => {

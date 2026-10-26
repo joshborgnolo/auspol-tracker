@@ -46,13 +46,33 @@ function valueText(v, kind, ctx) {
 }
 
 /* =============================== the lens tabs =============================== */
+// the search box promises as much as its width can show, never clipped mid-word
+let phCtx = null;
+function fitSearchPlaceholder() {
+  const input = $("#q"), sen = S.view === "chamber" && S.house === "senate";
+  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, member or place", "Search a seat or member", "Search"];
+  if (!phCtx) phCtx = document.createElement("canvas").getContext("2d");
+  const cs = getComputedStyle(input);
+  phCtx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const room = input.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 4;
+  for (const t of list) if (phCtx.measureText(t).width <= room) { input.placeholder = t; return; }
+  input.placeholder = "Search";
+}
+// a lens row with chips off the far edge flags itself: the fade asks to be scrolled
+const lensRowEl = $(".mp-lensrow");
+function lensOverflow() {
+  const el = $("#lenses"); if (!el || !lensRowEl) return;
+  lensRowEl.classList.toggle("more", el.scrollWidth - el.clientWidth - el.scrollLeft > 4);
+}
 // the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
   const sen = S.view === "chamber" && S.house === "senate";
   const list = sen ? SEN_LENSES : yearLenses(S.year), cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
   $("#lenses").innerHTML = list.map((l) => `<button type="button" class="rd-tab" role="tab" ${attr}="${l.id}" aria-selected="${cur === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
   $("#lenses").setAttribute("aria-label", sen ? "Colour the senators by" : "Colour the seats by");
-  $("#q").placeholder = sen ? "Search a senator or state" : "Search a seat, member or place";
+  $("#lenses").addEventListener("scroll", lensOverflow, { passive: true });
+  lensOverflow();
+  fitSearchPlaceholder();
 }
 
 /* =============================== the legend =============================== */
@@ -90,10 +110,12 @@ function renderLegend() {
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   holdLegendHeight(m);
 }
-/* the key holds the height of its tallest lens in its tallest election, so neither changing lens
-   nor changing year moves the figure (the stage below it on a wide screen, the timeline below it
-   on a phone). A year not loaded yet is measured on a stand-in: the loaded year's figures with that
-   year's own words (its seat counts, seating-plan note, census basis) */
+/* the key holds the height of the CURRENT lens at its tallest election, so stepping
+   through the years never moves the figure (the stage below it on a wide screen, the
+   timeline below it on a phone); switching lens or flip re-holds it once, which reads
+   as the key's own change. A year not loaded yet is measured on a stand-in: the loaded
+   year's figures with that year's own words (its seat counts, seating-plan note,
+   census basis) */
 const legendHeights = new Map();
 const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
@@ -118,26 +140,21 @@ function legendStandIn(m, y) {
 }
 function legendHeightOf(m, y, w, probe) {
   const real = !!(Y[y] && Y[y].search);
-  const key = [w, S.view, y, real, boothsShown()].join("|");
+  // the hold is per lens and mode: stepping through the years reuses the tallest
+  // measure of the CURRENT key, so the figure never moves; switching the lens (or
+  // its flip) re-holds it once, which reads as the key's own change
+  const key = [w, S.view, y, real, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.index, S.basis, S.seat].join("|");
   if (!legendHeights.has(key)) {
-    const keep = { lens: S.lens, tppMode: S.tppMode, fpMode: S.fpMode, seat: S.seat, index: S.index, year: S.year };
+    const keep = { seat: S.seat, year: S.year };
     let hMax = 0;
     try {
       S.year = y;
-      for (const lens of yearLenses(y).map((l) => l.id))
-        for (const mode of lens === "tpp" || lens === "fp" || lens === "senate" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null]) {
-          Object.assign(S, { lens });
-          if (lens === "tpp") S.tppMode = mode;
-          if (lens === "fp") S.fpMode = mode === "swing" ? "change" : "share";
-          if (lens === "senate") S.senMode = mode === "swing" ? "gap" : "share";
-          if (lens === "seifa") S.index = mode;
-          const my = legendStandIn(m, y);
-          for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
-            S.seat = seat;
-            probe.innerHTML = legendHTML(my);
-            hMax = Math.max(hMax, probe.getBoundingClientRect().height);
-          }
-        }
+      const my = legendStandIn(m, y);
+      for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
+        S.seat = seat;
+        probe.innerHTML = legendHTML(my);
+        hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+      }
     } finally { Object.assign(S, keep); }
     legendHeights.set(key, Math.ceil(hMax));
   }
@@ -153,20 +170,22 @@ function holdLegendHeight(m) {
   let h = 0;
   try {
     for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe));
-    if (S.view === "chamber") for (const sm of new Set([SENY.now, SENM])) if (sm) h = Math.max(h, senLegendHeight(sm, w, probe));
+    // the Senate chamber walks its Senates with the timeline: every loaded one's
+    // current-lens key joins the hold, so the switch between Senates stays quiet
+    if (S.view === "chamber") for (const sm of new Set([...Object.values(SENY), SENM])) if (sm) h = Math.max(h, senLegendHeight(sm, w, probe));
   } finally { probe.remove(); }
   el.style.minHeight = h + "px";
   el.style.boxSizing = "border-box";
 }
-// the Senate's key at its tallest: each lens, as seated and sorted
+// the Senate's key, current lens, as seated and sorted
 function senLegendHeight(sm, w, probe) {
-  const key = `senate|${sm.year}|${w}`;
+  const key = `senate|${sm.year}|${w}|${S.senLens}|${S.seat}`;
   if (!legendHeights.has(key)) {
-    const keep = { senLens: S.senLens, seat: S.seat };
+    const keep = { seat: S.seat };
     let hMax = 0;
     try {
-      for (const l of SEN_LENSES) for (const seat of ["plan", "sort"]) {
-        S.senLens = l.id; S.seat = seat;
+      for (const seat of ["plan", "sort"]) {
+        S.seat = seat;
         probe.innerHTML = senateLegendHTML(sm);
         hMax = Math.max(hMax, probe.getBoundingClientRect().height);
       }
@@ -190,7 +209,8 @@ function legendHTML(m) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
+      // in the chamber the counts are on the canvas's bloc labels and in the story, not three times
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
@@ -277,18 +297,21 @@ function legendHTML(m) {
 
 /* =============================== the timeline =============================== */
 let SUM = null;
+let tlCtx = null; // shared canvas context for measuring stop-label widths
 /* two dated rows, one per jurisdiction: the federal elections on top, the South
    Australian state ones below, each stop at its date on the one scale */
 function renderTimeline() {
   const el = $("#time"); if (!el) return;
-  const W = el.clientWidth || 600, H = el.clientHeight || 96, m = M();
+  const W = el.clientWidth || 600, H = el.clientHeight || 106, m = M();
   const X = (y) => 22 + ((xOfYear(y) - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
   const NX = (nx) => 22 + ((nx - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
   const saGx = (ry) => NX(SA_PREV_X[ry] ?? YEAR_X["sa" + String(ry).slice(2)] ?? ry);
   const short = W < 560, cur = S.year;
+  /* the SA row sits lower than the federal labels end: the whole row (line,
+     labels and the selected stop's underline) fits inside the box */
   const rows = [
-    { ys: YEARS_FED, base: Math.round(H * 0.36), top: 2 },
-    { ys: YEARS_SA, base: Math.round(H * 0.81), top: Math.round(H * 0.36) + 16 },
+    { ys: YEARS_FED, base: Math.round(H * 0.34), top: 2 },
+    { ys: YEARS_SA, base: Math.round(H * 0.80), top: Math.round(H * 0.34) + 16 },
   ];
   const sd = m ? selDiv() : null;
   let g = "";
@@ -320,20 +343,39 @@ function renderTimeline() {
         const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] ? SUM.seats[y][st] : (st === "AUS" || st === "SA") && META_FACTS.mix && META_FACTS.mix[y]; if (!s) continue;
         const tot = sum(Object.values(s)), x = X(y) - bw / 2;
         let acc = 0;
-        for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${r.base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+        // the make-up bar hugs its own row's line: the SA row's read sits with
+        // the state's stops, not midway to the federal labels
+        for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${r.base - 10}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
       }
     }
   }
-  // the lower row named at its empty start: the state's elections, where the federal row has 2004
-  {
-    const r = rows[1], x0 = Math.min(...r.ys.map(X)), lab = short ? "SA" : "South Australia";
-    if (x0 - 24 > (short ? 30 : 110)) g += `<text class="yr row" x="0" y="${r.base + 15}" text-anchor="start">${lab}</text>`;
-  }
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i], hitBot = i + 1 < rows.length ? rows[i + 1].top : H, labY = r.base + 15;
-    for (const y of r.ys) {
-      const on = y === cur, x = X(y), lab = short && y !== "now" && !SA_YEARS.has(y) ? "’" + String(y).slice(2) : yearLabel(y);
-      g += `<g class="stop" data-year="${y}" style="cursor:pointer"><rect class="hit" x="${x - 24}" y="${i ? r.top : 0}" width="48" height="${hitBot - (i ? r.top : 0)}"/><line x1="${x}" x2="${x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${on ? " on" : ""}" x="${x}" y="${labY}" text-anchor="middle">${lab}</text>${on ? `<line x1="${x - 16}" x2="${x + 16}" y1="${Math.min(labY + 2, H - 2)}" y2="${Math.min(labY + 2, H - 2)}" stroke="var(--ink)" stroke-width="2"/>` : ""}</g>`;
+  /* the stops' labels sit on their row; a pair whose boxes touch nudge apart a
+     little (2025 and Now on a phone), never far from the stop they name */
+  if (!tlCtx) tlCtx = document.createElement("canvas").getContext("2d");
+  tlCtx.font = `400 12px ${getComputedStyle(el).fontFamily}`;
+  const tW = (s) => tlCtx.measureText(s).width;
+  const rowsOf = [
+    { i: 0, items: YEARS_FED.map((y) => ({ y, lab: short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y) })) },
+    { i: 1, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + yearLabel(y).trim().slice(2) : yearLabel(y) })) },
+  ];
+  for (const R of rowsOf) {
+    const r = rows[R.i], labY = r.base + 15;
+    const its = R.items.map((t) => ({ ...t, x: NX(xOfYear(t.y)), w: tW(t.lab), dx: 0, on: t.y === cur }));
+    for (const t of its) { t.dx = -t.w / 2; }
+    for (let k = 0; k < 4; k++) for (let i = 1; i < its.length; i++) {
+      const a = its[i - 1], b = its[i], gap = b.x + b.dx - (a.x + a.dx + a.w);
+      if (gap < 6) { const push = Math.min(6 - gap, 12), pa = Math.min(push / 2, 6), pb = Math.min(push - pa, 6); a.dx -= pa; b.dx += pb; }
+    }
+    // the lower row named at its empty start, as a caption — never a stop
+    if (R.i === 1) {
+      const x0 = its.length ? its[0].x - 24 : W;
+      if (x0 > (short ? 30 : 110)) g += `<text class="yr row" x="0" y="${labY}" text-anchor="start">${short ? "SA" : "South Australia"}</text>`;
+    }
+    for (const t of its) {
+      const lx = t.x + t.dx + t.w / 2;
+      const hitTop = R.i ? r.top : 0, hitBot = R.i ? H : rows[1].top;
+      const uline = t.on ? `<line x1="${lx - t.w / 2}" x2="${lx + t.w / 2}" y1="${labY + 2}" y2="${labY + 2}" stroke="var(--ink)" stroke-width="2"/>` : "";
+      g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${t.x - 24}" y="${hitTop}" width="48" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections 2004 to now, and South Australian state elections; choose one">${g}</svg>`;
@@ -656,27 +698,31 @@ async function setYear(y) {
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
   if (sen) return sen.lc ? `South Australia’s Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : SA_YEARS.has(m.year) ? `The ${yearLabel(m.year)} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : SA_YEARS.has(m.year) ? `South Australian election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
-/* the eyebrow holds the height of its longest line, so a walk never moves the figure under it:
-   between 414 and 600px an election's line wraps to two and Now's fits on one, and with the page
-   at its top no scroll can take that back. Every election's line is measured, loaded or not, from
-   the facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate
-   (and back to the House at SA 2026), so only it floors on the Senate's longer lines too */
+/* the eyebrow holds the height of its jurisdiction family's longest line, so a walk through one
+   family never moves the figure under it: between 414 and 600px an election's line wraps to two
+   and Now's fits on one, and with the page at its top no scroll can take that back. Federal and
+   South Australian lines hold separately — the SA line is short and would sit in the tall federal
+   hold — with a family walk moving the head once. Every unloaded year's line is measured from the
+   facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate (and
+   back to the House at SA 2026), so only it floors on its family's Senate lines too */
 const META_FACTS = /*@meta-facts*/{};
 const ebHeights = new Map();
 function holdEyebrow() {
   const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
   if (!w || !M()) return;
-  const ch = S.view === "chamber", at = `${w}|${ch}`;
+  const ch = S.view === "chamber", fam = SA_YEARS.has(S.year) ? "sa" : "fed", at = `${w}|${ch}|${fam}`;
   if (!ebHeights.has(at)) {
     const keep = meta.textContent, lines = [], H = META_FACTS.house || {}, SN = META_FACTS.senate || {};
     for (const y of YEARS) {
+      if ((SA_YEARS.has(y) ? "sa" : "fed") !== fam) continue;
       if (Y[y] && Y[y].divs) { lines.push(metaLine(Y[y], null)); continue; }
       const f = H[y]; if (!f) continue;
       lines.push(metaLine({ year: y, date: f[0], asOf: f[0], divs: { length: f[1] }, booth: { n: f[2] } }, null));
     }
     if (ch) for (const y of SEN_YEARS) {
+      if ((SA_YEARS.has(y) ? "sa" : "fed") !== fam) continue;
       const s = SENY[y], f = s ? [s.asOf, s.divs.length] : SN[y]; if (!f) continue;
       lines.push(metaLine(M(), { year: y, lc: s ? s.lc : SA_YEARS.has(y), asOf: f[0], divs: { length: f[1] } }));
     }
@@ -689,6 +735,8 @@ function holdEyebrow() {
   eb.style.minHeight = ebHeights.get(at) + "px";
 }
 addEventListener("resize", holdEyebrow);
+addEventListener("resize", fitSearchPlaceholder);
+addEventListener("resize", lensOverflow);
 
 /* =============================== the frame =============================== */
 let raf = 0;
@@ -998,7 +1046,8 @@ function preloadYears() {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
   window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
-    get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
+    get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
+    landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); },
     view(ll, k) { const p = proj(ll); d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(Wpx / 2 - p[0] * k, Hpx / 2 - p[1] * k).scale(k)); } };

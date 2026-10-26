@@ -979,7 +979,7 @@ function seaSpots(m, hb, A, p) {
   if (cities && !cities.hidden && hint && hint.textContent) {
     const st = $("#stage").getBoundingClientRect();
     let top = 4;
-    for (const el of [cities, hint]) if (el.offsetHeight) top = Math.max(top, el.getBoundingClientRect().bottom - st.top + 6);
+    for (const el of [cities, hint]) if (el.offsetHeight) top = Math.max(top, el.getBoundingClientRect().bottom - st.top + 14);
     seaTop = { w: Wpx, top };
   }
   const top = seaTop.w === Wpx ? seaTop.top : isPhone() ? 4 : p.t + 22;
@@ -998,6 +998,31 @@ function seaSpots(m, hb, A, p) {
       x0 = Math.min(x0, x - half); x1 = Math.max(x1, x + half); y0 = Math.min(y0, y - A / 2); y1 = Math.max(y1, y + A / 2 + ISL_CAP);
     }
     const sx = x0 < 4 ? 4 - x0 : x1 > Wpx - 4 ? Wpx - 4 - x1 : 0, sy = y0 < top ? top - y0 : y1 > Hpx - 4 ? Hpx - 4 - y1 : 0;
+    // the hint's clearance can push a pair down onto the coast: step it back out to
+    // sea until no box edge or caption line touches a division's land
+    const g = geoOf(m);
+    if (g && g.paths) {
+      const dir = k === 0 ? -1 : 1;
+      let out2 = 0;
+      const touches = () => {
+        for (const key of [ne, sw]) {
+          const isl = m.isl.find((q) => q.key === key), name = ISL_SHORT[key] || (isl ? isl.name : "");
+          const half = Math.max(A, ctx.measureText(name).width + 6) / 2;
+          const [cx0, cy0] = [c[key][0] + sx + dir * out2, c[key][1] + sy];
+          for (let i = 0; i <= 2; i++) for (let j = 0; j <= 2; j++) {
+            const px = cx0 - half + half * i, py = cy0 - A / 2 + ((A + ISL_CAP) / 2) * j;
+            const bx = (px - HOME.x) / HOME.k, by = (py - HOME.y) / HOME.k;
+            for (let si = 0; si < g.paths.length; si++) {
+              const bb = g.bb[si]; if (!bb || bx < bb[0][0] || bx > bb[1][0] || by < bb[0][1] || by > bb[1][1]) continue;
+              if (hitCtx.isPointInPath(g.paths[si], bx, by)) return true;
+            }
+          }
+        }
+        return false;
+      };
+      while (out2 <= 60 && touches() && x0 + sx + dir * (out2 + 6) >= 4 && x1 + sx + dir * (out2 + 6) <= Wpx - 4) out2 += 6;
+      for (const key of [ne, sw]) c[key][0] += dir * out2;
+    }
     for (const key of [ne, sw]) out[key] = [c[key][0] + sx, c[key][1] + sy];
   });
   seaMemo = { memo, out };

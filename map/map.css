@@ -51,9 +51,12 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-views .rd-tab { height: 34px; padding: 0 10px; font-size: 14px; }
 .mp-views .rd-tab svg { margin-right: 7px; opacity: .8; }
 
-.mp-lensrow { margin-top: 18px; }
+.mp-lensrow { margin-top: 18px; position: relative; }
 .mp-lensrow .mp-lenses { display: flex; flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .mp-lensrow .mp-lenses::-webkit-scrollbar { display: none; }
+/* a scrollable lens row fades its far edge, so a chip cut mid-word reads as "swipe me" */
+.mp-lensrow::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 30px; pointer-events: none; opacity: 0; transition: opacity .2s; background: linear-gradient(to left, var(--bg), transparent); }
+.mp-lensrow.more::after { opacity: 1; }
 .mp-lenses .rd-tab:first-child { padding-left: 0; }
 .mp-lenses .rd-tab:first-child::after { left: 0; }
 
@@ -218,12 +221,12 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: 0 0 4px var(--bg); }
 
 /* the timeline: an election axis under the view */
-.mp-time { flex: none; position: relative; height: 96px; border-top: 1px solid var(--line); margin-top: 6px; }
+.mp-time { flex: none; position: relative; height: 112px; border-top: 1px solid var(--line); margin-top: 6px; }
 .mp-time svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .mp-time .yr { font: 400 12px var(--sans); fill: var(--ink-3); cursor: pointer; }
 .mp-time .yr.on { font-weight: 600; fill: var(--ink); }
 /* the state row's name: a caption, not a stop */
-.mp-time .yr.row { fill: var(--ink-faint); cursor: default; pointer-events: none; }
+.mp-time .yr.row { fill: var(--ink-faint); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; cursor: default; pointer-events: none; }
 .mp-time .hit { fill: transparent; cursor: pointer; }
 .mp-time .hit:hover + g .yr, .mp-time g.stop:hover .yr { fill: var(--ink); }
 
@@ -254,7 +257,10 @@ button { cursor: pointer; background: none; border: 0; }
 .st-sec > h3 small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
 .st-note { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
 .st-note b { color: var(--ink-2); font-weight: 600; }
-.t-alp { color: var(--alp-text); } .t-lnp { color: var(--lnp-text); } .t-grn { color: var(--grn-text); } .t-onp { color: var(--onp-text); } .t-ind { color: var(--ind-text); } .t-oth { color: var(--oth-text); }
+.t-alp { color: var(--alp-text); } .t-lnp { color: var(--lnp-text); } .t-grn { color: var(--grn-text); } .t-onp { color: var(--onp-text); } .t-oth { color: var(--oth-text); }
+/* independents wear the map's mauve here; the shell's --ind-text slate reads
+   blue against the map fills */
+.t-ind { color: var(--m-ind); }
 
 /* hero figures: the Now page's two-party read, a size down */
 .hero { margin-top: 18px; }
@@ -273,6 +279,9 @@ button { cursor: pointer; background: none; border: 0; }
 .mbar .dot { position: absolute; top: 22px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); }
 .mbar .bar { position: absolute; top: 25px; height: 8px; border-radius: 2px; opacity: .22; }
 .mbar .tick { position: absolute; top: 44px; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+/* the end labels ("20 pts") pin to the column's edges, never past them */
+.mbar .tick.edge-l { transform: none; }
+.mbar .tick.edge-r { transform: translateX(-100%); }
 .mbar .tick.tied { color: var(--ink-2); font-weight: 600; }
 .hero-verdict { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--ink-2); text-align: center; }
 .hero-verdict b { color: var(--ink); font-weight: 600; }
@@ -471,7 +480,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-views .rd-tab svg { margin: 0; width: 18px; height: 18px; }
   .rd-eyebrow .rd-meta { order: 4; flex-basis: 100%; }
   .mp-lenses .rd-tab { padding: 0 10px; font-size: 14.5px; }
-  .mp-time { height: 88px; }
+  .mp-time { height: 100px; }
   .st-hed { font-size: 27px; }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }
