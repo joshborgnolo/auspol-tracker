@@ -17,6 +17,9 @@ function divValue(m, i) {
 // (the AEC's candidate swing columns, summed by family; null where the family
 // didn't stand last time and doesn't now)
 function fpChange(m, d, fam) {
+  // sa26's chg column is a written zero (the ECSA publishes no previous-election
+  // pair to swing against): a zero isn't "no change", it's no source
+  if (m.year === "sa26") return null;
   if (d.by) { // the by-election against the seat's 2025 count
     const p = d.by.prev; return d.fp[fam] - p.fp[fam];
   }
@@ -969,6 +972,9 @@ function fitSelection(dur, force) {
 function flyToCity(k) {
   const [, st, ll] = CITIES[k];
   const a = proj(ll[0]), b = proj(ll[1]);
+  // a year whose jurisdiction holds no seats there (sa26: South Australia only,
+  // so Adelaide alone flies)
+  if (!M() || !M().areas[st]) return;
   select({ level: "state", st }, { fly: false });
   dock = null; // a city's view keeps no room for its state's islands
   const go = (dur) => {

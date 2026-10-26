@@ -486,6 +486,8 @@ let islandsP = null;
 const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
   if (!data) return [];
+  // the federal seat islands have no home in a state election's frame
+  if (m.year === "sa26") return [];
   const own = data.owner[m.year === "now" ? 2025 : m.year] || {};
   return data.islands.map((s) => {
     let lon0 = Infinity, lat0 = Infinity, lon1 = -Infinity, lat1 = -Infinity;
