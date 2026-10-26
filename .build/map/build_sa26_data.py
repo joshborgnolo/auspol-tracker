@@ -41,10 +41,13 @@ null; prev is null.
 
 Booths: every district's polling places ride the year file's booths lane on
 the federal schema (a dict of lists, each booth's v re-ordered onto the
-district's vote-sorted candidate rows). The ECSA payload carries no booth
-addresses, suburbs or coordinates, and none are published anywhere else in
-a reachable form, so prem/sub/pc/lat/lon are null and no booth dots draw on
-the map — the places fill the counts, the list, search and the story cards.
+district's vote-sorted candidate rows). The results payload carries no
+booth addresses, but ECSA's own election-site map page embedded them as JS
+literals during the campaign — archived by the Wayback Machine at
+20260319225331, derived into .build/map/src/sa26/ecsa-2026-venues.json.gz
+by load_venues below. Every fixed booth gains prem/sub/pc/lat/lon and its
+dot draws on the map; the six mobile teams keep nulls, matching the
+federal mobile lanes.
 Type strings map onto the federal lane (polling booths and shared booths
 1, early voting centres 5, mobile teams 4). tcp is a booth's
 two-candidate-preferred split ONLY where the booth's counted pair is the
@@ -78,7 +81,7 @@ one `name` property per feature (title case, the ECSA names it joins to).
 usage: python3 -I .build/map/build_sa26_data.py <out_dir> [--fetch]
 then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> map/data --years=sa26
 """
-import collections, gzip, json, os, sys, urllib.request
+import collections, gzip, json, os, re, sys, urllib.request
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
@@ -128,6 +131,58 @@ def fetch(name, path):
         return obj
     with gzip.open(p, "rt", encoding="utf-8") as f:
         return json.load(f)
+
+
+# Venue roll: ECSA's election-site map page embedded every polling place as
+# JS literals (venue, street, suburb, postcode, lat/lon); the live page
+# resets to empty arrays once the election closes, so the committed cache is
+# derived from the Wayback Machine snapshot taken during the campaign.
+
+VENUES_SNAPSHOT = "https://web.archive.org/web/20260319225331/https://www.ecsa.sa.gov.au/map"
+VENUES_CACHE = "ecsa-2026-venues.json.gz"
+
+
+def extract_places(page):
+    marker = "App.pollingPlaces ="
+    i = page.index(marker) + len(marker)
+    i += page[i:].index("[")
+    places, _ = json.JSONDecoder().raw_decode(page[i:])
+    return places
+
+
+def load_venues():
+    p = os.path.join(SRC, VENUES_CACHE)
+    if FETCH or not os.path.exists(p):
+        req = urllib.request.Request(VENUES_SNAPSHOT, headers={"User-Agent": "auspol-tracker sa26 venue cache"})
+        with urllib.request.urlopen(req) as r:
+            page = r.read().decode("utf-8")
+        venues = []
+        seen = set()
+        for q in extract_places(page):
+            lat, lon = round(float(q["lat"]), 5), round(float(q["lng"]), 5)
+            if not (-44 < lat < -9 and 112 < lon < 154):
+                fail(f"venue {q['location_name']!r} coords {lat},{lon} outside Australia")
+            # interstate EVCs (e.g. Elections ACT in Canberra) ride the roll
+            # legitimately; no results booth ever matches them
+            key = (q["district_name"].upper(), q["location_name"])
+            if key in seen:
+                fail(f"venue key {key!r} duplicated in the map-page roll")
+            seen.add(key)
+            venues.append({"d": q["district_name"], "n": q["location_name"], "t": q["type_code"],
+                           "prem": q["address_detail1"], "sub": re.sub(r"\s+\d{4}$", "", q["suburb"] or ""),
+                           "pc": q.get("postcode") or None, "lat": lat, "lon": lon})
+        if len(venues) < 740:
+            fail(f"venue roll holds {len(venues)} places — expected ~750")
+        with gzip.open(p, "wt", encoding="utf-8") as f:
+            f.write(json.dumps(venues, separators=(",", ":"), ensure_ascii=False))
+        return venues
+    with gzip.open(p, "rt", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def suburb_case(s):
+    t = (s or "").strip().title()
+    return re.sub(r"\bMc([a-z])", lambda m: "Mc" + m.group(1).upper(), t)
 
 
 def title_name(given, surname):
@@ -243,6 +298,7 @@ def main():
     demo = load_demo()
     seifa = load_seifa()
     flows, flow_err = load_flows()
+    venues = {(v["d"].upper(), v["n"]): v for v in load_venues()}
 
     D = []
     seats = collections.Counter()
@@ -252,6 +308,7 @@ def main():
     B = {k: [] for k in ("d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon",
                          "v", "inf", "tpp", "tcp", "fl", "dec", "vdec")}
     types_seen = collections.Counter()
+    geocoded = 0
     zero_booths = notional = tcp_booths = 0
     for di, name in enumerate(names):
         s = ha_d[name]
@@ -458,15 +515,22 @@ def main():
                 zero_booths += 1
             ty = s_pp[pname]
             types_seen[ty] += 1
+            if ty == 4:
+                vr = None
+            else:
+                vr = venues.get((name.upper(), pname))
+                if vr is None:
+                    fail(f"{name}: booth {pname!r} not in the ECSA venue roll")
+                geocoded += 1
             B["d"].append(di)
             B["id"].append(f"sa26-{di}-{bk}")
             B["n"].append(pname)
             B["ty"].append(ty)
-            B["prem"].append(None)
-            B["sub"].append(None)
-            B["pc"].append(None)
-            B["lat"].append(None)
-            B["lon"].append(None)
+            B["prem"].append(vr["prem"] if vr else None)
+            B["sub"].append(suburb_case(vr["sub"]) if vr else None)
+            B["pc"].append(vr["pc"] if vr else None)
+            B["lat"].append(vr["lat"] if vr else None)
+            B["lon"].append(vr["lon"] if vr else None)
             B["v"].append(pvotes)
             B["inf"].append(pp["informalVotes"])
             B["tpp"].append(None)
@@ -510,7 +574,7 @@ def main():
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1])
     print("sa26 districts", len(D), "| seats", dict(seats), "| 2PP-classic ALP", round(tp, 2),
           "| informal", round(100 * tot_inf / (tot_inf + tot_formal), 2), "| enrolled", tot_enrolled,
-          "| booths", len(B["id"]), dict(sorted(types_seen.items())),
+          "| booths", len(B["id"]), dict(sorted(types_seen.items())), "| geocoded", geocoded,
           f"(tcp {tcp_booths}, zero-vote {zero_booths}, notional-2CP {notional})",
           "->", os.path.getsize(p), "bytes")
 

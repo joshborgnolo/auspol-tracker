@@ -177,8 +177,10 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // votes in the district's candidate order, ECSA venue types mapped to the
 // federal day/EVC/mobile codes, the district's live 2CP pair kept where the
 // booth's pair matches (Croydon's 14 booths carried an election-night
-// notional ALP v One Nation pair, dropped). The ECSA publishes no booth
-// addresses or coordinates, so lat/lon/premises are null and dec/vdec too.
+// notional ALP v One Nation pair, dropped). Booth premises, suburb, postcode
+// and coordinates come from ECSA's own 2026 election-map venue roll (Wayback
+// snapshot, cached as ecsa-2026-venues.json.gz); the 6 mobile teams have no
+// fixed venue and stay null, and dec/vdec stay null too.
 {
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   const B = sa.booths;
@@ -187,7 +189,16 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   for (const k of LANES) assert.ok(Array.isArray(B[k]) && B[k].length === 753, `sa26 booths.${k}: 753 rows`);
   assert.equal(new Set(B.id).size, 753, "sa26 booth ids are unique");
   assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 4, 5], "sa26 booth types are day/EVC/mobile only");
-  assert.ok(B.lat.every((x) => x === null) && B.lon.every((x) => x === null) && B.prem.every((x) => x === null), "sa26 booths carry no venue facts (the ECSA publishes none)");
+  assert.equal(B.ty.filter((t) => t === 4).length, 6, "sa26: 6 mobile polling teams");
+  for (let k = 0; k < B.n.length; k++) {
+    if (B.ty[k] === 4) {
+      assert.ok(B.lat[k] === null && B.lon[k] === null && B.prem[k] === null && B.sub[k] === null && B.pc[k] === null, `sa26 mobile booth ${B.n[k]}: no venue facts (a mobile team has no fixed venue)`);
+    } else {
+      const c = `${B.n[k]}: venue facts off the ECSA venue roll`;
+      assert.ok(B.lat[k] > -44 && B.lat[k] < -9 && B.lon[k] > 112 && B.lon[k] < 154, `sa26 ${c}`);
+      assert.ok(typeof B.prem[k] === "string" && B.prem[k] && typeof B.sub[k] === "string" && B.sub[k] && typeof B.pc[k] === "string" && B.pc[k], `sa26 ${c}`);
+    }
+  }
   assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa26 booths carry no SEIFA deciles (the neighbourhood lane is blank)");
   sa.divs.forEach((d, di) => {
     const js = B.d.reduce((a, x, k) => (x === di ? (a.push(k), a) : a), []);
@@ -304,8 +315,9 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.equal(res.agg[st].pprim.onp, 0, `sa22: ${st} 2018 primaries hold no One Nation lane (it ran none)`);
   }
   // booths: 695 polling places on the federal lanes, ECSA 2022 types (day and
-  // mobile — no EVC lane in the 2022 vocabulary), no venue facts (the ECSA
-  // publishes none), tpp null and no flow lane
+  // mobile — no EVC lane in the 2022 vocabulary), venue facts off ECSA's own
+  // archived 2022 election-map venue roll (the 6 mobile teams stay null),
+  // tpp null and no flow lane
   {
     const B = res.booths;
     assert.ok(B, "sa22 res carries a booths record");
@@ -313,7 +325,16 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     for (const k of LANES) assert.ok(Array.isArray(B[k]) && B[k].length === 695, `sa22 booths.${k}: 695 rows`);
     assert.equal(new Set(B.id).size, 695, "sa22 booth ids are unique");
     assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 4], "sa22 booth types are day/mobile only (no EVC lane in 2022)");
-    assert.ok(B.lat.every((x) => x === null) && B.lon.every((x) => x === null) && B.prem.every((x) => x === null), "sa22 booths carry no venue facts (the ECSA publishes none)");
+    assert.equal(B.ty.filter((t) => t === 4).length, 6, "sa22: 6 mobile polling teams");
+    for (let k = 0; k < B.n.length; k++) {
+      if (B.ty[k] === 4) {
+        assert.ok(B.lat[k] === null && B.lon[k] === null && B.prem[k] === null && B.sub[k] === null && B.pc[k] === null, `sa22 mobile booth ${B.n[k]}: no venue facts (a mobile team has no fixed venue)`);
+      } else {
+        const c = `${B.n[k]}: venue facts off the ECSA venue roll`;
+        assert.ok(B.lat[k] > -44 && B.lat[k] < -9 && B.lon[k] > 112 && B.lon[k] < 154, `sa22 ${c}`);
+        assert.ok(typeof B.prem[k] === "string" && B.prem[k] && typeof B.sub[k] === "string" && B.sub[k] && typeof B.pc[k] === "string" && B.pc[k], `sa22 ${c}`);
+      }
+    }
     assert.ok(B.tpp.every((x) => x === null), "sa22 booths carry no tpp lane (the notional tally is partial)");
     assert.ok(B.fl.every((x) => x === null), "sa22 booths carry no flow lane");
     assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa22 booths carry no SEIFA deciles");
