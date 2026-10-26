@@ -1587,10 +1587,10 @@ function fitTransform(bb, maxK, res) {
 function unionBB(list) { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const b of list) { if (!b) continue; x0 = Math.min(x0, b[0][0]); y0 = Math.min(y0, b[0][1]); x1 = Math.max(x1, b[1][0]); y1 = Math.max(y1, b[1][1]); } return [[x0, y0], [x1, y1]]; }
 function homeBox(m) {
   const b = unionBB(m.geo.bb);
-  // sa26's whole-state home view sits 4% further out (user call 2026-10-26):
+  // sa26's whole-state home view sits 6% further out (user call 2026-10-26):
   // the districts fill the frame a touch tighter than the federal elections read
   if (m.year === "sa26") {
-    const [[x0, y0], [x1, y1]] = b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = 1.04;
+    const [[x0, y0], [x1, y1]] = b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = 1.06;
     return [[cx + (x0 - cx) * z, cy + (y0 - cy) * z], [cx + (x1 - cx) * z, cy + (y1 - cy) * z]];
   }
   return b;
