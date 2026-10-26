@@ -641,8 +641,8 @@ function storyBooth(m, j) {
 }
 
 function foot(m) {
-  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. AEC boundaries and seat types; ABS SEIFA.</p>`;
+  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : m.year === "sa26" ? `ECSA results for the ${yearLabel("sa26")} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  return `<p class="st-foot">${src}. ${m.year === "sa26" ? "ECSA boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {

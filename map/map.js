@@ -349,7 +349,7 @@ const S = {
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
-const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA 2026" : String(y));
+const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA26" : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -1596,10 +1596,10 @@ function fitTransform(bb, maxK, res) {
 function unionBB(list) { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const b of list) { if (!b) continue; x0 = Math.min(x0, b[0][0]); y0 = Math.min(y0, b[0][1]); x1 = Math.max(x1, b[1][0]); y1 = Math.max(y1, b[1][1]); } return [[x0, y0], [x1, y1]]; }
 function homeBox(m) {
   const b = unionBB(m.geo.bb);
-  // sa26's whole-state home view sits 6% further out (user call 2026-10-26):
+  // sa26's whole-state home view sits 8% further out (user calls 2026-10-26):
   // the districts fill the frame a touch tighter than the federal elections read
   if (m.year === "sa26") {
-    const [[x0, y0], [x1, y1]] = b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = 1.06;
+    const [[x0, y0], [x1, y1]] = b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = 1.08;
     return [[cx + (x0 - cx) * z, cy + (y0 - cy) * z], [cx + (x1 - cx) * z, cy + (y1 - cy) * z]];
   }
   return b;
@@ -3719,8 +3719,8 @@ function storyBooth(m, j) {
 }
 
 function foot(m) {
-  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. AEC boundaries and seat types; ABS SEIFA.</p>`;
+  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : m.year === "sa26" ? `ECSA results for the ${yearLabel("sa26")} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  return `<p class="st-foot">${src}. ${m.year === "sa26" ? "ECSA boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {
@@ -4273,7 +4273,7 @@ function legendHTML(m) {
   switch (S.lens) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
-      h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${m.year}`}</div>`;
+      h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
       h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
@@ -4708,7 +4708,7 @@ async function setYear(y) {
 function metaLine() {
   const m = M(); if (!m) return "";
   if (senOn()) return SENM.year === "now" ? `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators` : `The Senate from ${longDate(SENM.asOf)}, after the ${SENM.year} election · ${SENM.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : m.year === "sa26" ? `The ${yearLabel("sa26")} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 
 /* =============================== the frame =============================== */
