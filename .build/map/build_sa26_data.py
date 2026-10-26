@@ -69,8 +69,8 @@ ranked among the frame's own 47. The preferences lens rides
 data/sa26-flows.json (the two-class pile estimator's MODELLED per-district
 flows, .build/estimate-state-flows.py, written only when its federal
 back-test gates pass — the ECSA publishes a distribution of preferences,
-never where each party's own voters ended): each classic district (Labor
-v Liberal final) gains fl rows [candidateRow, toLabor, toLiberal]
+never where each party's own voters ended): each district whose final was Labor v Liberal or Labor v One Nation gains fl
+rows [candidateRow, to the tcp's first finalist, to its second]
 apportioned from the store's per-origin-group counts in proportion to the
 candidate's first preferences, and the year file carries err90 cells the
 UI quotes beside every modelled figure.
@@ -82,6 +82,8 @@ usage: python3 -I .build/map/build_sa26_data.py <out_dir> [--fetch]
 then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> map/data --years=sa26
 """
 import collections, gzip, json, os, re, sys, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sa_flow_lane import load_store, flow_rows
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
@@ -254,30 +256,8 @@ def load_seifa():
 
 
 def load_flows():
-    """the estimator's modelled per-district flows (data/sa26-flows.json):
-    {district: {bucket: [toLabor, toLiberal]}} over the election's classic
-    districts plus the federal-per-seat err90 the UI quotes with them."""
-    if not os.path.exists(FLOWS_STORE):
-        fail(f"flows store {FLOWS_STORE} missing — run .build/estimate-state-flows.py")
-    with open(FLOWS_STORE) as f:
-        d = json.load(f)
-    flows = d.get("flows")
-    n_cl = d.get("nClassic")
-    if not isinstance(flows, dict) or not isinstance(n_cl, int) or len(flows) != n_cl:
-        fail(f"flows store: {len(flows or {})} districts vs nClassic {n_cl!r}")
-    for name, fl in flows.items():
-        if set(fl) - {"grn", "onp", "oth"}:
-            fail(f"flows store: {name} carries buckets {sorted(set(fl) - {'grn', 'onp', 'oth'})}")
-        for b, (to_alp, to_lib) in fl.items():
-            if min(to_alp, to_lib) < 0:
-                fail(f"flows store: {name}.{b} has a negative share {[to_alp, to_lib]}")
-    err = d.get("seaterr") or {}
-    for b in ("grn", "onp", "oth"):
-        if not (err.get(b) or {}).get("p90"):
-            fail(f"flows store: seaterr.{b}.p90 missing")
-    return flows, {"grn": err["grn"]["p90"], "onp": err["onp"]["p90"],
-                   "oth": err["oth"]["p90"], "ind": err["oth"]["p90"]}
-
+    """the estimator's modelled per-district flows (data/sa26-flows.json, sa_flow_lane.py)"""
+    return load_store(FLOWS_STORE, fail)
 
 def main():
     os.makedirs(OUT, exist_ok=True)
@@ -297,7 +277,7 @@ def main():
         fail(f"{len(names)} districts, expected 47")
     demo = load_demo()
     seifa = load_seifa()
-    flows, flow_err = load_flows()
+    flows, contests, flow_err = load_flows()
     venues = {(v["d"].upper(), v["n"]): v for v in load_venues()}
 
     D = []
@@ -446,42 +426,10 @@ def main():
         tcp = [[cid2row[live[0]], last[live[0]]["progressiveTotal"]],
                [cid2row[live[1]], last[live[1]]["progressiveTotal"]]]
 
-        # ---- modelled preference flows (classic districts only) ----------
-        # The estimator's fit vocabulary is grn/onp/oth with independents
-        # folded into "oth" (its SA loader buckets IND -> oth, so the store's
-        # oth cell already carries every independent's ballots; flowErr["ind"]
-        # is oth's p90 for the same reason). Grouping therefore keys on the
-        # STORE bucket, not the display fam: ind rides the oth cell.
-        fl = []
-        if tpp is not None:
-            st = flows.get(name)
-            if st is None:
-                fail(f"{name}: classic district missing from the flows store — rerun estimate-state-flows.py")
-            by_b = {}
-            for r in rows:
-                if r["b"] in ("alp", "lnp"):
-                    continue
-                sb = "oth" if r["b"] == "ind" else r["b"]
-                by_b.setdefault(sb, []).append(r)
-            for b, cands in by_b.items():
-                tot_v = sum(r["v"] for r in cands)
-                if tot_v == 0:
-                    continue
-                cell = st.get(b)
-                if cell is None or sum(cell) == 0:
-                    fail(f"{name}: flows store lacks a {b} cell the district's first preferences need")
-                al, cl = cell
-                acc = [0, 0]
-                for i, r in enumerate(cands):
-                    if i < len(cands) - 1:
-                        ta = round(al * r["v"] / tot_v)
-                        tc = round(cl * r["v"] / tot_v)
-                        acc[0] += ta
-                        acc[1] += tc
-                    else:
-                        ta, tc = al - acc[0], cl - acc[1]
-                    fl.append([cid2row[r["cid"]], ta, tc])
-            fl.sort()
+        # ---- modelled preference flows: Labor v Liberal and Labor v One Nation finals ----
+        # (rows in the tcp's order; written Labor-first before 2026-10-26, which
+        # flipped the six classic districts whose count lists the Liberal first)
+        fl = flow_rows(name, rows, pair_buckets, bucket(s_cands[live[0]]["partyId"]), cid2row, flows, contests, fail)
 
         # ---- booths: the district's polling places, on the federal lanes ----
         for bk, pp in enumerate(c["pollingPlaces"]):

@@ -301,15 +301,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // distributionVotes, the 2CP lane reconciles exactly, and the twoPartyPref
 // notional tally is partial — every tpp lane records only a classic-pair
 // district's distribution finals, booths' tpp null). build_sa22_past.py joins
-// the 2018 static-HTML records in. NO preference-flow store exists for 2022
-// (fl rows empty, no flBasis)
+// the 2018 static-HTML records in. Its preferences lane is modelled
+// (data/sa22-flows.json, pinned with sa26's below)
 {
   const res = JSON.parse(R("map/data/res-sa22.json"));
   assert.equal(res.year, "sa22", "sa22: year id");
   assert.equal(res.date, "2022-03-19", "sa22: polling day");
   assert.equal(res.prev, 2018, "sa22: prev names the 2018 state election");
   assert.equal(res.demoBasis, "sa1", "sa22 records the SA1 census basis");
-  assert.ok(!("flBasis" in res), "sa22 records no flow basis (no 2022 flow store)");
   assert.equal(res.jurisdiction, "SA", "sa22: jurisdiction");
   assert.deepEqual(Object.keys(res.agg), ["AUS", "SA"], "sa22 carries only the SA frame's areas");
   assert.equal(res.divs.length, 47, "sa22: 47 districts");
@@ -318,7 +317,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   for (const d of res.divs) {
     assert.ok(Array.isArray(d.h) && d.h.length === 1 && d.h[0][0] === 2018 && typeof d.h[0][1] === "number" && typeof d.h[0][3] === "string",
       `sa22 ${d.n}: one 2018 history row ([year, TCP%, party, member])`);
-    assert.ok(Array.isArray(d.fl) && d.fl.length === 0, `sa22 ${d.n}: no flow rows (no 2022 flow store)`);
+    assert.ok(Array.isArray(d.fl), `sa22 ${d.n}: a flow lane`);
     nH += d.h.length;
     for (const c of d.c) {
       assert.ok(Number.isFinite(c[5]), `sa22 ${d.n}: c[5] finite for ${c[0]}`);
@@ -459,6 +458,28 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.deepEqual(lcs.roles, { oppLeader: "Nicola Centofanti", leader: "Kyam Maher", president: "Reggie Martin" }, "seats-sa26-lc: the chair and the leaders");
   assert.ok(!(lcs.roles.president in lcs.at), "seats-sa26-lc: the President in the chair, not at a desk");
   assert.ok(js.includes("sa22: \"Kavel\", sa26: \"Hurtle Vale\""), "the SA frames' Speakers in the chair");
+}
+
+// South Australia's modelled preference flows (sa_flow_lane.py): rows in the tcp's order, read
+// through the Labor side as the app reads them — a Labor-first row in a Liberal-first count reads
+// Greens preferences as running to the Liberals (six SA26 districts did, before 2026-10-26)
+for (const y of ["sa22", "sa26"]) {
+  const r = JSON.parse(R(`map/data/res-${y}.json`));
+  assert.equal(r.flBasis, "modelled", `${y}: the preferences lane is modelled`);
+  let nCl = 0, nOn = 0;
+  for (const d of r.divs) {
+    const fam = (k) => d.c[d.tcp[k][0]][3], pair = new Set([fam(0), fam(1)]);
+    const vs = pair.has("alp") && pair.has("lnp") ? "lnp" : pair.has("alp") && pair.has("onp") ? "onp" : null;
+    if (!vs) { assert.equal(d.fl.length, 0, `${y} ${d.n}: no split filed where the final wasn't Labor against the Liberals or One Nation`); continue; }
+    assert.ok(d.fl.length, `${y} ${d.n}: a Labor v ${vs} final carries its split`);
+    vs === "lnp" ? nCl++ : nOn++;
+    const side = fam(0) === "alp" ? 1 : 2;
+    let a = 0, t = 0;
+    for (const row of d.fl) if (d.c[row[0]][3] === "grn") { a += row[side]; t += row[1] + row[2]; }
+    if (t) assert.ok(a / t > 0.6, `${y} ${d.n}: Greens preferences read as running to Labor (${(100 * a / t).toFixed(0)}%)`);
+  }
+  if (y === "sa26") { assert.equal(nCl, 13, "sa26: 13 Labor v Liberal finals split"); assert.equal(nOn, 25, "sa26: 25 Labor v One Nation finals split"); assert.ok(r.flowErr.vsOnp && r.flowErr.vsOnp.lnp, "sa26: the Labor v One Nation error cells"); }
+  else assert.ok(nCl >= 40, `${y}: its classic finals split (${nCl})`);
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

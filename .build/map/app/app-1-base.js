@@ -112,6 +112,8 @@ function buildRamps() {
     // Labor at the low end of the index and the Coalition at the high end: the
     // site's own reading order ("◀ Labor ahead … Coalition ahead ▶")
     div: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
+    // Labor against One Nation, for preferences split between the two
+    divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
@@ -421,7 +423,7 @@ function walkHold(spot) {
 
 /* =============================== state =============================== */
 const S = {
-  year: "now", lens: "winner", party: "onp", from: "onp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
+  year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -454,6 +456,22 @@ function cleanBooth(name, div, ty) {
 }
 function firstYearOf(h, name, upto) { let y = upto; for (let k = h.length - 1; k >= 0; k--) { if (h[k][0] > upto) continue; if (h[k][3] === name) y = h[k][0]; else break; } return y; }
 
+// the preferences lens reads a seat whose final was Labor against the rival it is set to (S.vs)
+const flowSeat = (d) => d.vs != null && d.vs === S.vs;
+// that rival in a sentence: "the Coalition" ("the Liberals" in South Australia), or "One Nation"
+const vsW = (cap) => (S.vs === "onp" ? "One Nation" : SA_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+// a year's seats that finished Labor against One Nation with a split on file: the lens offers that rival
+const hasVsOnp = (m) => m.divs.some((d) => d.vs === "onp" && d.flows.length);
+/* a modelled split's error, the way it was measured: per seat against counted federal divisions
+   (Labor v the Liberals), or only in total for Labor v One Nation, against the contests where that
+   split was counted (flowErr.vsOnp) */
+const flowErrOf = (m, F) => {
+  const e = m.res.flowErr; if (!e) return null;
+  const v = S.vs === "onp" ? e.vsOnp && e.vsOnp[F] : e[F];
+  return v == null ? null : { v, seat: S.vs !== "onp" };
+};
+const flowErrWords = (x) => (x.seat ? `nine in ten of the model’s per-seat estimates land within ${f0(x.v)} points of a counted split`
+  : `the model’s Labor v One Nation splits are checked only in total, against the contests where they were counted, to within about ${f0(x.v)} points; no count tests them seat by seat`);
 function deriveDiv(d, i, year) {
   const c = d.c.map(([n, ab, pn, b, v, sw, el], k) => ({ k, n, ab, pn, b, v, sw, el: !!el, fam: FAM(ab) }));
   const formal = sum(c.map((x) => x.v));
@@ -463,12 +481,15 @@ function deriveDiv(d, i, year) {
   const win = va >= vb ? A : B, run = va >= vb ? B : A;
   const winPct = (100 * Math.max(va, vb)) / tt;
   const classic = [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("lnp");
-  const alpSide = classic ? (A.fam === "alp" ? 0 : 1) : -1;
+  // whom Labor's final rival was, where the preferences lens can read a split: the Coalition (a classic
+  // seat), or One Nation
+  const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
+  const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
   const flows = d.fl.map(([ci, ta, tb]) => ({ cand: c[ci], ta, tb }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
-    if (!classic) continue;
+    if (!vs) continue;
     let toA = 0, tot = 0;
     for (const f of flows) if (f.cand.b === b) { toA += alpSide === 0 ? f.ta : f.tb; tot += f.ta + f.tb; }
     if (tot > 0) flowAlp[b] = (100 * toA) / tot;
@@ -486,7 +507,7 @@ function deriveDiv(d, i, year) {
   const inf = d.inf;
   return {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
-    A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, alpSide, flows, flowAlp,
+    A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
     tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };
@@ -515,7 +536,7 @@ function deriveBooths(B, m) {
     const t = B.tpp[j]; if (t && t[0] + t[1]) { o.tpp[j] = (100 * t[0]) / (t[0] + t[1]); if (t[2] != null) o.tppSw[j] = t[2]; }
     const tc = B.tcp[j]; if (tc && tc[0] + tc[1]) { const a = tc[0] >= tc[1]; o.lead[j] = a ? D.A : D.B; o.leadPct[j] = (100 * Math.max(tc[0], tc[1])) / (tc[0] + tc[1]); }
     const fl = B.fl[j];
-    if (fl && D.classic) for (const b of FAMS) { let toA = 0, tot = 0; for (const [ci, ta, tb] of fl) if (D.c[ci].b === b) { toA += D.alpSide === 0 ? ta : tb; tot += ta + tb; } if (tot >= 12) o.flowAlp[b][j] = (100 * toA) / tot; }
+    if (fl && D.vs) for (const b of FAMS) { let toA = 0, tot = 0; for (const [ci, ta, tb] of fl) if (D.c[ci].b === b) { toA += D.alpSide === 0 ? ta : tb; tot += ta + tb; } if (tot >= 12) o.flowAlp[b][j] = (100 * toA) / tot; }
   }
   return o;
 }

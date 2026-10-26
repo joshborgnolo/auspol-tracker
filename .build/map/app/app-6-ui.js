@@ -58,7 +58,7 @@ function renderLenses() {
 /* =============================== the legend =============================== */
 let legendKey = "";
 const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -227,11 +227,14 @@ function legendHTML(m) {
       break;
     }
     case "flow": {
-      h += `<div class="lg-t">Where ${opt("from", S.from, [["grn", "the Greens’"], ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]])} preferences went</div>`;
+      // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
+      // the groups whose preferences can be read are the other parties'
+      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", SA_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", SA_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
       h += legendHist(m, 10, 90);
-      h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="t-lnp">Mostly to ${coalW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${coalW()}</div>`;
-      if (m.res.flBasis === "modelled" && m.res.flowErr && m.res.flowErr[S.from] != null)
-        h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. Nine in ten of the model’s per-seat estimates land within ${f0(m.res.flowErr[S.from])} points of a counted split.</div>`;
+      h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
+      const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
+      if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
       break;
     }
     case "informal":
@@ -752,7 +755,7 @@ function writeURL() {
   if (S.lens === "tpp" && S.tppMode === "swing") p.set("m", "swing");
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
-  if (S.lens === "flow") p.set("p", S.from);
+  if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); }
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -779,6 +782,7 @@ function readURL() {
   const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
+  S.vs = p.get("f") === "onp" ? "onp" : "lnp";
   const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i))) S.index = i;
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
@@ -886,6 +890,8 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.opt) {
     const k = t.dataset.opt;
+    // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
+    if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
     if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value;
     lensParamChanged(); return;
   }
