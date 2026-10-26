@@ -215,8 +215,11 @@ function normaliseLead(lead) {
 const BOUND = "(?:to|at|on|is|was|were|are|with)";
 const toValIn = (scope, name) => {
   const m = scope.match(new RegExp("\\b" + name + "\\b\\s+(?:on\\s+)?([\\d.]+)\\s*%", "i"))
-       ?? scope.match(new RegExp("\\b" + name + "\\b[^%]{0,60}?\\b" + BOUND + "\\s+([\\d.]+)\\s*%", "i"))
-       ?? scope.match(new RegExp("([\\d.]+)\\s*%\\s*" + name, "i")); // "(20% Liberal, 2.5% Nationals)"
+       // "(20% Liberal, 2.5% Nationals)" — adjacent stays above the loose span:
+       // "2.5% Nationals), ahead of One Nation on 22.5%" (10376) must not let
+       // the span hop the parenthetical into the next party's figure.
+       ?? scope.match(new RegExp("([\\d.]+)\\s*%\\s*" + name, "i"))
+       ?? scope.match(new RegExp("\\b" + name + "\\b[^%]{0,60}?\\b" + BOUND + "\\s+([\\d.]+)\\s*%", "i"));
   return m ? parseFloat(m[1]) : null;
 };
 const IND_NAME = "(?:Independents?\\s*\\/\\s*Others?(?:\\s+Parties)?|Others?(?:\\s+Parties)?\\s*\\/\\s*Independents?)";

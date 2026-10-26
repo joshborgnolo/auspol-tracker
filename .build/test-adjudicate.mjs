@@ -398,6 +398,32 @@ const REISSUE = {
   assert.equal(r.status.changed, true);
   assert.deepEqual(r.status.added.map((a) => a.date).sort(), ["2026-09-20", "2026-09-27"], "plain run files both");
 }
+
+// 10376's lead (2026-10-26): the Coalition split parenthetical "(21% Liberal,
+// 2.5% Nationals)" sits one clause before "ahead of One Nation on 22.5%" —
+// the toValIn ladder must land nat from the adjacent value-before-name form,
+// not let the loose span hop the parenthetical into One Nation's figure
+// (guard lib+nat≈lnp refused the wave's first filing for exactly that).
+const WAVE_CONTEST = {
+  slug: "10376-federal-voting-intention-october-26-2026", release: "26/10/2026", postDate: "2026-10-26T10:00:00",
+  content:
+    `Over the past fortnight the ALP has maintained a narrow election winning lead with 26% (unchanged from two weeks ago) of the primary vote. ` +
+    `Importantly, L-NP Coalition primary is 23.5% (up 2%): (21% Liberal, 2.5% Nationals), ahead of One Nation on 22.5% (down 1.5%) for the first time since mid-July. ` +
+    `Support for the Greens 15.5% (up 0.5%) and Independent/Others 12.5% (down 1%) is little changed. ` +
+    `The results are based on a representative Australia-wide cross-section of 2,711 electors. ` +
+    `This Roy Morgan Poll on Federal voting intention was conducted from October 12 - 25, 2026 for this wave. ` +
+    `If a Federal Election were held now on the basis of how electors said they'd 'vote' their preferences the ALP would win - ALP 52.5% cf. L-NP 47.5%.`,
+};
+{ // the contest-tail wave files, with the split from its own parenthetical
+  const T = rmTree({ rows: [], waves: [WAVE_CONTEST] });
+  const r = T.run([]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.deepEqual(r.status.added.map((a) => a.date), ["2026-10-25"], "the guard passes on the fixed ladder");
+  const p = T.data().polls.find((p) => p.date === "2026-10-25");
+  assert.equal(p.lnpSplit.Lib, 21);
+  assert.equal(p.lnpSplit.Nat, 2.5, "nat from the adjacent split, not the One Nation tail");
+  assert.deepEqual(validate(T.data()).errors, []);
+}
 console.log("roymorgan extractor: ok");
 
 console.log("test-adjudicate: ok");
