@@ -101,4 +101,15 @@ assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the 
 assert.ok(/<loc>https:\/\/auspoltracker\.com\/map\/<\/loc>/.test(R("sitemap.xml")), "the sitemap lists /map/");
 assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|atlas|vic)\//.test(page), "the map links none of the unlisted pages");
 
+// a state election's agg holds only its own state (sa26: SA and AUS), so
+// buildSearch skips the STATES with no area - a bare m.areas[st].idx threw
+// loadYear for sa26 ("That election didn't load. Try again.", 2026-10-26)
+{
+  const src = part("app-1-base.js");
+  const fn = src.match(/function buildSearch\(m\) \{[\s\S]*?\n\}/)[0];
+  assert.ok(!/m\.areas\[st\]\.idx/.test(fn), "buildSearch never dereferences a state that has no area");
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
+  assert.deepEqual(Object.keys(sa.agg), ["AUS", "SA"], "sa26 carries only the SA frame's areas");
+}
+
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

@@ -659,7 +659,8 @@ function writeURL() {
 }
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
-  const y = p.get("y"); if (y && YEARS.includes(+y)) S.year = +y;
+  // a word year restores as itself (sa26): +y is NaN for it
+  const yr = p.get("y"); if (yr && YEARS.includes(yr)) S.year = yr; else if (yr && YEARS.includes(+yr)) S.year = +yr;
   const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }

@@ -507,7 +507,8 @@ function buildIslands(data, m) {
 const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ");
 function buildSearch(m) {
   const items = [];
-  for (const st of STATES) items.push({ k: "state", st, t: STATE_TITLE[st], s: `${m.areas[st].idx.length} seats`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 });
+  // a state election's frame holds no other states' areas (sa26: SA and AUS only)
+  for (const st of STATES) { const a = m.areas[st]; if (!a) continue; items.push({ k: "state", st, t: STATE_TITLE[st], s: `${a.idx.length} seats`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 }); }
   for (const d of m.divs) {
     items.push({ k: "div", i: d.i, t: d.n, s: `${STATE_SHORT[d.st]} · ${d.hold.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.n), rank: 1 });
     items.push({ k: "mp", i: d.i, t: d.hold.n, s: `${isNow() || m.year === "now" ? "Member" : "Elected"} for ${d.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.hold.n), rank: 2 });
@@ -4451,7 +4452,8 @@ function writeURL() {
 }
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
-  const y = p.get("y"); if (y && YEARS.includes(+y)) S.year = +y;
+  // a word year restores as itself (sa26): +y is NaN for it
+  const yr = p.get("y"); if (yr && YEARS.includes(yr)) S.year = yr; else if (yr && YEARS.includes(+yr)) S.year = +yr;
   const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
