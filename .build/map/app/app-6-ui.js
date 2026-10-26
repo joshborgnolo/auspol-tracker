@@ -606,6 +606,7 @@ async function setYear(y) {
   try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null]); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
   showLoading(false);
   const b = Y[y];
+  proj = b.proj; // the year now shown (a year loaded ahead keeps the live projection)
   // carry the selection across by seat name and polling-place ID
   const s = S.sel;
   if ((s.level === "div" || s.level === "booth") && a) {

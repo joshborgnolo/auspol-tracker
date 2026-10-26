@@ -679,6 +679,10 @@ async function loadYear(year) {
     const ry = year === "now" ? 2025 : year;
     const [res, lo, now, seating, islands] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null, loadIslands()]);
+    // built under its own projection, then the live one put back: a year loaded
+    // ahead (the timeline's hover) must not move the streets and the sea under
+    // the year in view (setYear takes the new year's when it shows it)
+    const keep = proj;
     proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.demoBasis = res.demoBasis || null;
@@ -697,6 +701,7 @@ async function loadYear(year) {
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     m.search = buildSearch(m);
+    proj = keep || m.proj;
     // the hi detail can land after the reader has moved to another year — build
     // and bake its paths under this year's projection, then put the live one back
     getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); }).catch(() => {});
