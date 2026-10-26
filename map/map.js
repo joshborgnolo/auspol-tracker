@@ -444,7 +444,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa26.json":"faf757eb","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa26.json":"f4572331","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-sa26.json":"5bf5e41b","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa22.json":"43b562fb","data-sa26.json":"faf757eb","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa22.json":"d35bbf78","res-sa26.json":"f4572331","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-sa22.json":"f044aa86","senate-sa26.json":"5bf5e41b","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
 const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
@@ -564,13 +564,18 @@ function buildGeo(topo, m) {
     const p = new Path2D(); d3.geoPath(proj, p)(f); paths[i] = p;
     bb[i] = gen.bounds(f);
   }
-  const mk = (g) => { const p = new Path2D(); d3.geoPath(proj, p)(g); return p; };
-  const o = topo.objects.divs;
+  const P = proj, mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  const o = topo.objects.divs, at = (g) => m.byName.get(g.properties.name);
+  // each seat's coast and its borders with other seats, apart, made when the
+  // streets first need them (the streets' own sea draws the coast there)
+  const coastP = [], edgeP = [];
   return {
     paths, bb,
     meshDiv: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
+    coastOf: (i) => coastP[i] || (coastP[i] = mk(topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
   };
 }
 
@@ -854,51 +859,139 @@ function quietness(i, now) {
 }
 // streetA: how strongly the streets show between the fills and the borders
 // (only for the year in view; the frame passes it once per paint)
+// SEA_GROW: how far (m) past their AEC coast the seats are drawn when Esri's
+// sea cuts the coast (laySea), widest first: each seat's coast is stroked in
+// its colour at every width in turn, the narrower over the wider, so land
+// beyond every AEC coast goes to about the nearest seat's (within a factor
+// of two) - not to whichever seat was stroked last where two meet at the
+// shore. The two coasts part by 10-40m typically at street zoom, but by
+// hundreds where the AEC drops an islet's shore or Esri's coarser zooms
+// round an island out (Bass Strait's islands as the streets come in)
+// Widths past ~60px on screen are left out (the coasts never part by that
+// much once Esri's are fine-grained, and stroking whole coastlines that wide
+// costs frames); the last two always run.
+const SEA_GROW = [2400, 1200, 600, 300, 150];
+const growsAt = (unit) => SEA_GROW.filter((w, j) => j >= SEA_GROW.length - 2 || w * unit * T.k <= 60);
+// the paint's sea cut, for drawFocus: the year it was cut for and metres in map units
+let seaNow = null;
+const growBox = (b, x0, y0, x1, y1, w) => b && !(b[1][0] < x0 - w || b[0][0] > x1 + w || b[1][1] < y0 - w || b[0][1] > y1 + w);
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
+  const st = streetA > 0 ? prepStreets(streetA) : null;
+  let unit = 0;
+  if (st && st.cover) {
+    const c = proj.invert([(Wpx / 2 - T.x) / T.k, (Hpx / 2 - T.y) / T.k]), p0 = proj(c), p1 = proj([c[0], c[1] + 0.01]);
+    unit = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 1113.2;
+  }
+  const grows = unit ? growsAt(unit) : [], grow = unit * (grows[0] || 0);
+  if (streetA !== undefined) seaNow = unit ? { m, unit } : null;
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
   const [x0, y0, x1, y1] = viewBox();
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
   const filt = filtersOn();
+  const fills = [];
   for (let i = 0; i < m.divs.length; i++) {
-    const b = g.bb[i];
-    if (!b || b[1][0] < x0 || b[0][0] > x1 || b[1][1] < y0 || b[0][1] > y1) continue;
+    if (!growBox(g.bb[i], x0, y0, x1, y1, grow)) continue;
     let c = fillDiv(m, i);
     const qn = m === M() ? quietness(i, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
     if (qn > 0 && qn < 0.72 && i === selDiv()) needFrame = true;
-    ctx.fillStyle = c ? css(c) : pat;
-    ctx.fill(g.paths[i]);
-    if (filt && !passes(m, i)) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
+    fills.push([i, c ? css(c) : pat, filt && !passes(m, i)]);
   }
   // the islands where they lie, past the mainland frame: their seat's colour, quieted
   // as it is; plain land in a year no seat holds one
-  const isls = (m.isl || []).filter((q) => !(q.mbb[1][0] < x0 || q.mbb[0][0] > x1 || q.mbb[1][1] < y0 || q.mbb[0][1] > y1));
-  for (const q of isls) {
+  const isls = (m.isl || []).filter((q) => growBox(q.mbb, x0, y0, x1, y1, grow));
+  const islFills = isls.map((q) => {
     let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
     const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
-    ctx.fillStyle = c ? css(c) : pat; ctx.fill(q.mpath);
-    if (filt && q.owner != null && !passes(m, q.owner)) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(q.mpath); }
+    return [q, c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];
+  });
+  // under the fills, each seat's coast stroked in its own colour: the seats
+  // grown seaward, so the land between the AEC's coast and Esri's is theirs
+  for (const w of grows) {
+    ctx.lineWidth = 2 * w * unit;
+    for (const [i, f, out] of fills) { const p = g.coastOf(i); ctx.strokeStyle = f; ctx.stroke(p); if (out) { ctx.strokeStyle = css(th.bg, 0.8); ctx.stroke(p); } }
+    for (const [q, f, out] of islFills) { ctx.strokeStyle = f; ctx.stroke(q.mpath); if (out) { ctx.strokeStyle = css(th.bg, 0.8); ctx.stroke(q.mpath); } }
   }
-  if (streetA > 0) drawStreets(streetA);
-  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  for (const [i, f, out] of fills) {
+    ctx.fillStyle = f; ctx.fill(g.paths[i]);
+    if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
+  }
+  for (const [q, f, out] of islFills) {
+    ctx.fillStyle = f; ctx.fill(q.mpath);
+    if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(q.mpath); }
+  }
+  if (st) layStreets(st);
   ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k; ctx.stroke(g.meshDiv);
   ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.meshState);
   ctx.strokeStyle = css(th.state, 0.7); ctx.lineWidth = 0.9 / T.k; ctx.stroke(g.meshState);
-  ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
-  for (const q of isls) ctx.stroke(q.mpath);
+  // the AEC's coast, where Esri's isn't the one drawn
+  if (!grow) {
+    ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
+    for (const q of isls) ctx.stroke(q.mpath);
+  }
   ctx.restore();
+  if (grow) laySea(st, alpha);
 }
 
+// the veil, drawn whole on a layer and laid at its strength, its edge the
+// grown seats' (the same widths in the same order as drawGeo's, so each
+// stretch of land beyond the AEC's coasts is veiled as its colour's seat is):
+// with a seat open (sd) everything but that seat, the sea veiled with the
+// rest; with a state open its seats clear and the sea left clear too
+let veilLay = null;
+function veilSea(unit, sd, a) {
+  const m = M(), g = geoOf(m), th = TH, W = canvas.width, H = canvas.height;
+  if (!veilLay) veilLay = document.createElement("canvas");
+  if (veilLay.width !== W || veilLay.height !== H) { veilLay.width = W; veilLay.height = H; }
+  const L = veilLay.getContext("2d");
+  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
+  L.clearRect(0, 0, W, H);
+  L.fillStyle = L.strokeStyle = css(th.bg); L.lineJoin = L.lineCap = "round";
+  if (sd != null) L.fillRect(0, 0, W, H);
+  const clear = sd != null ? (i) => i === sd : (i) => m.divs[i].st === S.sel.st;
+  const [x0, y0, x1, y1] = viewBox(), grows = growsAt(unit), grow = unit * grows[0];
+  const vis = m.divs.filter((d) => growBox(g.bb[d.i], x0, y0, x1, y1, grow)).map((d) => d.i);
+  const isls = (m.isl || []).filter((q) => growBox(q.mbb, x0, y0, x1, y1, grow));
+  const islClear = (q) => q.owner != null && clear(q.owner);
+  // a state's veil with none of the other states' seats in view is nothing
+  if (sd == null && vis.every(clear) && isls.every(islClear)) return;
+  const op = (yes) => { L.globalCompositeOperation = yes ? "destination-out" : "source-over"; };
+  L.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  for (const w of grows) {
+    L.lineWidth = 2 * w * unit;
+    for (const i of vis) { op(clear(i)); L.stroke(g.coastOf(i)); }
+    for (const q of isls) { op(islClear(q)); L.stroke(q.mpath); }
+  }
+  for (const i of vis) { op(clear(i)); L.fill(g.paths[i]); }
+  for (const q of isls) { op(islClear(q)); L.fill(q.mpath); }
+  L.setTransform(1, 0, 0, 1, 0, 0);
+  if (sd != null) {
+    L.globalCompositeOperation = "source-over"; L.drawImage(seaCv, 0, 0);
+    // the sea mask is drawn black; the veil is the page's colour
+    L.globalCompositeOperation = "source-in"; L.fillRect(0, 0, W, H);
+  } else { L.globalCompositeOperation = "destination-out"; L.drawImage(seaCv, 0, 0); }
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = a;
+  ctx.drawImage(veilLay, 0, 0);
+  ctx.restore();
+}
 function drawFocus(m) {
   const g = geoOf(m), th = TH, sd = selDiv();
   ctx.save();
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   const [x0, y0, x1, y1] = viewBox();
-  if (sd != null) {
+  // where Esri's sea cuts the coast (drawGeo) the veil follows the grown seats
+  // and lies on the sea alike, so its edge is never the AEC's coast
+  const sea = seaNow && seaNow.m === m ? seaNow : null;
+  if (sea && (sd != null || S.sel.level === "state")) {
+    veilSea(sea.unit, sd, sd != null ? th.veil : th.veil * 0.85);
+  } else if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(g.paths[sd]);
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
@@ -907,8 +1000,11 @@ function drawFocus(m) {
     for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(g.paths[d.i]);
     for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
   }
-  // a seat's outline takes in its islands
-  const outline = (i) => { ctx.stroke(g.paths[i]); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath); };
+  // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
+  const outline = (i) => {
+    if (sea) { ctx.stroke(g.edgeOf(i)); return; }
+    ctx.stroke(g.paths[i]); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
+  };
   const h = S.hover;
   if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
   if (sd != null) { ctx.strokeStyle = css(th.ink); ctx.lineWidth = 2.2 / T.k; outline(sd); }
@@ -1084,7 +1180,7 @@ function tileAt(dark, z, x, y, want) {
     tiles.set(key, t); streetLive++;
     fetch(`${SVC_T}/${z}/${y}/${x}.pbf`)
       .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then((b) => { const pr = mvtParse(new Uint8Array(b)); t.cv = renderTile(pr, dark, z, tilePx()); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); })
+      .then((b) => { const pr = mvtParse(new Uint8Array(b)); t.cv = renderTile(pr, dark, z, tilePx()); t.sea = seaPath(pr.sea); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); })
       .catch(() => { t.failed = true; })
       .finally(() => { streetLive--; schedule(); });
     if (tiles.size > streetCap()) pruneTiles();
@@ -1109,7 +1205,7 @@ const SPOT_OF = (n) => (n === "Park or farming/label" ? "park" : n === "Water po
 function mvtParse(buf) {
   const vint = (b, st) => { let x = 0, s = 0; for (;;) { const v = b[st.i++]; x += (v & 127) * 2 ** s; s += 7; if (!(v & 128)) return x; } };
   const packed = (b) => { const st = { i: 0 }, out = []; while (st.i < b.length) out.push(vint(b, st)); return out; };
-  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] }, names: [], spots: [] };
+  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] }, sea: [], names: [], spots: [] };
   for (let i = 0; i <= 10; i++) { out.roads.push([]); out.tuns.push([]); }
   const FILL_OF = { "Urban area": "urban", "Park or farming": "park", "Golf course": "park", Airport: "park", Zoo: "park", "Marine area": "water", "Water area": "water" };
   const root = { i: 0 };
@@ -1151,7 +1247,7 @@ function mvtParse(buf) {
       for (let i = 0; i + 1 < f.tags.length; i += 2) tags[L.keys[f.tags[i]]] = vals[f.tags[i + 1]];
       const parts = decodeParts(f.geom);
       if (!parts.length) continue;
-      if (kind) { out.fills[kind].push({ ext: L.extent, parts }); continue; }
+      if (kind) { out.fills[kind].push({ ext: L.extent, parts }); if (L.name === "Marine area") out.sea.push({ ext: L.extent, parts }); continue; }
       // names: a road's along its label line (route shields carry only _name - left out),
       // a park's or a water's at its label point
       if (L.name === "Road/label") {
@@ -1172,6 +1268,16 @@ function mvtParse(buf) {
       (L.name === "Road" ? out.roads : out.tuns)[cls].push({ ext: L.extent, parts });
     }
   }
+}
+// the tile's sea (Esri's "Marine area": every ocean, bay and harbour, and
+// nothing inland) as one path in the tile's unit square
+function seaPath(bkts) {
+  const p = new Path2D();
+  for (const bkt of bkts) {
+    const k = 1 / bkt.ext;
+    for (const r of bkt.parts) { p.moveTo(r[0] * k, r[1] * k); for (let i = 2; i < r.length; i += 2) p.lineTo(r[i] * k, r[i + 1] * k); p.closePath(); }
+  }
+  return p;
 }
 // command streams to flat [x0,y0,x1,y1,...] parts; rings remembered as closed
 const zig = (v) => (v >> 1) ^ -(v & 1);
@@ -1265,19 +1371,45 @@ function tileQuad(z, x, y) {
 // an image (or the part of it at sx, sy, sw square) laid on a quad by the
 // affine that best fits its four corners, half a pixel over its edges so no
 // seam opens between neighbours
-function drawQuad(g, img, sx, sy, sw, q, alpha) {
+function quadFit(q) {
   const [a, b, c, d] = q;
   const B = [(b[0] - a[0] + d[0] - c[0]) / 2, (b[1] - a[1] + d[1] - c[1]) / 2];
   const C = [(c[0] - a[0] + d[0] - b[0]) / 2, (c[1] - a[1] + d[1] - b[1]) / 2];
   const o = [(a[0] + b[0] + c[0] + d[0]) / 4 - (B[0] + C[0]) / 2, (a[1] + b[1] + c[1] + d[1]) / 4 - (B[1] + C[1]) / 2];
-  const e = 0.5 / Math.max(1, Math.min(Math.hypot(B[0], B[1]), Math.hypot(C[0], C[1])));
+  return { m: [B[0], B[1], C[0], C[1], o[0], o[1]], e: 0.5 / Math.max(1, Math.min(Math.hypot(B[0], B[1]), Math.hypot(C[0], C[1]))) };
+}
+function drawQuad(g, img, sx, sy, sw, q, alpha) {
+  const { m, e } = quadFit(q);
   g.globalAlpha = alpha;
-  g.setTransform(B[0], B[1], C[0], C[1], o[0], o[1]);
+  g.setTransform(...m);
   g.drawImage(img, sx, sy, sw, sw, -e, -e, 1 + 2 * e, 1 + 2 * e);
 }
-function drawStreets(alpha) {
+// a tile's sea laid on its quad (or a coarser tile's, its part at ox, oy of
+// s squares a side), clipped to the quad so it never covers a neighbour's
+// (or, given a line width in device px, its edge: the clip keeps the tile's
+// buffer ring, past its square, out of the stroke, so only the coast draws)
+function seaQuad(g, sea, q, s = 1, ox = 0, oy = 0, line = 0) {
+  const { m, e } = quadFit(q);
+  g.setTransform(...m);
+  g.save();
+  g.beginPath(); g.rect(-e, -e, 1 + 2 * e, 1 + 2 * e); g.clip();
+  if (s !== 1) g.transform(s, 0, 0, s, -ox, -oy);
+  if (line) { g.lineWidth = line / (s * Math.min(Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]))); g.stroke(sea); } else g.fill(sea);
+  g.restore();
+}
+/* The streets come in two steps around the seat fills. prepStreets lays the
+   tiles under the view on a sheet the size of the canvas, and their sea on a
+   mask beside it; layStreets multiplies (screens) the sheet over the fills.
+   The mask lets Esri's coast stand as the map's only one from street zoom:
+   the AEC's coastline is coarse (Craggy Island is 23 points in its own
+   file) and sits typically 10-40m, at worst ~120m, off Esri's, so two
+   coasts showed. Where every tile in view has a sea to hand (cover), the
+   seats are drawn grown past their AEC coasts (SEA_GROW, drawGeo) and laySea
+   then puts the plain sea back over everything seaward of Esri's coast. */
+let seaCv = null, seaLay = null;
+function prepStreets(alpha) {
   streetDrawn.length = 0;
-  if (!proj || alpha <= 0.004) return;
+  if (!proj || alpha <= 0.004) return null;
   const dark = TH.dark, W = canvas.width, H = canvas.height, now = performance.now();
   streetUse++;
   const inv = (sx, sy) => merc(proj.invert([(sx - T.x) / T.k, (sy - T.y) / T.k]));
@@ -1294,32 +1426,47 @@ function drawStreets(alpha) {
     x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
   }
   const tx0 = Math.floor(x0 * n), tx1 = Math.floor(x1 * n), ty0 = Math.floor(y0 * n), ty1 = Math.floor(y1 * n);
-  if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 400) return; // never at these zooms; a guard
-  if (!streetCv) streetCv = document.createElement("canvas");
-  if (streetCv.width !== W || streetCv.height !== H) { streetCv.width = W; streetCv.height = H; }
+  if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 400) return null; // never at these zooms; a guard
+  if (!streetCv) { streetCv = document.createElement("canvas"); seaCv = document.createElement("canvas"); }
+  if (streetCv.width !== W || streetCv.height !== H) { streetCv.width = seaCv.width = W; streetCv.height = seaCv.height = H; }
   const g = streetCv.getContext("2d"), land = dark ? STREET_LAND.dark : STREET_LAND.light;
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = "source-over"; g.globalAlpha = 1;
   g.fillStyle = `rgb(${land},${land},${land})`; g.fillRect(0, 0, W, H);
+  const sg = seaCv.getContext("2d");
+  sg.setTransform(1, 0, 0, 1, 0, 0); sg.clearRect(0, 0, W, H); sg.fillStyle = "#000";
+  let cover = true;
+  const seas = [];
+  const sea1 = (...a) => { seaQuad(sg, ...a); seas.push(a); };
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
     const q = tileQuad(z, tx, ty);
     if (Math.max(q[0][0], q[1][0], q[2][0], q[3][0]) < 0 || Math.min(q[0][0], q[1][0], q[2][0], q[3][0]) > W
       || Math.max(q[0][1], q[1][1], q[2][1], q[3][1]) < 0 || Math.min(q[0][1], q[1][1], q[2][1], q[3][1]) > H) continue;
     const t = tileAt(dark, z, tx, ty, true);
     const f = t && t.ready ? clamp((now - t.ready) / 200, 0, 1) : 0;
+    let sea = !!(t && t.ready);
+    if (sea) sea1(t.sea, q);
     if (f < 1) {
       // until it arrives (and while it fades in): the nearest coarser tile on hand,
       // else the finer ones of the zoom just left
       let held = false;
       for (let up = 1; up <= 6 && z - up >= STREETS.zMin && !held; up++) {
         const s = 2 ** up, px = tx >> up, py = ty >> up, pt = tileAt(dark, z - up, px, py, false);
-        if (pt && pt.ready) { const w = pt.cv.width / s; drawQuad(g, pt.cv, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true; }
+        if (pt && pt.ready) {
+          const w = pt.cv.width / s; drawQuad(g, pt.cv, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true;
+          if (!sea) { sea1(pt.sea, q, s, tx - px * s, ty - py * s); sea = true; }
+        }
       }
-      if (!held && z < STREETS.zMax) for (let k = 0; k < 4; k++) {
-        const cx = 2 * tx + (k & 1), cy = 2 * ty + (k >> 1), ct = tileAt(dark, z + 1, cx, cy, false);
-        if (ct && ct.ready) drawQuad(g, ct.cv, 0, 0, ct.cv.width, tileQuad(z + 1, cx, cy), 1);
+      if (!held && z < STREETS.zMax) {
+        let kids = 0;
+        for (let k = 0; k < 4; k++) {
+          const cx = 2 * tx + (k & 1), cy = 2 * ty + (k >> 1), ct = tileAt(dark, z + 1, cx, cy, false);
+          if (ct && ct.ready) { const cq = tileQuad(z + 1, cx, cy); drawQuad(g, ct.cv, 0, 0, ct.cv.width, cq, 1); if (!sea) sea1(ct.sea, cq); kids++; }
+        }
+        if (kids === 4) sea = true;
       }
       if (t && t.ready) needFrame = true;
     }
+    if (!sea) cover = false;
     if (f > 0) { drawQuad(g, t.cv, 0, 0, t.cv.width, q, f); streetDrawn.push({ t, z, tx, ty, f }); }
   }
   // the plain land to nothing: lifted to white on paper, differenced to black on the dark page
@@ -1327,14 +1474,37 @@ function drawStreets(alpha) {
   g.globalCompositeOperation = dark ? "difference" : "lighter";
   const lift = dark ? land : 255 - land;
   g.fillStyle = `rgb(${lift},${lift},${lift})`; g.fillRect(0, 0, W, H);
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
   // on paper the streets come in at half strength over a seat's opening view
   // and reach full strength at street zoom, so a city seat still reads as its
   // colour first; on the dark page they are quiet already
-  ctx.globalAlpha = alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k));
-  ctx.globalCompositeOperation = dark ? "screen" : "multiply";
+  return { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", cover, seas };
+}
+function layStreets(st) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = st.a; ctx.globalCompositeOperation = st.op;
   ctx.drawImage(streetCv, 0, 0);
+  ctx.restore();
+}
+// the sea as the streets draw it where no seat lies (the sheet over a clear
+// canvas), cut to the mask and laid in place of whatever the seats put there
+function laySea(st, alpha) {
+  const W = canvas.width, H = canvas.height;
+  if (!seaLay) seaLay = document.createElement("canvas");
+  if (seaLay.width !== W || seaLay.height !== H) { seaLay.width = W; seaLay.height = H; }
+  const L = seaLay.getContext("2d");
+  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
+  L.clearRect(0, 0, W, H);
+  L.globalAlpha = st.a; L.globalCompositeOperation = st.op; L.drawImage(streetCv, 0, 0);
+  L.globalAlpha = 1; L.globalCompositeOperation = "destination-in"; L.drawImage(seaCv, 0, 0);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha;
+  ctx.globalCompositeOperation = "destination-out"; ctx.drawImage(seaCv, 0, 0);
+  ctx.globalCompositeOperation = "source-over"; ctx.drawImage(seaLay, 0, 0);
+  // the coast's hairline, as the AEC's was drawn, along Esri's
+  ctx.strokeStyle = css(TH.coast, 0.55); ctx.lineJoin = "round";
+  for (const [sea, q, s = 1, ox = 0, oy = 0] of st.seas) seaQuad(ctx, sea, q, s, ox, oy, 0.7 * dpr);
   ctx.restore();
 }
 /* the names: streets along their own line, parks and water level, read from
@@ -5187,7 +5357,8 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
-    panBy(dx, dy) { return panPx(dx, dy); } };
+    panBy(dx, dy) { return panPx(dx, dy); },
+    view(ll, k) { const p = proj(ll); d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(Wpx / 2 - p[0] * k, Hpx / 2 - p[1] * k).scale(k)); } };
 })();
 
 })();

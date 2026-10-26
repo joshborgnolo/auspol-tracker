@@ -954,5 +954,6 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
-    panBy(dx, dy) { return panPx(dx, dy); } };
+    panBy(dx, dy) { return panPx(dx, dy); },
+    view(ll, k) { const p = proj(ll); d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(Wpx / 2 - p[0] * k, Hpx / 2 - p[1] * k).scale(k)); } };
 })();

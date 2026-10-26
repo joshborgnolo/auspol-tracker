@@ -562,13 +562,18 @@ function buildGeo(topo, m) {
     const p = new Path2D(); d3.geoPath(proj, p)(f); paths[i] = p;
     bb[i] = gen.bounds(f);
   }
-  const mk = (g) => { const p = new Path2D(); d3.geoPath(proj, p)(g); return p; };
-  const o = topo.objects.divs;
+  const P = proj, mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  const o = topo.objects.divs, at = (g) => m.byName.get(g.properties.name);
+  // each seat's coast and its borders with other seats, apart, made when the
+  // streets first need them (the streets' own sea draws the coast there)
+  const coastP = [], edgeP = [];
   return {
     paths, bb,
     meshDiv: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
+    coastOf: (i) => coastP[i] || (coastP[i] = mk(topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
   };
 }
 
