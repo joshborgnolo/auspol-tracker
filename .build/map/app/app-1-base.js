@@ -467,9 +467,9 @@ function deriveDiv(d, i, year) {
   const yNum = year === "now" || year === "sa26" ? 2026 : year;
   const prev = d.h.filter((h) => h[0] < yNum && !h[4]).pop() || null;
   let change;
-  // sa26 carries no district history either (the ECSA publishes no previous-election
-  // join), so its empty h means "unknown", not "new seat"
-  if (!prev) change = { kind: yNum === 2004 || year === "sa26" ? "unknown" : "new" };
+  // 2004's h is empty by construction (the archive's first federal year); an
+  // empty h anywhere else means "new seat", not "unknown"
+  if (!prev) change = { kind: yNum === 2004 ? "unknown" : "new" };
   else if (prev[3] === win.n) change = { kind: "re", since: firstYearOf(d.h.filter((h) => !h[4]), win.n, yNum) };
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
@@ -527,7 +527,7 @@ function deriveAreas(res, m) {
     const a = res.agg[st];
     if (!a) continue;
     const fp = {}, fpSw = {};
-    // sa26 records no previous election, so no swing exists to subtract
+    // the previous election's statewide tally rides along where one is stored
     const hasPrev = a.pprim != null && a.pformal != null;
     for (const b of FAMS) { fp[b] = (100 * a.prim[b]) / a.formal; fpSw[b] = hasPrev ? fp[b] - (100 * a.pprim[b]) / a.pformal : null; }
     const idx = m.divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i);

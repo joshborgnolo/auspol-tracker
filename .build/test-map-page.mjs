@@ -190,5 +190,59 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   });
   assert.equal(B.tcp.filter(Boolean).length, 732, "732 booths carry the district's live pair (7 zero-vote, 14 Croydon notional)");
 }
+// ── sa26's upper house is South Australia's Legislative Council, and the
+// frame speaks of change on the 2022 state election (.build/map/
+// build_sa26_past.py) — the 2022 figures are STORED on the sa26 frame (prev,
+// agg pprim/pformal, per-district h rows, candidate c[5] and classic-pair
+// tpp[2] swings) and never drawn as a map/chamber of their own
+{
+  const sen = JSON.parse(R("map/data/senate-sa26.json"));
+  assert.equal(sen.year, "sa26", "senate-sa26: year");
+  assert.equal(sen.lc, true, "senate-sa26: lc flag");
+  assert.equal(sen.seatsN, 22, "senate-sa26: 22-member council");
+  assert.equal(sen.later, 2034, "senate-sa26: the 2026 cohort's terms run to 2034");
+  assert.equal(sen.dd, false, "senate-sa26: no double dissolution");
+  assert.equal(sen.senators.length, 22, "senate-sa26: 22 members on file");
+  const tally = {};
+  for (const s of sen.senators) tally[s.ab] = (tally[s.ab] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 10, ONP: 3, LIB: 6, GRN: 2, FGA: 1 }, "senate-sa26: the council's party balance");
+  const c26 = sen.senators.filter((s) => s.elected === 2026), c22 = sen.senators.filter((s) => s.elected === 2022);
+  assert.equal(c26.length, 11, "senate-sa26: 11 elected at sa26");
+  assert.equal(c22.length, 11, "senate-sa26: 11 carried over from 2022");
+  assert.ok(c26.every((s) => s.term === 2034), "senate-sa26: 2026 cohort terms to 2034");
+  assert.ok(c22.every((s) => s.term === 2030), "senate-sa26: 2022 cohort terms to 2030");
+  const game = sen.senators.find((s) => s.n === "Sarah Game");
+  assert.ok(game && game.ab === "FGA" && game.electedAs === "ONP" && game.elected === 2022,
+    "senate-sa26: Sarah Game sits FGA, her seat won for One Nation (electedAs)");
+  assert.equal(sen.formal, 1137942, "senate-sa26: 2026 LC formal vote");
+  assert.equal(sen.pformal, 1088840, "senate-sa26: 2022 LC formal vote");
+  assert.ok(sen.votes && sen.pvotes, "senate-sa26: statewide party votes for both elections");
+
+  const res = JSON.parse(R("map/data/res-sa26.json"));
+  assert.equal(res.prev, 2022, "sa26: prev names the 2022 state election");
+  let nSw = 0, nC5 = 0, nTpp = 0;
+  for (const d of res.divs) {
+    assert.ok(Array.isArray(d.h) && d.h.length === 1 && d.h[0][0] === 2022 && typeof d.h[0][1] === "number" && typeof d.h[0][3] === "string",
+      `sa26 ${d.n}: one 2022 history row ([year, TCP%, party, member])`);
+    for (const c of d.c) {
+      assert.ok(Number.isFinite(c[5]), `sa26 ${d.n}: c[5] finite for ${c[0]}`);
+      nC5++;
+      if (c[5] !== 0) nSw++;
+    }
+    if (d.tpp && Number.isFinite(d.tpp[2])) nTpp++;
+  }
+  assert.equal(res.divs.length, 47, "sa26: 47 districts");
+  assert.equal(nC5, 388, "sa26: every candidate carries a swing figure");
+  assert.equal(nSw, 387, "sa26: candidate swings on 2022 (only a same-share repeat may rest at 0)");
+  assert.equal(nTpp, 13, "sa26: 13 districts carry a classic-pair 2PP swing into 2022");
+  assert.equal(res.agg.SA.pformal, 1091173, "sa26: 2022 House of Assembly formal vote");
+  assert.equal(res.agg.AUS.pformal, 1091173, "sa26: the AUS agg mirrors the state frame's 2022 formal");
+  for (const st of ["SA", "AUS"]) {
+    const p = res.agg[st].pprim;
+    assert.ok(p, `sa26: ${st} agg carries 2022 primaries`);
+    const sum = ["alp", "lnp", "grn", "onp", "ind", "oth"].reduce((a, k) => a + (p[k] || 0), 0);
+    assert.equal(sum, 1091173, `sa26: ${st} 2022 primaries account for every formal vote`);
+  }
+}
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

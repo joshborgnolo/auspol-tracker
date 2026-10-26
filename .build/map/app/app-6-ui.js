@@ -626,7 +626,7 @@ async function setYear(y) {
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
-  if (sen) return sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
+  if (sen) return sen.lc ? `South Australia’s Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : m.year === "sa26" ? `The ${yearLabel("sa26")} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 /* the eyebrow holds the height of its longest line, so a walk never moves the figure under it:
@@ -648,8 +648,8 @@ function holdEyebrow() {
       lines.push(metaLine({ year: y, date: f[0], asOf: f[0], divs: { length: f[1] }, booth: { n: f[2] } }, null));
     }
     if (ch) for (const y of SEN_YEARS) {
-      const f = SENY[y] ? [SENY[y].asOf, SENY[y].divs.length] : SN[y]; if (!f) continue;
-      lines.push(metaLine(M(), { year: y, asOf: f[0], divs: { length: f[1] } }));
+      const s = SENY[y], f = s ? [s.asOf, s.divs.length] : SN[y]; if (!f) continue;
+      lines.push(metaLine(M(), { year: y, lc: s ? s.lc : y === "sa26", asOf: f[0], divs: { length: f[1] } }));
     }
     eb.style.minHeight = "";
     let h = 0;
