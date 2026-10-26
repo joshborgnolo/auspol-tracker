@@ -29,10 +29,6 @@ const LEADS = { leader: "A1", oppLeader: "D1" };
 const ALIAS = { "Laura Henderson": "Laura Curran" };
 // the cards' parties as the results files abbreviate them
 const PARTY = { "Australian Labor Party": "ALP", "Liberal Party": "LIB", "Pauline Hanson's One Nation": "ONP", "One Nation": "ONP", "The Greens": "GRN", "Greens": "GRN", "Greens SA": "GRN", Independent: "IND", "Family First Party": "FFP" };
-// a member whose party the chamber map gives otherwise than the frame's council file, as filed: the
-// file has Sarah Game (elected for One Nation in 2022) sitting for Fair Go for Australians at the
-// 2026 election; the October 2026 map lists her as Family First. The seat stands; the party is the file's
-const PARTY_AS_FILED = { "Sarah Game": ["FFP", "FGA"] };
 
 // the floors, from the app's own geometry
 const src = fs.readFileSync(path.join(HERE, "app", "app-3c-sa.js"), "utf8");
@@ -101,8 +97,8 @@ const write = (f, j) => { fs.writeFileSync(path.join(DATA, f), JSON.stringify(j,
   for (const m of p.members) {
     const n = ALIAS[m.name] || m.name, x = by.get(n);
     if (!x) throw new Error(`Council: ${m.name} is not a member of the ${YEAR} council`);
-    const ab = partyOf(m.party, m.name), filed = PARTY_AS_FILED[n];
-    if (ab !== x.ab && !(filed && filed[0] === ab && filed[1] === x.ab)) throw new Error(`Council: ${m.name} sits ${m.party}, the file has ${x.ab}`);
+    const ab = partyOf(m.party, m.name);
+    if (ab !== x.ab) throw new Error(`Council: ${m.name} sits ${m.party}, the file has ${x.ab}`);
     if (m.desk === PRESIDENT) { roles.president = n; continue; }
     if (!drawn.has(m.desk)) throw new Error(`Council: desk ${m.desk} (${m.name}) is not on the app's floor`);
     for (const [r, d] of Object.entries(LEADS)) if (m.desk === d) roles[r] = n;

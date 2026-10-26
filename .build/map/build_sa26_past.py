@@ -28,7 +28,8 @@ Two products, one cache (the build_sa26_data.py pipeline knows neither):
    and the 2022 cohort (terms to 2030, from the API's LCChange summary, which
    does file names). Sarah Game won her 2022 seat for One Nation, left the
    party, and carried the seat into her own (the 2026 LCStatic files it), so
-   her council row names that party.
+   her council row names that party. She now sits for Family First (the
+   Parliament's chamber map, October 2026), so the row is filed FFP.
 
 usage: python3 -I .build/map/build_sa26_data.py <map_data_dir>   (first: the frame)
        python3 -I .build/map/build_sa26_past.py <map_data_dir> [--fetch]
@@ -191,7 +192,7 @@ ELECTED_2026 = [
     ("Hilton Gumbys", "ALP"), ("Rebecca Hewett", "ONP"), ("Clare Scriven", "ALP"),
 ]
 EXPECTED_2026_LC_SEATS = {"ALP": 5, "ONP": 3, "LIB": 2, "GRN": 1}
-EXPECTED_2022_LC_SEATS = {"ALP": 5, "LIB": 4, "GRN": 1, "FGA": 1}
+EXPECTED_2022_LC_SEATS = {"ALP": 5, "LIB": 4, "GRN": 1, "FFP": 1}
 
 
 def build_lc():
@@ -230,12 +231,13 @@ def build_lc():
     elected22 = []
     for grp in lc22.get("parties") or []:
         ab = ab_of(p22.get(grp["id"], {}))
-        # Sarah Game, elected for One Nation in 2022, leads her own party
-        # into the new term (the 2026 static file's FGA). The votes stay
-        # filed under ONP; only her council row relabels
+        # Sarah Game, elected for One Nation in 2022, sits for Family First
+        # (the Parliament's chamber map and member card; the 2026 ballot's
+        # Fair Go for Australians group stays FGA in the votes). The 2022
+        # votes stay filed under ONP; only her council row relabels
         for cd in grp.get("candidates") or []:
             nm = flat_name(cd["name"])
-            row = {"n": nm, "ab": "FGA" if nm == "Sarah Game" and ab == "ONP" else ab, "order": cd["orderElected"]}
+            row = {"n": nm, "ab": "FFP" if nm == "Sarah Game" and ab == "ONP" else ab, "order": cd["orderElected"]}
             if nm == "Sarah Game" and ab == "ONP":
                 row["electedAs"] = "ONP"
             elected22.append(row)
@@ -282,6 +284,7 @@ def build_lc():
             pn.setdefault(ab_of(p), p.get("partyName") or "")
     pn["ONP"] = "Pauline Hanson's One Nation"
     pn["FGA"] = "Sarah Game Fair Go for Australians"
+    pn["FFP"] = "Family First"
     cohort22 = []
     for m in sorted(elected22, key=lambda x: x["order"]):
         row = {"n": m["n"], "st": "SA", "ab": m["ab"], "pn": pn[m["ab"]], "term": 2030, "elected": 2022}

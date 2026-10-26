@@ -215,15 +215,15 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(sen.senators.length, 22, "senate-sa26: 22 members on file");
   const tally = {};
   for (const s of sen.senators) tally[s.ab] = (tally[s.ab] || 0) + 1;
-  assert.deepEqual(tally, { ALP: 10, ONP: 3, LIB: 6, GRN: 2, FGA: 1 }, "senate-sa26: the council's party balance");
+  assert.deepEqual(tally, { ALP: 10, ONP: 3, LIB: 6, GRN: 2, FFP: 1 }, "senate-sa26: the council's party balance");
   const c26 = sen.senators.filter((s) => s.elected === 2026), c22 = sen.senators.filter((s) => s.elected === 2022);
   assert.equal(c26.length, 11, "senate-sa26: 11 elected at sa26");
   assert.equal(c22.length, 11, "senate-sa26: 11 carried over from 2022");
   assert.ok(c26.every((s) => s.term === 2034), "senate-sa26: 2026 cohort terms to 2034");
   assert.ok(c22.every((s) => s.term === 2030), "senate-sa26: 2022 cohort terms to 2030");
   const game = sen.senators.find((s) => s.n === "Sarah Game");
-  assert.ok(game && game.ab === "FGA" && game.electedAs === "ONP" && game.elected === 2022,
-    "senate-sa26: Sarah Game sits FGA, her seat won for One Nation (electedAs)");
+  assert.ok(game && game.ab === "FFP" && game.electedAs === "ONP" && game.elected === 2022,
+    "senate-sa26: Sarah Game sits Family First, her seat won for One Nation (electedAs)");
   assert.equal(sen.formal, 1137942, "senate-sa26: 2026 LC formal vote");
   assert.equal(sen.pformal, 1088840, "senate-sa26: 2022 LC formal vote");
   assert.ok(sen.votes && sen.pvotes, "senate-sa26: statewide party votes for both elections");
@@ -352,7 +352,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(c22.every((s) => s.elected === 2022), "senate-sa22: the 2022 cohort is elected 2022");
   assert.ok(c18.every((s) => s.elected === 2018), "senate-sa22: the cross-bench cohort is elected 2018");
   const game = sen.senators.find((s) => /Game/i.test(s.n));
-  assert.equal(game.ab, "ONP", "senate-sa22: Sarah Game sits One Nation as elected (the FGA relabel is an sa26-frame view)");
+  assert.equal(game.ab, "ONP", "senate-sa22: Sarah Game sits One Nation as elected (the Family First relabel is an sa26-frame view)");
   assert.equal(sen.formal, 1088840, "senate-sa22: 2022 LC formal vote");
   assert.equal(sen.pformal, 1050874, "senate-sa22: 2018 LC formal vote");
   assert.ok(sen.votes && sen.pvotes, "senate-sa22: statewide party votes for both elections");
