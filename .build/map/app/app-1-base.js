@@ -133,8 +133,9 @@ const holdFam = (h) => (h.ab === "CSA" ? "csa" : h.fam);
 const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", csa: "Community Strong", oth: "Others" };
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
-const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+// the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
+const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
+const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
 const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network" };
@@ -182,10 +183,12 @@ const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
 const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "now"];
-const YEAR_X = { now: 2026.8 };
-const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", now: "alp" };
-const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", now: "Anthony Albanese" };
+const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "sa26", "now"];
+// sa26: the South Australian state election of 21 March 2026 — the timeline's one
+// non-federal year, drawn at its date (day 80 of 2026) rather than a whole year in
+const YEAR_X = { sa26: 2026.216, now: 2026.8 };
+const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", sa26: "alp", now: "alp" };
+const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa26: "Peter Malinauskas", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -336,8 +339,8 @@ const S = {
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
-const yearLabel = (y) => (y === "now" ? "Now" : String(y));
-const xOfYear = (y) => (y === "now" ? YEAR_X.now : y);
+const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA 2026" : String(y));
+const xOfYear = (y) => YEAR_X[y] ?? y;
 
 /* =============================== data =============================== */
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
@@ -373,10 +376,12 @@ function deriveDiv(d, i, year) {
     if (tot > 0) flowAlp[b] = (100 * toA) / tot;
   }
   const tpp = d.tpp && d.tpp[0] + d.tpp[1] ? (100 * d.tpp[0]) / (d.tpp[0] + d.tpp[1]) : null;
-  const yNum = year === "now" ? 2026 : year;
+  const yNum = year === "now" || year === "sa26" ? 2026 : year;
   const prev = d.h.filter((h) => h[0] < yNum && !h[4]).pop() || null;
   let change;
-  if (!prev) change = { kind: yNum === 2004 ? "unknown" : "new" };
+  // sa26 carries no district history either (the ECSA publishes no previous-election
+  // join), so its empty h means "unknown", not "new seat"
+  if (!prev) change = { kind: yNum === 2004 || year === "sa26" ? "unknown" : "new" };
   else if (prev[3] === win.n) change = { kind: "re", since: firstYearOf(d.h.filter((h) => !h[4]), win.n, yNum) };
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
@@ -417,12 +422,26 @@ function deriveBooths(B, m) {
   return o;
 }
 
+// a year with no polling-place rows (sa26: the ECSA releases district totals
+// only) — the same shape deriveBooths returns, empty
+function emptyBooths(m) {
+  const o = { n: 0, d: new Int16Array(0), id: [], ty: new Uint8Array(0), prem: [], sub: [], pc: [], raw: null, isl: new Int8Array(0),
+    name: [], x: new Float32Array(0), y: new Float32Array(0), votes: new Float32Array(0), formal: new Float32Array(0),
+    infPct: new Float32Array(0), tpp: new Float32Array(0), tppSw: new Float32Array(0), lead: [], leadPct: new Float32Array(0),
+    fp: {}, flowAlp: {}, byDiv: m.divs.map(() => []) };
+  for (const b of FAMS) { o.fp[b] = new Float32Array(0); o.flowAlp[b] = new Float32Array(0); }
+  return o;
+}
+
 function deriveAreas(res, m) {
   const out = {};
   for (const st of ["AUS", ...STATES]) {
     const a = res.agg[st];
+    if (!a) continue;
     const fp = {}, fpSw = {};
-    for (const b of FAMS) { fp[b] = (100 * a.prim[b]) / a.formal; fpSw[b] = fp[b] - (100 * a.pprim[b]) / a.pformal; }
+    // sa26 records no previous election, so no swing exists to subtract
+    const hasPrev = a.pprim != null && a.pformal != null;
+    for (const b of FAMS) { fp[b] = (100 * a.prim[b]) / a.formal; fpSw[b] = hasPrev ? fp[b] - (100 * a.pprim[b]) / a.pformal : null; }
     const idx = m.divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i);
     // census shares pooled over the seats' vote-weighted populations, in percent
     let demo = null;
@@ -540,14 +559,16 @@ function applyNow(m, now) {
 // the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs)
 const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010]);
 async function loadYear(year) {
-  if (Y[year]) return Y[year].ready;
+  // switching back to an already-loaded year restores that year's projection:
+  // sa26's frame fits South Australia, the federal years' the continent
+  if (Y[year]) return Y[year].ready.then((mm) => { proj = mm.proj; return mm; });
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
     const [res, lo, now, seating, islands] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null, loadIslands()]);
-    if (!proj) proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
+    proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
     m.res = res;
     m.demoBasis = res.demoBasis || null;
     m.incomeCuts = res.incomeCuts || null;
@@ -561,14 +582,17 @@ async function loadYear(year) {
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);
     m.isl = buildIslands(islands, m);
-    m.booth = deriveBooths(m.res.booths, m);
+    m.booth = res.booths ? deriveBooths(res.booths, m) : emptyBooths(m);
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     m.search = buildSearch(m);
-    getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { m.geoHi = buildGeo(hi, m); schedule(); }).catch(() => {});
+    // the hi detail can land after the reader has moved to another year — build
+    // and bake its paths under this year's projection, then put the live one back
+    getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); }).catch(() => {});
     return m;
   })();
   return m.ready;
 }
 const M = () => (Y[S.year] && Y[S.year].divs ? Y[S.year] : null);
-const prevYearOf = (y) => (y === "now" ? 2025 : y === 2004 ? 2001 : YEARS[YEARS.indexOf(y) - 1] || null);
+// sa26 has no predecessor on the timeline (the previous SA election is not in the set)
+const prevYearOf = (y) => (y === "now" ? 2025 : y === "sa26" ? null : y === 2004 ? 2001 : YEARS[YEARS.indexOf(y) - 1] || null);
