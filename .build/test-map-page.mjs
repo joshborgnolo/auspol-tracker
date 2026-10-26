@@ -71,7 +71,7 @@ assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git 
 // block's two identical arms and the map's IIFE ran twice on the live page
 assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
 assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
 // the eyebrow's floor measures every election's real meta line from the facts stamped in (data-stamp.mjs);
@@ -108,7 +108,9 @@ assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the 
 // the chamber seats each year's members where the Parliament's seating plan puts them (node .build/map/seating.mjs)
 {
   const cells = new Function(`${part("app-3-chamber.js").match(/@cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @cells-end/)[1]}; return chamberCells().map((c) => c.id);`)();
-  const seated = part("app-1-base.js").match(/const SEATED = new Set\(\[([^\]]*)\]\)/)[1].split(",").map((s) => s.trim().replace(/"/g, ""));
+  const seated = part("app-1-base.js").match(/const SEATED = new Set\(\[([^\]]*)\]\)/)[1].split(",").map((s) => s.trim().replace(/"/g, ""))
+    // (South Australia's frames sit on their own floors: pinned below)
+    .filter((y) => !/^sa/.test(y));
   for (const y of seated) {
     const seats = JSON.parse(R(`map/data/seats-${y}.json`)), res = JSON.parse(R(`map/data/res-${y === "now" ? 2025 : y}.json`));
     const ids = Object.values(seats.at), names = new Set(res.divs.map((d) => d.n));
@@ -356,6 +358,40 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(sen.votes && sen.pvotes, "senate-sa22: statewide party votes for both elections");
   assert.equal(Object.values(sen.votes).reduce((a, b) => a + b, 0), sen.formal, "senate-sa22: 2022 party votes sum to formal");
   assert.equal(Object.values(sen.pvotes).reduce((a, b) => a + b, 0), sen.pformal, "senate-sa22: 2018 party votes sum to formal");
+}
+
+// South Australia's chambers: their own floors (app-3c-sa.js, measured off the Parliament's chamber
+// maps), and the sa26 Parliament seated at its desks (.build/map/sa_seating.mjs)
+{
+  const src = R(".build/map/app/app-3c-sa.js");
+  const block = src.match(/@sa-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @sa-cells-end \*\//);
+  assert.ok(block, "app-3c-sa.js carries its @sa-cells block");
+  const { SAF, saCells } = new Function(`${block[1]}; return { SAF, saCells };`)();
+  const ha = saCells(SAF.ha), lc = saCells(SAF.lc);
+  assert.equal(ha.length, 61, "the House of Assembly's floor: 61 desks besides the Speaker's chair");
+  assert.equal(lc.length, 28, "the Legislative Council's floor: 28 desks besides the President's chair");
+  for (const [k, cells] of [["ha", ha], ["lc", lc]]) {
+    assert.equal(new Set(cells.map((c) => c.id)).size, cells.length, `${k}: desk ids unique`);
+    // the government's side is the reader's left, a mirror of the opposition's
+    assert.equal(cells.filter((c) => c.x < 0).length - cells.filter((c) => c.x > 0).length, k === "ha" ? 1 : 0, `${k}: sides as the plan draws them (the Assembly's opposition front bench has no seat at the cross-aisle)`);
+  }
+  const ids = (cells) => new Set(cells.map((c) => c.id));
+  const seats = JSON.parse(R("map/data/seats-sa26.json")), res = JSON.parse(R("map/data/res-sa26.json"));
+  const seated = Object.keys(seats.at);
+  assert.equal(seated.length, 46, "seats-sa26: every member but the Speaker at a desk");
+  assert.ok(!seated.includes("Hurtle Vale") && res.divs.some((d) => d.n === "Hurtle Vale"), "seats-sa26: the Speaker (Hurtle Vale) in the chair, not at a desk");
+  assert.ok(seated.every((n) => res.divs.some((d) => d.n === n)), "seats-sa26: districts of the frame");
+  assert.ok(Object.values(seats.at).every((d) => ids(ha).has(d)), "seats-sa26: every desk on the drawn floor");
+  assert.equal(new Set(Object.values(seats.at)).size, 46, "seats-sa26: one member a desk");
+  assert.equal(seats.at.Croydon, "A1", "seats-sa26: the Premier nearest the Speaker on the government front bench");
+  assert.equal(seats.at.Schubert, "F1", "seats-sa26: the Leader of the Opposition across from the Premier");
+  const lcs = JSON.parse(R("map/data/seats-sa26-lc.json")), council = JSON.parse(R("map/data/senate-sa26.json"));
+  assert.equal(Object.keys(lcs.at).length, 21, "seats-sa26-lc: every member but the President at a desk");
+  assert.ok(Object.keys(lcs.at).every((n) => council.senators.some((s) => s.n === n)), "seats-sa26-lc: members of the frame's council");
+  assert.ok(Object.values(lcs.at).every((d) => ids(lc).has(d)) && new Set(Object.values(lcs.at)).size === 21, "seats-sa26-lc: one member a desk, every desk drawn");
+  assert.deepEqual(lcs.roles, { oppLeader: "Nicola Centofanti", leader: "Kyam Maher", president: "Reggie Martin" }, "seats-sa26-lc: the chair and the leaders");
+  assert.ok(!(lcs.roles.president in lcs.at), "seats-sa26-lc: the President in the chair, not at a desk");
+  assert.ok(js.includes("sa22: \"Kavel\", sa26: \"Hurtle Vale\""), "the SA frames' Speakers in the chair");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

@@ -34,16 +34,19 @@ export function stampData(js, stamps) {
    line names), stamped into map.js the same way: the eyebrow holds the height of its longest line
    (holdEyebrow, app-6-ui.js) before the reader has loaded any election but the first, and a
    stand-in line can only guess — too long, the floor leaves a blank line for good; too short, a
-   walk still moves the map */
+   walk still moves the map. And a state election's seats by family (mix), for the timeline's
+   make-up glyph over its stop: the federal years' come from summary.json, which has none of them */
 export const META_TOKEN = "/*@meta-facts*/{}";
 export function metaFacts(root) {
   const read = (f) => { try { return JSON.parse(fs.readFileSync(path.join(root, "map/data", f), "utf8")); } catch { return null; } };
-  const house = {}, senate = {};
+  const house = {}, senate = {}, mix = {};
   for (const f of fs.readdirSync(path.join(root, "map/data")).sort()) {
     let m = f.match(/^res-(\w+)\.json$/);
     if (m) {
       const r = read(f);
       if (r) house[m[1]] = [r.date, r.divs.length, r.booths ? r.booths.n.length : 0];
+      // (the winner is the candidate flagged elected; their family is the colour the map gives them)
+      if (r && !/^\d+$/.test(m[1])) for (const d of r.divs) { const w = d.c.find((c) => c[6] === 1); if (w) { const x = (mix[m[1]] ??= {}); x[w[3]] = (x[w[3]] || 0) + 1; } }
       continue;
     }
     m = f.match(/^senate-(\w+)\.json$/);
@@ -52,7 +55,7 @@ export function metaFacts(root) {
   const now = read("data-now.json");
   // Now is the 2025 House with its changes since
   if (now && house["2025"]) house.now = [now.asOf, house["2025"][1], house["2025"][2]];
-  return { house, senate };
+  return { house, senate, mix };
 }
 export function stampMeta(js, facts) {
   if (!js.includes(META_TOKEN)) throw new Error(`map.js has no ${META_TOKEN} to stamp (app-6-ui.js)`);

@@ -17,7 +17,7 @@ const isSA = () => SA_YEARS.has(S.year);
 const coalW = (cap) => (isSA() ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
 const leaderT = () => (isSA() ? "premier" : "prime minister");
 const ausW = () => (isSA() ? "South Australia" : "Australia");
-const legW = (b) => (isSA() && b === "lnp" ? "Liberals" : FAM_LEG[b]);
+const legW = (b) => famLeg(b);
 // the "now" view: today’s holder won the last count under another banner — the
 // winner’s row in the count stays historical but earns a "· now X" note
 const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
@@ -494,7 +494,7 @@ function seatHedDek(m, d) {
       const v = d.flowAlp[F];
       if (v == null) {
         const stood = d.c.some((c) => c.b === F);
-        const who = F === "ind" ? "No independent" : F === "oth" ? "No other candidate" : FAM_LEG[F];
+        const who = F === "ind" ? "No independent" : F === "oth" ? "No other candidate" : famLeg(F);
         return { hed: stood ? `${cap(nm)} preferences weren’t distributed in ${ds(d.n)}` : F === "ind" || F === "oth" ? `${who} stood in ${ds(d.n)}` : `${who} didn’t stand in ${ds(d.n)}`, dek: stood ? "Its candidate finished in the final two, so its votes were never passed on." : "" };
       }
       if (m.res.flBasis === "modelled") {
@@ -609,7 +609,7 @@ function storyBooth(m, j) {
         dek = `${int(b.votes[j])} votes were cast here, ${f1(b.infPct[j])}% informal. Across ${ds(D.n)}, ${ds(surname(D.win.n))} won ${f1(D.winPct)}–${f1(100 - D.winPct)}.`;
         void rn;
     }
-    if (S.lens === "fp") { const v = b.fp[S.party][j]; hed = `${FAM_LEG[S.party]} won ${f1(v)}% of first preferences here`; dek = `In ${ds(D.n)} as a whole, ${f1(D.fp[S.party])}%.`; }
+    if (S.lens === "fp") { const v = b.fp[S.party][j]; hed = `${famLeg(S.party)} won ${f1(v)}% of first preferences here`; dek = `In ${ds(D.n)} as a whole, ${f1(D.fp[S.party])}%.`; }
     if (S.lens === "senate") {
       const v = senBoothValue(m, j), dv = senDivValue(m, D);
       if (v == null) { hed = senNoValue(m, "booth", D); dek = ""; }
@@ -619,7 +619,7 @@ function storyBooth(m, j) {
     if (S.lens === "informal") { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     if (S.lens === "flow") {
       if (m.res.flBasis === "modelled") { hed = D.classic ? `Preference flows aren’t modelled by polling place` : `No preference split is modelled in ${ds(D.n)}`; dek = D.classic ? `${ds(D.n)}’s modelled split is a district figure — read it on the district’s card.` : `Its count didn’t finish Labor against the Liberals.`; }
-      else { const v = nn(b.flowAlp[S.from][j]); hed = v == null ? `No ${S.from === "ind" ? "independent’s" : FAM_LEG[S.from] + "’"} preferences were split here between Labor and the Coalition` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : FAM_LEG[S.from] + "’"} preferences here went to Labor`; }
+      else { const v = nn(b.flowAlp[S.from][j]); hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and the Coalition` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
     }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoCopy(m).whoAdults : demoCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }

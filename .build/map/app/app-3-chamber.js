@@ -54,14 +54,16 @@ const SERJEANT = "Rc5d1"; // the Serjeant-at-Arms's chair, in the curve's last r
 /* @cells-end */
 
 // position along the benches: down the government's side, round the curve, up the opposition's
+// (a chamber whose two curves each turn about their own side's centre, a out from the middle, as
+// South Australia's do, measures each round its own)
 const CHK = 6;
-const benchS = (x, y) => (y > 0 ? Math.atan2(y, -x) * CHK : x < 0 ? y : Math.PI * CHK - y);
+const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a)) * CHK : x < 0 ? y : Math.PI * CHK - y);
 /* a chamber's geometry: its seats in bench order (s, then row), its rows, the box it's framed in,
    and what differs between the House and the Senate — the presiding officer's chair, the table's
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
-   senateGeom (app-3b-senate.js) */
+   senateGeom (app-3b-senate.js), South Australia's two chambers from saGeom (app-3c-sa.js) */
 let chGeomC = null;
-const chamberGeom = (m) => (m && m.house === "senate" ? senateGeom() : houseGeom());
+const chamberGeom = (m) => (m && SA_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 function houseGeom() {
   if (chGeomC) return chGeomC;
   const all = chamberCells().map((c) => {
@@ -121,7 +123,9 @@ function chamberKey(m, d, bloc) {
    front bench instead and leave the table's chairs empty; March 2021's has only Morrison there) */
 const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"], 2010: ["Lalor", "Warringah"],
   2013: ["Warringah", "Maribyrnong"], 2016: ["Wentworth", "Maribyrnong"], 2019: ["Cook", "Grayndler"],
-  2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"] };
+  2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"],
+  // South Australia's Premier and Leader of the Opposition, at the front benches' seats nearest the Speaker
+  sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
@@ -199,8 +203,13 @@ function majorityCuts(ch, geom) {
     let L = -1;
     row.forEach((c, j) => { if (inside.has(c.k)) L = j; });
     if (L < 0) row.forEach((c, j) => { if (c.s < sStar) L = j; });
-    const a = row[L], b = row[L + 1];
-    cuts.push(a && b ? (a.s + b.s) / 2 : a ? a.s + 0.4 : b.s - 0.4);
+    let a = row[L], b = row[L + 1];
+    // a row that doesn't curve (South Australia's front benches) jumps the floor between its last
+    // seat on one side and its first on the other: the cut stays by the near one
+    if (geom.rect && a && b && b.s - a.s > 2.5) { if (a.s < sStar + 0.01) b = null; else a = null; }
+    // (past a row's end, clear of its last chair: the House's chairs are smaller than South Australia's)
+    const pad = geom.cutPad || 0.4;
+    cuts.push(a && b ? (a.s + b.s) / 2 : a ? a.s + pad : b.s - pad);
   }
   return cuts;
 }
@@ -428,7 +437,7 @@ function drawChamber(g, m, w, h, opts) {
       const x0 = () => (g.textAlign === "right" ? mx - tw : g.textAlign === "center" ? mx - tw / 2 : mx);
       if (x0() < 4) {
         mx += 4 - x0();
-        const floor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v > 0 && Math.hypot(u, v) <= rO + 0.5; };
+        const floor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v > 0 && Math.hypot(u, v) <= rO + 0.5; };
         const top = g.textBaseline === "top" ? 0 : -8;
         while (my < h - 18 && [x0(), x0() + tw / 2, x0() + tw].some((px) => floor(px, my + top) || floor(px, my + top + 15))) my += 2;
       }
@@ -522,7 +531,7 @@ function drawChamber(g, m, w, h, opts) {
         // no room beside the chamber on a narrow screen: the key below gives the counts
         const room = (side === "left" ? w - bx : bx) >= wMax + 4;
         // clear of the other labels, and off the chamber's floor (a phone has no room beside it)
-        const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= rO + 0.5 : Math.hypot(u, v) <= rO + 0.5; };
+        const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= rO + 0.5 : Math.hypot(u, v) <= rO + 0.5; };
         const clear = by + ht <= h - 2 && !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
           && ![[x0, by], [x0 + wMax, by], [x0, by + ht], [x0 + wMax, by + ht], [x0 + wMax / 2, by], [x0, by + ht / 2], [x0 + wMax, by + ht / 2]].some(([px, py]) => onFloor(px, py));
         return { side, bx, by, lines, wMax, ht, room, clear };
@@ -588,7 +597,7 @@ function drawChamber(g, m, w, h, opts) {
     const side = Math.abs(dx) >= 0.42;
     const align = side ? (dx < 0 ? "right" : "left") : "center";
     const floorR = rO + 0.5; // the outer chairs' backs
-    const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
+    const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
     const boxAt = (lx, ly) => {
       const x0 = align === "right" ? lx - 6 - tw : align === "center" ? lx - tw / 2 : lx + 6;
       const y0 = side ? ly - th2 / 2 : ly + 5;
@@ -650,7 +659,8 @@ function crossLabel(h) {
   if (f === "onp") return "One Nation";
   return partyShort(h.ab, h.pn);
 }
-const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick" };
+const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick",
+  sa22: "Dan Cregan", sa26: "Nat Cook" };
 const speakerName = (m) => SPEAKERS[m.year];
 // the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
 const presiding = (m) => (m.house === "senate" ? (m.speaker != null ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "President", name: "", place: "" }) : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });
@@ -676,7 +686,7 @@ function drawChamberMain(m, alpha) {
 let morph = null; // { to: "chamber" | "map", t0, dur }
 function drawMorph(m, p) {
   const th = TH;
-  const geom = houseGeom();
+  const geom = chamberGeom(m);
   const F = chamberFrame(geom, Wpx, Hpx, chamberPads());
   const target = chamberPositions(m, geom);
   // the map recedes, the chamber's furniture arrives
@@ -684,12 +694,12 @@ function drawMorph(m, p) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (p > 0.45) {
     ctx.globalAlpha = clamp((p - 0.45) / 0.55, 0, 1);
-    drawChamberFurniture(ctx, F, geom);
+    geom.furniture(ctx, F, geom);
   }
   ctx.restore();
   const g = geoOf(m);
   for (const d of m.divs) {
-    const tgt = d.i === m.speaker ? SPEAKER_AT : target.get(d.n);
+    const tgt = d.i === m.speaker ? geom.chairAt : target.get(d.n);
     if (!tgt) continue;
     const gx = d.lpx * T.k + T.x, gy = d.lpy * T.k + T.y;
     const cx = F.X(tgt[0]), cy = F.Yp(tgt[1]);
@@ -721,7 +731,7 @@ function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
   const w = c.clientWidth || 300;
-  const geom = houseGeom();
+  const geom = chamberGeom(m);
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);

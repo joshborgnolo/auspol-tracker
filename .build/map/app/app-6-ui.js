@@ -3,9 +3,9 @@ function lensShort() {
   switch (S.lens) {
     case "winner": return isNow() ? "Held by" : "Winner";
     case "tpp": return S.tppMode === "swing" ? "Swing to Labor" : "Labor 2PP";
-    case "fp": return S.fpMode === "change" ? `${FAM_LEG[S.party]} change` : `${FAM_LEG[S.party]} primary`;
-    case "senate": return senGap() ? `${FAM_LEG[S.party]}, Senate v House` : `${FAM_LEG[S.party]} Senate vote`;
-    case "flow": return `${FAM_LEG[S.from]} to Labor`;
+    case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} change` : `${famLeg(S.party)} primary`;
+    case "senate": return senGap() ? `${famLeg(S.party)}, Senate v House` : `${famLeg(S.party)} Senate vote`;
+    case "flow": return `${famLeg(S.from)} to Labor`;
     case "informal": return "Informal";
     case "cls": return "Seat type";
     case "seifa": return isDemo() ? DM_SHORT[S.index] : `${IX_ABBR[S.index]} decile`;
@@ -35,9 +35,9 @@ function valueText(v, kind, ctx) {
   switch (S.lens) {
     case "winner": return kind === "booth" ? `${FAM_NAME[v]} led here` : FAM_NAME[v];
     case "tpp": return S.tppMode === "swing" ? (Math.abs(v) < 0.05 ? "No swing" : `${f1(Math.abs(v))} swing to ${v > 0 ? "Labor" : "the Coalition"}`) : `Labor ${f1(v)} · Coalition ${f1(100 - v)}`;
-    case "fp": return S.fpMode === "change" ? `${FAM_LEG[S.party]} ${sgn(v)} points` : `${FAM_LEG[S.party]} ${f1(v)}%`;
-    case "senate": return senGap() ? `${FAM_LEG[S.party]} ${Math.abs(v) < 0.05 ? "level" : `${pts(v)} ${v > 0 ? "higher" : "lower"}`} in the Senate` : `${FAM_LEG[S.party]} ${f1(v)}% in the Senate`;
-    case "flow": return `${f0(v)}% of ${FAM_LEG[S.from]} preferences to Labor`;
+    case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} ${sgn(v)} points` : `${famLeg(S.party)} ${f1(v)}%`;
+    case "senate": return senGap() ? `${famLeg(S.party)} ${Math.abs(v) < 0.05 ? "level" : `${pts(v)} ${v > 0 ? "higher" : "lower"}`} in the Senate` : `${famLeg(S.party)} ${f1(v)}% in the Senate`;
+    case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
     case "informal": return `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
     case "seifa": return isDemo() ? `${f1(v)}% ${dmVerb(M(), S.index)}` : `Decile ${v} of 10`;
@@ -183,14 +183,14 @@ function legendHTML(m) {
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
-  const partyOpts = FAMS.map((f) => [f, FAM_LEG[f]]);
+  const partyOpts = FAMS.map((f) => [f, famLeg(f)]);
   // the chamber view chooses its chamber first
   let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
@@ -309,12 +309,22 @@ function renderTimeline() {
     // in the Senate's chamber each stop reads that election's upper house
     const sen = senOn();
     const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
-    for (const r of rows) for (const y of r.ys) {
-      const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
-      const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
-      let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${r.base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+    for (const r of rows) {
+      // as wide as the row's closest two stops allow (2025 and Now sit close on a phone)
+      const xs = r.ys.map(X), bw = Math.min(30, ...xs.slice(1).map((x, j) => x - xs[j] - 4));
+      for (const y of r.ys) {
+        // (a state election's House from the facts stamped into the script: summary.json is federal)
+        const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] ? SUM.seats[y][st] : (st === "AUS" || st === "SA") && META_FACTS.mix && META_FACTS.mix[y]; if (!s) continue;
+        const tot = sum(Object.values(s)), x = X(y) - bw / 2;
+        let acc = 0;
+        for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${r.base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+      }
     }
+  }
+  // the lower row named at its empty start: the state's elections, where the federal row has 2004
+  {
+    const r = rows[1], x0 = Math.min(...r.ys.map(X)), lab = short ? "SA" : "South Australia";
+    if (x0 - 24 > (short ? 30 : 110)) g += `<text class="yr row" x="0" y="${r.base + 15}" text-anchor="start">${lab}</text>`;
   }
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i], hitBot = i + 1 < rows.length ? rows[i + 1].top : H, labY = r.base + 15;
@@ -589,7 +599,8 @@ function showLoading(on, msg) {
   if (!on || msg || S.view !== "chamber") return;
   const r = $("#stage").getBoundingClientRect();
   if (!r.width) return;
-  const geom = chamberGeom(S.house === "senate" && senFloor ? SENM : null);
+  // (South Australia's floors are drawn from the start; the Senate's only once fetched)
+  const geom = chamberGeom(SA_YEARS.has(S.year) ? { year: S.year, house: S.house } : S.house === "senate" && senFloor ? SENM : null);
   const F = chamberFrame(geom, r.width, r.height, chamberPads(r.width));
   el.style.left = F.X(0) + "px"; el.style.top = F.Yp(geom.aisle) + "px";
 }

@@ -136,6 +136,8 @@ const FAM_PL = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "On
 // their own colour, while the vote tallies keep them in the independent family
 const holdFam = (h) => (h.ab === "CSA" ? "csa" : h.fam);
 const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", csa: "Community Strong", oth: "Others" };
+// a family's name in the legend's words: a South Australian frame's opposition is the Liberals
+const famLeg = (f) => (f === "lnp" && SA_YEARS.has(S.year) ? "Liberals" : FAM_LEG[f]);
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
@@ -667,8 +669,13 @@ function applyNow(m, now) {
   m.asOf = now.asOf;
 }
 
-// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs)
-const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010]);
+// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs, and
+// for South Australia's House of Assembly and Legislative Council .build/map/sa_seating.mjs)
+const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26"]);
+const SEATED_LC = new Set(["sa26"]);
+// the Speaker's district where the results files name none: South Australia's, as each Parliament
+// first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026)
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale" };
 async function loadYear(year) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
@@ -692,7 +699,7 @@ async function loadYear(year) {
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));
     for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     if (now) applyNow(m, now);
-    m.speaker = m.byName.get(res.speaker);
+    m.speaker = m.byName.get(res.speaker ?? SPEAKER_DIV[year]);
     m.seating = seating;
     m.gov = GOV[year];
     m.geo = buildGeo(lo, m);

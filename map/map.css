@@ -222,6 +222,8 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-time svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .mp-time .yr { font: 400 12px var(--sans); fill: var(--ink-3); cursor: pointer; }
 .mp-time .yr.on { font-weight: 600; fill: var(--ink); }
+/* the state row's name: a caption, not a stop */
+.mp-time .yr.row { fill: var(--ink-faint); cursor: default; pointer-events: none; }
 .mp-time .hit { fill: transparent; cursor: pointer; }
 .mp-time .hit:hover + g .yr, .mp-time g.stop:hover .yr { fill: var(--ink); }
 
