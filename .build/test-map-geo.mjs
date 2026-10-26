@@ -12,6 +12,15 @@
      neither it nor any 0.39km2 island survives the 2km2 floor;
    - Deal Island (ca. 2.6km2, above the old floor) still present everywhere;
    - every built year's hi/lo division set exactly the results' set.
+   Also pins the 2004 NT/QLD border repair (same day): the 2004 QLD MapInfo
+   file drew Kennedy's upper meridian edge as a synthetic 259km line ~460m
+   east of the surveyed border Lingiari's ring carries, so the two shared no
+   arcs and the map drew NO state border between the Gulf coast and -18.87
+   (user-reported; NT|QLD shared length 794km vs every other year's 1052-53).
+   make-boundary-src.mjs grafts Lingiari's surveyed meridian into Kennedy's
+   ring; this test keeps the repair present, the NT|QLD shared length at
+   1000km+ per year×level, and every 2004-era sliver strip point and the
+   meridian's west-side probes covered by exactly one division in every era.
    Run after any geometry rebuild: node .build/test-map-geo.mjs */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -67,4 +76,79 @@ for (const y of YEARS) {
     if (y !== 2004) assert.ok(dealKm < 1, `${y} ${lvl}: Deal Island (above the old floor) still drawn`);
   }
 }
-console.log("PASS: map geometry – per-level island floor, Craggy Island restored at hi 2007+ in Bass, low-zoom floor untouched, division sets exact");
+// --- the 2004 NT/QLD meridian repair pins (see header) -------------------
+assert.ok(/repairKennedy2004/.test(R(".build/map/make-boundary-src.mjs")),
+  "make-boundary-src.mjs keeps the Kennedy 2004 meridian repair");
+
+function inRing(ring, [x, y]) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+// division(s) covering a probe point; must be exactly one everywhere —
+// "NO DIV" means an inter-boundary gap like 2004's NT/QLD sliver
+function covering(fc, pt) {
+  const hits = [];
+  for (const f of fc.features) {
+    const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const poly of polys) {
+      if (inRing(poly[0], pt) && !poly.slice(1).some((hole) => inRing(hole, pt))) { hits.push(f.properties.name); break; }
+    }
+  }
+  return hits;
+}
+// km of arcs shared by divisions of DIFFERENT states, per state pair
+function sharedKm(t, a, b) {
+  const { scale, translate } = t.transform;
+  const states = new Map(); // arcIdx -> Set(st)
+  for (const g of t.objects.divs.geometries) {
+    const st = g.properties.st;
+    for (const ring of (g.type === "Polygon" ? g.arcs : g.arcs.flat()))
+      for (const arc of ring) {
+        const i = arc < 0 ? -arc - 1 : arc;
+        (states.get(i) ?? states.set(i, new Set()).get(i)).add(st);
+      }
+  }
+  let km = 0;
+  for (const [i, sts] of states) {
+    if (!sts.has(a) || !sts.has(b)) continue;
+    let x = 0, y = 0, px = null, py = null;
+    for (const [dx, dy] of t.arcs[i]) {
+      x += dx * scale[0]; y += dy * scale[1];
+      if (px !== null) km += Math.hypot((x - px) * Math.cos(((y + py) / 2) * Math.PI / 180), y - py) * 111.32;
+      px = x; py = y;
+    }
+  }
+  return km;
+}
+
+const PROBES = [
+  // [point, era -> expected covering division]; exactly-one everywhere,
+  // attribution asserted where the probe sat inside 2004's lost sliver
+  [[137.9995, -17.5], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, mid"],
+  [[138.0005, -17.0], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, north"],
+  [[137.9999, -18.7], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, south"],
+  [[137.99, -17.5], { all: "Lingiari" }, "west of the meridian"],
+  [[136.2, -24.15], { all: "Lingiari" }, "NT interior"],
+  [[137.8, -24.15], { all: "Lingiari" }, "NT interior, east"],
+];
+
+for (const y of YEARS) {
+  for (const lvl of ["lo", "hi"]) {
+    const t = JSON.parse(R(`map/data/geo-${y}-${lvl}.json`));
+    const ntqld = sharedKm(t, "NT", "QLD");
+    assert.ok(ntqld > 1000, `${y} ${lvl}: NT/QLD state border is drawn end to end (shared ${ntqld.toFixed(0)}km — 2004's defect left 794km and a gap from the Gulf coast to -18.87)`);
+    const fc = topojson.feature(t, t.objects.divs);
+    for (const [pt, expect, label] of PROBES) {
+      const got = covering(fc, pt).join("+") || "NO DIV";
+      const want = expect.all ?? expect[y];
+      if (want) assert.equal(got, want, `${y} ${lvl}: ${label} [${pt}] is ${want}, got ${got}`);
+      else assert.ok(got !== "NO DIV" && !got.includes("+"), `${y} ${lvl}: ${label} [${pt}] covered by exactly one division, got ${got}`);
+    }
+  }
+}
+
+console.log("PASS: map geometry – per-level island floor, Craggy Island restored at hi 2007+ in Bass, low-zoom floor untouched, division sets exact; 2004 NT/QLD meridian repair pinned (shared border 1053km in every era, sliver strip covered by exactly one division)");

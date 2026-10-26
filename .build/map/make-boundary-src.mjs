@@ -17,7 +17,16 @@
 // (case/punctuation-insensitive) with that year's map/data/data-YYYY.json
 // results, the same join geo_build re-checks. Needs mapshaper on PATH (or
 // MAPSHAPER) for the ESRI sources.
-// usage: node .build/map/make-boundary-src.mjs <stageDir>
+// 2004's QLD MIF carries a defect geo_build cannot see: Kennedy's upper
+// meridian edge is a synthetic 258km line at a constant 138.0012E, ~460m east
+// of the surveyed border Lingiari's ring carries (~137.996E, where the
+// 2007-era file puts it too), so the two share no arcs and the map drew no
+// NT/QLD border between the Gulf coast and -18.87. repairKennedy2004 below
+// grafts Lingiari's surveyed meridian into Kennedy's ring.
+// usage: node .build/map/make-boundary-src.mjs <stageDir> [--years=2004,2007]
+//        (--years regenerates only those eras, incl. their dependencies: 2013
+//        rides 2010, 2016 rides 2013 and its state zips — for a repair pass
+//        after the big AEC downloads have been cleaned off the machine)
 import fs from "fs";
 import path from "path";
 import { execFileSync } from "child_process";
@@ -29,8 +38,12 @@ const MIF2 = REPO + "/.build/map/mif2geojson.mjs";
 const ERAS = REPO + "/.matilda/seifa-irsad-abs/dl/aec-ced-eras";
 const DATA = REPO + "/map/data";
 const stage = process.argv[2];
-if (!stage) throw new Error("usage: node make-boundary-src.mjs <stageDir>");
+if (!stage) throw new Error("usage: node make-boundary-src.mjs <stageDir> [--years=...]");
 const dl = (f) => path.join(stage, "dl", f);
+const onlyArg = process.argv.find((a) => a.startsWith("--years="));
+const only = onlyArg ? new Set(onlyArg.slice("--years=".length).split(",").map(Number)) : null;
+const need = (y) => !only || only.has(y);
+fs.mkdirSync(path.join(stage, "x"), { recursive: true });
 
 const key = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
 const resultNames = (y, st) => JSON.parse(fs.readFileSync(`${DATA}/data-${y}.json`, "utf8")).divs
@@ -123,26 +136,77 @@ function write(fc, year, stateCol) {
   console.log(`n-${year}.geojson`, fc.features.length, "divisions" + (stateCol ? ` (state column ${stateCol})` : ""));
 }
 
+// Graft Lingiari's surveyed meridian (and its border/coast junction vertex)
+// into Kennedy's ring in place of the synthetic 138.0012E run — see the
+// header. The anchors are the MIF's own coordinates; any of them missing
+// means the source set changed and the repair must be re-probed, not guessed.
+function repairKennedy2004(fc) {
+  const findNamed = (n) => fc.features.find((f) => key(f.properties.name) === key(n));
+  const rings = (g) => g.type === "Polygon" ? g.coordinates
+    : g.type === "MultiPolygon" ? g.coordinates.flat() : [];
+  const idxNear = (ring, pt) => {
+    let bi = -1, bd = 1e-6; // ~110m at this latitude; the anchors are exact MIF vertices
+    ring.forEach((p, i) => { const d = (p[0] - pt[0]) ** 2 + (p[1] - pt[1]) ** 2; if (d < bd) { bd = d; bi = i; } });
+    return bi;
+  };
+  const kennedy = findNamed("Kennedy"), lingiari = findNamed("Lingiari");
+  if (!kennedy || !lingiari) throw new Error("2004 repair: Kennedy/Lingiari not in the set");
+  const KA = [138.00118, -16.546509];  // Kennedy's last true coast vertex
+  const KB = [137.996616, -18.868219]; // Kennedy meridian vertex to keep
+  const LJ = [137.996232, -16.540101]; // Lingiari's border/coast junction
+  const kr = rings(kennedy.geometry).find((r) => idxNear(r, KA) >= 0 && idxNear(r, KB) >= 0);
+  const lr = rings(lingiari.geometry).find((r) => idxNear(r, LJ) >= 0 && r.some((p) => p[0] > 137.9 && p[0] < 138.01 && p[1] <= -25.9));
+  if (!kr || !lr) throw new Error("2004 repair: the MIF geometry no longer matches the diagnosed defect; re-probe");
+  const ia = idxNear(kr, KA), ib = idxNear(kr, KB);
+  if (!(ia < ib) || ib - ia < 10 || ib - ia > 200) throw new Error(`2004 repair: unexpected Kennedy anchors ${ia}..${ib}`);
+  // the stretch between must be exactly the synthetic vertical run and
+  // nothing else — a real boundary vertex must never be dropped
+  for (let i = ia + 1; i < ib; i++) {
+    if (Math.abs(kr[i][0] - 138.00118) > 5e-5) throw new Error(`2004 repair: Kennedy vertex ${i} off the synthetic line (${kr[i]}); re-probe`);
+  }
+  const ij = idxNear(lr, LJ);
+  let ie = ij;
+  while (ie > 0 && lr[ie][1] > KB[1]) ie--; // first Lingiari vertex at/below KB's latitude
+  const spliced = [[...lr[ij]]];
+  for (let i = ij - 1; i > ie; i--) spliced.push([...lr[i]]);
+  const newRing = [...kr.slice(0, ia + 1), ...spliced, ...kr.slice(ib)];
+  const polys = kennedy.geometry.type === "Polygon" ? [kennedy.geometry.coordinates] : kennedy.geometry.coordinates;
+  const poly = polys.find((p) => p.includes(kr));
+  if (!poly) throw new Error("2004 repair: Kennedy ring not found within its own geometry");
+  poly[poly.indexOf(kr)] = newRing;
+  const km = (a, b) => Math.hypot((b[0] - a[0]) * 111.32 * Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180), (b[1] - a[1]) * 111.32);
+  let dropKm = 0;
+  for (let i = ia; i < ib; i++) dropKm += km(kr[i], kr[i + 1]);
+  let graftKm = 0;
+  for (let i = ia; i < ia + spliced.length + 1; i++) graftKm += km(newRing[i], newRing[i + 1]);
+  console.log(`2004 repair: dropped Kennedy's synthetic ${ib - ia - 1}-vertex ${dropKm.toFixed(0)}km run; grafted Lingiari's meridian (${spliced.length} vertices, ${graftKm.toFixed(0)}km) between ${KA} and ${KB}`);
+}
+
 const r = {};
-r[2010] = reduce(shpToFc(unzip(dl(ZIPS.n16122011)), "n16122011"), 2010);
-r[2004] = reduce(mifsToFc("2004", "mif2004"), 2004);
-r[2007] = reduce(mifsToFc("2007", "mif2007"), 2007);
-r[2019] = reduce(shpToFc(unzip(dl(ZIPS.fe2019)), "fe2019"), 2019);
-r[2022] = reduce(shpToFc(unzip(dl(ZIPS.cwlth2021)), "cwlth2021"), 2022);
-r[2025] = reduce(shpToFc(unzip(dl(ZIPS.fe2025)), "fe2025"), 2025);
+if (need(2010) || need(2013) || need(2016)) r[2010] = reduce(shpToFc(unzip(dl(ZIPS.n16122011)), "n16122011"), 2010);
+if (need(2004)) {
+  r[2004] = reduce(mifsToFc("2004", "mif2004"), 2004);
+  repairKennedy2004(r[2004].fc);
+}
+if (need(2007)) r[2007] = reduce(mifsToFc("2007", "mif2007"), 2007);
+if (need(2019)) r[2019] = reduce(shpToFc(unzip(dl(ZIPS.fe2019)), "fe2019"), 2019);
+if (need(2022)) r[2022] = reduce(shpToFc(unzip(dl(ZIPS.cwlth2021)), "cwlth2021"), 2022);
+if (need(2025)) r[2025] = reduce(shpToFc(unzip(dl(ZIPS.fe2025)), "fe2025"), 2025);
 
 // 2013: the same national file as 2010 (the comment's recipe)
-r[2013] = { fc: r[2010].fc, stateCol: r[2010].stateCol };
+if (need(2013)) r[2013] = { fc: r[2010].fc, stateCol: r[2010].stateCol };
 
 // 2016: the 2013 national set minus NSW/WA/ACT, plus that year's state files
-if (!r[2013].stateCol) throw new Error("the 2013 national set has no state column; cannot split it for 2016");
-const kept = r[2013].fc.features.filter((f) => !["NSW", "WA", "ACT"].includes(f.properties.st));
-const st16 = [];
-for (const [tag, zip, st] of [["nsw2016", ZIPS.nsw2016, "NSW"], ["wa2016", ZIPS.wa2016, "WA"], ["act2016", ZIPS.act2016, "ACT"]]) {
-  const r16 = reduce(shpToFc(unzip(dl(zip)), tag), 2016, st);
-  st16.push(...r16.fc.features);
+if (need(2016)) {
+  if (!r[2013].stateCol) throw new Error("the 2013 national set has no state column; cannot split it for 2016");
+  const kept = r[2013].fc.features.filter((f) => !["NSW", "WA", "ACT"].includes(f.properties.st));
+  const st16 = [];
+  for (const [tag, zip, st] of [["nsw2016", ZIPS.nsw2016, "NSW"], ["wa2016", ZIPS.wa2016, "WA"], ["act2016", ZIPS.act2016, "ACT"]]) {
+    const r16 = reduce(shpToFc(unzip(dl(zip)), tag), 2016, st);
+    st16.push(...r16.fc.features);
+  }
+  r[2016] = { fc: { type: "FeatureCollection", features: [...kept, ...st16] }, stateCol: null };
 }
-r[2016] = { fc: { type: "FeatureCollection", features: [...kept, ...st16] }, stateCol: null };
 
-for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) write(r[y].fc, y, r[y].stateCol);
-console.log("all boundary sources written to", stage);
+for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) if (r[y]) write(r[y].fc, y, r[y].stateCol);
+console.log("boundary sources written to", stage);
