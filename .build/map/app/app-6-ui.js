@@ -229,7 +229,9 @@ function legendHTML(m) {
     case "flow": {
       h += `<div class="lg-t">Where ${opt("from", S.from, [["grn", "the Greens’"], ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]])} preferences went</div>`;
       h += legendHist(m, 10, 90);
-      h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="t-lnp">Mostly to the Coalition ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and the Coalition</div>`;
+      h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="t-lnp">Mostly to ${coalW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${coalW()}</div>`;
+      if (m.res.flBasis === "modelled" && m.res.flowErr && m.res.flowErr[S.from] != null)
+        h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. Nine in ten of the model’s per-seat estimates land within ${f0(m.res.flowErr[S.from])} points of a counted split.</div>`;
       break;
     }
     case "informal":
