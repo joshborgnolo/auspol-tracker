@@ -64,9 +64,11 @@ federal files' census lanes never filed at booth level. The census people
 lane rides data/sa22-demo.json and the SEIFA lane data/sa22-seifa.json
 (.build/map/build_sa22_demo.py / build_sa22_seifa.py, both on the frame's
 own 2018–2022-era polygons in .build/map/src/sa26/n-sa22.geojson), spliced
-exactly as sa26_generation does. There is no preference-flow store for 2022
-(the sa26 lens's two-class pile estimator has no 2022 state loader), so fl
-rows are empty and no flBasis key lands in the file.
+exactly as sa26_generation does. The preferences lane rides data/sa22-flows.json,
+the two-class pile estimator's modelled per-district flows (its 2022 loader
+reads the distributions), filed by sa_flow_lane.py exactly as sa26's: fl rows
+on each Labor v Liberal (and Labor v One Nation) final, flBasis "modelled",
+the per-seat error cells in flowErr.
 
 Boundaries: as sa26's, the district polygons come from the frame's own
 boundary source; the geo stage reduces n-sa22.geojson beside the results.
@@ -76,11 +78,14 @@ then:  python3 -I .build/map/build_sa22_past.py <out_dir>
 then:  node .build/map/geo_build.mjs .build/map/src/sa26 <out_dir> map/data --years=sa22
 """
 import collections, gzip, json, os, re, sys, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sa_flow_lane import load_store, flow_rows
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC26 = os.path.join(REPO, ".build", "map", "src", "sa26")
 DEMO_STORE = os.path.join(REPO, "data", "sa22-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "sa22-seifa.json")
+FLOWS_STORE = os.path.join(REPO, "data", "sa22-flows.json")
 OUT = sys.argv[1]
 FETCH = "--fetch" in sys.argv[2:]
 BASE = "https://apim-ecsa-production.azure-api.net/results-display"
@@ -265,6 +270,7 @@ def main():
         fail(f"{len(names)} districts, expected 47")
     demo = load_demo()
     seifa = load_seifa()
+    flows, contests, flow_err = load_store(FLOWS_STORE, fail)
     venues = {(v["d"].upper(), v["n"]): v for v in load_venues()}
 
     D = []
@@ -449,7 +455,7 @@ def main():
             "c": [[r["n"], r["ab"], r["pn"], r["b"], r["v"], 0, 1 if r["el"] else 0, 0] for r in rows],
             "inf": informal,
             "tcp": [[cid2row[ia], fin[ia]], [cid2row[ib], fin[ib]]],
-            "fl": [],
+            "fl": flow_rows(name, rows, pair_buckets, bucket(s_cands[ia]["partyId"]), cid2row, flows, contests, fail),
             "h": [],
             "enrolled": enrolled,
             "demo": demo[name],
@@ -470,7 +476,7 @@ def main():
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
     out = {"year": "sa22", "date": ELECTION, "prev": None, "jurisdiction": "SA",
-           "demoBasis": "sa1",
+           "demoBasis": "sa1", "flBasis": "modelled", "flowErr": flow_err,
            "agg": {"AUS": agg, "SA": dict(agg)}, "divs": D, "booths": B}
     p = os.path.join(OUT, "data-sa22.json")
     with open(p, "w") as f:

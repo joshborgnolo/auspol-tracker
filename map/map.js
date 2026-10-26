@@ -114,6 +114,8 @@ function buildRamps() {
     // Labor at the low end of the index and the Coalition at the high end: the
     // site's own reading order ("◀ Labor ahead … Coalition ahead ▶")
     div: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
+    // Labor against One Nation, for preferences split between the two
+    divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
@@ -423,7 +425,7 @@ function walkHold(spot) {
 
 /* =============================== state =============================== */
 const S = {
-  year: "now", lens: "winner", party: "onp", from: "onp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
+  year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -446,7 +448,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa22.json":"ef996772","data-sa26.json":"b51bb60e","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa22.json":"f3e85ab8","res-sa26.json":"5fd164f0","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa22.json":"627ff5ba","data-sa26.json":"2da63850","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa22.json":"6237d3f3","res-sa26.json":"09a4856c","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
 const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
@@ -456,6 +458,22 @@ function cleanBooth(name, div, ty) {
 }
 function firstYearOf(h, name, upto) { let y = upto; for (let k = h.length - 1; k >= 0; k--) { if (h[k][0] > upto) continue; if (h[k][3] === name) y = h[k][0]; else break; } return y; }
 
+// the preferences lens reads a seat whose final was Labor against the rival it is set to (S.vs)
+const flowSeat = (d) => d.vs != null && d.vs === S.vs;
+// that rival in a sentence: "the Coalition" ("the Liberals" in South Australia), or "One Nation"
+const vsW = (cap) => (S.vs === "onp" ? "One Nation" : SA_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+// a year's seats that finished Labor against One Nation with a split on file: the lens offers that rival
+const hasVsOnp = (m) => m.divs.some((d) => d.vs === "onp" && d.flows.length);
+/* a modelled split's error, the way it was measured: per seat against counted federal divisions
+   (Labor v the Liberals), or only in total for Labor v One Nation, against the contests where that
+   split was counted (flowErr.vsOnp) */
+const flowErrOf = (m, F) => {
+  const e = m.res.flowErr; if (!e) return null;
+  const v = S.vs === "onp" ? e.vsOnp && e.vsOnp[F] : e[F];
+  return v == null ? null : { v, seat: S.vs !== "onp" };
+};
+const flowErrWords = (x) => (x.seat ? `nine in ten of the model’s per-seat estimates land within ${f0(x.v)} points of a counted split`
+  : `the model’s Labor v One Nation splits are checked only in total, against the contests where they were counted, to within about ${f0(x.v)} points; no count tests them seat by seat`);
 function deriveDiv(d, i, year) {
   const c = d.c.map(([n, ab, pn, b, v, sw, el], k) => ({ k, n, ab, pn, b, v, sw, el: !!el, fam: FAM(ab) }));
   const formal = sum(c.map((x) => x.v));
@@ -465,12 +483,15 @@ function deriveDiv(d, i, year) {
   const win = va >= vb ? A : B, run = va >= vb ? B : A;
   const winPct = (100 * Math.max(va, vb)) / tt;
   const classic = [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("lnp");
-  const alpSide = classic ? (A.fam === "alp" ? 0 : 1) : -1;
+  // whom Labor's final rival was, where the preferences lens can read a split: the Coalition (a classic
+  // seat), or One Nation
+  const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
+  const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
   const flows = d.fl.map(([ci, ta, tb]) => ({ cand: c[ci], ta, tb }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
-    if (!classic) continue;
+    if (!vs) continue;
     let toA = 0, tot = 0;
     for (const f of flows) if (f.cand.b === b) { toA += alpSide === 0 ? f.ta : f.tb; tot += f.ta + f.tb; }
     if (tot > 0) flowAlp[b] = (100 * toA) / tot;
@@ -488,7 +509,7 @@ function deriveDiv(d, i, year) {
   const inf = d.inf;
   return {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
-    A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, alpSide, flows, flowAlp,
+    A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
     tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };
@@ -517,7 +538,7 @@ function deriveBooths(B, m) {
     const t = B.tpp[j]; if (t && t[0] + t[1]) { o.tpp[j] = (100 * t[0]) / (t[0] + t[1]); if (t[2] != null) o.tppSw[j] = t[2]; }
     const tc = B.tcp[j]; if (tc && tc[0] + tc[1]) { const a = tc[0] >= tc[1]; o.lead[j] = a ? D.A : D.B; o.leadPct[j] = (100 * Math.max(tc[0], tc[1])) / (tc[0] + tc[1]); }
     const fl = B.fl[j];
-    if (fl && D.classic) for (const b of FAMS) { let toA = 0, tot = 0; for (const [ci, ta, tb] of fl) if (D.c[ci].b === b) { toA += D.alpSide === 0 ? ta : tb; tot += ta + tb; } if (tot >= 12) o.flowAlp[b][j] = (100 * toA) / tot; }
+    if (fl && D.vs) for (const b of FAMS) { let toA = 0, tot = 0; for (const [ci, ta, tb] of fl) if (D.c[ci].b === b) { toA += D.alpSide === 0 ? ta : tb; tot += ta + tb; } if (tot >= 12) o.flowAlp[b][j] = (100 * toA) / tot; }
   }
   return o;
 }
@@ -733,7 +754,7 @@ function divValue(m, i) {
     case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "senate": return senDivValue(m, d);
-    case "flow": return d.classic ? nn(d.flowAlp[S.from]) : null;
+    case "flow": return flowSeat(d) ? nn(d.flowAlp[S.from]) : null;
     case "informal": return nn(d.infPct);
     case "cls": return d.cls || null;
     case "seifa": return isDemo() ? (d.demo && d.demo[S.index] != null ? 100 * d.demo[S.index] : null) : nn(d.seifa[S.index] && d.seifa[S.index].dec);
@@ -763,7 +784,7 @@ function boothValue(m, j) {
       const v = b.fp[S.party][j];
       return Number.isNaN(v) ? null : v - pf[S.party];
     }
-    case "flow": return nn(b.flowAlp[S.from][j]);
+    case "flow": return flowSeat(m.divs[b.d[j]]) ? nn(b.flowAlp[S.from][j]) : null;
     case "senate": return senBoothValue(m, j);
     case "informal": return nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
@@ -783,7 +804,7 @@ function colorOf(v) {
     case "fp": return S.fpMode === "change"
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
-    case "flow": return RAMP.div[dIdx((50 - v) / 40)];
+    case "flow": return (S.vs === "onp" ? RAMP.divOn : RAMP.div)[dIdx((50 - v) / 40)];
     // the Senate gap reads as a change does: the party's own ramp above zero, the warm grey of losses below
     case "senate": return senGap()
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
@@ -2307,7 +2328,7 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.index}`;
   if (m._chKey === key) return m._ch;
   const geom = chamberGeom(m);
   const keyOf = m.house === "senate" ? senateKey : chamberKey;
@@ -3706,6 +3727,8 @@ const coalW = (cap) => (isSA() ? (cap ? "The Liberals" : "the Liberals") : cap ?
 const leaderT = () => (isSA() ? "premier" : "prime minister");
 const ausW = () => (isSA() ? "South Australia" : "Australia");
 const legW = (b) => famLeg(b);
+// a family's preferences, possessive: the Liberals' in South Australia, the Coalition's elsewhere
+const possW = (b) => (b === "lnp" && isSA() ? "the Liberals’" : POSS[b]);
 // the "now" view: today’s holder won the last count under another banner — the
 // winner’s row in the count stays historical but earns a "· now X" note
 const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
@@ -3941,20 +3964,20 @@ function areaHedDek(m, st) {
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
     case "flow": {
-      const F = S.from, name = POSS[F];
+      const F = S.from, name = possW(F), rival = vsW();
       let toA = 0, tot = 0;
       const per = [];
-      for (const i of idx) { const d = m.divs[i]; if (!d.classic) continue; let a = 0, t = 0; for (const f of d.flows) if (f.cand.b === F) { a += d.alpSide === 0 ? f.ta : f.tb; t += f.ta + f.tb; } if (t) { toA += a; tot += t; per.push({ i, v: (100 * a) / t, t }); } }
-      if (!tot) return { hed: `None of ${name} preferences were split between Labor and the Coalition${where}`, dek: "" };
+      for (const i of idx) { const d = m.divs[i]; if (!flowSeat(d)) continue; let a = 0, t = 0; for (const f of d.flows) if (f.cand.b === F) { a += d.alpSide === 0 ? f.ta : f.tb; t += f.ta + f.tb; } if (t) { toA += a; tot += t; per.push({ i, v: (100 * a) / t, t }); } }
+      if (!tot) return { hed: `None of ${name} preferences were split between Labor and ${rival}${where}`, dek: "" };
       const share = (100 * toA) / tot;
       if (m.res.flBasis === "modelled") {
-        const e = m.res.flowErr && m.res.flowErr[F];
-        return { hed: `${f0(share)}% of ${name} preferences modelled to go to Labor${where}`, dek: `No South Australian count records how ${name} preferences flowed, so each district’s share is modelled from the elections whose splits are published; measured against counted divisions, nine in ten of the model’s per-seat estimates land within ${f0(e)} points of the true split. Shown across the ${per.length} districts whose count finished Labor against the Liberals.` };
+        const e = flowErrOf(m, F);
+        return { hed: `${f0(share)}% of ${name} preferences modelled to go to Labor${S.vs === "onp" ? " over One Nation" : ""}${where}`, dek: `No South Australian count records how ${name} preferences flowed, so each district’s share is modelled from the elections whose splits are published${e ? `; ${flowErrWords(e)}` : ""}. Shown across the ${per.length} districts whose count finished Labor against ${rival}.` };
       }
-      const hed = `${f0(share)}% of ${name} preferences went to Labor${where}`;
+      const hed = `${f0(share)}% of ${name} preferences went to Labor${S.vs === "onp" ? " over One Nation" : ""}${where}`;
       per.sort((a, b) => a.v - b.v);
       const lo = per[0], hi = per[per.length - 1];
-      const dek = `Counted in the ${per.length} seats${where} that finished Labor against the Coalition. The share ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.`;
+      const dek = `Counted in the ${per.length === 1 ? "one seat" : `${per.length} seats`}${where} that finished Labor against ${rival}.${per.length === 1 ? "" : ` The share ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.`}`;
       return { hed, dek };
     }
     case "informal": {
@@ -4177,8 +4200,8 @@ function seatHedDek(m, d) {
       return { hed: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote in ${ds(d.n)}`, dek: `${pr.Its} House ${cands > 1 ? "candidates" : "candidate"} won ${f1(h)}%${aus ? `; across Australia ${pr.its} Senate vote was ${f1(aus.sen)}%` : ""}.` };
     }
     case "flow": {
-      const F = S.from, nm = POSS[F];
-      if (!d.classic) return { hed: `${ds(d.n)}’s count didn’t end Labor against the Coalition`, dek: `Its final two were ${ds(d.win.n)} and ${ds(d.run.n)}, so its preferences weren’t split between Labor and the Coalition.` };
+      const F = S.from, nm = possW(F), rival = vsW();
+      if (!flowSeat(d)) return { hed: `${ds(d.n)}’s count didn’t end Labor against ${rival}`, dek: `Its final two were ${ds(d.win.n)} and ${ds(d.run.n)}, so its preferences weren’t split between Labor and ${rival}.${d.vs && d.vs !== S.vs ? ` Set the preferences lens to Labor against ${d.vs === "onp" ? "One Nation" : coalW()} to read it.` : ""}` };
       const v = d.flowAlp[F];
       if (v == null) {
         const stood = d.c.some((c) => c.b === F);
@@ -4186,10 +4209,10 @@ function seatHedDek(m, d) {
         return { hed: stood ? `${cap(nm)} preferences weren’t distributed in ${ds(d.n)}` : F === "ind" || F === "oth" ? `${who} stood in ${ds(d.n)}` : `${who} didn’t stand in ${ds(d.n)}`, dek: stood ? "Its candidate finished in the final two, so its votes were never passed on." : "" };
       }
       if (m.res.flBasis === "modelled") {
-        const e = m.res.flowErr && m.res.flowErr[F];
-        return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} modelled to go to Labor`, dek: `The rest, ${f0(100 - v)}%, to the Liberals — an estimate: South Australia publishes no per-candidate split. Nine in ten of the model’s per-seat readings land within ${f0(e)} points of a counted one.` };
+        const e = flowErrOf(m, F);
+        return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} modelled to go to Labor`, dek: `The rest, ${f0(100 - v)}%, to ${rival} — an estimate: South Australia publishes no per-candidate split.${e ? ` ${cap(flowErrWords(e))}.` : ""}` };
       }
-      return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} went to Labor`, dek: `The rest, ${f0(100 - v)}%, went to the Coalition.` };
+      return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} went to Labor`, dek: `The rest, ${f0(100 - v)}%, went to ${rival}.` };
     }
     case "informal": {
       const r = [...m.divs].filter((x) => x.infPct != null).sort((a, b) => b.infPct - a.infPct).findIndex((x) => x.i === d.i) + 1;
@@ -4306,8 +4329,8 @@ function storyBooth(m, j) {
     }
     if (S.lens === "informal") { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     if (S.lens === "flow") {
-      if (m.res.flBasis === "modelled") { hed = D.classic ? `Preference flows aren’t modelled by polling place` : `No preference split is modelled in ${ds(D.n)}`; dek = D.classic ? `${ds(D.n)}’s modelled split is a district figure — read it on the district’s card.` : `Its count didn’t finish Labor against the Liberals.`; }
-      else { const v = nn(b.flowAlp[S.from][j]); hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and the Coalition` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
+      if (m.res.flBasis === "modelled") { hed = flowSeat(D) ? `Preference flows aren’t modelled by polling place` : `No preference split is modelled in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s modelled split is a district figure — read it on the district’s card.` : `Its count didn’t finish Labor against ${vsW()}.`; }
+      else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
     }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoCopy(m).whoAdults : demoCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
@@ -4356,7 +4379,7 @@ function renderStory(force) {
     $("#story").innerHTML = storySenate(SENM);
     return;
   }
-  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
+  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;
   const el = $("#story");
@@ -4547,7 +4570,7 @@ function lensRef() {
   if (S.lens === "fp") return S.fpMode === "change" ? a.fpSw[S.party] : a.fp[S.party];
   if (S.lens === "senate") { const r = senArea(m, a.idx, S.party); return r ? (senGap() ? r.gap : r.sen) : null; }
   if (S.lens === "seifa" && isDemo()) return a.demo ? a.demo[S.index] : null;
-  if (S.lens === "flow") { let toA = 0, tot = 0; for (const i of a.idx) { const d = m.divs[i]; if (!d.classic) continue; for (const f of d.flows) if (f.cand.b === S.from) { toA += d.alpSide === 0 ? f.ta : f.tb; tot += f.ta + f.tb; } } return tot ? (100 * toA) / tot : null; }
+  if (S.lens === "flow") { let toA = 0, tot = 0; for (const i of a.idx) { const d = m.divs[i]; if (!flowSeat(d)) continue; for (const f of d.flows) if (f.cand.b === S.from) { toA += d.alpSide === 0 ? f.ta : f.tb; tot += f.ta + f.tb; } } return tot ? (100 * toA) / tot : null; }
   return null;
 }
 // a placeholder the story or the list fills once laid out (the chart needs its width)
@@ -4766,7 +4789,7 @@ function renderLenses() {
 /* =============================== the legend =============================== */
 let legendKey = "";
 const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -4935,11 +4958,14 @@ function legendHTML(m) {
       break;
     }
     case "flow": {
-      h += `<div class="lg-t">Where ${opt("from", S.from, [["grn", "the Greens’"], ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]])} preferences went</div>`;
+      // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
+      // the groups whose preferences can be read are the other parties'
+      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", SA_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", SA_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
       h += legendHist(m, 10, 90);
-      h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="t-lnp">Mostly to ${coalW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${coalW()}</div>`;
-      if (m.res.flBasis === "modelled" && m.res.flowErr && m.res.flowErr[S.from] != null)
-        h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. Nine in ten of the model’s per-seat estimates land within ${f0(m.res.flowErr[S.from])} points of a counted split.</div>`;
+      h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
+      const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
+      if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
       break;
     }
     case "informal":
@@ -5460,7 +5486,7 @@ function writeURL() {
   if (S.lens === "tpp" && S.tppMode === "swing") p.set("m", "swing");
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
-  if (S.lens === "flow") p.set("p", S.from);
+  if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); }
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -5487,6 +5513,7 @@ function readURL() {
   const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
+  S.vs = p.get("f") === "onp" ? "onp" : "lnp";
   const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i))) S.index = i;
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
@@ -5594,6 +5621,8 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.opt) {
     const k = t.dataset.opt;
+    // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
+    if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
     if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value;
     lensParamChanged(); return;
   }

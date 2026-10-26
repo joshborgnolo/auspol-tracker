@@ -131,7 +131,7 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.index}`;
   if (m._chKey === key) return m._ch;
   const geom = chamberGeom(m);
   const keyOf = m.house === "senate" ? senateKey : chamberKey;

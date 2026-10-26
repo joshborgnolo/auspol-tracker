@@ -69,7 +69,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD = os.path.join(ROOT, ".build")
 OUT_CSV = os.path.join(ROOT, "data", "state-flows-est.csv")
 OUT_JSON = os.path.join(ROOT, "data", "state-flows-backtest.json")
-OUT_SA26 = os.path.join(ROOT, "data", "sa26-flows.json")
+OUT_SA = {2026: os.path.join(ROOT, "data", "sa26-flows.json"), 2022: os.path.join(ROOT, "data", "sa22-flows.json")}
 
 LAM0 = 3e4               # contrast shrinkage per federal-size seat (ballot units)
 FED_SEAT = 104000.0      # mean formal ballots in a 2022/2025 federal seat
@@ -963,37 +963,51 @@ def sapile(states, evs, params):
             "p90": round(a[int(0.9 * (len(a) - 1))], 2)}
 
 
-def write_sa26(states, evs, params, seaterr_, sapile_):
-    """The /map/ flow store: per classic district, the modelled per-group
-    votes to Labor and to the Liberals (counts, aggregated per first-
-    preference group like the federal store's per-origin rows)."""
-    seats = states[("sa", 2026)]
+def write_sa(y, states, evs, params, seaterr_, sapile_, contest_err=None):
+    """The /map/ flow store for South Australia's election of year y: per
+    district whose final was Labor against the Liberals (flows) or against One
+    Nation (contests), the modelled per-group votes to Labor and to the other
+    finalist (counts, aggregated per first-preference group like the federal
+    store's per-origin rows; the Liberals' own group is lnp in a contest)."""
+    seats = states[("sa", y)]
     ev = collections.defaultdict(dict)
-    for e in evs[("sa", 2026)]:
+    for e in evs[("sa", y)]:
         ev[e["seat"]][e["x"]] = e
-    out = {"seaterr": seaterr_, "sapile": sapile_, "flows": {}}
+    out = {"seaterr": seaterr_, "sapile": sapile_, "flows": {}, "contests": {}}
     n_cl = 0
     for k, s in seats.items():
-        if not classic(s):
+        pair = {s["cands"][c][0] for c in s["final"]} if len(s["final"]) == 2 else set()
+        if classic(s):
+            n_cl += 1
+            dest = out["flows"]
+        elif pair == {"alp", "onp"}:
+            dest = out["contests"]
+        else:
             continue
-        n_cl += 1
-        p = replay(s, params[("sa", 2026)], ev[k])
+        p = replay(s, params[("sa", y)], ev[k])
         a = next(c for c in s["final"] if s["cands"][c][0] == "alp")
         o = next(c for c in s["final"] if c != a)
         fl = {}
+        # (the finalists' own parties' groups aren't split: a classic seat's alp
+        # and coal, a contest's alp and onp)
+        own = {"alp", s["cands"][o][0]}
         for c, (b, fp) in s["cands"].items():
-            if b in ("alp", "coal"):
+            if b in own:
                 continue
             bb = "lnp" if b == "coal" else b
             got = fl.setdefault(bb, [0, 0])
             got[0] += round(p[a].get(b, 0.0))
             got[1] += round(p[o].get(b, 0.0))
-        out["flows"][k] = fl
+        dest[k] = fl
     out["nClassic"] = n_cl
-    with open(OUT_SA26, "w") as f:
+    out["nContest"] = len(out["contests"])
+    # a contest's 90% misses: the Labor v One Nation table's (lib the Liberal cell)
+    if out["contests"]:
+        out["contestErr"] = contest_err
+    with open(OUT_SA[y], "w") as f:
         json.dump(out, f, indent=1)
         f.write("\n")
-    print(f"wrote {os.path.relpath(OUT_SA26, ROOT)} ({n_cl} classic districts)", file=sys.stderr)
+    print(f"wrote {os.path.relpath(OUT_SA[y], ROOT)} ({n_cl} classic districts, {out['nContest']} Labor v One Nation)", file=sys.stderr)
 
 
 def onp_min_ballots(fed):
@@ -1201,7 +1215,10 @@ def main():
     print(f"  sapile: {pchk.get('events', 0)} events, mae {pchk.get('mae')}, p90 {pchk.get('p90')}",
           file=sys.stderr)
     if gates_ok:
-        write_sa26(states, evs, params, serr, pchk)
+        for y in OUT_SA:
+            if ("sa", y) in states:
+                c = contests.get(f"sa-{y}-alp-onp")
+                write_sa(y, states, evs, params, serr, pchk, c and c.get("err90"))
     else:
         print("  sa26 gate FAILED: store not written", file=sys.stderr)
     if vtable.get("band"):
