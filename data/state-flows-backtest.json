@@ -4546,6 +4546,28 @@
    }
   }
  },
+ "seaterr": {
+  "grn": {
+   "mae": 2.56,
+   "p90": 5.62,
+   "pairs": 1303
+  },
+  "oth": {
+   "mae": 2.56,
+   "p90": 5.75,
+   "pairs": 1356
+  },
+  "onp": {
+   "mae": 4.43,
+   "p90": 9.37,
+   "pairs": 630
+  }
+ },
+ "sapile": {
+  "events": 175,
+  "mae": 5.62,
+  "p90": 10.53
+ },
  "onp_min_ballots": 39264,
  "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"
 }

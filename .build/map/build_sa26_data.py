@@ -62,7 +62,15 @@ SEIFA lane rides data/sa26-seifa.json (ABS SEIFA 2021 SA1 index scores
 population-weighted onto the same districts by .build/map/build_sa26_seifa.py
 on the people pipeline's own SA1→district join): each division row gains
 seifa {ix: {v, pct, dec}} cells shaped like the federal rec's, deciles
-ranked among the frame's own 47.
+ranked among the frame's own 47. The preferences lens rides
+data/sa26-flows.json (the two-class pile estimator's MODELLED per-district
+flows, .build/estimate-state-flows.py, written only when its federal
+back-test gates pass — the ECSA publishes a distribution of preferences,
+never where each party's own voters ended): each classic district (Labor
+v Liberal final) gains fl rows [candidateRow, toLabor, toLiberal]
+apportioned from the store's per-origin-group counts in proportion to the
+candidate's first preferences, and the year file carries err90 cells the
+UI quotes beside every modelled figure.
 Boundaries are SA's own State Electorates 2026 geojson (data.sa.gov.au),
 committed-free like the federal n-YYYY.geojson era files; the reducer keeps
 one `name` property per feature (title case, the ECSA names it joins to).
@@ -76,6 +84,7 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
 DEMO_STORE = os.path.join(REPO, "data", "sa26-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "sa26-seifa.json")
+FLOWS_STORE = os.path.join(REPO, "data", "sa26-flows.json")
 OUT = sys.argv[1]
 FETCH = "--fetch" in sys.argv[2:]
 BASE = "https://apim-ecsa-production.azure-api.net/results-display"
@@ -189,6 +198,32 @@ def load_seifa():
     return seifa
 
 
+def load_flows():
+    """the estimator's modelled per-district flows (data/sa26-flows.json):
+    {district: {bucket: [toLabor, toLiberal]}} over the election's classic
+    districts plus the federal-per-seat err90 the UI quotes with them."""
+    if not os.path.exists(FLOWS_STORE):
+        fail(f"flows store {FLOWS_STORE} missing — run .build/estimate-state-flows.py")
+    with open(FLOWS_STORE) as f:
+        d = json.load(f)
+    flows = d.get("flows")
+    n_cl = d.get("nClassic")
+    if not isinstance(flows, dict) or not isinstance(n_cl, int) or len(flows) != n_cl:
+        fail(f"flows store: {len(flows or {})} districts vs nClassic {n_cl!r}")
+    for name, fl in flows.items():
+        if set(fl) - {"grn", "onp", "oth"}:
+            fail(f"flows store: {name} carries buckets {sorted(set(fl) - {'grn', 'onp', 'oth'})}")
+        for b, (to_alp, to_lib) in fl.items():
+            if min(to_alp, to_lib) < 0:
+                fail(f"flows store: {name}.{b} has a negative share {[to_alp, to_lib]}")
+    err = d.get("seaterr") or {}
+    for b in ("grn", "onp", "oth"):
+        if not (err.get(b) or {}).get("p90"):
+            fail(f"flows store: seaterr.{b}.p90 missing")
+    return flows, {"grn": err["grn"]["p90"], "onp": err["onp"]["p90"],
+                   "oth": err["oth"]["p90"], "ind": err["oth"]["p90"]}
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     ha = fetch("ecsa-ha", f"HAStatic/{ELECTION}")
@@ -207,6 +242,7 @@ def main():
         fail(f"{len(names)} districts, expected 47")
     demo = load_demo()
     seifa = load_seifa()
+    flows, flow_err = load_flows()
 
     D = []
     seats = collections.Counter()
@@ -353,6 +389,43 @@ def main():
         tcp = [[cid2row[live[0]], last[live[0]]["progressiveTotal"]],
                [cid2row[live[1]], last[live[1]]["progressiveTotal"]]]
 
+        # ---- modelled preference flows (classic districts only) ----------
+        # The estimator's fit vocabulary is grn/onp/oth with independents
+        # folded into "oth" (its SA loader buckets IND -> oth, so the store's
+        # oth cell already carries every independent's ballots; flowErr["ind"]
+        # is oth's p90 for the same reason). Grouping therefore keys on the
+        # STORE bucket, not the display fam: ind rides the oth cell.
+        fl = []
+        if tpp is not None:
+            st = flows.get(name)
+            if st is None:
+                fail(f"{name}: classic district missing from the flows store — rerun estimate-state-flows.py")
+            by_b = {}
+            for r in rows:
+                if r["b"] in ("alp", "lnp"):
+                    continue
+                sb = "oth" if r["b"] == "ind" else r["b"]
+                by_b.setdefault(sb, []).append(r)
+            for b, cands in by_b.items():
+                tot_v = sum(r["v"] for r in cands)
+                if tot_v == 0:
+                    continue
+                cell = st.get(b)
+                if cell is None or sum(cell) == 0:
+                    fail(f"{name}: flows store lacks a {b} cell the district's first preferences need")
+                al, cl = cell
+                acc = [0, 0]
+                for i, r in enumerate(cands):
+                    if i < len(cands) - 1:
+                        ta = round(al * r["v"] / tot_v)
+                        tc = round(cl * r["v"] / tot_v)
+                        acc[0] += ta
+                        acc[1] += tc
+                    else:
+                        ta, tc = al - acc[0], cl - acc[1]
+                    fl.append([cid2row[r["cid"]], ta, tc])
+            fl.sort()
+
         # ---- booths: the district's polling places, on the federal lanes ----
         for bk, pp in enumerate(c["pollingPlaces"]):
             pname = pp["pollingPlaceName"]
@@ -408,7 +481,7 @@ def main():
             "c": [[r["n"], r["ab"], r["pn"], r["b"], r["v"], 0, 1 if r["el"] else 0, 0] for r in rows],
             "inf": informal,
             "tcp": tcp,
-            "fl": [],
+            "fl": fl,
             "h": [],
             "enrolled": enrolled,
             "demo": demo[name],
@@ -429,6 +502,7 @@ def main():
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
     out = {"year": "sa26", "date": ELECTION, "prev": None, "jurisdiction": "SA", "demoBasis": "sa1",
+           "flBasis": "modelled", "flowErr": flow_err,
            "agg": {"AUS": agg, "SA": dict(agg)}, "divs": D, "booths": B}
     p = os.path.join(OUT, "data-sa26.json")
     with open(p, "w") as f:

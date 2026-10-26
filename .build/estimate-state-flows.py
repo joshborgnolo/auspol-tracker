@@ -69,6 +69,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD = os.path.join(ROOT, ".build")
 OUT_CSV = os.path.join(ROOT, "data", "state-flows-est.csv")
 OUT_JSON = os.path.join(ROOT, "data", "state-flows-backtest.json")
+OUT_SA26 = os.path.join(ROOT, "data", "sa26-flows.json")
 
 LAM0 = 3e4               # contrast shrinkage per federal-size seat (ballot units)
 FED_SEAT = 104000.0      # mean formal ballots in a 2022/2025 federal seat
@@ -878,6 +879,123 @@ def noncoal_check(fed, fed_evs, params):
     return out
 
 
+def seaterr(fed, fed_evs, params):
+    """The model's per-SEAT error at federal seats: the per-division model
+    flow scored against the AEC's per-division counted flow, one pair per
+    classic seat per group. The calibration (election-level error over
+    random seat subsets) and this seat-level scatter are the two numbers the
+    SA 2026 per-district modelled flows carry."""
+    pairs = collections.defaultdict(list)
+    for y in FED_YEARS:
+        seats, truth = fed[y]
+        idx = collections.defaultdict(dict)
+        for e in fed_evs[y]:
+            idx[e["seat"]][e["x"]] = e
+        for k, s in seats.items():
+            if not classic(s):
+                continue
+            p = replay(s, params[("fed", y)], idx[k])
+            a = next(c for c in s["final"] if s["cands"][c][0] == "alp")
+            o = next(c for c in s["final"] if c != a)
+            for b in ("grn", "onp", "oth", "ind"):
+                m = [p[a].get(b, 0.0), p[o].get(b, 0.0)]
+                t = truth.get(k, {}).get(b if b != "ind" else "oth")
+                ind_ = truth.get(k, {}).get("ind") if b == "ind" else None
+                tv = [t[0] + (ind_[0] if ind_ else 0.0), t[1] + (ind_[1] if ind_ else 0.0)] \
+                    if t is not None else (list(ind_) if ind_ else None)
+                if not tv or sum(tv) < 50 or sum(m) <= 0:
+                    continue
+                pairs[b].append(round(100 * m[0] / sum(m) - 100 * tv[0] / sum(tv), 3))
+    out = {}
+    for b, e in pairs.items():
+        if len(e) < 50:
+            continue
+        a = sorted(abs(x) for x in e)
+        out[b] = {"mae": round(sum(a) / len(a), 2), "p90": round(a[int(0.9 * (len(a) - 1))], 2), "pairs": len(e)}
+    return out
+
+
+def sapile(states, evs, params):
+    """Same-jurisdiction check: at every published SA 2022/2026 exclusion in
+    a seat that ended Labor v Liberal, the model's split of that pile (its
+    own-vs-inherited classes, over the continuing candidates) against the
+    split the ECSA count published."""
+    errs = []
+    for y in (2022, 2026):
+        if ("sa", y) not in states:
+            continue
+        seats = states[("sa", y)]
+        sev = evs[("sa", y)]
+        idx = collections.defaultdict(dict)
+        for e in sev:
+            idx[e["seat"]][e["x"]] = e
+        for k, s in seats.items():
+            if not classic(s):
+                continue
+            for excl, rec, exh in s["steps"]:
+                if len(excl) != 1:
+                    continue
+                x = excl[0]
+                b = s["cands"][x][0]
+                if b not in params[("sa", y)]:
+                    continue
+                tot = sum(rec.values())
+                if tot < 200:
+                    continue
+                ev = idx[k][x]
+                a_, d_ = params[("sa", y)][b]
+                po = softmax(a_, ev["X"])
+                pi = softmax([u + v for u, v in zip(a_, d_)], ev["X"])
+                own = s["cands"][x][1]
+                inh = max(0.0, tot - own)
+                # the pile's implied to-ALP share, published vs modelled
+                obs = rec.get(next(c for c in s["final"] if s["cands"][c][0] == "alp"), 0.0) / tot
+                to_a = next(i for i, r in enumerate(ev["recs"]) if s["cands"].get(r, (None,))[0] == "alp") \
+                    if "alp" in [s["cands"][c][0] for c in s["final"]] else None
+                if to_a is None:
+                    continue
+                mo = (own * po[to_a] + inh * pi[to_a]) / max(1.0, tot)
+                errs.append(round(100 * (mo - obs), 3))
+    if not errs:
+        return {"events": 0}
+    a = sorted(abs(x) for x in errs)
+    return {"events": len(errs), "mae": round(sum(a) / len(a), 2),
+            "p90": round(a[int(0.9 * (len(a) - 1))], 2)}
+
+
+def write_sa26(states, evs, params, seaterr_, sapile_):
+    """The /map/ flow store: per classic district, the modelled per-group
+    votes to Labor and to the Liberals (counts, aggregated per first-
+    preference group like the federal store's per-origin rows)."""
+    seats = states[("sa", 2026)]
+    ev = collections.defaultdict(dict)
+    for e in evs[("sa", 2026)]:
+        ev[e["seat"]][e["x"]] = e
+    out = {"seaterr": seaterr_, "sapile": sapile_, "flows": {}}
+    n_cl = 0
+    for k, s in seats.items():
+        if not classic(s):
+            continue
+        n_cl += 1
+        p = replay(s, params[("sa", 2026)], ev[k])
+        a = next(c for c in s["final"] if s["cands"][c][0] == "alp")
+        o = next(c for c in s["final"] if c != a)
+        fl = {}
+        for c, (b, fp) in s["cands"].items():
+            if b in ("alp", "coal"):
+                continue
+            bb = "lnp" if b == "coal" else b
+            got = fl.setdefault(bb, [0, 0])
+            got[0] += round(p[a].get(b, 0.0))
+            got[1] += round(p[o].get(b, 0.0))
+        out["flows"][k] = fl
+    out["nClassic"] = n_cl
+    with open(OUT_SA26, "w") as f:
+        json.dump(out, f, indent=1)
+        f.write("\n")
+    print(f"wrote {os.path.relpath(OUT_SA26, ROOT)} ({n_cl} classic districts)", file=sys.stderr)
+
+
 def onp_min_ballots(fed):
     """The smallest One Nation ballot base the calibration's error figures
     stand on: the 5th percentile of One Nation ballots (reaching Labor or
@@ -1053,6 +1171,16 @@ def main():
                                           "est_flow_to_alp", "err90", "exhausted_share", "n_classic"])
         w.writeheader()
         w.writerows(rows)
+    serr = seaterr(fed, fed_evs, params)
+    pchk = sapile(states, evs, params)
+    # the measured errors (2026-10-26), re-specced by the user after the
+    # first run: grn/oth p90 < 8, onp p90 < 11 (the model's per-seat One
+    # Nation scatter is the honest ±9-10, not ±8), ind via its oth proxy,
+    # sapile MAE <= 6.5. ind is honour-shown as oth's number because the
+    # federal truth bucket never separates independents.
+    gates_ok = all(serr.get(b, {}).get("p90", 99) < 8 for b in ("grn", "oth")) and \
+        serr.get("onp", {}).get("p90", 99) < 11 and \
+        serr.get("grn", {}).get("pairs", 0) >= 50 and pchk.get("mae", 99) <= 6.5 and pchk.get("events", 0) > 0
     with open(OUT_JSON, "w") as f:
         json.dump({"settings": {"lam0": LAM0, "fed_seat": FED_SEAT, "em_iters": EM_ITERS,
                                 "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in sorted(HIST_YEARS + FED_YEARS)],
@@ -1062,11 +1190,20 @@ def main():
                    "contest_calibration": ctable, "vicstop": vtable, "vicstop_rows": vrows,
                    "noncoal_check": noncoal, "federal_hist": federal_hist,
                    "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
+                   "seaterr": serr, "sapile": pchk,
                    "onp_min_ballots": onp_min_ballots(fed),
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
                   f, indent=1)
         f.write("\n")
     print(f"wrote {os.path.relpath(OUT_CSV, ROOT)} ({len(rows)} rows) and {os.path.relpath(OUT_JSON, ROOT)}")
+    print(f"  seaterr: " + "  ".join(f"{b} mae {v['mae']} p90 {v['p90']} ({v['pairs']} pairs)"
+                                  for b, v in serr.items()), file=sys.stderr)
+    print(f"  sapile: {pchk.get('events', 0)} events, mae {pchk.get('mae')}, p90 {pchk.get('p90')}",
+          file=sys.stderr)
+    if gates_ok:
+        write_sa26(states, evs, params, serr, pchk)
+    else:
+        print("  sa26 gate FAILED: store not written", file=sys.stderr)
     if vtable.get("band"):
         print(f"  vicstop draw {vtable['band']['draw']} -> classic {vtable['band']['classicMin']}-"
               f"{vtable['band']['classicMax']} (median {vtable['band']['classicMedian']}), "
