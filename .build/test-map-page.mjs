@@ -67,6 +67,9 @@ assert.ok(page.includes(`href="/map/map.css?v=${hs("map.css")}"`), "the page's m
 // a botched merge resolution ships its markers to the live page (7ae2bbe4's
 // rebase landed <<<<<<< HEAD above the footer, 2026-10-26)
 assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git conflict-marker lines");
+// one loader tag, once: 6a08ba3f's raced rebase staging shipped the marker
+// block's two identical arms and the map's IIFE ran twice on the live page
+assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
 const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
