@@ -482,6 +482,7 @@ function setView(v, quiet) {
   S.view = v;
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
   if (senate) { renderLenses(); $("#mp-meta").textContent = metaLine(); if (v === "chamber") needSenateFloor(); }
+  holdEyebrow();
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
@@ -548,7 +549,7 @@ async function setHouse(h) {
   chAnim = null; chLast.clear();
   houseFade = from && !reduceMotion && S.view === "chamber" ? { from, t0: performance.now(), dur: 420 } : null;
   renderLenses(); renderLegend(); renderStory(true); renderTimeline(); writeURL();
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (hold) hold.land();
   schedule();
 }
@@ -556,7 +557,7 @@ async function setHouse(h) {
 function needSenateFloor() {
   if (senFloor && SENY[S.year]) return;
   showLoading(true);
-  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); schedule(); loadSenates(); })
+  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); holdEyebrow(); schedule(); loadSenates(); })
     .catch(() => showLoading(true, "The Senate didn’t load. Try again."));
 }
 function lensParamChanged() {
@@ -616,16 +617,47 @@ async function setYear(y) {
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
   renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
   schedule();
 }
-function metaLine() {
-  const m = M(); if (!m) return "";
-  if (senOn()) return SENM.year === "now" ? `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators` : `The Senate from ${longDate(SENM.asOf)}, after the ${SENM.year} election · ${SENM.divs.length} senators`;
+function metaLine(m = M(), sen = senOn() ? SENM : null) {
+  if (!m) return "";
+  if (sen) return sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : m.year === "sa26" ? `The ${yearLabel("sa26")} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
+/* the eyebrow holds the height of its longest line, so a walk never moves the figure under it:
+   between 414 and 600px an election's line wraps to two and Now's fits on one, and with the page
+   at its top no scroll can take that back. Every election's line is measured, loaded or not, from
+   the facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate
+   (and back to the House at SA 2026), so only it floors on the Senate's longer lines too */
+const META_FACTS = /*@meta-facts*/{};
+const ebHeights = new Map();
+function holdEyebrow() {
+  const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
+  if (!w || !M()) return;
+  const ch = S.view === "chamber", at = `${w}|${ch}`;
+  if (!ebHeights.has(at)) {
+    const keep = meta.textContent, lines = [], H = META_FACTS.house || {}, SN = META_FACTS.senate || {};
+    for (const y of YEARS) {
+      if (Y[y] && Y[y].divs) { lines.push(metaLine(Y[y], null)); continue; }
+      const f = H[y]; if (!f) continue;
+      lines.push(metaLine({ year: y, date: f[0], asOf: f[0], divs: { length: f[1] }, booth: { n: f[2] } }, null));
+    }
+    if (ch) for (const y of SEN_YEARS) {
+      const f = SENY[y] ? [SENY[y].asOf, SENY[y].divs.length] : SN[y]; if (!f) continue;
+      lines.push(metaLine(M(), { year: y, asOf: f[0], divs: { length: f[1] } }));
+    }
+    eb.style.minHeight = "";
+    let h = 0;
+    for (const t of lines) { meta.textContent = t; h = Math.max(h, eb.getBoundingClientRect().height); }
+    meta.textContent = keep;
+    ebHeights.set(at, Math.ceil(h - 0.01));
+  }
+  eb.style.minHeight = ebHeights.get(at) + "px";
+}
+addEventListener("resize", holdEyebrow);
 
 /* =============================== the frame =============================== */
 let raf = 0;
@@ -893,7 +925,7 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
@@ -905,8 +937,8 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
-  window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },

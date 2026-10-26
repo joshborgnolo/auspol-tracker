@@ -244,16 +244,25 @@ function swipeWatch(el, onSwipe, want) {
    keeps the block the reader touched where it was on screen, and whatever
    changes above it gives way. The gesture names the spot (walkAim: the lens
    row, the map, its key, the timeline, or a story block); the render that
-   follows holds it (walkHold: measured just before the DOM changes, put back
-   with one scrollBy straight after, in the same task so before any paint);
-   then for a moment a ResizeObserver catches the late reflows — the story's
-   charts hydrate a frame on — before they paint. A scroll by the reader in
-   that moment folds into the target, and a jump of a screen or more ends the
-   hold. The story is rewritten on every walk, so its blocks are found again
+   follows holds it (walkHold). All polls' lessons on an iPhone, where a
+   scroll the page issues mid-gesture paints late or is lost to the finger's
+   fling: nothing above the held block may reflow while the gesture lasts,
+   and the page makes at most ONE correction, once the reader is still.
+   So the story's new blocks above the touched one go into a holder at the
+   old blocks' height (.st-hold: the new words bottom-aligned against the
+   touched block, any surplus or shortfall at its far top end, off screen as
+   a rule), and the holder is let go when no finger is down and the page has
+   stopped scrolling, with one scrollBy of exactly what the release moves
+   (measured across it, never against the stale spot: a reader who scrolled
+   away is not pulled back). A walk while the holder stands re-measures what
+   the reader sees and re-holds, so a run of swipes costs one correction in
+   all. The story is rewritten on every walk, so its blocks are found again
    by what they are (a section by its heading), and a block the new story
-   lacks hands the hold to the next one below it. A wide screen keeps the
-   story in its own column beside a sticky figure, so the hold is the phone
-   layout's only */
+   lacks hands the hold to the next one below it. The figure's spots have
+   nothing above them that reflows on a walk (the key and the eyebrow hold
+   their heights), so their correction is a backstop that should never
+   fire. A wide screen keeps the story in its own column beside a sticky
+   figure, so the hold is the phone layout's only */
 const PHONE = matchMedia("(max-width: 860px)");
 let walkSpot = null;
 const FIXED_SPOTS = ["#lenses", "#stage", "#legend", "#time"];
@@ -266,10 +275,19 @@ function blockKey(el) {
   // a note has no identity of its own across stories
   return el.matches(".st-note") ? null : el.className || el.tagName;
 }
+// the story's blocks in order, through a standing holder
+function storyKids() {
+  const out = [];
+  for (const el of $("#story").children) {
+    if (el.classList.contains("st-hold")) out.push(...el.firstElementChild.children);
+    else out.push(el);
+  }
+  return out;
+}
 // the story's blocks with their keys, a repeated key numbered; keyless blocks are left out
 function storyBlocks() {
   const seen = new Map(), out = [];
-  for (const el of $("#story").children) {
+  for (const el of storyKids()) {
     let k = blockKey(el);
     if (!k) continue;
     const n = seen.get(k) || 0;
@@ -291,10 +309,20 @@ function walkAim(y) {
 }
 // the spot a render may hold: only a fresh one (a gesture that changed nothing leaves a stale spot behind)
 function takeSpot() { const s = walkSpot; walkSpot = null; return s && performance.now() - s.at < 1000 ? s : null; }
+// is the reader still? no finger down, no scroll for a moment
+let touchesDown = 0, lastScrollAt = 0;
+addEventListener("touchstart", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("touchend", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("touchcancel", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("scroll", () => { lastScrollAt = performance.now(); }, { passive: true });
+// where the last release left its block: the spot it aimed for, which the next walk on the same
+// block aims for again while the reader hasn't scrolled. A correction lands on whole pixels
+// (WebKit rounds -551.3 to -552), so re-measuring each walk from where the last one landed
+// walked a run of swipes away a pixel at a time
+let walkMark = null;
 let holdEnd = null;
 function walkHold(spot) {
   if (!spot || !PHONE.matches) return null;
-  if (holdEnd) holdEnd();
   let cands;
   if (spot.el) cands = [{ el: spot.el, key: null }];
   else {
@@ -303,33 +331,82 @@ function walkHold(spot) {
     cands = kids.slice(i).map(([el, key]) => ({ el, key }));
   }
   for (const c of cands) c.top = c.el.getBoundingClientRect().top;
+  const mark = walkMark;
+  if (mark && mark.y === window.scrollY && (spot.el ? mark.el === spot.el : mark.key === spot.key) && Math.abs(cands[0].top - mark.top) < 2) cands[0].top = mark.top;
+  walkMark = null;
+  // the story keeps at least its height until the release: a shorter story
+  // mid-render would let the browser pull the page up at its foot
+  const story = $("#story");
+  story.style.minHeight = story.getBoundingClientRect().height + "px";
   return {
     land() {
-      let el = null, want = 0;
+      // a standing hold is superseded, not released: the render took its holder with the old story
+      if (holdEnd) holdEnd("superseded");
+      let el = null, want = 0, mkey = null;
       for (const c of cands) {
         const hit = c.key == null ? (c.el.isConnected ? [c.el] : null) : storyBlocks().find(([, k]) => k === c.key);
-        if (hit) { el = hit[0]; want = c.top; break; }
+        if (hit) { el = hit[0]; want = c.top; mkey = c.key; break; }
       }
-      if (!el) return;
+      if (!el) { story.style.minHeight = ""; return; }
       const html = document.documentElement, anchorWas = html.style.overflowAnchor;
       // the browser's own scroll anchoring would move the page under the hold's feet
       html.style.overflowAnchor = "none";
+      let hold = null;
+      if (el.parentElement === story && el !== story.firstElementChild) {
+        // the holder: the blocks above, bottom-aligned in a box sized so the touched block stays put
+        hold = document.createElement("div");
+        hold.className = "st-hold";
+        hold.style.cssText = "position:relative;overflow:hidden;height:0";
+        const inner = document.createElement("div");
+        inner.style.cssText = "position:absolute;left:0;right:0;bottom:0";
+        hold.appendChild(inner);
+        story.insertBefore(hold, story.firstChild);
+        while (hold.nextSibling !== el) inner.appendChild(hold.nextSibling);
+        hold.style.height = Math.max(0, want - el.getBoundingClientRect().top) + "px";
+      }
       let lastY = window.scrollY, timer = 0;
+      // a backstop: anything else that moves the block while the hold stands (a reader's scroll folds in)
       const fix = () => {
-        if (!el.isConnected) return end();
-        const dy = window.scrollY - lastY;
-        if (Math.abs(dy) > window.innerHeight) return end();
-        want -= dy;
+        if (!el.isConnected) return end(false);
+        want -= window.scrollY - lastY;
         const drift = el.getBoundingClientRect().top - want;
         if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
         lastY = window.scrollY;
       };
       const ro = new ResizeObserver(fix);
-      const end = () => { if (holdEnd !== end) return; holdEnd = null; ro.disconnect(); clearTimeout(timer); html.style.overflowAnchor = anchorWas; };
+      // the release: the holder's blocks back in the story, its floor off, and the
+      // one correction that needs, measured across it
+      const end = (release) => {
+        if (holdEnd !== end) return;
+        holdEnd = null; ro.disconnect(); clearTimeout(timer);
+        html.style.overflowAnchor = anchorWas;
+        // superseded, the new hold owns the floor; let go any other way (a render that isn't a walk), the floor goes
+        if (release !== true) { if (release !== "superseded") story.style.minHeight = ""; return; }
+        if (!el.isConnected) { story.style.minHeight = ""; return; }
+        // the target is where the block stands now, the reader's own scroll and all - unless it
+        // stands within a pixel of the spot the hold aimed for, the rounding of an earlier correction
+        const was = el.getBoundingClientRect().top, aim = window.scrollY === lastY && Math.abs(was - want) < 1 ? want : was;
+        if (hold && hold.isConnected) {
+          const inner = hold.firstElementChild;
+          while (inner.firstChild) story.insertBefore(inner.firstChild, hold);
+          hold.remove();
+        }
+        story.style.minHeight = "";
+        // whole pixels, rounded here: left to the browser, WebKit floors them
+        const shift = Math.round(el.getBoundingClientRect().top - aim);
+        if (shift) window.scrollBy(0, shift);
+        walkMark = { el: mkey == null ? el : null, key: mkey, top: aim, y: window.scrollY };
+      };
       holdEnd = end;
+      const t0 = performance.now();
+      const settle = () => {
+        const now = performance.now();
+        if (touchesDown || now - t0 < 400 || now - lastScrollAt < 200) { timer = setTimeout(settle, 100); return; }
+        end(true);
+      };
       fix();
       for (const sel of [".mp-sec > .rd-eyebrow", "#view", "#story"]) { const o = $(sel); if (o) ro.observe(o); }
-      timer = setTimeout(end, 700);
+      timer = setTimeout(settle, 400);
     },
   };
 }
@@ -3739,7 +3816,9 @@ function renderStory(force) {
   storyKey = key;
   const el = $("#story");
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
-  requestAnimationFrame(() => { paintMiniChamber(); hydrateDists(); });
+  // the charts fill in now, not a frame on: a block that grows after the
+  // story paints moves everything below it, and a walk's hold with it
+  paintMiniChamber(); hydrateDists();
 }
 
 /* =============================== filters =============================== */
@@ -4566,6 +4645,7 @@ function setView(v, quiet) {
   S.view = v;
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
   if (senate) { renderLenses(); $("#mp-meta").textContent = metaLine(); if (v === "chamber") needSenateFloor(); }
+  holdEyebrow();
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
@@ -4632,7 +4712,7 @@ async function setHouse(h) {
   chAnim = null; chLast.clear();
   houseFade = from && !reduceMotion && S.view === "chamber" ? { from, t0: performance.now(), dur: 420 } : null;
   renderLenses(); renderLegend(); renderStory(true); renderTimeline(); writeURL();
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (hold) hold.land();
   schedule();
 }
@@ -4640,7 +4720,7 @@ async function setHouse(h) {
 function needSenateFloor() {
   if (senFloor && SENY[S.year]) return;
   showLoading(true);
-  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); schedule(); loadSenates(); })
+  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); holdEyebrow(); schedule(); loadSenates(); })
     .catch(() => showLoading(true, "The Senate didn’t load. Try again."));
 }
 function lensParamChanged() {
@@ -4700,16 +4780,47 @@ async function setYear(y) {
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
   renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
   schedule();
 }
-function metaLine() {
-  const m = M(); if (!m) return "";
-  if (senOn()) return SENM.year === "now" ? `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators` : `The Senate from ${longDate(SENM.asOf)}, after the ${SENM.year} election · ${SENM.divs.length} senators`;
+function metaLine(m = M(), sen = senOn() ? SENM : null) {
+  if (!m) return "";
+  if (sen) return sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : m.year === "sa26" ? `The ${yearLabel("sa26")} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
+/* the eyebrow holds the height of its longest line, so a walk never moves the figure under it:
+   between 414 and 600px an election's line wraps to two and Now's fits on one, and with the page
+   at its top no scroll can take that back. Every election's line is measured, loaded or not, from
+   the facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate
+   (and back to the House at SA 2026), so only it floors on the Senate's longer lines too */
+const META_FACTS = /*@meta-facts*/{"house":{"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"sa26":["2026-03-21",47,0],"now":["2026-10-25",150,8940]},"senate":{"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76]}};
+const ebHeights = new Map();
+function holdEyebrow() {
+  const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
+  if (!w || !M()) return;
+  const ch = S.view === "chamber", at = `${w}|${ch}`;
+  if (!ebHeights.has(at)) {
+    const keep = meta.textContent, lines = [], H = META_FACTS.house || {}, SN = META_FACTS.senate || {};
+    for (const y of YEARS) {
+      if (Y[y] && Y[y].divs) { lines.push(metaLine(Y[y], null)); continue; }
+      const f = H[y]; if (!f) continue;
+      lines.push(metaLine({ year: y, date: f[0], asOf: f[0], divs: { length: f[1] }, booth: { n: f[2] } }, null));
+    }
+    if (ch) for (const y of SEN_YEARS) {
+      const f = SENY[y] ? [SENY[y].asOf, SENY[y].divs.length] : SN[y]; if (!f) continue;
+      lines.push(metaLine(M(), { year: y, asOf: f[0], divs: { length: f[1] } }));
+    }
+    eb.style.minHeight = "";
+    let h = 0;
+    for (const t of lines) { meta.textContent = t; h = Math.max(h, eb.getBoundingClientRect().height); }
+    meta.textContent = keep;
+    ebHeights.set(at, Math.ceil(h - 0.01));
+  }
+  eb.style.minHeight = ebHeights.get(at) + "px";
+}
+addEventListener("resize", holdEyebrow);
 
 /* =============================== the frame =============================== */
 let raf = 0;
@@ -4977,7 +5088,7 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
-  $("#mp-meta").textContent = metaLine();
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   recolor(false);
   resize();
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
@@ -4989,8 +5100,8 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
-  window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },

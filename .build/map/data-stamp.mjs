@@ -29,3 +29,32 @@ export function stampData(js, stamps) {
   if (!js.includes(TOKEN)) throw new Error(`map.js has no ${TOKEN} to stamp (app-1-base.js)`);
   return js.replace(TOKEN, `/*@data-stamps*/${JSON.stringify(stamps)}`);
 }
+
+/* each election's and each Senate's eyebrow facts (the date, seats and polling places the meta
+   line names), stamped into map.js the same way: the eyebrow holds the height of its longest line
+   (holdEyebrow, app-6-ui.js) before the reader has loaded any election but the first, and a
+   stand-in line can only guess — too long, the floor leaves a blank line for good; too short, a
+   walk still moves the map */
+export const META_TOKEN = "/*@meta-facts*/{}";
+export function metaFacts(root) {
+  const read = (f) => { try { return JSON.parse(fs.readFileSync(path.join(root, "map/data", f), "utf8")); } catch { return null; } };
+  const house = {}, senate = {};
+  for (const f of fs.readdirSync(path.join(root, "map/data")).sort()) {
+    let m = f.match(/^res-(\w+)\.json$/);
+    if (m) {
+      const r = read(f);
+      if (r) house[m[1]] = [r.date, r.divs.length, r.booths ? r.booths.n.length : 0];
+      continue;
+    }
+    m = f.match(/^senate-(\d{4}|now)\.json$/);
+    if (m) { const r = read(f); if (r) senate[m[1]] = [r.asOf, r.senators.length]; }
+  }
+  const now = read("data-now.json");
+  // Now is the 2025 House with its changes since
+  if (now && house["2025"]) house.now = [now.asOf, house["2025"][1], house["2025"][2]];
+  return { house, senate };
+}
+export function stampMeta(js, facts) {
+  if (!js.includes(META_TOKEN)) throw new Error(`map.js has no ${META_TOKEN} to stamp (app-6-ui.js)`);
+  return js.replace(META_TOKEN, `/*@meta-facts*/${JSON.stringify(facts)}`);
+}

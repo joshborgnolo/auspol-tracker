@@ -26,7 +26,7 @@ button { cursor: pointer; background: none; border: 0; }
 /* ------- the section anatomy (rd.css, ported) ------- */
 .mp { flex: 1 0 auto; }
 .mp-sec { padding-top: 30px; padding-bottom: 40px; }
-.rd-eyebrow { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-3); }
+.rd-eyebrow { display: flex; align-items: baseline; align-content: flex-start; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-3); }
 .rd-title { font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: var(--ink); }
 .rd-meta { font-size: 13px; color: var(--ink-3); }
 .rd-grow { flex: 1 1 auto; }

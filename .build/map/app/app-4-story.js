@@ -661,5 +661,7 @@ function renderStory(force) {
   storyKey = key;
   const el = $("#story");
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
-  requestAnimationFrame(() => { paintMiniChamber(); hydrateDists(); });
+  // the charts fill in now, not a frame on: a block that grows after the
+  // story paints moves everything below it, and a walk's hold with it
+  paintMiniChamber(); hydrateDists();
 }

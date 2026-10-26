@@ -1,6 +1,6 @@
 ---
 name: auspol-map-year-swipe
-description: "auspol-tracker — the /map/ year/lens WALK machinery (desktop arrow keys, phone swipes) end-to-end: walkYear/walkLens + swipeWatch (with start-target `want` predicate) in app-1-base.js, the year-swipe listener bound to the WHOLE .mp-fig figure — canvas, overlays, election timeline, story — with the native-control exclusion (widened from canvas-only in c28e1b65, 2026-10-26), the keyboard lensHover switch in app-6-ui.js plus the phone lens-ROW SCROLL (81d233eb, 2026-10-26: overflow-x:auto at all widths, the All-polls-menubar way; the old lens-row swipe-to-cycle double-fired the walk), the FIXED-VIEW WALK hold (2026-10-26, superseding 15a48d60's 'no compensation possible' verdict: on the ≤860px layout walkAim names the touched block — lens row, stage, legend, timeline or a story block keyed by its heading — and walkHold measures it before the render, scrollBys it back in the same task, then a 700ms ResizeObserver catches the hydrateDists reflow pre-paint; walkLens still reveals chips horizontally in-row, never scrollIntoView), and the headless touch-probe traps: scrollIntoView + re-fetch centres before EVERY dispatch (off-viewport coordinates send NO touch events and negative assertions pass vacuously), elementFromPoint-verify exclusion spots."
+description: "auspol-tracker — the /map/ year/lens WALK machinery (desktop arrow keys, phone swipes) end-to-end: walkYear/walkLens + swipeWatch (with start-target `want` predicate) in app-1-base.js, the year-swipe listener bound to the WHOLE .mp-fig figure — canvas, overlays, election timeline, story — with the native-control exclusion (widened from canvas-only in c28e1b65, 2026-10-26), the keyboard lensHover switch in app-6-ui.js plus the phone lens-ROW SCROLL (81d233eb, 2026-10-26: overflow-x:auto at all widths, the All-polls-menubar way; the old lens-row swipe-to-cycle double-fired the walk), the FIXED-VIEW WALK hold (2026-10-26, superseding 15a48d60's 'no compensation possible' verdict: on the ≤860px layout walkAim names the touched block — lens row, stage, legend, timeline or a story block keyed by its heading — and walkHold measures it before the render, scrollBys it back in the same task, then (round two) the blocks above sit in a .st-hold freeze released once when the reader is still, the story floored, corrections whole-pixel and non-cumulative via walkMark; walkLens still reveals chips horizontally in-row, never scrollIntoView), and the headless touch-probe traps: scrollIntoView + re-fetch centres before EVERY dispatch (off-viewport coordinates send NO touch events and negative assertions pass vacuously), elementFromPoint-verify exclusion spots."
 source: auto-skill
 extracted_at: '2026-10-26T11:30:00.000Z'
 ---
@@ -130,6 +130,82 @@ scroll 150px mid-hold lands exactly 150px on. Probe traps: pass setup
 functions as source and INVOKE them (`(${src})()`); stop each run's rAF
 recorder (old loops pushed into the next run's trace — fake alternating
 0/612px traces); a repeat tap on the selected year changes nothing.
+
+## Round two (2026-10-26): the freeze/thaw hold — All polls' iPhone lessons applied
+
+User, on db766f5d: "Swiping on my phone produces some upward drift … it's
+happened before, for example in the all polls table, but you fixed it. fix
+it here too, applying the lessons of that fix." db766f5d HELD in headless
+Chrome by NET position — which the rdPinScroll skill warns is not evidence:
+the correction STREAM is. Its stream, per story swipe: a sync −282px then
+a +259px RO correction a frame later (renderStory hydrated the "Across the
+seats" chart in a rAF, so the story painted 259px short for a frame), i.e.
+two big opposing scrolls in the gesture, the iPhone failure class (a
+page-issued scroll mid-gesture paints late or is lost to the fling).
+Fixes, each an All-polls lesson:
+
+1. **Kill the reflow** — renderStory now paints the mini chamber and
+   hydrates the dist charts in the same task (was rAF). No block changes
+   height after the story paints.
+2. **Freeze, then thaw once** — land() moves the NEW blocks above the
+   touched block into `.st-hold` (height = old above-height, overflow
+   hidden, an absolutely-positioned inner pinned `bottom:0`, so the new
+   words sit bottom-aligned against the touched block and any surplus or
+   shortfall is at the far top end). Zero page scrolls during the gesture.
+   Release (`settle`) waits for no finger down (capture touch listeners,
+   `touchesDown`), no scroll for 200ms, ≥400ms after land; then unwraps
+   and makes ONE `scrollBy` measured ACROSS the unwrap (teleporter lesson:
+   never against a stale spot). A walk while the holder stands supersedes
+   it without releasing (`end("superseded")`) — a run of swipes costs one
+   correction in all.
+3. **Hold the slot** — walkHold (before the render) floors `#story`'s
+   min-height at its current height until release: near the page foot a
+   momentarily shorter story let the BROWSER clamp scrollY (probe showed
+   "reader −715" with zero app scrolls). Superseding must not clear the
+   new hold's floor (bug found: it did).
+4. **Nothing cumulative** — WebKit floors scrollBy deltas (−551.3 →
+   −552), and each walk re-measured from the rounded landing: 0.5–0.8px
+   per swipe, 4–5px over a ten-year tour in Playwright WebKit (Chrome
+   held 0) — the "drift". Now the release rounds itself (`Math.round`,
+   ≤0.5px) and leaves `walkMark` {block, aimed top, scrollY}; the next walk
+   on the same block with scrollY unchanged aims for the mark, and the
+   release aims for `want` when the block stands within 1px of it.
+
+5. **Floor the eyebrow** (the map-at-top drift, iPhone Plus/Pro Max
+   widths) — at 414–600px an election's `#mp-meta` line wraps to two and
+   Now's fits on one: swiping the map at scrollY 0 moved it ±19px (34 at
+   600), and at the page top no scroll can take a shrink back. holdEyebrow
+   (app-6-ui.js, called wherever the meta changes, on resize and on
+   fonts.ready) floors `.mp-sec > .rd-eyebrow` at its tallest line, keyed
+   by width × view: the map view on every year's House line, the chamber
+   view also on every federal election's Senate line (a chamber walk can
+   cross Senate→House at SA 2026). `align-content: flex-start` keeps the
+   surplus at the bottom. Lines for years not yet loaded come from
+   `META_FACTS`, stamped by assemble.mjs (data-stamp.mjs `metaFacts`: each
+   res-*.json's date/seats/booth count, Now = data-now asOf + 2025's,
+   each senate-*.json's asOf/size) — stand-in lines failed both ways
+   ("8,888 polling places" for SA26's real 0 wrapped a third line at
+   320px and a ratcheting floor kept the blank for good). test-map-page
+   pins the stamp and a fact for every YEARS entry. Probe:
+   `.matilda/map-eyebrow-floor-probe.mjs` — stage/timeline tops across
+   every year in the map view and the Senate chamber, 320–860px, boot =
+   loaded.
+
+Probe: `.matilda/map-walk-tour-probe.mjs` (uncommitted scratch;
+`MAP_ROOT=<tree> ENGINE=chrome|webkit W=… [GAP=300] [ONLY=re] [V=1]`):
+ten consecutive swipes per surface (map at top, map half off, timeline,
+story head, 2PP, Primary, Closest seats — keyed, present every year)
+without re-placing; prints per swipe the net drift (net of the reader's
+own scroll), the painted-frame worst (sampler RO re-armed after each
+gesture so it reads painted frames), and every page scroll with its
+caller (`@settle` = the release). Acceptance: cumulative ≤3, worst ≤2,
+and no scroll attributed to anything but the release. GAP=300 (rapid
+swipes) must show ZERO scrolls until the run ends. WebKit can't build
+synthetic Touches ("Illegal constructor"), so it drives `__map.walk(dir,
+y)` (walkAim + walkYear, the swipe's own path). Probe traps: swipes are
+dropped while the map camera flies (sa26 reframes the projection) — the
+probe waits for `T.k <= HOME.k*1.001`; puppeteer's waitForFunction is
+(fn, opts, arg), Playwright's (fn, arg, opts).
 
 ## Headless probe — `.matilda/map-keys-swipe-probe.mjs`
 

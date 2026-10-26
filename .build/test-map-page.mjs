@@ -16,7 +16,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { SHELL_PAGES, shellHeader, shellCss, shellJs } from "./site-shell.mjs";
-import { dataStamps, stampData } from "./map/data-stamp.mjs";
+import { dataStamps, stampData, metaFacts, stampMeta } from "./map/data-stamp.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
@@ -73,7 +73,16 @@ assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads ma
 const part = (f) => R(".build/map/app/" + f);
 const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
-assert.equal(R("map/map.js"), stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
+assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
+// the eyebrow's floor measures every election's real meta line from the facts stamped in (data-stamp.mjs);
+// a year the stamp lacks would be left out of the floor, and walking to it would move the map
+{
+  const F = metaFacts(ROOT), years = (js.match(/const YEARS = \[([^\]]*)\]/) || [, ""])[1].split(",").map((t) => t.trim().replace(/"/g, "")).filter(Boolean);
+  assert.ok(years.length >= 10, "YEARS read from app-1-base.js");
+  for (const y of years) assert.ok(F.house[y] && F.house[y][0] && F.house[y][1] > 0, `meta facts: the House line for ${y}`);
+  for (const y of years.filter((y) => y !== "sa26")) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the Senate line for ${y}`);
+  assert.ok(js.includes("const META_FACTS = /*@meta-facts*/{};"), "holdEyebrow reads the stamped meta facts");
+}
 assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
 for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {

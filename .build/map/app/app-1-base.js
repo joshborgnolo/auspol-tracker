@@ -242,16 +242,25 @@ function swipeWatch(el, onSwipe, want) {
    keeps the block the reader touched where it was on screen, and whatever
    changes above it gives way. The gesture names the spot (walkAim: the lens
    row, the map, its key, the timeline, or a story block); the render that
-   follows holds it (walkHold: measured just before the DOM changes, put back
-   with one scrollBy straight after, in the same task so before any paint);
-   then for a moment a ResizeObserver catches the late reflows — the story's
-   charts hydrate a frame on — before they paint. A scroll by the reader in
-   that moment folds into the target, and a jump of a screen or more ends the
-   hold. The story is rewritten on every walk, so its blocks are found again
+   follows holds it (walkHold). All polls' lessons on an iPhone, where a
+   scroll the page issues mid-gesture paints late or is lost to the finger's
+   fling: nothing above the held block may reflow while the gesture lasts,
+   and the page makes at most ONE correction, once the reader is still.
+   So the story's new blocks above the touched one go into a holder at the
+   old blocks' height (.st-hold: the new words bottom-aligned against the
+   touched block, any surplus or shortfall at its far top end, off screen as
+   a rule), and the holder is let go when no finger is down and the page has
+   stopped scrolling, with one scrollBy of exactly what the release moves
+   (measured across it, never against the stale spot: a reader who scrolled
+   away is not pulled back). A walk while the holder stands re-measures what
+   the reader sees and re-holds, so a run of swipes costs one correction in
+   all. The story is rewritten on every walk, so its blocks are found again
    by what they are (a section by its heading), and a block the new story
-   lacks hands the hold to the next one below it. A wide screen keeps the
-   story in its own column beside a sticky figure, so the hold is the phone
-   layout's only */
+   lacks hands the hold to the next one below it. The figure's spots have
+   nothing above them that reflows on a walk (the key and the eyebrow hold
+   their heights), so their correction is a backstop that should never
+   fire. A wide screen keeps the story in its own column beside a sticky
+   figure, so the hold is the phone layout's only */
 const PHONE = matchMedia("(max-width: 860px)");
 let walkSpot = null;
 const FIXED_SPOTS = ["#lenses", "#stage", "#legend", "#time"];
@@ -264,10 +273,19 @@ function blockKey(el) {
   // a note has no identity of its own across stories
   return el.matches(".st-note") ? null : el.className || el.tagName;
 }
+// the story's blocks in order, through a standing holder
+function storyKids() {
+  const out = [];
+  for (const el of $("#story").children) {
+    if (el.classList.contains("st-hold")) out.push(...el.firstElementChild.children);
+    else out.push(el);
+  }
+  return out;
+}
 // the story's blocks with their keys, a repeated key numbered; keyless blocks are left out
 function storyBlocks() {
   const seen = new Map(), out = [];
-  for (const el of $("#story").children) {
+  for (const el of storyKids()) {
     let k = blockKey(el);
     if (!k) continue;
     const n = seen.get(k) || 0;
@@ -289,10 +307,20 @@ function walkAim(y) {
 }
 // the spot a render may hold: only a fresh one (a gesture that changed nothing leaves a stale spot behind)
 function takeSpot() { const s = walkSpot; walkSpot = null; return s && performance.now() - s.at < 1000 ? s : null; }
+// is the reader still? no finger down, no scroll for a moment
+let touchesDown = 0, lastScrollAt = 0;
+addEventListener("touchstart", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("touchend", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("touchcancel", (e) => { touchesDown = e.touches.length; }, { passive: true, capture: true });
+addEventListener("scroll", () => { lastScrollAt = performance.now(); }, { passive: true });
+// where the last release left its block: the spot it aimed for, which the next walk on the same
+// block aims for again while the reader hasn't scrolled. A correction lands on whole pixels
+// (WebKit rounds -551.3 to -552), so re-measuring each walk from where the last one landed
+// walked a run of swipes away a pixel at a time
+let walkMark = null;
 let holdEnd = null;
 function walkHold(spot) {
   if (!spot || !PHONE.matches) return null;
-  if (holdEnd) holdEnd();
   let cands;
   if (spot.el) cands = [{ el: spot.el, key: null }];
   else {
@@ -301,33 +329,82 @@ function walkHold(spot) {
     cands = kids.slice(i).map(([el, key]) => ({ el, key }));
   }
   for (const c of cands) c.top = c.el.getBoundingClientRect().top;
+  const mark = walkMark;
+  if (mark && mark.y === window.scrollY && (spot.el ? mark.el === spot.el : mark.key === spot.key) && Math.abs(cands[0].top - mark.top) < 2) cands[0].top = mark.top;
+  walkMark = null;
+  // the story keeps at least its height until the release: a shorter story
+  // mid-render would let the browser pull the page up at its foot
+  const story = $("#story");
+  story.style.minHeight = story.getBoundingClientRect().height + "px";
   return {
     land() {
-      let el = null, want = 0;
+      // a standing hold is superseded, not released: the render took its holder with the old story
+      if (holdEnd) holdEnd("superseded");
+      let el = null, want = 0, mkey = null;
       for (const c of cands) {
         const hit = c.key == null ? (c.el.isConnected ? [c.el] : null) : storyBlocks().find(([, k]) => k === c.key);
-        if (hit) { el = hit[0]; want = c.top; break; }
+        if (hit) { el = hit[0]; want = c.top; mkey = c.key; break; }
       }
-      if (!el) return;
+      if (!el) { story.style.minHeight = ""; return; }
       const html = document.documentElement, anchorWas = html.style.overflowAnchor;
       // the browser's own scroll anchoring would move the page under the hold's feet
       html.style.overflowAnchor = "none";
+      let hold = null;
+      if (el.parentElement === story && el !== story.firstElementChild) {
+        // the holder: the blocks above, bottom-aligned in a box sized so the touched block stays put
+        hold = document.createElement("div");
+        hold.className = "st-hold";
+        hold.style.cssText = "position:relative;overflow:hidden;height:0";
+        const inner = document.createElement("div");
+        inner.style.cssText = "position:absolute;left:0;right:0;bottom:0";
+        hold.appendChild(inner);
+        story.insertBefore(hold, story.firstChild);
+        while (hold.nextSibling !== el) inner.appendChild(hold.nextSibling);
+        hold.style.height = Math.max(0, want - el.getBoundingClientRect().top) + "px";
+      }
       let lastY = window.scrollY, timer = 0;
+      // a backstop: anything else that moves the block while the hold stands (a reader's scroll folds in)
       const fix = () => {
-        if (!el.isConnected) return end();
-        const dy = window.scrollY - lastY;
-        if (Math.abs(dy) > window.innerHeight) return end();
-        want -= dy;
+        if (!el.isConnected) return end(false);
+        want -= window.scrollY - lastY;
         const drift = el.getBoundingClientRect().top - want;
         if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
         lastY = window.scrollY;
       };
       const ro = new ResizeObserver(fix);
-      const end = () => { if (holdEnd !== end) return; holdEnd = null; ro.disconnect(); clearTimeout(timer); html.style.overflowAnchor = anchorWas; };
+      // the release: the holder's blocks back in the story, its floor off, and the
+      // one correction that needs, measured across it
+      const end = (release) => {
+        if (holdEnd !== end) return;
+        holdEnd = null; ro.disconnect(); clearTimeout(timer);
+        html.style.overflowAnchor = anchorWas;
+        // superseded, the new hold owns the floor; let go any other way (a render that isn't a walk), the floor goes
+        if (release !== true) { if (release !== "superseded") story.style.minHeight = ""; return; }
+        if (!el.isConnected) { story.style.minHeight = ""; return; }
+        // the target is where the block stands now, the reader's own scroll and all - unless it
+        // stands within a pixel of the spot the hold aimed for, the rounding of an earlier correction
+        const was = el.getBoundingClientRect().top, aim = window.scrollY === lastY && Math.abs(was - want) < 1 ? want : was;
+        if (hold && hold.isConnected) {
+          const inner = hold.firstElementChild;
+          while (inner.firstChild) story.insertBefore(inner.firstChild, hold);
+          hold.remove();
+        }
+        story.style.minHeight = "";
+        // whole pixels, rounded here: left to the browser, WebKit floors them
+        const shift = Math.round(el.getBoundingClientRect().top - aim);
+        if (shift) window.scrollBy(0, shift);
+        walkMark = { el: mkey == null ? el : null, key: mkey, top: aim, y: window.scrollY };
+      };
       holdEnd = end;
+      const t0 = performance.now();
+      const settle = () => {
+        const now = performance.now();
+        if (touchesDown || now - t0 < 400 || now - lastScrollAt < 200) { timer = setTimeout(settle, 100); return; }
+        end(true);
+      };
       fix();
       for (const sel of [".mp-sec > .rd-eyebrow", "#view", "#story"]) { const o = $(sel); if (o) ro.observe(o); }
-      timer = setTimeout(end, 700);
+      timer = setTimeout(settle, 400);
     },
   };
 }
