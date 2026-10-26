@@ -142,10 +142,10 @@ const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Natio
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
 const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
-const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network" };
+const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network", "Australian Democrats": "the Democrats", "Family First": "Family First", "Democratic Labour": "the DLP", "Palmer United": "Palmer United", "Motoring Enthusiast": "the Motoring Enthusiast Party", "Australian Conservatives": "the Australian Conservatives", "Progressive Alliance": "the Progressive Alliance" };
 const theParty = (ab, pn) => { const n = partyName(ab, pn); return THE[n] || n; };
 // whose: "One Nation’s preferences", "the Greens’ primary vote"
 const POSS = { alp: "Labor’s", lnp: "the Coalition’s", grn: "the Greens’", onp: "One Nation’s", ind: "independents’", oth: "other candidates’" };
@@ -356,7 +356,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa26.json":"fc9c7d0b","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa26.json":"7d6006fc","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","summary.json":"06f08fb1"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-sa26.json":"fc9c7d0b","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-sa26.json":"7d6006fc","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","summary.json":"06f08fb1"};
 const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
@@ -692,7 +692,7 @@ const lensNumeric = () => !(S.lens === "winner" || S.lens === "cls");
 /* =============================== colours per year =============================== */
 let fade = null, fadeT = 1;
 function recolor(animate) {
-  for (const m of [...Object.values(Y), SENM]) {
+  for (const m of [...Object.values(Y), ...Object.values(SENY)]) {
     if (!m || !m.divs) continue;
     if (animate && m.divCol && !reduceMotion) { m.prevDivCol = m.divCol; m.prevBoothCol = m.boothCol; }
     else { m.prevDivCol = null; m.prevBoothCol = null; }
@@ -1992,7 +1992,8 @@ function chamberOrder(m) {
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];
-  const N = m.divs.length, maj = Math.floor(N / 2) + 1;
+  // (the Senate counts its 76 seats, a vacant one among them)
+  const N = m.seatsN || m.divs.length, maj = Math.floor(N / 2) + 1;
   m._ch = { order, at, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj, plan: !!plan,
     majAt: maj - (sp && holdFam(sp.hold) === gov ? 1 : 0) };
   m._chKey = key;
@@ -2562,31 +2563,57 @@ function miniHit(px, py) {
    each a chair; a bill needs 39 votes, the President's among them (the President votes, and a tie
    fails). A senator's term is the AEC's: six years from the July after their election for a state,
    to the next election for a territory; a casual senator serves out the term of the one they
-   replaced. Only today's Senate is drawn: picking an election on the timeline returns to the House. */
+   replaced. Each election on the timeline has its Senate too (map/data/senate-<year>.json, from
+   .build/map/senate_past.py and the Parliamentary Handbook): the Senate on the day the election's
+   senators took their seats, drawn on the same floor (the chamber's since 1988) and sorted, there
+   being no seating plan filed for them. */
 const SEN_LENSES = [
   { id: "party", label: "Party" },
   { id: "term", label: "Next election" },
 ];
 const SU = 38.4; // the plan's units to a chamber unit: the Senate's floor is as wide as the House's
+// each year's Senate, and the one the timeline is on (SENM)
+const SENY = {}, SENP = {};
 let SENM = null, senFloor = null, senFloorP = null;
 const senOn = () => S.view === "chamber" && S.house === "senate" && !!SENM;
+const syncSenate = () => { SENM = SENY[S.year] || null; };
 // the model the chamber view draws: the House's year, or the Senate
 const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && senFloor ? SENM : null) : M());
-function senateModel(raw) {
-  const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab), fam: FAM(x.ab) } }));
+const SEN_SEATS = 76;
+// the federal elections: a state election on the timeline (SA 2026) chooses no Senate; the Senate then sitting
+// is the last federal election's
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now");
+const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
+function senateModel(raw, year) {
+  const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
+  // the term the election's own senators serve to: those not serving it are up at the next election
+  const later = raw.later || Math.max(...raw.senators.map((x) => (typeof x.term === "number" ? x.term : 0)));
+  const k = SEN_YEARS.indexOf(year);
+  // the 2016 double dissolution (9 May 2016) put every seat to the voters: a Senate whose next election it was
+  // had all 76 up, those due to sit to 2017 or 2020 among them
+  const nextDD = SEN_YEARS[k + 1] === 2016;
+  for (const d of divs) { d.due = d.sen.term !== later; d.up = nextDD || d.due; }
   const role = (r) => divs.findIndex((d) => d.sen.role === r);
   return {
-    house: "senate", year: "now", asOf: raw.asOf, floor: raw.floor, divs, byName: new Map(divs.map((d) => [d.n, d.i])),
-    speaker: role("president"), leaders: [role("leader"), role("oppLeader")], gov: "alp",
-    seating: { plan: longDate(raw.asOf), at: Object.fromEntries(divs.map((d) => [d.n, d.sen.seat])) },
+    house: "senate", year, asOf: raw.asOf, floor: raw.floor, divs, byName: new Map(divs.map((d) => [d.n, d.i])), seatsN: SEN_SEATS,
+    speaker: role("president"), leaders: [role("leader"), role("oppLeader")], gov: GOV[year], later, dd: !!raw.dd, nextDD, vacant: raw.vacant || [],
+    // the election after this one, by name ("the 2007 election"), where there has been one
+    nextYear: year !== "now" && SEN_YEARS[k + 1] !== "now" ? SEN_YEARS[k + 1] : null,
+    seating: raw.senators[0] && raw.senators[0].seat ? { plan: longDate(raw.asOf), at: Object.fromEntries(divs.map((d) => [d.n, d.sen.seat])) } : null,
   };
 }
-function loadSenate() {
-  if (SENM) return Promise.resolve(SENM);
-  return getJSON("/map/data/senate-now.json").then((raw) => { SENM = senateModel(raw); recolor(false); return SENM; });
+function loadSenate(year = S.year) {
+  if (SENY[year]) return Promise.resolve(SENY[year]);
+  return (SENP[year] ??= getJSON(`/map/data/senate-${year}.json`).then((raw) => { SENY[year] = senateModel(raw, year); syncSenate(); recolor(false); return SENY[year]; })
+    .catch((e) => { delete SENP[year]; throw e; }));
 }
+// every election's Senate, for the timeline's make-up glyphs (about 7KB each)
+function loadSenates() {
+  return Promise.all(SEN_YEARS.map((y) => loadSenate(y).catch(() => null))).then(() => renderTimeline());
+}
+// the floor is today's plan's, the chamber the same since 1988
 function loadSenateFloor() {
-  return (senFloorP ??= loadSenate().then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
+  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
 }
 
 /* ----- the floor ----- */
@@ -2719,7 +2746,7 @@ function drawSenateFurniture(g, F, geom, opts = {}) {
 }
 
 /* ----- the lenses: party, and who faces the voters next ----- */
-const upNext = (d) => d.sen.term !== 2031;
+const upNext = (d) => d.up;
 const SEN_STAY = (th) => (th.dark ? lch(0.45, 0.008, 66) : lch(0.83, 0.006, 75));
 function senateColor(m, d) {
   const c = TH.party[holdFam(d.hold)];
@@ -2727,7 +2754,7 @@ function senateColor(m, d) {
   return c;
 }
 // the sorted chamber's order within a bloc: by party, then (on the term lens) those up next first, then by state
-const SEN_PARTY_ORDER = ["ALP", "LP", "LNP", "NP", "CLP", "GRN", "IND", "JLN", "AV", "UAPP", "ON"];
+const SEN_PARTY_ORDER = ["ALP", "LP", "LNP", "NP", "CLP", "GRN", "AD", "XEN", "CA", "FFP", "DLP", "PUP", "LDP", "AMEP", "DHJP", "AC", "IND", "JLN", "AV", "UAPP", "KAP", "APA", "ON"];
 function senateKey(m, d, bloc) {
   const p = SEN_PARTY_ORDER.indexOf(d.hold.ab), st = STATES.indexOf(d.st);
   const term = S.senLens === "term" ? (upNext(d) ? 0 : 1) : 0;
@@ -2748,13 +2775,34 @@ function senCross(m) {
   for (const d of m.divs) {
     const f = holdFam(d.hold); if (f === "alp" || f === "lnp") continue;
     const k = f === "ind" ? "IND" : d.hold.ab;
-    if (!by.has(k)) by.set(k, { k, fam: f, n: 0, names: [] });
+    if (!by.has(k)) by.set(k, { k, fam: f, n: 0, names: [], pn: d.hold.pn });
     const g = by.get(k); g.n++; g.names.push(d.n);
   }
   return [...by.values()].sort((a, b) => b.n - a.n || a.k.localeCompare(b.k));
 }
-const crossName = (g) => (g.k === "IND" ? (g.n === 1 ? "an independent" : "independents") : g.k === "GRN" ? "the Greens" : g.k === "JLN" ? "the Jacqui Lambie Network" : partyName(g.k));
-const crossPoss = (g) => (g.k === "IND" ? `the ${words(g.n)} independents’` : g.k === "GRN" ? "the Greens’" : g.k === "JLN" ? "the Lambie Network’s" : `${partyName(g.k)}’s`);
+// (a party by its name of the day: 2016's Nick Xenophon Team, 2019's Centre Alliance)
+const crossName = (g) => (g.k === "IND" ? (g.n === 1 ? "an independent" : "independents") : g.k === "GRN" ? "the Greens" : g.k === "JLN" ? "the Jacqui Lambie Network" : theParty(g.k, g.pn));
+const crossPoss = (g) => (g.k === "IND" ? `the ${words(g.n)} independents’` : g.k === "GRN" ? "the Greens’" : g.k === "JLN" ? "the Lambie Network’s" : `${theParty(g.k, g.pn)}’s`);
+
+/* ----- the copy's tense and terms: today's Senate in the present; an election's in the past, but for
+   what was still to come (its next election, a term not yet run) ----- */
+const senNow = (m) => m.year === "now";
+const tv = (m, now, past) => (senNow(m) ? now : past);
+// the election a Senate's up-next half faced: "the 2007 election", or for today's and 2025's, "the next election"
+const nextEl = (m) => (m.nextYear ? `the ${m.nextYear} election` : "the next election");
+const nv = (m, still, done) => (m.nextYear ? done : still); // a verb about the next election: still to come, or past
+const termWords = (m, d) => (d.sen.term === "next" ? nextEl(m) : `30 June ${d.sen.term}`);
+const TERRITORIES = new Set(["ACT", "NT"]);
+// the election the up-next half of the states was chosen at (2016's short-term half at the double dissolution)
+function upClass(m) {
+  const c = {};
+  for (const d of m.divs) if (d.up && !TERRITORIES.has(d.st) && d.sen.elected) c[d.sen.elected] = (c[d.sen.elected] || 0) + 1;
+  const y = Object.keys(c).sort((a, b) => c[b] - c[a])[0];
+  return y ? +y : null;
+}
+const upClassWords = (m) => (upClass(m) === 2016 && m.year !== 2016 ? "each state’s six elected last in 2016" : m.dd ? "each state’s six elected last" : `each state’s six elected in ${upClass(m)}`);
+// the election that chose a Senate's own new half
+const ownElection = (m) => (senNow(m) ? 2025 : m.year);
 
 /* ----- the key ----- */
 function houseSwitchHTML() {
@@ -2765,20 +2813,20 @@ function senateLegendHTML(m) {
   let h = houseSwitchHTML();
   if (S.senLens === "term") {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
-    h += `<div class="lg-t">Who faces the voters at the next election</div>`;
-    h += `${cats(up, SEN_FAMS)}<span><i style="background:${css(SEN_STAY(TH))}"></i>Sits until 2031 <b>${stay}</b></span></div>`;
-    h += `<div class="lg-note">Each state elects half its 12 senators at a time; the territories’ four are elected every time.</div>`;
+    h += `<div class="lg-t">${nv(m, "Who faces", "Who faced")} the voters at ${nextEl(m)}</div>`;
+    h += `${cats(up, SEN_FAMS)}${stay ? `<span><i style="background:${css(SEN_STAY(TH))}"></i>Term to ${m.later} <b>${stay}</b></span>` : ""}</div>`;
+    h += `<div class="lg-note">${m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
   } else {
-    h += `<div class="lg-t">Who sits in the Senate today</div>`;
+    h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : `The Senate after the ${m.year} election`}</div>`;
     h += `${cats(senCounts(m), SEN_FAMS)}</div>`;
   }
   const md = seatMode(m);
-  h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s Senate seating plan of ${m.seating.plan}.` : `By ${S.senLens === "term" ? "who is up next, then party" : "party"}, each side from the President’s end.`}</span></div>`;
+  if (m.seating) h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s Senate seating plan of ${m.seating.plan}.` : `By ${S.senLens === "term" ? "who is up next, then party" : "party"}, each side from the President’s end.`}</span></div>`;
+  else h += `<div class="lg-note">Sorted by ${S.senLens === "term" ? "who was up next, then party" : "party"}, each side from the President’s end; no seating plan is filed for this Senate.</div>`;
   return h;
 }
 
 /* ----- the story ----- */
-const TERM_END = { 2028: "30 June 2028", 2031: "30 June 2031" };
 function senUpLink() {
   const s = S.ssel; if (s.level === "aus") return "";
   const label = s.level === "state" ? "The Senate" : STATE_TITLE[s.st];
@@ -2791,35 +2839,45 @@ function senHead(title, meta, hed, dek) {
 /* the balance of power, in rules: how many votes the government is short of the 39, which crossbench
    groups could supply them alone, and what it would take without them */
 function senBalance(m) {
-  const N = m.divs.length, maj = Math.floor(N / 2) + 1, cnt = senCounts(m);
+  const N = m.seatsN, maj = Math.floor(N / 2) + 1, cnt = senCounts(m);
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp", G = cnt[gov] || 0, O = cnt[opp] || 0;
-  const cross = senCross(m), C = N - G - O, need = maj - G;
+  const cross = senCross(m), C = m.divs.length - G - O, need = maj - G;
   const enough = cross.filter((g) => g.n >= need);
   return { N, maj, G, O, C, need, cross, enough, gov, opp };
 }
 function senHedDek(m) {
-  const b = senBalance(m), GN = blocName(m, b.gov), ON = blocName(m, b.opp), oppThe = b.opp === "lnp" ? "the Coalition" : "Labor";
+  // the government as a sentence opens with it ("The Coalition held …")
+  const b = senBalance(m), GN = b.gov === "lnp" ? "The Coalition" : "Labor", oppThe = b.opp === "lnp" ? "the Coalition" : "Labor";
   const pres = m.divs[m.speaker], presOwn = holdFam(pres.hold) === b.gov;
-  const holds = `${GN} holds ${b.G} of the ${b.N} seats${presOwn ? ", the President’s among them" : ""}`;
-  if (b.need <= 0) return { hed: `${GN} holds a majority in the Senate`, dek: `${holds}, ${b.G - b.maj + 1 > 1 ? `${words(b.G - b.maj + 1)} more than` : "one more than"} the ${b.maj} a bill needs. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
-  const short = `${words(b.need)} short of the ${b.maj} votes a bill needs`;
+  const has = tv(m, "holds", "held"), needs = tv(m, "needs", "needed"), opposes = tv(m, "opposes", "opposed");
+  const holds = `${GN} ${has} ${b.G} of the ${b.N} seats${presOwn ? ", the President’s among them" : ""}`;
+  const tail = `${cap(oppThe)} ${has} ${b.O}`;
+  const vacant = m.vacant.length ? ` ${cap(words(m.vacant.length))} ${STATE_NAME[m.vacant[0].st]} seat ${m.vacant.length > 1 ? "were" : "was"} vacant that day, until ${longDate(m.vacant[0].filled)}.` : "";
+  if (b.need <= 0) return { hed: `${GN} ${has} a majority in the Senate`, dek: `${holds}, ${b.G === b.maj ? "exactly" : `${words(b.G - b.maj)} more than`} the ${b.maj} a bill ${needs}. ${tail}; the crossbench ${b.C}.${vacant}` };
+  const short = `${words(b.need)} short of the ${b.maj} votes a bill ${needs}`;
   if (b.enough.length === 1) {
     const g = b.enough[0], rest = b.cross.filter((x) => x !== g), restN = rest.reduce((a, x) => a + x.n, 0);
-    const name = crossName(g);
-    const hed = `${GN} needs ${name} to pass a bill ${oppThe} opposes`;
-    let dek = `${holds}, ${short}. ${cap(crossPoss(g))} ${words(g.n)} take it to ${b.G + g.n}. `;
+    const hed = `${GN} ${needs} ${crossName(g)} to pass a bill ${oppThe} ${opposes}`;
+    let dek = `${holds}, ${short}. ${cap(crossPoss(g))} ${words(g.n)} ${tv(m, "take", "took")} it to ${b.G + g.n}. `;
     if (restN >= b.need) {
       // a party of several by its count, everyone else (independents among them) by name
       const who = [...rest.filter((x) => x.n > 1 && x.k !== "IND").map((x) => `${crossPoss(x)} ${words(x.n)}`), ...rest.filter((x) => x.n === 1 || x.k === "IND").flatMap((x) => x.names)];
-      dek += `Without them it would need ${restN === b.need ? `all ${words(restN)} other crossbenchers` : `${words(b.need)} of the other ${words(restN)} crossbenchers`}: ${listAnd(who)}.`;
-    } else dek += `No mix of the other ${words(restN)} crossbenchers is enough without them.`;
-    return { hed, dek: dek.trim() + ` ${cap(oppThe)} holds ${b.O}.` };
+      dek += `Without them it ${tv(m, "would need", "would have needed")} ${restN === b.need ? `all ${words(restN)} other crossbenchers` : `${words(b.need)} of the other ${words(restN)} crossbenchers`}: ${listAnd(who)}.`;
+    } else dek += `No mix of the other ${words(restN)} crossbenchers ${tv(m, "is", "was")} enough without them.`;
+    return { hed, dek: dek.trim() + ` ${tail}.${vacant}` };
   }
   if (b.enough.length > 1) {
     const names = b.enough.map(crossName);
-    return { hed: `${GN} can pass a bill with ${listAnd(names).replace(/ and /, " or ")}`, dek: `${holds}, ${short}. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
+    return { hed: `${GN} ${tv(m, "can", "could")} pass a bill with ${listAnd(names).replace(/ and /, " or ")}`, dek: `${holds}, ${short}. ${tail}; the crossbench ${b.C}.${vacant}` };
   }
-  return { hed: `${GN} needs two or more crossbench parties to pass a bill ${oppThe} opposes`, dek: `${holds}, ${short}; no single crossbench party has ${words(b.need)}. ${cap(oppThe)} holds ${b.O}; the crossbench ${b.C}.` };
+  // no one crossbench party is enough: every crossbencher, where it takes them all; else the largest
+  // party and how many more, named from the rest
+  const everyone = (gs) => [...gs.filter((x) => x.n > 1 && x.k !== "IND").map((x) => `${crossPoss(x)} ${words(x.n)}`), ...gs.filter((x) => x.n === 1 || x.k === "IND").flatMap((x) => x.names)];
+  if (b.C < b.need) return { hed: `${GN} ${tv(m, "can’t", "couldn’t")} pass a bill ${oppThe} ${opposes}, whatever the crossbench ${tv(m, "does", "did")}`, dek: `${holds}, ${short}, and the crossbench ${has} only ${words(b.C)}. ${tail}.${vacant}` };
+  if (b.C === b.need) return { hed: `${GN} ${needs} every crossbencher to pass a bill ${oppThe} ${opposes}`, dek: `${holds}, ${short}: all ${words(b.C)} crossbenchers, ${listAnd(everyone(b.cross))}. ${tail}.${vacant}` };
+  const g1 = b.cross[0], r = b.need - g1.n, rest = b.cross.slice(1), restN = rest.reduce((a, x) => a + x.n, 0);
+  return { hed: `${GN} ${needs} ${crossName(g1)} and ${words(r)} more ${r === 1 ? "crossbencher" : "crossbenchers"} to pass a bill ${oppThe} ${opposes}`,
+    dek: `${holds}, ${short}. ${cap(crossPoss(g1))} ${words(g1.n)} ${tv(m, "take", "took")} it to ${b.G + g1.n}; the last ${r === 1 ? "vote" : `${words(r)} votes`} ${tv(m, "have", "had")} to come from ${r === restN ? "all" : "among"} the other ${words(restN)}: ${listAnd(everyone(rest))}. ${tail}.${vacant}` };
 }
 // the 76 as one bar, the government first and the opposition last, the 39 marked
 function senBar(m) {
@@ -2828,7 +2886,7 @@ function senBar(m) {
   let acc = 0;
   const segs = order.map((f) => { const x = (100 * acc) / b.N, w = (100 * cnt[f]) / b.N; acc += cnt[f]; return `<i style="left:${x}%;width:${w}%;${swc(f)}" title="${FAM_LEG[f]} ${cnt[f]}"></i>`; }).join("");
   const mx = (100 * b.maj) / b.N;
-  const lab = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("");
+  const lab = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("") + (m.vacant.length ? `<span><i style="background:var(--line-2)"></i>Vacant <b>${m.vacant.length}</b></span>` : "");
   return `<div class="sn-bar" role="img" aria-label="${order.map((f) => `${FAM_LEG[f]} ${cnt[f]}`).join(", ")}; ${b.maj} for a majority"><div class="sn-track">${segs}<span class="sn-maj" style="left:${mx}%"></span></div><div class="sn-majlab" style="left:${mx}%">${b.maj} to pass a bill</div></div><div class="counts">${lab}</div>`;
 }
 function storySenate(m) {
@@ -2836,51 +2894,65 @@ function storySenate(m) {
   if (s.level === "sen") return storySenator(m, s.i);
   if (s.level === "state") return storySenState(m, s.st);
   const { hed, dek } = senHedDek(m);
-  let h = senHead("The Senate today", `Senators as at ${longDate(m.asOf)}`, hed, dek);
-  h += `<div class="st-sec"><h3>The balance of power <small>${senBalance(m).maj} of ${m.divs.length} votes pass a bill</small></h3>${senBar(m)}</div>`;
+  let h = senHead(senNow(m) ? "The Senate today" : `The Senate after ${m.year}`, senNow(m) ? `Senators as at ${longDate(m.asOf)}` : `From ${longDate(m.asOf)}, as the ${m.dd ? "double dissolution’s" : "election’s"} senators took their seats`, hed, dek);
+  h += `<div class="st-sec"><h3>The balance of power <small>${senBalance(m).maj} of ${m.seatsN} votes pass a bill</small></h3>${senBar(m)}</div>`;
   // who faces the voters next
   const up = m.divs.filter(upNext), upC = senCounts(m, upNext), stayC = senCounts(m, (d) => !upNext(d));
-  const nUp = up.length, nTerr = up.filter((d) => d.sen.term === "next").length;
+  const nUp = up.length, nTerr = up.filter((d) => TERRITORIES.has(d.st)).length;
   const upOrder = SEN_FAMS.filter((f) => upC[f] || stayC[f]);
-  h += `<div class="st-sec"><h3>At the next election <small>${nUp} seats up, ${m.divs.length - nUp} sit to 2031</small></h3><p class="st-p">The next election fills ${nUp} seats: each state’s six elected in 2022 and the ${words(nTerr)} territory senators. ${senDefends(m, upC)}</p><table class="tbl"><thead><tr><th>Party</th><th>Up next</th><th>To 2031</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${FAM_LEG[f]}</td><td>${upC[f] || 0}</td><td>${stayC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
+  if (m.nextDD) {
+    const dueC = senCounts(m, (d) => d.due);
+    h += `<div class="st-sec"><h3>At the 2016 election <small>all ${SEN_SEATS} seats, a double dissolution</small></h3><p class="st-p">The double dissolution of 9 May 2016 ended every senator’s term: all ${SEN_SEATS} seats were filled at the 2016 election, the ${m.divs.filter((d) => !d.due).length} due to sit to ${m.later} among them. ${senDefends(m, upC)}</p><table class="tbl"><thead><tr><th>Party</th><th>Seats</th><th>Due anyway</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${FAM_LEG[f]}</td><td>${upC[f] || 0}</td><td>${dueC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
+  } else h += `<div class="st-sec"><h3>At ${nextEl(m)} <small>${nUp} seats up, ${m.divs.length - nUp} with terms to ${m.later}</small></h3><p class="st-p">${cap(nextEl(m))} ${nv(m, "fills", "filled")} ${nUp} seats: ${upClassWords(m)} and the ${words(nTerr)} territory senators. ${senDefends(m, upC)}</p><table class="tbl"><thead><tr><th>Party</th><th>Up next</th><th>To ${m.later}</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${FAM_LEG[f]}</td><td>${upC[f] || 0}</td><td>${stayC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
   // the states
   h += `<div class="st-sec"><h3>By state <small>12 senators a state, two a territory</small></h3><table class="tbl"><thead><tr><th>State</th><th>Senators</th><th>Up next</th></tr></thead><tbody>${STATES.map((st) => {
-    const ds = m.divs.filter((d) => d.st === st), c = {}; for (const d of ds) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
-    const bar = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((f) => c[f]).map((f) => `<i style="width:${(100 * c[f]) / ds.length}%;${swc(f)}"></i>`).join("");
-    return `<tr data-sgo="state:${st}"><td>${STATE_TITLE[st].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${ds.length}<span class="seatbar">${bar}</span></td><td>${ds.filter(upNext).length}</td></tr>`;
+    const sens = m.divs.filter((d) => d.st === st), c = {}; for (const d of sens) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
+    const bar = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((f) => c[f]).map((f) => `<i style="width:${(100 * c[f]) / (TERRITORIES.has(st) ? 2 : 12)}%;${swc(f)}"></i>`).join("");
+    return `<tr data-sgo="state:${st}"><td>${STATE_TITLE[st].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${sens.length}<span class="seatbar">${bar}</span></td><td>${sens.filter(upNext).length}</td></tr>`;
   }).join("")}</tbody></table></div>`;
-  // since the elections: changes of party, and casual vacancies
-  const moved = m.divs.filter((d) => d.sen.electedAs), casual = m.divs.filter((d) => d.sen.casual);
-  if (moved.length || casual.length) {
+  // since the elections: changes of party, casual vacancies and the High Court's recounts
+  const moved = m.divs.filter((d) => d.sen.electedAs), filled = m.divs.filter((d) => d.sen.casual || d.sen.recount);
+  if (moved.length || filled.length) {
     const row = (d, tx) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${ds(d.n)}.</b> ${esc(tx)}.</span></button>`;
-    h += `<div class="st-sec"><h3>Not as elected <small>${moved.length} changed party, ${casual.length} filled a vacancy</small></h3><div class="changes">${moved.map((d) => row(d, `Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; now ${d.hold.fam === "ind" ? "sits as an independent" : `sits for ${theParty(d.hold.ab)}`}`)).join("")}${casual.map((d) => row(d, d.sen.casual.for ? `Filled ${d.sen.casual.for}’s vacancy for ${theParty(d.hold.ab)}, to ${termWords(d)}` : `Filled a ${partyName(d.hold.ab)} vacancy, to ${termWords(d)}`)).join("")}</div></div>`;
+    h += `<div class="st-sec"><h3>Not as elected <small>${moved.length} changed party, ${filled.length} filled a vacancy</small></h3><div class="changes">${moved.map((d) => row(d, `Elected for ${theParty(d.sen.electedAs)}${d.sen.elected ? ` in ${d.sen.elected}` : ""}; ${senMoved(m, d)}`)).join("")}${filled.map((d) => row(d, senFilled(m, d))).join("")}</div></div>`;
   }
   h += senFoot(m);
   return h;
 }
-const termWords = (d) => (d.sen.term === "next" ? "the next election" : TERM_END[d.sen.term]);
+// "now sits for Labor", or for an election's Senate, "sat for Labor by July 2019"
+const senMoved = (m, d) => `${tv(m, "now", "by " + monthYear(m.asOf) + ",")} ${d.hold.fam === "ind" ? tv(m, "sits as an independent", "sat as an independent") : `${tv(m, "sits", "sat")} for ${theParty(d.hold.ab)}`}`;
+function senFilled(m, d) {
+  const x = d.sen, to = termWords(m, d);
+  if (x.recount) return `Declared elected by the High Court in ${x.recount.for}’s place on ${shortDate(x.recount.date)}, to ${to}`;
+  return x.casual.for ? `Filled ${x.casual.for}’s vacancy for ${theParty(d.hold.ab)}${x.casual.date ? ` on ${shortDate(x.casual.date)}` : ""}, to ${to}` : `Filled a ${partyName(d.hold.ab, d.hold.pn)} vacancy, to ${to}`;
+}
 // "Labor defends 15 of them, the Coalition 15, the Greens six …"
 function senDefends(m, upC) {
   const parts = SEN_FAMS.filter((f) => upC[f]).sort((a, b) => upC[b] - upC[a]);
   if (!parts.length) return "";
   const [first, ...rest] = parts;
-  return `${cap(FAM_PL[first])} defends ${words(upC[first])} of them${rest.length ? `, ${listAnd(rest.map((f) => `${FAM_PL[f]} ${words(upC[f])}`))}` : ""}.`;
+  return `${cap(FAM_PL[first])} ${nv(m, "defends", "defended")} ${words(upC[first])} of them${rest.length ? `, ${listAnd(rest.map((f) => `${FAM_PL[f]} ${words(upC[f])}`))}` : ""}.`;
 }
 function storySenState(m, st) {
   const sens = m.divs.filter((d) => d.st === st), c = {}; for (const d of sens) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
   const order = SEN_FAMS.filter((f) => c[f]).sort((a, b) => c[b] - c[a]);
   const top = order[0], tie = order[1] && c[order[1]] === c[top];
-  const terr = st === "ACT" || st === "NT";
-  const hed = tie ? `${cap(FAM_PL[top])} and ${FAM_PL[order[1]]} hold ${words(c[top])} seats each` : `${cap(FAM_PL[top])} holds ${words(c[top])} of ${STATE_POSS[st]} ${words(sens.length)} seats`;
-  const up = sens.filter(upNext);
-  const dek = terr ? `Territory senators serve until the next election, so both seats are up then.` : `${cap(words(up.length))} of the ${words(sens.length)}, elected in 2022, are up at the next election; the other ${words(sens.length - up.length)} sit until 2031.`;
-  let h = senHead(STATE_TITLE[st], `${sens.length} senators`, hed, dek);
+  const terr = TERRITORIES.has(st), seats = terr ? 2 : 12, has = tv(m, "holds", "held");
+  const hed = tie ? `${cap(FAM_PL[top])} and ${FAM_PL[order[1]]} ${tv(m, "hold", "held")} ${words(c[top])} seats each` : `${cap(FAM_PL[top])} ${has} ${words(c[top])} of ${STATE_POSS[st]} ${words(seats)} seats`;
+  const up = sens.filter(upNext), cls = upClass(m);
+  const vac = m.vacant.filter((v) => v.st === st).length;
+  const dek = terr ? `Territory senators ${tv(m, "serve", "served")} until the next election, so both seats ${nv(m, "are", "were")} up at ${nextEl(m)}.`
+    : m.nextDD ? `The double dissolution of 9 May 2016 put all ${words(seats)} seats to the voters at the 2016 election.${vac ? ` ${cap(words(vac))} ${vac > 1 ? "seats were" : "seat was"} vacant that day.` : ""}`
+    : `${cap(words(up.length))} of the ${words(seats)}${m.dd ? ", the last six elected" : cls ? `, elected in ${cls}` : ""}, ${nv(m, "are", "were")} up at ${nextEl(m)}; the other ${words(seats - up.length)} ${tv(m, "have", "had")} terms to ${m.later}.${vac ? ` ${cap(words(vac))} ${vac > 1 ? "seats were" : "seat was"} vacant that day.` : ""}`;
+  let h = senHead(STATE_TITLE[st], `${sens.length} senators${senNow(m) ? "" : `, ${monthYear(m.asOf)}`}`, hed, dek);
   sens.sort(senOrder);
-  const row = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${ds(d.n)}</b> ${esc(partyName(d.hold.ab))}${d.sen.role ? ` · ${ROLE_NAME[d.sen.role]}` : ""}</span></button>`;
+  const row = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${ds(d.n)}</b> ${esc(partyName(d.hold.ab, d.hold.pn))}${d.sen.role ? ` · ${ROLE_NAME[d.sen.role]}` : ""}</span></button>`;
   if (!terr) {
-    h += `<div class="st-sec"><h3>Up at the next election <small>${up.length}, elected in 2022</small></h3><div class="changes sn-list">${up.map(row).join("")}</div></div>`;
-    h += `<div class="st-sec"><h3>Sitting until 2031 <small>${sens.length - up.length}, elected in 2025</small></h3><div class="changes sn-list">${sens.filter((d) => !upNext(d)).map(row).join("")}</div></div>`;
-  } else h += `<div class="st-sec"><h3>Senators <small>elected in 2025</small></h3><div class="changes sn-list">${sens.map(row).join("")}</div></div>`;
+    // (before the double dissolution the halves are the terms due, though every seat was up)
+    const dueUp = sens.filter((d) => d.due), stays = sens.filter((d) => !d.due);
+    h += `<div class="st-sec"><h3>${m.nextDD ? `Due at ${nextEl(m)}` : `Up at ${nextEl(m)}`} <small>${dueUp.length}${m.dd ? ", the last six elected" : cls ? `, elected in ${cls}` : ""}</small></h3><div class="changes sn-list">${dueUp.map(row).join("")}</div></div>`;
+    h += `<div class="st-sec"><h3>Terms to ${m.later} <small>${stays.length}, elected ${m.dd ? "first" : "in"} ${ownElection(m)}</small></h3><div class="changes sn-list">${stays.map(row).join("")}</div></div>`;
+  } else h += `<div class="st-sec"><h3>Senators <small>elected in ${ownElection(m)}</small></h3><div class="changes sn-list">${sens.map(row).join("")}</div></div>`;
   h += senFoot(m);
   return h;
 }
@@ -2888,24 +2960,26 @@ function storySenState(m, st) {
 const senOrder = (a, b) => (upNext(b) - upNext(a)) || SEN_PARTY_ORDER.indexOf(a.hold.ab) - SEN_PARTY_ORDER.indexOf(b.hold.ab) || a.n.localeCompare(b.n);
 const ROLE_NAME = { president: "President of the Senate", leader: "Leader of the Government in the Senate", oppLeader: "Leader of the Opposition in the Senate" };
 function storySenator(m, i) {
-  const d = m.divs[i], x = d.sen, party = partyName(d.hold.ab);
+  const d = m.divs[i], x = d.sen, party = partyName(d.hold.ab, d.hold.pn);
   const hed = x.role ? ROLE_NAME[x.role] : d.hold.fam === "ind" ? `Independent senator for ${STATE_NAME[x.st]}` : `${party} senator for ${STATE_NAME[x.st]}`;
-  const terr = x.term === "next";
+  const terr = TERRITORIES.has(x.st), is = nv(m, "is", "was");
   let dek;
-  if (x.casual) dek = `${x.casual.for ? `Filled ${x.casual.for}’s vacancy` : "Filled a casual vacancy"} for the rest of a term ${x.term === 2031 ? "won at the 2025 election" : "won at the 2022 election"}, which ends on ${TERM_END[x.term]}.`;
-  else if (terr) dek = `Elected in 2025. A territory senator’s term runs with the House’s, so the seat is up at the next election.`;
-  else dek = `Elected${x.electedAs ? ` for ${theParty(x.electedAs)}` : ""} in ${x.elected}, to a term that ends on ${TERM_END[x.term]}${x.term === 2028 ? ": the seat is up at the next election" : ", so the seat sits out the next election"}.`;
-  if (x.electedAs) dek += ` Now ${d.hold.fam === "ind" ? "sits as an independent" : `sits for ${theParty(d.hold.ab)}`}.`;
+  if (x.casual || x.recount) dek = `${senFilled(m, d)}.`;
+  else if (terr) dek = `Elected in ${x.elected}. A territory senator’s term runs with the House’s, so the seat ${is} up at ${nextEl(m)}.`;
+  else if (x.term === 2017 || x.term === 2020) dek = `Elected${x.electedAs ? ` for ${theParty(x.electedAs)}` : ""} in ${x.elected}, to a term due to end on 30 June ${x.term}; the double dissolution ended it on 9 May 2016.`;
+  else dek = `Elected${x.electedAs ? ` for ${theParty(x.electedAs)}` : ""} in ${x.elected}, to a term that ${x.term <= 2026 ? "ended" : "ends"} on 30 June ${x.term}${d.up ? `: the seat ${is} up at ${nextEl(m)}` : `, so the seat ${nv(m, "sits", "sat")} out ${nextEl(m)}`}.`;
+  if (x.electedAs) dek += ` ${cap(senMoved(m, d))}.`;
   if (x.role) dek = `${party} senator for ${STATE_NAME[x.st]}. ${dek}`;
-  let h = senHead(d.n, `Senator for ${STATE_TITLE[x.st]}`, hed, dek);
+  let h = senHead(d.n, `Senator for ${STATE_TITLE[x.st]}${senNow(m) ? "" : `, ${monthYear(m.asOf)}`}`, hed, dek);
   const mates = m.divs.filter((y) => y.st === x.st && y.i !== i).sort(senOrder);
-  const row = (y) => `<button type="button" data-sgo="sen:${y.i}"><span class="dt"><i class="sw" style="${swc(holdFam(y.hold))}"></i></span><span class="tx"><b>${ds(y.n)}</b> ${esc(partyName(y.hold.ab))}${upNext(y) ? "" : " · to 2031"}</span></button>`;
+  const row = (y) => `<button type="button" data-sgo="sen:${y.i}"><span class="dt"><i class="sw" style="${swc(holdFam(y.hold))}"></i></span><span class="tx"><b>${ds(y.n)}</b> ${esc(partyName(y.hold.ab, y.hold.pn))}${upNext(y) ? "" : ` · to ${m.later}`}</span></button>`;
   h += `<div class="st-sec"><h3>${STATE_POSS[x.st].replace(/^the /, "The ")} other senators <small>${mates.length}</small></h3><div class="changes sn-list">${mates.map(row).join("")}</div></div>`;
   h += senFoot(m);
   return h;
 }
 function senFoot(m) {
-  return `<p class="st-foot">The Parliament’s Senate seating plan as at ${longDate(m.asOf)}; terms from the AEC’s Senators Elected lists for 2022 and 2025.</p>`;
+  return senNow(m) ? `<p class="st-foot">The Parliament’s Senate seating plan as at ${longDate(m.asOf)}; terms from the AEC’s Senators Elected lists for 2022 and 2025.</p>`
+    : `<p class="st-foot">The Parliamentary Handbook: senators’ terms of service, parties and changes of party; the Senate on ${longDate(m.asOf)}. Drawn on today’s floor, sorted.</p>`;
 }
 
 /* ----- selection, search and the tooltip ----- */
@@ -2915,13 +2989,13 @@ function selectSen(sel) {
 }
 function senTip(m, i) {
   const d = m.divs[i], x = d.sen;
-  const term = x.term === "next" ? "Up at the next election" : x.term === 2028 ? "Up at the next election (term to 2028)" : "Sits until 2031";
-  return `<div class="tn">${ds(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab))}</div><div class="ts">${esc(term)}</div>`;
+  const term = d.up ? (x.term === "next" ? `Up at ${nextEl(m)}` : `Up at ${nextEl(m)} (term to ${x.term})`) : `Term to ${x.term}`;
+  return `<div class="tn">${ds(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab, d.hold.pn))}</div><div class="ts">${esc(cap(term))}</div>`;
 }
 function senSearchItems(m) {
   const items = [];
   for (const st of STATES) items.push({ k: "state", st, t: STATE_TITLE[st], s: `${m.divs.filter((d) => d.st === st).length} senators`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 });
-  for (const d of m.divs) items.push({ k: "sen", i: d.i, t: d.n, s: `Senator for ${STATE_SHORT[d.st]}, ${partyName(d.hold.ab)}`, h: norm(d.n), rank: 1 });
+  for (const d of m.divs) items.push({ k: "sen", i: d.i, t: d.n, s: `Senator for ${STATE_SHORT[d.st]}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.n), rank: 1 });
   return items;
 }
 
@@ -3981,8 +4055,9 @@ let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
     SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
-    // the Senate's senators (not its floor): its key is measured with the House's, so switching chamber moves nothing
-    loadSenate(),
+    // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
+    // plan's row), is measured with the House's, so switching chamber moves nothing
+    loadSenate("now"),
     ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
@@ -4032,21 +4107,21 @@ function holdLegendHeight(m) {
   let h = 0;
   try {
     for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe));
-    if (S.view === "chamber" && SENM) h = Math.max(h, senLegendHeight(w, probe));
+    if (S.view === "chamber") for (const sm of new Set([SENY.now, SENM])) if (sm) h = Math.max(h, senLegendHeight(sm, w, probe));
   } finally { probe.remove(); }
   el.style.minHeight = h + "px";
   el.style.boxSizing = "border-box";
 }
 // the Senate's key at its tallest: each lens, as seated and sorted
-function senLegendHeight(w, probe) {
-  const key = `senate|${w}`;
+function senLegendHeight(sm, w, probe) {
+  const key = `senate|${sm.year}|${w}`;
   if (!legendHeights.has(key)) {
     const keep = { senLens: S.senLens, seat: S.seat };
     let hMax = 0;
     try {
       for (const l of SEN_LENSES) for (const seat of ["plan", "sort"]) {
         S.senLens = l.id; S.seat = seat;
-        probe.innerHTML = senateLegendHTML(SENM);
+        probe.innerHTML = senateLegendHTML(sm);
         hMax = Math.max(hMax, probe.getBoundingClientRect().height);
       }
     } finally { Object.assign(S, keep); }
@@ -4164,14 +4239,14 @@ function renderTimeline() {
     }
     if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
-    // in the Senate's chamber the House's elections stay faint, and Now reads the Senate's make-up
+    // in the Senate's chamber each stop reads that election's Senate
     const sen = senOn();
     const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
     for (const y of YEARS) {
-      const s = sen && y === "now" ? senCounts(SENM, (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
+      const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
       const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
       let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : sen ? 0.22 : 0.62}"/>`; acc += w; }
+      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
     }
   }
   for (const y of YEARS) {
@@ -4387,18 +4462,21 @@ function setSenLens(id) {
   startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
   if (hold) hold.land();
 }
-/* the chamber view's chamber: the House or the Senate. The Senate is today's, so choosing it from an
-   election moves the timeline to Now; the two cross-fade, the chairs being different people */
+/* the chamber view's chamber: the House or the Senate, both at the timeline's election; the two
+   cross-fade, the chairs being different people */
 let houseFade = null;
 async function setHouse(h) {
   if (h === S.house) return;
   const spot = takeSpot(), from = CM();
-  if (h === "senate" && S.year !== "now") await setYear("now");
-  if (h === "senate" && !senFloor) {
+  // a state election has no Senate: the one sitting then is the last federal election's
+  if (h === "senate" && !SEN_YEARS.includes(S.year)) await setYear(senYearFor(S.year));
+  if (h === "senate" && (!senFloor || !SENY[S.year])) {
     showLoading(true);
-    try { await loadSenateFloor(); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
+    try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
     showLoading(false);
+    loadSenates();
   }
+  syncSenate();
   const hold = walkHold(spot);
   S.house = h; S.hover = null; hideTip();
   chAnim = null; chLast.clear();
@@ -4410,9 +4488,10 @@ async function setHouse(h) {
 }
 // the Senate's floor, fetched the first time its chamber is shown
 function needSenateFloor() {
-  if (senFloor) return;
+  if (senFloor && SENY[S.year]) return;
   showLoading(true);
-  loadSenateFloor().then(() => { showLoading(false); renderStory(true); schedule(); }).catch(() => showLoading(true, "The Senate didn’t load. Try again."));
+  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); schedule(); loadSenates(); })
+    .catch(() => showLoading(true, "The Senate didn’t load. Try again."));
 }
 function lensParamChanged() {
   const hold = walkHold(takeSpot());
@@ -4438,12 +4517,14 @@ function showLoading(on, msg) {
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
-  // the Senate is drawn as it sits today: an election on the timeline is the House's
-  if (S.house === "senate" && y !== "now") { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
+
   // the spot is taken now, while it's fresh: the election may take a while to load
   const from = S.year, a = M(), spot = takeSpot();
+  // a state election on the timeline has no Senate: it opens in the House's chamber
+  if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   showLoading(true);
-  try { await loadYear(y); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
+  // the Senate's chamber moves with the timeline: that election's Senate too
+  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null]); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
   showLoading(false);
   const b = Y[y];
   // carry the selection across by seat name and polling-place ID
@@ -4458,6 +4539,13 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
+  if (S.house === "senate") {
+    // the chosen senator carries across by name where they sat in both Senates, else their state
+    const was = SENM, ss = S.ssel;
+    syncSenate();
+    if (ss.level === "sen" && was) { const i = SENM.byName.get(was.divs[ss.i].n); S.ssel = i != null ? { level: "sen", st: ss.st, i } : { level: "state", st: ss.st }; }
+    renderLenses();
+  }
   recolor(false);
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
@@ -4469,7 +4557,7 @@ async function setYear(y) {
 }
 function metaLine() {
   const m = M(); if (!m) return "";
-  if (senOn()) return `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators`;
+  if (senOn()) return SENM.year === "now" ? `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators` : `The Senate from ${longDate(SENM.asOf)}, after the ${SENM.year} election · ${SENM.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 
@@ -4572,8 +4660,7 @@ function readURL() {
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
-  // the Senate is today's alone
-  if (p.get("c") === "senate" && S.year === "now") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
+  if (p.get("c") === "senate") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
   return p.get("s");
 }
 let senFromURL = null;
@@ -4736,7 +4823,7 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
-  if (S.house === "senate") { try { await loadSenateFloor(); applySenFromURL(); } catch (e) { S.house = "reps"; } }
+  if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);

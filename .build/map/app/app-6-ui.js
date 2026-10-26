@@ -94,8 +94,9 @@ let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
     SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
-    // the Senate's senators (not its floor): its key is measured with the House's, so switching chamber moves nothing
-    loadSenate(),
+    // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
+    // plan's row), is measured with the House's, so switching chamber moves nothing
+    loadSenate("now"),
     ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
@@ -145,21 +146,21 @@ function holdLegendHeight(m) {
   let h = 0;
   try {
     for (const y of YEARS) h = Math.max(h, legendHeightOf(m, y, w, probe));
-    if (S.view === "chamber" && SENM) h = Math.max(h, senLegendHeight(w, probe));
+    if (S.view === "chamber") for (const sm of new Set([SENY.now, SENM])) if (sm) h = Math.max(h, senLegendHeight(sm, w, probe));
   } finally { probe.remove(); }
   el.style.minHeight = h + "px";
   el.style.boxSizing = "border-box";
 }
 // the Senate's key at its tallest: each lens, as seated and sorted
-function senLegendHeight(w, probe) {
-  const key = `senate|${w}`;
+function senLegendHeight(sm, w, probe) {
+  const key = `senate|${sm.year}|${w}`;
   if (!legendHeights.has(key)) {
     const keep = { senLens: S.senLens, seat: S.seat };
     let hMax = 0;
     try {
       for (const l of SEN_LENSES) for (const seat of ["plan", "sort"]) {
         S.senLens = l.id; S.seat = seat;
-        probe.innerHTML = senateLegendHTML(SENM);
+        probe.innerHTML = senateLegendHTML(sm);
         hMax = Math.max(hMax, probe.getBoundingClientRect().height);
       }
     } finally { Object.assign(S, keep); }
@@ -277,14 +278,14 @@ function renderTimeline() {
     }
     if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
-    // in the Senate's chamber the House's elections stay faint, and Now reads the Senate's make-up
+    // in the Senate's chamber each stop reads that election's Senate
     const sen = senOn();
     const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
     for (const y of YEARS) {
-      const s = sen && y === "now" ? senCounts(SENM, (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
+      const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
       const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
       let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : sen ? 0.22 : 0.62}"/>`; acc += w; }
+      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
     }
   }
   for (const y of YEARS) {
@@ -500,18 +501,21 @@ function setSenLens(id) {
   startChamberGlide(); recolor(true); renderLegend(); renderStory(true); writeURL();
   if (hold) hold.land();
 }
-/* the chamber view's chamber: the House or the Senate. The Senate is today's, so choosing it from an
-   election moves the timeline to Now; the two cross-fade, the chairs being different people */
+/* the chamber view's chamber: the House or the Senate, both at the timeline's election; the two
+   cross-fade, the chairs being different people */
 let houseFade = null;
 async function setHouse(h) {
   if (h === S.house) return;
   const spot = takeSpot(), from = CM();
-  if (h === "senate" && S.year !== "now") await setYear("now");
-  if (h === "senate" && !senFloor) {
+  // a state election has no Senate: the one sitting then is the last federal election's
+  if (h === "senate" && !SEN_YEARS.includes(S.year)) await setYear(senYearFor(S.year));
+  if (h === "senate" && (!senFloor || !SENY[S.year])) {
     showLoading(true);
-    try { await loadSenateFloor(); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
+    try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); } catch (e) { showLoading(true, "The Senate didn’t load. Try again."); return; }
     showLoading(false);
+    loadSenates();
   }
+  syncSenate();
   const hold = walkHold(spot);
   S.house = h; S.hover = null; hideTip();
   chAnim = null; chLast.clear();
@@ -523,9 +527,10 @@ async function setHouse(h) {
 }
 // the Senate's floor, fetched the first time its chamber is shown
 function needSenateFloor() {
-  if (senFloor) return;
+  if (senFloor && SENY[S.year]) return;
   showLoading(true);
-  loadSenateFloor().then(() => { showLoading(false); renderStory(true); schedule(); }).catch(() => showLoading(true, "The Senate didn’t load. Try again."));
+  Promise.all([loadSenateFloor(), loadSenate(S.year)]).then(() => { syncSenate(); showLoading(false); renderLenses(); renderLegend(); renderStory(true); renderTimeline(); $("#mp-meta").textContent = metaLine(); schedule(); loadSenates(); })
+    .catch(() => showLoading(true, "The Senate didn’t load. Try again."));
 }
 function lensParamChanged() {
   const hold = walkHold(takeSpot());
@@ -551,12 +556,14 @@ function showLoading(on, msg) {
 let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
-  // the Senate is drawn as it sits today: an election on the timeline is the House's
-  if (S.house === "senate" && y !== "now") { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
+
   // the spot is taken now, while it's fresh: the election may take a while to load
   const from = S.year, a = M(), spot = takeSpot();
+  // a state election on the timeline has no Senate: it opens in the House's chamber
+  if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   showLoading(true);
-  try { await loadYear(y); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
+  // the Senate's chamber moves with the timeline: that election's Senate too
+  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null]); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
   showLoading(false);
   const b = Y[y];
   // carry the selection across by seat name and polling-place ID
@@ -571,6 +578,13 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
+  if (S.house === "senate") {
+    // the chosen senator carries across by name where they sat in both Senates, else their state
+    const was = SENM, ss = S.ssel;
+    syncSenate();
+    if (ss.level === "sen" && was) { const i = SENM.byName.get(was.divs[ss.i].n); S.ssel = i != null ? { level: "sen", st: ss.st, i } : { level: "state", st: ss.st }; }
+    renderLenses();
+  }
   recolor(false);
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
@@ -582,7 +596,7 @@ async function setYear(y) {
 }
 function metaLine() {
   const m = M(); if (!m) return "";
-  if (senOn()) return `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators`;
+  if (senOn()) return SENM.year === "now" ? `The Senate as it sits, ${longDate(SENM.asOf)} · ${SENM.divs.length} senators` : `The Senate from ${longDate(SENM.asOf)}, after the ${SENM.year} election · ${SENM.divs.length} senators`;
   return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 
@@ -685,8 +699,7 @@ function readURL() {
   if (p.get("b") === "voters") S.basis = "voters";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
-  // the Senate is today's alone
-  if (p.get("c") === "senate" && S.year === "now") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
+  if (p.get("c") === "senate") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
   return p.get("s");
 }
 let senFromURL = null;
@@ -849,7 +862,7 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
-  if (S.house === "senate") { try { await loadSenateFloor(); applySenFromURL(); } catch (e) { S.house = "reps"; } }
+  if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine();
   recolor(false);

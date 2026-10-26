@@ -179,7 +179,8 @@ function chamberOrder(m) {
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];
-  const N = m.divs.length, maj = Math.floor(N / 2) + 1;
+  // (the Senate counts its 76 seats, a vacant one among them)
+  const N = m.seatsN || m.divs.length, maj = Math.floor(N / 2) + 1;
   m._ch = { order, at, gov, opp, nGov: G.length, nCross: C.length, nOpp: O.length, groups, maj, plan: !!plan,
     majAt: maj - (sp && holdFam(sp.hold) === gov ? 1 : 0) };
   m._chKey = key;
