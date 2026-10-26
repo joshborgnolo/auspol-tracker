@@ -510,8 +510,8 @@ function deriveBooths(B, m) {
   return o;
 }
 
-// a year with no polling-place rows (sa26: the ECSA releases district totals
-// only) — the same shape deriveBooths returns, empty
+// the fallback for a res file with no booths dict — the same shape
+// deriveBooths returns, empty
 function emptyBooths(m) {
   const o = { n: 0, d: new Int16Array(0), id: [], ty: new Uint8Array(0), prem: [], sub: [], pc: [], raw: null, isl: new Int8Array(0),
     name: [], x: new Float32Array(0), y: new Float32Array(0), votes: new Float32Array(0), formal: new Float32Array(0),

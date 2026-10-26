@@ -37,8 +37,25 @@ close-enough row.
 
 There is no swing source in the API (no previous-election figures), so
 changes are the "unknown" kind, per-candidate chg is 0, and tpp swings are
-null; prev is null. No booth (polling place) lane: the site shows districts
-only. The census people lane rides data/sa26-demo.json (GCP 2021 SA1
+null; prev is null.
+
+Booths: every district's polling places ride the year file's booths lane on
+the federal schema (a dict of lists, each booth's v re-ordered onto the
+district's vote-sorted candidate rows). The ECSA payload carries no booth
+addresses, suburbs or coordinates, and none are published anywhere else in
+a reachable form, so prem/sub/pc/lat/lon are null and no booth dots draw on
+the map — the places fill the counts, the list, search and the story cards.
+Type strings map onto the federal lane (polling booths and shared booths
+1, early voting centres 5, mobile teams 4). tcp is a booth's
+two-candidate-preferred split ONLY where the booth's counted pair is the
+district's final-round pair: Croydon's 14 booths carry the election-night
+notional count instead (ALP v One Nation; the final pair was ALP v
+Greens) — pinned in KNOWN_NOTIONAL, any new district trip is a fail-stop —
+and seven visitor rows recorded no votes; those rows' tcp is null. Six
+booths' 2CP sums disagree with their formal totals by up to 2 (the
+residual BOOTH_TCP_DRIFT tolerates). tpp is null throughout: the ECSA
+publishes no notional two-party count per booth.
+The census people lane rides data/sa26-demo.json (GCP 2021 SA1
 tables pooled to the 47 districts by .build/map/build_sa26_demo.py): each
 division row gains demo, and the year file records demoBasis "sa1". The
 SEIFA lane rides data/sa26-seifa.json (ABS SEIFA 2021 SA1 index scores
@@ -66,6 +83,23 @@ ELECTION = "2026-03-21"
 EXPECTED_SEATS = {"ALP": 34, "LIB": 5, "IND": 4, "ONP": 4}
 # check-count vs first-count drift: elected densities observe ≤205 votes in 2026
 DRIFT_MAX = 300
+# per-booth 2CP-vs-formal residual: 2026 observes ≤2 on six booths
+BOOTH_TCP_DRIFT = 4
+# districts whose booth-level 2CP is ECSA's election-night notional count of a
+# pair that is NOT the district's final-round pair (Croydon 2026: counted ALP v
+# One Nation, decided ALP v Greens) — their booths' tcp stays null
+KNOWN_NOTIONAL = {"Croydon"}
+# the ECSA's polling-place type strings onto the federal map's booth type lane
+BOOTH_TYPE = {
+    "Polling Booth": 1,
+    "Shared Booth (Host)": 1,
+    "Shared Booth (Visitor 1)": 1,
+    "Shared Booth (Visitor 2)": 1,
+    "Early Voting Centre": 5,
+    "Shared Early Voting Centre (Host)": 5,
+    "Shared Early Voting Centre (Visitor 1)": 5,
+    "Mobile Polling Team": 4,
+}
 
 
 def fail(msg):
@@ -179,6 +213,10 @@ def main():
     tot_prim = collections.Counter()
     tot_formal = tot_inf = tot_enrolled = 0
     tpp_tot = [0, 0]
+    B = {k: [] for k in ("d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon",
+                         "v", "inf", "tpp", "tcp", "fl", "dec", "vdec")}
+    types_seen = collections.Counter()
+    zero_booths = notional = tcp_booths = 0
     for di, name in enumerate(names):
         s = ha_d[name]
         c = hc_d[name]
@@ -188,6 +226,22 @@ def main():
         c_cands = {cd["candidateId"]: cd for cd in c["candidates"]}
         if set(s_cands) != set(c_cands):
             fail(f"{name}: candidate id sets differ ({sorted(set(s_cands) ^ set(c_cands))})")
+
+        # static holds the polling-place types; both files name the same places
+        s_pp = {}
+        for pp in s["pollingPlaces"]:
+            pn = pp["pollingPlaceName"]
+            if pn in s_pp:
+                fail(f"{name}: duplicate polling place {pn!r} in the static file")
+            t = pp.get("pollingPlaceType")
+            if t not in BOOTH_TYPE:
+                fail(f"{name}: unknown polling place type {t!r} ({pn})")
+            s_pp[pn] = BOOTH_TYPE[t]
+        c_pp = [pp["pollingPlaceName"] for pp in c["pollingPlaces"]]
+        if len(c_pp) != len(set(c_pp)):
+            fail(f"{name}: duplicate polling place names in the change file")
+        if set(c_pp) != set(s_pp):
+            fail(f"{name}: static/change polling place sets differ: {sorted(set(c_pp) ^ set(s_pp))}")
 
         # formal per candidate: polling places + declaration piles + the
         # absent-ordinary lane (absentees' ordinary votes, counted with the
@@ -299,6 +353,55 @@ def main():
         tcp = [[cid2row[live[0]], last[live[0]]["progressiveTotal"]],
                [cid2row[live[1]], last[live[1]]["progressiveTotal"]]]
 
+        # ---- booths: the district's polling places, on the federal lanes ----
+        for bk, pp in enumerate(c["pollingPlaces"]):
+            pname = pp["pollingPlaceName"]
+            pvotes = [0] * len(rows)
+            two_cp = {}
+            for pc in pp["pollingCandidates"]:
+                cid = pc["candidateId"]
+                if cid not in cid2row:
+                    fail(f"{name}: booth {pname!r} counts unknown candidate {cid}")
+                pvotes[cid2row[cid]] = pc["formalVotes"]
+                if pc.get("twoCandidatePref"):
+                    two_cp[cid] = pc["twoCandidatePref"]
+            if len(two_cp) == 1:
+                fail(f"{name}: booth {pname!r} carries a one-sided two-candidate count")
+            pformal = sum(pvotes)
+            tcp_b = None
+            if two_cp:
+                if set(two_cp) == set(live):
+                    tcp_b = [two_cp.get(live[0], 0), two_cp.get(live[1], 0)]
+                    if abs(sum(tcp_b) - pformal) > BOOTH_TCP_DRIFT:
+                        fail(f"{name}: booth {pname!r} 2CP sum {sum(tcp_b)} vs formal {pformal} — beyond drift {BOOTH_TCP_DRIFT}")
+                    tcp_booths += 1
+                else:
+                    if name not in KNOWN_NOTIONAL:
+                        fail(f"{name}: booth {pname!r} counts 2CP for a pair that is not the final-round pair, and the district is not a known notional count")
+                    notional += 1
+            if pformal == 0:
+                if pp["informalVotes"] != 0:
+                    fail(f"{name}: booth {pname!r} records no formal votes but {pp['informalVotes']} informal")
+                zero_booths += 1
+            ty = s_pp[pname]
+            types_seen[ty] += 1
+            B["d"].append(di)
+            B["id"].append(f"sa26-{di}-{bk}")
+            B["n"].append(pname)
+            B["ty"].append(ty)
+            B["prem"].append(None)
+            B["sub"].append(None)
+            B["pc"].append(None)
+            B["lat"].append(None)
+            B["lon"].append(None)
+            B["v"].append(pvotes)
+            B["inf"].append(pp["informalVotes"])
+            B["tpp"].append(None)
+            B["tcp"].append(tcp_b)
+            B["fl"].append(None)
+            B["dec"].append(None)
+            B["vdec"].append(None)
+
         enrolled = s.get("districtEnrolled") or 0
         rec = {
             "id": di, "n": name, "st": "SA",
@@ -326,13 +429,15 @@ def main():
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
     out = {"year": "sa26", "date": ELECTION, "prev": None, "jurisdiction": "SA", "demoBasis": "sa1",
-           "agg": {"AUS": agg, "SA": dict(agg)}, "divs": D}
+           "agg": {"AUS": agg, "SA": dict(agg)}, "divs": D, "booths": B}
     p = os.path.join(OUT, "data-sa26.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1])
     print("sa26 districts", len(D), "| seats", dict(seats), "| 2PP-classic ALP", round(tp, 2),
           "| informal", round(100 * tot_inf / (tot_inf + tot_formal), 2), "| enrolled", tot_enrolled,
+          "| booths", len(B["id"]), dict(sorted(types_seen.items())),
+          f"(tcp {tcp_booths}, zero-vote {zero_booths}, notional-2CP {notional})",
           "->", os.path.getsize(p), "bytes")
 
 

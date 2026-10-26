@@ -145,7 +145,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 {
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
-  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA cuts (no booth lane)");
+  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA distribution cuts (its booths have no census lane)");
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of sa.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
@@ -160,6 +160,35 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   for (const p of ["data/sa26-demo.json", "data/sa26-seifa.json", ".build/map/sa26/assign-sa1.json"]) assert.ok(fs.existsSync(path.join(ROOT, p)), `${p} missing — run the sa26 census pipelines`);
   const dec = new Set(sa.divs.map((d) => d.seifa.irsad.dec));
   assert.ok(dec.size >= 8, "sa26 IRSAD deciles spread across the range (a monotone join bug collapses them)");
+}
+
+// the sa26 frame's polling places: 753 ECSA booths joined out of the HAChange
+// payload by build_sa26_data.py (committed caches in .build/map/src/sa26) —
+// votes in the district's candidate order, ECSA venue types mapped to the
+// federal day/EVC/mobile codes, the district's live 2CP pair kept where the
+// booth's pair matches (Croydon's 14 booths carried an election-night
+// notional ALP v One Nation pair, dropped). The ECSA publishes no booth
+// addresses or coordinates, so lat/lon/premises are null and dec/vdec too.
+{
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
+  const B = sa.booths;
+  assert.ok(B, "sa26 res carries a booths record");
+  const LANES = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
+  for (const k of LANES) assert.ok(Array.isArray(B[k]) && B[k].length === 753, `sa26 booths.${k}: 753 rows`);
+  assert.equal(new Set(B.id).size, 753, "sa26 booth ids are unique");
+  assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 4, 5], "sa26 booth types are day/EVC/mobile only");
+  assert.ok(B.lat.every((x) => x === null) && B.lon.every((x) => x === null) && B.prem.every((x) => x === null), "sa26 booths carry no venue facts (the ECSA publishes none)");
+  assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa26 booths carry no SEIFA deciles (the neighbourhood lane is blank)");
+  sa.divs.forEach((d, di) => {
+    const js = B.d.reduce((a, x, k) => (x === di ? (a.push(k), a) : a), []);
+    assert.ok(js.length > 0, `${d.n}: at least one booth`);
+    for (const j of js) {
+      assert.equal(B.v[j].length, d.c.length, `${d.n} ${B.n[j]}: a vote slot per district candidate`);
+      const formal = B.v[j].reduce((a, x) => a + x, 0);
+      assert.ok(!B.tcp[j] || B.tcp[j][0] + B.tcp[j][1] <= formal + 4, `${d.n} ${B.n[j]}: 2CP within the booth's formal count`);
+    }
+  });
+  assert.equal(B.tcp.filter(Boolean).length, 732, "732 booths carry the district's live pair (7 zero-vote, 14 Croydon notional)");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");
