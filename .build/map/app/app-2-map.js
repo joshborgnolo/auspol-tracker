@@ -110,7 +110,13 @@ const zoom = d3.zoom().scaleExtent([0.5, 2600]).clickDistance(6)
   // there is the small handler below
   .filter((e) => S.view === "map" && e.type !== "wheel" && !e.button && !(e.type === "dblclick")
     && !(e.type === "touchstart" && T.k <= HOME.k * 1.001))
-  .on("start", (e) => { if (e.sourceEvent && e.sourceEvent.type === "mousedown") canvas.classList.add("grabbing"); })
+  .on("start", (e) => {
+    // a real grab (mouse, touch) ends any running zoom glide; the glide's own
+    // programmatic transforms arrive sourceEvent-less and pass through
+    if (!e.sourceEvent) return;
+    glideCancel();
+    if (e.sourceEvent.type === "mousedown") canvas.classList.add("grabbing");
+  })
   .on("zoom", (e) => { T = e.transform; schedule(); updateHint(); legendIfChanged(); updateTouch(); })
   .on("end", () => { canvas.classList.remove("grabbing"); homeFromIsland(); });
 d3.select(canvas).call(zoom).on("dblclick.zoom", null);
@@ -1144,9 +1150,59 @@ function homeBox(m) {
   }
   return b;
 }
+/* ----- zoom momentum -----
+   A pinch on a trackpad (or a quick wheel flick) ends in a short glide, the
+   way a Maps app keeps zooming as the gesture lifts: every zoom-lane impulse
+   feeds a velocity tracker, and a beat after the gesture's last event the
+   remaining pace runs down with friction about the gesture's last anchor.
+   Panning needs none of this — the OS already streams momentum wheel events
+   for a two-finger scroll. */
+const Z_TRK = 0.06,   // s — the tracker's time constant while the gesture streams
+  Z_TAU = 0.24,       // s — the glide's own friction
+  Z_REL = 140,        // ms after the last impulse that the glide starts
+  Z_MIN_N = 3,        // impulses before a gesture can fling (a lone notch steps)
+  Z_MIN_V = 0.8,      // octaves/s below which the release is spent
+  Z_MAX_V = 5.8;      // octaves/s cap — the longest fling adds ~1.4 octaves
+let glide = null;     // {v, px, py, n, at, timer, raf}
+function glideCancel() {
+  if (!glide) return;
+  clearTimeout(glide.timer);
+  if (glide.raf) cancelAnimationFrame(glide.raf);
+  glide = null;
+}
+function glideFrame() {
+  if (!glide) return;
+  const now = performance.now(), dt = Math.min(0.05, (now - glide.at) / 1000);
+  glide.at = now;
+  const k0 = T.k;
+  zoomAt(glide.px, glide.py, Math.pow(2, glide.v * dt));
+  glide.v *= Math.exp(-dt / Z_TAU);
+  // done: spent, or held by the fit clamp (gliding out onto the whole country)
+  if (Math.abs(glide.v) < Z_MIN_V || T.k === k0 || (glide.v < 0 && T.k <= HOME.k * 1.001)) glide = null;
+  else glide.raf = requestAnimationFrame(glideFrame);
+}
+function glideRelease() {
+  if (!glide) return;
+  if (S.view !== "map" || glide.n < Z_MIN_N || Math.abs(glide.v) < Z_MIN_V) { glide = null; return; }
+  glide.v = Math.sign(glide.v) * Math.min(Math.abs(glide.v), Z_MAX_V);
+  glide.at = performance.now();
+  glide.raf = requestAnimationFrame(glideFrame);
+}
+// one zoom-lane impulse, applied at once and folded into the fling tracker
+function zoomImpulse(px, py, factor) {
+  zoomAt(px, py, factor);
+  if (reduceMotion) return;
+  const now = performance.now(), live = glide && now - glide.at <= Z_REL && S.view === "map";
+  if (live) { clearTimeout(glide.timer); if (glide.raf) { cancelAnimationFrame(glide.raf); glide.raf = null; } }
+  const dt = live ? Math.max((now - glide.at) / 1000, 1 / 240) : 1 / 60;
+  const rate = Math.log2(factor) / dt, b = live ? 1 - Math.exp(-dt / Z_TRK) : 1;
+  const v = live ? glide.v * (1 - b) + rate * b : rate;
+  glide = { v, px, py, n: (live ? glide.n : 0) + 1, at: now, timer: setTimeout(glideRelease, Z_REL), raf: null };
+}
 // the map may pan anywhere inside the frame of the whole-country view, and no
 // further out: at that zoom nothing moves, so a scroll there scrolls the page
 function setExtent() {
+  glideCancel();
   const m = M(); if (!m || !Wpx) return;
   // outside the map view the transform always rides the whole-country fit:
   // the insets grow the box after the first draw, and a transform pinned to
@@ -1186,6 +1242,7 @@ const atLastFit = () => lastFit && Math.abs(T.k / lastFit.k - 1) < 0.01 && Math.
 // stage's resize must take that for the page's view, not one the reader moved
 let flight = null;
 function fly(t, dur, redo) {
+  glideCancel();
   const s = d3.select(canvas), me = { redo, isl: away };
   flight = me;
   s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t)
@@ -1201,7 +1258,7 @@ function fitSelection(dur, force) {
   else { t = fitTransform(selectionBox(), 0, q && S.sel.level !== "booth" ? { t: isPhone() ? 64 : 46 } : null); dock = null; }
   lastFit = t;
   const s = d3.select(canvas);
-  if (!dur || reduceMotion) { flight = null; s.interrupt(); s.call(zoom.transform, t); }
+  if (!dur || reduceMotion) { glideCancel(); flight = null; s.interrupt(); s.call(zoom.transform, t); }
   else fly(t, dur, () => fitSelection(Math.min(dur, 320)));
 }
 function flyToCity(k) {
@@ -1231,7 +1288,7 @@ function homeFromIsland() {
   lastFit = HOME;
   d3.select(canvas).transition().duration(reduceMotion ? 0 : 300).call(zoom.transform, HOME);
 }
-function zoomBy(f) { if (S.view === "map") d3.select(canvas).transition().duration(reduceMotion ? 0 : 280).call(zoom.scaleBy, f); }
+function zoomBy(f) { glideCancel(); if (S.view === "map") d3.select(canvas).transition().duration(reduceMotion ? 0 : 280).call(zoom.scaleBy, f); }
 
 /* ----- the wheel, the trackpad and the pinch -----
    Two fingers on a trackpad pan the map in any direction; a pinch zooms; a
@@ -1251,7 +1308,11 @@ function classifyWheel(e) {
 }
 function zoomAt(px, py, factor) {
   d3.select(canvas).interrupt();
-  zoom.scaleTo(d3.select(canvas), T.k * factor, [px, py]);
+  // d3 clamps translation for programmatic calls but never the scale: the
+  // scale bound is ours to keep, or a wheel glide overshoots the home fit
+  const k = clamp(T.k * factor, HOME.k, 2600);
+  if (k === T.k) return;
+  zoom.scaleTo(d3.select(canvas), k, [px, py]);
 }
 function panPx(dx, dy) {
   d3.select(canvas).interrupt();
@@ -1273,7 +1334,7 @@ canvas.addEventListener("wheel", (e) => {
   }
   if (e.ctrlKey) { // a trackpad pinch arrives as a ctrl-wheel
     e.preventDefault();
-    zoomAt(px, py, Math.pow(2, -e.deltaY * 0.012));
+    zoomImpulse(px, py, Math.pow(2, -e.deltaY * 0.017));
     return;
   }
   // a notched wheel announces itself (line deltas, or whole multiples of 120); it
@@ -1292,7 +1353,7 @@ canvas.addEventListener("wheel", (e) => {
     const atMin = T.k <= HOME.k * 1.001 && e.deltaY > 0;
     if (atMin) return; // zoomed right out: scrolling on goes to the page
     e.preventDefault();
-    zoomAt(px, py, Math.pow(2, -e.deltaY * unit * 0.002));
+    zoomImpulse(px, py, Math.pow(2, -e.deltaY * unit * 0.0026));
   }
 }, { passive: false });
 // pinch-in from the whole-country fit, where d3's touch sits out so a lone
@@ -1305,6 +1366,7 @@ canvas.addEventListener("touchstart", (e) => {
   // actions up front or the first move under touch-action: pan-y can start a
   // scroll the touchmove preventDefault then can't take back
   if (e.cancelable) e.preventDefault();
+  glideCancel();
   const p = e.touches[0], q = e.touches[1];
   homePinch = { d: Math.hypot(p.clientX - q.clientX, p.clientY - q.clientY), k: T.k };
 }, { passive: false });
@@ -1327,13 +1389,13 @@ canvas.addEventListener("touchcancel", () => { homePinch = null; });
 // the list view's own rows
 swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
 // Safari's own pinch events
-let gestureK = 1;
-canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); gestureK = T.k; });
+let gesturePrev = 1;
+canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); glideCancel(); gesturePrev = 1; });
 canvas.addEventListener("gesturechange", (e) => {
   e.preventDefault(); if (S.view !== "map") return;
   const r = canvas.getBoundingClientRect();
-  d3.select(canvas).interrupt();
-  zoom.scaleTo(d3.select(canvas), gestureK * e.scale, [e.clientX - r.left, e.clientY - r.top]);
+  zoomImpulse(e.clientX - r.left, e.clientY - r.top, e.scale / gesturePrev);
+  gesturePrev = e.scale;
 });
 canvas.addEventListener("gestureend", (e) => e.preventDefault());
 
