@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 51.6
+      "alp": 51.3
     },
-    "imp": 51.6,
-    "pub": 50.4,
-    "on": 52,
+    "imp": 51.3,
+    "pub": 50.2,
+    "on": 52.1,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -207,7 +207,8 @@
       "2026-10-08|Newspoll",
       "2026-10-10|Resolve",
       "2026-10-11|Roy Morgan",
-      "2026-10-20|YouGov"
+      "2026-10-20|YouGov",
+      "2026-10-25|Roy Morgan"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -322,19 +323,19 @@
       }
     },
     "prim": {
-      "alp": 26.7,
-      "grn": 13.6,
-      "lnp": 22.4,
-      "onp": 26,
-      "oth": 11.2
+      "alp": 26.4,
+      "grn": 13.8,
+      "lnp": 23.1,
+      "onp": 25.2,
+      "oth": 11.3
     },
     "leaders": {
-      "alb_fav": -21.8,
-      "alb_net": -23.7,
+      "alb_fav": -21.5,
+      "alb_net": -23.8,
       "hanson_fav": -6,
-      "hanson_net": -2.9,
-      "taylor_fav": -4.8,
-      "taylor_net": -6.6
+      "hanson_net": -2.1,
+      "taylor_fav": -5,
+      "taylor_net": -6.5
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -349,7 +350,7 @@
         "RedBridge/Accent": 0.3,
         "RedBridge/Accent (MRP)": 0.1,
         "Resolve": -0.3,
-        "Roy Morgan": 0,
+        "Roy Morgan": 0.1,
         "Spectre Strategy": -0.8,
         "Wolf & Smith": 0,
         "YouGov": 0.1,
@@ -357,9 +358,9 @@
       }
     },
     "dir": {
-      "right": 28.1,
-      "wrong": 61.6,
-      "net": -33.5
+      "right": 25.6,
+      "wrong": 62.1,
+      "net": -36.5
     },
     "issLead": {
       "climate": "alp",
@@ -382,10 +383,14 @@
       "security": "National security"
     },
     "sig": {
-      "iss|housing|alp": -1
+      "iss|crime|imp": -1,
+      "iss|housing|alp": -1,
+      "prim|onp": -1
     },
     "sigMeta": {
-      "iss|housing|alp": "Labor's share as the best party on housing"
+      "iss|crime|imp": "the share naming crime a top-three issue",
+      "iss|housing|alp": "Labor's share as the best party on housing",
+      "prim|onp": "One Nation's primary vote"
     },
     "conf": {
       "business": 76.5,
@@ -494,6 +499,25 @@
       "label": "26 Oct 2026",
       "kind": "finding",
       "text": "35–54 voters (by age) now break significantly away from the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-10-26",
+      "label": "26 Oct 2026",
+      "kind": "poll",
+      "text": "Roy Morgan (fieldwork 12–25 Oct, n=2,711) added — the two-party preferred estimate moved 51.6 → 51.3 (Labor v the Coalition, implied flows). Primary votes: Labor 26.7 → 26.4, the Coalition 22.4 → 23.1, One Nation 26.0 → 25.2, the Greens 13.6 → 13.8, others 11.2 → 11.3. Leader ratings: Albanese's net approval −23.7 → −23.8, Albanese's net favourability −21.8 → −21.5, Taylor's net approval −6.6 → −6.5, Taylor's net favourability −4.8 → −5.0, Hanson's net approval −2.9 → −2.1. National direction: right track 28.1 → 25.6, wrong track 61.6 → 62.1 (net −33.5 → −36.5). House effect (Labor v the Coalition, implied flows; positive leans Labor): Roy Morgan 0.0 → +0.1.",
+      "url": "https://www.roymorgan.com/findings/10376-federal-voting-intention-october-26-2026"
+    },
+    {
+      "date": "2026-10-26",
+      "label": "26 Oct 2026",
+      "kind": "finding",
+      "text": "The fall in One Nation's primary vote over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-10-26",
+      "label": "26 Oct 2026",
+      "kind": "finding",
+      "text": "The fall in the share naming crime a top-three issue over the past month is now statistically significant."
     }
   ]
 }

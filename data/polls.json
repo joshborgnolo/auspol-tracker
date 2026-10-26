@@ -1475,6 +1475,14 @@
       "right": 24.5,
       "wrong": 62.5,
       "unsure": 13
+    },
+    {
+      "date": "2026-10-25",
+      "dateStart": "2026-10-12",
+      "pollster": "Roy Morgan",
+      "right": 22,
+      "wrong": 63,
+      "unsure": 15
     }
   ],
   "polls": [
@@ -6154,6 +6162,29 @@
       "published": "2026-10-21T05:20",
       "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_20_10_26_APC_Methodology_Statement.pdf"
+    },
+    {
+      "date": "2026-10-25",
+      "published": "2026-10-26T18:07",
+      "dateStart": "2026-10-12",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 2711,
+      "undecided": 6.5,
+      "alp": 26,
+      "lnp": 23.5,
+      "grn": 15.5,
+      "onp": 22.5,
+      "ind": 12.5,
+      "oth": null,
+      "tpp_alp": 52.5,
+      "tpp_lnp": 47.5,
+      "tpp_flows": 53,
+      "lnpSplit": {
+        "Lib": 21,
+        "Nat": 2.5
+      },
+      "url": "https://www.roymorgan.com/findings/10376-federal-voting-intention-october-26-2026"
     }
   ],
   "ppm": [
@@ -9364,6 +9395,12 @@
       "date": "2026-10-20",
       "firm": "YouGov",
       "alpVsOnp_alp": 50,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-10-25",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 55,
       "lnpVsOnp_lnp": null
     }
   ],

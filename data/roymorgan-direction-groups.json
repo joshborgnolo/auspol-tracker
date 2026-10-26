@@ -180,6 +180,19 @@
      "w": 54
     }
    }
+  },
+  "2026-10-25": {
+   "slug": "10376-federal-voting-intention-october-26-2026",
+   "stateExtremes": {
+    "highest": {
+     "state": "Queensland",
+     "w": 71
+    },
+    "lowest": {
+     "state": "South Australia",
+     "w": 55
+    }
+   }
   }
  },
  "_about": "Roy Morgan's national-direction splits as printed in each fortnightly release's 'Analysis by …' prose – the gender pair, the voting-intention wrong-track shares (ALP carries its right-direction share too), and the state highest/lowest extremes (the full state direction table is paywalled; only the extremes print). Banked by .build/extract-roymorgan-direction.mjs from the committed release caches; the national pair in each cache is re-verified against the wave's direction row in polls.json every run. A release prints whichever blocks it prints – absent blocks are simply not on the record that fortnight. The direction panel's group select reads this via gen-data."
