@@ -231,7 +231,7 @@ function senUpLink() {
   return `<button type="button" class="st-up" data-sgo="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(label)}</button>`;
 }
 function senHead(title, meta, hed, dek) {
-  return `${senUpLink()}<div class="st-head"><h2>${esc(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+  return `${senUpLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
 }
 /* the balance of power, in rules: how many votes the government is short of the 39, which crossbench
    groups could supply them alone, and what it would take without them */
@@ -297,7 +297,7 @@ function storySenate(m) {
   // since the elections: changes of party, and casual vacancies
   const moved = m.divs.filter((d) => d.sen.electedAs), casual = m.divs.filter((d) => d.sen.casual);
   if (moved.length || casual.length) {
-    const row = (d, tx) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${esc(d.n)}.</b> ${esc(tx)}.</span></button>`;
+    const row = (d, tx) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${ds(d.n)}.</b> ${esc(tx)}.</span></button>`;
     h += `<div class="st-sec"><h3>Not as elected <small>${moved.length} changed party, ${casual.length} filled a vacancy</small></h3><div class="changes">${moved.map((d) => row(d, `Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; now ${d.hold.fam === "ind" ? "sits as an independent" : `sits for ${theParty(d.hold.ab)}`}`)).join("")}${casual.map((d) => row(d, d.sen.casual.for ? `Filled ${d.sen.casual.for}’s vacancy for ${theParty(d.hold.ab)}, to ${termWords(d)}` : `Filled a ${partyName(d.hold.ab)} vacancy, to ${termWords(d)}`)).join("")}</div></div>`;
   }
   h += senFoot(m);
@@ -312,20 +312,20 @@ function senDefends(m, upC) {
   return `${cap(FAM_PL[first])} defends ${words(upC[first])} of them${rest.length ? `, ${listAnd(rest.map((f) => `${FAM_PL[f]} ${words(upC[f])}`))}` : ""}.`;
 }
 function storySenState(m, st) {
-  const ds = m.divs.filter((d) => d.st === st), c = {}; for (const d of ds) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
+  const sens = m.divs.filter((d) => d.st === st), c = {}; for (const d of sens) { const f = holdFam(d.hold); c[f] = (c[f] || 0) + 1; }
   const order = SEN_FAMS.filter((f) => c[f]).sort((a, b) => c[b] - c[a]);
   const top = order[0], tie = order[1] && c[order[1]] === c[top];
   const terr = st === "ACT" || st === "NT";
-  const hed = tie ? `${cap(FAM_PL[top])} and ${FAM_PL[order[1]]} hold ${words(c[top])} seats each` : `${cap(FAM_PL[top])} holds ${words(c[top])} of ${STATE_POSS[st]} ${words(ds.length)} seats`;
-  const up = ds.filter(upNext);
-  const dek = terr ? `Territory senators serve until the next election, so both seats are up then.` : `${cap(words(up.length))} of the ${words(ds.length)}, elected in 2022, are up at the next election; the other ${words(ds.length - up.length)} sit until 2031.`;
-  let h = senHead(STATE_TITLE[st], `${ds.length} senators`, hed, dek);
-  ds.sort(senOrder);
-  const row = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${esc(d.n)}</b> ${esc(partyName(d.hold.ab))}${d.sen.role ? ` · ${ROLE_NAME[d.sen.role]}` : ""}</span></button>`;
+  const hed = tie ? `${cap(FAM_PL[top])} and ${FAM_PL[order[1]]} hold ${words(c[top])} seats each` : `${cap(FAM_PL[top])} holds ${words(c[top])} of ${STATE_POSS[st]} ${words(sens.length)} seats`;
+  const up = sens.filter(upNext);
+  const dek = terr ? `Territory senators serve until the next election, so both seats are up then.` : `${cap(words(up.length))} of the ${words(sens.length)}, elected in 2022, are up at the next election; the other ${words(sens.length - up.length)} sit until 2031.`;
+  let h = senHead(STATE_TITLE[st], `${sens.length} senators`, hed, dek);
+  sens.sort(senOrder);
+  const row = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${ds(d.n)}</b> ${esc(partyName(d.hold.ab))}${d.sen.role ? ` · ${ROLE_NAME[d.sen.role]}` : ""}</span></button>`;
   if (!terr) {
     h += `<div class="st-sec"><h3>Up at the next election <small>${up.length}, elected in 2022</small></h3><div class="changes sn-list">${up.map(row).join("")}</div></div>`;
-    h += `<div class="st-sec"><h3>Sitting until 2031 <small>${ds.length - up.length}, elected in 2025</small></h3><div class="changes sn-list">${ds.filter((d) => !upNext(d)).map(row).join("")}</div></div>`;
-  } else h += `<div class="st-sec"><h3>Senators <small>elected in 2025</small></h3><div class="changes sn-list">${ds.map(row).join("")}</div></div>`;
+    h += `<div class="st-sec"><h3>Sitting until 2031 <small>${sens.length - up.length}, elected in 2025</small></h3><div class="changes sn-list">${sens.filter((d) => !upNext(d)).map(row).join("")}</div></div>`;
+  } else h += `<div class="st-sec"><h3>Senators <small>elected in 2025</small></h3><div class="changes sn-list">${sens.map(row).join("")}</div></div>`;
   h += senFoot(m);
   return h;
 }
@@ -344,7 +344,7 @@ function storySenator(m, i) {
   if (x.role) dek = `${party} senator for ${STATE_NAME[x.st]}. ${dek}`;
   let h = senHead(d.n, `Senator for ${STATE_TITLE[x.st]}`, hed, dek);
   const mates = m.divs.filter((y) => y.st === x.st && y.i !== i).sort(senOrder);
-  const row = (y) => `<button type="button" data-sgo="sen:${y.i}"><span class="dt"><i class="sw" style="${swc(holdFam(y.hold))}"></i></span><span class="tx"><b>${esc(y.n)}</b> ${esc(partyName(y.hold.ab))}${upNext(y) ? "" : " · to 2031"}</span></button>`;
+  const row = (y) => `<button type="button" data-sgo="sen:${y.i}"><span class="dt"><i class="sw" style="${swc(holdFam(y.hold))}"></i></span><span class="tx"><b>${ds(y.n)}</b> ${esc(partyName(y.hold.ab))}${upNext(y) ? "" : " · to 2031"}</span></button>`;
   h += `<div class="st-sec"><h3>${STATE_POSS[x.st].replace(/^the /, "The ")} other senators <small>${mates.length}</small></h3><div class="changes sn-list">${mates.map(row).join("")}</div></div>`;
   h += senFoot(m);
   return h;
@@ -361,7 +361,7 @@ function selectSen(sel) {
 function senTip(m, i) {
   const d = m.divs[i], x = d.sen;
   const term = x.term === "next" ? "Up at the next election" : x.term === 2028 ? "Up at the next election (term to 2028)" : "Sits until 2031";
-  return `<div class="tn">${esc(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab))}</div><div class="ts">${esc(term)}</div>`;
+  return `<div class="tn">${ds(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab))}</div><div class="ts">${esc(term)}</div>`;
 }
 function senSearchItems(m) {
   const items = [];

@@ -3,6 +3,11 @@
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+/* display text: the data canonically stores a straight apostrophe (O'Connor);
+   the page sets names with a curly one. ds is esc + curly for HTML slots,
+   dn the curly pass alone for canvas labels (O'Connor, O'Sullivan booths) */
+const ds = (s) => esc(String(s).replace(/'/g, "’"));
+const dn = (s) => String(s).replace(/'/g, "’");
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);

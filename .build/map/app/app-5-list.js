@@ -245,8 +245,7 @@ function previewDrag(el, r, drag) {
 /* =============================== the list view =============================== */
 /* booth rows are taller: their names wrap to two lines (.ls-row.booths in page.css) */
 const ROW_H = (u) => (u === "booths" ? 58 : 52);
-/* proper names in the table's cells: escaped, with typographic apostrophes */
-const ds = (s) => esc(String(s).replace(/'/g, "’"));
+/* the list's proper-name cells use the shared ds (esc + curly apostrophes) */
 function listRows(m) {
   const q = S.q.trim() && S.view === "list" ? norm(S.q.trim()).split(/\s+/).filter(Boolean) : null;
   const hit = (h) => !q || q.every((t) => h.includes(t));

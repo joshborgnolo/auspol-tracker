@@ -272,7 +272,7 @@ function drawLabels(m) {
   const sd = selDiv(), b = m.booth;
   const groundOf = (i) => { const c = fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
-    const j = S.sel.booth; put(b.name[j], b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(b.votes[j]) - 13, 13, 600, groundOf(sd), th.ink, true);
+    const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(b.votes[j]) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
@@ -287,7 +287,7 @@ function drawLabels(m) {
       cand.push({ d, x, y, a: w * h });
     }
     cand.sort((p, q) => (q.d.i === sd) - (p.d.i === sd) || q.a - p.a);
-    for (const c of cand) put(c.d.n, c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2);
+    for (const c of cand) put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2);
   }
   if (m._vis && m._vis.length && T.k > K_BLAB) {
     let n = 0;
@@ -296,7 +296,7 @@ function drawLabels(m) {
       if (S.sel.level === "booth" && j === S.sel.booth) continue;
       const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y;
       if (x < 0 || y < 0 || x > Wpx || y > Hpx) continue;
-      if (put(b.name[j].replace(" early voting centre", " (early)"), x, y - rad(b.votes[j]) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
+      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(b.votes[j]) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
     }
   }
   // the streets' own names last, clear of every label above and every booth
