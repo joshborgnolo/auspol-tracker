@@ -11,13 +11,20 @@ const famText = (fam) => `var(--${fam}-text)`;
 const famFill = (fam) => `var(--${fam})`;
 const thePartyFam = (fam) => FAM_PL[fam];
 const leaderName = (h) => (h.ab === "CSA" ? "Community Strong" : partyName(h.ab, h.pn));
+// sa26's own words: the state election's opposition is the Liberals, its head
+// of government a premier, its counts the ECSA's; across it, South Australia
+const isSA26 = () => S.year === "sa26";
+const coalW = (cap) => (isSA26() ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+const leaderT = () => (isSA26() ? "premier" : "prime minister");
+const ausW = () => (isSA26() ? "South Australia" : "Australia");
+const legW = (b) => (isSA26() && b === "lnp" ? "Liberals" : FAM_LEG[b]);
 // the "now" view: today’s holder won the last count under another banner — the
 // winner’s row in the count stays historical but earns a "· now X" note
 const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
 function swingPhrase(sw, prev) {
   if (sw == null) return "";
   if (Math.abs(sw) < 0.05) return `no swing since ${prev}`;
-  return `a swing of ${pts(sw)} to ${sw > 0 ? "Labor" : "the Coalition"} since ${prev}`;
+  return `a swing of ${pts(sw)} to ${sw > 0 ? "Labor" : coalW()} since ${prev}`;
 }
 function upDown(v, unit = "points") { const a = Math.abs(v); if (a < 0.05) return "unchanged"; return `${v >= 0 ? "up" : "down"} ${a.toFixed(1)} ${a.toFixed(1) === "1.0" ? unit.replace(/s$/, "") : unit}`; }
 const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -77,7 +84,8 @@ function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
 function famRows(fp, fpSw) {
   const order = FAMS.filter((b) => fp[b] > 0.05).sort((a, b) => fp[b] - fp[a]);
   const top = Math.max(40, fp[order[0]]);
-  return `<div class="rows">${order.map((b) => `<div class="row"><div class="nm">${FAM_LEG[b]}</div><div class="bar"><i style="width:${(100 * fp[b]) / top}%;${swc(b)}"></i></div><div class="v ${tx(b)}">${f1(fp[b])}</div><div class="d">${fpSw ? sgn(fpSw[b]) : ""}</div></div>`).join("")}</div>`;
+  // a year with no previous count carries fpSw as an object of nulls (sa26)
+  return `<div class="rows">${order.map((b) => `<div class="row"><div class="nm">${legW(b)}</div><div class="bar"><i style="width:${(100 * fp[b]) / top}%;${swc(b)}"></i></div><div class="v ${tx(b)}">${f1(fp[b])}</div><div class="d">${fpSw && fpSw[b] != null ? sgn(fpSw[b]) : ""}</div></div>`).join("")}</div>`;
 }
 function flowRows(flows, pairA, pairB) {
   const agg = {};
@@ -85,7 +93,7 @@ function flowRows(flows, pairA, pairB) {
   const list = Object.values(agg).filter((x) => x.ta + x.tb > 0).sort((x, y) => y.ta + y.tb - (x.ta + x.tb));
   if (!list.length) return "";
   const [la, lb] = pairNames(pairA, pairB);
-  return list.map((x) => { const t = x.ta + x.tb, pa = (100 * x.ta) / t; return `<div class="flow"><div class="fh"><div>${FAM_LEG[x.b]}</div><span>${int(t)} votes</span></div><div class="fb"><i style="width:calc(${pa}% - 1px);${swc(pairA.fam)}"></i><i style="flex:1;${swc(pairB.fam)}"></i></div><div class="fl"><span><b class="${tx(pairA.fam)}">${f0(pa)}%</b> to ${esc(la)}</span><span>${esc(lb)} <b class="${tx(pairB.fam)}">${f0(100 - pa)}%</b></span></div></div>`; }).join("");
+  return list.map((x) => { const t = x.ta + x.tb, pa = (100 * x.ta) / t; return `<div class="flow"><div class="fh"><div>${legW(x.b)}</div><span>${int(t)} votes</span></div><div class="fb"><i style="width:calc(${pa}% - 1px);${swc(pairA.fam)}"></i><i style="flex:1;${swc(pairB.fam)}"></i></div><div class="fl"><span><b class="${tx(pairA.fam)}">${f0(pa)}%</b> to ${esc(la)}</span><span>${esc(lb)} <b class="${tx(pairB.fam)}">${f0(100 - pa)}%</b></span></div></div>`; }).join("");
 }
 function decileRows(get, labelFor) {
   return `<div class="dec">${IX.map((ix) => { const v = get(ix); const cells = Array.from({ length: 10 }, (_, k) => `<i style="${v && k + 1 <= v ? `background:${css(RAMP.seifa[Math.round((k / 9) * 100)])}` : ""}"></i>`).join(""); return `<div class="nm">${IX_NAME[ix]}<small>${IX_ABBR[ix]}${v ? ` · decile ${v}` : " · no score"}${labelFor ? labelFor(ix, v) : ""}</small></div><div class="cells" role="img" aria-label="Decile ${v ?? "unknown"} of 10">${cells}</div>`; }).join("")}</div>`;
@@ -184,16 +192,16 @@ function areaHedDek(m, st) {
       const pv = prevYearOf(m.year), changed = pv && GOV[pv] && GOV[pv] !== gov;
       let hed;
       if (aus) {
-        if (g < maj) hed = `No party won a majority: ${o > g ? `the Coalition won ${o} seats, Labor ${g}` : `Labor won ${g} seats, the Coalition ${o}`}`;
-        else if (changed) hed = `${gov === "alp" ? "Labor" : "The Coalition"} won government with ${g} of the ${N} seats`;
-        else hed = `${gov === "alp" ? "Labor" : "The Coalition"} was returned with ${g} of the ${N} seats`;
+        if (g < maj) hed = `No party won a majority: ${o > g ? `${coalW()} won ${o} seats, Labor ${g}` : `Labor won ${g} seats, ${coalW()} ${o}`}`;
+        else if (changed) hed = `${gov === "alp" ? "Labor" : coalW(1)} won government with ${g} of the ${N} seats`;
+        else hed = `${gov === "alp" ? "Labor" : coalW(1)} was returned with ${g} of the ${N} seats`;
       } else {
         const best = (cnt.alp || 0) >= (cnt.lnp || 0) ? "alp" : "lnp", bn = cnt[best] || 0;
-        hed = `${best === "alp" ? "Labor" : "The Coalition"} won ${bn} ${ofSeats}`;
+        hed = `${best === "alp" ? "Labor" : coalW(1)} won ${bn} ${ofSeats}`;
       }
       let dek = aus
-        ? `${g < maj ? "" : `${opp === "alp" ? "Labor" : "The Coalition"} won ${o}. `}${crossSentence(m, idx, "won")}${c ? " " : ""}${m.year === 2010 ? "Labor kept government with the support of the Greens’ member and three independents. " : ""}${PM[m.year]} ${changed ? "became" : "remained"} prime minister.`
-        : `${(cnt.alp || 0) >= (cnt.lnp || 0) ? "The Coalition" : "Labor"} won ${(cnt.alp || 0) >= (cnt.lnp || 0) ? cnt.lnp || 0 : cnt.alp || 0}. ${crossSentence(m, idx, "won")}${c ? " " : ""}Labor’s two-party vote${where} was ${f1(A.tpp)}%, ${swingPhrase(A.tppSw, prev)}.`;
+        ? `${g < maj ? "" : `${opp === "alp" ? "Labor" : coalW(1)} won ${o}. `}${crossSentence(m, idx, "won")}${c ? " " : ""}${m.year === 2010 ? "Labor kept government with the support of the Greens’ member and three independents. " : ""}${PM[m.year]} ${changed ? "became" : "remained"} ${leaderT()}.`
+        : `${(cnt.alp || 0) >= (cnt.lnp || 0) ? coalW(1) : "Labor"} won ${(cnt.alp || 0) >= (cnt.lnp || 0) ? cnt.lnp || 0 : cnt.alp || 0}. ${crossSentence(m, idx, "won")}${c ? " " : ""}Labor’s two-party vote${where} was ${f1(A.tpp)}%${swingPhrase(A.tppSw, prev) ? ", " + swingPhrase(A.tppSw, prev) : ""}.`;
       return { hed, dek };
     }
     case "tpp": {
@@ -208,13 +216,14 @@ function areaHedDek(m, st) {
         const dek = sw.length ? `${toward === 0 ? "None" : cap(ofN(toward, sw.length))} ${toward === 0 ? `of the ${sw.length}` : ""} seats with a measured swing moved towards ${to}.`.replace("  ", " ") + ` The biggest swing that way was ${big ? `${esc(m.divs[big.i].n)}’s, ${pts(big.v)}` : "–"}.` : "";
         return { hed, dek: dek + (isNowM ? " These are the 2025 election’s swings." : "") };
       }
-      const hed = `${lead === "alp" ? "Labor" : "The Coalition"} won ${f1(leadPct)}% of the two-party vote${where}`;
+      const hed = `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
       const ahead = withData.filter((i) => m.divs[i].tpp > 50).length;
-      const dek = `That’s ${swingPhrase(A.tppSw, prev)}. On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, the Coalition in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? " These are the 2025 election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none." : ""}`;
+      const sp = swingPhrase(A.tppSw, prev);
+      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? " These are the 2025 election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none." : ""}`;
       return { hed, dek };
     }
     case "fp": {
-      const P = S.party, name = FAM_LEG[P];
+      const P = S.party, name = legW(P);
       const stood = idx.filter((i) => m.divs[i].fp[P] > 0);
       if (S.fpMode === "change") {
         const d0 = A.fpSw[P];
@@ -226,10 +235,12 @@ function areaHedDek(m, st) {
       }
       const hed = `${SUBJ[P]} won ${f1(A.fp[P])}% of first preferences${where}`;
       const ranked = stood.map((i) => ({ i, v: m.divs[i].fp[P] })).sort((a, b) => b.v - a.v);
-      const dek = `${cap(upDown(A.fpSw[P]))} on ${prev}. ${P === "ind" ? "Independents" : P === "oth" ? "Other candidates" : name} stood in ${stood.length === N ? `all ${N}` : `${stood.length} of the ${N}`} seats${ranked.length ? `; the best result was ${esc(m.divs[ranked[0].i].n)}’s ${f1(ranked[0].v)}%${byNote(m.divs[ranked[0].i])}` : ""}.`;
+      // a year with no previous count (sa26) doesn't pretend to a change figure
+      const dek = `${A.fpSw[P] != null ? `${cap(upDown(A.fpSw[P]))} on ${prev}. ` : ""}${P === "ind" ? "Independents" : P === "oth" ? "Other candidates" : name} stood in ${stood.length === N ? `all ${N}` : `${stood.length} of the ${N}`} seats${ranked.length ? `; the best result was ${esc(m.divs[ranked[0].i].n)}’s ${f1(ranked[0].v)}%${byNote(m.divs[ranked[0].i])}` : ""}.`;
       return { hed, dek };
     }
     case "flow": {
+      if (isSA26()) return { hed: `Preference flows aren’t published for this election`, dek: `The ECSA’s distribution decides each district’s winner; the AEC’s per-candidate splits that this lens draws have no South Australian counterpart.` };
       const F = S.from, name = POSS[F];
       let toA = 0, tot = 0;
       const per = [];
@@ -250,6 +261,7 @@ function areaHedDek(m, st) {
       return { hed, dek };
     }
     case "cls": {
+      if (isSA26()) return { hed: `South Australia’s seats carry no AEC type`, dek: `The inner-metropolitan to rural scale is the AEC’s federal classification; the ECSA publishes none of its own.` };
       let best = null;
       const per = CLS.map((c) => { const xs = idx.filter((i) => m.divs[i].cls === c); const a = seatCount(m, xs, "alp"), l = seatCount(m, xs, "lnp"); return { c, n: xs.length, a, l }; });
       for (const p of per) { if (p.n < (aus ? 10 : 3)) continue; for (const [fam, k] of [["alp", p.a], ["lnp", p.l]]) { const sh = k / p.n; if (!best || sh > best.sh) best = { fam, k, n: p.n, c: p.c, sh }; } }
@@ -323,6 +335,7 @@ function incFact(m, dm) {
 const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
+  if (isSA26()) return { hed: `No census figures for a state election`, dek: `These lanes are built on the federal seats’ census joins; South Australia’s 2026 districts have none here.` };
   if (!A.demo) return DEMO_EARLY;
   const scored = idx.filter((i) => m.divs[i].demo).sort((a, b) => m.divs[b].demo[k] - m.divs[a].demo[k]);
   const share = `${f1(A.demo[k])}% ${isInc(k) ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
@@ -343,15 +356,15 @@ function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
   const { hed, dek } = areaHedDek(m, st);
-  const title = aus ? (m.year === "now" ? "The House today" : `${m.year} election`) : STATE_TITLE[st];
-  const meta = aus ? (m.year === "now" ? `Members as at ${longDate(m.asOf)}` : `${longDate(m.date)} · ${N} seats`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${m.year} election`);
+  const title = aus ? (m.year === "now" ? "The House today" : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const meta = aus ? (m.year === "now" ? `Members as at ${longDate(m.asOf)}` : `${longDate(m.date)} · ${N} seats`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
-    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${FAM_LEG[f]} <b>${cnt[f]}</b></span>`).join("");
-    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="The House of Representatives, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
+    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
+    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA26() ? "The House of Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
   if (m.year === "now" && aus) {
     const ch = m.changes.slice().reverse();
@@ -359,11 +372,13 @@ function storyArea(m, st) {
     h += `<p class="st-note" style="margin-top:22px">The figures below are the 2025 election’s.</p>`;
   }
   // the two-party read
-  h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v Coalition${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", "Coalition", 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", "Coalition", "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : "The Coalition"} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}; ${swingPhrase(A.tppSw, prev)}.</p></div></div>`;
-  h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes · change on ${prev}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
-  h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `Australia ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
+  const swp = swingPhrase(A.tppSw, prev);
+  const classicN = m.divs.filter((d) => d.tpp != null).length;
+  h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${isSA26() ? "the Liberals" : "the Coalition"}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", isSA26() ? "Liberal" : "Coalition", 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", isSA26() ? "Liberal" : "Coalition", "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isSA26() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against Liberal carry this read; the ECSA publishes no notional two-party count for the rest.</p>` : ""}</div>`;
+  h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
+  h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   if (aus) {
-    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${sgn(a.tppSw)}</td></tr>`; }).join("")}</tbody></table></div>`;
+    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${STATES.filter((s) => m.areas[s]).map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;
@@ -409,25 +424,26 @@ function seatHedDek(m, d) {
       if (d.classic && d.tppSw != null) dek += `, ${swingPhrase(d.tppSw, prev)}`;
       dek += ".";
       if (fpLead !== d.win) dek += ` ${esc(surname(fpLead.n))} led on first preferences, ${f1((100 * fpLead.v) / d.formal)}% to ${f1((100 * d.win.v) / d.formal)}%.`;
-      dek += ` By the AEC’s measure that makes ${esc(d.n)} ${statusOf(d.winPct)}.`;
+      dek += ` ${isSA26() ? "On the usual scale" : "By the AEC’s measure"} that makes ${esc(d.n)} ${statusOf(d.winPct)}.`;
       if (ch.kind === "re" && ch.since < (m.year === "now" ? 2025 : m.year)) dek += ` ${esc(surname(d.win.n))} has held it since ${ch.since}.`;
       return { hed, dek };
     }
     case "tpp": {
-      if (d.tpp == null) return { hed: `There was no Labor v Coalition count in ${esc(d.n)}`, dek: d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
+      if (d.tpp == null) return { hed: `There was no Labor v ${isSA26() ? "Liberal" : "Coalition"} count in ${esc(d.n)}`, dek: isSA26() ? "The ECSA publishes a two-party count only where the final pair is Labor against Liberal." : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
       if (S.tppMode === "swing") {
         const s = d.tppSw;
-        const hed = s == null ? `${esc(d.n)} has no recorded swing` : Math.abs(s) < 0.05 ? `There was no two-party swing in ${esc(d.n)}` : `${esc(d.n)} swung ${pts(s)} to ${s > 0 ? "Labor" : "the Coalition"}`;
+        const hed = s == null ? `${esc(d.n)} has no recorded swing` : Math.abs(s) < 0.05 ? `There was no two-party swing in ${esc(d.n)}` : `${esc(d.n)} swung ${pts(s)} to ${s > 0 ? "Labor" : coalW()}`;
         const aus = m.areas.AUS.tppSw;
-        return { hed, dek: s == null ? "" : `Across Australia the swing was ${pts(aus)} to ${aus > 0 ? "Labor" : "the Coalition"}. The AEC measures a seat’s swing against its result last time, adjusted where its boundaries were redrawn.` };
+        return { hed, dek: s == null ? "" : `Across ${ausW()} the swing was ${pts(aus)} to ${aus > 0 ? "Labor" : coalW()}. The AEC measures a seat’s swing against its result last time, adjusted where its boundaries were redrawn.` };
       }
       const lead = d.tpp >= 50;
-      const hed = `${lead ? "Labor" : "The Coalition"} won ${f1(lead ? d.tpp : 100 - d.tpp)}% of the two-party vote in ${esc(d.n)}`;
-      const dek = d.classic ? `The final count was Labor against the Coalition, ${swingPhrase(d.tppSw, prev)}.` : `The final two here were ${esc(rn)} and ${esc(wn)}, so this is the AEC’s notional count of Labor against the Coalition, ${swingPhrase(d.tppSw, prev)}.`;
+      const hed = `${lead ? "Labor" : coalW(1)} won ${f1(lead ? d.tpp : 100 - d.tpp)}% of the two-party vote in ${esc(d.n)}`;
+      const sp = swingPhrase(d.tppSw, prev);
+      const dek = d.classic ? `The final count was Labor against ${coalW()}${sp ? `, ${sp}` : ""}.` : `The final two here were ${esc(rn)} and ${esc(wn)}, so this is the ${isSA26() ? "ECSA’s" : "AEC’s"} notional count of Labor against ${coalW()}${sp ? `, ${sp}` : ""}.`;
       return { hed, dek };
     }
     case "fp": {
-      const P = S.party, name = FAM_LEG[P], v = d.fp[P];
+      const P = S.party, name = legW(P), v = d.fp[P];
       if (S.fpMode === "change") {
         const c = fpChange(m, d, P);
         if (c == null) return { hed: `${SUBJ[P]} didn’t stand in ${esc(d.n)} both times`, dek: "" };
