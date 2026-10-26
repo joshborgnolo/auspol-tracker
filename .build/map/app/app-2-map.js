@@ -111,7 +111,7 @@ const zoom = d3.zoom().scaleExtent([0.5, 2600]).clickDistance(6)
   .filter((e) => S.view === "map" && e.type !== "wheel" && !e.button && !(e.type === "dblclick")
     && !(e.type === "touchstart" && T.k <= HOME.k * 1.001))
   .on("start", (e) => {
-    // a real grab (mouse, touch) ends any running zoom glide; the glide's own
+    // a real grab (mouse, touch) ends any running zoom ease or glide; their own
     // programmatic transforms arrive sourceEvent-less and pass through
     if (!e.sourceEvent) return;
     glideCancel();
@@ -1150,64 +1150,58 @@ function homeBox(m) {
   }
   return b;
 }
-/* ----- zoom momentum -----
-   A pinch on a trackpad (or a quick wheel flick) ends in a short glide, the
-   way a Maps app keeps zooming as the gesture lifts: every zoom-lane impulse
-   feeds a velocity tracker, and a beat after the gesture's last event the
-   remaining pace runs down with friction about the gesture's last anchor.
-   Panning needs none of this — the OS already streams momentum wheel events
-   for a two-finger scroll. */
-const Z_TRK = 0.06,   // s — the tracker's time constant while the gesture streams
-  Z_TAU = 0.24,       // s — the glide's own friction
-  Z_REL = 140,        // ms after the last impulse that the glide starts
-  Z_MIN_N = 3,        // impulses before a gesture can fling (a lone notch steps)
-  Z_MIN_V = 0.8,      // octaves/s below which the release is spent
-  Z_MAX_V = 5.8;      // octaves/s cap — the longest fling adds ~1.4 octaves
-let glide = null;     // {v, px, py, n, at, timer, raf}
+/* ----- zoom easing -----
+   Nothing here guesses when a gesture has ended. A trackpad pinch (a
+   ctrl-wheel stream in Chrome and Firefox) follows the fingers 1:1 and stops
+   when they stop: those browsers never say when the fingers lift, and a fling
+   timed off a gap in the stream fired whether the fingers had lifted or only
+   paused, so the map lurched on a beat after they had stopped. A wheel notch
+   eases in over a few frames instead of jumping, and the notches of one spin
+   add up into one run. Only Safari's pinch, which does report the lift
+   (gestureend), glides on after it, at the pace the fingers had then. */
+const Z_EASE = 0.07,  // s: a wheel notch's ease
+  Z_TAU = 0.2,        // s: the release glide's friction (it adds pace × Z_TAU octaves)
+  Z_MAX_V = 4;        // octaves/s: cap on the release pace (at most 0.8 octaves of glide)
+let glide = null;     // {left: octaves still to go, tau, px, py, at, raf}
 function glideCancel() {
   if (!glide) return;
-  clearTimeout(glide.timer);
-  if (glide.raf) cancelAnimationFrame(glide.raf);
+  cancelAnimationFrame(glide.raf);
   glide = null;
 }
 function glideFrame() {
   if (!glide) return;
   const now = performance.now(), dt = Math.min(0.05, (now - glide.at) / 1000);
   glide.at = now;
+  let step = glide.left * (1 - Math.exp(-dt / glide.tau));
+  if (Math.abs(glide.left - step) < 0.003) step = glide.left;
   const k0 = T.k;
-  zoomAt(glide.px, glide.py, Math.pow(2, glide.v * dt));
-  glide.v *= Math.exp(-dt / Z_TAU);
-  // done: spent, or held by the fit clamp (gliding out onto the whole country)
-  if (Math.abs(glide.v) < Z_MIN_V || T.k === k0 || (glide.v < 0 && T.k <= HOME.k * 1.001)) glide = null;
+  zoomAt(glide.px, glide.py, Math.pow(2, step));
+  glide.left -= step;
+  // done: run out, or held by the clamp (the whole-country fit, or all the way
+  // in); a frame too soon after the last to step at all is neither
+  if (glide.left === 0 || (Math.abs(step) > 1e-6 && T.k === k0)) glide = null;
   else glide.raf = requestAnimationFrame(glideFrame);
 }
-function glideRelease() {
-  if (!glide) return;
-  if (S.view !== "map" || glide.n < Z_MIN_N || Math.abs(glide.v) < Z_MIN_V) { glide = null; return; }
-  glide.v = Math.sign(glide.v) * Math.min(Math.abs(glide.v), Z_MAX_V);
-  glide.at = performance.now();
-  glide.raf = requestAnimationFrame(glideFrame);
-}
-// one zoom-lane impulse, applied at once and folded into the fling tracker
-function zoomImpulse(px, py, factor) {
-  zoomAt(px, py, factor);
-  if (reduceMotion) return;
-  const now = performance.now(), live = glide && now - glide.at <= Z_REL && S.view === "map";
-  if (live) { clearTimeout(glide.timer); if (glide.raf) { cancelAnimationFrame(glide.raf); glide.raf = null; } }
-  const dt = live ? Math.max((now - glide.at) / 1000, 1 / 240) : 1 / 60;
-  const rate = Math.log2(factor) / dt, b = live ? 1 - Math.exp(-dt / Z_TRK) : 1;
-  const v = live ? glide.v * (1 - b) + rate * b : rate;
-  glide = { v, px, py, n: (live ? glide.n : 0) + 1, at: now, timer: setTimeout(glideRelease, Z_REL), raf: null };
+// ease `oct` octaves of zoom about (px, py), adding to a run of the same kind
+function zoomEase(px, py, oct, tau) {
+  if (reduceMotion) { glideCancel(); zoomAt(px, py, Math.pow(2, oct)); return; }
+  const lk = Math.log2(T.k), left = (glide && glide.tau === tau ? glide.left : 0) + oct;
+  // the target stays inside the zoom's bounds, so spinning on past them banks nothing
+  const tgt = clamp(lk + left, Math.log2(HOME.k), Math.log2(2600));
+  glideCancel();
+  if (Math.abs(tgt - lk) < 1e-4) return;
+  glide = { left: tgt - lk, tau, px, py, at: performance.now(), raf: requestAnimationFrame(glideFrame) };
 }
 // the map may pan anywhere inside the frame of the whole-country view, and no
 // further out: at that zoom nothing moves, so a scroll there scrolls the page
 function setExtent() {
-  glideCancel();
   const m = M(); if (!m || !Wpx) return;
   // outside the map view the transform always rides the whole-country fit:
   // the insets grow the box after the first draw, and a transform pinned to
   // the early smaller box would later open the map on the north-west corner
+  // (a zoom easing on the map itself carries on through a resize)
   const rides = S.view !== "map";
+  if (rides) glideCancel();
   HOME = fitTransform(homeBox(m));
   // (out at an island, the frame stretches to take it in, some way of sea around it)
   let [[ex0, ey0], [ex1, ey1]] = [[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]];
@@ -1309,7 +1303,7 @@ function classifyWheel(e) {
 function zoomAt(px, py, factor) {
   d3.select(canvas).interrupt();
   // d3 clamps translation for programmatic calls but never the scale: the
-  // scale bound is ours to keep, or a wheel glide overshoots the home fit
+  // scale bound is ours to keep, or an eased zoom overshoots the home fit
   const k = clamp(T.k * factor, HOME.k, 2600);
   if (k === T.k) return;
   zoom.scaleTo(d3.select(canvas), k, [px, py]);
@@ -1332,15 +1326,18 @@ canvas.addEventListener("wheel", (e) => {
     const c = islDrawn.find((q) => px >= q.r.x && px <= q.r.x + q.r.w && py >= q.r.y && py <= q.r.y + q.r.h);
     if (c) { e.preventDefault(); goIsland(c.s.key); return; }
   }
-  if (e.ctrlKey) { // a trackpad pinch arrives as a ctrl-wheel
-    e.preventDefault();
-    zoomImpulse(px, py, Math.pow(2, -e.deltaY * 0.017));
-    return;
-  }
   // a notched wheel announces itself (line deltas, or whole multiples of 120); it
   // overrides a running trackpad gesture, which otherwise keeps its reading so
   // momentum scrolling never flips into zoom
   const notch = e.deltaMode !== 0 || (e.deltaX === 0 && Math.abs(e.deltaY) >= 50 && (e.wheelDeltaY ? e.wheelDeltaY % 120 === 0 : Number.isInteger(e.deltaY)));
+  if (e.ctrlKey && !notch) {
+    // a trackpad pinch arrives as a ctrl-wheel, its deltaY -100·ln(the
+    // fingers' scale): undone exactly, the map under the fingers stays put
+    e.preventDefault();
+    glideCancel();
+    zoomAt(px, py, Math.exp(-e.deltaY / 100));
+    return;
+  }
   if (notch) wheelMode = "zoom";
   else if (!wheelMode) wheelMode = classifyWheel(e);
   const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? Hpx : 1;
@@ -1351,9 +1348,10 @@ canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
   } else {
     const atMin = T.k <= HOME.k * 1.001 && e.deltaY > 0;
+    if (e.ctrlKey) e.preventDefault(); // ctrl+wheel is the browser's own page zoom
     if (atMin) return; // zoomed right out: scrolling on goes to the page
     e.preventDefault();
-    zoomImpulse(px, py, Math.pow(2, -e.deltaY * unit * 0.0026));
+    zoomEase(px, py, -e.deltaY * unit * 0.0026, Z_EASE);
   }
 }, { passive: false });
 // pinch-in from the whole-country fit, where d3's touch sits out so a lone
@@ -1388,16 +1386,35 @@ canvas.addEventListener("touchcancel", () => { homePinch = null; });
 // keep their own gestures (zoom and city buttons, form fields, links), and
 // the list view's own rows
 swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
-// Safari's own pinch events
-let gesturePrev = 1;
-canvas.addEventListener("gesturestart", (e) => { e.preventDefault(); glideCancel(); gesturePrev = 1; });
-canvas.addEventListener("gesturechange", (e) => {
-  e.preventDefault(); if (S.view !== "map") return;
-  const r = canvas.getBoundingClientRect();
-  zoomImpulse(e.clientX - r.left, e.clientY - r.top, e.scale / gesturePrev);
-  gesturePrev = e.scale;
+// Safari's own pinch events. On a Mac they are the trackpad's pinch; iOS sends
+// them alongside the touches, which d3 (or the home pinch) already follows,
+// so while fingers are down they are left alone
+let touchesOn = 0, gesture = null; // {k at the start, s, pace in octaves/s, at, px, py}
+for (const t of ["touchstart", "touchend", "touchcancel"]) canvas.addEventListener(t, (e) => { touchesOn = e.touches.length; }, { passive: true });
+canvas.addEventListener("gesturestart", (e) => {
+  e.preventDefault();
+  if (touchesOn || S.view !== "map") { gesture = null; return; }
+  glideCancel();
+  gesture = { k: T.k, s: 1, v: 0, at: performance.now(), px: 0, py: 0 };
 });
-canvas.addEventListener("gestureend", (e) => e.preventDefault());
+canvas.addEventListener("gesturechange", (e) => {
+  e.preventDefault(); if (!gesture || S.view !== "map") return;
+  const r = canvas.getBoundingClientRect(), now = performance.now();
+  const dt = Math.max((now - gesture.at) / 1000, 1 / 240);
+  // the pace, smoothed over the last ~50ms of the gesture
+  gesture.v += (Math.log2(e.scale / gesture.s) / dt - gesture.v) * (1 - Math.exp(-dt / 0.05));
+  Object.assign(gesture, { s: e.scale, at: now, px: e.clientX - r.left, py: e.clientY - r.top });
+  zoomAt(gesture.px, gesture.py, clamp(gesture.k * e.scale, HOME.k, 2600) / T.k);
+});
+canvas.addEventListener("gestureend", (e) => {
+  e.preventDefault();
+  const g = gesture; gesture = null;
+  if (!g || S.view !== "map" || reduceMotion) return;
+  // the pace at the lift, faded by any hold before it: fingers held still and
+  // then lifted glide nowhere
+  const v = g.v * Math.exp(-(performance.now() - g.at) / 50);
+  if (Math.abs(v) >= 0.8) zoomEase(g.px, g.py, Math.sign(v) * Math.min(Math.abs(v), Z_MAX_V) * Z_TAU, Z_TAU);
+});
 
 /* ----- hit testing ----- */
 function hitTest(px, py) {
