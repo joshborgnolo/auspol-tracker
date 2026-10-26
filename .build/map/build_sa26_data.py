@@ -38,9 +38,14 @@ close-enough row.
 There is no swing source in the API (no previous-election figures), so
 changes are the "unknown" kind, per-candidate chg is 0, and tpp swings are
 null; prev is null. No booth (polling place) lane: the site shows districts
-only. The census people lane instead rides data/sa26-demo.json (GCP 2021 SA1
+only. The census people lane rides data/sa26-demo.json (GCP 2021 SA1
 tables pooled to the 47 districts by .build/map/build_sa26_demo.py): each
-division row gains demo, and the year file records demoBasis "sa1".
+division row gains demo, and the year file records demoBasis "sa1". The
+SEIFA lane rides data/sa26-seifa.json (ABS SEIFA 2021 SA1 index scores
+population-weighted onto the same districts by .build/map/build_sa26_seifa.py
+on the people pipeline's own SA1→district join): each division row gains
+seifa {ix: {v, pct, dec}} cells shaped like the federal rec's, deciles
+ranked among the frame's own 47.
 Boundaries are SA's own State Electorates 2026 geojson (data.sa.gov.au),
 committed-free like the federal n-YYYY.geojson era files; the reducer keeps
 one `name` property per feature (title case, the ECSA names it joins to).
@@ -53,6 +58,7 @@ import collections, gzip, json, os, sys, urllib.request
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
 DEMO_STORE = os.path.join(REPO, "data", "sa26-demo.json")
+SEIFA_STORE = os.path.join(REPO, "data", "sa26-seifa.json")
 OUT = sys.argv[1]
 FETCH = "--fetch" in sys.argv[2:]
 BASE = "https://apim-ecsa-production.azure-api.net/results-display"
@@ -130,6 +136,25 @@ def load_demo():
     return demo
 
 
+def load_seifa():
+    if not os.path.exists(SEIFA_STORE):
+        fail(f"SEIFA store {SEIFA_STORE} missing — run .build/map/build_sa26_seifa.py")
+    with open(SEIFA_STORE) as f:
+        d = json.load(f)
+    if d.get("year") != "sa26":
+        fail(f"SEIFA store is year {d.get('year')!r}, expected sa26")
+    seifa = d.get("seifa")
+    if not isinstance(seifa, dict) or len(seifa) != 47:
+        fail(f"SEIFA store covers {len(seifa or {})} districts, expected 47")
+    for name, row in seifa.items():
+        for ix in ("irsad", "irsd", "ier", "ieo"):
+            c = (row or {}).get(ix) or {}
+            if not (isinstance(c.get("v"), (int, float)) and isinstance(c.get("dec"), int)
+                    and isinstance(c.get("pct"), (int, float))):
+                fail(f"SEIFA store: {name}.{ix} lacks a {{v, pct, dec}} cell — rerun build_sa26_seifa.py")
+    return seifa
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     ha = fetch("ecsa-ha", f"HAStatic/{ELECTION}")
@@ -147,6 +172,7 @@ def main():
     if len(names) != 47:
         fail(f"{len(names)} districts, expected 47")
     demo = load_demo()
+    seifa = load_seifa()
 
     D = []
     seats = collections.Counter()
@@ -283,6 +309,7 @@ def main():
             "h": [],
             "enrolled": enrolled,
             "demo": demo[name],
+            "seifa": seifa[name],
         }
         if tpp:
             rec["tpp"] = tpp

@@ -126,4 +126,31 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("setYear(yearOf(g.dataset.year))"), "the timeline stop click hands setYear a word-year-safe year");
 }
 
+// the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
+// (.build/map/build_sa26_demo.py) and the advantage indexes ride
+// data/sa26-seifa.json (.build/map/build_sa26_seifa.py, ABS SEIFA 2021 SA1
+// scores population-weighted onto the same SA1→district join in
+// .build/map/sa26/assign-sa1.json). build_sa26_data.py splices both onto the
+// division rows; the end-to-end page contract (legend tenths note, story
+// decile explainer, picker groups) is probed with .matilda/sa26-demo-probe.mjs
+{
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
+  assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
+  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA cuts (no booth lane)");
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  for (const d of sa.divs) {
+    assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
+    for (const ix of IXS) {
+      const c = d.seifa && d.seifa[ix];
+      assert.ok(c && typeof c.v === "number" && typeof c.pct === "number" && c.dec >= 1 && c.dec <= 10, `${d.n}: seifa ${ix} {v,pct,dec}`);
+    }
+  }
+  const byName = Object.fromEntries(sa.divs.map((d) => [d.n, d]));
+  assert.equal(byName.Bragg.seifa.irsad.dec, 10, "Bragg is the most advantaged tenth (SA geography guard)");
+  assert.equal(byName.Elizabeth.seifa.irsad.dec, 1, "Elizabeth is the least advantaged tenth");
+  for (const p of ["data/sa26-demo.json", "data/sa26-seifa.json", ".build/map/sa26/assign-sa1.json"]) assert.ok(fs.existsSync(path.join(ROOT, p)), `${p} missing — run the sa26 census pipelines`);
+  const dec = new Set(sa.divs.map((d) => d.seifa.irsad.dec));
+  assert.ok(dec.size >= 8, "sa26 IRSAD deciles spread across the range (a monotone join bug collapses them)");
+}
+
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");
