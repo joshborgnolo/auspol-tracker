@@ -1169,7 +1169,7 @@ function homeBox(m) {
   const b = unionBB(m.geo.bb);
   // the state frames' whole-state home view sits 8% further out (user calls 2026-10-26):
   // the districts fill the frame a touch tighter than the federal elections read
-  if (SA_YEARS.has(m.year)) {
+  if (STATE_YEARS.has(m.year)) {
     const [[x0, y0], [x1, y1]] = b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, z = 1.08;
     return [[cx + (x0 - cx) * z, cy + (y0 - cy) * z], [cx + (x1 - cx) * z, cy + (y1 - cy) * z]];
   }

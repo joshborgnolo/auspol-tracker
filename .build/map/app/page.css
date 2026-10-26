@@ -220,12 +220,12 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-credit a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 2px; }
 .mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: 0 0 4px var(--bg); }
 
-/* the timeline: an election axis under the view */
-.mp-time { flex: none; position: relative; height: 112px; border-top: 1px solid var(--line); margin-top: 6px; }
+/* the timeline: an election axis under the view (three rows — federal, NSW, SA) */
+.mp-time { flex: none; position: relative; height: 144px; border-top: 1px solid var(--line); margin-top: 6px; }
 .mp-time svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .mp-time .yr { font: 400 12px var(--sans); fill: var(--ink-3); cursor: pointer; }
 .mp-time .yr.on { font-weight: 600; fill: var(--ink); }
-/* the state row's name: a caption, not a stop */
+/* the state rows' names: captions, not stops */
 .mp-time .yr.row { fill: var(--ink-faint); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; cursor: default; pointer-events: none; }
 .mp-time .hit { fill: transparent; cursor: pointer; }
 .mp-time .hit:hover + g .yr, .mp-time g.stop:hover .yr { fill: var(--ink); }
@@ -480,7 +480,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-views .rd-tab svg { margin: 0; width: 18px; height: 18px; }
   .rd-eyebrow .rd-meta { order: 4; flex-basis: 100%; }
   .mp-lenses .rd-tab { padding: 0 10px; font-size: 14.5px; }
-  .mp-time { height: 100px; }
+  .mp-time { height: 128px; }
   .st-hed { font-size: 27px; }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }

@@ -24,11 +24,12 @@ const syncSenate = () => { SENM = SENY[S.year] || null; };
 // the model the chamber view draws: the House's year, or the Senate
 const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && senFloor ? SENM : null) : M());
 const SEN_SEATS = 76;
-// every year whose upper house is in this lane: the federal elections, and SA's — a state election
-// chooses no federal Senate, but SA's own upper house (its 22-member Legislative Council, 11
-// elected statewide at each state election) sits in the same chamber view on the sa22/sa26 frames,
-// from map/data/senate-sa22.json and senate-sa26.json (.build/map/build_sa22_past.py, build_sa26_past.py)
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || SA_YEARS.has(y));
+// every year whose upper house is in this lane: the federal elections, and the states' — a state
+// election chooses no federal Senate, but SA's and NSW's own upper houses (their Legislative
+// Councils, SA's 22 members / NSW's 42, half-plus-one elected statewide at each state election) sit
+// in the same chamber view on their frames, from map/data/senate-<year>.json
+// (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py)
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || STATE_YEARS.has(y));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -274,8 +275,10 @@ const coMember = (m) => (m.lc ? "member" : "senator");
 
 /* ----- the key ----- */
 function houseSwitchHTML() {
-  const sa = SA_YEARS.has(S.year);
-  return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="${sa ? "House of Assembly" : "House of Representatives"}" aria-pressed="${S.house !== "senate"}">${sa ? "House of Assembly" : "House of Representatives"}</button><button type="button" data-house="senate" data-t="${sa ? "Legislative Council" : "Senate"}" aria-pressed="${S.house === "senate"}">${sa ? "Legislative Council" : "Senate"}</button></div>`;
+  const sa = SA_YEARS.has(S.year), st = STATE_YEARS.has(S.year);
+  const lo = sa ? "House of Assembly" : st ? "Legislative Assembly" : "House of Representatives";
+  const up = st ? "Legislative Council" : "Senate";
+  return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="${lo}" aria-pressed="${S.house !== "senate"}">${lo}</button><button type="button" data-house="senate" data-t="${up}" aria-pressed="${S.house === "senate"}">${up}</button></div>`;
 }
 function senateLegendHTML(m) {
   const cats = (cnt, list) => `<div class="lg-cats">${list.filter((f) => cnt[f]).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)} <b>${cnt[f]}</b></span>`).join("")}`;
@@ -284,7 +287,7 @@ function senateLegendHTML(m) {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
     h += `<div class="lg-t">${nv(m, "Who faces", "Who faced")} the voters at ${nextEl(m)}</div>`;
     h += `${cats(up, SEN_FAMS)}${stay ? `<span><i style="background:${css(SEN_STAY(TH))}"></i>Term to ${m.lc ? `the ${m.later} election` : m.later} <b>${stay}</b></span>` : ""}</div>`;
-    h += `<div class="lg-note">${m.lc ? "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one." : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
+    h += `<div class="lg-note">${m.lc ? (m.year === "nsw23" ? "Twenty-one of the council’s forty-two members are elected as one statewide electorate at each state election; the rest sit until the next one." : "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one.") : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
   } else {
     h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : `The Senate after the ${m.year} election`}</div>`;
     h += `${cats(senCounts(m), SEN_FAMS)}</div>`;

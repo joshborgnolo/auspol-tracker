@@ -21,7 +21,7 @@ const sgn = (v, d = 1) => (v == null || Number.isNaN(v) ? "–" : (v > 0.049 ? "
 const pts = (v) => { const a = Math.abs(v); return `${a.toFixed(1)} point${a.toFixed(1) === "1.0" ? "" : "s"}`; };
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isPhone = () => matchMedia("(max-width: 860px)").matches;
-const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one"];
 const words = (n) => (n >= 0 && n < WORDS.length ? WORDS[n] : String(n));
 const Words = (n) => { const w = words(n); return w[0].toUpperCase() + w.slice(1); };
 const plural = (n, a, b) => `${n === 1 ? a : b || a + "s"}`;
@@ -138,13 +138,13 @@ const FAM_PL = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "On
 // their own colour, while the vote tallies keep them in the independent family
 const holdFam = (h) => (h.ab === "CSA" ? "csa" : h.fam);
 const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", csa: "Community Strong", oth: "Others" };
-// a family's name in the legend's words: a South Australian frame's opposition is the Liberals
-const famLeg = (f) => (f === "lnp" && SA_YEARS.has(S.year) ? "Liberals" : FAM_LEG[f]);
+// a family's name in the legend's words: a state frame's opposition is the Liberals
+const famLeg = (f) => (f === "lnp" && STATE_YEARS.has(S.year) ? "Liberals" : FAM_LEG[f]);
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
 const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
 const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network", "Australian Democrats": "the Democrats", "Family First": "Family First", "Democratic Labour": "the DLP", "Palmer United": "Palmer United", "Motoring Enthusiast": "the Motoring Enthusiast Party", "Australian Conservatives": "the Australian Conservatives", "Progressive Alliance": "the Progressive Alliance" };
@@ -192,20 +192,38 @@ const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
 const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "sa22", 2022, 2025, "sa26", "now"];
-// sa22/sa26: the South Australian state elections of 19 March 2022 and 21 March 2026 —
-// non-federal stops, drawn on their own timeline row at their date rather than a whole year in
+const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, 2025, "sa26", "now"];
+// nsw23/sa22/sa26: the 2023 New South Wales (25 March) and the 2022/2026 South
+// Australian (19/21 March) state elections — non-federal stops, drawn on their
+// own timeline rows at their date rather than a whole year in, named "SA"/"NSW"
+// + the election's year
 const SA_YEARS = new Set(["sa22", "sa26"]);
-const YEARS_FED = YEARS.filter((y) => !SA_YEARS.has(y));
+const NSW_YEARS = new Set(["nsw23"]);
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw23: "nsw" };
+const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+const YEARS_FED = YEARS.filter((y) => !STATE_YEARS.has(y));
 const YEARS_SA = YEARS.filter((y) => SA_YEARS.has(y));
+const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, now: 2026.8 };
+const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026 };
-// SA election dates the word years don't already cover (a state frame's history spot)
-const SA_PREV_X = { 2018: 2018.205 };
-const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
-const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", now: "Anthony Albanese" };
+const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023 };
+// a state frame's history spot: the previous election's date on its row's line
+const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222 };
+const SA_PREV_X = { 2018: STATE_PREV_X.sa };
+const NSW_PREV_X = { 2019: STATE_PREV_X.nsw };
+// the election each state frame names as its "previous election" (its date rides
+// STATE_PREV_X on the timelines): South Australia's 2018 and New South Wales' 2019
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw23: 2019 };
+const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales" };
+const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
+// a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
+const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
+const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
+const prevNameOf = (y) => `${stOfYear(y).toUpperCase()} ${String(PREV_YEAR[y]).slice(2)}`;
+const prevXLabOf = (y) => `${stOfYear(y).toUpperCase()}’${String(PREV_YEAR[y]).slice(2)}`;
+const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -219,15 +237,16 @@ const LENSES = [
   { id: "cls", label: "Seat type" },
   { id: "seifa", label: "Census" },
 ];
-// the Senate vote and the AEC's seat types are federal reads — the SA frames
-// (state legislature, ECSA boundaries) don't offer them
+// the Senate vote and the AEC's seat types are federal reads — the state frames
+// (state legislatures, state-commission boundaries) don't offer them
 const FED_LENS = new Set(["senate", "cls"]);
-const yearLenses = (y) => SA_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
+const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens walk is keyboard
 // only — a phone scrolls the lens row itself. On the phone a walk keeps the
 // view fixed (walkHold below), and has no scroll side effects of its own
-function walkYear(dir, wrap) { const lane = SA_YEARS.has(S.year) ? YEARS_SA : YEARS_FED; const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
+const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
+function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -440,7 +459,8 @@ const S = {
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
-const yearLabel = (y) => (y === "now" ? "Now" : SA_YEARS.has(y) ? String(y).toUpperCase() : String(y));
+// a state frame names itself "SA 22"/"NSW 23": the state's abbreviation + year's
+const yearLabel = (y) => (y === "now" ? "Now" : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()} ${String(y).slice(2)}` : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -462,8 +482,8 @@ function firstYearOf(h, name, upto) { let y = upto; for (let k = h.length - 1; k
 
 // the preferences lens reads a seat whose final was Labor against the rival it is set to (S.vs)
 const flowSeat = (d) => d.vs != null && d.vs === S.vs;
-// that rival in a sentence: "the Coalition" ("the Liberals" in South Australia), or "One Nation"
-const vsW = (cap) => (S.vs === "onp" ? "One Nation" : SA_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+// that rival in a sentence: "the Coalition" ("the Liberals" on a state frame), or "One Nation"
+const vsW = (cap) => (S.vs === "onp" ? "One Nation" : STATE_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
 // a year's seats that finished Labor against One Nation with a split on file: the lens offers that rival
 const hasVsOnp = (m) => m.divs.some((d) => d.vs === "onp" && d.flows.length);
 /* a modelled split's error, the way it was measured: per seat against counted federal divisions
@@ -616,7 +636,7 @@ const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.jso
 function buildIslands(data, m) {
   if (!data) return [];
   // the federal seat islands have no home in a state election's frame
-  if (SA_YEARS.has(m.year)) return [];
+  if (STATE_YEARS.has(m.year)) return [];
   const own = data.owner[m.year === "now" ? 2025 : m.year] || {};
   return data.islands.map((s) => {
     let lon0 = Infinity, lat0 = Infinity, lon1 = -Infinity, lat1 = -Infinity;
@@ -695,12 +715,13 @@ function applyNow(m, now) {
 }
 
 // the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs,
-// .build/map/sa_seating.mjs for the live sa26 chambers, .build/map/sa22_seating.mjs for sa22's)
+// .build/map/sa_seating.mjs for the live sa26 chambers, .build/map/sa22_seating.mjs for sa22's;
+// none is filed for New South Wales, so the nsw23 chambers fill their benches sorted)
 const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26", "sa22"]);
 const SEATED_LC = new Set(["sa26"]);
-// the Speaker's district where the results files name none: South Australia's, as each Parliament
-// first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale" };
+// the Speaker's district where the results files name none: each state's, as its
+// Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023)
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie" };
 async function loadYear(year) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
@@ -745,4 +766,4 @@ const M = () => (Y[S.year] && Y[S.year].divs ? Y[S.year] : null);
 // "the previous election" is defined only within the federal chain — a state stop's
 // predecessor is its own older state election, stored on its frame (res.prev), never
 // the federal year its index sits beside
-const prevYearOf = (y) => (y === "now" ? 2025 : SA_YEARS.has(y) ? null : y === 2004 ? 2001 : YEARS_FED[YEARS_FED.indexOf(y) - 1] || null);
+const prevYearOf = (y) => (y === "now" ? 2025 : STATE_YEARS.has(y) ? null : y === 2004 ? 2001 : YEARS_FED[YEARS_FED.indexOf(y) - 1] || null);

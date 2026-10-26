@@ -63,7 +63,7 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
    senateGeom (app-3b-senate.js), South Australia's two chambers from saGeom (app-3c-sa.js) */
 let chGeomC = null;
-const chamberGeom = (m) => (m && SA_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+const chamberGeom = (m) => (m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 function houseGeom() {
   if (chGeomC) return chGeomC;
   const all = chamberCells().map((c) => {
@@ -125,7 +125,9 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   2013: ["Warringah", "Maribyrnong"], 2016: ["Wentworth", "Maribyrnong"], 2019: ["Cook", "Grayndler"],
   2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"],
   // South Australia's Premier and Leader of the Opposition, at the front benches' seats nearest the Speaker
-  sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"] };
+  sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
+  // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
+  nsw23: ["Kogarah", "Cronulla"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
@@ -654,7 +656,7 @@ function drawChamber(g, m, w, h, opts) {
     else for (const q of drawn) { const nm = m.divs[q.i].n; const p = pos(nm); if (p) chLast.set(nm, p); }
   }
 }
-const blocName = (m, fam) => (fam === "alp" ? "Labor" : SA_YEARS.has(m.year) ? "Liberals" : "Coalition");
+const blocName = (m, fam) => (fam === "alp" ? "Labor" : STATE_YEARS.has(m.year) ? "Liberals" : "Coalition");
 function crossParts(m, ch) {
   const cnt = {};
   for (const i of ch.order) { const d = m.divs[i]; if (d.hold.fam === ch.gov || d.hold.fam === ch.opp) continue; const k = crossLabel(d.hold); cnt[k] = (cnt[k] || 0) + 1; }
@@ -669,7 +671,7 @@ function crossLabel(h) {
   return partyShort(h.ab, h.pn);
 }
 const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick",
-  sa22: "Dan Cregan", sa26: "Nat Cook" };
+  sa22: "Dan Cregan", sa26: "Nat Cook", nsw23: "Greg Piper" };
 const speakerName = (m) => SPEAKERS[m.year];
 // the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
 const presiding = (m) => (m.house === "senate" ? (m.speaker != null ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "President", name: "", place: "" }) : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });

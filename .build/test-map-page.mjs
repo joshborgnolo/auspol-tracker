@@ -515,17 +515,17 @@ for (const y of ["sa22", "sa26"]) {
   else assert.ok(nCl >= 40, `${y}: its classic finals split (${nCl})`);
 }
 
-// the SA frames' lens row: the Senate vote and the AEC's seat types are federal reads the
+// the state frames' lens row: the Senate vote and the AEC's seat types are federal reads the
 // state elections don't offer — out of the menu bar, the walks, the URL and the legend probe,
 // but never out of LENSES itself (a federal year's row still carries both)
 {
   assert.ok(js.includes('{ id: "senate", label: "Senate" },') && js.includes('{ id: "cls", label: "Seat type" },'), "the Senate and Seat-type lenses still exist for the federal years");
-  assert.ok(js.includes('const FED_LENS = new Set(["senate", "cls"]);') && js.includes("const yearLenses = (y) => SA_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;"), "yearLenses filters the two federal-only lenses for the SA frames");
+  assert.ok(js.includes('const FED_LENS = new Set(["senate", "cls"]);') && js.includes("const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;"), "yearLenses filters the two federal-only lenses for the state frames");
   assert.ok(js.includes("const list = sen ? SEN_LENSES : yearLenses(S.year)"), "renderLenses draws the year's own lenses");
   assert.ok(js.includes("const L = yearLenses(S.year), k = (L.findIndex("), "walkLens walks the year's own lenses");
-  assert.ok(js.includes('const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;'), "readURL refuses a federal-only lens on an SA deep link");
-  assert.ok(js.includes('if (SA_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";'), "setYear drops a federal-only lens on the walk into an SA frame");
-  assert.ok(js.includes("if (FED_LENS.has(id) && SA_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on an SA frame outright");
+  assert.ok(js.includes('const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;'), "readURL refuses a federal-only lens on a state deep link");
+  assert.ok(js.includes('if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";'), "setYear drops a federal-only lens on the walk into a state frame");
+  assert.ok(js.includes("if (FED_LENS.has(id) && STATE_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on a state frame outright");
   // the legend-height probe used to sweep every lens for a global max; since the
   // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens
   // above keep that lens one the year can show
@@ -533,4 +533,170 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes("boothsShown(), S.lens, S.tppMode"), "the legend-height hold key carries the lens and its mode");
 }
 
-console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");
+// ── the nsw23 frame: New South Wales' 25 March 2023 state election — the
+// first second-jurisdiction frame on /map/ (build_nsw23_data.py on the
+// committed NSWEC caches in .build/map/src/nsw23), 93 districts on their own
+// timeline row, the 2019 state election as its past join (build_nsw23_past.py:
+// prev, the agg pprim/pformal and per-candidate c[5] swings), the ABS 2021
+// census lanes spliced by build_nsw23_demo.py/build_nsw23_seifa.py off the
+// SA1→district join in .build/map/nsw23/assign-sa1.json
+{
+  const res = JSON.parse(R("map/data/res-nsw23.json"));
+  assert.equal(res.year, "nsw23", "nsw23: year id");
+  assert.equal(res.date, "2023-03-25", "nsw23: polling day");
+  assert.equal(res.prev, 2019, "nsw23: prev names the 2019 state election");
+  assert.equal(res.jurisdiction, "NSW", "nsw23: jurisdiction");
+  assert.equal(res.demoBasis, "sa1", "nsw23 records the SA1 census basis");
+  assert.deepEqual(Object.keys(res.agg), ["AUS", "NSW"], "nsw23 carries only its frame's areas");
+  assert.equal(res.divs.length, 93, "nsw23: 93 districts");
+  for (const f of ["geo-nsw23-lo.json", "geo-nsw23-hi.json", "data-nsw23.json", "senate-nsw23.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+  // the winners: derived from the 2CP tallies exactly as the app reads them
+  // (tcp entries are [candidate index, votes], so the winner's CANDIDATE is
+  // c[d.tcp[slot][0]], never c[slot] — the slot-read miscounts the tally);
+  // derived == the file's elected flags on all 93 == the official result
+  const tally = {};
+  let nC5 = 0, nSw = 0, nTpp = 0, nH = 0;
+  for (const d of res.divs) {
+    const w = d.tcp[0][1] >= d.tcp[1][1] ? d.tcp[0][0] : d.tcp[1][0];
+    tally[d.c[w][1]] = (tally[d.c[w][1]] || 0) + 1;
+    assert.equal(d.c.findIndex((c) => c[6] === 1), w, `nsw23 ${d.n}: the elected flag sits on the 2CP winner`);
+    nH += (d.h || []).length;
+    for (const row of d.h || []) {
+      assert.ok(row[0] === 2019 && typeof row[1] === "number" && typeof row[3] === "string", `nsw23 ${d.n}: a 2019 history row ([year, TCP%, party, member])`);
+    }
+    for (const c of d.c) {
+      assert.ok(Number.isFinite(c[5]), `nsw23 ${d.n}: c[5] finite for ${c[0]}`);
+      nC5++;
+      if (c[5] !== 0) nSw++;
+    }
+    if (d.tpp && Number.isFinite(d.tpp[2])) nTpp++;
+  }
+  assert.deepEqual(tally, { LIB: 25, ALP: 45, GRN: 3, IND: 9, NAT: 11 }, "nsw23: the official 2023 seat tally (Labor's 45-seat majority)");
+  assert.deepEqual(res.agg.NSW.seats, tally, "nsw23: the agg seat count is the derived tally");
+  const kog = res.divs.find((d) => d.n === "Kogarah");
+  const kw = kog.tcp[0][1] >= kog.tcp[1][1] ? kog.tcp[0][0] : kog.tcp[1][0];
+  assert.deepEqual([kog.c[kw][0], kog.c[kw][1]], ["Chris Minns", "ALP"], "nsw23: Kogarah elects Chris Minns, the Premier");
+  assert.equal(nH, 92, "nsw23: 92 history rows");
+  assert.deepEqual(res.divs.filter((d) => !d.h || !d.h.length).map((d) => d.n), ["Leppington"], "nsw23: Leppington is new in 2023 — the one division with no 2019 row");
+  assert.equal(nC5, 562, "nsw23: 562 candidates file a swing");
+  assert.equal(nSw, 556, "nsw23: 556 swings moved on 2019 (six rest at exactly 0)");
+  assert.equal(nTpp, 66, "nsw23: 66 districts carry a classic-pair 2PP swing into 2019");
+  assert.equal(res.agg.NSW.formal, 4701930, "nsw23: 2023 Legislative Assembly formal vote");
+  assert.equal(res.agg.AUS.formal, 4701930, "nsw23: the AUS agg mirrors the frame's formal");
+  assert.equal(res.agg.NSW.pformal, 4551886, "nsw23: 2019 Assembly formal vote");
+  assert.equal(res.agg.AUS.pformal, 4551886, "nsw23: the AUS agg mirrors the frame's 2019 formal");
+  for (const st of ["NSW", "AUS"]) {
+    const p = res.agg[st].pprim;
+    assert.ok(p, `nsw23: ${st} agg carries 2019 primaries`);
+    assert.equal(Object.values(p).reduce((a, b) => a + b, 0), 4551886, `nsw23: ${st} 2019 primaries account for every formal vote`);
+  }
+  // no preferences lane yet (the SA frames' are modelled by sa_flow_lane.py)
+  assert.ok(!("flBasis" in res) && res.divs.every((d) => Array.isArray(d.fl) && d.fl.length === 0), "nsw23: no preferences lane");
+  // the census lanes (the same splice contract as the SA frames')
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  for (const d of res.divs) {
+    assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "n", "p"].sort(), `nsw23 ${d.n}: no income lanes`);
+    for (const ix of IXS) {
+      const c = d.seifa && d.seifa[ix];
+      assert.ok(c && typeof c.v === "number" && typeof c.pct === "number" && c.dec >= 1 && c.dec <= 10, `nsw23 ${d.n}: seifa ${ix} {v,pct,dec}`);
+    }
+  }
+  const byName = Object.fromEntries(res.divs.map((d) => [d.n, d]));
+  assert.equal(byName.Vaucluse.seifa.irsad.dec, 10, "Vaucluse is the most advantaged tenth (NSW geography guard)");
+  assert.equal(byName.Fairfield.seifa.irsad.dec, 1, "Fairfield is the least advantaged tenth");
+  assert.ok(new Set(res.divs.map((d) => d.seifa.irsad.dec)).size >= 8, "nsw23 IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  for (const p of ["data/nsw23-demo.json", "data/nsw23-seifa.json", ".build/map/nsw23/assign-sa1.json"]) assert.ok(fs.existsSync(path.join(ROOT, p)), `${p} missing — run the nsw23 census pipelines`);
+  // the polling places: 3,117 NSWEC venues on the federal lanes (day, mobile
+  // team, EVC). The reserved lanes stay unjoined: no booth 2CP/TPP/flow
+  // (NSWEC's venue counts file is first preferences only), and no census
+  // splice at the venues — the SA1→venue pass belongs to the SA build
+  // (build_sa_boothcensus.py), and NSWEC publishes no votes-by-SA1 product,
+  // so vdec can never fill
+  const B = res.booths;
+  assert.ok(B, "nsw23 res carries a booths record");
+  const LANES = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
+  for (const k of LANES) assert.ok(Array.isArray(B[k]) && B[k].length === 3117, `nsw23 booths.${k}: 3,117 rows`);
+  assert.equal(new Set(B.id).size, 3117, "nsw23 booth ids are unique");
+  assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 4, 5], "nsw23 booth types are day/mobile team/EVC");
+  assert.equal(B.ty.filter((t) => t === 4).length, 167, "nsw23: 167 mobile teams");
+  assert.equal(B.ty.filter((t) => t === 5).length, 330, "nsw23: 330 early voting centres");
+  for (let k = 0; k < B.n.length; k++) {
+    if (B.lat[k] !== null) assert.ok(B.lat[k] > -38 && B.lat[k] < -28 && B.lon[k] > 140 && B.lon[k] < 160, `nsw23 ${B.n[k]}: venue inside New South Wales (Lord Howe Island east to 159.1)`);
+  }
+  assert.ok(B.tpp.every((x) => x === null) && B.tcp.every((x) => x === null) && B.fl.every((x) => x === null), "nsw23 booths carry no two-candidate or flow lane");
+  assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "nsw23 booth census lanes unjoined");
+  assert.ok(!("demo" in B), "nsw23 booths carry no people-cells lane");
+}
+
+// ── nsw23's upper house is the NSW Legislative Council (senate-nsw23.json):
+// 42 members — 21 elected at nsw23 (terms to 2031) joining the 21 carried
+// over from 2019 (terms to 2027) — parties and vacancy fills off Parliament
+// of NSW records; the statewide first-preference tallies for both elections
+{
+  const sen = JSON.parse(R("map/data/senate-nsw23.json"));
+  assert.equal(sen.year, "nsw23", "senate-nsw23: year");
+  assert.equal(sen.lc, true, "senate-nsw23: lc flag");
+  assert.equal(sen.seatsN, 42, "senate-nsw23: 42-member council");
+  assert.equal(sen.later, 2031, "senate-nsw23: the 2023 cohort's terms run to 2031");
+  assert.equal(sen.dd, false, "senate-nsw23: no double dissolution");
+  assert.equal(sen.senators.length, 42, "senate-nsw23: 42 members on file");
+  assert.equal(new Set(sen.senators.map((s) => s.n)).size, 42, "senate-nsw23: names key the chairs");
+  const tally = {};
+  for (const s of sen.senators) tally[s.ab] = (tally[s.ab] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 15, LIB: 10, NAT: 5, GRN: 4, ONP: 3, AJP: 1, SFF: 2, LCP: 1, LDP: 1 }, "senate-nsw23: the council's party balance at polling day 2023");
+  const c23 = sen.senators.filter((s) => s.term === 2031), c19 = sen.senators.filter((s) => s.term === 2027);
+  assert.equal(c23.length, 21, "senate-nsw23: 21 elected at nsw23");
+  assert.equal(c19.length, 21, "senate-nsw23: 21 carried over from 2019");
+  assert.ok(c23.every((s) => s.elected === 2023), "senate-nsw23: the 2031 cohort is elected 2023");
+  assert.ok(c19.every((s) => s.elected === 2019 || s.elected == null), "senate-nsw23: the 2027 cohort is elected 2019 or a vacancy fill");
+  assert.equal(sen.formal, 4616858, "senate-nsw23: 2023 LC formal vote");
+  assert.equal(sen.pformal, 4451146, "senate-nsw23: 2019 LC formal vote");
+  assert.ok(sen.votes && sen.pvotes, "senate-nsw23: statewide party votes for both elections");
+  assert.equal(Object.values(sen.votes).reduce((a, b) => a + b, 0), sen.formal, "senate-nsw23: 2023 party votes sum to formal");
+  assert.equal(Object.values(sen.pvotes).reduce((a, b) => a + b, 0), sen.pformal, "senate-nsw23: 2019 party votes sum to formal");
+}
+
+// New South Wales' chambers ride the same floor machinery as South
+// Australia's (the @sa-cells SAF table in app-3c-sa.js): the Assembly's
+// planless floor seats every member but the Speaker on benches filled in
+// sorted order (no NSW seating plan is filed), and the Council's five rows
+// seat 42
+{
+  const src = R(".build/map/app/app-3c-sa.js");
+  const { SAF, saCells } = new Function(`${src.match(/@sa-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @sa-cells-end \*\//)[1]}; return { SAF, saCells };`)();
+  const nswLA = saCells(SAF.nswLA), nswLC = saCells(SAF.nswLC);
+  assert.equal(nswLA.length, 92, "the NSW Assembly's floor: 92 desks besides the Speaker's chair");
+  assert.equal(nswLC.length, 42, "the NSW Council's floor: 42 desks besides the President's chair");
+  for (const [k, cells] of [["nswLA", nswLA], ["nswLC", nswLC]]) {
+    assert.equal(new Set(cells.map((c) => c.id)).size, cells.length, `${k}: desk ids unique`);
+    assert.equal(cells.filter((c) => c.x < 0).length, cells.filter((c) => c.x > 0).length, `${k}: the sides mirror each other`);
+  }
+  assert.ok(js.includes('const saFloorOf = (m) => (m.year === "nsw23" ? (m.house === "senate" ? "nswLC" : "nswLA") : m.house === "senate" ? "lc" : "ha");'), "saFloorOf routes nsw23 to the NSW floors");
+  assert.ok(js.includes('nsw23: "Greg Piper"'), "nsw23's Speaker (Greg Piper, first sat 2 May 2023) in the chair");
+  assert.ok(js.includes('nsw23: "Lake Macquarie"'), "nsw23's Speaker division is Lake Macquarie");
+}
+
+// nsw23 on the timeline and in the constants: the per-jurisdiction rows
+// (federal top, New South Wales middle, South Australia bottom), and the
+// YEAR_JUR contract — the frame-year→jurisdiction map is YEAR_JUR; only the
+// federal abbreviation→name map keeps STATE_NAME (a second top-level
+// `const STATE_NAME` beside it killed the assembled bundle at parse —
+// SyntaxError — and the page never booted, 2026-10-27)
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), css = part("page.css");
+  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw23"]);'), "NSW_YEARS names the NSW frames");
+  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw23: "nsw" };'), "YEAR_JUR maps a frame year to its jurisdiction");
+  assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
+  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw23: 2019 };"), "nsw23's past join is the 2019 election");
+  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023 };'), "nsw23's calendar year is 2023");
+  assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base), "nsw23's winning side is Labor");
+  assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base), "nsw23's Premier is Chris Minns");
+  assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
+  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 144px;/.test(css) && /\.mp-time \{ height: 128px; \}/.test(css), "the timeline bar holds three jurisdiction rows (144px; 128px on the phone rung)");
+  assert.ok(ui.includes("const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X };"), "each jurisdiction's row carries its own previous-election stop");
+  assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
+  assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and New South Wales and South Australian state elections; choose one"'), "the timeline names its three jurisdictions to a screen reader");
+}
+
+console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 frame on its own timeline row, in the sitemap");

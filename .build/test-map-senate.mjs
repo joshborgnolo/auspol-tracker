@@ -62,7 +62,7 @@ assert.ok(!floor.furniture.outlines, "the plan's line work left out, as the Hous
 const js = R("map/map.js");
 const part = R(".build/map/app/app-3b-senate.js");
 assert.ok(js.includes(part.trim()), "map.js carries app-3b-senate.js as is (run node .build/map/assemble.mjs)");
-assert.ok(js.includes('const chamberGeom = (m) => (m && SA_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());'), "one renderer, the chamber's geometry chosen by the model (South Australia's two on their own floors)");
+assert.ok(js.includes('const chamberGeom = (m) => (m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());'), "one renderer, the chamber's geometry chosen by the model (the state frames' chambers on their own floors)");
 assert.ok(js.includes("loadSenate(y) : null"), "an election on the timeline loads its Senate in the Senate's chamber");
 assert.ok(js.includes('if (p.get("c") === "senate") {'), "a Senate URL may name any election");
 assert.ok(js.includes('loadSenate("now"),'), "today's senators load with the key's measures, so the switch moves nothing");
