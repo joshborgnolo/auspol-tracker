@@ -406,6 +406,38 @@ function chooseSugg(k) {
 }
 
 /* =============================== views, lenses, years =============================== */
+/* chrome can leave a composited element's layer painted over the page's
+   bottom band once the element has scrolled out of the window — the tide
+   art then carries a stale slice of the page. First seen as the stage and
+   mini-chamber canvases mis-compositing a few rows (the original fix below);
+   the DESKTOP case is grosser: the whole story column (.mp-story, metres
+   tall and fully off-window at the band) paints a stale slice across the
+   band's full width. Killing any one canvas doesn't clear it, clipping
+   does, and visibility:hidden on the column clears it with no reflow. Here
+   at the band zero story children are inside the viewport, so hiding the
+   whole column the moment none of it is on window costs the user nothing —
+   the rAF scroll listener and resize() put it back the instant any part
+   re-enters. The stage canvas is hidden only when ALL of it is off the window
+   (matching the story column's own full-cull rule) — at page load the stage
+   partially overlaps the viewport, and culling it then would blank the hero
+   map. The mini-chamber at a ±half-viewport margin, and the list view
+   hides the stage canvas outright. visibility, not display, everywhere so
+   nothing reflows */
+function updateCanvasVis() {
+  const vh = window.innerHeight;
+  const story = $("#story");
+  if (story) {
+    const r = story.getBoundingClientRect();
+    story.style.visibility = r.bottom <= 0 || r.top >= vh ? "hidden" : "";
+  }
+  const stage = canvas.parentElement.getBoundingClientRect();
+  canvas.style.visibility =
+    S.view === "list" || stage.bottom <= 0 || stage.top >= vh ? "hidden" : "visible";
+  if (miniCh.canvas) {
+    const r = miniCh.canvas.getBoundingClientRect();
+    miniCh.canvas.style.visibility = r.bottom < -vh * 0.5 || r.top > vh * 1.5 ? "hidden" : "";
+  }
+}
 function setView(v, quiet) {
   if (v === S.view) return;
   const prev = S.view;
@@ -418,7 +450,7 @@ function setView(v, quiet) {
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
   for (const id of ["#cities", "#zoomer", "#hint"]) $(id).hidden = v !== "map";
-  canvas.style.visibility = list ? "hidden" : "visible";
+  updateCanvasVis();
   canvas.classList.toggle("grab", v === "map");
   updateTouch();
   hideTip(); S.hover = null;
@@ -591,6 +623,7 @@ function resize() {
     else if (flight && keyOnly) flight.redo();
     else if (first || changed) fitSelection(keyOnly && !reduceMotion ? 320 : 0);
   }
+  updateCanvasVis();
   renderTimeline();
   schedule();
 }
@@ -784,6 +817,8 @@ new ResizeObserver(() => resize()).observe($("#stage"));
 new ResizeObserver(() => { renderTimeline(); }).observe($("#time"));
 let storyW = 0;
 new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w - storyW) > 1) { storyW = w; paintMiniChamber(); hydrateDists(); } }).observe($("#story"));
+let cullRaf = 0;
+addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame(() => { cullRaf = 0; updateCanvasVis(); }); }, { passive: true });
 
 /* =============================== boot =============================== */
 (async () => {
