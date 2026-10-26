@@ -311,8 +311,17 @@ const DB = {
     whoAdults: "of the adults where this place’s voters live",
     note: "From the 2021 census, counted where its voters live.",
   },
+  // a state election has no AEC vote record to pool on; the figures are the
+  // SA1 census areas that make up each district
+  sa1: {
+    seats: "From the 2021 census, of the SA1 census areas that make up each district.",
+    who: "of residents of the district’s SA1 census areas",
+    whoAdults: "of the adults of the district’s SA1 census areas",
+    note: "From the 2021 census, of the district’s SA1 census areas.",
+  },
 };
 const demoCopy = (m) => {
+  if (m.demoBasis === "sa1") return DB.sa1;
   const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
   return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, whoAdults: db.whoAdults, note: db.note(m.year) } : db;
 };
@@ -335,7 +344,6 @@ function incFact(m, dm) {
 const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
-  if (isSA26()) return { hed: `No census figures for a state election`, dek: `These lanes are built on the federal seats’ census joins; South Australia’s 2026 districts have none here.` };
   if (!A.demo) return DEMO_EARLY;
   const scored = idx.filter((i) => m.divs[i].demo).sort((a, b) => m.divs[b].demo[k] - m.divs[a].demo[k]);
   const share = `${f1(A.demo[k])}% ${isInc(k) ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
@@ -475,7 +483,7 @@ function seatHedDek(m, d) {
         if (!d.demo) return m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY : { hed: `${ds(d.n)} has no census figure`, dek: "" };
         const xs = m.divs.filter((x) => x.demo).sort((a, b) => b.demo[k] - a.demo[k]), r = xs.findIndex((x) => x.i === d.i) + 1;
         const aus = m.areas.AUS.demo;
-        return { hed: `${f0(100 * d.demo[k])}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across Australia, ${f1(aus[k])}%. ${demoCopy(m).seats}` };
+        return { hed: `${f0(100 * d.demo[k])}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? "South Australia" : "Australia"}, ${f1(aus[k])}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
       if (!c || !c.dec) return { hed: `${ds(d.n)} has no ${IX_ABBR[S.index]} score`, dek: "" };
@@ -508,7 +516,12 @@ function storyDiv(m, i) {
   }
   h += `<div class="st-sec"><h3>Informal</h3><div class="big"><span class="v">${f1(d.infPct)}%</span><span class="l">of ballots · Australia ${f1(m.areas.AUS.infPct)}%</span></div>${d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : ""}</div>`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
-  h += `<div class="st-sec"><h3>The seat <small>AEC type · ABS census and SEIFA, deciles among seats</small></h3>${d.cls ? `<dl class="facts"><dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>${d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : ""}</dl>` : ""}${decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec)}<p class="st-note">${demoCopy(m).note} 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.</p></div>`;
+  const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : "";
+  const hasDeciles = IX.some((ix) => d.seifa[ix] && d.seifa[ix].dec);
+  const deciles = hasDeciles ? decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec) : "";
+  const seatNote = `${demoCopy(m).note}${deciles ? ` 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.` : ""}`;
+  const seatSmall = m.demoBasis === "sa1" ? "ABS census, 2021" : "AEC type · ABS census and SEIFA, deciles among seats";
+  if (d.cls || d.demo || deciles) h += `<div class="st-sec"><h3>The seat <small>${seatSmall}</small></h3>${d.cls || d.demo ? `<dl class="facts">${d.cls ? `<dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>` : ""}${demoFacts}</dl>` : ""}${deciles}<p class="st-note">${seatNote}</p></div>`;
   h += historyChart(d);
   // polling places
   const b = m.booth, js = b.byDiv[i];

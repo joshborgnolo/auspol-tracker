@@ -38,7 +38,10 @@ close-enough row.
 There is no swing source in the API (no previous-election figures), so
 changes are the "unknown" kind, per-candidate chg is 0, and tpp swings are
 null; prev is null. No booth (polling place) lane: the site shows districts
-only. Boundaries are SA's own State Electorates 2026 geojson (data.sa.gov.au),
+only. The census people lane instead rides data/sa26-demo.json (GCP 2021 SA1
+tables pooled to the 47 districts by .build/map/build_sa26_demo.py): each
+division row gains demo, and the year file records demoBasis "sa1".
+Boundaries are SA's own State Electorates 2026 geojson (data.sa.gov.au),
 committed-free like the federal n-YYYY.geojson era files; the reducer keeps
 one `name` property per feature (title case, the ECSA names it joins to).
 
@@ -49,6 +52,7 @@ import collections, gzip, json, os, sys, urllib.request
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
+DEMO_STORE = os.path.join(REPO, "data", "sa26-demo.json")
 OUT = sys.argv[1]
 FETCH = "--fetch" in sys.argv[2:]
 BASE = "https://apim-ecsa-production.azure-api.net/results-display"
@@ -113,6 +117,19 @@ def bucket(ab):
     return "oth"
 
 
+def load_demo():
+    if not os.path.exists(DEMO_STORE):
+        fail(f"census store {DEMO_STORE} missing — run .build/map/build_sa26_demo.py")
+    with open(DEMO_STORE) as f:
+        d = json.load(f)
+    if d.get("year") != "sa26" or d.get("demoBasis") != "sa1":
+        fail(f"census store is year {d.get('year')!r} basis {d.get('demoBasis')!r}, expected sa26/sa1")
+    demo = d.get("demo")
+    if not isinstance(demo, dict) or len(demo) != 47:
+        fail(f"census store covers {len(demo or {})} districts, expected 47")
+    return demo
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     ha = fetch("ecsa-ha", f"HAStatic/{ELECTION}")
@@ -129,6 +146,7 @@ def main():
         fail(f"district-name sets differ: static-only {sorted(set(ha_d) - set(hc_d))}, change-only {sorted(set(hc_d) - set(ha_d))}")
     if len(names) != 47:
         fail(f"{len(names)} districts, expected 47")
+    demo = load_demo()
 
     D = []
     seats = collections.Counter()
@@ -264,6 +282,7 @@ def main():
             "fl": [],
             "h": [],
             "enrolled": enrolled,
+            "demo": demo[name],
         }
         if tpp:
             rec["tpp"] = tpp
@@ -279,7 +298,7 @@ def main():
 
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
-    out = {"year": "sa26", "date": ELECTION, "prev": None, "jurisdiction": "SA",
+    out = {"year": "sa26", "date": ELECTION, "prev": None, "jurisdiction": "SA", "demoBasis": "sa1",
            "agg": {"AUS": agg, "SA": dict(agg)}, "divs": D}
     p = os.path.join(OUT, "data-sa26.json")
     with open(p, "w") as f:

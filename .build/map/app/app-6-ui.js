@@ -105,7 +105,7 @@ function legendStandIn(m, y) {
   const st = Object.create(m);
   st.year = y; st.standIn = true;
   st.seating = SEATED.has(y) ? SEAT_META.get(y) || null : null;
-  st.demoBasis = y === 2013 ? "venue" : null;
+  st.demoBasis = y === "sa26" ? "sa1" : y === 2013 ? "venue" : null;
   const c = S.lens === "winner" && SUM && SUM.seats[y] && SUM.seats[y].AUS;
   if (c) st.divs = Object.entries(c).flatMap(([fam, n]) => Array.from({ length: n }, () => ({ hold: { fam } })));
   return st;
@@ -233,7 +233,7 @@ function legendHTML(m) {
         // the income lanes' note names their own cut in the census
         // year's dollars, then the same census-basis tail
         const incNote = `Share of adults in households earning ${S.index === "loinc" ? `under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)}` : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more`} a week${m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 2007 election: 2007 and 2010 read the census areas the polling places stand in (2006 census), 2013 on the 2011 census; from 2016 they follow the voters (2021 census)." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : "Share of residents"}, ${m.demoBasis === "venue" ? `${m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo && aus.demo[S.index] != null ? ` The line marks Australia: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2007 election: 2007 and 2010 read the census areas the polling places stand in (2006 census), 2013 on the 2011 census; from 2016 they follow the voters (2021 census)." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : "Share of residents"}, ${m.demoBasis === "venue" ? `${m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? "2021 census, of the SA1 census areas that make up each district." : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`}${aus.demo && aus.demo[S.index] != null ? ` The line marks ${m.demoBasis === "sa1" ? "South Australia" : "Australia"}: ${f1(aus.demo[S.index])}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
