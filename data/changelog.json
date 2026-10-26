@@ -213,6 +213,7 @@
       "alp|education|TAFE or trade": -1,
       "alp|education|University": 1,
       "alp|state|Non-NSW/Vic/Qld": 1,
+      "grn|age|35–54": -1,
       "grn|education|TAFE or trade": 1,
       "grn|education|Year 12 or less": -1,
       "grn|language|English only": -1,
@@ -243,6 +244,11 @@
         "party": "alp",
         "group": "Non-NSW/Vic/Qld",
         "setLabel": "By state"
+      },
+      "grn|age|35–54": {
+        "party": "grn",
+        "group": "35–54",
+        "setLabel": "By age"
       },
       "grn|education|TAFE or trade": {
         "party": "grn",
@@ -482,6 +488,12 @@
       "label": "21 Oct 2026",
       "kind": "finding",
       "text": "Rural voters (by location) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-10-26",
+      "label": "26 Oct 2026",
+      "kind": "finding",
+      "text": "35–54 voters (by age) now break significantly away from the Greens, relative to all voters."
     }
   ]
 }
