@@ -155,7 +155,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 {
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
-  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA distribution cuts (its booths have no census lane)");
+  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA distribution cuts (its booths carry venue-grade census lanes only; the cuts are voter-footprint reads)");
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of sa.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
@@ -180,7 +180,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // notional ALP v One Nation pair, dropped). Booth premises, suburb, postcode
 // and coordinates come from ECSA's own 2026 election-map venue roll (Wayback
 // snapshot, cached as ecsa-2026-venues.json.gz); the 6 mobile teams have no
-// fixed venue and stay null, and dec/vdec stay null too.
+// fixed venue and stay null. The census lanes (dec, demo — vdec is left
+// empty by design) are then spliced in by .build/map/build_sa_boothcensus.py.
 {
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   const B = sa.booths;
@@ -199,7 +200,34 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       assert.ok(typeof B.prem[k] === "string" && B.prem[k] && typeof B.sub[k] === "string" && B.sub[k] && typeof B.pc[k] === "string" && B.pc[k], `sa26 ${c}`);
     }
   }
-  assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa26 booths carry no SEIFA deciles (the neighbourhood lane is blank)");
+  // census lanes (.build/map/build_sa_boothcensus.py, spliced into the data
+  // build): a fixed booth's venue coords join it to the SA1 it stands in —
+  // dec is that SA1's ABS 2021 national SEIFA deciles, demo the SA1's own
+  // people cells on the district lanes' ex-not-stated bases (8-wide; the two
+  // income slots stay null). Mobile teams and booths in SA1s the cube does
+  // not score stay null; vdec stays null by design — ECSA publishes no
+  // votes-by-SA1, so the voter-footprint read cannot exist
+  {
+    assert.equal(B.dec.filter(Boolean).length, 736, "sa26: 736 booths in cube-scored SA1s carry national SEIFA deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] === 4).length, 6, "sa26: the 6 mobile teams carry no deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] !== 4).length, 11, "sa26: 11 fixed booths sit in SA1s the cube does not score");
+    assert.ok(B.vdec.every((x) => x === null), "sa26: no voter-footprint deciles (ECSA publishes no votes-by-SA1 product)");
+    assert.equal(B.demo.filter(Boolean).length, 747, "sa26: every geocoded booth carries its SA1's people cells");
+    for (let k = 0; k < B.n.length; k++) {
+      const d = B.dec[k];
+      if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa26 ${B.n[k]}: dec is four national deciles or nulls`);
+      const dm = B.demo[k];
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 8 && dm[6] === null && dm[7] === null && dm.slice(0, 6).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is six 0-1 people cells on null income slots`);
+    }
+    const adl = B.n.indexOf("Adelaide");
+    assert.ok(adl >= 0, "sa26: the Adelaide booth exists");
+    assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa26: the Adelaide booth's SA1 national deciles");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, null, null], "sa26: the Adelaide booth's SA1 people cells");
+    assert.deepEqual(B.dec[B.n.indexOf("Beaumont")], [10, 10, 9, 10], "sa26: Beaumont, the top of the range");
+    assert.deepEqual(B.dec[B.n.indexOf("Barmera")], [1, 1, 2, 2], "sa26: Barmera, the bottom of the range");
+    const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
+    assert.ok(spread.size >= 8, "sa26 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
   sa.divs.forEach((d, di) => {
     const js = B.d.reduce((a, x, k) => (x === di ? (a.push(k), a) : a), []);
     assert.ok(js.length > 0, `${d.n}: at least one booth`);
@@ -317,7 +345,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   // booths: 695 polling places on the federal lanes, ECSA 2022 types (day and
   // mobile — no EVC lane in the 2022 vocabulary), venue facts off ECSA's own
   // archived 2022 election-map venue roll (the 6 mobile teams stay null),
-  // tpp null and no flow lane
+  // tpp null and no flow lane. dec/demo are spliced in by
+  // .build/map/build_sa_boothcensus.py exactly as sa26's
   {
     const B = res.booths;
     assert.ok(B, "sa22 res carries a booths record");
@@ -337,7 +366,24 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     }
     assert.ok(B.tpp.every((x) => x === null), "sa22 booths carry no tpp lane (the notional tally is partial)");
     assert.ok(B.fl.every((x) => x === null), "sa22 booths carry no flow lane");
-    assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa22 booths carry no SEIFA deciles");
+    // census lanes, the same splice contract as sa26's (see above)
+    assert.equal(B.dec.filter(Boolean).length, 681, "sa22: 681 booths in cube-scored SA1s carry national SEIFA deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] === 4).length, 6, "sa22: the 6 mobile teams carry no deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] !== 4).length, 8, "sa22: 8 fixed booths sit in SA1s the cube does not score");
+    assert.ok(B.vdec.every((x) => x === null), "sa22: no voter-footprint deciles (ECSA publishes no votes-by-SA1 product)");
+    assert.equal(B.demo.filter(Boolean).length, 689, "sa22: every geocoded booth carries its SA1's people cells");
+    for (let k = 0; k < B.n.length; k++) {
+      const d = B.dec[k];
+      if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa22 ${B.n[k]}: dec is four national deciles or nulls`);
+      const dm = B.demo[k];
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 8 && dm[6] === null && dm[7] === null && dm.slice(0, 6).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is six 0-1 people cells on null income slots`);
+    }
+    const adl = B.n.indexOf("Adelaide");
+    assert.ok(adl >= 0, "sa22: the Adelaide booth exists");
+    assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa22: the Adelaide booth's SA1 national deciles");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, null, null], "sa22: the Adelaide booth's SA1 people cells");
+    const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
+    assert.ok(spread.size >= 8, "sa22 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
   }
   // the census lanes splice exactly as sa26's
   {
