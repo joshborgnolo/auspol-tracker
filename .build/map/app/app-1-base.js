@@ -219,6 +219,10 @@ const LENSES = [
   { id: "cls", label: "Seat type" },
   { id: "seifa", label: "Census" },
 ];
+// the Senate vote and the AEC's seat types are federal reads — the SA frames
+// (state legislature, ECSA boundaries) don't offer them
+const FED_LENS = new Set(["senate", "cls"]);
+const yearLenses = (y) => SA_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens walk is keyboard
 // only — a phone scrolls the lens row itself. On the phone a walk keeps the
@@ -226,9 +230,9 @@ const LENSES = [
 function walkYear(dir, wrap) { const lane = SA_YEARS.has(S.year) ? YEARS_SA : YEARS_FED; const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
-  const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
-  setLens(LENSES[k].id);
-  const b = $(`#lenses [data-lens="${LENSES[k].id}"]`);
+  const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
+  setLens(L[k].id);
+  const b = $(`#lenses [data-lens="${L[k].id}"]`);
   // the row reveals the chip horizontally itself — the scrollIntoView this
   // replaced could also scroll the PAGE vertically, a walk side effect
   if (b) { const row = $("#lenses"); row.scrollLeft += b.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - b.offsetWidth) / 2; }

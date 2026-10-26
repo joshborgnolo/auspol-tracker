@@ -482,4 +482,18 @@ for (const y of ["sa22", "sa26"]) {
   else assert.ok(nCl >= 40, `${y}: its classic finals split (${nCl})`);
 }
 
+// the SA frames' lens row: the Senate vote and the AEC's seat types are federal reads the
+// state elections don't offer — out of the menu bar, the walks, the URL and the legend probe,
+// but never out of LENSES itself (a federal year's row still carries both)
+{
+  assert.ok(js.includes('{ id: "senate", label: "Senate" },') && js.includes('{ id: "cls", label: "Seat type" },'), "the Senate and Seat-type lenses still exist for the federal years");
+  assert.ok(js.includes('const FED_LENS = new Set(["senate", "cls"]);') && js.includes("const yearLenses = (y) => SA_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;"), "yearLenses filters the two federal-only lenses for the SA frames");
+  assert.ok(js.includes("const list = sen ? SEN_LENSES : yearLenses(S.year)"), "renderLenses draws the year's own lenses");
+  assert.ok(js.includes("const L = yearLenses(S.year), k = (L.findIndex("), "walkLens walks the year's own lenses");
+  assert.ok(js.includes('const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;'), "readURL refuses a federal-only lens on an SA deep link");
+  assert.ok(js.includes('if (SA_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";'), "setYear drops a federal-only lens on the walk into an SA frame");
+  assert.ok(js.includes("if (FED_LENS.has(id) && SA_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on an SA frame outright");
+  assert.ok(js.includes("for (const lens of yearLenses(y).map((l) => l.id))"), "the legend-height probe measures only the year's own lenses");
+}
+
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

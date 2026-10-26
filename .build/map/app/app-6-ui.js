@@ -49,7 +49,7 @@ function valueText(v, kind, ctx) {
 // the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
   const sen = S.view === "chamber" && S.house === "senate";
-  const list = sen ? SEN_LENSES : LENSES, cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
+  const list = sen ? SEN_LENSES : yearLenses(S.year), cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
   $("#lenses").innerHTML = list.map((l) => `<button type="button" class="rd-tab" role="tab" ${attr}="${l.id}" aria-selected="${cur === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
   $("#lenses").setAttribute("aria-label", sen ? "Colour the senators by" : "Colour the seats by");
   $("#q").placeholder = sen ? "Search a senator or state" : "Search a seat, member or place";
@@ -124,7 +124,7 @@ function legendHeightOf(m, y, w, probe) {
     let hMax = 0;
     try {
       S.year = y;
-      for (const lens of LENSES.map((l) => l.id))
+      for (const lens of yearLenses(y).map((l) => l.id))
         for (const mode of lens === "tpp" || lens === "fp" || lens === "senate" ? ["share", "swing"] : lens === "seifa" ? [IX[0], DM[0]] : [null]) {
           Object.assign(S, { lens });
           if (lens === "tpp") S.tppMode = mode;
@@ -529,6 +529,7 @@ function setView(v, quiet) {
 }
 function setLens(id) {
   if (S.lens === id) return;
+  if (FED_LENS.has(id) && SA_YEARS.has(S.year)) return;
   // the Senate's votes load with their lens (about 120KB a year, gzipped)
   if (id === "senate" && svYear(S.year) != null && !SV[svYear(S.year)]) {
     const spot = takeSpot();
@@ -615,6 +616,8 @@ async function setYear(y) {
   const from = S.year, a = M(), spot = takeSpot();
   // a state election on the timeline has no Senate: it opens in the House's chamber
   if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
+  // ... and the Senatevote/seat-type lenses are AEC reads the SA frames don't offer
+  if (SA_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";
   showLoading(true);
   // the Senate's chamber moves with the timeline: that election's Senate too
   try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null]); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
@@ -640,6 +643,7 @@ async function setYear(y) {
     if (ss.level === "sen" && was) { const i = SENM.byName.get(was.divs[ss.i].n); S.ssel = i != null ? { level: "sen", st: ss.st, i } : { level: "state", st: ss.st }; }
     renderLenses();
   }
+  renderLenses(); // the SA frames offer fewer lenses — the chip row changes with the year
   recolor(false);
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
@@ -779,7 +783,7 @@ function writeURL() {
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
   const yr = p.get("y"); if (yr && YEARS.includes(yearOf(yr))) S.year = yearOf(yr);
-  const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
+  const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
