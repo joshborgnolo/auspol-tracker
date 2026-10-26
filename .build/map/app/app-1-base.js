@@ -188,12 +188,20 @@ const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
 const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025, "sa26", "now"];
-// sa26: the South Australian state election of 21 March 2026 — the timeline's one
-// non-federal year, drawn at its date (day 80 of 2026) rather than a whole year in
-const YEAR_X = { sa26: 2026.216, now: 2026.8 };
-const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", sa26: "alp", now: "alp" };
-const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa26: "Peter Malinauskas", now: "Anthony Albanese" };
+const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "sa22", 2022, 2025, "sa26", "now"];
+// sa22/sa26: the South Australian state elections of 19 March 2022 and 21 March 2026 —
+// non-federal stops, drawn on their own timeline row at their date rather than a whole year in
+const SA_YEARS = new Set(["sa22", "sa26"]);
+const YEARS_FED = YEARS.filter((y) => !SA_YEARS.has(y));
+const YEARS_SA = YEARS.filter((y) => SA_YEARS.has(y));
+// each stop's spot on the timeline's date line (year + day-of-year/365)
+const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, now: 2026.8 };
+// the calendar year a non-year word's results belong to ("sa22" elects in 2022)
+const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026 };
+// SA election dates the word years don't already cover (a state frame's history spot)
+const SA_PREV_X = { 2018: 2018.205 };
+const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -211,7 +219,7 @@ const LENSES = [
 // figure swipes (a swipe cycles all the way around); the lens walk is keyboard
 // only — a phone scrolls the lens row itself. On the phone a walk keeps the
 // view fixed (walkHold below), and has no scroll side effects of its own
-function walkYear(dir, wrap) { const k = YEARS.indexOf(S.year) + dir, y = YEARS[wrap ? (k + YEARS.length) % YEARS.length : k]; if (y != null) setYear(y); }
+function walkYear(dir, wrap) { const lane = SA_YEARS.has(S.year) ? YEARS_SA : YEARS_FED; const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const k = (LENSES.findIndex((l) => l.id === S.lens) + dir + LENSES.length) % LENSES.length;
@@ -424,7 +432,7 @@ const S = {
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
-const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA26" : String(y));
+const yearLabel = (y) => (y === "now" ? "Now" : SA_YEARS.has(y) ? String(y).toUpperCase() : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -464,7 +472,7 @@ function deriveDiv(d, i, year) {
     if (tot > 0) flowAlp[b] = (100 * toA) / tot;
   }
   const tpp = d.tpp && d.tpp[0] + d.tpp[1] ? (100 * d.tpp[0]) / (d.tpp[0] + d.tpp[1]) : null;
-  const yNum = year === "now" || year === "sa26" ? 2026 : year;
+  const yNum = FRAME_YEAR[year] != null ? FRAME_YEAR[year] : year;
   const prev = d.h.filter((h) => h[0] < yNum && !h[4]).pop() || null;
   let change;
   // 2004's h is empty by construction (the archive's first federal year); an
@@ -576,7 +584,7 @@ const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.jso
 function buildIslands(data, m) {
   if (!data) return [];
   // the federal seat islands have no home in a state election's frame
-  if (m.year === "sa26") return [];
+  if (SA_YEARS.has(m.year)) return [];
   const own = data.owner[m.year === "now" ? 2025 : m.year] || {};
   return data.islands.map((s) => {
     let lon0 = Infinity, lat0 = Infinity, lon1 = -Infinity, lat1 = -Infinity;
@@ -692,5 +700,7 @@ async function loadYear(year) {
   return m.ready;
 }
 const M = () => (Y[S.year] && Y[S.year].divs ? Y[S.year] : null);
-// sa26 has no predecessor on the timeline (the previous SA election is not in the set)
-const prevYearOf = (y) => (y === "now" ? 2025 : y === "sa26" ? null : y === 2004 ? 2001 : YEARS[YEARS.indexOf(y) - 1] || null);
+// "the previous election" is defined only within the federal chain — a state stop's
+// predecessor is its own older state election, stored on its frame (res.prev), never
+// the federal year its index sits beside
+const prevYearOf = (y) => (y === "now" ? 2025 : SA_YEARS.has(y) ? null : y === 2004 ? 2001 : YEARS_FED[YEARS_FED.indexOf(y) - 1] || null);

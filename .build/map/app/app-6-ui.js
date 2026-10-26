@@ -111,7 +111,7 @@ function legendStandIn(m, y) {
   const st = Object.create(m);
   st.year = y; st.standIn = true;
   st.seating = SEATED.has(y) ? SEAT_META.get(y) || null : null;
-  st.demoBasis = y === "sa26" ? "sa1" : y === 2013 ? "venue" : null;
+  st.demoBasis = SA_YEARS.has(y) ? "sa1" : y === 2013 ? "venue" : null;
   const c = S.lens === "winner" && SUM && SUM.seats[y] && SUM.seats[y].AUS;
   if (c) st.divs = Object.entries(c).flatMap(([fam, n]) => Array.from({ length: n }, () => ({ hold: { fam } })));
   return st;
@@ -176,7 +176,7 @@ function senLegendHeight(sm, w, probe) {
   return legendHeights.get(key);
 }
 function legendHTML(m) {
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year);
+  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const grad = (tbl, from, to) => { const st = []; for (let k = 0; k <= 10; k++) st.push(`${css(tbl[Math.round(lerp(from, to, k / 10))])} ${k * 10}%`); return `linear-gradient(90deg, ${st.join(",")})`; };
   const ticks = (vals, lo, hi, fmt) => `<div class="lg-ticks">${vals.map((v) => `<span style="left:${(100 * (v - lo)) / (hi - lo)}%">${fmt(v)}</span>`).join("")}</div>`;
   const mark = (v, lo, hi) => (v == null ? "" : `<span class="mk" style="left:${(100 * (clamp(v, lo, hi) - lo)) / (hi - lo)}%" title="Australia ${f1(v)}"></span>`);
@@ -274,46 +274,56 @@ function legendHTML(m) {
 
 /* =============================== the timeline =============================== */
 let SUM = null;
+/* two dated rows, one per jurisdiction: the federal elections on top, the South
+   Australian state ones below, each stop at its date on the one scale */
 function renderTimeline() {
   const el = $("#time"); if (!el) return;
-  const W = el.clientWidth || 600, H = el.clientHeight || 66, m = M();
-  // the elections sit at even steps: a run of results, not a calendar
-  const X = (y) => 22 + (YEARS.indexOf(y) / (YEARS.length - 1)) * (W - 44);
-  const short = W < 560;
-  const base = H - 24, cur = S.year;
+  const W = el.clientWidth || 600, H = el.clientHeight || 96, m = M();
+  const X = (y) => 22 + ((xOfYear(y) - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
+  const NX = (nx) => 22 + ((nx - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
+  const saGx = (ry) => NX(SA_PREV_X[ry] ?? YEAR_X["sa" + String(ry).slice(2)] ?? ry);
+  const short = W < 560, cur = S.year;
+  const rows = [
+    { ys: YEARS_FED, base: Math.round(H * 0.36), top: 2 },
+    { ys: YEARS_SA, base: Math.round(H * 0.81), top: Math.round(H * 0.36) + 16 },
+  ];
   const sd = m ? selDiv() : null;
-  let g = `<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>`;
-  // the glyph above each stop: the House's make-up, or the chosen seat's two-party line
+  let g = "";
+  for (const r of rows) g += `<line x1="0" x2="${W}" y1="${r.base}" y2="${r.base}" stroke="var(--line)"/>`;
+  // the glyph above a stop: the House's make-up, or the chosen seat's two-party line
   if (sd != null && m) {
-    const d = m.divs[sd], hh = d.h;
+    const d = m.divs[sd], hh = d.h, row = rows[SA_YEARS.has(m.year) ? 1 : 0];
+    const gx = SA_YEARS.has(m.year) ? saGx : X;
     const vs = hh.map((r) => r[1]).filter((v) => v != null);
     let lo = Math.min(...vs, 50) - 3, hi = Math.max(...vs, 50) + 3;
     if (hi - lo < 16) { const c = (lo + hi) / 2; lo = c - 8; hi = c + 8; }
-    const yv = (v) => base - 6 - ((clamp(v, lo, hi) - lo) / (hi - lo)) * (base - 14);
-    const pl = hh.filter((r) => r[1] != null && !r[4]).map((r) => `${X(r[0]).toFixed(1)},${yv(r[1]).toFixed(1)}`).join(" ");
+    const yv = (v) => row.base - 6 - ((clamp(v, lo, hi) - lo) / (hi - lo)) * (row.base - 8 - row.top);
+    const pl = hh.filter((r) => r[1] != null && !r[4]).map((r) => `${gx(r[0]).toFixed(1)},${yv(r[1]).toFixed(1)}`).join(" ");
     g += `<line x1="0" x2="${W}" y1="${yv(50)}" y2="${yv(50)}" stroke="var(--line)" stroke-dasharray="2 3"/><polyline points="${pl}" fill="none" stroke="var(--ink-faint)" stroke-width="1.4"/>`;
     for (const r of hh) {
-      const yr = r[4] ? "now" : r[0];
       const cy = r[1] != null ? yv(r[1]) : yv(50);
-      g += `<circle cx="${X(yr)}" cy="${cy}" r="${yr === cur ? 5 : 3.6}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="1.5"><title>${r[4] ? "By-election" : r[0]}: ${ds(r[3])} (${esc(partyName(r[2]))})${r[1] != null ? `, Labor two-party ${f1(r[1])}` : ""}</title></circle>`;
+      g += `<circle cx="${r[4] ? X("now") : gx(r[0])}" cy="${cy}" r="${(r[4] ? "now" : r[0]) === cur ? 5 : 3.6}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="1.5"><title>${r[4] ? "By-election" : r[0]}: ${ds(r[3])} (${esc(partyName(r[2]))})${r[1] != null ? `, Labor two-party ${f1(r[1])}` : ""}</title></circle>`;
     }
     if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
-    // in the Senate's chamber each stop reads that election's Senate
+    // in the Senate's chamber each stop reads that election's upper house
     const sen = senOn();
     const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
-    for (const y of YEARS) {
+    for (const r of rows) for (const y of r.ys) {
       const s = sen ? SENY[y] && senCounts(SENY[y], (d) => st === "AUS" || d.st === st) : SUM.seats[y] && SUM.seats[y][st]; if (!s) continue;
       const tot = sum(Object.values(s)), bw = 30, x = X(y) - bw / 2;
       let acc = 0;
-      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
+      for (const f of ["alp", "grn", "ind", "oth", "onp", "lnp"]) { const n = s[f] || 0; if (!n) continue; const w = (bw * n) / tot; g += `<rect x="${(x + acc).toFixed(2)}" y="${r.base - 18}" width="${Math.max(0.6, w - 0.6).toFixed(2)}" height="8" fill="var(--m-${f})" opacity="${y === cur ? 1 : 0.62}"/>`; acc += w; }
     }
   }
-  for (const y of YEARS) {
-    const on = y === cur, x = X(y), lab = short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y);
-    g += `<g class="stop" data-year="${y}" style="cursor:pointer"><rect class="hit" x="${x - 24}" y="0" width="48" height="${H}"/><line x1="${x}" x2="${x}" y1="${base - 3}" y2="${base + 3}" stroke="${on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${on ? " on" : ""}" x="${x}" y="${base + 17}" text-anchor="middle">${lab}</text>${on ? `<line x1="${x - 16}" x2="${x + 16}" y1="${base + 22}" y2="${base + 22}" stroke="var(--ink)" stroke-width="2"/>` : ""}</g>`;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i], hitBot = i + 1 < rows.length ? rows[i + 1].top : H, labY = r.base + 15;
+    for (const y of r.ys) {
+      const on = y === cur, x = X(y), lab = short && y !== "now" && !SA_YEARS.has(y) ? "’" + String(y).slice(2) : yearLabel(y);
+      g += `<g class="stop" data-year="${y}" style="cursor:pointer"><rect class="hit" x="${x - 24}" y="${i ? r.top : 0}" width="48" height="${hitBot - (i ? r.top : 0)}"/><line x1="${x}" x2="${x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${on ? " on" : ""}" x="${x}" y="${labY}" text-anchor="middle">${lab}</text>${on ? `<line x1="${x - 16}" x2="${x + 16}" y1="${Math.min(labY + 2, H - 2)}" y2="${Math.min(labY + 2, H - 2)}" stroke="var(--ink)" stroke-width="2"/>` : ""}</g>`;
+    }
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Elections from 2004 to now; choose one">${g}</svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections 2004 to now, and South Australian state elections; choose one">${g}</svg>`;
 }
 
 /* =============================== tooltip =============================== */
@@ -627,7 +637,7 @@ async function setYear(y) {
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
   if (sen) return sen.lc ? `South Australia’s Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : m.year === "sa26" ? `The ${yearLabel("sa26")} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : SA_YEARS.has(m.year) ? `The ${yearLabel(m.year)} South Australian state election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 /* the eyebrow holds the height of its longest line, so a walk never moves the figure under it:
    between 414 and 600px an election's line wraps to two and Now's fits on one, and with the page
@@ -649,7 +659,7 @@ function holdEyebrow() {
     }
     if (ch) for (const y of SEN_YEARS) {
       const s = SENY[y], f = s ? [s.asOf, s.divs.length] : SN[y]; if (!f) continue;
-      lines.push(metaLine(M(), { year: y, lc: s ? s.lc : y === "sa26", asOf: f[0], divs: { length: f[1] } }));
+      lines.push(metaLine(M(), { year: y, lc: s ? s.lc : SA_YEARS.has(y), asOf: f[0], divs: { length: f[1] } }));
     }
     eb.style.minHeight = "";
     let h = 0;

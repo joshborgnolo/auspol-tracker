@@ -636,7 +636,7 @@ function drawChamber(g, m, w, h, opts) {
     else for (const q of drawn) { const nm = m.divs[q.i].n; const p = pos(nm); if (p) chLast.set(nm, p); }
   }
 }
-const blocName = (m, fam) => (fam === "alp" ? "Labor" : m.year === "sa26" ? "Liberals" : "Coalition");
+const blocName = (m, fam) => (fam === "alp" ? "Labor" : SA_YEARS.has(m.year) ? "Liberals" : "Coalition");
 function crossParts(m, ch) {
   const cnt = {};
   for (const i of ch.order) { const d = m.divs[i]; if (d.hold.fam === ch.gov || d.hold.fam === ch.opp) continue; const k = crossLabel(d.hold); cnt[k] = (cnt[k] || 0) + 1; }

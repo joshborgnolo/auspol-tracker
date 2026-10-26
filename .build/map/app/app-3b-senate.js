@@ -24,11 +24,11 @@ const syncSenate = () => { SENM = SENY[S.year] || null; };
 // the model the chamber view draws: the House's year, or the Senate
 const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && senFloor ? SENM : null) : M());
 const SEN_SEATS = 76;
-// every year whose upper house is in this lane: the federal elections, and sa26 — a state election
+// every year whose upper house is in this lane: the federal elections, and SA's — a state election
 // chooses no federal Senate, but SA's own upper house (its 22-member Legislative Council, 11
-// elected statewide at each state election) sits in the same chamber view on the sa26 frame,
-// from map/data/senate-sa26.json (.build/map/build_sa26_past.py)
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || y === "sa26");
+// elected statewide at each state election) sits in the same chamber view on the sa22/sa26 frames,
+// from map/data/senate-sa22.json and senate-sa26.json (.build/map/build_sa22_past.py, build_sa26_past.py)
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || SA_YEARS.has(y));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -253,7 +253,7 @@ function upClass(m) {
 const upClassWords = (m) => (upClass(m) === 2016 && m.year !== 2016 ? "each state’s six elected last in 2016" : m.dd ? "each state’s six elected last" : `each state’s six elected in ${upClass(m)}`);
 // the election that chose a Senate's own new half
 const ownElection = (m) => (senNow(m) ? 2025 : m.year);
-// the upper house as this frame's copy names it: the Senate federally, SA's council on sa26
+// the upper house as this frame's copy names it: the Senate federally, SA's council on the SA frames
 const coThe = (m) => (m.lc ? "the Legislative Council" : "the Senate");
 const coTheC = (m) => (m.lc ? "The Legislative Council" : "The Senate");
 // a member of it in copy: a senator, or a councillor (an MLC)
@@ -264,7 +264,7 @@ const coMember = (m) => (m.lc ? "member" : "senator");
 
 /* ----- the key ----- */
 function houseSwitchHTML() {
-  const sa = S.year === "sa26";
+  const sa = SA_YEARS.has(S.year);
   return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="${sa ? "House of Assembly" : "House of Representatives"}" aria-pressed="${S.house !== "senate"}">${sa ? "House of Assembly" : "House of Representatives"}</button><button type="button" data-house="senate" data-t="${sa ? "Legislative Council" : "Senate"}" aria-pressed="${S.house === "senate"}">${sa ? "Legislative Council" : "Senate"}</button></div>`;
 }
 function senateLegendHTML(m) {
@@ -276,7 +276,7 @@ function senateLegendHTML(m) {
     h += `${cats(up, SEN_FAMS)}${stay ? `<span><i style="background:${css(SEN_STAY(TH))}"></i>Term to ${m.lc ? `the ${m.later} election` : m.later} <b>${stay}</b></span>` : ""}</div>`;
     h += `<div class="lg-note">${m.lc ? "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one." : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
   } else {
-    h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : m.lc ? "The Legislative Council after SA26" : `The Senate after the ${m.year} election`}</div>`;
+    h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : `The Senate after the ${m.year} election`}</div>`;
     h += `${cats(senCounts(m), SEN_FAMS)}</div>`;
   }
   const md = seatMode(m);
@@ -354,7 +354,7 @@ function storySenate(m) {
   // (the council is one statewide electorate: its "state" story is the chamber's)
   if (s.level === "state" && !m.lc) return storySenState(m, s.st);
   const { hed, dek } = senHedDek(m);
-  let h = senHead(m.lc ? "The Legislative Council after SA26" : senNow(m) ? "The Senate today" : `The Senate after ${m.year}`, m.lc ? `The council as the new term began, ${longDate(m.asOf)}` : senNow(m) ? `Senators as at ${longDate(m.asOf)}` : `From ${longDate(m.asOf)}, as the ${m.dd ? "double dissolution’s" : "election’s"} senators took their seats`, hed, dek);
+  let h = senHead(m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : senNow(m) ? "The Senate today" : `The Senate after ${m.year}`, m.lc ? `The council as the new term began, ${longDate(m.asOf)}` : senNow(m) ? `Senators as at ${longDate(m.asOf)}` : `From ${longDate(m.asOf)}, as the ${m.dd ? "double dissolution’s" : "election’s"} senators took their seats`, hed, dek);
   h += `<div class="st-sec"><h3>The balance of power <small>${senBalance(m).maj} of ${m.seatsN} votes pass a bill</small></h3>${senBar(m)}</div>`;
   // who faces the voters next
   const up = m.divs.filter(upNext), upC = senCounts(m, upNext), stayC = senCounts(m, (d) => !upNext(d));

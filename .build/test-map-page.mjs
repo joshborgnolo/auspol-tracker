@@ -80,7 +80,15 @@ assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assem
   const F = metaFacts(ROOT), years = (js.match(/const YEARS = \[([^\]]*)\]/) || [, ""])[1].split(",").map((t) => t.trim().replace(/"/g, "")).filter(Boolean);
   assert.ok(years.length >= 10, "YEARS read from app-1-base.js");
   for (const y of years) assert.ok(F.house[y] && F.house[y][0] && F.house[y][1] > 0, `meta facts: the House line for ${y}`);
-  for (const y of years.filter((y) => y !== "sa26")) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the Senate line for ${y}`);
+  // an upper-house file exists only for the frames that have one (sa26/sa22's
+  // Legislative Council rides senate-<year>.json with lc:true)
+  const LC_YEARS = [];
+  for (const f of fs.readdirSync(path.join(ROOT, "map/data"))) {
+    const m = f.match(/^senate-(\w+)\.json$/);
+    if (m) { const s = JSON.parse(R("map/data/" + f)); if (s && s.lc) LC_YEARS.push(m[1]); }
+  }
+  for (const y of years.filter((y) => y !== "now" && !LC_YEARS.includes(y))) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the Senate line for ${y}`);
+  for (const y of LC_YEARS) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the upper-house line for ${y}`);
   assert.ok(js.includes("const META_FACTS = /*@meta-facts*/{};"), "holdEyebrow reads the stamped meta facts");
 }
 assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
@@ -243,6 +251,111 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     const sum = ["alp", "lnp", "grn", "onp", "ind", "oth"].reduce((a, k) => a + (p[k] || 0), 0);
     assert.equal(sum, 1091173, `sa26: ${st} 2022 primaries account for every formal vote`);
   }
+}
+
+// ── the sa22 frame: South Australia's 19 March 2022 state election, the
+// second state frame on /map/ (build_sa22_data.py on the committed 2022 ECSA
+// caches — an older payload vintage than 2026's: districts key on NAME,
+// candidates carry ordinaryVotes+declarationVotes+per-candidate
+// distributionVotes, the 2CP lane reconciles exactly, and the twoPartyPref
+// notional tally is partial — every tpp lane records only a classic-pair
+// district's distribution finals, booths' tpp null). build_sa22_past.py joins
+// the 2018 static-HTML records in. NO preference-flow store exists for 2022
+// (fl rows empty, no flBasis)
+{
+  const res = JSON.parse(R("map/data/res-sa22.json"));
+  assert.equal(res.year, "sa22", "sa22: year id");
+  assert.equal(res.date, "2022-03-19", "sa22: polling day");
+  assert.equal(res.prev, 2018, "sa22: prev names the 2018 state election");
+  assert.equal(res.demoBasis, "sa1", "sa22 records the SA1 census basis");
+  assert.ok(!("flBasis" in res), "sa22 records no flow basis (no 2022 flow store)");
+  assert.equal(res.jurisdiction, "SA", "sa22: jurisdiction");
+  assert.deepEqual(Object.keys(res.agg), ["AUS", "SA"], "sa22 carries only the SA frame's areas");
+  assert.equal(res.divs.length, 47, "sa22: 47 districts");
+  for (const f of ["geo-sa22-lo.json", "geo-sa22-hi.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+  let nSw = 0, nC5 = 0, nTpp = 0, nH = 0;
+  for (const d of res.divs) {
+    assert.ok(Array.isArray(d.h) && d.h.length === 1 && d.h[0][0] === 2018 && typeof d.h[0][1] === "number" && typeof d.h[0][3] === "string",
+      `sa22 ${d.n}: one 2018 history row ([year, TCP%, party, member])`);
+    assert.ok(Array.isArray(d.fl) && d.fl.length === 0, `sa22 ${d.n}: no flow rows (no 2022 flow store)`);
+    nH += d.h.length;
+    for (const c of d.c) {
+      assert.ok(Number.isFinite(c[5]), `sa22 ${d.n}: c[5] finite for ${c[0]}`);
+      nC5++;
+      if (c[5] !== 0) nSw++;
+    }
+    if (d.tpp && Number.isFinite(d.tpp[2])) nTpp++;
+  }
+  assert.equal(nH, 47, "sa22: every district carries its 2018 history row");
+  assert.equal(nC5, 240, "sa22: every candidate carries a swing figure");
+  assert.equal(nSw, 240, "sa22: 240 candidate swings on 2018 (every candidate moved)");
+  assert.equal(nTpp, 33, "sa22: 33 districts carry a classic-pair 2PP swing into 2018");
+  assert.deepEqual(res.agg.SA.seats, { ALP: 27, LIB: 16, IND: 4 }, "sa22: the 2022 seat count");
+  assert.equal(res.agg.SA.formal, 1091173, "sa22: 2022 HoA formal vote (matches the sa26 frame's pformal)");
+  assert.equal(res.agg.SA.pformal, 1048713, "sa22: 2018 HoA formal vote");
+  assert.equal(res.agg.AUS.pformal, 1048713, "sa22: the AUS agg mirrors the state frame's 2018 formal");
+  for (const st of ["SA", "AUS"]) {
+    const p = res.agg[st].pprim;
+    assert.ok(p, `sa22: ${st} agg carries 2018 primaries`);
+    const sum = ["alp", "lnp", "grn", "onp", "ind", "oth"].reduce((a, k) => a + (p[k] || 0), 0);
+    assert.equal(sum, 1048713, `sa22: ${st} 2018 primaries account for every formal vote`);
+    assert.equal(res.agg[st].pprim.onp, 0, `sa22: ${st} 2018 primaries hold no One Nation lane (it ran none)`);
+  }
+  // booths: 695 polling places on the federal lanes, ECSA 2022 types (day and
+  // mobile — no EVC lane in the 2022 vocabulary), no venue facts (the ECSA
+  // publishes none), tpp null and no flow lane
+  {
+    const B = res.booths;
+    assert.ok(B, "sa22 res carries a booths record");
+    const LANES = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
+    for (const k of LANES) assert.ok(Array.isArray(B[k]) && B[k].length === 695, `sa22 booths.${k}: 695 rows`);
+    assert.equal(new Set(B.id).size, 695, "sa22 booth ids are unique");
+    assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 4], "sa22 booth types are day/mobile only (no EVC lane in 2022)");
+    assert.ok(B.lat.every((x) => x === null) && B.lon.every((x) => x === null) && B.prem.every((x) => x === null), "sa22 booths carry no venue facts (the ECSA publishes none)");
+    assert.ok(B.tpp.every((x) => x === null), "sa22 booths carry no tpp lane (the notional tally is partial)");
+    assert.ok(B.fl.every((x) => x === null), "sa22 booths carry no flow lane");
+    assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "sa22 booths carry no SEIFA deciles");
+  }
+  // the census lanes splice exactly as sa26's
+  {
+    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
+    assert.equal(res.divs.length, 47, "sa22: 47 districts with census rows");
+    const dec = new Set(res.divs.map((d) => d.seifa.irsad.dec));
+    assert.ok(dec.size >= 8, "sa22 IRSAD deciles spread across the range (a monotone join bug collapses them)");
+    for (const d of res.divs) {
+      assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number", `sa22 ${d.n}: demo row`);
+      for (const ix of IXS) assert.ok(d.seifa && typeof d.seifa[ix].v === "number" && Number.isInteger(d.seifa[ix].dec), `sa22 ${d.n}: ${ix} cell`);
+    }
+  }
+}
+
+// ── the sa22 upper house is again the Legislative Council: the 11 elected
+// there 2022 (terms to 2030) join the 11 carried over from 2018 (terms to
+// 2026, the hard-coded roster the ECSA never published) — both written by
+// build_sa22_past.py from the committed 2022-LC cache
+{
+  const sen = JSON.parse(R("map/data/senate-sa22.json"));
+  assert.equal(sen.year, "sa22", "senate-sa22: year");
+  assert.equal(sen.lc, true, "senate-sa22: lc flag");
+  assert.equal(sen.seatsN, 22, "senate-sa22: 22-member council");
+  assert.equal(sen.later, 2030, "senate-sa22: the 2022 cohort's terms run to 2030");
+  assert.equal(sen.dd, false, "senate-sa22: no double dissolution");
+  assert.equal(sen.senators.length, 22, "senate-sa22: 22 members on file");
+  const tally = {};
+  for (const s of sen.senators) tally[s.ab] = (tally[s.ab] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 9, LIB: 8, SAB: 2, GRN: 2, ONP: 1 }, "senate-sa22: the council's party balance at polling day 2022");
+  const c22 = sen.senators.filter((s) => s.term === 2030), c18 = sen.senators.filter((s) => s.term === 2026);
+  assert.equal(c22.length, 11, "senate-sa22: 11 elected at sa22");
+  assert.equal(c18.length, 11, "senate-sa22: 11 carried over from 2018");
+  assert.ok(c22.every((s) => s.elected === 2022), "senate-sa22: the 2022 cohort is elected 2022");
+  assert.ok(c18.every((s) => s.elected === 2018), "senate-sa22: the cross-bench cohort is elected 2018");
+  const game = sen.senators.find((s) => /Game/i.test(s.n));
+  assert.equal(game.ab, "ONP", "senate-sa22: Sarah Game sits One Nation as elected (the FGA relabel is an sa26-frame view)");
+  assert.equal(sen.formal, 1088840, "senate-sa22: 2022 LC formal vote");
+  assert.equal(sen.pformal, 1050874, "senate-sa22: 2018 LC formal vote");
+  assert.ok(sen.votes && sen.pvotes, "senate-sa22: statewide party votes for both elections");
+  assert.equal(Object.values(sen.votes).reduce((a, b) => a + b, 0), sen.formal, "senate-sa22: 2022 party votes sum to formal");
+  assert.equal(Object.values(sen.pvotes).reduce((a, b) => a + b, 0), sen.pformal, "senate-sa22: 2018 party votes sum to formal");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

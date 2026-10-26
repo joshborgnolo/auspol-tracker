@@ -46,7 +46,7 @@ export function metaFacts(root) {
       if (r) house[m[1]] = [r.date, r.divs.length, r.booths ? r.booths.n.length : 0];
       continue;
     }
-    m = f.match(/^senate-(\d{4}|now)\.json$/);
+    m = f.match(/^senate-(\w+)\.json$/);
     if (m) { const r = read(f); if (r) senate[m[1]] = [r.asOf, r.senators.length]; }
   }
   const now = read("data-now.json");
