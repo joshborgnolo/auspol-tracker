@@ -402,8 +402,8 @@ function deriveDiv(d, i, year) {
   };
 }
 
-// an island's polling places stay off the map's own plane (x, y NaN): they
-// are drawn in the island's inset box (app-2-map.js), so isl marks which
+// an island's polling places stand at their own spot on the map's plane, out
+// past the mainland frame, and its inset box draws them too: isl marks which
 function deriveBooths(B, m) {
   const n = B.id.length;
   const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B, isl: new Int8Array(n).fill(-1),
@@ -417,7 +417,7 @@ function deriveBooths(B, m) {
     o.name[j] = cleanBooth(B.n[j], D.n, B.ty[j]);
     const k = B.lat[j] == null ? -1 : m.isl.findIndex((s) => B.lon[j] >= s.near[0] && B.lon[j] <= s.near[2] && B.lat[j] >= s.near[1] && B.lat[j] <= s.near[3]);
     if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
-    else if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
+    if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
     o.formal[j] = formal; o.votes[j] = formal + B.inf[j];
     if (o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
@@ -489,7 +489,8 @@ function buildGeo(topo, m) {
    north up in local degrees (x by the cosine of its latitude), its seat in
    this election (owner: the seat its boundary holds it in, null where none
    does - Norfolk Island before 2016) and the seat its polling places count
-   in (seat: the owner, else the places' own) */
+   in (seat: the owner, else the places' own); and the same coast on the
+   map's own plane (mpath, its bounds mbb), where the camera flies out to it */
 let islandsP = null;
 const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
@@ -503,10 +504,16 @@ function buildIslands(data, m) {
     const cos = Math.cos((((lat0 + lat1) / 2) * Math.PI) / 180);
     const path = new Path2D();
     for (const r of s.rings) { r.forEach(([x, y], i) => (i ? path.lineTo : path.moveTo).call(path, (x - lon0) * cos, lat1 - y)); path.closePath(); }
+    const mpath = new Path2D();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const r of s.rings) {
+      r.forEach((ll, i) => { const [x, y] = proj(ll); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); (i ? mpath.lineTo : mpath.moveTo).call(mpath, x, y); });
+      mpath.closePath();
+    }
     const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
     // a polling place counts as the island's within a few km of its frame
     const near = [s.box[0] - 0.05, s.box[1] - 0.05, s.box[2] + 0.05, s.box[3] + 0.05];
-    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [] };
+    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [], mpath, mbb: [[x0, y0], [x1, y1]] };
   });
 }
 

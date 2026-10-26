@@ -132,6 +132,13 @@ button { cursor: pointer; background: none; border: 0; }
   box-shadow: 0 6px 18px -8px oklch(0.3 0.02 60 / 0.3);
 }
 .mp-filter b { color: var(--ink); font-weight: 600; }
+/* the way back from an island, top left, where the cities and the hint have
+   stepped aside at an island's zoom (the street credit holds the foot) */
+.mp-back { position: absolute; left: 8px; top: 8px; z-index: 3; display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px 6px 10px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line);
+  font-size: 13px; font-weight: 500; color: var(--ink-2); box-shadow: 0 6px 18px -8px oklch(0.3 0.02 60 / 0.3); }
+.mp-back:hover { color: var(--ink); }
+.mp-back[hidden] { display: none; }
 .mp-filter button { font-size: 12.5px; font-weight: 600; color: var(--ink-2); padding: 3px 9px; border-radius: 12px; background: color-mix(in oklch, var(--ink) 6%, transparent); }
 
 /* legend: the site's keys */

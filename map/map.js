@@ -404,8 +404,8 @@ function deriveDiv(d, i, year) {
   };
 }
 
-// an island's polling places stay off the map's own plane (x, y NaN): they
-// are drawn in the island's inset box (app-2-map.js), so isl marks which
+// an island's polling places stand at their own spot on the map's plane, out
+// past the mainland frame, and its inset box draws them too: isl marks which
 function deriveBooths(B, m) {
   const n = B.id.length;
   const o = { n, d: Int16Array.from(B.d), id: B.id, ty: Uint8Array.from(B.ty), prem: B.prem, sub: B.sub, pc: B.pc, raw: B, isl: new Int8Array(n).fill(-1),
@@ -419,7 +419,7 @@ function deriveBooths(B, m) {
     o.name[j] = cleanBooth(B.n[j], D.n, B.ty[j]);
     const k = B.lat[j] == null ? -1 : m.isl.findIndex((s) => B.lon[j] >= s.near[0] && B.lon[j] <= s.near[2] && B.lat[j] >= s.near[1] && B.lat[j] <= s.near[3]);
     if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
-    else if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
+    if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
     o.formal[j] = formal; o.votes[j] = formal + B.inf[j];
     if (o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
@@ -491,7 +491,8 @@ function buildGeo(topo, m) {
    north up in local degrees (x by the cosine of its latitude), its seat in
    this election (owner: the seat its boundary holds it in, null where none
    does - Norfolk Island before 2016) and the seat its polling places count
-   in (seat: the owner, else the places' own) */
+   in (seat: the owner, else the places' own); and the same coast on the
+   map's own plane (mpath, its bounds mbb), where the camera flies out to it */
 let islandsP = null;
 const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
@@ -505,10 +506,16 @@ function buildIslands(data, m) {
     const cos = Math.cos((((lat0 + lat1) / 2) * Math.PI) / 180);
     const path = new Path2D();
     for (const r of s.rings) { r.forEach(([x, y], i) => (i ? path.lineTo : path.moveTo).call(path, (x - lon0) * cos, lat1 - y)); path.closePath(); }
+    const mpath = new Path2D();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const r of s.rings) {
+      r.forEach((ll, i) => { const [x, y] = proj(ll); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); (i ? mpath.lineTo : mpath.moveTo).call(mpath, x, y); });
+      mpath.closePath();
+    }
     const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
     // a polling place counts as the island's within a few km of its frame
     const near = [s.box[0] - 0.05, s.box[1] - 0.05, s.box[2] + 0.05, s.box[3] + 0.05];
-    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [] };
+    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [], mpath, mbb: [[x0, y0], [x1, y1]] };
   });
 }
 
@@ -721,7 +728,7 @@ const zoom = d3.zoom().scaleExtent([0.5, 2600]).clickDistance(6)
     && !(e.type === "touchstart" && T.k <= HOME.k * 1.001))
   .on("start", (e) => { if (e.sourceEvent && e.sourceEvent.type === "mousedown") canvas.classList.add("grabbing"); })
   .on("zoom", (e) => { T = e.transform; schedule(); updateHint(); legendIfChanged(); updateTouch(); })
-  .on("end", () => canvas.classList.remove("grabbing"));
+  .on("end", () => { canvas.classList.remove("grabbing"); homeFromIsland(); });
 d3.select(canvas).call(zoom).on("dblclick.zoom", null);
 updateTouch();
 
@@ -773,12 +780,23 @@ function drawGeo(m, alpha, streetA) {
     ctx.fill(g.paths[i]);
     if (filt && !passes(m, i)) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
   }
+  // the islands where they lie, past the mainland frame: their seat's colour, quieted
+  // as it is; plain land in a year no seat holds one
+  const isls = (m.isl || []).filter((q) => !(q.mbb[1][0] < x0 || q.mbb[0][0] > x1 || q.mbb[1][1] < y0 || q.mbb[0][1] > y1));
+  for (const q of isls) {
+    let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
+    const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
+    if (c && qn > 0) c = towards(c, th.bg, qn);
+    ctx.fillStyle = c ? css(c) : pat; ctx.fill(q.mpath);
+    if (filt && q.owner != null && !passes(m, q.owner)) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(q.mpath); }
+  }
   if (streetA > 0) drawStreets(streetA);
   ctx.lineJoin = "round"; ctx.lineCap = "round";
   ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k; ctx.stroke(g.meshDiv);
   ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.meshState);
   ctx.strokeStyle = css(th.state, 0.7); ctx.lineWidth = 0.9 / T.k; ctx.stroke(g.meshState);
   ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
+  for (const q of isls) ctx.stroke(q.mpath);
   ctx.restore();
 }
 
@@ -789,14 +807,18 @@ function drawFocus(m) {
   const [x0, y0, x1, y1] = viewBox();
   if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(g.paths[sd]);
+    for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
   } else if (S.sel.level === "state") {
     ctx.fillStyle = css(th.bg, th.veil * 0.85);
     for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(g.paths[d.i]);
+    for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
   }
+  // a seat's outline takes in its islands
+  const outline = (i) => { ctx.stroke(g.paths[i]); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath); };
   const h = S.hover;
-  if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; ctx.stroke(g.paths[h.i]); }
-  if (sd != null) { ctx.strokeStyle = css(th.ink); ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.paths[sd]); }
+  if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
+  if (sd != null) { ctx.strokeStyle = css(th.ink); ctx.lineWidth = 2.2 / T.k; outline(sd); }
   ctx.restore();
 }
 
@@ -900,6 +922,18 @@ function drawLabels(m) {
     }
     cand.sort((p, q) => (q.d.i === sd) - (p.d.i === sd) || q.a - p.a);
     for (const c of cand) put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2);
+  }
+  // an island where it lies: its name over its north coast once it shows (under
+  // its south coast where the way back holds the top)
+  for (const el of [backBtn, $("#credit")]) if (!el.hidden) placed.push([el.offsetLeft - 4, el.offsetTop - 4, el.offsetLeft + el.offsetWidth + 4, el.offsetTop + el.offsetHeight + 4]);
+  for (const q of m.isl || []) {
+    const x0 = q.mbb[0][0] * T.k + T.x, x1 = q.mbb[1][0] * T.k + T.x, y0 = q.mbb[0][1] * T.k + T.y, y1 = q.mbb[1][1] * T.k + T.y;
+    if (x1 - x0 < 30 || x1 < 0 || x0 > Wpx || y0 > Hpx) continue;
+    // clear of the island's own polling places (which stay free for their own names)
+    const n0 = placed.length;
+    for (const j of q.booths) { if (Number.isNaN(b.x[j])) continue; const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]) + 2; placed.push([x - r, y - r, x + r, y + r]); }
+    const on = put(q.name, (x0 + x1) / 2, Math.max(y0 - 13, 12), 13, 600, th.bg, th.ink2) || put(q.name, (x0 + x1) / 2, Math.min(y1 + 13, Hpx - 12), 13, 600, th.bg, th.ink2);
+    placed.splice(n0, placed.length - n0 - (on ? 1 : 0));
   }
   if (m._vis && m._vis.length && T.k > K_BLAB) {
     let n = 0;
@@ -1312,7 +1346,10 @@ function showCredit(on) {
    holds its seat (Bean, Sydney or Lingiari, or their state) the box docks,
    larger, beside the seat in room the fit keeps clear, with its polling
    places drawn and live; it glides between the two, and fades as the reader
-   zooms well past the docked fit. */
+   zooms well past the docked fit. A box is a way there, too: a click on it,
+   or zooming in on it, flies the map out to the island where it lies, coast,
+   streets and polling places at any zoom, with a way back to its seat; the
+   box itself steps aside while the island shows. */
 // the boxes at sea go in two pairs, each a diagonal as the islands lie (Christmas
 // north-east of Cocos, Norfolk north-east of Lord Howe), the pair's middle at a
 // fraction of the home box: in the sea inside it where the stage is wider than
@@ -1328,10 +1365,29 @@ const islDock = () => (isPhone() ? 92 : 124);
 let dock = null; // { side: "left" | "bottom", k }: the docked fit fitSelection last made, else null
 const islAnim = new Map();
 let islDrawn = [];
+// the island the camera is out at (its key), else null: only then does the pan reach past the mainland frame
+let away = null;
+const islOf = (m, key) => (m && m.isl ? m.isl.find((q) => q.key === key) || null : null);
+// the island the selection is out at: one opened by name, or the island of a chosen polling place
+function selIsland() {
+  const m = M(); if (!m || !m.isl) return null;
+  if (S.sel.isl) return islOf(m, S.sel.isl);
+  if (S.sel.level === "booth" && m.booth.isl[S.sel.booth] >= 0) return m.isl[m.booth.isl[S.sel.booth]];
+  return null;
+}
+// out to an island: its seat opened (an island in no seat that year opens alone)
+function goIsland(key, o) {
+  const m = M(), q = islOf(m, key); if (!q) return;
+  const i = q.seat;
+  select(i != null ? { level: "div", st: m.divs[i].st, div: i, isl: key } : { level: "aus", isl: key }, { dur: 1300, ...o });
+}
+// on screen as land, big enough to read: its box then steps aside
+const islShows = (q) => { const x0 = q.mbb[0][0] * T.k + T.x, x1 = q.mbb[1][0] * T.k + T.x, y0 = q.mbb[0][1] * T.k + T.y, y1 = q.mbb[1][1] * T.k + T.y; return x1 - x0 > 30 && x1 > 0 && x0 < Wpx && y1 > 0 && y0 < Hpx; };
 // the islands the selection holds: its seat's, or (a state) its seats'
 function heldIslands(m) {
   if (!m || !m.isl) return [];
   const sd = selDiv();
+  if (selIsland()) return [];
   if (sd != null) return m.isl.filter((s) => s.seat === sd);
   if (S.sel.level === "state") return m.isl.filter((s) => s.seat != null && m.divs[s.seat].st === S.sel.st);
   return [];
@@ -1399,6 +1455,7 @@ function islandCards(m) {
   const sea = seaSpots(m, hb, A, p);
   const dockA = dock ? 1 - smooth(2.2, 3.6, T.k / dock.k) : 1;
   for (const s of m.isl) {
+    if (away === s.key || islShows(s)) { islAnim.delete(s.key); continue; } // back without a glide
     const hi = docked ? held.indexOf(s) : -1, mode = hi >= 0 ? "dock" : "sea";
     let r;
     if (hi >= 0) r = docked[hi];
@@ -1516,10 +1573,11 @@ function stagePads() {
   const phone = isPhone();
   return { t: phone ? 12 : 36, b: phone ? 12 : 18, l: phone ? 8 : 12, r: phone ? 44 : 50 };
 }
-// res: room kept clear at the stage's left (l) or foot (b), for docked island boxes
+// res: room kept clear at the stage's left (l) or foot (b), for docked island
+// boxes, or its top (t), for the way back from an island and its name
 function fitTransform(bb, maxK, res) {
   const p = stagePads();
-  if (res) { p.l += res.l || 0; p.b += res.b || 0; }
+  if (res) { p.l += res.l || 0; p.b += res.b || 0; p.t += res.t || 0; }
   const [[x0, y0], [x1, y1]] = bb;
   const w = Math.max(x1 - x0, 0.05), h = Math.max(y1 - y0, 0.05);
   const k = Math.min((Wpx - p.l - p.r) / w, (Hpx - p.t - p.b) / h, maxK || 2400);
@@ -1537,13 +1595,18 @@ function setExtent() {
   // the early smaller box would later open the map on the north-west corner
   const rides = S.view !== "map";
   HOME = fitTransform(homeBox(m));
-  zoom.translateExtent([[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]])
+  // (out at an island, the frame stretches to take it in, some way of sea around it)
+  let [[ex0, ey0], [ex1, ey1]] = [[-HOME.x / HOME.k, -HOME.y / HOME.k], [(Wpx - HOME.x) / HOME.k, (Hpx - HOME.y) / HOME.k]];
+  const q = islOf(m, away);
+  if (q) { const pad = 12; ex0 = Math.min(ex0, q.mbb[0][0] - pad); ey0 = Math.min(ey0, q.mbb[0][1] - pad); ex1 = Math.max(ex1, q.mbb[1][0] + pad); ey1 = Math.max(ey1, q.mbb[1][1] + pad); }
+  zoom.translateExtent([[ex0, ey0], [ex1, ey1]])
     .scaleExtent([HOME.k, 2600]).extent([[0, 0], [Wpx, Hpx]]);
   if (rides) { lastFit = HOME; d3.select(canvas).call(zoom.transform, HOME); }
   updateTouch();
 }
 function selectionBox() {
   const m = M(), g = m.geo;
+  if (S.sel.isl && S.sel.level !== "booth") { const q = islOf(m, S.sel.isl); if (q) return q.mbb; }
   switch (S.sel.level) {
     case "aus": return homeBox(m);
     case "state": return unionBB(m.areas[S.sel.st].idx.map((i) => g.bb[i]));
@@ -1551,7 +1614,7 @@ function selectionBox() {
     case "booth": {
       const b = m.booth, j = S.sel.booth;
       if (Number.isNaN(b.x[j])) return g.bb[S.sel.div];
-      const k0 = fitTransform(g.bb[S.sel.div]).k;
+      const ik = b.isl[j], k0 = fitTransform(ik >= 0 ? m.isl[ik].mbb : g.bb[S.sel.div]).k;
       const k = clamp(k0 * 1.7, 80, 900), half = Math.min(Wpx, Hpx) / k / 2;
       return [[b.x[j] - half, b.y[j] - half], [b.x[j] + half, b.y[j] + half]];
     }
@@ -1565,17 +1628,19 @@ const atLastFit = () => lastFit && Math.abs(T.k / lastFit.k - 1) < 0.01 && Math.
 // stage's resize must take that for the page's view, not one the reader moved
 let flight = null;
 function fly(t, dur, redo) {
-  const s = d3.select(canvas), me = { redo };
+  const s = d3.select(canvas), me = { redo, isl: away };
   flight = me;
   s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t)
     .on("end.flight interrupt.flight", () => { if (flight === me) flight = null; });
 }
 function fitSelection(dur, force) {
   if (!M() || !Wpx || (S.view !== "map" && !force)) return;
+  const q = selIsland();
+  if ((q ? q.key : null) !== away) { away = q ? q.key : null; setExtent(); }
   const n = heldIslands(M()).length;
   let t;
   if (n) { const f = dockedFit(selectionBox(), n); t = f.t; dock = f.side ? { side: f.side, k: t.k } : null; }
-  else { t = fitTransform(selectionBox()); dock = null; }
+  else { t = fitTransform(selectionBox(), 0, q && S.sel.level !== "booth" ? { t: isPhone() ? 64 : 46 } : null); dock = null; }
   lastFit = t;
   const s = d3.select(canvas);
   if (!dur || reduceMotion) { flight = null; s.interrupt(); s.call(zoom.transform, t); }
@@ -1595,6 +1660,18 @@ function flyToCity(k) {
     if (reduceMotion) { flight = null; d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
   };
   go(900);
+}
+// zoomed right out from an island, the reader is home: the selection keeps its
+// seat but leaves the island, and the frame shrinks back to the mainland's
+function homeFromIsland() {
+  if (!away || flight || T.k > HOME.k * 1.02) return;
+  const m = M(), s = S.sel;
+  away = null;
+  if (s.isl) { const { isl, ...rest } = s; select(rest, { fly: false }); }
+  else if (s.level === "booth" && m.booth.isl[s.booth] >= 0) select({ level: "div", st: s.st, div: s.div }, { fly: false });
+  setExtent();
+  lastFit = HOME;
+  d3.select(canvas).transition().duration(reduceMotion ? 0 : 300).call(zoom.transform, HOME);
 }
 function zoomBy(f) { if (S.view === "map") d3.select(canvas).transition().duration(reduceMotion ? 0 : 280).call(zoom.scaleBy, f); }
 
@@ -1630,6 +1707,12 @@ canvas.addEventListener("wheel", (e) => {
   if (now - wheelAt > 180) wheelMode = null;
   wheelAt = now;
   const r = canvas.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
+  // zooming in on an island's box flies out to the island; the flight takes no wheel
+  if (flight && flight.isl) { e.preventDefault(); return; }
+  if (e.deltaY < 0 && (e.ctrlKey || e.deltaMode !== 0 || wheelMode === "zoom" || (!wheelMode && classifyWheel(e) === "zoom"))) {
+    const c = islDrawn.find((q) => px >= q.r.x && px <= q.r.x + q.r.w && py >= q.r.y && py <= q.r.y + q.r.h);
+    if (c) { e.preventDefault(); goIsland(c.s.key); return; }
+  }
   if (e.ctrlKey) { // a trackpad pinch arrives as a ctrl-wheel
     e.preventDefault();
     zoomAt(px, py, Math.pow(2, -e.deltaY * 0.012));
@@ -1708,7 +1791,7 @@ function hitTest(px, py) {
     let cj = null, cd = Infinity;
     for (const d of c.dots) { const dd = Math.hypot(px - d.x, py - d.y); if (dd <= Math.max(d.r + 3, 8) && dd < cd) { cd = dd; cj = d.j; } }
     if (cj != null) return { kind: "booth", i: cj };
-    return c.s.owner != null ? { kind: "div", i: c.s.owner, isl: c.s.name } : null;
+    return c.s.owner != null ? { kind: "div", i: c.s.owner, isl: c.s.name, go: c.s.key } : { kind: "isl", go: c.s.key, isl: c.s.name };
   }
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {
@@ -1717,6 +1800,10 @@ function hitTest(px, py) {
   }
   if (bj != null) return { kind: "booth", i: bj };
   const g = geoOf(m), bx = (px - T.x) / T.k, by = (py - T.y) / T.k;
+  for (const q of m.isl || []) {
+    const r = q.mbb; if (q.owner == null || bx < r[0][0] || bx > r[1][0] || by < r[0][1] || by > r[1][1]) continue;
+    if (hitCtx.isPointInPath(q.mpath, bx, by)) return { kind: "div", i: q.owner, isl: q.name };
+  }
   for (let i = 0; i < m.divs.length; i++) {
     const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue;
     if (hitCtx.isPointInPath(g.paths[i], bx, by)) return { kind: "div", i };
@@ -4110,12 +4197,14 @@ function showTipAt(html, cx, cy) {
 function tipFor(h) {
   if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
+  const goes = h.go ? `<div class="ts">Click to go out to the island</div>` : "";
+  if (h.kind === "isl") return `<div class="tn">${esc(h.isl)}</div><div class="ts">In no seat at this election</div>${goes}`;
   if (h.kind === "div") {
     const d = m.divs[h.i];
     const v = divValue(m, h.i);
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
-    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
+    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -4130,11 +4219,25 @@ function select(sel, opts = {}) {
   S.hover = null; hideTip();
   if (opts.view && opts.view !== S.view) setView(opts.view, true);
   if (S.view === "map" && opts.fly !== false) fitSelection(opts.dur ?? 800);
+  renderBack();
   renderStory(true);
   if (S.view === "list") renderList(true);
   renderFilterPill(); legendIfChanged(); updateHint(); renderTimeline(); writeURL();
   if (isPhone() && opts.scroll !== false && sel.level !== "aus") { /* the story sits under the map on a phone: nothing to scroll */ }
   schedule();
+}
+/* the way back from an island: to its seat on the mainland (or the country,
+   for an island in no seat that year) */
+const backBtn = document.createElement("button");
+backBtn.type = "button"; backBtn.className = "mp-back"; backBtn.hidden = true;
+$("#stage").appendChild(backBtn);
+backBtn.addEventListener("click", () => { const q = islOf(M(), away), i = q ? q.seat : null; if (i != null) goDiv(i); else goAus(); });
+function renderBack() {
+  const m = M(), q = S.view === "map" ? islOf(m, away) : null;
+  backBtn.hidden = !q;
+  if (!q) return;
+  const t = q.seat != null ? `Back to ${dn(m.divs[q.seat].n)}` : "Back to the mainland";
+  if (backBtn.dataset.t !== t) { backBtn.dataset.t = t; backBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(t)}`; }
 }
 const goAus = (o) => select({ level: "aus" }, o);
 const goState = (st, o) => select({ level: "state", st }, o);
@@ -4261,7 +4364,7 @@ function setView(v, quiet) {
     // and an unfitted one lands on the country's north-west corner
     if (v === "map" && prev !== "map") fitSelection(0);
   }
-  renderLegend(); renderFilterPill(); updateHint(); writeURL();
+  renderLegend(); renderFilterPill(); updateHint(); renderBack(); writeURL();
   if (!quiet) renderStory(true);
   schedule();
 }
@@ -4351,13 +4454,14 @@ async function setYear(y) {
     else if (s.level === "booth") { const id = a.booth.id[s.booth]; const nj = b.booth.byDiv[ni].find((j) => b.booth.id[j] === id); S.sel = nj != null ? { level: "booth", st: s.st, div: ni, booth: nj } : { level: "div", st: s.st, div: ni }; }
     else S.sel = { level: "div", st: s.st, div: ni };
   }
+  if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
   recolor(false);
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
-  renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); writeURL();
+  renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
   $("#mp-meta").textContent = metaLine();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
@@ -4453,6 +4557,7 @@ function writeURL() {
     if (s.level === "state") p.set("s", s.st);
     else if (s.level === "div") p.set("s", m.divs[s.div].n);
     else if (s.level === "booth") p.set("s", m.divs[s.div].n + "/" + m.booth.id[s.booth]);
+    if (s.isl) p.set("at", s.isl);
   }
   const h = p.toString();
   try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
@@ -4511,7 +4616,8 @@ canvas.addEventListener("click", (e) => {
     if (S.view === "chamber" || (S.view === "map" && T.k < HOME.k * 1.4)) goAus();
     return;
   }
-  if (h.kind === "booth") goBooth(h.i);
+  if (h.go) goIsland(h.go);
+  else if (h.kind === "booth") goBooth(h.i);
   else goDiv(h.i, { fly: S.view === "map" });
 });
 // the small chamber in the story
@@ -4640,11 +4746,13 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });
+  { const at = new URLSearchParams(location.hash.slice(1)).get("at"); if (at && islOf(M(), at)) S.sel = { ...S.sel, isl: at }; }
   fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
-  renderLegend(); updateHint(); renderTimeline();
+  renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
   window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+    get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); } };

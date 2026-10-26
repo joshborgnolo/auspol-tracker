@@ -310,12 +310,14 @@ function showTipAt(html, cx, cy) {
 function tipFor(h) {
   if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
+  const goes = h.go ? `<div class="ts">Click to go out to the island</div>` : "";
+  if (h.kind === "isl") return `<div class="tn">${esc(h.isl)}</div><div class="ts">In no seat at this election</div>${goes}`;
   if (h.kind === "div") {
     const d = m.divs[h.i];
     const v = divValue(m, h.i);
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
-    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>`;
+    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div"))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -330,11 +332,25 @@ function select(sel, opts = {}) {
   S.hover = null; hideTip();
   if (opts.view && opts.view !== S.view) setView(opts.view, true);
   if (S.view === "map" && opts.fly !== false) fitSelection(opts.dur ?? 800);
+  renderBack();
   renderStory(true);
   if (S.view === "list") renderList(true);
   renderFilterPill(); legendIfChanged(); updateHint(); renderTimeline(); writeURL();
   if (isPhone() && opts.scroll !== false && sel.level !== "aus") { /* the story sits under the map on a phone: nothing to scroll */ }
   schedule();
+}
+/* the way back from an island: to its seat on the mainland (or the country,
+   for an island in no seat that year) */
+const backBtn = document.createElement("button");
+backBtn.type = "button"; backBtn.className = "mp-back"; backBtn.hidden = true;
+$("#stage").appendChild(backBtn);
+backBtn.addEventListener("click", () => { const q = islOf(M(), away), i = q ? q.seat : null; if (i != null) goDiv(i); else goAus(); });
+function renderBack() {
+  const m = M(), q = S.view === "map" ? islOf(m, away) : null;
+  backBtn.hidden = !q;
+  if (!q) return;
+  const t = q.seat != null ? `Back to ${dn(m.divs[q.seat].n)}` : "Back to the mainland";
+  if (backBtn.dataset.t !== t) { backBtn.dataset.t = t; backBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(t)}`; }
 }
 const goAus = (o) => select({ level: "aus" }, o);
 const goState = (st, o) => select({ level: "state", st }, o);
@@ -461,7 +477,7 @@ function setView(v, quiet) {
     // and an unfitted one lands on the country's north-west corner
     if (v === "map" && prev !== "map") fitSelection(0);
   }
-  renderLegend(); renderFilterPill(); updateHint(); writeURL();
+  renderLegend(); renderFilterPill(); updateHint(); renderBack(); writeURL();
   if (!quiet) renderStory(true);
   schedule();
 }
@@ -551,13 +567,14 @@ async function setYear(y) {
     else if (s.level === "booth") { const id = a.booth.id[s.booth]; const nj = b.booth.byDiv[ni].find((j) => b.booth.id[j] === id); S.sel = nj != null ? { level: "booth", st: s.st, div: ni, booth: nj } : { level: "div", st: s.st, div: ni }; }
     else S.sel = { level: "div", st: s.st, div: ni };
   }
+  if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
   recolor(false);
   if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
-  renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); writeURL();
+  renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
   $("#mp-meta").textContent = metaLine();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
@@ -653,6 +670,7 @@ function writeURL() {
     if (s.level === "state") p.set("s", s.st);
     else if (s.level === "div") p.set("s", m.divs[s.div].n);
     else if (s.level === "booth") p.set("s", m.divs[s.div].n + "/" + m.booth.id[s.booth]);
+    if (s.isl) p.set("at", s.isl);
   }
   const h = p.toString();
   try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
@@ -711,7 +729,8 @@ canvas.addEventListener("click", (e) => {
     if (S.view === "chamber" || (S.view === "map" && T.k < HOME.k * 1.4)) goAus();
     return;
   }
-  if (h.kind === "booth") goBooth(h.i);
+  if (h.go) goIsland(h.go);
+  else if (h.kind === "booth") goBooth(h.i);
   else goDiv(h.i, { fly: S.view === "map" });
 });
 // the small chamber in the story
@@ -840,11 +859,13 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
   morph = null; // landing mid-state is not a transition between views
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });
+  { const at = new URLSearchParams(location.hash.slice(1)).get("at"); if (at && islOf(M(), at)) S.sel = { ...S.sel, isl: at }; }
   fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
-  renderLegend(); updateHint(); renderTimeline();
+  renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); });
   window.__map = { S, Y, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+    get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); } };
