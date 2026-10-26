@@ -110,7 +110,7 @@ function chamberKey(m, d, bloc) {
     case "tpp":
       if (S.tppMode === "swing") return d.tppSw == null ? null : bloc === "lnp" ? -d.tppSw : d.tppSw;
       return bloc === "alp" || bloc === "lnp" ? own(d.tpp) : d.winPct;
-    case "fp": return divValue(m, d.i);
+    case "fp": case "senate": return divValue(m, d.i);
     case "flow": case "informal": case "seifa": { const v = divValue(m, d.i); return v == null ? null : v + (S.lens === "seifa" && !isDemo() && d.seifa[S.index] ? d.seifa[S.index].pct / 100 : 0); }
     case "cls": return d.cls ? 10 - CLS.indexOf(d.cls) + d.winPct / 1000 : null;
     default: return d.winPct;

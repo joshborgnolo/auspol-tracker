@@ -442,3 +442,62 @@ function senSearchItems(m) {
   for (const d of m.divs) items.push({ k: "sen", i: d.i, t: d.n, s: `Senator for ${STATE_SHORT[d.st]}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.n), rank: 1 });
   return items;
 }
+
+/* =============================== the Senate lens ===============================
+   Each seat's and polling place's Senate vote (map/data/senate-vote-<year>.json, .build/map/senate_vote.py):
+   a party's share of the Senate's first preferences there, or (the lens's opening reading) that share less
+   its House share, the split ticket: above zero where it polled better in the Senate. The gap is drawn only
+   where the party stood for the House; the 2026 Farrer by-election had no Senate vote; the AEC served no
+   Senate counts by polling place for 2004; a state election (SA 2026) has no Senate. Loaded with the lens. */
+const SV = {}, SVP = {};
+const svYear = (y) => (y === "now" ? 2025 : typeof y === "number" ? y : null);
+function loadSenateVote(y) {
+  const k = svYear(y);
+  if (k == null) return Promise.resolve(null);
+  if (SV[k]) return Promise.resolve(SV[k]);
+  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+}
+const svOf = (m) => SV[svYear(m.year)] || null;
+const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
+const senGap = () => S.senMode !== "share";
+const stoodFor = (d, fam) => d.c.some((c) => c.b === fam);
+function senDivValue(m, d) {
+  if (d.by) return null; // the by-election had no Senate vote
+  const s = svOf(m), v = s && svShare(s.divs[d.n], S.party);
+  if (v == null) return null;
+  return !senGap() ? v : stoodFor(d, S.party) ? v - d.fp[S.party] : null;
+}
+function senBoothValue(m, j) {
+  const s = svOf(m), D = m.divs[m.booth.d[j]];
+  if (!s || D.by) return null;
+  const v = svShare(s.booths[m.booth.id[j]], S.party);
+  if (v == null) return null;
+  if (!senGap()) return v;
+  const h = m.booth.fp[S.party][j];
+  return stoodFor(D, S.party) && !Number.isNaN(h) ? v - h : null;
+}
+// an area's Senate share, its House share and the gap, over its seats (the by-election left out: no Senate vote)
+function senArea(m, idx, fam) {
+  const s = svOf(m); if (!s) return null;
+  let sv = 0, sf = 0, hv = 0, hf = 0, stood = 0, n = 0;
+  for (const i of idx) {
+    const d = m.divs[i], r = s.divs[d.n]; if (d.by || !r) continue;
+    sv += r[1 + FAMS.indexOf(fam)]; sf += r[0]; hv += (d.fp[fam] * d.formal) / 100; hf += d.formal; n++;
+    if (stoodFor(d, fam)) stood++;
+  }
+  if (!sf) return null;
+  return { sen: (100 * sv) / sf, house: (100 * hv) / hf, gap: (100 * sv) / sf - (100 * hv) / hf, stood, n };
+}
+// why a seat or place has no figure
+function senNoValue(m, kind, d) {
+  if (svYear(m.year) == null) return "A state election has no Senate";
+  if (d && d.by) return "No Senate vote at the by-election";
+  if (kind === "booth" && svYear(m.year) === 2004) return "No Senate count by polling place in 2004";
+  if (senGap() && d && !stoodFor(d, S.party)) return "Didn’t stand for the House here";
+  return "No Senate count here";
+}
+// "polled 3.2 points higher in the Senate than in the House"; under a quarter point, about the same (the
+// figures beside it, at a decimal place, can differ by a tenth)
+const senGapWords = (g) => (Math.abs(g) < 0.25 ? "polled about the same in the Senate as in the House" : `polled ${pts(g)} ${g > 0 ? "higher" : "lower"} in the Senate than in the House`);
+// a family as the copy refers back to it: the parties singular, independents and other candidates plural
+const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "their", It: "They", Its: "Their" } : { it: "it", its: "its", It: "It", Its: "Its" });

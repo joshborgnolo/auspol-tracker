@@ -6,6 +6,7 @@ function divValue(m, i) {
     case "winner": return holdFam(d.hold);
     case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
+    case "senate": return senDivValue(m, d);
     case "flow": return d.classic ? nn(d.flowAlp[S.from]) : null;
     case "informal": return nn(d.infPct);
     case "cls": return d.cls || null;
@@ -40,6 +41,7 @@ function boothValue(m, j) {
       return Number.isNaN(v) ? null : v - pf[S.party];
     }
     case "flow": return nn(b.flowAlp[S.from][j]);
+    case "senate": return senBoothValue(m, j);
     case "informal": return nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
@@ -59,6 +61,10 @@ function colorOf(v) {
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
     case "flow": return RAMP.div[dIdx((50 - v) / 40)];
+    // the Senate gap reads as a change does: the party's own ramp above zero, the warm grey of losses below
+    case "senate": return senGap()
+      ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
+      : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
     case "informal": return RAMP.inf[Math.round(clamp(v / 12, 0, 1) * 100)];
     case "cls": { const k = CLS.indexOf(v); return k < 0 ? null : TH.cls[k]; }
     case "seifa": {

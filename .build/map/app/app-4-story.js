@@ -239,6 +239,19 @@ function areaHedDek(m, st) {
       const dek = `${A.fpSw[P] != null ? `${cap(upDown(A.fpSw[P]))} on ${prev}. ` : ""}${P === "ind" ? "Independents" : P === "oth" ? "Other candidates" : name} stood in ${stood.length === N ? `all ${N}` : `${stood.length} of the ${N}`} seats${ranked.length ? `; the best result was ${ds(m.divs[ranked[0].i].n)}’s ${f1(ranked[0].v)}%${byNote(m.divs[ranked[0].i])}` : ""}.`;
       return { hed, dek };
     }
+    case "senate": {
+      const P = S.party, r = senArea(m, idx, P), pr = senPron(P);
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate lens reads federal elections; choose one on the timeline.` };
+      if (!r) return { hed: `The Senate’s votes are loading`, dek: "" };
+      const per = idx.map((i) => ({ i, v: senDivValue(m, m.divs[i]) })).filter((x) => x.v != null).sort((p, q) => q.v - p.v);
+      const stoodTxt = r.stood < r.n ? `; ${pr.it} stood for the House in ${r.stood} of the ${r.n} seats` : "";
+      if (senGap()) {
+        const higher = per.filter((x) => x.v > 0).length;
+        return { hed: `${SUBJ[P]} ${senGapWords(r.gap)}${where}`,
+          dek: `${f1(r.sen)}% of Senate first preferences against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` Seat by seat, ${pr.it} polled higher in the Senate in ${higher === per.length ? `every one of the ${per.length}` : ofN(higher, per.length)}; the gap was widest in ${ds(m.divs[per[0].i].n)} (${sgn(per[0].v)}).` : ""}` };
+      }
+      return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
+    }
     case "flow": {
       if (isSA26()) return { hed: `Preference flows aren’t published for this election`, dek: `The ECSA’s distribution decides each district’s winner; the AEC’s per-candidate splits that this lens draws have no South Australian counterpart.` };
       const F = S.from, name = POSS[F];
@@ -461,6 +474,17 @@ function seatHedDek(m, d) {
       const aus = m.areas.AUS.fp[P];
       return { hed: `${name} won ${f1(v)}% of first preferences in ${ds(d.n)}`, dek: `Across Australia ${name === "Independents" ? "independents" : name} won ${f1(aus)}%.` };
     }
+    case "senate": {
+      const P = S.party, name = legW(P), pr = senPron(P);
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
+      if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to set the Senate against ${ds(d.n)}’s 2025 House count.` };
+      const s = svOf(m), sv = s && svShare(s.divs[d.n], P);
+      if (sv == null) return { hed: `The Senate’s votes are loading`, dek: "" };
+      const h = d.fp[P], cands = d.c.filter((c) => c.b === P).length, aus = senArea(m, m.areas.AUS.idx, P);
+      if (!cands) return { hed: P === "ind" ? `No independent stood for the House in ${ds(d.n)}` : P === "oth" ? `No other candidate stood for the House in ${ds(d.n)}` : `${name} didn’t stand for the House in ${ds(d.n)}`, dek: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote here${aus ? `, against ${f1(aus.sen)}% across Australia` : ""}.` };
+      if (senGap()) return { hed: `${SUBJ[P]} ${senGapWords(sv - h)} in ${ds(d.n)}`, dek: `${f1(sv)}% of Senate first preferences against ${f1(h)}% for ${pr.its} House ${cands > 1 ? "candidates" : "candidate"}.${aus ? ` Across Australia the gap was ${sgn(aus.gap)} points.` : ""}` };
+      return { hed: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote in ${ds(d.n)}`, dek: `${pr.Its} House ${cands > 1 ? "candidates" : "candidate"} won ${f1(h)}%${aus ? `; across Australia ${pr.its} Senate vote was ${f1(aus.sen)}%` : ""}.` };
+    }
     case "flow": {
       const F = S.from, nm = POSS[F];
       if (!d.classic) return { hed: `${ds(d.n)}’s count didn’t end Labor against the Coalition`, dek: `Its final two were ${ds(d.win.n)} and ${ds(d.run.n)}, so its preferences weren’t split between Labor and the Coalition.` };
@@ -529,7 +553,7 @@ function storyDiv(m, i) {
   let bl = "";
   if (lensNumeric()) {
     const vals = js.map((j) => ({ j, v: boothValue(m, j) })).filter((x) => x.v != null && b.votes[x.j] >= 100).sort((p, q) => q.v - p.v);
-    const fmt = (v) => (S.lens === "seifa" ? `${v}` : (S.lens === "tpp" && S.tppMode === "swing") || (S.lens === "fp" && S.fpMode === "change") ? sgn(v) : f1(v));
+    const fmt = (v) => (S.lens === "seifa" ? `${v}` : (S.lens === "tpp" && S.tppMode === "swing") || (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap()) ? sgn(v) : f1(v));
     const li = (arr) => `<div class="links">${arr.map(({ j, v }) => `<button type="button" data-go="booth:${j}"><i style="background:${colCss(m.boothCol[j])}"></i><span class="nm">${ds(b.name[j])}<small>${int(b.votes[j])} votes</small></span><b>${fmt(v)}</b></button>`).join("")}</div>`;
     if (vals.length >= 6) bl = `<p class="st-note">Highest</p>${li(vals.slice(0, 3))}<p class="st-note">Lowest</p>${li(vals.slice(-3).reverse())}${distBlock(m, "booths", js, { compact: true })}`;
   } else if (S.lens === "winner") {
@@ -579,6 +603,12 @@ function storyBooth(m, j) {
         void rn;
     }
     if (S.lens === "fp") { const v = b.fp[S.party][j]; hed = `${FAM_LEG[S.party]} won ${f1(v)}% of first preferences here`; dek = `In ${ds(D.n)} as a whole, ${f1(D.fp[S.party])}%.`; }
+    if (S.lens === "senate") {
+      const v = senBoothValue(m, j), dv = senDivValue(m, D);
+      if (v == null) { hed = senNoValue(m, "booth", D); dek = ""; }
+      else if (senGap()) { hed = `${SUBJ[S.party]} ${senGapWords(v)} here`; dek = `${f1(svShare(svOf(m).booths[b.id[j]], S.party))}% of Senate first preferences against ${f1(b.fp[S.party][j])}% in the House.${dv != null ? ` Across ${ds(D.n)} the gap was ${sgn(dv)} points.` : ""}`; }
+      else { hed = `${SUBJ[S.party]} won ${f1(v)}% of the Senate vote here`; dek = dv != null ? `In ${ds(D.n)} as a whole, ${f1(dv)}%.` : ""; }
+    }
     if (S.lens === "informal") { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     if (S.lens === "flow") { const v = nn(b.flowAlp[S.from][j]); hed = v == null ? `No ${S.from === "ind" ? "independent’s" : FAM_LEG[S.from] + "’"} preferences were split here between Labor and the Coalition` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : FAM_LEG[S.from] + "’"} preferences here went to Labor`; }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoCopy(m).whoAdults : demoCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoCopy(m).note}`; }
@@ -626,7 +656,7 @@ function renderStory(force) {
     $("#story").innerHTML = storySenate(SENM);
     return;
   }
-  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.party, S.from, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
+  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;
   const el = $("#story");

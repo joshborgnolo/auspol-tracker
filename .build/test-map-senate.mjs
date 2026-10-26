@@ -84,4 +84,17 @@ for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
 // the Handbook's totals, checked by the builder; the new Senates it can be held to exactly
 const coal = (y) => JSON.parse(R(`map/data/senate-${y}.json`)).senators.filter((s) => ["LP", "NP", "LNP", "CLP"].includes(s.ab)).length;
 assert.deepEqual([2004, 2016, 2019, 2022, 2025].map(coal), [39, 30, 35, 32, 27], "the Coalition's seats: 2005's majority, then as the Handbook gives each new Senate");
+// ---- the Senate lens: each seat's and polling place's Senate vote (.build/map/senate_vote.py)
+for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+  const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)), res = JSON.parse(R(`map/data/res-${y}.json`));
+  assert.deepEqual(sv.fams, ["alp", "lnp", "grn", "onp", "ind", "oth"], `${y}: the families in the map's order`);
+  for (const d of res.divs) assert.ok(sv.divs[d.n], `${y}: ${d.n} has its Senate vote`);
+  for (const [n, r] of Object.entries(sv.divs)) assert.equal(r.slice(1).reduce((a, b) => a + b, 0), r[0], `${y}: ${n}'s families add to its formal votes`);
+  const ids = res.booths.id.map(String), hit = ids.filter((i) => sv.booths[i]).length;
+  if (y === 2004) assert.equal(Object.keys(sv.booths).length, 0, "2004: no Senate counts by polling place (the AEC never served them)");
+  else assert.ok(hit / ids.length > 0.97, `${y}: ${hit} of ${ids.length} House polling places have a Senate count`);
+}
+assert.ok(js.includes('{ id: "senate", label: "Senate" }'), "the Senate is a lens");
+assert.ok(js.includes("getJSON(`/map/data/senate-vote-${k}.json`)"), "the lens loads each election's Senate votes");
+
 console.log(`test-map-senate: ok – ${S.length} senators as at ${now.asOf}, floor ${floor.plan}`);

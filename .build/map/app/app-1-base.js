@@ -201,6 +201,7 @@ const LENSES = [
   { id: "winner", label: "Winner" },
   { id: "tpp", label: "Two-party" },
   { id: "fp", label: "Primary" },
+  { id: "senate", label: "Senate" },
   { id: "flow", label: "Preferences" },
   { id: "informal", label: "Informal" },
   { id: "cls", label: "Seat type" },
@@ -340,6 +341,8 @@ const S = {
   dist: null,
   // the chamber view's chamber: the House ("reps") or the Senate, with the Senate's own lens and selection
   house: "reps", senLens: "party", ssel: { level: "aus" },
+  // the Senate lens: a party's Senate vote less its House vote ("gap"), or its Senate share
+  senMode: "gap",
 };
 const Y = {};
 let proj = null;
