@@ -608,11 +608,12 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(new Set(res.divs.map((d) => d.seifa.irsad.dec)).size >= 8, "nsw23 IRSAD deciles spread across the range (a monotone join bug collapses them)");
   for (const p of ["data/nsw23-demo.json", "data/nsw23-seifa.json", ".build/map/nsw23/assign-sa1.json"]) assert.ok(fs.existsSync(path.join(ROOT, p)), `${p} missing — run the nsw23 census pipelines`);
   // the polling places: 3,117 NSWEC venues on the federal lanes (day, mobile
-  // team, EVC). The reserved lanes stay unjoined: no booth 2CP/TPP/flow
-  // (NSWEC's venue counts file is first preferences only), and no census
-  // splice at the venues — the SA1→venue pass belongs to the SA build
-  // (build_sa_boothcensus.py), and NSWEC publishes no votes-by-SA1 product,
-  // so vdec can never fill
+  // team, EVC). No booth 2CP/TPP/flow comes with them (NSWEC's venue
+  // counts file is first preferences only). The census lanes (dec, demo —
+  // vdec is left empty by design) are then spliced in by
+  // .build/map/build_nsw23_boothcensus.py, the NSW twin of the SA frames'
+  // build_sa_boothcensus.py; NSWEC publishes no votes-by-SA1 product, so
+  // the voter-footprint lane can never fill
   const B = res.booths;
   assert.ok(B, "nsw23 res carries a booths record");
   const LANES = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
@@ -625,8 +626,36 @@ for (const y of ["sa22", "sa26"]) {
     if (B.lat[k] !== null) assert.ok(B.lat[k] > -38 && B.lat[k] < -28 && B.lon[k] > 140 && B.lon[k] < 160, `nsw23 ${B.n[k]}: venue inside New South Wales (Lord Howe Island east to 159.1)`);
   }
   assert.ok(B.tpp.every((x) => x === null) && B.tcp.every((x) => x === null) && B.fl.every((x) => x === null), "nsw23 booths carry no two-candidate or flow lane");
-  assert.ok(B.dec.every((x) => x === null) && B.vdec.every((x) => x === null), "nsw23 booth census lanes unjoined");
-  assert.ok(!("demo" in B), "nsw23 booths carry no people-cells lane");
+  // census lanes (.build/map/build_nsw23_boothcensus.py, spliced into the
+  // data build): a fixed booth's NSWEC venue coords join it to the SA1 it
+  // stands in — dec is that SA1's ABS 2021 national SEIFA deciles, demo the
+  // SA1's own people cells on the district lanes' ex-not-stated bases
+  // (8-wide; the two income slots stay null). Mobile teams and booths in
+  // SA1s the cube does not score stay null; vdec stays null by design —
+  // NSWEC publishes no votes-by-SA1, so the voter-footprint read cannot
+  // exist
+  {
+    assert.equal(B.dec.filter(Boolean).length, 2876, "nsw23: 2,876 booths in cube-scored SA1s carry national SEIFA deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] === 4).length, 167, "nsw23: the 167 mobile teams carry no deciles");
+    assert.equal(B.dec.filter((x, k) => x === null && B.ty[k] !== 4).length, 74, "nsw23: 74 fixed booths sit in SA1s the cube does not score");
+    assert.ok(B.vdec.every((x) => x === null), "nsw23: no voter-footprint deciles (NSWEC publishes no votes-by-SA1 product)");
+    assert.equal(B.demo.filter(Boolean).length, 2950, "nsw23: every geocoded fixed booth carries its SA1's people cells");
+    for (let k = 0; k < B.n.length; k++) {
+      const d = B.dec[k];
+      if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `nsw23 ${B.n[k]}: dec is four national deciles or nulls`);
+      const dm = B.demo[k];
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 8 && dm[6] === null && dm[7] === null && dm.slice(0, 6).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is six 0-1 people cells on null income slots`);
+    }
+    const balmain = B.n.indexOf("Balmain Public");
+    assert.ok(balmain >= 0, "nsw23: the Balmain Public booth exists");
+    assert.deepEqual(B.dec[balmain], [10, 10, 7, 10], "nsw23: Balmain Public's SA1 national deciles");
+    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, null, null], "nsw23: Balmain Public's SA1 people cells");
+    assert.deepEqual(B.dec[B.n.indexOf("Inner City Montessori School")], [10, 10, 9, 10], "nsw23: Inner City Montessori School, the top of the range");
+    assert.deepEqual(B.dec[B.n.indexOf("Springdale Hghts Public")], [1, 1, 1, 1], "nsw23: Springdale Hghts Public, the bottom of the range");
+    assert.deepEqual(B.dec[B.n.indexOf("Lavington E Public")], [1, 1, 2, 1], "nsw23: Lavington E Public, also the bottom of the range");
+    const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
+    assert.ok(spread.size >= 8, "nsw23 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
 }
 
 // ── nsw23's upper house is the NSW Legislative Council (senate-nsw23.json):
@@ -697,6 +726,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X };"), "each jurisdiction's row carries its own previous-election stop");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
   assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and New South Wales and South Australian state elections; choose one"'), "the timeline names its three jurisdictions to a screen reader");
+  // a state frame's label: the five-char key "nsw23" ends in its two-digit
+  // year — slice(2) read it as "NSW w23" (the same derivation on the
+  // federal four-char keys was why it was written that way)
+  assert.ok(base.includes("`${YEAR_JUR[y].toUpperCase()} ${String(y).slice(-2)}`"), "a state frame's label takes the year's last two chars (nsw23 → 'NSW 23', never 'NSW w23')");
+  assert.ok(ui.includes('yearLabel(y).replace(/^\\S+\\s*/, "")'), "the timeline's short row strips the jurisdiction word AND its space ('NSW 23' → '’23', never '’ 23')");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 frame on its own timeline row, in the sitemap");

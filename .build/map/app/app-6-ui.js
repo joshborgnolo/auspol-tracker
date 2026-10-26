@@ -362,8 +362,8 @@ function renderTimeline() {
   const tW = (s) => tlCtx.measureText(s).width;
   const rowsOf = [
     { i: 0, items: YEARS_FED.map((y) => ({ y, lab: short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y) })) },
-    { i: 1, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+/, "") : yearLabel(y) })) },
-    { i: 2, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+/, "") : yearLabel(y) })) },
+    { i: 1, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+\s*/, "") : yearLabel(y) })) },
+    { i: 2, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+\s*/, "") : yearLabel(y) })) },
   ];
   for (const R of rowsOf) {
     const r = rows[R.i], labY = r.base + 15;
