@@ -694,9 +694,9 @@ function applyNow(m, now) {
   m.asOf = now.asOf;
 }
 
-// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs, and
-// for South Australia's House of Assembly and Legislative Council .build/map/sa_seating.mjs)
-const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26"]);
+// the views with a filed seating plan (map/data/seats-<year>.json, from .build/map/seating.mjs,
+// .build/map/sa_seating.mjs for the live sa26 chambers, .build/map/sa22_seating.mjs for sa22's)
+const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26", "sa22"]);
 const SEATED_LC = new Set(["sa26"]);
 // the Speaker's district where the results files name none: South Australia's, as each Parliament
 // first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026)

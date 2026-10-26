@@ -145,6 +145,22 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("setYear(yearOf(g.dataset.year))"), "the timeline stop click hands setYear a word-year-safe year");
 }
 
+// the background year preload (2026-10-26): once the page is up, every other
+// election loads in the background — nearest timeline stops first, one idle
+// slice at a time — so a timeline jump, a chamber switch or the Senate lens
+// finds its data already here. Skipped on save-data/2g connections (the
+// timeline's hover preload still covers a stop the reader nears); a year's
+// failed fetch drops its record so a real click tries it again
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes("function preloadYears()") && /YEARS\.filter\(\(y\) => !Y\[y\]\)\.sort/.test(ui), "preloadYears walks the years nearest-first");
+  assert.ok(ui.includes("conn.saveData") && ui.includes("effectiveType"), "the background preload yields to save-data and 2g connections");
+  assert.ok(ui.includes("delete Y[y]"), "a failed background load frees the year for a real retry");
+  assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy)"), "the preload also fills the chambers and the Senate-vote lane");
+  assert.ok(ui.includes("k !== 2004"), "no senate-vote-2004 fetch (no such file)");
+  assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
+}
+
 // the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
 // (.build/map/build_sa26_demo.py) and the advantage indexes ride
 // data/sa26-seifa.json (.build/map/build_sa26_seifa.py, ABS SEIFA 2021 SA1
@@ -457,7 +473,24 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(Object.values(lcs.at).every((d) => ids(lc).has(d)) && new Set(Object.values(lcs.at)).size === 21, "seats-sa26-lc: one member a desk, every desk drawn");
   assert.deepEqual(lcs.roles, { oppLeader: "Nicola Centofanti", leader: "Kyam Maher", president: "Reggie Martin" }, "seats-sa26-lc: the chair and the leaders");
   assert.ok(!(lcs.roles.president in lcs.at), "seats-sa26-lc: the President in the chair, not at a desk");
+  // sa22, seated from the Parliament's archived plan of 28 December 2024 (.build/map/sa22_seating.mjs)
+  {
+    const seats = JSON.parse(R("map/data/seats-sa22.json")), res = JSON.parse(R("map/data/res-sa22.json"));
+    const seated = Object.keys(seats.at);
+    assert.equal(seats.plan, "28 December 2024", "seats-sa22: the archived plan's capture date");
+    assert.ok(seats.note && seats.note.includes("Bignell"), "seats-sa22: the note owns the late-Speaker placement");
+    assert.equal(seated.length, 46, "seats-sa22: every member but the Speaker at a desk");
+    assert.ok(!seated.includes("Kavel") && res.divs.some((d) => d.n === "Kavel"), "seats-sa22: the Speaker (Kavel) in the chair, not at a desk");
+    assert.ok(!Object.values(seats.at).includes("C1"), "seats-sa22: Cregan's printed desk C1 left empty");
+    assert.ok(seated.every((n) => res.divs.some((d) => d.n === n)), "seats-sa22: districts of the frame");
+    assert.ok(Object.values(seats.at).every((d) => ids(ha).has(d)), "seats-sa22: every desk on the drawn floor");
+    assert.equal(new Set(Object.values(seats.at)).size, 46, "seats-sa22: one member a desk");
+    assert.equal(seats.at.Croydon, "A1", "seats-sa22: the Premier nearest the Speaker on the government front bench");
+    assert.equal(seats.at.Hartley, "F1", "seats-sa22: the Leader of the Opposition across from the Premier");
+    assert.equal(seats.at.Mawson, "C2", "seats-sa22: Bignell, the plan's Speaker, on the government bench by the chair");
+  }
   assert.ok(js.includes("sa22: \"Kavel\", sa26: \"Hurtle Vale\""), "the SA frames' Speakers in the chair");
+  assert.ok(js.includes('"sa26", "sa22"'), "sa22 in SEATED: the sa22 view shows its plan");
 }
 
 // South Australia's modelled preference flows (sa_flow_lane.py): rows in the tcp's order, read
