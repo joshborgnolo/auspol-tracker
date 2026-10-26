@@ -345,6 +345,9 @@ const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
 const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA 2026" : String(y));
+// a year as the URL and data-year attributes carry it: numeral digits, or a word
+// year ("now", "sa26") that stays a word - a bare +s gives NaN for those
+const yearOf = (s) => (YEARS.includes(s) ? s : +s);
 const xOfYear = (y) => YEAR_X[y] ?? y;
 
 /* =============================== data =============================== */

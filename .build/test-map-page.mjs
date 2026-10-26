@@ -111,5 +111,16 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.deepEqual(Object.keys(sa.agg), ["AUS", "SA"], "sa26 carries only the SA frame's areas");
 }
+// a timeline year from the DOM is a WORD ("sa26", "now"), never unary-+
+// coerced: +g.dataset.year turned "sa26" into NaN and the stop click fetched
+// res-NaN.json (404 -> "That election didn't load", 2026-10-26). yearOf keeps
+// a word year a word; the /map/ and #y=2025 stop clicks were pinned end-to-end
+// with .matilda/sa26-load-probe.mjs
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(!/\+.*dataset\.year/.test(ui), "no +…dataset.year coercion in the UI handlers (word years go through yearOf)");
+  assert.ok(part("app-1-base.js").includes("const yearOf = (s) => (YEARS.includes(s) ? s : +s);"), "app-1-base defines the yearOf word-year guard");
+  assert.ok(ui.includes("setYear(yearOf(g.dataset.year))"), "the timeline stop click hands setYear a word-year-safe year");
+}
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, in the sitemap");

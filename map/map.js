@@ -347,6 +347,9 @@ const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
 const yearLabel = (y) => (y === "now" ? "Now" : y === "sa26" ? "SA 2026" : String(y));
+// a year as the URL and data-year attributes carry it: numeral digits, or a word
+// year ("now", "sa26") that stays a word - a bare +s gives NaN for those
+const yearOf = (s) => (YEARS.includes(s) ? s : +s);
 const xOfYear = (y) => YEAR_X[y] ?? y;
 
 /* =============================== data =============================== */
@@ -4456,8 +4459,7 @@ function writeURL() {
 }
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
-  // a word year restores as itself (sa26): +y is NaN for it
-  const yr = p.get("y"); if (yr && YEARS.includes(yr)) S.year = yr; else if (yr && YEARS.includes(+yr)) S.year = +yr;
+  const yr = p.get("y"); if (yr && YEARS.includes(yearOf(yr))) S.year = yearOf(yr);
   const l = p.get("l"); if (l && LENSES.some((x) => x.id === l)) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
@@ -4524,13 +4526,13 @@ $("#story").addEventListener("pointermove", (e) => {
 $("#story").addEventListener("click", (e) => {
   const c = e.target.closest("#minich");
   if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
-  const g = e.target.closest("g[data-year]"); if (g) { setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); }
+  const g = e.target.closest("g[data-year]"); if (g) { setYear(yearOf(g.dataset.year)); }
 });
 // a tap names the fixed view's spot before any handler acts on it
 document.addEventListener("click", (e) => walkAim(e.clientY), true);
-$("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-year]"); if (g) setYear(g.dataset.year === "now" ? "now" : +g.dataset.year); });
+$("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-year]"); if (g) setYear(yearOf(g.dataset.year)); });
 // a stop under the pointer starts loading its election, so the click finds it ready
-$("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = g.dataset.year === "now" ? "now" : +g.dataset.year; if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });
+$("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = yearOf(g.dataset.year); if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
