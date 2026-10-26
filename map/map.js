@@ -5680,6 +5680,30 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
 let cullRaf = 0;
 addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame(() => { cullRaf = 0; updateCanvasVis(); }); }, { passive: true });
 
+/* once the page is up, every other election loads in the background — nearest
+   timeline stops first, one idle slice at a time — so a timeline jump, a
+   chamber switch or the Senate lens finds its data already here. Skipped where
+   the connection asks to save data (the timeline's hover preload still covers
+   a stop the reader nears); a year's failed fetch drops its record so a real
+   click tries it again */
+const idleSlice = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 900));
+function preloadYears() {
+  const conn = navigator.connection || {};
+  if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
+  const at = YEARS.indexOf(S.year);
+  const stops = YEARS.filter((y) => !Y[y]).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
+  const next = () => {
+    const y = stops.shift();
+    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(next));
+    // the chambers' lane, cheap beside the years: every Senate (~7KB each) and
+    // its floor, then the Senate-vote lens files (the AEC served no 2004 count)
+    loadSenates().catch(() => {});
+    loadSenateFloor().catch(() => {});
+    for (const sy of SEN_YEARS) { const k = svYear(sy); if (k != null && k !== 2004) loadSenateVote(sy).catch(() => {}); }
+  };
+  idleSlice(next);
+}
+
 /* =============================== boot =============================== */
 (async () => {
   TH = readTheme(); buildRamps();
@@ -5711,6 +5735,7 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },
     panBy(dx, dy) { return panPx(dx, dy); },
     view(ll, k) { const p = proj(ll); d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(Wpx / 2 - p[0] * k, Hpx / 2 - p[1] * k).scale(k)); } };
+  preloadYears();
 })();
 
 })();

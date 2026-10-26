@@ -145,6 +145,22 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("setYear(yearOf(g.dataset.year))"), "the timeline stop click hands setYear a word-year-safe year");
 }
 
+// the background year preload (2026-10-26): once the page is up, every other
+// election loads in the background — nearest timeline stops first, one idle
+// slice at a time — so a timeline jump, a chamber switch or the Senate lens
+// finds its data already here. Skipped on save-data/2g connections (the
+// timeline's hover preload still covers a stop the reader nears); a year's
+// failed fetch drops its record so a real click tries it again
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes("function preloadYears()") && /YEARS\.filter\(\(y\) => !Y\[y\]\)\.sort/.test(ui), "preloadYears walks the years nearest-first");
+  assert.ok(ui.includes("conn.saveData") && ui.includes("effectiveType"), "the background preload yields to save-data and 2g connections");
+  assert.ok(ui.includes("delete Y[y]"), "a failed background load frees the year for a real retry");
+  assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy)"), "the preload also fills the chambers and the Senate-vote lane");
+  assert.ok(ui.includes("k !== 2004"), "no senate-vote-2004 fetch (no such file)");
+  assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
+}
+
 // the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
 // (.build/map/build_sa26_demo.py) and the advantage indexes ride
 // data/sa26-seifa.json (.build/map/build_sa26_seifa.py, ABS SEIFA 2021 SA1
