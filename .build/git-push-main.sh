@@ -384,6 +384,16 @@ refresh_site() {
     log "WARN vic build failed; vic/index.html left stale"
     echo "::warning::vic build failed; vic/index.html left stale"
   fi
+  # The last word before anything stages: every page's local asset refs must
+  # resolve to tracked files. The 2026-10-28 seven-hour outage was a torn
+  # COMMIT (partial add list carried the renamed data bundle while the tab
+  # pages still pointed at the swept one) — nothing saw the tree as the live
+  # site would. This check is the refusal: a torn tree cannot be committed
+  # by any wrapper at all; npm test runs it too so a torn push goes red.
+  if ! node .build/check-asset-refs.mjs >> "$LOG" 2>&1; then
+    log "FAIL asset-ref check: a page references a file not in the tree; refusing to commit over a torn tree"
+    return 1
+  fi
   stage_dataset
   return 0
 }
