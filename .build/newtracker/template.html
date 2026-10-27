@@ -5608,6 +5608,29 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
 /* three tabs fit a 320px phone only on tighter padding */
 @media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
+/* the search box, above the order row: the redesign All-polls pill
+   (.rd-ap-search, rd.css), restated page-level so the classic design's
+   mount of the body takes it too */
+.btv-bar { display: flex; align-items: center; margin-top: 18px; }
+.btv-search {
+  box-sizing: border-box; flex: 1; height: 36px; padding: 0 12px 0 14px;
+  display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: 0;
+  border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
+}
+.btv-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
+.btv-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
+.btv-search input::placeholder { color: var(--ink-3); opacity: 1; }
+.btv-search input::-webkit-search-cancel-button { display: none; }
+.btv-search input:focus-visible { outline: none; }
+/* 16px on touch devices or iOS Safari zooms the page in on focus and never
+   back out (rd-ap-search carries the same rule in rd.css) */
+@media (pointer: coarse) {
+  .btv-search input { font-size: 16px; }
+}
+.btv-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
+/* the results under the box: the empty state, and the count line's figure */
+.btv-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }
+.btv-rcount b { color: var(--ink); }
 /* newest first and by pollster: each chart and question names its topic
    above its title */
 .btv-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }

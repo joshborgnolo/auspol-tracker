@@ -17,7 +17,7 @@
    alone, which the archived classic design mounts without the rd chrome
    (the .btv-* styles are page-level, not rd-gated). Replaced the /ad-hocs/
    catalogue 2026-10-18. */
-const { useState: btvUseState, useEffect: btvUseEffect, useMemo: btvUseMemo } = React;
+const { useState: btvUseState, useEffect: btvUseEffect, useMemo: btvUseMemo, useDeferredValue: btvUseDeferred } = React;
 
 const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const btvDay = (iso) => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
@@ -913,6 +913,148 @@ function BtvSort({ sort, onSort }) {
   );
 }
 
+/* ---- the search box ------------------------------------------------------------
+   The All-polls box's idiom over this page's own inventory (its TESTS['q']
+   lives in the d1a1d215 asset): query and haystacks lower-cased, every
+   white-space token of the query must appear in a piece's haystack, and a
+   typed hyphen matches an en dash. A piece's haystack is its own words -
+   its question as asked, its answers' labels, its tables' headings - plus
+   the name of the topic it belongs to; never pollsters, dates, samples or
+   figures. A non-empty query swaps the findings, the order row and the
+   topics for the pieces that match; empty is the page as it was. */
+const btvPushW = (parts, s) => { if (s) parts.push(String(s)); };
+const btvSegsW = (segs, parts) => (segs || []).forEach((s) => btvPushW(parts, s.label));
+const btvRowsW = (rows, parts) => (rows || []).forEach((r) => {
+  btvPushW(parts, r.label);
+  btvPushW(parts, r.wording);
+  btvSegsW(r.segs, parts);
+  (r.waves || []).forEach((w) => btvSegsW(w.segs, parts));
+});
+const btvCutsW = (cuts, parts) => (cuts || []).forEach((c) => {
+  btvPushW(parts, c.title);
+  (c.heads || []).forEach((h) => parts.push(String(h)));
+  (c.banners || []).forEach((b) => btvPushW(parts, b));
+  (c.rows || []).forEach((r) => r.length && btvPushW(parts, r[0]));
+});
+const btvFigsW = (figs, parts) => (figs || []).forEach((f) => {
+  [f.title, f.measure, f.base].forEach((s) => btvPushW(parts, s));
+  (f.heads || []).concat(f.extraHeads || []).forEach((h) => parts.push(String(h)));
+  (f.legend || []).forEach((l) => btvPushW(parts, l.label));
+  btvRowsW(f.rows, parts);
+  (f.sums || []).forEach((r) => btvPushW(parts, r.label));
+});
+/* a featured chart or question: cols are the ledger's answer-column heads
+   ("Support", "Unsure", "Oppose"), not dates */
+const btvBlockW = (b) => {
+  const parts = [];
+  [b.title, b.summary, b.note, b.question, b.xLabel, b.base].forEach((s) => btvPushW(parts, s));
+  (b.names || []).forEach((s) => btvPushW(parts, s));
+  (b.legend || []).forEach((l) => btvPushW(parts, l.label));
+  btvSegsW(b.segs, parts);
+  btvRowsW(b.rows, parts);
+  btvCutsW(b.cuts, parts);
+  if (b.kind === "tracker") {
+    [b.dek, b.head, b.refLabel].forEach((s) => btvPushW(parts, s));
+    (b.families || []).forEach((s) => parts.push(String(s)));
+    (b.cols || []).forEach((s) => parts.push(String(s)));
+    (b.panels || []).forEach((p) => btvPushW(parts, p.label));
+  }
+  return parts.join(" ").toLowerCase();
+};
+/* a long-tail question */
+const btvMoreW = (m) => {
+  const parts = [String(m.title || "")];
+  (m.srcs || []).forEach((s) => btvPushW(parts, s.question));
+  btvFigsW(m.figs, parts);
+  (m.prose || []).forEach((p) => parts.push(btvText((p.text || []).join(" "))));
+  btvCutsW(m.cuts, parts);
+  return parts.join(" ").toLowerCase();
+};
+/* a hyphen typed in search finds the en dash, the All-polls box's own rule */
+const btvHayMirror = (words) => words + " " + words.replace(/–/g, "-");
+
+function BtvSearch({ q, onQ }) {
+  return (
+    <label className="btv-search">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <input type="search" value={q} onChange={(e) => onQ(e.target.value)} autoCorrect="off" spellCheck={false}
+             placeholder="Search a question or its answers" aria-label="Search the questions" />
+      {q ? <button type="button" className="btv-x" onClick={() => onQ("")} aria-label="Clear search">×</button> : null}
+    </label>
+  );
+}
+
+/* a long-tail question among the results, drawn the way its own list's open
+   row draws it, without the fold it lives behind there */
+function BtvHitMore({ m, houses }) {
+  return (
+    <article className="btv-item btv-hit">
+      <div className="btv-il">
+        <h4 className="btv-q">{m.title}</h4>
+        <BtvWaves q={m} houses={houses} />
+      </div>
+      <div className="btv-ir">
+        {m.figs.length > 1 && m.figs.every((f) => btvTraitSeries(f)) ? <BtvTraits figs={m.figs} />
+          : m.figs.map((f, i) => <BtvFig key={i} f={f} solo={m.figs.length === 1} />)}
+        {m.prose.map((p, i) => (
+          <div className="btv-fig" key={"p" + i}>
+            {m.prose.length > 1 || m.figs.length ? <p className="btv-ght">{p.when}</p> : null}
+            <blockquote className="btv-prose">{btvText(p.text.join(" "))}</blockquote>
+          </div>
+        ))}
+        <BtvCuts cuts={m.cuts} when={m.srcs.length > 1 ? m.cutsWhen : null} />
+      </div>
+    </article>
+  );
+}
+
+/* ---- the results: the pieces the box finds, a group a topic -------------------
+   The count line reads the All-polls bar's way; under it each topic that
+   holds a match runs its charts and questions the way it always does, with
+   its long tail open. The first groups draw at once and each painted frame
+   adds more, the topics' own fill idiom, so a broad match never commits the
+   whole list in one task on a phone. */
+const BTV_R_FIRST = 3, BTV_R_STEP = 3;
+function BtvResults({ q, hits, houses }) {
+  const nCharts = hits.reduce((n, g) => n + g.blocks.filter((b) => b.kind === "tracker").length, 0);
+  const nItems = hits.reduce((n, g) => n + g.blocks.filter((b) => b.kind !== "tracker").length, 0);
+  const nMore = hits.reduce((n, g) => n + g.more.length, 0);
+  const total = nCharts + nItems + nMore;
+  const [fill, setFill] = btvUseState({ q, n: BTV_R_FIRST });
+  const filled = fill.q === q ? fill.n : BTV_R_FIRST;
+  btvUseEffect(() => {
+    if (filled >= hits.length) return undefined;
+    let t = 0;
+    const raf = requestAnimationFrame(() => {
+      t = setTimeout(() => setFill((f) => ({ q, n: (f.q === q ? f.n : BTV_R_FIRST) + BTV_R_STEP })), 0);
+    });
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
+  }, [q, filled, hits.length]);
+  if (!total) {
+    return <p className="btv-none">Nothing matches “{q}” — try the words of a question as asked, or of its answers.</p>;
+  }
+  return (
+    <div className="btv-res">
+      <p className="btv-scope btv-rcount"><b>{total}</b> {total === 1 ? "match" : "matches"} for “{q}”</p>
+      {hits.slice(0, filled).map((g) => {
+        const trackers = g.blocks.filter((b) => b.kind === "tracker");
+        const items = g.blocks.filter((b) => b.kind !== "tracker");
+        return (
+          <section className="btv-topic btv-mon" key={g.t.id}>
+            <div className="btv-tk">
+              <h3 className="btv-tt">{g.t.title}</h3>
+              <span className="btv-tc">{btvCount(trackers.length, items.length, g.more.length)}</span>
+            </div>
+            {trackers.map((c) => <BtvTracker key={c.id} c={c} houses={houses} />)}
+            {items.length ? <div className="btv-items">{items.map((c, i) => <BtvItem key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
+            {g.more.length ? <div className="btv-items">{g.more.map((m) => <BtvHitMore key={m.id + "|" + m.house} m={m} houses={houses} />)}</div> : null}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ---- the findings: one sentence a topic, each a link to its topic ---------- */
 function BtvFindings({ topics, onGo }) {
   return (
@@ -945,6 +1087,7 @@ function BtvBody() {
   const [tries, setTries] = btvUseState(0);
   const [sort, setSort] = btvUseState("issue");
   const [jump, setJump] = btvUseState(null);
+  const [q, setQ] = btvUseState("");
   btvUseEffect(() => {
     let live = true;
     D.loadOneOffs().then((j) => {
@@ -995,6 +1138,27 @@ function BtvBody() {
   const topics = btvUseMemo(() => (src ? src.topics.filter((t) => t.blocks.length || t.more.length) : []), [src]);
   const groups = btvUseMemo(() => (sort === "recent" ? btvByMonth(topics)
     : sort === "pollster" ? btvByPollster(topics, (src && src.houses) || {}) : null), [topics, sort, src]);
+  /* the search box stays on q and matching rides the deferred echo, the
+     All-polls box's own convention: a keystroke's urgent render finds every
+     input unchanged and skips, and the run happens once the query settles.
+     Haystacks build once per payload load, a piece's plus its topic's */
+  const dq = btvUseDeferred(q);
+  const ql = dq.trim().toLowerCase();
+  const inv = btvUseMemo(() => topics.map((t) => {
+    const tw = ((t.title || "") + " " + (t.short || "") + " " + (t.about || "")).toLowerCase() + " ";
+    return { t,
+      blocks: t.blocks.map((b) => ({ b, hay: btvHayMirror(tw + btvBlockW(b)) })),
+      more: t.more.map((m) => ({ m, hay: btvHayMirror(tw + btvMoreW(m)) })) };
+  }), [topics]);
+  const hits = btvUseMemo(() => {
+    if (!ql) return null;
+    const toks = ql.split(/\s+/);
+    return inv.map((g) => ({
+      t: g.t,
+      blocks: g.blocks.filter((x) => toks.every((k) => x.hay.includes(k))).map((x) => x.b),
+      more: g.more.filter((x) => toks.every((k) => x.hay.includes(k))).map((x) => x.m),
+    })).filter((g) => g.blocks.length || g.more.length);
+  }, [inv, ql]);
   /* The topics are drawn a few at a time, one batch a painted frame. Every
      topic in one commit cost a 360ms task at 4x CPU on a phone (most of
      a 36,000px page, the tap that opened it frozen till the end); the first
@@ -1031,13 +1195,15 @@ function BtvBody() {
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return (
     <div className="btv">
-      <BtvFindings topics={topics} onGo={onGo} />
-      <BtvSort sort={sort} onSort={setSort} />
-      <p className="btv-scope">
+      {!ql && <BtvFindings topics={topics} onGo={onGo} />}
+      <div className="btv-bar"><BtvSearch q={q} onQ={setQ} /></div>
+      {!ql && <BtvSort sort={sort} onSort={setSort} />}
+      {!ql && <p className="btv-scope">
         {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
         {" "}since {btvMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
-      </p>
-      {groups ? groups.slice(0, shown).map((g) => <BtvGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} />)
+      </p>}
+      {ql ? <BtvResults q={dq.trim()} hits={hits} houses={houses} />
+        : groups ? groups.slice(0, shown).map((g) => <BtvGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} />)
         : topics.slice(0, shown).map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
       <div className="btv-how">
         <p><b>How the findings are called.</b> Each topic opens with what its first chart or question found. A side is said

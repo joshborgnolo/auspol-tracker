@@ -1,7 +1,8 @@
 const {
   useState: btvUseState,
   useEffect: btvUseEffect,
-  useMemo: btvUseMemo
+  useMemo: btvUseMemo,
+  useDeferredValue: btvUseDeferred
 } = React;
 const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const btvDay = iso => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
@@ -1297,6 +1298,193 @@ function BtvSort({
     "data-t": o.label
   }, o.label)))));
 }
+const btvPushW = (parts, s) => {
+  if (s) parts.push(String(s));
+};
+const btvSegsW = (segs, parts) => (segs || []).forEach(s => btvPushW(parts, s.label));
+const btvRowsW = (rows, parts) => (rows || []).forEach(r => {
+  btvPushW(parts, r.label);
+  btvPushW(parts, r.wording);
+  btvSegsW(r.segs, parts);
+  (r.waves || []).forEach(w => btvSegsW(w.segs, parts));
+});
+const btvCutsW = (cuts, parts) => (cuts || []).forEach(c => {
+  btvPushW(parts, c.title);
+  (c.heads || []).forEach(h => parts.push(String(h)));
+  (c.banners || []).forEach(b => btvPushW(parts, b));
+  (c.rows || []).forEach(r => r.length && btvPushW(parts, r[0]));
+});
+const btvFigsW = (figs, parts) => (figs || []).forEach(f => {
+  [f.title, f.measure, f.base].forEach(s => btvPushW(parts, s));
+  (f.heads || []).concat(f.extraHeads || []).forEach(h => parts.push(String(h)));
+  (f.legend || []).forEach(l => btvPushW(parts, l.label));
+  btvRowsW(f.rows, parts);
+  (f.sums || []).forEach(r => btvPushW(parts, r.label));
+});
+const btvBlockW = b => {
+  const parts = [];
+  [b.title, b.summary, b.note, b.question, b.xLabel, b.base].forEach(s => btvPushW(parts, s));
+  (b.names || []).forEach(s => btvPushW(parts, s));
+  (b.legend || []).forEach(l => btvPushW(parts, l.label));
+  btvSegsW(b.segs, parts);
+  btvRowsW(b.rows, parts);
+  btvCutsW(b.cuts, parts);
+  if (b.kind === "tracker") {
+    [b.dek, b.head, b.refLabel].forEach(s => btvPushW(parts, s));
+    (b.families || []).forEach(s => parts.push(String(s)));
+    (b.cols || []).forEach(s => parts.push(String(s)));
+    (b.panels || []).forEach(p => btvPushW(parts, p.label));
+  }
+  return parts.join(" ").toLowerCase();
+};
+const btvMoreW = m => {
+  const parts = [String(m.title || "")];
+  (m.srcs || []).forEach(s => btvPushW(parts, s.question));
+  btvFigsW(m.figs, parts);
+  (m.prose || []).forEach(p => parts.push(btvText((p.text || []).join(" "))));
+  btvCutsW(m.cuts, parts);
+  return parts.join(" ").toLowerCase();
+};
+const btvHayMirror = words => words + " " + words.replace(/–/g, "-");
+function BtvSearch({
+  q,
+  onQ
+}) {
+  return React.createElement("label", {
+    className: "btv-search"
+  }, React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "15",
+    height: "15",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    "aria-hidden": "true"
+  }, React.createElement("circle", {
+    cx: "11",
+    cy: "11",
+    r: "7"
+  }), React.createElement("path", {
+    d: "M21 21l-4.3-4.3"
+  })), React.createElement("input", {
+    type: "search",
+    value: q,
+    onChange: e => onQ(e.target.value),
+    autoCorrect: "off",
+    spellCheck: false,
+    placeholder: "Search a question or its answers",
+    "aria-label": "Search the questions"
+  }), q ? React.createElement("button", {
+    type: "button",
+    className: "btv-x",
+    onClick: () => onQ(""),
+    "aria-label": "Clear search"
+  }, "\xD7") : null);
+}
+function BtvHitMore({
+  m,
+  houses
+}) {
+  return React.createElement("article", {
+    className: "btv-item btv-hit"
+  }, React.createElement("div", {
+    className: "btv-il"
+  }, React.createElement("h4", {
+    className: "btv-q"
+  }, m.title), React.createElement(BtvWaves, {
+    q: m,
+    houses: houses
+  })), React.createElement("div", {
+    className: "btv-ir"
+  }, m.figs.length > 1 && m.figs.every(f => btvTraitSeries(f)) ? React.createElement(BtvTraits, {
+    figs: m.figs
+  }) : m.figs.map((f, i) => React.createElement(BtvFig, {
+    key: i,
+    f: f,
+    solo: m.figs.length === 1
+  })), m.prose.map((p, i) => React.createElement("div", {
+    className: "btv-fig",
+    key: "p" + i
+  }, m.prose.length > 1 || m.figs.length ? React.createElement("p", {
+    className: "btv-ght"
+  }, p.when) : null, React.createElement("blockquote", {
+    className: "btv-prose"
+  }, btvText(p.text.join(" "))))), React.createElement(BtvCuts, {
+    cuts: m.cuts,
+    when: m.srcs.length > 1 ? m.cutsWhen : null
+  })));
+}
+const BTV_R_FIRST = 3,
+  BTV_R_STEP = 3;
+function BtvResults({
+  q,
+  hits,
+  houses
+}) {
+  const nCharts = hits.reduce((n, g) => n + g.blocks.filter(b => b.kind === "tracker").length, 0);
+  const nItems = hits.reduce((n, g) => n + g.blocks.filter(b => b.kind !== "tracker").length, 0);
+  const nMore = hits.reduce((n, g) => n + g.more.length, 0);
+  const total = nCharts + nItems + nMore;
+  const [fill, setFill] = btvUseState({
+    q,
+    n: BTV_R_FIRST
+  });
+  const filled = fill.q === q ? fill.n : BTV_R_FIRST;
+  btvUseEffect(() => {
+    if (filled >= hits.length) return undefined;
+    let t = 0;
+    const raf = requestAnimationFrame(() => {
+      t = setTimeout(() => setFill(f => ({
+        q,
+        n: (f.q === q ? f.n : BTV_R_FIRST) + BTV_R_STEP
+      })), 0);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [q, filled, hits.length]);
+  if (!total) {
+    return React.createElement("p", {
+      className: "btv-none"
+    }, "Nothing matches \u201C", q, "\u201D \u2014 try the words of a question as asked, or of its answers.");
+  }
+  return React.createElement("div", {
+    className: "btv-res"
+  }, React.createElement("p", {
+    className: "btv-scope btv-rcount"
+  }, React.createElement("b", null, total), " ", total === 1 ? "match" : "matches", " for \u201C", q, "\u201D"), hits.slice(0, filled).map(g => {
+    const trackers = g.blocks.filter(b => b.kind === "tracker");
+    const items = g.blocks.filter(b => b.kind !== "tracker");
+    return React.createElement("section", {
+      className: "btv-topic btv-mon",
+      key: g.t.id
+    }, React.createElement("div", {
+      className: "btv-tk"
+    }, React.createElement("h3", {
+      className: "btv-tt"
+    }, g.t.title), React.createElement("span", {
+      className: "btv-tc"
+    }, btvCount(trackers.length, items.length, g.more.length))), trackers.map(c => React.createElement(BtvTracker, {
+      key: c.id,
+      c: c,
+      houses: houses
+    })), items.length ? React.createElement("div", {
+      className: "btv-items"
+    }, items.map((c, i) => React.createElement(BtvItem, {
+      key: (c.id || "") + i,
+      c: c,
+      houses: houses
+    }))) : null, g.more.length ? React.createElement("div", {
+      className: "btv-items"
+    }, g.more.map(m => React.createElement(BtvHitMore, {
+      key: m.id + "|" + m.house,
+      m: m,
+      houses: houses
+    }))) : null);
+  }));
+}
 function BtvFindings({
   topics,
   onGo
@@ -1340,6 +1528,7 @@ function BtvBody() {
   const [tries, setTries] = btvUseState(0);
   const [sort, setSort] = btvUseState("issue");
   const [jump, setJump] = btvUseState(null);
+  const [q, setQ] = btvUseState("");
   btvUseEffect(() => {
     let live = true;
     D.loadOneOffs().then(j => {
@@ -1390,6 +1579,31 @@ function BtvBody() {
   }, []);
   const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
   const groups = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : sort === "pollster" ? btvByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
+  const dq = btvUseDeferred(q);
+  const ql = dq.trim().toLowerCase();
+  const inv = btvUseMemo(() => topics.map(t => {
+    const tw = ((t.title || "") + " " + (t.short || "") + " " + (t.about || "")).toLowerCase() + " ";
+    return {
+      t,
+      blocks: t.blocks.map(b => ({
+        b,
+        hay: btvHayMirror(tw + btvBlockW(b))
+      })),
+      more: t.more.map(m => ({
+        m,
+        hay: btvHayMirror(tw + btvMoreW(m))
+      }))
+    };
+  }), [topics]);
+  const hits = btvUseMemo(() => {
+    if (!ql) return null;
+    const toks = ql.split(/\s+/);
+    return inv.map(g => ({
+      t: g.t,
+      blocks: g.blocks.filter(x => toks.every(k => x.hay.includes(k))).map(x => x.b),
+      more: g.more.filter(x => toks.every(k => x.hay.includes(k))).map(x => x.m)
+    })).filter(g => g.blocks.length || g.more.length);
+  }, [inv, ql]);
   const list = groups || topics;
   const [fill, setFill] = btvUseState({
     sort,
@@ -1436,15 +1650,24 @@ function BtvBody() {
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return React.createElement("div", {
     className: "btv"
-  }, React.createElement(BtvFindings, {
+  }, !ql && React.createElement(BtvFindings, {
     topics: topics,
     onGo: onGo
-  }), React.createElement(BtvSort, {
+  }), React.createElement("div", {
+    className: "btv-bar"
+  }, React.createElement(BtvSearch, {
+    q: q,
+    onQ: setQ
+  })), !ql && React.createElement(BtvSort, {
     sort: sort,
     onSort: setSort
-  }), React.createElement("p", {
+  }), !ql && React.createElement("p", {
     className: "btv-scope"
-  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), groups ? groups.slice(0, shown).map(g => React.createElement(BtvGroup, {
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), ql ? React.createElement(BtvResults, {
+    q: dq.trim(),
+    hits: hits,
+    houses: houses
+  }) : groups ? groups.slice(0, shown).map(g => React.createElement(BtvGroup, {
     key: g.id,
     g: g,
     houses: houses,

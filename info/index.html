@@ -63,7 +63,7 @@
   <link rel="preload" href="../assets/js/rd-polls.537b5652.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.c11b52d8.js" as="script">
-  <link rel="preload" href="../assets/js/rd-beyond.334845dc.js" as="script">
+  <link rel="preload" href="../assets/js/rd-beyond.264db102.js" as="script">
   <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 27 October 2026, Labor leads the Coalition 51.5–48.5 two-party preferred on implied preference flows (±1.7), from 184 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
@@ -3379,6 +3379,23 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
 .btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
 @media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
+.btv-bar { display: flex; align-items: center; margin-top: 18px; }
+.btv-search {
+  box-sizing: border-box; flex: 1; height: 36px; padding: 0 12px 0 14px;
+  display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: 0;
+  border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
+}
+.btv-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
+.btv-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
+.btv-search input::placeholder { color: var(--ink-3); opacity: 1; }
+.btv-search input::-webkit-search-cancel-button { display: none; }
+.btv-search input:focus-visible { outline: none; }
+@media (pointer: coarse) {
+  .btv-search input { font-size: 16px; }
+}
+.btv-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
+.btv-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }
+.btv-rcount b { color: var(--ink); }
 .btv-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }
 .btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
 .btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
@@ -6751,7 +6768,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
   <script src="../assets/js/rd-polls.537b5652.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../assets/js/rd-allpolls.c11b52d8.js"></script>
-  <script src="../assets/js/rd-beyond.334845dc.js"></script>
+  <script src="../assets/js/rd-beyond.264db102.js"></script>
   <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js"></script>
 
 
