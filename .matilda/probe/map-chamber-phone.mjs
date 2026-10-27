@@ -14,8 +14,9 @@
        in-canvas - band off is a valid state, never a clip.
    Canvas text has no DOM boxes, so every fillText on the stage canvas
    is captured and its ink box rebuilt from measureText with the
-   recorded font. Frames: nsw23 (rect floor, user-reported; y0 varies
-   with width so sweep it), sa26 and 2025 (arc floor, y0 = 62 constant).
+   recorded font. Frames: nsw23, sa26 and 2025 (all arc or arc-adjacent
+   floors; nsw23's Assembly moved to app-3-chamber.js's NSWB arc idiom
+   2026-10-27, retiring the rect floor whose band moved with width).
    Serve another tree with BASE=... for a detached comparison. */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
@@ -48,12 +49,12 @@ const check = (name, cond, detail) => {
   else fails.push(`${name}${detail ? " - " + detail : ""}`);
 };
 
-/* (frame, widths as [px, bandOn], presiding name prefix) - nsw23's rect
-   band moves with width, so it's swept, and its 760 rung pins the
-   band-OFF state (side column has room); the arc floors pin y0 and one
-   rung proves them */
+/* (frame, widths as [px, bandOn], presiding name prefix) - every lower
+   house now draws on an arc-style geometry whose band pins y0 = 62, so
+   one band-on rung proves each; nsw23 keeps the 760 rung to pin the
+   band-OFF state (side column has room - shared by every idiom now) */
 const FRAMES = [
-  ["nsw23", [[360, 1], [390, 1], [480, 1], [760, 0]], "Greg Piper"],
+  ["nsw23", [[390, 1], [760, 0]], "Greg Piper"],
   ["sa26", [[390, 1]], "Nat Cook"],
   ["2025", [[390, 1]], "Milton Dick"],
 ];

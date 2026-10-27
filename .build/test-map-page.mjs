@@ -731,22 +731,29 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(Object.values(sen.pvotes).reduce((a, b) => a + b, 0), sen.pformal, "senate-nsw23: 2019 party votes sum to formal");
 }
 
-// New South Wales' chambers ride the same floor machinery as South
-// Australia's (the @sa-cells SAF table in app-3c-sa.js): the Assembly's
+// New South Wales' chambers: the Council rides South Australia's floor
+// machinery (the @sa-cells SAF table in app-3c-sa.js) — five rows seat 42 —
+// but the Assembly is Victoria's sister room, a horseshoe about a
+// rectangular central table with no Hansard desk, so it draws on the
+// House's own idiom in app-3-chamber.js (the @nsw-cells NSWB table): its
 // planless floor seats every member but the Speaker on benches filled in
-// sorted order (no NSW seating plan is filed), and the Council's five rows
-// seat 42
+// sorted order (no NSW seating plan is filed)
 {
   const src = R(".build/map/app/app-3c-sa.js");
   const { SAF, saCells } = new Function(`${src.match(/@sa-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @sa-cells-end \*\//)[1]}; return { SAF, saCells };`)();
-  const nswLA = saCells(SAF.nswLA), nswLC = saCells(SAF.nswLC);
-  assert.equal(nswLA.length, 92, "the NSW Assembly's floor: 92 desks besides the Speaker's chair");
+  assert.ok(!("nswLA" in SAF), "the old straight-block nswLA floor is retired (the Assembly rides NSWB)")
+  const nswLC = saCells(SAF.nswLC);
   assert.equal(nswLC.length, 42, "the NSW Council's floor: 42 desks besides the President's chair");
-  for (const [k, cells] of [["nswLA", nswLA], ["nswLC", nswLC]]) {
-    assert.equal(new Set(cells.map((c) => c.id)).size, cells.length, `${k}: desk ids unique`);
-    assert.equal(cells.filter((c) => c.x < 0).length, cells.filter((c) => c.x > 0).length, `${k}: the sides mirror each other`);
-  }
-  assert.ok(js.includes('const saFloorOf = (m) => (m.year === "nsw23" ? (m.house === "senate" ? "nswLC" : "nswLA") : m.house === "senate" ? "lc" : "ha");'), "saFloorOf routes the SA and NSW frames to their floors");
+  assert.equal(new Set(nswLC.map((c) => c.id)).size, nswLC.length, "nswLC: desk ids unique");
+  assert.equal(nswLC.filter((c) => c.x < 0).length, nswLC.filter((c) => c.x > 0).length, "nswLC: the sides mirror each other");
+  const { nswCells } = new Function(`${part("app-3-chamber.js").match(/@nsw-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @nsw-cells-end \*\//)[1]}; return { nswCells };`)();
+  const nswLA = nswCells();
+  assert.equal(nswLA.length, 94, "the NSW Assembly's floor: 93 desks and the Serjeant's chair");
+  assert.equal(nswLA.filter((c) => c.id !== "Rc5c0").length, 93, "the NSW Assembly: 93 desks for the 92 members and the one left empty");
+  assert.equal(new Set(nswLA.map((c) => c.id)).size, nswLA.length, "nswLA: desk ids unique");
+  assert.equal(nswLA.filter((c) => c.x < 0).length, nswLA.filter((c) => c.x > 0).length, "nswLA: the sides mirror each other");
+  assert.ok(js.includes('const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? "lc" : "ha");'), "saFloorOf routes the SA frames and NSW's Council (never its Assembly)");
+  assert.ok(js.includes('m && m.year === "nsw23" && m.house !== "senate" ? nswGeom()'), "chamberGeom routes nsw23's Assembly to its Macquarie Street floor");
   assert.ok(js.includes('const chamberGeom = (m) => (m && m.year === "vic22" ? vicGeom() :'), "chamberGeom routes vic22 to the Assembly's federal-style floor");
   assert.ok(js.includes('nsw23: "Greg Piper"'), "nsw23's Speaker (Greg Piper, first sat 2 May 2023) in the chair");
   assert.ok(js.includes('nsw23: "Lake Macquarie"'), "nsw23's Speaker division is Lake Macquarie");

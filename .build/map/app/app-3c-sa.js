@@ -1,4 +1,4 @@
-/* =============================== South Australia's chambers — and New South Wales' ===============================
+/* ===================== South Australia's chambers — and New South Wales' Council =====================
    The House of Assembly and the Legislative Council as they are built, after the Parliament of
    South Australia's chamber maps (chamber-maps.parliament.sa.gov.au): two rooms of the same size,
    the Speaker's (the President's) chair on its dais at the northern end, the table below it with
@@ -10,12 +10,14 @@
    28 and its President. Drawn by the House's renderer (drawChamber) like the Senate's floor; where
    a plan is filed (map/data/seats-<year>.json, seats-<year>-lc.json, from .build/map/sa_seating.mjs)
    each member sits at their desk, otherwise each bloc fills the benches from the chair's end.
-   New South Wales' two chambers (Parliament House, Sydney — assembly.parliament.nsw.gov.au and
-   parliament.nsw.gov.au's chamber photos) stand the same officers the same way but face straight
-   bench-blocks from wall to wall, four deep in the Assembly with the gangways arcing round the
-   ends, five shallow ones in the Council, a raised Speaker's chair under the public galleries up
-   the middle. The Assembly seats 93, the Council 42, none of either at a census desk here (no
-   seating plan is filed: each bloc fills the benches sorted, saFloorOf/saGeom's generic path).
+   New South Wales' Council (Parliament House, Sydney — parliament.nsw.gov.au's chamber photos)
+   stands the same officers the same way, five shallow bench rows curving round the far end, 21
+   members a side. Sydney's Assembly stood here too on its own straight blocks, but the real room
+   is the sister of Victoria's — a horseshoe of benches about a rectangular central table — so
+   since 2026-10-27 it is drawn in app-3-chamber.js's own idiom (NSWB/nswGeom) like the federal
+   House's floor, and only the Council remains on this one. The Council seats 42, none at a census
+   desk here (no seating plan is filed: each bloc fills the benches sorted, saFloorOf/saGeom's
+   generic path).
    @sa-cells-begin – read as is by .build/map/sa_seating.mjs, which checks every desk a plan names
    is one drawn here. Measured off the chamber maps' floor images (pixels, x from the centre line,
    y down from the curves' centres), seat ids the Parliament's own desk names; a side's list reads
@@ -45,29 +47,11 @@ const SAF = {
     // a lone seat either side of the gangway, beyond the curves, facing the chair
     singles: [{ row: 2, x: 170, y: 201, L: "H1", R: "I1" }],
   },
-  // the Legislative Assembly, Sydney (seats 93): the Speaker's dais up the middle between the
-  // public galleries, the Clerks at the table below, then four straight blocks of benches either
-  // side from wall to wall, the gangways arcing round their far ends; 46 desks a side — the
-  // Speaker's 93rd sits in the chair, and one desk stands empty. (Victoria's Assembly stood here
-  // in this idiom until the 60th Parliament's own plan was measured for the federal-style
-  // chamber of app-3-chamber.js — the vic22 frame now sits members where the plan puts them.)
-  nswLA: {
-    room: [-560, -580, 560, 420], chair: -490, officers: [-414, 190], table: [-392, -350, 104], mace: true, lead: ["A1", "F1"],
-    straight: [
-      { row: 1, x: 138, ys: [-420, -336, -252, -168], L: "A1 A2 A3 A4", R: "F1 F2 F3 F4" },
-      { row: 2, x: 250, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "G1 G2 G3 G4 G5 G6 G7 G8", R: "J1 J2 J3 J4 J5 J6 J7 J8" },
-      { row: 3, x: 362, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "K1 K2 K3 K4 K5 K6 K7 K8", R: "N1 N2 N3 N4 N5 N6 N7 N8" },
-      { row: 4, x: 474, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "M1 M2 M3 M4 M5 M6 M7 M8", R: "P1 P2 P3 P4 P5 P6 P7 P8" },
-    ],
-    arcs: [
-      { row: 2, a: 120, y: 12, r: 130, phi: [24, 54, 84], L: "H1 H2 H3", R: "I1 I2 I3" },
-      { row: 3, a: 120, y: 12, r: 242, phi: [15, 27, 39, 51, 63, 75, 87], L: "L1 L2 L3 L4 L5 L6 L7", R: "O1 O2 O3 O4 O5 O6 O7" },
-      { row: 4, a: 120, y: 12, r: 354, phi: [14, 25, 36, 47, 58, 69, 80, 91], L: "D1 D2 D3 D4 D5 D6 D7 D8", R: "Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8" },
-    ],
-  },
-  // and its Council (seats 42): five shallower rows round the same arrangement, the President under
-  // the galleries, the Clerks at the table, the Usher of the Black Rod by the bar — 21 members a
-  // side, the government's members to the reader's left, the rest to the right.
+  // and New South Wales' Council (seats 42): five shallower rows round the same arrangement, the
+  // President under the galleries, the Clerks at the table, the Usher of the Black Rod by the bar —
+  // the government's members to the reader's left, the rest to the right. (Sydney's Assembly stood
+  // here on its own straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real
+  // room is Victoria's sister, a horseshoe about a rectangular central table.)
   nswLC: {
     room: [-580, -520, 580, 328], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
     straight: [
@@ -101,8 +85,9 @@ const SAU = 36; // the floor images' pixels to a chamber unit
 const SA_SEAT = { W: 46, D: 50 }; // a chair, in pixels: along its bench, and deep
 const SA_PAD = 4; // a bench's margin round its chairs
 const saGeomC = {};
-// the chamber the year's House or council is drawn in
-const saFloorOf = (m) => (m.year === "nsw23" ? (m.house === "senate" ? "nswLC" : "nswLA") : m.house === "senate" ? "lc" : "ha");
+// the chamber the year's House or council is drawn in (nsw23's Assembly never reaches here:
+// chamberGeom routes it to app-3-chamber.js's nswGeom first)
+const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? "lc" : "ha");
 function saGeom(key) {
   if (saGeomC[key]) return saGeomC[key];
   const F = SAF[key], P = (v) => v / SAU;
@@ -110,8 +95,7 @@ function saGeom(key) {
   const A = P(F.arcs.reduce((t, b) => t + b.a, 0) / F.arcs.length);
   // the order along the benches: down the government's side, round its curve, across the gangway
   // (its own stretch, 2A long), round the opposition's curve and up its side. A curve seat goes by
-  // its angle about its own curve's centre, held to its own side of the gangway (New South Wales'
-  // back curves run a degree past it)
+  // its angle about its own curve's centre, held to its own side of the gangway
   const Q = (Math.PI / 2) * CHK, GAP = 2 * A, D2R = Math.PI / 180;
   const sideS = (c, x, y) => {
     const right = c.x > 0;
