@@ -1,6 +1,6 @@
 /* Probe: the Public opinion page's order control (rd-beyond.jsx BtvSort),
    in both designs at five widths (320 to 1440). Asserts the control sits
-   under the findings with only the search box between (the .btv-bar row
+   under the findings with only the search box between (the .btv-tools row
    shipped with the page's search) and opens on "By issue"; "By pollster"
    swaps the topics for a group a pollster, each holding only its own questions
    and linking to a last "Several pollsters" group that holds every
@@ -48,14 +48,14 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
   await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".btv-topic", { timeout: 20000 }); await sleep(300);
   const pre = await page.evaluate(() => ({ pressed: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getAttribute("aria-pressed") + ":" + b.textContent),
-    after: (() => { const f = document.querySelector(".btv-finds"); return f.nextElementSibling.className + ">" + f.nextElementSibling.nextElementSibling.className; })(),
-    bar: (() => { const b = document.querySelector(".btv-bar"); return b && b.firstElementChild.className; })(), topics: document.querySelectorAll(".btv-topic:not(.btv-mon)").length,
+    after: document.querySelector(".btv-finds").nextElementSibling.className,
+    bar: (() => { const b = document.querySelector(".btv-tools"); return b && [...b.children].map((c) => c.className.split(" ")[0]).join(); })(), topics: document.querySelectorAll(".btv-topic:not(.btv-mon)").length,
     bw: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getBoundingClientRect().width),
     fits: document.querySelector(".btv-sort-g").getBoundingClientRect().right <= document.querySelector(".btv-sort").getBoundingClientRect().right + 0.5 }));
   if (!pre.fits) fail(`${design}@${w} the tabs run past the column`);
   if (pre.pressed.join() !== "true:By issue,false:By pollster,false:By recency") fail(`${design}@${w} default ${pre.pressed}`);
-  if (pre.after !== "btv-bar>btv-sort") fail(`${design}@${w} control not under findings (via the search bar): ${pre.after}`);
-  if (pre.bar !== "btv-search") fail(`${design}@${w} the bar's child is not the search box: ${pre.bar}`);
+  if (pre.after !== "btv-tools") fail(`${design}@${w} the search bar does not follow the findings: ${pre.after}`);
+  if (pre.bar !== "btv-search,btv-sort") fail(`${design}@${w} the bar does not read [search][sort]: ${pre.bar}`);
   if (pre.topics !== topics.length) fail(`${design}@${w} topics ${pre.topics}`);
   // by pollster
   await page.click(".btv-sort-b:nth-child(2)"); await sleep(500);

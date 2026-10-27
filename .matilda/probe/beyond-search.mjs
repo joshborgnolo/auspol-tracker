@@ -1,5 +1,5 @@
 /* Probe: the Public opinion page's search (rd-beyond.jsx BtvSearch over
-   BtvResults, shipped with the page's .btv-bar row), in both designs at two
+   BtvResults, shipped with the page's .btv-tools row), in both designs at two
    widths. Asserts typing a word out of a question swaps the findings, the
    order row and the spell line for a results view whose topic groups carry
    the matched pieces (the long tail drawn open, never folded); the topic's
@@ -64,7 +64,7 @@ async function type(page, text) {
   await page.evaluate(() => {
     const x = document.querySelector(".btv-x");
     if (x) x.click();
-    document.querySelector(".btv-bar input").focus();
+    document.querySelector(".btv-tools input").focus();
   });
   if (text) await page.keyboard.type(text);
 }
@@ -74,19 +74,24 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   page.on("pageerror", (e) => errs.push(String(e.message))); page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
   await page.setViewport({ width: w, height: 1000 });
   await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector(".btv-bar input", { timeout: 20000 }); await sleep(300);
+  await page.waitForSelector(".btv-tools input", { timeout: 20000 }); await sleep(300);
   const here = await page.evaluate(() => ({
-    ph: document.querySelector(".btv-bar input").getAttribute("placeholder"),
-    type: document.querySelector(".btv-bar input").type,
-    val: document.querySelector(".btv-bar input").value,
+    ph: document.querySelector(".btv-tools input").getAttribute("placeholder"),
+    type: document.querySelector(".btv-tools input").type,
+    val: document.querySelector(".btv-tools input").value,
     x: !!document.querySelector(".btv-x"),
     pillW: document.querySelector(".btv-search").getBoundingClientRect().width,
-    barW: document.querySelector(".btv-bar").getBoundingClientRect().width,
+    barW: document.querySelector(".btv-tools").getBoundingClientRect().width,
+    barH: document.querySelector(".btv-tools").getBoundingClientRect().height,
   }));
   if (!here.ph) fail(`${design}@${w} the box has no placeholder`);
   if (here.type !== "search") fail(`${design}@${w} the box's type is ${here.type}`);
   if (here.val !== "") fail(`${design}@${w} the box opens with text in it`);
   if (here.x) fail(`${design}@${w} an empty box shows a clearer`);
+  /* the toolbar row must hold its pill: a height under the 36px pill means
+     the row clipped it (the 2026-10-28 btv-bar answer-track class collision
+     shrank it to a 12px sliver - the row is .btv-tools since) */
+  if (here.barH < 36) fail(`${design}@${w} the toolbar row is ${here.barH}px tall, under its 36px pill`);
   /* the All-polls pill's own width: 330 on the wide rung, full width on the
      phone rung (the ladder in template.html beside the .btv-sort rules) */
   if (w >= 1001 && Math.round(here.pillW) !== 330) fail(`${design}@${w} the pill is ${here.pillW}px wide, expected 330`);
@@ -103,7 +108,7 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
     groups: [...document.querySelectorAll(".btv-res .btv-topic")].map((g) => g.querySelector("h3").textContent),
     hits: [...document.querySelectorAll(".btv-hit .btv-q")].map((e) => e.textContent),
     none: !!document.querySelector(".btv-none"),
-    val: document.querySelector(".btv-bar input").value,
+    val: document.querySelector(".btv-tools input").value,
     sw: document.documentElement.scrollWidth > document.documentElement.clientWidth,
   }));
   if (r.val !== wordingPick.token) fail(`${design}@${w} the box lost the query: "${r.val}"`);
@@ -153,18 +158,18 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   await type(page, ""); await sleep(700);
   const press0 = await page.$$eval(".btv-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
   await type(page, "9"); await sleep(500);
-  const typ = await page.evaluate(() => ({ path: location.pathname, val: document.querySelector(".btv-bar input").value, finds: !!document.querySelector(".btv-finds") }));
+  const typ = await page.evaluate(() => ({ path: location.pathname, val: document.querySelector(".btv-tools input").value, finds: !!document.querySelector(".btv-finds") }));
   if (typ.path !== "/public-opinion/") fail(`${design}@${w} a digit navigated to ${typ.path}`);
   if (typ.val !== "9") fail(`${design}@${w} the typed digit never landed in the box: "${typ.val}"`);
   if (typ.finds) fail(`${design}@${w} a typed query left the default page up`);
   await page.keyboard.press("Backspace"); await sleep(700);
-  await page.evaluate(() => document.querySelector(".btv-bar input").focus());
+  await page.evaluate(() => document.querySelector(".btv-tools input").focus());
   await page.keyboard.press("ArrowRight"); await page.keyboard.press("ArrowLeft"); await sleep(300);
   const press2 = await page.$$eval(".btv-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
   if (press0 !== press2) fail(`${design}@${w} arrows flipped the order row while the box was focused: ${press0} -> ${press2}`);
   /* the × restores the whole page */
   await type(page, wordingPick.token); await sleep(500);
-  await page.evaluate(() => document.querySelector(".btv-bar").scrollIntoView({ behavior: "instant", block: "center" }));
+  await page.evaluate(() => document.querySelector(".btv-tools").scrollIntoView({ behavior: "instant", block: "center" }));
   await sleep(250);
   await page.click(".btv-x"); await sleep(800);
 
@@ -172,7 +177,7 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   const back = await page.evaluate(() => ({
     finds: !!document.querySelector(".btv-finds"), sort: !!document.querySelector(".btv-sort"),
     topics: document.querySelectorAll(".btv-topic:not(.btv-mon)").length,
-    val: document.querySelector(".btv-bar input").value, x: !!document.querySelector(".btv-x"),
+    val: document.querySelector(".btv-tools input").value, x: !!document.querySelector(".btv-x"),
     sw: document.documentElement.scrollWidth > document.documentElement.clientWidth,
   }));
   if (!back.finds || !back.sort) fail(`${design}@${w} the findings or the order row never came back`);

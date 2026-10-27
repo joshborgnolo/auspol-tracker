@@ -1654,14 +1654,14 @@ function BtvBody() {
     topics: topics,
     onGo: onGo
   }), React.createElement("div", {
-    className: "btv-bar"
+    className: "btv-tools"
   }, React.createElement(BtvSearch, {
     q: q,
     onQ: setQ
-  })), !ql && React.createElement(BtvSort, {
+  }), !ql && React.createElement(BtvSort, {
     sort: sort,
     onSort: setSort
-  }), !ql && React.createElement("p", {
+  })), !ql && React.createElement("p", {
     className: "btv-scope"
   }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), ql ? React.createElement(BtvResults, {
     q: dq.trim(),

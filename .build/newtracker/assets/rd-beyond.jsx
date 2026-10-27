@@ -1196,8 +1196,14 @@ function BtvBody() {
   return (
     <div className="btv">
       {!ql && <BtvFindings topics={topics} onGo={onGo} />}
-      <div className="btv-bar"><BtvSearch q={q} onQ={setQ} /></div>
-      {!ql && <BtvSort sort={sort} onSort={setSort} />}
+      {/* the search pill and the order tabs share one toolbar row, the
+          All-polls bar's composition ([pill][controls …]); below 760px the
+          pill takes the row and the sort wraps under it, flex-wrap like
+          rd-ap-bar's own handoff. (The row's class is btv-TOOLS: btv-bar
+          was already taken, by BtvBar's 0-100 answer track - the toolbar
+          inherited the track's 12px height and overflow hidden and read
+          as a thin sliver until named apart.) */}
+      <div className="btv-tools"><BtvSearch q={q} onQ={setQ} />{!ql && <BtvSort sort={sort} onSort={setSort} />}</div>
       {!ql && <p className="btv-scope">
         {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
         {" "}since {btvMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.

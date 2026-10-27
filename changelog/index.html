@@ -63,7 +63,7 @@
   <link rel="preload" href="../assets/js/rd-polls.537b5652.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.c11b52d8.js" as="script">
-  <link rel="preload" href="../assets/js/rd-beyond.264db102.js" as="script">
+  <link rel="preload" href="../assets/js/rd-beyond.09068bbd.js" as="script">
   <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 28 October 2026, Labor leads the Coalition 51.5–48.5 two-party preferred on implied preference flows (±1.7), from 184 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
@@ -3379,7 +3379,8 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
 .btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
 @media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
-.btv-bar { display: flex; align-items: center; margin-top: 18px; }
+.btv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; border-bottom: 1px solid var(--line); }
+.btv-tools .btv-sort { margin-top: 0; border-bottom: 0; }
 .btv-search {
   box-sizing: border-box; width: 330px; height: 36px; padding: 0 12px 0 14px;
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0; margin: 0;
@@ -3394,7 +3395,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .btv-search input { font-size: 16px; }
 }
 @media (max-width: 1000px) { .btv-search { width: 260px; } }
-@media (max-width: 760px) { .btv-search { width: 100%; } }
+@media (max-width: 760px) { .btv-search { width: 100%; } .btv-tools { margin-top: 12px; row-gap: 10px; column-gap: 8px; } }
 .btv-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
 .btv-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }
 .btv-rcount b { color: var(--ink); }
@@ -6612,130 +6613,6 @@ body.rd [role="tab"]:focus-visible,
 body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body.rd .rd-ap-search input:focus-visible { outline: none; }
 </style>
-  <script>
-  /* overflow-forbid — horizontal document overflow is forbidden outright,
-     enforced here in the page, because root CSS cannot do it (verified
-     empirically 2026-10-28: html/body overflow-x:clip and :hidden leave
-     documentElement.scrollWidth reporting the overflow and the viewport
-     pannable, for static and absolutely-positioned overflow alike).
-     Healthy pages never notice this; pages that DO break contract get
-     contained at the element, and the page never pans sideways again.
-     1. Detection: documentElement.scrollWidth past the viewport, twice in
-        ~400ms — a grace window for the 1-2 frame self-healing transients
-        (the glides' mid-interpolation class); only a stuck document is
-        clamped.
-     2. Clamp applies the site's own sanctioned idiom: a wide TABLE inside
-        a sane block parent takes scroll on the parent (the .table-wrap
-        pattern); any other offender is capped to the design viewport minus
-        its document-left offset, with overflow-x:auto. The design viewport
-        is screen.width on a phone (innerWidth lies after iOS has zoomed
-        the layout out to fit the overflow — detection and the width cap
-        must both ignore the rescaled value), innerWidth on a desktop.
-        Clamps persist until the LAYOUT context changes (a resize, or the
-        clamped element leaving the DOM): a permanent overflow earns a
-        permanent clamp — no timer ever lifts one for it to re-form.
-     3. Observability stays: every clamp console.errors and counts into
-        window.OF_CLAMPS, so the underlying bug is still loud for the
-        probes and tests that hunt it. */
-  (function () {
-    "use strict";
-    var GRACE = 400, DEBOUNCE = 120;
-    var clamped = [], overflowSince = 0, t = 0;
-    /* the DESIGN viewport, the width the page was built for — innerWidth on
-       a desktop (its window never rescales; and min() picks innerWidth
-       since a window can't outgrow its screen) but screen.width on a
-       phone: iOS answers a wide document by zooming the layout viewport
-       OUT to the document's width, after which scrollWidth === innerWidth
-       and the overflow is invisible to a naive guard */
-    function vw() {
-      var s = window.screen && screen.width;
-      return s && s < window.innerWidth ? s : window.innerWidth;
-    }
-    function overflowing() {
-      return !!document.body && document.documentElement.scrollWidth > vw() + 1;
-    }
-    function describe(el) {
-      var c = typeof el.className === "string" ? el.className.trim() : "";
-      return el.tagName.toLowerCase() + (c ? "." + c.split(/\s+/).slice(0, 3).join(".") : "");
-    }
-    function offenders() {
-      var lim = vw() + 1, out = [];
-      var els = document.body.getElementsByTagName("*");
-      for (var i = 0; i < els.length; i++) {
-        var r = els[i].getBoundingClientRect();
-        if (r.width && r.right > lim) out.push(els[i]);
-      }
-      return out;
-    }
-    function clamp() {
-      var els = offenders(), did = [], i, el;
-      for (i = 0; i < els.length; i++) {
-        el = els[i];
-        var target = el;
-        if (el.tagName === "TABLE" && el.parentElement && !/^(BODY|HTML)$/.test(el.parentElement.tagName)) target = el.parentElement;
-        if (target.hasAttribute("data-ofc")) continue;
-        target.setAttribute("data-ofc", "");
-        target.style.overflowX = "auto";
-        /* cap the WIDTH FROM WHAT REMAINS of the design viewport, not the
-           floating 100vw — both an absolute pile's document-left offset and
-           the phone's rescaled layout viewport would otherwise put the cap
-           where it can still push the page right */
-        var docLeft = Math.max(0, Math.round(target.getBoundingClientRect().left + window.scrollX));
-        var cap = vw() - docLeft - 1;
-        if (cap < 0) cap = 0;
-        target.style.maxWidth = cap + "px";
-        clamped.push(target);
-        did.push(describe(el));
-      }
-      if (did.length) {
-        window.OF_CLAMPS = (window.OF_CLAMPS || 0) + did.length;
-        if (window.console && console.error) console.error("overflow-forbid: clamped " + did.length + " element(s) that widened the document past the viewport: " + did.slice(0, 4).join(", "));
-      }
-    }
-    /* the clamps are lifted only by a layout-context change (resize) or by
-       their element leaving the DOM — a timer never lifts one */
-    function release() {
-      for (var i = 0; i < clamped.length; i++) {
-        clamped[i].style.maxWidth = "";
-        clamped[i].style.overflowX = "";
-        clamped[i].removeAttribute("data-ofc");
-      }
-      clamped.length = 0;
-    }
-    function prune() {
-      clamped = clamped.filter(function (el) {
-        if (el.isConnected) return true;
-        el.style.maxWidth = "";
-        el.style.overflowX = "";
-        return false;
-      });
-    }
-    function check() {
-      if (overflowing()) {
-        var now = Date.now();
-        if (!overflowSince) overflowSince = now;
-        if (now - overflowSince >= GRACE) {
-          clamp();
-          overflowSince = now;
-        }
-      } else {
-        overflowSince = 0;
-      }
-      /* self-perpetuate while there's still something to watch: a stuck
-         page does not mutate again, so mutations alone never re-fire the
-         grace period after which the clamp lands */
-      if (overflowing() || clamped.length) t = setTimeout(tick, DEBOUNCE);
-    }
-    function tick() { prune(); check(); }
-    function schedule() { clearTimeout(t); t = setTimeout(tick, DEBOUNCE); }
-    new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
-    window.addEventListener("resize", function () { overflowSince = 0; release(); schedule(); });
-    function boot() { requestAnimationFrame(check); }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
-    else boot();
-    window.OF_CLAMPS = window.OF_CLAMPS || 0;
-  })();
-  </script>
 </head>
 <body>
   <!-- Dresses the body before its first style is computed, with the classes
@@ -6885,7 +6762,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
   <script src="../assets/js/rd-polls.537b5652.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../assets/js/rd-allpolls.c11b52d8.js"></script>
-  <script src="../assets/js/rd-beyond.264db102.js"></script>
+  <script src="../assets/js/rd-beyond.09068bbd.js"></script>
   <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js"></script>
 
 
