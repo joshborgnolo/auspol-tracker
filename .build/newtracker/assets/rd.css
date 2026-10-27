@@ -362,7 +362,11 @@ body.rd .rd-cal-track::before { content: "("; }
 body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
-  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
+  /* qualifiers ("today", "open now", "3 days overdue") temper the DATE, so
+     the wrapped line sits flush with the date cell above it - the earlier
+     108px name-column indent left a lone "today" looking like a stray
+     indented fragment (user phone report 2026-10-27) */
+  body.rd .rd-cal-q { flex-basis: 100%; }
   /* a day shared by two series stacks one series per line instead of the
      inline ", " flow, which could break inside a long series name and
      strand its first word at the end of the line above (a phone showed
