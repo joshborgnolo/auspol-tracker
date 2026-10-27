@@ -2731,7 +2731,7 @@ function drawChamber(g, m, w, h, opts) {
     const room = X(-rO - 0.8);
     // no room beside the benches: the blocs head the chamber, either side of the Speaker
     let bandRoom = null;
-    const band = room <= 70 && F.oy + geom.box.y0 * s >= 56;
+    const band = room <= 70 && F.oy + geom.box.y0 * s >= 59;
     if (band) {
       const y0 = Yp(geom.box.y0);
       const spFam = m.divs[m.speaker] && holdFam(m.divs[m.speaker].hold);
@@ -2761,8 +2761,11 @@ function drawChamber(g, m, w, h, opts) {
         const ct = `Crossbench ${ch.nCross}`;
         g.textAlign = "center"; g.textBaseline = "alphabetic";
         g.font = `600 11px ${SANS}`; g.fillStyle = css(th.ink2);
-        g.fillText(ct, X(0), y0 - 46);
-        claim(X(0), y0 - 58, Math.max(g.measureText(ct).width, 40), 14, "center", "top");
+        // it shares the band with the Speaker's two lines below: at y0-46 its ink
+        // bottom sat 3px off the Speaker's cap line and the pair read as one - lift
+        // it (the arc chambers' y0 is a fixed 62, so the top stays in-canvas)
+        g.fillText(ct, X(0), y0 - 50);
+        claim(X(0), y0 - 60, Math.max(g.measureText(ct).width, 40), 14, "center", "top");
       }
     }
     if (room > 70) {
@@ -2842,11 +2845,11 @@ function drawChamber(g, m, w, h, opts) {
       // between the blocs' labels: two lines, the seat dropped if the name alone fits
       const y = Yp(geom.box.y0);
       g.textBaseline = "alphabetic"; g.textAlign = "center";
-      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText(pr.role, X(0), y - 34);
+      g.font = `600 12px ${SANS}`; g.fillStyle = css(th.ink2); g.fillText(pr.role, X(0), y - 32);
       g.font = `400 12px ${SANS}`; g.fillStyle = css(th.ink3);
       const full = `${pr.name}, ${pr.place}`, nm = g.measureText(full).width <= bandRoom ? full : pr.name;
-      g.fillText(nm, X(0), y - 12);
-      claim(X(0), y - 48, Math.max(g.measureText(nm).width, 50), 44, "center", "top");
+      g.fillText(nm, X(0), y - 10);
+      claim(X(0), y - 46, Math.max(g.measureText(nm).width, 50), 44, "center", "top");
     } else if (sp) {
       const a = pr.role, b = `  ${pr.name}, ${pr.place}`, y = Yp(geom.box.y0) - 9;
       g.textBaseline = "middle"; g.textAlign = "left";
