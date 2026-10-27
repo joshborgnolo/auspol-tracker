@@ -3916,10 +3916,13 @@ const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "t
    28 and its President. Drawn by the House's renderer (drawChamber) like the Senate's floor; where
    a plan is filed (map/data/seats-<year>.json, seats-<year>-lc.json, from .build/map/sa_seating.mjs)
    each member sits at their desk, otherwise each bloc fills the benches from the chair's end.
-   New South Wales' Council (Parliament House, Sydney — parliament.nsw.gov.au's chamber photos)
-   stands the same officers the same way, five shallow bench rows curving round the far end, 21
-   members a side. Sydney's Assembly stood here too on its own straight blocks, but the real room
-   is the sister of Victoria's — a horseshoe of benches about a rectangular central table — so
+   New South Wales' Council (Parliament House, Sydney — after the chamber's own layout plan,
+   .build/map/src/nsw23-lc-plan/, Wayback 2026-07-15) stands the same officers the same way, its
+   members in two straight files of benches down each side (eleven beside ten, their far ends
+   aligned), the whips by the table, the Usher of the Black Rod on his own chair past the bench
+   ends, and the public gallery across the far wall. Sydney's Assembly stood here too on its own
+   straight blocks, but the real room is the sister of Victoria's — a horseshoe of benches about
+   a rectangular central table — so
    since 2026-10-27 it is drawn in app-3-chamber.js's own idiom (NSWB/nswGeom) like the federal
    House's floor, and only the Council remains on this one. The Council seats 42, none at a census
    desk here (no seating plan is filed: each bloc fills the benches sorted, saFloorOf/saGeom's
@@ -3956,22 +3959,23 @@ const SAF = {
     // a lone seat either side of the gangway, beyond the curves, facing the chair
     singles: [{ row: 2, x: 170, y: 201, L: "H1", R: "I1" }],
   },
-  // and New South Wales' Council (seats 42): five shallower rows round the same arrangement, the
-  // President under the galleries, the Clerks at the table, the Usher of the Black Rod by the bar —
-  // the government's members to the reader's left, the rest to the right. (Sydney's Assembly stood
-  // here on its own straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real
-  // room is Victoria's sister, a horseshoe about a rectangular central table.)
+  // and New South Wales' Council (seats 42), measured off its own layout plan
+  // (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15): two straight files of benches down
+  // each side, eleven beside ten, their far ends aligned past the bar — nobody level with the
+  // dais, no curved fan; the President under the galleries, the Clerks at the table, the Usher
+  // of the Black Rod on his own chair past the bench ends, in the slot a gangway's height would
+  // hold (gang stands in for the curves' centre the other floors carry). The government's
+  // members to the reader's left, the rest to the right. (Sydney's Assembly stood here too on
+  // straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real room is
+  // Victoria's sister, a horseshoe about a rectangular central table.)
   nswLC: {
-    room: [-580, -520, 580, 306], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
+    room: [-580, -520, 580, 154.4], chair: -470, officers: [-273, 56], table: [-314, -284, 88], mace: false, lead: ["A1", "B1"],
+    gang: 130, usher: 120,
     straight: [
-      { row: 1, x: 130, ys: [-300, -203, -106, -8], L: "A1 A2 A3 A4", R: "B1 B2 B3 B4" },
-      { row: 2, x: 250, ys: [-300, -226, -152, -78, -4], L: "C1 C2 C3 C4 C5", R: "I1 I2 I3 I4 I5" },
+      { row: 1, x: 130, ys: [-463, -416, -369, -322, -275, -228, -181, -134, -87, -40], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9 A10", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
+      { row: 2, x: 250, ys: [-510, -463, -416, -369, -322, -275, -228, -181, -134, -87, -40], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
     ],
-    arcs: [
-      { row: 3, a: 120, y: 8, r: 120, phi: [24, 54, 84], L: "D1 D2 D3", R: "J1 J2 J3" },
-      { row: 4, a: 120, y: 8, r: 192, phi: [15, 38, 61, 84], L: "E1 E2 E3 E4", R: "K1 K2 K3 K4" },
-      { row: 5, a: 120, y: 8, r: 264, phi: [12, 30, 48, 66, 84], L: "F1 F2 F3 F4 F5", R: "L1 L2 L3 L4 L5" },
-    ],
+    arcs: [],
   },
 };
 // every seat on a floor: { id, x, y (pixels), fa (the way it faces), row, arc? }
@@ -4000,8 +4004,9 @@ const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? 
 function saGeom(key) {
   if (saGeomC[key]) return saGeomC[key];
   const F = SAF[key], P = (v) => v / SAU;
-  // the curves' common centre, each side's (half the gap between them), for the order along the benches
-  const A = P(F.arcs.reduce((t, b) => t + b.a, 0) / F.arcs.length);
+  // the curves' common centre, each side's (half the gap between them), for the order along the
+  // benches (Sydney's Council has no curves — its gangway width stands in)
+  const A = P(F.arcs.length ? F.arcs.reduce((t, b) => t + b.a, 0) / F.arcs.length : F.gang ?? 0);
   // the order along the benches: down the government's side, round its curve, across the gangway
   // (its own stretch, 2A long), round the opposition's curve and up its side. A curve seat goes by
   // its angle about its own curve's centre, held to its own side of the gangway
@@ -4034,6 +4039,8 @@ function saGeom(key) {
   const rowX = rows.slice(1).map((r) => mean(r.filter((c) => !c.raw.arc && c.y < 0).map((c) => Math.abs(c.x))));
   const rowR = rows.slice(1).map((r) => { const a = r.filter((c) => c.raw.arc); return a.length ? mean(a.map((c) => P(c.raw.arc.r))) : null; });
   for (let j = rowR.length - 2; j >= 0; j--) if (rowR[j] == null) rowR[j] = rowR[j + 1] - P(SA_SEAT.D + 14);
+  // a floor with no curves (Sydney's Council): the walkways run with the rows' own bookshelves
+  if (rowR.every((v) => v == null)) for (let j = 0; j < rowR.length; j++) rowR[j] = rowX[j];
   const walk = (v) => { const w = [v[0] - (v.length > 1 ? (v[1] - v[0]) / 2 : 0.7)]; for (let j = 1; j < v.length; j++) w.push((v[j - 1] + v[j]) / 2); w.push(v[v.length - 1] + 0.75); return w.map((x) => Math.max(0.15, x)); };
   const GS = walk(rowX), GC = walk(rowR);
   const benchPt = (s, k) => {
@@ -4139,6 +4146,8 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   // the officers: the Clerk on the chair's right, the Chairman of Committees, the Deputy Clerk
   const [oy, odx] = SF.officers, W = P(30) * s, Dp = P(28) * s;
   for (const ox of [-odx, 0, odx]) drawChair(g, X(P(ox)), Yp(P(oy)), Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
+  // Sydney's Council keeps the Usher of the Black Rod at the bar, on his own chair facing back to the President
+  if (SF.usher != null) drawChair(g, X(0), Yp(P(SF.usher)), -Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
   g.lineWidth = 1; g.strokeStyle = css(th.line);
   if (opts.big && s >= 16) {
     g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";

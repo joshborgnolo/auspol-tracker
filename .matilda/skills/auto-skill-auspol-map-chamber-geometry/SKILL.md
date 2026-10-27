@@ -1,6 +1,6 @@
 ---
 name: auspol-map-chamber-geometry
-description: "auspol-tracker — the /map/ chamber renderer's TWO geometry idioms and the worked nsw23 chamber redesign (2026-10-27, user-directed across TWO same-day lands: Sydney's Assembly is Victoria's sister — horseshoe about ONE rectangular central table, no Hansard desk/pair, two clerks alone chair at its head; then the floor rebuilt pedantically — NOTHING level with the dais, two straight files of 12+12 per side starting at the table's shoulders, three curved rows of 6/9/6 per side, 92 desks for the floor's 92 seated members exactly). app-3-chamber.js holds the federal/arc idiom as THREE compact-object ledgers (CHB 151 federal, VCHB 88 vic22, NSWB 92 nsw23) plus the shared geomFor builder (walkways/gangway/SPEAKER_at/lead-bunkering) and per-house furniture branches in drawChamberFurniture (vic22: Hansard pair @ TableW + no mace; nsw23: ONE rectangle table + mace + 2 clerks + NO officers/grooves/Hansard/tier-boxes, a second straight bench across B.row2X, the Serjeant centred behind the back row); app-3c-sa.js keeps the rect-floor SAF ledger idiom (ha/lc seated, nswLC fill-the-benches; SAF.nswLA was DELETED same day — the NSW Assembly never touches saFloorOf again). chamberGeom dispatch order is vic-arc ← nsw-arc ← SA-rect ← senate ← House. Test-rooted geometry via @<name>-cells-begin/end markers eval'd by test-map-page.mjs's new Function blocks (sa-cells off app-3c-sa.js, vic-cells AND nsw-cells off app-3-chamber.js); probes pin paint-level contracts (96 nsw chair clusters = 92 members + Speaker + 2 clerks + Serjeant; ZERO outlined-empty desks; 4-vertex rectangle vs the federal T's 8) with the canvas-primitive hook recipe (see auspol-headless-geometry-verify's canvas section). Cross-jurisdiction guard: the NSW Assembly's geometry is NOT a source for seating/census extrapolation (three note homes: .build/map/sa_seating.mjs header, .build/map/vics/README.md, app-3c-sa.js SA_GEOM comment)."
+description: "auspol-tracker — the /map/ chamber renderer's TWO geometry idioms and the worked nsw23 chamber redesign (2026-10-27, user-directed across THREE same-day lands: Sydney's Assembly is Victoria's sister — horseshoe about ONE rectangular central table, no Hansard desk/pair, two clerks alone chair at its head; then the floor rebuilt pedantically — NOTHING level with the dais, two straight files of 12+12 per side starting at the table's shoulders, three curved rows of 6/9/6 per side, 92 desks for the floor's 92 seated members exactly; then the plan-fidelity pass febaa202 — NSWB.row2Y0 staggers the outer straight file one pitch speaker-side so its head is LEVEL with the leaders' desks and the inner file protrudes one seat at the rear, sectors[2] [7,83,6]→[33,83,6] so the outer curve's side-most |x| EQUALS the middle row's (170.5 v 169.7, was 208), and ONE landscape officials' box per side under geom.nsw where the House/vic keep three portrait boxes). app-3-chamber.js holds the federal/arc idiom as THREE compact-object ledgers (CHB 151 federal, VCHB 88 vic22, NSWB 92 nsw23) plus the shared geomFor builder (walkways/gangway/SPEAKER_at/lead-bunkering) and per-house furniture branches in drawChamberFurniture (vic22: Hansard pair @ TableW + no mace; nsw23: ONE rectangle table + mace + 2 clerks + NO officers/grooves/Hansard/tier-boxes, a second straight bench across B.row2X, the Serjeant Rsj0 centred (0,242) behind the back row — the parliament's own 'chair separating the benches', per its chamber history + the 2023 plan's Deputy-Serjeant legend item). app-3c-sa.js keeps the rect-floor SAF ledger idiom (ha/lc seated, nswLC fill-the-benches; SAF.nswLA was DELETED same day — the NSW Assembly never touches saFloorOf again). chamberGeom dispatch order is vic-arc ← nsw-arc ← SA-rect ← senate ← House. Test-rooted geometry via @<name>-cells-begin/end markers eval'd by test-map-page.mjs's new Function blocks (sa-cells off app-3c-sa.js, vic-cells AND nsw-cells off app-3-chamber.js) — the blocks also eval standalone via new Function from a one-off node -e when the suite itself is red on foreign WIP; probes pin paint-level contracts (96 nsw chair clusters = 92 members + Speaker + 2 clerks + Serjeant; ZERO outlined-empty desks; 4-vertex rectangle vs the federal T's 8) with the canvas-primitive hook recipe (see auspol-headless-geometry-verify's canvas section). Cross-jurisdiction guard: the NSW Assembly's geometry is NOT a source for seating/census extrapolation (three note homes: .build/map/sa_seating.mjs header, .build/map/vics/README.md, app-3c-sa.js SA_GEOM comment)."
 source: auto-skill
 extracted_at: '2026-10-27T08:00:00.000Z'
 ---
@@ -137,6 +137,27 @@ became content-derived literals = lowest bench + the same skirt transposed
 seats). Pins: test-map-page.mjs derives every SAF floor's wall from its ledger
 (skirt relation) and the NSW canvas probe hooks `arc` to pin the floor circle's
 radius in table-widths (2.8635 nsw23 vs the 2025 control's 3.1299).
+**Fifth land, same day** (the nswLC FLOOR REBUILD to the chamber's own plan):
+the user pointed at parliament.nsw.gov.au's official Council layout plan
+(Cloudflare-walled live → fetched via Wayback capture 20260715045417, archived
+at `.build/map/src/nsw23-lc-plan/chamber-layout-wayback-20260715.jpg`; 2480×3508
+CMYK — a model can't read an image, so `.matilda/ascii-img.swift`'s min-pooled
+darkest-pixel ASCII renderer + OCR of the legend, `sips -s format png` first)
+showed the real room has NO arcs: two straight files of benches per side, eleven
+beside ten, far ends aligned; President and clerks as before; the whips flank
+the table; the Usher of the Black Rod sits ALONE past the bench ends, centre.
+SAF.nswLC became `straight` rows only (`ys` two files a side, 10+11 each
+mirrored), `arcs: []`, `gang` + `usher` scalars. Two saGeom NaN traps open on an
+arc-free floor (grow this list if you ship another one): (a) the mean
+`F.arcs.reduce(...)/F.arcs.length` is 0/0 — fall back `F.gang ?? 0`; (b) the
+rowR null-fill loop leaves the LAST element null (nothing ever curves) — seed
+rowR from rowX when every entry is null. drawSAFurniture draws the Usher's chair
+next to the officers (`SF.usher != null` — a scalar y past the bench ends, never
+a member cell in saCells/byId, so the bench-fill and the 42-desk count ignore
+it). test-map-page.mjs's southern-wall pin's `bottom(F)` gained the usher's
+chair-bottom. The scratch probe that drove it headlessly lives at
+`.matilda/probe-scratch-nswlc.mjs` (the data-house buttons render only after
+setView("chamber") — click order matters).
 
 ## The `@<name>-cells` markers + test eval idiom
 

@@ -467,7 +467,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     const bottom = (F) => Math.max(
       ...F.straight.map((b) => Math.max(...b.ys) + benchW),
       ...F.arcs.map((a) => a.y + (a.r + benchD) * Math.sin((a.phi[a.phi.length - 1] + benchW / a.r / D2R) * D2R)),
-      ...(F.singles ?? []).map((q) => q.y + benchD));
+      ...(F.singles ?? []).map((q) => q.y + benchD),
+      ...(F.usher != null ? [F.usher + benchD] : []));
     for (const [k, F] of [["ha", SAF.ha], ["lc", SAF.lc], ["nswLC", SAF.nswLC]])
       assert.ok(Math.abs(F.room[3] - (bottom(F) + skirt)) <= 0.6,
         `${k}: the room's southern wall ends with its seats plus the carpet skirt (wall at ${F.room[3]}, the lowest bench at ${bottom(F).toFixed(1)})`);
@@ -743,7 +744,9 @@ for (const y of ["sa22", "sa26"]) {
 }
 
 // New South Wales' chambers: the Council rides South Australia's floor
-// machinery (the @sa-cells SAF table in app-3c-sa.js) — five rows seat 42 —
+// machinery (the @sa-cells SAF table in app-3c-sa.js) — the chamber's own
+// layout plan (.build/map/src/nsw23-lc-plan/) puts its 42 in two straight
+// files a side, eleven beside ten, the Usher of the Black Rod at the bar —
 // but the Assembly is Victoria's sister room, a horseshoe about a
 // rectangular central table with no Hansard desk, so it draws on the
 // House's own idiom in app-3-chamber.js (the @nsw-cells NSWB table): its
