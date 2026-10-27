@@ -60,9 +60,10 @@ shared by every federal-idiom floor (2026-10-27 user call; NSW's had sat mid-tab
 -189 — at Sydney's Assembly the table's head lies away from the Speaker).
 Same call's nameplate trim: "The table" paints for the federal House, Spring Street,
 the vic LC and the federal Senate only — Adelaide's two chambers and Sydney's Assembly
-name their table nothing (drawSAFurniture gates the `put` on `geom.key === "nswLC"`,
-drawChamberFurniture folds its label pair into `!geom.nsw`); Sydney's Council keeps its
-plan's caption.
+name their table nothing (drawChamberFurniture folds its label pair into `!geom.nsw`);
+Sydney's Council kept its plan's caption until the sixth nswLC land below, when ALL
+furniture labels left it (user: furniture shows through shapes alone, so
+drawSAFurniture carries no labels at all — `put` is gone from app-3c entirely).
 Phone label-stack (`labelStack`): hoisted to `y0-50/35/13` with the crossbench label
 gated `only clockIn` and the whole band gated on `bandOn` (the centreWide rung).
 
@@ -163,6 +164,31 @@ it). test-map-page.mjs's southern-wall pin's `bottom(F)` gained the usher's
 chair-bottom. The scratch probe that drove it headlessly lives at
 `.matilda/probe-scratch-nswlc.mjs` (the data-house buttons render only after
 setView("chamber") — click order matters).
+**Sixth land, same day** (the user-directed layout pass over the shipped Council
+floor, with image-space coordinates treated as approximate illustration): all four
+bench files moved ENTIRELY inside the carpet sharing one span (-468..+108, inner
+10-seat file at x=±152 pitch 64, outer 11-seat at ±272 pitch 57.6 — keep pitches
+representable: the test rounds each interval to 1dp, so a 64.44… pitch fails as
+64.4≠64.5); the open U dais became a shallow closed platform (`plat`, x±68,
+y-511..-403) with the President's big chair plus a smaller deputy (`plat.deputy`),
+both furniture-neutral; the clerks' short desk moved up (`table` y-374..-345) with
+TWO officer chairs above it (`twoOfficers`, skip the centre slot), never three
+below; a NEW long table (`ltable`): square head, rounded bar end (outer path +
+6px-inset burgundy fill over stain-wood, r=58/52 arcs at cy=y1-r), seven neutral
+flank chairs a side at ±77 (clear floor to the inner file), the Black Rod a short
+faint stroke near the rounded end; the Usher slid to y=76 on the centreline;
+across the wall went the transverse backing (`transverse`, y148..184, two
+outline-only halves split by a 28px bar gap — a physical-layout note, no seats);
+and the majority THREAD is suppressed for nswLC in drawChamber (`geom.key !==
+"nswLC" ? majorityCuts` — a dashed line through the benches read as pointing at
+one arbitrary seat) with "22 for a majority" drawn centred under the floor at
+`box.y1+0.62u` instead. The southern wall stays content+skirt (189.4 = transverse
+184 + 5.4; test-map-page's `bottom(F)` gained `F.transverse`). Every label is
+political now; probe-scratch-nswlc.mjs pins the render-level contract on desktop
+and phone frames (61 chair clusters = 42 party + 19 neutral officials — 2 clerks,
+the usher, 2 platform, 14 flank — zero dashes, no furniture words, centreline
+shapes centred on the carpet's midline, nothing past the side walls, arc hooks
+for the rounded table end).
 
 ## The `@<name>-cells` markers + test eval idiom
 

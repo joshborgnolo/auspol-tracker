@@ -707,8 +707,17 @@ function drawChamber(g, m, w, h, opts) {
   };
   // the majority line, threaded between the chairs from the front bench to the back row; only
   // when sorted, where it marks the seats that would fall first (in the seating plan it would
-  // only count round from the Speaker's end)
-  const cuts = opts.labels !== false && !ch.plan ? majorityCuts(ch, geom) : null;
+  // only count round from the Speaker's end). Sydney's Council draws no thread at all — its
+  // figure stands alone under the floor (the 2026-10-27 layout pass: a dashed line that landed
+  // on one arbitrary seat read as a pointer)
+  const cuts = opts.labels !== false && !ch.plan && geom.key !== "nswLC" ? majorityCuts(ch, geom) : null;
+  if (!cuts && geom.key === "nswLC" && opts.labels !== false && !ch.plan && (opts.big || s > 6)) {
+    const mt = `${ch.maj} for a majority`, my = Yp(geom.box.y1 + 0.62);
+    g.font = `600 ${opts.big ? 12 : 11}px ${SANS}`; g.fillStyle = css(th.ink2);
+    g.textAlign = "center"; g.textBaseline = "top";
+    g.fillText(mt, X(0), my);
+    claim(X(0), my, g.measureText(mt).width, 16, "center", "top");
+  }
   if (cuts) {
     const pts = [];
     cuts.forEach((c, k) => {

@@ -53,21 +53,29 @@ const SAF = {
     // a lone seat either side of the gangway, beyond the curves, facing the chair
     singles: [{ row: 2, x: 170, y: 201, L: "H1", R: "I1" }],
   },
-  // and New South Wales' Council (seats 42), measured off its own layout plan
-  // (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15): two straight files of benches down
-  // each side, eleven beside ten, their far ends aligned past the bar — nobody level with the
-  // dais, no curved fan; the President under the galleries, the Clerks at the table, the Usher
-  // of the Black Rod on his own chair past the bench ends, in the slot a gangway's height would
-  // hold (gang stands in for the curves' centre the other floors carry). The government's
-  // members to the reader's left, the rest to the right. (Sydney's Assembly stood here too on
-  // straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real room is
-  // Victoria's sister, a horseshoe about a rectangular central table.)
+  // and New South Wales' Council (seats 42), laid out after the chamber photographs and its own
+  // plan (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15): two straight files of benches down
+  // each side, eleven beside ten, held entirely inside the floor and sharing one vertical span;
+  // at the President's end a shallow closed platform (the President's chair, a deputy's in front
+  // of it), then the clerks' short desk with its two officers between desk and platform, then the
+  // long central table — square at the President's end, rounded at the bar end, neutral chairs
+  // down its flanks and the Black Rod beside its rounded end — the Usher alone centreline below
+  // it, and across the far wall the transverse bench backing, outline only, split by the bar gap:
+  // no seats drawn on it, no seats named (the plan's lower-row transverse seating marks no member).
+  // No furniture is labelled — the furniture shows through its shapes; only the political labels
+  // and the majority figure hang text (2026-10-27 geometry pass: benches moved inside the carpet,
+  // the U dais closed into the platform, the long table and the transverse backing added, the
+  // majority's dashed thread replaced by the figure below the floor).
   nswLC: {
-    room: [-580, -520, 580, 154.4], chair: -470, officers: [-273, 56], table: [-314, -284, 88], mace: false, lead: ["A1", "B1"],
-    gang: 130, usher: 120,
+    room: [-580, -520, 580, 189.4], chair: -490, chairW: 44, chairD: 42,
+    officers: [-388, 28], twoOfficers: true, table: [-374, -345, 87], mace: false, lead: ["A1", "B1"],
+    plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
+    ltable: { x: 58, y0: -316, y1: 10, cx: 77, chairs: [-300, -260, -220, -180, -140, -100, -60], rod: 32 },
+    transverse: { y0: 148, y1: 184, half: 301, gap: 14 },
+    gang: 130, usher: 76,
     straight: [
-      { row: 1, x: 130, ys: [-463, -416, -369, -322, -275, -228, -181, -134, -87, -40], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9 A10", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
-      { row: 2, x: 250, ys: [-510, -463, -416, -369, -322, -275, -228, -181, -134, -87, -40], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
+      { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -148, -84, -20, 44, 108], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9 A10", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
+      { row: 2, x: 272, ys: [-468, -410.4, -352.8, -295.2, -237.6, -180, -122.4, -64.8, -7.2, 50.4, 108], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
     ],
     arcs: [],
   },
@@ -155,7 +163,7 @@ function saGeom(key) {
     key, seats, rows, nRows, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
     // the bloc labels hang just outside the room's walls
     rOut: rx1 - 0.6, box: { x0: rx0, x1: rx1, y0: ry0, y1: ry1 }, rect: true, cutPad: P(SA_SEAT.W / 2 + 10),
-    arms: false, table: F.lead, chairAt: [0, P(F.chair), Math.PI / 2, 0, P(40), P(38)],
+    arms: false, table: F.lead, chairAt: [0, P(F.chair), Math.PI / 2, 0, P(F.chairW ?? 40), P(F.chairD ?? 38)],
     aisle: P((F.officers[0] + F.straight[0].ys[0]) / 2 + 40), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
     // the stretch of bench a position along it falls on, as seats' seg (the gangway's -1; a lone seat's curve)
     segAt: (s) => (s <= 0 ? 0 : s < Q ? 1 : s <= Q + GAP ? -1 : s < 2 * Q + GAP ? 4 : 3),
@@ -211,15 +219,48 @@ function drawSAFurniture(g, F, geom, opts = {}) {
     }
     for (const q of SF.singles || []) rb(side * q.x - hw, q.y - hd, 2 * hw, 2 * hd);
   }
-  // the dais, raised above the floor, its step drawn inside
-  const dais = (inset) => { const w = 52 - inset, yt = SF.room[1] + 6 + inset, yc = SF.chair + 12; g.beginPath(); g.moveTo(-w, yt); g.lineTo(w, yt); g.lineTo(w, yc); g.arc(0, yc, w, 0, Math.PI); g.closePath(); };
-  dais(0); g.fillStyle = wood; g.fill(); g.stroke();
-  dais(7); g.fillStyle = bench; g.fill();
+  // the dais, raised above the floor, its step drawn inside — Sydney's Council instead keeps a
+  // shallow closed platform at the President's end (its own plan and the chamber photographs:
+  // no open U), one piece with its front lip
+  if (SF.plat) {
+    const { w: pw, y0: py0, y1: py1 } = SF.plat;
+    g.beginPath(); if (g.roundRect) g.roundRect(-pw, py0, 2 * pw, py1 - py0, 8); else g.rect(-pw, py0, 2 * pw, py1 - py0);
+    g.fillStyle = wood; g.fill(); g.stroke();
+  } else {
+    const dais = (inset) => { const w = 52 - inset, yt = SF.room[1] + 6 + inset, yc = SF.chair + 12; g.beginPath(); g.moveTo(-w, yt); g.lineTo(w, yt); g.lineTo(w, yc); g.arc(0, yc, w, 0, Math.PI); g.closePath(); };
+    dais(0); g.fillStyle = wood; g.fill(); g.stroke();
+    dais(7); g.fillStyle = bench; g.fill();
+  }
   // the table below it, the officers' chairs at its head; the Mace on the Assembly's
   const [t0, t1, tw] = SF.table;
   g.lineWidth = Math.max(hair, (0.05 * s) / k); g.strokeStyle = wood; g.fillStyle = bench;
   rb(-tw, t0, 2 * tw, t1 - t0, 3);
   g.lineWidth = hair; g.strokeStyle = css(th.line);
+  // Sydney's Council's long table: separate from the clerks' desk above it — square at the
+  // President's end, rounded at the bar end, a timber rim about a dark burgundy inset, and the
+  // Black Rod's short staff near the rounded end
+  if (SF.ltable) {
+    const L = SF.ltable;
+    const tPath = (inset) => {
+      const r = L.x - inset, cy = L.y1 - r;
+      g.beginPath(); g.moveTo(-r, L.y0 + inset); g.lineTo(r, L.y0 + inset); g.lineTo(r, cy); g.arc(0, cy, r, 0, Math.PI); g.closePath();
+    };
+    const burg = css(mixC(th.floor, [104, 28, 38], th.dark ? 0.55 : 0.78));
+    tPath(0); g.fillStyle = wood; g.fill(); g.stroke();
+    tPath(6); g.fillStyle = burg; g.fill();
+    g.strokeStyle = css(th.faint); g.lineWidth = Math.max(hair, (0.05 * s) / k); g.lineCap = "round";
+    g.beginPath(); g.moveTo(-16, L.rod); g.lineTo(16, L.rod); g.stroke();
+    g.lineCap = "butt"; g.lineWidth = hair; g.strokeStyle = css(th.line);
+  }
+  // the far wall's transverse backing: straight sections split at the bar, outline only —
+  // a physical-layout note, never a member's seat
+  if (SF.transverse) {
+    const T = SF.transverse;
+    for (const [x0, x1] of [[-T.half, -T.gap], [T.gap, T.half]]) {
+      g.beginPath(); if (g.roundRect) g.roundRect(x0, T.y0, x1 - x0, T.y1 - T.y0, 4); else g.rect(x0, T.y0, x1 - x0, T.y1 - T.y0);
+      g.stroke();
+    }
+  }
   if (SF.mace && s > 9) {
     const my = t1 - 11, mx = tw * 0.45;
     g.strokeStyle = css(th.faint); g.lineWidth = Math.max(hair, (0.07 * s) / k); g.lineCap = "round";
@@ -237,16 +278,24 @@ function drawSAFurniture(g, F, geom, opts = {}) {
     g.beginPath(); if (g.roundRect) g.roundRect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1, r); else g.rect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1);
     g.stroke(); g.restore();
   }
-  // the officers: the Clerk on the chair's right, the Chairman of Committees, the Deputy Clerk
+  // the officers: the Clerk on the chair's right, the Chairman of Committees, the Deputy Clerk —
+  // Sydney's Council two, chairing between the clerks' desk and the platform, not below the desk
   const [oy, odx] = SF.officers, W = P(30) * s, Dp = P(28) * s;
-  for (const ox of [-odx, 0, odx]) drawChair(g, X(P(ox)), Yp(P(oy)), Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
+  for (const ox of SF.twoOfficers ? [-odx, odx] : [-odx, 0, odx]) drawChair(g, X(P(ox)), Yp(P(oy)), Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
   // Sydney's Council keeps the Usher of the Black Rod at the bar, on his own chair facing back to the President
   if (SF.usher != null) drawChair(g, X(0), Yp(P(SF.usher)), -Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
-  g.lineWidth = 1; g.strokeStyle = css(th.line);
-  if (opts.big && s >= 16) {
-    g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
-    const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
-    // the table's name is Sydney's Council's alone: Adelaide's chambers name it nothing
-    if (geom.key === "nswLC") put("The table", 0, P((t0 + t1) / 2 - (SF.mace ? 5 : 0)), P(2 * tw - 16));
+  // ... and on its platform the President's big chair with a deputy's smaller one in front, both
+  // the officers' neutral (never read as party seats)
+  if (SF.plat) {
+    drawChair(g, X(0), Yp(P(SF.chair)), Math.PI / 2, P(SF.chairW ?? 40) * s, P(SF.chairD ?? 38) * s, css(officer), back(officer, 0.18), 1);
+    drawChair(g, X(0), Yp(P(SF.plat.deputy)), Math.PI / 2, P(32) * s, P(30) * s, css(officer), back(officer, 0.18), 1);
   }
+  // the neutral chairs down the long table's flanks, their number schematic, facing the table
+  if (SF.ltable) {
+    const L = SF.ltable, cw = P(20) * s, cd = P(26) * s;
+    for (const cx of [-L.cx, L.cx]) for (const cy of L.chairs) drawChair(g, X(P(cx)), Yp(P(cy)), cx < 0 ? 0 : Math.PI, cw, cd, css(officer), back(officer, 0.18), 1);
+  }
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  // (no furniture labels: the Council's furniture shows through its shapes — the political
+  // labels are the only text on its floor)
 }
