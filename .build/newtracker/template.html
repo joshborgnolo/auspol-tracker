@@ -1884,17 +1884,24 @@ body.dark .sens-band { opacity: 0.10; }
    masthead's own dial warms it. It lives on the opposite end of the SAME
    .show-score gate as .tab-score with the same timing pair, so the dial
    fading out and the score fading in are one move. Phone only: at ≥640px a
-   pinned bar with the hero on screen has plenty of room for its tabs alone,
-   and decorative by nature - never interactive, never in the tab order. */
+   pinned bar with the hero on screen has plenty of room for its tabs alone.
+   The dial is a door into its own story (the header's window.AP.openStory),
+   so pointer events follow the same visibility gate - the hidden dial
+   stays inert. */
 .tab-glyph {
   position: absolute; right: 5px; bottom: 9px; z-index: 1;
   display: none; pointer-events: none;
+  background: none; border: 0; padding: 3px; margin: -3px;
+  border-radius: 50%; cursor: pointer; color: inherit;
+  -webkit-tap-highlight-color: transparent;
   opacity: 0; transform: translateY(4px);
   transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
 }
+.tab-glyph svg { display: block; }
+.tab-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 @media (max-width: 640px) {
   .tab-glyph { display: block; }
-  .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; }
+  .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; pointer-events: auto; }
 }
 .ts-eyebrow {
   font-size: 11px; font-weight: 700;

@@ -211,7 +211,7 @@ function Tabs({
   const menuActive = menuTabs.find(t => t.id === active) || null;
   const pinHideTab = barTabs.find(t => t.pinHide);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [menuAt, setMenuAt] = React.useState(null);
+  const [menuTwo, setMenuTwo] = React.useState(false);
   const navRef = React.useRef(null);
   const menuBtn = React.useRef(null);
   const menuRef = React.useRef(null);
@@ -228,12 +228,14 @@ function Tabs({
     const br = b.getBoundingClientRect(),
       nr = n.getBoundingClientRect();
     const vw = window.innerWidth;
+    const m = menuRef.current;
     if (!window.AP.rd) {
       const w = Math.min(280, vw - 24);
       const x = Math.min(Math.max(br.right - w, 8), vw - 8 - w);
-      setMenuAt({
-        top: Math.round(br.bottom - nr.top),
-        left: Math.round(x - nr.left)
+      if (m) Object.assign(m.style, {
+        top: Math.round(br.bottom - nr.top) + "px",
+        left: Math.round(x - nr.left) + "px",
+        right: "auto"
       });
       return;
     }
@@ -246,19 +248,26 @@ function Tabs({
     const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
     let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)),
       R = L + w0;
-    if (pr.left - L < 16) L = Math.round(pr.left);
-    if (R - pr.right < 16) R = Math.round(pr.right);
+    if (pr.left - L < 16) L = pr.left;
+    if (R - pr.right < 16) R = pr.right;
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
-    setMenuAt({
-      two,
-      top: Math.round(br.bottom - nr.top),
-      left: L - Math.round(nr.left),
-      width: w,
-      gapA: Math.max(0, pr.left - L + 1),
-      gapB: Math.min(w, pr.right - L - 1),
-      maxH: stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) : null
+    setMenuTwo(two);
+    if (!m) return;
+    const gapA = Math.max(0, pr.left - L + 1),
+      gapB = Math.min(w, pr.right - L - 1);
+    Object.assign(m.style, {
+      top: Math.round(br.bottom - nr.top) + "px",
+      left: L - nr.left + "px",
+      right: "auto",
+      width: w + "px",
+      borderTopLeftRadius: gapA <= 1.5 ? "0px" : "",
+      borderTopRightRadius: gapB >= w - 1.5 ? "0px" : ""
     });
+    m.style.setProperty("--gap-a", gapA + "px");
+    m.style.setProperty("--gap-b", gapB + "px");
+    const list = m.querySelector(".tab-menu-list");
+    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
   };
   const openMenu = focusAt => {
     placeMenu();
@@ -273,18 +282,56 @@ function Tabs({
     setMenuOpen(false);
     if (refocus && menuBtn.current) menuBtn.current.focus();
   };
-  React.useEffect(() => {
-    if (!menuOpen) return;
-    const re = () => placeMenu();
-    window.addEventListener("resize", re);
-    window.addEventListener("scroll", re, {
+  const follow = React.useRef(null);
+  React.useLayoutEffect(() => {
+    if (!menuOpen) return undefined;
+    placeMenu();
+    const f = follow.current = {
+      raf: 0,
+      still: 0,
+      last: ""
+    };
+    const tick = () => {
+      f.raf = 0;
+      placeMenu();
+      const b = menuBtn.current,
+        pp = b && (b.querySelector(".tab-menu-paper") || b);
+      const r = pp ? pp.getBoundingClientRect() : null;
+      const key = r ? [r.left, r.right, r.bottom].join() : "";
+      f.still = key === f.last ? f.still + 1 : 0;
+      f.last = key;
+      if (f.still < 4) f.raf = requestAnimationFrame(tick);
+    };
+    const wake = f.wake = () => {
+      f.still = 0;
+      if (!f.raf) f.raf = requestAnimationFrame(tick);
+    };
+    const n = navRef.current;
+    window.addEventListener("resize", wake);
+    window.addEventListener("scroll", wake, {
       passive: true
     });
+    if (n) {
+      n.addEventListener("transitionrun", wake);
+      n.addEventListener("transitionend", wake);
+    }
+    wake();
     return () => {
-      window.removeEventListener("resize", re);
-      window.removeEventListener("scroll", re);
+      if (f.raf) cancelAnimationFrame(f.raf);
+      follow.current = null;
+      window.removeEventListener("resize", wake);
+      window.removeEventListener("scroll", wake);
+      if (n) {
+        n.removeEventListener("transitionrun", wake);
+        n.removeEventListener("transitionend", wake);
+      }
     };
-  }, [menuOpen]);
+  }, [menuOpen, menuTwo]);
+  React.useLayoutEffect(() => {
+    if (!follow.current) return;
+    placeMenu();
+    follow.current.wake();
+  }, [pinned, heroGone]);
   React.useEffect(() => {
     if (!menuOpen) return;
     const onDigit = e => {
@@ -572,38 +619,33 @@ function Tabs({
     fill: "none"
   })))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
-  }), React.createElement(GlyphDial, {
+  }), React.createElement("button", {
+    type: "button",
     className: "tab-glyph",
+    title: "Wind the dial back through the term",
+    "aria-label": "Wind the dial back through the term",
+    "aria-describedby": "wm-action",
+    onClick: e => {
+      if (window.AP.openStory) window.AP.openStory(e, e.currentTarget);
+    }
+  }, React.createElement(GlyphDial, {
     width: "34",
     height: "23.8"
-  }), React.createElement(TabScore, {
+  })), React.createElement(TabScore, {
     onGoHero: goHero,
     matchup: tppMatchup,
     tppBasis: tppBasis
   })), menuOpen && (rdMenu ? React.createElement("div", {
-    className: "tab-menu-pop" + (menuAt && menuAt.two ? " tab-menu-two" : ""),
+    className: "tab-menu-pop" + (menuTwo ? " tab-menu-two" : ""),
     id: "tab-menu-pop",
     role: "menu",
     "aria-label": "More pages",
     ref: menuRef,
-    style: menuAt ? {
-      top: menuAt.top + "px",
-      left: menuAt.left + "px",
-      right: "auto",
-      width: menuAt.width + "px",
-      "--gap-a": menuAt.gapA + "px",
-      "--gap-b": menuAt.gapB + "px",
-      borderTopLeftRadius: menuAt.gapA <= 1.5 ? 0 : undefined,
-      borderTopRightRadius: menuAt.gapB >= menuAt.width - 1.5 ? 0 : undefined
-    } : null,
     onKeyDown: onMenuKey
   }, React.createElement("div", {
-    className: "tab-menu-list",
-    style: menuAt && menuAt.maxH ? {
-      maxHeight: menuAt.maxH + "px"
-    } : null
+    className: "tab-menu-list"
   }, (rowEls => {
-    if (!(menuAt && menuAt.two)) return rowEls;
+    if (!menuTwo) return rowEls;
     const k = Math.ceil(menuTabs.length / 2);
     return React.createElement(React.Fragment, null, React.createElement("div", {
       className: "tab-menu-col"
@@ -656,11 +698,6 @@ function Tabs({
     role: "menu",
     "aria-label": "More pages",
     ref: menuRef,
-    style: menuAt ? {
-      top: menuAt.top + "px",
-      left: menuAt.left + "px",
-      right: "auto"
-    } : null,
     onKeyDown: onMenuKey
   }, pinHideTab && React.createElement("a", {
     role: "menuitem",

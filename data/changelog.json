@@ -394,7 +394,7 @@
     },
     "conf": {
       "business": 76.5,
-      "consumer": 67.7,
+      "consumer": 67.9,
       "nabBusiness": -13,
       "westpacConsumer": 80.4
     }
@@ -518,6 +518,12 @@
       "label": "26 Oct 2026",
       "kind": "finding",
       "text": "The fall in the share naming crime a top-three issue over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-10-27",
+      "label": "27 Oct 2026",
+      "kind": "conf",
+      "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 67.7 → 67.9."
     }
   ]
 }

@@ -249,12 +249,13 @@ function legendHTML(m) {
     case "flow": {
       // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
       // the groups whose preferences can be read are the other parties'
-      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", SA_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
-      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", SA_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
+      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", STATE_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
       const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
       if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
+      if (m.res.flOpv) h += `<div class="lg-note">Counted, not modelled — New South Wales re-counted every ballot paper. Preferences there are optional, so a ballot can exhaust before the final two; a share reads the ballots that reached them.</div>`;
       break;
     }
     case "informal":
@@ -363,9 +364,9 @@ function renderTimeline() {
   const tW = (s) => tlCtx.measureText(s).width;
   const rowsOf = [
     { i: 0, items: YEARS_FED.map((y) => ({ y, lab: short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y) })) },
-    { i: 1, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+\s*/, "") : yearLabel(y) })) },
-    { i: 2, items: YEARS_VIC.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+\s*/, "") : yearLabel(y) })) },
-    { i: 3, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + yearLabel(y).replace(/^\S+\s*/, "") : yearLabel(y) })) },
+    { i: 1, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
+    { i: 2, items: YEARS_VIC.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
+    { i: 3, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
   ];
   for (const R of rowsOf) {
     const r = rows[R.i], labY = r.base + 15;

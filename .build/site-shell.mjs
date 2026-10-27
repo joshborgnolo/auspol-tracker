@@ -936,6 +936,9 @@ body { height: auto; }
 .sh-menu-item.sh-menu-info { display: none; }
 @media (max-width: 640px) {
   .sh-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  /* unpinned the ☰ sits hard against the bar's clipped right end: step in by
+     the paper's overhang so the tab's side meets the sheet's (rd.css) */
+  .sh-tabs:not(.pinned) .sh-menu-btn { margin-right: 3px; }
   .sh-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
   .sh-menu-item.sh-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   .sh-menu-n { font-size: 17px; }
@@ -1250,13 +1253,15 @@ ${npProjectSrc()}
     new IntersectionObserver(function (es) {
       nav.classList.toggle("pinned", !es[0].isIntersecting);
       fitNext(); setTimeout(fitNext, 420);
+      mWake();
     }, { threshold: 0 }).observe(sent);
   }
   /* ---- the ☰ menu (the main page's Tabs menu): hangs off the button,
      arrow keys walk it, Escape or a press outside closes it ------------- */
   var mBtn = document.querySelector(".sh-menu-btn"), mPop = document.getElementById("sh-menu");
+  var mWake = function () {};
   if (nav && mBtn && mPop) {
-    var mAll = null;
+    var mAll = null, mTwo = null;
     var mItems = function () {
       var all = mPop.querySelectorAll('[role="menuitem"]'), out = [];
       for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
@@ -1274,7 +1279,10 @@ ${npProjectSrc()}
          the wider sheet keeps to the page's frame (the bar's inner box) */
       var two = vw >= 1060, list0 = mPop.querySelector(".sh-menu-list"), fin = nav.querySelector(".sh-tabs-inner");
       mPop.classList.toggle("sh-menu-two", two);
-      if (list0) {
+      /* the rows move between the columns only when the rung changes - mPlace
+         runs every frame of the pin's glide, and a re-appended row drops focus */
+      if (list0 && two !== mTwo) {
+        mTwo = two;
         if (!mAll) mAll = Array.prototype.slice.call(mPop.querySelectorAll(".sh-menu-item"));
         var cols = list0.querySelectorAll(".sh-menu-col");
         if (two) {
@@ -1290,12 +1298,12 @@ ${npProjectSrc()}
       var fr = two && fin ? fin.getBoundingClientRect() : null, lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
       var w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
       var L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
-      if (pr.left - L < 16) L = Math.round(pr.left);
-      if (R - pr.right < 16) R = Math.round(pr.right);
+      if (pr.left - L < 16) L = pr.left;
+      if (R - pr.right < 16) R = pr.right;
       var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
       var stuck = nav.classList.contains("pinned") && getComputedStyle(nav).position === "sticky";
       mPop.style.top = Math.round(br.bottom - nr.top) + "px";
-      mPop.style.left = (L - Math.round(nr.left)) + "px";
+      mPop.style.left = (L - nr.left) + "px";
       mPop.style.right = "auto";
       mPop.style.width = w + "px";
       mPop.style.setProperty("--gap-a", gA + "px");
@@ -1305,8 +1313,30 @@ ${npProjectSrc()}
       var list = mPop.querySelector(".sh-menu-list");
       if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
     };
+    /* the sheet follows the tab on every frame the tab moves (the main page's
+       Tabs follow, 2026-10-27): the pin's .38s condense runs on after the
+       scroll that set it off has stopped, so a scroll-only seat froze the
+       sheet off the tab. A scroll, a resize, the pin or a transition in the
+       bar wakes a frame loop that seats it before each paint and sleeps once
+       the tab has held still for a few frames */
+    var mRaf = 0, mStill = 0, mLast = "";
+    var mTick = function () {
+      mRaf = 0;
+      if (mPop.hidden) return;
+      mPlace();
+      var pp = mBtn.querySelector(".sh-menu-paper") || mBtn, r = pp.getBoundingClientRect();
+      var key = r.left + "," + r.right + "," + r.bottom;
+      mStill = key === mLast ? mStill + 1 : 0;
+      mLast = key;
+      if (mStill < 4) mRaf = requestAnimationFrame(mTick);
+    };
+    mWake = function () {
+      if (mPop.hidden) return;
+      mPlace(); mStill = 0;
+      if (!mRaf) mRaf = requestAnimationFrame(mTick);
+    };
     var mOpen = function (at) {
-      mPlace(); mPop.hidden = false; mBtn.setAttribute("aria-expanded", "true");
+      mPlace(); mPop.hidden = false; mWake(); mBtn.setAttribute("aria-expanded", "true");
       if (at != null) { var its = mItems(), el = at < 0 ? its[its.length - 1] : its[at]; if (el) el.focus(); }
     };
     var mClose = function (refocus) {
@@ -1382,8 +1412,10 @@ ${npProjectSrc()}
     document.addEventListener("pointerdown", function (e) {
       if (!mPop.hidden && !mPop.contains(e.target) && !mBtn.contains(e.target)) mClose(false);
     }, true);
-    window.addEventListener("resize", function () { if (!mPop.hidden) mPlace(); });
-    window.addEventListener("scroll", function () { if (!mPop.hidden) mPlace(); }, { passive: true });
+    window.addEventListener("resize", mWake);
+    window.addEventListener("scroll", mWake, { passive: true });
+    nav.addEventListener("transitionrun", mWake);
+    nav.addEventListener("transitionend", mWake);
   }
   /* the pinned set's END scale, off a parked pinned bar, so the countdown's
      room is measured against where the glide is heading and the scale in

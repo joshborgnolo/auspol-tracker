@@ -36,7 +36,21 @@ The frame's res file rides the sa22 shape exactly ({year,date,prev,
 jurisdiction,demoBasis,agg{AUS,NSW{...}},divs[],booths{}}; candidate rows
 [n,ab,pn,bucket,votes,swing,elected,x]; booth lanes d,id,n,ty,prem,sub,pc,
 lat,lon,v,inf,tpp,tcp,fl,dec,vdec with ty 1=day 4=mobile 5=EVC; tpp only on
-classic ALP-v-LNP final pairs; fl empty — no flow source for NSW 2023).
+classic ALP-v-LNP final pairs).
+
+The preferences lane is COUNTED, not modelled: the NSWEC publishes every
+ballot paper's preferences, and parse-nsw-state-flows.py's re-count of them
+(committed .build/state-flow-src/nsw/2023/counts.csv — never refetched, a
+miss fails the build) gives per district and candidate the ballots ending
+with each of the district's final pair plus the exhausted remainder. d.fl
+carries one [candIdx, toFinal1, toFinal2, exhausted] quadruple per
+NON-finalist candidate, oriented on the district's tcp pair (toFinal1 rides
+tcp[0]'s candidate); the finalists' own tallies are the tcp pair itself and
+never repeat in fl. Shares read of the ballots that reached the final two —
+NSW is optional preferential, so the exhausted slot is real here (the year
+carries flBasis "counted" + flOpv true; the federal and SA lanes carry no
+fourth slot). Booth tpp/tcp/fl stay empty — the NSWEC
+counts nothing below the district.
 
 Booths: the venue roll committed beside this script in
 .build/map/src/nsw23/venues/<event>/<nnn>-<district>.json (NSWEC map
@@ -55,7 +69,7 @@ usage: python3 -I .build/map/build_nsw23_data.py <out_dir>
 then:  python3 -I .build/map/build_nsw23_past.py <out_dir>
 then:  node .build/map/geo_build.mjs .build/map/src/nsw23 <out_dir> map/data --years=nsw23
 """
-import collections, gzip, html as H, json, os, re, sys
+import collections, csv, gzip, html as H, json, os, re, sys
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 FLOW = os.path.join(REPO, ".build", "state-flow-src", "nsw")
@@ -64,6 +78,7 @@ VENUES = os.path.join(NSW23, "venues")
 DEMO_STORE = os.path.join(REPO, "data", "nsw23-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "nsw23-seifa.json")
 DIST_IDS = os.path.join(NSW23, "district-ids.json")
+FLOW_COUNTS = os.path.join(FLOW, "2023", "counts.csv")
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 ELECTION = "2023-03-25"
@@ -579,6 +594,43 @@ def clean_booth_name(name):
     return name.strip()
 
 
+# ------------------------------------------- counted preference flows
+def load_flow_counts(slugs):
+    """The committed re-count of the NSWEC's ballot papers: {slug:
+    {"finals": [flatName, flatName], "rows": {flatName: (to_final1,
+    to_final2, exhausted, first_prefs)}}}, the frames' flattened name forms."""
+    if not os.path.exists(FLOW_COUNTS):
+        fail(f"{FLOW_COUNTS} missing — .build/parse-nsw-state-flows.py is the "
+             f"committed re-count of the NSWEC's ballot papers")
+    out = collections.defaultdict(lambda: {"finals": None, "rows": {}})
+    with open(FLOW_COUNTS, newline="") as f:
+        for r in csv.DictReader(f):
+            slug = r["district"]
+            if slug not in slugs:
+                fail(f"counts.csv names a district {slug!r} the frame lacks")
+            t1, t2, ex, fpv = (parse_int_cell(r[k]) for k in
+                               ("to_final1", "to_final2", "exhausted", "first_prefs"))
+            if t1 + t2 + ex != fpv:
+                fail(f"counts.csv {slug} {r['candidate']}: {t1}+{t2}+{ex} != fp {fpv}")
+            nm = flat_name(r["candidate"])
+            finals = (flat_name(r["final1"]), flat_name(r["final2"]))
+            d = out[slug]
+            if d["finals"] is None:
+                if finals[0] == finals[1]:
+                    fail(f"counts.csv {slug}: final1 == final2")
+                d["finals"] = list(finals)
+            elif tuple(d["finals"]) != finals:
+                fail(f"counts.csv {slug}: finals drift within the district")
+            if nm in d["rows"]:
+                fail(f"counts.csv {slug}: duplicate candidate {nm!r}")
+            d["rows"][nm] = (t1, t2, ex, fpv)
+    missing = slugs - set(out)
+    if missing:
+        fail(f"counts.csv has no rows for {sorted(missing)[:3]}"
+             f"{'…' if len(missing) > 3 else ''} — the 2023 re-count is short")
+    return out
+
+
 # ------------------------------------------------------------------ main
 def main():
     os.makedirs(OUT, exist_ok=True)
@@ -589,6 +641,7 @@ def main():
     demo = load_demo()
     seifa = load_seifa()
     venues = load_venues()
+    flows = load_flow_counts(set(DIST_SLUGS))
     disp_of = {slug_for(2023, n): n for n in names}
     if set(disp_of) != set(DIST_SLUGS):
         fail(f"district name drift: roster-only {sorted(set(disp_of) - set(DIST_SLUGS))[:3]}, "
@@ -649,6 +702,30 @@ def main():
             tpp_tot[0] += va
             tpp_tot[1] += vb
 
+        # counted preference re-count: one [k, toA, toB, exhausted] quadruple
+        # per non-finalist, oriented on the tcp pair's own order. The finalists'
+        # rows carry no tuple — their ballots are the tcp pair itself.
+        frec = flows[slug]
+        f1n, f2n = frec["finals"]
+        if {f1n, f2n} != {rows[ia]["n"], rows[ib]["n"]}:
+            fail(f"2023 {slug}: flow finals {frec['finals']} are not the dop tcp pair")
+        if set(frec["rows"]) != {r["n"] for r in rows}:
+            fail(f"2023 {slug}: counts.csv candidates do not match the fp roll")
+        for slot, fn in ((0, f1n), (1, f2n)):
+            t1, t2, ex, fpv = frec["rows"][fn]
+            if (t1, t2)[slot] != fpv or (t1, t2)[1 - slot] != 0 or ex != 0:
+                fail(f"2023 {slug}: finalist {fn!r} has stray ballot flow "
+                     f"({t1} {t2} {ex} of fp {fpv})")
+        swap = f1n != rows[ia]["n"]
+        fl = []
+        for k, r in enumerate(rows):
+            if r["n"] in (f1n, f2n):
+                continue
+            t1, t2, ex, fpv = frec["rows"][r["n"]]
+            if fpv != r["v"]:
+                fail(f"2023 {slug}: counts.csv fp {fpv} != fp-page {r['v']} for {r['n']!r}")
+            fl.append([k, t2, t1, ex] if swap else [k, t1, t2, ex])
+
         # ---- booths
         for bk, v in enumerate(fp["venues"]):
             votes = [0] * len(rows)
@@ -706,7 +783,7 @@ def main():
             "c": [[r["n"], r["ab"], r["pn"], r["b"], r["v"], 0, 1 if r["el"] else 0, 0] for r in rows],
             "inf": fp["inf"],
             "tcp": tcp_pair,
-            "fl": [],
+            "fl": fl,
             "h": [],
             "enrolled": fp["enrolled"],
             "demo": demo[disp],
@@ -727,7 +804,7 @@ def main():
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
     out = {"year": "nsw23", "date": ELECTION, "prev": None, "jurisdiction": "NSW",
-           "demoBasis": "sa1",
+           "demoBasis": "sa1", "flBasis": "counted", "flOpv": True,
            "agg": {"AUS": agg, "NSW": dict(agg)}, "divs": D, "booths": B}
     p = os.path.join(OUT, "data-nsw23.json")
     with open(p, "w") as f:

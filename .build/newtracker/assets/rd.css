@@ -362,7 +362,11 @@ body.rd .rd-cal-track::before { content: "("; }
 body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
-  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
+  /* qualifiers ("today", "open now", "3 days overdue") temper the DATE, so
+     the wrapped line sits flush with the date cell above it - the earlier
+     108px name-column indent left a lone "today" looking like a stray
+     indented fragment (user phone report 2026-10-27) */
+  body.rd .rd-cal-q { flex-basis: 100%; }
   /* a day shared by two series stacks one series per line instead of the
      inline ", " flow, which could break inside a long series name and
      strand its first word at the end of the line above (a phone showed
@@ -796,6 +800,11 @@ body.rd .tab-menu-item.tab-menu-info { display: none; }
 }
 @media (max-width: 640px) {
   body.rd .tab-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  /* unpinned, the spread row puts the ☰ hard against the bar's right end,
+     and .tabs-inner clips there: the paper's 3px overhang (and its right
+     border) was cut off, so the tab's side stopped 3px short of the sheet's
+     (user phone report 2026-10-27). The button steps in by the overhang */
+  body.rd .tabs:not(.pinned) .tab.tab-menu { margin-right: 3px; }
   body.rd .tab-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
   body.rd .tab-menu-item.tab-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   body.rd .tab-menu-n { font-size: 17px; }

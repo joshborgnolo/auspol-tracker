@@ -212,6 +212,83 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
   await page.close();
 }
 
+/* QUALIFIER GEOMETRY (phone rung): a dated slot that lands ON today
+   carries a .rd-cal-q "today" span, which the <=640px rung wraps to its
+   own line; that line must sit flush with the date column's left edge.
+   The 108px name-column indent the rule used to carry stranded a lone
+   "today" far to the right - the stray indented fragment of the
+   2026-10-27 user phone report. The main loop's pages run on the real
+   clock, where no slot is usually "today", so find the first dated
+   confidence slot from the live projection and replay the page with
+   Date pinned to 08:00 Sydney on that day (before every timed
+   confidence house's release hour, so nothing flips into "Due"). */
+const slotPg = await browser.newPage();
+await slotPg.goto(base + "/", { waitUntil: "load" });
+await new Promise((r) => setTimeout(r, 1200));
+const slotIso = await slotPg.evaluate(() => {
+  const proj = window.AP.nextPolls(null, { horizonDays: 62, includeTracked: true });
+  const row = proj.rows.find((r) => r.tracked === "confidence" && !r.overdue &&
+                                    !(r.loose && r.cadence <= 60) && r.cadence <= 60);
+  return row ? new Date(row.release).toISOString().slice(0, 10) : null;
+});
+await slotPg.close();
+check("a dated confidence slot exists in the window", !!slotIso);
+if (slotIso) {
+  /* the UTC instant whose Sydney local clock reads slotIso T08:00
+     (Sydney is UTC+10 or UTC+11; exactly one of the two candidates
+     formats back to the same calendar date and hour) */
+  let fixedMs = null;
+  for (const off of [10, 11]) {
+    const t = Date.parse(slotIso + "T00:00:00Z") + (8 - off) * 3600000;
+    const p = {};
+    for (const x of new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", hourCycle: "h23" }).formatToParts(new Date(t))) p[x.type] = x.value;
+    if (`${p.year}-${p.month}-${p.day}` === slotIso && (Number(p.hour) % 24) === 8) fixedMs = t;
+  }
+  const pgT = await browser.newPage();
+  await pgT.setViewport({ width: 390, height: 844, isMobile: true });
+  await pgT.evaluateOnNewDocument((fixed) => {
+    const D = Date;
+    class MockDate extends D {
+      constructor(...a) { super(...(a.length ? a : [fixed])); }
+      static now() { return fixed; }
+    }
+    MockDate.parse = D.parse; MockDate.UTC = D.UTC;
+    window.Date = MockDate;
+  }, fixedMs);
+  await pgT.goto(base + "/", { waitUntil: "load" });
+  await new Promise((r) => setTimeout(r, 1500));
+  const rq = await pgT.evaluate(() => {
+    const det = document.querySelector("#confidence details.rd-conf-cal");
+    if (!det) return { rows: [] };
+    det.open = true;
+    /* text offset, not element box: the q span used to carry its indent
+       as padding-left, which moves the text without moving the box */
+    const tl = (e) => {
+      const r = e.getBoundingClientRect();
+      return { left_x: +(r.left + (parseFloat(getComputedStyle(e).paddingLeft) || 0)).toFixed(1),
+               top_y: +r.top.toFixed(1) };
+    };
+    return { rows: [...det.querySelectorAll("li")].map((li) => {
+      const d = li.querySelector(".rd-cal-d"), q = li.querySelector(".rd-cal-q");
+      return q && d ? { txt: q.textContent.trim(), q: tl(q), date: tl(d) } : null;
+    }).filter(Boolean) };
+  });
+  const today = rq.rows.find((r) => r.txt === "today");
+  check("phone 'today' qualifier renders under the mocked date", !!today,
+        slotIso + " rows -> " + JSON.stringify(rq.rows.map((r) => r.txt)));
+  check("phone qualifier wraps to its own line below the date",
+        rq.rows.length > 0 && rq.rows.every((r) => r.q.top_y > r.date.top_y + 2),
+        JSON.stringify(rq.rows));
+  /* the defect itself: with padding-left 108px the q word measured 128
+     against the date cell's 20 - a lone left-flush qualifier is the fix */
+  check("phone wrapped qualifier is flush with the date column",
+        rq.rows.length > 0 && rq.rows.every((r) => Math.abs(r.q.left_x - r.date.left_x) <= 1),
+        JSON.stringify(rq.rows));
+  await pgT.close();
+}
+
 await browser.close();
 server.close();
 if (fails.length) { console.log("\nFAIL\n  " + fails.join("\n  ")); process.exit(1); }

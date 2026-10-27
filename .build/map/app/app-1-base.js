@@ -467,8 +467,8 @@ const S = {
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
-// a state frame names itself "SA 22"/"NSW 23": the state's abbreviation + year's
-const yearLabel = (y) => (y === "now" ? "Now" : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()} ${String(y).slice(-2)}` : String(y));
+// a state frame names itself "SA2022"/"NSW2023": the state's abbreviation + full year
+const yearLabel = (y) => (y === "now" ? "Now" : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}` : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -517,7 +517,7 @@ function deriveDiv(d, i, year) {
   // seat), or One Nation
   const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
   const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
-  const flows = d.fl.map(([ci, ta, tb]) => ({ cand: c[ci], ta, tb }));
+  const flows = d.fl.map(([ci, ta, tb, exh]) => (exh == null ? { cand: c[ci], ta, tb } : { cand: c[ci], ta, tb, exh }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
