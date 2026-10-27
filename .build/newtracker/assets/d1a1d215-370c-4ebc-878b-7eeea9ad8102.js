@@ -299,6 +299,28 @@ function NextPollTicker({ showScore }) {
 // ====================================================================
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
+/* A box inside the tab set, through the set's pin glide: where it sat when
+   the glide began (a), where it will rest (b), and how far along it is (t).
+   The set scales about its left edge (transform-origin left bottom), so a
+   box's x is linear in the scale: at scale k it sits at x0 + (x - x0)·k/s.
+   The ends are the running transition's first and last keyframes; null
+   when nothing is gliding (the box is at rest). Only x - the bottom is the
+   origin's line. */
+const menuGlide = (r, set) => {
+  if (!set || !set.getAnimations) return null;
+  try {
+    const run = set.getAnimations().find((a) => a.transitionProperty === "transform");
+    const ks = run && run.effect ? run.effect.getKeyframes() : null;
+    if (!ks || ks.length < 2) return null;
+    const sc = (v) => new DOMMatrix(v || "none").a || 1;
+    const s = sc(getComputedStyle(set).transform), sa = sc(ks[0].transform), sb = sc(ks[ks.length - 1].transform);
+    if (Math.abs(sb - sa) < 1e-4) return null;
+    const x0 = set.getBoundingClientRect().left;
+    const at = (k) => ({ left: x0 + (r.left - x0) * k / s, right: x0 + (r.right - x0) * k / s });
+    return { a: at(sa), b: at(sb), t: Math.min(1, Math.max(0, (s - sa) / (sb - sa))) };
+  } catch (e) { return null; }
+};
+
 function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   // Sticky on every view. Once the bar is pinned AND the hero's 2PP figures
   // have scrolled out of view, a compact score docks into the right side of
@@ -368,20 +390,38 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     const fr = two && n.querySelector(".tabs-inner") ? n.querySelector(".tabs-inner").getBoundingClientRect() : null;
     const lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
     const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
-    let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
-    /* unrounded where the sheet ends with the tab: rounded, it stepped a
-       pixel at a time behind the tab through the end of the pin's glide */
-    if (pr.left - L < 16) L = pr.left;
-    if (R - pr.right < 16) R = pr.right;
-    const w = R - L;
+    /* the sheet for a tab at q - unrounded where it ends with the tab, so
+       the two sides meet to the sub-pixel */
+    const seatAt = (q) => {
+      let L = Math.round(Math.min(Math.max(q.left, lo), hi - w0)), R = L + w0;
+      const tied = q.left - L < 16, ends = R - q.right < 16;
+      if (tied) L = q.left;
+      if (ends) R = q.right;
+      return { L, R, tied, ends };
+    };
+    /* Through the pin's glide the sheet's edges run from its seat for the
+       tab where the glide began to its seat for the tab at rest, in step
+       with the glide: an edge tied to the tab tracks it exactly (x is linear
+       in the scale), one the screen's margin holds goes straight to its new
+       place, and none overshoots. Seated off the moving tab instead, the
+       16px reach flipped mid-glide: an unpinning phone sheet held the
+       screen's edge until the growing tab came within reach, snapped in past
+       where the tab would stop and rode back out with it (user report
+       2026-10-27: "goes inwards a little too far and then ... back out").
+       The opening under the tab follows the tab itself (pr) */
+    const g = menuGlide(pr, n.querySelector(".tabs-set"));
+    const A = seatAt(g ? g.a : pr), B = g ? seatAt(g.b) : A, t = g ? g.t : 1;
+    const L = A.L + (B.L - A.L) * t, R = A.R + (B.R - A.R) * t, w = R - L;
+    const tied = B.tied, ends = B.ends;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuTwo(two);
     if (!m) return;
     /* the tab's sides to the sub-pixel: mid-condense the tab is scaled, and
        a rounded opening left a sliver of the sheet's edge showing under it */
-    const gapA = Math.max(0, pr.left - L + 1), gapB = Math.min(w, pr.right - L - 1);
+    const gapA = Math.max(0, pr.left - L + 1), gapB = Math.max(gapA, Math.min(w, pr.right - L - 1));
+    /* the corners square where the tab will sit, so it glides into a square one */
     Object.assign(m.style, { top: Math.round(br.bottom - nr.top) + "px", left: L - nr.left + "px", right: "auto", width: w + "px",
-                             borderTopLeftRadius: gapA <= 1.5 ? "0px" : "", borderTopRightRadius: gapB >= w - 1.5 ? "0px" : "" });
+                             borderTopLeftRadius: tied ? "0px" : "", borderTopRightRadius: ends ? "0px" : "" });
     m.style.setProperty("--gap-a", gapA + "px");
     m.style.setProperty("--gap-b", gapB + "px");
     const list = m.querySelector(".tab-menu-list");

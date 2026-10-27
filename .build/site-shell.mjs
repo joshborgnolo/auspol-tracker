@@ -1274,6 +1274,23 @@ ${npProjectSrc()}
     var mPlace = function () {
       var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect(), vw = window.innerWidth;
       var pp = mBtn.querySelector(".sh-menu-paper"), pr = pp ? pp.getBoundingClientRect() : br;
+      /* the tab through the set's pin glide - where it sat when the glide
+         began (ga), where it will rest (gb), how far along (gt): the main
+         page's menuGlide, which says why */
+      var ga = pr, gb = pr, gt = 1, set = nav.querySelector(".sh-tabs-set");
+      try {
+        var runs = set.getAnimations ? set.getAnimations() : [], ks = null;
+        for (var ai = 0; ai < runs.length; ai++) if (runs[ai].transitionProperty === "transform" && runs[ai].effect) ks = runs[ai].effect.getKeyframes();
+        if (ks && ks.length > 1) {
+          var sc = function (v) { return new DOMMatrix(v || "none").a || 1; };
+          var s = sc(getComputedStyle(set).transform), sa = sc(ks[0].transform), sb = sc(ks[ks.length - 1].transform);
+          if (Math.abs(sb - sa) >= 1e-4) {
+            var x0 = set.getBoundingClientRect().left;
+            var at = function (k) { return { left: x0 + (pr.left - x0) * k / s, right: x0 + (pr.right - x0) * k / s }; };
+            ga = at(sa); gb = at(sb); gt = Math.min(1, Math.max(0, (s - sa) / (sb - sa)));
+          }
+        }
+      } catch (e) { ga = gb = pr; gt = 1; }
       /* two columns from 1060px, as the main page's menu (2026-10-25): each
          column a sheet of its own, read down the first and then the second;
          the wider sheet keeps to the page's frame (the bar's inner box) */
@@ -1297,10 +1314,19 @@ ${npProjectSrc()}
       }
       var fr = two && fin ? fin.getBoundingClientRect() : null, lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
       var w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
-      var L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
-      if (pr.left - L < 16) L = pr.left;
-      if (R - pr.right < 16) R = pr.right;
-      var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
+      /* the sheet for a tab at q; through the glide its edges run from the
+         seat where the glide began to the seat at rest, in step with it, so
+         none overshoots (the main page's placeMenu, which says why) */
+      var seatAt = function (q) {
+        var L = Math.round(Math.min(Math.max(q.left, lo), hi - w0)), R = L + w0;
+        var tied = q.left - L < 16, ends = R - q.right < 16;
+        if (tied) L = q.left;
+        if (ends) R = q.right;
+        return { L: L, R: R, tied: tied, ends: ends };
+      };
+      var A = seatAt(ga), B = seatAt(gb);
+      var L = A.L + (B.L - A.L) * gt, R = A.R + (B.R - A.R) * gt, w = R - L, tied = B.tied, ends = B.ends;
+      var gA = Math.max(0, pr.left - L + 1), gB = Math.max(gA, Math.min(w, pr.right - L - 1));
       var stuck = nav.classList.contains("pinned") && getComputedStyle(nav).position === "sticky";
       mPop.style.top = Math.round(br.bottom - nr.top) + "px";
       mPop.style.left = (L - nr.left) + "px";
@@ -1308,8 +1334,8 @@ ${npProjectSrc()}
       mPop.style.width = w + "px";
       mPop.style.setProperty("--gap-a", gA + "px");
       mPop.style.setProperty("--gap-b", gB + "px");
-      mPop.style.borderTopLeftRadius = gA <= 1.5 ? "0" : "";
-      mPop.style.borderTopRightRadius = gB >= w - 1.5 ? "0" : "";
+      mPop.style.borderTopLeftRadius = tied ? "0" : "";
+      mPop.style.borderTopRightRadius = ends ? "0" : "";
       var list = mPop.querySelector(".sh-menu-list");
       if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
     };

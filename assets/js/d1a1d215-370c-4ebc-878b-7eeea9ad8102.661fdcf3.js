@@ -194,6 +194,31 @@ function NextPollTicker({
     }, " (maybe)")))))
   );
 }
+const menuGlide = (r, set) => {
+  if (!set || !set.getAnimations) return null;
+  try {
+    const run = set.getAnimations().find(a => a.transitionProperty === "transform");
+    const ks = run && run.effect ? run.effect.getKeyframes() : null;
+    if (!ks || ks.length < 2) return null;
+    const sc = v => new DOMMatrix(v || "none").a || 1;
+    const s = sc(getComputedStyle(set).transform),
+      sa = sc(ks[0].transform),
+      sb = sc(ks[ks.length - 1].transform);
+    if (Math.abs(sb - sa) < 1e-4) return null;
+    const x0 = set.getBoundingClientRect().left;
+    const at = k => ({
+      left: x0 + (r.left - x0) * k / s,
+      right: x0 + (r.right - x0) * k / s
+    });
+    return {
+      a: at(sa),
+      b: at(sb),
+      t: Math.min(1, Math.max(0, (s - sa) / (sb - sa)))
+    };
+  } catch (e) {
+    return null;
+  }
+};
 function Tabs({
   tabs,
   active,
@@ -246,23 +271,41 @@ function Tabs({
     const lo = fr ? fr.left : 8,
       hi = fr ? fr.right : vw - 8;
     const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
-    let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)),
-      R = L + w0;
-    if (pr.left - L < 16) L = pr.left;
-    if (R - pr.right < 16) R = pr.right;
-    const w = R - L;
+    const seatAt = q => {
+      let L = Math.round(Math.min(Math.max(q.left, lo), hi - w0)),
+        R = L + w0;
+      const tied = q.left - L < 16,
+        ends = R - q.right < 16;
+      if (tied) L = q.left;
+      if (ends) R = q.right;
+      return {
+        L,
+        R,
+        tied,
+        ends
+      };
+    };
+    const g = menuGlide(pr, n.querySelector(".tabs-set"));
+    const A = seatAt(g ? g.a : pr),
+      B = g ? seatAt(g.b) : A,
+      t = g ? g.t : 1;
+    const L = A.L + (B.L - A.L) * t,
+      R = A.R + (B.R - A.R) * t,
+      w = R - L;
+    const tied = B.tied,
+      ends = B.ends;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuTwo(two);
     if (!m) return;
     const gapA = Math.max(0, pr.left - L + 1),
-      gapB = Math.min(w, pr.right - L - 1);
+      gapB = Math.max(gapA, Math.min(w, pr.right - L - 1));
     Object.assign(m.style, {
       top: Math.round(br.bottom - nr.top) + "px",
       left: L - nr.left + "px",
       right: "auto",
       width: w + "px",
-      borderTopLeftRadius: gapA <= 1.5 ? "0px" : "",
-      borderTopRightRadius: gapB >= w - 1.5 ? "0px" : ""
+      borderTopLeftRadius: tied ? "0px" : "",
+      borderTopRightRadius: ends ? "0px" : ""
     });
     m.style.setProperty("--gap-a", gapA + "px");
     m.style.setProperty("--gap-b", gapB + "px");

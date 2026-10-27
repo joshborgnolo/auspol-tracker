@@ -30,7 +30,7 @@ const browser = await puppeteer.launch({
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const ok = (cond, msg) => { console.log((cond ? " ok  " : "FAIL ") + msg); if (!cond) fails++; };
-const widths = process.argv[2] ? [Number(process.argv[2])] : [320, 375, 390, 430, 600, 800];
+const widths = process.argv[2] ? [Number(process.argv[2])] : [320, 375, 390, 430, 600, 800, 1000, 1280];
 /* the main page and a satellite (site-shell.js carries the same folder) */
 const sites = [
   { url: "/#allpolls", nav: ".tabs", btn: ".tab.tab-menu", paper: ".tab-menu-paper", pop: ".tab-menu-pop" },
@@ -67,6 +67,7 @@ for (const S of sites) for (const W of widths) {
       const b = pop.getBoundingClientRect();
       const ga = parseFloat(pop.style.getPropertyValue("--gap-a")) || 0, gb = parseFloat(pop.style.getPropertyValue("--gap-b")) || 0;
       out.push({ tag, t: Math.round(performance.now() - t0),
+        sL: +b.left.toFixed(2), sR: +b.right.toFixed(2),
         dTop: +(b.top - a.bottom).toFixed(2),           // sheet top v tab foot
         dL: +((b.left + ga - 1) - a.left).toFixed(2),   // opening's left v tab's left
         dR: +((b.left + gb + 1) - a.right).toFixed(2),  // opening's right v tab's right
@@ -87,6 +88,26 @@ for (const S of sites) for (const W of widths) {
   ok(gone === 0, `${S.url} ${W}px: the menu stays open through the pin (${gone} closed frames)`);
   ok(bad.length === 0, `${S.url} ${W}px: tab and sheet joined on every frame (${bad.length}/${log.length} off)`
      + (bad.length ? "\n      " + bad.slice(0, 6).map((r) => `${r.tag}@${r.t} top${r.dTop} L${r.dL} R${r.dR}${r.pinned ? " P" : ""}`).join("\n      ") : ""));
+  /* the sheet's own edges move one way through each glide: straight to where
+     the tab will rest, never past it and back (user report 2026-10-27: on
+     unpinning, the right edge went "inwards a little too far and then ...
+     back out") */
+  const oneWay = (tags, k) => {
+    const v = log.filter((r) => !r.gone && tags.includes(r.tag)).map((r) => r[k]);
+    let dir = 0, turns = 0;
+    for (let i = 1; i < v.length; i++) {
+      const d = v[i] - v[i - 1];
+      if (Math.abs(d) < 0.25) continue;
+      if (dir && Math.sign(d) !== dir) turns++;
+      dir = Math.sign(d);
+    }
+    return { turns, from: v[0], to: v[v.length - 1], min: Math.min(...v), max: Math.max(...v) };
+  };
+  for (const [ph, tags] of [["pinning", ["down", "rest-pinned"]], ["unpinning", ["up", "rest-unpinned"]]]) for (const k of ["sL", "sR"]) {
+    const o = oneWay(tags, k);
+    ok(o.turns === 0 && o.min >= Math.min(o.from, o.to) - 0.25 && o.max <= Math.max(o.from, o.to) + 0.25,
+       `${S.url} ${W}px: ${ph}, the sheet's ${k === "sL" ? "left" : "right"} edge moves one way (${o.from} → ${o.to}, range ${o.min}–${o.max}, ${o.turns} turns)`);
+  }
   const rp = last("rest-pinned"), ru = last("rest-unpinned");
   ok(rp && !rp.gone && Math.abs(rp.dL) < .75 && Math.abs(rp.dR) < .75 && Math.abs(rp.dTop) < .75, `${S.url} ${W}px: at rest pinned ${JSON.stringify(rp)}`);
   ok(ru && !ru.gone && Math.abs(ru.dL) < .75 && Math.abs(ru.dR) < .75 && Math.abs(ru.dTop) < .75, `${S.url} ${W}px: at rest unpinned ${JSON.stringify(ru)}`);
