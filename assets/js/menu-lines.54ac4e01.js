@@ -371,7 +371,7 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
       return {
         head: `${who} holds ${n} of the ${H.total} seats` + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
         fig: {
-          v: String(n),
+          v: `${Math.round(100 * n / H.total)}%`,
           cap: lead === "alp" ? "Labor seats" : "Coalition seats",
           tone: lead
         }

@@ -38,9 +38,9 @@
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
-     Election map        the seats the largest party holds today, in its
-                         tone, under "Labor holds 94 of the 150 seats" (and
-                         how many seats have changed hands or party since
+     Election map        the largest party's share of the House's seats today,
+                         in its tone, under "Labor holds 94 of the 150 seats"
+                         (and how many seats have changed hands or party since
                          the election, where any have)
      Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
@@ -365,8 +365,9 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
     });
     /* the House today (/map/, a page outside this build): the largest party's
-       seats out of the chamber's, and the seats that have changed hands or
-       party since the election by by-election or defection */
+       share of the chamber's seats as its figure, the raw count in the head,
+       and the seats that have changed hands or party since the election by
+       by-election or defection */
     put("map", () => {
       const H = D.house;
       if (!H) return null;
@@ -377,7 +378,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const k = H.changed, kw = W[k] || String(k);
       return { head: `${who} holds ${n} of the ${H.total} seats`
           + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
-        fig: { v: String(n), cap: lead === "alp" ? "Labor seats" : "Coalition seats", tone: lead } };
+        fig: { v: `${Math.round((100 * n) / H.total)}%`, cap: lead === "alp" ? "Labor seats" : "Coalition seats", tone: lead } };
     });
     /* the catalogue's newest wave as a date figure, as the changelog row's */
     put("public-opinion", () => {
