@@ -252,23 +252,11 @@ const LENSES = [
 const FED_LENS = new Set(["senate", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
-// figure swipes (a swipe cycles all the way around); the lens and row walks
-// are keyboard only — a phone scrolls the lens row itself, and its vertical
-// drags belong to the page. On the phone a walk keeps the view fixed
-// (walkHold below), and has no scroll side effects of its own
+// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
+// only — a phone scrolls the lens row itself. On the phone a walk keeps the
+// view fixed (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
-// the up/down-arrows row walk: the timeline's rows top to bottom, in
-// renderTimeline's `rows` order, walking round the ends; a row holds the stop
-// it was left on (setYear keeps the memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
-const laneMem = new Map();
-function walkLane(dir) {
-  const cur = yearLane(S.year);
-  laneMem.set(cur, S.year);
-  const lane = LANES[(LANES.indexOf(cur) + dir + LANES.length) % LANES.length];
-  setYear(laneMem.get(lane) ?? lane[lane.length - 1]);
-}
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -2363,8 +2351,12 @@ function vicCells() {
    as the chamber's own seating plan draws them (2026-10-27, the user's pass over the plan):
    NO row runs up beside the Speaker's dais — each side has TWO straight files of twelve
    running parallel to the table from its shoulders down, the Premier and the Leader of the
-   Opposition heading the inner one (nothing sits level with the dais), and the far end turns
-   in THREE curved rows of 6, 9 and 6 a side. 92 desks for the 92 members exactly; the
+   Opposition heading the inner one (nothing sits level with the dais), the outer file
+   standing one seat the Speaker's side of the inner (its head level with the leaders'
+   desks, the inner file protruding one seat at the rear), and the far end turning
+   in THREE curved rows of 6, 9 and 6 a side — the outer row spanning no wider sideways
+   than the middle row's far desk (the three user calls of 2026-10-27, over the plan).
+   92 desks for the 92 members exactly; the
    Serjeant-at-Arms's chair stands centred behind the curve, "the chair separating the
    benches" (the parliament's own description).
    @nsw-cells-begin */
@@ -2372,8 +2364,11 @@ const NSWB = {
   leadY: -268.2, // the leaders' desks, heading the inner straight row at the table's shoulder
   arm: { x: 130, y0: -250, pitch: 18.2, n: 12 }, // the inner straight row, continuing the inner curve's radius
   row2X: 172, // the outer straight row, continuing the middle curve's radius (2026-10-27 user call)
+  row2Y0: -268.2, // its head one seat the Speaker's side of the inner file's — level with the leaders' desks — so the inner file protrudes one seat at the rear (2026-10-27 user call)
   R: [130, 172, 214], // the curve's three rows
-  sectors: [[[6, 84, 6]], [[5, 85, 9]], [[7, 83, 6]]],
+  // the outer curve spans no wider sideways than the middle row's far desk (|x| ≈ 170 at
+  // R 214 = a0 33°): its six seats crowd the rear half of the arc (2026-10-27 user call)
+  sectors: [[[6, 84, 6]], [[5, 85, 9]], [[33, 83, 6]]],
   // the walkway radii the majority line threads (the House's CH tables presume five curve
   // rows): inside the inner file, between the files, past the outer file; then inside the
   // curve, between the curve rows, past the outer one (so the line ends by the seats, not
@@ -2387,7 +2382,7 @@ function nswCells() {
     const sx = side ? 1 : -1, P = side ? "R" : "L", fa = side ? Math.PI : 0;
     cells.push({ id: `${P}t0`, x: sx * NSWB.arm.x, y: NSWB.leadY, fa, row: 1, w: NSWB.arm.pitch });
     for (let i = 0; i < NSWB.arm.n; i++) cells.push({ id: `${P}a${i}`, x: sx * NSWB.arm.x, y: NSWB.arm.y0 + NSWB.arm.pitch * i, fa, row: 1, w: NSWB.arm.pitch });
-    for (let i = 0; i < NSWB.arm.n; i++) cells.push({ id: `${P}b${i}`, x: sx * NSWB.row2X, y: NSWB.arm.y0 + NSWB.arm.pitch * i, fa, row: 2, w: NSWB.arm.pitch });
+    for (let i = 0; i < NSWB.arm.n; i++) cells.push({ id: `${P}b${i}`, x: sx * NSWB.row2X, y: NSWB.row2Y0 + NSWB.arm.pitch * i, fa, row: 2, w: NSWB.arm.pitch });
     NSWB.sectors.forEach((secs, k) => secs.forEach(([a0, a1, n], q) => {
       for (let i = 0; i < n; i++) {
         const a = (a0 + ((i + 0.5) * (a1 - a0)) / n) * D, r = NSWB.R[k];
@@ -2833,7 +2828,7 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   for (const sx of [-1, 1]) {
     const lo = (a, b) => [Math.min(a, b), Math.max(a, b)];
     { const [x0, x1] = lo(sx * (B.arm.x - 13), sx * (B.arm.x + 13)); rr(x0, B.arm.y0 - 12, x1, B.arm.y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
-    if (B.row2X !== undefined) { const [x0, x1] = lo(sx * (B.row2X - 13), sx * (B.row2X + 13)); rr(x0, B.arm.y0 - 12, x1, B.arm.y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
+    if (B.row2X !== undefined) { const [x0, x1] = lo(sx * (B.row2X - 13), sx * (B.row2X + 13)), y0 = B.row2Y0 ?? B.arm.y0; rr(x0, y0 - 12, x1, y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
     for (const bx of B.blockX ?? []) for (const [t0, t1] of B.tierY) { const [x0, x1] = lo(sx * (bx - 13.5), sx * (bx + 13.5)); rr(x0, t0 - 14, x1, t1 + 14, 2); g.fill(); g.stroke(); }
     B.sectors.forEach((secs, k) => secs.forEach(([a0, a1]) => {
       const r0 = P(B.R[k] - 13.5) * s, r1 = P(B.R[k] + 13.5) * s;
@@ -2841,8 +2836,11 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
       const A0 = sx < 0 ? Math.PI - a0 * D : a0 * D, A1 = sx < 0 ? Math.PI - a1 * D : a1 * D;
       g.beginPath(); g.arc(X(0), Yp(0), r1, A0, A1, sx < 0); g.arc(X(0), Yp(0), r0, A1, A0, sx > 0); g.closePath(); g.fill(); g.stroke();
     }));
-    // the officials' boxes behind the front bench, on a rail
-    for (const cx of [222.9, 189.6, 147.7]) { const [x0, x1] = lo(sx * (cx - 12), sx * (cx + 12)); rr(x0, -373, x1, -322, 2); g.fill(); g.stroke(); }
+    // the officials' boxes behind the front bench, on a rail — three low boxes a
+    // side in the House and at Spring Street; Macquarie Street stands ONE broad
+    // side-on box a side, its length along the rail (2026-10-27 user call)
+    if (geom.nsw) { const [x0, x1] = lo(sx * 159.8, sx * 210.8); rr(x0, -359.5, x1, -335.5, 2); g.fill(); g.stroke(); }
+    else for (const cx of [222.9, 189.6, 147.7]) { const [x0, x1] = lo(sx * (cx - 12), sx * (cx + 12)); rr(x0, -373, x1, -322, 2); g.fill(); g.stroke(); }
     g.beginPath(); g.moveTo(X(P(sx * 236)), Yp(P(-318))); g.lineTo(X(P(sx * 121)), Yp(P(-318))); g.lineWidth = Math.max(1, s * 0.07); g.strokeStyle = wood; g.stroke(); g.lineWidth = 1; g.strokeStyle = css(th.line);
   }
   // the Speaker's dais, raised above the floor, its step drawn inside
@@ -5887,7 +5885,6 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
-  laneMem.set(yearLane(y), y);
   if (S.house === "senate") {
     // the chosen senator carries across by name where they sat in both Senates, else their state
     const was = SENM, ss = S.ssel;
@@ -6187,7 +6184,6 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
-  if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -6256,7 +6252,7 @@ function preloadYears() {
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },
