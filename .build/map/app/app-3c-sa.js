@@ -65,9 +65,11 @@ const SAF = {
   // No furniture is labelled — the furniture shows through its shapes; only the political labels
   // and the majority figure hang text (2026-10-27 geometry pass: benches moved inside the carpet,
   // the U dais closed into the platform, the long table and the transverse backing added, the
-  // majority's dashed thread replaced by the figure below the floor).
+  // majority's dashed thread replaced by the figure below the floor; the carpet's side walls hug
+  // the widest seat — the outer files and the transverse share ±301 — plus the same skirt the
+  // south wall keeps).
   nswLC: {
-    room: [-580, -520, 580, 189.4], chair: -490, chairW: 44, chairD: 42,
+    room: [-306.4, -520, 306.4, 189.4], chair: -490, chairW: 44, chairD: 42,
     officers: [-388, 28], twoOfficers: true, table: [-374, -345, 87], mace: false, lead: ["A1", "B1"],
     plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
     ltable: { x: 58, y0: -316, y1: 10, cx: 77, chairs: [-300, -260, -220, -180, -140, -100, -60], rod: 32 },

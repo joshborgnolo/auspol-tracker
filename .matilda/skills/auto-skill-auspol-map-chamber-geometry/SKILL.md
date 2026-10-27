@@ -182,7 +182,15 @@ outline-only halves split by a 28px bar gap — a physical-layout note, no seats
 and the majority THREAD is suppressed for nswLC in drawChamber (`geom.key !==
 "nswLC" ? majorityCuts` — a dashed line through the benches read as pointing at
 one arbitrary seat) with "22 for a majority" drawn centred under the floor at
-`box.y1+0.62u` instead. The southern wall stays content+skirt (189.4 = transverse
+`box.y1+0.62u` instead. The carpet's SIDE walls then hugged the seats like its
+south wall hugs the south seats (follow-up user call same day, "it should hug the
+seats": the Council's carpet had kept the SA floors' ±580 stretch, nearly twice its
+content's width): `room[0..2]` in x now reads ±(widest content 301 + skirt) = ±306.4
+— the outer files and the transverse share the widest extent. The bloc labels and
+crossbench stack ride the walls with it (their x positions derive from
+`geom.box`/`rOut`, so the label layer needed no change) — and the 351px phone frame
+keeps every text span in-canvas (the layout probe checks text anchors+widths at
+1281/641/391). The southern wall stays content+skirt (189.4 = transverse
 184 + 5.4; test-map-page's `bottom(F)` gained `F.transverse`). Every label is
 political now; probe-scratch-nswlc.mjs pins the render-level contract on desktop
 and phone frames (61 chair clusters = 42 party + 19 neutral officials — 2 clerks,

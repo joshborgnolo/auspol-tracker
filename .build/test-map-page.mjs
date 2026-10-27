@@ -819,6 +819,9 @@ for (const y of ["sa22", "sa26"]) {
     assert.ok(F.transverse.y1 > F.transverse.y0 && F.transverse.gap < F.transverse.half / 2, "nswLC: the transverse backing splits at the bar gap");
     assert.ok(F.officers[0] > F.plat.y1 && F.officers[0] < F.table[0], "nswLC: the two officers' chairs between platform and desk");
     assert.equal(F.twoOfficers, true, "nswLC: two officers chair the clerks' desk, not three below it");
+    const widest = Math.max(...F.straight.map((r) => r.x + benchD), F.transverse.half);
+    assert.equal(F.transverse.half, widest, "nswLC: the transverse backing is the widest seat, level with the outer files");
+    assert.ok(Math.abs(-F.room[0] - (widest + 5.4)) <= 0.6 && F.room[0] === -F.room[2], "nswLC: the side walls hug the seats (widest seat + skirt), level either side");
   }
   assert.ok(!part("app-3c-sa.js").includes('put("The table"'), "no furniture labels on the Council's floor (the nameplate is gone)");
   assert.ok(part("app-3-chamber.js").includes('geom.key !== "nswLC" ? majorityCuts'), "nswLC draws no dashed majority thread");
