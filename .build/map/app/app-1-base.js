@@ -179,9 +179,21 @@ const isDemo = () => DM.includes(S.index);
 const isInc = (k) => k === "loinc" || k === "hiinc";
 const mny = (v) => (v == null ? "–" : `$${int(Math.round(v))}`);
 const incDollars = (m) => (m.incomeCuts && m.incomeCuts.dollarsYear ? ` in ${m.incomeCuts.dollarsYear} dollars` : "");
+// an interpolated year's loinc cut can't name one dollar epoch: the
+// share blends two census years' cuts, so the fragment names the range
+// the blend spans; the epoch wordage comes from incEpoch, once
+const incLoFrag = (m) => {
+  const s = m.incomeCuts && m.incomeCuts.sides;
+  if (m.demoInterp && s) {
+    const cuts = Object.keys(s).sort().map((y) => s[y].loCutWeekly);
+    return cuts[0] === cuts[1] ? `under ${mny(cuts[0])} a week` : `under ${mny(Math.min(...cuts))}–${mny(Math.max(...cuts))} a week`;
+  }
+  return `under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)} a week`;
+};
+const incEpoch = (m) => (m.demoInterp ? " in census-year dollars" : incDollars(m));
 const DM_VERB_INC = {
-  loinc: (m) => `live in households earning under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)} a week${incDollars(m)}`,
-  hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incDollars(m)}`,
+  loinc: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
+  hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
 };
 const dmVerb = (m, k) => (isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
@@ -777,6 +789,9 @@ async function loadYear(year) {
     m.res = res;
     m.demoBasis = res.demoBasis || null;
     m.incomeCuts = res.incomeCuts || null;
+    // the people-interp blend record rides the year on interpolated years
+    // (2007–2019); the demo copy and income epoch texts branch on it
+    m.demoInterp = res.demoInterp || null;
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));

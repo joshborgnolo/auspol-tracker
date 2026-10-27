@@ -224,15 +224,20 @@ for (const year of [2007, 2010]) {
 }
 
 // boundary-unchanged divisions carry identical division rows in both
-// eras; Fowler (redistributed) must differ
+// eras (the measured blocks; the demoI interp blocks legitimately
+// differ across eras — each era blends at its own day-share, f 0.259
+// vs 0.807); Fowler (redistributed) must differ
 {
   const d7 = new Map(JSON.parse(readFileSync("data/booth-demo-2007.json",
     "utf8")).divisions.map((x) => [x.div, x]));
   const d0 = new Map(JSON.parse(readFileSync("data/booth-demo-2010.json",
     "utf8")).divisions.map((x) => [x.div, x]));
+  const meas = (o) => { const { demoI, ...rest } = o; return rest; };
   for (const n of ["Bennelong", "Lingiari", "Wentworth"]) {
-    eq(JSON.stringify(d0.get(n)), JSON.stringify(d7.get(n)),
-      `${n} row identical across eras (unchanged boundary)`);
+    eq(JSON.stringify(meas(d0.get(n))), JSON.stringify(meas(d7.get(n))),
+      `${n} measured row identical across eras (unchanged boundary)`);
+    ok(JSON.stringify(d0.get(n).demoI) !== JSON.stringify(d7.get(n).demoI),
+      `${n} demoI differs across eras (the era's own f)`);
   }
   ok(JSON.stringify(d0.get("Fowler")) !== JSON.stringify(d7.get("Fowler")),
     "Fowler row differs across eras (redistributed)");

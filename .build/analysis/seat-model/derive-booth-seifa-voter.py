@@ -819,6 +819,334 @@ def band_median(masses):
     return None
 
 
+# ------------------------------------------- people-interp (census blends)
+# The voter-basis years of the /map/ people-interpolation lanes: the
+# people cells interpolate between the bracketing censuses to election
+# day at the SEIFA pcti lanes' day-share f (hist.interp_f — the SAME
+# map; the cross-read keeps both stores' factors identical), blending
+# shares directly. 2019 folds its Ed2-native units on the 2016 GCP
+# (g16.load_gcp16) beside the measured 2021 fold; 2016 folds its
+# Ed1-native units on the 2011 BCP beside its scoring walk's Ed2 units
+# on the 2016 GCP (f ≈ 0.979 — the census sat five weeks after
+# election day). The blend emits demoI blocks beside demo: a block
+# missing on either census side stays null whole (the display falls
+# back to the measured block), and a lane missing on either side stays
+# null inside its block (the pcti far-suppressed convention, per
+# lane). incMed and the incomeCuts dollar labels pin to the NEAREST
+# census side — a blended dollar figure would mix epochs.
+INTERP = {
+    2016: {"c0": 2011, "c1": 2016},
+    2019: {"c0": 2016, "c1": 2021},
+}
+_G16 = None
+_D13 = None
+
+
+def _g16():
+    global _G16
+    if _G16 is None:
+        spec = importlib.util.spec_from_file_location(
+            "g16m", SM / "derive-booth-demo-2016.py")
+        _G16 = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_G16)
+    return _G16
+
+
+def _d13():
+    global _D13
+    if _D13 is None:
+        spec = importlib.util.spec_from_file_location(
+            "d13m", SM / "derive-booth-demo-2013.py")
+        _D13 = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_D13)
+    return _D13
+
+
+def demo_units_i(units, gcp):
+    """demo_units folded for the interp sides: identical accumulation,
+    except the income band histograms ride only rows that carry them
+    (the 2011 BCP-side map emits income scalars but its 14-band
+    histograms stay home — they are never a nearest side, so the
+    masses are never consumed)."""
+    nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
+           "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
+           "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
+           "bluen": 0.0, "occd": 0.0,
+           "inct": 0.0, "incl": 0.0, "inch": 0.0,
+           "incbh": None}
+    divs = {}
+    out = {}
+    for key, kv in units.items():
+        tot = sum(kv.values())
+        if tot <= 0:
+            out[key] = None
+            continue
+        cov = pers = eng = oth = 0.0
+        aust = totc = cobns = uni = eduns = pop15 = 0.0
+        bluen = occd = 0.0
+        inct = incl = inch = 0.0
+        bands = [0.0] * len(DEMO_BANDS)
+        incbh = None
+        for code, w in kv.items():
+            r = gcp.get(code)
+            if r is None:
+                continue
+            cov += w
+            pers += w * r[0]
+            eng += w * r[1]
+            oth += w * r[2]
+            for i in range(len(DEMO_BANDS)):
+                bands[i] += w * r[3][i]
+            aust += w * r[4]
+            totc += w * r[5]
+            cobns += w * r[6]
+            uni += w * r[7]
+            eduns += w * r[8]
+            bluen += w * r[9]
+            occd += w * r[10]
+            pop15 += w * (r[0] - r[3][0] - r[3][1])
+            inct += w * r[11]
+            incl += w * r[12]
+            inch += w * r[13]
+            if len(r) > 15 and r[15] is not None:
+                if incbh is None:
+                    incbh = [0.0] * len(INC_BANDS)
+                for i in range(len(INC_BANDS)):
+                    incbh[i] += w * r[15][i]
+        dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
+                                      "pers": 0.0, "eng": 0.0,
+                                      "oth": 0.0,
+                                      "bands": [0.0] * len(DEMO_BANDS),
+                                      "aust": 0.0, "totc": 0.0,
+                                      "cobns": 0.0, "uni": 0.0,
+                                      "eduns": 0.0, "pop15": 0.0,
+                                      "bluen": 0.0, "occd": 0.0,
+                                      "inct": 0.0, "incl": 0.0,
+                                      "inch": 0.0, "incbh": None})
+        dv["votes"] += tot
+        dv["cov"] += cov
+        dv["pers"] += pers
+        dv["eng"] += eng
+        dv["oth"] += oth
+        for i in range(len(DEMO_BANDS)):
+            dv["bands"][i] += bands[i]
+        for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("bluen", bluen), ("occd", occd),
+                     ("inct", inct), ("incl", incl), ("inch", inch)):
+            dv[k] += v
+        if incbh is not None:
+            if dv["incbh"] is None:
+                dv["incbh"] = [0.0] * len(INC_BANDS)
+            for i in range(len(INC_BANDS)):
+                dv["incbh"][i] += incbh[i]
+        cov /= tot
+        nat["votes"] += tot
+        nat["pers"] += pers
+        nat["eng"] += eng
+        nat["oth"] += oth
+        for i in range(len(DEMO_BANDS)):
+            nat["bands"][i] += bands[i]
+        for k, v in (("aust", aust), ("totc", totc), ("cobns", cobns),
+                     ("uni", uni), ("eduns", eduns), ("pop15", pop15),
+                     ("bluen", bluen), ("occd", occd),
+                     ("inct", inct), ("incl", incl), ("inch", inch)):
+            nat[k] += v
+        if incbh is not None:
+            if nat["incbh"] is None:
+                nat["incbh"] = [0.0] * len(INC_BANDS)
+            for i in range(len(INC_BANDS)):
+                nat["incbh"][i] += incbh[i]
+        bsum = sum(bands)
+        fb_den = totc - cobns
+        uni_den = pop15 - eduns
+        out[key] = {
+            "persons": int(round(pers)),
+            "cov": round(cov, 4),
+            "langOther":
+                round(oth / (eng + oth), 4) if eng + oth > 0 else None,
+            "fborn":
+                round((fb_den - aust) / fb_den, 4) if fb_den > 0 else None,
+            "uni":
+                round(uni / uni_den, 4) if uni_den > 0 else None,
+            "blue":
+                round(bluen / occd, 4) if occd > 0 else None,
+            "age": ({b: round(bands[i] / bsum, 4)
+                     for i, b in enumerate(DEMO_BANDS)}
+                    if bsum > 0 else None),
+            "loinc": round(incl / inct, 4) if inct > 0 else None,
+            "hiinc": round(inch / inct, 4) if inct > 0 else None,
+        }
+    return out, nat, divs
+
+
+_GCP11 = None
+
+
+def gcp11():
+    """The 2011 BCP universe in the _GCP row layout (income histograms
+    omitted — see demo_units_i), keyed 7-digit SA1 2011, plus its
+    income-cuts meta. Built on derive-booth-demo-2013.py's readers."""
+    global _GCP11
+    if _GCP11 is not None:
+        return _GCP11
+    d13 = _d13()
+    bcp = d13.load_bcp()
+    z = zipfile.ZipFile(d13.BCP_ZIP)
+    ad4, nonfam, inc_path = income_factors()
+    inc, cut, hishare = d13.income_bcp(z, ad4, nonfam)
+    z.close()
+    if set(inc) != set(bcp):
+        fail("B01/B28 SA1 universes diverge (gcp11)")
+    out = {}
+    for code, r in bcp.items():
+        ir = inc[code]
+        if any(r[k] is None for k in
+               ("aus", "totc", "cobns", "uni", "eduns", "bluen", "occd")):
+            continue  # short-table SA1s: coverage drop, never null maths
+        out[code] = (r["pers"], r["eng"], r["oth"], tuple(r["ages"]),
+                     r["aus"], r["totc"], r["cobns"], r["uni"],
+                     r["eduns"], r["bluen"], r["occd"],
+                     ir[0], ir[1], ir[2])
+    print(f"gcp11: BCP 2011 in the _GCP layout, {len(out)} SA1s")
+    _GCP11 = (out, {"loCutWeekly": cut, "hiEdgeWeekly": 4000,
+                    "hiNationalShare": hishare, "loQuantile": INC_LO_Q,
+                    "dollarsYear": 2011,
+                    "factors": str(inc_path.relative_to(ROOT))})
+    return _GCP11
+
+
+def interp_f_year(year, c0, c1):
+    """The pcti lanes' own day-share (derive-booth-seifa-hist.py's
+    map — the demo blend rides the identical factors to the last
+    decimal; f > 0.5 means the newer census is the nearest side)."""
+    return hist.interp_f(year, c0, c1)
+
+
+def lane_blend(a, b, f):
+    return round((1 - f) * a + f * b, 4) if a is not None \
+        and b is not None else None
+
+
+def blend_demo(c0blk, c1blk, f):
+    """One demoI block out of two census-side blocks; the block needs
+    BOTH census sides (a one-sided block stays null whole, so the
+    display falls back to the measured block), and inside it a lane
+    missing on either side is null (the per-lane pcti doctrine — never
+    a one-sided value wearing the blend's label)."""
+    if c0blk is None or c1blk is None:
+        return None
+    out = {"persons": int(round(
+        (1 - f) * c0blk["persons"] + f * c1blk["persons"]))
+        if c0blk is not None and c1blk is not None
+        and c0blk["persons"] is not None and c1blk["persons"] is not None
+        else None}
+    for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc"):
+        out[k] = lane_blend(c0blk.get(k) if c0blk else None,
+                            c1blk.get(k) if c1blk else None, f)
+    a0 = c0blk.get("age") if c0blk else None
+    a1 = c1blk.get("age") if c1blk else None
+    out["age"] = ({b: lane_blend(None if a0 is None else a0.get(b),
+                                 None if a1 is None else a1.get(b), f)
+                   for b in DEMO_BANDS}
+                  if a0 is not None or a1 is not None else None)
+    return out
+
+
+def div_block(dv, votes, incbh_medians=True):
+    """The store's division-row emission shape out of a fold's
+    division accumulator (mirrors the divisions[] builder below)."""
+    tot = votes
+    bsum = sum(dv["bands"])
+    fb_den = dv["totc"] - dv["cobns"]
+    uni_den = dv["pop15"] - dv["eduns"]
+    return {
+        "votes": int(round(tot)),
+        "persons": int(round(dv["pers"])),
+        "cov": round(dv["cov"] / tot, 4) if tot > 0 else None,
+        "langOther": round(dv["oth"] / (dv["eng"] + dv["oth"]), 4)
+        if dv["eng"] + dv["oth"] > 0 else None,
+        "fborn": round((fb_den - dv["aust"]) / fb_den, 4)
+        if fb_den > 0 else None,
+        "uni": round(dv["uni"] / uni_den, 4) if uni_den > 0 else None,
+        "blue": round(dv["bluen"] / dv["occd"], 4)
+        if dv["occd"] > 0 else None,
+        "age": ({b: round(dv["bands"][i] / bsum, 4)
+                 for i, b in enumerate(DEMO_BANDS)}
+                if bsum > 0 else None),
+        "loinc": round(dv["incl"] / dv["inct"], 4)
+        if dv["inct"] > 0 else None,
+        "hiinc": round(dv["inch"] / dv["inct"], 4)
+        if dv["inct"] > 0 else None,
+        "incMed": (band_median(dv["incbh"])
+                   if dv["incbh"] is not None else None),
+    }
+
+
+def nat_block(nat):
+    """companion of div_block for the national pool"""
+    nat_b = sum(nat["bands"]) or 1
+    nat_eo = nat["eng"] + nat["oth"]
+    nat_fbd = nat["totc"] - nat["cobns"]
+    nat_unid = nat["pop15"] - nat["eduns"]
+    nat_inc = nat["inct"]
+    return {
+        "langOther": round(nat["oth"] / nat_eo, 4) if nat_eo else None,
+        "fborn": round((nat_fbd - nat["aust"]) / nat_fbd, 4)
+        if nat_fbd > 0 else None,
+        "uni": round(nat["uni"] / nat_unid, 4) if nat_unid else None,
+        "blue": round(nat["bluen"] / nat["occd"], 4)
+        if nat["occd"] > 0 else None,
+        "age0_14": round(
+            (nat["bands"][0] + nat["bands"][1]) / nat_b, 4),
+        "age65ov": round(sum(nat["bands"][8:]) / nat_b, 4),
+        "loinc": round(nat["incl"] / nat_inc, 4)
+        if nat_inc > 0 else None,
+        "hiinc": round(nat["inch"] / nat_inc, 4)
+        if nat_inc > 0 else None,
+        "incMed": (band_median(nat["incbh"])
+                   if nat["incbh"] is not None else None),
+    }
+
+
+def interp_side(year, conf, c):
+    """Fold side c for the interp year's lanes: returns
+    (demo_map, nat, div, meta) for either census edge."""
+    g = _g16()
+    if c == 2021:
+        gcp, meta = load_gcp21()
+        units21, drop = units_to_ed3(_INTERP_UNITS[year], conf,
+                                     _CC[conf["ed"]],
+                                     load_xwalk()
+                                     if conf["ed"] == "Ed2"
+                                     else load_xwalk11())
+        du = demo_units_i(units21, gcp)
+        return (*du, {"loCutWeekly": meta["loCutWeekly"],
+                      "hiEdgeWeekly": meta["hiEdgeWeekly"],
+                      "hiNationalShare": meta["hiNationalShare"],
+                      "loQuantile": meta["loQuantile"],
+                      "dollarsYear": 2021})
+    if c == 2016:
+        gcp, meta = g.load_gcp16()
+        units16 = _INTERP_UNITS16.get(year) or _INTERP_UNITS[year]
+        return (*demo_units_i(units16, gcp),
+                {"loCutWeekly": meta["loCutWeekly"],
+                 "hiEdgeWeekly": meta["hiEdgeWeekly"],
+                 "hiNationalShare": meta["hiNationalShare"],
+                 "loQuantile": meta["loQuantile"], "dollarsYear": 2016})
+    if c == 2011:
+        gcp, meta = gcp11()
+        return (*demo_units_i(_INTERP_UNITS[year], gcp),
+                dict(meta))
+    fail(f"interp side {c}")
+
+
+# native/edition-keyed unit maps captured mid-build() for the interp
+# sides: the interp fold rides the SAME walk intermediates scoring uses
+_INTERP_UNITS = {}
+_INTERP_UNITS16 = {}
+
+
 # ------------------------------------------------------------- votes files
 LANES = {
     2025: {"file": VDIR / "2025-federal-election-votes-sa1-nat.csv",
@@ -1006,8 +1334,12 @@ def build(year):
     xwalk = load_xwalk() if conf["mode"] == "xwalk21" else None
     units, sent_ids, drop_xw = load_votes(year, conf, _CC[conf["ed"]], xwalk)
     sent_votes = sum(sent_ids.values())
+    if year in INTERP:
+        _INTERP_UNITS[year] = units
     if conf.get("score") == "xwalk16":
         units16, drop16 = units_to_ed2(units, _CC[conf["ed"]], load_xwalk1116())
+        if year in INTERP:
+            _INTERP_UNITS16[year] = units16
         print(f"{year} scores: walked onto 2016 SA1s, {drop16} votes on no 2016 target")
         stats = score_units(units16, cube)
         # the unit's own vote total stays the file's (the walk only moves
@@ -1033,6 +1365,74 @@ def build(year):
     demo_map, demo_nat, demo_div = demo_units(units21, gcp)
     if demo_drop:
         print(f"{year} demo: {demo_drop} votes land on no Ed3 target")
+
+    # people-interp sides: fold the election's units on both bracketing
+    # censuses and blend the shares (module header comment)
+    interp = INTERP.get(year)
+    demoI_map = demoI_divs = demoI_national = incuts_i = demo_interp = None
+    if interp is not None:
+        f = hist.interp_f(year, interp["c0"], interp["c1"])
+        near = interp["c1"] if f > 0.5 else interp["c0"]
+        side, meta_i = {}, {}
+        for c in (interp["c0"], interp["c1"]):
+            dm, nt, dv, mt = interp_side(year, conf, c)
+            side[c] = {"map": dm, "nat": nt, "div": dv, "meta": mt}
+            meta_i[c] = mt
+        demoI_map = {}
+        (c0, c1), s0, s1 = (interp["c0"], interp["c1"]), \
+            side[interp["c0"]], side[interp["c1"]]
+        for key in set(s0["map"]) | set(s1["map"]):
+            demoI_map[key] = blend_demo(s0["map"].get(key),
+                                        s1["map"].get(key), f)
+        nbi = {}
+        for k in ("langOther", "fborn", "uni", "blue", "age0_14",
+                  "age65ov", "loinc", "hiinc"):
+            nbi[k] = lane_blend(nat_block(s0["nat"]).get(k),
+                                nat_block(s1["nat"]).get(k), f)
+        nbi["incMed"] = nat_block(side[near]["nat"])["incMed"]
+        demoI_national = nbi
+        demoI_divs = {}
+        for div in set(s0["div"]) | set(s1["div"]):
+            b0 = div_block(s0["div"][div], s0["div"][div]["votes"]) \
+                if div in s0["div"] else None
+            b1 = div_block(s1["div"][div], s1["div"][div]["votes"]) \
+                if div in s1["div"] else None
+            ib = blend_demo(b0, b1, f) if b0 is not None \
+                or b1 is not None else None
+            if ib is not None:
+                ndv = side[near]["div"].get(div)
+                ib["incMed"] = (band_median(ndv["incbh"]) if ndv is not None
+                                and ndv["incbh"] is not None else None)
+                if near == c0 and ib["incMed"] is None:
+                    fail(f"{year}: {div} nearest side {near} carries no "
+                         "incbh histogram")
+            demoI_divs[div] = ib
+        demo_interp = {
+            "f": f, "c0": c0, "c1": c1, "nearestSide": near,
+            "censusNights": {str(c0): hist.CENSUS_NIGHT[c0].isoformat(),
+                             str(c1): hist.CENSUS_NIGHT[c1].isoformat()},
+            "blend": "shares",
+            "nullRule": ("a unit missing its demo block on either "
+                         "census side, or a lane missing on either "
+                         "side, shows the measured figure instead"),
+        }
+        incuts_i = {
+            "loQuantile": INC_LO_Q,
+            "loCutWeekly": meta_i[near]["loCutWeekly"],
+            "hiEdgeWeekly": meta_i[near]["hiEdgeWeekly"],
+            "hiNationalShare": meta_i[near]["hiNationalShare"],
+            "dollarsYear": near,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+            "sides": {
+                str(c): {"loCutWeekly": meta_i[c]["loCutWeekly"],
+                         "dollarsYear": c,
+                         "hiNationalShare":
+                             meta_i[c]["hiNationalShare"]}
+                for c in (c0, c1)},
+        }
+        print(f"{year} interp: {c0}<--f={f}-->{c1}, nearest {near}, "
+              f"{sum(1 for v in demoI_map.values() if v)} demoI rows")
 
     venue_by = {(b["div"], b["boothId"]): b for b in venue_rows}
     vote_keys = {(k[0], k[2]) for k in stats if k[1] == "booth"}
@@ -1093,6 +1493,9 @@ def build(year):
             rec["cov"] = st["cov"]
             rec["seifa"] = seifa
             rec["demo"] = demo_map.get((vb["div"], "booth", vb["boothId"]))
+            if demoI_map is not None:
+                rec["demoI"] = demoI_map.get(
+                    (vb["div"], "booth", vb["boothId"]))
             if seifa:
                 scored += 1
             if vseifa and seifa:
@@ -1111,7 +1514,9 @@ def build(year):
                         "seifa": st["seifa"] if any(
                             v is not None for v in st["seifa"].values())
                         else None,
-                        "demo": demo_map.get((div, "cohort", name))})
+                        "demo": demo_map.get((div, "cohort", name)),
+                        **({"demoI": demoI_map.get((div, "cohort", name))}
+                           if demoI_map is not None else {})})
     cohorts.sort(key=lambda c: (STATE_ORDER[c["state"]], c["div"], c["cohort"]))
 
     diverge = {}
@@ -1177,6 +1582,11 @@ def build(year):
             "incMed": band_median(demo_nat["incbh"]),
         },
     }
+    if demoI_national is not None:
+        counts["demoI"] = {
+            "rows": sum(1 for v in demoI_map.values() if v),
+            "national": demoI_national,
+        }
 
     # the division level: the same per-SA1 tallies re-pooled by division
     # (one pass over the div accumulators — a division's shares come from
@@ -1215,6 +1625,8 @@ def build(year):
                 if dv["inct"] > 0 else None,
             "incMed": band_median(dv["incbh"]),
         })
+        if demoI_divs is not None:
+            divisions[-1]["demoI"] = demoI_divs.get(div)
 
     mode_note = {
         "xwalk16": ". Scores are SEIFA 2016: each 2011 SA1's votes are "
@@ -1228,6 +1640,17 @@ def build(year):
             "redistributed over SA1_CODE21 targets by the ABS "
             "CG_SA1_2016_SA1_2021 correspondence (RATIO_FROM_TO shares)",
     }[conf.get("score", conf["mode"])]
+    interp_note = (
+        f" The demoI blocks interpolate the people figures between the "
+        f"{interp['c0']} and {interp['c1']} censuses to election day "
+        f"(day-share {demo_interp['f']} of the intercensal span — the "
+        f"SEIFA pcti lanes' own factors): each demoI lane blends the "
+        f"shares of this election's votes folded on both censuses, a "
+        f"lane missing on either side falling back to the measured "
+        f"demo figure for that lane; incMed and the incomeCutsI dollar "
+        f"figures come from the {demo_interp['nearestSide']} census "
+        f"side alone, never a mixed-currency blend."
+        if demo_interp is not None else "")
     out = {
         "_about": (
             "Voter-footprint SEIFA per federal booth: vote-weighted mean "
@@ -1247,7 +1670,7 @@ def build(year):
             "language/foreign-born/university/blue-collar/age/income "
             "reading per division, "
             "its shares from its own pooled sum, never from averaging "
-            "the row-level rounded shares.") + DEMO_ABOUT[year],
+            "the row-level rounded shares.") + DEMO_ABOUT[year] + interp_note,
         "_provenance": {
             "sourceUrls": {
                 "votes": {2016: "AEC 2016 downloads, Votes by SA1 (xlsx)",
@@ -1261,11 +1684,26 @@ def build(year):
                    if conf["mode"] == "xwalk21" else {}),
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
                    if year == 2016 else {}),
+                **({"gcpInterp": "ABS 2016 Census GCP datapack (SA1, "
+                                 "G01/G09/G28/G29/G46B/G57B)"}
+                   if demo_interp is not None else {}),
+                **({"bcpInterp": "ABS 2011 Census Basic Community "
+                                 "Profile, SA1 for AUST "
+                                 "(B01/B09/B26/B28/B40B/B45B)"}
+                   if demo_interp is not None and interp["c0"] == 2011
+                   else {}),
             },
             "files": {
                 str(conf["file"].relative_to(ROOT)): hash16(conf["file"]),
                 str(vpath.relative_to(ROOT)): hash16(vpath),
                 str(GCP_ZIP.relative_to(ROOT)): hash16(GCP_ZIP),
+                **({"cache/gcp-sa1-2016.zip": hash16(
+                        SM / "cache/gcp-sa1-2016.zip")}
+                   if demo_interp is not None else {}),
+                **({"cache/bcp-sa1-2011.zip": hash16(
+                        SM / "cache/bcp-sa1-2011.zip")}
+                   if demo_interp is not None and interp["c0"] == 2011
+                   else {}),
                 **({str((VDIR / "CG_SA1_2016_SA1_2021.csv").relative_to(ROOT)):
                         hash16(VDIR / "CG_SA1_2016_SA1_2021.csv")}
                    if conf["mode"] == "xwalk21" else {}),
@@ -1292,6 +1730,8 @@ def build(year):
             "adultsWeights": gcp_meta["factors"],
             "medianBasis": "households (shares are per-adult)",
         },
+        **({"demoInterp": demo_interp, "incomeCutsI": incuts_i}
+           if demo_interp is not None else {}),
         "counts": counts,
         "divisions": divisions,
         "cohorts": cohorts,

@@ -277,6 +277,34 @@ def seifa_cells(sf):
     return S
 
 
+def demo_interp_of(dm, di):
+    """The demo cells' counterpart of seifa_cells' pcti-before-pct: a
+    store's demoI block interpolates the people lanes between the
+    year's bracketing censuses to election day, and a lane null there
+    falls back to the measured value for that lane (never a one-sided
+    figure under the blend's label). persons/cov stay the measured
+    side's — they're a pool weight and a coverage, not displayed
+    census figures."""
+    if not dm:
+        return None
+    if not di:
+        return dm
+    m = dict(dm)
+    for k, v in di.items():
+        if k in ("persons", "cov"):
+            continue
+        if k == "age":
+            if v is not None:
+                age = dict(m.get("age") or {})
+                age.update({bk: bv for bk, bv in v.items()
+                            if bv is not None})
+                m["age"] = age
+            continue
+        if v is not None:
+            m[k] = v
+    return m
+
+
 # ---------------------------------------------------------------- history
 def build_history():
     """per division NAME: [year, Labor 2PP, winner party, winner name]. The
@@ -430,7 +458,8 @@ def build_year(year, hist, base2001):
         }
         if vstore:
             dd = next((x for x in vstore.get("divisions", []) if x.get("div") == name), None)
-            dc = demo_cells(dd)
+            dm = demo_interp_of(dd, (dd or {}).get("demoI"))
+            dc = demo_cells(dm)
             if dc:
                 # p: the store's pool weight — vote-weighted pseudo-population
                 # on the voter store, real census headcount on the venue proxy.
@@ -438,7 +467,7 @@ def build_year(year, hist, base2001):
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
-                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dd.get("incMed")}
+                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed")}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -484,7 +513,8 @@ def build_year(year, hist, base2001):
         B["fl"].append(flows)
         B["dec"].append([dec.get("irsad"), dec.get("irsd"), dec.get("ier"), dec.get("ieo")] if dec else None)
         B["vdec"].append([dec_of(ix, vs.get(ix)) for ix in ("irsad", "irsd", "ier", "ieo")] if vs else None)
-        B["demo"].append(demo_cells((bvoter.get((d, pp)) or {}).get("demo")))
+        bv = bvoter.get((d, pp)) or {}
+        B["demo"].append(demo_cells(demo_interp_of(bv.get("demo"), bv.get("demoI"))))
 
     if not any(B["demo"]):
         del B["demo"]  # no census-people store before 2013
@@ -535,8 +565,15 @@ def build_year(year, hist, base2001):
            # the income lanes' own definitions (national low cut in
            # weekly dollars, top-band edge and epoch year) from the
            # store that year read — verbatim, so the app's copy always
-           # names the same cuts the numbers were built on
-           "incomeCuts": vstore.get("incomeCuts") if vstore else None}
+           # names the same cuts the numbers were built on. interp years
+           # carry incomeCutsI: the nearest census side's dollar epoch,
+           # both sides' cuts under sides
+           "incomeCuts": (vstore.get("incomeCutsI") or vstore.get("incomeCuts")) if vstore else None}
+    if vstore and vstore.get("demoInterp"):
+        # the people-interp blend record (f, c0/c1, nearestSide,
+        # nullRule) on interpolated years; the app's demo copy reads
+        # "interpolated between censuses to election day" from it
+        out["demoInterp"] = vstore["demoInterp"]
     names = {x["n"] for x in D}
     assert SPEAKER[year] in names, f"{year}: speaker seat {SPEAKER[year]} not in the House"
     p = os.path.join(OUT, f"data-{year}.json")

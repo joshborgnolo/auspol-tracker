@@ -143,13 +143,17 @@ eq(d.counts.national, {
   incMed: 1235,
 }, "counts.national");
 
-// 4. division anchors
+// 4. division anchors (measured blocks; the demoI interp block has its
+// own contract in section 8)
+const stripI = (o) => { const { demoI, ...rest } = o; return rest; };
+let divs;
 {
-  const divs = new Map(d.divisions.map((x) => [x.div, x]));
-  eq(divs.get("Sydney"), {
+  divs = new Map(d.divisions.map((x) => [x.div, x]));
+  const S = divs.get("Sydney");
+  eq(stripI(S), {
     div: "Sydney", state: "NSW", persons: 170700, cov: 1,
     langOther: 0.3277, fborn: 0.4686, uni: 0.4751, blue: 0.1316,
-    age: divs.get("Sydney").age,
+    age: S.age,
     loinc: 0.2038, hiinc: 0.1164, incMed: 1730,
   }, "Sydney row");
   const M = divs.get("Melbourne");
@@ -162,13 +166,14 @@ eq(d.counts.national, {
     F.loinc, F.hiinc, F.incMed],
     [148973, 0.7084, 0.528, 0.098, 0.4582, 0.3204, 0.0225, 1040],
     "Fowler figures");
-  eq(divs.get("Lingiari"), {
+  const L = divs.get("Lingiari");
+  eq(stripI(L), {
     div: "Lingiari", state: "NT", persons: 109461, cov: 1,
     langOther: 0.4016, fborn: 0.1179, uni: 0.1317, blue: 0.3522,
-    age: divs.get("Lingiari").age,
+    age: L.age,
     loinc: 0.1977, hiinc: 0.0449, incMed: 1504,
   }, "Lingiari row (printed)");
-  console.log("Lingiari:", JSON.stringify(divs.get("Lingiari")));
+  console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
   const byLang = d.divisions.filter((x) => x.langOther !== null)
     .slice().sort((a, b) => b.langOther - a.langOther);
@@ -238,6 +243,96 @@ eq(d.incomeCuts, {
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
 }, "incomeCuts record");
+
+// 8. demoI interp contract (derive-booth-demo-interp.py): the blend
+// rides the seifa store's own pcti factor to the last decimal; a lane
+// is the two census sides' share blend when both are present, null in
+// demoI otherwise (the display falls back per lane); incMed and the
+// incomeCutsI dollars pin to the nearest census side (2011 at f
+// 0.416); 2007/2010-style one-sided income lanes never appear under
+// the blend's label
+{
+  const far = JSON.parse(readFileSync("data/booth-demo-2013-c1.json",
+    "utf8"));
+  const sf = JSON.parse(readFileSync("data/booth-seifa-2013.json",
+    "utf8"));
+  const f = 0.415982;
+  eq([d.demoInterp.f, d.demoInterp.c0, d.demoInterp.c1,
+    d.demoInterp.nearestSide, d.demoInterp.blend],
+    [f, 2011, 2016, 2011, "shares"], "demoInterp record");
+  eq(d.demoInterp.censusNights, { 2011: "2011-08-09", 2016: "2016-08-09" },
+    "demoInterp census nights");
+  eq(d.demoInterp.f, sf._pcti.f, "demoInterp.f == seifa _pcti.f");
+  const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
+  const NL = new Set(["langOther", "fborn", "uni", "blue", "age0_14",
+    "age65ov", "loinc", "hiinc"]);
+  for (const k of NL) {
+    eq(d.counts.demoI.national[k],
+      LN(d.counts.national[k], far.counts.national[k]),
+      `demoI national ${k}`);
+  }
+  eq(d.counts.demoI.national.incMed, d.counts.national.incMed,
+    "demoI national incMed is the nearest (2011) side's");
+  eq(d.incomeCutsI.dollarsYear, 2011,
+    "incomeCutsI dollars year is the nearest side's");
+  eq([d.incomeCutsI.sides["2011"].loCutWeekly,
+    d.incomeCutsI.sides["2016"].loCutWeekly],
+    [d.incomeCuts.loCutWeekly, far.incomeCuts.loCutWeekly],
+    "incomeCutsI sides carry both cuts");
+  const farDiv = new Map(far.divisions.map((x) => [x.div, x]));
+  const LNset = farDiv.get("Lingiari");
+  const LI = divs.get("Lingiari");
+  for (const k of ["langOther", "fborn", "uni", "blue", "loinc",
+    "hiinc"]) {
+    eq(LI.demoI[k], LN(LI[k], LNset[k]), `Lingiari demoI ${k}`);
+  }
+  eq(LI.demoI.incMed, 1504, "Lingiari demoI.incMed nearest side");
+  let keyok = true;
+  const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
+    "blue", "age", "loinc", "hiinc", "incMed"]);
+  let nullBoth = 0, blended = 0;
+  const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
+  for (const b of d.booths) {
+    if (b.demoI === null) {
+      if (b.demo !== null && farB.get(`${b.div}|${b.boothId}`).demo !== null) {
+        failures++;
+        console.error(`FAIL demoI null with both sides present ` +
+          `${b.div}|${b.boothId}`);
+        keyok = false;
+      } else {
+        nullBoth++;
+      }
+      continue;
+    }
+    if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
+    blended++;
+    for (const k of ["langOther", "fborn", "uni", "blue"]) {
+      const a = b.demo && b.demo[k], fb = farB.get(`${b.div}|${b.boothId}`);
+      const x = fb.demo && fb.demo[k];
+      if (a != null && x != null) {
+        if (b.demoI[k] !== LN(a, x)) {
+          failures++;
+          console.error(`FAIL booth ${b.div}|${b.boothId} demoI ${k}: ` +
+            `${b.demoI[k]} vs blend ${LN(a, x)}`);
+          keyok = false;
+          break;
+        }
+      } else if (b.demoI[k] !== null) {
+        failures++;
+        console.error(`FAIL booth ${b.div}|${b.boothId} demoI ${k} not ` +
+          `null on a one-sided lane`);
+        keyok = false;
+        break;
+      }
+    }
+  }
+  ok(keyok, "booth demoI keys + per-lane blend/null rule");
+  ok(blended > 8000 && nullBoth > 400,
+    `booth demoI profile: ${blended} blended, ${nullBoth} both-null`);
+  eq(d.counts.demoI.rows,
+    d.booths.filter((b) => b.demoI !== null).length + 0,
+    "counts.demoI.rows");
+}
 
 if (failures) {
   console.error(`\n${failures} FAILURES`);

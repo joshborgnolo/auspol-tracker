@@ -363,6 +363,15 @@ const DB = {
 const demoCopy = (m) => {
   if (m.demoBasis === "sa1") return DB.sa1;
   const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
+  if (m.demoInterp) {
+    const { c0, c1 } = m.demoInterp;
+    return {
+      seats: `Interpolated between the ${c0} and ${c1} censuses to election day${m.demoBasis === "venue" ? ", of the census areas the polling places stand in" : ", counted where each seat’s voters live"}.`,
+      who: db.who,
+      whoAdults: db.whoAdults,
+      note: `Interpolated between the ${c0} and ${c1} censuses to election day.`,
+    };
+  }
   return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, whoAdults: db.whoAdults, note: db.note(m.year) } : db;
 };
 // polling-place cards read one area, not a district pool
@@ -376,11 +385,11 @@ function incFact(m, dm) {
   const parts = [];
   if (dm.loinc != null || dm.hiinc != null) {
     const pair = [];
-    if (dm.loinc != null) pair.push(`${f0(100 * dm.loinc)}% of adults live in households earning under ${mny(c.loCutWeekly)} a week`);
+    if (dm.loinc != null) pair.push(`${f0(100 * dm.loinc)}% of adults live in households earning ${incLoFrag(m)}`);
     if (dm.hiinc != null) pair.push(`${f0(100 * dm.hiinc)}% in households earning ${mny(c.hiEdgeWeekly)} or more a week`);
-    parts.push(`${pair.join(", ")}${incDollars(m)}`);
+    parts.push(`${pair.join(", ")}${incEpoch(m)}`);
   }
-  if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}`);
+  if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${m.demoInterp && c.dollarsYear ? ` in ${c.dollarsYear} dollars` : ""}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
 const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "2007 and 2010 are counted from the census areas the polling places stand in (the 2006 census — the AEC’s record of where voters live begins in 2016), 2013 on the 2011 census; from 2016 the figures follow the voters. Choose 2007 or later on the timeline." };

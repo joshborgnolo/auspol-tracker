@@ -97,6 +97,34 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
 for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
 }
+// the people-interp contract (derive-booth-demo-{2011,2016}.py +
+// derive-booth-demo-interp.py + derive-booth-seifa-voter.py): 2007-2019
+// are interpolated between the bracketing censuses to election day at
+// the SEIFA pcti lanes' own day-share f (asserted identical to each
+// year's booth-seifa _pcti block); the other years carry no record
+{
+  const INTERP = { 2007: [2006, 2011, 2006, 0.258894], 2010: [2006, 2011, 2011, 0.806787], 2013: [2011, 2016, 2011, 0.415982], 2016: [2011, 2016, 2016, 0.979201], 2019: [2016, 2021, 2021, 0.553914] };
+  for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+    const r = JSON.parse(R(`map/data/res-${y}.json`));
+    if (!INTERP[y]) {
+      assert.ok(!r.demoInterp, `${y} has no demoInterp record`);
+      continue;
+    }
+    const [c0, c1, near, f] = INTERP[y];
+    const di = r.demoInterp;
+    assert.ok(di && di.c0 === c0 && di.c1 === c1 && di.nearestSide === near && di.f === f && di.blend === "shares", `${y} demoInterp record`);
+    const sf = JSON.parse(R(`data/booth-seifa-${y}.json`));
+    assert.equal(di.f, sf._pcti.f, `${y} demoInterp.f == the seifa store's own _pcti.f`);
+    const div = r.divs.find((d) => d.demo);
+    assert.ok(div && Object.values(div.demo).every((v) => v == null || typeof v === "number" && v >= 0), `${y} demo rows well-formed`);
+  }
+  // income's 2013 floor survives the blend: 2007/2010 carry no cuts
+  // record, and 2016/2019 name THEIR bracketing epochs in sides
+  const r10 = JSON.parse(R("map/data/res-2010.json"));
+  assert.ok(r10.incomeCuts === null, "2010 incomeCuts stays null (income floor 2013)");
+  const r19 = JSON.parse(R("map/data/res-2019.json"));
+  assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
+}
 // the islands past the mainland frame, drawn in inset boxes (node .build/map/islands_build.mjs)
 {
   const isl = JSON.parse(R("map/data/islands.json"));
