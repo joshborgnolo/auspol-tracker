@@ -729,8 +729,8 @@ for (const y of ["sa22", "sa26"]) {
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
   // federal four-char keys was why it was written that way)
-  assert.ok(base.includes("`${YEAR_JUR[y].toUpperCase()} ${String(y).slice(-2)}`"), "a state frame's label takes the year's last two chars (nsw23 → 'NSW 23', never 'NSW w23')");
-  assert.ok(ui.includes('yearLabel(y).replace(/^\\S+\\s*/, "")'), "the timeline's short row strips the jurisdiction word AND its space ('NSW 23' → '’23', never '’ 23')");
+  assert.ok(base.includes("`${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}`"), "a state frame's label is the jurisdiction word + full year, no space (nsw23 → 'NSW2023', never 'NSW w23' or 'NSW 23')");
+  assert.ok(ui.includes('short ? "’" + String(y).slice(-2) : yearLabel(y)'), "the timeline's short row shows the two-digit year only (nsw23 → '’23')");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 frame on its own timeline row, in the sitemap");
