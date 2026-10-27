@@ -529,6 +529,9 @@ body { height: auto; }
 .sh-menu-item.sh-menu-info { display: none; }
 @media (max-width: 640px) {
   .sh-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  /* unpinned the ☰ sits hard against the bar's clipped right end: step in by
+     the paper's overhang so the tab's side meets the sheet's (rd.css) */
+  .sh-tabs:not(.pinned) .sh-menu-btn { margin-right: 3px; }
   .sh-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
   .sh-menu-item.sh-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   .sh-menu-n { font-size: 17px; }

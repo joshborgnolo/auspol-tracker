@@ -369,8 +369,10 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     const lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
     const w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
     let L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
-    if (pr.left - L < 16) L = Math.round(pr.left);
-    if (R - pr.right < 16) R = Math.round(pr.right);
+    /* unrounded where the sheet ends with the tab: rounded, it stepped a
+       pixel at a time behind the tab through the end of the pin's glide */
+    if (pr.left - L < 16) L = pr.left;
+    if (R - pr.right < 16) R = pr.right;
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuTwo(two);

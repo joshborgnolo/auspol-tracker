@@ -4,6 +4,7 @@
    back, logging every painted frame: the paper tab's edges against the
    sheet's opening (--gap-a/--gap-b) and the sheet's top against the tab's
    foot. The join holds when they agree on every frame, mid-transition too.
+   The tab is read as it paints (clipped).
    Run after a build: node .matilda/probe/menu-join.mjs [W] */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
@@ -53,7 +54,17 @@ for (const S of sites) for (const W of widths) {
     const snap = (tag) => {
       const pp = document.querySelector(S.paper), pop = document.querySelector(S.pop);
       if (!pp || !pop || pop.hidden) { out.push({ tag, gone: true }); return; }
-      const a = pp.getBoundingClientRect(), b = pop.getBoundingClientRect();
+      /* the tab as it paints: clipped by any ancestor that hides overflow
+         (.tabs-inner clips at the bar's ends - the 2026-10-27 report was a
+         tab whose right side the clip cut 3px short of the sheet's) */
+      const r0 = pp.getBoundingClientRect(), a = { left: r0.left, right: r0.right, bottom: r0.bottom };
+      for (let e = pp.parentElement; e && e !== document.body; e = e.parentElement) {
+        const cs = getComputedStyle(e);
+        if (cs.overflowX === "visible") continue;
+        const c = e.getBoundingClientRect();
+        a.left = Math.max(a.left, c.left); a.right = Math.min(a.right, c.right);
+      }
+      const b = pop.getBoundingClientRect();
       const ga = parseFloat(pop.style.getPropertyValue("--gap-a")) || 0, gb = parseFloat(pop.style.getPropertyValue("--gap-b")) || 0;
       out.push({ tag, t: Math.round(performance.now() - t0),
         dTop: +(b.top - a.bottom).toFixed(2),           // sheet top v tab foot

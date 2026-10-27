@@ -936,6 +936,9 @@ body { height: auto; }
 .sh-menu-item.sh-menu-info { display: none; }
 @media (max-width: 640px) {
   .sh-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  /* unpinned the ☰ sits hard against the bar's clipped right end: step in by
+     the paper's overhang so the tab's side meets the sheet's (rd.css) */
+  .sh-tabs:not(.pinned) .sh-menu-btn { margin-right: 3px; }
   .sh-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
   .sh-menu-item.sh-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   .sh-menu-n { font-size: 17px; }
@@ -1295,8 +1298,8 @@ ${npProjectSrc()}
       var fr = two && fin ? fin.getBoundingClientRect() : null, lo = fr ? fr.left : 8, hi = fr ? fr.right : vw - 8;
       var w0 = Math.min(two ? 968 : 492, vw - 16, Math.round(hi - lo));
       var L = Math.round(Math.min(Math.max(pr.left, lo), hi - w0)), R = L + w0;
-      if (pr.left - L < 16) L = Math.round(pr.left);
-      if (R - pr.right < 16) R = Math.round(pr.right);
+      if (pr.left - L < 16) L = pr.left;
+      if (R - pr.right < 16) R = pr.right;
       var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
       var stuck = nav.classList.contains("pinned") && getComputedStyle(nav).position === "sticky";
       mPop.style.top = Math.round(br.bottom - nr.top) + "px";
