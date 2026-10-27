@@ -5609,12 +5609,12 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 /* three tabs fit a 320px phone only on tighter padding */
 @media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
 /* the search box, above the order row: the redesign All-polls pill
-   (.rd-ap-search, rd.css), restated page-level so the classic design's
-   mount of the body takes it too */
+   (.rd-ap-search, rd.css), restated page-level, width ladder included, so
+   the classic design's mount of the body takes it too */
 .btv-bar { display: flex; align-items: center; margin-top: 18px; }
 .btv-search {
-  box-sizing: border-box; flex: 1; height: 36px; padding: 0 12px 0 14px;
-  display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: 0;
+  box-sizing: border-box; width: 330px; height: 36px; padding: 0 12px 0 14px;
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0; margin: 0;
   border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
 }
 .btv-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -5627,6 +5627,10 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (pointer: coarse) {
   .btv-search input { font-size: 16px; }
 }
+/* the All-polls pill's own width ladder (rd.css, the <=1000px and <=760px
+   rungs): desktop 330, mid 260, full width on the phone rung */
+@media (max-width: 1000px) { .btv-search { width: 260px; } }
+@media (max-width: 760px) { .btv-search { width: 100%; } }
 .btv-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
 /* the results under the box: the empty state, and the count line's figure */
 .btv-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }

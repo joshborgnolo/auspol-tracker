@@ -80,11 +80,17 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
     type: document.querySelector(".btv-bar input").type,
     val: document.querySelector(".btv-bar input").value,
     x: !!document.querySelector(".btv-x"),
+    pillW: document.querySelector(".btv-search").getBoundingClientRect().width,
+    barW: document.querySelector(".btv-bar").getBoundingClientRect().width,
   }));
   if (!here.ph) fail(`${design}@${w} the box has no placeholder`);
   if (here.type !== "search") fail(`${design}@${w} the box's type is ${here.type}`);
   if (here.val !== "") fail(`${design}@${w} the box opens with text in it`);
   if (here.x) fail(`${design}@${w} an empty box shows a clearer`);
+  /* the All-polls pill's own width: 330 on the wide rung, full width on the
+     phone rung (the ladder in template.html beside the .btv-sort rules) */
+  if (w >= 1001 && Math.round(here.pillW) !== 330) fail(`${design}@${w} the pill is ${here.pillW}px wide, expected 330`);
+  if (w <= 760 && Math.abs(here.pillW - here.barW) > 1) fail(`${design}@${w} the phone pill stops ${here.barW - here.pillW}px short of its row`);
 
   if (!wordingPick) { fail("no long-tail question offered a token"); await page.close(); continue; }
 
