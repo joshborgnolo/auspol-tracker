@@ -3,10 +3,10 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 51.3
+      "alp": 51.5
     },
-    "imp": 51.3,
-    "pub": 50.2,
+    "imp": 51.5,
+    "pub": 49.6,
     "on": 52.1,
     "momSig": false,
     "flows": {
@@ -208,7 +208,8 @@
       "2026-10-10|Resolve",
       "2026-10-11|Roy Morgan",
       "2026-10-20|YouGov",
-      "2026-10-25|Roy Morgan"
+      "2026-10-25|Roy Morgan",
+      "2026-10-27|Essential"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -323,19 +324,19 @@
       }
     },
     "prim": {
-      "alp": 26.4,
-      "grn": 13.8,
-      "lnp": 23.1,
-      "onp": 25.2,
+      "alp": 26.6,
+      "grn": 13.7,
+      "lnp": 22.7,
+      "onp": 26.2,
       "oth": 11.3
     },
     "leaders": {
-      "alb_fav": -21.5,
-      "alb_net": -23.8,
+      "alb_fav": -21.4,
+      "alb_net": -22.6,
       "hanson_fav": -6,
-      "hanson_net": -2.1,
-      "taylor_fav": -5,
-      "taylor_net": -6.5
+      "hanson_net": -1.8,
+      "taylor_fav": -4.9,
+      "taylor_net": -5.7
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -358,9 +359,9 @@
       }
     },
     "dir": {
-      "right": 25.6,
-      "wrong": 62.1,
-      "net": -36.5
+      "right": 24.8,
+      "wrong": 63.3,
+      "net": -38.5
     },
     "issLead": {
       "climate": "alp",
@@ -384,13 +385,11 @@
     },
     "sig": {
       "iss|crime|imp": -1,
-      "iss|housing|alp": -1,
-      "prim|onp": -1
+      "iss|housing|alp": -1
     },
     "sigMeta": {
       "iss|crime|imp": "the share naming crime a top-three issue",
-      "iss|housing|alp": "Labor's share as the best party on housing",
-      "prim|onp": "One Nation's primary vote"
+      "iss|housing|alp": "Labor's share as the best party on housing"
     },
     "conf": {
       "business": 76.5,
@@ -524,6 +523,19 @@
       "label": "27 Oct 2026",
       "kind": "conf",
       "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 67.7 → 67.9."
+    },
+    {
+      "date": "2026-10-27",
+      "label": "27 Oct 2026",
+      "kind": "poll",
+      "text": "Essential (fieldwork 22–27 Oct) added — the two-party preferred estimate moved 51.3 → 51.5 (Labor v the Coalition, implied flows). Primary votes: Labor 26.4 → 26.6, the Coalition 23.1 → 22.7, One Nation 25.2 → 26.2, the Greens 13.8 → 13.7. Leader ratings: Albanese's net approval −23.8 → −22.6, Albanese's net favourability −21.5 → −21.4, Taylor's net approval −6.5 → −5.7, Taylor's net favourability −5.0 → −4.9, Hanson's net approval −2.1 → −1.8. National direction: right track 25.6 → 24.8, wrong track 62.1 → 63.3 (net −36.5 → −38.5). House effect (Labor v the Coalition, implied flows; positive leans Labor): Essential held at −1.0.",
+      "url": "https://essentialreport.com.au/reports/28-october-2026"
+    },
+    {
+      "date": "2026-10-27",
+      "label": "27 Oct 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in One Nation's primary vote is no longer statistically significant."
     }
   ]
 }
