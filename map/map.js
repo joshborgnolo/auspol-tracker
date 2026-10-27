@@ -472,7 +472,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-nsw23.json":"2afda2fc","data-sa22.json":"e6ff9052","data-sa26.json":"9b940b4e","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-nsw23.json":"053732bb","res-sa22.json":"2757b9d3","res-sa26.json":"1330a5a6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-nsw23.json":"1d234a46","data-sa22.json":"e6ff9052","data-sa26.json":"9b940b4e","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"125753ec","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-nsw23.json":"4e9a6123","res-sa22.json":"2757b9d3","res-sa26.json":"1330a5a6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
 const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
@@ -511,7 +511,7 @@ function deriveDiv(d, i, year) {
   // seat), or One Nation
   const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
   const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
-  const flows = d.fl.map(([ci, ta, tb]) => ({ cand: c[ci], ta, tb }));
+  const flows = d.fl.map(([ci, ta, tb, exh]) => (exh == null ? { cand: c[ci], ta, tb } : { cand: c[ci], ta, tb, exh }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
@@ -4075,9 +4075,9 @@ function areaHedDek(m, st) {
     }
     case "flow": {
       const F = S.from, name = possW(F), rival = vsW();
-      let toA = 0, tot = 0;
+      let toA = 0, tot = 0, xN = 0, xT = 0;
       const per = [];
-      for (const i of idx) { const d = m.divs[i]; if (!flowSeat(d)) continue; let a = 0, t = 0; for (const f of d.flows) if (f.cand.b === F) { a += d.alpSide === 0 ? f.ta : f.tb; t += f.ta + f.tb; } if (t) { toA += a; tot += t; per.push({ i, v: (100 * a) / t, t }); } }
+      for (const i of idx) { const d = m.divs[i]; if (!flowSeat(d)) continue; let a = 0, t = 0; for (const f of d.flows) if (f.cand.b === F) { a += d.alpSide === 0 ? f.ta : f.tb; t += f.ta + f.tb; if (f.exh != null) { xN += f.exh; xT += f.ta + f.tb + f.exh; } } if (t) { toA += a; tot += t; per.push({ i, v: (100 * a) / t, t }); } }
       if (!tot) return { hed: `None of ${name} preferences were split between Labor and ${rival}${where}`, dek: "" };
       const share = (100 * toA) / tot;
       if (m.res.flBasis === "modelled") {
@@ -4087,7 +4087,8 @@ function areaHedDek(m, st) {
       const hed = `${f0(share)}% of ${name} preferences went to Labor${S.vs === "onp" ? " over One Nation" : ""}${where}`;
       per.sort((a, b) => a.v - b.v);
       const lo = per[0], hi = per[per.length - 1];
-      const dek = `Counted in the ${per.length === 1 ? "one seat" : `${per.length} seats`}${where} that finished Labor against ${rival}.${per.length === 1 ? "" : ` The share ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.`}`;
+      const opv = m.res.flOpv && xT ? ` Under New South Wales’s optional preferences another ${f0((100 * xN) / xT)}% of ${name} ballots exhausted before the final two.` : "";
+      const dek = `Counted in the ${per.length === 1 ? "one seat" : `${per.length} seats`}${where} that finished Labor against ${rival}.${per.length === 1 ? "" : ` The share ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.`}${opv}`;
       return { hed, dek };
     }
     case "informal": {
@@ -4333,7 +4334,10 @@ function seatHedDek(m, d) {
         const e = flowErrOf(m, F);
         return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} modelled to go to Labor`, dek: `The rest, ${f0(100 - v)}%, to ${rival} — an estimate: South Australia publishes no per-candidate split.${e ? ` ${cap(flowErrWords(e))}.` : ""}` };
       }
-      return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} went to Labor`, dek: `The rest, ${f0(100 - v)}%, went to ${rival}.` };
+      let ex = 0, xt = 0;
+      if (m.res.flOpv) for (const f of d.flows) if (f.cand.b === F && f.exh != null) { ex += f.exh; xt += f.ta + f.tb + f.exh; }
+      const opc = xt ? ` Another ${f0((100 * ex) / xt)}% of ${nm} ballots exhausted before the final two — New South Wales votes optional-preferential.` : "";
+      return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} went to Labor`, dek: `The rest, ${f0(100 - v)}%, went to ${rival}.${opc}` };
     }
     case "informal": {
       const r = [...m.divs].filter((x) => x.infPct != null).sort((a, b) => b.infPct - a.infPct).findIndex((x) => x.i === d.i) + 1;
@@ -4449,13 +4453,16 @@ function storyBooth(m, j) {
       else { hed = `${SUBJ[S.party]} won ${f1(v)}% of the Senate vote here`; dek = dv != null ? `In ${ds(D.n)} as a whole, ${f1(dv)}%.` : ""; }
     }
     if (S.lens === "informal") { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
-    if (S.lens === "flow") {
-      if (m.res.flBasis === "modelled") { hed = flowSeat(D) ? `Preference flows aren’t modelled by polling place` : `No preference split is modelled in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s modelled split is a district figure — read it on the district’s card.` : `Its count didn’t finish Labor against ${vsW()}.`; }
-      else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
-    }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoBoothCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
     if (S.lens === "cls") { hed = `${ds(D.n)} is ${/^[aeiou]/i.test(CLS_LOWER[D.cls] || "") ? "an" : "a"} ${CLS_LOWER[D.cls] || ""} seat`; }
+  }
+  // the flow hed needs no per-booth count: the NSWEC carries no booth 2CP,
+  // so nsw23 booths have no lead/tcp and the copy would never render here
+  if (S.lens === "flow") {
+    if (m.res.flBasis === "modelled") { hed = flowSeat(D) ? `Preference flows aren’t modelled by polling place` : `No preference split is modelled in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s modelled split is a district figure — read it on the district’s card.` : `Its count didn’t finish Labor against ${vsW()}.`; }
+    else if (m.res.flOpv) { hed = flowSeat(D) ? `Preference flows aren’t counted by polling place` : `No preference split was counted in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s split is a district figure — read it on the district’s card. New South Wales re-counts ballots by district, not by polling place.` : `Its count didn’t finish Labor against ${vsW()}.`; }
+    else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
   }
   let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed, dek);
   if (lead && tc) {
@@ -5099,12 +5106,13 @@ function legendHTML(m) {
     case "flow": {
       // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
       // the groups whose preferences can be read are the other parties'
-      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", SA_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
-      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", SA_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
+      const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", STATE_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
       const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
       if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
+      if (m.res.flOpv) h += `<div class="lg-note">Counted, not modelled — New South Wales re-counted every ballot paper. Preferences there are optional, so a ballot can exhaust before the final two; a share reads the ballots that reached them.</div>`;
       break;
     }
     case "informal":

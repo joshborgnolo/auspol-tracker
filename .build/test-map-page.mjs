@@ -590,8 +590,49 @@ for (const y of ["sa22", "sa26"]) {
     assert.ok(p, `nsw23: ${st} agg carries 2019 primaries`);
     assert.equal(Object.values(p).reduce((a, b) => a + b, 0), 4551886, `nsw23: ${st} 2019 primaries account for every formal vote`);
   }
-  // no preferences lane yet (the SA frames' are modelled by sa_flow_lane.py)
-  assert.ok(!("flBasis" in res) && res.divs.every((d) => Array.isArray(d.fl) && d.fl.length === 0), "nsw23: no preferences lane");
+  // the preferences lane is COUNTED, not modelled: the NSWEC re-counted
+  // every 2023 ballot paper (parse-nsw-state-flows.py's committed re-count
+  // in .build/state-flow-src/nsw/2023/counts.csv), and build_nsw23_data.py
+  // files one [candidate, toA, toB, exhausted] quadruple per NON-finalist,
+  // oriented on the tcp pair's order. NSW's optional preferences make the
+  // fourth slot real; booths stay null — the re-count runs by district
+  {
+  assert.equal(res.flBasis, "counted", "nsw23: the preferences lane is counted");
+  assert.equal(res.flOpv, true, "nsw23: the optional-preferential flag rides the lane");
+  let nAlpFinal = 0, nClassic = 0, gA = 0, gB = 0;
+  for (const d of res.divs) {
+    for (const row of d.fl) {
+      assert.equal(row.length, 4, `nsw23 ${d.n}: a flow row is one quadruple`);
+      assert.equal(row[1] + row[2] + row[3], d.c[row[0]][4], `nsw23 ${d.n}: ${d.c[row[0]][0]}’s ballots account for their first preferences`);
+    }
+    const finalIdx = new Set([d.tcp[0][0], d.tcp[1][0]]);
+    assert.equal(d.fl.length, d.c.length - 2, `nsw23 ${d.n}: one flow row per non-finalist`);
+    assert.ok(!d.fl.some((row) => finalIdx.has(row[0])), `nsw23 ${d.n}: a finalist carries no flow row`);
+    const fam = (k) => d.c[d.tcp[k][0]][3];
+    if (fam(0) !== "alp" && fam(1) !== "alp") continue;
+    nAlpFinal++;
+    if ([fam(0), fam(1)].sort().join("+") !== "alp+lnp") continue;
+    nClassic++;
+    const side = fam(0) === "alp" ? 1 : 2;
+    for (const row of d.fl) if (d.c[row[0]][3] === "grn") { gA += row[side]; gB += row[3 - side]; }
+  }
+  // the final-pair census: 71 classic ALP v L/NP finals (the state-flows.csv
+  // row's n_classic) inside Labor's 79 top-two finishes
+  assert.equal(nClassic, 71, "nsw23: 71 classic finals, the state-flows.csv row's n_classic");
+  assert.equal(nAlpFinal, 79, "nsw23: Labor made the final two in 79 districts");
+  // the state's canonical Greens figure (data/state-flows.csv: flow shares
+  // read the ballots that REACHED the final two, exhausted ballots carry no
+  // share): 182875 / (182875 + 24645) = 0.88124
+  assert.ok(gA / (gA + gB) > 0.877 && gA / (gA + gB) < 0.885, `nsw23: Greens preferences run to Labor (${(100 * gA / (gA + gB)).toFixed(1)}%, the csv's 88.1)`);
+  // the oracles: Albury's Davern (GRN) split 462 Liberal / 2402 Labor / 1808
+  // exhausted; Newtown, an ALP v GRN final, still carries its minor rows
+  const alb = res.divs.find((d) => d.n === "Albury");
+  assert.equal(alb.c[2][1] + "/" + alb.c[2][0], "GRN/Eli Davern", "nsw23: the oracle's candidate cell");
+  assert.deepEqual(alb.fl.find((row) => row[0] === 2), [2, 462, 2402, 1808], "nsw23: Albury's Greens split, tcp-ordered");
+  const nt = res.divs.find((d) => d.n === "Newtown");
+  assert.deepEqual([nt.c[nt.tcp[0][0]][1], nt.c[nt.tcp[1][0]][1]], ["ALP", "GRN"], "nsw23: Newtown's non-classic final pair");
+  assert.deepEqual(nt.fl, [[2, 1609, 892, 3864], [3, 381, 365, 529]], "nsw23: Newtown's minor-candidate splits");
+  }
   // the census lanes (the same splice contract as the SA frames')
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {

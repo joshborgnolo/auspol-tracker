@@ -509,7 +509,7 @@ function deriveDiv(d, i, year) {
   // seat), or One Nation
   const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
   const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
-  const flows = d.fl.map(([ci, ta, tb]) => ({ cand: c[ci], ta, tb }));
+  const flows = d.fl.map(([ci, ta, tb, exh]) => (exh == null ? { cand: c[ci], ta, tb } : { cand: c[ci], ta, tb, exh }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
