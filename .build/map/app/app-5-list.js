@@ -28,7 +28,8 @@ function rangeText(r, c) { const f = c.fmt || f1; return r.loOpen ? `under ${f(r
    sparkline, the distribution chart and the range filter. */
 function seatColValue(m, d, key) { const c = colByKey(m, "seats", key); return c ? c.get(d) : null; }
 function boothColValue(m, j, key) { const c = colByKey(m, "booths", key); return c ? c.get(j) : null; }
-const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tpp") : S.lens === "informal" ? "inf" : S.lens === "winner" ? "win" : S.lens === "cls" ? "cls" : "lens");
+// the informal lens rides its own column until the exhausted-ballot view takes over, then the generic lens column carries the district figure
+const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tpp") : S.lens === "informal" ? (infModeOf(M()) === "exhaust" ? "lens" : "inf") : S.lens === "winner" ? "win" : S.lens === "cls" ? "cls" : "lens");
 function lensColumn(get, colOf) {
   const lab = lensShort();
   const dec = S.lens === "seifa" && !isDemo();

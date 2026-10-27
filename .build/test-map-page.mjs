@@ -649,6 +649,38 @@ for (const y of ["sa22", "sa26"]) {
   assert.deepEqual([nt.c[nt.tcp[0][0]][1], nt.c[nt.tcp[1][0]][1]], ["ALP", "GRN"], "nsw23: Newtown's non-classic final pair");
   assert.deepEqual(nt.fl, [[2, 1609, 892, 3864], [3, 381, 365, 529]], "nsw23: Newtown's minor-candidate splits");
   }
+  // the informal lens's exhausted-ballot view (infModeOf/infHi flip the
+  // lens's datum, ceiling and legend copy; the census-people select's idiom):
+  // exhaustion rides the flow rows' fourth slot, and under NSW's optional
+  // count every formal ballot resolves exactly into the final count plus
+  // the exhausted residue — the identity the app's exhPct derivation leans on
+  {
+  let exh = 0, form = 0; const pct = [];
+  for (const d of res.divs) {
+    const f = d.c.reduce((a, c) => a + c[4], 0);
+    const e = d.fl.reduce((a, r) => a + r[3], 0);
+    assert.equal(d.tcp[0][1] + d.tcp[1][1] + e, f, `nsw23 ${d.n}: formal = final count + exhausted`);
+    exh += e; form += f; pct.push([d.n, (100 * e) / f]);
+  }
+  pct.sort((a, b) => a[1] - b[1]);
+  assert.ok(Math.abs((100 * exh) / form - 11.44) < 0.01, "nsw23: one ballot in nine exhausted statewide (11.4%)");
+  assert.ok(pct[pct.length - 1][0] === "Cabramatta" && Math.abs(pct[pct.length - 1][1] - 22.9) < 0.05, "nsw23: Cabramatta exhausted most, one ballot in five");
+  assert.ok(pct[0][0] === "Kogarah" && Math.abs(pct[0][1] - 4.1) < 0.05, "nsw23: Kogarah exhausted least, one in twenty-five");
+  const alb = res.divs.find((d) => d.n === "Albury");
+  assert.ok(Math.abs((100 * alb.fl.reduce((a, r) => a + r[3], 0)) / alb.c.reduce((a, c) => a + c[4], 0) - 12.76) < 0.01, "nsw23: Albury's 6,351 exhausted of 49,788 formal (this share drives the view)");
+  assert.ok((100 * exh) / form / 25 < 0.5, "nsw23: the app's 25% exhausted ceiling sits well over the statewide share");
+  }
+  // the view in the sources: a legend switcher like the census measure's,
+  // offered only where the count ran optional-preferential (res.flOpv); the
+  // booths (no per-place re-count) and the state's rundown read the
+  // district's figure
+  assert.ok(js.includes('data-opt="infm"') && js.includes(">Exhausted ballots</option>"), "map.js: the informal lens's Informal / Exhausted ballots switcher");
+  assert.ok(js.includes('else if (k === "infm") S.infMode = t.value;') && js.includes('p.set("im", "exhaust")') && js.includes('p.get("im")'), "map.js: infMode's change handler + the im URL param both ways");
+  assert.ok(js.includes("const infModeOf = (m) =>") && js.includes("const infHi =") && js.includes("? 25 : 12"), "map.js: infModeOf and infHi (the 25 exhausted ceiling)");
+  assert.ok(js.includes("nn(d.exhPct)") && js.includes("nn(m.divs[b.d[j]].exhPct)"), "map.js: the exhausted datum reads the flow rows, booths falling back to the district's");
+  assert.ok(js.includes('"Exhausted ballots" : "Informal"') && js.includes("ballots exhausting before the final two"), "map.js: the exhausted view's scale word and legend title");
+  assert.ok(js.includes("optional-preferential, so a ballot leaves the count when its numbered candidates are gone"), "map.js: the exhausted legend note explains the scheme");
+  assert.ok(js.includes('m.res.flOpv ? `<select data-opt="infm"'), "map.js: the switcher is offered only on the optional-preferential frame");
   // the census lanes (the same splice contract as the SA frames')
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {

@@ -8,7 +8,7 @@ function divValue(m, i) {
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "senate": return senDivValue(m, d);
     case "flow": return flowSeat(d) ? nn(d.flowAlp[S.from]) : null;
-    case "informal": return nn(d.infPct);
+    case "informal": return infModeOf(m) === "exhaust" ? nn(d.exhPct) : nn(d.infPct);
     case "cls": return d.cls || null;
     case "seifa": return isDemo() ? (d.demo && d.demo[S.index] != null ? 100 * d.demo[S.index] : null) : nn(d.seifa[S.index] && d.seifa[S.index].dec);
   }
@@ -39,7 +39,7 @@ function boothValue(m, j) {
     }
     case "flow": return flowSeat(m.divs[b.d[j]]) ? nn(b.flowAlp[S.from][j]) : null;
     case "senate": return senBoothValue(m, j);
-    case "informal": return nn(b.infPct[j]);
+    case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
       if (isDemo()) { const r = b.raw.demo && b.raw.demo[j]; return r ? 100 * r[DM.indexOf(S.index)] : null; }
@@ -62,7 +62,7 @@ function colorOf(v) {
     case "senate": return senGap()
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
-    case "informal": return RAMP.inf[Math.round(clamp(v / 12, 0, 1) * 100)];
+    case "informal": return RAMP.inf[Math.round(clamp(v / infHi(), 0, 1) * 100)];
     case "cls": { const k = CLS.indexOf(v); return k < 0 ? null : TH.cls[k]; }
     case "seifa": {
       if (!isDemo()) return RAMP.seifa[Math.round(((v - 1) / 9) * 100)];

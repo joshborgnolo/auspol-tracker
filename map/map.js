@@ -252,11 +252,23 @@ const LENSES = [
 const FED_LENS = new Set(["senate", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
-// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
-// only — a phone scrolls the lens row itself. On the phone a walk keeps the
-// view fixed (walkHold below), and has no scroll side effects of its own
+// figure swipes (a swipe cycles all the way around); the lens and row walks
+// are keyboard only — a phone scrolls the lens row itself, and its vertical
+// drags belong to the page. On the phone a walk keeps the view fixed
+// (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
+// the up/down-arrows row walk: the timeline's rows top to bottom, in
+// renderTimeline's `rows` order, walking round the ends; a row holds the stop
+// it was left on (setYear keeps the memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
+const laneMem = new Map();
+function walkLane(dir) {
+  const cur = yearLane(S.year);
+  laneMem.set(cur, S.year);
+  const lane = LANES[(LANES.indexOf(cur) + dir + LANES.length) % LANES.length];
+  setYear(laneMem.get(lane) ?? lane[lane.length - 1]);
+}
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -457,6 +469,8 @@ function walkHold(spot) {
 /* =============================== state =============================== */
 const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
+  // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
+  infMode: "informal",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -496,6 +510,12 @@ const flowSeat = (d) => d.vs != null && d.vs === S.vs;
 const vsW = (cap) => (S.vs === "onp" ? "One Nation" : STATE_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
 // a year's seats that finished Labor against One Nation with a split on file: the lens offers that rival
 const hasVsOnp = (m) => m.divs.some((d) => d.vs === "onp" && d.flows.length);
+// the informal lens's exhausted view exists only where the count is optional-preferential;
+// everywhere else it reads as the plain informal share
+const infModeOf = (m) => (S.infMode === "exhaust" && m && m.res && m.res.flOpv ? "exhaust" : "informal");
+// the informal ramp's ceiling on the current year: informal runs to 12% of
+// ballots; exhaustion runs higher (nsw23's most-exhausted seat is 22.9%)
+const infHi = (m) => (infModeOf(m || M()) === "exhaust" ? 25 : 12);
 /* a modelled split's error, the way it was measured: per seat against counted federal divisions
    (Labor v the Liberals), or only in total for Labor v One Nation, against the contests where that
    split was counted (flowErr.vsOnp) */
@@ -539,8 +559,13 @@ function deriveDiv(d, i, year) {
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
   const inf = d.inf;
+  // exhausted ballots ride the flow rows' fourth figure; the share of formal
+  // (like infPct shares formal+informal, exhaustion shares the kept count:
+  // formal = tcp + exhausted here, so this is ballots leaving before the final two)
+  const exhTot = flows.reduce((a, f) => a + (f.exh || 0), 0);
   return {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
+    exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
     A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
     tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
@@ -604,7 +629,10 @@ function deriveAreas(res, m) {
       // a lane's null rows sit that lane's pool out, both sides of the line
       for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
-    out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), idx, formal: a.formal, demo };
+    // the lens-level exhausted share is counted off the divisions' own flow rows
+    const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
+    const exhPct = exd.length ? (100 * sum(exd.map((d) => (d.exhPct / 100) * d.formal))) / sum(exd.map((d) => d.formal)) : null;
+    out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), exhPct, idx, formal: a.formal, demo };
   }
   return out;
 }
@@ -789,7 +817,7 @@ function divValue(m, i) {
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "senate": return senDivValue(m, d);
     case "flow": return flowSeat(d) ? nn(d.flowAlp[S.from]) : null;
-    case "informal": return nn(d.infPct);
+    case "informal": return infModeOf(m) === "exhaust" ? nn(d.exhPct) : nn(d.infPct);
     case "cls": return d.cls || null;
     case "seifa": return isDemo() ? (d.demo && d.demo[S.index] != null ? 100 * d.demo[S.index] : null) : nn(d.seifa[S.index] && d.seifa[S.index].dec);
   }
@@ -820,7 +848,7 @@ function boothValue(m, j) {
     }
     case "flow": return flowSeat(m.divs[b.d[j]]) ? nn(b.flowAlp[S.from][j]) : null;
     case "senate": return senBoothValue(m, j);
-    case "informal": return nn(b.infPct[j]);
+    case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
       if (isDemo()) { const r = b.raw.demo && b.raw.demo[j]; return r ? 100 * r[DM.indexOf(S.index)] : null; }
@@ -843,7 +871,7 @@ function colorOf(v) {
     case "senate": return senGap()
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
-    case "informal": return RAMP.inf[Math.round(clamp(v / 12, 0, 1) * 100)];
+    case "informal": return RAMP.inf[Math.round(clamp(v / infHi(), 0, 1) * 100)];
     case "cls": { const k = CLS.indexOf(v); return k < 0 ? null : TH.cls[k]; }
     case "seifa": {
       if (!isDemo()) return RAMP.seifa[Math.round(((v - 1) / 9) * 100)];
@@ -4441,8 +4469,13 @@ function areaHedDek(m, st) {
       return { hed, dek };
     }
     case "informal": {
-      const hed = `${f1(A.infPct)}% of ballots${where} were informal`;
-      const r = idx.map((i) => ({ i, v: m.divs[i].infPct })).filter((x) => x.v != null).sort((a, b) => b.v - a.v);
+      const exh = infModeOf(m) === "exhaust";
+      const hed = exh ? `${f1(A.exhPct)}% of ballots${where} exhausted before the final two` : `${f1(A.infPct)}% of ballots${where} were informal`;
+      const r = idx.map((i) => ({ i, v: exh ? m.divs[i].exhPct : m.divs[i].infPct })).filter((x) => x.v != null).sort((a, b) => b.v - a.v);
+      if (exh) {
+        const dek = `Under New South Wales’s optional-preferential vote, a ballot leaves the count when its numbered candidates are gone. The highest rate was ${ds(m.divs[r[0].i].n)}’s ${f1(r[0].v)}%${byNote(m.divs[r[0].i])}; the lowest ${ds(m.divs[r[r.length - 1].i].n)}’s ${f1(r[r.length - 1].v)}%.`;
+        return { hed, dek };
+      }
       const pa = prev && Y[prev] && Y[prev].areas ? Y[prev].areas[st] : null;
       const dek = `${pa ? `${Math.abs(A.infPct - pa.infPct) < 0.05 ? "Unchanged" : A.infPct >= pa.infPct ? "Up" : "Down"} from ${f1(pa.infPct)}% in ${prev}. ` : ""}The highest rate was ${ds(m.divs[r[0].i].n)}’s ${f1(r[0].v)}%${byNote(m.divs[r[0].i])}; the lowest ${ds(m.divs[r[r.length - 1].i].n)}’s ${f1(r[r.length - 1].v)}%.`;
       return { hed, dek };
@@ -4689,6 +4722,11 @@ function seatHedDek(m, d) {
       return { hed: `${f0(v)}% of ${nm} preferences in ${ds(d.n)} went to Labor`, dek: `The rest, ${f0(100 - v)}%, went to ${rival}.${opc}` };
     }
     case "informal": {
+      if (infModeOf(m) === "exhaust") {
+        const xs = [...m.divs].filter((x) => x.exhPct != null).sort((a, b) => b.exhPct - a.exhPct);
+        const r = xs.findIndex((x) => x.i === d.i) + 1;
+        return { hed: `${f1(d.exhPct)}% of ${ds(d.n)}’s ballots exhausted before the final two`, dek: `New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. That’s ${rankWords(r, xs.length)} rate of the ${xs.length} seats${byNote(d)}; across the state it was ${f1(m.areas.NSW.exhPct)}%.` };
+      }
       const r = [...m.divs].filter((x) => x.infPct != null).sort((a, b) => b.infPct - a.infPct).findIndex((x) => x.i === d.i) + 1;
       return { hed: `${f1(d.infPct)}% of ${ds(d.n)}’s ballots were informal`, dek: `That’s ${rankWords(r, m.divs.length)} rate of the ${m.divs.length} seats${byNote(d)}; across Australia it was ${f1(m.areas.AUS.infPct)}%.` };
     }
@@ -4801,7 +4839,10 @@ function storyBooth(m, j) {
       else if (senGap()) { hed = `${SUBJ[S.party]} ${senGapWords(v)} here`; dek = `${f1(svShare(svOf(m).booths[b.id[j]], S.party))}% of Senate first preferences against ${f1(b.fp[S.party][j])}% in the House.${dv != null ? ` Across ${ds(D.n)} the gap was ${sgn(dv)} points.` : ""}`; }
       else { hed = `${SUBJ[S.party]} won ${f1(v)}% of the Senate vote here`; dek = dv != null ? `In ${ds(D.n)} as a whole, ${f1(dv)}%.` : ""; }
     }
-    if (S.lens === "informal") { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
+    if (S.lens === "informal") {
+      if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
+      else { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
+    }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoBoothCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
     if (S.lens === "cls") { hed = `${ds(D.n)} is ${/^[aeiou]/i.test(CLS_LOWER[D.cls] || "") ? "an" : "a"} ${CLS_LOWER[D.cls] || ""} seat`; }
@@ -4894,7 +4935,8 @@ function rangeText(r, c) { const f = c.fmt || f1; return r.loOpen ? `under ${f(r
    sparkline, the distribution chart and the range filter. */
 function seatColValue(m, d, key) { const c = colByKey(m, "seats", key); return c ? c.get(d) : null; }
 function boothColValue(m, j, key) { const c = colByKey(m, "booths", key); return c ? c.get(j) : null; }
-const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tpp") : S.lens === "informal" ? "inf" : S.lens === "winner" ? "win" : S.lens === "cls" ? "cls" : "lens");
+// the informal lens rides its own column until the exhausted-ballot view takes over, then the generic lens column carries the district figure
+const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tpp") : S.lens === "informal" ? (infModeOf(M()) === "exhaust" ? "lens" : "inf") : S.lens === "winner" ? "win" : S.lens === "cls" ? "cls" : "lens");
 function lensColumn(get, colOf) {
   const lab = lensShort();
   const dec = S.lens === "seifa" && !isDemo();
@@ -5212,7 +5254,7 @@ function lensShort() {
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} change` : `${famLeg(S.party)} primary`;
     case "senate": return senGap() ? `${famLeg(S.party)}, Senate v House` : `${famLeg(S.party)} Senate vote`;
     case "flow": return `${famLeg(S.from)} to Labor`;
-    case "informal": return "Informal";
+    case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
     case "seifa": return isDemo() ? DM_SHORT[S.index] : `${IX_ABBR[S.index]} decile`;
   }
@@ -5244,7 +5286,7 @@ function valueText(v, kind, ctx) {
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} ${sgn(v)} points` : `${famLeg(S.party)} ${f1(v)}%`;
     case "senate": return senGap() ? `${famLeg(S.party)} ${Math.abs(v) < 0.05 ? "level" : `${pts(v)} ${v > 0 ? "higher" : "lower"}`} in the Senate` : `${famLeg(S.party)} ${f1(v)}% in the Senate`;
     case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
-    case "informal": return `${f1(v)}% informal`;
+    case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
     case "seifa": return isDemo() ? `${f1(v)}% ${dmVerb(M(), S.index)}` : `Decile ${v} of 10`;
   }
@@ -5284,7 +5326,7 @@ function renderLenses() {
 /* =============================== the legend =============================== */
 let legendKey = "";
 const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -5292,7 +5334,7 @@ const RANGE = () => {
     case "fp": return S.fpMode === "change" ? [-15, 15] : [0, FPMAX[S.party]];
     case "senate": return senGap() ? [-10, 10] : [0, FPMAX[S.party]];
     case "flow": return [10, 90];
-    case "informal": return [0, 12];
+    case "informal": return [0, infHi(M())];
     case "seifa": return isDemo() ? DM_RANGE[S.index] : [1, 10];
   }
   return null;
@@ -5349,7 +5391,7 @@ function legendHeightOf(m, y, w, probe) {
   // the hold is per lens and mode: stepping through the years reuses the tallest
   // measure of the CURRENT key, so the figure never moves; switching the lens (or
   // its flip) re-holds it once, which reads as the key's own change
-  const key = [w, S.view, y, real, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.index, S.basis, S.seat].join("|");
+  const key = [w, S.view, y, real, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.basis, S.seat].join("|");
   if (!legendHeights.has(key)) {
     const keep = { seat: S.seat, year: S.year };
     let hMax = 0;
@@ -5464,9 +5506,16 @@ function legendHTML(m) {
       if (m.res.flOpv) h += `<div class="lg-note">Counted, not modelled — New South Wales re-counted every ballot paper. Preferences there are optional, so a ballot can exhaust before the final two; a share reads the ballots that reached them.</div>`;
       break;
     }
-    case "informal":
-      h += `<div class="lg-t">Informal ballots</div>${legendHist(m, 0, 12)}<div class="lg-ramp" style="background:${grad(RAMP.inf, 0, 100)}">${mark(aus.infPct, 0, 12)}</div>${ticks([0, 3, 6, 9, 12], 0, 12, (v) => `${v}%${v === 12 ? "+" : ""}`)}<div class="lg-note">The line marks Australia: ${f1(aus.infPct)}%.</div>`;
+    case "informal": {
+      const exh = infModeOf(m) === "exhaust", hi = infHi(m);
+      // the exhausted view is offered only where the count is optional-preferential —
+      // like the census switcher, the same legend swaps measure under the lens
+      const opts = m.res && m.res.flOpv ? `<select data-opt="infm" aria-label="Informal lens view"><option value="informal"${S.infMode === "informal" ? " selected" : ""}>Informal</option><option value="exhaust"${S.infMode === "exhaust" ? " selected" : ""}>Exhausted ballots</option></select> ` : "";
+      h += `<div class="lg-t">${opts}${exh ? "ballots exhausting before the final two" : "Informal ballots"}</div>`;
+      if (exh) h += `${legendHist(m, 0, hi)}<div class="lg-ramp" style="background:${grad(RAMP.inf, 0, 100)}">${mark(aus.exhPct, 0, hi)}</div>${ticks([0, 6, 12, 18, 25], 0, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}<div class="lg-note">Share of formal ballots that ran out of preferences — New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. The line marks ${stNameCap(m.year)}: ${f1(aus.exhPct)}%.</div>`;
+      else h += `${legendHist(m, 0, hi)}<div class="lg-ramp" style="background:${grad(RAMP.inf, 0, 100)}">${mark(aus.infPct, 0, hi)}</div>${ticks([0, 3, 6, 9, 12], 0, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}<div class="lg-note">The line marks Australia: ${f1(aus.infPct)}%.</div>`;
       break;
+    }
     case "cls":
       h += `<div class="lg-t">The AEC’s seat types</div><div class="lg-cats">${CLS.map((c, k) => `<span><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]} <b>${m.divs.filter((d) => d.cls === c).length}</b></span>`).join("")}</div>`;
       break;
@@ -5894,6 +5943,7 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
+  laneMem.set(yearLane(y), y);
   if (S.house === "senate") {
     // the chosen senator carries across by name where they sat in both Senates, else their state
     const was = SENM, ss = S.ssel;
@@ -6026,6 +6076,7 @@ function writeURL() {
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); }
+  if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
   if (S.house === "senate") {
@@ -6054,6 +6105,7 @@ function readURL() {
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
   const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i))) S.index = i;
   if (p.get("b") === "voters") S.basis = "voters";
+  if (p.get("im") === "exhaust") S.infMode = "exhaust";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
   if (p.get("c") === "senate") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
@@ -6161,7 +6213,7 @@ document.addEventListener("change", (e) => {
     const k = t.dataset.opt;
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
-    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value;
+    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value;
     lensParamChanged(); return;
   }
   if (t.dataset.fsel) { S.f[t.dataset.fsel] = t.value || null; filtersChanged(); return; }
@@ -6193,6 +6245,7 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -6261,7 +6314,7 @@ function preloadYears() {
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },

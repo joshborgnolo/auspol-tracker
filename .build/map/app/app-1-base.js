@@ -250,11 +250,23 @@ const LENSES = [
 const FED_LENS = new Set(["senate", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
-// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
-// only — a phone scrolls the lens row itself. On the phone a walk keeps the
-// view fixed (walkHold below), and has no scroll side effects of its own
+// figure swipes (a swipe cycles all the way around); the lens and row walks
+// are keyboard only — a phone scrolls the lens row itself, and its vertical
+// drags belong to the page. On the phone a walk keeps the view fixed
+// (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
+// the up/down-arrows row walk: the timeline's rows top to bottom, in
+// renderTimeline's `rows` order, walking round the ends; a row holds the stop
+// it was left on (setYear keeps the memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
+const laneMem = new Map();
+function walkLane(dir) {
+  const cur = yearLane(S.year);
+  laneMem.set(cur, S.year);
+  const lane = LANES[(LANES.indexOf(cur) + dir + LANES.length) % LANES.length];
+  setYear(laneMem.get(lane) ?? lane[lane.length - 1]);
+}
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -455,6 +467,8 @@ function walkHold(spot) {
 /* =============================== state =============================== */
 const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
+  // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
+  infMode: "informal",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -494,6 +508,12 @@ const flowSeat = (d) => d.vs != null && d.vs === S.vs;
 const vsW = (cap) => (S.vs === "onp" ? "One Nation" : STATE_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
 // a year's seats that finished Labor against One Nation with a split on file: the lens offers that rival
 const hasVsOnp = (m) => m.divs.some((d) => d.vs === "onp" && d.flows.length);
+// the informal lens's exhausted view exists only where the count is optional-preferential;
+// everywhere else it reads as the plain informal share
+const infModeOf = (m) => (S.infMode === "exhaust" && m && m.res && m.res.flOpv ? "exhaust" : "informal");
+// the informal ramp's ceiling on the current year: informal runs to 12% of
+// ballots; exhaustion runs higher (nsw23's most-exhausted seat is 22.9%)
+const infHi = (m) => (infModeOf(m || M()) === "exhaust" ? 25 : 12);
 /* a modelled split's error, the way it was measured: per seat against counted federal divisions
    (Labor v the Liberals), or only in total for Labor v One Nation, against the contests where that
    split was counted (flowErr.vsOnp) */
@@ -537,8 +557,13 @@ function deriveDiv(d, i, year) {
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
   const inf = d.inf;
+  // exhausted ballots ride the flow rows' fourth figure; the share of formal
+  // (like infPct shares formal+informal, exhaustion shares the kept count:
+  // formal = tcp + exhausted here, so this is ballots leaving before the final two)
+  const exhTot = flows.reduce((a, f) => a + (f.exh || 0), 0);
   return {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
+    exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
     A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
     tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
@@ -602,7 +627,10 @@ function deriveAreas(res, m) {
       // a lane's null rows sit that lane's pool out, both sides of the line
       for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
-    out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), idx, formal: a.formal, demo };
+    // the lens-level exhausted share is counted off the divisions' own flow rows
+    const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
+    const exhPct = exd.length ? (100 * sum(exd.map((d) => (d.exhPct / 100) * d.formal))) / sum(exd.map((d) => d.formal)) : null;
+    out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), exhPct, idx, formal: a.formal, demo };
   }
   return out;
 }
