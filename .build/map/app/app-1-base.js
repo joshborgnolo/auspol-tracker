@@ -192,38 +192,46 @@ const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
 const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, 2025, "sa26", "now"];
-// nsw23/sa22/sa26: the 2023 New South Wales (25 March) and the 2022/2026 South
-// Australian (19/21 March) state elections — non-federal stops, drawn on their
-// own timeline rows at their date rather than a whole year in, named "SA"/"NSW"
-// + the election's year
+const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, "vic22", 2025, "sa26", "now"];
+// nsw23/sa22/vic22/sa26: the 2023 New South Wales (25 March), the 2022/2026
+// South Australian (19/21 March) and the 2022 Victorian (26 November) state
+// elections — non-federal stops, drawn on their own timeline rows at their
+// date rather than a whole year in, named "SA"/"NSW"/"Vic" + the election's year
 const SA_YEARS = new Set(["sa22", "sa26"]);
 const NSW_YEARS = new Set(["nsw23"]);
-const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw23: "nsw" };
+const VIC_YEARS = new Set(["vic22"]);
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw23: "nsw", vic22: "vic" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
 const YEARS_FED = YEARS.filter((y) => !STATE_YEARS.has(y));
 const YEARS_SA = YEARS.filter((y) => SA_YEARS.has(y));
 const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
+const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, now: 2026.8 };
+const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023 };
+const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023, vic22: 2022 };
 // a state frame's history spot: the previous election's date on its row's line
-const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222 };
+const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901 };
 const SA_PREV_X = { 2018: STATE_PREV_X.sa };
 const NSW_PREV_X = { 2019: STATE_PREV_X.nsw };
+const VIC_PREV_X = { 2018: STATE_PREV_X.vic };
 // the election each state frame names as its "previous election" (its date rides
-// STATE_PREV_X on the timelines): South Australia's 2018 and New South Wales' 2019
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw23: 2019 };
-const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales" };
+// STATE_PREV_X on the timelines): South Australia's 2018, New South Wales' 2019
+// and Victoria's 2018
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw23: 2019, vic22: 2018 };
+const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
 const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => `${stOfYear(y).toUpperCase()} ${String(PREV_YEAR[y]).slice(2)}`;
 const prevXLabOf = (y) => `${stOfYear(y).toUpperCase()}’${String(PREV_YEAR[y]).slice(2)}`;
-const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
-const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", now: "Anthony Albanese" };
+const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", vic22: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+// another state's 2018 prev-government collides with SA's key above: Victoria
+// 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
+// against comes from this corridor, not GOV[2018]
+const PREV_GOV_BY_JUR = { vic: { 2018: "alp" } };
+const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", vic22: "Daniel Andrews", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -245,7 +253,7 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 // figure swipes (a swipe cycles all the way around); the lens walk is keyboard
 // only — a phone scrolls the lens row itself. On the phone a walk keeps the
 // view fixed (walkHold below), and has no scroll side effects of its own
-const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
+const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
@@ -721,7 +729,7 @@ const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26", "sa22
 const SEATED_LC = new Set(["sa26"]);
 // the Speaker's district where the results files name none: each state's, as its
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie" };
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie", vic22: "Bendigo West" };
 async function loadYear(year) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent

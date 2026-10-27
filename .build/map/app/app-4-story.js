@@ -17,14 +17,15 @@ const leaderName = (h) => (h.ab === "CSA" ? "Community Strong" : partyName(h.ab,
 const isState = () => STATE_YEARS.has(S.year);
 const isSA = () => SA_YEARS.has(S.year);
 const isNSW = () => NSW_YEARS.has(S.year);
+const isVic = () => VIC_YEARS.has(S.year);
 // a state frame's elections commission, short form (state frames only)
-const commX = () => (isSA() ? "ECSA" : "NSWEC");
-const coalW = (cap) => (isSA() ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+const commX = () => (isSA() ? "ECSA" : isVic() ? "VEC" : "NSWEC");
+const coalW = (cap) => (isSA() || isVic() ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
 const leaderT = () => (isState() ? "premier" : "prime minister");
-const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : "Australia");
+const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : isVic() ? "Victoria" : "Australia");
 const legW = (b) => famLeg(b);
-// a family's preferences, possessive: the Liberals' on an SA frame, the Coalition's elsewhere
-const possW = (b) => (b === "lnp" && isSA() ? "the Liberals’" : POSS[b]);
+// a family's preferences, possessive: the Liberals' on an SA or Victorian frame, the Coalition's elsewhere
+const possW = (b) => (b === "lnp" && (isSA() || isVic()) ? "the Liberals’" : POSS[b]);
 // the "now" view: today’s holder won the last count under another banner — the
 // winner’s row in the count stays historical but earns a "· now X" note
 const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
@@ -198,7 +199,9 @@ function areaHedDek(m, st) {
         return { hed, dek };
       }
       const maj = Math.floor(N / 2) + 1;
-      const pv = prevYearOf(m.year) ?? (m.res && m.res.prev), changed = pv && GOV[pv] && GOV[pv] !== gov;
+      // a state frame's prev lives under its jurisdiction when the federal GOV
+      // table's same-numbered key already belongs to another state (vic's 2018 v SA's)
+      const pv = prevYearOf(m.year) ?? (m.res && m.res.prev), pvG = (pv && STATE_YEARS.has(m.year) && PREV_GOV_BY_JUR[YEAR_JUR[m.year]] && PREV_GOV_BY_JUR[YEAR_JUR[m.year]][pv]) ?? GOV[pv], changed = pv && pvG && pvG !== gov;
       let hed;
       if (aus) {
         if (g < maj) hed = `No party won a majority: ${o > g ? `${coalW()} won ${o} seats, Labor ${g}` : `Labor won ${g} seats, ${coalW()} ${o}`}`;
@@ -397,7 +400,7 @@ function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek } = areaHedDek(m, st);
-  const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
   const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${STATE_YEARS.has(m.year) ? "districts" : "seats"}`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
@@ -406,7 +409,7 @@ function storyArea(m, st) {
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
     const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
-    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
+    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
   if (m.year === "now" && aus) {
     const ch = m.changes.slice().reverse();
@@ -416,7 +419,7 @@ function storyArea(m, st) {
   // the two-party read
   const swp = swingPhrase(A.tppSw, prev);
   const classicN = m.divs.filter((d) => d.tpp != null).length;
-  h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${isSA() ? "the Liberals" : "the Coalition"}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", isSA() ? "Liberal" : "Coalition", 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", isSA() ? "Liberal" : "Coalition", "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${isSA() ? "Liberal" : "the Coalition"} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
+  h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${isSA() || isVic() ? "the Liberals" : "the Coalition"}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", isSA() || isVic() ? "Liberal" : "Coalition", 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", isSA() || isVic() ? "Liberal" : "Coalition", "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${isSA() || isVic() ? "Liberal" : "the Coalition"} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
   h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const bySt = aus ? STATES.filter((s) => m.areas[s]) : [];
@@ -473,7 +476,7 @@ function seatHedDek(m, d) {
       return { hed, dek };
     }
     case "tpp": {
-      if (d.tpp == null) return { hed: `There was no Labor v ${isSA() ? "Liberal" : "Coalition"} count in ${ds(d.n)}`, dek: isState() ? `The ${commX()} publishes a two-party count only where the final pair is Labor against ${isSA() ? "Liberal" : "the Coalition"}.` : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
+      if (d.tpp == null) return { hed: `There was no Labor v ${isSA() || isVic() ? "Liberal" : "Coalition"} count in ${ds(d.n)}`, dek: isState() ? `The ${commX()} publishes a two-party count only where the final pair is Labor against ${isSA() || isVic() ? "Liberal" : "the Coalition"}.` : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
       if (S.tppMode === "swing") {
         const s = d.tppSw;
         const hed = s == null ? `${ds(d.n)} has no recorded swing` : Math.abs(s) < 0.05 ? `There was no two-party swing in ${ds(d.n)}` : `${ds(d.n)} swung ${pts(s)} to ${s > 0 ? "Labor" : coalW()}`;
@@ -671,8 +674,8 @@ function storyBooth(m, j) {
 }
 
 function foot(m) {
-  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. ${SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
+  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  return `<p class="st-foot">${src}. ${SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {

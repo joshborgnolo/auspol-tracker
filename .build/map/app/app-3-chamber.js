@@ -127,7 +127,9 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   // South Australia's Premier and Leader of the Opposition, at the front benches' seats nearest the Speaker
   sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
   // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
-  nsw23: ["Kogarah", "Cronulla"] };
+  nsw23: ["Kogarah", "Cronulla"],
+  // Victoria's (Andrews at Mulgrave, Guy at Bulleen)
+  vic22: ["Mulgrave", "Bulleen"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
@@ -671,7 +673,7 @@ function crossLabel(h) {
   return partyShort(h.ab, h.pn);
 }
 const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick",
-  sa22: "Dan Cregan", sa26: "Nat Cook", nsw23: "Greg Piper" };
+  sa22: "Dan Cregan", sa26: "Nat Cook", nsw23: "Greg Piper", vic22: "Maree Edwards" };
 const speakerName = (m) => SPEAKERS[m.year];
 // the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
 const presiding = (m) => (m.house === "senate" ? (m.speaker != null ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "President", name: "", place: "" }) : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });

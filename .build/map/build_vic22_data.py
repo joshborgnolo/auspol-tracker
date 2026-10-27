@@ -32,7 +32,9 @@ this script never refetches — a cache gap fails the build loudly):
     table; the header row names the final TCP pair; rows per voting centre
     [pairA, pairB, mis-sorts, informal, total]; a closing 'Total' row. The
     booth `tcp` lane and the district TCP totals are made here — the VEC
-    publishes no TCP XLS. (Narracan's annex is the May 2023 SUPPLEMENTARY
+    publishes no TCP XLS. (Pakenham's and Shepparton's district lanes
+    carry the certified distribution final instead — THE CERTIFIED-FINAL
+    OVERRIDE below.) (Narracan's annex is the May 2023 SUPPLEMENTARY
     election's page, the only record: that district's ordinary poll was
     deferred, so the frame carries the supplementary result — see the
     harvester's comment.)
@@ -87,11 +89,22 @@ O'KEEFFE (NAT) in the full preference distribution's final exclusion
 member in general. The frame's winner authority is the VEC's own
 declaration — the results-summary tiles plus Narracan's supplementary
 page (the demsausage roll analogue: authoritative, machine-pinned
-grammar, asserted in load_roster). The TCP LANES (district tcp and
-booth tcp) still ride the annex as published — the annex IS the VEC's
-2CP record, exactly as nsw23 shows a notional-pair tcp where the
-commission published one; only the winner flag/seat tally move to the
-roster. The tally is pinned at EXPECTED_SEATS = {ALP 56, LIB 19 (18
+grammar, asserted in load_roster). The TCP LANES ride the annex as
+published (the annex is the VEC's only per-venue 2CP product) — except
+THE CERTIFIED-FINAL OVERRIDE: Pakenham's and Shepparton's district tcp
+lanes carry the certified distribution-of-preferences final exclusion
+from the committed certified/<slug>.html pages instead, because the
+annex's figures there contradict the commission's own declaration
+(Pakenham 19,587 VULIN v 19,280 FARRELLY, not the annex's
+declaration-night 19,468 v 19,558; Shepparton 23,455 O'KEEFFE v
+17,846 SHEED — a PAIR CHANGE from the annex's notional HAMMER v
+SHEED), and the seat cards everywhere read member and margin straight
+off the district tcp lane. Their per-booth tcp lanes stay the annex's
+(the recheck plain tally has no venue rerun); the other 86 districts
+stay the annex's too, drift pinned exactly by BOOTH_TCP_DRIFT. A
+build-time guard then fails if any district's tcp-lane top figure is
+not the roster-declared member. The tally is pinned at EXPECTED_SEATS
+= {ALP 56, LIB 19 (18
 general + Narracan), NAT 9, GRN 4}, the VEC's official 88-district
 count. load_roster also fails loudly if a roster winner's party is not
 in ROSTER_PARTY (e.g. a future independent winner) — that is a schema
@@ -137,6 +150,7 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "vic22")
 XLS_DIR = os.path.join(SRC, "xls")
 ANNEX_DIR = os.path.join(SRC, "2cp")
+CERT_DIR = os.path.join(SRC, "certified")
 DS_STORE = os.path.join(SRC, "demsausage", "vic-2022.json")
 DEMO_STORE = os.path.join(REPO, "data", "vic22-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "vic22-seifa.json")
@@ -150,6 +164,13 @@ ELECTION = "2022-11-26"
 # AUTHORITY). COUNTED FROM THE ROSTER in load_roster and cross-checked at
 # the end of main().
 EXPECTED_SEATS = {"ALP": 56, "GRN": 4, "LIB": 19, "NAT": 9}
+# certified distribution-of-preferences finals, pinned (THE
+# CERTIFIED-FINAL OVERRIDE): slug -> (winner, winner votes, runner-up,
+# runner-up votes). parse_certified parses the committed certified/
+# pages and asserts they say exactly this — a page move, a hand edit
+# or a source drift all fail loudly.
+CERTIFIED_FINAL = {"pakenham": ("Emma Vulin", 19587, "David Farrelly", 19280),
+                   "shepparton": ("Kim O'Keeffe", 23455, "Suzanna Sheed", 17846)}
 # the results-summary tile's <strong> party strings -> frame abbrs.
 # Narracan's supplementary page says "Liberal". Anything else (an
 # independent, a new party) fails loudly — a schema decision, not a guess.
@@ -576,6 +597,62 @@ def parse_annex(path, name, xls, drift):
             "tcpDrift": tcp_drift}
 
 
+# ------------------------------------------------------------ certified page
+def parse_certified(path, name, cn, pinned):
+    """A distribution-of-preferences page (certified/<slug>.html): its
+    'Elected member' block joins the first-pref roster, its sole FINAL
+    TOTAL row names exactly the final two candidates with their certified
+    votes and their sum as the TOTAL cell, and the count's top figure IS
+    the declared member — then the whole record must equal the pinned
+    figures (a source move or a hand edit both fail loudly)."""
+    ctx = f"certified {name}"
+    page = open(path, encoding="utf-8").read()
+    m = re.search(r"<h3>\s*Elected member\s*</h3>\s*<p>\s*<b>(.*?)</b>",
+                  page, re.S | re.I)
+    if not m:
+        fail(f"{ctx}: no Elected-member block")
+    elected = flat_name(txt(m.group(1)))
+    if elected not in cn:
+        fail(f"{ctx}: declared member {elected!r} not on the ballot")
+    tabs = re.findall(r"<table[^>]*>.*?</table>", page, re.S | re.I)
+    finals = []
+    for t in tabs:
+        trs = re.findall(r"<tr.*?</tr>", t, re.S | re.I)
+        if not trs:
+            continue
+        hdr = [txt(c) for c in re.findall(r"<th[^>]*>.*?</th[^>]*>", trs[0], re.S | re.I)]
+        last = [txt(c) for c in re.findall(r"<t[dh][^>]*>.*?</t[dh]>", trs[-1], re.S | re.I)]
+        if last and last[0] == "FINAL TOTAL":
+            finals.append((hdr, last))
+    if len(finals) != 1:
+        fail(f"{ctx}: {len(finals)} FINAL TOTAL rows, expected 1")
+    hdr, row = finals[0]
+    if len(row) != len(hdr):
+        fail(f"{ctx}: FINAL TOTAL row {len(row)} cells vs header {len(hdr)}")
+    pair, tot = [], None
+    for h, v in zip(hdr, row):
+        if not h:
+            continue
+        if h == "TOTAL":
+            tot = int(v)
+        elif v:
+            pair.append((flat_name(h), int(v)))
+    if tot is None or len(pair) != 2:
+        fail(f"{ctx}: final row {row!r} not a two-candidate count with TOTAL")
+    pair.sort(key=lambda x: -x[1])
+    (w, wv), (r, rv) = pair
+    if wv + rv != tot:
+        fail(f"{ctx}: {wv}+{rv} != TOTAL {tot}")
+    if w != elected:
+        fail(f"{ctx}: count winner {w!r} != declared member {elected!r}")
+    if r not in cn:
+        fail(f"{ctx}: final-two {r!r} not on the ballot")
+    got = (w, wv, r, rv)
+    if got != pinned:
+        fail(f"{ctx}: certified final {got} != pinned {pinned}")
+    return {"pair": (w, r), "votes": (wv, rv)}
+
+
 # ------------------------------------------------------------------ demsausage
 ADDR_RE = re.compile(r"^(?P<street>.*),\s*(?P<sub>[A-Za-z][A-Za-z .'-]*)\s+(?P<pc>\d{4})$")
 
@@ -647,6 +724,12 @@ def main():
 
     warnings.simplefilter("ignore")  # xlrd's benign sector-size note on the VEC blobs
 
+    cert_files = {f[:-5] for f in os.listdir(CERT_DIR)
+                  if f.endswith(".html")} if os.path.isdir(CERT_DIR) else set()
+    if cert_files != set(CERTIFIED_FINAL):
+        fail(f"certified pages {sorted(cert_files)} != pinned "
+             f"CERTIFIED_FINAL {sorted(CERTIFIED_FINAL)}")
+
     D = []
     seats = collections.Counter()
     tot_prim = collections.Counter()
@@ -655,6 +738,7 @@ def main():
     B = {k: [] for k in ("d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon",
                          "v", "inf", "tpp", "tcp", "fl", "dec", "vdec")}
     n_booths_tcp = 0
+    n_cert = 0
     for di, slug in enumerate(files):
         xls = parse_district(os.path.join(XLS_DIR, slug))
         name = xls["name"]
@@ -686,17 +770,35 @@ def main():
         rows_out = [[r["n"], r["ab"], r["pn"], bucket(r["ab"]), r["v"], 0,
                      1 if r["n"] == win else 0, 0] for r in rows]
         seats[win_ab] += 1
-        tcpA = next(i for i, r in enumerate(rows) if r["n"] == ann["pair"][0])
-        tcpB = next(i for i, r in enumerate(rows) if r["n"] == ann["pair"][1])
-        tcp = [[tcpA, pA], [tcpB, pB]]
-        pair_buckets = {bucket(r["ab"]) for r in rows if r["n"] in ann["pair"]}
+
+        # the district tcp lane: the annex's pair and figures, except the
+        # CERTIFIED-FINAL OVERRIDE districts', which carry the certified
+        # distribution final's pair and totals (per-booth lanes untouched)
+        pair_names = ann["pair"]
+        pair_votes = (pA, pB)
+        if slug[:-4] in CERTIFIED_FINAL:
+            cert = parse_certified(os.path.join(CERT_DIR, slug[:-4] + ".html"),
+                                   name, set(cn), CERTIFIED_FINAL[slug[:-4]])
+            pair_names = cert["pair"]
+            pair_votes = cert["votes"]
+            n_cert += 1
+        tcpA = next(i for i, r in enumerate(rows) if r["n"] == pair_names[0])
+        tcpB = next(i for i, r in enumerate(rows) if r["n"] == pair_names[1])
+        tcp = [[tcpA, pair_votes[0]], [tcpB, pair_votes[1]]]
+        pair_buckets = {bucket(r["ab"]) for r in rows if r["n"] in pair_names}
+        # every lane's top figure must be the declared member — the seat
+        # cards read their member and margin straight off this lane
+        if rows[tcpA if pair_votes[0] >= pair_votes[1] else tcpB]["n"] != win:
+            fail(f"{name}: tcp-lane top figure "
+                 f"{rows[tcpA if pair_votes[0] < pair_votes[1] else tcpB]['n']!r} "
+                 f"!= declared member {win!r}")
 
         tpp = None
         if pair_buckets == {"alp", "lnp"}:
-            alp = next(r for r in rows if r["n"] in ann["pair"] and bucket(r["ab"]) == "alp")
-            lnp = next(r for r in rows if r["n"] in ann["pair"] and bucket(r["ab"]) == "lnp")
-            va = pA if alp["n"] == ann["pair"][0] else pB
-            vb = pA if lnp["n"] == ann["pair"][0] else pB
+            alp = next(r for r in rows if r["n"] in pair_names and bucket(r["ab"]) == "alp")
+            lnp = next(r for r in rows if r["n"] in pair_names and bucket(r["ab"]) == "lnp")
+            va = pair_votes[0] if alp["n"] == pair_names[0] else pair_votes[1]
+            vb = pair_votes[0] if lnp["n"] == pair_names[0] else pair_votes[1]
             tpp = [va, vb, None]
             tpp_tot[0] += va
             tpp_tot[1] += vb
@@ -751,7 +853,7 @@ def main():
             "c": rows_out,
             "inf": xls["informal"],
             "tcp": tcp,
-            "fl": None,
+            "fl": [],
             "h": [],
             "enrolled": xls["enrolled"],
             "demo": demo[name],
@@ -787,6 +889,7 @@ def main():
           "| informal", round(100 * tot_inf / (tot_inf + tot_formal), 2),
           "| enrolled", tot_enrolled, "| booths", len(B["id"]),
           f"(tcp on {n_booths_tcp})",
+          f"| certified-final tcp on {n_cert}" if n_cert else "",
           "->", os.path.getsize(p), "bytes")
 
 
