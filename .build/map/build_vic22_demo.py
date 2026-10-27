@@ -61,6 +61,15 @@ GCP_G60B_OCCS = ["P_Tot_Managers", "P_Tot_Professionals",
                  "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
                  "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
                  "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
+# the G09 top-country columns surfaced on /map/ as birthplace sub-views
+# (the federal stores' COB_KEYS — site-key order, 2021 national shares)
+COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+            "lka", "sct"]
+GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
+GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
+GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
+                 "P_Vietnam_Tot", "P_South_Africa_Tot", "P_Scotland_Tot",
+                 "P_Sri_Lanka_Tot"]
 
 
 def fail(msg):
@@ -115,9 +124,11 @@ def load_gcp_vic():
     extra = {}
     for tag, member, cols in (
         ("G09F", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09F_AUST_SA1.csv",
-         ["P_Australia_Tot"]),
+         GCP_G09F_COLS),
+        ("G09G", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09G_AUST_SA1.csv",
+         GCP_G09G_COLS),
         ("G09H", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09H_AUST_SA1.csv",
-         ["P_Tot_Tot", "P_COB_NS_Tot"]),
+         GCP_G09H_COLS),
         ("G49B", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G49B_AUST_SA1.csv",
          ["P_PGrad_Deg_Total", "P_GradDip_and_GradCert_Total",
           "P_BachDeg_Total", "P_Lev_Edu_NS_Total"]),
@@ -152,14 +163,20 @@ def load_gcp_vic():
     out = {}
     for code, r in base.items():
         f09 = extra["G09F"].get(code)
+        g09 = extra["G09G"].get(code)
         h09 = extra["G09H"].get(code)
         e49 = extra["G49B"].get(code)
         o60 = extra["G60B"].get(code)
-        if f09 is None or h09 is None or e49 is None or o60 is None:
+        if f09 is None or g09 is None or h09 is None or e49 is None \
+                or o60 is None:
             fail(f"GCP SA1 set mismatch at {code}")
+        # the ten-country cob tuple, in COB_KEYS order, indexed on the
+        # GCP_G09{F,G,H}_COLS orders above
+        cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
+               g09[2], h09[6], h09[5])
         out[code] = r + (f09[0], h09[0], h09[1],
                          e49[0] + e49[1] + e49[2], e49[3],
-                         o60[2] + o60[6] + o60[7], sum(o60))
+                         o60[2] + o60[6] + o60[7], sum(o60)) + (cob,)
     print(f"GCP demo Vic: {len(out)} rows, persons {persons}")
     return out, persons
 
@@ -198,6 +215,7 @@ def main():
         a = acc.setdefault(dist, {"p": 0, "eng": 0, "oth": 0, "aust": 0,
                                   "tot": 0, "cobns": 0, "uni": 0, "eduns": 0,
                                   "pop15": 0, "blue": 0, "occd": 0,
+                                  "cobN": [0] * len(COB_KEYS),
                                   "bands": [0] * len(DEMO_BANDS), "n": 0})
         r = gcp[code]
         a["p"] += r[0]
@@ -212,6 +230,8 @@ def main():
         a["eduns"] += r[8]
         a["blue"] += r[9]
         a["occd"] += r[10]
+        for i in range(len(COB_KEYS)):
+            a["cobN"][i] += r[11][i]
         a["pop15"] += r[0] - r[3][0] - r[3][1]
         a["n"] += 1
     for dist, _bb, _polys in districts:
@@ -234,6 +254,8 @@ def main():
             "fborn": round((fb_den - a["aust"]) / fb_den, 4),
             "uni": round(a["uni"] / uni_den, 4),
             "blue": round(a["blue"] / a["occd"], 4),
+            "cob": {k: round(a["cobN"][i] / fb_den, 4)
+                    for i, k in enumerate(COB_KEYS)},
         }
         return s, None
 
@@ -248,12 +270,16 @@ def main():
     state = {"p": sum(a["p"] for a in acc.values()), "n": sum(a["n"] for a in acc.values())}
     st_acc = {"p": 0, "eng": 0, "oth": 0, "aust": 0, "tot": 0, "cobns": 0,
               "uni": 0, "eduns": 0, "pop15": 0, "blue": 0, "occd": 0,
+              "cobN": [0] * len(COB_KEYS),
               "bands": [0] * len(DEMO_BANDS), "n": 0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
+            elif k2 == "cobN":
+                for i in range(len(COB_KEYS)):
+                    st_acc["cobN"][i] += v2[i]
             else:
                 st_acc[k2] += v2
     st_shares, why = shares(st_acc)
@@ -268,24 +294,27 @@ def main():
         "jurisdiction": "VIC",
         "date": "2022-11-26",
         "demoBasis": "sa1",
+        "cobKeys": COB_KEYS,
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(VIC_SENTINELS), "sentinelPersons": sentinel_persons},
         "src": {
             "districtGeojson": {"path": os.path.relpath(DIST_GEOJSON, REPO), "sha16": hash16(DIST_GEOJSON)},
             "gcp": {"path": os.path.relpath(GCP_ZIP, REPO), "sha16": hash16(GCP_ZIP),
-                    "members": ["G01", "G09F", "G09H", "G49B", "G60B"]},
+                    "members": ["G01", "G09F", "G09G", "G09H", "G49B", "G60B"]},
             "sa1Shp": {"path": os.path.relpath(SA1_ZIP, REPO), "sha16": hash16(SA1_ZIP)},
             "gcpRows": GCP_ROWS,
         },
-        "about": ("2021 Census GCP G01/G09F/G09H/G49B/G60B SA1 tables, pooled to Victoria's "
+        "about": ("2021 Census GCP G01/G09F/G09G/G09H/G49B/G60B SA1 tables, pooled to Victoria's "
                   "88 state electoral districts for the 26 November 2022 election (the 2021 "
                   "redistribution's boundaries). Each SA1 counts whole to the district its "
                   "polygon representative point lies in (boundary SA1s are not split; the "
                   "state total is never moved). Bases match the federal stores (ex-not-"
                   "stated): language other than English over English-only+other stated; age "
                   "shares renormalised over G01's 11 bands (which exclude age-not-stated); "
-                  "overseas-born over country-stated; university (bachelor and above) over "
+                  "overseas-born over country-stated, and the ten curated birthplace-country "
+                  "shares (cob, order in cobKeys) riding that same basis; "
+                  "university (bachelor and above) over "
                   "the G01 aged-15+ population less level-of-education-not-stated; blue-"
                   "collar (trades, machinery operators and drivers, labourers) over the "
                   "eight stated ANZSCO groups. p is census persons; n the SA1 count. The "

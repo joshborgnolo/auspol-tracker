@@ -79,11 +79,22 @@ GCP_G60B_OCCS = ["P_Tot_Managers", "P_Tot_Professionals",
                  "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
                  "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
                  "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
+# the G09 top-country columns surfaced on /map/ as birthplace sub-views
+# (the federal stores' COB_KEYS — site-key order, 2021 national shares)
+COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+            "lka", "sct"]
+GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
+GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
+GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
+                 "P_Vietnam_Tot", "P_South_Africa_Tot", "P_Scotland_Tot",
+                 "P_Sri_Lanka_Tot"]
 GCP_MEMBERS = (
     ("G09F", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09F_AUST_SA1.csv",
-     ["P_Australia_Tot"]),
+     GCP_G09F_COLS),
+    ("G09G", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09G_AUST_SA1.csv",
+     GCP_G09G_COLS),
     ("G09H", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G09H_AUST_SA1.csv",
-     ["P_Tot_Tot", "P_COB_NS_Tot"]),
+     GCP_G09H_COLS),
     ("G49B", "2021 Census GCP Statistical Area 1 for AUS/2021Census_G49B_AUST_SA1.csv",
      ["P_PGrad_Deg_Total", "P_GradDip_and_GradCert_Total",
       "P_BachDeg_Total", "P_Lev_Edu_NS_Total"]),
@@ -196,8 +207,9 @@ def seifa_deciles():
 
 @functools.lru_cache(maxsize=None)
 def demo_cells():
-    """SA1 code -> [lang, a65, a2034, fborn, uni, blue, None, None] with the
-    district people lanes' exact bases (build_vic22_demo.py)."""
+    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, None, None],
+    cob row in COB_KEYS order) with the district people lanes' exact bases
+    (build_vic22_demo.py)."""
     import csv
     import io
     import zipfile
@@ -246,8 +258,11 @@ def demo_cells():
     out = {}
     for code, r in base.items():
         p, eng, oth, bands = r[0], r[1], r[2], r[3]
-        aust = extra["G09F"][code][0]
-        tot, cobns = extra["G09H"][code]
+        f09 = extra["G09F"][code]
+        g09 = extra["G09G"][code]
+        h09 = extra["G09H"][code]
+        aust = f09[0]
+        tot, cobns = h09[0], h09[1]
         uni = sum(extra["G49B"][code][:3])
         eduns = extra["G49B"][code][3]
         oc = extra["G60B"][code]
@@ -265,13 +280,17 @@ def demo_cells():
                 return None
             v = num / den
             return round(v, 4) if 0 <= v <= 1 else None
-        out[code] = [safe(oth, eng + oth),
-                     safe(bands[8] + bands[9] + bands[10], bsum),
-                     safe(bands[3] + bands[4], bsum),
-                     safe(tot - cobns - aust, tot - cobns),
-                     safe(uni, pop15 - eduns),
-                     safe(blue, occd),
-                     None, None]
+        den09 = tot - cobns
+        cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
+               g09[2], h09[6], h09[5])
+        out[code] = ([safe(oth, eng + oth),
+                      safe(bands[8] + bands[9] + bands[10], bsum),
+                      safe(bands[3] + bands[4], bsum),
+                      safe(tot - cobns - aust, tot - cobns),
+                      safe(uni, pop15 - eduns),
+                      safe(blue, occd),
+                      None, None],
+                     [safe(c, den09) for c in cob])
     print(f"GCP demo cells: {len(out)} SA1s")
     return out
 
@@ -295,15 +314,19 @@ def main():
     if owned:
         fail(f"vic22: {owned} dec rows already filled — the lane is not this script's on a stale data build "
              f"(rerun build_vic22_data.py .build/map/vic22 first)")
+    if data.get("cobKeys"):
+        fail(f"vic22: cobKeys already set — the lane is not this script's on a stale data build "
+             f"(rerun build_vic22_data.py .build/map/vic22 first)")
     out_sa1, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0}
-    dec_col, demo_col = [], []
+    dec_col, demo_col, cob_col = [], [], []
     for k in range(n):
         lat, _lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
         if ty == 4:
             counts["mobile"] += 1
             dec_col.append(None)
             demo_col.append(None)
+            cob_col.append(None)
             continue
         if lat is None:
             fail(f"vic22 booth {B['n'][k]!r}: no coordinates — every fixed booth must carry the venue roll's coords before the census join")
@@ -325,11 +348,14 @@ def main():
         if dm is None:
             fail(f"vic22 booth {B['n'][k]!r}: SA1 {code} has no GCP row (the GCP and SA1 packs must cover the same codes)")
         counts["demo"] += 1
-        demo_col.append(list(dm))
+        demo_col.append(list(dm[0]))
+        cob_col.append(list(dm[1]))
     B["dec"] = dec_col
     B["vdec"] = [None] * n  # the VEC releases no votes-by-SA1 product; the
     # voter-footprint lane is a federal AEC read and stays empty by design
     B["demo"] = demo_col
+    B["cob"] = cob_col
+    data["cobKeys"] = COB_KEYS
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"vic22: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

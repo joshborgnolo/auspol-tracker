@@ -224,10 +224,11 @@ def load_xwalk():
 
 # ------------------------------------------ demo (GCP G01/G09/G49B/G60B)
 # The demo block: 2021-census GCP (SA1) — G01 age bands + language spoken
-# at home, G09F/G09H country of birth, G49B highest non-school
+# at home, G09F/G09G/G09H country of birth, G49B highest non-school
 # qualification, G60B occupation — folded by the same per-SA1 vote weights
 # (the emitted tuple gains blue-collar count + stated-occupation total at
-# indexes 9 and 10). EVERY lane
+# indexes 9 and 10, and the ten curated birthplace-country totals of
+# COB_KEYS as a tuple at index 16). EVERY lane
 # lands on the Ed3/2021-census table; older votes are chain-walked into
 # Ed3 first
 # (2019 & 2022 via CG_SA1_2016_SA1_2021; 2016 via CG_SA1_2011_SA1_2016
@@ -241,8 +242,21 @@ GCP_MEMBER = ("2021 Census GCP Statistical Area 1 for AUS/"
 # block is F-H) and highest non-school qualification
 GCP_MEMBER_G09F = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G09F_AUST_SA1.csv")
+GCP_MEMBER_G09G = ("2021 Census GCP Statistical Area 1 for AUS/"
+                   "2021Census_G09G_AUST_SA1.csv")
 GCP_MEMBER_G09H = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G09H_AUST_SA1.csv")
+# the G09 top-country columns surfaced on /map/ as birthplace sub-views,
+# keyed by their site key and ordered by 2021 national share of the
+# country-stated population (eng 3.84 ind 2.77 chn 2.25 nzl 2.19 phl
+# 1.18 vnm 1.04 zaf 0.74 ita 0.63 lka 0.52 sct 0.43)
+COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+            "lka", "sct"]
+GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
+GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
+GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
+                 "P_Vietnam_Tot", "P_South_Africa_Tot", "P_Scotland_Tot",
+                 "P_Sri_Lanka_Tot"]
 GCP_MEMBER_G49B = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G49B_AUST_SA1.csv")
 GCP_MEMBER_G32 = ("2021 Census GCP Statistical Area 1 for AUS/"
@@ -281,16 +295,18 @@ XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G09F/G09H, G49B, G32/G33 and G60B "
+DEMO_BASIS = ("2021 Census GCP G01, G09F/G09G/G09H, G49B, G32/G33 and G60B "
               "@ SA1 (Ed3); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
-_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09H, "
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09G/G09H, "
               "G49B, G32/G33 and G60B SA1 tables (G01: age-band structure; language "
               "spoken at home English-only vs other. G09: country of "
               "birth — the overseas-born share excludes "
-              "country-of-birth-not-stated. G49B: highest non-school "
+              "country-of-birth-not-stated, and the ten curated "
+              "birthplace-country shares (cob, country order in cobKeys) "
+              "ride the same country-stated basis. G49B: highest non-school "
               "qualification — the bachelor-and-above share is of the "
               "G01 aged-15-and-over population, excluding "
               "level-of-education-not-stated. G33 households by weekly "
@@ -531,8 +547,9 @@ def load_gcp21():
         fail(f"GCP G01 rows {n} != pin {GCP_ROWS}")
     extra = {}
     for tag, member, cols in (
-        ("G09F", GCP_MEMBER_G09F, ["P_Australia_Tot"]),
-        ("G09H", GCP_MEMBER_G09H, ["P_Tot_Tot", "P_COB_NS_Tot"]),
+        ("G09F", GCP_MEMBER_G09F, GCP_G09F_COLS),
+        ("G09G", GCP_MEMBER_G09G, GCP_G09G_COLS),
+        ("G09H", GCP_MEMBER_G09H, GCP_G09H_COLS),
         ("G49B", GCP_MEMBER_G49B, ["P_PGrad_Deg_Total",
                                    "P_GradDip_and_GradCert_Total",
                                    "P_BachDeg_Total",
@@ -564,16 +581,21 @@ def load_gcp21():
     out = {}
     for code, r in base.items():
         f09 = extra["G09F"].get(code)
+        g09 = extra["G09G"].get(code)
         h09 = extra["G09H"].get(code)
         e49 = extra["G49B"].get(code)
         ir = inc.get(code)
         o60 = extra["G60B"].get(code)
-        if f09 is None or h09 is None or e49 is None or ir is None \
-                or o60 is None:
+        if f09 is None or g09 is None or h09 is None or e49 is None \
+                or ir is None or o60 is None:
             fail(f"GCP G09/G49B/G32/G33/G60B SA1 set mismatch at {code}")
+        # the ten-country cob tuple, in COB_KEYS order, indexed on the
+        # GCP_G09{F,G,H}_COLS orders above
+        cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
+               g09[2], h09[6], h09[5])
         out[code] = r + (f09[0], h09[0], h09[1],
                          e49[0] + e49[1] + e49[2], e49[3],
-                         o60[2] + o60[6] + o60[7], sum(o60)) + ir
+                         o60[2] + o60[6] + o60[7], sum(o60)) + ir + (cob,)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -688,7 +710,8 @@ def demo_units(units21, gcp):
            "bluen": 0.0, "occd": 0.0,
            "inct": 0.0, "incl": 0.0, "inch": 0.0,
            "incb": [0.0] * len(INC_BANDS),
-           "incbh": [0.0] * len(INC_BANDS)}
+           "incbh": [0.0] * len(INC_BANDS),
+           "cobN": [0.0] * len(COB_KEYS)}
     divs = {}
     out = {}
     for key, kv in units21.items():
@@ -703,6 +726,7 @@ def demo_units(units21, gcp):
         bands = [0.0] * len(DEMO_BANDS)
         incb = [0.0] * len(INC_BANDS)
         incbh = [0.0] * len(INC_BANDS)
+        cobacc = [0.0] * len(COB_KEYS)
         for code, w in kv.items():
             r = gcp.get(code)
             if r is None:
@@ -728,6 +752,8 @@ def demo_units(units21, gcp):
             for i in range(len(INC_BANDS)):
                 incb[i] += w * r[14][i]
                 incbh[i] += w * r[15][i]
+            for i in range(len(COB_KEYS)):
+                cobacc[i] += w * r[16][i]
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0, "oth": 0.0,
                                       "bands": [0.0] * len(DEMO_BANDS),
@@ -738,7 +764,8 @@ def demo_units(units21, gcp):
                                       "inct": 0.0, "incl": 0.0,
                                       "inch": 0.0,
                                       "incb": [0.0] * len(INC_BANDS),
-                                      "incbh": [0.0] * len(INC_BANDS)})
+                                      "incbh": [0.0] * len(INC_BANDS),
+                                      "cobN": [0.0] * len(COB_KEYS)})
         dv["votes"] += tot
         dv["cov"] += cov
         dv["pers"] += pers
@@ -754,6 +781,8 @@ def demo_units(units21, gcp):
         for i in range(len(INC_BANDS)):
             dv["incb"][i] += incb[i]
             dv["incbh"][i] += incbh[i]
+        for i in range(len(COB_KEYS)):
+            dv["cobN"][i] += cobacc[i]
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -769,6 +798,8 @@ def demo_units(units21, gcp):
         for i in range(len(INC_BANDS)):
             nat["incb"][i] += incb[i]
             nat["incbh"][i] += incbh[i]
+        for i in range(len(COB_KEYS)):
+            nat["cobN"][i] += cobacc[i]
         # G01's 11 age bands exclude age-not-stated (no NS column; the
         # residual against Tot_P_P runs anywhere up to ~5% per SA1), so
         # the age shares renormalise on the band sum — the same
@@ -798,6 +829,9 @@ def demo_units(units21, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "cob": {k: (round(cobacc[i] / fb_den, 4)
+                        if fb_den > 0 else None)
+                    for i, k in enumerate(COB_KEYS)},
         }
     return out, nat, divs
 
@@ -1579,6 +1613,9 @@ def build(year):
             if nat_inc > 0 else None,
             "hiinc": round(demo_nat["inch"] / nat_inc, 4)
             if nat_inc > 0 else None,
+            "cob": {k: (round(demo_nat["cobN"][i] / nat_fbd, 4)
+                        if nat_fbd > 0 else None)
+                    for i, k in enumerate(COB_KEYS)},
             "incMed": band_median(demo_nat["incbh"]),
         },
     }
@@ -1623,6 +1660,9 @@ def build(year):
                 if dv["inct"] > 0 else None,
             "hiinc": round(dv["inch"] / dv["inct"], 4)
                 if dv["inct"] > 0 else None,
+            "cob": {k: (round(dv["cobN"][i] / fb_den, 4)
+                        if fb_den > 0 else None)
+                    for i, k in enumerate(COB_KEYS)},
             "incMed": band_median(dv["incbh"]),
         })
         if demoI_divs is not None:
@@ -1668,7 +1708,9 @@ def build(year):
             "votes:null and note:noVotesRows. The divisions array "
             "re-pools every unit's per-SA1 demo tallies by division: one "
             "language/foreign-born/university/blue-collar/age/income "
-            "reading per division, "
+            "reading per division plus the curated birthplace-country "
+            "(cob) shares (same country-stated basis as fborn; country "
+            "order in cobKeys), "
             "its shares from its own pooled sum, never from averaging "
             "the row-level rounded shares.") + DEMO_ABOUT[year] + interp_note,
         "_provenance": {
@@ -1721,6 +1763,7 @@ def build(year):
                            "Ed3": "SA1 (ASGS Ed3 2021, 7-digit ccd)"}[conf["ed"]],
         "indexes": list(INDEXES),
         "demoBasis": DEMO_BASIS,
+        "cobKeys": COB_KEYS,
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],

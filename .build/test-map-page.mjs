@@ -116,7 +116,10 @@ for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     const sf = JSON.parse(R(`data/booth-seifa-${y}.json`));
     assert.equal(di.f, sf._pcti.f, `${y} demoInterp.f == the seifa store's own _pcti.f`);
     const div = r.divs.find((d) => d.demo);
-    assert.ok(div && Object.values(div.demo).every((v) => v == null || typeof v === "number" && v >= 0), `${y} demo rows well-formed`);
+    // demo rows: 0..1 shares or null per lane, and the birthplace dict's
+    // own country shares the same inside it (the interp contract joined
+    // its object-valued cob key 2026-10-28)
+    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (k === "cob" && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
   // income's 2013 floor survives the blend: 2007/2010 carry no cuts
   // record, and 2016/2019 name THEIR bracketing epochs in sides
@@ -189,6 +192,33 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy)"), "the preload also fills the chambers and the Senate-vote lane");
   assert.ok(ui.includes("k !== 2004"), "no senate-vote-2004 fetch (no such file)");
   assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
+}
+
+// ── the Born overseas birthplace sub-view (the cob lane): the fborn People
+// lane gains a country picker on the year's own census-edition menu — data
+// and app wiring assertions per frame follow in the blocks below
+const GCP_COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka", "sct"];
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js");
+  assert.ok(base.includes('const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };'), "the ten curated birthplace keys and display names in one literal");
+  assert.ok(base.includes('const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand"'), "the country display names");
+  assert.ok(base.includes('const COB_VERB = { eng: "were born in England"') && base.includes('sct: "were born in Scotland"'), "per-country story verbs");
+  assert.ok(base.includes("const COB_RANGE = {") && base.includes("sct: [0, 3]"), "per-country range caps (Scotland's tiny 3% cap)");
+  assert.ok(base.includes('const isCob = () => S.index === "fborn" && S.cob != null;'), "the fborn-only sub-view guard");
+  assert.ok(base.includes("const demoShare = (d) =>") && base.includes("const demoBoothShare = (raw, j, cobPos) =>") && base.includes("const demoRange = () =>") && base.includes("const demoRamp = () =>"), "the cob-aware lane accessors at every seam");
+  assert.ok(base.includes('m.cobKeys = res.cobKeys || null;') && base.includes("map((k, i) => [k, i])"), "loadYear records the year's country order and its positional spots");
+  assert.ok(base.includes("demo.cob = {};") && base.includes("m.cobKeys"), "area pools sum the country shares with the same pool weights");
+  assert.ok(map2.includes("demoShare(d); return v == null ? null : 100 * v"), "division colour reads the country share");
+  assert.ok(map2.includes("demoBoothShare(b.raw, j, m.cobPos || {})"), "booth colour reads the positional cob row");
+  assert.ok(map2.includes("demoRange(); return demoRamp()"), "the sewn ramp stays the fborn family");
+  assert.ok(ui.includes('data-opt="cob" aria-label="Birthplace country"'), "the legend's country picker, the informal lens's own switcher idiom");
+  assert.ok(ui.includes("All overseas-born") && ui.includes("Born in ${COB_NAME[k]}"), "the picker's all-plus-countries options");
+  assert.ok(ui.includes('if (isCob()) p.set("cb", S.cob);'), "the hash carries cb on the fborn lens only");
+  assert.ok(ui.includes('S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;'), "readURL restores the country");
+  assert.ok(ui.includes('k === "cob"'), "the picker change handler is wired");
+  assert.ok(ui.includes("if (S.cob != null && !(b.cobKeys || []).includes(S.cob)) S.cob = null;"), "setYear clamps a country the new year's menu can't print");
+  assert.ok(ui.includes("const bmc = M();") && ui.includes("!(bmc.cobKeys || []).includes(S.cob)) S.cob = null;") && !base.includes("if (S.cob != null && !(m.cobKeys || []).includes(S.cob)) S.cob = null;"), "the boot clamp sits at the model, never inside loadYear (idle preloads of every year mustn't touch S)");
+  assert.ok(story.includes("const COB_TOP = {") && story.includes("the most Australia-born"), "area stories phrase the country against the Australia-born share");
 }
 
 // the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
@@ -273,6 +303,22 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.deepEqual(B.dec[B.n.indexOf("Barmera")], [1, 1, 2, 2], "sa26: Barmera, the bottom of the range");
     const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
     assert.ok(spread.size >= 8, "sa26 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
+  // the birthplace sub-view's data (spliced by the same boothcensus pass):
+  // the frame's ten-country cob rows in site order, every geocoded booth's
+  // reading from the SA1 it stands in, parallel to the people cells
+  {
+    assert.deepEqual(sa.cobKeys, GCP_COB_KEYS, "sa26: cobKeys holds the ten curated countries in site order");
+    assert.equal(B.cob.length, B.n.length, "sa26: a cob row per booth slot");
+    assert.equal(B.cob.filter(Boolean).length, 747, "sa26: cob rows parallel to the people cells");
+    assert.equal(B.cob.filter((x, k) => (x === null) !== (B.demo[k] === null)).length, 0, "sa26: cob rows null exactly where the census block is");
+    for (let k = 0; k < B.n.length; k++) {
+      const r = B.cob[k];
+      if (r !== null) assert.ok(Array.isArray(r) && r.length === GCP_COB_KEYS.length && r.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: cob is ten 0-1 country shares`);
+    }
+    const adl = B.n.indexOf("Adelaide");
+    assert.deepEqual(B.cob[adl], [0.0655, 0.0262, 0.0742, 0.0, 0.0, 0.0, 0.0131, 0.0, 0.0, 0.0], "sa26: the Adelaide booth's birthplace cells");
+    for (const d of sa.divs) assert.ok(d.demo && d.demo.cob && Object.keys(d.demo.cob).length === GCP_COB_KEYS.length, `sa26 ${d.n}: demo carries the ten-country cob`);
   }
   sa.divs.forEach((d, di) => {
     const js = B.d.reduce((a, x, k) => (x === di ? (a.push(k), a) : a), []);
@@ -429,6 +475,22 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, null, null], "sa22: the Adelaide booth's SA1 people cells");
     const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
     assert.ok(spread.size >= 8, "sa22 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
+  // the birthplace sub-view's data on the 2022 frame: the same ten-country
+  // cob rows, spliced sa26-plain by build_sa_boothcensus.py
+  {
+    assert.deepEqual(res.cobKeys, GCP_COB_KEYS, "sa22: the ten curated countries in site order");
+    const BB = res.booths;
+    assert.equal(BB.cob.length, BB.n.length, "sa22: a cob row per booth slot");
+    assert.equal(BB.cob.filter(Boolean).length, 689, "sa22: cob rows parallel to the people cells");
+    assert.equal(BB.cob.filter((x, k) => (x === null) !== (BB.demo[k] === null)).length, 0, "sa22: cob rows null exactly where the census block is");
+    for (let k = 0; k < BB.n.length; k++) {
+      const r = BB.cob[k];
+      if (r !== null) assert.ok(Array.isArray(r) && r.length === GCP_COB_KEYS.length && r.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${BB.n[k]}: cob is ten 0-1 country shares`);
+    }
+    const adl = BB.n.indexOf("Adelaide");
+    assert.deepEqual(BB.cob[adl], [0.0655, 0.0262, 0.0742, 0.0, 0.0, 0.0, 0.0131, 0.0, 0.0, 0.0], "sa22: the Adelaide booth's birthplace cells");
+    for (const d of res.divs) assert.ok(d.demo && d.demo.cob && Object.keys(d.demo.cob).length === GCP_COB_KEYS.length, `sa22 ${d.n}: demo carries the ten-country cob`);
   }
   // the census lanes splice exactly as sa26's
   {
@@ -715,7 +777,8 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "n", "p"].sort(), `nsw23 ${d.n}: no income lanes`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "cob", "n", "p"].sort(), `nsw23 ${d.n}: no income lanes, the birthplace dict rides`);
+    assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
       const c = d.seifa && d.seifa[ix];
       assert.ok(c && typeof c.v === "number" && typeof c.pct === "number" && c.dec >= 1 && c.dec <= 10, `nsw23 ${d.n}: seifa ${ix} {v,pct,dec}`);
@@ -769,11 +832,24 @@ for (const y of ["sa22", "sa26"]) {
     assert.ok(balmain >= 0, "nsw23: the Balmain Public booth exists");
     assert.deepEqual(B.dec[balmain], [10, 10, 7, 10], "nsw23: Balmain Public's SA1 national deciles");
     assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, null, null], "nsw23: Balmain Public's SA1 people cells");
+    assert.deepEqual(B.cob[balmain], [0.0899, 0.0072, 0.0072, 0.0216, 0.0126, 0.0072, 0.0, 0.009, 0.0, 0.0], "nsw23: Balmain Public's birthplace cells");
     assert.deepEqual(B.dec[B.n.indexOf("Inner City Montessori School")], [10, 10, 9, 10], "nsw23: Inner City Montessori School, the top of the range");
     assert.deepEqual(B.dec[B.n.indexOf("Springdale Hghts Public")], [1, 1, 1, 1], "nsw23: Springdale Hghts Public, the bottom of the range");
     assert.deepEqual(B.dec[B.n.indexOf("Lavington E Public")], [1, 1, 2, 1], "nsw23: Lavington E Public, also the bottom of the range");
     const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
     assert.ok(spread.size >= 8, "nsw23 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
+  // the birthplace sub-view's data on the NSW frame (build_nsw23_boothcensus.py):
+  // the ten-country cob rows in site order, parallel to the people cells
+  {
+    assert.deepEqual(res.cobKeys, GCP_COB_KEYS, "nsw23: the ten curated countries in site order");
+    assert.equal(B.cob.length, B.n.length, "nsw23: a cob row per booth slot");
+    assert.equal(B.cob.filter(Boolean).length, 2950, "nsw23: cob rows parallel to the people cells (the fixed booths; mobile teams stay null)");
+    assert.equal(B.cob.filter((x, k) => (x === null) !== (B.demo[k] === null)).length, 0, "nsw23: cob rows null exactly where the census block is");
+    for (let k = 0; k < B.n.length; k++) {
+      const r = B.cob[k];
+      if (r !== null) assert.ok(Array.isArray(r) && r.length === GCP_COB_KEYS.length && r.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: cob is ten 0-1 country shares`);
+    }
   }
 }
 
@@ -1026,7 +1102,8 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "n", "p"].sort(), `vic22 ${d.n}: no income lanes`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "cob", "n", "p"].sort(), `vic22 ${d.n}: no income lanes, the birthplace dict rides`);
+    assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
       const c = d.seifa && d.seifa[ix];
       assert.ok(c && typeof c.v === "number" && typeof c.pct === "number" && c.dec >= 1 && c.dec <= 10, `vic22 ${d.n}: seifa ${ix} {v,pct,dec}`);
@@ -1077,11 +1154,25 @@ for (const y of ["sa22", "sa26"]) {
     assert.ok(toorak >= 0, "vic22: the Toorak Central booth exists");
     assert.deepEqual(B.dec[toorak], [9, 8, 5, 9], "vic22: Toorak Central's SA1 national deciles");
     assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, null, null], "vic22: Toorak Central's SA1 people cells");
+    assert.deepEqual(B.cob[toorak], [0.0481, 0.0137, 0.0103, 0.0137, 0.0, 0.0, 0.0275, 0.0206, 0.0, 0.0], "vic22: Toorak Central's birthplace cells");
     assert.deepEqual(B.dec[B.n.indexOf("Burwood West")], [10, 10, 10, 10], "vic22: Burwood West, the top of the range");
     assert.deepEqual(B.dec[B.n.indexOf("Wodonga Birallee")], [1, 1, 1, 1], "vic22: Wodonga Birallee, the bottom of the range");
     assert.deepEqual(B.dec[B.n.indexOf("Comet Hill")], [1, 1, 1, 1], "vic22: Comet Hill (Bendigo), also the bottom of the range");
     const spread = new Set(B.dec.filter(Boolean).map((d) => d[0]).filter((x) => x !== null));
     assert.ok(spread.size >= 8, "vic22 booth IRSAD deciles spread across the range (a monotone join bug collapses them)");
+  }
+  // the birthplace sub-view's data on the Victorian frame
+  // (build_vic22_boothcensus.py): the ten-country cob rows in site
+  // order, every fixed venue's read of the SA1 it stands in
+  {
+    assert.deepEqual(res.cobKeys, GCP_COB_KEYS, "vic22: the ten curated countries in site order");
+    assert.equal(B.cob.length, B.n.length, "vic22: a cob row per venue slot");
+    assert.equal(B.cob.filter(Boolean).length, 1755, "vic22: cob rows parallel to the people cells");
+    assert.equal(B.cob.filter((x, k) => (x === null) !== (B.demo[k] === null)).length, 0, "vic22: cob rows null exactly where the census block is");
+    for (let k = 0; k < B.n.length; k++) {
+      const r = B.cob[k];
+      if (r !== null) assert.ok(Array.isArray(r) && r.length === GCP_COB_KEYS.length && r.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: cob is ten 0-1 country shares`);
+    }
   }
 }
 
@@ -1116,7 +1207,6 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base), "the Premiers are named (nsw23's Chris Minns, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
   assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds four jurisdiction rows (169px; 148px on the phone rung)");
-  assert.ok(ui.includes("const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X };"), "each jurisdiction's row carries its own previous-election stop");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
   assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and Victorian, New South Wales and South Australian state elections; choose one"'), "the timeline names its jurisdiction rows to a screen reader");
   // the rung order itself, in all four spots that encode it: the rail's rows

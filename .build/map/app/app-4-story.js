@@ -328,6 +328,8 @@ function areaHedDek(m, st) {
 
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"] };
+// the pair-of-phrases for a birthplace country, against the Australia-born share
+const COB_TOP = { eng: ["seats where the most residents were born in England", "the most Australia-born"], ind: ["seats where the most residents were born in India", "the most Australia-born"], chn: ["seats where the most residents were born in China", "the most Australia-born"], nzl: ["seats where the most residents were born in New Zealand", "the most Australia-born"], phl: ["seats where the most residents were born in the Philippines", "the most Australia-born"], vnm: ["seats where the most residents were born in Vietnam", "the most Australia-born"], zaf: ["seats where the most residents were born in South Africa", "the most Australia-born"], ita: ["seats where the most residents were born in Italy", "the most Australia-born"], lka: ["seats where the most residents were born in Sri Lanka", "the most Australia-born"], sct: ["seats where the most residents were born in Scotland", "the most Australia-born"] };
 // the measures' census basis as copy: 2007–2013 read the census areas the
 // polling places stand in (2006 census at 2007 and 2010, 2011 at 2013 — the
 // AEC's where-voters-live record begins 2016); 2016 on reads where their
@@ -363,16 +365,17 @@ const DB = {
 const demoCopy = (m) => {
   if (m.demoBasis === "sa1") return DB.sa1;
   const db = DB[m.demoBasis === "venue" ? "venue" : "voter"];
-  if (m.demoInterp) {
-    const { c0, c1 } = m.demoInterp;
-    return {
-      seats: `Interpolated between the ${c0} and ${c1} censuses to election day${m.demoBasis === "venue" ? ", of the census areas the polling places stand in" : ", counted where each seat’s voters live"}.`,
-      who: db.who,
-      whoAdults: db.whoAdults,
-      note: `Interpolated between the ${c0} and ${c1} censuses to election day.`,
-    };
-  }
-  return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, whoAdults: db.whoAdults, note: db.note(m.year) } : db;
+  // a birthplace-country sub-view never reads the blend epoch: cob rides
+  // the measured census (the 2006/2011 editions carry no England or
+  // Scotland to blend), so its notes name its own census
+  if (isCob() || !m.demoInterp) return m.demoBasis === "venue" ? { seats: db.seats(m.year), who: db.who, whoAdults: db.whoAdults, note: db.note(m.year) } : db;
+  const { c0, c1 } = m.demoInterp;
+  return {
+    seats: `Interpolated between the ${c0} and ${c1} censuses to election day${m.demoBasis === "venue" ? ", of the census areas the polling places stand in" : ", counted where each seat’s voters live"}.`,
+    who: db.who,
+    whoAdults: db.whoAdults,
+    note: `Interpolated between the ${c0} and ${c1} censuses to election day.`,
+  };
 };
 // polling-place cards read one area, not a district pool
 const demoBoothCopy = (m) => (m.demoBasis === "sa1" ? DB.sa1Booth : demoCopy(m));
@@ -396,8 +399,8 @@ const DEMO_EARLY = { hed: "Census figures start at the 2007 election", dek: "200
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
-  const scored = idx.filter((i) => m.divs[i].demo).sort((a, b) => m.divs[b].demo[k] - m.divs[a].demo[k]);
-  const share = `${f1(A.demo[k])}% ${isInc(k) ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
+  const scored = idx.filter((i) => demoShare(m.divs[i]) != null).sort((a, b) => demoShare(m.divs[b]) - demoShare(m.divs[a]));
+  const share = `${f1(demoAreaShare(A.demo))}% ${isInc(k) ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -405,9 +408,10 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${DM_TOP[k][0]}${where}`;
+  const top = isCob() ? COB_TOP[S.cob] : DM_TOP[k];
+  const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
-  const dek = `Of the ${q} ${DM_TOP[k][1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
+  const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
   return { hed, dek };
 }
 
@@ -558,9 +562,9 @@ function seatHedDek(m, d) {
       if (isDemo()) {
         const k = S.index;
         if (!d.demo) return m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY : { hed: `${ds(d.n)} has no census figure`, dek: "" };
-        const xs = m.divs.filter((x) => x.demo).sort((a, b) => b.demo[k] - a.demo[k]), r = xs.findIndex((x) => x.i === d.i) + 1;
+        const xs = m.divs.filter((x) => demoShare(x) != null).sort((a, b) => demoShare(b) - demoShare(a)), r = xs.findIndex((x) => x.i === d.i) + 1;
         const aus = m.areas.AUS.demo;
-        return { hed: `${f0(100 * d.demo[k])}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(aus[k])}%. ${demoCopy(m).seats}` };
+        return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
       if (!c || !c.dec) return { hed: `${ds(d.n)} has no ${IX_ABBR[S.index]} score`, dek: "" };
@@ -593,7 +597,8 @@ function storyDiv(m, i) {
   }
   h += `<div class="st-sec"><h3>Informal</h3><div class="big"><span class="v">${f1(d.infPct)}%</span><span class="l">of ballots · Australia ${f1(m.areas.AUS.infPct)}%</span></div>${d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : ""}</div>`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
-  const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : "";
+  const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
+  const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${origV != null ? `${f0(100 * origV)}% ${COB_VERB[S.cob]}` : `${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}`}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}` : "";
   const hasDeciles = IX.some((ix) => d.seifa[ix] && d.seifa[ix].dec);
   const deciles = hasDeciles ? decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec) : "";
   const seatNote = `${demoCopy(m).note}${deciles ? ` 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.` : ""}`;
@@ -666,7 +671,7 @@ function storyBooth(m, j) {
       if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
       else { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     }
-    if (S.lens === "seifa" && isDemo()) { const k = S.index, r = raw.demo && raw.demo[j], v = r ? 100 * r[DM.indexOf(k)] : null; hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(v)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${D.demo ? f1(100 * D.demo[k]) : "–"}%. ${demoBoothCopy(m).note}`; }
+    if (S.lens === "seifa" && isDemo()) { const k = S.index, v = demoBoothShare(raw, j, m.cobPos || {}), pct = v == null ? null : 100 * v, dv = D.demo && demoShare(D); hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
     if (S.lens === "cls") { hed = `${ds(D.n)} is ${/^[aeiou]/i.test(CLS_LOWER[D.cls] || "") ? "an" : "a"} ${CLS_LOWER[D.cls] || ""} seat`; }
   }
@@ -695,7 +700,8 @@ function storyBooth(m, j) {
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
   const incRow = dr ? incFact(m, { loinc: dr[6], hiinc: dr[7] }) : "";
-  const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${f0(100 * dr[3])}% ${DM_VERB.fborn}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
+  const origB = isCob() && raw.cob && raw.cob[j] ? raw.cob[j][m.cobPos[S.cob]] : null;
+  const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${origB != null ? `${f0(100 * origB)}% ${COB_VERB[S.cob]}` : `${f0(100 * dr[3])}% ${DM_VERB.fborn}`}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
   h += `<div class="st-sec"><h3>The neighbourhood <small>ABS census and SEIFA, national deciles</small></h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in.${isState() ? "" : " From 2016, where the AEC records it, “its voters” scores the areas its voters live in."}</p>${demoRows}</div>`;
   h += `<div class="act"><button type="button" data-go="div:${D.i}">Back to ${ds(D.n)}</button><button type="button" data-listbooths>All places in ${ds(D.n)}</button></div>`;
   h += foot(m);

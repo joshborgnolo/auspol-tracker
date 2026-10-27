@@ -266,6 +266,18 @@ def demo_cells(dm):
             dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc")]
 
 
+def cob_cells(dm, keys):
+    """A booth's birthplace-country row, positional in the year's cobKeys
+    order (None slots where the underlying share is None); None when no
+    demo block (or cob lane) exists."""
+    if not dm:
+        return None
+    c = dm.get("cob")
+    if not c:
+        return None
+    return [c.get(k) for k in keys]
+
+
 def seifa_cells(sf):
     S = {}
     for ix in ("irsad", "irsd", "ier", "ieo"):
@@ -382,6 +394,7 @@ def build_year(year, hist, base2001):
             vstore = json.load(open(p))
             census_basis = "venue"
     bvoter = {(b["divId"], b["boothId"]): b for b in vstore["booths"]} if vstore else {}
+    cobkeys = vstore.get("cobKeys", []) if vstore else []
     if prev >= 2004:
         prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
         prev_ids = {pp for (_, pp) in prev_pp}
@@ -467,7 +480,7 @@ def build_year(year, hist, base2001):
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
-                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed")}
+                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob")}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -514,10 +527,23 @@ def build_year(year, hist, base2001):
         B["dec"].append([dec.get("irsad"), dec.get("irsd"), dec.get("ier"), dec.get("ieo")] if dec else None)
         B["vdec"].append([dec_of(ix, vs.get(ix)) for ix in ("irsad", "irsd", "ier", "ieo")] if vs else None)
         bv = bvoter.get((d, pp)) or {}
-        B["demo"].append(demo_cells(demo_interp_of(bv.get("demo"), bv.get("demoI"))))
+        # the demo row blends like the SEIFA lanes (people-interp block
+        # per-lane-preferred); the cob row rides the MEASURED demo only
+        # (the birthplace lane never joins the blend: the 2006/2011
+        # editions don't print England/Scotland and a union-read from
+        # one census edition could never keep the sub-view copy exact) —
+        # a partially-null census block's cob is withheld with it, so
+        # the booth "no census figures" copy and the birthplace view
+        # agree on which booths carry census people figures
+        dmd = bv.get("demo")
+        dcrow = demo_cells(demo_interp_of(dmd, bv.get("demoI")))
+        B["demo"].append(dcrow)
+        B["cob"].append(cob_cells(dmd, cobkeys) if dcrow else None)
 
     if not any(B["demo"]):
         del B["demo"]  # no census-people store before 2013
+    if not any(B["cob"]):
+        del B["cob"]
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -568,7 +594,12 @@ def build_year(year, hist, base2001):
            # names the same cuts the numbers were built on. interp years
            # carry incomeCutsI: the nearest census side's dollar epoch,
            # both sides' cuts under sides
-           "incomeCuts": (vstore.get("incomeCutsI") or vstore.get("incomeCuts")) if vstore else None}
+           "incomeCuts": (vstore.get("incomeCutsI") or vstore.get("incomeCuts")) if vstore else None,
+           # the birthplace-country sub-view country order the B["cob"]
+           # rows and rec.demo.cob dicts follow (10 keys from 2016 /
+           # the state frames' GCP basis, 8 on the 2006/2011
+           # venue-proxy editions — England/Scotland unreadable there)
+           "cobKeys": cobkeys if vstore else None}
     if vstore and vstore.get("demoInterp"):
         # the people-interp blend record (f, c0/c1, nearestSide,
         # nullRule) on interpolated years; the app's demo copy reads
@@ -708,6 +739,7 @@ def build_farrer(y2025):
         Bb["dec"].append(B25["dec"][j25] if j25 is not None else None)
         Bb["vdec"].append(B25["vdec"][j25] if j25 is not None else None)
         Bb["demo"].append(B25["demo"][j25] if j25 is not None else None)
+        Bb["cob"].append(B25["cob"][j25] if j25 is not None else None)
         Bb["prev"].append(j25)  # index into the 2025 booths, for swings at the same place
     print("Farrer by-election: formal", formal, "booth informal", inf_booths, "2CP",
           {cands[cidx[c]]["n"]: tcp[c] for c in pair}, "booths", len(booths))

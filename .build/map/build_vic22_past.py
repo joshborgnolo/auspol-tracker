@@ -257,9 +257,14 @@ def parse_page(path):
 
 # ------------------------------------------------------------------ the 2018s
 def build_2018():
+    # the district-rollup pages only: the same shared cache also carries the
+    # FPV-by-voting-centre pages (parse-vic-state-flows.py's prefix
+    # exclusion idiom — distribution / fpvbyvotingcentre /
+    # tcpbyvotingcentre are booth-level products, not district rollups)
     files = sorted(f for f in os.listdir(SRC18)
                    if f.endswith("district.html")
                    and not f.startswith("distribution")
+                   and not f.startswith("fpvbyvotingcentre")
                    and not f.startswith("tcpbyvotingcentre"))
     if len(files) != 88:
         fail(f"{len(files)} district pages in {SRC18}, expected 88")

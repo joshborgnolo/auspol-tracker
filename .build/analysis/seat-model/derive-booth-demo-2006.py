@@ -90,6 +90,14 @@ BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
          "55_64", "65_74", "75_84", "85ov"]
 B01_BANDS = [f"B{i}" for i in range(6, 37, 3)]  # B6,B9,…,B36, P columns
 B09_COLS = ["B1249", "B1357", "B1360"]      # aus, cob-ns, total
+# the curated birthplace-country set the GCP-era stores carry as
+# COB_KEYS, minus eng/sct: B09 prints one United Kingdom row, so only
+# the eight are readable at this edition (same site-key order); cells
+# verified against BCP2006_cell_desc_dp.xls
+COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"]
+B09_COB_CELLS = ["B1282", "B1258", "B1315", "B1321", "B1351", "B1330",
+                 "B1294", "B1336"]  # ind chn nzl phl vnm zaf ita lka _P
+B09_COLS += B09_COB_CELLS
 B12_COLS = ["B1990", "B2104"]               # eng-only, other-lang
 B39_COLS = ["B5167", "B5176", "B5185", "B5248"]  # pg,graddip,bach,ns
 B44_COLS = [f"B{i}" for i in range(7153, 7161)]  # 8 major groups
@@ -151,7 +159,9 @@ def load_bcp():
     b44 = bcp_table("B44_B", B44_COLS)
     out = {}
     for code, g in b01.items():
-        aus, cobns, totc = b09[code]
+        row09 = b09[code]
+        aus, cobns, totc = row09[:3]
+        ccob = row09[3:]
         eng, oth = b12[code]
         pg, gd, ba, eduns = b39[code]
         occ = b44[code]
@@ -160,6 +170,7 @@ def load_bcp():
             "ages": g[1:12],
             "eng": eng, "oth": oth,
             "aus": aus, "totc": totc, "cobns": cobns,
+            "cobn": ccob,
             "uni": pg + gd + ba,
             "eduns": eduns,
             "bluen": occ[2] + occ[6] + occ[7],
@@ -185,7 +196,7 @@ def shares(rec):
     bsum = sum(rec["bands"])
     fb_den = rec["totc"] - rec["cobns"]
     uni_den = rec["pop15"] - rec["eduns"]
-    return {
+    out = {
         "persons": rec["pers"],
         "cov": 1.0,
         "langOther": bounded(rec["oth"], rec["eng"] + rec["oth"]),
@@ -195,6 +206,10 @@ def shares(rec):
         "age": ({b: round(rec["bands"][i] / bsum, 4)
                  for i, b in enumerate(BANDS)} if bsum > 0 else None),
     }
+    if rec.get("cobn") is not None:
+        out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
+                      for i, k in enumerate(COB_KEYS8)}
+    return out
 
 
 def build_year(year, sa1):
@@ -224,7 +239,8 @@ def build_year(year, sa1):
     divstate = {b["div"]: b["state"] for b in booths}
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * len(BANDS),
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
-                                  "cobns": 0, "uni": 0, "eduns": 0,
+                                  "cobns": 0, "cobn": [0] * len(COB_KEYS8),
+                                  "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0})
     for key, dv in ced.items():
         r = sa1[key]
@@ -237,6 +253,8 @@ def build_year(year, sa1):
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
                   "occd", "pop15"):
             acc[k] += r[k]
+        for i in range(len(COB_KEYS8)):
+            acc["cobn"][i] += r["cobn"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -259,7 +277,8 @@ def build_year(year, sa1):
                 "pers": row["pers"], "bands": list(row["ages"]),
                 "eng": row["eng"], "oth": row["oth"],
                 "aus": row["aus"], "totc": row["totc"],
-                "cobns": row["cobns"], "uni": row["uni"],
+                "cobns": row["cobns"], "cobn": row["cobn"],
+                "uni": row["uni"],
                 "eduns": row["eduns"], "bluen": row["bluen"],
                 "occd": row["occd"], "pop15": row["pop15"]})
         out_booths.append(rec)
@@ -272,6 +291,9 @@ def build_year(year, sa1):
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
+        for i in range(len(COB_KEYS8)):
+            nat.setdefault("cobn", [0.0] * len(COB_KEYS8))
+            nat["cobn"][i] += dv["cobn"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -300,6 +322,9 @@ def build_year(year, sa1):
             if nat["occd"] > 0 else None,
             "age0_14": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
             "age65ov": round(sum(nat[b] for b in BANDS[8:]) / nat_b, 4),
+            "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
+                        if nat_fbd > 0 else None)
+                    for i, k in enumerate(COB_KEYS8)},
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -327,7 +352,11 @@ def build_year(year, sa1):
             "mirror the GCP lanes: age renormalised over the 11 B01 "
             "bands (no age-not-stated column); language other-at-home "
             "over English-only + other; overseas-born over "
-            "country-of-birth stated; university (bachelor and above) "
+            "country-of-birth stated, and the curated birthplace-country "
+            "(cob) shares riding that same basis — the 2006 B09 prints "
+            "one United Kingdom row, so the GCP-era ten-country set is "
+            "trimmed to eight here (country order in cobKeys); "
+            "university (bachelor and above) "
             "per the aged-15+ population less "
             "level-of-education-not-stated; blue-collar (technicians/"
             "trades + machinery operators/drivers + labourers of B44 "
@@ -361,6 +390,7 @@ def build_year(year, sa1):
         },
         "election": year,
         "censusEdition": 2006,
+        "cobKeys": COB_KEYS8,
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),

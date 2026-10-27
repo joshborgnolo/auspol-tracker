@@ -195,12 +195,38 @@ const DM_VERB_INC = {
   loinc: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
   hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
 };
-const dmVerb = (m, k) => (isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
+const dmVerb = (m, k) => (k === "fborn" && S.cob != null ? COB_VERB[S.cob] : isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
 // (2013 on); 2007 and 2010 stop at the six people measures
 const hasInc = (m) => !!(m && m.incomeCuts);
 const DM_ALL = DM;
 const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
+// the birthplace-country sub-views of the Born overseas lane: when S.cob
+// names a country the lens reads that country's share (the census's
+// country-stated basis, the same as fborn) everywhere fborn would be
+// read. Each year's menu is its own cobKeys (10 keys on 2021-census
+// bases, 8 on the 2006/2011 editions, which merge the whole UK — so
+// England and Scotland are 2016-onward only). Range caps are measured
+// just above each country's division maximum across the frames (booth
+// tails saturate past the cap, the fborn lane's way)
+const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
+const COB_VERB = { eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
+const COB_RANGE = { eng: [0, 20], ind: [0, 25], chn: [0, 20], nzl: [0, 12], phl: [0, 12], vnm: [0, 25], zaf: [0, 7], ita: [0, 9], lka: [0, 7], sct: [0, 3] };
+const isCob = () => S.index === "fborn" && S.cob != null;
+// the active people-lane share of a division, as a fraction (cob-aware)
+const demoShare = (d) => (isCob() ? (d.demo && d.demo.cob ? d.demo.cob[S.cob] : null) : d.demo ? d.demo[S.index] : null);
+// ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
+const demoAreaShare = (demo) => (isCob() ? (demo && demo.cob ? demo.cob[S.cob] : null) : demo ? demo[S.index] : null);
+// ...and of one booth row (fraction): the cob lanes ride the parallel
+// B["cob"] rows, positional in the year's cobKeys (S.cob's spot rides
+// the model's cobPos map)
+const demoBoothShare = (raw, j, cobPos) => {
+  if (isCob()) { const r = raw.cob && raw.cob[j]; return r ? r[cobPos[S.cob]] : null; }
+  const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
+};
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : S.index];
+const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 const DEMO_FROM = 2007;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
@@ -482,6 +508,8 @@ const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
   // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
   infMode: "informal",
+  // the Born overseas lens's birthplace-country sub-view (a COB_NAME key, null = all overseas-born)
+  cob: null,
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -639,6 +667,11 @@ function deriveAreas(res, m) {
       demo = {};
       // a lane's null rows sit that lane's pool out, both sides of the line
       for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
+      // the birthplace countries pool the same way, per year-country
+      if (m.cobKeys && m.cobKeys.length) {
+        demo.cob = {};
+        for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
+      }
     }
     // the lens-level exhausted share is counted off the divisions' own flow rows
     const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
@@ -793,6 +826,10 @@ async function loadYear(year) {
     // the people-interp blend record rides the year on interpolated years
     // (2007–2019); the demo copy and income epoch texts branch on it
     m.demoInterp = res.demoInterp || null;
+    // this year's birthplace-country menu (null where no census people
+    // lane exists) and S.cob's positional spot in its B["cob"] rows
+    m.cobKeys = res.cobKeys || null;
+    m.cobPos = m.cobKeys ? Object.fromEntries(m.cobKeys.map((k, i) => [k, i])) : null;
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));

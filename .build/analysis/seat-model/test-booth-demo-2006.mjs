@@ -63,7 +63,12 @@ const NATIONAL = {
   blue: 0.3204,
   age0_14: 0.1985,
   age65ov: 0.1333,
+  cob: { ind: 0.008, chn: 0.0112, nzl: 0.021, phl: 0.0065,
+         vnm: 0.0087, zaf: 0.0056, ita: 0.0108, lka: 0.0034 },
 };
+// the 2006 B09 per-country lanes: the GCP-era ten-country set trims to
+// eight here (the 2006 table prints one United Kingdom row)
+const COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
 
 // per-year pins measured on the first green emission
 const YEARS = {
@@ -74,11 +79,18 @@ const YEARS = {
       uni: 0.4376, blue: 0.1299 },
     fowler: { persons: 135571, langOther: 0.6011, fborn: 0.4568,
       uni: 0.0836, blue: 0.4495 },
+    sydneyCob: { ind: 0.0082, chn: 0.0449, nzl: 0.0386, phl: 0.0066,
+      vnm: 0.0108, zaf: 0.006, ita: 0.0058, lka: 0.0016 },
+    fowlerCob: { ind: 0.0034, chn: 0.0122, nzl: 0.0128, phl: 0.0154,
+      vnm: 0.0978, zaf: 0.0008, ita: 0.0254, lka: 0.0013 },
     maxLang: ["Watson", 0.6771], minLang: ["Lyons", 0.0161],
     maxFb: ["Reid", 0.546], minFb: ["Parkes", 0.0563],
     maxUni: ["North Sydney", 0.4556], minUni: ["Wakefield", 0.0578],
     maxBlue: ["Flynn", 0.473], minBlue: ["North Sydney", 0.1016],
     oldest: ["Gilmore", 0.2144], youngest: ["Lingiari", 0.0432],
+    maxVnm: ["Blaxland", 0.1311], maxChn: ["Watson", 0.1041],
+    maxInd: ["Reid", 0.0488], maxNzl: ["Fadden", 0.0903],
+    maxIta: ["Wills", 0.0769],
   },
   2010: {
     booths: 8951, geoMissing: 599, geoEmpty: 42,
@@ -87,17 +99,26 @@ const YEARS = {
       uni: 0.4328, blue: 0.1335 },
     fowler: { persons: 142967, langOther: 0.6909, fborn: 0.53,
       uni: 0.0808, blue: 0.4853 },
+    sydneyCob: { ind: 0.0082, chn: 0.0455, nzl: 0.0379, phl: 0.0067,
+      vnm: 0.0105, zaf: 0.006, ita: 0.006, lka: 0.0016 },
+    fowlerCob: { ind: 0.0044, chn: 0.0217, nzl: 0.0131, phl: 0.0146,
+      vnm: 0.154, zaf: 0.0007, ita: 0.0192, lka: 0.0012 },
     maxLang: ["Watson", 0.6919], minLang: ["Lyons", 0.0151],
     maxFb: ["Fowler", 0.53], minFb: ["Parkes", 0.0533],
     maxUni: ["North Sydney", 0.4456], minUni: ["Wakefield", 0.0578],
     maxBlue: ["Fowler", 0.4853], minBlue: ["North Sydney", 0.1085],
     oldest: ["Lyne", 0.2117], youngest: ["Lingiari", 0.0432],
+    maxVnm: ["Fowler", 0.154], maxChn: ["Banks", 0.1042],
+    maxInd: ["Parramatta", 0.0653], maxNzl: ["Fadden", 0.0904],
+    maxIta: ["Wills", 0.0769],
   },
 };
 
 const LINGIARI = {
   div: "Lingiari", state: "NT", persons: 101436, cov: 1,
   langOther: 0.3687, fborn: 0.1015, uni: 0.1085, blue: 0.3867,
+  cob: { ind: 0.0019, chn: 0.0006, nzl: 0.0146, phl: 0.005,
+         vnm: 0.0023, zaf: 0.0025, ita: 0.0018, lka: 0.0007 },
 };
 
 const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
@@ -148,6 +169,11 @@ for (const year of [2007, 2010]) {
         const s = BANDS.reduce((t, x) => t + dm.age[x], 0);
         ok(Math.abs(s - 1) < 0.01, `${year} age sums ~1 ${k}: ${s}`);
       }
+      eq(dm.cob && Object.keys(dm.cob), COB_KEYS8, `${year} cob keys ${k}`);
+      for (const f of COB_KEYS8) {
+        ok(dm.cob[f] === null || (dm.cob[f] >= 0 && dm.cob[f] <= 1),
+          `${year} cob share range ${f} ${k}`);
+      }
     }
     eq(nulls, P.geoMissing + P.geoEmpty,
       `${year} null demo == geo missing + geo empty`);
@@ -156,6 +182,7 @@ for (const year of [2007, 2010]) {
 
   // 3. national pins
   eq(d.counts.national, NATIONAL, `${year} counts.national`);
+  eq(d.cobKeys, COB_KEYS8, `${year} cobKeys contract`);
 
   // 4. division anchors + extrema
   {
@@ -165,9 +192,12 @@ for (const year of [2007, 2010]) {
       f.map((k) => P.sydney[k]), `${year} Sydney figures`);
     eq(f.map((k) => divs.get("Fowler")[k]),
       f.map((k) => P.fowler[k]), `${year} Fowler figures`);
+    eq(divs.get("Sydney").cob, P.sydneyCob, `${year} Sydney cob`);
+    eq(divs.get("Fowler").cob, P.fowlerCob, `${year} Fowler cob`);
     const L = divs.get("Lingiari");
     eq(f.map((k) => L[k]), f.map((k) => LINGIARI[k]),
       `${year} Lingiari figures`);
+    eq(L.cob, LINGIARI.cob, `${year} Lingiari cob`);
     eq([L.state, L.cov], ["NT", 1], `${year} Lingiari state/cov`);
     console.log(`${year} Lingiari:`, JSON.stringify(L));
     const sr = (g) => [...d.divisions].sort((a, b) => g(b) - g(a));
@@ -194,6 +224,11 @@ for (const year of [2007, 2010]) {
       `${year} oldest`);
     eq([age.at(-1).div, +a65(age.at(-1)).toFixed(4)], P.youngest,
       `${year} youngest`);
+    for (const [key, pin] of [["vnm", P.maxVnm], ["chn", P.maxChn],
+        ["ind", P.maxInd], ["nzl", P.maxNzl], ["ita", P.maxIta]]) {
+      const t = sr((x) => x.cob[key])[0];
+      eq([t.div, t.cob[key]], pin, `${year} max ${key}`);
+    }
     // sort-order: state order then div, non-decreasing
     const STATES = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
     const ORD = STATES.indexOf.bind(STATES);

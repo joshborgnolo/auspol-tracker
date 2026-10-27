@@ -121,6 +121,7 @@ def sum_divisions(alloc, sa1, inc):
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
                                   "cobns": 0, "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
+                                  "cobn": [0] * len(d13.COB_KEYS8),
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
                                   "incbh": [0.0] * len(d13.INC_BANDS14)})
     for key, dv in alloc.items():
@@ -138,6 +139,8 @@ def sum_divisions(alloc, sa1, inc):
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
                   "occd", "pop15"):
             acc[k] += r[k]
+        for i in range(len(d13.COB_KEYS8)):
+            acc["cobn"][i] += r["cobn"][i]
         acc["inct"] += ir[0]
         acc["incl"] += ir[1]
         acc["inch"] += ir[2]
@@ -161,6 +164,9 @@ def national_of(divsum):
         nat.setdefault("incbh", [0.0] * len(d13.INC_BANDS14))
         for i in range(len(d13.INC_BANDS14)):
             nat["incbh"][i] += dv["incbh"][i]
+        nat.setdefault("cobn", [0.0] * len(d13.COB_KEYS8))
+        for i in range(len(d13.COB_KEYS8)):
+            nat["cobn"][i] += dv["cobn"][i]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -179,6 +185,9 @@ def national_of(divsum):
         if nat["inct"] else None,
         "hiinc": round(nat["inch"] / nat["inct"], 4)
         if nat["inct"] else None,
+        "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
+                    if nat_fbd > 0 else None)
+                for i, k in enumerate(d13.COB_KEYS8)},
         "incMed": d13.band_median14(nat["incbh"]),
     }
 
@@ -245,7 +254,8 @@ def main():
                     "pers": row["pers"], "bands": list(row["ages"]),
                     "eng": row["eng"], "oth": row["oth"],
                     "aus": row["aus"], "totc": row["totc"],
-                    "cobns": row["cobns"], "uni": row["uni"],
+                    "cobns": row["cobns"], "cobn": row["cobn"],
+                    "uni": row["uni"],
                     "eduns": row["eduns"], "bluen": row["bluen"],
                     "occd": row["occd"], "pop15": row["pop15"],
                     "inct": ir[0], "incl": ir[1], "inch": ir[2],
@@ -300,7 +310,9 @@ def main():
                 f"(seifa-src/{y['alloc']}) and summed, never an average "
                 "of booth rows. Shares and income lanes are "
                 "derive-booth-demo-2013.py's own readers re-run — same "
-                "B01/B09/B26/B28/B40B/B45B bases, same adult "
+                "B01/B09/B26/B28/B40B/B45B bases (its curated "
+                "birthplace-country cob lanes riding the B09 per-country "
+                "cells in the 2013 store's COB_KEYS8 order), same adult "
                 "re-weighting at data/income-dist.json's factors, the "
                 "national 25th-percentile cut in 2011 dollars; this "
                 "census universe is the 2013 store's, so incomeCuts "
@@ -356,6 +368,7 @@ def main():
                 "adultsWeights": "data/income-dist.json",
                 "medianBasis": "households (shares are per-adult)",
             },
+            "cobKeys": list(d13.COB_KEYS8),
             "counts": counts,
             "divisions": divisions,
             "booths": out_booths,

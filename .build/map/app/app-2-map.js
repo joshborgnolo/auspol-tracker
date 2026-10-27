@@ -10,7 +10,10 @@ function divValue(m, i) {
     case "flow": return flowSeat(d) ? nn(d.flowAlp[S.from]) : null;
     case "informal": return infModeOf(m) === "exhaust" ? nn(d.exhPct) : nn(d.infPct);
     case "cls": return d.cls || null;
-    case "seifa": return isDemo() ? (d.demo && d.demo[S.index] != null ? 100 * d.demo[S.index] : null) : nn(d.seifa[S.index] && d.seifa[S.index].dec);
+    case "seifa": {
+      if (!isDemo()) return nn(d.seifa[S.index] && d.seifa[S.index].dec);
+      const v = demoShare(d); return v == null ? null : 100 * v;
+    }
   }
   return null;
 }
@@ -42,7 +45,7 @@ function boothValue(m, j) {
     case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
-      if (isDemo()) { const r = b.raw.demo && b.raw.demo[j]; return r ? 100 * r[DM.indexOf(S.index)] : null; }
+      if (isDemo()) { const v = demoBoothShare(b.raw, j, m.cobPos || {}); return v == null ? null : 100 * v; }
       const arr = S.basis === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }
   }
@@ -66,7 +69,7 @@ function colorOf(v) {
     case "cls": { const k = CLS.indexOf(v); return k < 0 ? null : TH.cls[k]; }
     case "seifa": {
       if (!isDemo()) return RAMP.seifa[Math.round(((v - 1) / 9) * 100)];
-      const [lo, hi] = DM_RANGE[S.index]; return RAMP.demo[S.index][Math.round(clamp((v - lo) / (hi - lo), 0, 1) * 100)];
+      const [lo, hi] = demoRange(); return demoRamp()[Math.round(clamp((v - lo) / (hi - lo), 0, 1) * 100)];
     }
   }
   return null;

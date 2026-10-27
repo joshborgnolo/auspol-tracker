@@ -110,7 +110,16 @@ INC_HI_GUARD_2011 = (0.03, 0.06)  # national adults share of the top band
 BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
          "55_64", "65_74", "75_84", "85ov"]
 AGECOLS = [f"Age_{b}_yr_P" for b in BANDS[:-1]] + ["Age_85ov_P"]
-B09_COLS = ["Australia_P", "Country_birth_not_stated_P", "Tot_P"]
+# the curated birthplace-country set the GCP-era stores carry as
+# COB_KEYS, minus eng/sct: B09 merges the whole UK into one
+# UK_Channel_Islands_Isle_Man row, so only the eight are readable here
+# (same site-key order)
+COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"]
+B09_COB_COLS = ["India_P", "China_excl_SARs_Taiwan_P", "New_Zealand_P",
+                "Philippines_P", "Vietnam_P", "South_Africa_P", "Italy_P",
+                "Sri_Lanka_P"]
+B09_COLS = ["Australia_P", "Country_birth_not_stated_P", "Tot_P"] + \
+           B09_COB_COLS
 B40_COLS = ["P_PGrad_Deg_Total", "P_GradDip_and_GradCert_Total",
             "P_BachDeg_Total", "P_Lev_Edu_NS_Total"]
 # the eight stated ANZSCO occupation major groups (B45B P_Tot_*), in
@@ -174,7 +183,12 @@ def load_bcp():
     b45 = bcp_table(z, BCP_B45B, "region_id", B45_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
-        aus, cobns, totc = b09.get(code, (None, None, None))
+        row09 = b09.get(code)
+        if row09 is None:
+            aus = totc = cobns = ccob = None
+        else:
+            aus, cobns, totc = row09[:3]
+            ccob = row09[3:]
         pg, gd, ba, eduns = b40.get(code, (None, None, None, None))
         occ = b45.get(code)
         out[code] = {
@@ -182,6 +196,7 @@ def load_bcp():
             "ages": g[1:12],
             "eng": g[12], "oth": g[13],
             "aus": aus, "totc": totc, "cobns": cobns,
+            "cobn": ccob,
             "uni": (pg + gd + ba) if pg is not None else None,
             "eduns": eduns,
             "bluen": (occ[2] + occ[6] + occ[7]) if occ is not None
@@ -455,6 +470,9 @@ def shares(rec):
         out["loinc"] = bounded(rec["incl"], rec["inct"])
         out["hiinc"] = bounded(rec["inch"], rec["inct"])
         out["incMed"] = band_median14(rec["incbh"])
+    if rec.get("cobn") is not None:
+        out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
+                      for i, k in enumerate(COB_KEYS8)}
     return out
 
 
@@ -489,7 +507,8 @@ def main():
     divstate = {b["div"]: b["state"] for b in booths}
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * len(BANDS),
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
-                                  "cobns": 0, "uni": 0, "eduns": 0,
+                                  "cobns": 0, "cobn": [0] * len(COB_KEYS8),
+                                  "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
                                   "incbh": [0.0] * len(INC_BANDS14)})
@@ -505,6 +524,8 @@ def main():
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
                   "occd", "pop15"):
             acc[k] += r[k]
+        for i in range(len(COB_KEYS8)):
+            acc["cobn"][i] += r["cobn"][i]
         acc["inct"] += ir[0]
         acc["incl"] += ir[1]
         acc["inch"] += ir[2]
@@ -533,7 +554,8 @@ def main():
                 "pers": row["pers"], "bands": list(row["ages"]),
                 "eng": row["eng"], "oth": row["oth"],
                 "aus": row["aus"], "totc": row["totc"],
-                "cobns": row["cobns"], "uni": row["uni"],
+                "cobns": row["cobns"], "cobn": row["cobn"],
+                "uni": row["uni"],
                 "eduns": row["eduns"], "bluen": row["bluen"],
                 "occd": row["occd"], "pop15": row["pop15"],
                 "inct": ir[0], "incl": ir[1], "inch": ir[2],
@@ -553,6 +575,9 @@ def main():
         for i in range(len(INC_BANDS14)):
             nat.setdefault("incbh", [0.0] * len(INC_BANDS14))
             nat["incbh"][i] += dv["incbh"][i]
+        for i in range(len(COB_KEYS8)):
+            nat.setdefault("cobn", [0.0] * len(COB_KEYS8))
+            nat["cobn"][i] += dv["cobn"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -586,6 +611,9 @@ def main():
             if nat["inct"] else None,
             "hiinc": round(nat["inch"] / nat["inct"], 4)
             if nat["inct"] else None,
+            "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
+                        if nat_fbd > 0 else None)
+                    for i, k in enumerate(COB_KEYS8)},
             "incMed": band_median14(nat["incbh"]),
         },
     }
@@ -608,7 +636,12 @@ def main():
             "mirror the GCP lanes: age renormalised over the 11 B01 "
             "bands (no age-not-stated column); language other-at-home "
             "over English-only + other; overseas-born over "
-            "country-of-birth stated; university (bachelor and above) "
+            "country-of-birth stated, and the curated birthplace-country "
+            "(cob) shares riding that same country-stated basis — the "
+            "2011 B09 prints no England or Scotland subsets (it merges "
+            "the UK into one row), so the GCP-era ten-country set is "
+            "trimmed to eight here (country order in cobKeys); "
+            "university (bachelor and above) "
             "per the aged-15+ population less "
             "level-of-education-not-stated; blue-collar (technicians/"
             "trades + machinery operators/drivers + labourers of B45B "
@@ -663,6 +696,7 @@ def main():
         },
         "election": 2013,
         "censusEdition": 2011,
+        "cobKeys": COB_KEYS8,
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
         "incomeCuts": {

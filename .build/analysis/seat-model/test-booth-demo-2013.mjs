@@ -117,6 +117,14 @@ eq(d.counts.cedPseudoSkipped, 33, "pseudo-entry SA1s dropped");
     ok(dm.incMed === null || (dm.incMed >= 100 && dm.incMed <= 4200),
       `incMed range ${k}`);
     if (dm.incMed === null) laneNull.incMed++;
+    eq(dm.cob && Object.keys(dm.cob),
+      ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"],
+      `cob keys ${k}`);
+    for (const f of ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+      "lka"]) {
+      ok(dm.cob[f] === null || (dm.cob[f] >= 0 && dm.cob[f] <= 1),
+        `cob share range ${f} ${k}`);
+    }
   }
   eq(nulls, d.counts.boothsGeoMissing + d.counts.boothsGeoEmpty,
     "null demo == geo missing + geo empty");
@@ -140,6 +148,8 @@ eq(d.counts.national, {
   age65ov: 0.1401,
   loinc: 0.2517,
   hiinc: 0.043,
+  cob: { ind: 0.0146, chn: 0.0157, nzl: 0.0237, phl: 0.0084,
+    vnm: 0.0091, zaf: 0.0072, ita: 0.0091, lka: 0.0043 },
   incMed: 1235,
 }, "counts.national");
 
@@ -147,6 +157,13 @@ eq(d.counts.national, {
 // own contract in section 8)
 const stripI = (o) => { const { demoI, ...rest } = o; return rest; };
 let divs;
+// the 2011 B09 per-country lanes: the GCP-era ten-country set trims to
+// eight here (the 2011 table merges the UK into one row — no England or
+// Scotland subset to read)
+const COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
+eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
+
+// 4. division anchors
 {
   divs = new Map(d.divisions.map((x) => [x.div, x]));
   const S = divs.get("Sydney");
@@ -155,6 +172,8 @@ let divs;
     langOther: 0.3277, fborn: 0.4686, uni: 0.4751, blue: 0.1316,
     age: S.age,
     loinc: 0.2038, hiinc: 0.1164, incMed: 1730,
+    cob: { ind: 0.0127, chn: 0.0603, nzl: 0.0347, phl: 0.0088,
+      vnm: 0.0117, zaf: 0.0066, ita: 0.0061, lka: 0.0023 },
   }, "Sydney row");
   const M = divs.get("Melbourne");
   eq([M.persons, M.langOther, M.fborn, M.uni, M.blue,
@@ -172,6 +191,8 @@ let divs;
     langOther: 0.4016, fborn: 0.1179, uni: 0.1317, blue: 0.3522,
     age: L.age,
     loinc: 0.1977, hiinc: 0.0449, incMed: 1504,
+    cob: { ind: 0.006, chn: 0.0011, nzl: 0.0169, phl: 0.0077,
+      vnm: 0.002, zaf: 0.0032, ita: 0.0015, lka: 0.0008 },
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
@@ -208,6 +229,17 @@ let divs;
     "max median income");
   eq([byMed.at(-1).div, byMed.at(-1).incMed], ["Hinkler", 800],
     "min median income");
+  const sr = (g) => [...d.divisions].sort((a, b) => g(b) - g(a))[0];
+  eq((() => { const t = sr((x) => x.cob.vnm); return [t.div, t.cob.vnm]; })(),
+    ["Fowler", 0.1605], "max Vietnam-born");
+  eq((() => { const t = sr((x) => x.cob.chn); return [t.div, t.cob.chn]; })(),
+    ["Banks", 0.1325], "max China-born");
+  eq((() => { const t = sr((x) => x.cob.ind); return [t.div, t.cob.ind]; })(),
+    ["Parramatta", 0.1101], "max India-born");
+  eq((() => { const t = sr((x) => x.cob.nzl); return [t.div, t.cob.nzl]; })(),
+    ["Fadden", 0.106], "max NZ-born");
+  eq((() => { const t = sr((x) => x.cob.ita); return [t.div, t.cob.ita]; })(),
+    ["Wills", 0.063], "max Italy-born");
   // sort-order: state order then div, non-decreasing
   const ORD = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"].indexOf
     .bind(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]);

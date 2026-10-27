@@ -119,7 +119,7 @@ const YEARS = {
     maxs: { irsd: 1143.7, irsad: 1192.8, ier: 1209.4, ieo: 1209.6 },
     sentinelIds: "9999901",
     zeroVotes: ["Brand|65161"],
-    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, fborn: 0.278, uni: 0.2823, blue: 0.2825, age0_14: 0.1805, age65ov: 0.1823, loinc: 0.2537, hiinc: 0.1651, incMed: 1758 } },
+    demo: { rows: 8795, coverage: 1.0, national: { langOther: 0.218, fborn: 0.278, uni: 0.2823, blue: 0.2825, age0_14: 0.1805, age65ov: 0.1823, loinc: 0.2537, hiinc: 0.1651, cob: { eng: 0.0402, ind: 0.0225, chn: 0.0202, nzl: 0.0209, phl: 0.0105, vnm: 0.0103, zaf: 0.0076, ita: 0.0066, lka: 0.0047, sct: 0.0046 }, incMed: 1758 } },
     demoMaxLang: ["Lingiari", "Home Island", 0.9804],
     demoDivs: { langMax: ["Fowler", 0.7328], langMin: ["Lyne", 0.0296],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.0777],
@@ -132,6 +132,8 @@ const YEARS = {
                hiMax: ["Wentworth", 0.4476], hiMin: ["Lyons", 0.0514],
                medMin: ["Hinkler", 1133], medMax: ["Wentworth", 2943] },
     incLingiari: { lo: 0.2671, hi: 0.1389, med: 1825 },
+    demoCob: { engTop: ["Moore", 0.1535], indTop: ["Greenway", 0.1503],
+               chnTop: ["Chisholm", 0.1314], fowlerVnm: 0.1794 },
     demoEmpties: [],
     spots: [
       ["Canberra", "Norfolk Island", { votes: 59, sa1s: 7, seifa: [1081.7, 1101.5, 1131.4, 1107.9], cov: [0.9685, 0.9685, 0.9685, 0.9685] }],
@@ -158,7 +160,7 @@ const YEARS = {
     maxs: { irsd: 1144.4, irsad: 1193.9, ier: 1212.2, ieo: 1209.7 },
     sentinelIds: null,
     zeroVotes: [],
-    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, fborn: 0.2804, uni: 0.284, blue: 0.2818, age0_14: 0.1825, age65ov: 0.1789, loinc: 0.2502, hiinc: 0.1649, incMed: 1775 } },
+    demo: { rows: 9343, coverage: 1.0, national: { langOther: 0.2205, fborn: 0.2804, uni: 0.284, blue: 0.2818, age0_14: 0.1825, age65ov: 0.1789, loinc: 0.2502, hiinc: 0.1649, cob: { eng: 0.0402, ind: 0.0238, chn: 0.02, nzl: 0.0212, phl: 0.0109, vnm: 0.0101, zaf: 0.0077, ita: 0.0065, lka: 0.0048, sct: 0.0046 }, incMed: 1775 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.9425],
     demoDivs: { langMax: ["Fowler", 0.7327], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3099], oldMin: ["Lingiari", 0.0758],
@@ -171,6 +173,8 @@ const YEARS = {
                hiMax: ["Wentworth", 0.4483], hiMin: ["Spence", 0.0435],
                medMin: ["Hinkler", 1147], medMax: ["Wentworth", 2944] },
     incLingiari: { lo: 0.247, hi: 0.1441, med: 1910 },
+    demoCob: { engTop: ["Moore", 0.1551], indTop: ["Lalor", 0.1585],
+               chnTop: ["Chisholm", 0.142], fowlerVnm: 0.1777 },
     demoEmpties: ["O'Connor|65160"],
     spots: [
       ["Brisbane", "Brisbane City BRISBANE PPVC", { votes: 8690, sa1s: 358, seifa: [1068.3, 1099.7, 963.1, 1134.3], cov: [0.9995, 0.9995, 0.9995, 0.9995] }],
@@ -197,7 +201,7 @@ const YEARS = {
     maxs: { irsd: 1135.4, irsad: 1196.2, ier: 1181.6, ieo: 1207.8 },
     sentinelIds: null,
     zeroVotes: ["Tangney|65478"],
-    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, fborn: 0.2834, uni: 0.2861, blue: 0.2814, age0_14: 0.1835, age65ov: 0.1761, loinc: 0.2474, hiinc: 0.1643, incMed: 1788 } },
+    demo: { rows: 9052, coverage: 1.0, national: { langOther: 0.2229, fborn: 0.2834, uni: 0.2861, blue: 0.2814, age0_14: 0.1835, age65ov: 0.1761, loinc: 0.2474, hiinc: 0.1643, cob: { eng: 0.0403, ind: 0.0251, chn: 0.0204, nzl: 0.0214, phl: 0.0113, vnm: 0.0099, zaf: 0.0079, ita: 0.0064, lka: 0.0049, sct: 0.0046 }, incMed: 1788 } },
     demoMaxLang: ["Lingiari", "Home Island PPVC", 0.9695],
     demoDivs: { langMax: ["Fowler", 0.7335], langMin: ["Lyne", 0.0297],
                 oldMax: ["Lyne", 0.3082], oldMin: ["Lingiari", 0.077],
@@ -210,6 +214,8 @@ const YEARS = {
                hiMax: ["Wentworth", 0.4462], hiMin: ["Spence", 0.0446],
                medMin: ["Hinkler", 1156], medMax: ["Wentworth", 2926] },
     incLingiari: { lo: 0.2363, hi: 0.1486, med: 1956 },
+    demoCob: { engTop: ["Pearce", 0.1537], indTop: ["Greenway", 0.1622],
+               chnTop: ["Bennelong", 0.1413], fowlerVnm: 0.1757 },
     demoEmpties: [],
     spots: [
       ["Melbourne", "Northcote MELBOURNE PPVC", { votes: 838, sa1s: 305, seifa: [1066, 1121.2, 951.6, 1167.1], cov: [0.9988, 0.9988, 0.9988, 0.9988] }],
@@ -236,7 +242,7 @@ const YEARS = {
     maxs: { irsd: 1135.1, irsad: 1196.1, ier: 1183.6, ieo: 1202.8 },
     sentinelIds: null,
     zeroVotes: ["Page|123920"],
-    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, fborn: 0.2869, uni: 0.2871, blue: 0.2822, age0_14: 0.1855, age65ov: 0.1728, loinc: 0.2443, hiinc: 0.1625, incMed: 1801 } },
+    demo: { rows: 9513, coverage: 1.0, national: { langOther: 0.2277, fborn: 0.2869, uni: 0.2871, blue: 0.2822, age0_14: 0.1855, age65ov: 0.1728, loinc: 0.2443, hiinc: 0.1625, cob: { eng: 0.04, ind: 0.0274, chn: 0.0204, nzl: 0.0218, phl: 0.0119, vnm: 0.0098, zaf: 0.0079, ita: 0.0063, lka: 0.0051, sct: 0.0046 }, incMed: 1801 } },
     demoMaxLang: ["Lingiari", "Remote Mobile Team 5", 0.942],
     demoDivs: { langMax: ["Fowler", 0.7295], langMin: ["Lyne", 0.0295],
                 oldMax: ["Lyne", 0.309], oldMin: ["Lingiari", 0.079],
@@ -249,6 +255,8 @@ const YEARS = {
                hiMax: ["Bradfield", 0.4369], hiMin: ["Spence", 0.0449],
                medMin: ["Hinkler", 1161], medMax: ["Bradfield", 2964] },
     incLingiari: { lo: 0.2653, hi: 0.1414, med: 1834 },
+    demoCob: { engTop: ["Pearce", 0.1817], indTop: ["Lalor", 0.1772],
+               chnTop: ["Menzies", 0.1293], fowlerVnm: 0.1671 },
     demoEmpties: [],
     spots: [
       ["Curtin", "Perth CURTIN PPVC", { votes: 2509, sa1s: 340, seifa: [1084.3, 1118.2, 1049.4, 1142.6], cov: [0.9936, 0.9936, 0.9936, 0.9936] }],
@@ -385,6 +393,9 @@ for (const [ys, w] of Object.entries(YEARS)) {
 
   // demo block: 2021-census GCP G01 folded by the same vote weights
   eq(d.counts.demo, w.demo, tag("counts.demo"));
+  const COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf",
+                    "ita", "lka", "sct"];
+  eq(d.cobKeys, COB_KEYS, tag("cobKeys"));
   ok(d.demoBasis && d.demoBasis.includes("2021 Census GCP G01"), tag("demoBasis"));
   ok(d._about.includes("GCP G01"), tag("_about names GCP G01"));
   eq(d.incomeCuts, {
@@ -435,6 +446,12 @@ for (const [ys, w] of Object.entries(YEARS)) {
        tag(`demo loinc range ${k} ${dm.loinc}`));
     ok(dm.hiinc != null && dm.hiinc >= 0 && dm.hiinc <= 0.7,
        tag(`demo hiinc range ${k} ${dm.hiinc}`));
+    eq(dm.cob && Object.keys(dm.cob), COB_KEYS,
+       tag(`demo cob keys ${k}`));
+    for (const ck of COB_KEYS) {
+      ok(dm.cob[ck] === null || (dm.cob[ck] >= 0 && dm.cob[ck] <= 1),
+         tag(`demo cob range ${ck} ${k}`));
+    }
   }
   eq(demoEmpties, w.demoEmpties, tag("demo zero-persons rows"));
   let coDemoRows = 0;
@@ -449,6 +466,13 @@ for (const [ys, w] of Object.entries(YEARS)) {
       ok(Math.abs(s - 1) < 0.005, tag(`cohort demo age sum ${c.div} ${c.cohort}`));
       ok(c.demo.loinc != null, tag(`cohort demo loinc ${c.div} ${c.cohort}`));
       ok(c.demo.hiinc != null, tag(`cohort demo hiinc ${c.div} ${c.cohort}`));
+      eq(c.demo.cob && Object.keys(c.demo.cob), COB_KEYS,
+        tag(`cohort cob keys ${c.div} ${c.cohort}`));
+      for (const ck of COB_KEYS) {
+        ok(c.demo.cob[ck] === null ||
+           (c.demo.cob[ck] >= 0 && c.demo.cob[ck] <= 1),
+          tag(`cohort cob range ${ck} ${c.div}`));
+      }
     }
   }
   // counts.demo.rows spans BOTH the booth rows and the cohort rows
@@ -499,6 +523,11 @@ for (const [ys, w] of Object.entries(YEARS)) {
          tag(`division hiinc range ${r.div} ${r.hiinc}`));
       ok(typeof r.incMed === "number" && r.incMed >= 1000 &&
          r.incMed <= 3200, tag(`division incMed range ${r.div} ${r.incMed}`));
+      eq(Object.keys(r.cob), COB_KEYS, tag(`division cob keys ${r.div}`));
+      for (const ck of COB_KEYS) {
+        ok(r.cob[ck] != null && r.cob[ck] >= 0 && r.cob[ck] <= 0.6,
+           tag(`division cob range ${ck} ${r.div}`));
+      }
       const k = [STATE_ORDER.indexOf(r.state), r.div];
       if (dprev) {
         ok(k[0] > dprev[0] || (k[0] === dprev[0] && k[1] > dprev[1]),
@@ -600,6 +629,17 @@ for (const [ys, w] of Object.entries(YEARS)) {
       eq(lg.hiinc, w.incLingiari.hi, tag("Lingiari hiinc"));
       eq(lg.incMed, w.incLingiari.med, tag("Lingiari incMed"));
     }
+    // birthplace-country landmarks: country maxima across the seats
+    // (Fowler's Vietnam-born the signature cluster behind Cabramatta)
+    const top = (ck) => {
+      const t = [...d.divisions].sort((a, b) => b.cob[ck] - a.cob[ck])[0];
+      return [t.div, t.cob[ck]];
+    };
+    eq(top("eng"), w.demoCob.engTop, tag("division eng max"));
+    eq(top("ind"), w.demoCob.indTop, tag("division ind max"));
+    eq(top("chn"), w.demoCob.chnTop, tag("division chn max"));
+    eq(d.divisions.find((r) => r.div === "Fowler").cob.vnm,
+       w.demoCob.fowlerVnm, tag("Fowler Vietnam-born"));
   }
 
   // spot cells
