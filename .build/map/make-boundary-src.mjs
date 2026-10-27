@@ -1,7 +1,13 @@
 // Derives the n-YYYY.geojson boundary sources geo_build.mjs builds the map's
-// geometry from, for every election 2004-2025 (the set used to live on one
-// machine unrecorded; the rebuild for the island-floor change re-created it
-// reproducibly). All sources are the AEC's own boundary files:
+// geometry from, for every election 2001-2025 (the 2004-2025 set used to live
+// on one machine unrecorded; the rebuild for the island-floor change re-created
+// it reproducibly). All sources are the their-agency boundary files:
+//   2001        ABS ASGC (2001 Edition) Commonwealth_Electoral_Division_2001
+//               layer, asgc2001.gpkg (data.gov.au "ASGC (2001 Edition) -
+//               Boundaries"; extracted by extract-asgc2001-ced.py — the AEC's
+//               own map-api.aec.gov.au Electoral_2001_CED WMTS was the first
+//               choice but has been DNS-dead since 2026-10-23 and is raster
+//               anyway; the 7 ABS offshore pseudo-rows are excluded there)
 //   2004, 2007  MapInfo era sets kept in .matilda/seifa-irsad-abs/dl/aec-ced-eras/
 //               (one MIF per state; converted by mif2geojson.mjs)
 //   2010, 2013  national-esri-16122011.zip   (24.6MB, AEC GIS downloads page)
@@ -35,7 +41,9 @@ import { fileURLToPath } from "url";
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const MS = process.env.MAPSHAPER || "mapshaper";
 const MIF2 = REPO + "/.build/map/mif2geojson.mjs";
+const GPKG_EXTRACT = REPO + "/.build/map/extract-asgc2001-ced.py";
 const ERAS = REPO + "/.matilda/seifa-irsad-abs/dl/aec-ced-eras";
+const ASGC = REPO + "/.matilda/seifa-irsad-abs/dl/asgc/asgc2001.gpkg";
 const DATA = REPO + "/map/data";
 const stage = process.argv[2];
 if (!stage) throw new Error("usage: node make-boundary-src.mjs <stageDir> [--years=...]");
@@ -84,6 +92,12 @@ function mifsToFc(yearDir, tag) {
   const mifs = fs.readdirSync(dir).filter((f) => /\.mif$/i.test(f)).sort().map((f) => path.join(dir, f));
   const out = path.join(stage, "x", `${tag}.geojson`);
   execFileSync(process.execPath, [MIF2, out, ...mifs]);
+  return JSON.parse(fs.readFileSync(out, "utf8"));
+}
+
+function gpkg2001ToFc(tag) {
+  const out = path.join(stage, "x", `${tag}.geojson`);
+  execFileSync("python3", [GPKG_EXTRACT, ASGC, out]);
   return JSON.parse(fs.readFileSync(out, "utf8"));
 }
 
@@ -183,6 +197,7 @@ function repairKennedy2004(fc) {
 }
 
 const r = {};
+if (need(2001)) r[2001] = reduce(gpkg2001ToFc("asgc2001"), 2001);
 if (need(2010) || need(2013) || need(2016)) r[2010] = reduce(shpToFc(unzip(dl(ZIPS.n16122011)), "n16122011"), 2010);
 if (need(2004)) {
   r[2004] = reduce(mifsToFc("2004", "mif2004"), 2004);
@@ -208,5 +223,5 @@ if (need(2016)) {
   r[2016] = { fc: { type: "FeatureCollection", features: [...kept, ...st16] }, stateCol: null };
 }
 
-for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) if (r[y]) write(r[y].fc, y, r[y].stateCol);
+for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) if (r[y]) write(r[y].fc, y, r[y].stateCol);
 console.log("boundary sources written to", stage);
