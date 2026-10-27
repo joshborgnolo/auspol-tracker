@@ -1,0 +1,856 @@
+General Information - 2001 Election: Western Australia				
+Polling Places				
+				
+Brand				
+Polling Place Name	Premises	Address	Suburb	
+Baldivis	Tranby College	Tranby Road	BALDIVIS	
+Calista	Calista Primary School	Chilcott Street	CALISTA	
+Coodanup	Coodanup Community College	Wanjeep Street	COODANUP	
+Cooloongup	Cooloongup Primary School	Westerly Way	COOLOONGUP	
+Golden Bay	Coastal Community Centre	Tangadee Road	GOLDEN BAY	
+Greenfields	Bortolo Pavilion	Murdoch Dr	GREENFIELDS	
+Greenfields East	Riverside Primary School	Teranca Rd	GREENFIELDS	
+Hillman	Hillman Primary School	Unnaro Street	HILLMAN	
+Hope Valley	Hope Valley Primary School	McLaren Ave	HOPE VALLEY	
+Leda	Leda Primary School	Feilman Dr	LEDA	
+Madora	Ron Christian Memorial Hall	Orelia Street	MADORA	
+Mandurah	Baden Powell Hall	Cnr Anstruther Rd & Elizabeth St	MANDURAH
+Mandurah Central	Mandurah Primary School	Hackett Street	MANDURAH
+Mandurah East	Billy Dower Youth Centre	Dower Street	MANDURAH
+Mandurah South	Dudley Park Primary School	Gillark Street	DUDLEY PARK
+Meadow Springs	Frederick Irwin Anglican Community School	Gordon Rd	MEADOW SPRINGS
+Meadow Springs North	Royal Australian Air Force Association Estate	41 Portrush Parade	MEADOW SPRINGS
+Medina	Medina Primary School	Medina Ave	MEDINA
+Parmelia	North Parmelia Primary School	Durrant Ave	PARMELIA
+Perth (Brand)	Perth GPO	Forrest Place	PERTH
+Port Kennedy	Port Kennedy Primary School	La Manche Ave	PORT KENNEDY
+Rockingham	Rockingham Senior High School	Read Street	ROCKINGHAM
+Rockingham Beach	Rockingham Beach Primary School	Bay View Street	ROCKINGHAM
+Rottnest (Brand)	Rottnest Primary School		ROTTNEST ISLAND
+Safety Bay	Safety Bay Primary School	Rae Rd	SAFETY BAY
+Safety Bay Central	Safety Bay Senior High School	Malibu Rd	SAFETY BAY
+Secret Harbour	Secret Harbour Community Centre	Oasis Drive	SECRET HARBOUR
+Singleton	Singleton Hall	Cavender Street	SINGLETON
+Waikiki	Charthouse Primary School	43 Rand Ave	WAIKIKI
+Warnbro	Warnbro Primary School	Axminster St	WARNBRO
+Warnbro East	Koorana Primary School	Coronata Drive	WARNBRO
+Wellard	Kwinana South Fire Station	Corner Mortimer & Barker Roads	WELLARD
+
+
+Canning			
+Polling Place Name	Premises	Address	Suburb
+Armadale	Neerigen Brook Primary School	Seventh Rd	ARMADALE
+Armadale East	Armadale Primary School	Carradine Rd	ARMADALE
+Armadale North	Kingsley Primary School	Lathwell St	ARMADALE
+Armadale South	Armadale Kelmscott Senior Citizens Centre	Coombe Ave	ARMADALE
+Armadale West	Challis Primary School	40 Braemore St	ARMADALE
+Barragup	West Murray Community Centre	Cnr Pinjarra Rd and Goodooga Rd	BARRAGUP
+Bedfordale	Bedfordale District Hall	Admiral Rd	BEDFORDALE
+Brookdale	Evelyn Gribble Community Centre	Ninth Road	BROOKDALE
+Byford	Byford Primary School	Clifton St	BYFORD
+Canning Vale	Canning Vale Primary School	The Ramble	CANNING VALE
+Canning Vale South	Ranford Primary School	Orkney Cres	CANNING VALE
+Carcoola	Carcoola Primary School	Wisteria Cres	CARCOOLA
+Coolup	Coolup CWA Rest Room	Murray Street	COOLUP
+Dawesville	Southern Estuary Progress Assn Hall	Estuary Road	DAWESVILLE
+Dwellingup	Dwellingup Primary School	Newton Sreet	DWELLINGUP
+Falcon	Falcon (Community) Pavilion	Cnr Lynda & Flame Sts	FALCON
+Forrestdale	Forrestdale Primary School	35 Broome St	FORRESTDALE
+Gosnells South (Canning)	Gosnells Senior High School	Southern River Rd	GOSNELLS
+Halls Head	Glencoe Primary School	Balmoral Parade	HALLS HEAD
+Halls Head South	Halls Head Primary School	Oleander Pl	HALLS HEAD
+Huntingdale (Canning)	Huntingdale Primary School	Matilda St	HUNTINGDALE
+Jarrahdale	Jarrahdale Primary School	Wanliss St	JARRAHDALE
+Karragullen	Karragullen District Hall	Old Station St	KARRAGULLEN
+Kelmscott	Kelmscott Senior High School	Third Ave	KELMSCOTT
+Kelmscott East	Kelmscott Primary School	River Rd	KELMSCOTT
+Kelmscott North	Clifton Hills Primary School	Connell Ave	KELMSCOTT
+Lake Clifton	Lake Clifton Fire Brigade Hall	Tuart Grove Ave	LAKE CLIFTON
+Mundijong	Mundijong Primary School	Livesey St	MUNDIJONG
+North Dandalup	North Dandalup Lesser Hall	South Western Hwy	NORTH DANDALUP
+Oakford	Oakford Fire Station	Nicholson Road South	OAKFORD
+Perth (Canning)	Perth GPO	Forrest Place	PERTH
+Pinjarra	Pinjarra Senior High School	16 McLarty Rd	PINJARRA
+Roleystone	Roleystone Primary School	Robins Rd	ROLEYSTONE
+Rottnest (Canning)	Rottnest Primary School		ROTTNEST ISLAND
+Serpentine	Serpentine Ambulance Hall	Wellard St	SERPENTINE
+Strawberry Fields	Cecil Andrews Snr High School	Seville Dve	ARMADALE
+Thornlie (Canning)	Thornlie Senior High School	Ovens Rd	THORNLIE
+Thornlie South (Canning)	Forest Crescent Primary School	Forest Cres	THORNLIE
+Waroona	Waroona Senior Citizens' Centre	Millar Ave	WAROONA
+Westfield	Westfield Park Primary School	Hemingway Dve	WESTFIELD
+Westfield South	Grovelands Primary School	Grovelands Dve	WESTFIELD
+Yunderup	Sth Yunderup/Ravenswood Fire Brigade Station	Yunderup Rd	SOUTH YUNDERUP
+Yunderup North	North Yunderup CWA Centre	45 Culeenup Rd	NORTH YUNDERUP
+
+
+Cowan			
+Polling Place Name	Premises	Address	Suburb
+Alexander Heights	Alinjarra Primary School	Avila Way	ALEXANDER HEIGHTS
+Alexander Heights West	Alexander Heights Community Hall	Linto Way	ALEXANDER HEIGHTS
+Ballajura	Illawarra Primary School	Illawarra Cres N	BALLAJURA
+Ballajura Central	Ballajura Primary School	Illawarra Cres South	BALLAJURA
+Ballajura South	South Ballajura Primary School	Wyperfeld Gdns	BALLAJURA
+Ballajura West	Ballajura Community College	Illawarra Crescent South	BALLAJURA
+Banksia Grove	Neerabup Primary School	Mist Pl	BANKSIA GROVE
+Camboon	Camboon Primary School	Forder Street	NORANDA
+Girrawheen	Blackmore Primary School	Allinson Dve	GIRRAWHEEN
+Girrawheen Central	Montrose Primary School	Stebbing Way	GIRRAWHEEN
+Girrawheen East	Hainsworth Primary School	Harford Way	GIRRAWHEEN
+Greenwood	Greenwood Senior High School	Coolibah Dve	GREENWOOD
+Greenwood East	East Greenwood Primary School	Mulligan Dve	GREENWOOD
+Greenwood West	Allenswood Primary School	Merivale Way	GREENWOOD
+Kingsley	Creaney Primary School	Creaney Dve	KINGSLEY
+Kingsley East	Halidon Primary School	Halidon Street	KINGSLEY
+Kingsley South	Goollelal Primary School	Cadogan Street	KINGSLEY
+Koondoola	Koondoola Primary School	Burbridge Ave	KOONDOOLA
+Landsdale	Landsdale Primary School	The Broadview	LANDSDALE
+Marangaroo	Marangaroo Primary School	Giralt Rd	MARANGAROO
+Marangaroo Central	Marangaroo Family Centre	46 Highclere Blvd	MARANGAROO
+Noranda	Noranda Primary School	Walmsley Dve	NORANDA
+Noranda West (Cowan)	North Morley Primary School	Gordon Rd West	DIANELLA
+Perth (Cowan)	Perth GPO	Forrest Place	PERTH
+Rottnest (Cowan)	Rottnest Primary School		ROTTNEST ISLAND
+Tapping	St Stephen's College	50 St Stephen's Crescent	TAPPING
+Wanneroo	Wanneroo Primary School	Wanneroo Rd	WANNEROO
+Wanneroo East	Wanneroo Senior High School	Quarkum St	WANNEROO
+Wanneroo West	Crossways Uniting Church	"Unit 4, 631 Wanneroo Rd"	WANNEROO
+Warwick	Greenwood-Warwick Community Care Centre	Dorchester Ave	WARWICK
+Warwick West	Hawker Park Primary School	Hawker Avenue	WARWICK
+Woodvale	Woodvale High School	Woodvale Dve	WOODVALE
+Woodvale North	North Woodvale Primary School	Chichester Dve	WOODVALE
+
+
+Curtin			
+Polling Place Name	Premises	Address	Suburb
+Churchlands	Churchlands Primary School	Cromarty Road	CHURCHLANDS
+City Beach	City Beach Primary School	Marapana Rd	CITY BEACH
+City Beach North	Holy Spirit School	Brompton Rd	CITY BEACH
+Claremont	Claremont Primary School	Bay View Tce	CLAREMONT
+Claremont East	St Andrews Church	cnr Napier St & Stirling Hwy	NEDLANDS
+Cottesloe	Cottesloe Civic centre	109 Broome Street	COTTESLOE
+Cottesloe East	North Cottesloe Primary School	100 Eric Street	COTTESLOE
+Cottesloe South	Cottesloe School for Deaf and Hearing Impaired Children	Johnston Street	PEPPERMINT GROVE
+Dalkeith	Dalkeith Primary School	Circe Circle	DALKEITH
+Doubleview (Curtin)	Doubleview Primary School	St Brigid's Tce	DOUBLEVIEW
+Floreat	Floreat Primary School	Chandler Ave	FLOREAT
+Floreat East	Floreat Park Pre-Primary Centre	cnr Birkdale & Newry Street	FLOREAT
+Graylands	Graylands Primary School	cnr Alfred Rd & Montgomery Ave	MT CLAREMONT
+Jolimont	Jolimont Primary School	657 Hay Street	JOLIMONT
+Joondanna	St Denis Primary School	157 Powell Street	JOONDANNA
+King Edward Memorial Hospital	King Edward Memorial Hospital	Bagot Rd	SUBIACO
+Leederville	Leederville College of TAFE	Cnr Oxford & Richmond Streets	LEEDERVILLE
+Leederville North	Aranmore College Hall	cnr Oxford & Franklin Street	LEEDERVILLE
+Leederville West	West Leederville Primary School	Northwood Street	LEEDERVILLE
+Mosman Park	Mosman Park Memorial Hall	16 Lochee Street	MOSMAN PARK
+Mosman Park South	All Saints Anglican Church	Jameson Street	MOSMAN PARK
+Mount Hawthorn	Mt Hawthorn Primary School	Matlock Street	MOUNT HAWTHORN
+Mount Hawthorn East	Mt Hawthorn Baptist Church Hall	cnr Edinboro and Hobart Streets	MOUNT HAWTHORN
+Mount Hawthorn West	Mt Hawthorn Scout Hall	cnr East & Berryman Street	MOUNT HAWTHORN
+Nedlands Central	UWA Nedlands Campus	Clifton St	NEDLANDS
+Nedlands East	Drabble House	2 Webster Street	NEDLANDS
+Nedlands North	Hollywood Primary School	Monash Ave	NEDLANDS
+Nedlands South	Nedlands Primary School	35 Kingsway	NEDLANDS
+Peppermint Grove	Star of the Sea Parish Hall	Cnr McNeil & Stirling Hwy	PEPPERMINT GROVE
+Perth (Curtin)	Perth GPO	Forrest Place	PERTH
+Rottnest (Curtin)	Rottnest Primary School		ROTTNEST ISLAND
+Shenton Park East	St Aloysius Catholic Church	Cnr Henry St & Keightley Rd West	SHENTON PARK
+Shenton Park West	Rosalie Pre-Primary School (Off-site)	334 Onslow Rd	SHENTON PARK
+Sir Charles Gairdner Hospital	Sir Charles Gairdner Hospital	Outpatients Centre	NEDLANDS
+Subiaco	Subiaco Community Centre	203 Bagot Rd	SUBIACO
+Subiaco North	Perth Modern School	Roberts Rd	SUBIACO
+Swanbourne	Swanbourne Primary School	Derby Street	SWANBOURNE
+Tuart Hill (Curtin)	Tuart Hill Primary School	Banksia St	TUART HILL
+Wembley Central	Wembley Church of Christ	Nanson Street	WEMBLEY
+Wembley Downs	Wembley Downs Primary School	Bournemouth Cres	WEMBLEY DOWNS
+Wembley North	Lake Monger Primary School	Dodd Street	WEMBLEY
+Wembley South	Subiaco College of TAFE	133 Salvado Rd	SUBIACO
+Wembley West	Wembley Primary School	cnr Grantham & Alexander Street	WEMBLEY
+West Perth (Curtin)	Greek Orthodox Church	Cnr Charles & Carr Streets	WEST PERTH
+West Perth Central	Ross Memorial Uniting Church	Cnr Hay & Colin Street	WEST PERTH
+Woodlands	Woodlands Primary School	Bentwood Ave	WOODLANDS
+Woodlands North	Teakwood Community Kindergarten	16 Tamarisk Way	WOODLANDS
+
+
+Forrest			
+Polling Place Name	Premises	Address	Suburb
+Acton Park	Acton Park Hall		ACTON PARK
+Alexandra Bridge	Alexandra Bridge Hall		ALEXANDRA BRIDGE
+Allanson	Allanson Primary School	Cameron St	ALLANSON
+Augusta	Augusta Civic Centre	Allnutt Tce	AUGUSTA
+Australind	Australind Community Hall	Paris Rd	AUSTRALIND
+Australind East	Riverlinks Community Centre	Paris Rd	AUSTRALIND
+Australind North	Parkfield Primary School	Garfield Drive	AUSTRALIND
+Balingup	Balingup Primary School	Brockman Street	BALINGUP
+Binningup	Binningup Community Hall	Driftwood Way	BINNINGUP
+Boyanup	Boyanup Primary School		BOYANUP
+Bridgetown	St Brigid's Hall	Roe St	BRIDGETOWN
+Brookhampton	Brookhampton Hall		BROOKHAMPTON
+Brunswick	Brunswick Primary School	Vincent Street	BRUNSWICK
+Bunbury	Bunbury Pre-primary Centre	Lovegrove Ave	BUNBURY
+Bunbury Central	Good News Family Church	Cnr Symmons and Wittenoom Sts	BUNBURY
+Bunbury East	Cooinda Primary School	Trott Street	BUNBURY
+Burekup	River Valley Primary School	Russell Rd	BUREKUP
+Busselton	Churchill Park Pavilion	Adelaide St	BUSSELTON
+Busselton East	Busselton Primary School	Avocet Blvd	BUSSELTON
+Busselton South	Busselton Senior High School	Bussell Hwy	BUSSELTON
+Busselton West	West Busselton Primary School	Bower Rd	BUSSELTON
+Capel	Capel Hall		CAPEL
+Carbunup River	Carbunup River Hall	Wildwood Rd	CARBUNUP RIVER
+Carey Park	Carey Park Primary School	Frankel Street	BUNBURY
+Carey Park South	Milligan House	Milligan Street	BUNBURY
+Clifton Park	Clifton Park Primary School	Lucy Victoria Ave	CLIFTON PARK
+Collie	Collie Senior High School	Wittenoom St	COLLIE
+Collie Central	Margaretta Wilson Centre	Forrest St	COLLIE
+Collie East	Fairview Primary School	Vernon St	COLLIE
+Collie North	North Collie Hall	Princep St	COLLIE
+Coral Park	Newton Moore Senior High School	Hotchin Street	BUNBURY
+Cowaramup	Cowaramup Primary School	Waverley Rd	COWARAMUP
+Dardanup	Dardanup Hall		DARDANUP
+Deanmill	Deanmill Football Clubroom		DEANMILL
+Donnybrook	Donnybrook Memorial Hall		DONNYBROOK
+Dunsborough	Dunsborough Progress Assoc Hall	Gifford Rd	DUNSBOROUGH
+Eaton	Eaton Hall	Pratt Rd	EATON
+Eaton East	Glen Huon Primary School	Monash Blvd	EATON
+Elgin	Elgin Hall		ELGIN
+Ferguson	Ferguson Hall		FERGUSON
+Gelorup	Bunbury Cathedral Grammar Primary School	Jenour Ct	GELORUP
+Greenbushes	Greenbushes Primary School		GREENBUSHES
+Harvey	St Anne's Primary School	Young Street	HARVEY
+Karridale	Karridale Primary School	Bussell Hwy	KARRIDALE
+Kirup	Kirup Hall	South Western Hwy	KIRUP
+Kudardup	Kudardup Hall		KUDARDUP
+Leschenault	Settlers' Hall	Marine Drive	AUSTRALIND
+Lowden	Yabberup Hall		LOWDEN
+Manjimup	Manjimup Town Hall	Rose Street	MANJIMUP
+Manjimup East	East Manjimup Primary School	O'Connor Street	MANJIMUP
+Margaret River	Margaret River Senior High School	Bussell Hwy	MARGARET RIVER
+Middlesex	Middlesex Hall		MIDDLESEX
+Nannup	Nannup Shire Office Function Room	Adam Rd	NANNUP
+Northcliffe	Northcliffe Ambulance Hall		NORTHCLIFFE
+Pemberton	Pemberton Community Centre	Club St	PEMBERTON
+Perth (Forrest)	Perth GPO	Forrest Place	PERTH
+Picton	Picton Primary School	Jeffery Rd	BUNBURY
+Quinninup	Quinninup Primary School		QUINNINUP
+Rosa Brook	Rosa Brook Hall		ROSA BROOK
+Rottnest (Forrest)	Rottnest Primary School		ROTTNEST ISLAND
+Sealinks	Sealinks Pre-primary Centre	Hastie Street	BUNBURY
+South Bunbury	South Bunbury Pre-primary Centre	Queen Street	BUNBURY
+South West Health Campus	South West Health Campus	Bussell Hwy	BUNBURY
+Vasse	Vasse Primary School		VASSE
+Villa Maria	Ray Village Nursing Home	Bussell Hwy	BUSSELTON
+Walpole	Walpole Primary School	Swan Street	WALPOLE
+Wilson Park	Wilson Park Primary School	Porter Street	COLLIE
+Witchcliffe	Witchcliffe Hall		WITCHCLIFFE
+Withers	Withers Primary School	Westwood St	BUNBURY
+Wollaston	Bunbury Catholic College	Rodsted Street	BUNBURY
+Yallingup	Yallingup Hall		YALLINGUP
+Yarloop	Yarloop Hall	Station Street	YARLOOP
+Yoongarillup	Yoongarillup Hall		YOONGARILUP
+Yornup	Yornup Hall	South Western Hwy	YORNUP
+
+
+Fremantle			
+Polling Place Name	Premises	Address	Suburb
+Atwell	Atwell Primary School	Lydon Blvd	ATWELL
+Beaconsfield	Beaconsfield Primary School	Hale St	BEACONSFIELD
+Beeliar	St Lukes Primary School	The Grange	BEELIAR
+Bibra Lake	Bibra Lake Primary School	Annois Rd	BIBRA LAKE
+Bicton	Bicton Primary School	View Tce	BICTON
+Coogee Beach	Coogee Beach Community Hall	Arlington Loop	COOGEE
+Coolbellup	Coolbellup Primary School	Hilory St	COOLBELLUP
+Coolbellup East	North Lake Primary School	Montague Way	COOLBELLUP
+East Fremantle	East Fremantle Primary School	Forrest St	FREMANTLE
+Fremantle	Victoria Pavillion - Fremantle Oval	Fremantle Oval	FREMANTLE
+Hamilton Hill East	East Hamilton Hill Primary School	Bradbury Rd	HAMILTON HILL
+Hamilton Hill North	Winterfold Primary School	Annie St	BEACONSFIELD
+Hamilton Hill South	Southwell Primary School	Grandpre Cres	HAMILTON HILL
+Hilton	Hilton Primary School	Rennie Cres	HILTON
+Jandakot	Jandakot Primary School	Baningan Ave	SUCCESS
+Kardinya (Fremantle)	Kardinya Primary School	Ochiltree Way	KARDINYA
+Kardinya West	North Lake Senior Campus	Winterfold Rd	KARDINYA
+Lakeland	Lakeland Senior High School	South Lake Dr	SOUTH LAKE
+Melville (Fremantle)	Melville Recreation Centre	Cnr Canning Hwy & Stock Rd	MELVILLE
+Munster	South Coogee Primary School	Russell Rd	MUNSTER
+North Fremantle	North Fremantle Community Centre	2 Thompson Rd	NORTH FREMANTLE
+Palmyra	Palmyra Primary School	McKimmie Rd	PALMYRA
+Palmyra North	Anglican Church Hall	2 Hammad St	PALMYRA
+Perth (Fremantle)	Perth GPO	Forrest Place	PERTH
+Richmond	Richmond Primary School	Windsor Rd	EAST FREMANTLE
+Rottnest (Fremantle)	Rottnest Primary School		ROTTNEST ISLAND
+Samson	Samson Primary School	Lawrence Way	SAMSON
+South Fremantle	Fremantle Primary School	Alma St	FREMANTLE
+South Lake	South Lake Primary School	Mason Ct	SOUTH LAKE
+Spearwood	Spearwood Primary School	Gerald St	SPEARWOOD
+Spearwood South	Newton Primary School	Marvell Ave	SPEARWOOD
+Spearwood West	Phoenix Primary School	Phoenix Rd	SPEARWOOD
+Wattleup	Wattleup Primary School	Hitchcock Pl	WATTLEUP
+White Gum Valley	White Gum Valley Primary School	Hope St	WHITE GUM VALLEY
+Willagee	Willagee Primary School	Drury St	WILLAGEE
+Willagee East	Carawatha Primary School	North Lake Rd	WILLAGEE
+Yangebup	Yangebup Primary School	Moorhen Dr	YANGEBUP
+Yangebup South	Mater Christi Catholic Primary School	340 Yangebup Rd	YANGEBUP
+
+
+Hasluck			
+Polling Place Name	Premises	Address	Suburb
+Bellevue	Bellevue Hall	Helen St	BELLEVUE
+Caversham	Old Caversham School	West Swan Rd	CAVERSHAM
+Forrestfield	Forrestfield Primary School	Sussex Rd	FORRESTFIELD
+Forrestfield North	Forrestfield Senior High School	Berkshire Rd	FORRESTFIELD
+Gooseberry Hill	Gooseberry Hill Primary School	Ledger Rd	GOOSEBERRY HILL
+Gosnells	Gosnells Primary School	Cnr May & Hicks Sts	GOSNELLS
+Gosnells Central	Gosnells Civic Centre	2242 Albany Hwy	GOSNELLS
+Gosnells South (Hasluck)	Gosnells Senior High School	Southern River Rd	GOSNELLS
+Gosnells West	Wirrabirra Primary School	Cnr Corfield & Jenkinson Sts	GOSNELLS
+Guildford	Guildford Mechanics Institute	Meadow St	GUILDFORD
+Hazelmere	Hazelmere Community Hall	Bushmead Road	HAZELMERE
+Helena Valley (Hasluck)	Helena Valley Recreation Hall	Cnr Scott St & Clayton Rd	HELENA VALLEY
+High Wycombe	Cyril Road Hall	Cyril Road	HIGH WYCOMBE
+High Wycombe South	High Wycombe Sport and Recreation Hall	Newburn Rd	HIGH WYCOMBE
+Huntingdale (Hasluck)	Huntingdale Primary School	Matilda St	HUNTINGDALE
+Kalamunda	Kalamunda Senior High School	Canning Rd	KALAMUNDA
+Kalamunda North	Kalamunda Primary School	Heath Rd	KALAMUNDA
+Kenwick	Kenwick Community Centre	Cnr Kenwick Rd/Brixton St	KENWICK
+Koongamia	Koongamia Hall	Banjine Rd	KOONGAMIA
+Lesmurdie	Lesmurdie Primary School	Sanderson Rd	LESMURDIE
+Maddington	East Maddington Primary School	Pitchford Ave	MADDINGTON
+Maddington East	Yule Brook College	Dellar Rd	MADDINGTON
+Maddington North	Bramfield Park Primary School	Yule St	MADDINGTON
+Maida Vale	Maida Vale Primary School	Kalamunda Rd	MAIDA VALE
+Middle Swan	Midland TAFE College	Lloyd Street	MIDDLE SWAN
+Midland (Hasluck)	Midland Town Hall	Cnr Gt Eastern Hwy & Gt Northern Hwy	MIDLAND
+Perth (Hasluck)	Perth GPO	Forrest Place	PERTH
+Rottnest (Hasluck)	Rottnest Primary School		ROTTNEST ISLAND
+Swan View (Hasluck)	Swan View High School	Weld Rd	SWAN VIEW
+Thornlie (Hasluck)	Thornlie Senior High School	Ovens Rd	THORNLIE
+Thornlie East	Thornlie Primary School	Thornlie Ave	THORNLIE
+Thornlie South (Hasluck)	Forest Crescent Primary School	Forest Cres	THORNLIE
+Thornlie West	Yale Primary School	Cnr Yale & Sage Rds	THORNLIE
+Walliston (Hasluck)	Walliston Primary School	Dianella Rd	WALLISTON
+Wattle Grove	Wattle Grove Primary School	Welshpool Rd	WATTLE GROVE
+
+
+Kalgoorlie			
+Polling Place Name	Premises	Address	Suburb
+Ajana	Ajana Hall	Kalbarri Road	AJANA
+Argyle	Argyle SMQ	Argyle Village	ARGYLE
+Balgo	Balgo Catholic School	Balgo PMB 2 Via	HALLS CREEK
+Bodallin	Bodallin Primary School	Great Eastern Hwy	BODALLIN
+Boulder	Boulder Primary School	Lane Street	BOULDER
+Broome	Broome Shire Hall	Weld St	BROOME
+Broome West	Cable Beach Primary School	Lot 2439 Dakas St	BROOME
+Bullfinch	Bullfinch CWA Hall	Dorothy Street	BULLFINCH
+Burracoppin	Burracoppin Sports Pavilion	Burracoppin North West Road	BURRACOPPIN
+Carnarvon	Carnarvon High School Recreation Centre	Cleaver Street	CARNARVON
+Carnarvon East	East Carnarvon Primary School	Marmion Street	CARNARVON
+Cascade	Cascade Primary School	Asha Court	CASCADE
+Castletown	Castletown Primary School	Easton Rd	ESPERANCE
+Condingup	Condingup Primary School	Sutcliffe Street	CONDINGUP
+Cooke Point	Port Hedland Primary School	Cnr Athol & Corney Sts	PORT HEDLAND
+Coolgardie	Coolgardie Recreation Centre	Sylvester Street	COOLGARDIE
+Coral Bay	Coral Bay Shopping Centre	Rear Reef Cafe	CORAL BAY
+Cue	Cue Primary School	Simpson Street	CUE
+Dalyup	Dalyup Progress Assoc Hall	South Coast Hwy	DALYUP
+Dampier	Dampier Primary School	Church Rd	DAMPIER
+Denham	Denham Primary School (Shark Bay)	Hughes Street	DENHAM
+Derby	Derby District High School	Stanley Street	DERBY
+Esperance	Esperance Civic Centre	Council Place	ESPERANCE
+Exmouth	Exmouth Shire Hall	Maidestone Cres	EXMOUTH
+Fitzroy Crossing	Fitzroy Crossing District High School	Forrest Rd	FITZROY CROSSING
+Gascoyne Junction	Gascoyne Junction Shire Office	Scott Street	GASCOYNE JUNCTION
+Gibson	Gibson Football Club	Starr Street	GIBSON
+Grass Patch	Grass Patch Community Hall	Shepherd Street	GRASS PATCH
+Halls Creek	Halls Creek District High School	Thomas Street	HALLS CREEK
+Horrocks	Horrocks Community Centre	Mitchell Street	HORROCKS
+Jigalong	Wintamarra Training Centre	Wintamarra Training Centre	NEWMAN
+Kalbarri	Kalbarri Community Centre	Grey Street	KALBARRI
+Kalgoorlie	Kalgoorlie Town Hall	Hannan Street	KALGOORLIE
+Kalgoorlie East	Kalgoorlie East Primary School	Mafeking Street	KALGOORLIE
+Kalgoorlie Eastern Goldfields	Kalgoorlie District Education Office	Federal Road	KALGOORLIE
+Kalgoorlie Halfway	John Paul College	Lionel Street	KALGOORLIE
+Kalgoorlie Hannans	Hannans Primary School	Nankiville Rd	KALGOORLIE
+Kalgoorlie North	Kalgoorlie North Primary School	Campbell Street	KALGOORLIE
+Kalgoorlie Regional Hospital	Kalgoorlie Regional Hospital	Piccadilly Street	KALGOORLIE
+Kalgoorlie Somerville	O'Connor Primary School	Johnston Street	SOMERVILLE
+Kalgoorlie Wallace Park	Wallace Park Pre-Primary School	Bourke Street	KALGOORLIE
+Kambalda	Kambalda Primary School	Larkin Street	KAMBALDA
+Kambalda West	Kambalda West District High School	Salmon Gum Rd	KAMBALDA WEST
+Karratha	Karratha Senior High School	Searipple Rd	KARRATHA
+Karratha West	Karratha College	Millstream Rd	KARRATHA
+Kununurra	Kununurra District High School	Cnr Mangaloo St & Coolibah Dr	KUNUNURRA
+Laverton	Laverton Lesser Hall	MacPherson Place	LAVERTON
+Leinster	Leinster Community Hall	Link Road	LEINSTER
+Leonora	Leonora Recreation Centre	Tower Street	LEONORA
+Looma	Looma District High School	Looma District High School	DERBY
+Marble Bar	Marble Bar Shire Office	Francis St	MARBLE BAR
+Marvel Loch	Marvel Loch Primary School	Cheney Street	MARVEL LOCH
+Meekatharra	Meekatharra Shire Hall	Savage Street	MEEKATHARRA
+Menzies	Menzies Shire Hall	Shenton Street	MENZIES
+Merredin	Merredin Court House	Mitchell St	MERREDIN
+Merredin District Hospital	Merredin District Hospital	Kitchener Rd	MERREDIN
+Merredin South	Merredin High School	Woolgar Ave	MERREDIN
+Moorine Rock	Moorine Rock Primary School	Moorine South Rd	MOORINE ROCK
+Mount Magnet	Mt Magnet Court House	Richardson Street	MOUNT MAGNET
+Mowanjum	Mowanjum Community Building	Mowanjum Community	DERBY
+Mullewa	Mullewa District High School	Jose Street	MULLEWA
+Munglinup (Kalgoorlie)	Munglinup Hall	Tallarack Street	MUNGLINUP
+Muntadgin	Muntadgin Primary School	Crossland Street	MUNTADGIN
+Nabawa	Nabawa Community Centre	Chapman Valley Rd	NABAWA
+Newman	Newman High school	Gregory Ave	NEWMAN
+Newman North	Newman Primary School	Hilditch Ave	NEWMAN
+Noonkanbah	Kulkarriya Community School (Noonkanbah)	Noonkanbah Community	FITZROY CROSSING
+Norseman	Norseman Court House	Prinsep Street	NORSEMAN
+Northampton	Northampton District Bowling Club	Hampton Rd	NORTHAMPTON
+Nullagine	Nullagine Telecentre	Clementson St	NULLAGINE
+Nulsen	Nulsen Primary School	Victoria Street	ESPERANCE
+Onslow	Onslow Shire Hall	Second Ave	ONSLOW
+Pannawonica	Pannawonica Primary School	Sports Way	PANNAWONICA
+Paraburdoo	Paraburdoo Primary School	De Grey Rd	PARABURDOO
+Perth (Kalgoorlie)	Perth GPO	Forrest Place	PERTH
+Port Hedland	Port Hedland Town Hall	McGregor St	PORT HEDLAND
+Roebourne	Roebourne Shire Hall	Cnr Scholl & Frazer Sts	ROEBOURNE
+Rottnest (Kalgoorlie)	Rottnest Primary School		ROTTNEST ISLAND
+Salmon Gums	Salmon Gums Primary School	Rogers Street	SALMON GUMS
+Sandstone	Sandstone Community Centre	Rowe St	SANDSTONE
+Scaddan	Scaddan Primary School	Kendall Rd	SCADDAN
+Southern Cross	Southern Cross Community Centre	Antares Street	SOUTHERN CROSS
+South Hedland	South Hedland Primary School	Weaver Pl	SOUTH HEDLAND
+South Hedland Baler	South Hedland Baler Primary School	Baler Close	SOUTH HEDLAND
+Tardun	Tardun Store	Railway Parade	TARDUN
+Telfer	Telfer Messing Facilities	Newcrest Mining Limited	TELFER
+Tom Price	Tom Price Primary School	Wattle Street	TOM PRICE
+Useless Loop	Useless Loop Primary School	Wilsons Rise	USELESS LOOP
+Wangkatjungka	Wangkatjungka School (Christmas Creek)	Wangkatjungka Community School	FITZROY CROSSING
+Warmun	Warmun Community Centre	Warmun Aboriginal Community	WARMUN
+Westonia	Westonia Shire Office	Wolfram Street	WESTONIA
+Wickham	Wickham Community Hall	Carse St	WICKHAM
+Wiluna	Wiluna Remote Community School	Wotton Street	WILUNA
+Wyndham	Wyndham District High School	Wyndham District High School	WYNDHAM
+Yalgoo	Yalgoo Primary School	Henty Street	YALGOO
+Yandeyarra	Yandeyarra Community Building	Yandeyarra Community	PORT HEDLAND
+Yuna	Yuna Primary School	Yuna-Tenindewa Road	YUNA
+
+
+Moore			
+Polling Place Name	Premises	Address	Suburb
+Beldon	Beldon Primary School	Pacific Way	BELDON
+Burns Beach	Jack Kikeros Hall	Ocean Pde	BURNS
+Connolly	Connolly Primary School	Fairway Cir	CONNOLLY
+Craigie	Craigie Senior High School	Arawa Pl	CRAIGIE
+Currambine	Currambine Primary School	Ambassador Dr	CURRAMBINE
+Duncraig	Duncraig Primary School	Roche Rd	DUNCRAIG
+Duncraig East (Moore)	Davallia Primary School	Juniper Way	DUNCRAIG
+Duncraig North	Glengarry Primary School	Doveridge Dr	DUNCRAIG
+Duncraig South	Poynter Primary School	Poynter Dr	DUNCRAIG
+Edgewater	Edgewater Primary School	Treetop Ave	EDGEWATER
+Heathridge	Poseidon Primary School	Poseidon Rd	HEATHRIDGE
+Heathridge East	Eddystone Primary School	Littorina Ave	HEATHRIDGE
+Hillarys	Lymburner Primary School	Lymburner Dr	HILLARYS
+Hillarys North	Hillarys Pre-Primary	Broadbeach Blvd	HILLARYS
+Joondalup	Joondalup Primary School	Blue Mountain Dr	JOONDALUP
+Kallaroo	Springfield Primary School	Bridgewater Dr	KALLAROO
+Kinross	Kinross Primary School	Kintoss Dr	KINROSS
+Marmion	Marmion Primary School	Cliverton Ct	MARMION
+Mullaloo	Mullaloo Heights Primary School	Charonia Rd	MULLALOO
+North Beach Central (Moore)	North Beach Autumn Centre	20 Castle St	NORTH BEACH
+Ocean Reef	Ocean Reef Senior High School	Venturi Dr	OCEAN REEF
+Ocean Reef North	Beaumaris Primary School	Beaumaris Blvd	OCEAN REEF
+Padbury	Padbury Primary School	MacDonald Ave	PADBURY
+Padbury South	Padbury Catholic Primary School	O'Leary Rd	PADBURY
+Perth (Moore)	Perth GPO	Forrest Place	PERTH
+Rottnest (Moore)	Rottnest Primary School		ROTTNEST ISLAND
+Sorrento	Sorrento Primary School	Elfreda Ave	SORRENTO
+Sorrento Beach	Sorrento Surf Club Hall	West Coast Dr	SORRENTO
+
+
+O'Connor			
+Polling Place Name	Premises	Address	Suburb
+Albany	Albany Primary School	Albany Hwy	ALBANY
+Albany Central	Albany Senior Citizens Centre	122 Grey St	ALBANY
+Albany Regional Hospital	Albany Hosp Seminar Room	Hardie Rd	ALBANY
+Ardath	Ardath Amenities Centre	Main St	ARDATH
+Arthur River	Arthur River Hall	Albany Highway	ARTHUR RIVER
+Badgebup	Badgebup Hall	Katanning-Nyabing Rd	BADGEBUP
+Badgingarra	Badgingarra Community Centre	North West Rd	BADGINGARRA
+Ballidu	Ballidu Primary School	Fairbank St	BALLIDU
+Bayonet Head	Flinders Park Primary School	Yatana Rd	ALBANY
+Beachlands	Beachlands Primary School	Whitfield Street	BEACHLANDS
+Beacon	Beacon CWA Hall	Rowlands St	BEACON
+Bencubbin	Bencubbin Shire Office	Monger Street	BENCUBBIN
+Bindi Bindi	Bindi Bindi Hall	Bindi Bindi-Toodyay Rd	BINDI BINDI
+Bluff Point	Bluff Point Primary School	Mitchell Street	BLUFF POINT
+Bolgart	Bolgart Primary School	Smith Street	BOLGART
+Borden	Borden Hall	Stone Street	BORDEN
+Bornholm	Bornholm Hall	Lower Denmark Rd	BORNHOLM
+Boscabel	Boscabel Hall	Chitterup Rd	BOSCABEL
+Boxwood Hill	Boxwood Hill Community Centre	Bremer Bay-Borden Rd	BOXWOOD HILL
+Boyup Brook	Boyup Brook Family Centre	Abel St	BOYUP BROOK
+Bremer Bay	Bremer Bay Tele Centre	Mary Street	BREMER BAY
+Broomehill	Broomehill Hall	Lot 4 Jasper St	BROOMEHILL
+Bruce Rock	Bruce Rock Emergency Services	Dunstal Street	BRUCE ROCK
+Bullaring	Bullaring Community Centre	Attwood St	BULLARING
+Bulyee	Bulyee Hall	Bulyee South Rd	BULYEE
+Buntine	Buntine Primary School	Douglas Street	BUNTINE
+Cadoux	Cadoux Primary School	James St	CADOUX
+Calingiri	Calingiri Primary School	Cavell Street	CALINGIRI
+Cape Burney	Greenough Rivermouth Caravan Park	Hull St	CAPE BURNEY
+Carnamah	Carnamah District High School	McPherson Street	CARNAMAH
+Centennial Park	Centennial Park Scout Hall	Sanford Rd	ALBANY
+Cervantes	Cervantes Gym Hall	Aragon St	CERVANTES
+Coomberdale	Coomberdale Hall	Midlands Rd	COOMBERDALE
+Coorow	Coorow Primary School	Bristol St	COOROW
+Corrigin	Corrigin District High School	Hill Street	CORRIGIN
+Cranbrook	Cranbrook Memorial Hall	Gathorne St	CRANBROOK
+Cunderdin	Cunderdin District High School	Cubbine Street	CUNDERDIN
+Dalwallinu	Dalwallinu District High School	Johnson Street	DALWALLINU
+Dandaragan	Dandaragan Primary School	Dandaragan Rd	DANDARAGAN
+Darkan	"West Arthur Telecentre,Health and Resource Centre"	Burrowes St	DARKAN
+Denmark	Denmark Recreation Centre	Brazier St	DENMARK
+Dinninup	Dinninup Hall	Blackwood-Arthur River Rd	DINNINUP
+Dongara	Dongara Shire Hall	Waldeck St	DONGARA
+Doodlakine	Doodlakine Primary School	Spring Street	DOODLAKINE
+Dowerin	Dowerin Lesser Hall		DOWERIN
+Dudinin	Dudinin Agricultural Hall	Fence Rd	DUDININ
+Dumbleyung	Dumbelyung Primary School	Taylor Street	DUMBLEYUNG
+Duranillin	Duranillin Hall	Farrell St	DURANILLIN
+Elleker	Elleker Hall	Brassey St	ELLEKER
+Emu Point	Emu Point Sea Rescue Hall	Swarbrick St	ALBANY
+Eneabba	Eneabba Primary School	Dewar St	ENEABBA
+Fitzgerald	Fitzgerald Hall	cnr Fitzgerald Rd-South Coast Hwy	FITZGERALD
+Forest Hill	Forest Hill Hall	Muir Hwy	FOREST HILL
+Frankland	Frankland Hall	Moir St	FRANKLAND
+Gairdner River	Gairdner River Primary School	Gairdner South Rd	GAIRDNER RIVER
+Geraldton	Geraldton Civic Centre	Cathedral Ave	GERALDTON
+Geraldton Central	Geraldton Primary School	Fitzgerald Street	GERALDTON
+Geraldton Regional Hospital	Geraldton Regional Hospital	Shenton Street	GERALDTON
+Geraldton St John of God Hospital	St John of God Hospital	Cathedral Ave	GERALDTON
+Gnowangerup	Gnowangerup Memorial Hall	Youngenup Rd	GNOWANGERUP
+Goomalling	Goomalling Sports Pavilion	Quinlan & Hoddy Street	GOOMALLING
+Hopetoun	Mary Ann Haven Senior Citizens Centre	Veal Street	HOPETOUN
+Hyden	Hyden Primary School	Naughton Street	HYDEN
+Jennacubbine	Jennacubbine Hall	Jennacubbine East Rd	JENNACUBBINE
+Jerdacuttup	Jerdacuttup Primary School	Jerdacuttup North Rd	JERDACUTTUP
+Jerramungup	Jerramungup District High School	Lancaster Rd	JERRAMUNGUP
+Jingalup	Jingalup Golf Club	Jingalup Rd	JINGALUP
+Jurien	Jurien District High School	Hamersley St	JURIEN
+Kalannie	Kalannie Primary School	Locke St	KALANNIE
+Karlgarin	Karlgarin Primary School	Melba St	KARLGARIN
+Katanning	Katanning Uniting Church Hall	Taylor Street	KATANNING
+Katanning District Hospital	Katanning District Hospital	Kobeelya Ave	KATANNING
+Kellerberrin	Kellerberrin Memorial Hall	Massingham St	KELLERBERRIN
+Kendenup	Kendenup Primary School	Austin St	KENDENUP
+King River	King River Hall	Millbrook Rd	KING RIVER
+Kojonup	Kojonup RSL Hall	Albany Hwy	KOJONUP
+Kondinin	Kondinin Primary School	Graham Street	KONDININ
+Koorda	Koorda Primary School	Birdwood Street	KOORDA
+Kukerin	Kukerin Primary School	Bennett Street	KUKERIN
+Kulin	Kulin Recreation Centre	Johnston Street	KULIN
+Kununoppin	Kununoppin Primary School	Hughes Street	KUNUNOPPIN
+Lake Grace	Lake Grace Tele Centre	Absolon Street	LAKE GRACE
+Lake King	Lake King Primary School	Ravensthorpe Rd	LAKE KING
+Latham	Latham Primary School	Chapple Street	LATHAM
+Leeman	Leeman Primary School	Lot 470 Spencer St	LEEMAN
+Little Grove	South Coast Progress Assn Hall	Bay View Dr	LITTLE GROVE
+Lockyer	Mt Lockyer Primary School	South Coast Hwy	ALBANY
+Lower Kalgan	Lower Kalgan Hall	Nanarup Rd	LOWER KALGAN
+Lower King	Lower King Pre-primary Centre	Rutherford Dr	LOWER KING
+Manypeaks	Mt Manypeaks Primary School	Howie Rd	MANYPEAKS
+Mayanup	Mayanup Hall	Cranbrook Rd	MAYANUP
+Meckering	Meckering Primary School	Knight Street	MECKERING
+Middleton Beach	Middleton Beach Surf Club	Flinders Pde	ALBANY
+Miling	Miling Primary School	Nardy St	MILING
+Mingenew	Mingenew Primary School	Victoria Street	MINGENEW
+Mogumber	Mogumber Hall	Bindoon-Moora Rd	MOGUMBER
+Moonyoonooka	Moonyoonooka Polocross & Pony Club	Geraldton-Mt Magnet Rd	MOONYOONOOKA
+Moora	Moora Recreation Centre	Roberts Street	MOORA
+Morawa	Morawa Council Chambers	Dreghorn Street	MORAWA
+Mount Barker	Mount Barker Town Hall	Muir Street	MOUNT BARKER
+Mount Tarcoola	Mount Tarcoola Community Hall	Paringa St	MOUNT TARCOOLA
+Mount Walker	Mount Walker Primary School	Soldiers Rd	MOUNT WALKER
+Mukinbudin	Mukinbudin Shire Office	Maddock St	MUKINBUDIN
+Munglinup (O'Connor)	Munglinup Hall	Tallarack Street	MUNGLINUP
+Muradup	Muradup Hall	Piesse St	MURADUP
+Napier	Napier Hall	Chester Pass Rd	NAPIER
+Narembeen	Narembeen District High School	Ada Street	NAREMBEEN
+Narrikup	Narrikup Hall	Spencer Rd	NARRIKUP
+Newdegate	Newdegate Primary School	Mitchell St	NEWDEGATE
+New Norcia	Benedictine Monastery	Great Northern Hwy	NEW NORCIA
+Nungarin	Nungarin Primary School	Danberrin Rd	NUNGARIN
+Nyabing	Nyabing Town Hall	Richmond Street	NYABING
+Ongerup	Ongerup Primary School	Carpenter St	ONGERUP
+Parryville	Parryville Hall	Pates Rd	PARRYVILLE
+Perenjori	Perenjori Primary School	Carnamah Rd	PERENJORI
+Perth (O'Connor)	Perth GPO	Forrest Place	PERTH
+Pingaring	Pingaring CWA Hall	Luke Price St	PINGARING
+Pingrup	Pingrup Hall	Sanderson St	PINGRUP
+Pithara	Pithara Hall	Great Northern Hwy	PITHARA
+Porongurup	Porongurup Hall	Porongurup Rd	PORONGURUP
+Quairading	Quairading District High School	McLennon Street	QUAIRADING
+Rangeway	Rangeway Primary School	Cassia Street	RANGEWAY
+Ravensthorpe	Ravensthorpe District High School	Morgan St	RAVENSTHORPE
+Redmond	Redmond Hall	Redmond-Hay River Rd	REDMOND
+Rocky Gully	Rocky Gully Primary School	Arbour Street	ROCKY GULLY
+Rottnest (O'Connor)	Rottnest Primary School		ROTTNEST ISLAND
+Scotsdale	Scotsdale Hall	Scotsdale Rd	SCOTSDALE
+Shackleton	Shackleton Hall	Jerymn Street	SHACKLETON
+Spalding	Spalding Family Centre	75 Mitchell St	SPALDING
+Spencer Park	Spencer Park Primary School	Hardie Rd	ALBANY
+Tambellup	Tambellup Tele Centre	Norrish Street	TAMBELLUP
+Tammin	Tammin Primary School	Ridley Street	TAMMIN
+Three Springs	Three Springs Primary School	Carter Street	THREE SPRINGS
+Tincurrin	Tincurrin Primary School	Dumbleyung Rd	TINCURRIN
+Tingledale	Tingledale Hall	Valley of the Giants Rd	TINGLEDALE
+Trayning	Don Mason Community Centre	Railway St	TRAYNING
+Varley	Varley Primary School	Thomas Street	VARLEY
+Waggrakine	Waggrakine Primary School	Hall Rd	WAGGRAKINE
+Wagin	Wagin Court House	Tudor Street	WAGIN
+Walkaway	Walkaway Primary School	Evans Street	WALKAWAY
+Watheroo	Watheroo Primary School	cnr Marah and York St	WATHEROO
+Wellstead	Wellstead Hall	South Coast Hwy	WELLSTEAD
+Wickepin	Wickepin Primary School	Henry Street	WICKEPIN
+Wongan Hills	Wongan Hills District High School	Quinlan Street	WONGAN HILLS
+Wonthella	Allendale Primary School	Wittenoom Street	WONTHELLA
+Woodanilling	Woodanilling Shire Hall	31 Robinson Rd	WOODANILLING
+Wubin	Wubin Primary School	Glowery St	WUBIN
+Wyalkatchem	Wyalkatchem District High School	Honour Ave	WYALKATCHEM
+Yakamia	Yakamia Primary School	Beaufort Rd	ALBANY
+Yealering	Yealering Primary School	Yealering-Pingelly Rd	YEALERING
+Yerecoin	Yerecoin Hall	Toodyay-Bindi Bindi Rd	YERECOIN
+Yorkrakine	Yorkrakine Hall	Tammin-Wyalkatchem Rd	YORKRAKINE
+
+
+Pearce			
+Polling Place Name	Premises	Address	Suburb
+Bakers Hill	Bakers Hill Primary School	St George St	BAKERS HILL
+Beverley	Beverley Town Hall	Vincent Street	BEVERLEY
+Bindoon	Bindoon Ambulance Hall	Great Northern Hwy	BINDOON
+Boddington	Boddington District High School	25 Pollard St	BODDINGTON
+Brookton	Brookton District High School	Tiller ST	BROOKTON
+Bullsbrook	Pickett Park Community Hall	Maroubra Ave	BULLSBROOK
+Carmel	Carmel District Hall	Carmel Rd	CARMEL
+Chidlow	Chidlow Primary School	Lilydale Rd	CHIDLOW
+Clarkson	Clarkson Community High School	Hannaford Ave	CLARKSON
+Cuballing	Cuballing Hall	Campbell St	CUBALLING
+Darlington	Darlington Primary School	Glen Rd	DARLINGTON
+Ellenbrook	Ellenbrook Primary School	65 Fortescue Pl	ELLENBROOK
+Gidgegannup	Gidgegannup Hall	Toodyay Rd	GIDGEGANNUP
+Gingin	Granville Civic Centre	Weld Street	GINGIN
+Glen Forrest	Glen Forrest Hall	Marnie Rd	GLEN FORREST
+Grass Valley	Grass Valley Hall	Wilson St	GRASS VALLEY
+Greenhills	Greenhills Hall	Greenhills Rd	GREENHILLS
+Greenmount	Greenmount Primary School	Innamincka Rd	GREENMOUNT
+Guilderton	Guilderton Hall	Wedge Street	GUILDERTON
+Helena Valley (Pearce)	Helena Valley Recreation Hall	Cnr Scott St & Clayton Rd	HELENA VALLEY
+Henley Brook	West Swan Hall	Cnr West Swan Rd/Henley St	HENLEY BROOK
+Herne Hill	Herne Hill Primary School	Argyle St	HERNE HILL
+Highbury	Highbury Hall	Burley St	HIGHBURY
+Lancelin	St.John's Ambulance Hall	Atkinson Way	LANCELIN
+Ledge Point	Ledge Point Community Hall	381 Turner St	LEDGE POINT
+Lower Chittering	Lower Chittering Progress Association Hall	Chittering Rd	LOWER CHITTERING
+Mahogany Creek	Mahogany Creek Hall	Cnr Jacoby St & Strettle Rd	MAHOGANY CREEK
+Merriwa	Merriwa Primary School	Baltimore Pde	MERRIWA
+Midland (Pearce)	Midland Town Hall	Cnr Gt Eastern Hwy & Gt Northern Hwy	MIDLAND
+Mindarie	Mindarie Primary School	Rothesday Hts	MINDARIE
+Mount Helena	Mount Helena Community Centre	Keane St East	MOUNT HELENA
+Muchea	Muchea Community Hall	Archibald St	MUCHEA
+Mundaring	Mundaring Hall	Cnr Jacoby & Nichol Sts	MUNDARING
+Narrogin	Narrogin Railway Institute Hall	Federal St	NARROGIN
+Narrogin Regional Hospital	Narrogin Regional Hospital	Williams Rd	NARROGIN
+Northam	Northam Memorial Hall	Fitzgerald St	NORTHAM
+Northam East	Northam Primary School	Duke St	NORTHAM
+Northam North	Avonvale Primary School	Hutt St	NORTHAM
+Parkerville	Parkerville Primary School	Windoo Rd	PARKERVILLE
+Perth (Pearce)	Perth GPO	Forrest Place	PERTH
+Pickering Brook	Pickering Brook Primary School	Pickering Brook Rd	PICKERING BROOK
+Pingelly	Pingelly Town Hall	Parade St	PINGELLY
+Popanyinning	Popanyinning Hall	Francis St	POPANYINNING
+Quindanning	Quindanning Hall	Pinjarra-Williams Rd	QUINDANNING
+Quinns Rock	Gumblossom Sports Hall	Tapping Way	QUINNS ROCKS
+Rottnest (Pearce)	Rottnest Primary School		ROTTNEST ISLAND
+Sawyers Valley	Sawyers Valley Primary School	Barlow St	SAWYERS VALLEY
+Seabird	Seabird Ambulance Hall	Chalon Ave	SEABIRD
+Stoneville	Stoneville Hall	Bentley St	STONEVILLE
+Stratton	Middle Swan Primary School	Lewis Jones Cross	STRATTON
+Swan View (Pearce)	Swan View High School	Weld Rd	SWAN VIEW
+Toodyay	Sports Pavilion	Telegraph Rd	TOODYAY
+Two Rocks	Phil Renkin Recreation Centre	Lisford Ave	TWO ROCKS
+Upper Swan	Upper Swan Primary School	Great Northern Hwy	UPPER SWAN
+Walliston (Pearce)	Walliston Primary School	Dianella Rd	WALLISTON
+Wandering	Wandering Primary School	2 Watts St	WANDERING
+West Dale	Dale River Tennis Club	Brookton Hwy	WEST DALE
+Williams	Williams RSL Hall	Brooking Street	WILLIAMS
+Woodridge	Woodridge Community Centre	King Dr	WOODRIDGE
+Wooroloo	Wooroloo Primary School	Wade St	WOOROLOO
+Wundowie	Wundowie Primary School	Boronia Ave	WUNDOWIE
+Yanchep	Yanchep District High School	Lagoon Dr	YANCHEP
+York	York District High School	Trews Rd	YORK
+
+
+Perth  			
+Polling Place Name	Premises	Address	Suburb
+Ashfield	Ashfield Primary School	Margaret St	ASHFIELD
+Bassendean	Anzac Tce Primary School	Anzac Tce	BASSENDEAN
+Bassendean South	Bassendean Primary School	65 West Rd	BASSENDEAN
+Bayswater	Senior Citizens Centre	27 King William Street	BAYSWATER
+Bayswater North	Hillcrest Primary School	Coode Street	BAYSWATER
+Bedford Park	Bedford Scout Hall	Birkett Street	BEDFORD
+Bedford West	St Peters Hall	93 Wood St	INGLEWOOD
+Beechboro	Beechboro Primary School	King Rd	BEECHBORO
+Beechboro East	East Beechboro Primary School	Brockmill Ave	BEECHBORO
+Beechboro West	John Septimus Roe Anglican Community School	Blackboy Way	BEECHBORO
+Coolbinia	Coolbinia Primary School	Bradford Street	COOLBINIA
+Dianella	Islamic College	Cleveland Street	DIANELLA
+Dianella Central	Autumn Centre	18 Kerry Street	DIANELLA
+Dianella North	West Morley Primary School	Fitzroy Street	DIANELLA
+East Perth	Ministry of Housing	99 Plain Street	EAST PERTH
+Eden Hill	Eden Hill Primary School	Ivanhoe Street	EDEN HILL
+Embleton	Embleton Primary School	Collier Rd	EMBLETON
+Hampton Park	Hampton Park Primary School	Hamersley Place	MORLEY
+Highgate	Highgate Primary School	Lincoln Street	HIGHGATE
+Inglewood	Inglewood Masonic Hall	Carrington Street	INGLEWOOD
+Inglewood North	Inglewood Primary School	Normanby Rd	INGLEWOOD
+Kiara	Lockridge Senior High School	Benara Rd	KIARA
+Lockridge	Lockridge Primary School	Rosher Rd	LOCKRIDGE
+Maylands	Maylands Primary School	Peninsula Rd	MAYLANDS
+Maylands East	East Maylands Primary School	Kelvin Street	MAYLANDS
+Menora	RSL Homes	16 Freedman Rd	MENORA
+Menora South	Coolbinia Pre Primary	Holmfirth St	MENORA
+Mercy Hospital	Mercy Hospital	2 Ellesmere Rd	MT LAWLEY
+Morley	Morley Primary School	Wellington Rd	MORLEY
+Morley North	Morley Kindergarten	Lincoln Rd	MORLEY
+Morley South	Hampton Senior High School	Morley Dve E	MORLEY
+Mount Lawley	Mt Lawley Primary School	Second Ave	MT LAWLEY
+Mount Lawley East	Mt Lawley Pre Primary	81 Railway Pde	MT LAWLEY
+Mount Lawley South	Mt Lawley TAFE College	Harold Street	MT LAWLEY
+Mount Lawley West	Mt Lawley Masonic Hall	48 Alma Rd	MT LAWLEY
+Noranda West (Perth)	North Morley Primary School	Gordon Rd West	DIANELLA
+Northbridge	Perth TAFE College	20 Francis St	NORTHBRIDGE
+North Perth	Kyilla Primary School	Selkirk Street	NORTH PERTH
+North Perth Central	North Perth Primary School	Albert Street	NORTH PERTH
+Perth (Perth)	Perth GPO	Forrest Place	PERTH
+Rottnest (Perth)	Rottnest Primary School		ROTTNEST ISLAND
+Royal Perth Hospital	Royal Perth Hospital	Victoria Square	PERTH
+West Perth (Perth)	Greek Orthodox Church	Cnr Charles & Carr Streets	WEST PERTH
+
+
+Stirling			
+Polling Place Name	Premises	Address	Suburb
+Balcatta	Balcatta Primary School	Main Street	BALCATTA
+Balcatta Central	Balcatta Senior High School	"Performing Arts Centre, Poincaire St"	BALCATTA
+Balcatta East	Balcatta Gospel Hall	38 Collier Ave	BALCATTA
+Balcatta North	Takari Primary School	Rickman St	BALCATTA
+Balga	Balga Primary School	Fernhurst Cres	BALGA
+Balga North	North Balga Primary School	Maitland Road	BALGA
+Carine	Carine Senior High School	Everingham St	CARINE
+Deanmore	Deanmore Primary School	Deanmore Rd	KARRINYUP
+Dianella Heights	Dianella Heights Primary School	Beaman St	DIANELLA
+Dianella West	Sutherland Primary School	Sutherland St	DIANELLA
+Doubleview (Stirling)	Doubleview Primary School	St Brigid's Tce	DOUBLEVIEW
+Doubleview North	Newborough Primary School	Newborough St	DOUBLEVIEW
+Duncraig East (Stirling)	Davallia Primary School	Juniper Way	DUNCRAIG
+Hamersley	Glendale Primary School	Glendale Ave	HAMERSLEY
+Hamersley East	East Hamersley Primary School	Doon Way	HAMERSLEY
+Innaloo North	Yuluma Primary School	Ambrose St	INNALOO
+Karrinyup	Karrinyup Primary School	Hampton St	KARRINYUP
+Lake Gwelup	Lake Gwelup Primary School	Porter St	GWELUP
+Mirrabooka	Mirrabooka Senior High School	Nollamara Ave	NOLLAMARA
+Mirrabooka Central	Dryandra Primary School	449 Dryandra Dr	MIRRABOOKA
+Mirrabooka East	Boyare Primary School	Threadleaf Way	MIRRABOOKA
+Nollamara	Nollamara Primary School	Harrison St	NOLLAMARA
+Nollamara North	St Gerard's Parish Hall	Majella Rd	WESTMINSTER
+Noranda West (Stirling)	North Morley Primary School	Gordon Rd West	DIANELLA
+North Beach	North Beach Primary School	North Beach Rd	NORTH BEACH
+North Beach Central (Stirling)	North Beach Autumn Centre	20 Castle St	NORTH BEACH
+Osborne	Osborne Primary School	Albert St	OSBORNE PARK
+Osborne East	Adam Spagnolo Community Centre	11 Royal Street	OSBORNE PARK
+Osborne Park	Osborne Park Hospital	Osborne Pl	STIRLING
+Perth (Stirling)	Perth GPO	Forrest Place	PERTH
+Rottnest (Stirling)	Rottnest Primary School		ROTTNEST ISLAND
+Scarborough	Scarborough Uniting Church	121 Northstead St	SCARBOROUGH
+Scarborough Central	Scarborough Pre-Primary School	Bazaar Tce	SCARBOROUGH
+Trigg	Trigg Surf Life Saving Club	West Coast Dr	TRIGG
+Tuart Hill (Stirling)	Tuart Hill Primary School	Banksia St	TUART HILL
+Westminster	Westminster Primary School	Marloo Rd	WESTMINSTER
+Yokine	Yokine Primary School	Woodrow Ave	YOKINE
+Yokine North	Yokine Uniting Church Hall	Golf View St	YOKINE
+Yokine West	Yokine Pre-School Centre	Ranger Rd	YOKINE
+
+
+Swan  			
+Polling Place Name	Premises	Address	Suburb
+Beckenham	Beckenham Community Church Hall	Cnr Streatham & Sydenham Streets	BECKENHAM
+Belmont	Belmont Primary School	213 Great Eastern Highway	BELMONT
+Bentley	Bentley Pre School Centre	6 John Street	BENTLEY
+Bentley South	Bentley Community Centre	Via Nyamup Way	BENTLEY
+Bentley West	South Bentley Community Care Centre	Hillview Place	BENTLEY
+Cannington	Sevenoaks Senior College	275 Sevenoaks Street	CANNINGTON
+Cannington East	Gibbs Street Primary School	Gibbs Street	EAST CANNINGTON
+Carlisle	Carlisle Memorial Hall	2 Memorial Avenue	CARLISLE
+Cloverdale	Forster Park Hall	Cnr Keane St & Abernethy Rd	CLOVERDALE
+Cloverdale North	Belmont City Church	240-244 Epsom Ave	BELMONT
+Cloverdale West	Belmont City College	Fisher Street	CLOVERDALE
+Como	Como P & C Hall	Coode Street	COMO
+Como North	Collier Park Village	16 Morrison Street	COMO
+Como South	St Augustines Church Hall	Cnr Cale & Park Streets	COMO
+Kensington	Kensington Primary School	73 Banksia Terrace	KENSINGTON
+Kewdale	Kewdale Primary School	Cnr Belmont & Kew Streets	KEWDALE
+Kewdale West	Carlisle Primary School	Cnr Wright & Orrong Roads	KEWDALE
+Lathlain	Lathlain Primary School	120 Howick Street	LATHLAIN
+Manning	St Pius X Parish Hall	23 Paterson Street	MANNING
+Manning North	Koonawara Primary School	Goss Avenue	MANNING
+Millen	Millen Primary School	Playfield Street	EAST VICTORIA PARK
+Perth (Swan)	Perth GPO	Forrest Place	PERTH
+Perth Domestic Airport	Qantas Domestic Terminal	Brearley Avenue	PERTH AIRPORT
+Perth International Airport	International Terminal	Horrie Miller Drive	PERTH AIRPORT
+Queens Park	St Josephs Parish Hall	136 Railway Parade	QUEENS PARK
+Redcliffe	Redcliffe Primary School	Kanowna Avenue East	REDCLIFFE
+Rivervale	WA Lapidary & Rock Hunting Club Hall	31-35 Gladstone Road	RIVERVALE
+Rivervale North	Tranby Primary School	99 Acton Avenue	RIVERVALE
+Rottnest (Swan)	Rottnest Primary School		ROTTNEST ISLAND
+Rowethorpe	Rowethorpe Retirement Village	Jacaranda Avenue	BENTLEY
+South Perth	South Perth Primary School	51 Forrest Street	SOUTH PERTH
+South Perth Central	Ernest Johnson Hall & Scout Hall	Pilgrim Street	SOUTH PERTH
+South Perth North	Legacy House	64 Mill Point Road	SOUTH PERTH
+Swan Cottage Homes	Swan Cottage Homes	26 Plantation Drive	BENTLEY
+Victoria Park	Victoria Park Primary School	1 Cargill Street	VICTORIA PARK
+Victoria Park Central	The Park Recreation Centre	Cnr Kent & Gloucester Streets	EAST VICTORIA PARK
+Victoria Park East	East Victoria Park Primary School	Beatty Avenue	EAST VICTORIA PARK
+Wilson	Wilson Community Hall	Braibrise Road	WILSON
+
+
+Tangney			
+Polling Place Name	Premises	Address	Suburb
+Applecross	Applecross Primary School	Kintail Rd	APPLECROSS
+Ardross	St Benedict's Primary School	Alness St	ARDROSS
+Ardross West	Applecross Senior High School	Links Rd	ARDROSS
+Attadale	Attadale Primary School	Wichmann Rd	ATTADALE
+Bateman	Bateman Primary School	20 Bartling Cres	BATEMAN
+Booragoon	Booragoon Primary School	Clements Rd	BOORAGOON
+Brentwood	Brentwood Primary School	Moolyeen Rd	BRENTWOOD
+Bull Creek	Bull Creek Primary School	Hardy St	BULL CREEK
+Bull Creek East	Oberthur Primary School	Nicholls Cres	BULL CREEK
+Bull Creek North	"Admin Bldg, Air Force Estate"	Bull Creek Dr	BULL CREEK
+Ferndale	Ferndale Primary School	Karri Way	FERNDALE
+Ferndale East	Kinlock Primary School	Latham Rd	FERNDALE
+Kardinya (Tangney)	Kardinya Primary School	Ochiltree Way	KARDINYA
+Langford	Langford Primary School	Southgate Rd	LANGFORD
+Leeming	Leeming Primary School	Meharry Rd	LEEMING
+Leeming East	Banksia Park Primary School	Hicks St	LEEMING
+Leeming West	West Leeming Primary School	Westall Tce	LEEMING
+Lynwood	Lynwood Primary School	Purley Cres	LYNWOOD
+Melville (Tangney)	Melville Recreation Centre	Cnr Canning Hwy & Stock Rd	MELVILLE
+Melville East	Melville Primary School	Kitchener Rd	MELVILLE
+Melville South	Melville Senior High School	Potts St	MELVILLE
+Mt Pleasant	Mt Pleasant Primary School	Queens Rd	MT PLEASANT
+Parkwood	Lynwood Senior High School	Metcalfe Rd	PARKWOOD
+Perth (Tangney)	Perth GPO	Forrest Place	PERTH
+Riverton	Riverton Primary School	Corinthian Rd East	RIVERTON
+Rossmoyne	Rossmoyne Primary School	Second Ave	ROSSMOYNE
+Rottnest (Tangney)	Rottnest Primary School		ROTTNEST ISLAND
+Shelley	Shelley Primary School	Monota Ave	SHELLEY
+Willetton	Willetton Primary School	Apsley Rd	WILLETTON
+Willetton East	Rostrata Primary School	Rostrata Ave	WILLETTON
+Willetton North	Senior Citizens Centre	Cnr Herald Ave & High Rd	WILLETTON
+Willetton South	Willetton Senior High School	Pinetree Gully Rd	WILLETTON
+Winthrop	Winthrop Primary School	Jackson Ave	WINTHROP
