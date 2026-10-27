@@ -64,7 +64,7 @@ const writeCsv = (tmp, lines) => {
   const r = runIn({});
   assert.equal(r.code, 0, `clean run: ${r.status}`);
   const st = JSON.parse(r.status.slice("ESS_DIR_STATUS ".length));
-  assert.equal(st.waves, 51, "51 mood clusters in the committed CSV");
+  assert.equal(st.waves, 52, "52 mood clusters in the committed CSV");
   assert.equal(st.reconciled, Object.keys(STORE.waves).length, "every wave reconciles against polls.json");
   assert.equal(st.guards, 0);
   assert.equal(r.written, true, "first run writes");

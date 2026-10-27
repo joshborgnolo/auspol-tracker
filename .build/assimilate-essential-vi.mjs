@@ -33,8 +33,10 @@
 // vs Sydney wave labels), so the lookup allows +/-1 day. Essential
 // publishes the report page AFTER the charts update in place, so a new
 // wave often has no indexed page yet; the retro-fill below completes the
-// row on a later run. Guardian write-up URLs are not derivable: a NOTE is
-// logged so the url key can be hand-set.
+// row on a later run. The Guardian write-up URL is DISCOVERED off the
+// Guardian's essential-poll hub (below) when exactly one essential-poll
+// article surrounds the wave day; a NOTE still asks for a hand-set url
+// when it can't be.
 // Rows are flagged `assimilated: true`, which records where they came from
 // and exempts them from the validator's sample-size rule.
 //
@@ -202,9 +204,10 @@ const fieldworkStart = (date) => iso(Date.parse(date) - 5 * DAY);
 /* publishedFor is a PROVISIONAL guess: Essential's label date used to sit a
    day ahead of the Guardian embargo day, but the 2026-09 wave's label landed
    ON the embargo day, and the guess displayed a publication time a full day
-   late. Once a Guardian write-up URL is on the row (hand-set; a NOTE logs in
-   the retro-fill until then), the article's own datePublished is the truth
-   and retro-correct rewrites the guess from it. */
+   late. Once a Guardian write-up URL is on the row (discovered off the
+   Guardian's essential-poll hub, else hand-set — a NOTE logs in the
+   retro-fill until then), the article's own datePublished is the truth and
+   retro-correct rewrites the guess from it. */
 const GUARDIAN_RE = /^https?:\/\/(www\.)?theguardian\.com\//;
 const sydneyStamp = (utcIso) => {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en", {
@@ -226,6 +229,45 @@ const guardianPublished = async (url) => {
     console.log(`WARNING: could not read the Guardian publication time from ${url} (${e.message}); keeping the recorded stamp`);
     return null;
   }
+};
+
+/* url discovery: a Guardian write-up URL is never derivable from the wave,
+   but the Guardian keeps its recent essential-poll articles on one hub page,
+   linked as RELATIVE hrefs whose slugs contain guardian-essential-poll (one
+   wave even carries the phrase mid-slug). A URL-less assimilated row asks
+   the hub (fetched once a run) for such an article whose PATH day is the
+   wave's csvDate or one of the two days before it (the Sydney embargo reads
+   past path conventions both ways — oct/28 and sep/29 each carried their
+   wave's 01:00 AEDT article); exactly one candidate files the url, none or
+   several leaves the hand-set NOTE standing (wired 2026-10-28, user call:
+   "publication date/time should always come from the Guardian article"). */
+const GUARDIAN_HUB = "https://www.theguardian.com/australia-news/essential-poll";
+const HUB_MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+let hubCache = null;
+const guardianHubArticles = () => hubCache ??= (async () => {
+  try {
+    const res = await fetch(GUARDIAN_HUB, {
+      headers: { "user-agent": "Mozilla/5.0 (auspol-tracker essential assimilator)" },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    const found = new Map();
+    for (const m of html.matchAll(/\/australia-news\/(\d{4})\/([a-z]{3})\/(\d{2})\/([-\w]*guardian-essential-poll[-\w]*)/g)) {
+      const day = `${m[1]}-${String(HUB_MON[m[2]]).padStart(2, "0")}-${m[3]}`;
+      const url = `https://www.theguardian.com/australia-news/${m[1]}/${m[2]}/${m[3]}/${m[4]}`;
+      if (!found.has(url)) found.set(url, day);
+    }
+    return [...found].map(([url, day]) => ({ url, day }));
+  } catch (e) {
+    console.log(`WARNING: could not read the Guardian essential-poll hub (${e.message}); url stays hand-set`);
+    return [];
+  }
+})();
+const guardianArticleFor = async (csvWave) => {
+  const lag = (day) => Math.round((Date.parse(csvWave) - Date.parse(day)) / DAY);
+  const hits = (await guardianHubArticles()).filter((a) => lag(a.day) >= 0 && lag(a.day) <= 2);
+  return hits.length === 1 ? hits[0].url : null;
 };
 
 // canonical curated poll-row key order, used to rebuild retro-filled rows
@@ -250,6 +292,10 @@ for (let i = 0; i < D.polls.length; i++) {
   if (!vi.has(csvWave)) {
     console.log(`WARNING: assimilated row ${p.date} has no matching CSV wave ${csvWave}; retro-fill skipped`);
     continue;
+  }
+  if (p.url == null) {
+    const found = await guardianArticleFor(csvWave);
+    if (found) { p.url = found; fixes.push(`url ${found}`); }
   }
   if (p.url != null) truthByWave.set(csvWave, p);
   if (p.published == null && embargoed(publishedFor(csvWave))) {

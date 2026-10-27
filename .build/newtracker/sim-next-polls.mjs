@@ -324,13 +324,20 @@ function eq(name, got, want) {
 // week of tolerance is still open (edge Wed 9 Sep), so Essential shows the
 // overdue-but-counting face — the agent's daily 5am sweep either records
 // this poll or confirms 2 Sep as absent too and slips again to 9 Sep.
+// Since 2026-10-28 the house runs on published-basis cadence (the newest
+// wave's Guardian stamp completed the unbroken published tail), and its
+// file-at-01:00 habit is now 11 of 12 timed releases — tsSpan trims the one
+// 04:36 outlier, so releaseTo sits at 60 and by 3am the moment is past and
+// Essential is OFF the ticker until the sweep (the panel face above still
+// counts the tolerance). Before the publish-basis flip this read
+// ["Essential", "any moment now"].
 {
   const { label, t0, nowMs } = scen("Wed 2 Sep 3am", "2026-09-02", 180);
   const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   eq("Essential overdue, tolerance open to 9 Sep", [firm(rows, "Essential").overdue, firm(rows, "Essential").missed], [true, false]);
-  eq("ticker item 1", items[0] && [items[0].firm, items[0].when], ["Essential", "any moment now"]);
+  eq("ticker item 1", items[0] && [items[0].firm, items[0].when], ["Resolve", "11 days"]);
 }
 
 // S3 – Thu 3 Sep: Wed 2 Sep went by unrecorded and UNCONFIRMED (the 5am

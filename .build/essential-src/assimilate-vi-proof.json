@@ -1,67 +1,18 @@
 {
-  "generatedAt": "2026-10-27T11:45:01.079Z",
+  "generatedAt": "2026-10-27T21:12:42.819Z",
   "horizon": "2025-09-29",
-  "retro": [],
-  "added": [
+  "retro": [
     {
-      "csvWave": "2026-10-28",
-      "tppWave": "2026-10-28",
-      "row": {
-        "date": "2026-10-27",
-        "dateStart": "2026-10-22",
-        "pollster": "Essential",
-        "client": "The Guardian",
-        "sample": null,
-        "alp": 28,
-        "lnp": 23,
-        "grn": 12,
-        "onp": 28,
-        "ind": 10,
-        "oth": null,
-        "tpp_alp": 44,
-        "tpp_lnp": 52,
-        "releaseUrl": "https://essentialreport.com.au/reports/28-october-2026",
-        "assimilated": true
-      }
+      "date": "2026-10-27",
+      "fixes": [
+        "url https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb",
+        "published 2026-10-28T01:00 (Guardian's datePublished; replaces synthetic –)"
+      ]
     }
   ],
-  "addedAppr": [
-    {
-      "csvWave": "2026-10-28",
-      "row": {
-        "date": "2026-10-27",
-        "firm": "Essential",
-        "alb": -18,
-        "opp": -5,
-        "oppName": "Taylor",
-        "han": null,
-        "detail": {
-          "alb": {
-            "app": 38,
-            "dis": 56
-          },
-          "opp": {
-            "app": 35,
-            "dis": 40
-          }
-        }
-      }
-    }
-  ],
-  "addedDir": [
-    {
-      "csvWave": "2026-10-28",
-      "row": {
-        "date": "2026-10-27",
-        "dateStart": "2026-10-22",
-        "pollster": "Essential",
-        "right": 25,
-        "wrong": 61,
-        "unsure": 15,
-        "url": "https://essentialreport.com.au/reports/28-october-2026"
-      }
-    }
-  ],
+  "added": [],
+  "addedAppr": [],
+  "addedDir": [],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -73,7 +24,8 @@
     "2026-06-30",
     "2026-07-28",
     "2026-09-01",
-    "2026-09-30"
+    "2026-09-30",
+    "2026-10-28"
   ],
   "skippedFigureDup": [
     {
@@ -127,7 +79,8 @@
     "2026-06-30",
     "2026-07-28",
     "2026-09-01",
-    "2026-09-30"
+    "2026-09-30",
+    "2026-10-28"
   ],
   "skippedApprFigureDup": [
     {
@@ -146,7 +99,8 @@
     "2026-06-30",
     "2026-07-28",
     "2026-09-01",
-    "2026-09-30"
+    "2026-09-30",
+    "2026-10-28"
   ],
   "skippedDirFigureDup": [
     {

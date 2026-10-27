@@ -1494,7 +1494,8 @@
       "right": 25,
       "wrong": 61,
       "unsure": 15,
-      "url": "https://essentialreport.com.au/reports/28-october-2026"
+      "url": "https://essentialreport.com.au/reports/28-october-2026",
+      "published": "2026-10-28T01:00"
     }
   ],
   "polls": [
@@ -6200,10 +6201,11 @@
     },
     {
       "date": "2026-10-27",
+      "published": "2026-10-28T01:00",
       "dateStart": "2026-10-22",
       "pollster": "Essential",
       "client": "The Guardian",
-      "sample": null,
+      "sample": 1087,
       "alp": 28,
       "lnp": 23,
       "grn": 12,
@@ -6212,6 +6214,7 @@
       "oth": null,
       "tpp_alp": 44,
       "tpp_lnp": 52,
+      "url": "https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb",
       "releaseUrl": "https://essentialreport.com.au/reports/28-october-2026",
       "assimilated": true
     }
