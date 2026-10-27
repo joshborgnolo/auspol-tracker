@@ -5625,6 +5625,11 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
 .btv-search input::placeholder { color: var(--ink-3); opacity: 1; }
 .btv-search input::-webkit-search-cancel-button { display: none; }
+/* classic-sheet kill: the page's shared bare ::focus-visible ring (above)
+   matches the inset input on Tab focus; the pill's own ring lives on its
+   container, so the input's own outline must stay dark. The redesign's
+   kill is its own: rd.css's tail block, beside .rd-ap-search's - rd.css
+   splices AFTER this file and would outrank this one there */
 .btv-search input:focus-visible { outline: none; }
 /* 16px on touch devices or iOS Safari zooms the page in on focus and never
    back out (rd-ap-search carries the same rule in rd.css) */

@@ -97,6 +97,17 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   if (w >= 1001 && Math.round(here.pillW) !== 330) fail(`${design}@${w} the pill is ${here.pillW}px wide, expected 330`);
   if (w <= 760 && Math.abs(here.pillW - here.barW) > 1) fail(`${design}@${w} the phone pill stops ${here.barW - here.pillW}px short of its row`);
 
+  /* keyboard focus rings the pill's container, never a second rectangle on
+     the inset input (the rd.css tail kill beside rd-ap-search's, plus the
+     template's classic-sheet kill) */
+  await page.keyboard.press("Tab");
+  await page.evaluate(() => document.querySelector(".btv-search input").focus());
+  const focus = await page.evaluate(() => ({ pill: getComputedStyle(document.querySelector(".btv-search")).outlineStyle,
+    inner: getComputedStyle(document.querySelector(".btv-search input")).outlineStyle }));
+  await page.evaluate(() => document.activeElement.blur());
+  if (focus.inner !== "none") fail(`${design}@${w} keyboard focus rings the inset input - the inner rectangle (${focus.inner})`);
+  if (focus.pill !== "solid") fail(`${design}@${w} keyboard focus never rings the pill itself (${focus.pill})`);
+
   if (!wordingPick) { fail("no long-tail question offered a token"); await page.close(); continue; }
 
   /* a word out of a long-tail question (its topic's group draws first) */
