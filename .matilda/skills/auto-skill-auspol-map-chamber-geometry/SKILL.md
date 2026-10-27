@@ -118,7 +118,9 @@ centred (0, 242) cell renamed `Rsj0` (was `Rc5c0` — no longer row-indexed), an
 nswGeom must pass `rOut: NSWB.R[2] / CU` because geomFor's `B.R[4]` fallback
 index only fits a five-row curve. In the canvas probe the fit-checks are the
 chair count (96) and ZERO outlined-empty desks; the NSW phone/band contract is
-unchanged.
+unchanged. **Third user call, same day**: the straight files sit at the curve
+radii they continue — `arm.x` mirrors `R[0]` (130) and `row2X` mirrors `R[1]`
+(172), so each file reads as the tail of its curve row.
 
 ## The `@<name>-cells` markers + test eval idiom
 

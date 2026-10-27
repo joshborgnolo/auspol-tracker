@@ -102,8 +102,8 @@ function vicCells() {
    @nsw-cells-begin */
 const NSWB = {
   leadY: -268.2, // the leaders' desks, heading the inner straight row at the table's shoulder
-  arm: { x: 115, y0: -250, pitch: 18.2, n: 12 }, // the inner straight row
-  row2X: 158, // the outer straight row, same files and span
+  arm: { x: 130, y0: -250, pitch: 18.2, n: 12 }, // the inner straight row, continuing the inner curve's radius
+  row2X: 172, // the outer straight row, continuing the middle curve's radius (2026-10-27 user call)
   R: [130, 172, 214], // the curve's three rows
   sectors: [[[6, 84, 6]], [[5, 85, 9]], [[7, 83, 6]]],
 };
