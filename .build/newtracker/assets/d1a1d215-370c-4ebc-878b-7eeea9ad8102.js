@@ -318,7 +318,11 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   const menuActive = menuTabs.find((t) => t.id === active) || null;
   const pinHideTab = barTabs.find((t) => t.pinHide);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [menuAt, setMenuAt] = React.useState(null);   // { top, left } in the nav's box
+  /* the sheet's seat is written straight onto it (seatMenu), not held in
+     state: it has to follow the tab on every frame of the pin's condense,
+     and a re-render of the bar per frame was the stutter. Only the column
+     count (a rung, not a position) re-renders */
+  const [menuTwo, setMenuTwo] = React.useState(false);
   const navRef = React.useRef(null);
   const menuBtn = React.useRef(null);
   const menuRef = React.useRef(null);
@@ -334,12 +338,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     if (!b || !n) return;
     const br = b.getBoundingClientRect(), nr = n.getBoundingClientRect();
     const vw = window.innerWidth;
+    const m = menuRef.current;
     if (!window.AP.rd) {
       /* its right edge under the button's, kept 8px inside the screen: on a
          phone the button sits left of the menu's own width */
       const w = Math.min(280, vw - 24);
       const x = Math.min(Math.max(br.right - w, 8), vw - 8 - w);
-      setMenuAt({ top: Math.round(br.bottom - nr.top), left: Math.round(x - nr.left) });
+      if (m) Object.assign(m.style, { top: Math.round(br.bottom - nr.top) + "px", left: Math.round(x - nr.left) + "px", right: "auto" });
       return;
     }
     /* The redesign's folder (2026-10-18): the open button becomes a paper
@@ -368,9 +373,17 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     if (R - pr.right < 16) R = Math.round(pr.right);
     const w = R - L;
     const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
-    setMenuAt({ two, top: Math.round(br.bottom - nr.top), left: L - Math.round(nr.left), width: w,
-                gapA: Math.max(0, pr.left - L + 1), gapB: Math.min(w, pr.right - L - 1),
-                maxH: stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) : null });
+    setMenuTwo(two);
+    if (!m) return;
+    /* the tab's sides to the sub-pixel: mid-condense the tab is scaled, and
+       a rounded opening left a sliver of the sheet's edge showing under it */
+    const gapA = Math.max(0, pr.left - L + 1), gapB = Math.min(w, pr.right - L - 1);
+    Object.assign(m.style, { top: Math.round(br.bottom - nr.top) + "px", left: L - nr.left + "px", right: "auto", width: w + "px",
+                             borderTopLeftRadius: gapA <= 1.5 ? "0px" : "", borderTopRightRadius: gapB >= w - 1.5 ? "0px" : "" });
+    m.style.setProperty("--gap-a", gapA + "px");
+    m.style.setProperty("--gap-b", gapB + "px");
+    const list = m.querySelector(".tab-menu-list");
+    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
   };
   const openMenu = (focusAt) => {
     placeMenu();
@@ -385,15 +398,49 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     setMenuOpen(false);
     if (refocus && menuBtn.current) menuBtn.current.focus();
   };
-  /* the menu hangs off the button: a scroll that pins or unpins the bar (it
-     condenses) or a resize re-seats it rather than leave it floating */
-  React.useEffect(() => {
-    if (!menuOpen) return;
-    const re = () => placeMenu();
-    window.addEventListener("resize", re);
-    window.addEventListener("scroll", re, { passive: true });
-    return () => { window.removeEventListener("resize", re); window.removeEventListener("scroll", re); };
-  }, [menuOpen]);
+  /* The menu hangs off the button, so it follows the tab on every frame the
+     tab moves. Pinning or unpinning the bar condenses it in a .38s glide
+     that runs on after the scroll that set it off has stopped (and on a
+     phone the tabs close up at the left in the same commit), so re-seating
+     on scroll alone froze the sheet wherever the last scroll caught it -
+     12-18px off the tab pinned, 24-40px unpinned (user report 2026-10-27,
+     probe menu-join.mjs). A scroll, a resize or any transition in the bar
+     wakes a frame loop that seats the sheet before each paint and sleeps
+     once the tab has held still for a few frames; the layout effect below
+     seats it in the very commit that flips the pin, before it paints */
+  const follow = React.useRef(null);
+  React.useLayoutEffect(() => {
+    if (!menuOpen) return undefined;
+    placeMenu();
+    const f = follow.current = { raf: 0, still: 0, last: "" };
+    const tick = () => {
+      f.raf = 0;
+      placeMenu();
+      const b = menuBtn.current, pp = b && (b.querySelector(".tab-menu-paper") || b);
+      const r = pp ? pp.getBoundingClientRect() : null;
+      const key = r ? [r.left, r.right, r.bottom].join() : "";
+      f.still = key === f.last ? f.still + 1 : 0;
+      f.last = key;
+      if (f.still < 4) f.raf = requestAnimationFrame(tick);
+    };
+    const wake = f.wake = () => { f.still = 0; if (!f.raf) f.raf = requestAnimationFrame(tick); };
+    const n = navRef.current;
+    window.addEventListener("resize", wake);
+    window.addEventListener("scroll", wake, { passive: true });
+    if (n) { n.addEventListener("transitionrun", wake); n.addEventListener("transitionend", wake); }
+    wake();
+    return () => {
+      if (f.raf) cancelAnimationFrame(f.raf);
+      follow.current = null;
+      window.removeEventListener("resize", wake); window.removeEventListener("scroll", wake);
+      if (n) { n.removeEventListener("transitionrun", wake); n.removeEventListener("transitionend", wake); }
+    };
+  }, [menuOpen, menuTwo]);
+  React.useLayoutEffect(() => {
+    if (!follow.current) return;
+    placeMenu();
+    follow.current.wake();
+  }, [pinned, heroGone]);
   /* the ledger's numbers are keys: while the menu is open a digit goes
      straight to that numbered row, by the count on screen (Info's #7 joins
      on a phone bar once the score docks). Document-level, so it fires from
@@ -724,20 +771,16 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
              for the explainer), Info last where the phone bar has dropped
              its tab. The rows scroll inside the sheet on a short screen,
              so the sheet's own edges - the open top under the tab - stay put */
-          <div className={"tab-menu-pop" + (menuAt && menuAt.two ? " tab-menu-two" : "")} id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
-               style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto", width: menuAt.width + "px",
-                                 "--gap-a": menuAt.gapA + "px", "--gap-b": menuAt.gapB + "px",
-                                 borderTopLeftRadius: menuAt.gapA <= 1.5 ? 0 : undefined,
-                                 borderTopRightRadius: menuAt.gapB >= menuAt.width - 1.5 ? 0 : undefined } : null}
+          <div className={"tab-menu-pop" + (menuTwo ? " tab-menu-two" : "")} id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
                onKeyDown={onMenuKey}>
-            <div className="tab-menu-list" style={menuAt && menuAt.maxH ? { maxHeight: menuAt.maxH + "px" } : null}>
+            <div className="tab-menu-list">
               {((rowEls) => {
                 /* on a wide screen the pages sit in two columns, read down the
                    first and then the second (the numbers and the arrow keys
                    both run that way), each column a sheet of its own so the
                    menu takes the shape of its pages; Info, hidden at these
                    widths, rides the second column's foot */
-                if (!(menuAt && menuAt.two)) return rowEls;
+                if (!menuTwo) return rowEls;
                 const k = Math.ceil(menuTabs.length / 2);
                 return <>
                   <div className="tab-menu-col">{rowEls.slice(0, k)}</div>
@@ -784,7 +827,6 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
           </div>
           ) : (
           <div className="tab-menu-pop" id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
-               style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto" } : null}
                onKeyDown={onMenuKey}>
             {pinHideTab && (
               <a role="menuitem" tabIndex={-1} className={"tab-menu-item tab-menu-info" + (active === pinHideTab.id ? " on" : "")}
