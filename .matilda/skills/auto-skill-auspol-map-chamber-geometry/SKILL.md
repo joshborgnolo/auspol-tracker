@@ -58,6 +58,11 @@ draws ONE plain rectangle table (the federal table is the T shape — an 8-verte
 The mace rides at the table's HEAD, the end away from the Speaker — `const my = -123`
 shared by every federal-idiom floor (2026-10-27 user call; NSW's had sat mid-table at
 -189 — at Sydney's Assembly the table's head lies away from the Speaker).
+Same call's nameplate trim: "The table" paints for the federal House, Spring Street,
+the vic LC and the federal Senate only — Adelaide's two chambers and Sydney's Assembly
+name their table nothing (drawSAFurniture gates the `put` on `geom.key === "nswLC"`,
+drawChamberFurniture folds its label pair into `!geom.nsw`); Sydney's Council keeps its
+plan's caption.
 Phone label-stack (`labelStack`): hoisted to `y0-50/35/13` with the crossbench label
 gated `only clockIn` and the whole band gated on `bandOn` (the centreWide rung).
 
@@ -180,7 +185,8 @@ backrest at ONE transform — cluster roundRects by their `getTransform()` key, 
 auspol-headless-geometry-verify's canvas section); NO desk outlined-empty (the 92
 desks seat the floor's 92 members exactly — the first land's spare desk is gone);
 the table path is the 4-vertex rectangle while the federal 2025
-control keeps its 8-vertex T; "The table" label paints, "Hansard" never does. The
+control keeps its 8-vertex T; the "The table" nameplate is NSW-gone (the control keeps
+its), "Hansard" never does. The
 phone-band contract (`labelStack` gaps, in-canvas ink, presiding member named) lives
 in `.matilda/probe/map-chamber-phone.mjs`. Both probes force-tracked with
 `git add -f` (.matilda is gitignored; see auspol-headless-geometry-verify).

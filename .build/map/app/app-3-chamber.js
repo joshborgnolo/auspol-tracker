@@ -634,12 +634,14 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   const sj = geom.serjeant;
   for (const [x, y, fa] of [...geom.officers, ...(geom.nsw ? [] : [[-19.7, -21.5, -Math.PI / 2], [18.2, -21.5, -Math.PI / 2]]), [sj.x * CU, sj.y * CU, sj.fa]])
     drawChair(g, X(P(x)), Yp(P(y)), fa, W, Dp, css(officer), back(officer, 0.18), 1);
-  // the furniture's names, where they fit
+  // the furniture's names, where they fit (Sydney's Assembly names none)
   if (opts.big && s >= 16) {
     g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
     const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
-    put("The table", 0, P(geom.nsw ? -189 : -196), P(66));
-    if (!geom.nsw) put("Hansard", 0, P(-48.5), P(58));
+    if (!geom.nsw) {
+      put("The table", 0, P(-196), P(66));
+      put("Hansard", 0, P(-48.5), P(58));
+    }
   }
 }
 

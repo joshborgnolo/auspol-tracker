@@ -21,7 +21,8 @@
        (the federal T is eight vertices; 2025 is the control);
      - the mace rides at the table's head, the end away from the
        Speaker (2026-10-27 user call; it sat mid-table before);
-     - "The table" labels it and NO "Hansard" label ever paints;
+     - the table is named nowhere (user call 2026-10-27; the 2025
+       control keeps its "The table") and NO "Hansard" label ever paints;
      - the majority band still names Greg Piper's pair of lines;
      - the carpet's semicircle ends with the seats (the 2026-10-27
        substrate trim): its radius is NSW's own 258 points, not the
@@ -174,7 +175,7 @@ for (const year of ["nsw23", "2025"]) {
     check(`nsw23 the table is a four-vertex rectangle (no T head)`,
           !!r.polys.find((p) => p.n === 4) && !r.polys.find((p) => p.n === 8),
           JSON.stringify(r.polys));
-    check(`nsw23 "The table" labels the rectangle`, r.texts.includes("The table"),
+    check(`nsw23 the table is named nowhere (no "The table" nameplate)`, !r.texts.includes("The table"),
           JSON.stringify(r.texts.slice(0, 20)));
     check(`nsw23 no "Hansard" label paints`, !r.texts.includes("Hansard"),
           "Hansard found among " + JSON.stringify(r.texts.slice(0, 20)));
@@ -186,6 +187,8 @@ for (const year of ["nsw23", "2025"]) {
     // the control: the federal House keeps its T table and names Hansard
     check(`${year} the House's table is the eight-vertex T`,
           !!r.polys.find((p) => p.n === 8), JSON.stringify(r.polys));
+    check(`${year} "The table" still names the T`, r.texts.includes("The table"),
+          JSON.stringify(r.texts.slice(0, 20)));
     check(`${year} "Hansard" labels the desk`, r.texts.includes("Hansard"),
           JSON.stringify(r.texts.slice(0, 20)));
     check(`${year} the mace lies at the table's far end too`, !!r.mace,

@@ -246,6 +246,7 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   if (opts.big && s >= 16) {
     g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
     const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
-    put("The table", 0, P((t0 + t1) / 2 - (SF.mace ? 5 : 0)), P(2 * tw - 16));
+    // the table's name is Sydney's Council's alone: Adelaide's chambers name it nothing
+    if (geom.key === "nswLC") put("The table", 0, P((t0 + t1) / 2 - (SF.mace ? 5 : 0)), P(2 * tw - 16));
   }
 }
