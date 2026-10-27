@@ -2359,38 +2359,42 @@ function vicCells() {
    sister: a horseshoe of benches about a central table) — but Sydney's table is one long
    rectangle, no T head, no Hansard desk at its foot, and no members sit at it at all: two
    clerks alone chair at its head, Speaker-side (the parliament's own chamber layout,
-   parliament.nsw.gov.au's the-chamber page and seating-layout diagram). The Premier and the
-   Leader of the Opposition pin to the tops of the front benches; 93 desks face them for the
-   92 members and the one left empty, the Speaker in the chair — the old app-3c-sa.js nswLA
-   floor's allowance carried into this idiom. */
+   parliament.nsw.gov.au's the-chamber page and seating-layout diagram). The floor's benches
+   as the chamber's own seating plan draws them (2026-10-27, the user's pass over the plan):
+   NO row runs up beside the Speaker's dais — each side has TWO straight files of twelve
+   running parallel to the table from its shoulders down, the Premier and the Leader of the
+   Opposition heading the inner one (nothing sits level with the dais), and the far end turns
+   in THREE curved rows of 6, 9 and 6 a side. 92 desks for the 92 members exactly; the
+   Serjeant-at-Arms's chair stands centred behind the curve, "the chair separating the
+   benches" (the parliament's own description).
+   @nsw-cells-begin */
 const NSWB = {
-  leadY: -362, // the leaders' desks, topping the front benches
-  arm: { x: 110, y0: -345.1, pitch: 16.9, n: 9 },
-  blockX: [138, 181, 223],
-  tierY: [[-282, -256], [-214, -188], [-146, -120], [-68, -42]],
-  R: [91, 138, 180, 222, 264],
-  sectors: [[[4, 42, 1], [44, 82, 1]], [[4, 42, 1], [44, 82, 1]],
-    [[4, 29, 1], [31, 56, 1], [58, 83, 1]], [[4, 29, 1], [31, 56, 1], [58, 83, 1]],
-    [[4, 29, 1], [31, 56, 1], [58, 83, 1]]],
+  leadY: -268.2, // the leaders' desks, heading the inner straight row at the table's shoulder
+  arm: { x: 115, y0: -250, pitch: 18.2, n: 12 }, // the inner straight row
+  row2X: 158, // the outer straight row, same files and span
+  R: [130, 172, 214], // the curve's three rows
+  sectors: [[[6, 84, 6]], [[5, 85, 9]], [[7, 83, 6]]],
 };
-const NSW_SERJEANT = "Rc5c0"; // as Victoria's: the curve's back row, by the centre
+const NSW_SERJEANT = "Rsj0"; // the Serjeant-at-Arms, centred at the curve's back
 function nswCells() {
   const cells = [], D = Math.PI / 180;
   for (const side of [0, 1]) {
     const sx = side ? 1 : -1, P = side ? "R" : "L", fa = side ? Math.PI : 0;
     cells.push({ id: `${P}t0`, x: sx * NSWB.arm.x, y: NSWB.leadY, fa, row: 1, w: NSWB.arm.pitch });
     for (let i = 0; i < NSWB.arm.n; i++) cells.push({ id: `${P}a${i}`, x: sx * NSWB.arm.x, y: NSWB.arm.y0 + NSWB.arm.pitch * i, fa, row: 1, w: NSWB.arm.pitch });
-    NSWB.blockX.forEach((bx, k) => NSWB.tierY.flat().forEach((y, j) => cells.push({ id: `${P}b${k + 2}${j}`, x: sx * bx, y, fa, row: k + 2, w: 26 })));
+    for (let i = 0; i < NSWB.arm.n; i++) cells.push({ id: `${P}b${i}`, x: sx * NSWB.row2X, y: NSWB.arm.y0 + NSWB.arm.pitch * i, fa, row: 2, w: NSWB.arm.pitch });
     NSWB.sectors.forEach((secs, k) => secs.forEach(([a0, a1, n], q) => {
       for (let i = 0; i < n; i++) {
         const a = (a0 + ((i + 0.5) * (a1 - a0)) / n) * D, r = NSWB.R[k];
         const x = sx * r * Math.cos(a), y = r * Math.sin(a);
-        cells.push({ id: `${P}c${k + 1}${"abcd"[q]}${i}`, x, y, fa: Math.atan2(-y, -x), row: k + 1, w: ((a1 - a0) * D * r) / n });
+        cells.push({ id: `${P}c${k + 3}${"abcd"[q]}${i}`, x, y, fa: Math.atan2(-y, -x), row: k + 3, w: ((a1 - a0) * D * r) / n });
       }
     }));
   }
+  cells.push({ id: NSW_SERJEANT, x: 0, y: 242, fa: -Math.PI / 2, row: 5, w: 26 });
   return cells;
 }
+/* @nsw-cells-end */
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 // (a chamber whose two curves each turn about their own side's centre, a out from the middle, as
@@ -2437,6 +2441,7 @@ function vicGeom() {
 function nswGeom() {
   // no table chairs (its leaders top the front benches); the two clerks chair at the table's head
   if (!nswGeomC) nswGeomC = geomFor(nswCells, NSW_SERJEANT, NSWB, { table: ["Lt0", "Rt0"], nsw: true,
+    rOut: NSWB.R[2] / CU, // the outer of its three curve rows (geomFor reads R[4], a House index)
     officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
   return nswGeomC;
 }
@@ -2654,13 +2659,16 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   const FR = P(282), top = P(-380);
   g.beginPath(); g.moveTo(X(-FR), Yp(top)); g.lineTo(X(-FR), Yp(0)); g.arc(X(0), Yp(0), FR * s, Math.PI, 0, true); g.lineTo(X(FR), Yp(top)); g.closePath();
   g.fillStyle = css(th.floor); g.fill();
-  // the benches (the House's plan, or Victoria's of it)
+  // the benches (the House's plan, or Victoria's of it; Macquarie Street's pairs of
+  // straight files flank the table and three curved rows close the floor, nothing between
+  // them and the dais)
   g.fillStyle = bench;
   const B = geom.src, D = Math.PI / 180;
   for (const sx of [-1, 1]) {
     const lo = (a, b) => [Math.min(a, b), Math.max(a, b)];
     { const [x0, x1] = lo(sx * (B.arm.x - 13), sx * (B.arm.x + 13)); rr(x0, B.arm.y0 - 12, x1, B.arm.y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
-    for (const bx of B.blockX) for (const [t0, t1] of B.tierY) { const [x0, x1] = lo(sx * (bx - 13.5), sx * (bx + 13.5)); rr(x0, t0 - 14, x1, t1 + 14, 2); g.fill(); g.stroke(); }
+    if (B.row2X !== undefined) { const [x0, x1] = lo(sx * (B.row2X - 13), sx * (B.row2X + 13)); rr(x0, B.arm.y0 - 12, x1, B.arm.y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
+    for (const bx of B.blockX ?? []) for (const [t0, t1] of B.tierY) { const [x0, x1] = lo(sx * (bx - 13.5), sx * (bx + 13.5)); rr(x0, t0 - 14, x1, t1 + 14, 2); g.fill(); g.stroke(); }
     B.sectors.forEach((secs, k) => secs.forEach(([a0, a1]) => {
       const r0 = P(B.R[k] - 13.5) * s, r1 = P(B.R[k] + 13.5) * s;
       // angles on the canvas: the government's quarter runs from pi back towards pi/2, the opposition's from 0 to pi/2
@@ -2675,7 +2683,8 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   const dais = (inset) => { const w = 34 - inset, yt = -393 + inset, yc = -349; g.beginPath(); g.moveTo(X(P(-w)), Yp(P(yt))); g.lineTo(X(P(w)), Yp(P(yt))); g.lineTo(X(P(w)), Yp(P(yc))); g.arc(X(0), Yp(P(yc)), P(w) * s, 0, Math.PI); g.closePath(); };
   dais(0); g.fillStyle = wood; g.fill(); g.stroke();
   dais(5); g.fillStyle = bench; g.fill();
-  // the table: a T, the wider head towards the Speaker; its panels, and the mace — New South
+  // the table: a T, the wider head towards the Speaker; its panels, and the mace at the far
+  // end (at Sydney's Assembly the table's head lies away from the Speaker) — New South
   // Wales' Assembly's is one clean rectangle (no T head), and its Hansard sits nowhere near it
   g.beginPath();
   for (const [x, y] of (geom.nsw ? [[-45.8, -268.6], [44.3, -268.6], [44.3, -110], [-45.8, -110]]
@@ -2692,7 +2701,7 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
     g.stroke();
   }
   if (s > 9) {
-    const my = geom.nsw ? -189 : -123;
+    const my = -123;
     g.strokeStyle = css(th.faint); g.lineWidth = Math.max(1, s * 0.07); g.lineCap = "round";
     g.beginPath(); g.moveTo(X(P(-19)), Yp(P(my))); g.lineTo(X(P(17)), Yp(P(my))); g.stroke();
     g.beginPath(); g.arc(X(P(-19)), Yp(P(my)), s * 0.12, 0, Math.PI * 2); g.fillStyle = css(th.faint); g.fill();

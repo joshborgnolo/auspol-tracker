@@ -748,8 +748,9 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(nswLC.filter((c) => c.x < 0).length, nswLC.filter((c) => c.x > 0).length, "nswLC: the sides mirror each other");
   const { nswCells } = new Function(`${part("app-3-chamber.js").match(/@nsw-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @nsw-cells-end \*\//)[1]}; return { nswCells };`)();
   const nswLA = nswCells();
-  assert.equal(nswLA.length, 94, "the NSW Assembly's floor: 93 desks and the Serjeant's chair");
-  assert.equal(nswLA.filter((c) => c.id !== "Rc5c0").length, 93, "the NSW Assembly: 93 desks for the 92 members and the one left empty");
+  assert.equal(nswLA.length, 93, "the NSW Assembly's floor: 92 desks and the Serjeant's chair");
+  assert.equal(nswLA.filter((c) => c.id !== "Rsj0").length, 92, "the NSW Assembly: exactly one desk per member on the floor");
+  assert.equal(nswLA.filter((c) => c.x < 0).length, 46, "each side seats 12 along the table and 22 on the curved rows");
   assert.equal(new Set(nswLA.map((c) => c.id)).size, nswLA.length, "nswLA: desk ids unique");
   assert.equal(nswLA.filter((c) => c.x < 0).length, nswLA.filter((c) => c.x > 0).length, "nswLA: the sides mirror each other");
   assert.ok(js.includes('const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? "lc" : "ha");'), "saFloorOf routes the SA frames and NSW's Council (never its Assembly)");

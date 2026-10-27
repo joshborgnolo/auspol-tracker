@@ -2,18 +2,25 @@
    (shipped 2026-10-27 after the user's direction: Sydney's Assembly
    resembles Victoria's, except the central table is one RECTANGLE -
    no T head, no Hansard desk at its foot - and no members sit at it;
-   two clerks alone chair at its head, Speaker-side). The old rect
-   saGeom("nswLA") floor is retired for app-3-chamber.js's NSWB arc
-   idiom (nswCells/nswGeom, 93 desks for the 92 members and the one
-   left empty, the Speaker in the chair).
+   two clerks alone chair at its head, Speaker-side. Same day, floor
+   rebuilt: nothing level with the dais - two straight files of 12
+   seats per side start at the table's shoulders, and the far fan is
+   three curved rows of 6/9/6 per side, 92 desks for the floor's 92
+   seated members exactly - nobody's desk stands empty).
+   The old rect saGeom("nswLA") floor is retired for app-3-chamber.js's
+   NSWB arc idiom (nswCells/nswGeom), with the Serjeant-at-Arms centred
+   below the far row and the Speaker in the chair.
    Contract pinned here, headlessly against canvas primitives:
      - the chamber paints 96 chair clusters: 92 members' + the
        Speaker's at the chair + TWO clerks' + the Serjeant-at-Arms's
        (a drawChair is one rounded body + one backrest at a single
        transform; a Hansard pair would make it 98);
-     - exactly one desk stands outlined-empty (the Speaker's own);
+     - NO desk stands outlined-empty (92 desks, 92 seated members -
+       the earlier floor's spare desk is gone);
      - the table is a closed FOUR-vertex axis-aligned-rectangle path
        (the federal T is eight vertices; 2025 is the control);
+     - the mace rides at the table's head, the end away from the
+       Speaker (2026-10-27 user call; it sat mid-table before);
      - "The table" labels it and NO "Hansard" label ever paints;
      - the majority band still names Greg Piper's pair of lines.
    Canvas primitives have no accessible post-hoc state, so the probe
@@ -85,10 +92,14 @@ for (const year of ["nsw23", "2025"]) {
   }, year);
   /* the chamber glide settles, then the labelled state draws; glide
      frames paint chairs at interpolated transforms, so force one more
-     repaint after a marker and replay only what follows it */
+     repaint after a marker and replay only what follows it. The nudge
+     itself can land a second layout while an old one still repaints
+     (a 192-chair flake), so settle, mark + clear, then nudge again */
   await new Promise((r) => { setTimeout(r, 3000); });
-  await page.evaluate(() => window.__log.push({ k: "MARK" }));
   await page.setViewport({ width: 1441, height: 1001 });
+  await new Promise((r) => { setTimeout(r, 900); });
+  await page.evaluate(() => { window.__log.length = 0; window.__log.push({ k: "MARK" }); });
+  await page.setViewport({ width: 1442, height: 1002 });
   await new Promise((r) => { setTimeout(r, 900); });
 
   const r = await page.evaluate(() => {
@@ -109,8 +120,23 @@ for (const year of ["nsw23", "2025"]) {
     // closed paths of screen points only (the table is the furniture's one such polygon)
     const polys = paths.filter((p) => p.closed && p.cmds.length >= 3 && p.cmds.every((c) => c.k === "lineTo" || c.k === "moveTo"))
       .map((p) => ({ n: p.cmds.length,
-                     w: Math.max(...p.cmds.map((q) => q.x)) - Math.min(...p.cmds.map((q) => q.x)),
-                     h: Math.max(...p.cmds.map((q) => q.y)) - Math.min(...p.cmds.map((q) => q.y)) }));
+                     x0: Math.min(...p.cmds.map((q) => q.x)), x1: Math.max(...p.cmds.map((q) => q.x)),
+                     y0: Math.min(...p.cmds.map((q) => q.y)), y1: Math.max(...p.cmds.map((q) => q.y)) }))
+      .map((p) => ({ ...p, w: p.x1 - p.x0, h: p.y1 - p.y0 }));
+    /* the mace: a lone horizontal stroke, table-width-ish at the table's head (the end
+       away from the Speaker, the bigger y). Federal-idiom furniture draws in the one
+       user space, so local coords compare straight across. */
+    const seg = (p) => (p.closed || p.cmds.length !== 2 || p.cmds[0].k !== "moveTo" || p.cmds[1].k !== "lineTo") ? null
+      : { x0: p.cmds[0].x, y0: p.cmds[0].y, x1: p.cmds[1].x, y1: p.cmds[1].y };
+    const tbl = polys.find((p) => p.n === 4) || polys.find((p) => p.n === 8);
+    let mace = null;
+    if (tbl) {
+      const cand = paths.map(seg).filter((l) => l && Math.abs(l.y1 - l.y0) < 0.5 &&
+        Math.abs(l.x1 - l.x0) >= 0.25 * tbl.w && Math.abs(l.x1 - l.x0) <= 0.6 * tbl.w &&
+        Math.abs((l.x0 + l.x1) / 2 - (tbl.x0 + tbl.x1) / 2) <= 0.2 * tbl.w);
+      mace = cand.find((l) => (l.y0 - tbl.y0) / (tbl.y1 - tbl.y0) >= 0.78) || null;
+      if (mace) mace = { ...mace, frac: (mace.y0 - tbl.y0) / (tbl.y1 - tbl.y0) };
+    }
     // chairs: two rounded rects (body + backrest) at one transform; clustered
     const byT = new Map();
     for (const e of frame) if (e.k === "roundRect" || e.k === "rect") {
@@ -126,7 +152,8 @@ for (const year of ["nsw23", "2025"]) {
     const texts = new Set(frame.filter((e) => e.k === "fillText").map((e) => e.txt));
     return { polys: polys.map((p) => ({ n: p.n, w: +p.w.toFixed(1), h: +p.h.toFixed(1) })),
              chairs: chairs.length, singles: singles.length,
-             cmds: frame.length, texts: [...texts] };
+             cmds: frame.length, texts: [...texts],
+             mace: mace ? { frac: +mace.frac.toFixed(2) } : null };
   });
 
   check(`${year} a settled chamber frame drew`, r.cmds > 200, `only ${r.cmds} commands after the mark`);
@@ -134,7 +161,7 @@ for (const year of ["nsw23", "2025"]) {
   if (nsw) {
     check(`nsw23 paints 96 chair clusters (92 members + Speaker + 2 clerks + Serjeant; +0 Hansard)`,
           r.chairs === 96, `got ${r.chairs} chairs, ${r.singles} singles`);
-    check(`nsw23 exactly one desk outlined-empty (the Speaker's own)`, r.singles === 1,
+    check(`nsw23 no desk outlined-empty (the 92 desks seat the floor's 92 members exactly)`, r.singles === 0,
           `got ${r.singles}`);
     check(`nsw23 the table is a four-vertex rectangle (no T head)`,
           !!r.polys.find((p) => p.n === 4) && !r.polys.find((p) => p.n === 8),
@@ -143,12 +170,16 @@ for (const year of ["nsw23", "2025"]) {
           JSON.stringify(r.texts.slice(0, 20)));
     check(`nsw23 no "Hansard" label paints`, !r.texts.includes("Hansard"),
           "Hansard found among " + JSON.stringify(r.texts.slice(0, 20)));
+    check(`nsw23 the mace lies at the table's head (the end away from the Speaker)`,
+          !!r.mace, JSON.stringify(r.mace ?? "no mace stroke found"));
   } else {
     // the control: the federal House keeps its T table and names Hansard
     check(`${year} the House's table is the eight-vertex T`,
           !!r.polys.find((p) => p.n === 8), JSON.stringify(r.polys));
     check(`${year} "Hansard" labels the desk`, r.texts.includes("Hansard"),
           JSON.stringify(r.texts.slice(0, 20)));
+    check(`${year} the mace lies at the table's far end too`, !!r.mace,
+          JSON.stringify(r.mace ?? "no mace stroke found"));
   }
   await page.close();
 }
