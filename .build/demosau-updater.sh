@@ -95,12 +95,17 @@ if [ $WAVE_CHANGED -eq 0 ] && git diff --quiet -- data/vote-switching.json data/
       log "FAIL validate after skip-confirm; skipping slot"
       exit 1
     fi
-    if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+    # refresh_site + SITE_FILES like the wave path below, not a bare build
+    # with a partial add list: the skip moves the data bundle's content hash
+    # too, and a commit that carried only index.html+assets left every tab
+    # page pointing at the old, swept data-*.*.js asset — 404 on all nine
+    # live tab documents (2026-10-28, this path's commit 83cb2ed4).
+    if ! refresh_site; then
       log "FAIL build after skip-confirm; skipping slot"
       exit 1
     fi
-    git add data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt || true
-    stage_dataset
+    SKIP_FILES=(data/polls.json "${SITE_FILES[@]}")
+    git add "${SKIP_FILES[@]}" || true
     SKIP_YM="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
     MSG="Confirm skipped DemosAU slot month $SKIP_YM"
     if git diff --cached --quiet; then
@@ -111,7 +116,7 @@ if [ $WAVE_CHANGED -eq 0 ] && git diff --quiet -- data/vote-switching.json data/
       log "FAIL git commit after skip-confirm; no commit made"
       exit 1
     fi
-    if push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt; then
+    if push_main "$MSG" "${SKIP_FILES[@]}"; then
       log "OK committed + pushed: $MSG"
     else
       log "FAIL git push (commit kept locally)"
