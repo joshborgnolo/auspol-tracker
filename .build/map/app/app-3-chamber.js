@@ -157,7 +157,7 @@ function nswCells() {
 const VCLC = (() => {
   const D = {
     cx: 580, cy: 1163, table: 799, // the centre table's mid-line, which the far-end desks face
-    room: [104, 104, 952, 1702], // the Level 2 floor, a rect [x y w h]
+    room: [104, 104, 952, 1510], // the Level 2 floor, a rect [x y w h]; its southern wall ends with the deepest backing's edge plus the carpet skirt (4.5 plan points the chamber unit, the House floor's own margin)
     tables: {
       presidentDesk: [510, 379, 140, 64], clerkTable: [490, 526, 180, 54], centreTable: [509, 609, 142, 392],
     },

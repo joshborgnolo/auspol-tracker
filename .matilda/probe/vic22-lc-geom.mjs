@@ -131,8 +131,18 @@ const Xp = (px) => ox + ((px - VCLC.cx) / VLUn) * 45 * k, Yp = (py) => oy + ((py
 const [fx0, fy0] = [Xp(VCLC.room[0]), Yp(VCLC.room[1])];
 const floorW = (VCLC.room[2] / VLUn) * 45 * k, floorH = (VCLC.room[3] / VLUn) * 45 * k;
 const floor = r.fills.find((f) => Math.abs(f.a[0] - fx0) < 1 && Math.abs(f.a[1] - fy0) < 1 && Math.abs(f.a[2] - floorW) < 1 && Math.abs(f.a[3] - floorH) < 1);
-check("the Level 2 floor paints as its plan rectangle (straight walls, unchanged rect)", !!floor,
+check("the Level 2 floor paints as its plan rectangle (straight walls)", !!floor,
   `expected fillRect ≈ [${fx0.toFixed(1)},${fy0.toFixed(1)},${floorW.toFixed(1)},${floorH.toFixed(1)}], fills ${JSON.stringify(r.fills.map((f) => f.a.map((v) => +v.toFixed(0))))}`);
+
+// 1a. the floor's south wall ends with the backings' deepest edge plus the House's carpet skirt
+{
+  const skirt = (4.5 * VLUn) / 30;
+  const deepest = Math.max(...VCLC.bands.map((b) =>
+    VCLC.cy + (b.R + 33) * ((b.to[1] - VCLC.cy) / Math.hypot(b.to[0] - VCLC.cx, b.to[1] - VCLC.cy))));
+  check("the floor's southern wall hugs the backings' tips plus the carpet skirt",
+    Math.abs(VCLC.room[3] - (deepest - VCLC.room[1] + skirt)) <= 0.6,
+    `room[3] ${VCLC.room[3]}, deepest bench edge ${deepest.toFixed(1)}, skirt ${skirt}`);
+}
 
 // 2. exactly two curved backings a side: 8 arcs, radii 334±33 and 420±33 about (cx, cy)
 const norm = (d) => ((d % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
