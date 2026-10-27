@@ -1,0 +1,51 @@
+vic22 frame — 2018→2022 district rename adjudication
+=====================================================
+
+The 2021 redistribution renamed six districts, created three officially-new
+district names and abolished three old ones. The vic22 past build (h rows,
+primary swings, 2PP swings) joins each 2022 district to exactly one 2018
+successor per the Victorian Electoral Commission's OWN treatment, taken from
+its August 2022 publication "Methodology of estimating 2018 election results
+on new electoral boundaries" — mirrored here as
+vec-2018-on-2022-boundaries-methodology.pdf.
+
+Source:
+  https://www.vec.vic.gov.au/-/media/4dd734d659a44a08b45d415501981cc6.ashx
+  (fetched 2026-10-27; PDF version 1.7, 554,257 bytes)
+
+The document's table "2018 Victorian State election two-candidate-preferred
+vote on new boundaries" tags each new name with its predecessor — verbatim
+tags as extracted from the PDF text layer:
+
+    Ashwood (formerly Burwood)
+    Eureka (formerly Buninyong)
+    Glen Waverley (formerly Forest Hill)
+    Kalkallo (formerly Yuroke)
+    Pakenham (formerly Gembrook)          [also stated in prose: "Pakenham
+        (Liberal to ALP) (treating Pakenham as formerly Gembrook)"]
+    Point Cook (formerly Altona)
+    Berwick (new district)
+    Greenvale (new district)
+    Laverton (new district)
+
+Its body section "Abolished districts" lists exactly three:
+
+    1.  Ferntree Gully (Liberal 51.66%)
+    2.  Keysborough (ALP 64.85%)
+    3.  Mount Waverley (ALP 51.53%)
+
+Hence the build's constants:
+
+    RENAMES = {"Burwood": "Ashwood", "Buninyong": "Eureka",
+               "Forest Hill": "Glen Waverley", "Yuroke": "Kalkallo",
+               "Gembrook": "Pakenham", "Altona": "Point Cook"}
+    NEW_2022 = {"Berwick", "Greenvale", "Laverton"}
+    ABOLISHED_2018 = {"Ferntree Gully", "Keysborough", "Mount Waverley"}
+
+Arithmetic check against the harvested pages: 88 2018 districts =
+79 shared names + 6 rename sources + 3 abolished; 88 2022 districts =
+79 shared + 6 renames + 3 new.
+
+(One punctuation re-keying rides this list silently: the 2018 VEC file key
+south-westcoastdistrict.html vs the 2022 frame's "South-West Coast" — the
+display names agree, so it joins with no rename entry.)
