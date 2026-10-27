@@ -104,3 +104,7 @@ Two checks read the clock's work back out of GitHub's run list
   again with no one having to notice first. Shrinking them to the daily
   sweeps would retire `SCHEDULE_TUNER_TOKEN` (it exists only so the tuner
   can rewrite workflow files), at the cost of that automatic fallback.
+- Ops log: on 2026-10-24 every dispatch began answering HTTP 401 — the
+  fine-grained PAT minted at the 2026-09-24 deployment had expired on its
+  30-day default. Rotated 2026-10-27 with a one-year expiry; the next
+  rotation is due ~Oct 2027 (GitHub emails the account a warning first).
