@@ -459,6 +459,19 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     // the government's side is the reader's left, a mirror of the opposition's
     assert.equal(cells.filter((c) => c.x < 0).length - cells.filter((c) => c.x > 0).length, k === "ha" ? 1 : 0, `${k}: sides as the plan draws them (the Assembly's opposition front bench has no seat at the cross-aisle)`);
   }
+  // each room's southern wall ends with its seats: the lowest bench's edge plus the carpet
+  // skirt the House floor keeps (4.5 plan points, 5.4 pixels at this plan's 36-pixel unit —
+  // the 2026-10-27 substrate trim; the walls used to reach well past the seats)
+  {
+    const benchW = 46 / 2 + 4, benchD = 50 / 2 + 4, D2R = Math.PI / 180, skirt = (4.5 * 36) / 30;
+    const bottom = (F) => Math.max(
+      ...F.straight.map((b) => Math.max(...b.ys) + benchW),
+      ...F.arcs.map((a) => a.y + (a.r + benchD) * Math.sin((a.phi[a.phi.length - 1] + benchW / a.r / D2R) * D2R)),
+      ...(F.singles ?? []).map((q) => q.y + benchD));
+    for (const [k, F] of [["ha", SAF.ha], ["lc", SAF.lc], ["nswLC", SAF.nswLC]])
+      assert.ok(Math.abs(F.room[3] - (bottom(F) + skirt)) <= 0.6,
+        `${k}: the room's southern wall ends with its seats plus the carpet skirt (wall at ${F.room[3]}, the lowest bench at ${bottom(F).toFixed(1)})`);
+  }
   const ids = (cells) => new Set(cells.map((c) => c.id));
   const seats = JSON.parse(R("map/data/seats-sa26.json")), res = JSON.parse(R("map/data/res-sa26.json"));
   const seated = Object.keys(seats.at);

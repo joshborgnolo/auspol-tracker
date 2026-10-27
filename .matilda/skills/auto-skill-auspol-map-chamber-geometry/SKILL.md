@@ -120,7 +120,23 @@ index only fits a five-row curve. In the canvas probe the fit-checks are the
 chair count (96) and ZERO outlined-empty desks; the NSW phone/band contract is
 unchanged. **Third user call, same day**: the straight files sit at the curve
 radii they continue — `arm.x` mirrors `R[0]` (130) and `row2X` mirrors `R[1]`
-(172), so each file reads as the tail of its curve row.
+(172), so each file reads as the tail of its curve row. **Fourth user call, same
+day** (the CARPET trim, committed after): the chambers' floor substrate sprawled
+past the seats — the arc idiom painted a fixed 282-point floor circle (the
+House's own, whose back bench ends at 277.5). geomFor now computes `fr` per
+ledger = max(back-bench edge `B.R[last]+13.5`, the Serjeant's chair back
+`sj.y*CU+11.5`)/CU + 0.15 (the House's own 4.5-point skirt — federal and vic22
+keep 282/9.4 EXACTLY; NSW gets 258, ending with its centred Serjeant) and
+`geom.box` hugs ±(fr+0.15); drawChamberFurniture reads `geom.fr`; the label
+`onFloor` predicates dodge the PAINTED carpet (`geom.fr ?? rOut+0.5`);
+`NSWB.walks [116,151,187,151,193,229]` gives NSW's majority line its own walkway
+radii (benchPt takes a per-ledger walks table) so the line ends at 229pt on the
+carpet, never adrift past the trimmed edge; the SA-idiom floors' southern walls
+became content-derived literals = lowest bench + the same skirt transposed
+(ha 261→246, lc 258→235, nswLC 328→306 pixels — singles' bench bottoms count as
+seats). Pins: test-map-page.mjs derives every SAF floor's wall from its ledger
+(skirt relation) and the NSW canvas probe hooks `arc` to pin the floor circle's
+radius in table-widths (2.8635 nsw23 vs the 2025 control's 3.1299).
 
 ## The `@<name>-cells` markers + test eval idiom
 

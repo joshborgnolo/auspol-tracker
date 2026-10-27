@@ -22,10 +22,13 @@
    is one drawn here. Measured off the chamber maps' floor images (pixels, x from the centre line,
    y down from the curves' centres), seat ids the Parliament's own desk names; a side's list reads
    down a column from the chair's end, or round a curve from the side wall to the gangway ("-" is
-   no seat: the opposition's front bench has none at the cross-aisle). */
+   no seat: the opposition's front bench has none at the cross-aisle). A room's southern wall
+   (room[3]) ends with its seats: the lowest bench's southern edge plus the carpet skirt the
+   House floor keeps (4.5 plan points, 5.4 pixels here — the 2026-10-27 substrate trim; test-
+   map-page.mjs pins the relation for every floor). */
 const SAF = {
   ha: {
-    room: [-360, -700, 360, 261], chair: -649.5, officers: [-553.5, 70], table: [-527, -484, 92], mace: true, lead: ["A1", "F1"],
+    room: [-360, -700, 360, 246], chair: -649.5, officers: [-553.5, 70], table: [-527, -484, 92], mace: true, lead: ["A1", "F1"],
     straight: [
       { row: 1, x: 140, ys: [-461.3, -410.3, -359.3, -308.3, -257.3, -206.3, -155.3, -104.3, -53.3], L: "A1 A2 A3 A4 A5 B1 B2 B3 B4", R: "F1 F2 F3 F4 - E1 E2 E3 E4" },
       { row: 2, x: 231, ys: [-459.8, -383.8, -307.8, -205.8, -129.8, -53.8], L: "G1 G2 G3 H1 H2 H3", R: "J1 J2 J3 I1 I2 I3" },
@@ -38,7 +41,7 @@ const SAF = {
     ],
   },
   lc: {
-    room: [-350, -690, 350, 258], chair: -630.5, officers: [-526.5, 56], table: [-500, -458, 78], mace: false, lead: ["A1", "D1"],
+    room: [-350, -690, 350, 235], chair: -630.5, officers: [-526.5, 56], table: [-500, -458, 78], mace: false, lead: ["A1", "D1"],
     straight: [
       { row: 1, x: 131, ys: [-303, -205, -141, -77], L: "A1 B1 B2 B3", R: "D1 C1 C2 C3" },
       { row: 2, x: 235, ys: [-433, -369.5, -303, -205, -141, -77], L: "E1 E2 E3 F1 F2 F3", R: "L1 L2 L3 K1 K2 K3" },
@@ -53,7 +56,7 @@ const SAF = {
   // here on its own straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real
   // room is Victoria's sister, a horseshoe about a rectangular central table.)
   nswLC: {
-    room: [-580, -520, 580, 328], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
+    room: [-580, -520, 580, 306], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
     straight: [
       { row: 1, x: 130, ys: [-300, -203, -106, -8], L: "A1 A2 A3 A4", R: "B1 B2 B3 B4" },
       { row: 2, x: 250, ys: [-300, -226, -152, -78, -4], L: "C1 C2 C3 C4 C5", R: "I1 I2 I3 I4 I5" },

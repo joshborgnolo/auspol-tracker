@@ -252,11 +252,23 @@ const LENSES = [
 const FED_LENS = new Set(["senate", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
-// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
-// only — a phone scrolls the lens row itself. On the phone a walk keeps the
-// view fixed (walkHold below), and has no scroll side effects of its own
+// figure swipes (a swipe cycles all the way around); the lens and row walks
+// are keyboard only — a phone scrolls the lens row itself, and its vertical
+// drags belong to the page. On the phone a walk keeps the view fixed
+// (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
+// the up/down-arrows row walk: the timeline's rows top to bottom, in
+// renderTimeline's `rows` order, walking round the ends; a row holds the stop
+// it was left on (setYear keeps the memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
+const laneMem = new Map();
+function walkLane(dir) {
+  const cur = yearLane(S.year);
+  laneMem.set(cur, S.year);
+  const lane = LANES[(LANES.indexOf(cur) + dir + LANES.length) % LANES.length];
+  setYear(laneMem.get(lane) ?? lane[lane.length - 1]);
+}
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -2362,6 +2374,11 @@ const NSWB = {
   row2X: 172, // the outer straight row, continuing the middle curve's radius (2026-10-27 user call)
   R: [130, 172, 214], // the curve's three rows
   sectors: [[[6, 84, 6]], [[5, 85, 9]], [[7, 83, 6]]],
+  // the walkway radii the majority line threads (the House's CH tables presume five curve
+  // rows): inside the inner file, between the files, past the outer file; then inside the
+  // curve, between the curve rows, past the outer one (so the line ends by the seats, not
+  // adrift off the carpet's south edge — the 2026-10-27 substrate trim)
+  walks: [116, 151, 187, 151, 193, 229],
 };
 const NSW_SERJEANT = "Rsj0"; // the Serjeant-at-Arms, centred at the curve's back
 function nswCells() {
@@ -2455,11 +2472,19 @@ function geomFor(cellsOf, serjeantId, B, extra) {
   const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
   seats.forEach((c, k) => { c.k = k; c.u = (c.s - s0) / (s1 - s0); });
   const rows = [0, 1, 2, 3, 4, 5].map((r) => seats.filter((c) => c.row === r));
+  const sj = all.find((c) => c.id === serjeantId);
+  // the carpet ends just past its lowest seat: the back bench's back edge — or Macquarie
+  // Street's Serjeant's chair standing behind it — plus the carpet skirt the House's own
+  // floor keeps (the 2026-10-27 trim: the states' carpets no longer sprawl past the seats)
+  const fr = Math.max(B.R[B.R.length - 1] + 13.5, sj.y * CU + 11.5) / CU + 0.15;
+  // the majority line's walkway radii ride each floor's own rows (the House's CH tables
+  // presume five curve rows), and the frame box hugs the carpet
+  const WS = B.walks ? B.walks.map((v) => v / CU) : null;
   return { seats, rows, nRows: 5, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
-    serjeant: all.find((c) => c.id === serjeantId), rOut: B.R[4] / CU, src: B,
-    box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 },
+    serjeant: sj, rOut: B.R[4] / CU, src: B, fr,
+    box: { x0: -fr - 0.15, x1: fr + 0.15, y0: -13.25, y1: fr + 0.15 },
     arms: true, ...extra, chairAt: SPEAKER_AT, aisle: CH_AISLE, yMid: -6.6,
-    benchPt, benchOut, furniture: drawChamberFurniture };
+    benchPt: WS ? (s, k) => benchPt(s, k, WS) : benchPt, benchOut, furniture: drawChamberFurniture };
 }
 function houseGeom() {
   if (!chGeomC) chGeomC = geomFor(chamberCells, SERJEANT, CHB, { table: ["Lt0", "Rt0"], officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
@@ -2587,10 +2612,11 @@ function drawVicLCFurniture(g, F, geom, opts = {}) {
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
 const CH_GS = [96, 124, 159.5, 202, 243.5, 279].map((v) => v / CU);
 const CH_GC = [77, 114.5, 159, 201, 243, 279].map((v) => v / CU);
-function benchPt(s, k) {
-  if (s <= 0) return [-CH_GS[k], s];
-  if (s >= Math.PI * CHK) return [CH_GS[k], Math.PI * CHK - s];
-  const a = s / CHK; return [-CH_GC[k] * Math.cos(a), CH_GC[k] * Math.sin(a)];
+function benchPt(s, k, W = null) {
+  const GS = W ?? CH_GS, GC = W ?? CH_GC;
+  if (s <= 0) return [-GS[k], s];
+  if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
+  const a = s / CHK; return [-GC[k] * Math.cos(a), GC[k] * Math.sin(a)];
 }
 // outward from the benches at position s
 function benchOut(s) {
@@ -2794,8 +2820,9 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   const officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
   const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
   g.lineWidth = 1; g.strokeStyle = css(th.line);
-  // the floor
-  const FR = P(282), top = P(-380);
+  // the floor: its semicircle's radius is each chamber's own (the House's 282 points ends
+  // with the backs of its back bench; Sydney's with its Serjeant's — geomFor's fr)
+  const FR = geom.fr ?? P(282), top = P(-380);
   g.beginPath(); g.moveTo(X(-FR), Yp(top)); g.lineTo(X(-FR), Yp(0)); g.arc(X(0), Yp(0), FR * s, Math.PI, 0, true); g.lineTo(X(FR), Yp(top)); g.closePath();
   g.fillStyle = css(th.floor); g.fill();
   // the benches (the House's plan, or Victoria's of it; Macquarie Street's pairs of
@@ -2894,6 +2921,8 @@ function drawChamber(g, m, w, h, opts) {
     return [lerp(fr[0], to[0], q), lerp(fr[1], to[1], q), angLerp(fr[2], to[2], q), to[3], lerp(fr[4] ?? to[4], to[4], q), lerp(fr[5] ?? to[5], to[5], q)];
   };
   const X = F.X, Yp = F.Yp, rO = geom.rOut;
+  // where the painted carpet reaches (a label dodges it), not just the outer chairs' backs
+  const floorR = geom.fr ?? rO + 0.5;
   g.save();
   g.globalAlpha = opts.alpha ?? 1;
   geom.furniture(g, F, geom, { ...opts, occupied: chAnim ? null : new Set(ch.at.values()) });
@@ -2970,7 +2999,7 @@ function drawChamber(g, m, w, h, opts) {
       const x0 = () => (g.textAlign === "right" ? mx - tw : g.textAlign === "center" ? mx - tw / 2 : mx);
       if (x0() < 4) {
         mx += 4 - x0();
-        const floor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v > 0 && Math.hypot(u, v) <= rO + 0.5; };
+        const floor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v > 0 && Math.hypot(u, v) <= floorR; };
         const top = g.textBaseline === "top" ? 0 : -8;
         while (my < h - 18 && [x0(), x0() + tw / 2, x0() + tw].some((px) => floor(px, my + top) || floor(px, my + top + 15))) my += 2;
       }
@@ -3076,7 +3105,7 @@ function drawChamber(g, m, w, h, opts) {
         // no room beside the chamber on a narrow screen: the key below gives the counts
         const room = (side === "left" ? w - bx : bx) >= wMax + 4;
         // clear of the other labels, and off the chamber's floor (a phone has no room beside it)
-        const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= rO + 0.5 : Math.hypot(u, v) <= rO + 0.5; };
+        const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
         const clear = by + ht <= h - 2 && !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
           && ![[x0, by], [x0 + wMax, by], [x0, by + ht], [x0 + wMax, by + ht], [x0 + wMax / 2, by], [x0, by + ht / 2], [x0 + wMax, by + ht / 2]].some(([px, py]) => onFloor(px, py));
         return { side, bx, by, lines, wMax, ht, room, clear };
@@ -3141,7 +3170,6 @@ function drawChamber(g, m, w, h, opts) {
     const tw = g.measureText(txt).width, th2 = 16;
     const side = Math.abs(dx) >= 0.42;
     const align = side ? (dx < 0 ? "right" : "left") : "center";
-    const floorR = rO + 0.5; // the outer chairs' backs
     const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
     const boxAt = (lx, ly) => {
       const x0 = align === "right" ? lx - 6 - tw : align === "center" ? lx - tw / 2 : lx + 6;
@@ -3902,10 +3930,13 @@ const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "t
    is one drawn here. Measured off the chamber maps' floor images (pixels, x from the centre line,
    y down from the curves' centres), seat ids the Parliament's own desk names; a side's list reads
    down a column from the chair's end, or round a curve from the side wall to the gangway ("-" is
-   no seat: the opposition's front bench has none at the cross-aisle). */
+   no seat: the opposition's front bench has none at the cross-aisle). A room's southern wall
+   (room[3]) ends with its seats: the lowest bench's southern edge plus the carpet skirt the
+   House floor keeps (4.5 plan points, 5.4 pixels here — the 2026-10-27 substrate trim; test-
+   map-page.mjs pins the relation for every floor). */
 const SAF = {
   ha: {
-    room: [-360, -700, 360, 261], chair: -649.5, officers: [-553.5, 70], table: [-527, -484, 92], mace: true, lead: ["A1", "F1"],
+    room: [-360, -700, 360, 246], chair: -649.5, officers: [-553.5, 70], table: [-527, -484, 92], mace: true, lead: ["A1", "F1"],
     straight: [
       { row: 1, x: 140, ys: [-461.3, -410.3, -359.3, -308.3, -257.3, -206.3, -155.3, -104.3, -53.3], L: "A1 A2 A3 A4 A5 B1 B2 B3 B4", R: "F1 F2 F3 F4 - E1 E2 E3 E4" },
       { row: 2, x: 231, ys: [-459.8, -383.8, -307.8, -205.8, -129.8, -53.8], L: "G1 G2 G3 H1 H2 H3", R: "J1 J2 J3 I1 I2 I3" },
@@ -3918,7 +3949,7 @@ const SAF = {
     ],
   },
   lc: {
-    room: [-350, -690, 350, 258], chair: -630.5, officers: [-526.5, 56], table: [-500, -458, 78], mace: false, lead: ["A1", "D1"],
+    room: [-350, -690, 350, 235], chair: -630.5, officers: [-526.5, 56], table: [-500, -458, 78], mace: false, lead: ["A1", "D1"],
     straight: [
       { row: 1, x: 131, ys: [-303, -205, -141, -77], L: "A1 B1 B2 B3", R: "D1 C1 C2 C3" },
       { row: 2, x: 235, ys: [-433, -369.5, -303, -205, -141, -77], L: "E1 E2 E3 F1 F2 F3", R: "L1 L2 L3 K1 K2 K3" },
@@ -3933,7 +3964,7 @@ const SAF = {
   // here on its own straight blocks until it moved to app-3-chamber.js's NSWB idiom — the real
   // room is Victoria's sister, a horseshoe about a rectangular central table.)
   nswLC: {
-    room: [-580, -520, 580, 328], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
+    room: [-580, -520, 580, 306], chair: -446, officers: [-372, 192], table: [-346, -318, 88], mace: false, lead: ["A1", "B1"],
     straight: [
       { row: 1, x: 130, ys: [-300, -203, -106, -8], L: "A1 A2 A3 A4", R: "B1 B2 B3 B4" },
       { row: 2, x: 250, ys: [-300, -226, -152, -78, -4], L: "C1 C2 C3 C4 C5", R: "I1 I2 I3 I4 I5" },
@@ -5856,6 +5887,7 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
+  laneMem.set(yearLane(y), y);
   if (S.house === "senate") {
     // the chosen senator carries across by name where they sat in both Senates, else their state
     const was = SENM, ss = S.ssel;
@@ -6155,6 +6187,7 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -6223,7 +6256,7 @@ function preloadYears() {
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },

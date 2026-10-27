@@ -22,7 +22,11 @@
      - the mace rides at the table's head, the end away from the
        Speaker (2026-10-27 user call; it sat mid-table before);
      - "The table" labels it and NO "Hansard" label ever paints;
-     - the majority band still names Greg Piper's pair of lines.
+     - the majority band still names Greg Piper's pair of lines;
+     - the carpet's semicircle ends with the seats (the 2026-10-27
+       substrate trim): its radius is NSW's own 258 points, not the
+       House's 282, measured as floor-arc/table-width ratios
+       2.8635 against the 2025 control's 3.1299.
    Canvas primitives have no accessible post-hoc state, so the probe
    hooks beginPath/moveTo/lineTo/closePath/roundRect/rect/fillText
    before navigation and replays them; transform-key clustering makes
@@ -82,7 +86,7 @@ for (const year of ["nsw23", "2025"]) {
       return ofBT.call(this, text, x, y);
     };
     hook("beginPath", 0); hook("moveTo", 2); hook("lineTo", 2);
-    hook("closePath", 0); hook("roundRect", 4); hook("rect", 4);
+    hook("closePath", 0); hook("roundRect", 4); hook("rect", 4); hook("arc", 3);
   });
   await page.goto(base + "/map/", { waitUntil: "load" });
   await page.waitForFunction(() => window.__map && window.__map.S, { timeout: 15000 });
@@ -150,9 +154,13 @@ for (const year of ["nsw23", "2025"]) {
       else if (shapes.size === 1 && hs.every((h) => h < 80)) singles.push(t);
     }
     const texts = new Set(frame.filter((e) => e.k === "fillText").map((e) => e.txt));
+    // the carpet's semicircle is the frame's biggest arc; measure it in table widths,
+    // so the check holds at any viewport (nsw23 258/90.1 = 2.8635; the House 282/90.1 = 3.1299)
+    const arcs = frame.filter((e) => e.k === "arc").map((e) => e.a[2]);
+    const floorRatio = arcs.length && tbl ? Math.max(...arcs) / tbl.w : null;
     return { polys: polys.map((p) => ({ n: p.n, w: +p.w.toFixed(1), h: +p.h.toFixed(1) })),
              chairs: chairs.length, singles: singles.length,
-             cmds: frame.length, texts: [...texts],
+             cmds: frame.length, texts: [...texts], floorRatio: floorRatio == null ? null : +floorRatio.toFixed(4),
              mace: mace ? { frac: +mace.frac.toFixed(2) } : null };
   });
 
@@ -172,6 +180,8 @@ for (const year of ["nsw23", "2025"]) {
           "Hansard found among " + JSON.stringify(r.texts.slice(0, 20)));
     check(`nsw23 the mace lies at the table's head (the end away from the Speaker)`,
           !!r.mace, JSON.stringify(r.mace ?? "no mace stroke found"));
+    check(`nsw23 the carpet's circle ends with its seats (258 points, not the House's 282)`,
+          r.floorRatio != null && Math.abs(r.floorRatio - 2.8635) <= 0.02, `ratio ${r.floorRatio}`);
   } else {
     // the control: the federal House keeps its T table and names Hansard
     check(`${year} the House's table is the eight-vertex T`,
@@ -180,6 +190,8 @@ for (const year of ["nsw23", "2025"]) {
           JSON.stringify(r.texts.slice(0, 20)));
     check(`${year} the mace lies at the table's far end too`, !!r.mace,
           JSON.stringify(r.mace ?? "no mace stroke found"));
+    check(`${year} the House's carpet keeps its own 282-point circle`,
+          r.floorRatio != null && Math.abs(r.floorRatio - 3.1299) <= 0.02, `ratio ${r.floorRatio}`);
   }
   await page.close();
 }
