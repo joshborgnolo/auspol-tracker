@@ -308,8 +308,9 @@ function legendHTML(m) {
 /* =============================== the timeline =============================== */
 let SUM = null;
 let tlCtx = null; // shared canvas context for measuring stop-label widths
-/* one dated row per jurisdiction: the federal elections on top, New South Wales',
-   Victoria's and South Australia's state ones on their own rows below, each stop
+/* one dated row per jurisdiction: the federal elections on top, Victoria's,
+   New South Wales' and South Australia's state ones on their own rows below
+   (2026-10-28 user call — Vic rides above NSW on the rail), each stop
    at its date on the one scale */
 function renderTimeline() {
   const el = $("#time"); if (!el) return;
@@ -325,11 +326,11 @@ function renderTimeline() {
      labels and the selected stop's underline) fits inside the box */
   const rows = [
     { ys: YEARS_FED, base: Math.round(H * 0.22), top: 2 },
-    { ys: YEARS_NSW, base: Math.round(H * 0.44), top: Math.round(H * 0.22) + 16, gx: stGx("nsw") },
-    { ys: YEARS_VIC, base: Math.round(H * 0.66), top: Math.round(H * 0.44) + 16, gx: stGx("vic") },
+    { ys: YEARS_VIC, base: Math.round(H * 0.44), top: Math.round(H * 0.22) + 16, gx: stGx("vic") },
+    { ys: YEARS_NSW, base: Math.round(H * 0.66), top: Math.round(H * 0.44) + 16, gx: stGx("nsw") },
     { ys: YEARS_SA, base: Math.round(H * 0.88), top: Math.round(H * 0.66) + 16, gx: stGx("sa") },
   ];
-  const rowIx = (y) => (NSW_YEARS.has(y) ? 1 : VIC_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : 0);
+  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : 0);
   const sd = m ? selDiv() : null;
   let g = "";
   for (const r of rows) g += `<line x1="0" x2="${W}" y1="${r.base}" y2="${r.base}" stroke="var(--line)"/>`;
@@ -373,8 +374,8 @@ function renderTimeline() {
   const tW = (s) => tlCtx.measureText(s).width;
   const rowsOf = [
     { i: 0, items: YEARS_FED.map((y) => ({ y, lab: short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y) })) },
-    { i: 1, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
-    { i: 2, items: YEARS_VIC.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
+    { i: 1, items: YEARS_VIC.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
+    { i: 2, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
     { i: 3, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
   ];
   for (const R of rowsOf) {
@@ -397,7 +398,7 @@ function renderTimeline() {
       g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${t.x - 24}" y="${hitTop}" width="48" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections 2004 to now, and New South Wales, Victorian and South Australian state elections; choose one">${g}</svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections 2004 to now, and Victorian, New South Wales and South Australian state elections; choose one">${g}</svg>`;
 }
 
 /* =============================== tooltip =============================== */

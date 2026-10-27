@@ -269,9 +269,10 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 // the up/down-arrows row walk: the timeline's rows top to bottom, in
-// renderTimeline's `rows` order, walking round the ends; a row holds the stop
-// it was left on (setYear keeps the memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
+// renderTimeline's `rows` order (Vic above NSW since 2026-10-28), walking
+// round the ends; a row holds the stop it was left on (setYear keeps the
+// memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA];
 const laneMem = new Map();
 function walkLane(dir) {
   const cur = yearLane(S.year);

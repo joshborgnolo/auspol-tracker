@@ -1099,7 +1099,8 @@ for (const y of ["sa22", "sa26"]) {
 }
 
 // the state frames on the timeline and in the constants: the per-jurisdiction
-// rows (federal top, then New South Wales, Victoria, South Australia) and the
+// rows (federal top, then Victoria, New South Wales, South Australia — Vic
+// rides above NSW since the 2026-10-28 user call) and the
 // YEAR_JUR contract — the frame-year→jurisdiction map is YEAR_JUR; only the
 // federal abbreviation→name map keeps STATE_NAME (a second top-level
 // `const STATE_NAME` beside it killed the assembled bundle at parse —
@@ -1117,7 +1118,18 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds four jurisdiction rows (169px; 148px on the phone rung)");
   assert.ok(ui.includes("const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X };"), "each jurisdiction's row carries its own previous-election stop");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
-  assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and New South Wales, Victorian and South Australian state elections; choose one"'), "the timeline names its jurisdiction rows to a screen reader");
+  assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and Victorian, New South Wales and South Australian state elections; choose one"'), "the timeline names its jurisdiction rows to a screen reader");
+  // the rung order itself, in all four spots that encode it: the rail's rows
+  // stack federal, Victoria, New South Wales, South Australia (2026-10-28 user
+  // call); labels, the glyph's row lookup and the up/down-arrow walk follow
+  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA];"), "the up/down row walk follows the rail's rung order (Vic above NSW)");
+  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1)");
+  const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
+  const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
+  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs stack federal, Victoria, New South Wales, South Australia top to bottom");
+  const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
+  const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA"].map((k) => labelsSlice.indexOf(`${k}.map`));
+  assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
   // federal four-char keys was why it was written that way)
