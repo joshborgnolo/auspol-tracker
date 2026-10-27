@@ -619,11 +619,19 @@ function Tabs({
     fill: "none"
   })))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
-  }), React.createElement(GlyphDial, {
+  }), React.createElement("button", {
+    type: "button",
     className: "tab-glyph",
+    title: "Wind the dial back through the term",
+    "aria-label": "Wind the dial back through the term",
+    "aria-describedby": "wm-action",
+    onClick: e => {
+      if (window.AP.openStory) window.AP.openStory(e, e.currentTarget);
+    }
+  }, React.createElement(GlyphDial, {
     width: "34",
     height: "23.8"
-  }), React.createElement(TabScore, {
+  })), React.createElement(TabScore, {
     onGoHero: goHero,
     matchup: tppMatchup,
     tppBasis: tppBasis

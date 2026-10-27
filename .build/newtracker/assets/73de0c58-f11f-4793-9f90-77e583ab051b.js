@@ -300,18 +300,22 @@ function Header({ isDark, onToggleTheme, rd }) {
   const [story, setStory] = useState(null);
   const late = useLateReady();   // the dial replay is a late module (loadLate)
   const glyphRef = useRef(null);
-  /* Closing hands focus back to whichever element opened the overlay - the
-     whole lockup is the way in today, but the return is kept generic so a
-     second entry point never has to touch this. The dial still grows out of
-     the MARK either way: that is where the instrument being wound back
-     actually sits on the page. */
+  /* Closing hands focus back to whichever element opened the overlay -
+     the return is kept generic so a second entry point (the tab bar's
+     stand-in, below) never has to touch this. */
   const openerRef = useRef(null);
-  const openStory = (e) => {
+  /* The tab bar's stand-in dial (the 2PP score's seat-warmer on a small
+     screen) is a second way into the same story, and by the time that
+     stand-in is visible the lockup's dial has scrolled off - so the FLIP
+     origin is whichever element was actually tapped, and the story's
+     opener exposes itself to that second door. */
+  const openStory = (e, fromEl) => {
     openerRef.current = (e && e.currentTarget) || glyphRef.current;
-    const el = glyphRef.current;
+    const el = fromEl || glyphRef.current;
     loadLate();
     setStory({ rect: el ? el.getBoundingClientRect() : null });
   };
+  useEffect(() => { window.AP.openStory = openStory; }, []);
   /* The freshness dot in the meta line doubles as a switch: press it and the
      page trades the interactive app for the article version of itself - the
      static summary a crawler or reader mode reads, which sits in flow all

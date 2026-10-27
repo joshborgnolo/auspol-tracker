@@ -262,14 +262,17 @@ function Header({
   const late = useLateReady();
   const glyphRef = useRef(null);
   const openerRef = useRef(null);
-  const openStory = e => {
+  const openStory = (e, fromEl) => {
     openerRef.current = e && e.currentTarget || glyphRef.current;
-    const el = glyphRef.current;
+    const el = fromEl || glyphRef.current;
     loadLate();
     setStory({
       rect: el ? el.getBoundingClientRect() : null
     });
   };
+  useEffect(() => {
+    window.AP.openStory = openStory;
+  }, []);
   const [staticView, setStaticView] = useState(false);
   useEffect(() => {
     window.AP.openStatic = () => setStaticView(true);

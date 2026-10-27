@@ -54,7 +54,7 @@
   <link rel="preload" href="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js" as="script">
-  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.c6b8a61d.js" as="script">
+  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.75cecdc5.js" as="script">
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.9d5a6955.js" as="script">
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.4f929cab.js" as="script">
@@ -64,7 +64,7 @@
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.c11b52d8.js" as="script">
   <link rel="preload" href="../assets/js/rd-beyond.334845dc.js" as="script">
-  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.cb04877a.js" as="script">
+  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 26 October 2026, Labor leads the Coalition 51.3–48.7 two-party preferred on implied preference flows (±1.6), from 183 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
 @font-face {
@@ -1235,12 +1235,17 @@ body.dark .sens-band { opacity: 0.10; }
 .tab-glyph {
   position: absolute; right: 5px; bottom: 9px; z-index: 1;
   display: none; pointer-events: none;
+  background: none; border: 0; padding: 3px; margin: -3px;
+  border-radius: 50%; cursor: pointer; color: inherit;
+  -webkit-tap-highlight-color: transparent;
   opacity: 0; transform: translateY(4px);
   transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
 }
+.tab-glyph svg { display: block; }
+.tab-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 @media (max-width: 640px) {
   .tab-glyph { display: block; }
-  .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; }
+  .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; pointer-events: auto; }
 }
 .ts-eyebrow {
   font-size: 11px; font-weight: 700;
@@ -6692,7 +6697,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
   <script src="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js"></script>
-  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.c6b8a61d.js"></script>
+  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.75cecdc5.js"></script>
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.9d5a6955.js"></script>
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.4f929cab.js"></script>
@@ -6702,7 +6707,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../assets/js/rd-allpolls.c11b52d8.js"></script>
   <script src="../assets/js/rd-beyond.334845dc.js"></script>
-  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.cb04877a.js"></script>
+  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js"></script>
 
 
 </body></html>

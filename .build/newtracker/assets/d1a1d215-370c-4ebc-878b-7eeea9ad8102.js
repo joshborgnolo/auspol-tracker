@@ -757,12 +757,21 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
               pin flip changes nothing the ticker measures (see the fit pass
               in NextPollTicker) */}
           <NextPollTicker showScore={pinned && heroGone} />
-          {/* phone placeholder: while the bar is pinned but the hero's 2PP
+          {/* phone stand-in: while the bar is pinned but the hero's 2PP
               is still on screen, the score's seat is empty - the masthead's
               own dial holds it until the score docks (CSS: .tab-glyph joins
               and leaves on the same .show-score gate as .tab-score, so the
-              swap is one move). */}
-          <GlyphDial className="tab-glyph" width="34" height="23.8" />
+              swap is one move). Tapping it opens the dial's story through
+              the header's second door, window.AP.openStory, with this
+              button's own rect as the FLIP origin - the lockup's dial has
+              scrolled off by the time this stand-in shows. */}
+          <button type="button" className="tab-glyph"
+                  title="Wind the dial back through the term"
+                  aria-label="Wind the dial back through the term"
+                  aria-describedby="wm-action"
+                  onClick={(e) => { if (window.AP.openStory) window.AP.openStory(e, e.currentTarget); }}>
+            <GlyphDial width="34" height="23.8" />
+          </button>
           <TabScore onGoHero={goHero} matchup={tppMatchup} tppBasis={tppBasis} />
         </div>
         {menuOpen && (
