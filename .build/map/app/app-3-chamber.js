@@ -178,7 +178,9 @@ function chamberOrder(m) {
     // the other end; the empty seats fall between the crossbench and the opposition, so the
     // majority line never has to cross them
     // the leaders at the table
-    const B = geom.bench, onBench = (d) => !lead.includes(d.i);
+    // (the states' table chairs are desks on the front bench: a leader's is theirs alone)
+    const held = new Set(lead.map((i, s) => (i != null ? table[s] : null)));
+    const B = geom.bench.filter((c) => !held.has(c.k)), onBench = (d) => !lead.includes(d.i);
     lead.forEach((i, s) => { if (i != null) at.set(i, table[s]); });
     const Gb = G.filter(onBench), Ob = O.filter(onBench);
     Gb.forEach((d, k) => at.set(d.i, B[k].k));
@@ -201,20 +203,32 @@ function majorityCuts(ch, geom) {
   const sat = [...ch.at.values()].map((k) => geom.seats[k]).sort((p, q) => p.s - q.s || p.row - q.row);
   if (ch.majAt <= 0 || ch.majAt >= sat.length) return null;
   const inside = new Set(sat.slice(0, ch.majAt).map((c) => c.k)), sStar = sat[ch.majAt - 1].s;
-  const cuts = [];
+  const cuts = [], free = [];
+  // (past a row's end, clear of its last chair: the House's chairs are smaller than the states')
+  const pad = geom.cutPad || 0.4;
   for (let r = 1; r <= geom.nRows; r++) {
     const row = geom.rows[r];
     let L = -1;
     row.forEach((c, j) => { if (inside.has(c.k)) L = j; });
     if (L < 0) row.forEach((c, j) => { if (c.s < sStar) L = j; });
     let a = row[L], b = row[L + 1];
-    // a row that doesn't curve (South Australia's front benches) jumps the floor between its last
-    // seat on one side and its first on the other: the cut stays by the near one
-    if (geom.rect && a && b && b.s - a.s > 2.5) { if (a.s < sStar + 0.01) b = null; else a = null; }
-    // (past a row's end, clear of its last chair: the House's chairs are smaller than South Australia's)
-    const pad = geom.cutPad || 0.4;
+    // on the states' floors a row breaks off (a front bench that doesn't curve, a straight bench
+    // meeting its curve, the gangway between the curves): where the cut falls in such a break it
+    // crosses open floor, so it may sit anywhere in it, and goes where the rows with chairs at the
+    // line put it
+    // line put it (a curve's chairs clear by their own pad: the same gap is more of the angle on a
+    // tight curve)
+    if (geom.rect && (!a || !b || a.seg !== b.seg)) { free.push([cuts.length, a ? a.s + (a.pad || pad) : -Infinity, b ? b.s - (b.pad || pad) : Infinity]); cuts.push(null); continue; }
     cuts.push(a && b ? (a.s + b.s) / 2 : a ? a.s + pad : b.s - pad);
   }
+  const tight = cuts.filter((c) => c != null), to = tight.length ? tight.reduce((x, y) => x + y, 0) / tight.length : sStar;
+  for (const [r, lo, hi] of free) cuts[r] = clamp(to, lo, hi);
+  // front rows with no chairs where the line falls (a front bench that stops short of the curves)
+  // it doesn't cross at all: it starts behind them
+  // (a lone seat counts with its side's curve; the gangway runs between the curves)
+  const stretch = (g) => g - (g % 3 === 2 ? 1 : 0);
+  const meets = (row, s) => { const at = geom.segAt(s); return row.some((c) => (at < 0 ? stretch(c.seg) % 3 === 1 : stretch(c.seg) === at)); };
+  if (geom.rect) for (let r = 0; r < cuts.length - 1 && !meets(geom.rows[r + 1], cuts[r]); r++) cuts[r] = null;
   return cuts;
 }
 
@@ -411,8 +425,9 @@ function drawChamber(g, m, w, h, opts) {
   if (cuts) {
     const pts = [];
     cuts.forEach((c, k) => {
-      if (k) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(geom.benchPt(lerp(cp, c, j / n), k)); }
-      else pts.push(geom.benchPt(c, 0));
+      if (c == null) return;
+      if (cuts[k - 1] != null) { const cp = cuts[k - 1], n = Math.max(2, Math.ceil(Math.abs(c - cp) * 3)); for (let j = 1; j <= n; j++) pts.push(geom.benchPt(lerp(cp, c, j / n), k)); }
+      else pts.push(geom.benchPt(c, k));
       pts.push(geom.benchPt(c, k + 1));
     });
     const c5 = cuts[cuts.length - 1], o = geom.benchOut(c5), e = geom.benchPt(c5, geom.nRows), ext = opts.big ? 0.45 : 0.2;

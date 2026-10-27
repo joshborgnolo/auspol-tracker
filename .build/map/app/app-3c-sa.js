@@ -127,9 +127,24 @@ function saGeom(key) {
   const F = SAF[key], P = (v) => v / SAU;
   // the curves' common centre, each side's (half the gap between them), for the order along the benches
   const A = P(F.arcs.reduce((t, b) => t + b.a, 0) / F.arcs.length);
+  // the order along the benches: down the government's side, round its curve, across the gangway
+  // (its own stretch, 2A long), round the opposition's curve and up its side. A curve seat goes by
+  // its angle about its own curve's centre, held to its own side of the gangway (New South Wales'
+  // back curves run a degree past it)
+  const Q = (Math.PI / 2) * CHK, GAP = 2 * A, D2R = Math.PI / 180;
+  const sideS = (c, x, y) => {
+    const right = c.x > 0;
+    if (!c.arc && y <= 0) return right ? 2 * Q + GAP - y : y;
+    const ang = c.arc ? c.arc.phi[c.arc[right ? "R" : "L"].split(" ").indexOf(c.id)] * D2R : Math.atan2(y, Math.abs(x) - A);
+    return right ? 2 * Q + GAP - Math.min(ang, Math.PI / 2) * CHK : Math.min(ang, Math.PI / 2) * CHK;
+  };
   const all = saCells(F).map((c) => {
     const x = P(c.x), y = P(c.y);
-    return { id: c.id, x, y, fa: c.fa, row: c.row, s: benchS(x, y, A), W: P(SA_SEAT.W - 4), D: P(SA_SEAT.D - 6), raw: c };
+    // seg: which stretch of bench it's on (a side's straight, its curve, a lone seat), where a row breaks off
+    const seg = (c.x > 0 ? 3 : 0) + (c.arc ? 1 : y > 0 ? 2 : 0);
+    // (pad: the bench order's clearance past it, for the majority line — round a curve, by its radius)
+    const pad = c.arc ? (P(SA_SEAT.W / 2 + 10) / P(c.arc.r)) * CHK : P(SA_SEAT.W / 2 + 10);
+    return { id: c.id, x, y, fa: c.fa, row: c.row, s: sideS(c, x, y), seg, pad, W: P(SA_SEAT.W - 4), D: P(SA_SEAT.D - 6), raw: c };
   });
   const seats = all.sort((p, q) => p.s - q.s || p.row - q.row);
   seats.forEach((c, k) => { c.k = k; });
@@ -149,14 +164,16 @@ function saGeom(key) {
   const GS = walk(rowX), GC = walk(rowR);
   const benchPt = (s, k) => {
     if (s <= 0) return [-GS[k], s];
-    if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
-    const a = s / CHK, c = Math.cos(a);
-    return [(c >= 0 ? -A : A) - GC[k] * c, GC[k] * Math.sin(a)];
+    if (s >= 2 * Q + GAP) return [GS[k], 2 * Q + GAP - s];
+    if (s > Q && s < Q + GAP) return [s - Q - A, GC[k]];
+    const a = (s < Q ? s : s - GAP) / CHK, c = Math.cos(a);
+    return [(s < Q ? -A : A) - GC[k] * c, GC[k] * Math.sin(a)];
   };
   const benchOut = (s) => {
     if (s <= 0) return [-1, 0];
-    if (s >= Math.PI * CHK) return [1, 0];
-    const a = s / CHK; return [-Math.cos(a), Math.sin(a)];
+    if (s >= 2 * Q + GAP) return [1, 0];
+    if (s > Q && s < Q + GAP) return [0, 1];
+    const a = (s < Q ? s : s - GAP) / CHK; return [-Math.cos(a), Math.sin(a)];
   };
   const [rx0, ry0, rx1, ry1] = F.room.map(P);
   saGeomC[key] = {
@@ -165,6 +182,8 @@ function saGeom(key) {
     rOut: rx1 - 0.6, box: { x0: rx0, x1: rx1, y0: ry0, y1: ry1 }, rect: true, cutPad: P(SA_SEAT.W / 2 + 10),
     arms: false, table: F.lead, chairAt: [0, P(F.chair), Math.PI / 2, 0, P(40), P(38)],
     aisle: P((F.officers[0] + F.straight[0].ys[0]) / 2 + 40), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
+    // the stretch of bench a position along it falls on, as seats' seg (the gangway's -1; a lone seat's curve)
+    segAt: (s) => (s <= 0 ? 0 : s < Q ? 1 : s <= Q + GAP ? -1 : s < 2 * Q + GAP ? 4 : 3),
     benchPt, benchOut, furniture: drawSAFurniture,
   };
   return saGeomC[key];
