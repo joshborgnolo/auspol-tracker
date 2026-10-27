@@ -52,6 +52,41 @@ function chamberCells() {
 }
 const SERJEANT = "Rc5d1"; // the Serjeant-at-Arms's chair, in the curve's last row by the centre aisle
 /* @cells-end */
+/* Victoria's Legislative Assembly in the federal chamber's idiom (the 60th Parliament's
+   own plan — map/data/la-seating-plan-vic-2026-08-11.json — seats members on it): the
+   same Speaker's dais and T-table, but three chairs a side at the table (Premier,
+   Leader of the House, Deputy Premier against the Opposition Leader, the Deputy
+   Leader of the Opposition and the Nationals' leader), three clerks at its head, a
+   shorter front bench and one block column fewer — 93 desks and the chair.
+   @vic-cells-begin – read as is by .build/map/vic_seating.mjs. */
+const VCHB = {
+  arm: { x: 110, y0: -362, pitch: 16.9, n: 8 },
+  table: { x: 49.6, ys: [-196, -156, -116] },
+  blockX: [138, 181, 223],
+  tierY: [[-282, -256], [-214, -188], [-146, -120], [-68, -42]],
+  R: [91, 138, 180, 222, 264],
+  sectors: [[[4, 42, 1], [44, 82, 1]], [[4, 42, 1], [44, 82, 1]], [[4, 42, 1], [44, 82, 1]],
+    [[4, 29, 1], [31, 56, 1], [58, 83, 1]], [[4, 29, 1], [31, 56, 1], [58, 83, 1]]],
+};
+const VIC_SERJEANT = "Rc5c0"; // the Serjeant-at-Arms, at the curve's back by the centre
+function vicCells() {
+  const cells = [], D = Math.PI / 180;
+  for (const side of [0, 1]) {
+    const sx = side ? 1 : -1, P = side ? "R" : "L", fa = side ? Math.PI : 0;
+    for (let i = 0; i < VCHB.arm.n; i++) cells.push({ id: `${P}a${i}`, x: sx * VCHB.arm.x, y: VCHB.arm.y0 + VCHB.arm.pitch * i, fa, row: 1, w: VCHB.arm.pitch });
+    VCHB.table.ys.forEach((y, i) => cells.push({ id: `${P}t${i}`, x: sx * VCHB.table.x, y, fa, row: 0, w: 26 }));
+    VCHB.blockX.forEach((bx, k) => VCHB.tierY.flat().forEach((y, j) => cells.push({ id: `${P}b${k + 2}${j}`, x: sx * bx, y, fa, row: k + 2, w: 26 })));
+    VCHB.sectors.forEach((secs, k) => secs.forEach(([a0, a1, n], q) => {
+      for (let i = 0; i < n; i++) {
+        const a = (a0 + ((i + 0.5) * (a1 - a0)) / n) * D, r = VCHB.R[k];
+        const x = sx * r * Math.cos(a), y = r * Math.sin(a);
+        cells.push({ id: `${P}c${k + 1}${"abcd"[q]}${i}`, x, y, fa: Math.atan2(-y, -x), row: k + 1, w: ((a1 - a0) * D * r) / n });
+      }
+    }));
+  }
+  return cells;
+}
+/* @vic-cells-end */
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 // (a chamber whose two curves each turn about their own side's centre, a out from the middle, as
@@ -62,27 +97,36 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    and what differs between the House and the Senate — the presiding officer's chair, the table's
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
    senateGeom (app-3b-senate.js), South Australia's two chambers from saGeom (app-3c-sa.js) */
-let chGeomC = null;
-const chamberGeom = (m) => (m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
-function houseGeom() {
-  if (chGeomC) return chGeomC;
-  const all = chamberCells().map((c) => {
+let chGeomC = null, vicGeomC = null;
+const chamberGeom = (m) => (m && m.year === "vic22" ? vicGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+// the House's layout builder, shared by Victoria's variant: the extra block carries what
+// differs — the table's chairs, the head clerks, and for Spring Street the clean table
+function geomFor(cellsOf, serjeantId, B, extra) {
+  const all = cellsOf().map((c) => {
     const x = c.x / CU, y = c.y / CU;
     const s = benchS(x, y);
     // each chair as wide as its seat allows (3pt clear of the next), as deep as its bench
     const W = clamp(c.w - 3, 13.5, 30) / CU, D = (c.row === 1 && y < 0 ? 24 : 23) / CU;
     return { id: c.id, x, y, fa: c.fa, row: c.row, s, W, D };
   });
-  const seats = all.filter((c) => c.id !== SERJEANT).sort((p, q) => p.s - q.s || p.row - q.row);
+  const seats = all.filter((c) => c.id !== serjeantId).sort((p, q) => p.s - q.s || p.row - q.row);
   const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
   seats.forEach((c, k) => { c.k = k; c.u = (c.s - s0) / (s1 - s0); });
   const rows = [0, 1, 2, 3, 4, 5].map((r) => seats.filter((c) => c.row === r));
-  chGeomC = { seats, rows, nRows: 5, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
-    serjeant: all.find((c) => c.id === SERJEANT), rOut: CHB.R[4] / CU,
+  return { seats, rows, nRows: 5, bench: seats.filter((c) => c.row > 0), byId: new Map(seats.map((c) => [c.id, c.k])),
+    serjeant: all.find((c) => c.id === serjeantId), rOut: B.R[4] / CU, src: B,
     box: { x0: -9.55, x1: 9.55, y0: -13.25, y1: 9.55 },
-    arms: true, table: ["Lt0", "Rt0"], chairAt: SPEAKER_AT, aisle: CH_AISLE, yMid: -6.6,
+    arms: true, ...extra, chairAt: SPEAKER_AT, aisle: CH_AISLE, yMid: -6.6,
     benchPt, benchOut, furniture: drawChamberFurniture };
+}
+function houseGeom() {
+  if (!chGeomC) chGeomC = geomFor(chamberCells, SERJEANT, CHB, { table: ["Lt0", "Rt0"], officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
   return chGeomC;
+}
+function vicGeom() {
+  if (!vicGeomC) vicGeomC = geomFor(vicCells, VIC_SERJEANT, VCHB, { table: ["Lt0", "Rt0", "Lt1", "Rt1", "Lt2", "Rt2"], vic: true,
+    officers: [[-24, -285.5, Math.PI / 2], [0, -285.5, Math.PI / 2], [24, -285.5, Math.PI / 2]] });
+  return vicGeomC;
 }
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
 const CH_GS = [96, 124, 159.5, 202, 243.5, 279].map((v) => v / CU);
@@ -128,8 +172,10 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
   // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
   nsw23: ["Kogarah", "Cronulla"],
-  // Victoria's (Andrews at Mulgrave, Guy at Bulleen)
-  vic22: ["Mulgrave", "Bulleen"] };
+  // Victoria's, three a side at the table in the 60th Parliament's plan: the Premier, the Leader
+  // of the House and the Deputy Premier facing the Opposition Leader, the Deputy Leader of the
+  // Opposition and the Nationals' leader (Carroll, Carbines, Williams against Wilson, Southwick, O'Brien)
+  vic22: ["Niddrie", "Kew", "Ivanhoe", "Caulfield", "Dandenong", "Gippsland South"] };
 /* seating plan or sorted: a year with a filed plan opens on it under the Winner lens and
    sorted under the others, until the reader picks one (S.seat) */
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
@@ -159,7 +205,7 @@ function chamberOrder(m) {
   }
   // the leaders, each at their side's table chair (when they lead the bloc on that side)
   const table = geom.table.map((id) => geom.byId.get(id));
-  const lead = (m.leaders || LEADERS[m.year] || []).map((n, s) => { const i = typeof n === "number" ? n : m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s ? opp : gov) ? i : null; });
+  const lead = (m.leaders || LEADERS[m.year] || []).map((n, s) => { const i = typeof n === "number" ? n : m.byName.get(n); return i != null && holdFam(m.divs[i].hold) === (s < table.length / 2 ? gov : opp) ? i : null; });
   // each member's seat (an index into geom.seats)
   const at = new Map();
   if (plan) {
@@ -254,7 +300,7 @@ function chamberPositions(m, geom) {
   }
   // the front bench's arm is one long bench: whoever sits there spreads evenly along it, in order,
   // each chair as wide as the share allows, as the plans print them
-  const A = CHB.arm, top = A.y0 - A.pitch / 2, len = A.pitch * A.n;
+  const A = geom.src ? geom.src.arm : CHB.arm, top = A.y0 - A.pitch / 2, len = A.pitch * A.n;
   for (const list of Object.values(arms)) {
     list.sort((a, b) => a[1].y - b[1].y);
     const p = len / Math.max(list.length, 1), W = clamp(p - 3, 13.5, 21) / CU;
@@ -296,15 +342,15 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   const FR = P(282), top = P(-380);
   g.beginPath(); g.moveTo(X(-FR), Yp(top)); g.lineTo(X(-FR), Yp(0)); g.arc(X(0), Yp(0), FR * s, Math.PI, 0, true); g.lineTo(X(FR), Yp(top)); g.closePath();
   g.fillStyle = css(th.floor); g.fill();
-  // the benches
+  // the benches (the House's plan, or Victoria's of it)
   g.fillStyle = bench;
-  const D = Math.PI / 180;
+  const B = geom.src, D = Math.PI / 180;
   for (const sx of [-1, 1]) {
     const lo = (a, b) => [Math.min(a, b), Math.max(a, b)];
-    { const [x0, x1] = lo(sx * (CHB.arm.x - 13), sx * (CHB.arm.x + 13)); rr(x0, CHB.arm.y0 - 12, x1, CHB.arm.y0 + CHB.arm.pitch * (CHB.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
-    for (const bx of CHB.blockX) for (const [t0, t1] of CHB.tierY) { const [x0, x1] = lo(sx * (bx - 13.5), sx * (bx + 13.5)); rr(x0, t0 - 14, x1, t1 + 14, 2); g.fill(); g.stroke(); }
-    CHB.sectors.forEach((secs, k) => secs.forEach(([a0, a1]) => {
-      const r0 = P(CHB.R[k] - 13.5) * s, r1 = P(CHB.R[k] + 13.5) * s;
+    { const [x0, x1] = lo(sx * (B.arm.x - 13), sx * (B.arm.x + 13)); rr(x0, B.arm.y0 - 12, x1, B.arm.y0 + B.arm.pitch * (B.arm.n - 1) + 12, 2); g.fill(); g.stroke(); }
+    for (const bx of B.blockX) for (const [t0, t1] of B.tierY) { const [x0, x1] = lo(sx * (bx - 13.5), sx * (bx + 13.5)); rr(x0, t0 - 14, x1, t1 + 14, 2); g.fill(); g.stroke(); }
+    B.sectors.forEach((secs, k) => secs.forEach(([a0, a1]) => {
+      const r0 = P(B.R[k] - 13.5) * s, r1 = P(B.R[k] + 13.5) * s;
       // angles on the canvas: the government's quarter runs from pi back towards pi/2, the opposition's from 0 to pi/2
       const A0 = sx < 0 ? Math.PI - a0 * D : a0 * D, A1 = sx < 0 ? Math.PI - a1 * D : a1 * D;
       g.beginPath(); g.arc(X(0), Yp(0), r1, A0, A1, sx < 0); g.arc(X(0), Yp(0), r0, A1, A0, sx > 0); g.closePath(); g.fill(); g.stroke();
@@ -322,11 +368,14 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   for (const [x, y] of [[-45.8, -268.6], [44.3, -268.6], [44.3, -215.2], [35, -215.2], [35, -110], [-36.6, -110], [-36.6, -215.2], [-45.8, -215.2]]) g.lineTo(X(P(x)), Yp(P(y)));
   g.closePath(); g.fillStyle = bench; g.fill(); g.lineWidth = Math.max(1, s * 0.05); g.strokeStyle = wood; g.stroke();
   g.lineWidth = 1; g.strokeStyle = css(th.line);
-  g.beginPath();
-  for (const x of [-15.5, 14.5]) { g.moveTo(X(P(x)), Yp(P(-266))); g.lineTo(X(P(x)), Yp(P(-218))); }
-  g.moveTo(X(P(-0.8)), Yp(P(-212))); g.lineTo(X(P(-0.8)), Yp(P(-113)));
-  for (const y of [-180, -145]) { g.moveTo(X(P(-34)), Yp(P(y))); g.lineTo(X(P(32.5)), Yp(P(y))); }
-  g.stroke();
+  // the House's table is panelled and grooved for the mace; Spring Street's top is one clean sheet
+  if (!geom.vic) {
+    g.beginPath();
+    for (const x of [-15.5, 14.5]) { g.moveTo(X(P(x)), Yp(P(-266))); g.lineTo(X(P(x)), Yp(P(-218))); }
+    g.moveTo(X(P(-0.8)), Yp(P(-212))); g.lineTo(X(P(-0.8)), Yp(P(-113)));
+    for (const y of [-180, -145]) { g.moveTo(X(P(-34)), Yp(P(y))); g.lineTo(X(P(32.5)), Yp(P(y))); }
+    g.stroke();
+  }
   if (s > 9) {
     g.strokeStyle = css(th.faint); g.lineWidth = Math.max(1, s * 0.07); g.lineCap = "round";
     g.beginPath(); g.moveTo(X(P(-19)), Yp(P(-123))); g.lineTo(X(P(17)), Yp(P(-123))); g.stroke();
@@ -347,9 +396,10 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
   }
   g.strokeStyle = css(th.line);
   const W = (20 / CU) * s, Dp = (18 / CU) * s;
-  // the officers: Clerk and Deputy Clerk at the table's head, Hansard's two reporters, the Serjeant-at-Arms
+  // the officers: the Clerks at the table's head (two of the House, three of the Assembly),
+  // Hansard's two reporters, the Serjeant-at-Arms
   const sj = geom.serjeant;
-  for (const [x, y, fa] of [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2], [-19.7, -21.5, -Math.PI / 2], [18.2, -21.5, -Math.PI / 2], [sj.x * CU, sj.y * CU, sj.fa]])
+  for (const [x, y, fa] of [...geom.officers, [-19.7, -21.5, -Math.PI / 2], [18.2, -21.5, -Math.PI / 2], [sj.x * CU, sj.y * CU, sj.fa]])
     drawChair(g, X(P(x)), Yp(P(y)), fa, W, Dp, css(officer), back(officer, 0.18), 1);
   // the furniture's names, where they fit
   if (opts.big && s >= 16) {

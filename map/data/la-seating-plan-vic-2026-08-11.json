@@ -1,0 +1,721 @@
+{
+ "plan": "11 August 2026",
+ "parliament": "60th",
+ "title": "Legislative Assembly seating plan (gallery perspective)",
+ "speaker": {
+  "div": "Bendigo West",
+  "member": "Maree Edwards",
+  "party": "ALP"
+ },
+ "counts": "ALP 54 (53); L/Nat 29; Green 3; Independent 2",
+ "source": "https://www.parliament.vic.gov.au/assembly",
+ "divisions": {
+  "Bendigo West": {
+   "m": "Maree Edwards",
+   "p": "ALP",
+   "speaker": true
+  },
+  "Albert Park": {
+   "m": "Nina Taylor",
+   "p": "ALP",
+   "desk": [
+    265.2,
+    280.1
+   ]
+  },
+  "Ashwood": {
+   "m": "Matt Fregon",
+   "p": "ALP",
+   "desk": [
+    209.6,
+    245.3
+   ]
+  },
+  "Bass": {
+   "m": "Jordan Crugnale",
+   "p": "ALP",
+   "desk": [
+    77.0,
+    389.0
+   ]
+  },
+  "Bayswater": {
+   "m": "Jackson Taylor",
+   "p": "ALP",
+   "desk": [
+    75.7,
+    517.8
+   ]
+  },
+  "Bellarine": {
+   "m": "Alison Marchant",
+   "p": "ALP",
+   "desk": [
+    130.9,
+    532.1
+   ]
+  },
+  "Benambra": {
+   "m": "Bill Tilley",
+   "p": "L/N",
+   "desk": [
+    535.7,
+    566.3
+   ]
+  },
+  "Bendigo East": {
+   "m": "Jacinta Allan",
+   "p": "ALP",
+   "desk": [
+    357.1,
+    224.8
+   ]
+  },
+  "Bentleigh": {
+   "m": "Nick Staikos",
+   "p": "ALP",
+   "desk": [
+    180.4,
+    265.0
+   ]
+  },
+  "Berwick": {
+   "m": "Brad Battin",
+   "p": "L/N",
+   "desk": [
+    418.6,
+    481.8
+   ]
+  },
+  "Box Hill": {
+   "m": "Paul Hamer",
+   "p": "ALP",
+   "desk": [
+    210.0,
+    319.2
+   ]
+  },
+  "Brighton": {
+   "m": "James Newbury",
+   "p": "L/N",
+   "desk": [
+    403.9,
+    324.8
+   ]
+  },
+  "Broadmeadows": {
+   "m": "Kathleen Matthews-Ward",
+   "p": "ALP",
+   "desk": [
+    388.0,
+    245.5
+   ]
+  },
+  "Brunswick": {
+   "m": "Tim Read",
+   "p": "GRN",
+   "desk": [
+    531.6,
+    363.3
+   ]
+  },
+  "Bulleen": {
+   "m": "Matthew Guy",
+   "p": "L/N",
+   "desk": [
+    382.3,
+    303.3
+   ]
+  },
+  "Bundoora": {
+   "m": "Colin Brooks",
+   "p": "ALP",
+   "desk": [
+    197.2,
+    366.9
+   ]
+  },
+  "Carrum": {
+   "m": "Sonya Kilkenny",
+   "p": "ALP",
+   "desk": [
+    195.5,
+    396.3
+   ]
+  },
+  "Caulfield": {
+   "m": "David Southwick",
+   "p": "L/N",
+   "desk": [
+    352.1,
+    440.7
+   ],
+   "role": "Deputy Leader of the Opposition"
+  },
+  "Clarinda": {
+   "m": "Meng Heang Tak",
+   "p": "ALP",
+   "desk": [
+    134.5,
+    560.0
+   ]
+  },
+  "Cranbourne": {
+   "m": "Pauline Richards",
+   "p": "ALP",
+   "desk": [
+    132.7,
+    506.6
+   ]
+  },
+  "Croydon": {
+   "m": "David Hodgett",
+   "p": "L/N",
+   "desk": [
+    539.0,
+    623.9
+   ]
+  },
+  "Dandenong": {
+   "m": "Gabrielle Williams",
+   "p": "ALP",
+   "desk": [
+    259.7,
+    401.1
+   ],
+   "role": "Deputy Premier"
+  },
+  "Eildon": {
+   "m": "Cindy McLEISH",
+   "p": "L/N",
+   "desk": [
+    416.7,
+    508.2
+   ]
+  },
+  "Eltham": {
+   "m": "Vicki Ward",
+   "p": "ALP",
+   "desk": [
+    164.2,
+    284.2
+   ]
+  },
+  "Essendon": {
+   "m": "Danny Pearson",
+   "p": "ALP",
+   "desk": [
+    190.5,
+    671.5
+   ]
+  },
+  "Eureka": {
+   "m": "Michaela Settle",
+   "p": "ALP",
+   "desk": [
+    173.8,
+    204.2
+   ]
+  },
+  "Euroa": {
+   "m": "Annabelle Cleeland",
+   "p": "L/N",
+   "desk": [
+    476.7,
+    509.8
+   ]
+  },
+  "Evelyn": {
+   "m": "Bridget Vallence",
+   "p": "L/N",
+   "desk": [
+    414.6,
+    367.4
+   ]
+  },
+  "Footscray": {
+   "m": "Katie Hall",
+   "p": "ALP",
+   "desk": [
+    127.3,
+    243.3
+   ]
+  },
+  "Frankston": {
+   "m": "Paul Edbrooke",
+   "p": "ALP",
+   "desk": [
+    190.0,
+    506.3
+   ]
+  },
+  "Geelong": {
+   "m": "Christine Couzens",
+   "p": "ALP",
+   "desk": [
+    188.9,
+    562.5
+   ]
+  },
+  "Gippsland East": {
+   "m": "Tim Bull",
+   "p": "L/N",
+   "desk": [
+    478.8,
+    397.9
+   ]
+  },
+  "Gippsland South": {
+   "m": "Danny O'Brien",
+   "p": "L/N",
+   "desk": [
+    342.3,
+    402.2
+   ],
+   "role": "Nationals Leader"
+  },
+  "Glen Waverley": {
+   "m": "John Mullahy",
+   "p": "ALP",
+   "desk": [
+    129.4,
+    371.2
+   ]
+  },
+  "Greenvale": {
+   "m": "Iwan Walters",
+   "p": "ALP",
+   "desk": [
+    67.2,
+    645.8
+   ]
+  },
+  "Hastings": {
+   "m": "Paul Mercurio",
+   "p": "ALP",
+   "desk": [
+    72.2,
+    490.6
+   ]
+  },
+  "Hawthorn": {
+   "m": "John Pesutto",
+   "p": "L/N",
+   "desk": [
+    477.8,
+    620.2
+   ]
+  },
+  "Ivanhoe": {
+   "m": "Anthony Carbines",
+   "p": "ALP",
+   "desk": [
+    255.5,
+    441.5
+   ],
+   "role": "Leader of the House"
+  },
+  "Kalkallo": {
+   "m": "Ros Spence",
+   "p": "ALP",
+   "desk": [
+    188.1,
+    481.5
+   ]
+  },
+  "Kew": {
+   "m": "Jess Wilson",
+   "p": "L/N",
+   "desk": [
+    346.8,
+    477.9
+   ],
+   "role": "Leader of the Opposition"
+  },
+  "Kororoit": {
+   "m": "Luba Grigorovitch",
+   "p": "ALP",
+   "desk": [
+    207.7,
+    189.1
+   ]
+  },
+  "Lara": {
+   "m": "Ella George",
+   "p": "ALP",
+   "desk": [
+    71.5,
+    619.9
+   ]
+  },
+  "Laverton": {
+   "m": "Sarah Connolly",
+   "p": "ALP",
+   "desk": [
+    137.9,
+    396.2
+   ]
+  },
+  "Lowan": {
+   "m": "Emma Kealy",
+   "p": "L/N",
+   "desk": [
+    415.2,
+    532.8
+   ]
+  },
+  "Macedon": {
+   "m": "Mary-Anne Thomas",
+   "p": "ALP",
+   "desk": [
+    187.0,
+    645.2
+   ]
+  },
+  "Malvern": {
+   "m": "Michael O'Brien",
+   "p": "L/N",
+   "desk": [
+    478.6,
+    559.2
+   ]
+  },
+  "Melbourne": {
+   "m": "Ellen Sandell",
+   "p": "GRN",
+   "desk": [
+    535.5,
+    414.8
+   ]
+  },
+  "Melton": {
+   "m": "Steve McGHIE",
+   "p": "ALP",
+   "desk": [
+    132.6,
+    648.3
+   ]
+  },
+  "Mildura": {
+   "m": "Jade Benham",
+   "p": "L/N",
+   "desk": [
+    422.0,
+    562.4
+   ]
+  },
+  "Mill Park": {
+   "m": "Lily D'Ambrosio",
+   "p": "ALP",
+   "desk": [
+    132.6,
+    673.7
+   ]
+  },
+  "Monbulk": {
+   "m": "Daniela De Martino",
+   "p": "ALP",
+   "desk": [
+    134.8,
+    423.2
+   ]
+  },
+  "Mordialloc": {
+   "m": "Tim Richardson",
+   "p": "ALP",
+   "desk": [
+    75.6,
+    541.1
+   ]
+  },
+  "Mornington": {
+   "m": "Chris Crewther",
+   "p": "L/N",
+   "desk": [
+    534.8,
+    542.4
+   ]
+  },
+  "Morwell": {
+   "m": "Martin Cameron",
+   "p": "L/N",
+   "desk": [
+    478.3,
+    427.0
+   ]
+  },
+  "Mulgrave": {
+   "m": "Eden Foster",
+   "p": "ALP",
+   "desk": [
+    252.2,
+    227.9
+   ]
+  },
+  "Murray Plains": {
+   "m": "Peter Walsh",
+   "p": "L/N",
+   "desk": [
+    536.5,
+    490.2
+   ]
+  },
+  "Narracan": {
+   "m": "Wayne Farnham",
+   "p": "L/N",
+   "desk": [
+    479.2,
+    372.1
+   ]
+  },
+  "Narre Warren North": {
+   "m": "Belinda Wilson",
+   "p": "ALP",
+   "desk": [
+    72.2,
+    415.0
+   ]
+  },
+  "Narre Warren South": {
+   "m": "Gary Maas",
+   "p": "ALP",
+   "desk": [
+    129.6,
+    480.9
+   ]
+  },
+  "Nepean": {
+   "m": "Anthony Marsh",
+   "p": "L/N",
+   "desk": [
+    417.1,
+    644.5
+   ]
+  },
+  "Niddrie": {
+   "m": "Ben Carroll",
+   "p": "ALP",
+   "desk": [
+    259.3,
+    478.3
+   ],
+   "role": "Premier"
+  },
+  "Northcote": {
+   "m": "Kat Theophanous",
+   "p": "ALP",
+   "desk": [
+    135.2,
+    338.4
+   ]
+  },
+  "Oakleigh": {
+   "m": "Steve Dimopoulos",
+   "p": "ALP",
+   "desk": [
+    230.3,
+    298.7
+   ]
+  },
+  "Ovens Valley": {
+   "m": "Tim McCURDY",
+   "p": "L/N",
+   "desk": [
+    417.6,
+    620.5
+   ]
+  },
+  "Pakenham": {
+   "m": "Emma Vulin",
+   "p": "ALP",
+   "desk": [
+    74.7,
+    441.7
+   ]
+  },
+  "Pascoe Vale": {
+   "m": "Anthony Cianflone",
+   "p": "ALP",
+   "desk": [
+    429.8,
+    259.9
+   ]
+  },
+  "Point Cook": {
+   "m": "Mathew Hilakari",
+   "p": "ALP",
+   "desk": [
+    112.5,
+    265.0
+   ]
+  },
+  "Polwarth": {
+   "m": "Richard Riordan",
+   "p": "L/N",
+   "desk": [
+    472.1,
+    343.9
+   ]
+  },
+  "Prahran": {
+   "m": "Rachel Westaway",
+   "p": "L/N",
+   "desk": [
+    534.6,
+    514.4
+   ]
+  },
+  "Preston": {
+   "m": "Nathan Lambert",
+   "p": "ALP",
+   "desk": [
+    439.3,
+    283.0
+   ]
+  },
+  "Richmond": {
+   "m": "Gabrielle De Vietri",
+   "p": "GRN",
+   "desk": [
+    533.6,
+    390.7
+   ]
+  },
+  "Ringwood": {
+   "m": "Will Fowles",
+   "p": "IND",
+   "desk": [
+    466.6,
+    219.5
+   ]
+  },
+  "Ripon": {
+   "m": "Martha Haylett",
+   "p": "ALP",
+   "desk": [
+    77.9,
+    364.9
+   ]
+  },
+  "Rowville": {
+   "m": "Kim Wells",
+   "p": "L/N",
+   "desk": [
+    482.3,
+    534.4
+   ]
+  },
+  "Sandringham": {
+   "m": "Brad Rowswell",
+   "p": "L/N",
+   "desk": [
+    415.3,
+    396.3
+   ]
+  },
+  "Shepparton": {
+   "m": "Kim O'Keeffe",
+   "p": "L/N",
+   "desk": [
+    479.6,
+    481.8
+   ]
+  },
+  "South Barwon": {
+   "m": "Darren Cheeseman",
+   "p": "IND",
+   "desk": [
+    489.3,
+    240.2
+   ]
+  },
+  "South-West Coast": {
+   "m": "Roma Britnell",
+   "p": "L/N",
+   "desk": [
+    350.9,
+    281.5
+   ]
+  },
+  "St Albans": {
+   "m": "Natalie Suleyman",
+   "p": "ALP",
+   "desk": [
+    191.2,
+    535.8
+   ]
+  },
+  "Sunbury": {
+   "m": "Josh Bull",
+   "p": "ALP",
+   "desk": [
+    149.7,
+    223.6
+   ]
+  },
+  "Sydenham": {
+   "m": "Natalie Hutchins",
+   "p": "ALP",
+   "desk": [
+    238.5,
+    171.1
+   ]
+  },
+  "Tarneit": {
+   "m": "Dylan Wight",
+   "p": "ALP",
+   "desk": [
+    70.0,
+    672.2
+   ]
+  },
+  "Thomastown": {
+   "m": "Bronwyn Halfpenny",
+   "p": "ALP",
+   "desk": [
+    189.0,
+    616.8
+   ]
+  },
+  "Warrandyte": {
+   "m": "Nicole Werner",
+   "p": "L/N",
+   "desk": [
+    415.4,
+    422.3
+   ]
+  },
+  "Wendouree": {
+   "m": "Juliana Addison",
+   "p": "ALP",
+   "desk": [
+    75.9,
+    335.1
+   ]
+  },
+  "Werribee": {
+   "m": "John Lister",
+   "p": "ALP",
+   "desk": [
+    130.1,
+    621.3
+   ]
+  },
+  "Williamstown": {
+   "m": "Melissa Horne",
+   "p": "ALP",
+   "desk": [
+    189.0,
+    424.4
+   ]
+  },
+  "Yan Yean": {
+   "m": "Lauren Kathage",
+   "p": "ALP",
+   "desk": [
+    67.2,
+    565.7
+   ]
+  }
+ }
+}

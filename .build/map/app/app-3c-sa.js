@@ -16,8 +16,6 @@
    ends, five shallow ones in the Council, a raised Speaker's chair under the public galleries up
    the middle. The Assembly seats 93, the Council 42, none of either at a census desk here (no
    seating plan is filed: each bloc fills the benches sorted, saFloorOf/saGeom's generic path).
-   Victoria's Assembly (Spring Street) is drawn in the same straight-block idiom, 87 desks and
-   the Speaker's chair, likewise sorted-filled only — no Spring Street plan is measured.
    @sa-cells-begin – read as is by .build/map/sa_seating.mjs, which checks every desk a plan names
    is one drawn here. Measured off the chamber maps' floor images (pixels, x from the centre line,
    y down from the curves' centres), seat ids the Parliament's own desk names; a side's list reads
@@ -50,7 +48,9 @@ const SAF = {
   // the Legislative Assembly, Sydney (seats 93): the Speaker's dais up the middle between the
   // public galleries, the Clerks at the table below, then four straight blocks of benches either
   // side from wall to wall, the gangways arcing round their far ends; 46 desks a side — the
-  // Speaker's 93rd sits in the chair, and one desk stands empty.
+  // Speaker's 93rd sits in the chair, and one desk stands empty. (Victoria's Assembly stood here
+  // in this idiom until the 60th Parliament's own plan was measured for the federal-style
+  // chamber of app-3-chamber.js — the vic22 frame now sits members where the plan puts them.)
   nswLA: {
     room: [-560, -580, 560, 420], chair: -490, officers: [-414, 190], table: [-392, -350, 104], mace: true, lead: ["A1", "F1"],
     straight: [
@@ -63,25 +63,6 @@ const SAF = {
       { row: 2, a: 120, y: 12, r: 130, phi: [24, 54, 84], L: "H1 H2 H3", R: "I1 I2 I3" },
       { row: 3, a: 120, y: 12, r: 242, phi: [15, 27, 39, 51, 63, 75, 87], L: "L1 L2 L3 L4 L5 L6 L7", R: "O1 O2 O3 O4 O5 O6 O7" },
       { row: 4, a: 120, y: 12, r: 354, phi: [14, 25, 36, 47, 58, 69, 80, 91], L: "D1 D2 D3 D4 D5 D6 D7 D8", R: "Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8" },
-    ],
-  },
-  // Victoria's Legislative Assembly, Spring Street (seats 88): Sydney's straight
-  // bench-block room with one back curve fewer — 87 desks between the sides (the
-  // back row short a desk right, keyed "-"), the other 87 members at them, the
-  // Speaker in the chair (no Spring Street seating plan is measured: each bloc
-  // fills the benches sorted, no SEATED entry).
-  vicLA: {
-    room: [-560, -580, 560, 420], chair: -490, officers: [-414, 190], table: [-392, -350, 104], mace: true, lead: ["A1", "F1"],
-    straight: [
-      { row: 1, x: 138, ys: [-420, -336, -252, -168], L: "A1 A2 A3 A4", R: "F1 F2 F3 F4" },
-      { row: 2, x: 250, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "G1 G2 G3 G4 G5 G6 G7 G8", R: "J1 J2 J3 J4 J5 J6 J7 J8" },
-      { row: 3, x: 362, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "K1 K2 K3 K4 K5 K6 K7 K8", R: "N1 N2 N3 N4 N5 N6 N7 N8" },
-      { row: 4, x: 474, ys: [-420, -361, -302, -243, -184, -125, -66, -7], L: "M1 M2 M3 M4 M5 M6 M7 M8", R: "P1 P2 P3 P4 P5 P6 P7 P8" },
-    ],
-    arcs: [
-      { row: 2, a: 120, y: 12, r: 130, phi: [24, 54, 84], L: "H1 H2 H3", R: "I1 I2 I3" },
-      { row: 3, a: 120, y: 12, r: 242, phi: [15, 27, 39, 51, 63, 75, 87], L: "L1 L2 L3 L4 L5 L6 L7", R: "O1 O2 O3 O4 O5 O6 O7" },
-      { row: 4, a: 120, y: 12, r: 354, phi: [14, 25, 36, 47, 58, 69], L: "D1 D2 D3 D4 D5 D6", R: "Q1 Q2 Q3 Q4 Q5 -" },
     ],
   },
   // and its Council (seats 42): five shallower rows round the same arrangement, the President under
@@ -121,7 +102,7 @@ const SA_SEAT = { W: 46, D: 50 }; // a chair, in pixels: along its bench, and de
 const SA_PAD = 4; // a bench's margin round its chairs
 const saGeomC = {};
 // the chamber the year's House or council is drawn in
-const saFloorOf = (m) => (m.year === "vic22" ? "vicLA" : m.year === "nsw23" ? (m.house === "senate" ? "nswLC" : "nswLA") : m.house === "senate" ? "lc" : "ha");
+const saFloorOf = (m) => (m.year === "nsw23" ? (m.house === "senate" ? "nswLC" : "nswLA") : m.house === "senate" ? "lc" : "ha");
 function saGeom(key) {
   if (saGeomC[key]) return saGeomC[key];
   const F = SAF[key], P = (v) => v / SAU;
