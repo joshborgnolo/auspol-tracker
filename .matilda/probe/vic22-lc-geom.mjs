@@ -1,7 +1,9 @@
 /* Pins the vic22 Legislative Council chamber redraw (2026-10-27, the user's
    seven-point annotation pass over the chamber photograph) on /map/
    (#y=vic22&v=chamber&c=senate), headlessly against canvas primitives:
-     - the rectangular Level 2 floor keeps its plan rect [104,104,952,1702];
+     - the floor keeps the federal chambers' own outline: straight side walls down to
+       the backings' centreline, the southern wall a semicircle at the carpet radius
+       (the outer backings' outer edge plus the House's 4.5-point skirt);
      - the rear curves are TWO quarter-turn backings a side about the new
        centre (580,1163): radii 334/420 with 33-point benches' margin, spans
        ~107deg (inner) and ~99deg (outer), desk count per row still 14,14,6,8,2;
@@ -127,21 +129,25 @@ const k = xf ? xf[0] : null, ox = xf ? xf[4] : null, oy = xf ? xf[5] : null;
 check("the furniture frame's transform is registered", !!(k && Number.isFinite(ox)), JSON.stringify(xf));
 const Xp = (px) => ox + ((px - VCLC.cx) / VLUn) * 45 * k, Yp = (py) => oy + ((py - VCLC.cy) / VLUn) * 45 * k;
 
-// 1. the rectangular floor: one fillRect matching the plan rect, straight edges
-const [fx0, fy0] = [Xp(VCLC.room[0]), Yp(VCLC.room[1])];
-const floorW = (VCLC.room[2] / VLUn) * 45 * k, floorH = (VCLC.room[3] / VLUn) * 45 * k;
-const floor = r.fills.find((f) => Math.abs(f.a[0] - fx0) < 1 && Math.abs(f.a[1] - fy0) < 1 && Math.abs(f.a[2] - floorW) < 1 && Math.abs(f.a[3] - floorH) < 1);
-check("the Level 2 floor paints as its plan rectangle (straight walls)", !!floor,
-  `expected fillRect ≈ [${fx0.toFixed(1)},${fy0.toFixed(1)},${floorW.toFixed(1)},${floorH.toFixed(1)}], fills ${JSON.stringify(r.fills.map((f) => f.a.map((v) => +v.toFixed(0))))}`);
+// 1. the floor: the federal chambers' own outline — one semicircle at the carpet radius
+//    about the backings' centre, straight walls either side down to it
+const floorArcs = r.arcs.filter((a) => Math.abs(a.r - VCLC.floorR) < 0.75);
+check("the floor's southern wall is one semicircle at the carpet radius (the federal outline)",
+  floorArcs.length === 1 && Math.abs(floorArcs[0].a0 - Math.PI) < 1e-6 && Math.abs(floorArcs[0].a1) < 1e-6,
+  `floor-radius arcs ${JSON.stringify(r.arcs.filter((a) => a.r > 400).map((a) => [+a.r.toFixed(1), +a.a0.toFixed(2), +a.a1.toFixed(2)]))}`);
 
-// 1a. the floor's south wall ends with the backings' deepest edge plus the House's carpet skirt
+// 1a. the carpet radius = the outer backings' outer edge plus the House's carpet skirt; the
+//    walls' bounds hug it (straight sides at the carpet's reach, south at the arc's foot)
 {
   const skirt = (4.5 * VLUn) / 30;
-  const deepest = Math.max(...VCLC.bands.map((b) =>
-    VCLC.cy + (b.R + 33) * ((b.to[1] - VCLC.cy) / Math.hypot(b.to[0] - VCLC.cx, b.to[1] - VCLC.cy))));
-  check("the floor's southern wall hugs the backings' tips plus the carpet skirt",
-    Math.abs(VCLC.room[3] - (deepest - VCLC.room[1] + skirt)) <= 0.6,
-    `room[3] ${VCLC.room[3]}, deepest bench edge ${deepest.toFixed(1)}, skirt ${skirt}`);
+  check("the carpet radius threads the outer backings' edge plus the House's carpet skirt",
+    Math.abs(VCLC.floorR - (VCLC.bands[1].R + 33 + skirt)) < 0.01,
+    `floorR ${VCLC.floorR}, outer band edge ${VCLC.bands[1].R + 33}, skirt ${skirt}`);
+  check("the room bounds the carpet on every side (west/east walls at its reach, south at its foot)",
+    Math.abs(VCLC.room[0] - (VCLC.cx - VCLC.floorR)) < 0.6 &&
+    Math.abs(VCLC.room[0] + VCLC.room[2] - (VCLC.cx + VCLC.floorR)) < 0.6 &&
+    Math.abs(VCLC.room[1] + VCLC.room[3] - (VCLC.cy + VCLC.floorR)) < 0.6,
+    JSON.stringify(VCLC.room));
 }
 
 // 2. exactly two curved backings a side: 8 arcs, radii 334±33 and 420±33 about (cx, cy)
@@ -151,9 +157,10 @@ const bands = VCLC.bands.map((b) => {
   return { R: b.R, span };
 });
 const expectR = bands.flatMap((b) => [b.R + 33, b.R - 33]);
-const gotR = r.arcs.map((a) => a.r);
+const benchArcs = r.arcs.filter((a) => Math.abs(a.r - VCLC.floorR) >= 0.75);
+const gotR = benchArcs.map((a) => a.r);
 check("eight backing arcs paint (two quarter-turn backings a side)",
-  gotR.length === 8 && expectR.every((R) => gotR.filter((g) => Math.abs(g - R) < 0.75).length === 2),
+  benchArcs.length === 8 && expectR.every((R) => gotR.filter((g) => Math.abs(g - R) < 0.75).length === 2),
   `radii ${JSON.stringify(gotR.map((v) => +v.toFixed(1)))}, wanted pairs of ${expectR.join(",")}`);
 {
   // each band's drawn span matches its waypoints' span (quarter-turn-like, ~107deg / ~99deg);

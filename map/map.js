@@ -2441,8 +2441,10 @@ function nswCells() {
 /* Victoria's Legislative Council, seating the 60th Parliament's own plan
    (map/data/lc-seating-plan-vic-2026-10-27.json — the Parliament's desk numbers are the
    seats' ids here). The 2026-10-27 redraw to the chamber photograph: a flat overhead
-   view of the rectangular Level 2 floor (its straight walls kept), the President's end
-   up top, the entrance end below — the government on the President's right (the reader's
+   view of the Level 2 floor in the federal chambers' own outline — straight side walls
+   down to the backings' centreline, the southern wall a semicircle hugging the rear
+   seating — the President's end up top, the entrance end below — the government on the
+   President's right (the reader's
    left), the straight side columns of the main benches running down to two quarter-turn
    backings a side that sweep the floor's empty south end, broad curved rear seating both
    sides of a continuous entrance aisle (never a horseshoe joined across it), the centre
@@ -2456,7 +2458,12 @@ function nswCells() {
 const VCLC = (() => {
   const D = {
     cx: 580, cy: 1163, table: 799, // the centre table's mid-line, which the far-end desks face
-    room: [104, 104, 952, 1510], // the Level 2 floor, a rect [x y w h]; its southern wall ends with the deepest backing's edge plus the carpet skirt (4.5 plan points the chamber unit, the House floor's own margin)
+    // the carpet's radius about (cx, cy): the outer backing's outer edge plus the House's own
+    // 4.5-point carpet skirt at this plan's 45-pixel unit — the walls its span hugs
+    floorR: 459.75,
+    // the walls' bounds: straight sides at the carpet's reach, top at 104, the southern wall
+    // the semicircle the federal chambers draw (below; it used to be a full rectangle)
+    room: [120.25, 104, 919.5, 1518.75],
     tables: {
       presidentDesk: [510, 379, 140, 64], clerkTable: [490, 526, 180, 54], centreTable: [509, 609, 142, 392],
     },
@@ -2592,9 +2599,9 @@ function vicLCGeom() {
   const rowR = [null, null, P(D.arcs[3]), P(D.arcs[4]), P(D.arcs[5])];
   for (let j = 2; j >= 0; j--) rowR[j] = (j === 2 ? rowR[3] : rowR[j + 1]) - P(72);
   const GAS = rowX[1] - rowX[0];
-  const GS = [rowX[0] - GAS / 2, rowX[0] + GAS / 2, rowX[1] + GAS / 2, 10.83, 10.83, 10.83];
-  // the outer curve walkway never paints off the room: the floor's straight walls end it
-  const GC = [0.15, ...rowR.slice(0, -1).map((x, j) => (x + rowR[j + 1]) / 2), Math.min(rowR[4] + 1.35, P(D.room[2]) / 2 - 0.3)];
+  const WG = P(D.floorR) - 0.2; // the outer walkway threads just inside the carpet, as the House's does
+  const GS = [rowX[0] - GAS / 2, rowX[0] + GAS / 2, rowX[1] + GAS / 2, WG, WG, WG];
+  const GC = [0.15, ...rowR.slice(0, -1).map((x, j) => (x + rowR[j + 1]) / 2), Math.min(rowR[4] + 1.35, WG)];
   const benchPt = (s, k) => {
     if (s <= 0) return [-GS[k], s];
     if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
@@ -2626,10 +2633,16 @@ function drawVicLCFurniture(g, F, geom, opts = {}) {
   const carpet = css(mixC(th.floor, [122, 44, 52], th.dark ? 0.8 : 0.68)); // the centre table's dark burgundy inset
   const officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
   const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
-  const b = geom.box;
-  g.fillStyle = css(th.floor); g.fillRect(X(b.x0), Yp(b.y0), (b.x1 - b.x0) * s, (b.y1 - b.y0) * s);
   g.save(); g.translate(X(0), Yp(0)); g.scale(k, k);
   const hair = 1 / k, H = 33; // a chair's half-side and a bench's margin round it
+  // the floor, the federal chambers' own outline: straight sides from the head of the room
+  // down to the backings' centreline, then the southern wall at the carpet radius —
+  // one semicircle hugging the rear backings' outer edge plus the House's own skirt
+  const [fx, fy] = [D.room[0] - D.cx, D.room[1] - D.cy];
+  g.beginPath();
+  g.moveTo(fx, fy); g.lineTo(fx, 0); g.arc(0, 0, D.floorR, Math.PI, 0, true); g.lineTo(fx + D.room[2], fy);
+  g.closePath();
+  g.fillStyle = css(th.floor); g.fill();
   g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
   const rb = (x, y, w, h, r = 4) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
   // the straight columns: each run of desks closer than a seat and a half apart is one bench;
