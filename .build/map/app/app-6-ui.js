@@ -280,7 +280,7 @@ function legendHTML(m) {
         // (the year's own census-edition menu; the informal lens's own
         // measure-switcher idiom)
         if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) {
-          h += `<div class="lg-t"><select data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_NAME[k]}</option>`).join("")}</select></div>`;
+          h += `<div class="lg-t"><select data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_BORN[k]}</option>`).join("")}</select></div>`;
         }
         const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
         // an income lane can arrive by hash on a year whose store carries

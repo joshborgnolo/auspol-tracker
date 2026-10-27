@@ -212,7 +212,7 @@ const GCP_COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "l
   assert.ok(map2.includes("demoBoothShare(b.raw, j, m.cobPos || {})"), "booth colour reads the positional cob row");
   assert.ok(map2.includes("demoRange(); return demoRamp()"), "the sewn ramp stays the fborn family");
   assert.ok(ui.includes('data-opt="cob" aria-label="Birthplace country"'), "the legend's country picker, the informal lens's own switcher idiom");
-  assert.ok(ui.includes("All overseas-born") && ui.includes("Born in ${COB_NAME[k]}"), "the picker's all-plus-countries options");
+  assert.ok(ui.includes("All overseas-born") && ui.includes("Born in ${COB_BORN[k]}") && base.includes('phl: "the Philippines"'), "the picker's all-plus-countries options, the Philippines with its article");
   assert.ok(ui.includes('if (isCob()) p.set("cb", S.cob);'), "the hash carries cb on the fborn lens only");
   assert.ok(ui.includes('S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;'), "readURL restores the country");
   assert.ok(ui.includes('k === "cob"'), "the picker change handler is wired");
