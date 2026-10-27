@@ -1,0 +1,576 @@
+{
+ "captured": "27 October 2026",
+ "url": "https://www.parliament.vic.gov.au/councilseatingplan",
+ "source": "the Parliament of Victoria's councilseatingplan page, captured 27 October 2026 (.build/map/src/vic22-lc-plan/, the page's server-rendered seat-data and chamber svg)",
+ "chambers": "Legislative Council of the 60th Parliament",
+ "rooms": {
+  "floor": [
+   104.001,
+   104,
+   951.999,
+   1702
+  ],
+  "centreTable": [
+   525,
+   639,
+   110,
+   320
+  ],
+  "clerkTable": [
+   490,
+   535,
+   180,
+   100
+  ],
+  "presidentDesk": [
+   510,
+   379,
+   140,
+   64
+  ]
+ },
+ "seats": {
+  "0": {
+   "x": 580.6,
+   "y": 195
+  },
+  "1": {
+   "x": 580.1,
+   "y": 342.5
+  },
+  "2": {
+   "x": 542.2,
+   "y": 498.5
+  },
+  "3": {
+   "x": 618,
+   "y": 498.5
+  },
+  "4": {
+   "x": 487.1,
+   "y": 688.5
+  },
+  "5": {
+   "x": 672.1,
+   "y": 688.5
+  },
+  "7": {
+   "x": 297,
+   "y": 355
+  },
+  "8": {
+   "x": 297,
+   "y": 445
+  },
+  "9": {
+   "x": 297,
+   "y": 535
+  },
+  "10": {
+   "x": 297,
+   "y": 625
+  },
+  "11": {
+   "x": 297,
+   "y": 715
+  },
+  "12": {
+   "x": 297,
+   "y": 805
+  },
+  "13": {
+   "x": 297,
+   "y": 895
+  },
+  "14": {
+   "x": 161,
+   "y": 326.6
+  },
+  "15": {
+   "x": 161,
+   "y": 397.4
+  },
+  "16": {
+   "x": 161,
+   "y": 576
+  },
+  "17": {
+   "x": 161,
+   "y": 645.1
+  },
+  "18": {
+   "x": 161,
+   "y": 714.2
+  },
+  "19": {
+   "x": 161,
+   "y": 894.5
+  },
+  "20": {
+   "x": 161,
+   "y": 963.6
+  },
+  "21": {
+   "x": 161,
+   "y": 1032.7
+  },
+  "23": {
+   "x": 863,
+   "y": 355
+  },
+  "24": {
+   "x": 863.2,
+   "y": 445
+  },
+  "25": {
+   "x": 863.2,
+   "y": 535
+  },
+  "26": {
+   "x": 863.2,
+   "y": 625
+  },
+  "27": {
+   "x": 863,
+   "y": 715
+  },
+  "28": {
+   "x": 863.2,
+   "y": 805
+  },
+  "29": {
+   "x": 863.2,
+   "y": 895
+  },
+  "30": {
+   "x": 999.3,
+   "y": 326.6
+  },
+  "31": {
+   "x": 999.3,
+   "y": 397.4
+  },
+  "32": {
+   "x": 999.3,
+   "y": 576
+  },
+  "33": {
+   "x": 999.3,
+   "y": 645.1
+  },
+  "34": {
+   "x": 999.3,
+   "y": 714.2
+  },
+  "35": {
+   "x": 999.3,
+   "y": 894.5
+  },
+  "36": {
+   "x": 999.3,
+   "y": 963.6
+  },
+  "37": {
+   "x": 999.3,
+   "y": 1032.7
+  },
+  "38": {
+   "x": 416.7,
+   "y": 1073.1
+  },
+  "39": {
+   "x": 446.2,
+   "y": 1143
+  },
+  "40": {
+   "x": 498.4,
+   "y": 1193.6
+  },
+  "41": {
+   "x": 663.5,
+   "y": 1193.6
+  },
+  "42": {
+   "x": 714.1,
+   "y": 1143
+  },
+  "43": {
+   "x": 743.6,
+   "y": 1073.1
+  },
+  "44": {
+   "x": 312.2,
+   "y": 1121.1
+  },
+  "45": {
+   "x": 345.1,
+   "y": 1194.4
+  },
+  "46": {
+   "x": 399.8,
+   "y": 1261
+  },
+  "47": {
+   "x": 467.2,
+   "y": 1306.5
+  },
+  "48": {
+   "x": 693,
+   "y": 1306.5
+  },
+  "49": {
+   "x": 760.4,
+   "y": 1261
+  },
+  "50": {
+   "x": 815.2,
+   "y": 1194.4
+  },
+  "51": {
+   "x": 848,
+   "y": 1121.1
+  },
+  "52": {
+   "x": 230.1,
+   "y": 1240.5
+  },
+  "53": {
+   "x": 930.1,
+   "y": 1240.5
+  }
+ },
+ "advisers": [
+  -2,
+  -1,
+  14,
+  15
+ ],
+ "members": {
+  "1": {
+   "m": "Shaun Leane",
+   "p": "ALP",
+   "region": "North-Eastern Metropolitan",
+   "pimsId": 60,
+   "positions": [
+    "President of the Legislative Council"
+   ]
+  },
+  "7": {
+   "m": "Lee Tarlamis",
+   "p": "ALP",
+   "region": "South-Eastern Metropolitan",
+   "pimsId": 1719,
+   "positions": [
+    "Government Whip in the Legislative Council"
+   ]
+  },
+  "8": {
+   "m": "Harriet Shing",
+   "p": "ALP",
+   "region": "Eastern Victoria",
+   "pimsId": 33
+  },
+  "9": {
+   "m": "Jaclyn Symes",
+   "p": "ALP",
+   "region": "Northern Victoria",
+   "pimsId": 116,
+   "positions": [
+    "Leader of the Government in the Legislative Council"
+   ]
+  },
+  "10": {
+   "m": "Lizzie Blandthorn",
+   "p": "ALP",
+   "region": "Western Metropolitan",
+   "pimsId": 8,
+   "positions": [
+    "Deputy Leader of the Government in the Legislative Council"
+   ]
+  },
+  "11": {
+   "m": "Ingrid Stitt",
+   "p": "ALP",
+   "region": "Western Metropolitan",
+   "pimsId": 1749
+  },
+  "12": {
+   "m": "Enver Erdogan",
+   "p": "ALP",
+   "region": "Northern Metropolitan",
+   "pimsId": 1760
+  },
+  "13": {
+   "m": "Gayle Tierney",
+   "p": "ALP",
+   "region": "Western Victoria",
+   "pimsId": 59
+  },
+  "16": {
+   "m": "Ryan Batchelor",
+   "p": "ALP",
+   "region": "Southern Metropolitan",
+   "pimsId": 1804
+  },
+  "17": {
+   "m": "Sonja Terpstra",
+   "p": "ALP",
+   "region": "North-Eastern Metropolitan",
+   "pimsId": 1751
+  },
+  "18": {
+   "m": "Tom McIntosh",
+   "p": "ALP",
+   "region": "Eastern Victoria",
+   "pimsId": 1766
+  },
+  "19": {
+   "m": "John Berger",
+   "p": "ALP",
+   "region": "Southern Metropolitan",
+   "pimsId": 1803
+  },
+  "20": {
+   "m": "Jacinta Ermacora",
+   "p": "ALP",
+   "region": "Western Victoria",
+   "pimsId": 1809
+  },
+  "21": {
+   "m": "Michael Galea",
+   "p": "ALP",
+   "region": "South-Eastern Metropolitan",
+   "pimsId": 1800
+  },
+  "23": {
+   "m": "Renee Heath",
+   "p": "LP",
+   "region": "Eastern Victoria",
+   "pimsId": 1793,
+   "positions": [
+    "Opposition Whip in Legislative Council"
+   ]
+  },
+  "24": {
+   "m": "Melina Bath",
+   "p": "NAT",
+   "region": "Eastern Victoria",
+   "pimsId": 121,
+   "positions": [
+    "Leader of The Nationals in the Legislative Council"
+   ]
+  },
+  "25": {
+   "m": "Bev McArthur",
+   "p": "LP",
+   "region": "Western Victoria",
+   "pimsId": 1758,
+   "positions": [
+    "Leader of the Liberal Party in the Legislative Council",
+    "Leader of the Opposition in the Legislative Council"
+   ]
+  },
+  "26": {
+   "m": "Evan Mulholland",
+   "p": "LP",
+   "region": "Northern Metropolitan",
+   "pimsId": 1796,
+   "positions": [
+    "Deputy Leader of the Opposition in the Legislative Council",
+    "Deputy Leader of the Liberal Party in the Legislative Council"
+   ]
+  },
+  "27": {
+   "m": "Georgie Crozier",
+   "p": "LP",
+   "region": "Southern Metropolitan",
+   "pimsId": 102
+  },
+  "28": {
+   "m": "Nick McGowan",
+   "p": "LP",
+   "region": "North-Eastern Metropolitan",
+   "pimsId": 1794
+  },
+  "29": {
+   "m": "David Davis",
+   "p": "LP",
+   "region": "Southern Metropolitan",
+   "pimsId": 12
+  },
+  "31": {
+   "m": "Gaelle Broad",
+   "p": "NAT",
+   "region": "Northern Victoria",
+   "pimsId": 1797,
+   "positions": [
+    "The National Party Whip in the Legislative Council"
+   ]
+  },
+  "32": {
+   "m": "Trung Luu",
+   "p": "LP",
+   "region": "Western Metropolitan",
+   "pimsId": 1807,
+   "positions": [
+    "Shadow Assistant Minister for Police and Corrections",
+    "Secretary of the Parliamentary Liberal Party"
+   ]
+  },
+  "34": {
+   "m": "Ann-Marie Hermans",
+   "p": "LP",
+   "region": "South-Eastern Metropolitan",
+   "pimsId": 1801,
+   "positions": [
+    "Shadow Assistant Minister for Community Safety"
+   ]
+  },
+  "35": {
+   "m": "Wendy Lovell",
+   "p": "LP",
+   "region": "Northern Victoria",
+   "pimsId": 45,
+   "positions": [
+    "Deputy President of the Legislative Council"
+   ]
+  },
+  "36": {
+   "m": "Richard Welch",
+   "p": "LP",
+   "region": "North-Eastern Metropolitan",
+   "pimsId": 1815
+  },
+  "37": {
+   "m": "Joe McCracken",
+   "p": "LP",
+   "region": "Western Victoria",
+   "pimsId": 1810
+  },
+  "38": {
+   "m": "Sheena Watt",
+   "p": "ALP",
+   "region": "Northern Metropolitan",
+   "pimsId": 1762,
+   "positions": [
+    "Parliamentary Secretary for Emergency Services",
+    "Parliamentary Secretary for Climate Action"
+   ]
+  },
+  "39": {
+   "m": "Rachel Payne",
+   "p": "LC",
+   "region": "South-Eastern Metropolitan",
+   "pimsId": 1802
+  },
+  "40": {
+   "m": "David Ettershank",
+   "p": "LC",
+   "region": "Western Metropolitan",
+   "pimsId": 1808
+  },
+  "41": {
+   "m": "Georgie Purcell",
+   "p": "AJP",
+   "region": "Northern Victoria",
+   "pimsId": 1798
+  },
+  "43": {
+   "m": "David Limbrick",
+   "p": "Libertarian",
+   "region": "South-Eastern Metropolitan",
+   "pimsId": 1755
+  },
+  "44": {
+   "m": "Katherine Copsey",
+   "p": "GRN",
+   "region": "Southern Metropolitan",
+   "pimsId": 1805,
+   "positions": [
+    "Deputy Party Room Chair",
+    "Spokesperson for Justice",
+    "Spokesperson for Public Transport and Roads",
+    "Spokesperson for Gambling Harm Reduction",
+    "Spokesperson for Animal Protection",
+    "Spokesperson for Major Events"
+   ]
+  },
+  "45": {
+   "m": "Anasina Gray-Barberio",
+   "p": "GRN",
+   "region": "Northern Metropolitan",
+   "pimsId": 1816,
+   "positions": [
+    "Spokesperson for Multiculturalism and Anti-Racism",
+    "Spokesperson for Women, Gender Equality and Family Violence",
+    "Spokesperson for Child Protection",
+    "Spokesperson for Disability Rights and Services",
+    "Spokesperson for Community Services",
+    "Spokesperson for Ageing",
+    "Spokesperson for Sport",
+    "Spokesperson for Early Childhood Education and Kinder"
+   ]
+  },
+  "46": {
+   "m": "Aiv Puglielli",
+   "p": "GRN",
+   "region": "North-Eastern Metropolitan",
+   "pimsId": 1795,
+   "positions": [
+    "Spokesperson for Legal Cannabis and Drug Harm Reduction",
+    "Spokesperson for LGBTIQA+ Equality",
+    "Spokesperson for Economic Justice and Consumer Rights",
+    "Spokesperson for Young People",
+    "Spokesperson for Free Uni and TAFE",
+    "Spokesperson for Workers' Rights",
+    "The Victorian Greens Whip - Legislative Council"
+   ]
+  },
+  "47": {
+   "m": "Sarah Mansfield",
+   "p": "GRN",
+   "region": "Western Victoria",
+   "pimsId": 1811,
+   "positions": [
+    "Spokesperson for Mental Health",
+    "Spokesperson for Agriculture",
+    "Spokesperson for Rural and Regional Communities",
+    "Spokesperson for Water",
+    "Spokesperson for Local Government",
+    "Spokesperson for Health",
+    "Spokesperson for Sustainable Cities and Planning",
+    "Deputy Leader of the Victorian Greens",
+    "Leader of the Greens in the Legislative Council"
+   ]
+  },
+  "48": {
+   "m": "Jeff Bourman",
+   "p": "SFFP",
+   "region": "Eastern Victoria",
+   "pimsId": 111
+  },
+  "49": {
+   "m": "Moira Deeming",
+   "p": "Family First",
+   "region": "Western Metropolitan",
+   "pimsId": 1806
+  },
+  "50": {
+   "m": "Rikkie-Lee Tyrrell",
+   "p": "One Nation",
+   "region": "Northern Victoria",
+   "pimsId": 1799
+  },
+  "51": {
+   "m": "Adem Somyurek",
+   "p": "Ind",
+   "region": "Northern Metropolitan",
+   "pimsId": 43
+  }
+ },
+ "roles": {
+  "president": "Shaun Leane",
+  "leader": "Jaclyn Symes",
+  "oppLeader": "Bev McArthur"
+ }
+}

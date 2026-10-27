@@ -252,23 +252,11 @@ const LENSES = [
 const FED_LENS = new Set(["senate", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
-// figure swipes (a swipe cycles all the way around); the lens and row walks
-// are keyboard only — a phone scrolls the lens row itself, and its vertical
-// drags belong to the page. On the phone a walk keeps the view fixed
-// (walkHold below), and has no scroll side effects of its own
+// figure swipes (a swipe cycles all the way around); the lens walk is keyboard
+// only — a phone scrolls the lens row itself. On the phone a walk keeps the
+// view fixed (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
-// the up/down-arrows row walk: the timeline's rows top to bottom, in
-// renderTimeline's `rows` order, walking round the ends; a row holds the stop
-// it was left on (setYear keeps the memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_NSW, YEARS_VIC, YEARS_SA];
-const laneMem = new Map();
-function walkLane(dir) {
-  const cur = yearLane(S.year);
-  laneMem.set(cur, S.year);
-  const lane = LANES[(LANES.indexOf(cur) + dir + LANES.length) % LANES.length];
-  setYear(laneMem.get(lane) ?? lane[lane.length - 1]);
-}
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
   const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
@@ -492,7 +480,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-nsw23.json":"1d234a46","data-sa22.json":"e6ff9052","data-sa26.json":"9b940b4e","data-vic22.json":"77bbb4f7","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"125753ec","la-seating-plan-vic-2026-08-11.json":"f825735f","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-nsw23.json":"4e9a6123","res-sa22.json":"2757b9d3","res-sa26.json":"1330a5a6","res-vic22.json":"b70dbd2c","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22.json":"5603a5a3","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"f3fc56ed","data-nsw23.json":"1d234a46","data-sa22.json":"e6ff9052","data-sa26.json":"9b940b4e","data-vic22.json":"77bbb4f7","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"3c101b06","geo-2010-lo.json":"f8051359","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"f8ae8d2d","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"125753ec","la-seating-plan-vic-2026-08-11.json":"f825735f","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-2004.json":"f83dcb86","res-2007.json":"56e4a28c","res-2010.json":"cf2b0d8f","res-2013.json":"c7b16d57","res-2016.json":"d57b0d2c","res-2019.json":"ef010f51","res-2022.json":"cf4ed33f","res-2025.json":"cea825d3","res-nsw23.json":"4e9a6123","res-sa22.json":"2757b9d3","res-sa26.json":"1330a5a6","res-vic22.json":"b70dbd2c","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"06f08fb1"};
 const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
 
 function cleanBooth(name, div, ty) {
@@ -741,7 +729,7 @@ function applyNow(m, now) {
 // .build/map/vic_seating.mjs for vic22's; none is filed for New South Wales, so the nsw23
 // chambers fill their benches sorted)
 const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26", "sa22", "vic22"]);
-const SEATED_LC = new Set(["sa26"]);
+const SEATED_LC = new Set(["sa26", "vic22"]);
 // the Speaker's district where the results files name none: each state's, as its
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023)
 const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie", vic22: "Bendigo West" };
@@ -2395,6 +2383,50 @@ function nswCells() {
   return cells;
 }
 /* @nsw-cells-end */
+/* Victoria's Legislative Council, as the 60th Parliament's own seating plan lays it out
+   (map/data/lc-seating-plan-vic-2026-10-27.json, the Parliament's councilseatingplan page of
+   27 October 2026): the President's chair at the head, her desk and the two clerks and theirs
+   down the centre line to the centre table, the government's benches in two straight columns
+   down her right, the opposition's mirroring, and the crossbench round two arcs at the far
+   end — six desks on R164 and eight on R275 about the rings' fitted centre — with two spare
+   desks at the corners and the Level 2 floor running on past them to the bar of the house.
+   The plan's desk numbers are the seats' ids (6 and 22 are unbuilt; desks 0-5, 14 and 15 are
+   the Governor's, the officials' and the advisers' chairs, never a member's).
+   @viclc-cells-begin – shared with .build/map/vic_lc_seating.mjs, which reads this block as is.
+   Plan pixels as the plan files them (x across from the left, y down); cx is the centre line,
+   cy the crossbench rings' common fitted centre, and every seat is read against them. */
+const VCLC = {
+  cx: 580, cy: 1052.5, table: 799, // the centre table's mid-line, which the far-end desks face
+  room: [104, 104, 952, 1702], // the Level 2 floor, a rect [x y w h]
+  tables: {
+    presidentDesk: [510, 379, 140, 64], clerkTable: [490, 535, 180, 100], centreTable: [525, 639, 110, 320],
+  },
+  president: [580.1, 342.5], // desk 1: a role's chair, not a bench seat
+  // the officials and staff: the Governor's ceremonial chair (0), the clerks flanking theirs'
+  // table (2, 3), the chairs at the centre table's ends (4, 5) and the Government Advisers (14, 15)
+  officers: { "0": [580.6, 195], "2": [542.2, 498.5], "3": [618, 498.5], "4": [487.1, 688.5], "5": [672.1, 688.5], "14": [161, 326.6], "15": [161, 397.4] },
+  advisers: ["14", "15"],
+  // every desk a member may sit at, [x, y] as the plan centres it
+  desks: {
+    "7": [297, 355], "8": [297, 445], "9": [297, 535], "10": [297, 625], "11": [297, 715], "12": [297, 805], "13": [297, 895],
+    "23": [863, 355], "24": [863.2, 445], "25": [863.2, 535], "26": [863.2, 625], "27": [863, 715], "28": [863.2, 805], "29": [863.2, 895],
+    "16": [161, 576], "17": [161, 645.1], "18": [161, 714.2], "19": [161, 894.5], "20": [161, 963.6], "21": [161, 1032.7],
+    "30": [999.3, 326.6], "31": [999.3, 397.4], "32": [999.3, 576], "33": [999.3, 645.1], "34": [999.3, 714.2], "35": [999.3, 894.5], "36": [999.3, 963.6], "37": [999.3, 1032.7],
+    "38": [416.7, 1073.1], "39": [446.2, 1143], "40": [498.4, 1193.6], "41": [663.5, 1193.6], "42": [714.1, 1143], "43": [743.6, 1073.1],
+    "44": [312.2, 1121.1], "45": [345.1, 1194.4], "46": [399.8, 1261], "47": [467.2, 1306.5], "48": [693, 1306.5], "49": [760.4, 1261], "50": [815.2, 1194.4], "51": [848, 1121.1],
+    "52": [230.1, 1240.5], "53": [930.1, 1240.5],
+  },
+  arcs: { 3: 164.4, 4: 275, 5: 397.3 }, // each ring's fitted radius about (cx, cy)
+};
+const VCLC_ROW = (id) => {
+  const n = +id;
+  if ((n >= 7 && n <= 13) || (n >= 23 && n <= 29)) return 1;
+  if ((n >= 16 && n <= 21) || (n >= 30 && n <= 37)) return 2;
+  if (n >= 38 && n <= 43) return 3;
+  if (n >= 44 && n <= 51) return 4;
+  return 5;
+};
+/* @viclc-cells-end */
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 // (a chamber whose two curves each turn about their own side's centre, a out from the middle, as
@@ -2406,8 +2438,8 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
    senateGeom (app-3b-senate.js), South Australia's two chambers and New South Wales' Council
    from saGeom (app-3c-sa.js) */
-let chGeomC = null, vicGeomC = null, nswGeomC = null;
-const chamberGeom = (m) => (m && m.year === "vic22" ? vicGeom() : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+let chGeomC = null, vicGeomC = null, vicLCGeomC = null, nswGeomC = null;
+const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 // the House's layout builder, shared by Victoria's and New South Wales' variants: the extra block
 // carries what differs — the table's chairs, the head clerks, and for Spring Street the clean
 // table, for Macquarie Street the rectangular one with no Hansard
@@ -2444,6 +2476,113 @@ function nswGeom() {
     rOut: NSWB.R[2] / CU, // the outer of its three curve rows (geomFor reads R[4], a House index)
     officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
   return nswGeomC;
+}
+
+/* the council's geometry, off its own descriptor: no floor file to wait on. The order along the
+   benches runs as the House's does — down the government's columns, round the rings, up the
+   opposition's — with every y measured off the rings' common centre so benchS reads it straight */
+const VLU = 45; // the plan's pixels to a chamber unit
+function vicLCGeom() {
+  if (vicLCGeomC) return vicLCGeomC;
+  const P = (v) => v / VLU, D = VCLC;
+  const seats = Object.entries(D.desks).map(([id, [px, py]]) => {
+    const x = P(px - D.cx), y = P(py - D.cy), row = VCLC_ROW(id);
+    // the columns' chairs face the centre line; the rings' face the table
+    const fa = row <= 2 ? (px < D.cx ? 0 : Math.PI) : Math.atan2(P(D.table - D.cy) - y, 0 - x);
+    return { id, x, y, fa, row, s: benchS(x, y, 0), W: P(55), D: P(56) };
+  }).sort((p, q) => p.s - q.s || p.row - q.row);
+  const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
+  seats.forEach((c, k) => { c.k = k; c.u = clamp((c.s - s0) / (s1 - s0), 0, 1); });
+  const rows = [null, 1, 2, 3, 4, 5].map((r) => (r === null ? [] : seats.filter((c) => c.row === r)));
+  // the walkways the majority line threads, per row's edge: on the straight columns their
+  // distance off the centre line, round the rings their radius (the columns get the backfilled
+  // stand-ins South Australia's floors use, a chair inside the inner ring)
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const rowX = [1, 2].map((r) => mean(rows[r].filter((c) => c.y < 0).map((c) => Math.abs(c.x))));
+  const rowR = [null, null, P(D.arcs[3]), P(D.arcs[4]), P(D.arcs[5])];
+  for (let j = 2; j >= 0; j--) rowR[j] = (j === 2 ? rowR[3] : rowR[j + 1]) - P(72);
+  const GAS = rowX[1] - rowX[0];
+  const GS = [rowX[0] - GAS / 2, rowX[0] + GAS / 2, rowX[1] + GAS / 2, 10.83, 10.83, 10.83];
+  const GC = [0.15, ...rowR.slice(0, -1).map((x, j) => (x + rowR[j + 1]) / 2), rowR[4] + 1.35];
+  const benchPt = (s, k) => {
+    if (s <= 0) return [-GS[k], s];
+    if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
+    const a = s / CHK; return [-GC[k] * Math.cos(a), GC[k] * Math.sin(a)];
+  };
+  const [rx, ry, rw, rh] = D.room.map((v, j) => P(v - (j < 2 ? (j ? D.cy : D.cx) : 0)));
+  vicLCGeomC = {
+    seats, rows, nRows: 5, bench: seats, byId: new Map(seats.map((c) => [c.id, c.k])),
+    rOut: P(D.arcs[5]), box: { x0: rx, x1: rx + rw, y0: ry, y1: ry + rh },
+    arms: false, table: ["9", "25"], // the leaders' own desks: third down each front column
+    chairAt: [P(D.president[0] - D.cx), P(D.president[1] - D.cy), Math.PI / 2, 0, P(55), P(56)],
+    aisle: P(225), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
+    benchPt, benchOut, furniture: drawVicLCFurniture,
+  };
+  return vicLCGeomC;
+}
+/* the council's room, in the House's drawing: the floor, the benches (a run down each column
+   where desks touch, a sector band per side round each ring), the President's desk and the
+   clerks' and centre tables down the middle, the officials' and advisers' chairs, and the
+   empty seats (outlined only, as the House's are) */
+function drawVicLCFurniture(g, F, geom, opts = {}) {
+  const th = TH, X = F.X, Yp = F.Yp, s = F.s, k = s / VLU, D = VCLC, P = (v) => v / VLU;
+  const bench = css(mixC(th.floor, th.ink, th.dark ? 0.08 : 0.05)), wood = css(mixC(th.floor, th.ink, th.dark ? 0.15 : 0.11));
+  const officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
+  const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
+  const b = geom.box;
+  g.fillStyle = css(th.floor); g.fillRect(X(b.x0), Yp(b.y0), (b.x1 - b.x0) * s, (b.y1 - b.y0) * s);
+  g.save(); g.translate(X(0), Yp(0)); g.scale(k, k);
+  const hair = 1 / k, H = 33; // a chair's half-side and a bench's margin round it
+  g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
+  const rb = (x, y, w, h, r = 4) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
+  // the straight columns: each run of desks closer than a seat and a half apart is one bench
+  const cols = new Map();
+  const seatSpot = Object.entries(D.desks).filter(([id]) => VCLC_ROW(id) <= 2);
+  for (const [id, [px, py]] of [...seatSpot, ...D.advisers.map((id) => [id, D.officers[id]])]) { const x = Math.round(px); if (!cols.has(x)) cols.set(x, []); cols.get(x).push(py); }
+  for (const [x, ys] of cols) {
+    ys.sort((p, q) => p - q);
+    let run = null;
+    for (const y of [...ys, 1e9]) {
+      if (run && y - run[1] > 110) { rb(x - D.cx - H, run[0] - D.cy - H, 2 * H, run[1] - run[0] + 2 * H); run = null; }
+      if (!run) run = [y, y]; else run[1] = y;
+    }
+  }
+  // the rings: a sector band each side of the gangway, padded half a pitch past its desks
+  for (const r of [3, 4, 5]) for (const side of [-1, 1]) {
+    const ds = Object.entries(D.desks).filter(([id]) => VCLC_ROW(id) === r).map(([, [px, py]]) => [px - D.cx, py - D.cy]).filter(([x]) => (side < 0 ? x < 0 : x > 0));
+    if (!ds.length) continue;
+    const R = D.arcs[r], ang = ds.map(([x, y]) => Math.atan2(y, x)).sort((p, q) => p - q);
+    const padA = (H / R) * 0.8, a0 = ang[0] - padA, a1 = ang[ang.length - 1] + padA;
+    g.beginPath(); g.arc(0, 0, R - H, a0, a1, false); g.arc(0, 0, R + H, a1, a0, true); g.closePath(); g.fill(); g.stroke();
+  }
+  // the centre table and the clerks', and the President's desk with its inset
+  const [tx, ty, tw, thh] = D.tables.centreTable, [cx2, cy2, cw, ch2] = D.tables.clerkTable, [px, py, pw, ph] = D.tables.presidentDesk;
+  g.lineWidth = Math.max(hair, (0.05 * s) / k); g.strokeStyle = wood;
+  rb(tx - D.cx, ty - D.cy, tw, thh, 3); rb(cx2 - D.cx, cy2 - D.cy, cw, ch2, 3);
+  g.lineWidth = hair; g.strokeStyle = css(th.line);
+  g.fillStyle = wood; rb(px - D.cx, py - D.cy, pw, ph, 3);
+  g.fillStyle = bench; rb(px - D.cx + 6, py - D.cy + 6, pw - 12, ph - 12, 2);
+  g.restore();
+  // the empty seats, outlined only, so they never read as a member's chair (a dimmed one is filled)
+  g.strokeStyle = css(mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24)); g.lineWidth = 1;
+  for (const c of geom.seats) {
+    if (opts.occupied && opts.occupied.has(c.k)) continue;
+    const w = c.W * s, d = c.D * s, r = Math.min(w, d) * 0.24;
+    g.save(); g.translate(X(c.x), Yp(c.y)); g.rotate(c.fa);
+    g.beginPath(); if (g.roundRect) g.roundRect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1, r); else g.rect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1);
+    g.stroke(); g.restore();
+  }
+  // the officials: the Governor's ceremonial chair, the clerks, the centre table's chairs, the advisers
+  for (const [id, [px, py]] of Object.entries(D.officers)) {
+    const fa = D.advisers.includes(id) ? 0 : Math.PI / 2;
+    drawChair(g, X(P(px - D.cx)), Yp(P(py - D.cy)), fa, P(38) * s, P(36) * s, css(officer), back(officer, 0.18), 1);
+  }
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  if (opts.big && s >= 16) {
+    g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
+    const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
+    put("The table", 0, P(ty + thh / 2 - D.cy), P(tw - 16));
+  }
 }
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
 const CH_GS = [96, 124, 159.5, 202, 243.5, 279].map((v) => v / CU);
@@ -3180,16 +3319,17 @@ const SENY = {}, SENP = {};
 let SENM = null, senFloor = null, senFloorP = null;
 const senOn = () => S.view === "chamber" && S.house === "senate" && !!SENM;
 const syncSenate = () => { SENM = SENY[S.year] || null; };
-// the model the chamber view draws: the House's year, or the Senate
-const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && senFloor ? SENM : null) : M());
+// the model the chamber view draws: the House's year, or the Senate — the Victorian council's
+// floor is baked into the app's code like the House's, so it never waits on the federal floor file
+const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && (senFloor || SENM.year === "vic22") ? SENM : null) : M());
 const SEN_SEATS = 76;
 // every year whose upper house is in this lane: the federal elections, and the states' — a state
-// election chooses no federal Senate, but SA's and NSW's own upper houses (their Legislative
-// Councils, SA's 22 members / NSW's 42, half-plus-one elected statewide at each state election) sit
-// in the same chamber view on their frames, from map/data/senate-<year>.json
-// (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py). Victoria's frame
-// carries none: its Legislative Council isn't in the lane, so vic22 is left off here.
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !VIC_YEARS.has(y)));
+// election chooses no federal Senate, but the states' own upper houses (their Legislative
+// Councils: SA's 22 members and NSW's 42, half-plus-one elected statewide at each state
+// election, and Victoria's 40, five a region, all up together) sit in the same chamber view
+// on their frames, from map/data/senate-<year>.json
+// (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py, build_vic22_lc.py).
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || STATE_YEARS.has(y));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -3199,7 +3339,10 @@ function senateModel(raw, year) {
   // the 2016 double dissolution (9 May 2016) put every seat to the voters: a Senate whose next election it was
   // had all 76 up, those due to sit to 2017 or 2020 among them
   const nextDD = SEN_YEARS[k + 1] === 2016;
-  for (const d of divs) { d.due = d.sen.term !== later; d.up = nextDD || d.due; }
+  // a council whose terms all run out together (Victoria's) puts every seat to the voters next,
+  // term being the file's own later rather than a sitting-past half
+  const uniform = raw.senators.every((x) => x.term === later);
+  for (const d of divs) { d.due = d.sen.term !== later; d.up = uniform || nextDD || d.due; }
   // an unlisted role is no role: null (a state council file may carry none),
   // never findIndex's -1, which the chamber geometry reads as a member index
   const role = (r) => { const i = divs.findIndex((d) => d.sen.role === r); return i < 0 ? null : i; };
@@ -3207,7 +3350,7 @@ function senateModel(raw, year) {
     house: "senate", year, asOf: raw.asOf, floor: raw.floor, lc: !!raw.lc, src: raw.source || null, divs, byName: new Map(divs.map((d) => [d.n, d.i])), seatsN: raw.seatsN || SEN_SEATS,
     // a state upper house's statewide first-preference tally (the federal files have none)
     votes: raw.votes || null, pvotes: raw.pvotes || null, formal: raw.formal || 0, pformal: raw.pformal || 0, prev: raw.prev || (raw.lc ? 2022 : null),
-    speaker: role("president"), leaders: [role("leader"), role("oppLeader")].filter((i) => i != null), gov: GOV[year], later, dd: !!raw.dd, nextDD, vacant: raw.vacant || [],
+    speaker: role("president"), leaders: [role("leader"), role("oppLeader")].filter((i) => i != null), gov: GOV[year], later, dd: !!raw.dd, nextDD, uniform, nextPending: !!raw.nextPending, vacant: raw.vacant || [],
     // the election after this one, by name ("the 2007 election"), where there has been one
     nextYear: year !== "now" && SEN_YEARS[k + 1] !== "now" ? SEN_YEARS[k + 1] : null,
     // (a council's plan is filed apart, with its own date: seats-<year>-lc.json)
@@ -3409,8 +3552,9 @@ const crossPoss = (g) => (g.k === "IND" ? `the ${words(g.n)} independents’` : 
    what was still to come (its next election, a term not yet run) ----- */
 const senNow = (m) => m.year === "now";
 const tv = (m, now, past) => (senNow(m) ? now : past);
-// the election a Senate's up-next half faced: "the 2007 election", or for today's and 2025's, "the next election"
-const nextEl = (m) => (m.nextYear ? `the ${m.nextYear} election` : m.lc ? `the ${m.later - 4} state election` : "the next election");
+// the election a Senate's up-next half faced: "the 2007 election"; a council's is its own state
+// election — the far half's end less four, or the end itself when every member goes up together
+const nextEl = (m) => (m.lc ? `the ${m.uniform ? m.later : m.later - 4} state election` : m.nextYear ? `the ${m.nextYear} election` : "the next election");
 const nv = (m, still, done) => (m.nextYear ? done : still); // a verb about the next election: still to come, or past
 const termWords = (m, d) => (d.sen.term === "next" ? nextEl(m) : m.lc ? `the ${d.sen.term} election` : `30 June ${d.sen.term}`);
 const TERRITORIES = new Set(["ACT", "NT"]);
@@ -3449,13 +3593,13 @@ function senateLegendHTML(m) {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
     h += `<div class="lg-t">${nv(m, "Who faces", "Who faced")} the voters at ${nextEl(m)}</div>`;
     h += `${cats(up, SEN_FAMS)}${stay ? `<span><i style="background:${css(SEN_STAY(TH))}"></i>Term to ${m.lc ? `the ${m.later} election` : m.later} <b>${stay}</b></span>` : ""}</div>`;
-    h += `<div class="lg-note">${m.lc ? (m.year === "nsw23" ? "Twenty-one of the council’s forty-two members are elected as one statewide electorate at each state election; the rest sit until the next one." : "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one.") : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
+    h += `<div class="lg-note">${m.lc ? (m.year === "nsw23" ? "Twenty-one of the council’s forty-two members are elected as one statewide electorate at each state election; the rest sit until the next one." : m.year === "vic22" ? "All forty of the council’s members are elected together — five in each of Victoria’s eight regions — so every member faces the voters at each state election." : "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one.") : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
   } else {
     h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : `The Senate after the ${m.year} election`}</div>`;
     h += `${cats(senCounts(m), SEN_FAMS)}</div>`;
   }
   const md = seatMode(m);
-  if (m.seating) h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s ${m.lc ? "chamber map" : "Senate seating plan"} of ${m.seating.plan}.` : `By ${S.senLens === "term" ? "who is up next, then party" : "party"}, each side from the President’s end.`}</span></div>`;
+  if (m.seating) h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s ${m.lc ? (m.year === "vic22" ? "council seating plan" : "chamber map") : "Senate seating plan"} of ${m.seating.plan}.` : `By ${S.senLens === "term" ? "who is up next, then party" : "party"}, each side from the President’s end.`}</span></div>`;
   else h += `<div class="lg-note">Sorted by ${S.senLens === "term" ? "who was up next, then party" : "party"}, each side from the President’s end; no seating plan is filed for ${m.lc ? "this council" : "this Senate"}.</div>`;
   return h;
 }
@@ -3529,14 +3673,15 @@ function storySenate(m) {
   // (the council is one statewide electorate: its "state" story is the chamber's)
   if (s.level === "state" && !m.lc) return storySenState(m, s.st);
   const { hed, dek } = senHedDek(m);
-  let h = senHead(m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : senNow(m) ? "The Senate today" : `The Senate after ${m.year}`, m.lc ? `The council as the new term began, ${longDate(m.asOf)}` : senNow(m) ? `Senators as at ${longDate(m.asOf)}` : `From ${longDate(m.asOf)}, as the ${m.dd ? "double dissolution’s" : "election’s"} senators took their seats`, hed, dek);
+  let h = senHead(m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : senNow(m) ? "The Senate today" : `The Senate after ${m.year}`, m.lc ? (m.uniform ? `The council as it sat on ${longDate(m.asOf)}` : `The council as the new term began, ${longDate(m.asOf)}`) : senNow(m) ? `Senators as at ${longDate(m.asOf)}` : `From ${longDate(m.asOf)}, as the ${m.dd ? "double dissolution’s" : "election’s"} senators took their seats`, hed, dek);
   h += `<div class="st-sec"><h3>The balance of power <small>${senBalance(m).maj} of ${m.seatsN} votes pass a bill</small></h3>${senBar(m)}</div>`;
   // who faces the voters next
   const up = m.divs.filter(upNext), upC = senCounts(m, upNext), stayC = senCounts(m, (d) => !upNext(d));
   const nUp = up.length, nTerr = up.filter((d) => TERRITORIES.has(d.st)).length;
   const upOrder = SEN_FAMS.filter((f) => upC[f] || stayC[f]);
   if (m.lc) {
-    h += `<div class="st-sec"><h3>At ${nextEl(m)} <small>${nUp} seats up, ${m.divs.length - nUp} with terms to the ${m.later} election</small></h3><p class="st-p">${cap(nextEl(m))} ${nv(m, "fills", "filled")} ${words(nUp)} of the council’s ${m.seatsN} seats; the other ${words(m.divs.length - nUp)} ${tv(m, "have", "had")} terms to the ${m.later} election. ${lcDefends(m)}</p><table class="tbl"><thead><tr><th>Party</th><th>Up next</th><th>To ${m.later}</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${famLeg(f)}</td><td>${upC[f] || 0}</td><td>${stayC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
+    if (m.uniform) h += `<div class="st-sec"><h3>At ${nextEl(m)} <small>every seat up</small></h3><p class="st-p">Every one of the council’s ${m.seatsN} seats ${nv(m, "is", "was")} up at ${nextEl(m)}: Victoria’s upper house is not staggered, so the whole council — five members in each of its eight regions — ${m.nextPending ? "faces" : "faced"} the voters together at each state election. ${lcDefends(m)}</p></div>`;
+    else h += `<div class="st-sec"><h3>At ${nextEl(m)} <small>${nUp} seats up, ${m.divs.length - nUp} with terms to the ${m.later} election</small></h3><p class="st-p">${cap(nextEl(m))} ${nv(m, "fills", "filled")} ${words(nUp)} of the council’s ${m.seatsN} seats; the other ${words(m.divs.length - nUp)} ${tv(m, "have", "had")} terms to the ${m.later} election. ${lcDefends(m)}</p><table class="tbl"><thead><tr><th>Party</th><th>Up next</th><th>To ${m.later}</th></tr></thead><tbody>${upOrder.map((f) => `<tr><td><i class="sw" style="${swc(f)}"></i>${famLeg(f)}</td><td>${upC[f] || 0}</td><td>${stayC[f] || 0}</td></tr>`).join("")}</tbody></table></div>`;
     // the statewide vote, this election and the last stored one
     if (m.votes && m.pvotes) {
       const rows = {};
@@ -3548,11 +3693,16 @@ function storySenate(m) {
     }
     // the chamber's members, the new cohort first
     const row2 = (d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt"><i class="sw" style="${swc(holdFam(d.hold))}"></i></span><span class="tx"><b>${ds(d.n)}</b> ${esc(partyName(d.hold.ab, d.hold.pn))}</span></button>`;
-    const newC = m.divs.filter((d) => !upNext(d)), oldC = m.divs.filter(upNext);
-    h += `<div class="st-sec"><h3>Elected at ${yearLabel(m.year)} <small>terms to the ${m.later} election</small></h3><div class="changes sn-list">${newC.sort(senOrder).map(row2).join("")}</div></div>`;
-    h += `<div class="st-sec"><h3>Carried over <small>terms to the ${m.later - 4} election</small></h3><div class="changes sn-list">${oldC.sort(senOrder).map(row2).join("")}</div></div>`;
-    const moved = m.divs.filter((d) => d.sen.electedAs);
-    if (moved.length) h += `<div class="st-sec"><h3>Not as elected</h3><div class="changes">${moved.map((d) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${ds(d.n)}.</b> Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; she carried the seat into her own party, ${esc(partyName(d.hold.ab, d.hold.pn))}.</span></button>`).join("")}</div></div>`;
+    if (m.uniform) h += `<div class="st-sec"><h3>Elected at ${yearLabel(m.year)} <small>all ${words(m.seatsN)} members — terms to the ${m.later} election</small></h3><div class="changes sn-list">${[...m.divs].sort(senOrder).map(row2).join("")}</div></div>`;
+    else {
+      const newC = m.divs.filter((d) => !upNext(d)), oldC = m.divs.filter(upNext);
+      h += `<div class="st-sec"><h3>Elected at ${yearLabel(m.year)} <small>terms to the ${m.later} election</small></h3><div class="changes sn-list">${newC.sort(senOrder).map(row2).join("")}</div></div>`;
+      h += `<div class="st-sec"><h3>Carried over <small>terms to the ${m.later - 4} election</small></h3><div class="changes sn-list">${oldC.sort(senOrder).map(row2).join("")}</div></div>`;
+    }
+    const moved = m.divs.filter((d) => d.sen.electedAs), filled = m.divs.filter((d) => d.sen.casual || d.sen.recount);
+    const mrow = (d, tx) => `<button type="button" data-sgo="sen:${d.i}"><span class="dt">${STATE_SHORT[d.st]}</span><span class="tx"><b>${ds(d.n)}.</b> ${tx}.</span></button>`;
+    if (moved.length) h += `<div class="st-sec"><h3>Not as elected</h3><div class="changes">${moved.map((d) => mrow(d, m.uniform ? `Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; ${m.nextPending ? "now sits" : "sat"} ${d.hold.fam === "ind" ? "as an independent" : `for ${theParty(d.hold.ab)}`}` : `Elected for ${theParty(d.sen.electedAs)} in ${d.sen.elected}; she carried the seat into her own party, ${esc(partyName(d.hold.ab, d.hold.pn))}`)).join("")}</div></div>`;
+    if (filled.length) h += `<div class="st-sec"><h3>Filled mid-term</h3><div class="changes">${filled.map((d) => mrow(d, esc(senFilled(m, d)))).join("")}</div></div>`;
     h += senFoot(m);
     return h;
   }
@@ -3647,7 +3797,7 @@ function storySenator(m, i) {
   return h;
 }
 function senFoot(m) {
-  return m.lc ? `<p class="st-foot">${m.src}. ${m.seating ? `Seats from the Parliament of South Australia’s chamber map, ${m.seating.plan}.` : "Drawn on the council’s own floor, sorted — no seating plan is filed for this council."}</p>`
+  return m.lc ? `<p class="st-foot">${m.src}. ${m.seating ? `Seats from ${m.year === "vic22" ? "the Parliament of Victoria’s council seating plan" : "the Parliament of South Australia’s chamber map"}, ${m.seating.plan}.` : "Drawn on the council’s own floor, sorted — no seating plan is filed for this council."}</p>`
     : senNow(m) ? `<p class="st-foot">The Parliament’s Senate seating plan as at ${longDate(m.asOf)}; terms from the AEC’s Senators Elected lists for 2022 and 2025.</p>`
     : `<p class="st-foot">The Parliamentary Handbook: senators’ terms of service, parties and changes of party; the Senate on ${longDate(m.asOf)}. Drawn on today’s floor, sorted.</p>`;
 }
@@ -3659,7 +3809,7 @@ function selectSen(sel) {
 }
 function senTip(m, i) {
   const d = m.divs[i], x = d.sen;
-  const term = m.lc ? (d.up ? `Up at the ${m.later - 4} state election` : `Term to the ${m.later} election`) : d.up ? (x.term === "next" ? `Up at ${nextEl(m)}` : `Up at ${nextEl(m)} (term to ${x.term})`) : `Term to ${x.term}`;
+  const term = m.lc ? (d.up ? `Up at ${nextEl(m)}` : `Term to the ${m.later} election`) : d.up ? (x.term === "next" ? `Up at ${nextEl(m)}` : `Up at ${nextEl(m)} (term to ${x.term})`) : `Term to ${x.term}`;
   return `<div class="tn">${ds(d.n)}<span>${STATE_SHORT[x.st]}${x.role === "president" ? " · President" : ""}</span></div><div class="tv">${esc(partyName(d.hold.ab, d.hold.pn))}</div><div class="ts">${esc(cap(term))}</div>`;
 }
 function senSearchItems(m) {
@@ -5706,7 +5856,6 @@ async function setYear(y) {
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
-  laneMem.set(yearLane(y), y);
   if (S.house === "senate") {
     // the chosen senator carries across by name where they sat in both Senates, else their state
     const was = SENM, ss = S.ssel;
@@ -5736,7 +5885,7 @@ function metaLine(m = M(), sen = senOn() ? SENM : null) {
    hold — with a family walk moving the head once. Every unloaded year's line is measured from the
    facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate (and
    back to the House at SA 2026), so only it floors on its family's Senate lines too */
-const META_FACTS = /*@meta-facts*/{"house":{"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw23":["2023-03-25",93,3117],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic22":["2022-11-26",88,1755],"now":["2026-10-25",150,8940]},"senate":{"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22]},"mix":{"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic22":{"alp":56,"lnp":28,"grn":4}}};
+const META_FACTS = /*@meta-facts*/{"house":{"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw23":["2023-03-25",93,3117],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic22":["2022-11-26",88,1755],"now":["2026-10-25",150,8940]},"senate":{"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22],"vic22":["2026-10-27",40]},"mix":{"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic22":{"alp":56,"lnp":28,"grn":4}}};
 const ebHeights = new Map();
 function holdEyebrow() {
   const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
@@ -6006,7 +6155,6 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
-  if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
@@ -6075,7 +6223,7 @@ function preloadYears() {
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },

@@ -127,6 +127,50 @@ function nswCells() {
   return cells;
 }
 /* @nsw-cells-end */
+/* Victoria's Legislative Council, as the 60th Parliament's own seating plan lays it out
+   (map/data/lc-seating-plan-vic-2026-10-27.json, the Parliament's councilseatingplan page of
+   27 October 2026): the President's chair at the head, her desk and the two clerks and theirs
+   down the centre line to the centre table, the government's benches in two straight columns
+   down her right, the opposition's mirroring, and the crossbench round two arcs at the far
+   end — six desks on R164 and eight on R275 about the rings' fitted centre — with two spare
+   desks at the corners and the Level 2 floor running on past them to the bar of the house.
+   The plan's desk numbers are the seats' ids (6 and 22 are unbuilt; desks 0-5, 14 and 15 are
+   the Governor's, the officials' and the advisers' chairs, never a member's).
+   @viclc-cells-begin – shared with .build/map/vic_lc_seating.mjs, which reads this block as is.
+   Plan pixels as the plan files them (x across from the left, y down); cx is the centre line,
+   cy the crossbench rings' common fitted centre, and every seat is read against them. */
+const VCLC = {
+  cx: 580, cy: 1052.5, table: 799, // the centre table's mid-line, which the far-end desks face
+  room: [104, 104, 952, 1702], // the Level 2 floor, a rect [x y w h]
+  tables: {
+    presidentDesk: [510, 379, 140, 64], clerkTable: [490, 535, 180, 100], centreTable: [525, 639, 110, 320],
+  },
+  president: [580.1, 342.5], // desk 1: a role's chair, not a bench seat
+  // the officials and staff: the Governor's ceremonial chair (0), the clerks flanking theirs'
+  // table (2, 3), the chairs at the centre table's ends (4, 5) and the Government Advisers (14, 15)
+  officers: { "0": [580.6, 195], "2": [542.2, 498.5], "3": [618, 498.5], "4": [487.1, 688.5], "5": [672.1, 688.5], "14": [161, 326.6], "15": [161, 397.4] },
+  advisers: ["14", "15"],
+  // every desk a member may sit at, [x, y] as the plan centres it
+  desks: {
+    "7": [297, 355], "8": [297, 445], "9": [297, 535], "10": [297, 625], "11": [297, 715], "12": [297, 805], "13": [297, 895],
+    "23": [863, 355], "24": [863.2, 445], "25": [863.2, 535], "26": [863.2, 625], "27": [863, 715], "28": [863.2, 805], "29": [863.2, 895],
+    "16": [161, 576], "17": [161, 645.1], "18": [161, 714.2], "19": [161, 894.5], "20": [161, 963.6], "21": [161, 1032.7],
+    "30": [999.3, 326.6], "31": [999.3, 397.4], "32": [999.3, 576], "33": [999.3, 645.1], "34": [999.3, 714.2], "35": [999.3, 894.5], "36": [999.3, 963.6], "37": [999.3, 1032.7],
+    "38": [416.7, 1073.1], "39": [446.2, 1143], "40": [498.4, 1193.6], "41": [663.5, 1193.6], "42": [714.1, 1143], "43": [743.6, 1073.1],
+    "44": [312.2, 1121.1], "45": [345.1, 1194.4], "46": [399.8, 1261], "47": [467.2, 1306.5], "48": [693, 1306.5], "49": [760.4, 1261], "50": [815.2, 1194.4], "51": [848, 1121.1],
+    "52": [230.1, 1240.5], "53": [930.1, 1240.5],
+  },
+  arcs: { 3: 164.4, 4: 275, 5: 397.3 }, // each ring's fitted radius about (cx, cy)
+};
+const VCLC_ROW = (id) => {
+  const n = +id;
+  if ((n >= 7 && n <= 13) || (n >= 23 && n <= 29)) return 1;
+  if ((n >= 16 && n <= 21) || (n >= 30 && n <= 37)) return 2;
+  if (n >= 38 && n <= 43) return 3;
+  if (n >= 44 && n <= 51) return 4;
+  return 5;
+};
+/* @viclc-cells-end */
 
 // position along the benches: down the government's side, round the curve, up the opposition's
 // (a chamber whose two curves each turn about their own side's centre, a out from the middle, as
@@ -138,8 +182,8 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
    senateGeom (app-3b-senate.js), South Australia's two chambers and New South Wales' Council
    from saGeom (app-3c-sa.js) */
-let chGeomC = null, vicGeomC = null, nswGeomC = null;
-const chamberGeom = (m) => (m && m.year === "vic22" ? vicGeom() : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+let chGeomC = null, vicGeomC = null, vicLCGeomC = null, nswGeomC = null;
+const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 // the House's layout builder, shared by Victoria's and New South Wales' variants: the extra block
 // carries what differs — the table's chairs, the head clerks, and for Spring Street the clean
 // table, for Macquarie Street the rectangular one with no Hansard
@@ -176,6 +220,113 @@ function nswGeom() {
     rOut: NSWB.R[2] / CU, // the outer of its three curve rows (geomFor reads R[4], a House index)
     officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
   return nswGeomC;
+}
+
+/* the council's geometry, off its own descriptor: no floor file to wait on. The order along the
+   benches runs as the House's does — down the government's columns, round the rings, up the
+   opposition's — with every y measured off the rings' common centre so benchS reads it straight */
+const VLU = 45; // the plan's pixels to a chamber unit
+function vicLCGeom() {
+  if (vicLCGeomC) return vicLCGeomC;
+  const P = (v) => v / VLU, D = VCLC;
+  const seats = Object.entries(D.desks).map(([id, [px, py]]) => {
+    const x = P(px - D.cx), y = P(py - D.cy), row = VCLC_ROW(id);
+    // the columns' chairs face the centre line; the rings' face the table
+    const fa = row <= 2 ? (px < D.cx ? 0 : Math.PI) : Math.atan2(P(D.table - D.cy) - y, 0 - x);
+    return { id, x, y, fa, row, s: benchS(x, y, 0), W: P(55), D: P(56) };
+  }).sort((p, q) => p.s - q.s || p.row - q.row);
+  const s0 = seats[0].s, s1 = seats[seats.length - 1].s;
+  seats.forEach((c, k) => { c.k = k; c.u = clamp((c.s - s0) / (s1 - s0), 0, 1); });
+  const rows = [null, 1, 2, 3, 4, 5].map((r) => (r === null ? [] : seats.filter((c) => c.row === r)));
+  // the walkways the majority line threads, per row's edge: on the straight columns their
+  // distance off the centre line, round the rings their radius (the columns get the backfilled
+  // stand-ins South Australia's floors use, a chair inside the inner ring)
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const rowX = [1, 2].map((r) => mean(rows[r].filter((c) => c.y < 0).map((c) => Math.abs(c.x))));
+  const rowR = [null, null, P(D.arcs[3]), P(D.arcs[4]), P(D.arcs[5])];
+  for (let j = 2; j >= 0; j--) rowR[j] = (j === 2 ? rowR[3] : rowR[j + 1]) - P(72);
+  const GAS = rowX[1] - rowX[0];
+  const GS = [rowX[0] - GAS / 2, rowX[0] + GAS / 2, rowX[1] + GAS / 2, 10.83, 10.83, 10.83];
+  const GC = [0.15, ...rowR.slice(0, -1).map((x, j) => (x + rowR[j + 1]) / 2), rowR[4] + 1.35];
+  const benchPt = (s, k) => {
+    if (s <= 0) return [-GS[k], s];
+    if (s >= Math.PI * CHK) return [GS[k], Math.PI * CHK - s];
+    const a = s / CHK; return [-GC[k] * Math.cos(a), GC[k] * Math.sin(a)];
+  };
+  const [rx, ry, rw, rh] = D.room.map((v, j) => P(v - (j < 2 ? (j ? D.cy : D.cx) : 0)));
+  vicLCGeomC = {
+    seats, rows, nRows: 5, bench: seats, byId: new Map(seats.map((c) => [c.id, c.k])),
+    rOut: P(D.arcs[5]), box: { x0: rx, x1: rx + rw, y0: ry, y1: ry + rh },
+    arms: false, table: ["9", "25"], // the leaders' own desks: third down each front column
+    chairAt: [P(D.president[0] - D.cx), P(D.president[1] - D.cy), Math.PI / 2, 0, P(55), P(56)],
+    aisle: P(225), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
+    benchPt, benchOut, furniture: drawVicLCFurniture,
+  };
+  return vicLCGeomC;
+}
+/* the council's room, in the House's drawing: the floor, the benches (a run down each column
+   where desks touch, a sector band per side round each ring), the President's desk and the
+   clerks' and centre tables down the middle, the officials' and advisers' chairs, and the
+   empty seats (outlined only, as the House's are) */
+function drawVicLCFurniture(g, F, geom, opts = {}) {
+  const th = TH, X = F.X, Yp = F.Yp, s = F.s, k = s / VLU, D = VCLC, P = (v) => v / VLU;
+  const bench = css(mixC(th.floor, th.ink, th.dark ? 0.08 : 0.05)), wood = css(mixC(th.floor, th.ink, th.dark ? 0.15 : 0.11));
+  const officer = mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24);
+  const back = (c, t) => css(towards(c, th.dark ? [0, 0, 0] : th.ink, t));
+  const b = geom.box;
+  g.fillStyle = css(th.floor); g.fillRect(X(b.x0), Yp(b.y0), (b.x1 - b.x0) * s, (b.y1 - b.y0) * s);
+  g.save(); g.translate(X(0), Yp(0)); g.scale(k, k);
+  const hair = 1 / k, H = 33; // a chair's half-side and a bench's margin round it
+  g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
+  const rb = (x, y, w, h, r = 4) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
+  // the straight columns: each run of desks closer than a seat and a half apart is one bench
+  const cols = new Map();
+  const seatSpot = Object.entries(D.desks).filter(([id]) => VCLC_ROW(id) <= 2);
+  for (const [id, [px, py]] of [...seatSpot, ...D.advisers.map((id) => [id, D.officers[id]])]) { const x = Math.round(px); if (!cols.has(x)) cols.set(x, []); cols.get(x).push(py); }
+  for (const [x, ys] of cols) {
+    ys.sort((p, q) => p - q);
+    let run = null;
+    for (const y of [...ys, 1e9]) {
+      if (run && y - run[1] > 110) { rb(x - D.cx - H, run[0] - D.cy - H, 2 * H, run[1] - run[0] + 2 * H); run = null; }
+      if (!run) run = [y, y]; else run[1] = y;
+    }
+  }
+  // the rings: a sector band each side of the gangway, padded half a pitch past its desks
+  for (const r of [3, 4, 5]) for (const side of [-1, 1]) {
+    const ds = Object.entries(D.desks).filter(([id]) => VCLC_ROW(id) === r).map(([, [px, py]]) => [px - D.cx, py - D.cy]).filter(([x]) => (side < 0 ? x < 0 : x > 0));
+    if (!ds.length) continue;
+    const R = D.arcs[r], ang = ds.map(([x, y]) => Math.atan2(y, x)).sort((p, q) => p - q);
+    const padA = (H / R) * 0.8, a0 = ang[0] - padA, a1 = ang[ang.length - 1] + padA;
+    g.beginPath(); g.arc(0, 0, R - H, a0, a1, false); g.arc(0, 0, R + H, a1, a0, true); g.closePath(); g.fill(); g.stroke();
+  }
+  // the centre table and the clerks', and the President's desk with its inset
+  const [tx, ty, tw, thh] = D.tables.centreTable, [cx2, cy2, cw, ch2] = D.tables.clerkTable, [px, py, pw, ph] = D.tables.presidentDesk;
+  g.lineWidth = Math.max(hair, (0.05 * s) / k); g.strokeStyle = wood;
+  rb(tx - D.cx, ty - D.cy, tw, thh, 3); rb(cx2 - D.cx, cy2 - D.cy, cw, ch2, 3);
+  g.lineWidth = hair; g.strokeStyle = css(th.line);
+  g.fillStyle = wood; rb(px - D.cx, py - D.cy, pw, ph, 3);
+  g.fillStyle = bench; rb(px - D.cx + 6, py - D.cy + 6, pw - 12, ph - 12, 2);
+  g.restore();
+  // the empty seats, outlined only, so they never read as a member's chair (a dimmed one is filled)
+  g.strokeStyle = css(mixC(th.floor, th.ink, th.dark ? 0.3 : 0.24)); g.lineWidth = 1;
+  for (const c of geom.seats) {
+    if (opts.occupied && opts.occupied.has(c.k)) continue;
+    const w = c.W * s, d = c.D * s, r = Math.min(w, d) * 0.24;
+    g.save(); g.translate(X(c.x), Yp(c.y)); g.rotate(c.fa);
+    g.beginPath(); if (g.roundRect) g.roundRect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1, r); else g.rect(-d / 2 + 0.5, -w / 2 + 0.5, d - 1, w - 1);
+    g.stroke(); g.restore();
+  }
+  // the officials: the Governor's ceremonial chair, the clerks, the centre table's chairs, the advisers
+  for (const [id, [px, py]] of Object.entries(D.officers)) {
+    const fa = D.advisers.includes(id) ? 0 : Math.PI / 2;
+    drawChair(g, X(P(px - D.cx)), Yp(P(py - D.cy)), fa, P(38) * s, P(36) * s, css(officer), back(officer, 0.18), 1);
+  }
+  g.lineWidth = 1; g.strokeStyle = css(th.line);
+  if (opts.big && s >= 16) {
+    g.font = `400 ${s >= 26 ? 11 : 10}px ${SANS}`; g.fillStyle = css(th.ink3); g.textAlign = "center"; g.textBaseline = "middle";
+    const put = (t, x, y, room) => { if (g.measureText(t).width <= room * s) g.fillText(t, X(x), Yp(y)); };
+    put("The table", 0, P(ty + thh / 2 - D.cy), P(tw - 16));
+  }
 }
 // the walkways between rows (0 inside the front bench, 5 outside the back row), on the straight and round the curve
 const CH_GS = [96, 124, 159.5, 202, 243.5, 279].map((v) => v / CU);

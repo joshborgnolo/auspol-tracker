@@ -81,15 +81,13 @@ assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assem
   assert.ok(years.length >= 10, "YEARS read from app-1-base.js");
   for (const y of years) assert.ok(F.house[y] && F.house[y][0] && F.house[y][1] > 0, `meta facts: the House line for ${y}`);
   // an upper-house file exists only for the frames that have one (sa26/sa22's
-  // Legislative Council rides senate-<year>.json with lc:true); vic22 has NO
-  // senate file at all — Victoria's Legislative Council isn't built out —
-  // and carries no Senate line
+  // Legislative Council and vic22's ride senate-<year>.json with lc:true)
   const LC_YEARS = [], SEN_FILES = [];
   for (const f of fs.readdirSync(path.join(ROOT, "map/data"))) {
     const m = f.match(/^senate-(\w+)\.json$/);
     if (m) { const s = JSON.parse(R("map/data/" + f)); if (s && s.lc) LC_YEARS.push(m[1]); SEN_FILES.push(m[1]); }
   }
-  assert.ok(!F.senate.vic22, "meta facts: no Senate line for vic22 (no upper-house file)");
+  assert.ok(LC_YEARS.includes("vic22") && F.senate.vic22, "meta facts: vic22's council has its Senate line (the Legislative Council rides senate-vic22.json)");
   for (const y of years.filter((y) => y !== "now" && !LC_YEARS.includes(y) && SEN_FILES.includes(y))) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the Senate line for ${y}`);
   for (const y of LC_YEARS) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the upper-house line for ${y}`);
   assert.ok(js.includes("const META_FACTS = /*@meta-facts*/{};"), "holdEyebrow reads the stamped meta facts");
@@ -755,7 +753,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(nswLA.filter((c) => c.x < 0).length, nswLA.filter((c) => c.x > 0).length, "nswLA: the sides mirror each other");
   assert.ok(js.includes('const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? "lc" : "ha");'), "saFloorOf routes the SA frames and NSW's Council (never its Assembly)");
   assert.ok(js.includes('m && m.year === "nsw23" && m.house !== "senate" ? nswGeom()'), "chamberGeom routes nsw23's Assembly to its Macquarie Street floor");
-  assert.ok(js.includes('const chamberGeom = (m) => (m && m.year === "vic22" ? vicGeom() :'), "chamberGeom routes vic22 to the Assembly's federal-style floor");
+  assert.ok(js.includes('const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) :'), "chamberGeom routes vic22's two chambers: the Legislative Council on its own floor, the Assembly on the federal-style floor");
   assert.ok(js.includes('nsw23: "Greg Piper"'), "nsw23's Speaker (Greg Piper, first sat 2 May 2023) in the chair");
   assert.ok(js.includes('nsw23: "Lake Macquarie"'), "nsw23's Speaker division is Lake Macquarie");
 }
@@ -787,6 +785,66 @@ for (const y of ["sa22", "sa26"]) {
   for (const [div, desk] of Object.entries(TABLE)) assert.equal(seats.at[div], desk, `seats-vic22: ${div} at the table's ${desk}`);
 }
 
+// ── vic22's upper house: Victoria's Legislative Council on its own floor (the
+// @viclc-cells VCLC table in app-3-chamber.js — the Parliament's chamber plan
+// masked into 44 member desks plus the President's chair, from the committed
+// snapshot map/data/lc-seating-plan-vic-2026-10-27.json), the council as it
+// sits from the Parliament's own council seating plan of 27 October 2026
+// (seats-vic22-lc.json, node .build/map/vic_lc_seating.mjs), its membership
+// and the statewide vote from the VEC's 2022 distribution-of-preferences and
+// first-preference reports and 2018's region pages (.build/map/
+// build_vic22_lc.py). The council is not staggered: all forty members are up
+// together at the 2026 state election
+{
+  const { VCLC, VCLC_ROW } = new Function(`${part("app-3-chamber.js").match(/@viclc-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @viclc-cells-end \*\//)[1]}; return { VCLC, VCLC_ROW };`)();
+  const deskIds = Object.keys(VCLC.desks);
+  assert.equal(deskIds.length, 44, "the Council's floor: 44 member desks");
+  const rowN = [1, 2, 3, 4, 5].map((r) => deskIds.filter((id) => VCLC_ROW(id) === r).length);
+  assert.deepEqual(rowN, [14, 14, 6, 8, 2], "the Council's floor: 14, 14 down the columns, 6, 8 and 2 round the rings");
+  for (const id of deskIds) {
+    const [px, py] = VCLC.desks[id];
+    assert.ok(Number.isFinite(px) && Number.isFinite(py), `viclc desk ${id} has a place`);
+  }
+  const sen = JSON.parse(R("map/data/senate-vic22.json"));
+  assert.equal(sen.year, "vic22", "senate-vic22: year");
+  assert.equal(sen.lc, true, "senate-vic22: lc flag");
+  assert.equal(sen.date, "2022-11-26", "senate-vic22: polling day");
+  assert.equal(sen.asOf, "2026-10-27", "senate-vic22: the plan's date");
+  assert.equal(sen.seatsN, 40, "senate-vic22: 40-member council");
+  assert.equal(sen.later, 2026, "senate-vic22: every term runs out at the 2026 election");
+  assert.equal(sen.dd, false, "senate-vic22: no double dissolution");
+  assert.equal(sen.prev, 2018, "senate-vic22: prev names the 2018 state election");
+  assert.equal(sen.gov, "alp", "senate-vic22: Labor in government");
+  assert.equal(sen.nextPending, true, "senate-vic22: the incoming council isn't on the frame");
+  assert.equal(sen.senators.length, 40, "senate-vic22: 40 members on file");
+  assert.ok(sen.senators.every((s) => s.term === 2026 && s.st === "VIC"), "senate-vic22: the uniform term, every member a Victorian");
+  const tally = {};
+  for (const s of sen.senators) tally[s.ab] = (tally[s.ab] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 15, LIB: 11, NAT: 2, GRN: 4, LCV: 2, SFF: 1, AJP: 1, ONP: 1, LDP: 1, FFP: 1, IND: 1 }, "senate-vic22: the council's party balance");
+  const fills = Object.fromEntries(sen.senators.filter((s) => s.casual).map((s) => [s.n, s.casual]));
+  assert.equal(fills["Richard Welch"] && fills["Richard Welch"].for, "Matthew Bach", "senate-vic22: Welch holds Bach's vacancy");
+  assert.equal(fills["Anasina Gray-Barberio"] && fills["Anasina Gray-Barberio"].for, "Samantha Ratnam", "senate-vic22: Gray-Barberio holds Ratnam's vacancy");
+  const moved = Object.fromEntries(sen.senators.filter((s) => s.electedAs).map((s) => [s.n, s.electedAs]));
+  assert.equal(moved["Adem Somyurek"], "DLP", "senate-vic22: Somyurek sits independent, his seat won for the DLP");
+  assert.equal(moved["Moira Deeming"], "LIB", "senate-vic22: Deeming sits Family First, her seat won for the Liberals");
+  assert.equal(sen.formal, 3752406, "senate-vic22: 2022 LC formal vote");
+  assert.equal(sen.inf, 124726, "senate-vic22: 2022 LC informal vote");
+  assert.equal(sen.pformal, 3583478, "senate-vic22: 2018 LC formal vote");
+  assert.ok(sen.votes && sen.pvotes, "senate-vic22: statewide party votes for both elections");
+  assert.ok(Object.keys(sen.votes).includes("IND") && !Object.keys(sen.votes).includes("ind"), "senate-vic22: the votes keys are the FAM-able codes (IND, never ind)");
+  const seats = JSON.parse(R("map/data/seats-vic22-lc.json"));
+  assert.equal(seats.plan, "27 October 2026", "seats-vic22-lc: the plan's date");
+  assert.deepEqual(seats.roles, { president: "Shaun Leane", leader: "Jaclyn Symes", oppLeader: "Bev McArthur" }, "seats-vic22-lc: the chair and the two leaders");
+  const seated = Object.keys(seats.at), desks = Object.values(seats.at);
+  assert.equal(seated.length, 39, "seats-vic22-lc: every member but the President at a desk");
+  assert.ok(!seated.includes("Shaun Leane"), "seats-vic22-lc: the President in the chair, not at a desk");
+  assert.ok(seated.every((n) => sen.senators.some((s) => s.n === n)), "seats-vic22-lc: members of the council file");
+  assert.ok(desks.every((d) => deskIds.includes(d)), "seats-vic22-lc: every desk on the drawn floor");
+  assert.equal(new Set(desks).size, 39, "seats-vic22-lc: one member a desk");
+  assert.equal(seats.at["Jaclyn Symes"], "9", "seats-vic22-lc: the government leader at the table's desk 9");
+  assert.equal(seats.at["Bev McArthur"], "25", "seats-vic22-lc: the opposition leader at the table's desk 25");
+}
+
 // ── vic22: the Victorian state election of 26 November 2022, the third state
 // frame on /map/ (build_vic22_data.py on the committed VEC caches in
 // .build/map/src/vic22), 88 Legislative Assembly districts on their own
@@ -807,7 +865,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.deepEqual(Object.keys(res.agg), ["AUS", "VIC"], "vic22 carries only its frame's areas");
   assert.equal(res.divs.length, 88, "vic22: 88 districts");
   for (const f of ["geo-vic22-lo.json", "geo-vic22-hi.json", "data-vic22.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
-  assert.ok(!fs.existsSync(path.join(ROOT, "map", "data", "senate-vic22.json")), "vic22: no upper-house lane (Victoria's Legislative Council isn't built out)");
+  for (const f of ["senate-vic22.json", "seats-vic22-lc.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
   // the winners: derived from the 2CP tallies exactly as the app reads them
   // (tcp entries are [candidate index, votes], so the winner's CANDIDATE is
   // c[d.tcp[slot][0]], never c[slot] — Mulgrave's tcp slots are index 0 and
@@ -917,13 +975,14 @@ for (const y of ["sa22", "sa26"]) {
   }
 }
 
-// Victoria's single chamber left the SAF straight-block machinery for the
-// House's own floor (the vic22 chamber pin above reads the @vic-cells floor):
-// no senate-vic22.json — the Legislative Council isn't a frame lane, so the
-// house-switch is suppressed and the upper-house lane leaves vic22 out
+// Victoria's Council joins the upper-house lane on its own floor (the vic22 LC
+// pin above reads the @viclc-cells floor): senate-vic22.json is a frame lane,
+// the house-switch offers it and the SEATED_LC plans load with the Senate lane
 {
-  const sen = part("app-3b-senate.js");
-  assert.ok(sen.includes("!VIC_YEARS.has(y)"), "vic22 stays out of the upper-house lane (Victoria's Legislative Council isn't built out)");
+  const sen = part("app-3b-senate.js"), base = part("app-1-base.js");
+  assert.ok(!sen.includes("!VIC_YEARS.has(y)"), "vic22 is in the upper-house lane (its Legislative Council is built out)");
+  assert.ok(base.includes('const SEATED_LC = new Set(["sa26", "vic22"]);'), "SEATED_LC names the councils with seating plans (South Australia's and Victoria's)");
+  assert.ok(sen.includes('const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && (senFloor || SENM.year === "vic22") ? SENM : null) : M());'), "the chamber model never waits on the federal floor for vic22's baked-in floor");
   assert.ok(sen.includes('if (!SEN_YEARS.includes(S.year)) return "";'), "the house switch hides on an upper-house-less frame");
   assert.ok(js.includes('vic22: "Maree Edwards"'), "vic22's Speaker (Maree Edwards, MLA for Bendigo West) in the chair");
   assert.ok(js.includes('vic22: "Bendigo West"'), "vic22's Speaker division is Bendigo West");

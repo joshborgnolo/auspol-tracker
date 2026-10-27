@@ -727,7 +727,7 @@ function applyNow(m, now) {
 // .build/map/vic_seating.mjs for vic22's; none is filed for New South Wales, so the nsw23
 // chambers fill their benches sorted)
 const SEATED = new Set(["now", 2025, 2022, 2019, 2016, 2013, 2010, "sa26", "sa22", "vic22"]);
-const SEATED_LC = new Set(["sa26"]);
+const SEATED_LC = new Set(["sa26", "vic22"]);
 // the Speaker's district where the results files name none: each state's, as its
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023)
 const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie", vic22: "Bendigo West" };
