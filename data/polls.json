@@ -6205,7 +6205,8 @@
       "dateStart": "2026-10-22",
       "pollster": "Essential",
       "client": "The Guardian",
-      "sample": 1087,
+      "sample": 1003,
+      "sampleEff": 722,
       "alp": 28,
       "lnp": 23,
       "grn": 12,
@@ -6216,6 +6217,7 @@
       "tpp_lnp": 52,
       "url": "https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb",
       "releaseUrl": "https://essentialreport.com.au/reports/28-october-2026",
+      "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/10/Essential-Report-Disclosure-Statement-Full-Questionnaire-.pdf",
       "assimilated": true
     }
   ],

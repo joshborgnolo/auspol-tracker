@@ -380,33 +380,28 @@ Page 6 / 19
 
    30-Sep-26    23-Sep-26    28-Sep-26   National   1,008      86%          865       ±3.3%
 
+   28-Oct-26    21-Oct-26    26-Oct-26   National   1,003      72%          722       ±3.6%
+
 
 
 
 Page 7 / 19
-Questionnaire Content (23 September 2026)
-
-
-SCREENERS
+Questionnaire Content (26 August 2026)
 
 
 ASK ALL
-D1.      What is your gender?
-
+D1.   What is your gender?
 
          SINGLE RESPONSE
 
-
          1. Male
          2. Female
-
+         3. Other
 
 
 D2.      What is your age?
 
-
          SINGLE RESPONSE
-
 
          1. Under 18 [TERMINATE]
          2. 18-19
@@ -424,26 +419,18 @@ D2.      What is your age?
          14. 75 and over
 
 
-
 D3.      In which one of the following areas do you live?
-
 
          SINGLE RESPONSE
 
-
-         1.   Sydney
-         2.   NSW other than Sydney
-         3.   Melbourne
-         4.   Victoria other than Melbourne
-         5.   Brisbane
-         6.   Queensland other than Brisbane
-         7.   Adelaide
-
-
-
-
-Page 8 / 19
-         8. South Australia other than Adelaide
+         1. Sydney
+         2. NSW other than Sydney
+         3. Melbourne
+         4. Victoria other than Melbourne
+         5. Brisbane
+         6. Queensland other than Brisbane
+         7. Adelaide
+         8. South Australia other than Adelaide
          9. Perth
          10. Western Australia other than Perth
          11. Hobart
@@ -455,27 +442,29 @@ Page 8 / 19
 
 
 
-D4.      What is your postcode?
+Page 8 / 19
+D4.      What is your postcode?
+
          4-DIGIT OPEN-BOX. VALIDATE POSTCODES BASED ON D3
 
 
+
 D12.     And which of the following best describes the type of household you currently live in?
-         SINGLE RESPONSE
-         1.   Single without children
-         2.   Couple with no children
-         3.   Group household with no children
-         4.   Mix of adults - no children under 18yrs in the household
-         5.   Young family - mainly dependent pre-school kids
-         6.   Middle family - mainly dependent school aged kids
-         7.   Older family - mainly dependent teenagers or older still at home
-         8.   Single or couple whose children have left home
-         9.   Other
-
-D14.     What is the highest level of education you have attained?
-
 
          SINGLE RESPONSE
+         1. Single without children
+         2. Couple with no children
+         3. Group household with no children
+         4. Mix of adults - no children under 18yrs in the household
+         5. Young family - mainly dependent pre-school kids
+         6. Middle family - mainly dependent school aged kids
+         7. Older family - mainly dependent teenagers or older still at home
+         8. Single or couple whose children have left home
+         9. Other
 
+
+D14. What is the highest level of education you have attained?
+      SINGLE RESPONSE
 
          1.   Year 9 and below
          2.   Year 10 and above
@@ -488,143 +477,149 @@ D14.     What is the highest level of education you have attained?
          9.   I prefer not to answer
 
 
-
 Q41.     Are you enrolled to vote in the next Australian federal election?
+
          SINGLE RESPONSE
+
          1. Yes
          2. No, but will be come 2028
          3. No, and won’t be come 2028
 
 
-
-
-Page 9 / 19
-ASK IF Q41=1
-Q43.     Did you vote in the May 2025 federal election, or were you unable to do so for some reason?
-
+ASK IF Q41=1
+Q43. Did you vote in the May 2025 federal election, or were you unable to do so for some reason?
 
          SINGLE RESPONSE
+
          1. Yes, voted
          2. No, unable to
          3. Not enrolled to vote
 
 
 
-ASK IF Q41=1 or 2
-Q21.     If a federal election was held tomorrow, to which party would you give your first preference vote in
-         the House of Representatives (Lower House)?
 
+Page 9 / 19
+ASK IF Q41=1 or 2
+Q21. If a federal election was held tomorrow, to which party would you give your first preference vote in
+       the House of Representatives (Lower House)?
 
          SINGLE RESPONSE. STATEMENTS 7 & 8 TO REMAIN AT BOTTOM OF LIST RANDOMISE
          STATEMENTS 1 & 2/3/4/5
-         1.    Labor
-         2.    Liberal (Do not show in QLD or NT)
-         3.    National (Do not show in QLD or NT)
-         4.    Liberal National Party (Only show in QLD)
-         5.    Country Liberals (Only show in NT)
-         6.    Greens
-         7.    Pauline Hanson’s One Nation
-         8.    Independent or other party
-         9.    Don’t know
+
+         1. Labor
+         2. Liberal (Do not show in QLD or NT)
+         3. National (Do not show in QLD or NT)
+         4. Liberal National Party (Only show in QLD)
+         5. Country Liberals (Only show in NT)
+         6. Greens
+         7. Pauline Hanson’s One Nation
+         8. WAS TRUMPETS OF PATRIOTS [NO LONGER SHOWN]
+         9. Independent or other party
+         10. Don’t know
+
+
 
 ASK IF Q21=1-9
-Q22.     And how likely are you to change your vote between now and the next federal election?
-         SINGLE RESPONSE
+Q22. And how likely are you to change your vote between now and the next federal election?
 
+         SINGLE RESPONSE
 
          1.    Not at all likely to change
          2.    Not that likely to change
          3.    Quite likely to change
          4.    Very likely to change
 
+
 ASK IF Q21=10
-Q23.     Well which party are you currently leaning towards?
+Q23. Well which party are you currently leaning towards?
+
          SINGLE RESPONSE. STATEMENTS 7 & 8 TO REMAIN AT BOTTOM OF LIST RANDOMISE
          STATEMENTS 1 & 2/3/4/5
 
+         1. Labor
+         2. Liberal (Do not show in QLD or NT)
+         3. National (Do not show in QLD or NT)
+         4. Liberal National Party (Only show in QLD)
+         5. Country Liberals (Only show in NT)
+         6. Greens
+         7. Pauline Hanson’s One Nation
+         8. WAS TRUMPETS OF PATRIOTS [NO LONGER SHOWN]
+         9. Independent or other party
+         10. Don’t know
 
-         1.    Labor
-         2.    Liberal (Do not show in QLD or NT)
-         3.    National (Do not show in QLD or NT)
-         4.    Liberal National Party (Only show in QLD)
-         5.    Country Liberals (Only show in NT)
-         6.    Greens
 
-
-
-Page 10 / 19
-         7. Pauline Hanson’s One Nation
-         8. Independent or other party
-         9. Don’t know
 
 ASK IF Q21=6-9 OR Q23=6-9
-Q24.     Following your first preference vote, which of the following would you preference higher in the House
-         of Representatives (Lower House)?
-
+Q24. Following your first preference vote, which of the following would you preference higher in the House
+       of Representatives (Lower House)?
 
          SINGLE RESPONSE. RANDOMISE 1 & 2
 
 
-         1. Labor
+
+
+Page 10 / 19
+         1. Labor
          2. Liberal/National Coalition
          3. Unsure
 
+ASK IF Q21=2/3/4/5/6/9 OR Q23=2/3/4/5/6/9
+Q24B. Following your first preference vote, which of the following would you preference higher in the House
+       of Representatives (Lower House)?
+
+         SINGLE RESPONSE. RANDOMISE 1 & 2
+
+               1. Labor
+               2. Pauline Hanson’s One Nation
+               3. Unsure
 
 
 ASK IF Q41=1 or 2
-Q26.     If a state election was held tomorrow, to which party would you give your first preference vote in the
-         Legislative Assembly / House of Assembly (Lower House)?
-
+Q26. If a state election was held tomorrow, to which party would you give your first preference vote in the
+       Legislative Assembly / House of Assembly (Lower House)?
 
          SINGLE RESPONSE. STATEMENT 19 TO REMAIN AT BOTTOM OF LIST. RANDOMISE
          STATEMENTS 1 & 2/3/4
 
-
-         1.    Labor [SHOW FOR ALL]
-         2.    Liberal/National (Only show in NSW, VIC and QLD)
-         3.    Liberal (Only show in SA, WA, TAS and ACT)
-         4.    Country Liberal (Only show in NT)
-         5.    Greens [SHOW FOR ALL]
-         6.    One Nation [SHOW FOR ALL]
-         7.    Independent
-         8.    Other party [SHOW FOR ALL]
-         9.    Don’t know [SHOW FOR ALL]
-
+         1. Labor [SHOW FOR ALL]
+         2. Liberal/National (Only show in NSW, VIC and QLD)
+         3. Liberal (Only show in SA, WA, TAS and ACT)
+         4. Country Liberal (Only show in NT)
+         5. Greens [SHOW FOR ALL]
+         9. One Nation [SHOW FOR ALL]
+         19. Independent [SHOW FOR ALL]
+         20. Other party [SHOW FOR ALL]
+         21. Don’t know [SHOW FOR ALL]
 
 
 ASK IF Q43=1
-Q17.     At the most recent Federal election (held on 3 May 2025), to which party did you give your first
-         preference vote in the House of Representatives (Lower House)?
-
+Q17. At the most recent Federal election (held on 3 May 2025), to which party did you give your first
+       preference vote in the House of Representatives (Lower House)?
 
          SINGLE RESPONSE. OPTION 10 TO REMAIN AT BOTTOM OF LIST RANDOMISE OPTIONS 1 &
          2/3/4/5
 
+         1. Labor
+         2. Liberal (Do not show in QLD or NT)
+         3. National (Do not show in QLD or NT)
+         4. Liberal National Party (Only show in QLD)
+         5. Country Liberals (Only show in NT)
+         6. Greens
+         7. Pauline Hanson’s One Nation
+         8. WAS TRUMPETS OF PATRIOTS [NO LONGER SHOWN]
+         9. Independent or other party
+         10. Don’t know
 
-         1.    Labor
-         2.    Liberal (Do not show in QLD or NT)
-         3.    National (Do not show in QLD or NT)
-         4.    Liberal National Party (Only show in QLD)
-         5.    Country Liberals (Only show in NT)
-         6.    Greens
+
+PAGE BREAK
 
 
 
 Page 11 / 19
-         7. Pauline Hanson’s One Nation
-         8. Independent or other party
-         9. Don’t know
-
-
-
-AD HOC
-
-
-Q37.     Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?
-
+ASK ALL
+Q37. Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?
 
          SINGLE RESPONSE
-
 
          1.    Strongly approve
          2.    Approve
@@ -632,13 +627,10 @@ Q37.     Do you approve or disapprove of the job Anthony Albanese is doing as Pr
          4.    Strongly disapprove
          5.    Don’t know
 
-
-
-Q56.     Do you approve or disapprove of the job Angus Taylor is doing as Opposition Leader?
-
+PAGE BREAK
+Q56. Do you approve or disapprove of the job Angus Taylor is doing as Opposition Leader?
 
          SINGLE RESPONSE
-
 
          1.    Strongly approve
          2.    Approve
@@ -646,255 +638,275 @@ Q56.     Do you approve or disapprove of the job Angus Taylor is doing as Opposi
          4.    Strongly disapprove
          5.    Don’t know
 
+PAGE BREAK
+Q57. Do you approve or disapprove of the job Pauline Hanson is doing as Leader of One Nation?
+
+         SINGLE RESPONSE
+
+               1.   Strongly approve
+               2.   Approve
+               3.   Disapprove
+               4.   Strongly disapprove
+               5.   Don’t know
 
 
-E563.    In general, would you say that Australia is heading in the right direction or on the wrong track?
-
+PAGE BREAK
+E563. In general, would you say that Australia is heading in the right direction or on the wrong track?
 
          SINGLE RESPONSE. RANDOMISE 1 & 2.
-
 
          1. Right direction
          2. Wrong track
          3. Unsure
 
 
-
 ASK IF CODE 1 SELECTED AT E563
+
 E563A. Why do you think that Australia is heading in the right direction?
+
 OPEN ENDED
+
+
+ASK IF CODE 2 SELECTED AT E563
+
+E563B. Why do you think that Australia is heading in the wrong direction?
 
 
 
 
 Page 12 / 19
-ASK IF CODE 2 SELECTED AT E563
-E563B. Why do you think that Australia is heading in the wrong direction?
-OPEN ENDED
-
-
-E74.     Do you think immigration to Australia is generally positive or generally negative for the country?
-
-
-         SINGLE RESPONSE. RANDOMISE 1 & 2
-               1. Generally positive
-               2. Generally negative
-               3. Unsure
-
-
-
-E1094. To what extent would you like to see Australia’s yearly immigration intake increase, decrease or stay
-about the same?
-
+OPEN ENDED
+E724. Do you think social and economic inequality in Australia is increasing, decreasing or staying about
+      the same?
 
          SINGLE RESPONSE
-               1.   Increase significantly
-               2.   Increase moderately
-               3.   Stay about the same
-               4.   Decrease moderately
-               5.   Decrease significantly
+
+         1.    Increasing a lot
+         2.    Increasing a little
+         3.    Staying about the same
+         4.    Decreasing a little
+         5.    Decreasing a lot
+         6.    Don’t know
+
+
+E290.    To what extent do you agree or disagree with the following statements about gender equality in
+         Australia?
+
+         a.    Strongly disagree
+         b.    Somewhat disagree
+         c.    Somewhat agree
+         d.    Strongly agree
+         e.    Unsure
+
+         SINGLE RESPONSE PER OPTION. RANDOMISE ANSWER OPTIONS
+
+         1.    There should be laws that require equal salaries for men and women in the same position
+         2.    Although there has been significant progress on gender equality there is still a long way to go
+         3.    Work to achieve gender equality today benefits mostly well-to-do people
+         4.    Gender equality has already been mostly achieved
+         5.    Gender equality, meaning that men and women are equal, has come far enough already
 
 
 
-ASK IF CODE 4 OR 5 AT E1094
-E1198. You said you think immigration to Australia should be decreased. Thinking about where those
-reductions should come from, imagine you have 100 points to allocate across the groups below. Put more
-points on the groups you would cut the most, and fewer or zero points on the groups you would
-protect from cuts. Your points should add up to 100.
+E535.    Which party do you trust most to…?
 
+         a.    Coalition
+         b.    Labor
+         c.    One Nation
+         d.    No difference
 
-RANDOMISE ROWS. CONSTANT SUM.
-    1.   Skilled workers
-    2.   International students
-    3.   Family members of people already living in Australia
-    4.   Refugees and people admitted on humanitarian grounds
-    5.   Working holidaymakers and seasonal or temporary workers
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
+
+         1. Manage the economy generally
+         2. Ensure the economy works in the interests of everyday Australians
 
 
 
-(Total must equal 100)
+E1204. Has the cost of living impacted any of the following for you?
+   1. Very negative impact
+   2. Somewhat negative impact
+   3. No impact
+   4. Somewhat positive impact
+   5. Very positive impact
+   6. Prefer not to say
 
 
 
 
 Page 13 / 19
-ASK ALL
-E967. From your perspective, what sort of impact does immigration have on:
+CARROUSEL WITH FOLLOWING. RANDOMISED. SINGLE RESPONSE PER TILE
+   a. Sleep
+   b. Mental health
+   c. Relationships
+   d. Physical health
 
 
-CARROUSEL. UNSURE ON BOTTOM ROW.
+E1205. Which of the following do you blame most for the rising cost of living?
+Please rank up to your top 3 you, where 1 is what you blame the most.
+
+RANK TOP 1-3. RANDOMISE CODES 1-6
+
+         1.    Supermarkets price gouging
+         2.    Government spending too much
+         3.    Wage rising too fast
+         4.    High immigration and population growth
+         5.    Global events such as the war in the Middle East
+         6.    Extreme weather events e.g., flooding, drought, bushfires
+         7.    Don’t know EXCLUSIVE
 
 
-    1.   Very positive impact
-    2.   Somewhat positive impact
-    3.   No impact
-    4.   Somewhat negative impact
-    5.   Very negative impact
-    6.   Unsure
+E1124. In general, do you want Australia to be more or less like the USA?
+
+    1. More like the USA
+    2. The current situation is about right
+    3. Less like the USA
+
+E1207. The two main parties in the United States are the Republican Party (the party of Presidents Donald
+Trump, George W. Bush and Ronald Reagan) and the Democratic Party (the party of Presidents Joe Biden,
+Barack Obama and Bill Clinton).
+
+The United States will hold its midterm elections on 3 November. Americans will vote for members of
+Congress, which is made up of the House of Representatives and the Senate. Congress passes laws that
+can support or limit the President. Republicans currently control both.
+
+Which of the following outcomes would you prefer from the US midterm elections?
+
+SINGLE RESPONSE. RANDOMISE CODES 1 AND 2.
+
+    1.   Republicans control both the House and the Senate
+    2.   Democrats control both the House and the Senate
+    3.   Control is split between the two parties
+    4.   I don’t have a preference
+    5.   I don’t know enough to say
 
 
-
-         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
-
-
-         1.    The Australian economy
-         2.    Housing availability and affordability
-         3.    The environment
-         4.    Job opportunities and the unemployment rate
-         5.    Filling worker shortages in essential industries
-         6.    Availability of essential services such as schools and hospitals
-         7.    Community safety
-         8.    How well people from different backgrounds get along
+E1206. If One Nation were leading the federal government, do you think each of the following would be
+better, worse or about the same as it is now?
 
 
-
-ASK ALL
-E1199. To what extent do you support or oppose each of the following?
-    a.   Strongly support
-    b.   Somewhat support
-    c.   Neutral
-    d.   Somewhat oppose
-    e.   Strongly oppose
-    f.   Unsure
-
-CARROUSEL. RANDOMISE STATEMENTS. PUT “Unsure” ON ROW BELOW
-
-
-    1. Greater scrutiny of people seeking protection or asylum visas
-    2. Forced deportation of people who have overstayed their visa
-    3. Making it harder for temporary migrants to move between different types of visas to extend their stay
-    4. Directing skilled worker visas towards industries with shortages, such as healthcare, construction
-       and education
-    5. Introducing a ballot (random selection) system for backpackers (working holiday visa holders)
-       wanting to stay for a second or third year
-    6. Preventing most international students from bringing family members with them to Australia
-
+         1. Much better
 
 
 
 Page 14 / 19
-ASK ALL
-E1200. Below are four different views on immigration into Australia. Please select the one statement that
-best reflects your own opinion.
+         2.    Somewhat better
+         3.    About the same
+         4.    Somewhat worse
+         5.    Much worse
+         6.    Unsure
 
-
-SINGLE RESPONSE. RANDOMISE ROWS
-
-
-1. Immigration is good for Australia and we should keep welcoming people, with the focus on supporting
-   refugees and reuniting families rather than cutting the numbers.
-
-2. Immigration overall benefits Australia, but the numbers have been too high and should be gradually
-   brought down to a more manageable level, while still bringing in the skilled workers the economy needs.
-
-
-3. Immigration is currently too high and is putting real pressure on housing and services. It should be cut
-   further and as fast as possible.
-
-
-4. Immigration is far too high and is the main cause of problems like housing shortages. It should be cut
-   dramatically, to the point where more people should be leaving Australia than arriving.
-
-5. None of these reflects my view
-
-6. Unsure
+CARROUSEL WITH FOLLOWING. RANDOMISED
+   a. Energy prices
+   b. Cost of groceries
+   c. Management of the economy
+   d. Government spending and debt
+   e. Housing affordability
+   f. Community safety
+   g. Relationships with trading partners like the US and China
+   h. The government’s ability to manage a sudden crisis such as a global pandemic
+   i. Management of immigration levels
+   j. How well different communities get along with each other in Australia
 
 
 
+PAGE BREAK
+ASK ALL
+E156. How would you describe your level of interest in the Melbourne Cup?
 
-ASK IF CODE 4 OR 5 AT E1094
-E1201. If governments built enough homes and expanded public services to keep pace with population
-growth, would you still want immigration reduced?
-               1. Yes
-               2. No
-               3. Unsure
+         SINGLE RESPONSE
+
+         1.    High interest
+         2.    Moderate interest
+         3.    Low interest
+         4.    No interest
+         5.    Don’t know
 
 
+E355.    Which of the following best describes your regular betting activity?
 
-E1202. Which of the following is closest to your view about artists and celebrities expressing political
-opinions?
-SINGLE RESPONSE. ROTATE 1 AND 3
-    1. They should feel free to share their political views, including during their performances or events
-    2. They can share their political views in general, but performances and events are not the right place
-       for it
-    3. They should stay out of politics altogether
-    4. Unsure
+         SINGLE RESPONSE
+         1. I regularly bet on horse races and will place a bet on the Melbourne Cup
+         2. I rarely bet on horse races but will watch the Melbourne Cup and place a bet
+         3. I will watch the Melbourne Cup but will not place a bet
+         4. I am not interested in the Melbourne Cup and will not place a bet
 
+PAGE BREAK
+ASK ALL
+E157. To what extent do you agree or disagree with the following statements about the Melbourne Cup?
+
+         a.    Strongly disagree
+         b.    Somewhat disagree
+         c.    Neither agree, nor disagree
+         d.    Somewhat agree
+         e.    Strongly agree
+
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
+
+         1. The Melbourne Cup is a unique part of Australia’s national identity
+         2. The Melbourne Cup normalises animal cruelty
 
 
 
 Page 15 / 19
-E1203. Thinking about gambling advertising in Australia, which of the following comes closest to what you
-think the rules should be?
+         3. The Melbourne Cup promotes unhealthy gambling behaviour
+         4. I am less interested in the Melbourne Cup than I used to be
 
 
-SINGLE RESPONSE
+ASK ALL
 
+E1208. The Queensland Government has announced plans to introduce changes to the industrial relations
+system that would give the government additional powers to stop workers from taking protected industrial
+action.
 
-    1. There should be no restrictions on gambling advertising
-    2. There should be restrictions on gambling advertising only during live sport broadcasts
-    3. There should be restrictions on gambling advertising during live sport and a ban on gambling ads on
-       social media and online
-    4. There should be ban on all gambling advertising on TV, radio, on social media and online, at all
-       times
-    5. Unsure
+The additional measures include a 30-day limit on action and additional powers to stop action if the
+government deems it is not in the public interest.
 
+Prior to this, to what extent were you aware of the Queensland Government’s planned changes?
 
+         1.    Know a lot about them
+         2.    Know a little about them
+         3.    Heard of them, but know nothing more
+         4.    Never heard of them
+         5.    Unsure
 
+ASK ALL
 
-E82.     How happy or unhappy are you with each of the following parts of your personal situation?
+E1209. To what extent do you agree or disagree with the following statements about the Queensland
+Government’s proposed changes to the industrial relations system?
 
+         a.    Strongly disagree
+         b.    Somewhat disagree
+         c.    Neither agree nor disagree
+         d.    Somewhat agree
+         e.    Strongly agree
+         f.    Unsure
 
-         a. 0 – Extremely unhappy
-         b.    1
-         c.    2
-         d.    3
-         e.    4
-         f.    5
-         g.    6
-         h.    7
-         i.    8
-         j.    9
-         k.    10 – Extremely happy
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
 
+         1. The proposed changes will make it harder for workers, including teachers, nurses, transport and
+            local government workers, to achieve improvements to their wages and conditions.
+         2. The proposed changes are necessary to stop unions from causing public harm.
+         3. Governments need to have greater powers to stop workers taking industrial action.
+         4. The proposed changes will only impact a small number of workers.
+         5. The proposed changes will impact workers across the state.
 
-         SINGLE RESPONSE FOR EACH ROW. RANDOMISE STATEMENTS 2-6. USE 11 POINT SCALE,
-         LABELLING TOP AND BOTTOM POINTS ONLY. SHOW AS SLIDER SCALE
-
-
-         1.    My life overall
-         2.    My personal/family life
-         3.    My social life
-         4.    My spiritual life
-         5.    My work life
-         6.    My financial situation
-
-
-
-DEMOGRAPHICS
 
 
 Thank you for your time so far, we only have a few more questions.
 
-
-
-
-Page 16 / 19
-ASK ALL
-D23.     In what year were you born?
-
+ASK ALL
+D23.  In what year were you born?
 
          FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
-
-
 
 
 D6.      What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
          that your household usually receives (GROSS – before tax and superannuation deductions)?
 
 
-         SINGLE RESPONSE
 
+Page 16 / 19
+         SINGLE RESPONSE
 
          1. $3,500 or more per week ($182,000 or more per year)
          2. $3,000-$3,499 per week ($156,000-$181,999 per year)
@@ -914,12 +926,8 @@ D6.      What is the total of all wages/salaries, government benefits, pensions,
          16. Prefer not to say
 
 
-
 D7.      What is your current employment status?
-
-
          SINGLE RESPONSE
-
 
          1. Employed, working Full-time (more than 35 hours a week)
          2. Self Employed, working Full-time (more than 35 hours a week)
@@ -934,15 +942,40 @@ D7.      What is your current employment status?
          11. Other (please specify)
          12. Refuse to answer
 
+ASK IF CODES 1-3 SELECTED AT D7
+C1138. Which industry do you mainly work in? If you have more than one job, please answer for the job
+where you work the most hours.
+SINGLE SELECT
+   1. Agriculture, forestry or fishing
+   2. Mining
+   3. Manufacturing
+   4. Electricity, gas, water or waste services
+   5. Construction
+   6. Wholesale trade
+   7. Retail trade
+   8. Accommodation or food services (including hospitality)
+   9. Transport, postal or warehousing
+   10. Information, media or telecommunications
+   11. Financial or insurance services
+   12. Rental, hiring or real estate services
+   13. Professional, scientific or technical services
+   14. Administrative or support services (including cleaning and security)
+   15. Public administration or safety
+
 
 
 
 Page 17 / 19
-D24.     Which of the following best describes how you feel about your current financial circumstances?
+    16. Education or training
+    17. Health care or social assistance (including aged care and disability support)
+    18. Arts or recreation services
+    19. Other services
+    20. Prefer not to say
 
 
+
+D24.     Which of the following best describes how you feel about your current financial circumstances?
          SINGLE RESPONSE
-
 
          1.    Comfortable. I don’t have to worry about paying bills, I have savings and enough to buy luxuries
          2.    Secure. I’m able to pay bills and usually have money spare for savings or buying luxuries
@@ -950,9 +983,7 @@ Page 17 / 19
          4.    In serious difficulty. Being able to pay all the bills is a regular concern
 
 
-
 D22.     Which of the following best describes your current living situation?
-
          SINGLE RESPONSE
 
          1.    Live in your own home
@@ -961,27 +992,29 @@ D22.     Which of the following best describes your current living situation?
          4.    Other
 
 
-
 D25.     Are you currently paying off a mortgage/home loan?
-
-
          SINGLE RESPONSE
 
+         1. Yes
+         2. No
+
+
+D26.     Do you currently own an investment property?
+         SINGLE RESPONSE
 
          1. Yes
          2. No
 
 
 
-D21.     Which of the following applies to you?
 
+D21.     Which of the following applies to you?
 
          a. Yes
          b. No
          c. Prefer not to say
 
          SINGLE RESPONSE PER STATEMENT. RANDOMISE ANSWER STATEMENTS.
-
 
          1.    I identify as Aboriginal or Torres Strait Islander
          2.    I was born in Australia
