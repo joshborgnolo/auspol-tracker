@@ -155,32 +155,25 @@ function quietness(i, now) {
 }
 // streetA: how strongly the streets show between the fills and the borders
 // (only for the year in view; the frame passes it once per paint)
-// SEA_GROW: how far (m) past their AEC coast the seats are drawn when Esri's
-// sea cuts the coast (laySea), widest first: each seat's coast is stroked in
-// its colour at every width in turn, the narrower over the wider, so land
-// beyond every AEC coast goes to about the nearest seat's (within a factor
-// of two) - not to whichever seat was stroked last where two meet at the
-// shore. The two coasts part by 10-40m typically at street zoom, but by
-// hundreds where the AEC drops an islet's shore or Esri's coarser zooms
-// round an island out (Bass Strait's islands as the streets come in)
-// Widths past ~60px on screen are left out (the coasts never part by that
-// much once Esri's are fine-grained, and stroking whole coastlines that wide
-// costs frames); the last two always run.
-const SEA_GROW = [2400, 1200, 600, 300, 150];
-const growsAt = (unit) => SEA_GROW.filter((w, j) => j >= SEA_GROW.length - 2 || w * unit * T.k <= 60);
-// the paint's sea cut, for drawFocus: the year it was cut for and metres in map units
+//
+// From street zoom Esri's coast is the map's only one (prepStreets, laySea):
+// the AEC's is coarse, 10-40m off Esri's along most shores and hundreds of
+// metres where it rounds an islet away, and it leaves out whole rocks Esri
+// draws (the Hogan and Kent Groups'). So under the fills each seat claims the
+// land nearest its own coast - its waters, below - and the sea mask cuts them
+// back to Esri's land: every bit of land Esri draws takes the colour of the
+// seat whose coast lies nearest it. Esri's coast takes over from the AEC's as
+// the zoom passes the streets' first stretch (seaA), tile by tile as their
+// seas arrive (st.known), so neither coast ever jumps to the other.
+const seaA = () => smooth(STREETS.k0, STREETS.k0 * 1.4, T.k);
+// the paint's sea cut, for drawFocus: the year it was cut for and how far it has taken over
 let seaNow = null;
-const growBox = (b, x0, y0, x1, y1, w) => b && !(b[1][0] < x0 - w || b[0][0] > x1 + w || b[1][1] < y0 - w || b[0][1] > y1 + w);
+const inBox = (b, x0, y0, x1, y1) => b && !(b[1][0] < x0 || b[0][0] > x1 || b[1][1] < y0 || b[0][1] > y1);
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
-  let unit = 0;
-  if (st && st.cover) {
-    const c = proj.invert([(Wpx / 2 - T.x) / T.k, (Hpx / 2 - T.y) / T.k]), p0 = proj(c), p1 = proj([c[0], c[1] + 0.01]);
-    unit = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 1113.2;
-  }
-  const grows = unit ? growsAt(unit) : [], grow = unit * (grows[0] || 0);
-  if (streetA !== undefined) seaNow = unit ? { m, unit } : null;
+  const sa = st && st.known ? seaA() : 0;
+  if (streetA !== undefined) seaNow = sa > 0 ? { m, sa } : null;
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
@@ -188,37 +181,38 @@ function drawGeo(m, alpha, streetA) {
   const [x0, y0, x1, y1] = viewBox();
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
   const filt = filtersOn();
-  const fills = [];
+  const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
-    if (!growBox(g.bb[i], x0, y0, x1, y1, grow)) continue;
+    if (!inBox(g.bb[i], x0, y0, x1, y1) && !sa) continue;
     let c = fillDiv(m, i);
     // (another year's map, under a year morph, quiets with the zoom alone)
     const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
     if (m === M() && qn > 0 && qn < 0.72 && i === selDiv()) needFrame = true;
-    fills.push([i, c ? css(c) : pat, filt && !passes(m, i)]);
+    fillOf[i] = [c ? css(c) : pat, filt && !passes(m, i)];
+    if (inBox(g.bb[i], x0, y0, x1, y1)) fills.push(i);
   }
   // the islands where they lie, past the mainland frame: their seat's colour, quieted
   // as it is; plain land in a year no seat holds one
-  const isls = (m.isl || []).filter((q) => growBox(q.mbb, x0, y0, x1, y1, grow));
-  const islFills = isls.map((q) => {
+  const isls = (m.isl || []).filter((q) => inBox(q.mbb, x0, y0, x1, y1));
+  const islFill = (q) => {
     let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
     const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
-    return [q, c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];
-  });
-  // under the fills, each seat's coast stroked in its own colour: the seats
-  // grown seaward, so the land between the AEC's coast and Esri's is theirs
-  for (const w of grows) {
-    ctx.lineWidth = 2 * w * unit;
-    for (const [i, f, out] of fills) { const p = g.coastOf(i); ctx.strokeStyle = f; ctx.stroke(p); if (out) { ctx.strokeStyle = css(th.bg, 0.8); ctx.stroke(p); } }
-    for (const [q, f, out] of islFills) { ctx.strokeStyle = f; ctx.stroke(q.mpath); if (out) { ctx.strokeStyle = css(th.bg, 0.8); ctx.stroke(q.mpath); } }
+    return [c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];
+  };
+  if (sa) {
+    const islOf = (m.isl || []).map(islFill);
+    const look = (lab) => (lab < m.divs.length ? fillOf[lab] : islOf[lab - m.divs.length]);
+    layWaters(m, g, st, look, alpha * sa);
   }
-  for (const [i, f, out] of fills) {
+  for (const i of fills) {
+    const [f, out] = fillOf[i];
     ctx.fillStyle = f; ctx.fill(g.paths[i]);
     if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
   }
-  for (const [q, f, out] of islFills) {
+  for (const q of isls) {
+    const [f, out] = islFill(q);
     ctx.fillStyle = f; ctx.fill(q.mpath);
     if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(q.mpath); }
   }
@@ -226,44 +220,177 @@ function drawGeo(m, alpha, streetA) {
   ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k; ctx.stroke(g.meshDiv);
   ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.meshState);
   ctx.strokeStyle = css(th.state, 0.7); ctx.lineWidth = 0.9 / T.k; ctx.stroke(g.meshState);
-  // the AEC's coast, where Esri's isn't the one drawn
-  if (!grow) {
-    ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
-    for (const q of isls) ctx.stroke(q.mpath);
+  // the AEC's coast: whole where no sea of Esri's has come in, fading out where one has
+  if (sa < 1) {
+    const aec = () => { ctx.stroke(g.coast); for (const q of isls) ctx.stroke(q.mpath); };
+    ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k;
+    if (!sa) aec();
+    else {
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+      const out = new Path2D(); out.rect(-1, -1, canvas.width + 2, canvas.height + 2); out.addPath(st.known);
+      ctx.clip(out, "evenodd"); ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); aec(); ctx.restore();
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clip(st.known); ctx.globalAlpha = alpha * (1 - sa);
+      ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); aec(); ctx.restore();
+    }
   }
   ctx.restore();
-  if (grow) laySea(st, alpha);
+  if (sa) laySea(st, alpha * sa);
+  if (streetA !== undefined && !sa) warmWaters();
+}
+
+/* ----- the seats' waters -----
+   The plane cut into the Voronoi cells of every coast vertex (each AEC coast
+   arc belongs to the one seat whose ring uses it; the federal islands' coasts
+   to their island), each cell its seat's: a seat's waters are the land and sea
+   nearer its coast than any other's. Made per square region (WATER_R map units,
+   ~27km) as a view first needs one, from the coast points within a region of
+   it, under a budget a frame (the rest follow on the next frames, and the view
+   in reach of street zoom is made ahead in idle time). */
+const WATER_R = 6, WATER_STEP = 0.3, WATER_BUDGET = 4, WATER_REACH = 2;
+const rKey = (rx, ry) => (rx + 4096) * 8192 + ry + 4096;
+// the coast points, bucketed by region; read off the topology a slice at a time
+// (step), so no paint and no idle slice ever carries the whole of it
+function watersOf(m, g) {
+  if (g.waters) return g.waters;
+  const topo = g.topo, n = topo.arcs.length, use = new Uint8Array(n), own = new Int32Array(n).fill(-1);
+  for (const gm of topo.objects.divs.geometries) {
+    const i = g.at(gm), rs = gm.type === "Polygon" ? gm.arcs : gm.type === "MultiPolygon" ? gm.arcs.flat() : [];
+    for (const r of rs) for (const a of r) { const k = a < 0 ? ~a : a; use[k] = Math.min(2, use[k] + 1); own[k] = i ?? -1; }
+  }
+  return (g.waters = { m, g, use, own, k: 0, isl: 0, done: false, xs: [], ys: [], lab: [], bucket: new Map(), regions: new Map() });
+}
+function stepWaters(W, budget) {
+  const t0 = performance.now(), { g, m } = W, topo = g.topo, tf = topo.transform, P = g.proj, n = topo.arcs.length;
+  const put = (x, y, l) => {
+    const key = rKey(Math.floor(x / WATER_R), Math.floor(y / WATER_R));
+    let b = W.bucket.get(key); if (!b) W.bucket.set(key, (b = []));
+    b.push(W.xs.length); W.xs.push(x); W.ys.push(y); W.lab.push(l);
+  };
+  // a coast line's points, its long straight runs filled in every WATER_STEP so a
+  // neighbour's points never reach past the middle of a run
+  const line = (pts, l) => {
+    let px = 0, py = 0;
+    pts.forEach((ll, k) => {
+      const [x, y] = P(ll);
+      if (k) { const S = Math.ceil(Math.hypot(x - px, y - py) / WATER_STEP); for (let s = 1; s < S; s++) put(px + ((x - px) * s) / S, py + ((y - py) * s) / S, l); }
+      put(x, y, l); px = x; py = y;
+    });
+  };
+  while (W.k < n) {
+    const k = W.k++;
+    if (W.use[k] === 1 && W.own[k] >= 0) {
+      let x = 0, y = 0;
+      line(tf ? topo.arcs[k].map(([dx, dy]) => [(x += dx) * tf.scale[0] + tf.translate[0], (y += dy) * tf.scale[1] + tf.translate[1]]) : topo.arcs[k], W.own[k]);
+    }
+    if ((k & 31) === 31 && performance.now() - t0 > budget) return false;
+  }
+  const isl = m.isl || [];
+  while (W.isl < isl.length) { for (const r of isl[W.isl].rings) line(r, m.divs.length + W.isl); W.isl++; }
+  W.done = true; W.use = W.own = null;
+  return true;
+}
+// a region's waters: the cells of the coast points within reach of it, cut to its square
+function waterRegion(W, rx, ry) {
+  const R = WATER_R, ax = rx * R - WATER_REACH, ay = ry * R - WATER_REACH, bx = (rx + 1) * R + WATER_REACH, by = (ry + 1) * R + WATER_REACH;
+  let pts = [], labs = [];
+  const gather = (reach) => {
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+      const b = W.bucket.get(rKey(rx + dx, ry + dy)); if (!b) continue;
+      for (const k of b) { const x = W.xs[k], y = W.ys[k]; if (!reach || (x >= ax && x <= bx && y >= ay && y <= by)) { pts.push(x, y); labs.push(W.lab[k]); } }
+    }
+  };
+  gather(true);
+  // no coast in reach: the nearest coast further off claims it all, if any
+  if (!labs.length) gather(false);
+  const paths = new Map();
+  if (labs.length) {
+    const vor = new d3.Delaunay(Float64Array.from(pts)).voronoi([rx * R, ry * R, (rx + 1) * R, (ry + 1) * R]);
+    for (let k = 0; k < labs.length; k++) { let p = paths.get(labs[k]); if (!p) paths.set(labs[k], (p = new Path2D())); vor.renderCell(k, p); }
+  }
+  return paths;
+}
+// the regions over the view, made while the budget lasts (all false: not all made yet)
+function watersInView(m, g, budget) {
+  const W = watersOf(m, g), t0 = performance.now(), out = [];
+  if (!W.done && (budget < 0 || !stepWaters(W, budget))) return { out, all: false };
+  const [x0, y0, x1, y1] = viewBox(), R = WATER_R;
+  let all = true;
+  for (let rx = Math.floor(x0 / R); rx <= Math.floor(x1 / R); rx++) for (let ry = Math.floor(y0 / R); ry <= Math.floor(y1 / R); ry++) {
+    const key = rKey(rx, ry);
+    let r = W.regions.get(key);
+    if (!r) {
+      if (performance.now() - t0 > budget) { all = false; continue; }
+      W.regions.set(key, (r = waterRegion(W, rx, ry)));
+    }
+    if (r.size) out.push(r);
+  }
+  return { out, all };
+}
+// the waters on a layer of their own, cut back to Esri's land and laid under the fills
+function layWaters(m, g, st, look, a) {
+  const { out, all } = watersInView(m, g, WATER_BUDGET);
+  if (!all) needFrame = true;
+  const L = layer(), W = canvas.width, H = canvas.height;
+  L.save(); L.clip(st.known);
+  L.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  for (const r of out) for (const [lab, p] of r) { const f = look(lab); if (!f) continue; L.fillStyle = f[0]; L.fill(p); if (f[1]) { L.fillStyle = css(TH.bg, 0.8); L.fill(p); } }
+  L.restore();
+  L.globalCompositeOperation = "destination-out"; L.drawImage(seaCv, 0, 0);
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a; ctx.drawImage(L.canvas, 0, 0, W, H); ctx.restore();
+}
+// a scratch layer the size of the canvas (the waters, then the veil, each paint)
+let scratchLay = null;
+function layer() {
+  const W = canvas.width, H = canvas.height;
+  if (!scratchLay) scratchLay = document.createElement("canvas");
+  if (scratchLay.width !== W || scratchLay.height !== H) { scratchLay.width = W; scratchLay.height = H; }
+  const L = scratchLay.getContext("2d");
+  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
+  L.clearRect(0, 0, W, H);
+  return L;
+}
+// near street zoom the regions under the view are made ahead, in idle time
+let waterIdle = 0;
+function warmWaters() {
+  if (waterIdle || !window.requestIdleCallback || S.view !== "map" || T.k < STREETS.k0 * 0.5) return;
+  const m = M(); if (!m || !m.geoHi) return;
+  waterIdle = requestIdleCallback((dl) => {
+    waterIdle = 0;
+    const m2 = M(); if (!m2 || m2 !== m || !m.geoHi) return;
+    const g = m.geoHi, keep = T;
+    // the view as it will be at street zoom's door: the same middle, the streets' first zoom
+    const c = [(Wpx / 2 - T.x) / T.k, (Hpx / 2 - T.y) / T.k], k = Math.max(T.k, STREETS.k0);
+    T = d3.zoomIdentity.translate(Wpx / 2 - c[0] * k, Hpx / 2 - c[1] * k).scale(k);
+    let all;
+    try { ({ all } = watersInView(m, g, Math.max(1, Math.min(8, dl.timeRemaining() - 2)))); } finally { T = keep; }
+    if (!all) warmWaters();
+  });
 }
 
 // the veil, drawn whole on a layer and laid at its strength, its edge the
-// grown seats' (the same widths in the same order as drawGeo's, so each
-// stretch of land beyond the AEC's coasts is veiled as its colour's seat is):
-// with a seat open (sd) everything but that seat, the sea veiled with the
-// rest; with a state open its seats clear and the sea left clear too
-let veilLay = null;
-function veilSea(unit, sd, a) {
+// seats' waters (so each stretch of land beyond the AEC's coasts is veiled as
+// its colour's seat is): with a seat open (sd) everything but that seat, the
+// sea veiled with the rest; with a state open its seats clear and the sea left clear too
+function veilSea(sd, a) {
   const m = M(), g = geoOf(m), th = TH, W = canvas.width, H = canvas.height;
-  if (!veilLay) veilLay = document.createElement("canvas");
-  if (veilLay.width !== W || veilLay.height !== H) { veilLay.width = W; veilLay.height = H; }
-  const L = veilLay.getContext("2d");
-  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
-  L.clearRect(0, 0, W, H);
-  L.fillStyle = L.strokeStyle = css(th.bg); L.lineJoin = L.lineCap = "round";
-  if (sd != null) L.fillRect(0, 0, W, H);
   const clear = sd != null ? (i) => i === sd : (i) => m.divs[i].st === S.sel.st;
-  const [x0, y0, x1, y1] = viewBox(), grows = growsAt(unit), grow = unit * grows[0];
-  const vis = m.divs.filter((d) => growBox(g.bb[d.i], x0, y0, x1, y1, grow)).map((d) => d.i);
-  const isls = (m.isl || []).filter((q) => growBox(q.mbb, x0, y0, x1, y1, grow));
+  const [x0, y0, x1, y1] = viewBox();
+  const vis = m.divs.filter((d) => inBox(g.bb[d.i], x0, y0, x1, y1)).map((d) => d.i);
+  const isls = (m.isl || []).filter((q) => inBox(q.mbb, x0, y0, x1, y1));
   const islClear = (q) => q.owner != null && clear(q.owner);
+  const { out } = watersInView(m, g, -1);
+  const labClear = (lab) => (lab < m.divs.length ? clear(lab) : islClear(m.isl[lab - m.divs.length]));
   // a state's veil with none of the other states' seats in view is nothing
-  if (sd == null && vis.every(clear) && isls.every(islClear)) return;
+  if (sd == null && vis.every(clear) && isls.every(islClear) && out.every((r) => [...r.keys()].every(labClear))) return;
+  const L = layer();
+  L.fillStyle = css(th.bg);
+  if (sd != null) L.fillRect(0, 0, W, H);
   const op = (yes) => { L.globalCompositeOperation = yes ? "destination-out" : "source-over"; };
+  L.save(); L.clip(prepKnown);
   L.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
-  for (const w of grows) {
-    L.lineWidth = 2 * w * unit;
-    for (const i of vis) { op(clear(i)); L.stroke(g.coastOf(i)); }
-    for (const q of isls) { op(islClear(q)); L.stroke(q.mpath); }
-  }
+  for (const r of out) for (const [lab, p] of r) { op(labClear(lab)); L.fill(p); }
+  L.restore();
+  L.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   for (const i of vis) { op(clear(i)); L.fill(g.paths[i]); }
   for (const q of isls) { op(islClear(q)); L.fill(q.mpath); }
   L.setTransform(1, 0, 0, 1, 0, 0);
@@ -275,7 +402,7 @@ function veilSea(unit, sd, a) {
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = a;
-  ctx.drawImage(veilLay, 0, 0);
+  ctx.drawImage(L.canvas, 0, 0);
   ctx.restore();
 }
 // pathOf: each seat's shape as painted (a year morph passes its seats' shapes mid-change)
@@ -284,11 +411,11 @@ function drawFocus(m, pathOf) {
   ctx.save();
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   const [x0, y0, x1, y1] = viewBox();
-  // where Esri's sea cuts the coast (drawGeo) the veil follows the grown seats
-  // and lies on the sea alike, so its edge is never the AEC's coast
-  const sea = seaNow && seaNow.m === m ? seaNow : null;
-  if (sea && (sd != null || S.sel.level === "state")) {
-    veilSea(sea.unit, sd, sd != null ? th.veil : th.veil * 0.85);
+  // where Esri's sea has taken the coast (drawGeo) the veil follows the seats'
+  // waters and lies on the sea alike, so its edge is never the AEC's coast
+  const sea = seaNow && seaNow.m === m && !pathOf ? seaNow : null;
+  if (sea && sea.sa > 0.5 && (sd != null || S.sel.level === "state")) {
+    veilSea(sd, sd != null ? th.veil : th.veil * 0.85);
   } else if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(P(sd));
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
@@ -300,7 +427,7 @@ function drawFocus(m, pathOf) {
   }
   // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
   const outline = (i) => {
-    if (sea) { ctx.stroke(g.edgeOf(i)); return; }
+    if (sea && sea.sa > 0.5) { ctx.stroke(g.edgeOf(i)); return; }
     ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
   };
   const h = S.hover;
@@ -574,7 +701,7 @@ function drawYearMorph(mo, t) {
   for (const i of order) {
     const s = mo.seats[i], u = (us[i] = morphU(mo, i, t));
     const p = (mo.cur[i] = s.kind === "morph" ? morphPath(s.sm, su) : g.paths[i]);
-    if (s.kind !== "morph" && !growBox(g.bb[i], x0, y0, x1, y1, 0)) continue;
+    if (s.kind !== "morph" && !inBox(g.bb[i], x0, y0, x1, y1)) continue;
     const c = quiet(i, s.kind === "new" ? s.cn : morphColor(s, u));
     ctx.globalAlpha = s.kind === "new" ? newA(mo, u) : 1;
     ctx.fillStyle = c ? css(c) : pat; ctx.fill(p, "evenodd");
@@ -582,7 +709,7 @@ function drawYearMorph(mo, t) {
   }
   // the islands where they lie, in their seat's colour as it turns
   for (const q of m.isl || []) {
-    if (!growBox(q.mbb, x0, y0, x1, y1, 0)) continue;
+    if (!inBox(q.mbb, x0, y0, x1, y1)) continue;
     const s = q.owner != null ? mo.seats[q.owner] : null, u = q.owner != null ? us[q.owner] : 1;
     const c = s ? quiet(q.owner, s.kind === "new" ? s.cn : morphColor(s, u)) : th.nodata;
     ctx.globalAlpha = s && s.kind === "new" ? newA(mo, u) : mo.cross ? smooth(0, 0.7, t) : 1;
@@ -595,7 +722,7 @@ function drawYearMorph(mo, t) {
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k;
   for (let i = 0; i < m.divs.length; i++) {
-    const s = mo.seats[i], p = mo.cur[i]; if (!p || (s.kind !== "morph" && !growBox(g.bb[i], x0, y0, x1, y1, 0))) continue;
+    const s = mo.seats[i], p = mo.cur[i]; if (!p || (s.kind !== "morph" && !inBox(g.bb[i], x0, y0, x1, y1))) continue;
     ctx.globalAlpha = s.kind === "new" ? newA(mo, us[i]) : 1; ctx.stroke(p);
   }
   ctx.globalAlpha = mo.cross ? smooth(0.15, 0.85, t) : 1;
@@ -622,12 +749,16 @@ const voteScale = (v) => Math.min(2.5, v <= 4000 ? Math.sqrt(v / 1000) : 2 * Mat
 const rad = (votes) => Math.max(1.6 + 0.6 * roomy(), dotBase() * voteScale(votes));
 // the paper ring that parts overlapping dots, thinner on the small ones
 const halo = (r) => clamp(0.18 * r + 0.5, 0.8, 1.6);
+// every seat's booths come up over the zoom's last stretch to city zoom
+// (K_ALL, where the key and the hint turn to them), not all in one frame
+const K_IN = K_ALL * 0.8;
+const boothIn = () => smooth(K_IN, K_ALL, T.k);
 function visibleBooths(m) {
   const b = m.booth, out = [], sd = selDiv();
-  if (sd == null && T.k < K_ALL) return out;
+  if (sd == null && T.k < K_IN) return out;
   const [x0, y0, x1, y1] = viewBox(), pad = 24 / T.k;
   if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j])) out.push(j);
-  if (T.k >= K_ALL) for (let j = 0; j < b.n; j++) {
+  if (T.k >= K_IN) for (let j = 0; j < b.n; j++) {
     if (b.d[j] === sd || b.ty[j] !== 1) continue;
     const x = b.x[j], y = b.y[j];
     if (Number.isNaN(x) || x < x0 - pad || x > x1 + pad || y < y0 - pad || y > y1 + pad) continue;
@@ -648,11 +779,11 @@ function drawBooths(m) {
   ctx.save();
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / dpr));
-  const rf = S.f.range && S.listUnit === "booths" ? S.f.range : null;
+  const rf = S.f.range && S.listUnit === "booths" ? S.f.range : null, rise = boothIn();
   for (const j of list) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]);
     if (x < -r || y < -r || x > Wpx + r || y > Hpx + r) continue;
-    let a = sd != null && b.d[j] !== sd ? 0.5 : 1;
+    let a = sd != null && b.d[j] !== sd ? 0.5 * rise : b.d[j] === sd ? 1 : rise;
     if (rf && !inRange(boothColValue(m, j, rf.key), rf)) a *= 0.2;
     ctx.globalAlpha = a * ovA;
     boothShape(ctx, b.ty[j], x, y, r + halo(r)); ctx.fillStyle = css(th.bg); ctx.fill();
@@ -775,7 +906,7 @@ function tileAt(dark, z, x, y, want) {
     tiles.set(key, t); streetLive++;
     fetch(`${SVC_T}/${z}/${y}/${x}.pbf`)
       .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then((b) => { const pr = mvtParse(new Uint8Array(b)); t.cv = renderTile(pr, dark, z, tilePx()); t.sea = seaPath(pr.sea); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); })
+      .then((b) => { t.buf = b; t.dark = dark; t.z = z; tileQueue.push(t); })
       .catch(() => { t.failed = true; })
       .finally(() => { streetLive--; schedule(); });
     if (tiles.size > streetCap()) pruneTiles();
@@ -783,8 +914,23 @@ function tileAt(dark, z, x, y, want) {
   if (t) t.used = streetUse;
   return t;
 }
+// tiles that have arrived wait to be read and drawn in the paint, a few
+// milliseconds' worth a frame, so a burst of arrivals never holds up one frame
+// (the coarser tile on hand stands in meanwhile)
+const tileQueue = [], TILE_BUDGET = 5;
+function drainTiles() {
+  const t0 = performance.now();
+  while (tileQueue.length && performance.now() - t0 < TILE_BUDGET) {
+    const t = tileQueue.shift();
+    if (!t.buf) continue;
+    try { const pr = mvtParse(new Uint8Array(t.buf)); t.cv = renderTile(pr, t.dark, t.z, tilePx()); t.sea = seaPath(pr.sea); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); }
+    catch { t.failed = true; }
+    t.buf = null;
+  }
+  if (tileQueue.length) needFrame = true;
+}
 function pruneTiles() {
-  const old = [...tiles].filter(([, t]) => (t.ready || t.failed) && t.used < streetUse).sort((a, b) => a[1].used - b[1].used);
+  const old = [...tiles].filter(([, t]) => (t.ready || t.failed || t.buf) && t.used < streetUse).sort((a, b) => a[1].used - b[1].used);
   for (const [k] of old.slice(0, tiles.size - Math.round(streetCap() * 0.75))) tiles.delete(k);
 }
 /* the tile reaches us as a protobuf of layers of tagged line/polygon
@@ -1001,12 +1147,72 @@ function seaQuad(g, sea, q, s = 1, ox = 0, oy = 0, line = 0) {
    coasts showed. Where every tile in view has a sea to hand (cover), the
    seats are drawn grown past their AEC coasts (SEA_GROW, drawGeo) and laySea
    then puts the plain sea back over everything seaward of Esri's coast. */
-let seaCv = null, seaLay = null;
+let seaCv = null, seaLay = null, prepKnown = null;
+/* An island the AEC draws and Esri's sea covers whole (Curtis Island, in
+   Bass: Esri has it only as a reserve laid over its sea) would be cut away
+   with the sea. Each small ring of the seats' (under ~100 km2) is tested at
+   a point inside it against the sea of the tile it lies in, once a tile, and
+   one the sea swallows is cut back out of the mask, its AEC coast drawn. */
+// (a seat's small rings, made the first time the seat is in view at street zoom)
+function islets(g, i) {
+  const all = (g.islets ??= []);
+  if (all[i]) return all[i];
+  const out = (all[i] = []), P = g.proj, ps = g.polys(i);
+  if (ps) {
+    for (const pg of ps) {
+      const r = pg.outer; if (Math.abs(ringArea(r)) > 5) continue;
+      const [cx, cy] = ringMid(r);
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (let k = 0; k < r.length; k += 2) { x0 = Math.min(x0, r[k]); x1 = Math.max(x1, r[k]); y0 = Math.min(y0, r[k + 1]); y1 = Math.max(y1, r[k + 1]); }
+      const pt = ringInside(r, cx, cy), path = new Path2D();
+      for (let k = 0; k < r.length; k += 2) (k ? path.lineTo : path.moveTo).call(path, r[k], r[k + 1]);
+      path.closePath();
+      out.push({ i, bb: [[x0, y0], [x1, y1]], at: merc(P.invert(pt)), path, seen: new WeakMap() });
+    }
+  }
+  return out;
+}
+// a point inside a flat ring: the middle of its bounds where that is in it,
+// else the middle of the widest span of the line across it there
+function ringInside(r, cx, cy) {
+  const xs = [];
+  for (let k = 0, n = r.length; k < n; k += 2) {
+    const ax = r[k], ay = r[k + 1], bx = r[(k + 2) % n], by = r[(k + 3) % n];
+    if ((ay <= cy) !== (by <= cy)) xs.push(ax + ((cy - ay) * (bx - ax)) / (by - ay));
+  }
+  xs.sort((a, b) => a - b);
+  let best = [cx, cy], w = -1, mid = false;
+  for (let k = 0; k + 1 < xs.length; k += 2) { if (xs[k] <= cx && cx <= xs[k + 1]) mid = true; if (xs[k + 1] - xs[k] > w) { w = xs[k + 1] - xs[k]; best = [(xs[k] + xs[k + 1]) / 2, cy]; } }
+  return mid ? [cx, cy] : best;
+}
+function rescue(st, sg) {
+  const m = M(); if (!m) return;
+  const g = geoOf(m), [x0, y0, x1, y1] = viewBox();
+  hitCtx.setTransform(1, 0, 0, 1, 0, 0);
+  for (let i = 0; i < m.divs.length; i++) if (inBox(g.bb[i], x0, y0, x1, y1)) for (const r of islets(g, i)) {
+    if (!inBox(r.bb, x0, y0, x1, y1)) continue;
+    for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
+      const n = 2 ** tz, u = r.at[0] * n - tx, v = r.at[1] * n - ty;
+      if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
+      let wet = r.seen.get(sea);
+      if (wet == null) r.seen.set(sea, (wet = hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s)));
+      if (wet) st.saved.push(r);
+      break;
+    }
+  }
+  if (!st.saved.length) return;
+  sg.save();
+  sg.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  sg.globalCompositeOperation = "destination-out";
+  for (const r of st.saved) sg.fill(r.path);
+  sg.restore();
+}
 function prepStreets(alpha) {
   streetDrawn.length = 0;
   if (!proj || alpha <= 0.004) return null;
   const dark = TH.dark, W = canvas.width, H = canvas.height, now = performance.now();
   streetUse++;
+  drainTiles();
   const inv = (sx, sy) => merc(proj.invert([(sx - T.x) / T.k, (sy - T.y) / T.k]));
   // the zoom whose pixels match the screen's, read at the middle of the view
   const m0 = inv(Wpx / 2, Hpx / 2), m1 = inv(Wpx / 2 + 64, Hpx / 2);
@@ -1029,9 +1235,17 @@ function prepStreets(alpha) {
   g.fillStyle = `rgb(${land},${land},${land})`; g.fillRect(0, 0, W, H);
   const sg = seaCv.getContext("2d");
   sg.setTransform(1, 0, 0, 1, 0, 0); sg.clearRect(0, 0, W, H); sg.fillStyle = "#000";
-  let cover = true;
-  const seas = [];
-  const sea1 = (...a) => { seaQuad(sg, ...a); seas.push(a); };
+  // known: the quads whose sea is in hand (a tile's own, a coarser one's part, or all
+  // four finer ones'), where Esri's coast stands in for the AEC's
+  const seas = [], known = new Path2D();
+  let some = false;
+  const sea1 = (tz, tx, ty, ...a) => { seaQuad(sg, ...a); seas.push({ tz, tx, ty, a }); };
+  const know = (q) => {
+    // a pixel past its edges, so no hairline of the unknown opens between two known quads
+    const cx = (q[0][0] + q[1][0] + q[2][0] + q[3][0]) / 4, cy = (q[0][1] + q[1][1] + q[2][1] + q[3][1]) / 4;
+    [0, 1, 3, 2].forEach((c, k) => { const dx = q[c][0] - cx, dy = q[c][1] - cy, d = Math.hypot(dx, dy) || 1; (k ? known.lineTo : known.moveTo).call(known, q[c][0] + dx / d, q[c][1] + dy / d); });
+    known.closePath(); some = true;
+  };
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
     const q = tileQuad(z, tx, ty);
     if (Math.max(q[0][0], q[1][0], q[2][0], q[3][0]) < 0 || Math.min(q[0][0], q[1][0], q[2][0], q[3][0]) > W
@@ -1039,7 +1253,7 @@ function prepStreets(alpha) {
     const t = tileAt(dark, z, tx, ty, true);
     const f = t && t.ready ? clamp((now - t.ready) / 200, 0, 1) : 0;
     let sea = !!(t && t.ready);
-    if (sea) sea1(t.sea, q);
+    if (sea) sea1(z, tx, ty, t.sea, q);
     if (f < 1) {
       // until it arrives (and while it fades in): the nearest coarser tile on hand,
       // else the finer ones of the zoom just left
@@ -1048,20 +1262,20 @@ function prepStreets(alpha) {
         const s = 2 ** up, px = tx >> up, py = ty >> up, pt = tileAt(dark, z - up, px, py, false);
         if (pt && pt.ready) {
           const w = pt.cv.width / s; drawQuad(g, pt.cv, (tx - px * s) * w, (ty - py * s) * w, w, q, 1); held = true;
-          if (!sea) { sea1(pt.sea, q, s, tx - px * s, ty - py * s); sea = true; }
+          if (!sea) { sea1(z, tx, ty, pt.sea, q, s, tx - px * s, ty - py * s); sea = true; }
         }
       }
       if (!held && z < STREETS.zMax) {
         let kids = 0;
         for (let k = 0; k < 4; k++) {
           const cx = 2 * tx + (k & 1), cy = 2 * ty + (k >> 1), ct = tileAt(dark, z + 1, cx, cy, false);
-          if (ct && ct.ready) { const cq = tileQuad(z + 1, cx, cy); drawQuad(g, ct.cv, 0, 0, ct.cv.width, cq, 1); if (!sea) sea1(ct.sea, cq); kids++; }
+          if (ct && ct.ready) { const cq = tileQuad(z + 1, cx, cy); drawQuad(g, ct.cv, 0, 0, ct.cv.width, cq, 1); if (!sea) sea1(z + 1, cx, cy, ct.sea, cq); kids++; }
         }
         if (kids === 4) sea = true;
       }
       if (t && t.ready) needFrame = true;
     }
-    if (!sea) cover = false;
+    if (sea) know(q);
     if (f > 0) { drawQuad(g, t.cv, 0, 0, t.cv.width, q, f); streetDrawn.push({ t, z, tx, ty, f }); }
   }
   // the plain land to nothing: lifted to white on paper, differenced to black on the dark page
@@ -1072,7 +1286,10 @@ function prepStreets(alpha) {
   // on paper the streets come in at half strength over a seat's opening view
   // and reach full strength at street zoom, so a city seat still reads as its
   // colour first; on the dark page they are quiet already
-  return { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", cover, seas };
+  const st = { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", known: some ? known : null, seas, saved: [] };
+  if (some) rescue(st, sg);
+  prepKnown = st.known;
+  return st;
 }
 function layStreets(st) {
   ctx.save();
@@ -1099,7 +1316,12 @@ function laySea(st, alpha) {
   ctx.globalCompositeOperation = "source-over"; ctx.drawImage(seaLay, 0, 0);
   // the coast's hairline, as the AEC's was drawn, along Esri's
   ctx.strokeStyle = css(TH.coast, 0.55); ctx.lineJoin = "round";
-  for (const [sea, q, s = 1, ox = 0, oy = 0] of st.seas) seaQuad(ctx, sea, q, s, ox, oy, 0.7 * dpr);
+  for (const { a: [sea, q, s = 1, ox = 0, oy = 0] } of st.seas) seaQuad(ctx, sea, q, s, ox, oy, 0.7 * dpr);
+  // and the AEC's, round an island Esri's sea swallows whole
+  if (st.saved.length) {
+    ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); ctx.lineWidth = 0.7 / T.k;
+    for (const r of st.saved) ctx.stroke(r.path);
+  }
   ctx.restore();
 }
 /* the names: streets along their own line, parks and water level, read from
@@ -1760,6 +1982,7 @@ function hitTest(px, py) {
   }
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {
+    if (T.k < K_ALL && b.d[j] !== selDiv()) continue; // still coming up
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, dd = Math.hypot(px - x, py - y);
     if (dd <= Math.max(rad(b.votes[j]) + 3, 8) && dd < bd) { bd = dd; bj = j; }
   }

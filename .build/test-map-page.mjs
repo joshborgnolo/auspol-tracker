@@ -730,7 +730,10 @@ for (const y of ["sa22", "sa26"]) {
   // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens
   // above keep that lens one the year can show
   assert.ok(js.includes("const my = legendStandIn(m, y);") && !js.includes("for (const lens of yearLenses(y).map("), "the legend-height probe measures the current lens's stand-in (no lens sweep)");
-  assert.ok(js.includes("boothsShown(), S.lens, S.tppMode"), "the legend-height hold key carries the lens and its mode");
+  assert.ok(js.includes("w, S.view, y, real, S.lens, S.tppMode"), "the legend-height hold key carries the lens and its mode");
+  // the map's key holds the taller of its seats and polling-places faces, so the
+  // stage never moves as the zoom crosses to the places (2026-10-28: 23px at 1400)
+  assert.ok(js.includes('for (const bo of S.view === "map" ? [false, true] : [false])') && !js.includes("real, boothsShown(), S.lens"), "the key's hold measures both booth faces, not the one showing");
 }
 
 // ── the nsw23 frame: New South Wales' 25 March 2023 state election — the

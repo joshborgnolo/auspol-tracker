@@ -715,6 +715,8 @@ function buildGeo(topo, m) {
   const coastP = [], edgeP = [];
   return {
     paths, bb, polys,
+    // the topology itself and a geometry's seat, for the seats' waters (app-2)
+    topo, at, proj: P,
     meshDiv: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
@@ -752,7 +754,7 @@ function buildIslands(data, m) {
     const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
     // a polling place counts as the island's within a few km of its frame
     const near = [s.box[0] - 0.05, s.box[1] - 0.05, s.box[2] + 0.05, s.box[3] + 0.05];
-    return { key: s.key, name: s.name, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [], mpath, mbb: [[x0, y0], [x1, y1]] };
+    return { key: s.key, name: s.name, rings: s.rings, path, lon0, lat1, cos, w: (lon1 - lon0) * cos, h: lat1 - lat0, near, owner: o ?? null, seat: o ?? null, booths: [], mpath, mbb: [[x0, y0], [x1, y1]] };
   });
 }
 

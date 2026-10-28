@@ -77,7 +77,9 @@ function renderLenses() {
 
 /* =============================== the legend =============================== */
 let legendKey = "";
-const boothsShown = () => S.view === "map" && (selDiv() != null || T.k >= K_ALL);
+// (boothsAs: the key's measure asks for one side or the other, below)
+let boothsAs = null;
+const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL));
 const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
@@ -142,8 +144,10 @@ function legendHeightOf(m, y, w, probe) {
   const real = !!(Y[y] && Y[y].search);
   // the hold is per lens and mode: stepping through the years reuses the tallest
   // measure of the CURRENT key, so the figure never moves; switching the lens (or
-  // its flip) re-holds it once, which reads as the key's own change
-  const key = [w, S.view, y, real, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.basis, S.seat].join("|");
+  // its flip) re-holds it once, which reads as the key's own change. On the map
+  // it holds the taller of its two faces, seats and polling places, so zooming in
+  // to the places (or out of them) never moves the stage under the reader
+  const key = [w, S.view, y, real, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.basis, S.seat].join("|");
   if (!legendHeights.has(key)) {
     const keep = { seat: S.seat, year: S.year };
     let hMax = 0;
@@ -152,10 +156,13 @@ function legendHeightOf(m, y, w, probe) {
       const my = legendStandIn(m, y);
       for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
         S.seat = seat;
-        probe.innerHTML = legendHTML(my);
-        hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+        for (const bo of S.view === "map" ? [false, true] : [false]) {
+          boothsAs = bo;
+          probe.innerHTML = legendHTML(my);
+          hMax = Math.max(hMax, probe.getBoundingClientRect().height);
+        }
       }
-    } finally { Object.assign(S, keep); }
+    } finally { Object.assign(S, keep); boothsAs = null; }
     legendHeights.set(key, Math.ceil(hMax));
   }
   return legendHeights.get(key);
