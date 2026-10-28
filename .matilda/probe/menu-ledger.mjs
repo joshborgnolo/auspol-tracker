@@ -141,10 +141,9 @@ const headOf = async (url, sel) => {
       + (changed ? `; ${W[changed] || changed} ${changed === 1 ? "has" : "have"} changed hands or party since the election` : "");
     const pct = (x, t) => Math.round((100 * x) / t) + "%";
     ok(mr.d === head, `map: the line is today's House off /map/'s own data ("${mr.d}")`);
-    ok(mr.mini.length === 2 && mr.mini[0].cap === capP + " · House of Reps" && mr.mini[0].cells[0] === pct(ln, res.divs.length),
-      `map: ${mr.mini[0] && mr.mini[0].cells[0]} of ${capP} House seats`);
-    ok(mr.mini[1] && mr.mini[1].cap === capP + " · Senate" && mr.mini[1].cells[0] === pct(ss[lead] || 0, sen.senators.length),
-      `map: ${mr.mini[1] && mr.mini[1].cells[0]} of ${capP} Senate seats`);
+    ok(mr.v === pct(ln, res.divs.length) + " | " + pct(ss[lead] || 0, sen.senators.length),
+      `map: ${mr.v} is ${capP}'s House then Senate share on one line`);
+    ok(mr.c === capP + "’s share of HoR and Senate seats", `map: the caption names both chambers ("${mr.c}")`);
   }
   const pubop = await headOf("/public-opinion/", ".view-public-opinion .rd-hed");
   ok(pubop.head === row("public-opinion").d, "Public opinion: the line is the page's head");

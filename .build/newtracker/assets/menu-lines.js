@@ -38,11 +38,11 @@
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
-     Election map        the largest party's share of each chamber's seats
-                         today, one mini-row each for the House and the
-                         Senate, in its tone, under "Labor holds 94 of the
-                         150 seats" (and how many seats have changed hands or
-                         party since the election, where any have)
+     Election map        the largest party's House-then-Senate shares of each
+                         chamber's seats today on one figure line, in its
+                         tone, under "Labor holds 94 of the 150 seats" (and
+                         how many seats have changed hands or party since the
+                         election, where any have)
      Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
@@ -366,11 +366,12 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
     });
     /* both chambers today (/map/, a page outside this build): the largest
-       party's share of each chamber's seats as the figure - one mini-row per
-       chamber, the explainer's rows contract - the House's raw count in the
-       head beside the seats that have changed hands or party since the
-       election by by-election or defection. A House-only dataset keeps the
-       old single figure; a federal-less build files no line at all */
+       party's shares of each chamber's seats as one figure line, House then
+       Senate, under its caption (user call 2026-10-28: "63% | 39%", the two
+       mini-rows it replaced read too tall beside the line) - the House's raw
+       count in the head beside the seats that have changed hands or party
+       since the election by by-election or defection. A House-only dataset
+       keeps the old single share; a federal-less build files no line at all */
     put("map", () => {
       const H = D.house;
       if (!H) return null;
@@ -384,8 +385,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const party = lead === "alp" ? "Labor" : "Coalition", share = (x, t) => `${Math.round((100 * x) / t)}%`;
       const S = H.senate;
       const fig = S && S.seats && typeof S.seats[lead] === "number"
-        ? { rows: [{ cap: `${party} · House of Reps`, cells: [{ v: share(n, H.total), tone: lead }] },
-                   { cap: `${party} · Senate`, cells: [{ v: share(S.seats[lead], S.total), tone: lead }] }] }
+        ? { v: `${share(n, H.total)} | ${share(S.seats[lead], S.total)}`, cap: `${party}’s share of HoR and Senate seats`, tone: lead }
         : { v: share(n, H.total), cap: `${party} seats`, tone: lead };
       return { head, fig };
     });
