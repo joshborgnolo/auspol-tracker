@@ -57,6 +57,10 @@ for (const f of ["data/polls.json", "data/other.json"]) JSON.parse(readFileSync(
 `,
   ".build/newtracker/render-card.mjs": "",
   ".build/newtracker/render-favicon.mjs": "",
+  // the torn-tree gate refresh_site now runs (9820618d): the toy has no
+  // page refs to check, so the seed carries the exit-0 stub the renderer
+  // stubs already get
+  ".build/check-asset-refs.mjs": "",
   // the wrapper: the real wrappers' shape, cut down
   ".build/toy-updater.sh": `#!/bin/bash
 set -uo pipefail
