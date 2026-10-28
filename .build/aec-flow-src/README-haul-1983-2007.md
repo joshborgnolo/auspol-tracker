@@ -97,6 +97,51 @@ documented in the script. Rebuild deterministically with
 emitted number is gated against divs-2001.txt's printed totals
 exactly-recompose per the script's oracle run.
 
+## Division summaries + Senate lane for 1993/1996/1998 (fetched 2026-10-28)
+
+Same zip as the HPPDOP/HTPP members
+(`aec-1993-1996-1998-election-statistics.zip`, ~99MB; sha256
+`ee3b46be593dfd2b6e8f29ca1acf78a1ae4a86f0dfd0aba71f33248bdbb025e8`),
+completing the division-summary and Senate lanes across the CD-ROM era
+(1993–2001 now contiguous with the committed 2001 files):
+
+- `divs-1993.txt` ← `data/import/tables93/DIVS.TXT`
+  sha256 `2d1fe96fc7abdc6c45cfc7c5beb20bf0f08e5ea06582054743991b489d61f03c`
+- `divs-1996.txt` ← `data/import/tables96/DIVS.TXT`
+  sha256 `6189dee54a7f57269fdae3de4870a054e86f2925dcb279ea9aee2ce6ae4344ce`
+- `divs-1998.txt` ← `data/import/tables98/DIVS.TXT`
+  sha256 `8c4299421e0184278f3924aebba763366f5771c3107d0d95abeb93d930dbd4cc`
+- `scands-{1993,1996,1998}.txt` ← `SCANDS.TXT` (Senate candidates; identical
+  schema to committed `scands-2001.txt`)
+  sha256 `8ecd3ec0f55a345a51c2b60c9be7c44764f04283820523e6c383a6ce74184f14`,
+  `bc8a10aeec6d6997286826d08d4fb11d2d0b542043936e7154b1c84e8df93187`,
+  `1e93a5c9e36486789b0b707ad67f1749dfbb8697784aac69bc673a05cae582c6`
+- `sppvote-{1993,1996,1998}.csv.gz` ← `SPPVOTE.TXT` gzipped (Senate first
+  prefs by division and polling place; identical schema to committed
+  `sppvote-2001.csv.gz`), plaintext sha256
+  `7418d6c8243d67726b17e8233904214333927ad64db7dc875f9ceabb12bbe5e8`,
+  `ba11f690c3b6ff86984ddeb87c9357823c9f5e65add8cb0aaefaf5f94fffb1ef`,
+  `39a54c92d76f97310c291056660a9cee9c277511edc18188d06fb3eb9825886b`
+
+DIVS.TXT schema per its header:
+`State;Division;Enrolment;Formal Vote;Informal Vote;Total Vote;Formal Pc;
+Formal Swing;Informal Pc;Informal Swing;Turnout;Turnout Swing;ALP TPP Vote;
+Coalition TPP Vote;TPP Exhausted;ALP TPP Pc;ALP Swing` — swing cells may be
+EMPTY (no previous-election comparator, e.g. Namadgi 1996); parse those as
+null, do not coerce to 0.
+
+**1993's DIVS.TXT carries real ALP/Coalition TPP pairs + swings at division
+level.** The "1993 = informal only" floor applies to the booth-grain
+HTPPBYPP.TXT product only; the AEC's own division summary for 1993 IS the
+certified division-level Labor-v-Coalition count and it is the finest 1993
+TPP grain that exists.
+
+Division counts are the chamber counts (derived, pin via consumer tests):
+147 (1993 — pre-1995-redistribution, no Namadgi, NT single-seat) / 148
+(1996 — Namadgi in) / 148 (1998 — Blair in, Namadgi out). Files end with a
+trailing blank line; skip blank records when parsing. divs-1993.txt's 148
+lines = 147 divisions + terminator.
+
 ## psephos transcriptions (1983–1990, pre-digital AEC era)
 
 psephos/<year>/<year>reps<state>.txt — Adam Carr's verbatim transcriptions
