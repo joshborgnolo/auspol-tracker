@@ -234,7 +234,7 @@ const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 const DEMO_FROM = 2004;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, "vic22", 2025, "sa26", "now"];
+const YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, "vic22", 2025, "sa26", "now"];
 // nsw23/sa22/vic22/sa26: the 2023 New South Wales (25 March), the 2022/2026
 // South Australian (19/21 March) and the 2022 Victorian (26 November) state
 // elections — non-federal stops, drawn on their own timeline rows at their

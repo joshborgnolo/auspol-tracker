@@ -38,18 +38,22 @@ BOOTH = SRC + "/booth"
 OUT = sys.argv[1]
 FARRER = sys.argv[2] if len(sys.argv) > 2 else os.path.join(REPO, ".build", "map", "src", "farrer-31633")
 STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]
-YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
+YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
 EVENT = {2004: 12246, 2007: 13745, 2010: 15508, 2013: 17496, 2016: 20499, 2019: 24310, 2022: 27966, 2025: 31496}
-DATE = {2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02",
+# 2001 has no Virtual Tally Room event (ids start at 12246); its lanes ride
+# the statistics-pack products instead (same role)
+EVENT_STATS = 2001
+DATE = {2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02",
         2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
-PREV = {2004: 2001, 2007: 2004, 2010: 2007, 2013: 2010, 2016: 2013, 2019: 2016, 2022: 2019, 2025: 2022}
+PREV = {2001: 1998, 2004: 2001, 2007: 2004, 2010: 2007, 2013: 2010, 2016: 2013, 2019: 2016, 2022: 2019, 2025: 2022}
 # the member the new House elected Speaker at its first sitting
-SPEAKER = {2004: "Wannon", 2007: "Scullin", 2010: "Scullin", 2013: "Mackellar", 2016: "Casey", 2019: "Casey",
+SPEAKER = {2001: "Wakefield", 2004: "Wannon", 2007: "Scullin", 2010: "Scullin", 2013: "Mackellar", 2016: "Casey", 2019: "Casey",
            2022: "Oxley", 2025: "Oxley"}
 COALITION = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ"}
 BUCKETS = ["alp", "lnp", "grn", "onp", "ind", "oth"]
 # 2001 two-party preferred: state rows from the atlas history, the nation from the AEC (Labor 49.05)
-TPP2001_AUS = 49.05
+TPP1998_AUS = 50.98  # canonical 1998 ALP 2PP from data/polls.json
+TPP2001_AUS = 49.05  # canonical 2001 ALP 2PP from data/polls.json
 
 
 def bucket(ab):
@@ -365,6 +369,33 @@ def load_2001():
     return prim, tpp, names
 
 
+def load_1998():
+    """The 1998 federal election in the stats-pack era (load_2001's mirror):
+    hcands-1998.txt for state primaries, the atlas 2PP-by-state CSV for
+    per-state Labor 2PP, and fpv/1998.csv.gz for the place-continuity set
+    (the era members sit under the same haul - README-haul-1983-2007.md)."""
+    prim = collections.defaultdict(collections.Counter)
+    with open(SRC + "/hcands-1998.txt", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            if r["Party"]:
+                v = int(r["Vote"])
+                b = bucket(r["Party"])
+                prim[r["State"]][b] += v
+                prim["AUS"][b] += v
+    assert set(prim) - {"AUS"} == set(STATES), sorted(set(prim) - {"AUS"})
+    tpp = {}
+    with open(REPO + "/atlas/data/all_elections_2PP_by_state.csv", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            if r["State"] != "AUS" and r["Year"] == "1998":
+                tpp[r["State"]] = float(r["Labor_2PP_percent"])
+    tpp["AUS"] = TPP1998_AUS
+    names98 = set()
+    with gzip.open(BOOTH + "/fpv/1998.csv.gz", "rt", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            names98.add((r["Division"], norm_pp(r["Polling Place"])))
+    return prim, tpp, names98
+
+
 def build_year(year, hist, base2001):
     prev = PREV[year]
     divs = load_fpvvt(year)
@@ -584,7 +615,7 @@ def build_year(year, hist, base2001):
                 "tpp": [alp, coa, round(100 * alp / (alp + coa) - p2, 2)], "seats": dict(seats)}
 
     A = {st: agg(st) for st in ["AUS"] + STATES}
-    out = {"year": year, "event": EVENT[year], "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
+    out = {"year": year, "event": EVENT.get(year) or None, "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
            "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,
            # what a demo row describes: where voters live (2016+) vs the
            # venue's own census neighbourhood (2013) — null when no lane
@@ -750,10 +781,12 @@ def build_farrer(y2025):
 def main():
     os.makedirs(OUT, exist_ok=True)
     hist = build_history()
-    base2001 = load_2001()
+    # stats-era base lanes for previous-election comparisons below the VTR
+    # era: 2001 the existing lane, 1998 its mirror for the 2001 frame
+    base_by_prev = {1998: load_1998(), 2001: load_2001()}
     out = {}
     for y in YEARS:
-        out[y] = build_year(y, hist, base2001)
+        out[y] = build_year(y, hist, base_by_prev.get(PREV[y], base_by_prev[2001]))
     far = build_farrer(out[2025])
     now = {
         "asOf": "2026-10-25",

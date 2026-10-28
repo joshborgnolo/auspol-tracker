@@ -86,7 +86,13 @@ from v310_2001 import parse_all as v310_parse_all
 
 
 def norm(s):
-    s = re.sub(r"\s*\([^)]*\)\s*$", "", s or "")
+    s = s or ""
+    # the pack truncates names mid-word, including inside a "(Disambiguator)"
+    # tail that never closes ("Croydon Park West (Port Adelaide" beside the
+    # roll's complete "Croydon Park West (Port Adelaide)") - both forms
+    # collapse here
+    s = re.sub(r"\s*\([^()]*$", "", s)
+    s = re.sub(r"\s*\([^)]*\)\s*$", "", s)
     return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
@@ -115,6 +121,10 @@ def main():
     for st in STATES:
         by_state[st].sort(key=str.lower)
     div_id, div_state, div_rt = {}, {}, {r["Division"]: r for r in divs}
+    # place ids are global per year: div_id*10000 + local-class numbering
+    # (every AEC PollingPlaceID product presents them nation-wide-unique)
+    def gid(d, lid):
+        return div_id[d] * 10000 + lid
     for st in STATES:
         for j, d in enumerate(by_state[st]):
             div_id[d] = BLOCK_BASE[st] + 1 + j
@@ -174,7 +184,7 @@ def main():
             assert div_state[cur] == st, (cur, st)
             while len(parts) < 4:
                 parts.append("")
-            roll[cur].append({"id": len(roll[cur]) + 1, "name": parts[0],
+            roll[cur].append({"id": gid(cur, len(roll[cur]) + 1), "name": parts[0],
                               "prem": parts[1], "addr": parts[2], "sub": parts[3]})
             n_roll += 1
     assert len(roll) == 150, len(roll)
@@ -252,7 +262,7 @@ def main():
     for d, lst in mobile.items():
         lst.sort()
         for i, pp in enumerate(lst):
-            mobile_id[(d, pp)] = 1001 + i
+            mobile_id[(d, pp)] = gid(d, 1001 + i)
     place_ids = {}
     for (d, pp) in places:
         if pp in DECL:
@@ -273,7 +283,7 @@ def main():
         if pp in DECL or (d, pp) in p_roll or (d, pp) in mobile_id or \
            (d, norm(pp)) in p_roll or roll_prefix(d, pp):
             continue
-        hosp_id[d].setdefault(pp, 9001 + len(hosp_id[d]))
+        hosp_id[d].setdefault(pp, gid(d, 9001 + len(hosp_id[d])))
 
     for r in htpp:
         a, c, pc = int(r["ALP TPP Vote"] or 0), int(r["Coalition TPP Vote"] or 0), float(r["ALP TPP Pc"] or 0)
@@ -345,7 +355,7 @@ def main():
     # ------------------------------------------------------------- htpp ids
     def tpp_pid(d, pp):
         if pp in DECL:
-            return DECL[pp][1]
+            return gid(d, DECL[pp][1])
         if (d, pp) in p_roll:
             return p_roll[(d, pp)]["id"]
         if (d, norm(pp)) in p_roll:
@@ -360,7 +370,29 @@ def main():
     # ------------------------------------------------------------- emissions
     os.makedirs(BOOTH + "/oracle", exist_ok=True)
     os.makedirs(ATLAS, exist_ok=True)
-    inf_map = {(r["Division"], r["Polling Place"]): int(r["Informal Vote"] or 0) for r in htpp}
+
+    # informals land on the RESOLVED booth id (his truncated forms in htpp -
+    # "Colleg", "Hospita" - carry their informal vote to the roll booth they
+    # print, otherwise the division-level street checks pass while per-booth
+    # informal leaks; proven by the recompose gate in build_map_data.py)
+    def pid_of(d, pp):
+        if pp in DECL:
+            return gid(d, DECL[pp][1])
+        if (d, pp) in p_roll:
+            return p_roll[(d, pp)]["id"]
+        if (d, norm(pp)) in p_roll:
+            return p_roll[(d, norm(pp))]["id"]
+        if (d, pp) in mobile_id:
+            return mobile_id[(d, pp)]
+        pref = roll_prefix(d, pp)
+        if pref is not None:
+            return pref
+        return hosp_id[d][pp]
+
+    inf_map = collections.defaultdict(int)
+    for r in htpp:
+        d, pp = r["Division"], r["Polling Place"]
+        inf_map[(d, pid_of(d, pp))] += int(r["Informal Vote"] or 0)
 
     # fpv per state
     for st in STATES:
@@ -377,7 +409,7 @@ def main():
                     rows.append([st, div_id[d], d, pid, pp, c["_cid"], c["_sur"], c["_giv"], bp, c["_sit"],
                                  c["Party"], c["Party"], c1.get(bp, 0), c["Swing"] or ""])
                 rows.append([st, div_id[d], d, pid, pp, 999, "", "", "", "", "INFORMAL", "Informal",
-                             inf_map.get((d, pp), 0), ""])
+                             inf_map.get((d, pid), 0), ""])
         gzwrite(BOOTH + f"/fpv/2001-{st}.csv.gz",
                 ["StateAb", "DivisionID", "DivisionNm", "PollingPlaceID", "PollingPlace", "CandidateID",
                  "Surname", "GivenNm", "BallotPosition", "SittingMemberFl", "PartyAb", "PartyNm",
@@ -443,6 +475,11 @@ def main():
         return [st, div_id[d], d, pid, pp_caption, xi["id"], xi["Party"], xi["Party"], xi["SUR"], xi["GIV"], xi["BP"],
                 ti["id"], ti["Party"], ti["Party"], ti["SUR"], ti["GIV"], ti["BP"], n, pct]
 
+    def div_flow_row(st, d, xrow, to_row, n, pct):
+        xi, ti = xrow, to_row
+        return [st, div_id[d], d, xi["id"], xi["Party"], xi["Party"], xi["SUR"], xi["GIV"], xi["BP"],
+                ti["id"], ti["Party"], ti["Party"], ti["SUR"], ti["GIV"], ti["BP"], n, pct]
+
     # candidates in the (div, name)-keyed shape the v3_10 tables print
     for d, cl in cands.items():
         for c in cl:
@@ -457,7 +494,7 @@ def main():
     def sect_id(d, s):
         ds = _SECT_DECL.get(s, s)
         if ds in DECL:
-            return DECL[ds][1]
+            return gid(d, DECL[ds][1])
         if (d, s) in p_roll:
             return p_roll[(d, s)]["id"]
         if (d, norm(s)) in p_roll:
@@ -465,7 +502,7 @@ def main():
         if (d, s) in mobile_id:
             return mobile_id[(d, s)]
         if s in V310_PSEUDO:
-            return V310_PSEUDO[s]
+            return gid(d, V310_PSEUDO[s])
         unknown_sections.append((d, s))
         return None
 
@@ -489,14 +526,14 @@ def main():
                         xi = bind(d, cd, ab)
                         assert elx == int(xi["Vote"]), (d, cd, elx, xi["Vote"])
                         if to1:
-                            tcpflow_rows.append(flow_row(st, d, 0, "", xi, pA, to1, round(100 * to1 / elx, 2) if elx else 0))
+                            tcpflow_rows.append(div_flow_row(st, d, xi, pA, to1, round(100 * to1 / elx, 2) if elx else 0))
                         if to2:
-                            tcpflow_rows.append(flow_row(st, d, 0, "", xi, pB, to2, round(100 * to2 / elx, 2) if elx else 0))
+                            tcpflow_rows.append(div_flow_row(st, d, xi, pB, to2, round(100 * to2 / elx, 2) if elx else 0))
                     fptot = sec["fp"][0] + sec["fp"][1]
-                    tcpflow_rows.append(flow_row(st, d, 0, "", {"id": 0, "Party": "", "SUR": "First Preferences",
+                    tcpflow_rows.append(div_flow_row(st, d, {"id": 0, "Party": "", "SUR": "First Preferences",
                                                                 "GIV": "", "BP": 0}, pA, sec["fp"][0],
                                                  round(100 * sec["fp"][0] / fptot, 3) if fptot else 0))
-                    tcpflow_rows.append(flow_row(st, d, 0, "", {"id": 0, "Party": "", "SUR": "First Preferences",
+                    tcpflow_rows.append(div_flow_row(st, d, {"id": 0, "Party": "", "SUR": "First Preferences",
                                                                 "GIV": "", "BP": 0}, pB, sec["fp"][1],
                                                  round(100 * sec["fp"][1] / fptot, 3) if fptot else 0))
                     continue
@@ -587,11 +624,14 @@ def main():
         tppd.append([d, div_id[d], div_state[d], wp,
                      a, r["ALP TPP Pc"], c, round(100 - float(r["ALP TPP Pc"]), 2), a + c,
                      r["ALP Swing"] or ""])
-    gzwrite(SRC + "/tppdiv-2001.csv.gz",
-            ["DivisionNm", "DivisionID", "StateAb", "PartyAb", "Australian Labor Party Votes",
-             "Australian Labor Party Percentage", "Liberal/National Coalition Votes",
-             "Liberal/National Coalition Percentage", "TotalVotes", "Swing"], tppd,
-            "House of Representatives Two Party Preferred By Division")
+    # tppdiv lives plain beside the modern tppdiv-YYYY.csv files (loader
+    # reads .csv, not .gz)
+    with open(SRC + "/tppdiv-2001.csv", "w", newline="") as f:
+        f.write(BANNER.format(what="House of Representatives Two Party Preferred By Division") + "\n")
+        f.write("DivisionNm,DivisionID,StateAb,PartyAb,Australian Labor Party Votes,"
+                "Australian Labor Party Percentage,Liberal/National Coalition Votes,"
+                "Liberal/National Coalition Percentage,TotalVotes,Swing\n")
+        csv.writer(f).writerows(tppd)
 
     # GPP derived (roll only; mobile-class places have no named premises)
     gpp_rows = []
@@ -600,13 +640,44 @@ def main():
             for v in roll[d]:
                 gpp_rows.append([st, div_id[d], d, v["id"], 1, v["name"], v["prem"], v["addr"], "", "",
                                  v["sub"], st, ""])
-    gzwrite(ATLAS + "/GeneralPollingPlacesDownload-2001-derived.csv",
-            ["State", "DivisionID", "DivisionNm", "PollingPlaceID", "PollingPlaceTypeID", "PollingPlaceNm",
-             "PremisesNm", "PremisesAddress1", "PremisesAddress2", "PremisesAddress3", "PremisesSuburb",
-             "PremisesStateAb", "PremisesPostCode"], gpp_rows,
-            "General Polling Places (derived from the pps rolls of the election-statistics CD-ROM)")
+    # the GPP lane sits plain beside the AEC downloads like the other years
+    with open(ATLAS + "/GeneralPollingPlacesDownload-2001-derived.csv", "w", newline="") as f:
+        f.write(BANNER.format(what="House of Representatives General Polling Places") + "\n")
+        f.write("State,DivisionID,DivisionNm,PollingPlaceID,PollingPlaceTypeID,PollingPlaceNm,"
+                "PremisesNm,PremisesAddress1,PremisesAddress2,PremisesAddress3,PremisesSuburb,"
+                "PremisesStateAb,PremisesPostCode\n")
+        csv.writer(f).writerows(gpp_rows)
 
-    # ------------------------------------------------------------ recaps
+    # --------------------------------------------------------- place-id map
+    # The whole (division, printed place) -> synthetic id map, one home: the
+    # lane products the pack writes, and pack-2001-senate.py for the Senate
+    # lanes take identities from it (its own pseudo vocabulary lands here as
+    # the same ids).
+    pm = collections.defaultdict(dict)
+    for (d, pp), pid in place_ids.items():
+        pm[d][pp] = pid
+    for (d, pp), pid in mobile_id.items():
+        pm[d].setdefault(pp, pid)
+    for dd, m in hosp_id.items():
+        for pp, pid in m.items():
+            pm[dd][pp] = pid
+    pm_doc = {
+        "_about": "Place -> synthetic id map for the pack-era 2001 lanes (pack-2001-booth.py's own "
+                  "assignment; roll venues keep their 1..k roll order per division, hppdop mobile-class "
+                  "pseudo teams 1001+, v3_10 pseudo aggregates 2001-2003, declaration pseudo places "
+                  "8001-8004, special-placement rows htpp alone names 9001+). The Senate lane pack "
+                  "(.build/map/pack-2001-senate.py) and any other 2001-era lanes read ids from here.",
+        "divisions": {d: {"id": div_id[d], "st": div_state[d]} for d in div_id},
+        "places": {"roll": {d: {} for d in pm},}
+    }
+    for d in pm:
+        pm_doc["places"]["roll"][d] = pm[d]
+    import json as _json
+    with open(SRC + "/place-ids-2001.json", "w") as f:
+        _json.dump(pm_doc, f, separators=(",", ":"))
+    print("place-ids-2001.json:", sum(len(v) for v in pm_doc["places"]["roll"].values()), "place ids")
+
+        # ------------------------------------------------------------ recaps
     print("pps roll venues:", n_roll)
     print("mobile-class pseudo places:", len(mobile_id), "| htpp-only hospitals:", sum(len(v) for v in hosp_id.values()))
     print("fpv lanes:", {st: st for st in STATES}.keys())

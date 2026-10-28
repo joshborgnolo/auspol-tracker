@@ -94,8 +94,47 @@ assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assem
 }
 assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
-for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+}
+{ // the 2001 federal frame (.build/map/README-era recipes: pack-2001-booth.py's VTR lanes,
+  // v310-2001.txt.gz official per-place flows, asgc2001.gpkg boundary plus the
+  // senate lanes on the handbook caches and sppvote). AsOf is the election's day and
+  // seats/total figures are the AEC's own (howard 82 seats, TISBHG-independent 1 seat).
+  for (const f of ["senate-2001.json", "senate-vote-2001.json", "res-2001.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "2001 lane " + f + " on disk");
+  assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-2001.json")), "the 2001 venue store (derive-2001-venues.py) is on disk");
+  const D = JSON.parse(R("map/data/data-2001.json"));
+  const r = JSON.parse(R("map/data/res-2001.json"));
+  const S = JSON.parse(R("map/data/senate-2001.json"));
+  const SV = JSON.parse(R("map/data/senate-vote-2001.json"));
+  assert.equal(D.year, 2001);
+  assert.equal(D.divs.length, 150, "2001 has its 150 divisions");
+  assert.equal(D.date, "2001-11-10");
+  assert.equal(D.prev, 1998, "2001's previous election is 1998");
+  assert.equal(D.speaker, "Wakefield");
+  assert.equal(D.event, null, "2001 has no VTR event id (stats-pack era)");
+  const tally = {};
+  for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
+  const B = D.booths;
+  assert.equal(Object.keys(B).length, 16, "the booth lane is the full columnar");
+  {
+    const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
+    assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
+  }
+  assert.ok(B.lat, "booth coordinate lane present");
+  assert.equal(S.senators.length, 76, "76 senators after the 2001 election");
+  assert.equal(S.asOf, "2002-07-01", "the 2001 senate's seating day is 2002-07-01");
+  const partyOf = {};
+  for (const s of S.senators) partyOf[s.ab] = (partyOf[s.ab] || 0) + 1;
+  assert.deepEqual(partyOf, { LP: 31, ALP: 28, AD: 8, NP: 4, GRN: 2, IND: 2, ON: 1 }, "parliament 40's party balance");
+  assert.equal(S.senators.find((s) => s.role === "president")?.n, "Paul Calvert");
+  assert.equal(S.senators.find((s) => s.role === "leader")?.n, "Robert Hill");
+  assert.equal(S.senators.find((s) => s.role === "oppLeader")?.n, "John Faulkner");
+  assert.equal(Object.keys(SV.divs).length, 150, "senate-vote-2001 has all divisions");
+  const seatsById = r.divs.map((d) => d.n).sort();
+  assert.deepEqual(D.divs.map((d) => d.n).sort(), seatsById, "data-2001.json and res-2001.json carry the same divisions");
+
 }
 // the people-interp contract (derive-booth-demo-{2011,2016}.py +
 // derive-booth-demo-interp.py + derive-booth-seifa-voter.py): 2007-2019
@@ -1227,6 +1266,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
   assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds four jurisdiction rows (169px; 148px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
+<<<<<<< HEAD
   assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and Victorian, New South Wales and South Australian state elections; choose one"'), "the timeline names its jurisdiction rows to a screen reader");
   // the rung order itself, in all four spots that encode it: the rail's rows
   // stack federal, Victoria, New South Wales, South Australia (2026-10-28 user
@@ -1239,6 +1279,9 @@ for (const y of ["sa22", "sa26"]) {
   const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
   const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA"].map((k) => labelsSlice.indexOf(`${k}.map`));
   assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
+=======
+  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and New South Wales, Victorian and South Australian state elections"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
+>>>>>>> 5edc1644 (Election map: the 2001 federal frame wired end to end)
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
   // federal four-char keys was why it was written that way)

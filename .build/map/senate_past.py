@@ -29,7 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SRC = os.path.join(ROOT, ".build/map/src/senate-handbook")
 OUT = os.path.join(ROOT, "map/data")
 D = dt.date.fromisoformat
-ELECTIONS = {2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
+ELECTIONS = {2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
 TERRITORY = {"ACT", "NT"}
 OPEN = D("2100-01-01")
 # the Handbook's party names as the map's party codes (partyName in app-1-base.js names them back)
@@ -149,7 +149,7 @@ fmt = lambda c: " ".join(f"{k} {v}" for k, v in sorted(c.items(), key=lambda kv:
 fails = []
 for row in load("party-representation-senate")["Rows"]:
     p, d = row["Parliament"], D(row["Date"][:10])
-    if p < 41:
+    if p < 40:
         continue
     y = d.year
     want = collections.Counter()
@@ -165,6 +165,11 @@ for row in load("party-representation-senate")["Rows"]:
     # start his successor's on the 7th). No Senate drawn here reads polling day, so only that difference passes
     if not which and p == 44 and want - before == collections.Counter({"COAL": 1}) and not (before - want):
         which = "the Senate on polling day, but for the Handbook's ACT boundary (its total has one Coalition senator more)"
+    # 2001: the Handbook's parliamentary opening row seats the incoming territory senator (Scullion, CLP, NT, his
+    # polling-day-starting term) against everyone else's (Tambling's term closed on that day); polling-day
+    # terms turn over for everyone else. Same anatomy as 2013's ACT boundary, one territory gun out
+    if not which and p == 40 and want - before == collections.Counter({"COAL": 1}) and not (before - want):
+        which = "the Senate on polling day, but for the Handbook's territory take-office (its count seats the incoming NT member the records sit that day)"
     print(f"parliament {p} ({y}): " + (f"agrees with {which}: {fmt(want)}" if which else f"DIFFERS: the Handbook {fmt(want)}\n    on polling day {fmt(before)}\n    the new Senate {fmt(after)}"))
     if not which:
         fails.append(p)
@@ -182,9 +187,9 @@ def president_on(d):
 
 VICE = re.compile(r"vice (?:the Hon\.? |Dr |Sir |Mr |Mrs |Ms )*((?:[A-Z]\.? ?)+)\s*([A-Z][A-Za-z'’\-]+(?: [A-Z][a-z][A-Za-z'’\-]+)?)")
 # the Leader of the Government and of the Opposition in the Senate on the new Senate's first sitting day
-LEADERS = {2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
+LEADERS = {2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
            2019: ("Cormann", "Wong"), 2022: ("Wong", "Birmingham"), 2025: ("Wong", "Cash")}
-GOV = {2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
+GOV = {2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
 long16 = {(r["State"].upper(), r["Name"].split(",")[0].strip().upper()) for r in load("senators-elected-2016") if (r["OrderElected"] or 99) <= 6}
 for y, e in ELECTIONS.items():
     d = seated_on(y)
