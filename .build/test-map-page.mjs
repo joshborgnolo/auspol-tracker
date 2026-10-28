@@ -884,12 +884,13 @@ for (const y of ["sa22", "sa26"]) {
 // New South Wales' chambers: the Council rides South Australia's floor
 // machinery (the @sa-cells SAF table in app-3c-sa.js) — the chamber's own
 // layout plan (.build/map/src/nsw23-lc-plan/) puts its 42 in two straight
-// files a side, eleven beside ten, the Usher of the Black Rod at the bar —
-// but the Assembly is Victoria's sister room, a horseshoe about a
-// rectangular central table with no Hansard desk, so it draws on the
-// House's own idiom in app-3-chamber.js (the @nsw-cells NSWB table): its
-// planless floor seats every member but the Speaker on benches filled in
-// sorted order (no NSW seating plan is filed)
+// files a side, an outer eleven beside an inner nine, plus two crossbench
+// seats standing beside the rear gate, and the Usher of the Black Rod at the
+// long table's rounded end — but the Assembly is Victoria's sister room, a
+// horseshoe about a rectangular central table with no Hansard desk, so it
+// draws on the House's own idiom in app-3-chamber.js (the @nsw-cells NSWB
+// table): its planless floor seats every member but the Speaker on benches
+// filled in sorted order (no NSW seating plan is filed)
 {
   const src = R(".build/map/app/app-3c-sa.js");
   const { SAF, saCells } = new Function(`${src.match(/@sa-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @sa-cells-end \*\//)[1]}; return { SAF, saCells };`)();
@@ -898,13 +899,17 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(nswLC.length, 42, "the NSW Council's floor: 42 desks besides the President's chair");
   assert.equal(new Set(nswLC.map((c) => c.id)).size, nswLC.length, "nswLC: desk ids unique");
   assert.equal(nswLC.filter((c) => c.x < 0).length, nswLC.filter((c) => c.x > 0).length, "nswLC: the sides mirror each other");
-  // the 2026-10-27 layout: two straight files a side, eleven beside ten, sharing one
-  // vertical span, every backrest inside the carpet; the platform, the clerks' desk, the
-  // long table and the Usher on one centreline; the transverse backing outline-only
+  // the 2026-10-27 layout and its 2026-10-28 reference-crop corrections: an outer file
+  // of eleven beside an inner of nine a side, their head ends level, every backrest
+  // inside the carpet; the platform, the clerks' desk, the long table and the Usher on
+  // one centreline (the Usher at the table's rounded bar end, a small gap only, the
+  // Black Rod on the tabletop inside the inset); three neutral chairs down each table
+  // flank; two crossbench seats standing beside the rear gate, facing up the chamber —
+  // the transverse backing stays outline-only
   {
     const F = SAF.nswLC, benchW = 46 / 2 + 4, benchD = 50 / 2 + 4;
     assert.deepEqual(F.straight.map((r) => r.ys[0]), [F.straight[0].ys[0], F.straight[0].ys[0]], "nswLC: both files start level");
-    assert.deepEqual(F.straight.map((r) => r.ys[r.ys.length - 1]), [F.straight[0].ys[9], F.straight[0].ys[9]], "nswLC: both files end level");
+    assert.deepEqual(F.straight.map((r) => r.ys[r.ys.length - 1]), [F.straight[0].ys[8], F.straight[1].ys[10]], "nswLC: the outer file runs its two seats past the inner, level side to side");
     for (const r of F.straight) {
       const p = r.ys.map((y, j) => j && +(y - r.ys[j - 1]).toFixed(1)).slice(1);
       assert.ok(p.every((v) => v === p[0]), `nswLC row ${r.row}: one even pitch down the file`);
@@ -914,13 +919,27 @@ for (const y of ["sa22", "sa26"]) {
         for (const sx of [r.x - benchD, r.x + benchD]) assert.ok(Math.abs(sx) <= -F.room[0], `nswLC row ${r.row}: the file's whole width fits the room`);
       }
     }
-    assert.equal(F.straight[0].ys.length, 10, "nswLC: the inner file seats ten a side");
+    assert.equal(F.straight[0].ys.length, 9, "nswLC: the inner file seats nine a side");
     assert.equal(F.straight[1].ys.length, 11, "nswLC: the outer file seats eleven a side");
     assert.ok(F.plat && F.plat.y0 >= F.room[1] && F.plat.y1 < F.table[0], "nswLC: the closed platform ends clear above the clerks' desk");
     assert.ok(F.table[1] < F.ltable.y0, "nswLC: the long table stands clear below the clerks' desk");
-    assert.ok(F.ltable.y1 < F.usher && F.usher + benchD < F.transverse.y0, "nswLC: table end, Usher and transverse backing keep one centreline order");
+    assert.ok(F.ltable.y1 < F.usher && F.usher - F.ltable.y1 < 40, "nswLC: the Usher sits directly at the long table's rounded end, a small gap only");
+    assert.ok(F.usher + benchD < F.transverse.y0, "nswLC: the Usher clears the transverse backing");
     assert.ok(F.ltable.cx + 20 / 2 < F.straight[0].x - benchD, "nswLC: clear floor between the table's flank chairs and the inner file");
+    assert.equal(F.ltable.chairs.length, 3, "nswLC: exactly three neutral chairs down each table flank");
+    assert.ok(F.ltable.chairs[1] - F.ltable.chairs[0] === F.ltable.chairs[2] - F.ltable.chairs[1]
+      && F.ltable.chairs.every((y) => y > F.ltable.y0 && y < F.ltable.y1 - F.ltable.x), "nswLC: the three flank chairs evenly spaced down the table's straight sides");
+    assert.ok(F.ltable.rod > (F.ltable.y0 + F.ltable.y1) / 2 && F.ltable.rod < F.ltable.y1 - 6, "nswLC: the Black Rod lies on the tabletop, across the inset's entrance-facing end");
     assert.ok(F.transverse.y1 > F.transverse.y0 && F.transverse.gap < F.transverse.half / 2, "nswLC: the transverse backing splits at the bar gap");
+    {
+      const rear = F.singles || [], q = rear[0];
+      assert.ok(rear.length === 1 && q.L && q.R, "nswLC: one rear pair, standing each side of the bar gate");
+      assert.ok(q.x - benchD >= F.transverse.gap, "nswLC: the rear pair stands clear of the gate's bar");
+      assert.ok(q.x + benchD < F.straight[0].x - benchD, "nswLC: the rear pair clear of the inner files");
+      assert.ok(q.y > F.ltable.y1 && q.y + benchD < F.transverse.y0, "nswLC: the rear pair behind the table, its backing clear of the transverse outline");
+    }
+    const rearSeats = nswLC.filter((c) => c.row === 2 && c.y > 0 && c.fa === -Math.PI / 2 && Math.abs(c.x) < F.straight[0].x);
+    assert.equal(rearSeats.length, 2, "nswLC: two member seats stand beside the rear gate, facing up the chamber");
     assert.ok(F.officers[0] > F.plat.y1 && F.officers[0] < F.table[0], "nswLC: the two officers' chairs between platform and desk");
     assert.equal(F.twoOfficers, true, "nswLC: two officers chair the clerks' desk, not three below it");
     const widest = Math.max(...F.straight.map((r) => r.x + benchD), F.transverse.half);

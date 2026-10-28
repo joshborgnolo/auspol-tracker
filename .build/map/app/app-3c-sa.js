@@ -12,9 +12,10 @@
    each member sits at their desk, otherwise each bloc fills the benches from the chair's end.
    New South Wales' Council (Parliament House, Sydney — after the chamber's own layout plan,
    .build/map/src/nsw23-lc-plan/, Wayback 2026-07-15) stands the same officers the same way, its
-   members in two straight files of benches down each side (eleven beside ten, their far ends
-   aligned), the whips by the table, the Usher of the Black Rod on his own chair past the bench
-   ends, and the public gallery across the far wall. Sydney's Assembly stood here too on its own
+   members mostly in two straight files of benches down each side (an outer file of eleven beside
+   an inner of nine, their head ends aligned), two crossbenchers standing alone beside the gate at
+   the chamber's rear, the whips by the table, the Usher of the Black Rod in his own chair at the
+   long table's rounded entrance end, and the public gallery across the far wall. Sydney's Assembly stood here too on its own
    straight blocks, but the real room is the sister of Victoria's — a horseshoe of benches about
    a rectangular central table — so
    since 2026-10-27 it is drawn in app-3-chamber.js's own idiom (NSWB/nswGeom) like the federal
@@ -54,31 +55,41 @@ const SAF = {
     singles: [{ row: 2, x: 170, y: 201, L: "H1", R: "I1" }],
   },
   // and New South Wales' Council (seats 42), laid out after the chamber photographs and its own
-  // plan (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15): two straight files of benches down
-  // each side, eleven beside ten, held entirely inside the floor and sharing one vertical span;
-  // at the President's end a shallow closed platform (the President's chair, a deputy's in front
-  // of it), then the clerks' short desk with its two officers between desk and platform, then the
-  // long central table — square at the President's end, rounded at the bar end, neutral chairs
-  // down its flanks and the Black Rod beside its rounded end — the Usher alone centreline below
-  // it, and across the far wall the transverse bench backing, outline only, split by the bar gap:
-  // no seats drawn on it, no seats named (the plan's lower-row transverse seating marks no member).
+  // plan (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15): an outer file of eleven
+  // benches and an inner of nine down each side, held entirely inside the floor and sharing one
+  // head end; at the President's end a shallow closed platform (the President's chair, a deputy's
+  // in front of it), then the clerks' short desk with its two officers between desk and platform,
+  // then the long central table — square at the President's end, rounded at the bar end, three
+  // neutral chairs down each flank and the Black Rod lying across the burgundy inset inside the
+  // rounded end — the Usher in his own chair directly at that rounded end, and down by the
+  // chamber's rear gate two crossbench members seated alone beside the bar gap, facing up the
+  // chamber (relocated members, never extra seats: their desks leave the inner files, the roll
+  // stays 42); and across the far wall the transverse bench backing, outline only, split by the
+  // bar gap: no seats drawn on it, no seats named (the plan's lower-row transverse seating marks
+  // no member).
   // No furniture is labelled — the furniture shows through its shapes; only the political labels
   // and the majority figure hang text (2026-10-27 geometry pass: benches moved inside the carpet,
   // the U dais closed into the platform, the long table and the transverse backing added, the
   // majority's dashed thread replaced by the figure below the floor; the carpet's side walls hug
   // the widest seat — the outer files and the transverse share ±301 — plus the same skirt the
-  // south wall keeps).
+  // south wall keeps; 2026-10-28 reference-crop corrections: the flank chairs to three a side,
+  // the Usher up to the table's rounded end, the Black Rod onto the tabletop, and the two
+  // crossbenchers to their own seats beside the rear gate — the government side still seats
+  // crossbenchers, and nothing about the sides' party make-up is re-decided here: the sorted
+  // fill assigns the rear seats from the bench order like every other seat).
   nswLC: {
     room: [-306.4, -520, 306.4, 189.4], chair: -490, chairW: 44, chairD: 42,
     officers: [-388, 28], twoOfficers: true, table: [-374, -345, 87], mace: false, lead: ["A1", "B1"],
     plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
-    ltable: { x: 58, y0: -316, y1: 10, cx: 77, chairs: [-300, -260, -220, -180, -140, -100, -60], rod: 32 },
+    ltable: { x: 58, y0: -316, y1: 10, cx: 77, chairs: [-280, -182, -84], rod: -12 },
     transverse: { y0: 148, y1: 184, half: 301, gap: 14 },
-    gang: 130, usher: 76,
+    gang: 130, usher: 34,
     straight: [
-      { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -148, -84, -20, 44, 108], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9 A10", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
+      { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -148, -84, -20, 44], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9" },
       { row: 2, x: 272, ys: [-468, -410.4, -352.8, -295.2, -237.6, -180, -122.4, -64.8, -7.2, 50.4, 108], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
     ],
+    // the chamber's rear pair, standing each side of the bar gate, facing up the chamber to the President
+    singles: [{ row: 2, x: 44, y: 116, L: "E1", R: "E2" }],
     arcs: [],
   },
 };
@@ -240,7 +251,7 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   g.lineWidth = hair; g.strokeStyle = css(th.line);
   // Sydney's Council's long table: separate from the clerks' desk above it — square at the
   // President's end, rounded at the bar end, a timber rim about a dark burgundy inset, and the
-  // Black Rod's short staff near the rounded end
+  // Black Rod lying across the inset inside the rounded end
   if (SF.ltable) {
     const L = SF.ltable;
     const tPath = (inset) => {
@@ -284,7 +295,7 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   // Sydney's Council two, chairing between the clerks' desk and the platform, not below the desk
   const [oy, odx] = SF.officers, W = P(30) * s, Dp = P(28) * s;
   for (const ox of SF.twoOfficers ? [-odx, odx] : [-odx, 0, odx]) drawChair(g, X(P(ox)), Yp(P(oy)), Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
-  // Sydney's Council keeps the Usher of the Black Rod at the bar, on his own chair facing back to the President
+  // Sydney's Council keeps the Usher of the Black Rod at the long table's rounded end, on his own chair facing back to the President
   if (SF.usher != null) drawChair(g, X(0), Yp(P(SF.usher)), -Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
   // ... and on its platform the President's big chair with a deputy's smaller one in front, both
   // the officers' neutral (never read as party seats)
@@ -292,7 +303,7 @@ function drawSAFurniture(g, F, geom, opts = {}) {
     drawChair(g, X(0), Yp(P(SF.chair)), Math.PI / 2, P(SF.chairW ?? 40) * s, P(SF.chairD ?? 38) * s, css(officer), back(officer, 0.18), 1);
     drawChair(g, X(0), Yp(P(SF.plat.deputy)), Math.PI / 2, P(32) * s, P(30) * s, css(officer), back(officer, 0.18), 1);
   }
-  // the neutral chairs down the long table's flanks, their number schematic, facing the table
+  // three neutral chairs down each of the long table's flanks, evenly spaced, facing the table
   if (SF.ltable) {
     const L = SF.ltable, cw = P(20) * s, cd = P(26) * s;
     for (const cx of [-L.cx, L.cx]) for (const cy of L.chairs) drawChair(g, X(P(cx)), Yp(P(cy)), cx < 0 ? 0 : Math.PI, cw, cd, css(officer), back(officer, 0.18), 1);
