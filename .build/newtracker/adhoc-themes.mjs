@@ -3,11 +3,11 @@
    page (the ☰ menu page that was /ad-hocs/ until 2026-10-18, then
    /beyond-the-vote/ until 2026-10-21). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic
-   as it builds the page's sidecar (via beyond-the-vote.mjs), and build.mjs's
+   as it builds the page's sidecar (via public-opinion.mjs), and build.mjs's
    static article regroups from the same payload. themeOf THROWS on an unmapped
    id, so a new wave of the stores (or a new house) fails the build loudly
    rather than landing silently unsorted: map a new id to a topic (it joins that
-   topic's "More questions" list until beyond-the-vote.mjs features it) or to
+   topic's "More questions" list until public-opinion.mjs features it) or to
    "cut".
 
    "cut" is the editorial call that a question is not worth a reader's time on

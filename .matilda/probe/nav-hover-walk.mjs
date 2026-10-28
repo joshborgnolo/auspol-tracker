@@ -6,7 +6,7 @@
       bar tabs, wrapping; on a menu page right goes to the first bar tab.
       The ☰ menu owns the keys while open, and real keyboard focus on a tab
       wins over the claim.
-   2. the Public opinion Sort row (BtvSort) - hovering anywhere in
+   2. the Public opinion Sort row (PubOpSort) - hovering anywhere in
       section#public-opinion steps issue -> pollster -> recency, wrapping.
    Where neither claim is armed the page-level walk keeps its turn.
    BASE=<tree> serves another tree's build. */
@@ -112,11 +112,11 @@ for (let i = 0; i < seq.length; i++) {
 
 /* ---- Phase B: the Sort row's catalogue-wide hover claim --------------- */
 await page.goto(`${base}/public-opinion/`, { waitUntil: "networkidle0", timeout: 60000 });
-await page.waitForSelector(".btv-sort-g", { timeout: 20000 }); await sleep(400);
-const pressed = () => page.evaluate(() => [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getAttribute("aria-pressed")).join());
+await page.waitForSelector(".pubop-sort-g", { timeout: 20000 }); await sleep(400);
+const pressed = () => page.evaluate(() => [...document.querySelectorAll(".pubop-sort-b")].map((b) => b.getAttribute("aria-pressed")).join());
 if (await pressed() !== "true,false,false") fail(`sort starts ${await pressed()}, wanted issue pressed`);
 { /* pointer on the sort row */
-  const y = await page.evaluate(() => { const g = document.querySelector(".btv-sort-g"); g.scrollIntoView({ behavior: "instant", block: "center" }); const r = g.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; });
+  const y = await page.evaluate(() => { const g = document.querySelector(".pubop-sort-g"); g.scrollIntoView({ behavior: "instant", block: "center" }); const r = g.getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; });
   await page.mouse.move(y.x, y.y); await sleep(200);
 }
 const sortSeq = ["false,true,false", "false,false,true", "true,false,false"];
@@ -130,7 +130,7 @@ for (let i = 0; i < sortSeq.length; i++) {
 }
 { /* pointer deep in the catalogue (a topic head) still owns the step */
   const spot = await page.evaluate(() => {
-    const h = [...document.querySelectorAll(".btv-mon h3, .btv-topic h3")][3];
+    const h = [...document.querySelectorAll(".pubop-mon h3, .pubop-topic h3")][3];
     h.scrollIntoView({ behavior: "instant", block: "center" });
     const r = h.getBoundingClientRect();
     return { x: Math.round(r.left + 60), y: Math.round(r.top + r.height / 2) };
@@ -145,7 +145,7 @@ for (let i = 0; i < sortSeq.length; i++) {
   await arrow("ArrowRight");
   const s = await active();
   if (s.path === "/public-opinion/") fail("after leaving the catalogue the sort claim still armed (no page turn)");
-  const gone = await page.evaluate(() => !document.querySelector(".btv-sort-g"));
+  const gone = await page.evaluate(() => !document.querySelector(".pubop-sort-g"));
   if (!gone) fail("sort row still mounted after the page turn");
 }
 if (errs.length) fail(`page errors ${errs.slice(0, 3)}`);

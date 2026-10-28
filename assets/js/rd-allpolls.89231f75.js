@@ -2129,7 +2129,7 @@ const RD_LG_PANEL = {
 const rdLgPanelGo = (id, p) => {
   if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
   if (id === "opinion") {
-    const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+    const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
     if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
   }
 };
@@ -2812,7 +2812,7 @@ function rdLgLines(p, {
       }, def.note))
     });
   }
-  const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+  const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
   if (bo) {
     out.push({
       id: "opinion",

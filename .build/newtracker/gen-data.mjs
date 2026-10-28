@@ -18,7 +18,7 @@ import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED,
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
-import { readStores as readOneOffStores, buildBeyond, HOUSES as BTV_HOUSES } from "./beyond-the-vote.mjs";
+import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -8391,7 +8391,7 @@ const changelog = JUR ? null : (() => {
    The /public-opinion/ page (the ☰ menu page that was the /ad-hocs/
    catalogue, and until 2026-10-21 /beyond-the-vote/): what the pollsters
    ask beyond voting intention, by topic.
-   beyond-the-vote.mjs reads the eight hand-curated one-off stores
+   public-opinion.mjs reads the eight hand-curated one-off stores
    (data/*-one-offs.json), files every question on adhoc-themes.mjs's topic
    map (an unmapped id throws, so a new wave fails the build rather than
    landing unsorted), and builds the page's trackers and cards with their
@@ -8399,7 +8399,7 @@ const changelog = JUR ? null : (() => {
    "level" on that page means what it means here. The static article in
    build.mjs reads this same payload. Federal only. */
 /* The /public-opinion/ tracker dots open their wave's All-polls row when
-   the wave sits behind one of the four emitted row sets. BTV_HOUSES maps
+   the wave sits behind one of the four emitted row sets. PUBOP_HOUSES maps
    each one-off store key to the pollster name its rows carry in the row
    sets ("RedBridge/Accent" for the redbridge store, "YouGov" and
    "SEC Newgate" for the news24 and secnewgate stores' short forms...), and
@@ -8409,7 +8409,7 @@ const changelog = JUR ? null : (() => {
    key, fieldwork start). Each key answers the row's exact client
    pollRowKey string and the archive facet its set opens on; the poll facet
    wins a wave two sets both hold */
-const btvRowKeys = new Map();
+const pubopRowKeys = new Map();
 if (!JUR) {
   /* the emitted rows shed their source datum's dateStart, but Essential's
      store waves sit a day AFTER their poll/direction row (its direction
@@ -8417,36 +8417,36 @@ if (!JUR) {
      needs the raw datum beside each row. Only the poll and direction row
      sets are readable this way – and only they can ever match a one-off
      store, so no other source is spanned */
-  const btvSrcStart = new Map();
+  const pubopSrcStart = new Map();
   for (const src of [POLLS, DIR]) for (const p of src)
-    if (p.dateStart) { const k = p.pollster + "|" + p.date; if (!btvSrcStart.has(k)) btvSrcStart.set(k, p.dateStart); }
+    if (p.dateStart) { const k = p.pollster + "|" + p.date; if (!pubopSrcStart.has(k)) pubopSrcStart.set(k, p.dateStart); }
   const rowSets = [[individualPolls, "twopp"], [directionOnlyPolls || [], "direction"], [issuesOnlyPolls || [], "issues"], [confidenceOnlyPolls || [], "confidence"]];
-  for (const [storeKey, def] of Object.entries(BTV_HOUSES)) {
+  for (const [storeKey, def] of Object.entries(PUBOP_HOUSES)) {
     for (const [rows, facet] of rowSets) {
       for (const r of rows) {
         if (r.pollster !== def.full && r.pollster !== def.short) continue;
         const pay = { rk: r.pollster + "|" + r.released, fk: facet };
         const ek = storeKey + "|e|" + r.released;
-        if (!btvRowKeys.has(ek)) btvRowKeys.set(ek, pay);
-        const ds0 = r.dateStart || btvSrcStart.get(pay.rk);
-        if (ds0) { const sk = storeKey + "|s|" + ds0; if (!btvRowKeys.has(sk)) btvRowKeys.set(sk, pay); }
+        if (!pubopRowKeys.has(ek)) pubopRowKeys.set(ek, pay);
+        const ds0 = r.dateStart || pubopSrcStart.get(pay.rk);
+        if (ds0) { const sk = storeKey + "|s|" + ds0; if (!pubopRowKeys.has(sk)) pubopRowKeys.set(sk, pay); }
       }
     }
   }
 }
-const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: HL_DEFF, rowKeys: btvRowKeys });
+const oneOffsSource = JUR ? null : buildPublicOpinion(readOneOffStores(ROOT), { deff: HL_DEFF, rowKeys: pubopRowKeys });
 /* the page's count of topics, counted as its own topic list counts them
    (a topic with neither cards nor a list is left off): the main bundle's
    copy of it, for the page's dek and the More menu's line, which render
    before the sidecar has loaded, or without it */
-const beyondTopics = oneOffsSource ? oneOffsSource.topics.filter((t) => t.blocks.length || t.more.length).length : null;
+const publicOpinionTopics = oneOffsSource ? oneOffsSource.topics.filter((t) => t.blocks.length || t.more.length).length : null;
 /* the catalogue's newest entry, on the same contract, for the More menu's
    "Latest entry" date beside its line: the max of every tracker's and
    listed question's publication date (`pub`), with the fieldwork dates
    (`last`/`wave`) beneath as the fallback for a store that files none - the
    figure names the day the reading reached the page, not the day fieldwork
    ended (ISO strings sort lexicographically) */
-const beyondLatest = oneOffsSource
+const publicOpinionLatest = oneOffsSource
   ? oneOffsSource.topics
       .filter((t) => t.blocks.length || t.more.length)
       .flatMap((t) => [...t.blocks.map((b) => [b.pub, b.last, b.wave]), ...t.more.map((m) => [m.pub, m.last, m.wave])].flat())
@@ -8860,15 +8860,15 @@ window.AUSPOL = (function () {
      date, so the panel stays honest as the page ages. */
   const pollCadence = ${JSON.stringify(pollCadence)};
   /* the /public-opinion/ page's count of topics (§8e) - null off the federal page */
-  const beyondTopics = ${JSON.stringify(beyondTopics)};
+  const publicOpinionTopics = ${JSON.stringify(publicOpinionTopics)};
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
-  const beyondLatest = ${JSON.stringify(beyondLatest)};
+  const publicOpinionLatest = ${JSON.stringify(publicOpinionLatest)};
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = ${JSON.stringify(house)};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
-  const beyondByRow = ${JSON.stringify(oneOffsSource ? oneOffsSource.byRow : null)};
+  const publicOpinionByRow = ${JSON.stringify(oneOffsSource ? oneOffsSource.byRow : null)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -8916,7 +8916,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, beyondTopics, beyondLatest, beyondByRow, house,
+    loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)

@@ -2373,8 +2373,8 @@ function App() {
       if (readLocation() !== "public-opinion") navTab("public-opinion", true);
       let tries = 0;
       const seek = () => {
-        if (window.AP.btvGo) {
-          window.AP.btvGo("btv-p-" + storeKey);
+        if (window.AP.pubopGo) {
+          window.AP.pubopGo("pubop-p-" + storeKey);
           return;
         }
         if (++tries < 40) setTimeout(seek, 75);

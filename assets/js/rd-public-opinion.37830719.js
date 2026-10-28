@@ -1,29 +1,29 @@
 const {
-  useState: btvUseState,
-  useEffect: btvUseEffect,
-  useMemo: btvUseMemo,
-  useDeferredValue: btvUseDeferred
+  useState: pubopUseState,
+  useEffect: pubopUseEffect,
+  useMemo: pubopUseMemo,
+  useDeferredValue: pubopUseDeferred
 } = React;
-const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const btvDay = iso => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
-const btvMonth = iso => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
-const btvMonYY = iso => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(2, 4);
-const btvSpan = f => {
+const PUBOP_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const pubopDay = iso => Number(iso.slice(8, 10)) + " " + PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+const pubopMonth = iso => PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+const pubopMonYY = iso => PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(2, 4);
+const pubopSpan = f => {
   if (!f || !f.end) return "";
-  if (!f.start || f.start === f.end) return btvDay(f.end);
-  if (f.start.slice(0, 7) === f.end.slice(0, 7)) return Number(f.start.slice(8)) + "–" + btvDay(f.end);
-  if (f.start.slice(0, 4) === f.end.slice(0, 4)) return Number(f.start.slice(8)) + " " + BTV_MON[+f.start.slice(5, 7) - 1] + " – " + btvDay(f.end);
-  return btvDay(f.start) + " – " + btvDay(f.end);
+  if (!f.start || f.start === f.end) return pubopDay(f.end);
+  if (f.start.slice(0, 7) === f.end.slice(0, 7)) return Number(f.start.slice(8)) + "–" + pubopDay(f.end);
+  if (f.start.slice(0, 4) === f.end.slice(0, 4)) return Number(f.start.slice(8)) + " " + PUBOP_MON[+f.start.slice(5, 7) - 1] + " – " + pubopDay(f.end);
+  return pubopDay(f.start) + " – " + pubopDay(f.end);
 };
-const btvN = v => Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
-const btvPct = v => btvN(v) + "%";
-const btvSigned = v => (v > 0 ? "+" : v < 0 ? "−" : "") + btvN(Math.abs(v));
-const btvHouse = (src, houses, full) => houses[src.house] ? houses[src.house][full ? "full" : "short"] : src.house;
-const btvCap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-const btvWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
-const btvNo = i => String(i + 1).padStart(2, "0");
-const btvLow = s => !s || /^(?:Australia|Australian|Labor|Liberal|Coalition|One Nation|Greens|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
-function BtvBar({
+const pubopN = v => Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
+const pubopPct = v => pubopN(v) + "%";
+const pubopSigned = v => (v > 0 ? "+" : v < 0 ? "−" : "") + pubopN(Math.abs(v));
+const pubopHouse = (src, houses, full) => houses[src.house] ? houses[src.house][full ? "full" : "short"] : src.house;
+const pubopCap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const pubopWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
+const pubopNo = i => String(i + 1).padStart(2, "0");
+const pubopLow = s => !s || /^(?:Australia|Australian|Labor|Liberal|Coalition|One Nation|Greens|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
+function PubOpBar({
   segs,
   tall
 }) {
@@ -36,157 +36,157 @@ function BtvBar({
     v: rest
   }, ...shown.slice(at)] : shown;
   return React.createElement("span", {
-    className: "btv-bar" + (tall ? " btv-bar-t" : ""),
+    className: "pubop-bar" + (tall ? " pubop-bar-t" : ""),
     role: "img",
-    "aria-label": shown.map(s => btvPct(s.v) + " " + s.label).join(", ")
+    "aria-label": shown.map(s => pubopPct(s.v) + " " + s.label).join(", ")
   }, seq.map((s, i) => s.side === "gap" ? React.createElement("i", {
     key: i,
-    className: "btv-gap",
+    className: "pubop-gap",
     style: {
       width: s.v + "%"
     }
   }) : React.createElement("i", {
     key: i,
-    className: "btv-seg btv-" + s.side + s.tone,
+    className: "pubop-seg pubop-" + s.side + s.tone,
     style: {
       width: s.v + "%"
     },
-    title: btvPct(s.v) + " " + s.label
+    title: pubopPct(s.v) + " " + s.label
   })));
 }
-function BtvSwatch({
+function PubOpSwatch({
   side,
   tone
 }) {
   return React.createElement("i", {
-    className: "btv-sw btv-" + side + tone,
+    className: "pubop-sw pubop-" + side + tone,
     "aria-hidden": "true"
   });
 }
-function BtvSplit({
+function PubOpSplit({
   c
 }) {
   const mids = c.segs.filter(s => s.side === "m" && s.v > 0);
   const rest = Math.round(100 - c.a - c.b - c.m - (c.x || 0));
   return React.createElement("div", {
-    className: "btv-split"
+    className: "pubop-split"
   }, React.createElement("div", {
-    className: "btv-ends"
+    className: "pubop-ends"
   }, React.createElement("span", {
-    className: "btv-end"
-  }, React.createElement(BtvSwatch, {
+    className: "pubop-end"
+  }, React.createElement(PubOpSwatch, {
     side: "a",
     tone: 2
-  }), React.createElement("b", null, btvPct(c.a)), " ", React.createElement("span", {
-    className: "btv-endl"
+  }), React.createElement("b", null, pubopPct(c.a)), " ", React.createElement("span", {
+    className: "pubop-endl"
   }, c.names[0])), React.createElement("span", {
-    className: "btv-end btv-end-b"
-  }, React.createElement("b", null, btvPct(c.b)), " ", React.createElement("span", {
-    className: "btv-endl"
-  }, c.names[1]), React.createElement(BtvSwatch, {
+    className: "pubop-end pubop-end-b"
+  }, React.createElement("b", null, pubopPct(c.b)), " ", React.createElement("span", {
+    className: "pubop-endl"
+  }, c.names[1]), React.createElement(PubOpSwatch, {
     side: "b",
     tone: 2
-  }))), React.createElement(BtvBar, {
+  }))), React.createElement(PubOpBar, {
     segs: c.segs,
     tall: true
   }), React.createElement("p", {
-    className: "btv-mids"
+    className: "pubop-mids"
   }, mids.map((s, i) => React.createElement("span", {
     key: i
-  }, btvPct(s.v), " ", btvLow(s.label))), c.x >= 1 ? React.createElement("span", null, btvPct(c.x), " ", btvLow(c.xLabel || "")) : null, rest >= 3 ? React.createElement("span", null, rest, "% not published") : null), c.sig === false ? React.createElement("p", {
-    className: "btv-level"
+  }, pubopPct(s.v), " ", pubopLow(s.label))), c.x >= 1 ? React.createElement("span", null, pubopPct(c.x), " ", pubopLow(c.xLabel || "")) : null, rest >= 3 ? React.createElement("span", null, rest, "% not published") : null), c.sig === false ? React.createElement("p", {
+    className: "pubop-level"
   }, "Level: the gap is inside the margin of error.") : null);
 }
-function BtvStack({
+function PubOpStack({
   c,
   houses
 }) {
-  const [all, setAll] = btvUseState(false);
+  const [all, setAll] = pubopUseState(false);
   const rows = c.show && !all ? c.rows.slice(0, c.show) : c.rows;
   return React.createElement("div", {
-    className: "btv-stack"
+    className: "pubop-stack"
   }, React.createElement("div", {
-    className: "btv-key"
+    className: "pubop-key"
   }, c.legend.map((l, i) => React.createElement("span", {
     key: i
-  }, React.createElement(BtvSwatch, {
+  }, React.createElement(PubOpSwatch, {
     side: l.side,
     tone: l.tone
   }), l.label)), c.shades ? React.createElement("span", {
-    className: "btv-key-n"
+    className: "pubop-key-n"
   }, "Stronger answers in full colour, milder ones faded") : null), React.createElement("div", {
-    className: "btv-rows"
+    className: "pubop-rows"
   }, rows.map((r, i) => React.createElement("div", {
-    className: "btv-row",
+    className: "pubop-row",
     key: i
   }, React.createElement("div", {
-    className: "btv-rl"
+    className: "pubop-rl"
   }, c.mode === "battery" ? React.createElement("span", null, r.label) : React.createElement(React.Fragment, null, React.createElement("span", {
-    className: c.mode === "waves" ? "" : "btv-rh"
-  }, r.label || (c.mode === "waves" ? btvMonth(r.when || r.src.field.end) : btvHouse(r.src, houses)), c.mode === "compare" && !r.label ? React.createElement("span", {
-    className: "btv-rd"
-  }, " \xB7 ", btvMonth(r.src.field.end)) : null), r.wording ? React.createElement("span", {
-    className: "btv-rw"
+    className: c.mode === "waves" ? "" : "pubop-rh"
+  }, r.label || (c.mode === "waves" ? pubopMonth(r.when || r.src.field.end) : pubopHouse(r.src, houses)), c.mode === "compare" && !r.label ? React.createElement("span", {
+    className: "pubop-rd"
+  }, " \xB7 ", pubopMonth(r.src.field.end)) : null), r.wording ? React.createElement("span", {
+    className: "pubop-rw"
   }, r.wording) : null)), React.createElement("span", {
-    className: "btv-va"
-  }, btvN(r.a)), React.createElement(BtvBar, {
+    className: "pubop-va"
+  }, pubopN(r.a)), React.createElement(PubOpBar, {
     segs: r.segs
   }), React.createElement("span", {
-    className: "btv-vb"
-  }, btvN(r.b)), React.createElement("span", {
-    className: "btv-net",
+    className: "pubop-vb"
+  }, pubopN(r.b)), React.createElement("span", {
+    className: "pubop-net",
     title: r.sig === false ? "The gap is inside the margin of error" : ""
   }, r.sig === false ? "level" : "")))), c.show && c.rows.length > c.show ? React.createElement("button", {
     type: "button",
-    className: "btv-all",
+    className: "pubop-all",
     onClick: () => setAll(!all)
   }, all ? "Show fewer" : "Show all " + c.rows.length) : null);
 }
-function BtvRank({
+function PubOpRank({
   c
 }) {
-  const [all, setAll] = btvUseState(false);
+  const [all, setAll] = pubopUseState(false);
   const top = Math.max(...c.rows.map(r => r.v), 1);
   const rows = !all ? c.rows.slice(0, c.show) : c.rows;
   const tenths = c.rows.some(r => Math.abs(r.v - Math.round(r.v)) >= 0.05);
   return React.createElement("div", {
-    className: "btv-rank"
+    className: "pubop-rank"
   }, rows.map((r, i) => React.createElement("div", {
-    className: "btv-rk",
+    className: "pubop-rk",
     key: i
   }, React.createElement("span", {
-    className: "btv-rkl"
+    className: "pubop-rkl"
   }, r.label), React.createElement("span", {
-    className: "btv-rkb"
+    className: "pubop-rkb"
   }, React.createElement("i", {
     style: {
       width: r.v / Math.max(top, 50) * 100 + "%"
     }
   })), React.createElement("span", {
-    className: "btv-rkv"
-  }, tenths ? r.v.toFixed(1) + "%" : btvPct(r.v)))), c.rows.length > c.show ? React.createElement("button", {
+    className: "pubop-rkv"
+  }, tenths ? r.v.toFixed(1) + "%" : pubopPct(r.v)))), c.rows.length > c.show ? React.createElement("button", {
     type: "button",
-    className: "btv-all",
+    className: "pubop-all",
     onClick: () => setAll(!all)
   }, all ? "Show fewer" : "Show all " + c.rows.length) : null, c.base ? React.createElement("p", {
-    className: "btv-base"
+    className: "pubop-base"
   }, c.base) : null);
 }
-function BtvNets({
+function PubOpNets({
   c
 }) {
   const span = Math.max(...c.rows.map(r => Math.abs(r.v)), 10) * 1.2;
   return React.createElement("div", {
-    className: "btv-nets"
+    className: "pubop-nets"
   }, c.rows.map((r, i) => React.createElement("div", {
-    className: "btv-nt",
+    className: "pubop-nt",
     key: i
   }, React.createElement("span", {
-    className: "btv-ntl"
+    className: "pubop-ntl"
   }, r.label), React.createElement("span", {
-    className: "btv-ntb"
+    className: "pubop-ntb"
   }, React.createElement("i", {
-    className: r.v >= 0 ? "btv-a2" : "btv-b2",
+    className: r.v >= 0 ? "pubop-a2" : "pubop-b2",
     style: r.v >= 0 ? {
       left: "50%",
       width: r.v / span * 50 + "%"
@@ -200,14 +200,14 @@ function BtvNets({
     } : {
       right: "calc(50% + " + -r.v / span * 50 + "% + 6px)"
     }
-  }, btvSigned(r.v))))), c.unit ? React.createElement("p", {
-    className: "btv-base"
-  }, btvCap(c.unit)) : null);
+  }, pubopSigned(r.v))))), c.unit ? React.createElement("p", {
+    className: "pubop-base"
+  }, pubopCap(c.unit)) : null);
 }
-const btvVal = (v, unit) => v == null ? "–" : unit === "net" ? btvSigned(v) : unit === "score" ? btvN(v) : btvPct(v);
-const btvCols = cols => cols.length > 1 && cols.every(c => /^\d/.test(c) && c.slice(-4) === cols[0].slice(-4)) ? cols.map(c => c.slice(0, -5)) : cols;
-const btvSumUnit = label => /^net\b|\bnet\s|\bchange\b/i.test(label) ? "net" : "%";
-const BTV_ENT = {
+const pubopVal = (v, unit) => v == null ? "–" : unit === "net" ? pubopSigned(v) : unit === "score" ? pubopN(v) : pubopPct(v);
+const pubopCols = cols => cols.length > 1 && cols.every(c => /^\d/.test(c) && c.slice(-4) === cols[0].slice(-4)) ? cols.map(c => c.slice(0, -5)) : cols;
+const pubopSumUnit = label => /^net\b|\bnet\s|\bchange\b/i.test(label) ? "net" : "%";
+const PUBOP_ENT = {
   rsquo: "’",
   lsquo: "‘",
   ldquo: "“",
@@ -217,23 +217,23 @@ const BTV_ENT = {
   amp: "&",
   nbsp: " "
 };
-const btvText = s => String(s || "").replace(/&(\w+);/g, (m, k) => BTV_ENT[k] || m);
-function BtvFigHead({
+const pubopText = s => String(s || "").replace(/&(\w+);/g, (m, k) => PUBOP_ENT[k] || m);
+function PubOpFigHead({
   f,
   solo
 }) {
   const t = solo ? null : f.title;
-  const line = [f.measure ? btvCap(f.measure) : null, f.base].filter(Boolean).join(" · ");
+  const line = [f.measure ? pubopCap(f.measure) : null, f.base].filter(Boolean).join(" · ");
   if (!t && !line) return null;
   return React.createElement("div", {
-    className: "btv-gh"
+    className: "pubop-gh"
   }, t ? React.createElement("p", {
-    className: "btv-ght"
+    className: "pubop-ght"
   }, t) : null, line ? React.createElement("p", {
-    className: "btv-ghb"
+    className: "pubop-ghb"
   }, line) : null);
 }
-function BtvFigList({
+function PubOpFigList({
   f
 }) {
   const multi = f.cols.length > 1;
@@ -241,33 +241,33 @@ function BtvFigList({
   const scale = unit === "score" ? f.max : Math.max(50, ...f.rows.map(r => r.v[0] || 0));
   const w = v => Math.max(0, Math.min(100, (v || 0) / scale * 100)) + "%";
   return React.createElement("div", {
-    className: "btv-gl" + (multi ? " btv-gl-m" : ""),
+    className: "pubop-gl" + (multi ? " pubop-gl-m" : ""),
     role: "table",
     "aria-label": f.title || "Answers",
     style: {
-      "--btv-n": f.cols.length
+      "--pubop-n": f.cols.length
     }
   }, multi ? React.createElement("div", {
-    className: "btv-gr btv-gr-h",
+    className: "pubop-gr pubop-gr-h",
     role: "row"
   }, React.createElement("span", {
     role: "columnheader",
-    className: "btv-gk"
+    className: "pubop-gk"
   }, "Answer"), React.createElement("span", {
     "aria-hidden": "true"
-  }), btvCols(f.cols).map((c, i) => React.createElement("span", {
+  }), pubopCols(f.cols).map((c, i) => React.createElement("span", {
     key: i,
     role: "columnheader",
-    className: "btv-gv"
+    className: "pubop-gv"
   }, c))) : null, f.rows.map((r, i) => React.createElement("div", {
-    className: "btv-gr",
+    className: "pubop-gr",
     role: "row",
     key: i
   }, React.createElement("span", {
     role: "rowheader",
-    className: "btv-gk"
+    className: "pubop-gk"
   }, r.label), React.createElement("span", {
-    className: "btv-gbar",
+    className: "pubop-gbar",
     "aria-hidden": "true"
   }, React.createElement("i", {
     style: {
@@ -276,26 +276,26 @@ function BtvFigList({
   })), r.v.map((v, k) => React.createElement("span", {
     key: k,
     role: "cell",
-    className: "btv-gv" + (k ? " btv-gv-o" : "")
-  }, btvVal(v, unit))))), f.sums.map((r, i) => React.createElement("div", {
-    className: "btv-gr btv-gr-s" + (i ? "" : " btv-gr-s1"),
+    className: "pubop-gv" + (k ? " pubop-gv-o" : "")
+  }, pubopVal(v, unit))))), f.sums.map((r, i) => React.createElement("div", {
+    className: "pubop-gr pubop-gr-s" + (i ? "" : " pubop-gr-s1"),
     role: "row",
     key: "s" + i
   }, React.createElement("span", {
     role: "rowheader",
-    className: "btv-gk"
+    className: "pubop-gk"
   }, r.label), React.createElement("span", {
     "aria-hidden": "true"
   }), r.v.map((v, k) => React.createElement("span", {
     key: k,
     role: "cell",
-    className: "btv-gv" + (k ? " btv-gv-o" : "")
-  }, btvVal(v, btvSumUnit(r.label)))))));
+    className: "pubop-gv" + (k ? " pubop-gv-o" : "")
+  }, pubopVal(v, pubopSumUnit(r.label)))))));
 }
-function BtvFigNets({
+function PubOpFigNets({
   f
 }) {
-  return React.createElement(BtvNets, {
+  return React.createElement(PubOpNets, {
     c: {
       rows: f.rows.map(r => ({
         label: r.label,
@@ -305,59 +305,59 @@ function BtvFigNets({
     }
   });
 }
-function BtvFigSplit({
+function PubOpFigSplit({
   f
 }) {
   const multi = f.cols.length > 1;
   const ex = f.extraHeads;
   const row = (key, label, w) => React.createElement("div", {
-    className: "btv-row" + (label == null ? " btv-row-1" : ""),
+    className: "pubop-row" + (label == null ? " pubop-row-1" : ""),
     key: key,
     style: {
-      "--btv-x": ex.length
+      "--pubop-x": ex.length
     }
   }, label != null ? React.createElement("div", {
-    className: "btv-rl"
+    className: "pubop-rl"
   }, React.createElement("span", null, label)) : null, React.createElement("span", {
-    className: "btv-va"
-  }, btvN(w.a)), React.createElement(BtvBar, {
+    className: "pubop-va"
+  }, pubopN(w.a)), React.createElement(PubOpBar, {
     segs: w.segs
   }), React.createElement("span", {
-    className: "btv-vb"
-  }, btvN(w.b)), w.extra.map((v, k) => React.createElement("span", {
-    className: "btv-vx",
+    className: "pubop-vb"
+  }, pubopN(w.b)), w.extra.map((v, k) => React.createElement("span", {
+    className: "pubop-vx",
     key: k
-  }, btvVal(v, btvSumUnit(ex[k])))));
+  }, pubopVal(v, pubopSumUnit(ex[k])))));
   return React.createElement("div", {
-    className: "btv-stack btv-gs" + (ex.length ? " btv-gs-x" : "")
+    className: "pubop-stack pubop-gs" + (ex.length ? " pubop-gs-x" : "")
   }, React.createElement("div", {
-    className: "btv-key"
+    className: "pubop-key"
   }, f.legend.map((l, i) => React.createElement("span", {
     key: i
-  }, React.createElement(BtvSwatch, {
+  }, React.createElement(PubOpSwatch, {
     side: l.side,
     tone: l.tone
-  }), btvCap(l.label)))), ex.length ? React.createElement("div", {
-    className: "btv-row btv-row-h" + (f.one ? " btv-row-1" : ""),
+  }), pubopCap(l.label)))), ex.length ? React.createElement("div", {
+    className: "pubop-row pubop-row-h" + (f.one ? " pubop-row-1" : ""),
     style: {
-      "--btv-x": ex.length
+      "--pubop-x": ex.length
     },
     "aria-hidden": "true"
   }, f.one ? null : React.createElement("span", {
-    className: "btv-rlx"
+    className: "pubop-rlx"
   }), React.createElement("span", null), React.createElement("span", null), React.createElement("span", null), ex.map((h, k) => React.createElement("span", {
-    className: "btv-vx",
+    className: "pubop-vx",
     key: k
   }, h))) : null, React.createElement("div", {
-    className: "btv-rows"
+    className: "pubop-rows"
   }, f.rows.map((r, i) => multi && r.waves.length > 1 ? React.createElement("div", {
-    className: "btv-sg",
+    className: "pubop-sg",
     key: i
   }, React.createElement("p", {
-    className: "btv-sgl"
+    className: "pubop-sgl"
   }, r.label), r.waves.map((w, k) => row(k, w.when, w))) : row(i, f.one ? null : r.label + (multi ? " · " + r.waves[0].when : ""), r.waves[0]))));
 }
-function BtvFigTable({
+function PubOpFigTable({
   f
 }) {
   const multi = f.cols.length > 1;
@@ -365,66 +365,66 @@ function BtvFigTable({
   const n = f.heads.length;
   const cells = w => w.cells.concat(w.extra).map((v, k) => React.createElement("td", {
     key: k,
-    className: k < n ? "" : "btv-tc-x"
-  }, v == null ? "–" : k >= n && btvSumUnit(heads[k]) === "net" ? btvSigned(v) : btvN(v)));
+    className: k < n ? "" : "pubop-tc-x"
+  }, v == null ? "–" : k >= n && pubopSumUnit(heads[k]) === "net" ? pubopSigned(v) : pubopN(v)));
   return React.createElement("div", {
-    className: "btv-twrap"
+    className: "pubop-twrap"
   }, React.createElement("table", {
-    className: "btv-table btv-gt"
+    className: "pubop-table pubop-gt"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-    className: "btv-l"
+    className: "pubop-l"
   }), heads.map((h, i) => React.createElement("th", {
     key: i,
     scope: "col"
   }, h)))), React.createElement("tbody", null, f.rows.flatMap((r, i) => r.sect ? [React.createElement("tr", {
-    className: "btv-tsec",
+    className: "pubop-tsec",
     key: i
   }, React.createElement("th", {
     colSpan: heads.length + 1,
     scope: "colgroup",
-    className: "btv-l"
+    className: "pubop-l"
   }, r.label))] : multi && r.waves.length > 1 ? [React.createElement("tr", {
-    className: "btv-tgrp",
+    className: "pubop-tgrp",
     key: i + "g"
   }, React.createElement("th", {
     colSpan: heads.length + 1,
     scope: "colgroup",
-    className: "btv-l"
+    className: "pubop-l"
   }, r.label)), ...r.waves.map((w, k) => React.createElement("tr", {
     key: i + "-" + k
   }, React.createElement("th", {
     scope: "row",
-    className: "btv-l btv-twv"
+    className: "pubop-l pubop-twv"
   }, w.when), cells(w)))] : [React.createElement("tr", {
     key: i
   }, React.createElement("th", {
     scope: "row",
-    className: "btv-l"
+    className: "pubop-l"
   }, r.label, multi ? React.createElement("span", {
-    className: "btv-twd"
+    className: "pubop-twd"
   }, " \xB7 ", r.waves[0].when) : null), cells(r.waves[0]))]))));
 }
-const BTV_LABOR = /\b(?:Rudd|Gillard|Shorten|Albanese)\b/,
-  BTV_COAL = /\b(?:Turnbull|Abbott|Morrison|Dutton|Ley|Nelson|Taylor)\b/;
-const btvYear = (label, prev) => {
+const PUBOP_LABOR = /\b(?:Rudd|Gillard|Shorten|Albanese)\b/,
+  PUBOP_COAL = /\b(?:Turnbull|Abbott|Morrison|Dutton|Ley|Nelson|Taylor)\b/;
+const pubopYear = (label, prev) => {
   const m = String(label).match(/(January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+(\d{4}))?\s*$/);
   if (!m) return null;
-  const mo = (BTV_MONF.indexOf(m[1]) + 0.5) / 12;
+  const mo = (PUBOP_MONF.indexOf(m[1]) + 0.5) / 12;
   if (m[2]) return +m[2] + mo;
   if (prev == null) return null;
   const y = Math.floor(prev);
   return y + mo > prev ? y + mo : y + 1 + mo;
 };
-const BTV_MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-function btvTraitSeries(f) {
+const PUBOP_MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function pubopTraitSeries(f) {
   if (f.kind !== "table" || f.heads.length !== 2 || !f.rows.some(r => r.sect)) return null;
   let pair = null;
   const pts = [];
   for (const r of f.rows) {
     if (r.sect) {
       const [a, b] = r.label.split(" v ");
-      const pa = BTV_LABOR.test(a) ? "alp" : BTV_COAL.test(a) ? "lnp" : null;
-      const pb = BTV_LABOR.test(b) ? "alp" : BTV_COAL.test(b) ? "lnp" : null;
+      const pa = PUBOP_LABOR.test(a) ? "alp" : PUBOP_COAL.test(a) ? "lnp" : null;
+      const pb = PUBOP_LABOR.test(b) ? "alp" : PUBOP_COAL.test(b) ? "lnp" : null;
       if (!pa || !pb || pa === pb) return null;
       pair = {
         a: [pa, a.replace(/^(?:Mr|Ms|Mrs)\s+/, "")],
@@ -432,7 +432,7 @@ function btvTraitSeries(f) {
       };
       continue;
     }
-    const x = btvYear(r.label, pts.length ? pts[pts.length - 1].x : null);
+    const x = pubopYear(r.label, pts.length ? pts[pts.length - 1].x : null);
     if (x == null || !pair) return null;
     const c = r.waves[0].cells;
     pts.push({
@@ -446,7 +446,7 @@ function btvTraitSeries(f) {
   }
   return pts.length ? pts : null;
 }
-function BtvTraitChart({
+function PubOpTraitChart({
   title,
   pts,
   x0,
@@ -476,9 +476,9 @@ function BtvTraitChart({
   };
   const last = k => [...pts].reverse().find(p => p.vals[k][0] != null);
   return React.createElement("figure", {
-    className: "btv-tr"
+    className: "pubop-tr"
   }, React.createElement("figcaption", {
-    className: "btv-trt"
+    className: "pubop-trt"
   }, title), React.createElement("svg", {
     viewBox: "0 0 " + W + " " + H,
     role: "img",
@@ -490,142 +490,142 @@ function BtvTraitChart({
     x2: W - R,
     y1: Y(v),
     y2: Y(v),
-    className: "btv-trg"
+    className: "pubop-trg"
   }), React.createElement("text", {
     x: L - 5,
     y: Y(v) + 3.5,
-    className: "btv-trax",
+    className: "pubop-trax",
     textAnchor: "end"
   }, v))), [2010, 2015, 2020, 2025].filter(y => y >= x0 && y <= x1).map(y => React.createElement("text", {
     key: y,
     x: X(y),
     y: H - 4,
-    className: "btv-trax",
+    className: "pubop-trax",
     textAnchor: "middle"
   }, y)), ["lnp", "alp"].map(k => React.createElement("path", {
     key: k,
     d: line(k),
-    className: "btv-trl btv-trl-" + k
+    className: "pubop-trl pubop-trl-" + k
   })), ["lnp", "alp"].map(k => pts.map((p, i) => p.vals[k][0] == null ? null : React.createElement("circle", {
     key: k + i,
     cx: X(p.x),
     cy: Y(p.vals[k][0]),
     r: 2.2,
-    className: "btv-trd btv-trl-" + k
+    className: "pubop-trd pubop-trl-" + k
   }, React.createElement("title", null, p.vals[k][1] + ", " + p.when + ": " + p.vals[k][0] + "%")))), ["alp", "lnp"].map(k => {
     const p = last(k);
     return p ? React.createElement("text", {
       key: "e" + k,
       x: X(p.x) + 5,
       y: Y(p.vals[k][0]) + 3.5,
-      className: "btv-trv"
+      className: "pubop-trv"
     }, p.vals[k][0]) : null;
   })));
 }
-function BtvTraits({
+function PubOpTraits({
   figs
 }) {
   const all = figs.map(f => ({
     f,
-    pts: btvTraitSeries(f)
+    pts: pubopTraitSeries(f)
   }));
   const xs = all.flatMap(a => a.pts.map(p => p.x));
   const x0 = Math.min(...xs) - 0.3,
     x1 = Math.max(...xs) + 0.3;
   const measure = figs[0].measure;
   return React.createElement("div", {
-    className: "btv-fig"
+    className: "pubop-fig"
   }, React.createElement("div", {
-    className: "btv-gh"
+    className: "pubop-gh"
   }, React.createElement("p", {
-    className: "btv-ghb"
-  }, (measure ? btvCap(measure) + ", %, " : "") + "for each trait"), React.createElement("p", {
-    className: "btv-fams"
+    className: "pubop-ghb"
+  }, (measure ? pubopCap(measure) + ", %, " : "") + "for each trait"), React.createElement("p", {
+    className: "pubop-fams"
   }, React.createElement("span", null, React.createElement("i", {
-    className: "btv-wsw btv-trs-alp",
+    className: "pubop-wsw pubop-trs-alp",
     "aria-hidden": "true"
   }), "Labor leader (Rudd, Gillard, Shorten, Albanese)"), React.createElement("span", null, React.createElement("i", {
-    className: "btv-wsw btv-trs-lnp",
+    className: "pubop-wsw pubop-trs-lnp",
     "aria-hidden": "true"
   }), "Coalition leader (Turnbull, Abbott, Morrison, Dutton, Ley)"))), React.createElement("div", {
-    className: "btv-trs"
-  }, all.map((a, i) => React.createElement(BtvTraitChart, {
+    className: "pubop-trs"
+  }, all.map((a, i) => React.createElement(PubOpTraitChart, {
     key: i,
     title: a.f.title,
     pts: a.pts,
     x0: x0,
     x1: x1
   }))), React.createElement("details", {
-    className: "btv-cuts"
+    className: "pubop-cuts"
   }, React.createElement("summary", null, "The figures, poll by poll"), figs.map((f, i) => React.createElement("div", {
-    className: "btv-cut",
+    className: "pubop-cut",
     key: i
   }, React.createElement("p", {
-    className: "btv-cutt"
-  }, f.title), React.createElement(BtvFigTable, {
+    className: "pubop-cutt"
+  }, f.title), React.createElement(PubOpFigTable, {
     f: f
   })))));
 }
-function BtvFig({
+function PubOpFig({
   f,
   solo
 }) {
-  const body = f.kind === "list" ? React.createElement(BtvFigList, {
+  const body = f.kind === "list" ? React.createElement(PubOpFigList, {
     f: f
-  }) : f.kind === "nets" ? React.createElement(BtvFigNets, {
+  }) : f.kind === "nets" ? React.createElement(PubOpFigNets, {
     f: f
-  }) : f.kind === "split" ? React.createElement(BtvFigSplit, {
+  }) : f.kind === "split" ? React.createElement(PubOpFigSplit, {
     f: f
-  }) : React.createElement(BtvFigTable, {
+  }) : React.createElement(PubOpFigTable, {
     f: f
   });
   return React.createElement("div", {
-    className: "btv-fig btv-fig-" + f.kind
-  }, React.createElement(BtvFigHead, {
+    className: "pubop-fig pubop-fig-" + f.kind
+  }, React.createElement(PubOpFigHead, {
     f: f,
     solo: solo
   }), body);
 }
-const btvCutsLabel = cuts => {
+const pubopCutsLabel = cuts => {
   const bs = [...new Set(cuts.flatMap(c => (c.banners || []).filter(Boolean)))];
   if (!bs.length || bs.length > 4) return "By group";
-  const w = bs.map(btvLow);
+  const w = bs.map(pubopLow);
   return "By " + (w.length < 2 ? w[0] : w.slice(0, -1).join(", ") + " and " + w[w.length - 1]);
 };
-function BtvCut({
+function PubOpCut({
   c
 }) {
-  const v = x => x == null ? "–" : btvN(x);
+  const v = x => x == null ? "–" : pubopN(x);
   if (c.down) {
     const span = c.heads.length + 1;
     return React.createElement("div", {
-      className: "btv-cut"
+      className: "pubop-cut"
     }, c.title ? React.createElement("p", {
-      className: "btv-cutt"
+      className: "pubop-cutt"
     }, c.title) : null, React.createElement("div", {
-      className: "btv-twrap"
+      className: "pubop-twrap"
     }, React.createElement("table", {
-      className: "btv-table"
+      className: "pubop-table"
     }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-      className: "btv-l"
+      className: "pubop-l"
     }), c.heads.map((h, i) => React.createElement("th", {
       key: i,
       scope: "col"
     }, h)))), React.createElement("tbody", null, c.rows.flatMap((r, i) => {
       const b = c.banners && c.banners[i];
       const head = b && (!i || c.banners[i - 1] !== b) ? [React.createElement("tr", {
-        className: "btv-tsec",
+        className: "pubop-tsec",
         key: "b" + i
       }, React.createElement("th", {
         colSpan: span,
         scope: "colgroup",
-        className: "btv-l"
+        className: "pubop-l"
       }, b))] : [];
       return head.concat(React.createElement("tr", {
         key: i
       }, React.createElement("th", {
         scope: "row",
-        className: "btv-l"
+        className: "pubop-l"
       }, r[0]), r.slice(1).map((x, k) => React.createElement("td", {
         key: k
       }, v(x)))));
@@ -642,150 +642,150 @@ function BtvCut({
   });
   const banner = runs.some(r => r.b);
   return React.createElement("div", {
-    className: "btv-cut"
+    className: "pubop-cut"
   }, c.title ? React.createElement("p", {
-    className: "btv-cutt"
+    className: "pubop-cutt"
   }, c.title) : null, React.createElement("div", {
-    className: "btv-twrap"
+    className: "pubop-twrap"
   }, React.createElement("table", {
-    className: "btv-table"
+    className: "pubop-table"
   }, React.createElement("thead", null, banner ? React.createElement("tr", {
-    className: "btv-tban"
+    className: "pubop-tban"
   }, React.createElement("th", {
-    className: "btv-l"
+    className: "pubop-l"
   }), runs.map((r, i) => React.createElement("th", {
     key: i,
     colSpan: r.n,
     scope: "colgroup"
   }, r.b || ""))) : null, React.createElement("tr", null, React.createElement("th", {
-    className: "btv-l"
+    className: "pubop-l"
   }), c.heads.map((h, i) => React.createElement("th", {
     key: i,
     scope: "col",
-    className: (runs.some(r => r.k === i && i) ? "btv-tb0" : "") + (h.length <= 7 ? " btv-nw" : "")
+    className: (runs.some(r => r.k === i && i) ? "pubop-tb0" : "") + (h.length <= 7 ? " pubop-nw" : "")
   }, h)))), React.createElement("tbody", null, c.rows.map((r, i) => React.createElement("tr", {
     key: i
   }, React.createElement("th", {
     scope: "row",
-    className: "btv-l"
+    className: "pubop-l"
   }, r[0]), r.slice(1).map((x, k) => React.createElement("td", {
     key: k,
-    className: runs.some(q => q.k === k && k) ? "btv-tb0" : ""
+    className: runs.some(q => q.k === k && k) ? "pubop-tb0" : ""
   }, v(x)))))))));
 }
-function BtvCuts({
+function PubOpCuts({
   cuts,
   when
 }) {
   if (!cuts || !cuts.length) return null;
   return React.createElement("details", {
-    className: "btv-cuts"
-  }, React.createElement("summary", null, btvCutsLabel(cuts), when ? React.createElement("span", null, " \xB7 ", when) : null), cuts.map((c, i) => React.createElement(BtvCut, {
+    className: "pubop-cuts"
+  }, React.createElement("summary", null, pubopCutsLabel(cuts), when ? React.createElement("span", null, " \xB7 ", when) : null), cuts.map((c, i) => React.createElement(PubOpCut, {
     key: i,
     c: c
   })));
 }
-function BtvSource({
+function PubOpSource({
   src,
   houses,
   question
 }) {
   return React.createElement("div", {
-    className: "btv-src"
+    className: "pubop-src"
   }, React.createElement("span", {
-    className: "btv-src-l"
-  }, React.createElement("b", null, btvHouse(src, houses, true)), React.createElement("span", null, btvSpan(src.field)), src.n ? React.createElement("span", null, src.n.toLocaleString("en-AU"), " people") : null, src.url ? React.createElement("a", {
+    className: "pubop-src-l"
+  }, React.createElement("b", null, pubopHouse(src, houses, true)), React.createElement("span", null, pubopSpan(src.field)), src.n ? React.createElement("span", null, src.n.toLocaleString("en-AU"), " people") : null, src.url ? React.createElement("a", {
     href: src.url,
     target: "_blank",
     rel: "noopener"
   }, "Source \u2197") : null), question ? React.createElement("details", {
-    className: "btv-wd"
+    className: "pubop-wd"
   }, React.createElement("summary", null, "The question as asked"), React.createElement("p", null, question)) : null);
 }
-function BtvSources({
+function PubOpSources({
   c,
   houses
 }) {
   const seen = new Set();
   const links = (c.rows || []).filter(r => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
   return React.createElement("div", {
-    className: "btv-src"
+    className: "pubop-src"
   }, React.createElement("span", {
-    className: "btv-src-l"
-  }, c.mode === "waves" ? React.createElement("b", null, btvHouse(c.src || c.rows[0].src, houses, true)) : null, links.length ? React.createElement("span", {
-    className: "btv-srcs"
+    className: "pubop-src-l"
+  }, c.mode === "waves" ? React.createElement("b", null, pubopHouse(c.src || c.rows[0].src, houses, true)) : null, links.length ? React.createElement("span", {
+    className: "pubop-srcs"
   }, "Sources: ", links.map((r, i) => React.createElement("a", {
     key: i,
     href: r.src.url,
     target: "_blank",
     rel: "noopener"
-  }, c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end), " \u2197"))) : null));
+  }, c.mode === "waves" ? pubopMonth(r.src.field.end) : pubopHouse(r.src, houses) + " " + pubopMonth(r.src.field.end), " \u2197"))) : null));
 }
-function BtvWaves({
+function PubOpWaves({
   q,
   houses
 }) {
   const asked = [...new Set(q.srcs.map(s => s.question).filter(Boolean))];
   return React.createElement("div", {
-    className: "btv-src"
+    className: "pubop-src"
   }, React.createElement("b", {
-    className: "btv-srch"
-  }, btvHouse(q, houses, true)), React.createElement("ul", {
-    className: "btv-srcw"
+    className: "pubop-srch"
+  }, pubopHouse(q, houses, true)), React.createElement("ul", {
+    className: "pubop-srcw"
   }, q.srcs.map((s, i) => React.createElement("li", {
     key: i
-  }, React.createElement("span", null, btvSpan(s.field)), s.n ? React.createElement("span", null, s.n.toLocaleString("en-AU"), " people") : null, s.url ? React.createElement("a", {
+  }, React.createElement("span", null, pubopSpan(s.field)), s.n ? React.createElement("span", null, s.n.toLocaleString("en-AU"), " people") : null, s.url ? React.createElement("a", {
     href: s.url,
     target: "_blank",
     rel: "noopener"
   }, "Source \u2197") : null))), asked.length ? React.createElement("details", {
-    className: "btv-wd"
+    className: "pubop-wd"
   }, React.createElement("summary", null, asked.length > 1 ? "The questions as asked" : "The question as asked"), asked.map((x, i) => React.createElement("p", {
     key: i
   }, x))) : null);
 }
-function BtvItem({
+function PubOpItem({
   c,
   houses,
   topic
 }) {
-  const body = c.kind === "split" ? React.createElement(BtvSplit, {
+  const body = c.kind === "split" ? React.createElement(PubOpSplit, {
     c: c
-  }) : c.kind === "stack" ? React.createElement(BtvStack, {
+  }) : c.kind === "stack" ? React.createElement(PubOpStack, {
     c: c,
     houses: houses
-  }) : c.kind === "rank" ? React.createElement(BtvRank, {
+  }) : c.kind === "rank" ? React.createElement(PubOpRank, {
     c: c
-  }) : c.kind === "nets" ? React.createElement(BtvNets, {
+  }) : c.kind === "nets" ? React.createElement(PubOpNets, {
     c: c
   }) : null;
   return React.createElement("article", {
-    className: "btv-item btv-k-" + c.kind
+    className: "pubop-item pubop-k-" + c.kind
   }, React.createElement("div", {
-    className: "btv-il"
+    className: "pubop-il"
   }, topic ? React.createElement("p", {
-    className: "btv-qt"
+    className: "pubop-qt"
   }, topic) : null, React.createElement("h4", {
-    className: "btv-q"
+    className: "pubop-q"
   }, c.title), c.summary ? React.createElement("p", {
-    className: "btv-sum"
+    className: "pubop-sum"
   }, c.summary) : null, c.note ? React.createElement("p", {
-    className: "btv-note"
-  }, c.note) : null, c.src && c.src.field ? React.createElement(BtvSource, {
+    className: "pubop-note"
+  }, c.note) : null, c.src && c.src.field ? React.createElement(PubOpSource, {
     src: c.src,
     houses: houses,
     question: c.question
-  }) : React.createElement(BtvSources, {
+  }) : React.createElement(PubOpSources, {
     c: c,
     houses: houses
   })), React.createElement("div", {
-    className: "btv-ir"
-  }, body, React.createElement(BtvCuts, {
+    className: "pubop-ir"
+  }, body, React.createElement(PubOpCuts, {
     cuts: c.cuts,
     when: null
   })));
 }
-function BtvTracker({
+function PubOpTracker({
   c,
   houses,
   topic
@@ -807,14 +807,14 @@ function BtvTracker({
       const x = y + m / 12;
       if (x >= x0 && x <= x1) ticks.push({
         x,
-        label: BTV_MON[m] + " " + String(y).slice(2)
+        label: PUBOP_MON[m] + " " + String(y).slice(2)
       });
     }
   }
-  const fmt = v => net ? btvSigned(v) : btvPct(v);
+  const fmt = v => net ? pubopSigned(v) : pubopPct(v);
   const yt = [];
   for (let v = lo + step; v <= hi + 1e-9; v += step) yt.push(v);
-  const ink = f => "var(--btv-w" + f + ")";
+  const ink = f => "var(--pubop-w" + f + ")";
   const fams = c.families.map((label, i) => ({
     label,
     i
@@ -830,28 +830,28 @@ function BtvTracker({
   })).sort((a, b) => b.q.x - a.q.x);
   const rows = pts.slice().sort((p, q) => q.x - p.x);
   return React.createElement("div", {
-    className: "btv-tracker"
+    className: "pubop-tracker"
   }, topic ? React.createElement("p", {
-    className: "btv-qt"
+    className: "pubop-qt"
   }, topic) : null, React.createElement("p", {
-    className: "btv-tlab"
+    className: "pubop-tlab"
   }, c.title), React.createElement("p", {
-    className: "btv-tdek"
+    className: "pubop-tdek"
   }, c.dek), React.createElement("p", {
-    className: "btv-fams"
+    className: "pubop-fams"
   }, fams.map(f => React.createElement("span", {
     key: f.i
   }, React.createElement("i", {
-    className: "btv-wsw btv-w" + f.i,
+    className: "pubop-wsw pubop-w" + f.i,
     "aria-hidden": "true"
   }), f.label))), React.createElement("div", {
-    className: "btv-tbody"
+    className: "pubop-tbody"
   }, React.createElement("div", {
-    className: "btv-tchart"
+    className: "pubop-tchart"
   }, React.createElement("div", {
-    className: "card rd-card btv-chart"
+    className: "card rd-card pubop-chart"
   }, React.createElement(TrendChart, {
-    key: "btv-" + c.id,
+    key: "pubop-" + c.id,
     heightPx: narrow ? 250 : 320,
     padPx: {
       l: 34,
@@ -869,9 +869,9 @@ function BtvTracker({
       x: "left",
       y: v,
       dy: -3,
-      text: net ? v === 0 ? "Even" : btvSigned(v) : v + (v === hi ? "%" : ""),
+      text: net ? v === 0 ? "Even" : pubopSigned(v) : v + (v === hi ? "%" : ""),
       size: 10.5,
-      cls: "btv-ylab"
+      cls: "pubop-ylab"
     })),
     refLines: c.ref != null ? [{
       y: c.ref,
@@ -880,11 +880,11 @@ function BtvTracker({
     }] : [],
     series: c.panels.map(p => ({
       id: p.house,
-      label: btvHouse(p, houses),
+      label: pubopHouse(p, houses),
       color: ink(p.fam),
       rdWidth: 2,
       smooth: false,
-      endLabel: btvHouse(p, houses),
+      endLabel: pubopHouse(p, houses),
       points: p.points.map(q => ({
         x: q.x,
         y: q.v
@@ -896,36 +896,36 @@ function BtvTracker({
       x: q.x,
       y: q.v,
       color: ink(q.fam),
-      label: net ? "Net" : btvCap(c.names[0]),
+      label: net ? "Net" : pubopCap(c.names[0]),
       meta: q.rk ? {
         pollster: q.rk.split("|")[0],
         released: q.rk.split("|")[1],
         facet: q.fk,
-        dateLabel: btvSpan(q.field),
+        dateLabel: pubopSpan(q.field),
         sample: q.n
       } : {
-        pollster: btvHouse(q, houses, true),
-        dateLabel: btvSpan(q.field),
+        pollster: pubopHouse(q, houses, true),
+        dateLabel: pubopSpan(q.field),
         sample: q.n
       }
     })),
     tooltipTitle: i => {
       const qs = at(i);
-      return qs.length === 1 ? btvSpan(qs[0].field) : qs.length ? btvDay(qs[0].field.end) : "";
+      return qs.length === 1 ? pubopSpan(qs[0].field) : qs.length ? pubopDay(qs[0].field.end) : "";
     },
     extraRows: i => {
       const qs = at(i);
       return qs.flatMap(q => {
-        const pre = qs.length > 1 ? btvHouse(q, houses) + ": " : "";
+        const pre = qs.length > 1 ? pubopHouse(q, houses) + ": " : "";
         return net ? [{
-          label: pre + btvCap(c.names[0]),
-          value: btvPct(q.a)
+          label: pre + pubopCap(c.names[0]),
+          value: pubopPct(q.a)
         }, {
-          label: pre + btvCap(c.names[1]),
-          value: btvPct(q.b)
+          label: pre + pubopCap(c.names[1]),
+          value: pubopPct(q.b)
         }] : [{
-          label: pre + btvCap(c.names[1]),
-          value: btvPct(q.b)
+          label: pre + pubopCap(c.names[1]),
+          value: pubopPct(q.b)
         }];
       });
     },
@@ -933,7 +933,7 @@ function BtvTracker({
     copy: {
       title: c.title,
       sub: c.head + "." + (c.note ? " " + c.note : ""),
-      span: btvMonYY(c.first) + " – " + btvMonYY(c.last),
+      span: pubopMonYY(c.first) + " – " + pubopMonYY(c.last),
       caption: "Each dot is one poll; a line joins one pollster’s own readings, coloured by how it asked.",
       legend: fams.map(f => ({
         label: f.label,
@@ -946,162 +946,162 @@ function BtvTracker({
       }] : [])
     }
   }), React.createElement("p", {
-    className: "rd-ckey btv-tkey"
+    className: "rd-ckey pubop-tkey"
   }, React.createElement("span", null, React.createElement("i", {
-    className: "btv-dot",
+    className: "pubop-dot",
     "aria-hidden": "true"
   }), "One poll"), React.createElement("span", null, React.createElement("i", {
-    className: "btv-ln",
+    className: "pubop-ln",
     "aria-hidden": "true"
   }), "One pollster\u2019s readings, joined"), c.ref != null ? React.createElement("span", null, React.createElement("i", {
-    className: "btv-rl0",
+    className: "pubop-rl0",
     "aria-hidden": "true"
   }), c.refLabel) : null)), c.note ? React.createElement("p", {
-    className: "btv-note"
+    className: "pubop-note"
   }, c.note) : null), React.createElement("aside", {
-    className: "btv-latest",
+    className: "pubop-latest",
     "aria-label": "Latest from each pollster"
   }, React.createElement("p", {
-    className: "btv-lh"
+    className: "pubop-lh"
   }, "Latest from each pollster"), React.createElement("ul", {
-    className: "btv-ll"
+    className: "pubop-ll"
   }, latest.map(({
     p,
     q
   }) => React.createElement("li", {
     key: p.house
   }, React.createElement("span", {
-    className: "btv-lp"
+    className: "pubop-lp"
   }, React.createElement("span", {
-    className: "btv-lnm"
+    className: "pubop-lnm"
   }, React.createElement("i", {
-    className: "btv-ldot btv-w" + p.fam,
+    className: "pubop-ldot pubop-w" + p.fam,
     "aria-hidden": "true"
-  }), btvHouse(p, houses), React.createElement("span", {
-    className: "btv-ld"
-  }, btvDay(q.field.end))), React.createElement("span", {
-    className: "btv-lq"
+  }), pubopHouse(p, houses), React.createElement("span", {
+    className: "pubop-ld"
+  }, pubopDay(q.field.end))), React.createElement("span", {
+    className: "pubop-lq"
   }, p.label)), React.createElement("b", {
-    className: "btv-lv"
+    className: "pubop-lv"
   }, fmt(q.v))))))), React.createElement("details", {
-    className: "btv-ledger"
+    className: "pubop-ledger"
   }, React.createElement("summary", null, "All ", rows.length, " readings"), React.createElement("div", {
-    className: "btv-twrap"
+    className: "pubop-twrap"
   }, React.createElement("table", {
-    className: "btv-table"
+    className: "pubop-table"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-    className: "btv-l"
+    className: "pubop-l"
   }, "Pollster"), React.createElement("th", {
-    className: "btv-l"
+    className: "pubop-l"
   }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), React.createElement("th", null, c.cols[1]), React.createElement("th", null, c.cols[2]), net ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
     key: i
   }, React.createElement("td", {
-    className: "btv-l"
-  }, btvHouse(q, houses)), React.createElement("td", {
-    className: "btv-l"
-  }, btvSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, btvN(q.a)), React.createElement("td", null, btvN(q.m)), React.createElement("td", null, btvN(q.b)), net ? React.createElement("td", null, React.createElement("b", null, btvSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
+    className: "pubop-l"
+  }, pubopHouse(q, houses)), React.createElement("td", {
+    className: "pubop-l"
+  }, pubopSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, pubopN(q.a)), React.createElement("td", null, pubopN(q.m)), React.createElement("td", null, pubopN(q.b)), net ? React.createElement("td", null, React.createElement("b", null, pubopSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
     href: q.url,
     target: "_blank",
     rel: "noopener"
   }, "Source \u2197") : null))))))));
 }
-function BtvMore({
+function PubOpMore({
   label,
   qs,
   houses,
   meta
 }) {
   return React.createElement("details", {
-    className: "btv-more"
+    className: "pubop-more"
   }, React.createElement("summary", null, label, React.createElement("span", null, " \xB7 ", qs.length)), React.createElement("ul", {
-    className: "btv-ml"
+    className: "pubop-ml"
   }, qs.map(q => React.createElement("li", {
     key: q.id + q.house
   }, React.createElement("details", {
-    className: "btv-mi"
+    className: "pubop-mi"
   }, React.createElement("summary", null, React.createElement("span", {
-    className: "btv-mq"
+    className: "pubop-mq"
   }, q.title), React.createElement("span", {
-    className: "btv-mm"
+    className: "pubop-mm"
   }, meta(q))), React.createElement("div", {
-    className: "btv-mb"
+    className: "pubop-mb"
   }, React.createElement("div", {
-    className: "btv-il"
-  }, React.createElement(BtvWaves, {
+    className: "pubop-il"
+  }, React.createElement(PubOpWaves, {
     q: q,
     houses: houses
   })), React.createElement("div", {
-    className: "btv-ir"
-  }, q.figs.length > 1 && q.figs.every(f => btvTraitSeries(f)) ? React.createElement(BtvTraits, {
+    className: "pubop-ir"
+  }, q.figs.length > 1 && q.figs.every(f => pubopTraitSeries(f)) ? React.createElement(PubOpTraits, {
     figs: q.figs
-  }) : q.figs.map((f, i) => React.createElement(BtvFig, {
+  }) : q.figs.map((f, i) => React.createElement(PubOpFig, {
     key: i,
     f: f,
     solo: q.figs.length === 1
   })), q.prose.map((p, i) => React.createElement("div", {
-    className: "btv-fig",
+    className: "pubop-fig",
     key: "p" + i
   }, q.prose.length > 1 || q.figs.length ? React.createElement("p", {
-    className: "btv-ght"
+    className: "pubop-ght"
   }, p.when) : null, React.createElement("blockquote", {
-    className: "btv-prose"
-  }, btvText(p.text.join(" "))))), React.createElement(BtvCuts, {
+    className: "pubop-prose"
+  }, pubopText(p.text.join(" "))))), React.createElement(PubOpCuts, {
     cuts: q.cuts,
     when: q.srcs.length > 1 ? q.cutsWhen : null
   }))))))));
 }
-const btvCount = (trackers, items, more) => [trackers ? trackers === 1 ? "One chart" : btvCap(btvWord(trackers)) + " charts" : null, items ? items + (items === 1 ? " question" : " questions") : null, more ? more + " more" : null].filter(Boolean).join(" · ");
-function BtvTopic({
+const pubopCount = (trackers, items, more) => [trackers ? trackers === 1 ? "One chart" : pubopCap(pubopWord(trackers)) + " charts" : null, items ? items + (items === 1 ? " question" : " questions") : null, more ? more + " more" : null].filter(Boolean).join(" · ");
+function PubOpTopic({
   t,
   n,
   houses
 }) {
   const trackers = t.blocks.filter(b => b.kind === "tracker");
   const items = t.blocks.filter(b => b.kind !== "tracker");
-  const count = btvCount(trackers.length, items.length, t.more.length);
+  const count = pubopCount(trackers.length, items.length, t.more.length);
   return React.createElement("section", {
-    className: "btv-topic",
-    id: "btv-" + t.id,
-    "aria-labelledby": "btv-h-" + t.id
+    className: "pubop-topic",
+    id: "pubop-" + t.id,
+    "aria-labelledby": "pubop-h-" + t.id
   }, React.createElement("div", {
-    className: "btv-tk"
+    className: "pubop-tk"
   }, React.createElement("h3", {
-    className: "btv-tt",
-    id: "btv-h-" + t.id
+    className: "pubop-tt",
+    id: "pubop-h-" + t.id
   }, React.createElement("span", {
-    className: "btv-tn"
+    className: "pubop-tn"
   }, n), t.title), React.createElement("span", {
-    className: "btv-tc"
+    className: "pubop-tc"
   }, count)), t.finding ? React.createElement("p", {
-    className: "btv-hl"
+    className: "pubop-hl"
   }, t.finding.text) : null, React.createElement("p", {
-    className: "btv-tdk"
-  }, t.dek), trackers.map(c => React.createElement(BtvTracker, {
+    className: "pubop-tdk"
+  }, t.dek), trackers.map(c => React.createElement(PubOpTracker, {
     key: c.id,
     c: c,
     houses: houses
   })), items.length ? React.createElement("div", {
-    className: "btv-items"
-  }, items.map((c, i) => React.createElement(BtvItem, {
+    className: "pubop-items"
+  }, items.map((c, i) => React.createElement(PubOpItem, {
     key: (c.id || "") + i,
     c: c,
     houses: houses
-  }))) : null, t.more.length ? React.createElement(BtvMore, {
+  }))) : null, t.more.length ? React.createElement(PubOpMore, {
     label: "More questions on " + (t.about || t.title),
     qs: t.more,
     houses: houses,
-    meta: q => btvHouse(q, houses) + " · " + btvMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
+    meta: q => pubopHouse(q, houses) + " · " + pubopMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
   }) : null);
 }
-const btvLast = b => b.kind === "tracker" ? b.last : b.src && b.src.field ? b.src.field.end : (b.rows || []).reduce((d, r) => r.src && r.src.field && r.src.field.end > d ? r.src.field.end : d, "");
-const btvHousesOf = b => b.kind === "tracker" ? [...new Set(b.panels.map(p => p.house))] : b.src && b.src.house ? [b.src.house] : [...new Set((b.rows || []).map(r => r.src && r.src.house).filter(Boolean))];
-function btvDated(topics) {
+const pubopLast = b => b.kind === "tracker" ? b.last : b.src && b.src.field ? b.src.field.end : (b.rows || []).reduce((d, r) => r.src && r.src.field && r.src.field.end > d ? r.src.field.end : d, "");
+const pubopHousesOf = b => b.kind === "tracker" ? [...new Set(b.panels.map(p => p.house))] : b.src && b.src.house ? [b.src.house] : [...new Set((b.rows || []).map(r => r.src && r.src.house).filter(Boolean))];
+function pubopDated(topics) {
   const all = [];
   topics.forEach(t => {
     t.blocks.forEach(b => all.push({
       t,
       b,
-      date: btvLast(b)
+      date: pubopLast(b)
     }));
     t.more.forEach(q => all.push({
       t,
@@ -1111,14 +1111,14 @@ function btvDated(topics) {
   });
   return all.sort((p, q) => p.date < q.date ? 1 : p.date > q.date ? -1 : 0);
 }
-const btvSplitKinds = all => ({
+const pubopSplitKinds = all => ({
   trackers: all.filter(e => e.b && e.b.kind === "tracker"),
   items: all.filter(e => e.b && e.b.kind !== "tracker"),
   more: all.filter(e => e.q)
 });
-function btvByMonth(topics) {
+function pubopByMonth(topics) {
   const months = [];
-  for (const e of btvDated(topics)) {
+  for (const e of pubopDated(topics)) {
     const ym = e.date.slice(0, 7);
     if (!months.length || months[months.length - 1].ym !== ym) months.push({
       ym,
@@ -1127,21 +1127,21 @@ function btvByMonth(topics) {
     months[months.length - 1].all.push(e);
   }
   return months.map(m => {
-    const title = BTV_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
+    const title = PUBOP_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
     return {
       id: "m-" + m.ym,
       title,
       moreLabel: "More questions from " + title,
-      ...btvSplitKinds(m.all)
+      ...pubopSplitKinds(m.all)
     };
   });
 }
-function btvByPollster(topics, houses) {
+function pubopByPollster(topics, houses) {
   const own = new Map(),
     also = new Map(),
     several = [];
-  for (const e of btvDated(topics)) {
-    const hs = e.q ? [e.q.house] : btvHousesOf(e.b);
+  for (const e of pubopDated(topics)) {
+    const hs = e.q ? [e.q.house] : pubopHousesOf(e.b);
     if (hs.length === 1) {
       if (!own.has(hs[0])) own.set(hs[0], []);
       own.get(hs[0]).push(e);
@@ -1150,26 +1150,26 @@ function btvByPollster(topics, houses) {
       hs.forEach(h => also.set(h, (also.get(h) || 0) + 1));
     }
   }
-  const name = h => btvHouse({
+  const name = h => pubopHouse({
     house: h
   }, houses);
   const ids = [...new Set([...own.keys(), ...also.keys()])].sort((p, q) => (own.get(q) || []).length - (own.get(p) || []).length || (also.get(q) || 0) - (also.get(p) || 0) || name(p).localeCompare(name(q)));
   const groups = ids.map(h => {
     const n = also.get(h) || 0,
       mine = own.get(h) || [];
-    const cmp = btvWord(n) + (n === 1 ? " comparison" : " comparisons") + " with other pollsters";
+    const cmp = pubopWord(n) + (n === 1 ? " comparison" : " comparisons") + " with other pollsters";
     return {
       id: "p-" + h,
-      title: btvHouse({
+      title: pubopHouse({
         house: h
       }, houses, true),
       moreLabel: "More questions from " + name(h),
       lead: n ? React.createElement("p", {
-        className: "btv-tdk"
+        className: "pubop-tdk"
       }, mine.length ? "Also in " : "Only in ", React.createElement("a", {
-        href: "#btv-p-several"
+        href: "#pubop-p-several"
       }, cmp), ".") : null,
-      ...btvSplitKinds(mine)
+      ...pubopSplitKinds(mine)
     };
   });
   if (several.length) groups.push({
@@ -1177,50 +1177,50 @@ function btvByPollster(topics, houses) {
     title: "Several pollsters",
     moreLabel: "",
     lead: React.createElement("p", {
-      className: "btv-tdk"
+      className: "pubop-tdk"
     }, "Charts and questions that set two or more pollsters side by side."),
-    ...btvSplitKinds(several)
+    ...pubopSplitKinds(several)
   });
   return groups;
 }
-function BtvGroup({
+function PubOpGroup({
   g,
   houses,
   byHouse
 }) {
   const topicOf = new Map(g.more.map(e => [e.q, e.t]));
-  const count = btvCount(g.trackers.length, g.items.length, g.more.length);
+  const count = pubopCount(g.trackers.length, g.items.length, g.more.length);
   return React.createElement("section", {
-    className: "btv-topic btv-mon",
-    id: "btv-" + g.id,
-    "aria-labelledby": "btv-h-" + g.id
+    className: "pubop-topic pubop-mon",
+    id: "pubop-" + g.id,
+    "aria-labelledby": "pubop-h-" + g.id
   }, React.createElement("div", {
-    className: "btv-tk"
+    className: "pubop-tk"
   }, React.createElement("h3", {
-    className: "btv-tt",
-    id: "btv-h-" + g.id
+    className: "pubop-tt",
+    id: "pubop-h-" + g.id
   }, g.title), count ? React.createElement("span", {
-    className: "btv-tc"
-  }, count) : null), g.lead || null, g.trackers.map(e => React.createElement(BtvTracker, {
+    className: "pubop-tc"
+  }, count) : null), g.lead || null, g.trackers.map(e => React.createElement(PubOpTracker, {
     key: e.b.id,
     c: e.b,
     houses: houses,
     topic: e.t.short
   })), g.items.length ? React.createElement("div", {
-    className: "btv-items"
-  }, g.items.map((e, i) => React.createElement(BtvItem, {
+    className: "pubop-items"
+  }, g.items.map((e, i) => React.createElement(PubOpItem, {
     key: (e.b.id || "") + i,
     c: e.b,
     houses: houses,
     topic: e.t.short
-  }))) : null, g.more.length ? React.createElement(BtvMore, {
+  }))) : null, g.more.length ? React.createElement(PubOpMore, {
     label: g.moreLabel,
     qs: g.more.map(e => e.q),
     houses: houses,
-    meta: q => topicOf.get(q).short + (byHouse ? "" : " · " + btvHouse(q, houses)) + " · " + btvDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
+    meta: q => topicOf.get(q).short + (byHouse ? "" : " · " + pubopHouse(q, houses)) + " · " + pubopDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
   }) : null);
 }
-const BTV_SORTS = [{
+const PUBOP_SORTS = [{
   id: "issue",
   label: "By issue"
 }, {
@@ -1230,15 +1230,15 @@ const BTV_SORTS = [{
   id: "recent",
   label: "By recency"
 }];
-function BtvSort({
+function PubOpSort({
   sort,
   onSort
 }) {
   const sortSwipeLive = React.useRef(null);
   sortSwipeLive.current = dir => {
-    const i = BTV_SORTS.findIndex(o => o.id === sort);
+    const i = PUBOP_SORTS.findIndex(o => o.id === sort);
     if (i < 0) return false;
-    onSort(BTV_SORTS[(i + dir + BTV_SORTS.length) % BTV_SORTS.length].id);
+    onSort(PUBOP_SORTS[(i + dir + PUBOP_SORTS.length) % PUBOP_SORTS.length].id);
     return true;
   };
   const sortSwipe = React.useCallback(el => {
@@ -1275,83 +1275,83 @@ function BtvSort({
     };
   }, []);
   return React.createElement("div", {
-    className: "btv-sort"
+    className: "pubop-sort"
   }, React.createElement("span", {
-    className: "btv-sort-l",
-    id: "btv-sort-l"
+    className: "pubop-sort-l",
+    id: "pubop-sort-l"
   }, "Sort"), React.createElement("div", {
-    className: "btv-sort-g",
+    className: "pubop-sort-g",
     role: "group",
-    "aria-labelledby": "btv-sort-l",
+    "aria-labelledby": "pubop-sort-l",
     ref: sortSwipe,
     "data-rd-swipe": "",
-    onKeyDown: rdTabsKey(BTV_SORTS, onSort),
+    onKeyDown: rdTabsKey(PUBOP_SORTS, onSort),
     onClick: rdTabFocus
-  }, BTV_SORTS.map(o => React.createElement("button", {
+  }, PUBOP_SORTS.map(o => React.createElement("button", {
     key: o.id,
     type: "button",
-    className: "btv-sort-b",
+    className: "pubop-sort-b",
     "aria-pressed": sort === o.id,
     onClick: () => onSort(o.id)
   }, React.createElement("span", {
-    className: "btv-sort-w",
+    className: "pubop-sort-w",
     "data-t": o.label
   }, o.label)))));
 }
-const btvPushW = (parts, s) => {
+const pubopPushW = (parts, s) => {
   if (s) parts.push(String(s));
 };
-const btvSegsW = (segs, parts) => (segs || []).forEach(s => btvPushW(parts, s.label));
-const btvRowsW = (rows, parts) => (rows || []).forEach(r => {
-  btvPushW(parts, r.label);
-  btvPushW(parts, r.wording);
-  btvSegsW(r.segs, parts);
-  (r.waves || []).forEach(w => btvSegsW(w.segs, parts));
+const pubopSegsW = (segs, parts) => (segs || []).forEach(s => pubopPushW(parts, s.label));
+const pubopRowsW = (rows, parts) => (rows || []).forEach(r => {
+  pubopPushW(parts, r.label);
+  pubopPushW(parts, r.wording);
+  pubopSegsW(r.segs, parts);
+  (r.waves || []).forEach(w => pubopSegsW(w.segs, parts));
 });
-const btvCutsW = (cuts, parts) => (cuts || []).forEach(c => {
-  btvPushW(parts, c.title);
+const pubopCutsW = (cuts, parts) => (cuts || []).forEach(c => {
+  pubopPushW(parts, c.title);
   (c.heads || []).forEach(h => parts.push(String(h)));
-  (c.banners || []).forEach(b => btvPushW(parts, b));
-  (c.rows || []).forEach(r => r.length && btvPushW(parts, r[0]));
+  (c.banners || []).forEach(b => pubopPushW(parts, b));
+  (c.rows || []).forEach(r => r.length && pubopPushW(parts, r[0]));
 });
-const btvFigsW = (figs, parts) => (figs || []).forEach(f => {
-  [f.title, f.measure, f.base].forEach(s => btvPushW(parts, s));
+const pubopFigsW = (figs, parts) => (figs || []).forEach(f => {
+  [f.title, f.measure, f.base].forEach(s => pubopPushW(parts, s));
   (f.heads || []).concat(f.extraHeads || []).forEach(h => parts.push(String(h)));
-  (f.legend || []).forEach(l => btvPushW(parts, l.label));
-  btvRowsW(f.rows, parts);
-  (f.sums || []).forEach(r => btvPushW(parts, r.label));
+  (f.legend || []).forEach(l => pubopPushW(parts, l.label));
+  pubopRowsW(f.rows, parts);
+  (f.sums || []).forEach(r => pubopPushW(parts, r.label));
 });
-const btvBlockW = b => {
+const pubopBlockW = b => {
   const parts = [];
-  [b.title, b.summary, b.note, b.question, b.xLabel, b.base].forEach(s => btvPushW(parts, s));
-  (b.names || []).forEach(s => btvPushW(parts, s));
-  (b.legend || []).forEach(l => btvPushW(parts, l.label));
-  btvSegsW(b.segs, parts);
-  btvRowsW(b.rows, parts);
-  btvCutsW(b.cuts, parts);
+  [b.title, b.summary, b.note, b.question, b.xLabel, b.base].forEach(s => pubopPushW(parts, s));
+  (b.names || []).forEach(s => pubopPushW(parts, s));
+  (b.legend || []).forEach(l => pubopPushW(parts, l.label));
+  pubopSegsW(b.segs, parts);
+  pubopRowsW(b.rows, parts);
+  pubopCutsW(b.cuts, parts);
   if (b.kind === "tracker") {
-    [b.dek, b.head, b.refLabel].forEach(s => btvPushW(parts, s));
+    [b.dek, b.head, b.refLabel].forEach(s => pubopPushW(parts, s));
     (b.families || []).forEach(s => parts.push(String(s)));
     (b.cols || []).forEach(s => parts.push(String(s)));
-    (b.panels || []).forEach(p => btvPushW(parts, p.label));
+    (b.panels || []).forEach(p => pubopPushW(parts, p.label));
   }
   return parts.join(" ").toLowerCase();
 };
-const btvMoreW = m => {
+const pubopMoreW = m => {
   const parts = [String(m.title || "")];
-  (m.srcs || []).forEach(s => btvPushW(parts, s.question));
-  btvFigsW(m.figs, parts);
-  (m.prose || []).forEach(p => parts.push(btvText((p.text || []).join(" "))));
-  btvCutsW(m.cuts, parts);
+  (m.srcs || []).forEach(s => pubopPushW(parts, s.question));
+  pubopFigsW(m.figs, parts);
+  (m.prose || []).forEach(p => parts.push(pubopText((p.text || []).join(" "))));
+  pubopCutsW(m.cuts, parts);
   return parts.join(" ").toLowerCase();
 };
-const btvHayMirror = words => words + " " + words.replace(/–/g, "-");
-function BtvSearch({
+const pubopHayMirror = words => words + " " + words.replace(/–/g, "-");
+function PubOpSearch({
   q,
   onQ
 }) {
   return React.createElement("label", {
-    className: "btv-search"
+    className: "pubop-search"
   }, React.createElement("svg", {
     viewBox: "0 0 24 24",
     width: "15",
@@ -1377,47 +1377,47 @@ function BtvSearch({
     "aria-label": "Search the questions"
   }), q ? React.createElement("button", {
     type: "button",
-    className: "btv-x",
+    className: "pubop-x",
     onClick: () => onQ(""),
     "aria-label": "Clear search"
   }, "\xD7") : null);
 }
-function BtvHitMore({
+function PubOpHitMore({
   m,
   houses
 }) {
   return React.createElement("article", {
-    className: "btv-item btv-hit"
+    className: "pubop-item pubop-hit"
   }, React.createElement("div", {
-    className: "btv-il"
+    className: "pubop-il"
   }, React.createElement("h4", {
-    className: "btv-q"
-  }, m.title), React.createElement(BtvWaves, {
+    className: "pubop-q"
+  }, m.title), React.createElement(PubOpWaves, {
     q: m,
     houses: houses
   })), React.createElement("div", {
-    className: "btv-ir"
-  }, m.figs.length > 1 && m.figs.every(f => btvTraitSeries(f)) ? React.createElement(BtvTraits, {
+    className: "pubop-ir"
+  }, m.figs.length > 1 && m.figs.every(f => pubopTraitSeries(f)) ? React.createElement(PubOpTraits, {
     figs: m.figs
-  }) : m.figs.map((f, i) => React.createElement(BtvFig, {
+  }) : m.figs.map((f, i) => React.createElement(PubOpFig, {
     key: i,
     f: f,
     solo: m.figs.length === 1
   })), m.prose.map((p, i) => React.createElement("div", {
-    className: "btv-fig",
+    className: "pubop-fig",
     key: "p" + i
   }, m.prose.length > 1 || m.figs.length ? React.createElement("p", {
-    className: "btv-ght"
+    className: "pubop-ght"
   }, p.when) : null, React.createElement("blockquote", {
-    className: "btv-prose"
-  }, btvText(p.text.join(" "))))), React.createElement(BtvCuts, {
+    className: "pubop-prose"
+  }, pubopText(p.text.join(" "))))), React.createElement(PubOpCuts, {
     cuts: m.cuts,
     when: m.srcs.length > 1 ? m.cutsWhen : null
   })));
 }
-const BTV_R_FIRST = 3,
-  BTV_R_STEP = 3;
-function BtvResults({
+const PUBOP_R_FIRST = 3,
+  PUBOP_R_STEP = 3;
+function PubOpResults({
   q,
   hits,
   houses
@@ -1426,18 +1426,18 @@ function BtvResults({
   const nItems = hits.reduce((n, g) => n + g.blocks.filter(b => b.kind !== "tracker").length, 0);
   const nMore = hits.reduce((n, g) => n + g.more.length, 0);
   const total = nCharts + nItems + nMore;
-  const [fill, setFill] = btvUseState({
+  const [fill, setFill] = pubopUseState({
     q,
-    n: BTV_R_FIRST
+    n: PUBOP_R_FIRST
   });
-  const filled = fill.q === q ? fill.n : BTV_R_FIRST;
-  btvUseEffect(() => {
+  const filled = fill.q === q ? fill.n : PUBOP_R_FIRST;
+  pubopUseEffect(() => {
     if (filled >= hits.length) return undefined;
     let t = 0;
     const raf = requestAnimationFrame(() => {
       t = setTimeout(() => setFill(f => ({
         q,
-        n: (f.q === q ? f.n : BTV_R_FIRST) + BTV_R_STEP
+        n: (f.q === q ? f.n : PUBOP_R_FIRST) + PUBOP_R_STEP
       })), 0);
     });
     return () => {
@@ -1447,89 +1447,89 @@ function BtvResults({
   }, [q, filled, hits.length]);
   if (!total) {
     return React.createElement("p", {
-      className: "btv-none"
+      className: "pubop-none"
     }, "Nothing matches \u201C", q, "\u201D \u2014 try the words of a question as asked, or of its answers.");
   }
   return React.createElement("div", {
-    className: "btv-res"
+    className: "pubop-res"
   }, React.createElement("p", {
-    className: "btv-scope btv-rcount"
+    className: "pubop-scope pubop-rcount"
   }, React.createElement("b", null, total), " ", total === 1 ? "match" : "matches", " for \u201C", q, "\u201D"), hits.slice(0, filled).map(g => {
     const trackers = g.blocks.filter(b => b.kind === "tracker");
     const items = g.blocks.filter(b => b.kind !== "tracker");
     return React.createElement("section", {
-      className: "btv-topic btv-mon",
+      className: "pubop-topic pubop-mon",
       key: g.t.id
     }, React.createElement("div", {
-      className: "btv-tk"
+      className: "pubop-tk"
     }, React.createElement("h3", {
-      className: "btv-tt"
+      className: "pubop-tt"
     }, g.t.title), React.createElement("span", {
-      className: "btv-tc"
-    }, btvCount(trackers.length, items.length, g.more.length))), trackers.map(c => React.createElement(BtvTracker, {
+      className: "pubop-tc"
+    }, pubopCount(trackers.length, items.length, g.more.length))), trackers.map(c => React.createElement(PubOpTracker, {
       key: c.id,
       c: c,
       houses: houses
     })), items.length ? React.createElement("div", {
-      className: "btv-items"
-    }, items.map((c, i) => React.createElement(BtvItem, {
+      className: "pubop-items"
+    }, items.map((c, i) => React.createElement(PubOpItem, {
       key: (c.id || "") + i,
       c: c,
       houses: houses
     }))) : null, g.more.length ? React.createElement("div", {
-      className: "btv-items"
-    }, g.more.map(m => React.createElement(BtvHitMore, {
+      className: "pubop-items"
+    }, g.more.map(m => React.createElement(PubOpHitMore, {
       key: m.id + "|" + m.house,
       m: m,
       houses: houses
     }))) : null);
   }));
 }
-function BtvFindings({
+function PubOpFindings({
   topics,
   onGo
 }) {
   return React.createElement("section", {
-    className: "btv-finds",
-    "aria-labelledby": "btv-finds-h"
+    className: "pubop-finds",
+    "aria-labelledby": "pubop-finds-h"
   }, React.createElement("h3", {
-    className: "btv-fh",
-    id: "btv-finds-h"
+    className: "pubop-fh",
+    id: "pubop-finds-h"
   }, "The findings"), React.createElement("ol", {
-    className: "btv-fl",
+    className: "pubop-fl",
     role: "list"
   }, topics.map((t, i) => t.finding ? React.createElement("li", {
     key: t.id
   }, React.createElement("a", {
-    className: "btv-f",
-    href: "#btv-" + t.id,
+    className: "pubop-f",
+    href: "#pubop-" + t.id,
     onClick: () => onGo(t.id)
   }, React.createElement("span", {
-    className: "btv-fn",
+    className: "pubop-fn",
     "aria-hidden": "true"
-  }, btvNo(i)), React.createElement("span", {
-    className: "btv-fb"
+  }, pubopNo(i)), React.createElement("span", {
+    className: "pubop-fb"
   }, React.createElement("span", {
-    className: "btv-fk"
+    className: "pubop-fk"
   }, t.short), React.createElement("span", {
-    className: "btv-ft"
+    className: "pubop-ft"
   }, t.finding.text), React.createElement("span", {
-    className: "btv-fm"
+    className: "pubop-fm"
   }, t.finding.meta)))) : null)));
 }
-const BTV_FIRST = 2,
-  BTV_STEP = 2;
-function BtvBody() {
+const PUBOP_FIRST = 2,
+  PUBOP_STEP = 2;
+function PublicOpinionBody() {
   const {
     D
   } = window.AP;
-  const [src, setSrc] = btvUseState(null);
-  const [failed, setFailed] = btvUseState(false);
-  const [tries, setTries] = btvUseState(0);
-  const [sort, setSort] = btvUseState("issue");
-  const [jump, setJump] = btvUseState(null);
-  const [q, setQ] = btvUseState("");
-  btvUseEffect(() => {
+  const [src, setSrc] = pubopUseState(null);
+  const [failed, setFailed] = pubopUseState(false);
+  const [tries, setTries] = pubopUseState(0);
+  const [sort, setSort] = pubopUseState("issue");
+  const [jump, setJump] = pubopUseState(null);
+  const [q, setQ] = pubopUseState("");
+  pubopUseEffect(() => {
     let live = true;
     D.loadOneOffs().then(j => {
       if (!live) return;
@@ -1542,10 +1542,10 @@ function BtvBody() {
       live = false;
     };
   }, [tries]);
-  btvUseEffect(() => {
+  pubopUseEffect(() => {
     if (!src) return;
     const h = jump ? jump.id : (window.location.hash || "").replace(/^#/, "");
-    if (!/^btv-/.test(h)) return;
+    if (!/^pubop-/.test(h)) return;
     let raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame(() => {
         const el = document.getElementById(h);
@@ -1563,39 +1563,39 @@ function BtvBody() {
     if (sort === "issue" && shown >= list.length) return;
     setSort("issue");
     setJump({
-      id: "btv-" + id
+      id: "pubop-" + id
     });
   };
-  btvUseEffect(() => {
-    window.AP.btvGo = h => {
+  pubopUseEffect(() => {
+    window.AP.pubopGo = h => {
       setSort("pollster");
       setJump({
         id: h
       });
     };
     return () => {
-      delete window.AP.btvGo;
+      delete window.AP.pubopGo;
     };
   }, []);
-  const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
-  const groups = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : sort === "pollster" ? btvByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
-  const dq = btvUseDeferred(q);
+  const topics = pubopUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
+  const groups = pubopUseMemo(() => sort === "recent" ? pubopByMonth(topics) : sort === "pollster" ? pubopByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
+  const dq = pubopUseDeferred(q);
   const ql = dq.trim().toLowerCase();
-  const inv = btvUseMemo(() => topics.map(t => {
+  const inv = pubopUseMemo(() => topics.map(t => {
     const tw = ((t.title || "") + " " + (t.short || "") + " " + (t.about || "")).toLowerCase() + " ";
     return {
       t,
       blocks: t.blocks.map(b => ({
         b,
-        hay: btvHayMirror(tw + btvBlockW(b))
+        hay: pubopHayMirror(tw + pubopBlockW(b))
       })),
       more: t.more.map(m => ({
         m,
-        hay: btvHayMirror(tw + btvMoreW(m))
+        hay: pubopHayMirror(tw + pubopMoreW(m))
       }))
     };
   }), [topics]);
-  const hits = btvUseMemo(() => {
+  const hits = pubopUseMemo(() => {
     if (!ql) return null;
     const toks = ql.split(/\s+/);
     return inv.map(g => ({
@@ -1605,19 +1605,19 @@ function BtvBody() {
     })).filter(g => g.blocks.length || g.more.length);
   }, [inv, ql]);
   const list = groups || topics;
-  const [fill, setFill] = btvUseState({
+  const [fill, setFill] = pubopUseState({
     sort,
-    n: BTV_FIRST
+    n: PUBOP_FIRST
   });
-  const filled = fill.sort === sort ? fill.n : BTV_FIRST;
-  const shown = jump || /^#btv-/.test(window.location.hash || "") ? Infinity : filled;
-  btvUseEffect(() => {
+  const filled = fill.sort === sort ? fill.n : PUBOP_FIRST;
+  const shown = jump || /^#pubop-/.test(window.location.hash || "") ? Infinity : filled;
+  pubopUseEffect(() => {
     if (!src || shown >= list.length) return undefined;
     let t = 0;
     const raf = requestAnimationFrame(() => {
       t = setTimeout(() => setFill(f => ({
         sort,
-        n: (f.sort === sort ? f.n : BTV_FIRST) + BTV_STEP
+        n: (f.sort === sort ? f.n : PUBOP_FIRST) + PUBOP_STEP
       })), 0);
     });
     return () => {
@@ -1627,80 +1627,80 @@ function BtvBody() {
   }, [src, sort, shown, list.length]);
   if (failed) {
     return React.createElement("div", {
-      className: "btv"
+      className: "pubop"
     }, React.createElement("p", {
-      className: "btv-note"
+      className: "pubop-note"
     }, "The questions could not be loaded.", " ", React.createElement("button", {
       type: "button",
-      className: "btv-retry",
+      className: "pubop-retry",
       onClick: () => setTries(n => n + 1)
     }, "Try again")));
   }
   if (!src) return React.createElement("div", {
-    className: "btv"
+    className: "pubop"
   }, React.createElement("p", {
-    className: "btv-note"
+    className: "pubop-note"
   }, "Loading the questions\u2026"));
   if (!topics.length) return React.createElement("div", {
-    className: "btv"
+    className: "pubop"
   }, React.createElement("p", {
-    className: "btv-note"
+    className: "pubop-note"
   }, "No questions are on file yet."));
   const houses = src.houses || {};
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return React.createElement("div", {
-    className: "btv"
-  }, !ql && React.createElement(BtvFindings, {
+    className: "pubop"
+  }, !ql && React.createElement(PubOpFindings, {
     topics: topics,
     onGo: onGo
   }), React.createElement("div", {
-    className: "btv-tools"
-  }, React.createElement(BtvSearch, {
+    className: "pubop-tools"
+  }, React.createElement(PubOpSearch, {
     q: q,
     onQ: setQ
-  }), !ql && React.createElement(BtvSort, {
+  }), !ql && React.createElement(PubOpSort, {
     sort: sort,
     onSort: setSort
   })), !ql && React.createElement("p", {
-    className: "btv-scope"
-  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), ql ? React.createElement(BtvResults, {
+    className: "pubop-scope"
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", pubopWord(Object.keys(houses).length), " pollsters", " ", "since ", pubopMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), ql ? React.createElement(PubOpResults, {
     q: dq.trim(),
     hits: hits,
     houses: houses
-  }) : groups ? groups.slice(0, shown).map(g => React.createElement(BtvGroup, {
+  }) : groups ? groups.slice(0, shown).map(g => React.createElement(PubOpGroup, {
     key: g.id,
     g: g,
     houses: houses,
     byHouse: sort === "pollster"
-  })) : topics.slice(0, shown).map((t, i) => React.createElement(BtvTopic, {
+  })) : topics.slice(0, shown).map((t, i) => React.createElement(PubOpTopic, {
     key: t.id,
     t: t,
-    n: btvNo(i),
+    n: pubopNo(i),
     houses: houses
   })), React.createElement("div", {
-    className: "btv-how"
+    className: "pubop-how"
   }, React.createElement("p", null, React.createElement("b", null, "How the findings are called."), " Each topic opens with what its first chart or question found. A side is said to lead only where the gap clears the poll\u2019s 95% margin of error, and to be a majority only where its share clears half by its own margin; inside the margin, the answer is \u201Clevel\u201D and the voters \u201Cdivided\u201D."), React.createElement("p", null, React.createElement("b", null, "How to read the answers."), " Each bar is one poll\u2019s answers on a scale of 0 to 100, as the pollster printed them, with the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded. In the charts, each line joins one pollster\u2019s own readings and is coloured by how that pollster asked. Pollsters word their questions differently, so compare a pollster with itself before comparing it with another."), React.createElement("p", null, React.createElement("b", null, "What is left out."), " Questions about sport, holidays and personal habits, state politics, surveys run before this term, and questions the main page already tracks, such as whether the country is heading in the right direction.")));
 }
-function RdBeyond() {
+function RdPublicOpinion() {
   return React.createElement("section", {
-    className: "rd-sec rd-btv",
+    className: "rd-sec rd-pubop",
     id: "public-opinion",
-    "aria-labelledby": "rd-btv-t"
+    "aria-labelledby": "rd-pubop-t"
   }, React.createElement("div", {
     className: "rd-eyebrow"
   }, React.createElement("h2", {
     className: "rd-title",
-    id: "rd-btv-t"
+    id: "rd-pubop-t"
   }, "Public opinion"), React.createElement("span", {
     className: "rd-meta"
   }, "What else Australians tell the pollsters")), React.createElement(RdHed, {
     head: window.AP.PAGE_HEAD["public-opinion"],
-    dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.beyondTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."
-  }), React.createElement(BtvBody, null));
+    dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.publicOpinionTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."
+  }), React.createElement(PublicOpinionBody, null));
 }
-const RdBeyondM = React.memo(RdBeyond);
-const BtvBodyM = React.memo(BtvBody);
+const RdPublicOpinionM = React.memo(RdPublicOpinion);
+const PublicOpinionBodyM = React.memo(PublicOpinionBody);
 Object.assign(window, {
-  RdBeyond: RdBeyondM,
-  BtvBody: BtvBodyM
+  RdPublicOpinion: RdPublicOpinionM,
+  PublicOpinionBody: PublicOpinionBodyM
 });

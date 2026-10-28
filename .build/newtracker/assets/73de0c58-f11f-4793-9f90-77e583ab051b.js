@@ -2834,13 +2834,13 @@ function App() {
     /* The poll ledger's "Public opinion" line goes to the /public-opinion/
        page's By-pollster view, landed on the pollster's own group. The
        page owns its sort and jump state, so the go hook it registers
-       (AP.btvGo, rd-beyond.jsx) does both jobs; the seek loop waits for
+       (AP.pubopGo, rd-public-opinion.jsx) does both jobs; the seek loop waits for
        the hook the way gotoSwitching's waits for the section. */
     window.AP.gotoOpinion = (storeKey) => {
       if (readLocation() !== "public-opinion") navTab("public-opinion", true);
       let tries = 0;
       const seek = () => {
-        if (window.AP.btvGo) { window.AP.btvGo("btv-p-" + storeKey); return; }
+        if (window.AP.pubopGo) { window.AP.pubopGo("pubop-p-" + storeKey); return; }
         if (++tries < 40) setTimeout(seek, 75);
       };
       setTimeout(seek, 0);

@@ -372,14 +372,14 @@ console.log("== the Public opinion line trips to the pollster’s group ==");
   const page = await newPage(1440, 2400);
   await toAllPolls(page);
   const opw = await page.evaluate(() => {
-    const bo = window.AUSPOL.beyondByRow || {};
+    const bo = window.AUSPOL.publicOpinionByRow || {};
     const ks = Object.keys(bo);
     if (!ks.length) return null;
     const k = ks.sort((a, b) => (a.split("|")[1] < b.split("|")[1] ? 1 : -1))[0];
     const p = k.split("|");
     return { key: k, h: p[0], r: p[1], store: bo[k].h, n: bo[k].n };
   });
-  if (!opw) console.log("  --  no beyondByRow entry in the bundle: skipped");
+  if (!opw) console.log("  --  no publicOpinionByRow entry in the bundle: skipped");
   else {
     await page.evaluate((k) => window.AP.openPoll(k, "twopp", "the probe"), opw.key);
     await settle(900);
@@ -397,11 +397,11 @@ console.log("== the Public opinion line trips to the pollster’s group ==");
     if (box) await page.mouse.click(box.x + 30, box.y + box.height / 2);
     await settle(1600);
     const hop = await page.evaluate((store) => {
-      const sec = document.getElementById("btv-p-" + store);
-      const pressed = document.querySelector(".btv-sort-b[aria-pressed=true]");
+      const sec = document.getElementById("pubop-p-" + store);
+      const pressed = document.querySelector(".pubop-sort-b[aria-pressed=true]");
       return { path: window.location.pathname, sort: pressed ? pressed.textContent.trim() : null, secTop: sec ? Math.round(sec.getBoundingClientRect().top) : null };
     }, opw.store);
-    ok(`…pressing it lands the Public opinion page’s By-pollster view on the ${opw.h} group (#btv-p-${opw.store} at its 64px clearance)`,
+    ok(`…pressing it lands the Public opinion page’s By-pollster view on the ${opw.h} group (#pubop-p-${opw.store} at its 64px clearance)`,
        hop.path === "/public-opinion/" && hop.sort === "By pollster" && hop.secTop != null && hop.secTop >= 30 && hop.secTop <= 160, JSON.stringify(hop));
     await page.evaluate(() => window.history.back());
     await settle(1400);
@@ -420,9 +420,9 @@ console.log("== the Public opinion line trips to the pollster’s group ==");
   await settle(500);
   const lat = await page2.evaluate(async () => {
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-    const bo = window.AUSPOL.beyondByRow || {};
+    const bo = window.AUSPOL.publicOpinionByRow || {};
     const houses = [...new Set(Object.keys(bo).map((k) => k.split("|")[0]))];
-    if (!houses.length) return { skip: "no beyondByRow entry in the bundle" };
+    if (!houses.length) return { skip: "no publicOpinionByRow entry in the bundle" };
     let item = null, line = null, name = "";
     for (const it of document.querySelectorAll("#latest-polls .rd-pl-item")) {
       const nm = ((it.querySelector(".rd-pl-c-name") || {}).textContent || "").replace(/↗/g, "").trim();
@@ -437,8 +437,8 @@ console.log("== the Public opinion line trips to the pollster’s group ==");
     const meta = { tag: line.tagName, go: line.classList.contains("go"), title: line.getAttribute("title") || "", arrow: (line.querySelector(".rd-ldg-arrow") || {}).textContent };
     line.click();
     await wait(1600);
-    const sec = ip ? document.getElementById("btv-p-" + bo[ip.pollster + "|" + ip.released].h) : null;
-    const pressed = document.querySelector(".btv-sort-b[aria-pressed=true]");
+    const sec = ip ? document.getElementById("pubop-p-" + bo[ip.pollster + "|" + ip.released].h) : null;
+    const pressed = document.querySelector(".pubop-sort-b[aria-pressed=true]");
     return { name, store: ip ? bo[ip.pollster + "|" + ip.released].h : null, meta, path: window.location.pathname,
              sort: pressed ? pressed.textContent.trim() : null, secTop: sec ? Math.round(sec.getBoundingClientRect().top) : null };
   });
@@ -446,7 +446,7 @@ console.log("== the Public opinion line trips to the pollster’s group ==");
   else {
     ok(`Latest: ${lat.name}'s line is away from the Snapshot too, tipped for the page (↗)`,
        lat.meta.tag === "BUTTON" && lat.meta.go && lat.meta.title === "Open what else this poll asked on Public opinion" && lat.meta.arrow === "↗", JSON.stringify(lat.meta));
-    ok(`…pressing it lands the By-pollster view on #btv-p-${lat.store}`, lat.path === "/public-opinion/" && lat.sort === "By pollster" && lat.secTop != null && lat.secTop >= 30 && lat.secTop <= 160, JSON.stringify({ secTop: lat.secTop, sort: lat.sort }));
+    ok(`…pressing it lands the By-pollster view on #pubop-p-${lat.store}`, lat.path === "/public-opinion/" && lat.sort === "By pollster" && lat.secTop != null && lat.secTop >= 30 && lat.secTop <= 160, JSON.stringify({ secTop: lat.secTop, sort: lat.sort }));
   }
   await page2.close();
 }

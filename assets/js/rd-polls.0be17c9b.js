@@ -655,7 +655,7 @@ function RdPolls({
         if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (id === "switching") {
           if (window.AP.gotoSwitching) window.AP.gotoSwitching();
         } else if (id === "opinion") {
-          const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[ip.pollster + "|" + ip.released];
+          const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[ip.pollster + "|" + ip.released];
           if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
         } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },

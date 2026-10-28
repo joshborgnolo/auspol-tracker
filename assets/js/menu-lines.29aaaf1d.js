@@ -378,11 +378,11 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
       };
     });
     put("public-opinion", () => {
-      if (!D.beyondLatest) return {
+      if (!D.publicOpinionLatest) return {
         head: AP.PAGE_HEAD["public-opinion"],
         fig: null
       };
-      const [, mo, dd] = D.beyondLatest.split("-").map(Number);
+      const [, mo, dd] = D.publicOpinionLatest.split("-").map(Number);
       return {
         head: AP.PAGE_HEAD["public-opinion"],
         fig: {

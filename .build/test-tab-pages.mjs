@@ -107,11 +107,11 @@ assert.ok(/pastTab = !VIC \|\|/.test(build)
   "the Vic cycles page is gated on a term closing, not hand-listed");
 assert.ok(build.includes("window.AP_INITIAL_TAB="), "build.mjs stamps the per-tab constant");
 assert.ok(build.includes("one document per tab"), "the emission pass logs its outputs");
-assert.ok(build.includes("rd-beyond.jsx") && build.includes("oneoffs-source.json"),
+assert.ok(build.includes("rd-public-opinion.jsx") && build.includes("oneoffs-source.json"),
   "the Public opinion page's view layer and its data sidecar ride the build");
 const genData = read(path.join(".build", "newtracker", "gen-data.mjs"));
-assert.ok(genData.includes("oneoffs-source.json") && genData.includes("loadOneOffs") && genData.includes("buildBeyond(readOneOffStores(ROOT)"),
-  "gen-data emits the Public opinion sidecar (beyond-the-vote.mjs) and its lazy loader");
+assert.ok(genData.includes("oneoffs-source.json") && genData.includes("loadOneOffs") && genData.includes("buildPublicOpinion(readOneOffStores(ROOT)"),
+  "gen-data emits the Public opinion sidecar (public-opinion.mjs) and its lazy loader");
 
 // ---- the client routes by path -----------------------------------------------------------
 const hdr = read(path.join(".build", "newtracker", "assets", "73de0c58-f11f-4793-9f90-77e583ab051b.js"));
@@ -208,14 +208,14 @@ assert.ok(views.includes('<MenuPageView id="flows-explained"') || views.includes
   "the menu-page view knows the explainer");
 assert.ok(views.includes('id === "changelog"') && views.includes("function RdChangelog("),
   "the menu-page view knows the change log and renders it as a page of the site");
-assert.ok(views.includes('{id === "public-opinion" && <RdBeyond />}') && views.includes('{id === "public-opinion" && <BtvBody />}'),
+assert.ok(views.includes('{id === "public-opinion" && <RdPublicOpinion />}') && views.includes('{id === "public-opinion" && <PublicOpinionBody />}'),
   "the menu-page view knows Public opinion in both designs");
 {
-  const btv = read(path.join(".build", "newtracker", "assets", "rd-beyond.jsx"));
-  assert.ok(btv.includes("function RdBeyond(") && btv.includes("function BtvBody(")
-    && btv.includes("Object.assign(window, { RdBeyond: RdBeyondM, BtvBody: BtvBodyM })"),
-    "rd-beyond.jsx renders the page and exports both mount points");
-  assert.ok(btv.includes("D.loadOneOffs()"),
+  const pubop = read(path.join(".build", "newtracker", "assets", "rd-public-opinion.jsx"));
+  assert.ok(pubop.includes("function RdPublicOpinion(") && pubop.includes("function PublicOpinionBody(")
+    && pubop.includes("Object.assign(window, { RdPublicOpinion: RdPublicOpinionM, PublicOpinionBody: PublicOpinionBodyM })"),
+    "rd-public-opinion.jsx renders the page and exports both mount points");
+  assert.ok(pubop.includes("D.loadOneOffs()"),
     "the page lazily fetches its sidecar, like the cycle source");
   assert.ok(!fs.existsSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-adhocs.jsx")), "the retired catalogue component is gone");
 }

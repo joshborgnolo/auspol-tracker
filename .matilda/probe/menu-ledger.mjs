@@ -74,7 +74,7 @@ const headOf = async (url, sel) => {
     const all = (c) => [...document.querySelectorAll(c)].map((e) => e.textContent);
     return { head: h ? h.textContent : null, dek: (h && h.nextElementSibling && h.nextElementSibling.classList.contains("rd-dek")) ? h.nextElementSibling.textContent : null,
              dis: [...document.querySelectorAll(".rd-dis-panel")].map((p) => ({ name: (p.querySelector(".rd-dis-name") || {}).textContent, sub: (p.querySelector(".rd-dis-sub") || {}).textContent })),
-             topics: document.querySelectorAll(".btv-topic").length, clDate: (document.querySelector(".cl-date") || {}).textContent || null,
+             topics: document.querySelectorAll(".pubop-topic").length, clDate: (document.querySelector(".cl-date") || {}).textContent || null,
              months: all(".rd-dis-ax") };
   }, sel);
   await page.close();
@@ -97,8 +97,8 @@ const headOf = async (url, sel) => {
     `flows: ${row("flows").v} is printed in the page's own words`);
   const ex = await headOf("/flows-explained/", ".view-flows-explained .rd-hed");
   ok(ex.head === row("flows-explained").d && row("flows-explained").chip === "Explainer", "explainer: its head, and its kind for a figure");
-  const btv = await headOf("/public-opinion/", ".view-public-opinion .rd-hed");
-  ok(btv.head === row("public-opinion").d, "Public opinion: the line is the page's head");
+  const pubop = await headOf("/public-opinion/", ".view-public-opinion .rd-hed");
+  ok(pubop.head === row("public-opinion").d, "Public opinion: the line is the page's head");
   const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   {
     const oneoffs = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "oneoffs-source.json"), "utf8"));

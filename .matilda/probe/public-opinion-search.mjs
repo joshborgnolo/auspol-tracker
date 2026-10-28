@@ -1,5 +1,5 @@
-/* Probe: the Public opinion page's search (rd-beyond.jsx BtvSearch over
-   BtvResults, shipped with the page's .btv-tools row), in both designs at two
+/* Probe: the Public opinion page's search (rd-public-opinion.jsx PubOpSearch over
+   PubOpResults, shipped with the page's .pubop-tools row), in both designs at two
    widths. Asserts typing a word out of a question swaps the findings, the
    order row and the spell line for a results view whose topic groups carry
    the matched pieces (the long tail drawn open, never folded); the topic's
@@ -62,9 +62,9 @@ const dashPick = (() => {
    .value= never reaches a controlled React input) */
 async function type(page, text) {
   await page.evaluate(() => {
-    const x = document.querySelector(".btv-x");
+    const x = document.querySelector(".pubop-x");
     if (x) x.click();
-    document.querySelector(".btv-tools input").focus();
+    document.querySelector(".pubop-tools input").focus();
   });
   if (text) await page.keyboard.type(text);
 }
@@ -74,26 +74,26 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   page.on("pageerror", (e) => errs.push(String(e.message))); page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
   await page.setViewport({ width: w, height: 1000 });
   await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector(".btv-tools input", { timeout: 20000 }); await sleep(300);
+  await page.waitForSelector(".pubop-tools input", { timeout: 20000 }); await sleep(300);
   const here = await page.evaluate(() => ({
-    ph: document.querySelector(".btv-tools input").getAttribute("placeholder"),
-    type: document.querySelector(".btv-tools input").type,
-    val: document.querySelector(".btv-tools input").value,
-    x: !!document.querySelector(".btv-x"),
-    pillW: document.querySelector(".btv-search").getBoundingClientRect().width,
-    barW: document.querySelector(".btv-tools").getBoundingClientRect().width,
-    barH: document.querySelector(".btv-tools").getBoundingClientRect().height,
+    ph: document.querySelector(".pubop-tools input").getAttribute("placeholder"),
+    type: document.querySelector(".pubop-tools input").type,
+    val: document.querySelector(".pubop-tools input").value,
+    x: !!document.querySelector(".pubop-x"),
+    pillW: document.querySelector(".pubop-search").getBoundingClientRect().width,
+    barW: document.querySelector(".pubop-tools").getBoundingClientRect().width,
+    barH: document.querySelector(".pubop-tools").getBoundingClientRect().height,
   }));
   if (!here.ph) fail(`${design}@${w} the box has no placeholder`);
   if (here.type !== "search") fail(`${design}@${w} the box's type is ${here.type}`);
   if (here.val !== "") fail(`${design}@${w} the box opens with text in it`);
   if (here.x) fail(`${design}@${w} an empty box shows a clearer`);
   /* the toolbar row must hold its pill: a height under the 36px pill means
-     the row clipped it (the 2026-10-28 btv-bar answer-track class collision
-     shrank it to a 12px sliver - the row is .btv-tools since) */
+     the row clipped it (the 2026-10-28 pubop-bar answer-track class collision
+     shrank it to a 12px sliver - the row is .pubop-tools since) */
   if (here.barH < 36) fail(`${design}@${w} the toolbar row is ${here.barH}px tall, under its 36px pill`);
   /* the All-polls pill's own width: 330 on the wide rung, full width on the
-     phone rung (the ladder in template.html beside the .btv-sort rules) */
+     phone rung (the ladder in template.html beside the .pubop-sort rules) */
   if (w >= 1001 && Math.round(here.pillW) !== 330) fail(`${design}@${w} the pill is ${here.pillW}px wide, expected 330`);
   if (w <= 760 && Math.abs(here.pillW - here.barW) > 1) fail(`${design}@${w} the phone pill stops ${here.barW - here.pillW}px short of its row`);
 
@@ -101,9 +101,9 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
      the inset input (the rd.css tail kill beside rd-ap-search's, plus the
      template's classic-sheet kill) */
   await page.keyboard.press("Tab");
-  await page.evaluate(() => document.querySelector(".btv-search input").focus());
-  const focus = await page.evaluate(() => ({ pill: getComputedStyle(document.querySelector(".btv-search")).outlineStyle,
-    inner: getComputedStyle(document.querySelector(".btv-search input")).outlineStyle }));
+  await page.evaluate(() => document.querySelector(".pubop-search input").focus());
+  const focus = await page.evaluate(() => ({ pill: getComputedStyle(document.querySelector(".pubop-search")).outlineStyle,
+    inner: getComputedStyle(document.querySelector(".pubop-search input")).outlineStyle }));
   await page.evaluate(() => document.activeElement.blur());
   if (focus.inner !== "none") fail(`${design}@${w} keyboard focus rings the inset input - the inner rectangle (${focus.inner})`);
   if (focus.pill !== "solid") fail(`${design}@${w} keyboard focus never rings the pill itself (${focus.pill})`);
@@ -113,13 +113,13 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   /* a word out of a long-tail question (its topic's group draws first) */
   await type(page, wordingPick.token); await sleep(800);
   const r = await page.evaluate(() => ({
-    finds: !!document.querySelector(".btv-finds"), sort: !!document.querySelector(".btv-sort"),
-    scope: !!document.querySelector(".btv > p.btv-scope"),
-    count: (document.querySelector(".btv-rcount b") || {}).textContent || null,
-    groups: [...document.querySelectorAll(".btv-res .btv-topic")].map((g) => g.querySelector("h3").textContent),
-    hits: [...document.querySelectorAll(".btv-hit .btv-q")].map((e) => e.textContent),
-    none: !!document.querySelector(".btv-none"),
-    val: document.querySelector(".btv-tools input").value,
+    finds: !!document.querySelector(".pubop-finds"), sort: !!document.querySelector(".pubop-sort"),
+    scope: !!document.querySelector(".pubop > p.pubop-scope"),
+    count: (document.querySelector(".pubop-rcount b") || {}).textContent || null,
+    groups: [...document.querySelectorAll(".pubop-res .pubop-topic")].map((g) => g.querySelector("h3").textContent),
+    hits: [...document.querySelectorAll(".pubop-hit .pubop-q")].map((e) => e.textContent),
+    none: !!document.querySelector(".pubop-none"),
+    val: document.querySelector(".pubop-tools input").value,
     sw: document.documentElement.scrollWidth > document.documentElement.clientWidth,
   }));
   if (r.val !== wordingPick.token) fail(`${design}@${w} the box lost the query: "${r.val}"`);
@@ -134,21 +134,21 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   /* the topic's own name finds every one of its pieces; its group draws first */
   await type(page, t0Token); await sleep(800);
   const k = await page.evaluate((want) => {
-    const g = [...document.querySelectorAll(".btv-res .btv-topic")].find((s) => s.querySelector("h3").textContent === want);
+    const g = [...document.querySelectorAll(".pubop-res .pubop-topic")].find((s) => s.querySelector("h3").textContent === want);
     if (!g) return { missing: true };
-    return { trackers: g.querySelectorAll(".btv-tracker").length, items: g.querySelectorAll(".btv-item").length };
+    return { trackers: g.querySelectorAll(".pubop-tracker").length, items: g.querySelectorAll(".pubop-item").length };
   }, t0.title);
   if (k.missing) fail(`${design}@${w} "${t0Token}" never found the ${t0.title} topic`);
   else if (k.trackers + k.items !== t0Pieces) fail(`${design}@${w} "${t0Token}" left pieces of the topic behind: ${k.trackers}+${k.items} of ${t0Pieces}`);
 
   /* every token must match (the word plus a made-up one: nothing) */
   await type(page, wordingPick.token + " zzzzx"); await sleep(800);
-  if (await page.evaluate(() => !document.querySelector(".btv-none"))) fail(`${design}@${w} an impossible AND still matched`);
+  if (await page.evaluate(() => !document.querySelector(".pubop-none"))) fail(`${design}@${w} an impossible AND still matched`);
 
   /* a miss names itself, quote and all, and no results remain */
   await type(page, "zzzzx"); await sleep(800);
-  const none = await page.evaluate(() => ({ msg: (document.querySelector(".btv-none") || {}).textContent || null,
-    groups: document.querySelectorAll(".btv-res .btv-topic").length }));
+  const none = await page.evaluate(() => ({ msg: (document.querySelector(".pubop-none") || {}).textContent || null,
+    groups: document.querySelectorAll(".pubop-res .pubop-topic").length }));
   if (!none.msg || !/Nothing matches/.test(none.msg)) fail(`${design}@${w} the miss never named itself: ${none.msg}`);
   if (!/zzzzx/.test(none.msg || "")) fail(`${design}@${w} the miss does not quote the query: ${none.msg}`);
   if (none.groups) fail(`${design}@${w} the miss kept ${none.groups} result groups`);
@@ -158,7 +158,7 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
     const counts = {};
     for (const [kind, token] of [["en", dashPick.en], ["hy", dashPick.hy]]) {
       await type(page, token); await sleep(800);
-      counts[kind] = await page.evaluate(() => (document.querySelector(".btv-rcount b") || { textContent: "0" }).textContent);
+      counts[kind] = await page.evaluate(() => (document.querySelector(".pubop-rcount b") || { textContent: "0" }).textContent);
     }
     if (counts.en === "0" || counts.hy === "0") fail(`${design}@${w} the en-dash pair matched nothing: ${dashPick.en} (${counts.en},${counts.hy})`);
     else if (counts.en !== counts.hy) fail(`${design}@${w} hyphen ≠ en dash: ${counts.hy} v ${counts.en}`);
@@ -167,28 +167,28 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
   /* typed digits and arrow keys stay in the box (the sort reads its default
      page first: the queries above leave it under the empty state) */
   await type(page, ""); await sleep(700);
-  const press0 = await page.$$eval(".btv-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
+  const press0 = await page.$$eval(".pubop-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
   await type(page, "9"); await sleep(500);
-  const typ = await page.evaluate(() => ({ path: location.pathname, val: document.querySelector(".btv-tools input").value, finds: !!document.querySelector(".btv-finds") }));
+  const typ = await page.evaluate(() => ({ path: location.pathname, val: document.querySelector(".pubop-tools input").value, finds: !!document.querySelector(".pubop-finds") }));
   if (typ.path !== "/public-opinion/") fail(`${design}@${w} a digit navigated to ${typ.path}`);
   if (typ.val !== "9") fail(`${design}@${w} the typed digit never landed in the box: "${typ.val}"`);
   if (typ.finds) fail(`${design}@${w} a typed query left the default page up`);
   await page.keyboard.press("Backspace"); await sleep(700);
-  await page.evaluate(() => document.querySelector(".btv-tools input").focus());
+  await page.evaluate(() => document.querySelector(".pubop-tools input").focus());
   await page.keyboard.press("ArrowRight"); await page.keyboard.press("ArrowLeft"); await sleep(300);
-  const press2 = await page.$$eval(".btv-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
+  const press2 = await page.$$eval(".pubop-sort-b", (bs) => bs.map((b) => b.getAttribute("aria-pressed")).join());
   if (press0 !== press2) fail(`${design}@${w} arrows flipped the order row while the box was focused: ${press0} -> ${press2}`);
   /* the × restores the whole page */
   await type(page, wordingPick.token); await sleep(500);
-  await page.evaluate(() => document.querySelector(".btv-tools").scrollIntoView({ behavior: "instant", block: "center" }));
+  await page.evaluate(() => document.querySelector(".pubop-tools").scrollIntoView({ behavior: "instant", block: "center" }));
   await sleep(250);
-  await page.click(".btv-x"); await sleep(800);
+  await page.click(".pubop-x"); await sleep(800);
 
   /* the page as it was */
   const back = await page.evaluate(() => ({
-    finds: !!document.querySelector(".btv-finds"), sort: !!document.querySelector(".btv-sort"),
-    topics: document.querySelectorAll(".btv-topic:not(.btv-mon)").length,
-    val: document.querySelector(".btv-tools input").value, x: !!document.querySelector(".btv-x"),
+    finds: !!document.querySelector(".pubop-finds"), sort: !!document.querySelector(".pubop-sort"),
+    topics: document.querySelectorAll(".pubop-topic:not(.pubop-mon)").length,
+    val: document.querySelector(".pubop-tools input").value, x: !!document.querySelector(".pubop-x"),
     sw: document.documentElement.scrollWidth > document.documentElement.clientWidth,
   }));
   if (!back.finds || !back.sort) fail(`${design}@${w} the findings or the order row never came back`);

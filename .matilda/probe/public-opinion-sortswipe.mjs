@@ -1,5 +1,5 @@
 /* Probe: phone touch-swipe walking on the Public opinion Sort row
-   (rd-beyond.jsx BtvSort, registered by data-rd-swipe + __rdSwipe so the
+   (rd-public-opinion.jsx PubOpSort, registered by data-rd-swipe + __rdSwipe so the
    app's swipe effect treats the row like any tab row, user call
    2026-10-21 "walkable like any other menu bar").
    A right-to-left flick on the row steps issue -> pollster -> recency
@@ -25,8 +25,8 @@ const page = await browser.newPage(); const errs = [];
 page.on("pageerror", (e) => errs.push(String(e.message))); page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
 await page.setViewport({ width: W, height: H, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
 await page.goto(`${base}/public-opinion/`, { waitUntil: "networkidle0", timeout: 60000 });
-await page.waitForSelector(".btv-sort-g[data-rd-swipe]", { timeout: 20000 }); await sleep(400);
-const wired = await page.evaluate(() => typeof document.querySelector(".btv-sort-g").__rdSwipe === "function");
+await page.waitForSelector(".pubop-sort-g[data-rd-swipe]", { timeout: 20000 }); await sleep(400);
+const wired = await page.evaluate(() => typeof document.querySelector(".pubop-sort-g").__rdSwipe === "function");
 if (!wired) fail("sort row is marked data-rd-swipe but carries no __rdSwipe handler");
 const cdp = await page.createCDPSession();
 const flick = async (fx, tx, y) => {
@@ -34,7 +34,7 @@ const flick = async (fx, tx, y) => {
   for (let i = 1; i <= 6; i++) { await sleep(18); await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: Math.round(fx + ((tx - fx) * i) / 6), y, id: 1 }] }); }
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 };
-const state = () => page.evaluate(() => ({ pressed: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getAttribute("aria-pressed")).join(), path: location.pathname }));
+const state = () => page.evaluate(() => ({ pressed: [...document.querySelectorAll(".pubop-sort-b")].map((b) => b.getAttribute("aria-pressed")).join(), path: location.pathname }));
 const expect = async (want, at) => {
   await sleep(450);
   const s = await state();
@@ -44,9 +44,9 @@ const expect = async (want, at) => {
 /* six flicks through the row centre: forward wraps recency -> issue,
    backward wraps issue -> recency */
 const rowY = async () => {
-  await page.evaluate(() => document.querySelector(".btv-sort").scrollIntoView({ behavior: "instant", block: "center" }));
+  await page.evaluate(() => document.querySelector(".pubop-sort").scrollIntoView({ behavior: "instant", block: "center" }));
   await sleep(200);
-  return page.evaluate(() => { const r = document.querySelector(".btv-sort-g").getBoundingClientRect(); return Math.round(r.top + r.height / 2); });
+  return page.evaluate(() => { const r = document.querySelector(".pubop-sort-g").getBoundingClientRect(); return Math.round(r.top + r.height / 2); });
 };
 const seq = [["false,true,false"], ["false,false,true"], ["true,false,false"], ["false,false,true"], ["false,true,false"], ["true,false,false"]];
 for (let i = 0; i < seq.length; i++) {
@@ -55,16 +55,16 @@ for (let i = 0; i < seq.length; i++) {
 }
 /* just under the row is inside its reach band */
 {
-  const y = await page.evaluate(() => { const r = document.querySelector(".btv-sort-g").getBoundingClientRect(); return Math.round(r.bottom + 30); });
+  const y = await page.evaluate(() => { const r = document.querySelector(".pubop-sort-g").getBoundingClientRect(); return Math.round(r.bottom + 30); });
   await flick(x0, x1, y); await expect("false,true,false", "flick just under the row");
 }
 /* deep in the catalogue the row still owns the flick (section reach) */
 {
   const deep = await page.evaluate(() => {
-    const h = [...document.querySelectorAll(".btv-mon h3, .btv-topic h3")][3];
+    const h = [...document.querySelectorAll(".pubop-mon h3, .pubop-topic h3")][3];
     h.scrollIntoView({ behavior: "instant", block: "center" });
     const r = h.getBoundingClientRect();
-    const sec = document.querySelector(".btv-sort-g").closest("section");
+    const sec = document.querySelector(".pubop-sort-g").closest("section");
     return { y: Math.round(r.top + r.height / 2), sec: sec ? sec.id || sec.className : "none" };
   });
   await sleep(250);
@@ -76,14 +76,14 @@ for (let i = 0; i < seq.length; i++) {
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await sleep(300);
   const foot = await page.evaluate(() => {
-    const r = document.querySelector(".btv-sort-g").closest("section").getBoundingClientRect();
+    const r = document.querySelector(".pubop-sort-g").closest("section").getBoundingClientRect();
     return { bottom: Math.round(r.bottom), ih: innerHeight };
   });
   if (foot.bottom > foot.ih - 100) fail(`catalogue section runs to the viewport foot (${foot.bottom} of ${foot.ih}); nowhere to flick past the row's reach`);
   else {
     await flick(x0, x1, Math.min(foot.bottom + 40, foot.ih - 60));
     await sleep(700);
-    const nav = await page.evaluate(() => ({ path: location.pathname, sort: document.querySelectorAll(".btv-sort-b").length }));
+    const nav = await page.evaluate(() => ({ path: location.pathname, sort: document.querySelectorAll(".pubop-sort-b").length }));
     if (nav.path !== "/changelog/") fail(`flick under the catalogue turned to ${nav.path}, wanted the next tab document /changelog/`);
     if (nav.sort) fail("sort row still mounted after the page turn");
   }

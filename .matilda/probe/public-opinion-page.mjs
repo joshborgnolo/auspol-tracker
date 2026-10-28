@@ -1,5 +1,5 @@
 /* Probe: the /public-opinion/ page (at /beyond-the-vote/ until 2026-10-21;
-   rd-beyond.jsx over the sidecar that beyond-the-vote.mjs builds – both
+   rd-public-opinion.jsx over the sidecar that public-opinion.mjs builds – both
    keep their legacy names), in both designs at four widths. Asserts no
    errors and no sideways scroll; the findings index (one link a topic, each
    landing on its topic, each sentence the payload's) and each topic's
@@ -61,28 +61,28 @@ for (const design of ["new", "old"]) {
     page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
     await page.setViewport({ width: w, height: 900 });
     await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
-    try { await page.waitForSelector(".btv-topic", { timeout: 20000 }); }
+    try { await page.waitForSelector(".pubop-topic", { timeout: 20000 }); }
     catch { fail(`${design}@${w}: no topics rendered`); await page.close(); continue; }
     await new Promise((r) => setTimeout(r, 400));
     const m = await page.evaluate(() => {
       const q = (s) => document.querySelectorAll(s);
-      const txt = document.querySelector(".btv").innerText;
+      const txt = document.querySelector(".pubop").innerText;
       const box = (e) => e.getBoundingClientRect();
       return {
         sw: document.documentElement.scrollWidth, title: document.title,
-        finds: [...q(".btv-f")].map((a) => ({ ok: !!document.getElementById(a.getAttribute("href").slice(1)), text: a.querySelector(".btv-ft").textContent })),
-        heads: [...q(".btv-hl")].map((e) => e.textContent),
-        topics: q(".btv-topic").length, trackers: q(".btv-tracker").length,
-        charts: [...q(".btv-tracker")].map((t) => t.querySelectorAll(".chart svg.chart-svg").length),
-        lines: [...q(".btv-tracker")].map((t) => t.querySelectorAll("path.series-line").length),
-        copyBtns: [...q(".btv-tracker")].filter((t) => t.querySelector(".chart-copy-btn")).length,
-        beside: [...q(".btv-tracker")].map((t) => { const c = box(t.querySelector(".btv-tchart")), l = box(t.querySelector(".btv-latest")); return l.left >= c.right - 1 ? "beside" : l.top >= c.bottom - 1 ? "under" : "overlap"; }),
-        items: q(".btv-item").length, levels: q(".btv-level").length + [...q(".btv-net")].filter((e) => e.textContent === "level").length,
-        rowLay: [...q(".btv-item")].map((it) => { const l = box(it.querySelector(".btv-il")), r = box(it.querySelector(".btv-ir")); return r.left >= l.right - 1 ? "beside" : r.top >= l.bottom - 1 ? "under" : "overlap"; }),
-        boxes: q(".btv-card, .btv-panel, .btv-pgrid, .btv-grid").length,
-        unsourced: [...q(".btv-item")].filter((c) => !c.querySelector(".btv-src a[href]")).map((c) => c.querySelector(".btv-q").textContent),
-        nan: /\bNaN\b|undefined|\[object/.test(txt), more: q(".btv-more").length,
-        rdHead: !!document.querySelector(".rd-btv .rd-hed"),
+        finds: [...q(".pubop-f")].map((a) => ({ ok: !!document.getElementById(a.getAttribute("href").slice(1)), text: a.querySelector(".pubop-ft").textContent })),
+        heads: [...q(".pubop-hl")].map((e) => e.textContent),
+        topics: q(".pubop-topic").length, trackers: q(".pubop-tracker").length,
+        charts: [...q(".pubop-tracker")].map((t) => t.querySelectorAll(".chart svg.chart-svg").length),
+        lines: [...q(".pubop-tracker")].map((t) => t.querySelectorAll("path.series-line").length),
+        copyBtns: [...q(".pubop-tracker")].filter((t) => t.querySelector(".chart-copy-btn")).length,
+        beside: [...q(".pubop-tracker")].map((t) => { const c = box(t.querySelector(".pubop-tchart")), l = box(t.querySelector(".pubop-latest")); return l.left >= c.right - 1 ? "beside" : l.top >= c.bottom - 1 ? "under" : "overlap"; }),
+        items: q(".pubop-item").length, levels: q(".pubop-level").length + [...q(".pubop-net")].filter((e) => e.textContent === "level").length,
+        rowLay: [...q(".pubop-item")].map((it) => { const l = box(it.querySelector(".pubop-il")), r = box(it.querySelector(".pubop-ir")); return r.left >= l.right - 1 ? "beside" : r.top >= l.bottom - 1 ? "under" : "overlap"; }),
+        boxes: q(".pubop-card, .pubop-panel, .pubop-pgrid, .pubop-grid").length,
+        unsourced: [...q(".pubop-item")].filter((c) => !c.querySelector(".pubop-src a[href]")).map((c) => c.querySelector(".pubop-q").textContent),
+        nan: /\bNaN\b|undefined|\[object/.test(txt), more: q(".pubop-more").length,
+        rdHead: !!document.querySelector(".rd-pubop .rd-hed"),
       };
     });
     const at = `${design}@${w}`;
@@ -111,12 +111,12 @@ for (const design of ["new", "old"]) {
          many as the payload holds, with no store marking in the text, and
          the page still fits its width with every item and fold open */
       const o = await page.evaluate(() => {
-        document.querySelectorAll(".btv-more, .btv-mi, .btv-cuts").forEach((d) => { d.open = true; });
-        const its = [...document.querySelectorAll(".btv-mi")];
-        return { n: its.length, empty: its.filter((it) => !it.querySelector(".btv-fig")).map((it) => it.querySelector(".btv-mq").textContent),
-          figs: document.querySelectorAll(".btv-mi .btv-fig").length, sw: document.documentElement.scrollWidth,
-          trs: document.querySelectorAll(".btv-mi .btv-tr svg path.btv-trl").length,
-          marks: [...document.querySelectorAll(".btv-mi .btv-fig")].map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
+        document.querySelectorAll(".pubop-more, .pubop-mi, .pubop-cuts").forEach((d) => { d.open = true; });
+        const its = [...document.querySelectorAll(".pubop-mi")];
+        return { n: its.length, empty: its.filter((it) => !it.querySelector(".pubop-fig")).map((it) => it.querySelector(".pubop-mq").textContent),
+          figs: document.querySelectorAll(".pubop-mi .pubop-fig").length, sw: document.documentElement.scrollWidth,
+          trs: document.querySelectorAll(".pubop-mi .pubop-tr svg path.pubop-trl").length,
+          marks: [...document.querySelectorAll(".pubop-mi .pubop-fig")].map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
       });
       const moreN = topics.reduce((n, t) => n + t.more.length, 0);
       /* a traits series (tables segmented by leader pairing) draws as one grid of small charts */
@@ -136,15 +136,15 @@ for (const design of ["new", "old"]) {
 
 /* the two retired paths redirect, topic anchor and all, and the topic lands
    in view — /ad-hocs/ since 2026-10-18, /beyond-the-vote/ since 2026-10-21 */
-for (const from of ["ad-hocs", "beyond-the-vote"]) {
+for (const from of ["ad-hocs", "public-opinion"]) {
   const page = await browser.newPage();
   await page.setViewport({ width: 1024, height: 900 });
-  await page.goto(`${base}/${from}/#btv-trump-us`, { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector("#btv-trump-us", { timeout: 20000 }).catch(() => {});
+  await page.goto(`${base}/${from}/#pubop-trump-us`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page.waitForSelector("#pubop-trump-us", { timeout: 20000 }).catch(() => {});
   await new Promise((r) => setTimeout(r, 600));
   const r = await page.evaluate(() => ({ path: location.pathname, hash: location.hash,
-    top: document.getElementById("btv-trump-us") ? document.getElementById("btv-trump-us").getBoundingClientRect().top : null }));
-  if (r.path !== "/public-opinion/" || r.hash !== "#btv-trump-us") fail(`/${from}/ landed on ${r.path}${r.hash}`);
+    top: document.getElementById("pubop-trump-us") ? document.getElementById("pubop-trump-us").getBoundingClientRect().top : null }));
+  if (r.path !== "/public-opinion/" || r.hash !== "#pubop-trump-us") fail(`/${from}/ landed on ${r.path}${r.hash}`);
   if (r.top == null || r.top < 0 || r.top > 200) fail(`/${from}/: the topic anchor did not land in view (top ${r.top})`);
   await page.close();
 }

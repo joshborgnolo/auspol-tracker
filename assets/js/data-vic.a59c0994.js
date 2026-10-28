@@ -4415,10 +4415,10 @@ window.AUSPOL = function () {
     }],
     "gapsUsed": 6
   }];
-  const beyondTopics = null;
-  const beyondLatest = null;
+  const publicOpinionTopics = null;
+  const publicOpinionLatest = null;
   const house = null;
-  const beyondByRow = null;
+  const publicOpinionByRow = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
     gov: c.gov,
@@ -4620,9 +4620,9 @@ window.AUSPOL = function () {
       return _oneOffs || {};
     },
     loadOneOffs,
-    beyondTopics,
-    beyondLatest,
-    beyondByRow,
+    publicOpinionTopics,
+    publicOpinionLatest,
+    publicOpinionByRow,
     house,
     pollCadence,
     domain: {

@@ -1591,7 +1591,7 @@ function figuresOf(ws) {
 }
 
 /* ---- the payload ------------------------------------------------------------- */
-export function buildBeyond(entries, { deff, rowKeys }) {
+export function buildPublicOpinion(entries, { deff, rowKeys }) {
   const shown = entries.filter((e) => themeOf(e.id) !== "cut");
   const ix = makeIndex(shown);
   /* a featured card takes its question-and-pollster pairs out of the topic's
@@ -1656,7 +1656,7 @@ export function buildBeyond(entries, { deff, rowKeys }) {
   }
   const houses = new Set(shown.map((e) => e.house));
   return {
-    generated: "beyond-the-vote",
+    generated: "public-opinion",
     houses: Object.fromEntries(Object.entries(HOUSES).filter(([k]) => houses.has(k))),
     byRow: Object.fromEntries(Object.entries(byRow).map(([k, b]) => [k,
       { h: b.h, n: b.ids.size, t: THEMES.filter((t) => b.th.has(t.id)).map((t) => t.short) }])),
@@ -1924,6 +1924,6 @@ const TITLES = {
   "new-government-issues": "What should the new government act on first?",
 };
 
-/* the rules, for .build/test-beyond.mjs to pin branch by branch */
+/* the rules, for .build/test-public-opinion.mjs to pin branch by branch */
 export const __test = { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf,
   splitFinding, tallyFinding, rankFinding, findingMeta, tidyTitle, tidyHead, unpack, groupOf, matchKey, figuresOf };

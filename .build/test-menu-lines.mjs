@@ -154,9 +154,9 @@ const fresh = (mutate) => {
   assert.match(L["public-opinion"].fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);
   assert.equal(L["public-opinion"].fig.cap, "Latest entry");
   assert.match(L.changelog.fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);
-  assert.equal(fresh((D) => { D.beyondLatest = "2027-04-03"; }).menuLines()["public-opinion"].fig.v, "3 Apr",
-    "the figure reads beyondLatest, not a restated constant");
-  const undated = JSON.parse(JSON.stringify(fresh((D) => { D.beyondLatest = null; }).menuLines()["public-opinion"]));
+  assert.equal(fresh((D) => { D.publicOpinionLatest = "2027-04-03"; }).menuLines()["public-opinion"].fig.v, "3 Apr",
+    "the figure reads publicOpinionLatest, not a restated constant");
+  const undated = JSON.parse(JSON.stringify(fresh((D) => { D.publicOpinionLatest = null; }).menuLines()["public-opinion"]));
   assert.equal(undated.fig, null, "no catalogue date, no figure");
   assert.ok(undated.head, "the line stands without it");
   /* a finding that throws gives way to the tip, never takes the menu down */

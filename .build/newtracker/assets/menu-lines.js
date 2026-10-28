@@ -382,8 +382,8 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     });
     /* the catalogue's newest wave as a date figure, as the changelog row's */
     put("public-opinion", () => {
-      if (!D.beyondLatest) return { head: AP.PAGE_HEAD["public-opinion"], fig: null };
-      const [, mo, dd] = D.beyondLatest.split("-").map(Number);
+      if (!D.publicOpinionLatest) return { head: AP.PAGE_HEAD["public-opinion"], fig: null };
+      const [, mo, dd] = D.publicOpinionLatest.split("-").map(Number);
       return { head: AP.PAGE_HEAD["public-opinion"], fig: { v: dd + " " + D.monthName(mo), cap: "Latest entry" } };
     });
     put("changelog", () => {

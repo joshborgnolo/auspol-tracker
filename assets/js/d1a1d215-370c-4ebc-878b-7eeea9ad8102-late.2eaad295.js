@@ -6069,7 +6069,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "public-opinion" && React.createElement(RdBeyond, null), id === "changelog" && React.createElement(RdChangelog, null));
+  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "public-opinion" && React.createElement(RdPublicOpinion, null), id === "changelog" && React.createElement(RdChangelog, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -6090,7 +6090,7 @@ function MenuPageView({
     dangerouslySetInnerHTML: {
       __html: window.EXPLAINED_ARTICLE || ""
     }
-  }), id === "public-opinion" && React.createElement(BtvBody, null), id === "changelog" && React.createElement(ChangelogEntries, null));
+  }), id === "public-opinion" && React.createElement(PublicOpinionBody, null), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
 const CL_KIND = {
   poll: "poll",

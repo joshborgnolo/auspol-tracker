@@ -34,16 +34,16 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../assets/js/data-vic.428236d8.js" as="script">
+  <link rel="preload" href="../assets/js/data-vic.a59c0994.js" as="script">
   <link rel="preload" href="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js" as="script">
   <link rel="preload" href="../assets/js/np-project.ab528b77.js" as="script">
-  <link rel="preload" href="../assets/js/menu-lines.54ac4e01.js" as="script">
+  <link rel="preload" href="../assets/js/menu-lines.29aaaf1d.js" as="script">
   <link rel="preload" href="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.661fdcf3.js" as="script">
   <link rel="preload" href="../assets/js/rd.4f929cab.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.3bd6f0f0.js" as="script">
-  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js" as="script">
+  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3953ec2.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Victorian state election polling","url":"https://auspoltracker.com/vic/","description":"vicpol tracker averages every published Victorian state opinion poll. As of 28 September 2026, the Coalition leads Labor 52.8–47.2 two-party preferred on implied preference flows (±2), from 64 polls by 8 pollsters. Election day: Saturday 28 November 2026.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
   <style>
 @font-face {
@@ -175,8 +175,8 @@
   --mood-neg: oklch(0.44 0.045 50);
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
-  --btv-w0: oklch(0.50 0.105 305);
-  --btv-w1: oklch(0.60 0.115 83);
+  --pubop-w0: oklch(0.50 0.105 305);
+  --pubop-w1: oklch(0.60 0.115 83);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -241,8 +241,8 @@ body.dark {
   --mood-neg: oklch(0.68 0.05 45);
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
-  --btv-w0: oklch(0.66 0.110 305);
-  --btv-w1: oklch(0.67 0.115 83);
+  --pubop-w0: oklch(0.66 0.110 305);
+  --pubop-w1: oklch(0.67 0.115 83);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -1565,18 +1565,18 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   .ex-num { font-size: 44px; }
 }</style><style data-lc="65"></style><style>
-.btv-w0 { background: var(--btv-w0); }
-.btv-w1 { background: var(--btv-w1); }</style><style data-lc="66"></style><style>
-.btv-a1 { background: var(--btv-a1); }</style><style data-lc="67"></style><style>
-.btv-b1 { background: var(--btv-b1); }
-.btv-m0 { background: var(--btv-m0); }
-.btv-x0 { background: repeating-linear-gradient(135deg, var(--btv-m0) 0 2px, transparent 2px 5px); }</style><style data-lc="68"></style><style>
-.btv-trl-alp { stroke: var(--alp); fill: var(--alp); }
-.btv-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
-path.btv-trl-alp, path.btv-trl-lnp { fill: none; }</style><style data-lc="69"></style><style>
-.btv-ss h2 { scroll-margin-top: 56px; }
-.btv-ss-dek, .btv-ss-by { color: var(--ink-3); }
-.btv-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }</style><style data-lc="70"></style>
+.pubop-w0 { background: var(--pubop-w0); }
+.pubop-w1 { background: var(--pubop-w1); }</style><style data-lc="66"></style><style>
+.pubop-a1 { background: var(--pubop-a1); }</style><style data-lc="67"></style><style>
+.pubop-b1 { background: var(--pubop-b1); }
+.pubop-m0 { background: var(--pubop-m0); }
+.pubop-x0 { background: repeating-linear-gradient(135deg, var(--pubop-m0) 0 2px, transparent 2px 5px); }</style><style data-lc="68"></style><style>
+.pubop-trl-alp { stroke: var(--alp); fill: var(--alp); }
+.pubop-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
+path.pubop-trl-alp, path.pubop-trl-lnp { fill: none; }</style><style data-lc="69"></style><style>
+.pubop-ss h2 { scroll-margin-top: 56px; }
+.pubop-ss-dek, .pubop-ss-by { color: var(--ink-3); }
+.pubop-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }</style><style data-lc="70"></style>
   <style>
 body.rd {
   --rd-rule: var(--ink);
@@ -2438,21 +2438,21 @@ body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outlin
        built page ships no toolchain. The order lives in build.mjs (PLAIN, then
        JSX) because the plain scripts define the window aliases the components
        rely on; it is not expressed here. -->
-  <script>window.AP_LATE=["../assets/js/late-css-vic.a734eca1.js","../assets/js/data-vic-late.f7c7c1ff.js","../assets/js/pv-agg.981ce406.js","../assets/js/copy-chart.ae95f2e7.js","../assets/js/copy-poll.feb389c5.js","../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js","../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.9d5a6955.js","../assets/js/wm-story.63f19861.js","../assets/js/rd-panels.905b9c27.js","../assets/js/rd-polls.537b5652.js","../assets/js/rd-cycles.ecc621d4.js","../assets/js/rd-allpolls.c11b52d8.js","../assets/js/rd-beyond.09068bbd.js"];</script>
+  <script>window.AP_LATE=["../assets/js/late-css-vic.80eae4cd.js","../assets/js/data-vic-late.f7c7c1ff.js","../assets/js/pv-agg.981ce406.js","../assets/js/copy-chart.ae95f2e7.js","../assets/js/copy-poll.feb389c5.js","../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js","../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2eaad295.js","../assets/js/wm-story.63f19861.js","../assets/js/rd-panels.905b9c27.js","../assets/js/rd-polls.0be17c9b.js","../assets/js/rd-cycles.ecc621d4.js","../assets/js/rd-allpolls.89231f75.js","../assets/js/rd-public-opinion.37830719.js"];</script>
   <script>window.AP_CYCLE_SRC=null;</script>
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../assets/js/react.d949f1c3.js"></script>
   <script src="../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../assets/js/data-vic.428236d8.js"></script>
+  <script src="../assets/js/data-vic.a59c0994.js"></script>
   <script src="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js"></script>
   <script src="../assets/js/np-project.ab528b77.js"></script>
-  <script src="../assets/js/menu-lines.54ac4e01.js"></script>
+  <script src="../assets/js/menu-lines.29aaaf1d.js"></script>
   <script src="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.661fdcf3.js"></script>
   <script src="../assets/js/rd.4f929cab.js"></script>
   <script src="../assets/js/rd-hero.3bd6f0f0.js"></script>
-  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js"></script>
+  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3953ec2.js"></script>
 
 
 </body></html>

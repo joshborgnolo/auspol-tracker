@@ -1575,7 +1575,7 @@ const RD_LG_PANEL = {
 const rdLgPanelGo = (id, p) => {
   if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
   if (id === "opinion") {
-    const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+    const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
     if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
   }
 };
@@ -2025,9 +2025,9 @@ function rdLgLines(p, { onM, demSplit }) {
     </> });
   }
   /* the /public-opinion/ catalogue's one-off questions filed to this wave
-     (gen-data §8e's beyondByRow) - federal only, and only where one of the
+     (gen-data §8e's publicOpinionByRow) - federal only, and only where one of the
      pollster's store waves pairs to the row's release */
-  const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+  const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
   if (bo) {
     out.push({ id: "opinion", lab: "Public opinion", body: <>
       {bo.t.map((t) => <U key={t}>{t}</U>)}

@@ -43,28 +43,28 @@
   <link rel="preload" href="../assets/js/explained.ae90d788.js" as="script">
   <link rel="preload" href="../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../assets/js/data.5d8f6c4b.js" as="script">
+  <link rel="preload" href="../assets/js/data.5919d4e4.js" as="script">
   <link rel="preload" href="../assets/js/data-late.1b9221eb.js" as="script">
   <link rel="preload" href="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js" as="script">
   <link rel="preload" href="../assets/js/np-project.ab528b77.js" as="script">
   <link rel="preload" href="../assets/js/pv-agg.981ce406.js" as="script">
-  <link rel="preload" href="../assets/js/menu-lines.54ac4e01.js" as="script">
+  <link rel="preload" href="../assets/js/menu-lines.29aaaf1d.js" as="script">
   <link rel="preload" href="../assets/js/copy-chart.ae95f2e7.js" as="script">
   <link rel="preload" href="../assets/js/copy-poll.feb389c5.js" as="script">
   <link rel="preload" href="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js" as="script">
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.661fdcf3.js" as="script">
-  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.9d5a6955.js" as="script">
+  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2eaad295.js" as="script">
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.4f929cab.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.3bd6f0f0.js" as="script">
   <link rel="preload" href="../assets/js/rd-panels.905b9c27.js" as="script">
-  <link rel="preload" href="../assets/js/rd-polls.537b5652.js" as="script">
+  <link rel="preload" href="../assets/js/rd-polls.0be17c9b.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
-  <link rel="preload" href="../assets/js/rd-allpolls.c11b52d8.js" as="script">
-  <link rel="preload" href="../assets/js/rd-beyond.09068bbd.js" as="script">
-  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js" as="script">
+  <link rel="preload" href="../assets/js/rd-allpolls.89231f75.js" as="script">
+  <link rel="preload" href="../assets/js/rd-public-opinion.37830719.js" as="script">
+  <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3953ec2.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 28 October 2026, Labor leads the Coalition 51.5–48.5 two-party preferred on implied preference flows (±1.7), from 184 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
 @font-face {
@@ -197,8 +197,8 @@
   --mood-neg: oklch(0.44 0.045 50);
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
-  --btv-w0: oklch(0.50 0.105 305);
-  --btv-w1: oklch(0.60 0.115 83);
+  --pubop-w0: oklch(0.50 0.105 305);
+  --pubop-w1: oklch(0.60 0.115 83);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -263,8 +263,8 @@ body.dark {
   --mood-neg: oklch(0.68 0.05 45);
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
-  --btv-w0: oklch(0.66 0.110 305);
-  --btv-w1: oklch(0.67 0.115 83);
+  --pubop-w0: oklch(0.66 0.110 305);
+  --pubop-w1: oklch(0.67 0.115 83);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -3337,309 +3337,309 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
 }
-.btv {
-  --btv-a2: var(--mood-pos);
-  --btv-a1: color-mix(in oklab, var(--mood-pos) 50%, var(--surface));
-  --btv-b2: var(--mood-neg);
-  --btv-b1: color-mix(in oklab, var(--mood-neg) 48%, var(--surface));
-  --btv-m0: color-mix(in oklab, var(--ink-3) 24%, var(--surface));
-  --btv-track: var(--line-2);
-  --btv-rank: color-mix(in oklab, var(--ink-2) 58%, var(--surface));
+.pubop {
+  --pubop-a2: var(--mood-pos);
+  --pubop-a1: color-mix(in oklab, var(--mood-pos) 50%, var(--surface));
+  --pubop-b2: var(--mood-neg);
+  --pubop-b1: color-mix(in oklab, var(--mood-neg) 48%, var(--surface));
+  --pubop-m0: color-mix(in oklab, var(--ink-3) 24%, var(--surface));
+  --pubop-track: var(--line-2);
+  --pubop-rank: color-mix(in oklab, var(--ink-2) 58%, var(--surface));
   margin-top: 6px;
 }
-.btv-scope { margin: 16px 0 0; max-width: 76ch; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
-.btv a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent); }
-.btv a:hover, .btv a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
-.btv-finds { margin-top: 28px; }
-.btv-fh { margin: 0 0 8px; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
-.btv-fl { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); column-gap: 44px; margin: 0; padding: 0; list-style: none; }
-.btv-fl > li { min-width: 0; border-top: 1px solid var(--line); }
-.btv .btv-f { display: flex; gap: 12px; padding: 13px 0 15px; color: var(--ink); border-bottom: 0; }
-.btv-fn { flex: none; width: 1.5em; font-family: var(--serif); font-size: 22px; line-height: 1.1; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.btv-fb { display: flex; flex-direction: column; min-width: 0; }
-.btv-fk { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
-.btv-ft { margin-top: 3px; font-family: var(--serif); font-size: 20px; line-height: 1.22; color: var(--ink); text-wrap: pretty; }
-.btv-fm { margin-top: 5px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
-.btv .btv-f:hover .btv-ft, .btv .btv-f:focus-visible .btv-ft {
+.pubop-scope { margin: 16px 0 0; max-width: 76ch; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.pubop a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent); }
+.pubop a:hover, .pubop a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.pubop-finds { margin-top: 28px; }
+.pubop-fh { margin: 0 0 8px; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+.pubop-fl { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); column-gap: 44px; margin: 0; padding: 0; list-style: none; }
+.pubop-fl > li { min-width: 0; border-top: 1px solid var(--line); }
+.pubop .pubop-f { display: flex; gap: 12px; padding: 13px 0 15px; color: var(--ink); border-bottom: 0; }
+.pubop-fn { flex: none; width: 1.5em; font-family: var(--serif); font-size: 22px; line-height: 1.1; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.pubop-fb { display: flex; flex-direction: column; min-width: 0; }
+.pubop-fk { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
+.pubop-ft { margin-top: 3px; font-family: var(--serif); font-size: 20px; line-height: 1.22; color: var(--ink); text-wrap: pretty; }
+.pubop-fm { margin-top: 5px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
+.pubop .pubop-f:hover .pubop-ft, .pubop .pubop-f:focus-visible .pubop-ft {
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in oklch, var(--ink) 45%, transparent);
 }
-.btv-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; margin-top: 24px; border-bottom: 1px solid var(--line); }
-.btv-sort-l { font-size: 13px; color: var(--ink-3); }
-.btv-sort-g { display: flex; gap: 4px; }
-.btv-sort-b {
+.pubop-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; margin-top: 24px; border-bottom: 1px solid var(--line); }
+.pubop-sort-l { font-size: 13px; color: var(--ink-3); }
+.pubop-sort-g { display: flex; gap: 4px; }
+.pubop-sort-b {
   all: unset; box-sizing: border-box; cursor: pointer;
   min-height: 44px; padding: 0 12px; display: inline-flex; align-items: center;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
   font-size: 15px; color: var(--ink-3); white-space: nowrap;
 }
-.btv-sort-b[aria-pressed="true"] { border-bottom-color: var(--ink); font-weight: 600; color: var(--ink); }
-.btv-sort-b:hover { color: var(--ink); }
-.btv-sort-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
-.btv-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
-.btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
-@media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
-.btv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; border-bottom: 1px solid var(--line); }
-.btv-tools .btv-sort { margin-top: 0; border-bottom: 0; }
-.btv-search {
+.pubop-sort-b[aria-pressed="true"] { border-bottom-color: var(--ink); font-weight: 600; color: var(--ink); }
+.pubop-sort-b:hover { color: var(--ink); }
+.pubop-sort-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+.pubop-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
+.pubop-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
+@media (max-width: 380px) { .pubop-sort-b { padding: 0 8px; } }
+.pubop-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; border-bottom: 1px solid var(--line); }
+.pubop-tools .pubop-sort { margin-top: 0; border-bottom: 0; }
+.pubop-search {
   box-sizing: border-box; width: 330px; height: 36px; padding: 0 12px 0 14px;
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0; margin: 0;
   border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
 }
-.btv-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
-.btv-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
-.btv-search input::placeholder { color: var(--ink-3); opacity: 1; }
-.btv-search input::-webkit-search-cancel-button { display: none; }
-.btv-search input:focus-visible { outline: none; }
+.pubop-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
+.pubop-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
+.pubop-search input::placeholder { color: var(--ink-3); opacity: 1; }
+.pubop-search input::-webkit-search-cancel-button { display: none; }
+.pubop-search input:focus-visible { outline: none; }
 @media (pointer: coarse) {
-  .btv-search input { font-size: 16px; }
+  .pubop-search input { font-size: 16px; }
 }
-@media (max-width: 1000px) { .btv-search { width: 260px; } }
-@media (max-width: 760px) { .btv-search { width: 100%; } .btv-tools { margin-top: 12px; row-gap: 10px; column-gap: 8px; } }
-.btv-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
-.btv-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }
-.btv-rcount b { color: var(--ink); }
-.btv-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }
-.btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
-.btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
-.btv-tt { margin: 0; font-family: var(--sans); font-size: 19px; font-weight: 600; line-height: 1.3; color: var(--ink); }
-.btv-tn { margin-right: 0.5em; font-weight: 400; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.btv-tc { font-size: 13px; color: var(--ink-3); }
-.btv-hl { margin: 10px 0 0; max-width: 42ch; font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; color: var(--ink); text-wrap: balance; }
-.btv-tdk { margin: 8px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
-.btv-tracker { margin-top: 28px; }
-.btv-tlab { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
-.btv-tdek { margin: 6px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
-.btv-fams { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 12px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
-.btv-fams span { display: inline-flex; align-items: center; gap: 7px; }
-.btv-wsw { display: inline-block; flex: none; width: 18px; height: 3px; border-radius: 2px; }
-.btv-w0 { background: var(--btv-w0); }
-.btv-w1 { background: var(--btv-w1); }
-.btv-tbody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; margin-top: 4px; }
-.btv-tchart { min-width: 0; }
-.btv .btv-chart { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; transition: none; }
-.btv-ylab { fill: var(--ink-3); }
-.btv-latest { min-width: 0; }
-.btv-lh { margin: 0 0 2px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
-.btv-ll { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 28px; margin: 0; padding: 0; list-style: none; }
-.btv-ll > li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
-.btv-lp { display: flex; flex-direction: column; min-width: 0; }
-.btv-lnm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 7px; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink); }
-.btv-ld { font-size: 12px; font-weight: 400; color: var(--ink-3); }
-.btv-ldot { display: inline-block; flex: none; width: 9px; height: 9px; border-radius: 50%; }
-.btv-lq { margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
-.btv-lv { flex: none; font-family: var(--serif); font-size: 28px; font-weight: 600; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+@media (max-width: 1000px) { .pubop-search { width: 260px; } }
+@media (max-width: 760px) { .pubop-search { width: 100%; } .pubop-tools { margin-top: 12px; row-gap: 10px; column-gap: 8px; } }
+.pubop-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
+.pubop-none { margin: 28px 0 0; font-size: 14px; color: var(--ink-3); }
+.pubop-rcount b { color: var(--ink); }
+.pubop-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }
+.pubop-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
+.pubop-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.pubop-tt { margin: 0; font-family: var(--sans); font-size: 19px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.pubop-tn { margin-right: 0.5em; font-weight: 400; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.pubop-tc { font-size: 13px; color: var(--ink-3); }
+.pubop-hl { margin: 10px 0 0; max-width: 42ch; font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; color: var(--ink); text-wrap: balance; }
+.pubop-tdk { margin: 8px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+.pubop-tracker { margin-top: 28px; }
+.pubop-tlab { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.pubop-tdek { margin: 6px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.pubop-fams { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 12px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+.pubop-fams span { display: inline-flex; align-items: center; gap: 7px; }
+.pubop-wsw { display: inline-block; flex: none; width: 18px; height: 3px; border-radius: 2px; }
+.pubop-w0 { background: var(--pubop-w0); }
+.pubop-w1 { background: var(--pubop-w1); }
+.pubop-tbody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; margin-top: 4px; }
+.pubop-tchart { min-width: 0; }
+.pubop .pubop-chart { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; transition: none; }
+.pubop-ylab { fill: var(--ink-3); }
+.pubop-latest { min-width: 0; }
+.pubop-lh { margin: 0 0 2px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
+.pubop-ll { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 28px; margin: 0; padding: 0; list-style: none; }
+.pubop-ll > li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
+.pubop-lp { display: flex; flex-direction: column; min-width: 0; }
+.pubop-lnm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 7px; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.pubop-ld { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.pubop-ldot { display: inline-block; flex: none; width: 9px; height: 9px; border-radius: 50%; }
+.pubop-lq { margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+.pubop-lv { flex: none; font-family: var(--serif); font-size: 28px; font-weight: 600; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 @media (min-width: 900px) {
-  .btv-tbody { grid-template-columns: minmax(0, 1fr) minmax(220px, 290px); }
-  .btv-latest { border-left: 1px solid var(--line); padding-left: 24px; }
-  .btv-ll { grid-template-columns: minmax(0, 1fr); }
+  .pubop-tbody { grid-template-columns: minmax(0, 1fr) minmax(220px, 290px); }
+  .pubop-latest { border-left: 1px solid var(--line); padding-left: 24px; }
+  .pubop-ll { grid-template-columns: minmax(0, 1fr); }
 }
-.btv-tkey { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 8px 0 0; font-size: 12.5px; color: var(--ink-3); }
-.btv-tkey span { display: inline-flex; align-items: center; gap: 7px; }
-.btv-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
-.btv-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink-3); }
-.btv-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px dashed var(--ink-3); }
-.btv-ledger { margin-top: 14px; }
-.btv-items { margin-top: 30px; }
-.btv-item { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 22px 0 24px; border-top: 1px solid var(--line); }
-.btv-il { flex: 1 1 260px; min-width: 0; }
-.btv-ir { flex: 1.7 1 360px; min-width: 0; }
-.btv-q { margin: 0; font-family: var(--sans); font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
-.btv-sum { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
-.btv-bar { position: relative; display: flex; height: 12px; border-radius: 3px; overflow: hidden; background: var(--btv-track); }
-.btv-bar-t { height: 18px; border-radius: 4px; }
-.btv-seg { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
-.btv-gap { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
-.btv-a2 { background: var(--btv-a2); }
-.btv-a1 { background: var(--btv-a1); }
-.btv-b2 { background: var(--btv-b2); }
-.btv-b1 { background: var(--btv-b1); }
-.btv-m0 { background: var(--btv-m0); }
-.btv-x0 { background: repeating-linear-gradient(135deg, var(--btv-m0) 0 2px, transparent 2px 5px); }
-.btv-sw { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; }
-.btv-ends { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; font-size: 13.5px; line-height: 1.3; color: var(--ink-2); }
-.btv-end { display: inline-flex; align-items: baseline; gap: 6px; }
-.btv-end-b { text-align: right; }
-.btv-end b { font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-end .btv-sw { align-self: center; }
-.btv-mids { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; margin: 7px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-3); text-align: center; }
-.btv-mids:empty { display: none; }
-.btv-level { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); text-align: center; }
-.btv-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.3; color: var(--ink-3); }
-.btv-key span { display: inline-flex; align-items: center; gap: 6px; }
-.btv-key .btv-key-n { color: var(--ink-faint); }
-.btv-rows { display: grid; gap: 9px; }
-.btv-row { display: grid; grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em 2.6em; align-items: center; column-gap: 7px; }
-.btv-rl { display: flex; flex-direction: column; font-size: 13px; line-height: 1.3; color: var(--ink-2); }
-.btv-rh { color: var(--ink); font-weight: 600; }
-.btv-rd { font-weight: 400; color: var(--ink-3); }
-.btv-rw { font-size: 12px; color: var(--ink-3); }
-.btv-va, .btv-vb { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-va { text-align: right; }
-.btv-net { font-size: 11.5px; color: var(--ink-3); text-align: right; white-space: nowrap; }
-.btv-all {
+.pubop-tkey { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 8px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.pubop-tkey span { display: inline-flex; align-items: center; gap: 7px; }
+.pubop-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
+.pubop-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink-3); }
+.pubop-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px dashed var(--ink-3); }
+.pubop-ledger { margin-top: 14px; }
+.pubop-items { margin-top: 30px; }
+.pubop-item { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 22px 0 24px; border-top: 1px solid var(--line); }
+.pubop-il { flex: 1 1 260px; min-width: 0; }
+.pubop-ir { flex: 1.7 1 360px; min-width: 0; }
+.pubop-q { margin: 0; font-family: var(--sans); font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.pubop-sum { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.pubop-bar { position: relative; display: flex; height: 12px; border-radius: 3px; overflow: hidden; background: var(--pubop-track); }
+.pubop-bar-t { height: 18px; border-radius: 4px; }
+.pubop-seg { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
+.pubop-gap { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
+.pubop-a2 { background: var(--pubop-a2); }
+.pubop-a1 { background: var(--pubop-a1); }
+.pubop-b2 { background: var(--pubop-b2); }
+.pubop-b1 { background: var(--pubop-b1); }
+.pubop-m0 { background: var(--pubop-m0); }
+.pubop-x0 { background: repeating-linear-gradient(135deg, var(--pubop-m0) 0 2px, transparent 2px 5px); }
+.pubop-sw { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; }
+.pubop-ends { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; font-size: 13.5px; line-height: 1.3; color: var(--ink-2); }
+.pubop-end { display: inline-flex; align-items: baseline; gap: 6px; }
+.pubop-end-b { text-align: right; }
+.pubop-end b { font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pubop-end .pubop-sw { align-self: center; }
+.pubop-mids { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; margin: 7px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-3); text-align: center; }
+.pubop-mids:empty { display: none; }
+.pubop-level { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); text-align: center; }
+.pubop-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.3; color: var(--ink-3); }
+.pubop-key span { display: inline-flex; align-items: center; gap: 6px; }
+.pubop-key .pubop-key-n { color: var(--ink-faint); }
+.pubop-rows { display: grid; gap: 9px; }
+.pubop-row { display: grid; grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em 2.6em; align-items: center; column-gap: 7px; }
+.pubop-rl { display: flex; flex-direction: column; font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.pubop-rh { color: var(--ink); font-weight: 600; }
+.pubop-rd { font-weight: 400; color: var(--ink-3); }
+.pubop-rw { font-size: 12px; color: var(--ink-3); }
+.pubop-va, .pubop-vb { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pubop-va { text-align: right; }
+.pubop-net { font-size: 11.5px; color: var(--ink-3); text-align: right; white-space: nowrap; }
+.pubop-all {
   justify-self: start; margin-top: 10px; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2);
   background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
 }
-.btv-all:hover { color: var(--ink); }
-.btv-rank { display: grid; gap: 8px; }
-.btv-rk { display: grid; grid-template-columns: minmax(0, 1fr) 38% 3em; align-items: center; gap: 10px; }
-.btv-rkl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
-.btv-rkb { height: 10px; border-radius: 3px; background: var(--btv-track); overflow: hidden; }
-.btv-rkb i { display: block; height: 100%; border-radius: 3px; background: var(--btv-rank); }
-.btv-rkv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-base { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
-.btv-nets { display: grid; gap: 10px; }
-.btv-ntl { display: block; font-size: 13px; line-height: 1.35; color: var(--ink-2); }
-.btv-ntb { position: relative; display: block; height: 12px; margin-top: 4px; }
-.btv-ntb::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--ink-3); }
-.btv-ntb i { position: absolute; top: 0; height: 100%; border-radius: 2px; }
-.btv-ntb b { position: absolute; top: -2px; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
-.btv-src { margin-top: 10px; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
-.btv-src-l { display: flex; flex-wrap: wrap; gap: 2px 12px; }
-.btv-src-l b { font-weight: 600; color: var(--ink-2); }
-.btv-srcs { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; }
-.btv-wd { margin-top: 6px; }
-.btv-wd summary, .btv-ledger summary, .btv-mi summary { cursor: pointer; }
-.btv-wd summary { font-size: 12.5px; color: var(--ink-2); }
-.btv-wd > p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-.btv-ledger summary { font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.btv-twrap { overflow-x: auto; }
-.btv-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.btv-table th, .btv-table td { padding: 5px 0 5px 10px; font-size: 13px; line-height: 1.35; text-align: right; white-space: nowrap; }
-.btv-table thead th { min-width: 3.4em; font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; vertical-align: bottom; border-bottom: 1px solid var(--line); }
-.btv-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
-.btv-table tbody th { font-weight: 400; color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
-.btv-table .btv-l { padding-left: 0; text-align: left; white-space: normal; min-width: 7em; }
-.btv-table td b { color: var(--ink); font-weight: 600; }
-.btv-twrap .btv-table .btv-l { position: sticky; left: 0; z-index: 1; background: var(--bg); }
-.btv-table .btv-tsec th, .btv-table .btv-tgrp th { padding-top: 12px; font-weight: 600; color: var(--ink); border-bottom-color: var(--line); }
-.btv-table .btv-twv { padding-left: 12px; color: var(--ink-3); }
-.btv-twd { color: var(--ink-3); }
-.btv-table .btv-tban th { padding-bottom: 2px; text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-2); border-bottom: 0; }
-.btv-table .btv-tban th + th { padding-left: 10px; }
-.btv-table .btv-tb0, .btv-table .btv-tban th + th { box-shadow: inset 1px 0 0 var(--line-2); }
-.btv-table thead th.btv-nw { white-space: nowrap; }
-.btv-gt td { color: var(--ink); }
-.btv-gt td.btv-tc-x { color: var(--ink-3); }
-.btv-more { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 14px; }
-.btv-items + .btv-more { margin-top: 0; }
-.btv-more > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-2); }
-.btv-more > summary span { font-weight: 400; color: var(--ink-3); }
-.btv-more > summary:hover { color: var(--ink); }
-.btv-ml { margin: 10px 0 0; padding: 0; list-style: none; }
-.btv-ml > li { min-width: 0; border-bottom: 1px solid var(--line-2); }
-.btv-mi > summary {
+.pubop-all:hover { color: var(--ink); }
+.pubop-rank { display: grid; gap: 8px; }
+.pubop-rk { display: grid; grid-template-columns: minmax(0, 1fr) 38% 3em; align-items: center; gap: 10px; }
+.pubop-rkl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.pubop-rkb { height: 10px; border-radius: 3px; background: var(--pubop-track); overflow: hidden; }
+.pubop-rkb i { display: block; height: 100%; border-radius: 3px; background: var(--pubop-rank); }
+.pubop-rkv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pubop-base { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.pubop-nets { display: grid; gap: 10px; }
+.pubop-ntl { display: block; font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+.pubop-ntb { position: relative; display: block; height: 12px; margin-top: 4px; }
+.pubop-ntb::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--ink-3); }
+.pubop-ntb i { position: absolute; top: 0; height: 100%; border-radius: 2px; }
+.pubop-ntb b { position: absolute; top: -2px; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pubop-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.pubop-src { margin-top: 10px; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.pubop-src-l { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.pubop-src-l b { font-weight: 600; color: var(--ink-2); }
+.pubop-srcs { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; }
+.pubop-wd { margin-top: 6px; }
+.pubop-wd summary, .pubop-ledger summary, .pubop-mi summary { cursor: pointer; }
+.pubop-wd summary { font-size: 12.5px; color: var(--ink-2); }
+.pubop-wd > p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.pubop-ledger summary { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.pubop-twrap { overflow-x: auto; }
+.pubop-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pubop-table th, .pubop-table td { padding: 5px 0 5px 10px; font-size: 13px; line-height: 1.35; text-align: right; white-space: nowrap; }
+.pubop-table thead th { min-width: 3.4em; font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; vertical-align: bottom; border-bottom: 1px solid var(--line); }
+.pubop-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.pubop-table tbody th { font-weight: 400; color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.pubop-table .pubop-l { padding-left: 0; text-align: left; white-space: normal; min-width: 7em; }
+.pubop-table td b { color: var(--ink); font-weight: 600; }
+.pubop-twrap .pubop-table .pubop-l { position: sticky; left: 0; z-index: 1; background: var(--bg); }
+.pubop-table .pubop-tsec th, .pubop-table .pubop-tgrp th { padding-top: 12px; font-weight: 600; color: var(--ink); border-bottom-color: var(--line); }
+.pubop-table .pubop-twv { padding-left: 12px; color: var(--ink-3); }
+.pubop-twd { color: var(--ink-3); }
+.pubop-table .pubop-tban th { padding-bottom: 2px; text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-2); border-bottom: 0; }
+.pubop-table .pubop-tban th + th { padding-left: 10px; }
+.pubop-table .pubop-tb0, .pubop-table .pubop-tban th + th { box-shadow: inset 1px 0 0 var(--line-2); }
+.pubop-table thead th.pubop-nw { white-space: nowrap; }
+.pubop-gt td { color: var(--ink); }
+.pubop-gt td.pubop-tc-x { color: var(--ink-3); }
+.pubop-more { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 14px; }
+.pubop-items + .pubop-more { margin-top: 0; }
+.pubop-more > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.pubop-more > summary span { font-weight: 400; color: var(--ink-3); }
+.pubop-more > summary:hover { color: var(--ink); }
+.pubop-ml { margin: 10px 0 0; padding: 0; list-style: none; }
+.pubop-ml > li { min-width: 0; border-bottom: 1px solid var(--line-2); }
+.pubop-mi > summary {
   display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: baseline; column-gap: 4px;
   padding: 10px 0; font-size: 14.5px; line-height: 1.4; list-style: none;
 }
-.btv-mi > summary::-webkit-details-marker { display: none; }
-.btv-mi > summary::before {
+.pubop-mi > summary::-webkit-details-marker { display: none; }
+.pubop-mi > summary::before {
   content: ""; justify-self: start; align-self: center; width: 6px; height: 6px; margin-left: 1px;
   border-right: 1.5px solid var(--ink-3); border-bottom: 1.5px solid var(--ink-3); transform: rotate(-45deg); transition: transform 0.15s ease;
 }
-.btv-mi[open] > summary::before { transform: rotate(45deg); }
-.btv-mi > summary:hover .btv-mq { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in oklch, var(--ink) 40%, transparent); }
-.btv-mq { min-width: 0; color: var(--ink); text-wrap: pretty; }
-.btv-mm { padding-left: 16px; font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
-.btv-mb { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 4px 0 24px 22px; }
-.btv-mb .btv-src { margin-top: 0; }
-.btv-srch { display: block; font-weight: 600; color: var(--ink-2); }
-.btv-srcw { margin: 2px 0 0; padding: 0; list-style: none; }
-.btv-srcw > li { display: flex; flex-wrap: wrap; gap: 0 12px; }
-.btv-prose { margin: 0; padding-left: 12px; border-left: 2px solid var(--line); font-size: 14px; line-height: 1.55; color: var(--ink-2); }
-.btv-fig + .btv-fig { margin-top: 26px; }
-.btv-gh { margin-bottom: 9px; }
-.btv-ght { margin: 0; font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
-.btv-ghb { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
-.btv-gh .btv-ght + .btv-ghb { margin-top: 1px; }
-.btv-gl { display: grid; row-gap: 7px; }
-.btv-gr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(56px, 34%) 3.4em; align-items: center; column-gap: 10px; }
-.btv-gl-m .btv-gr { grid-template-columns: minmax(0, 1fr) minmax(56px, 28%) repeat(var(--btv-n), 4.2em); }
-.btv-gk { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
-.btv-gbar { height: 10px; border-radius: 3px; background: var(--btv-track); overflow: hidden; }
-.btv-gbar i { display: block; height: 100%; border-radius: 3px; background: var(--btv-rank); }
-.btv-gv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.btv-gv-o { font-weight: 400; color: var(--ink-3); }
-.btv-gr-h { align-items: end; }
-.btv-gr-h .btv-gk { color: transparent; user-select: none; }
-.btv-gr-h .btv-gv { font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; }
-.btv-gr-s .btv-gk { color: var(--ink-3); }
-.btv-gr-s1 { margin-top: 2px; padding-top: 7px; border-top: 1px solid var(--line-2); }
-.btv-gs .btv-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em; }
-.btv-gs-x .btv-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x), 3.6em); }
-.btv-gs .btv-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
-.btv-gs-x .btv-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x), 3.6em); }
-.btv-row-h { align-items: end; margin-bottom: 4px; }
-.btv-vx { font-size: 13px; color: var(--ink-3); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.btv-row-h .btv-vx { font-size: 12px; font-weight: 600; line-height: 1.25; white-space: normal; }
-.btv-sg { display: grid; row-gap: 5px; }
-.btv-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
-.btv-sg .btv-rl { padding-left: 12px; color: var(--ink-3); }
-.btv-trs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px 22px; margin-top: 10px; }
-.btv-tr { margin: 0; min-width: 0; }
-.btv-trt { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); }
-.btv-tr svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
-.btv-trg { stroke: var(--line-2); stroke-width: 1; }
-.btv-trax { font-size: 9.5px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
-.btv-trv { font-size: 10.5px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-trl { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.btv-trl-alp { stroke: var(--alp); fill: var(--alp); }
-.btv-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
-path.btv-trl-alp, path.btv-trl-lnp { fill: none; }
-.btv-trd { stroke: var(--bg); stroke-width: 1; }
-.btv-trs-alp { background: var(--alp); }
-.btv-trs-lnp { background: var(--lnp); }
-.btv-cuts { margin-top: 16px; }
-.btv-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
-.btv-cuts > summary span { color: var(--ink-3); }
-.btv-cut { margin-top: 12px; }
-.btv-cutt { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
-.btv-how { margin-top: 56px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
-.btv-how p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
-.btv-how b { font-weight: 600; color: var(--ink-2); }
-.btv-retry {
+.pubop-mi[open] > summary::before { transform: rotate(45deg); }
+.pubop-mi > summary:hover .pubop-mq { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in oklch, var(--ink) 40%, transparent); }
+.pubop-mq { min-width: 0; color: var(--ink); text-wrap: pretty; }
+.pubop-mm { padding-left: 16px; font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
+.pubop-mb { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 4px 0 24px 22px; }
+.pubop-mb .pubop-src { margin-top: 0; }
+.pubop-srch { display: block; font-weight: 600; color: var(--ink-2); }
+.pubop-srcw { margin: 2px 0 0; padding: 0; list-style: none; }
+.pubop-srcw > li { display: flex; flex-wrap: wrap; gap: 0 12px; }
+.pubop-prose { margin: 0; padding-left: 12px; border-left: 2px solid var(--line); font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+.pubop-fig + .pubop-fig { margin-top: 26px; }
+.pubop-gh { margin-bottom: 9px; }
+.pubop-ght { margin: 0; font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+.pubop-ghb { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.pubop-gh .pubop-ght + .pubop-ghb { margin-top: 1px; }
+.pubop-gl { display: grid; row-gap: 7px; }
+.pubop-gr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(56px, 34%) 3.4em; align-items: center; column-gap: 10px; }
+.pubop-gl-m .pubop-gr { grid-template-columns: minmax(0, 1fr) minmax(56px, 28%) repeat(var(--pubop-n), 4.2em); }
+.pubop-gk { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+.pubop-gbar { height: 10px; border-radius: 3px; background: var(--pubop-track); overflow: hidden; }
+.pubop-gbar i { display: block; height: 100%; border-radius: 3px; background: var(--pubop-rank); }
+.pubop-gv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pubop-gv-o { font-weight: 400; color: var(--ink-3); }
+.pubop-gr-h { align-items: end; }
+.pubop-gr-h .pubop-gk { color: transparent; user-select: none; }
+.pubop-gr-h .pubop-gv { font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; }
+.pubop-gr-s .pubop-gk { color: var(--ink-3); }
+.pubop-gr-s1 { margin-top: 2px; padding-top: 7px; border-top: 1px solid var(--line-2); }
+.pubop-gs .pubop-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em; }
+.pubop-gs-x .pubop-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em repeat(var(--pubop-x), 3.6em); }
+.pubop-gs .pubop-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
+.pubop-gs-x .pubop-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--pubop-x), 3.6em); }
+.pubop-row-h { align-items: end; margin-bottom: 4px; }
+.pubop-vx { font-size: 13px; color: var(--ink-3); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pubop-row-h .pubop-vx { font-size: 12px; font-weight: 600; line-height: 1.25; white-space: normal; }
+.pubop-sg { display: grid; row-gap: 5px; }
+.pubop-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.pubop-sg .pubop-rl { padding-left: 12px; color: var(--ink-3); }
+.pubop-trs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px 22px; margin-top: 10px; }
+.pubop-tr { margin: 0; min-width: 0; }
+.pubop-trt { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.pubop-tr svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.pubop-trg { stroke: var(--line-2); stroke-width: 1; }
+.pubop-trax { font-size: 9.5px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pubop-trv { font-size: 10.5px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.pubop-trl { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.pubop-trl-alp { stroke: var(--alp); fill: var(--alp); }
+.pubop-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
+path.pubop-trl-alp, path.pubop-trl-lnp { fill: none; }
+.pubop-trd { stroke: var(--bg); stroke-width: 1; }
+.pubop-trs-alp { background: var(--alp); }
+.pubop-trs-lnp { background: var(--lnp); }
+.pubop-cuts { margin-top: 16px; }
+.pubop-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
+.pubop-cuts > summary span { color: var(--ink-3); }
+.pubop-cut { margin-top: 12px; }
+.pubop-cutt { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
+.pubop-how { margin-top: 56px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
+.pubop-how p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
+.pubop-how b { font-weight: 600; color: var(--ink-2); }
+.pubop-retry {
   font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
 }
-.btv-ss h2 { scroll-margin-top: 56px; }
-.btv-ss-dek, .btv-ss-by { color: var(--ink-3); }
-.btv-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
+.pubop-ss h2 { scroll-margin-top: 56px; }
+.pubop-ss-dek, .pubop-ss-by { color: var(--ink-3); }
+.pubop-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
 @media (max-width: 640px) {
-  .btv-topic { margin-top: 48px; }
-  .btv-hl { font-size: 23px; }
-  .btv-fn { font-size: 19px; }
-  .btv-ft { font-size: 18px; }
-  .btv-tdk, .btv-tdek { font-size: 14.5px; }
-  .btv-item { gap: 12px; padding: 18px 0 20px; }
-  .btv-q { font-size: 15px; }
-  .btv-end b { font-size: 21px; }
-  .btv-lv { font-size: 24px; }
-  .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em 2.6em; row-gap: 3px; }
-  .btv-rl { grid-column: 1 / -1; }
-  .btv-rk { grid-template-columns: minmax(0, 1fr) 3em; row-gap: 3px; }
-  .btv-rkl { grid-column: 1 / -1; }
-  .btv-rkb { grid-column: 1; }
-  .btv-ends { align-items: flex-start; }
-  .btv-end { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 6px; row-gap: 3px; max-width: 49%; }
-  .btv-end .btv-endl { grid-column: 1 / -1; font-size: 13px; line-height: 1.3; }
-  .btv-end-b { justify-content: end; text-align: right; }
-  .btv-end-b b { grid-column: 1; grid-row: 1; }
-  .btv-end-b .btv-sw { grid-column: 2; grid-row: 1; }
-  .btv-mi > summary { grid-template-columns: 18px minmax(0, 1fr); }
-  .btv-mm { grid-column: 2; padding-left: 0; white-space: normal; }
-  .btv-mb { padding-left: 0; gap: 14px; }
-  .btv-gr, .btv-gl-m .btv-gr { grid-template-columns: minmax(0, 1fr) repeat(var(--btv-n, 1), 3.6em); row-gap: 3px; }
-  .btv-gk { grid-column: 1 / -1; }
-  .btv-gbar { grid-column: 1; }
-  .btv-gr-h .btv-gk, .btv-gr-s .btv-gk + span { display: none; }
-  .btv-gr-h > span:nth-child(2) { grid-column: 1; }
-  .btv-gr-s .btv-gk { grid-column: 1; }
-  .btv-gs .btv-row, .btv-gs-x .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x, 0), 3.4em); }
-  .btv-gs:not(.btv-gs-x) .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
-  .btv-gs .btv-rl { grid-column: 1 / -1; }
-  .btv-rlx { display: none; }
+  .pubop-topic { margin-top: 48px; }
+  .pubop-hl { font-size: 23px; }
+  .pubop-fn { font-size: 19px; }
+  .pubop-ft { font-size: 18px; }
+  .pubop-tdk, .pubop-tdek { font-size: 14.5px; }
+  .pubop-item { gap: 12px; padding: 18px 0 20px; }
+  .pubop-q { font-size: 15px; }
+  .pubop-end b { font-size: 21px; }
+  .pubop-lv { font-size: 24px; }
+  .pubop-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em 2.6em; row-gap: 3px; }
+  .pubop-rl { grid-column: 1 / -1; }
+  .pubop-rk { grid-template-columns: minmax(0, 1fr) 3em; row-gap: 3px; }
+  .pubop-rkl { grid-column: 1 / -1; }
+  .pubop-rkb { grid-column: 1; }
+  .pubop-ends { align-items: flex-start; }
+  .pubop-end { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 6px; row-gap: 3px; max-width: 49%; }
+  .pubop-end .pubop-endl { grid-column: 1 / -1; font-size: 13px; line-height: 1.3; }
+  .pubop-end-b { justify-content: end; text-align: right; }
+  .pubop-end-b b { grid-column: 1; grid-row: 1; }
+  .pubop-end-b .pubop-sw { grid-column: 2; grid-row: 1; }
+  .pubop-mi > summary { grid-template-columns: 18px minmax(0, 1fr); }
+  .pubop-mm { grid-column: 2; padding-left: 0; white-space: normal; }
+  .pubop-mb { padding-left: 0; gap: 14px; }
+  .pubop-gr, .pubop-gl-m .pubop-gr { grid-template-columns: minmax(0, 1fr) repeat(var(--pubop-n, 1), 3.6em); row-gap: 3px; }
+  .pubop-gk { grid-column: 1 / -1; }
+  .pubop-gbar { grid-column: 1; }
+  .pubop-gr-h .pubop-gk, .pubop-gr-s .pubop-gk + span { display: none; }
+  .pubop-gr-h > span:nth-child(2) { grid-column: 1; }
+  .pubop-gr-s .pubop-gk { grid-column: 1; }
+  .pubop-gs .pubop-row, .pubop-gs-x .pubop-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--pubop-x, 0), 3.4em); }
+  .pubop-gs:not(.pubop-gs-x) .pubop-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
+  .pubop-gs .pubop-rl { grid-column: 1 / -1; }
+  .pubop-rlx { display: none; }
 }
 </style>
   <style>
@@ -6611,7 +6611,7 @@ body.rd input:focus-visible,
 body.rd summary:focus-visible,
 body.rd [role="tab"]:focus-visible,
 body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-body.rd .rd-ap-search input:focus-visible, body.rd .btv-search input:focus-visible { outline: none; }
+body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-visible { outline: none; }
 </style>
 </head>
 <body>
@@ -6666,247 +6666,247 @@ body.rd .rd-ap-search input:focus-visible, body.rd .btv-search input:focus-visib
 
 
 
-      <section class="btv-ss" aria-label="Public opinion: the questions by topic">
+      <section class="pubop-ss" aria-label="Public opinion: the questions by topic">
       <h2>The findings</h2>
-      <ol class="btv-ss-list"><li><b>Immigration:</b> In every poll, a majority want less immigration. <span class="btv-ss-by">Five pollsters, 12 readings since April 2025</span></li><li><b>Trump and the US:</b> Every pollster finds Donald Trump deeply unpopular. <span class="btv-ss-by">Four pollsters, 16 readings since July 2025</span></li><li><b>One Nation:</b> Voters are divided on whether One Nation’s rise is good or bad for Australia, 42% to 41%. <span class="btv-ss-by">SEC Newgate, July 2026</span></li><li><b>Housing and the budget:</b> Negative verdicts on the May budget outnumber positive ones in all seven polls. <span class="btv-ss-by">Seven polls, May 2026</span></li><li><b>Cost of living:</b> 46% hold federal Labor primarily responsible for the cost-of-living crunch. <span class="btv-ss-by">Resolve, October 2026</span></li><li><b>War and fuel:</b> 63% opposed sending Australian naval ships to help keep the Strait of Hormuz open. <span class="btv-ss-by">Newspoll, March 2026</span></li><li><b>Bondi and cohesion:</b> More voters rated the government’s response to the Bondi attack poorly than well in both polls. <span class="btv-ss-by">Two polls, December 2025 to January 2026</span></li><li><b>Climate and energy:</b> 57% back more oil and gas exploration, even if it undermines net zero. <span class="btv-ss-by">YouGov, April 2026</span></li><li><b>Tech and society:</b> Support for the under-16 social media ban outweighs opposition in all three polls. <span class="btv-ss-by">Three polls, September 2025 to January 2026</span></li><li><b>Trust and democracy:</b> 56% say the Albanese government has fallen short of their expectations. <span class="btv-ss-by">Essential, May 2026</span></li></ol>
+      <ol class="pubop-ss-list"><li><b>Immigration:</b> In every poll, a majority want less immigration. <span class="pubop-ss-by">Five pollsters, 12 readings since April 2025</span></li><li><b>Trump and the US:</b> Every pollster finds Donald Trump deeply unpopular. <span class="pubop-ss-by">Four pollsters, 16 readings since July 2025</span></li><li><b>One Nation:</b> Voters are divided on whether One Nation’s rise is good or bad for Australia, 42% to 41%. <span class="pubop-ss-by">SEC Newgate, July 2026</span></li><li><b>Housing and the budget:</b> Negative verdicts on the May budget outnumber positive ones in all seven polls. <span class="pubop-ss-by">Seven polls, May 2026</span></li><li><b>Cost of living:</b> 46% hold federal Labor primarily responsible for the cost-of-living crunch. <span class="pubop-ss-by">Resolve, October 2026</span></li><li><b>War and fuel:</b> 63% opposed sending Australian naval ships to help keep the Strait of Hormuz open. <span class="pubop-ss-by">Newspoll, March 2026</span></li><li><b>Bondi and cohesion:</b> More voters rated the government’s response to the Bondi attack poorly than well in both polls. <span class="pubop-ss-by">Two polls, December 2025 to January 2026</span></li><li><b>Climate and energy:</b> 57% back more oil and gas exploration, even if it undermines net zero. <span class="pubop-ss-by">YouGov, April 2026</span></li><li><b>Tech and society:</b> Support for the under-16 social media ban outweighs opposition in all three polls. <span class="pubop-ss-by">Three polls, September 2025 to January 2026</span></li><li><b>Trust and democracy:</b> 56% say the Albanese government has fallen short of their expectations. <span class="pubop-ss-by">Essential, May 2026</span></li></ol>
       <h2>Immigration</h2>
-      <p><b>In every poll, a majority want less immigration.</b> <span class="btv-ss-by">Five pollsters, 12 readings since April 2025</span></p>
-      <p class="btv-ss-dek">How many migrants Australians want, where cuts should fall, and how they rate the government’s handling of the program.</p>
+      <p><b>In every poll, a majority want less immigration.</b> <span class="pubop-ss-by">Five pollsters, 12 readings since April 2025</span></p>
+      <p class="pubop-ss-dek">How many migrants Australians want, where cuts should fall, and how they rate the government’s handling of the program.</p>
 
         <h3>Share wanting less immigration, by pollster</h3>
         <p>In each pollster’s latest reading, 56–66% say immigration is too high or should be cut, and 4–15% want more. Resolve’s latest reading is 4 points higher than its first, in December 2025. SEC Newgate’s, YouGov’s and Newspoll’s latest readings are much the same as their first.</p>
-        <ul class="btv-ss-list"><li>Resolve Political Monitor, Aug 2026: 57% want less</li><li>SEC Newgate Mood of the Nation, Sep 2026: 57% want less</li><li>YouGov for News24, Sep 2026: 66% want less</li><li>Newspoll, Sep 2026: 66% want less</li><li>Essential Report, Sep 2026: 56% want less</li></ul>
+        <ul class="pubop-ss-list"><li>Resolve Political Monitor, Aug 2026: 57% want less</li><li>SEC Newgate Mood of the Nation, Sep 2026: 57% want less</li><li>YouGov for News24, Sep 2026: 66% want less</li><li>Newspoll, Sep 2026: 66% want less</li><li>Essential Report, Sep 2026: 56% want less</li></ul>
         <h3>Would people still want immigration cut if housing and services kept pace?</h3>
-        <p>70% still want cuts, 15% would not. <span class="btv-ss-by">Essential Report, Sep 2026</span></p>
+        <p>70% still want cuts, 15% would not. <span class="pubop-ss-by">Essential Report, Sep 2026</span></p>
         <h3>Is the government running immigration in a planned way?</h3>
-        <p>26% planned, 54% unplanned. <span class="btv-ss-by">Resolve Political Monitor, Aug 2026</span></p>
+        <p>26% planned, 54% unplanned. <span class="pubop-ss-by">Resolve Political Monitor, Aug 2026</span></p>
         <h3>Do Australians feel positive or negative about immigration?</h3>
-        <ul class="btv-ss-list"><li>Essential, Sep 2026: 46% positive, 39% negative</li><li>Essential, Apr 2026: 41% positive, 45% negative (level)</li><li>Essential, Nov 2025: 42% positive, 42% negative (level)</li><li>Essential, Sep 2025: 41% positive, 41% negative (level)</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, Sep 2026: 46% positive, 39% negative</li><li>Essential, Apr 2026: 41% positive, 45% negative (level)</li><li>Essential, Nov 2025: 42% positive, 42% negative (level)</li><li>Essential, Sep 2025: 41% positive, 41% negative (level)</li></ul>
         <p>Positive: 46%, up from 41% in September 2025.</p>
         <h3>Where should cuts to immigration fall?</h3>
-        <ul class="btv-ss-list"><li>Refugees and people admitted on humanitarian grounds: 27.9%</li><li>Family members of people already living in Australia: 20.5%</li><li>Skilled workers: 18.4%</li><li>International students: 18%</li><li>Working holidaymakers and seasonal or temporary workers: 15.2%</li></ul>
-        <p><span class="btv-ss-by">% choosing each as the first place to cut. Essential Report, Sep 2026</span></p>
+        <ul class="pubop-ss-list"><li>Refugees and people admitted on humanitarian grounds: 27.9%</li><li>Family members of people already living in Australia: 20.5%</li><li>Skilled workers: 18.4%</li><li>International students: 18%</li><li>Working holidaymakers and seasonal or temporary workers: 15.2%</li></ul>
+        <p><span class="pubop-ss-by">% choosing each as the first place to cut. Essential Report, Sep 2026</span></p>
         <h3>Which steps to control immigration do voters back?</h3>
-        <ul class="btv-ss-list"><li>Directing skilled worker visas towards industries with shortages, such as healthcare, construction and education: 74% support, 8% oppose</li><li>Forced deportation of people who have overstayed their visa: 70% support, 9% oppose</li><li>Greater scrutiny of people seeking protection or asylum visas: 68% support, 12% oppose</li><li>Making it harder for temporary migrants to move between different types of visas to extend their stay: 64% support, 14% oppose</li><li>Preventing most international students from bringing family members with them to Australia: 62% support, 15% oppose</li><li>Introducing a ballot (random selection) system for backpackers (working holiday visa holders) wanting to stay for a second or third year: 40% support, 23% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Directing skilled worker visas towards industries with shortages, such as healthcare, construction and education: 74% support, 8% oppose</li><li>Forced deportation of people who have overstayed their visa: 70% support, 9% oppose</li><li>Greater scrutiny of people seeking protection or asylum visas: 68% support, 12% oppose</li><li>Making it harder for temporary migrants to move between different types of visas to extend their stay: 64% support, 14% oppose</li><li>Preventing most international students from bringing family members with them to Australia: 62% support, 15% oppose</li><li>Introducing a ballot (random selection) system for backpackers (working holiday visa holders) wanting to stay for a second or third year: 40% support, 23% oppose</li></ul>
         <h3>Has multiculturalism been good for Australia?</h3>
-        <p>37% good, and still is, 10% has not served us well. <span class="btv-ss-by">YouGov for News24, Jul 2026</span></p>
+        <p>37% good, and still is, 10% has not served us well. <span class="pubop-ss-by">YouGov for News24, Jul 2026</span></p>
         <h3>Would Australia be better off as a ‘monocultural’ country?</h3>
-        <p>33% yes, 39% no. <span class="btv-ss-by">Resolve Political Monitor, Jul 2026</span></p>
+        <p>33% yes, 39% no. <span class="pubop-ss-by">Resolve Political Monitor, Jul 2026</span></p>
         <h3>More questions on immigration</h3>
-        <ul class="btv-ss-list"><li>The Government has cut the number of backpacker visas as part of its effort to bring down migration. Farmers and regional councils are warning against the move because they say there will be a worker shortage. What is closest to your view? <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>Four views of immigration: which is closest to yours? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>The impact of immigration, area by area <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Does immigration mainly benefit or harm most Australians? <span class="btv-ss-by">(Newspoll, Sep 2026)</span></li><li>Is Pauline Hanson right that immigration settings are wrong? <span class="btv-ss-by">(Resolve, Jul 2026)</span></li><li>Should immigration from regions run by terrorist groups be restricted? <span class="btv-ss-by">(YouGov, Feb 2026)</span></li><li>Should immigration pause until housing catches up? <span class="btv-ss-by">(Resolve, Dec 2025)</span></li><li>Should permanent migration be limited to needed skills? <span class="btv-ss-by">(Resolve, Dec 2025)</span></li><li>Is the immigration cap too high, too low or about right? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Should immigration numbers be cut significantly? <span class="btv-ss-by">(Resolve, Oct 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>The Government has cut the number of backpacker visas as part of its effort to bring down migration. Farmers and regional councils are warning against the move because they say there will be a worker shortage. What is closest to your view? <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>Four views of immigration: which is closest to yours? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>The impact of immigration, area by area <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Does immigration mainly benefit or harm most Australians? <span class="pubop-ss-by">(Newspoll, Sep 2026)</span></li><li>Is Pauline Hanson right that immigration settings are wrong? <span class="pubop-ss-by">(Resolve, Jul 2026)</span></li><li>Should immigration from regions run by terrorist groups be restricted? <span class="pubop-ss-by">(YouGov, Feb 2026)</span></li><li>Should immigration pause until housing catches up? <span class="pubop-ss-by">(Resolve, Dec 2025)</span></li><li>Should permanent migration be limited to needed skills? <span class="pubop-ss-by">(Resolve, Dec 2025)</span></li><li>Is the immigration cap too high, too low or about right? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Should immigration numbers be cut significantly? <span class="pubop-ss-by">(Resolve, Oct 2025)</span></li></ul>
       <h2>Trump and the United States</h2>
-      <p><b>Every pollster finds Donald Trump deeply unpopular.</b> <span class="btv-ss-by">Four pollsters, 16 readings since July 2025</span></p>
-      <p class="btv-ss-dek">How Australians see Donald Trump, the American alliance and AUKUS.</p>
+      <p><b>Every pollster finds Donald Trump deeply unpopular.</b> <span class="pubop-ss-by">Four pollsters, 16 readings since July 2025</span></p>
+      <p class="pubop-ss-dek">How Australians see Donald Trump, the American alliance and AUKUS.</p>
 
         <h3>Donald Trump’s net favourability, by pollster</h3>
         <p>In each pollster’s latest reading, 62–73% view him unfavourably or negatively and 14–28% favourably or positively. Freshwater’s latest reading is 11 points lower than its first, in October 2025; RedBridge’s is 8 points lower than its first, in January 2026. SEC Newgate’s latest is much the same as its first, in July 2025.</p>
-        <ul class="btv-ss-list"><li>Freshwater Strategy, May 2026: net &#8722;47.1 (20% favourable, 67.1% unfavourable)</li><li>RedBridge/Accent, Oct 2026: net &#8722;59 (14% favourable, 73% unfavourable)</li><li>SEC Newgate Mood of the Nation, Sep 2026: net &#8722;53 (16% favourable, 69% unfavourable)</li><li>Essential Report, Jun 2026: net &#8722;34 (28% favourable, 62% unfavourable)</li></ul>
+        <ul class="pubop-ss-list"><li>Freshwater Strategy, May 2026: net &#8722;47.1 (20% favourable, 67.1% unfavourable)</li><li>RedBridge/Accent, Oct 2026: net &#8722;59 (14% favourable, 73% unfavourable)</li><li>SEC Newgate Mood of the Nation, Sep 2026: net &#8722;53 (16% favourable, 69% unfavourable)</li><li>Essential Report, Jun 2026: net &#8722;34 (28% favourable, 62% unfavourable)</li></ul>
         <h3>Do Australians support AUKUS?</h3>
-        <ul class="btv-ss-list"><li>Sep 2026: 55% support, 17% oppose</li><li>Jul 2026: 52% support, 19% oppose</li><li>May 2026: 53% support, 19% oppose</li><li>Nov 2025: 59% support, 17% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Sep 2026: 55% support, 17% oppose</li><li>Jul 2026: 52% support, 19% oppose</li><li>May 2026: 53% support, 19% oppose</li><li>Nov 2025: 59% support, 17% oppose</li></ul>
         <h3>Is the United States a reliable military ally?</h3>
-        <p>25% yes, 28% no (level). <span class="btv-ss-by">DemosAU, Apr 2026</span></p>
+        <p>25% yes, 28% no (level). <span class="pubop-ss-by">DemosAU, Apr 2026</span></p>
         <h3>Should the government back Trump closely or keep its distance?</h3>
-        <ul class="btv-ss-list"><li>Apr 2026: 22% back him closely, 59% keep its distance</li><li>Jan 2025: 36% back him closely, 45% keep its distance</li><li>Nov 2024: 37% back him closely, 23% keep its distance</li></ul>
+        <ul class="pubop-ss-list"><li>Apr 2026: 22% back him closely, 59% keep its distance</li><li>Jan 2025: 36% back him closely, 45% keep its distance</li><li>Nov 2024: 37% back him closely, 23% keep its distance</li></ul>
         <h3>Does Australia need a prime minister like Donald Trump?</h3>
-        <ul class="btv-ss-list"><li>DemosAU, Jul 2026: 16% agree, 72% disagree</li><li>DemosAU, Apr 2026: 19% agree, 69% disagree</li><li>DemosAU, Apr 2026: 27% agree, 59% disagree</li></ul>
+        <ul class="pubop-ss-list"><li>DemosAU, Jul 2026: 16% agree, 72% disagree</li><li>DemosAU, Apr 2026: 19% agree, 69% disagree</li><li>DemosAU, Apr 2026: 27% agree, 59% disagree</li></ul>
         <h3>Is Trump making the world safer or less safe?</h3>
-        <ul class="btv-ss-list"><li>SEC Newgate, May 2026: 12% safer, 72% less safe</li><li>SEC Newgate, Feb 2026: 14% safer, 64% less safe</li></ul>
+        <ul class="pubop-ss-list"><li>SEC Newgate, May 2026: 12% safer, 72% less safe</li><li>SEC Newgate, Feb 2026: 14% safer, 64% less safe</li></ul>
         <p>Less safe: 72%, up from 64% in February 2026.</p>
         <h3>Should national security lean on the US alliance or on other partners?</h3>
-        <p>16% the US alliance, 71% other alliances. <span class="btv-ss-by">SEC Newgate Mood of the Nation, May 2026</span></p>
+        <p>16% the US alliance, 71% other alliances. <span class="pubop-ss-by">SEC Newgate Mood of the Nation, May 2026</span></p>
         <h3>How Australians see other countries</h3>
-        <ul class="btv-ss-list"><li>UK: 53% positive, 16% negative</li><li>European Nations: 47% positive, 14% negative</li><li>Ukraine: 41% positive, 20% negative</li><li>Indonesia: 31% positive, 20% negative</li><li>India: 24% positive, 29% negative (level)</li><li>USA: 29% positive, 40% negative</li><li>China: 24% positive, 39% negative</li><li>Palestine: 20% positive, 41% negative</li><li>Israel: 19% positive, 45% negative</li><li>Syria: 14% positive, 44% negative</li><li>Russia: 13% positive, 57% negative</li><li>Iran: 11% positive, 57% negative</li></ul>
+        <ul class="pubop-ss-list"><li>UK: 53% positive, 16% negative</li><li>European Nations: 47% positive, 14% negative</li><li>Ukraine: 41% positive, 20% negative</li><li>Indonesia: 31% positive, 20% negative</li><li>India: 24% positive, 29% negative (level)</li><li>USA: 29% positive, 40% negative</li><li>China: 24% positive, 39% negative</li><li>Palestine: 20% positive, 41% negative</li><li>Israel: 19% positive, 45% negative</li><li>Syria: 14% positive, 44% negative</li><li>Russia: 13% positive, 57% negative</li><li>Iran: 11% positive, 57% negative</li></ul>
         <h3>More questions on trump and the US</h3>
-        <ul class="btv-ss-list"><li>Should Australia be more or less like the United States? <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Views on US Midterms <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>How good is Australia’s relationship with each country? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>The US, or other middle powers: which relationship should come first? <span class="btv-ss-by">(Essential, Mar 2026)</span></li><li>Which countries should Australia get closer to? <span class="btv-ss-by">(Essential, Mar 2026)</span></li><li>Support for what came out of the Albanese–Trump meeting <span class="btv-ss-by">(Essential, Oct 2025)</span></li><li>Was Albanese’s meeting with Trump good for Australia? <span class="btv-ss-by">(Essential, Oct 2025)</span></li><li>How important is it that Albanese meets Trump? <span class="btv-ss-by">(Essential, Sep 2025)</span></li><li>The impact of Trump’s presidency, area by area <span class="btv-ss-by">(Essential, Sep 2025)</span></li><li>How positive is Australia’s relationship with each country? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Should Australia hold its ground against US tariff pressure? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Which relationship would it pay most to strengthen, the US or China? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Will AUKUS deliver? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Will AUKUS make Australia more or less secure? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Will Trump’s presidency be good or bad for each of these? <span class="btv-ss-by">(SEC Newgate, Jul 2025)</span></li><li>Can Albanese work with Trump? <span class="btv-ss-by">(Essential, May 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Should Australia be more or less like the United States? <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Views on US Midterms <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>How good is Australia’s relationship with each country? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>The US, or other middle powers: which relationship should come first? <span class="pubop-ss-by">(Essential, Mar 2026)</span></li><li>Which countries should Australia get closer to? <span class="pubop-ss-by">(Essential, Mar 2026)</span></li><li>Support for what came out of the Albanese–Trump meeting <span class="pubop-ss-by">(Essential, Oct 2025)</span></li><li>Was Albanese’s meeting with Trump good for Australia? <span class="pubop-ss-by">(Essential, Oct 2025)</span></li><li>How important is it that Albanese meets Trump? <span class="pubop-ss-by">(Essential, Sep 2025)</span></li><li>The impact of Trump’s presidency, area by area <span class="pubop-ss-by">(Essential, Sep 2025)</span></li><li>How positive is Australia’s relationship with each country? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Should Australia hold its ground against US tariff pressure? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Which relationship would it pay most to strengthen, the US or China? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Will AUKUS deliver? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Will AUKUS make Australia more or less secure? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Will Trump’s presidency be good or bad for each of these? <span class="pubop-ss-by">(SEC Newgate, Jul 2025)</span></li><li>Can Albanese work with Trump? <span class="pubop-ss-by">(Essential, May 2025)</span></li></ul>
       <h2>One Nation and the Coalition</h2>
-      <p><b>Voters are divided on whether One Nation’s rise is good or bad for Australia, 42% to 41%.</b> <span class="btv-ss-by">SEC Newgate, July 2026</span></p>
-      <p class="btv-ss-dek">What draws voters to One Nation, what holds them back, and how Pauline Hanson’s agenda sits with everyone else.</p>
+      <p><b>Voters are divided on whether One Nation’s rise is good or bad for Australia, 42% to 41%.</b> <span class="pubop-ss-by">SEC Newgate, July 2026</span></p>
+      <p class="pubop-ss-dek">What draws voters to One Nation, what holds them back, and how Pauline Hanson’s agenda sits with everyone else.</p>
 
         <h3>Is the rise of One Nation good or bad for Australia?</h3>
-        <p>42% good, 41% bad (level). <span class="btv-ss-by">SEC Newgate Mood of the Nation, Jul 2026</span></p>
+        <p>42% good, 41% bad (level). <span class="pubop-ss-by">SEC Newgate Mood of the Nation, Jul 2026</span></p>
         <h3>Why One Nation appeals to its supporters</h3>
-        <ul class="btv-ss-list"><li>Rejection of other major parties and the desire for an alternative: 36%</li><li>Support for stronger border control / reduced immigration and alignment with One Nation’s immigration policies: 17%</li><li>Belief that One Nation is standing up for Australia’s best interests: 17%</li><li>General mentions of support for One Nation policies: 15%</li><li>Honesty and “saying it how it is”, having a common-sense approach: 14%</li><li>Upholding Australian identity, values and traditions: 11%</li><li>Understanding of everyday economic pressures (cost of living concerns, housing affordability and supply): 4%</li><li>Representation of “ordinary” Australians, seen as relatable or “one of us”: 4%</li></ul>
-        <p><span class="btv-ss-by">% of One Nation supporters giving each reason, in their own words. SEC Newgate Mood of the Nation, Feb 2026</span></p>
+        <ul class="pubop-ss-list"><li>Rejection of other major parties and the desire for an alternative: 36%</li><li>Support for stronger border control / reduced immigration and alignment with One Nation’s immigration policies: 17%</li><li>Belief that One Nation is standing up for Australia’s best interests: 17%</li><li>General mentions of support for One Nation policies: 15%</li><li>Honesty and “saying it how it is”, having a common-sense approach: 14%</li><li>Upholding Australian identity, values and traditions: 11%</li><li>Understanding of everyday economic pressures (cost of living concerns, housing affordability and supply): 4%</li><li>Representation of “ordinary” Australians, seen as relatable or “one of us”: 4%</li></ul>
+        <p><span class="pubop-ss-by">% of One Nation supporters giving each reason, in their own words. SEC Newgate Mood of the Nation, Feb 2026</span></p>
         <h3>What draws voters open to One Nation?</h3>
-        <ul class="btv-ss-list"><li>We need to cut immigration numbers and take control of Australia’s borders: 31.3%</li><li>The major parties are not listening to Australians; it is time to give someone else a go: 26.7%</li><li>The gap between rich and poor is too wide – One Nation stands up for ordinary Australians: 21.6%</li><li>We need to be free to say what we believe: 20.5%</li></ul>
-        <p><span class="btv-ss-by">% of voters open to One Nation choosing each as their main reason. Essential Report, Jun 2026</span></p>
+        <ul class="pubop-ss-list"><li>We need to cut immigration numbers and take control of Australia’s borders: 31.3%</li><li>The major parties are not listening to Australians; it is time to give someone else a go: 26.7%</li><li>The gap between rich and poor is too wide – One Nation stands up for ordinary Australians: 21.6%</li><li>We need to be free to say what we believe: 20.5%</li></ul>
+        <p><span class="pubop-ss-by">% of voters open to One Nation choosing each as their main reason. Essential Report, Jun 2026</span></p>
         <h3>What gives voters pause about One Nation?</h3>
-        <ul class="btv-ss-list"><li>Pauline Hanson is a strong supporter and admirer of President Donald Trump: 21%</li><li>I would never vote for One Nation: 19%</li><li>Pauline Hanson has said Australia should support Donald Trump and enter the conflict in Iran: 18%</li><li>I don't have any hesitations about voting for One Nation: 15%</li><li>A One Nation minority government means economic uncertainty and risk: 7%</li><li>Pauline Hanson and One Nation have never delivered a budget: 6%</li><li>Unsure: 6%</li><li>A vote for One Nation is a wasted vote: 5%</li><li>Other: 3%</li></ul>
-        <p><span class="btv-ss-by">% of all voters choosing each as what makes them most hesitant. RedBridge/Accent, Apr 2026</span></p>
+        <ul class="pubop-ss-list"><li>Pauline Hanson is a strong supporter and admirer of President Donald Trump: 21%</li><li>I would never vote for One Nation: 19%</li><li>Pauline Hanson has said Australia should support Donald Trump and enter the conflict in Iran: 18%</li><li>I don't have any hesitations about voting for One Nation: 15%</li><li>A One Nation minority government means economic uncertainty and risk: 7%</li><li>Pauline Hanson and One Nation have never delivered a budget: 6%</li><li>Unsure: 6%</li><li>A vote for One Nation is a wasted vote: 5%</li><li>Other: 3%</li></ul>
+        <p><span class="pubop-ss-by">% of all voters choosing each as what makes them most hesitant. RedBridge/Accent, Apr 2026</span></p>
         <h3>Which messages move voters towards or away from One Nation?</h3>
-        <ul class="btv-ss-list"><li>One Nation stands up for ordinary Australians struggling with the cost of living: +27</li><li>One Nation will put Australia first: +26</li><li>Pauline Hanson and One Nation will reduce the level of immigration: +23</li><li>Pauline Hanson speaks her mind and says what other politicians won't: +23</li><li>Voting for One Nation sends a message to Labor and the Coalition that voters want change: +20</li><li>Hanson/One Nation share the values of ordinary Australians while the major parties only represent the elites: +18</li><li>The major parties aren't up to the job anymore, time to give One Nation a chance: +6</li><li>A vote for One Nation is a wasted vote, because they cannot form government: &#8722;18</li><li>Some of the people Pauline Hanson associates with have expressed extreme or controversial views: &#8722;26</li><li>If One Nation held the balance of power, it could create economic uncertainty and risk: &#8722;30</li><li>Pauline Hanson and One Nation have no experience governing or managing a federal budget: &#8722;37</li><li>Pauline Hanson is a strong supporter and admirer of Donald Trump: &#8722;38</li><li>Pauline Hanson has voted in parliament to cut penalty rates and weaken protections for workers: &#8722;38</li><li>Pauline Hanson has called for Australia to help Trump 'stamp out evil' by entering the conflict in Iran: &#8722;39</li></ul>
-        <p><span class="btv-ss-by">Net more willing to vote One Nation: the share more willing after hearing each statement, less the share less willing. RedBridge/Accent, Apr 2026</span></p>
+        <ul class="pubop-ss-list"><li>One Nation stands up for ordinary Australians struggling with the cost of living: +27</li><li>One Nation will put Australia first: +26</li><li>Pauline Hanson and One Nation will reduce the level of immigration: +23</li><li>Pauline Hanson speaks her mind and says what other politicians won't: +23</li><li>Voting for One Nation sends a message to Labor and the Coalition that voters want change: +20</li><li>Hanson/One Nation share the values of ordinary Australians while the major parties only represent the elites: +18</li><li>The major parties aren't up to the job anymore, time to give One Nation a chance: +6</li><li>A vote for One Nation is a wasted vote, because they cannot form government: &#8722;18</li><li>Some of the people Pauline Hanson associates with have expressed extreme or controversial views: &#8722;26</li><li>If One Nation held the balance of power, it could create economic uncertainty and risk: &#8722;30</li><li>Pauline Hanson and One Nation have no experience governing or managing a federal budget: &#8722;37</li><li>Pauline Hanson is a strong supporter and admirer of Donald Trump: &#8722;38</li><li>Pauline Hanson has voted in parliament to cut penalty rates and weaken protections for workers: &#8722;38</li><li>Pauline Hanson has called for Australia to help Trump 'stamp out evil' by entering the conflict in Iran: &#8722;39</li></ul>
+        <p><span class="pubop-ss-by">Net more willing to vote One Nation: the share more willing after hearing each statement, less the share less willing. RedBridge/Accent, Apr 2026</span></p>
         <h3>Do voters approve of Pauline Hanson as leader?</h3>
-        <p>52% approve, 34% disapprove. <span class="btv-ss-by">Essential Report, Apr 2026</span></p>
+        <p>52% approve, 34% disapprove. <span class="pubop-ss-by">Essential Report, Apr 2026</span></p>
         <h3>Should renters and mortgage holders get a quarter of their super as pay, as One Nation proposes?</h3>
-        <p>38% support, 39% oppose (level). <span class="btv-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
+        <p>38% support, 39% oppose (level). <span class="pubop-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
         <h3>Seven contested ideas, put to voters</h3>
-        <ul class="btv-ss-list"><li>Immigration to Australia should be substantially reduced: 61% agree, 21% disagree</li><li>Australia should build nuclear power plants: 37% agree, 38% disagree (level)</li><li>Employers should have more flexibility to dismiss workers: 32% agree, 43% disagree</li><li>Australia should be a monocultural country rather than a multicultural country: 25% agree, 51% disagree</li><li>Early childhood educators should not need a degree to work in a childcare centre: 26% agree, 52% disagree</li><li>The ABC should become a subscription-based service in metropolitan areas, while remaining publicly funded in regional, rural and remote areas: 21% agree, 54% disagree</li><li>SBS should be abolished: 12% agree, 58% disagree</li></ul>
+        <ul class="pubop-ss-list"><li>Immigration to Australia should be substantially reduced: 61% agree, 21% disagree</li><li>Australia should build nuclear power plants: 37% agree, 38% disagree (level)</li><li>Employers should have more flexibility to dismiss workers: 32% agree, 43% disagree</li><li>Australia should be a monocultural country rather than a multicultural country: 25% agree, 51% disagree</li><li>Early childhood educators should not need a degree to work in a childcare centre: 26% agree, 52% disagree</li><li>The ABC should become a subscription-based service in metropolitan areas, while remaining publicly funded in regional, rural and remote areas: 21% agree, 54% disagree</li><li>SBS should be abolished: 12% agree, 58% disagree</li></ul>
         <h3>More questions on one Nation</h3>
-        <ul class="btv-ss-list"><li>Opinion on One Nation leading the federal government <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Where 2025 Labor and Coalition voters have gone <span class="btv-ss-by">(Newspoll, Sep 2026)</span></li><li>Why One Nation’s supporters back it: the party or a dislike of the others? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>One Nation are proposing making access to superannuation before retirement easier arguing people can do what they want with their money. This has been opposed on the grounds that it will destroy retirement incomes and people already have access to superannuation in case of hardship. Do you support or oppose One Nations proposed change to superannuation? <span class="btv-ss-by">(YouGov, Sep 2026)</span></li><li>Who would you prefer as Liberal leader? <span class="btv-ss-by">(Resolve, Aug 2026)</span></li><li>Do people share Pauline Hanson’s concerns about the NDIS? <span class="btv-ss-by">(Resolve, Jul 2026)</span></li><li>Is Pauline Hanson right that many young workers are lazy? <span class="btv-ss-by">(Resolve, Jul 2026)</span></li><li>Is poverty a serious problem the government must address? <span class="btv-ss-by">(Resolve, Jul 2026)</span></li><li>Should it be easier to sack people? <span class="btv-ss-by">(Resolve, Jul 2026)</span></li><li>How concerning are claims about One Nation? <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>What matters most in deciding a vote: policies, understanding, or character? <span class="btv-ss-by">(Newspoll, Jun 2026)</span></li><li>How would people vote if Tony Abbott led the Coalition? <span class="btv-ss-by">(DemosAU, Jun 2026)</span></li><li>Is One Nation ready to govern? <span class="btv-ss-by">(YouGov, Jun 2026)</span></li><li>Do people regret their 2025 vote? <span class="btv-ss-by">(YouGov, Jun 2026)</span></li><li>Should the Coalition and One Nation team up to form government? <span class="btv-ss-by">(YouGov, Jun 2026)</span></li><li>How would people vote if Pauline Hanson retired? <span class="btv-ss-by">(DemosAU, May 2026)</span></li><li>Eight party messages: agree or disagree? <span class="btv-ss-by">(RedBridge, Feb 2026)</span></li><li>Does Angus Taylor as leader make people more likely to vote Liberal? <span class="btv-ss-by">(Essential, Feb 2026)</span></li><li>The main reason for considering One Nation <span class="btv-ss-by">(YouGov, Feb 2026)</span></li><li>Had people heard of Angus Taylor when he became leader? <span class="btv-ss-by">(Resolve, Feb 2026)</span></li><li>Who would give the Liberals the best chance at the next election? <span class="btv-ss-by">(YouGov, Feb 2026)</span></li><li>How 2025 Liberal voters would vote now <span class="btv-ss-by">(YouGov, Jan 2026)</span></li><li>What will Barnaby Joyce do next? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>What would make people more or less likely to vote One Nation? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Would Barnaby Joyce joining One Nation change people’s vote? <span class="btv-ss-by">(Resolve, Dec 2025)</span></li><li>Who would give the Liberals the best chance at the next election? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Who should lead the Coalition? <span class="btv-ss-by">(Newspoll, Nov 2025)</span></li><li>Should the Liberals become more progressive or more conservative? <span class="btv-ss-by">(Essential, Oct 2025)</span></li><li>Should the Coalition move right, to the centre, or stay put? <span class="btv-ss-by">(Resolve, Oct 2025)</span></li><li>Should the Liberals use quotas to lift female representation? <span class="btv-ss-by">(Resolve, Jul 2025)</span></li><li>Should the Liberals use quotas to lift female representation? <span class="btv-ss-by">(Essential, May 2025)</span></li><li>Who should lead the Coalition? <span class="btv-ss-by">(Essential, May 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Opinion on One Nation leading the federal government <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Where 2025 Labor and Coalition voters have gone <span class="pubop-ss-by">(Newspoll, Sep 2026)</span></li><li>Why One Nation’s supporters back it: the party or a dislike of the others? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>One Nation are proposing making access to superannuation before retirement easier arguing people can do what they want with their money. This has been opposed on the grounds that it will destroy retirement incomes and people already have access to superannuation in case of hardship. Do you support or oppose One Nations proposed change to superannuation? <span class="pubop-ss-by">(YouGov, Sep 2026)</span></li><li>Who would you prefer as Liberal leader? <span class="pubop-ss-by">(Resolve, Aug 2026)</span></li><li>Do people share Pauline Hanson’s concerns about the NDIS? <span class="pubop-ss-by">(Resolve, Jul 2026)</span></li><li>Is Pauline Hanson right that many young workers are lazy? <span class="pubop-ss-by">(Resolve, Jul 2026)</span></li><li>Is poverty a serious problem the government must address? <span class="pubop-ss-by">(Resolve, Jul 2026)</span></li><li>Should it be easier to sack people? <span class="pubop-ss-by">(Resolve, Jul 2026)</span></li><li>How concerning are claims about One Nation? <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>What matters most in deciding a vote: policies, understanding, or character? <span class="pubop-ss-by">(Newspoll, Jun 2026)</span></li><li>How would people vote if Tony Abbott led the Coalition? <span class="pubop-ss-by">(DemosAU, Jun 2026)</span></li><li>Is One Nation ready to govern? <span class="pubop-ss-by">(YouGov, Jun 2026)</span></li><li>Do people regret their 2025 vote? <span class="pubop-ss-by">(YouGov, Jun 2026)</span></li><li>Should the Coalition and One Nation team up to form government? <span class="pubop-ss-by">(YouGov, Jun 2026)</span></li><li>How would people vote if Pauline Hanson retired? <span class="pubop-ss-by">(DemosAU, May 2026)</span></li><li>Eight party messages: agree or disagree? <span class="pubop-ss-by">(RedBridge, Feb 2026)</span></li><li>Does Angus Taylor as leader make people more likely to vote Liberal? <span class="pubop-ss-by">(Essential, Feb 2026)</span></li><li>The main reason for considering One Nation <span class="pubop-ss-by">(YouGov, Feb 2026)</span></li><li>Had people heard of Angus Taylor when he became leader? <span class="pubop-ss-by">(Resolve, Feb 2026)</span></li><li>Who would give the Liberals the best chance at the next election? <span class="pubop-ss-by">(YouGov, Feb 2026)</span></li><li>How 2025 Liberal voters would vote now <span class="pubop-ss-by">(YouGov, Jan 2026)</span></li><li>What will Barnaby Joyce do next? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>What would make people more or less likely to vote One Nation? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Would Barnaby Joyce joining One Nation change people’s vote? <span class="pubop-ss-by">(Resolve, Dec 2025)</span></li><li>Who would give the Liberals the best chance at the next election? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Who should lead the Coalition? <span class="pubop-ss-by">(Newspoll, Nov 2025)</span></li><li>Should the Liberals become more progressive or more conservative? <span class="pubop-ss-by">(Essential, Oct 2025)</span></li><li>Should the Coalition move right, to the centre, or stay put? <span class="pubop-ss-by">(Resolve, Oct 2025)</span></li><li>Should the Liberals use quotas to lift female representation? <span class="pubop-ss-by">(Resolve, Jul 2025)</span></li><li>Should the Liberals use quotas to lift female representation? <span class="pubop-ss-by">(Essential, May 2025)</span></li><li>Who should lead the Coalition? <span class="pubop-ss-by">(Essential, May 2025)</span></li></ul>
       <h2>Housing, tax and the budget</h2>
-      <p><b>Negative verdicts on the May budget outnumber positive ones in all seven polls.</b> <span class="btv-ss-by">Seven polls, May 2026</span></p>
-      <p class="btv-ss-dek">Verdicts on the May 2026 budget, its capital gains tax and negative gearing changes, and the broken promises behind them.</p>
+      <p><b>Negative verdicts on the May budget outnumber positive ones in all seven polls.</b> <span class="pubop-ss-by">Seven polls, May 2026</span></p>
+      <p class="pubop-ss-dek">Verdicts on the May 2026 budget, its capital gains tax and negative gearing changes, and the broken promises behind them.</p>
 
         <h3>How did voters judge the May 2026 budget?</h3>
-        <ul class="btv-ss-list"><li>Essential, May 2026 (Approve or disapprove of the budget?): 25% positive, 39% negative</li><li>DemosAU, May 2026 (Overall opinion of the budget): 23% positive, 43% negative</li><li>YouGov, May 2026 (Will your household be better or worse off?): 9% positive, 44% negative</li><li>SEC Newgate, May 2026 (Its impact on you and your family): 14% positive, 39% negative</li><li>Newspoll, May 2026 (Good or bad for the economy?): 22% positive, 47% negative</li><li>Newspoll, May 2026 (Will you be better or worse off?): 11% positive, 52% negative</li><li>Resolve, May 2026 (Good or bad for your household?): 24% positive, 35% negative</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, May 2026 (Approve or disapprove of the budget?): 25% positive, 39% negative</li><li>DemosAU, May 2026 (Overall opinion of the budget): 23% positive, 43% negative</li><li>YouGov, May 2026 (Will your household be better or worse off?): 9% positive, 44% negative</li><li>SEC Newgate, May 2026 (Its impact on you and your family): 14% positive, 39% negative</li><li>Newspoll, May 2026 (Good or bad for the economy?): 22% positive, 47% negative</li><li>Newspoll, May 2026 (Will you be better or worse off?): 11% positive, 52% negative</li><li>Resolve, May 2026 (Good or bad for your household?): 24% positive, 35% negative</li></ul>
         <p>Negative verdicts lead in all seven polls.</p>
         <h3>Do voters back cutting the capital gains tax discount?</h3>
-        <ul class="btv-ss-list"><li>Resolve, Aug 2026 (Removing the 50% discount): 35% support, 21% oppose</li><li>SEC Newgate, Jul 2026 (The budget’s changes, described in full): 28% support, 37% oppose</li><li>DemosAU, Jun 2026 (Scrapping the 50% discount for indexation): 29% support, 33% oppose (level)</li><li>Resolve, Jun 2026 (Removing the 50% discount): 31% support, 31% oppose (level)</li><li>Essential, May 2026 (Winding it back for shares and investments): 32% support, 29% oppose (level)</li><li>DemosAU, May 2026 (Scrapping the 50% discount for indexation): 28% support, 29% oppose (level)</li><li>SEC Newgate, May 2026 (The budget’s changes, described in full): 33% support, 32% oppose (level)</li><li>Resolve, May 2026 (Removing the 50% discount): 36% support, 21% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Resolve, Aug 2026 (Removing the 50% discount): 35% support, 21% oppose</li><li>SEC Newgate, Jul 2026 (The budget’s changes, described in full): 28% support, 37% oppose</li><li>DemosAU, Jun 2026 (Scrapping the 50% discount for indexation): 29% support, 33% oppose (level)</li><li>Resolve, Jun 2026 (Removing the 50% discount): 31% support, 31% oppose (level)</li><li>Essential, May 2026 (Winding it back for shares and investments): 32% support, 29% oppose (level)</li><li>DemosAU, May 2026 (Scrapping the 50% discount for indexation): 28% support, 29% oppose (level)</li><li>SEC Newgate, May 2026 (The budget’s changes, described in full): 33% support, 32% oppose (level)</li><li>Resolve, May 2026 (Removing the 50% discount): 36% support, 21% oppose</li></ul>
         <p>Support leads in two of the eight polls and opposition leads in one; five are level.</p>
         <h3>Do voters back limiting negative gearing?</h3>
-        <ul class="btv-ss-list"><li>Resolve, Aug 2026 (Restricting it to new homes): 35% support, 20% oppose</li><li>DemosAU, Jun 2026 (Ending it for existing homes bought from 12 May): 32% support, 31% oppose (level)</li><li>Resolve, Jun 2026 (Restricting it to new homes): 33% support, 26% oppose</li><li>Essential, May 2026 (Winding back negative gearing and the CGT discount for property): 32% support, 27% oppose</li><li>DemosAU, May 2026 (Ending it for existing homes bought from 12 May): 34% support, 29% oppose (level)</li><li>SEC Newgate, May 2026 (The budget’s changes, described in full): 37% support, 31% oppose (level)</li><li>Resolve, May 2026 (Restricting it): 35% support, 21% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Resolve, Aug 2026 (Restricting it to new homes): 35% support, 20% oppose</li><li>DemosAU, Jun 2026 (Ending it for existing homes bought from 12 May): 32% support, 31% oppose (level)</li><li>Resolve, Jun 2026 (Restricting it to new homes): 33% support, 26% oppose</li><li>Essential, May 2026 (Winding back negative gearing and the CGT discount for property): 32% support, 27% oppose</li><li>DemosAU, May 2026 (Ending it for existing homes bought from 12 May): 34% support, 29% oppose (level)</li><li>SEC Newgate, May 2026 (The budget’s changes, described in full): 37% support, 31% oppose (level)</li><li>Resolve, May 2026 (Restricting it): 35% support, 21% oppose</li></ul>
         <p>Support leads in four of the seven polls; three are level.</p>
         <h3>Do the budget’s broken promises make people less likely to vote Labor?</h3>
-        <p>20% more likely, 41% less likely. <span class="btv-ss-by">Resolve Political Monitor, Sep 2026</span></p>
+        <p>20% more likely, 41% less likely. <span class="pubop-ss-by">Resolve Political Monitor, Sep 2026</span></p>
         <h3>Will the housing tax changes push rents up or down?</h3>
-        <p>48% push rents up, 12% bring rents down. <span class="btv-ss-by">RedBridge/Accent, Aug 2026</span></p>
+        <p>48% push rents up, 12% bring rents down. <span class="pubop-ss-by">RedBridge/Accent, Aug 2026</span></p>
         <h3>What is more to blame for the housing shortage: immigration or investor tax breaks?</h3>
-        <p>51% immigration, 29% investor tax breaks. <span class="btv-ss-by">DemosAU, Apr 2026</span></p>
+        <p>51% immigration, 29% investor tax breaks. <span class="pubop-ss-by">DemosAU, Apr 2026</span></p>
         <h3>Should house prices fall?</h3>
-        <ul class="btv-ss-list"><li>Resolve, Sep 2026 (Support or oppose lower house prices?): 59% lower prices, 9% steady or higher prices</li><li>Newspoll, Aug 2026 (Prices staying the same or rising, or falling?): 32% lower prices, 62% steady or higher prices</li></ul>
+        <ul class="pubop-ss-list"><li>Resolve, Sep 2026 (Support or oppose lower house prices?): 59% lower prices, 9% steady or higher prices</li><li>Newspoll, Aug 2026 (Prices staying the same or rising, or falling?): 32% lower prices, 62% steady or higher prices</li></ul>
         <h3>Should people be able to use their super to buy a home?</h3>
-        <p>54% support, 28% oppose. <span class="btv-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
+        <p>54% support, 28% oppose. <span class="pubop-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
         <h3>More questions on housing and the budget</h3>
-        <ul class="btv-ss-list"><li>How much have people heard about the budget, and what do they make of it? <span class="btv-ss-by">(RedBridge, Oct 2026)</span></li><li>Is it a good time to buy or sell a home? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Views on super contributions and early access <span class="btv-ss-by">(DemosAU, Sep 2026)</span></li><li>What is driving the housing affordability crisis? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>What should be done about the black market in cigarettes? <span class="btv-ss-by">(DemosAU, Sep 2026)</span></li><li>Will house prices be higher or lower in a year? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Would falling house prices be good or bad, for you and for Australia? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Are you concerned about the federal government debt? <span class="btv-ss-by">(Resolve, Sep 2026)</span></li><li>Are you concerned about your state government's debt? <span class="btv-ss-by">(Resolve, Sep 2026)</span></li><li>Has the budget's broken promises changed your trust in Anthony Albanese? <span class="btv-ss-by">(Resolve, Sep 2026)</span></li><li>How should the government deal with debt and deficit? <span class="btv-ss-by">(Resolve, Sep 2026)</span></li><li>Views on superannuation <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Would the capital gains tax changes make it harder to get ahead? <span class="btv-ss-by">(SEC Newgate, Jul 2026)</span></li><li>Support for policies from ending multiculturalism to leaving the UN <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>Where should government spend more? <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>Do you support or oppose increasing tax rates on trusts? <span class="btv-ss-by">(Resolve, Jun 2026)</span></li><li>How much attention have you paid to the federal budget announcements? <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Impact of the federal budget on cost of living <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Opinion about effect of federal budget on people, economy etc. <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Should governments always keep their election promises? <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Should investment income be taxed more, less, or the same as wages? <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Support for the Coalition’s budget-reply proposals <span class="btv-ss-by">(Essential, May 2026)</span></li><li>The biggest housing concerns, ranked <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Will the housing tax changes make things fairer for younger people? <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Should investment income be taxed at a lower rate than work? <span class="btv-ss-by">(DemosAU, May 2026)</span></li><li>Views on the budget’s tax changes <span class="btv-ss-by">(DemosAU, May 2026)</span></li><li>Will the housing tax changes make homes more affordable? <span class="btv-ss-by">(YouGov, May 2026)</span></li><li>Has the budget changed people’s trust in the government? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>Are Labor’s housing measures a step in the right direction? <span class="btv-ss-by">(Newspoll, May 2026)</span></li><li>Will the budget make inflation better or worse? <span class="btv-ss-by">(Newspoll, May 2026)</span></li><li>Would the Coalition have delivered a better budget? <span class="btv-ss-by">(Newspoll, May 2026)</span></li><li>Do you support or oppose cutting the NDIS to save $36 billion over four years? <span class="btv-ss-by">(Resolve, May 2026)</span></li><li>Has Labor breaking its tax promises changed your view of the party? <span class="btv-ss-by">(Resolve, May 2026)</span></li><li>What should the budget prioritise? <span class="btv-ss-by">(YouGov, May 2026)</span></li><li>Support for possible budget changes, before the budget <span class="btv-ss-by">(Essential, Apr 2026)</span></li><li>What should the budget prioritise? <span class="btv-ss-by">(Essential, Apr 2026)</span></li><li>Ten ways to raise revenue: which do people back? <span class="btv-ss-by">(Newspoll, Apr 2026)</span></li><li>How serious is the budget deficit? <span class="btv-ss-by">(RedBridge, Dec 2025)</span></li><li>How should the deficit be cut: tax the rich, or cut spending? <span class="btv-ss-by">(RedBridge, Dec 2025)</span></li><li>Should governments prop up struggling smelters, steelworks and refineries? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Should super balances over $3 million pay more tax? <span class="btv-ss-by">(DemosAU, Jul 2025)</span></li><li>Support for possible tax reforms <span class="btv-ss-by">(SEC Newgate, Jul 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>How much have people heard about the budget, and what do they make of it? <span class="pubop-ss-by">(RedBridge, Oct 2026)</span></li><li>Is it a good time to buy or sell a home? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Views on super contributions and early access <span class="pubop-ss-by">(DemosAU, Sep 2026)</span></li><li>What is driving the housing affordability crisis? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>What should be done about the black market in cigarettes? <span class="pubop-ss-by">(DemosAU, Sep 2026)</span></li><li>Will house prices be higher or lower in a year? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Would falling house prices be good or bad, for you and for Australia? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Are you concerned about the federal government debt? <span class="pubop-ss-by">(Resolve, Sep 2026)</span></li><li>Are you concerned about your state government's debt? <span class="pubop-ss-by">(Resolve, Sep 2026)</span></li><li>Has the budget's broken promises changed your trust in Anthony Albanese? <span class="pubop-ss-by">(Resolve, Sep 2026)</span></li><li>How should the government deal with debt and deficit? <span class="pubop-ss-by">(Resolve, Sep 2026)</span></li><li>Views on superannuation <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Would the capital gains tax changes make it harder to get ahead? <span class="pubop-ss-by">(SEC Newgate, Jul 2026)</span></li><li>Support for policies from ending multiculturalism to leaving the UN <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>Where should government spend more? <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>Do you support or oppose increasing tax rates on trusts? <span class="pubop-ss-by">(Resolve, Jun 2026)</span></li><li>How much attention have you paid to the federal budget announcements? <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Impact of the federal budget on cost of living <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Opinion about effect of federal budget on people, economy etc. <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Should governments always keep their election promises? <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Should investment income be taxed more, less, or the same as wages? <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Support for the Coalition’s budget-reply proposals <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>The biggest housing concerns, ranked <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Will the housing tax changes make things fairer for younger people? <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Should investment income be taxed at a lower rate than work? <span class="pubop-ss-by">(DemosAU, May 2026)</span></li><li>Views on the budget’s tax changes <span class="pubop-ss-by">(DemosAU, May 2026)</span></li><li>Will the housing tax changes make homes more affordable? <span class="pubop-ss-by">(YouGov, May 2026)</span></li><li>Has the budget changed people’s trust in the government? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>Are Labor’s housing measures a step in the right direction? <span class="pubop-ss-by">(Newspoll, May 2026)</span></li><li>Will the budget make inflation better or worse? <span class="pubop-ss-by">(Newspoll, May 2026)</span></li><li>Would the Coalition have delivered a better budget? <span class="pubop-ss-by">(Newspoll, May 2026)</span></li><li>Do you support or oppose cutting the NDIS to save $36 billion over four years? <span class="pubop-ss-by">(Resolve, May 2026)</span></li><li>Has Labor breaking its tax promises changed your view of the party? <span class="pubop-ss-by">(Resolve, May 2026)</span></li><li>What should the budget prioritise? <span class="pubop-ss-by">(YouGov, May 2026)</span></li><li>Support for possible budget changes, before the budget <span class="pubop-ss-by">(Essential, Apr 2026)</span></li><li>What should the budget prioritise? <span class="pubop-ss-by">(Essential, Apr 2026)</span></li><li>Ten ways to raise revenue: which do people back? <span class="pubop-ss-by">(Newspoll, Apr 2026)</span></li><li>How serious is the budget deficit? <span class="pubop-ss-by">(RedBridge, Dec 2025)</span></li><li>How should the deficit be cut: tax the rich, or cut spending? <span class="pubop-ss-by">(RedBridge, Dec 2025)</span></li><li>Should governments prop up struggling smelters, steelworks and refineries? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Should super balances over $3 million pay more tax? <span class="pubop-ss-by">(DemosAU, Jul 2025)</span></li><li>Support for possible tax reforms <span class="pubop-ss-by">(SEC Newgate, Jul 2025)</span></li></ul>
       <h2>Cost of living and the economy</h2>
-      <p><b>46% hold federal Labor primarily responsible for the cost-of-living crunch.</b> <span class="btv-ss-by">Resolve, October 2026</span></p>
-      <p class="btv-ss-dek">Household finances, interest rates, and who voters blame for rising prices.</p>
+      <p><b>46% hold federal Labor primarily responsible for the cost-of-living crunch.</b> <span class="pubop-ss-by">Resolve, October 2026</span></p>
+      <p class="pubop-ss-dek">Household finances, interest rates, and who voters blame for rising prices.</p>
 
         <h3>Who is to blame for the cost-of-living crunch?</h3>
-        <ul class="btv-ss-list"><li>Federal Labor: 46%</li><li>Global factors: 26%</li><li>The Reserve Bank: 4%</li></ul>
-        <p><span class="btv-ss-by">% naming each as primarily responsible. Resolve Political Monitor, Oct 2026</span></p>
+        <ul class="pubop-ss-list"><li>Federal Labor: 46%</li><li>Global factors: 26%</li><li>The Reserve Bank: 4%</li></ul>
+        <p><span class="pubop-ss-by">% naming each as primarily responsible. Resolve Political Monitor, Oct 2026</span></p>
         <h3>Was the latest rate rise mainly caused by the Middle East conflict, as the Treasurer says?</h3>
-        <p>37% agree, 63% disagree. <span class="btv-ss-by">YouGov for News24, Oct 2026</span></p>
+        <p>37% agree, 63% disagree. <span class="pubop-ss-by">YouGov for News24, Oct 2026</span></p>
         <h3>Is your household better or worse off than three months ago?</h3>
-        <ul class="btv-ss-list"><li>YouGov, Jun 2026: 9% better off, 39% worse off</li><li>YouGov, May 2026: 7% better off, 47% worse off</li><li>YouGov, Mar 2026: 7% better off, 42% worse off</li></ul>
+        <ul class="pubop-ss-list"><li>YouGov, Jun 2026: 9% better off, 39% worse off</li><li>YouGov, May 2026: 7% better off, 47% worse off</li><li>YouGov, Mar 2026: 7% better off, 42% worse off</li></ul>
         <p>Worse off: 39%, much the same as the 42% in March 2026.</p>
         <h3>How should the government respond to inflation?</h3>
-        <ul class="btv-ss-list"><li>Lower government spending: 55%</li><li>Subsidise essentials such as energy and fuel: 51%</li><li>Cut income taxes: 31%</li><li>Reduce regulation and costs for business: 27%</li><li>One-off payments: 11%</li></ul>
-        <p><span class="btv-ss-by">% naming each as one of their top two priorities. Newspoll, Oct 2026</span></p>
+        <ul class="pubop-ss-list"><li>Lower government spending: 55%</li><li>Subsidise essentials such as energy and fuel: 51%</li><li>Cut income taxes: 31%</li><li>Reduce regulation and costs for business: 27%</li><li>One-off payments: 11%</li></ul>
+        <p><span class="pubop-ss-by">% naming each as one of their top two priorities. Newspoll, Oct 2026</span></p>
         <h3>Skipped care because of the cost</h3>
-        <ul class="btv-ss-list"><li>Dentist: 34%</li><li>GP: 27%</li><li>Medical specialist: 27%</li><li>Allied health professional (e.g., physio): 27%</li></ul>
-        <p><span class="btv-ss-by">% who, in the past year, needed to see each but did not go because of the cost. Essential Report, Jul 2026</span></p>
+        <ul class="pubop-ss-list"><li>Dentist: 34%</li><li>GP: 27%</li><li>Medical specialist: 27%</li><li>Allied health professional (e.g., physio): 27%</li></ul>
+        <p><span class="pubop-ss-by">% who, in the past year, needed to see each but did not go because of the cost. Essential Report, Jul 2026</span></p>
         <h3>What have people put off because of the economy?</h3>
-        <ul class="btv-ss-list"><li>Buying a home: 54%</li><li>Big household items: 53%</li><li>Buying a vehicle: 51%</li><li>Retiring: 49%</li><li>Medical treatment: 39%</li><li>Having children: 30%</li><li>Getting married: 26%</li></ul>
-        <p><span class="btv-ss-by">% who have delayed each, of those for whom it applies. RedBridge/Accent, Nov 2025</span></p>
+        <ul class="pubop-ss-list"><li>Buying a home: 54%</li><li>Big household items: 53%</li><li>Buying a vehicle: 51%</li><li>Retiring: 49%</li><li>Medical treatment: 39%</li><li>Having children: 30%</li><li>Getting married: 26%</li></ul>
+        <p><span class="pubop-ss-by">% who have delayed each, of those for whom it applies. RedBridge/Accent, Nov 2025</span></p>
         <h3>Will the next generation have a better or worse life than their parents?</h3>
-        <p>19% better, 62% worse. <span class="btv-ss-by">RedBridge/Accent, Jun 2026</span></p>
+        <p>19% better, 62% worse. <span class="pubop-ss-by">RedBridge/Accent, Jun 2026</span></p>
         <h3>Would you struggle to pay an unexpected bill of a few thousand dollars?</h3>
-        <p>61% would struggle, 24% would not. <span class="btv-ss-by">Resolve Political Monitor, Nov 2025</span></p>
+        <p>61% would struggle, 24% would not. <span class="pubop-ss-by">Resolve Political Monitor, Nov 2025</span></p>
         <h3>More questions on cost of living</h3>
-        <ul class="btv-ss-list"><li>Impact of cost of living <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Reasons for the rising cost of living <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Social and economic inequality <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Ban card surcharges even if it means higher prices? (as reported on TV) <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>Do you support or oppose the government's ban on credit card surcharges if it means businesses increase overall prices slightly to absorb payment costs? <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>What do you expect will happen to the level of unemployment over the coming 12 months? <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>Thinking about the financial situation in your household, would you say you are... <span class="btv-ss-by">(YouGov, Sep 2026)</span></li><li>Thinking about your access to medical treatment for you and your family, in the past 12 months... Which of the following best describes your situation? <span class="btv-ss-by">(YouGov, Sep 2026)</span></li><li>Who is to blame for the September 2026 rate rise? <span class="btv-ss-by">(YouGov, Sep 2026)</span></li><li>Does Australia have too much regulation, or too little? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Worries about working life over the next five years <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Are big companies behaving ethically? <span class="btv-ss-by">(SEC Newgate, Jul 2026)</span></li><li>Are people better or worse off than their parents were? <span class="btv-ss-by">(SEC Newgate, Jul 2026)</span></li><li>How secure do workers feel in their jobs? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>Will the economy improve or worsen in the next six months? <span class="btv-ss-by">(Essential, Apr 2026)</span></li><li>Have working-class Australians delayed healthcare because of the cost? <span class="btv-ss-by">(YouGov, Apr 2026)</span></li><li>Will energy prices rise over the next year? <span class="btv-ss-by">(YouGov, Apr 2026)</span></li><li>Will unemployment rise over the next year? <span class="btv-ss-by">(YouGov, Apr 2026)</span></li><li>What is behind the rate rises? <span class="btv-ss-by">(Essential, Mar 2026)</span></li><li>How well have Jim Chalmers’s policies dealt with the cost of living? <span class="btv-ss-by">(YouGov, Mar 2026)</span></li><li>Is the government responsible for the February 2026 rate rise? <span class="btv-ss-by">(YouGov, Feb 2026)</span></li><li>How people have coped with the rising cost of living <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Will interest rates be higher by the end of 2026? <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Will your standard of living improve or worsen this year? <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>How much does a household need to earn to be wealthy? <span class="btv-ss-by">(RedBridge, Dec 2025)</span></li><li>Are people better or worse off than a year ago? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>What will rise in 2026: prices, rates, unemployment? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Is the government doing enough on the economy? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Are people cutting back on Christmas spending? <span class="btv-ss-by">(Resolve, Nov 2025)</span></li><li>Will the economic outlook improve or worsen? <span class="btv-ss-by">(Resolve, Nov 2025)</span></li><li>Is there enough regulation in Australia? <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Support for economic reform ideas <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Views on the August 2025 economic roundtable <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Whose views of the economy match yours? <span class="btv-ss-by">(Essential, Aug 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Impact of cost of living <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Reasons for the rising cost of living <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Social and economic inequality <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Ban card surcharges even if it means higher prices? (as reported on TV) <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>Do you support or oppose the government's ban on credit card surcharges if it means businesses increase overall prices slightly to absorb payment costs? <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>What do you expect will happen to the level of unemployment over the coming 12 months? <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>Thinking about the financial situation in your household, would you say you are... <span class="pubop-ss-by">(YouGov, Sep 2026)</span></li><li>Thinking about your access to medical treatment for you and your family, in the past 12 months... Which of the following best describes your situation? <span class="pubop-ss-by">(YouGov, Sep 2026)</span></li><li>Who is to blame for the September 2026 rate rise? <span class="pubop-ss-by">(YouGov, Sep 2026)</span></li><li>Does Australia have too much regulation, or too little? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>Worries about working life over the next five years <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Are big companies behaving ethically? <span class="pubop-ss-by">(SEC Newgate, Jul 2026)</span></li><li>Are people better or worse off than their parents were? <span class="pubop-ss-by">(SEC Newgate, Jul 2026)</span></li><li>How secure do workers feel in their jobs? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>Will the economy improve or worsen in the next six months? <span class="pubop-ss-by">(Essential, Apr 2026)</span></li><li>Have working-class Australians delayed healthcare because of the cost? <span class="pubop-ss-by">(YouGov, Apr 2026)</span></li><li>Will energy prices rise over the next year? <span class="pubop-ss-by">(YouGov, Apr 2026)</span></li><li>Will unemployment rise over the next year? <span class="pubop-ss-by">(YouGov, Apr 2026)</span></li><li>What is behind the rate rises? <span class="pubop-ss-by">(Essential, Mar 2026)</span></li><li>How well have Jim Chalmers’s policies dealt with the cost of living? <span class="pubop-ss-by">(YouGov, Mar 2026)</span></li><li>Is the government responsible for the February 2026 rate rise? <span class="pubop-ss-by">(YouGov, Feb 2026)</span></li><li>How people have coped with the rising cost of living <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Will interest rates be higher by the end of 2026? <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Will your standard of living improve or worsen this year? <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>How much does a household need to earn to be wealthy? <span class="pubop-ss-by">(RedBridge, Dec 2025)</span></li><li>Are people better or worse off than a year ago? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>What will rise in 2026: prices, rates, unemployment? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Is the government doing enough on the economy? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Are people cutting back on Christmas spending? <span class="pubop-ss-by">(Resolve, Nov 2025)</span></li><li>Will the economic outlook improve or worsen? <span class="pubop-ss-by">(Resolve, Nov 2025)</span></li><li>Is there enough regulation in Australia? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Support for economic reform ideas <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Views on the August 2025 economic roundtable <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Whose views of the economy match yours? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li></ul>
       <h2>War, fuel and security</h2>
-      <p><b>63% opposed sending Australian naval ships to help keep the Strait of Hormuz open.</b> <span class="btv-ss-by">Newspoll, March 2026</span></p>
-      <p class="btv-ss-dek">The Iran war and the fuel crisis that followed, Gaza and the recognition of Palestine, and ties with China.</p>
+      <p><b>63% opposed sending Australian naval ships to help keep the Strait of Hormuz open.</b> <span class="pubop-ss-by">Newspoll, March 2026</span></p>
+      <p class="pubop-ss-dek">The Iran war and the fuel crisis that followed, Gaza and the recognition of Palestine, and ties with China.</p>
 
         <h3>Should Australia send ships to help keep the Strait of Hormuz open?</h3>
-        <p>30% support, 63% oppose. <span class="btv-ss-by">Newspoll, Mar 2026</span></p>
+        <p>30% support, 63% oppose. <span class="pubop-ss-by">Newspoll, Mar 2026</span></p>
         <h3>Did voters back the US strikes on Iran?</h3>
-        <ul class="btv-ss-list"><li>Newspoll, Mar 2026 (US military action against Iran): 23% approve, 72% disapprove</li><li>Essential, Mar 2026 (The US and Israel’s decision to strike Iran): 26% approve, 42% disapprove</li></ul>
+        <ul class="pubop-ss-list"><li>Newspoll, Mar 2026 (US military action against Iran): 23% approve, 72% disapprove</li><li>Essential, Mar 2026 (The US and Israel’s decision to strike Iran): 26% approve, 42% disapprove</li></ul>
         <p>Disapproval leads in both polls.</p>
         <h3>What role should Australia play in the Middle East war?</h3>
-        <ul class="btv-ss-list"><li>Working with international organisations to help with peace talks and prevent further escalation: 60% support, 11% oppose</li><li>Providing naval support to end Iran’s blockade of oil supplies through the Straits of Hormuz: 37% support, 31% oppose</li><li>Offering refuge to civilians who are displaced by the war.: 37% support, 31% oppose</li><li>Sending weapons and equipment to support third party nations impacted by Iranian counter-strikes on US bases such as the United Arab Emirates (UAE): 32% support, 35% oppose (level)</li><li>Sending Australian troops to support US-Israeli ground operations if requested: 21% support, 50% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Working with international organisations to help with peace talks and prevent further escalation: 60% support, 11% oppose</li><li>Providing naval support to end Iran’s blockade of oil supplies through the Straits of Hormuz: 37% support, 31% oppose</li><li>Offering refuge to civilians who are displaced by the war.: 37% support, 31% oppose</li><li>Sending weapons and equipment to support third party nations impacted by Iranian counter-strikes on US bases such as the United Arab Emirates (UAE): 32% support, 35% oppose (level)</li><li>Sending Australian troops to support US-Israeli ground operations if requested: 21% support, 50% oppose</li></ul>
         <h3>The biggest worry about the Iran war</h3>
-        <ul class="btv-ss-list"><li>Increase fuel prices and inflation: 33%</li><li>Major destabilisation in the region: 32%</li><li>Terror attacks in Australia: 21%</li><li>Disrupt travel plans: 5%</li><li>Not worried: 5%</li><li>Prefer not to say: 4%</li></ul>
-        <p><span class="btv-ss-by">% naming each as their biggest concern. YouGov for News24, Mar 2026</span></p>
+        <ul class="pubop-ss-list"><li>Increase fuel prices and inflation: 33%</li><li>Major destabilisation in the region: 32%</li><li>Terror attacks in Australia: 21%</li><li>Disrupt travel plans: 5%</li><li>Not worried: 5%</li><li>Prefer not to say: 4%</li></ul>
+        <p><span class="pubop-ss-by">% naming each as their biggest concern. YouGov for News24, Mar 2026</span></p>
         <h3>Who is responsible for the fuel crisis?</h3>
-        <ul class="btv-ss-list"><li>The US and Israel for initiating military strikes on Iran: 42%</li><li>The Australian Government for not planning ahead: 32%</li><li>Iran for closing the Strait of Hormuz in response to the military strikes from the US and Israel: 17%</li><li>Don’t know: 9%</li></ul>
-        <p><span class="btv-ss-by">% naming each as most responsible. Essential Report, Apr 2026</span></p>
+        <ul class="pubop-ss-list"><li>The US and Israel for initiating military strikes on Iran: 42%</li><li>The Australian Government for not planning ahead: 32%</li><li>Iran for closing the Strait of Hormuz in response to the military strikes from the US and Israel: 17%</li><li>Don’t know: 9%</li></ul>
+        <p><span class="pubop-ss-by">% naming each as most responsible. Essential Report, Apr 2026</span></p>
         <h3>Should the government spend $20 billion on a 90-day fuel reserve?</h3>
-        <p>63% support, 13% oppose. <span class="btv-ss-by">YouGov for News24, Apr 2026</span></p>
+        <p>63% support, 13% oppose. <span class="pubop-ss-by">YouGov for News24, Apr 2026</span></p>
         <h3>Should Australia recognise a Palestinian state?</h3>
-        <ul class="btv-ss-list"><li>Essential, Sep 2025: 34% support, 30% oppose (level)</li><li>DemosAU, Jul 2025: 45% support, 23% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, Sep 2025: 34% support, 30% oppose (level)</li><li>DemosAU, Jul 2025: 45% support, 23% oppose</li></ul>
         <p>Support leads in one of the two polls; one is level.</p>
         <h3>Should Australia strengthen, keep or reduce its economic ties with China?</h3>
-        <p>21% strengthen, 18% reduce. <span class="btv-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
+        <p>21% strengthen, 18% reduce. <span class="pubop-ss-by">SEC Newgate Mood of the Nation, Sep 2026</span></p>
         <h3>More questions on war and fuel</h3>
-        <ul class="btv-ss-list"><li>Which country will matter most to Australia’s economy? <span class="btv-ss-by">(SEC Newgate, Sep 2026)</span></li><li>How much will fuel shortages hit prices and the economy? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>Is fuel availability a problem, and is the government doing enough? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>Should fuel be rationed? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>What people are doing to save fuel <span class="btv-ss-by">(Essential, Apr 2026)</span></li><li>How people changed their driving as petrol prices surged <span class="btv-ss-by">(Resolve, Apr 2026)</span></li><li>Have people cut their fuel use? <span class="btv-ss-by">(YouGov, Apr 2026)</span></li><li>How well is Trump handling the war in Iran? <span class="btv-ss-by">(YouGov, Apr 2026)</span></li><li>Do people approve of Australia’s response to the strikes on Iran? <span class="btv-ss-by">(Essential, Mar 2026)</span></li><li>How secure is Australia from external threats? <span class="btv-ss-by">(YouGov, Mar 2026)</span></li><li>What will recognising Palestine achieve? <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Has the government’s response to the Gaza war been right? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Should Israel continue its military action in Gaza? <span class="btv-ss-by">(Essential, Jul 2025)</span></li><li>Did people support the US and Israeli strikes on Iran in 2025? <span class="btv-ss-by">(SEC Newgate, Jul 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Which country will matter most to Australia’s economy? <span class="pubop-ss-by">(SEC Newgate, Sep 2026)</span></li><li>How much will fuel shortages hit prices and the economy? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>Is fuel availability a problem, and is the government doing enough? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>Should fuel be rationed? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>What people are doing to save fuel <span class="pubop-ss-by">(Essential, Apr 2026)</span></li><li>How people changed their driving as petrol prices surged <span class="pubop-ss-by">(Resolve, Apr 2026)</span></li><li>Have people cut their fuel use? <span class="pubop-ss-by">(YouGov, Apr 2026)</span></li><li>How well is Trump handling the war in Iran? <span class="pubop-ss-by">(YouGov, Apr 2026)</span></li><li>Do people approve of Australia’s response to the strikes on Iran? <span class="pubop-ss-by">(Essential, Mar 2026)</span></li><li>How secure is Australia from external threats? <span class="pubop-ss-by">(YouGov, Mar 2026)</span></li><li>What will recognising Palestine achieve? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Has the government’s response to the Gaza war been right? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Should Israel continue its military action in Gaza? <span class="pubop-ss-by">(Essential, Jul 2025)</span></li><li>Did people support the US and Israeli strikes on Iran in 2025? <span class="pubop-ss-by">(SEC Newgate, Jul 2025)</span></li></ul>
       <h2>Bondi and social cohesion</h2>
-      <p><b>More voters rated the government’s response to the Bondi attack poorly than well in both polls.</b> <span class="btv-ss-by">Two polls, December 2025 to January 2026</span></p>
-      <p class="btv-ss-dek">Responses to the December 2025 Bondi terror attack, antisemitism and racism, and whether the country is pulling apart.</p>
+      <p><b>More voters rated the government’s response to the Bondi attack poorly than well in both polls.</b> <span class="pubop-ss-by">Two polls, December 2025 to January 2026</span></p>
+      <p class="pubop-ss-dek">Responses to the December 2025 Bondi terror attack, antisemitism and racism, and whether the country is pulling apart.</p>
 
         <h3>How well did the government respond to the Bondi attack?</h3>
-        <ul class="btv-ss-list"><li>Essential, Jan 2026 (Albanese’s handling of the issues since): 36% well, 56% badly</li><li>Resolve, Dec 2025 (The federal government’s response): 29% well, 46% badly</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, Jan 2026 (Albanese’s handling of the issues since): 36% well, 56% badly</li><li>Resolve, Dec 2025 (The federal government’s response): 29% well, 46% badly</li></ul>
         <p>A poor verdict leads in both polls.</p>
         <h3>How did each leader respond to Bondi?</h3>
-        <ul class="btv-ss-list"><li>Anthony Albanese: 32% good, 56% poor</li><li>Sussan Ley: 53% good, 29% poor</li></ul>
+        <ul class="pubop-ss-list"><li>Anthony Albanese: 32% good, 56% poor</li><li>Sussan Ley: 53% good, 29% poor</li></ul>
         <h3>Which measures after Bondi do voters back?</h3>
-        <ul class="btv-ss-list"><li>Banning public display of designated ‘terrorist’ symbols: 73% support, 11% oppose</li><li>Strengthen Australian gun laws: 63% support, 18% oppose</li><li>Strengthening police power to curb protests: 62% support, 17% oppose</li><li>Introduce new laws criminalising hate speech: 60% support, 18% oppose</li><li>To hold a Federal Royal Commission on Antisemitism and Social Cohesion: 56% support, 16% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>Banning public display of designated ‘terrorist’ symbols: 73% support, 11% oppose</li><li>Strengthen Australian gun laws: 63% support, 18% oppose</li><li>Strengthening police power to curb protests: 62% support, 17% oppose</li><li>Introduce new laws criminalising hate speech: 60% support, 18% oppose</li><li>To hold a Federal Royal Commission on Antisemitism and Social Cohesion: 56% support, 16% oppose</li></ul>
         <h3>Should immigration screening be tougher on antisemitic or extremist views?</h3>
-        <p>76% support, 7% oppose. <span class="btv-ss-by">Resolve Political Monitor, Dec 2025</span></p>
+        <p>76% support, 7% oppose. <span class="pubop-ss-by">Resolve Political Monitor, Dec 2025</span></p>
         <h3>Have racism and religious intolerance risen since the Gaza war began?</h3>
-        <p>72% agree, 9% disagree. <span class="btv-ss-by">Resolve Political Monitor, Dec 2025</span></p>
+        <p>72% agree, 9% disagree. <span class="pubop-ss-by">Resolve Political Monitor, Dec 2025</span></p>
         <h3>Who should hate speech laws protect?</h3>
-        <ul class="btv-ss-list"><li>Hate speech laws should extend to all religions and other groups like LGBTI and disability: 35%</li><li>Hate speech laws should apply to all religions: 32%</li><li>Hate speech laws are an unacceptable curb on free speech: 22%</li><li>Hate speech laws should only apply to radical Muslim preachers: 10%</li></ul>
-        <p><span class="btv-ss-by">% choosing each view. Essential Report, Jan 2026</span></p>
+        <ul class="pubop-ss-list"><li>Hate speech laws should extend to all religions and other groups like LGBTI and disability: 35%</li><li>Hate speech laws should apply to all religions: 32%</li><li>Hate speech laws are an unacceptable curb on free speech: 22%</li><li>Hate speech laws should only apply to radical Muslim preachers: 10%</li></ul>
+        <p><span class="pubop-ss-by">% choosing each view. Essential Report, Jan 2026</span></p>
         <h3>Is Australia becoming more united or more divided?</h3>
-        <p>12% more united, 53% more divided. <span class="btv-ss-by">Essential Report, Feb 2026</span></p>
+        <p>12% more united, 53% more divided. <span class="pubop-ss-by">Essential Report, Feb 2026</span></p>
         <h3>More questions on bondi and cohesion</h3>
-        <ul class="btv-ss-list"><li>How serious of a problem do you think antisemitism is in the Australia? <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>Which is closest to your view? Radical Islamic extremism represents a growing concern for national security and social cohesion in Australia <span class="btv-ss-by">(YouGov, Oct 2026)</span></li><li>Who has a role in improving social cohesion? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>Will social cohesion get better or worse? <span class="btv-ss-by">(SEC Newgate, May 2026)</span></li><li>How cohesive is Australian society? <span class="btv-ss-by">(Essential, Feb 2026)</span></li><li>What could improve social cohesion? <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>How people mark Australia Day <span class="btv-ss-by">(Essential, Jan 2026)</span></li><li>Should there be a separate national day for Indigenous Australians? <span class="btv-ss-by">(Essential, Jan 2026)</span></li><li>Views on antisemitism after the Bondi attack <span class="btv-ss-by">(Essential, Jan 2026)</span></li><li>Views on racism in Australia <span class="btv-ss-by">(Essential, Jan 2026)</span></li><li>How well did Albanese respond to the Bondi attack? <span class="btv-ss-by">(YouGov, Jan 2026)</span></li><li>Should there be a royal commission into antisemitism? <span class="btv-ss-by">(Resolve, Jan 2026)</span></li><li>How would you rate social cohesion in Australia? <span class="btv-ss-by">(Resolve, Dec 2025)</span></li><li>What is driving the rise in racism? <span class="btv-ss-by">(Resolve, Dec 2025)</span></li><li>Is the world becoming more divided? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Where should large protests be allowed? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Support for measures against antisemitism, before Bondi <span class="btv-ss-by">(Essential, Jul 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>How serious of a problem do you think antisemitism is in the Australia? <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>Which is closest to your view? Radical Islamic extremism represents a growing concern for national security and social cohesion in Australia <span class="pubop-ss-by">(YouGov, Oct 2026)</span></li><li>Who has a role in improving social cohesion? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>Will social cohesion get better or worse? <span class="pubop-ss-by">(SEC Newgate, May 2026)</span></li><li>How cohesive is Australian society? <span class="pubop-ss-by">(Essential, Feb 2026)</span></li><li>What could improve social cohesion? <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>How people mark Australia Day <span class="pubop-ss-by">(Essential, Jan 2026)</span></li><li>Should there be a separate national day for Indigenous Australians? <span class="pubop-ss-by">(Essential, Jan 2026)</span></li><li>Views on antisemitism after the Bondi attack <span class="pubop-ss-by">(Essential, Jan 2026)</span></li><li>Views on racism in Australia <span class="pubop-ss-by">(Essential, Jan 2026)</span></li><li>How well did Albanese respond to the Bondi attack? <span class="pubop-ss-by">(YouGov, Jan 2026)</span></li><li>Should there be a royal commission into antisemitism? <span class="pubop-ss-by">(Resolve, Jan 2026)</span></li><li>How would you rate social cohesion in Australia? <span class="pubop-ss-by">(Resolve, Dec 2025)</span></li><li>What is driving the rise in racism? <span class="pubop-ss-by">(Resolve, Dec 2025)</span></li><li>Is the world becoming more divided? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Where should large protests be allowed? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Support for measures against antisemitism, before Bondi <span class="pubop-ss-by">(Essential, Jul 2025)</span></li></ul>
       <h2>Climate and energy</h2>
-      <p><b>57% back more oil and gas exploration, even if it undermines net zero.</b> <span class="btv-ss-by">YouGov, April 2026</span></p>
-      <p class="btv-ss-dek">Net zero, emissions targets, gas and the energy transition.</p>
+      <p><b>57% back more oil and gas exploration, even if it undermines net zero.</b> <span class="pubop-ss-by">YouGov, April 2026</span></p>
+      <p class="pubop-ss-dek">Net zero, emissions targets, gas and the energy transition.</p>
 
         <h3>Should Australia drill for more oil and gas, even if it undermines net zero?</h3>
-        <p>57% yes, 21% no. <span class="btv-ss-by">YouGov for News24, Apr 2026</span></p>
+        <p>57% yes, 21% no. <span class="pubop-ss-by">YouGov for News24, Apr 2026</span></p>
         <h3>Do voters support net zero emissions by 2050?</h3>
-        <p>44% support, 27% oppose. <span class="btv-ss-by">Essential Report, Oct 2025</span></p>
+        <p>44% support, 27% oppose. <span class="pubop-ss-by">Essential Report, Oct 2025</span></p>
         <h3>How fast should Australia move to renewable energy?</h3>
-        <p>61% move to renewables, 29% slow or stop the shift. <span class="btv-ss-by">Essential Report, Apr 2026</span></p>
+        <p>61% move to renewables, 29% slow or stop the shift. <span class="pubop-ss-by">Essential Report, Apr 2026</span></p>
         <h3>Is the 2035 emissions target too ambitious?</h3>
-        <p>39% too ambitious, 13% not ambitious enough. <span class="btv-ss-by">Essential Report, Sep 2025</span></p>
+        <p>39% too ambitious, 13% not ambitious enough. <span class="pubop-ss-by">Essential Report, Sep 2025</span></p>
         <h3>Is climate change caused by people?</h3>
-        <ul class="btv-ss-list"><li>Essential, Jun 2026: 51% caused by people, 36% natural fluctuation</li><li>Essential, Nov 2025: 53% caused by people, 31% natural fluctuation</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, Jun 2026: 51% caused by people, 36% natural fluctuation</li><li>Essential, Nov 2025: 53% caused by people, 31% natural fluctuation</li></ul>
         <p>Caused by people: 51%, much the same as the 53% in November 2025.</p>
         <h3>Is Australia doing enough on climate change?</h3>
-        <ul class="btv-ss-list"><li>Essential, Jun 2026: 30% not doing enough, 21% doing too much</li><li>Essential, Nov 2025: 36% not doing enough, 20% doing too much</li></ul>
+        <ul class="pubop-ss-list"><li>Essential, Jun 2026: 30% not doing enough, 21% doing too much</li><li>Essential, Nov 2025: 36% not doing enough, 20% doing too much</li></ul>
         <p>Not doing enough: 30%, down from 36% in November 2025.</p>
         <h3>More questions on climate and energy</h3>
-        <ul class="btv-ss-list"><li>Is the government doing enough on the environment? <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>Should Australia host COP31? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Will the world prevent dangerous global warming? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Should approvals for energy projects be sped up? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Will the shift to renewables make the grid more or less reliable? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Will the shift to renewables raise or lower power bills? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Views on emissions targets <span class="btv-ss-by">(Essential, Sep 2025)</span></li><li>Will Australia meet its 2035 emissions target? <span class="btv-ss-by">(Essential, Sep 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Is the government doing enough on the environment? <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>Should Australia host COP31? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Will the world prevent dangerous global warming? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Should approvals for energy projects be sped up? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Will the shift to renewables make the grid more or less reliable? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Will the shift to renewables raise or lower power bills? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Views on emissions targets <span class="pubop-ss-by">(Essential, Sep 2025)</span></li><li>Will Australia meet its 2035 emissions target? <span class="pubop-ss-by">(Essential, Sep 2025)</span></li></ul>
       <h2>Technology and society</h2>
-      <p><b>Support for the under-16 social media ban outweighs opposition in all three polls.</b> <span class="btv-ss-by">Three polls, September 2025 to January 2026</span></p>
-      <p class="btv-ss-dek">The under-16 social media ban, AI and data centres, gambling ads, unions, abortion and other questions of how we live and work.</p>
+      <p><b>Support for the under-16 social media ban outweighs opposition in all three polls.</b> <span class="pubop-ss-by">Three polls, September 2025 to January 2026</span></p>
+      <p class="pubop-ss-dek">The under-16 social media ban, AI and data centres, gambling ads, unions, abortion and other questions of how we live and work.</p>
 
         <h3>Do voters back the under-16 social media ban?</h3>
-        <ul class="btv-ss-list"><li>YouGov, Jan 2026: 69% support, 16% oppose</li><li>Essential, Dec 2025: 57% support, 22% oppose</li><li>Essential, Sep 2025: 63% support, 19% oppose</li></ul>
+        <ul class="pubop-ss-list"><li>YouGov, Jan 2026: 69% support, 16% oppose</li><li>Essential, Dec 2025: 57% support, 22% oppose</li><li>Essential, Sep 2025: 63% support, 19% oppose</li></ul>
         <p>Support leads in all three polls.</p>
         <h3>Should social media companies be regulated more or less?</h3>
-        <p>53% more, 8% less. <span class="btv-ss-by">Essential Report, May 2026</span></p>
+        <p>53% more, 8% less. <span class="pubop-ss-by">Essential Report, May 2026</span></p>
         <h3>Does AI bring more opportunity or more risk?</h3>
-        <p>22% more opportunity, 36% more risk. <span class="btv-ss-by">Essential Report, May 2026</span></p>
+        <p>22% more opportunity, 36% more risk. <span class="pubop-ss-by">Essential Report, May 2026</span></p>
         <h3>Will AI be good or bad, for you and for society?</h3>
-        <ul class="btv-ss-list"><li>On you personally: 41% positive, 28% negative</li><li>On society: 30% positive, 49% negative</li></ul>
+        <ul class="pubop-ss-list"><li>On you personally: 41% positive, 28% negative</li><li>On society: 30% positive, 49% negative</li></ul>
         <h3>Would you support a data centre being built in your area?</h3>
-        <p>28% support, 36% oppose. <span class="btv-ss-by">Essential Report, Jul 2026</span></p>
+        <p>28% support, 36% oppose. <span class="pubop-ss-by">Essential Report, Jul 2026</span></p>
         <h3>What should the rules be for gambling ads?</h3>
-        <ul class="btv-ss-list"><li>A ban on all gambling ads, everywhere, at all times: 39%</li><li>Limits during live sport, and a ban online and on social media: 25%</li><li>Limits only during live sport broadcasts: 15%</li><li>No restrictions: 11%</li><li>Unsure: 9%</li></ul>
-        <p><span class="btv-ss-by">% choosing each. Essential Report, Sep 2026</span></p>
+        <ul class="pubop-ss-list"><li>A ban on all gambling ads, everywhere, at all times: 39%</li><li>Limits during live sport, and a ban online and on social media: 25%</li><li>Limits only during live sport broadcasts: 15%</li><li>No restrictions: 11%</li><li>Unsure: 9%</li></ul>
+        <p><span class="pubop-ss-by">% choosing each. Essential Report, Sep 2026</span></p>
         <h3>Should abortion be legal?</h3>
-        <p>71% legal, 28% illegal. <span class="btv-ss-by">Essential Report, Jun 2026</span></p>
+        <p>71% legal, 28% illegal. <span class="pubop-ss-by">Essential Report, Jun 2026</span></p>
         <h3>Would workers be better off if unions were stronger?</h3>
-        <p>49% better off, 22% worse off. <span class="btv-ss-by">Essential Report, Aug 2026</span></p>
+        <p>49% better off, 22% worse off. <span class="pubop-ss-by">Essential Report, Aug 2026</span></p>
         <h3>More questions on tech and society</h3>
-        <ul class="btv-ss-list"><li>Views towards gender equality in Australia <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>The government has introduced a digital duty of care bill, that aims to make social media companies responsible for material on their sites. The bill gives power to the Minister for Communications to determine what is harmful content, and the eSafety commissioner is in charge of enforcing it. Which of these is closest to your view? <span class="btv-ss-by">(YouGov, Sep 2026)</span></li><li>Should social media companies owe their users a duty of care? <span class="btv-ss-by">(DemosAU, Sep 2026)</span></li><li>Should users be able to opt out of social media algorithms? <span class="btv-ss-by">(DemosAU, Sep 2026)</span></li><li>Do people want more control over their social media feeds? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Has violence against women increased? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Have people heard of ‘the manosphere’? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>How important are unions today? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Should employers’ use of AI be regulated? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Views on the ‘manosphere’ <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Will worker protections hold as employers bring in AI? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Apartments, a data centre, a nuclear plant: would people back them locally? <span class="btv-ss-by">(DemosAU, Aug 2026)</span></li><li>What would a local data centre do to power prices, pollution and jobs? <span class="btv-ss-by">(DemosAU, Aug 2026)</span></li><li>Will more data centres be good or bad for Australians? <span class="btv-ss-by">(DemosAU, Aug 2026)</span></li><li>The biggest worries about a local data centre <span class="btv-ss-by">(Essential, Jul 2026)</span></li><li>Should abortion be available after 20 weeks? <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>Views on access to abortion care <span class="btv-ss-by">(Essential, Jun 2026)</span></li><li>How often people use generative AI <span class="btv-ss-by">(Essential, May 2026)</span></li><li>Can people spot misinformation? <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Are people concerned about AI? <span class="btv-ss-by">(DemosAU, Jan 2026)</span></li><li>How often do people use AI? <span class="btv-ss-by">(DemosAU, Jan 2026)</span></li><li>What people use AI for <span class="btv-ss-by">(DemosAU, Jan 2026)</span></li><li>What worries people about AI? <span class="btv-ss-by">(DemosAU, Jan 2026)</span></li><li>Will AI take your job, or make it easier? <span class="btv-ss-by">(DemosAU, Jan 2026)</span></li><li>How concerning are AI’s side effects? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Will the under-16 social media ban work? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>How worried are people about AI, climate, nuclear war and pandemics? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>What should be done about gambling ads? <span class="btv-ss-by">(Essential, Nov 2025)</span></li><li>Who should decide on working from home? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Should AI develop freely, or only with guardrails? <span class="btv-ss-by">(Essential, Oct 2025)</span></li><li>Should AI companies be allowed to use copyrighted work? <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Should Australia move to a four-day work week? <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Where is there too little regulation? <span class="btv-ss-by">(Essential, Aug 2025)</span></li><li>Should under-16s be banned from YouTube? <span class="btv-ss-by">(DemosAU, Jul 2025)</span></li><li>Would parents help their children get around the YouTube ban? <span class="btv-ss-by">(DemosAU, Jul 2025)</span></li><li>Should men be banned from working in childcare? <span class="btv-ss-by">(DemosAU, Jul 2025)</span></li><li>Views on the childcare sector <span class="btv-ss-by">(DemosAU, Jul 2025)</span></li><li>Will AI help workers or replace them? <span class="btv-ss-by">(Essential, May 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Views towards gender equality in Australia <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>The government has introduced a digital duty of care bill, that aims to make social media companies responsible for material on their sites. The bill gives power to the Minister for Communications to determine what is harmful content, and the eSafety commissioner is in charge of enforcing it. Which of these is closest to your view? <span class="pubop-ss-by">(YouGov, Sep 2026)</span></li><li>Should social media companies owe their users a duty of care? <span class="pubop-ss-by">(DemosAU, Sep 2026)</span></li><li>Should users be able to opt out of social media algorithms? <span class="pubop-ss-by">(DemosAU, Sep 2026)</span></li><li>Do people want more control over their social media feeds? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Has violence against women increased? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Have people heard of ‘the manosphere’? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>How important are unions today? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Should employers’ use of AI be regulated? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Views on the ‘manosphere’ <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Will worker protections hold as employers bring in AI? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Apartments, a data centre, a nuclear plant: would people back them locally? <span class="pubop-ss-by">(DemosAU, Aug 2026)</span></li><li>What would a local data centre do to power prices, pollution and jobs? <span class="pubop-ss-by">(DemosAU, Aug 2026)</span></li><li>Will more data centres be good or bad for Australians? <span class="pubop-ss-by">(DemosAU, Aug 2026)</span></li><li>The biggest worries about a local data centre <span class="pubop-ss-by">(Essential, Jul 2026)</span></li><li>Should abortion be available after 20 weeks? <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>Views on access to abortion care <span class="pubop-ss-by">(Essential, Jun 2026)</span></li><li>How often people use generative AI <span class="pubop-ss-by">(Essential, May 2026)</span></li><li>Can people spot misinformation? <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Are people concerned about AI? <span class="pubop-ss-by">(DemosAU, Jan 2026)</span></li><li>How often do people use AI? <span class="pubop-ss-by">(DemosAU, Jan 2026)</span></li><li>What people use AI for <span class="pubop-ss-by">(DemosAU, Jan 2026)</span></li><li>What worries people about AI? <span class="pubop-ss-by">(DemosAU, Jan 2026)</span></li><li>Will AI take your job, or make it easier? <span class="pubop-ss-by">(DemosAU, Jan 2026)</span></li><li>How concerning are AI’s side effects? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Will the under-16 social media ban work? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>How worried are people about AI, climate, nuclear war and pandemics? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>What should be done about gambling ads? <span class="pubop-ss-by">(Essential, Nov 2025)</span></li><li>Who should decide on working from home? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>Should AI develop freely, or only with guardrails? <span class="pubop-ss-by">(Essential, Oct 2025)</span></li><li>Should AI companies be allowed to use copyrighted work? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Should Australia move to a four-day work week? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Where is there too little regulation? <span class="pubop-ss-by">(Essential, Aug 2025)</span></li><li>Should under-16s be banned from YouTube? <span class="pubop-ss-by">(DemosAU, Jul 2025)</span></li><li>Would parents help their children get around the YouTube ban? <span class="pubop-ss-by">(DemosAU, Jul 2025)</span></li><li>Should men be banned from working in childcare? <span class="pubop-ss-by">(DemosAU, Jul 2025)</span></li><li>Views on the childcare sector <span class="pubop-ss-by">(DemosAU, Jul 2025)</span></li><li>Will AI help workers or replace them? <span class="pubop-ss-by">(Essential, May 2025)</span></li></ul>
       <h2>Leaders, trust and democracy</h2>
-      <p><b>56% say the Albanese government has fallen short of their expectations.</b> <span class="btv-ss-by">Essential, May 2026</span></p>
-      <p class="btv-ss-dek">How voters rate the government, the leaders and the institutions, and how much they think politics needs to change.</p>
+      <p><b>56% say the Albanese government has fallen short of their expectations.</b> <span class="pubop-ss-by">Essential, May 2026</span></p>
+      <p class="pubop-ss-dek">How voters rate the government, the leaders and the institutions, and how much they think politics needs to change.</p>
 
         <h3>Has the Albanese government lived up to expectations?</h3>
-        <p>34% met or exceeded them, 56% fallen short. <span class="btv-ss-by">Essential Report, May 2026</span></p>
+        <p>34% met or exceeded them, 56% fallen short. <span class="pubop-ss-by">Essential Report, May 2026</span></p>
         <h3>How much does the political system need to change?</h3>
-        <ul class="btv-ss-list"><li>It is fine as it is: 5%</li><li>It needs minor changes: 29%</li><li>It needs major changes: 44%</li><li>It needs to be burned down so we can start over: 15%</li><li>Not sure: 7%</li></ul>
-        <p><span class="btv-ss-by">% choosing each. RedBridge/Accent, Jan 2026</span></p>
+        <ul class="pubop-ss-list"><li>It is fine as it is: 5%</li><li>It needs minor changes: 29%</li><li>It needs major changes: 44%</li><li>It needs to be burned down so we can start over: 15%</li><li>Not sure: 7%</li></ul>
+        <p><span class="pubop-ss-by">% choosing each. RedBridge/Accent, Jan 2026</span></p>
         <h3>Is Australia stronger or weaker than a year ago?</h3>
-        <p>15% stronger, 51% weaker. <span class="btv-ss-by">YouGov for News24, Jul 2026</span></p>
+        <p>15% stronger, 51% weaker. <span class="pubop-ss-by">YouGov for News24, Jul 2026</span></p>
         <h3>Which institutions do Australians trust?</h3>
-        <ul class="btv-ss-list"><li>CSIRO: 54% trust, 12% distrust</li><li>Bureau of Meteorology: 58% trust, 18% distrust</li><li>Australian Electoral Commission: 55% trust, 16% distrust</li><li>ACCC: 48% trust, 18% distrust</li><li>Therapeutic Goods Administration: 41% trust, 13% distrust</li><li>The High Court: 45% trust, 23% distrust</li><li>Australian Broadcasting Commission: 42% trust, 25% distrust</li><li>Reserve Bank of Australia: 43% trust, 28% distrust</li><li>The Australian Senate: 30% trust, 29% distrust (level)</li><li>House of Representatives: 29% trust, 30% distrust (level)</li><li>Australian Energy Market Operator: 23% trust, 32% distrust</li><li>The criminal justice system: 32% trust, 41% distrust</li></ul>
+        <ul class="pubop-ss-list"><li>CSIRO: 54% trust, 12% distrust</li><li>Bureau of Meteorology: 58% trust, 18% distrust</li><li>Australian Electoral Commission: 55% trust, 16% distrust</li><li>ACCC: 48% trust, 18% distrust</li><li>Therapeutic Goods Administration: 41% trust, 13% distrust</li><li>The High Court: 45% trust, 23% distrust</li><li>Australian Broadcasting Commission: 42% trust, 25% distrust</li><li>Reserve Bank of Australia: 43% trust, 28% distrust</li><li>The Australian Senate: 30% trust, 29% distrust (level)</li><li>House of Representatives: 29% trust, 30% distrust (level)</li><li>Australian Energy Market Operator: 23% trust, 32% distrust</li><li>The criminal justice system: 32% trust, 41% distrust</li></ul>
         <h3>How voters rate the political figures</h3>
-        <ul class="btv-ss-list"><li>Jacqui Lambie: 28% positive, 23% negative</li><li>Chris Minns: 27% positive, 22% negative</li><li>David Crisafulli: 24% positive, 19% negative</li><li>David Pocock: 17% positive, 15% negative (level)</li><li>Jane Hume: 20% positive, 19% negative (level)</li><li>Bridget McKenzie: 16% positive, 15% negative (level)</li><li>Peter Malinauskas: 21% positive, 21% negative (level)</li><li>Matthew Canavan: 20% positive, 22% negative (level)</li><li>Angus Taylor: 24% positive, 26% negative (level)</li><li>Andrew Hastie: 21% positive, 24% negative (level)</li><li>Zali Steggall: 15% positive, 18% negative</li><li>Pauline Hanson: 34% positive, 42% negative</li><li>Malcolm Turnbull: 27% positive, 35% negative</li><li>Penny Wong: 31% positive, 39% negative</li><li>Tony Abbott: 29% positive, 38% negative</li><li>Mark Butler: 18% positive, 27% negative</li><li>Kevin Rudd: 29% positive, 39% negative</li><li>Richard Marles: 17% positive, 29% negative</li><li>Barnaby Joyce: 27% positive, 40% negative</li><li>Tanya Plibersek: 20% positive, 33% negative</li><li>Larissa Waters: 20% positive, 33% negative</li><li>Jim Chalmers: 19% positive, 38% negative</li><li>Anthony Albanese: 25% positive, 47% negative</li><li>Scott Morrison: 23% positive, 45% negative</li></ul>
+        <ul class="pubop-ss-list"><li>Jacqui Lambie: 28% positive, 23% negative</li><li>Chris Minns: 27% positive, 22% negative</li><li>David Crisafulli: 24% positive, 19% negative</li><li>David Pocock: 17% positive, 15% negative (level)</li><li>Jane Hume: 20% positive, 19% negative (level)</li><li>Bridget McKenzie: 16% positive, 15% negative (level)</li><li>Peter Malinauskas: 21% positive, 21% negative (level)</li><li>Matthew Canavan: 20% positive, 22% negative (level)</li><li>Angus Taylor: 24% positive, 26% negative (level)</li><li>Andrew Hastie: 21% positive, 24% negative (level)</li><li>Zali Steggall: 15% positive, 18% negative</li><li>Pauline Hanson: 34% positive, 42% negative</li><li>Malcolm Turnbull: 27% positive, 35% negative</li><li>Penny Wong: 31% positive, 39% negative</li><li>Tony Abbott: 29% positive, 38% negative</li><li>Mark Butler: 18% positive, 27% negative</li><li>Kevin Rudd: 29% positive, 39% negative</li><li>Richard Marles: 17% positive, 29% negative</li><li>Barnaby Joyce: 27% positive, 40% negative</li><li>Tanya Plibersek: 20% positive, 33% negative</li><li>Larissa Waters: 20% positive, 33% negative</li><li>Jim Chalmers: 19% positive, 38% negative</li><li>Anthony Albanese: 25% positive, 47% negative</li><li>Scott Morrison: 23% positive, 45% negative</li></ul>
         <h3>Does the Greens’ change of leader change people’s vote?</h3>
-        <p>13% more likely, 17% less likely. <span class="btv-ss-by">Resolve Political Monitor, Oct 2026</span></p>
+        <p>13% more likely, 17% less likely. <span class="pubop-ss-by">Resolve Political Monitor, Oct 2026</span></p>
         <h3>More questions on trust and democracy</h3>
-        <ul class="btv-ss-list"><li>Party trusted to ensure economic best interests of Australians <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Which party is trusted on the economy? <span class="btv-ss-by">(Essential, Oct 2026)</span></li><li>Did people know the Greens had a new leader? <span class="btv-ss-by">(Resolve, Oct 2026)</span></li><li>How familiar are the Greens’ leaders? <span class="btv-ss-by">(Resolve, Oct 2026)</span></li><li>How happy are people with their own situation? <span class="btv-ss-by">(Essential, Sep 2026)</span></li><li>Please select the party leader who you would consider to be the most... Trustworthy <span class="btv-ss-by">(YouGov, Aug 2026)</span></li><li>How voters rate former leaders <span class="btv-ss-by">(DemosAU, Aug 2026)</span></li><li>Which issue matters most? <span class="btv-ss-by">(Resolve, Aug 2026)</span></li><li>Are people proud of Australia? Is super a national asset? <span class="btv-ss-by">(RedBridge, Jul 2026)</span></li><li>How is the government performing on health? <span class="btv-ss-by">(Essential, Jul 2026)</span></li><li>How is the government performing, issue by issue? <span class="btv-ss-by">(Essential, Jul 2026)</span></li><li>Which issues matter most? <span class="btv-ss-by">(Essential, Jul 2026)</span></li><li>Will the public health system be there when you need it? <span class="btv-ss-by">(Essential, Jul 2026)</span></li><li>Albanese or Hanson: who would be the better PM for each group? <span class="btv-ss-by">(DemosAU, Jul 2026)</span></li><li>How people see Australia’s billionaires <span class="btv-ss-by">(DemosAU, Jun 2026)</span></li><li>Is Australian politics overdue for a shake-up? <span class="btv-ss-by">(Newspoll, Jun 2026)</span></li><li>Which sources of information do people trust? <span class="btv-ss-by">(DemosAU, May 2026)</span></li><li>Albanese, Taylor and Hanson, trait by trait <span class="btv-ss-by">(DemosAU, Apr 2026)</span></li><li>Support for a range of policies <span class="btv-ss-by">(Essential, Feb 2026)</span></li><li>Trust in government, business and family <span class="btv-ss-by">(Essential, Feb 2026)</span></li><li>Which issue matters most? <span class="btv-ss-by">(YouGov, Feb 2026)</span></li><li>Which news sources do people trust? <span class="btv-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Support for social policies, January 2026 <span class="btv-ss-by">(Essential, Jan 2026)</span></li><li>Albanese and Ley, trait by trait <span class="btv-ss-by">(Newspoll, Jan 2026)</span></li><li>Newspoll’s leader traits since 2008 <span class="btv-ss-by">(Newspoll, Jan 2026)</span></li><li>Is Australia a better place to live than most countries? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Will 2026 be better or worse than 2025? <span class="btv-ss-by">(Essential, Dec 2025)</span></li><li>Views on Australian democracy <span class="btv-ss-by">(DemosAU, Nov 2025)</span></li><li>Can governments handle a local natural disaster? <span class="btv-ss-by">(SEC Newgate, Nov 2025)</span></li><li>How optimistic are people about the future? <span class="btv-ss-by">(Essential, Sep 2025)</span></li><li>What should the government’s top priorities be? <span class="btv-ss-by">(SEC Newgate, Jul 2025)</span></li><li>Do people trust the Australian Electoral Commission? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Is Australian democracy healthy? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Should how-to-vote cards be handed out at polling booths? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Should Parliament have more MPs? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Was your vote counted fairly at the 2025 election? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Which voting system should the House use? <span class="btv-ss-by">(DemosAU, Jun 2025)</span></li><li>Should Labor stick to its election policies? <span class="btv-ss-by">(Essential, May 2025)</span></li><li>What should Labor move faster on in its second term? <span class="btv-ss-by">(Essential, May 2025)</span></li><li>What should the new government act on first? <span class="btv-ss-by">(Essential, May 2025)</span></li></ul>
+        <ul class="pubop-ss-list"><li>Party trusted to ensure economic best interests of Australians <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Which party is trusted on the economy? <span class="pubop-ss-by">(Essential, Oct 2026)</span></li><li>Did people know the Greens had a new leader? <span class="pubop-ss-by">(Resolve, Oct 2026)</span></li><li>How familiar are the Greens’ leaders? <span class="pubop-ss-by">(Resolve, Oct 2026)</span></li><li>How happy are people with their own situation? <span class="pubop-ss-by">(Essential, Sep 2026)</span></li><li>Please select the party leader who you would consider to be the most... Trustworthy <span class="pubop-ss-by">(YouGov, Aug 2026)</span></li><li>How voters rate former leaders <span class="pubop-ss-by">(DemosAU, Aug 2026)</span></li><li>Which issue matters most? <span class="pubop-ss-by">(Resolve, Aug 2026)</span></li><li>Are people proud of Australia? Is super a national asset? <span class="pubop-ss-by">(RedBridge, Jul 2026)</span></li><li>How is the government performing on health? <span class="pubop-ss-by">(Essential, Jul 2026)</span></li><li>How is the government performing, issue by issue? <span class="pubop-ss-by">(Essential, Jul 2026)</span></li><li>Which issues matter most? <span class="pubop-ss-by">(Essential, Jul 2026)</span></li><li>Will the public health system be there when you need it? <span class="pubop-ss-by">(Essential, Jul 2026)</span></li><li>Albanese or Hanson: who would be the better PM for each group? <span class="pubop-ss-by">(DemosAU, Jul 2026)</span></li><li>How people see Australia’s billionaires <span class="pubop-ss-by">(DemosAU, Jun 2026)</span></li><li>Is Australian politics overdue for a shake-up? <span class="pubop-ss-by">(Newspoll, Jun 2026)</span></li><li>Which sources of information do people trust? <span class="pubop-ss-by">(DemosAU, May 2026)</span></li><li>Albanese, Taylor and Hanson, trait by trait <span class="pubop-ss-by">(DemosAU, Apr 2026)</span></li><li>Support for a range of policies <span class="pubop-ss-by">(Essential, Feb 2026)</span></li><li>Trust in government, business and family <span class="pubop-ss-by">(Essential, Feb 2026)</span></li><li>Which issue matters most? <span class="pubop-ss-by">(YouGov, Feb 2026)</span></li><li>Which news sources do people trust? <span class="pubop-ss-by">(SEC Newgate, Feb 2026)</span></li><li>Support for social policies, January 2026 <span class="pubop-ss-by">(Essential, Jan 2026)</span></li><li>Albanese and Ley, trait by trait <span class="pubop-ss-by">(Newspoll, Jan 2026)</span></li><li>Newspoll’s leader traits since 2008 <span class="pubop-ss-by">(Newspoll, Jan 2026)</span></li><li>Is Australia a better place to live than most countries? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Will 2026 be better or worse than 2025? <span class="pubop-ss-by">(Essential, Dec 2025)</span></li><li>Views on Australian democracy <span class="pubop-ss-by">(DemosAU, Nov 2025)</span></li><li>Can governments handle a local natural disaster? <span class="pubop-ss-by">(SEC Newgate, Nov 2025)</span></li><li>How optimistic are people about the future? <span class="pubop-ss-by">(Essential, Sep 2025)</span></li><li>What should the government’s top priorities be? <span class="pubop-ss-by">(SEC Newgate, Jul 2025)</span></li><li>Do people trust the Australian Electoral Commission? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Is Australian democracy healthy? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Should how-to-vote cards be handed out at polling booths? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Should Parliament have more MPs? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Was your vote counted fairly at the 2025 election? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Which voting system should the House use? <span class="pubop-ss-by">(DemosAU, Jun 2025)</span></li><li>Should Labor stick to its election policies? <span class="pubop-ss-by">(Essential, May 2025)</span></li><li>What should Labor move faster on in its second term? <span class="pubop-ss-by">(Essential, May 2025)</span></li><li>What should the new government act on first? <span class="pubop-ss-by">(Essential, May 2025)</span></li></ul>
       </section>
 
   <h2>Sources</h2>
@@ -6947,32 +6947,32 @@ body.rd .rd-ap-search input:focus-visible, body.rd .btv-search input:focus-visib
        rely on; it is not expressed here. -->
   <script>window.AP_INITIAL_TAB="public-opinion";</script>
   <script>window.AP_CYCLE_SRC="/assets/cycle-source.2bc98cd9.json";</script>
-  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.ae77aefa.json";</script>
+  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.67e5e865.json";</script>
   <script src="../assets/js/explained.ae90d788.js"></script>
   <script src="../assets/js/react.d949f1c3.js"></script>
   <script src="../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../assets/js/data.5d8f6c4b.js"></script>
+  <script src="../assets/js/data.5919d4e4.js"></script>
   <script src="../assets/js/data-late.1b9221eb.js"></script>
   <script src="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js"></script>
   <script src="../assets/js/np-project.ab528b77.js"></script>
   <script src="../assets/js/pv-agg.981ce406.js"></script>
-  <script src="../assets/js/menu-lines.54ac4e01.js"></script>
+  <script src="../assets/js/menu-lines.29aaaf1d.js"></script>
   <script src="../assets/js/copy-chart.ae95f2e7.js"></script>
   <script src="../assets/js/copy-poll.feb389c5.js"></script>
   <script src="../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.d3c528e8.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js"></script>
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.661fdcf3.js"></script>
-  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.9d5a6955.js"></script>
+  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2eaad295.js"></script>
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.4f929cab.js"></script>
   <script src="../assets/js/rd-hero.3bd6f0f0.js"></script>
   <script src="../assets/js/rd-panels.905b9c27.js"></script>
-  <script src="../assets/js/rd-polls.537b5652.js"></script>
+  <script src="../assets/js/rd-polls.0be17c9b.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
-  <script src="../assets/js/rd-allpolls.c11b52d8.js"></script>
-  <script src="../assets/js/rd-beyond.09068bbd.js"></script>
-  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.75c4bc78.js"></script>
+  <script src="../assets/js/rd-allpolls.89231f75.js"></script>
+  <script src="../assets/js/rd-public-opinion.37830719.js"></script>
+  <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3953ec2.js"></script>
 
 
 </body></html>

@@ -123,7 +123,7 @@ const JSX = [
   "rd-polls.jsx",                             // the redesign's latest-and-next polls table
   "rd-cycles.jsx",                            // the redesign's Past cycles tab
   "rd-allpolls.jsx",                          // the redesign's All polls tab
-  "rd-beyond.jsx",                            // the ☰ menu's Public opinion page
+  "rd-public-opinion.jsx",                            // the ☰ menu's Public opinion page
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 
@@ -921,23 +921,23 @@ function ssChangelogBlock(esc) {
 }
 
 /* The Public opinion page's static article: the payload the live page draws
-   (gen-data's oneoffs-source.json, which beyond-the-vote.mjs builds from the
+   (gen-data's oneoffs-source.json, which public-opinion.mjs builds from the
    one-off stores), set as text in the same topic order, so a no-JS reader or
    a crawler gets the page's findings and figures: the index of findings the
    page opens on; each topic an h2, its finding and its dek; each tracker
    its title, dek and every pollster's latest reading; each question its
    figures and pollster; each topic's further questions as a list of
    titles. One source, so the two can never disagree. No
-   colour here; the .btv-ss styles are template.html's. Caller supplies its
+   colour here; the .pubop-ss styles are template.html's. Caller supplies its
    esc. */
-const BTV_SS_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const PUBOP_SS_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function ssBeyondBlock(esc) {
   let src = null;
   try { src = JSON.parse(fs.readFileSync(DA("oneoffs-source.json"), "utf8")); } catch { return ""; }
   if (!src || !Array.isArray(src.topics)) return "";
   const H = src.houses || {};
   const house = (h, full) => esc((H[h] || {})[full ? "full" : "short"] || h);
-  const month = (iso) => BTV_SS_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+  const month = (iso) => PUBOP_SS_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
   const n = (v) => (Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1));
   const pct = (v) => n(v) + "%";
   const signed = (v) => (v > 0 ? "+" : v < 0 ? "&#8722;" : "") + n(Math.abs(v));
@@ -952,36 +952,36 @@ function ssBeyondBlock(esc) {
       return `
         <h3>${esc(c.title)}</h3>
         <p>${esc(c.dek)}</p>
-        <ul class="btv-ss-list">${latest}</ul>`;
+        <ul class="pubop-ss-list">${latest}</ul>`;
     }
     if (c.kind === "split") return `
         <h3>${esc(c.title)}</h3>
-        <p>${pair(c, c.names)}. <span class="btv-ss-by">${by(c.src)}</span></p>`;
+        <p>${pair(c, c.names)}. <span class="pubop-ss-by">${by(c.src)}</span></p>`;
     if (c.kind === "stack") return `
         <h3>${esc(c.title)}</h3>
-        <ul class="btv-ss-list">${c.rows.map((r) => `<li>${r.label ? esc(r.label) : house(r.src.house) + ", " + month(r.src.field.end)}${r.wording ? " (" + esc(r.wording) + ")" : ""}: ${pair(r, c.names)}</li>`).join("")}</ul>${c.summary ? `
+        <ul class="pubop-ss-list">${c.rows.map((r) => `<li>${r.label ? esc(r.label) : house(r.src.house) + ", " + month(r.src.field.end)}${r.wording ? " (" + esc(r.wording) + ")" : ""}: ${pair(r, c.names)}</li>`).join("")}</ul>${c.summary ? `
         <p>${esc(c.summary)}</p>` : ""}`;
     if (c.kind === "rank" || c.kind === "nets") return `
         <h3>${esc(c.title)}</h3>
-        <ul class="btv-ss-list">${c.rows.map((r) => `<li>${esc(r.label)}: ${c.kind === "nets" ? signed(r.v) : pct(r.v)}</li>`).join("")}</ul>
-        <p><span class="btv-ss-by">${esc(c.base || c.unit || "")}${c.base || c.unit ? ". " : ""}${by(c.src)}</span></p>`;
+        <ul class="pubop-ss-list">${c.rows.map((r) => `<li>${esc(r.label)}: ${c.kind === "nets" ? signed(r.v) : pct(r.v)}</li>`).join("")}</ul>
+        <p><span class="pubop-ss-by">${esc(c.base || c.unit || "")}${c.base || c.unit ? ". " : ""}${by(c.src)}</span></p>`;
     return "";
   };
   const shown = src.topics.filter((t) => t.blocks.length || t.more.length);
   /* the index the live page opens on: each topic's finding, as text */
-  const findings = shown.filter((t) => t.finding).map((t) => `<li><b>${esc(t.short)}:</b> ${esc(t.finding.text)}. <span class="btv-ss-by">${esc(t.finding.meta)}</span></li>`).join("");
+  const findings = shown.filter((t) => t.finding).map((t) => `<li><b>${esc(t.short)}:</b> ${esc(t.finding.text)}. <span class="pubop-ss-by">${esc(t.finding.meta)}</span></li>`).join("");
   const sections = shown.map((t) => `
       <h2>${esc(t.title)}</h2>${t.finding ? `
-      <p><b>${esc(t.finding.text)}.</b> <span class="btv-ss-by">${esc(t.finding.meta)}</span></p>` : ""}
-      <p class="btv-ss-dek">${esc(t.dek)}</p>
+      <p><b>${esc(t.finding.text)}.</b> <span class="pubop-ss-by">${esc(t.finding.meta)}</span></p>` : ""}
+      <p class="pubop-ss-dek">${esc(t.dek)}</p>
 ${t.blocks.map(block).join("")}${t.more.length ? `
         <h3>More questions on ${esc(t.short.charAt(0).toLowerCase() + t.short.slice(1))}</h3>
-        <ul class="btv-ss-list">${t.more.map((q) => `<li>${esc(q.title)} <span class="btv-ss-by">(${house(q.house)}, ${month(q.last)})</span></li>`).join("")}</ul>` : ""}`).join("");
+        <ul class="pubop-ss-list">${t.more.map((q) => `<li>${esc(q.title)} <span class="pubop-ss-by">(${house(q.house)}, ${month(q.last)})</span></li>`).join("")}</ul>` : ""}`).join("");
   return `
 
-      <section class="btv-ss" aria-label="Public opinion: the questions by topic">
+      <section class="pubop-ss" aria-label="Public opinion: the questions by topic">
       <h2>The findings</h2>
-      <ol class="btv-ss-list">${findings}</ol>${sections}
+      <ol class="pubop-ss-list">${findings}</ol>${sections}
       </section>`;
 }
 
@@ -1337,10 +1337,10 @@ ${body.trim()}
   }
   /* the ☰ menu's fifth page, Public opinion: the questions the pollsters
      ask beyond voting intention, by topic (ssBeyondBlock); the live tab draws
-     the same payload as findings, charts and rows (RdBeyond, rd-beyond.jsx). Federal
+     the same payload as findings, charts and rows (RdPublicOpinion, rd-public-opinion.jsx). Federal
      only – /vic/'s menu never holds it */
   if (id === "public-opinion") {
-    /* the topic count the live dek states (gen-data's beyondTopics, counted
+    /* the topic count the live dek states (gen-data's publicOpinionTopics, counted
        the way the page's own topic list counts) */
     let topics = null;
     try { topics = JSON.parse(fs.readFileSync(DA("oneoffs-source.json"), "utf8")).topics.filter((t) => t.blocks.length || t.more.length).length; } catch {}
@@ -1978,7 +1978,7 @@ const withScriptPreloads = (doc) => {
    documents above were cut from the full tag list - each renders its own
    tab first and needs its module from the start. Order is kept: the late
    list runs in the order the tags did. */
-const LATE_MODULES = ["data-late", "data-vic-late", "pv-agg", "a11e1559-f455-44d5-8a31-6699de4ef310-late", "d1a1d215-370c-4ebc-878b-7eeea9ad8102-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-beyond"];
+const LATE_MODULES = ["data-late", "data-vic-late", "pv-agg", "a11e1559-f455-44d5-8a31-6699de4ef310-late", "d1a1d215-370c-4ebc-878b-7eeea9ad8102-late", "copy-chart", "copy-poll", "explained", "wm-story", "rd-panels", "rd-polls", "rd-cycles", "rd-allpolls", "rd-public-opinion"];
 {
   const late = [];
   html = html.replace(/\n?[ \t]*<script src="((?:\.\.\/)*assets\/js\/([\w-]+)\.[0-9a-f]{8}\.js)"><\/script>/g,
