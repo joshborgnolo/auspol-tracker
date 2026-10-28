@@ -319,7 +319,7 @@ function areaHedDek(m, st) {
       const hs = ht.filter((x) => x[1]);
       const first = hs[0], rest = hs.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
       const v1 = verb === "holds" ? (first[0] === "ind" || first[0] === "grn" ? "hold" : "holds") : "won";
-      const dek = `Of the ${q} ${adv[1]}, ${FAM_PL[first[0]]} ${v1} ${first[1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Seats are ranked on the ABS’s ${IX_NAME[ix].toLowerCase()} index (${IX_ABBR[ix]}), ${m.year === "now" || m.year >= 2022 ? "from the 2021 census" : "interpolated between censuses to election day"}.`;
+      const dek = `Of the ${q} ${adv[1]}, ${FAM_PL[first[0]]} ${v1} ${first[1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Seats are ranked on the ABS’s ${IX_NAME[ix].toLowerCase()} index (${IX_ABBR[ix]}), ${m.year === "now" || m.year >= 2022 ? "from the 2021 census" : m.year < 2004 ? "from the 2001 census" : "interpolated between censuses to election day"}.`;
       return { hed, dek };
     }
   }
@@ -330,16 +330,16 @@ function areaHedDek(m, st) {
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"] };
 // the pair-of-phrases for a birthplace country, against the Australia-born share
 const COB_TOP = { eng: ["seats where the most residents were born in England", "the most Australia-born"], ind: ["seats where the most residents were born in India", "the most Australia-born"], chn: ["seats where the most residents were born in China", "the most Australia-born"], nzl: ["seats where the most residents were born in New Zealand", "the most Australia-born"], phl: ["seats where the most residents were born in the Philippines", "the most Australia-born"], vnm: ["seats where the most residents were born in Vietnam", "the most Australia-born"], zaf: ["seats where the most residents were born in South Africa", "the most Australia-born"], ita: ["seats where the most residents were born in Italy", "the most Australia-born"], lka: ["seats where the most residents were born in Sri Lanka", "the most Australia-born"], sct: ["seats where the most residents were born in Scotland", "the most Australia-born"] };
-// the measures' census basis as copy: 2007–2013 read the census areas the
-// polling places stand in (2006 census at 2007 and 2010, 2011 at 2013 — the
-// AEC's where-voters-live record begins 2016); 2016 on reads where their
-// voters live (2021 census); the income lanes (2013 on) count adults
+// the measures' census basis as copy: 2001 reads its own census area
+// figures measured-only (the frame's floor year, its census ~3 months
+// before election day); 2004-2019 blend their bracketing censuses; the
+// income lanes (2013 on) count adults
 const DB = {
   venue: {
-    seats: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
+    seats: (y) => `From the ${y < 2004 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
     who: "of residents of the census area it stands in",
     whoAdults: "of the adults of the census area it stands in",
-    note: (y) => `From the ${y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
+    note: (y) => `From the ${y < 2004 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
   },
   voter: {
     seats: "From the 2021 census, counted where each seat’s voters live.",
@@ -395,7 +395,7 @@ function incFact(m, dm) {
   if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${m.demoInterp && c.dollarsYear ? ` in ${c.dollarsYear} dollars` : ""}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
-const DEMO_EARLY = { hed: "Census figures start at the 2004 election", dek: "Every election from 2004 to 2019 blends between the two censuses that bracket it to election day (2004 between the 2001 and 2006 censuses); 2022 reads the 2021 census. The timeline starts at 2004." };
+const DEMO_EARLY = { hed: "Census figures start at the 2001 election", dek: "The 2001 election reads the 2001 census; every election from 2004 to 2019 blends between the two censuses that bracket it to election day (2004 between the 2001 and 2006 censuses); 2022 reads the 2021 census. The timeline starts at 2001." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;

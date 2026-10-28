@@ -1,0 +1,152 @@
+/* test-booth-demo-2001-frame.mjs — pin data/booth-demo-2001.json and
+   the 2001-election CD allocation
+   (derive-booth-demo-2001-frame.py + derive-cd-2001-ced-2001set.py):
+   the /map/ People lanes' floor year, the 2001 census measured
+   against its own election (measured-only — the election sits inside
+   the interp era's brackets but its census night was ~3 months before
+   election day; the SEIFA pcti side already classes 2001 measured).
+
+   Invariants (universe + value pins measured 2026-10-28 on the first
+   green emission):
+
+   1. Store header: election 2001, censusEdition 2001, no demoInterp
+      record anywhere (never a blend), no income keys anywhere (the
+      repo's income floor is the 2013 election).
+   2. Universe: 7,701 booths in the venue store's exact order; CD-join
+      classes 6,311 inherited from the 2004 store / 738 pointed
+      point-in-polygon / 4 pip-miss / 143 suburb-tier null /
+      505 coordinate-less null; 780 join-total null rows of the
+      classes plus the venues standing in tally-less pseudo CDs.
+      150 divisions.
+   3. The allocation (seifa-src/cd-2001-ced-2001set.json): 37,209
+      units, 37,116 placed (0 straddle — the 2001-era set sits inside
+      its own polygons, 14 by first vertex), 93 unplaced all the ABS
+      offshore-migratory class (8,249 people), 0 profile-free pseudos.
+   4. National pins recompute the published census anchors (persons
+      18,644,579 after the drop class — letter-for-letter the 2004
+      lane's figure, the two allocs dropping the same offshore
+      class); anchors Lingiari/Sydney stated in 2001-set sums and
+      Gwydir printed verbatim (a 2001-era division the 2003ed lane
+      never holds).
+*/
+import { readFileSync } from "node:fs";
+
+let failures = 0;
+const eq = (a, b, msg) => {
+  if (JSON.stringify(a) !== JSON.stringify(b)) {
+    failures++;
+    console.error(`FAIL ${msg}: got ${JSON.stringify(a)} want ${JSON.stringify(b)}`);
+  }
+};
+const ok = (c, msg) => {
+  if (!c) {
+    failures++;
+    console.error(`FAIL ${msg}`);
+  }
+};
+
+const d = JSON.parse(readFileSync("data/booth-demo-2001.json", "utf8"));
+const alloc = JSON.parse(readFileSync(
+  ".build/analysis/seat-model/seifa-src/cd-2001-ced-2001set.json", "utf8"));
+
+// 1. header + never-a-blend / no-income contracts
+eq([d.election, d.censusEdition], [2001, 2001],
+  "the frame store reads its own election on its own census");
+ok(!("demoInterp" in d) && !("demoI" in d),
+  "measured-only: no interp record on the store");
+{
+  let interp = 0, income = 0;
+  for (const b of d.booths) {
+    interp += ("demoI" in b);
+    if (b.demo) income += ["loinc", "hiinc", "incMed"].filter((k) => k in b.demo).length;
+  }
+  for (const x of d.divisions) {
+    interp += ("demoI" in x);
+    income += ["loinc", "hiinc", "medIncWeekly"].filter((k) => k in x).length;
+  }
+  ok(interp === 0, "no demoI rows anywhere (measured-only)");
+  ok(income === 0, "no income keys anywhere (income floor 2013)");
+}
+
+// 2. store universe + the join-class ledger
+const c = d.counts;
+eq([c.booths, c.boothsGeo, c.boothsGeoMissing, c.boothsGeoEmpty,
+  c.divisions, c.cdsBcpTally, c.cdsAlloc, c.cdsShortTable,
+  c.personsShortTable],
+  [7701, 6921, 780, 0, 150, 35289, 37116, 2, 751],
+  "frame store universe pins");
+eq([c.boothsCdInherit2004, c.boothsCdPip, c.cdsAlloc,
+  c.boothsCdPipMiss, c.boothsSuburbTier, c.boothsNoCoords],
+  [6311, 738, 37116, 4, 143, 505],
+  "CD-join class ledger (inherit / pip / honest-null tiers)");
+eq(c.national, {
+  persons: 18644579, langOther: 0.1594, fborn: 0.2318, uni: 0.1461,
+  blue: 0.2951, age0_14: 0.2088, age65ov: 0.1265,
+}, "national == the 2004 lane's figure (same tally, same offshore drop)");
+// booth order == the venue store's
+{
+  const v = JSON.parse(readFileSync("data/booth-seifa-2001.json",
+    "utf8"));
+  eq(d.booths.map((b) => `${b.div}|${b.boothId}`),
+    v.booths.map((b) => `${b.div}|${b.boothId}`), "frame booth order");
+}
+// well-formed booth demo blocks
+{
+  let badShare = 0, nulls = 0;
+  for (const b of d.booths) {
+    if (b.demo === null) { nulls++; continue; }
+    for (const k of ["langOther", "fborn", "uni", "blue"]) {
+      const x = b.demo[k];
+      if (x != null && !(x >= 0 && x <= 1)) badShare++;
+    }
+  }
+  ok(!badShare, `frames shares inside [0,1] (${badShare} bad)`);
+  eq(nulls, c.boothsGeoMissing + c.boothsGeoEmpty,
+    "null rows == the missing+empty classes");
+}
+
+// 3. the 2001-election allocation
+eq([alloc.unit, alloc.unitCount, alloc.placed, alloc.split,
+  alloc.fallback],
+  ["CD_CODE_2001", 37209, 37116, 0, 14], "alloc universe");
+eq(alloc.divisions.length, 150, "alloc holds the 2001-era 150 divisions");
+ok(alloc.divisions.includes("Gwydir") &&
+   !alloc.divisions.includes("Bonner"),
+  "the era set itself (Gwydir in, Bonner not yet)");
+eq([alloc.offshoreClass.offshoreMigratory.name,
+  alloc.offshoreClass.offshoreMigratory.units,
+  alloc.offshoreClass.offshoreMigratory.population],
+  ["Off-Shore Areas & Migratory", 93, 8249],
+  "the 93 offshore balance units, 8,249 people");
+eq(alloc.offshoreClass.profileFreePseudo.units, 0,
+  "no profile-free pseudos outside the era polygons");
+eq(alloc.unplacedUnscored.length, 93, "unplaced == offshore class");
+
+// 4. division anchors (2001-set sums)
+{
+  const divs = new Map(d.divisions.map((x) => [x.div, x]));
+  const L = divs.get("Lingiari");
+  eq([L.persons, L.langOther, L.fborn, L.uni, L.blue],
+    [102909, 0.3159, 0.1206, 0.1093, 0.3511],
+    "Lingiari 2001-set (moves vs the 2003ed lane)");
+  const S = divs.get("Sydney");
+  eq([S.persons, S.langOther, S.fborn, S.uni, S.blue],
+    [158113, 0.2561, 0.4111, 0.3653, 0.1094],
+    "Sydney unchanged across the two era sets");
+  const G = divs.get("Gwydir");
+  eq([G.persons, G.langOther, G.fborn, G.uni, G.blue],
+    [125105, 0.0209, 0.06, 0.0734, 0.3561],
+    "Gwydir (a 2001-era division the 2003ed lane never holds)");
+  const M = divs.get("Macarthur");
+  eq([M.persons, M.langOther, M.fborn, M.uni, M.blue],
+    [129851, 0.1508, 0.2197, 0.0859, 0.345], "Macarthur");
+  eq(divs.get("Bonner"), undefined, "Bonner is a 2003-edition seat");
+  const sum = d.divisions.reduce((t, x) => t + x.persons, 0);
+  eq(sum, 18644579, "sum of division persons == national persons");
+}
+
+if (failures) {
+  console.error(`\n${failures} FAILURES`);
+  process.exit(1);
+}
+console.log("OK: data/booth-demo-2001.json + cd-2001-ced-2001set.json pinned (frame floor year)");

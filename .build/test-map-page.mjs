@@ -117,10 +117,32 @@ for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 16, "the booth lane is the full columnar");
+  assert.equal(Object.keys(B).length, 17, "the booth lane is the full columnar (16 + the census demo row)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
+  }
+  // the census People lanes of the floor year: the measured 2001 census
+  // joined to its own election (derive-booth-demo-2001-frame.py over
+  // cd-2001-ced-2001set.json, pinned by test-booth-demo-2001-frame.mjs) —
+  // the interp era begins at 2004, income stays floored at 2013, and the
+  // 2001-era sub-CED SEIFA milestone keeps the seifa lanes null
+  for (const f of [r, D]) {
+    assert.equal(f.demoBasis, "venue", "2001 census basis is the venue-proxy read");
+    assert.ok(!f.demoInterp, "2001 is measured-only (no interp record)");
+    assert.equal(f.incomeCuts, null, "the income floor stays 2013");
+    assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "2001 SEIFA cuts stay null");
+  }
+  assert.ok(D.divs.every((d) => d.demo), "all 150 divisions carry a census demo row");
+  {
+    const demo = r.booths.demo;
+    assert.equal(demo.length, r.booths.n.length, "the demo row rides the full booth lane");
+    assert.equal(demo.filter(Boolean).length, 6920, "landed venue-CD joins (mobile/pseudo places and the suburb/zero-coordinate/honest-null tiers stay null)");
+    assert.ok(demo.every((row) => row === null || row.slice(0, 6).every((v) => v !== null)), "every landed demo row carries all six people lanes");
+    const gw = D.divs.find((d) => d.n === "Gwydir");
+    assert.equal(gw.demo.p, 125105, "Gwydir's census sum (a 2001-era division the 2003ed people lanes never hold)");
+    assert.equal(D.divs.find((d) => d.n === "Canberra").demo.p, 151237, "Canberra's census sum");
+    assert.equal(r.cobKeys.length, 0, "the 2001 BCP tally prints no birthplace-country rows (no cob picker)");
   }
   assert.ok(B.lat, "booth coordinate lane present");
   assert.equal(S.senators.length, 76, "76 senators after the 2001 election");
