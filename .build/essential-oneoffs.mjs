@@ -44,7 +44,7 @@ const MANIFEST = [
   /* immigration */
   { id: "attitudes-immigration", ds: "attitudes_to_immigration", also: ["do_you_think_immigration_to_australia_is_generally_positive_or_generally_negative_for_the_country", "do_you_think_immigration_to_australia_is_generally_positive_or_generally_negative_for_the_country_trend", "do_you_think_immigration_to_australia_is_generally_positive_or_generally_negative_for_the_country_by_gender", "do_you_think_immigration_to_australia_is_generally_positive_or_generally_negative_for_the_country_by_age", "do_you_think_immigration_to_australia_is_generally_positive_or_generally_negative_for_the_country_by_voting_intention"],
     note: "The long-running trend read (asked since 2019; in-term reads appear per wave)." },
-  { id: "immigration-intake", ds: "views_on_australia_s_immigration_intake", also: ["to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_trend", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_gender", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_age", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_voting_intention"] },
+  { id: "immigration-intake", ds: "views_on_australia_s_immigration_intake", also: ["to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_trend", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_gender", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_age", "to_what_extent_would_you_like_to_see_australias_yearly_immigration_intake_increase_decrease_or_stay_about_the_same_by_voting_intention", "australia_s_immigration_intake"] },
   { id: "immigration-cap", ds: "views_on_australia_s_immigration_cap" },
   { id: "immigration-impact", ds: "perceived_impact_of_immigration", also: ["impact_of_immigration", "impact_of_immigration_by_gender", "impact_of_immigration_by_age", "impact_of_immigration_by_voting_intention"] },
   { id: "immigration-views", ds: "views_on_immigration_into_australia", also: ["different_views_on_immigration", "different_views_on_immigration_by_gender", "different_views_on_immigration_by_age", "different_views_on_immigration_by_voting_intention"],
@@ -308,6 +308,16 @@ const INDEX_PATH = path.join(ROOT, ".build", "essential-src", "report-index.json
 const OUT_PATH = path.join(ROOT, "data", "essential-one-offs.json");
 const CHECK = process.argv.includes("--check");
 const WINDOW_START = "2025-05-12";
+/* The one sanctioned pre-window read (user call 2026-10-28): Essential's
+   election-fortnight April 2025 read of the immigration-intake question,
+   admitted so the public-opinion page's immigration tracker shows two
+   Essential readings rather than one – the house's only other reading is
+   September 2026's. The CSV carries that wave under the truncated legacy
+   id "australia_s_immigration_intake" (the platform slug caps at 30
+   chars). An exception for this (dataset, date) pair alone, never a
+   widening of the scope: anything else below WINDOW_START stays out. */
+const WINDOW_EXTRA = { australia_s_immigration_intake: new Set(["2025-04-14"]) };
+const WINDOW_EXTRA_DATES = new Set(Object.values(WINDOW_EXTRA).flatMap((s) => [...s]));
 
 const errors = [];
 const die = (m) => errors.push(m);
@@ -465,7 +475,7 @@ const reportIndex = JSON.parse(fs.readFileSync(INDEX_PATH, "utf8"));
 const WAVE_DATES = Object.keys(reportIndex).sort();
 
 function waveOfRead(date) {
-  if (date < WINDOW_START) return null;
+  if (date < WINDOW_START && !WINDOW_EXTRA_DATES.has(date)) return null;
   const i = WAVE_DATES.findIndex((w) => w >= date);
   if (i >= 0) {
     if (i > 0) {
@@ -510,7 +520,7 @@ function mergedRows(ids) {
     const c = corpus.get(id);
     if (!c) { die(`manifest: dataset id "${id}" is not in the CSV`); continue; }
     for (let r of c.rows) {
-      if (r.date < WINDOW_START) continue;
+      if (r.date < WINDOW_START && !(WINDOW_EXTRA[id] && WINDOW_EXTRA[id].has(r.date))) continue;
       const dv = !norm(r.vis) && idDerivedVis(id);
       if (dv) r = { ...r, vis: dv };
       const k = [norm(r.vis), norm(r.ans), norm(r.dim), norm(r.key), r.date].join("");
@@ -900,12 +910,15 @@ const store = {
   _about: [
     "Essential Report one-off and occasional survey questions that do NOT channel into the auspol-tracker",
     "data model (voting intention, 2PP, leader approvals, national direction, vote-by-demographics, the",
-    "party-consideration map). Scope: the 48th parliament – waves of 2025-05-12 onward, as extracted",
+    "party-consideration map). Scope: the 48th parliament – waves of 2025-05-12 onward, plus one",
+    "sanctioned exception: the election-fortnight 2025-04-14 read of the immigration-intake question,",
+    "admitted 2026-10-28 so the public-opinion page's immigration tracker shows two Essential readings",
+    "rather than one (an exception for that question alone, not a widening of the scope), as extracted",
     "into data/essential-report.csv (latest wave on file: " + latestWave + "; later waves join on a re-run",
     "of .build/essential-oneoffs.mjs after the extractor merges them). Figures are the CSV's rows verbatim;",
     "question texts are Essential's own chart titles (E-codes stripped); samples and release links come",
-    "from the matching polls.json row (waves 2025-05-12, 2025-07-29 and 2025-08-26 have no polls.json row –",
-    "their sample sizes are null and the report-index release link stands). Generated by",
+    "from the matching polls.json row (waves 2025-04-14, 2025-05-12, 2025-07-29 and 2025-08-26 have no",
+    "polls.json row – their sample sizes are null and the report-index release link stands). Generated by",
     ".build/essential-oneoffs.mjs from data/essential-report.csv, .build/essential-src/report-index.json",
     "and data/polls.json – never hand-edit.",
   ].join(" "),
