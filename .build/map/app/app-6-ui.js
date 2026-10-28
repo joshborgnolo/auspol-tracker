@@ -680,7 +680,6 @@ function showLoading(on, msg) {
   const F = chamberFrame(geom, r.width, r.height, chamberPads(r.width));
   el.style.left = F.X(0) + "px"; el.style.top = F.Yp(geom.aisle) + "px";
 }
-let yearFade = null;
 async function setYear(y) {
   if (y === S.year) return;
 
@@ -690,11 +689,19 @@ async function setYear(y) {
   if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // ... and the Senate-vote/seat-type lenses are AEC reads the state frames don't offer
   if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";
-  showLoading(true);
+  // the stamp names the election at the press; while it loads the stamp's rule runs and a
+  // sheen crosses the map (an election already loaded lands within the frame)
+  const dir = yearDir(from, y), tok = ++yearTok;
+  showStamp(y, dir);
+  const ready = Y[y] && Y[y].divs;
+  if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null]); } catch (e) { showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
+  if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
+  // the view the reader left as the page framed it (or the page is still flying to) is framed again in the new election
+  const framed = S.view === "map" && a && (atLastFit() || !!flight || T.k <= HOME.k * 1.001);
   // a year's birthplace menu is its own census edition's: a country it
   // doesn't print (England/Scotland before 2016) falls back to all overseas-born
   if (S.cob != null && !(b.cobKeys || []).includes(S.cob)) S.cob = null;
@@ -708,6 +715,8 @@ async function setYear(y) {
     else S.sel = { level: "div", st: s.st, div: ni };
   }
   if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
+  // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole frame
+  if (S.sel.level === "state" && !b.areas[S.sel.st]) S.sel = { level: "aus" };
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;
@@ -721,13 +730,77 @@ async function setYear(y) {
   }
   renderLenses(); // the SA frames offer fewer lenses — the chip row changes with the year
   recolor(false);
-  if (S.view === "map") yearFade = reduceMotion ? null : { from, t0: performance.now(), dur: 520 };
   setExtent();
-  renderTimeline(); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
+  ymorph = null;
+  if (S.view === "map" && a && a !== b) {
+    // the camera first shows on the new election's plane the ground it showed on the old;
+    // a framed view then flies to its frame in the new (federal to a state: in to the state)
+    const C0 = intoFrame(T, frameMap(a, b));
+    glideCancel(); flight = null; d3.select(canvas).interrupt().call(zoom.transform, C0);
+    if (framed || C0.k < HOME.k * 0.999) fitSelection(jurOf(a.year) !== jurOf(y) ? 1000 : 640);
+    if (!startYearMorph(a, b, framed && lastFit ? lastFit : T, dir)) carryColours(a, b);
+  }
+  const ul = tlMark();
+  renderTimeline(); tlGlide(ul); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
   $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
+  stampDone(ymorph ? ymorph.dur : 300);
   schedule();
+}
+let yearTok = 0;
+// +1 going forward in time, -1 back (Now is the latest of all)
+const yearWhen = (y) => (y === "now" ? "9999" : Y[y] && Y[y].date ? Y[y].date : META_FACTS.house && META_FACTS.house[y] ? META_FACTS.house[y][0] : String(xOfYear(y)));
+const yearDir = (a, b) => (yearWhen(b) < yearWhen(a) ? -1 : 1);
+/* the stamp: the election just chosen, set large in the stage's corner while the map turns
+   to it, rolling over from the one before like a counter (up going forward in time, down
+   going back), a kicker naming its parliament above. Up at the press, before the data
+   lands, its rule running while the election loads; it goes once the map has turned */
+const stampEl = (() => {
+  const el = document.createElement("div");
+  el.className = "mp-stamp"; el.setAttribute("aria-hidden", "true");
+  el.innerHTML = `<div class="mp-stamp-k"></div><div class="mp-stamp-y"></div><div class="mp-stamp-r"><i></i></div>`;
+  $("#stage").appendChild(el);
+  return el;
+})();
+let stampShown = "", stampOff = 0;
+function stampParts(y) {
+  if (y === "now") return ["The House today", "Now"];
+  if (STATE_YEARS.has(y)) return [`${NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : "South Australian"} election`, "20" + String(y).slice(-2)];
+  return ["Federal election", String(y)];
+}
+function showStamp(y, dir) {
+  clearTimeout(stampOff);
+  const [kick, big] = stampParts(y), el = stampEl, yel = $(".mp-stamp-y", el), was = el.classList.contains("on") ? stampShown : "";
+  $(".mp-stamp-k", el).textContent = kick;
+  el.classList.add("on", "wait");
+  if (big === was) return;
+  stampShown = big;
+  // each character rolls on its own, left to right, where it changed; the rest stay put
+  yel.innerHTML = [...big].map((ch, k) => `<span class="c">${was[k] !== ch && was ? `<span class="o">${esc(was[k] || "")}</span>` : ""}<span class="n">${esc(ch)}</span></span>`).join("");
+  if (reduceMotion || !was) return;
+  $$(".c", yel).forEach((c, k) => {
+    const o = $(".o", c), n = $(".n", c); if (!o) return;
+    const opt = { duration: 420, delay: k * 55, easing: "cubic-bezier(.3,.7,.2,1)", fill: "both" };
+    o.animate([{ transform: "translateY(0)", opacity: 1 }, { transform: `translateY(${-dir * 70}%)`, opacity: 0 }], opt);
+    n.animate([{ transform: `translateY(${dir * 70}%)`, opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], opt);
+  });
+}
+// the election has landed: the rule fills, and the stamp goes once the map has turned
+function stampDone(after = 300) {
+  stampEl.classList.remove("wait");
+  clearTimeout(stampOff);
+  stampOff = setTimeout(() => stampEl.classList.remove("on"), after + 900);
+}
+// the timeline's underline glides from the stop it left to the one chosen
+const tlMark = () => { const t = $("#time .yr.on"), l = t && t.nextElementSibling; return l ? l.getBoundingClientRect() : null; };
+function tlGlide(r0) {
+  const t = $("#time .yr.on"), l = t && t.nextElementSibling;
+  if (!r0 || !l || reduceMotion || !l.animate) return;
+  const r1 = l.getBoundingClientRect();
+  if (!r1.width || (Math.abs(r1.left - r0.left) < 0.5 && Math.abs(r1.top - r0.top) < 0.5)) return;
+  l.style.transformBox = "fill-box"; l.style.transformOrigin = "left center";
+  l.animate([{ transform: `translate(${r0.left - r1.left}px, ${r0.top - r1.top}px) scaleX(${r0.width / r1.width})` }, { transform: "none" }], { duration: 520, easing: "cubic-bezier(.65,0,.35,1)" });
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
@@ -785,16 +858,28 @@ function frame(ts) {
   let again = false;
   fadeT = 1;
   if (fade) { fadeT = clamp((ts - fade.t0) / fade.dur, 0, 1); if (fadeT < 1) again = true; else { fade = null; for (const y of Object.values(Y)) { y.prevDivCol = y.prevBoothCol = null; } } }
-  let yf = 1;
-  if (yearFade) { yf = ease(clamp((ts - yearFade.t0) / yearFade.dur, 0, 1)); if (yf < 1) again = true; else yearFade = null; }
   if (morph) {
     const t = clamp((ts - morph.t0) / morph.dur, 0, 1);
     drawMorph(m, morph.to === "chamber" ? t : 1 - t);
     if (t < 1) again = true; else { morph = null; again = true; }
   } else if (S.view === "map") {
-    if (yearFade && Y[yearFade.from] && Y[yearFade.from].divs) drawGeo(Y[yearFade.from], 1 - yf);
-    drawGeo(m, yearFade ? yf : 1, streetK());
-    drawFocus(m); drawBooths(m); drawIslands(m); drawLabels(m);
+    let mt = 1;
+    if (ymorph) { mt = clamp((ts - ymorph.t0) / ymorph.dur, 0, 1); if (mt >= 1 || ymorph.to !== m) ymorph = null; }
+    if (ymorph) {
+      again = true;
+      drawYearMorph(ymorph, mt);
+      ovA = smooth(0.55, 1, mt);
+      const mo = ymorph;
+      drawFocus(m, (i) => mo.cur[i] || geoOf(m).paths[i]);
+      drawOldBooths(mo, mt); ovA = smooth(0.55, 1, mt); drawBooths(m);
+      if (mo.cross) withT(viaFrame(T, mo.A), () => drawIslands(mo.from, 1 - smooth(0, 0.6, mt)));
+      drawIslands(m, mo.cross ? smooth(0.4, 1, mt) : 1); drawLabels(m);
+      ovA = 1;
+    } else {
+      drawGeo(m, 1, streetK());
+      drawFocus(m); drawBooths(m); drawIslands(m); drawLabels(m);
+    }
+    if (ywait) { waitSheen(ts); again = true; }
   } else if (S.view === "chamber") {
     const c = CM();
     if (houseFade) {
@@ -829,7 +914,10 @@ function resize() {
   }
   updateCanvasVis();
   renderTimeline();
-  schedule();
+  // setting the canvas's size blanks it: paint it again now, not a frame later (the resize
+  // lands between the frame's callbacks and its paint, so a scheduled repaint left one blank frame)
+  if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  frame(performance.now());
 }
 
 /* =============================== the URL =============================== */
@@ -1088,7 +1176,7 @@ function preloadYears() {
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },

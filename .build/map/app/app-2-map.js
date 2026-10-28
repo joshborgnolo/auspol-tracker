@@ -147,8 +147,9 @@ const selDiv = () => (S.sel.level === "div" || S.sel.level === "booth" ? S.sel.d
 // the opened seat as soon as it is chosen.
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 let quietSince = 0, needFrame = false;
+const quietAll = () => 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k);
 function quietness(i, now) {
-  const all = 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k);
+  const all = quietAll();
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
   return all;
 }
@@ -191,9 +192,10 @@ function drawGeo(m, alpha, streetA) {
   for (let i = 0; i < m.divs.length; i++) {
     if (!growBox(g.bb[i], x0, y0, x1, y1, grow)) continue;
     let c = fillDiv(m, i);
-    const qn = m === M() ? quietness(i, now) : 0;
+    // (another year's map, under a year morph, quiets with the zoom alone)
+    const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
-    if (qn > 0 && qn < 0.72 && i === selDiv()) needFrame = true;
+    if (m === M() && qn > 0 && qn < 0.72 && i === selDiv()) needFrame = true;
     fills.push([i, c ? css(c) : pat, filt && !passes(m, i)]);
   }
   // the islands where they lie, past the mainland frame: their seat's colour, quieted
@@ -276,8 +278,9 @@ function veilSea(unit, sd, a) {
   ctx.drawImage(veilLay, 0, 0);
   ctx.restore();
 }
-function drawFocus(m) {
-  const g = geoOf(m), th = TH, sd = selDiv();
+// pathOf: each seat's shape as painted (a year morph passes its seats' shapes mid-change)
+function drawFocus(m, pathOf) {
+  const g = geoOf(m), th = TH, sd = selDiv(), P = pathOf || ((i) => g.paths[i]);
   ctx.save();
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   const [x0, y0, x1, y1] = viewBox();
@@ -287,22 +290,319 @@ function drawFocus(m) {
   if (sea && (sd != null || S.sel.level === "state")) {
     veilSea(sea.unit, sd, sd != null ? th.veil : th.veil * 0.85);
   } else if (sd != null) {
-    const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(g.paths[sd]);
+    const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(P(sd));
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
   } else if (S.sel.level === "state") {
     ctx.fillStyle = css(th.bg, th.veil * 0.85);
-    for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(g.paths[d.i]);
+    for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(P(d.i));
     for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
   }
   // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
   const outline = (i) => {
     if (sea) { ctx.stroke(g.edgeOf(i)); return; }
-    ctx.stroke(g.paths[i]); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
+    ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
   };
   const h = S.hover;
   if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
   if (sd != null) { ctx.strokeStyle = css(th.ink); ctx.lineWidth = 2.2 / T.k; outline(sd); }
+  ctx.restore();
+}
+
+/* ----- the year morph -----
+   From one election to another the seats reshape where their boundaries moved
+   and recolour as they go. A seat both elections have (by name, else a renamed
+   seat by where it lies) has its outline eased from the old to the new, both
+   sampled at the union of their own corners so neither end is cut, and its
+   colour blended in OKLab; a seat only the new election has comes up beneath
+   its neighbours as they give way to it, and one only the old had is covered
+   as they take it in. The outlines move together, so neighbours keep meeting;
+   the colours sweep the map the way time runs - west to east going forward,
+   east to west going back - with a soft sheen on the sweep's front.
+   A federal and a state frame share no seats: there the old map fades as the
+   new comes up, the camera flying between their frames (setYear). Every
+   frame shares one projection but for its scale and offset (loadYear), so one
+   frame's plane maps onto another's by a scale and a shift. */
+const SWEEP = 0.42;        // of the morph's run, how far behind the first seat the last starts
+let ymorph = null;         // the morph under way
+const morphCache = new Map();
+let ywait = null;          // an election loading: the sheen runs over the old map until it lands
+let ovA = 1;               // the booths' and labels' strength: they come up as a morph ends
+const jurOf = (y) => YEAR_JUR[y] || "fed";
+// the map from one year's plane to another's, and the cameras that show the same ground in each
+function frameMap(from, to) {
+  const ko = from.proj.scale(), kn = to.proj.scale(), [ox, oy] = from.proj.translate(), [nx, ny] = to.proj.translate(), a = kn / ko;
+  return { a, bx: nx - a * ox, by: ny - a * oy };
+}
+const viaFrame = (t, A) => d3.zoomIdentity.translate(t.x + t.k * A.bx, t.y + t.k * A.by).scale(t.k * A.a);
+const intoFrame = (t, A) => d3.zoomIdentity.translate(t.x - (t.k * A.bx) / A.a, t.y - (t.k * A.by) / A.a).scale(t.k / A.a);
+// draw under another camera (the old year's, on the new year's plane)
+function withT(t, fn) { const keep = T; T = t; try { fn(); } finally { T = keep; } }
+
+const ringArea = (r) => { let s = 0; const n = r.length; for (let i = 0; i < n; i += 2) { const j = (i + 2) % n; s += r[i] * r[j + 1] - r[j] * r[i + 1]; } return s / 2; };
+const ringMid = (r) => { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < r.length; i += 2) { x0 = Math.min(x0, r[i]); x1 = Math.max(x1, r[i]); y0 = Math.min(y0, r[i + 1]); y1 = Math.max(y1, r[i + 1]); } return [(x0 + x1) / 2, (y0 + y1) / 2, Math.hypot(x1 - x0, y1 - y0)]; };
+const ringRev = (r) => { const o = new Float64Array(r.length); for (let i = 0; i < r.length; i += 2) { o[r.length - 2 - i] = r[i]; o[r.length - 1 - i] = r[i + 1]; } return o; };
+// a ring's corners by the share of its perimeter they sit at
+function ringCum(r) {
+  const n = r.length / 2, c = new Float64Array(n + 1);
+  for (let i = 0; i < n; i++) { const j = (i + 1) % n; c[i + 1] = c[i] + Math.hypot(r[2 * j] - r[2 * i], r[2 * j + 1] - r[2 * i + 1]); }
+  const L = c[n] || 1;
+  for (let i = 0; i <= n; i++) c[i] /= L;
+  return c;
+}
+// the ring's points at the perimeter shares fs (each in [0, 1))
+function ringAt(r, c, fs, out) {
+  const n = r.length / 2;
+  for (let s = 0; s < fs.length; s++) {
+    const f = fs[s];
+    let lo = 0, hi = n - 1;
+    while (lo < hi) { const md = (lo + hi + 1) >> 1; if (c[md] <= f) lo = md; else hi = md - 1; }
+    const k = lo, j = (k + 1) % n, seg = c[k + 1] - c[k], u = seg > 0 ? (f - c[k]) / seg : 0;
+    out[2 * s] = r[2 * k] + (r[2 * j] - r[2 * k]) * u; out[2 * s + 1] = r[2 * k + 1] + (r[2 * j + 1] - r[2 * k + 1]) * u;
+  }
+  return out;
+}
+// two rings as one point list each, matched point to point: the new ring is turned
+// to start where the old one does (the turn that moves the points least), and both
+// are sampled at every corner of either
+const sameRing = (a, b) => { if (a.length !== b.length) return false; for (let i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > 1e-3) return false; return true; };
+function ringPair(a, b) {
+  // (a ring the two elections share - most islands, most coasts - stays as it is)
+  if (sameRing(a, b)) { const r = Float32Array.from(b); return { a: r, b: r }; }
+  if (Math.sign(ringArea(a)) !== Math.sign(ringArea(b))) b = ringRev(b);
+  const ca = ringCum(a), cb = ringCum(b);
+  const even = (N) => Float64Array.from({ length: N }, (_, k) => k / N);
+  // the turn o (in N-ths of the perimeter) that moves N even samples least; the new
+  // ring's samples run twice round, so no wrap inside the loop
+  const fit = (N, lo, hi) => {
+    const sa = ringAt(a, ca, even(N), new Float64Array(2 * N)), sb = ringAt(b, cb, even(N), new Float64Array(4 * N));
+    sb.copyWithin(2 * N, 0, 2 * N);
+    let best = lo, bd = Infinity;
+    for (let o = lo; o <= hi; o++) {
+      const off = 2 * (((o % N) + N) % N);
+      let d = 0;
+      for (let k = 0; k < 2 * N && d < bd; k += 2) { const dx = sa[k] - sb[k + off], dy = sa[k + 1] - sb[k + off + 1]; d += dx * dx + dy * dy; }
+      if (d < bd) { bd = d; best = o; }
+    }
+    return best / N;
+  };
+  // the turn found coarsely, then finely about it; a small ring needs few samples
+  const n0 = clamp((a.length + b.length) >> 2, 8, 32), n1 = n0 * 6;
+  const o1 = fit(n0, 0, n0 - 1), phi = (fit(n1, Math.round(o1 * n1) - 4, Math.round(o1 * n1) + 4) + 1) % 1;
+  const fb = Array.from(cb.subarray(0, cb.length - 1), (f) => (f - phi + 1) % 1);
+  const fs = Float64Array.from(new Set([...ca.subarray(0, ca.length - 1), ...fb, 0])).sort();
+  const pa = ringAt(a, ca, fs, new Float32Array(2 * fs.length));
+  const pb = ringAt(b, cb, fs.map((f) => (f + phi) % 1), new Float32Array(2 * fs.length));
+  return { a: pa, b: pb };
+}
+// a seat's polygons on the new plane, eased point for point; a piece with no partner
+// (an island one election drew and the other didn't) grows from or shrinks to its middle
+function seatMorph(pa, pb) {
+  const A = pa.map((p) => ({ r: p.outer, m: ringMid(p.outer), ar: Math.abs(ringArea(p.outer)), used: false }));
+  const B = pb.map((p) => ({ r: p.outer, m: ringMid(p.outer), ar: Math.abs(ringArea(p.outer)) })).sort((p, q) => q.ar - p.ar);
+  A.sort((p, q) => q.ar - p.ar);
+  const rings = [];
+  B.forEach((q, k) => {
+    let best = null, bd = Infinity;
+    for (const p of A) {
+      if (p.used) continue;
+      const d = Math.hypot(p.m[0] - q.m[0], p.m[1] - q.m[1]);
+      if ((k === 0 && p === A[0]) || (d < 0.6 * (p.m[2] + q.m[2]) && d < bd)) { best = p; bd = d; if (k === 0) break; }
+    }
+    if (best) { best.used = true; rings.push(ringPair(best.r, q.r)); }
+    else rings.push({ b: Float32Array.from(q.r), cx: q.m[0], cy: q.m[1] });
+  });
+  for (const p of A) if (!p.used) rings.push({ a: Float32Array.from(p.r), cx: p.m[0], cy: p.m[1] });
+  const holes = [];
+  for (const p of pb) for (const h of p.holes) holes.push(h);
+  return { rings, holes };
+}
+function morphPath(sm, u) {
+  const p = new Path2D();
+  for (const q of sm.rings) {
+    if (q.a && q.b) {
+      const A = q.a, B = q.b;
+      for (let i = 0; i < A.length; i += 2) { const x = A[i] + (B[i] - A[i]) * u, y = A[i + 1] + (B[i + 1] - A[i + 1]) * u; if (i) p.lineTo(x, y); else p.moveTo(x, y); }
+    } else {
+      const R = q.a || q.b, s = q.a ? 1 - u : u;
+      if (s <= 0.001) continue;
+      for (let i = 0; i < R.length; i += 2) { const x = q.cx + (R[i] - q.cx) * s, y = q.cy + (R[i + 1] - q.cy) * s; if (i) p.lineTo(x, y); else p.moveTo(x, y); }
+    }
+    p.closePath();
+  }
+  for (const h of sm.holes) { for (let i = 0; i < h.length; i += 2) (i ? p.lineTo : p.moveTo).call(p, h[i], h[i + 1]); p.closePath(); }
+  return p;
+}
+const sameRings = (pa, pb) => pa.length === pb.length && pa.every((p, k) => sameRing(p.outer, pb[k].outer));
+const onPlane = (ps, A) => ps.map((p) => {
+  const f = (r) => { const o = new Float64Array(r.length); for (let i = 0; i < r.length; i += 2) { o[i] = A.a * r[i] + A.bx; o[i + 1] = A.a * r[i + 1] + A.by; } return o; };
+  return { outer: f(p.outer), holes: p.holes.map(f) };
+});
+const bbOn = (b, A) => b && [[A.a * b[0][0] + A.bx, A.a * b[0][1] + A.by], [A.a * b[1][0] + A.bx, A.a * b[1][1] + A.by]];
+const bbIoU = (p, q) => {
+  const ix = Math.max(0, Math.min(p[1][0], q[1][0]) - Math.max(p[0][0], q[0][0])), iy = Math.max(0, Math.min(p[1][1], q[1][1]) - Math.max(p[0][1], q[0][1]));
+  const ar = (b) => (b[1][0] - b[0][0]) * (b[1][1] - b[0][1]), i = ix * iy;
+  return i / (ar(p) + ar(q) - i || 1);
+};
+// at street zoom the seats keep the new election's lines from the start, under its streets,
+// and only their colours turn (the lens change's fade, from each seat's colour at the old
+// election); a seat new to the election turns from its own colour, so nothing flashes
+function carryColours(from, to) {
+  if (reduceMotion || !from || !to || from === to || jurOf(from.year) !== jurOf(to.year) || !from.divCol || !to.divCol) return;
+  for (const y of Object.values(Y)) if (y) { y.prevDivCol = y.prevBoothCol = null; }
+  to.prevDivCol = to.divs.map((d, i) => { const j = from.byName.get(d.n); return j != null && from.divCol[j] ? from.divCol[j] : to.divCol[i]; });
+  fade = { t0: performance.now(), dur: 700 };
+  schedule();
+}
+// to: the year now shown, from the one before; T1 the camera the map is going to; dir +1
+// going forward in time, -1 back. False where it can't run (the streets, reduced motion)
+function startYearMorph(from, to, T1, dir) {
+  ymorph = null;
+  if (reduceMotion || !from || !to || from === to || !from.geo || !to.geo || !Wpx) return false;
+  if (T1.k >= STREETS.k0 || T.k >= STREETS.k0) return false;
+  const A = frameMap(from, to), cross = jurOf(from.year) !== jurOf(to.year);
+  const hi = T1.k > K_HI && from.geoHi && to.geoHi;
+  const go = hi ? from.geoHi : from.geo, gn = hi ? to.geoHi : to.geo;
+  const n = to.divs.length, pair = new Int32Array(n).fill(-1);
+  if (!cross) {
+    const took = new Set();
+    for (let i = 0; i < n; i++) { const j = from.byName.get(to.divs[i].n); if (j != null && go.bb[j] && gn.bb[i]) { pair[i] = j; took.add(j); } }
+    // a renamed seat (Denison to Clark, Batman to Cooper): the left-over seats that sit on each other
+    const cand = [];
+    for (let i = 0; i < n; i++) {
+      if (pair[i] >= 0 || !gn.bb[i]) continue;
+      for (let j = 0; j < from.divs.length; j++) {
+        if (took.has(j) || !go.bb[j]) continue;
+        const o = bbIoU(gn.bb[i], bbOn(go.bb[j], A)); if (o > 0.35) cand.push([o, i, j]);
+      }
+    }
+    cand.sort((p, q) => q[0] - p[0]);
+    for (const [, i, j] of cand) if (pair[i] < 0 && !took.has(j)) { pair[i] = j; took.add(j); }
+  }
+  // the view the morph ends on, padded: seats out of it change colour only
+  const pad = 40 / T1.k, vx0 = -T1.x / T1.k - pad, vy0 = -T1.y / T1.k - pad, vx1 = (Wpx - T1.x) / T1.k + pad, vy1 = (Hpx - T1.y) / T1.k + pad;
+  const seen = (b) => b && !(b[1][0] < vx0 || b[0][0] > vx1 || b[1][1] < vy0 || b[0][1] > vy1);
+  const seats = new Array(n), lag = new Float32Array(n);
+  // the outlines' pairings kept for the last few changes of election, so walking back and forth costs nothing
+  const ck = `${from.year}>${to.year}${hi ? "+" : ""}`;
+  let cache = morphCache.get(ck);
+  if (!cache) { cache = new Map(); morphCache.set(ck, cache); if (morphCache.size > 6) morphCache.delete(morphCache.keys().next().value); }
+  for (let i = 0; i < n; i++) {
+    const b = gn.bb[i];
+    if (b) {
+      const xn = clamp((((b[0][0] + b[1][0]) / 2) * T1.k + T1.x) / Wpx, 0, 1), yn = clamp((((b[0][1] + b[1][1]) / 2) * T1.k + T1.y) / Hpx, 0, 1);
+      lag[i] = SWEEP * (0.8 * (dir < 0 ? 1 - xn : xn) + 0.2 * yn);
+    }
+    const j = pair[i], cn = to.divCol[i];
+    if (j < 0) { seats[i] = { kind: "new", cn }; continue; }
+    const co = from.divCol[j], s = { kind: "same", co, cn, la: co && cn ? rgb2lab(co) : null, lb: co && cn ? rgb2lab(cn) : null };
+    seats[i] = s;
+    if (!seen(b) && !seen(bbOn(go.bb[j], A))) continue;
+    let sm = cache.get(i);
+    if (sm === undefined) {
+      const pa = go.polys(j), pb = gn.polys(i), pA = pa && pb ? onPlane(pa, A) : null;
+      sm = !pA || sameRings(pA, pb) ? null : seatMorph(pA, pb);
+      cache.set(i, sm);
+    }
+    if (sm) { s.kind = "morph"; s.sm = sm; }
+  }
+  ymorph = { from, to, A, cross, g: gn, seats, lag, dir, pair, t0: performance.now(), dur: cross ? 1350 : 1200, cur: new Array(n) };
+  schedule();
+  return true;
+}
+// a seat's colour runs on the sweep; every outline moves at once, in the run's middle
+const morphU = (mo, i, t) => ease(clamp((t - mo.lag[i]) / (1 - SWEEP), 0, 1));
+const shapeU = (t) => ease(clamp((t - 0.12) / 0.76, 0, 1));
+// a seat only one side has comes up on the sweep (quickly: there may be bare paper beneath)
+const newA = (mo, u) => (mo.cross ? smooth(0, 0.6, u) : u);
+function morphColor(s, u) {
+  if (!s.co || !s.cn) return u < 0.5 ? s.co : s.cn;
+  if (u <= 0) return s.co; if (u >= 1) return s.cn;
+  return lab2rgb([lerp(s.la[0], s.lb[0], u), lerp(s.la[1], s.lb[1], u), lerp(s.la[2], s.lb[2], u)]);
+}
+// the sheen: a soft band of light across the land at d (the sweep's own measure, 0 at the
+// side it starts from to 1 at the far side), at strength a; drawn over what is painted only
+function sheen(d, dir, a) {
+  if (a <= 0.002) return;
+  const th = TH, gx = (dir < 0 ? -0.8 : 0.8) / Wpx, gy = 0.2 / Hpx, gl = Math.hypot(gx, gy), nx = gx / gl, ny = gy / gl;
+  // the point at d on the stage's mid-height, and the band's half-width along the sweep
+  const px = ((dir < 0 ? 1 - (d - 0.1) / 0.8 : (d - 0.1) / 0.8)) * Wpx, py = Hpx / 2, hw = 0.075 / gl;
+  const dark = lumL(th.bg) < 0.5, c = dark ? th.ink : th.bg;
+  const grad = ctx.createLinearGradient(px - nx * hw, py - ny * hw, px + nx * hw, py + ny * hw);
+  grad.addColorStop(0, css(c, 0)); grad.addColorStop(0.5, css(c, (dark ? 0.16 : 0.4) * a)); grad.addColorStop(1, css(c, 0));
+  ctx.save();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, Wpx, Hpx);
+  ctx.restore();
+}
+// the wait for an election's data: the band crosses the old map, again and again
+function waitSheen(now) {
+  const w = ywait, e = now - w.t0 - 140;
+  if (e <= 0) return;
+  const ph = (e / 1300) % 1;
+  sheen(-0.15 + 1.3 * ph, w.dir, 0.7 * Math.min(1, e / 300) * Math.sin(Math.PI * ph));
+}
+// the old election's polling places, going as the new ones come (ovA): drawn on the old
+// plane with the open seat as it was then
+function drawOldBooths(mo, t) {
+  const a = 1 - smooth(0, 0.35, t), old = mo.from, sd = selDiv(), keep = S.sel;
+  if (a <= 0 || mo.cross) return;
+  const j = sd != null ? mo.pair[sd] : -1;
+  S.sel = j >= 0 ? { level: "div", st: old.divs[j].st, div: j } : sd != null ? { level: "aus" } : keep;
+  ovA = a;
+  try { withT(viaFrame(T, mo.A), () => drawBooths(old)); } finally { S.sel = keep; ovA = 1; }
+}
+function drawYearMorph(mo, t) {
+  const m = mo.to, old = mo.from, th = TH, now = performance.now(), g = mo.g;
+  const Co = viaFrame(T, mo.A);
+  // under it all, the old map: on a change of frame it fades as the new comes up
+  const oldA = mo.cross ? 1 - smooth(0.3, 0.92, t) : 1;
+  if (oldA > 0) withT(Co, () => drawGeo(old, oldA));
+  ctx.save();
+  ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
+  const [x0, y0, x1, y1] = viewBox(), filt = filtersOn();
+  const quiet = (i, c) => { const qn = quietness(i, now); return c && qn > 0 ? towards(c, th.bg, qn) : c; };
+  const us = new Float32Array(m.divs.length), su = shapeU(t), sd = selDiv();
+  // the seats new to this election beneath, then the rest, the open seat last (over
+  // whatever its neighbours' moving outlines cut across)
+  const order = [];
+  for (const pass of ["new", "same", "morph"]) for (let i = 0; i < m.divs.length; i++) if (mo.seats[i].kind === pass && i !== sd) order.push(i);
+  if (sd != null) order.push(sd);
+  for (const i of order) {
+    const s = mo.seats[i], u = (us[i] = morphU(mo, i, t));
+    const p = (mo.cur[i] = s.kind === "morph" ? morphPath(s.sm, su) : g.paths[i]);
+    if (s.kind !== "morph" && !growBox(g.bb[i], x0, y0, x1, y1, 0)) continue;
+    const c = quiet(i, s.kind === "new" ? s.cn : morphColor(s, u));
+    ctx.globalAlpha = s.kind === "new" ? newA(mo, u) : 1;
+    ctx.fillStyle = c ? css(c) : pat; ctx.fill(p, "evenodd");
+    if (filt && !passes(m, i)) { ctx.globalAlpha *= u; ctx.fillStyle = css(th.bg, 0.8); ctx.fill(p, "evenodd"); }
+  }
+  // the islands where they lie, in their seat's colour as it turns
+  for (const q of m.isl || []) {
+    if (!growBox(q.mbb, x0, y0, x1, y1, 0)) continue;
+    const s = q.owner != null ? mo.seats[q.owner] : null, u = q.owner != null ? us[q.owner] : 1;
+    const c = s ? quiet(q.owner, s.kind === "new" ? s.cn : morphColor(s, u)) : th.nodata;
+    ctx.globalAlpha = s && s.kind === "new" ? newA(mo, u) : mo.cross ? smooth(0, 0.7, t) : 1;
+    ctx.fillStyle = c ? css(c) : pat; ctx.fill(q.mpath);
+  }
+  ctx.globalAlpha = 1;
+  sheen((t - (1 - SWEEP) / 2) / SWEEP, mo.dir, Math.sin(Math.PI * t));
+  // the borders as they stand mid-change: each seat's own outline in the paper's colour
+  // (the borders between states never move but between frames)
+  ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
+  ctx.strokeStyle = css(th.bg); ctx.lineWidth = Math.min(1.1, 0.35 + T.k * 0.25) / T.k;
+  for (let i = 0; i < m.divs.length; i++) {
+    const s = mo.seats[i], p = mo.cur[i]; if (!p || (s.kind !== "morph" && !growBox(g.bb[i], x0, y0, x1, y1, 0))) continue;
+    ctx.globalAlpha = s.kind === "new" ? newA(mo, us[i]) : 1; ctx.stroke(p);
+  }
+  ctx.globalAlpha = mo.cross ? smooth(0.15, 0.85, t) : 1;
+  ctx.lineWidth = 2.2 / T.k; ctx.stroke(g.meshState);
+  ctx.strokeStyle = css(th.state, 0.7); ctx.lineWidth = 0.9 / T.k; ctx.stroke(g.meshState);
+  ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
+  for (const q of m.isl || []) ctx.stroke(q.mpath);
   ctx.restore();
 }
 
@@ -354,12 +654,12 @@ function drawBooths(m) {
     if (x < -r || y < -r || x > Wpx + r || y > Hpx + r) continue;
     let a = sd != null && b.d[j] !== sd ? 0.5 : 1;
     if (rf && !inRange(boothColValue(m, j, rf.key), rf)) a *= 0.2;
-    ctx.globalAlpha = a;
+    ctx.globalAlpha = a * ovA;
     boothShape(ctx, b.ty[j], x, y, r + halo(r)); ctx.fillStyle = css(th.bg); ctx.fill();
     const c = fillBooth(m, j);
     boothShape(ctx, b.ty[j], x, y, r); ctx.fillStyle = c ? css(c) : pat; ctx.fill();
   }
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = ovA;
   const ring = (j, w, col) => { const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]); boothShape(ctx, b.ty[j], x, y, r + 2.4); ctx.lineWidth = w; ctx.strokeStyle = css(col); ctx.stroke(); };
   if (S.hover && S.hover.kind === "booth") ring(S.hover.i, 1.6, th.ink);
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) ring(S.sel.booth, 2.4, th.ink);
@@ -369,7 +669,7 @@ function drawBooths(m) {
 function drawLabels(m) {
   const th = TH, placed = islDrawn.map((c) => c.box), now = performance.now();
   ctx.save();
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalAlpha = ovA;
   ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
   // ground = the colour the label sits on: light ground takes ink with a soft
   // paper halo, dark ground takes near-white with a faint shadow

@@ -686,20 +686,29 @@ function deriveAreas(res, m) {
 function buildGeo(topo, m) {
   const fc = topojson.feature(topo, topo.objects.divs);
   const gen = d3.geoPath(proj);
-  const paths = new Array(m.divs.length), bb = new Array(m.divs.length);
+  const paths = new Array(m.divs.length), bb = new Array(m.divs.length), feats = new Array(m.divs.length);
   for (const f of fc.features) {
     const i = m.byName.get(f.properties.name);
     if (i == null) continue;
     const p = new Path2D(); d3.geoPath(proj, p)(f); paths[i] = p;
-    bb[i] = gen.bounds(f);
+    bb[i] = gen.bounds(f); feats[i] = f;
   }
   const P = proj, mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  // each seat's polygons on the plane, flat [x0, y0, x1, y1, ...] rings (the closing point
+  // dropped), made when a change of election first morphs them (the year morph, app-2)
+  const polyP = [];
+  const ringXY = (r) => { const o = new Float64Array(2 * (r.length - 1)); for (let k = 0; k < r.length - 1; k++) { const q = P(r[k]); o[2 * k] = q[0]; o[2 * k + 1] = q[1]; } return o; };
+  const polys = (i) => {
+    if (polyP[i] || !feats[i]) return polyP[i] || null;
+    const gm = feats[i].geometry, cs = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates;
+    return (polyP[i] = cs.map((pg) => ({ outer: ringXY(pg[0]), holes: pg.slice(1).map(ringXY) })));
+  };
   const o = topo.objects.divs, at = (g) => m.byName.get(g.properties.name);
   // each seat's coast and its borders with other seats, apart, made when the
   // streets first need them (the streets' own sea draws the coast there)
   const coastP = [], edgeP = [];
   return {
-    paths, bb,
+    paths, bb, polys,
     meshDiv: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
