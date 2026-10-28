@@ -78,6 +78,25 @@ empty candidate field); HTPPBYPP/HPPDOP carry ABSENT, POSTAL, PRE POLL
 and PROVISIONAL declaration rows by name under each division (no
 division-summary sentinel rows). The pack ships NO boundary geometry.
 
+### 2001 /map/ VTR-equivalent lanes (added 2026-10-28)
+
+From the same pack's v3_10<DIV>.txt members ("Two Candidate Preferred
+Preference Flow Result", the OFFICIAL movement of each excluded
+candidate's first preferences into the final pair per polling place and
+division): collated member-marker-concatenated to `v310-2001.txt.gz`
+(3,391,892 bytes → 778 KB), plaintext sha256
+`243932ae3d37da0912d0e0f65d5ba6a568b6a3f2bc4b1549339f3b4756088e26`.
+The VTR-frame lanes under `booth/` + `tcpflow-2001.csv.gz`, `tppdiv-2001.csv.gz`
+and `atlas/data/aec-2001/GeneralPollingPlacesDownload-2001-derived.csv`
+are DERIVED products `<as the year marks>` of
+`.build/map/pack-2001-booth.py` from these committed members (parser
+`.build/map/v310_2001.py`); the pack's products carry no candidate or
+polling-place ids, so the pack assigns AEC-flavoured synthetic ones —
+documented in the script. Rebuild deterministically with
+`python3 .build/map/pack-2001-booth.py` after changing any member — every
+emitted number is gated against divs-2001.txt's printed totals
+exactly-recompose per the script's oracle run.
+
 ## psephos transcriptions (1983–1990, pre-digital AEC era)
 
 psephos/<year>/<year>reps<state>.txt — Adam Carr's verbatim transcriptions
