@@ -4607,8 +4607,8 @@ const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "t
    same way, its 42 members over 47 desks: two straight files of benches down each side, the
    opposition's two rows running all the way to the back wall while the government's stop short,
    each inner file breaking at an aisle into a main run and a small detached bench of four at the
-   rear, two members' seats beside the bar on the government's side and a five-seat row hemming
-   the back wall opposite, the three clerks up at the long table's wider T head facing the bar
+   rear, the long five-seat bench hemming the back wall's left and a seat pair to the right of it
+   across the bar, the three clerks up at the long table's wider T head facing the bar
    (no desk of their own by the dais), the whips by the table, the Usher of the Black Rod in his
    own chair at the long table's rounded entrance end, and the public gallery across the far wall.
    Sydney's Assembly stood here too on its own straight blocks, but the real room is the sister of
@@ -4655,9 +4655,9 @@ const SAF = {
   // benches down each side, the opposition's inner and outer both running all the way to the
   // back wall while the government's stop short of it — each inner file split at an aisle into
   // its main run and a small detached bench of four at the rear, the government's four ending
-  // short of the rear row, the opposition's four going all the way back; two members' seats
-  // beside the bar on the government's side and the five-seat row hemming the back wall on the
-  // opposition's, their backs to the transverse line, facing up the chamber to the President; at
+  // clear above the long bench, the opposition's four going all the way back; the long
+  // five-seat bench hemming the back wall's left and, across the bar to its right, the seat
+  // pair, all facing up the chamber to the President with a chair's air between neighbours; at
   // the chamber's front a shallow closed platform (the President's chair, a deputy's in front of
   // it), then the long central table, a T the federal House's way but with its wider speaker-side
   // head drawn a touch stronger — the clerk and his two offsiders chairing its head, facing the
@@ -4676,35 +4676,40 @@ const SAF = {
   // south wall keeps; 2026-10-28 reference-crop corrections: the flank chairs to three a side,
   // the Usher up to the table's rounded end, the Black Rod onto the tabletop; 2026-10-28 rear
   // rebuild on the user's floor walk: seats to the back on both sides only on the opposition's,
-  // the inner files' detached fours, the government pair and the five-seat row at the back, and
-  // the T table with its three clerks in place of the dais-side desk — the two-seat gate pairs
-  // and the two officers' chairs go with it).
+  // the inner files' detached fours, the back-wall rows, and the T table with its three clerks in
+  // place of the dais-side desk — the two-seat gate pairs and the two officers' chairs go with
+  // it; 2026-10-29, the user's walk over the shipped floor: the long bench belongs on the rear
+  // wall's left, not its right (the pair swaps across the bar with it), its chairs are spread a
+  // chair's width apart instead of butting, the government's detached tail falls back clear of
+  // the long bench, and the flank chairs walk the stem below the T head's wings).
   nswLC: {
     room: [-306.4, -520, 306.4, 189.4], chair: -490, chairW: 44, chairD: 42,
     officers: [-340, 46], mace: false, lead: ["A1", "B1"],
     plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
-    ltable: { x: 58, hx: 96, hd: 26, y0: -316, y1: 10, cx: 77, chairs: [-280, -182, -84], rod: -12 },
+    // the three flank chairs walk the stem below the T head's wings, 87 apart and centred on it
+    ltable: { x: 58, hx: 96, hd: 26, y0: -316, y1: 10, cx: 77, chairs: [-256, -169, -82], rod: -12 },
     transverse: { y0: 148, y1: 184, half: 301, gap: 14 },
     gang: 130, usher: 34,
     // the five spare desks, standing empty at the back of the outer files (the bench fill walks
     // past them, so they draw as empty outlined seats, never a member's)
     vacant: ["C8", "C9", "C10", "D10", "D11"],
     straight: [
-      { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -64.8, -7.2, 50.4, 108], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9", R: "" },
+      { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -117.8, -60.2, -2.6, 55], L: "A1 A2 A3 A4 A5 A6 A7 A8 A9", R: "" },
       { row: 1, x: 152, ys: [-468, -404, -340, -276, -212, -148, -21.6, 36, 93.6, 151.2], L: "", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
       { row: 2, x: 272, ys: [-468, -410.4, -352.8, -295.2, -237.6, -180, -122.4, -64.8, -7.2, 50.4], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10", R: "" },
       { row: 2, x: 272, ys: [-468, -406.2, -344.4, -282.6, -220.8, -159, -97.2, -35.4, 26.4, 88.2, 150], L: "", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
     ],
-    // the back-wall rows, facing up the chamber to the President: two seats on the government's
-    // side flanking the bar, and the five-seat row on the opposition's
+    // the back-wall rows, facing up the chamber to the President at one chair's width apart
+    // (the 44-seat rooms of them, never butting): the five-seat long bench on the left,
+    // the pair on the right flanking the bar
     singles: [
-      { row: 2, x: 46, y: 119, L: "E1" },
-      { row: 2, x: 91, y: 119, L: "E2" },
-      { row: 2, x: 46, y: 119, R: "X1" },
-      { row: 2, x: 91, y: 119, R: "X2" },
-      { row: 2, x: 136, y: 119, R: "X3" },
-      { row: 2, x: 181, y: 119, R: "X4" },
-      { row: 2, x: 226, y: 119, R: "X5" },
+      { row: 2, x: 44, y: 119, L: "X1" },
+      { row: 2, x: 100, y: 119, L: "X2" },
+      { row: 2, x: 156, y: 119, L: "X3" },
+      { row: 2, x: 212, y: 119, L: "X4" },
+      { row: 2, x: 268, y: 119, L: "X5" },
+      { row: 2, x: 44, y: 119, R: "E1" },
+      { row: 2, x: 100, y: 119, R: "E2" },
     ],
     arcs: [],
   },
