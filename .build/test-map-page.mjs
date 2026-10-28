@@ -1266,8 +1266,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
   assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds four jurisdiction rows (169px; 148px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
-<<<<<<< HEAD
-  assert.ok(ui.includes('aria-label="Federal elections 2004 to now, and Victorian, New South Wales and South Australian state elections; choose one"'), "the timeline names its jurisdiction rows to a screen reader");
+  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales and South Australian state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
   // the rung order itself, in all four spots that encode it: the rail's rows
   // stack federal, Victoria, New South Wales, South Australia (2026-10-28 user
   // call); labels, the glyph's row lookup and the up/down-arrow walk follow
@@ -1279,9 +1278,6 @@ for (const y of ["sa22", "sa26"]) {
   const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
   const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA"].map((k) => labelsSlice.indexOf(`${k}.map`));
   assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
-=======
-  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and New South Wales, Victorian and South Australian state elections"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
->>>>>>> 5edc1644 (Election map: the 2001 federal frame wired end to end)
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
   // federal four-char keys was why it was written that way)
