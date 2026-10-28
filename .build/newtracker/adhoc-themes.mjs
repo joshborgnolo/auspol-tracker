@@ -57,6 +57,7 @@ export const THEME_OF = {
   "government-relationship-with-trump": "trump-us",
   "us-reliable-military-ally": "trump-us",
   // essential
+  "us-midterms": "trump-us",
   "trump-presidency-impact": "trump-us",
   "us-alignment": "trump-us",
   "us-vs-middle-powers": "trump-us",
@@ -127,6 +128,8 @@ export const THEME_OF = {
   // essential+resolve
   "liberal-direction": "one-nation",
   "gender-quotas-coalition": "one-nation",
+  // essential
+  "one-nation-government-impact": "one-nation",
   // news24
   "coalition-one-nation-cooperation": "one-nation",
   "one-nation-readiness-to-govern": "one-nation",
@@ -229,6 +232,9 @@ export const THEME_OF = {
   // essential
   "interest-rate-contributors": "cost-of-living",
   "healthcare-cost-impact": "cost-of-living",
+  "cost-of-living-impact": "cost-of-living",
+  "cost-of-living-reasons": "cost-of-living",
+  "inequality": "cost-of-living",
   "working-life-concerns": "cost-of-living",
   "better-or-worse-off": "cost-of-living",
   "economy-2026-expectations": "cost-of-living",
@@ -398,6 +404,7 @@ export const THEME_OF = {
   "violence-against-women": "tech-society",
   "manosphere-awareness": "tech-society",
   "manosphere-attitudes": "tech-society",
+  "gender-equality-views": "tech-society",
   // news24
   "social-media-ban-under16": "tech-society",
   // secnewgate
@@ -434,6 +441,7 @@ export const THEME_OF = {
   "party-trust-economy": "trust-democracy",
   "government-issue-performance": "trust-democracy",
   "health-services-performance": "trust-democracy",
+  "party-trust-best-interests": "trust-democracy",
   "public-health-confidence": "trust-democracy",
   "policy-support-battery": "trust-democracy",
   "bondi-policies": "trust-democracy",
@@ -485,6 +493,8 @@ export const THEME_OF = {
   "melbourne-cup-attitudes": "cut",
   "melbourne-cup-betting": "cut",
   "melbourne-cup-interest": "cut",
+  "qld-ir-awareness": "cut",
+  "qld-ir-support": "cut",
   "santa-tradition": "cut",
   "australians-qualities": "cut",
   "personal-qualities": "cut",

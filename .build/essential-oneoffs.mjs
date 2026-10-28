@@ -261,15 +261,32 @@ const MANIFEST = [
   { id: "racism", ds: "racism_in_australia" },
 
   /* one-offs, seasonal & standalone batteries */
-  { id: "melbourne-cup-interest", ds: "interest_in_the_melbourne_cup" },
-  { id: "melbourne-cup-betting", ds: "betting_activity_and_the_melbourne_cup" },
-  { id: "melbourne-cup-attitudes", ds: "attitudes_to_the_melbourne_cup" },
+  /* the October 2026 wave re-filed the Cup battery under its question-page
+     longhand ids (…_trend / …_by_cut) – assert-merged per the duplicate id
+     space note above */
+  { id: "melbourne-cup-interest", ds: "interest_in_the_melbourne_cup",
+    also: ["interest_in_the_melbourne_cup_trend", "interest_in_the_melbourne_cup_by_gender", "interest_in_the_melbourne_cup_by_age", "interest_in_the_melbourne_cup_by_voting_intention"] },
+  { id: "melbourne-cup-betting", ds: "betting_activity_and_the_melbourne_cup",
+    also: ["betting_activity_and_the_melbourne_cup_trend", "betting_activity_and_the_melbourne_cup_by_gender", "betting_activity_and_the_melbourne_cup_by_age", "betting_activity_and_the_melbourne_cup_by_voting_intention"] },
+  { id: "melbourne-cup-attitudes", ds: "attitudes_to_the_melbourne_cup", also: ["attitudes_to_the_melbourne_cup_trend"] },
   { id: "santa-tradition", ds: "impact_of_santa_tradition" },
   { id: "violence-against-women", ds: "views_on_violence_against_women_in_australia" },
   { id: "manosphere-awareness", ds: "manosphere_awareness" },
   { id: "manosphere-attitudes", ds: "attitudes_to_manosphere_content" },
   { id: "policy-support-battery", ds: "policy_support", note: "Support/oppose battery on the February 2026 policy slate (industry protection, the wealth gap, tech regulation, …)." },
   { id: "initiatives-menu", ds: "support_for_initiatives", note: "'% selected' menu of One Nation-aligned policy initiatives (June 2026), filed with the wave's One Nation consideration cut." },
+
+  /* the 2026-10-27 wave's reads */
+  { id: "inequality", ds: "social_and_economic_inequality", note: "The long-running trend read: is inequality in Australia increasing?" },
+  { id: "gender-equality-views", ds: "views_towards_gender_equality_in_australia" },
+  { id: "party-trust-best-interests", ds: "party_trust_to_ensure_economic_best_interests_of_australians",
+    note: "Sibling battery of party-trust-economy: trusted that the economy works for everyday Australians. The platform split it off E535 (manage-the-economy) for this read." },
+  { id: "cost-of-living-impact", ds: "impact_of_cost_of_living", note: "Where the cost-of-living squeeze bites in daily life (sleep, …)." },
+  { id: "cost-of-living-reasons", ds: "reasons_for_the_rising_cost_of_living" },
+  { id: "one-nation-government-impact", ds: "opinion_on_one_nation_leading_the_federal_government", note: "Better or worse off per issue under a One Nation-led federal government." },
+  { id: "us-midterms", ds: "views_on_us_midterms" },
+  { id: "qld-ir-awareness", ds: "awareness_of_the_queensland_governments_planned_changes_to_the_industrial_relations_system", note: "State-politics read (theme-cut: a federal page does not carry it)." },
+  { id: "qld-ir-support", ds: "agreement_to_the_statements_about_the_queensland_governments_proposed_changes", note: "State-politics read (theme-cut: a federal page does not carry it)." },
 ];
 const EXCLUDE = {
   primary: "primary voting intention – channelled into polls.json",
@@ -374,6 +391,17 @@ const G_ONC = [
 ];
 const GROUP_ORDER = [...G_GENDER, ...G_AGE, ...G_PARTY, ...G_ONC];
 
+/* Token → voter-cut name, for the vis-blank whole-table crosstab dumps the
+   October 2026 wave arrived as (the cut head is missing: the group label
+   sits on ans, the printed answer/metric on key). gender/age/party vocabs
+   are disjoint, so one token tells the cut; G_ONC stays out of it (its
+   tokens – "unsure" and friends – are real answer options elsewhere). */
+const GROUP_OF_TOKEN = new Map([
+  ...G_GENDER.map((g) => [g, "By gender"]),
+  ...G_AGE.map((g) => [g, "By age"]),
+  ...G_PARTY.map((g) => [g, "By voting intention"]),
+]);
+
 const DIM_NAMES = {
   gender: "By gender", age: "By age",
   voting_intention: "By voting intention", vote: "By voting intention",
@@ -408,6 +436,16 @@ const CONTEXT_GROUPS = {
    vis=Voting-intention folds fail the rollout test both ways (its
    groups sit in ans, not key) and stay guard failures. */
 const DIM_OF_VIS = { "by gender": "gender", gender: "gender", "by age": "age", age: "age", "voting intention": "voting_intention", "by voting intention": "voting_intention", "previous vote": "previous_vote" };
+
+/* Party-named-ANSWER batteries (the trust-to-manage family, E535): the
+   all-voters answers are party names, so a voting-intention fold row
+   carries party words on BOTH sides – the vocab test cannot place the
+   group. Declared per dataset: the voter group is ALWAYS on ans, the
+   trusted-party answer on key. */
+const PARTY_ANSWER_BATTERY = new Set([
+  "party_trust_to_manage_the_economy",
+  "party_trust_to_ensure_economic_best_interests_of_australians",
+]);
 
 /* ---- load the corpus ---------------------------------------------------- */
 const rawRows = parseCSV(fs.readFileSync(CSV_PATH, "utf8"));
@@ -522,6 +560,13 @@ function mergedRows(ids) {
    (vis/dim words name cuts on AV rows too); a row with a group label on
    BOTH sides is an ambiguity the build refuses. */
 function foldGroup(r) {
+  /* A whole-table crosstab dump carried without its cut head (vis blank:
+     the October 2026 wave's seasonal/state batteries) – the group label
+     sits on ans, the printed answer/metric on key, and the token's vocab
+     names the cut. */
+  if (!norm(r.vis) && (!norm(r.dim) || norm(r.dim) === "item")
+    && GROUP_OF_TOKEN.has(norm(r.ans)) && norm(r.key) && norm(r.key) !== "overall")
+    return { t: GROUP_OF_TOKEN.get(norm(r.ans)), group: r.ans, metric: r.key };
   const t0 = VIS_NAMES[norm(r.vis)] || DIM_NAMES[norm(r.dim)] || null;
   let t = t0;
   if (t && norm(r.vis) && DIM_OF_VIS[norm(r.vis)]) {
@@ -538,6 +583,9 @@ function foldGroup(r) {
   const inKey = s.has(norm(r.key));
   if (!inAns && !inKey) return null;
   if (inAns && inKey) {
+    /* party-answer batteries (declared): the voting-intention fold is a
+       party×party grid, voter group on ans, trusted-party answer on key */
+    if (PARTY_ANSWER_BATTERY.has(r.ds) && t === "By voting intention") return { t, group: r.ans, metric: r.key };
     die(`fold row with group labels on both sides: "${r.ans}" / "${r.key}" (${r.ds} @ ${r.date})`);
     return null;
   }

@@ -292,13 +292,13 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   assert.equal(sec.v, -39, "SEC Newgate's November 2025 net quotes its printed 60% negative (21 - 60), not the parts' 59");
   /* the stores as filed: a trend chart's month point sits with the report
      that asked the question (happiness was asked on 30 Sep 2026 only; the
-     Melbourne Cup on 29 Oct 2025), and no all-voters grid carries a column
-     no row fills */
+     Melbourne Cup each late-October Cup-eve report), and no all-voters grid
+     carries a column no row fills */
   const waves = (id, house) => entries.filter((e) => e.id === id && e.house === house).map((e) => e.waveDate).sort();
   assert.deepEqual(waves("happiness-personal", "essential"), ["2026-09-29"], "happiness: one wave, the 30 Sep 2026 report's");
   assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
   for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])
-    assert.deepEqual(waves(id, "essential"), ["2025-10-28"], `${id}: the 29 Oct 2025 report's alone`);
+    assert.deepEqual(waves(id, "essential"), ["2025-10-28", "2026-10-27"], `${id}: each Cup read under the Cup-eve report that asked it`);
   for (const e of entries) for (const t of e.tables) {
     if (!t.headers || !t.rows.length) continue;
     t.headers.forEach((h, i) => assert.ok(!i || t.rows.some((r) => r[i] != null), `${e.id} @ ${e.waveDate}: "${h}" is a column no row fills`));
