@@ -134,6 +134,16 @@ for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.equal(Object.keys(SV.divs).length, 150, "senate-vote-2001 has all divisions");
   const seatsById = r.divs.map((d) => d.n).sort();
   assert.deepEqual(D.divs.map((d) => d.n).sort(), seatsById, "data-2001.json and res-2001.json carry the same divisions");
+  // the timeline rail's two surfaces: its year registry covers every year the
+  // list carries (a missing one used to give YEAR_X[oldAnchor] a NaN), and
+  // the scale's left anchor is the list's own head, never a literal year
+  {
+    const base = part("app-1-base.js");
+    const YX = base.match(/const YEAR_X = \{([^}]*)\}/)[1];
+    for (const y of js.match(/const YEARS = \[([^\]]*)\]/)[1].match(/\d{4}/g) || []) assert.ok(YX.includes(y + ":"), "YEAR_X covers " + y);
+    assert.ok(part("app-6-ui.js").includes("const FED0 = YEAR_X[YEARS_FED[0]] ?? YEARS_FED[0];"), "the timeline scale anchors at YEARS_FED[0], not at a literal earliest year");
+    assert.ok(!/YEAR_X\[20\d\d\]/.test(part("app-6-ui.js")), "no literal YEAR_X[year] anchors on the rail");
+  }
 
 }
 // the people-interp contract (derive-booth-demo-{2011,2016}.py +

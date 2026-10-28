@@ -249,7 +249,7 @@ const YEARS_SA = YEARS.filter((y) => SA_YEARS.has(y));
 const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, now: 2026.8 };
+const YEAR_X = { 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
 const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023, vic22: 2022 };
 // a state frame's history spot: the previous election's date on its row's line

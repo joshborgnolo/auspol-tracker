@@ -325,8 +325,12 @@ let tlCtx = null; // shared canvas context for measuring stop-label widths
 function renderTimeline() {
   const el = $("#time"); if (!el) return;
   const W = el.clientWidth || 600, H = el.clientHeight || 106, m = M();
-  const X = (y) => 22 + ((xOfYear(y) - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
-  const NX = (nx) => 22 + ((nx - YEAR_X[2004]) / (YEAR_X.now - YEAR_X[2004])) * (W - 44);
+  // the rail's left anchor is the years list's own head – 2004 when the span
+  // opened there, 2001 now: a year before the literal anchor used to render
+  // off the left edge with a NaN-ish hit rect (the 2001 stop the first day)
+  const FED0 = YEAR_X[YEARS_FED[0]] ?? YEARS_FED[0];
+  const X = (y) => 22 + ((xOfYear(y) - FED0) / (YEAR_X.now - FED0)) * (W - 44);
+  const NX = (nx) => 22 + ((nx - FED0) / (YEAR_X.now - FED0)) * (W - 44);
   // a state row's cursor: its own previous elections (2018/2019 before the frames
   // open, 2022 on the SA row is sa22, not the federal 2022), then the frames' spots
   const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X };
