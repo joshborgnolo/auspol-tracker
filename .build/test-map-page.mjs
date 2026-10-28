@@ -978,12 +978,13 @@ for (const y of ["sa22", "sa26"]) {
 
 // New South Wales' chambers: the Council rides South Australia's floor
 // machinery (the @sa-cells SAF table in app-3c-sa.js) — the chamber's own
-// layout plan (.build/map/src/nsw23-lc-plan/) puts its 42 members over 47
+// layout plan (.build/map/src/nsw23-lc-plan/) puts its 42 members over 49
 // desks: two straight files a side, the opposition's two rows running all
 // the way to the back wall as the government's stop short, each inner file
-// breaking into a main run and a detached rear bench of four, a seat pair
-// beside the bar on the government's side and a five-seat row hemming the
-// back wall opposite, and three clerks at the long table's wider T head —
+// breaking into a main run and a detached rear bench of four, and along the
+// back wall a five-seat long bench on the left with a two-seater beside it
+// on the centre-left and a matching pair to the bar's right, three clerks at
+// the long table's wider T head —
 // but the Assembly is Victoria's sister room, a
 // horseshoe about a rectangular central table with no Hansard desk, so it
 // draws on the House's own idiom in app-3-chamber.js (the @nsw-cells NSWB
@@ -994,35 +995,37 @@ for (const y of ["sa22", "sa26"]) {
   const { SAF, saCells } = new Function(`${src.match(/@sa-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @sa-cells-end \*\//)[1]}; return { SAF, saCells };`)();
   assert.ok(!("nswLA" in SAF), "the old straight-block nswLA floor is retired (the Assembly rides NSWB)")
   const nswLC = saCells(SAF.nswLC);
-  assert.equal(nswLC.length, 47, "the NSW Council's floor: 47 desks for the 42 members (five stand spare) besides the President's chair");
+  assert.equal(nswLC.length, 48, "the NSW Council's floor: 48 desks for the 42 members (six stand spare) besides the President's chair");
   assert.equal(new Set(nswLC.map((c) => c.id)).size, nswLC.length, "nswLC: desk ids unique");
-  assert.deepEqual([nswLC.filter((c) => c.x < 0).length, nswLC.filter((c) => c.x > 0).length], [24, 23], "nswLC: 24 desks to the government's side (the long bench is theirs), 23 to the opposition's");
-  // the 2026-10-28 rear rebuild and its 2026-10-29 walk-back over the shipped floor (the
+  assert.deepEqual([nswLC.filter((c) => c.x < 0).length, nswLC.filter((c) => c.x > 0).length], [25, 23], "nswLC: 25 desks to the government's side (the long bench and its centre pair are theirs), 23 to the opposition's");
+  // the 2026-10-28 rear rebuild and its 2026-10-29 walks back over the shipped floor (the
   // user's calls): only the opposition's two rows run all the way to the back wall; each
   // inner file breaks into a main run and a detached bench of four at the rear (the
-  // government's tail falling back clear of the wall row); the long five-seat bench hemming
-  // the back wall's left and the pair to its right, spread a chair width apart; five desks
-  // stand vacant at the outer files' tails; and the long table's head widened to a T with
-  // three clerks chairing it (their short desk by the dais gone), the flank chairs walked
+  // government's tail falling well clear, +30, of the wall seats); the room widened a little
+  // for the air the furniture needed — the inner files pulled an aisle off the table; along
+  // the back wall, the long five-seat bench on the left, a matching two-seat bench beside it
+  // on the centre-left, and a pair to the bar's right, all spread a chair's air apart; seven
+  // desks stand vacant at the outer files' tails; and the long table's head widened to a T
+  // with three clerks chairing it (their short desk by the dais gone), the flank chairs walked
   // down the stem out of the wings — the Usher at its rounded bar end, the Black Rod on its
   // inset, and the transverse backing staying outline-only
   {
     const F = SAF.nswLC, benchW = 46 / 2 + 4, benchD = 50 / 2 + 4;
     assert.deepEqual(F.straight.map((r) => r.ys[0]), F.straight.map(() => -468), "nswLC: the four files' head ends all start level");
     const [inL, inR, outL, outR] = F.straight;
-    assert.ok(inL.row === 1 && inR.row === 1 && inL.x === 152 && inR.x === 152, "nswLC: the inner files share their line, one bench list a side");
+    assert.ok(inL.row === 1 && inR.row === 1 && inL.x === 168 && inR.x === 168, "nswLC: the inner files share their line, one bench list a side, an honest aisle off the table");
     assert.ok(outL.row === 2 && outR.row === 2 && outL.x === 272 && outR.x === 272, "nswLC: the outer files share their line, one bench list a side");
-    assert.equal(inL.ys.length, 9, "nswLC: the government's inner file seats nine (a main five and a detached four)");
+    assert.equal(inL.ys.length, 8, "nswLC: the government's inner file seats eight (a main four and a detached four)");
     assert.equal(inR.ys.length, 10, "nswLC: the opposition's inner file seats ten (a main six and a detached four)");
     assert.equal(outL.ys.length, 10, "nswLC: the government's outer file seats ten and stops short of the back");
     assert.equal(outR.ys.length, 11, "nswLC: the opposition's outer file seats eleven, running to the back");
-    assert.equal(inL.ys[8], 55, "nswLC: the government's detached bench falls back clear of the back-wall row");
+    assert.equal(inL.ys[7], 30, "nswLC: the government's detached bench falls back well clear of the back-wall seats");
     assert.equal(inR.ys[9], 151.2, "nswLC: the opposition's detached bench ends all the way at the back");
     assert.equal(outL.ys[9], 50.4, "nswLC: the government's outer file ends short of the back");
     assert.equal(outR.ys[10], 150, "nswLC: the opposition's outer file goes all the way to the back");
     const gapOf = (ys) => Math.max(...ys.map((y, j) => j && +(y - ys[j - 1]).toFixed(1)).slice(1));
     assert.ok(gapOf(inL.ys) > 86 && gapOf(inR.ys) > 86, "nswLC: the inner files' detached benches stand an aisle apart from their main runs");
-    for (const [ys, runs, tag] of [[inL.ys, [5, 4], "government's inner"], [inR.ys, [6, 4], "opposition's inner"], [outL.ys, [10], "government's outer"], [outR.ys, [11], "opposition's outer"]]) {
+    for (const [ys, runs, tag] of [[inL.ys, [4, 4], "government's inner"], [inR.ys, [6, 4], "opposition's inner"], [outL.ys, [10], "government's outer"], [outR.ys, [11], "opposition's outer"]]) {
       let at = 0;
       for (const n of runs) {
         const span = ys.slice(at, at + n), p = span.map((y, j) => j && +(y - span[j - 1]).toFixed(1)).slice(1);
@@ -1035,7 +1038,7 @@ for (const y of ["sa22", "sa26"]) {
       assert.ok(y + benchW <= F.room[3], `nswLC row ${r.row}: no backing over the carpet's bottom edge`);
       for (const sx of [r.x - benchD, r.x + benchD]) assert.ok(Math.abs(sx) <= -F.room[0], `nswLC row ${r.row}: the file's whole width fits the room`);
     }
-    assert.deepEqual(F.vacant, ["C8", "C9", "C10", "D10", "D11"], "nswLC: the five spare desks stand at the back of the outer files");
+    assert.deepEqual(F.vacant, ["C8", "C9", "C10", "D9", "D10", "D11"], "nswLC: the six spare desks stand at the back of the outer files");
     {
       const deskIds = new Set(nswLC.map((c) => c.id));
       assert.ok(F.vacant.every((id) => deskIds.has(id)), "nswLC: every spare desk is a desk on the floor");
@@ -1059,25 +1062,25 @@ for (const y of ["sa22", "sa26"]) {
     assert.ok(F.transverse.y1 > F.transverse.y0 && F.transverse.gap < F.transverse.half / 2, "nswLC: the transverse backing splits at the bar gap");
     {
       const rear = F.singles || [];
-      assert.equal(rear.length, 7, "nswLC: seven member seats line the back wall");
+      assert.equal(rear.length, 9, "nswLC: nine member seats line the back wall — a five-seat long bench, a two-seater beside it on the centre-left, and a pair to the bar's right");
       for (const q of rear) {
         assert.ok(!!q.L !== !!q.R, "nswLC: a rear-wall seat belongs to the one side's row");
         assert.ok(q.y === 119 && q.y + benchW <= F.transverse.y0 && q.y > F.ltable.y1, "nswLC: a rear-wall seat backs onto the transverse line, clear of the table");
         assert.ok(q.x - benchD >= F.transverse.gap, "nswLC: the rear-wall seats stand clear of the bar gate");
       }
       const lx = rear.filter((q) => q.L).map((q) => q.x).sort((a, b) => a - b), rx = rear.filter((q) => q.R).map((q) => q.x).sort((a, b) => a - b);
-      assert.deepEqual(lx, [44, 100, 156, 212, 268], "nswLC: the long five-seat bench hems the back wall's left");
-      assert.deepEqual(rx, [44, 100], "nswLC: the pair stands to the long bench's right, across the bar");
-      for (const xs of [lx, rx]) assert.ok(xs.every((x, j) => !j || x - xs[j - 1] >= 56), "nswLC: the back-wall chairs spread a chair's width apart, nothing butting");
+      assert.deepEqual(lx.slice(2), [150, 200, 250, 300, 350], "nswLC: the long five-seat bench hems the back wall's left-outer line");
+      assert.deepEqual(lx.slice(0, 2), [44, 94], "nswLC: the two-seat bench stands on the centre-left, beside the bar");
+      assert.deepEqual(rx, [44, 94], "nswLC: a matching pair stands to the bar's right");
+      assert.ok(lx.every((x, j) => !j || x - lx[j - 1] >= 50) && rx.every((x, j) => !j || x - rx[j - 1] >= 50), "nswLC: the back-wall chairs spread a chair's air apart, nothing butting");
       assert.ok(lx[lx.length - 1] + 22 <= -F.room[0], "nswLC: the long bench keeps its last seat inside the carpet's west wall");
-      assert.ok(rx[0] - 22 >= F.transverse.gap, "nswLC: the pair's nearest seat clears the bar");
-      assert.ok(lx[0] - 22 >= F.transverse.gap, "nswLC: the long bench's nearest seat clears the bar");
-      assert.ok(inL.ys[8] + 21 < 119 - 21, "nswLC: the government's detached tail's last chair clears the long bench's line");
+      assert.ok(inL.ys[7] + 21 < 119 - 21, "nswLC: the government's detached tail's last chair clears the back-wall seats' line");
+      assert.ok(F.transverse.half >= lx[lx.length - 1] + benchW, "nswLC: the transverse backing runs the full width of the wall row");
     }
     const rearSeats = nswLC.filter((c) => c.row === 2 && c.y > 0 && c.fa === -Math.PI / 2);
-    assert.equal(rearSeats.length, 7, "nswLC: seven member seats stand at the back wall, facing up the chamber");
+    assert.equal(rearSeats.length, 9, "nswLC: nine member seats stand at the back wall, facing up the chamber");
     const widest = Math.max(...F.straight.map((r) => r.x + benchD), F.transverse.half);
-    assert.equal(F.transverse.half, widest, "nswLC: the transverse backing is the widest seat, level with the outer files");
+    assert.equal(F.transverse.half, widest, "nswLC: the transverse backing is the widest seat of all, running the wall row's full width");
     assert.ok(Math.abs(-F.room[0] - (widest + 5.4)) <= 0.6 && F.room[0] === -F.room[2], "nswLC: the side walls hug the seats (widest seat + skirt), level either side");
   }
   assert.ok(!part("app-3c-sa.js").includes('put("The table"'), "no furniture labels on the Council's floor (the nameplate is gone)");
