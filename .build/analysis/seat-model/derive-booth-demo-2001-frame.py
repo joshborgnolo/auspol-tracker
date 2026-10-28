@@ -75,10 +75,11 @@ fail, hash16 = lane.fail, lane.hash16
 # verbatim recipe carry: tally loader, share composition and the
 # BANDS/STATE_ORDER tables live on the 2004-election lane this script
 # shadows (its shares() nests inside main(), so the recipe text is
-# mirrored below — keep the two in lock-step)
+# mirrored below — keep the two in lock-step, birthplace menu included)
 load_tally = lane.load_tally
 STATE_ORDER = lane.STATE_ORDER
 BANDS = lane.BANDS
+COB_KEYS01 = lane.COB_KEYS01
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2001set.json"
@@ -144,6 +145,13 @@ def shares(rec):
         "age": {b: round(rec["bands"][i] / bsum, 4)
                 for i, b in enumerate(BANDS)},
     }
+    if rec.get("cobn") is not None:
+        # the birthplace menu: shares on the same stated-birthplace
+        # basis as fborn itself (measured lane — no interp demoI ever
+        # carries a cob key, per the app contract)
+        s["cob"] = {k: round(rec["cobn"][i] / fb, 4) if fb > 0
+                    else None
+                    for i, k in enumerate(COB_KEYS01)}
     return s
 
 
@@ -159,7 +167,7 @@ def demo_of(r):
         "pers": r["pers"], "bands": r["bands"], "eng": r["eng"],
         "oth": r["oth"], "aus": r["aus"], "totc": r["totc"],
         "cobns": r["cobns"], "uni": r["uni"], "eduns": r["eduns"],
-        "bluen": r["bluen"], "occd": r["occd"]})
+        "bluen": r["bluen"], "occd": r["occd"], "cobn": r.get("cobn")})
 
 
 def main():
@@ -183,7 +191,8 @@ def main():
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * 11,
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
-                                  "eduns": 0, "bluen": 0, "occd": 0})
+                                  "eduns": 0, "bluen": 0, "occd": 0,
+                                  "cobn": [0] * len(COB_KEYS01)})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -198,6 +207,8 @@ def main():
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni", "eduns",
                   "bluen", "occd"):
             acc[k] += r[k]
+        for i in range(len(COB_KEYS01)):
+            acc["cobn"][i] += r["cobn"][i]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     nat = defaultdict(int)
@@ -211,6 +222,8 @@ def main():
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
+    natcob = [sum(dv["cobn"][i] for dv in divsum.values())
+              for i in range(len(COB_KEYS01))]
     national = {
         "persons": nat["pers"],
         "langOther": round(nat["oth"] / nat_eo, 4),
@@ -220,6 +233,8 @@ def main():
         "age0_14": round((nat["bands"][0] + nat["bands"][1]) /
                          nat["pers"], 4),
         "age65ov": round(sum(nat["bands"][8:]) / nat["pers"], 4),
+        "cob": {k: round(natcob[i] / nat_fb, 4)
+                for i, k in enumerate(COB_KEYS01)},
     }
     # measured-once pin (the 2004 lane's own figure): the tally total
     # (18,652,828) less the 8,249 people of the dropped offshore class
@@ -331,7 +346,10 @@ def main():
         "d13's); OCCUPATION is the ASCO classification (pre-ANZSCO): "
         "blue-collar maps {Tradespersons, Intermediate Production & "
         "Transport, Labourers} onto the ANZSCO 3/7/8 lane (broadly "
-        "comparable per ABS, the named definitional wobble). No income "
+        "comparable per ABS, the named definitional wobble). Birthplace "
+        "countries ride cobKeys/cob (the /map/ Born-overseas country "
+        "menu: whole-UK leading as eng leads the 2021-era menu, then "
+        "the era's eight, all read from the same B 06 table). No income "
         "lanes: the repo's income floor stays at the 2013 election, so "
         "this store carries no incomeCuts record and its demo blocks "
         "carry no income keys.")
@@ -367,6 +385,7 @@ def main():
         },
         "election": 2001,
         "censusEdition": 2001,
+        "cobKeys": COB_KEYS01,
         "deliveryBasis": (
             "venue-CD join per booth (inherit lane: the 2004 seifa "
             "store's own 2001-CD geo for the same premises; point-in-"

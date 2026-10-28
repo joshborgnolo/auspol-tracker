@@ -205,15 +205,17 @@ const dmFor = (m) => (hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k)));
 // names a country the lens reads that country's share (the census's
 // country-stated basis, the same as fborn) everywhere fborn would be
 // read. Each year's menu is its own cobKeys (10 keys on 2021-census
-// bases, 8 on the 2006/2011 editions, which merge the whole UK — so
-// England and Scotland are 2016-onward only). Range caps are measured
+// bases; 9 on the 2001 edition, whose B 06 prints a whole-UK row the
+// menu leads with; 8 on the 2006/2011 editions — England and Scotland
+// are 2016-onward only, every other era merging them inside a UK row
+// or row-class). Range caps are measured
 // just above each country's division maximum across the frames (booth
 // tails saturate past the cap, the fborn lane's way)
-const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
+const COB_NAME = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
 // the picker's "Born in …" labels (definite article where the name takes one)
-const COB_BORN = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "the Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
-const COB_VERB = { eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
-const COB_RANGE = { eng: [0, 20], ind: [0, 25], chn: [0, 20], nzl: [0, 12], phl: [0, 12], vnm: [0, 25], zaf: [0, 7], ita: [0, 9], lka: [0, 7], sct: [0, 3] };
+const COB_BORN = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "the Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
+const COB_VERB = { uk: "were born in the United Kingdom", eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
+const COB_RANGE = { uk: [0, 25], eng: [0, 20], ind: [0, 25], chn: [0, 20], nzl: [0, 12], phl: [0, 12], vnm: [0, 25], zaf: [0, 7], ita: [0, 9], lka: [0, 7], sct: [0, 3] };
 const isCob = () => S.index === "fborn" && S.cob != null;
 // the active people-lane share of a division, as a fraction (cob-aware)
 const demoShare = (d) => (isCob() ? (d.demo && d.demo.cob ? d.demo.cob[S.cob] : null) : d.demo ? d.demo[S.index] : null);

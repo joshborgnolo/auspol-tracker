@@ -13,8 +13,11 @@ matter; the people lanes need six:
   B 03  Age by sex          THREE column-block layout (0-29 | 30-59 |
                         60-100+), five-year subtotal rows - merged to
                         the pipeline's 11 G01 bands
-  B 06  Birthplace (countries)        Australia, Not stated,
-                        Overseas visitors, Total
+  B 06  Birthplace (countries)       Australia, Not stated,
+                        Overseas visitors, Total, and the nine country
+                        rows of the /map/ Born-overseas menu
+                        (COB01_KEYS: uk + the era's eight, the per-CD
+                        cobn vector)
   B 08  Language spoken at home       Speaks English only, "Speaks
                         other language: Total", Overseas visitors
   B 23  Non-school qualification      Postgraduate/GradDip/Bachelor,
@@ -93,6 +96,26 @@ OCC_GROUPS = [
 BLUE = {"Tradespersons and Related Workers",
         "Intermediate Production and Transport Workers",
         "Labourers and Related Workers"}
+# B 06's birthplace country rows -> the /map/ Born-overseas country menu
+# (a per-CD `cobn` vector on the tally rec, in this exact order). The
+# whole-era menu: the eight the 2006/2011-census stores print, plus the
+# whole-UK row this edition's own table carries ("United Kingdom"
+# merges England/Scotland/Wales/NI/Channel-Islands like the GCP-era
+# B09 does) — "uk" leads the list exactly as "eng" leads the 2021-era
+# menu, the remaining eight follow the site key order.
+COB01_KEYS = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+              "lka"]
+COB01_PREFIX = {
+    "uk": "united kingdom",
+    "ind": "india",
+    "chn": "china",
+    "nzl": "new zealand",
+    "phl": "philippines",
+    "vnm": "viet nam",
+    "zaf": "south africa",
+    "ita": "italy",
+    "lka": "sri lanka",
+}
 
 import openpyxl  # noqa: E402
 
@@ -156,6 +179,7 @@ def parse_cd(member_name, wb):
                 "bands": [0] * 11, "aus": None, "totc": None,
                 "cobns": None, "eng": None, "oth": None, "uni": None,
                 "eduns": None, "bluen": None, "occd": None,
+                "cobn": None,
                 "shortCd": True}
 
     def sheet_rows(name, minc, maxc):
@@ -210,18 +234,39 @@ def parse_cd(member_name, wb):
 
     # ---- B 06 birthplace
     aus = cobns = b6_ov = b6_total = None
+    elsewhere = None
+    others = 0
+    cob = {k: None for k in COB01_KEYS}
     for row in sheet_rows("B 06", 1, 4):
         lab = label_of(row)
         per = cell_of(row, 3)
         if lab == "australia":
             aus = per
-        elif lab == "not stated":
-            if cobns is None:
-                cobns = per
+        elif lab.startswith("born elsewhere overseas"):
+            elsewhere = per
         elif lab.startswith("overseas visit"):
             b6_ov = per
         elif lab == "total":
             b6_total = per
+        elif lab.startswith("not stated"):
+            if cobns is None:
+                cobns = per
+        else:
+            hit = False
+            for k, pref in COB01_PREFIX.items():
+                if lab.startswith(pref):
+                    cob[k] = per
+                    hit = True
+                    break
+            if not hit:
+                # the twenty-odd named countries outside the menu (and
+                # the table's footnote text rows, cell_of 0) — kept as
+                # one residual count so the table fully recomposes
+                others += per
+    cob_miss = [k for k, v in cob.items() if v is None]
+    if cob_miss or elsewhere is None:
+        raise KeyError(f"{member_name}: B 06 menu rows drifted "
+                       f"(missing {cob_miss}, elsewhere {elsewhere is None})")
 
     # ---- B 08 language: language lists carry inner subtotal rows
     # (Chinese languages etc.), so the sheet's arithmetic gives the
@@ -294,6 +339,9 @@ def parse_cd(member_name, wb):
         "uni": pgrad + gdip + bach, "eduns": eduns,
         "bluen": sum(occ[g] for g in OCC_GROUPS if g in BLUE),
         "occd": sum(occ.values()),
+        "cobn": [cob[k] for k in COB01_KEYS],
+        "b6Others": others,
+        "b6Elsewhere": elsewhere,
     }
 
 
@@ -354,6 +402,13 @@ def main():
                 checks["bands"] += 1
             if abs(rec["b1Persons"] - rec["pers"]) > TOL:
                 checks["prof-b1"] += 1
+            # the birthplace composition recomposes its table total
+            # within perturbation slack (menu countries + the residual
+            # named others + elsewhere + Australia + not stated)
+            comp = rec["aus"] + sum(rec["cobn"]) + rec["b6Others"] \
+                + rec["b6Elsewhere"] + rec["cobns"]
+            if abs(comp - rec["totc"]) > TOL * 3:
+                checks["b6cob"] += 1
             if abs(rec["totc"] - rec["pers"]) > 20:
                 checks["prof-b6"] += 1
             if rec["uni"] == 0 and rec["pers"] > 50:
@@ -391,6 +446,12 @@ def main():
                                 for r in tally.values()) / bands_tot, 4),
            "age65ov": round(sum(sum(r["bands"][8:])
                                 for r in tally.values()) / bands_tot, 4)})
+    cobnat = {k: sum((r["cobn"] or [0] * len(COB01_KEYS))[i]
+                     for r in tally.values())
+              for i, k in enumerate(COB01_KEYS)}
+    print("birthplace countries (share of the stated birthplace base "
+          f"{fbd:,}):",
+          {k: round(v / fbd, 4) for k, v in cobnat.items()})
     out_path.write_text(json.dumps({"tally": tally}) + "\n",
                         encoding="utf-8")
     print(f"OK -> {out_path} ({len(tally)} CDs)")

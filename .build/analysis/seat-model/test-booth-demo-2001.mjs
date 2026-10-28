@@ -59,6 +59,10 @@ eq([c.booths, c.boothsGeo, c.boothsGeoMissing, c.boothsGeoEmpty,
 eq(c.national, {
   persons: 18644579, langOther: 0.1594, fborn: 0.2318, uni: 0.1461,
   blue: 0.2951, age0_14: 0.2088, age65ov: 0.1265,
+  cob: {
+    uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
+    vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
+  },
 }, "c0 national (2001 census anchors)");
 {
   const divs = new Map(d.divisions.map((x) => [x.div, x]));
@@ -184,6 +188,48 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   ok(keyok, "2004 booth demoI keys + per-lane blend/null rule");
   eq([blendC, bothNullC], [6718, 1516],
     `2004 demoI profile: ${blendC} blended, ${bothNullC} null`);
+}
+
+// ── 6. the birthplace menu on the c0 side (B 06's country rows, uk-led;
+// the demoI blend NEVER carries cob — cob reads the measured store only)
+eq(d.cobKeys, ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"],
+  "c0 cob menu order (whole-UK leading like eng leads the 2021-era menu)");
+eq(c.national.cob, {
+  uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
+  vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
+}, "c0 national birthplace pool (the extractor's printed shares — letter-for-letter the frame store's)");
+{
+  const dd = new Map(d.divisions.map((x) => [x.div, x]));
+  const M = dd.get("Moore");
+  eq([M.cob.uk, M.cob.ind, M.cob.chn, M.cob.vnm, M.cob.ita],
+    [0.2004, 0.0056, 0.0019, 0.0019, 0.0061],
+    "Moore tops the menu (the app's uk park cap sits just above the max)");
+  const L = dd.get("Lingiari");
+  eq([L.cob.uk, L.cob.chn, L.cob.ind, L.cob.vnm, L.cob.ita],
+    [0.0378, 0.0005, 0.0013, 0.0016, 0.0023],
+    "Lingiari's c0 anchors (the 2003ed era read)");
+  let missing = 0, bad = 0, interpCob = 0;
+  for (const x of d.divisions) {
+    if (x.demoI && "cob" in x.demoI) interpCob++;
+    for (const k of d.cobKeys) {
+      const v = x.cob && x.cob[k];
+      if (!(k in (x.cob || {}))) missing++;
+      if (v != null && !(v >= 0 && v <= 1)) bad++;
+    }
+  }
+  for (const b of d.booths) {
+    if (b.demoI && "cob" in b.demoI) interpCob++;
+    if (b.demo === null) continue;
+    if (!b.demo.cob) { missing++; continue; }
+    for (const k of d.cobKeys) {
+      if (!(k in b.demo.cob)) missing++;
+      const v = b.demo.cob[k];
+      if (v != null && !(v >= 0 && v <= 1)) bad++;
+    }
+  }
+  ok(missing === 0, `every c0 demo row carries all nine cob keys (${missing} missing)`);
+  ok(!bad, `c0 cob shares inside [0,1] (${bad} bad)`);
+  ok(interpCob === 0, `no demoI row ever carries cob (${interpCob} leaked)`);
 }
 
 if (failures) {

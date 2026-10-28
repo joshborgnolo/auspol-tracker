@@ -82,6 +82,10 @@ eq([c.boothsCdInherit2004, c.boothsCdPip, c.cdsAlloc,
 eq(c.national, {
   persons: 18644579, langOther: 0.1594, fborn: 0.2318, uni: 0.1461,
   blue: 0.2951, age0_14: 0.2088, age65ov: 0.1265,
+  cob: {
+    uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
+    vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
+  },
 }, "national == the 2004 lane's figure (same tally, same offshore drop)");
 // booth order == the venue store's
 {
@@ -143,6 +147,49 @@ eq(alloc.unplacedUnscored.length, 93, "unplaced == offshore class");
   eq(divs.get("Bonner"), undefined, "Bonner is a 2003-edition seat");
   const sum = d.divisions.reduce((t, x) => t + x.persons, 0);
   eq(sum, 18644579, "sum of division persons == national persons");
+}
+
+// 5. the birthplace menu (the B 06 country rows, uk-led, on the
+//    measured store; counts.national.cob pins the extractor's own
+//    printed national pool so the store's pool can be read without a
+//    recompute)
+eq(d.cobKeys, ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"],
+  "cob menu order (whole-UK leading like eng leads the 2021-era menu)");
+eq(c.national.cob, {
+  uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
+  vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
+}, "national birthplace pool (the extractor's printed shares)");
+{
+  const divs = new Map(d.divisions.map((x) => [x.div, x]));
+  const M = divs.get("Moore");
+  eq([M.cob.uk, M.cob.ind, M.cob.chn, M.cob.vnm, M.cob.ita],
+    [0.2004, 0.0056, 0.0019, 0.0019, 0.0061],
+    "Moore tops the menu (the app's uk park cap sits just above the max)");
+  const S = divs.get("Sydney");
+  eq([S.cob.uk, S.cob.chn, S.cob.ind, S.cob.vnm, S.cob.ita],
+    [0.0763, 0.0264, 0.0061, 0.0113, 0.0067], "Sydney birthplace anchors");
+  const G = divs.get("Gwydir");
+  eq([G.cob.uk, G.cob.ita], [0.0209, 0.0017], "Gwydir birthplace anchors");
+  let missing = 0, bad = 0;
+  for (const x of d.divisions) {
+    for (const k of d.cobKeys) {
+      const v = x.cob && x.cob[k];
+      if (v == null && k in (x.cob || {})) { /* explicit null ok */ }
+      if (!(k in (x.cob || {}))) missing++;
+      if (v != null && !(v >= 0 && v <= 1)) bad++;
+    }
+  }
+  for (const b of d.booths) {
+    if (b.demo === null) continue;
+    if (!b.demo.cob) { missing++; continue; }
+    for (const k of d.cobKeys) {
+      if (!(k in b.demo.cob)) missing++;
+      const v = b.demo.cob[k];
+      if (v != null && !(v >= 0 && v <= 1)) bad++;
+    }
+  }
+  ok(missing === 0, `every demo row carries all nine cob keys (${missing} missing)`);
+  ok(!bad, `cob shares inside [0,1] (${bad} bad)`);
 }
 
 if (failures) {

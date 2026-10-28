@@ -94,6 +94,12 @@ assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assem
 }
 assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
+// the birthplace menus' two eras: the 2021-GCP ten-country set, and the
+// 2001-census edition's own nine (its B 06 prints a whole-UK row the
+// menu leads with, as eng leads the GCP menu — used by both the 2001
+// and 2004 federal frames; the 2006/2011 editions trim to the eight)
+const GCP_COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka", "sct"];
+const CENSUS01_COB_KEYS = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
 for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
 }
@@ -117,7 +123,7 @@ for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 17, "the booth lane is the full columnar (16 + the census demo row)");
+  assert.equal(Object.keys(B).length, 18, "the booth lane is the full columnar (16 + census demo + birthplace rows)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -142,7 +148,11 @@ for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     const gw = D.divs.find((d) => d.n === "Gwydir");
     assert.equal(gw.demo.p, 125105, "Gwydir's census sum (a 2001-era division the 2003ed people lanes never hold)");
     assert.equal(D.divs.find((d) => d.n === "Canberra").demo.p, 151237, "Canberra's census sum");
-    assert.equal(r.cobKeys.length, 0, "the 2001 BCP tally prints no birthplace-country rows (no cob picker)");
+    assert.deepEqual(r.cobKeys, CENSUS01_COB_KEYS, "the 2001 edition's birthplace menu (whole-UK leading, then the era's eight)");
+    const bcob = r.booths.cob;
+    assert.equal(bcob.length, r.booths.n.length, "the birthplace row rides the full booth lane");
+    assert.equal(bcob.filter(Boolean).length, 6920, "birthplace rows ride exactly the landed demo rows");
+    assert.ok(bcob.every((row) => row === null || (row.length === CENSUS01_COB_KEYS.length && row.every((v) => v === null || (typeof v === "number" && v >= 0 && v <= 1)))), "every landed birthplace row carries nine 0-1 shares");
   }
   assert.ok(B.lat, "booth coordinate lane present");
   assert.equal(S.senators.length, 76, "76 senators after the 2001 election");
@@ -198,6 +208,18 @@ for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.ok(r10.incomeCuts === null, "2010 incomeCuts stays null (income floor 2013)");
   const r19 = JSON.parse(R("map/data/res-2019.json"));
   assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
+  // the birthplace menu matrix: every census-edition year lists its own
+  // cobKeys, uk-led on the 2001 edition and GCP-era on 2016+; booth cob
+  // rows ride exactly the landed demo rows everywhere
+  const VENUE08 = CENSUS01_COB_KEYS.slice(1);
+  const MENUS = { 2001: CENSUS01_COB_KEYS, 2004: CENSUS01_COB_KEYS, 2007: VENUE08, 2010: VENUE08, 2013: VENUE08, 2016: GCP_COB_KEYS, 2019: GCP_COB_KEYS, 2022: GCP_COB_KEYS, 2025: GCP_COB_KEYS };
+  for (const [y, menu] of Object.entries(MENUS)) {
+    const r = JSON.parse(R(`map/data/res-${y}.json`));
+    assert.deepEqual(r.cobKeys, menu, `${y} birthplace menu rides its own census edition`);
+    assert.equal(r.booths.cob.length, r.booths.n.length, `${y} cob rows ride the full booth lane`);
+    assert.equal(r.booths.cob.filter(Boolean).length, r.booths.demo.filter(Boolean).length, `${y} cob rows ride exactly the landed demo rows`);
+    assert.ok(r.booths.cob.every((row) => row === null || (row.length === menu.length && row.every((v) => v === null || (typeof v === "number" && v >= 0 && v <= 1)))), `${y} every landed cob row carries ${menu.length} 0-1 shares`);
+  }
 }
 // the islands past the mainland frame, drawn in inset boxes (node .build/map/islands_build.mjs)
 {
@@ -268,12 +290,11 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // ── the Born overseas birthplace sub-view (the cob lane): the fborn People
 // lane gains a country picker on the year's own census-edition menu — data
 // and app wiring assertions per frame follow in the blocks below
-const GCP_COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka", "sct"];
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js");
-  assert.ok(base.includes('const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };'), "the ten curated birthplace keys and display names in one literal");
-  assert.ok(base.includes('const COB_NAME = { eng: "England", ind: "India", chn: "China", nzl: "New Zealand"'), "the country display names");
-  assert.ok(base.includes('const COB_VERB = { eng: "were born in England"') && base.includes('sct: "were born in Scotland"'), "per-country story verbs");
+  assert.ok(base.includes('const COB_NAME = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };'), "the curated birthplace keys and display names in one literal (whole-UK first for the 2001 edition's own row)");
+  assert.ok(base.includes('const COB_BORN = { uk: "the United Kingdom"') && base.includes('phl: "the Philippines"'), "the picker's Born-in labels (whole-UK and the Philippines take their article)");
+  assert.ok(base.includes('const COB_VERB = { uk: "were born in the United Kingdom"') && base.includes('sct: "were born in Scotland"'), "per-country story verbs");
   assert.ok(base.includes("const COB_RANGE = {") && base.includes("sct: [0, 3]"), "per-country range caps (Scotland's tiny 3% cap)");
   assert.ok(base.includes('const isCob = () => S.index === "fborn" && S.cob != null;'), "the fborn-only sub-view guard");
   assert.ok(base.includes("const demoShare = (d) =>") && base.includes("const demoBoothShare = (raw, j, cobPos) =>") && base.includes("const demoRange = () =>") && base.includes("const demoRamp = () =>"), "the cob-aware lane accessors at every seam");

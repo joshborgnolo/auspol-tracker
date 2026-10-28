@@ -329,17 +329,17 @@ function areaHedDek(m, st) {
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"] };
 // the pair-of-phrases for a birthplace country, against the Australia-born share
-const COB_TOP = { eng: ["seats where the most residents were born in England", "the most Australia-born"], ind: ["seats where the most residents were born in India", "the most Australia-born"], chn: ["seats where the most residents were born in China", "the most Australia-born"], nzl: ["seats where the most residents were born in New Zealand", "the most Australia-born"], phl: ["seats where the most residents were born in the Philippines", "the most Australia-born"], vnm: ["seats where the most residents were born in Vietnam", "the most Australia-born"], zaf: ["seats where the most residents were born in South Africa", "the most Australia-born"], ita: ["seats where the most residents were born in Italy", "the most Australia-born"], lka: ["seats where the most residents were born in Sri Lanka", "the most Australia-born"], sct: ["seats where the most residents were born in Scotland", "the most Australia-born"] };
+const COB_TOP = { uk: ["seats where the most residents were born in the United Kingdom", "the most Australia-born"], eng: ["seats where the most residents were born in England", "the most Australia-born"], ind: ["seats where the most residents were born in India", "the most Australia-born"], chn: ["seats where the most residents were born in China", "the most Australia-born"], nzl: ["seats where the most residents were born in New Zealand", "the most Australia-born"], phl: ["seats where the most residents were born in the Philippines", "the most Australia-born"], vnm: ["seats where the most residents were born in Vietnam", "the most Australia-born"], zaf: ["seats where the most residents were born in South Africa", "the most Australia-born"], ita: ["seats where the most residents were born in Italy", "the most Australia-born"], lka: ["seats where the most residents were born in Sri Lanka", "the most Australia-born"], sct: ["seats where the most residents were born in Scotland", "the most Australia-born"] };
 // the measures' census basis as copy: 2001 reads its own census area
 // figures measured-only (the frame's floor year, its census ~3 months
 // before election day); 2004-2019 blend their bracketing censuses; the
 // income lanes (2013 on) count adults
 const DB = {
   venue: {
-    seats: (y) => `From the ${y < 2004 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
+    seats: (y) => `From the ${y < 2007 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in: the AEC’s record of where voters live begins in 2016.`,
     who: "of residents of the census area it stands in",
     whoAdults: "of the adults of the census area it stands in",
-    note: (y) => `From the ${y < 2004 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
+    note: (y) => `From the ${y < 2007 ? 2001 : y < 2013 ? 2006 : 2011} census, of the census areas the polling places stand in.`,
   },
   voter: {
     seats: "From the 2021 census, counted where each seat’s voters live.",

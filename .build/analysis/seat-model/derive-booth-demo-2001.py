@@ -59,7 +59,13 @@ def _lib(name, path):
 
 
 d13 = _lib("d13", "derive-booth-demo-2013.py")
+xt = _lib("xt01", "extract-bcp-2001-tally.py")
 fail, hash16 = d13.fail, d13.hash16
+
+# the /map/ Born-overseas country menu, in store-row order (the
+# extractor's own constant): whole-UK first exactly as eng leads the
+# 2021-era menu, then the era's eight in the GCP-era site order
+COB_KEYS01 = xt.COB01_KEYS
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2003ed.json"
@@ -75,10 +81,14 @@ def load_tally():
     if len(d) != exp:
         fail(f"2001 tally rows {len(d)} != {exp}")
     need = {"pers", "bands", "aus", "totc", "cobns", "eng", "oth",
-            "uni", "eduns", "bluen", "occd"}
+            "uni", "eduns", "bluen", "occd", "cobn"}
     for code, r in d.items():
         if any(k not in r for k in need):
             fail(f"2001 tally {code} row shape drift")
+        if r.get("cobn") is None and not r.get("shortCd"):
+            fail(f"2001 tally {code}: cobn missing off a full profile")
+        if r.get("cobn") is not None and len(r["cobn"]) != len(COB_KEYS01):
+            fail(f"2001 tally {code}: cobn width drift")
     print(f"2001 BCP tally: {len(d)} CDs")
     return d
 
@@ -105,7 +115,8 @@ def main():
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * 11,
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
-                                  "eduns": 0, "bluen": 0, "occd": 0})
+                                  "eduns": 0, "bluen": 0, "occd": 0,
+                                  "cobn": [0] * len(COB_KEYS01)})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -120,6 +131,8 @@ def main():
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni", "eduns",
                   "bluen", "occd"):
             acc[k] += r[k]
+        for i in range(len(COB_KEYS01)):
+            acc["cobn"][i] += r["cobn"][i]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     def shares(rec):
@@ -143,6 +156,13 @@ def main():
             "age": {b: round(rec["bands"][i] / bsum, 4)
                     for i, b in enumerate(BANDS)},
         }
+        if rec.get("cobn") is not None:
+            # the birthplace menu: shares on the same stated-birthplace
+            # basis as fborn itself (Never the blend's — cob rides the
+            # measured store; demoI never carries it)
+            s["cob"] = {k: round(rec["cobn"][i] / fb, 4) if fb > 0
+                        else None
+                        for i, k in enumerate(COB_KEYS01)}
         return s
 
     nat = defaultdict(int)
@@ -156,6 +176,8 @@ def main():
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
+    natcob = [sum(dv["cobn"][i] for dv in divsum.values())
+              for i in range(len(COB_KEYS01))]
     national = {
         "persons": nat["pers"],
         "langOther": round(nat["oth"] / nat_eo, 4),
@@ -165,6 +187,8 @@ def main():
         "age0_14": round((nat["bands"][0] + nat["bands"][1]) /
                          nat["pers"], 4),
         "age65ov": round(sum(nat["bands"][8:]) / nat["pers"], 4),
+        "cob": {k: round(natcob[i] / nat_fb, 4)
+                for i, k in enumerate(COB_KEYS01)},
     }
     # measured-once pin (first verified run): the tally's own total
     # (18,652,828) less the 8,249 people in the dropped offshore class
@@ -199,7 +223,8 @@ def main():
                 "eng": r["eng"], "oth": r["oth"],
                 "aus": r["aus"], "totc": r["totc"], "cobns": r["cobns"],
                 "uni": r["uni"], "eduns": r["eduns"],
-                "bluen": r["bluen"], "occd": r["occd"]})
+                "bluen": r["bluen"], "occd": r["occd"],
+                "cobn": r.get("cobn")})
             if rec["demo"] is None:
                 geo_empty += 1
         out_booths.append(rec)
@@ -254,7 +279,11 @@ def main():
         "(pre-ANZSCO): blue-collar maps {Tradespersons, Intermediate "
         "Production & Transport, Labourers} onto the ANZSCO 3/7/8 lane "
         "(broadly comparable per ABS, the named definitional wobble). "
-        "No income lanes: the repo's income floor stays at the 2013 "
+        "Birthplace countries ride cobKeys/cob on the measured side "
+        "(the /map/ Born-overseas country menu: whole-UK leading as eng "
+        "leads the 2021-era menu, then the era's eight); the interp "
+        "blend's demoI never carries a cob key — cob is read measured, "
+        "never blended. No income lanes: the repo's income floor stays at the 2013 "
         "election, so this store carries no incomeCuts record and its "
         "demo blocks carry no income keys; 2007-and-later years ride "
         "the SEIFA-excluded-turnout voter-games lane or the "
@@ -287,6 +316,7 @@ def main():
         },
         "election": 2004,
         "censusEdition": 2001,
+        "cobKeys": COB_KEYS01,
         "deliveryBasis": (
             "venue-CD lookup per booth (the venue seifa store's own "
             "2001-CD geo of the premises); exact CD sum per division "
