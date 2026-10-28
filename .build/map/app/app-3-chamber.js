@@ -494,7 +494,9 @@ function chamberOrder(m) {
     // the leaders at the table
     // (the states' table chairs are desks on the front bench: a leader's is theirs alone)
     const held = new Set(lead.map((i, s) => (i != null ? table[s] : null)));
-    const B = geom.bench.filter((c) => !held.has(c.k)), onBench = (d) => !lead.includes(d.i);
+    // geom.vacant (a floor with more seats than members, Sydney's Council's ledger) names the
+    // spare desks: the fill walks past them and they draw as empty outlined seats
+    const B = geom.bench.filter((c) => !held.has(c.k) && !(geom.vacant && geom.vacant.has(c.k))), onBench = (d) => !lead.includes(d.i);
     lead.forEach((i, s) => { if (i != null) at.set(i, table[s]); });
     const Gb = G.filter(onBench), Ob = O.filter(onBench);
     Gb.forEach((d, k) => at.set(d.i, B[k].k));
