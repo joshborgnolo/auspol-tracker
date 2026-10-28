@@ -13,6 +13,7 @@ import puppeteer from "puppeteer-core";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 const ROOT = decodeURIComponent(new URL("../../", import.meta.url).pathname);
 const types = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json",
                 ".css": "text/css", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
@@ -44,12 +45,15 @@ const open = async ({ W, H = 844, url = "/", pin = false, dark = false, btn = ".
   await page.click(btn); await wait(350);
   return page;
 };
-/* every visible row: its id, numeral, line and figure */
+/* every visible row: its id, numeral, line, figure - and any mini-rows */
 const rowsOf = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null).map((e) => {
   const q = (c) => { const el = e.querySelector(c); return el ? el.textContent.replace(/​/g, "") : null; };
   const id = e.getAttribute("data-id") || new URL(e.href).pathname.replace(/^\/(vic\/)?|\/$/g, "");
   return { id, n: q(".tab-menu-n, .sh-menu-n"), t: q(".tab-menu-t, .sh-menu-t"), d: q(".tab-menu-d, .sh-menu-d"),
-           v: q(".tab-menu-v, .sh-menu-v"), c: q(".tab-menu-c, .sh-menu-c"), chip: q(".tab-menu-chip, .sh-menu-chip") };
+           v: q(".tab-menu-v, .sh-menu-v"), c: q(".tab-menu-c, .sh-menu-c"), chip: q(".tab-menu-chip, .sh-menu-chip"),
+           mini: [...e.querySelectorAll(".tab-menu-fr, .sh-menu-fr")].map((fr) => ({
+             cells: [...fr.querySelectorAll(".tab-menu-fv > span, .sh-menu-fv > span")].map((c) => c.textContent),
+             cap: (fr.querySelector(".tab-menu-fc, .sh-menu-fc") || {}).textContent || "" })) };
 });
 
 /* ---- 1. every row says what its page says ---------------------------------- */
@@ -57,8 +61,8 @@ let main = null;
 {
   const page = await open({ W: 1280, H: 900 });
   main = await page.evaluate(rowsOf, ".tab-menu-pop .tab-menu-item");
-  ok(main.map((r) => r.id).join(" ") === "disagreement leans flows flows-explained public-opinion changelog",
-    "the menu's six pages, in TABS order (" + main.map((r) => r.id).join(", ") + ")");
+  ok(main.map((r) => r.id).join(" ") === "disagreement leans flows flows-explained map public-opinion changelog",
+    "the menu's seven pages, in TABS order (" + main.map((r) => r.id).join(", ") + ")");
   ok(main.every((r, i) => r.n === String(i + 1)), "numbered 1 to " + main.length);
   ok(main.every((r) => r.d && r.d.length > 12), "every page has its line");
   await page.close();
@@ -75,6 +79,7 @@ const headOf = async (url, sel) => {
     return { head: h ? h.textContent : null, dek: (h && h.nextElementSibling && h.nextElementSibling.classList.contains("rd-dek")) ? h.nextElementSibling.textContent : null,
              dis: [...document.querySelectorAll(".rd-dis-panel")].map((p) => ({ name: (p.querySelector(".rd-dis-name") || {}).textContent, sub: (p.querySelector(".rd-dis-sub") || {}).textContent })),
              topics: document.querySelectorAll(".pubop-topic").length, clDate: (document.querySelector(".cl-date") || {}).textContent || null,
+             rival: (window.AUSPOL && window.AUSPOL.latest && window.AUSPOL.latest.rivalLead) || null,
              months: all(".rd-dis-ax") };
   }, sel);
   await page.close();
@@ -96,7 +101,51 @@ const headOf = async (url, sel) => {
   if (row("flows").v) ok((row("flows").v.endsWith("%") ? fl.dek : fl.head + fl.dek).includes(row("flows").v.replace(/^[+−]/, "")),
     `flows: ${row("flows").v} is printed in the page's own words`);
   const ex = await headOf("/flows-explained/", ".view-flows-explained .rd-hed");
-  ok(ex.head === row("flows-explained").d && row("flows-explained").chip === "Explainer", "explainer: its head, and its kind for a figure");
+  ok(ex.head === row("flows-explained").d, `explainer: the line is the page's head ("${row("flows-explained").d}")`);
+  /* the explainer's figure recomputed from the committed tables the page's
+     chart and the estimator read (flows.mjs), the Coalition row first while
+     it is the main rival */
+  {
+    const { FLOW, FP_ON } = await import(pathToFileURL(path.join(ROOT, ".build", "newtracker", "flows.mjs")).href);
+    const trios = { lnp: { cap: "To Labor v Coalition", vs: [FLOW.grn, FLOW.onp, FLOW.oth] },
+                    onp: { cap: "To Labor v One Nation", vs: [FP_ON.grn, FP_ON.lnp, FP_ON.oth] } };
+    const want = (ex.rival === "alp_on" ? [trios.onp, trios.lnp] : [trios.lnp, trios.onp])
+      .map((t) => ({ cap: t.cap, cells: t.vs.map((x) => String(Math.round(x * 100))) }));
+    const got = row("flows-explained").mini.map((m) => ({ cap: m.cap, cells: m.cells }));
+    ok(JSON.stringify(got) === JSON.stringify(want) && row("flows-explained").chip == null,
+      `explainer: the two frozen tables as its figure (${want.map((w) => w.cells.join("·")).join(", ")})`);
+  }
+  /* the map row: its head and both chambers' shares recomputed from /map/'s
+     own committed data (res-2025 + data-now, senate-now), the tally gen-data
+     reads for the line */
+  {
+    const mr = row("map");
+    const fam = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn"
+      : ab === "ON" || ab === "HAN" ? "onp" : ["IND", "", "NAFD", "CSA"].includes(ab) ? "ind" : "oth");
+    const res = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "res-2025.json"), "utf8"));
+    const now = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "data-now.json"), "utf8"));
+    const hs = {}, W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    let changed = 0;
+    for (const d of res.divs) {
+      const won = d.c.find((c) => c[6]), h = now.holders[d.n];
+      const ab = h ? h.ab : won[1];
+      if (h && (h.n !== won[0] || h.ab !== won[1])) changed++;
+      hs[fam(ab)] = (hs[fam(ab)] || 0) + 1;
+    }
+    const [lead, ln] = Object.entries(hs).sort((a, b) => b[1] - a[1])[0];
+    const sen = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "senate-now.json"), "utf8"));
+    const ss = {};
+    for (const m of sen.senators) ss[fam(m.ab)] = (ss[fam(m.ab)] || 0) + 1;
+    const who = { alp: "Labor", lnp: "The Coalition" }[lead], capP = lead === "alp" ? "Labor" : "Coalition";
+    const head = `${who} holds ${ln} of the ${res.divs.length} seats`
+      + (changed ? `; ${W[changed] || changed} ${changed === 1 ? "has" : "have"} changed hands or party since the election` : "");
+    const pct = (x, t) => Math.round((100 * x) / t) + "%";
+    ok(mr.d === head, `map: the line is today's House off /map/'s own data ("${mr.d}")`);
+    ok(mr.mini.length === 2 && mr.mini[0].cap === capP + " · House of Reps" && mr.mini[0].cells[0] === pct(ln, res.divs.length),
+      `map: ${mr.mini[0] && mr.mini[0].cells[0]} of ${capP} House seats`);
+    ok(mr.mini[1] && mr.mini[1].cap === capP + " · Senate" && mr.mini[1].cells[0] === pct(ss[lead] || 0, sen.senators.length),
+      `map: ${mr.mini[1] && mr.mini[1].cells[0]} of ${capP} Senate seats`);
+  }
   const pubop = await headOf("/public-opinion/", ".view-public-opinion .rd-hed");
   ok(pubop.head === row("public-opinion").d, "Public opinion: the line is the page's head");
   const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -129,6 +178,7 @@ for (const W of [320, 360, 390, 414, 430, 600, 640, 641, 700, 860, 1024, 1280, 1
              vis: getComputedStyle(pp).visibility, gA: parseFloat(pop.style.getPropertyValue("--gap-a")), gB: parseFloat(pop.style.getPropertyValue("--gap-b")),
              figR: items.map((e) => Math.round(e.querySelector(".tab-menu-f").getBoundingClientRect().right)),
              txtL: items.map((e) => Math.round(e.querySelector(".tab-menu-txt").getBoundingClientRect().left)),
+             cols: items.map((e) => { const c = e.closest(".tab-menu-col"); return c ? [...pop.querySelectorAll(".tab-menu-col")].indexOf(c) : 0; }),
              ids: items.map((e) => new URL(e.href).pathname), info: items.some((e) => e.classList.contains("tab-menu-info")),
              docked: document.querySelector(".tabs").classList.contains("show-score"),
              stuck: document.querySelector(".tabs").classList.contains("pinned") && getComputedStyle(document.querySelector(".tabs")).position === "sticky" };
@@ -140,7 +190,12 @@ for (const W of [320, 360, 390, 414, 430, 600, 640, 641, 700, 860, 1024, 1280, 1
   ok(m.vis === "visible" && m.paper.l >= m.pop.l - 0.5 && m.paper.r <= m.pop.r + 0.5, `${W}: the tab stands on the sheet's top edge`);
   ok(near(m.pop.t, m.btn.b) && near(m.paper.b, m.pop.t), `${W}: the sheet hangs from the rule, flush under the tab`);
   ok(near(m.gA, m.paper.l - m.pop.l + 1, 1.5) && near(m.gB, m.paper.r - m.pop.l - 1, 1.5), `${W}: the top edge opens between the tab's sides`);
-  ok(m.figR.every((x) => near(x, m.figR[0])) && m.txtL.every((x) => near(x, m.txtL[0])), `${W}: the ledger's columns line up`);
+  /* each column's ledger lines up within itself (from 1060px the menu is
+     two sheets, each with its own figure column) */
+  const byCol = {};
+  m.figR.forEach((x, i) => { (byCol[m.cols[i]] ??= []).push({ f: x, t: m.txtL[i] }); });
+  ok(Object.values(byCol).every((rs) => rs.every((r) => near(r.f, rs[0].f) && near(r.t, rs[0].t))),
+    `${W}: the ledger's columns line up${Object.keys(byCol).length > 1 ? " (both sheets)" : ""}`);
   ok(m.info === (W <= 420 && m.docked), `${W}: Info ${m.info ? "joins" : "stays off"} the menu (docked=${m.docked})`);
   if (m.stuck) ok(m.pop.b <= m.vh - 12 + 1, `${W}: on the stuck bar the sheet fits the screen, its rows scrolling (${Math.round(m.pop.b)} of ${m.vh})`);
   await page.close();
@@ -150,7 +205,7 @@ for (const W of [320, 360, 390, 414, 430, 600, 640, 641, 700, 860, 1024, 1280, 1
   const page = await open({ W: 390, pin: true });
   const rows = await page.evaluate(rowsOf, ".tab-menu-pop .tab-menu-item");
   const info = rows.find((r) => r.id === "info");
-  ok(info && info.n === "7" && info.d === main.infoHead, `390 pinned: Info is 7, under its own head ("${info && info.d}")`);
+  ok(info && info.n === "8" && info.d === main.infoHead, `390 pinned: Info is 8, under its own head ("${info && info.d}")`);
   await page.close();
 }
 
@@ -199,8 +254,9 @@ for (const W of [320, 360, 390, 414, 430, 600, 640, 641, 700, 860, 1024, 1280, 1
 {
   const page = await open({ W: 1280, url: "/feedback/", btn: ".sh-menu-btn" });
   const sat = await page.evaluate(rowsOf, "#sh-menu .sh-menu-item");
-  const same = main.every((r) => { const s = sat.find((x) => x.id === r.id); return s && s.d === r.d && s.v === r.v && s.c === r.c && s.chip === r.chip; });
-  ok(same && sat.filter((s) => s.id !== "info").length === main.length, "feedback: the same six lines and figures as the main page's menu");
+  const same = main.every((r) => { const s = sat.find((x) => x.id === r.id); return s && s.d === r.d && s.v === r.v && s.c === r.c && s.chip === r.chip
+    && JSON.stringify(s.mini) === JSON.stringify(r.mini); });
+  ok(same && sat.filter((s) => s.id !== "info").length === main.length, "feedback: the same seven lines and figures as the main page's menu");
   const m = await page.evaluate(() => {
     const pop = document.getElementById("sh-menu").getBoundingClientRect(), pp = document.querySelector(".sh-menu-paper").getBoundingClientRect(),
       btn = document.querySelector(".sh-menu-btn").getBoundingClientRect();

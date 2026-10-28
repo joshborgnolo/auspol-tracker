@@ -8460,8 +8460,10 @@ const publicOpinionLatest = oneOffsSource
    (the Farrer by-election, members who changed party), read off the map's own
    committed data (map/data, built by .build/map/). Seats by party family as
    the map colours them (Community Strong with the independents), and how many
-   seats have changed hands or party since the election. Federal only; null
-   when the map's data is absent */
+   seats have changed hands or party since the election. The Senate sits
+   beside it (senate-now.json, the APH seating plan's party per senator), so
+   the menu's figure can give the leader's share of each chamber. Federal
+   only; null when the map's House data is absent */
 const house = (() => {
   if (JUR) return null;
   try {
@@ -8478,7 +8480,17 @@ const house = (() => {
       if (h && (h.n !== won[0] || h.ab !== won[1])) changed++;
       seats[fam(ab)]++;
     }
-    return { asOf: now.asOf, total: res.divs.length, seats, changed };
+    /* today's Senate, tallied on the same party families: its own try so a
+       missing floor file costs only the Senate figure, never the House line */
+    const senate = (() => {
+      try {
+        const sen = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "senate-now.json"), "utf8"));
+        const s = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
+        for (const m of sen.senators) s[fam(m.ab)]++;
+        return { asOf: sen.asOf, total: sen.senators.length, seats: s };
+      } catch (e) { console.warn("gen-data: the map's Senate data is unreadable (" + e.message + ")"); return null; }
+    })();
+    return { asOf: now.asOf, total: res.divs.length, seats, changed, ...(senate ? { senate } : {}) };
   } catch (e) { console.warn("gen-data: the map's House data is unreadable (" + e.message + ")"); return null; }
 })();
 

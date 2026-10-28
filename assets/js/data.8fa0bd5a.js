@@ -5218,7 +5218,19 @@ window.AUSPOL = function () {
       "ind": 10,
       "oth": 2
     },
-    "changed": 4
+    "changed": 4,
+    "senate": {
+      "asOf": "2026-10-09",
+      "total": 76,
+      "seats": {
+        "alp": 30,
+        "lnp": 27,
+        "grn": 10,
+        "onp": 4,
+        "ind": 2,
+        "oth": 3
+      }
+    }
   };
   const publicOpinionByRow = {
     "YouGov|2026-01-27": {

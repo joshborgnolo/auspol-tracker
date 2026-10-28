@@ -368,13 +368,32 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
       const W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
       const k = H.changed,
         kw = W[k] || String(k);
+      const head = `${who} holds ${n} of the ${H.total} seats` + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : "");
+      const party = lead === "alp" ? "Labor" : "Coalition",
+        share = (x, t) => `${Math.round(100 * x / t)}%`;
+      const S = H.senate;
+      const fig = S && S.seats && typeof S.seats[lead] === "number" ? {
+        rows: [{
+          cap: `${party} · House of Reps`,
+          cells: [{
+            v: share(n, H.total),
+            tone: lead
+          }]
+        }, {
+          cap: `${party} · Senate`,
+          cells: [{
+            v: share(S.seats[lead], S.total),
+            tone: lead
+          }]
+        }]
+      } : {
+        v: share(n, H.total),
+        cap: `${party} seats`,
+        tone: lead
+      };
       return {
-        head: `${who} holds ${n} of the ${H.total} seats` + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
-        fig: {
-          v: `${Math.round(100 * n / H.total)}%`,
-          cap: lead === "alp" ? "Labor seats" : "Coalition seats",
-          tone: lead
-        }
+        head,
+        fig
       };
     });
     put("public-opinion", () => {

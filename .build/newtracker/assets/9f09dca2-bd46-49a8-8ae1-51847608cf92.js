@@ -338,7 +338,7 @@ window.AUSPOL = (function () {
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
   const publicOpinionLatest = "2026-10-28";
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
-  const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4};
+  const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4,"senate":{"asOf":"2026-10-09","total":76,"seats":{"alp":30,"lnp":27,"grn":10,"onp":4,"ind":2,"oth":3}}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */

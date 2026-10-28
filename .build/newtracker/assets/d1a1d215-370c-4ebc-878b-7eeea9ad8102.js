@@ -425,7 +425,9 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     m.style.setProperty("--gap-a", gapA + "px");
     m.style.setProperty("--gap-b", gapB + "px");
     const list = m.querySelector(".tab-menu-list");
-    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
+    /* the 12px clearance under the sheet is measured to the pop's own bottom
+       border, so the pop's two border pixels come off the list's share */
+    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12 - (m.offsetHeight - list.offsetHeight || 2))) + "px" : "";
   };
   const openMenu = (focusAt) => {
     placeMenu();

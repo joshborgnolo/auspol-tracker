@@ -38,10 +38,11 @@
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
-     Election map        the largest party's share of the House's seats today,
-                         in its tone, under "Labor holds 94 of the 150 seats"
-                         (and how many seats have changed hands or party since
-                         the election, where any have)
+     Election map        the largest party's share of each chamber's seats
+                         today, one mini-row each for the House and the
+                         Senate, in its tone, under "Labor holds 94 of the
+                         150 seats" (and how many seats have changed hands or
+                         party since the election, where any have)
      Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
@@ -364,10 +365,12 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const fig = AP.flowsExplainedFig();
       return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
     });
-    /* the House today (/map/, a page outside this build): the largest party's
-       share of the chamber's seats as its figure, the raw count in the head,
-       and the seats that have changed hands or party since the election by
-       by-election or defection */
+    /* both chambers today (/map/, a page outside this build): the largest
+       party's share of each chamber's seats as the figure - one mini-row per
+       chamber, the explainer's rows contract - the House's raw count in the
+       head beside the seats that have changed hands or party since the
+       election by by-election or defection. A House-only dataset keeps the
+       old single figure; a federal-less build files no line at all */
     put("map", () => {
       const H = D.house;
       if (!H) return null;
@@ -376,9 +379,15 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       if (!who) return null;
       const W = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
       const k = H.changed, kw = W[k] || String(k);
-      return { head: `${who} holds ${n} of the ${H.total} seats`
-          + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : ""),
-        fig: { v: `${Math.round((100 * n) / H.total)}%`, cap: lead === "alp" ? "Labor seats" : "Coalition seats", tone: lead } };
+      const head = `${who} holds ${n} of the ${H.total} seats`
+        + (k ? `; ${kw} ${k === 1 ? "has" : "have"} changed hands or party since the election` : "");
+      const party = lead === "alp" ? "Labor" : "Coalition", share = (x, t) => `${Math.round((100 * x) / t)}%`;
+      const S = H.senate;
+      const fig = S && S.seats && typeof S.seats[lead] === "number"
+        ? { rows: [{ cap: `${party} · House of Reps`, cells: [{ v: share(n, H.total), tone: lead }] },
+                   { cap: `${party} · Senate`, cells: [{ v: share(S.seats[lead], S.total), tone: lead }] }] }
+        : { v: share(n, H.total), cap: `${party} seats`, tone: lead };
+      return { head, fig };
     });
     /* the catalogue's newest wave as a date figure, as the changelog row's */
     put("public-opinion", () => {

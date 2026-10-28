@@ -310,7 +310,7 @@ function Tabs({
     m.style.setProperty("--gap-a", gapA + "px");
     m.style.setProperty("--gap-b", gapB + "px");
     const list = m.querySelector(".tab-menu-list");
-    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
+    if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12 - (m.offsetHeight - list.offsetHeight || 2))) + "px" : "";
   };
   const openMenu = focusAt => {
     placeMenu();

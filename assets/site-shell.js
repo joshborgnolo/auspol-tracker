@@ -835,7 +835,9 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       mPop.style.borderTopLeftRadius = tied ? "0" : "";
       mPop.style.borderTopRightRadius = ends ? "0" : "";
       var list = mPop.querySelector(".sh-menu-list");
-      if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
+      /* the main page's fit, chrome and all: the 12px clearance runs to the
+         pop's bottom border, so its two border pixels come off the list */
+      if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12 - (mPop.offsetHeight - list.offsetHeight || 2))) + "px" : "";
     };
     /* the sheet follows the tab on every frame the tab moves (the main page's
        Tabs follow, 2026-10-27): the pin's .38s condense runs on after the
