@@ -2291,7 +2291,7 @@ const ARCHIVE_STAMP = "2026-10-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-10-27";
+const PREDICTION_STAMP = "2026-10-28";
 /* map/ is hand-built (.build/map/): its data is the House as at this date (the
    "Now" overlay's asOf); bump it with each rebuild of map/data */
 const MAP_STAMP = "2026-10-25";
