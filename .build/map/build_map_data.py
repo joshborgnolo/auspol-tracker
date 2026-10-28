@@ -383,12 +383,12 @@ def build_year(year, hist, base2001):
     vstore = json.load(open(vpath)) if os.path.exists(vpath) else None
     census_basis = "voter"
     if vstore is None:
-        # 2007-2013 predate the AEC's Votes-by-SA1 product, so no voter
+        # 2004-2013 predate the AEC's Votes-by-SA1 product, so no voter
         # footprint exists: read the venue-proxy store instead — a booth's
-        # figures are the census area its premises stand in (2006 census
-        # CD at 2007/2010, 2011 census SA1 at 2013), a seat's the exact
-        # census sum over its areas (real headcounts, never
-        # vote-weighted pseudo-populations)
+        # figures are the census area its premises stand in (2001 census
+        # CD at 2004, 2006 census CD at 2007/2010, 2011 census SA1 at
+        # 2013), a seat's the exact census sum over its areas (real
+        # headcounts, never vote-weighted pseudo-populations)
         p = REPO + f"/data/booth-demo-{year}.json"
         if os.path.exists(p):
             vstore = json.load(open(p))
@@ -541,7 +541,8 @@ def build_year(year, hist, base2001):
         B["cob"].append(cob_cells(dmd, cobkeys) if dcrow else None)
 
     if not any(B["demo"]):
-        del B["demo"]  # no census-people store before 2013
+        del B["demo"]  # the year's store didn't exist (pre-2004, absent
+        # venue rows untouched — the people floor is the 2004 election)
     if not any(B["cob"]):
         del B["cob"]
 

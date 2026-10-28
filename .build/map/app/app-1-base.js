@@ -229,7 +229,9 @@ const demoBoothShare = (raw, j, cobPos) => {
 const demoRange = () => (isCob() ? COB_RANGE[S.cob] : DM_RANGE[S.index]);
 const demoRamp = () => RAMP.demo[isCob() ? "fborn" : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
-const DEMO_FROM = 2007;
+// the People lanes' floor: 2004 joined the blend era on its own
+// derive chain (2001&2006 censuses, derive-booth-demo-2001.py)
+const DEMO_FROM = 2004;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, "nsw23", "sa22", 2022, "vic22", 2025, "sa26", "now"];

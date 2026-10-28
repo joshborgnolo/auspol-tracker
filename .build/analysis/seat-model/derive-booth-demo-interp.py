@@ -18,13 +18,15 @@ pre-existing key passes through byte-identical, only the interp keys
 are (re)written, so the pass composes with anything else the measured
 stores carry and is idempotent.
 
+  2004  c0 = 2001 census (data/booth-demo-2004.json),
+        c1 = 2006 (data/booth-demo-2004-c1.json)
   2007  c0 = 2006 census (data/booth-demo-2007.json),
         c1 = 2011 (data/booth-demo-2007-c1.json)
   2010  c0 = 2006, c1 = 2011
   2013  c0 = 2011, c1 = 2016 (data/booth-demo-2013-c1.json)
 
-The income lanes keep their 2013 floor: 2007/2010's measured stores
-carry no incomeCuts, and the blend never brands the c1 store's
+The income lanes keep their 2013 floor: 2004/2007/2010's measured
+stores carry no incomeCuts, and the blend never brands the c1 store's
 one-sided figure as intercensal.
 
 Guards fail loud (booth-set drift between sides, division-set drift,
@@ -51,6 +53,7 @@ fail = hist.fail
 hash16 = hist.hash16
 
 YEARS = {
+    2004: {"c0": 2001, "c1": 2006},
     2007: {"c0": 2006, "c1": 2011},
     2010: {"c0": 2006, "c1": 2011},
     2013: {"c0": 2011, "c1": 2016},
@@ -186,7 +189,7 @@ def main():
                                "hiNationalShare": fc["hiNationalShare"]},
             },
             }
-        meas["_about"] = meas["_about"] + (
+        about_interp = (
             f" The demoI blocks interpolate the people figures between "
             f"the {y['c0']} and {y['c1']} censuses to election day "
             f"(day-share {f} of the intercensal span — the SEIFA pcti "
@@ -198,6 +201,8 @@ def main():
             f"come from the {near} census side alone, never a "
             f"mixed-currency blend. The far side of the blend is "
             f"data/booth-demo-{year}-c1.json.")
+        if about_interp.strip()[:60] not in meas["_about"]:
+            meas["_about"] = meas["_about"] + about_interp
         meas["_provenance"]["files"][
             f"data/booth-demo-{year}-c1.json"] = hash16(cp)
         meas["_provenance"]["interpolatedAt"] = str(date.today())

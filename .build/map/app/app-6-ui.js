@@ -27,7 +27,7 @@ function valueText(v, kind, ctx) {
       case "senate": return ctx ? senNoValue(ctx.m, kind, ctx.d) : "No Senate count here";
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
-      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2007 on" : "No census figure here") : "No score here";
+      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2004 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
     }
@@ -297,7 +297,7 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census, never the people-interp blend)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `2021 census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 2007 election: 2007 and 2010 read the census areas the polling places stand in (2006 census), 2013 on the 2011 census; from 2016 they follow the voters (2021 census)." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}` : "Share of residents"}, ${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2004 election: every election from 2004 to 2019 blends between the two censuses that bracket it to election day; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}` : "Share of residents"}, ${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
