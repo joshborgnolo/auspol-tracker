@@ -142,6 +142,22 @@ Division counts are the chamber counts (derived, pin via consumer tests):
 trailing blank line; skip blank records when parsing. divs-1993.txt's 148
 lines = 147 divisions + terminator.
 
+## Polling-place rolls, 1998 (fetched 2026-10-29)
+
+`pps-1998-{act,nsw,nt,qld,sa,tas,vic,wa}.txt` ←
+`data/geninfo/tables98/text/PPS<ST>.TXT` of the same zip — the per-division
+venue roll (premises, address, suburb/state/postcode), the 1998 election's
+only pack-era venue source. Completes the CD-ROM era's venue-roll coverage:
+the 1993 and 1996 packs carry ONLY `PPSNUM93/96` counts (no per-place roll),
+so 1998 and 2001 are the era's two roll years. Downstream consumer: the
+planned /map/ 1998 federal frame (Phase 2 of the elect-map lane) — pack-era
+booth payload vocabulary per pack-2001-booth.py.
+
+Member sha256 (verbatim, end-of-file newline preserved):
+
+- act `f0e8277914…` nsw `3856f9ba4b…` nt `ed14dc2608…` qld `f706deeb52…`
+  sa `5a34503b12…` tas `66e3ed30bc…` vic `6e166704fb…` wa `615ad58361…`
+
 ## psephos transcriptions (1983–1990, pre-digital AEC era)
 
 psephos/<year>/<year>reps<state>.txt — Adam Carr's verbatim transcriptions

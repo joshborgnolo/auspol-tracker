@@ -1,0 +1,88 @@
+General Information - 1998 Election:  Australian Capital Territory				
+Polling Places				
+				
+Canberra				
+Polling Place Name	Premises	Address	Suburb	
+Bonython	Bonython Primary School	Hurtle Ave	BONYTHON	
+Calwell	Calwell High School	Casey Cres	CALWELL	
+Canberra Hospital	The Canberra Hospital	Building 2 Level 3 Yamba Dr	GARRAN	
+Chapman	Chapman Primary School	Perry Dr	CHAPMAN	
+Chifley	Melrose Primary School	Maclaurin Cres	CHIFLEY	
+Chisholm	Chisholm Primary School	Hambidge Cres	CHISHOLM	
+Conder	Charles Conder Primary School	Tom Roberts Ave	CONDER	
+Curtin	Curtin Primary School	Theodore St	CURTIN	
+Deakin	CCEGGS Senior School	Melbourne Ave	DEAKIN	
+Duffy	Duffy Primary School	Burrinjuck Cres	DUFFY	
+Fadden	Fadden Primary School	Hanlon Cres	FADDEN	
+Farrer	Farrer Primary School	Lambrigg St	FARRER
+Gilmore	Gilmore Primary School	Heagney Cres	GILMORE
+Gordon	Gordon Primary School	Knoke St	GORDON
+Gowrie	Gowrie Primary School	Jeffries St	GOWRIE
+Holder	St. Judes Primary School	Mulley St	HOLDER
+Hughes	Hughes Primary School	Kent St	HUGHES
+Isabella Plains	Isabella Plains Primary School	Ellerston Ave	ISABELLA PLAINS
+Kambah East	Village Creek Primary School	Kingsmill St	KAMBAH
+Kambah North	Taylor Primary School	Marconi Cres	KAMBAH
+Kambah South	Urambi Primary School	O'Halloran Crct	KAMBAH
+Kambah West	Mount Neighbour Primary School	Boddington Cres	KAMBAH
+Lyons	Lyons Primary School	Tarraleah Cres	LYONS
+Mawson	Mawson Primary School	Ainsworth St	MAWSON
+Monash	Monash Primary School	Corlette Cres	MONASH
+Oaks Estate	Oaks Estate Community Hall	William St	OAKS ESTATE
+Pearce	Melrose High School	Marr St	PEARCE
+Red Hill	Red Hill Primary School	Astrolabe St	RED HILL	
+Richardson	Richardson Primary School	May Gibbs Cl	RICHARDSON	
+Rivett	Rivett Primary School	Bangalay Cres	RIVETT	
+Tharwa	Tharwa Primary School		THARWA	
+Theodore	Theodore Primary School	Lawrence Wackett Cres	THEODORE	
+Uriarra	Uriarra Primary School	Forestry Settlement	URIARRA	
+Wanniassa	Wanniassa Primary School	Sternberg Cres	WANNIASSA	
+Wanniassa Hills	Wanniassa Hills Primary School	Langdon Ave	WANNIASSA	
+Waramanga	Arawang Primary School	Nemarang Cres	WARAMANGA	
+Weston	Weston Primary School	Hilder St	WESTON	
+Yarralumla	Yarralumla Primary School	Loftus St	YARRALUMLA	
+
+Fraser				
+				
+Polling Place Name	Premises	Address	Suburb	
+Ainslie	Ainslie Primary School	Elder St	BRADDON	
+Ainslie North	North Ainslie Primary School	Sherbrooke St	AINSLIE
+Aranda	Aranda Primary School	Banambila St	ARANDA
+Baker Gardens	Baker Gardens Pre School	Baker Gardens	AINSLIE
+Barton	Telopea Park School	New South Wales Cres	BARTON
+Belconnen	Lake Ginninderra College	Emu Bank	BELCONNEN
+Bruce	Calvary Hospital	Haydon Dr	BRUCE
+Campbell	Campbell Primary School	Chauvel St	CAMPBELL
+Charnwood	St Thomas Aquinas Primary School	Lhotsky St	CHARNWOOD
+City	Pilgrim House	69 Northbourne Ave	CANBERRA CITY
+Dickson	Daramalan College	Cowper St	DICKSON
+Downer	Downer Community Centre	Frencham Pl	DOWNER
+Evatt	Evatt Primary School	Heydon Cres	EVATT
+Evatt South	Miles Franklin Primary School	Alderman St	EVATT
+Florey	St Francis Xavier High School	Barnard Crct	FLOREY
+Flynn	Flynn Primary School	Bingle St	FLYNN
+Giralang	Giralang Primary School	Canopus Cres	GIRALANG
+Griffith	O'Connell Centre	Stuart St	GRIFFITH
+Hall	Hall Primary School	Hoskins St	HALL
+Higgins	Higgins Primary School	Fullagar Cres	HIGGINS
+Holt	Holt Primary School	Beaurepaire Cres	HOLT
+Jervis Bay	Jervis Bay Primary School		JERVIS BAY
+Kaleen	Kaleen Primary School	Ashburton St	KALEEN
+Kaleen South	Maribyrnong Primary School	Alberga St	KALEEN
+Latham	Latham Primary School	O'Loghlen St	LATHAM
+Lyneham	Lyneham Primary School	Hall St	LYNEHAM
+Macgregor	Macgregor Primary School	Hirschfeld Cres	MACGREGOR
+Macquarie	Macquarie Primary School	Bennelong Cres	MACQUARIE
+Melba	Mt Rogers Community School - Melba Campus	Alfred Hill Dr	MELBA
+Narrabundah	Narrabundah Primary School	Kootara Cres	NARRABUNDAH
+Ngunnawal	Ngunnawal Primary School	Unaipon Ave	NGUNNAWAL
+Nicholls	Nicholls Primary School	Kelleway Ave	NICHOLLS
+Page	St Matthew's School	Stutchbury St	PAGE
+Palmerston	Palmerston Primary School	Kosciusko Ave	PALMERSTON
+Reid	Uniting Church Hall	54 Coranderrk St	REID
+Scullin	Southern Cross Primary School	Ross Smith Cres	SCULLIN
+Spence	Mt Rogers Community School - Spence Campus	Crofts Cres	SPENCE
+Turner	Turner Primary School	Condamine St	TURNER
+Watson	Majura Primary School	Irvine St	WATSON
+Weetangera	Weetangera Primary School	Southwell St	WEETANGERA
+Wreck Bay	Community Office		WRECK BAY
