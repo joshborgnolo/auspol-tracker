@@ -125,6 +125,43 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 49, LP: 76, NP: 18, CLP: 1, IND: 4 },
     "the 1996 House per the AEC's certified hcands (Howard's Coalition 95 seats and the four independents: Andren, Rocher, Campbell, Filing)");
+  // the hand-keyed make-up record behind the federal rail's 1996 stop bar
+  // (its 2001 class line landed the same way in b5eb8d35's recital): bind
+  // it to the certified lanes it must never drift from
+  {
+    const SUM_J = JSON.parse(R("map/data/summary.json"));
+    assert.ok(SUM_J.seats["1996"] && SUM_J.tpp["1996"], "summary.json carries the 1996 record (seats + tpp)");
+    const fam = (p) => (p === "ALP" ? "alp" : ["LP", "NP", "CLP"].includes(p) ? "lnp" : "ind");
+    const want = {};
+    for (const row of fs.readFileSync(path.join(ROOT, ".build/aec-flow-src/hcands-1996.txt"), "utf8").trim().split("\n").slice(1)) {
+      const c = row.split(";");
+      if (c[3].trim() !== "#") continue;
+      const st = c[0], party = c[5];
+      for (const st2 of [st, "AUS"]) {
+        want[st2] = want[st2] || {};
+        want[st2][fam(party)] = (want[st2][fam(party)] || 0) + 1;
+      }
+    }
+    for (const [st, rowsum] of Object.entries(want)) {
+      assert.deepEqual(SUM_J.seats["1996"][st], rowsum, `summary.seats.1996.${st} drifts from the certified hcands census`);
+    }
+    assert.equal(Object.values(SUM_J.seats["1996"].AUS).reduce((a, b) => a + b, 0), 148,
+      "summary.seats.1996.AUS totals the 148-member chamber");
+    // tpp: per-state Labor 2PP shares recomputed from divs-1996's certified columns
+    const tsum = {};
+    for (const row of fs.readFileSync(path.join(ROOT, ".build/aec-flow-src/divs-1996.txt"), "utf8").trim().split("\n").slice(1)) {
+      const c = row.split(";");
+      const st = c[0];
+      tsum[st] = tsum[st] || [0, 0];
+      tsum[st][0] += parseInt(c[12], 10);
+      tsum[st][1] += parseInt(c[13], 10);
+    }
+    for (const [st, [a, coa]] of Object.entries(tsum)) {
+      const share = Math.round((100 * a) / (a + coa) * 100) / 100;
+      assert.ok(Math.abs(SUM_J.tpp["1996"][st] - share) < 0.005,
+        `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
+    }
+  }
   assert.equal(Object.keys(D.booths).length, 16, "the booth lane is the columnar 16 lanes (no census demo or birthplace rows on a stats-era frame)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
