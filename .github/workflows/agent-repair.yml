@@ -207,7 +207,7 @@ jobs:
           fetch-depth: 0 # prediction's model scripts read git show origin/main:...
 
       - name: Pin Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -334,7 +334,7 @@ jobs:
 
       - name: Upload the repair bundle
         if: always() && steps.bundle.outputs.commits != '' && steps.bundle.outputs.commits != '0'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: repair-bundle
           path: ${{ runner.temp }}/repair.bundle
@@ -343,7 +343,7 @@ jobs:
 
       - name: Upload the agent report
         if: always() && steps.agent.outputs.ran == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: repair-report
           path: .build/agent-repair-report.txt
@@ -371,7 +371,7 @@ jobs:
       - name: Download the agent report
         id: dl
         continue-on-error: true # an abnormally-ended repair job may have no artifact; file the issue with links anyway
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: repair-report
           path: report
@@ -426,7 +426,7 @@ jobs:
           fetch-depth: 0 # the bundle's prerequisite is the repair job's base
 
       - name: Pin Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -441,7 +441,7 @@ jobs:
 
       - name: Download the repair bundle
         if: needs.repair.outputs.offmain != 'true'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: repair-bundle
           path: ${{ runner.temp }}/bundle
