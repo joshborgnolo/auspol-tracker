@@ -4691,6 +4691,9 @@ const SAF = {
   // stem below the T head's wings).
   nswLC: {
     room: [-382.4, -520, 382.4, 189.4], chair: -490, chairW: 44, chairD: 42,
+    // the Council's own chair size — the shared 46x50 seat looms oversized on this small a
+    // room beside the other houses' floors
+    seat: { W: 35, D: 38 },
     officers: [-340, 46], mace: false, lead: ["A1", "B1"],
     plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
     // the three flank chairs walk the stem below the T head's wings, 87 apart and centred on it
@@ -4710,15 +4713,15 @@ const SAF = {
     // neighbours: the five-seat long bench on the left, its two-seat neighbour flanking the
     // bar's left, and a matching pair to its right, all one line off the transverse face
     singles: [
-      { row: 2, x: 44, y: 119, L: "Y1" },
-      { row: 2, x: 94, y: 119, L: "Y2" },
-      { row: 2, x: 150, y: 119, L: "X1" },
-      { row: 2, x: 200, y: 119, L: "X2" },
-      { row: 2, x: 250, y: 119, L: "X3" },
-      { row: 2, x: 300, y: 119, L: "X4" },
-      { row: 2, x: 350, y: 119, L: "X5" },
-      { row: 2, x: 44, y: 119, R: "E1" },
-      { row: 2, x: 94, y: 119, R: "E2" },
+      { row: 2, x: 44, y: 125, L: "Y1" },
+      { row: 2, x: 94, y: 125, L: "Y2" },
+      { row: 2, x: 150, y: 125, L: "X1" },
+      { row: 2, x: 200, y: 125, L: "X2" },
+      { row: 2, x: 250, y: 125, L: "X3" },
+      { row: 2, x: 300, y: 125, L: "X4" },
+      { row: 2, x: 350, y: 125, L: "X5" },
+      { row: 2, x: 44, y: 125, R: "E1" },
+      { row: 2, x: 94, y: 125, R: "E2" },
     ],
     arcs: [],
   },
@@ -4750,6 +4753,9 @@ const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? 
 function saGeom(key) {
   if (saGeomC[key]) return saGeomC[key];
   const F = SAF[key], P = (v) => v / SAU;
+  // a floor may carry a room-sized chair of its own (Sydney's Council draws a smaller seat for
+  // its small room — never the shared 46x50, which reads oversized beside the other houses)
+  const seat = F.seat ?? SA_SEAT;
   // the curves' common centre, each side's (half the gap between them), for the order along the
   // benches (Sydney's Council has no curves — its gangway width stands in)
   const A = P(F.arcs.length ? F.arcs.reduce((t, b) => t + b.a, 0) / F.arcs.length : F.gang ?? 0);
@@ -4768,8 +4774,8 @@ function saGeom(key) {
     // seg: which stretch of bench it's on (a side's straight, its curve, a lone seat), where a row breaks off
     const seg = (c.x > 0 ? 3 : 0) + (c.arc ? 1 : y > 0 ? 2 : 0);
     // (pad: the bench order's clearance past it, for the majority line — round a curve, by its radius)
-    const pad = c.arc ? (P(SA_SEAT.W / 2 + 10) / P(c.arc.r)) * CHK : P(SA_SEAT.W / 2 + 10);
-    return { id: c.id, x, y, fa: c.fa, row: c.row, s: sideS(c, x, y), seg, pad, W: P(SA_SEAT.W - 4), D: P(SA_SEAT.D - 6), raw: c };
+    const pad = c.arc ? (P(seat.W / 2 + 10) / P(c.arc.r)) * CHK : P(seat.W / 2 + 10);
+    return { id: c.id, x, y, fa: c.fa, row: c.row, s: sideS(c, x, y), seg, pad, W: P(seat.W - 4), D: P(seat.D - 6), raw: c };
   });
   const seats = all.sort((p, q) => p.s - q.s || p.row - q.row);
   seats.forEach((c, k) => { c.k = k; });
@@ -4788,7 +4794,7 @@ function saGeom(key) {
   const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
   const rowX = rows.slice(1).map((r) => mean(r.filter((c) => !c.raw.arc && c.y < 0).map((c) => Math.abs(c.x))));
   const rowR = rows.slice(1).map((r) => { const a = r.filter((c) => c.raw.arc); return a.length ? mean(a.map((c) => P(c.raw.arc.r))) : null; });
-  for (let j = rowR.length - 2; j >= 0; j--) if (rowR[j] == null) rowR[j] = rowR[j + 1] - P(SA_SEAT.D + 14);
+  for (let j = rowR.length - 2; j >= 0; j--) if (rowR[j] == null) rowR[j] = rowR[j + 1] - P(seat.D + 14);
   // a floor with no curves (Sydney's Council): the walkways run with the rows' own bookshelves
   if (rowR.every((v) => v == null)) for (let j = 0; j < rowR.length; j++) rowR[j] = rowX[j];
   const walk = (v) => { const w = [v[0] - (v.length > 1 ? (v[1] - v[0]) / 2 : 0.7)]; for (let j = 1; j < v.length; j++) w.push((v[j - 1] + v[j]) / 2); w.push(v[v.length - 1] + 0.75); return w.map((x) => Math.max(0.15, x)); };
@@ -4810,7 +4816,7 @@ function saGeom(key) {
   saGeomC[key] = {
     key, seats, rows, nRows, bench: seats.filter((c) => c.row > 0), byId, vacant,
     // the bloc labels hang just outside the room's walls
-    rOut: rx1 - 0.6, box: { x0: rx0, x1: rx1, y0: ry0, y1: ry1 }, rect: true, cutPad: P(SA_SEAT.W / 2 + 10),
+    rOut: rx1 - 0.6, box: { x0: rx0, x1: rx1, y0: ry0, y1: ry1 }, rect: true, cutPad: P(seat.W / 2 + 10),
     arms: false, table: F.lead, chairAt: [0, P(F.chair), Math.PI / 2, 0, P(F.chairW ?? 40), P(F.chairD ?? 38)],
     aisle: P((F.officers[0] + F.straight[0].ys[0]) / 2 + 40), yMid: mean(rows[1].filter((c) => c.y < 0).map((c) => c.y)),
     // the stretch of bench a position along it falls on, as seats' seg (the gangway's -1; a lone seat's curve)
@@ -4840,7 +4846,8 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   const hair = 1 / k;
   g.lineWidth = hair; g.strokeStyle = css(th.line); g.fillStyle = bench;
   const rb = (x, y, w, h, r = 4) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); g.stroke(); };
-  const hw = SA_SEAT.W / 2 + SA_PAD, hd = SA_SEAT.D / 2 + SA_PAD;
+  // the room's own chair where the ledger carries one (Sydney's Council's smaller seat)
+  const seat = SF.seat ?? SA_SEAT, hw = seat.W / 2 + SA_PAD, hd = seat.D / 2 + SA_PAD;
   for (const side of [-1, 1]) {
     const key = side > 0 ? "R" : "L";
     // down the straight: a run of seats closer than a seat and a half apart is one bench
