@@ -324,5 +324,18 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     assert.equal(t.finding.of, t.blocks[0].id, `${t.id}'s finding reads its first block`);
     assert.ok(!/[{}]|undefined|NaN/.test(t.finding.text + t.finding.meta), `${t.id}'s finding is filled: "${t.finding.text}"`);
   }
+  /* byRow carries the paired wave anchor for the wave-marked trip out of a
+     poll detail (AP.gotoOpinion's wave arg, 2026-10-29): ISO dates, newest
+     first, one pairing per (house, wave) the row sets hold */
+  const rowKeys = new Map();
+  for (const e of entries) rowKeys.set(e.house + "|e|" + e.waveDate, { rk: e.house + "@" + e.waveDate });
+  const out2 = buildPublicOpinion(entries, { deff: 1.6, rowKeys });
+  assert.ok(Object.keys(out2.byRow).length > 50, "most waves pair to a row key");
+  for (const [rk, bo] of Object.entries(out2.byRow)) {
+    assert.ok(Array.isArray(bo.w) && bo.w.length, `${rk}: a wave anchor list`);
+    assert.ok(bo.w.every((w) => /^\d{4}-\d{2}-\d{2}$/.test(w)), `${rk}: wave anchors are ISO dates`);
+    assert.deepEqual(bo.w, [...bo.w].sort().reverse(), `${rk}: wave anchors newest first`);
+    assert.ok(bo.w.every((w) => entries.some((e) => e.house === bo.h && e.waveDate === w)), `${rk}: every anchor is a real store wave`);
+  }
 }
 console.log("PASS: public opinion – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), findings (every branch), the long tail's tables (titles, packed readings, groups, waves, cuts), payload");

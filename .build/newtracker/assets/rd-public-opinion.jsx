@@ -699,17 +699,28 @@ function PubOpTracker({ c, houses, topic }) {
    the right, the breakdowns by group behind their own fold. A month or a
    pollster lists its long tail the same way, each line naming its topic
    and its day. */
-function PubOpMore({ label, qs, houses, meta }) {
+/* a wave's mark (AP.pubopGo's second arg): a trip from a poll's "Public
+   opinion" line lands on the pollster's group with exactly THAT wave's
+   questions flagged and the folds asked open, so the per-poll claim shows
+   the questions it means rather than the pollster's whole catalogue. The
+   sources a line carries know their wave (sourceOf's wave field). */
+const pubopHasWave = (q, wv) => !!wv && (q.srcs || []).some((s) => s && s.wave === wv);
+/* opens a closed <details> once, on mount, and then leaves it to the reader */
+const pubopOpenOnce = (el) => { if (el && !el.open) el.open = true; };
+function PubOpMore({ label, qs, houses, meta, wv }) {
+  const hit = !!wv && qs.some((q) => pubopHasWave(q, wv));
   return (
-    <details className="pubop-more">
+    <details className="pubop-more" ref={hit ? pubopOpenOnce : null}>
       <summary>{label}<span> · {qs.length}</span></summary>
       <ul className="pubop-ml">
-        {qs.map((q) => (
-          <li key={q.id + q.house}>
-            <details className="pubop-mi">
+        {qs.map((q) => {
+          const wh = pubopHasWave(q, wv);
+          return (
+          <li key={q.id + q.house} className={wh ? "pubop-wvh" : null}>
+            <details className="pubop-mi" ref={wh ? pubopOpenOnce : null}>
               <summary>
                 <span className="pubop-mq">{q.title}</span>
-                <span className="pubop-mm">{meta(q)}</span>
+                <span className="pubop-mm">{wh ? <em className="pubop-wvh-t">this poll</em> : null}{meta(q)}</span>
               </summary>
               <div className="pubop-mb">
                 <div className="pubop-il"><PubOpWaves q={q} houses={houses} /></div>
@@ -727,7 +738,8 @@ function PubOpMore({ label, qs, houses, meta }) {
               </div>
             </details>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </details>
   );
@@ -831,7 +843,7 @@ function pubopByPollster(topics, houses) {
 /* a month or a pollster, run like a topic: its charts, its questions, then
    its long tail behind a fold, every piece naming its topic; a long-tail
    line names its pollster too, where the group is not already one */
-function PubOpGroup({ g, houses, byHouse }) {
+function PubOpGroup({ g, houses, byHouse, wv }) {
   const topicOf = new Map(g.more.map((e) => [e.q, e.t]));
   const count = pubopCount(g.trackers.length, g.items.length, g.more.length);
   return (
@@ -843,7 +855,7 @@ function PubOpGroup({ g, houses, byHouse }) {
       {g.lead || null}
       {g.trackers.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} topic={e.t.short} />)}
       {g.items.length ? <div className="pubop-items">{g.items.map((e, i) => <PubOpItem key={(e.b.id || "") + i} c={e.b} houses={houses} topic={e.t.short} />)}</div> : null}
-      {g.more.length ? <PubOpMore label={g.moreLabel} qs={g.more.map((e) => e.q)} houses={houses}
+      {g.more.length ? <PubOpMore label={g.moreLabel} qs={g.more.map((e) => e.q)} houses={houses} wv={wv}
         meta={(q) => topicOf.get(q).short + (byHouse ? "" : " · " + pubopHouse(q, houses)) + " · " + pubopDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
     </section>
   );
@@ -1130,9 +1142,11 @@ function PublicOpinionBody() {
   /* the go hook for a cross-tab trip (AP.gotoOpinion): flip the page to
      its By-pollster view and land on the pollster's group. It lives on
      window.AP only while the page itself is mounted - a trip arriving
-     before that (or after leaving) is gotoOpinion's seek loop's job. */
+     before that (or after leaving) is gotoOpinion's seek loop's job. A
+     trip that names a wave (gotoOpinion's second arg, from the poll
+     ledger's byRow key) carries it in jump.wave for the wave marks. */
   pubopUseEffect(() => {
-    window.AP.pubopGo = (h) => { setSort("pollster"); setJump({ id: h }); };
+    window.AP.pubopGo = (h, wave) => { setSort("pollster"); setJump({ id: h, wave: wave || null }); };
     return () => { delete window.AP.pubopGo; };
   }, []);
   const topics = pubopUseMemo(() => (src ? src.topics.filter((t) => t.blocks.length || t.more.length) : []), [src]);
@@ -1209,7 +1223,7 @@ function PublicOpinionBody() {
         {" "}since {pubopMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
       </p>}
       {ql ? <PubOpResults q={dq.trim()} hits={hits} houses={houses} />
-        : groups ? groups.slice(0, shown).map((g) => <PubOpGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} />)
+        : groups ? groups.slice(0, shown).map((g) => <PubOpGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} wv={jump && jump.wave} />)
         : topics.slice(0, shown).map((t, i) => <PubOpTopic key={t.id} t={t} n={pubopNo(i)} houses={houses} />)}
       <div className="pubop-how">
         <p><b>How the findings are called.</b> Each topic opens with what its first chart or question found. A side is said

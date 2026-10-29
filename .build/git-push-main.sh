@@ -408,9 +408,13 @@ refresh_site() {
 # left the dataset behind and the 12:00 slot refused). refresh_site and
 # push_main's rebuild stage them; a wrapper that runs build.mjs itself calls
 # this before committing.
-GEN_DATASET=".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js .build/newtracker/assets/cycle-source.json"
+# oneoffs-source.json joined the list 2026-10-29: gen-data rewrites it every
+# build from the one-off stores, and the essential updater's one-offs sidecar
+# (same day) is the first wrapper lane that can move it on a quiet slot — a
+# commit that missed it left the tree dirty for the next launchd slot.
+GEN_DATASET=".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js .build/newtracker/assets/cycle-source.json .build/newtracker/assets/oneoffs-source.json"
 stage_dataset() {
-  # shellcheck disable=SC2086 # two fixed paths, split on purpose
+  # shellcheck disable=SC2086 # three fixed paths, split on purpose
   git add $GEN_DATASET >> "$LOG" 2>&1 || true
   # build.mjs names cycle-source and the webfonts by content hash and sweeps
   # the old names; the wrappers' explicit add lists name neither, so a build

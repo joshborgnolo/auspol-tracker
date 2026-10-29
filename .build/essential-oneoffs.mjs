@@ -31,7 +31,19 @@
    figure equality on every shared cell, then merges any cell the
    canonical lacks.
 
-   Usage: node .build/essential-oneoffs.mjs [--check]
+   THE AUTO LANE (2026-10-29): when a wave brings datasets nobody has
+   adjudicated, `--cases <file>` records them and the builder still exits
+   2. `essential-oneoffs-adjudicate.mjs` (Matilda, routing only) answers
+   each case with a manifest stanza {id, ds, theme, note}; `--decisions
+   <verdict-file>` re-runs the builder, which validates every stanza here
+   (id shape, theme against adhoc-themes.mjs's list, ds must be pending)
+   and writes the survivors to the committed ledger
+   .build/essential-oneoffs-adjudicated.json — the hand MANIFEST below
+   stays the curation of record and wins on any overlap. The audit below
+   remains the hard gate: a verdict the builder rejects lands nothing.
+   Figures never travel this lane: cases carry question WORDS only.
+
+   Usage: node .build/essential-oneoffs.mjs [--check] [--cases F] [--decisions F]
    Exit 2 = adjudication or guard failure (unadjudicated dataset,
    duplicate mismatch, unmapped read, two reads in one wave).
    ==================================================================== */
@@ -39,6 +51,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { THEMES as ADHOC_THEMES } from "./newtracker/adhoc-themes.mjs";
 
 const MANIFEST = [
   /* immigration */
@@ -305,8 +318,26 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CSV_PATH = path.join(ROOT, "data", "essential-report.csv");
 const POLLS_PATH = path.join(ROOT, "data", "polls.json");
 const INDEX_PATH = path.join(ROOT, ".build", "essential-src", "report-index.json");
-const OUT_PATH = path.join(ROOT, "data", "essential-one-offs.json");
+/* test overrides: ESSENTIAL_ONEOFFS_OUT for the store,
+   ESSENTIAL_ONEOFFS_LEDGER for the adjudicated ledger — both default to the
+   committed paths in every lane (the pinned test runs hermetically) */
+const OUT_PATH = process.env.ESSENTIAL_ONEOFFS_OUT || path.join(ROOT, "data", "essential-one-offs.json");
+/* the auto lane's committed ledger: Matilda's accepted stanzas, keyed by
+   dataset. ESSENTIAL_ONEOFFS_LEDGER overrides the path for tests. */
+const LEDGER_PATH = process.env.ESSENTIAL_ONEOFFS_LEDGER || path.join(ROOT, ".build", "essential-oneoffs-adjudicated.json");
 const CHECK = process.argv.includes("--check");
+const argVal = (k) => { const i = process.argv.indexOf(k); return i >= 0 ? process.argv[i + 1] : null; };
+const CASES_PATH = argVal("--cases");
+const DECISIONS_PATH = argVal("--decisions");
+/* verdict keys a decision may carry; anything else poisons the whole
+   verdict (routing only — the lane never moves a figure) */
+const DECISION_KEYS = new Set(["ds", "id", "theme", "note", "defer", "why"]);
+const DECISION_ID = /^[a-z][a-z0-9-]{2,48}$/;
+const THEME_IDS = new Set([...ADHOC_THEMES.map((t) => t.id), "cut"]);
+/* test hook ONLY: hides hand stanzas so test-essential-oneoffs-adjudicate
+   can run the pending → verdict → apply path against a fresh ledger; unset
+   in every real lane */
+const TEST_HIDE = new Set((process.env.ESSENTIAL_ONEOFFS_TEST_HIDE || "").split(",").filter(Boolean));
 const WINDOW_START = "2025-05-12";
 /* The one sanctioned pre-window read (user call 2026-10-28): Essential's
    election-fortnight April 2025 read of the immigration-intake question,
@@ -562,6 +593,109 @@ function mergedRows(ids) {
   });
 }
 
+/* ---- the auto-lane ledger ----------------------------------------------
+   The adjudicator's accepted stanzas, keyed by dataset. The hand MANIFEST
+   above is the curation of record: it wins on any overlap, and an auto
+   stanza whose entry id any hand stanza (or another auto stanza first)
+   already owns is dropped. The wave the stanza admitted is recorded for
+   provenance. themeOf (adhoc-themes.mjs) reads this same file for its
+   per-id topic lookup, so a stanza lands its theme without a source edit. */
+function loadLedger() {
+  try {
+    const j = JSON.parse(fs.readFileSync(LEDGER_PATH, "utf8"));
+    return Array.isArray(j && j.stanzas) ? j : { generated: "essential-oneoffs-adjudicated", stanzas: [] };
+  } catch {
+    return { generated: "essential-oneoffs-adjudicated", stanzas: [] };
+  }
+}
+let LEDGER = loadLedger();
+function handSpace() {
+  /* ids = the whole entry-id space the hand file owns: stanza ids, their
+     csv keys (st.ds), and every `also` alias – a verdict may never reuse
+     any of them for another question */
+  const ds = new Set(), ids = new Set();
+  for (const st of MANIFEST) {
+    if (TEST_HIDE.has(st.ds)) continue;
+    ds.add(st.ds); ids.add(st.id); ids.add(st.ds); for (const a of st.also || []) ids.add(a);
+  }
+  for (const k of Object.keys(EXCLUDE)) ds.add(k);
+  return { ds, ids };
+}
+function autoStanzasFrom(ledger) {
+  const hand = handSpace(), out = [], owned = new Map();
+  for (const st of ledger.stanzas) {
+    if (!st || !DECISION_ID.test(String(st.id)) || hand.ds.has(st.ds)) { out.push({ ...st, _dropped: hand.ds.has(st.ds) ? "hand adjudicated since" : "bad id" }); continue; }
+    if (owned.has(st.id)) { out.push({ ...st, _dropped: "id already owned by " + owned.get(st.id) }); continue; }
+    const other = MANIFEST.some((s) => s.id === st.id && s.ds !== st.ds);
+    if (other) { out.push({ ...st, _dropped: "id owned by a hand stanza" }); continue; }
+    owned.set(st.id, st.ds);
+    out.push({ id: st.id, ds: st.ds, note: st.note || undefined });
+  }
+  return { auto: out.filter((s) => !s._dropped), dropped: out.filter((s) => s._dropped).map((s) => ({ id: s.id, ds: s.ds, why: s._dropped })) };
+}
+/* the datasets the coverage audit below would die on, as adjudication
+   cases: words only – question texts and chart titles, never a figure */
+function pendingCases(now) {
+  const cases = [];
+  for (const [ds, c] of corpus) {
+    const rows = c.rows.filter((r) => r.date >= WINDOW_START || (WINDOW_EXTRA[ds] && WINDOW_EXTRA[ds].has(r.date)));
+    if (!rows.some((r) => r.date >= WINDOW_START)) continue;
+    if (now && now.has(ds)) continue;
+    if (EXCLUDE[ds]) continue;
+    cases.push({ ds, qid: c.rows[0] && c.rows[0].qid || null,
+      question: String((c.rows[0] && c.rows[0].q) || "").slice(0, 300),
+      titles: [...new Set(c.rows.map((r) => norm(r.vis)).filter(Boolean))].slice(0, 5),
+      waves: [...new Set(rows.map((r) => waveOfRead(r.date)).filter(Boolean))].sort().slice(-4) });
+  }
+  return cases;
+}
+/* --decisions: validate Matilda's verdict against TODAY's pending set and
+   fold the survivors into the ledger. All-or-nothing per verdict file (a
+   malformed verdict applies nothing); per stanza the checks are ds pending,
+   id shape + not already owned, theme on adhoc-themes's list, note capped.
+   Returns the adjudicated ds set so the run continues with them on board. */
+function applyDecisionsFile(manifestDsNow) {
+  let verdict = null;
+  try { verdict = JSON.parse(fs.readFileSync(DECISIONS_PATH, "utf8")); }
+  catch (e) { console.log(`decisions: verdict file unreadable (${e.message}); nothing applied`); return new Set(); }
+  const list = Array.isArray(verdict && verdict.decisions) ? verdict.decisions : null;
+  if (!list) { console.log("decisions: verdict carries no decisions array; nothing applied"); return new Set(); }
+  const pending = new Set(pendingCases(manifestDsNow).map((c) => c.ds));
+  const hand = handSpace();
+  const bad = [];
+  const clean = [];
+  for (const d of list) {
+    if (!d || typeof d !== "object" || Object.keys(d).some((k) => !DECISION_KEYS.has(k))) { bad.push("unexpected keys"); break; }
+    if (d.defer === true) continue;
+    if (!pending.has(d.ds)) { bad.push(`ds "${d.ds}" is not pending`); break; }
+    if (!DECISION_ID.test(String(d.id))) { bad.push(`id "${d.id}" bad shape`); break; }
+    if (hand.ids.has(String(d.id))) { bad.push(`id "${d.id}" already owned by a hand stanza`); break; }
+    if (LEDGER.stanzas.some((s) => s.id === d.id && s.ds !== d.ds)) { bad.push(`id "${d.id}" conflicts with a ledger stanza`); break; }
+    if (!THEME_IDS.has(d.theme)) { bad.push(`theme "${d.theme}" unknown`); break; }
+    if (d.note != null && (typeof d.note !== "string" || d.note.length > 240)) { bad.push(`note over 240 chars`); break; }
+    clean.push({ id: String(d.id), ds: String(d.ds), theme: String(d.theme),
+      note: d.note ? String(d.note).replace(/\s+/g, " ").trim() : undefined });
+  }
+  if (bad.length) { console.log(`decisions: verdict invalid (${bad[0]}); nothing applied`); return new Set(); }
+  const dup = new Set();
+  for (const s of clean) { if (dup.has(s.ds) || dup.has("id:" + s.id)) { console.log("decisions: duplicate ds or id inside the verdict; nothing applied"); return new Set(); } dup.add(s.ds); dup.add("id:" + s.id); }
+  if (!clean.length) { console.log("decisions: no stanzas in the verdict (all deferred?); nothing applied"); return new Set(); }
+  const byDs = new Map(LEDGER.stanzas.map((s) => [s.ds, s]));
+  for (const s of clean) byDs.set(s.ds, { ...s, wave: pendingCasesFreshWave(s.ds), adjudicatedBy: "matilda", adjudicated: new Date().toISOString().slice(0, 10) });
+  LEDGER = { generated: "essential-oneoffs-adjudicated", stanzas: [...byDs.values()] };
+  if (CHECK) { console.log(`decisions: ${clean.length} stanza(s) check-clean; ledger updated in memory, not written (--check)`); return new Set(clean.map((s) => s.ds)); }
+  fs.writeFileSync(LEDGER_PATH + ".tmp", JSON.stringify(LEDGER, null, 2) + "\n");
+  fs.renameSync(LEDGER_PATH + ".tmp", LEDGER_PATH);
+  console.log(`decisions: applied ${clean.length} stanza(s) -> ${path.relative(ROOT, LEDGER_PATH)}`);
+  return new Set(clean.map((s) => s.ds));
+}
+function pendingCasesFreshWave(ds) {
+  const c = corpus.get(ds);
+  if (!c) return null;
+  const ws = [...new Set(c.rows.map((r) => waveOfRead(r.date)).filter(Boolean))].sort();
+  return ws[ws.length - 1] || null;
+}
+
 /* ---- emit helpers -------------------------------------------------------
    foldGroup(r): null means the row is an all-voters row. Otherwise the
    row's cut name plus which side holds the group label and which holds
@@ -710,12 +844,30 @@ function buildEntry(st, wave, avRowsList, foldMap, qMeta, seriesList) {
   return e;
 }
 
-/* ---- ask the manifest, emit entries ------------------------------------ */
+/* ---- ask the manifest (hand file + adjudicated ledger), emit entries ---- */
+const seedDs = (all) => {
+  const s = new Set();
+  for (const st of all) { s.add(st.ds); for (const a of st.also || []) s.add(a); }
+  return s;
+};
+const buildManifestAll = () => {
+  const { auto, dropped } = autoStanzasFrom(LEDGER);
+  for (const d of dropped) console.log(`NOTE: auto stanza "${d.id}" (${d.ds}) dropped: ${d.why}`);
+  return [...MANIFEST.filter((s) => !TEST_HIDE.has(s.ds)), ...auto];
+};
+let MANIFEST_ALL = buildManifestAll();
+let manifestDs = seedDs(MANIFEST_ALL);
+/* --decisions lands before the audit: a verdict that applies is on board
+   for THIS run (the file was re-written a moment ago, and the merged
+   manifest re-reads it); a verdict that fails applies nothing and the
+   audit below is the audit exactly as ever. */
+if (DECISIONS_PATH) {
+  const fresh = applyDecisionsFile(manifestDs);
+  if (fresh.size) { MANIFEST_ALL = buildManifestAll(); manifestDs = seedDs(MANIFEST_ALL); }
+}
 const entries = [];
-const manifestDs = new Set();
-for (const st of MANIFEST) {
+for (const st of MANIFEST_ALL) {
   const ids = [st.ds, ...(st.also || [])];
-  for (const id of ids) manifestDs.add(id);
   const rows = mergedRows(ids);
   /* A trend chart's points are month buckets ("Sep'26" → 2026-09-01), and
      Essential labels them by fieldwork, not by release, so the nearest
@@ -896,12 +1048,19 @@ for (const st of MANIFEST) {
   }
 }
 
-/* ---- coverage audit ------------------------------------------------------ */
-for (const [ds, c] of corpus) {
-  if (manifestDs.has(ds) || EXCLUDE[ds]) continue;
-  if (!c.rows.some((r) => r.date >= WINDOW_START)) continue;
-  die(`unadjudicated dataset "${ds}" (${c.rows[0].qid}): "${c.rows[0].q.slice(0, 110)}"`);
+/* ---- coverage audit ------------------------------------------------------
+   The hard gate, unchanged by the auto lane: --cases records the pending
+   sets as adjudication cases (words only, never a figure) and the build
+   still refuses. --decisions had its chance upstream; what's left here
+   was never adjudicated. */
+const PENDING = pendingCases(manifestDs);
+if (CASES_PATH && PENDING.length) {
+  const casesDoc = { generated: new Date().toISOString(), house: "essential",
+    cases: PENDING.map((c) => ({ ds: c.ds, qid: c.qid, question: c.question, titles: c.titles, waves: c.waves })) };
+  fs.writeFileSync(CASES_PATH, JSON.stringify(casesDoc, null, 2) + "\n");
+  console.log(`cases: ${PENDING.length} pending dataset(s) written to ${path.relative(ROOT, CASES_PATH)}`);
 }
+for (const c of PENDING) die(`unadjudicated dataset "${c.ds}" (${c.qid}): "${c.question.slice(0, 110)}"`);
 
 /* ---- the store ----------------------------------------------------------- */
 entries.sort((a, b) => a.waveDate < b.waveDate ? -1 : a.waveDate > b.waveDate ? 1 : a.id.localeCompare(b.id));
@@ -950,5 +1109,5 @@ if (CHECK) {
   const tmp = OUT_PATH + ".tmp";
   fs.writeFileSync(tmp, out);
   fs.renameSync(tmp, OUT_PATH);
-  console.log(`wrote data/essential-one-offs.json: ${entries.length} entries across ${new Set(entries.map((e) => e.waveDate)).size} waves (${out.length} bytes)`);
+  console.log(`wrote ${path.relative(ROOT, OUT_PATH)}: ${entries.length} entries across ${new Set(entries.map((e) => e.waveDate)).size} waves (${out.length} bytes)`);
 }

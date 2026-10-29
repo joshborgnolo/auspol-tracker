@@ -1005,50 +1005,64 @@ function PubOpTracker({
     rel: "noopener"
   }, "Source \u2197") : null))))))));
 }
+const pubopHasWave = (q, wv) => !!wv && (q.srcs || []).some(s => s && s.wave === wv);
+const pubopOpenOnce = el => {
+  if (el && !el.open) el.open = true;
+};
 function PubOpMore({
   label,
   qs,
   houses,
-  meta
+  meta,
+  wv
 }) {
+  const hit = !!wv && qs.some(q => pubopHasWave(q, wv));
   return React.createElement("details", {
-    className: "pubop-more"
+    className: "pubop-more",
+    ref: hit ? pubopOpenOnce : null
   }, React.createElement("summary", null, label, React.createElement("span", null, " \xB7 ", qs.length)), React.createElement("ul", {
     className: "pubop-ml"
-  }, qs.map(q => React.createElement("li", {
-    key: q.id + q.house
-  }, React.createElement("details", {
-    className: "pubop-mi"
-  }, React.createElement("summary", null, React.createElement("span", {
-    className: "pubop-mq"
-  }, q.title), React.createElement("span", {
-    className: "pubop-mm"
-  }, meta(q))), React.createElement("div", {
-    className: "pubop-mb"
-  }, React.createElement("div", {
-    className: "pubop-il"
-  }, React.createElement(PubOpWaves, {
-    q: q,
-    houses: houses
-  })), React.createElement("div", {
-    className: "pubop-ir"
-  }, q.figs.length > 1 && q.figs.every(f => pubopTraitSeries(f)) ? React.createElement(PubOpTraits, {
-    figs: q.figs
-  }) : q.figs.map((f, i) => React.createElement(PubOpFig, {
-    key: i,
-    f: f,
-    solo: q.figs.length === 1
-  })), q.prose.map((p, i) => React.createElement("div", {
-    className: "pubop-fig",
-    key: "p" + i
-  }, q.prose.length > 1 || q.figs.length ? React.createElement("p", {
-    className: "pubop-ght"
-  }, p.when) : null, React.createElement("blockquote", {
-    className: "pubop-prose"
-  }, pubopText(p.text.join(" "))))), React.createElement(PubOpCuts, {
-    cuts: q.cuts,
-    when: q.srcs.length > 1 ? q.cutsWhen : null
-  }))))))));
+  }, qs.map(q => {
+    const wh = pubopHasWave(q, wv);
+    return React.createElement("li", {
+      key: q.id + q.house,
+      className: wh ? "pubop-wvh" : null
+    }, React.createElement("details", {
+      className: "pubop-mi",
+      ref: wh ? pubopOpenOnce : null
+    }, React.createElement("summary", null, React.createElement("span", {
+      className: "pubop-mq"
+    }, q.title), React.createElement("span", {
+      className: "pubop-mm"
+    }, wh ? React.createElement("em", {
+      className: "pubop-wvh-t"
+    }, "this poll") : null, meta(q))), React.createElement("div", {
+      className: "pubop-mb"
+    }, React.createElement("div", {
+      className: "pubop-il"
+    }, React.createElement(PubOpWaves, {
+      q: q,
+      houses: houses
+    })), React.createElement("div", {
+      className: "pubop-ir"
+    }, q.figs.length > 1 && q.figs.every(f => pubopTraitSeries(f)) ? React.createElement(PubOpTraits, {
+      figs: q.figs
+    }) : q.figs.map((f, i) => React.createElement(PubOpFig, {
+      key: i,
+      f: f,
+      solo: q.figs.length === 1
+    })), q.prose.map((p, i) => React.createElement("div", {
+      className: "pubop-fig",
+      key: "p" + i
+    }, q.prose.length > 1 || q.figs.length ? React.createElement("p", {
+      className: "pubop-ght"
+    }, p.when) : null, React.createElement("blockquote", {
+      className: "pubop-prose"
+    }, pubopText(p.text.join(" "))))), React.createElement(PubOpCuts, {
+      cuts: q.cuts,
+      when: q.srcs.length > 1 ? q.cutsWhen : null
+    })))));
+  })));
 }
 const pubopCount = (trackers, items, more) => [trackers ? trackers === 1 ? "One chart" : pubopCap(pubopWord(trackers)) + " charts" : null, items ? items + (items === 1 ? " question" : " questions") : null, more ? more + " more" : null].filter(Boolean).join(" · ");
 function PubOpTopic({
@@ -1186,7 +1200,8 @@ function pubopByPollster(topics, houses) {
 function PubOpGroup({
   g,
   houses,
-  byHouse
+  byHouse,
+  wv
 }) {
   const topicOf = new Map(g.more.map(e => [e.q, e.t]));
   const count = pubopCount(g.trackers.length, g.items.length, g.more.length);
@@ -1217,6 +1232,7 @@ function PubOpGroup({
     label: g.moreLabel,
     qs: g.more.map(e => e.q),
     houses: houses,
+    wv: wv,
     meta: q => topicOf.get(q).short + (byHouse ? "" : " · " + pubopHouse(q, houses)) + " · " + pubopDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
   }) : null);
 }
@@ -1567,10 +1583,11 @@ function PublicOpinionBody() {
     });
   };
   pubopUseEffect(() => {
-    window.AP.pubopGo = h => {
+    window.AP.pubopGo = (h, wave) => {
       setSort("pollster");
       setJump({
-        id: h
+        id: h,
+        wave: wave || null
       });
     };
     return () => {
@@ -1671,7 +1688,8 @@ function PublicOpinionBody() {
     key: g.id,
     g: g,
     houses: houses,
-    byHouse: sort === "pollster"
+    byHouse: sort === "pollster",
+    wv: jump && jump.wave
   })) : topics.slice(0, shown).map((t, i) => React.createElement(PubOpTopic, {
     key: t.id,
     t: t,

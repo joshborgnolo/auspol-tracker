@@ -4,7 +4,11 @@
 # once Essential publishes the release page after the charts — when the
 # extractor reports the report index drifted) -> direction-groups pass (the
 # CSV's national-mood breakdowns banked into data/essential-direction-groups.json,
-# warn-only; a quiet-slot move takes the sidecar commit path) -> if anything changed ->
+# warn-only; a quiet-slot move takes the sidecar commit path) -> one-offs pass
+# (.build/essential-oneoffs.mjs rebuilds data/essential-one-offs.json for the
+# /public-opinion/ catalogue, warn-only; exit 2 = unadjudicated new question
+# datasets, logged + a deduped ci-alert, the wave's store left at last good
+# until a human admits the datasets into the MANIFEST) -> if anything changed ->
 # validate -> render-card -> build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.essential.plist from
 # the copy in this directory). Every step logs one line to
@@ -176,6 +180,121 @@ if [ "$DATA_CHANGED" = false ] && [ "$EDIR_MOVED" = true ]; then
   EDIR_MOVED=false
 fi
 
+# Public-opinion one-offs pass: .build/essential-oneoffs.mjs rebuilds
+# data/essential-one-offs.json (the /public-opinion/ page's Essential
+# catalogue) from the same committed CSV the extractor refreshed. Warn-only
+# like the other sidecars — but with extra steps on its exit 2, which means
+# the wave carries question datasets nobody has adjudicated into the
+# builder's MANIFEST yet. The script wrote the pending datasets' case file
+# on the way out; .build/essential-oneoffs-adjudicate.mjs puts them to
+# Matilda (routing only, question words in — never figures), the builder
+# re-runs with --decisions and files what validates, and only when ALL of
+# that fails does a deduped ci-alert email the wave needs a human
+# (2026-10-27's wave sat a full day for exactly this reason).
+ONEOFF_MOVED=false
+OO_CASES=.build/essential-src/oneoffs-cases.json
+OO_VERDICT=.build/essential-src/oneoffs-verdict.json
+OO_LEDGER=.build/essential-oneoffs-adjudicated.json
+rm -f "$OO_CASES" "$OO_VERDICT"
+ONEOFF_OUT="$(node .build/essential-oneoffs.mjs --cases "$OO_CASES" 2>&1)"
+ONEOFF_CODE=$?
+echo "$ONEOFF_OUT" >> "$LOG"
+if [ $ONEOFF_CODE -eq 0 ]; then
+  if [ -n "$(git status --porcelain -- data/essential-one-offs.json "$OO_LEDGER")" ]; then
+    ONEOFF_MOVED=true
+    log "one-offs store moved"
+  else
+    log "one-offs: store unchanged"
+  fi
+elif [ $ONEOFF_CODE -eq 2 ]; then
+  log "WARN one-offs builder needs adjudication (exit 2); trying Matilda's routing call:"
+  echo "$ONEOFF_OUT" | grep -iE "unadjudicated|guard" | while IFS= read -r l; do log "one-offs: $l"; done
+  ONEOFF_SETTLED=false
+  if [ -s "$OO_CASES" ]; then
+    # Matilda's routing call: cases (question words only) -> stanzas to
+    # fold into the adjudicated ledger. Skip reasons (no CLI, no key) are
+    # logged and the ci-alert below carries the wave as before.
+    ADJ_OUT="$(node .build/essential-oneoffs-adjudicate.mjs --cases "$OO_CASES" --out "$OO_VERDICT" 2>&1)"
+    echo "$ADJ_OUT" >> "$LOG"
+    ADJ_LAST="$(echo "$ADJ_OUT" | tail -1)"
+    log "$ADJ_LAST"
+    if echo "$ADJ_LAST" | grep -q '"applied":true'; then
+      log "one-offs: Matilda settled stanzas; re-running the builder with --decisions"
+      RE_OUT="$(node .build/essential-oneoffs.mjs --cases "$OO_CASES" --decisions "$OO_VERDICT" 2>&1)"
+      RE_CODE=$?
+      echo "$RE_OUT" >> "$LOG"
+      if [ $RE_CODE -eq 0 ]; then
+        log "one-offs: adjudication accepted; rebuilt clean"
+        ONEOFF_SETTLED=true
+        [ -n "$(git status --porcelain -- data/essential-one-offs.json "$OO_LEDGER")" ] && ONEOFF_MOVED=true
+      else
+        log "one-offs: builder still red after the verdict (exit $RE_CODE); the alert below lists what stayed out"
+      fi
+    else
+      log "one-offs: Matilda unavailable or could not settle the wave; the alert below lists what stayed out"
+    fi
+  fi
+  if [ "$ONEOFF_SETTLED" = false ]; then
+    # One ci-alert issue per wave, filed once across all lanes (an open issue
+    # with the same title suppresses a re-file from a later slot, calling and
+    # checking follow alert-issue.sh's own title dedupe). On the laptop gh
+    # carries the repo's ambient login; on CI the update job's token has no
+    # issues scope, so the create fails visibly in the log and the laptop's
+    # next slot lands the issue (only the first lane to succeed creates it).
+    ONEOFF_WAVE="$(node -e 'const I=require("./.build/essential-src/report-index.json");const ks=Object.keys(I).sort();console.log(ks[ks.length-1]||"unknown")' 2>/dev/null || echo unknown)"
+    ONEOFF_TITLE="Essential one-offs: adjudication needed (wave $ONEOFF_WAVE)"
+    ONEOFF_REPO="${GITHUB_REPOSITORY:-$(git remote get-url origin 2>/dev/null | sed -E 's#.*github\.com[:/]##; s#\.git$##')}"
+    ONEOFF_ALERT_BODY="essential-oneoffs.mjs exited 2 on $(date '+%Y-%m-%d %H:%M %Z'): a new Essential wave carries question datasets not yet adjudicated into the MANIFEST, and the Matilda routing call could not settle them. The store was left at its last good state, so nothing new shows on /public-opinion/ until these are admitted.
+
+$(echo "$ONEOFF_OUT" | grep -iE "unadjudicated|guard failure" | head -20)
+
+Adjudication: add MANIFEST stanzas (id, ds, optional also/note) in .build/essential-oneoffs.mjs, then any slot (or \"node .build/essential-oneoffs.mjs\" + commit) files them — the essential updater re-tries the builder (and Matilda's routing call) every slot."
+    if command -v gh >/dev/null 2>&1 && [ -n "$ONEOFF_REPO" ]; then
+      OPEN_CNT="$(gh issue list --repo "$ONEOFF_REPO" --state open --label ci-alert --search "in:title \"$ONEOFF_TITLE\"" --json number --jq length 2>>"$LOG" || echo 0)"
+      if [ "$OPEN_CNT" = "0" ]; then
+        if GITHUB_REPOSITORY="$ONEOFF_REPO" GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}" bash .build/alert-issue.sh "$ONEOFF_TITLE" "$ONEOFF_ALERT_BODY" >> "$LOG" 2>&1; then
+          log "one-offs adjudication ci-alert filed: $ONEOFF_TITLE"
+        else
+          log "WARN one-offs ci-alert failed to file (next slot retries)"
+        fi
+      else
+        log "one-offs adjudication ci-alert already open for $ONEOFF_WAVE; not refiling"
+      fi
+    else
+      log "one-offs adjudication alert skipped (no gh on PATH / no repo resolvable)"
+    fi
+  fi
+else
+  log "WARN one-offs builder guard/failure (exit $ONEOFF_CODE): $(echo "$ONEOFF_OUT" | tail -1)"
+fi
+
+if [ "$DATA_CHANGED" = false ] && [ "$ONEOFF_MOVED" = true ]; then
+  # Sidecar wave: the catalogue moved on an otherwise quiet slot. It lands
+  # in the page build, so validate + rebuild exactly like a poll change.
+  log "one-offs store moved; running validate/build/commit/push"
+  if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+    log "FAIL validate (one-offs); no commit made"
+    exit 1
+  fi
+  if ! refresh_site; then
+    log "FAIL build (one-offs); no commit made"
+    exit 1
+  fi
+  ONEOFF_FILES=(data/essential-one-offs.json .build/newtracker/assets/oneoffs-source.json "${SITE_FILES[@]}")
+  [ -f "$OO_LEDGER" ] && ONEOFF_FILES+=("$OO_LEDGER")
+  git add "${ONEOFF_FILES[@]}" || { log "FAIL git add"; exit 1; }
+  ONEOFF_MSG="Update Essential public-opinion one-offs $(date '+%Y-%m-%d')"
+  if ! git commit -m "$ONEOFF_MSG" >> "$LOG" 2>&1; then
+    log "FAIL git commit (one-offs)"
+    exit 1
+  fi
+  if ! push_main "$ONEOFF_MSG" "${ONEOFF_FILES[@]}"; then
+    exit 1
+  fi
+  log "OK committed + pushed: $ONEOFF_MSG"
+  ONEOFF_MOVED=false
+fi
+
 # The crawl preflight's fingerprint (extract-essential-report.mjs) lives in
 # the repo: a fresh CI runner has no other memory of what it last read, so
 # a fingerprint that moved without any data change is committed on its own —
@@ -257,9 +376,11 @@ fi
 
 # essential-src has no tracked files (the extractor writes the CSV directly);
 # add it only if this run produced snapshots, so a fresh checkout doesn't fail
-# the add with "pathspec did not match". The direction-groups store rides the
-# poll commit when a poll wave and a mood wave land together.
-ESS_FILES=(data/essential-report.csv data/polls.json data/essential-direction-groups.json "${SITE_FILES[@]}")
+# the add with "pathspec did not match". The direction-groups and one-offs
+# stores ride the poll commit when their waves land together; the adjudicated
+# ledger rides either when Matilda's routing call settled this run.
+ESS_FILES=(data/essential-report.csv data/polls.json data/essential-direction-groups.json data/essential-one-offs.json "${SITE_FILES[@]}")
+[ -f "$OO_LEDGER" ] && ESS_FILES+=("$OO_LEDGER")
 git add "${ESS_FILES[@]}" || { log "FAIL git add"; exit 1; }
 [ -d .build/essential-src ] && git add .build/essential-src/ || true
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

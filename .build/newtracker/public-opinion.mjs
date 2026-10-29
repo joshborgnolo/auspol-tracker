@@ -1644,22 +1644,28 @@ export function buildPublicOpinion(entries, { deff, rowKeys }) {
   /* the rkAttach pairing, inverted: each wave's All-polls row key → the
      pollster's store the wave sits in, the questions it filed and their
      topics. gen-data emits it, and the poll ledger's "Public opinion"
-     line (rd-allpolls.jsx rdLgLines) reads it for the trip it offers */
+     line (rd-allpolls.jsx rdLgLines) reads it for the trip it offers. w
+     carries the paired wave date(s) so the trip (AP.gotoOpinion →
+     pubopGo) can mark exactly that wave's cards, not the pollster's whole
+     catalogue (added 2026-10-29: usually one date; a row can in principle
+     pair two waves on the fieldwork-start fallback) */
   const byRow = {};
   if (rowKeys) for (const e of shown) {
     const hit = rowKeys.get(e.house + "|e|" + e.waveDate)
       || ((e.dateStart || (e.fieldwork && e.fieldwork.start)) ? rowKeys.get(e.house + "|s|" + (e.dateStart || e.fieldwork.start)) : null);
     if (!hit) continue;
-    const b = byRow[hit.rk] || (byRow[hit.rk] = { h: e.house, ids: new Set(), th: new Set() });
+    const b = byRow[hit.rk] || (byRow[hit.rk] = { h: e.house, ids: new Set(), th: new Set(), ws: new Set() });
     b.ids.add(e.id);
     b.th.add(themeOf(e.id));
+    b.ws.add(e.waveDate);
   }
   const houses = new Set(shown.map((e) => e.house));
   return {
     generated: "public-opinion",
     houses: Object.fromEntries(Object.entries(HOUSES).filter(([k]) => houses.has(k))),
     byRow: Object.fromEntries(Object.entries(byRow).map(([k, b]) => [k,
-      { h: b.h, n: b.ids.size, t: THEMES.filter((t) => b.th.has(t.id)).map((t) => t.short) }])),
+      { h: b.h, n: b.ids.size, t: THEMES.filter((t) => b.th.has(t.id)).map((t) => t.short),
+        w: [...b.ws].sort().reverse() }])),
     counts: {
       questions: new Set(shown.map((e) => e.id + "|" + e.house)).size,
       waves: shown.length,

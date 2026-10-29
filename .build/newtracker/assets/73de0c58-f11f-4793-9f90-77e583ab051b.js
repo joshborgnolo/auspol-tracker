@@ -2835,12 +2835,15 @@ function App() {
        page's By-pollster view, landed on the pollster's own group. The
        page owns its sort and jump state, so the go hook it registers
        (AP.pubopGo, rd-public-opinion.jsx) does both jobs; the seek loop waits for
-       the hook the way gotoSwitching's waits for the section. */
-    window.AP.gotoOpinion = (storeKey) => {
+       the hook the way gotoSwitching's waits for the section. A trip that
+       names a wave (the ledger line's byRow pairing) also flags that
+       wave's questions on arrival, so the per-poll claim lands on the
+       poll's own questions (2026-10-29). */
+    window.AP.gotoOpinion = (storeKey, wave) => {
       if (readLocation() !== "public-opinion") navTab("public-opinion", true);
       let tries = 0;
       const seek = () => {
-        if (window.AP.pubopGo) { window.AP.pubopGo("pubop-p-" + storeKey); return; }
+        if (window.AP.pubopGo) { window.AP.pubopGo("pubop-p-" + storeKey, wave); return; }
         if (++tries < 40) setTimeout(seek, 75);
       };
       setTimeout(seek, 0);

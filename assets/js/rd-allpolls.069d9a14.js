@@ -2130,7 +2130,7 @@ const rdLgPanelGo = (id, p) => {
   if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
   if (id === "opinion") {
     const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
-    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
+    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]);
   }
 };
 function rdLgChgNote(p, keys) {

@@ -435,7 +435,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             no aggregate: it says so, as the same poll does in All polls */}
         <RdLedger p={ip} facet={facet} onM={onMatch} latest moe={rdLgMoe(ip)}
                   side={r.noAgg ? <><p className="rd-ldg-noagg"><b>Outside the aggregates.</b> {r.noAggWhy}</p>{rhythm}</> : rhythm}
-                  onLine={(id) => { if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id); else if (id === "switching") { if (window.AP.gotoSwitching) window.AP.gotoSwitching(); } else if (id === "opinion") { const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[ip.pollster + "|" + ip.released]; if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h); } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls"); }}
+                  onLine={(id) => { if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id); else if (id === "switching") { if (window.AP.gotoSwitching) window.AP.gotoSwitching(); } else if (id === "opinion") { const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[ip.pollster + "|" + ip.released]; if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]); } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls"); }}
                   sources={r.links && r.links.length ? rdPollLinks(r.links) : null}
                   foot={<>
                     {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}

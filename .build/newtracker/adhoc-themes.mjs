@@ -25,6 +25,9 @@
    jump-nav label, `about` the topic as a phrase inside a sentence ("More
    questions on ..."); `dek` says what the topic covers and never claims a
    finding (the findings live on the charts and cards, under margin rules). */
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 export const THEMES = [
   { id: "immigration", title: "Immigration", short: "Immigration", about: "immigration",
     dek: "How many migrants Australians want, where cuts should fall, and how they rate the government’s handling of the program." },
@@ -538,8 +541,22 @@ export const THEME_OF = {
 
 const THEME_IDS = new Set(THEMES.map((t) => t.id).concat("cut"));
 
+/* the auto-adjudicated essential stanzas (.build/essential-oneoffs-adjudicated.json,
+   written by essential-oneoffs.mjs --decisions after Matilda's routing call,
+   2026-10-29): each carries the theme it was filed under, so an accepted
+   question lands on the page without a THEME_OF source edit. The hand map
+   stays the curation of record and overrides anything here; the file is a
+   node-side read only (this module's importers are gen-data/build/test). */
+const AUTO_THEMES = (() => {
+  try {
+    const p = process.env.ESSENTIAL_ONEOFFS_LEDGER || fileURLToPath(new URL("../essential-oneoffs-adjudicated.json", import.meta.url));
+    const j = JSON.parse(readFileSync(p, "utf8"));
+    return Object.fromEntries((j.stanzas || []).filter((s) => s && s.id && s.theme).map((s) => [s.id, s.theme]));
+  } catch { return {}; }
+})();
+
 export function themeOf(entryId) {
-  const t = THEME_OF[entryId];
+  const t = THEME_OF[entryId] || AUTO_THEMES[entryId];
   if (!t) throw new Error(`adhoc-themes: no topic for entry id "${entryId}" – map it to a topic or "cut"`);
   if (!THEME_IDS.has(t)) throw new Error(`adhoc-themes: entry "${entryId}" maps to unknown topic "${t}"`);
   return t;

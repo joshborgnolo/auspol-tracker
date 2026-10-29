@@ -2369,12 +2369,12 @@ function App() {
       };
       setTimeout(seek, 0);
     };
-    window.AP.gotoOpinion = storeKey => {
+    window.AP.gotoOpinion = (storeKey, wave) => {
       if (readLocation() !== "public-opinion") navTab("public-opinion", true);
       let tries = 0;
       const seek = () => {
         if (window.AP.pubopGo) {
-          window.AP.pubopGo("pubop-p-" + storeKey);
+          window.AP.pubopGo("pubop-p-" + storeKey, wave);
           return;
         }
         if (++tries < 40) setTimeout(seek, 75);

@@ -1576,7 +1576,9 @@ const rdLgPanelGo = (id, p) => {
   if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
   if (id === "opinion") {
     const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[p.pollster + "|" + p.released];
-    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
+    /* the byRow pairing knows the wave - the trip lands on that wave's own
+       cards, not the pollster's whole catalogue */
+    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]);
   }
 };
 /* which poll a lead's change markers are measured on: the house's previous

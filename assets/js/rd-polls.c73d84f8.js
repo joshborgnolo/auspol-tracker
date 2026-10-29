@@ -656,7 +656,7 @@ function RdPolls({
           if (window.AP.gotoSwitching) window.AP.gotoSwitching();
         } else if (id === "opinion") {
           const bo = window.AUSPOL.publicOpinionByRow && window.AUSPOL.publicOpinionByRow[ip.pollster + "|" + ip.released];
-          if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
+          if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]);
         } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },
       sources: r.links && r.links.length ? rdPollLinks(r.links) : null,
