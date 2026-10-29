@@ -29,7 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SRC = os.path.join(ROOT, ".build/map/src/senate-handbook")
 OUT = os.path.join(ROOT, "map/data")
 D = dt.date.fromisoformat
-ELECTIONS = {2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
+ELECTIONS = {1996: "1996-03-02", 2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
 TERRITORY = {"ACT", "NT"}
 OPEN = D("2100-01-01")
 # the Handbook's party names as the map's party codes (partyName in app-1-base.js names them back)
@@ -187,9 +187,9 @@ def president_on(d):
 
 VICE = re.compile(r"vice (?:the Hon\.? |Dr |Sir |Mr |Mrs |Ms )*((?:[A-Z]\.? ?)+)\s*([A-Z][A-Za-z'’\-]+(?: [A-Z][a-z][A-Za-z'’\-]+)?)")
 # the Leader of the Government and of the Opposition in the Senate on the new Senate's first sitting day
-LEADERS = {2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
+LEADERS = {1996: ("Hill", "Faulkner"), 2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
            2019: ("Cormann", "Wong"), 2022: ("Wong", "Birmingham"), 2025: ("Wong", "Cash")}
-GOV = {2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
+GOV = {1996: "COAL", 2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
 long16 = {(r["State"].upper(), r["Name"].split(",")[0].strip().upper()) for r in load("senators-elected-2016") if (r["OrderElected"] or 99) <= 6}
 for y, e in ELECTIONS.items():
     d = seated_on(y)
@@ -224,7 +224,7 @@ for y, e in ELECTIONS.items():
             who = max(gone, key=lambda u: u["end"])["n"] if gone else f"{m.group(1).strip()} {m.group(2)}"
             o["casual" if ("Chosen" in t["text"] or "Appointed" in t["text"]) else "recount"] = {"for": who, "date": t["start"].isoformat()}
         else:
-            o["elected"] = max(k for k, v in ELECTIONS.items() if D(v) <= t["start"]) if t["start"] >= D(ELECTIONS[2004]) else (2001 if t["start"] >= D("2001-11-10") else 1998)
+            o["elected"] = max(k for k, v in ELECTIONS.items() if D(v) <= t["start"]) if t["start"] >= D(ELECTIONS[2004]) else (2001 if t["start"] >= D("2001-11-10") else (1996 if t["start"] >= D("1996-03-02") else 1993))
         # a senator now sitting for another party than they began the term with
         began = party_on(t["phid"], t["start"])
         same = {"XEN": "CA"}  # the Nick Xenophon Team renamed itself Centre Alliance in 2018: a new name, not a move

@@ -22,7 +22,7 @@ import collections, csv, gzip, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(ROOT, ".build/aec-flow-src/senate-fpv")
-YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
+YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
 STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]
 FAMS = ["alp", "lnp", "grn", "onp", "ind", "oth"]
 COAL = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LPNP"}
@@ -42,7 +42,7 @@ def bucket(ab, name, members):
         return "alp"
     if ab in COAL:
         return "lnp"
-    if ab in ("GRN", "GVIC"):
+    if ab in ("GRN", "GVIC", "TG", "GWA"):
         return "grn"
     if ab in ("ON", "HAN"):
         return "onp"
