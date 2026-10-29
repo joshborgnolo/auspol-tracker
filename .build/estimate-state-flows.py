@@ -70,6 +70,9 @@ BUILD = os.path.join(ROOT, ".build")
 OUT_CSV = os.path.join(ROOT, "data", "state-flows-est.csv")
 OUT_JSON = os.path.join(ROOT, "data", "state-flows-backtest.json")
 OUT_SA = {2026: os.path.join(ROOT, "data", "sa26-flows.json"), 2022: os.path.join(ROOT, "data", "sa22-flows.json")}
+OUT_QLD = {2024: os.path.join(ROOT, "data", "qld24-flows.json"),
+           2020: os.path.join(ROOT, "data", "qld20-flows.json"),
+           2017: os.path.join(ROOT, "data", "qld17-flows.json")}
 
 LAM0 = 3e4               # contrast shrinkage per federal-size seat (ballot units)
 FED_SEAT = 104000.0      # mean formal ballots in a 2022/2025 federal seat
@@ -1010,6 +1013,52 @@ def write_sa(y, states, evs, params, seaterr_, sapile_, contest_err=None):
     print(f"wrote {os.path.relpath(OUT_SA[y], ROOT)} ({n_cl} classic districts, {out['nContest']} Labor v One Nation)", file=sys.stderr)
 
 
+def write_qld(y, states, evs, params, seaterr_, contest_err=None):
+    """The /map/ flow store for Queensland's election of year y — write_sa's
+    contract on the Queensland seats: per district whose final was Labor
+    against the LNP (flows) or against One Nation (contests), the modelled
+    per-group votes to Labor and to the other finalist. 2017 carries 13
+    Labor v One Nation finals; the classic set counts the LNP v Labor
+    finals; a non-classic final (Katter-era, LNP v One Nation, Green v
+    Liberal) contributes no row."""
+    seats = states[("qld", y)]
+    ev = collections.defaultdict(dict)
+    for e in evs[("qld", y)]:
+        ev[e["seat"]][e["x"]] = e
+    out = {"seaterr": seaterr_, "flows": {}, "contests": {}}
+    n_cl = 0
+    for k, s in seats.items():
+        pair = {s["cands"][c][0] for c in s["final"]} if len(s["final"]) == 2 else set()
+        if classic(s):
+            n_cl += 1
+            dest = out["flows"]
+        elif pair == {"alp", "onp"}:
+            dest = out["contests"]
+        else:
+            continue
+        p = replay(s, params[("qld", y)], ev[k])
+        a = next(c for c in s["final"] if s["cands"][c][0] == "alp")
+        o = next(c for c in s["final"] if c != a)
+        fl = {}
+        own = {"alp", s["cands"][o][0]}
+        for c, (b, fp) in s["cands"].items():
+            if b in own:
+                continue
+            bb = "lnp" if b == "coal" else b
+            got = fl.setdefault(bb, [0, 0])
+            got[0] += round(p[a].get(b, 0.0))
+            got[1] += round(p[o].get(b, 0.0))
+        dest[k] = fl
+    out["nClassic"] = n_cl
+    out["nContest"] = len(out["contests"])
+    if out["contests"]:
+        out["contestErr"] = contest_err
+    with open(OUT_QLD[y], "w") as f:
+        json.dump(out, f, indent=1)
+        f.write("\n")
+    print(f"wrote {os.path.relpath(OUT_QLD[y], ROOT)} ({n_cl} classic districts, {out['nContest']} Labor v One Nation)", file=sys.stderr)
+
+
 def onp_min_ballots(fed):
     """The smallest One Nation ballot base the calibration's error figures
     stand on: the 5th percentile of One Nation ballots (reaching Labor or
@@ -1219,6 +1268,16 @@ def main():
             if ("sa", y) in states:
                 c = contests.get(f"sa-{y}-alp-onp")
                 write_sa(y, states, evs, params, serr, pchk, c and c.get("err90"))
+        for y in OUT_QLD:
+            if ("qld", y) in states:
+                n_ct = sum(1 for s in states[("qld", y)].values()
+                           if len(s["final"]) == 2 and {s["cands"][c][0] for c in s["final"]} == {"alp", "onp"})
+                c_err = None
+                if n_ct:
+                    miss = [abs(d["coal"]["model"] - d["coal"]["counted"]) for d in noncoal.values() if "coal" in d]
+                    c_err = {"lib": round(max(miss), 2) if miss else None,
+                             "grn": err90(ctable, "grn", n_ct), "oth": err90(ctable, "oth", n_ct)}
+                write_qld(y, states, evs, params, serr, c_err)
     else:
         print("  sa26 gate FAILED: store not written", file=sys.stderr)
     if vtable.get("band"):

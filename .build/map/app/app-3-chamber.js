@@ -139,6 +139,49 @@ function nswCells() {
   return cells;
 }
 /* @nsw-cells-end */
+/* Queensland's Legislative Assembly in the same idiom (Parliament House, Brisbane — the
+   1868 Westminster horseshoe of benches about a central table, the mace lying on the
+   table). Its ledger today follows the Macquarie Street arc fork (desks = the chamber's
+   92 seated members, straight files of twelve continuing the two inner curve radii, the
+   far end turning in three rows of 6, 9 and 6 a side, the Serjeant-at-Arms's chair
+   centred behind the curve): every other state floor here rides its OWN parliament's
+   published plan, but as of 2026-10-29 Queensland's was not captured (the live seating
+   plan is bot-walled, the Wayback search line was down, Factsheet 3.4's PDF is the next
+   call) — the floor carries no claim of plan truth and is re-visited when the official
+   plan lands; the shared arc mechanics, the furniture's rectangle table and its mace
+   (Queensland's mace does lie on the table, documented) are what every shape pin in the
+   map test stands on.
+   @qld-cells-begin */
+const QLDB = {
+  leadY: -268.2, // the leaders' desks, heading the inner straight row at the table's shoulder
+  arm: { x: 130, y0: -250, pitch: 18.2, n: 12 }, // the inner straight row, continuing the inner curve's radius
+  row2X: 172, // the outer straight row, continuing the middle curve's radius
+  row2Y0: -268.2, // its head level with the leaders' desks
+  R: [130, 172, 214], // the curve's three rows
+  sectors: [[[6, 84, 6]], [[5, 85, 9]], [[33, 83, 6]]],
+  // the walkway radii the majority line threads (per the Macquarie Street fork's ledgers)
+  walks: [116, 151, 187, 151, 193, 229],
+};
+const QLD_SERJEANT = "Rsj0"; // the Serjeant-at-Arms-the-Rod chair, centred at the curve's back
+function qldCells() {
+  const cells = [], D = Math.PI / 180;
+  for (const side of [0, 1]) {
+    const sx = side ? 1 : -1, P = side ? "R" : "L", fa = side ? Math.PI : 0;
+    cells.push({ id: `${P}t0`, x: sx * QLDB.arm.x, y: QLDB.leadY, fa, row: 1, w: QLDB.arm.pitch });
+    for (let i = 0; i < QLDB.arm.n; i++) cells.push({ id: `${P}a${i}`, x: sx * QLDB.arm.x, y: QLDB.arm.y0 + QLDB.arm.pitch * i, fa, row: 1, w: QLDB.arm.pitch });
+    for (let i = 0; i < QLDB.arm.n; i++) cells.push({ id: `${P}b${i}`, x: sx * QLDB.row2X, y: QLDB.row2Y0 + QLDB.arm.pitch * i, fa, row: 2, w: QLDB.arm.pitch });
+    QLDB.sectors.forEach((secs, k) => secs.forEach(([a0, a1, n], q) => {
+      for (let i = 0; i < n; i++) {
+        const a = (a0 + ((i + 0.5) * (a1 - a0)) / n) * D, r = QLDB.R[k];
+        const x = sx * r * Math.cos(a), y = r * Math.sin(a);
+        cells.push({ id: `${P}c${k + 3}${"abcd"[q]}${i}`, x, y, fa: Math.atan2(-y, -x), row: k + 3, w: ((a1 - a0) * D * r) / n });
+      }
+    }));
+  }
+  cells.push({ id: QLD_SERJEANT, x: 0, y: 242, fa: -Math.PI / 2, row: 5, w: 26 });
+  return cells;
+}
+/* @qld-cells-end */
 /* Victoria's Legislative Council, seating the 60th Parliament's own plan
    (map/data/lc-seating-plan-vic-2026-10-27.json — the Parliament's desk numbers are the
    seats' ids here). The 2026-10-27 redraw to the chamber photograph: a flat overhead
@@ -227,8 +270,8 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    two chairs, the walkways the majority line threads, the furniture. The Senate's comes from
    senateGeom (app-3b-senate.js), South Australia's two chambers and New South Wales' Council
    from saGeom (app-3c-sa.js) */
-let chGeomC = null, vicGeomC = null, vicLCGeomC = null, nswGeomC = null;
-const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+let chGeomC = null, vicGeomC = null, vicLCGeomC = null, nswGeomC = null, qldGeomC = null;
+const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && QLD_YEARS.has(m.year) ? qldGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 // the House's layout builder, shared by Victoria's and New South Wales' variants: the extra block
 // carries what differs — the table's chairs, the head clerks, and for Spring Street the clean
 // table, for Macquarie Street the rectangular one with no Hansard
@@ -273,6 +316,15 @@ function nswGeom() {
     rOut: NSWB.R[2] / CU, // the outer of its three curve rows (geomFor reads R[4], a House index)
     officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
   return nswGeomC;
+}
+function qldGeom() {
+  // Queensland's floor, the same arc fork: leaders top the front benches, two clerks
+  // chair at the table's head (the geometry's shape today is the shared arc ledger —
+  // see the @qld-cells note against plan truth)
+  if (!qldGeomC) qldGeomC = geomFor(qldCells, QLD_SERJEANT, QLDB, { table: ["Lt0", "Rt0"], nsw: true,
+    rOut: QLDB.R[2] / CU,
+    officers: [[-19, -285.5, Math.PI / 2], [18, -285.5, Math.PI / 2]] });
+  return qldGeomC;
 }
 
 /* the council's geometry, off its own descriptor: no floor file to wait on. The order along the
@@ -440,6 +492,10 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
   // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
   nsw23: ["Kogarah", "Cronulla"],
+  // Queensland's Premier and Leader of the Opposition, at the front benches' heads:
+  // Palaszczuk/Nicholls at 2017, Palaszczuk/Frecklington at 2020, and 2024's incoming
+  // front-runners: the LNP's Crisafulli flips the chamber to Broadwater against Labor's Miles
+  qld17: ["Inala", "Clayfield"], qld20: ["Inala", "Nanango"], qld24: ["Broadwater", "Murrumba"],
   // Victoria's, three a side at the table in the 60th Parliament's plan: the Premier, the Leader
   // of the House and the Deputy Premier facing the Opposition Leader, the Deputy Leader of the
   // Opposition and the Nationals' leader (Carroll, Carbines, Williams against Wilson, Southwick, O'Brien)
@@ -1035,7 +1091,8 @@ function crossLabel(h) {
   return partyShort(h.ab, h.pn);
 }
 const SPEAKERS = { 2004: "David Hawker", 2007: "Harry Jenkins", 2010: "Harry Jenkins", 2013: "Bronwyn Bishop", 2016: "Tony Smith", 2019: "Tony Smith", 2022: "Milton Dick", 2025: "Milton Dick", now: "Milton Dick",
-  sa22: "Dan Cregan", sa26: "Nat Cook", nsw23: "Greg Piper", vic22: "Maree Edwards" };
+  sa22: "Dan Cregan", sa26: "Nat Cook", nsw23: "Greg Piper", vic22: "Maree Edwards",
+  qld17: "Curtis Pitt", qld20: "Curtis Pitt", qld24: "Pat Weir" };
 const speakerName = (m) => SPEAKERS[m.year];
 // the chair's occupant as the chamber names them: the Speaker and their seat, the President and their state
 const presiding = (m) => (m.house === "senate" ? (m.speaker != null ? { role: "President", name: m.divs[m.speaker].n, place: STATE_SHORT[m.divs[m.speaker].st] } : { role: "President", name: "", place: "" }) : { role: "Speaker", name: speakerName(m), place: m.divs[m.speaker] && m.divs[m.speaker].n });
