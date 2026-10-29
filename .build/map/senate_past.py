@@ -187,6 +187,11 @@ def president_on(d):
 
 VICE = re.compile(r"vice (?:the Hon\.? |Dr |Sir |Mr |Mrs |Ms )*((?:[A-Z]\.? ?)+)\s*([A-Z][A-Za-z'’\-]+(?: [A-Z][a-z][A-Za-z'’\-]+)?)")
 # the Leader of the Government and of the Opposition in the Senate on the new Senate's first sitting day
+# a senator's `elected` is the ELECTION CLASS their term started with (so
+# scands' own class years - including 1998, which has no /map/ frame); the
+# ELECTIONS-keyed double-dissolution/half-senate era above 2004 reads
+# straight off ELECTIONS.
+SERVICE_CLASS = [(D("1993-03-13"), 1993), (D("1996-03-02"), 1996), (D("1998-10-03"), 1998), (D("2001-11-10"), 2001)]
 LEADERS = {1996: ("Hill", "Faulkner"), 2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
            2019: ("Cormann", "Wong"), 2022: ("Wong", "Birmingham"), 2025: ("Wong", "Cash")}
 GOV = {1996: "COAL", 2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
@@ -224,7 +229,7 @@ for y, e in ELECTIONS.items():
             who = max(gone, key=lambda u: u["end"])["n"] if gone else f"{m.group(1).strip()} {m.group(2)}"
             o["casual" if ("Chosen" in t["text"] or "Appointed" in t["text"]) else "recount"] = {"for": who, "date": t["start"].isoformat()}
         else:
-            o["elected"] = max(k for k, v in ELECTIONS.items() if D(v) <= t["start"]) if t["start"] >= D(ELECTIONS[2004]) else (2001 if t["start"] >= D("2001-11-10") else (1996 if t["start"] >= D("1996-03-02") else 1993))
+            o["elected"] = max(k for k, v in ELECTIONS.items() if D(v) <= t["start"]) if t["start"] >= D(ELECTIONS[2004]) else next((cy for dd, cy in reversed(SERVICE_CLASS) if t["start"] >= dd), None)
         # a senator now sitting for another party than they began the term with
         began = party_on(t["phid"], t["start"])
         same = {"XEN": "CA"}  # the Nick Xenophon Team renamed itself Centre Alliance in 2018: a new name, not a move
