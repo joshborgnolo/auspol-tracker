@@ -34,7 +34,7 @@ const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 // the repo declares no such dependency, so CI's npm ci never installs it and
 // a bare import failed every run from the test's first commit
 const topojson = (() => { const g = {}; vm.runInNewContext(R("map/vendor/topojson-client-3.1.0.min.js"), g); return g.topojson; })();
-const YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 
 // the floor pair itself lives in geo_build.mjs
 assert.ok(/lo: \{ iv: 1000, minArea: "2km2" \}, hi: \{ iv: 60, minArea: "0\.1km2" \}/.test(R(".build/map/geo_build.mjs")),
@@ -77,7 +77,8 @@ for (const y of YEARS) {
       assert.equal(craggyName, "Bass", `${y} hi: Craggy Island belongs to Bass`);
     } else assert.ok(craggyKm > 5, `${y} lo: the 2km2 low-zoom floor still strips 0.39km2 islands`);
     const [dealKm] = closest(fc, DEAL);
-    if (y !== 2004) assert.ok(dealKm < 1, `${y} ${lvl}: Deal Island (above the old floor) still drawn`);
+    if (y !== 2004) assert.ok(dealKm < (y === 1996 ? 2 : 1),
+      `${y} ${lvl}: Deal Island (above the old floor) still drawn (${dealKm.toFixed(3)}km — 1996's era digitisation of Deal Island carries the ~1.5km offset the pre-2001 editions measured, pinned at hi to 0.6km; 2004's MIF defect cut it entirely)`);
   }
 }
 // --- the 2004 NT/QLD meridian repair pins (see header) -------------------
@@ -135,9 +136,9 @@ const PROBES = [
   [[137.9995, -17.5], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, mid"],
   [[138.0005, -17.0], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, north"],
   [[137.9999, -18.7], { 2004: "Kennedy", 2022: "Kennedy", 2025: "Kennedy" }, "old sliver, south"],
-  [[137.99, -17.5], { all: "Lingiari" }, "west of the meridian"],
-  [[136.2, -24.15], { all: "Lingiari" }, "NT interior"],
-  [[137.8, -24.15], { all: "Lingiari" }, "NT interior, east"],
+  [[137.99, -17.5], { 1996: "Northern Territory", all: "Lingiari" }, "west of the meridian"],
+  [[136.2, -24.15], { 1996: "Northern Territory", all: "Lingiari" }, "NT interior"],
+  [[137.8, -24.15], { 1996: "Northern Territory", all: "Lingiari" }, "NT interior, east"],
 ];
 
 for (const y of YEARS) {
@@ -148,7 +149,7 @@ for (const y of YEARS) {
     const fc = topojson.feature(t, t.objects.divs);
     for (const [pt, expect, label] of PROBES) {
       const got = covering(fc, pt).join("+") || "NO DIV";
-      const want = expect.all ?? expect[y];
+      const want = expect[y] ?? expect.all;
       if (want) assert.equal(got, want, `${y} ${lvl}: ${label} [${pt}] is ${want}, got ${got}`);
       else assert.ok(got !== "NO DIV" && !got.includes("+"), `${y} ${lvl}: ${label} [${pt}] covered by exactly one division, got ${got}`);
     }

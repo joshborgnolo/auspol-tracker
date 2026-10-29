@@ -238,7 +238,7 @@ const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 const DEMO_FROM = 2001;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [2001, 2004, 2007, 2010, 2013, 2016, "qld17", 2019, "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
+const YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, "qld17", 2019, "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw23/sa22/vic22/sa26 —
 // non-federal stops, drawn on their own timeline row at their
@@ -255,7 +255,7 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
+const YEAR_X = { 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
 const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
@@ -277,14 +277,14 @@ const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
 const PREV_GOV_BY_JUR = { vic: { 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" } };
-const PM = { 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
+const PM = { 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];

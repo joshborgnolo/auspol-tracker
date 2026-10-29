@@ -100,8 +100,63 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
 // and 2004 federal frames; the 2006/2011 editions trim to the eight)
 const GCP_COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka", "sct"];
 const CENSUS01_COB_KEYS = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
-for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+}
+{ // the 1996 federal frame (.build/map/README-era recipes: extract-asgc1996-ced.py over
+  // data.gov.au's asgc1996 gpkg, pack-1996-booth.py + pack-1996-senate.py from the
+  // statistics CD-ROM's divs/hcands/htpp/dop-1996 with no pps roll (1996 carries only
+  // PPSNUM96 counts; HPPDOP prints piles+Vote Distributed so the flow lanes restate
+  // that table verbatim), derive-1996-venues.py's short-name+prefix inherits at 85.2%
+  // coverage, the handbook caches refreshed full (1812 senate-service).
+  for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "1996 lane " + f + " on disk");
+  assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 venue store (derive-1996-venues.py) is on disk");
+  const D = JSON.parse(R("map/data/data-1996.json"));
+  const r = JSON.parse(R("map/data/res-1996.json"));
+  const S = JSON.parse(R("map/data/senate-1996.json"));
+  const SV = JSON.parse(R("map/data/senate-vote-1996.json"));
+  assert.equal(D.year, 1996);
+  assert.equal(D.divs.length, 148, "1996 has its 148 divisions (Namadgi's only term)");
+  assert.equal(D.date, "1996-03-02");
+  assert.equal(D.prev, 1993, "1996's previous election is 1993");
+  assert.equal(D.speaker, "Casey");
+  assert.equal(D.event, null, "1996 has no VTR event id (stats-pack era)");
+  const tally = {};
+  for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
+  assert.deepEqual(tally, { ALP: 49, LP: 76, NP: 18, CLP: 1, IND: 4 },
+    "the 1996 House per the AEC's certified hcands (Howard's Coalition 95 seats and the four independents: Andren, Rocher, Campbell, Filing)");
+  assert.equal(Object.keys(D.booths).length, 16, "the booth lane is the columnar 16 lanes (no census demo or birthplace rows on a stats-era frame)");
+  {
+    const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
+    assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
+    assert.ok(Math.abs(D.agg.AUS.tpp[2] - -5.06) < 0.01, "1996's national swing vs 1993 is the Howard landslide's -5.06 (got " + D.agg.AUS.tpp[2] + ")");
+  }
+  // the stats-era floor: no census people lanes and no SEIFA anywhere on the frame
+  for (const f of [r, D]) {
+    assert.equal(f.demoBasis, null, "1996 has no census people basis");
+    assert.equal(f.incomeCuts, null, "the income floor stays 2013 everywhere the frame reaches");
+    assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "1996 SEIFA cuts stay null");
+  }
+  assert.ok(!D.divs.some((d) => d.demo), "no 1996 division carries a census demo row");
+  // the new Senate as at 1 July 1996: LP 31, ALP 29, Democrats 7, NP 6, GRN 2, IND 1
+  {
+    const tot = {};
+    for (const s of S.senators) tot[s.ab] = (tot[s.ab] || 0) + 1;
+    assert.deepEqual(tot, { ALP: 29, LP: 31, AD: 7, NP: 6, GRN: 2, IND: 1 }, "the Senate that took its seats 1 July 1996");
+    assert.equal(S.senators.length, 76, "all 76 senators seat that day (zero vacancies over the refetched handbook caches)");
+  }
+  assert.equal(SV.year, 1996);
+  {
+    // family shares from the senate-fpv recompute: the box-and-ballot elections of the era
+    const nat = [0, 0, 0, 0, 0, 0, 0];
+    for (const dv of Object.values(SV.divs)) for (let i = 0; i < 7; i++) nat[i] += dv[i] || 0;
+    const fam = (i) => 100 * nat[i + 1] / nat[0];
+    assert.ok(Math.abs(fam(0) - 36.2) < 0.3 && Math.abs(fam(1) - 44.0) < 0.3 &&
+              Math.abs(fam(2) - 2.4) < 0.2 && fam(3) === 0 && Math.abs(fam(4) - 0.1) < 0.05 &&
+              Math.abs(fam(5) - 17.3) < 0.3,
+      "the 1996 Senate family shares over the senate-fpv lanes (got " +
+      [fam(0), fam(1), fam(2), fam(3), fam(4), fam(5)].map((v) => v.toFixed(1)).join(",") + ")");
+  }
 }
 { // the 2001 federal frame (.build/map/README-era recipes: pack-2001-booth.py's VTR lanes,
   // v310-2001.txt.gz official per-place flows, asgc2001.gpkg boundary plus the

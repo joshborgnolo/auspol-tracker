@@ -38,20 +38,21 @@ BOOTH = SRC + "/booth"
 OUT = sys.argv[1]
 FARRER = sys.argv[2] if len(sys.argv) > 2 else os.path.join(REPO, ".build", "map", "src", "farrer-31633")
 STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]
-YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
+YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
 EVENT = {2004: 12246, 2007: 13745, 2010: 15508, 2013: 17496, 2016: 20499, 2019: 24310, 2022: 27966, 2025: 31496}
-# 2001 has no Virtual Tally Room event (ids start at 12246); its lanes ride
-# the statistics-pack products instead (same role)
+# 2001 and 1996 have no Virtual Tally Room event (ids start at 12246); their
+# lanes ride the statistics-pack products instead (same role)
 EVENT_STATS = 2001
-DATE = {2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02",
+DATE = {1996: "1996-03-02", 2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02",
         2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
-PREV = {2001: 1998, 2004: 2001, 2007: 2004, 2010: 2007, 2013: 2010, 2016: 2013, 2019: 2016, 2022: 2019, 2025: 2022}
+PREV = {1996: 1993, 2001: 1998, 2004: 2001, 2007: 2004, 2010: 2007, 2013: 2010, 2016: 2013, 2019: 2016, 2022: 2019, 2025: 2022}
 # the member the new House elected Speaker at its first sitting
-SPEAKER = {2001: "Wakefield", 2004: "Wannon", 2007: "Scullin", 2010: "Scullin", 2013: "Mackellar", 2016: "Casey", 2019: "Casey",
+SPEAKER = {1996: "Casey", 2001: "Wakefield", 2004: "Wannon", 2007: "Scullin", 2010: "Scullin", 2013: "Mackellar", 2016: "Casey", 2019: "Casey",
            2022: "Oxley", 2025: "Oxley"}
 COALITION = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ"}
 BUCKETS = ["alp", "lnp", "grn", "onp", "ind", "oth"]
-# 2001 two-party preferred: state rows from the atlas history, the nation from the AEC (Labor 49.05)
+# per-election state returns before 2001 live in the stats-pack era
+TPP1993_AUS = 51.435  # canonical ALP 2PP drift-checked against data/division-results.json's 1993 block (51.4)
 TPP1998_AUS = 50.98  # canonical 1998 ALP 2PP from data/polls.json
 TPP2001_AUS = 49.05  # canonical 2001 ALP 2PP from data/polls.json
 
@@ -396,6 +397,34 @@ def load_1998():
     return prim, tpp, names98
 
 
+def load_1993():
+    """The 1993 federal election, load_1998's mirror: hcands-1993.txt for
+    state primaries, the same atlas 2PP-by-state CSV for per-state Labor
+    2PP, and fpv/1993.csv.gz for the place-continuity set. National 2PP
+    rides TPP1993_AUS (the certified division-summed figure from
+    data/division-results.json; canonical polls.json prints 51.4)."""
+    prim = collections.defaultdict(collections.Counter)
+    with open(SRC + "/hcands-1993.txt", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            if r["Party"]:
+                v = int(r["Vote"])
+                b = bucket(r["Party"])
+                prim[r["State"]][b] += v
+                prim["AUS"][b] += v
+    assert set(prim) - {"AUS"} == set(STATES), sorted(set(prim) - {"AUS"})
+    tpp = {}
+    with open(REPO + "/atlas/data/all_elections_2PP_by_state.csv", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            if r["State"] != "AUS" and r["Year"] == "1993":
+                tpp[r["State"]] = float(r["Labor_2PP_percent"])
+    tpp["AUS"] = TPP1993_AUS
+    names93 = set()
+    with gzip.open(BOOTH + "/fpv/1993.csv.gz", "rt", encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            names93.add((r["Division"], norm_pp(r["Polling Place"])))
+    return prim, tpp, names93
+
+
 def build_year(year, hist, base2001):
     prev = PREV[year]
     divs = load_fpvvt(year)
@@ -407,8 +436,10 @@ def build_year(year, hist, base2001):
     btpp = load_booth_tpp(year)
     btcf = load_booth_tcf(year)
     gpp = load_gpp(gpp_path(year))
-    cls = json.load(open(REPO + "/data/division-classifications.json"))["elections"][str(year)]
-    seifa = json.load(open(REPO + "/data/division-seifa-indexes.json"))["elections"][str(year)]
+    cls = json.load(open(REPO + "/data/division-classifications.json"))["elections"].get(str(year)) or {}
+    # some elections have no division SEIFA block yet (1996's rides the
+    # AURIN-eld homeland; the frame ships with seifa cells null)
+    seifa = json.load(open(REPO + "/data/division-seifa-indexes.json"))["elections"].get(str(year)) or {}
     bseifa = {(b["divId"], b["boothId"]): b for b in json.load(open(REPO + f"/data/booth-seifa-{year}.json"))["booths"]}
     vpath = REPO + f"/data/booth-seifa-voter-{year}.json"
     vstore = json.load(open(vpath)) if os.path.exists(vpath) else None
@@ -783,7 +814,7 @@ def main():
     hist = build_history()
     # stats-era base lanes for previous-election comparisons below the VTR
     # era: 2001 the existing lane, 1998 its mirror for the 2001 frame
-    base_by_prev = {1998: load_1998(), 2001: load_2001()}
+    base_by_prev = {1993: load_1993(), 1998: load_1998(), 2001: load_2001()}
     out = {}
     for y in YEARS:
         out[y] = build_year(y, hist, base_by_prev.get(PREV[y], base_by_prev[2001]))
