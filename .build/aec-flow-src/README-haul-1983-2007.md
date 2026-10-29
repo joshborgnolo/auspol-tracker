@@ -158,6 +158,21 @@ Member sha256 (verbatim, end-of-file newline preserved):
 - act `f0e8277914…` nsw `3856f9ba4b…` nt `ed14dc2608…` qld `f706deeb52…`
   sa `5a34503b12…` tas `66e3ed30bc…` vic `6e166704fb…` wa `615ad58361…`
 
+### Senate cross-tab oracles for 1996 (fetched 2026-10-29)
+
+`v24-1996.txt` ← `data/senres/tables96/text/V2_4.TXT` (Senate first prefs
+by candidate by vote type BY DIVISION) sha256
+`df5e2e57c894766d080b082b1db915dbe57164c6f960ed2ecc358d3997ac4f22`
+`v24s-1996.txt` ← `data/senres/tables96/text/V2_4_S.TXT` (the same roll-up
+BY STATE, with the STV "Adj" adjustment column) sha256
+`aaff7fd7401e083ab78ff2d743f0bd399e8e3e95f4dd308924374ccb779bd73c`
+
+These are the oracle pair pack-1996-senate.py gates its SPPVOTE
+recomputation against before anything is written — division-grain from
+V2_4.TXT, the state roll-up from V2_4_S.TXT — same role as the 2001
+pack's V2_4_D; the 1993-96-98 zip holds no V2_4_D-name, the family runs
+as V2_4/V2_4_S (per election year) under data/senres/.
+
 ## psephos transcriptions (1983–1990, pre-digital AEC era)
 
 psephos/<year>/<year>reps<state>.txt — Adam Carr's verbatim transcriptions
