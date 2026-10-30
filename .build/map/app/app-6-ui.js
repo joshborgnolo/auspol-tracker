@@ -429,11 +429,16 @@ function renderTimeline() {
       const x0 = its.length ? its[0].x - 24 : W;
       if (x0 > (short ? 30 : 110)) g += `<text class="yr row" x="0" y="${labY}" text-anchor="start">${short ? stOfYear(r.ys[0]) : stNameCap(r.ys[0])}</text>`;
     }
-    for (const t of its) {
+    for (const [i, t] of its.entries()) {
       const lx = t.x + t.dx + t.w / 2;
+      // Split adjacent touch areas between their visible labels. Fixed-width
+      // targets overlap on phones and let a later year intercept an earlier tap.
+      const centre = (v) => v.x + v.dx + v.w / 2;
+      const hitLeft = i ? Math.max(lx - 24, (centre(its[i - 1]) + lx) / 2) : lx - 24;
+      const hitRight = i + 1 < its.length ? Math.min(lx + 24, (lx + centre(its[i + 1])) / 2) : lx + 24;
       const hitTop = R.i ? r.top : 0, hitBot = R.i + 1 < rows.length ? rows[R.i + 1].top : H;
       const uline = t.on ? `<line x1="${lx - t.w / 2}" x2="${lx + t.w / 2}" y1="${labY + 2}" y2="${labY + 2}" stroke="var(--ink)" stroke-width="2"/>` : "";
-      g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${t.x - 24}" y="${hitTop}" width="48" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
+      g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${hitLeft}" y="${hitTop}" width="${hitRight - hitLeft}" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian and Queensland state elections; choose one">${g}</svg>`;

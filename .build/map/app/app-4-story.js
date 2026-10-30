@@ -402,7 +402,7 @@ function incFact(m, dm) {
   if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${m.demoInterp && c.dollarsYear ? ` in ${c.dollarsYear} dollars` : ""}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
-const DEMO_EARLY = { hed: "Census figures start at the 2001 election", dek: "Census-linked people figures exist only from the 2001 election on: 2001 reads the 2001 census, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census. The timeline now runs from 1996, which has no census-linked figures of its own." };
+const DEMO_EARLY = { hed: "Census figures start at the 2001 election", dek: "Census-linked people figures exist only from the 2001 election on: 2001 reads the 2001 census, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census. The 1993, 1996 and 1998 elections have no census-linked figures of their own." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
@@ -430,6 +430,7 @@ function storyArea(m, st) {
   // never the date — the eyebrow line above the map already carries it
   const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${STATE_YEARS.has(m.year) ? "districts" : "seats"}`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
+  if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats
   if (S.view !== "chamber") {
@@ -446,7 +447,7 @@ function storyArea(m, st) {
   const swp = swingPhrase(A.tppSw, prev);
   const classicN = m.divs.filter((d) => d.tpp != null).length;
   h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
-  h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
+  h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null && m.res.agg[st].pprim != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const bySt = aus ? STATES.filter((s) => m.areas[s]) : [];
   // a one-row "by state" table says nothing the headline didn't (SA frames list SA alone)
@@ -664,7 +665,7 @@ function storyBooth(m, j) {
       // falls through when there's no two-party count
       default:
         hed = `${ds(ln)} won this place ${f0(lp)}–${f0(100 - lp)}`;
-        dek = `${int(b.votes[j])} votes were cast here, ${f1(b.infPct[j])}% informal. Across ${ds(D.n)}, ${ds(surname(D.win.n))} won ${f1(D.winPct)}–${f1(100 - D.winPct)}.`;
+        dek = `${Number.isFinite(b.votes[j]) ? `${int(b.votes[j])} votes were cast here, ${f1(b.infPct[j])}% informal.` : `${int(b.formal[j])} formal votes were recorded here; the informal count is unavailable.`} Across ${ds(D.n)}, ${ds(surname(D.win.n))} won ${f1(D.winPct)}–${f1(100 - D.winPct)}.`;
         void rn;
     }
     if (S.lens === "fp") { const v = b.fp[S.party][j]; hed = `${famLeg(S.party)} won ${f1(v)}% of first preferences here`; dek = `In ${ds(D.n)} as a whole, ${f1(D.fp[S.party])}%.`; }
@@ -676,7 +677,7 @@ function storyBooth(m, j) {
     }
     if (S.lens === "informal") {
       if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
-      else { hed = `${f1(b.infPct[j])}% of ballots here were informal`; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
+      else { hed = Number.isFinite(b.infPct[j]) ? `${f1(b.infPct[j])}% of ballots here were informal` : "This place has no informal count on record"; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     }
     if (S.lens === "seifa" && isDemo()) { const k = S.index, v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v, dv = D.demo && demoShare(D); hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`; }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
@@ -690,6 +691,10 @@ function storyBooth(m, j) {
     else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
   }
   let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed, dek);
+  const loc = raw.location && raw.location[j];
+  if (loc) h += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
+  else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
+  if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
   if (lead && tc) {
     const ta = tc[0], tb = tc[1], tot = ta + tb;
     const [an, bn] = pairNames(D.A, D.B);

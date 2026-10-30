@@ -745,6 +745,8 @@ function drawYearMorph(mo, t) {
 const BOOTH_GAP = 0.158;
 const roomy = () => 1 - smooth(K_ALL * 0.4, K_ALL * 0.9, T.k);
 const dotBase = () => Math.min(9, Math.max(2.6 + 1.9 * roomy(), 0.34 * BOOTH_GAP * T.k));
+// Size by recorded formal votes when the source has no informal count.
+const boothSizeVotes = (b, j) => Number.isFinite(b.votes[j]) ? b.votes[j] : b.formal[j];
 const voteScale = (v) => Math.min(2.5, v <= 4000 ? Math.sqrt(v / 1000) : 2 * Math.pow(v / 4000, 0.25));
 const rad = (votes) => Math.max(1.6 + 0.6 * roomy(), dotBase() * voteScale(votes));
 // the paper ring that parts overlapping dots, thinner on the small ones
@@ -764,7 +766,7 @@ function visibleBooths(m) {
     if (Number.isNaN(x) || x < x0 - pad || x > x1 + pad || y < y0 - pad || y > y1 + pad) continue;
     out.push(j);
   }
-  out.sort((a, c) => b.votes[c] - b.votes[a]);
+  out.sort((a, c) => boothSizeVotes(b, c) - boothSizeVotes(b, a));
   return out;
 }
 function boothShape(g, ty, x, y, r) {
@@ -781,7 +783,7 @@ function drawBooths(m) {
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / dpr));
   const rf = S.f.range && S.listUnit === "booths" ? S.f.range : null, rise = boothIn();
   for (const j of list) {
-    const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]);
+    const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j));
     if (x < -r || y < -r || x > Wpx + r || y > Hpx + r) continue;
     let a = sd != null && b.d[j] !== sd ? 0.5 * rise : b.d[j] === sd ? 1 : rise;
     if (rf && !inRange(boothColValue(m, j, rf.key), rf)) a *= 0.2;
@@ -791,7 +793,7 @@ function drawBooths(m) {
     boothShape(ctx, b.ty[j], x, y, r); ctx.fillStyle = c ? css(c) : pat; ctx.fill();
   }
   ctx.globalAlpha = ovA;
-  const ring = (j, w, col) => { const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]); boothShape(ctx, b.ty[j], x, y, r + 2.4); ctx.lineWidth = w; ctx.strokeStyle = css(col); ctx.stroke(); };
+  const ring = (j, w, col) => { const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)); boothShape(ctx, b.ty[j], x, y, r + 2.4); ctx.lineWidth = w; ctx.strokeStyle = css(col); ctx.stroke(); };
   if (S.hover && S.hover.kind === "booth") ring(S.hover.i, 1.6, th.ink);
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) ring(S.sel.booth, 2.4, th.ink);
   ctx.restore();
@@ -821,7 +823,7 @@ function drawLabels(m) {
   const sd = selDiv(), b = m.booth;
   const groundOf = (i) => { const c = fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
-    const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(b.votes[j]) - 13, 13, 600, groundOf(sd), th.ink, true);
+    const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
@@ -846,7 +848,7 @@ function drawLabels(m) {
     if (x1 - x0 < 30 || x1 < 0 || x0 > Wpx || y0 > Hpx) continue;
     // clear of the island's own polling places (which stay free for their own names)
     const n0 = placed.length;
-    for (const j of q.booths) { if (Number.isNaN(b.x[j])) continue; const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]) + 2; placed.push([x - r, y - r, x + r, y + r]); }
+    for (const j of q.booths) { if (Number.isNaN(b.x[j])) continue; const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2; placed.push([x - r, y - r, x + r, y + r]); }
     const on = put(q.name, (x0 + x1) / 2, Math.max(y0 - 13, 12), 13, 600, th.bg, th.ink2) || put(q.name, (x0 + x1) / 2, Math.min(y1 + 13, Hpx - 12), 13, 600, th.bg, th.ink2);
     placed.splice(n0, placed.length - n0 - (on ? 1 : 0));
   }
@@ -857,7 +859,7 @@ function drawLabels(m) {
       if (S.sel.level === "booth" && j === S.sel.booth) continue;
       const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y;
       if (x < 0 || y < 0 || x > Wpx || y > Hpx) continue;
-      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(b.votes[j]) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
+      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
     }
   }
   // the streets' own names last, clear of every label above and every booth
@@ -865,7 +867,7 @@ function drawLabels(m) {
   if (sA > 0.02 && streetDrawn.length) {
     const obst = [];
     for (const j of m._vis || []) {
-      const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(b.votes[j]) + 2;
+      const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
       if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
     }
     drawStreetNames(placed, obst, sA);
@@ -1635,8 +1637,8 @@ function drawIslands(m, alpha = 1) {
     // its early-voting centre) sit side by side
     const dots = [];
     if (places) {
-      for (const j of s.booths.slice().sort((p, q) => b.votes[q] - b.votes[p])) {
-        const rr = clamp(3.4 * voteScale(b.votes[j]), 2.6, 8);
+      for (const j of s.booths.slice().sort((p, q) => boothSizeVotes(b, q) - boothSizeVotes(b, p))) {
+        const rr = clamp(3.4 * voteScale(boothSizeVotes(b, j)), 2.6, 8);
         let x = ox + (b.raw.lon[j] - s.lon0) * s.cos * k, y = oy + (s.lat1 - b.raw.lat[j]) * k;
         for (const d of dots) if (Math.hypot(d.x - x, d.y - y) < d.r + rr) x = d.x + d.r + rr + 2;
         dots.push({ j, x: clamp(x, r.x + rr + 3, r.x + r.w - rr - 3), y: clamp(y, r.y + rr + 3, r.y + r.h - rr - 3), r: rr });
@@ -1984,7 +1986,7 @@ function hitTest(px, py) {
   for (const j of m._vis || []) {
     if (T.k < K_ALL && b.d[j] !== selDiv()) continue; // still coming up
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, dd = Math.hypot(px - x, py - y);
-    if (dd <= Math.max(rad(b.votes[j]) + 3, 8) && dd < bd) { bd = dd; bj = j; }
+    if (dd <= Math.max(rad(boothSizeVotes(b, j)) + 3, 8) && dd < bd) { bd = dd; bj = j; }
   }
   if (bj != null) return { kind: "booth", i: bj };
   const g = geoOf(m), bx = (px - T.x) / T.k, by = (py - T.y) / T.k;

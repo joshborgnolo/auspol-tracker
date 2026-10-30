@@ -68,7 +68,7 @@ assert.ok(js.includes('if (p.get("c") === "senate") {'), "a Senate URL may name 
 assert.ok(js.includes('loadSenate("now"),'), "today's senators load with the key's measures, so the switch moves nothing");
 
 // ---- each election's Senate
-for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   const p = JSON.parse(R(`map/data/senate-${y}.json`)), ss = p.senators, vac = p.vacant || [];
   assert.equal(ss.length + vac.length, 76, `${y}: 76 seats`);
   const by = {};
@@ -85,13 +85,14 @@ for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
 const coal = (y) => JSON.parse(R(`map/data/senate-${y}.json`)).senators.filter((s) => ["LP", "NP", "LNP", "CLP"].includes(s.ab)).length;
 assert.deepEqual([2004, 2016, 2019, 2022, 2025].map(coal), [39, 30, 35, 32, 27], "the Coalition's seats: 2005's majority, then as the Handbook gives each new Senate");
 // ---- the Senate lens: each seat's and polling place's Senate vote (.build/map/senate_vote.py)
-for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)), res = JSON.parse(R(`map/data/res-${y}.json`));
   assert.deepEqual(sv.fams, ["alp", "lnp", "grn", "onp", "ind", "oth"], `${y}: the families in the map's order`);
   for (const d of res.divs) assert.ok(sv.divs[d.n], `${y}: ${d.n} has its Senate vote`);
   for (const [n, r] of Object.entries(sv.divs)) assert.equal(r.slice(1).reduce((a, b) => a + b, 0), r[0], `${y}: ${n}'s families add to its formal votes`);
   const ids = res.booths.id.map(String), hit = ids.filter((i) => sv.booths[i]).length;
   if (y === 2004) assert.equal(Object.keys(sv.booths).length, 0, "2004: no Senate counts by polling place (the AEC never served them)");
+  else if (y < 2004) assert.equal(hit, {1993:7885,1996:7905,1998:7775,2001:7699}[y], `${y}: exact named-place joins; Senate hospital/mobile aggregates are not allocated to individual House teams`);
   else assert.ok(hit / ids.length > 0.97, `${y}: ${hit} of ${ids.length} House polling places have a Senate count`);
 }
 assert.ok(js.includes('{ id: "senate", label: "Senate" }'), "the Senate is a lens");

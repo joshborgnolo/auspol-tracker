@@ -145,8 +145,8 @@ const famLeg = (f) => (f === "lnp" && STATE_YEARS.has(S.year) ? "Liberals" : FAM
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
-const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ab === "GRN" ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", CLP: "Country Liberal", GRN: "Greens", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ["GRN", "GWA", "TG", "GVIC", "AGV", "GA", "QG", "CCG", "ESG", "GDA", "GLO", "GSA", "RCG", "VGA", "WSG"].includes(ab) ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
+const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", CLP: "Country Liberal", GRN: "Greens", GA: "Greens", GWA: "Greens (WA)", TG: "Tasmanian Greens", GVIC: "Victorian Greens", AD: "Democrats", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
 const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network", "Australian Democrats": "the Democrats", "Family First": "Family First", "Democratic Labour": "the DLP", "Palmer United": "Palmer United", "Motoring Enthusiast": "the Motoring Enthusiast Party", "Australian Conservatives": "the Australian Conservatives", "Progressive Alliance": "the Progressive Alliance" };
@@ -272,7 +272,7 @@ const selName = (m, k) => (isRel() ? REL_NAME[k] : TEN_NAME[k]);
 const DEMO_FROM = 2001;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, "qld17", 2019, "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
+const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, "qld17", 2019, "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw23/sa22/vic22/sa26 —
 // non-federal stops, drawn on their own timeline row at their
@@ -289,7 +289,7 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
+const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw23: 2023.23, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
 const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw23: 2023, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
@@ -311,14 +311,14 @@ const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 1993: "alp", 1996: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw23: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
 const PREV_GOV_BY_JUR = { vic: { 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" } };
-const PM = { 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
+const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw23: "Chris Minns", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -647,7 +647,7 @@ function deriveDiv(d, i, year) {
   let change;
   // 2004's h is empty by construction (the archive's first federal year); an
   // empty h anywhere else means "new seat", not "unknown"
-  if (!prev) change = { kind: yNum === 2004 ? "unknown" : "new" };
+  if (!prev) change = { kind: yNum <= 1993 || yNum === 2004 ? "unknown" : "new" };
   else if (prev[3] === win.n) change = { kind: "re", since: firstYearOf(d.h.filter((h) => !h[4]), win.n, yNum) };
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
@@ -682,8 +682,8 @@ function deriveBooths(B, m) {
     if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
     if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
-    o.formal[j] = formal; o.votes[j] = formal + B.inf[j];
-    if (o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
+    o.formal[j] = formal; o.votes[j] = B.inf[j] == null ? NaN : formal + B.inf[j];
+    if (B.inf[j] != null && o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
     if (formal) { const acc = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 }; for (let k = 0; k < v.length; k++) acc[D.c[k].b] += v[k]; for (const b of FAMS) o.fp[b][j] = (100 * acc[b]) / formal; }
     const t = B.tpp[j]; if (t && t[0] + t[1]) { o.tpp[j] = (100 * t[0]) / (t[0] + t[1]); if (t[2] != null) o.tppSw[j] = t[2]; }
     const tc = B.tcp[j]; if (tc && tc[0] + tc[1]) { const a = tc[0] >= tc[1]; o.lead[j] = a ? D.A : D.B; o.leadPct[j] = (100 * Math.max(tc[0], tc[1])) / (tc[0] + tc[1]); }
@@ -744,8 +744,28 @@ function deriveAreas(res, m) {
   return out;
 }
 
+// Handbook files retain the original coordinates. Apply D3 winding and
+// linear-coordinate resampling only while drawing; the source is unchanged.
+// The main viewport uses mainland parts; external islands have their insets.
+function handbookDisplay(fc) {
+  for (const f of fc.features) {
+    const ps = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    f.geometry = { type: "MultiPolygon", coordinates: ps.filter(p => p[0].some(([x,y]) => x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9)).map(p => p.map((ring, ri) => {
+      const r = [];
+      for (let i = 0; i < ring.length - 1; i++) {
+        const a = ring[i], b = ring[i+1], n = Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[1]-a[1]) / .05));
+        for (let j = 0; j < n; j++) r.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]);
+      }
+      r.push(r[0]);
+      if ((d3.geoArea({type:"Polygon", coordinates:[r]}) > 2*Math.PI) === (ri === 0)) r.reverse();
+      return r;
+    })) };
+  }
+  return fc;
+}
 function buildGeo(topo, m) {
-  const fc = topojson.feature(topo, topo.objects.divs);
+  const raw = topojson.feature(topo, topo.objects.divs);
+  const fc = topo.handbook ? handbookDisplay(raw) : raw;
   const gen = d3.geoPath(proj);
   const paths = new Array(m.divs.length), bb = new Array(m.divs.length), feats = new Array(m.divs.length);
   for (const f of fc.features) {
@@ -772,11 +792,11 @@ function buildGeo(topo, m) {
     paths, bb, polys,
     // the topology itself and a geometry's seat, for the seats' waters (app-2)
     topo, at, proj: P,
-    meshDiv: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
+    meshDiv: topo.handbook ? mk({type:"MultiLineString", coordinates:fc.features.flatMap(f=>f.geometry.coordinates.flat())}) : mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
-    coast: mk(topojson.mesh(topo, o, (a, b) => a === b)),
-    coastOf: (i) => coastP[i] || (coastP[i] = mk(topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
-    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
+    coast: topo.handbook ? mk({type:"MultiLineString", coordinates:fc.features.flatMap(f=>f.geometry.coordinates.flat())}) : mk(topojson.mesh(topo, o, (a, b) => a === b)),
+    coastOf: (i) => coastP[i] || (coastP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
   };
 }
 
@@ -893,7 +913,9 @@ async function loadYear(year) {
     // ahead (the timeline's hover) must not move the streets and the sea under
     // the year in view (setYear takes the new year's when it shows it)
     const keep = proj;
-    proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], topojson.feature(lo, lo.objects.divs));
+    const fitFC = topojson.feature(lo, lo.objects.divs);
+    const fit = lo.handbook ? {type:"MultiPoint", coordinates:fitFC.features.flatMap(f=>f.geometry.coordinates.flat(2)).filter(([x,y])=>x>=112&&x<=154.5&&y>=-44.5&&y<=-9)} : fitFC;
+    proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
     m.res = res;
     m.demoBasis = res.demoBasis || null;
     m.demoYear = res.demoYear || null;
@@ -927,7 +949,8 @@ async function loadYear(year) {
     proj = keep || m.proj;
     // the hi detail can land after the reader has moved to another year — build
     // and bake its paths under this year's projection, then put the live one back
-    getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); }).catch(() => {});
+    if (lo.handbook) m.geoHi = m.geo; // already full precision; no duplicate download
+    else getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); }).catch(() => {});
     return m;
   })();
   return m.ready;

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Historical-map warning: this ABS vintage contains later WA geometry. Do not use
+# it as the 2 March 1996 election frame; see README-history.md and handbook_geo.mjs.
 """ASGC 1996 GeoPackage -> n-1996.geojson for the /map/ 1996 federal frame.
 
 The 1996 election's division geometry is the ABS's own

@@ -35,7 +35,7 @@ import csv, gzip, json, os, re, sys, collections
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = REPO + "/.build/aec-flow-src"
 BOOTH = SRC + "/booth"
-OUT = sys.argv[1]
+OUT = sys.argv[1] if len(sys.argv) > 1 else REPO + "/map/data"
 FARRER = sys.argv[2] if len(sys.argv) > 2 else os.path.join(REPO, ".build", "map", "src", "farrer-31633")
 STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]
 YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
@@ -63,11 +63,11 @@ def bucket(ab):
         return "alp"
     if ab in COALITION:
         return "lnp"
-    if ab == "GRN":
+    if ab in ("GRN", "GWA", "TG", "GVIC", "AGV", "GA", "QG", "CCG", "ESG", "GDA", "GLO", "GSA", "RCG", "VGA", "WSG"):
         return "grn"
     if ab in ("ON", "HAN"):
         return "onp"
-    if ab in ("IND", "", "NAFD"):
+    if ab in ("IND", "", "NAFD", "HAR"):
         return "ind"
     return "oth"
 
@@ -342,6 +342,20 @@ def build_history():
     winner is the 2CP leader in the division TCP-flow product (2004's
     candidate file carries no Elected column, so the count decides)."""
     hist = collections.defaultdict(list)
+    # The statistics-era frames join the same name-based history, including
+    # when a later election's card shows the seat's earlier results.
+    for hy in (1993, 1998):
+        with open(SRC + f"/divs-{hy}.txt") as f:
+            ds = {r['Division']: r for r in csv.DictReader(f, delimiter=';')}
+        with open(SRC + f"/hcands-{hy}.txt") as f:
+            for c in csv.DictReader(f, delimiter=';'):
+                if c['Member'] != '#':
+                    continue
+                d = ds[c['Division']]
+                a, co = int(d['ALP TPP Vote'] or 0), int(d['Coalition TPP Vote'] or 0)
+                sur, _, given = c['Candidate'].partition(', ')
+                hist[c['Division']].append([hy, round(100*a/(a+co), 2) if a+co else None,
+                                           c['Party'] or 'IND', title_name(given, sur)])
     for hy in YEARS:
         tp = load_tppdiv(hy)
         tot = collections.defaultdict(collections.Counter)
@@ -703,6 +717,10 @@ def build_year(year, hist, base2001):
         out["demoInterp"] = vstore["demoInterp"]
     names = {x["n"] for x in D}
     assert SPEAKER[year] in names, f"{year}: speaker seat {SPEAKER[year]} not in the House"
+    if year == 1996:
+        from historical_booth_locations import apply_locations
+        apply_locations(out)
+        n_coords = sum(x is not None for x in B["lat"])
     p = os.path.join(OUT, f"data-{year}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
@@ -880,4 +898,5 @@ def main():
     print("now ->", os.path.getsize(p), "bytes")
 
 
-main()
+if __name__ == "__main__":
+    main()

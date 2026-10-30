@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Derive data/booth-seifa-1996.json — the /map/ 1996 federal frame's per-booth
+"""LEGACY: /map/ now overrides these coordinates with the common 1993/96/98
+matcher in historical_booth_locations.py, using corrected Handbook boundaries.
+This file retains the earlier store recipe for reproducibility.
+
+Derive data/booth-seifa-1996.json — the /map/ 1996 federal frame's per-booth
 venue-coordinate store.
 
 The 1996 pack carries no polling-place roll (only PPSNUM96 counts) and no
