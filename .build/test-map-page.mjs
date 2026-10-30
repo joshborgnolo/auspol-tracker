@@ -457,6 +457,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js");
   assert.ok(base.includes('const COB_NAME = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };'), "the curated birthplace keys and display names in one literal (whole-UK first for the 2001 edition's own row)");
   assert.ok(base.includes('const COB_BORN = { uk: "the United Kingdom"') && base.includes('phl: "the Philippines"'), "the picker's Born-in labels (whole-UK and the Philippines take their article)");
+  assert.ok(base.includes('const COB_SHORT = { uk: "the UK", eng: "ENG", ind: "IND", chn: "CHN", nzl: "NZ", phl: "PHL", vnm: "VNM", zaf: "ZAF", ita: "ITA", lka: "LKA", sct: "SCT" };'), "the compact head stubs: alpha-3, alpha-2 where the short form is natural (NZ, the UK)");
+  assert.ok(ui.includes('isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]'), "the lens head names the chosen country (no more stale Born overseas)");
   assert.ok(base.includes('const COB_VERB = { uk: "were born in the United Kingdom"') && base.includes('sct: "were born in Scotland"'), "per-country story verbs");
   assert.ok(base.includes("const COB_RANGE = {") && base.includes("sct: [0, 3]"), "per-country range caps (Scotland's tiny 3% cap)");
   assert.ok(base.includes('const isCob = () => S.index === "fborn" && S.cob != null;'), "the fborn-only sub-view guard");
