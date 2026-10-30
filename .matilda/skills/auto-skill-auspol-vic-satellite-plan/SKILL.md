@@ -272,3 +272,61 @@ weeks to the election). What landed:
   cross-check tests MERGED rows not raw wiki rows (approx "Mar – Apr" rows
   false-flagged against their CSV-re-dated committed waves); and a blindness
   tripwire floors the witness parse (polls <55 or leadership <80 ⇒ FAIL).
+
+### Landing a wave manually (recipe, worked 2026-10-30 — what the vic-watch
+### ci-alert asks for; run per wave until 28 Nov)
+
+1. `node .build/vic-watch.mjs --cross-check --json` — exit 0: current; exit 2:
+   the findings JSON names missing `firm|fwEnd` rows; exit 1: witness
+   fetch/parse broke (incl. the tripwire) — fix the parser, don't file rows.
+2. `node .build/vic-watch.mjs --emit-backfill > scratch.json`, diff its rows
+   against `data/vic-polls.json` to isolate the candidates.
+3. **Verify BEFORE merging** — three checks caught real defects on day one:
+   `figCheck` all true (wiki-vs-CSV agreement on the four key primaries);
+   primary sum ≈ 100 — a sub-100 sum can hide a null-cell parser defect even
+   with both witnesses agreeing (the `5%| 5%` case: the CSV's single combined
+   `others` is the tiebreak against ind+oth); and a discovery-lane hit is NOT
+   proof of a new wave — an empty `.build/vic-src/seen.json` flags everything,
+   and a house's "latest poll" post may describe a wave already filed (the
+   DemosAU October-post/September-fieldwork case — match fieldwork dates and
+   figures against committed rows first).
+4. **Envelope**: new poll rows drop `year`/`csvSample`/`csvDates`/`figCheck`;
+   keep `provenance` + `sourceUrl`; leadership rows gain `provenance:
+   ["wikipedia"]`. `polls[]` stays fwEnd-sorted; leadership rows insert into
+   their `series|pair` group date-ordered; hand-entered rows carry a
+   provenance naming their real source (`["demosau"]`). Bump `generated` and
+   the two `sources` snapshot dates.
+5. `npm run build:vic` (validates: "validated N polls") →
+   `node .build/test-vic-build.mjs` → `npm test`.
+6. **Commit named paths** (the sibling-shared checkout WILL have other
+   sessions' WIP — never `git add -A`): the data file, any
+   `.build/vic{-watch,}/` source touched, the six `vic/*/index.html`,
+   `sitemap.xml`, the `assets/js/data-vic*` twins (the build sweeps stale
+   hashes — stage the deletion plus the new hash), `.build/vic/out/*` via
+   `git add -u` (ignored for new files, tracked for updates),
+   and `.build/vic-src/seen.json` if the discovery lane ran.
+- Flipping a house in/out of every Vic aggregate is a NAME change in
+  to-main-schema's HOUSE maps alone — gen-data's NO_AGG_HOUSES is an
+  exact-name-keyed Set (the 2026-10-30 Roy Morgan inclusion). The same edit
+  must follow in test-vic-build's pin.
+
+### Methodology links for vic rows (added 2026-10-30, commit a147b2db)
+
+vic rows that lack `releaseUrl`/`methodUrl` render the ledger's pending
+shim ("Accent's release and methodology: not yet out"), which reads as
+"no methodology". When landing a wave, wire its links the same run:
+
+- **RedBridge/Accent** — releaseUrl = the Accent projects-page slug
+  (discoverable from accent-research.com/sitemap.xml's dynamic-projects
+  sitemaps; comma-prefix `%2C` up to Aug 2026, bare from Sep 2026) and
+  methodUrl = the usrfiles PDF, which appears in NO static source (Wix
+  file-viewer builds it on click) — extract it with the federal
+  extractor's own scrapeProjectPage under headless Chrome (extract lines
+  111-114 imports, :129 CHROME, :158-232 launchChrome/connectCdp/sleep,
+  :234-319 scrapeProjectPage into a scratch script). Pages map to waves by
+  publish-date adjacency (≤7 days, as legNewspoll).
+- **Newspoll** — methodUrl from pyxispolling.com's CMS collection
+  (api.php/collection/6909661a09b83573fd004fe4/items); Victorian statements
+  carry `victoria-newspoll-D-M-YYYY` slugs (federal legs exclude them with
+  the state-prefix rule); resolve file.url against the api.php proxy, never
+  the bare /images/ path (404s).
