@@ -435,10 +435,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // slice at a time — so a timeline jump, a chamber switch or the Senate lens
 // finds its data already here. Skipped on save-data/2g connections (the
 // timeline's hover preload still covers a stop the reader nears); a year's
-// failed fetch drops its record so a real click tries it again
+// failed fetch drops its record so a real click tries it again. The Handbook
+// years never ride the loop (2026-10-31): their geometry ships lossless at
+// both levels (licence bars a simplified lo), 6.5–19MB a year — preloading
+// all four cost ~53MB and four long main-thread builds on every visit
 {
   const ui = part("app-6-ui.js");
-  assert.ok(ui.includes("function preloadYears()") && /YEARS\.filter\(\(y\) => !Y\[y\]\)\.sort/.test(ui), "preloadYears walks the years nearest-first");
+  assert.ok(ui.includes("function preloadYears()") && /YEARS\.filter\(\(y\) => !Y\[y\] && !HANDBOOK_YEARS\.has\(y\)\)\.sort/.test(ui), "preloadYears walks the years nearest-first, Handbook years excepted");
+  assert.ok(part("app-1-base.js").includes("const HANDBOOK_YEARS = new Set([1993, 1996, 1998, 2001])"), "the Handbook years' lossless geometry files are the idle preload's skip set");
   assert.ok(ui.includes("conn.saveData") && ui.includes("effectiveType"), "the background preload yields to save-data and 2g connections");
   assert.ok(ui.includes("delete Y[y]"), "a failed background load frees the year for a real retry");
   assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy)"), "the preload also fills the chambers and the Senate-vote lane");

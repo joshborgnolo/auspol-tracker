@@ -310,6 +310,11 @@ const VIC_YEARS = new Set(["vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);
 const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw23: "nsw", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+// the Handbook years' geometry ships lossless both levels (its licence bars a
+// simplified lo derivative), 6.5–19MB a stop — too heavy for the boot-time idle
+// preload, which skips them; the timeline's hover preload (app-6) still fetches
+// a stop the reader nears, and a click loads on demand
+const HANDBOOK_YEARS = new Set([1993, 1996, 1998, 2001]);
 const YEARS_FED = YEARS.filter((y) => !STATE_YEARS.has(y));
 const YEARS_SA = YEARS.filter((y) => SA_YEARS.has(y));
 const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));

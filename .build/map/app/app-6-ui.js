@@ -1190,13 +1190,14 @@ addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame
    chamber switch or the Senate lens finds its data already here. Skipped where
    the connection asks to save data (the timeline's hover preload still covers
    a stop the reader nears); a year's failed fetch drops its record so a real
-   click tries it again */
+   click tries it again. The Handbook years never ride this loop — their
+   lossless geometry is 6.5–19MB a year, fetched only on hover/click demand */
 const idleSlice = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 900));
 function preloadYears() {
   const conn = navigator.connection || {};
   if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
   const at = YEARS.indexOf(S.year);
-  const stops = YEARS.filter((y) => !Y[y]).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
+  const stops = YEARS.filter((y) => !Y[y] && !HANDBOOK_YEARS.has(y)).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
   const next = () => {
     const y = stops.shift();
     if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(next));
