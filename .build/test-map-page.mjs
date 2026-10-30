@@ -508,6 +508,9 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('k === "rel"') && ui.includes('k === "ten"'), "both pickers' change handlers are wired");
   assert.ok(/S\.index === LENS_REL && m\.relKeys/.test(ui) && /S\.index === LENS_TEN && m\.tenKeys/.test(ui), "the two sub-selects appear only on their lenses when their rows exist");
   assert.ok(story.includes("const REL_TOP = {") && story.includes("norel:") && story.includes("const TEN_TOP = {"), "area stories phrase the select options' top-fifth words");
+  assert.ok(ui.includes('isRel() ? REL_NAME[S.rel] : isTen()'), "the Religion head is the option itself (no 'Religion:' prefix, 2026-10-31 user call)");
+  assert.ok(!ui.includes('`Religion: ${REL_NAME[S.rel]}`'), "the prefixed Religion head is gone");
+  assert.ok(ui.includes('isAnc() ? `${ANC_NAME[S.anc]} ancestry`'), "the Ancestry head names the picked ancestry (German ancestry), the tenure pattern");
   // the data files' structure at every fed stop: relKeys (norel first),
   // tenKeys (mort first), 12-wide demo rows, division rel/ten dicts
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
