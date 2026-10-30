@@ -573,7 +573,7 @@ def build_year(year, hist, base2001):
                 # — medians don't pool, so it never joins a state aggregate
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
                                "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob"),
-                               "y12l": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
+                               "y12less": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
                                "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten")}
         div_index[d] = len(D)
         D.append(rec)

@@ -80,6 +80,8 @@ load_tally = lane.load_tally
 STATE_ORDER = lane.STATE_ORDER
 BANDS = lane.BANDS
 COB_KEYS01 = lane.COB_KEYS01
+REL_KEYS01 = lane.REL_KEYS_01
+TEN_KEYS = lane.TEN_KEYS
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2001set.json"
@@ -144,7 +146,31 @@ def shares(rec):
         if rec["occd"] > 0 else None,
         "age": {b: round(rec["bands"][i] / bsum, 4)
                 for i, b in enumerate(BANDS)},
+        "u15": (round((rec["bands"][0] + rec["bands"][1]) / bsum, 4)
+                if bsum > 0 else None),
     }
+    # the six new People lanes over the same tally (the 2004-election
+    # lane's own map of the B 10/B 12/B 17/B 19/B 01 tables — keep the
+    # two in lock-step)
+    if rec.get("sch01") is not None:
+        sc = rec["sch01"]
+        s["y12less"] = round(sum(sc[:5]) / sum(sc), 4) if sum(sc) > 0 else None
+    if rec.get("indig") is not None and rec.get("indigDen"):
+        s["atsci"] = round(rec["indig"] / rec["indigDen"], 4)
+    if rec.get("rel01") is not None and rec.get("relTot") is not None:
+        relbd = rec["relTot"] - rec.get("relNS", 0)
+        s["rel"] = {k: round(rec["rel01"][i] / relbd, 4) if relbd > 0
+                    else None
+                    for i, k in enumerate(REL_KEYS01)}
+    if rec.get("ten01") is not None:
+        own, mort, rent, stha, oth, tns = rec["ten01"]
+        tend = own + mort + rent + oth
+        s["ten"] = {k: round({"mort": mort, "rent": rent,
+                              "own": own, "rentPub": stha}[k] / tend, 4)
+                    if tend > 0 else None
+                    for k in TEN_KEYS}
+    if rec.get("famN") is not None and rec.get("famD"):
+        s["onepar"] = round(rec["famN"] / rec["famD"], 4)
     if rec.get("cobn") is not None:
         # the birthplace menu: shares on the same stated-birthplace
         # basis as fborn itself (measured lane — no interp demoI ever
@@ -162,12 +188,23 @@ def demo_of(r):
         # ABS shipped a headcount only for this CD: people counted,
         # every lane untabled — never a fabricated share
         return {"persons": r["pers"], "cov": 1.0, "langOther": None,
-                "fborn": None, "uni": None, "blue": None, "age": None}
+                "fborn": None, "uni": None, "blue": None, "age": None,
+                "u15": None, "y12less": None, "atsci": None,
+                "onepar": None, "rel": None, "ten": None}
     return shares({
         "pers": r["pers"], "bands": r["bands"], "eng": r["eng"],
         "oth": r["oth"], "aus": r["aus"], "totc": r["totc"],
         "cobns": r["cobns"], "uni": r["uni"], "eduns": r["eduns"],
-        "bluen": r["bluen"], "occd": r["occd"], "cobn": r.get("cobn")})
+        "bluen": r["bluen"], "occd": r["occd"], "cobn": r.get("cobn"),
+        "sch01": r.get("sch01"),
+        "indig": r.get("ind01"),
+        "indigDen": (r.get("b1Persons", 0) - r.get("b1ov", 0)),
+        "rel01": r.get("rel01"),
+        "relNS": r.get("rel01ns"),
+        "relTot": r.get("rel01tot"),
+        "ten01": r.get("ten01"),
+        "famN": r.get("fam01", [0] * 5)[2],
+        "famD": r.get("fam01", [0] * 5)[4]})
 
 
 def main():
@@ -192,7 +229,13 @@ def main():
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
                                   "eduns": 0, "bluen": 0, "occd": 0,
-                                  "cobn": [0] * len(COB_KEYS01)})
+                                  "cobn": [0] * len(COB_KEYS01),
+                                  "sch01": [0] * 6,
+                                  "indig": 0, "indigDen": 0,
+                                  "rel01": [0] * len(REL_KEYS01),
+                                  "relNS": 0, "relTot": 0,
+                                  "ten01": [0] * 6,
+                                  "famN": 0, "famD": 0})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -209,6 +252,17 @@ def main():
             acc[k] += r[k]
         for i in range(len(COB_KEYS01)):
             acc["cobn"][i] += r["cobn"][i]
+        for i in range(6):
+            acc["sch01"][i] += r["sch01"][i]
+            acc["ten01"][i] += r["ten01"][i]
+        for i in range(len(REL_KEYS01)):
+            acc["rel01"][i] += r["rel01"][i]
+        acc["relNS"] += r["rel01ns"]
+        acc["relTot"] += r["rel01tot"]
+        acc["famN"] += r["fam01"][2]
+        acc["famD"] += r["fam01"][4]
+        acc["indig"] += r["ind01"]
+        acc["indigDen"] += r["b1Persons"] - r["b1ov"]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     nat = defaultdict(int)
@@ -219,6 +273,17 @@ def main():
         for i in range(11):
             nat.setdefault("bands", [0] * 11)
             nat["bands"][i] += dv["bands"][i]
+        for i in range(6):
+            nat.setdefault("sch01", [0] * 6)
+            nat.setdefault("ten01", [0] * 6)
+            nat["sch01"][i] += dv["sch01"][i]
+            nat["ten01"][i] += dv["ten01"][i]
+        for k in ("relNS", "relTot", "indig", "indigDen",
+                  "famN", "famD"):
+            nat[k] += dv[k]
+        for i in range(len(REL_KEYS01)):
+            nat.setdefault("rel01", [0] * len(REL_KEYS01))
+            nat["rel01"][i] += dv["rel01"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -235,6 +300,21 @@ def main():
         "age65ov": round(sum(nat["bands"][8:]) / nat["pers"], 4),
         "cob": {k: round(natcob[i] / nat_fb, 4)
                 for i, k in enumerate(COB_KEYS01)},
+        "u15": round((nat["bands"][0] + nat["bands"][1]) /
+                     nat["pers"], 4),
+        "y12less": round(sum(nat["sch01"][:5]) / sum(nat["sch01"]), 4),
+        "atsci": round(nat["indig"] / nat["indigDen"], 4),
+        "onepar": round(nat["famN"] / nat["famD"], 4),
+        "rel": {k: round(nat["rel01"][i]
+                         / (nat["relTot"] - nat["relNS"]), 4)
+                for i, k in enumerate(REL_KEYS01)},
+        "ten": {k: round({"mort": nat["ten01"][1],
+                          "rent": nat["ten01"][2],
+                          "own": nat["ten01"][0],
+                          "rentPub": nat["ten01"][3]}[k]
+                         / (nat["ten01"][0] + nat["ten01"][1]
+                            + nat["ten01"][2] + nat["ten01"][4]), 4)
+                for k in TEN_KEYS},
     }
     # measured-once pin (the 2004 lane's own figure): the tally total
     # (18,652,828) less the 8,249 people of the dropped offshore class
@@ -338,7 +418,26 @@ def main():
         "extract-bcp-2001-tally.py, and overseas visitors ride their "
         "own row inside several 2001 tables' totals and are subtracted "
         "so every lane is the as-enumerated resident count the GCP-era "
-        "products take. Two balance-area CDs carry a truncated workbook "
+        "products take. The six new People lanes ride the 2001 BCP's "
+        "own tables identically to the 2004-election lane: B 10's "
+        "Religion menu ten shares (rel, key order in relKeys, "
+        "No-religion leading; the orth lane sums the edition's two "
+        "\"Orthodox\"/\"Oriental Christian\" rows) over the "
+        "ex-affiliation-not-stated persons-ex-overseas basis, B 12's "
+        "year-12-or-less over the printed stated schooling levels "
+        "(its \"Still at school\" row kept out of the basis to hold "
+        "the GCP-era frame), B 01's total Indigenous persons over "
+        "persons ex-overseas (the 2001 product publishes no "
+        "Indigenous-status-not-stated row, so the lane's basis is "
+        "persons ex-overseas — the share runs a few per cent relative "
+        "under the later editions' ex-not-stated basis), B 19's "
+        "Housing-tenure menu four shares (ten, key order in tenKeys, "
+        "owned-with-mortgage leading; the 2001 print has no "
+        "grand-total column, its rented total riding its own printed "
+        "column) over the ex-tenure-not-stated "
+        "occupied-private-dwellings basis, B 17's one-parent share of "
+        "families, and the under-15 share of the stated ages. Two "
+        "balance-area CDs carry a truncated workbook "
         "(no demographic tables) and count people but share no lanes "
         "(counts.cdsShortTable/personsShortTable — the not-stated "
         "doctrine over whole tables). Anglophone-age-language-foreign-"
@@ -386,6 +485,8 @@ def main():
         "election": 2001,
         "censusEdition": 2001,
         "cobKeys": COB_KEYS01,
+        "relKeys": list(REL_KEYS01),
+        "tenKeys": list(TEN_KEYS),
         "deliveryBasis": (
             "venue-CD join per booth (inherit lane: the 2004 seifa "
             "store's own 2001-CD geo for the same premises; point-in-"

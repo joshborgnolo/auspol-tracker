@@ -208,11 +208,21 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.equal(D.prev, 1998, "2001's previous election is 1998");
   assert.equal(D.speaker, "Wakefield");
   assert.equal(D.event, null, "2001 has no VTR event id (stats-pack era)");
+  // the 2001 frame carries the full People-lane set (the user's same-session arc)
+  assert.equal((D.relKeys || []).length, 10, "2001 relKeys has the ten religions (norel first)");
+  assert.equal(D.relKeys[0], "norel");
+  assert.equal((D.tenKeys || []).length, 4, "2001 tenKeys has four tenures (mort first)");
+  assert.equal(D.tenKeys[0], "mort");
+  const lingiari01 = D.divs.find(x => x.n === "Lingiari");
+  assert.ok(lingiari01 && lingiari01.demo && lingiari01.demo.atsci != null && lingiari01.demo.y12less != null && lingiari01.demo.onepar != null && lingiari01.demo.rel && lingiari01.demo.ten, "2001 Lingiari carries the new lanes (indigenous/year-12/families/religion/tenure)");
+  assert.ok(lingiari01.demo.atsci > 0.34, "2001 Lingiari is among the nation's most Indigenous seats");
+  assert.ok(Math.abs(lingiari01.demo.atsci - 0.3509) < 0.002, "2001 Lingiari Indigenous share is the measured 2001-census read");
+  assert.ok(Math.abs(lingiari01.demo.y12less - 0.6998) < 0.002, "2001 Lingiari Year-12-or-less at 70%, the era's education floor");
   const tally = {};
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 18, "the booth lane is the full columnar (16 + census demo + birthplace rows)");
+  assert.equal(Object.keys(B).length, 20, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure rows)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -444,7 +454,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.ok(Array.isArray(d.booths.ten[i]) && d.booths.ten[i].length === 4, `${y}: parallel booth tenure rows`);
     const lin = d.divs.find((x) => x.n === "Lingiari");
     assert.ok(lin.demo.atsci != null && lin.demo.rel && lin.demo.rel.norel != null && lin.demo.ten && lin.demo.ten.mort != null, `${y}: Lingiari carries atsci/rel/ten`);
-    assert.ok(lin.demo.onepar != null && lin.demo.y12l != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12less/u15`);
+    assert.ok(lin.demo.onepar != null && lin.demo.y12less != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12less/u15`);
   }
 }
 
