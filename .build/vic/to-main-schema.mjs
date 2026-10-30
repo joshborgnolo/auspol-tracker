@@ -173,6 +173,7 @@ export function vicToMain(src) {
       url: r.sourceUrl || null,
       ...(r.releaseUrl ? { releaseUrl: r.releaseUrl } : {}),
       ...(r.methodUrl ? { methodUrl: r.methodUrl } : {}),
+      ...(r.samplePending ? { samplePending: true } : {}),
       ...(r.tpp_flows != null ? { tpp_flows: r.tpp_flows } : {}),
       ...(r.tpp_split ? { tpp_split: r.tpp_split } : {}),
       ...(r.tpp_split_on ? { tpp_split_on: r.tpp_split_on } : {}),
@@ -180,6 +181,14 @@ export function vicToMain(src) {
     polls.push(row);
     if (r.alt && (r.alt.alpVOnp != null || r.alt.lnpVOnp != null))
       altTpp.push({ date: row.date, firm: pollster, alpVsOnp_alp: r.alt.alpVOnp ?? null, lnpVsOnp_lnp: r.alt.lnpVOnp ?? null });
+  }
+  /* threeParty rows become the federal model's inline tpp3 on their poll
+     row (three-cornered preferred vote). The separate top-level array is
+     vic-polls.json's storage shape; without this fold it renders nowhere. */
+  for (const t of src.threeParty || []) {
+    const house = FIRM_KEY_TO_HOUSE[t.firm] || t.firm;
+    const p = polls.find((q) => q.date === t.fwEnd && q.pollster === house);
+    if (p && p.tpp3 == null) p.tpp3 = { alp: t.alp ?? null, lnp: t.lnp ?? null, onp: t.onp ?? null };
   }
   // leadership: the source keys each row by leader; the main shape keys a
   // wave's slots (alb/opp/han) with the opposition leader named per row

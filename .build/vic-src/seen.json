@@ -1,6 +1,11 @@
 {
   "pages": {
-    "roymorgan": [],
+    "roymorgan": [
+      "https://www.roymorgan.com/findings/10373-victorian-state-voting-intention-october-2026",
+      "https://www.roymorgan.com/findings/10371-victorian-state-voting-intention-eastern-victoria-seats-october-2026",
+      "https://www.roymorgan.com/findings/10361-victorian-state-voting-intention-september-2026",
+      "https://www.roymorgan.com/findings/10346-victorian-state-voting-intention-by-seat-winnability-september-2026"
+    ],
     "demosau": [
       "https://demosau.com/news/coalition-lead-narrows-as-labor-rises-in-latest-victorian-poll/"
     ],

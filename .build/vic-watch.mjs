@@ -606,7 +606,11 @@ const loadSeen = () => { try { return JSON.parse(readFileSync(SEEN_FILE, "utf8")
 const saveSeen = (s) => { mkdirSync(SEEN_DIR, { recursive: true }); writeFileSync(SEEN_FILE + ".tmp", JSON.stringify(s, null, 2) + "\n"); };
 
 const PAGE_WATCH = [
-  { id: "roymorgan", url: "https://www.roymorgan.com/findings", match: /victorian state voting intention/i },
+  /* RM's findings landing page renders page 1 only (a client-side list; ?page=
+     is ignored server-side), so an HTML grep there misses releases — it
+     missed all four Oct-2026 Victorian releases. The REST feed paginates
+     properly (the federal extractor discovers the same way). */
+  { id: "roymorgan", feed: "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search?page=", pages: 3, match: /victorian-state-voting-intention/i },
   { id: "demosau", url: "https://demosau.com/news/", match: /victoria|vic /i },
   { id: "freshwater", url: "https://freshwaterstrategy.com/category/insights/", match: /vic(toria(n)?)? /i },
   { id: "redbridge-accent", url: "https://www.accent-research.com/projects", match: /victoria/i },
@@ -617,6 +621,21 @@ const discovery = async () => {
   const news = [];
   for (const p of PAGE_WATCH) {
     try {
+      if (p.feed) {
+        const prev = new Set(seen.pages[p.id] || []);
+        const found = [];
+        for (let pg = 1; pg <= (p.pages || 2); pg++) {
+          const posts = JSON.parse(await fetchText(p.feed + pg));
+          for (const post of posts) {
+            if (!p.match.test(post.slug)) continue;
+            const href = "https://www.roymorgan.com/findings/" + post.slug;
+            found.push(href);
+            if (!prev.has(href)) news.push({ house: p.id, href, text: post.slug.replace(/-/g, " ") });
+          }
+        }
+        seen.pages[p.id] = [...new Set([...found, ...prev])].slice(0, 60);
+        continue;
+      }
       const html = await fetchText(p.url);
       const titles = [...html.matchAll(/<a[^>]+href="([^"]+)"[^>]*>([^<]{8,140})<\/a>/g)]
         .map((m) => ({ href: m[1], text: m[2].replace(/\s+/g, " ").trim() }))

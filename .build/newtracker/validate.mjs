@@ -245,11 +245,13 @@ export function validate(D) {
     }
     // 2b2. tpp3 (the three-cornered preferred Fox & Hedgehog prints every
     //      wave and Roy Morgan (SMS) printed for its 13–14 May 2026 post-
-    //      budget special) carries all three slices or none, each in
+    //      budget special; on the Vic build, RedBridge/Accent and Roy Morgan
+    //      print them for Victorian waves – 2026-10-30) carries all three
+    //      slices or none, each in
     //      bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.
     if (p.tpp3 != null) {
-      if (!["Fox & Hedgehog", "Roy Morgan (SMS)"].includes(p.pollster))
+      if (!["Fox & Hedgehog", "Roy Morgan (SMS)", "Roy Morgan", "RedBridge/Accent"].includes(p.pollster))
         fail("3cp-pollster", `tpp3 on a row for ${p.pollster}`);
       const t3 = ["alp", "lnp", "onp"].map((k) => p.tpp3[k]);
       if (t3.some((v) => v == null))

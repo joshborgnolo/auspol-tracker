@@ -1741,6 +1741,35 @@
       }
     },
     {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": null,
+      "dateLabel": "8 Oct–9 Oct",
+      "fwStart": "2026-10-08",
+      "fwEnd": "2026-10-09",
+      "approxDate": false,
+      "primary": {
+        "alp": 22.5,
+        "lnp": 26,
+        "grn": 14,
+        "onp": 25,
+        "ind": 7,
+        "oth": 5.5
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {
+        "alpVOnp": 54
+      },
+      "provenance": [
+        "roymorgan"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10373-victorian-state-voting-intention-october-2026",
+      "samplePending": true
+    },
+    {
       "firmRaw": "Resolve",
       "firm": "resolve",
       "client": "The Age",
@@ -1792,9 +1821,62 @@
       ],
       "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28885773/VictoriaNewspollMethodologyStatement26October2026byPyxis-pBBqdFZRLovuHeSHQef6CQ.pdf"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 3610,
+      "dateLabel": "26 Oct–29 Oct",
+      "fwStart": "2026-10-26",
+      "fwEnd": "2026-10-29",
+      "approxDate": false,
+      "primary": {
+        "alp": 22.5,
+        "lnp": 29.5,
+        "grn": 12.5,
+        "onp": 22,
+        "ind": 7.5,
+        "oth": 6
+      },
+      "tpp2": {
+        "alp": 44
+      },
+      "alt": {
+        "alpVOnp": 54.5
+      },
+      "provenance": [
+        "roymorgan"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10373-victorian-state-voting-intention-october-2026"
     }
   ],
   "threeParty": [
+    {
+      "dateLabel": "26-29 Oct 2026",
+      "fwEnd": "2026-10-29",
+      "firm": "roymorgan",
+      "sample": 3610,
+      "alp": 43,
+      "lnp": 33,
+      "onp": 24,
+      "sourceUrl": "https://www.roymorgan.com/findings/10373-victorian-state-voting-intention-october-2026",
+      "provenance": [
+        "roymorgan"
+      ]
+    },
+    {
+      "dateLabel": "8-9 Oct 2026",
+      "fwEnd": "2026-10-09",
+      "firm": "roymorgan",
+      "sample": null,
+      "alp": 44,
+      "lnp": 29,
+      "onp": 27,
+      "provenance": [
+        "roymorgan"
+      ]
+    },
     {
       "dateLabel": "5-7 Aug 2026",
       "fwEnd": "2026-08-07",

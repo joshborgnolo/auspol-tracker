@@ -345,3 +345,28 @@ then fills the vic bundle's flowForced, which was shipped-null until
 2026-10-30 (that's what made /vic/flows/ look "different" from the main
 site's forced-choice section). Dec 2025's report has no cohort table (one
 LABOR 2PP column only) — nothing to wire there.
+
+### Roy Morgan Victorian waves via the REST feed + tpp3 fold (2026-10-31)
+
+- **The witnesses lag RM badly in a campaign**: electiontracker.au and
+  Wikipedia both sat at Aug 2026 while RM shipped five Vic releases in
+  October. vic-watch's RM lane now reads the REST feed
+  (`wp.roymorgan.com/wp-json/rmr/v1/findings-search?page=N`, x-wp-totalpages
+  for the walk) filtered by /victorian-state-voting-intention/i on the
+  slug — the findings landing page renders page 1 only, same trap the
+  federal extractor moved discovery off.
+- **Wave classes, only ONE files**: statewide VI waves file from their
+  prose + PDF trend tables (10373's PDF carried the unreleased Oct 8-9 SMS
+  wave figure-by-figure); seat analyses ("by-seat-winnability",
+  "eastern-victoria-seats"), upper-house forecasts, inner-Melbourne specials
+  and trust/releases are discovery items only.
+- **tpp3**: vic-polls.json's threeParty[] is the storage shape; to-main-
+  schema folds it onto the matching poll row as inline tpp3 (the federal
+  model) — before 2026-10-31 the array was written nowhere and rendered
+  nothing. validate.mjs's 3cp-pollster allowlist gained "Roy Morgan" and
+  "RedBridge/Accent" (vic houses; additive only).
+- **samplePending rides vic rows too**: RM's Oct 8-9 statewide wave appears
+  ONLY in 10373's trend table with no per-wave n published anywhere (not
+  the PDF's margin section, not release prose) — the row files with
+  samplePending:true (validate check 5's documented allowance; gen-data
+  prices implicit n=1200). Never invent an n.
