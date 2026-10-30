@@ -550,7 +550,7 @@ function RdLeadGauge({
       h.anim.cancel();
       h.anim = null;
     }
-    if (Math.random() < 1 / 150) h.chute = rdChute(el, () => colRef.current, () => {
+    if (Math.random() < 1 / ((100 + Math.abs(lead)) / 2)) h.chute = rdChute(el, () => colRef.current, () => {
       h.chute = null;
       h.t = -1e9;
     });else if (el.animate) h.anim = el.animate(rdHopKeys(), {

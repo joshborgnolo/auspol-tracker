@@ -38,7 +38,8 @@ function rdHeroChartSeed() {
   return Math.min(1152, vw - 2 * g);
 }
 
-/* ---- the lead dot's click hop, and its one-in-150 parachute jump ------- */
+/* ---- the lead dot's click hop, and its parachute jump (odds the leading
+     side's 2PP figure: at 51.5 it's one click in 51.5) -------------------- */
 const rdClamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const rdLerp = (a, b, u) => a + (b - a) * u;
 const rdWin = (t, a, b) => rdClamp((t - a) / (b - a), 0, 1);
@@ -420,8 +421,9 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const lo = margin != null ? lead - margin : lead, hi = margin != null ? lead + margin : lead;
   const col = lead >= 0 ? aColor : bColor;
   const L = settled ? X(hi) : cx, R = settled ? X(lo) : cx, P = settled ? X(lead) : cx;
-  /* idle-click Easter egg: the dot hops on a click (rdHopKeys); about one
-     click in 150 it jumps with a parachute instead (rdChute). Both drive the
+  /* idle-click Easter egg: the dot hops on a click (rdHopKeys); one click in
+     the leading side's 2PP figure (one in 51.5 at a 51.5-48.5 view) it jumps
+     with a parachute instead (rdChute). Both drive the
      dot's element directly, never a re-render, so it keeps a keyboard user's
      focus; a click while it is still in the air waits for the landing. */
   const dotRef = React.useRef(null);
@@ -434,7 +436,9 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
     if (REDUCED_MOTION || !el || h.chute || now - h.t < RD_HOP.airborne) return;
     h.t = now;
     if (h.anim) { h.anim.cancel(); h.anim = null; }
-    if (Math.random() < 1 / 150) h.chute = rdChute(el, () => colRef.current, () => { h.chute = null; h.t = -1e9; });
+    /* chance denominator = the leading side's own 2PP figure in the view on
+       screen; a and b sum to 100 in every matchup, so share = (100+|lead|)/2 */
+    if (Math.random() < 1 / ((100 + Math.abs(lead)) / 2)) h.chute = rdChute(el, () => colRef.current, () => { h.chute = null; h.t = -1e9; });
     else if (el.animate) h.anim = el.animate(rdHopKeys(), { duration: RD_HOP.ms });
   };
   const sideX = Math.max(0, cx - 10 * unit - 56);
