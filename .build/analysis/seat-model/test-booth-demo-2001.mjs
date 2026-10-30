@@ -24,10 +24,15 @@
    4. The interp contract on data/booth-demo-2004.json: demoInterp
       record complete (f 0.634373 == data/booth-seifa-2004.json's own
       _pcti.f, c0 2001 / c1 2006, nearest 2006, census nights), counts
-      demoI national exactly the c0/c1 share blend at f, incomeCuts
-      absent (income floor is 2013) and no incomeCutsI, and the
-      booth-level both-sides rule: demoI null iff either side's demo
-      is null, inside a live block each lane is the exact blend.
+      demoI national exactly the c0/c1 share blend at f for the
+      share lanes, lo/inc-follows its own doctrine for the income
+      arm: the two sides' hi edges differ ($2,000+ in the 2001 grid
+      vs $3,000+ in the 2006 grid) so demoI hiinc and incMed pin to
+      the nearest side (2006) — never a mixed-edge blend — while
+      loinc, whose 25th-percentile cut is edition-semantic, blends
+      as usual. incomeCutsI carries the nearest side's edge + the
+      sides record of both. Booths: demoI null iff either side's
+      demo is null, inside a live block each lane follows its rule.
 */
 import { readFileSync } from "node:fs";
 
@@ -68,7 +73,14 @@ eq(c.national, {
     pres: 0.0377, orth: 0.0335, budd: 0.0211, isl: 0.0167, hind: 0.0057,
     jew: 0.005 },
   ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
+  loinc: 0.2502, hiinc: 0.1033, incMed: 786,
 }, "c0 national (2001 census anchors)");
+eq(d.incomeCuts, {
+  loQuantile: 0.25, loCutWeekly: 456.13, hiEdgeWeekly: 2000,
+  hiNationalShare: 0.103255, dollarsYear: 2001,
+  adultsWeights: "data/income-dist.json",
+  medianBasis: "households (shares are per-adult)",
+}, "c0 incomeCuts (2001 edition: $2,000+ top edge)");
 {
   const divs = new Map(d.divisions.map((x) => [x.div, x]));
   eq(["lingiari", "sydney"].map((n) => divs.get(n === "lingiari"
@@ -88,23 +100,35 @@ eq(c.national, {
   eq(d.booths.map((b) => `${b.div}|${b.boothId}`),
     v.booths.map((b) => `${b.div}|${b.boothId}`), "c0 booth order");
 }
-// shapes: every demo block no income keys, shares inside [0,1],
-// the not-stated doctrine intact (nulls where ABS published nothing)
+// shapes: income keys live on every full-table demo block (the
+// short-table pair carries the Nones), shares inside [0,1], the
+// not-stated doctrine intact (nulls where ABS published nothing)
 {
-  let incomeKey = 0, badShare = 0, nulls = 0;
+  let incomeBlocks = 0, incomeShortNull = 0, badShare = 0, nulls = 0,
+    shortNones = 0;
   for (const b of d.booths) {
     if (b.demo === null) {
       nulls++;
       continue;
     }
-    for (const k of ["loinc", "hiinc", "incMed"]) incomeKey += (k in b.demo);
+    const hasInc = b.demo.loinc != null || b.demo.incMed != null;
+    if (hasInc) incomeBlocks++;
+    else incomeShortNull++;
     for (const k of ["langOther", "fborn", "uni", "blue"]) {
       const x = b.demo[k];
       if (x != null && !(x >= 0 && x <= 1)) badShare++;
     }
+    if (b.demo.langOther === null) {
+      // the short-table CD pattern: everything null incl. income
+      if (b.demo.loinc !== null || b.demo.hiinc !== null ||
+        b.demo.incMed !== null) shortNones++;
+    }
   }
-  ok(incomeKey === 0 && !badShare && nulls === 1513 + 1,
-    `c0 blocks well-formed (${incomeKey} income keys, ${badShare} bad, ${nulls} null)`);
+  ok(incomeBlocks + incomeShortNull === c.boothsGeo &&
+    incomeShortNull <= 4 && !badShare &&
+    nulls === 1513 + 1 && shortNones === 0,
+    `c0 blocks well-formed (${incomeBlocks} income blocks, ` +
+    `${incomeShortNull} income-null, ${badShare} bad, ${nulls} null)`);
 }
 
 // 2. the alloc membership
@@ -132,7 +156,14 @@ eq(c1c.national, {
     pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193, hind: 0.0084,
     jew: 0.005 },
   ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
+  loinc: 0.25, hiinc: 0.0645, incMed: 1027,
 }, "c1 national (2006 census anchors)");
+eq(c1.incomeCuts, {
+  loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
+  hiNationalShare: 0.065439, dollarsYear: 2006,
+  adultsWeights: "data/income-dist.json",
+  medianBasis: "households (shares are per-adult)",
+}, "c1 incomeCuts (2006 edition: $3,000+ top edge)");
 {
   const divs = new Map(c1.divisions.map((x) => [x.div, x]));
   const L = divs.get("Lingiari");
@@ -158,14 +189,31 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   eq(d.demoInterp.censusNights, { 2001: "2001-08-07", 2006: "2006-08-08" },
     "demoInterp census nights");
   eq(d.demoInterp.f, sf._pcti.f, "demoInterp.f == seifa _pcti.f");
-  ok(!("incomeCutsI" in d) && !("incomeCuts" in d),
-    "2004 keeps the income floor (no income cuts either side)");
+  eq(d.incomeCutsI, {
+    loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
+    hiNationalShare: 0.065439, dollarsYear: 2006,
+    adultsWeights: "data/income-dist.json",
+    medianBasis: "households (shares are per-adult); hiinc pinned to " +
+      "the nearest census side (hi edges differ across the blend's " +
+      "editions)",
+    sides: {
+      2001: { loCutWeekly: 456.13, dollarsYear: 2001,
+        hiEdgeWeekly: 2000, hiNationalShare: 0.103255 },
+      2006: { loCutWeekly: 603.75, dollarsYear: 2006,
+        hiEdgeWeekly: 3000, hiNationalShare: 0.065439 },
+    },
+  }, "2004 incomeCutsI = the nearest (2006) edge + both sides");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   for (const k of ["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "y12less", "atsci", "u15", "onepar"]) {
+    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc"]) {
     eq(d.counts.demoI.national[k],
       LN(c.national[k], c1c.national[k]), `demoI national ${k}`);
   }
+  // the income arm's mixed-edge doctrine: hi and median pin nearest
+  eq(d.counts.demoI.national.hiinc, c1c.national.hiinc,
+    "demoI national hiinc == nearest side's (2006) hi");
+  eq(d.counts.demoI.national.incMed, c1c.national.incMed,
+    "demoI national incMed == nearest side's (2006) median");
   for (const [lane, keys] of [["rel", d.relKeys], ["ten", d.tenKeys]]) {
     for (const k of keys) {
       eq(d.counts.demoI.national[lane][k],
@@ -197,11 +245,19 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     blendC++;
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
-      "atsci", "onepar"]) {
+      "atsci", "onepar", "loinc"]) {
       const a = b.demo && b.demo[k], x = fb.demo && fb.demo[k];
       if (a != null && x != null) {
         if (b.demoI[k] !== LN(a, x)) keyok = false;
       } else if (b.demoI[k] !== null) keyok = false;
+    }
+    // hi + median are nearest-side pinned (edges differ across the
+    // blend's editions): nearest is the 2006 side
+    for (const k of ["hiinc", "incMed"]) {
+      const x = fb.demo && fb.demo[k];
+      if (x != null ? b.demoI[k] !== x : b.demoI[k] !== null) {
+        keyok = false;
+      }
     }
   }
   ok(keyok, "2004 booth demoI keys + per-lane blend/null rule");

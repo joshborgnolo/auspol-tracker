@@ -73,6 +73,16 @@ const NATIONAL = {
          pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193,
          hind: 0.0084, jew: 0.005 },
   ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
+  loinc: 0.25,
+  hiinc: 0.0645,
+  incMed: 1027,
+};
+// 2006 edition's incomeCuts record (the $3,000+ top-band edition)
+const INC_CUTS = {
+  loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
+  hiNationalShare: 0.065439, dollarsYear: 2006,
+  adultsWeights: "data/income-dist.json",
+  medianBasis: "households (shares are per-adult)",
 };
 // the 2006 B09 per-country lanes: the GCP-era ten-country set trims to
 // eight here (the 2006 table prints one United Kingdom row)
@@ -190,7 +200,26 @@ for (const year of [2007, 2010]) {
 
   // 3. national pins
   eq(d.counts.national, NATIONAL, `${year} counts.national`);
+  eq(d.incomeCuts, INC_CUTS, `${year} incomeCuts record`);
   eq(d.cobKeys, COB_KEYS8, `${year} cobKeys contract`);
+  // 3a. income arm well-formedness: shares in range, median sane
+  {
+    let badShare = 0, badMed = 0, incNull = 0;
+    for (const b of d.booths) {
+      if (!b.demo) continue;
+      const dm = b.demo;
+      for (const f of ["loinc", "hiinc"]) {
+        const v = dm[f];
+        if (v != null && !(v >= 0 && v <= 1)) badShare++;
+        if (v === null) incNull++;
+      }
+      if (dm.incMed !== null &&
+          !(dm.incMed >= 50 && dm.incMed <= 4200)) badMed++;
+    }
+    ok(!badShare && !badMed,
+      `${year} income lanes sane (${badShare} bad shares, ` +
+      `${badMed} bad medians, ${incNull} null income rows)`);
+  }
 
   // 4. division anchors + extrema
   {

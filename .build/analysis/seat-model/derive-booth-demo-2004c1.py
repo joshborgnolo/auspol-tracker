@@ -19,10 +19,10 @@ cause, same null).
 
 The Derive reads through derive-booth-demo-2006.py's readers
 importlib-side (the 2006 BCP per-state tables ARE the loaders the 2006
-measured stores pass through) — this script is a re-driving of that
-machinery onto the 2004 boundary set, never a re-implementation. No
-income lanes (the repo's income floor stays at the 2013 election; the
-2004 store and its c1 counterpart carry no incomeCuts record).
+measured stores pass through — the income lanes included, B26/B28 of
+the same edition feeding income_lanes.py's shared engine) — this
+script is a re-driving of that machinery onto the 2004 boundary set,
+never a re-implementation.
 
 Guards fail loud: booth-set drift vs the venue store's (div, boothId)
 pairs, division-name drift, alloc universe drift, national persons
@@ -84,6 +84,7 @@ def main():
         fail(f"{ALLOC.name}: {len(not_in_bcp)} allocated CDs absent "
              f"from the BCP, e.g. {not_in_bcp[:8]}")
 
+    inc_map, inc_cut, inc_hishare = d06.income06()
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * 11,
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
@@ -94,7 +95,10 @@ def main():
                                   "relvec": [0] * len(d06.REL_KEYS),
                                   "relNS": 0, "relTot": 0,
                                   "ten6": [0] * 6,
-                                  "famN": 0, "famD": 0})
+                                  "famN": 0, "famD": 0,
+                                  "incT": 0.0, "incLo": 0.0,
+                                  "incHi": 0.0,
+                                  "incHH": [0] * len(d06.INC_BANDS06)})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -112,6 +116,13 @@ def main():
             acc[k] += r[k]
         for i in range(len(d06.REL_KEYS)):
             acc["relvec"][i] += r["relvec"][i]
+        inc = inc_map.get(code)
+        if inc is not None:
+            acc["incT"] += inc[0]
+            acc["incLo"] += inc[1]
+            acc["incHi"] += inc[2]
+            for i in range(len(d06.INC_BANDS06)):
+                acc["incHH"][i] += inc[4][i]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -132,6 +143,11 @@ def main():
         for i in range(len(d06.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d06.REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
+        for k in ("incT", "incLo", "incHi"):
+            nat[k] += dv[k]
+        for i in range(len(d06.INC_BANDS06)):
+            nat.setdefault("incHH", [0] * len(d06.INC_BANDS06))
+            nat["incHH"][i] += dv["incHH"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -159,6 +175,9 @@ def main():
                          / (nat["ten6"][0] + nat["ten6"][1]
                             + nat["ten6"][2] + nat["ten6"][4]), 4)
                 for k in d06.TEN_KEYS},
+        "loinc": round(nat["incLo"] / nat["incT"], 4),
+        "hiinc": round(nat["incHi"] / nat["incT"], 4),
+        "incMed": round(d06.income_band_median(nat["incHH"])),
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -186,6 +205,7 @@ def main():
             pip_empty += 1
             rec["demo"] = None
         else:
+            inc = inc_map.get(key)
             rec["demo"] = d06.shares({
                 "pers": r["pers"], "bands": list(r["ages"]),
                 "eng": r["eng"], "oth": r["oth"], "aus": r["aus"],
@@ -197,7 +217,9 @@ def main():
                 "relvec": list(r["relvec"]),
                 "relNS": r["relNS"], "relTot": r["relTot"],
                 "ten6": list(r["ten6"]),
-                "famN": r["famN"], "famD": r["famD"]})
+                "famN": r["famN"], "famD": r["famD"],
+                **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHH": list(inc[4])} if inc else {})})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}
@@ -232,8 +254,8 @@ def main():
             "(counts.boothsPipMiss), as does one whose CD housed no one "
             "(boothsPipEmpty). Shares mirror the 2006-era store's "
             "recipes verbatim (derive-booth-demo-2006.py's load_bcp + "
-            "shares via importlib); no income lanes (the repo's income "
-            "floor stays at the 2013 election). The two sides blend to "
+            "shares via importlib, the income lanes riding the same "
+            "B26/B28 engine). The two sides blend to "
             "election day at the SEIFA pcti lane's day-share — see "
             "data/booth-demo-2004.json's demoInterp record; this store "
             "is the far side only."),
@@ -266,6 +288,15 @@ def main():
             "(cd-2006-ced-2003ed)"),
         "relKeys": list(d06.REL_KEYS),
         "tenKeys": list(d06.TEN_KEYS),
+        "incomeCuts": {
+            "loQuantile": d06.ilanes.INC_LO_Q,
+            "loCutWeekly": inc_cut,
+            "hiEdgeWeekly": d06.INC_BANDS06[-1][0],
+            "hiNationalShare": inc_hishare,
+            "dollarsYear": 2006,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+        },
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

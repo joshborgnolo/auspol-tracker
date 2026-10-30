@@ -170,8 +170,8 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // (1996's f sits at the 1996 census's side), carry-proofed against the
   // venue-nearest surveyed-linework rescue
   for (const f of [r, D]) {
-    assert.equal(f.demoBasis, "venue", "1996's census people basis is the venue-CD lane");
-    assert.equal(f.incomeCuts, null, "the income floor stays 2013 everywhere the frame reaches");
+    assert.equal(f.demoBasis, "venue", "1996's census people basis is the venue-CD lane (the '90s people-interp arc)");
+    assert.equal(f.incomeCuts, null, "1996 has no incomeCuts (the income floor is the 2001 election)");
     assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "1996 SEIFA cuts stay null");
     assert.ok(f.demoInterp && f.demoInterp.f === 0.914067 && f.demoInterp.c0 === 1991 && f.demoInterp.c1 === 1996 && f.demoInterp.nearestSide === 1996,
       "1996's demoInterp record interpolates 1991↔1996 at f=0.914067 nearest-1996-side");
@@ -219,7 +219,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     assert.equal(D.demoBasis, "venue", `${y}'s census people basis is the venue-CD lane`);
     assert.ok(D.demoInterp && D.demoInterp.f === f && D.demoInterp.c0 === c0 && D.demoInterp.c1 === c1 && D.demoInterp.nearestSide === near,
       `${y}'s demoInterp blends ${c0}↔${c1} at f=${f} nearest the ${near} census`);
-    assert.equal(D.incomeCuts, null, `${y}: the income floor stays 2013`);
+    assert.equal(D.incomeCuts, null, `${y}: the income floor stays 2001`);
     assert.deepEqual(D.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, `${y}: SEIFA cuts stay null`);
     assert.equal(D.divs.filter((d) => d.demo).length, nDivs, `every ${y} division carries its census CD-sum demo row`);
     const nBooth = (D.booths.demo || []).filter((x) => x !== null).length;
@@ -249,11 +249,21 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.equal(D.prev, 1998, "2001's previous election is 1998");
   assert.equal(D.speaker, "Wakefield");
   assert.equal(D.event, null, "2001 has no VTR event id (stats-pack era)");
+  // the 2001 frame carries the full People-lane set (the user's same-session arc)
+  assert.equal((D.relKeys || []).length, 10, "2001 relKeys has the ten religions (norel first)");
+  assert.equal(D.relKeys[0], "norel");
+  assert.equal((D.tenKeys || []).length, 4, "2001 tenKeys has four tenures (mort first)");
+  assert.equal(D.tenKeys[0], "mort");
+  const lingiari01 = D.divs.find(x => x.n === "Lingiari");
+  assert.ok(lingiari01 && lingiari01.demo && lingiari01.demo.atsci != null && lingiari01.demo.y12less != null && lingiari01.demo.onepar != null && lingiari01.demo.rel && lingiari01.demo.ten, "2001 Lingiari carries the new lanes (indigenous/year-12/families/religion/tenure)");
+  assert.ok(lingiari01.demo.atsci > 0.34, "2001 Lingiari is among the nation's most Indigenous seats");
+  assert.ok(Math.abs(lingiari01.demo.atsci - 0.3509) < 0.002, "2001 Lingiari Indigenous share is the measured 2001-census read");
+  assert.ok(Math.abs(lingiari01.demo.y12less - 0.6998) < 0.002, "2001 Lingiari Year-12-or-less at 70%, the era's education floor");
   const tally = {};
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 18, "the booth lane is the full columnar (16 + census demo + birthplace rows)");
+  assert.equal(Object.keys(B).length, 20, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure rows)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -261,12 +271,13 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // the census People lanes of the floor year: the measured 2001 census
   // joined to its own election (derive-booth-demo-2001-frame.py over
   // cd-2001-ced-2001set.json, pinned by test-booth-demo-2001-frame.mjs) —
-  // the interp era begins at 2004, income stays floored at 2013, and the
-  // 2001-era sub-CED SEIFA milestone keeps the seifa lanes null
+  // the interp era begins at 2004, every year from here carries its
+  // own edition's income cuts, and the 2001-era sub-CED SEIFA milestone
+  // keeps the seifa lanes null
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, "venue", "2001 census basis is the venue-proxy read");
     assert.ok(!f.demoInterp, "2001 is measured-only (no interp record)");
-    assert.equal(f.incomeCuts, null, "the income floor stays 2013");
+    assert.ok(f.incomeCuts && f.incomeCuts.hiEdgeWeekly === 2000 && f.incomeCuts.dollarsYear === 2001 && !f.incomeCuts.sides, "2001 incomeCuts: the 2001 edition's $2,000+ edge in 2001 dollars, single-edition (no sides)");
     assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "2001 SEIFA cuts stay null");
   }
   assert.ok(D.divs.every((d) => d.demo), "all 150 divisions carry a census demo row");
@@ -332,10 +343,26 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     // its object-valued cob key 2026-10-28)
     assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
-  // income's 2013 floor survives the blend: 2007/2010 carry no cuts
-  // record, and 2016/2019 name THEIR bracketing epochs in sides
+  // every interp year rides the income cuts of the nearest census
+  // side (hi edges differ across the 2001/2006/2011 grids, so the hi
+  // lane pins to the nearest side's edition — the res file carries
+  // its year-appropriate incomeCutsI with both sides named)
+  const CUTS_I = {
+    2004: [3000, 2006, [2001, 2006]],
+    2007: [3000, 2006, [2006, 2011]],
+    2010: [4000, 2011, [2006, 2011]],
+    2013: [4000, 2011, [2011, 2016]],
+    2016: [4000, 2016, [2011, 2016]],
+    2019: [4000, 2021, [2016, 2021]],
+  };
+  for (const [y, [edge, dollars]] of Object.entries(CUTS_I)) {
+    const rc = JSON.parse(R(`map/data/res-${y}.json`)).incomeCuts;
+    assert.ok(rc && rc.hiEdgeWeekly === edge && rc.dollarsYear === dollars, `${y} incomeCuts: nearest-side ${edge} edge in ${dollars} dollars`);
+  }
+  const r04 = JSON.parse(R("map/data/res-2004.json"));
+  assert.ok(r04.incomeCuts.sides && r04.incomeCuts.sides["2001"] && r04.incomeCuts.sides["2006"], "2004 incomeCuts names its 2001/2006 bracketing editions in sides");
   const r10 = JSON.parse(R("map/data/res-2010.json"));
-  assert.ok(r10.incomeCuts === null, "2010 incomeCuts stays null (income floor 2013)");
+  assert.ok(r10.incomeCuts.sides && r10.incomeCuts.sides["2006"] && r10.incomeCuts.sides["2011"], "2010 incomeCuts names its 2006/2011 bracketing editions in sides");
   const r19 = JSON.parse(R("map/data/res-2019.json"));
   assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
   // the birthplace menu matrix: every census-edition year lists its own
@@ -485,7 +512,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.ok(Array.isArray(d.booths.ten[i]) && d.booths.ten[i].length === 4, `${y}: parallel booth tenure rows`);
     const lin = d.divs.find((x) => x.n === "Lingiari");
     assert.ok(lin.demo.atsci != null && lin.demo.rel && lin.demo.rel.norel != null && lin.demo.ten && lin.demo.ten.mort != null, `${y}: Lingiari carries atsci/rel/ten`);
-    assert.ok(lin.demo.onepar != null && lin.demo.y12l != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12less/u15`);
+    assert.ok(lin.demo.onepar != null && lin.demo.y12less != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12less/u15`);
   }
 }
 

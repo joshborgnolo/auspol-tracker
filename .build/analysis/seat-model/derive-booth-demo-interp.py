@@ -25,9 +25,13 @@ stores carry and is idempotent.
   2010  c0 = 2006, c1 = 2011
   2013  c0 = 2011, c1 = 2016 (data/booth-demo-2013-c1.json)
 
-The income lanes keep their 2013 floor: 2004/2007/2010's measured
-stores carry no incomeCuts, and the blend never brands the c1 store's
-one-sided figure as intercensal.
+The income lanes blend like any lane (loinc's 25th-percentile cut is
+edition-semantic), except hiinc when the two census sides' top-band
+dollar edges differ (the 2001/2006 grids print $2,000+/$3,000+ tops
+against 2011's $4,000+): a mixed-edge share blend would mix
+definitions, so those years pin hiinc to the nearest census side —
+the same doctrine incMed has always ridden. incomeCutsI carries the
+nearest side's edge and a sides record of both.
 
 Guards fail loud (booth-set drift between sides, division-set drift,
 f drift against the SEIFA pcti store's own factors for the year).
@@ -61,7 +65,7 @@ YEARS = {
     2010: {"c0": 2006, "c1": 2011},
     2013: {"c0": 2011, "c1": 2016},
 }
-LANES = ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
+LANES = ("langOther", "fborn", "uni", "blue", "loinc",
          "y12less", "atsci", "u15", "onepar")
 # the select-family lanes blend per option, like the age bands
 # (orders pinned to the store-level relKeys/tenKeys records)
@@ -77,13 +81,18 @@ def lane_blend(a, b, f):
         and b is not None else None
 
 
-def blend_demo(c0blk, c1blk, f, nearest_blk):
+def blend_demo(c0blk, c1blk, f, nearest_blk, hi_mixed):
     """One demoI block out of two census-side share dicts (venue-store
     shape — persons, cov, the six lanes, age, incMed): the block needs
     BOTH census sides (a one-sided block stays null whole, so the
     display falls back to the measured block), and inside it a lane
-    missing on either side is null (the per-lane pcti doctrine). incMed
-    takes the nearest side."""
+    missing on either side is null ( the per-lane pcti doctrine).
+    incMed takes the nearest side. hiinc blends like any lane ONLY
+    when the two sides' hi edges share a dollar (2011/2016/2021 eras
+    all print $4,000+): between editions whose grids print different
+    top edges (2001 $2,000+ / 2006 $3,000+ / 2011 $4,000+) a share
+    blend would mix definitions, so hi_mixed years pin it to the
+    nearest side like incMed."""
     if c0blk is None or c1blk is None:
         return None
     out = {"persons": None, "cov": None}
@@ -95,6 +104,9 @@ def blend_demo(c0blk, c1blk, f, nearest_blk):
     for k in LANES:
         out[k] = lane_blend(c0blk.get(k) if c0blk else None,
                             c1blk.get(k) if c1blk else None, f)
+    out["hiinc"] = (nearest_blk.get("hiinc") if hi_mixed else
+                    lane_blend(c0blk.get("hiinc"),
+                               c1blk.get("hiinc"), f))
     a0 = c0blk.get("age") if c0blk else None
     a1 = c1blk.get("age") if c1blk else None
     out["age"] = ({b: lane_blend(None if a0 is None else a0.get(b),
@@ -156,12 +168,16 @@ def main():
             fail(f"{year}: division-set drift "
                  f"{sorted(set(c1_divs) ^ set(m_divs))}")
 
+        mc_cut = (meas.get("incomeCuts") or {}).get("hiEdgeWeekly")
+        fc_cut = (far.get("incomeCuts") or {}).get("hiEdgeWeekly")
+        hi_mixed = mc_cut is not None and fc_cut is not None \
+            and mc_cut != fc_cut
         rows = 0
         for b in meas["booths"]:
             fblk = c1_booths[(b["div"], b["boothId"])]["demo"]
             mblk = b["demo"]
             near_blk = fblk if near == y["c1"] else mblk
-            ib = blend_demo(mblk, fblk, f, near_blk)
+            ib = blend_demo(mblk, fblk, f, near_blk, hi_mixed)
             b["demoI"] = ib
             if ib is not None:
                 rows += 1
@@ -169,11 +185,15 @@ def main():
             fblk = c1_divs[d["div"]]
             mblk = d
             near_blk = fblk if near == y["c1"] else mblk
-            d["demoI"] = blend_demo(mblk, fblk, f, near_blk)
+            d["demoI"] = blend_demo(mblk, fblk, f, near_blk, hi_mixed)
 
         mn, fn = meas["counts"]["national"], far["counts"]["national"]
         ni = {k: lane_blend(mn.get(k), fn.get(k), f)
               for k in LANES + ("age0_14", "age65ov")}
+        ni["hiinc"] = ((fn if near == y["c1"] else mn).get("hiinc")
+                       if hi_mixed
+                       else lane_blend(mn.get("hiinc"),
+                                       fn.get("hiinc"), f))
         for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
             d0, d1 = mn.get(which), fn.get(which)
             ni[which] = (
@@ -196,27 +216,35 @@ def main():
                          "census side, or a lane missing on either "
                          "side, shows the measured figure instead"),
         }
-        # income lanes exist from 2013 (the measured stores' floor);
-        # 2007/2010 keep that floor — a c1-only income figure would
-        # brand a one-sided lane as intercensal, so incomeCutsI rides
-        # only years whose measured side carries incomeCuts
+        # the income lane set is now edition-local on every side the
+        # blend spans; a one-sided income figure would still brand a
+        # hole as intercensal, so incomeCutsI rides only years whose
+        # BOTH sides carry incomeCuts. When the two sides' hi edges
+        # differ the demoI hiinc pins to the nearest side — record
+        # that year's own edge here, never the measured side's alone
         mc, fc = meas.get("incomeCuts"), far.get("incomeCuts")
         if mc is not None and fc is not None:
             meas["incomeCutsI"] = {
             "loQuantile": mc["loQuantile"],
             "loCutWeekly": (fc if near == y["c1"] else mc)["loCutWeekly"],
-            "hiEdgeWeekly": mc["hiEdgeWeekly"],
+            "hiEdgeWeekly":
+                (fc if near == y["c1"] else mc)["hiEdgeWeekly"],
             "hiNationalShare":
                 (fc if near == y["c1"] else mc)["hiNationalShare"],
             "dollarsYear": near,
             "adultsWeights": mc["adultsWeights"],
-            "medianBasis": mc["medianBasis"],
+            "medianBasis": mc["medianBasis"] +
+                ("; hiinc pinned to the nearest census side "
+                 "(hi edges differ across the blend's editions)"
+                 if hi_mixed else ""),
             "sides": {
                 str(y["c0"]): {"loCutWeekly": mc["loCutWeekly"],
                                "dollarsYear": mc["dollarsYear"],
+                               "hiEdgeWeekly": mc["hiEdgeWeekly"],
                                "hiNationalShare": mc["hiNationalShare"]},
                 str(y["c1"]): {"loCutWeekly": fc["loCutWeekly"],
                                "dollarsYear": fc["dollarsYear"],
+                               "hiEdgeWeekly": fc["hiEdgeWeekly"],
                                "hiNationalShare": fc["hiNationalShare"]},
             },
             }

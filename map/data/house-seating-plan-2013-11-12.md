@@ -83,7 +83,7 @@ The transcription is **corroborated by the archived next revision**: Wayback Mac
 18. **Jim Chalmers** (Rankin, ALP)  
 19. **Kelvin Thomson** (Wills, ALP)  
 20. **Warren Snowdon** (Lingiari, ALP)  
-21. **Alannah MacTIERNAN** (Perth, ALP)  
+21. **Alannah MacTiernan** (Perth, ALP)  
 22. **Tony Zappia** (Makin, ALP)  
 23. **Michael Danby** (Melbourne Ports, ALP)  *(division then named Melbourne Ports - renamed Macnamara in 2018)*  
 24. **Stephen Jones** (Throsby, ALP)  

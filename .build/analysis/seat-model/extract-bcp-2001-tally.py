@@ -40,6 +40,15 @@ matter; the people lanes need six, and the new-lane arc adds five more:
                         Not stated
   B 27B Occupation by age by sex      nine ASCO-era major groups x 7
                         age bands, col 9 = Total (2 of 2 = Persons)
+  B 30  Weekly family income          band x family type (12 stated
+                        bands, Negative/Nil and the partial-stated /
+                        all-not-stated ledger rows read for the
+                        identity but excluded from every basis — the
+                        B26/G31-era doctrine)
+  B 31  Weekly household income       band x household type; the
+                        household histogram rides the table's Total
+                        column (family/non-family cells may shave
+                        independently in small cells)
 
 Overseas visitors ride their own row INSIDE several tables' totals in
 the 2001 product, so every lane subtracts them: an as-enumerated
@@ -149,6 +158,14 @@ REL01_PREFIX = {
     "hind": "hinduism",
     "jew": "judaism",
 }
+# B 30's column order: couple-with-children, couple-without, one-parent,
+# other, Total (header verified against the printed sheet — B 31's is
+# family / non-family / Total). The row ladder is the same 12 stated
+# bands in both (and identical to derive-booth-demo-2001's INC_BANDS01).
+INC01_BAND_LABELS = ["$1-$199", "$200-$299", "$300-$399", "$400-$499",
+                     "$500-$599", "$600-$699", "$700-$799", "$800-$999",
+                     "$1,000-$1,199", "$1,200-$1,499", "$1,500-$1,999",
+                     "$2,000 or more"]
 
 import openpyxl  # noqa: E402
 
@@ -217,6 +234,7 @@ def parse_cd(member_name, wb):
                 "rel01": None, "rel01ns": None, "rel01tot": None,
                 "rel01ov": None, "sch01": None, "sch01ns": None,
                 "fam01": None, "ten01": None,
+                "fiTot01": None, "fiMix01": None, "hiTot01": None,
                 "ind01": None, "b1ov": None,
                 "shortCd": True}
 
@@ -377,6 +395,86 @@ def parse_cd(member_name, wb):
         ten_othtype = cell_of(row, 8)
         ten_tenns = cell_of(row, 9)
 
+    # ---- B 30 weekly family income (band x family type) ----
+    # cols: 1 = couple-with-children, 2 = couple-without, 3 = one-parent,
+    # 4 = other, 5 = Total. fi lists are 13 long: neg/nil folds in as
+    # row 0, then the 12 stated bands (INC01_BAND_LABELS order).
+    fi_mix = [[0] * 4 for _ in range(13)]
+    fi_tot = [0] * 13
+    fi_part = fi_nostat = fi_total = None
+    for row in sheet_rows("B 30", 1, 6):
+        lab = label_of(row)
+        if not lab:
+            continue
+        if lab.startswith("negative"):
+            tgt = 0
+        elif lab.startswith("partial income"):
+            tgt = "part"
+        elif lab.startswith("all incomes"):
+            tgt = "notstated"
+        elif lab == "total":
+            tgt = "total"
+        else:
+            lab_stem = lab.rstrip()
+            tgt = None
+            for gi, glab in enumerate(INC01_BAND_LABELS):
+                if lab_stem.lower().startswith(glab.lower()):
+                    tgt = gi + 1
+                    break
+        if tgt is None:
+            continue
+        vals = [cell_of(row, k) for k in range(1, 6)]
+        if tgt == "part":
+            fi_part = vals[4]
+        elif tgt == "notstated":
+            fi_nostat = vals[4]
+        elif tgt == "total":
+            fi_total = vals[4]
+        else:
+            for k in range(4):
+                fi_mix[tgt][k] += vals[k]
+            fi_tot[tgt] += vals[4]
+
+    # ---- B 31 weekly household income (band x household type) ----
+    # col 3 = Total; family / non-family splits read for the identity
+    # only (small-cell shave doctrine: the Total column is canonical)
+    hh_tot = [0] * 13
+    hh_fam = [0] * 13
+    hh_nonf = [0] * 13
+    hh_part = hh_nostat = hh_total = None
+    for row in sheet_rows("B 31", 1, 4):
+        lab = label_of(row)
+        if not lab:
+            continue
+        if lab.startswith("negative"):
+            tgt = 0
+        elif lab.startswith("partial income"):
+            tgt = "part"
+        elif lab.startswith("all incomes"):
+            tgt = "notstated"
+        elif lab == "total":
+            tgt = "total"
+        else:
+            lab_stem = lab.rstrip()
+            tgt = None
+            for gi, glab in enumerate(INC01_BAND_LABELS):
+                if lab_stem.lower().startswith(glab.lower()):
+                    tgt = gi + 1
+                    break
+        if tgt is None:
+            continue
+        fc, nf, tt = cell_of(row, 1), cell_of(row, 2), cell_of(row, 3)
+        if tgt == "part":
+            hh_part = tt
+        elif tgt == "notstated":
+            hh_nostat = tt
+        elif tgt == "total":
+            hh_total = tt
+        else:
+            hh_fam[tgt] += fc
+            hh_nonf[tgt] += nf
+            hh_tot[tgt] += tt
+
     # ---- B 06 birthplace
     aus = cobns = b6_ov = b6_total = None
     elsewhere = None
@@ -510,6 +608,24 @@ def parse_cd(member_name, wb):
         recons["sch-share"] = 1
     if b1_indig > b1_persons:
         recons["indig>pers"] = 1
+    # B 30/B 31 within-table identities: each stated band's printed
+    # Total recomposes its four family types, and each table's printed
+    # Total recomposes stated + partial-stated + not-stated
+    for gi in range(13):
+        if abs(sum(fi_mix[gi]) - fi_tot[gi]) > TOL:
+            recons["b30band"] = 1
+        if abs(hh_fam[gi] + hh_nonf[gi] - hh_tot[gi]) > TOL:
+            recons["b31band"] = 1
+    if fi_part is None or fi_nostat is None or fi_total is None:
+        recons["b30miss"] = 1
+    elif abs(sum(fi_tot) + fi_part + fi_nostat - fi_total) > TOL * 3:
+        recons["b30total"] = sum(fi_tot) + fi_part + fi_nostat \
+            - fi_total
+    if hh_part is None or hh_nostat is None or hh_total is None:
+        recons["b31miss"] = 1
+    elif abs(sum(hh_tot) + hh_part + hh_nostat - hh_total) > TOL * 3:
+        recons["b31total"] = sum(hh_tot) + hh_part + hh_nostat \
+            - hh_total
 
     return {
         "pers": b3_total - b3_ov,
@@ -535,6 +651,9 @@ def parse_cd(member_name, wb):
                   fam_tot],
         "ten01": [ten_own, ten_purch + ten_rentbuy, ten_renttot,
                   ten_stha, ten_othtype, ten_tenns],
+        "fiTot01": fi_tot,
+        "fiMix01": [c for band in fi_mix for c in band],
+        "hiTot01": hh_tot,
         "_recons": recons or None,
     }
 
