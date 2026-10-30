@@ -124,7 +124,14 @@ const cellAttrs = (attrTxt, value) => {
 
 const pctVal = (s) => {
   if (s == null) return null;
-  const m = cleanCell(s).match(/^([<>≈~]*)\s*(-?\d+(?:\.\d+)?)\s*%?\s*$/);
+  let c = cleanCell(s);
+  let m = c.match(/^([<>≈~]*)\s*(-?\d+(?:\.\d+)?)\s*%?\s*$/);
+  /* Editor copy-paste artifact: two cells run into one line with a single
+     pipe ("5%| 5%") — take the tail segment (Resolve 6–10 Oct 2026 row). */
+  if (!m && c.includes("|")) {
+    c = c.slice(c.lastIndexOf("|") + 1).trim();
+    m = c.match(/^([<>≈~]*)\s*(-?\d+(?:\.\d+)?)\s*%?\s*$/);
+  }
   return m ? +m[2] : null;
 };
 const numVal = (s) => {
@@ -177,7 +184,7 @@ function parseDateLabel(raw, yearDefault) {
 // ---------- table extraction ----------------------------------------------
 const FIRM_IDS = [
   [/newspoll/i, "newspoll"],
-  [/roy ?morgan/i, "roymorgan"],
+  [/roy[ -]?morgan/i, "roymorgan"],
   [/demosau/i, "demosau"],
   [/resolve/i, "resolve"],
   [/fresh ?water|freshwater/i, "freshwater"],
@@ -564,9 +571,21 @@ const crossCheck = async () => {
   const ours = JSON.parse(readFileSync(DATA_FILE, "utf8"));
   const wt = await getWiki(ARGV("wiki-file"));
   const csv = await getCsv(ARGV("csv-file"));
-  const wikiPolls = parseLaTables(wt);
   const csvRows = parseEtCsv(csv);
+  /* Test MERGED rows, not raw wiki rows: an approx-month wiki row
+     ("Mar – Apr") merges onto its CSV wave's real fieldwork dates, and the
+     committed file keys it there — raw-row comparison false-flags every
+     approx wave we already hold (Resolve Mar–Apr/May–Jun 2026). */
+  const wikiPolls = mergeRows(parseLaTables(wt), csvRows);
   const leaders = parseLeadership(wt);
+  /* Blindness tripwire (the Sep-2026 federal lesson): a reshaped witness
+     layout parses to a thinned row set, which would diff as "missing=0"
+     forever. The file has ~67 polls / ~97 leadership rows; demand a sane
+     floor and FAIL loudly rather than certify a silent parser. */
+  if (wikiPolls.length < 55 || leaders.length < 80) {
+    console.error(`FAIL witness parse thinned out: ${wikiPolls.length} LA polls, ${leaders.length} leadership rows`);
+    process.exit(1);
+  }
   const have = new Set(ours.polls.map((p) => `${p.firm}|${p.fwEnd}`));
   const missingPolls = wikiPolls.filter((w) => !have.has(`${w.firm}|${w.fwEnd}`)).map((w) => ({ firm: w.firm, fwEnd: w.fwEnd, pollster: w.firmRaw }));
   const csvMissing = csvRows.filter((c) => !ours.polls.some((p) => p.firm === c.firm && closeDate(p.fwEnd, c.fwEnd))).map((c) => ({ firm: c.firm, fwEnd: c.fwEnd }));

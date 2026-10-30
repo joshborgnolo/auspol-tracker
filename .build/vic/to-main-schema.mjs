@@ -84,17 +84,19 @@ const VIC_EVENTS = [
 // house names as the main page spells them (one house, one name). Every
 // Victorian Roy Morgan poll is an SMS poll – "Snap SMS Poll" (May and July
 // 2023), "special SMS Roy Morgan survey" (Feb, Apr, Aug 2026), per each
-// release – so it files as the federal page files Roy Morgan's SMS polls:
-// "Roy Morgan (SMS)", in the archive and out of every aggregate (gen-data's
-// NO_AGG_HOUSES: SMS polls have a strong selection bias)
+// release – and filed "Roy Morgan (SMS)" (out of every aggregate, gen-data's
+// NO_AGG_HOUSES) until the user call 2026-10-30 to bring it back in:
+// Victoria has no non-SMS Roy Morgan series to distinguish it from, so it
+// files plain "Roy Morgan" and joins the aggregates, with the SMS method
+// documented here.
 const HOUSE = {
   "Resolve": "Resolve", "RedBridge/Accent": "RedBridge/Accent", "DemosAU/Premier National": "DemosAU",
-  "Freshwater": "Freshwater", "Roy Morgan": "Roy Morgan (SMS)", "Newspoll": "Newspoll",
+  "Freshwater": "Freshwater", "Roy Morgan": "Roy Morgan", "Newspoll": "Newspoll",
   "Wolf & Smith": "Wolf & Smith", "YouGov (MRP)": "YouGov (MRP)",
 };
 const FIRM_KEY_TO_HOUSE = {
   resolve: "Resolve", "redbridge-accent": "RedBridge/Accent", demosau: "DemosAU", freshwater: "Freshwater",
-  roymorgan: "Roy Morgan (SMS)", newspoll: "Newspoll", "wolf-smith": "Wolf & Smith", "yougov-mrp": "YouGov (MRP)",
+  roymorgan: "Roy Morgan", newspoll: "Newspoll", "wolf-smith": "Wolf & Smith", "yougov-mrp": "YouGov (MRP)",
 };
 
 const eraAt = (slot, iso) => (VIC_ERAS[slot] || []).find((e) => iso >= e.from && (!e.to || iso <= e.to)) || null;

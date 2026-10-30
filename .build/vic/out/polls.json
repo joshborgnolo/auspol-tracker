@@ -127,7 +127,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-10-03"
+    "generated": "2026-10-30"
   },
   "metricRules": {
     "favFirms": [
@@ -143,7 +143,7 @@
     "Newspoll": {},
     "RedBridge/Accent": {},
     "Resolve": {},
-    "Roy Morgan (SMS)": {},
+    "Roy Morgan": {},
     "Wolf & Smith": {},
     "YouGov (MRP)": {}
   },
@@ -233,7 +233,7 @@
     {
       "date": "2023-05-22",
       "dateStart": "2023-05-17",
-      "pollster": "Roy Morgan (SMS)",
+      "pollster": "Roy Morgan",
       "client": null,
       "sample": 2095,
       "alp": 42,
@@ -267,7 +267,7 @@
     {
       "date": "2023-07-20",
       "dateStart": "2023-07-19",
-      "pollster": "Roy Morgan (SMS)",
+      "pollster": "Roy Morgan",
       "client": null,
       "sample": 1046,
       "alp": 33,
@@ -865,7 +865,7 @@
     {
       "date": "2026-02-16",
       "dateStart": "2026-02-13",
-      "pollster": "Roy Morgan (SMS)",
+      "pollster": "Roy Morgan",
       "client": null,
       "sample": 2462,
       "alp": 25.5,
@@ -945,7 +945,7 @@
     {
       "date": "2026-04-24",
       "dateStart": "2026-04-22",
-      "pollster": "Roy Morgan (SMS)",
+      "pollster": "Roy Morgan",
       "client": null,
       "sample": 1707,
       "alp": 25.5,
@@ -1121,7 +1121,7 @@
     {
       "date": "2026-08-07",
       "dateStart": "2026-08-05",
-      "pollster": "Roy Morgan (SMS)",
+      "pollster": "Roy Morgan",
       "client": null,
       "sample": 2084,
       "alp": 26,
@@ -1229,6 +1229,54 @@
       "tpp_alp": 47,
       "tpp_lnp": 53,
       "url": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377"
+    },
+    {
+      "date": "2026-10-08",
+      "dateStart": "2026-10-02",
+      "pollster": "RedBridge/Accent",
+      "client": "Australian Financial Review",
+      "sample": 1008,
+      "alp": 24,
+      "lnp": 30,
+      "grn": 16,
+      "onp": 24,
+      "ind": 6,
+      "oth": null,
+      "tpp_alp": 44,
+      "tpp_lnp": 56,
+      "url": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e"
+    },
+    {
+      "date": "2026-10-10",
+      "dateStart": "2026-10-06",
+      "pollster": "Resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "alp": 25,
+      "lnp": 28,
+      "grn": 15,
+      "onp": 23,
+      "ind": 4,
+      "oth": 5,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theage.com.au/politics/victoria/wilson-is-gaining-economic-traction-as-carroll-s-popularity-takes-a-further-dive-20261012-p614pi.html"
+    },
+    {
+      "date": "2026-10-22",
+      "dateStart": "2026-10-15",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1017,
+      "alp": 24,
+      "lnp": 33,
+      "grn": 14,
+      "onp": 20,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": 45,
+      "tpp_lnp": 55,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec"
     }
   ],
   "ppm": [
@@ -1254,7 +1302,7 @@
     },
     {
       "date": "2023-05-22",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 64,
       "opp": 36,
       "oppName": "Pesutto",
@@ -1264,7 +1312,7 @@
     },
     {
       "date": "2023-07-20",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 52.5,
       "opp": 47.5,
       "oppName": "Pesutto",
@@ -1474,7 +1522,7 @@
     },
     {
       "date": "2026-02-16",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 42.5,
       "opp": 51,
       "oppName": "Wilson",
@@ -1514,7 +1562,7 @@
     },
     {
       "date": "2026-04-24",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 42,
       "opp": 53,
       "oppName": "Wilson",
@@ -1584,7 +1632,7 @@
     },
     {
       "date": "2026-08-07",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 46.5,
       "opp": 35.5,
       "oppName": "Wilson",
@@ -1621,12 +1669,42 @@
       "pmName": "Carroll",
       "han": 13,
       "extra": null
+    },
+    {
+      "date": "2026-10-08",
+      "firm": "RedBridge/Accent",
+      "alb": 19,
+      "opp": 28,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 8,
+      "extra": null
+    },
+    {
+      "date": "2026-10-10",
+      "firm": "Resolve",
+      "alb": 22,
+      "opp": 29,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 14,
+      "extra": null
+    },
+    {
+      "date": "2026-10-22",
+      "firm": "Newspoll",
+      "alb": 34,
+      "opp": 48,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "extra": null
     }
   ],
   "approval": [
     {
       "date": "2023-05-22",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 5,
       "opp": -7,
       "oppName": "Pesutto",
@@ -1645,7 +1723,7 @@
     },
     {
       "date": "2023-07-20",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": -10,
       "opp": null,
       "oppName": null,
@@ -1780,7 +1858,7 @@
     },
     {
       "date": "2026-02-16",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": -37,
       "opp": 10.5,
       "oppName": "Wilson",
@@ -1828,7 +1906,7 @@
     },
     {
       "date": "2026-04-24",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": -34,
       "opp": 0,
       "oppName": "Wilson",
@@ -1933,7 +2011,7 @@
     },
     {
       "date": "2026-08-03",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alb": 8,
       "opp": 20,
       "oppName": "Wilson",
@@ -2013,7 +2091,7 @@
       "opp": 8,
       "oppName": "Wilson",
       "pmName": "Carroll",
-      "han": null,
+      "han": -18,
       "detail": null
     },
     {
@@ -2025,13 +2103,61 @@
       "pmName": "Carroll",
       "han": null,
       "detail": null
+    },
+    {
+      "date": "2026-10-08",
+      "firm": "RedBridge/Accent",
+      "alb": -18,
+      "opp": 17,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 19,
+          "dis": 37
+        },
+        "opp": {
+          "app": 35,
+          "dis": 18
+        }
+      }
+    },
+    {
+      "date": "2026-10-10",
+      "firm": "Resolve",
+      "alb": -11,
+      "opp": 23,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "detail": null
+    },
+    {
+      "date": "2026-10-22",
+      "firm": "Newspoll",
+      "alb": -28,
+      "opp": 10,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 30,
+          "dis": 58
+        },
+        "opp": {
+          "app": 49,
+          "dis": 39
+        }
+      }
     }
   ],
   "ppmHeadToHead": [],
   "altTpp": [
     {
       "date": "2026-02-16",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alpVsOnp_alp": 52.5,
       "lnpVsOnp_lnp": 56
     },
@@ -2043,7 +2169,7 @@
     },
     {
       "date": "2026-04-24",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alpVsOnp_alp": 53.5,
       "lnpVsOnp_lnp": 59
     },
@@ -2055,7 +2181,7 @@
     },
     {
       "date": "2026-08-07",
-      "firm": "Roy Morgan (SMS)",
+      "firm": "Roy Morgan",
       "alpVsOnp_alp": 56,
       "lnpVsOnp_lnp": 63.5
     },
@@ -2063,6 +2189,12 @@
       "date": "2026-09-14",
       "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-10-08",
+      "firm": "RedBridge/Accent",
+      "alpVsOnp_alp": 55,
       "lnpVsOnp_lnp": null
     }
   ],

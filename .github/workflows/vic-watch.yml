@@ -1,0 +1,125 @@
+# Vicpoll watch — the /vic/ page's missing-wave watchdog (shipped 2026-10-30,
+# finishing the satellite's never-wired collection job; Victorian election
+# 28 Nov 2026, after which this workflow is retired per the off-ramp plan).
+#
+#   crosscheck  daily diff of data/vic-polls.json against the two witnesses
+#               (Wikipedia's 2026 polling tables + electiontracker.au's
+#               polls.csv). A wave, leadership row or 3PP row upstream that
+#               we lack → ci-alert issue AND red. Rows are landed by hand via
+#               the pinned landing path (vic-watch.mjs --emit-backfill, audit,
+#               merge, npm run build:vic) — nothing auto-commits poll rows,
+#               the satellite's locked design.
+#   discovery   the early-warning lane: Roy Morgan's findings feed, the
+#               DemosAU / Freshwater / Accent release pages and a Bing RSS
+#               scan often move before the witnesses do. New items → ci-alert
+#               (never red — a house page redesign is not a defect), and the
+#               seen-state file is pushed so an item never alerts twice.
+#
+# Deliberately NOT in agent-repair's watch list: a miss here is data work,
+# not a parser defect warranting an agent session on its own (matching the
+# coverage-check precedent: missed waves wait for a human).
+
+name: vic-watch
+
+on:
+  schedule:
+    - cron: '0 21 * * *' # daily 08:00 Sydney (AEDT)
+  workflow_dispatch:
+
+concurrency:
+  group: vic-watch
+  cancel-in-progress: false
+
+jobs:
+  crosscheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write # the missing-waves ci-alert
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cross-check the Vic data against the witnesses
+        id: xc
+        run: |
+          set +e
+          OUT="$(node .build/vic-watch.mjs --cross-check --json 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "$OUT" | tail -1 > xc-findings.json
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          # exit 1 flags fetch/parse failure (incl. the blindness tripwire) —
+          # that IS a red-run failure; exit 2 is missing rows, alerted below
+          [ "$CODE" -ne 1 ]
+
+      - name: File a ci-alert for the missing rows
+        if: always() && steps.xc.outputs.code == '2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DETAIL="$(cat xc-findings.json 2>/dev/null || true)"
+          BODY="The Vic poll tracker is missing rows the witnesses carry. Land them via the pinned landing path: node .build/vic-watch.mjs --emit-backfill, audit the candidate rows, merge into data/vic-polls.json, npm run build:vic. [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          BODY="${BODY}"$'\n\n```json\n'"${DETAIL}"$'\n```'
+          bash .build/alert-issue.sh \
+            "Vicpoll: wave(s) missing from data/vic-polls.json" \
+            "$BODY" || echo "::warning::could not file the ci-alert issue"
+
+      - name: Missing rows are a red run
+        if: steps.xc.outputs.code == '2'
+        run: exit 1
+
+  discovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # push the seen-state file
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0 # push_main's rebase needs the history
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Watch the house release pages and the news feed
+        id: watch
+        run: |
+          set +e
+          OUT="$(node .build/vic-watch.mjs --discovery --json 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "$OUT" | tail -1 > watch-items.json
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          # a source outage is a warning inside the JSON, not a failure;
+          # only a hard crash (exit 1) goes red
+          [ "$CODE" -ne 1 ]
+
+      - name: Alert and push the seen-state
+        if: always() && steps.watch.outputs.code == '2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DETAIL="$(cat watch-items.json 2>/dev/null || true)"
+          BODY="A Victorian poll release page or the news feed shows an item vic-watch has not seen. If it is a poll wave it will also reach the witnesses; land it via the pinned landing path (see the vic-watch ci-alert conventions). [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          BODY="${BODY}"$'\n\n```json\n'"${DETAIL}"$'\n```'
+          bash .build/alert-issue.sh \
+            "Vicpoll watch: new Victorian release item spotted" \
+            "$BODY" || echo "::warning::could not file the ci-alert issue"
+          # the alert fired for exactly these items — remember them so the
+          # next run doesn't fire again (same dedupe role as seen.json's
+          # local runs)
+          LOG=/dev/null
+          log() { echo "$*"; }
+          . .build/git-push-main.sh
+          push_main "vic-watch: mark discovered release items seen" .build/vic-src/seen.json

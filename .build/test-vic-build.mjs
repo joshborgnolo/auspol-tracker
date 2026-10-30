@@ -71,9 +71,11 @@ assert.equal(D.jur.id, "vic");
 assert.equal(D.jur.brand, "vicpol", "the user's wordmark: vicpol tracker");
 assert.equal(D.latest.nextElectionISO, "2026-11-28");
 assert.ok(!D.cycles.some((c) => !c.current), "no past terms yet, so no Past cycles tab");
-// every Victorian Roy Morgan poll is an SMS poll: archived, never aggregated
+// Roy Morgan's Victorian waves are all SMS polls; the user call 2026-10-30
+// is full inclusion: plain "Roy Morgan", in every aggregate (there is no
+// non-SMS Victorian series to distinguish it from)
 const rm = D.individualPolls.filter((q) => /Roy Morgan/.test(q.pollster));
-assert.ok(rm.length > 0 && rm.every((q) => q.pollster === "Roy Morgan (SMS)" && q.noAgg), "Roy Morgan files as SMS, out of the aggregates");
+assert.ok(rm.length > 0 && rm.every((q) => q.pollster === "Roy Morgan" && !q.noAgg), "Roy Morgan files plain and counts in the aggregates");
 // One Nation was folded into others before 2026: no month reads it as 0
 assert.ok(!D.aggPrimary.some((m) => !m.election && m.onp === 0), "an unreported party-month is null, never 0");
 // a one-day poll reads "13 Sep", never "13–13 Sep"
@@ -104,4 +106,4 @@ assert.ok(D.twoPPHistory && D.twoPPHistory.fed && D.twoPPHistory.fed.sen && D.tw
     && D.twoPPHistory.nswLc && D.twoPPHistory.nswLc.implied === true && D.twoPPHistory.nswLc.years.length === 4,
   "the Vic build carries the federal 2PP history, implied Senate and NSW council banks and all");
 assert.ok(D.primaryHistory && D.primaryHistory.fed, "the Vic build carries the federal primary history");
-console.log(`vic build ok: ${D.individualPolls.length} polls, ${rm.length} Roy Morgan SMS archived, Premier now ${albWho[albWho.length - 1]}`);
+console.log(`vic build ok: ${D.individualPolls.length} polls, ${rm.length} Roy Morgan polls in the aggregates, Premier now ${albWho[albWho.length - 1]}`);

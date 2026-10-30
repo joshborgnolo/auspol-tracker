@@ -245,3 +245,30 @@ this is the architecture now, not a proposal:
 - Consequence: every writer run (all *-updater.sh, prediction-refresh.sh,
   card-watch.sh, agent-repair's publish, healer.yml) now refreshes /vic/ as a
   side effect; a manual `npm run build:vic` remains fine for vic-only work.
+
+## 2026-10-30 addendum — the collection job wired + Roy Morgan's inclusion
+
+The "every wave still lands by hand" state ended (user: "finish the job", 4
+weeks to the election). What landed:
+
+- **The October backfill**: Newspoll 15–22 Oct (n=1017), Resolve 6–10 Oct
+  (n=1000), RedBridge/Accent 2–8 Oct (n=1008) + their 9 leadership rows,
+  via `--emit-backfill` against live witnesses (figCheck all true), plus a
+  DemosAU Pickering −18 backfill for 10–20 Sep from DemosAU's own release
+  post. The DemosAU discovery hit turned out to be the September wave
+  already on file — first-run empty seen-state flags everything.
+- **vic-watch.yml** (daily 08:00 Sydney): crosscheck job missing→ci-alert+red,
+  discovery job new items→ci-alert + pushes `.build/vic-src/seen.json` via
+  push_main. Email-only, not in agent-repair's watch list. Retires after
+  28 Nov (off-ramp).
+- **Roy Morgan JOINS the aggregates** (user call, "bring it back in"):
+  to-main-schema's HOUSE/FIRM_KEY_TO_HOUSE map "Roy Morgan (SMS)"→"Roy Morgan"
+  — NO_AGG_HOUSES is exact-name-keyed, so the rename alone re-includes all
+  five SMS waves. test-vic-build's pin flipped to assert inclusion.
+- **vic-watch.mjs hardening** (three drift fixes the refresh surfaced):
+  `firmId` accepts the CSV's hyphenated `roy-morgan`; pctVal survives the
+  `5%| 5%` single-pipe duplicated-cell artifact (was silently nulling
+  Resolve 6–10 Oct's OTH — sum95 instead of its real ind4+oth5);
+  cross-check tests MERGED rows not raw wiki rows (approx "Mar – Apr" rows
+  false-flagged against their CSV-re-dated committed waves); and a blindness
+  tripwire floors the witness parse (polls <55 or leadership <80 ⇒ FAIL).

@@ -1,8 +1,8 @@
 {
-  "generated": "2026-10-03",
+  "generated": "2026-10-30",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-10-03 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-10-03 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-10-30 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-10-30 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -1657,6 +1657,87 @@
         "wikipedia"
       ],
       "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1008,
+      "dateLabel": "2–8 Oct",
+      "fwStart": "2026-10-02",
+      "fwEnd": "2026-10-08",
+      "approxDate": false,
+      "primary": {
+        "alp": 24,
+        "lnp": 30,
+        "grn": 16,
+        "onp": 24,
+        "ind": null,
+        "oth": 6
+      },
+      "tpp2": {
+        "alp": 44
+      },
+      "alt": {
+        "alpVOnp": 55
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "6-10 Oct",
+      "fwStart": "2026-10-06",
+      "fwEnd": "2026-10-10",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 28,
+        "grn": 15,
+        "onp": 23,
+        "ind": 4,
+        "oth": 5
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/wilson-is-gaining-economic-traction-as-carroll-s-popularity-takes-a-further-dive-20261012-p614pi.html"
+    },
+    {
+      "firmRaw": "Newspoll",
+      "firm": "newspoll",
+      "client": "The Australian",
+      "sample": 1017,
+      "dateLabel": "15–22 Oct",
+      "fwStart": "2026-10-15",
+      "fwEnd": "2026-10-22",
+      "approxDate": false,
+      "primary": {
+        "alp": 24,
+        "lnp": 33,
+        "grn": 14,
+        "onp": 20,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec"
     }
   ],
   "threeParty": [
@@ -1807,6 +1888,66 @@
       "dk": 49,
       "net": 13,
       "sourceUrl": "https://www.afr.com/politics/coalition-surges-ahead-of-labor-following-vic-leadership-challenge-20260803-p60kvr",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "2–8 Oct 2026",
+      "date": "2026-10-08",
+      "fwStart": "2026-10-02",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "values": {
+        "carroll": 19,
+        "wilson": 28,
+        "pickering": 8
+      },
+      "dk": 45,
+      "net": 9,
+      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "6–10 Oct 2026",
+      "date": "2026-10-10",
+      "fwStart": "2026-10-06",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "values": {
+        "carroll": 22,
+        "wilson": 29,
+        "pickering": 14
+      },
+      "dk": 35,
+      "net": 7,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/wilson-is-gaining-economic-traction-as-carroll-s-popularity-takes-a-further-dive-20261012-p614pi.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "15–22 Oct 2026",
+      "date": "2026-10-22",
+      "fwStart": "2026-10-15",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1017,
+      "values": {
+        "carroll": 34,
+        "wilson": 48,
+        "pickering": null
+      },
+      "dk": 18,
+      "net": 14,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
       "provenance": [
         "wikipedia"
       ]
@@ -2741,6 +2882,132 @@
       "dk": 47,
       "net": 13,
       "sourceUrl": "https://www.afr.com/politics/coalition-surges-ahead-of-labor-following-vic-leadership-challenge-20260803-p60kvr",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "10–20 Sep 2026",
+      "date": "2026-09-20",
+      "fwStart": "2026-09-10",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1020,
+      "leader": "pickering",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -18,
+      "sourceUrl": "https://demosau.com/news/coalition-lead-narrows-as-labor-rises-in-latest-victorian-poll/",
+      "provenance": [
+        "demosau"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2 – 8 Oct 2026",
+      "date": "2026-10-08",
+      "fwStart": "2026-10-02",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "leader": "carroll",
+      "pos": 19,
+      "neg": 37,
+      "dk": 44,
+      "net": -18,
+      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2 – 8 Oct 2026",
+      "date": "2026-10-08",
+      "fwStart": "2026-10-02",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "leader": "wilson",
+      "pos": 35,
+      "neg": 18,
+      "dk": 47,
+      "net": 17,
+      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6 – 10 Oct 2026",
+      "date": "2026-10-10",
+      "fwStart": "2026-10-06",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -11,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/wilson-is-gaining-economic-traction-as-carroll-s-popularity-takes-a-further-dive-20261012-p614pi.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6 – 10 Oct 2026",
+      "date": "2026-10-10",
+      "fwStart": "2026-10-06",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 23,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/wilson-is-gaining-economic-traction-as-carroll-s-popularity-takes-a-further-dive-20261012-p614pi.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "15 – 22 Oct 2026",
+      "date": "2026-10-22",
+      "fwStart": "2026-10-15",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1017,
+      "leader": "carroll",
+      "pos": 30,
+      "neg": 58,
+      "dk": 12,
+      "net": -28,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "15 – 22 Oct 2026",
+      "date": "2026-10-22",
+      "fwStart": "2026-10-15",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1017,
+      "leader": "wilson",
+      "pos": 49,
+      "neg": 39,
+      "dk": 12,
+      "net": 10,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
       "provenance": [
         "wikipedia"
       ]
