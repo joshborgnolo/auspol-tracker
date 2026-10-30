@@ -18,10 +18,10 @@ try {
         return arc.apply(this,args);
       };
     });
-    await page.goto(`${base}/map/#y=${width < 500 ? 1998 : 1993}`,{waitUntil:'domcontentloaded'});
+    await page.goto(`${base}/map/#y=${width < 500 ? 2010 : 2001}`,{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>window.__map,{timeout:60000});
     if (width < 500) {
-      for (const year of [1993,1996,1998]) {
+      for (const year of [1993,1996,1998,2001,2010]) {
         const selector = `.stop[data-year="${year}"] text`;
         await page.$eval(selector,e=>e.scrollIntoView({block:'center'}));
         const point = await page.$eval(selector,e=>{
@@ -33,7 +33,7 @@ try {
         await page.waitForFunction(y=>__map.S.year===y,{timeout:15000},year);
       }
     }
-    for (const year of [1993,1996,1998,2001,1993]) {
+    for (const year of [1993,1996,1998,2001,2010,2013,2001]) {
       await page.evaluate(async y=>{ await __map.setYear(y); __map.goAus(); __map.setView('map'); },year);
       await page.waitForFunction(y=>__map.S.year===y && __map.Y[y]?.divs,{},year);
       if ([1993,1996,1998].includes(year)) {
@@ -55,7 +55,7 @@ try {
         const m=__map.Y[__map.S.year];
         return {divs:m.divs.length,finite:m.geo.bb.every(b=>b.flat().every(Number.isFinite)),width:document.documentElement.scrollWidth,view:innerWidth};
       });
-      assert.equal(state.divs,year===1993?147:year===2001?150:148);
+      assert.equal(state.divs,year===1993?147:year>=2001?150:148);
       assert.ok(state.finite,`${year}: finite geometry bounds`);
       assert.ok(state.width<=state.view+1,`${width}: no horizontal overflow`);
       for (const lens of ['winner','tpp','fp','senate','flow','informal','cls','seifa']) {
@@ -64,10 +64,16 @@ try {
         const text = await page.$eval('#story',e=>e.textContent);
         assert.ok(!/NaN|undefined|Infinity/.test(text),`${year} ${lens}: ${text.slice(0,200)}`);
       }
-      await page.evaluate(()=>{__map.setLens('winner');const m=__map.Y[__map.S.year];__map.goDiv(m.byName.get('Brand'));});
+      const probeSeat=year===2001?'Kennedy':year>=2010?'McEwen':'Brand';
+      await page.evaluate(name=>{__map.setLens('winner');const m=__map.Y[__map.S.year];__map.goDiv(m.byName.get(name));},probeSeat);
       await new Promise(r=>setTimeout(r,200));
-      assert.match(await page.$eval('#story',e=>e.textContent),/Brand/);
-      await page.evaluate(()=>{const m=__map.Y[__map.S.year];__map.goBooth(m.booth.byDiv[m.byName.get('Brand')][0]);});
+      assert.ok((await page.$eval('#story',e=>e.textContent)).includes(probeSeat));
+      if(year>=2001) {
+        await page.$eval('#stage',e=>e.scrollIntoView({block:'center'}));
+        await new Promise(r=>setTimeout(r,500));
+        await page.screenshot({path:`/private/tmp/history-boundary-${year}-${width}.png`});
+      }
+      await page.evaluate(name=>{const m=__map.Y[__map.S.year];__map.goBooth(m.booth.byDiv[m.byName.get(name)][0]);},probeSeat);
       assert.ok(!/NaN|undefined/.test(await page.$eval('#story',e=>e.textContent)),`${year}: booth card`);
       await page.evaluate(()=>{__map.goAus();__map.setView('chamber');});
       await new Promise(r=>setTimeout(r,200));

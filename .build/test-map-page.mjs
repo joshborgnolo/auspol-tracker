@@ -503,7 +503,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   // the data files' structure at every fed stop: relKeys (norel first),
   // tenKeys (mort first), 12-wide demo rows, division rel/ten dicts
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-    const d = JSON.parse(R(`map/data/data-${y}.json`));
+    const d = JSON.parse(R(`map/data/res-${y}.json`));
     assert.ok(Array.isArray(d.relKeys) && d.relKeys[0] === "norel" && d.relKeys.length === 10, `${y}: relKeys leads with norel (10 options)`);
     assert.ok(Array.isArray(d.tenKeys) && d.tenKeys[0] === "mort" && d.tenKeys.length === 4, `${y}: tenKeys leads with mort (4 options)`);
     const i = d.booths.demo.findIndex((x) => x !== null);

@@ -36,7 +36,7 @@ const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const topojson = (() => { const g = {}; vm.runInNewContext(R("map/vendor/topojson-client-3.1.0.min.js"), g); return g.topojson; })();
 // Handbook frames are lossless and tested separately in test-map-history.mjs.
 // These checks concern the later mapshaper simplification/shared-arc recipe.
-const YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 
 // the floor pair itself lives in geo_build.mjs
 assert.ok(/lo: \{ iv: 1000, minArea: "2km2" \}, hi: \{ iv: 60, minArea: "0\.1km2" \}/.test(R(".build/map/geo_build.mjs")),

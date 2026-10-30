@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""ASGC 2001 GeoPackage -> n-2001.geojson for the /map/ 2001 federal frame.
+"""Legacy ABS ASGC 2001 statistical-boundary extraction for research.
+
+The public 2001 map now uses handbook_geo.mjs: this ABS layer displaces
+remote shared boundaries (Kennedy/Leichhardt, Grey/Wakefield, Lyons/Franklin).
+Keep this recipe for census/research comparisons, not election-map publication.
 
 The 2001 election's division geometry is the ABS's own
 Commonwealth_Electoral_Division_2001 layer in

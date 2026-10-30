@@ -1,16 +1,13 @@
 // Derives the n-YYYY.geojson boundary sources geo_build.mjs builds the map's
-// geometry from, for every election 2001-2025 (the 2004-2025 set used to live
+// geometry from, for every election 2004-2025 (the 2004-2025 set used to live
 // on one machine unrecorded; the rebuild for the island-floor change re-created
 // it reproducibly). All sources are the their-agency boundary files:
-//   2001        ABS ASGC (2001 Edition) Commonwealth_Electoral_Division_2001
-//               layer, asgc2001.gpkg (data.gov.au "ASGC (2001 Edition) -
-//               Boundaries"; extracted by extract-asgc2001-ced.py — the AEC's
-//               own map-api.aec.gov.au Electoral_2001_CED WMTS was the first
-//               choice but has been DNS-dead since 2026-10-23 and is raster
-//               anyway; the 7 ABS offshore pseudo-rows are excluded there)
+//   1993-2001   use handbook_geo.mjs instead: original Handbook polygons.
+//               The former ABS 2001 fallback displaced remote shared borders.
 //   2004, 2007  MapInfo era sets kept in .matilda/seifa-irsad-abs/dl/aec-ced-eras/
 //               (one MIF per state; converted by mif2geojson.mjs)
-//   2010, 2013  national-esri-16122011.zip   (24.6MB, AEC GIS downloads page)
+//   2010        national-esri-2010.zip (AEC's election-specific archive)
+//   2013        national-esri-16122011.zip (includes post-2010 VIC/SA changes)
 //   2016        the 2013 national set with NSW, WA and ACT swapped for that
 //               year's state files (nsw-esri-06042016, wa-esri-19012016,
 //               act-esri-28012016) — the recipe geo_build.mjs's header records
@@ -30,34 +27,35 @@
 // NT/QLD border between the Gulf coast and -18.87. repairKennedy2004 below
 // grafts Lingiari's surveyed meridian into Kennedy's ring.
 // usage: node .build/map/make-boundary-src.mjs <stageDir> [--years=2004,2007]
-//        (--years regenerates only those eras, incl. their dependencies: 2013
-//        rides 2010, 2016 rides 2013 and its state zips — for a repair pass
+//        (--years regenerates only those eras, incl. their dependencies:
+//        2016 rides 2013 and its state zips — for a repair pass
 //        after the big AEC downloads have been cleaned off the machine)
 import fs from "fs";
 import path from "path";
 import { execFileSync } from "child_process";
 import { fileURLToPath } from "url";
+import crypto from "node:crypto";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const MS = process.env.MAPSHAPER || "mapshaper";
 const MIF2 = REPO + "/.build/map/mif2geojson.mjs";
-const GPKG_EXTRACT = REPO + "/.build/map/extract-asgc2001-ced.py";
 const ERAS = REPO + "/.matilda/seifa-irsad-abs/dl/aec-ced-eras";
-const ASGC = REPO + "/.matilda/seifa-irsad-abs/dl/asgc/asgc2001.gpkg";
 const DATA = REPO + "/map/data";
 const stage = process.argv[2];
 if (!stage) throw new Error("usage: node make-boundary-src.mjs <stageDir> [--years=...]");
 const dl = (f) => path.join(stage, "dl", f);
 const onlyArg = process.argv.find((a) => a.startsWith("--years="));
 const only = onlyArg ? new Set(onlyArg.slice("--years=".length).split(",").map(Number)) : null;
+if (only?.has(2001)) throw new Error("2001 uses the lossless Handbook build: node .build/map/handbook_geo.mjs --years=2001 --fetch");
 const need = (y) => !only || only.has(y);
 fs.mkdirSync(path.join(stage, "x"), { recursive: true });
 
 const key = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
-const resultNames = (y, st) => JSON.parse(fs.readFileSync(`${DATA}/data-${y}.json`, "utf8")).divs
+const resultNames = (y, st) => JSON.parse(fs.readFileSync(`${DATA}/res-${y}.json`, "utf8")).divs
   .filter((d) => !st || d.st === st).map((d) => d.n);
 
 const ZIPS = {
+  n2010: "national-esri-2010.zip",
   n16122011: "national-esri-16122011.zip",
   nsw2016: "nsw-esri-06042016.zip",
   wa2016: "wa-esri-19012016.zip",
@@ -92,12 +90,6 @@ function mifsToFc(yearDir, tag) {
   const mifs = fs.readdirSync(dir).filter((f) => /\.mif$/i.test(f)).sort().map((f) => path.join(dir, f));
   const out = path.join(stage, "x", `${tag}.geojson`);
   execFileSync(process.execPath, [MIF2, out, ...mifs]);
-  return JSON.parse(fs.readFileSync(out, "utf8"));
-}
-
-function gpkg2001ToFc(tag) {
-  const out = path.join(stage, "x", `${tag}.geojson`);
-  execFileSync("python3", [GPKG_EXTRACT, ASGC, out]);
   return JSON.parse(fs.readFileSync(out, "utf8"));
 }
 
@@ -197,8 +189,13 @@ function repairKennedy2004(fc) {
 }
 
 const r = {};
-if (need(2001)) r[2001] = reduce(gpkg2001ToFc("asgc2001"), 2001);
-if (need(2010) || need(2013) || need(2016)) r[2010] = reduce(shpToFc(unzip(dl(ZIPS.n16122011)), "n16122011"), 2010);
+if (need(2010)) {
+  const file = dl(ZIPS.n2010);
+  const sha = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  if (sha !== 'eecefadcfe7d2eab56af53768918573b8ef691f68f7bfc9bd8b10eae0c834c52') throw new Error('AEC 2010 archive changed; re-audit its election vintage');
+  r[2010] = reduce(shpToFc(unzip(file), "n2010"), 2010);
+}
+if (need(2013) || need(2016)) r[2013] = reduce(shpToFc(unzip(dl(ZIPS.n16122011)), "n16122011"), 2013);
 if (need(2004)) {
   r[2004] = reduce(mifsToFc("2004", "mif2004"), 2004);
   repairKennedy2004(r[2004].fc);
@@ -207,9 +204,6 @@ if (need(2007)) r[2007] = reduce(mifsToFc("2007", "mif2007"), 2007);
 if (need(2019)) r[2019] = reduce(shpToFc(unzip(dl(ZIPS.fe2019)), "fe2019"), 2019);
 if (need(2022)) r[2022] = reduce(shpToFc(unzip(dl(ZIPS.cwlth2021)), "cwlth2021"), 2022);
 if (need(2025)) r[2025] = reduce(shpToFc(unzip(dl(ZIPS.fe2025)), "fe2025"), 2025);
-
-// 2013: the same national file as 2010 (the comment's recipe)
-if (need(2013)) r[2013] = { fc: r[2010].fc, stateCol: r[2010].stateCol };
 
 // 2016: the 2013 national set minus NSW/WA/ACT, plus that year's state files
 if (need(2016)) {
@@ -223,5 +217,5 @@ if (need(2016)) {
   r[2016] = { fc: { type: "FeatureCollection", features: [...kept, ...st16] }, stateCol: null };
 }
 
-for (const y of [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) if (r[y]) write(r[y].fc, y, r[y].stateCol);
+for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) if (r[y] && need(y)) write(r[y].fc, y, r[y].stateCol);
 console.log("boundary sources written to", stage);

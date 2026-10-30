@@ -1,4 +1,4 @@
-# Federal map: 1993, 1996 and 1998
+# Federal map: 1993–2001 and the 2010 vintage correction
 
 The public frames use the Parliamentary Handbook's historical polygons,
 extracted by Tim Sherratt, at repository revision
@@ -153,5 +153,61 @@ intermediate build files. Stage new public assets before assembling so
 their content hashes enter the page's cache-busting manifest.
 `probe-history.mjs` exercises 1280px and 390px browser layouts, every lens,
 seat/booth selection and both chambers against a locally served checkout.
-The old quantized-map island-floor tests apply to 2001 onward; the new
+The quantized-map island-floor tests apply to 2004 onward; the new
 historical test verifies exact source coordinates instead.
+
+## 2001 and 2010 corrections (31 October 2026)
+
+The former 2010 build reused `national-esri-16122011.zip`, which the AEC
+labels for **2013**. VIC’s 24 December 2010 and SA’s 16 December 2011
+determinations postdate the 21 August 2010 election. The corrected build
+uses the separate official `national-esri-2010.zip`, downloaded from:
+https://www.aec.gov.au/Electorates/gis/files/national-esri-2010.zip
+SHA-256: `eecefadcfe7d2eab56af53768918573b8ef691f68f7bfc9bd8b10eae0c834c52`.
+The AEC index explicitly associates the two archives with different elections:
+https://www.aec.gov.au/Electorates/gis/gis_datadownload.htm
+The source’s area attributes are McEwen 10,669.8664 km², Casey 409.21325 km²
+and Kingston 377.26663 km²; the old frame instead drew their 2013 shapes.
+`make-boundary-src.mjs` now keeps the 2010 and 2013 recipes separate,
+including when 2016’s dependency is built on its own.
+
+The 2001 frame now uses original Handbook geometry, under the same licence
+and lossless conversion as 1993–98. `audit-handbook-2001.py` and
+`handbook-2001-audit.json` record the exact 150-seat selection (10 November
+2001 strictly inside every source interval), file hashes, validity, topology
+and comparison against the former published ABS ASGC 2001 frame.
+Queensland’s 27 map IDs are identical to the 1998 selection.
+
+The audit confirms the ABS statistical layer’s material shared-boundary
+displacements: roughly 9,000 km² between Kennedy and Leichhardt, 5,400 km²
+between Grey and Wakefield, and 1,500 km² between Lyons and Franklin.
+Coastline digitisation also differs, so pair unions do not agree exactly.
+The Handbook follows the expected historical areas much more closely.
+Independent AEC 2001 profiles give Kennedy 562,160 km², Leichhardt 150,236,
+Grey 897,822, Lyons 40,604 and Franklin 7,933:
+https://www.aec.gov.au/Elections/federal_elections/2001/profiles/kennedy.htm
+https://www.aec.gov.au/Elections/federal_elections/2001/profiles/leichhardt.htm
+https://www.aec.gov.au/Elections/federal_elections/2001/Profiles/Grey.htm
+https://www.aec.gov.au/Elections/federal_elections/2001/profiles/lyons.htm
+https://www.aec.gov.au/Elections/federal_elections/2001/profiles/franklin.htm
+
+The Handbook is still a historical digitisation: 2001 has small interstate
+overlap strips (about 103 km² pairwise nationally), enclosed holes that may
+include water, and a Braddon self-intersection. These are diagnosed, not
+repaired in the published source. Census figures and election results retain
+their original data sources; only geometry, source notes and label anchors
+change. `test-map-boundary-vintages.mjs` pins original coordinate hashes,
+state counts, remote shared-boundary probe points and 2010 election-day areas.
+
+Targeted rebuild:
+```sh
+# Audit needs Shapely and pyproj; build uses the normal map dependencies.
+python .build/map/audit-handbook-2001.py --fetch
+node .build/map/handbook_geo.mjs --years=2001 --fetch
+# Put the official 2010 ZIP under STAGE/dl/ and an unchanged copy of
+# map/data/res-2010.json at STAGE/data-2010.json.
+node .build/map/make-boundary-src.mjs STAGE --years=2010
+node .build/map/geo_build.mjs STAGE STAGE map/data --years=2010
+node .build/map/assemble.mjs
+node .build/test-map-boundary-vintages.mjs
+```

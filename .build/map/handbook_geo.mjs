@@ -2,7 +2,7 @@
 // clipping, snapping, gap filling, coordinate rounding or island deletion.
 // One arc per ring preserves the source coordinate sequence, including Z.
 // Source files: pinned revision and SHA-256s in handbook-boundaries-audit.json.
-// node .build/map/handbook_geo.mjs [cache-directory]
+// node .build/map/handbook_geo.mjs [cache-directory] [--years=2001] [--fetch]
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -16,16 +16,21 @@ const cache = process.argv.slice(2).find(a=>!a.startsWith('--')) || `${root}/.ma
 const fetchMissing = process.argv.includes('--fetch');
 const out = `${root}/map/data`;
 const audit = JSON.parse(fs.readFileSync(`${root}/.build/map/handbook-boundaries-audit.json`));
+audit.elections[2001] = JSON.parse(fs.readFileSync(`${root}/.build/map/handbook-2001-audit.json`));
+const yearsFlag = process.argv.find(a=>a.startsWith('--years='));
+const years = yearsFlag ? yearsFlag.slice(8).split(',').map(Number) : [1993,1996,1998,2001];
+if (years.some(y=>![1993,1996,1998,2001].includes(y))) throw Error('Unsupported Handbook year');
 const hash = (s) => crypto.createHash('sha256').update(s).digest('hex');
 const sources = {source:audit.source, revision:audit.revision,
   copyright:'Commonwealth of Australia (Parliamentary Handbook); extracted by Tim Sherratt',
   licence:'https://creativecommons.org/licenses/by-nc-nd/4.0/',
   terms:'https://www.aph.gov.au/Help/Disclaimer_Privacy_Copyright',
-  conversion:'Lossless GeoJSON to unquantized TopoJSON. All polygon coordinates and rings retained; no geometry repairs or simplification. Non-commercial display.', elections:{}};
+  conversion:'Lossless GeoJSON to unquantized TopoJSON. All polygon coordinates and rings retained; no geometry repairs or simplification. Non-commercial display.',
+  elections:yearsFlag ? JSON.parse(fs.readFileSync(`${out}/historical-boundary-sources.json`)).elections : {}};
 const resState = name => ({'New South Wales':'NSW','Victoria':'VIC','Queensland':'QLD','Western Australia':'WA','South Australia':'SA','Tasmania':'TAS','Australian Capital Territory':'ACT','Northern Territory':'NT'})[name];
 const polygons = g => g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : g.type === 'GeometryCollection' ? g.geometries.flatMap(polygons) : g.type === 'Point' ? [] : (()=>{throw Error(g.type);})();
 
-for (const year of [1993, 1996, 1998]) {
+for (const year of years) {
   const selection = audit.elections[year].selection;
   const features = [];
   for (const record of selection) {
@@ -42,7 +47,7 @@ for (const year of [1993, 1996, 1998]) {
       geometry:{type:'MultiPolygon',coordinates:JSON.parse(original).features.flatMap(f=>polygons(f.geometry))}});
   }
   const fc = {type:'FeatureCollection',features};
-  const resultPath = `${out}/${year === 1996 ? 'res' : 'data'}-${year}.json`;
+  const resultPath = `${out}/${year === 1993 || year === 1998 ? 'data' : 'res'}-${year}.json`;
   const res = JSON.parse(fs.readFileSync(resultPath));
   const byName = new Map(res.divs.map(d => [d.n, d]));
   const arcs = [], geometries = [], seen = new Set();
@@ -101,7 +106,7 @@ fs.writeFileSync(`${out}/historical-boundary-sources.json`, JSON.stringify(sourc
 
 // Timeline summaries are derived from the exact same certified result records.
 const summary = JSON.parse(fs.readFileSync(`${out}/summary.json`));
-for (const year of [1993,1996,1998]) {
+for (const year of years.filter(y=>y<2001)) {
   const r = JSON.parse(fs.readFileSync(`${out}/res-${year}.json`));
   summary.seats[year] = {}; summary.tpp[year] = {};
   for (const [st, a] of Object.entries(r.agg)) {
@@ -120,7 +125,7 @@ fs.writeFileSync(`${out}/summary.json`, JSON.stringify(summary));
 // independently in the AEC's polling-place returns. Do not graft modern
 // coastline coordinates into the licensed historical boundary files.
 const islands = JSON.parse(fs.readFileSync(`${out}/islands.json`));
-for (const year of [1993,1996,1998]) {
+for (const year of years.filter(y=>y<2001)) {
   const r = JSON.parse(fs.readFileSync(`${out}/res-${year}.json`));
   const seat = name => {
     const hits = r.booths.n.flatMap((n,i)=>n===name?[r.divs[r.booths.d[i]].n]:[]);

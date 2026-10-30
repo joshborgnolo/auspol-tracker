@@ -17,8 +17,8 @@
 //     projected space) written into the result file as lp.
 // The boundaries are the AEC's own files for each election, kept out of the
 // repo for their size (about 500MB): 2004 and 2007 from the MapInfo eras in
-// .matilda/seifa-irsad-abs/dl/aec-ced-eras (mif2geojson.mjs), 2010, 2013
-// (national-esri-16122011), 2019, 2022 and 2025 from the national files at
+// .matilda/seifa-irsad-abs/dl/aec-ced-eras (mif2geojson.mjs), 2010
+// (national-esri-2010), 2013 (national-esri-16122011), 2019, 2022 and 2025 from the national files at
 // aec.gov.au/electorates/gis, and 2016 as the 2013 file with that year's
 // NSW, WA and ACT files swapped in; each reduced to a name per feature as
 // n-YYYY.geojson. From the 2017 redistribution the AEC draws Queensland's
@@ -41,6 +41,7 @@ const [, , srcDir, dataDir, outDir, ...rest] = process.argv;
 const MS = process.env.MAPSHAPER || "mapshaper";
 const flag = rest.find((a) => a.startsWith("--years="));
 const YEARS = flag ? flag.slice("--years=".length).split(",") : [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+if (YEARS.some(y=>Number(y)<=2001)) throw new Error('1993–2001 use handbook_geo.mjs; do not simplify or overwrite the original Handbook geometry');
 const LEVELS = { lo: { iv: 1000, minArea: "2km2" }, hi: { iv: 60, minArea: "0.1km2" } };
 const SEA_YEARS = new Set([2019, 2022, 2025]);
 const key = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
@@ -92,6 +93,7 @@ for (const y of YEARS) {
     lp[f.properties.name] = [Math.round(ll[0] * 1e4) / 1e4, Math.round(ll[1] * 1e4) / 1e4];
   }
   for (const d of data.divs) d.lp = lp[d.n];
+  if (Number(y) === 2010) data.boundarySource = 'AEC national-esri-2010.zip: boundaries for the 21 August 2010 election. The later VIC (24 December 2010) and SA (16 December 2011) determinations apply from 2013.';
   fs.writeFileSync(`${outDir}/res-${y}.json`, JSON.stringify(data));
   const sz = (f) => fs.statSync(`${outDir}/${f}`).size;
   console.log(y, "lo", sz(`geo-${y}-lo.json`), "hi", sz(`geo-${y}-hi.json`), "res", sz(`res-${y}.json`));

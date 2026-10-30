@@ -1,0 +1,4222 @@
+{
+  "source": "https://github.com/wragge/historical-federal-electorate-boundaries",
+  "revision": "fb76072cfa5edb6fa52e557694efdc85954ace31",
+  "index_sha256": "7fb971bcde20581d0235ac1883d5988e4f292e29f1e5bd96bfbeca05cbaf006a",
+  "date": "2001-11-10",
+  "date_precision": "year; election strictly inside every interval",
+  "state_counts": {
+    "SA": 12,
+    "VIC": 37,
+    "NSW": 50,
+    "TAS": 5,
+    "QLD": 27,
+    "WA": 15,
+    "ACT": 2,
+    "NT": 2
+  },
+  "selection": [
+    {
+      "electorate": "Canberra",
+      "state": "Australian Capital Territory",
+      "map_id": "10828",
+      "start_date": "1997",
+      "end_date": "2005",
+      "geojson_file": "Canberra_Australian-Capital-Territory_10828_1997-2005.geojson",
+      "canonical_name": "Canberra",
+      "sha256": "7c4b3b0c025ee26b7212964bc584e0f1af94c9cf26c26ba75cda169b2d5c0ce5",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        148.76279,
+        -35.920528,
+        149.233211,
+        -35.218607
+      ]
+    },
+    {
+      "electorate": "Fraser",
+      "state": "Australian Capital Territory",
+      "map_id": "10827",
+      "start_date": "1997",
+      "end_date": "2005",
+      "geojson_file": "Fraser_Australian-Capital-Territory_10827_1997-2005.geojson",
+      "canonical_name": "Fraser",
+      "sha256": "d796002e41f6d566d5cc11005b2c3c7bdee1892782939255ff931bb0222419c9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        148.961398,
+        -35.351539,
+        150.772822,
+        -35.112407
+      ]
+    },
+    {
+      "electorate": "Banks",
+      "state": "New South Wales",
+      "map_id": "11297",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Banks_New-South-Wales_11297_2000-2006.geojson",
+      "canonical_name": "Banks",
+      "sha256": "abddc256ccfb90fb515b8b9f455ab145b85e440ac5c02a3217b425fc6986d77d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.965969,
+        -33.995067,
+        151.09428,
+        -33.92891
+      ]
+    },
+    {
+      "electorate": "Barton",
+      "state": "New South Wales",
+      "map_id": "11284",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Barton_New-South-Wales_11284_2000-2006.geojson",
+      "canonical_name": "Barton",
+      "sha256": "7d8e8623f7d322fcb2cfa5947652355bacbaa531423e4d54e05177c3bd4076e8",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.070571,
+        -34.010106,
+        151.169039,
+        -33.926218
+      ]
+    },
+    {
+      "electorate": "Bennelong",
+      "state": "New South Wales",
+      "map_id": "11269",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Bennelong_New-South-Wales_11269_2000-2006.geojson",
+      "canonical_name": "Bennelong",
+      "sha256": "b5462353f4d3585b107bdb313bdf7770065f8e82fa3e6c53e13a2926fffc1156",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.047573,
+        -33.84182,
+        151.159121,
+        -33.751943
+      ]
+    },
+    {
+      "electorate": "Berowra",
+      "state": "New South Wales",
+      "map_id": "11268",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Berowra_New-South-Wales_11268_2000-2006.geojson",
+      "canonical_name": "Berowra",
+      "sha256": "6cf48bd5477b24568c158ef69097eb59d7ca7ecaeb99ed8cc1f7522078874b09",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.86979,
+        -33.766523,
+        151.273944,
+        -33.376992
+      ]
+    },
+    {
+      "electorate": "Blaxland",
+      "state": "New South Wales",
+      "map_id": "11267",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Blaxland_New-South-Wales_11267_2000-2006.geojson",
+      "canonical_name": "Blaxland",
+      "sha256": "3abee8a45aaea531c09a3628ac8bc617e654fdc25c3ee45b05d653723b7b8ac8",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.967282,
+        -33.938494,
+        151.091444,
+        -33.864083
+      ]
+    },
+    {
+      "electorate": "Bradfield",
+      "state": "New South Wales",
+      "map_id": "11266",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Bradfield_New-South-Wales_11266_2000-2006.geojson",
+      "canonical_name": "Bradfield",
+      "sha256": "905cc5c8a8b5600cebe808f9e8677359e27f7526f790038ea3ee0fc2fd3ac95b",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.090006,
+        -33.807759,
+        151.232558,
+        -33.659742
+      ]
+    },
+    {
+      "electorate": "Calare",
+      "state": "New South Wales",
+      "map_id": "11265",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Calare_New-South-Wales_11265_2000-2006.geojson",
+      "canonical_name": "Calare",
+      "sha256": "320793d4d854a3b5739ba704fd22e26a847212e101300929f31fa4dafebb59a2",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        148.290215,
+        -34.20577,
+        150.591577,
+        -32.60722
+      ]
+    },
+    {
+      "electorate": "Charlton",
+      "state": "New South Wales",
+      "map_id": "11264",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Charlton_New-South-Wales_11264_2000-2006.geojson",
+      "canonical_name": "Charlton",
+      "sha256": "892c7e0d850db284df5e139746e115e4aaf1210283eb1a62f438ea385b957089",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.33136,
+        -33.202943,
+        151.697079,
+        -32.872277
+      ]
+    },
+    {
+      "electorate": "Chifley",
+      "state": "New South Wales",
+      "map_id": "11263",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Chifley_New-South-Wales_11263_2000-2006.geojson",
+      "canonical_name": "Chifley",
+      "sha256": "b73b24c03c648fea0b59884afd75c43ca4d02c432f488733df1346e812920465",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.752377,
+        -33.802942,
+        150.896912,
+        -33.67425
+      ]
+    },
+    {
+      "electorate": "Cook",
+      "state": "New South Wales",
+      "map_id": "11262",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Cook_New-South-Wales_11262_2000-2006.geojson",
+      "canonical_name": "Cook",
+      "sha256": "08c3c559810b9a1a240a51b098077057292d1db77bd08e3e1cb1c8b60d63342f",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.013985,
+        -34.17233,
+        151.232192,
+        -33.996039
+      ]
+    },
+    {
+      "electorate": "Cowper",
+      "state": "New South Wales",
+      "map_id": "11261",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Cowper_New-South-Wales_11261_2000-2006.geojson",
+      "canonical_name": "Cowper",
+      "sha256": "54e709b711afa90472e45b495fa702b3285daa4ce9fcc386132eafc806c1311e",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 6,
+      "bounds": [
+        152.311714,
+        -31.114917,
+        153.394818,
+        -29.379326
+      ]
+    },
+    {
+      "electorate": "Cunningham",
+      "state": "New South Wales",
+      "map_id": "11260",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Cunningham_New-South-Wales_11260_2000-2006.geojson",
+      "canonical_name": "Cunningham",
+      "sha256": "77792e28930378fd747b110c184e486f80d1c0b91cb8984215f9d9343a1de8ab",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.689618,
+        -34.461249,
+        151.066151,
+        -34.129974
+      ]
+    },
+    {
+      "electorate": "Dobell",
+      "state": "New South Wales",
+      "map_id": "11259",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Dobell_New-South-Wales_11259_2000-2006.geojson",
+      "canonical_name": "Dobell",
+      "sha256": "867a1aa2984a90e8b2a9711ce7efc0ebea23b838594decb686b9c21b14506ca6",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.086788,
+        -33.44403,
+        151.552733,
+        -33.043742
+      ]
+    },
+    {
+      "electorate": "Eden-Monaro",
+      "state": "New South Wales",
+      "map_id": "11258",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Eden-Monaro_New-South-Wales_11258_2000-2006.geojson",
+      "canonical_name": "Eden-Monaro",
+      "sha256": "14e225acb8054db52bc6556ddba500f30da57565b726077c28ba69d442252f47",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 5,
+      "bounds": [
+        148.200674,
+        -37.505023,
+        150.31228,
+        -34.999665
+      ]
+    },
+    {
+      "electorate": "Farrer",
+      "state": "New South Wales",
+      "map_id": "11257",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Farrer_New-South-Wales_11257_2000-2006.geojson",
+      "canonical_name": "Farrer",
+      "sha256": "5b89f5cbbd7340c8ac5b401176f4b57959081c0fca749cbe7a7b9ee60a4bf079",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        141.002089,
+        -36.805905,
+        148.628565,
+        -32.748556
+      ]
+    },
+    {
+      "electorate": "Fowler",
+      "state": "New South Wales",
+      "map_id": "11256",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Fowler_New-South-Wales_11256_2000-2006.geojson",
+      "canonical_name": "Fowler",
+      "sha256": "3cc5aa27a50db68972fd29d44d39abb3e8a37b625d7545eb08d8278ff5549cde",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.85718,
+        -33.938998,
+        150.985511,
+        -33.868427
+      ]
+    },
+    {
+      "electorate": "Gilmore",
+      "state": "New South Wales",
+      "map_id": "11255",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Gilmore_New-South-Wales_11255_2000-2006.geojson",
+      "canonical_name": "Gilmore",
+      "sha256": "e7cb619112cc4323b9adb75262b202815dc51381241206a79ffb6f02ea088fa9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 8,
+      "bounds": [
+        149.976061,
+        -35.644531,
+        150.865473,
+        -34.493443
+      ]
+    },
+    {
+      "electorate": "Grayndler",
+      "state": "New South Wales",
+      "map_id": "11254",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Grayndler_New-South-Wales_11254_2000-2006.geojson",
+      "canonical_name": "Grayndler",
+      "sha256": "f9081450d408b4ac0a0d3b79a1738735282cd911165ac91b395cd17318aab892",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.109802,
+        -33.933991,
+        151.181553,
+        -33.86198
+      ]
+    },
+    {
+      "electorate": "Greenway",
+      "state": "New South Wales",
+      "map_id": "11253",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Greenway_New-South-Wales_11253_2000-2006.geojson",
+      "canonical_name": "Greenway",
+      "sha256": "9471df0d1215b4826ceab3251e822d7a63788f2f9931bab4da4905dd7891374e",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.812385,
+        -33.806812,
+        150.965414,
+        -33.646362
+      ]
+    },
+    {
+      "electorate": "Gwydir",
+      "state": "New South Wales",
+      "map_id": "11252",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Gwydir_New-South-Wales_11252_2000-2006.geojson",
+      "canonical_name": "Gwydir",
+      "sha256": "89b9e099ade39a023597be3c5977cb61563a573878ee7377ef72b1a641b9eb1f",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.065178,
+        -33.209485,
+        151.594021,
+        -28.537176
+      ]
+    },
+    {
+      "electorate": "Hughes",
+      "state": "New South Wales",
+      "map_id": "11251",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Hughes_New-South-Wales_11251_2000-2006.geojson",
+      "canonical_name": "Hughes",
+      "sha256": "0b8f50cc042075e137868c4b215e8de58388b52edbcb57f1773ebb8ce243906b",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.886105,
+        -34.156153,
+        151.100382,
+        -33.899113
+      ]
+    },
+    {
+      "electorate": "Hume",
+      "state": "New South Wales",
+      "map_id": "11250",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Hume_New-South-Wales_11250_2000-2006.geojson",
+      "canonical_name": "Hume",
+      "sha256": "5d024fe8e3d5028d09f6af19ca045f4bf75cbc86a8ec14de31c599e9d0b52681",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        147.71078,
+        -35.258249,
+        150.898066,
+        -33.801741
+      ]
+    },
+    {
+      "electorate": "Hunter",
+      "state": "New South Wales",
+      "map_id": "11249",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Hunter_New-South-Wales_11249_2000-2006.geojson",
+      "canonical_name": "Hunter",
+      "sha256": "07908d7279c382fc327ef38e9013e98d3d3cb5ba44372009174c257d1cbe8390",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.226432,
+        -33.139046,
+        151.647917,
+        -32.130036
+      ]
+    },
+    {
+      "electorate": "Kingsford Smith",
+      "state": "New South Wales",
+      "map_id": "11270",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Kingsford Smith_New-South-Wales_11270_2000-2006.geojson",
+      "canonical_name": "Kingsford Smith",
+      "sha256": "e1344cf95c34ae203a2bfa496ea60eac7393e2eef716306f24df0ce975e858fe",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.147832,
+        -34.016557,
+        151.268154,
+        -33.901289
+      ]
+    },
+    {
+      "electorate": "Lindsay",
+      "state": "New South Wales",
+      "map_id": "11271",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Lindsay_New-South-Wales_11271_2000-2006.geojson",
+      "canonical_name": "Lindsay",
+      "sha256": "0e3d1a5b97e847042a7dd597091374eba329a6223bd3e1f74b2c5278263eafae",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.587988,
+        -33.883174,
+        150.812385,
+        -33.612358
+      ]
+    },
+    {
+      "electorate": "Lowe",
+      "state": "New South Wales",
+      "map_id": "11272",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Lowe_New-South-Wales_11272_2000-2006.geojson",
+      "canonical_name": "Lowe",
+      "sha256": "821b252d005ed5eb5de274a7b96980c53240d65291e426e8b0d735ed96dc8174",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.056965,
+        -33.899791,
+        151.164701,
+        -33.821876
+      ]
+    },
+    {
+      "electorate": "Lyne",
+      "state": "New South Wales",
+      "map_id": "11273",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Lyne_New-South-Wales_11273_2000-2006.geojson",
+      "canonical_name": "Lyne",
+      "sha256": "d54633792c7ce29f00d0237b29eb0335f130a63d405c75d56a1f25e931cd7def",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 3,
+      "bounds": [
+        151.753336,
+        -32.16725,
+        153.016623,
+        -30.763916
+      ]
+    },
+    {
+      "electorate": "Macarthur",
+      "state": "New South Wales",
+      "map_id": "11295",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Macarthur_New-South-Wales_11295_2000-2006.geojson",
+      "canonical_name": "Macarthur",
+      "sha256": "d263cebd4feb369b14aa511643ad84532fd19c04eed31db60201d3d26ade285d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.61768,
+        -34.189607,
+        150.940783,
+        -33.86421
+      ]
+    },
+    {
+      "electorate": "Mackellar",
+      "state": "New South Wales",
+      "map_id": "11294",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Mackellar_New-South-Wales_11294_2000-2006.geojson",
+      "canonical_name": "Mackellar",
+      "sha256": "c959d2de8ace099a53c63ca03fb579c68aeedaf4a334de9f2675a1d188322d53",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.160527,
+        -33.758543,
+        151.342567,
+        -33.571959
+      ]
+    },
+    {
+      "electorate": "Macquarie",
+      "state": "New South Wales",
+      "map_id": "11293",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Macquarie_New-South-Wales_11293_2000-2006.geojson",
+      "canonical_name": "Macquarie",
+      "sha256": "2b79d55395a3549f1264fdfda16305dfb7b0b7ce28e5d5a767924d4da6a840a3",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.16601,
+        -33.899934,
+        151.135943,
+        -32.996071
+      ]
+    },
+    {
+      "electorate": "Mitchell",
+      "state": "New South Wales",
+      "map_id": "11292",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Mitchell_New-South-Wales_11292_2000-2006.geojson",
+      "canonical_name": "Mitchell",
+      "sha256": "ee5406207b3377ba022a1a3911fbd1912f9100cddcc27e523432cbaa2b7fe822",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.874111,
+        -33.793378,
+        151.049919,
+        -33.564705
+      ]
+    },
+    {
+      "electorate": "New England",
+      "state": "New South Wales",
+      "map_id": "11291",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "New England_New-South-Wales_11291_2000-2006.geojson",
+      "canonical_name": "New England",
+      "sha256": "745e65044e864eaa443471f460050d4b1e5cbbf540c06c375756f72c02da2b23",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.073874,
+        -31.661856,
+        152.630509,
+        -28.249126
+      ]
+    },
+    {
+      "electorate": "Newcastle",
+      "state": "New South Wales",
+      "map_id": "11290",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Newcastle_New-South-Wales_11290_2000-2006.geojson",
+      "canonical_name": "Newcastle",
+      "sha256": "4ddb69f353dc39c7e73d592dcd8da278e3630d8d94b8f2e0bb1183e936d84327",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.606738,
+        -32.963249,
+        151.818567,
+        -32.789863
+      ]
+    },
+    {
+      "electorate": "North Sydney",
+      "state": "New South Wales",
+      "map_id": "11289",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "North Sydney_New-South-Wales_11289_2000-2006.geojson",
+      "canonical_name": "North Sydney",
+      "sha256": "268fbffb89b02fd6847df4793899244586e79585bcbd04e35e66d5e8c64c62cc",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.126733,
+        -33.853064,
+        151.233191,
+        -33.789695
+      ]
+    },
+    {
+      "electorate": "Page",
+      "state": "New South Wales",
+      "map_id": "11288",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Page_New-South-Wales_11288_2000-2006.geojson",
+      "canonical_name": "Page",
+      "sha256": "f38981f0f78a49448325720808eaeb9c7f1dfb8135d458c24d9fc4dfd4ef531c",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.168289,
+        -30.418897,
+        153.600854,
+        -28.269443
+      ]
+    },
+    {
+      "electorate": "Parkes",
+      "state": "New South Wales",
+      "map_id": "11287",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Parkes_New-South-Wales_11287_2000-2006.geojson",
+      "canonical_name": "Parkes",
+      "sha256": "7f7392bf4fc89154622806633198bfb778704230078b686b5d567ffe9d2e15c0",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        140.999262,
+        -34.317237,
+        149.031636,
+        -28.998483
+      ]
+    },
+    {
+      "electorate": "Parramatta",
+      "state": "New South Wales",
+      "map_id": "11286",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Parramatta_New-South-Wales_11286_2000-2006.geojson",
+      "canonical_name": "Parramatta",
+      "sha256": "01de7d31438e7018d66558ad5c84f61735a0a4db4ad6f791352e3dac3828c01a",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.928808,
+        -33.835138,
+        151.073939,
+        -33.766523
+      ]
+    },
+    {
+      "electorate": "Paterson",
+      "state": "New South Wales",
+      "map_id": "11296",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Paterson_New-South-Wales_11296_2000-2006.geojson",
+      "canonical_name": "Paterson",
+      "sha256": "3ed8f46a6e2d573b3562f25369862ed18d7404537fb5cd19486ba2387bd29403",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 11,
+      "bounds": [
+        151.303733,
+        -32.878153,
+        152.570853,
+        -31.585588
+      ]
+    },
+    {
+      "electorate": "Prospect",
+      "state": "New South Wales",
+      "map_id": "11285",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Prospect_New-South-Wales_11285_2000-2006.geojson",
+      "canonical_name": "Prospect",
+      "sha256": "77fd0b0c3559a41f0eaeedbf86cd1ed1c8a1d765ed675e8d4d595a9e937e1842",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.758524,
+        -33.886161,
+        150.963969,
+        -33.783128
+      ]
+    },
+    {
+      "electorate": "Reid",
+      "state": "New South Wales",
+      "map_id": "11283",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Reid_New-South-Wales_11283_2000-2006.geojson",
+      "canonical_name": "Reid",
+      "sha256": "c2e7cc4ae63d7803d4f6c7bc4ba3899a9a8b74af969a31fc04d22945fb93f54f",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.944802,
+        -33.888224,
+        151.088787,
+        -33.816169
+      ]
+    },
+    {
+      "electorate": "Richmond",
+      "state": "New South Wales",
+      "map_id": "11282",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Richmond_New-South-Wales_11282_2000-2006.geojson",
+      "canonical_name": "Richmond",
+      "sha256": "3ebfa0abfad3b68aaddcdcbbca55950a838c7b009500faf0db1174dd9fda6c89",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        153.106721,
+        -28.876243,
+        153.638837,
+        -28.157002
+      ]
+    },
+    {
+      "electorate": "Riverina",
+      "state": "New South Wales",
+      "map_id": "11281",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Riverina_New-South-Wales_11281_2000-2006.geojson",
+      "canonical_name": "Riverina",
+      "sha256": "7e0cc2e8bd1b463d42bbfdda4734c2df58d15128d7da3d1b639baa387d50c41e",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        143.9011,
+        -35.563631,
+        148.583096,
+        -33.462329
+      ]
+    },
+    {
+      "electorate": "Robertson",
+      "state": "New South Wales",
+      "map_id": "11280",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Robertson_New-South-Wales_11280_2000-2006.geojson",
+      "canonical_name": "Robertson",
+      "sha256": "deb62b1beaa404089d390595030174ba9a7bd0cf668eb227c0b73ee46c1addcb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.984135,
+        -33.582947,
+        151.452431,
+        -33.261932
+      ]
+    },
+    {
+      "electorate": "Shortland",
+      "state": "New South Wales",
+      "map_id": "11279",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Shortland_New-South-Wales_11279_2000-2006.geojson",
+      "canonical_name": "Shortland",
+      "sha256": "7363e4c055b640b7264fe151b87c5c9f866867bc7872d1d5450cccf271b49d72",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        151.4899,
+        -33.298622,
+        151.73839,
+        -32.951479
+      ]
+    },
+    {
+      "electorate": "Sydney",
+      "state": "New South Wales",
+      "map_id": "11278",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Sydney_New-South-Wales_11278_2000-2006.geojson",
+      "canonical_name": "Sydney",
+      "sha256": "f2127b53bacbc1ea7582c37a748dd7a55e6e2dd8d6bde0e814d25f0c682f2bcb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 7,
+      "bounds": [
+        151.15641,
+        -33.92437,
+        159.105405,
+        -31.496653
+      ]
+    },
+    {
+      "electorate": "Throsby",
+      "state": "New South Wales",
+      "map_id": "11277",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Throsby_New-South-Wales_11277_2000-2006.geojson",
+      "canonical_name": "Throsby",
+      "sha256": "2df1f793582fd4400daf9e9a86d1340efefbe14925ad913b67917de9babf052c",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 5,
+      "bounds": [
+        150.635068,
+        -34.643239,
+        150.938824,
+        -34.441727
+      ]
+    },
+    {
+      "electorate": "Warringah",
+      "state": "New South Wales",
+      "map_id": "11276",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Warringah_New-South-Wales_11276_2000-2006.geojson",
+      "canonical_name": "Warringah",
+      "sha256": "016706dd79db4ce238b3241c4f980e5308524a0306d4eb6f536ee2b219ea9d77",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.19113,
+        -33.853432,
+        151.307636,
+        -33.7454
+      ]
+    },
+    {
+      "electorate": "Watson",
+      "state": "New South Wales",
+      "map_id": "11275",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Watson_New-South-Wales_11275_2000-2006.geojson",
+      "canonical_name": "Watson",
+      "sha256": "200799c4ff72e3b658284890836b4ef0622803eef9518b8f2cd6bbc98348eec5",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.064063,
+        -33.969771,
+        151.155129,
+        -33.894207
+      ]
+    },
+    {
+      "electorate": "Wentworth",
+      "state": "New South Wales",
+      "map_id": "11274",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Wentworth_New-South-Wales_11274_2000-2006.geojson",
+      "canonical_name": "Wentworth",
+      "sha256": "000adad4950e684c6e515a19e63a35c9615e3d6c0aa94efa031ffb29d083b09e",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.219152,
+        -33.914823,
+        151.288033,
+        -33.832883
+      ]
+    },
+    {
+      "electorate": "Werriwa",
+      "state": "New South Wales",
+      "map_id": "11248",
+      "start_date": "2000",
+      "end_date": "2006",
+      "geojson_file": "Werriwa_New-South-Wales_11248_2000-2006.geojson",
+      "canonical_name": "Werriwa",
+      "sha256": "58df982080c9237df436733bf75baf962761ec302aa6e6e092c3d1addb3f2677",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        150.755671,
+        -34.055426,
+        150.919029,
+        -33.87472
+      ]
+    },
+    {
+      "electorate": "Lingiari",
+      "state": "Northern Territory",
+      "map_id": "11444",
+      "start_date": "2000",
+      "end_date": "2003",
+      "geojson_file": "Lingiari_Northern-Territory_11444_2000-2003.geojson",
+      "canonical_name": "Lingiari",
+      "sha256": "538ac7f0896be44efdd6e60556b355feefb357696da2819245a6cdec77d9e771",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 240,
+      "bounds": [
+        96.81803200000002,
+        -26.00063,
+        137.997301,
+        -10.411063
+      ]
+    },
+    {
+      "electorate": "Solomon",
+      "state": "Northern Territory",
+      "map_id": "11443",
+      "start_date": "2000",
+      "end_date": "2003",
+      "geojson_file": "Solomon_Northern-Territory_11443_2000-2003.geojson",
+      "canonical_name": "Solomon",
+      "sha256": "362683a4980630ff9d9ec43ac3fac4fde9782f7ce49fef3bbd0f6675f2b73dd4",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        130.815165,
+        -12.547208,
+        131.051861,
+        -12.329624
+      ]
+    },
+    {
+      "electorate": "Blair",
+      "state": "Queensland",
+      "map_id": "11667",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Blair_Queensland_11667_1997-2003.geojson",
+      "canonical_name": "Blair",
+      "sha256": "ff4f34f5ffe7555a39fae30136190e62574b9cb976b87f0527e942006a79ca67",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.201586,
+        -27.980521,
+        152.854938,
+        -26.364981
+      ]
+    },
+    {
+      "electorate": "Bowman",
+      "state": "Queensland",
+      "map_id": "11653",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Bowman_Queensland_11653_1997-2003.geojson",
+      "canonical_name": "Bowman",
+      "sha256": "1d0306bb2e01a1342f76ca97af14a85465fe8a67f0018faaf680750d2a17493c",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 10,
+      "bounds": [
+        153.111403,
+        -27.740677,
+        153.546697,
+        -27.021965
+      ]
+    },
+    {
+      "electorate": "Brisbane",
+      "state": "Queensland",
+      "map_id": "11649",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Brisbane_Queensland_11649_1997-2003.geojson",
+      "canonical_name": "Brisbane",
+      "sha256": "3d680d5f4f50506f3e5d669a988b6ac5642222a2f45124bb1638fb88d55f75e7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        152.936946,
+        -27.5024,
+        153.057235,
+        -27.403674
+      ]
+    },
+    {
+      "electorate": "Capricornia",
+      "state": "Queensland",
+      "map_id": "11671",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Capricornia_Queensland_11671_1997-2003.geojson",
+      "canonical_name": "Capricornia",
+      "sha256": "4f62427817d1ceda0ba80cfca791b463d69b3abae3ebe680566db82b80d16dd3",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 179,
+      "bounds": [
+        140.827757,
+        -24.445628,
+        151.08669,
+        -20.304929
+      ]
+    },
+    {
+      "electorate": "Dawson",
+      "state": "Queensland",
+      "map_id": "11661",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Dawson_Queensland_11661_1997-2003.geojson",
+      "canonical_name": "Dawson",
+      "sha256": "5461abe32b8a8ccb7befcd97b80d0ffe6705f7da345feadb7c61b5ace9447a57",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 234,
+      "bounds": [
+        146.882178,
+        -22.124794,
+        150.441978,
+        -19.301986
+      ]
+    },
+    {
+      "electorate": "Dickson",
+      "state": "Queensland",
+      "map_id": "11648",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Dickson_Queensland_11648_1997-2003.geojson",
+      "canonical_name": "Dickson",
+      "sha256": "25b0bc34667fe2c887aa90abd7612810f4f173033eb659539f7ac14c162593c9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.679743,
+        -27.434478,
+        153.020545,
+        -27.090997
+      ]
+    },
+    {
+      "electorate": "Fadden",
+      "state": "Queensland",
+      "map_id": "11654",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Fadden_Queensland_11654_1997-2003.geojson",
+      "canonical_name": "Fadden",
+      "sha256": "873fd8fb82079f5c25bad06cf0b87a6587b82197dd8ad27fd921f3ab69c326df",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 58,
+      "bounds": [
+        153.111797,
+        -27.934348,
+        153.448823,
+        -27.548441
+      ]
+    },
+    {
+      "electorate": "Fairfax",
+      "state": "Queensland",
+      "map_id": "11658",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Fairfax_Queensland_11658_1997-2003.geojson",
+      "canonical_name": "Fairfax",
+      "sha256": "812007fa9e3a4d0e3756982a70920a07b4a29cfc7daf3dd6b54b310ba959a3ed",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 4,
+      "bounds": [
+        152.373162,
+        -26.730915,
+        153.119947,
+        -25.931048
+      ]
+    },
+    {
+      "electorate": "Fisher",
+      "state": "Queensland",
+      "map_id": "11664",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Fisher_Queensland_11664_1997-2003.geojson",
+      "canonical_name": "Fisher",
+      "sha256": "29e615f4b4f03d2ff35351a22b2a833db74f27889c969b4b2dda0b0349e6f015",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 31,
+      "bounds": [
+        152.883446,
+        -26.980966,
+        153.151353,
+        -26.642336
+      ]
+    },
+    {
+      "electorate": "Forde",
+      "state": "Queensland",
+      "map_id": "11668",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Forde_Queensland_11668_1997-2003.geojson",
+      "canonical_name": "Forde",
+      "sha256": "9e9b3c4c435ce1d22fd9185fd2a7da8f2471a7b29109921baa3f17f417d2cf65",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.37621,
+        -28.363914,
+        153.349539,
+        -27.665254
+      ]
+    },
+    {
+      "electorate": "Griffith",
+      "state": "Queensland",
+      "map_id": "11652",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Griffith_Queensland_11652_1997-2003.geojson",
+      "canonical_name": "Griffith",
+      "sha256": "faf2ab7af6c96445d38fe6fa04cbc1ce2736c8db59df1ca1cca0a867e07b29f7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        153.042443,
+        -27.559717,
+        153.190638,
+        -27.428999
+      ]
+    },
+    {
+      "electorate": "Groom",
+      "state": "Queensland",
+      "map_id": "11666",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Groom_Queensland_11666_1997-2003.geojson",
+      "canonical_name": "Groom",
+      "sha256": "6f4383913ec79860037c26e6037a2ab472162cbe4871bf1ea83b358b91a52d87",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        151.078976,
+        -28.03065,
+        152.213794,
+        -26.97395
+      ]
+    },
+    {
+      "electorate": "Herbert",
+      "state": "Queensland",
+      "map_id": "11672",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Herbert_Queensland_11672_1997-2003.geojson",
+      "canonical_name": "Herbert",
+      "sha256": "a418538624d6cc52df80846ef4d82ac1503b92f6c2216f3ad4000a29a0ddddf2",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 23,
+      "bounds": [
+        146.452342,
+        -19.790396,
+        147.148295,
+        -18.537807
+      ]
+    },
+    {
+      "electorate": "Hinkler",
+      "state": "Queensland",
+      "map_id": "11670",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Hinkler_Queensland_11670_1997-2003.geojson",
+      "canonical_name": "Hinkler",
+      "sha256": "406486098e6f6a4f2c83966cfa32eea7eeefe2dae403a07270b8ac125d97c031",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 63,
+      "bounds": [
+        150.256125,
+        -25.428818,
+        152.718351,
+        -23.245455
+      ]
+    },
+    {
+      "electorate": "Kennedy",
+      "state": "Queensland",
+      "map_id": "11647",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Kennedy_Queensland_11647_1997-2003.geojson",
+      "canonical_name": "Kennedy",
+      "sha256": "692f95e74f77be389737ef0d872c70b4a39d137b7623699b3f19b40281d036cb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 72,
+      "bounds": [
+        137.999608,
+        -23.709668,
+        147.363931,
+        -15.812892
+      ]
+    },
+    {
+      "electorate": "Leichhardt",
+      "state": "Queensland",
+      "map_id": "11660",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Leichhardt_Queensland_11660_1997-2003.geojson",
+      "canonical_name": "Leichhardt",
+      "sha256": "ff75cbb2b10f815efb3f31268827e9e06a8ae443a438dd5d3451a947bf2326e0",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 330,
+      "bounds": [
+        141.417547,
+        -17.173601,
+        146.016634,
+        -9.142306
+      ]
+    },
+    {
+      "electorate": "Lilley",
+      "state": "Queensland",
+      "map_id": "11673",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Lilley_Queensland_11673_1997-2003.geojson",
+      "canonical_name": "Lilley",
+      "sha256": "06ab70c8954ca5badfc8937c313ab5b35f3f8d8adf2b2ca90babd9cd240919ac",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        153.015412,
+        -27.445666,
+        153.160525,
+        -27.278744
+      ]
+    },
+    {
+      "electorate": "Longman",
+      "state": "Queensland",
+      "map_id": "11665",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Longman_Queensland_11665_1997-2003.geojson",
+      "canonical_name": "Longman",
+      "sha256": "15811a8c8c8f9b9b9c66e857141fdcdc404c9d89c38998d54a9eb82f9bb08ee8",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 28,
+      "bounds": [
+        152.580245,
+        -27.215718,
+        153.207481,
+        -26.614803
+      ]
+    },
+    {
+      "electorate": "Maranoa",
+      "state": "Queensland",
+      "map_id": "11662",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Maranoa_Queensland_11662_1997-2003.geojson",
+      "canonical_name": "Maranoa",
+      "sha256": "4ebfdd0d0739e82011dc1b3a0f18453595ca8a499cef8d5cb3cbf5f9f23fbb4a",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        137.999054,
+        -29.177893,
+        152.489867,
+        -22.86664
+      ]
+    },
+    {
+      "electorate": "McPherson",
+      "state": "Queensland",
+      "map_id": "11656",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "McPherson_Queensland_11656_1997-2003.geojson",
+      "canonical_name": "McPherson",
+      "sha256": "addd010e6b2b20c59dfd2f61f691285ee705d07899c31806774e235f35e5cba1",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        153.238172,
+        -28.250311,
+        153.552171,
+        -28.02627
+      ]
+    },
+    {
+      "electorate": "Moncrieff",
+      "state": "Queensland",
+      "map_id": "11655",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Moncrieff_Queensland_11655_1997-2003.geojson",
+      "canonical_name": "Moncrieff",
+      "sha256": "ea78b718b9405d00d3073d221ac13b406af493175f0d2c85cf0efacbe2ed19b9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        153.270991,
+        -28.082513,
+        153.437088,
+        -27.919369
+      ]
+    },
+    {
+      "electorate": "Moreton",
+      "state": "Queensland",
+      "map_id": "11650",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Moreton_Queensland_11650_1997-2003.geojson",
+      "canonical_name": "Moreton",
+      "sha256": "a4b5308337b11bdf5c3472bba295cf9dbb097dd0e78561e5c3309332dc4f89d9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.967787,
+        -27.62052900000001,
+        153.142258,
+        -27.500178
+      ]
+    },
+    {
+      "electorate": "Oxley",
+      "state": "Queensland",
+      "map_id": "11657",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Oxley_Queensland_11657_1997-2003.geojson",
+      "canonical_name": "Oxley",
+      "sha256": "887e2ffe1a640b1f9aa713f5686becdc34e56c8a21a17a52a84d7e9558a1c626",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        152.620741,
+        -27.871571,
+        153.032741,
+        -27.56402200000001
+      ]
+    },
+    {
+      "electorate": "Petrie",
+      "state": "Queensland",
+      "map_id": "11659",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Petrie_Queensland_11659_1997-2003.geojson",
+      "canonical_name": "Petrie",
+      "sha256": "ca0ad3d4799c957424b234c0c19ba24b39e0b51ca3c01d76e7b784a91fa36c8a",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.978384,
+        -27.412319,
+        153.118992,
+        -27.178171
+      ]
+    },
+    {
+      "electorate": "Rankin",
+      "state": "Queensland",
+      "map_id": "11663",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Rankin_Queensland_11663_1997-2003.geojson",
+      "canonical_name": "Rankin",
+      "sha256": "b893d3cbb14855bd722e58c195bddfc7ece6bdc42546f9fbe57165e187c6c6da",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        152.986934,
+        -27.725298,
+        153.18924,
+        -27.572619
+      ]
+    },
+    {
+      "electorate": "Ryan",
+      "state": "Queensland",
+      "map_id": "11651",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Ryan_Queensland_11651_1997-2003.geojson",
+      "canonical_name": "Ryan",
+      "sha256": "acce3f8c43d7b25fc0c95aab48fe9c90839c352c80e4e1bb3b49e090094ef941",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        152.799043,
+        -27.602088,
+        153.020615,
+        -27.398729
+      ]
+    },
+    {
+      "electorate": "Wide Bay",
+      "state": "Queensland",
+      "map_id": "11669",
+      "start_date": "1997",
+      "end_date": "2003",
+      "geojson_file": "Wide Bay_Queensland_11669_1997-2003.geojson",
+      "canonical_name": "Wide Bay",
+      "sha256": "2cac377246c57cb581653d1c1da7d27cb82f7fbb1eab36770535a67724b9ba55",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 114,
+      "bounds": [
+        149.579996,
+        -27.720299,
+        153.360338,
+        -23.643057
+      ]
+    },
+    {
+      "electorate": "Adelaide",
+      "state": "South Australia",
+      "map_id": "11893",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Adelaide_South-Australia_11893_1999-2003.geojson",
+      "canonical_name": "Adelaide",
+      "sha256": "d4d9d64a66715a5380d196bddadf24c09bdd242f856d760d357963ced5a1a499",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.557247,
+        -34.967286,
+        138.644239,
+        -34.846862
+      ]
+    },
+    {
+      "electorate": "Barker",
+      "state": "South Australia",
+      "map_id": "11892",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Barker_South-Australia_11892_1999-2003.geojson",
+      "canonical_name": "Barker",
+      "sha256": "b59f03f9c6d3d420805227e5922cfda03eeb2337e622300ac522a0189dccacad",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 17,
+      "bounds": [
+        136.532966,
+        -38.061503,
+        140.971989,
+        -34.472056
+      ]
+    },
+    {
+      "electorate": "Bonython",
+      "state": "South Australia",
+      "map_id": "11891",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Bonython_South-Australia_11891_1999-2003.geojson",
+      "canonical_name": "Bonython",
+      "sha256": "58978c8b9cf357a4d5a0738b4359e466d11de7e709b37750f6db321271b33aad",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.531367,
+        -34.848071,
+        138.791048,
+        -34.613104
+      ]
+    },
+    {
+      "electorate": "Boothby",
+      "state": "South Australia",
+      "map_id": "11890",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Boothby_South-Australia_11890_1999-2003.geojson",
+      "canonical_name": "Boothby",
+      "sha256": "be6404370417c0aebe4addd85224679cd82cdd6ca86dc6cc3378cb570b846cce",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.50364,
+        -35.069853,
+        138.681436,
+        -34.963658
+      ]
+    },
+    {
+      "electorate": "Grey",
+      "state": "South Australia",
+      "map_id": "11889",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Grey_South-Australia_11889_1999-2003.geojson",
+      "canonical_name": "Grey",
+      "sha256": "5742a410907afd9e8930fa0067e238730e7601d870340764bcad5c327d9fba9d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 100,
+      "bounds": [
+        129.001335,
+        -35.34038,
+        141.002386,
+        -25.994483
+      ]
+    },
+    {
+      "electorate": "Hindmarsh",
+      "state": "South Australia",
+      "map_id": "11888",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Hindmarsh_South-Australia_11888_1999-2003.geojson",
+      "canonical_name": "Hindmarsh",
+      "sha256": "17af78fe03076e7d6270199438b48cbc8f14213e0e503a0e28a5336e241671c7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.489856,
+        -34.997273,
+        138.574893,
+        -34.90406
+      ]
+    },
+    {
+      "electorate": "Kingston",
+      "state": "South Australia",
+      "map_id": "11887",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Kingston_South-Australia_11887_1999-2003.geojson",
+      "canonical_name": "Kingston",
+      "sha256": "8e166916fdb2fab8e999c9ab3036873b051c7e54feaf1f195b30ab589df5d74a",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.442152,
+        -35.349163,
+        138.607139,
+        -35.05126
+      ]
+    },
+    {
+      "electorate": "Makin",
+      "state": "South Australia",
+      "map_id": "11886",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Makin_South-Australia_11886_1999-2003.geojson",
+      "canonical_name": "Makin",
+      "sha256": "5222a78bb550325a77785e7ec9d00875416f8c18f5fdb265d49827255b8c7ecb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.600155,
+        -34.848071,
+        138.780181,
+        -34.734569
+      ]
+    },
+    {
+      "electorate": "Mayo",
+      "state": "South Australia",
+      "map_id": "11885",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Mayo_South-Australia_11885_1999-2003.geojson",
+      "canonical_name": "Mayo",
+      "sha256": "5a32fb9309fd4202f74b9390c3072854022a416adb47bd820d3e2a691de8d7ec",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.454765,
+        -35.350309,
+        139.158162,
+        -34.76704
+      ]
+    },
+    {
+      "electorate": "Port Adelaide",
+      "state": "South Australia",
+      "map_id": "11884",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Port Adelaide_South-Australia_11884_1999-2003.geojson",
+      "canonical_name": "Port Adelaide",
+      "sha256": "f6c9c85cc9c7da6e3e353e704d619f83635c1e9880cc5abf39a3f67005c460d0",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.435314,
+        -34.907584,
+        138.600155,
+        -34.636734
+      ]
+    },
+    {
+      "electorate": "Sturt",
+      "state": "South Australia",
+      "map_id": "11883",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Sturt_South-Australia_11883_1999-2003.geojson",
+      "canonical_name": "Sturt",
+      "sha256": "c211e07ca5399b4d3cdc127f839ac0fd4a480d3b7eccb4d508513dd80d1a0172",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        138.620525,
+        -34.976218,
+        138.721256,
+        -34.839567
+      ]
+    },
+    {
+      "electorate": "Wakefield",
+      "state": "South Australia",
+      "map_id": "11882",
+      "start_date": "1999",
+      "end_date": "2003",
+      "geojson_file": "Wakefield_South-Australia_11882_1999-2003.geojson",
+      "canonical_name": "Wakefield",
+      "sha256": "9c63c76b4f8d9783065f59f3e1dc8c8f8a78ec5feb9b41d0a521930f8f13007c",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 22,
+      "bounds": [
+        136.821921,
+        -35.37821,
+        141.00295,
+        -33.311179
+      ]
+    },
+    {
+      "electorate": "Bass",
+      "state": "Tasmania",
+      "map_id": "11971",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Bass_Tasmania_11971_2000-2009.geojson",
+      "canonical_name": "Bass",
+      "sha256": "9f309907fb201e75ed8d702ce270927a6ad0027fea64a116bbd4504c74a14587",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 133,
+      "bounds": [
+        146.786761,
+        -41.556144,
+        148.498733,
+        -39.637081
+      ]
+    },
+    {
+      "electorate": "Braddon",
+      "state": "Tasmania",
+      "map_id": "11970",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Braddon_Tasmania_11970_2000-2009.geojson",
+      "canonical_name": "Braddon",
+      "sha256": "0a9c3819b0f58d341fa514305d9b4c40209aa3b87e358540f2a67bb273ab63ac",
+      "valid": false,
+      "validity": "Self-intersection[144.872768193221 -40.7250035991652]",
+      "polygon_parts": 298,
+      "bounds": [
+        143.818948,
+        -41.707502,
+        146.762068,
+        -39.57926
+      ]
+    },
+    {
+      "electorate": "Denison",
+      "state": "Tasmania",
+      "map_id": "11969",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Denison_Tasmania_11969_2000-2009.geojson",
+      "canonical_name": "Denison",
+      "sha256": "04035660dc9c18eaf6f75f1688e4342c828979469719f3556394eead87240ec7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 2,
+      "bounds": [
+        147.135468,
+        -42.965611,
+        147.361874,
+        -42.7503
+      ]
+    },
+    {
+      "electorate": "Franklin",
+      "state": "Tasmania",
+      "map_id": "11968",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Franklin_Tasmania_11968_2000-2009.geojson",
+      "canonical_name": "Franklin",
+      "sha256": "d7bf422aa8574b1a904c7ddad511d02b905bc88ff78625225d7d982ae9a694b5",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 205,
+      "bounds": [
+        145.916502,
+        -43.740471,
+        147.61335,
+        -42.730293
+      ]
+    },
+    {
+      "electorate": "Lyons",
+      "state": "Tasmania",
+      "map_id": "11967",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Lyons_Tasmania_11967_2000-2009.geojson",
+      "canonical_name": "Lyons",
+      "sha256": "6e9fbb0bc6d22bba7721869d0462950a494d909adfbe2e80479e32b4399121da",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 284,
+      "bounds": [
+        144.911001,
+        -43.322035,
+        148.359265,
+        -40.899199
+      ]
+    },
+    {
+      "electorate": "Aston",
+      "state": "Victoria",
+      "map_id": "12311",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Aston_Victoria_12311_1994-2003.geojson",
+      "canonical_name": "Aston",
+      "sha256": "872209418ae017e2f3f5054ca9290be6c2acf91cb63b98c991d1039bf750737d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.169072,
+        -37.963593,
+        145.29953,
+        -37.825194
+      ]
+    },
+    {
+      "electorate": "Ballarat",
+      "state": "Victoria",
+      "map_id": "12319",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Ballarat_Victoria_12319_1994-2003.geojson",
+      "canonical_name": "Ballarat",
+      "sha256": "72f992fc747e0f70212fe74ffc34bbece4e623d690910d12b237f283cc19c64f",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        142.460964,
+        -37.827104,
+        144.376239,
+        -36.59724
+      ]
+    },
+    {
+      "electorate": "Batman",
+      "state": "Victoria",
+      "map_id": "12304",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Batman_Victoria_12304_1994-2003.geojson",
+      "canonical_name": "Batman",
+      "sha256": "56d52c4ea3c8f4b69c6f1ef87e5befa716d6800ba2d75376f6e6cb9ef4979293",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.966221,
+        -37.803815,
+        145.058408,
+        -37.691061
+      ]
+    },
+    {
+      "electorate": "Bendigo",
+      "state": "Victoria",
+      "map_id": "12322",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Bendigo_Victoria_12322_1994-2003.geojson",
+      "canonical_name": "Bendigo",
+      "sha256": "6327dd220e73c30368ee8f44f31c55c527c7def0cb4604e836e1d74fe965bcf6",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        143.319017,
+        -37.265171,
+        145.095869,
+        -36.17053
+      ]
+    },
+    {
+      "electorate": "Bruce",
+      "state": "Victoria",
+      "map_id": "12312",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Bruce_Victoria_12312_1994-2003.geojson",
+      "canonical_name": "Bruce",
+      "sha256": "a20ab708f36ca9da18f81845f8bf5b11c301909a44bd426256abe9bcea6e0c56",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.139094,
+        -37.983954,
+        145.237317,
+        -37.86203
+      ]
+    },
+    {
+      "electorate": "Burke",
+      "state": "Victoria",
+      "map_id": "12321",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Burke_Victoria_12321_1994-2003.geojson",
+      "canonical_name": "Burke",
+      "sha256": "118d62cc4d6b30682b410120a4a5bb122b4866ae09c647169549e26fc31645b9",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.255808,
+        -37.867709,
+        144.922946,
+        -37.097205
+      ]
+    },
+    {
+      "electorate": "Calwell",
+      "state": "Victoria",
+      "map_id": "12301",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Calwell_Victoria_12301_1994-2003.geojson",
+      "canonical_name": "Calwell",
+      "sha256": "38eea89faf1137c67c5868f2fd9a552d7f96d74db3eb7a296e15e8371ffbd640",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.692489,
+        -37.733604,
+        144.977664,
+        -37.609052
+      ]
+    },
+    {
+      "electorate": "Casey",
+      "state": "Victoria",
+      "map_id": "12330",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Casey_Victoria_12330_1994-2003.geojson",
+      "canonical_name": "Casey",
+      "sha256": "70c9cb30a43584045e13b57197da716baecbb4e05f840739864da2255da2600d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.253966,
+        -37.914597,
+        145.531754,
+        -37.657978
+      ]
+    },
+    {
+      "electorate": "Chisholm",
+      "state": "Victoria",
+      "map_id": "12309",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Chisholm_Victoria_12309_1994-2003.geojson",
+      "canonical_name": "Chisholm",
+      "sha256": "01e611c3e051ee273819286e8a002d4c317973628469633e3e3b9b6e2ed79462",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.086827,
+        -37.939287,
+        145.169072,
+        -37.791969
+      ]
+    },
+    {
+      "electorate": "Corangamite",
+      "state": "Victoria",
+      "map_id": "12320",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Corangamite_Victoria_12320_1994-2003.geojson",
+      "canonical_name": "Corangamite",
+      "sha256": "45b7b8dcc5947544ab21e755ec0d7886cef0c839912dd1657a21d22e965cebe3",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 8,
+      "bounds": [
+        143.116161,
+        -38.85758,
+        144.7202,
+        -37.786232
+      ]
+    },
+    {
+      "electorate": "Corio",
+      "state": "Victoria",
+      "map_id": "12331",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Corio_Victoria_12331_1994-2003.geojson",
+      "canonical_name": "Corio",
+      "sha256": "6c6ebe7aed7afb05e90a91732755c70b68b9e51427d4742a019fab39b0aaa06a",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.202528,
+        -38.234735,
+        144.595683,
+        -37.805068
+      ]
+    },
+    {
+      "electorate": "Deakin",
+      "state": "Victoria",
+      "map_id": "12308",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Deakin_Victoria_12308_1994-2003.geojson",
+      "canonical_name": "Deakin",
+      "sha256": "0275440fdc593bc6816490fa2574491353a52e23ec0cc9185c9656c018b10bc2",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.132392,
+        -37.86203,
+        145.289945,
+        -37.779188
+      ]
+    },
+    {
+      "electorate": "Dunkley",
+      "state": "Victoria",
+      "map_id": "12334",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Dunkley_Victoria_12334_1994-2003.geojson",
+      "canonical_name": "Dunkley",
+      "sha256": "b944472232e33dae1775051c559ac18d50ca54320baa23b0adb1b496212e18b2",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.025502,
+        -38.25459,
+        145.230518,
+        -38.081524
+      ]
+    },
+    {
+      "electorate": "Flinders",
+      "state": "Victoria",
+      "map_id": "12328",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Flinders_Victoria_12328_1994-2003.geojson",
+      "canonical_name": "Flinders",
+      "sha256": "c42c021c652c8f8078f3b256784ce0424d58f92d68e9c0e6444db0f0f5e10feb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 35,
+      "bounds": [
+        144.6515,
+        -38.575772,
+        145.737256,
+        -38.069707
+      ]
+    },
+    {
+      "electorate": "Gellibrand",
+      "state": "Victoria",
+      "map_id": "12317",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Gellibrand_Victoria_12317_1994-2003.geojson",
+      "canonical_name": "Gellibrand",
+      "sha256": "411a93bae52309c1abbb86cabf94143608b6225d48ad725356345546ef9eef59",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.791041,
+        -37.872525,
+        144.916224,
+        -37.747429
+      ]
+    },
+    {
+      "electorate": "Gippsland",
+      "state": "Victoria",
+      "map_id": "12325",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Gippsland_Victoria_12325_1994-2003.geojson",
+      "canonical_name": "Gippsland",
+      "sha256": "2c9eedc1307c59167e1dab1b5b739c864f5c99898af6da4a05110fb728e045c8",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 97,
+      "bounds": [
+        145.5042,
+        -39.159036,
+        149.976679,
+        -36.601915
+      ]
+    },
+    {
+      "electorate": "Goldstein",
+      "state": "Victoria",
+      "map_id": "12299",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Goldstein_Victoria_12299_1994-2003.geojson",
+      "canonical_name": "Goldstein",
+      "sha256": "06854d64d2d648d4455ba5fd5ddd10188dadcb6b391418a836cc7c49ec4f7d87",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.983382,
+        -37.996447,
+        145.056694,
+        -37.883286
+      ]
+    },
+    {
+      "electorate": "Higgins",
+      "state": "Victoria",
+      "map_id": "12314",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Higgins_Victoria_12314_1994-2003.geojson",
+      "canonical_name": "Higgins",
+      "sha256": "1e57478278c7debcf07f2e6bcdaa5c0511db91ac9e759d9d3451438875c7c11c",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.983279,
+        -37.899074,
+        145.095504,
+        -37.830201
+      ]
+    },
+    {
+      "electorate": "Holt",
+      "state": "Victoria",
+      "map_id": "12313",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Holt_Victoria_12313_1994-2003.geojson",
+      "canonical_name": "Holt",
+      "sha256": "ff494da05f3ba7f148f9e2f6d2f0cf36eb0d6e7ff76eaf82b3e28d9780ecabcf",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.140642,
+        -38.069707,
+        145.316733,
+        -37.941891
+      ]
+    },
+    {
+      "electorate": "Hotham",
+      "state": "Victoria",
+      "map_id": "12310",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Hotham_Victoria_12310_1994-2003.geojson",
+      "canonical_name": "Hotham",
+      "sha256": "b0f8ff8df684d69820c3a7830883c3fe92aa8cec3dcf05ec67e40a6eca93e121",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.034301,
+        -37.990833,
+        145.169218,
+        -37.88915
+      ]
+    },
+    {
+      "electorate": "Indi",
+      "state": "Victoria",
+      "map_id": "12324",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Indi_Victoria_12324_1994-2003.geojson",
+      "canonical_name": "Indi",
+      "sha256": "662b70f36e5a8141f028e180eacb4844767eb13a9cf50af10b089788d1892304",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.282325,
+        -37.274058,
+        148.22067,
+        -35.928545
+      ]
+    },
+    {
+      "electorate": "Isaacs",
+      "state": "Victoria",
+      "map_id": "12315",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Isaacs_Victoria_12315_1994-2003.geojson",
+      "canonical_name": "Isaacs",
+      "sha256": "9ff6a0d11af1a882ddbcb0d6cef0d891c7fd0fe36b7787d36f7b61dd96e119c7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.051708,
+        -38.129127,
+        145.298241,
+        -37.965092
+      ]
+    },
+    {
+      "electorate": "Jagajaga",
+      "state": "Victoria",
+      "map_id": "12305",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Jagajaga_Victoria_12305_1994-2003.geojson",
+      "canonical_name": "Jagajaga",
+      "sha256": "ba84b78a29cf0f79e40eb9300a6660a8d66ef42834d26018a7ccc7b2bb864f83",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.027976,
+        -37.78502,
+        145.211545,
+        -37.686163
+      ]
+    },
+    {
+      "electorate": "Kooyong",
+      "state": "Victoria",
+      "map_id": "12306",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Kooyong_Victoria_12306_1994-2003.geojson",
+      "canonical_name": "Kooyong",
+      "sha256": "18551227422c547f1e29a06dc350da405cab13d2941f98e8cdd55fd244fb9a50",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.000024,
+        -37.851743,
+        145.106544,
+        -37.776941
+      ]
+    },
+    {
+      "electorate": "La Trobe",
+      "state": "Victoria",
+      "map_id": "12329",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "La Trobe_Victoria_12329_1994-2003.geojson",
+      "canonical_name": "La Trobe",
+      "sha256": "ad7eb5d2e511fde0a3cbc4107fbc861fbc22d263b7fca5f3656c7779fac5a5f3",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.257499,
+        -38.148678,
+        145.629567,
+        -37.807068
+      ]
+    },
+    {
+      "electorate": "Lalor",
+      "state": "Victoria",
+      "map_id": "12332",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Lalor_Victoria_12332_1994-2003.geojson",
+      "canonical_name": "Lalor",
+      "sha256": "33ea4bf952e236fa21627ce5b78d56beb2e45be8f87e0b163002b4a86d6004f7",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.399009,
+        -38.006446,
+        144.867208,
+        -37.704489
+      ]
+    },
+    {
+      "electorate": "Mallee",
+      "state": "Victoria",
+      "map_id": "12298",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Mallee_Victoria_12298_1994-2003.geojson",
+      "canonical_name": "Mallee",
+      "sha256": "cf4240b6fd1a44b5144e4e098135b35c5bb80044d6dc7a74d8df71bfb0eb454e",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        140.961682,
+        -37.310489,
+        143.805389,
+        -33.980648
+      ]
+    },
+    {
+      "electorate": "Maribyrnong",
+      "state": "Victoria",
+      "map_id": "12302",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Maribyrnong_Victoria_12302_1994-2003.geojson",
+      "canonical_name": "Maribyrnong",
+      "sha256": "3ae37885b11c982477fbecd076c1cfcaef068633022a33db27b7ac41d4950555",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.756765,
+        -37.776442,
+        144.920617,
+        -37.702717
+      ]
+    },
+    {
+      "electorate": "McEwen",
+      "state": "Victoria",
+      "map_id": "12326",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "McEwen_Victoria_12326_1994-2003.geojson",
+      "canonical_name": "McEwen",
+      "sha256": "770faaab2b4eec0774589f88fc57e6fa208a87c4b29c31e94ae2a67a38c49d8b",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.714345,
+        -37.921597,
+        146.643387,
+        -36.574985
+      ]
+    },
+    {
+      "electorate": "McMillan",
+      "state": "Victoria",
+      "map_id": "12327",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "McMillan_Victoria_12327_1994-2003.geojson",
+      "canonical_name": "McMillan",
+      "sha256": "6d4233c44668f0ec6e2d825b40b7e16bde7787266da6ca2fea1f987d1532a49f",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.448776,
+        -38.535644,
+        146.711365,
+        -37.596939
+      ]
+    },
+    {
+      "electorate": "Melbourne",
+      "state": "Victoria",
+      "map_id": "12333",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Melbourne_Victoria_12333_1994-2003.geojson",
+      "canonical_name": "Melbourne",
+      "sha256": "6e9b2a7f609482e3eaa88bade9930b29f3c82b7de4bc68bbe61494e7b88a1018",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.89587,
+        -37.834494,
+        145.027456,
+        -37.764186
+      ]
+    },
+    {
+      "electorate": "Melbourne Ports",
+      "state": "Victoria",
+      "map_id": "12316",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Melbourne Ports_Victoria_12316_1994-2003.geojson",
+      "canonical_name": "Melbourne Ports",
+      "sha256": "419f3cb7c578856b10c4b8f8126daab1e7e6a8a00fc8f0c474eae1930fdf0a37",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.897155,
+        -37.902089,
+        145.049644,
+        -37.818547
+      ]
+    },
+    {
+      "electorate": "Menzies",
+      "state": "Victoria",
+      "map_id": "12307",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Menzies_Victoria_12307_1994-2003.geojson",
+      "canonical_name": "Menzies",
+      "sha256": "c56395f06b9223dfd01c0a8116023d6b285d2a83f639d160165b0c5b735fa3a5",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        145.067422,
+        -37.811062,
+        145.29642,
+        -37.704139
+      ]
+    },
+    {
+      "electorate": "Murray",
+      "state": "Victoria",
+      "map_id": "12323",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Murray_Victoria_12323_1994-2003.geojson",
+      "canonical_name": "Murray",
+      "sha256": "9387def319b739d336ad7e86815ac1c95bf60995c31c42dd36b98d0b704f5f53",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        143.28949,
+        -36.763389,
+        145.79982,
+        -35.433282
+      ]
+    },
+    {
+      "electorate": "Scullin",
+      "state": "Victoria",
+      "map_id": "12300",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Scullin_Victoria_12300_1994-2003.geojson",
+      "canonical_name": "Scullin",
+      "sha256": "8274ddea938231569a5093f03e4e92a29d2194e25e3165df85235aca57e117c5",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.95696,
+        -37.706451,
+        145.146835,
+        -37.61623
+      ]
+    },
+    {
+      "electorate": "Wannon",
+      "state": "Victoria",
+      "map_id": "12318",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Wannon_Victoria_12318_1994-2003.geojson",
+      "canonical_name": "Wannon",
+      "sha256": "56d30ed8bf58faec8d1c8930fef6207ddffad9bf400f4fd99cbf2675b53bc072",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 21,
+      "bounds": [
+        140.965735,
+        -38.673271,
+        143.737723,
+        -37.087791
+      ]
+    },
+    {
+      "electorate": "Wills",
+      "state": "Victoria",
+      "map_id": "12303",
+      "start_date": "1994",
+      "end_date": "2003",
+      "geojson_file": "Wills_Victoria_12303_1994-2003.geojson",
+      "canonical_name": "Wills",
+      "sha256": "3fc5a3524d9c36ca3ea8b484324b153a74bc1a4e9031a2732c9e383ef5819528",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        144.888548,
+        -37.773648,
+        144.985048,
+        -37.690556
+      ]
+    },
+    {
+      "electorate": "Brand",
+      "state": "Western Australia",
+      "map_id": "12623",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Brand_Western-Australia_12623_2000-2009.geojson",
+      "canonical_name": "Brand",
+      "sha256": "5f14d0b837ab3a046826c8a8be65fd4845512fa461cf8276465b97513b84aa1d",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 5,
+      "bounds": [
+        115.66006,
+        -32.574734,
+        115.900796,
+        -32.15555
+      ]
+    },
+    {
+      "electorate": "Canning",
+      "state": "Western Australia",
+      "map_id": "12622",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Canning_Western-Australia_12622_2000-2009.geojson",
+      "canonical_name": "Canning",
+      "sha256": "a153d6cfe09714d5216d7d424bb24a240c343df0b5fbc016530bc84f8e8a5907",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.606785,
+        -32.943129,
+        116.358089,
+        -32.05369
+      ]
+    },
+    {
+      "electorate": "Cowan",
+      "state": "Western Australia",
+      "map_id": "12621",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Cowan_Western-Australia_12621_2000-2009.geojson",
+      "canonical_name": "Cowan",
+      "sha256": "fcc401ab9820af52aae0bf1bfab58a37e009562a81c18ab68bbb0d38bb3505e0",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.765901,
+        -31.879819,
+        115.925249,
+        -31.685424
+      ]
+    },
+    {
+      "electorate": "Curtin",
+      "state": "Western Australia",
+      "map_id": "12620",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Curtin_Western-Australia_12620_2000-2009.geojson",
+      "canonical_name": "Curtin",
+      "sha256": "990a307c59b0e3e74c18d670008fc7a18b312ce8a6177d2a347a4afb00692a68",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.749986,
+        -32.025083,
+        115.852737,
+        -31.899828
+      ]
+    },
+    {
+      "electorate": "Forrest",
+      "state": "Western Australia",
+      "map_id": "12619",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Forrest_Western-Australia_12619_2000-2009.geojson",
+      "canonical_name": "Forrest",
+      "sha256": "9cc5b03dbb456ff9a02ca63d21b931dce9ea0f9b0be816b2f2fa26bcf5543b53",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 22,
+      "bounds": [
+        114.974666,
+        -35.068921,
+        116.856814,
+        -32.92069
+      ]
+    },
+    {
+      "electorate": "Fremantle",
+      "state": "Western Australia",
+      "map_id": "12618",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Fremantle_Western-Australia_12618_2000-2009.geojson",
+      "canonical_name": "Fremantle",
+      "sha256": "b4cda4182800b1c06941b9c5b8870a53580da0d9863f12acaf3e8a6f208a6727",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 7,
+      "bounds": [
+        115.449481,
+        -32.181309,
+        115.916182,
+        -31.987361
+      ]
+    },
+    {
+      "electorate": "Hasluck",
+      "state": "Western Australia",
+      "map_id": "12617",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Hasluck_Western-Australia_12617_2000-2009.geojson",
+      "canonical_name": "Hasluck",
+      "sha256": "35cb96679ae80d1c3e345019be65e435128d6bb52c07bcbd0cd26f5769ca27c0",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.930725,
+        -32.113891,
+        116.089582,
+        -31.855645
+      ]
+    },
+    {
+      "electorate": "Kalgoorlie",
+      "state": "Western Australia",
+      "map_id": "12616",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Kalgoorlie_Western-Australia_12616_2000-2009.geojson",
+      "canonical_name": "Kalgoorlie",
+      "sha256": "52e68a9497459c7ba92f5f2e563148fed501edb262c744100dc344a0ac818edb",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 742,
+      "bounds": [
+        112.921136,
+        -34.474708,
+        129.00193,
+        -13.740827
+      ]
+    },
+    {
+      "electorate": "Moore",
+      "state": "Western Australia",
+      "map_id": "12615",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Moore_Western-Australia_12615_2000-2009.geojson",
+      "canonical_name": "Moore",
+      "sha256": "0318d2307ebd90ec98ede0d08bd6f5545f86177d7fff2676aa633f55de497b2b",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.706615,
+        -31.861164,
+        115.798285,
+        -31.711958
+      ]
+    },
+    {
+      "electorate": "O'Connor",
+      "state": "Western Australia",
+      "map_id": "12614",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "O'Connor_Western-Australia_12614_2000-2009.geojson",
+      "canonical_name": "O'Connor",
+      "sha256": "e1ed67e1163c2067fadf5989816cb50827d3a41cfd59c1206d9abd26bedefe83",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 115,
+      "bounds": [
+        113.58831,
+        -35.134865,
+        120.875769,
+        -28.289335
+      ]
+    },
+    {
+      "electorate": "Pearce",
+      "state": "Western Australia",
+      "map_id": "12613",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Pearce_Western-Australia_12613_2000-2009.geojson",
+      "canonical_name": "Pearce",
+      "sha256": "d5a0a2a6c952e73d5fcc6a661fd3fe87da99d4040787cdf3e88fa3433a071a71",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.262689,
+        -33.343395,
+        117.580432,
+        -30.891707
+      ]
+    },
+    {
+      "electorate": "Perth",
+      "state": "Western Australia",
+      "map_id": "12612",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Perth_Western-Australia_12612_2000-2009.geojson",
+      "canonical_name": "Perth",
+      "sha256": "823cd2f5a2051053b9045c55bdaa03f0bfad84ab3404d4b86b04c7da68273204",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.84684,
+        -31.969108,
+        115.964321,
+        -31.855575
+      ]
+    },
+    {
+      "electorate": "Stirling",
+      "state": "Western Australia",
+      "map_id": "12611",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Stirling_Western-Australia_12611_2000-2009.geojson",
+      "canonical_name": "Stirling",
+      "sha256": "74a8346b7c9257c7fa46a5532fa13e36fcd1a47dcdc3a21e6670e77d6bd9db50",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.750924,
+        -31.914266,
+        115.889127,
+        -31.842249
+      ]
+    },
+    {
+      "electorate": "Swan",
+      "state": "Western Australia",
+      "map_id": "12610",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Swan_Western-Australia_12610_2000-2009.geojson",
+      "canonical_name": "Swan",
+      "sha256": "18b5aa7234948070ff7b8ab92e725868a5d834117dc3d5f46aa04f1c9c43ce20",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.844828,
+        -32.040072,
+        115.98765,
+        -31.920383
+      ]
+    },
+    {
+      "electorate": "Tangney",
+      "state": "Western Australia",
+      "map_id": "12609",
+      "start_date": "2000",
+      "end_date": "2009",
+      "geojson_file": "Tangney_Western-Australia_12609_2000-2009.geojson",
+      "canonical_name": "Tangney",
+      "sha256": "22312400f3e9c187665fde4d04115299f6a6a925ce897082c2aea79d1c9552d6",
+      "valid": true,
+      "validity": "Valid Geometry",
+      "polygon_parts": 1,
+      "bounds": [
+        115.793384,
+        -32.087586,
+        115.955063,
+        -32.001666
+      ]
+    }
+  ],
+  "baseline_commit": "3eea65671583db209500ab8ade51b2aa52b5f705",
+  "baseline_source": "ABS ASGC 2001 statistical CED layer, previously published hi detail",
+  "area_crs": "EPSG:3577",
+  "measurement_extent": [
+    112.0,
+    -44.5,
+    154.5,
+    -9.0
+  ],
+  "preprojection_max_segment_degrees": 0.01,
+  "invalid_geometry_policy": "make_valid for diagnostic measurements only; source coordinates unchanged",
+  "topology": {
+    "overlap_pairs_over_100m2": 20,
+    "pairwise_overlap_km2": 102.650407,
+    "largest_overlaps": [
+      {
+        "a": "Parkes",
+        "b": "Maranoa",
+        "km2": 21.615655
+      },
+      {
+        "a": "Barker",
+        "b": "Mallee",
+        "km2": 17.294771
+      },
+      {
+        "a": "Maranoa",
+        "b": "Grey",
+        "km2": 13.518427
+      },
+      {
+        "a": "Gwydir",
+        "b": "Maranoa",
+        "km2": 13.109766
+      },
+      {
+        "a": "Wakefield",
+        "b": "Mallee",
+        "km2": 12.015073
+      },
+      {
+        "a": "New England",
+        "b": "Maranoa",
+        "km2": 10.169891
+      },
+      {
+        "a": "Farrer",
+        "b": "Indi",
+        "km2": 6.342591
+      },
+      {
+        "a": "Eden-Monaro",
+        "b": "Gippsland",
+        "km2": 2.662918
+      },
+      {
+        "a": "Farrer",
+        "b": "Mallee",
+        "km2": 2.610301
+      },
+      {
+        "a": "Page",
+        "b": "Forde",
+        "km2": 0.912473
+      },
+      {
+        "a": "Farrer",
+        "b": "Murray",
+        "km2": 0.720348
+      },
+      {
+        "a": "Richmond",
+        "b": "Forde",
+        "km2": 0.711127
+      },
+      {
+        "a": "New England",
+        "b": "Forde",
+        "km2": 0.409966
+      },
+      {
+        "a": "Farrer",
+        "b": "Gippsland",
+        "km2": 0.254005
+      },
+      {
+        "a": "Richmond",
+        "b": "McPherson",
+        "km2": 0.222115
+      },
+      {
+        "a": "Fraser",
+        "b": "Gilmore",
+        "km2": 0.0395
+      },
+      {
+        "a": "Barker",
+        "b": "Wannon",
+        "km2": 0.024482
+      },
+      {
+        "a": "Grey",
+        "b": "Kalgoorlie",
+        "km2": 0.013865
+      },
+      {
+        "a": "Cook",
+        "b": "Kingsford Smith",
+        "km2": 0.002762
+      },
+      {
+        "a": "Parkes",
+        "b": "Grey",
+        "km2": 0.000371
+      }
+    ],
+    "enclosed_holes_over_100m2": 1827,
+    "enclosed_holes_km2": 236.82071,
+    "largest_enclosed_holes_km2": [
+      85.085473,
+      15.224902,
+      12.750395,
+      10.91151,
+      6.38184,
+      4.50005,
+      4.202894,
+      2.749202,
+      2.354245,
+      2.32303,
+      2.267709,
+      2.096148,
+      1.937896,
+      1.827657,
+      1.805813
+    ],
+    "union_km2": 7688745.362984
+  },
+  "comparison": {
+    "Adelaide": {
+      "state": "SA",
+      "handbook_km2": 70.820489,
+      "abs_km2": 70.887273,
+      "symmetric_difference_km2": 0.345979,
+      "symmetric_difference_pct_abs": 0.488069,
+      "intersection_over_union": 0.9951289
+    },
+    "Aston": {
+      "state": "VIC",
+      "handbook_km2": 100.923274,
+      "abs_km2": 101.913108,
+      "symmetric_difference_km2": 6.263692,
+      "symmetric_difference_pct_abs": 6.14611,
+      "intersection_over_union": 0.94008905
+    },
+    "Ballarat": {
+      "state": "VIC",
+      "handbook_km2": 8842.849778,
+      "abs_km2": 8695.951147,
+      "symmetric_difference_km2": 364.635721,
+      "symmetric_difference_pct_abs": 4.193167,
+      "intersection_over_union": 0.9592664
+    },
+    "Banks": {
+      "state": "NSW",
+      "handbook_km2": 54.468709,
+      "abs_km2": 54.42752,
+      "symmetric_difference_km2": 0.703636,
+      "symmetric_difference_pct_abs": 1.292795,
+      "intersection_over_union": 0.98715991
+    },
+    "Barker": {
+      "state": "SA",
+      "handbook_km2": 51971.249534,
+      "abs_km2": 52069.584973,
+      "symmetric_difference_km2": 331.951547,
+      "symmetric_difference_pct_abs": 0.637515,
+      "intersection_over_union": 0.99363912
+    },
+    "Barton": {
+      "state": "NSW",
+      "handbook_km2": 42.134677,
+      "abs_km2": 44.682881,
+      "symmetric_difference_km2": 3.902874,
+      "symmetric_difference_pct_abs": 8.734606,
+      "intersection_over_union": 0.91395822
+    },
+    "Bass": {
+      "state": "TAS",
+      "handbook_km2": 7351.92773,
+      "abs_km2": 7385.064538,
+      "symmetric_difference_km2": 64.697756,
+      "symmetric_difference_pct_abs": 0.876062,
+      "intersection_over_union": 0.99125806
+    },
+    "Batman": {
+      "state": "VIC",
+      "handbook_km2": 54.183489,
+      "abs_km2": 54.182335,
+      "symmetric_difference_km2": 1.085523,
+      "symmetric_difference_pct_abs": 2.003463,
+      "intersection_over_union": 0.98016428
+    },
+    "Bendigo": {
+      "state": "VIC",
+      "handbook_km2": 9924.718852,
+      "abs_km2": 9844.055399,
+      "symmetric_difference_km2": 386.04595,
+      "symmetric_difference_pct_abs": 3.921615,
+      "intersection_over_union": 0.96169195
+    },
+    "Bennelong": {
+      "state": "NSW",
+      "handbook_km2": 53.31211,
+      "abs_km2": 53.167116,
+      "symmetric_difference_km2": 0.716367,
+      "symmetric_difference_pct_abs": 1.347388,
+      "intersection_over_union": 0.98663439
+    },
+    "Berowra": {
+      "state": "NSW",
+      "handbook_km2": 711.63733,
+      "abs_km2": 765.391317,
+      "symmetric_difference_km2": 62.265632,
+      "symmetric_difference_pct_abs": 8.135137,
+      "intersection_over_union": 0.91909847
+    },
+    "Blair": {
+      "state": "QLD",
+      "handbook_km2": 15015.975725,
+      "abs_km2": 15087.253375,
+      "symmetric_difference_km2": 249.998733,
+      "symmetric_difference_pct_abs": 1.65702,
+      "intersection_over_union": 0.98352737
+    },
+    "Blaxland": {
+      "state": "NSW",
+      "handbook_km2": 54.078484,
+      "abs_km2": 54.026384,
+      "symmetric_difference_km2": 0.37726,
+      "symmetric_difference_pct_abs": 0.698289,
+      "intersection_over_union": 0.99304475
+    },
+    "Bonython": {
+      "state": "SA",
+      "handbook_km2": 274.37137,
+      "abs_km2": 252.149096,
+      "symmetric_difference_km2": 31.148727,
+      "symmetric_difference_pct_abs": 12.353297,
+      "intersection_over_union": 0.88828959
+    },
+    "Boothby": {
+      "state": "SA",
+      "handbook_km2": 119.213391,
+      "abs_km2": 117.44664,
+      "symmetric_difference_km2": 2.476954,
+      "symmetric_difference_pct_abs": 2.109004,
+      "intersection_over_union": 0.97928422
+    },
+    "Bowman": {
+      "state": "QLD",
+      "handbook_km2": 616.44224,
+      "abs_km2": 602.640899,
+      "symmetric_difference_km2": 19.906739,
+      "symmetric_difference_pct_abs": 3.303251,
+      "intersection_over_union": 0.96786618
+    },
+    "Braddon": {
+      "state": "TAS",
+      "handbook_km2": 11775.740331,
+      "abs_km2": 11778.394774,
+      "symmetric_difference_km2": 33.425371,
+      "symmetric_difference_pct_abs": 0.283785,
+      "intersection_over_union": 0.99716585
+    },
+    "Bradfield": {
+      "state": "NSW",
+      "handbook_km2": 96.554633,
+      "abs_km2": 96.573062,
+      "symmetric_difference_km2": 0.83196,
+      "symmetric_difference_pct_abs": 0.861483,
+      "intersection_over_union": 0.99142131
+    },
+    "Brand": {
+      "state": "WA",
+      "handbook_km2": 429.723297,
+      "abs_km2": 429.538194,
+      "symmetric_difference_km2": 1.970483,
+      "symmetric_difference_pct_abs": 0.458745,
+      "intersection_over_union": 0.99542404
+    },
+    "Brisbane": {
+      "state": "QLD",
+      "handbook_km2": 72.356652,
+      "abs_km2": 71.554586,
+      "symmetric_difference_km2": 2.617671,
+      "symmetric_difference_pct_abs": 3.658285,
+      "intersection_over_union": 0.96427093
+    },
+    "Bruce": {
+      "state": "VIC",
+      "handbook_km2": 64.121617,
+      "abs_km2": 64.032065,
+      "symmetric_difference_km2": 1.539566,
+      "symmetric_difference_pct_abs": 2.404367,
+      "intersection_over_union": 0.97625835
+    },
+    "Burke": {
+      "state": "VIC",
+      "handbook_km2": 3118.32078,
+      "abs_km2": 3104.520971,
+      "symmetric_difference_km2": 259.720814,
+      "symmetric_difference_pct_abs": 8.36589,
+      "intersection_over_union": 0.91987094
+    },
+    "Calare": {
+      "state": "NSW",
+      "handbook_km2": 21612.770356,
+      "abs_km2": 21612.55782,
+      "symmetric_difference_km2": 14.78752,
+      "symmetric_difference_pct_abs": 0.068421,
+      "intersection_over_union": 0.99931603
+    },
+    "Calwell": {
+      "state": "VIC",
+      "handbook_km2": 232.271357,
+      "abs_km2": 337.270808,
+      "symmetric_difference_km2": 123.206652,
+      "symmetric_difference_pct_abs": 36.530482,
+      "intersection_over_union": 0.64429632
+    },
+    "Canberra": {
+      "state": "ACT",
+      "handbook_km2": 1895.854462,
+      "abs_km2": 1898.44465,
+      "symmetric_difference_km2": 7.246259,
+      "symmetric_difference_pct_abs": 0.381695,
+      "intersection_over_union": 0.99618773
+    },
+    "Canning": {
+      "state": "WA",
+      "handbook_km2": 4174.553478,
+      "abs_km2": 4303.713527,
+      "symmetric_difference_km2": 139.342152,
+      "symmetric_difference_pct_abs": 3.237719,
+      "intersection_over_union": 0.96766106
+    },
+    "Capricornia": {
+      "state": "QLD",
+      "handbook_km2": 236349.028802,
+      "abs_km2": 235792.983247,
+      "symmetric_difference_km2": 4833.057796,
+      "symmetric_difference_pct_abs": 2.049704,
+      "intersection_over_union": 0.97973455
+    },
+    "Casey": {
+      "state": "VIC",
+      "handbook_km2": 407.23662,
+      "abs_km2": 408.272954,
+      "symmetric_difference_km2": 10.71913,
+      "symmetric_difference_pct_abs": 2.625481,
+      "intersection_over_union": 0.97405287
+    },
+    "Charlton": {
+      "state": "NSW",
+      "handbook_km2": 567.249496,
+      "abs_km2": 663.450849,
+      "symmetric_difference_km2": 98.435311,
+      "symmetric_difference_pct_abs": 14.836866,
+      "intersection_over_union": 0.85188072
+    },
+    "Chifley": {
+      "state": "NSW",
+      "handbook_km2": 109.913197,
+      "abs_km2": 120.195149,
+      "symmetric_difference_km2": 19.864766,
+      "symmetric_difference_pct_abs": 16.527095,
+      "intersection_over_union": 0.84106478
+    },
+    "Chisholm": {
+      "state": "VIC",
+      "handbook_km2": 59.308115,
+      "abs_km2": 59.311226,
+      "symmetric_difference_km2": 1.239411,
+      "symmetric_difference_pct_abs": 2.089674,
+      "intersection_over_union": 0.97931881
+    },
+    "Cook": {
+      "state": "NSW",
+      "handbook_km2": 188.712218,
+      "abs_km2": 184.741109,
+      "symmetric_difference_km2": 6.008426,
+      "symmetric_difference_pct_abs": 3.252349,
+      "intersection_over_union": 0.96833185
+    },
+    "Corangamite": {
+      "state": "VIC",
+      "handbook_km2": 7596.799895,
+      "abs_km2": 7468.588791,
+      "symmetric_difference_km2": 194.313198,
+      "symmetric_difference_pct_abs": 2.601739,
+      "intersection_over_union": 0.9745325
+    },
+    "Corio": {
+      "state": "VIC",
+      "handbook_km2": 807.623258,
+      "abs_km2": 799.280649,
+      "symmetric_difference_km2": 25.299449,
+      "symmetric_difference_pct_abs": 3.165277,
+      "intersection_over_union": 0.96899964
+    },
+    "Cowan": {
+      "state": "WA",
+      "handbook_km2": 195.225421,
+      "abs_km2": 195.4993,
+      "symmetric_difference_km2": 1.062063,
+      "symmetric_difference_pct_abs": 0.543257,
+      "intersection_over_union": 0.99457836
+    },
+    "Cowper": {
+      "state": "NSW",
+      "handbook_km2": 7691.452936,
+      "abs_km2": 7706.06797,
+      "symmetric_difference_km2": 23.131449,
+      "symmetric_difference_pct_abs": 0.300172,
+      "intersection_over_union": 0.99699994
+    },
+    "Cunningham": {
+      "state": "NSW",
+      "handbook_km2": 489.695093,
+      "abs_km2": 401.753552,
+      "symmetric_difference_km2": 104.722477,
+      "symmetric_difference_pct_abs": 26.066347,
+      "intersection_over_union": 0.78975003
+    },
+    "Curtin": {
+      "state": "WA",
+      "handbook_km2": 89.488805,
+      "abs_km2": 88.413165,
+      "symmetric_difference_km2": 1.594908,
+      "symmetric_difference_pct_abs": 1.803926,
+      "intersection_over_union": 0.98222913
+    },
+    "Dawson": {
+      "state": "QLD",
+      "handbook_km2": 22172.57189,
+      "abs_km2": 22034.841099,
+      "symmetric_difference_km2": 2034.09685,
+      "symmetric_difference_pct_abs": 9.231275,
+      "intersection_over_union": 0.91202291
+    },
+    "Deakin": {
+      "state": "VIC",
+      "handbook_km2": 58.947666,
+      "abs_km2": 58.378402,
+      "symmetric_difference_km2": 1.706546,
+      "symmetric_difference_pct_abs": 2.923249,
+      "intersection_over_union": 0.97132642
+    },
+    "Denison": {
+      "state": "TAS",
+      "handbook_km2": 221.731207,
+      "abs_km2": 221.577223,
+      "symmetric_difference_km2": 1.517604,
+      "symmetric_difference_pct_abs": 0.68491,
+      "intersection_over_union": 0.99317664
+    },
+    "Dickson": {
+      "state": "QLD",
+      "handbook_km2": 749.024366,
+      "abs_km2": 749.39195,
+      "symmetric_difference_km2": 18.494625,
+      "symmetric_difference_pct_abs": 2.467951,
+      "intersection_over_union": 0.97561541
+    },
+    "Dobell": {
+      "state": "NSW",
+      "handbook_km2": 951.653703,
+      "abs_km2": 877.089956,
+      "symmetric_difference_km2": 79.360817,
+      "symmetric_difference_pct_abs": 9.048196,
+      "intersection_over_union": 0.91681712
+    },
+    "Dunkley": {
+      "state": "VIC",
+      "handbook_km2": 122.987254,
+      "abs_km2": 124.990934,
+      "symmetric_difference_km2": 7.751611,
+      "symmetric_difference_pct_abs": 6.201739,
+      "intersection_over_union": 0.93937655
+    },
+    "Eden-Monaro": {
+      "state": "NSW",
+      "handbook_km2": 30990.098132,
+      "abs_km2": 30953.696004,
+      "symmetric_difference_km2": 56.623251,
+      "symmetric_difference_pct_abs": 0.182929,
+      "intersection_over_union": 0.99817346
+    },
+    "Fadden": {
+      "state": "QLD",
+      "handbook_km2": 590.440501,
+      "abs_km2": 590.053418,
+      "symmetric_difference_km2": 13.088369,
+      "symmetric_difference_pct_abs": 2.218167,
+      "intersection_over_union": 0.97806876
+    },
+    "Fairfax": {
+      "state": "QLD",
+      "handbook_km2": 4267.647504,
+      "abs_km2": 3957.350777,
+      "symmetric_difference_km2": 435.886201,
+      "symmetric_difference_pct_abs": 11.014596,
+      "intersection_over_union": 0.89934372
+    },
+    "Farrer": {
+      "state": "NSW",
+      "handbook_km2": 96830.03119,
+      "abs_km2": 96938.842875,
+      "symmetric_difference_km2": 140.902376,
+      "symmetric_difference_pct_abs": 0.145352,
+      "intersection_over_union": 0.99854672
+    },
+    "Fisher": {
+      "state": "QLD",
+      "handbook_km2": 523.065656,
+      "abs_km2": 562.11192,
+      "symmetric_difference_km2": 67.411534,
+      "symmetric_difference_pct_abs": 11.992547,
+      "intersection_over_union": 0.88302591
+    },
+    "Flinders": {
+      "state": "VIC",
+      "handbook_km2": 2082.91425,
+      "abs_km2": 2044.798218,
+      "symmetric_difference_km2": 114.999849,
+      "symmetric_difference_pct_abs": 5.624019,
+      "intersection_over_union": 0.94578947
+    },
+    "Forde": {
+      "state": "QLD",
+      "handbook_km2": 4842.722489,
+      "abs_km2": 4813.690549,
+      "symmetric_difference_km2": 113.290697,
+      "symmetric_difference_pct_abs": 2.35351,
+      "intersection_over_union": 0.97680775
+    },
+    "Forrest": {
+      "state": "WA",
+      "handbook_km2": 21142.394888,
+      "abs_km2": 21142.464592,
+      "symmetric_difference_km2": 11.855171,
+      "symmetric_difference_pct_abs": 0.056073,
+      "intersection_over_union": 0.99943943
+    },
+    "Fowler": {
+      "state": "NSW",
+      "handbook_km2": 47.396452,
+      "abs_km2": 47.180682,
+      "symmetric_difference_km2": 0.689864,
+      "symmetric_difference_pct_abs": 1.462175,
+      "intersection_over_union": 0.98551724
+    },
+    "Franklin": {
+      "state": "TAS",
+      "handbook_km2": 7947.73606,
+      "abs_km2": 6458.321802,
+      "symmetric_difference_km2": 1534.203136,
+      "symmetric_difference_pct_abs": 23.755446,
+      "intersection_over_union": 0.8075059
+    },
+    "Fraser": {
+      "state": "ACT",
+      "handbook_km2": 532.896387,
+      "abs_km2": 534.849445,
+      "symmetric_difference_km2": 7.940896,
+      "symmetric_difference_pct_abs": 1.484698,
+      "intersection_over_union": 0.98523567
+    },
+    "Fremantle": {
+      "state": "WA",
+      "handbook_km2": 199.336777,
+      "abs_km2": 199.272975,
+      "symmetric_difference_km2": 2.072849,
+      "symmetric_difference_pct_abs": 1.040206,
+      "intersection_over_union": 0.98965341
+    },
+    "Gellibrand": {
+      "state": "VIC",
+      "handbook_km2": 75.427969,
+      "abs_km2": 73.432136,
+      "symmetric_difference_km2": 4.99475,
+      "symmetric_difference_pct_abs": 6.801858,
+      "intersection_over_union": 0.93507192
+    },
+    "Gilmore": {
+      "state": "NSW",
+      "handbook_km2": 5719.411478,
+      "abs_km2": 5613.15451,
+      "symmetric_difference_km2": 129.215741,
+      "symmetric_difference_pct_abs": 2.302016,
+      "intersection_over_union": 0.97745277
+    },
+    "Gippsland": {
+      "state": "VIC",
+      "handbook_km2": 35522.450394,
+      "abs_km2": 35639.708836,
+      "symmetric_difference_km2": 475.910412,
+      "symmetric_difference_pct_abs": 1.335338,
+      "intersection_over_union": 0.98671348
+    },
+    "Goldstein": {
+      "state": "VIC",
+      "handbook_km2": 49.031649,
+      "abs_km2": 48.771577,
+      "symmetric_difference_km2": 0.713143,
+      "symmetric_difference_pct_abs": 1.46221,
+      "intersection_over_union": 0.98552235
+    },
+    "Grayndler": {
+      "state": "NSW",
+      "handbook_km2": 29.290095,
+      "abs_km2": 29.370956,
+      "symmetric_difference_km2": 0.449022,
+      "symmetric_difference_pct_abs": 1.528798,
+      "intersection_over_union": 0.98480724
+    },
+    "Greenway": {
+      "state": "NSW",
+      "handbook_km2": 119.684637,
+      "abs_km2": 118.384952,
+      "symmetric_difference_km2": 1.905059,
+      "symmetric_difference_pct_abs": 1.609207,
+      "intersection_over_union": 0.98412283
+    },
+    "Grey": {
+      "state": "SA",
+      "handbook_km2": 897866.438551,
+      "abs_km2": 903316.832246,
+      "symmetric_difference_km2": 5592.970285,
+      "symmetric_difference_pct_abs": 0.619159,
+      "intersection_over_union": 0.9938089
+    },
+    "Griffith": {
+      "state": "QLD",
+      "handbook_km2": 123.407899,
+      "abs_km2": 123.486762,
+      "symmetric_difference_km2": 1.579115,
+      "symmetric_difference_pct_abs": 1.278773,
+      "intersection_over_union": 0.98728949
+    },
+    "Groom": {
+      "state": "QLD",
+      "handbook_km2": 6410.329423,
+      "abs_km2": 6416.274441,
+      "symmetric_difference_km2": 156.239789,
+      "symmetric_difference_pct_abs": 2.435055,
+      "intersection_over_union": 0.97593135
+    },
+    "Gwydir": {
+      "state": "NSW",
+      "handbook_km2": 185413.612234,
+      "abs_km2": 184773.816153,
+      "symmetric_difference_km2": 683.423619,
+      "symmetric_difference_pct_abs": 0.36987,
+      "intersection_over_union": 0.99631449
+    },
+    "Hasluck": {
+      "state": "WA",
+      "handbook_km2": 226.973568,
+      "abs_km2": 226.172078,
+      "symmetric_difference_km2": 3.45287,
+      "symmetric_difference_pct_abs": 1.526656,
+      "intersection_over_union": 0.98487568
+    },
+    "Herbert": {
+      "state": "QLD",
+      "handbook_km2": 3007.41726,
+      "abs_km2": 2965.100997,
+      "symmetric_difference_km2": 166.967068,
+      "symmetric_difference_pct_abs": 5.631075,
+      "intersection_over_union": 0.94560877
+    },
+    "Higgins": {
+      "state": "VIC",
+      "handbook_km2": 38.592298,
+      "abs_km2": 38.832363,
+      "symmetric_difference_km2": 0.601034,
+      "symmetric_difference_pct_abs": 1.547765,
+      "intersection_over_union": 0.98459395
+    },
+    "Hindmarsh": {
+      "state": "SA",
+      "handbook_km2": 62.801389,
+      "abs_km2": 62.771693,
+      "symmetric_difference_km2": 0.350288,
+      "symmetric_difference_pct_abs": 0.558035,
+      "intersection_over_union": 0.99443649
+    },
+    "Hinkler": {
+      "state": "QLD",
+      "handbook_km2": 15246.043989,
+      "abs_km2": 15395.852383,
+      "symmetric_difference_km2": 407.52534,
+      "symmetric_difference_pct_abs": 2.646981,
+      "intersection_over_union": 0.97374989
+    },
+    "Holt": {
+      "state": "VIC",
+      "handbook_km2": 106.386152,
+      "abs_km2": 93.616467,
+      "symmetric_difference_km2": 17.64673,
+      "symmetric_difference_pct_abs": 18.850028,
+      "intersection_over_union": 0.83784256
+    },
+    "Hotham": {
+      "state": "VIC",
+      "handbook_km2": 71.76122,
+      "abs_km2": 71.555293,
+      "symmetric_difference_km2": 0.987655,
+      "symmetric_difference_pct_abs": 1.380268,
+      "intersection_over_union": 0.98631149
+    },
+    "Hughes": {
+      "state": "NSW",
+      "handbook_km2": 265.018993,
+      "abs_km2": 269.392657,
+      "symmetric_difference_km2": 5.939338,
+      "symmetric_difference_pct_abs": 2.204714,
+      "intersection_over_union": 0.97801674
+    },
+    "Hume": {
+      "state": "NSW",
+      "handbook_km2": 25943.6328,
+      "abs_km2": 25941.953382,
+      "symmetric_difference_km2": 37.089343,
+      "symmetric_difference_pct_abs": 0.142971,
+      "intersection_over_union": 0.99857136
+    },
+    "Hunter": {
+      "state": "NSW",
+      "handbook_km2": 10587.306217,
+      "abs_km2": 10582.578698,
+      "symmetric_difference_km2": 12.251218,
+      "symmetric_difference_pct_abs": 0.115768,
+      "intersection_over_union": 0.99884325
+    },
+    "Indi": {
+      "state": "VIC",
+      "handbook_km2": 23953.517089,
+      "abs_km2": 23916.451422,
+      "symmetric_difference_km2": 334.893585,
+      "symmetric_difference_pct_abs": 1.400265,
+      "intersection_over_union": 0.9861054
+    },
+    "Isaacs": {
+      "state": "VIC",
+      "handbook_km2": 179.050653,
+      "abs_km2": 200.022383,
+      "symmetric_difference_km2": 25.90333,
+      "symmetric_difference_pct_abs": 12.950215,
+      "intersection_over_union": 0.87207486
+    },
+    "Jagajaga": {
+      "state": "VIC",
+      "handbook_km2": 83.700129,
+      "abs_km2": 77.942746,
+      "symmetric_difference_km2": 7.938078,
+      "symmetric_difference_pct_abs": 10.184498,
+      "intersection_over_union": 0.90638008
+    },
+    "Kalgoorlie": {
+      "state": "WA",
+      "handbook_km2": 2295354.968257,
+      "abs_km2": 2295263.728106,
+      "symmetric_difference_km2": 354.033616,
+      "symmetric_difference_pct_abs": 0.015425,
+      "intersection_over_union": 0.99984577
+    },
+    "Kennedy": {
+      "state": "QLD",
+      "handbook_km2": 562811.887282,
+      "abs_km2": 553716.953527,
+      "symmetric_difference_km2": 11676.961422,
+      "symmetric_difference_pct_abs": 2.108832,
+      "intersection_over_union": 0.97929994
+    },
+    "Kingsford Smith": {
+      "state": "NSW",
+      "handbook_km2": 89.80277,
+      "abs_km2": 59.375785,
+      "symmetric_difference_km2": 30.9499,
+      "symmetric_difference_pct_abs": 52.125458,
+      "intersection_over_union": 0.65635746
+    },
+    "Kingston": {
+      "state": "SA",
+      "handbook_km2": 169.717282,
+      "abs_km2": 171.4489,
+      "symmetric_difference_km2": 4.764179,
+      "symmetric_difference_pct_abs": 2.778775,
+      "intersection_over_union": 0.97245585
+    },
+    "Kooyong": {
+      "state": "VIC",
+      "handbook_km2": 49.022375,
+      "abs_km2": 49.237415,
+      "symmetric_difference_km2": 1.039401,
+      "symmetric_difference_pct_abs": 2.110999,
+      "intersection_over_union": 0.97906526
+    },
+    "La Trobe": {
+      "state": "VIC",
+      "handbook_km2": 554.540996,
+      "abs_km2": 528.5816,
+      "symmetric_difference_km2": 74.153897,
+      "symmetric_difference_pct_abs": 14.028846,
+      "intersection_over_union": 0.87184757
+    },
+    "Lalor": {
+      "state": "VIC",
+      "handbook_km2": 656.226181,
+      "abs_km2": 616.534536,
+      "symmetric_difference_km2": 146.531494,
+      "symmetric_difference_pct_abs": 23.766956,
+      "intersection_over_union": 0.79351469
+    },
+    "Leichhardt": {
+      "state": "QLD",
+      "handbook_km2": 149625.977767,
+      "abs_km2": 158468.764688,
+      "symmetric_difference_km2": 9403.94433,
+      "symmetric_difference_pct_abs": 5.934257,
+      "intersection_over_union": 0.94076231
+    },
+    "Lilley": {
+      "state": "QLD",
+      "handbook_km2": 139.411302,
+      "abs_km2": 139.243882,
+      "symmetric_difference_km2": 2.014264,
+      "symmetric_difference_pct_abs": 1.446573,
+      "intersection_over_union": 0.98564672
+    },
+    "Lindsay": {
+      "state": "NSW",
+      "handbook_km2": 350.698159,
+      "abs_km2": 352.377038,
+      "symmetric_difference_km2": 2.775201,
+      "symmetric_difference_pct_abs": 0.787566,
+      "intersection_over_union": 0.99213658
+    },
+    "Lingiari": {
+      "state": "NT",
+      "handbook_km2": 1347643.137622,
+      "abs_km2": 1347875.089053,
+      "symmetric_difference_km2": 700.916561,
+      "symmetric_difference_pct_abs": 0.052002,
+      "intersection_over_union": 0.99948007
+    },
+    "Longman": {
+      "state": "QLD",
+      "handbook_km2": 1987.148777,
+      "abs_km2": 1957.753796,
+      "symmetric_difference_km2": 88.633137,
+      "symmetric_difference_pct_abs": 4.527287,
+      "intersection_over_union": 0.95605189
+    },
+    "Lowe": {
+      "state": "NSW",
+      "handbook_km2": 48.843898,
+      "abs_km2": 40.870283,
+      "symmetric_difference_km2": 8.308996,
+      "symmetric_difference_pct_abs": 20.330166,
+      "intersection_over_union": 0.83046874
+    },
+    "Lyne": {
+      "state": "NSW",
+      "handbook_km2": 9283.489553,
+      "abs_km2": 9268.191259,
+      "symmetric_difference_km2": 22.510348,
+      "symmetric_difference_pct_abs": 0.242877,
+      "intersection_over_union": 0.99757617
+    },
+    "Lyons": {
+      "state": "TAS",
+      "handbook_km2": 40667.221813,
+      "abs_km2": 42171.627583,
+      "symmetric_difference_km2": 1564.613035,
+      "symmetric_difference_pct_abs": 3.710108,
+      "intersection_over_union": 0.96292538
+    },
+    "Macarthur": {
+      "state": "NSW",
+      "handbook_km2": 572.606557,
+      "abs_km2": 584.080257,
+      "symmetric_difference_km2": 13.187961,
+      "symmetric_difference_pct_abs": 2.257902,
+      "intersection_over_union": 0.97745406
+    },
+    "Mackellar": {
+      "state": "NSW",
+      "handbook_km2": 229.125487,
+      "abs_km2": 229.30031,
+      "symmetric_difference_km2": 1.240488,
+      "symmetric_difference_pct_abs": 0.540988,
+      "intersection_over_union": 0.99460266
+    },
+    "Macquarie": {
+      "state": "NSW",
+      "handbook_km2": 4195.006599,
+      "abs_km2": 4194.848762,
+      "symmetric_difference_km2": 6.638589,
+      "symmetric_difference_pct_abs": 0.158256,
+      "intersection_over_union": 0.99841872
+    },
+    "Makin": {
+      "state": "SA",
+      "handbook_km2": 109.776352,
+      "abs_km2": 107.799061,
+      "symmetric_difference_km2": 2.630501,
+      "symmetric_difference_pct_abs": 2.440189,
+      "intersection_over_union": 0.97610871
+    },
+    "Mallee": {
+      "state": "VIC",
+      "handbook_km2": 66570.793901,
+      "abs_km2": 66572.953956,
+      "symmetric_difference_km2": 527.474733,
+      "symmetric_difference_pct_abs": 0.792326,
+      "intersection_over_union": 0.99210788
+    },
+    "Maranoa": {
+      "state": "QLD",
+      "handbook_km2": 649133.777873,
+      "abs_km2": 650382.689681,
+      "symmetric_difference_km2": 2377.397228,
+      "symmetric_difference_pct_abs": 0.365538,
+      "intersection_over_union": 0.99634779
+    },
+    "Maribyrnong": {
+      "state": "VIC",
+      "handbook_km2": 64.241297,
+      "abs_km2": 64.347094,
+      "symmetric_difference_km2": 5.065762,
+      "symmetric_difference_pct_abs": 7.872557,
+      "intersection_over_union": 0.92419597
+    },
+    "Mayo": {
+      "state": "SA",
+      "handbook_km2": 2050.170767,
+      "abs_km2": 1994.105821,
+      "symmetric_difference_km2": 208.383671,
+      "symmetric_difference_pct_abs": 10.449981,
+      "intersection_over_union": 0.90199844
+    },
+    "McEwen": {
+      "state": "VIC",
+      "handbook_km2": 14325.440743,
+      "abs_km2": 14192.046494,
+      "symmetric_difference_km2": 706.361981,
+      "symmetric_difference_pct_abs": 4.977168,
+      "intersection_over_union": 0.95165853
+    },
+    "McMillan": {
+      "state": "VIC",
+      "handbook_km2": 5737.543662,
+      "abs_km2": 5959.777503,
+      "symmetric_difference_km2": 350.106901,
+      "symmetric_difference_pct_abs": 5.874496,
+      "intersection_over_union": 0.94187857
+    },
+    "McPherson": {
+      "state": "QLD",
+      "handbook_km2": 380.660086,
+      "abs_km2": 435.427715,
+      "symmetric_difference_km2": 63.971459,
+      "symmetric_difference_pct_abs": 14.691637,
+      "intersection_over_union": 0.85462011
+    },
+    "Melbourne": {
+      "state": "VIC",
+      "handbook_km2": 54.164191,
+      "abs_km2": 54.440709,
+      "symmetric_difference_km2": 1.295471,
+      "symmetric_difference_pct_abs": 2.379599,
+      "intersection_over_union": 0.97642463
+    },
+    "Melbourne Ports": {
+      "state": "VIC",
+      "handbook_km2": 43.809405,
+      "abs_km2": 43.361444,
+      "symmetric_difference_km2": 1.247169,
+      "symmetric_difference_pct_abs": 2.876216,
+      "intersection_over_union": 0.97178926
+    },
+    "Menzies": {
+      "state": "VIC",
+      "handbook_km2": 116.854613,
+      "abs_km2": 117.035383,
+      "symmetric_difference_km2": 5.630968,
+      "symmetric_difference_pct_abs": 4.811338,
+      "intersection_over_union": 0.95298142
+    },
+    "Mitchell": {
+      "state": "NSW",
+      "handbook_km2": 182.056595,
+      "abs_km2": 184.844978,
+      "symmetric_difference_km2": 4.272394,
+      "symmetric_difference_pct_abs": 2.311339,
+      "intersection_over_union": 0.97697902
+    },
+    "Moncrieff": {
+      "state": "QLD",
+      "handbook_km2": 185.334685,
+      "abs_km2": 181.442194,
+      "symmetric_difference_km2": 17.109538,
+      "symmetric_difference_pct_abs": 9.429746,
+      "intersection_over_union": 0.91086145
+    },
+    "Moore": {
+      "state": "WA",
+      "handbook_km2": 78.494328,
+      "abs_km2": 78.441633,
+      "symmetric_difference_km2": 0.753676,
+      "symmetric_difference_pct_abs": 0.960811,
+      "intersection_over_union": 0.99044103
+    },
+    "Moreton": {
+      "state": "QLD",
+      "handbook_km2": 107.504668,
+      "abs_km2": 107.466182,
+      "symmetric_difference_km2": 1.2868,
+      "symmetric_difference_pct_abs": 1.1974,
+      "intersection_over_union": 0.98809938
+    },
+    "Murray": {
+      "state": "VIC",
+      "handbook_km2": 15911.179845,
+      "abs_km2": 15989.809165,
+      "symmetric_difference_km2": 327.291209,
+      "symmetric_difference_pct_abs": 2.046874,
+      "intersection_over_union": 0.97968919
+    },
+    "New England": {
+      "state": "NSW",
+      "handbook_km2": 53798.527713,
+      "abs_km2": 53798.501586,
+      "symmetric_difference_km2": 36.503616,
+      "symmetric_difference_pct_abs": 0.067852,
+      "intersection_over_union": 0.99932171
+    },
+    "Newcastle": {
+      "state": "NSW",
+      "handbook_km2": 198.408979,
+      "abs_km2": 206.30044,
+      "symmetric_difference_km2": 15.813568,
+      "symmetric_difference_pct_abs": 7.66531,
+      "intersection_over_union": 0.92479095
+    },
+    "North Sydney": {
+      "state": "NSW",
+      "handbook_km2": 42.059353,
+      "abs_km2": 38.687506,
+      "symmetric_difference_km2": 4.11877,
+      "symmetric_difference_pct_abs": 10.646255,
+      "intersection_over_union": 0.90293431
+    },
+    "O'Connor": {
+      "state": "WA",
+      "handbook_km2": 179053.461851,
+      "abs_km2": 179038.844558,
+      "symmetric_difference_km2": 57.680421,
+      "symmetric_difference_pct_abs": 0.032217,
+      "intersection_over_union": 0.9996779
+    },
+    "Oxley": {
+      "state": "QLD",
+      "handbook_km2": 679.330337,
+      "abs_km2": 671.697986,
+      "symmetric_difference_km2": 24.557612,
+      "symmetric_difference_pct_abs": 3.65605,
+      "intersection_over_union": 0.96429505
+    },
+    "Page": {
+      "state": "NSW",
+      "handbook_km2": 16668.145659,
+      "abs_km2": 16647.566718,
+      "symmetric_difference_km2": 32.717695,
+      "symmetric_difference_pct_abs": 0.196531,
+      "intersection_over_union": 0.99803783
+    },
+    "Parkes": {
+      "state": "NSW",
+      "handbook_km2": 268468.769387,
+      "abs_km2": 269082.756975,
+      "symmetric_difference_km2": 692.522919,
+      "symmetric_difference_pct_abs": 0.257364,
+      "intersection_over_union": 0.99742673
+    },
+    "Parramatta": {
+      "state": "NSW",
+      "handbook_km2": 61.330266,
+      "abs_km2": 60.30343,
+      "symmetric_difference_km2": 1.492473,
+      "symmetric_difference_pct_abs": 2.474938,
+      "intersection_over_union": 0.97575702
+    },
+    "Paterson": {
+      "state": "NSW",
+      "handbook_km2": 9626.123469,
+      "abs_km2": 9623.116556,
+      "symmetric_difference_km2": 27.496778,
+      "symmetric_difference_pct_abs": 0.285737,
+      "intersection_over_union": 0.99714715
+    },
+    "Pearce": {
+      "state": "WA",
+      "handbook_km2": 26251.32896,
+      "abs_km2": 26255.760974,
+      "symmetric_difference_km2": 14.86257,
+      "symmetric_difference_pct_abs": 0.056607,
+      "intersection_over_union": 0.99943404
+    },
+    "Perth": {
+      "state": "WA",
+      "handbook_km2": 73.588603,
+      "abs_km2": 73.645171,
+      "symmetric_difference_km2": 0.559227,
+      "symmetric_difference_pct_abs": 0.759354,
+      "intersection_over_union": 0.99243229
+    },
+    "Petrie": {
+      "state": "QLD",
+      "handbook_km2": 149.21094,
+      "abs_km2": 152.548638,
+      "symmetric_difference_km2": 6.675961,
+      "symmetric_difference_pct_abs": 4.376284,
+      "intersection_over_union": 0.95671082
+    },
+    "Port Adelaide": {
+      "state": "SA",
+      "handbook_km2": 282.615498,
+      "abs_km2": 235.741353,
+      "symmetric_difference_km2": 65.247892,
+      "symmetric_difference_pct_abs": 27.677746,
+      "intersection_over_union": 0.77639698
+    },
+    "Prospect": {
+      "state": "NSW",
+      "handbook_km2": 158.686783,
+      "abs_km2": 148.903593,
+      "symmetric_difference_km2": 23.60713,
+      "symmetric_difference_pct_abs": 15.853969,
+      "intersection_over_union": 0.8574438
+    },
+    "Rankin": {
+      "state": "QLD",
+      "handbook_km2": 151.224775,
+      "abs_km2": 152.463419,
+      "symmetric_difference_km2": 4.196621,
+      "symmetric_difference_pct_abs": 2.752543,
+      "intersection_over_union": 0.97273902
+    },
+    "Reid": {
+      "state": "NSW",
+      "handbook_km2": 62.988677,
+      "abs_km2": 62.277857,
+      "symmetric_difference_km2": 2.17333,
+      "symmetric_difference_pct_abs": 3.489732,
+      "intersection_over_union": 0.96589245
+    },
+    "Richmond": {
+      "state": "NSW",
+      "handbook_km2": 2134.1063,
+      "abs_km2": 2146.749616,
+      "symmetric_difference_km2": 17.898164,
+      "symmetric_difference_pct_abs": 0.833733,
+      "intersection_over_union": 0.99167286
+    },
+    "Riverina": {
+      "state": "NSW",
+      "handbook_km2": 44963.018461,
+      "abs_km2": 44963.494959,
+      "symmetric_difference_km2": 18.603535,
+      "symmetric_difference_pct_abs": 0.041375,
+      "intersection_over_union": 0.99958634
+    },
+    "Robertson": {
+      "state": "NSW",
+      "handbook_km2": 784.750995,
+      "abs_km2": 744.922027,
+      "symmetric_difference_km2": 67.108512,
+      "symmetric_difference_pct_abs": 9.008797,
+      "intersection_over_union": 0.91594528
+    },
+    "Ryan": {
+      "state": "QLD",
+      "handbook_km2": 238.952509,
+      "abs_km2": 243.15069,
+      "symmetric_difference_km2": 10.224732,
+      "symmetric_difference_pct_abs": 4.205101,
+      "intersection_over_union": 0.95846373
+    },
+    "Scullin": {
+      "state": "VIC",
+      "handbook_km2": 105.504058,
+      "abs_km2": 87.83777,
+      "symmetric_difference_km2": 18.498619,
+      "symmetric_difference_pct_abs": 21.059982,
+      "intersection_over_union": 0.82535329
+    },
+    "Shortland": {
+      "state": "NSW",
+      "handbook_km2": 303.536904,
+      "abs_km2": 269.024691,
+      "symmetric_difference_km2": 161.565697,
+      "symmetric_difference_pct_abs": 60.056085,
+      "intersection_over_union": 0.55984283
+    },
+    "Solomon": {
+      "state": "NT",
+      "handbook_km2": 325.42703,
+      "abs_km2": 314.617534,
+      "symmetric_difference_km2": 108.060998,
+      "symmetric_difference_pct_abs": 34.346782,
+      "intersection_over_union": 0.71110762
+    },
+    "Stirling": {
+      "state": "WA",
+      "handbook_km2": 76.333656,
+      "abs_km2": 77.291963,
+      "symmetric_difference_km2": 1.580722,
+      "symmetric_difference_pct_abs": 2.045131,
+      "intersection_over_union": 0.9796307
+    },
+    "Sturt": {
+      "state": "SA",
+      "handbook_km2": 66.308658,
+      "abs_km2": 66.270837,
+      "symmetric_difference_km2": 0.473534,
+      "symmetric_difference_pct_abs": 0.714544,
+      "intersection_over_union": 0.99288202
+    },
+    "Swan": {
+      "state": "WA",
+      "handbook_km2": 108.546341,
+      "abs_km2": 108.613105,
+      "symmetric_difference_km2": 1.974908,
+      "symmetric_difference_pct_abs": 1.818297,
+      "intersection_over_union": 0.98197537
+    },
+    "Sydney": {
+      "state": "NSW",
+      "handbook_km2": 60.141424,
+      "abs_km2": 33.618559,
+      "symmetric_difference_km2": 26.735233,
+      "symmetric_difference_pct_abs": 79.525219,
+      "intersection_over_union": 0.55624408
+    },
+    "Tangney": {
+      "state": "WA",
+      "handbook_km2": 69.976358,
+      "abs_km2": 69.801561,
+      "symmetric_difference_km2": 1.289199,
+      "symmetric_difference_pct_abs": 1.846948,
+      "intersection_over_union": 0.98172219
+    },
+    "Throsby": {
+      "state": "NSW",
+      "handbook_km2": 389.632717,
+      "abs_km2": 465.15623,
+      "symmetric_difference_km2": 96.912362,
+      "symmetric_difference_pct_abs": 20.834368,
+      "intersection_over_union": 0.7963387
+    },
+    "Wakefield": {
+      "state": "SA",
+      "handbook_km2": 31145.451761,
+      "abs_km2": 25776.740679,
+      "symmetric_difference_km2": 5466.098282,
+      "symmetric_difference_pct_abs": 21.205545,
+      "intersection_over_union": 0.82477166
+    },
+    "Wannon": {
+      "state": "VIC",
+      "handbook_km2": 29712.081966,
+      "abs_km2": 30014.759577,
+      "symmetric_difference_km2": 432.332238,
+      "symmetric_difference_pct_abs": 1.440399,
+      "intersection_over_union": 0.98562706
+    },
+    "Warringah": {
+      "state": "NSW",
+      "handbook_km2": 62.32807,
+      "abs_km2": 55.552335,
+      "symmetric_difference_km2": 7.419716,
+      "symmetric_difference_pct_abs": 13.356262,
+      "intersection_over_union": 0.8815689
+    },
+    "Watson": {
+      "state": "NSW",
+      "handbook_km2": 33.073145,
+      "abs_km2": 33.259485,
+      "symmetric_difference_km2": 0.632929,
+      "symmetric_difference_pct_abs": 1.903004,
+      "intersection_over_union": 0.98109687
+    },
+    "Wentworth": {
+      "state": "NSW",
+      "handbook_km2": 26.11482,
+      "abs_km2": 26.079187,
+      "symmetric_difference_km2": 0.514756,
+      "symmetric_difference_pct_abs": 1.973819,
+      "intersection_over_union": 0.98046792
+    },
+    "Werriwa": {
+      "state": "NSW",
+      "handbook_km2": 168.353795,
+      "abs_km2": 167.406534,
+      "symmetric_difference_km2": 1.62427,
+      "symmetric_difference_pct_abs": 0.970255,
+      "intersection_over_union": 0.99037141
+    },
+    "Wide Bay": {
+      "state": "QLD",
+      "handbook_km2": 54159.05939,
+      "abs_km2": 54137.882391,
+      "symmetric_difference_km2": 1162.668441,
+      "symmetric_difference_pct_abs": 2.147606,
+      "intersection_over_union": 0.97875621
+    },
+    "Wills": {
+      "state": "VIC",
+      "handbook_km2": 51.687688,
+      "abs_km2": 51.764387,
+      "symmetric_difference_km2": 0.750325,
+      "symmetric_difference_pct_abs": 1.449501,
+      "intersection_over_union": 0.98559869
+    }
+  },
+  "shared_boundary_pairs": {
+    "Kennedy/Leichhardt": {
+      "individual_difference_km2": 11676.961422,
+      "pair_union_difference_km2": 2510.790822
+    },
+    "Grey/Wakefield": {
+      "individual_difference_km2": 5592.970285,
+      "pair_union_difference_km2": 389.091281
+    },
+    "Lyons/Franklin": {
+      "individual_difference_km2": 1564.613035,
+      "pair_union_difference_km2": 106.313533
+    }
+  }
+}
