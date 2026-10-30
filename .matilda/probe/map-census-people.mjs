@@ -156,7 +156,8 @@ const y1996 = await page.evaluate(async () => {
 });
 ok("1996 legend shows the early-floor copy", /start at the 2001 election/.test(y1996), y1996.slice(0, 160));
 
-// 4b. 2010 is inside the floor now: venue lanes on the 2006 census, no income lanes
+// 4b. 2010 sits inside the lifted income floor: venue lanes on the
+// interp blend, the income pair IS in the optgroup
 await page.goto("about:blank");
 await page.goto(`${base}/map/#y=2010&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
@@ -174,11 +175,12 @@ const y2010 = await page.evaluate(async () => {
 });
 ok("2010 basis is venue", y2010.basis === "venue", y2010.basis);
 ok("2010 legend cites the 2006 census", /2006 and 2011 censuses/.test(y2010.note), y2010.note.slice(0, 140));
-ok("2010 People optgroup drops the income lanes",
-  y2010.people && y2010.people.length === 12 && !y2010.people.includes("loinc") && !y2010.people.includes("hiinc"),
+ok("2010 People optgroup carries the income lanes",
+  y2010.people && y2010.people.length === 14 && y2010.people.includes("loinc") && y2010.people.includes("hiinc"),
   JSON.stringify(y2010.people));
 
-// 4c. an income deep link on 2010 shows the income-start copy, not a figure
+// 4c. an income deep link on 2010 shows the interp income copy: the
+// two bracketing editions' cuts span-named in census-year dollars
 await page.goto("about:blank");
 await page.goto(`${base}/map/#y=2010&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
@@ -188,10 +190,38 @@ const lo2010 = await page.evaluate(async () => {
   await new Promise((r) => setTimeout(r, 500));
   return (document.querySelector(".lg-note") || {}).textContent || "";
 });
-ok("2010 income lane shows the income-start copy", /Income figures start at the 2013 election/.test(lo2010), lo2010.slice(0, 160));
+ok("2010 income lane shows the interp income copy (2010 between the 2006 and 2011 censuses)",
+  /earning under \$604–\$738 a week \(census-year dollars\)/.test(lo2010), lo2010.slice(0, 190));
+
+// 4d. the lifted floor's own ends: 2001's single 2001-census cuts and 2004's 2001/2006 span
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2001&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const lo2001 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[2001].ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return (document.querySelector(".lg-note") || {}).textContent || "";
+});
+ok("2001 income lane shows the single-edition 2001 cut",
+  /earning under \$456 a week \(2001 dollars\)/.test(lo2001), lo2001.slice(0, 190));
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2004&l=seifa&i=hiinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const hi2004 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[2004].ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return (document.querySelector(".lg-note") || {}).textContent || "";
+});
+ok("2004 income lane shows the nearest-side $3,000 edge",
+  /earning \$3,000 or more a week \(census-year dollars\)/.test(hi2004), hi2004.slice(0, 190));
 
 mark("section 4 done");
 // 5. booth story on 2013 carries venue 'who' phrasing and an Income row WITHOUT a median
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2013&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
 const booth = await page.evaluate(async () => {
   const m = window.__map;
   m.setYear(2013);

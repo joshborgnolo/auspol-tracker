@@ -48,6 +48,13 @@ Cell map (all Persons columns; see the xls descriptor):
        (B7155 technicians & trades, B7159 machinery operators &
        drivers, B7160 labourers = the blue numerator), B7161 =
        inadequately described / not stated (out of frame)
+  B26: B4319,B4324,.. (step 5) = the 15 family-income Tot cells
+       (Negative/Nil then the 14 stated bands), B4315,B4320,B4325,..
+       (step 5, four cells each) = the band x four-family-type mix
+  B28: B4415,B4418,B4421,.. (step 3) = the 15 household-band Tot
+       cells (Negative/Nil + 14 stated bands; partial-stated
+       B4458-60 and all-not-stated B4461-63 verified for the
+       identity and kept out of every lane basis)
 
 Guards fail loud (header drift, CD-key drift, universe drift,
 division-set drift). Run:  python3 .build/analysis/seat-model/derive-booth-demo-2006.py
@@ -72,6 +79,15 @@ m25 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(m25)
 fail = m25.fail
 hash16 = m25.hash16
+
+_spec = importlib.util.spec_from_file_location("ilanes", SM / "income_lanes.py")
+ilanes = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(ilanes)
+income_factors = ilanes.income_factors
+income_engine = ilanes.engine
+income_band_median = lambda masses: ilanes.band_median(  # noqa: E731
+    masses, ilanes.INC_BANDS_06)
+INC_BANDS06 = ilanes.INC_BANDS_06
 
 ABS = ROOT / ".matilda/seifa-irsad-abs"
 BCP_ZIP = ABS / "dl/census06bcp.zip"
@@ -141,6 +157,17 @@ B24_FAM = ["B4243", "B4223", "B4233", "B4244", "B4245"]
 B32_TEN = ["B4531", "B4537", "B4579", "B4549", "B4585", "B4591"]
 # own-outright, being-purchased, rented-total, S/T housing authority,
 # other-tenure-type, tenure-NS
+# ---- income: B26 family income by composition + B28 household income
+# ---- (14 stated bands, Negative/Nil counted with the $1-$149 band at
+# ---- read time like the 2011 reader; partial/all-not-stated out of
+# ---- frame, verified against the table's own printed Total)
+B28_TOT = ["B4415"] + [f"B{4418 + 3 * i}" for i in range(14)]
+B26_TOT = [f"B{4319 + 5 * j}" for j in range(15)]
+B26_MIX = [f"B{4315 + 5 * j + k}" for j in range(15) for k in range(4)]
+B28_PART = ["B4458", "B4459", "B4460"]      # partial, by household type
+B28_NOSTAT = ["B4461", "B4462", "B4463"]    # all not stated
+B28_GRAND = "B4466"                          # table Total, households
+B26_GRAND = "B4404"                          # fi Total row, its Total col
 # the cross-era key orders the whole lane stack shares
 REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
             "isl", "hind", "jew"]
@@ -249,6 +276,58 @@ def load_bcp():
     return out
 
 
+def income_rows06():
+    """per CD: (hh14, fi14, mix14x4) — the B28 household-band Tots and
+    B26 family-band Tots with Negative/Nil folded into the $1-$149 band
+    (the 2011 reader's fold), mix the four-family-type rows. The
+    within-table identities reconcile per CD: each band's Tot
+    recomposes its four types, and stated + partial-stated +
+    all-not-stated recompose each table's printed Total — everything
+    inside the BCP's measured ±cell perturbation."""
+    b28 = bcp_table("B28", B28_TOT + B28_PART + B28_NOSTAT + [B28_GRAND])
+    b26 = bcp_table("B26", B26_TOT + B26_MIX + [B26_GRAND])
+    if set(b26) != set(b28):
+        fail("B26/B28 CD sets diverge")
+    rows = {}
+    for code, r28 in b28.items():
+        r26 = b26[code]
+        hh_raw = [int(v) for v in r28[:15]]
+        fi_raw = [int(v) for v in r26[:15]]
+        part = int(r28[17])               # Total-col partial-stated
+        nost = int(r28[20])               # Total-col all-not-stated
+        grand28 = int(r28[21])            # printed Total households
+        if abs(sum(hh_raw) + part + nost - grand28) > 12:
+            fail(f"B28 identity tripped at {code}: {sum(hh_raw)}+"
+                 f"{part}+{nost} vs {grand28}")
+        mix = [int(v) for v in r26[15:75]]
+        if abs(sum(fi_raw) - sum(mix)) > 12:
+            fail(f"B26 band-vs-mix identity tripped at {code}")
+        # B26's printed Total (B4404) carries its own partial-stated /
+        # all-not-stated households, rows which sit outside this
+        # reader's lanes — the band-vs-mix line identity above is the
+        # tight check the crop keeps
+        hh = [hh_raw[0] + hh_raw[1]] + hh_raw[2:]
+        fi = [fi_raw[0] + fi_raw[1]] + fi_raw[2:]
+        mrows = [[mix[0 + k] + mix[4 + k] for k in range(4)]] + \
+                [[mix[8 + g * 4 + k] for k in range(4)]
+                 for g in range(13)]
+        rows[code] = (hh, fi, mrows)
+    return rows
+
+
+def income06():
+    """the 2006-census income lanes: (per-CD engine map, nat cut,
+    nat hi share) — see income_lanes.py for the recipe (mirrors the
+    2011/GCP-era lanes; the $3,000+ top band is this edition's
+    hi edge)."""
+    ad, nonfam = income_factors()
+    inc, cut, his = income_engine(income_rows06(), INC_BANDS06,
+                                  ad, nonfam, "06")
+    print(f"income: B26/B28 CD, national 25% cut ${cut:.0f}/wk; "
+          f"top band {his:.4f} of adults")
+    return inc, cut, his
+
+
 def bounded(num, den):
     """A share of an ex-not-stated basis: none when the basis is empty,
     and none when BCP perturbation of a tiny CD takes the arithmetic
@@ -257,6 +336,20 @@ def bounded(num, den):
         return None
     v = num / den
     return round(v, 4) if 0 <= v <= 1 else None
+
+
+def income_shares(rec, bands=None):
+    """the income arm of a demo block from a rec carrying incT/incLo/
+    incHi (adult masses) and incHH (pooled household band masses):
+    the 25th-percentile-cut share, the top-band share and the
+    band-interpolated household-income median."""
+    if rec.get("incT") is None:
+        return {}
+    tsum = rec["incT"]
+    med = income_band_median(rec["incHH"]) if rec.get("incHH") else None
+    return {"loinc": bounded(rec["incLo"], tsum),
+            "hiinc": bounded(rec["incHi"], tsum),
+            "incMed": round(med) if med is not None else None}
 
 
 def shares(rec):
@@ -298,10 +391,11 @@ def shares(rec):
     if rec.get("cobn") is not None:
         out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
                       for i, k in enumerate(COB_KEYS8)}
+    out.update(income_shares(rec))
     return out
 
 
-def build_year(year, sa1):
+def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
     """One election's store off the shared BCP table."""
     venue_path = VENUE[year]
     alloc_path = ALLOC[year]
@@ -336,7 +430,10 @@ def build_year(year, sa1):
                                   "relvec": [0] * len(REL_KEYS),
                                   "relNS": 0, "relTot": 0,
                                   "ten6": [0] * 6,
-                                  "famN": 0, "famD": 0})
+                                  "famN": 0, "famD": 0,
+                                  "incT": 0.0, "incLo": 0.0,
+                                  "incHi": 0.0,
+                                  "incHH": [0] * len(INC_BANDS06)})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -358,6 +455,13 @@ def build_year(year, sa1):
             acc[k] += r[k]
         for i in range(len(REL_KEYS)):
             acc["relvec"][i] += r["relvec"][i]
+        inc = inc_map.get(key)
+        if inc is not None:
+            acc["incT"] += inc[0]
+            acc["incLo"] += inc[1]
+            acc["incHi"] += inc[2]
+            for i in range(len(INC_BANDS06)):
+                acc["incHH"][i] += inc[4][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -376,6 +480,7 @@ def build_year(year, sa1):
             geo_empty += 1
             rec["demo"] = None
         else:
+            inc = inc_map.get(vb.get("geo"))
             rec["demo"] = shares({
                 "pers": row["pers"], "bands": list(row["ages"]),
                 "eng": row["eng"], "oth": row["oth"],
@@ -390,7 +495,9 @@ def build_year(year, sa1):
                 "relvec": list(row["relvec"]),
                 "relNS": row["relNS"], "relTot": row["relTot"],
                 "ten6": list(row["ten6"]),
-                "famN": row["famN"], "famD": row["famD"]})
+                "famN": row["famN"], "famD": row["famD"],
+                **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHH": list(inc[4])} if inc else {})})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -415,6 +522,11 @@ def build_year(year, sa1):
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
+        for k in ("incT", "incLo", "incHi"):
+            nat[k] += dv[k]
+        for i in range(len(INC_BANDS06)):
+            nat.setdefault("incHH", [0] * len(INC_BANDS06))
+            nat["incHH"][i] += dv["incHH"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -460,6 +572,9 @@ def build_year(year, sa1):
                              / (nat["ten6"][0] + nat["ten6"][1]
                                 + nat["ten6"][2] + nat["ten6"][4]), 4)
                     for k in TEN_KEYS},
+            "loinc": round(nat["incLo"] / nat["incT"], 4),
+            "hiinc": round(nat["incHi"] / nat["incT"], 4),
+            "incMed": round(income_band_median(nat["incHH"])),
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -493,7 +608,28 @@ def build_year(year, sa1):
             "trimmed to eight here (country order in cobKeys); "
             "university (bachelor and above) "
             "per the aged-15+ population less "
-            "level-of-education-not-stated; the new lane set mirrors "
+            "level-of-education-not-stated; income lanes mirror the "
+            "voter stores on the BCP's own tables: B28 households by "
+            "the 14-band weekly household-income grid are re-weighted "
+            "to ADULTS at the data/income-dist.json factors (each "
+            "band's family share from B26's family-income Tot over its "
+            "family-composition mix in the CD — national mix as "
+            "fallback — the rest non-family at the national mean; "
+            "household mass rides the Tot columns, never B28's "
+            "fam/non columns, small-CD perturbation independently "
+            "shaving the splits; partial-stated and all-not-stated "
+            "households sit outside the basis). loinc is the adult "
+            "share below the national 25th-percentile weekly "
+            "household-income cut the store-level incomeCuts record "
+            "carries (the 2006 national adults histogram's cut band "
+            "split linearly, in 2006 dollars), hiinc the adult share "
+            "in the $3,000-and-top band (this edition's hi edge — the "
+            "page's own dollar wording reads incomeCuts.hiEdgeWeekly "
+            "per year), incMed the band-interpolated median weekly "
+            "household income in 2006 dollars on the HOUSEHOLD basis "
+            "(ABS's own published-median basis — the adults-weighted "
+            "histogram would read a few hundred dollars higher, "
+            "skewed by couples). The new lane set mirrors "
             "the voter stores: B15_B's highest-year-of-schooling six "
             "levels (year-12-or-less over the stated levels), "
             "Indigenous status of B01's total over persons ex "
@@ -527,7 +663,7 @@ def build_year(year, sa1):
             "sourceUrls": {
                 "bcp": "ABS 2006 Census Basic Community Profile, "
                        "collection districts (B01/B07/B09/B12/B13/"
-                       "B15_B/B24/B32/B39_B/B44_B), "
+                       "B15_B/B24/B26/B28/B32/B39_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
                 "venue": f"data/booth-seifa-{year}.json",
@@ -547,6 +683,15 @@ def build_year(year, sa1):
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),
+        "incomeCuts": {
+            "loQuantile": ilanes.INC_LO_Q,
+            "loCutWeekly": inc_cut,
+            "hiEdgeWeekly": INC_BANDS06[-1][0],
+            "hiNationalShare": inc_hishare,
+            "dollarsYear": 2006,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+        },
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,
@@ -556,8 +701,9 @@ def build_year(year, sa1):
 
 def main():
     sa1 = load_bcp()
+    inc_map, inc_cut, inc_hishare = income06()
     for year in (2007, 2010):
-        out = build_year(year, sa1)
+        out = build_year(year, sa1, inc_map, inc_cut, inc_hishare)
         c = out["counts"]
         op = ROOT / f"data/booth-demo-{year}.json"
         op.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n",

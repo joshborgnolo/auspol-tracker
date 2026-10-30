@@ -168,7 +168,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // the stats-era floor: no census people lanes and no SEIFA anywhere on the frame
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, null, "1996 has no census people basis");
-    assert.equal(f.incomeCuts, null, "the income floor stays 2013 everywhere the frame reaches");
+    assert.equal(f.incomeCuts, null, "1996 has no incomeCuts (the floor is the 2001 election)");
     assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "1996 SEIFA cuts stay null");
   }
   assert.ok(!D.divs.some((d) => d.demo), "no 1996 division carries a census demo row");
@@ -230,12 +230,13 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // the census People lanes of the floor year: the measured 2001 census
   // joined to its own election (derive-booth-demo-2001-frame.py over
   // cd-2001-ced-2001set.json, pinned by test-booth-demo-2001-frame.mjs) —
-  // the interp era begins at 2004, income stays floored at 2013, and the
-  // 2001-era sub-CED SEIFA milestone keeps the seifa lanes null
+  // the interp era begins at 2004, every year from here carries its
+  // own edition's income cuts, and the 2001-era sub-CED SEIFA milestone
+  // keeps the seifa lanes null
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, "venue", "2001 census basis is the venue-proxy read");
     assert.ok(!f.demoInterp, "2001 is measured-only (no interp record)");
-    assert.equal(f.incomeCuts, null, "the income floor stays 2013");
+    assert.ok(f.incomeCuts && f.incomeCuts.hiEdgeWeekly === 2000 && f.incomeCuts.dollarsYear === 2001 && !f.incomeCuts.sides, "2001 incomeCuts: the 2001 edition's $2,000+ edge in 2001 dollars, single-edition (no sides)");
     assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "2001 SEIFA cuts stay null");
   }
   assert.ok(D.divs.every((d) => d.demo), "all 150 divisions carry a census demo row");
@@ -301,10 +302,26 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     // its object-valued cob key 2026-10-28)
     assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
-  // income's 2013 floor survives the blend: 2007/2010 carry no cuts
-  // record, and 2016/2019 name THEIR bracketing epochs in sides
+  // every interp year rides the income cuts of the nearest census
+  // side (hi edges differ across the 2001/2006/2011 grids, so the hi
+  // lane pins to the nearest side's edition — the res file carries
+  // its year-appropriate incomeCutsI with both sides named)
+  const CUTS_I = {
+    2004: [3000, 2006, [2001, 2006]],
+    2007: [3000, 2006, [2006, 2011]],
+    2010: [4000, 2011, [2006, 2011]],
+    2013: [4000, 2011, [2011, 2016]],
+    2016: [4000, 2016, [2011, 2016]],
+    2019: [4000, 2021, [2016, 2021]],
+  };
+  for (const [y, [edge, dollars]] of Object.entries(CUTS_I)) {
+    const rc = JSON.parse(R(`map/data/res-${y}.json`)).incomeCuts;
+    assert.ok(rc && rc.hiEdgeWeekly === edge && rc.dollarsYear === dollars, `${y} incomeCuts: nearest-side ${edge} edge in ${dollars} dollars`);
+  }
+  const r04 = JSON.parse(R("map/data/res-2004.json"));
+  assert.ok(r04.incomeCuts.sides && r04.incomeCuts.sides["2001"] && r04.incomeCuts.sides["2006"], "2004 incomeCuts names its 2001/2006 bracketing editions in sides");
   const r10 = JSON.parse(R("map/data/res-2010.json"));
-  assert.ok(r10.incomeCuts === null, "2010 incomeCuts stays null (income floor 2013)");
+  assert.ok(r10.incomeCuts.sides && r10.incomeCuts.sides["2006"] && r10.incomeCuts.sides["2011"], "2010 incomeCuts names its 2006/2011 bracketing editions in sides");
   const r19 = JSON.parse(R("map/data/res-2019.json"));
   assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
   // the birthplace menu matrix: every census-edition year lists its own

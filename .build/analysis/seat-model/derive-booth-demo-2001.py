@@ -28,9 +28,11 @@ Transport, Labourers} onto the ANZSCO 3/7/8 lane the later censuses
 read — the/definitional wobble name in _about; the ABS reported the
 two classifications as broadly comparable.
 
-No income lanes (the repo's income floor stays at the 2013 election —
-the blend keeps that floor; the store carries no incomeCuts and its
-demo blocks carry no loinc/hiinc/income-median keys).
+The income lanes ride the BCP's own B 30 family-income and B 31
+household-income tables through income_lanes.py's shared engine —
+the same recipe the GCP-era runs on the G31/G33 inner grids, lifted
+by hand onto the 2001 12-band edition whose top printed edge is
+$2,000-or-more (the store's incomeCuts.hiEdgeWeekly carries the edge).
 
 Guards fail loud (booth-set drift vs the venue store, division-name
 drift, allocation universe drift against the gateway population check,
@@ -78,6 +80,11 @@ OUT = ROOT / "data/booth-demo-2004.json"
 STATE_ORDER = d13.STATE_ORDER
 BANDS = d13.BANDS
 
+_spec = importlib.util.spec_from_file_location("ilanes", SM / "income_lanes.py")
+ilanes = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(ilanes)
+INC_BANDS01 = ilanes.INC_BANDS_01
+
 
 def load_tally():
     d = json.loads(TALLY.read_text())["tally"]
@@ -109,6 +116,25 @@ def load_tally():
 
 def main():
     people = load_tally()
+    # the 2001-edition income lanes over the same tally (B 30 the
+    # family-income x type grid, B 31 the household grid), engine rows
+    # per 2001 CD, era guard set 01 — see income_lanes.py's recipe
+    inc_rows = {}
+    for code, r in people.items():
+        if not r.get("fiTot01"):
+            continue
+        fi, hh, mixraw = r["fiTot01"], r["hiTot01"], r["fiMix01"]
+        inc_rows[code] = (
+            [hh[0] + hh[1]] + hh[2:],
+            [fi[0] + fi[1]] + fi[2:],
+            [[mixraw[0 + k] + mixraw[4 + k] for k in range(4)]] +
+            [[mixraw[8 + g * 4 + k] for k in range(4)]
+             for g in range(11)])
+    ad, nonfam = ilanes.income_factors()
+    inc_map, inc_cut, inc_hishare = ilanes.engine(
+        inc_rows, INC_BANDS01, ad, nonfam, "01")
+    print(f"income: B 30/B 31 CD, {len(inc_rows)} rows, national 25% "
+          f"cut ${inc_cut:.0f}/wk; top band {inc_hishare:.4f} of adults")
     alloc_d = json.loads(ALLOC.read_text())
     alloc = alloc_d["alloc"]
     if alloc_d.get("unit") != "CD_CODE_2001":
@@ -136,7 +162,10 @@ def main():
                                   "rel01": [0] * len(REL_KEYS_01),
                                   "relNS": 0, "relTot": 0,
                                   "ten01": [0] * 6,
-                                  "famN": 0, "famD": 0})
+                                  "famN": 0, "famD": 0,
+                                  "incT": 0.0, "incLo": 0.0,
+                                  "incHi": 0.0,
+                                  "incHH": [0] * len(INC_BANDS01)})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -164,6 +193,13 @@ def main():
         acc["famD"] += r["fam01"][4]
         acc["indig"] += r["ind01"]
         acc["indigDen"] += r["b1Persons"] - r["b1ov"]
+        inc = inc_map.get(code)
+        if inc is not None:
+            acc["incT"] += inc[0]
+            acc["incLo"] += inc[1]
+            acc["incHi"] += inc[2]
+            for i in range(len(INC_BANDS01)):
+                acc["incHH"][i] += inc[4][i]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     def shares(rec):
@@ -209,6 +245,16 @@ def main():
                         for k in TEN_KEYS}
         if rec.get("famN") is not None and rec.get("famD"):
             s["onepar"] = round(rec["famN"] / rec["famD"], 4)
+        if rec.get("incT") is not None and rec["incT"] > 0:
+            tsum = rec["incT"]
+            lo, hi = rec["incLo"], rec["incHi"]
+            s["loinc"] = round(lo / tsum, 4) if 0 <= lo / tsum <= 1 \
+                else None
+            s["hiinc"] = round(hi / tsum, 4) if 0 <= hi / tsum <= 1 \
+                else None
+            med = ilanes.band_median(rec["incHH"], INC_BANDS01) \
+                if rec.get("incHH") else None
+            s["incMed"] = round(med) if med is not None else None
         if rec.get("cobn") is not None:
             # the birthplace menu: shares on the same stated-birthplace
             # basis as fborn itself (Never the blend's — cob rides the
@@ -237,6 +283,11 @@ def main():
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
+        for k in ("incT", "incLo", "incHi"):
+            nat[k] += dv[k]
+        for i in range(len(INC_BANDS01)):
+            nat.setdefault("incHH", [0] * len(INC_BANDS01))
+            nat["incHH"][i] += dv["incHH"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -268,6 +319,9 @@ def main():
                          / (nat["ten01"][0] + nat["ten01"][1]
                             + nat["ten01"][2] + nat["ten01"][4]), 4)
                 for k in TEN_KEYS},
+        "loinc": round(nat["incLo"] / nat["incT"], 4),
+        "hiinc": round(nat["incHi"] / nat["incT"], 4),
+        "incMed": round(ilanes.band_median(nat["incHH"], INC_BANDS01)),
     }
     # measured-once pin (first verified run): the tally's own total
     # (18,652,828) less the 8,249 people in the dropped offshore class
@@ -297,8 +351,10 @@ def main():
                            "langOther": None, "fborn": None, "uni": None,
                            "blue": None, "age": None,
                            "y12less": None, "atsci": None, "u15": None,
-                           "onepar": None, "rel": None, "ten": None}
+                           "onepar": None, "rel": None, "ten": None,
+                           "loinc": None, "hiinc": None, "incMed": None}
         else:
+            inc = inc_map.get(str(key))
             rec["demo"] = shares({
                 "pers": r["pers"], "bands": r["bands"],
                 "eng": r["eng"], "oth": r["oth"],
@@ -314,7 +370,9 @@ def main():
                 "relTot": r.get("rel01tot"),
                 "ten01": r.get("ten01"),
                 "famN": r.get("fam01", [0] * 5)[2],
-                "famD": r.get("fam01", [0] * 5)[4]})
+                "famD": r.get("fam01", [0] * 5)[4],
+                **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHH": list(inc[4])} if inc else {})})
             if rec["demo"] is None:
                 geo_empty += 1
         out_booths.append(rec)
@@ -394,11 +452,23 @@ def main():
         "(the /map/ Born-overseas country menu: whole-UK leading as eng "
         "leads the 2021-era menu, then the era's eight); the interp "
         "blend's demoI never carries a cob key — cob is read measured, "
-        "never blended. No income lanes: the repo's income floor stays at the 2013 "
-        "election, so this store carries no incomeCuts record and its "
-        "demo blocks carry no income keys; 2007-and-later years ride "
-        "the SEIFA-excluded-turnout voter-games lane or the "
-        "intercensal blends.")
+        "never blended. Income lanes ride the BCP's own B 30/B 31 "
+        "tables through the shared income engine (income_lanes.py — "
+        "the GCP-era recipe verbatim on this edition's own grids): "
+        "B 31's 12-band weekly household-income histogram re-weighted "
+        "to ADULTS at the data/income-dist.json factors (each band's "
+        "family share from B 30's Tot over the band's family-type mix "
+        "— national mix as fallback — Negative/Nil households folding "
+        "into the $1-$199 band, partial-stated and all-not-stated "
+        "kept out of every basis); loinc the adult share below the "
+        "national 25th-percentile weekly household-income cut of the "
+        "incomeCuts record (2001 dollars), hiinc the adult share in "
+        "the $2,000-or-more top band — this edition's hi edge, lower "
+        "capped than later censuses' $3,000+/$4,000+ tops (the page's "
+        "own wording reads the store's incomeCuts.hiEdgeWeekly), "
+        "incMed the band-interpolated median weekly household income "
+        "in 2001 dollars on the HOUSEHOLD basis (ABS's own "
+        "published-median basis).")
     out = {
         "_about": about,
         "_provenance": {
@@ -434,6 +504,15 @@ def main():
             "venue-CD lookup per booth (the venue seifa store's own "
             "2001-CD geo of the premises); exact CD sum per division "
             "(cd-2001-ced-2003ed)"),
+        "incomeCuts": {
+            "loQuantile": ilanes.INC_LO_Q,
+            "loCutWeekly": inc_cut,
+            "hiEdgeWeekly": INC_BANDS01[-1][0],
+            "hiNationalShare": inc_hishare,
+            "dollarsYear": 2001,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+        },
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

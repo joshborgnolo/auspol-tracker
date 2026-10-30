@@ -10,8 +10,8 @@
    green emission):
 
    1. Store header: election 2001, censusEdition 2001, no demoInterp
-      record anywhere (never a blend), no income keys anywhere (the
-      repo's income floor is the 2013 election).
+      record anywhere (never a blend); income keys live via the
+      shared 2001-edition engine (B 30/B 31, $2,000+ top edge).
    2. Universe: 7,701 booths in the venue store's exact order; CD-join
       classes 6,311 inherited from the 2004 store / 738 pointed
       point-in-polygon / 4 pip-miss / 143 suburb-tier null /
@@ -49,23 +49,38 @@ const d = JSON.parse(readFileSync("data/booth-demo-2001.json", "utf8"));
 const alloc = JSON.parse(readFileSync(
   ".build/analysis/seat-model/seifa-src/cd-2001-ced-2001set.json", "utf8"));
 
-// 1. header + never-a-blend / no-income contracts
+// 1. header + never-a-blend contracts + the 2001-edition incomeCuts
 eq([d.election, d.censusEdition], [2001, 2001],
   "the frame store reads its own election on its own census");
 ok(!("demoInterp" in d) && !("demoI" in d),
   "measured-only: no interp record on the store");
 {
-  let interp = 0, income = 0;
-  for (const b of d.booths) {
-    interp += ("demoI" in b);
-    if (b.demo) income += ["loinc", "hiinc", "incMed"].filter((k) => k in b.demo).length;
-  }
-  for (const x of d.divisions) {
-    interp += ("demoI" in x);
-    income += ["loinc", "hiinc", "medIncWeekly"].filter((k) => k in x).length;
-  }
+  let interp = 0;
+  for (const b of d.booths) interp += ("demoI" in b);
+  for (const x of d.divisions) interp += ("demoI" in x);
   ok(interp === 0, "no demoI rows anywhere (measured-only)");
-  ok(income === 0, "no income keys anywhere (income floor 2013)");
+}
+eq(d.incomeCuts, {
+  loQuantile: 0.25, loCutWeekly: 456.13, hiEdgeWeekly: 2000,
+  hiNationalShare: 0.103255, dollarsYear: 2001,
+  adultsWeights: "data/income-dist.json",
+  medianBasis: "households (shares are per-adult)",
+}, "frame incomeCuts (2001 edition: $2,000+ top edge)");
+{
+  let incBlocks = 0, incNull = 0, badShare = 0;
+  for (const b of d.booths) {
+    if (!b.demo) continue;
+    if (b.demo.loinc != null || b.demo.incMed != null) incBlocks++;
+    if (b.demo.langOther !== null &&
+        (b.demo.loinc === null && b.demo.incMed === null)) incNull++;
+    for (const k of ["loinc", "hiinc"]) {
+      const v = b.demo[k];
+      if (v != null && !(v >= 0 && v <= 1)) badShare++;
+    }
+  }
+  ok(incBlocks > 0 && incNull === 0 && !badShare,
+    `income lanes live on every full-table join block ` +
+    `(${incBlocks} with, ${incNull} full-table holes, ${badShare} bad)`);
 }
 
 // 2. store universe + the join-class ledger
@@ -93,6 +108,7 @@ eq(c.national, {
     hind: 0.0057, jew: 0.005,
   },
   ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
+  loinc: 0.2502, hiinc: 0.1033, incMed: 786,
 }, "national == the 2004 lane's figure (same tally, same offshore drop)");
 // booth order == the venue store's
 {
