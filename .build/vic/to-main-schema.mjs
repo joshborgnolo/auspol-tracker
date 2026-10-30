@@ -171,6 +171,8 @@ export function vicToMain(src) {
       tpp_lnp: r.tpp2 && r.tpp2.alp != null ? Math.round((100 - r.tpp2.alp) * 10) / 10 : null,
       ...(r.approxDate ? { approxDate: true, dateLabel: r.dateLabel } : {}),
       url: r.sourceUrl || null,
+      ...(r.releaseUrl ? { releaseUrl: r.releaseUrl } : {}),
+      ...(r.methodUrl ? { methodUrl: r.methodUrl } : {}),
     };
     polls.push(row);
     if (r.alt && (r.alt.alpVOnp != null || r.alt.lnpVOnp != null))

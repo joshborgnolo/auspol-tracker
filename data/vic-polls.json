@@ -682,7 +682,8 @@
       "provenance": [
         "wikipedia"
       ],
-      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759"
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/21147945/VictoriaNewspollMethodologyStatement4July2025byPyxis-ERkRECzjo-nwRMCedeDmJQ.pdf"
     },
     {
       "firmRaw": "RedBridge/Accent",
@@ -912,7 +913,8 @@
       "provenance": [
         "wikipedia"
       ],
-      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d"
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/21147947/VictoriaNewspollMethodologyStatement22November2025byPyxis-O-Bx84l2rALbg8q7-aBVGA.pdf"
     },
     {
       "firmRaw": "Freshwater",
@@ -988,7 +990,9 @@
       "provenance": [
         "wikipedia"
       ],
-      "sourceUrl": "https://www.afr.com/politics/voters-see-vic-politics-as-the-deeply-unpopular-versus-the-untested-20251210-p5nmiw"
+      "sourceUrl": "https://www.afr.com/politics/voters-see-vic-politics-as-the-deeply-unpopular-versus-the-untested-20251210-p5nmiw",
+      "releaseUrl": "https://www.accent-research.com/projects/the-redbridge-group-and-accent-research-victorian-state-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93776caca33441709a5306c51d97b7d4.pdf"
     },
     {
       "firmRaw": "DemosAU/Premier National",
@@ -1123,7 +1127,9 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://web.archive.org/web/20260308055403/https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf"
+      "sourceUrl": "https://web.archive.org/web/20260308055403/https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf",
+      "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-victorian-public-opinion-snapshot",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf"
     },
     {
       "firmRaw": "Freshwater",
@@ -1415,7 +1421,8 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94"
+      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/27115671/VictoriaNewspollMethodologyStatement28July2026byPyxis--fa7boZO3lDIKy_xyBs9NA.pdf"
     },
     {
       "firmRaw": "RedBridge/Accent",
@@ -1442,7 +1449,9 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll"
+      "sourceUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll",
+      "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_dca98962b02540e08b82dc3734482169.pdf"
     },
     {
       "firmRaw": "Freshwater",
@@ -1604,7 +1613,9 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll"
+      "sourceUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll",
+      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_046899eb40cd4f509fc7325fece7440f.pdf"
     },
     {
       "firmRaw": "DemosAU/Premier National",
@@ -1685,7 +1696,9 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e"
+      "sourceUrl": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e",
+      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-october-2026-victorian-state-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_52f25d79262b4f219cefe48f6983c41b.pdf"
     },
     {
       "firmRaw": "Resolve",
@@ -1737,7 +1750,8 @@
         "wikipedia",
         "electiontracker"
       ],
-      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec"
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/28885773/VictoriaNewspollMethodologyStatement26October2026byPyxis-pBBqdFZRLovuHeSHQef6CQ.pdf"
     }
   ],
   "threeParty": [
