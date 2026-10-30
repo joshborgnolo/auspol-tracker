@@ -103,12 +103,9 @@ const CENSUS01_COB_KEYS = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita"
 for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
 }
-{ // the 1996 federal frame (.build/map/README-era recipes: extract-asgc1996-ced.py over
-  // data.gov.au's asgc1996 gpkg, pack-1996-booth.py + pack-1996-senate.py from the
-  // statistics CD-ROM's divs/hcands/htpp/dop-1996 with no pps roll (1996 carries only
-  // PPSNUM96 counts; HPPDOP prints piles+Vote Distributed so the flow lanes restate
-  // that table verbatim), derive-1996-venues.py's short-name+prefix inherits at 85.2%
-  // coverage, the handbook caches refreshed full (1812 senate-service).
+{ // 1996: AEC statistics-pack results, Handbook polygons and the common
+  // historical_booth_locations.py matcher. README-history.md documents the
+  // source limitations and superseded ABS/venue matching recipes.
   for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "1996 lane " + f + " on disk");
   assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 venue store (derive-1996-venues.py) is on disk");
   const D = JSON.parse(R("map/data/res-1996.json"));
@@ -162,7 +159,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 16, "the booth lane is the columnar 16 lanes (no census demo or birthplace rows on a stats-era frame)");
+  assert.equal(Object.keys(D.booths).length, 17, "16 result lanes plus approximate-location provenance; no census demo or birthplace rows");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");

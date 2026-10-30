@@ -81,13 +81,38 @@ https://www.aec.gov.au/About_AEC/Publications/statistics/files/aec-1993-1996-199
   The AEC's codes distinguish the local Greens parties from similarly
   abbreviated unrelated groups. The full party names are kept on cards.
 
-No modern coordinates are assigned to the 8,431 named 1993 or 8,311 named
-1998 House places/teams. They can be searched and their recorded votes
-read, but there are no invented map markers. Reused 1993 hospital-team
-names are aggregated under their printed name. The existing 1996 location
-estimates remain explicitly described as approximate; changing the
-boundary does not make those estimates historical premises records.
-Census/SEIFA information remains unavailable for these years.
+`historical_booth_locations.py` assigns approximate locations to the three
+frames from committed AEC venue records for 2007–2025. The 2004 store's
+coordinates were themselves inherited from 2007, so it is not presented
+as an earlier coordinate source. Every match retains its source year,
+division, booth ID, booth name, venue and original coordinates in
+`data/booth-locations-history.json`; source files and boundaries are hashed.
+
+Names are state-scoped, normalized for punctuation/spacing and Mt/Mount,
+and stripped of their own division suffix. Exact names win over a restricted
+school/hall/church suffix expansion. Every candidate must be inside that
+election's original polygon, including its holes. All candidates from the
+earliest matching year must agree within 100 metres; no duplicate is silently
+discarded. Unresolved names, administrative city returns, special hospital
+records and mobile teams remain unlocated. There is no centroid fallback.
+
+This supersedes the 1996 map's previous matching and locality-centroid
+estimates. That older builder's pool retained only one same-name candidate
+per year, and checked against the superseded ABS geometry. Its legacy
+`booth-seifa-1996.json` store remains an upstream input, but the map builder
+overrides its coordinates using the new identity-checked location store.
+All three years expose the source year and later venue on each matched
+place's card. These are approximate locations, not evidence that the same
+premises was used in the historical election. Vote counts are unchanged.
+Where informal counts are missing, marker size uses the recorded formal
+votes while the total count remains unavailable. Census/SEIFA information
+remains unavailable. Reused 1993 hospital-team names remain aggregated
+under their printed names.
+
+The committed run locates 6,540 of 8,431 records in 1993, 6,757 of 8,463
+in 1996, and 6,861 of 8,311 in 1998. Those denominators include mobile and
+hospital teams and administrative returns. Each year's full rejection
+counts and every unresolved name are retained in the matching store.
 
 Senate votes sum ticket and candidate votes, checked against every separate
 ZZ formal/informal/total record. The House-to-Senate place join is exact by
@@ -112,6 +137,9 @@ python3 .build/map/build_stats_history.py
 python3 .build/map/senate_past.py
 node .build/map/handbook_geo.mjs --fetch
 # --fetch downloads missing pinned originals; cached runs are offline.
+python3 .build/map/historical_booth_locations.py
+# Re-derives and applies matches; the result builders also consume the
+# committed location store on subsequent rebuilds.
 node .build/map/assemble.mjs
 node .build/test-map-history.mjs
 node .build/test-map-geo.mjs

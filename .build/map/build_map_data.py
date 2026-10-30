@@ -684,6 +684,10 @@ def build_year(year, hist, base2001):
         out["demoInterp"] = vstore["demoInterp"]
     names = {x["n"] for x in D}
     assert SPEAKER[year] in names, f"{year}: speaker seat {SPEAKER[year]} not in the House"
+    if year == 1996:
+        from historical_booth_locations import apply_locations
+        apply_locations(out)
+        n_coords = sum(x is not None for x in B["lat"])
     p = os.path.join(OUT, f"data-{year}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)

@@ -689,7 +689,9 @@ function storyBooth(m, j) {
     else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
   }
   let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed, dek);
-  if (raw.lat[j] == null) h += `<p class="st-note">Historical venue coordinates are unavailable. This polling place’s recorded votes remain available here.</p>`;
+  const loc = raw.location && raw.location[j];
+  if (loc) h += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
+  else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
   if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
   if (lead && tc) {
     const ta = tc[0], tb = tc[1], tot = ta + tb;

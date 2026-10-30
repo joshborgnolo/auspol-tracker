@@ -10,6 +10,14 @@ try {
     const errors = []; page.on('pageerror', e=>errors.push(e.message));
     await page.setViewport({width, height:900, isMobile:width<500, hasTouch:width<500});
     await page.evaluateOnNewDocument(()=>Object.defineProperty(navigator,'connection',{value:{saveData:true}}));
+    await page.evaluateOnNewDocument(()=>{
+      window.__invalidMapArcs=0;
+      const arc=CanvasRenderingContext2D.prototype.arc;
+      CanvasRenderingContext2D.prototype.arc=function(...args) {
+        if(!args.slice(0,5).every(Number.isFinite)) window.__invalidMapArcs++;
+        return arc.apply(this,args);
+      };
+    });
     await page.goto(`${base}/map/#y=${width < 500 ? 1998 : 1993}`,{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>window.__map,{timeout:60000});
     if (width < 500) {
@@ -28,6 +36,21 @@ try {
     for (const year of [1993,1996,1998,2001,1993]) {
       await page.evaluate(async y=>{ await __map.setYear(y); __map.goAus(); __map.setView('map'); },year);
       await page.waitForFunction(y=>__map.S.year===y && __map.Y[y]?.divs,{},year);
+      if ([1993,1996,1998].includes(year)) {
+        const probes=await page.evaluate(()=>{
+          const b=__map.Y[__map.S.year].booth.raw;
+          return [b.location.findIndex(Boolean),b.location.findIndex((v,j)=>v&&b.inf[j]==null)].filter(j=>j>=0);
+        });
+        for(const j of probes) {
+          await page.evaluate(j=>{__map.setLens('fp');__map.goBooth(j);},j);
+          await page.$eval('#stage',e=>e.scrollIntoView({block:'center'}));
+          await new Promise(r=>setTimeout(r,600));
+          assert.match(await page.$eval('#story',e=>e.textContent),/Approximate location, matched by name to the AEC/);
+          assert.equal(await page.evaluate(()=>window.__invalidMapArcs),0,'located booths with missing informal counts draw finite markers');
+        }
+        await page.screenshot({path:`/private/tmp/history-booths-${year}-${width}.png`});
+        await page.evaluate(()=>__map.goAus());
+      }
       const state = await page.evaluate(()=>{
         const m=__map.Y[__map.S.year];
         return {divs:m.divs.length,finite:m.geo.bb.every(b=>b.flat().every(Number.isFinite)),width:document.documentElement.scrollWidth,view:innerWidth};

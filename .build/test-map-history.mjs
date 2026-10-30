@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import vm from 'node:vm';
+import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
@@ -62,8 +63,8 @@ for(const y of [1993,1996,1998]) assert.equal(contains(frame[y].features.find(f=
 for(const y of [1993,1998]) {
   const r=json(`map/data/res-${y}.json`);
   assert.equal(r.booths.id.length,y===1993?8431:8311);
-  assert.ok(r.booths.lat.every(x=>x===null)&&r.booths.lon.every(x=>x===null),'no invented historical coordinates');
-  assert.equal(r.coverage.boothCoordinates,false);
+  assert.equal(r.coverage.boothCoordinates,'approximate');
+  assert.equal(r.booths.location.filter(Boolean).length,r.booths.lat.filter(x=>x!==null).length,'every estimated coordinate has provenance');
   assert.ok(r.booths.inf.some(x=>x>0),'recorded informal votes retained');
   assert.equal(r.divs.find(d=>d.n===r.speaker).c.find(c=>c[6])[0],y===1993?'Stephen Paul Martin':'Neil Andrew');
   const national=r.agg.AUS, sv=json(`map/data/senate-vote-${y}.json`);
@@ -78,4 +79,36 @@ for(const y of [1993,1998]) {
   } else assert.equal(r.divs.find(d=>d.n==='Newcastle').tpp,null);
 }
 assert.equal(json('map/data/senate-1998.json').senators.find(s=>s.n==='Kay Denman').term,2005,'Denman elected in 1998, not continuing class');
+// Each estimate is traceable to an actual source venue and inside the original
+// historical polygon. This JS containment check is independent of the builder.
+const locations=json('data/booth-locations-history.json');
+for(const [p,h] of Object.entries(locations.sourceSHA256)) assert.equal(hash(fs.readFileSync(path.join(root,p))),h,`${p}: matching input hash`);
+const venueSources={};
+for(const y of [2007,2010,2013,2016,2019,2022,2025]) venueSources[y]=new Map(json(`data/booth-seifa-${y}.json`).booths.map(b=>[`${b.div}|${b.boothId}`,b]));
+for(const y of [1993,1996,1998]) {
+  const r=json(`map/data/res-${y}.json`), B=r.booths, saved=locations.elections[y];
+  const geoms=new Map(frame[y].features.map(f=>[f.properties.name,f]));
+  const counts={};
+  for(let j=0;j<B.id.length;j++) {
+    const p=saved.places[B.id[j]], d=r.divs[B.d[j]], m=p.match;
+    assert.equal(p.name,B.n[j]);assert.equal(p.division,d.n);
+    counts[p.status]=(counts[p.status]||0)+1;
+    if(!m) {assert.equal(B.lat[j],null);assert.equal(B.lon[j],null);assert.equal(B.location[j],null);continue;}
+    assert.equal(B.ty[j],1,'only ordinary fixed places get estimated markers');
+    assert.equal(p.status,'matched');
+    const v=venueSources[m.year].get(`${m.div}|${m.boothId}`);
+    assert.ok(v);assert.equal(v.type,'Polling place');
+    assert.equal(v.premisesState||v.state,d.st);
+    assert.equal(m.booth,v.booth);assert.equal(m.venue,v.venue);
+    assert.deepEqual([B.lat[j],B.lon[j]],[v.lat,v.lon],'original source coordinates, no rounding or centroid');
+    assert.deepEqual([m.lat,m.lon],[v.lat,v.lon]);
+    assert.deepEqual(B.location[j],[m.year,m.venue,m.method]);
+    assert.ok(contains(geoms.get(d.n),[m.lon,m.lat]),`${y} ${d.n} ${p.name}: inside historical boundary`);
+  }
+  assert.deepEqual(counts,saved.counts);assert.deepEqual(r.coverage.boothLocationCounts,counts);
+  assert.ok(counts.matched>6000,'substantial ordinary-place coverage');
+  const administrative=Object.values(saved.places).filter(p=>/^Sydney \(/.test(p.name));
+  assert.ok(administrative.length>40);assert.ok(administrative.every(p=>!p.match),'allocated city returns cannot become local venues');
+}
+process.stdout.write(execFileSync('python3',[path.join(root,'.build/map/test_historical_booth_locations.py')]));
 console.log('PASS: historical maps — 443 division/result joins, exact source-coordinate hashes, redistribution states, Collie/Brand, certified totals and honest data gaps');

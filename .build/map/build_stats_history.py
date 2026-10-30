@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Build 1993/1998 map results directly from the committed AEC statistics packs.
 
-No modern booth coordinates or census figures are imputed. 1993 has only
+Approximate later-venue matches are applied from the audited location store;
+no census figures are imputed. 1993 has only
 division-level DOP counts beyond first preferences; its HTPPBYPP contains
 informal votes only. Missing cells stay null. First preferences are compared
 with HCANDS/DIVS; exact 1993 source discrepancies are pinned below. Flows
@@ -18,6 +19,7 @@ import json
 from pathlib import Path
 import re
 import build_map_data as common
+from historical_booth_locations import apply_locations
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / '.build/aec-flow-src'
@@ -236,6 +238,7 @@ def build(year):
                          'firstPreferenceDifferences': discrepancies, 'countDiscrepancies':count_discrepancies,
                          'informalDifferences': informal_differences,
                          'note':'Polling-place names and votes are from the AEC statistics pack. Historical venue coordinates are unavailable in this source; these polling places are not plotted. Census figures are unavailable.'})
+    apply_locations(doc)
     write(f'data-{year}.json', doc)
     senate(year, byname, pids)
     print(year, len(D), 'divisions;', len(pids), 'polling places;', A['AUS']['seats'])
