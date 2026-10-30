@@ -8,7 +8,7 @@ function lensShort() {
     case "flow": return `${famLeg(S.from)} to Labor`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? DM_SHORT[S.index] : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? `Religion: ${REL_NAME[S.rel]}` : isTen() ? TEN_NAME[S.ten] : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -89,7 +89,7 @@ const RANGE = () => {
     case "senate": return senGap() ? [-10, 10] : [0, FPMAX[S.party]];
     case "flow": return [10, 90];
     case "informal": return [0, infHi(M())];
-    case "seifa": return isDemo() ? DM_RANGE[S.index] : [1, 10];
+    case "seifa": return isDemo() ? demoRange() : [1, 10];
   }
   return null;
 };
@@ -281,13 +281,25 @@ function legendHTML(m) {
     case "seifa": {
       // one picker for the census: the ABS's advantage indexes, then the people measures
       const og = (label, list) => `<optgroup label="${label}">${list.map(([v, t]) => `<option value="${v}"${S.index === v ? " selected" : ""}>${t}</option>`).join("")}</optgroup>`;
-      h += `<div class="lg-t"><select data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", dmFor(m).map((x) => [x, DM_NAME[x]]))}</select></div>`;
+      const peopleExtra = [
+        ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
+        ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
+      ];
+      h += `<div class="lg-t"><select data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select></div>`;
       if (isDemo()) {
         // on Born overseas a second picker reads a birthplace country per year
         // (the year's own census-edition menu; the informal lens's own
         // measure-switcher idiom)
         if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) {
           h += `<div class="lg-t"><select data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_BORN[k]}</option>`).join("")}</select></div>`;
+        }
+        // the Religion and Housing-tenure lenses' own option pickers
+        // (No religion and owned-with-mortgage are the landing views)
+        if (S.index === LENS_REL && m.relKeys && m.relKeys.length) {
+          h += `<div class="lg-t"><select data-opt="rel" aria-label="Religion">${m.relKeys.map((k) => `<option value="${k}"${S.rel === k ? " selected" : ""}>${REL_NAME[k]}</option>`).join("")}</select></div>`;
+        }
+        if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) {
+          h += `<div class="lg-t"><select data-opt="ten" aria-label="Housing tenure">${m.tenKeys.map((k) => `<option value="${k}"${S.ten === k ? " selected" : ""}>${TEN_NAME[k]}</option>`).join("")}</select></div>`;
         }
         const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
         // an income lane can arrive by hash on a year whose store carries
@@ -304,7 +316,7 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 2001 election: 2001 reads the 2001 census; every election from 2004 to 2019 blends between the two censuses that bracket it to election day; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}` : "Share of residents"}, ${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 2001 election: 2001 reads the 2001 census; every election from 2004 to 2019 blends between the two censuses that bracket it to election day; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2013 election, in the census year's own dollars: 2013 reads the census areas the polling places stand in; from 2016 they follow the voters." : `${isDemo() && isInc(S.index) ? incNote : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}` : isRel() ? `Share of residents who ${RELISMS[S.rel]}` : isTen() ? `Share of residents whose dwellings ${TENESMS[S.ten]}` : "Share of residents"}, ${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
@@ -721,6 +733,12 @@ async function setYear(y) {
   // a year's birthplace menu is its own census edition's: a country it
   // doesn't print (England/Scotland before 2016) falls back to all overseas-born
   if (S.cob != null && !(b.cobKeys || []).includes(S.cob)) S.cob = null;
+  // the Religion/Tenure menus appear only where their rows are; an
+  // unknown option falls back to the menu's landing view
+  if (!(b.relKeys || []).includes(S.rel)) S.rel = (b.relKeys || [])[0] || "norel";
+  if (!(b.tenKeys || []).includes(S.ten)) S.ten = (b.tenKeys || [])[0] || "mort";
+  if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
+  if (!b.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   proj = b.proj; // the year now shown (a year loaded ahead keeps the live projection)
   // carry the selection across by seat name and polling-place ID
   const s = S.sel;
@@ -947,7 +965,7 @@ function writeURL() {
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isCob()) p.set("cb", S.cob); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -975,8 +993,10 @@ function readURL() {
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
-  const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i))) S.index = i;
+  const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i) || i === LENS_REL || i === LENS_TEN)) S.index = i;
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
+  S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
+  S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
   if (p.get("b") === "voters") S.basis = "voters";
   if (p.get("im") === "exhaust") S.infMode = "exhaust";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
@@ -1086,7 +1106,7 @@ document.addEventListener("change", (e) => {
     const k = t.dataset.opt;
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
-    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "cob") S.cob = t.value || null;
+    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort";
     lensParamChanged(); return;
   }
   if (t.dataset.fsel) { S.f[t.dataset.fsel] = t.value || null; filtersChanged(); return; }
@@ -1177,6 +1197,10 @@ function preloadYears() {
   // never inside loadYear (idle preloads of every year mustn't touch S)
   const bmc = M();
   if (S.cob != null && bmc && !(bmc.cobKeys || []).includes(S.cob)) S.cob = null;
+  if (bmc && !(bmc.relKeys || []).includes(S.rel)) S.rel = (bmc.relKeys || [])[0] || "norel";
+  if (bmc && !(bmc.tenKeys || []).includes(S.ten)) S.ten = (bmc.tenKeys || [])[0] || "mort";
+  if (bmc && !bmc.relKeys && S.index === LENS_REL) S.index = "irsad";
+  if (bmc && !bmc.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine(); holdEyebrow();

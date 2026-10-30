@@ -55,6 +55,11 @@ eq(c.national, {
   persons: 23310689, langOther: 0.2222, fborn: 0.2827, uni: 0.2426,
   blue: 0.2913, age0_14: 0.1867, age65ov: 0.1571, loinc: 0.2523,
   hiinc: 0.0911, incMed: 1447,
+  u15: 0.1867, y12less: 0.4318, atsci: 0.0292, onepar: 0.1581,
+  rel: { norel: 0.3274, cath: 0.2502, angl: 0.1466, unch: 0.0411,
+    pres: 0.0247, orth: 0.0258, budd: 0.0263, isl: 0.0283, hind: 0.0205,
+    jew: 0.004 },
+  ten: { mort: 0.3545, rent: 0.3183, own: 0.3193, rentPub: 0.0365 },
 }, "national row (2016 census)");
 eq([d.incomeCuts.loCutWeekly, d.incomeCuts.hiNationalShare,
   d.incomeCuts.dollarsYear, d.incomeCuts.hiEdgeWeekly],

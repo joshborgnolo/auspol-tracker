@@ -58,7 +58,13 @@ YEARS = {
     2010: {"c0": 2006, "c1": 2011},
     2013: {"c0": 2011, "c1": 2016},
 }
-LANES = ("langOther", "fborn", "uni", "blue", "loinc", "hiinc")
+LANES = ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
+         "y12less", "atsci", "u15", "onepar")
+# the select-family lanes blend per option, like the age bands
+# (orders pinned to the store-level relKeys/tenKeys records)
+REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+            "isl", "hind", "jew"]
+TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 AGE_BANDS = ("0_4", "5_14", "15_19", "20_24", "25_34", "35_44",
              "45_54", "55_64", "65_74", "75_84", "85ov")
 
@@ -92,6 +98,15 @@ def blend_demo(c0blk, c1blk, f, nearest_blk):
                                  None if a1 is None else a1.get(b), f)
                    for b in AGE_BANDS}
                   if a0 is not None or a1 is not None else None)
+    for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+        d0 = c0blk.get(which) if c0blk else None
+        d1 = c1blk.get(which) if c1blk else None
+        out[which] = ({k: lane_blend(None if d0 is None
+                                     else d0.get(k),
+                                     None if d1 is None
+                                     else d1.get(k), f)
+                       for k in keys}
+                      if d0 is not None or d1 is not None else None)
     near = nearest_blk if nearest_blk is not None else {}
     out["incMed"] = near.get("incMed")
     return out
@@ -150,6 +165,13 @@ def main():
         mn, fn = meas["counts"]["national"], far["counts"]["national"]
         ni = {k: lane_blend(mn.get(k), fn.get(k), f)
               for k in LANES + ("age0_14", "age65ov")}
+        for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+            d0, d1 = mn.get(which), fn.get(which)
+            ni[which] = (
+                {k: lane_blend(None if d0 is None else d0.get(k),
+                               None if d1 is None else d1.get(k), f)
+                 for k in keys}
+                if d0 is not None or d1 is not None else None)
         ni["incMed"] = (fn if near == y["c1"] else mn).get("incMed")
         meas["counts"]["demoI"] = {"rows": rows, "national": ni}
 

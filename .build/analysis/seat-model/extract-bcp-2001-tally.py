@@ -7,9 +7,14 @@ archive.org/details/2001-bcp-cd-00_aus (ABS Census 2001, Basic
 Community Profiles - All Collection Districts; ABS does not currently
 host a bulk 2001 BCP — the CD-level product was the paid CDATA CD).
 Each BCP_<7-digit-CD>.xlsx carries 33 tables (B 01..B 33) plus front
-matter; the people lanes need six:
+matter; the people lanes need six, and the new-lane arc adds five more:
 
-  B 01  Selected characteristics      total persons (cross-check)
+  B 01  Selected characteristics      total persons (cross-check),
+                        ALSO total Indigenous persons + Overseas
+                        visitors (the atsci lane - no Indigenous-status-
+                        not-stated row exists in the 2001 product, so
+                        the lane's basis is persons ex-overseas; the
+                        store names it)
   B 03  Age by sex          THREE column-block layout (0-29 | 30-59 |
                         60-100+), five-year subtotal rows - merged to
                         the pipeline's 11 G01 bands
@@ -20,6 +25,17 @@ matter; the people lanes need six:
                         cobn vector)
   B 08  Language spoken at home       Speaks English only, "Speaks
                         other language: Total", Overseas visitors
+  B 10  Religious affiliation         the ten REL01 menu rows + Not
+                        stated + Overseas visitors
+  B 12  Highest level of schooling    Year 8 .. Year 12 (+ Still at
+                        school, Did not go, Not stated); the y12less
+                        lane numerator excludes "still at school" to
+                        hold the GCP-era stated-level basis
+  B 17  Family type                   couple-with-children total,
+                        couple w/o children, one-parent total, other
+  B 19  Dwelling structure by tenure  tenure Type x landlord grid;
+                        the OWN/MORT/RENT(STHA+other)/rentPublic cells
+                        ride its Total row
   B 23  Non-school qualification      Postgraduate/GradDip/Bachelor,
                         Not stated
   B 27B Occupation by age by sex      nine ASCO-era major groups x 7
@@ -116,6 +132,23 @@ COB01_PREFIX = {
     "ita": "italy",
     "lka": "sri lanka",
 }
+# B 10's religious-affiliation rows -> the /map/ Religion menu (order
+# leads with "No religion", the cross-era REL_KEYS set; "orth" sums the
+# edition's two orthodox rows - 2001 prints "Orthodox" and "Oriental
+# Christian" separately, GCP-era prints Eastern + Oriental orthodox)
+REL01_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+              "isl", "hind", "jew"]
+REL01_PREFIX = {
+    "norel": "no religion",
+    "cath": "catholic",
+    "angl": "anglican",
+    "unch": "uniting church",
+    "pres": "presbyterian and reformed",
+    "budd": "buddhism",
+    "isl": "islam",
+    "hind": "hinduism",
+    "jew": "judaism",
+}
 
 import openpyxl  # noqa: E402
 
@@ -167,7 +200,8 @@ def parse_cd(member_name, wb):
     # address" codes, ~32 sheets, none of the demographic tables):
     # keep the B 01 headcount and null the lanes before any lane reads
     if any(s not in wb.sheetnames for s in
-           ("B 06", "B 08", "B 23", "B 27B")):
+           ("B 06", "B 08", "B 10", "B 12", "B 17", "B 19", "B 23",
+            "B 27B")):
         pers_tot = None
         for row in wb_get(wb, "B 01", 1, 4):
             lab = label_of(row)
@@ -180,6 +214,10 @@ def parse_cd(member_name, wb):
                 "cobns": None, "eng": None, "oth": None, "uni": None,
                 "eduns": None, "bluen": None, "occd": None,
                 "cobn": None,
+                "rel01": None, "rel01ns": None, "rel01tot": None,
+                "rel01ov": None, "sch01": None, "sch01ns": None,
+                "fam01": None, "ten01": None,
+                "ind01": None, "b1ov": None,
                 "shortCd": True}
 
     def sheet_rows(name, minc, maxc):
@@ -224,13 +262,120 @@ def parse_cd(member_name, wb):
         bands["85_89"] + bands["90_94"] + bands["95_99"] + bands["100ov"],
     ]
 
-    # ---- B 01 summary
+    # ---- B 01 summary (plus the Indigenous and overseas-visitor rows
+    # the atsci share rides)
     b1 = sheet_rows("B 01", 1, 4)
-    b1_persons = None
+    b1_persons = b1_indig = b1_ov = None
     for row in b1:
         lab = label_of(row)
         if lab.startswith("total persons"):
             b1_persons = cell_of(row, 3)
+        elif lab == "total indigenous persons":
+            b1_indig = cell_of(row, 3)
+        elif lab.startswith("overseas visit"):
+            b1_ov = cell_of(row, 3)
+
+    # ---- B 10 religion (the ten-menu rows; the table prints THREE
+    # "Total" rows: Christianity's, Other religions', and the grand
+    # total last. Within-table identity: grand == (Christianity +
+    # Other religions) + norel + inadequately-described + not-stated +
+    # overseas-visitors; the grand total does NOT reconcile with
+    # B 01's persons row (the two tables' totals disagree in the 2001
+    # product itself, ~0.2% at CD level, so no cross-table check)
+    rel = {k: None for k in REL01_KEYS}
+    rel_orth = 0
+    rel_ns = rel_ineq = b10_ov = None
+    totals = []
+    for row in sheet_rows("B 10", 1, 4):
+        lab = label_of(row)
+        per = cell_of(row, 3)
+        if lab == "total":
+            totals.append(per)
+            continue
+        if lab.startswith("overseas visit"):
+            b10_ov = per
+        elif lab in ("orthodox", "oriental christian"):
+            rel_orth += per
+        elif lab.startswith("inadequately"):
+            rel_ineq = per
+        elif lab.startswith("not stated"):
+            rel_ns = per
+        else:
+            for k, pref in REL01_PREFIX.items():
+                if lab == pref or lab.startswith(pref):
+                    rel[k] = per
+                    break
+    rel["orth"] = rel_orth
+    b10_grand = totals[-1] if totals else None
+    # B 10's own print: grand = Christianity-Total + Other-religions-
+    # Total + the four standalone rows (Buddhism/Hinduism/Islam/
+    # Judaism) + no-religion + inadequately-described + not-stated +
+    # overseas-visitors
+    b10_identity = (len(totals) == 3
+                    and totals[2] == totals[0] + totals[1]
+                    + (rel.get("budd") or 0) + (rel.get("hind") or 0)
+                    + (rel.get("isl") or 0) + (rel.get("jew") or 0)
+                    + (rel.get("norel") or 0) + (rel_ineq or 0)
+                    + (rel_ns or 0) + (b10_ov or 0))
+    # ---- B 12 highest schooling completed (15+, excl overseas
+    # visitors): the printed level rows; "Still at school" is excluded
+    # from the stated-level basis to hold the 2011+ GCP-gnu basis
+    sch = {k: None for k in ("y12", "y11", "y10", "y9", "y8", "dng")}
+    sch_ns = None
+    SCH01_LABELS = {
+        "year 12 or equivalent": "y12", "year 11 or equivalent": "y11",
+        "year 10 or equivalent": "y10", "year 9 or equivalent": "y9",
+        "year 8 or below": "y8", "did not go to school": "dng"}
+    for row in sheet_rows("B 12", 1, 4):
+        lab = label_of(row)
+        per = cell_of(row, 3)
+        for txt, k in SCH01_LABELS.items():
+            if lab == txt:
+                sch[k] = per
+        if lab.startswith("not stated"):
+            sch_ns = per
+
+    # ---- B 17 family type (families, col 1; section-total rows)
+    fam_cf_child = fam_cf_nochild = fam_opf = fam_other = fam_tot = None
+    section = None
+    for row in sheet_rows("B 17", 1, 4):
+        lab = label_of(row)
+        per = cell_of(row, 1)
+        if lab.startswith("couple family:"):
+            section = "cf"
+        elif lab.startswith("one parent family:"):
+            section = "opf"
+        elif lab == "total" and section == "cf":
+            fam_cf_child = per
+            section = None
+        elif lab == "total" and section == "opf":
+            fam_opf = per
+            section = None
+        elif lab.startswith("couple family without children"):
+            fam_cf_nochild = per
+        elif lab.startswith("other family"):
+            fam_other = per
+        elif lab == "total" and section is None \
+                and fam_cf_child is not None and fam_opf is not None \
+                and fam_other is not None:
+            fam_tot = per
+
+    # ---- B 19 tenure x dwelling (Total row; rented-total is column 7,
+    # and there is no grand-total column in this edition)
+    ten_own = ten_purch = ten_rentbuy = ten_stha = ten_othll = None
+    ten_nsll = ten_renttot = ten_othtype = ten_tenns = None
+    for row in sheet_rows("B 19", 1, 10):
+        if label_of(row) != "total":
+            continue
+        ten_own = cell_of(row, 1)
+        ten_purch = cell_of(row, 2)
+        ten_rentbuy = cell_of(row, 3)
+        ten_stha = cell_of(row, 4)
+        ten_othll = cell_of(row, 5)
+        ten_nsll = cell_of(row, 6)
+        ten_renttot = cell_of(row, 7)
+        ten_othtype = cell_of(row, 8)
+        ten_tenns = cell_of(row, 9)
 
     # ---- B 06 birthplace
     aus = cobns = b6_ov = b6_total = None
@@ -321,13 +466,50 @@ def parse_cd(member_name, wb):
                               "b8_total": b8_total, "pgrad": pgrad,
                               "gdip": gdip, "bach": bach,
                               "eduns": eduns, "b1_persons": b1_persons,
-                              "b3_total": b3_total, "b3_ov": b3_ov}.items()
+                              "b3_total": b3_total, "b3_ov": b3_ov,
+                              "b1_indig": b1_indig, "b1_ov": b1_ov,
+                              "rel_ns": rel_ns, "b10_ov": b10_ov,
+                              "b10_grand": b10_grand,
+                              "sch_ns": sch_ns,
+                              "fam_cf_child": fam_cf_child,
+                              "fam_cf_nochild": fam_cf_nochild,
+                              "fam_opf": fam_opf,
+                              "fam_other": fam_other,
+                              "fam_tot": fam_tot,
+                              "ten_own": ten_own,
+                              "ten_renttot": ten_renttot,
+                              "ten_stha": ten_stha,
+                              "ten_othtype": ten_othtype,
+                              "ten_tenns": ten_tenns,
+                              }.items()
                if v is None]
+    missing += [f"rel01.{k}" for k, v in rel.items() if v is None]
+    missing += [f"sch01.{k}" for k, v in sch.items() if v is None]
     if missing:
         raise ValueError("table drift " + ",".join(missing))
     if oth is not None and oth < 0:
         oth = None  # perturbation pushed the computed total negative —
         # emit no share, never clamp
+    # table-internal recompositions (failure classes ride `checks`;
+    # the 2001 product is unperturbed so these identities hold exactly)
+    recons = {}
+    if fam_cf_child + fam_cf_nochild + fam_opf + fam_other \
+            != fam_tot:
+        recons["fam"] = fam_cf_child + fam_cf_nochild + fam_opf \
+            + fam_other - fam_tot
+    if not b10_identity:
+        recons["rel-total"] = 1
+    if abs(ten_stha + ten_othll + ten_nsll - ten_renttot) > TOL:
+        recons["renttot"] = (ten_stha + ten_othll + ten_nsll
+                             - ten_renttot)
+    y12_den = sum(sch.values())
+    if y12_den <= 0:
+        recons["sch-empty"] = 1
+    elif not 0 <= (sch["y11"] + sch["y10"] + sch["y9"] + sch["y8"]
+                   + sch["dng"]) / y12_den <= 1:
+        recons["sch-share"] = 1
+    if b1_indig > b1_persons:
+        recons["indig>pers"] = 1
 
     return {
         "pers": b3_total - b3_ov,
@@ -342,7 +524,76 @@ def parse_cd(member_name, wb):
         "cobn": [cob[k] for k in COB01_KEYS],
         "b6Others": others,
         "b6Elsewhere": elsewhere,
+        "ind01": b1_indig, "b1ov": b1_ov,
+        "rel01": [rel[k] for k in REL01_KEYS],
+        "rel01ns": rel_ns, "rel01tot": b10_grand - b10_ov,
+        "rel01ov": b10_ov,
+        "sch01": [sch["y11"], sch["y10"], sch["y9"], sch["y8"],
+                  sch["dng"], sch["y12"]],
+        "sch01ns": sch_ns,
+        "fam01": [fam_cf_child, fam_cf_nochild, fam_opf, fam_other,
+                  fam_tot],
+        "ten01": [ten_own, ten_purch + ten_rentbuy, ten_renttot,
+                  ten_stha, ten_othtype, ten_tenns],
+        "_recons": recons or None,
     }
+
+
+def merge_shards(pattern, out_path):
+    """Fold a running shard-outs set into the derived tally (the
+    lightest amortisation: per-shard runs write their own tables;
+    this joins them and reprints the national profile)."""
+    import glob as g
+    tally = {}
+    for p in sorted(g.glob(pattern)):
+        d = json.load(open(p, encoding="utf-8"))
+        for k, v in d["tally"].items():
+            tally[k] = v
+    if len(tally) != 35289:
+        raise SystemExit(f"merged tally rows {len(tally)} != pin 35289")
+    relc = {k: 0 for k in REL01_KEYS}
+    sc = [0] * 6
+    fc = [0] * 5
+    tc = [0] * 6
+    ind = pers = less_ov = 0
+    full = [r for r in tally.values() if r.get("rel01tot") is not None]
+    for r in full:
+        for i, k in enumerate(REL01_KEYS):
+            relc[k] += r["rel01"][i]
+        for i in range(6):
+            sc[i] += r["sch01"][i]
+        for i in range(5):
+            fc[i] += r["fam01"][i]
+        for i in range(6):
+            tc[i] += r["ten01"][i]
+        ind += r["ind01"]
+        pers += r["b1Persons"]
+        less_ov += r["b1ov"]
+    relnat_den = sum(r["rel01tot"] - r["rel01ns"] for r in full)
+    sc_den = sum(sc)
+    ten_den = tc[0] + tc[1] + tc[2] + tc[4]
+    print("national new-lane shares (2001 census, full-table CDs):",
+          {"norel": round(relc['norel'] / relnat_den, 4),
+           "cath": round(relc['cath'] / relnat_den, 4),
+           "angl": round(relc['angl'] / relnat_den, 4),
+           "unch": round(relc['unch'] / relnat_den, 4),
+           "pres": round(relc['pres'] / relnat_den, 4),
+           "orth": round(relc['orth'] / relnat_den, 4),
+           "budd": round(relc['budd'] / relnat_den, 4),
+           "isl": round(relc['isl'] / relnat_den, 4),
+           "hind": round(relc['hind'] / relnat_den, 4),
+           "jew": round(relc['jew'] / relnat_den, 4),
+           "y12less": round(sum(sc[:5]) / sc_den, 4),
+           "oneparent": round(fc[2] / fc[4], 4),
+           "mort": round(tc[1] / ten_den, 4),
+           "rent": round(tc[2] / ten_den, 4),
+           "own": round(tc[0] / ten_den, 4),
+           "rentPub": round(tc[3] / ten_den, 4),
+           "atsci": round(ind / (pers - less_ov), 4)})
+    with open(out_path, "w", encoding="utf-8") as fh:
+        json.dump({"tally": tally}, fh)
+        fh.write("\n")
+    print(f"OK -> {out_path} ({len(tally)} CDs)")
 
 
 def main():
@@ -357,6 +608,9 @@ def main():
             shard = (int(i), int(n))
         elif a.startswith("--out="):
             out_path = Path(a.split("=", 1)[1])
+        elif a.startswith("--merge="):
+            merge_shards(a.split("=", 1)[1], OUT)
+            return
     zips = sorted(CACHE.glob("bcp-2001-cd-*.zip"))
     if only:
         zips = [z for z in zips if only.lower() in z.name.lower()]
@@ -390,9 +644,12 @@ def main():
                     continue
             if code in tally:
                 raise SystemExit(f"GUARD dup CD {code}")
+            recons = rec.pop("_recons", None) or {}
+            for c in recons:
+                checks["prof-" + c if c in ("sch-empty",) else c] += 1
+            tally[code] = rec
             if rec.get("shortCd"):
                 checks["prof-short-cd"] += 1
-                tally[code] = rec
                 continue
             # checks: the bands MUST sum to the table's own Total
             # (sheet-internal, zero tolerance); the B 01/B 06/B 03
@@ -452,6 +709,29 @@ def main():
     print("birthplace countries (share of the stated birthplace base "
           f"{fbd:,}):",
           {k: round(v / fbd, 4) for k, v in cobnat.items()})
+    # the new-lane national reads (full-table CDs only)
+    full = [r for r in tally.values() if r.get("rel01tot")]
+    relc = {k: sum(r["rel01"][i] for r in full)
+            for i, k in enumerate(REL01_KEYS)}
+    relnat_den = sum(r["rel01tot"] - r["rel01ns"] for r in full)
+    sc = [sum(r["sch01"][i] for r in full) for i in range(6)]
+    sc_den = sum(sc)
+    fc = [sum(r["fam01"][i] for r in full) for i in range(5)]
+    tc = [sum(r["ten01"][i] for r in full) for i in range(6)]
+    ten_den = tc[0] + tc[1] + tc[2] + tc[4]  # ex tenure-NS basis
+    print("new-lane national shares (full-table CDs):",
+          {"norel": round(relc['norel'] / relnat_den, 4),
+           "cath": round(relc['cath'] / relnat_den, 4),
+           "angl": round(relc['angl'] / relnat_den, 4),
+           "y12less": round(sum(sc[:5]) / sc_den, 4),
+           "oneparent": round(fc[2] / fc[4], 4),
+           "mort": round(tc[1] / ten_den, 4),
+           "rent": round(tc[2] / ten_den, 4),
+           "ownOut": round(tc[0] / ten_den, 4),
+           "rentPublic": round(tc[3] / ten_den, 4),
+           "atsci": round(sum(r["ind01"] for r in full)
+                          / sum(r["b1Persons"] - r["b1ov"]
+                                for r in full), 4)})
     out_path.write_text(json.dumps({"tally": tally}) + "\n",
                         encoding="utf-8")
     print(f"OK -> {out_path} ({len(tally)} CDs)")

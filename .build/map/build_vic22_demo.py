@@ -48,6 +48,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vic22_geo import (DIST_GEOJSON, SA1_ZIP, VIC_SENTINELS, assign_sa1,  # noqa: E402
                        load_districts, read_sa1_polygons, write_assign_map,
                        GCP_ROWS, GCP_VIC_ROWS, VIC_PERSONS_MIN, VIC_PERSONS_MAX)
+import gcp_newlanes  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 GCP_ZIP = os.path.join(REPO, ".build", "analysis", "seat-model", "cache", "gcp-sa1-2021.zip")
@@ -185,6 +186,7 @@ def load_gcp_vic():
 # ------------------------------------------------------------------ assemble
 def main():
     gcp, vic_persons = load_gcp_vic()
+    nlt = gcp_newlanes.load(GCP_ZIP, prefix="2")
     sa1 = read_sa1_polygons()
     districts, order = load_districts()
 
@@ -216,7 +218,10 @@ def main():
                                   "tot": 0, "cobns": 0, "uni": 0, "eduns": 0,
                                   "pop15": 0, "blue": 0, "occd": 0,
                                   "cobN": [0] * len(COB_KEYS),
-                                  "bands": [0] * len(DEMO_BANDS), "n": 0})
+                                  "bands": [0] * len(DEMO_BANDS), "n": 0, "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
+                                  "relN": [0] * len(gcp_newlanes.REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "tenN": [0] * 6, "famN": 0, "famD": 0})
         r = gcp[code]
         a["p"] += r[0]
         a["eng"] += r[1]
@@ -234,6 +239,19 @@ def main():
             a["cobN"][i] += r[11][i]
         a["pop15"] += r[0] - r[3][0] - r[3][1]
         a["n"] += 1
+        sch6, indt, (relvec, relns, reltot), ten6, fam = nlt[code]
+        a["ylN"] += sum(sch6[1:])
+        a["ylD"] += sum(sch6)
+        a["atN"] += indt[0]
+        a["atD"] += indt[1]
+        for i in range(len(gcp_newlanes.REL_KEYS)):
+            a["relN"][i] += relvec[i]
+        a["relNS"] += relns
+        a["relTot"] += reltot
+        for i in range(6):
+            a["tenN"][i] += ten6[i]
+        a["famN"] += fam[0]
+        a["famD"] += fam[1]
     for dist, _bb, _polys in districts:
         if dist not in acc:
             fail(f"district {dist} has no SA1 assigned")
@@ -247,6 +265,8 @@ def main():
                       ("eng+oth", a["eng"] + a["oth"])):
             if v <= 0:
                 return None, nm
+        tn = a["tenN"]
+        tend = tn[0] + tn[1] + tn[2] + tn[4]
         s = {
             "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
             "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
@@ -256,6 +276,17 @@ def main():
             "blue": round(a["blue"] / a["occd"], 4),
             "cob": {k: round(a["cobN"][i] / fb_den, 4)
                     for i, k in enumerate(COB_KEYS)},
+            "u15": round((a["bands"][0] + a["bands"][1]) / bsum, 4),
+            "y12less": round(a["ylN"] / a["ylD"], 4) if a["ylD"] else None,
+            "atsci": round(a["atN"] / a["atD"], 4) if a["atD"] else None,
+            "onepar": round(a["famN"] / a["famD"], 4) if a["famD"] else None,
+            "rel": {k: (round(a["relN"][i] / (a["relTot"] - a["relNS"]), 4)
+                        if a["relTot"] - a["relNS"] > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.REL_KEYS)},
+            "ten": {k: (round({"mort": tn[1], "rent": tn[2],
+                               "own": tn[0], "rentPub": tn[3]}[k] / tend, 4)
+                        if tend > 0 else None)
+                    for k in ["mort", "rent", "own", "rentPub"]},
         }
         return s, None
 
@@ -271,15 +302,19 @@ def main():
     st_acc = {"p": 0, "eng": 0, "oth": 0, "aust": 0, "tot": 0, "cobns": 0,
               "uni": 0, "eduns": 0, "pop15": 0, "blue": 0, "occd": 0,
               "cobN": [0] * len(COB_KEYS),
-              "bands": [0] * len(DEMO_BANDS), "n": 0}
+              "bands": [0] * len(DEMO_BANDS), "n": 0,
+              "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
+              "relN": [0] * len(gcp_newlanes.REL_KEYS),
+              "relNS": 0, "relTot": 0, "tenN": [0] * 6,
+              "famN": 0, "famD": 0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 == "cobN":
-                for i in range(len(COB_KEYS)):
-                    st_acc["cobN"][i] += v2[i]
+            elif k2 in ("cobN", "relN", "tenN"):
+                for i in range(len(v2)):
+                    st_acc[k2][i] += v2[i]
             else:
                 st_acc[k2] += v2
     st_shares, why = shares(st_acc)
@@ -295,17 +330,20 @@ def main():
         "date": "2022-11-26",
         "demoBasis": "sa1",
         "cobKeys": COB_KEYS,
+        "relKeys": list(gcp_newlanes.REL_KEYS),
+        "tenKeys": ["mort", "rent", "own", "rentPub"],
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(VIC_SENTINELS), "sentinelPersons": sentinel_persons},
         "src": {
             "districtGeojson": {"path": os.path.relpath(DIST_GEOJSON, REPO), "sha16": hash16(DIST_GEOJSON)},
             "gcp": {"path": os.path.relpath(GCP_ZIP, REPO), "sha16": hash16(GCP_ZIP),
-                    "members": ["G01", "G09F", "G09G", "G09H", "G49B", "G60B"]},
+                    "members": ["G01", "G07", "G09F", "G09G", "G09H", "G14",
+                                "G32", "G37", "G49B", "G60B"]},
             "sa1Shp": {"path": os.path.relpath(SA1_ZIP, REPO), "sha16": hash16(SA1_ZIP)},
             "gcpRows": GCP_ROWS,
         },
-        "about": ("2021 Census GCP G01/G09F/G09G/G09H/G49B/G60B SA1 tables, pooled to Victoria's "
+        "about": ("2021 Census GCP G01/G07/G09F/G09G/G09H/G14/G32/G37/G49B/G60B SA1 tables, pooled to Victoria's "
                   "88 state electoral districts for the 26 November 2022 election (the 2021 "
                   "redistribution's boundaries). Each SA1 counts whole to the district its "
                   "polygon representative point lies in (boundary SA1s are not split; the "
@@ -317,7 +355,7 @@ def main():
                   "university (bachelor and above) over "
                   "the G01 aged-15+ population less level-of-education-not-stated; blue-"
                   "collar (trades, machinery operators and drivers, labourers) over the "
-                  "eight stated ANZSCO groups. p is census persons; n the SA1 count. The "
+                  "eight stated ANZSCO groups; the new lane set mirrors the federal stores (year-12-or-less over G01's six printed stated schooling levels; G07 Tot-row Indigenous/ Indigenous-plus-non-Indigenous; G14's Religion menu ten shares (rel, key order in relKeys) over the ex-affiliation-not-stated persons basis; G37's Housing-tenure menu four shares (ten, key order in tenKeys) over the ex-tenure-not-stated occupied-private-dwellings basis; G32's one-parent share of families; the under-15 share of the stated ages). p is census persons; n the SA1 count. The "
                   "four Vic sentinel SA1s (migratory/offshore) carry no polygon and sit "
                   f"outside the join, holding {sentinel_persons} persons statewide."),
     }

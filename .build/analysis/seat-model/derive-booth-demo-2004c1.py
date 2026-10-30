@@ -88,7 +88,13 @@ def main():
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
                                   "eduns": 0, "bluen": 0, "occd": 0,
-                                  "pop15": 0})
+                                  "pop15": 0,
+                                  "sch6": [0] * 6,
+                                  "indig": 0, "indigDen": 0,
+                                  "relvec": [0] * len(d06.REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "ten6": [0] * 6,
+                                  "famN": 0, "famD": 0})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -98,6 +104,14 @@ def main():
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni", "eduns",
                   "bluen", "occd", "pop15"):
             acc[k] += r[k]
+        for i in range(6):
+            acc["sch6"][i] += r["sch6"][i]
+            acc["ten6"][i] += r["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            acc[k] += r[k]
+        for i in range(len(d06.REL_KEYS)):
+            acc["relvec"][i] += r["relvec"][i]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -107,6 +121,17 @@ def main():
         for i in range(11):
             nat.setdefault("bands", [0] * 11)
             nat["bands"][i] += dv["bands"][i]
+        for i in range(6):
+            nat.setdefault("sch6", [0] * 6)
+            nat.setdefault("ten6", [0] * 6)
+            nat["sch6"][i] += dv["sch6"][i]
+            nat["ten6"][i] += dv["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            nat[k] += dv[k]
+        for i in range(len(d06.REL_KEYS)):
+            nat.setdefault("relvec", [0] * len(d06.REL_KEYS))
+            nat["relvec"][i] += dv["relvec"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -119,6 +144,21 @@ def main():
         "age0_14": round((nat["bands"][0] + nat["bands"][1]) /
                          nat["pers"], 4),
         "age65ov": round(sum(nat["bands"][8:]) / nat["pers"], 4),
+        "u15": round((nat["bands"][0] + nat["bands"][1]) /
+                     (nat["pers"] - 0), 4),
+        "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+        "atsci": round(nat["indig"] / nat["indigDen"], 4),
+        "onepar": round(nat["famN"] / nat["famD"], 4),
+        "rel": {k: round(nat["relvec"][i]
+                         / (nat["relTot"] - nat["relNS"]), 4)
+                for i, k in enumerate(d06.REL_KEYS)},
+        "ten": {k: round({"mort": nat["ten6"][1],
+                          "rent": nat["ten6"][2],
+                          "own": nat["ten6"][0],
+                          "rentPub": nat["ten6"][3]}[k]
+                         / (nat["ten6"][0] + nat["ten6"][1]
+                            + nat["ten6"][2] + nat["ten6"][4]), 4)
+                for k in d06.TEN_KEYS},
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -151,7 +191,13 @@ def main():
                 "eng": r["eng"], "oth": r["oth"], "aus": r["aus"],
                 "totc": r["totc"], "cobns": r["cobns"], "uni": r["uni"],
                 "eduns": r["eduns"], "bluen": r["bluen"],
-                "occd": r["occd"], "pop15": r["pop15"]})
+                "occd": r["occd"], "pop15": r["pop15"],
+                "sch6": list(r["sch6"]),
+                "indig": r["indig"], "indigDen": r["indigDen"],
+                "relvec": list(r["relvec"]),
+                "relNS": r["relNS"], "relTot": r["relTot"],
+                "ten6": list(r["ten6"]),
+                "famN": r["famN"], "famD": r["famD"]})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}
@@ -218,6 +264,8 @@ def main():
             "venue-proxy per booth (2006-census CD of the premises, "
             "point-in-polygon); exact 2006-BCP CD sum per division "
             "(cd-2006-ced-2003ed)"),
+        "relKeys": list(d06.REL_KEYS),
+        "tenKeys": list(d06.TEN_KEYS),
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

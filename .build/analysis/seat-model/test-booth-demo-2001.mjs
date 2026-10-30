@@ -63,6 +63,11 @@ eq(c.national, {
     uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
     vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
   },
+  u15: 0.2088, y12less: 0.5756, atsci: 0.0209, onepar: 0.1545,
+  rel: { norel: 0.1716, cath: 0.2956, angl: 0.2292, unch: 0.0737,
+    pres: 0.0377, orth: 0.0335, budd: 0.0211, isl: 0.0167, hind: 0.0057,
+    jew: 0.005 },
+  ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
 }, "c0 national (2001 census anchors)");
 {
   const divs = new Map(d.divisions.map((x) => [x.div, x]));
@@ -122,6 +127,11 @@ eq([c1c.booths, c1c.boothsPip, c1c.boothsPipMiss, c1c.boothsPipEmpty,
 eq(c1c.national, {
   persons: 19813809, langOther: 0.1681, fborn: 0.2388, uni: 0.1765,
   blue: 0.3204, age0_14: 0.1985, age65ov: 0.1333,
+  u15: 0.1985, y12less: 0.5313, atsci: 0.0243, onepar: 0.1577,
+  rel: { norel: 0.21, cath: 0.2909, angl: 0.2109, unch: 0.0644,
+    pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193, hind: 0.0084,
+    jew: 0.005 },
+  ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
 }, "c1 national (2006 census anchors)");
 {
   const divs = new Map(c1.divisions.map((x) => [x.div, x]));
@@ -152,9 +162,16 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     "2004 keeps the income floor (no income cuts either side)");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   for (const k of ["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov"]) {
+    "age65ov", "y12less", "atsci", "u15", "onepar"]) {
     eq(d.counts.demoI.national[k],
       LN(c.national[k], c1c.national[k]), `demoI national ${k}`);
+  }
+  for (const [lane, keys] of [["rel", d.relKeys], ["ten", d.tenKeys]]) {
+    for (const k of keys) {
+      eq(d.counts.demoI.national[lane][k],
+        LN(c.national[lane][k], c1c.national[lane][k]),
+        `demoI national ${lane}.${k}`);
+    }
   }
   const LI = new Map(d.divisions.map((x) => [x.div, x]))
     .get("Lingiari");
@@ -168,7 +185,8 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   const nc1b = new Map(c1.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   let bothNullC = 0, blendC = 0, keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
-    "blue", "age", "loinc", "hiinc", "incMed"]);
+    "blue", "age", "loinc", "hiinc", "incMed",
+    "y12less", "atsci", "u15", "onepar", "rel", "ten"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {
@@ -178,7 +196,8 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     }
     blendC++;
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
-    for (const k of ["langOther", "fborn", "uni", "blue"]) {
+    for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
+      "atsci", "onepar"]) {
       const a = b.demo && b.demo[k], x = fb.demo && fb.demo[k];
       if (a != null && x != null) {
         if (b.demoI[k] !== LN(a, x)) keyok = false;

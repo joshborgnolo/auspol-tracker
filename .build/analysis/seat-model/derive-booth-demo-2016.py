@@ -191,7 +191,8 @@ def load_gcp16():
     g01 = gcp_table(z, MEMBERS["G01"], "SA1_7DIGITCODE_2016",
                     ["Tot_P_P", *age_cols,
                      "Lang_spoken_home_Eng_only_P",
-                     "Lang_spoken_home_Oth_Lang_P"])
+                     "Lang_spoken_home_Oth_Lang_P",
+                     *voter.GCP_G01_SCHOOL_COLS])
     g09f = gcp_table(z, MEMBERS["G09F"], "SA1_7DIGITCODE_2016",
                      ["P_Australia_Tot"])
     g09h = gcp_table(z, MEMBERS["G09H"],
@@ -218,6 +219,8 @@ def load_gcp16():
 
     ad4, nonfam, inc_path = voter.income_factors()
     inc, inc_cut, inc_hishare = income_gcp16(z, ad4, nonfam)
+    nlt = voter.new_lane_tables(z, idcol="SA1_7DIGITCODE_2016",
+                              era="2016")
     if set(g01) != set(inc):
         fail("G01/G28+G29 SA1 universes diverge")
     out = {}
@@ -225,9 +228,16 @@ def load_gcp16():
         if code not in g09f or code not in g09h or code not in g46 \
                 or code not in g57:
             fail(f"GCP G09/G46B/G57B SA1 set mismatch at {code}")
+        if code not in nlt["G07"] or code not in nlt["G14"] \
+                or code not in nlt["G37"] or code not in nlt["G32"]:
+            fail(f"GCP G07/G14/G37/G32 SA1 set mismatch at {code}")
         bluen, occd = occ_of(g57[code])
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
+        sc = r[14:20]
+        y12t = (sum(sc[1:]), sum(sc))
+        indig, nonind = nlt["G07"][code]
+        relvec, relns, reltot = nlt["G14"][code]
         out[code] = (r[0], r[12], r[13],           # pers, eng, oth
                      r[1:12],                      # ages(11)
                      g09f[code][0],                # aust
@@ -236,9 +246,13 @@ def load_gcp16():
                      uni, g46[code][3],            # uni, eduns
                      bluen, occd,                  # bluen, occd
                      ir[0], ir[1], ir[2],          # inct/incl/inch
-                     ir[3], ir[4])                 # incb(16), incbh(16)
+                     ir[3], ir[4],                 # incb(16), incbh(16)
+                     None,                         # slot 16 (no 2016 cob)
+                     y12t, (indig, indig + nonind),
+                     relvec, (relns, reltot),
+                     nlt["G37"][code], nlt["G32"][code])
     print(f"GCP 2016: {len(out)} SA1s "
-          f"(G01/G09/G46B/G57B + G28/G29 income)")
+          f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
             "hiNationalShare": inc_hishare, "loQuantile": INC_LO_Q,
             "dollarsYear": 2016, "factors": inc_path}
@@ -386,10 +400,14 @@ def band_median16(masses):
 
 def shares16(rec):
     """d13.shares' body on the 16-band income grid (median off
-    band_median16) — the 2016-edition division/booth demo block."""
+    band_median16) — the 2016-edition division/booth demo block. A
+    voter-style new-lane accumulator (newL) emits the same lanes
+    straight from the pooled tail counts."""
     s = d13.shares(rec)
     if rec.get("incbh") is not None:
         s["incMed"] = band_median16(rec["incbh"])
+    if rec.get("newL") is not None:
+        s.update(voter.emit_new(rec["newL"]))
     return s
 
 
@@ -401,7 +419,22 @@ def gcp_to_rec(row):
             "bluen": row[9], "occd": row[10],
             "pop15": row[0] - row[3][0] - row[3][1],
             "inct": row[11], "incl": row[12], "inch": row[13],
-            "incbh": list(row[15])}
+            "incbh": list(row[15]),
+            "sch6": sc6of(row[17]),
+            "indig": row[18][0],
+            "indigDen": row[18][1],
+            "relvec": list(row[19]) if row[19] is not None else None,
+            "relNS": row[20][0], "relTot": row[20][1],
+            "ten6": list(row[21]),
+            "famN": row[22][0], "famD": row[22][1]}
+
+
+def sc6of(y12t):
+    """The _GCP tail's (less, stated) y12 pair -> the six-level
+    schooling counts d13.shares expects (the less mass is the five
+    sub-Year-12 levels' sum; Year 12 is the stated remainder)."""
+    less, stated = y12t
+    return [stated - less, less, 0, 0, 0, 0]
 
 
 def ced_of(gcp, sa11):
@@ -467,7 +500,8 @@ def main():
                                   "cobns": 0, "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
-                                  "incbh": [0.0] * len(INC_BANDS)})
+                                  "incbh": [0.0] * len(INC_BANDS),
+                                  "newL": voter.acc_new()})
     for code, dv in alloc.items():
         row = gcp.get(code)
         if row is None:
@@ -487,6 +521,7 @@ def main():
         acc["inch"] += row[13]
         for i in range(len(INC_BANDS)):
             acc["incbh"][i] += row[15][i]
+        voter.acc_row(acc["newL"], row, 1.0)
 
     locate, _polys, _nulls = hist.build_locate("sa1-2016")
     out_booths = []
@@ -518,6 +553,7 @@ def main():
         divisions.append({"div": name, "state": divstate[name],
                           **shares16(divsum[name])})
     nat = defaultdict(int)
+    nat_l = voter.acc_new()
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd", "pop15"):
@@ -529,6 +565,7 @@ def main():
         nat.setdefault("incbh", [0.0] * len(INC_BANDS))
         for i in range(len(INC_BANDS)):
             nat["incbh"][i] += dv["incbh"][i]
+        voter.acc_merge(nat_l, dv["newL"])
     nat_b = sum(nat[b] for b in BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -548,6 +585,8 @@ def main():
         "hiinc": round(nat["inch"] / nat["inct"], 4)
         if nat["inct"] else None,
         "incMed": band_median16(nat["incbh"]),
+        "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
+        **voter.emit_new(nat_l),
     }
     if len(alloc) != ALLOC_SA1_2016 or abs(
             national["persons"] - ALLOC_PERSONS_2016) > ALLOC_PERSONS_TOL:
@@ -595,7 +634,18 @@ def main():
             "language other-at-home over English-only + other; "
             "overseas-born over country-of-birth stated; university "
             "(bachelor and above) per the aged-15+ population less "
-            "level-of-education-not-stated; blue-collar over the eight "
+            "level-of-education-not-stated; the new lane set mirrors "
+            "the voter stores (G01's highest-year-of-schooling "
+            "persons columns — year-12-or-less over the six printed "
+            "stated levels; G07's Tot-row Indigenous/"
+            "Indigenous-plus-non-Indigenous share; G14's Religion "
+            "menu ten shares (rel, key order in relKeys) over the "
+            "ex-affiliation-not-stated basis; G33's Housing-tenure "
+            "menu four shares (ten, key order in tenKeys, "
+            "owned-with-mortgage leading) over the "
+            "ex-tenure-not-stated occupied-private-dwellings basis; "
+            "G28's one-parent share of families; the under-15 share "
+            "of the stated ages); blue-collar over the eight "
             "stated ANZSCO groups. Income lanes are the voter store's "
             "algorithm on the 2016 GCP's G28/G29 (16-band grid, "
             "FI/HI stems): household masses re-weighted to adults at "
@@ -615,7 +665,8 @@ def main():
         "_provenance": {
             "sourceUrls": {
                 "gcp": "ABS 2016 Census General Community Profile, SA1 "
-                       "for AUST (G01/G09F/G09H/G28/G29/G46B/G57B), "
+                       "for AUST "
+                       "(G01/G07/G09F/G09H/G14/G28/G29/G33/G46B/G57B), "
                        "abs.gov.au census datapacks",
                 "shapes": "ABS 1270.0.55.001 July 2016, SA1 polygons "
                           "(1270055001_sa1_2016_aust_shape.zip)",
@@ -643,6 +694,8 @@ def main():
         },
         "election": 2013,
         "censusEdition": 2016,
+        "relKeys": list(voter.REL_KEYS),
+        "tenKeys": list(voter.TEN_KEYS),
         "deliveryBasis": (
             "venue-proxy per booth (2016-census SA1 of the premises, "
             "point-in-polygon); CG-plurality whole-allocated 2016 GCP "

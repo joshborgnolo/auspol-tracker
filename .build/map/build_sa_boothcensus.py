@@ -49,11 +49,13 @@ import openpyxl
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sa26_geo import read_sa1_polygons, in_geometry, SA_SENTINELS  # noqa: E402
+import gcp_newlanes  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 GCP_ZIP = os.path.join(REPO, ".build", "analysis", "seat-model", "cache", "gcp-sa1-2021.zip")
 CUBE_XLSX = os.path.join(REPO, ".matilda", "seifa-irsad-abs", "abs-seifa-2021-sa1-indexes.xlsx")
-YEARS = ("sa22", "sa26")
+YEARS = tuple(filter(None, os.environ.get("SA_YEARS", "").split(","))) \
+    or ("sa22", "sa26")
 
 IX = ["irsad", "irsd", "ier", "ieo"]
 INDEX_TITLES = {
@@ -201,9 +203,10 @@ def seifa_deciles():
 
 @functools.lru_cache(maxsize=None)
 def demo_cells():
-    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, None, None],
-    cob row in COB_KEYS order) with the district people lanes' exact bases
-    (build_sa26_demo.py shares())."""
+    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, None,
+    None, y12less, atsci, u15, onepar], cob row in COB_KEYS order, rel
+    row in REL_KEYS order, ten row in TEN_KEYS order) with the district
+    people lanes' exact bases (build_sa26_demo.py shares())."""
     import csv
     import io
     import zipfile
@@ -231,6 +234,7 @@ def demo_cells():
                           tuple(int(row[c]) for c in agecols))
     if n != GCP_ROWS or len(base) != GCP_SA_ROWS:
         fail(f"GCP G01 rows {n} (pin {GCP_ROWS}), SA {len(base)} (pin {GCP_SA_ROWS})")
+    newl = gcp_newlanes.load(GCP_ZIP, prefix="4")
     extra = {}
     for tag, member, cols in GCP_MEMBERS:
         if member not in z.namelist():
@@ -276,14 +280,25 @@ def demo_cells():
         den09 = tot - cobns
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
                g09[2], h09[6], h09[5])
+        sch6, indt, (relvec, relns, reltot), ten6, fam = newl[code]
+        rel = [safe(v, reltot - relns) for v in relvec]
+        own, mort, rent, rentpub, othtype, tenns = ten6
+        tend = own + mort + rent + othtype
+        ten = [safe(mort, tend), safe(rent, tend),
+               safe(own, tend), safe(rentpub, tend)]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
                       safe(bands[3] + bands[4], bsum),
                       safe(tot - cobns - aust, tot - cobns),
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
-                      None, None],
-                     [safe(c, den09) for c in cob])
+                      None, None,
+                      gcp_newlanes.y12less_cell(sch6, safe),
+                      safe(indt[0], indt[1]),
+                      gcp_newlanes.u15_cell(bands, safe),
+                      safe(fam[0], fam[1])],
+                     [safe(c, den09) for c in cob],
+                     rel, ten)
     print(f"GCP demo cells: {len(out)} SA1s")
     return out
 
@@ -309,7 +324,7 @@ def main():
             fail(f"{year}: cobKeys already set — the lane is not this script's on a stale data build (rerun build_{year}_data.py first)")
         out_sa1, suppressions = set(), 0
         counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0}
-        dec_col, demo_col, cob_col = [], [], []
+        dec_col, demo_col, cob_col, rel_col, ten_col = [], [], [], [], []
         for k in range(n):
             lat, _lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
             if ty == 4:
@@ -317,6 +332,8 @@ def main():
                 dec_col.append(None)
                 demo_col.append(None)
                 cob_col.append(None)
+                rel_col.append(None)
+                ten_col.append(None)
                 continue
             if lat is None:
                 fail(f"{year} booth {B['n'][k]!r}: no coordinates — every fixed booth must carry the venue roll's coords before the census join")
@@ -340,12 +357,18 @@ def main():
             counts["demo"] += 1
             demo_col.append(list(dm[0]))
             cob_col.append(list(dm[1]))
+            rel_col.append(list(dm[2]))
+            ten_col.append(list(dm[3]))
         B["dec"] = dec_col
         B["vdec"] = [None] * n  # ECSA releases no votes-by-SA1 product; the
         # voter-footprint lane is a federal AEC read and stays empty by design
         B["demo"] = demo_col
         B["cob"] = cob_col
+        B["rel"] = rel_col
+        B["ten"] = ten_col
         data["cobKeys"] = COB_KEYS
+        data["relKeys"] = list(gcp_newlanes.REL_KEYS)
+        data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
         with open(path, "w") as f:
             json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
         print(f"{year}: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

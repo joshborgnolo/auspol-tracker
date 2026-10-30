@@ -105,6 +105,46 @@ PIN_ROWS = 38713  # exact CD universe across the nine state CSVs
 STATE_ORDER = {s: i for i, s in
                enumerate(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT",
                           "ACT"])}
+# ---- the six new People lanes' 2006-BCP cells (2026-10-29 arc; ids
+# verified row-by-row against BCP2006_cell_desc_dp.xls):
+#   B01 B54 = Total Indigenous persons (the table's own
+#     selected-characteristics total — see the GCP-era Tot-row
+#     rationale in derive-booth-seifa-voter.py); B07's "Total" row
+#     B1039 = Indigenous status not stated (the lane's basis = persons
+#     ex status-not-stated: B54 raw Indigenous / (B3 persons - B1039))
+#   B13 = religion (the ten REL menu rows + not-stated + total; the
+#     orth lane sums Eastern B2134 + Oriental B2146)
+#   B15 P_*_Tot = highest year of school, persons, six levels
+#   B24 = family composition (one-parent/total families)
+#   B32 = tenure by landlord totals (mort lane is "Being purchased"
+#     incl rent/buy schemes)
+B01_INDIG = "B54"
+B07_NS_TOTAL = "B1039"  # B07 Total-row Indigenous status NS, persons
+B13_REL = {
+    "norel": ["B2194"],      # No_Religion_P
+    "cath": ["B2128"],       # Christ_Catholic_P
+    "angl": ["B2116"],       # Christ_Anglican_P
+    "unch": ["B2164"],       # Christ_Uniting_Church_P
+    "pres": ["B2155"],       # Christ_Presbyter_Ref_P
+    "orth": ["B2134", "B2146"],  # Eastern + Oriental orthodox
+    "budd": ["B2113"],       # Buddhism_P
+    "isl": ["B2179"],        # Islam_P
+    "hind": ["B2176"],       # Hinduism_P
+    "jew": ["B2182"],        # Judaism_P
+}
+B13_NS = "B2200"
+B13_TOT = "B2203"
+B15_SCHOOL = ["B2454", "B2464", "B2474", "B2484", "B2494",
+              "B2504"]  # P_Yr_12_eq .. P_Did_not_go (GCP level order)
+B24_FAM = ["B4243", "B4223", "B4233", "B4244", "B4245"]
+# OPF_Tot_F, Couple_no_child_F, Couple_Tot_F, Other_Family_F, Total_F
+B32_TEN = ["B4531", "B4537", "B4579", "B4549", "B4585", "B4591"]
+# own-outright, being-purchased, rented-total, S/T housing authority,
+# other-tenure-type, tenure-NS
+# the cross-era key orders the whole lane stack shares
+REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+            "isl", "hind", "jew"]
+TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 
 
 def bcp_table(table, cols, pin_rows=PIN_ROWS):
@@ -145,18 +185,29 @@ def load_bcp():
     """Per CD: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
-        for t in ("B01", "B09", "B12", "B39_B", "B44_B"):
+        for t in ("B01", "B07", "B09", "B12", "B13", "B15_B", "B24",
+                  "B32", "B39_B", "B44_B"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
                 fail(f"missing cd06 extracts ({CD06}); see module "
                      f"docstring")
     if not BCP_ZIP.exists():
         fail(f"missing {BCP_ZIP} (provenance anchor; ABS 2006 Census "
              f"datapacks, archive census06bcp.zip)")
-    b01 = bcp_table("B01", ["B3"] + B01_BANDS)
+    b01 = bcp_table("B01", ["B3", B01_INDIG] + B01_BANDS)
     b09 = bcp_table("B09", B09_COLS)
     b12 = bcp_table("B12", B12_COLS)
     b39 = bcp_table("B39_B", B39_COLS)
     b44 = bcp_table("B44_B", B44_COLS)
+    b07 = bcp_table("B07", [B07_NS_TOTAL])
+    rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
+    b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
+    # B15's Persons cell block straddles the two split files: the
+    # Year-12..Year-9 total cells ride B15_A, Year-8-below +
+    # did-not-go ride B15_B (BCP2006_cell_desc_dp.xls Split column)
+    b15a = bcp_table("B15_A", ["B2454", "B2464", "B2474", "B2484"])
+    b15b = bcp_table("B15_B", ["B2494", "B2504"])
+    b24 = bcp_table("B24", B24_FAM)
+    b32 = bcp_table("B32", B32_TEN)
     out = {}
     for code, g in b01.items():
         row09 = b09[code]
@@ -165,9 +216,17 @@ def load_bcp():
         eng, oth = b12[code]
         pg, gd, ba, eduns = b39[code]
         occ = b44[code]
+        row13 = b13[code]
+        # the cross-era REL_KEYS vector, orth = its two-cell sum
+        relvec = []
+        i = 0
+        for k in REL_KEYS:
+            span = len(B13_REL[k])
+            relvec.append(sum(row13[i:i + span]))
+            i += span
         out[code] = {
             "pers": g[0],
-            "ages": g[1:12],
+            "ages": g[2:13],
             "eng": eng, "oth": oth,
             "aus": aus, "totc": totc, "cobns": cobns,
             "cobn": ccob,
@@ -175,7 +234,16 @@ def load_bcp():
             "eduns": eduns,
             "bluen": occ[2] + occ[6] + occ[7],
             "occd": sum(occ),
-            "pop15": g[0] - g[1] - g[2],
+            "pop15": g[0] - g[2] - g[3],
+            "sch6": list(b15a[code]) + list(b15b[code]),
+            "indig": g[1],
+            "indigDen": g[0] - b07[code][0],
+            "relvec": tuple(relvec),
+            "relNS": row13[-2],
+            "relTot": row13[-1],
+            "ten6": tuple(b32[code]),
+            "famN": b24[code][0],
+            "famD": b24[code][4],
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -205,7 +273,28 @@ def shares(rec):
         "blue": bounded(rec["bluen"], rec["occd"]),
         "age": ({b: round(rec["bands"][i] / bsum, 4)
                  for i, b in enumerate(BANDS)} if bsum > 0 else None),
+        "u15": (bounded(rec["bands"][0] + rec["bands"][1], bsum)
+                if bsum > 0 else None),
     }
+    if rec.get("sch6") is not None:
+        sc = rec["sch6"]
+        scd = sum(sc)
+        out["y12less"] = bounded(sum(sc[1:]), scd) if scd > 0 else None
+    if rec.get("indig") is not None and rec.get("indigDen"):
+        out["atsci"] = bounded(rec["indig"], rec["indigDen"])
+    if rec.get("relvec") is not None and rec.get("relTot") is not None:
+        relbd = rec["relTot"] - (rec.get("relNS") or 0)
+        out["rel"] = {k: bounded(rec["relvec"][i], relbd)
+                      for i, k in enumerate(REL_KEYS)}
+    if rec.get("ten6") is not None:
+        own, mort, rent, rentpub, othtype, tenns = rec["ten6"]
+        tend = own + mort + rent + othtype
+        out["ten"] = {k: bounded({"mort": mort, "rent": rent,
+                                  "own": own, "rentPub": rentpub}[k],
+                                 tend)
+                      for k in TEN_KEYS}
+    if rec.get("famN") is not None and rec.get("famD"):
+        out["onepar"] = bounded(rec["famN"], rec["famD"])
     if rec.get("cobn") is not None:
         out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
                       for i, k in enumerate(COB_KEYS8)}
@@ -241,7 +330,13 @@ def build_year(year, sa1):
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
                                   "cobns": 0, "cobn": [0] * len(COB_KEYS8),
                                   "uni": 0, "eduns": 0,
-                                  "bluen": 0, "occd": 0, "pop15": 0})
+                                  "bluen": 0, "occd": 0, "pop15": 0,
+                                  "sch6": [0] * 6,
+                                  "indig": 0, "indigDen": 0,
+                                  "relvec": [0] * len(REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "ten6": [0] * 6,
+                                  "famN": 0, "famD": 0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -255,6 +350,14 @@ def build_year(year, sa1):
             acc[k] += r[k]
         for i in range(len(COB_KEYS8)):
             acc["cobn"][i] += r["cobn"][i]
+        for i in range(6):
+            acc["sch6"][i] += r["sch6"][i]
+            acc["ten6"][i] += r["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            acc[k] += r[k]
+        for i in range(len(REL_KEYS)):
+            acc["relvec"][i] += r["relvec"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -280,7 +383,14 @@ def build_year(year, sa1):
                 "cobns": row["cobns"], "cobn": row["cobn"],
                 "uni": row["uni"],
                 "eduns": row["eduns"], "bluen": row["bluen"],
-                "occd": row["occd"], "pop15": row["pop15"]})
+                "occd": row["occd"], "pop15": row["pop15"],
+                "sch6": list(row["sch6"]),
+                "indig": row["indig"],
+                "indigDen": row["indigDen"],
+                "relvec": list(row["relvec"]),
+                "relNS": row["relNS"], "relTot": row["relTot"],
+                "ten6": list(row["ten6"]),
+                "famN": row["famN"], "famD": row["famD"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -294,6 +404,17 @@ def build_year(year, sa1):
         for i in range(len(COB_KEYS8)):
             nat.setdefault("cobn", [0.0] * len(COB_KEYS8))
             nat["cobn"][i] += dv["cobn"][i]
+        for i in range(6):
+            nat.setdefault("sch6", [0] * 6)
+            nat.setdefault("ten6", [0] * 6)
+            nat["sch6"][i] += dv["sch6"][i]
+            nat["ten6"][i] += dv["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            nat[k] += dv[k]
+        for i in range(len(REL_KEYS)):
+            nat.setdefault("relvec", [0] * len(REL_KEYS))
+            nat["relvec"][i] += dv["relvec"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -325,6 +446,20 @@ def build_year(year, sa1):
             "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
                         if nat_fbd > 0 else None)
                     for i, k in enumerate(COB_KEYS8)},
+            "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
+            "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+            "atsci": round(nat["indig"] / nat["indigDen"], 4),
+            "onepar": round(nat["famN"] / nat["famD"], 4),
+            "rel": {k: round(nat["relvec"][i]
+                             / (nat["relTot"] - nat["relNS"]), 4)
+                    for i, k in enumerate(REL_KEYS)},
+            "ten": {k: round({"mort": nat["ten6"][1],
+                              "rent": nat["ten6"][2],
+                              "own": nat["ten6"][0],
+                              "rentPub": nat["ten6"][3]}[k]
+                             / (nat["ten6"][0] + nat["ten6"][1]
+                                + nat["ten6"][2] + nat["ten6"][4]), 4)
+                    for k in TEN_KEYS},
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -358,7 +493,22 @@ def build_year(year, sa1):
             "trimmed to eight here (country order in cobKeys); "
             "university (bachelor and above) "
             "per the aged-15+ population less "
-            "level-of-education-not-stated; blue-collar (technicians/"
+            "level-of-education-not-stated; the new lane set mirrors "
+            "the voter stores: B15_B's highest-year-of-schooling six "
+            "levels (year-12-or-less over the stated levels), "
+            "Indigenous status of B01's total over persons ex "
+            "B07's status-not-stated (the lane is B54 indigenous / "
+            "(B3 persons - B1039 status-not-stated)), B13's ten "
+            "Religion menu shares (rel, key order in relKeys, "
+            "No-religion leading) over the ex-affiliation-not-stated "
+            "persons basis, B32's four Housing-tenure menu shares "
+            "(ten, key order in tenKeys, owned-with-mortgage "
+            "leading — being-purchased includes rent/buy) over the "
+            "ex-tenure-not-stated occupied-private-dwellings basis "
+            "(rented-public a state-or-territory-housing-authority "
+            "landlord within that base), B24's one-parent share of "
+            "families, and the under-15 share of the stated ages; "
+            "blue-collar (technicians/"+
             "trades + machinery operators/drivers + labourers of B44 "
             "the ANZSCO occupation major groups) over the eight stated "
             "occupation groups, inadequately-described and not-stated "
@@ -376,7 +526,8 @@ def build_year(year, sa1):
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2006 Census Basic Community Profile, "
-                       "collection districts (B01/B09/B12/B39_B/B44_B), "
+                       "collection districts (B01/B07/B09/B12/B13/"
+                       "B15_B/B24/B32/B39_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
                 "venue": f"data/booth-seifa-{year}.json",
@@ -391,6 +542,8 @@ def build_year(year, sa1):
         "election": year,
         "censusEdition": 2006,
         "cobKeys": COB_KEYS8,
+        "relKeys": list(REL_KEYS),
+        "tenKeys": list(TEN_KEYS),
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),

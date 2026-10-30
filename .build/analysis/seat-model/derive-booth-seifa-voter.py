@@ -252,6 +252,12 @@ GCP_MEMBER_G09H = ("2021 Census GCP Statistical Area 1 for AUS/"
 # 1.18 vnm 1.04 zaf 0.74 ita 0.63 lka 0.52 sct 0.43)
 COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
             "lka", "sct"]
+# the Religion and Housing-tenure select families (cross-era key sets,
+# identical order in every edition's reader; REL keys lead with "No
+# religion", TEN keys lead with the user-default "mort")
+REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+            "isl", "hind", "jew"]
+TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
 GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
 GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
@@ -265,6 +271,60 @@ GCP_MEMBER_G33 = ("2021 Census GCP Statistical Area 1 for AUS/"
                   "2021Census_G33_AUST_SA1.csv")
 GCP_MEMBER_G60B = ("2021 Census GCP Statistical Area 1 for AUS/"
                    "2021Census_G60B_AUST_SA1.csv")
+# ---- the six new People lanes' 2021 GCP members (2026-10-29 arc):
+# schooling rides G01 (already read); Indigenous status G07 (the
+# age-banded person table — its Indigenous/Non-Indigenous stall is the
+# lane's ex-not-stated basis); religion G14; family composition totals
+# G32 (income x composition); tenure x landlord G37
+GCP_MEMBER_G07 = ("2021 Census GCP Statistical Area 1 for AUS/"
+                  "2021Census_G07_AUST_SA1.csv")
+GCP_MEMBER_G14 = ("2021 Census GCP Statistical Area 1 for AUS/"
+                  "2021Census_G14_AUST_SA1.csv")
+GCP_MEMBER_G37 = ("2021 Census GCP Statistical Area 1 for AUS/"
+                  "2021Census_G37_AUST_SA1.csv")
+# G01's highest-year-of-schooling persons columns (printed six-state
+# set; y12less = the five below-original-year rows over their stated
+# sum — still-at-school sits outside every era's GCP print)
+GCP_G01_SCHOOL_COLS = ["High_yr_schl_comp_Yr_12_eq_P",
+                       "High_yr_schl_comp_Yr_11_eq_P",
+                       "High_yr_schl_comp_Yr_10_eq_P",
+                       "High_yr_schl_comp_Yr_9_eq_P",
+                       "High_yr_schl_comp_Yr_8_belw_P",
+                       "High_yr_schl_comp_D_n_g_sch_P"]
+# G07 age-band row stems (Indigenous_P / Non_Indig*-P / Tot_P) — the
+# Non-Indigenous column's suffix varies band to band in the GCP print
+# ("Non_Indigenous_P" young bands, "Non_Indig_P" older); resolve per
+# header at load
+G07_BANDS = ["A_0_4_y", "A_5_9_y", "A_10_14_y", "A_15_19_y", "A_20_24_y",
+             "A_25_29_y", "A_30_34_y", "A_35_39_y", "A_40_44_y",
+             "A_45_49_y", "A_50_54_y", "A_55_59_y", "A_60_64_y",
+             "A_65_y_ov"]
+# G14 religion columns per REL_KEYS slot (GCP era: No-religion is the
+# so-described NR part of SB_OSB_NRA; the orth lane sums Eastern +
+# Oriental orthodox — the 2001 print's own two orthodox rows)
+GCP_G14_REL = {
+    "norel": ["SB_OSB_NRA_NR_P"],
+    "cath": ["Christianity_Catholic_P"],
+    "angl": ["Christianity_Anglican_P"],
+    "unch": ["Christianity_Uniting_Church_P"],
+    "pres": ["Christinty_Prsbytrin_Refrmd_P"],
+    "orth": ["Christianity_Eastrn_Orthdox_P",
+             "Christianity_Orintal_Orthdx_P"],
+    "budd": ["Buddhism_P"],
+    "isl": ["Islam_P"],
+    "hind": ["Hinduism_P"],
+    "jew": ["Judaism_P"],
+}
+# G37 tenure x landlord totals (occupied private dwellings): owned
+# outright, owned with mortgage, rented (all landlords), rented from a
+# state/territory housing authority, other tenure type, tenure not
+# stated
+GCP_G37_COLS = ["O_OR_Total", "O_MTG_Total", "R_Tot_Total",
+                "R_ST_h_auth_Total", "Oth_ten_type_Total",
+                "Ten_type_NS_Total"]
+# G32's family-composition totals (one-parent share's family basis)
+GCP_G32_FAMCOLS = ["Tot_One_parent_fam", "Tot_cpl_fam_no_child",
+                   "Tot_cpl_fam_wth_chld", "Tot_Other_fam", "Tot_Tot"]
 # the eight stated ANZSCO occupation major groups (G60B P_Tot_*), in
 # file order; blue-collar = trades + machinery operators & drivers +
 # labourers, shared over the stated set (inadequately-described/
@@ -295,14 +355,33 @@ XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G09F/G09G/G09H, G49B, G32/G33 and G60B "
-              "@ SA1 (Ed3); "
+DEMO_BASIS = ("2021 Census GCP G01, G07, G09F/G09G/G09H, G14, "
+              "G32/G33, G37, G49B and G60B @ SA1 (Ed3); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
-_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G09F/G09G/G09H, "
-              "G49B, G32/G33 and G60B SA1 tables (G01: age-band structure; language "
-              "spoken at home English-only vs other. G09: country of "
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G07, "
+              "G09F/G09G/G09H, G14, G32/G33, G37, G49B and G60B SA1 "
+              "tables (G01: age-band structure (u15 the under-15 share "
+              "of the stated ages); language "
+              "spoken at home English-only vs other; the "
+              "highest-year-of-schooling persons columns — the "
+              "year-12-or-less share of the six printed stated levels "
+              "(below-Year-12 = Year 11, Year 10, Year 9, Year 8 or "
+              "below, did-not-go-to-school). G07: Indigenous status — "
+              "the identifying share of the Indigenous-plus-non-Indigenous "
+              "persons basis (status-not-stated excluded). G14: "
+              "religious affiliation — the Religion menu's ten share "
+              "options (rel, key order in relKeys, No-religion leading) "
+              "ride the ex-affiliation-not-stated persons basis. "
+              "G32's family-composition totals: the one-parent share "
+              "of families (couple-with-children + couple-without-children "
+              "+ one-parent + other-family). G37: tenure by landlord "
+              "— the Housing-tenure menu's four share options "
+              "(ten, key order in tenKeys, owned-with-mortgage leading) "
+              "ride the ex-tenure-not-stated occupied-private-dwellings "
+              "basis, rented-public a state-or-territory-housing-authority "
+              "landlord within that base. G09: country of "
               "birth — the overseas-born share excludes "
               "country-of-birth-not-stated, and the ten curated "
               "birthplace-country shares (cob, country order in cobKeys) "
@@ -515,6 +594,93 @@ def income_gcp(z, factors, nonfam):
     return out, round(cut25, 2), round(hi_share, 6)
 
 
+def read_p_cols(z, member, idcol, cols, rows_pin, tag):
+    """One GCP table's persons columns as compact int tuples, guarded —
+    header drift, duplicate codes and the table's row-count pin all
+    fail loud. cols may include None (a column name that resolved to
+    no header) only when the caller tolerates it."""
+    if member not in z.namelist():
+        fail(f"GCP zip lacks {member}")
+    d = {}
+    with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+        rdr = csv.DictReader(fh)
+        fn = rdr.fieldnames or []
+        miss = [c for c in cols + [idcol]
+                if c is not None and c not in fn]
+        if miss:
+            fail(f"GCP {tag} header drift, missing {miss}")
+        m = 0
+        for row in rdr:
+            m += 1
+            code = row[idcol]
+            if code in d:
+                fail(f"GCP {tag} dup code {code}")
+            d[code] = tuple(int(row[c]) if c is not None else None
+                            for c in cols)
+    if m != rows_pin:
+        fail(f"GCP {tag} rows {m} != pin {rows_pin}")
+    print(f"GCP demo: {tag}, {m} rows")
+    return d
+
+
+# SA1-row pins of the GCP universes the new-lane tables join (the
+# 2021 zip's pin lives at GCP_ROWS; the 2016 zip's sits here so both
+# the voter-store reader and derive-booth-demo-2016.py share it)
+G16_GCP_ROWS = 57523
+
+
+def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
+    """The six new People lanes' GCP reads, keyed per SA1:
+      G07 {code: (ind-tuple, nonind-tuple)}   G14 {code: (relvec, ns, tot)}
+      G37 {code: (own, mort, rent, rentPub, othType, tenNS)}
+      G32 {code: (onepar, cplNoChild, cplChild, otherFam, famTot)}
+    Schooling is always the caller's own G01 base pass. era=2016 reads
+    the Ed2 zip's G07/G14/G33/G28 counterparts."""
+    pfx = ("2021 Census GCP Statistical Area 1 for AUS/"
+           if era == "2021" else
+           "2016 Census GCP Statistical Area 1 for AUST/")
+    rows_pin = GCP_ROWS if era == "2021" else G16_GCP_ROWS
+    tbl = {}
+    zpf = lambda m: pfx + m
+    if era == "2021":
+        m07, m14, mten, mfam = ("2021Census_G07_AUST_SA1.csv",
+                                "2021Census_G14_AUST_SA1.csv",
+                                "2021Census_G37_AUST_SA1.csv",
+                                "2021Census_G32_AUST_SA1.csv")
+    else:
+        m07, m14, mten, mfam = ("2016Census_G07_AUS_SA1.csv",
+                                "2016Census_G14_AUS_SA1.csv",
+                                "2016Census_G33_AUS_SA1.csv",
+                                "2016Census_G28_AUS_SA1.csv")
+    # G07's per-band Indigenous columns are individually suppressed
+    # (0-3-person cells turned to zero far outnumbering bumps) and
+    # undercount nationally by a fifth; the table's own Tot rows are
+    # coherent with G01's Indigenous totals and the census headline —
+    # the lane reads the Tot row, never the band stall
+    tbl["G07"] = read_p_cols(z, zpf(m07), idcol,
+                             ["Tot_Indigenous_P", "Tot_Non_Indigenous_P"],
+                             rows_pin, "G07")
+    rel_cols = [c for k in REL_KEYS for c in GCP_G14_REL[k]]
+    g14 = read_p_cols(z, zpf(m14), idcol,
+                      rel_cols + ["Religious_affiliation_ns_P", "Tot_P"],
+                      rows_pin, "G14")
+    tbl["G14"] = {}
+    for c, r in g14.items():
+        relvec, i = [], 0
+        for k in REL_KEYS:
+            span = len(GCP_G14_REL[k])
+            relvec.append(sum(r[i: i + span]))
+            i += span
+        tbl["G14"][c] = (tuple(relvec), r[-2], r[-1])
+    tbl["G37"] = read_p_cols(z, zpf(mten), idcol, GCP_G37_COLS,
+                             rows_pin, "G37")
+    tbl["G32"] = {c: (r[0], r[4])
+                  for c, r in read_p_cols(
+                      z, zpf(mfam), idcol, GCP_G32_FAMCOLS,
+                      rows_pin, "G32").items()}
+    return tbl
+
+
 def load_gcp21():
     global _GCP
     if _GCP is not None:
@@ -525,12 +691,14 @@ def load_gcp21():
     want = ["SA1_CODE_2021", "Tot_P_P", "Lang_used_home_Eng_only_P",
             "Lang_used_home_Oth_Lang_P", *agecols]
     base = {}
+    school = {}
     z = zipfile.ZipFile(GCP_ZIP)
     if GCP_MEMBER not in z.namelist():
         fail(f"GCP zip lacks {GCP_MEMBER}")
     with io.TextIOWrapper(z.open(GCP_MEMBER), encoding="utf-8-sig") as fh:
         rdr = csv.DictReader(fh)
-        miss = [c for c in want if c not in (rdr.fieldnames or [])]
+        miss = [c for c in want + GCP_G01_SCHOOL_COLS
+                if c not in (rdr.fieldnames or [])]
         if miss:
             fail(f"GCP G01 header drift, missing {miss}")
         n = 0
@@ -543,6 +711,8 @@ def load_gcp21():
                           int(row["Lang_used_home_Eng_only_P"]),
                           int(row["Lang_used_home_Oth_Lang_P"]),
                           tuple(int(row[c]) for c in agecols))
+            school[code] = tuple(int(row[c])
+                                 for c in GCP_G01_SCHOOL_COLS)
     if n != GCP_ROWS:
         fail(f"GCP G01 rows {n} != pin {GCP_ROWS}")
     extra = {}
@@ -578,6 +748,7 @@ def load_gcp21():
         print(f"GCP demo: {tag} SA1, {m} rows")
     ad4, nonfam, inc_path = income_factors()
     inc, inc_cut, inc_hishare = income_gcp(z, ad4, nonfam)
+    nlt = new_lane_tables(z, era="2021")
     out = {}
     for code, r in base.items():
         f09 = extra["G09F"].get(code)
@@ -589,13 +760,25 @@ def load_gcp21():
         if f09 is None or g09 is None or h09 is None or e49 is None \
                 or ir is None or o60 is None:
             fail(f"GCP G09/G49B/G32/G33/G60B SA1 set mismatch at {code}")
+        if code not in school or code not in nlt["G07"] \
+                or code not in nlt["G14"] or code not in nlt["G37"] \
+                or code not in nlt["G32"]:
+            fail(f"GCP G01/G07/G14/G37/G32 SA1 set mismatch at {code}")
         # the ten-country cob tuple, in COB_KEYS order, indexed on the
         # GCP_G09{F,G,H}_COLS orders above
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
                g09[2], h09[6], h09[5])
+        sc = school[code]
+        y12t = (sc[1] + sc[2] + sc[3] + sc[4] + sc[5], sum(sc))
+        indig, nonind = nlt["G07"][code]
+        indt = (indig, indig + nonind)
+        relvec, relns, reltot = nlt["G14"][code]
+        ten = nlt["G37"][code]
+        fam = nlt["G32"][code]
         out[code] = r + (f09[0], h09[0], h09[1],
                          e49[0] + e49[1] + e49[2], e49[3],
-                         o60[2] + o60[6] + o60[7], sum(o60)) + ir + (cob,)
+                         o60[2] + o60[6] + o60[7], sum(o60)) + ir + (cob,) \
+            + (y12t, indt, relvec, (relns, reltot), ten, fam)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -702,6 +885,66 @@ def units_to_ed3(units, conf, dec, xw):
     return out, round(drop)
 
 
+def acc_new():
+    """The new-lane lane accumulator (zero-weight)."""
+    return {"y12n": 0.0, "y12d": 0.0, "atN": 0.0, "atD": 0.0,
+            "relN": [0.0] * len(REL_KEYS), "relNS": 0.0, "relTot": 0.0,
+            "tenN": [0.0] * 6, "famN": 0.0, "famD": 0.0}
+
+
+def acc_row(acc, r, w):
+    """Weight-add row r's new-lane tail (r[17..22]) into acc; any
+    reader of the GCP/BCP universes emits the same tail layout."""
+    acc["y12n"] += w * r[17][0]
+    acc["y12d"] += w * r[17][1]
+    acc["atN"] += w * r[18][0]
+    acc["atD"] += w * r[18][1]
+    for i in range(len(REL_KEYS)):
+        acc["relN"][i] += w * r[19][i]
+    acc["relNS"] += w * r[20][0]
+    acc["relTot"] += w * r[20][1]
+    for i in range(6):
+        acc["tenN"][i] += w * r[21][i]
+    acc["famN"] += w * r[22][0]
+    acc["famD"] += w * r[22][1]
+
+
+def acc_merge(dst, src):
+    for k in ("y12n", "y12d", "atN", "atD", "relNS", "relTot",
+              "famN", "famD"):
+        dst[k] += src[k]
+    for i in range(len(REL_KEYS)):
+        dst["relN"][i] += src["relN"][i]
+    for i in range(6):
+        dst["tenN"][i] += src["tenN"][i]
+
+
+def emit_new(acc):
+    """One share-block's new-lane section. Shares come from the
+    weighted COUNTS (never averaged row shares), and an empty basis
+    emits null on the per-lane pcti convention — nothing is ever
+    clamped or completed. rel rides the ex-not-stated persons basis,
+    ten the ex-tenure-not-stated dwellings basis."""
+    yd, ad = acc["y12d"], acc["atD"]
+    relD = acc["relTot"] - acc["relNS"]
+    tn = acc["tenN"]
+    tenD = tn[0] + tn[1] + tn[2] + tn[4]
+    return {
+        "y12less": round(acc["y12n"] / yd, 4) if yd > 0 else None,
+        "atsci": round(acc["atN"] / ad, 4) if ad > 0 else None,
+        "onepar": round(acc["famN"] / acc["famD"], 4)
+        if acc["famD"] > 0 else None,
+        "rel": {k: (round(acc["relN"][i] / relD, 4)
+                    if relD > 0 else None)
+                for i, k in enumerate(REL_KEYS)},
+        "ten": {k: (round({"mort": tn[1], "rent": tn[2],
+                           "own": tn[0], "rentPub": tn[3]}[k] / tenD,
+                          4)
+                    if tenD > 0 else None)
+                for k in TEN_KEYS},
+    }
+
+
 def demo_units(units21, gcp):
     """Per unit: the GCP demo block + the div/national accumulators."""
     nat = {"votes": 0.0, "pers": 0.0, "eng": 0.0, "oth": 0.0,
@@ -711,7 +954,8 @@ def demo_units(units21, gcp):
            "inct": 0.0, "incl": 0.0, "inch": 0.0,
            "incb": [0.0] * len(INC_BANDS),
            "incbh": [0.0] * len(INC_BANDS),
-           "cobN": [0.0] * len(COB_KEYS)}
+           "cobN": [0.0] * len(COB_KEYS),
+           "newL": acc_new()}
     divs = {}
     out = {}
     for key, kv in units21.items():
@@ -727,6 +971,7 @@ def demo_units(units21, gcp):
         incb = [0.0] * len(INC_BANDS)
         incbh = [0.0] * len(INC_BANDS)
         cobacc = [0.0] * len(COB_KEYS)
+        dvn = acc_new()
         for code, w in kv.items():
             r = gcp.get(code)
             if r is None:
@@ -754,6 +999,7 @@ def demo_units(units21, gcp):
                 incbh[i] += w * r[15][i]
             for i in range(len(COB_KEYS)):
                 cobacc[i] += w * r[16][i]
+            acc_row(dvn, r, w)
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0, "oth": 0.0,
                                       "bands": [0.0] * len(DEMO_BANDS),
@@ -765,7 +1011,8 @@ def demo_units(units21, gcp):
                                       "inch": 0.0,
                                       "incb": [0.0] * len(INC_BANDS),
                                       "incbh": [0.0] * len(INC_BANDS),
-                                      "cobN": [0.0] * len(COB_KEYS)})
+                                      "cobN": [0.0] * len(COB_KEYS),
+                                      "newL": acc_new()})
         dv["votes"] += tot
         dv["cov"] += cov
         dv["pers"] += pers
@@ -783,6 +1030,7 @@ def demo_units(units21, gcp):
             dv["incbh"][i] += incbh[i]
         for i in range(len(COB_KEYS)):
             dv["cobN"][i] += cobacc[i]
+        acc_merge(dv["newL"], dvn)
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -800,6 +1048,7 @@ def demo_units(units21, gcp):
             nat["incbh"][i] += incbh[i]
         for i in range(len(COB_KEYS)):
             nat["cobN"][i] += cobacc[i]
+        acc_merge(nat["newL"], dvn)
         # G01's 11 age bands exclude age-not-stated (no NS column; the
         # residual against Tot_P_P runs anywhere up to ~5% per SA1), so
         # the age shares renormalise on the band sum — the same
@@ -832,6 +1081,9 @@ def demo_units(units21, gcp):
             "cob": {k: (round(cobacc[i] / fb_den, 4)
                         if fb_den > 0 else None)
                     for i, k in enumerate(COB_KEYS)},
+            "u15": (round((bands[0] + bands[1]) / bsum, 4)
+                    if bsum > 0 else None),
+            **emit_new(dvn),
         }
     return out, nat, divs
 
@@ -907,7 +1159,8 @@ def demo_units_i(units, gcp):
            "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
            "bluen": 0.0, "occd": 0.0,
            "inct": 0.0, "incl": 0.0, "inch": 0.0,
-           "incbh": None}
+           "incbh": None,
+           "newL": acc_new()}
     divs = {}
     out = {}
     for key, kv in units.items():
@@ -921,6 +1174,7 @@ def demo_units_i(units, gcp):
         inct = incl = inch = 0.0
         bands = [0.0] * len(DEMO_BANDS)
         incbh = None
+        dvn = acc_new()
         for code, w in kv.items():
             r = gcp.get(code)
             if r is None:
@@ -947,6 +1201,7 @@ def demo_units_i(units, gcp):
                     incbh = [0.0] * len(INC_BANDS)
                 for i in range(len(INC_BANDS)):
                     incbh[i] += w * r[15][i]
+            acc_row(dvn, r, w)
         dv = divs.setdefault(key[0], {"votes": 0.0, "cov": 0.0,
                                       "pers": 0.0, "eng": 0.0,
                                       "oth": 0.0,
@@ -956,7 +1211,8 @@ def demo_units_i(units, gcp):
                                       "eduns": 0.0, "pop15": 0.0,
                                       "bluen": 0.0, "occd": 0.0,
                                       "inct": 0.0, "incl": 0.0,
-                                      "inch": 0.0, "incbh": None})
+                                      "inch": 0.0, "incbh": None,
+                                      "newL": acc_new()})
         dv["votes"] += tot
         dv["cov"] += cov
         dv["pers"] += pers
@@ -974,6 +1230,7 @@ def demo_units_i(units, gcp):
                 dv["incbh"] = [0.0] * len(INC_BANDS)
             for i in range(len(INC_BANDS)):
                 dv["incbh"][i] += incbh[i]
+        acc_merge(dv["newL"], dvn)
         cov /= tot
         nat["votes"] += tot
         nat["pers"] += pers
@@ -991,6 +1248,7 @@ def demo_units_i(units, gcp):
                 nat["incbh"] = [0.0] * len(INC_BANDS)
             for i in range(len(INC_BANDS)):
                 nat["incbh"][i] += incbh[i]
+        acc_merge(nat["newL"], dvn)
         bsum = sum(bands)
         fb_den = totc - cobns
         uni_den = pop15 - eduns
@@ -1010,6 +1268,9 @@ def demo_units_i(units, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "u15": (round((bands[0] + bands[1]) / bsum, 4)
+                    if bsum > 0 else None),
+            **emit_new(dvn),
         }
     return out, nat, divs
 
@@ -1036,12 +1297,19 @@ def gcp11():
     for code, r in bcp.items():
         ir = inc[code]
         if any(r[k] is None for k in
-               ("aus", "totc", "cobns", "uni", "eduns", "bluen", "occd")):
+               ("aus", "totc", "cobns", "uni", "eduns", "bluen", "occd",
+                "sch6", "indig", "indigDen", "relvec", "relNS",
+                "relTot", "ten6", "famN", "famD")):
             continue  # short-table SA1s: coverage drop, never null maths
+        y12t = (sum(r["sch6"][1:]), sum(r["sch6"]))
         out[code] = (r["pers"], r["eng"], r["oth"], tuple(r["ages"]),
                      r["aus"], r["totc"], r["cobns"], r["uni"],
                      r["eduns"], r["bluen"], r["occd"],
-                     ir[0], ir[1], ir[2])
+                     ir[0], ir[1], ir[2],
+                     None, None, None,            # slots 14/15/16 hist-cob pads
+                     y12t, (r["indig"], r["indigDen"]),
+                     tuple(r["relvec"]), (r["relNS"], r["relTot"]),
+                     tuple(r["ten6"]), (r["famN"], r["famD"]))
     print(f"gcp11: BCP 2011 in the _GCP layout, {len(out)} SA1s")
     _GCP11 = (out, {"loCutWeekly": cut, "hiEdgeWeekly": 4000,
                     "hiNationalShare": hishare, "loQuantile": INC_LO_Q,
@@ -1075,7 +1343,8 @@ def blend_demo(c0blk, c1blk, f):
         if c0blk is not None and c1blk is not None
         and c0blk["persons"] is not None and c1blk["persons"] is not None
         else None}
-    for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc"):
+    for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
+              "y12less", "atsci", "u15", "onepar"):
         out[k] = lane_blend(c0blk.get(k) if c0blk else None,
                             c1blk.get(k) if c1blk else None, f)
     a0 = c0blk.get("age") if c0blk else None
@@ -1084,6 +1353,16 @@ def blend_demo(c0blk, c1blk, f):
                                  None if a1 is None else a1.get(b), f)
                    for b in DEMO_BANDS}
                   if a0 is not None or a1 is not None else None)
+    # the select-family lanes blend per option like the age bands do
+    for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+        d0 = c0blk.get(which) if c0blk else None
+        d1 = c1blk.get(which) if c1blk else None
+        out[which] = ({k: lane_blend(None if d0 is None
+                                     else d0.get(k),
+                                     None if d1 is None
+                                     else d1.get(k), f)
+                       for k in keys}
+                      if d0 is not None or d1 is not None else None)
     return out
 
 
@@ -1114,6 +1393,9 @@ def div_block(dv, votes, incbh_medians=True):
         if dv["inct"] > 0 else None,
         "incMed": (band_median(dv["incbh"])
                    if dv["incbh"] is not None else None),
+        "u15": (round((dv["bands"][0] + dv["bands"][1]) / bsum, 4)
+                if bsum > 0 else None),
+        **emit_new(dv["newL"]),
     }
 
 
@@ -1140,6 +1422,7 @@ def nat_block(nat):
         if nat_inc > 0 else None,
         "incMed": (band_median(nat["incbh"])
                    if nat["incbh"] is not None else None),
+        **emit_new(nat["newL"]),
     }
 
 
@@ -1419,10 +1702,18 @@ def build(year):
             demoI_map[key] = blend_demo(s0["map"].get(key),
                                         s1["map"].get(key), f)
         nbi = {}
+        nb0, nb1 = nat_block(s0["nat"]), nat_block(s1["nat"])
         for k in ("langOther", "fborn", "uni", "blue", "age0_14",
-                  "age65ov", "loinc", "hiinc"):
-            nbi[k] = lane_blend(nat_block(s0["nat"]).get(k),
-                                nat_block(s1["nat"]).get(k), f)
+                  "age65ov", "loinc", "hiinc", "y12less", "atsci",
+                  "onepar"):
+            nbi[k] = lane_blend(nb0.get(k), nb1.get(k), f)
+        for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+            d0, d1 = nb0.get(which), nb1.get(which)
+            nbi[which] = ({k: lane_blend(
+                None if d0 is None else d0.get(k),
+                None if d1 is None else d1.get(k), f)
+                for k in keys}
+                if d0 is not None or d1 is not None else None)
         nbi["incMed"] = nat_block(side[near]["nat"])["incMed"]
         demoI_national = nbi
         demoI_divs = {}
@@ -1617,6 +1908,10 @@ def build(year):
                         if nat_fbd > 0 else None)
                     for i, k in enumerate(COB_KEYS)},
             "incMed": band_median(demo_nat["incbh"]),
+            "u15": round(
+                (demo_nat["bands"][0] + demo_nat["bands"][1])
+                / nat_b, 4),
+            **emit_new(demo_nat["newL"]),
         },
     }
     if demoI_national is not None:
@@ -1664,6 +1959,9 @@ def build(year):
                         if fb_den > 0 else None)
                     for i, k in enumerate(COB_KEYS)},
             "incMed": band_median(dv["incbh"]),
+            "u15": (round((dv["bands"][0] + dv["bands"][1]) / bsum, 4)
+                    if bsum > 0 else None),
+            **emit_new(dv["newL"]),
         })
         if demoI_divs is not None:
             divisions[-1]["demoI"] = demoI_divs.get(div)
@@ -1720,18 +2018,19 @@ def build(year):
                           2022: "AEC 2022 downloads, Votes by SA1",
                           2025: "AEC fe25 downloads-statistics, Votes by SA1 – national"}[year],
                 "fpvOracle": "VTR HouseStateFirstPrefsByPollingPlaceDownload",
-                "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G09/G49B/"
-                       "G32/G33/G60B)",
+                "gcp": "ABS 2021 Census GCP datapack (SA1, G01/G07/G09/"
+                       "G14/G32/G33/G37/G49B/G60B)",
                 **({"crosswalk": "ABS CG_SA1_2016_SA1_2021 (ASGS Ed3 correspondences page)"}
                    if conf["mode"] == "xwalk21" else {}),
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
                    if year == 2016 else {}),
                 **({"gcpInterp": "ABS 2016 Census GCP datapack (SA1, "
-                                 "G01/G09/G28/G29/G46B/G57B)"}
+                                 "G01/G07/G09/G14/G28/G29/G33/G46B/G57B)"}
                    if demo_interp is not None else {}),
                 **({"bcpInterp": "ABS 2011 Census Basic Community "
                                  "Profile, SA1 for AUST "
-                                 "(B01/B09/B26/B28/B40B/B45B)"}
+                                 "(B01/B07/B09/B14/B16/B25/B26/B28/"
+                                 "B32/B40B/B45B)"}
                    if demo_interp is not None and interp["c0"] == 2011
                    else {}),
             },
@@ -1764,6 +2063,8 @@ def build(year):
         "indexes": list(INDEXES),
         "demoBasis": DEMO_BASIS,
         "cobKeys": COB_KEYS,
+        "relKeys": list(REL_KEYS),
+        "tenKeys": list(TEN_KEYS),
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],

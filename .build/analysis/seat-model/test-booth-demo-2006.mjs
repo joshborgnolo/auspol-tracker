@@ -65,6 +65,14 @@ const NATIONAL = {
   age65ov: 0.1333,
   cob: { ind: 0.008, chn: 0.0112, nzl: 0.021, phl: 0.0065,
          vnm: 0.0087, zaf: 0.0056, ita: 0.0108, lka: 0.0034 },
+  u15: 0.1985,
+  y12less: 0.5313,
+  atsci: 0.0243,
+  onepar: 0.1577,
+  rel: { norel: 0.21, cath: 0.2909, angl: 0.2109, unch: 0.0644,
+         pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193,
+         hind: 0.0084, jew: 0.005 },
+  ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
 };
 // the 2006 B09 per-country lanes: the GCP-era ten-country set trims to
 // eight here (the 2006 table prints one United Kingdom row)

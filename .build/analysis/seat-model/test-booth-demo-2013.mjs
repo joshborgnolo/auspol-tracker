@@ -151,6 +151,14 @@ eq(d.counts.national, {
   cob: { ind: 0.0146, chn: 0.0157, nzl: 0.0237, phl: 0.0084,
     vnm: 0.0091, zaf: 0.0072, ita: 0.0091, lka: 0.0043 },
   incMed: 1235,
+  u15: 0.1929,
+  y12less: 0.4803,
+  atsci: 0.0267,
+  onepar: 0.1417,
+  rel: { norel: 0.2437, cath: 0.2767, angl: 0.1871, unch: 0.0542,
+    pres: 0.0305, orth: 0.0308, budd: 0.0269, isl: 0.0242, hind: 0.014,
+    jew: 0.005 },
+  ten: { mort: 0.3581, rent: 0.3037, own: 0.3289, rentPub: 0.0416 },
 }, "counts.national");
 
 // 4. division anchors (measured blocks; the demoI interp block has its
@@ -171,6 +179,12 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
     div: "Sydney", state: "NSW", persons: 170700, cov: 1,
     langOther: 0.3277, fborn: 0.4686, uni: 0.4751, blue: 0.1316,
     age: S.age,
+    u15: 0.0912, y12less: 0.186, atsci: 0.0147,
+    rel: { norel: 0.3971, cath: 0.23, angl: 0.1112, unch: 0.0199,
+      pres: 0.0197, orth: 0.0318, budd: 0.0737, isl: 0.0205, hind: 0.0142,
+      jew: 0.0119 },
+    ten: { mort: 0.2589, rent: 0.5793, own: 0.1567, rentPub: 0.0913 },
+    onepar: 0.1116,
     loinc: 0.2038, hiinc: 0.1164, incMed: 1730,
     cob: { ind: 0.0127, chn: 0.0603, nzl: 0.0347, phl: 0.0088,
       vnm: 0.0117, zaf: 0.0066, ita: 0.0061, lka: 0.0023 },
@@ -190,6 +204,12 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
     div: "Lingiari", state: "NT", persons: 109461, cov: 1,
     langOther: 0.4016, fborn: 0.1179, uni: 0.1317, blue: 0.3522,
     age: L.age,
+    u15: 0.2553, y12less: 0.6456, atsci: 0.4577,
+    rel: { norel: 0.2512, cath: 0.2265, angl: 0.1299, unch: 0.1076,
+      pres: 0.0156, orth: 0.0041, budd: 0.0145, isl: 0.0106, hind: 0.004,
+      jew: 0.0005 },
+    ten: { mort: 0.2692, rent: 0.5562, own: 0.1584, rentPub: 0.1849 },
+    onepar: 0.1903,
     loinc: 0.1977, hiinc: 0.0449, incMed: 1504,
     cob: { ind: 0.006, chn: 0.0011, nzl: 0.0169, phl: 0.0077,
       vnm: 0.002, zaf: 0.0032, ita: 0.0015, lka: 0.0008 },
@@ -297,11 +317,19 @@ eq(d.incomeCuts, {
   eq(d.demoInterp.f, sf._pcti.f, "demoInterp.f == seifa _pcti.f");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   const NL = new Set(["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "loinc", "hiinc"]);
+    "age65ov", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar"]);
+  const SELK = { rel: [...d.relKeys], ten: [...d.tenKeys] };
   for (const k of NL) {
     eq(d.counts.demoI.national[k],
       LN(d.counts.national[k], far.counts.national[k]),
       `demoI national ${k}`);
+  }
+  for (const [lane, keys] of Object.entries(SELK)) {
+    for (const k of keys) {
+      eq(d.counts.demoI.national[lane][k],
+        LN(d.counts.national[lane][k], far.counts.national[lane][k]),
+        `demoI national ${lane}.${k}`);
+    }
   }
   eq(d.counts.demoI.national.incMed, d.counts.national.incMed,
     "demoI national incMed is the nearest (2011) side's");
@@ -321,7 +349,8 @@ eq(d.incomeCuts, {
   eq(LI.demoI.incMed, 1504, "Lingiari demoI.incMed nearest side");
   let keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
-    "blue", "age", "loinc", "hiinc", "incMed"]);
+    "blue", "age", "loinc", "hiinc", "incMed",
+    "y12less", "atsci", "u15", "onepar", "rel", "ten"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   for (const b of d.booths) {
@@ -338,7 +367,8 @@ eq(d.incomeCuts, {
     }
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     blended++;
-    for (const k of ["langOther", "fborn", "uni", "blue"]) {
+    for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
+      "atsci", "u15", "onepar"]) {
       const a = b.demo && b.demo[k], fb = farB.get(`${b.div}|${b.boothId}`);
       const x = fb.demo && fb.demo[k];
       if (a != null && x != null) {
@@ -353,6 +383,20 @@ eq(d.incomeCuts, {
         failures++;
         console.error(`FAIL booth ${b.div}|${b.boothId} demoI ${k} not ` +
           `null on a one-sided lane`);
+        keyok = false;
+        break;
+      }
+    }
+    for (const [lane, k] of [["rel", "norel"], ["ten", "mort"]]) {
+      const fb = farB.get(`${b.div}|${b.boothId}`);
+      const a = b.demo && b.demo[lane] && b.demo[lane][k];
+      const x = fb.demo && fb.demo[lane] && fb.demo[lane][k];
+      const got = b.demoI[lane] && b.demoI[lane][k];
+      const want = (a != null && x != null) ? LN(a, x) : null;
+      if (got !== want) {
+        failures++;
+        console.error(`FAIL booth ${b.div}|${b.boothId} demoI ` +
+          `${lane}.${k}: ${got} vs ${want}`);
         keyok = false;
         break;
       }

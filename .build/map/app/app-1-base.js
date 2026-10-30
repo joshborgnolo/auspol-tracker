@@ -121,7 +121,9 @@ function buildRamps() {
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
-      loinc: seq(20, 0.13), hiinc: seq(275, 0.12) },
+      loinc: seq(20, 0.13), hiinc: seq(275, 0.12),
+      y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
+      rel: seq(88, 0.12), ten: seq(258, 0.12) },
   };
 }
 
@@ -167,12 +169,23 @@ const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
 // where each polling place's voters live (the AEC records that from
 // 2016 on); 2007–2013 read the census of the areas the places stand in
 // (the 2006 census at 2007 and 2010, the 2011 census at 2013)
-const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc"];
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", loinc: "Lower income", hiinc: "Higher income" };
-const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], loinc: [10, 45], hiinc: [0, 50] };
-const isDemo = () => DM.includes(S.index);
+const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar"];
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent" };
+const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families" };
+const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], loinc: [10, 45], hiinc: [0, 50], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30] };
+// the Religion and Housing-tenure select lenses: S.index is the menu
+// ("rel"/"ten") and S.rel/S.ten the picked option; a lane share rides the
+// division dicts (demo.rel/.ten), the parallel B rows, and the pooled
+// areas demo dicts, positioning by the year's relKeys/tenKeys
+const LENS_REL = "rel", LENS_TEN = "ten";
+const REL_NAME = { norel: "No religion", cath: "Catholic", angl: "Anglican", unch: "Uniting Church", pres: "Presbyterian", orth: "Orthodox", budd: "Buddhist", isl: "Islamic", hind: "Hindu", jew: "Jewish" };
+const RELISMS = { norel: "say they have no religion", cath: "are Catholic", angl: "are Anglican", unch: "are Uniting Church", pres: "are Presbyterian", orth: "are Orthodox Christian", budd: "are Buddhist", isl: "are Muslim", hind: "are Hindu", jew: "are Jewish" };
+const TEN_NAME = { mort: "Owned with a mortgage", rent: "Rented", own: "Owned outright", rentPub: "Rented from public housing" };
+const TENESMS = { mort: "are owned with a mortgage", rent: "are rented", own: "are owned outright", rentPub: "are rented from public housing" };
+const REL_RANGE = { norel: [0, 65], cath: [0, 65], angl: [0, 50], unch: [0, 35], pres: [0, 20], orth: [0, 25], budd: [0, 25], isl: [0, 35], hind: [0, 25], jew: [0, 25] };
+const TEN_RANGE = { mort: [0, 65], rent: [0, 70], own: [0, 60], rentPub: [0, 20] };
+const isDemo = () => DM.includes(S.index) || S.index === LENS_REL || S.index === LENS_TEN;
 // the income lanes name their own definitions: the year's national
 // weekly cut in the census year's dollars, as each year's incomeCuts
 // record carries them (2013 reads 2011 dollars, 2016 on 2021 dollars)
@@ -195,7 +208,7 @@ const DM_VERB_INC = {
   loinc: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
   hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
 };
-const dmVerb = (m, k) => (k === "fborn" && S.cob != null ? COB_VERB[S.cob] : isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
 // (2013 on); 2007 and 2010 stop at the six people measures
 const hasInc = (m) => !!(m && m.incomeCuts);
@@ -217,20 +230,41 @@ const COB_BORN = { uk: "the United Kingdom", eng: "England", ind: "India", chn: 
 const COB_VERB = { uk: "were born in the United Kingdom", eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
 const COB_RANGE = { uk: [0, 25], eng: [0, 20], ind: [0, 25], chn: [0, 20], nzl: [0, 12], phl: [0, 12], vnm: [0, 25], zaf: [0, 7], ita: [0, 9], lka: [0, 7], sct: [0, 3] };
 const isCob = () => S.index === "fborn" && S.cob != null;
-// the active people-lane share of a division, as a fraction (cob-aware)
-const demoShare = (d) => (isCob() ? (d.demo && d.demo.cob ? d.demo.cob[S.cob] : null) : d.demo ? d.demo[S.index] : null);
+const isRel = () => S.index === LENS_REL && S.rel != null;
+const isTen = () => S.index === LENS_TEN && S.ten != null;
+// the active people-lane share of a division, as a fraction (cob-aware,
+// religion/tenure select-aware)
+const demoShare = (d) => {
+  if (isCob()) return d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
+  if (isRel()) return d.demo && d.demo.rel ? d.demo.rel[S.rel] : null;
+  if (isTen()) return d.demo && d.demo.ten ? d.demo.ten[S.ten] : null;
+  return d.demo ? d.demo[S.index] : null;
+};
 // ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
-const demoAreaShare = (demo) => (isCob() ? (demo && demo.cob ? demo.cob[S.cob] : null) : demo ? demo[S.index] : null);
-// ...and of one booth row (fraction): the cob lanes ride the parallel
-// B["cob"] rows, positional in the year's cobKeys (S.cob's spot rides
-// the model's cobPos map)
-const demoBoothShare = (raw, j, cobPos) => {
-  if (isCob()) { const r = raw.cob && raw.cob[j]; return r ? r[cobPos[S.cob]] : null; }
+const demoAreaShare = (demo) => {
+  if (isCob()) return demo && demo.cob ? demo.cob[S.cob] : null;
+  if (isRel()) return demo && demo.rel ? demo.rel[S.rel] : null;
+  if (isTen()) return demo && demo.ten ? demo.ten[S.ten] : null;
+  return demo ? demo[S.index] : null;
+};
+// ...and of one booth row (fraction): the select lanes ride their
+// parallel B rows (cob/rel/ten), positional in the year's key orders
+const demoBoothShare = (raw, j, pos) => {
+  if (isCob()) { const r = raw.cob && raw.cob[j]; return r ? r[pos[S.cob]] : null; }
+  if (isRel()) { const r = raw.rel && raw.rel[j]; return r ? r[pos[S.rel]] : null; }
+  if (isTen()) { const r = raw.ten && raw.ten[j]; return r ? r[pos[S.ten]] : null; }
   const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : S.index];
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
+// the model's positional map for the active select lane (cob/rel/ten)
+const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : (m.cobPos || {}));
+const relFor = (m) => (m.relKeys || []).map((k) => [k, REL_NAME[k]]);
+const tenFor = (m) => (m.tenKeys || []).map((k) => [k, TEN_NAME[k]]);
+// a select lane's sub-select label: the ideology/noun phrase the
+// legend and menu land on
+const selName = (m, k) => (isRel() ? REL_NAME[k] : TEN_NAME[k]);
 // the People lanes' floor: the 2001 election reads its own census
 // measured-only (derive-booth-demo-2001-frame.py — its census night sat
 // ~3 months before election day, same measured-only class the SEIFA pcti
@@ -526,6 +560,10 @@ const S = {
   infMode: "informal",
   // the Born overseas lens's birthplace-country sub-view (a COB_NAME key, null = all overseas-born)
   cob: null,
+  // the Religion and Housing-tenure select lenses' picked options
+  // (a REL_NAME/TEN_NAME key, null = the default: No religion /
+  // owned with a mortgage)
+  rel: "norel", ten: "mort",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -687,6 +725,15 @@ function deriveAreas(res, m) {
       if (m.cobKeys && m.cobKeys.length) {
         demo.cob = {};
         for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
+      }
+      // the Religion and Housing-tenure select pools, same vote-weighted way
+      if (m.relKeys && m.relKeys.length) {
+        demo.rel = {};
+        for (const k of m.relKeys) { const xs = ds.filter((x) => x.rel && x.rel[k] != null); demo.rel[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.rel[k]))) / sum(xs.map((x) => x.p)) : null; }
+      }
+      if (m.tenKeys && m.tenKeys.length) {
+        demo.ten = {};
+        for (const k of m.tenKeys) { const xs = ds.filter((x) => x.ten && x.ten[k] != null); demo.ten[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ten[k]))) / sum(xs.map((x) => x.p)) : null; }
       }
     }
     // the lens-level exhausted share is counted off the divisions' own flow rows
@@ -858,6 +905,11 @@ async function loadYear(year) {
     // lane exists) and S.cob's positional spot in its B["cob"] rows
     m.cobKeys = res.cobKeys || null;
     m.cobPos = m.cobKeys ? Object.fromEntries(m.cobKeys.map((k, i) => [k, i])) : null;
+    // the Religion and Housing-tenure select menus, same positional idiom
+    m.relKeys = res.relKeys || null;
+    m.relPos = m.relKeys ? Object.fromEntries(m.relKeys.map((k, i) => [k, i])) : null;
+    m.tenKeys = res.tenKeys || null;
+    m.tenPos = m.tenKeys ? Object.fromEntries(m.tenKeys.map((k, i) => [k, i])) : null;
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));

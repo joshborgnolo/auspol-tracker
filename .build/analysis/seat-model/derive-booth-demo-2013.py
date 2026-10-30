@@ -130,6 +130,56 @@ B45_COLS = ["P_Tot_Managers", "P_Tot_Professionals",
             "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
             "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
             "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
+# ---- the six new People lanes' 2011-BCP tables (2026-10-29 arc):
+# schooling rides B01 (its six High_yr_schl_comp persons columns,
+# GCP-era basis: sub-Year-12 levels over their stated sum); Indigenous
+# status rides B07's Tot row (the per-band Indigenous sums underread
+# GCP-era SA1 universes by a fifth — see measure-gcp-tot row
+# rationale in derive-booth-seifa-voter.py); religion B14 (the ten
+# REL menu rows + not-stated + total); family composition B25;
+# tenure-by-landlord B32
+BCP_B07 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B07_AUST_SA1_short.csv")
+BCP_B14 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B14_AUST_SA1_short.csv")
+BCP_B25 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B25_AUST_SA1_short.csv")
+BCP_B32 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B32_AUST_SA1_short.csv")
+B01_SCHOOL_COLS = ["High_yr_schl_comp_Yr_12_eq_P",
+                   "High_yr_schl_comp_Yr_11_eq_P",
+                   "High_yr_schl_comp_Yr_10_eq_P",
+                   "High_yr_schl_comp_Yr_9_eq_P",
+                   "High_yr_schl_comp_Yr_8_belw_P",
+                   "High_yr_schl_comp_D_n_g_sch_P"]
+B07_TOT_COLS = ["Tot_Indigenous_P", "Tot_Non_Indigenous_P"]
+# REL menu rows in the cross-era key order; the orth lane sums Eastern
+# and Oriental orthodox (the 2001 print's own two orthodox rows)
+B14_REL_COLS = {
+    "norel": ["No_Religion_P"],
+    "cath": ["Christianity_Catholic_P"],
+    "angl": ["Christianity_Anglican_P"],
+    "unch": ["Christianity_Uniting_Church_P"],
+    "pres": ["Christinty_Prsbytrin_Refrmd_P"],
+    "orth": ["Christianity_Eastrn_Orthdox_P",
+             "Christianity_Orintal_Orthdx_P"],
+    "budd": ["Buddhism_P"],
+    "isl": ["Islam_P"],
+    "hind": ["Hinduism_P"],
+    "jew": ["Judaism_P"],
+}
+B14_TAIL = ["Religious_affiliation_ns_P", "Tot_P"]
+B25_FAM_COLS = ["OPF_Total_P", "CF_no_children_P", "CF_Total_P",
+                "Other_family_P", "Total_P"]
+B32_TEN_COLS = ["O_OR_Total", "O_MTG_Total", "R_Tot_Total",
+                "R_ST_h_auth_Total", "Oth_ten_type_Total",
+                "Ten_type_NS_Total"]
+# the cross-era key orders the whole lane stack shares (the venue-era
+# drivers emit relvec/tenvec in these orders; the voter store has the
+# identical constants — see the there-asserted national shares)
+REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+            "isl", "hind", "jew"]
+TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 RENAME = {"Mcewen": "McEwen", "Mcmillan": "McMillan",
           "Mcpherson": "McPherson"}
 STATE_ORDER = {s: i for i, s in
@@ -168,8 +218,21 @@ def bcp_table(zipf, member, key_col, cols, pin_rows_low, pin_rows_high):
     return out
 
 
+def relvec_of(row14):
+    """B14's printed religion cells -> the ten-slot REL_KEYS vector
+    (orth sums the Eastern + Oriental orthodox columns)."""
+    vec, i = [], 0
+    for k in REL_KEYS:
+        span = len(B14_REL_COLS[k])
+        vec.append(sum(row14[i: i + span]))
+        i += span
+    return tuple(vec)
+
+
 def load_bcp():
-    """Per SA1: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns."""
+    """Per SA1: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
+    plus the new-lane counts (sch6, indig/indigDen, relvec/relNS/relTot,
+    ten6, famN/famD)."""
     if not BCP_ZIP.exists():
         fail(f"missing {BCP_ZIP} (ABS datapacks 2011_BCP_SA1 for AUST, "
              f"short-header; see module docstring)")
@@ -177,10 +240,17 @@ def load_bcp():
     g01 = bcp_table(z, BCP_B01, "region_id",
                     ["Tot_P_P", *AGECOLS,
                      "Lang_spoken_home_Eng_only_P",
-                     "Lang_spoken_home_Oth_Lang_P"], 54805, 54805)
+                     "Lang_spoken_home_Oth_Lang_P",
+                     *B01_SCHOOL_COLS], 54805, 54805)
     b09 = bcp_table(z, BCP_B09, "region_id", B09_COLS, 54800, 54805)
     b40 = bcp_table(z, BCP_B40B, "region_id", B40_COLS, 54800, 54805)
     b45 = bcp_table(z, BCP_B45B, "region_id", B45_COLS, 54800, 54805)
+    b07 = bcp_table(z, BCP_B07, "region_id", B07_TOT_COLS, 54800, 54805)
+    b14 = bcp_table(z, BCP_B14, "region_id",
+                    [c for k in REL_KEYS for c in B14_REL_COLS[k]]
+                    + B14_TAIL, 54800, 54805)
+    b25 = bcp_table(z, BCP_B25, "region_id", B25_FAM_COLS, 54800, 54805)
+    b32 = bcp_table(z, BCP_B32, "region_id", B32_TEN_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
         row09 = b09.get(code)
@@ -191,6 +261,10 @@ def load_bcp():
             ccob = row09[3:]
         pg, gd, ba, eduns = b40.get(code, (None, None, None, None))
         occ = b45.get(code)
+        row07 = b07.get(code)
+        row14 = b14.get(code)
+        row25 = b25.get(code)
+        row32 = b32.get(code)
         out[code] = {
             "pers": g[0],
             "ages": g[1:12],
@@ -203,12 +277,26 @@ def load_bcp():
                      else None,
             "occd": sum(occ) if occ is not None else None,
             "pop15": g[0] - g[1] - g[2],
+            "sch6": g[14:],
+            "indig": None if row07 is None else row07[0],
+            "indigDen": None if row07 is None else row07[0] + row07[1],
+            "relvec": None if row14 is None else relvec_of(row14),
+            "relNS": None if row14 is None else row14[-2],
+            "relTot": None if row14 is None else row14[-1],
+            "ten6": None if row32 is None else row32,
+            "famN": None if row25 is None else row25[0],
+            "famD": None if row25 is None else row25[4],
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
     n45 = sum(1 for c in out.values() if c["occd"] is None)
+    n07 = sum(1 for c in out.values() if c["indig"] is None)
+    n14 = sum(1 for c in out.values() if c["relvec"] is None)
+    n25 = sum(1 for c in out.values() if c["famN"] is None)
+    n32 = sum(1 for c in out.values() if c["ten6"] is None)
     print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40}, "
-          f"B45B short {n45})")
+          f"B45B short {n45}, B07 short {n07}, B14 short {n14}, "
+          f"B25 short {n25}, B32 short {n32})")
     return out
 
 
@@ -465,7 +553,28 @@ def shares(rec):
         "blue": bounded(rec["bluen"], rec["occd"]),
         "age": ({b: round(rec["bands"][i] / bsum, 4)
                  for i, b in enumerate(BANDS)} if bsum > 0 else None),
+        "u15": (bounded(rec["bands"][0] + rec["bands"][1], bsum)
+                if bsum > 0 else None),
     }
+    if rec.get("sch6") is not None:
+        sc = rec["sch6"]
+        scd = sum(sc)  # the six printed stated levels (stated basis)
+        out["y12less"] = bounded(sum(sc[1:]), scd) if scd > 0 else None
+    if rec.get("indig") is not None and rec.get("indigDen"):
+        out["atsci"] = bounded(rec["indig"], rec["indigDen"])
+    if rec.get("relvec") is not None and rec.get("relTot") is not None:
+        relbd = rec["relTot"] - (rec.get("relNS") or 0)
+        out["rel"] = {k: bounded(rec["relvec"][i], relbd)
+                      for i, k in enumerate(REL_KEYS)}
+    if rec.get("ten6") is not None:
+        own, mort, rent, rentpub, othtype, tenns = rec["ten6"]
+        tend = own + mort + rent + othtype
+        out["ten"] = {k: bounded({"mort": mort, "rent": rent,
+                                  "own": own, "rentPub": rentpub}[k],
+                                 tend)
+                      for k in TEN_KEYS}
+    if rec.get("famN") is not None and rec.get("famD"):
+        out["onepar"] = bounded(rec["famN"], rec["famD"])
     if rec.get("inct") is not None:
         out["loinc"] = bounded(rec["incl"], rec["inct"])
         out["hiinc"] = bounded(rec["inch"], rec["inct"])
@@ -496,11 +605,15 @@ def main():
     if mapped != set(divs_hist):
         fail(f"division drift: ced-only {sorted(mapped - set(divs_hist))} "
              f"venue-only {sorted(set(divs_hist) - mapped)}")
-    # every division SA1 needs its four BCP tables
+    # every division SA1 needs its BCP tables
     short = {k for k in ced
              if sa1.get(k, {}).get("aus") is None
              or sa1.get(k, {}).get("uni") is None
-             or sa1.get(k, {}).get("occd") is None}
+             or sa1.get(k, {}).get("occd") is None
+             or sa1.get(k, {}).get("indig") is None
+             or sa1.get(k, {}).get("relvec") is None
+             or sa1.get(k, {}).get("ten6") is None
+             or sa1.get(k, {}).get("famN") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -511,7 +624,13 @@ def main():
                                   "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
-                                  "incbh": [0.0] * len(INC_BANDS14)})
+                                  "incbh": [0.0] * len(INC_BANDS14),
+                                  "sch6": [0] * 6,
+                                  "indig": 0, "indigDen": 0,
+                                  "relvec": [0] * len(REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "ten6": [0] * 6,
+                                  "famN": 0, "famD": 0})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -531,6 +650,14 @@ def main():
         acc["inch"] += ir[2]
         for i in range(len(INC_BANDS14)):
             acc["incbh"][i] += ir[4][i]
+        for i in range(6):
+            acc["sch6"][i] += r["sch6"][i]
+            acc["ten6"][i] += r["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            acc[k] += r[k]
+        for i in range(len(REL_KEYS)):
+            acc["relvec"][i] += r["relvec"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -559,7 +686,15 @@ def main():
                 "eduns": row["eduns"], "bluen": row["bluen"],
                 "occd": row["occd"], "pop15": row["pop15"],
                 "inct": ir[0], "incl": ir[1], "inch": ir[2],
-                "incbh": list(ir[4])})
+                "incbh": list(ir[4]),
+                "sch6": list(row["sch6"]),
+                "indig": row["indig"], "indigDen": row["indigDen"],
+                "relvec": list(row["relvec"]) if row["relvec"] is not None
+                else None,
+                "relNS": row["relNS"], "relTot": row["relTot"],
+                "ten6": list(row["ten6"]) if row["ten6"] is not None
+                else None,
+                "famN": row["famN"], "famD": row["famD"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
@@ -578,6 +713,17 @@ def main():
         for i in range(len(COB_KEYS8)):
             nat.setdefault("cobn", [0.0] * len(COB_KEYS8))
             nat["cobn"][i] += dv["cobn"][i]
+        for i in range(6):
+            nat.setdefault("sch6", [0] * 6)
+            nat.setdefault("ten6", [0] * 6)
+            nat["sch6"][i] += dv["sch6"][i]
+            nat["ten6"][i] += dv["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            nat[k] += dv[k]
+        for i in range(len(REL_KEYS)):
+            nat.setdefault("relvec", [0] * len(REL_KEYS))
+            nat["relvec"][i] += dv["relvec"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -615,6 +761,20 @@ def main():
                         if nat_fbd > 0 else None)
                     for i, k in enumerate(COB_KEYS8)},
             "incMed": band_median14(nat["incbh"]),
+            "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
+            "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+            "atsci": round(nat["indig"] / nat["indigDen"], 4),
+            "onepar": round(nat["famN"] / nat["famD"], 4),
+            "rel": {k: round(nat["relvec"][i]
+                             / (nat["relTot"] - nat["relNS"]), 4)
+                    for i, k in enumerate(REL_KEYS)},
+            "ten": {k: round({"mort": nat["ten6"][1],
+                              "rent": nat["ten6"][2],
+                              "own": nat["ten6"][0],
+                              "rentPub": nat["ten6"][3]}[k]
+                             / (nat["ten6"][0] + nat["ten6"][1]
+                                + nat["ten6"][2] + nat["ten6"][4]), 4)
+                    for k in TEN_KEYS},
         },
     }
     out = {
@@ -643,7 +803,21 @@ def main():
             "trimmed to eight here (country order in cobKeys); "
             "university (bachelor and above) "
             "per the aged-15+ population less "
-            "level-of-education-not-stated; blue-collar (technicians/"
+            "level-of-education-not-stated; the new lane set mirrors "
+            "the voter stores: the highest-year-of-schooling persons "
+            "columns of B01 (year-12-or-less over the six printed "
+            "stated levels), Indigenous status over B07's own Tot row "
+            "(Indigenous / Indigenous-plus-non-Indigenous persons), "
+            "the Religion menu's ten shares (rel, key order in "
+            "relKeys, No-religion leading) over B14's "
+            "ex-affiliation-not-stated persons basis, the "
+            "Housing-tenure menu's four shares (ten, key order in "
+            "tenKeys, owned-with-mortgage leading) over B32's "
+            "ex-tenure-not-stated occupied-private-dwellings basis "
+            "(rented-public a state-or-territory-housing-authority "
+            "landlord within that base), B25's one-parent share of "
+            "families, and the under-15 share of the stated ages; "
+            "blue-collar (technicians/"
             "trades + machinery operators/drivers + labourers of B45B "
             "the ANZSCO occupation major groups) over the eight stated "
             "occupation groups, inadequately-described and not-stated "
@@ -681,8 +855,8 @@ def main():
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2011 Census Basic Community Profile, SA1 for "
-                       "AUST (B01/B09/B26/B28/B40B/B45B), abs.gov.au census "
-                       "datapacks",
+                       "AUST (B01/B07/B09/B14/B25/B26/B28/B32/B40B/"
+                       "B45B), abs.gov.au census datapacks",
                 "ced": "ABS ASGS Vol 3 July 2011, CED to SA1 allocation "
                        "(1270055003_ced_2011_aust_csv.zip)",
                 "venue": "data/booth-seifa-2013.json",
@@ -697,6 +871,8 @@ def main():
         "election": 2013,
         "censusEdition": 2011,
         "cobKeys": COB_KEYS8,
+        "relKeys": list(REL_KEYS),
+        "tenKeys": list(TEN_KEYS),
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
         "incomeCuts": {

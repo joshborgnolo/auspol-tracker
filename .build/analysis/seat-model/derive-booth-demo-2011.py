@@ -123,7 +123,13 @@ def sum_divisions(alloc, sa1, inc):
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "cobn": [0] * len(d13.COB_KEYS8),
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
-                                  "incbh": [0.0] * len(d13.INC_BANDS14)})
+                                  "incbh": [0.0] * len(d13.INC_BANDS14),
+                                  "sch6": [0] * 6,
+                                  "indig": 0, "indigDen": 0,
+                                  "relvec": [0] * len(d13.REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "ten6": [0] * 6,
+                                  "famN": 0, "famD": 0})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -139,6 +145,14 @@ def sum_divisions(alloc, sa1, inc):
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
                   "occd", "pop15"):
             acc[k] += r[k]
+        for i in range(6):
+            acc["sch6"][i] += r["sch6"][i]
+            acc["ten6"][i] += r["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            acc[k] += r[k]
+        for i in range(len(d13.REL_KEYS)):
+            acc["relvec"][i] += r["relvec"][i]
         for i in range(len(d13.COB_KEYS8)):
             acc["cobn"][i] += r["cobn"][i]
         acc["inct"] += ir[0]
@@ -167,6 +181,17 @@ def national_of(divsum):
         nat.setdefault("cobn", [0.0] * len(d13.COB_KEYS8))
         for i in range(len(d13.COB_KEYS8)):
             nat["cobn"][i] += dv["cobn"][i]
+        for i in range(6):
+            nat.setdefault("sch6", [0] * 6)
+            nat.setdefault("ten6", [0] * 6)
+            nat["sch6"][i] += dv["sch6"][i]
+            nat["ten6"][i] += dv["ten6"][i]
+        for k in ("indig", "indigDen", "relNS", "relTot",
+                  "famN", "famD"):
+            nat[k] += dv[k]
+        for i in range(len(d13.REL_KEYS)):
+            nat.setdefault("relvec", [0] * len(d13.REL_KEYS))
+            nat["relvec"][i] += dv["relvec"][i]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -189,6 +214,20 @@ def national_of(divsum):
                     if nat_fbd > 0 else None)
                 for i, k in enumerate(d13.COB_KEYS8)},
         "incMed": d13.band_median14(nat["incbh"]),
+        "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
+        "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+        "atsci": round(nat["indig"] / nat["indigDen"], 4),
+        "onepar": round(nat["famN"] / nat["famD"], 4),
+        "rel": {k: round(nat["relvec"][i]
+                         / (nat["relTot"] - nat["relNS"]), 4)
+                for i, k in enumerate(d13.REL_KEYS)},
+        "ten": {k: round({"mort": nat["ten6"][1],
+                          "rent": nat["ten6"][2],
+                          "own": nat["ten6"][0],
+                          "rentPub": nat["ten6"][3]}[k]
+                         / (nat["ten6"][0] + nat["ten6"][1]
+                            + nat["ten6"][2] + nat["ten6"][4]), 4)
+                for k in d13.TEN_KEYS},
     }
 
 
@@ -259,7 +298,16 @@ def main():
                     "eduns": row["eduns"], "bluen": row["bluen"],
                     "occd": row["occd"], "pop15": row["pop15"],
                     "inct": ir[0], "incl": ir[1], "inch": ir[2],
-                    "incbh": list(ir[4])})
+                    "incbh": list(ir[4]),
+                    "sch6": list(row["sch6"]),
+                    "indig": row["indig"],
+                    "indigDen": row["indigDen"],
+                    "relvec": (list(row["relvec"]) if row["relvec"]
+                               is not None else None),
+                    "relNS": row["relNS"], "relTot": row["relTot"],
+                    "ten6": (list(row["ten6"]) if row["ten6"]
+                             is not None else None),
+                    "famN": row["famN"], "famD": row["famD"]})
             out_booths.append(rec)
 
         divisions = []
@@ -310,9 +358,15 @@ def main():
                 f"(seifa-src/{y['alloc']}) and summed, never an average "
                 "of booth rows. Shares and income lanes are "
                 "derive-booth-demo-2013.py's own readers re-run — same "
-                "B01/B09/B26/B28/B40B/B45B bases (its curated "
+                "B01/B07/B09/B14/B25/B26/B28/B32/B40B/B45B bases "
+                "(its curated "
                 "birthplace-country cob lanes riding the B09 per-country "
-                "cells in the 2013 store's COB_KEYS8 order), same adult "
+                "cells in the 2013 store's COB_KEYS8 order; the "
+                "Religion/Housing-tenure/indigenous/schooling/family "
+                "lanes riding B01's schooling columns, B07's Tot row, "
+                "B14, B25, B32 identically — the ten rel and four ten "
+                "menu shares are in the store's relKeys/tenKeys "
+                "orders), same adult "
                 "re-weighting at data/income-dist.json's factors, the "
                 "national 25th-percentile cut in 2011 dollars; this "
                 "census universe is the 2013 store's, so incomeCuts "
@@ -369,6 +423,8 @@ def main():
                 "medianBasis": "households (shares are per-adult)",
             },
             "cobKeys": list(d13.COB_KEYS8),
+            "relKeys": list(d13.REL_KEYS),
+            "tenKeys": list(d13.TEN_KEYS),
             "counts": counts,
             "divisions": divisions,
             "booths": out_booths,

@@ -50,6 +50,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from qld_geo import (QLD_SENTINELS, VINTAGES, in_geometry,  # noqa: E402
                      read_sa1_polygons)
 from build_qld_demo_common import COB_KEYS, DEMO_BANDS  # noqa: E402
+import gcp_newlanes  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
@@ -199,8 +200,10 @@ def seifa_deciles(year):
 
 @functools.lru_cache(maxsize=None)
 def demo_cells(year):
-    """SA1 code -> (demo row, cob row) with the district people lanes'
-    exact bases (build_qld_demo_common.py's shares())."""
+    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, None,
+    None, y12less, atsci, u15, onepar], cob row in COB_KEYS order, rel
+    row in REL_KEYS order, ten row in TEN_KEYS order) with the district
+    people lanes' exact bases (build_qld_demo_common.py's shares())."""
     import csv
     import io
     import zipfile
@@ -208,6 +211,7 @@ def demo_cells(year):
     if not os.path.exists(V["gcp"]):
         fail(f"missing GCP input {V['gcp']}")
     z = zipfile.ZipFile(V["gcp"])
+    newl = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     agecols = [f"Age_{b}_yr_P" for b in DEMO_BANDS[:-1]] + ["Age_85ov_P"]
     want = [V["gcp_key"], "Tot_P_P", *V["lang"], *agecols]
     def member(table):
@@ -271,14 +275,25 @@ def demo_cells(year):
         den09 = tot - cobns
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
                g09[2], h09[6], h09[5])
+        sch6, indt, (relvec, relns, reltot), ten6, fam = newl[code]
+        rel = [safe(v, reltot - relns) for v in relvec]
+        own, mort, rent, rentpub, othtype, tenns = ten6
+        tend = own + mort + rent + othtype
+        ten = [safe(mort, tend), safe(rent, tend),
+               safe(own, tend), safe(rentpub, tend)]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
                       safe(bands[3] + bands[4], bsum),
                       safe(tot - cobns - aust, den09),
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
-                      None, None],
-                     [safe(c, den09) for c in cob])
+                      None, None,
+                      gcp_newlanes.y12less_cell(sch6, safe),
+                      safe(indt[0], indt[1]),
+                      gcp_newlanes.u15_cell(bands, safe),
+                      safe(fam[0], fam[1])],
+                     [safe(c, den09) for c in cob],
+                     rel, ten)
     print(f"GCP {year} demo cells: {len(out)} SA1s")
     return out
 
@@ -306,7 +321,7 @@ def run_frame(frame):
     unlocated_ok = ERA_UNLOCATED_OK[frame]
     sa1s, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0, "unlocated": 0}
-    dec_col, demo_col, cob_col = [], [], []
+    dec_col, demo_col, cob_col, rel_col, ten_col = [], [], [], [], []
     for k in range(n):
         lat, ty = B["lat"][k], B["ty"][k]
         if ty == 4:
@@ -314,6 +329,8 @@ def run_frame(frame):
             dec_col.append(None)
             demo_col.append(None)
             cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
             continue
         if lat is None:
             if not unlocated_ok:
@@ -323,6 +340,8 @@ def run_frame(frame):
             dec_col.append(None)
             demo_col.append(None)
             cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
             continue
         code = pip(year, B["lon"][k], lat)
         if code is None:
@@ -345,12 +364,18 @@ def run_frame(frame):
         counts["demo"] += 1
         demo_col.append(list(dm[0]))
         cob_col.append(list(dm[1]))
+        rel_col.append(list(dm[2]))
+        ten_col.append(list(dm[3]))
     B["dec"] = dec_col
     B["vdec"] = [None] * n  # the ECQ releases no votes-by-SA1 product; the
     # voter-footprint lane is a federal AEC read and stays empty by design
     B["demo"] = demo_col
     B["cob"] = cob_col
+    B["rel"] = rel_col
+    B["ten"] = ten_col
     data["cobKeys"] = COB_KEYS
+    data["relKeys"] = list(gcp_newlanes.REL_KEYS)
+    data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"{frame}: {counts['pip']} booths joined to {len(sa1s)} SA1s"

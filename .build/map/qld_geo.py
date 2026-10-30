@@ -40,6 +40,7 @@ VINTAGES = {
         "member": "2021 Census GCP Statistical Area 1 for AUS/2021Census_{table}_AUST_SA1.csv",
         "lang": ("Lang_used_home_Eng_only_P", "Lang_used_home_Oth_Lang_P"),
         "uni_member": "G49B", "occ_member": "G60B",
+        "fam_member": "G32", "ten_member": "G37",
         "assign": os.path.join(REPO, ".build", "map", "qld21", "assign-sa1.json"),
         "null_sentinel": True,   # the pack ends with one ZZZZZZZZZZZ null-geometry row
     },
@@ -53,6 +54,7 @@ VINTAGES = {
         "member": "2016 Census GCP Statistical Area 1 for AUST/2016Census_{table}_AUS_SA1.csv",
         "lang": ("Lang_spoken_home_Eng_only_P", "Lang_spoken_home_Oth_Lang_P"),
         "uni_member": "G46B", "occ_member": "G57B",
+        "fam_member": "G28", "ten_member": "G33",
         "assign": os.path.join(REPO, ".build", "map", "qld16", "assign-sa1.json"),
         "null_sentinel": False,
     },

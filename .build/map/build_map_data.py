@@ -268,7 +268,8 @@ def demo_cells(dm):
         return None
     a = dm["age"]
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
-            dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc")]
+            dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc"),
+            dm.get("y12less"), dm.get("atsci"), dm.get("u15"), dm.get("onepar")]
 
 
 def cob_cells(dm, keys):
@@ -278,6 +279,17 @@ def cob_cells(dm, keys):
     if not dm:
         return None
     c = dm.get("cob")
+    if not c:
+        return None
+    return [c.get(k) for k in keys]
+
+
+def select_cells(dm, lane, keys):
+    """The Religion/Housing-tenure menu rows, positional in the year's
+    relKeys/tenKeys order; None when the block has no lane at all."""
+    if not dm:
+        return None
+    c = dm.get(lane)
     if not c:
         return None
     return [c.get(k) for k in keys]
@@ -310,12 +322,14 @@ def demo_interp_of(dm, di):
     for k, v in di.items():
         if k in ("persons", "cov"):
             continue
-        if k == "age":
+        if k in ("age", "rel", "ten"):
+            # dict lanes fall back per option: a select option missing on
+            # either census side shows the measured option's figure
             if v is not None:
-                age = dict(m.get("age") or {})
-                age.update({bk: bv for bk, bv in v.items()
-                            if bv is not None})
-                m["age"] = age
+                base = dict(m.get(k) or {})
+                base.update({bk: bv for bk, bv in v.items()
+                             if bv is not None})
+                m[k] = base
             continue
         if v is not None:
             m[k] = v
@@ -457,6 +471,8 @@ def build_year(year, hist, base2001):
             census_basis = "venue"
     bvoter = {(b["divId"], b["boothId"]): b for b in vstore["booths"]} if vstore else {}
     cobkeys = vstore.get("cobKeys", []) if vstore else []
+    relkeys = vstore.get("relKeys", []) if vstore else []
+    tenkeys = vstore.get("tenKeys", []) if vstore else []
     if prev >= 2004:
         prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
         prev_ids = {pp for (_, pp) in prev_pp}
@@ -542,7 +558,9 @@ def build_year(year, hist, base2001):
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
-                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob")}
+                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob"),
+                               "y12l": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
+                               "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten")}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -601,12 +619,22 @@ def build_year(year, hist, base2001):
         dcrow = demo_cells(demo_interp_of(dmd, bv.get("demoI")))
         B["demo"].append(dcrow)
         B["cob"].append(cob_cells(dmd, cobkeys) if dcrow else None)
+        # the Religion and Housing-tenure menu rows blend per option like
+        # the age bands — interp possible only inside their stores (each
+        # edition covers all options), so no measured-only doctrine needed
+        dirow = demo_interp_of(dmd, bv.get("demoI"))
+        B["rel"].append(select_cells(dirow, "rel", relkeys) if dcrow else None)
+        B["ten"].append(select_cells(dirow, "ten", tenkeys) if dcrow else None)
 
     if not any(B["demo"]):
         del B["demo"]  # the year's store didn't exist (pre-2004, absent
         # venue rows untouched — the people floor is the 2004 election)
     if not any(B["cob"]):
         del B["cob"]
+    if not any(B["rel"]):
+        del B["rel"]
+    if not any(B["ten"]):
+        del B["ten"]
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -662,7 +690,12 @@ def build_year(year, hist, base2001):
            # rows and rec.demo.cob dicts follow (10 keys from 2016 /
            # the state frames' GCP basis, 8 on the 2006/2011
            # venue-proxy editions — England/Scotland unreadable there)
-           "cobKeys": cobkeys if vstore else None}
+           "cobKeys": cobkeys if vstore else None,
+           # the Religion and Housing-tenure select menus' option orders
+           # (B["rel"]/B["ten"] rows and rec.demo.rel/ten dicts follow;
+           # identical across the whole census era)
+           "relKeys": relkeys if vstore else None,
+           "tenKeys": tenkeys if vstore else None}
     if vstore and vstore.get("demoInterp"):
         # the people-interp blend record (f, c0/c1, nearestSide,
         # nullRule) on interpolated years; the app's demo copy reads
