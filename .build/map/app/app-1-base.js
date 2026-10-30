@@ -265,11 +265,13 @@ const tenFor = (m) => (m.tenKeys || []).map((k) => [k, TEN_NAME[k]]);
 // a select lane's sub-select label: the ideology/noun phrase the
 // legend and menu land on
 const selName = (m, k) => (isRel() ? REL_NAME[k] : TEN_NAME[k]);
-// the People lanes' floor: the 2001 election reads its own census
-// measured-only (derive-booth-demo-2001-frame.py — its census night sat
-// ~3 months before election day, same measured-only class the SEIFA pcti
-// lanes keep it in); 2004-2019 are the blend era
-const DEMO_FROM = 2001;
+// the People lanes' floor: 1993/1996/1998 are the statistics-era
+// interp blend entrance (1991↔1996 and 1996↔2001 day-share blends,
+// derive-booth-demo-90s.py's stores at the venue-nearest
+// linework rescue, the era's own census cover on the desk); the 2001
+// election reads its own census measured-only, 2004-2019 are the
+// blend era
+const DEMO_FROM = 1993;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
 const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, "qld17", 2019, "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];

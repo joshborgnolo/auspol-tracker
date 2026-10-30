@@ -27,7 +27,7 @@ function valueText(v, kind, ctx) {
       case "senate": return ctx ? senNoValue(ctx.m, kind, ctx.d) : "No Senate count here";
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
-      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 2001 on" : "No census figure here") : "No score here";
+      case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 1993 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
     }

@@ -402,7 +402,7 @@ function incFact(m, dm) {
   if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${m.demoInterp && c.dollarsYear ? ` in ${c.dollarsYear} dollars` : ""}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
-const DEMO_EARLY = { hed: "Census figures start at the 2001 election", dek: "Census-linked people figures exist only from the 2001 election on: 2001 reads the 2001 census, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census. The 1993, 1996 and 1998 elections have no census-linked figures of their own." };
+const DEMO_EARLY = { hed: "Census figures start at the 1993 election", dek: "Census-linked people figures exist only from the 1993 election on: 1993 and 1996 blend the 1991 and 1996 censuses to election day, 1998 blends the 1996 and 2001 censuses, the 2001 election reads the 2001 census itself, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;

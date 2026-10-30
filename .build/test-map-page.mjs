@@ -159,19 +159,31 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 17, "16 result lanes plus approximate-location provenance; no census demo or birthplace rows");
+  assert.equal(Object.keys(D.booths).length, 18, "17 result lanes plus approximate-location provenance and census demo rows (the '90s people-interp arc)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
     assert.ok(Math.abs(D.agg.AUS.tpp[2] - -5.06) < 0.01, "1996's national swing vs 1993 is the Howard landslide's -5.06 (got " + D.agg.AUS.tpp[2] + ")");
   }
-  // the stats-era floor: no census people lanes and no SEIFA anywhere on the frame
+  // the stats-era floor now bridges in census people lanes: the '90s
+  // people-interp arc interpolates the 1991↔1996 censuses to election day
+  // (1996's f sits at the 1996 census's side), carry-proofed against the
+  // venue-nearest surveyed-linework rescue
   for (const f of [r, D]) {
-    assert.equal(f.demoBasis, null, "1996 has no census people basis");
+    assert.equal(f.demoBasis, "venue", "1996's census people basis is the venue-CD lane");
     assert.equal(f.incomeCuts, null, "the income floor stays 2013 everywhere the frame reaches");
     assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "1996 SEIFA cuts stay null");
+    assert.ok(f.demoInterp && f.demoInterp.f === 0.914067 && f.demoInterp.c0 === 1991 && f.demoInterp.c1 === 1996 && f.demoInterp.nearestSide === 1996,
+      "1996's demoInterp record interpolates 1991↔1996 at f=0.914067 nearest-1996-side");
   }
-  assert.ok(!D.divs.some((d) => d.demo), "no 1996 division carries a census demo row");
+  assert.equal(D.divs.filter((d) => d.demo).length, 148, "every 1996 division carries its census CD-sum demo row");
+  {
+    const nBooth = (D.booths.demo || []).filter((x) => x !== null).length;
+    assert.ok(nBooth > 6000, `most 1996 booths carry census demo cells (got ${nBooth})`);
+    const d0 = D.divs.find((d) => d.demo);
+    assert.ok(d0 && d0.demo.fborn > 0 && d0.demo.uni > 0 && d0.demo.p > 10000,
+      "a sample 1996 division's demo row reads real census shares");
+  }
   // the new Senate as at 1 July 1996: LP 31, ALP 29, Democrats 7, NP 6, GRN 2, IND 1
   {
     const tot = {};
@@ -190,6 +202,35 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
               Math.abs(fam(5) - 17.3) < 0.3,
       "the 1996 Senate family shares over the senate-fpv lanes (got " +
       [fam(0), fam(1), fam(2), fam(3), fam(4), fam(5)].map((v) => v.toFixed(1)).join(",") + ")");
+  }
+}
+{ // the 1993 and 1998 statistics-era frames, people-interp covered by the
+  // '90s arc: derive-cd-91-96-ced-alloc.py's era memberships (Handbook-era
+  // polygons — never the ASGC CED layer carrying its WA defect), the
+  // extract-bcp-aurin-tally.py census lane extractions and
+  // derive-booth-demo-90s.py's six venue stores. The lanes themselefs are
+  // pinned per-store at the seat-model tests; here the frames' publish-side
+  // contract: interp record, division/booth demo coverage and the
+  // income/SEIFA-floor invariants the rest of the page relies on
+  for (const [y, f, c0, c1, near, nDivs] of [[1993, 0.320197, 1991, 1996, 1991, 147], [1998, 0.431308, 1996, 2001, 1996, 148]]) {
+    const D = JSON.parse(R(`map/data/res-${y}.json`));
+    assert.equal(D.year, y);
+    assert.equal(D.divs.length, nDivs, `${y} has its ${nDivs} divisions`);
+    assert.equal(D.demoBasis, "venue", `${y}'s census people basis is the venue-CD lane`);
+    assert.ok(D.demoInterp && D.demoInterp.f === f && D.demoInterp.c0 === c0 && D.demoInterp.c1 === c1 && D.demoInterp.nearestSide === near,
+      `${y}'s demoInterp blends ${c0}↔${c1} at f=${f} nearest the ${near} census`);
+    assert.equal(D.incomeCuts, null, `${y}: the income floor stays 2013`);
+    assert.deepEqual(D.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, `${y}: SEIFA cuts stay null`);
+    assert.equal(D.divs.filter((d) => d.demo).length, nDivs, `every ${y} division carries its census CD-sum demo row`);
+    const nBooth = (D.booths.demo || []).filter((x) => x !== null).length;
+    assert.ok(nBooth > 5800, `most ${y} booths carry census demo cells (got ${nBooth})`);
+    const d0 = D.divs.find((d) => d.demo);
+    assert.ok(d0 && d0.demo.fborn > 0 && d0.demo.uni > 0,
+      `${y}: a sample division's demo row reads real census shares`);
+    for (const k of ["cob", "rel", "ten"]) {
+      assert.ok(!(k in D.booths) || D.booths[k].every((x) => x == null),
+        `${y} carries no ${k} columns (the '90s arc is six lanes only)`);
+    }
   }
 }
 { // the 2001 federal frame (.build/map/README-era recipes: pack-2001-booth.py's VTR lanes,

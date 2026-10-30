@@ -239,9 +239,88 @@ def build(year):
                          'informalDifferences': informal_differences,
                          'note':'Polling-place names and votes are from the AEC statistics pack. Historical venue coordinates are unavailable in this source; these polling places are not plotted. Census figures are unavailable.'})
     apply_locations(doc)
+    with_demo(doc, year)
     write(f'data-{year}.json', doc)
     senate(year, byname, pids)
     print(year, len(D), 'divisions;', len(pids), 'polling places;', A['AUS']['seats'])
+
+
+
+
+
+def with_demo(doc, year):
+    """Attach the Census People lanes to the statistics-era frame:
+    data/booth-demo-<year>.json is the measured census store (its
+    venue-CD lookups rode the location store's coordinates on the era
+    census districts); the intercensal-blend `.demoI` blocks and its
+    demoInterp record interpolate the lanes between the bracketing
+    censuses to election day. Division rows are each division's exact
+    census CD sum; booth rows compose like the GCP era's. Emission is
+    parity with build_map_data's per-year rows for 1996-onward (same
+    cell keys), so people-lens and card copy treat this frame like
+    the modern ones with the seats era's caveat joining the coverage
+    note."""
+    p = ROOT / f'data/booth-demo-{year}.json'
+    if not p.exists():
+        doc['coverage']['census'] = 'unavailable'
+        return
+    store = json.loads(p.read_text(encoding='utf-8'))
+    if 'demoInterp' not in store:
+        # the interp pass runs after the store derives; a half-ready
+        # measured store weaves in measured rows only, no cells, so the
+        # page reads exactly 'no census figure here', never an epoch-
+        # mismatched blend
+        doc['coverage']['census'] = (
+            f"measured-only ({store.get('censusEdition')}) "
+            "— interp not yet run on this store")
+    by_div = {dv['div']: dv for dv in store['divisions']}
+    by_booth = {b['boothId']: b for b in store['booths']}
+
+    def cells(block, iblk):
+        dm = common.demo_interp_of(block, iblk)
+        return common.demo_cells(dm) if dm else None
+
+    n_div = n_booth = 0
+    for d in doc['divs']:
+        dv = by_div.get(d['n'])
+        if not dv or dv.get('persons') in (None, 0):
+            continue
+        dc = cells(dv, dv.get('demoI'))
+        if not dc:
+            continue
+        d['demo'] = {'lang': dc[0], 'a65': dc[1], 'a2034': dc[2],
+                     'fborn': dc[3], 'uni': dc[4], 'blue': dc[5],
+                     'p': dv.get('persons'),
+                     'loinc': dc[6], 'hiinc': dc[7], 'medIncWeekly': None,
+                     'cob': None,
+                     'y12less': dc[8], 'atsci': dc[9], 'u15': dc[10],
+                     'onepar': dc[11], 'rel': None, 'ten': None}
+        n_div += 1
+    dcol = []
+    for bid in doc['booths']['id']:
+        vb = by_booth.get(bid)
+        blk = (vb or {}).get('demo')
+        dcol.append(cells(blk, (vb or {}).get('demoI')) if blk else None)
+    if any(x is not None for x in dcol):
+        doc['booths']['demo'] = dcol
+        n_booth = sum(x is not None for x in dcol)
+    doc['demoBasis'] = 'venue'
+    if store.get('demoInterp'):
+        doc['demoInterp'] = store['demoInterp']
+    doc['coverage']['census'] = (
+        f"the {store.get('censusEdition')} census on era district "
+        f"lines (venue-nearest within 1.5 km, "
+        f"{store.get('counts', {}).get('boothsGeoNearest')} of "
+        f"{store.get('counts', {}).get('booths')} booths), "
+        f"interpolated between censuses to election day")
+    doc['coverage']['note'] = (
+        doc['coverage']['note'].replace(
+            ' Census figures are unavailable.',
+            ' Census figures ride the era census districts per '
+            'venue-nearest mapping (see coverage.census) — the GCP-era '
+            'census demos do not exist at this frame.'))
+    print(f"    people lanes: {n_div} divisions, {n_booth} booths "
+          f"carried census demo cells")
 
 
 def senate(year, divs, pids):

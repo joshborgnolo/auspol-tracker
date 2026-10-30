@@ -4,6 +4,7 @@ import puppeteer from "puppeteer-core";
 
 const base = process.argv[2];
 if (!base) { console.error("need base url, e.g. http://127.0.0.1:8123"); process.exit(2); }
+console.log("probe build: 90s-arc-v2");
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"], protocolTimeout: 90000 });
 const page = await browser.newPage();
 await page.setCacheEnabled(false);
@@ -142,7 +143,8 @@ ok("2013 loinc hed uses the adults wording", /of Watson’s adults live in house
 ok("no story renders 'undefined' (loinc)", !/undefined/.test(lo2013.story));
 
 mark("section 3b done");
-// 4. outside the floor (1996) shows the early copy, not a figure
+// 4. the '90s arc floor moved to 1993: 1996 sits INSIDE the People
+// floor now, interpolated 1991↔1996 to election day
 const y1996 = await page.evaluate(async () => {
   const m = window.__map;
   const sel = document.querySelector('select[data-opt="index"]');
@@ -154,7 +156,9 @@ const y1996 = await page.evaluate(async () => {
   await new Promise((r) => setTimeout(r, 500));
   return (document.querySelector(".lg-note") || {}).textContent || "";
 });
-ok("1996 legend shows the early-floor copy", /start at the 2001 election/.test(y1996), y1996.slice(0, 160));
+ok("1996 legend interpolates 1991↔1996 (the '90s arc floor)",
+  /1991 and 1996/.test(y1996) && /23\.4%/.test(y1996),
+  y1996.slice(0, 160));
 
 // 4b. 2010 is inside the floor now: venue lanes on the 2006 census, no income lanes
 await page.goto("about:blank");

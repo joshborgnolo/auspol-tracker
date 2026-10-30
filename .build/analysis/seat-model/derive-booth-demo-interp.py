@@ -53,6 +53,9 @@ fail = hist.fail
 hash16 = hist.hash16
 
 YEARS = {
+    1993: {"c0": 1991, "c1": 1996},
+    1996: {"c0": 1991, "c1": 1996},
+    1998: {"c0": 1996, "c1": 2001},
     2004: {"c0": 2001, "c1": 2006},
     2007: {"c0": 2006, "c1": 2011},
     2010: {"c0": 2006, "c1": 2011},
@@ -125,14 +128,20 @@ def main():
                  f"{meas['censusEdition']}/{far['censusEdition']} vs "
                  f"{y}")
 
-        # the SEIFA store's own factors must agree to the last decimal
-        sf = json.loads((ROOT / f"data/booth-seifa-{year}.json")
-                        .read_text(encoding="utf-8"))
-        pcti = sf.get("_pcti")
-        if pcti is None or pcti["f"] != f or (
-                pcti["c0"], pcti["c1"]) != (y["c0"], y["c1"]):
+        # the SEIFA store's own factors must agree to the last
+        # decimal — where the year HAS a SEIFA lane (2004-onward).
+        # 1991/1996-era elections predate every SEIFA cohort's cover,
+        # so the cross-read is off there by construction; the day-
+        # share arithmetic (hist.interp_f over the same CENSUS_NIGHT /
+        # ELECTION_DAY maps) carries the season's keys itself.
+        sp = ROOT / f"data/booth-seifa-{year}.json"
+        sf = json.loads(sp.read_text(encoding="utf-8")) if sp.exists() \
+            else None
+        pcti = (sf or {}).get("_pcti") if sf else None
+        if pcti is not None and (pcti["f"] != f or (
+                pcti["c0"], pcti["c1"]) != (y["c0"], y["c1"])):
             fail(f"{year}: f {f} / sides {y} drift the seifa store's "
-                 f"{pcti and (pcti['f'], pcti['c0'], pcti['c1'])}")
+                 f"{(pcti['f'], pcti['c0'], pcti['c1'])}")
 
         c1_booths = {(b["div"], b["boothId"]): b for b in far["booths"]}
         m_booths = {(b["div"], b["boothId"]): b for b in meas["booths"]}
@@ -211,12 +220,21 @@ def main():
                                "hiNationalShare": fc["hiNationalShare"]},
             },
             }
+        if year >= 2004:
+            factors_clause = (
+                f"day-share {f} of the intercensal span — the SEIFA "
+                f"pcti lanes' own factors, asserted identical to "
+                f"data/booth-seifa-{year}.json's _pcti record")
+        else:
+            factors_clause = (
+                f"day-share {f} of the intercensal span — the season's "
+                f"CENSUS_NIGHT/ELECTION_DAY day counts themselves "
+                f"(this year's election predates every SEIFA cohort's "
+                f"cover, so there is no SEIFA lane to cross-read)")
         about_interp = (
             f" The demoI blocks interpolate the people figures between "
             f"the {y['c0']} and {y['c1']} censuses to election day "
-            f"(day-share {f} of the intercensal span — the SEIFA pcti "
-            f"lanes' own factors, asserted identical to "
-            f"data/booth-seifa-{year}.json's _pcti record): each demoI "
+            f"({factors_clause}): each demoI "
             f"lane blends the two census sides' shares, a lane missing "
             f"on either side falling back to the measured block for "
             f"that lane; incMed and the incomeCutsI dollar figures "

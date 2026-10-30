@@ -208,10 +208,13 @@ CUBE_CENSUS = {"cd2001": 2001, "cd2006": 2006, "sa1-2011": 2011,
 # census nights + election days (derive-division-seifa-interp.py carries
 # the 2013/2016/2019 lanes of this same map — f must match its store's
 # _pcti.factors to the last decimal; the test asserts the cross-read)
-CENSUS_NIGHT = {2001: date(2001, 8, 7), 2006: date(2006, 8, 8),
+CENSUS_NIGHT = {1991: date(1991, 8, 6), 1996: date(1996, 8, 6),
+                2001: date(2001, 8, 7), 2006: date(2006, 8, 8),
                 2011: date(2011, 8, 9), 2016: date(2016, 8, 9),
                 2021: date(2021, 8, 10)}
-ELECTION_DAY = {2004: date(2004, 10, 9), 2007: date(2007, 11, 24),
+ELECTION_DAY = {1993: date(1993, 3, 13), 1996: date(1996, 3, 2),
+                1998: date(1998, 10, 3),
+                2004: date(2004, 10, 9), 2007: date(2007, 11, 24),
                 2010: date(2010, 8, 21), 2013: date(2013, 9, 7),
                 2016: date(2016, 7, 2), 2019: date(2019, 5, 18)}
 
