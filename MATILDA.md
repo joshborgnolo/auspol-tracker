@@ -101,7 +101,18 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     re-runs the wrapper once. `test-push-main.mjs` races two clones through
     it. Every writer — new ones included — pushes through `push_main`, and
     commits the generated files by the shared `SITE_FILES` list defined
-    beside `refresh_site` (add a new generated file there, once).
+    beside `refresh_site` (add a new generated file there, once). push_main
+    refuses to push a torn tree (2026-10-31): refresh_site's check-asset-refs
+    worktree check can't see `git add assets/` carrying DELETIONS whose
+    pages rode the same commit unchanged — a sibling rebuild in this
+    checkout swept the live late-css/public-opinion hashes and the vic
+    commit's staging shipped the deletion, 404ing the Now page's late
+    styles live. `push_main_torn_guard` now audits HEAD's own tree
+    (check-asset-refs --tree) before every push; build.mjs's hashed-asset
+    sweeps never delete a file HEAD's documents reference; both plus the
+    npm-test pin (test-asset-refs.mjs) share `.build/asset-refs.mjs`, which
+    finds loader-config refs (window.AP_LATE et al.) an attribute scan
+    misses.
   - A run that fails because the pollster was down or walled, or that lost
     a push race twice, ends GREEN with a warning (`.build/classify-failure.mjs`);
     `.build/transient-streak.sh` turns it red only after 12h of that, and

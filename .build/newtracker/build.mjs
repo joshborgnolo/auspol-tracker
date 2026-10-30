@@ -25,10 +25,24 @@ import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
 import { rewriteTideArt } from "./tide-art.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
+import { referencedAssets } from "../asset-refs.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
+/* The hashed-file sweeps below delete what THIS build didn't write. Run in a
+   checkout whose sources differ from HEAD's (a sibling session's WIP in the
+   shared checkout) a build re-hashes layers and would GC the very files
+   HEAD's deployed pages still point at — the 2026-10-31 tear, where a
+   worktree sweep plus an `assets/` staging left every tab document 404ing
+   its late styles live. HEAD_REFS is what HEAD's documents reference; a
+   file on the list is never swept. A truly-orphaned file stays collectable:
+   once HEAD's pages no longer point at a hash the next build takes it.
+   Unreadable (a copy of the sources outside a git repo) → unguarded, the
+   historical behaviour. */
+let HEAD_REFS = null;
+try { HEAD_REFS = referencedAssets("HEAD", ROOT); } catch { HEAD_REFS = null; }
+const sweepKeep = (rel) => HEAD_REFS !== null && HEAD_REFS.has(rel);
 /* BUILD_JUR=vic builds /vic/ – the Victorian state-election page – from this
    same file, the same template and the same components, on the Victorian
    dataset (.build/vic/to-main-schema.mjs maps data/vic-polls.json onto
@@ -397,7 +411,7 @@ const faceCss = FONTS.map((f) => {
 }).filter(Boolean).join("\n");
 // a hashed name changes when the bytes do, so sweep the ones nothing points at
 for (const old of fs.readdirSync(FONT_DIR)) {
-  if (/\.woff2$/.test(old) && !fontKeep.has(old)) fs.unlinkSync(path.join(FONT_DIR, old));
+  if (/\.woff2$/.test(old) && !fontKeep.has(old) && !sweepKeep(`assets/fonts/${old}`)) fs.unlinkSync(path.join(FONT_DIR, old));
 }
 
 /* Splice the generated faces in at an explicit marker, like the static
@@ -1750,7 +1764,7 @@ const cycleSrcName = `cycle-source.${hash8(Buffer.from(cycleSourceJson))}.json`;
    not sweep the federal page's file out of assets/ */
 if (!VIC) {
 for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
-  if (/^cycle-source\..*\.json$/.test(old) && old !== cycleSrcName)
+  if (/^cycle-source\..*\.json$/.test(old) && old !== cycleSrcName && !sweepKeep(`assets/${old}`))
     fs.unlinkSync(path.join(ROOT, "assets", old));
 }
 writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
@@ -1768,7 +1782,7 @@ const oneOffsJson = !VIC && fs.readFileSync(DA("oneoffs-source.json"), "utf8");
 if (!VIC) {
   const name = `oneoffs-source.${hash8(Buffer.from(oneOffsJson))}.json`;
   for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
-    if (/^oneoffs-source\..*\.json$/.test(old) && old !== name)
+    if (/^oneoffs-source\..*\.json$/.test(old) && old !== name && !sweepKeep(`assets/${old}`))
       fs.unlinkSync(path.join(ROOT, "assets", old));
   }
   writeAtomic(path.join(ROOT, "assets", name), oneOffsJson);
@@ -1852,7 +1866,7 @@ for (const f of JSX) {
   for (const old of fs.readdirSync(JS_DIR)) {
     if (!/\.[0-9a-f]{8}\.js$/.test(old)) continue;
     const base = old.replace(/\.[0-9a-f]{8}\.js$/, "");
-    if (!jsBases.includes(base) || jsKeep.has(old)) continue;
+    if (!jsBases.includes(base) || jsKeep.has(old) || sweepKeep(`assets/js/${old}`)) continue;
     fs.unlinkSync(path.join(JS_DIR, old));
     swept++;
   }
@@ -2075,7 +2089,7 @@ const LATE_MODULES = ["data-late", "data-vic-late", "pv-agg", "a11e1559-f455-44d
        stale copies - this jurisdiction's base only */
     const cssBase = VIC ? "late-css-vic" : "late-css";
     for (const old of fs.readdirSync(JS_DIR))
-      if (new RegExp(`^${cssBase}\\.[0-9a-f]{8}\\.js$`).test(old) && !src.endsWith(old)) fs.unlinkSync(path.join(JS_DIR, old));
+      if (new RegExp(`^${cssBase}\\.[0-9a-f]{8}\\.js$`).test(old) && !src.endsWith(old) && !sweepKeep(`assets/js/${old}`)) fs.unlinkSync(path.join(JS_DIR, old));
     const rel = VIC ? "../" + src : src;
     html = html.replace(/window\.AP_LATE=\[/, `window.AP_LATE=[${JSON.stringify(rel)},`);
   }

@@ -60,12 +60,34 @@ case "$0" in
 esac
 PUSH_MAIN_ARGV=("$@")
 
+# Torn-tree refusal — the last gate before main moves. The worktree checks
+# can't see the deletion-only tear: refresh_site's check-asset-refs audits
+# pages against files ON DISK, but `git add assets/` in stage_dataset also
+# stages DELETIONS, and a file can be missing from the worktree while its
+# pages sit unchanged in HEAD (2026-10-31: a sibling rebuild in the shared
+# checkout re-hashed and swept late-css.deff1edb.js and
+# rd-public-opinion.7f636c3b.js; the vic commit's assets/ staging carried
+# the deletions, the federal pages pointing at them stayed on main, and the
+# Now page rendered without its late styles until the files were restored).
+# HEAD is by then exactly what would land, so audit ITS tree.
+push_main_torn_guard() {
+  local chk="${REPO:-.}/.build/check-asset-refs.mjs"
+  # absent in test-push-main's toy repo, which carries this file alone
+  [ -f "$chk" ] || return 0
+  if ! node "$chk" --tree HEAD >> "$LOG" 2>&1; then
+    log "FAIL asset-ref check on the committed tree: a page references a file the commit does not carry; refusing to push"
+    return 1
+  fi
+  return 0
+}
+
 push_main() {
   local msg="$1"; shift
   if [ "${AUSPOL_PR_GATE:-}" = "1" ]; then
     log "agent session (AUSPOL_PR_GATE=1): commit left local; the calling workflow owns the push"
     return 0
   fi
+  push_main_torn_guard || return 1
   if git push origin HEAD:main >> "$LOG" 2>&1; then
     return 0
   fi
@@ -113,6 +135,7 @@ push_main() {
     log "FAIL amend after rebase"
     return 1
   fi
+  push_main_torn_guard || return 1
   if ! git push origin HEAD:main >> "$LOG" 2>&1; then
     push_main_rerun "the push after the rebase was rejected too"
     log "FAIL push race: the push after the rebase was rejected too (commit kept locally: $msg)"
