@@ -129,7 +129,13 @@ def sum_divisions(alloc, sa1, inc):
                                   "relvec": [0] * len(d13.REL_KEYS),
                                   "relNS": 0, "relTot": 0,
                                   "ten6": [0] * 6,
-                                  "famN": 0, "famD": 0})
+                                  "famN": 0, "famD": 0,
+                                  "citz": 0,
+                                  "mtw": {"n": 0, "t": 0, "ns": 0},
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancn": [0] * len(d13.ANC_KEYS),
+                                  "ancns": 0, "ancP": 0,
+                                  "hle": 0.0})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -143,7 +149,7 @@ def sum_divisions(alloc, sa1, inc):
         acc["eng"] += r["eng"]
         acc["oth"] += r["oth"]
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
-                  "occd", "pop15"):
+                  "occd", "pop15", "citz"):
             acc[k] += r[k]
         for i in range(6):
             acc["sch6"][i] += r["sch6"][i]
@@ -160,6 +166,18 @@ def sum_divisions(alloc, sa1, inc):
         acc["inch"] += ir[2]
         for i in range(len(d13.INC_BANDS14)):
             acc["incbh"][i] += ir[4][i]
+        mk = r["mtw"]
+        if mk is not None:
+            acc["mtw"]["n"] += mk["n"]
+            acc["mtw"]["t"] += mk["t"]
+            acc["mtw"]["ns"] += mk["ns"]
+        for k in ("ceb3", "cebns", "cebt"):
+            acc[k] += r[k]
+        for i in range(len(d13.ANC_KEYS)):
+            acc["ancn"][i] += r["ancn"][i]
+        acc["ancns"] += r["ancns"]
+        acc["ancP"] += r["ancP"]
+        acc["hle"] += r["hle"] or 0.0
     return divsum
 
 
@@ -169,7 +187,7 @@ def national_of(divsum):
     nat = defaultdict(int)
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd", "pop15"):
+                  "eduns", "bluen", "occd", "pop15", "citz"):
             nat[k] += dv[k]
         for i, b in enumerate(d13.BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
@@ -187,11 +205,19 @@ def national_of(divsum):
             nat["sch6"][i] += dv["sch6"][i]
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
-                  "famN", "famD"):
+                  "famN", "famD", "ceb3", "cebns", "cebt",
+                  "ancns", "ancP"):
             nat[k] += dv[k]
         for i in range(len(d13.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d13.REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
+        mk = dv["mtw"]
+        for kk in ("n", "t", "ns"):
+            nat["mtw_" + kk] = nat.get("mtw_" + kk, 0) + mk[kk]
+        for i in range(len(d13.ANC_KEYS)):
+            nat.setdefault("ancn", [0] * len(d13.ANC_KEYS))
+            nat["ancn"][i] += dv["ancn"][i]
+        nat["hle"] = nat.get("hle", 0.0) + dv["hle"]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -228,6 +254,12 @@ def national_of(divsum):
                          / (nat["ten6"][0] + nat["ten6"][1]
                             + nat["ten6"][2] + nat["ten6"][4]), 4)
                 for k in d13.TEN_KEYS},
+        "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
+        "noncit": round(1 - nat["citz"] / nat["pers"], 4),
+        "bigfam": round(nat["ceb3"] / (nat["cebt"] - nat["cebns"]), 4),
+        "hl": round(nat["hle"] / nat["pers"], 4),
+        "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
+                for i, k in enumerate(d13.ANC_KEYS)},
     }
 
 
@@ -307,7 +339,14 @@ def main():
                     "relNS": row["relNS"], "relTot": row["relTot"],
                     "ten6": (list(row["ten6"]) if row["ten6"]
                              is not None else None),
-                    "famN": row["famN"], "famD": row["famD"]})
+                    "famN": row["famN"], "famD": row["famD"],
+                    "citz": row["citz"], "mtw": row["mtw"],
+                    "ceb3": row["ceb3"], "cebns": row["cebns"],
+                    "cebt": row["cebt"],
+                    "ancn": (list(row["ancn"]) if row["ancn"] is not None
+                             else None),
+                    "ancns": row["ancns"], "ancP": row["ancP"],
+                    "hle": row["hle"]})
             out_booths.append(rec)
 
         divisions = []
@@ -425,6 +464,7 @@ def main():
             "cobKeys": list(d13.COB_KEYS8),
             "relKeys": list(d13.REL_KEYS),
             "tenKeys": list(d13.TEN_KEYS),
+            "ancKeys": list(d13.ANC_KEYS),
             "counts": counts,
             "divisions": divisions,
             "booths": out_booths,

@@ -14,7 +14,10 @@ const ok = (name, cond, detail = "") => { console.log(`${cond ? "ok" : "FAIL"} $
 const mark = (s) => console.log(`… ${s}`);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// 1. People optgroup carries eight measures, incl. blue-collar and the two income lanes
+// 1. People optgroup carries the full sixteen-lane set plus the three
+// select lenses (the 2026-10-31 arc: public transport to work,
+// non-citizens, more than two children, homeless, and the Ancestry
+// select-with-twelve menu)
 await page.goto(`${base}/map/`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 mark("boot ok");
@@ -29,7 +32,7 @@ const opts = await page.evaluate(() => {
 const people = opts && opts.find((g) => g[0] === "People");
 ok("legend People optgroup exists", !!people, JSON.stringify(opts && opts.map((g) => g[0])));
 if (people) {
-  ok("People has 14 options (12 measures + Religion + Housing tenure)", people[1].length === 14, people[1].join(" | "));
+  ok("People has 19 options (16 measures + Religion + Housing tenure + Ancestry)", people[1].length === 19, people[1].join(" | "));
   ok("Born overseas listed", people[1].some((t) => /born overseas/i.test(t)));
   ok("University educated listed", people[1].some((t) => /university/i.test(t)));
   ok("Blue-collar listed", people[1].some((t) => /blue-collar/i.test(t)));
@@ -39,8 +42,12 @@ if (people) {
   ok("Indigenous Australians listed", people[1].some((t) => /indigenous/i.test(t)));
   ok("Children under 15 listed", people[1].some((t) => /children under 15/i.test(t)));
   ok("One-parent families listed", people[1].some((t) => /one-parent/i.test(t)));
-  ok("Religion listed last-but-one", people[1][people[1].length - 2] === "Religion", people[1].join(" | "));
-  ok("Housing tenure listed last", people[1][people[1].length - 1] === "Housing tenure", people[1].join(" | "));
+  ok("Public transport to work listed", people[1].some((t) => /public transport to work/i.test(t)));
+  ok("Non-citizens listed", people[1].some((t) => /non-citizens/i.test(t)));
+  ok("More than two children listed", people[1].some((t) => /more than two children/i.test(t)));
+  ok("Homeless listed", people[1].some((t) => /homeless/i.test(t)));
+  ok("Housing tenure listed before Ancestry", people[1][people[1].length - 2] === "Housing tenure", people[1].join(" | "));
+  ok("Ancestry listed last", people[1][people[1].length - 1] === "Ancestry", people[1].join(" | "));
 }
 
 mark("section 1 done");
@@ -179,8 +186,8 @@ const y2010 = await page.evaluate(async () => {
 });
 ok("2010 basis is venue", y2010.basis === "venue", y2010.basis);
 ok("2010 legend cites the 2006 census", /2006 and 2011 censuses/.test(y2010.note), y2010.note.slice(0, 140));
-ok("2010 People optgroup carries the income lanes",
-  y2010.people && y2010.people.length === 14 && y2010.people.includes("loinc") && y2010.people.includes("hiinc"),
+ok("2010 People optgroup carries the income lanes (18: no homeless lane yet on a 2010-era year, and Ancestry joined)",
+  y2010.people && y2010.people.length === 18 && y2010.people.includes("loinc") && y2010.people.includes("hiinc") && y2010.people.includes("anc") && !y2010.people.includes("hl"),
   JSON.stringify(y2010.people));
 
 // 4c. an income deep link on 2010 shows the interp income copy: the
@@ -310,6 +317,131 @@ ok("now legend says owned with mortgage", /Share of residents whose dwellings ar
 ok("now AUS mort ≈ 36.9%", tenNow.aus && Math.abs(tenNow.aus.ten.mort - 36.9) < 0.6, JSON.stringify(tenNow.aus && tenNow.aus.ten));
 
 mark("section 5z done");
+// 5z2. the 2026-10-31 lanes arc's people measures: the public-transport,
+// non-citizens, more-than-two-children and homeless lanes plus the
+// Ancestry select menu (deep links, your-hash-and-pickers restore,
+// honest legend notes on each new lane).
+// pt: the commute share of employed people per the census's own
+// method-of-travel table.
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=pt`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const ptNow = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return { sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo,
+    story: "" };
+});
+ok("#i=pt selects Public transport", ptNow.sel === "pt", ptNow.sel);
+ok("pt note describes PT-by-stated-method journeys",
+  /share of employed/i.test(ptNow.note) && /train|tram|bus|ferry/i.test(ptNow.note), ptNow.note.slice(0, 220));
+ok("now AUS pt ≈ 3.4% (post-pandemic JTW read)", ptNow.aus && Math.abs(ptNow.aus.pt - 3.4) < 0.4, JSON.stringify(ptNow.aus));
+
+// noncit: residents not listed as Australian citizens by the census
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=noncit`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const ncNow = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return { note: (document.querySelector(".lg-note") || {}).textContent || "",
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo };
+});
+ok("noncit note names the census complement honestly", /not (listed as|counted as) Australian citizens/i.test(ncNow.note), ncNow.note.slice(0, 240));
+ok("now AUS noncit ≈ 15%", ncNow.aus && Math.abs(ncNow.aus.noncit - 15.1) < 0.4, JSON.stringify(ncNow.aus));
+
+// bigfam: women who've had three or more children
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=bigfam`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const bfNow = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return { note: (document.querySelector(".lg-note") || {}).textContent || "",
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo };
+});
+ok("bigfam note names women with more than two children", /women aged 15\+ who have had more than two children/i.test(bfNow.note), bfNow.note.slice(0, 220));
+ok("now AUS bigfam ≈ 24.7%", bfNow.aus && Math.abs(bfNow.aus.bigfam - 24.7) < 0.4, JSON.stringify(bfNow.aus));
+
+// hl: the ABS homelessness estimate, at SA2-area basis of copy
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=hl`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const hlNow = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return { note: (document.querySelector(".lg-note") || {}).textContent || "",
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo };
+});
+ok("hl note names the ABS estimate + the SA2 area basis",
+  /ABS/i.test(hlNow.note) && /homeless/i.test(hlNow.note) && /SA2/.test(hlNow.note),
+  hlNow.note.slice(0, 240));
+ok("now AUS hl ≈ 0.45%", hlNow.aus && Math.abs(hlNow.aus.hl - 0.45) < 0.08, JSON.stringify(hlNow.aus));
+
+// anc: the Ancestry select menu — #i=anc&an=scottish deep-link restores
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=anc&an=scottish`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const ancNow = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  const ancSel = document.querySelector('select[data-opt="anc"]');
+  return { sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    ancOptCount: ancSel ? ancSel.querySelectorAll("option").length : 0,
+    ancSelVal: ancSel && ancSel.value,
+    hash: location.hash,
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo };
+});
+ok("#i=anc selects the Ancestry lens", ancNow.sel === "anc", ancNow.sel);
+ok("ancestry picker offers the twelve", ancNow.ancOptCount === 12, String(ancNow.ancOptCount));
+ok("#an=scottish restores Scottish", ancNow.ancSelVal === "scottish", ancNow.ancSelVal);
+ok("the an= param serialises on the hash", /\ban=scottish/.test(ancNow.hash), ancNow.hash);
+ok("now legend names Scottish ancestry", /English ancestry|Scottish ancestry/.test(ancNow.note) && /Scottish ancestry/.test(ancNow.note), ancNow.note.slice(0, 200));
+ok("ancestry note mentions two ancestries", /up to two ancestries|two ancestries/.test(ancNow.note), ancNow.note.slice(0, 260));
+ok("now AUS scottish ≈ 9.3%", ancNow.aus && ancNow.aus.anc && Math.abs(ancNow.aus.anc.scottish - 9.3) < 0.4, JSON.stringify(ancNow.aus && ancNow.aus.anc));
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=anc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const ancDef = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return { sel: (document.querySelector('select[data-opt="anc"]') || {}).value,
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo };
+});
+ok("ancestry lands on its own first option (English)", ancDef.sel === "english", ancDef.sel);
+ok("now AUS english ≈ 35.7%", ancDef.aus && ancDef.aus.anc && Math.abs(ancDef.aus.anc.english - 35.7) < 0.5, JSON.stringify(ancDef.aus && ancDef.aus.anc));
+// the 2013 frame carries hl's venue read; 2007/2010 hide the lane
+const hl2013 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.setYear(2013);
+  await m.Y[2013].ready;
+  await new Promise((r) => setTimeout(r, 500));
+  const sel = document.querySelector('select[data-opt="index"]');
+  return { hasHl: ![...sel.options].map((o) => o.value).includes("hl"),
+    watsonDiv: (m.Y[2013].byName.get("Watson") != null) ? m.Y[2013].divs[m.Y[2013].byName.get("Watson")].demo : null };
+});
+ok("2013 People lists homeless (the 2011-era lane lives)", !hl2013.hasHl);
+ok("2013 Watson hl ≈ 0.5% (venue SA1 read)", hl2013.watsonDiv && typeof hl2013.watsonDiv.hl === "number" && Math.abs(hl2013.watsonDiv.hl - 0.005) < 0.004, JSON.stringify(hl2013.watsonDiv));
+const p2010 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.setYear(2010);
+  await m.Y[2010].ready;
+  await new Promise((r) => setTimeout(r, 300));
+  const sel = document.querySelector('select[data-opt="index"]');
+  return [...sel.options].map((o) => o.value);
+});
+ok("2010 People hides homeless (no 2006 homelessness estimates)", !p2010.includes("hl") && p2010.includes("pt") && p2010.includes("anc"), p2010.join(","));
+
+mark("section 5z2 done");
 // 6. hover tooltip on an income lane names the income wording, never "undefined":
 // goDiv flies the seat into view, then a real pointer sweep over the canvas
 // lands on it (hitTest is not exported, so this must drive real mouse events).

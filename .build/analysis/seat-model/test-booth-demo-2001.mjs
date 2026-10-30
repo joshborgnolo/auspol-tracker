@@ -74,6 +74,17 @@ eq(c.national, {
     jew: 0.005 },
   ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
   loinc: 0.2502, hiinc: 0.1033, incMed: 786,
+  // the 2026-10-31 lanes arc (measured from the B 01/B 05A/B/B 28
+  // prints — no children-ever-born table ships in the 2001 BCP, so
+  // bigfam is ABSENT on this era's stores, as is homeless). The
+  // earlier 0.2026 noncit pin belonged to a pre-epsilon-fix tally
+  // whose "Australian citizen aged 18 years and over" row had
+  // swallowed the all-ages citizen cell; the honest figure is 0.1173
+  pt: 0.0907, noncit: 0.1173,
+  anc: { english: 0.3657, australian: 0.3876, irish: 0.1103,
+    scottish: 0.031, chinese: 0.032, italian: 0.0461, german: 0.0426,
+    indian: 0.009, filipino: 0.0075, dutch: 0.0155, vietnamese: 0.009,
+    lebanese: 0.0094 },
 }, "c0 national (2001 census anchors)");
 eq(d.incomeCuts, {
   loQuantile: 0.25, loCutWeekly: 456.13, hiEdgeWeekly: 2000,
@@ -81,6 +92,11 @@ eq(d.incomeCuts, {
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
 }, "c0 incomeCuts (2001 edition: $2,000+ top edge)");
+eq(d.ancKeys, ["english", "australian", "irish", "scottish",
+  "chinese", "italian", "german", "indian", "filipino", "dutch",
+  "vietnamese", "lebanese"], "c0 ancKeys");
+ok(!("bigfam" in c.national) && !("hl" in c.national),
+  "c0: no children/homeless tables in the 2001 product");
 {
   const divs = new Map(d.divisions.map((x) => [x.div, x]));
   eq(["lingiari", "sydney"].map((n) => divs.get(n === "lingiari"
@@ -157,6 +173,14 @@ eq(c1c.national, {
     jew: 0.005 },
   ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
   loinc: 0.25, hiinc: 0.0645, incMed: 1027,
+  // the 2026-10-31 lanes arc (2006 B 01 citizen, B 08 ancestry, B 23
+  // children-ever-born, B 45 travel — 2049.0's homelessness estimates
+  // start at the 2011 edition, so hl stays absent)
+  pt: 0.0847, noncit: 0.1388, bigfam: 0.2913,
+  anc: { english: 0.3443, australian: 0.4041, irish: 0.0989,
+    scottish: 0.0822, chinese: 0.0367, italian: 0.0468, german: 0.0445,
+    indian: 0.0129, filipino: 0.0088, dutch: 0.017, vietnamese: 0.0095,
+    lebanese: 0.01 },
 }, "c1 national (2006 census anchors)");
 eq(c1.incomeCuts, {
   loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
@@ -164,6 +188,10 @@ eq(c1.incomeCuts, {
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
 }, "c1 incomeCuts (2006 edition: $3,000+ top edge)");
+eq(c1.ancKeys, ["english", "australian", "irish", "scottish",
+  "chinese", "italian", "german", "indian", "filipino", "dutch",
+  "vietnamese", "lebanese"], "c1 ancKeys");
+ok(!("hl" in c1c.national), "c1: no 2006 homelessness edition");
 {
   const divs = new Map(c1.divisions.map((x) => [x.div, x]));
   const L = divs.get("Lingiari");
@@ -205,7 +233,8 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   }, "2004 incomeCutsI = the nearest (2006) edge + both sides");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   for (const k of ["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc"]) {
+    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc",
+    "pt", "noncit"]) {
     eq(d.counts.demoI.national[k],
       LN(c.national[k], c1c.national[k]), `demoI national ${k}`);
   }
@@ -214,7 +243,11 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     "demoI national hiinc == nearest side's (2006) hi");
   eq(d.counts.demoI.national.incMed, c1c.national.incMed,
     "demoI national incMed == nearest side's (2006) median");
-  for (const [lane, keys] of [["rel", d.relKeys], ["ten", d.tenKeys]]) {
+  eq(d.counts.demoI.national.pt, 0.0869, "demoI national pt blend");
+  eq(d.counts.demoI.national.noncit, 0.1309,
+    "demoI national noncit blend");
+  for (const [lane, keys] of [["rel", d.relKeys], ["ten", d.tenKeys],
+      ["anc", d.ancKeys]]) {
     for (const k of keys) {
       eq(d.counts.demoI.national[lane][k],
         LN(c.national[lane][k], c1c.national[lane][k]),
@@ -234,7 +267,8 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   let bothNullC = 0, blendC = 0, keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "incMed",
-    "y12less", "atsci", "u15", "onepar", "rel", "ten"]);
+    "y12less", "atsci", "u15", "onepar", "rel", "ten",
+    "pt", "noncit", "bigfam", "hl", "anc"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

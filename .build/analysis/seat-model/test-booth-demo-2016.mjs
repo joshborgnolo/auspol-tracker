@@ -60,7 +60,18 @@ eq(c.national, {
     pres: 0.0247, orth: 0.0258, budd: 0.0263, isl: 0.0283, hind: 0.0205,
     jew: 0.004 },
   ten: { mort: 0.3545, rent: 0.3183, own: 0.3193, rentPub: 0.0365 },
+  // the 2026-10-31 lanes arc (measured 2026-10-31 from the GCP G01/
+  // G08/G24/G59 tables + the ABS 2049.0 SA2 estimates)
+  pt: 0.1004, noncit: 0.1755, bigfam: 0.2634,
+  anc: { english: 0.3608, australian: 0.3353, irish: 0.1097,
+    scottish: 0.0929, chinese: 0.0554, italian: 0.0459, german: 0.0451,
+    indian: 0.0281, filipino: 0.0136, dutch: 0.0154,
+    vietnamese: 0.0133, lebanese: 0.0103 },
+  hl: 0.005,
 }, "national row (2016 census)");
+eq(d.ancKeys, ["english", "australian", "irish", "scottish",
+  "chinese", "italian", "german", "indian", "filipino", "dutch",
+  "vietnamese", "lebanese"], "ancKeys (the Ancestry menu's twelve)");
 eq([d.incomeCuts.loCutWeekly, d.incomeCuts.hiNationalShare,
   d.incomeCuts.dollarsYear, d.incomeCuts.hiEdgeWeekly],
   [895.8, 0.09093, 2016, 4000], "incomeCuts (2016 dollars)");

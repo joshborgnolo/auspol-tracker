@@ -178,6 +178,10 @@ def demo_main(frame, year):
     V = VINTAGES[year]
     gcp, qld_persons = load_gcp_qld(year)
     nlt = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
+    arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
+    HL = gcp_newlanes.hl_alloc_of(
+        2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
+        2016, "c7")
     sa1 = read_sa1_polygons(year)
     districts, order = load_districts()
 
@@ -205,7 +209,12 @@ def demo_main(frame, year):
                                   "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
                                   "relN": [0] * len(gcp_newlanes.REL_KEYS),
                                   "relNS": 0, "relTot": 0,
-                                  "tenN": [0] * 6, "famN": 0, "famD": 0})
+                                  "tenN": [0] * 6, "famN": 0, "famD": 0,
+                                  "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+                                  "ancP": 0, "ancNS": 0,
+                                  "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
         a["eng"] += r[1]
@@ -236,6 +245,20 @@ def demo_main(frame, year):
             a["tenN"][i] += ten6[i]
         a["famN"] += fam[0]
         a["famD"] += fam[1]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        a["citz"] += citz
+        a["ptn"] += ptn
+        a["ptt"] += ptt
+        a["ptns"] += ptns
+        a["ceb3"] += ceb3
+        a["cebns"] += cebns
+        a["cebt"] += cebt
+        for i in range(len(gcp_newlanes.ANC_KEYS)):
+            a["ancN"][i] += ancv[i]
+        a["ancP"] += ancp
+        a["ancNS"] += ancns
+        a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
             fail(f"district {dist} has no SA1 assigned")
@@ -271,6 +294,15 @@ def demo_main(frame, year):
                                "own": tn[0], "rentPub": tn[3]}[k] / tend, 4)
                         if tend > 0 else None)
                     for k in ["mort", "rent", "own", "rentPub"]},
+            "pt": (round(a["ptn"] / (a["ptt"] - a["ptns"]), 4)
+                   if a["ptt"] - a["ptns"] > 0 else None),
+            "noncit": round((a["p"] - a["citz"]) / a["p"], 4) if a["p"] else None,
+            "bigfam": (round(a["ceb3"] / (a["cebt"] - a["cebns"]), 4)
+                       if a["cebt"] - a["cebns"] > 0 else None),
+            "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
+            "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
+                        if a["ancP"] - a["ancNS"] > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
         }
         return s, None
 
@@ -289,13 +321,18 @@ def demo_main(frame, year):
               "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
               "relN": [0] * len(gcp_newlanes.REL_KEYS),
               "relNS": 0, "relTot": 0, "tenN": [0] * 6,
-              "famN": 0, "famD": 0}
+              "famN": 0, "famD": 0,
+              "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+              "ceb3": 0, "cebns": 0, "cebt": 0,
+              "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+              "ancP": 0, "ancNS": 0,
+              "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -320,6 +357,7 @@ def demo_main(frame, year):
         "cobKeys": COB_KEYS,
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
+        "ancKeys": list(gcp_newlanes.ANC_KEYS),
         "demo": {nm: demo[nm] for nm in order},
         "state": {**st_shares, "persons": persons, "sa1": st_acc["n"],
                   "sentinelSa1": len(QLD_SENTINELS[year]), "sentinelPersons": sentinel_persons},

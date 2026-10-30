@@ -92,8 +92,16 @@ _spec.loader.exec_module(m25)
 _spec = importlib.util.spec_from_file_location("hist", SM / "derive-booth-seifa-hist.py")
 hist = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(hist)
+_spec = importlib.util.spec_from_file_location("hla", SM / "homeless_alloc.py")
+hla = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(hla)
 fail = m25.fail
 hash16 = m25.hash16
+HL_ALLOC = {2011: hla.alloc_of(2011, "c7"),
+            2016: hla.alloc_of(2016, "c7"),
+            2021: hla.alloc_of(2021, "m")}
+# slot 27 on every GCP-universe row: hla's allocated homeless estimate
+# count (never a rate); the acc machinery pools it additively
 
 ABS = ROOT / ".matilda/seifa-irsad-abs"
 CACHE = SM / "cache"
@@ -258,6 +266,13 @@ COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
 REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
             "isl", "hind", "jew"]
 TEN_KEYS = ["mort", "rent", "own", "rentPub"]
+# the Ancestry menu options, site key order (the 2026-10-31 lanes arc;
+# user-specified set — every era's store records its readable subset
+# in ancKeys). Census ancestry takes up to two responses per person,
+# so option shares are independent and sum past 100%, never normalised
+ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
+            "italian", "german", "indian", "filipino", "dutch",
+            "vietnamese", "lebanese"]
 GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
 GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
 GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
@@ -355,13 +370,17 @@ XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G07, G09F/G09G/G09H, G14, "
-              "G32/G33, G37, G49B and G60B @ SA1 (Ed3); "
+DEMO_BASIS = ("2021 Census GCP G01, G07, G08, G09F/G09G/G09H, G14, "
+              "G28, G32/G33, G37, G49B, G60B and G62 @ SA1 (Ed3), plus "
+              "the ABS Estimating-homelessness 2049.0 SA2 estimates "
+              "down-allocated by population share "
+              "(cache/homeless-sa1-2021-alloc.json); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
 _DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G07, "
-              "G09F/G09G/G09H, G14, G32/G33, G37, G49B and G60B SA1 "
+              "G08, G09F/G09G/G09H, G14, G28, G32/G33, G37, G49B, G60B "
+              "and G62 SA1 "
               "tables (G01: age-band structure (u15 the under-15 share "
               "of the stated ages); language "
               "spoken at home English-only vs other; the "
@@ -405,7 +424,23 @@ _DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G07, "
               "technicians-and-trades, machinery-operators-and-drivers "
               "and labourers major groups over the eight stated "
               "occupation groups, excluding inadequately-described/"
-              "not-stated) — all by the same per-SA1 vote "
+              "not-stated). The 2026-10-31 lanes arc: G62's commute "
+              "share — any train, bus, tram or ferry leg of the "
+              "counted employed-persons-with-stated-method journeys; "
+              "G01's citizenship — residents not counted as Australian "
+              "citizens (the GCP publishes no not-stated count for "
+              "citizenship, so they're inside the complement as "
+              "everywhere in this stack); G28's bigfam — women aged 15+ "
+              "who have had three or more children "
+              "ever born, over motherhood-stated women; G08's Ancestry"
+              "-menu twelve shares (anc, key order in ancKeys) "
+              "over persons ex the ancestry-not-stated responses — a "
+              "person can name two ancestries so the options never "
+              "partition residents, they count people per option; and "
+              "the homeless lane, the ABS Estimating-homelessness "
+              "2049.0 SA2 estimates down-allocated to each SA1 by "
+              "resident-population share — an SA2-area measure. "
+              "— all by the same per-SA1 vote "
               "weights — age shares "
               "renormalise over the 11 bands, which exclude "
               "age-not-stated; persons are a "
@@ -634,8 +669,13 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
       G07 {code: (ind-tuple, nonind-tuple)}   G14 {code: (relvec, ns, tot)}
       G37 {code: (own, mort, rent, rentPub, othType, tenNS)}
       G32 {code: (onepar, cplNoChild, cplChild, otherFam, famTot)}
+      G01c {code: (Australian_citizen_P,)}   Gmtw {code: (ptn, mtot, mns)}
+      Gceb {code: (ceb3plus, cebNS, cebTot)}
+      G08 {code: (ancvec[12], ancTotP, ancNS)}
     Schooling is always the caller's own G01 base pass. era=2016 reads
-    the Ed2 zip's G07/G14/G33/G28 counterparts."""
+    the Ed2 zip's G07/G14/G33/G28 counterparts (travel G59, children
+    G24) and its G08 G01-era column spellings differ in resp-case
+    (Ancestry_NS_Tot_Resp / _Tot_Resp vs 2021's _Tot_resp)."""
     pfx = ("2021 Census GCP Statistical Area 1 for AUS/"
            if era == "2021" else
            "2016 Census GCP Statistical Area 1 for AUST/")
@@ -647,11 +687,27 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
                                 "2021Census_G14_AUST_SA1.csv",
                                 "2021Census_G37_AUST_SA1.csv",
                                 "2021Census_G32_AUST_SA1.csv")
+        mg01, mmtw, mceb, m08 = ("2021Census_G01_AUST_SA1.csv",
+                                 "2021Census_G62_AUST_SA1.csv",
+                                 "2021Census_G28_AUST_SA1.csv",
+                                 "2021Census_G08_AUST_SA1.csv")
+        tram_col = "One_met_Tram_or_lt_rail_P"
+        three_trn_col = "Three_meth_Tr_2_oth_meth_P"
+        resp_sfx = "resp"
+        ns_resp = "Ancestry_NS_Tot_resp"
     else:
         m07, m14, mten, mfam = ("2016Census_G07_AUS_SA1.csv",
                                 "2016Census_G14_AUS_SA1.csv",
                                 "2016Census_G33_AUS_SA1.csv",
                                 "2016Census_G28_AUS_SA1.csv")
+        mg01, mmtw, mceb, m08 = ("2016Census_G01_AUS_SA1.csv",
+                                 "2016Census_G59_AUS_SA1.csv",
+                                 "2016Census_G24_AUS_SA1.csv",
+                                 "2016Census_G08_AUS_SA1.csv")
+        tram_col = "One_met_Tram_incl_lt_rail_P"
+        three_trn_col = "Three_meth_Trn_two_othr_met_P"
+        resp_sfx = "Resp"
+        ns_resp = "Ancestry_NS_Tot_Resp"
     # G07's per-band Indigenous columns are individually suppressed
     # (0-3-person cells turned to zero far outnumbering bumps) and
     # undercount nationally by a fifth; the table's own Tot rows are
@@ -678,6 +734,49 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
                   for c, r in read_p_cols(
                       z, zpf(mfam), idcol, GCP_G32_FAMCOLS,
                       rows_pin, "G32").items()}
+    # ---- the 2026-10-31 lanes arc's GCP reads: G01's Australian
+    # citizen persons cell; the method-of-travel table's persons
+    # cells (G62/G59 — PT numerator as the d13 B46 formula's GCP
+    # counterpart: any train/bus/ferry/tram one- or multi-method ride,
+    # the two-method Train_Tot and Bus_Tot overlap on train-bus
+    # deduped, three-method train/bus rows in, the unattributable
+    # other-combination rows out); children-ever-born totals row
+    # (three-or-more over the stated total, women 15+); G08 ancestry
+    # (the twelve options' <A>_Tot response cells over persons ex the
+    # ancestry-not-stated responses — one NS response per NS person)
+    tbl["G01c"] = read_p_cols(z, zpf(mg01), idcol,
+                              ["Australian_citizen_P"], rows_pin, "G01c")
+    mtw_cols = ["One_method_Train_P", "One_method_Bus_P",
+                "One_method_Ferry_P", tram_col,
+                "Two_methods_Train_Tot_P", "Two_methods_Bus_Tot_P",
+                "Two_methods_Train_Bus_P",
+                three_trn_col,
+                "Three_met_Bs_2_ot_met_ex_tr_P",
+                "Tot_P", "Method_travel_to_work_ns_P"]
+    g62 = read_p_cols(z, zpf(mmtw), idcol, mtw_cols, rows_pin, "Gmtw")
+    tbl["Gmtw"] = {c: (r[0] + r[1] + r[2] + r[3] + r[4] + r[5] - r[6]
+                       + r[7] + r[8], r[9], r[10])
+                   for c, r in g62.items()}
+    tbl["Gceb"] = {c: (r[0] + r[1] + r[2] + r[3], r[4], r[5])
+                   for c, r in read_p_cols(
+                       z, zpf(mceb), idcol,
+                       ["Tot_Nmbr_children_ever_born_3",
+                        "Tot_Nmbr_children_ever_born_4",
+                        "Tot_Nmbr_children_ever_born_5",
+                        "Tot_Nmbr_chidrn_ever_brn_6_mr",
+                        "Tot_Nmbr_childrn_ever_born_Ns", "Total_Total"],
+                       rows_pin, "Gceb").items()}
+    anc_cols = [f"{b}_Tot_{resp_sfx}" for b in
+                ("English", "Aust", "Irish", "Scottish", "Chinese",
+                 "Italian", "German", "Indian", "Filipino", "Dutch",
+                 "Vietnamese", "Lebanese")]
+    g08 = read_p_cols(z, zpf(m08), idcol,
+                      anc_cols + [ns_resp, "Tot_P_Tot_resp"]
+                      if resp_sfx == "resp"
+                      else anc_cols + [ns_resp, "Tot_P_Tot_Resp"],
+                      rows_pin, "G08")
+    tbl["G08"] = {c: (r[:len(ANC_KEYS)], r[-1], r[-2])
+                  for c, r in g08.items()}
     return tbl
 
 
@@ -764,6 +863,9 @@ def load_gcp21():
                 or code not in nlt["G14"] or code not in nlt["G37"] \
                 or code not in nlt["G32"]:
             fail(f"GCP G01/G07/G14/G37/G32 SA1 set mismatch at {code}")
+        if code not in nlt["G01c"] or code not in nlt["Gmtw"] \
+                or code not in nlt["Gceb"] or code not in nlt["G08"]:
+            fail(f"GCP G01c/Gmtw/Gceb/G08 SA1 set mismatch at {code}")
         # the ten-country cob tuple, in COB_KEYS order, indexed on the
         # GCP_G09{F,G,H}_COLS orders above
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
@@ -778,7 +880,10 @@ def load_gcp21():
         out[code] = r + (f09[0], h09[0], h09[1],
                          e49[0] + e49[1] + e49[2], e49[3],
                          o60[2] + o60[6] + o60[7], sum(o60)) + ir + (cob,) \
-            + (y12t, indt, relvec, (relns, reltot), ten, fam)
+            + (y12t, indt, relvec, (relns, reltot), ten, fam) \
+            + (nlt["G01c"][code][0], nlt["Gmtw"][code],
+               nlt["Gceb"][code], nlt["G08"][code]) \
+            + (HL_ALLOC[2021].get(code, {}).get("e", 0.0),)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -886,15 +991,22 @@ def units_to_ed3(units, conf, dec, xw):
 
 
 def acc_new():
-    """The new-lane lane accumulator (zero-weight)."""
-    return {"y12n": 0.0, "y12d": 0.0, "atN": 0.0, "atD": 0.0,
+    """The new-lane lane accumulator (zero-weight); pers rides here too
+    because the noncit share's denominator is the weighted persons."""
+    return {"pers": 0.0,
+            "y12n": 0.0, "y12d": 0.0, "atN": 0.0, "atD": 0.0,
             "relN": [0.0] * len(REL_KEYS), "relNS": 0.0, "relTot": 0.0,
-            "tenN": [0.0] * 6, "famN": 0.0, "famD": 0.0}
+            "tenN": [0.0] * 6, "famN": 0.0, "famD": 0.0,
+            "citz": 0.0, "ptN": 0.0, "ptT": 0.0, "ptNS": 0.0,
+            "cebN": 0.0, "cebNS": 0.0, "cebT": 0.0,
+            "ancN": [0.0] * len(ANC_KEYS), "ancP": 0.0, "ancNS": 0.0,
+            "hlE": 0.0}
 
 
 def acc_row(acc, r, w):
-    """Weight-add row r's new-lane tail (r[17..22]) into acc; any
+    """Weight-add row r's new-lane tail (r[17..26]) into acc; any
     reader of the GCP/BCP universes emits the same tail layout."""
+    acc["pers"] += w * r[0]
     acc["y12n"] += w * r[17][0]
     acc["y12d"] += w * r[17][1]
     acc["atN"] += w * r[18][0]
@@ -907,16 +1019,31 @@ def acc_row(acc, r, w):
         acc["tenN"][i] += w * r[21][i]
     acc["famN"] += w * r[22][0]
     acc["famD"] += w * r[22][1]
+    acc["citz"] += w * r[23]
+    acc["ptN"] += w * r[24][0]
+    acc["ptT"] += w * r[24][1]
+    acc["ptNS"] += w * r[24][2]
+    acc["cebN"] += w * r[25][0]
+    acc["cebNS"] += w * r[25][1]
+    acc["cebT"] += w * r[25][2]
+    for i in range(len(ANC_KEYS)):
+        acc["ancN"][i] += w * r[26][0][i]
+    acc["ancP"] += w * r[26][1]
+    acc["ancNS"] += w * r[26][2]
+    acc["hlE"] += w * r[27]
 
 
 def acc_merge(dst, src):
-    for k in ("y12n", "y12d", "atN", "atD", "relNS", "relTot",
-              "famN", "famD"):
+    for k in ("pers", "y12n", "y12d", "atN", "atD", "relNS", "relTot",
+              "famN", "famD", "citz", "ptN", "ptT", "ptNS",
+              "cebN", "cebNS", "cebT", "ancP", "ancNS", "hlE"):
         dst[k] += src[k]
     for i in range(len(REL_KEYS)):
         dst["relN"][i] += src["relN"][i]
     for i in range(6):
         dst["tenN"][i] += src["tenN"][i]
+    for i in range(len(ANC_KEYS)):
+        dst["ancN"][i] += src["ancN"][i]
 
 
 def emit_new(acc):
@@ -929,6 +1056,9 @@ def emit_new(acc):
     relD = acc["relTot"] - acc["relNS"]
     tn = acc["tenN"]
     tenD = tn[0] + tn[1] + tn[2] + tn[4]
+    ptD = acc["ptT"] - acc["ptNS"]
+    cebD = acc["cebT"] - acc["cebNS"]
+    ancD = acc["ancP"] - acc["ancNS"]
     return {
         "y12less": round(acc["y12n"] / yd, 4) if yd > 0 else None,
         "atsci": round(acc["atN"] / ad, 4) if ad > 0 else None,
@@ -942,6 +1072,15 @@ def emit_new(acc):
                           4)
                     if tenD > 0 else None)
                 for k in TEN_KEYS},
+        "pt": round(acc["ptN"] / ptD, 4) if ptD > 0 else None,
+        "noncit": (round((acc["pers"] - acc["citz"]) / acc["pers"], 4)
+                   if acc["pers"] > 0 else None),
+        "bigfam": round(acc["cebN"] / cebD, 4) if cebD > 0 else None,
+        "anc": {k: (round(acc["ancN"][i] / ancD, 4)
+                    if ancD > 0 else None)
+                for i, k in enumerate(ANC_KEYS)},
+        "hl": (round(acc["hlE"] / acc["pers"], 4)
+               if acc["pers"] > 0 else None),
     }
 
 
@@ -1299,7 +1438,8 @@ def gcp11():
         if any(r[k] is None for k in
                ("aus", "totc", "cobns", "uni", "eduns", "bluen", "occd",
                 "sch6", "indig", "indigDen", "relvec", "relNS",
-                "relTot", "ten6", "famN", "famD")):
+                "relTot", "ten6", "famN", "famD", "citz", "mtw",
+                "ceb3", "ancn", "ancP")):
             continue  # short-table SA1s: coverage drop, never null maths
         y12t = (sum(r["sch6"][1:]), sum(r["sch6"]))
         out[code] = (r["pers"], r["eng"], r["oth"], tuple(r["ages"]),
@@ -1309,7 +1449,12 @@ def gcp11():
                      None, None, None,            # slots 14/15/16 hist-cob pads
                      y12t, (r["indig"], r["indigDen"]),
                      tuple(r["relvec"]), (r["relNS"], r["relTot"]),
-                     tuple(r["ten6"]), (r["famN"], r["famD"]))
+                     tuple(r["ten6"]), (r["famN"], r["famD"]),
+                     r["citz"], (r["mtw"]["n"], r["mtw"]["t"],
+                                 r["mtw"]["ns"]),
+                     (r["ceb3"], r["cebns"], r["cebt"]),
+                     (tuple(r["ancn"]), r["ancP"], r["ancns"]),
+                     r["hle"] or 0.0)
     print(f"gcp11: BCP 2011 in the _GCP layout, {len(out)} SA1s")
     _GCP11 = (out, {"loCutWeekly": cut, "hiEdgeWeekly": 4000,
                     "hiNationalShare": hishare, "loQuantile": INC_LO_Q,
@@ -1344,7 +1489,8 @@ def blend_demo(c0blk, c1blk, f):
         and c0blk["persons"] is not None and c1blk["persons"] is not None
         else None}
     for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
-              "y12less", "atsci", "u15", "onepar"):
+              "y12less", "atsci", "u15", "onepar", "pt", "noncit",
+              "bigfam", "hl"):
         out[k] = lane_blend(c0blk.get(k) if c0blk else None,
                             c1blk.get(k) if c1blk else None, f)
     a0 = c0blk.get("age") if c0blk else None
@@ -1354,7 +1500,8 @@ def blend_demo(c0blk, c1blk, f):
                    for b in DEMO_BANDS}
                   if a0 is not None or a1 is not None else None)
     # the select-family lanes blend per option like the age bands do
-    for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+    for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
+                        ("anc", ANC_KEYS)):
         d0 = c0blk.get(which) if c0blk else None
         d1 = c1blk.get(which) if c1blk else None
         out[which] = ({k: lane_blend(None if d0 is None
@@ -1705,9 +1852,10 @@ def build(year):
         nb0, nb1 = nat_block(s0["nat"]), nat_block(s1["nat"])
         for k in ("langOther", "fborn", "uni", "blue", "age0_14",
                   "age65ov", "loinc", "hiinc", "y12less", "atsci",
-                  "onepar"):
+                  "onepar", "pt", "noncit", "bigfam", "hl"):
             nbi[k] = lane_blend(nb0.get(k), nb1.get(k), f)
-        for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS)):
+        for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
+                            ("anc", ANC_KEYS)):
             d0, d1 = nb0.get(which), nb1.get(which)
             nbi[which] = ({k: lane_blend(
                 None if d0 is None else d0.get(k),
@@ -2065,6 +2213,7 @@ def build(year):
         "cobKeys": COB_KEYS,
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
+        "ancKeys": list(ANC_KEYS),
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],

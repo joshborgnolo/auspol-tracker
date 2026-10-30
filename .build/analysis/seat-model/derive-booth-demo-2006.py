@@ -172,6 +172,37 @@ B26_GRAND = "B4404"                          # fi Total row, its Total col
 REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
             "isl", "hind", "jew"]
 TEN_KEYS = ["mort", "rent", "own", "rentPub"]
+# ---- the five lanes of the 2026-10-31 people-lanes arc, 2006 B-cell
+# ids (verified against BCP2006_cell_desc_dp.xls):
+#   citizen: B01 B69 (Australian citizen, Persons)
+#   travel B45: PT numerator = train/bus/ferry/tram one-method
+#     (B7165/B7168/B7171/B7174) + the two-method Train total B7222 and
+#     Bus total B7240 (their train-bus overlap B7204 deduped) + the
+#     three-method train B7249 and bus-ex-train B7252 rows; the
+#     "other"* combination rows can't be attributed a PT mode and
+#     stay out; denominator B7270−B7267 (stated method)
+#   children B23: women with 3+ children ever born over the stated
+#     total (B4217..B4220 over B4222−B4221)
+#   ancestry B08_A (the twelve options' Tot-R cells) over Total
+#     Persons B1246 (B08_B) ex ancestry-not-stated responses B1234;
+#     census ancestry counts up to two responses per person and a
+#     not-stated person contributes exactly one not-stated response,
+#     so the NS response cell IS the person-level NS
+B01_CITIZEN = "B69"
+B45_TRAVEL = ["B7165", "B7168", "B7171", "B7174", "B7222", "B7240",
+              "B7204", "B7249", "B7252", "B7270", "B7267"]
+B23_CHILDREN = ["B4217", "B4218", "B4219", "B4220", "B4221", "B4222"]
+B08_ANC_CELLS = {
+    "english": "B1084", "australian": "B1048", "irish": "B1126",
+    "scottish": "B1180", "chinese": "B1066", "italian": "B1132",
+    "german": "B1102", "indian": "B1120", "filipino": "B1090",
+    "dutch": "B1078", "vietnamese": "B1216", "lebanese": "B1138",
+}
+B08_NS = "B1234"
+B08_PERS = "B1246"
+ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
+            "italian", "german", "indian", "filipino", "dutch",
+            "vietnamese", "lebanese"]
 
 
 def bcp_table(table, cols, pin_rows=PIN_ROWS):
@@ -212,15 +243,16 @@ def load_bcp():
     """Per CD: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
-        for t in ("B01", "B07", "B09", "B12", "B13", "B15_B", "B24",
-                  "B32", "B39_B", "B44_B"):
+        for t in ("B01", "B07", "B08_A", "B08_B", "B09", "B12", "B13",
+                  "B15_B", "B23", "B24", "B32", "B39_B", "B44_B", "B45"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
                 fail(f"missing cd06 extracts ({CD06}); see module "
                      f"docstring")
     if not BCP_ZIP.exists():
         fail(f"missing {BCP_ZIP} (provenance anchor; ABS 2006 Census "
              f"datapacks, archive census06bcp.zip)")
-    b01 = bcp_table("B01", ["B3", B01_INDIG] + B01_BANDS)
+    b01 = bcp_table("B01", ["B3", B01_INDIG] + B01_BANDS
+                    + [B01_CITIZEN])
     b09 = bcp_table("B09", B09_COLS)
     b12 = bcp_table("B12", B12_COLS)
     b39 = bcp_table("B39_B", B39_COLS)
@@ -228,6 +260,11 @@ def load_bcp():
     b07 = bcp_table("B07", [B07_NS_TOTAL])
     rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
     b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
+    b08a = bcp_table("B08_A", [B08_ANC_CELLS[k] for k in ANC_KEYS]
+                     + [B08_NS])
+    b08b = bcp_table("B08_B", [B08_PERS])
+    b23 = bcp_table("B23", B23_CHILDREN)
+    b45 = bcp_table("B45", B45_TRAVEL)
     # B15's Persons cell block straddles the two split files: the
     # Year-12..Year-9 total cells ride B15_A, Year-8-below +
     # did-not-go ride B15_B (BCP2006_cell_desc_dp.xls Split column)
@@ -251,6 +288,8 @@ def load_bcp():
             span = len(B13_REL[k])
             relvec.append(sum(row13[i:i + span]))
             i += span
+        tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = b45[code]
+        cw = b23[code]
         out[code] = {
             "pers": g[0],
             "ages": g[2:13],
@@ -271,6 +310,14 @@ def load_bcp():
             "ten6": tuple(b32[code]),
             "famN": b24[code][0],
             "famD": b24[code][4],
+            "citz": g[-1],
+            "mtw": {"n": tr1 + bu1 + fe1 + tm1 + tr2 + bu2 - tb2
+                        + t3t + t3b, "t": ttot, "ns": tns},
+            "ceb3": cw[0] + cw[1] + cw[2] + cw[3],
+            "cebns": cw[4], "cebt": cw[5],
+            "ancn": b08a[code][:len(ANC_KEYS)],
+            "ancns": b08a[code][-1],
+            "ancP": b08b[code][0],
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -392,6 +439,19 @@ def shares(rec):
         out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
                       for i, k in enumerate(COB_KEYS8)}
     out.update(income_shares(rec))
+    # the 2026-10-31 lanes arc
+    mt = rec.get("mtw")
+    if mt is not None and mt.get("t") is not None:
+        out["pt"] = bounded(mt["n"], mt["t"] - (mt.get("ns") or 0))
+    if rec.get("citz") is not None and rec["pers"]:
+        out["noncit"] = bounded(rec["pers"] - rec["citz"], rec["pers"])
+    if rec.get("ceb3") is not None and rec.get("cebt") is not None:
+        out["bigfam"] = bounded(rec["ceb3"],
+                                rec["cebt"] - (rec.get("cebns") or 0))
+    if rec.get("ancn") is not None and rec.get("ancP") is not None:
+        ancd = rec["ancP"] - (rec.get("ancns") or 0)
+        out["anc"] = {k: bounded(rec["ancn"][i], ancd)
+                      for i, k in enumerate(ANC_KEYS)}
     return out
 
 
@@ -433,7 +493,12 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
                                   "incHi": 0.0,
-                                  "incHH": [0] * len(INC_BANDS06)})
+                                  "incHH": [0] * len(INC_BANDS06),
+                                  "citz": 0,
+                                  "mtw": {"n": 0, "t": 0, "ns": 0},
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancn": [0] * len(ANC_KEYS),
+                                  "ancns": 0, "ancP": 0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -443,7 +508,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
         acc["eng"] += r["eng"]
         acc["oth"] += r["oth"]
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
-                  "occd", "pop15"):
+                  "occd", "pop15", "citz"):
             acc[k] += r[k]
         for i in range(len(COB_KEYS8)):
             acc["cobn"][i] += r["cobn"][i]
@@ -462,6 +527,16 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
             acc["incHi"] += inc[2]
             for i in range(len(INC_BANDS06)):
                 acc["incHH"][i] += inc[4][i]
+        mk = r["mtw"]
+        acc["mtw"]["n"] += mk["n"]
+        acc["mtw"]["t"] += mk["t"]
+        acc["mtw"]["ns"] += mk["ns"]
+        for k in ("ceb3", "cebns", "cebt"):
+            acc[k] += r[k]
+        for i in range(len(ANC_KEYS)):
+            acc["ancn"][i] += r["ancn"][i]
+        acc["ancns"] += r["ancns"]
+        acc["ancP"] += r["ancP"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -497,14 +572,19 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
                 "ten6": list(row["ten6"]),
                 "famN": row["famN"], "famD": row["famD"],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
-                    "incHH": list(inc[4])} if inc else {})})
+                    "incHH": list(inc[4])} if inc else {}),
+                "citz": row["citz"], "mtw": row["mtw"],
+                "ceb3": row["ceb3"], "cebns": row["cebns"],
+                "cebt": row["cebt"],
+                "ancn": list(row["ancn"]),
+                "ancns": row["ancns"], "ancP": row["ancP"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
     # not the venue CDs — a national reading of the election's geography
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd", "pop15"):
+                  "eduns", "bluen", "occd", "pop15", "citz"):
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
@@ -517,7 +597,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
             nat["sch6"][i] += dv["sch6"][i]
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
-                  "famN", "famD"):
+                  "famN", "famD", "ceb3", "cebns", "cebt",
+                  "ancns", "ancP"):
             nat[k] += dv[k]
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
@@ -527,6 +608,12 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
         for i in range(len(INC_BANDS06)):
             nat.setdefault("incHH", [0] * len(INC_BANDS06))
             nat["incHH"][i] += dv["incHH"][i]
+        mk = dv["mtw"]
+        for kk in ("n", "t", "ns"):
+            nat["mtw_" + kk] = nat.get("mtw_" + kk, 0) + mk[kk]
+        for i in range(len(ANC_KEYS)):
+            nat.setdefault("ancn", [0] * len(ANC_KEYS))
+            nat["ancn"][i] += dv["ancn"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -575,6 +662,11 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
             "loinc": round(nat["incLo"] / nat["incT"], 4),
             "hiinc": round(nat["incHi"] / nat["incT"], 4),
             "incMed": round(income_band_median(nat["incHH"])),
+            "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
+            "noncit": round(1 - nat["citz"] / nat["pers"], 4),
+            "bigfam": round(nat["ceb3"] / (nat["cebt"] - nat["cebns"]), 4),
+            "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
+                    for i, k in enumerate(ANC_KEYS)},
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -680,6 +772,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
         "cobKeys": COB_KEYS8,
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
+        "ancKeys": list(ANC_KEYS),
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),

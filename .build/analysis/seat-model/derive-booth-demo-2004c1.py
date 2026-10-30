@@ -98,7 +98,12 @@ def main():
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
                                   "incHi": 0.0,
-                                  "incHH": [0] * len(d06.INC_BANDS06)})
+                                  "incHH": [0] * len(d06.INC_BANDS06),
+                                  "citz": 0,
+                                  "mtw": {"n": 0, "t": 0, "ns": 0},
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancn": [0] * len(d06.ANC_KEYS),
+                                  "ancns": 0, "ancP": 0})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -106,7 +111,7 @@ def main():
         for i in range(11):
             acc["bands"][i] += r["ages"][i]
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni", "eduns",
-                  "bluen", "occd", "pop15"):
+                  "bluen", "occd", "pop15", "citz"):
             acc[k] += r[k]
         for i in range(6):
             acc["sch6"][i] += r["sch6"][i]
@@ -123,11 +128,21 @@ def main():
             acc["incHi"] += inc[2]
             for i in range(len(d06.INC_BANDS06)):
                 acc["incHH"][i] += inc[4][i]
+        mk = r["mtw"]
+        acc["mtw"]["n"] += mk["n"]
+        acc["mtw"]["t"] += mk["t"]
+        acc["mtw"]["ns"] += mk["ns"]
+        for k in ("ceb3", "cebns", "cebt"):
+            acc[k] += r[k]
+        for i in range(len(d06.ANC_KEYS)):
+            acc["ancn"][i] += r["ancn"][i]
+        acc["ancns"] += r["ancns"]
+        acc["ancP"] += r["ancP"]
 
     nat = defaultdict(int)
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd", "pop15"):
+                  "eduns", "bluen", "occd", "pop15", "citz"):
             nat[k] += dv[k]
         for i in range(11):
             nat.setdefault("bands", [0] * 11)
@@ -137,8 +152,8 @@ def main():
             nat.setdefault("ten6", [0] * 6)
             nat["sch6"][i] += dv["sch6"][i]
             nat["ten6"][i] += dv["ten6"][i]
-        for k in ("indig", "indigDen", "relNS", "relTot",
-                  "famN", "famD"):
+        for k in ("indig", "indigDen", "relNS", "relTot", "famN",
+                  "famD", "ceb3", "cebns", "cebt", "ancns", "ancP"):
             nat[k] += dv[k]
         for i in range(len(d06.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d06.REL_KEYS))
@@ -148,6 +163,12 @@ def main():
         for i in range(len(d06.INC_BANDS06)):
             nat.setdefault("incHH", [0] * len(d06.INC_BANDS06))
             nat["incHH"][i] += dv["incHH"][i]
+        mk = dv["mtw"]
+        for kk in ("n", "t", "ns"):
+            nat["mtw_" + kk] = nat.get("mtw_" + kk, 0) + mk[kk]
+        nat.setdefault("ancn", [0] * len(d06.ANC_KEYS))
+        for i in range(len(d06.ANC_KEYS)):
+            nat["ancn"][i] += dv["ancn"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -178,6 +199,12 @@ def main():
         "loinc": round(nat["incLo"] / nat["incT"], 4),
         "hiinc": round(nat["incHi"] / nat["incT"], 4),
         "incMed": round(d06.income_band_median(nat["incHH"])),
+        "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
+        "noncit": round(1 - nat["citz"] / nat["pers"], 4),
+        "bigfam": round(nat["ceb3"] / (nat["cebt"] - nat["cebns"]), 4),
+        "anc": {k: round(nat["ancn"][i]
+                         / (nat["ancP"] - nat["ancns"]), 4)
+                for i, k in enumerate(d06.ANC_KEYS)},
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -219,7 +246,12 @@ def main():
                 "ten6": list(r["ten6"]),
                 "famN": r["famN"], "famD": r["famD"],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
-                    "incHH": list(inc[4])} if inc else {})})
+                    "incHH": list(inc[4])} if inc else {}),
+                "citz": r["citz"], "mtw": r["mtw"],
+                "ceb3": r["ceb3"], "cebns": r["cebns"],
+                "cebt": r["cebt"],
+                "ancn": r["ancn"], "ancns": r["ancns"],
+                "ancP": r["ancP"]})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}
@@ -297,6 +329,7 @@ def main():
             "adultsWeights": "data/income-dist.json",
             "medianBasis": "households (shares are per-adult)",
         },
+        "ancKeys": list(d06.ANC_KEYS),
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

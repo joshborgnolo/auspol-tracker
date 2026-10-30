@@ -72,8 +72,14 @@ SM = ROOT / ".build/analysis/seat-model"
 _spec = importlib.util.spec_from_file_location("m25", SM / "derive-booth-seifa-2025.py")
 m25 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(m25)
+_spec = importlib.util.spec_from_file_location("hla", SM / "homeless_alloc.py")
+hla = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(hla)
 fail = m25.fail
 hash16 = m25.hash16
+# the homeless lane's est-allocation table (its own guard fails loud
+# when the cache is missing); the lane reads the 2011 edition here
+HL_ALLOC = hla.alloc_of(2011, "c7") if hla is not None else None
 
 CACHE = SM / "cache"
 ABS = ROOT / ".matilda/seifa-irsad-abs"
@@ -169,6 +175,59 @@ B14_REL_COLS = {
     "jew": ["Judaism_P"],
 }
 B14_TAIL = ["Religious_affiliation_ns_P", "Tot_P"]
+# ---- the five lanes of the 2026-10-31 people-lanes arc: commute-by-
+# public-transport (B46), not-counted-as-Australian-citizens (B01),
+# women with three or more children (B24's persons totals row), the
+# Ancestry menu's twelve shares (B08A response columns + B08B's persons
+# denominator), and household homelessness (no BCP table — the ABS
+# Estimating-homelessness 2049.0 SA2 estimates land in the stores in a
+# separate read-modify-write pass, derive-booth-homeless.py).
+BCP_B08A = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B08A_AUST_SA1_short.csv")
+BCP_B08B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B08B_AUST_SA1_short.csv")
+BCP_B24 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B24_AUST_SA1_short.csv")
+BCP_B46 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B46_AUST_SA1_short.csv")
+# the Ancestry menu options, site key order (user-specified set; every
+# era's store records its own readable subset in ancKeys); shares ride
+# each table's printed <A>_Tot_Resp response counts over persons ex
+# the ancestry-not-stated count (a not-stated person contributes
+# exactly one not-stated response, so the NS response column IS the
+# person-level NS), and people could name up to two ancestries, so the
+# twelve shares are independent and sum past 100% — never normalised
+ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
+            "italian", "german", "indian", "filipino", "dutch",
+            "vietnamese", "lebanese"]
+B08A_ANC_COLS = {
+    "english": "English_Tot_Resp", "australian": "Aust_Tot_Resp",
+    "irish": "Irish_Tot_Resp", "scottish": "Scottish_Tot_Resp",
+    "chinese": "Chinese_Tot_Resp", "italian": "Italian_Tot_Resp",
+    "german": "German_Tot_Resp", "indian": "Indian_Tot_Resp",
+    "filipino": "Filipino_Tot_Resp", "dutch": "Dutch_Tot_Resp",
+    "vietnamese": "Vietnamese_Tot_Resp", "lebanese": "Lebanese_Tot_Resp",
+}
+B08_NS_COL = "Ancestry_ns_Tot_Resp"
+B08B_TOT_COL = "Tot_P_Tot_Resp"
+# B46 method-of-travel: PT numerator = any train/bus/ferry/tram ride,
+# one or multi-method (the two-method Train_Tot and Bus_Tot overlap on
+# the train-bus combination, deduped; three-method train-bus rows in;
+# "other" combinations that could hide a ferry/tram leg stay out — the
+# unattributable remainder the lane's _about copy names); the
+# denominator is employed persons with a stated method (NS out)
+B46_COLS = ["One_method_Train_P", "One_method_Bus_P",
+            "One_method_Ferry_P", "One_met_Tram_incl_lt_rail_P",
+            "Two_methods_Train_Tot_P", "Two_methods_Bus_Tot_P",
+            "Two_methods_Train_Bus_P",
+            "Three_meth_Trn_two_othr_met_P",
+            "Three_met_Bs_2_ot_met_ex_tr_P",
+            "Tot_P", "Method_travel_to_work_ns_P"]
+# B24's women-15+ totals row: 3/4/5/6-or-more children ever born over
+# the stated total (the NS column joins the denominator exclusion)
+B24_COLS = ["Tot_Nmbr_children_ever_born_3", "Tot_Nmbr_children_ever_born_4",
+            "Tot_Nmbr_children_ever_born_5", "Tot_Nmbr_chidrn_ever_brn_6_mr",
+            "Tot_Nmbr_childrn_ever_born_Ns", "Total_Total"]
 B25_FAM_COLS = ["OPF_Total_P", "CF_no_children_P", "CF_Total_P",
                 "Other_family_P", "Total_P"]
 B32_TEN_COLS = ["O_OR_Total", "O_MTG_Total", "R_Tot_Total",
@@ -241,7 +300,8 @@ def load_bcp():
                     ["Tot_P_P", *AGECOLS,
                      "Lang_spoken_home_Eng_only_P",
                      "Lang_spoken_home_Oth_Lang_P",
-                     *B01_SCHOOL_COLS], 54805, 54805)
+                     *B01_SCHOOL_COLS, "Australian_citizen_P"],
+                    54805, 54805)  # citz = g[-1] (appended col)
     b09 = bcp_table(z, BCP_B09, "region_id", B09_COLS, 54800, 54805)
     b40 = bcp_table(z, BCP_B40B, "region_id", B40_COLS, 54800, 54805)
     b45 = bcp_table(z, BCP_B45B, "region_id", B45_COLS, 54800, 54805)
@@ -251,6 +311,13 @@ def load_bcp():
                     + B14_TAIL, 54800, 54805)
     b25 = bcp_table(z, BCP_B25, "region_id", B25_FAM_COLS, 54800, 54805)
     b32 = bcp_table(z, BCP_B32, "region_id", B32_TEN_COLS, 54800, 54805)
+    b08a = bcp_table(z, BCP_B08A, "region_id",
+                     [B08A_ANC_COLS[k] for k in ANC_KEYS] + [B08_NS_COL],
+                     54800, 54805)
+    b08b = bcp_table(z, BCP_B08B, "region_id", [B08B_TOT_COL],
+                     54800, 54805)
+    b24 = bcp_table(z, BCP_B24, "region_id", B24_COLS, 54800, 54805)
+    b46 = bcp_table(z, BCP_B46, "region_id", B46_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
         row09 = b09.get(code)
@@ -265,6 +332,15 @@ def load_bcp():
         row14 = b14.get(code)
         row25 = b25.get(code)
         row32 = b32.get(code)
+        row08a = b08a.get(code)
+        row08b = b08b.get(code)
+        row24 = b24.get(code)
+        row46 = b46.get(code)
+        mtw = None
+        if row46 is not None:
+            tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = row46
+            mtw = {"n": tr1 + bu1 + fe1 + tm1 + tr2 + bu2 - tb2
+                        + t3t + t3b, "t": ttot, "ns": tns}
         out[code] = {
             "pers": g[0],
             "ages": g[1:12],
@@ -277,7 +353,16 @@ def load_bcp():
                      else None,
             "occd": sum(occ) if occ is not None else None,
             "pop15": g[0] - g[1] - g[2],
-            "sch6": g[14:],
+            "sch6": g[14:20],
+            "citz": g[-1],
+            "ancn": None if row08a is None else row08a[:len(ANC_KEYS)],
+            "ancns": None if row08a is None else row08a[-1],
+            "ancP": None if row08b is None else row08b[0],
+            "ceb3": (None if row24 is None
+                     else row24[0] + row24[1] + row24[2] + row24[3]),
+            "cebns": None if row24 is None else row24[4],
+            "cebt": None if row24 is None else row24[5],
+            "mtw": mtw,
             "indig": None if row07 is None else row07[0],
             "indigDen": None if row07 is None else row07[0] + row07[1],
             "relvec": None if row14 is None else relvec_of(row14),
@@ -286,6 +371,7 @@ def load_bcp():
             "ten6": None if row32 is None else row32,
             "famN": None if row25 is None else row25[0],
             "famD": None if row25 is None else row25[4],
+            "hle": HL_ALLOC.get(code, {}).get("e"),
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
@@ -294,9 +380,13 @@ def load_bcp():
     n14 = sum(1 for c in out.values() if c["relvec"] is None)
     n25 = sum(1 for c in out.values() if c["famN"] is None)
     n32 = sum(1 for c in out.values() if c["ten6"] is None)
+    n08 = sum(1 for c in out.values() if c["ancn"] is None)
+    n24 = sum(1 for c in out.values() if c["ceb3"] is None)
+    n46 = sum(1 for c in out.values() if c["mtw"] is None)
     print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40}, "
           f"B45B short {n45}, B07 short {n07}, B14 short {n14}, "
-          f"B25 short {n25}, B32 short {n32})")
+          f"B25 short {n25}, B32 short {n32}, B08 short {n08}, "
+          f"B24 short {n24}, B46 short {n46})")
     return out
 
 
@@ -582,6 +672,21 @@ def shares(rec):
     if rec.get("cobn") is not None:
         out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
                       for i, k in enumerate(COB_KEYS8)}
+    # the 2026-10-31 people-lanes arc
+    mt = rec.get("mtw")
+    if mt is not None and mt["t"] is not None:
+        out["pt"] = bounded(mt["n"], mt["t"] - (mt["ns"] or 0))
+    if rec.get("citz") is not None and rec["pers"]:
+        out["noncit"] = bounded(rec["pers"] - rec["citz"], rec["pers"])
+    if rec.get("ceb3") is not None and rec.get("cebt") is not None:
+        out["bigfam"] = bounded(rec["ceb3"],
+                                rec["cebt"] - (rec.get("cebns") or 0))
+    if rec.get("hle") is not None and rec["pers"]:
+        out["hl"] = bounded(rec["hle"], rec["pers"])
+    if rec.get("ancn") is not None and rec.get("ancP") is not None:
+        ancd = rec["ancP"] - (rec.get("ancns") or 0)
+        out["anc"] = {k: bounded(rec["ancn"][i], ancd)
+                      for i, k in enumerate(ANC_KEYS)}
     return out
 
 
@@ -613,7 +718,12 @@ def main():
              or sa1.get(k, {}).get("indig") is None
              or sa1.get(k, {}).get("relvec") is None
              or sa1.get(k, {}).get("ten6") is None
-             or sa1.get(k, {}).get("famN") is None}
+             or sa1.get(k, {}).get("famN") is None
+             or sa1.get(k, {}).get("citz") is None
+             or sa1.get(k, {}).get("mtw") is None
+             or sa1.get(k, {}).get("ceb3") is None
+             or sa1.get(k, {}).get("ancn") is None
+             or sa1.get(k, {}).get("ancP") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -630,7 +740,13 @@ def main():
                                   "relvec": [0] * len(REL_KEYS),
                                   "relNS": 0, "relTot": 0,
                                   "ten6": [0] * 6,
-                                  "famN": 0, "famD": 0})
+                                  "famN": 0, "famD": 0,
+                                  "citz": 0,
+                                  "mtw": {"n": 0, "t": 0, "ns": 0},
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancn": [0] * len(ANC_KEYS),
+                                  "ancns": 0, "ancP": 0,
+                                  "hle": 0.0})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -641,7 +757,7 @@ def main():
         acc["eng"] += r["eng"]
         acc["oth"] += r["oth"]
         for k in ("aus", "totc", "cobns", "uni", "eduns", "bluen",
-                  "occd", "pop15"):
+                  "occd", "pop15", "citz"):
             acc[k] += r[k]
         for i in range(len(COB_KEYS8)):
             acc["cobn"][i] += r["cobn"][i]
@@ -658,6 +774,18 @@ def main():
             acc[k] += r[k]
         for i in range(len(REL_KEYS)):
             acc["relvec"][i] += r["relvec"][i]
+        mk = r["mtw"]
+        if mk is not None:
+            acc["mtw"]["n"] += mk["n"]
+            acc["mtw"]["t"] += mk["t"]
+            acc["mtw"]["ns"] += mk["ns"]
+        for k in ("ceb3", "cebns", "cebt"):
+            acc[k] += r[k]
+        for i in range(len(ANC_KEYS)):
+            acc["ancn"][i] += r["ancn"][i]
+        acc["ancns"] += r["ancns"]
+        acc["ancP"] += r["ancP"]
+        acc["hle"] += r["hle"] or 0.0
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -694,14 +822,21 @@ def main():
                 "relNS": row["relNS"], "relTot": row["relTot"],
                 "ten6": list(row["ten6"]) if row["ten6"] is not None
                 else None,
-                "famN": row["famN"], "famD": row["famD"]})
+                "famN": row["famN"], "famD": row["famD"],
+                "citz": row["citz"], "mtw": row["mtw"],
+                "ceb3": row["ceb3"], "cebns": row["cebns"],
+                "cebt": row["cebt"],
+                "ancn": (list(row["ancn"]) if row["ancn"] is not None
+                         else None),
+                "ancns": row["ancns"], "ancP": row["ancP"],
+                "hle": row["hle"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
     # the venue SA1s — a national reading of the election's geography
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd", "pop15"):
+                  "eduns", "bluen", "occd", "pop15", "citz"):
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
@@ -719,11 +854,19 @@ def main():
             nat["sch6"][i] += dv["sch6"][i]
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
-                  "famN", "famD"):
+                  "famN", "famD", "ceb3", "cebns", "cebt",
+                  "ancns", "ancP"):
             nat[k] += dv[k]
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
+        mk = dv["mtw"]
+        for kk in ("n", "t", "ns"):
+            nat["mtw_" + kk] = nat.get("mtw_" + kk, 0) + mk[kk]
+        for i in range(len(ANC_KEYS)):
+            nat.setdefault("ancn", [0] * len(ANC_KEYS))
+            nat["ancn"][i] += dv["ancn"][i]
+        nat["hle"] = nat.get("hle", 0.0) + dv["hle"]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -775,6 +918,12 @@ def main():
                              / (nat["ten6"][0] + nat["ten6"][1]
                                 + nat["ten6"][2] + nat["ten6"][4]), 4)
                     for k in TEN_KEYS},
+            "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
+            "noncit": round(1 - nat["citz"] / nat["pers"], 4),
+            "bigfam": round(nat["ceb3"] / (nat["cebt"] - nat["cebns"]), 4),
+            "hl": round(nat["hle"] / nat["pers"], 4),
+            "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
+                    for i, k in enumerate(ANC_KEYS)},
         },
     }
     out = {
@@ -817,6 +966,18 @@ def main():
             "(rented-public a state-or-territory-housing-authority "
             "landlord within that base), B25's one-parent share of "
             "families, and the under-15 share of the stated ages; "
+            "then the first-2026-10-31 people-lanes lines: B46's "
+            "commute-by-public-transport share (any train, bus, tram "
+            "or ferry single- or multi-method leg, over the "
+            "ex-method-not-stated employed), B01's "
+            "not-counted-as-citizens share (no not-stated broken out "
+            "in the product, so they're in the complement), B24's "
+            "women-with-more-than-two-children share of women 15+, "
+            "B08A/B08B's twelve Ancestry-menu ancestry shares (anc, "
+            "key order in ancKeys) over persons ex the "
+            "ancestry-not-stated responses, and hl — the ABS "
+            "Estimating-homelessness SA2 estimates down-allocated "
+            "per SA1 by resident population; "
             "blue-collar (technicians/"
             "trades + machinery operators/drivers + labourers of B45B "
             "the ANZSCO occupation major groups) over the eight stated "
@@ -873,6 +1034,7 @@ def main():
         "cobKeys": COB_KEYS8,
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
+        "ancKeys": list(ANC_KEYS),
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
         "incomeCuts": {

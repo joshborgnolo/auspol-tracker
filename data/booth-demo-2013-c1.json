@@ -15,7 +15,7 @@
       "dl/1270055003_ced_2011_aust_csv.zip": "e68c2025c13e9b35",
       "data/booth-seifa-2013.json": "6b4c727d18b39eab"
     },
-    "extractedAt": "2026-10-30"
+    "extractedAt": "2026-10-31"
   },
   "election": 2013,
   "censusEdition": 2016,
@@ -36,6 +36,20 @@
     "rent",
     "own",
     "rentPub"
+  ],
+  "ancKeys": [
+    "english",
+    "australian",
+    "irish",
+    "scottish",
+    "chinese",
+    "italian",
+    "german",
+    "indian",
+    "filipino",
+    "dutch",
+    "vietnamese",
+    "lebanese"
   ],
   "deliveryBasis": "venue-proxy per booth (2016-census SA1 of the premises, point-in-polygon); CG-plurality whole-allocated 2016 GCP sum per division (CED_2011 membership identical to the measured store's)",
   "incomeCuts": {
@@ -87,7 +101,25 @@
         "rent": 0.3183,
         "own": 0.3193,
         "rentPub": 0.0365
-      }
+      },
+      "pt": 0.1004,
+      "noncit": 0.1755,
+      "bigfam": 0.2634,
+      "anc": {
+        "english": 0.3608,
+        "australian": 0.3353,
+        "irish": 0.1097,
+        "scottish": 0.0929,
+        "chinese": 0.0554,
+        "italian": 0.0459,
+        "german": 0.0451,
+        "indian": 0.0281,
+        "filipino": 0.0136,
+        "dutch": 0.0154,
+        "vietnamese": 0.0133,
+        "lebanese": 0.0103
+      },
+      "hl": 0.005
     }
   },
   "divisions": [
@@ -137,7 +169,25 @@
         "rent": 0.3419,
         "own": 0.3355,
         "rentPub": 0.0609
-      }
+      },
+      "pt": 0.2661,
+      "noncit": 0.2329,
+      "bigfam": 0.2018,
+      "anc": {
+        "english": 0.1773,
+        "australian": 0.1736,
+        "irish": 0.0621,
+        "scottish": 0.0435,
+        "chinese": 0.2809,
+        "italian": 0.0374,
+        "german": 0.016,
+        "indian": 0.0238,
+        "filipino": 0.0196,
+        "dutch": 0.0037,
+        "vietnamese": 0.0197,
+        "lebanese": 0.0496
+      },
+      "hl": 0.0048
     },
     {
       "div": "Barton",
@@ -185,7 +235,25 @@
         "rent": 0.3505,
         "own": 0.3434,
         "rentPub": 0.0192
-      }
+      },
+      "pt": 0.2667,
+      "noncit": 0.2384,
+      "bigfam": 0.1857,
+      "anc": {
+        "english": 0.1459,
+        "australian": 0.1442,
+        "irish": 0.0574,
+        "scottish": 0.0358,
+        "chinese": 0.1491,
+        "italian": 0.0571,
+        "german": 0.0157,
+        "indian": 0.0256,
+        "filipino": 0.0239,
+        "dutch": 0.0035,
+        "vietnamese": 0.0166,
+        "lebanese": 0.0686
+      },
+      "hl": 0.0053
     },
     {
       "div": "Bennelong",
@@ -233,7 +301,25 @@
         "rent": 0.3701,
         "own": 0.3131,
         "rentPub": 0.0343
-      }
+      },
+      "pt": 0.2492,
+      "noncit": 0.2541,
+      "bigfam": 0.1682,
+      "anc": {
+        "english": 0.1976,
+        "australian": 0.1831,
+        "irish": 0.0739,
+        "scottish": 0.0554,
+        "chinese": 0.2738,
+        "italian": 0.0545,
+        "german": 0.021,
+        "indian": 0.0528,
+        "filipino": 0.0196,
+        "dutch": 0.0064,
+        "vietnamese": 0.0089,
+        "lebanese": 0.0195
+      },
+      "hl": 0.003
     },
     {
       "div": "Berowra",
@@ -281,7 +367,25 @@
         "rent": 0.1418,
         "own": 0.4135,
         "rentPub": 0.0053
-      }
+      },
+      "pt": 0.19,
+      "noncit": 0.1243,
+      "bigfam": 0.252,
+      "anc": {
+        "english": 0.3381,
+        "australian": 0.297,
+        "irish": 0.1067,
+        "scottish": 0.0911,
+        "chinese": 0.1262,
+        "italian": 0.0418,
+        "german": 0.0329,
+        "indian": 0.0448,
+        "filipino": 0.0116,
+        "dutch": 0.0149,
+        "vietnamese": 0.0045,
+        "lebanese": 0.0193
+      },
+      "hl": 0.0014
     },
     {
       "div": "Blaxland",
@@ -329,7 +433,25 @@
         "rent": 0.4076,
         "own": 0.2848,
         "rentPub": 0.1116
-      }
+      },
+      "pt": 0.159,
+      "noncit": 0.2053,
+      "bigfam": 0.3038,
+      "anc": {
+        "english": 0.1088,
+        "australian": 0.1355,
+        "irish": 0.0275,
+        "scottish": 0.0197,
+        "chinese": 0.1127,
+        "italian": 0.0279,
+        "german": 0.0099,
+        "indian": 0.0209,
+        "filipino": 0.0165,
+        "dutch": 0.0014,
+        "vietnamese": 0.1222,
+        "lebanese": 0.2168
+      },
+      "hl": 0.0106
     },
     {
       "div": "Bradfield",
@@ -377,7 +499,25 @@
         "rent": 0.2348,
         "own": 0.3852,
         "rentPub": 0.0077
-      }
+      },
+      "pt": 0.2752,
+      "noncit": 0.1908,
+      "bigfam": 0.2201,
+      "anc": {
+        "english": 0.3133,
+        "australian": 0.2451,
+        "irish": 0.1012,
+        "scottish": 0.0882,
+        "chinese": 0.1904,
+        "italian": 0.0253,
+        "german": 0.0315,
+        "indian": 0.0415,
+        "filipino": 0.0124,
+        "dutch": 0.0126,
+        "vietnamese": 0.0054,
+        "lebanese": 0.0063
+      },
+      "hl": 0.0014
     },
     {
       "div": "Calare",
@@ -425,7 +565,25 @@
         "rent": 0.2954,
         "own": 0.3668,
         "rentPub": 0.0407
-      }
+      },
+      "pt": 0.003,
+      "noncit": 0.1167,
+      "bigfam": 0.3526,
+      "anc": {
+        "english": 0.4489,
+        "australian": 0.4894,
+        "irish": 0.1486,
+        "scottish": 0.1089,
+        "chinese": 0.008,
+        "italian": 0.0185,
+        "german": 0.0388,
+        "indian": 0.0067,
+        "filipino": 0.0051,
+        "dutch": 0.0123,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0022
+      },
+      "hl": 0.0024
     },
     {
       "div": "Charlton",
@@ -473,7 +631,25 @@
         "rent": 0.2359,
         "own": 0.3616,
         "rentPub": 0.0329
-      }
+      },
+      "pt": 0.0172,
+      "noncit": 0.0825,
+      "bigfam": 0.301,
+      "anc": {
+        "english": 0.4532,
+        "australian": 0.4592,
+        "irish": 0.1182,
+        "scottish": 0.1211,
+        "chinese": 0.0126,
+        "italian": 0.0208,
+        "german": 0.0452,
+        "indian": 0.0084,
+        "filipino": 0.0066,
+        "dutch": 0.0134,
+        "vietnamese": 0.0017,
+        "lebanese": 0.0013
+      },
+      "hl": 0.0023
     },
     {
       "div": "Chifley",
@@ -521,7 +697,25 @@
         "rent": 0.3795,
         "own": 0.2287,
         "rentPub": 0.1151
-      }
+      },
+      "pt": 0.1575,
+      "noncit": 0.1969,
+      "bigfam": 0.3123,
+      "anc": {
+        "english": 0.2101,
+        "australian": 0.2369,
+        "irish": 0.0526,
+        "scottish": 0.0418,
+        "chinese": 0.0341,
+        "italian": 0.0209,
+        "german": 0.0219,
+        "indian": 0.0956,
+        "filipino": 0.1266,
+        "dutch": 0.0063,
+        "vietnamese": 0.0053,
+        "lebanese": 0.016
+      },
+      "hl": 0.0056
     },
     {
       "div": "Cook",
@@ -569,7 +763,25 @@
         "rent": 0.2572,
         "own": 0.3713,
         "rentPub": 0.0246
-      }
+      },
+      "pt": 0.1628,
+      "noncit": 0.1116,
+      "bigfam": 0.2439,
+      "anc": {
+        "english": 0.3999,
+        "australian": 0.3681,
+        "irish": 0.1395,
+        "scottish": 0.0991,
+        "chinese": 0.0413,
+        "italian": 0.0465,
+        "german": 0.0363,
+        "indian": 0.0104,
+        "filipino": 0.0089,
+        "dutch": 0.012,
+        "vietnamese": 0.0022,
+        "lebanese": 0.0084
+      },
+      "hl": 0.0014
     },
     {
       "div": "Cowper",
@@ -617,7 +829,25 @@
         "rent": 0.2912,
         "own": 0.4194,
         "rentPub": 0.0343
-      }
+      },
+      "pt": 0.0028,
+      "noncit": 0.1208,
+      "bigfam": 0.3562,
+      "anc": {
+        "english": 0.455,
+        "australian": 0.4617,
+        "irish": 0.1363,
+        "scottish": 0.1155,
+        "chinese": 0.007,
+        "italian": 0.0192,
+        "german": 0.0451,
+        "indian": 0.0116,
+        "filipino": 0.0043,
+        "dutch": 0.0132,
+        "vietnamese": 0.0006,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0045
     },
     {
       "div": "Cunningham",
@@ -665,7 +895,25 @@
         "rent": 0.3159,
         "own": 0.3532,
         "rentPub": 0.0656
-      }
+      },
+      "pt": 0.0827,
+      "noncit": 0.138,
+      "bigfam": 0.2598,
+      "anc": {
+        "english": 0.3854,
+        "australian": 0.3648,
+        "irish": 0.1269,
+        "scottish": 0.1082,
+        "chinese": 0.0321,
+        "italian": 0.0617,
+        "german": 0.0393,
+        "indian": 0.0129,
+        "filipino": 0.0059,
+        "dutch": 0.0193,
+        "vietnamese": 0.0061,
+        "lebanese": 0.0072
+      },
+      "hl": 0.0037
     },
     {
       "div": "Dobell",
@@ -713,7 +961,25 @@
         "rent": 0.2844,
         "own": 0.3324,
         "rentPub": 0.0321
-      }
+      },
+      "pt": 0.0538,
+      "noncit": 0.1045,
+      "bigfam": 0.3114,
+      "anc": {
+        "english": 0.4592,
+        "australian": 0.4607,
+        "irish": 0.1343,
+        "scottish": 0.1077,
+        "chinese": 0.0114,
+        "italian": 0.0278,
+        "german": 0.0351,
+        "indian": 0.0069,
+        "filipino": 0.0077,
+        "dutch": 0.0137,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0026
+      },
+      "hl": 0.003
     },
     {
       "div": "Eden-Monaro",
@@ -761,7 +1027,25 @@
         "rent": 0.2713,
         "own": 0.4016,
         "rentPub": 0.0267
-      }
+      },
+      "pt": 0.0077,
+      "noncit": 0.1195,
+      "bigfam": 0.3131,
+      "anc": {
+        "english": 0.4349,
+        "australian": 0.4319,
+        "irish": 0.1395,
+        "scottish": 0.116,
+        "chinese": 0.0086,
+        "italian": 0.0293,
+        "german": 0.0514,
+        "indian": 0.0091,
+        "filipino": 0.0061,
+        "dutch": 0.0183,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0017
+      },
+      "hl": 0.0031
     },
     {
       "div": "Farrer",
@@ -809,7 +1093,25 @@
         "rent": 0.286,
         "own": 0.393,
         "rentPub": 0.0221
-      }
+      },
+      "pt": 0.0033,
+      "noncit": 0.1143,
+      "bigfam": 0.3715,
+      "anc": {
+        "english": 0.4247,
+        "australian": 0.4663,
+        "irish": 0.1346,
+        "scottish": 0.1158,
+        "chinese": 0.0048,
+        "italian": 0.0279,
+        "german": 0.0659,
+        "indian": 0.007,
+        "filipino": 0.0054,
+        "dutch": 0.0132,
+        "vietnamese": 0.0006,
+        "lebanese": 0.0013
+      },
+      "hl": 0.0025
     },
     {
       "div": "Fowler",
@@ -857,7 +1159,25 @@
         "rent": 0.3541,
         "own": 0.2953,
         "rentPub": 0.102
-      }
+      },
+      "pt": 0.1194,
+      "noncit": 0.1733,
+      "bigfam": 0.2958,
+      "anc": {
+        "english": 0.0985,
+        "australian": 0.1137,
+        "irish": 0.0213,
+        "scottish": 0.0166,
+        "chinese": 0.144,
+        "italian": 0.0522,
+        "german": 0.0106,
+        "indian": 0.0235,
+        "filipino": 0.02,
+        "dutch": 0.0014,
+        "vietnamese": 0.2235,
+        "lebanese": 0.0388
+      },
+      "hl": 0.0096
     },
     {
       "div": "Gilmore",
@@ -905,7 +1225,25 @@
         "rent": 0.2502,
         "own": 0.4396,
         "rentPub": 0.0341
-      }
+      },
+      "pt": 0.0098,
+      "noncit": 0.1087,
+      "bigfam": 0.3362,
+      "anc": {
+        "english": 0.4531,
+        "australian": 0.4501,
+        "irish": 0.1297,
+        "scottish": 0.1108,
+        "chinese": 0.008,
+        "italian": 0.0284,
+        "german": 0.0411,
+        "indian": 0.0041,
+        "filipino": 0.0047,
+        "dutch": 0.0144,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0024
     },
     {
       "div": "Grayndler",
@@ -953,7 +1291,25 @@
         "rent": 0.4478,
         "own": 0.2571,
         "rentPub": 0.0279
-      }
+      },
+      "pt": 0.3488,
+      "noncit": 0.2179,
+      "bigfam": 0.1241,
+      "anc": {
+        "english": 0.2824,
+        "australian": 0.2358,
+        "irish": 0.1364,
+        "scottish": 0.0879,
+        "chinese": 0.0965,
+        "italian": 0.0761,
+        "german": 0.033,
+        "indian": 0.0236,
+        "filipino": 0.019,
+        "dutch": 0.0099,
+        "vietnamese": 0.0288,
+        "lebanese": 0.0224
+      },
+      "hl": 0.0136
     },
     {
       "div": "Greenway",
@@ -1001,7 +1357,25 @@
         "rent": 0.2912,
         "own": 0.2435,
         "rentPub": 0.0391
-      }
+      },
+      "pt": 0.1847,
+      "noncit": 0.1957,
+      "bigfam": 0.2254,
+      "anc": {
+        "english": 0.2226,
+        "australian": 0.2395,
+        "irish": 0.0672,
+        "scottish": 0.0507,
+        "chinese": 0.0555,
+        "italian": 0.0331,
+        "german": 0.0225,
+        "indian": 0.1597,
+        "filipino": 0.0531,
+        "dutch": 0.0098,
+        "vietnamese": 0.0031,
+        "lebanese": 0.0179
+      },
+      "hl": 0.0039
     },
     {
       "div": "Hughes",
@@ -1049,7 +1423,25 @@
         "rent": 0.2367,
         "own": 0.3402,
         "rentPub": 0.0404
-      }
+      },
+      "pt": 0.1564,
+      "noncit": 0.1249,
+      "bigfam": 0.2513,
+      "anc": {
+        "english": 0.3033,
+        "australian": 0.3237,
+        "irish": 0.1007,
+        "scottish": 0.0755,
+        "chinese": 0.0518,
+        "italian": 0.047,
+        "german": 0.0276,
+        "indian": 0.0375,
+        "filipino": 0.0155,
+        "dutch": 0.0096,
+        "vietnamese": 0.0233,
+        "lebanese": 0.0371
+      },
+      "hl": 0.0024
     },
     {
       "div": "Hume",
@@ -1097,7 +1489,25 @@
         "rent": 0.2232,
         "own": 0.3908,
         "rentPub": 0.0234
-      }
+      },
+      "pt": 0.0131,
+      "noncit": 0.1017,
+      "bigfam": 0.3522,
+      "anc": {
+        "english": 0.4411,
+        "australian": 0.488,
+        "irish": 0.1373,
+        "scottish": 0.1069,
+        "chinese": 0.0063,
+        "italian": 0.024,
+        "german": 0.0393,
+        "indian": 0.003,
+        "filipino": 0.0036,
+        "dutch": 0.0134,
+        "vietnamese": 0.0007,
+        "lebanese": 0.0051
+      },
+      "hl": 0.0021
     },
     {
       "div": "Hunter",
@@ -1145,7 +1555,25 @@
         "rent": 0.3128,
         "own": 0.3196,
         "rentPub": 0.0359
-      }
+      },
+      "pt": 0.0044,
+      "noncit": 0.1089,
+      "bigfam": 0.3335,
+      "anc": {
+        "english": 0.4614,
+        "australian": 0.508,
+        "irish": 0.1192,
+        "scottish": 0.1145,
+        "chinese": 0.0058,
+        "italian": 0.014,
+        "german": 0.0462,
+        "indian": 0.0054,
+        "filipino": 0.0067,
+        "dutch": 0.0104,
+        "vietnamese": 0.0008,
+        "lebanese": 0.001
+      },
+      "hl": 0.0023
     },
     {
       "div": "Kingsford Smith",
@@ -1193,7 +1621,25 @@
         "rent": 0.4817,
         "own": 0.2625,
         "rentPub": 0.072
-      }
+      },
+      "pt": 0.2416,
+      "noncit": 0.2921,
+      "bigfam": 0.1411,
+      "anc": {
+        "english": 0.2415,
+        "australian": 0.2098,
+        "irish": 0.1234,
+        "scottish": 0.064,
+        "chinese": 0.1639,
+        "italian": 0.0442,
+        "german": 0.0287,
+        "indian": 0.0213,
+        "filipino": 0.0182,
+        "dutch": 0.0079,
+        "vietnamese": 0.0074,
+        "lebanese": 0.0113
+      },
+      "hl": 0.0052
     },
     {
       "div": "Lindsay",
@@ -1241,7 +1687,25 @@
         "rent": 0.3316,
         "own": 0.2608,
         "rentPub": 0.0461
-      }
+      },
+      "pt": 0.1007,
+      "noncit": 0.1406,
+      "bigfam": 0.2858,
+      "anc": {
+        "english": 0.3668,
+        "australian": 0.3892,
+        "irish": 0.1086,
+        "scottish": 0.081,
+        "chinese": 0.0197,
+        "italian": 0.0363,
+        "german": 0.0358,
+        "indian": 0.0315,
+        "filipino": 0.0258,
+        "dutch": 0.0167,
+        "vietnamese": 0.0029,
+        "lebanese": 0.0111
+      },
+      "hl": 0.005
     },
     {
       "div": "Lyne",
@@ -1289,7 +1753,25 @@
         "rent": 0.2679,
         "own": 0.446,
         "rentPub": 0.0297
-      }
+      },
+      "pt": 0.0026,
+      "noncit": 0.0987,
+      "bigfam": 0.3536,
+      "anc": {
+        "english": 0.4755,
+        "australian": 0.4772,
+        "irish": 0.1295,
+        "scottish": 0.1146,
+        "chinese": 0.0063,
+        "italian": 0.0171,
+        "german": 0.0423,
+        "indian": 0.0037,
+        "filipino": 0.0042,
+        "dutch": 0.0135,
+        "vietnamese": 0.0008,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0031
     },
     {
       "div": "Macarthur",
@@ -1337,7 +1819,25 @@
         "rent": 0.272,
         "own": 0.2588,
         "rentPub": 0.0515
-      }
+      },
+      "pt": 0.0894,
+      "noncit": 0.1216,
+      "bigfam": 0.2975,
+      "anc": {
+        "english": 0.3519,
+        "australian": 0.378,
+        "irish": 0.101,
+        "scottish": 0.0827,
+        "chinese": 0.0226,
+        "italian": 0.0561,
+        "german": 0.0341,
+        "indian": 0.0237,
+        "filipino": 0.0194,
+        "dutch": 0.011,
+        "vietnamese": 0.0064,
+        "lebanese": 0.0179
+      },
+      "hl": 0.0032
     },
     {
       "div": "Mackellar",
@@ -1385,7 +1885,25 @@
         "rent": 0.222,
         "own": 0.3779,
         "rentPub": 0.0109
-      }
+      },
+      "pt": 0.1166,
+      "noncit": 0.1418,
+      "bigfam": 0.2357,
+      "anc": {
+        "english": 0.435,
+        "australian": 0.3428,
+        "irish": 0.1314,
+        "scottish": 0.1097,
+        "chinese": 0.0296,
+        "italian": 0.0521,
+        "german": 0.0409,
+        "indian": 0.0097,
+        "filipino": 0.0094,
+        "dutch": 0.0211,
+        "vietnamese": 0.0027,
+        "lebanese": 0.003
+      },
+      "hl": 0.0019
     },
     {
       "div": "Macquarie",
@@ -1433,7 +1951,25 @@
         "rent": 0.2134,
         "own": 0.3651,
         "rentPub": 0.0207
-      }
+      },
+      "pt": 0.0802,
+      "noncit": 0.1008,
+      "bigfam": 0.2874,
+      "anc": {
+        "english": 0.4558,
+        "australian": 0.4254,
+        "irish": 0.1493,
+        "scottish": 0.1182,
+        "chinese": 0.0123,
+        "italian": 0.0307,
+        "german": 0.0463,
+        "indian": 0.0047,
+        "filipino": 0.0049,
+        "dutch": 0.0216,
+        "vietnamese": 0.0016,
+        "lebanese": 0.0044
+      },
+      "hl": 0.0028
     },
     {
       "div": "McMahon",
@@ -1481,7 +2017,25 @@
         "rent": 0.2875,
         "own": 0.3453,
         "rentPub": 0.0395
-      }
+      },
+      "pt": 0.1042,
+      "noncit": 0.1709,
+      "bigfam": 0.3037,
+      "anc": {
+        "english": 0.1491,
+        "australian": 0.1758,
+        "irish": 0.0436,
+        "scottish": 0.0306,
+        "chinese": 0.0655,
+        "italian": 0.0789,
+        "german": 0.0162,
+        "indian": 0.0296,
+        "filipino": 0.0269,
+        "dutch": 0.0041,
+        "vietnamese": 0.0659,
+        "lebanese": 0.0492
+      },
+      "hl": 0.0072
     },
     {
       "div": "Mitchell",
@@ -1529,7 +2083,25 @@
         "rent": 0.1872,
         "own": 0.3341,
         "rentPub": 0.0034
-      }
+      },
+      "pt": 0.1543,
+      "noncit": 0.1447,
+      "bigfam": 0.2319,
+      "anc": {
+        "english": 0.2673,
+        "australian": 0.2552,
+        "irish": 0.0882,
+        "scottish": 0.0689,
+        "chinese": 0.1338,
+        "italian": 0.0471,
+        "german": 0.0267,
+        "indian": 0.069,
+        "filipino": 0.025,
+        "dutch": 0.0123,
+        "vietnamese": 0.0051,
+        "lebanese": 0.0238
+      },
+      "hl": 0.0015
     },
     {
       "div": "New England",
@@ -1577,7 +2149,25 @@
         "rent": 0.317,
         "own": 0.3794,
         "rentPub": 0.0323
-      }
+      },
+      "pt": 0.0038,
+      "noncit": 0.118,
+      "bigfam": 0.3631,
+      "anc": {
+        "english": 0.4344,
+        "australian": 0.5113,
+        "irish": 0.1283,
+        "scottish": 0.1147,
+        "chinese": 0.0107,
+        "italian": 0.0126,
+        "german": 0.0513,
+        "indian": 0.0047,
+        "filipino": 0.0062,
+        "dutch": 0.0092,
+        "vietnamese": 0.0012,
+        "lebanese": 0.0013
+      },
+      "hl": 0.004
     },
     {
       "div": "Newcastle",
@@ -1625,7 +2215,25 @@
         "rent": 0.3709,
         "own": 0.3143,
         "rentPub": 0.0595
-      }
+      },
+      "pt": 0.0316,
+      "noncit": 0.1134,
+      "bigfam": 0.2315,
+      "anc": {
+        "english": 0.4433,
+        "australian": 0.4131,
+        "irish": 0.1473,
+        "scottish": 0.1252,
+        "chinese": 0.0229,
+        "italian": 0.0284,
+        "german": 0.0463,
+        "indian": 0.0088,
+        "filipino": 0.0072,
+        "dutch": 0.0124,
+        "vietnamese": 0.0033,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0053
     },
     {
       "div": "North Sydney",
@@ -1673,7 +2281,25 @@
         "rent": 0.4187,
         "own": 0.2964,
         "rentPub": 0.0193
-      }
+      },
+      "pt": 0.3223,
+      "noncit": 0.237,
+      "bigfam": 0.1498,
+      "anc": {
+        "english": 0.3059,
+        "australian": 0.2387,
+        "irish": 0.1273,
+        "scottish": 0.0903,
+        "chinese": 0.1698,
+        "italian": 0.0395,
+        "german": 0.0328,
+        "indian": 0.0353,
+        "filipino": 0.0143,
+        "dutch": 0.0122,
+        "vietnamese": 0.0056,
+        "lebanese": 0.0077
+      },
+      "hl": 0.0032
     },
     {
       "div": "Page",
@@ -1721,7 +2347,25 @@
         "rent": 0.297,
         "own": 0.4127,
         "rentPub": 0.0316
-      }
+      },
+      "pt": 0.003,
+      "noncit": 0.1031,
+      "bigfam": 0.3645,
+      "anc": {
+        "english": 0.4611,
+        "australian": 0.4751,
+        "irish": 0.1466,
+        "scottish": 0.1209,
+        "chinese": 0.0055,
+        "italian": 0.0286,
+        "german": 0.0482,
+        "indian": 0.004,
+        "filipino": 0.005,
+        "dutch": 0.0118,
+        "vietnamese": 0.0009,
+        "lebanese": 0.0008
+      },
+      "hl": 0.0045
     },
     {
       "div": "Parkes",
@@ -1769,7 +2413,25 @@
         "rent": 0.3278,
         "own": 0.3699,
         "rentPub": 0.0444
-      }
+      },
+      "pt": 0.0032,
+      "noncit": 0.1319,
+      "bigfam": 0.3898,
+      "anc": {
+        "english": 0.4154,
+        "australian": 0.5402,
+        "irish": 0.1228,
+        "scottish": 0.0974,
+        "chinese": 0.0073,
+        "italian": 0.0105,
+        "german": 0.0375,
+        "indian": 0.0057,
+        "filipino": 0.0045,
+        "dutch": 0.0088,
+        "vietnamese": 0.0008,
+        "lebanese": 0.0013
+      },
+      "hl": 0.004
     },
     {
       "div": "Parramatta",
@@ -1817,7 +2479,25 @@
         "rent": 0.5002,
         "own": 0.2156,
         "rentPub": 0.0704
-      }
+      },
+      "pt": 0.2438,
+      "noncit": 0.324,
+      "bigfam": 0.1902,
+      "anc": {
+        "english": 0.1419,
+        "australian": 0.1397,
+        "irish": 0.0462,
+        "scottish": 0.0329,
+        "chinese": 0.1607,
+        "italian": 0.0225,
+        "german": 0.0133,
+        "indian": 0.1694,
+        "filipino": 0.0273,
+        "dutch": 0.0039,
+        "vietnamese": 0.0098,
+        "lebanese": 0.0812
+      },
+      "hl": 0.0074
     },
     {
       "div": "Paterson",
@@ -1865,7 +2545,25 @@
         "rent": 0.2669,
         "own": 0.4093,
         "rentPub": 0.0301
-      }
+      },
+      "pt": 0.0066,
+      "noncit": 0.0974,
+      "bigfam": 0.3395,
+      "anc": {
+        "english": 0.475,
+        "australian": 0.4761,
+        "irish": 0.1255,
+        "scottish": 0.1138,
+        "chinese": 0.0055,
+        "italian": 0.0174,
+        "german": 0.046,
+        "indian": 0.0025,
+        "filipino": 0.0045,
+        "dutch": 0.0137,
+        "vietnamese": 0.0007,
+        "lebanese": 0.0009
+      },
+      "hl": 0.0018
     },
     {
       "div": "Reid",
@@ -1913,7 +2611,25 @@
         "rent": 0.4371,
         "own": 0.2674,
         "rentPub": 0.0214
-      }
+      },
+      "pt": 0.2848,
+      "noncit": 0.3386,
+      "bigfam": 0.1607,
+      "anc": {
+        "english": 0.1433,
+        "australian": 0.1273,
+        "irish": 0.0594,
+        "scottish": 0.0368,
+        "chinese": 0.2249,
+        "italian": 0.0857,
+        "german": 0.0137,
+        "indian": 0.0638,
+        "filipino": 0.0176,
+        "dutch": 0.0038,
+        "vietnamese": 0.017,
+        "lebanese": 0.0361
+      },
+      "hl": 0.0121
     },
     {
       "div": "Richmond",
@@ -1961,7 +2677,25 @@
         "rent": 0.2779,
         "own": 0.4124,
         "rentPub": 0.0199
-      }
+      },
+      "pt": 0.007,
+      "noncit": 0.1374,
+      "bigfam": 0.2979,
+      "anc": {
+        "english": 0.4611,
+        "australian": 0.4179,
+        "irish": 0.1595,
+        "scottish": 0.1264,
+        "chinese": 0.0076,
+        "italian": 0.0281,
+        "german": 0.0507,
+        "indian": 0.0059,
+        "filipino": 0.0058,
+        "dutch": 0.0163,
+        "vietnamese": 0.0006,
+        "lebanese": 0.0011
+      },
+      "hl": 0.0058
     },
     {
       "div": "Riverina",
@@ -2009,7 +2743,25 @@
         "rent": 0.3123,
         "own": 0.3625,
         "rentPub": 0.0341
-      }
+      },
+      "pt": 0.0027,
+      "noncit": 0.1334,
+      "bigfam": 0.3795,
+      "anc": {
+        "english": 0.4049,
+        "australian": 0.4563,
+        "irish": 0.135,
+        "scottish": 0.1051,
+        "chinese": 0.0104,
+        "italian": 0.0676,
+        "german": 0.0522,
+        "indian": 0.0151,
+        "filipino": 0.0071,
+        "dutch": 0.0092,
+        "vietnamese": 0.0008,
+        "lebanese": 0.001
+      },
+      "hl": 0.0025
     },
     {
       "div": "Robertson",
@@ -2057,7 +2809,25 @@
         "rent": 0.2765,
         "own": 0.3701,
         "rentPub": 0.0309
-      }
+      },
+      "pt": 0.1091,
+      "noncit": 0.1167,
+      "bigfam": 0.2863,
+      "anc": {
+        "english": 0.4621,
+        "australian": 0.4204,
+        "irish": 0.1433,
+        "scottish": 0.1149,
+        "chinese": 0.0169,
+        "italian": 0.0269,
+        "german": 0.0378,
+        "indian": 0.0076,
+        "filipino": 0.0081,
+        "dutch": 0.0158,
+        "vietnamese": 0.0014,
+        "lebanese": 0.0028
+      },
+      "hl": 0.0036
     },
     {
       "div": "Shortland",
@@ -2105,7 +2875,25 @@
         "rent": 0.2477,
         "own": 0.4048,
         "rentPub": 0.0472
-      }
+      },
+      "pt": 0.0161,
+      "noncit": 0.0833,
+      "bigfam": 0.3166,
+      "anc": {
+        "english": 0.4696,
+        "australian": 0.4649,
+        "irish": 0.1246,
+        "scottish": 0.1198,
+        "chinese": 0.0097,
+        "italian": 0.023,
+        "german": 0.0412,
+        "indian": 0.0044,
+        "filipino": 0.005,
+        "dutch": 0.0125,
+        "vietnamese": 0.0009,
+        "lebanese": 0.0011
+      },
+      "hl": 0.0019
     },
     {
       "div": "Sydney",
@@ -2153,7 +2941,25 @@
         "rent": 0.6086,
         "own": 0.1595,
         "rentPub": 0.0784
-      }
+      },
+      "pt": 0.3184,
+      "noncit": 0.4114,
+      "bigfam": 0.0641,
+      "anc": {
+        "english": 0.2762,
+        "australian": 0.1898,
+        "irish": 0.1211,
+        "scottish": 0.0809,
+        "chinese": 0.1954,
+        "italian": 0.0388,
+        "german": 0.0344,
+        "indian": 0.0231,
+        "filipino": 0.012,
+        "dutch": 0.0117,
+        "vietnamese": 0.0145,
+        "lebanese": 0.0076
+      },
+      "hl": 0.0201
     },
     {
       "div": "Throsby",
@@ -2201,7 +3007,25 @@
         "rent": 0.2631,
         "own": 0.3948,
         "rentPub": 0.0646
-      }
+      },
+      "pt": 0.0279,
+      "noncit": 0.1087,
+      "bigfam": 0.3221,
+      "anc": {
+        "english": 0.4146,
+        "australian": 0.4018,
+        "irish": 0.1099,
+        "scottish": 0.105,
+        "chinese": 0.0095,
+        "italian": 0.0463,
+        "german": 0.0438,
+        "indian": 0.0044,
+        "filipino": 0.0079,
+        "dutch": 0.0161,
+        "vietnamese": 0.0035,
+        "lebanese": 0.0071
+      },
+      "hl": 0.0031
     },
     {
       "div": "Warringah",
@@ -2249,7 +3073,25 @@
         "rent": 0.3577,
         "own": 0.3262,
         "rentPub": 0.0094
-      }
+      },
+      "pt": 0.2543,
+      "noncit": 0.2021,
+      "bigfam": 0.1809,
+      "anc": {
+        "english": 0.4253,
+        "australian": 0.2957,
+        "irish": 0.1494,
+        "scottish": 0.1173,
+        "chinese": 0.0462,
+        "italian": 0.0471,
+        "german": 0.0439,
+        "indian": 0.0121,
+        "filipino": 0.0084,
+        "dutch": 0.0176,
+        "vietnamese": 0.0025,
+        "lebanese": 0.0038
+      },
+      "hl": 0.0034
     },
     {
       "div": "Watson",
@@ -2297,7 +3139,25 @@
         "rent": 0.4139,
         "own": 0.2987,
         "rentPub": 0.0492
-      }
+      },
+      "pt": 0.211,
+      "noncit": 0.2505,
+      "bigfam": 0.2494,
+      "anc": {
+        "english": 0.0941,
+        "australian": 0.111,
+        "irish": 0.0322,
+        "scottish": 0.0198,
+        "chinese": 0.1609,
+        "italian": 0.0537,
+        "german": 0.0089,
+        "indian": 0.0414,
+        "filipino": 0.0189,
+        "dutch": 0.0015,
+        "vietnamese": 0.0425,
+        "lebanese": 0.1652
+      },
+      "hl": 0.0098
     },
     {
       "div": "Wentworth",
@@ -2345,7 +3205,25 @@
         "rent": 0.4829,
         "own": 0.2758,
         "rentPub": 0.0149
-      }
+      },
+      "pt": 0.2446,
+      "noncit": 0.273,
+      "bigfam": 0.1301,
+      "anc": {
+        "english": 0.3533,
+        "australian": 0.2446,
+        "irish": 0.1487,
+        "scottish": 0.0996,
+        "chinese": 0.042,
+        "italian": 0.05,
+        "german": 0.0473,
+        "indian": 0.0115,
+        "filipino": 0.0083,
+        "dutch": 0.0131,
+        "vietnamese": 0.0035,
+        "lebanese": 0.0078
+      },
+      "hl": 0.0099
     },
     {
       "div": "Werriwa",
@@ -2393,7 +3271,25 @@
         "rent": 0.3066,
         "own": 0.2453,
         "rentPub": 0.0742
-      }
+      },
+      "pt": 0.1515,
+      "noncit": 0.1743,
+      "bigfam": 0.2847,
+      "anc": {
+        "english": 0.193,
+        "australian": 0.2158,
+        "irish": 0.0533,
+        "scottish": 0.043,
+        "chinese": 0.0428,
+        "italian": 0.0553,
+        "german": 0.0219,
+        "indian": 0.0832,
+        "filipino": 0.0388,
+        "dutch": 0.0051,
+        "vietnamese": 0.0203,
+        "lebanese": 0.0491
+      },
+      "hl": 0.0051
     },
     {
       "div": "Aston",
@@ -2441,7 +3337,25 @@
         "rent": 0.1816,
         "own": 0.3738,
         "rentPub": 0.0115
-      }
+      },
+      "pt": 0.0762,
+      "noncit": 0.1556,
+      "bigfam": 0.2383,
+      "anc": {
+        "english": 0.2935,
+        "australian": 0.2722,
+        "irish": 0.0882,
+        "scottish": 0.0773,
+        "chinese": 0.1571,
+        "italian": 0.0544,
+        "german": 0.0362,
+        "indian": 0.0432,
+        "filipino": 0.0119,
+        "dutch": 0.0206,
+        "vietnamese": 0.0117,
+        "lebanese": 0.003
+      },
+      "hl": 0.0017
     },
     {
       "div": "Ballarat",
@@ -2489,7 +3403,25 @@
         "rent": 0.2732,
         "own": 0.3483,
         "rentPub": 0.0324
-      }
+      },
+      "pt": 0.0302,
+      "noncit": 0.1073,
+      "bigfam": 0.3139,
+      "anc": {
+        "english": 0.4416,
+        "australian": 0.4261,
+        "irish": 0.165,
+        "scottish": 0.1293,
+        "chinese": 0.0134,
+        "italian": 0.0309,
+        "german": 0.047,
+        "indian": 0.0096,
+        "filipino": 0.0044,
+        "dutch": 0.027,
+        "vietnamese": 0.0012,
+        "lebanese": 0.001
+      },
+      "hl": 0.0033
     },
     {
       "div": "Batman",
@@ -2537,7 +3469,25 @@
         "rent": 0.3973,
         "own": 0.3138,
         "rentPub": 0.0408
-      }
+      },
+      "pt": 0.225,
+      "noncit": 0.2208,
+      "bigfam": 0.1754,
+      "anc": {
+        "english": 0.2439,
+        "australian": 0.2209,
+        "irish": 0.1149,
+        "scottish": 0.0766,
+        "chinese": 0.0684,
+        "italian": 0.1465,
+        "german": 0.0286,
+        "indian": 0.0388,
+        "filipino": 0.0089,
+        "dutch": 0.011,
+        "vietnamese": 0.0259,
+        "lebanese": 0.0213
+      },
+      "hl": 0.0066
     },
     {
       "div": "Bendigo",
@@ -2585,7 +3535,25 @@
         "rent": 0.2628,
         "own": 0.3727,
         "rentPub": 0.0313
-      }
+      },
+      "pt": 0.0184,
+      "noncit": 0.1078,
+      "bigfam": 0.3309,
+      "anc": {
+        "english": 0.4582,
+        "australian": 0.4511,
+        "irish": 0.1533,
+        "scottish": 0.1241,
+        "chinese": 0.0116,
+        "italian": 0.0299,
+        "german": 0.0473,
+        "indian": 0.0065,
+        "filipino": 0.0046,
+        "dutch": 0.0163,
+        "vietnamese": 0.0009,
+        "lebanese": 0.0006
+      },
+      "hl": 0.0027
     },
     {
       "div": "Bruce",
@@ -2633,7 +3601,25 @@
         "rent": 0.3237,
         "own": 0.369,
         "rentPub": 0.0258
-      }
+      },
+      "pt": 0.11,
+      "noncit": 0.2848,
+      "bigfam": 0.2287,
+      "anc": {
+        "english": 0.161,
+        "australian": 0.1388,
+        "irish": 0.0461,
+        "scottish": 0.0404,
+        "chinese": 0.1662,
+        "italian": 0.0477,
+        "german": 0.0196,
+        "indian": 0.0876,
+        "filipino": 0.0135,
+        "dutch": 0.0109,
+        "vietnamese": 0.0434,
+        "lebanese": 0.0075
+      },
+      "hl": 0.0091
     },
     {
       "div": "Calwell",
@@ -2681,7 +3667,25 @@
         "rent": 0.254,
         "own": 0.2733,
         "rentPub": 0.0256
-      }
+      },
+      "pt": 0.0893,
+      "noncit": 0.1918,
+      "bigfam": 0.2905,
+      "anc": {
+        "english": 0.2063,
+        "australian": 0.2201,
+        "irish": 0.0654,
+        "scottish": 0.0499,
+        "chinese": 0.0152,
+        "italian": 0.0908,
+        "german": 0.0208,
+        "indian": 0.056,
+        "filipino": 0.0187,
+        "dutch": 0.0069,
+        "vietnamese": 0.0107,
+        "lebanese": 0.0493
+      },
+      "hl": 0.0046
     },
     {
       "div": "Casey",
@@ -2729,7 +3733,25 @@
         "rent": 0.1761,
         "own": 0.3423,
         "rentPub": 0.0104
-      }
+      },
+      "pt": 0.0687,
+      "noncit": 0.1153,
+      "bigfam": 0.2768,
+      "anc": {
+        "english": 0.4363,
+        "australian": 0.3964,
+        "irish": 0.1172,
+        "scottish": 0.1103,
+        "chinese": 0.024,
+        "italian": 0.052,
+        "german": 0.0515,
+        "indian": 0.0127,
+        "filipino": 0.0056,
+        "dutch": 0.0434,
+        "vietnamese": 0.0021,
+        "lebanese": 0.0021
+      },
+      "hl": 0.0022
     },
     {
       "div": "Chisholm",
@@ -2777,7 +3799,25 @@
         "rent": 0.3571,
         "own": 0.3496,
         "rentPub": 0.0243
-      }
+      },
+      "pt": 0.1774,
+      "noncit": 0.3129,
+      "bigfam": 0.1654,
+      "anc": {
+        "english": 0.2156,
+        "australian": 0.184,
+        "irish": 0.0808,
+        "scottish": 0.0636,
+        "chinese": 0.277,
+        "italian": 0.0487,
+        "german": 0.0246,
+        "indian": 0.0579,
+        "filipino": 0.0085,
+        "dutch": 0.0105,
+        "vietnamese": 0.0166,
+        "lebanese": 0.002
+      },
+      "hl": 0.0063
     },
     {
       "div": "Corangamite",
@@ -2825,7 +3865,25 @@
         "rent": 0.223,
         "own": 0.3917,
         "rentPub": 0.0113
-      }
+      },
+      "pt": 0.0319,
+      "noncit": 0.1085,
+      "bigfam": 0.3126,
+      "anc": {
+        "english": 0.4402,
+        "australian": 0.4131,
+        "irish": 0.1544,
+        "scottish": 0.1359,
+        "chinese": 0.0135,
+        "italian": 0.0354,
+        "german": 0.0487,
+        "indian": 0.0097,
+        "filipino": 0.0037,
+        "dutch": 0.0258,
+        "vietnamese": 0.0014,
+        "lebanese": 0.0013
+      },
+      "hl": 0.0025
     },
     {
       "div": "Corio",
@@ -2873,7 +3931,25 @@
         "rent": 0.3105,
         "own": 0.3428,
         "rentPub": 0.0416
-      }
+      },
+      "pt": 0.0496,
+      "noncit": 0.1366,
+      "bigfam": 0.2909,
+      "anc": {
+        "english": 0.3951,
+        "australian": 0.374,
+        "irish": 0.1336,
+        "scottish": 0.1146,
+        "chinese": 0.0134,
+        "italian": 0.0501,
+        "german": 0.0468,
+        "indian": 0.0116,
+        "filipino": 0.0095,
+        "dutch": 0.0298,
+        "vietnamese": 0.0043,
+        "lebanese": 0.001
+      },
+      "hl": 0.0034
     },
     {
       "div": "Deakin",
@@ -2921,7 +3997,25 @@
         "rent": 0.2731,
         "own": 0.3593,
         "rentPub": 0.0209
-      }
+      },
+      "pt": 0.1513,
+      "noncit": 0.1833,
+      "bigfam": 0.2203,
+      "anc": {
+        "english": 0.3273,
+        "australian": 0.2921,
+        "irish": 0.11,
+        "scottish": 0.0939,
+        "chinese": 0.145,
+        "italian": 0.0448,
+        "german": 0.0365,
+        "indian": 0.0386,
+        "filipino": 0.0077,
+        "dutch": 0.0203,
+        "vietnamese": 0.0116,
+        "lebanese": 0.0016
+      },
+      "hl": 0.0032
     },
     {
       "div": "Dunkley",
@@ -2969,7 +4063,25 @@
         "rent": 0.2717,
         "own": 0.3252,
         "rentPub": 0.0256
-      }
+      },
+      "pt": 0.046,
+      "noncit": 0.1422,
+      "bigfam": 0.2689,
+      "anc": {
+        "english": 0.4557,
+        "australian": 0.3797,
+        "irish": 0.131,
+        "scottish": 0.1201,
+        "chinese": 0.0168,
+        "italian": 0.0385,
+        "german": 0.044,
+        "indian": 0.011,
+        "filipino": 0.0066,
+        "dutch": 0.0256,
+        "vietnamese": 0.0012,
+        "lebanese": 0.002
+      },
+      "hl": 0.004
     },
     {
       "div": "Flinders",
@@ -3017,7 +4129,25 @@
         "rent": 0.2155,
         "own": 0.3958,
         "rentPub": 0.0105
-      }
+      },
+      "pt": 0.0129,
+      "noncit": 0.1148,
+      "bigfam": 0.3115,
+      "anc": {
+        "english": 0.473,
+        "australian": 0.4187,
+        "irish": 0.1287,
+        "scottish": 0.1222,
+        "chinese": 0.0064,
+        "italian": 0.0459,
+        "german": 0.0429,
+        "indian": 0.0038,
+        "filipino": 0.0034,
+        "dutch": 0.0277,
+        "vietnamese": 0.0005,
+        "lebanese": 0.001
+      },
+      "hl": 0.0018
     },
     {
       "div": "Gellibrand",
@@ -3065,7 +4195,25 @@
         "rent": 0.3755,
         "own": 0.2893,
         "rentPub": 0.0377
-      }
+      },
+      "pt": 0.1926,
+      "noncit": 0.2117,
+      "bigfam": 0.1816,
+      "anc": {
+        "english": 0.2678,
+        "australian": 0.2376,
+        "irish": 0.1086,
+        "scottish": 0.0796,
+        "chinese": 0.0693,
+        "italian": 0.0673,
+        "german": 0.0312,
+        "indian": 0.0384,
+        "filipino": 0.0162,
+        "dutch": 0.0118,
+        "vietnamese": 0.0756,
+        "lebanese": 0.0196
+      },
+      "hl": 0.0058
     },
     {
       "div": "Gippsland",
@@ -3113,7 +4261,25 @@
         "rent": 0.2474,
         "own": 0.4105,
         "rentPub": 0.0316
-      }
+      },
+      "pt": 0.0052,
+      "noncit": 0.1255,
+      "bigfam": 0.3586,
+      "anc": {
+        "english": 0.4405,
+        "australian": 0.4535,
+        "irish": 0.1202,
+        "scottish": 0.1203,
+        "chinese": 0.0082,
+        "italian": 0.0389,
+        "german": 0.0459,
+        "indian": 0.0063,
+        "filipino": 0.0061,
+        "dutch": 0.0315,
+        "vietnamese": 0.0017,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0032
     },
     {
       "div": "Goldstein",
@@ -3161,7 +4327,25 @@
         "rent": 0.2694,
         "own": 0.3924,
         "rentPub": 0.018
-      }
+      },
+      "pt": 0.1655,
+      "noncit": 0.1678,
+      "bigfam": 0.2067,
+      "anc": {
+        "english": 0.357,
+        "australian": 0.2914,
+        "irish": 0.1303,
+        "scottish": 0.1068,
+        "chinese": 0.0606,
+        "italian": 0.0519,
+        "german": 0.0417,
+        "indian": 0.0308,
+        "filipino": 0.0042,
+        "dutch": 0.0154,
+        "vietnamese": 0.0041,
+        "lebanese": 0.0033
+      },
+      "hl": 0.0022
     },
     {
       "div": "Gorton",
@@ -3209,7 +4393,25 @@
         "rent": 0.2172,
         "own": 0.3175,
         "rentPub": 0.0135
-      }
+      },
+      "pt": 0.1064,
+      "noncit": 0.1928,
+      "bigfam": 0.2522,
+      "anc": {
+        "english": 0.1367,
+        "australian": 0.1509,
+        "irish": 0.0359,
+        "scottish": 0.0291,
+        "chinese": 0.0588,
+        "italian": 0.0813,
+        "german": 0.0185,
+        "indian": 0.0609,
+        "filipino": 0.0527,
+        "dutch": 0.005,
+        "vietnamese": 0.1058,
+        "lebanese": 0.0124
+      },
+      "hl": 0.0052
     },
     {
       "div": "Higgins",
@@ -3257,7 +4459,25 @@
         "rent": 0.4402,
         "own": 0.3017,
         "rentPub": 0.0249
-      }
+      },
+      "pt": 0.2585,
+      "noncit": 0.2257,
+      "bigfam": 0.1538,
+      "anc": {
+        "english": 0.3291,
+        "australian": 0.2628,
+        "irish": 0.1349,
+        "scottish": 0.1067,
+        "chinese": 0.1045,
+        "italian": 0.0514,
+        "german": 0.0381,
+        "indian": 0.0401,
+        "filipino": 0.0057,
+        "dutch": 0.0139,
+        "vietnamese": 0.0082,
+        "lebanese": 0.0027
+      },
+      "hl": 0.0035
     },
     {
       "div": "Holt",
@@ -3305,7 +4525,25 @@
         "rent": 0.2339,
         "own": 0.223,
         "rentPub": 0.0185
-      }
+      },
+      "pt": 0.0745,
+      "noncit": 0.2114,
+      "bigfam": 0.256,
+      "anc": {
+        "english": 0.2368,
+        "australian": 0.2269,
+        "irish": 0.0577,
+        "scottish": 0.0554,
+        "chinese": 0.0453,
+        "italian": 0.0356,
+        "german": 0.026,
+        "indian": 0.0941,
+        "filipino": 0.0256,
+        "dutch": 0.019,
+        "vietnamese": 0.0107,
+        "lebanese": 0.006
+      },
+      "hl": 0.005
     },
     {
       "div": "Hotham",
@@ -3353,7 +4591,25 @@
         "rent": 0.2881,
         "own": 0.3677,
         "rentPub": 0.016
-      }
+      },
+      "pt": 0.1479,
+      "noncit": 0.2171,
+      "bigfam": 0.2025,
+      "anc": {
+        "english": 0.2175,
+        "australian": 0.1998,
+        "irish": 0.0797,
+        "scottish": 0.0592,
+        "chinese": 0.1216,
+        "italian": 0.0546,
+        "german": 0.0257,
+        "indian": 0.0656,
+        "filipino": 0.0125,
+        "dutch": 0.0105,
+        "vietnamese": 0.0587,
+        "lebanese": 0.0052
+      },
+      "hl": 0.006
     },
     {
       "div": "Indi",
@@ -3401,7 +4657,25 @@
         "rent": 0.2604,
         "own": 0.3955,
         "rentPub": 0.0353
-      }
+      },
+      "pt": 0.0034,
+      "noncit": 0.1058,
+      "bigfam": 0.351,
+      "anc": {
+        "english": 0.4426,
+        "australian": 0.4433,
+        "irish": 0.1482,
+        "scottish": 0.1252,
+        "chinese": 0.0074,
+        "italian": 0.0438,
+        "german": 0.0606,
+        "indian": 0.005,
+        "filipino": 0.0047,
+        "dutch": 0.0193,
+        "vietnamese": 0.0004,
+        "lebanese": 0.0006
+      },
+      "hl": 0.0029
     },
     {
       "div": "Isaacs",
@@ -3449,7 +4723,25 @@
         "rent": 0.2662,
         "own": 0.3138,
         "rentPub": 0.0153
-      }
+      },
+      "pt": 0.1017,
+      "noncit": 0.1773,
+      "bigfam": 0.2273,
+      "anc": {
+        "english": 0.302,
+        "australian": 0.2678,
+        "irish": 0.0971,
+        "scottish": 0.0794,
+        "chinese": 0.0698,
+        "italian": 0.0439,
+        "german": 0.0306,
+        "indian": 0.0432,
+        "filipino": 0.014,
+        "dutch": 0.016,
+        "vietnamese": 0.0438,
+        "lebanese": 0.0045
+      },
+      "hl": 0.0041
     },
     {
       "div": "Jagajaga",
@@ -3497,7 +4789,25 @@
         "rent": 0.2386,
         "own": 0.3826,
         "rentPub": 0.0304
-      }
+      },
+      "pt": 0.1473,
+      "noncit": 0.1302,
+      "bigfam": 0.2324,
+      "anc": {
+        "english": 0.3537,
+        "australian": 0.3186,
+        "irish": 0.1441,
+        "scottish": 0.1058,
+        "chinese": 0.055,
+        "italian": 0.0965,
+        "german": 0.0395,
+        "indian": 0.0218,
+        "filipino": 0.0054,
+        "dutch": 0.015,
+        "vietnamese": 0.0068,
+        "lebanese": 0.0074
+      },
+      "hl": 0.0024
     },
     {
       "div": "Kooyong",
@@ -3545,7 +4855,25 @@
         "rent": 0.3263,
         "own": 0.3818,
         "rentPub": 0.0047
-      }
+      },
+      "pt": 0.2081,
+      "noncit": 0.1942,
+      "bigfam": 0.198,
+      "anc": {
+        "english": 0.3063,
+        "australian": 0.2485,
+        "irish": 0.1324,
+        "scottish": 0.1029,
+        "chinese": 0.1679,
+        "italian": 0.0643,
+        "german": 0.034,
+        "indian": 0.0376,
+        "filipino": 0.0041,
+        "dutch": 0.0127,
+        "vietnamese": 0.0162,
+        "lebanese": 0.0033
+      },
+      "hl": 0.0027
     },
     {
       "div": "La Trobe",
@@ -3593,7 +4921,25 @@
         "rent": 0.1894,
         "own": 0.309,
         "rentPub": 0.01
-      }
+      },
+      "pt": 0.0685,
+      "noncit": 0.1309,
+      "bigfam": 0.2545,
+      "anc": {
+        "english": 0.3986,
+        "australian": 0.3585,
+        "irish": 0.1158,
+        "scottish": 0.1044,
+        "chinese": 0.0328,
+        "italian": 0.045,
+        "german": 0.0471,
+        "indian": 0.027,
+        "filipino": 0.0086,
+        "dutch": 0.0369,
+        "vietnamese": 0.0024,
+        "lebanese": 0.0027
+      },
+      "hl": 0.0025
     },
     {
       "div": "Lalor",
@@ -3641,7 +4987,25 @@
         "rent": 0.292,
         "own": 0.2182,
         "rentPub": 0.0104
-      }
+      },
+      "pt": 0.1217,
+      "noncit": 0.2418,
+      "bigfam": 0.2428,
+      "anc": {
+        "english": 0.2534,
+        "australian": 0.2482,
+        "irish": 0.0718,
+        "scottish": 0.0629,
+        "chinese": 0.0531,
+        "italian": 0.0524,
+        "german": 0.0277,
+        "indian": 0.1116,
+        "filipino": 0.0341,
+        "dutch": 0.0104,
+        "vietnamese": 0.0105,
+        "lebanese": 0.0103
+      },
+      "hl": 0.0034
     },
     {
       "div": "Mallee",
@@ -3689,7 +5053,25 @@
         "rent": 0.2678,
         "own": 0.4136,
         "rentPub": 0.0341
-      }
+      },
+      "pt": 0.0025,
+      "noncit": 0.1224,
+      "bigfam": 0.4011,
+      "anc": {
+        "english": 0.4193,
+        "australian": 0.4455,
+        "irish": 0.1124,
+        "scottish": 0.1108,
+        "chinese": 0.0096,
+        "italian": 0.0541,
+        "german": 0.0719,
+        "indian": 0.0081,
+        "filipino": 0.0054,
+        "dutch": 0.0105,
+        "vietnamese": 0.0032,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0028
     },
     {
       "div": "Maribyrnong",
@@ -3737,7 +5119,25 @@
         "rent": 0.3136,
         "own": 0.3885,
         "rentPub": 0.0148
-      }
+      },
+      "pt": 0.1539,
+      "noncit": 0.2039,
+      "bigfam": 0.2312,
+      "anc": {
+        "english": 0.1941,
+        "australian": 0.1938,
+        "irish": 0.0866,
+        "scottish": 0.0537,
+        "chinese": 0.0583,
+        "italian": 0.1471,
+        "german": 0.0245,
+        "indian": 0.0404,
+        "filipino": 0.0168,
+        "dutch": 0.0074,
+        "vietnamese": 0.1132,
+        "lebanese": 0.0091
+      },
+      "hl": 0.0052
     },
     {
       "div": "McEwen",
@@ -3785,7 +5185,25 @@
         "rent": 0.1854,
         "own": 0.2969,
         "rentPub": 0.009
-      }
+      },
+      "pt": 0.0638,
+      "noncit": 0.1294,
+      "bigfam": 0.276,
+      "anc": {
+        "english": 0.3739,
+        "australian": 0.3794,
+        "irish": 0.119,
+        "scottish": 0.0991,
+        "chinese": 0.0151,
+        "italian": 0.076,
+        "german": 0.0402,
+        "indian": 0.0331,
+        "filipino": 0.0078,
+        "dutch": 0.0189,
+        "vietnamese": 0.003,
+        "lebanese": 0.0056
+      },
+      "hl": 0.0018
     },
     {
       "div": "McMillan",
@@ -3833,7 +5251,25 @@
         "rent": 0.2456,
         "own": 0.3646,
         "rentPub": 0.0227
-      }
+      },
+      "pt": 0.0254,
+      "noncit": 0.1215,
+      "bigfam": 0.3542,
+      "anc": {
+        "english": 0.4357,
+        "australian": 0.4377,
+        "irish": 0.1183,
+        "scottish": 0.1132,
+        "chinese": 0.0086,
+        "italian": 0.0398,
+        "german": 0.044,
+        "indian": 0.012,
+        "filipino": 0.0063,
+        "dutch": 0.0383,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0022
     },
     {
       "div": "Melbourne",
@@ -3881,7 +5317,25 @@
         "rent": 0.6233,
         "own": 0.171,
         "rentPub": 0.0821
-      }
+      },
+      "pt": 0.2931,
+      "noncit": 0.3887,
+      "bigfam": 0.0803,
+      "anc": {
+        "english": 0.262,
+        "australian": 0.1947,
+        "irish": 0.1239,
+        "scottish": 0.087,
+        "chinese": 0.1972,
+        "italian": 0.0581,
+        "german": 0.034,
+        "indian": 0.0371,
+        "filipino": 0.0082,
+        "dutch": 0.0129,
+        "vietnamese": 0.0315,
+        "lebanese": 0.0035
+      },
+      "hl": 0.0118
     },
     {
       "div": "Melbourne Ports",
@@ -3929,7 +5383,25 @@
         "rent": 0.522,
         "own": 0.2318,
         "rentPub": 0.029
-      }
+      },
+      "pt": 0.2508,
+      "noncit": 0.2817,
+      "bigfam": 0.1166,
+      "anc": {
+        "english": 0.3072,
+        "australian": 0.2395,
+        "irish": 0.1312,
+        "scottish": 0.0946,
+        "chinese": 0.079,
+        "italian": 0.0487,
+        "german": 0.0443,
+        "indian": 0.0321,
+        "filipino": 0.0073,
+        "dutch": 0.0151,
+        "vietnamese": 0.0064,
+        "lebanese": 0.0022
+      },
+      "hl": 0.0082
     },
     {
       "div": "Menzies",
@@ -3977,7 +5449,25 @@
         "rent": 0.1854,
         "own": 0.4645,
         "rentPub": 0.0049
-      }
+      },
+      "pt": 0.1108,
+      "noncit": 0.1732,
+      "bigfam": 0.2414,
+      "anc": {
+        "english": 0.2341,
+        "australian": 0.2089,
+        "irish": 0.0752,
+        "scottish": 0.0656,
+        "chinese": 0.2216,
+        "italian": 0.1061,
+        "german": 0.0275,
+        "indian": 0.0249,
+        "filipino": 0.0053,
+        "dutch": 0.0126,
+        "vietnamese": 0.0077,
+        "lebanese": 0.0086
+      },
+      "hl": 0.0019
     },
     {
       "div": "Murray",
@@ -4025,7 +5515,25 @@
         "rent": 0.2679,
         "own": 0.3897,
         "rentPub": 0.0348
-      }
+      },
+      "pt": 0.0017,
+      "noncit": 0.1341,
+      "bigfam": 0.3906,
+      "anc": {
+        "english": 0.4173,
+        "australian": 0.4326,
+        "irish": 0.1301,
+        "scottish": 0.1107,
+        "chinese": 0.008,
+        "italian": 0.062,
+        "german": 0.0375,
+        "indian": 0.0124,
+        "filipino": 0.0069,
+        "dutch": 0.016,
+        "vietnamese": 0.0004,
+        "lebanese": 0.0004
+      },
+      "hl": 0.0043
     },
     {
       "div": "Scullin",
@@ -4073,7 +5581,25 @@
         "rent": 0.239,
         "own": 0.3853,
         "rentPub": 0.0121
-      }
+      },
+      "pt": 0.1035,
+      "noncit": 0.1839,
+      "bigfam": 0.2536,
+      "anc": {
+        "english": 0.178,
+        "australian": 0.1915,
+        "irish": 0.0578,
+        "scottish": 0.0423,
+        "chinese": 0.0593,
+        "italian": 0.1504,
+        "german": 0.0177,
+        "indian": 0.0539,
+        "filipino": 0.0158,
+        "dutch": 0.0053,
+        "vietnamese": 0.0321,
+        "lebanese": 0.0301
+      },
+      "hl": 0.0042
     },
     {
       "div": "Wannon",
@@ -4121,7 +5647,25 @@
         "rent": 0.2491,
         "own": 0.4258,
         "rentPub": 0.0295
-      }
+      },
+      "pt": 0.0019,
+      "noncit": 0.1162,
+      "bigfam": 0.3825,
+      "anc": {
+        "english": 0.4375,
+        "australian": 0.4605,
+        "irish": 0.1629,
+        "scottish": 0.1347,
+        "chinese": 0.0071,
+        "italian": 0.0136,
+        "german": 0.0512,
+        "indian": 0.0034,
+        "filipino": 0.0046,
+        "dutch": 0.0191,
+        "vietnamese": 0.0006,
+        "lebanese": 0.0004
+      },
+      "hl": 0.0028
     },
     {
       "div": "Wills",
@@ -4169,7 +5713,25 @@
         "rent": 0.3676,
         "own": 0.3238,
         "rentPub": 0.0206
-      }
+      },
+      "pt": 0.2297,
+      "noncit": 0.2058,
+      "bigfam": 0.191,
+      "anc": {
+        "english": 0.2343,
+        "australian": 0.2178,
+        "irish": 0.1095,
+        "scottish": 0.0713,
+        "chinese": 0.039,
+        "italian": 0.1683,
+        "german": 0.028,
+        "indian": 0.0362,
+        "filipino": 0.01,
+        "dutch": 0.0104,
+        "vietnamese": 0.0108,
+        "lebanese": 0.0453
+      },
+      "hl": 0.0045
     },
     {
       "div": "Blair",
@@ -4217,7 +5779,25 @@
         "rent": 0.3815,
         "own": 0.2623,
         "rentPub": 0.0293
-      }
+      },
+      "pt": 0.0454,
+      "noncit": 0.1458,
+      "bigfam": 0.3229,
+      "anc": {
+        "english": 0.4285,
+        "australian": 0.4378,
+        "irish": 0.1202,
+        "scottish": 0.1127,
+        "chinese": 0.0111,
+        "italian": 0.0148,
+        "german": 0.1018,
+        "indian": 0.0105,
+        "filipino": 0.011,
+        "dutch": 0.0168,
+        "vietnamese": 0.003,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0038
     },
     {
       "div": "Bonner",
@@ -4265,7 +5845,25 @@
         "rent": 0.2894,
         "own": 0.3213,
         "rentPub": 0.0349
-      }
+      },
+      "pt": 0.1139,
+      "noncit": 0.1713,
+      "bigfam": 0.2418,
+      "anc": {
+        "english": 0.3827,
+        "australian": 0.3285,
+        "irish": 0.1353,
+        "scottish": 0.1093,
+        "chinese": 0.0627,
+        "italian": 0.0322,
+        "german": 0.0569,
+        "indian": 0.0296,
+        "filipino": 0.014,
+        "dutch": 0.0151,
+        "vietnamese": 0.0068,
+        "lebanese": 0.0029
+      },
+      "hl": 0.0024
     },
     {
       "div": "Bowman",
@@ -4313,7 +5911,25 @@
         "rent": 0.2515,
         "own": 0.327,
         "rentPub": 0.027
-      }
+      },
+      "pt": 0.052,
+      "noncit": 0.1327,
+      "bigfam": 0.2933,
+      "anc": {
+        "english": 0.4775,
+        "australian": 0.3761,
+        "irish": 0.133,
+        "scottish": 0.1278,
+        "chinese": 0.0127,
+        "italian": 0.0249,
+        "german": 0.0664,
+        "indian": 0.008,
+        "filipino": 0.0073,
+        "dutch": 0.0213,
+        "vietnamese": 0.0013,
+        "lebanese": 0.0013
+      },
+      "hl": 0.0017
     },
     {
       "div": "Brisbane",
@@ -4361,7 +5977,25 @@
         "rent": 0.5202,
         "own": 0.2058,
         "rentPub": 0.031
-      }
+      },
+      "pt": 0.1749,
+      "noncit": 0.2493,
+      "bigfam": 0.1381,
+      "anc": {
+        "english": 0.3815,
+        "australian": 0.2984,
+        "irish": 0.181,
+        "scottish": 0.1264,
+        "chinese": 0.056,
+        "italian": 0.0481,
+        "german": 0.0578,
+        "indian": 0.0275,
+        "filipino": 0.0101,
+        "dutch": 0.0158,
+        "vietnamese": 0.0038,
+        "lebanese": 0.0023
+      },
+      "hl": 0.0137
     },
     {
       "div": "Capricornia",
@@ -4409,7 +6043,25 @@
         "rent": 0.3452,
         "own": 0.3052,
         "rentPub": 0.028
-      }
+      },
+      "pt": 0.0212,
+      "noncit": 0.1384,
+      "bigfam": 0.3365,
+      "anc": {
+        "english": 0.4198,
+        "australian": 0.4874,
+        "irish": 0.1285,
+        "scottish": 0.1112,
+        "chinese": 0.01,
+        "italian": 0.0206,
+        "german": 0.073,
+        "indian": 0.0063,
+        "filipino": 0.0124,
+        "dutch": 0.0115,
+        "vietnamese": 0.0032,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0038
     },
     {
       "div": "Dawson",
@@ -4457,7 +6109,25 @@
         "rent": 0.348,
         "own": 0.2983,
         "rentPub": 0.033
-      }
+      },
+      "pt": 0.0192,
+      "noncit": 0.1523,
+      "bigfam": 0.3174,
+      "anc": {
+        "english": 0.4147,
+        "australian": 0.4378,
+        "irish": 0.1285,
+        "scottish": 0.1175,
+        "chinese": 0.0124,
+        "italian": 0.0536,
+        "german": 0.0663,
+        "indian": 0.0092,
+        "filipino": 0.0154,
+        "dutch": 0.0143,
+        "vietnamese": 0.0016,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0043
     },
     {
       "div": "Dickson",
@@ -4505,7 +6175,25 @@
         "rent": 0.2369,
         "own": 0.2872,
         "rentPub": 0.0181
-      }
+      },
+      "pt": 0.0884,
+      "noncit": 0.1168,
+      "bigfam": 0.2693,
+      "anc": {
+        "english": 0.4517,
+        "australian": 0.4103,
+        "irish": 0.1426,
+        "scottish": 0.1253,
+        "chinese": 0.0133,
+        "italian": 0.0282,
+        "german": 0.0683,
+        "indian": 0.0132,
+        "filipino": 0.0105,
+        "dutch": 0.019,
+        "vietnamese": 0.001,
+        "lebanese": 0.0009
+      },
+      "hl": 0.0017
     },
     {
       "div": "Fadden",
@@ -4553,7 +6241,25 @@
         "rent": 0.3886,
         "own": 0.2633,
         "rentPub": 0.0196
-      }
+      },
+      "pt": 0.0266,
+      "noncit": 0.2264,
+      "bigfam": 0.2466,
+      "anc": {
+        "english": 0.4424,
+        "australian": 0.3304,
+        "irish": 0.1141,
+        "scottish": 0.1091,
+        "chinese": 0.0339,
+        "italian": 0.0261,
+        "german": 0.0536,
+        "indian": 0.0117,
+        "filipino": 0.0123,
+        "dutch": 0.0173,
+        "vietnamese": 0.0024,
+        "lebanese": 0.002
+      },
+      "hl": 0.0023
     },
     {
       "div": "Fairfax",
@@ -4601,7 +6307,25 @@
         "rent": 0.3023,
         "own": 0.3255,
         "rentPub": 0.0206
-      }
+      },
+      "pt": 0.0148,
+      "noncit": 0.141,
+      "bigfam": 0.286,
+      "anc": {
+        "english": 0.4827,
+        "australian": 0.3896,
+        "irish": 0.1414,
+        "scottish": 0.1323,
+        "chinese": 0.0088,
+        "italian": 0.0236,
+        "german": 0.0731,
+        "indian": 0.0064,
+        "filipino": 0.0055,
+        "dutch": 0.0212,
+        "vietnamese": 0.0005,
+        "lebanese": 0.0008
+      },
+      "hl": 0.0029
     },
     {
       "div": "Fisher",
@@ -4649,7 +6373,25 @@
         "rent": 0.3036,
         "own": 0.3601,
         "rentPub": 0.0221
-      }
+      },
+      "pt": 0.0199,
+      "noncit": 0.1387,
+      "bigfam": 0.3014,
+      "anc": {
+        "english": 0.4768,
+        "australian": 0.4036,
+        "irish": 0.1365,
+        "scottish": 0.1277,
+        "chinese": 0.0086,
+        "italian": 0.0238,
+        "german": 0.0699,
+        "indian": 0.0062,
+        "filipino": 0.0053,
+        "dutch": 0.0195,
+        "vietnamese": 0.0007,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0024
     },
     {
       "div": "Flynn",
@@ -4697,7 +6439,25 @@
         "rent": 0.3495,
         "own": 0.3016,
         "rentPub": 0.0292
-      }
+      },
+      "pt": 0.0357,
+      "noncit": 0.148,
+      "bigfam": 0.352,
+      "anc": {
+        "english": 0.414,
+        "australian": 0.4915,
+        "irish": 0.1138,
+        "scottish": 0.1066,
+        "chinese": 0.0089,
+        "italian": 0.0175,
+        "german": 0.0814,
+        "indian": 0.0071,
+        "filipino": 0.0123,
+        "dutch": 0.0142,
+        "vietnamese": 0.0012,
+        "lebanese": 0.0004
+      },
+      "hl": 0.005
     },
     {
       "div": "Forde",
@@ -4745,7 +6505,25 @@
         "rent": 0.3538,
         "own": 0.235,
         "rentPub": 0.0306
-      }
+      },
+      "pt": 0.0426,
+      "noncit": 0.1968,
+      "bigfam": 0.3018,
+      "anc": {
+        "english": 0.4346,
+        "australian": 0.3677,
+        "irish": 0.1084,
+        "scottish": 0.104,
+        "chinese": 0.0196,
+        "italian": 0.0206,
+        "german": 0.0607,
+        "indian": 0.0132,
+        "filipino": 0.0125,
+        "dutch": 0.0196,
+        "vietnamese": 0.0035,
+        "lebanese": 0.0023
+      },
+      "hl": 0.0021
     },
     {
       "div": "Griffith",
@@ -4793,7 +6571,25 @@
         "rent": 0.4769,
         "own": 0.2142,
         "rentPub": 0.0479
-      }
+      },
+      "pt": 0.1772,
+      "noncit": 0.2097,
+      "bigfam": 0.1598,
+      "anc": {
+        "english": 0.3783,
+        "australian": 0.3052,
+        "irish": 0.1708,
+        "scottish": 0.1206,
+        "chinese": 0.0461,
+        "italian": 0.0412,
+        "german": 0.06,
+        "indian": 0.0292,
+        "filipino": 0.01,
+        "dutch": 0.0167,
+        "vietnamese": 0.0098,
+        "lebanese": 0.0037
+      },
+      "hl": 0.0062
     },
     {
       "div": "Groom",
@@ -4841,7 +6637,25 @@
         "rent": 0.3316,
         "own": 0.3214,
         "rentPub": 0.0233
-      }
+      },
+      "pt": 0.0028,
+      "noncit": 0.1238,
+      "bigfam": 0.341,
+      "anc": {
+        "english": 0.4172,
+        "australian": 0.4359,
+        "irish": 0.1486,
+        "scottish": 0.1166,
+        "chinese": 0.012,
+        "italian": 0.0154,
+        "german": 0.1208,
+        "indian": 0.0104,
+        "filipino": 0.0087,
+        "dutch": 0.0132,
+        "vietnamese": 0.001,
+        "lebanese": 0.0017
+      },
+      "hl": 0.0031
     },
     {
       "div": "Herbert",
@@ -4889,7 +6703,25 @@
         "rent": 0.4194,
         "own": 0.2219,
         "rentPub": 0.0515
-      }
+      },
+      "pt": 0.0135,
+      "noncit": 0.1385,
+      "bigfam": 0.2788,
+      "anc": {
+        "english": 0.4139,
+        "australian": 0.4309,
+        "irish": 0.1417,
+        "scottish": 0.1128,
+        "chinese": 0.0142,
+        "italian": 0.0486,
+        "german": 0.0614,
+        "indian": 0.0103,
+        "filipino": 0.0136,
+        "dutch": 0.0142,
+        "vietnamese": 0.0017,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0081
     },
     {
       "div": "Hinkler",
@@ -4937,7 +6769,25 @@
         "rent": 0.3165,
         "own": 0.3976,
         "rentPub": 0.0293
-      }
+      },
+      "pt": 0.0068,
+      "noncit": 0.1224,
+      "bigfam": 0.3514,
+      "anc": {
+        "english": 0.4677,
+        "australian": 0.4315,
+        "irish": 0.1188,
+        "scottish": 0.1169,
+        "chinese": 0.0089,
+        "italian": 0.0236,
+        "german": 0.0898,
+        "indian": 0.0053,
+        "filipino": 0.0079,
+        "dutch": 0.0163,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0003
+      },
+      "hl": 0.004
     },
     {
       "div": "Kennedy",
@@ -4985,7 +6835,25 @@
         "rent": 0.3397,
         "own": 0.3611,
         "rentPub": 0.0537
-      }
+      },
+      "pt": 0.0161,
+      "noncit": 0.1443,
+      "bigfam": 0.3632,
+      "anc": {
+        "english": 0.3629,
+        "australian": 0.4464,
+        "irish": 0.1217,
+        "scottish": 0.0962,
+        "chinese": 0.011,
+        "italian": 0.0914,
+        "german": 0.0568,
+        "indian": 0.0085,
+        "filipino": 0.0117,
+        "dutch": 0.0118,
+        "vietnamese": 0.0003,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0118
     },
     {
       "div": "Leichhardt",
@@ -5033,7 +6901,25 @@
         "rent": 0.447,
         "own": 0.2347,
         "rentPub": 0.0819
-      }
+      },
+      "pt": 0.018,
+      "noncit": 0.188,
+      "bigfam": 0.2567,
+      "anc": {
+        "english": 0.356,
+        "australian": 0.3529,
+        "irish": 0.1164,
+        "scottish": 0.097,
+        "chinese": 0.0213,
+        "italian": 0.0429,
+        "german": 0.0547,
+        "indian": 0.0106,
+        "filipino": 0.0159,
+        "dutch": 0.0162,
+        "vietnamese": 0.0023,
+        "lebanese": 0.0004
+      },
+      "hl": 0.0137
     },
     {
       "div": "Lilley",
@@ -5081,7 +6967,25 @@
         "rent": 0.3685,
         "own": 0.2825,
         "rentPub": 0.0466
-      }
+      },
+      "pt": 0.1469,
+      "noncit": 0.1631,
+      "bigfam": 0.2252,
+      "anc": {
+        "english": 0.3937,
+        "australian": 0.3471,
+        "irish": 0.1603,
+        "scottish": 0.1172,
+        "chinese": 0.0312,
+        "italian": 0.0475,
+        "german": 0.0636,
+        "indian": 0.0386,
+        "filipino": 0.0208,
+        "dutch": 0.0139,
+        "vietnamese": 0.0033,
+        "lebanese": 0.0014
+      },
+      "hl": 0.0027
     },
     {
       "div": "Longman",
@@ -5129,7 +7033,25 @@
         "rent": 0.3366,
         "own": 0.2904,
         "rentPub": 0.0237
-      }
+      },
+      "pt": 0.0551,
+      "noncit": 0.1465,
+      "bigfam": 0.327,
+      "anc": {
+        "english": 0.4665,
+        "australian": 0.4337,
+        "irish": 0.1232,
+        "scottish": 0.1129,
+        "chinese": 0.0114,
+        "italian": 0.0215,
+        "german": 0.07,
+        "indian": 0.0056,
+        "filipino": 0.0098,
+        "dutch": 0.0169,
+        "vietnamese": 0.0015,
+        "lebanese": 0.0004
+      },
+      "hl": 0.0041
     },
     {
       "div": "Maranoa",
@@ -5177,7 +7099,25 @@
         "rent": 0.3267,
         "own": 0.3822,
         "rentPub": 0.0234
-      }
+      },
+      "pt": 0.0039,
+      "noncit": 0.1192,
+      "bigfam": 0.398,
+      "anc": {
+        "english": 0.425,
+        "australian": 0.4938,
+        "irish": 0.1331,
+        "scottish": 0.112,
+        "chinese": 0.006,
+        "italian": 0.0188,
+        "german": 0.0929,
+        "indian": 0.0044,
+        "filipino": 0.01,
+        "dutch": 0.0107,
+        "vietnamese": 0.001,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0035
     },
     {
       "div": "McPherson",
@@ -5225,7 +7165,25 @@
         "rent": 0.3372,
         "own": 0.3044,
         "rentPub": 0.0189
-      }
+      },
+      "pt": 0.0243,
+      "noncit": 0.1791,
+      "bigfam": 0.2356,
+      "anc": {
+        "english": 0.4479,
+        "australian": 0.3562,
+        "irish": 0.1345,
+        "scottish": 0.1158,
+        "chinese": 0.0311,
+        "italian": 0.0299,
+        "german": 0.051,
+        "indian": 0.0093,
+        "filipino": 0.0086,
+        "dutch": 0.0177,
+        "vietnamese": 0.0015,
+        "lebanese": 0.0021
+      },
+      "hl": 0.0028
     },
     {
       "div": "Moncrieff",
@@ -5273,7 +7231,25 @@
         "rent": 0.4292,
         "own": 0.2727,
         "rentPub": 0.0236
-      }
+      },
+      "pt": 0.0511,
+      "noncit": 0.2591,
+      "bigfam": 0.2104,
+      "anc": {
+        "english": 0.4088,
+        "australian": 0.3039,
+        "irish": 0.1236,
+        "scottish": 0.1084,
+        "chinese": 0.0427,
+        "italian": 0.0357,
+        "german": 0.0532,
+        "indian": 0.0165,
+        "filipino": 0.0127,
+        "dutch": 0.0159,
+        "vietnamese": 0.0032,
+        "lebanese": 0.0029
+      },
+      "hl": 0.0049
     },
     {
       "div": "Moreton",
@@ -5321,7 +7297,25 @@
         "rent": 0.3506,
         "own": 0.3077,
         "rentPub": 0.0304
-      }
+      },
+      "pt": 0.1525,
+      "noncit": 0.2587,
+      "bigfam": 0.2067,
+      "anc": {
+        "english": 0.2809,
+        "australian": 0.2429,
+        "irish": 0.109,
+        "scottish": 0.0866,
+        "chinese": 0.1721,
+        "italian": 0.0222,
+        "german": 0.0467,
+        "indian": 0.0536,
+        "filipino": 0.0143,
+        "dutch": 0.012,
+        "vietnamese": 0.0224,
+        "lebanese": 0.0023
+      },
+      "hl": 0.006
     },
     {
       "div": "Oxley",
@@ -5369,7 +7363,25 @@
         "rent": 0.364,
         "own": 0.2297,
         "rentPub": 0.0492
-      }
+      },
+      "pt": 0.0884,
+      "noncit": 0.225,
+      "bigfam": 0.269,
+      "anc": {
+        "english": 0.3288,
+        "australian": 0.2822,
+        "irish": 0.0935,
+        "scottish": 0.0868,
+        "chinese": 0.0428,
+        "italian": 0.0191,
+        "german": 0.0551,
+        "indian": 0.0371,
+        "filipino": 0.0186,
+        "dutch": 0.0168,
+        "vietnamese": 0.0848,
+        "lebanese": 0.0023
+      },
+      "hl": 0.0033
     },
     {
       "div": "Petrie",
@@ -5417,7 +7429,25 @@
         "rent": 0.3709,
         "own": 0.2768,
         "rentPub": 0.0364
-      }
+      },
+      "pt": 0.0783,
+      "noncit": 0.175,
+      "bigfam": 0.2836,
+      "anc": {
+        "english": 0.4322,
+        "australian": 0.3654,
+        "irish": 0.1287,
+        "scottish": 0.113,
+        "chinese": 0.0208,
+        "italian": 0.0268,
+        "german": 0.0624,
+        "indian": 0.027,
+        "filipino": 0.02,
+        "dutch": 0.0171,
+        "vietnamese": 0.0017,
+        "lebanese": 0.001
+      },
+      "hl": 0.0021
     },
     {
       "div": "Rankin",
@@ -5465,7 +7495,25 @@
         "rent": 0.3687,
         "own": 0.2262,
         "rentPub": 0.0422
-      }
+      },
+      "pt": 0.0791,
+      "noncit": 0.2484,
+      "bigfam": 0.2827,
+      "anc": {
+        "english": 0.3173,
+        "australian": 0.2848,
+        "irish": 0.0847,
+        "scottish": 0.0788,
+        "chinese": 0.0922,
+        "italian": 0.0177,
+        "german": 0.0471,
+        "indian": 0.0416,
+        "filipino": 0.0199,
+        "dutch": 0.0127,
+        "vietnamese": 0.0097,
+        "lebanese": 0.0036
+      },
+      "hl": 0.0051
     },
     {
       "div": "Ryan",
@@ -5513,7 +7561,25 @@
         "rent": 0.3151,
         "own": 0.3212,
         "rentPub": 0.0137
-      }
+      },
+      "pt": 0.1408,
+      "noncit": 0.1799,
+      "bigfam": 0.2104,
+      "anc": {
+        "english": 0.4087,
+        "australian": 0.3211,
+        "irish": 0.1607,
+        "scottish": 0.1318,
+        "chinese": 0.0655,
+        "italian": 0.0294,
+        "german": 0.065,
+        "indian": 0.0235,
+        "filipino": 0.007,
+        "dutch": 0.0191,
+        "vietnamese": 0.0052,
+        "lebanese": 0.0017
+      },
+      "hl": 0.0021
     },
     {
       "div": "Wide Bay",
@@ -5561,7 +7627,25 @@
         "rent": 0.2738,
         "own": 0.405,
         "rentPub": 0.0247
-      }
+      },
+      "pt": 0.0101,
+      "noncit": 0.1261,
+      "bigfam": 0.3415,
+      "anc": {
+        "english": 0.4735,
+        "australian": 0.4263,
+        "irish": 0.129,
+        "scottish": 0.1226,
+        "chinese": 0.0053,
+        "italian": 0.019,
+        "german": 0.0865,
+        "indian": 0.003,
+        "filipino": 0.006,
+        "dutch": 0.017,
+        "vietnamese": 0.0007,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0048
     },
     {
       "div": "Wright",
@@ -5609,7 +7693,25 @@
         "rent": 0.2112,
         "own": 0.3078,
         "rentPub": 0.0063
-      }
+      },
+      "pt": 0.0144,
+      "noncit": 0.1436,
+      "bigfam": 0.3164,
+      "anc": {
+        "english": 0.4462,
+        "australian": 0.4283,
+        "irish": 0.1203,
+        "scottish": 0.1132,
+        "chinese": 0.0118,
+        "italian": 0.0187,
+        "german": 0.0953,
+        "indian": 0.0049,
+        "filipino": 0.0048,
+        "dutch": 0.0198,
+        "vietnamese": 0.0022,
+        "lebanese": 0.0009
+      },
+      "hl": 0.0025
     },
     {
       "div": "Adelaide",
@@ -5657,7 +7759,25 @@
         "rent": 0.4147,
         "own": 0.2849,
         "rentPub": 0.0633
-      }
+      },
+      "pt": 0.1049,
+      "noncit": 0.2281,
+      "bigfam": 0.1794,
+      "anc": {
+        "english": 0.3222,
+        "australian": 0.2607,
+        "irish": 0.0893,
+        "scottish": 0.0817,
+        "chinese": 0.0886,
+        "italian": 0.0744,
+        "german": 0.0664,
+        "indian": 0.0457,
+        "filipino": 0.0092,
+        "dutch": 0.0122,
+        "vietnamese": 0.0248,
+        "lebanese": 0.0041
+      },
+      "hl": 0.0081
     },
     {
       "div": "Barker",
@@ -5705,7 +7825,25 @@
         "rent": 0.2785,
         "own": 0.3695,
         "rentPub": 0.0439
-      }
+      },
+      "pt": 0.0021,
+      "noncit": 0.1135,
+      "bigfam": 0.3573,
+      "anc": {
+        "english": 0.4272,
+        "australian": 0.4455,
+        "irish": 0.0793,
+        "scottish": 0.096,
+        "chinese": 0.0081,
+        "italian": 0.0252,
+        "german": 0.1434,
+        "indian": 0.0054,
+        "filipino": 0.008,
+        "dutch": 0.019,
+        "vietnamese": 0.0021,
+        "lebanese": 0.0007
+      },
+      "hl": 0.0039
     },
     {
       "div": "Boothby",
@@ -5753,7 +7891,25 @@
         "rent": 0.2457,
         "own": 0.363,
         "rentPub": 0.0386
-      }
+      },
+      "pt": 0.0877,
+      "noncit": 0.1414,
+      "bigfam": 0.228,
+      "anc": {
+        "english": 0.4255,
+        "australian": 0.3415,
+        "irish": 0.1035,
+        "scottish": 0.1019,
+        "chinese": 0.0429,
+        "italian": 0.0397,
+        "german": 0.0794,
+        "indian": 0.0208,
+        "filipino": 0.0075,
+        "dutch": 0.0182,
+        "vietnamese": 0.0044,
+        "lebanese": 0.0049
+      },
+      "hl": 0.0028
     },
     {
       "div": "Grey",
@@ -5801,7 +7957,25 @@
         "rent": 0.3172,
         "own": 0.3815,
         "rentPub": 0.0846
-      }
+      },
+      "pt": 0.0123,
+      "noncit": 0.1125,
+      "bigfam": 0.3692,
+      "anc": {
+        "english": 0.4328,
+        "australian": 0.4778,
+        "irish": 0.0873,
+        "scottish": 0.0925,
+        "chinese": 0.0033,
+        "italian": 0.0219,
+        "german": 0.0948,
+        "indian": 0.0042,
+        "filipino": 0.0069,
+        "dutch": 0.0144,
+        "vietnamese": 0.0005,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0058
     },
     {
       "div": "Hindmarsh",
@@ -5849,7 +8023,25 @@
         "rent": 0.3344,
         "own": 0.349,
         "rentPub": 0.0545
-      }
+      },
+      "pt": 0.0955,
+      "noncit": 0.1607,
+      "bigfam": 0.2109,
+      "anc": {
+        "english": 0.3507,
+        "australian": 0.2954,
+        "irish": 0.094,
+        "scottish": 0.085,
+        "chinese": 0.0448,
+        "italian": 0.096,
+        "german": 0.0689,
+        "indian": 0.0318,
+        "filipino": 0.0104,
+        "dutch": 0.0125,
+        "vietnamese": 0.0057,
+        "lebanese": 0.0037
+      },
+      "hl": 0.0028
     },
     {
       "div": "Kingston",
@@ -5897,7 +8089,25 @@
         "rent": 0.2553,
         "own": 0.2901,
         "rentPub": 0.0447
-      }
+      },
+      "pt": 0.0555,
+      "noncit": 0.1224,
+      "bigfam": 0.2586,
+      "anc": {
+        "english": 0.5042,
+        "australian": 0.3937,
+        "irish": 0.092,
+        "scottish": 0.1027,
+        "chinese": 0.0105,
+        "italian": 0.0278,
+        "german": 0.0738,
+        "indian": 0.0088,
+        "filipino": 0.0092,
+        "dutch": 0.0227,
+        "vietnamese": 0.0012,
+        "lebanese": 0.003
+      },
+      "hl": 0.0029
     },
     {
       "div": "Makin",
@@ -5945,7 +8155,25 @@
         "rent": 0.2049,
         "own": 0.3371,
         "rentPub": 0.0395
-      }
+      },
+      "pt": 0.0881,
+      "noncit": 0.1271,
+      "bigfam": 0.256,
+      "anc": {
+        "english": 0.4308,
+        "australian": 0.3446,
+        "irish": 0.0797,
+        "scottish": 0.0855,
+        "chinese": 0.0217,
+        "italian": 0.0605,
+        "german": 0.0796,
+        "indian": 0.0234,
+        "filipino": 0.0118,
+        "dutch": 0.019,
+        "vietnamese": 0.012,
+        "lebanese": 0.0048
+      },
+      "hl": 0.0024
     },
     {
       "div": "Mayo",
@@ -5993,7 +8221,25 @@
         "rent": 0.1851,
         "own": 0.3821,
         "rentPub": 0.0141
-      }
+      },
+      "pt": 0.0342,
+      "noncit": 0.0975,
+      "bigfam": 0.2867,
+      "anc": {
+        "english": 0.4987,
+        "australian": 0.4154,
+        "irish": 0.0916,
+        "scottish": 0.1066,
+        "chinese": 0.0064,
+        "italian": 0.0295,
+        "german": 0.1056,
+        "indian": 0.0034,
+        "filipino": 0.0043,
+        "dutch": 0.0232,
+        "vietnamese": 0.0008,
+        "lebanese": 0.0011
+      },
+      "hl": 0.0012
     },
     {
       "div": "Port Adelaide",
@@ -6041,7 +8287,25 @@
         "rent": 0.3408,
         "own": 0.2719,
         "rentPub": 0.0855
-      }
+      },
+      "pt": 0.0716,
+      "noncit": 0.1577,
+      "bigfam": 0.246,
+      "anc": {
+        "english": 0.31,
+        "australian": 0.2862,
+        "irish": 0.0704,
+        "scottish": 0.0684,
+        "chinese": 0.0392,
+        "italian": 0.0817,
+        "german": 0.056,
+        "indian": 0.0346,
+        "filipino": 0.0196,
+        "dutch": 0.0114,
+        "vietnamese": 0.0627,
+        "lebanese": 0.003
+      },
+      "hl": 0.0047
     },
     {
       "div": "Sturt",
@@ -6089,7 +8353,25 @@
         "rent": 0.2737,
         "own": 0.3768,
         "rentPub": 0.0386
-      }
+      },
+      "pt": 0.1018,
+      "noncit": 0.175,
+      "bigfam": 0.2263,
+      "anc": {
+        "english": 0.3026,
+        "australian": 0.2522,
+        "irish": 0.0736,
+        "scottish": 0.0725,
+        "chinese": 0.0882,
+        "italian": 0.17,
+        "german": 0.0625,
+        "indian": 0.0418,
+        "filipino": 0.0086,
+        "dutch": 0.0132,
+        "vietnamese": 0.0074,
+        "lebanese": 0.0057
+      },
+      "hl": 0.0017
     },
     {
       "div": "Wakefield",
@@ -6137,7 +8419,25 @@
         "rent": 0.3347,
         "own": 0.2509,
         "rentPub": 0.071
-      }
+      },
+      "pt": 0.0375,
+      "noncit": 0.1341,
+      "bigfam": 0.3176,
+      "anc": {
+        "english": 0.4598,
+        "australian": 0.4034,
+        "irish": 0.0793,
+        "scottish": 0.0886,
+        "chinese": 0.0062,
+        "italian": 0.0405,
+        "german": 0.0812,
+        "indian": 0.006,
+        "filipino": 0.0098,
+        "dutch": 0.0172,
+        "vietnamese": 0.0089,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0037
     },
     {
       "div": "Brand",
@@ -6185,7 +8485,25 @@
         "rent": 0.2632,
         "own": 0.2262,
         "rentPub": 0.0232
-      }
+      },
+      "pt": 0.0821,
+      "noncit": 0.2178,
+      "bigfam": 0.2904,
+      "anc": {
+        "english": 0.4926,
+        "australian": 0.3595,
+        "irish": 0.0958,
+        "scottish": 0.1047,
+        "chinese": 0.0125,
+        "italian": 0.0321,
+        "german": 0.0331,
+        "indian": 0.0172,
+        "filipino": 0.0213,
+        "dutch": 0.0225,
+        "vietnamese": 0.0021,
+        "lebanese": 0.0006
+      },
+      "hl": 0.0014
     },
     {
       "div": "Canning",
@@ -6233,7 +8551,25 @@
         "rent": 0.2382,
         "own": 0.2896,
         "rentPub": 0.0211
-      }
+      },
+      "pt": 0.0565,
+      "noncit": 0.1869,
+      "bigfam": 0.3073,
+      "anc": {
+        "english": 0.4722,
+        "australian": 0.3736,
+        "irish": 0.092,
+        "scottish": 0.0977,
+        "chinese": 0.0191,
+        "italian": 0.0375,
+        "german": 0.0318,
+        "indian": 0.0297,
+        "filipino": 0.0134,
+        "dutch": 0.0322,
+        "vietnamese": 0.0012,
+        "lebanese": 0.0007
+      },
+      "hl": 0.0028
     },
     {
       "div": "Cowan",
@@ -6281,7 +8617,25 @@
         "rent": 0.1865,
         "own": 0.2885,
         "rentPub": 0.0204
-      }
+      },
+      "pt": 0.0679,
+      "noncit": 0.1685,
+      "bigfam": 0.2637,
+      "anc": {
+        "english": 0.3769,
+        "australian": 0.2944,
+        "irish": 0.0871,
+        "scottish": 0.085,
+        "chinese": 0.0333,
+        "italian": 0.0592,
+        "german": 0.0256,
+        "indian": 0.0351,
+        "filipino": 0.0131,
+        "dutch": 0.0183,
+        "vietnamese": 0.0427,
+        "lebanese": 0.0016
+      },
+      "hl": 0.0021
     },
     {
       "div": "Curtin",
@@ -6329,7 +8683,25 @@
         "rent": 0.3319,
         "own": 0.3486,
         "rentPub": 0.0237
-      }
+      },
+      "pt": 0.1107,
+      "noncit": 0.2106,
+      "bigfam": 0.2171,
+      "anc": {
+        "english": 0.4034,
+        "australian": 0.3115,
+        "irish": 0.1302,
+        "scottish": 0.1106,
+        "chinese": 0.0688,
+        "italian": 0.0572,
+        "german": 0.0364,
+        "indian": 0.0286,
+        "filipino": 0.0048,
+        "dutch": 0.0194,
+        "vietnamese": 0.0055,
+        "lebanese": 0.001
+      },
+      "hl": 0.0026
     },
     {
       "div": "Durack",
@@ -6377,7 +8749,25 @@
         "rent": 0.5227,
         "own": 0.2422,
         "rentPub": 0.1174
-      }
+      },
+      "pt": 0.0928,
+      "noncit": 0.2068,
+      "bigfam": 0.3235,
+      "anc": {
+        "english": 0.3764,
+        "australian": 0.4511,
+        "irish": 0.0916,
+        "scottish": 0.0877,
+        "chinese": 0.0115,
+        "italian": 0.0295,
+        "german": 0.035,
+        "indian": 0.0096,
+        "filipino": 0.0189,
+        "dutch": 0.0162,
+        "vietnamese": 0.0031,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0136
     },
     {
       "div": "Forrest",
@@ -6425,7 +8815,25 @@
         "rent": 0.2753,
         "own": 0.3213,
         "rentPub": 0.0343
-      }
+      },
+      "pt": 0.02,
+      "noncit": 0.1547,
+      "bigfam": 0.33,
+      "anc": {
+        "english": 0.4836,
+        "australian": 0.4336,
+        "irish": 0.1063,
+        "scottish": 0.1045,
+        "chinese": 0.008,
+        "italian": 0.0564,
+        "german": 0.0366,
+        "indian": 0.0068,
+        "filipino": 0.0109,
+        "dutch": 0.0225,
+        "vietnamese": 0.0012,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0026
     },
     {
       "div": "Fremantle",
@@ -6473,7 +8881,25 @@
         "rent": 0.2773,
         "own": 0.2919,
         "rentPub": 0.0481
-      }
+      },
+      "pt": 0.0775,
+      "noncit": 0.1935,
+      "bigfam": 0.2292,
+      "anc": {
+        "english": 0.3887,
+        "australian": 0.3135,
+        "irish": 0.1078,
+        "scottish": 0.0997,
+        "chinese": 0.0436,
+        "italian": 0.095,
+        "german": 0.0319,
+        "indian": 0.0226,
+        "filipino": 0.0194,
+        "dutch": 0.0201,
+        "vietnamese": 0.0024,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0042
     },
     {
       "div": "Hasluck",
@@ -6521,7 +8947,25 @@
         "rent": 0.2288,
         "own": 0.293,
         "rentPub": 0.0281
-      }
+      },
+      "pt": 0.0645,
+      "noncit": 0.2085,
+      "bigfam": 0.2822,
+      "anc": {
+        "english": 0.4003,
+        "australian": 0.3227,
+        "irish": 0.0876,
+        "scottish": 0.087,
+        "chinese": 0.0441,
+        "italian": 0.0469,
+        "german": 0.0303,
+        "indian": 0.0441,
+        "filipino": 0.0266,
+        "dutch": 0.0226,
+        "vietnamese": 0.0042,
+        "lebanese": 0.0016
+      },
+      "hl": 0.003
     },
     {
       "div": "Moore",
@@ -6569,7 +9013,25 @@
         "rent": 0.1978,
         "own": 0.2991,
         "rentPub": 0.0093
-      }
+      },
+      "pt": 0.0836,
+      "noncit": 0.1843,
+      "bigfam": 0.2424,
+      "anc": {
+        "english": 0.4807,
+        "australian": 0.292,
+        "irish": 0.1176,
+        "scottish": 0.1082,
+        "chinese": 0.023,
+        "italian": 0.0413,
+        "german": 0.0339,
+        "indian": 0.0207,
+        "filipino": 0.0092,
+        "dutch": 0.0222,
+        "vietnamese": 0.0037,
+        "lebanese": 0.001
+      },
+      "hl": 0.0011
     },
     {
       "div": "O'Connor",
@@ -6617,7 +9079,25 @@
         "rent": 0.3212,
         "own": 0.3524,
         "rentPub": 0.0535
-      }
+      },
+      "pt": 0.023,
+      "noncit": 0.18,
+      "bigfam": 0.3616,
+      "anc": {
+        "english": 0.457,
+        "australian": 0.4459,
+        "irish": 0.0943,
+        "scottish": 0.1017,
+        "chinese": 0.0069,
+        "italian": 0.0354,
+        "german": 0.04,
+        "indian": 0.007,
+        "filipino": 0.0141,
+        "dutch": 0.0219,
+        "vietnamese": 0.0007,
+        "lebanese": 0.0001
+      },
+      "hl": 0.0051
     },
     {
       "div": "Pearce",
@@ -6665,7 +9145,25 @@
         "rent": 0.1994,
         "own": 0.2562,
         "rentPub": 0.0196
-      }
+      },
+      "pt": 0.0544,
+      "noncit": 0.2058,
+      "bigfam": 0.2864,
+      "anc": {
+        "english": 0.4655,
+        "australian": 0.3646,
+        "irish": 0.0961,
+        "scottish": 0.101,
+        "chinese": 0.0128,
+        "italian": 0.0435,
+        "german": 0.034,
+        "indian": 0.0229,
+        "filipino": 0.0122,
+        "dutch": 0.0218,
+        "vietnamese": 0.0059,
+        "lebanese": 0.0009
+      },
+      "hl": 0.0018
     },
     {
       "div": "Perth",
@@ -6713,7 +9211,25 @@
         "rent": 0.37,
         "own": 0.2786,
         "rentPub": 0.0373
-      }
+      },
+      "pt": 0.1326,
+      "noncit": 0.2532,
+      "bigfam": 0.1902,
+      "anc": {
+        "english": 0.3291,
+        "australian": 0.2575,
+        "irish": 0.102,
+        "scottish": 0.0824,
+        "chinese": 0.0749,
+        "italian": 0.086,
+        "german": 0.0304,
+        "indian": 0.041,
+        "filipino": 0.0161,
+        "dutch": 0.0176,
+        "vietnamese": 0.0301,
+        "lebanese": 0.0011
+      },
+      "hl": 0.0062
     },
     {
       "div": "Stirling",
@@ -6761,7 +9277,25 @@
         "rent": 0.3357,
         "own": 0.2975,
         "rentPub": 0.048
-      }
+      },
+      "pt": 0.0787,
+      "noncit": 0.2256,
+      "bigfam": 0.2167,
+      "anc": {
+        "english": 0.3117,
+        "australian": 0.2528,
+        "irish": 0.0963,
+        "scottish": 0.0734,
+        "chinese": 0.0515,
+        "italian": 0.1034,
+        "german": 0.0263,
+        "indian": 0.0426,
+        "filipino": 0.0115,
+        "dutch": 0.0151,
+        "vietnamese": 0.0273,
+        "lebanese": 0.0013
+      },
+      "hl": 0.0026
     },
     {
       "div": "Swan",
@@ -6809,7 +9343,25 @@
         "rent": 0.4137,
         "own": 0.2573,
         "rentPub": 0.0538
-      }
+      },
+      "pt": 0.1185,
+      "noncit": 0.3155,
+      "bigfam": 0.197,
+      "anc": {
+        "english": 0.3115,
+        "australian": 0.2494,
+        "irish": 0.0901,
+        "scottish": 0.077,
+        "chinese": 0.1127,
+        "italian": 0.0484,
+        "german": 0.0267,
+        "indian": 0.0552,
+        "filipino": 0.0237,
+        "dutch": 0.0172,
+        "vietnamese": 0.0089,
+        "lebanese": 0.0024
+      },
+      "hl": 0.0041
     },
     {
       "div": "Tangney",
@@ -6857,7 +9409,25 @@
         "rent": 0.2004,
         "own": 0.4009,
         "rentPub": 0.0068
-      }
+      },
+      "pt": 0.0721,
+      "noncit": 0.2146,
+      "bigfam": 0.2442,
+      "anc": {
+        "english": 0.3331,
+        "australian": 0.2556,
+        "irish": 0.0827,
+        "scottish": 0.082,
+        "chinese": 0.1712,
+        "italian": 0.0475,
+        "german": 0.0255,
+        "indian": 0.0622,
+        "filipino": 0.0079,
+        "dutch": 0.0168,
+        "vietnamese": 0.0051,
+        "lebanese": 0.0022
+      },
+      "hl": 0.0014
     },
     {
       "div": "Bass",
@@ -6905,7 +9475,25 @@
         "rent": 0.3137,
         "own": 0.3456,
         "rentPub": 0.0518
-      }
+      },
+      "pt": 0.0104,
+      "noncit": 0.1187,
+      "bigfam": 0.3062,
+      "anc": {
+        "english": 0.474,
+        "australian": 0.461,
+        "irish": 0.11,
+        "scottish": 0.1017,
+        "chinese": 0.015,
+        "italian": 0.0165,
+        "german": 0.0373,
+        "indian": 0.0058,
+        "filipino": 0.0047,
+        "dutch": 0.0264,
+        "vietnamese": 0.0011,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0029
     },
     {
       "div": "Braddon",
@@ -6953,7 +9541,25 @@
         "rent": 0.2942,
         "own": 0.3764,
         "rentPub": 0.0611
-      }
+      },
+      "pt": 0.0046,
+      "noncit": 0.0904,
+      "bigfam": 0.3559,
+      "anc": {
+        "english": 0.475,
+        "australian": 0.5124,
+        "irish": 0.1101,
+        "scottish": 0.0967,
+        "chinese": 0.0046,
+        "italian": 0.0088,
+        "german": 0.0342,
+        "indian": 0.0034,
+        "filipino": 0.004,
+        "dutch": 0.0205,
+        "vietnamese": 0.0004,
+        "lebanese": 0.0003
+      },
+      "hl": 0.0031
     },
     {
       "div": "Denison",
@@ -7001,7 +9607,25 @@
         "rent": 0.345,
         "own": 0.3284,
         "rentPub": 0.0508
-      }
+      },
+      "pt": 0.0544,
+      "noncit": 0.1451,
+      "bigfam": 0.2435,
+      "anc": {
+        "english": 0.4503,
+        "australian": 0.3948,
+        "irish": 0.1341,
+        "scottish": 0.1061,
+        "chinese": 0.0383,
+        "italian": 0.0236,
+        "german": 0.0432,
+        "indian": 0.0139,
+        "filipino": 0.0054,
+        "dutch": 0.0174,
+        "vietnamese": 0.0023,
+        "lebanese": 0.0012
+      },
+      "hl": 0.0053
     },
     {
       "div": "Franklin",
@@ -7049,7 +9673,25 @@
         "rent": 0.2213,
         "own": 0.3809,
         "rentPub": 0.0367
-      }
+      },
+      "pt": 0.045,
+      "noncit": 0.0946,
+      "bigfam": 0.2932,
+      "anc": {
+        "english": 0.4919,
+        "australian": 0.4515,
+        "irish": 0.1285,
+        "scottish": 0.1054,
+        "chinese": 0.0107,
+        "italian": 0.016,
+        "german": 0.0429,
+        "indian": 0.0036,
+        "filipino": 0.0029,
+        "dutch": 0.0258,
+        "vietnamese": 0.0006,
+        "lebanese": 0.0004
+      },
+      "hl": 0.0029
     },
     {
       "div": "Lyons",
@@ -7097,7 +9739,25 @@
         "rent": 0.2343,
         "own": 0.4012,
         "rentPub": 0.0378
-      }
+      },
+      "pt": 0.0074,
+      "noncit": 0.0982,
+      "bigfam": 0.3364,
+      "anc": {
+        "english": 0.4941,
+        "australian": 0.4988,
+        "irish": 0.1033,
+        "scottish": 0.091,
+        "chinese": 0.0033,
+        "italian": 0.0099,
+        "german": 0.036,
+        "indian": 0.0011,
+        "filipino": 0.0029,
+        "dutch": 0.0172,
+        "vietnamese": 0.0002,
+        "lebanese": 0.0002
+      },
+      "hl": 0.0021
     },
     {
       "div": "Lingiari",
@@ -7145,7 +9805,25 @@
         "rent": 0.5574,
         "own": 0.1631,
         "rentPub": 0.1976
-      }
+      },
+      "pt": 0.0481,
+      "noncit": 0.1803,
+      "bigfam": 0.302,
+      "anc": {
+        "english": 0.2292,
+        "australian": 0.2962,
+        "irish": 0.0744,
+        "scottish": 0.0628,
+        "chinese": 0.0151,
+        "italian": 0.0142,
+        "german": 0.0377,
+        "indian": 0.0128,
+        "filipino": 0.0144,
+        "dutch": 0.0099,
+        "vietnamese": 0.0043,
+        "lebanese": 0.0003
+      },
+      "hl": 0.1076
     },
     {
       "div": "Solomon",
@@ -7193,7 +9871,25 @@
         "rent": 0.5011,
         "own": 0.1589,
         "rentPub": 0.0696
-      }
+      },
+      "pt": 0.0687,
+      "noncit": 0.2488,
+      "bigfam": 0.221,
+      "anc": {
+        "english": 0.3164,
+        "australian": 0.3524,
+        "irish": 0.1096,
+        "scottish": 0.086,
+        "chinese": 0.0511,
+        "italian": 0.0259,
+        "german": 0.0493,
+        "indian": 0.0316,
+        "filipino": 0.0536,
+        "dutch": 0.0143,
+        "vietnamese": 0.0081,
+        "lebanese": 0.0005
+      },
+      "hl": 0.0133
     },
     {
       "div": "Canberra",
@@ -7241,7 +9937,25 @@
         "rent": 0.2842,
         "own": 0.321,
         "rentPub": 0.063
-      }
+      },
+      "pt": 0.0557,
+      "noncit": 0.1271,
+      "bigfam": 0.2442,
+      "anc": {
+        "english": 0.3793,
+        "australian": 0.3629,
+        "irish": 0.1482,
+        "scottish": 0.1161,
+        "chinese": 0.0338,
+        "italian": 0.0357,
+        "german": 0.0494,
+        "indian": 0.0313,
+        "filipino": 0.0124,
+        "dutch": 0.0184,
+        "vietnamese": 0.008,
+        "lebanese": 0.0041
+      },
+      "hl": 0.0028
     },
     {
       "div": "Fraser",
@@ -7289,7 +10003,25 @@
         "rent": 0.3635,
         "own": 0.247,
         "rentPub": 0.0605
-      }
+      },
+      "pt": 0.0767,
+      "noncit": 0.1724,
+      "bigfam": 0.1878,
+      "anc": {
+        "english": 0.3359,
+        "australian": 0.3258,
+        "irish": 0.1314,
+        "scottish": 0.1017,
+        "chinese": 0.0785,
+        "italian": 0.0344,
+        "german": 0.0456,
+        "indian": 0.041,
+        "filipino": 0.0131,
+        "dutch": 0.0165,
+        "vietnamese": 0.0161,
+        "lebanese": 0.0026
+      },
+      "hl": 0.0052
     }
   ],
   "booths": [

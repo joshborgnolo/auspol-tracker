@@ -50,6 +50,31 @@ matter; the people lanes need six, and the new-lane arc adds five more:
                         column (family/non-family cells may shave
                         independently in small cells)
 
+The 2026-10-31 people-lanes arc reads three more:
+  B 01  (again)                     the "Australian citizen" row —
+                        the noncit lane counts residents NOT counted
+                        here (citizenship-not-stated is not printed
+                        anywhere in the GCP-era product either, so the
+                        lane rides the consistent counted-complement)
+  B 05A/B 05B  Ancestry by birthplace  the twelve ANC01 options' Total
+                        Responses column + the "Total Persons" and
+                        "Not stated" rows (one NS response per
+                        not-stated person, so the NS response row is
+                        the person-level NS)
+  B 28  Method of travel to work    train/bus/ferry/tram one-method
+                        rows; the two-method print is combination-level
+                        (Train and Bus / Train and other (excluding
+                        Bus) / Bus and other (excluding Train) /
+                        Other two methods), so PT = the one-method
+                        rides + Train-and-Bus + Train-and-other +
+                        Bus-and-other + both three-method rows (the
+                        same formula as the GCP-era total-column
+                        version); over the ex-NS total
+
+2001 has NO children-ever-born table (the variable sat out the 2001
+BCP), so the bigfam lane is null on this era's stores and the
+interpolated 2004 store blends its 2006 side's measure.
+
 Overseas visitors ride their own row INSIDE several tables' totals in
 the 2001 product, so every lane subtracts them: an as-enumerated
 count with visitors out, the GCP-era basis every later edition uses.
@@ -166,6 +191,25 @@ INC01_BAND_LABELS = ["$1-$199", "$200-$299", "$300-$399", "$400-$499",
                      "$500-$599", "$600-$699", "$700-$799", "$800-$999",
                      "$1,000-$1,199", "$1,200-$1,499", "$1,500-$1,999",
                      "$2,000 or more"]
+# B 05A/B 05B's ancestry rows -> the /map/ Ancestry menu (the site's
+# cross-era key order; the 2001 print's labels are exact matches)
+ANC01_KEYS = ["english", "australian", "irish", "scottish", "chinese",
+              "italian", "german", "indian", "filipino", "dutch",
+              "vietnamese", "lebanese"]
+ANC01_LABELS = {
+    "english": "english",
+    "australian": "australian",
+    "irish": "irish",
+    "scottish": "scottish",
+    "chinese": "chinese",
+    "italian": "italian",
+    "german": "german",
+    "indian": "indian",
+    "filipino": "filipino",
+    "dutch": "dutch",
+    "vietnamese": "vietnamese",
+    "lebanese": "lebanese",
+}
 
 import openpyxl  # noqa: E402
 
@@ -217,8 +261,8 @@ def parse_cd(member_name, wb):
     # address" codes, ~32 sheets, none of the demographic tables):
     # keep the B 01 headcount and null the lanes before any lane reads
     if any(s not in wb.sheetnames for s in
-           ("B 06", "B 08", "B 10", "B 12", "B 17", "B 19", "B 23",
-            "B 27B")):
+           ("B 05A", "B 05B", "B 06", "B 08", "B 10", "B 12", "B 17",
+            "B 19", "B 23", "B 27B", "B 28")):
         pers_tot = None
         for row in wb_get(wb, "B 01", 1, 4):
             lab = label_of(row)
@@ -236,6 +280,8 @@ def parse_cd(member_name, wb):
                 "fam01": None, "ten01": None,
                 "fiTot01": None, "fiMix01": None, "hiTot01": None,
                 "ind01": None, "b1ov": None,
+                "cit01": None, "tw01": None, "anc01": None,
+                "ancp01": None, "ancns01": None,
                 "shortCd": True}
 
     def sheet_rows(name, minc, maxc):
@@ -280,16 +326,21 @@ def parse_cd(member_name, wb):
         bands["85_89"] + bands["90_94"] + bands["95_99"] + bands["100ov"],
     ]
 
-    # ---- B 01 summary (plus the Indigenous and overseas-visitor rows
-    # the atsci share rides)
+    # ---- B 01 summary (plus the Indigenous, citizen and overseas-
+    # visitor rows the atsci/noncit shares ride)
     b1 = sheet_rows("B 01", 1, 4)
-    b1_persons = b1_indig = b1_ov = None
+    b1_persons = b1_indig = b1_ov = b1_cit = None
     for row in b1:
         lab = label_of(row)
         if lab.startswith("total persons"):
             b1_persons = cell_of(row, 3)
         elif lab == "total indigenous persons":
             b1_indig = cell_of(row, 3)
+        elif lab == "australian citizen":
+            b1_cit = cell_of(row, 3)  # exact: "Australian citizen
+            # aged 18 years and over" follows one row below and must
+            # never overwrite this (a startswith match once cost the
+            # age-gated count landing here instead)
         elif lab.startswith("overseas visit"):
             b1_ov = cell_of(row, 3)
 
@@ -544,6 +595,76 @@ def parse_cd(member_name, wb):
         elif lab.startswith("not stated"):
             eduns = per
 
+    # ---- B 28 method of travel to work (persons col; PT numerator is
+    # the GCP-era formula on the combination-level print: one-method
+    # train/bus/ferry/tram + Train-and-Bus + Train-and-other +
+    # Bus-and-other + both three-method rows, other-combination rows
+    # unattributable; denominator the ex-not-stated total)
+    tw = {"train1": 0, "bus1": 0, "ferry1": 0, "tram1": 0,
+          "tr2": 0, "bu2": 0, "three_t": 0, "three_b": 0,
+          "tot": None, "ns": None}
+    sect = None
+    for row in sheet_rows("B 28", 1, 4):
+        lab = label_of(row)
+        if not lab:
+            continue
+        per = cell_of(row, 3)
+        if lab.startswith("one method"):
+            sect = "one"
+        elif lab.startswith("two methods"):
+            sect = "two"
+        elif lab.startswith("three methods"):
+            sect = "three"
+        elif sect == "one" and lab == "train":
+            tw["train1"] = per
+        elif sect == "one" and lab == "bus":
+            tw["bus1"] = per
+        elif sect == "one" and lab == "ferry":
+            tw["ferry1"] = per
+        elif sect == "one" and lab.startswith("tram"):
+            tw["tram1"] = per
+        elif sect == "two":
+            if lab.startswith("train and bus") or lab.startswith("train and other"):
+                tw["tr2"] += per
+            elif lab.startswith("bus and other"):
+                tw["bu2"] += per
+        elif sect == "three":
+            if lab.startswith("train and"):
+                tw["three_t"] += per
+            elif lab.startswith("bus and"):
+                tw["three_b"] += per
+        if lab == "total":
+            tw["tot"] = per  # last printed total wins: the grand
+            # total ends the table (the one/two/three-method
+            # subtotal rows are the same label)
+            sect = None
+        elif lab.startswith("not stated"):
+            tw["ns"] = per
+
+    # ---- B 05A/B 05B ancestry (Total Responses column 6; a person
+    # not stating ancestry contributes exactly one not-stated
+    # response, so the NS response row is the person-level NS)
+    anc28n = tw["train1"] + tw["bus1"] + tw["ferry1"] + tw["tram1"] \
+        + tw["tr2"] + tw["bu2"] + tw["three_t"] + tw["three_b"]
+    tw01 = [anc28n, tw["tot"], tw["ns"]] \
+        if tw["tot"] is not None and tw["ns"] is not None else None
+    anc = {k: None for k in ANC01_LABELS}
+    ancp = ancns = None
+    for sheet in ("B 05A", "B 05B"):
+        for row in sheet_rows(sheet, 1, 7):
+            lab = label_of(row)
+            if not lab:
+                continue
+            per = cell_of(row, 6)
+            if lab.startswith("total persons"):
+                ancp = per
+            elif lab.startswith("not stated"):
+                ancns = per
+            else:
+                for k, pref in ANC01_LABELS.items():
+                    if lab == pref:
+                        anc[k] = per
+
     # ---- B 27B occupation (persons sheet; col 9 = Total)
     occ = {g: 0 for g in OCC_GROUPS}
     occ_ns = 0
@@ -579,10 +700,14 @@ def parse_cd(member_name, wb):
                               "ten_stha": ten_stha,
                               "ten_othtype": ten_othtype,
                               "ten_tenns": ten_tenns,
+                              "b1_cit": b1_cit,
+                              "tw01": tw01,
+                              "ancp": ancp, "ancns": ancns,
                               }.items()
                if v is None]
     missing += [f"rel01.{k}" for k, v in rel.items() if v is None]
     missing += [f"sch01.{k}" for k, v in sch.items() if v is None]
+    missing += [f"anc01.{k}" for k, v in anc.items() if v is None]
     if missing:
         raise ValueError("table drift " + ",".join(missing))
     if oth is not None and oth < 0:
@@ -654,6 +779,10 @@ def parse_cd(member_name, wb):
         "fiTot01": fi_tot,
         "fiMix01": [c for band in fi_mix for c in band],
         "hiTot01": hh_tot,
+        "cit01": b1_cit,
+        "tw01": tw01,
+        "anc01": [anc[k] for k in ANC01_KEYS],
+        "ancp01": ancp, "ancns01": ancns,
         "_recons": recons or None,
     }
 
@@ -671,14 +800,17 @@ def merge_shards(pattern, out_path):
     if len(tally) != 35289:
         raise SystemExit(f"merged tally rows {len(tally)} != pin 35289")
     relc = {k: 0 for k in REL01_KEYS}
+    ancc = {k: 0 for k in ANC01_KEYS}
     sc = [0] * 6
     fc = [0] * 5
     tc = [0] * 6
-    ind = pers = less_ov = 0
+    ind = pers = less_ov = cit = pt = ptt = ptns = ancp = ancns = 0
     full = [r for r in tally.values() if r.get("rel01tot") is not None]
     for r in full:
         for i, k in enumerate(REL01_KEYS):
             relc[k] += r["rel01"][i]
+        for i, k in enumerate(ANC01_KEYS):
+            ancc[k] += r["anc01"][i]
         for i in range(6):
             sc[i] += r["sch01"][i]
         for i in range(5):
@@ -688,9 +820,16 @@ def merge_shards(pattern, out_path):
         ind += r["ind01"]
         pers += r["b1Persons"]
         less_ov += r["b1ov"]
+        cit += r["cit01"]
+        pt += r["tw01"][0]
+        ptt += r["tw01"][1]
+        ptns += r["tw01"][2]
+        ancp += r["ancp01"]
+        ancns += r["ancns01"]
     relnat_den = sum(r["rel01tot"] - r["rel01ns"] for r in full)
     sc_den = sum(sc)
     ten_den = tc[0] + tc[1] + tc[2] + tc[4]
+    ancden = ancp - ancns
     print("national new-lane shares (2001 census, full-table CDs):",
           {"norel": round(relc['norel'] / relnat_den, 4),
            "cath": round(relc['cath'] / relnat_den, 4),
@@ -708,7 +847,11 @@ def merge_shards(pattern, out_path):
            "rent": round(tc[2] / ten_den, 4),
            "own": round(tc[0] / ten_den, 4),
            "rentPub": round(tc[3] / ten_den, 4),
-           "atsci": round(ind / (pers - less_ov), 4)})
+           "atsci": round(ind / (pers - less_ov), 4),
+           "pt": round(pt / (ptt - ptns), 4),
+           "noncit": round(1 - cit / pers, 4),
+           "anc": {k: round(ancc[k] / ancden, 4)
+                   for k in ANC01_KEYS}})
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump({"tally": tally}, fh)
         fh.write("\n")

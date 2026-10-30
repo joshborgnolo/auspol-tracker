@@ -72,6 +72,9 @@ COB_KEYS01 = xt.COB01_KEYS
 # orders — the extractor's REL01_KEYS list is the same order)
 REL_KEYS_01 = xt.REL01_KEYS
 TEN_KEYS = ["mort", "rent", "own", "rentPub"]
+# the Ancestry menu's twelve options (the extractor's ANC01_KEYS,
+# the site's cross-era order)
+ANC_KEYS_01 = xt.ANC01_KEYS
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2003ed.json"
@@ -94,7 +97,8 @@ def load_tally():
     need = {"pers", "bands", "aus", "totc", "cobns", "eng", "oth",
             "uni", "eduns", "bluen", "occd", "cobn"}
     need_new = {"rel01", "rel01ns", "rel01tot",
-                "sch01", "fam01", "ten01", "ind01", "b1ov"}
+                "sch01", "fam01", "ten01", "ind01", "b1ov",
+                "cit01", "tw01", "anc01", "ancp01", "ancns01"}
     for code, r in d.items():
         if any(k not in r for k in need):
             fail(f"2001 tally {code} row shape drift")
@@ -106,6 +110,8 @@ def load_tally():
                 or len(r["fam01"]) != 5 or len(r["ten01"]) != 6 \
                 or len(r["sch01"]) != 6:
             fail(f"2001 tally {code} new-lane widths drift")
+        if len(r["tw01"]) != 3 or len(r["anc01"]) != len(ANC_KEYS_01):
+            fail(f"2001 tally {code} 2026-10 lane widths drift")
         if r.get("cobn") is None and not r.get("shortCd"):
             fail(f"2001 tally {code}: cobn missing off a full profile")
         if r.get("cobn") is not None and len(r["cobn"]) != len(COB_KEYS01):
@@ -165,7 +171,11 @@ def main():
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
                                   "incHi": 0.0,
-                                  "incHH": [0] * len(INC_BANDS01)})
+                                  "incHH": [0] * len(INC_BANDS01),
+                                  "cit01": 0,
+                                  "tw01": [0] * 3,
+                                  "anc01": [0] * len(ANC_KEYS_01),
+                                  "ancP01": 0, "ancNS01": 0})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -200,6 +210,13 @@ def main():
             acc["incHi"] += inc[2]
             for i in range(len(INC_BANDS01)):
                 acc["incHH"][i] += inc[4][i]
+        acc["cit01"] += r["cit01"]
+        for i in range(3):
+            acc["tw01"][i] += r["tw01"][i]
+        for i in range(len(ANC_KEYS_01)):
+            acc["anc01"][i] += r["anc01"][i]
+        acc["ancP01"] += r["ancp01"]
+        acc["ancNS01"] += r["ancns01"]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     def shares(rec):
@@ -262,12 +279,25 @@ def main():
             s["cob"] = {k: round(rec["cobn"][i] / fb, 4) if fb > 0
                         else None
                         for i, k in enumerate(COB_KEYS01)}
+        # the 2026-10-31 lanes arc (no children-ever-born table in the
+        # 2001 BCP, so bigfam is absent on this era's stores)
+        if rec.get("tw01") is not None:
+            ptd = rec["tw01"][1] - rec["tw01"][2]
+            if ptd > 0:
+                s["pt"] = round(rec["tw01"][0] / ptd, 4)
+        if rec.get("cit01") is not None and per > 0:
+            s["noncit"] = round((per - rec["cit01"]) / per, 4)
+        if rec.get("anc01") is not None and rec.get("ancP01"):
+            ancd = rec["ancP01"] - rec.get("ancNS01", 0)
+            if ancd > 0:
+                s["anc"] = {k: round(rec["anc01"][i] / ancd, 4)
+                            for i, k in enumerate(ANC_KEYS_01)}
         return s
 
     nat = defaultdict(int)
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd"):
+                  "eduns", "bluen", "occd", "cit01"):
             nat[k] += dv[k]
         for i in range(11):
             nat.setdefault("bands", [0] * 11)
@@ -280,6 +310,14 @@ def main():
         for i in range(len(REL_KEYS_01)):
             nat.setdefault("rel01", [0] * len(REL_KEYS_01))
             nat["rel01"][i] += dv["rel01"][i]
+        nat.setdefault("tw01", [0] * 3)
+        for i in range(3):
+            nat["tw01"][i] += dv["tw01"][i]
+        nat.setdefault("anc01", [0] * len(ANC_KEYS_01))
+        for i in range(len(ANC_KEYS_01)):
+            nat["anc01"][i] += dv["anc01"][i]
+        nat["ancP01"] = nat.get("ancP01", 0) + dv["ancP01"]
+        nat["ancNS01"] = nat.get("ancNS01", 0) + dv["ancNS01"]
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
@@ -322,6 +360,12 @@ def main():
         "loinc": round(nat["incLo"] / nat["incT"], 4),
         "hiinc": round(nat["incHi"] / nat["incT"], 4),
         "incMed": round(ilanes.band_median(nat["incHH"], INC_BANDS01)),
+        "pt": round(nat["tw01"][0] / (nat["tw01"][1]
+                    - nat["tw01"][2]), 4),
+        "noncit": round(1 - nat["cit01"] / nat["pers"], 4),
+        "anc": {k: round(nat["anc01"][i]
+                         / (nat["ancP01"] - nat["ancNS01"]), 4)
+                for i, k in enumerate(ANC_KEYS_01)},
     }
     # measured-once pin (first verified run): the tally's own total
     # (18,652,828) less the 8,249 people in the dropped offshore class
@@ -352,7 +396,8 @@ def main():
                            "blue": None, "age": None,
                            "y12less": None, "atsci": None, "u15": None,
                            "onepar": None, "rel": None, "ten": None,
-                           "loinc": None, "hiinc": None, "incMed": None}
+                           "loinc": None, "hiinc": None, "incMed": None,
+                           "pt": None, "noncit": None, "anc": None}
         else:
             inc = inc_map.get(str(key))
             rec["demo"] = shares({
@@ -372,7 +417,12 @@ def main():
                 "famN": r.get("fam01", [0] * 5)[2],
                 "famD": r.get("fam01", [0] * 5)[4],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
-                    "incHH": list(inc[4])} if inc else {})})
+                    "incHH": list(inc[4])} if inc else {}),
+                "cit01": r.get("cit01"),
+                "tw01": r.get("tw01"),
+                "anc01": r.get("anc01"),
+                "ancP01": r.get("ancp01"),
+                "ancNS01": r.get("ancns01")})
             if rec["demo"] is None:
                 geo_empty += 1
         out_booths.append(rec)
@@ -500,6 +550,7 @@ def main():
         "cobKeys": COB_KEYS01,
         "relKeys": list(REL_KEYS_01),
         "tenKeys": list(TEN_KEYS),
+        "ancKeys": list(ANC_KEYS_01),
         "deliveryBasis": (
             "venue-CD lookup per booth (the venue seifa store's own "
             "2001-CD geo of the premises); exact CD sum per division "

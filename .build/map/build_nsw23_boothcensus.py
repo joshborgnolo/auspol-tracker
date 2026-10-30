@@ -236,6 +236,8 @@ def demo_cells():
     if n != GCP_ROWS or len(base) != GCP_NSW_ROWS:
         fail(f"GCP G01 rows {n} (pin {GCP_ROWS}), NSW {len(base)} (pin {GCP_NSW_ROWS})")
     newl = gcp_newlanes.load(GCP_ZIP, prefix="1")
+    arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="1", era="2021")
+    HL = gcp_newlanes.hl_alloc_of(2021, "m")
     extra = {}
     for tag, member, cols in GCP_MEMBERS:
         if member not in z.namelist():
@@ -287,6 +289,10 @@ def demo_cells():
         tend = own + mort + rent + othtype
         ten = [safe(mort, tend), safe(rent, tend),
                safe(own, tend), safe(rentpub, tend)]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        hle = HL.get(code, {}).get("e", 0.0)
+        anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
                       safe(bands[3] + bands[4], bsum),
@@ -297,9 +303,13 @@ def demo_cells():
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),
-                      safe(fam[0], fam[1])],
+                      safe(fam[0], fam[1]),
+                      safe(ptn, ptt - ptns),
+                      safe(p - citz, p),
+                      safe(ceb3, cebt - cebns),
+                      safe(hle, p)],
                      [safe(c, den09) for c in cob],
-                     rel, ten)
+                     rel, ten, anc)
     print(f"GCP demo cells: {len(out)} SA1s")
     return out
 
@@ -325,7 +335,8 @@ def main():
             fail(f"{year}: cobKeys already set — the lane is not this script's on a stale data build (rerun build_{year}_data.py first)")
         out_sa1, suppressions = set(), 0
         counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0}
-        dec_col, demo_col, cob_col, rel_col, ten_col = [], [], [], [], []
+        dec_col, demo_col, cob_col, rel_col, ten_col, anc_col = \
+            [], [], [], [], [], []
         for k in range(n):
             lat, _lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
             if ty == 4:
@@ -335,6 +346,7 @@ def main():
                 cob_col.append(None)
                 rel_col.append(None)
                 ten_col.append(None)
+                anc_col.append(None)
                 continue
             if lat is None:
                 fail(f"{year} booth {B['n'][k]!r}: no coordinates — every fixed booth must carry the venue roll's coords before the census join")
@@ -360,6 +372,7 @@ def main():
             cob_col.append(list(dm[1]))
             rel_col.append(list(dm[2]))
             ten_col.append(list(dm[3]))
+            anc_col.append(list(dm[4]))
         B["dec"] = dec_col
         B["vdec"] = [None] * n  # NSWEC releases no votes-by-SA1 product; the
         # voter-footprint lane is a federal AEC read and stays empty by design
@@ -367,9 +380,11 @@ def main():
         B["cob"] = cob_col
         B["rel"] = rel_col
         B["ten"] = ten_col
+        B["anc"] = anc_col
         data["cobKeys"] = COB_KEYS
         data["relKeys"] = list(gcp_newlanes.REL_KEYS)
         data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
+        data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
         with open(path, "w") as f:
             json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
         print(f"{year}: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

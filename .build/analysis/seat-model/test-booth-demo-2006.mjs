@@ -76,6 +76,14 @@ const NATIONAL = {
   loinc: 0.25,
   hiinc: 0.0645,
   incMed: 1027,
+  // the 2026-10-31 lanes arc (2006 B 01 citizen / B 08 ancestry /
+  // B 23 children / B 45 travel — same household lines as the
+  // earlier layers, no 2049.0 edition at this census)
+  pt: 0.0847, noncit: 0.1388, bigfam: 0.2913,
+  anc: { english: 0.3443, australian: 0.4041, irish: 0.0989,
+         scottish: 0.0822, chinese: 0.0367, italian: 0.0468,
+         german: 0.0445, indian: 0.0129, filipino: 0.0088, dutch: 0.017,
+         vietnamese: 0.0095, lebanese: 0.01 },
 };
 // 2006 edition's incomeCuts record (the $3,000+ top-band edition)
 const INC_CUTS = {

@@ -188,6 +188,8 @@ def load_gcp_sa():
 def main():
     gcp, sa_persons = load_gcp_sa()
     nlt = gcp_newlanes.load(GCP_ZIP, prefix="4")
+    arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="4", era="2021")
+    HL = gcp_newlanes.hl_alloc_of(2021, "m")
     sa1 = read_sa1_polygons()
     districts, order = load_districts()
 
@@ -222,7 +224,12 @@ def main():
                                   "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
                                   "relN": [0] * len(gcp_newlanes.REL_KEYS),
                                   "relNS": 0, "relTot": 0,
-                                  "tenN": [0] * 6, "famN": 0, "famD": 0})
+                                  "tenN": [0] * 6, "famN": 0, "famD": 0,
+                                  "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+                                  "ancP": 0, "ancNS": 0,
+                                  "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
         a["eng"] += r[1]
@@ -253,6 +260,20 @@ def main():
             a["tenN"][i] += ten6[i]
         a["famN"] += fam[0]
         a["famD"] += fam[1]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        a["citz"] += citz
+        a["ptn"] += ptn
+        a["ptt"] += ptt
+        a["ptns"] += ptns
+        a["ceb3"] += ceb3
+        a["cebns"] += cebns
+        a["cebt"] += cebt
+        for i in range(len(gcp_newlanes.ANC_KEYS)):
+            a["ancN"][i] += ancv[i]
+        a["ancP"] += ancp
+        a["ancNS"] += ancns
+        a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
             fail(f"district {dist} has no SA1 assigned")
@@ -288,6 +309,15 @@ def main():
                                "own": tn[0], "rentPub": tn[3]}[k] / tend, 4)
                         if tend > 0 else None)
                     for k in ["mort", "rent", "own", "rentPub"]},
+            "pt": (round(a["ptn"] / (a["ptt"] - a["ptns"]), 4)
+                   if a["ptt"] - a["ptns"] > 0 else None),
+            "noncit": round((a["p"] - a["citz"]) / a["p"], 4) if a["p"] else None,
+            "bigfam": (round(a["ceb3"] / (a["cebt"] - a["cebns"]), 4)
+                       if a["cebt"] - a["cebns"] > 0 else None),
+            "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
+            "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
+                        if a["ancP"] - a["ancNS"] > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
         }
         return s, None
 
@@ -307,13 +337,18 @@ def main():
               "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
               "relN": [0] * len(gcp_newlanes.REL_KEYS),
               "relNS": 0, "relTot": 0, "tenN": [0] * 6,
-              "famN": 0, "famD": 0}
+              "famN": 0, "famD": 0,
+              "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+              "ceb3": 0, "cebns": 0, "cebt": 0,
+              "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+              "ancP": 0, "ancNS": 0,
+              "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -333,6 +368,7 @@ def main():
         "cobKeys": COB_KEYS,
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
+        "ancKeys": list(gcp_newlanes.ANC_KEYS),
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(SA_SENTINELS), "sentinelPersons": sentinel_persons},

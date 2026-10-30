@@ -80,7 +80,10 @@ def _lib(name, path):
 d13 = _lib("d13", "derive-booth-demo-2013.py")
 hist = _lib("hist", "derive-booth-seifa-hist.py")
 voter = _lib("voter", "derive-booth-seifa-voter.py")
+hla = _lib("hla", "homeless_alloc.py")
 fail, hash16 = d13.fail, d13.hash16
+# the homeless lane's est-allocation at this edition (2016 ASGS units)
+HL_ALLOC = hla.alloc_of(2016, "c7")
 
 STATE_ORDER = d13.STATE_ORDER
 BANDS = d13.BANDS
@@ -231,6 +234,9 @@ def load_gcp16():
         if code not in nlt["G07"] or code not in nlt["G14"] \
                 or code not in nlt["G37"] or code not in nlt["G32"]:
             fail(f"GCP G07/G14/G37/G32 SA1 set mismatch at {code}")
+        if code not in nlt["G01c"] or code not in nlt["Gmtw"] \
+                or code not in nlt["Gceb"] or code not in nlt["G08"]:
+            fail(f"GCP G01c/Gmtw/Gceb/G08 SA1 set mismatch at {code}")
         bluen, occd = occ_of(g57[code])
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
@@ -250,7 +256,10 @@ def load_gcp16():
                      None,                         # slot 16 (no 2016 cob)
                      y12t, (indig, indig + nonind),
                      relvec, (relns, reltot),
-                     nlt["G37"][code], nlt["G32"][code])
+                     nlt["G37"][code], nlt["G32"][code],
+                     nlt["G01c"][code][0], nlt["Gmtw"][code],
+                     nlt["Gceb"][code], nlt["G08"][code],
+                     HL_ALLOC.get(code, {}).get("e", 0.0))
     print(f"GCP 2016: {len(out)} SA1s "
           f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
@@ -696,6 +705,7 @@ def main():
         "censusEdition": 2016,
         "relKeys": list(voter.REL_KEYS),
         "tenKeys": list(voter.TEN_KEYS),
+        "ancKeys": list(voter.ANC_KEYS),
         "deliveryBasis": (
             "venue-proxy per booth (2016-census SA1 of the premises, "
             "point-in-polygon); CG-plurality whole-allocated 2016 GCP "

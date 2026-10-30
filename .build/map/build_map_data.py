@@ -276,7 +276,8 @@ def demo_cells(dm):
     a = dm["age"]
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
             dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc"),
-            dm.get("y12less"), dm.get("atsci"), dm.get("u15"), dm.get("onepar")]
+            dm.get("y12less"), dm.get("atsci"), dm.get("u15"), dm.get("onepar"),
+            dm.get("pt"), dm.get("noncit"), dm.get("bigfam"), dm.get("hl")]
 
 
 def cob_cells(dm, keys):
@@ -329,7 +330,7 @@ def demo_interp_of(dm, di):
     for k, v in di.items():
         if k in ("persons", "cov"):
             continue
-        if k in ("age", "rel", "ten"):
+        if k in ("age", "rel", "ten", "anc"):
             # dict lanes fall back per option: a select option missing on
             # either census side shows the measured option's figure
             if v is not None:
@@ -494,6 +495,7 @@ def build_year(year, hist, base2001):
     cobkeys = vstore.get("cobKeys", []) if vstore else []
     relkeys = vstore.get("relKeys", []) if vstore else []
     tenkeys = vstore.get("tenKeys", []) if vstore else []
+    anckeys = vstore.get("ancKeys", []) if vstore else []
     if prev >= 2004:
         prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
         prev_ids = {pp for (_, pp) in prev_pp}
@@ -581,7 +583,9 @@ def build_year(year, hist, base2001):
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
                                "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob"),
                                "y12less": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
-                               "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten")}
+                               "pt": dc[12], "noncit": dc[13], "bigfam": dc[14], "hl": dc[15],
+                               "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten"),
+                               "anc": (dm or {}).get("anc")}
         div_index[d] = len(D)
         D.append(rec)
 
@@ -646,6 +650,7 @@ def build_year(year, hist, base2001):
         dirow = demo_interp_of(dmd, bv.get("demoI"))
         B["rel"].append(select_cells(dirow, "rel", relkeys) if dcrow else None)
         B["ten"].append(select_cells(dirow, "ten", tenkeys) if dcrow else None)
+        B["anc"].append(select_cells(dirow, "anc", anckeys) if dcrow else None)
 
     if not any(B["demo"]):
         del B["demo"]  # the year's store didn't exist (pre-2004, absent
@@ -656,6 +661,8 @@ def build_year(year, hist, base2001):
         del B["rel"]
     if not any(B["ten"]):
         del B["ten"]
+    if not any(B["anc"]):
+        del B["anc"]
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -716,7 +723,10 @@ def build_year(year, hist, base2001):
            # (B["rel"]/B["ten"] rows and rec.demo.rel/ten dicts follow;
            # identical across the whole census era)
            "relKeys": relkeys if vstore else None,
-           "tenKeys": tenkeys if vstore else None}
+           "tenKeys": tenkeys if vstore else None,
+           # the Ancestry select menu's twelve options (B["anc"] rows +
+           # rec.demo.anc dicts follow; the 2026-10-31 lanes arc)
+           "ancKeys": anckeys if vstore else None}
     if vstore and vstore.get("demoInterp"):
         # the people-interp blend record (f, c0/c1, nearestSide,
         # nullRule) on interpolated years; the app's demo copy reads

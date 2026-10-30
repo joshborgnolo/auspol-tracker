@@ -30,7 +30,32 @@ G37 {code: (own, mort, rent, rentPub, othType, tenNS)}.
 
 import csv
 import io
+import json
+import os
 import zipfile
+
+_REPO = os.path.abspath(os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), "..", ".."))
+
+
+def hl_alloc_of(ed, form):
+    """The homeless lane's est-allocation (2026-10-31 lanes arc):
+    {unit: {"e": est, "p": pop}} per edition's key form ("m"
+    SA1-main | "c7" cube-7-digit), from
+    .build/analysis/seat-model/cache/homeless-sa1-<ed>-alloc.json —
+    derive-booth-homeless era reads via homeless_alloc.alloc_of; the
+    state frames read the same caches through this mirror (the module
+    deliberately stays seat-model-free, like the rest of its readers)."""
+    p = os.path.join(_REPO, ".build/analysis/seat-model/cache",
+                     f"homeless-sa1-{ed}-alloc.json")
+    if not os.path.exists(p):
+        _fail(f"missing {p} (run .build/analysis/seat-model/"
+              "homeless_alloc.py)")
+    d = json.load(open(p, encoding="utf-8"))
+    if form not in d or not d[form]:
+        _fail(f"homeless alloc {ed}/{form}: empty form")
+    return d[form]
+
 
 GCP_ZIP = None  # set via connect(); module stays import-light (no heavy read)
 GCP_ROWS = 61844
@@ -76,6 +101,83 @@ REL_MAP = {
     "jew": ["Judaism_P"],
 }
 G14_TAIL = ["Religious_affiliation_ns_P", "Tot_P"]
+# ---- the 2026-10-31 people-lanes arc (public transport to work,
+# non-citizens, women with three or more children, Ancestry): G01's
+# Australian-citizens cell; the era's method-of-travel table (G62/G59);
+# children-ever-born (G28/G24); ancestry (G08's Tot-response cells ex
+# the ancestry-not-stated responses — a not-stated person counts
+# exactly one not-stated response, so the NS response cell IS the
+# person-level NS; people could name two ancestries and the shares
+# are independent, never normalised). Column spellings drifted at
+# 2021 (tram "or lt rail" and three-method train; G08's _Tot_resp
+# lower-case). Reader table ids per vintage mirror
+# derive-booth-seifa-voter.py's new_lane_tables arc block.
+ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
+            "italian", "german", "indian", "filipino", "dutch",
+            "vietnamese", "lebanese"]
+ARC = {
+    "2021": dict(travel="G62", children="G28", ancestry="G08",
+                 tram="One_met_Tram_or_lt_rail_P",
+                 three_tr="Three_meth_Tr_2_oth_meth_P",
+                 resp_sfx="resp", ns_resp="Ancestry_NS_Tot_resp",
+                 tot_resp="Tot_P_Tot_resp"),
+    "2016": dict(travel="G59", children="G24", ancestry="G08",
+                 tram="One_met_Tram_incl_lt_rail_P",
+                 three_tr="Three_meth_Trn_two_othr_met_P",
+                 resp_sfx="Resp", ns_resp="Ancestry_NS_Tot_Resp",
+                 tot_resp="Tot_P_Tot_Resp"),
+}
+
+
+def load_arc31(gcp_zip, prefix="", era="2021", rows_pin=None,
+               key_col=None):
+    """The 2026-10-31 lanes arc per SA1 -> {code: (citz,
+    (ptn, ptot, ptns), (ceb3p, cebns, cebtot), (ancvec12, ancTotP,
+    ancNS))}; universes assert against load()'s own G01 set."""
+    v = VINTAGES[era]
+    a = ARC[era]
+    memb = v["member"].format
+    idc = key_col or v["key"]
+    pin = rows_pin or v["rows"]
+    z = zipfile.ZipFile(gcp_zip)
+    g01c = _table(z, memb(table="G01"), idc, ["Australian_citizen_P"],
+                  pin, prefix)
+    mtw = _table(
+        z, memb(table=a["travel"]), idc,
+        ["One_method_Train_P", "One_method_Bus_P",
+         "One_method_Ferry_P", a["tram"],
+         "Two_methods_Train_Tot_P", "Two_methods_Bus_Tot_P",
+         "Two_methods_Train_Bus_P", a["three_tr"],
+         "Three_met_Bs_2_ot_met_ex_tr_P",
+         "Tot_P", "Method_travel_to_work_ns_P"], pin, prefix)
+    ceb = _table(z, memb(table=a["children"]), idc,
+                 ["Tot_Nmbr_children_ever_born_3",
+                  "Tot_Nmbr_children_ever_born_4",
+                  "Tot_Nmbr_children_ever_born_5",
+                  "Tot_Nmbr_chidrn_ever_brn_6_mr",
+                  "Tot_Nmbr_childrn_ever_born_Ns", "Total_Total"],
+                 pin, prefix)
+    anc_cols = [f"{b}_Tot_{a['resp_sfx']}" for b in
+                ("English", "Aust", "Irish", "Scottish", "Chinese",
+                 "Italian", "German", "Indian", "Filipino", "Dutch",
+                 "Vietnamese", "Lebanese")]
+    anc = _table(z, memb(table=a["ancestry"]), idc,
+                 anc_cols + [a["ns_resp"], a["tot_resp"]], pin, prefix)
+    if not (set(g01c) == set(mtw) == set(ceb) == set(anc)):
+        _fail("arc-31 SA1 universes diverge")
+    out = {}
+    for code in g01c:
+        t = mtw[code]
+        tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b = t[:9]
+        ptn = tr1 + bu1 + fe1 + tm1 + tr2 + bu2 - tb2 + t3t + t3b
+        c = ceb[code]
+        anc_row = anc[code]
+        out[code] = (g01c[code][0], (ptn, t[9], t[10]),
+                     (c[0] + c[1] + c[2] + c[3], c[4], c[5]),
+                     (anc_row[:len(ANC_KEYS)], anc_row[-1], anc_row[-2]))
+    print(f"GCP arc-31 cells: {len(out)} SA1s (prefix {prefix or 'AU'}, "
+          f"era {era})")
+    return out
 
 
 def _fail(msg):
