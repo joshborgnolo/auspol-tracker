@@ -330,3 +330,18 @@ shim ("Accent's release and methodology: not yet out"), which reads as
   carry `victoria-newspoll-D-M-YYYY` slugs (federal legs exclude them with
   the state-prefix rule); resolve file.url against the api.php proxy, never
   the bare /images/ path (404s).
+
+### Respondent-allocated flow splits (added 2026-10-30)
+
+Accent's Victorian reports' Table 1 (Feb's is Table 2) holds the
+respondent-allocated two-party-by-first-preference grid — the poll's own
+answer to "where are preferences flowing now". Transcribe it onto the wave
+row as `tpp_split` {grn,onp,oth} (ALP share, Labor-v-Coalition) and
+`tpp_split_on` {lnp,grn,oth} (Labor-v-One Nation); `tpp_flows` stays absent
+because the Vic reports publish ONLY the respondent basis (the
+"calculated using respondent allocated flows" sentence), unlike the federal
+report's two bases. to-main-schema passes all three through; gen-data §7db
+then fills the vic bundle's flowForced, which was shipped-null until
+2026-10-30 (that's what made /vic/flows/ look "different" from the main
+site's forced-choice section). Dec 2025's report has no cohort table (one
+LABOR 2PP column only) — nothing to wire there.

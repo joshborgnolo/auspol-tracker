@@ -173,6 +173,9 @@ export function vicToMain(src) {
       url: r.sourceUrl || null,
       ...(r.releaseUrl ? { releaseUrl: r.releaseUrl } : {}),
       ...(r.methodUrl ? { methodUrl: r.methodUrl } : {}),
+      ...(r.tpp_flows != null ? { tpp_flows: r.tpp_flows } : {}),
+      ...(r.tpp_split ? { tpp_split: r.tpp_split } : {}),
+      ...(r.tpp_split_on ? { tpp_split_on: r.tpp_split_on } : {}),
     };
     polls.push(row);
     if (r.alt && (r.alt.alpVOnp != null || r.alt.lnpVOnp != null))

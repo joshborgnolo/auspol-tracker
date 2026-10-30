@@ -914,7 +914,17 @@
       "tpp_lnp": 52,
       "url": "https://web.archive.org/web/20260308055403/https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-victorian-public-opinion-snapshot",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf",
+      "tpp_split": {
+        "grn": 85,
+        "onp": 25,
+        "oth": 56
+      },
+      "tpp_split_on": {
+        "lnp": 31,
+        "grn": 91,
+        "oth": 64
+      }
     },
     {
       "date": "2026-03-23",
@@ -1109,7 +1119,17 @@
       "tpp_lnp": 57,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_dca98962b02540e08b82dc3734482169.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_dca98962b02540e08b82dc3734482169.pdf",
+      "tpp_split": {
+        "grn": 92,
+        "onp": 10,
+        "oth": 47
+      },
+      "tpp_split_on": {
+        "lnp": 35,
+        "grn": 94,
+        "oth": 68
+      }
     },
     {
       "date": "2026-08-03",
@@ -1207,7 +1227,17 @@
       "tpp_lnp": 56,
       "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_046899eb40cd4f509fc7325fece7440f.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_046899eb40cd4f509fc7325fece7440f.pdf",
+      "tpp_split": {
+        "grn": 82,
+        "onp": 13,
+        "oth": 62
+      },
+      "tpp_split_on": {
+        "lnp": 35,
+        "grn": 94,
+        "oth": 72
+      }
     },
     {
       "date": "2026-09-20",
@@ -1257,7 +1287,17 @@
       "tpp_lnp": 56,
       "url": "https://www.afr.com/politics/coalition-firms-for-majority-in-victoria-as-voters-warm-to-wilson-20261011-p6146e",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-october-2026-victorian-state-poll",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_52f25d79262b4f219cefe48f6983c41b.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_52f25d79262b4f219cefe48f6983c41b.pdf",
+      "tpp_split": {
+        "grn": 85,
+        "onp": 13,
+        "oth": 65
+      },
+      "tpp_split_on": {
+        "lnp": 37,
+        "grn": 93,
+        "oth": 80
+      }
     },
     {
       "date": "2026-10-10",
