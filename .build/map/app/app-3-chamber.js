@@ -555,9 +555,23 @@ function chamberOrder(m) {
     const B = geom.bench.filter((c) => !held.has(c.k) && !(geom.vacant && geom.vacant.has(c.k))), onBench = (d) => !lead.includes(d.i);
     lead.forEach((i, s) => { if (i != null) at.set(i, table[s]); });
     const Gb = G.filter(onBench), Ob = O.filter(onBench);
-    Gb.forEach((d, k) => at.set(d.i, B[k].k));
-    C.forEach((d, k) => at.set(d.i, B[Gb.length + k].k));
-    Ob.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
+    if (geom.blocSeats) {
+      // Sydney's crossbenches are separate furniture at the entrance end. Filling one
+      // continuous horseshoe put government members on that transverse bench and left
+      // members' table chairs empty. Keep each sorted bloc in its physical area.
+      const free = new Set(B.map((c) => c.k)), pending = [];
+      for (const [bloc, ds] of [["gov", Gb], ["opp", Ob], ["cross", C]]) {
+        const slots = geom.blocSeats[bloc].filter((k) => free.has(k));
+        ds.forEach((d, j) => { if (j < slots.length) { at.set(d.i, slots[j]); free.delete(slots[j]); } else pending.push(d); });
+      }
+      // Preserve every member if a future dataset changes the bloc sizes.
+      const rest = [...free];
+      pending.forEach((d, j) => at.set(d.i, rest[j]));
+    } else {
+      Gb.forEach((d, k) => at.set(d.i, B[k].k));
+      C.forEach((d, k) => at.set(d.i, B[Gb.length + k].k));
+      Ob.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
+    }
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];

@@ -3446,9 +3446,23 @@ function chamberOrder(m) {
     const B = geom.bench.filter((c) => !held.has(c.k) && !(geom.vacant && geom.vacant.has(c.k))), onBench = (d) => !lead.includes(d.i);
     lead.forEach((i, s) => { if (i != null) at.set(i, table[s]); });
     const Gb = G.filter(onBench), Ob = O.filter(onBench);
-    Gb.forEach((d, k) => at.set(d.i, B[k].k));
-    C.forEach((d, k) => at.set(d.i, B[Gb.length + k].k));
-    Ob.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
+    if (geom.blocSeats) {
+      // Sydney's crossbenches are separate furniture at the entrance end. Filling one
+      // continuous horseshoe put government members on that transverse bench and left
+      // members' table chairs empty. Keep each sorted bloc in its physical area.
+      const free = new Set(B.map((c) => c.k)), pending = [];
+      for (const [bloc, ds] of [["gov", Gb], ["opp", Ob], ["cross", C]]) {
+        const slots = geom.blocSeats[bloc].filter((k) => free.has(k));
+        ds.forEach((d, j) => { if (j < slots.length) { at.set(d.i, slots[j]); free.delete(slots[j]); } else pending.push(d); });
+      }
+      // Preserve every member if a future dataset changes the bloc sizes.
+      const rest = [...free];
+      pending.forEach((d, j) => at.set(d.i, rest[j]));
+    } else {
+      Gb.forEach((d, k) => at.set(d.i, B[k].k));
+      C.forEach((d, k) => at.set(d.i, B[Gb.length + k].k));
+      Ob.forEach((d, k) => at.set(d.i, B[B.length - 1 - k].k));
+    }
   }
   const order = [...G, ...C, ...O].map((d) => d.i);
   const sp = m.divs[m.speaker];
@@ -4668,26 +4682,19 @@ const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "t
    28 and its President. Drawn by the House's renderer (drawChamber) like the Senate's floor; where
    a plan is filed (map/data/seats-<year>.json, seats-<year>-lc.json, from .build/map/sa_seating.mjs)
    each member sits at their desk, otherwise each bloc fills the benches from the chair's end.
-   New South Wales' Council (Parliament House, Sydney — after the chamber's own layout plan,
-   .build/map/src/nsw23-lc-plan/, Wayback 2026-07-15) stands the President's officers much the
-   same way, its 42 members over 48 desks: two straight files of benches down each side (pulled
-   off the table a comfortable aisle), the opposition's two rows running all the way to the back
-   wall while the government's stop well short, each inner file breaking at an aisle into a main
-   run and a small detached bench of four at the rear, the back wall's left hemming a five-seat
-   long bench with a two-seat bench beside it on the centre-left and a matching pair to the bar's
-   right, the three clerks up at the long table's wider T head facing the bar
-   (no desk of their own by the dais), the whips by the table, the Usher of the Black Rod in his
-   own chair at the long table's rounded entrance end, and the public gallery across the far wall.
-   Sydney's Assembly stood here too on its own straight blocks, but the real room is the sister of
-   Victoria's — a horseshoe of benches about a rectangular central table — so
-   since 2026-10-27 it is drawn in app-3-chamber.js's own idiom (NSWB/nswGeom) like the federal
-   House's floor, and only the Council remains on this one. The Council seats 42 over the 48
-   desks, none at a census desk here (no seating plan is filed: each bloc fills the benches
-   sorted, saFloorOf/saGeom's generic path, and the six spare desks stand vacant by name in the
-   ledger's vacant list).
+   New South Wales' Council uses the same renderer with its own rectangular floor. Its
+   proportions and furniture follow the user's four chamber photographs (2026-10-30) and
+   Parliament's chamber layout (https://www.parliament.nsw.gov.au/parliamentary-business/legislative-council/the-chamber):
+   government on the President's right (drawing left), opposition
+   on the left, crossbenches across the entrance end and on the detached inner benches.
+   The long table has a broad clerks' head and a rounded entrance end, with three members'
+   chairs along each side. The vice-regal chair is behind the President, not a second President
+   or deputy. These are schematic member positions, not an assigned seating plan or a count
+   of fixed chairs: the leather benches have no individual desks. Party/term sorting is retained.
    @sa-cells-begin – read as is by .build/map/sa_seating.mjs, which checks every desk a plan names
-   is one drawn here. Measured off the chamber maps' floor images (pixels, x from the centre line,
-   y down from the curves' centres), seat ids the Parliament's own desk names; a side's list reads
+   is one drawn here. SA is measured off the chamber maps' floor images (pixels, x from the centre line,
+   y down from the curves' centres), with the Parliament's own desk names; NSW uses schematic ids.
+   A side's list reads
    down a column from the chair's end, or round a curve from the side wall to the gangway ("-" is
    no seat: the opposition's front bench has none at the cross-aisle). A room's southern wall
    (room[3]) ends with its seats: the lowest bench's southern edge plus the carpet skirt the
@@ -4717,77 +4724,43 @@ const SAF = {
     // a lone seat either side of the gangway, beyond the curves, facing the chair
     singles: [{ row: 2, x: 170, y: 201, L: "H1", R: "I1" }],
   },
-  // and New South Wales' Council (seats 42 over 47 desks), laid out after the chamber photographs
-  // and its own plan (.build/map/src/nsw23-lc-plan/, Wayback 2026-07-15), the room widened a
-  // little on the user's 2026-10-29 walk for the air the furniture needed: two straight files of
-  // benches down each side, pulled an honest aisle off the table, the opposition's inner and
-  // outer both running all the way to the back wall while the government's stop well short of
-  // it — each inner file split at an aisle into its main run and a small detached bench of four
-  // at the rear, the government's tail ending clear above the wall row, the opposition's diving
-  // to it; and along the back wall, their backs to the transverse line and a chair's air between
-  // neighbours, the five-seat long bench on the left, its two-seat neighbour beside it on the
-  // centre-left, and a matching pair to the bar's right; at
-  // the chamber's front a shallow closed platform (the President's chair, a deputy's in front of
-  // it), then the long central table, a T the federal House's way but with its wider speaker-side
-  // head drawn a touch stronger — the clerk and his two offsiders chairing its head, facing the
-  // bar, no desk of their own (the clerks' short desk by the dais is gone — they sit at the
-  // table) — the stem narrowing south and ending rounded at the bar end, three neutral chairs
-  // down each flank and the Black Rod lying across the burgundy inset inside the rounded end —
-  // the Usher in his own chair directly at that end; and across the far wall the transverse
-  // bench backing, outline only, split by the bar gap, running the full width the wall row needs.
-  // The 48 desks outnumber the 42 members: six seats hold no member — the vacant list keeps the
-  // spares at the back of the outer files (empty-outline seats, the real chamber's slack), never
-  // at the wall rows.
-  // No furniture is labelled — the furniture shows through its shapes; only the political labels
-  // and the majority figure hang text (2026-10-27 geometry pass: benches moved inside the carpet,
-  // the U dais closed into the platform, the long table and the transverse backing added, the
-  // majority's dashed thread replaced by the figure below the floor; the carpet's side walls hug
-  // the widest seat — the transverse and the long bench run widest at ±377, the walls them + the
-  // same skirt the south wall keeps; 2026-10-28 reference-crop corrections: the flank chairs to three a side,
-  // the Usher up to the table's rounded end, the Black Rod onto the tabletop; 2026-10-28 rear
-  // rebuild on the user's floor walk: seats to the back on both sides only on the opposition's,
-  // the inner files' detached fours, the back-wall rows, and the T table with its three clerks in
-  // place of the dais-side desk — the two-seat gate pairs and the two officers' chairs go with
-  // it; 2026-10-29, the user's walks over the shipped floor: the long bench belongs on the rear
-  // wall's left, not its right, and the centre-left needed its own two-seat bench beside the bar
-  // (the pair to the bar's right was shipped alone); so the room widens ±76 — the long five
-  // spreading pitch for pitch and never butting, both centre pairs at the wall's line, the inner
-  // files pulled an honest aisle off the table, the government's detached tail falling back to
-  // +30 well clear of the wall seats, six desks standing spare — and the flank chairs walk the
-  // stem below the T head's wings).
+  // NSW Council: long rectangular room, two facing rows on each side, divided inner
+  // benches at the entrance end. The government side stops short of the rear wall.
+  // The rear left long bench and the two short benches beside the central gate face
+  // the President. Gallery furniture is neutral and never counted as members.
   nswLC: {
-    room: [-382.4, -520, 382.4, 189.4], chair: -490, chairW: 44, chairD: 42,
-    // the Council's own chair size — the shared 46x50 seat looms oversized on this small a
-    // room beside the other houses' floors
+    room: [-320.4, -650, 320.4, 318.4], chair: -510, chairW: 38, chairD: 36,
     seat: { W: 35, D: 38 },
-    officers: [-340, 46], mace: false, lead: ["A1", "B1"],
-    plat: { w: 68, y0: -511, y1: -403, deputy: -439 },
-    // the three flank chairs walk the stem below the T head's wings, 87 apart and centred on it
-    ltable: { x: 58, hx: 96, hd: 26, y0: -316, y1: 10, cx: 77, chairs: [-256, -169, -82], rod: -12 },
-    transverse: { y0: 148, y1: 184, half: 377, gap: 14 },
-    gang: 130, usher: 34,
-    // the six spare desks, standing empty at the back of the outer files (the bench fill
-    // walks past them, so they draw as empty outlined seats, never a member's)
-    vacant: ["C8", "C9", "C10", "D9", "D10", "D11"],
+    officers: [-391, 65], mace: false, lead: ["T1", "U1"],
+    plat: { w: 88, y0: -625, y1: -448, regal: -588 },
+    presidentDesk: { x: 62, y0: -484, y1: -458 },
+    headBenches: { x0: 110, x1: 293, ys: [-602, -558], depth: 28 },
+    ltable: { x: 65, hx: 110, hd: 68, y0: -360, y1: 165, cx: 99, chairs: [-236, -110, 16], rod: 134 },
+    transverse: { y0: 293, y1: 313, half: 315, gap: 30 },
+    gang: 130, usher: 201,
+    vacant: ["C7", "C8", "C9", "D7", "D8", "D9"],
+    // Six of the 48 schematic member positions are at the table, not on the benches.
+    tableSeats: { L: "T1 T2 T3", R: "U1 U2 U3" },
+    blocs: {
+      gov: "T1 T2 T3 A1 C1 A2 C2 A3 C3 A4 C4 A5 C5 A6 C6",
+      opp: "U1 U2 U3 B1 D1 B2 D2 B3 D3 B4 D4 B5 D5 B6 D6",
+      cross: "A7 A8 X4 X3 X2 X1 Y2 Y1 E1 E2 B8 B7",
+    },
     straight: [
-      { row: 1, x: 168, ys: [-468, -404, -340, -276, -142.8, -85.2, -27.6, 30], L: "A1 A2 A3 A4 A5 A6 A7 A8", R: "" },
-      { row: 1, x: 168, ys: [-468, -404, -340, -276, -212, -148, -21.6, 36, 93.6, 151.2], L: "", R: "B1 B2 B3 B4 B5 B6 B7 B8 B9 B10" },
-      { row: 2, x: 272, ys: [-468, -410.4, -352.8, -295.2, -237.6, -180, -122.4, -64.8, -7.2, 50.4], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9 C10", R: "" },
-      { row: 2, x: 272, ys: [-468, -406.2, -344.4, -282.6, -220.8, -159, -97.2, -35.4, 26.4, 88.2, 150], L: "", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11" },
+      { row: 1, x: 180, ys: [-440, -358, -276, -194, -112, -30, 104, 154], breakAfter: [5], L: "A1 A2 A3 A4 A5 A6 A7 A8", R: "" },
+      { row: 1, x: 180, ys: [-440, -350, -260, -170, -80, 10, 164, 214], breakAfter: [5], L: "", R: "B1 B2 B3 B4 B5 B6 B7 B8" },
+      { row: 2, x: 270, ys: [-440, -365, -290, -215, -140, -65, 10, 85, 160], L: "C1 C2 C3 C4 C5 C6 C7 C8 C9", R: "" },
+      { row: 2, x: 270, ys: [-440, -358, -276, -194, -112, -30, 52, 134, 216], L: "", R: "D1 D2 D3 D4 D5 D6 D7 D8 D9" },
     ],
-    // the back-wall seats, facing up the chamber to the President, a chair's air between
-    // neighbours: the five-seat long bench on the left, its two-seat neighbour flanking the
-    // bar's left, and a matching pair to its right, all one line off the transverse face
     singles: [
-      { row: 2, x: 44, y: 125, L: "Y1" },
-      { row: 2, x: 94, y: 125, L: "Y2" },
-      { row: 2, x: 150, y: 125, L: "X1" },
-      { row: 2, x: 200, y: 125, L: "X2" },
-      { row: 2, x: 250, y: 125, L: "X3" },
-      { row: 2, x: 300, y: 125, L: "X4" },
-      { row: 2, x: 350, y: 125, L: "X5" },
-      { row: 2, x: 44, y: 125, R: "E1" },
-      { row: 2, x: 94, y: 125, R: "E2" },
+      { row: 2, x: 52, y: 270, L: "Y1", bench: "left-pair" },
+      { row: 2, x: 99, y: 270, L: "Y2", bench: "left-pair" },
+      { row: 2, x: 151, y: 270, L: "X1", bench: "left-long" },
+      { row: 2, x: 198, y: 270, L: "X2", bench: "left-long" },
+      { row: 2, x: 245, y: 270, L: "X3", bench: "left-long" },
+      { row: 2, x: 292, y: 270, L: "X4", bench: "left-long" },
+      { row: 2, x: 52, y: 270, R: "E1", bench: "right-pair" },
+      { row: 2, x: 99, y: 270, R: "E2", bench: "right-pair" },
     ],
     arcs: [],
   },
@@ -4805,6 +4778,7 @@ function saCells(F) {
       cells.push({ id, x, y, fa: Math.atan2(b.y - y, sx * b.a - x), row: b.row, arc: b });
     });
     for (const b of F.singles || []) if (b[key]) cells.push({ id: b[key], x: sx * b.x, y: b.y, fa: -Math.PI / 2, row: b.row });
+    if (F.tableSeats) F.tableSeats[key].split(" ").forEach((id, j) => cells.push({ id, x: sx * F.ltable.cx, y: F.ltable.chairs[j], fa: side ? Math.PI : 0, row: 0 }));
   }
   return cells;
 }
@@ -4880,7 +4854,8 @@ function saGeom(key) {
   };
   const [rx0, ry0, rx1, ry1] = F.room.map(P);
   saGeomC[key] = {
-    key, seats, rows, nRows, bench: seats.filter((c) => c.row > 0), byId, vacant,
+    key, seats, rows, nRows, bench: seats.filter((c) => c.row > 0 || F.tableSeats), byId, vacant,
+    blocSeats: F.blocs ? Object.fromEntries(Object.entries(F.blocs).map(([bloc, ids]) => [bloc, ids.split(" ").map((id) => byId.get(id))])) : null,
     // the bloc labels hang just outside the room's walls
     rOut: rx1 - 0.6, box: { x0: rx0, x1: rx1, y0: ry0, y1: ry1 }, rect: true, cutPad: P(seat.W / 2 + 10),
     arms: false, table: F.lead, chairAt: [0, P(F.chair), Math.PI / 2, 0, P(F.chairW ?? 40), P(F.chairD ?? 38)],
@@ -4922,7 +4897,7 @@ function drawSAFurniture(g, F, geom, opts = {}) {
       const pitch = Math.min(...r.ys.slice(1).map((y, j) => y - r.ys[j]).filter((d) => d > 0));
       let run = null;
       const flush = () => { if (run) rb(side * r.x - hd, run[0] - hw, 2 * hd, run[1] - run[0] + 2 * hw); run = null; };
-      for (const y of ys) { if (y == null) { flush(); continue; } if (run && y - run[1] <= pitch * 1.5) run[1] = y; else { flush(); run = [y, y]; } }
+      for (const [j, y] of ys.entries()) { if (y == null) { flush(); continue; } if (run && (r.breakAfter ? !r.breakAfter.includes(j - 1) : y - run[1] <= pitch * 1.5)) run[1] = y; else { flush(); run = [y, y]; } }
       flush();
     }
     // round the curves: each run a sector of its curve, about that side's own centre — a
@@ -4938,7 +4913,19 @@ function drawSAFurniture(g, F, geom, opts = {}) {
         g.beginPath(); g.arc(c, a.y, a.r + hd, A0, A1, side < 0); g.arc(c, a.y, a.r - hd, A1, A0, side > 0); g.closePath(); g.fill(); g.stroke();
       }
     }
-    for (const q of SF.singles || []) if (q[key]) rb(side * q.x - hw, q.y - hd, 2 * hw, 2 * hd);
+    const rearRuns = new Map();
+    for (const q of SF.singles || []) if (q[key]) {
+      if (!q.bench) rb(side * q.x - hw, q.y - hd, 2 * hw, 2 * hd);
+      else { const run = rearRuns.get(q.bench) || []; run.push(q); rearRuns.set(q.bench, run); }
+    }
+    for (const run of rearRuns.values()) {
+      const xs = run.map((q) => side * q.x), x0 = Math.min(...xs) - hw, x1 = Math.max(...xs) + hw;
+      rb(x0, run[0].y - hd, x1 - x0, 2 * hd);
+    }
+    if (SF.headBenches) {
+      const H = SF.headBenches;
+      for (const y of H.ys) rb(side > 0 ? H.x0 : -H.x1, y, H.x1 - H.x0, H.depth);
+    }
   }
   // the dais, raised above the floor, its step drawn inside — Sydney's Council instead keeps a
   // shallow closed platform at the President's end (its own plan and the chamber photographs:
@@ -4947,6 +4934,9 @@ function drawSAFurniture(g, F, geom, opts = {}) {
     const { w: pw, y0: py0, y1: py1 } = SF.plat;
     g.beginPath(); if (g.roundRect) g.roundRect(-pw, py0, 2 * pw, py1 - py0, 8); else g.rect(-pw, py0, 2 * pw, py1 - py0);
     g.fillStyle = wood; g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(-pw + 8, py1 - 10); g.lineTo(pw - 8, py1 - 10); g.stroke();
+    const desk = SF.presidentDesk;
+    if (desk) { g.fillStyle = bench; rb(-desk.x, desk.y0, 2 * desk.x, desk.y1 - desk.y0, 3); }
   } else {
     const dais = (inset) => { const w = 52 - inset, yt = SF.room[1] + 6 + inset, yc = SF.chair + 12; g.beginPath(); g.moveTo(-w, yt); g.lineTo(w, yt); g.lineTo(w, yc); g.arc(0, yc, w, 0, Math.PI); g.closePath(); };
     dais(0); g.fillStyle = wood; g.fill(); g.stroke();
@@ -4966,16 +4956,19 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   if (SF.ltable) {
     const L = SF.ltable;
     const tPath = (inset) => {
-      const r = L.x - inset, hx = L.hx - inset, cy = L.y1 - r, y0 = L.y0 + inset;
-      g.beginPath(); g.moveTo(-hx, y0); g.lineTo(hx, y0); g.lineTo(hx, y0 + L.hd);
-      g.lineTo(r, y0 + L.hd); g.lineTo(r, cy); g.arc(0, cy, r, 0, Math.PI); g.lineTo(-r, y0 + L.hd);
-      g.lineTo(-hx, y0 + L.hd); g.closePath();
+      const r = L.x - inset, hx = L.hx - inset, cy = L.y1 - L.x, y0 = L.y0 + inset, shoulder = L.y0 + L.hd - inset;
+      g.beginPath(); g.moveTo(-hx, y0); g.lineTo(hx, y0); g.lineTo(hx, shoulder);
+      g.lineTo(r, shoulder); g.lineTo(r, cy); g.arc(0, cy, r, 0, Math.PI); g.lineTo(-r, shoulder);
+      g.lineTo(-hx, shoulder); g.closePath();
     };
     const burg = css(mixC(th.floor, [104, 28, 38], th.dark ? 0.55 : 0.78));
     tPath(0); g.fillStyle = wood; g.fill(); g.stroke();
     tPath(6); g.fillStyle = burg; g.fill();
+    // Keep only the clerks' raised book rack across the President's end.
+    g.fillStyle = wood;
+    rb(-L.hx + 12, L.y0 + L.hd - 22, 2 * (L.hx - 12), 13, 2);
     g.strokeStyle = css(th.faint); g.lineWidth = Math.max(hair, (0.05 * s) / k); g.lineCap = "round";
-    g.beginPath(); g.moveTo(-16, L.rod); g.lineTo(16, L.rod); g.stroke();
+    g.beginPath(); g.moveTo(-24, L.rod); g.lineTo(24, L.rod); g.stroke();
     g.lineCap = "butt"; g.lineWidth = hair; g.strokeStyle = css(th.line);
   }
   // the far wall's transverse backing: straight sections split at the bar, outline only —
@@ -5011,14 +5004,14 @@ function drawSAFurniture(g, F, geom, opts = {}) {
   for (const ox of SF.twoOfficers ? [-odx, odx] : [-odx, 0, odx]) drawChair(g, X(P(ox)), Yp(P(oy)), Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
   // Sydney's Council keeps the Usher of the Black Rod at the long table's rounded end, on his own chair facing back to the President
   if (SF.usher != null) drawChair(g, X(0), Yp(P(SF.usher)), -Math.PI / 2, W, Dp, css(officer), back(officer, 0.18), 1);
-  // ... and on its platform the President's big chair with a deputy's smaller one in front, both
-  // the officers' neutral (never read as party seats)
+  // The ceremonial vice-regal chair stands behind the President's working chair.
+  // A named President, when available in the model, is painted at SF.chair by drawChamber.
   if (SF.plat) {
     drawChair(g, X(0), Yp(P(SF.chair)), Math.PI / 2, P(SF.chairW ?? 40) * s, P(SF.chairD ?? 38) * s, css(officer), back(officer, 0.18), 1);
-    drawChair(g, X(0), Yp(P(SF.plat.deputy)), Math.PI / 2, P(32) * s, P(30) * s, css(officer), back(officer, 0.18), 1);
+    drawChair(g, X(0), Yp(P(SF.plat.regal)), Math.PI / 2, P(48) * s, P(48) * s, css(officer), back(officer, 0.18), 1);
   }
   // three neutral chairs down each of the long table's flanks, evenly spaced, facing the table
-  if (SF.ltable) {
+  if (SF.ltable && !SF.tableSeats) {
     const L = SF.ltable, cw = P(20) * s, cd = P(26) * s;
     for (const cx of [-L.cx, L.cx]) for (const cy of L.chairs) drawChair(g, X(P(cx)), Yp(P(cy)), cx < 0 ? 0 : Math.PI, cw, cd, css(officer), back(officer, 0.18), 1);
   }
