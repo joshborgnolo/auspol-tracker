@@ -1,0 +1,69 @@
+"General Information - 1998, 1996 AND 1993  Elections"							
+Codes for Political Parties							
+Below is the list of AEC codes used in the results section of this report to identify registered 							
+political parties. IND and OTH are used throughout these statistics to identify Independent candidate.							
+							
+AEC Code	Party name						
+ABF	A Better Future for our Children						
+ABR	Australian Bill of Rights Group						
+ACS	Abolish Child Support/Family Court Party						
+AFI	Australians Against Further Immigration						
+AGV	The Australian Greens - Victoria						
+AIP	Australia’s Indigenous Peoples Party						
+ALP	Australian Labor Party						
+ARP	Australian Reform Party						
+ASG	Abolish Self Government Coalition						
+ASP	Australian Shooters Party						
+AWP	Australian Women’s Party
+CAP	The Confederate Action Party of Australia
+CCG	Central Coast Green Party
+CDP	Christian Democratic Party (Fred Nile Group) - 1998 election
+CEC	Citizens Electoral Council of Australia
+CIR	Pensioner and Citizen Initiated Referendum Alliance
+CLP	Northern Territory Country Liberal Party
+CTA	CTA Child Protection (Elaine Nile) Party - 1998 election
+	Call to Australia (Fred Nile) Group - 1993 and 1996 elections
+DEM	Australian Democrats
+DLP	Democratic Labor Party (DLP) of Australia
+DSL	Democratic Socialist Electoral League
+EFF	Independent EFF
+ESG	The Eastern Suburb Greens
+FCP	Abolish Child Support/Family Court Party/Family Law Reform Party
+FLR	Family Law Reform Party
+FST	Australia First Party
+GA	Green Alliance Senate - New South Wales
+GDA	ACT Green Democratic Alliance
+GLO	Greens in Lowe
+GRN	Australian Greens
+GRY	Grey Power
+GSA	The Green Party South Australia
+GWA	The Greens (WA) Inc
+HAN	Pauline Hanson's One Nation
+HAR	Tasmanian Independent Senator Brian Harradine Group
+IND	Independent
+JPI	Janet Powell Independents' Network
+LNP*	Liberal/National Party
+LP	Liberal Party of Australia
+NAN	No Aircraft Noise
+NDP	Nuclear Disarmament Party of Australia
+NLP	Natural Law Party
+NP	National Party of Australia
+OAP	One Australia Party
+PLP	Progressive Labour Party
+QF	Queensland First
+QG	Queensland Greens
+RAR/RARI	Reclaim Australia: Reduce Immigration
+RCG	Richmond/Clarence Greens
+RCL	Rex Connor (Snr) Labor Party
+RPA	Republican Party of Australia
+SEN	The Seniors
+SEP	Socialist Equality Party
+TFP	Tasmania First Party
+TG	Tasmanian Greens
+TPS	Taxi Operators Political Service (Oceania)
+TST	Tasmania Senate Team
+UNI	Unity - Say No To Hanson
+VGA	The Victorian Green Alliance
+WSG	Western Suburbs Greens
+
+*  These parties stood as joint Senate groups in some States.	

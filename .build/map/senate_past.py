@@ -29,7 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SRC = os.path.join(ROOT, ".build/map/src/senate-handbook")
 OUT = os.path.join(ROOT, "map/data")
 D = dt.date.fromisoformat
-ELECTIONS = {1996: "1996-03-02", 2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
+ELECTIONS = {1993: "1993-03-13", 1996: "1996-03-02", 1998: "1998-10-03", 2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
 TERRITORY = {"ACT", "NT"}
 OPEN = D("2100-01-01")
 # the Handbook's party names as the map's party codes (partyName in app-1-base.js names them back)
@@ -40,7 +40,7 @@ AB = {"Australian Labor Party": "ALP", "Liberal Party of Australia": "LP", "Nati
       "Democratic Labor Party": "DLP", "Palmer United Party": "PUP", "Liberal Democratic Party": "LDP", "Liberal Democrats": "LDP", "Australian Motoring Enthusiast Party": "AMEP",
       "Jacqui Lambie Network": "JLN", "Derryn Hinch's Justice Party": "DHJP", "United Australia Party": "UAPP", "Australian Conservatives": "AC", "Katter's Australian Party": "KAP",
       "Australia's Voice": "AV", "Australian Progressive Alliance": "APA", "Australian Sports Party": "ASP", "Gerard Rennick People First": "GRPF", "Glenn Lazarus Team": "GLT",
-      "Labor": "ALP", "Liberal": "LP", "Tasmanian Independent Senator Brian Harradine Group": "IND"}
+      "Labor": "ALP", "Liberal": "LP", "Independent Liberal": "IND", "Tasmanian Independent Senator Brian Harradine Group": "IND"}
 # the check folds the Coalition into one: the Handbook's totals count Liberal National and Country Liberal
 # senators with the party room each sits in
 FAMILY = {"LP": "COAL", "NP": "COAL", "LNP": "COAL", "CLP": "COAL"}
@@ -149,7 +149,7 @@ fmt = lambda c: " ".join(f"{k} {v}" for k, v in sorted(c.items(), key=lambda kv:
 fails = []
 for row in load("party-representation-senate")["Rows"]:
     p, d = row["Parliament"], D(row["Date"][:10])
-    if p < 40:
+    if p < 37:
         continue
     y = d.year
     want = collections.Counter()
@@ -170,6 +170,15 @@ for row in load("party-representation-senate")["Rows"]:
     # terms turn over for everyone else. Same anatomy as 2013's ACT boundary, one territory gun out
     if not which and p == 40 and want - before == collections.Counter({"COAL": 1}) and not (before - want):
         which = "the Senate on polling day, but for the Handbook's territory take-office (its count seats the incoming NT member the records sit that day)"
+    if not which and p == 39 and want - before == collections.Counter({"ALP": 1}) and not (before - want):
+        which = "the Senate on polling day, but for Crossin's territory term renewal on polling day"
+    if not which and p == 38 and want - before == collections.Counter({"ALP": 3}) and not (before - want):
+        # The opening table retains the seats of three February resignations;
+        # service records correctly leave them vacant on 2 March. The map
+        # displays 1 July, after all three have been filled.
+        resigned = {t['n'] for t in terms if D('1996-02-01') <= t['end'] < d and 'Resigned' in t['text']}
+        assert resigned == {'Gareth Evans', 'Robert McMullan', 'John Devereux'}, resigned
+        which = "the outgoing Senate before the February resignations of Evans, McMullan and Devereux"
     print(f"parliament {p} ({y}): " + (f"agrees with {which}: {fmt(want)}" if which else f"DIFFERS: the Handbook {fmt(want)}\n    on polling day {fmt(before)}\n    the new Senate {fmt(after)}"))
     if not which:
         fails.append(p)
@@ -191,10 +200,10 @@ VICE = re.compile(r"vice (?:the Hon\.? |Dr |Sir |Mr |Mrs |Ms )*((?:[A-Z]\.? ?)+)
 # scands' own class years - including 1998, which has no /map/ frame); the
 # ELECTIONS-keyed double-dissolution/half-senate era above 2004 reads
 # straight off ELECTIONS.
-SERVICE_CLASS = [(D("1993-03-13"), 1993), (D("1996-03-02"), 1996), (D("1998-10-03"), 1998), (D("2001-11-10"), 2001)]
-LEADERS = {1996: ("Hill", "Faulkner"), 2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
+SERVICE_CLASS = [(D("1990-03-24"), 1990), (D("1993-03-13"), 1993), (D("1996-03-02"), 1996), (D("1998-10-03"), 1998), (D("2001-11-10"), 2001)]
+LEADERS = {1993: ("Evans", "Hill"), 1996: ("Hill", "Faulkner"), 1998: ("Hill", "Faulkner"), 2001: ("Hill", "Faulkner"), 2004: ("Hill", "Evans"), 2007: ("Evans", "Minchin"), 2010: ("Evans", "Abetz"), 2013: ("Abetz", "Wong"), 2016: ("Brandis", "Wong"),
            2019: ("Cormann", "Wong"), 2022: ("Wong", "Birmingham"), 2025: ("Wong", "Cash")}
-GOV = {1996: "COAL", 2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
+GOV = {1993: "ALP", 1996: "COAL", 1998: "COAL", 2001: "COAL", 2004: "COAL", 2007: "ALP", 2010: "ALP", 2013: "COAL", 2016: "COAL", 2019: "COAL", 2022: "ALP", 2025: "ALP"}
 long16 = {(r["State"].upper(), r["Name"].split(",")[0].strip().upper()) for r in load("senators-elected-2016") if (r["OrderElected"] or 99) <= 6}
 for y, e in ELECTIONS.items():
     d = seated_on(y)
@@ -215,7 +224,7 @@ for y, e in ELECTIONS.items():
         if y == 2016:
             new = t["st"] not in TERRITORY and (t["st"], t["dn"].split(",")[0].strip().upper()) in long16
         else:
-            new = t["st"] not in TERRITORY and t["start"] == d
+            new = t["st"] not in TERRITORY and (t["start"] == d or (y == 1998 and t["phid"] == "FY5" and t["start"] == D("1999-06-30")))  # Denman: Handbook starts her elected term one day early
         # a state senator's term is the year it is due to end (the continuing half's three years on); a territory
         # senator's runs to the next election
         o = {"n": t["n"], "st": t["st"], "ab": ab(party), "pn": re.sub(r"\s*\[.*\]$", "", party),
@@ -239,7 +248,7 @@ for y, e in ELECTIONS.items():
             o["role"] = "president"
         sur = t["n"].split(" ", 1)[1]
         side = FAMILY.get(o["ab"], o["ab"])
-        if sur == gl and side == GOV[y]:
+        if sur == gl and side == GOV[y] and (y != 1993 or t['n'] == 'Gareth Evans'):
             o["role"] = "leader"
         if sur == ol and side != GOV[y] and side in ("ALP", "COAL"):
             o["role"] = "oppLeader"

@@ -111,7 +111,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // coverage, the handbook caches refreshed full (1812 senate-service).
   for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "1996 lane " + f + " on disk");
   assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 venue store (derive-1996-venues.py) is on disk");
-  const D = JSON.parse(R("map/data/data-1996.json"));
+  const D = JSON.parse(R("map/data/res-1996.json"));
   const r = JSON.parse(R("map/data/res-1996.json"));
   const S = JSON.parse(R("map/data/senate-1996.json"));
   const SV = JSON.parse(R("map/data/senate-vote-1996.json"));
@@ -201,7 +201,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // seats/total figures are the AEC's own (howard 82 seats, TISBHG-independent 1 seat).
   for (const f of ["senate-2001.json", "senate-vote-2001.json", "res-2001.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "2001 lane " + f + " on disk");
   assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-2001.json")), "the 2001 venue store (derive-2001-venues.py) is on disk");
-  const D = JSON.parse(R("map/data/data-2001.json"));
+  const D = JSON.parse(R("map/data/res-2001.json"));
   const r = JSON.parse(R("map/data/res-2001.json"));
   const S = JSON.parse(R("map/data/senate-2001.json"));
   const SV = JSON.parse(R("map/data/senate-vote-2001.json"));

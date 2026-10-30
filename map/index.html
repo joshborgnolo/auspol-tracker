@@ -168,7 +168,7 @@
   <section class="sh-frame mp-sec" aria-labelledby="mp-title">
     <div class="rd-eyebrow">
       <h1 class="rd-title" id="mp-title">Election map</h1>
-      <span class="rd-meta" id="mp-meta">Every seat and polling place since 2004</span>
+      <span class="rd-meta" id="mp-meta">Federal election maps from 1993</span>
       <span class="rd-grow"></span>
       <div class="mp-views" role="tablist" aria-label="View">
         <button type="button" class="rd-tab" role="tab" data-view="map" aria-selected="true"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 3.8 5.6 2l4.8 2 4.1-1.8v10L10.4 14l-4.8-2-4.1 1.8z"/><path d="M5.6 2v10M10.4 4v10"/></svg><span class="tw" data-t="Map">Map</span></button>
@@ -208,13 +208,14 @@
     <div class="cols">
       <div>
         <h3>Results</h3>
-        <p>Every figure is the Australian Electoral Commission’s final count for that election: first preferences, the final two candidates, the two-party count against Labor and the Coalition, informal ballots and the flow of each excluded candidate’s preferences. Polling places are the AEC’s own booths; their ordinary votes add up, candidate by candidate, to each seat’s ordinary-vote total.</p>
+        <p>Results come from the Australian Electoral Commission: first preferences, the final two candidates, the two-party count against Labor and the Coalition, informal ballots and recorded preference transfers. Missing figures remain unavailable. The 1993 statistics pack’s booth counts differ slightly from its certified candidate totals in 23 divisions; the map retains each published figure. Preference flows are withheld where those count records do not reconcile. Some 1993 booth informal figures are also absent or differ from division totals. In 1998, Newcastle has no notional two-party count, and Reid’s booth informal count is three votes below its division total.</p>
         <p>The 2026 Farrer by-election is the AEC’s count for that by-election. “Now” shows who holds each seat today: the 2025 result, the Farrer by-election, and members who have changed party since.</p>
         <p>The chamber view also shows the Senate. Today’s puts each senator in their seat on the Parliament’s Senate seating plan, with terms from the AEC’s lists of senators elected in 2022 and 2025. Each election’s Senate is the one that sat when its new senators took their seats: 1 July after a half-Senate election, or July 2016 for the double dissolution. Who sat, and for which party, comes from the Parliamentary Handbook’s records of each senator’s terms and changes of party. These Senates are sorted, since no seating plan survives for them, and drawn on today’s floor; the chamber has not changed since 1988.</p>
       </div>
       <div>
         <h3>Boundaries and places</h3>
-        <p>Seats are drawn on the AEC’s boundaries for each election, from 2004 to 2025. Polling places are mapped from the AEC’s addresses; 2004’s places carry the coordinates the same places had in 2007. Early voting centres are drawn as squares and sized, like the other places, by votes cast.</p>
+        <p>The 1993, 1996 and 1998 boundaries come from the <a href="https://handbook.aph.gov.au/">Parliamentary Handbook</a>, Commonwealth of Australia, extracted by <a href="https://github.com/wragge/historical-federal-electorate-boundaries">Tim Sherratt</a>. They are shared for non-commercial use under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>, retaining the original polygon coordinates through a lossless format conversion. See the <a href="/map/data/historical-boundary-sources.json">dated source index and attribution</a>. The historical digitisation includes small border discrepancies and a self-intersection in 1993 Dickson; these source features have not been redrawn.</p>
+        <p>Later maps use ABS and AEC boundaries for their respective elections. Polling-place names and votes are available for 1993 and 1998, but verified historical venue coordinates are unavailable in the source used here, so those booths are searchable without map markers. The 1996 map uses the existing later-venue name matches and locality estimates; these are approximate historical locations. From 2004, polling places use the AEC’s venue records; 2004’s places carry coordinates matched from 2007. Early voting centres are drawn as squares.</p>
         <p>The map’s party colours are the site’s, re-stepped so that touching seats stay distinguishable for colour-blind readers.</p>
       </div>
       <div>
@@ -228,7 +229,7 @@
 </main>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
 <script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
-<script src="/map/map.js?v=08c5b688"></script>
+<script src="/map/map.js?v=0bc626b6"></script>
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">
