@@ -201,6 +201,32 @@ function senLegendHeight(sm, w, probe) {
   }
   return legendHeights.get(key);
 }
+/* the census pickers: the ABS's advantage indexes, then the people measures,
+   then the active lane's own option picker. The legend lays each line out in
+   its own .lg-t block on the map and chamber; the list bar lays the same
+   selects out bare in its row (the legend is hidden in the list view) */
+function censusSelects(m, cls = "") {
+  const c = cls ? ` class="${cls}"` : "";
+  const og = (label, list) => `<optgroup label="${label}">${list.map(([v, t]) => `<option value="${v}"${S.index === v ? " selected" : ""}>${t}</option>`).join("")}</optgroup>`;
+  const peopleExtra = [
+    ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
+    ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
+    ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
+  ];
+  const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
+  if (isDemo()) {
+    // on Born overseas a second picker reads a birthplace country per year
+    // (the year's own census-edition menu; the informal lens's own
+    // measure-switcher idiom)
+    if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) out.push(`<select${c} data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_BORN[k]}</option>`).join("")}</select>`);
+    // the Religion and Housing-tenure lenses' own option pickers
+    // (No religion and owned-with-mortgage are the landing views)
+    if (S.index === LENS_REL && m.relKeys && m.relKeys.length) out.push(`<select${c} data-opt="rel" aria-label="Religion">${m.relKeys.map((k) => `<option value="${k}"${S.rel === k ? " selected" : ""}>${REL_NAME[k]}</option>`).join("")}</select>`);
+    if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) out.push(`<select${c} data-opt="ten" aria-label="Housing tenure">${m.tenKeys.map((k) => `<option value="${k}"${S.ten === k ? " selected" : ""}>${TEN_NAME[k]}</option>`).join("")}</select>`);
+    if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(`<select${c} data-opt="anc" aria-label="Ancestry">${m.ancKeys.map((k) => `<option value="${k}"${S.anc === k ? " selected" : ""}>${ANC_NAME[k]}</option>`).join("")}</select>`);
+  }
+  return out;
+}
 function legendHTML(m) {
   const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const grad = (tbl, from, to) => { const st = []; for (let k = 0; k <= 10; k++) st.push(`${css(tbl[Math.round(lerp(from, to, k / 10))])} ${k * 10}%`); return `linear-gradient(90deg, ${st.join(",")})`; };
@@ -279,32 +305,10 @@ function legendHTML(m) {
       h += `<div class="lg-t">The AEC’s seat types</div><div class="lg-cats">${CLS.map((c, k) => `<span><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]} <b>${m.divs.filter((d) => d.cls === c).length}</b></span>`).join("")}</div>`;
       break;
     case "seifa": {
-      // one picker for the census: the ABS's advantage indexes, then the people measures
-      const og = (label, list) => `<optgroup label="${label}">${list.map(([v, t]) => `<option value="${v}"${S.index === v ? " selected" : ""}>${t}</option>`).join("")}</optgroup>`;
-      const peopleExtra = [
-        ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
-        ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
-        ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
-      ];
-      h += `<div class="lg-t"><select data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select></div>`;
+      // the census pickers come from the shared builder: the list bar lays
+      // the same selects out too (this legend is hidden in the list view)
+      for (const s of censusSelects(m)) h += `<div class="lg-t">${s}</div>`;
       if (isDemo()) {
-        // on Born overseas a second picker reads a birthplace country per year
-        // (the year's own census-edition menu; the informal lens's own
-        // measure-switcher idiom)
-        if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) {
-          h += `<div class="lg-t"><select data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_BORN[k]}</option>`).join("")}</select></div>`;
-        }
-        // the Religion and Housing-tenure lenses' own option pickers
-        // (No religion and owned-with-mortgage are the landing views)
-        if (S.index === LENS_REL && m.relKeys && m.relKeys.length) {
-          h += `<div class="lg-t"><select data-opt="rel" aria-label="Religion">${m.relKeys.map((k) => `<option value="${k}"${S.rel === k ? " selected" : ""}>${REL_NAME[k]}</option>`).join("")}</select></div>`;
-        }
-        if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) {
-          h += `<div class="lg-t"><select data-opt="ten" aria-label="Housing tenure">${m.tenKeys.map((k) => `<option value="${k}"${S.ten === k ? " selected" : ""}>${TEN_NAME[k]}</option>`).join("")}</select></div>`;
-        }
-        if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) {
-          h += `<div class="lg-t"><select data-opt="anc" aria-label="Ancestry">${m.ancKeys.map((k) => `<option value="${k}"${S.anc === k ? " selected" : ""}>${ANC_NAME[k]}</option>`).join("")}</select></div>`;
-        }
         const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
         // an income lane can arrive by hash on a year whose store carries
         // none (income starts 2001); it reads as its own kind of early

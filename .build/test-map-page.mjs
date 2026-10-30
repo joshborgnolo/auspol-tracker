@@ -528,6 +528,24 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   }
 }
 
+// ── the census pickers in the list view (2026-10-31): the measure select and
+// its active-lane sub-pickers come from ONE shared builder (censusSelects);
+// the legend lays each out in a .lg-t block on the map and chamber, and the
+// list bar lays the same selects out bare — the legend is hidden in the list
+// view, whose lens column still reads S.index (before this the list had no
+// way to change the census measure it displays)
+{
+  const ui = part("app-6-ui.js"), list = part("app-5-list.js"), css = part("page.css");
+  assert.ok(ui.includes("function censusSelects(m, cls = \"\")"), "the shared census-picker builder");
+  assert.ok(ui.includes('const out = [`<select${c} data-opt="index" aria-label="Census measure">'), "the measure select is the builder's first line");
+  assert.ok(ui.includes('out.push(`<select${c} data-opt="cob" aria-label="Birthplace country"') && ui.includes('out.push(`<select${c} data-opt="rel" aria-label="Religion"') && ui.includes('out.push(`<select${c} data-opt="ten" aria-label="Housing tenure"'), "the active lane's own pickers ride the builder too");
+  assert.ok(ui.includes('for (const s of censusSelects(m)) h += `<div class="lg-t">${s}</div>`;'), "the legend lays each picker out in its own block");
+  assert.ok(list.includes('if (S.lens === "seifa") bar += censusSelects(m, "ls-sel").join("");'), "the list bar lays the same selects out on the census lens");
+  assert.ok(css.includes('.ls-sel[aria-label="Census measure"]'), "the picker gets a wider cap in the list bar than the filter selects");
+  assert.ok(ui.includes('k === "index"') && ui.includes('k === "cob"') && ui.includes('k === "rel"') && ui.includes('k === "ten"'), "the document-level change handler drives the pickers wherever they render");
+  assert.ok(ui.includes('if (S.view === "list") renderList(true);'), "a census change re-renders the list");
+}
+
 // the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
 // (.build/map/build_sa26_demo.py) and the advantage indexes ride
 // data/sa26-seifa.json (.build/map/build_sa26_seifa.py, ABS SEIFA 2021 SA1
