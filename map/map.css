@@ -433,6 +433,9 @@ button { cursor: pointer; background: none; border: 0; }
 .ls-head { position: sticky; top: 0; z-index: 2; display: grid; align-items: end; padding: 10px 0 6px; background: var(--bg); border-bottom: 1px solid var(--ink-faint); }
 .ls-head button { font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; padding: 0 8px 0 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .ls-head button.r { text-align: right; padding: 0 0 0 8px; }
+/* a text cell right after a number cell has 0px of padding on either side of the seam
+   (r cells carry only padding-left, text cells only padding-right) — give it the same 8px */
+.ls-head .ls-hc.r + .ls-hc:not(.r) { padding-left: 8px; }
 .ls-head button:hover { color: var(--ink); }
 .ls-head button[aria-sort] { color: var(--ink); }
 .ls-head button .ar { font-size: 9px; margin-left: 3px; color: var(--ink-faint); }
@@ -442,6 +445,7 @@ button { cursor: pointer; background: none; border: 0; }
 .ls-row.on { background: color-mix(in oklch, var(--ink) 6%, transparent); }
 .ls-row > div { min-width: 0; padding-right: 8px; }
 .ls-row > div.r { text-align: right; padding: 0 0 0 8px; font-variant-numeric: tabular-nums; }
+.ls-row > div.r + div:not(.r) { padding-left: 8px; }
 /* the cells are inline <span>s, so these need blockify to ever truncate */
 .ls-row .c1 { display: block; font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* polling-place names run to a second line rather than off the column;

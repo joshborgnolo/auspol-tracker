@@ -549,6 +549,15 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(!part("page.css").includes('.ls-sel[aria-label="Census measure"]'), "no bar-only census select styling survives");
 }
 
+// a text cell that follows a numeric list-table cell gets the same 8px left
+// gap every seam carries (the seat-type lens column sits after Swing)
+{
+  const css = part("page.css"), list = part("app-5-list.js");
+  assert.ok(css.includes('.ls-row > div.r + div:not(.r) { padding-left: 8px; }'), "a text cell after a numeric cell keeps 8px left padding in list rows");
+  assert.ok(css.includes('.ls-head .ls-hc.r + .ls-hc:not(.r) { padding-left: 8px; }'), "the list header keeps the same gap");
+  assert.ok(list.includes('if (S.lens === "cls") return esc(CLS_SHORT[v]);'), "the seat-type lens cell is the class name as plain text, no key swatch");
+}
+
 // the sa26 frame's census lanes: the People shares ride data/sa26-demo.json
 // (.build/map/build_sa26_demo.py) and the advantage indexes ride
 // data/sa26-seifa.json (.build/map/build_sa26_seifa.py, ABS SEIFA 2021 SA1
