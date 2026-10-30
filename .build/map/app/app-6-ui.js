@@ -107,7 +107,10 @@ function legendHist(m, lo, hi) {
 function renderLegend() {
   legendKey = legendState();
   const el = $("#legend"), m = M();
-  if (!m || S.view === "list") { el.hidden = true; return; }
+  // the key shows in all three views: the list reads the same lens values
+  // (its coloured cells) as the map and chamber, so it needs the same key —
+  // census measure picker, ramps and switchers included
+  if (!m) { el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   holdLegendHeight(m);

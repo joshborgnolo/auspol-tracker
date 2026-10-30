@@ -6184,9 +6184,6 @@ function renderList(keepScroll) {
   const total = unit === "seats" ? m.divs.length : sd != null ? m.booth.byDiv[sd].length : m.booth.n;
   const sel = (name, k, opts, cur) => `<select class="ls-sel${cur ? " on" : ""}" data-fsel="${k}" aria-label="${name}"><option value="">${name}</option>${opts.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${cur === v ? "✓ " : ""}${t}</option>`).join("")}</select>`;
   let bar = `<div class="ls-unit" role="tablist" aria-label="Rows"><button type="button" class="rd-tab" role="tab" data-unit="seats" aria-selected="${unit === "seats"}"><span class="tw" data-t="Seats">Seats</span></button><button type="button" class="rd-tab" role="tab" data-unit="booths" aria-selected="${unit === "booths"}"><span class="tw" data-t="Polling places">Polling places</span></button></div>`;
-  // the census pickers ride the bar too: the legend that carries them on the
-  // map and chamber is hidden here, and the lens column still reads S.index
-  if (S.lens === "seifa") bar += censusSelects(m, "ls-sel").join("");
   if (unit === "booths" && sd != null) bar += `<button type="button" class="ls-chip" data-unseat title="Show every polling place">In ${ds(m.divs[sd].n)} ✕</button>`;
   else {
     bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
@@ -6353,7 +6350,10 @@ function legendHist(m, lo, hi) {
 function renderLegend() {
   legendKey = legendState();
   const el = $("#legend"), m = M();
-  if (!m || S.view === "list") { el.hidden = true; return; }
+  // the key shows in all three views: the list reads the same lens values
+  // (its coloured cells) as the map and chamber, so it needs the same key —
+  // census measure picker, ramps and switchers included
+  if (!m) { el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   holdLegendHeight(m);

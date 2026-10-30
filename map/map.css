@@ -421,8 +421,6 @@ button { cursor: pointer; background: none; border: 0; }
 }
 .ls-sel { flex: none; width: auto; max-width: 150px; text-overflow: ellipsis; }
 .ls-sel[data-fsel="st"] { max-width: 136px; }
-/* the census picker names its indexes in full — "Education and occupation (IEO)" */
-.ls-sel[aria-label="Census measure"] { max-width: 230px; }
 .ls-sel.on { border-color: var(--ink-faint); background-color: color-mix(in oklch, var(--ink) 4%, var(--bg)); }
 .ls-chip { flex: none; height: 34px; padding: 0 12px; border: 1px solid var(--ink-faint); border-radius: 8px; background: color-mix(in oklch, var(--ink) 4%, var(--bg)); font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
 .ls-chip:hover { border-color: var(--ink-3); }
