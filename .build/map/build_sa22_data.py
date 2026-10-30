@@ -182,20 +182,27 @@ def suburb_case(s):
     return re.sub(r"\bMc([a-z])", lambda m: "Mc" + m.group(1).upper(), t)
 
 
+def fix_word(w):
+    if w.isupper() and len(w) > 1:
+        t = w.capitalize()
+        for pre in ("Mc", "O'", "D'"):
+            if t.startswith(pre) and len(t) > len(pre):
+                t = pre + t[len(pre)].upper() + t[len(pre) + 1:]
+        return t
+    # the ECSA record prints a few nominated names "McLEISH" style (the
+    # surname's own capital kept, the tail still in caps); those aren't
+    # .isupper(), so normalise the caps tail here
+    m = re.fullmatch(r"(Mc|Mac)([A-Z]{2,})", w)
+    if m:
+        return m.group(1) + m.group(2).capitalize()
+    return w
+
+
 def title_name(given, surname):
     s = surname or ""
     parts = []
     for w in s.split(" "):
-        if w.isupper() and len(w) > 1:
-            t = w.capitalize()
-            for pre in ("Mc", "O'", "D'"):
-                if t.startswith(pre) and len(t) > len(pre):
-                    t = pre + t[len(pre)].upper() + t[len(pre) + 1:]
-            if "-" in t:
-                t = "-".join(p[:1].upper() + p[1:] for p in t.split("-"))
-            parts.append(t)
-        else:
-            parts.append(w)
+        parts.append("-".join(fix_word(p) if p else p for p in w.split("-")))
     return ((given or "").strip() + " " + " ".join(parts)).strip()
 
 

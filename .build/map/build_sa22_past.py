@@ -127,20 +127,27 @@ def cached_json(name):
         return json.load(f)
 
 
+def fix_word(w):
+    if w.isupper() and len(w) > 1:
+        t = w.capitalize()
+        for pre in ("Mc", "O'", "D'"):
+            if t.startswith(pre) and len(t) > len(pre):
+                t = pre + t[len(pre)].upper() + t[len(pre) + 1:]
+        return t
+    # the ECSA record prints a few nominated names "McLEISH" style (the
+    # surname's own capital kept, the tail still in caps); those aren't
+    # .isupper(), so normalise the caps tail here
+    m = re.fullmatch(r"(Mc|Mac)([A-Z]{2,})", w)
+    if m:
+        return m.group(1) + m.group(2).capitalize()
+    return w
+
+
 def title_name(given, surname):
     s = surname or ""
     out = []
     for w in s.split(" "):
-        if w.isupper() and len(w) > 1:
-            t = w.capitalize()
-            for pre in ("Mc", "O'", "D'"):
-                if t.startswith(pre) and len(t) > len(pre):
-                    t = pre + t[len(pre)].upper() + t[len(pre) + 1:]
-            if "-" in t:
-                t = "-".join(p[:1].upper() + p[1:] for p in t.split("-"))
-            out.append(t)
-        else:
-            out.append(w)
+        out.append("-".join(fix_word(p) if p else p for p in w.split("-")))
     return ((given or "").strip() + " " + " ".join(out)).strip()
 
 
