@@ -112,6 +112,11 @@ const rdApLeanDot = (v, onM) => (v == null || Math.abs(v) < 0.05 ? "var(--ink-3)
 const rdApLeanInk = (v, onM) => (v == null || Math.abs(v) < 0.05 ? "var(--ink-3)" : v > 0 ? "var(--alp-text)" : onM ? "var(--onp-text)" : "var(--lnp-text)");
 const rdApSigned = (v) => (Math.abs(v) < 0.05 ? "0.0" : rdSigned(v, 1));
 const rdApDays = (iso) => Date.parse(String(iso).slice(0, 10) + "T00:00:00Z");
+/* the age the window counts on in the headline facets: the fieldwork midpoint,
+   as gen-data's nowcast judges a wave in/out (mid in [ref - 21d, ref]) - the row's
+   displayed end date can sit inside a window its midpoint has left. `mid` rides
+   every row of the term except a legacy one; released (fieldwork end) backstops it */
+const rdApWinMid = (p) => (p.mid != null ? p.mid : rdApDays(p.released));
 const RD_AP_WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /* "Wed 23 Sep, 5 am" */
 function rdApOut(stamp) {
@@ -2190,7 +2195,10 @@ function RdApPrimRail({ p }) {
    nowcasts gen-data ships), then reads the polls in the table against it:
    how many sit in the figure's window and how far apart they run. The
    window follows the measure's own (three weeks, six for the sparse ones),
-   counted by release date as the 2PP head counts it. Returns null when the
+   counted by release date - except the 2PP head, which counts on the
+   fieldwork midpoint as the estimate itself judges a wave's age (rdApWinMid):
+   a wave's printed end date can sit inside three weeks its midpoint - and
+   hence its estimator weight - has already left. Returns null when the
    measure has nothing current to say, and the table opens on its tabs.
    Each reads the whole poll set off the bundle, never the table's live
    rows: the walk floor (RdAllPolls) writes every state's words at once,
@@ -2494,7 +2502,7 @@ function rdApTppStory(onM, pub, upd) {
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
   const winDays = (D.latest.method && D.latest.method.windowDays) || 21;
   const figOf = (p) => rdApFig(p, onM, pub);
-  const win = (D.individualPolls || []).filter((p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; });
+  const win = (D.individualPolls || []).filter((p) => { const t = rdApWinMid(p); return t >= upd - winDays * 864e5 && t <= upd && figOf(p).a != null; });
   if (!today || !win.length) return null;
   const rival = onM ? "One Nation" : "the Coalition";
   const contest = onM ? "onp" : "lnp";
@@ -2737,7 +2745,7 @@ function RdAllPolls(P) {
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
   const upd = rdApDays(D.latest.updatedISO);
   const winDays = (D.latest.method && D.latest.method.windowDays) || 21;
-  const inToday = (p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
+  const inToday = (p) => { const t = rdApWinMid(p); return t >= upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
   /* the confidence facet replaces `rows` with its releases, which carry no
      2PP figure - the window stays poll-based there, so an opened release's
      detail counts the same polls the other facets do */
