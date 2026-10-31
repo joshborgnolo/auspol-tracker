@@ -247,13 +247,13 @@ const INC_VERB = {
 };
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
-// (2001 on — the older statistics-era frames stop at the six people measures)
+// (1991's household-basis print on the 1990s frames, 2001's on the GCP
+// bases); other era-null People lanes filter the same way
 const hasInc = (m) => !!(m && m.incomeCuts);
 const DM_ALL = DM_MENU;
 const dmFor = (m) => {
   let ks = hasInc(m) ? DM_ALL : DM_ALL.filter((k) => k !== LENS_INC);
-  if (m && m.hasLane && !m.hasLane.hl) ks = ks.filter((k) => k !== "hl");
-  if (m && m.hasLane && !m.hasLane.bigfam) ks = ks.filter((k) => k !== "bigfam");
+  if (m && m.hasLane) ks = ks.filter((k) => m.hasLane[k] !== false);
   return ks;
 };
 // the birthplace-country sub-views of the Born overseas lane: when S.cob
@@ -673,7 +673,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"0c5bd078","data-nsw23.json":"a318a736","data-qld17.json":"4ba31535","data-qld20.json":"de19f1d0","data-qld24.json":"adfefdfa","data-sa22.json":"4c3c388d","data-sa26.json":"1fb55c9d","data-vic22.json":"0f203b79","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"c7c7a579","res-1996.json":"351818e3","res-1998.json":"09dc239e","res-2001.json":"c1841b7b","res-2004.json":"7b88d5e3","res-2007.json":"4b9f0267","res-2010.json":"dc29ce4a","res-2013.json":"1c25a72b","res-2016.json":"2d4a902a","res-2019.json":"ed380b80","res-2022.json":"cb10ecc9","res-2025.json":"f33f8ff1","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"0c5bd078","data-nsw23.json":"a318a736","data-qld17.json":"4ba31535","data-qld20.json":"de19f1d0","data-qld24.json":"adfefdfa","data-sa22.json":"4c3c388d","data-sa26.json":"1fb55c9d","data-vic22.json":"0f203b79","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"005a3537","res-1996.json":"e9577172","res-1998.json":"2e77ecd8","res-2001.json":"c1841b7b","res-2004.json":"7b88d5e3","res-2007.json":"4b9f0267","res-2010.json":"dc29ce4a","res-2013.json":"1c25a72b","res-2016.json":"2d4a902a","res-2019.json":"ed380b80","res-2022.json":"cb10ecc9","res-2025.json":"f33f8ff1","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 const getJSON = (u) => {
@@ -1035,11 +1035,17 @@ async function loadYear(year) {
     // this year stays out of its menus and copy (the homeless lane's
     // census floor is the 2011 edition onward — the 2013 election on /
     // 2016-census state frames — and three-or-more-children stands out
-    // the 2001 election alone: the 2001 BCP printed no children table)
+    // the 2001 election alone: the 2001 BCP printed no children table;
+    // the older census-era floors are ancestry 2001 and schooling
+    // 2006, the JTW/citizenship lanes carry the 1991 census, and the
+    // income lanes begin on 1991 household-basis prints with the GCP-
+    // era adult-basis prints from 2001 — the menu omits whatever the
+    // era never printed, confirmed positively null across the year)
     {
-      const anyHl = (res.divs || []).some((d) => d.demo && d.demo.hl != null);
-      const anyBig = (res.divs || []).some((d) => d.demo && d.demo.bigfam != null);
-      m.hasLane = { hl: anyHl, bigfam: anyBig };
+      const divs = res.divs || [];
+      const any = (k) => divs.some((d) => d.demo && d.demo[k] != null);
+      m.hasLane = Object.fromEntries(DM.map((k) => [k, k === "loinc" || k === "hiinc" ? hasInc({ incomeCuts: res.incomeCuts }) : any(k)]));
+      m.hasLane[LENS_INC] = m.hasLane.loinc;
     }
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
@@ -6707,29 +6713,35 @@ function legendHTML(m) {
         // GCP lanes today) shows the seats' medians only — the note says
         // why the places carry none
         const incMedNote = m.incomeCuts && m.incomeCuts.medWeekly == null ? "; this frame doesn't carry a national line or median-figure reads for individual places" : "";
+        // the era print's own households-basis lane names it — only the
+        // GCP-era lanes are adult shares
+        const incHouse = m.incomeCuts && m.incomeCuts.basis === "households";
         const incNote = incMed()
           ? `Median weekly household income${incEpochBrk}${incMedNote}`
-          : `Share of adults in households earning ${S.incMode === "lo" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${incEpochBrk}`;
+          : `${incHouse ? "Share of households" : "Share of adults in households"} earning ${S.incMode === "lo" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${incEpochBrk}`;
         // the 2026-10-31 lane notes: each carries its basis the way the
         // older lanes do (the older lanes' honest phrasing is part of
         // the lane-set's contract now)
+        const PT_SINGLE = "Share of employed people whose ONE listed method of travel to work was train, bus or ferry+tram — the 1991 census's journey-to-work print keeps a single method per worker (no multi-method legs before the 1996 edition)";
         const NOTE_ARC = {
           pt: "Share of employed people who travelled to work by train, bus, tram or ferry — any one or more of those legs",
           noncit: "Share of residents not listed as Australian citizens (the census doesn't break out a not-stated share separately here: they're inside the complement)",
           bigfam: "Share of women aged 15+ who have had more than two children",
           hl: "Share of residents counted homeless in the ABS's census estimate, measured per SA2 statistical area (coarser than the other census measures)",
         };
+        const ptNote = m.demoInterp && m.demoInterp.c0 === 1991 ? PT_SINGLE : NOTE_ARC.pt;
         const headNote = isInc() ? incNote
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of residents whose dwellings ${TENESMS[S.ten]}`
           : isAnc() ? `Share of residents who ${ANCISMS[S.anc]} (people could name up to two ancestries, so the options don't add up to a whole)`
+          : S.index === "pt" ? ptNote
           : NOTE_ARC[S.index] || "Share of residents";
         const basisTail = m.demoInterp ? `interpolated between the ${m.demoInterp.c0} and ${m.demoInterp.c1} censuses to election day${m.demoBasis === "venue" ? `, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in` : `, where each ${boothsOn ? "place’s" : "seat’s"} voters live`}.` : m.demoBasis === "venue" ? `${m.year < 2004 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2001 election, in the census year's own dollars: 2001 to 2013 read the census areas the polling places stand in; from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
@@ -7156,6 +7168,9 @@ async function setYear(y) {
   if (!(b.relKeys || []).includes(S.rel)) S.rel = (b.relKeys || [])[0] || "norel";
   if (!(b.tenKeys || []).includes(S.ten)) S.ten = (b.tenKeys || [])[0] || "mort";
   if (!(b.ancKeys || []).includes(S.anc)) S.anc = (b.ancKeys || [])[0] || "english";
+  // a People lane the frame's era never printed (menu omits it) drops
+  // the selection to the always-printed language share
+  if (b.hasLane && DM.includes(S.index) && b.hasLane[S.index] === false) S.index = "lang";
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (!b.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   if (!b.ancKeys && S.index === LENS_ANC) S.index = "irsad";

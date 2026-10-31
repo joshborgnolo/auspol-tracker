@@ -164,6 +164,62 @@ for (const spec of STORES) {
       check(dv0.demoI.rel && dv0.demoI.rel.hind == null,
             `${tag}: demoI's hind null through the '91 shows`);
   }
+
+  // the JTW/citizenship lanes: on both '90s prints, pinned nationally
+  // (the 1991 print's single-method edition vs the 1996 print's
+  // multi-method included — each era's own contract)
+  check(bIn(national.pt) && national.pt != null, `${tag}: national pt reads (${national.pt})`);
+  check(bIn(national.noncit) && national.noncit != null, `${tag}: national noncit reads (${national.noncit})`);
+  if (spec.census === 1991) {
+    check(Math.abs(national.pt - 0.1091) < 0.0005, `${tag}: national pt ${national.pt} != 0.1091 (1991 single-method JTW)`);
+    check(Math.abs(national.noncit - 0.123) < 0.0005, `${tag}: national noncit ${national.noncit} != 0.123`);
+  }
+  if (spec.census === 1996) {
+    check(Math.abs(national.pt - 0.0876) < 0.0005, `${tag}: national pt ${national.pt} != 0.0876 (1996 multi-method JTW)`);
+    check(Math.abs(national.noncit - 0.112) < 0.0005, `${tag}: national noncit ${national.noncit} != 0.112`);
+  }
+
+  // the income print: only the 1991 era's BCP carries household income
+  // — the frame's cuts ride its weekly-equivalent conversion, the
+  // income-free eras keep the lane empty end to end
+  if (spec.census === 1991) {
+    const c = d.incomeCuts;
+    check(c && c.dollarsYear === 1991 && c.basis === "households",
+          `${tag}: incomeCuts record on the 1991 household basis`);
+    check(Math.abs(c.loCutWeekly - 345.51) < 0.02, `${tag}: 25% cut ${c && c.loCutWeekly} != 345.51`);
+    check(c.hiEdgeWeekly === 2874.92, `${tag}: hi edge ${c && c.hiEdgeWeekly} != 2874.92 (150001/52.1758)`);
+    check(Math.abs(c.hiNationalShare - 0.005101) < 0.00005, `${tag}: top-band share ${c && c.hiNationalShare} != 0.005101`);
+    check(bIn(national.loinc) && national.loinc === 0.25, `${tag}: national loinc sits at the quantile (${national.loinc})`);
+    check(Math.abs(national.hiinc - 0.0051) < 0.0001, `${tag}: national hiinc ${national.hiinc} != 0.0051`);
+    check(national.incMed === 699, `${tag}: national median ${national.incMed} != 699 ($ weeks 1991)`);
+  } else {
+    check(!("incomeCuts" in d), `${tag}: no incomeCuts on the ${spec.census} era print`);
+    check(national.loinc == null && national.hiinc == null && national.incMed == null,
+          `${tag}: income lanes stay null on the ${spec.census} era print`);
+  }
+
+  // row-level lane checks alongside the demo core
+  let withPt = 0, withInc = 0;
+  for (const dv of d.divisions) {
+    check(dv.pt == null || bIn(dv.pt), `${tag} div ${dv.div}: pt bounded ${dv.pt}`);
+    check(dv.noncit == null || bIn(dv.noncit), `${tag} div ${dv.div}: noncit bounded ${dv.noncit}`);
+    if (dv.pt != null) withPt++;
+    if (spec.census === 1991) {
+      check((dv.loinc == null) === (dv.hiinc == null) && (dv.hiinc == null) === (dv.incMed == null),
+            `${tag} div ${dv.div}: income lanes move together`);
+      if (dv.loinc != null) {
+        check(bIn(dv.loinc) && bIn(dv.hiinc) && Number.isInteger(dv.incMed) && dv.incMed > 0,
+              `${tag} div ${dv.div}: loinc ${dv.loinc} hiinc ${dv.hiinc} med ${dv.incMed}`);
+        withInc++;
+      }
+    } else {
+      check(dv.loinc == null && dv.hiinc == null && dv.incMed == null,
+            `${tag} div ${dv.div}: no income lanes on the ${spec.census} print`);
+    }
+  }
+  check(withPt > (d.divisions.length * 0.9), `${tag}: pt rides most division rows (${withPt}/${d.divisions.length})`);
+  if (spec.census === 1991) check(withInc > (d.divisions.length * 0.9),
+                                  `${tag}: income lanes ride most division rows (${withInc}/${d.divisions.length})`);
 }
 
 if (failures.length) {

@@ -279,30 +279,34 @@ def with_demo(doc, year):
 
     def cells(block, iblk):
         dm = common.demo_interp_of(block, iblk)
-        return common.demo_cells(dm) if dm else None
+        return dm, (common.demo_cells(dm) if dm else None)
 
     n_div = n_booth = 0
     for d in doc['divs']:
         dv = by_div.get(d['n'])
         if not dv or dv.get('persons') in (None, 0):
             continue
-        dc = cells(dv, dv.get('demoI'))
+        dm, dc = cells(dv, dv.get('demoI'))
         if not dc:
             continue
         d['demo'] = {'lang': dc[0], 'a65': dc[1], 'a2034': dc[2],
                      'fborn': dc[3], 'uni': dc[4], 'blue': dc[5],
                      'p': dv.get('persons'),
-                     'loinc': dc[6], 'hiinc': dc[7], 'medIncWeekly': None,
+                     'loinc': dc[6], 'hiinc': dc[7],
+                     'medIncWeekly': dm.get('incMed'),
                      'cob': dv.get('cob'),
                      'y12less': dc[8], 'atsci': dc[9], 'u15': dc[10],
-                     'onepar': dc[11], 'rel': dv.get('rel'),
+                     'onepar': dc[11], 'pt': dc[12], 'noncit': dc[13],
+                     'bigfam': dc[14], 'hl': dc[15],
+                     'rel': dv.get('rel'),
                      'ten': dv.get('ten')}
         n_div += 1
     dcol = []
     for bid in doc['booths']['id']:
         vb = by_booth.get(bid)
         blk = (vb or {}).get('demo')
-        dcol.append(cells(blk, (vb or {}).get('demoI')) if blk else None)
+        _dm, dc = cells(blk, (vb or {}).get('demoI')) if blk else (None, None)
+        dcol.append(dc)
     if any(x is not None for x in dcol):
         doc['booths']['demo'] = dcol
         n_booth = sum(x is not None for x in dcol)
@@ -343,6 +347,16 @@ def with_demo(doc, year):
     doc['demoBasis'] = 'venue'
     if store.get('demoInterp'):
         doc['demoInterp'] = store['demoInterp']
+    # the era's own income-cuts record where its census prints income
+    # (the 1991-side frames ride it in 1991-era weekly-equivalent
+    # dollars; eras whose print carries no household-income table keep
+    # money-cut lanes null end to end)
+    if store.get('incomeCuts'):
+        cuts = dict(store['incomeCuts'])
+        nat = store.get('counts', {}).get('national') or {}
+        if nat.get('incMed') is not None:
+            cuts['medWeekly'] = nat['incMed']
+        doc['incomeCuts'] = cuts
     doc['coverage']['census'] = (
         f"the {store.get('censusEdition')} census on era district "
         f"lines (venue-nearest within 1.5 km, "

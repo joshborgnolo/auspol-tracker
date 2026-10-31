@@ -245,13 +245,13 @@ const INC_VERB = {
 };
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
-// (2001 on — the older statistics-era frames stop at the six people measures)
+// (1991's household-basis print on the 1990s frames, 2001's on the GCP
+// bases); other era-null People lanes filter the same way
 const hasInc = (m) => !!(m && m.incomeCuts);
 const DM_ALL = DM_MENU;
 const dmFor = (m) => {
   let ks = hasInc(m) ? DM_ALL : DM_ALL.filter((k) => k !== LENS_INC);
-  if (m && m.hasLane && !m.hasLane.hl) ks = ks.filter((k) => k !== "hl");
-  if (m && m.hasLane && !m.hasLane.bigfam) ks = ks.filter((k) => k !== "bigfam");
+  if (m && m.hasLane) ks = ks.filter((k) => m.hasLane[k] !== false);
   return ks;
 };
 // the birthplace-country sub-views of the Born overseas lane: when S.cob
@@ -1033,11 +1033,17 @@ async function loadYear(year) {
     // this year stays out of its menus and copy (the homeless lane's
     // census floor is the 2011 edition onward — the 2013 election on /
     // 2016-census state frames — and three-or-more-children stands out
-    // the 2001 election alone: the 2001 BCP printed no children table)
+    // the 2001 election alone: the 2001 BCP printed no children table;
+    // the older census-era floors are ancestry 2001 and schooling
+    // 2006, the JTW/citizenship lanes carry the 1991 census, and the
+    // income lanes begin on 1991 household-basis prints with the GCP-
+    // era adult-basis prints from 2001 — the menu omits whatever the
+    // era never printed, confirmed positively null across the year)
     {
-      const anyHl = (res.divs || []).some((d) => d.demo && d.demo.hl != null);
-      const anyBig = (res.divs || []).some((d) => d.demo && d.demo.bigfam != null);
-      m.hasLane = { hl: anyHl, bigfam: anyBig };
+      const divs = res.divs || [];
+      const any = (k) => divs.some((d) => d.demo && d.demo[k] != null);
+      m.hasLane = Object.fromEntries(DM.map((k) => [k, k === "loinc" || k === "hiinc" ? hasInc({ incomeCuts: res.incomeCuts }) : any(k)]));
+      m.hasLane[LENS_INC] = m.hasLane.loinc;
     }
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));

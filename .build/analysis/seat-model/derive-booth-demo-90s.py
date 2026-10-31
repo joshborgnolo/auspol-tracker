@@ -131,6 +131,116 @@ STATE_OF_ID = {1: "ACT", 2: "NSW", 3: "VIC", 4: "QLD", 5: "WA",
 # short-table CDs (demo:null, no in-between figure).
 NEAREST_CAP_M = 1500
 
+# the 1991 BCP's yearly household-income bands (annual dollars per
+# household), converted to weekly equivalents at WEEKS_PER_YEAR for the
+# map's weekly lens (the era prints no weekly edition)
+WEEKS_PER_YEAR = 52.1758
+INC91_ANNUAL_EDGES = (
+    (0, 3001), (3001, 5001), (5001, 8001), (8001, 12001),
+    (12001, 16001), (16001, 20001), (20001, 25001), (25001, 30001),
+    (30001, 35001), (35001, 40001), (40001, 50001), (50001, 60001),
+    (60001, 70001), (70001, 80001), (80001, 100001), (100001, 120001),
+    (120001, 150001), (150001, None),
+)
+INC_WEEK_EDGES = tuple((lo / WEEKS_PER_YEAR, None if hi is None else
+                        hi / WEEKS_PER_YEAR) for lo, hi in INC91_ANNUAL_EDGES)
+
+
+def cum_share_at(cell_counts, tot, edge_weekly):
+    """The share of households lying at-or-below a weekly-dollars cut,
+    interpolated piecewise-uniform inside the band it falls in (the
+    income_lanes engine's own band-integral convention, era-mapped onto
+    the 1991 annual print's converted edges). tot folds the partial- and
+    no-incomes-stated rows into the denominator, the print's own
+    pr100 basis — same fold policy as the GCP fleets' not-stated rows."""
+    if tot <= 0:
+        return None
+    acc = 0.0
+    for n, (lo, hi) in zip(cell_counts, INC_WEEK_EDGES):
+        lo_v = lo
+        hi_v = hi if hi is not None else float('inf')
+        if edge_weekly <= lo_v:
+            break
+        seg = n if hi is None else (
+            n * min(1.0, (edge_weekly - lo_v) / (hi_v - lo_v)))
+        acc += seg
+        if edge_weekly < hi_v:
+            break
+    return acc / tot
+
+
+def inc_median_weekly(cell_counts, tot):
+    """The interpolated 50% point in weekly dollars of a converted
+    histogram; None where the median sits on an open or zeroed band."""
+    if tot <= 0:
+        return None
+    half = tot / 2.0
+    acc = 0.0
+    for n, (lo, hi) in zip(cell_counts, INC_WEEK_EDGES):
+        if n <= 0:
+            continue
+        nxt = acc + n
+        if nxt >= half:
+            if hi is None:
+                return round(lo, 2)
+            return round(lo + (hi - lo) * (half - acc) / n, 2)
+        acc = nxt
+    return None
+
+
+def era_inc_cuts(hist, tot):
+    """The census-print's own national cuts record (loQuantile-0.25's
+    interpolated weekly cut, the open top band's edge, its national
+    share), where the era carries an income print at all — None on a
+    income-less edition (the 1996 AURIN workspace lists no household
+    income table anywhere in its b01..b32 layer set)."""
+    if tot <= 0 or sum(hist) <= 0:
+        return None
+    target = 0.25 * tot
+    acc = 0.0
+    lo_cut = None
+    for n, (lo, hi) in zip(hist, INC_WEEK_EDGES):
+        if n <= 0:
+            continue
+        nxt = acc + n
+        if nxt >= target:
+            lo_cut = lo if hi is None else (
+                lo + (hi - lo) * (target - acc) / n)
+            break
+        acc = nxt
+    hi_edge = INC_WEEK_EDGES[-1][0]
+    return {"loQuantile": 0.25,
+            "loCutWeekly": round(lo_cut, 2) if lo_cut is not None else None,
+            "hiEdgeWeekly": round(hi_edge, 2),
+            "hiNationalShare": round(hist[-1] / tot, 6),
+            "dollarsYear": 1991,
+            "basis": "households",
+            "unitsNote": ("weekly-equivalent conversion of the 1991 "
+                          "BCP's annual-dollar family-income print at "
+                          "52.1758 wk/yr; the era prints no weekly "
+                          "edition; shares are household shares, not "
+                          "the GCP-era adult shares"),
+            "adultsWeights": None,
+            "medianBasis": "households (shares are households)"}
+
+
+def inc_lanes_for(cell_counts, tot, cuts):
+    """(loinc, hiinc, incMed) for one CD sum or CD row against the
+    census decade's own national cuts; None all through on an
+    income-less era or a household-universe-less row — never a zero."""
+    if cuts is None or tot <= 0:
+        return None, None, None
+    lo = cum_share_at(cell_counts, tot, cuts["loCutWeekly"]) \
+        if cuts["loCutWeekly"] is not None else None
+    hi = cell_counts[-1] / tot if sum(cell_counts) > 0 else None
+    med = inc_median_weekly(cell_counts, tot)
+    if hi is not None:
+        hi = round(hi, 4)
+    if lo is not None:
+        lo = round(lo, 4)
+    med = int(round(med)) if med is not None else None
+    return lo, hi, med
+
 
 def load_venues(year):
     """The frame's authoritative place registry from the published
@@ -189,7 +299,19 @@ def shares(r):
                 for i, b in enumerate(BANDS)},
         "u15": round((r["bands"][0] + r["bands"][1]) / bsum, 4),
     }
-    for k in ("langOther", "fborn", "uni", "blue", "u15"):
+    # the pt (journey-to-work) and citizenship cohorts ride both '90s
+    # prints; pt's era contracts differ (1991 single-method only, 1996
+    # with multi-method legs) — recorded per-era in the store note
+    pt_den = (r.get("ptot") or 0) - (r.get("ptns") or 0)
+    if r.get("ptn") is not None and pt_den > 0:
+        vals["pt"] = round(r["ptn"] / pt_den, 4)
+    else:
+        vals["pt"] = None
+    if r.get("citz") is not None:
+        vals["noncit"] = round((per - r["citz"]) / per, 4)
+    else:
+        vals["noncit"] = None
+    for k in ("langOther", "fborn", "uni", "blue", "u15", "pt", "noncit"):
         x = vals[k]
         if x is not None and not (0 <= x <= 1):
             return None
@@ -484,9 +606,36 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     if len(people) != UNIT_COUNT[census]:
         fail(f"{census} tally universe {len(people)} != "
              f"{UNIT_COUNT[census]}")
+    if census == 2001:
+        # the 2001 BCP tally's own vector-list contract (extract-bcp-
+        # 2001-tally.py): tw01 is [short-list-pt-journeys, jtw-universe,
+        # not-stated] per CD and cit01 the australian-citizens count —
+        # bridge them onto the 1991/1996 cohort names so shares()
+        # never senses which print family wrote the numbers
+        for r in people.values():
+            tw = r.get("tw01")
+            if tw is not None and len(tw) == 3:
+                r["ptn"], r["ptot"], r["ptns"] = tw[0], tw[1], tw[2]
+            if r.get("cit01") is not None:
+                r["citz"] = r["cit01"]
     venues = load_venues(year)
     polys = era_polygons(census)
     buckets = ct_index(polys)
+
+    # the income print's census-decade cuts: the whole-nation household
+    # histogram where the era prints income (1991 only of the three
+    # archived BCP editions); the 1996 CSV workspace carries no income
+    # table, so its era's income lane reads None from here on
+    nat_inc_hist = [0] * len(INC_WEEK_EDGES)
+    nat_inc_tot = 0
+    for r in people.values():
+        n = r.get("inc")
+        if n is not None:
+            for i in range(len(INC_WEEK_EDGES)):
+                nat_inc_hist[i] += n[i]
+        nat_inc_tot += r.get("incTot") or 0
+    era_inc = (era_inc_cuts(nat_inc_hist, nat_inc_tot)
+               if census == 1991 else None)
 
     # division sums over the alloc. Cohort fields ride the same names
     # as the tally records so lane_cohorts reads the aggregates with
@@ -503,6 +652,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "rel": {k: 0 for k in REL_KEYS}, "relDen": 0,
         "ten": {k: 0 for k in TEN_KEYS}, "tenDen": 0,
         "atsciN": 0, "atsciD": 0, "oneparN": 0, "oneparD": 0,
+        "citz": 0, "ptn": 0, "ptot": 0, "ptns": 0,
+        "inc": [0] * len(INC91_ANNUAL_EDGES), "incTot": 0,
     })
     for code, dv in alloc.items():
         r = people.get(code)
@@ -520,6 +671,11 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd"):
             acc[k] += r[k]
+        for k in ("citz", "ptn", "ptot", "ptns", "incTot"):
+            acc[k] += r.get(k) or 0
+        if r.get("inc") is not None:
+            for i in range(len(INC91_ANNUAL_EDGES)):
+                acc["inc"][i] += r["inc"][i]
         cohort = lane_cohorts(r, census)
         if cohort is not None and cohort.get("cob") is not None:
             for k, v in cohort["cob"].items():
@@ -566,6 +722,9 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                     ls = lane_shares(lane_cohorts(r, census))
                     for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
                         d[lane_k] = ls[lane_k]
+                    d["loinc"], d["hiinc"], d["incMed"] = inc_lanes_for(
+                        r.get("inc") or [0] * len(INC_WEEK_EDGES),
+                        r.get("incTot") or 0, era_inc)
                     _era_holes(d, census)
                 rec["demo"] = d
                 geo_hit += 1
@@ -580,6 +739,9 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         ls = lane_shares(divsum[name])
         for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
             row[lane_k] = ls[lane_k]
+        acc = divsum[name]
+        row["loinc"], row["hiinc"], row["incMed"] = inc_lanes_for(
+            acc["inc"], acc["incTot"], era_inc)
         _era_holes(row, census)
         divisions.append(row)
 
@@ -591,7 +753,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd", "cobDen", "relDen", "tenDen",
-                  "atsciN", "atsciD", "oneparN", "oneparD"):
+                  "atsciN", "atsciD", "oneparN", "oneparD",
+                  "citz", "ptn", "ptot", "ptns"):
             nat[k] += dv[k]
         for i in range(11):
             nat["bands"][i] += dv["bands"][i]
@@ -645,7 +808,14 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "onepar": (round(nat["oneparN"] / nat["oneparD"], 4)
                    if nat["oneparD"] else None),
         "oneparD": nat["oneparD"],
+        "pt": (round(nat["ptn"] / (nat["ptot"] - nat["ptns"]), 4)
+               if nat["ptot"] - nat["ptns"] > 0 else None),
+        "noncit": (round((nat["pers"] - nat["citz"]) / nat["pers"], 4)
+                   if nat["pers"] > 0 else None),
     })
+    if era_inc is not None:
+        national["loinc"], national["hiinc"], national["incMed"] = \
+            inc_lanes_for(nat_inc_hist, nat_inc_tot, era_inc)
     _era_holes(national, census)
     about = (
         "Census-people basis store for the " + str(year) + " federal "
@@ -686,7 +856,23 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "stays absent on the '90s-era frames. Ancestry has no "
         "print before the 2001 census's own and no era-mate on "
         "the '90s sides at all, so ancKeys/car lanes stay null. "
-        "The census's ABS-filed balance classes named "
+        "The journey-to-work lane (pt) rides each era's own "
+        "JTW print: the 1991 BCP publishes single-method legs "
+        "only (its pt share counts residents whose ONE stated "
+        "method was train, bus or ferry+tram), the 1996 BCP its "
+        "one/two/three-method blocks (its pt share includes legs "
+        "paired with any other method, with the printed caveat "
+        "that its two-method train+bus pair row is unpublished "
+        "and the train+bus traveller joins both columns of the "
+        "pair). The citizenship lane (noncit) rides each era's "
+        "australian-citizens counts over the whole residency. "
+        "Household income survives ONLY at the 1991 print, in "
+        "annual dollars (the 1996 BCP workspace lists no income "
+        "table): that era's loinc/hiinc/incMed lanes and its "
+        "incomeCuts record are weekly-equivalent conversions at "
+        "52.1758 wk/yr of household shares — household-basis, "
+        "never the GCP era's adult shares. The census's "
+        "ABS-filed balance classes named "
         "offshoreClass in the allocation file are dropped here "
         "entirely by ABS's own filing.")
     out = {
@@ -705,6 +891,7 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "cobKeys": list(menu),
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
+        **({"incomeCuts": era_inc} if era_inc is not None else {}),
         "deliveryBasis": (
             f"venue PIP of the history-location-store coordinates "
             f"over the {census}-census CD polygons; exact CD sum per "

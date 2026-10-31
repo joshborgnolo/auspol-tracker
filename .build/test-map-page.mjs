@@ -161,7 +161,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 21, "17 result lanes plus approximate-location provenance + census demo rows (the '90s people-interp arc) + the map-people-fill arc's three cohort cob/rel/ten lanes");
+  assert.equal(Object.keys(D.booths).length, 22, "17 result lanes plus approximate-location provenance + census demo rows (the '90s people-interp arc) + the map-people-fill arc's three cohort cob/rel/ten lanes, plus the medinc booth column the frame's 1991-era census income print fills");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -170,10 +170,13 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // the stats-era floor now bridges in census people lanes: the '90s
   // people-interp arc interpolates the 1991↔1996 censuses to election day
   // (1996's f sits at the 1996 census's side), carry-proofed against the
-  // venue-nearest surveyed-linework rescue
+  // venue-nearest surveyed-linework rescue. Its income cuts ride the 1991
+  // era print (household-basis weekly-equivalents): the 1996 census's own
+  // workspace prints no income table, and 1991 is the frame's nearest
+  // income era
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, "venue", "1996's census people basis is the venue-CD lane (the '90s people-interp arc)");
-    assert.equal(f.incomeCuts, null, "1996 has no incomeCuts (the income floor is the 2001 election)");
+    assert.ok(f.incomeCuts && f.incomeCuts.dollarsYear === 1991 && f.incomeCuts.basis === "households", "1996's income cuts ride the 1991 household-basis era print");
     assert.equal(f.seifaCuts.irsad, null, "1996 has no irsad cut (pre-IRSAD censeration)");
     for (const ix of ["irsd", "ier", "ieo"])
       assert.ok(Array.isArray(f.seifaCuts[ix]) && f.seifaCuts[ix].length === 9, `1996's ${ix} cut carries the nine national decile edges`);
@@ -231,14 +234,18 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // pinned per-store at the seat-model tests; here the frames' publish-side
   // contract: interp record, division/booth demo coverage and the
   // income/SEIFA-floor invariants the rest of the page relies on
-  for (const [y, f, c0, c1, near, nDivs, sf] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7]], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7]]]) {
+  for (const [y, f, c0, c1, near, nDivs, sf, cuts] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7], { dy: 1991, basis: "households", lo: 345.51 }], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7], null]]) {
     const D = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(D.year, y);
     assert.equal(D.divs.length, nDivs, `${y} has its ${nDivs} divisions`);
     assert.equal(D.demoBasis, "venue", `${y}'s census people basis is the venue-CD lane`);
     assert.ok(D.demoInterp && D.demoInterp.f === f && D.demoInterp.c0 === c0 && D.demoInterp.c1 === c1 && D.demoInterp.nearestSide === near,
       `${y}'s demoInterp blends ${c0}↔${c1} at f=${f} nearest the ${near} census`);
-    assert.equal(D.incomeCuts, null, `${y}: the income floor stays 2001`);
+    if (cuts === null) {
+      assert.equal(D.incomeCuts, null, `${y}: the 1996-census side prints no income table, so the frame keeps money cuts null`);
+    } else {
+      assert.ok(D.incomeCuts && D.incomeCuts.dollarsYear === cuts.dy && D.incomeCuts.basis === cuts.basis && Math.abs(D.incomeCuts.loCutWeekly - cuts.lo) < 0.02, `${y}: income cuts ride the ${cuts.dy} ${cuts.basis}-basis era print`);
+    }
     // the SEIFA lens reads on the '90s frames (derive-division-seifa-stats90s.py
     // + derive-booth-seifa-stats90s.py): three-index era only — IRSAD predates
     // its SEIFA-2001 invention, so irsad cut+lanes stay null here

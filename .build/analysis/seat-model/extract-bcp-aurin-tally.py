@@ -74,6 +74,19 @@ EXPECTED = {
     "1996": {"cds": 34327, "published": 17881210},
 }
 
+# the 1991 BCP's yearly household income bands (b29): annual dollars per
+# household in its own era print (the only household-income print of the
+# three archived editions: 1996's workspace carries no income table at
+# all, and the 1991 edition never prints it weekly)
+INC91_BANDS = (
+    "yr_inc_0_3000", "yr_inc_3001_5000", "yr_inc_5001_8000",
+    "yr_inc_8001_12000", "yr_inc_12001_16000", "yr_inc_16001_20000",
+    "yr_inc_20001_25000", "yr_inc_25001_30000", "yr_inc_30001_35000",
+    "yr_inc_35001_40000", "yr_inc_40001_50000", "yr_inc_50001_60000",
+    "yr_inc_60001_70000", "yr_inc_70001_80000", "yr_inc_80001_100000",
+    "yr_inc_100001_120000", "yr_inc_120001_150000", "yr_inc_ov_150000",
+)
+
 
 def _sub_int(row, name):
     try:
@@ -106,6 +119,7 @@ def tally_1991():
         c = r["cd_code_1991"]
         tally[c] = {"pers": _sub_int(r, "tot_p")
                     - _sub_int(r, "p_enumertd_migratory_offshore_cd")}
+        tally[c]["citz"] = _sub_int(r, "tot_aus_citizens")
 
     for r in read("b05_age_by_sex_cd_1991.csv"):
         c = r["cd_code_1991"]
@@ -160,6 +174,31 @@ def tally_1991():
         tally[c]["bluen"] = blue
         tally[c]["occd"] = occd
 
+    # b26 journey-to-work: the 1991 print is single-method only (one
+    # method column per mode; multi-method legs appear in no '91 BCP
+    # table), the era's own pt-lane contract
+    for r in read("b26_method_trvl_wrk_by_sex_cd_1991.csv"):
+        c = r["cd_code_1991"]
+        ptn = (_sub_int(r, "p_trvling_wrk_by_train_p")
+               + _sub_int(r, "p_trvling_wrk_by_bus_p")
+               + _sub_int(r, "p_trvling_wrk_by_ferry_tram_p"))
+        ns = _sub_int(r, "method_trvl_wrk_no_stated_p")
+        tally[c]["ptn"] = ptn
+        tally[c]["ptot"] = ptn + sum(
+            _sub_int(r, f"p_trvling_wrk_by_{s}_p")
+            for s in ("taxi", "car_driver", "car_passenger", "oth_avgs")
+        ) + _sub_int(r, "p_trvling_wrk_by_motor_bike_motor_scooter_p") \
+            + _sub_int(r, "p_trvling_wrk_by_bicycle_p") \
+            + _sub_int(r, "p_walked_wrk_only_p") \
+            + _sub_int(r, "p_wrked_home_p") \
+            + _sub_int(r, "p_no_wrk_p") + ns
+        tally[c]["ptns"] = ns
+
+    for r in read("b29_yr_hsld_inc_cd_1991.csv"):
+        c = r["cd_code_1991"]
+        tally[c]["inc"] = [_sub_int(r, f"{b}_hslds") for b in INC91_BANDS]
+        tally[c]["incTot"] = _sub_int(r, "tot_hslds")
+
     return tally
 
 
@@ -177,6 +216,7 @@ def tally_1996():
     for r in read("cd_b01_census_1996.csv"):
         c = r["cd_code"]
         tally[c] = {"pers": _sub_int(r, "total_persons")}
+        tally[c]["citz"] = _sub_int(r, "australian_citizen_p")
 
     for r in read("cd_b03a_census_1996.csv"):
         c = r["cd_code"]
@@ -242,6 +282,25 @@ def tally_1996():
                 + _sub_int(r, "total_lbrers_rltd_wrkrs_p"))
         tally[c]["bluen"] = blue
         tally[c]["occd"] = occd
+
+    # b21 journey-to-work: the 1996 print does carry multi-method legs
+    # (one/two/three-method blocks the 1991 edition never printed); the
+    # public-transport numerator takes train/bus/ferry-tram wherever
+    # they pair with another method. Its only caveat: the 1996 print
+    # has no two-method train+bus overlap cell, so that pair rides both
+    # its train_other and bus_other cells — the era note names it
+    for r in read("cd_b21_census_1996.csv"):
+        c = r["cd_code"]
+        ptn = (_sub_int(r, "one_meth_train_persons")
+               + _sub_int(r, "one_meth_bus_persons")
+               + _sub_int(r, "one_meth_ferry_tram_persons")
+               + _sub_int(r, "two_meth_train_oth_persons")
+               + _sub_int(r, "two_meth_bus_oth_persons")
+               + _sub_int(r, "three_meth_train_oth_persons")
+               + _sub_int(r, "three_meth_bus_oth_persons"))
+        tally[c]["ptn"] = ptn
+        tally[c]["ptot"] = _sub_int(r, "total_persons")
+        tally[c]["ptns"] = _sub_int(r, "not_stated_persons")
 
     return tally
 
