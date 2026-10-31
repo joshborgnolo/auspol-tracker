@@ -2,6 +2,8 @@
 # Daily crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
 # + confidence.mjs (ANZ–Roy Morgan consumer confidence + Roy Morgan business
 # confidence, for the Snapshot's "Economic sentiment" panel)
+# + macro.mjs (ABS CPI + GDP-per-capita and OECD aggregates via their data
+# APIs, for that panel's "Inflation & growth" view)
 # -> if any file changed -> validate -> render-card -> build -> commit -> push.
 # Run in CI by crosstabs-update.yml.
 #
@@ -109,13 +111,13 @@ case "$EMRSLAST" in
     UNFINISHED="$UNFINISHED emrs"
     ;;
 esac
-for b in vote-switching demographics issues confidence; do
+for b in vote-switching demographics issues confidence macro; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
   LAST="$(echo "$OUT" | tail -1)"
   echo "$OUT" | grep '^\(pending\|dropped\|reminder\) ' | while IFS= read -r l; do log "$b: $l"; done
   case "$LAST" in
-    VS_STATUS*|DEMO_STATUS*|ISSUES_STATUS*|CONFIDENCE_STATUS*) ;;
+    VS_STATUS*|DEMO_STATUS*|ISSUES_STATUS*|CONFIDENCE_STATUS*|MACRO_STATUS*) ;;
     *) [ $CODE -eq 0 ] && CODE=1 ;;
   esac
   if [ $CODE -ne 0 ]; then
@@ -150,7 +152,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/macro.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

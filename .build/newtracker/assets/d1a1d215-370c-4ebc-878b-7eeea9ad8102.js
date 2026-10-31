@@ -8551,6 +8551,13 @@ function infoTerms(D) {
         {" "}{xref("house-effect", "mood", "house-effect")} adjustment applies — a record, not an
         estimate. The change shown beside each series is the one the house printed with it, kept
         only where it agrees with the previous printed reading.</span>
+        <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It charts the ABS
+        and OECD's official series as published: Australia's headline inflation (the monthly CPI
+        era's printed annual change, spliced onto the earlier quarterly series derived from the
+        ABS's own published index numbers) and real GDP per person (chain volume, seasonally
+        adjusted), with the OECD-wide averages as dashed context, and the Reserve Bank's 2–3%
+        inflation target as a shaded band. Nothing is smoothed, adjusted or estimated — the
+        prints refresh daily from the ABS and OECD data APIs.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
         polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },

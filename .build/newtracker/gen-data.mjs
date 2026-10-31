@@ -2211,6 +2211,16 @@ const CONF_HISTORY_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "confidence-history.json"), "utf8")); }
   catch { return null; }
 })();
+/* The Economic sentiment panel's "Inflation & growth" view (§5m): the ABS
+   CPI and GDP-per-capita series and their OECD comparators, built by
+   .build/macro.mjs straight off the ABS and OECD data APIs — the payloads
+   stay the published (or index-derived, per the file's _about) annual
+   changes, per-row {date, v}; dots and any splice are render-side. */
+const MACRO_FILE = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
+  catch { return null; }
+})();
 const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
 const ISS_ONLY = new Set(["Ipsos"]);   // issues houses with no poll/direction rows to join
 const ISS_BY = new Map();              // "date|pollster" → the wave's issues payload
@@ -7043,6 +7053,22 @@ const confDeep = (() => {
   }
   return Object.keys(out).length ? out : null;
 })();
+/* --- §5m. macro lanes for the "Inflation & growth" view ----------------
+   data/macro.json (built by .build/macro.mjs off the ABS and OECD data
+   APIs) passes through as-is: cpi/cpiMonthly inflation, gdppc real GDP
+   per capita, and the OECD average comparators. The view reads the raw
+   {date, v} rows and splices the quarterly CPI history onto the printed
+   monthly era render-side. */
+const macro = (() => {
+  if (!MACRO_FILE) return null;
+  const out = {};
+  for (const k of ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "oecdGdp"]) {
+    const lane = MACRO_FILE[k];
+    if (lane && Array.isArray(lane.rows) && lane.rows.length)
+      out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
+  }
+  return Object.keys(out).length ? out : null;
+})();
 /* A term that changed leaders mid-stream is not one line. The pooled net /
    oppnet series stay (they fit the domain, the change-since base and the
    peer average), and beside them each person gets his own monthly run, built
@@ -8746,6 +8772,10 @@ window.AUSPOL = (function () {
      survey month per lane, what the confidence panel's complete-history
      window draws behind the live lines. */
   const confDeep = ${JSON.stringify(confDeep)};
+  /* The ABS/OECD price and output series (§5m): the Economic sentiment
+     panel's Inflation & growth view — published (or index-derived) annual
+     changes, raw {date, v} rows. */
+  const macro = ${JSON.stringify(macro)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = ${JSON.stringify(firmness)};
@@ -8919,7 +8949,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

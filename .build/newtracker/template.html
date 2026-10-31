@@ -119,6 +119,12 @@
      above - the lanes carry no good/bad valence. */
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
+  /* The Economic sentiment panel's "Inflation & growth" view: ABS CPI and
+     GDP-per-capita lanes (the OECD comparators draw in --ink-2 – context,
+     never principals). Ochre and deep steel sit clear of the party palette
+     and of the two confidence hues beside them on the page. */
+  --macro-cpi: oklch(0.56 0.115 40);
+  --macro-gdppc: oklch(0.50 0.095 230);
   /* Public opinion's tracker lines: the family of wording a pollster asked
      in ("is it too high?" against "should it fall?"), the same no-valence
      pair as the confidence lanes in light. Here at root, not on .pubop, so the
@@ -237,6 +243,9 @@ body.dark {
   /* economic-confidence panel lane hues (the house split), lifted the same way */
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
+  /* the Inflation & growth view's CPI / GDP-per-capita lanes, lifted too */
+  --macro-cpi: oklch(0.72 0.115 40);
+  --macro-gdppc: oklch(0.70 0.095 230);
   /* the wording pair on dark, held inside the palette validator's dark
      lightness band (0.48-0.67) the confidence values sit just above; every
      check passes on the dark surface and paper (2026-10-18) */

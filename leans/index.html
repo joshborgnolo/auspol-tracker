@@ -43,7 +43,7 @@
   <link rel="preload" href="../assets/js/explained.ae90d788.js" as="script">
   <link rel="preload" href="../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../assets/js/data.ea567981.js" as="script">
+  <link rel="preload" href="../assets/js/data.e6caff58.js" as="script">
   <link rel="preload" href="../assets/js/data-late.dd2cb248.js" as="script">
   <link rel="preload" href="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js" as="script">
   <link rel="preload" href="../assets/js/np-project.ab528b77.js" as="script">
@@ -55,11 +55,11 @@
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js" as="script">
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.398b6e00.js" as="script">
-  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2eaad295.js" as="script">
+  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2b2bd214.js" as="script">
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.4f929cab.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.09f16144.js" as="script">
-  <link rel="preload" href="../assets/js/rd-panels.905b9c27.js" as="script">
+  <link rel="preload" href="../assets/js/rd-panels.9435c5e8.js" as="script">
   <link rel="preload" href="../assets/js/rd-polls.c73d84f8.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.069d9a14.js" as="script">
@@ -197,6 +197,8 @@
   --mood-neg: oklch(0.44 0.045 50);
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
+  --macro-cpi: oklch(0.56 0.115 40);
+  --macro-gdppc: oklch(0.50 0.095 230);
   --pubop-w0: oklch(0.50 0.105 305);
   --pubop-w1: oklch(0.60 0.115 83);
   --chg-up:   oklch(0.505 0.110 152);
@@ -263,6 +265,8 @@ body.dark {
   --mood-neg: oklch(0.68 0.05 45);
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
+  --macro-cpi: oklch(0.72 0.115 40);
+  --macro-gdppc: oklch(0.70 0.095 230);
   --pubop-w0: oklch(0.66 0.110 305);
   --pubop-w1: oklch(0.67 0.115 83);
   --chg-up:   oklch(0.735 0.135 152);
@@ -5425,6 +5429,11 @@ body.rd .conf-band.lo.thin { opacity: 0.045; }
 body.rd .conf-band.hi.thin { opacity: 0.075; }
 body.rd.dark .conf-band.lo { fill: var(--ink-2); opacity: 0.1; }
 body.rd.dark .conf-band.hi { fill: var(--ink-2); opacity: 0.18; }
+body.rd .rba-band { fill: var(--macro-cpi); opacity: 0.07; }
+body.rd.dark .rba-band { fill: var(--macro-cpi); opacity: 0.11; }
+body.rd .rd-cs-keyband.rba, body.rd .rd-cs-keyband.rba i { background: var(--macro-cpi); }
+body.rd .rd-cs-keyband.rba { opacity: 0.28; }
+body.rd .rd-cs-keyband.rba i { opacity: 0.55; }
 body.rd .rd-acc-basis { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 body.rd .rd-acc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 16px; row-gap: 16px; margin-top: 20px; }
 body.rd .rd-acc-stats { border-collapse: collapse; margin-top: 22px; font-size: 13px; line-height: 1.35; }
@@ -6707,7 +6716,7 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../assets/js/explained.ae90d788.js"></script>
   <script src="../assets/js/react.d949f1c3.js"></script>
   <script src="../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../assets/js/data.ea567981.js"></script>
+  <script src="../assets/js/data.e6caff58.js"></script>
   <script src="../assets/js/data-late.dd2cb248.js"></script>
   <script src="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js"></script>
   <script src="../assets/js/np-project.ab528b77.js"></script>
@@ -6719,11 +6728,11 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js"></script>
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.398b6e00.js"></script>
-  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2eaad295.js"></script>
+  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.2b2bd214.js"></script>
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.4f929cab.js"></script>
   <script src="../assets/js/rd-hero.09f16144.js"></script>
-  <script src="../assets/js/rd-panels.905b9c27.js"></script>
+  <script src="../assets/js/rd-panels.9435c5e8.js"></script>
   <script src="../assets/js/rd-polls.c73d84f8.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../assets/js/rd-allpolls.069d9a14.js"></script>

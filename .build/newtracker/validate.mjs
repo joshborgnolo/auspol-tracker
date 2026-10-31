@@ -1432,6 +1432,58 @@ export function validateBooth() {
   return errors;
 }
 
+/* data/macro.json – the ABS/OECD price and output series behind the
+   Economic sentiment panel's Inflation & growth view (built by
+   .build/macro.mjs off the ABS and OECD data APIs; the extractor's own
+   lanes guards ran at pull time). The gate is on the committed file's
+   shape and internal consistency: all five lanes present with ascending
+   dates inside plausible bounds, the quarterly CPI history and the
+   printed monthly era reconciling at their handoff (the extractor's
+   HANDOFF_DRIFT allowance), and each lane no staler than the extractor
+   itself tolerates. */
+export function validateMacro() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let M = null;
+  try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
+  catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], oecdCpi: [-5, 30], oecdGdp: [-12, 15] };
+  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, oecdCpi: 95, oecdGdp: 210 };
+  const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
+  const lanes = {};
+  for (const k of Object.keys(BAND)) {
+    const where = `macro.json ${k}`;
+    const lane = M[k];
+    if (!lane || !Array.isArray(lane.rows) || !lane.rows.length) { fail(where, "macro-shape", "lane missing or empty"); continue; }
+    lanes[k] = lane.rows;
+    const [lo, hi] = BAND[k];
+    let prev = null;
+    for (const [i, r] of lane.rows.entries()) {
+      const at = `${where} #${i} (${r && r.date})`;
+      if (!r || typeof r !== "object" || !ISO_DAY.test(r.date || "")) { fail(at, "date-format", `row missing a YYYY-MM-DD date`); continue; }
+      if (typeof r.v !== "number" || !Number.isFinite(r.v)) { fail(at, "macro-shape", `v not a finite number (${JSON.stringify(r.v)})`); continue; }
+      if (r.v < lo || r.v > hi) fail(at, "macro-band", `${r.v} outside [${lo}, ${hi}]`);
+      if (prev && r.date < prev) fail(at, "date-order", `precedes previous row (${prev})`);
+      prev = r.date;
+    }
+    const newAge = days(lane.rows[lane.rows.length - 1].date);
+    if (newAge > STALE[k]) fail(where, "macro-stale", `newest row ${lane.rows[lane.rows.length - 1].date} is ${Math.round(newAge)}d old (> ${STALE[k]}d)`);
+  }
+  // the quarterly derived series and the printed monthly one must agree at
+  // shared quarter ends, within the extractor's own handoff allowance
+  if (lanes.cpi && lanes.cpiMonthly) {
+    const qByDate = new Map(lanes.cpi.map((r) => [r.date, r.v]));
+    let worst = 0, worstDate = null;
+    for (const m of lanes.cpiMonthly) {
+      if (!qByDate.has(m.date)) continue;
+      const d = Math.abs(m.v - qByDate.get(m.date));
+      if (d > worst) { worst = d; worstDate = m.date; }
+    }
+    if (worst > 1.5) fail("macro.json cpi↔cpiMonthly", "macro-drift", `quarterly/monthly handoff drift ${worst.toFixed(1)}pt at ${worstDate} (> 1.5)`);
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -1447,6 +1499,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   errors.push(...validateSecDirectionStates());
   errors.push(...validateEssDirectionGroups());
   errors.push(...validateRbDirectionGroups());
+  errors.push(...validateMacro());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }

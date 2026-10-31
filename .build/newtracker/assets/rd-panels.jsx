@@ -5499,6 +5499,233 @@ const CONF_SHEET = {
 const confYmIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
 const confYmOf = (i) => Math.floor(i / 12) + "-" + String((i % 12) + 1).padStart(2, "0");
 const RD_CONF_VIEWS = [{ id: "consumer", label: "Consumers" }, { id: "business", label: "Businesses" }];
+/* the third tab exists only when gen-data §5m's payload is on the page */
+const MACRO_VIEW = { id: "macro", label: "Inflation & growth" };
+
+/* ======== the "Inflation & growth" view of Economic sentiment =========
+   D.macro (gen-data §5m ← .build/macro.mjs ← the ABS and OECD data APIs).
+   The two Australian lanes — ABS headline CPI and real GDP per capita,
+   both annual change — draw solid with every print dotted; the OECD
+   averages draw as pale dashed context lines with no dots. The term
+   window opens first; "Show complete history" widens onto the calendar
+   to the whole published run (CPI history from the ABS's quarterly index
+   numbers, 1949→, spliced onto the printed monthly series' era; GDP pc
+   1974→; OECD inflation 1971→; OECD GDP growth 1963→). the CPI lane's
+   splice sits where the printed monthly measure begins; every figure
+   shown is a published print or an index-derived annual change, joined
+   as-is — no smoothing, no adjustment, nothing estimated. */
+function RdMacro() {
+  const { D, monthLabelFull } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const M = D.macro;
+  if (!M || !M.cpi || !M.cpiMonthly || !M.gdppc) return null;
+  /* ISO period-end -> gen-data's decimal-year x (same contract as gen-data
+     dx: day-of-year over the true year length, so a leap Dec 31 never
+     lands on the next 1 Jan) */
+  const dx = (iso) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    const doy = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000;
+    const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
+    return y + doy / yrLen;
+  };
+  const qName = (iso) => ({ "03": "March", "06": "June", "09": "September", "12": "December" })[iso.slice(5, 7)] + " quarter";
+  const moName = (iso) => monthLabelFull(iso.slice(0, 7));
+  /* date granularity rides the lane (a CPI row ending March is a MONTH, a
+     GDP row ending March a QUARTER), never the month's number */
+  const laneNice = (l, iso) => (l.q ? qName(iso) : moName(iso));
+  const PCT = (v) => v.toFixed(1);
+  const LANES = [
+    {
+      k: "cpi", by: "Headline inflation", house: "ABS", color: "var(--macro-cpi)", solid: true, q: false,
+      rows: M.cpiMonthly.rows, history: M.cpi.rows,
+      vfmt: (v) => PCT(v) + "%",
+      short: "Across the years of goods and services Australians buy — the ABS's all-items CPI, annual change. Before the monthly CPI era the ABS's quarterly index drove this lane.",
+    },
+    {
+      k: "gdppc", by: "GDP per person", house: "ABS", color: "var(--macro-gdppc)", solid: true, q: true,
+      rows: M.gdppc.rows, history: M.gdppc.rows,
+      vfmt: (v) => PCT(v) + "%",
+      short: "Real (price-adjusted) GDP divided across every Australian — the annual change, seasonally adjusted. Growth is everyone's slice getting bigger, on average.",
+    },
+  ]
+    .concat(M.oecdCpi && M.oecdCpi.rows.length ? [{
+      k: "oecdCpi", by: "OECD average inflation", house: "OECD", color: "var(--ink-2)", solid: false, q: false,
+      rows: M.oecdCpi.rows, history: M.oecdCpi.rows,
+      vfmt: (v) => PCT(v) + "%",
+      short: "Inflation across the OECD countries as a whole — the comparator, not the Australian story.",
+    }] : [])
+    .concat(M.oecdGdp && M.oecdGdp.rows.length ? [{
+      k: "oecdGdp", by: "OECD average growth", house: "OECD", color: "var(--ink-2)", solid: false, q: true,
+      rows: M.oecdGdp.rows, history: M.oecdGdp.rows,
+      vfmt: (v) => PCT(v) + "%",
+      short: "Annual change in the OECD's total real GDP — its all-members headline; the OECD publishes no per-person average.",
+    }] : [])
+    .filter((l) => l.rows && l.rows.length);
+  if (!LANES.length) return null;
+  const x0 = 2025 + 122 / 365;
+  const x1 = D.domain.x1;
+  const toM = (x) => (x - x0) * 12;
+  const nowM = toM(x1);
+  const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
+  /* the CPI lane's deep splice: quarterly index-derived rows up to the
+     printed monthly series' first row, then the printed monthly rows */
+  const cpiSplice = (() => {
+    const mo = M.cpiMonthly.rows;
+    const cut = mo.length ? dx(mo[0].date) : Infinity;
+    return M.cpi.rows.filter((r) => dx(r.date) < cut).concat(mo);
+  })();
+  const deepRows = (l) => (l.k === "cpi" ? cpiSplice : l.history);
+  /* the term-window (months-into-term ruler) and the calendar-history
+     (year-fraction ruler) forms of each lane */
+  const [hist, setHist] = useState(false);
+  const [evtOpen, setEvtOpen] = useState(null);
+  const histDeep = new Map(LANES.map((l) => [l.k, deepRows(l).map((r) => ({ x: dx(r.date), y: r.v, ym: r.date.slice(0, 7), dateIso: r.date }))]));
+  const histOn = hist && LANES.some((l) => histDeep.get(l.k).length > 1);
+  const histX0 = histOn ? Math.floor(Math.min(...LANES.flatMap((l) => histDeep.get(l.k).map((p) => p.x)))) : 0;
+  const lanePoints = (l) => (histOn ? histDeep.get(l.k) : l.rows.filter((r) => dx(r.date) >= x0).map((r) => ({ x: toM(dx(r.date)), y: r.v, ym: r.date.slice(0, 7), dateIso: r.date })));
+  /* the numbered events: the hero's set, less the party-politics changes
+     of hand (RdConfidence's own list) — the economy's events stay */
+  const MACRO_ECONDS_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MACRO_ECONDS_OFF.includes(e.date))
+    .map((e) => ({ ...e, x: toM(e.x) }));
+  const badges = !histOn && narrow ? rdEventBadges("macro", evs, 0, xMax) : null;
+  const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
+  /* y window: drawn values plus the frame's own landmarks (0 and the
+     2–3% target band), padded a point and ticked at 1 (or 2 on a wide span) */
+  const drawnVals = LANES.flatMap((l) => lanePoints(l).map((p) => p.y)).concat([0, 2, 3]);
+  const yLo = Math.floor(Math.min(...drawnVals) - 1);
+  const yHi = Math.ceil(Math.max(...drawnVals) + 1);
+  const yStep = yHi - yLo > 14 ? 2 : 1;
+  /* the RBA 2–3% inflation target fills behind the CPI lane */
+  const rbaAreas = [{
+    id: "rba-target", className: "rba-band", color: "var(--macro-cpi)", opacity: 0.08, edge: false,
+    points: [
+      { x: histOn ? histX0 : 0, y0: 2, y1: 3 },
+      { x: histOn ? x1 : xMax, y0: 2, y1: 3 },
+    ],
+  }];
+  const xTicks = [{ x: 0, label: "Election" }, { x: 12, label: "1 yr" }, { x: 24, label: "2 yrs" }, { x: 36, label: "3 yrs" }];
+  if (!histOn && nowM < xMax - 1.4) xTicks.push({ x: +nowM.toFixed(1), label: "Now" });
+  xTicks.sort((a, b) => a.x - b.x);
+  const histTicks = histOn ? (() => {
+    const step = narrow ? 10 : 5, t = [];
+    for (let y = Math.ceil(histX0 / step) * step; y < x1 - 0.9; y += step) t.push({ x: y, label: String(y) });
+    return t;
+  })() : null;
+  const laneSeries = LANES.map((l) => ({
+    id: l.k, label: l.by, color: l.color,
+    rdWidth: l.solid ? 2.2 : 1.5, dash: l.solid ? undefined : "3 3",
+    smooth: false, endCap: false, endLabel: narrow ? null : l.by,
+    /* the quarterly lanes' prints meet the monthly ones on the shared
+       CPI spine by luck alone - ride the line between prints */
+    interpHover: true, points: lanePoints(l),
+  }));
+  /* every AU print is a dot; the OECD context lanes never dot */
+  const scatter = LANES.filter((l) => l.solid).flatMap((l) => lanePoints(l).map((p) => ({ x: p.x, y: p.y, color: l.color, label: l.by, meta: { pollster: l.house, dateLabel: laneNice(l, p.dateIso) } })));
+  /* the hover spine rides the CPI lane (its cadence is the densest) */
+  const spineLane = LANES.find((l) => l.k === "cpi") || LANES[0];
+  const spine = lanePoints(spineLane);
+  const exportCsv = () => {
+    const rr = [["kind", "series", "date", "annual_change_pct"]];
+    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", gdppc: "Real GDP per capita", oecdCpi: "OECD average inflation", oecdGdp: "OECD average GDP growth" };
+    for (const k of Object.keys(SHEET)) {
+      const lane = M[k];
+      if (!lane) continue;
+      for (const r of lane.rows) rr.push(["series", SHEET[k], r.date, r.v]);
+    }
+    confDownloadCsv(`auspol-tracker-macro-${D.latest.updatedISO}.csv`, rr);
+  };
+  return (<>
+    <div className="rd-cc rd-confidence-cc">
+      <div className="rd-confidence-draw">
+        <button type="button" className="rd-chip rd-confidence-hist" aria-pressed={histOn}
+                onClick={() => { setHist((h) => !h); setEvtOpen(null); }}>
+          {histOn ? "Back to this term" : "＋ " + (narrow ? "Full history" : "Show complete history")}
+        </button>
+      </div>
+    </div>
+    <div className="card rd-card rd-confidence-chart">
+      <div className="rd-un-ptitle"><b>Inflation & growth</b><span>annual change, per cent</span></div>
+      {LANES.map((l) => {
+        const lat = l.rows[l.rows.length - 1];
+        return (
+          <div key={l.k} className="rd-un-read">
+            <RdSwatch kind={l.solid ? "line" : "dash"} color={l.color} />
+            <div>
+              <div className="rd-un-rtop"><b>{l.by}</b><span className="rd-un-rhouse">{l.house}</span><span className="rd-un-rfig"><span className="rd-un-rv">{l.vfmt(lat.v)}</span></span></div>
+              <p>{l.short} {l.rows.length > 1 ? "Latest: " + laneNice(l, lat.date) + ", " + l.vfmt(lat.v) + "." : ""}</p>
+            </div>
+          </div>
+        );
+      })}
+      <TrendChart key={"rd-macro" + (histOn ? "-hist" : "")} heightPx={narrow ? 260 : 340}
+        padPx={narrow ? { l: 34, r: 8, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
+        xDomain={histOn ? [histX0, x1] : [0, xMax]} yDomain={[yLo, yHi]} yTicks={rdYTicks(yLo, yHi, yStep)} yTickFmt={(v) => String(v)}
+        xTicks={histOn ? histTicks : xTicks} baseline
+        refLines={[{ y: 0, label: "0", align: "left", color: "var(--ink-3)" }]}
+        areas={rbaAreas}
+        series={laneSeries}
+        spine={spine}
+        events={histOn ? [] : (badges ? badges.events : evs)}
+        evt={histOn ? null : evtOpen} onEvt={setEvtOpen}
+        scatter={scatter}
+        tooltipTitle={(i) => { const p = spine[i]; return p ? moName(p.ym + "-01") : ""; }}
+        fmt={(v) => PCT(v) + "%"}
+        copy={{
+          title: "Inflation & growth",
+          sub: "Official ABS and OECD series, as published. " + (histOn ? "Full published history, " + histX0 + " to now." : "This parliamentary term."),
+          caption: "The Australian Bureau of Statistics' headline inflation (all-items CPI, annual change; quarterly before the monthly CPI era, derived from the ABS's own published index numbers, spliced where the printed monthly measure begins) and real GDP per person (annual change, chain volume, seasonally adjusted), beside the OECD-wide averages for inflation and GDP growth, drawn as dashed context. The shaded band is the RBA's 2–3% inflation target. Nothing smoothed, adjusted or estimated — official prints, joined as-is.",
+          legend: LANES.map((l) => ({ label: l.by + " (latest " + l.vfmt(l.rows[l.rows.length - 1].v) + ")", color: l.color, kind: l.solid ? "line" : "dashed" })),
+        }} />
+      {badges && badges.list.length === 1 && (
+        <RdEventList list={badges.list} onPick={pickEv}
+                     openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+      )}
+      {badges && badges.list.length > 1 && (
+        <details className="rd-evdrop">
+          <summary>The marked events</summary>
+          <RdEventList list={badges.list} onPick={pickEv}
+                       openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+        </details>
+      )}
+      <RdKey className="rd-ckey" items={[
+        { kind: "dot", color: "var(--ink-3)", label: "One official print (Australia)" },
+        { kind: "line", color: "var(--ink-3)", label: "Joined prints — no smoothing" },
+        { kind: "dash", color: "var(--ink-2)", label: "OECD average" },
+      ]}>
+        <span className="rd-key-item"><span className="rd-cs-keyband rba" aria-hidden="true"><i></i></span>The RBA's 2–3% inflation target</span>
+      </RdKey>
+      <div className="rd-foot">
+        <span className="rd-foot-text">Official ABS and OECD series, refreshed daily from their data APIs — a record, not an estimate.</span>
+        <span className="rd-grow"></span>
+        <button type="button" className="rd-how rd-confidence-csv" onClick={exportCsv}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path></svg> Source data, CSV</button>
+      </div>
+    </div>
+  </>);
+}
+
+/* The macro view's head/dek from the payload (data-driven; null guard
+   matches RdMacro's, so the tab never shows its copy without its data) */
+function macroStory(D) {
+  const M = D.macro;
+  if (!M || !M.cpiMonthly || !M.gdppc) return null;
+  const { monthLabelFull } = window.AP;
+  const c = (M.cpiMonthly.rows || []).at(-1), g = (M.gdppc.rows || []).at(-1);
+  if (!c || !g) return null;
+  const oc = M.oecdCpi && M.oecdCpi.rows.length ? M.oecdCpi.rows.at(-1) : null;
+  const og = M.oecdGdp && M.oecdGdp.rows.length ? M.oecdGdp.rows.at(-1) : null;
+  const f = (v) => (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const qName = (iso) => ({ "03": "March", "06": "June", "09": "September", "12": "December" })[iso.slice(5, 7)] + " quarter";
+  const head = "Inflation runs at " + f(c.v) + "% a year; real income per person " + (g.v >= 0 ? "grows " : "shrinks ") + f(g.v) + "% a year.";
+  const dek = "Headline inflation reads " + f(c.v) + "% for " + monthLabelFull(c.date.slice(0, 7))
+    + " (the ABS's monthly CPI, annual change); real GDP per person moved " + f(g.v) + "% apiece in the " + qName(g.date)
+    + " on the year before, seasonally adjusted, chain-volume."
+    + (oc ? " OECD-wide, inflation stands at " + f(oc.v) + "%" : "")
+    + (og ? " and average GDP growth at " + f(og.v) + "%" : "")
+    + (oc || og ? "." : "");
+  return { head, dek };
+}
+
 /* ------------------------------------------------ Release calendar ----
    The confidence gauges' own calendar fold under this panel (user call
    2026-10-09: split out of the Latest-polls fold, which keeps polls and
@@ -5634,11 +5861,16 @@ function RdConfidence({ rangeId }) {
   /* the tabs over the chart open on the consumer pair; each view draws
      only its own lanes, dots and domain */
   const [view, setView] = useState("consumer");
+  /* the Inflation & growth tab joins the row when gen-data §5m's payload
+     is on the page (absent for a BUILD_JUR build, and every confidence
+     measure below guards it: viewLanes is empty on that view) */
+  const views = D.macro ? RD_CONF_VIEWS.concat(MACRO_VIEW) : RD_CONF_VIEWS;
+  const isMacro = view === "macro";
   /* hovering the panel hands the arrow keys to the Consumers/Businesses
      row (the claim never survives the pointer leaving the card), pinned
      through the crossfade exactly as the row's own pin does */
   useHoverClaim("confidence", true, null, (e) => {
-    const ids = RD_CONF_VIEWS.map((v) => v.id);
+    const ids = views.map((v) => v.id);
     const i = ids.indexOf(view);
     if (i < 0 || ids.length < 2) return false;
     const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
@@ -5740,6 +5972,8 @@ function RdConfidence({ rangeId }) {
   const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const rows = new Map(lanes.map((l) => [l.k, l.s.polls.filter((p) => p.x >= x0)]));
   const dek = lanes.map(sent).join(" ");
+  /* the macro tab swaps head and dek for the payload's own story */
+  const mStory = isMacro ? macroStory(D) : null;
   /* The dots, spine and domain ride the raw prints; the series lines are
      the kernel smooth of the same readings. The NAB display shift is a
      constant, so smoothing then shifting equals shifting and smoothing —
@@ -5893,7 +6127,10 @@ function RdConfidence({ rangeId }) {
       .concat(wideRaw.get(viewLanes[0].k))
       .map((p) => [p.x, p])
   ).values()].sort((a, b) => a.x - b.x) : null;
-  const spine = histOn ? histSpine : rawPoints.get(viewLanes[0].k);
+  /* on the macro view viewLanes is empty — no spine to take (the macro
+     card carries its own); guarding here, not by early-returning the
+     whole panel, keeps the tab row's state where it belongs */
+  const spine = histOn ? histSpine : (viewLanes[0] ? rawPoints.get(viewLanes[0].k) : undefined);
   /* the chart's series and dots, shared by both windows: the live lines
      are the smoothed trend over the window's releases; in the history
      window the deep monthly lines go UNDER the live ones */
@@ -5932,13 +6169,14 @@ function RdConfidence({ rangeId }) {
   if (nowM < xMax - 1.4) xTicks.push({ x: +nowM.toFixed(1), label: "Now" });
   xTicks.sort((a, b) => a.x - b.x);
   return (
-    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
-      <RdHed head={head} dek={dek} />
+    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
+      <RdHed head={isMacro && mStory ? mStory.head : head} dek={isMacro && mStory ? mStory.dek : dek} />
       {/* the views are pages of their own, so the row walks them by arrow
           keys (focused, or hovering the panel) and a phone swipe;
           rdPinScroll holds the row's spot through the crossfade (pin) */}
-      <RdTabs swipe pin value={view} onChange={setView} options={RD_CONF_VIEWS} ariaLabel="Confidence of" className="rd-confidence-tabs" />
+      <RdTabs swipe pin value={view} onChange={setView} options={views} ariaLabel="View of the economy" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
+      {!isMacro && <>
       {(hband || deepDrawn.length > 0) && (
       <div className="rd-cc rd-confidence-cc">
         <div className="rd-confidence-draw">
@@ -6044,11 +6282,14 @@ function RdConfidence({ rangeId }) {
           </>}
         </RdKey>
       </div>
+      </>}
+      {isMacro && <RdMacro />}
       </RdCrossfade>
       <HowTo paras={[
         <>Four published gauges of economic confidence, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
+        <>The Inflation &amp; growth tab charts the ABS’s and OECD’s official figures exactly as published: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) and real GDP per person (the annual change in chain-volume GDP per capita, seasonally adjusted), beside the OECD-wide averages drawn as dashed context lines. The shaded band marks the Reserve Bank’s 2–3% inflation target. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
       {/* placement is deliberate: under the how-to, not beside the chart
