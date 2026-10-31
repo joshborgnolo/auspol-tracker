@@ -129,6 +129,13 @@ const oecdCpiCsv = (rows) => [
     return `OECD.SDD.TPS:DSD_PRICES@DF_PRICES_ALL(1.0),OECD,M,N,CPI,PA,_T,N,GY,${y}-${String(m).padStart(2, "0")},${v},A,,,,2`;
   }),
 ].join("\n") + "\n";
+const g20CpiCsv = (rows) => [
+  "DATAFLOW,REF_AREA,FREQ,METHODOLOGY,MEASURE,UNIT_MEASURE,EXPENDITURE,ADJUSTMENT,TRANSFORMATION,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,BASE_PER,DURABILITY,DECIMALS",
+  ...rows.map((v, i) => {
+    const y = 2021 + Math.floor(i / 12), m = (i % 12) + 1;
+    return `OECD.SDD.TPS:DSD_PRICES@DF_PRICES_ALL(1.0),G20,M,N,CPI,PA,_T,N,GY,${y}-${String(m).padStart(2, "0")},${v},A,,,,2`;
+  }),
+].join("\n") + "\n";
 const oecdGdpCsv = (rows) => [
   "DATAFLOW,REF_AREA,FREQ,MEASURE,UNIT_MEASURE,ACTIVITY,ADJUSTMENT,TRANSFORMATION,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,DECIMALS,BASE_PER",
   ...rows.map((v, i) => {
@@ -139,6 +146,7 @@ const oecdGdpCsv = (rows) => [
 
 const CPI_MONTHLY = [4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.5, 4.6];  // drift 0–0.1 vs the 4.5 quarterly line
 const OECD_CPI = Array.from({ length: 68 }, (_, i) => Math.round((1.5 + i * 0.05) * 10) / 10);
+const G20_CPI = Array.from({ length: 68 }, (_, i) => Math.round((2.0 + i * 0.02) * 10) / 10);
 const OECD_GDP = Array.from({ length: 186 }, (_, i) => Math.round((2.0 + 1.5 * Math.sin(i / 8)) * 10) / 10);
 
 const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {}) => {
@@ -146,6 +154,7 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-cpi-yoy.csv"), absMonthlyCpiCsv(cpiMonthly));
   fs.writeFileSync(path.join(dir, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiCsv(oecdCpi));
+  fs.writeFileSync(path.join(dir, "g20-cpi.csv"), g20CpiCsv(G20_CPI));
   fs.writeFileSync(path.join(dir, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
 };
 writeFixtures(FIX);
@@ -161,6 +170,7 @@ assert.equal(st.rows.cpi, 263 - 4);
 assert.equal(st.rows.cpiMonthly, 9);
 assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.oecdCpi, 68);
+assert.equal(st.rows.g20Cpi, 68);
 assert.equal(st.rows.oecdGdp, 186);
 assert.equal(st.newest.cpi, "2026-09-30");
 assert.equal(st.newest.cpiMonthly, "2026-09-30");
@@ -172,6 +182,7 @@ assert.equal(doc.cpi.rows[0].date, "1962-03-31", "first y/y is the fifth quarter
 assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
 assert.equal(doc.oecdCpi.rows.at(-1).v, OECD_CPI.at(-1));
+assert.equal(doc.g20Cpi.rows.at(-1).v, G20_CPI.at(-1));
 
 /* second run, untouched upstream: writes nothing */
 r = run(FIX);
@@ -185,6 +196,7 @@ assert.equal(statusOf(r.out).changed, false, "idempotent on an unchanged upstrea
   fs.writeFileSync(path.join(d, "abs-cpi-yoy.csv"), absMonthlyCpiCsv([4.3, 4.4, 4.5, 4.6, 4.6, 4.6, 4.6, 4.6, 31]));
   fs.writeFileSync(path.join(d, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(d, "oecd-cpi.csv"), oecdCpiCsv(OECD_CPI));
+  fs.writeFileSync(path.join(d, "g20-cpi.csv"), g20CpiCsv(G20_CPI));
   fs.writeFileSync(path.join(d, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
   const rr = run(d);
   assert.equal(rr.status, 2, "band breach must exit 2: " + rr.out);
@@ -198,6 +210,7 @@ assert.equal(statusOf(r.out).changed, false, "idempotent on an unchanged upstrea
   fs.writeFileSync(path.join(d, "abs-cpi-yoy.csv"), absMonthlyCpiCsv([4.3, 4.4, 4.5, 4.6, 4.6, 4.6, 4.6, 4.6, 6.6]));
   fs.writeFileSync(path.join(d, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(d, "oecd-cpi.csv"), oecdCpiCsv(OECD_CPI));
+  fs.writeFileSync(path.join(d, "g20-cpi.csv"), g20CpiCsv(G20_CPI));
   fs.writeFileSync(path.join(d, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
   const rr = run(d);
   assert.equal(rr.status, 2, "handoff drift must exit 2: " + rr.out);
@@ -215,7 +228,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "g20Cpi", "oecdGdp"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -234,6 +247,7 @@ for (const k of KEYS) {
 assert.ok(live.cpi.rows[0].date <= "1955-01-01", "quarterly CPI reaches the mid-50s");
 assert.ok(live.gdppc.rows[0].date <= "1980-01-01", "GDP pc reaches the 70s");
 assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s");
+assert.ok(live.g20Cpi.rows[0].date <= "2005-01-01", "G20 CPI reaches the late 90s");
 assert.ok(live.oecdGdp.rows[0].date <= "1970-01-01", "OECD GDP reaches the 60s");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
 /* the handoff the extractor certified really is tight on disk */

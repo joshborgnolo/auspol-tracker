@@ -25,6 +25,10 @@
      oecdCpi    – OECD total, all-items CPI, y/y, monthly; the OECD's printed
                   measure (DF_PRICES_ALL: OECD.M.N.CPI.PA._T.N.GY), no
                   arithmetic on our side.
+     g20Cpi     – G20 total, all-items CPI, y/y, monthly; the OECD's printed
+                  measure for the twenty-biggest-economies aggregate
+                  (same publication, REF_AREA=G20, 1998→) — a wider
+                  comparator than the OECD membership for headline inflation.
      oecdGdp    – OECD total real GDP, y/y, quarterly; the OECD's printed
                   growth measure (DF_KEI: OECD.Q.B1GQ_Q.GR._T.Y.GY, 1963→).
                   The OECD publishes no per-capita OECD-total growth series —
@@ -87,6 +91,12 @@ const SOURCES = {
     accept: "text/csv",
     cite: "OECD Data Explorer, consumer prices: OECD total, all items CPI, percentage change on the same period of the previous year (DF_PRICES_ALL)",
   },
+  g20Cpi: {
+    fixture: "g20-cpi.csv",
+    url: `${OECD_BF}/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/G20.M.N.CPI.PA._T.N.GY/all`,
+    accept: "text/csv",
+    cite: "OECD Data Explorer, consumer prices: G20 total, all items CPI, percentage change on the same period of the previous year (DF_PRICES_ALL)",
+  },
   oecdGdp: {
     fixture: "oecd-gdp.csv",
     url: `${OECD_BF}/OECD.SDD.STES,DSD_KEI@DF_KEI,4.0/OECD.Q.B1GQ_Q.GR._T.Y.GY/all`,
@@ -98,9 +108,9 @@ const SOURCES = {
 // Plausible annual-change bands per display lane (a breach guards, never
 // files): Australia 1947→ sees CPI ~18% (1975) and ~−2% (1997/2020); OECD
 // histories are tamer but padded on the same logic.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], oecdCpi: [-5, 30], oecdGdp: [-12, 15] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, oecdCpi: 60, oecdGdp: 40 };
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, oecdCpi: 95, oecdGdp: 210 };
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], oecdCpi: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, oecdCpi: 60, g20Cpi: 60, oecdGdp: 40 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, oecdCpi: 95, g20Cpi: 95, oecdGdp: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -269,7 +279,7 @@ if (!process.env.MACRO_LIB) {
     await sleep(400);
   }
   const absCpiIdx = texts.cpiIndex, absCpiYoy = texts.cpiYoy, absGdp = texts.gdppcLvl;
-  const oecdCpiRows = texts.oecdCpi, oecdGdpRows = texts.oecdGdp;
+  const oecdCpiRows = texts.oecdCpi, g20CpiRows = texts.g20Cpi, oecdGdpRows = texts.oecdGdp;
 
   // cpi — quarterly, derived from the ABS's own quarterly index numbers.
   const cpiLevels = absFiltered(parseSdmxCsv(absCpiIdx), { MEASURE: 1, INDEX: 10001, TSEST: 10, REGION: 50 });
@@ -287,9 +297,10 @@ if (!process.env.MACRO_LIB) {
 
   // OECD lanes — printed measures, no arithmetic.
   const oecdCpi = printedRows(parseSdmxCsv(oecdCpiRows).filter((r) => r.REF_AREA === "OECD"));
+  const g20Cpi = printedRows(parseSdmxCsv(g20CpiRows).filter((r) => r.REF_AREA === "G20"));
   const oecdGdp = printedRows(parseSdmxCsv(oecdGdpRows).filter((r) => r.REF_AREA === "OECD"));
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, oecdCpi, oecdGdp })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, oecdCpi, g20Cpi, oecdGdp })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -305,16 +316,17 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     gdppc: { label: "GDP per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: gdppc },
     oecdCpi: { label: "OECD average inflation", basis: "OECD printed measure", rows: oecdCpi },
+    g20Cpi: { label: "G20 average inflation", basis: "OECD printed measure", rows: g20Cpi },
     oecdGdp: { label: "OECD average GDP growth", basis: "OECD printed measure", rows: oecdGdp },
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "oecdGdp"];
+  const KEYS = ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "g20Cpi", "oecdGdp"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);

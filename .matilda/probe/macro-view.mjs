@@ -56,6 +56,7 @@ const readState = () => page.evaluate(() => {
     tabInflation: q(".rd-confidence-tabs button").some((b) => /Inflation & growth/i.test(b.textContent)),
     ptitle: t.includes("Inflation & growth") && t.includes("annual change, per cent"),
     oecdRow: t.includes("OECD average inflation"),
+    g20Row: t.includes("G20 average inflation"),
     rbaBand: q("svg .rba-band").length > 0,
     histChip: t.includes("Show complete history"),
     backLabel: t.includes("Back to this term"),
@@ -75,10 +76,13 @@ const check = (name, got, want) => {
 };
 
 /* file-grounded expectations: the read rows must quote macro.json's own
-   newest figures, never a recalculation */
+   newest figures, never a recalculation (lane order: AU solid lanes,
+   then OECD CPI, G20 CPI, OECD GDP) */
 const expectedFigs = [
   MACRO.cpiMonthly.rows.at(-1).v.toFixed(1) + "%",
   MACRO.gdppc.rows.at(-1).v.toFixed(1) + "%",
+  MACRO.oecdCpi.rows.at(-1).v.toFixed(1) + "%",
+  MACRO.g20Cpi.rows.at(-1).v.toFixed(1) + "%",
 ];
 
 const s0 = await readState();
@@ -89,14 +93,14 @@ if (!(await clickText(/Inflation & growth/))) fails.push("no Inflation & growth 
 await new Promise((r) => setTimeout(r, 800));
 const s1 = await readState();
 check("macro term view", s1, {
-  found: true, boundary: false, ptitle: true, oecdRow: true,
+  found: true, boundary: false, ptitle: true, oecdRow: true, g20Row: true,
   rbaBand: true, histChip: true, backLabel: false, eventNow: true, tick1960: false, head: true,
 });
-if (s1.figs.length >= 2) {
-  if (s1.figs[0] !== expectedFigs[0]) fails.push(`CPI read row shows ${s1.figs[0]}, want the file's own ${expectedFigs[0]}`);
-  else console.log(`read row 1: ok (${s1.figs[0]})`);
-  if (s1.figs[1] !== expectedFigs[1]) fails.push(`GDP pc read row shows ${s1.figs[1]}, want the file's own ${expectedFigs[1]}`);
-  else console.log(`read row 2: ok (${s1.figs[1]})`);
+if (s1.figs.length >= 4) {
+  expectedFigs.forEach((want, i) => {
+    if (s1.figs[i] !== want) fails.push(`read row ${i + 1} shows ${s1.figs[i]}, want the file's own ${want}`);
+    else console.log(`read row ${i + 1}: ok (${s1.figs[i]})`);
+  });
 } else fails.push(`expected read-row figures, got ${JSON.stringify(s1.figs)}`);
 
 // history mode: the calendar ruler

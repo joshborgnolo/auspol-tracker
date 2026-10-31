@@ -7497,6 +7497,17 @@ function RdMacro() {
     history: M.oecdCpi.rows,
     vfmt: v => PCT(v) + "%",
     short: "Inflation across the OECD countries as a whole — the comparator, not the Australian story."
+  }] : []).concat(M.g20Cpi && M.g20Cpi.rows.length ? [{
+    k: "g20Cpi",
+    by: "G20 average inflation",
+    house: "OECD",
+    color: "var(--ink-2)",
+    solid: false,
+    q: false,
+    rows: M.g20Cpi.rows,
+    history: M.g20Cpi.rows,
+    vfmt: v => PCT(v) + "%",
+    short: "Inflation across the twenty-biggest-economies aggregate — a wider comparator than the OECD membership alone."
   }] : []).concat(M.oecdGdp && M.oecdGdp.rows.length ? [{
     k: "oecdGdp",
     by: "OECD average growth",
@@ -7627,6 +7638,7 @@ function RdMacro() {
       cpiMonthly: "Headline inflation (monthly CPI)",
       gdppc: "Real GDP per capita",
       oecdCpi: "OECD average inflation",
+      g20Cpi: "G20 average inflation",
       oecdGdp: "OECD average GDP growth"
     };
     for (const k of Object.keys(SHEET)) {
@@ -7740,7 +7752,7 @@ function RdMacro() {
     }, {
       kind: "dash",
       color: "var(--ink-2)",
-      label: "OECD average"
+      label: "OECD / G20 averages"
     }]
   }, React.createElement("span", {
     className: "rd-key-item"
@@ -7781,6 +7793,7 @@ function macroStory(D) {
     g = (M.gdppc.rows || []).at(-1);
   if (!c || !g) return null;
   const oc = M.oecdCpi && M.oecdCpi.rows.length ? M.oecdCpi.rows.at(-1) : null;
+  const g2 = M.g20Cpi && M.g20Cpi.rows.length ? M.g20Cpi.rows.at(-1) : null;
   const og = M.oecdGdp && M.oecdGdp.rows.length ? M.oecdGdp.rows.at(-1) : null;
   const f = v => Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1);
   const qName = iso => ({
@@ -7790,7 +7803,7 @@ function macroStory(D) {
     "12": "December"
   })[iso.slice(5, 7)] + " quarter";
   const head = "Inflation runs at " + f(c.v) + "% a year; real income per person " + (g.v >= 0 ? "grows " : "shrinks ") + f(g.v) + "% a year.";
-  const dek = "Headline inflation reads " + f(c.v) + "% for " + monthLabelFull(c.date.slice(0, 7)) + " (the ABS's monthly CPI, annual change); real GDP per person moved " + f(g.v) + "% apiece in the " + qName(g.date) + " on the year before, seasonally adjusted, chain-volume." + (oc ? " OECD-wide, inflation stands at " + f(oc.v) + "%" : "") + (og ? " and average GDP growth at " + f(og.v) + "%" : "") + (oc || og ? "." : "");
+  const dek = "Headline inflation reads " + f(c.v) + "% for " + monthLabelFull(c.date.slice(0, 7)) + " (the ABS's monthly CPI, annual change); real GDP per person moved " + f(g.v) + "% apiece in the " + qName(g.date) + " on the year before, seasonally adjusted, chain-volume." + (oc ? " OECD-wide, inflation stands at " + f(oc.v) + "%" : "") + (g2 ? oc ? ", the G20 at " + f(g2.v) + "%" : " The G20 average sits at " + f(g2.v) + "%" : "") + (og ? " and OECD-wide average GDP growth at " + f(og.v) + "%" : "") + (oc || g2 || og ? "." : "");
   return {
     head,
     dek
@@ -8551,7 +8564,7 @@ function RdConfidence({
     className: "rd-cs-keythin",
     "aria-hidden": "true"
   }), "Monthly history back to ", histX0, ", as the house published it"))))), isMacro && React.createElement(RdMacro, null)), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Four published gauges of economic confidence, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "The Inflation & growth tab charts the ABS\u2019s and OECD\u2019s official figures exactly as published: Australia\u2019s headline inflation (the ABS\u2019s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS\u2019s own published index numbers, spliced where the printed monthly measure begins) and real GDP per person (the annual change in chain-volume GDP per capita, seasonally adjusted), beside the OECD-wide averages drawn as dashed context lines. The shaded band marks the Reserve Bank\u2019s 2\u20133% inflation target. Nothing is smoothed, adjusted, combined or estimated \u2014 official prints, joined as-is, refreshed daily from the ABS and OECD data APIs."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of economic confidence, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "The Inflation & growth tab charts the ABS\u2019s and OECD\u2019s official figures exactly as published: Australia\u2019s headline inflation (the ABS\u2019s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS\u2019s own published index numbers, spliced where the printed monthly measure begins) and real GDP per person (the annual change in chain-volume GDP per capita, seasonally adjusted), beside the OECD-wide averages and the G20\u2019s wider inflation aggregate drawn as dashed context lines. The shaded band marks the Reserve Bank\u2019s 2\u20133% inflation target. Nothing is smoothed, adjusted, combined or estimated \u2014 official prints, joined as-is, refreshed daily from the ABS and OECD data APIs."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement(RdConfCal, null), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {

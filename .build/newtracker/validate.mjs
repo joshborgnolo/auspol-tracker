@@ -1447,8 +1447,8 @@ export function validateMacro() {
   let M = null;
   try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
   catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
-  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], oecdCpi: [-5, 30], oecdGdp: [-12, 15] };
-  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, oecdCpi: 95, oecdGdp: 210 };
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], oecdCpi: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
+  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, oecdCpi: 95, g20Cpi: 95, oecdGdp: 210 };
   const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
   const lanes = {};
   for (const k of Object.keys(BAND)) {

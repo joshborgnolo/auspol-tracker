@@ -7056,13 +7056,13 @@ const confDeep = (() => {
 /* --- §5m. macro lanes for the "Inflation & growth" view ----------------
    data/macro.json (built by .build/macro.mjs off the ABS and OECD data
    APIs) passes through as-is: cpi/cpiMonthly inflation, gdppc real GDP
-   per capita, and the OECD average comparators. The view reads the raw
-   {date, v} rows and splices the quarterly CPI history onto the printed
+   per capita, and the OECD/G20 average comparators. The view reads the
+   raw {date, v} rows and splices the quarterly CPI history onto the printed
    monthly era render-side. */
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "oecdGdp"]) {
+  for (const k of ["cpi", "cpiMonthly", "gdppc", "oecdCpi", "g20Cpi", "oecdGdp"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };

@@ -8555,9 +8555,10 @@ function infoTerms(D) {
         and OECD's official series as published: Australia's headline inflation (the monthly CPI
         era's printed annual change, spliced onto the earlier quarterly series derived from the
         ABS's own published index numbers) and real GDP per person (chain volume, seasonally
-        adjusted), with the OECD-wide averages as dashed context, and the Reserve Bank's 2–3%
-        inflation target as a shaded band. Nothing is smoothed, adjusted or estimated — the
-        prints refresh daily from the ABS and OECD data APIs.</span>
+        adjusted), with the OECD-wide averages and the G20's inflation aggregate as dashed
+        context, and the Reserve Bank's 2–3% inflation target as a shaded band. Nothing is
+        smoothed, adjusted or estimated — the prints refresh daily from the ABS and OECD data
+        APIs.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
         polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },
