@@ -216,7 +216,7 @@ function censusSelects(m, cls = "") {
     ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
     ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
   ];
-  const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
+  const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", ixFor(m).map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
   if (isDemo()) {
     // on Household income a second picker reads the measure: the median
     // spectrum lands; the two share views sit beside it (loinc/hiinc as
@@ -242,7 +242,7 @@ function legendHTML(m) {
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
-  const partyOpts = FAMS.map((f) => [f, famLeg(f)]);
+  const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
   // the chamber view chooses its chamber first
   let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
@@ -250,7 +250,7 @@ function legendHTML(m) {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
       // in the chamber the counts are on the canvas's bloc labels and in the story, not three times
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f] || boothsOn).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (cnt[f] || boothsOn) && famEraOpts(m).includes(f)).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
@@ -793,6 +793,8 @@ async function setYear(y) {
   // a People lane the frame's era never printed (menu omits it) drops
   // the selection to the always-printed language share
   if (b.hasLane && DM.includes(S.index) && b.hasLane[S.index] === false) S.index = "lang";
+  if (b.hasIx && IX.includes(S.index) && b.hasIx[S.index] === false) S.index = "irsd";
+  if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (!b.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   if (!b.ancKeys && S.index === LENS_ANC) S.index = "irsad";

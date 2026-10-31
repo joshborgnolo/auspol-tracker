@@ -165,6 +165,16 @@ const CLS_DEF = { "Inner Metropolitan": "Settled, well-established suburbs of a 
 const IX = ["irsad", "irsd", "ier", "ieo"];
 const IX_NAME = { irsad: "Advantage and disadvantage", irsd: "Disadvantage", ier: "Economic resources", ieo: "Education and occupation" };
 const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
+// the Advantage menu offers only the indexes its frame's print actually
+// scores (IRSAD debuts in the 2001-census four-index suite)
+const ixFor = (m) => IX.filter((k) => !m.hasIx || m.hasIx[k] !== false);
+// how far back a vote family's lane reaches: One Nation's first federal
+// vote figures are the 1998 election (its April 1997 formation posts no
+// '90s figures), so no frame older than 1998 offers the family; the
+// state frames all sit after its era. The menu omits whatever the era
+// never ran a candidate in — the swap fallback below lands the same way
+const FAM_FORMED = { onp: 1998 };
+const famEraOpts = (m) => FAMS.filter((f) => !(FAM_FORMED[f] && Number.isFinite(+m.year) && +m.year < FAM_FORMED[f]));
 // the census tab's people measures: shares of residents (the income
 // shares are shares of an area's ADULTS — one menu entry, "inc", whose
 // own picker reads the median or the two shares), from the 2021 census counted
@@ -1044,6 +1054,11 @@ async function loadYear(year) {
       const any = (k) => divs.some((d) => d.demo && d.demo[k] != null);
       m.hasLane = Object.fromEntries(DM.map((k) => [k, k === "loinc" || k === "hiinc" ? hasInc({ incomeCuts: res.incomeCuts }) : any(k)]));
       m.hasLane[LENS_INC] = m.hasLane.loinc;
+      // the Advantage indexes joined with their era print only: IRSAD
+      // debuts at the 2001-census SEIFA issue (its name, the four-index
+      // suite); the '90s frames carry IRSD/IER/IEO alone, so their menu
+      // omits the index the era never scored
+      m.hasIx = Object.fromEntries(IX.map((k) => [k, divs.some((d) => d.seifa && d.seifa[k] && d.seifa[k].dec != null)]));
     }
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
