@@ -3239,7 +3239,7 @@ canvas.addEventListener("touchcancel", () => { homePinch = null; });
 // at the whole-country fit (a zoomed-in map pans instead). Native controls
 // keep their own gestures (zoom and city buttons, form fields, links), and
 // the list view's own rows
-swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list"));
+swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list, .cls-vote-scroll"));
 // Safari's own pinch events. On a Mac they are the trackpad's pinch; iOS sends
 // them alongside the touches, which d3 (or the home pinch) already follows,
 // so while fingers are down they are left alone
@@ -5888,10 +5888,9 @@ function clsVoteBlock(m, idx) {
     const xs = idx.filter((i) => m.divs[i].cls === c);
     if (!xs.length) continue;
     let ta = 0, tb = 0, nTpp = 0, formal = 0;
-    const fp = CLS_FAMS.map(() => 0), sc = {};
+    const fp = CLS_FAMS.map(() => 0);
     for (const i of xs) {
       const d = m.divs[i];
-      const f = holdFam(d.hold); sc[f] = (sc[f] || 0) + 1;
       // on the now frame a by-election row swaps its seat's 2025 count for the
       // by-election's; this table answers "the election's" figures, so pool the
       // predecessor row the swap keeps, like the aggregates above do
@@ -5900,12 +5899,11 @@ function clsVoteBlock(m, idx) {
       formal += v.formal;
       for (let k = 0; k < CLS_FAMS.length; k++) fp[k] += (v.formal * (v.fp[CLS_FAMS[k]] || 0)) / 100;
     }
-    rows.push({ c, n: xs.length, tpp: nTpp ? (100 * ta) / (ta + tb) : null, nTpp, fp: fp.map((v) => (100 * v) / formal), sc });
+    rows.push({ c, n: xs.length, tpp: nTpp ? (100 * ta) / (ta + tb) : null, nTpp, fp: fp.map((v) => (100 * v) / formal) });
   }
   if (!rows.length) return "";
-  const bar = (r) => ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => r.sc[f]).map((f) => `<i style="width:${(100 * r.sc[f]) / r.n}%;${swc(f)}"></i>`).join("");
   const miss = rows.reduce((a, r) => a + (r.n - r.nTpp), 0);
-  return `<div class="st-sec"><h3>By seat type <small>votes pooled from each type’s seats</small></h3><table class="tbl"><thead><tr><th>Type</th><th>Seats</th><th>Labor 2PP</th>${CLS_FAMS.map((f) => `<th>${FAM_CODE[f]}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(CLS_SHORT[r.c])}</td><td>${r.n}<span class="seatbar">${bar(r)}</span></td><td>${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
+  return `<div class="st-sec st-cls-votes"><h3>By seat type</h3><p class="cls-vote-dek" id="cls-vote-note">Votes pooled from each type’s seats</p><div class="cls-vote-scroll" role="region" aria-label="Votes by seat type" tabindex="0"><table class="cls-votes" aria-label="Vote shares by seat type" aria-describedby="cls-vote-note"><colgroup><col class="cls-vote-type"><col class="cls-vote-tpp"></colgroup><colgroup span="${CLS_FAMS.length}"></colgroup><thead><tr><th scope="col" rowspan="2">Type<span class="cls-vote-unit">Seats</span></th><th scope="col" rowspan="2" class="cls-vote-2pp">Labor<span class="cls-vote-unit">2PP %</span></th><th scope="colgroup" colspan="${CLS_FAMS.length}" class="cls-vote-group">Primary vote %</th></tr><tr>${CLS_FAMS.map((f) => `<th scope="col"><span class="cls-vote-party" style="--cls-party:var(--m-${f})">${FAM_CODE[f]}</span></th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><th scope="row"><span class="cls-vote-name"><i aria-hidden="true" style="background:${css(TH.cls[CLS.indexOf(r.c)])}"></i>${esc(CLS_SHORT[r.c])}</span><span class="cls-vote-seats">${r.n} ${r.n === 1 ? "seat" : "seats"}</span></th><td class="cls-vote-2pp">${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
 }
 
 function storyArea(m, st) {
