@@ -1722,6 +1722,7 @@ for (const y of ["sa22", "sa26"]) {
 {
   const sen = part("app-3b-senate.js"), base = part("app-1-base.js");
   assert.ok(!sen.includes("!VIC_YEARS.has(y)"), "vic22 is in the upper-house lane (its Legislative Council is built out)");
+  assert.ok(sen.includes("&& !QLD_YEARS.has(y)"), "the qld frames are out of the upper-house lane: Queensland's parliament is unicameral (its Legislative Council was abolished in 1922), so the house switch never offers one there");
   assert.ok(base.includes('const SEATED_LC = new Set(["sa26", "vic22"]);'), "SEATED_LC names the councils with seating plans (South Australia's and Victoria's)");
   assert.ok(sen.includes('const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && (senFloor || SENM.year === "vic22") ? SENM : null) : M());'), "the chamber model never waits on the federal floor for vic22's baked-in floor");
   assert.ok(sen.includes('if (!SEN_YEARS.includes(S.year)) return "";'), "the house switch hides on an upper-house-less frame");

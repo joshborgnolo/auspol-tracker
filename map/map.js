@@ -4358,7 +4358,9 @@ const SEN_SEATS = 76;
 // election, and Victoria's 40, five a region, all up together) sit in the same chamber view
 // on their frames, from map/data/senate-<year>.json
 // (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py, build_vic22_lc.py).
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || STATE_YEARS.has(y));
+// Queensland's parliament is unicameral (its Legislative Council was abolished in 1922), so the
+// qld frames take no upper-house lane — their one chamber is the Legislative Assembly.
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y)));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -4611,7 +4613,7 @@ function houseSwitchHTML() {
   const sa = SA_YEARS.has(S.year), st = STATE_YEARS.has(S.year);
   const lo = sa ? "House of Assembly" : st ? "Legislative Assembly" : "House of Representatives";
   const up = st ? "Legislative Council" : "Senate";
-  // Victoria's frame carries no upper house: nothing to switch to
+  // Queensland's frames carry no upper house (the parliament is unicameral): nothing to switch to
   if (!SEN_YEARS.includes(S.year)) return "";
   return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="${lo}" aria-pressed="${S.house !== "senate"}">${lo}</button><button type="button" data-house="senate" data-t="${up}" aria-pressed="${S.house === "senate"}">${up}</button></div>`;
 }
