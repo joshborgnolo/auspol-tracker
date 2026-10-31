@@ -610,6 +610,62 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
 }
 
+// ── the preload's two brakes (2026-10-31): hi geometry waits for a real visit,
+// and the frame cache is weighted and capped. Baseline measured on the probe
+// (.matilda/map-perf-probe.mjs, 4× cpu): preloading all fifteen frames' hi
+// fetch + Path2D build fired ~42 long tasks ≈15s of main-thread jank in the
+// first minute, pulled 71MB and held a 377MB heap (545MB after a Handbook
+// visit, whose lossless geo is ~140MB). Now: hi arrives only for frames the
+// reader actually shows (warmHi on boot/setYear), preloading stops at the cap
+// and spaces itself, and the least-recently-viewed frames fall overboard
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js");
+  assert.equal((base.match(/geo-\$\{ry\}-hi\.json/g) || []).length, 1, "the hi fetch has exactly one home (warmHi) — never inline in loadYear");
+  assert.ok(base.includes("function warmHi(y)") && base.includes("if (lo.handbook) m.geoHi = m.geo;"), "warmHi owns the hi chain; the Handbook years alias lo as before");
+  assert.ok((ui.match(/warmHi\(/g) || []).length >= 2, "boot and setYear both warm the frame now in view");
+  assert.ok(base.includes("const FRAME_CAP = 12") && base.includes("const frameLoad =") && base.includes("function evictFrames()"), "the weighted frame cache and its LRU eviction (Handbook years ×4)");
+  assert.ok(ui.includes("frameLoad() < FRAME_CAP") && ui.includes("PRELOAD_GAP"), "the preload stops at the cap and paces itself between stops");
+  assert.ok(ui.includes("evictFrames();"), "setYear sweeps the cache once the new frame has landed");
+}
+
+// ── Queensland is unicameral (its Council abolished itself in 1922): no
+// senate-qld*.json can ever exist, so its frames never fetch it and never
+// offer the Council switch (before 2026-10-31 they 404'd three files a visit)
+{
+  const sen = part("app-3b-senate.js");
+  assert.ok(sen.includes('(STATE_YEARS.has(y) && !QLD_YEARS.has(y))'), "SEN_YEARS leaves the Queensland frames out");
+  assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-qld17.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld20.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld24.json")), "no Queensland upper-house files exist to fetch");
+}
+
+// ── the Handbook frame in slices (2026-10-31): the lossless-handbook click
+// used to parse, decode, resample, wind, path and outline in one synchronous
+// rush — one 5–8s task on throttled hardware (probe: 2001 loaded in 8.1s with
+// a contiguous 5.6s freeze, and ~1.5s more of morph longtasks leaving it).
+// buildHandbookGeo streams the same work in two yielded passes (decode+bbox,
+// then resample/wind/path/outline per seat with 32ms slice yields); the same
+// visit's morph is now the colour sweep alone. The licence-limited bits stand
+// untouched: files ship lossless, resampling stays a draw-time transform
+{
+  const base = part("app-1-base.js"), map2 = part("app-2-map.js");
+  assert.ok(base.includes("async function buildHandbookGeo(topo, m)"), "the sliced Handbook geometry builder exists");
+  assert.ok(base.includes("lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m)"), "loadYear routes Handbook frames through the sliced builder");
+  assert.ok(base.includes("function handbookFeature(f)") && base.includes("handbookDisplay(fc)"), "the resample-and-wind treatment keeps one shared per-feature home");
+  assert.ok(base.includes("sliceDone") && /await pause\(\)/.test(base), "the sliced builder yields to the browser between seat-sized slices");
+  assert.ok(base.includes("coast: outline"), "the fused outline serves meshDiv and coast alike (the old full re-walks' exact lines, free)");
+  assert.ok(map2.includes("if (HANDBOOK_YEARS.has(from.year) || HANDBOOK_YEARS.has(to.year)) return false;"), "a Handbook side declines the outline morph — the colour sweep carries the transition");
+}
+
+// ── the head's data-warm script (2026-10-31): the landing year's fetches
+// start while d3/topojson/map.js download (~800KB of script ahead of the
+// first data request); getJSON drinks from window.__warm, never racing it
+{
+  const base = part("app-1-base.js");
+  assert.ok(page.includes('id="map-data-warm"') && page.includes("window.__warm={}"), "the head carries the data-warm script");
+  assert.ok(/<script id="map-data-warm">[^<]*"res-2025\.json":"[0-9a-f]{8}"/.test(page), "the warm script's stamps are current for the landing year (node .build/map/assemble.mjs)");
+  assert.ok(page.includes('"geo-2025-lo.json":"') && page.includes('"data-now.json":"') && page.includes('"islands.json":"'), "the warm script prices every file it may warm");
+  assert.ok(base.includes("window.__warm[u]") && base.includes("delete window.__warm[u]"), "getJSON drinks from the warm script, once");
+}
+
 // ── the Born overseas birthplace sub-view (the cob lane): the fborn People
 // lane gains a country picker on the year's own census-edition menu — data
 // and app wiring assertions per frame follow in the blocks below

@@ -108,6 +108,9 @@
 :root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #e45e51; --m-lnp: #4092e7; --m-grn: #5dc47e; --m-onp: #f69828; --m-ind: #ba96bf; --m-csa: #00b4cd; --m-oth: #a69d93; color-scheme: dark; }
 </style>
 <!--/shell:head-->
+<!--map-data-warm:begin-->
+<script id="map-data-warm">(function(){var V={"data-now.json":"0c5bd078","geo-1993-lo.json":"d5b83add","geo-1996-lo.json":"b3def3ba","geo-1998-lo.json":"e2c51765","geo-2001-lo.json":"a6606c1d","geo-2004-lo.json":"f1a3ae40","geo-2007-lo.json":"5cb6dd10","geo-2010-lo.json":"2f3e4725","geo-2013-lo.json":"f8051359","geo-2016-lo.json":"da0f2884","geo-2019-lo.json":"17e396f0","geo-2022-lo.json":"3d3e3056","geo-2025-lo.json":"194abc94","geo-nsw23-lo.json":"23ad692a","geo-qld17-lo.json":"e66797d1","geo-qld20-lo.json":"e66797d1","geo-qld24-lo.json":"e66797d1","geo-sa22-lo.json":"75ee7453","geo-sa26-lo.json":"73866149","geo-vic22-lo.json":"7dd2d4e3","islands.json":"10fe4949","res-1993.json":"1bc1d88e","res-1996.json":"265d567b","res-1998.json":"f3e5d6d8","res-2001.json":"71e40491","res-2004.json":"a524e173","res-2007.json":"1b23ab44","res-2010.json":"55654cd5","res-2013.json":"e6669639","res-2016.json":"1a79a369","res-2019.json":"352c71a4","res-2022.json":"2b090495","res-2025.json":"a8256835","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7"};var y=(location.hash.match(/[#&]y=(\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;var b="res-"+ry+".json";if(!V[b]){y="now";ry="2025";b="res-"+ry+".json";}var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>
+<!--map-data-warm:end-->
 </head>
 <body>
 <!--shell:header-->
@@ -230,11 +233,7 @@
 </main>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
 <script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
-<<<<<<< HEAD
 <script src="/map/map.js?v=3ee315ea"></script>
-=======
-<script src="/map/map.js?v=3ee315ea"></script>
->>>>>>> 193cb4de (Map: merge the two age lanes into one Age lens with a median-age)
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">
