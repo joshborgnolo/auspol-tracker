@@ -430,7 +430,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;

@@ -16,10 +16,10 @@ const ok = (name, cond, detail = "") => { console.log(`${cond ? "ok" : "FAIL"} $
 const mark = (s) => console.log(`… ${s}`);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// 1. People optgroup carries the full sixteen-lane set plus the three
-// select lenses (the 2026-10-31 arc: public transport to work,
-// non-citizens, more than two children, homeless, and the Ancestry
-// select-with-twelve menu)
+// 1. People optgroup carries the lane set plus the three select lenses
+// (the 2026-10-31 arcs: public transport to work, non-citizens, more than
+// two children, homeless, the Ancestry select-with-twelve menu, and the
+// income/age/education folds' merged entries)
 await page.goto(`${base}/map/`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 mark("boot ok");
@@ -34,16 +34,17 @@ const opts = await page.evaluate(() => {
 const people = opts && opts.find((g) => g[0] === "People");
 ok("legend People optgroup exists", !!people, JSON.stringify(opts && opts.map((g) => g[0])));
 if (people) {
-  // the 2026-10-31 merged lenses fold the income pair AND the age pair (-2),
-  // each a single entry with its own picker (median lands on both)
-  ok("People has 17 options (14 measures + Religion + Housing tenure + Ancestry)", people[1].length === 17, people[1].join(" | "));
+  // the 2026-10-31 merged lenses fold the income, age AND schooling pairs
+  // (-3), each a single entry with its own picker (median lands on both,
+  // University educated on the schooling one)
+  ok("People has 16 options (13 measures + Religion + Housing tenure + Ancestry)", people[1].length === 16, people[1].join(" | "));
   ok("Born overseas listed", people[1].some((t) => /born overseas/i.test(t)));
-  ok("University educated listed", people[1].some((t) => /university/i.test(t)));
+  ok("Education folds uni and Year-12-or-less into one entry", people[1].filter((t) => t === "Education").length === 1 && !people[1].some((t) => /university|year 12/i.test(t)), people[1].join(" | "));
+  ok("Education sits where University educated sat (after Born overseas)", /Born overseas \| Education \| Blue-collar workers/.test(people[1].join(" | ")), people[1].join(" | "));
   ok("Blue-collar listed", people[1].some((t) => /blue-collar/i.test(t)));
   ok("Household income listed once", people[1].filter((t) => /household income/i.test(t)).length === 1, people[1].join(" | "));
   ok("Age folds Aged 65/20-34 into one entry", people[1].filter((t) => /^age$/i.test(t)).length === 1 && !people[1].some((t) => /65 and over|20 to 34/i.test(t)), people[1].join(" | "));
   ok("Household income sits where lower income sat (after Blue-collar)", /Blue-collar workers \| Household income/.test(people[1].join(" | ")), people[1].join(" | "));
-  ok("Year 12 or less listed", people[1].some((t) => /year 12 or less/i.test(t)));
   ok("Indigenous Australians listed", people[1].some((t) => /indigenous/i.test(t)));
   ok("Children under 15 listed", people[1].some((t) => /children under 15/i.test(t)));
   ok("One-parent families listed", people[1].some((t) => /one-parent/i.test(t)));
@@ -197,8 +198,8 @@ const y2010 = await page.evaluate(async () => {
 });
 ok("2010 basis is venue", y2010.basis === "venue", y2010.basis);
 ok("2010 legend cites the 2006 census", /2006 and 2011 censuses/.test(y2010.note), y2010.note.slice(0, 140));
-ok("2010 People optgroup carries income + age lenses (16: their two folded entries, no homeless lane yet, and Ancestry joined)",
-  y2010.people && y2010.people.length === 16 && y2010.people.includes("inc") && y2010.people.includes("age") && y2010.people.includes("anc") && !y2010.people.includes("loinc") && !y2010.people.includes("a65") && !y2010.people.includes("hl"),
+ok("2010 People optgroup carries the folded lenses (15: the income/age/education entries, no homeless lane yet, and Ancestry joined)",
+  y2010.people && y2010.people.length === 15 && y2010.people.includes("inc") && y2010.people.includes("age") && y2010.people.includes("edu") && y2010.people.includes("anc") && !y2010.people.includes("loinc") && !y2010.people.includes("a65") && !y2010.people.includes("uni") && !y2010.people.includes("y12less") && !y2010.people.includes("hl"),
   JSON.stringify(y2010.people));
 
 // 4c. an income deep link on 2010 shows the interp income copy: the
@@ -341,6 +342,7 @@ const menuNow96 = await page.evaluate(async () => {
 // (where the menu once listed no income lanes at all); 1998's workspace
 // prints no household-income table, so its menu stays income-less
 ok("1996 People menu carries Household income (the 1991-era print landed)", menuNow96.includes("inc"), JSON.stringify(menuNow96));
+ok("1996 folds Education without the schooling read (no 2006-schooling table yet)", menuNow96.includes("edu") && !menuNow96.includes("uni") && !menuNow96.includes("y12less"), JSON.stringify(menuNow96));
 const menuNow98 = await page.evaluate(async () => {
   const m = window.__map;
   m.setYear(1998);
@@ -363,6 +365,92 @@ ok("nsw23 People menu carries Household income (state-frame income arc)",
   menuNsw && menuNsw.menu.includes("inc"), JSON.stringify(menuNsw && menuNsw.menu));
 
 mark("median view done");
+// 5e. the Education lens fold (2026-10-31): uni/y12less ride the one
+// Education entry, University educated lands, the schooling read is one
+// picker switch away as ev=y12less, the legacy lane ids alias in, and the
+// statistics-era frames offer the qualification read alone
+mark("section 5e (Education fold)");
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=uni`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const eduUni = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  const es = document.querySelector('select[data-opt="eduv"]');
+  return {
+    sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    eduv: es && es.value,
+    eduvOpts: es ? [...es.querySelectorAll("option")].map((o) => o.textContent) : null,
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    hash: location.hash,
+    S: { index: m.S.index, eduMode: m.S.eduMode },
+    aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo,
+  };
+});
+ok("#i=uni aliases onto the Education lens", eduUni.sel === "edu" && eduUni.S.index === "edu", JSON.stringify(eduUni.S));
+ok("University educated is the landing read", eduUni.eduv === "uni" && eduUni.S.eduMode === "uni", String(eduUni.eduv));
+ok("Education's picker offers its two reads, university first",
+  eduUni.eduvOpts && eduUni.eduvOpts.length === 2 && /university educated/i.test(eduUni.eduvOpts[0]) && /year 12 or less/i.test(eduUni.eduvOpts[1]),
+  (eduUni.eduvOpts || []).join(" | "));
+ok("the default uni read leaves ev out of the hash", /i=edu/.test(eduUni.hash) && !/[?&]ev=/.test(eduUni.hash), eduUni.hash);
+ok("uni legend names the qualification read", /Share of residents who hold a university qualification/.test(eduUni.note), eduUni.note.slice(0, 170));
+ok("now AUS uni ≈ 28.4% (app persons-weighted pool)", eduUni.aus && Math.abs(eduUni.aus.uni - 28.36) < 0.3, JSON.stringify(eduUni.aus && eduUni.aus.uni));
+ok("uni legend marks Australia 28.4%", /The line marks Australia: 28\.4%/.test(eduUni.note), eduUni.note.slice(-80));
+
+// the picker idiom: swap to the schooling read through the SAME selects
+await page.evaluate(async () => {
+  const es = document.querySelector('select[data-opt="eduv"]');
+  es.value = "y12less";
+  es.dispatchEvent(new Event("change", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 500));
+});
+const eduY12 = await page.evaluate(() => ({
+  note: (document.querySelector(".lg-note") || {}).textContent || "",
+  hash: location.hash,
+  aus: window.__map.Y.now.areas && window.__map.Y.now.areas.AUS && window.__map.Y.now.areas.AUS.demo,
+}));
+ok("the schooling read serialises as ev=y12less", /i=edu/.test(eduY12.hash) && /ev=y12less/.test(eduY12.hash), eduY12.hash);
+ok("y12less legend names the schooling read", /Share of people aged 15\+ who left schooling before Year 12/.test(eduY12.note), eduY12.note.slice(0, 170));
+ok("y12less legend marks Australia 39.2%", /The line marks Australia: 39\.2%/.test(eduY12.note), eduY12.note.slice(-80));
+
+await page.goto("about:blank");
+await page.goto(`${base}/map/#l=seifa&i=y12less`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const eduLegacy = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y.now.ready;
+  await new Promise((r) => setTimeout(r, 500));
+  return {
+    eduv: (document.querySelector('select[data-opt="eduv"]') || {}).value,
+    hash: location.hash,
+    S: { index: m.S.index, eduMode: m.S.eduMode },
+  };
+});
+ok("#i=y12less aliases onto the lens with the schooling read", eduLegacy.S.index === "edu" && eduLegacy.S.eduMode === "y12less" && eduLegacy.eduv === "y12less", JSON.stringify(eduLegacy.S));
+
+// a statistics-era frame carries the qualification read alone: no picker,
+// and a schooling-read crossing falls back to the era's own publication
+const edu1996 = await page.evaluate(async () => {
+  const m = window.__map;
+  m.setYear(1996);
+  await m.Y[1996].ready;
+  await new Promise((r) => setTimeout(r, 500));
+  const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
+  return {
+    menu: g ? [...g.querySelectorAll("option")].map((o) => o.value) : null,
+    picker: !!document.querySelector('select[data-opt="eduv"]'),
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    S: { index: m.S.index, eduMode: m.S.eduMode },
+    hash: location.hash,
+  };
+});
+ok("1996 folds the menu entry without the schooling read", edu1996.menu && edu1996.menu.includes("edu") && !edu1996.menu.includes("uni") && !edu1996.menu.includes("y12less"), JSON.stringify(edu1996.menu));
+ok("1996 shows no Education picker (one printed read)", !edu1996.picker);
+ok("1996 clamps the schooling read to University educated", edu1996.S.index === "edu" && edu1996.S.eduMode === "uni", JSON.stringify(edu1996.S));
+ok("1996 legend names the qualification read", /university qualification/.test(edu1996.note), edu1996.note.slice(0, 170));
+
+mark("section 5e done");
 // 5a. the Age lens (2026-10-31): the median-age spectrum lands on the
 // merged entry, five share views one picker away, national age line per
 // year, per-view hash, 18-24 admits its band estimate, the 85+ open band

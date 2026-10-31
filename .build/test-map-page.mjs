@@ -713,7 +713,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('else if (k === "incv") S.incMode = t.value;'), "the picker change handler is wired");
   assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
   assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
-  assert.ok(ui.includes('S.incMode, S.ageMode, S.party'), "the legend's refresh key re-reads on a measure switch");
+  assert.ok(ui.includes('S.incMode, S.ageMode, S.eduMode, S.party'), "the legend's refresh key re-reads on a measure switch");
   assert.ok(ui.includes("Income: ${INC_SHORT[S.incMode]}"), "the lens head names the picked measure");
   assert.ok(ui.includes('`Median weekly household income${incEpochBrk}${incMedNote}`'), "the median legend note names itself in census-year dollars and carries the no-national-line caveat where the frame lacks it");
   assert.ok(ui.includes("mny(ausShare)"), "the Australia line formats in dollars on the median view");
@@ -750,6 +750,34 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("The median age near here is"), "the place's median-age headline");
   assert.ok(story.includes("AGE_TOP[S.ageMode]"), "the area ranking phrases follow the picked age view");
   assert.ok(list.includes("ageMed()") && list.includes("yr"), "the list column prices the median-age view in whole years");
+}
+
+// ── the Education lens (2026-10-31): the fold's third sibling — the
+// uni/y12less schooling pair ride one People-menu entry, University
+// educated the landing read and the left-school-early share one picker
+// switch away. Each read keeps its own DM lane for the dicts, ranges,
+// ramps and area rankings, the hash gains ev, legacy uni/y12less hashes
+// alias in, and an era that never printed the schooling read (the
+// statistics-era '90s) offers it nowhere
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
+  assert.ok(base.includes('const LENS_EDU = "edu";') && base.includes('const EDU_MODES = ["uni", "y12less"];'), "the Education lane id and its two reads, university first");
+  assert.ok(base.includes('if (k === "uni") { ks.push(LENS_EDU); continue; }'), "the People menu folds the schooling pair into the one Education entry (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('uni: "University educated", edu: "Education",') && base.includes('uni: "University", edu: "Education",'), "the menu entry labels itself Education in both name tables");
+  assert.ok(base.includes('eduMode: "uni"'), "University educated is the landing read");
+  assert.ok(base.includes('if (isEdu()) return d.demo ? d.demo[S.eduMode] : null;'), "the read rides its own demo-dict key");
+  assert.ok(base.includes('DM_RANGE[S.eduMode]') && base.includes('isEdu() ? S.eduMode :'), "range and ramp follow the picked read");
+  assert.ok(base.includes("m.hasLane[LENS_EDU] = m.hasLane.uni;"), "the menu gate rides the university read");
+  assert.ok(ui.includes('data-opt="eduv" aria-label="Education view"'), "the education picker rides the select-lens idiom");
+  assert.ok(ui.includes("EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false)"), "the picker offers only reads the frame printed");
+  assert.ok(ui.includes('else if (k === "eduv") S.eduMode = t.value;'), "the picker change handler is wired");
+  assert.ok(ui.includes('if (i === "uni" || i === "y12less") { S.index = LENS_EDU;') && ui.includes('p.get("ev")'), "legacy uni/y12less hashes alias onto the lens with that read picked");
+  assert.ok(ui.includes('p.set("ev", S.eduMode);'), "the hash carries the schooling read");
+  assert.ok(ui.includes("S.ageMode, S.eduMode"), "the legend's refresh key re-reads on a schooling switch");
+  assert.ok(ui.includes("Education: ${EDU_SHORT[S.eduMode]}"), "the lens head names the picked read");
+  assert.ok(ui.includes("isEdu() ? EDU_NOTE[S.eduMode]"), "the legend note names the picked read");
+  assert.ok(ui.includes("b.hasLane[S.eduMode] === false"), "a year swap falls back to the frame's own publication when a read never printed");
+  assert.ok(story.includes("isEdu() ? DM_TOP[S.eduMode]"), "the area ranking phrases follow the picked read");
 }
 
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain
