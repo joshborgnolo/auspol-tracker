@@ -161,7 +161,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 18, "17 result lanes plus approximate-location provenance and census demo rows (the '90s people-interp arc)");
+  assert.equal(Object.keys(D.booths).length, 21, "17 result lanes plus approximate-location provenance + census demo rows (the '90s people-interp arc) + the map-people-fill arc's three cohort cob/rel/ten lanes");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -271,9 +271,43 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     const d0 = D.divs.find((d) => d.demo);
     assert.ok(d0 && d0.demo.fborn > 0 && d0.demo.uni > 0,
       `${y}: a sample division's demo row reads real census shares`);
-    for (const k of ["cob", "rel", "ten"]) {
-      assert.ok(!(k in D.booths) || D.booths[k].every((x) => x == null),
-        `${y} carries no ${k} columns (the '90s arc is six lanes only)`);
+    // the follow-on people cohorts of the map-people-fill arc (birthplace-
+    // country menu, religion, tenure) on the statistics-era frames: menus are
+    // the era prints' own intersections (1991-era sides: seven cob keys, no
+    // India/Sri Lanka; 1996/2001-era sides: the era's nine), the era print
+    // holes are null reads end-to-end (1991-census sides carry no Hindu,
+    // 1996's tenure table no landlord arm), and every frame carries the
+    // cohorts on its era census districts
+    {
+      const wanted = y === 1998
+        ? ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"]
+        : ["uk", "chn", "nzl", "phl", "vnm", "zaf", "ita"];
+      assert.deepEqual(D.cobKeys, wanted, `${y}: the cob menu follows its era print set`);
+      assert.equal(D.relKeys.length, 10, `${y}: ten religion options ride the frame`);
+      assert.equal(D.relKeys[0], "norel", `${y}: religion menu leads with No religion`);
+      assert.deepEqual(D.tenKeys, ["mort", "rent", "own", "rentPub"], `${y}: tenure menu's four options`);
+      for (const k of ["cob", "rel", "ten"]) {
+        const lane = D.booths[k] || [];
+        assert.equal(lane.length, D.booths.id.length, `${y} ${k} rides the full registry`);
+        const n = lane.filter((x) => x !== null).length;
+        assert.ok(n > 5800, `${y}: most booths carry ${k} cohorts (got ${n})`);
+        const wk = { cob: D.cobKeys.length, rel: D.relKeys.length, ten: D.tenKeys.length }[k];
+        lane.forEach((row) => {
+          assert.ok(row === null || (row.length === wk && row.every((x) => x == null || typeof x === "number")),
+            `${y}: every landed ${k} cohort row is menu-width of numbers (or whole-row null)`);
+        });
+      }
+      const dRel = d0.demo.rel, dTen = d0.demo.ten, dCob = d0.demo.cob;
+      assert.ok(dRel && dTen && dCob, `${y}: cohort dicts ride beside the six-lane demo row`);
+      assert.ok((dRel.norel ?? 0) >= 0 && (dTen.own ?? 0) >= 0, `${y}: cohort cells read era shares`);
+      // era holes, printed type pins:
+      //   1991-census sides (1993's frame) carry no Hindu anywhere
+      //   1996-census sides (its own dwelling table) carry no rental-authority share
+      if (y === 1993) {
+        assert.ok(!(dCob.ind) && !(dCob.lka), "1993: no India/Sri Lanka columns on the '91-era menu");
+        assert.ok(dRel.hind == null, "1993: the '91-era print carries no Hindu row");
+        assert.ok(dTen.rentPub != null && dTen.rentPub >= 0, "1993: its '91-era landlord table did print rentPub");
+      }
     }
   }
 }

@@ -59,6 +59,7 @@ GET_CHUNK = 50000
 # map-people-fill arc reads.
 T1991 = {
     "b01_slct_characteristics_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
+    "b04_abity_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b05_age_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b08_birthplace_ctry_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b11_language_spoken_home_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
@@ -67,6 +68,7 @@ T1991 = {
     "b22_occupation_by_age_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b27_yr_individual_inc_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b29_yr_hsld_inc_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
+    "b34_fam_type_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b47_nature_occ_by_lld_type_by_dwl_type_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b48_nature_occ_by_lld_type_by_dwl_type_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
 }

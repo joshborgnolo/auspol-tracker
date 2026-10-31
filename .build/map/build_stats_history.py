@@ -293,9 +293,10 @@ def with_demo(doc, year):
                      'fborn': dc[3], 'uni': dc[4], 'blue': dc[5],
                      'p': dv.get('persons'),
                      'loinc': dc[6], 'hiinc': dc[7], 'medIncWeekly': None,
-                     'cob': None,
+                     'cob': dv.get('cob'),
                      'y12less': dc[8], 'atsci': dc[9], 'u15': dc[10],
-                     'onepar': dc[11], 'rel': None, 'ten': None}
+                     'onepar': dc[11], 'rel': dv.get('rel'),
+                     'ten': dv.get('ten')}
         n_div += 1
     dcol = []
     for bid in doc['booths']['id']:
@@ -305,6 +306,40 @@ def with_demo(doc, year):
     if any(x is not None for x in dcol):
         doc['booths']['demo'] = dcol
         n_booth = sum(x is not None for x in dcol)
+    # the follow-on people cohorts of the 90s people-lane arc
+    # (birthplace-country menu, religion, tenure): the stats frame rides
+    # the measured census side's own menu (era print intersections,
+    # never an invented row), and the GCP-era era print holes ride null
+    # figures end-to-end. Menu keys only emit when the era can offer
+    # them — no empty menus.
+    cobkeys = store.get('cobKeys')
+    if cobkeys:
+        doc['cobKeys'] = list(cobkeys)
+    relkeys = store.get('relKeys')
+    if relkeys:
+        doc['relKeys'] = list(relkeys)
+    tenkeys = store.get('tenKeys')
+    if tenkeys:
+        doc['tenKeys'] = list(tenkeys)
+    n_cob = n_rel = n_ten = 0
+    for bid in doc['booths']['id']:
+        vb = by_booth.get(bid)
+        blk = (vb or {}).get('demo')
+        cob_b = (blk or {}).get('cob')
+        rel_b = (blk or {}).get('rel')
+        ten_b = (blk or {}).get('ten')
+        c_row = [cob_b.get(k) for k in cobkeys] if (cobkeys and isinstance(cob_b, dict)) else None
+        r_row = [rel_b.get(k) for k in (relkeys or [])] if (relkeys and isinstance(rel_b, dict)) else None
+        t_row = [ten_b.get(k) for k in (tenkeys or [])] if (tenkeys and isinstance(ten_b, dict)) else None
+        doc['booths'].setdefault('cob', []).append(c_row)
+        doc['booths'].setdefault('rel', []).append(r_row)
+        doc['booths'].setdefault('ten', []).append(t_row)
+        n_cob += (c_row is not None)
+        n_rel += (r_row is not None)
+        n_ten += (t_row is not None)
+    for kk in ('cob', 'rel', 'ten'):
+        if not any(x is not None for x in doc['booths'][kk]):
+            del doc['booths'][kk]
     doc['demoBasis'] = 'venue'
     if store.get('demoInterp'):
         doc['demoInterp'] = store['demoInterp']
@@ -321,7 +356,8 @@ def with_demo(doc, year):
             'venue-nearest mapping (see coverage.census) — the GCP-era '
             'census demos do not exist at this frame.'))
     print(f"    people lanes: {n_div} divisions, {n_booth} booths "
-          f"carried census demo cells")
+          f"carried census demo cells; cohort lanes cob {n_cob}, "
+          f"rel {n_rel}, ten {n_ten}")
 
 
 def with_seifa(doc, year):

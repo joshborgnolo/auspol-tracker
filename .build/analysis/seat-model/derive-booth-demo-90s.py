@@ -100,6 +100,20 @@ STORES = (
     (1998, 2001, "cd-2001-ced-1998set", "bcp-2001-cd-tally",
      "booth-demo-1998-c1.json"),
 )
+# the birthplace-country menu per census edition (the GCP-era doctrine
+# where the map's cob lane rides the measured census side of every
+# frame; the '91-era BCP prints England+Scotland inside united_kingdom
+# and no India/Sri Lanka, the '96 print has them both; menu rows are
+# the printed intersections; null reads on an era stay null cells)
+COB91_MENU = ["uk", "chn", "nzl", "phl", "vnm", "zaf", "ita"]
+COB96_MENU = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+              "lka"]
+COB01_MENU = COB96_MENU
+COB_MENU_FOR_CENSUS = {1991: COB91_MENU, 1996: COB96_MENU,
+                       2001: COB01_MENU}
+REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
+            "isl", "hind", "jew"]
+TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 
 UNIT_COUNT = {1991: 31401, 1996: 34327, 2001: 35289}
 STATE_OF_ID = {1: "ACT", 2: "NSW", 3: "VIC", 4: "QLD", 5: "WA",
@@ -180,6 +194,130 @@ def shares(r):
         if x is not None and not (0 <= x <= 1):
             return None
     return vals
+
+
+def lane_shares(c):
+    """The share block of the follow-on cohorts (booth or division-sum
+    equally): null where the census's print doesn't read (hind at the
+    '91 print, rentPub at '96's dwelling-table lineage), and never a
+    polite clamp on an out-of-range figure — the lane recipe's same
+    policy as the 2001-era balance classes."""
+    if c is None or c.get("cob") is None:
+        return {"cob": None, "rel": None, "ten": None, "atsci": None,
+                "onepar": None}
+
+    def _bounded(v):
+        return None if v is None or not (0 <= v <= 1) else round(v, 4)
+
+    def _share_of(num, den):
+        if num is None:
+            return None
+        if not den:
+            return None
+        return _bounded(num / den)
+    cobden = c["cobDen"]
+    relden = c["relDen"]
+    tenden = c["tenDen"]
+    atscid = c["atsciD"]
+    onepard = c["oneparD"]
+    return {
+        "cob": {k: _share_of(v, cobden)
+                for k, v in (c["cob"] or {}).items()},
+        "cobDen": cobden,
+        "rel": {k: _share_of(v, relden)
+                for k, v in (c["rel"] or {}).items()},
+        "relDen": relden,
+        "ten": {k: _share_of(v, tenden)
+                for k, v in (c["ten"] or {}).items()},
+        "tenDen": tenden,
+        "atsci": _share_of(c["atsciN"], atscid),
+        "atsciD": atscid,
+        "onepar": _share_of(c["oneparN"], onepard),
+        "oneparD": onepard,
+    }
+
+
+def _era_holes(row, census):
+    """The era print's holes read null at every level, never the
+    sums-collapse zero: the 1991 BCP prints no Hindu row, the 1996
+    dwelling table no rental landlord arm. Same-marks as the
+    GCP-era cohort stores' null contracts."""
+    if census == 1991:
+        if isinstance(row.get("rel"), dict):
+            row["rel"]["hind"] = None
+    if census == 1996:
+        if isinstance(row.get("ten"), dict):
+            row["ten"]["rentPub"] = None
+
+
+def lane_cohorts(r, census):
+    """One follow-on cohort block out of a per-CD tally record, the
+    map-people-fill arc's cob/rel/ten/atsci/onepar lanes on the
+    census-edition's own print contract. Returned dicts numerate the
+    menu option keys with the cohort denominator inside the record —
+    share readers never sense which print family wrote the numbers.
+    A lane its census print doesn't carry is None all through (never
+    an invented slot); the 1991 BCP prints no Hindu, no Sri Lanka and
+    no India birthplace row, the 1996 BCP no rental-authority arm of
+    its dwelling table, and the year-of-schooling lane has no era
+    edition before the 2006 census by print history."""
+    if census in (1991, 1996):
+        cobv = r.get("cob")
+        cob_den = None
+        if cobv is not None:
+            cob_den = r["totc"] - r["cobns"] - (r.get("cobOV") or 0)
+        out = {"cob": {k: _num_or_none(cobv.get(k) if cobv else None)
+                       for k in COB_MENU_FOR_CENSUS[census]},
+                "cobDen": cob_den if cobv is not None else None,
+                "rel": r.get("rel"),
+                "relDen": ((r.get("relTot") or 0) - (r.get("relNS") or 0)
+                           - (r.get("relOV") or 0)),
+                "ten": r.get("ten"),
+                "tenDen": ((r.get("tenTot") or 0) - (r.get("tenNS") or 0)),
+                "atsciN": r.get("atsciN"),
+                "atsciD": r["atsciD"] if census == 1991 else r["pers"],
+                "oneparN": r.get("oneparN"),
+                "oneparD": r.get("oneparD"),
+                }
+        if census == 1996:
+            out["cobDen"] = r["totc"] - r["cobns"] \
+                - (r.get("cobOV") or 0)
+        return out
+    if census == 2001:
+        # the c1-of-1998 reader's own tallies ride extract-bcp-2001-
+        # tally.py's vector rows (its per-CD contracted orders)
+        t01 = r.get("ten01") or []
+        ten = None
+        ten_den = None
+        cobv = {}
+        for i, k in enumerate(COB01_MENU):
+            cv = (r.get("cobn") or [None] * len(COB01_MENU))[i]
+            cobv[k] = cv
+        cob_den = r["totc"] - r["cobns"] \
+            if r.get("cobns") is not None else None
+        relv = {}
+        for i, k in enumerate(REL_KEYS):
+            rv = (r.get("rel01") or [None] * 10)[i]
+            relv[k] = rv
+        if len(t01) == 6:
+            ten = {"mort": t01[1], "rent": t01[2], "own": t01[0],
+                   "rentPub": t01[3]}
+            ten_den = t01[0] + t01[1] + t01[2] + t01[4]
+        fam = r.get("fam01") or []
+        return {"cob": cobv, "cobDen": cob_den,
+                "rel": relv,
+                "relDen": ((r.get("rel01tot") or 0)
+                           - (r.get("rel01ns") or 0)),
+                "ten": ten, "tenDen": ten_den,
+                "atsciN": r.get("ind01"),
+                "atsciD": (r.get("b1Persons") or 0) - (r.get("b1ov") or 0),
+                "oneparN": fam[2] if len(fam) > 4 else None,
+                "oneparD": fam[4] if len(fam) > 4 else None}
+    fail(f"lane_cohorts has no lane read on census {census}")
+
+
+def _num_or_none(v):
+    return v if v is not None else None
 
 
 def ct_index(era_polys):
@@ -350,11 +488,22 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     polys = era_polygons(census)
     buckets = ct_index(polys)
 
-    # division sums over the alloc
-    divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * 11,
-                                  "eng": 0, "oth": 0, "aus": 0,
-                                  "totc": 0, "cobns": 0, "uni": 0,
-                                  "eduns": 0, "bluen": 0, "occd": 0})
+    # division sums over the alloc. Cohort fields ride the same names
+    # as the tally records so lane_cohorts reads the aggregates with
+    # no census remap (each cohort keeps its denominator parts summed
+    # per lane recipe: cob ns/ov, rel tot/ns/ov, ten tot/ns, atsci and
+    # onepar num/den)
+    menu = COB_MENU_FOR_CENSUS[census]
+    divsum = defaultdict(lambda: {
+        "pers": 0, "bands": [0] * 11,
+        "eng": 0, "oth": 0, "aus": 0,
+        "totc": 0, "cobns": 0, "uni": 0,
+        "eduns": 0, "bluen": 0, "occd": 0,
+        "cob": {k: 0 for k in menu}, "cobDen": 0,
+        "rel": {k: 0 for k in REL_KEYS}, "relDen": 0,
+        "ten": {k: 0 for k in TEN_KEYS}, "tenDen": 0,
+        "atsciN": 0, "atsciD": 0, "oneparN": 0, "oneparD": 0,
+    })
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -371,6 +520,21 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd"):
             acc[k] += r[k]
+        cohort = lane_cohorts(r, census)
+        if cohort is not None and cohort.get("cob") is not None:
+            for k, v in cohort["cob"].items():
+                acc["cob"][k] += v or 0
+            acc["cobDen"] += cohort["cobDen"] or 0
+            for k, v in cohort["rel"].items():
+                acc["rel"][k] += v or 0
+            acc["relDen"] += cohort["relDen"] or 0
+            for k, v in cohort["ten"].items():
+                acc["ten"][k] += v or 0
+            acc["tenDen"] += cohort["tenDen"] or 0
+            acc["atsciN"] += cohort["atsciN"] or 0
+            acc["atsciD"] += cohort["atsciD"] or 0
+            acc["oneparN"] += cohort["oneparN"] or 0
+            acc["oneparD"] += cohort["oneparD"] or 0
 
     # venue geo blocks (PIP first, then the era-linework nearest
     # rescue within NEAREST_CAP_M metres — see its note)
@@ -397,7 +561,13 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                 rec["demo"] = None
                 geo_empty += 1
             else:
-                rec["demo"] = shares(r)
+                d = shares(r)
+                if d is not None:
+                    ls = lane_shares(lane_cohorts(r, census))
+                    for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
+                        d[lane_k] = ls[lane_k]
+                    _era_holes(d, census)
+                rec["demo"] = d
                 geo_hit += 1
         out_booths.append(rec)
 
@@ -405,17 +575,30 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     divisions = []
     for name in sorted(divsum, key=lambda n: (
             STATE_ORDER[divname_of[n]], n)):
-        divisions.append({"div": name, "state": divname_of[name],
-                          **shares(divsum[name])})
+        row = {"div": name, "state": divname_of[name],
+               **shares(divsum[name])}
+        ls = lane_shares(divsum[name])
+        for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
+            row[lane_k] = ls[lane_k]
+        _era_holes(row, census)
+        divisions.append(row)
 
     nat = defaultdict(int)
     nat["bands"] = [0] * 11
+    nat["cob"] = defaultdict(int)
+    nat["rel"] = defaultdict(int)
+    nat["ten"] = defaultdict(int)
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
-                  "eduns", "bluen", "occd"):
+                  "eduns", "bluen", "occd", "cobDen", "relDen", "tenDen",
+                  "atsciN", "atsciD", "oneparN", "oneparD"):
             nat[k] += dv[k]
         for i in range(11):
             nat["bands"][i] += dv["bands"][i]
+        for lane_set, lane_key in (("cob", "cob"), ("rel", "rel"),
+                                   ("ten", "ten")):
+            for k in dv[lane_key]:
+                nat[lane_key][k] += dv[lane_key][k]
     off = alloc_d.get("offshoreClass", {}) or {}
     off_pop = sum(v.get("population", 0) for v in off.values())
     census_nat = sum(r["pers"] for r in people.values())
@@ -438,6 +621,32 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "u15": round((nat["bands"][0] + nat["bands"][1])
                      / nat["pers"], 4),
     }
+    # the follow-on cohorts' national shares (same per-cohort sums as
+    # the divisions, computed off the whole-country aggregations)
+    nshare_cobden = nat["cobDen"]
+    nshare_relden = nat["relDen"]
+    nshare_tenden = nat["tenDen"]
+    national.update({
+        "cob": {k: (round(nat["cob"][k] / nshare_cobden, 4)
+                    if nshare_cobden else None)
+                for k in menu},
+        "cobDen": nshare_cobden,
+        "rel": {k: (round(nat["rel"][k] / nshare_relden, 4)
+                    if nshare_relden else None)
+                for k in REL_KEYS},
+        "relDen": nshare_relden,
+        "ten": {k: (round(nat["ten"][k] / nshare_tenden, 4)
+                    if nshare_tenden else None)
+                for k in TEN_KEYS},
+        "tenDen": nshare_tenden,
+        "atsci": (round(nat["atsciN"] / nat["atsciD"], 4)
+                  if nat["atsciD"] else None),
+        "atsciD": nat["atsciD"],
+        "onepar": (round(nat["oneparN"] / nat["oneparD"], 4)
+                   if nat["oneparD"] else None),
+        "oneparD": nat["oneparD"],
+    })
+    _era_holes(national, census)
     about = (
         "Census-people basis store for the " + str(year) + " federal "
         "election (the " + str(census) + "-census side of the "
@@ -460,17 +669,26 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "counts.geoNearestDistP95) where no district contains it — "
         "the era boundaries' drafting vintage puts most venue points "
         "within a couple of hundred metres of the printed line. "
-        "The '90s lane is the six GCP-era lanes measured "
-        "on the census's own AURIN Basic Community Profile lane "
-        "(extract-bcp-aurin-tally.py): persons, ages, "
-        "home-language share, birthplace, education level, "
-        "blue-collar occupation. COB country menu, religion, tenure, "
-        "year-12, Indigenous status and one-parent keys ride the "
-        "2001-and-later arcs' own census editions only — the '90s "
-        "stores carry none of those keys by design. The census's "
-        "ABS-filed balance classes named offshoreClass in the "
-        "allocation file are dropped here entirely by ABS's own "
-        "filing.")
+        "The '90s lane reads the GCP-era six lanes plus the "
+        "follow-on people cohorts on the census's own AURIN Basic "
+        "Community Profile (extract-bcp-aurin-tally.py): persons, "
+        "ages, home-language share, birthplace, education level, "
+        "blue-collar occupation, birthplace-country menu (cob, the "
+        "measured census side's own menu era — " +
+        str(census) + " ), religion (rel), housing tenure (ten), "
+        "the Indigenous status and one-parent lanes. The era's "
+        "print holes read null at every level rather than a "
+        "cross-era substitute: the 1991 BCP prints no Hindu row "
+        "and no India/Sri Lanka birthplace, the 1996 BCP's "
+        "dwelling tenure table carries no landlord arm (rentPub), "
+        "and the year-of-schooling GP lane has no era edition "
+        "before the 2006 census by print history, so y12less "
+        "stays absent on the '90s-era frames. Ancestry has no "
+        "print before the 2001 census's own and no era-mate on "
+        "the '90s sides at all, so ancKeys/car lanes stay null. "
+        "The census's ABS-filed balance classes named "
+        "offshoreClass in the allocation file are dropped here "
+        "entirely by ABS's own filing.")
     out = {
         "_about": about,
         "_provenance": {
@@ -484,6 +702,9 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         },
         "election": year,
         "censusEdition": census,
+        "cobKeys": list(menu),
+        "relKeys": list(REL_KEYS),
+        "tenKeys": list(TEN_KEYS),
         "deliveryBasis": (
             f"venue PIP of the history-location-store coordinates "
             f"over the {census}-census CD polygons; exact CD sum per "
