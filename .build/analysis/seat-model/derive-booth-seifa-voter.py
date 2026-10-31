@@ -1217,6 +1217,7 @@ def demo_units(units21, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "incMed": band_median(incbh) if inct > 0 else None,
             "cob": {k: (round(cobacc[i] / fb_den, 4)
                         if fb_den > 0 else None)
                     for i, k in enumerate(COB_KEYS)},
@@ -1407,6 +1408,7 @@ def demo_units_i(units, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "incMed": band_median(incbh) if incbh is not None else None,
             "u15": (round((bands[0] + bands[1]) / bsum, 4)
                     if bsum > 0 else None),
             **emit_new(dvn),
@@ -1845,9 +1847,17 @@ def build(year):
         demoI_map = {}
         (c0, c1), s0, s1 = (interp["c0"], interp["c1"]), \
             side[interp["c0"]], side[interp["c1"]]
+        nmap = side[near]["map"]
         for key in set(s0["map"]) | set(s1["map"]):
-            demoI_map[key] = blend_demo(s0["map"].get(key),
-                                        s1["map"].get(key), f)
+            bi = blend_demo(s0["map"].get(key),
+                            s1["map"].get(key), f)
+            if bi is not None:
+                nb = nmap.get(key)
+                # booth demoI incMed pins to the nearest census side,
+                # like the division blocks — a nearest-side row that
+                # stays null hands the lane to the measured figure
+                bi["incMed"] = nb.get("incMed") if nb else None
+            demoI_map[key] = bi
         nbi = {}
         nb0, nb1 = nat_block(s0["nat"]), nat_block(s1["nat"])
         for k in ("langOther", "fborn", "uni", "blue", "age0_14",

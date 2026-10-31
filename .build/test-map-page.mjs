@@ -341,7 +341,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 21, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows)");
+  assert.equal(Object.keys(B).length, 22, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows + the household-median dollar lane)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -457,6 +457,28 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.ok(r10.incomeCuts.sides && r10.incomeCuts.sides["2006"] && r10.incomeCuts.sides["2011"], "2010 incomeCuts names its 2006/2011 bracketing editions in sides");
   const r19 = JSON.parse(R("map/data/res-2019.json"));
   assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
+  // the Household-income lens's median spectrum (2026-10-31): every
+  // income year carries the national household median at its nearest
+  // census side's epoch (interp years pin like every dollar figure), a
+  // per-division median on every seat, and the per-booth median lane —
+  // the open-top-band footprints stay null, never a fabricated figure
+  const MED_Y = {
+    2001: [786, 2001, 6918, 624], 2004: [1027, 2006, 6719, 837],
+    2007: [1027, 2006, 7674, 667], 2010: [1235, 2011, 8251, 801],
+    2013: [1235, 2011, 8357, 800], 2016: [1476, 2016, 8195, 955],
+    2019: [1775, 2021, 8730, 1147], 2022: [1788, 2021, 8440, 1156],
+    2025: [1801, 2021, 8907, 1161],
+  };
+  for (const [y, [med, dollars, boothN, hin]] of Object.entries(MED_Y)) {
+    const J = JSON.parse(R(`map/data/res-${y}.json`));
+    assert.equal(J.incomeCuts.medWeekly, med, `${y}: the national household median rides its nearest census epoch`);
+    assert.equal(J.incomeCuts.dollarsYear, dollars, `${y}: the median's dollar epoch matches the incomeCuts nearest side`);
+    assert.equal(J.divs.every((d) => d.demo && d.demo.medIncWeekly != null), true, `${y}: every division carries its household median`);
+    assert.equal(J.divs.find((d) => d.n === "Hinkler").demo.medIncWeekly, hin, `${y}: Hinkler's median (the national floor) in epoch dollars`);
+    const vals = (J.booths.medinc || []).filter((v) => v != null);
+    assert.equal(vals.length, boothN, `${y}: the booth median lane's row count`);
+    assert.ok(vals.every((v) => v >= 100 && v < 4000), `${y}: booth medians inside the edition grids' printed edges (open-top nulls never a figure)`);
+  }
   // the birthplace menu matrix: every census-edition year lists its own
   // cobKeys, uk-led on the 2001 edition and GCP-era on 2016+; booth cob
   // rows ride exactly the landed demo rows everywhere
@@ -566,6 +588,37 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("if (S.cob != null && !(b.cobKeys || []).includes(S.cob)) S.cob = null;"), "setYear clamps a country the new year's menu can't print");
   assert.ok(ui.includes("const bmc = M();") && ui.includes("!(bmc.cobKeys || []).includes(S.cob)) S.cob = null;") && !base.includes("if (S.cob != null && !(m.cobKeys || []).includes(S.cob)) S.cob = null;"), "the boot clamp sits at the model, never inside loadYear (idle preloads of every year mustn't touch S)");
   assert.ok(story.includes("const COB_TOP = {") && story.includes("the most Australia-born"), "area stories phrase the country against the Australia-born share");
+}
+
+// ── the Household-income lens (2026-10-31): one People-menu entry that
+// replaces the loinc/hiinc pair, its option picker landing on the median
+// weekly household income spectrum with the lower/higher share views
+// beside it; the median lane is dollars (parallel booth lane, never a
+// share cell), the hash gains iv, and legacy loinc/hiinc hashes alias in
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
+  assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hi"];'), "the income lane id and its three measures, median first");
+  assert.ok(base.includes('"loinc") ks.push(LENS_INC)'), "the People menu folds the two share lanes into the one Household-income entry (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hi: "hiinc" };'), "the income view's demo key per measure");
+  assert.ok(base.includes("incmed: seq(48, 0.14)"), "the median spectrum wears its own money-gold hue");
+  assert.ok(base.includes('incMode: "med"'), "the median spectrum is the landing measure");
+  assert.ok(base.includes('const incMedRange = (m) =>') && base.includes("Math.floor(lo / 100)"), "the median's colour domain measures the year's own divisions, snapped to $100s (no hand-set LUT)");
+  assert.ok(map2.includes('if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null;'), "booth colour reads the median's own dollar lane, never a share cell");
+  assert.ok(map2.includes('const v = demoShare(d); return v == null ? null : 100 * v;'), "the pinned share idiom survives beside the median guard");
+  assert.ok(ui.includes('data-opt="incv" aria-label="Income measure"'), "the legend's income picker rides the select-lens idiom");
+  assert.ok(ui.includes('else if (k === "incv") S.incMode = t.value;'), "the picker change handler is wired");
+  assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
+  assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
+  assert.ok(ui.includes('S.incMode, S.party'), "the legend's refresh key re-reads on a measure switch");
+  assert.ok(ui.includes("Income: ${INC_SHORT[S.incMode]}"), "the lens head names the picked measure");
+  assert.ok(ui.includes('`Median weekly household income${incEpochBrk}${incMedNote}`'), "the median legend note names itself in census-year dollars and carries the no-national-line caveat where the frame lacks it");
+  assert.ok(ui.includes("mny(ausShare)"), "the Australia line formats in dollars on the median view");
+  assert.ok(story.includes("the median weekly household income is ${mny(dm.medIncWeekly)}${incEpoch(m)}"), "the seat/place income fact pair leads the dollar shares into the median sentence");
+  assert.ok(story.includes("medIncWeekly: raw.medinc ? raw.medinc[j] : null"), "the neighbourhood's median reads the booth lane");
+  assert.ok(story.includes('The median household in ${ds(d.n)} earns'), "the seat's median headline");
+  assert.ok(story.includes("INC_TOP[S.incMode]"), "the area ranking phrases follow the picked measure");
+  assert.ok(base.includes('INC_TOP = { med: ["seats where households earn the most"'), "the median ranking phrase");
+  assert.ok(list.includes("incMed()") && list.includes("mny(v)"), "the list column prices the median view in dollars");
 }
 
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain

@@ -33,13 +33,15 @@ const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tp
 function lensColumn(get, colOf) {
   const lab = lensShort();
   const dec = S.lens === "seifa" && !isDemo();
+  // the income lens's median view prices column cells in weekly dollars
+  const dol = S.lens === "seifa" && incMed();
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
   const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
   return { key: "lens", label: lensHead(), short: lab, get, num: S.lens !== "cls", txt: S.lens === "cls", w: "minmax(120px,1fr)", lens: true, dist: S.lens !== "cls",
-    fmt: dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
+    fmt: dol ? (v) => mny(v) : dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
     color: (v) => colorOf(v), decile: dec, diverge: signed,
-    html: (r) => { const v = get(r); if (v == null || Number.isNaN(v)) return `<span class="c2">–</span>`; if (S.lens === "cls") return esc(CLS_SHORT[v]); const w = scale ? clamp((100 * v) / scale, 3, 100) : 100; return `<div class="lv">${scale ? `<i style="width:${0.6 * w}px;background:${colCss(colorOf(v))}"></i>` : `<i style="width:9px;height:9px;background:${colCss(colorOf(v))}"></i>`}<span>${dec ? v : signed ? sgn(v) : f1(v)}</span></div>`; } };
+    html: (r) => { const v = get(r); if (v == null || Number.isNaN(v)) return `<span class="c2">–</span>`; if (S.lens === "cls") return esc(CLS_SHORT[v]); const w = scale ? clamp((100 * v) / scale, 3, 100) : 100; return `<div class="lv">${scale ? `<i style="width:${0.6 * w}px;background:${colCss(colorOf(v))}"></i>` : `<i style="width:9px;height:9px;background:${colCss(colorOf(v))}"></i>`}<span>${dol ? mny(v) : dec ? v : signed ? sgn(v) : f1(v)}</span></div>`; } };
 }
 const fig2 = (a, af, b, bf) => `<span class="fig"><span class="${tx(af)}">${f1(a)}</span><span style="color:var(--ink-faint)"> – </span><span class="${tx(bf)}">${f1(b)}</span></span>`;
 function seatCols(m) {

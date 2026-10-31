@@ -8,7 +8,7 @@ function lensShort() {
     case "flow": return `${famLeg(S.from)} to Labor`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -40,7 +40,7 @@ function valueText(v, kind, ctx) {
     case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? `${f1(v)}% ${dmVerb(M(), S.index)}` : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : `${f1(v)}% ${dmVerb(M(), S.index)}`) : `Decile ${v} of 10`;
   }
   return "";
 }
@@ -80,7 +80,7 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL));
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -218,6 +218,10 @@ function censusSelects(m, cls = "") {
   ];
   const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
   if (isDemo()) {
+    // on Household income a second picker reads the measure: the median
+    // spectrum lands; the two share views sit beside it (loinc/hiinc as
+    // standalone menu lanes until 2026-10-31)
+    if (S.index === LENS_INC && hasInc(m)) out.push(`<select${c} data-opt="incv" aria-label="Income measure">${INC_MODES.map((k) => `<option value="${k}"${S.incMode === k ? " selected" : ""}>${INC_NAME[k]}</option>`).join("")}</select>`);
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
     // measure-switcher idiom)
@@ -315,14 +319,25 @@ function legendHTML(m) {
         const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
         // an income lane can arrive by hash on a year whose store carries
         // none (income starts 2001); it reads as its own kind of early
-        const noInc = isInc(S.index) && !hasInc(m);
+        const noInc = isInc() && !hasInc(m);
         if (!early) h += legendHist(m, lo, hi);
         const ausShare = aus.demo && demoAreaShare(aus.demo);
-        h += `<div class="lg-ramp" style="background:${grad(demoRamp(), 0, 100)}">${early || !aus.demo || ausShare == null ? "" : mark(ausShare, lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
+        // the median lane prices its axis in weekly dollars; every other
+        // people lane reads percentages
+        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
+        h += `<div class="lg-ramp" style="background:${grad(demoRamp(), 0, 100)}">${early || !aus.demo || ausShare == null ? "" : mark(ausShare, lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, demoTick)}`;
         // the income lanes' note names their own cut in the census
-        // year's dollars, then the same census-basis tail (interpolated
-        // years name the blend, never one epoch)
-        const incNote = `Share of adults in households earning ${S.index === "loinc" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${m.demoInterp ? " (census-year dollars)" : m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
+        // year's dollars — the median spectrum reads the national
+        // household line straight — then the same census-basis tail
+        // (interpolated years name the blend, never one epoch)
+        const incEpochBrk = `${m.demoInterp ? " (census-year dollars)" : m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
+        // a frame without a national median record (the state frames'
+        // GCP lanes today) shows the seats' medians only — the note says
+        // why the places carry none
+        const incMedNote = m.incomeCuts && m.incomeCuts.medWeekly == null ? "; this frame doesn't carry a national line or median-figure reads for individual places" : "";
+        const incNote = incMed()
+          ? `Median weekly household income${incEpochBrk}${incMedNote}`
+          : `Share of adults in households earning ${S.incMode === "lo" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${incEpochBrk}`;
         // the 2026-10-31 lane notes: each carries its basis the way the
         // older lanes do (the older lanes' honest phrasing is part of
         // the lane-set's contract now)
@@ -332,7 +347,7 @@ function legendHTML(m) {
           bigfam: "Share of women aged 15+ who have had more than two children",
           hl: "Share of residents counted homeless in the ABS's census estimate, measured per SA2 statistical area (coarser than the other census measures)",
         };
-        const headNote = isDemo() && isInc(S.index) ? incNote
+        const headNote = isInc() ? incNote
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of residents whose dwellings ${TENESMS[S.ten]}`
@@ -342,7 +357,7 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2001 election, in the census year's own dollars: 2001 to 2013 read the census areas the polling places stand in; from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2001 election, in the census year's own dollars: 2001 to 2013 read the census areas the polling places stand in; from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
@@ -813,6 +828,11 @@ async function setYear(y) {
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
   stampDone(ymorph ? ymorph.dur : 300);
+  // now that it's shown, this frame earns its hi geometry and its place in the
+  // cache; the morph above keeps its own references, so eviction can't hurt it
+  warmHi(y);
+  Y[y].viewedAt = performance.now();
+  evictFrames();
   schedule();
 }
 let yearTok = 0;
@@ -998,7 +1018,7 @@ function writeURL() {
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -1026,7 +1046,12 @@ function readURL() {
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
-  const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i) || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
+  const i = p.get("i");
+  // the loinc/hiinc menu ids pre-date the Household-income lens: a legacy
+  // hash naming one lands on the lens with that share view picked
+  if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hi"; }
+  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
+  const iv = p.get("iv"); S.incMode = iv === "lo" || iv === "hi" ? iv : (i === "loinc" ? "lo" : i === "hiinc" ? "hi" : "med");
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
@@ -1140,7 +1165,7 @@ document.addEventListener("change", (e) => {
     const k = t.dataset.opt;
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
-    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
+    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "incv") S.incMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
     lensParamChanged(); return;
   }
   if (t.dataset.fsel) { S.f[t.dataset.fsel] = t.value || null; filtersChanged(); return; }
@@ -1192,27 +1217,36 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
 let cullRaf = 0;
 addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame(() => { cullRaf = 0; updateCanvasVis(); }); }, { passive: true });
 
-/* once the page is up, every other election loads in the background — nearest
-   timeline stops first, one idle slice at a time — so a timeline jump, a
-   chamber switch or the Senate lens finds its data already here. Skipped where
-   the connection asks to save data (the timeline's hover preload still covers
-   a stop the reader nears); a year's failed fetch drops its record so a real
-   click tries it again. The Handbook years never ride this loop — their
-   lossless geometry is 6.5–19MB a year, fetched only on hover/click demand */
+/* once the page is up, the nearest elections load in the background — nearest
+   timeline stops first, one idle slice at a time and paced a breath apart — so
+   a timeline jump, a chamber switch or the Senate lens finds its data already
+   here. Skipped where the connection asks to save data (the timeline's hover
+   preload still covers a stop the reader nears); a year's failed fetch drops
+   its record so a real click tries it again. The Handbook years never ride this
+   loop — their lossless geometry is 6.5–19MB a year, fetched only on hover/click
+   demand. Two brakes keep this a polite background job: it stops when the frame
+   cache is full (FRAME_CAP), and each stop's hi geometry waits for a real visit
+   (warmHi) — fetching and building every stop's hi Path2D set here was the
+   2026-10 idle-time long-task storm (≈15s of main-thread jank in the first
+   minute) and most of the page's half-gigabyte heap */
 const idleSlice = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 900));
+const PRELOAD_GAP = 1800;
 function preloadYears() {
   const conn = navigator.connection || {};
   if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
   const at = YEARS.indexOf(S.year);
   const stops = YEARS.filter((y) => !Y[y] && !HANDBOOK_YEARS.has(y)).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
-  const next = () => {
-    const y = stops.shift();
-    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(next));
+  const senateLane = () => {
     // the chambers' lane, cheap beside the years: every Senate (~7KB each) and
     // its floor, then the Senate-vote lens files (the AEC served no 2004 count)
     loadSenates().catch(() => {});
     loadSenateFloor().catch(() => {});
     for (const sy of SEN_YEARS) { const k = svYear(sy); if (k != null && k !== 2004) loadSenateVote(sy).catch(() => {}); }
+  };
+  const next = () => {
+    const y = frameLoad() < FRAME_CAP ? stops.shift() : null;
+    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
+    senateLane();
   };
   idleSlice(next);
 }
@@ -1227,6 +1261,8 @@ function preloadYears() {
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
+  Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print
   // (England on 2013): clamp before the first render, at the model —
   // never inside loadYear (idle preloads of every year mustn't touch S)

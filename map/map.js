@@ -123,7 +123,7 @@ function buildRamps() {
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
-      loinc: seq(20, 0.13), hiinc: seq(275, 0.12),
+      loinc: seq(20, 0.13), hiinc: seq(275, 0.12), incmed: seq(48, 0.14),
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10) },
@@ -167,8 +167,9 @@ const CLS_DEF = { "Inner Metropolitan": "Settled, well-established suburbs of a 
 const IX = ["irsad", "irsd", "ier", "ieo"];
 const IX_NAME = { irsad: "Advantage and disadvantage", irsd: "Disadvantage", ier: "Economic resources", ieo: "Education and occupation" };
 const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
-// the census tab's people measures: shares of residents (the two income
-// lanes are shares of an area's ADULTS), from the 2021 census counted
+// the census tab's people measures: shares of residents (the income
+// shares are shares of an area's ADULTS — one menu entry, "inc", whose
+// own picker reads the median or the two shares), from the 2021 census counted
 // where each polling place's voters live (the AEC records that from
 // 2016 on); 2007–2013 read the census of the areas the places stand in
 // (the 2006 census at 2007 and 2010, the 2011 census at 2013). The
@@ -177,11 +178,20 @@ const IX_ABBR = { irsad: "IRSAD", irsd: "IRSD", ier: "IER", ieo: "IEO" };
 // bigfam (women with three or more children ever born, per women 15+),
 // and hl (the ABS Estimating-homelessness SA2 estimates' share of
 // residents — a census-area-group measure, coarser than the SA1 lanes')
+// DM's order is POSITIONAL against the booth demo cell tuple, so the two
+// income share lanes keep their slots here; the menu folds them into one
+// entry via DM_MENU below
 const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"];
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
+// the Household-income lens lane id: its block sits below with the other
+// select lenses — declared early because the menu fold needs it
+const LENS_INC = "inc";
+// the menu's People list: DM in order, the two income shares folded into
+// the single Household-income entry where loinc sat
+const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "loinc") ks.push(LENS_INC); else if (k !== "hiinc") ks.push(k); } return ks; })();
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
 const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families", pt: "of employed people travelled to work by public transport", noncit: "were not counted as Australian citizens", bigfam: "of women aged 15+ have had more than two children", hl: "were counted homeless in the ABS census estimate" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], loinc: [10, 45], hiinc: [0, 50], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
+const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
 // the Religion and Housing-tenure select lenses: S.index is the menu
 // ("rel"/"ten") and S.rel/S.ten the picked option; a lane share rides the
 // division dicts (demo.rel/.ten), the parallel B rows, and the pooled
@@ -202,11 +212,21 @@ const LENS_ANC = "anc";
 const ANC_NAME = { english: "English", australian: "Australian", irish: "Irish", scottish: "Scottish", chinese: "Chinese", italian: "Italian", german: "German", indian: "Indian", filipino: "Filipino", dutch: "Dutch", vietnamese: "Vietnamese", lebanese: "Lebanese" };
 const ANCISMS = { english: "named English ancestry", australian: "named Australian ancestry", irish: "named Irish ancestry", scottish: "named Scottish ancestry", chinese: "named Chinese ancestry", italian: "named Italian ancestry", german: "named German ancestry", indian: "named Indian ancestry", filipino: "named Filipino ancestry", dutch: "named Dutch ancestry", vietnamese: "named Vietnamese ancestry", lebanese: "named Lebanese ancestry" };
 const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scottish: [0, 22], chinese: [0, 35], italian: [0, 25], german: [0, 18], indian: [0, 30], filipino: [0, 18], dutch: [0, 6], vietnamese: [0, 22], lebanese: [0, 35] };
-const isDemo = () => DM.includes(S.index) || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
-// the income lanes name their own definitions: the year's national
-// weekly cut in the census year's dollars, as each year's incomeCuts
-// record carries them (2013 reads 2011 dollars, 2016 on 2021 dollars)
-const isInc = (k) => k === "loinc" || k === "hiinc";
+const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
+// the Household-income lane: S.index === "inc" and S.incMode the picked
+// measure — the median weekly household income spectrum lands by default;
+// the bottom-cut and $4,000+ shares (loinc/hiinc as their own menu lanes
+// until 2026-10-31) ride the same legend picker as the other views. The
+// shares name their own definitions: the year's national weekly cut in
+// the census year's dollars, as each year's incomeCuts record carries
+// them (2013 reads 2011 dollars, 2016 on 2021 dollars)
+const INC_MODES = ["med", "lo", "hi"];
+const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hi: "Adults in high-income households" };
+const INC_SHORT = { med: "Median income", lo: "Lower income", hi: "Higher income" };
+const INC_RANGE = { lo: [10, 45], hi: [0, 50] };
+const INC_TOP = { med: ["seats where households earn the most", "where they earn the least"], lo: ["seats where the most adults live in lower-income households", "with the fewest"], hi: ["seats where the most adults live in high-income households", "with the fewest"] };
+const isInc = () => S.index === LENS_INC;
+const incMed = () => isInc() && S.incMode === "med";
 const mny = (v) => (v == null ? "–" : `$${int(Math.round(v))}`);
 const incDollars = (m) => (m.incomeCuts && m.incomeCuts.dollarsYear ? ` in ${m.incomeCuts.dollarsYear} dollars` : "");
 // an interpolated year's loinc cut can't name one dollar epoch: the
@@ -221,17 +241,17 @@ const incLoFrag = (m) => {
   return `under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)} a week`;
 };
 const incEpoch = (m) => (m.demoInterp ? " in census-year dollars" : incDollars(m));
-const DM_VERB_INC = {
-  loinc: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
-  hiinc: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
+const INC_VERB = {
+  lo: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
+  hi: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
 };
-const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : isInc(k) ? DM_VERB_INC[k](m) : DM_VERB[k]);
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
-// (2013 on); 2007 and 2010 stop at the six people measures
+// (2001 on — the older statistics-era frames stop at the six people measures)
 const hasInc = (m) => !!(m && m.incomeCuts);
-const DM_ALL = DM;
+const DM_ALL = DM_MENU;
 const dmFor = (m) => {
-  let ks = hasInc(m) ? DM_ALL : DM_ALL.filter((k) => !isInc(k));
+  let ks = hasInc(m) ? DM_ALL : DM_ALL.filter((k) => k !== LENS_INC);
   if (m && m.hasLane && !m.hasLane.hl) ks = ks.filter((k) => k !== "hl");
   if (m && m.hasLane && !m.hasLane.bigfam) ks = ks.filter((k) => k !== "bigfam");
   return ks;
@@ -249,22 +269,25 @@ const dmFor = (m) => {
 const COB_NAME = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
 // the picker's "Born in …" labels (definite article where the name takes one)
 const COB_BORN = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "the Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };
+const COB_VERB = { uk: "were born in the United Kingdom", eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
 /* the country as a compact head stub ("Born in NZ"): alpha-3 codes, alpha-2
    where the short form is the natural one (NZ, the UK) */
 const COB_SHORT = { uk: "the UK", eng: "ENG", ind: "IND", chn: "CHN", nzl: "NZ", phl: "PHL", vnm: "VNM", zaf: "ZAF", ita: "ITA", lka: "LKA", sct: "SCT" };
-const COB_VERB = { uk: "were born in the United Kingdom", eng: "were born in England", ind: "were born in India", chn: "were born in China", nzl: "were born in New Zealand", phl: "were born in the Philippines", vnm: "were born in Vietnam", zaf: "were born in South Africa", ita: "were born in Italy", lka: "were born in Sri Lanka", sct: "were born in Scotland" };
 const COB_RANGE = { uk: [0, 25], eng: [0, 20], ind: [0, 25], chn: [0, 20], nzl: [0, 12], phl: [0, 12], vnm: [0, 25], zaf: [0, 7], ita: [0, 9], lka: [0, 7], sct: [0, 3] };
 const isCob = () => S.index === "fborn" && S.cob != null;
 const isRel = () => S.index === LENS_REL && S.rel != null;
 const isTen = () => S.index === LENS_TEN && S.ten != null;
 const isAnc = () => S.index === LENS_ANC && S.anc != null;
-// the active people-lane share of a division, as a fraction (cob-aware,
-// religion/tenure select-aware)
+// the active people-lane figure of a division: a share as a fraction
+// (cob-aware, religion/tenure select-aware), or the income view's datum —
+// the median lane reads DOLLARS (medIncWeekly), the shares the band keys
+const INC_KEY = { med: "medIncWeekly", lo: "loinc", hi: "hiinc" };
 const demoShare = (d) => {
   if (isCob()) return d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   if (isRel()) return d.demo && d.demo.rel ? d.demo.rel[S.rel] : null;
   if (isTen()) return d.demo && d.demo.ten ? d.demo.ten[S.ten] : null;
   if (isAnc()) return d.demo && d.demo.anc ? d.demo.anc[S.anc] : null;
+  if (isInc()) return d.demo ? d.demo[INC_KEY[S.incMode]] : null;
   return d.demo ? d.demo[S.index] : null;
 };
 // ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
@@ -273,6 +296,7 @@ const demoAreaShare = (demo) => {
   if (isRel()) return demo && demo.rel ? demo.rel[S.rel] : null;
   if (isTen()) return demo && demo.ten ? demo.ten[S.ten] : null;
   if (isAnc()) return demo && demo.anc ? demo.anc[S.anc] : null;
+  if (isInc()) return demo ? demo[INC_KEY[S.incMode]] : null;
   return demo ? demo[S.index] : null;
 };
 // ...and of one booth row (fraction): the select lanes ride their
@@ -282,10 +306,29 @@ const demoBoothShare = (raw, j, pos) => {
   if (isRel()) { const r = raw.rel && raw.rel[j]; return r ? r[pos[S.rel]] : null; }
   if (isTen()) { const r = raw.ten && raw.ten[j]; return r ? r[pos[S.ten]] : null; }
   if (isAnc()) { const r = raw.anc && raw.anc[j]; return r ? r[pos[S.anc]] : null; }
+  // income: the share views ride the demo tuple's cells 6/7; the median
+  // is dollars, dollars never a share — boothValue reads raw.medinc
+  if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[S.incMode === "lo" ? 6 : 7] : null; }
   const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : S.index];
+// the median lane's colour domain per year: the year's own division
+// medians snapped outward to $100s — each census epoch's dollars price
+// their own spectrum, no hand-set LUT to drift
+const incMedRange = (m) => {
+  if (m && m._incMedRange) return m._incMedRange;
+  let lo = Infinity, hi = -Infinity;
+  for (const d of (m && m.divs) || []) {
+    const v = d.demo && d.demo.medIncWeekly;
+    if (v == null) continue;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const r = isFinite(lo) ? [Math.floor(lo / 100) * 100, Math.ceil(hi / 100) * 100] : [0, 4500];
+  if (m) m._incMedRange = r;
+  return r;
+};
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiinc") : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc)
 const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : (m.cobPos || {}));
@@ -595,6 +638,9 @@ const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
   // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
   infMode: "informal",
+  // the Household-income lens's measure: the median spectrum, or the lower- /
+  // higher-income household shares (an INC_MODES value; median lands)
+  incMode: "med",
   // the Born overseas lens's birthplace-country sub-view (a COB_NAME key, null = all overseas-born)
   cob: null,
   // the Religion and Housing-tenure select lenses' picked options
@@ -627,8 +673,14 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"0c5bd078","data-nsw23.json":"a318a736","data-qld17.json":"4ba31535","data-qld20.json":"de19f1d0","data-qld24.json":"adfefdfa","data-sa22.json":"4c3c388d","data-sa26.json":"1fb55c9d","data-vic22.json":"0f203b79","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"c7c7a579","res-1996.json":"351818e3","res-1998.json":"09dc239e","res-2001.json":"47403976","res-2004.json":"f170ae08","res-2007.json":"d97591b1","res-2010.json":"42b98d9e","res-2013.json":"ca606719","res-2016.json":"1d3b0f8c","res-2019.json":"346e6d18","res-2022.json":"5e75079c","res-2025.json":"2a9fa3d3","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
-const getJSON = (u) => { const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }); };
+const DATA_V = /*@data-stamps*/{"data-now.json":"0c5bd078","data-nsw23.json":"a318a736","data-qld17.json":"4ba31535","data-qld20.json":"de19f1d0","data-qld24.json":"adfefdfa","data-sa22.json":"4c3c388d","data-sa26.json":"1fb55c9d","data-vic22.json":"0f203b79","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"c7c7a579","res-1996.json":"351818e3","res-1998.json":"09dc239e","res-2001.json":"c1841b7b","res-2004.json":"7b88d5e3","res-2007.json":"4b9f0267","res-2010.json":"dc29ce4a","res-2013.json":"1c25a72b","res-2016.json":"2d4a902a","res-2019.json":"ed380b80","res-2022.json":"cb10ecc9","res-2025.json":"f33f8ff1","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+// the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
+// while the script downloads and parses; getJSON drinks from it once, then it's gone
+const getJSON = (u) => {
+  const w = window.__warm && window.__warm[u];
+  if (w) { delete window.__warm[u]; return w.catch(() => getJSON(u)); }
+  const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+};
 
 function cleanBooth(name, div, ty) {
   let s = name.replace(new RegExp("\\s*\\(" + div.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\)$"), "");
@@ -1002,15 +1054,57 @@ async function loadYear(year) {
     m.booth = res.booths ? deriveBooths(res.booths, m) : emptyBooths(m);
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
+    // the national household median joins the AUS pool: medians never
+    // pool, so deriveAreas leaves it off, but the incomeCuts record the
+    // build stamps carries the year's own national figure
+    if (m.incomeCuts && m.incomeCuts.medWeekly != null && m.areas.AUS.demo)
+      m.areas.AUS.demo.medIncWeekly = m.incomeCuts.medWeekly;
     m.search = buildSearch(m);
     proj = keep || m.proj;
-    // the hi detail can land after the reader has moved to another year — build
-    // and bake its paths under this year's projection, then put the live one back
-    if (lo.handbook) m.geoHi = m.geo; // already full precision; no duplicate download
-    else getJSON(`/map/data/geo-${ry}-hi.json`).then((hi) => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); }).catch(() => {});
+    // the hi detail comes up only for a frame the reader actually visits (warmHi):
+    // preloading paths +15 frames and building all their hi Path2Ds was the 2026-10
+    // long-task storm. The Handbook years are lossless at both levels: no hi download
+    if (lo.handbook) m.geoHi = m.geo;
     return m;
   })();
   return m.ready;
+}
+/* a frame's hi geometry, fetched the first time it's shown and built in an idle
+   slice after it lands, so the year-morph it interrupts nothing interactive.
+   geoOf (app-2) draws lo at any zoom until it lands, so a miss just keeps the
+   lo edges a little longer — the same shape boot already tolerates */
+function warmHi(y) {
+  const m = Y[y];
+  if (!m || !m.divs || m.geoHi || m._hiP) return m && m._hiP;
+  const ry = y === "now" ? 2025 : y;
+  // the hi detail can land after the reader has moved to another year — build
+  // and bake its paths under this year's projection, then put the live one back
+  m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
+    .then((hi) => new Promise((done) => (window.requestIdleCallback ? requestIdleCallback : setTimeout)(() => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); done(); }, { timeout: 1500 })))
+    .catch(() => { m._hiP = null; });
+  return m._hiP;
+}
+/* the frame cache, weighted and capped: a Handbook year's lossless geometry holds
+   ~140MB against a normal year's ~15MB, so it counts quadruple. Frames the reader
+   never viewed (the preload's speculative fills) fall first, the current frame
+   never falls; a year morph keeps its own references alive past an eviction, so
+   deleting Y[y] here can never hurt the transition in flight */
+const FRAME_CAP = 12, FRAME_W = (y) => (HANDBOOK_YEARS.has(y) ? 4 : 1);
+const frameLoad = () => Object.keys(Y).reduce((w, k) => w + (Y[k].divs ? FRAME_W(yearOf(k)) : 0), 0);
+// a frame stays while it's the one in view; walks past the cap drop the
+// least-recently-viewed ones, never-viewed preload fills first
+function evictFrames() {
+  const ks = Object.keys(Y).filter((k) => Y[k].divs);
+  let load = ks.reduce((w, k) => w + FRAME_W(yearOf(k)), 0);
+  while (load > FRAME_CAP) {
+    const cand = ks.filter((k) => String(S.year) !== String(yearOf(k)));
+    if (!cand.length) break;
+    cand.sort((a, b) => (Y[a].viewedAt || 0) - (Y[b].viewedAt || 0));
+    const k = cand[0];
+    load -= FRAME_W(yearOf(k));
+    delete Y[k];
+    ks.splice(ks.indexOf(k), 1);
+  }
 }
 const M = () => (Y[S.year] && Y[S.year].divs ? Y[S.year] : null);
 // "the previous election" is defined only within the federal chain — a state stop's
@@ -1032,6 +1126,9 @@ function divValue(m, i) {
     case "cls": return d.cls || null;
     case "seifa": {
       if (!isDemo()) return nn(d.seifa[S.index] && d.seifa[S.index].dec);
+      // the income median prices divisions in dollars (no % scaling) —
+      // the pinned share idiom below stays backed by every other lane
+      if (incMed()) { const v = d.demo && d.demo.medIncWeekly; return v == null ? null : v; }
       const v = demoShare(d); return v == null ? null : 100 * v;
     }
   }
@@ -1065,6 +1162,8 @@ function boothValue(m, j) {
     case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
+      // the income median reads its own dollar lane, never a share cell
+      if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null; return v == null ? null : v; }
       if (isDemo()) { const v = demoBoothShare(b.raw, j, selPos(m)); return v == null ? null : 100 * v; }
       const arr = S.basis === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }
@@ -5486,7 +5585,7 @@ function areaHedDek(m, st) {
 }
 
 // the census people measures, area level: who holds the fifth of seats at each end
-const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], loinc: ["seats where the most adults live in lower-income households", "with the fewest"], hiinc: ["seats where the most adults live in high-income households", "with the fewest"], y12less: ["seats where the most residents aged 15+ left school before Year 12", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
+const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats with the most residents holding a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12less: ["seats where the most residents aged 15+ left school before Year 12", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
   pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
@@ -5545,7 +5644,9 @@ const demoCopy = (m) => {
 const demoBoothCopy = (m) => (m.demoBasis === "sa1" ? DB.sa1Booth : demoCopy(m));
 // one income sentence for a seat or place facts list: both band shares,
 // then the household median, in the census year's own dollars; "" when
-// the place carries no income lane at all
+// the place carries no income lane at all. Booth rows arrive as
+// {loinc, hiinc, medIncWeekly} from the demo tuple's cells and the
+// parallel medinc lane; seat rows arrive as the divId demo dict
 function incFact(m, dm) {
   if (!dm) return "";
   const c = m.incomeCuts || {};
@@ -5556,15 +5657,21 @@ function incFact(m, dm) {
     if (dm.hiinc != null) pair.push(`${f0(100 * dm.hiinc)}% in households earning ${mny(c.hiEdgeWeekly)} or more a week`);
     parts.push(`${pair.join(", ")}${incEpoch(m)}`);
   }
-  if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${m.demoInterp && c.dollarsYear ? ` in ${c.dollarsYear} dollars` : ""}`);
+  if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${incEpoch(m)}`);
   return parts.length ? `${parts.join("; ")}.` : "";
 }
 const DEMO_EARLY = { hed: "Census figures start at the 1993 election", dek: "Census-linked people figures exist only from the 1993 election on: 1993 and 1996 blend the 1991 and 1996 censuses to election day, 1998 blends the 1996 and 2001 censuses, the 2001 election reads the 2001 census itself, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census." };
 function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
+  const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
+  // the median view's headline is the national line: medians never pool,
+  // so a state area carries no figure of its own to print
+  if (incMed() && med == null) return { hed: "Income figures start at the 2001 election", dek: "" };
   const scored = idx.filter((i) => demoShare(m.divs[i]) != null).sort((a, b) => demoShare(m.divs[b]) - demoShare(m.divs[a]));
-  const share = `${f1(demoAreaShare(A.demo))}% ${isInc(k) ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
+  const share = incMed()
+    ? `${st === "AUS" ? "the median weekly household income" : "the national median weekly household income"} is ${mny(med)}${incEpoch(m)}`
+    : `${f1(demoAreaShare(A.demo))}% ${isInc() ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -5572,7 +5679,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
@@ -5729,6 +5836,9 @@ function seatHedDek(m, d) {
         if (!d.demo) return m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY : { hed: `${ds(d.n)} has no census figure`, dek: "" };
         const xs = m.divs.filter((x) => demoShare(x) != null).sort((a, b) => demoShare(b) - demoShare(a)), r = xs.findIndex((x) => x.i === d.i) + 1;
         const aus = m.areas.AUS.demo;
+        // the median view prices the seat's figure in dollars against
+        // the national household line, never a share of anything
+        if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
         return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
@@ -5836,7 +5946,21 @@ function storyBooth(m, j) {
       if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
       else { hed = Number.isFinite(b.infPct[j]) ? `${f1(b.infPct[j])}% of ballots here were informal` : "This place has no informal count on record"; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
     }
-    if (S.lens === "seifa" && isDemo()) { const k = S.index, v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v, dv = D.demo && demoShare(D); hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc(k) ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`; dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`; }
+    if (S.lens === "seifa" && isDemo()) {
+      const k = S.index, dv = D.demo && demoShare(D);
+      // the income median says its own dollars at the place itself: a
+      // share-shaped template was never the right frame for it
+      if (incMed()) {
+        const v = raw.medinc ? raw.medinc[j] : null;
+        hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure")
+          : `The median household near here earns ${mny(v)} a week`;
+        dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${mny(dv != null ? dv : null)} a week${dv != null ? incEpoch(m) : ""}. ${demoBoothCopy(m).note}`;
+      } else {
+        const v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v;
+        hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`;
+        dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`;
+      }
+    }
     else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
     if (S.lens === "cls") { hed = `${ds(D.n)} is ${/^[aeiou]/i.test(CLS_LOWER[D.cls] || "") ? "an" : "a"} ${CLS_LOWER[D.cls] || ""} seat`; }
   }
@@ -5868,7 +5992,7 @@ function storyBooth(m, j) {
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
-  const incRow = dr ? incFact(m, { loinc: dr[6], hiinc: dr[7] }) : "";
+  const incRow = dr ? incFact(m, { loinc: dr[6], hiinc: dr[7], medIncWeekly: raw.medinc ? raw.medinc[j] : null }) : "";
   const origB = isCob() && raw.cob && raw.cob[j] ? raw.cob[j][m.cobPos[S.cob]] : null;
   const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${origB != null ? `${f0(100 * origB)}% ${COB_VERB[S.cob]}` : `${f0(100 * dr[3])}% ${DM_VERB.fborn}`}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}${dr[12] != null ? `, ${f0(100 * dr[12])}% ${DM_VERB.pt}` : ""}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}${dr[13] != null ? `<dt>Citizenship</dt><dd>${f0(100 * dr[13])}% ${DM_VERB.noncit}</dd>` : ""}${dr[14] != null ? `<dt>Children</dt><dd>${f0(100 * dr[14])}% ${DM_VERB.bigfam}</dd>` : ""}${dr[15] != null ? `<dt>Home</dt><dd>${f0(100 * dr[15])}% ${DM_VERB.hl}</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
   h += `<div class="st-sec"><h3>The neighbourhood <small>ABS census and SEIFA, national deciles</small></h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in.${isState() ? "" : " From 2016, where the AEC records it, “its voters” scores the areas its voters live in."}</p>${demoRows}</div>`;
@@ -5938,13 +6062,15 @@ const lensKey = () => (S.lens === "tpp" ? (S.tppMode === "swing" ? "swing" : "tp
 function lensColumn(get, colOf) {
   const lab = lensShort();
   const dec = S.lens === "seifa" && !isDemo();
+  // the income lens's median view prices column cells in weekly dollars
+  const dol = S.lens === "seifa" && incMed();
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
   const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
   return { key: "lens", label: lensHead(), short: lab, get, num: S.lens !== "cls", txt: S.lens === "cls", w: "minmax(120px,1fr)", lens: true, dist: S.lens !== "cls",
-    fmt: dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
+    fmt: dol ? (v) => mny(v) : dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
     color: (v) => colorOf(v), decile: dec, diverge: signed,
-    html: (r) => { const v = get(r); if (v == null || Number.isNaN(v)) return `<span class="c2">–</span>`; if (S.lens === "cls") return esc(CLS_SHORT[v]); const w = scale ? clamp((100 * v) / scale, 3, 100) : 100; return `<div class="lv">${scale ? `<i style="width:${0.6 * w}px;background:${colCss(colorOf(v))}"></i>` : `<i style="width:9px;height:9px;background:${colCss(colorOf(v))}"></i>`}<span>${dec ? v : signed ? sgn(v) : f1(v)}</span></div>`; } };
+    html: (r) => { const v = get(r); if (v == null || Number.isNaN(v)) return `<span class="c2">–</span>`; if (S.lens === "cls") return esc(CLS_SHORT[v]); const w = scale ? clamp((100 * v) / scale, 3, 100) : 100; return `<div class="lv">${scale ? `<i style="width:${0.6 * w}px;background:${colCss(colorOf(v))}"></i>` : `<i style="width:9px;height:9px;background:${colCss(colorOf(v))}"></i>`}<span>${dol ? mny(v) : dec ? v : signed ? sgn(v) : f1(v)}</span></div>`; } };
 }
 const fig2 = (a, af, b, bf) => `<span class="fig"><span class="${tx(af)}">${f1(a)}</span><span style="color:var(--ink-faint)"> – </span><span class="${tx(bf)}">${f1(b)}</span></span>`;
 function seatCols(m) {
@@ -6254,7 +6380,7 @@ function lensShort() {
     case "flow": return `${famLeg(S.from)} to Labor`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -6286,7 +6412,7 @@ function valueText(v, kind, ctx) {
     case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? `${f1(v)}% ${dmVerb(M(), S.index)}` : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : `${f1(v)}% ${dmVerb(M(), S.index)}`) : `Decile ${v} of 10`;
   }
   return "";
 }
@@ -6326,7 +6452,7 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL));
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.party, S.from, S.vs, S.index, S.basis, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -6464,6 +6590,10 @@ function censusSelects(m, cls = "") {
   ];
   const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", IX.map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
   if (isDemo()) {
+    // on Household income a second picker reads the measure: the median
+    // spectrum lands; the two share views sit beside it (loinc/hiinc as
+    // standalone menu lanes until 2026-10-31)
+    if (S.index === LENS_INC && hasInc(m)) out.push(`<select${c} data-opt="incv" aria-label="Income measure">${INC_MODES.map((k) => `<option value="${k}"${S.incMode === k ? " selected" : ""}>${INC_NAME[k]}</option>`).join("")}</select>`);
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
     // measure-switcher idiom)
@@ -6561,14 +6691,25 @@ function legendHTML(m) {
         const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
         // an income lane can arrive by hash on a year whose store carries
         // none (income starts 2001); it reads as its own kind of early
-        const noInc = isInc(S.index) && !hasInc(m);
+        const noInc = isInc() && !hasInc(m);
         if (!early) h += legendHist(m, lo, hi);
         const ausShare = aus.demo && demoAreaShare(aus.demo);
-        h += `<div class="lg-ramp" style="background:${grad(demoRamp(), 0, 100)}">${early || !aus.demo || ausShare == null ? "" : mark(ausShare, lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}`;
+        // the median lane prices its axis in weekly dollars; every other
+        // people lane reads percentages
+        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
+        h += `<div class="lg-ramp" style="background:${grad(demoRamp(), 0, 100)}">${early || !aus.demo || ausShare == null ? "" : mark(ausShare, lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, demoTick)}`;
         // the income lanes' note names their own cut in the census
-        // year's dollars, then the same census-basis tail (interpolated
-        // years name the blend, never one epoch)
-        const incNote = `Share of adults in households earning ${S.index === "loinc" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${m.demoInterp ? " (census-year dollars)" : m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
+        // year's dollars — the median spectrum reads the national
+        // household line straight — then the same census-basis tail
+        // (interpolated years name the blend, never one epoch)
+        const incEpochBrk = `${m.demoInterp ? " (census-year dollars)" : m.incomeCuts && m.incomeCuts.dollarsYear ? ` (${m.incomeCuts.dollarsYear} dollars)` : ""}`;
+        // a frame without a national median record (the state frames'
+        // GCP lanes today) shows the seats' medians only — the note says
+        // why the places carry none
+        const incMedNote = m.incomeCuts && m.incomeCuts.medWeekly == null ? "; this frame doesn't carry a national line or median-figure reads for individual places" : "";
+        const incNote = incMed()
+          ? `Median weekly household income${incEpochBrk}${incMedNote}`
+          : `Share of adults in households earning ${S.incMode === "lo" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${incEpochBrk}`;
         // the 2026-10-31 lane notes: each carries its basis the way the
         // older lanes do (the older lanes' honest phrasing is part of
         // the lane-set's contract now)
@@ -6578,7 +6719,7 @@ function legendHTML(m) {
           bigfam: "Share of women aged 15+ who have had more than two children",
           hl: "Share of residents counted homeless in the ABS's census estimate, measured per SA2 statistical area (coarser than the other census measures)",
         };
-        const headNote = isDemo() && isInc(S.index) ? incNote
+        const headNote = isInc() ? incNote
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of residents whose dwellings ${TENESMS[S.ten]}`
@@ -6588,7 +6729,7 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2001 election, in the census year's own dollars: 2001 to 2013 read the census areas the polling places stand in; from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${f1(ausShare)}%.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures start at the 2001 election, in the census year's own dollars: 2001 to 2013 read the census areas the polling places stand in; from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
@@ -7059,6 +7200,11 @@ async function setYear(y) {
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
   stampDone(ymorph ? ymorph.dur : 300);
+  // now that it's shown, this frame earns its hi geometry and its place in the
+  // cache; the morph above keeps its own references, so eviction can't hurt it
+  warmHi(y);
+  Y[y].viewedAt = performance.now();
+  evictFrames();
   schedule();
 }
 let yearTok = 0;
@@ -7244,7 +7390,7 @@ function writeURL() {
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (S.basis === "voters") p.set("b", "voters"); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -7272,7 +7418,12 @@ function readURL() {
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
-  const i = p.get("i"); if (i && (IX.includes(i) || DM.includes(i) || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
+  const i = p.get("i");
+  // the loinc/hiinc menu ids pre-date the Household-income lens: a legacy
+  // hash naming one lands on the lens with that share view picked
+  if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hi"; }
+  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
+  const iv = p.get("iv"); S.incMode = iv === "lo" || iv === "hi" ? iv : (i === "loinc" ? "lo" : i === "hiinc" ? "hi" : "med");
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
@@ -7386,7 +7537,7 @@ document.addEventListener("change", (e) => {
     const k = t.dataset.opt;
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
-    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
+    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "basis") S.basis = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "incv") S.incMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
     lensParamChanged(); return;
   }
   if (t.dataset.fsel) { S.f[t.dataset.fsel] = t.value || null; filtersChanged(); return; }
@@ -7438,27 +7589,36 @@ new ResizeObserver((es) => { const w = es[0].contentRect.width; if (Math.abs(w -
 let cullRaf = 0;
 addEventListener("scroll", () => { if (!cullRaf) cullRaf = requestAnimationFrame(() => { cullRaf = 0; updateCanvasVis(); }); }, { passive: true });
 
-/* once the page is up, every other election loads in the background — nearest
-   timeline stops first, one idle slice at a time — so a timeline jump, a
-   chamber switch or the Senate lens finds its data already here. Skipped where
-   the connection asks to save data (the timeline's hover preload still covers
-   a stop the reader nears); a year's failed fetch drops its record so a real
-   click tries it again. The Handbook years never ride this loop — their
-   lossless geometry is 6.5–19MB a year, fetched only on hover/click demand */
+/* once the page is up, the nearest elections load in the background — nearest
+   timeline stops first, one idle slice at a time and paced a breath apart — so
+   a timeline jump, a chamber switch or the Senate lens finds its data already
+   here. Skipped where the connection asks to save data (the timeline's hover
+   preload still covers a stop the reader nears); a year's failed fetch drops
+   its record so a real click tries it again. The Handbook years never ride this
+   loop — their lossless geometry is 6.5–19MB a year, fetched only on hover/click
+   demand. Two brakes keep this a polite background job: it stops when the frame
+   cache is full (FRAME_CAP), and each stop's hi geometry waits for a real visit
+   (warmHi) — fetching and building every stop's hi Path2D set here was the
+   2026-10 idle-time long-task storm (≈15s of main-thread jank in the first
+   minute) and most of the page's half-gigabyte heap */
 const idleSlice = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 900));
+const PRELOAD_GAP = 1800;
 function preloadYears() {
   const conn = navigator.connection || {};
   if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
   const at = YEARS.indexOf(S.year);
   const stops = YEARS.filter((y) => !Y[y] && !HANDBOOK_YEARS.has(y)).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
-  const next = () => {
-    const y = stops.shift();
-    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(next));
+  const senateLane = () => {
     // the chambers' lane, cheap beside the years: every Senate (~7KB each) and
     // its floor, then the Senate-vote lens files (the AEC served no 2004 count)
     loadSenates().catch(() => {});
     loadSenateFloor().catch(() => {});
     for (const sy of SEN_YEARS) { const k = svYear(sy); if (k != null && k !== 2004) loadSenateVote(sy).catch(() => {}); }
+  };
+  const next = () => {
+    const y = frameLoad() < FRAME_CAP ? stops.shift() : null;
+    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
+    senateLane();
   };
   idleSlice(next);
 }
@@ -7473,6 +7633,8 @@ function preloadYears() {
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
+  Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print
   // (England on 2013): clamp before the first render, at the model —
   // never inside loadYear (idle preloads of every year mustn't touch S)

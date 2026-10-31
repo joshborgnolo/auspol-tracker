@@ -656,6 +656,11 @@ def build_year(year, hist, base2001):
         B["rel"].append(select_cells(dirow, "rel", relkeys) if dcrow else None)
         B["ten"].append(select_cells(dirow, "ten", tenkeys) if dcrow else None)
         B["anc"].append(select_cells(dirow, "anc", anckeys) if dcrow else None)
+        # the household-median lane is dollars, not a share, so it never
+        # joins the demo cell tuple: a parallel lane, interp per the
+        # nearest-side convention like the rest of the dollar figures;
+        # a no-census block withholds it like the cob row
+        B["medinc"].append(dirow.get("incMed") if dcrow else None)
 
     if not any(B["demo"]):
         del B["demo"]  # the year's store didn't exist (pre-2004, absent
@@ -668,6 +673,8 @@ def build_year(year, hist, base2001):
         del B["ten"]
     if not any(B["anc"]):
         del B["anc"]
+    if not any(B["medinc"]):
+        del B["medinc"]
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -707,6 +714,18 @@ def build_year(year, hist, base2001):
                 "tpp": [alp, coa, round(100 * alp / (alp + coa) - p2, 2)], "seats": dict(seats)}
 
     A = {st: agg(st) for st in ["AUS"] + STATES}
+    # the national household median per census epoch rides incomeCuts so
+    # the income lens's median spectrum can mark the country line; interp
+    # years pin it to the nearest census side like every dollar figure
+    incuts = (vstore.get("incomeCutsI") or vstore.get("incomeCuts")) if vstore else None
+    if incuts is not None:
+        incuts = dict(incuts)
+        cnts = vstore.get("counts") or {}
+        natrec = ((cnts.get("demoI") or {}).get("national")
+                  or (cnts.get("demo") or {}).get("national")
+                  or cnts.get("national") or {})
+        if natrec.get("incMed") is not None:
+            incuts["medWeekly"] = natrec["incMed"]
     out = {"year": year, "event": EVENT.get(year) or None, "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
            "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,
            # what a demo row describes: where voters live (2016+) vs the
@@ -718,7 +737,7 @@ def build_year(year, hist, base2001):
            # names the same cuts the numbers were built on. interp years
            # carry incomeCutsI: the nearest census side's dollar epoch,
            # both sides' cuts under sides
-           "incomeCuts": (vstore.get("incomeCutsI") or vstore.get("incomeCuts")) if vstore else None,
+           "incomeCuts": incuts,
            # the birthplace-country sub-view country order the B["cob"]
            # rows and rec.demo.cob dicts follow (10 keys from 2016 /
            # the state frames' GCP basis, 8 on the 2006/2011

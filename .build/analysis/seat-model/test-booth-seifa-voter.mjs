@@ -54,12 +54,17 @@
       below the national 25th-percentile cut the store-level incomeCuts
       record carries ($1,078.87/wk, identical on all four lanes — one
       2021-census basis), hiinc = adult share in the $4,000+ band;
-      incMed (divisions only) is the band-interpolated median on the
-      HOUSEHOLD basis (ABS's published-median basis — the adults
-      histogram would read ~+$300). counts.demo.national carries
-      loinc/hiinc/incMed exact per year; division anchors pinned
-      (Hinkler is the lo-income/median floor, the hi-income ceiling is
-      Wentworth except 2025's Bradfield on the new boundaries).
+      incMed is the band-interpolated median on the HOUSEHOLD basis
+      (ABS's published-median basis — the adults histogram would read
+      ~+$300), carried at booth, cohort AND division grain since the
+      2026-10-31 median-lane add: a footprint whose median lands inside
+      the open $4,000+ band files null by design (the ultra-wealthy
+      set, pinned verbatim per year; the 2016-dollar demoI side stays
+      non-null there — its median sits below the edge). counts.
+      demo.national carries loinc/hiinc/incMed exact per year;
+      division anchors pinned (Hinkler is the lo-income/median floor,
+      the hi-income ceiling is Wentworth except 2025's Bradfield on
+      the new boundaries).
    10. Divisions block (the division-level add-on: every unit's
       per-SA1 demo tallies re-pooled by division — one language/age
       reading per division, shares from its own pooled sum, never an
@@ -133,6 +138,15 @@ const YEARS = {
     demoInc: { loMax: ["Hinkler", 0.4221], loMin: ["Warringah", 0.1215],
                hiMax: ["Wentworth", 0.4476], hiMin: ["Lyons", 0.0514],
                medMin: ["Hinkler", 1133], medMax: ["Wentworth", 2943] },
+    /* booth medians: the demo side rides the measured 2021-census
+       fold, demoI the nearest census side (2016 dollars here — the
+       live-map lane reads demoI) */
+    demoMed: { booth: 8187, boothI: 8195,
+               bondiDemo: 2696, bondiDemoI: 2234,
+               openTop: ["Curtin|City Beach", "Curtin|Dalkeith",
+                         "North Sydney|Castlecrag", "North Sydney|Longueville",
+                         "North Sydney|Northbridge East", "Warringah|Balgowlah Heights",
+                         "Warringah|North Balgowlah", "Wentworth|Vaucluse"] },
     incLingiari: { lo: 0.2671, hi: 0.1389, med: 1825 },
     demoCob: { engTop: ["Moore", 0.1535], indTop: ["Greenway", 0.1503],
                chnTop: ["Chisholm", 0.1314], fowlerVnm: 0.1794 },
@@ -176,6 +190,14 @@ const YEARS = {
     demoInc: { loMax: ["Hinkler", 0.417], loMin: ["Canberra", 0.1168],
                hiMax: ["Wentworth", 0.4483], hiMin: ["Spence", 0.0435],
                medMin: ["Hinkler", 1147], medMax: ["Wentworth", 2944] },
+    /* the nearest side IS the measured 2021 fold here, so demoI
+       medians equal the demo ones exact */
+    demoMed: { booth: 8730, boothI: 8730,
+               bondiDemo: 2717, bondiDemoI: 2717,
+               openTop: ["Curtin|City Beach", "Curtin|Dalkeith",
+                         "North Sydney|Castlecrag", "North Sydney|Longueville",
+                         "North Sydney|Northbridge East", "Warringah|Balgowlah Heights",
+                         "Warringah|North Balgowlah", "Wentworth|Vaucluse"] },
     incLingiari: { lo: 0.247, hi: 0.1441, med: 1910 },
     demoCob: { engTop: ["Moore", 0.1551], indTop: ["Lalor", 0.1585],
                chnTop: ["Chisholm", 0.142], fowlerVnm: 0.1777 },
@@ -219,6 +241,13 @@ const YEARS = {
     demoInc: { loMax: ["Hinkler", 0.4141], loMin: ["Canberra", 0.117],
                hiMax: ["Wentworth", 0.4462], hiMin: ["Spence", 0.0446],
                medMin: ["Hinkler", 1156], medMax: ["Wentworth", 2926] },
+    demoMed: { booth: 8440, boothI: 0,
+               bondiDemo: 2658, bondiDemoI: null,
+               openTop: ["Curtin|Dalkeith",
+                         "North Sydney|Castlecrag", "North Sydney|Longueville",
+                         "North Sydney|Northbridge East", "Warringah|Balgowlah Heights",
+                         "Warringah|North Balgowlah", "Wentworth|Bellevue Hill South",
+                         "Wentworth|Vaucluse"] },
     incLingiari: { lo: 0.2363, hi: 0.1486, med: 1956 },
     demoCob: { engTop: ["Pearce", 0.1537], indTop: ["Greenway", 0.1622],
                chnTop: ["Bennelong", 0.1413], fowlerVnm: 0.1757 },
@@ -262,6 +291,11 @@ const YEARS = {
     demoInc: { loMax: ["Hinkler", 0.4127], loMin: ["Greenway", 0.1113],
                hiMax: ["Bradfield", 0.4369], hiMin: ["Spence", 0.0449],
                medMin: ["Hinkler", 1161], medMax: ["Bradfield", 2964] },
+    demoMed: { booth: 8907, boothI: 0,
+               bondiDemo: 2776, bondiDemoI: null,
+               openTop: ["Bennelong|Longueville", "Bradfield|Castlecrag",
+                         "Curtin|Dalkeith", "Warringah|Balgowlah Heights",
+                         "Warringah|North Balgowlah", "Wentworth|Vaucluse"] },
     incLingiari: { lo: 0.2653, hi: 0.1414, med: 1834 },
     demoCob: { engTop: ["Pearce", 0.1817], indTop: ["Lalor", 0.1772],
                chnTop: ["Menzies", 0.1293], fowlerVnm: 0.1671 },
@@ -486,6 +520,45 @@ for (const [ys, w] of Object.entries(YEARS)) {
   // counts.demo.rows spans BOTH the booth rows and the cohort rows
   eq(demoRowCount + coDemoRows, w.demo.rows, tag("demo rows == booths + cohorts"));
   eq(coDemoRows, w.cohorts, tag("every cohort row carries demo"));
+  // booth-grain household medians (the 2026-10-31 median-lane add):
+  // every loinc-carrying row carries the band-interpolated median
+  // except the open-$4,000+-band set — a median beyond the grid's
+  // printed edge stays null, never an invented figure. Interp years
+  // pin the demoI lane to the nearest census side's own dollars.
+  {
+    let med = 0, medI = 0;
+    const openTop = [];
+    for (const b of d.booths) {
+      if (!(b.demo && b.demo.loinc != null)) continue;
+      if (b.demo.incMed != null) {
+        med++;
+        ok(b.demo.incMed >= 450 && b.demo.incMed <= 3999,
+           tag(`demo incMed range ${b.div}|${b.booth} ${b.demo.incMed}`));
+      } else openTop.push(`${b.div}|${b.booth}`);
+      if (b.demoI) {
+        ok(b.demoI.incMed == null ||
+           (b.demoI.incMed >= 450 && b.demoI.incMed <= 3999),
+           tag(`demoI incMed range ${b.div}|${b.booth} ${b.demoI.incMed}`));
+        if (b.demoI.incMed != null) medI++;
+      }
+    }
+    for (const c of d.cohorts) {
+      if (c.demo && c.demo.persons > 0)
+        ok(c.demo.incMed != null,
+           tag(`cohort demo incMed ${c.div} ${c.cohort}`));
+    }
+    eq(med, w.demoMed.booth, tag("booth incMed row count"));
+    eq(medI, w.demoMed.boothI, tag("booth demoI incMed row count"));
+    eq(openTop.sort(), w.demoMed.openTop, tag("open-top median nulls"));
+    if (w.demoMed.bondiDemo != null) {
+      const bd = byKey.get("Wentworth|Bondi");
+      eq(bd && bd.demo && bd.demo.incMed, w.demoMed.bondiDemo,
+         tag("Bondi incMed"));
+      if (w.demoMed.bondiDemoI != null)
+        eq(bd && bd.demoI && bd.demoI.incMed, w.demoMed.bondiDemoI,
+           tag("Bondi demoI incMed"));
+    }
+  }
   {
     const [div, booth, want] = w.demoMaxLang;
     const b = byKey.get(`${div}|${booth}`);

@@ -7,6 +7,8 @@ if (!base) { console.error("need base url, e.g. http://127.0.0.1:8123"); process
 console.log("probe build: 90s-arc-v2");
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"], protocolTimeout: 90000 });
 const page = await browser.newPage();
+page.on("pageerror", (e) => console.log(`PAGEERROR: ${e.message} :: ${(e.stack || "").split("\n").slice(1, 3).join(" <- ")}`));
+page.on("console", (msg) => { if (msg.type() === "error") console.log("CONSOLE:", msg.text().slice(0, 200)); });
 await page.setCacheEnabled(false);
 await page.setViewport({ width: 1200, height: 900 });
 const fails = [];
@@ -32,12 +34,14 @@ const opts = await page.evaluate(() => {
 const people = opts && opts.find((g) => g[0] === "People");
 ok("legend People optgroup exists", !!people, JSON.stringify(opts && opts.map((g) => g[0])));
 if (people) {
-  ok("People has 19 options (16 measures + Religion + Housing tenure + Ancestry)", people[1].length === 19, people[1].join(" | "));
+  // the 2026-10-31 Household-income lens folds the loinc/hiinc menu pair
+  // into one entry (-1), the median spectrum landing inside its picker
+  ok("People has 18 options (15 measures + Religion + Housing tenure + Ancestry)", people[1].length === 18, people[1].join(" | "));
   ok("Born overseas listed", people[1].some((t) => /born overseas/i.test(t)));
   ok("University educated listed", people[1].some((t) => /university/i.test(t)));
   ok("Blue-collar listed", people[1].some((t) => /blue-collar/i.test(t)));
-  ok("Lower income listed", people[1].some((t) => /lower-income household/i.test(t)));
-  ok("Higher income listed", people[1].some((t) => /high-income household/i.test(t)));
+  ok("Household income listed once", people[1].filter((t) => /household income/i.test(t)).length === 1, people[1].join(" | "));
+  ok("Household income sits where lower income sat (after Blue-collar)", /Blue-collar workers \| Household income/.test(people[1].join(" | ")), people[1].join(" | "));
   ok("Year 12 or less listed", people[1].some((t) => /year 12 or less/i.test(t)));
   ok("Indigenous Australians listed", people[1].some((t) => /indigenous/i.test(t)));
   ok("Children under 15 listed", people[1].some((t) => /children under 15/i.test(t)));
@@ -76,11 +80,16 @@ const loNow = await page.evaluate(async () => {
   await new Promise((r) => setTimeout(r, 500));
   return {
     sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    incv: (document.querySelector('select[data-opt="incv"]') || {}).value,
+    incvOpts: [...document.querySelectorAll('select[data-opt="incv"] option')].map((o) => o.textContent),
     note: (document.querySelector(".lg-note") || {}).textContent || "",
     aus: m.Y.now.areas && m.Y.now.areas.AUS && m.Y.now.areas.AUS.demo,
+    hash: location.hash,
   };
 });
-ok("#i=loinc selects loinc", loNow.sel === "loinc", loNow.sel);
+ok("#i=loinc aliases onto the Household-income lane", loNow.sel === "inc", loNow.sel);
+ok("alias picks the lower-income share view", loNow.incv === "lo", JSON.stringify(loNow.incvOpts));
+ok("alias rewrites the hash i=inc&iv=lo", /i=inc/.test(loNow.hash) && /iv=lo/.test(loNow.hash), loNow.hash);
 ok("now loinc legend names the cut in 2021 dollars", /Share of adults in households earning under \$1,079 a week \(2021 dollars\)/.test(loNow.note), loNow.note.slice(0, 160));
 // legend prints "The line marks Australia: 24.5%." — deriveAreas persons-
 // weights the division shares; assert the app pool matches that render
@@ -97,10 +106,11 @@ const hi2016 = await page.evaluate(async () => {
   await new Promise((r) => setTimeout(r, 500));
   return {
     sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    incv: (document.querySelector('select[data-opt="incv"]') || {}).value,
     note: (document.querySelector(".lg-note") || {}).textContent || "",
   };
 });
-ok("#i=hiinc selects hiinc", hi2016.sel === "hiinc", hi2016.sel);
+ok("#i=hiinc aliases onto the lens", hi2016.sel === "inc" && hi2016.incv === "hi", `${hi2016.sel}/${hi2016.incv}`);
 ok("2016 hiinc legend names $4,000 or more (census-year dollars)", /earning \$4,000 or more a week \(census-year dollars\)/.test(hi2016.note), hi2016.note.slice(0, 160));
 
 mark("section 2c done");
@@ -186,8 +196,8 @@ const y2010 = await page.evaluate(async () => {
 });
 ok("2010 basis is venue", y2010.basis === "venue", y2010.basis);
 ok("2010 legend cites the 2006 census", /2006 and 2011 censuses/.test(y2010.note), y2010.note.slice(0, 140));
-ok("2010 People optgroup carries the income lanes (18: no homeless lane yet on a 2010-era year, and Ancestry joined)",
-  y2010.people && y2010.people.length === 18 && y2010.people.includes("loinc") && y2010.people.includes("hiinc") && y2010.people.includes("anc") && !y2010.people.includes("hl"),
+ok("2010 People optgroup carries the income lens (17: one Household-income entry, no homeless lane yet, and Ancestry joined)",
+  y2010.people && y2010.people.length === 17 && y2010.people.includes("inc") && y2010.people.includes("anc") && !y2010.people.includes("loinc") && !y2010.people.includes("hl"),
   JSON.stringify(y2010.people));
 
 // 4c. an income deep link on 2010 shows the interp income copy: the
@@ -247,10 +257,98 @@ const booth = await page.evaluate(async () => {
 ok("2013 booth story uses 'census area it stands in'", /census area it stands in/.test(booth.story), `${booth.name}: ${booth.story.slice(0, 200)}`);
 ok("2013 booth facts show Origin and Education", /Origin/.test(booth.story) && /Education/.test(booth.story));
 ok("2013 booth facts show an Income row", /Income/.test(booth.story) && /households earning/.test(booth.story));
-ok("booth Income row has NO median (booths carry none)", !/median weekly household income/.test(booth.story));
+ok("booth Income row HAS a median (2026-10-31: the medinc booth lane lands on every income year)",
+  /median weekly household income is \$1,0|median weekly household income is \$\d/.test(booth.story), booth.story.match(/Income[\s\S]{0,220}/)?.[0]);
 ok("no story renders 'undefined'", !/undefined/.test(y2013.story) && !/undefined/.test(booth.story));
 
 mark("section 5 done");
+// 5m. the Household-income lens's median view (2026-10-31): the landing
+// measure on the merged lane — a $ spectrum, ticks and the national line
+// in dollars, census-year-dollar epochs, per-view hash, the share views
+// one picker away
+mark("median view");
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2025&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const med25 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[2025].ready;
+  await new Promise((r) => setTimeout(r, 600));
+  return {
+    sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    incv: (document.querySelector('select[data-opt="incv"]') || {}).value,
+    incvOpts: [...document.querySelectorAll('select[data-opt="incv"] option')].map((o) => o.textContent),
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    ticks: [...document.querySelectorAll(".lg-ticks span")].map((s) => s.textContent).join("|"),
+    hash: location.hash,
+    S: { index: m.S.index, incMode: m.S.incMode },
+  };
+});
+ok("#i=inc selects the Household-income lane", med25.sel === "inc" && med25.S.index === "inc", JSON.stringify(med25.S));
+ok("the median is the landing measure", med25.incv === "med" && med25.S.incMode === "med", med25.incv);
+ok("the picker offers median then the two share views", med25.incvOpts.length === 3 && /median household income/i.test(med25.incvOpts[0]) && /lower-income household/i.test(med25.incvOpts[1]) && /high-income household/i.test(med25.incvOpts[2]), med25.incvOpts.join(" | "));
+ok("the default med view leaves iv out of the hash", !/[?&]iv=/.test(med25.hash), med25.hash);
+ok("2025 median legend note names the epoch", /Median weekly household income \(2021 dollars\)/.test(med25.note), med25.note.slice(0, 160));
+ok("2025 median legend ticks price in dollars", /\$\d,\d/.test(med25.ticks), med25.ticks);
+ok("2025 median legend marks the national line", /The line marks Australia: \$1,801/.test(med25.note), med25.note.slice(-140));
+
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2013&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const med13 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[2013].ready;
+  await new Promise((r) => setTimeout(r, 600));
+  const i = m.Y[2013].byName.get("Watson");
+  m.select({ level: "div", st: m.Y[2013].divs[i].st, div: i });
+  await new Promise((r) => setTimeout(r, 600));
+  return {
+    note2: (document.querySelector(".lg-note") || {}).textContent || "",
+    story: (document.querySelector("#story") || document.body).innerText,
+  };
+});
+ok("2013 median legend names census-year dollars", /Median weekly household income \(census-year dollars\)/.test(med13.note2), med13.note2.slice(0, 160));
+ok("2013 median legend marks the 2011-census national line", /The line marks Australia: \$1,235/.test(med13.note2), med13.note2.slice(-140));
+ok("2013 Watson seat hed carries the median figure", /median household in Watson earns \$1,046 a week/.test(med13.story), med13.story.slice(0, 200));
+ok("2013 Watson dek names the national line in epoch dollars", /across Australia, households earn \$1,235 a week in census-year dollars/.test(med13.story), med13.story.slice(0, 400));
+
+// the picker idiom: swap to the lower-income share view through the SAME selects
+await page.evaluate(async () => {
+  const sel = document.querySelector('select[data-opt="incv"]');
+  sel.value = "lo";
+  sel.dispatchEvent(new Event("change", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 500));
+});
+const lo13 = await page.evaluate(() => ({
+  note: (document.querySelector(".lg-note") || {}).textContent || "",
+  hash: location.hash,
+}));
+ok("switching to the share view through the picker keeps the interp copy", /Share of adults in households earning under \$738–\$896 a week \(census-year dollars\)/.test(lo13.note), lo13.note.slice(0, 180));
+ok("the share view lands in the hash (iv=lo)", /iv=lo/.test(lo13.hash), lo13.hash);
+
+// the income lane never appears where its store has none
+const menuNow96 = await page.evaluate(async () => {
+  const m = window.__map;
+  m.setYear(1996);
+  await m.Y[1996].ready;
+  await new Promise((r) => setTimeout(r, 400));
+  const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
+  return [...g.querySelectorAll("option")].map((o) => o.value);
+});
+ok("1996 People menu omits Household income (income starts 2001)", !menuNow96.includes("inc"), JSON.stringify(menuNow96));
+await page.evaluate(async () => { const m = window.__map; m.setYear("nsw23"); await m.Y.nsw23.ready; await new Promise((r) => setTimeout(r, 400)); });
+const menuNsw = await page.evaluate(() => {
+  const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
+  const note = (document.querySelector(".lg-note") || {}).textContent || "";
+  return g ? { menu: [...g.querySelectorAll("option")].map((o) => o.value), note } : null;
+});
+// the today-arc's GCP income lanes on the seven state frames (d2a7dc7d) put
+// the Household-income entry on state menus too; the median view names the
+// places caveat until state-level booth medians land
+ok("nsw23 People menu carries Household income (state-frame income arc)",
+  menuNsw && menuNsw.menu.includes("inc"), JSON.stringify(menuNsw && menuNsw.menu));
+
+mark("median view done");
 // 5z. the Religion and Housing-tenure select lenses: the deep links open
 // straight on No religion and Owned-with-mortgage, a religious option swap
 // rides as rl= in the hash, and Wentworth's Jewish share is its own figure
@@ -445,19 +543,31 @@ mark("section 5z2 done");
 // 6. hover tooltip on an income lane names the income wording, never "undefined":
 // goDiv flies the seat into view, then a real pointer sweep over the canvas
 // lands on it (hitTest is not exported, so this must drive real mouse events).
-async function tipAfterHover(year, index) {
+async function tipAfterHover(year, incView) {
   const seatName = year === "now" ? "Grayndler" : "Watson";
-  await page.evaluate(async (yr, idx, nm) => {
+  await page.evaluate(async (yr, view, nm) => {
     const m = window.__map;
     m.setYear(yr);
     m.setLens("seifa");
     await m.Y[yr].ready;
     const sel = document.querySelector('select[data-opt="index"]');
-    sel.value = idx;
-    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    if (["med", "lo", "hi"].includes(view)) {
+      // a real pick through the merged income lane + its own measure picker
+      sel.value = "inc";
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      await new Promise((r) => setTimeout(r, 200));
+      if (view !== "med") {
+        const iv = document.querySelector('select[data-opt="incv"]');
+        iv.value = view;
+        iv.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    } else {
+      sel.value = view;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     await new Promise((r) => setTimeout(r, 400));
     m.goDiv(m.Y[yr].byName.get(nm), { fly: true, dur: 0 });
-  }, year, index, seatName);
+  }, year, incView, seatName);
   await wait(700);
   const grid = await page.evaluate(() => {
     const canvas = document.querySelector("canvas");
@@ -478,14 +588,14 @@ async function tipAfterHover(year, index) {
   }
   return found;
 }
-const tipNow = await tipAfterHover("now", "hiinc");
+const tipNow = await tipAfterHover("now", "hi");
 ok("now hiinc tip found over Grayndler", tipNow.length > 0, tipNow.slice(0, 140));
 ok("now hiinc tip has no 'undefined'", !/undefined/.test(tipNow), tipNow.slice(0, 140));
 const nowCuts = await page.evaluate(() => window.__map.Y.now.incomeCuts);
 ok("now hiinc tip names its cut in 2021 dollars",
   nowCuts && new RegExp(`%\\s+live in households earning \\$${nowCuts.hiEdgeWeekly.toLocaleString("en-AU")} or more a week in ${nowCuts.dollarsYear} dollars`).test(tipNow),
   tipNow.slice(0, 160));
-const tip2013 = await tipAfterHover(2013, "loinc");
+const tip2013 = await tipAfterHover(2013, "lo");
 ok("2013 loinc tip found over Watson", tip2013.length > 0, tip2013.slice(0, 140));
 ok("2013 loinc tip has no 'undefined'", !/undefined/.test(tip2013), tip2013.slice(0, 140));
 const cuts13 = await page.evaluate(() => window.__map.Y[2013].incomeCuts);

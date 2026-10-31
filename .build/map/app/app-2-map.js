@@ -12,6 +12,9 @@ function divValue(m, i) {
     case "cls": return d.cls || null;
     case "seifa": {
       if (!isDemo()) return nn(d.seifa[S.index] && d.seifa[S.index].dec);
+      // the income median prices divisions in dollars (no % scaling) —
+      // the pinned share idiom below stays backed by every other lane
+      if (incMed()) { const v = d.demo && d.demo.medIncWeekly; return v == null ? null : v; }
       const v = demoShare(d); return v == null ? null : 100 * v;
     }
   }
@@ -45,6 +48,8 @@ function boothValue(m, j) {
     case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
+      // the income median reads its own dollar lane, never a share cell
+      if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null; return v == null ? null : v; }
       if (isDemo()) { const v = demoBoothShare(b.raw, j, selPos(m)); return v == null ? null : 100 * v; }
       const arr = S.basis === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }
