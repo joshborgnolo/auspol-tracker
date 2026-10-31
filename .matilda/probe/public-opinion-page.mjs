@@ -47,6 +47,7 @@ const src = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", asset), "utf8")
 const topics = src.topics.filter((t) => t.blocks.length || t.more.length);
 const trackers = topics.flatMap((t) => t.blocks.filter((b) => b.kind === "tracker"));
 const cards = topics.flatMap((t) => t.blocks.filter((b) => b.kind !== "tracker"));
+const catalogueN = topics.reduce((n, t) => n + t.more.length, 0);
 const panels = trackers.reduce((n, c) => n + c.panels.length, 0);
 const finds = topics.filter((t) => t.finding).map((t) => t.finding.text);
 /* the levels a reader sees: a single question's, and each stack row on show */
@@ -77,7 +78,8 @@ for (const design of ["new", "old"]) {
         lines: [...q(".pubop-tracker")].map((t) => t.querySelectorAll("path.series-line").length),
         copyBtns: [...q(".pubop-tracker")].filter((t) => t.querySelector(".chart-copy-btn")).length,
         beside: [...q(".pubop-tracker")].map((t) => { const c = box(t.querySelector(".pubop-tchart")), l = box(t.querySelector(".pubop-latest")); return l.left >= c.right - 1 ? "beside" : l.top >= c.bottom - 1 ? "under" : "overlap"; }),
-        items: q(".pubop-item").length, levels: q(".pubop-level").length + [...q(".pubop-net")].filter((e) => e.textContent === "level").length,
+        items: q(".pubop-item").length, folded: q(".pubop-mi").length,
+        levels: q(".pubop-level").length + [...q(".pubop-net")].filter((e) => e.textContent === "level").length,
         rowLay: [...q(".pubop-item")].map((it) => { const l = box(it.querySelector(".pubop-il")), r = box(it.querySelector(".pubop-ir")); return r.left >= l.right - 1 ? "beside" : r.top >= l.bottom - 1 ? "under" : "overlap"; }),
         boxes: q(".pubop-card, .pubop-panel, .pubop-pgrid, .pubop-grid").length,
         unsourced: [...q(".pubop-item")].filter((c) => !c.querySelector(".pubop-src a[href]")).map((c) => c.querySelector(".pubop-q").textContent),
@@ -97,7 +99,7 @@ for (const design of ["new", "old"]) {
     if (m.lines.reduce((a, b) => a + b, 0) !== panels) fail(`${at}: tracker lines ${m.lines}, pollsters ${panels}`);
     if (m.copyBtns !== trackers.length) fail(`${at}: copy buttons on ${m.copyBtns}/${trackers.length} trackers`);
     if (m.beside.some((b) => b !== (w >= 900 ? "beside" : "under"))) fail(`${at}: latest list ${m.beside}`);
-    if (m.items !== cards.length) fail(`${at}: question rows ${m.items}/${cards.length}`);
+    if (m.items + m.folded !== cards.length + catalogueN) fail(`${at}: inline + folded questions ${m.items + m.folded}/${cards.length + catalogueN}`);
     if (w <= 640 && m.rowLay.some((r) => r !== "under")) fail(`${at}: a phone row is not stacked (${m.rowLay.join(",")})`);
     if (w >= 1024 && m.rowLay.some((r) => r !== "beside")) fail(`${at}: a wide row is stacked (${m.rowLay.join(",")})`);
     if (m.boxes) fail(`${at}: ${m.boxes} boxed card or panel element(s) left`);
@@ -112,11 +114,11 @@ for (const design of ["new", "old"]) {
          the page still fits its width with every item and fold open */
       const o = await page.evaluate(() => {
         document.querySelectorAll(".pubop-more, .pubop-mi, .pubop-cuts").forEach((d) => { d.open = true; });
-        const its = [...document.querySelectorAll(".pubop-mi")];
-        return { n: its.length, empty: its.filter((it) => !it.querySelector(".pubop-fig")).map((it) => it.querySelector(".pubop-mq").textContent),
-          figs: document.querySelectorAll(".pubop-mi .pubop-fig").length, sw: document.documentElement.scrollWidth,
-          trs: document.querySelectorAll(".pubop-mi .pubop-tr svg path.pubop-trl").length,
-          marks: [...document.querySelectorAll(".pubop-mi .pubop-fig")].map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
+        const its = [...document.querySelectorAll(".pubop-mi, .pubop-auto")];
+        return { n: its.length, empty: its.filter((it) => !it.querySelector(".pubop-fig")).map((it) => it.querySelector(".pubop-mq, .pubop-q").textContent),
+          figs: its.reduce((n, it) => n + it.querySelectorAll(".pubop-fig").length, 0), sw: document.documentElement.scrollWidth,
+          trs: its.reduce((n, it) => n + it.querySelectorAll(".pubop-tr svg path.pubop-trl").length, 0),
+          marks: its.flatMap((it) => [...it.querySelectorAll(".pubop-fig")]).map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
       });
       const moreN = topics.reduce((n, t) => n + t.more.length, 0);
       /* a traits series (tables segmented by leader pairing) draws as one grid of small charts */

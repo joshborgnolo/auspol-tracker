@@ -57,25 +57,25 @@ if (trip) {
     return !!g;
   }, { timeout: 20000 }, trip.house);
   await page.waitForFunction((h) => {
-    return document.querySelectorAll("#pubop-p-" + h + " li.pubop-wvh").length > 0;
+    return document.querySelectorAll("#pubop-p-" + h + " .pubop-wvh").length > 0;
   }, { timeout: 20000 }, trip.house);
 
   const got = await page.evaluate((t) => {
     const g = document.getElementById("pubop-p-" + t.house);
-    const li = [...g.querySelectorAll("li.pubop-wvh")];
-    const allLi = [...g.querySelectorAll(".pubop-ml > li")];
+    const li = [...g.querySelectorAll(".pubop-wvh")];
+    const allLi = [...g.querySelectorAll(".pubop-ml > li, .pubop-auto")];
     const sortBtn = g.ownerDocument.querySelector('.pubop-sort-b[aria-pressed="true"]');
     return {
       hits: li.map((x) => ({
-        title: (x.querySelector(".pubop-mq") || {}).textContent || null,
-        open: !!(x.querySelector("details.pubop-mi") && x.querySelector("details.pubop-mi").open),
-        outerOpen: !!x.closest("details.pubop-more").open,
+        title: (x.querySelector(".pubop-mq, .pubop-q") || {}).textContent || null,
+        open: !x.querySelector("details.pubop-mi") || x.querySelector("details.pubop-mi").open,
+        outerOpen: !x.closest("details.pubop-more") || x.closest("details.pubop-more").open,
         tag: !!(x.querySelector(".pubop-wvh-t")),
       })),
       allCount: allLi.length,
       hitTops: li.filter((x) => !x.closest("details.pubop-more")).length,
       sortText: sortBtn ? sortBtn.textContent.trim() : null,
-      anyFlaggedOutsideHouse: !!document.querySelector("li.pubop-wvh:not(#pubop-p-" + t.house + " li.pubop-wvh)"),
+      anyFlaggedOutsideHouse: [...document.querySelectorAll(".pubop-wvh")].some((x) => !g.contains(x)),
     };
   }, trip);
   ok(got.hits.length > 0, "no wave-flagged rows");

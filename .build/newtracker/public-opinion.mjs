@@ -9,8 +9,10 @@
    2. FEATURES below picks, per topic, the trackers and cards that lead it,
       in reading order. A featured card names its store entries exactly
       (id, house, wave), so a store edit that drops one fails the build.
-   3. Everything else filed under a topic joins its "More questions" list,
-      newest first, with the figures as each wave printed them.
+   3. Everything else joins the topic's question catalogue (`more` in the
+      payload), with the figures as each wave printed them. The client
+      surfaces its newest questions automatically in issue/pollster views
+      and shows every question in recency order.
 
    Every number comes from the stores, read through one set of rules:
    - a card's main table is the all-voters one (Essential's "All voters"
@@ -1594,10 +1596,10 @@ function figuresOf(ws) {
 export function buildPublicOpinion(entries, { deff, rowKeys }) {
   const shown = entries.filter((e) => themeOf(e.id) !== "cut");
   const ix = makeIndex(shown);
-  /* a featured card takes its question-and-pollster pairs out of the topic's
-     list (a pollster's other waves of the question with them), and must
-     feature only questions filed under its own topic */
-  const used = new Set();
+  /* A card covers its question/pollster through the wave it represents.
+     Date-pinned comparisons must not swallow later imports of that same
+     question: those still join the automatically displayed catalogue. */
+  const used = new Map();
   const refsOf = (spec) => (spec.kind === "tracker" ? spec.series.map((s) => ({ id: s.id, house: s.house }))
     : spec.mode === "compare" ? spec.items.map((it) => it.ref) : [spec.ref]);
   const topics = THEMES.map((t) => {
@@ -1612,15 +1614,17 @@ export function buildPublicOpinion(entries, { deff, rowKeys }) {
       if (!b) throw new Error("beyond-the-vote: unknown block kind " + spec.kind);
       for (const ref of refsOf(spec)) {
         if (themeOf(ref.id) !== t.id) throw new Error("beyond-the-vote: " + ref.id + " is featured under " + t.id + " but filed under " + themeOf(ref.id));
-        used.add(ref.id + "|" + ix.find(ref).house);
+        const k = ref.id + "|" + ix.find(ref).house;
+        const through = ref.wave || "9999";
+        if (!used.has(k) || through > used.get(k)) used.set(k, through);
       }
       return b;
     });
     /* everything else filed here, by question and pollster, newest first */
     const more = new Map();
     for (const e of shown) {
-      if (themeOf(e.id) !== t.id || used.has(e.id + "|" + e.house)) continue;
       const k = e.id + "|" + e.house;
+      if (themeOf(e.id) !== t.id || (used.has(k) && e.waveDate <= used.get(k))) continue;
       if (!more.has(k)) more.set(k, []);
       more.get(k).push(e);
     }

@@ -6,7 +6,8 @@
    leads with its finding, charts its recurring question (one chart, a line
    per pollster, coloured by how the pollster asked), runs its questions as
    rows parted by hairlines (the question and its source on the left, the
-   answers on the right), and files everything else under "More questions".
+   answers on the right). New questions join those rows automatically;
+   only the older questions sit under "More questions". Recency shows all.
    No boxed cards and no chart per pollster: the 2026-10-18 redesign, the
    canvas's findings index and coloured lines (B) with its rows (A).
    The payload is the sidecar gen-data builds with public-opinion.mjs (the
@@ -752,9 +753,8 @@ const pubopCount = (trackers, items, more) => [
 ].filter(Boolean).join(" · ");
 /* ---- a topic: its number and name, its finding, then the evidence ---------- */
 function PubOpTopic({ t, n, houses }) {
-  const trackers = t.blocks.filter((b) => b.kind === "tracker");
-  const items = t.blocks.filter((b) => b.kind !== "tracker");
-  const count = pubopCount(trackers.length, items.length, t.more.length);
+  const g = pubopSplitKinds(pubopDated([t]));
+  const count = pubopCount(g.trackers.length, g.items.length, g.more.length);
   return (
     <section className="pubop-topic" id={"pubop-" + t.id} aria-labelledby={"pubop-h-" + t.id}>
       <div className="pubop-tk">
@@ -763,9 +763,9 @@ function PubOpTopic({ t, n, houses }) {
       </div>
       {t.finding ? <p className="pubop-hl">{t.finding.text}</p> : null}
       <p className="pubop-tdk">{t.dek}</p>
-      {trackers.map((c) => <PubOpTracker key={c.id} c={c} houses={houses} />)}
-      {items.length ? <div className="pubop-items">{items.map((c, i) => <PubOpItem key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
-      {t.more.length ? <PubOpMore label={"More questions on " + (t.about || t.title)} qs={t.more} houses={houses}
+      {g.trackers.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} />)}
+      <PubOpEntries entries={g.items} houses={houses} />
+      {g.more.length ? <PubOpMore label={"More questions on " + (t.about || t.title)} qs={g.more.map((e) => e.q)} houses={houses}
         meta={(q) => pubopHouse(q, houses) + " · " + pubopMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
     </section>
   );
@@ -790,11 +790,32 @@ function pubopDated(topics) {
   /* Array.prototype.sort is stable, so equal dates keep the topics' order */
   return all.sort((p, q) => (p.date < q.date ? 1 : p.date > q.date ? -1 : 0));
 }
-const pubopSplitKinds = (all) => ({
-  trackers: all.filter((e) => e.b && e.b.kind === "tracker"),
-  items: all.filter((e) => e.b && e.b.kind !== "tracker"),
-  more: all.filter((e) => e.q),
-});
+/* At least the six newest questions lead each issue/pollster, alongside
+   the curated pieces. Keep every question on the boundary date visible:
+   an incoming report must never be split arbitrarily at question six.
+   No wall clock or hand-picked ids: the next import takes its own place.
+   Recency is a complete chronology, with no editorial visibility gate. */
+const PUBOP_LATEST = 6;
+function pubopSplitKinds(all, chronological = false) {
+  const questions = all.filter((e) => e.q || e.b.kind !== "tracker");
+  const cutoff = questions[Math.min(PUBOP_LATEST, questions.length) - 1]?.date || "";
+  const entries = all.filter((e) => e.b || chronological || e.date >= cutoff);
+  return {
+    entries,
+    trackers: entries.filter((e) => e.b && e.b.kind === "tracker"),
+    items: entries.filter((e) => e.q || e.b.kind !== "tracker"),
+    more: all.filter((e) => e.q && !chronological && e.date < cutoff),
+  };
+}
+function PubOpEntries({ entries, houses, topics, wv }) {
+  if (!entries.length) return null;
+  return <div className="pubop-items">{entries.map((e, i) => {
+    const topic = topics ? e.t.short : null;
+    return e.q ? <PubOpQuestion key={e.q.id + "|" + e.q.house} m={e.q} houses={houses} topic={topic} wv={wv} />
+      : e.b.kind === "tracker" ? <PubOpTracker key={e.b.id} c={e.b} houses={houses} topic={topic} />
+      : <PubOpItem key={(e.b.id || "") + i} c={e.b} houses={houses} topic={topic} />;
+  })}</div>;
+}
 /* newest first: one group a month the pieces were last asked in */
 function pubopByMonth(topics) {
   const months = [];
@@ -805,7 +826,7 @@ function pubopByMonth(topics) {
   }
   return months.map((m) => {
     const title = PUBOP_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
-    return { id: "m-" + m.ym, title, moreLabel: "More questions from " + title, ...pubopSplitKinds(m.all) };
+    return { id: "m-" + m.ym, title, ...pubopSplitKinds(m.all, true) };
   });
 }
 /* by pollster: one group a pollster, the one with the most questions first,
@@ -840,8 +861,8 @@ function pubopByPollster(topics, houses) {
     lead: <p className="pubop-tdk">Charts and questions that set two or more pollsters side by side.</p>, ...pubopSplitKinds(several) });
   return groups;
 }
-/* a month or a pollster, run like a topic: its charts, its questions, then
-   its long tail behind a fold, every piece naming its topic; a long-tail
+/* A month or pollster runs in date order across charts and questions,
+   every piece naming its topic; an older-question
    line names its pollster too, where the group is not already one */
 function PubOpGroup({ g, houses, byHouse, wv }) {
   const topicOf = new Map(g.more.map((e) => [e.q, e.t]));
@@ -853,8 +874,7 @@ function PubOpGroup({ g, houses, byHouse, wv }) {
         {count ? <span className="pubop-tc">{count}</span> : null}
       </div>
       {g.lead || null}
-      {g.trackers.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} topic={e.t.short} />)}
-      {g.items.length ? <div className="pubop-items">{g.items.map((e, i) => <PubOpItem key={(e.b.id || "") + i} c={e.b} houses={houses} topic={e.t.short} />)}</div> : null}
+      <PubOpEntries entries={g.entries} houses={houses} topics wv={byHouse ? wv : null} />
       {g.more.length ? <PubOpMore label={g.moreLabel} qs={g.more.map((e) => e.q)} houses={houses} wv={wv}
         meta={(q) => topicOf.get(q).short + (byHouse ? "" : " · " + pubopHouse(q, houses)) + " · " + pubopDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
     </section>
@@ -996,12 +1016,14 @@ function PubOpSearch({ q, onQ }) {
   );
 }
 
-/* a long-tail question among the results, drawn the way its own list's open
-   row draws it, without the fold it lives behind there */
-function PubOpHitMore({ m, houses }) {
+/* The same question row serves automatic placement and search results. */
+function PubOpQuestion({ m, houses, topic, wv }) {
+  const hit = pubopHasWave(m, wv);
   return (
-    <article className="pubop-item pubop-hit">
+    <article className={"pubop-item pubop-auto" + (hit ? " pubop-wvh" : "")}>
       <div className="pubop-il">
+        {topic ? <p className="pubop-qt">{topic}</p> : null}
+        {hit ? <em className="pubop-wvh-t">this poll</em> : null}
         <h4 className="pubop-q">{m.title}</h4>
         <PubOpWaves q={m} houses={houses} />
       </div>
@@ -1059,7 +1081,7 @@ function PubOpResults({ q, hits, houses }) {
             </div>
             {trackers.map((c) => <PubOpTracker key={c.id} c={c} houses={houses} />)}
             {items.length ? <div className="pubop-items">{items.map((c, i) => <PubOpItem key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
-            {g.more.length ? <div className="pubop-items">{g.more.map((m) => <PubOpHitMore key={m.id + "|" + m.house} m={m} houses={houses} />)}</div> : null}
+            {g.more.length ? <div className="pubop-items">{g.more.map((m) => <PubOpQuestion key={m.id + "|" + m.house} m={m} houses={houses} />)}</div> : null}
           </section>
         );
       })}
@@ -1206,7 +1228,6 @@ function PublicOpinionBody() {
   if (!src) return <div className="pubop"><p className="pubop-note">Loading the questions…</p></div>;
   if (!topics.length) return <div className="pubop"><p className="pubop-note">No questions are on file yet.</p></div>;
   const houses = src.houses || {};
-  const more = topics.reduce((n, t) => n + t.more.length, 0);
   return (
     <div className="pubop">
       {!ql && <PubOpFindings topics={topics} onGo={onGo} />}
@@ -1219,8 +1240,9 @@ function PublicOpinionBody() {
           as a thin sliver until named apart.) */}
       <div className="pubop-tools"><PubOpSearch q={q} onQ={setQ} />{!ql && <PubOpSort sort={sort} onSort={setSort} />}</div>
       {!ql && <p className="pubop-scope">
-        {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {pubopWord(Object.keys(houses).length)} pollsters
-        {" "}since {pubopMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
+        {src.counts.questions} questions from {pubopWord(Object.keys(houses).length)} pollsters
+        {" "}since {pubopMonth(src.first)}. The newest questions appear automatically by issue and pollster; by recency shows every question, newest first.
+        {" "}Every figure names its pollster, its dates and its sample, and links to its source.
       </p>}
       {ql ? <PubOpResults q={dq.trim()} hits={hits} houses={houses} />
         : groups ? groups.slice(0, shown).map((g) => <PubOpGroup key={g.id} g={g} houses={houses} byHouse={sort === "pollster"} wv={jump && jump.wave} />)

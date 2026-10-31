@@ -6,8 +6,8 @@
    as it builds the page's sidecar (via public-opinion.mjs), and build.mjs's
    static article regroups from the same payload. themeOf THROWS on an unmapped
    id, so a new wave of the stores (or a new house) fails the build loudly
-   rather than landing silently unsorted: map a new id to a topic (it joins that
-   topic's "More questions" list until public-opinion.mjs features it) or to
+   rather than landing silently unsorted: map a new id to a topic (the page
+   automatically surfaces its newest questions alongside curated cards) or to
    "cut".
 
    "cut" is the editorial call that a question is not worth a reader's time on

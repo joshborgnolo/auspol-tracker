@@ -11,6 +11,9 @@
    Usage: node .build/test-public-opinion.mjs */
 import assert from "node:assert/strict";
 import path from "node:path";
+import fs from "node:fs";
+import vm from "node:vm";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { readStores, buildPublicOpinion, FEATURES, __test } from "./newtracker/public-opinion.mjs";
 import { THEMES, THEME_OF } from "./newtracker/adhoc-themes.mjs";
@@ -338,4 +341,51 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     assert.ok(bo.w.every((w) => entries.some((e) => e.house === bo.h && e.waveDate === w)), `${rk}: every anchor is a real store wave`);
   }
 }
-console.log("PASS: public opinion – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), findings (every branch), the long tail's tables (titles, packed readings, groups, waves, cuts), payload");
+// ---- automatic placement: exercise the actual client grouping rules -------------------
+{
+  const Babel = createRequire(import.meta.url)("./newtracker/vendor/babel-standalone.js");
+  const source = fs.readFileSync(path.join(ROOT, ".build/newtracker/assets/rd-public-opinion.jsx"), "utf8");
+  const ctx = vm.createContext({ window: {}, React: { memo: (f) => f, createElement: () => null } });
+  vm.runInContext(Babel.transform(source, { presets: ["react"] }).code, ctx);
+  const { pubopDated: dated, pubopSplitKinds: split, pubopByMonth: months, pubopByPollster: pollsters } = ctx;
+  const entries = readStores(ROOT);
+  const out = buildPublicOpinion(entries, { deff: 1.6 });
+  const all = dated(out.topics);
+  const midterms = (e) => e.q?.id === "us-midterms" && e.q.house === "essential";
+  const newestFirst = (es) => es.every((e, i) => !i || es[i - 1].date >= e.date);
+  const groups = [
+    split(dated([out.topics.find((t) => t.id === "trump-us")])),
+    pollsters(out.topics, out.houses).find((g) => g.id === "p-essential"),
+    months(out.topics).find((g) => g.entries.some(midterms)),
+  ];
+  for (const g of groups) {
+    assert.ok(g.entries.some(midterms), "US midterms is in the main display in every view");
+    assert.ok(!g.more.some(midterms), "US midterms is not also behind More");
+    assert.ok(newestFirst(g.entries), "main results run newest first across display kinds");
+  }
+  for (const gs of [months(out.topics), pollsters(out.topics, out.houses)]) {
+    const represented = gs.flatMap((g) => [...g.entries, ...g.more]);
+    assert.equal(represented.length, all.length, "every piece appears exactly once");
+    assert.equal(new Set(represented.map((e) => e.q || e.b)).size, all.length, "no duplicates across groups or folds");
+  }
+  assert.ok(months(out.topics).every((g) => !g.more.length), "recency never hides questions behind More");
+
+  // A future report's size and pollster do not affect promotion.
+  const recent = Array.from({ length: 9 }, (_, i) => ({ q: { id: "future-" + i }, date: "2027-01-20" }));
+  const old = { q: { id: "old" }, date: "2026-01-01" };
+  const selected = split([...recent, old]);
+  assert.equal(selected.items.length, 9, "the six-question threshold never splits a release date");
+  assert.equal(selected.more[0], old, "older questions remain available");
+  assert.equal(split([old]).items.length, 1, "a small topic has no unnecessary More fold");
+  assert.equal(split([]).entries.length, 0, "empty topics are safe");
+
+  // A card pinned to a historical wave must not consume its next import.
+  const pinned = entries.find((e) => e.id === "ai-opportunities-risks" && e.house === "essential" && e.waveDate === "2026-05-26");
+  const future = { ...pinned, waveDate: "2027-01-20", dateStart: "2027-01-18", dateEnd: "2027-01-20" };
+  const updated = buildPublicOpinion([...entries, future], { deff: 1.6 });
+  const tech = updated.topics.find((t) => t.id === "tech-society");
+  assert.ok(tech.more.some((q) => q.id === pinned.id && q.last === future.waveDate), "new wave survives a date-pinned card");
+  assert.ok(split(dated([tech])).items.some((e) => e.q?.id === pinned.id && e.date === future.waveDate), "new wave is automatically visible");
+  assert.equal(tech.blocks.find((b) => b.id === pinned.id).src.wave, pinned.waveDate, "historical card retains its intended comparison");
+}
+console.log("PASS: public opinion – figures, findings, payload, automatic placement in all views, complete release dates, later waves of pinned questions");

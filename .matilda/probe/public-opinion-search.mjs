@@ -117,7 +117,7 @@ for (const design of ["new", "old"]) for (const w of [390, 1440]) {
     scope: !!document.querySelector(".pubop > p.pubop-scope"),
     count: (document.querySelector(".pubop-rcount b") || {}).textContent || null,
     groups: [...document.querySelectorAll(".pubop-res .pubop-topic")].map((g) => g.querySelector("h3").textContent),
-    hits: [...document.querySelectorAll(".pubop-hit .pubop-q")].map((e) => e.textContent),
+    hits: [...document.querySelectorAll(".pubop-res .pubop-auto .pubop-q")].map((e) => e.textContent),
     none: !!document.querySelector(".pubop-none"),
     val: document.querySelector(".pubop-tools input").value,
     sw: document.documentElement.scrollWidth > document.documentElement.clientWidth,

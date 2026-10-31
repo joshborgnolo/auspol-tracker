@@ -74,7 +74,7 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
   if (P.groups[P.groups.length - 1] !== sev) fail(`${design}@${w} several not last`);
   if (own.length !== pollsters.size) fail(`${design}@${w} pollster groups ${own.length} v ${pollsters.size}`);
   const tot = P.groups.reduce((a, g) => [a[0] + g.trackers, a[1] + g.items, a[2] + g.more], [0, 0, 0]);
-  if (tot.join() !== [blocks.filter((b) => b.kind === "tracker").length, blocks.filter((b) => b.kind !== "tracker").length, nMore].join()) fail(`${design}@${w} pollster counts ${tot}`);
+  if (tot[0] !== nTr || tot[1] + tot[2] !== nIt + nMore) fail(`${design}@${w} pollster counts ${tot}`);
   for (const g of own) {
     if (g.houses.some((h) => h !== g.title)) fail(`${design}@${w} ${g.title} holds ${g.houses}`);
     if (g.also.some((a) => a !== "#pubop-p-several")) fail(`${design}@${w} ${g.title} also-link ${g.also}`);
@@ -108,15 +108,16 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
   });
   if (m.bw.join() !== pre.bw.join()) fail(`${design}@${w} tab widths moved ${pre.bw} -> ${m.bw}`);
   if (m.topics) fail(`${design}@${w} topics left in recency view`);
-  if (m.trackers !== nTr || m.items !== nIt || m.more !== nMore) fail(`${design}@${w} counts ${m.trackers}/${m.items}/${m.more} v ${nTr}/${nIt}/${nMore}`);
-  if (m.tags !== nTr + nIt) fail(`${design}@${w} topic tags ${m.tags}`);
+  if (m.trackers !== nTr || m.items !== nIt + nMore || m.more !== 0) fail(`${design}@${w} counts ${m.trackers}/${m.items}/${m.more} v ${nTr}/${nIt + nMore}/0`);
+  if (m.tags !== nTr + nIt + nMore) fail(`${design}@${w} topic tags ${m.tags}`);
   if (m.sw > m.cw) fail(`${design}@${w} sideways scroll ${m.sw}>${m.cw}`);
   if (m.txt) fail(`${design}@${w} NaN/undefined`);
   if (m.lines.some((n) => !n)) fail(`${design}@${w} tracker without lines ${m.lines}`);
   if (OUT) await page.screenshot({ path: `${OUT}/${design}-${w}-recent-top.png`, captureBeyondViewport: false });
   await page.evaluate(() => document.querySelectorAll(".pubop-mon")[1].scrollIntoView({ behavior: "instant" })); await sleep(300);
   if (OUT) await page.screenshot({ path: `${OUT}/${design}-${w}-recent-m2.png`, captureBeyondViewport: false });
-  // open a month's long tail and one row
+  // Only issue/pollster views fold older questions; recency shows every row.
+  await page.click(".pubop-sort-b:nth-child(2)"); await sleep(500);
   await page.evaluate(() => { const d = document.querySelector(".pubop-mon .pubop-more"); d.open = true; d.querySelector(".pubop-mi").open = true; d.scrollIntoView({ behavior: "instant" }); }); await sleep(300);
   if (OUT) await page.screenshot({ path: `${OUT}/${design}-${w}-recent-more.png`, captureBeyondViewport: false });
   const sw2 = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
