@@ -73,7 +73,7 @@ eq(c.national, {
     pres: 0.0377, orth: 0.0335, budd: 0.0211, isl: 0.0167, hind: 0.0057,
     jew: 0.005 },
   ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
-  loinc: 0.2502, hiinc: 0.1033, incMed: 786,
+  loinc: 0.2502, hiinc: 0.1033, hiqinc: 0.2503, incMed: 786,
   // the 2026-10-31 lanes arc (measured from the B 01/B 05A/B/B 28
   // prints — no children-ever-born table ships in the 2001 BCP, so
   // bigfam is ABSENT on this era's stores, as is homeless). The
@@ -87,8 +87,9 @@ eq(c.national, {
     lebanese: 0.0094 },
 }, "c0 national (2001 census anchors)");
 eq(d.incomeCuts, {
-  loQuantile: 0.25, loCutWeekly: 456.13, hiEdgeWeekly: 2000,
-  hiNationalShare: 0.103255, dollarsYear: 2001,
+  loQuantile: 0.25, loCutWeekly: 456.13,
+  hiQuantile: 0.75, hiQCutWeekly: 1432.72,
+  hiEdgeWeekly: 2000, hiNationalShare: 0.103255, dollarsYear: 2001,
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
 }, "c0 incomeCuts (2001 edition: $2,000+ top edge)");
@@ -172,7 +173,7 @@ eq(c1c.national, {
     pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193, hind: 0.0084,
     jew: 0.005 },
   ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
-  loinc: 0.25, hiinc: 0.0645, incMed: 1027,
+  loinc: 0.25, hiinc: 0.0645, hiqinc: 0.2474, incMed: 1027,
   // the 2026-10-31 lanes arc (2006 B 01 citizen, B 08 ancestry, B 23
   // children-ever-born, B 45 travel — 2049.0's homelessness estimates
   // start at the 2011 edition, so hl stays absent)
@@ -183,8 +184,9 @@ eq(c1c.national, {
     lebanese: 0.01 },
 }, "c1 national (2006 census anchors)");
 eq(c1.incomeCuts, {
-  loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
-  hiNationalShare: 0.065439, dollarsYear: 2006,
+  loQuantile: 0.25, loCutWeekly: 603.75,
+  hiQuantile: 0.75, hiQCutWeekly: 1851.91,
+  hiEdgeWeekly: 3000, hiNationalShare: 0.065439, dollarsYear: 2006,
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
 }, "c1 incomeCuts (2006 edition: $3,000+ top edge)");
@@ -218,22 +220,25 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     "demoInterp census nights");
   eq(d.demoInterp.f, sf._pcti.f, "demoInterp.f == seifa _pcti.f");
   eq(d.incomeCutsI, {
-    loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
-    hiNationalShare: 0.065439, dollarsYear: 2006,
+    loQuantile: 0.25, loCutWeekly: 603.75,
+    hiQuantile: 0.75, hiQCutWeekly: 1851.91,
+    hiEdgeWeekly: 3000, hiNationalShare: 0.065439, dollarsYear: 2006,
     adultsWeights: "data/income-dist.json",
     medianBasis: "households (shares are per-adult); hiinc pinned to " +
       "the nearest census side (hi edges differ across the blend's " +
       "editions)",
     sides: {
-      2001: { loCutWeekly: 456.13, dollarsYear: 2001,
+      2001: { loCutWeekly: 456.13, hiQCutWeekly: 1432.72,
+        dollarsYear: 2001,
         hiEdgeWeekly: 2000, hiNationalShare: 0.103255 },
-      2006: { loCutWeekly: 603.75, dollarsYear: 2006,
+      2006: { loCutWeekly: 603.75, hiQCutWeekly: 1851.91,
+        dollarsYear: 2006,
         hiEdgeWeekly: 3000, hiNationalShare: 0.065439 },
     },
   }, "2004 incomeCutsI = the nearest (2006) edge + both sides");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   for (const k of ["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc",
+    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc", "hiqinc",
     "pt", "noncit"]) {
     eq(d.counts.demoI.national[k],
       LN(c.national[k], c1c.national[k]), `demoI national ${k}`);
@@ -266,7 +271,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   const nc1b = new Map(c1.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   let bothNullC = 0, blendC = 0, keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
-    "blue", "age", "loinc", "hiinc", "incMed",
+    "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "atsci", "u15", "onepar", "rel", "ten",
     "pt", "noncit", "bigfam", "hl", "anc"]);
   for (const b of d.booths) {
@@ -279,7 +284,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     blendC++;
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
-      "atsci", "onepar", "loinc"]) {
+      "atsci", "onepar", "loinc", "hiqinc"]) {
       const a = b.demo && b.demo[k], x = fb.demo && fb.demo[k];
       if (a != null && x != null) {
         if (b.demoI[k] !== LN(a, x)) keyok = false;

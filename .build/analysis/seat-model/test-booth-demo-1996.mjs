@@ -125,6 +125,18 @@ for (let i = 0; i < ERAS.length; i++) {
 const nat96 = {
   persons: 17878649, langOther: 0.1556, fborn: 0.2342, uni: 0.1159,
   blue: 0.3439, age0_14: 0.2146, age65ov: 0.1202, u15: 0.2146,
+  cob: { uk: 0.0626, ind: 0.0045, chn: 0.0065, nzl: 0.017, phl: 0.0054,
+         vnm: 0.0088, zaf: 0.0032, ita: 0.0139, lka: 0.0027 },
+  cobDen: 17123395,
+  rel: { norel: 0.182, cath: 0.2963, angl: 0.2409, unch: 0.0824,
+         pres: 0.0417, orth: 0.0326, budd: 0.0123, isl: 0.0124,
+         hind: 0.0041, jew: 0.0049 },
+  relDen: 16190243,
+  ten: { mort: 0.2604, rent: 0.2838, own: 0.4254, rentPub: null },
+  tenDen: 6247299,
+  atsci: 0.0197, atsciD: 17878649,
+  onepar: 0.1393, oneparD: 4511391,
+  pt: 0.0876, noncit: 0.112,
 };
 const STORES = [
   ["data/booth-demo-1993-c1.json", 1993, 147, 8431, 6383, 2109, 1891, 157],
@@ -158,12 +170,17 @@ for (const [file, year, nDivs, nBooths, geo, near, miss, empty] of STORES) {
   // the place records (JS Object.keys() separates digit-keys out)
   eq(d.booths.map((b) => String(b.boothId)), yearPlacesKeys(year),
     `${year} booth order`);
-  // six-lane-only block doctrine
+  // six-lane-only block doctrine: blocks hold the era's own cohort
+  // portfolio, nothing more
+  const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
+    "uni", "blue", "u15", "age", "cob", "rel", "ten", "pt", "noncit",
+    "atsci", "onepar", "loinc", "hiinc", "hiqinc", "incMed"]);
   let crossKeys = 0, badShare = 0;
   for (const b of d.booths) {
     if (!b.demo) continue;
-    for (const k of ["loinc", "hiinc", "incMed", "cob", "rel", "ten",
-      "y12less", "atsci", "onepar"]) crossKeys += (k in b.demo);
+    for (const k of Object.keys(b.demo)) {
+      if (!CROSS_KEYS.has(k)) crossKeys++;
+    }
     for (const k of ["langOther", "fborn", "uni", "blue", "u15"]) {
       const x = b.demo[k];
       if (x != null && !(x >= 0 && x <= 1)) badShare++;

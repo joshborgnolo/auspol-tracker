@@ -61,7 +61,8 @@ ok(!("demoInterp" in d) && !("demoI" in d),
   ok(interp === 0, "no demoI rows anywhere (measured-only)");
 }
 eq(d.incomeCuts, {
-  loQuantile: 0.25, loCutWeekly: 456.13, hiEdgeWeekly: 2000,
+  loQuantile: 0.25, loCutWeekly: 456.13,
+  hiQuantile: 0.75, hiQCutWeekly: 1432.72, hiEdgeWeekly: 2000,
   hiNationalShare: 0.103255, dollarsYear: 2001,
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",
@@ -108,7 +109,13 @@ eq(c.national, {
     hind: 0.0057, jew: 0.005,
   },
   ten: { mort: 0.2783, rent: 0.2758, own: 0.4171, rentPub: 0.0472 },
-  loinc: 0.2502, hiinc: 0.1033, incMed: 786,
+  loinc: 0.2502, hiinc: 0.1033, hiqinc: 0.2503, incMed: 786,
+  pt: 0.0907, noncit: 0.1173,
+  anc: {
+    english: 0.3657, australian: 0.3876, irish: 0.1103, scottish: 0.031,
+    chinese: 0.032, italian: 0.0461, german: 0.0426, indian: 0.009,
+    filipino: 0.0075, dutch: 0.0155, vietnamese: 0.009, lebanese: 0.0094,
+  },
 }, "national == the 2004 lane's figure (same tally, same offshore drop)");
 // booth order == the venue store's
 {

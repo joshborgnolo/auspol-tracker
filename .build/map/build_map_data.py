@@ -277,7 +277,8 @@ def demo_cells(dm):
     return [dm["langOther"], round(a["65_74"] + a["75_84"] + a["85ov"], 4), round(a["20_24"] + a["25_34"], 4),
             dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc"),
             dm.get("y12less"), dm.get("atsci"), dm.get("u15"), dm.get("onepar"),
-            dm.get("pt"), dm.get("noncit"), dm.get("bigfam"), dm.get("hl")]
+            dm.get("pt"), dm.get("noncit"), dm.get("bigfam"), dm.get("hl"),
+            dm.get("hiqinc")]
 
 
 def cob_cells(dm, keys):
@@ -641,7 +642,7 @@ def build_year(year, hist, base2001):
                 # — medians don't pool, so it never joins a state aggregate
                 a18, a35, a75x = age_shares(dm.get("age"))
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
-                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "ageMed": age_median(dm.get("age")),
+                               "loinc": dc[6], "hiinc": dc[7], "hiqinc": dc[16], "medIncWeekly": dm.get("incMed"), "ageMed": age_median(dm.get("age")),
                                "a1824": a18, "a3554": a35, "a75": a75x, "cob": dd.get("cob"),
                                "y12less": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
                                "pt": dc[12], "noncit": dc[13], "bigfam": dc[14], "hl": dc[15],

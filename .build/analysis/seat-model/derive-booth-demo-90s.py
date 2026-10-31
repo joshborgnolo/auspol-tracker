@@ -23,6 +23,12 @@ does the blending and lands the demoI blocks in the measured store):
                        c1 = 1996 census → booth-demo-1996-c1.json
   e1998  (3 Oct 1998): c0 = 1996 census → booth-demo-1998.json
                        c1 = 2001 census → booth-demo-1998-c1.json
+                       income c0 = 1991 census →
+                           booth-demo-1998-inc91.json (the 1996
+                           edition prints no income table anywhere;
+                           the frame's income lanes interpolate
+                           1991↔2001 — derive-booth-demo-interp.py's
+                           incomeBlock picks this store up)
 
 A booth's demo block is the census's collection-district counts of the
 CD the venue sits in (PIP of the venue's lat/lon on the census-era
@@ -76,6 +82,7 @@ def _lib(name, path):
 hist = _lib("hist", "derive-booth-seifa-hist.py")
 fail = hist.fail
 hash16 = hist.hash16
+ilanes = _lib("ilanes", "income_lanes.py")
 d13 = _lib("d13", "derive-booth-demo-2013.py")
 STATE_ORDER = d13.STATE_ORDER
 BANDS = ("0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
@@ -99,6 +106,12 @@ STORES = (
      "booth-demo-1998.json"),
     (1998, 2001, "cd-2001-ced-1998set", "bcp-2001-cd-tally",
      "booth-demo-1998-c1.json"),
+    # 1998's income c0: the 1991-edition income store on the 1998
+    # frame — the 1996 edition its measured store sits on prints no
+    # income table at all, so the frame's income lanes interpolate
+    # 1991↔2001 (derive-booth-demo-interp.py's incomeBlock)
+    (1998, 1991, "cd-1991-ced-1998set", "bcp-1991-aurin-tally",
+     "booth-demo-1998-inc91.json"),
 )
 # the birthplace-country menu per census edition (the GCP-era doctrine
 # where the map's cob lane rides the measured census side of every
@@ -145,6 +158,15 @@ INC91_ANNUAL_EDGES = (
 INC_WEEK_EDGES = tuple((lo / WEEKS_PER_YEAR, None if hi is None else
                         hi / WEEKS_PER_YEAR) for lo, hi in INC91_ANNUAL_EDGES)
 
+# the era's income quantiles: the low lane rides the national 25th-
+# percentile cut, the HIGH lane the 75th-percentile (top-quartile)
+# cut — the edition-semantic quantile doctrine income_lanes.py runs
+# on the GCP-era grids; the era's own top edge ($150k+/yr) stays the
+# record's hiEdgeWeekly, but that open tail is never cuttable as a
+# share comparison across editions
+LO_QUANTILE = 0.25
+HI_QUANTILE = 0.75
+
 
 def cum_share_at(cell_counts, tot, edge_weekly):
     """The share of households lying at-or-below a weekly-dollars cut,
@@ -188,29 +210,45 @@ def inc_median_weekly(cell_counts, tot):
     return None
 
 
-def era_inc_cuts(hist, tot):
-    """The census-print's own national cuts record (loQuantile-0.25's
-    interpolated weekly cut, the open top band's edge, its national
-    share), where the era carries an income print at all — None on a
-    income-less edition (the 1996 AURIN workspace lists no household
-    income table anywhere in its b01..b32 layer set)."""
-    if tot <= 0 or sum(hist) <= 0:
-        return None
-    target = 0.25 * tot
+def era_cut_at(hist, tot, q):
+    """The q-quantile weekly cut of the era histogram, interpolated
+    piecewise-uniform inside the band it lands in (the same walk the
+    loQuantile-0.25 cut has always ridden); the era print's open top
+    band holds under a percent, so any q <= 0.99 lands in a closed
+    band. The era convention lands on the band's lo should a cut ever
+    sit on the open edge (never observed in the era's prints)."""
+    target = q * tot
     acc = 0.0
-    lo_cut = None
+    cut = None
     for n, (lo, hi) in zip(hist, INC_WEEK_EDGES):
         if n <= 0:
             continue
         nxt = acc + n
         if nxt >= target:
-            lo_cut = lo if hi is None else (
+            cut = lo if hi is None else (
                 lo + (hi - lo) * (target - acc) / n)
             break
         acc = nxt
+    return cut
+
+
+def era_inc_cuts(hist, tot):
+    """The census-print's own national cuts record (loQuantile-0.25's
+    interpolated weekly cut, hiQuantile-0.75's top-quartile cut — the
+    edition-semantic high lane the other era engines carry — the open
+    top band's edge, its national share), where the era carries an
+    income print at all — None on a income-less edition (the 1996
+    AURIN workspace lists no household income table anywhere in its
+    b01..b32 layer set)."""
+    if tot <= 0 or sum(hist) <= 0:
+        return None
+    lo_cut = era_cut_at(hist, tot, LO_QUANTILE)
+    hiq_cut = era_cut_at(hist, tot, HI_QUANTILE)
     hi_edge = INC_WEEK_EDGES[-1][0]
-    return {"loQuantile": 0.25,
+    return {"loQuantile": LO_QUANTILE,
             "loCutWeekly": round(lo_cut, 2) if lo_cut is not None else None,
+            "hiQuantile": HI_QUANTILE,
+            "hiQCutWeekly": round(hiq_cut, 2) if hiq_cut is not None else None,
             "hiEdgeWeekly": round(hi_edge, 2),
             "hiNationalShare": round(hist[-1] / tot, 6),
             "dollarsYear": 1991,
@@ -225,21 +263,25 @@ def era_inc_cuts(hist, tot):
 
 
 def inc_lanes_for(cell_counts, tot, cuts):
-    """(loinc, hiinc, incMed) for one CD sum or CD row against the
-    census decade's own national cuts; None all through on an
+    """(loinc, hiinc, hiqinc, incMed) for one CD sum or CD row against
+    the census decade's own national cuts; None all through on an
     income-less era or a household-universe-less row — never a zero."""
     if cuts is None or tot <= 0:
-        return None, None, None
+        return None, None, None, None
     lo = cum_share_at(cell_counts, tot, cuts["loCutWeekly"]) \
         if cuts["loCutWeekly"] is not None else None
     hi = cell_counts[-1] / tot if sum(cell_counts) > 0 else None
+    hiq = (1 - cum_share_at(cell_counts, tot, cuts["hiQCutWeekly"])) \
+        if cuts.get("hiQCutWeekly") is not None else None
     med = inc_median_weekly(cell_counts, tot)
     if hi is not None:
         hi = round(hi, 4)
     if lo is not None:
         lo = round(lo, 4)
+    if hiq is not None:
+        hiq = round(max(0.0, hiq), 4)
     med = int(round(med)) if med is not None else None
-    return lo, hi, med
+    return lo, hi, hiq, med
 
 
 def load_venues(year):
@@ -623,9 +665,10 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     buckets = ct_index(polys)
 
     # the income print's census-decade cuts: the whole-nation household
-    # histogram where the era prints income (1991 only of the three
-    # archived BCP editions); the 1996 CSV workspace carries no income
-    # table, so its era's income lane reads None from here on
+    # histogram where the era prints income (1991's annual-dollar
+    # family print; the 2001 BCP's B 30/B 31 tables through the shared
+    # engine — the 1996 CSV workspace carries no income table, so its
+    # era's income lane reads None from here on)
     nat_inc_hist = [0] * len(INC_WEEK_EDGES)
     nat_inc_tot = 0
     for r in people.values():
@@ -634,8 +677,86 @@ def build_store(year, census, alloc_name, tally_name, out_name):
             for i in range(len(INC_WEEK_EDGES)):
                 nat_inc_hist[i] += n[i]
         nat_inc_tot += r.get("incTot") or 0
-    era_inc = (era_inc_cuts(nat_inc_hist, nat_inc_tot)
-               if census == 1991 else None)
+    inc_map = None
+    nat_inc01 = None
+    if census == 1991:
+        era_inc = era_inc_cuts(nat_inc_hist, nat_inc_tot)
+    elif census == 2001:
+        # the 2004 lane's row fold over the same tally (derive-booth-
+        # demo-2001.py): the 13-row B 30/B 31 vectors fold neg/nil
+        # into band 0, the engine returns adults masses per CD
+        ad, nonfam = ilanes.income_factors()
+        inc_rows = {}
+        for code, r in people.items():
+            if not r.get("fiTot01"):
+                continue
+            fi, hh, mixraw = r["fiTot01"], r["hiTot01"], r["fiMix01"]
+            inc_rows[code] = (
+                [hh[0] + hh[1]] + hh[2:],
+                [fi[0] + fi[1]] + fi[2:],
+                [[mixraw[0 + k] + mixraw[4 + k] for k in range(4)]] +
+                [[mixraw[8 + g * 4 + k] for k in range(4)]
+                 for g in range(11)])
+        inc_map, inc_cut, inc_hishare, inc_hiqcut = ilanes.engine(
+            inc_rows, ilanes.INC_BANDS_01, ad, nonfam, "01")
+        era_inc = {
+            "loQuantile": ilanes.INC_LO_Q,
+            "loCutWeekly": inc_cut,
+            "hiQuantile": ilanes.INC_HI_Q,
+            "hiQCutWeekly": inc_hiqcut,
+            "hiEdgeWeekly": ilanes.INC_BANDS_01[-1][0],
+            "hiNationalShare": inc_hishare,
+            "dollarsYear": 2001,
+            "adultsWeights": "data/income-dist.json",
+            "medianBasis": "households (shares are per-adult)",
+        }
+        nat_inc01 = (
+            sum(v[0] for v in inc_map.values()),
+            sum(v[1] for v in inc_map.values()),
+            sum(v[2] for v in inc_map.values()),
+            sum(v[5] for v in inc_map.values()),
+            [sum(v[4][i] for v in inc_map.values())
+             for i in range(len(ilanes.INC_BANDS_01))],
+        )
+        print(f"income: B 30/B 31 CD, {len(inc_rows)} rows, "
+              f"national 25% cut ${inc_cut:.0f}/wk, 75% cut "
+              f"${inc_hiqcut:.0f}/wk; top band {inc_hishare:.4f} "
+              f"of adults")
+    else:
+        era_inc = None
+
+    def inc_pack(code, acc):
+        """(loinc, hiinc, hiqinc, incMed) for a venue row (code)
+        or a division accumulator (acc): the 1991 household print
+        reads the annual vector via inc_lanes_for; the 2001 store
+        the shared engine's adults masses against its own cuts."""
+        if census == 2001:
+            if acc is not None:
+                tsum, lo, hi, hiq, hhh = (acc["incT"], acc["incLo"],
+                                          acc["incHi"], acc["incHiQ"],
+                                          acc["incHH"])
+            else:
+                inc = (inc_map or {}).get(code)
+                if inc is None:
+                    return None, None, None, None
+                tsum, lo, hi, hiq, hhh = inc[0], inc[1], inc[2], \
+                    inc[5], inc[4]
+            if tsum <= 0:
+                return None, None, None, None
+            med = ilanes.band_median(
+                list(hhh) if not isinstance(hhh, list) else hhh,
+                ilanes.INC_BANDS_01)
+            return (round(lo / tsum, 4), round(hi / tsum, 4),
+                    round(hiq / tsum, 4),
+                    int(round(med)) if med is not None else None)
+        if acc is None:
+            r = people.get(code)
+            cell = (r.get("inc") if r else None) \
+                or [0] * len(INC_WEEK_EDGES)
+            tot = (r.get("incTot") if r else 0) or 0
+        else:
+            cell, tot = acc["inc"], acc["incTot"]
+        return inc_lanes_for(cell, tot, era_inc)
 
     # division sums over the alloc. Cohort fields ride the same names
     # as the tally records so lane_cohorts reads the aggregates with
@@ -654,6 +775,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "atsciN": 0, "atsciD": 0, "oneparN": 0, "oneparD": 0,
         "citz": 0, "ptn": 0, "ptot": 0, "ptns": 0,
         "inc": [0] * len(INC91_ANNUAL_EDGES), "incTot": 0,
+        "incT": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
+        "incHH": [0] * len(ilanes.INC_BANDS_01),
     })
     for code, dv in alloc.items():
         r = people.get(code)
@@ -676,6 +799,15 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         if r.get("inc") is not None:
             for i in range(len(INC91_ANNUAL_EDGES)):
                 acc["inc"][i] += r["inc"][i]
+        if census == 2001:
+            inc = inc_map.get(code)
+            if inc is not None:
+                acc["incT"] += inc[0]
+                acc["incLo"] += inc[1]
+                acc["incHi"] += inc[2]
+                acc["incHiQ"] += inc[5]
+                for i in range(len(ilanes.INC_BANDS_01)):
+                    acc["incHH"][i] += inc[4][i]
         cohort = lane_cohorts(r, census)
         if cohort is not None and cohort.get("cob") is not None:
             for k, v in cohort["cob"].items():
@@ -722,9 +854,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                     ls = lane_shares(lane_cohorts(r, census))
                     for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
                         d[lane_k] = ls[lane_k]
-                    d["loinc"], d["hiinc"], d["incMed"] = inc_lanes_for(
-                        r.get("inc") or [0] * len(INC_WEEK_EDGES),
-                        r.get("incTot") or 0, era_inc)
+                    d["loinc"], d["hiinc"], d["hiqinc"], \
+                        d["incMed"] = inc_pack(code, None)
                     _era_holes(d, census)
                 rec["demo"] = d
                 geo_hit += 1
@@ -740,8 +871,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         for lane_k in ("cob", "rel", "ten", "atsci", "onepar"):
             row[lane_k] = ls[lane_k]
         acc = divsum[name]
-        row["loinc"], row["hiinc"], row["incMed"] = inc_lanes_for(
-            acc["inc"], acc["incTot"], era_inc)
+        row["loinc"], row["hiinc"], row["hiqinc"], row["incMed"] = \
+            inc_pack(None, acc)
         _era_holes(row, census)
         divisions.append(row)
 
@@ -814,14 +945,25 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                    if nat["pers"] > 0 else None),
     })
     if era_inc is not None:
-        national["loinc"], national["hiinc"], national["incMed"] = \
-            inc_lanes_for(nat_inc_hist, nat_inc_tot, era_inc)
+        if census == 2001:
+            t01, lo01, hi01, hiq01, hhh01 = nat_inc01
+            if t01 > 0:
+                national["loinc"] = round(lo01 / t01, 4)
+                national["hiinc"] = round(hi01 / t01, 4)
+                national["hiqinc"] = round(hiq01 / t01, 4)
+                med01 = ilanes.band_median(hhh01, ilanes.INC_BANDS_01)
+                national["incMed"] = (int(round(med01))
+                                      if med01 is not None else None)
+        else:
+            national["loinc"], national["hiinc"], national["hiqinc"], \
+                national["incMed"] = inc_lanes_for(
+                    nat_inc_hist, nat_inc_tot, era_inc)
     _era_holes(national, census)
     about = (
         "Census-people basis store for the " + str(year) + " federal "
         "election (the " + str(census) + "-census side of the "
         "people-interp lane for that frame — "
-        "derive-booth-demo-90s.py's six-store output; "
+        "derive-booth-demo-90s.py's seven-store output; "
         "see its header). The people-smallest-area is a "
         + str(census) + "-census collection district: a booth's demo "
         "block is that CD's census counts pinned to the venue's "
@@ -866,13 +1008,25 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "and the train+bus traveller joins both columns of the "
         "pair). The citizenship lane (noncit) rides each era's "
         "australian-citizens counts over the whole residency. "
-        "Household income survives ONLY at the 1991 print, in "
-        "annual dollars (the 1996 BCP workspace lists no income "
-        "table): that era's loinc/hiinc/incMed lanes and its "
-        "incomeCuts record are weekly-equivalent conversions at "
-        "52.1758 wk/yr of household shares — household-basis, "
-        "never the GCP era's adult shares. The census's "
-        "ABS-filed balance classes named "
+        + (
+            "Household income rides this edition's own B 30/B 31 "
+            "family- and household-income tables through "
+            "income_lanes.py's shared engine (the same recipe the "
+            "2004-election lane runs on the same tally): the "
+            "store's loinc/hiqinc/hiinc shares and its incomeCuts "
+            "record are per-ADULT shares in 2001 dollars exactly as "
+            "the GCP-era fleet computes them, each quantile cut "
+            "interpolated inside its own band of the edition's "
+            "grid. The census's "
+            if census == 2001 else
+            "Household income survives ONLY at the 1991 print, in "
+            "annual dollars (the 1996 BCP workspace lists no income "
+            "table): that era's loinc/hiqinc/hiinc/incMed lanes and "
+            "its incomeCuts record are weekly-equivalent "
+            "conversions at "
+            "52.1758 wk/yr of household shares — household-basis, "
+            "never the GCP era's adult shares. The census's ")
+        + "ABS-filed balance classes named "
         "offshoreClass in the allocation file are dropped here "
         "entirely by ABS's own filing.")
     out = {

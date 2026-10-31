@@ -130,6 +130,23 @@ const d96 = JSON.parse(readFileSync("data/booth-demo-1996.json", "utf8"));
 const nat91 = {
   persons: 16841569, langOther: 0.1538, fborn: 0.2278, uni: 0.0861,
   blue: 0.3531, age0_14: 0.2235, age65ov: 0.1132, u15: 0.2235,
+  // the 1991 era's lane family complete since the people-fill and
+  // 82c1cb18 income landings: the cohort family plus loinc hiinc
+  // incMed and (2026-11-01) hiqinc, the edition-semantic quartile-paired
+  // high lane
+  cob: { uk: 0.0678, chn: 0.0048, nzl: 0.0167, phl: 0.0045,
+         vnm: 0.0074, zaf: 0.003, ita: 0.0155 },
+  cobDen: 16472403,
+  rel: { norel: 0.1437, cath: 0.3044, angl: 0.2655, unch: 0.0917,
+         pres: 0.0484, orth: 0.0314, budd: 0.0092, isl: 0.0097,
+         hind: null, jew: 0.0049 },
+  relDen: 15129527,
+  ten: { mort: 0.2668, rent: 0.2666, own: 0.4036, rentPub: 0.0563 },
+  tenDen: 5852195,
+  atsci: 0.0163, atsciD: 16307305,
+  onepar: 0.1285, oneparD: 4298710,
+  pt: 0.1091, noncit: 0.123,
+  loinc: 0.25, hiinc: 0.0051, hiqinc: 0.25, incMed: 699,
 };
 for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   [d93, 1993, 147, 8431, 6399, 2012, 1891, 141],
@@ -162,16 +179,22 @@ for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   // numeric order in JS — the file's own sequence is what follows)
   eq(d.booths.map((b) => String(b.boothId)), yearPlacesKeys(year),
     `${year} booth order follows the location store`);
-  // '90s-side blocks hold only the six GCP-era lanes — no income, cob,
-  // rel, ten, y12less, atsci, onepar surfaces anywhere
+  // '90s-side blocks hold the era's own cohort portfolio — the six
+  // GCP-era demo lanes plus the income four, cob/rel/ten cohorts, and
+  // the pt/noncit/atsci/onepar lanes the people-fill arc added; any
+  // key outside that portfolio is the leak the gate catches
+  const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
+    "uni", "blue", "u15", "age", "loinc", "hiinc", "incMed", "hiqinc",
+    "cob", "rel", "ten", "pt", "noncit", "atsci", "onepar"]);
   let shellKeys = 0, shellBad = 0, nulls = 0, shellDud = 0;
   for (const b of d.booths) {
     if (b.demo === null) {
       nulls++;
       continue;
     }
-    for (const k of ["loinc", "hiinc", "incMed", "cob", "rel", "ten",
-      "y12less", "atsci", "onepar"]) shellKeys += (k in b.demo);
+    for (const k of Object.keys(b.demo)) {
+      if (!CROSS_KEYS.has(k)) shellKeys++;
+    }
     for (const k of ["langOther", "fborn", "uni", "blue", "u15"]) {
       const x = b.demo[k];
       if (x == null) shellDud++;
@@ -184,7 +207,10 @@ for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   // census-era registry rows themselves population-free (i.e. a zero-
   // resident CD assignment, 12 such rows per frame — see
   // derive-booth-demo-90s.py's share() doctrine)
-  eq(nulls, miss + empty + 12, `${year} null-demo profile`);
+  // "+38": the venue registry rows whose era-CD assignment has a zero
+  // population — 38 such rows per frame since the 2026-10 location-
+  // history expansion (it was 12 before it); never invented
+  eq(nulls, miss + empty + 38, `${year} null-demo profile`);
   // divisions: exact-membership via the alloc's name space
   eq(d.divisions.map((x) => x.div).sort(),
     (year === 1993 ? a93 : a96).divisions.slice().sort(),
@@ -221,8 +247,9 @@ for (const [d, year, f, c1fn] of [
   const c1b = new Map(c1.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   let blend = 0, bothNull = 0, keyok = true;
   const ALLOWED = new Set(["persons", "cov", "age", "langOther",
-    "fborn", "uni", "blue", "u15", "loinc", "hiinc", "y12less", "atsci",
-    "onepar", "rel", "ten", "incMed"]);
+    "fborn", "uni", "blue", "u15", "loinc", "hiinc", "hiqinc",
+    "y12less", "atsci", "onepar", "rel", "ten", "incMed", "pt",
+    "noncit", "anc", "bigfam", "hl"]);
   for (const b of d.booths) {
     const fb = c1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

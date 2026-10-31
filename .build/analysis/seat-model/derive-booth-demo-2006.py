@@ -363,16 +363,16 @@ def income_rows06():
 
 
 def income06():
-    """the 2006-census income lanes: (per-CD engine map, nat cut,
+    """the 2006-census income lanes: (per-CD engine map, nat cuts,
     nat hi share) — see income_lanes.py for the recipe (mirrors the
     2011/GCP-era lanes; the $3,000+ top band is this edition's
     hi edge)."""
     ad, nonfam = income_factors()
-    inc, cut, his = income_engine(income_rows06(), INC_BANDS06,
-                                  ad, nonfam, "06")
-    print(f"income: B26/B28 CD, national 25% cut ${cut:.0f}/wk; "
-          f"top band {his:.4f} of adults")
-    return inc, cut, his
+    inc, cut, his, hiqcut = income_engine(income_rows06(), INC_BANDS06,
+                                          ad, nonfam, "06")
+    print(f"income: B26/B28 CD, national 25% cut ${cut:.0f}/wk, "
+          f"75% cut ${hiqcut:.0f}/wk; top band {his:.4f} of adults")
+    return inc, cut, his, hiqcut
 
 
 def bounded(num, den):
@@ -396,6 +396,7 @@ def income_shares(rec, bands=None):
     med = income_band_median(rec["incHH"]) if rec.get("incHH") else None
     return {"loinc": bounded(rec["incLo"], tsum),
             "hiinc": bounded(rec["incHi"], tsum),
+            "hiqinc": bounded(rec.get("incHiQ"), tsum),
             "incMed": round(med) if med is not None else None}
 
 
@@ -455,7 +456,7 @@ def shares(rec):
     return out
 
 
-def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
+def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
     """One election's store off the shared BCP table."""
     venue_path = VENUE[year]
     alloc_path = ALLOC[year]
@@ -492,7 +493,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
                                   "ten6": [0] * 6,
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
-                                  "incHi": 0.0,
+                                  "incHi": 0.0, "incHiQ": 0.0,
                                   "incHH": [0] * len(INC_BANDS06),
                                   "citz": 0,
                                   "mtw": {"n": 0, "t": 0, "ns": 0},
@@ -525,6 +526,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
             acc["incT"] += inc[0]
             acc["incLo"] += inc[1]
             acc["incHi"] += inc[2]
+            acc["incHiQ"] += inc[5]
             for i in range(len(INC_BANDS06)):
                 acc["incHH"][i] += inc[4][i]
         mk = r["mtw"]
@@ -572,6 +574,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
                 "ten6": list(row["ten6"]),
                 "famN": row["famN"], "famD": row["famD"],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHiQ": inc[5],
                     "incHH": list(inc[4])} if inc else {}),
                 "citz": row["citz"], "mtw": row["mtw"],
                 "ceb3": row["ceb3"], "cebns": row["cebns"],
@@ -603,7 +606,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
-        for k in ("incT", "incLo", "incHi"):
+        for k in ("incT", "incLo", "incHi", "incHiQ"):
             nat[k] += dv[k]
         for i in range(len(INC_BANDS06)):
             nat.setdefault("incHH", [0] * len(INC_BANDS06))
@@ -661,6 +664,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
                     for k in TEN_KEYS},
             "loinc": round(nat["incLo"] / nat["incT"], 4),
             "hiinc": round(nat["incHi"] / nat["incT"], 4),
+            "hiqinc": round(nat["incHiQ"] / nat["incT"], 4),
             "incMed": round(income_band_median(nat["incHH"])),
             "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
             "noncit": round(1 - nat["citz"] / nat["pers"], 4),
@@ -779,6 +783,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
         "incomeCuts": {
             "loQuantile": ilanes.INC_LO_Q,
             "loCutWeekly": inc_cut,
+            "hiQuantile": ilanes.INC_HI_Q,
+            "hiQCutWeekly": inc_hiqcut,
             "hiEdgeWeekly": INC_BANDS06[-1][0],
             "hiNationalShare": inc_hishare,
             "dollarsYear": 2006,
@@ -794,9 +800,10 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare):
 
 def main():
     sa1 = load_bcp()
-    inc_map, inc_cut, inc_hishare = income06()
+    inc_map, inc_cut, inc_hishare, inc_hiqcut = income06()
     for year in (2007, 2010):
-        out = build_year(year, sa1, inc_map, inc_cut, inc_hishare)
+        out = build_year(year, sa1, inc_map, inc_cut, inc_hishare,
+                         inc_hiqcut)
         c = out["counts"]
         op = ROOT / f"data/booth-demo-{year}.json"
         op.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n",

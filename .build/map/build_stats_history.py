@@ -298,7 +298,7 @@ def with_demo(doc, year):
         d['demo'] = {'lang': dc[0], 'a65': dc[1], 'a2034': dc[2],
                      'fborn': dc[3], 'uni': dc[4], 'blue': dc[5],
                      'p': dv.get('persons'),
-                     'loinc': dc[6], 'hiinc': dc[7],
+                     'loinc': dc[6], 'hiinc': dc[7], 'hiqinc': dc[16],
                      'medIncWeekly': dm.get('incMed'),
                      'ageMed': common.age_median(dm.get('age')),
                      'a1824': a18, 'a3554': a35, 'a75': a75x,
@@ -386,8 +386,12 @@ def with_demo(doc, year):
     # (the 1991-side frames ride it in 1991-era weekly-equivalent
     # dollars; eras whose print carries no household-income table keep
     # money-cut lanes null end to end)
-    if store.get('incomeCuts'):
-        cuts = dict(store['incomeCuts'])
+    # interp years echo the blended span record (incomeCutsI) — for
+    # 1998 the INCOME_SPAN record (the income-carrying 1991/2001
+    # editions) over the measured side's missing print — the measured
+    # record otherwise
+    if store.get('incomeCutsI') or store.get('incomeCuts'):
+        cuts = dict(store.get('incomeCutsI') or store['incomeCuts'])
         nat = store.get('counts', {}).get('national') or {}
         if nat.get('incMed') is not None:
             cuts['medWeekly'] = nat['incMed']

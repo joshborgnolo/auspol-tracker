@@ -137,10 +137,11 @@ def main():
             [[mixraw[8 + g * 4 + k] for k in range(4)]
              for g in range(11)])
     ad, nonfam = ilanes.income_factors()
-    inc_map, inc_cut, inc_hishare = ilanes.engine(
+    inc_map, inc_cut, inc_hishare, inc_hiqcut = ilanes.engine(
         inc_rows, INC_BANDS01, ad, nonfam, "01")
     print(f"income: B 30/B 31 CD, {len(inc_rows)} rows, national 25% "
-          f"cut ${inc_cut:.0f}/wk; top band {inc_hishare:.4f} of adults")
+          f"cut ${inc_cut:.0f}/wk, 75% cut ${inc_hiqcut:.0f}/wk; "
+          f"top band {inc_hishare:.4f} of adults")
     alloc_d = json.loads(ALLOC.read_text())
     alloc = alloc_d["alloc"]
     if alloc_d.get("unit") != "CD_CODE_2001":
@@ -170,7 +171,7 @@ def main():
                                   "ten01": [0] * 6,
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
-                                  "incHi": 0.0,
+                                  "incHi": 0.0, "incHiQ": 0.0,
                                   "incHH": [0] * len(INC_BANDS01),
                                   "cit01": 0,
                                   "tw01": [0] * 3,
@@ -208,6 +209,7 @@ def main():
             acc["incT"] += inc[0]
             acc["incLo"] += inc[1]
             acc["incHi"] += inc[2]
+            acc["incHiQ"] += inc[5]
             for i in range(len(INC_BANDS01)):
                 acc["incHH"][i] += inc[4][i]
         acc["cit01"] += r["cit01"]
@@ -265,10 +267,14 @@ def main():
         if rec.get("incT") is not None and rec["incT"] > 0:
             tsum = rec["incT"]
             lo, hi = rec["incLo"], rec["incHi"]
+            hiq = rec.get("incHiQ")
             s["loinc"] = round(lo / tsum, 4) if 0 <= lo / tsum <= 1 \
                 else None
             s["hiinc"] = round(hi / tsum, 4) if 0 <= hi / tsum <= 1 \
                 else None
+            s["hiqinc"] = (round(hiq / tsum, 4)
+                           if hiq is not None and 0 <= hiq / tsum <= 1
+                           else None)
             med = ilanes.band_median(rec["incHH"], INC_BANDS01) \
                 if rec.get("incHH") else None
             s["incMed"] = round(med) if med is not None else None
@@ -321,7 +327,7 @@ def main():
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
-        for k in ("incT", "incLo", "incHi"):
+        for k in ("incT", "incLo", "incHi", "incHiQ"):
             nat[k] += dv[k]
         for i in range(len(INC_BANDS01)):
             nat.setdefault("incHH", [0] * len(INC_BANDS01))
@@ -359,6 +365,7 @@ def main():
                 for k in TEN_KEYS},
         "loinc": round(nat["incLo"] / nat["incT"], 4),
         "hiinc": round(nat["incHi"] / nat["incT"], 4),
+        "hiqinc": round(nat["incHiQ"] / nat["incT"], 4),
         "incMed": round(ilanes.band_median(nat["incHH"], INC_BANDS01)),
         "pt": round(nat["tw01"][0] / (nat["tw01"][1]
                     - nat["tw01"][2]), 4),
@@ -396,7 +403,8 @@ def main():
                            "blue": None, "age": None,
                            "y12less": None, "atsci": None, "u15": None,
                            "onepar": None, "rel": None, "ten": None,
-                           "loinc": None, "hiinc": None, "incMed": None,
+                           "loinc": None, "hiinc": None, "hiqinc": None,
+                           "incMed": None,
                            "pt": None, "noncit": None, "anc": None}
         else:
             inc = inc_map.get(str(key))
@@ -417,6 +425,7 @@ def main():
                 "famN": r.get("fam01", [0] * 5)[2],
                 "famD": r.get("fam01", [0] * 5)[4],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHiQ": inc[5],
                     "incHH": list(inc[4])} if inc else {}),
                 "cit01": r.get("cit01"),
                 "tw01": r.get("tw01"),
@@ -558,6 +567,8 @@ def main():
         "incomeCuts": {
             "loQuantile": ilanes.INC_LO_Q,
             "loCutWeekly": inc_cut,
+            "hiQuantile": ilanes.INC_HI_Q,
+            "hiQCutWeekly": inc_hiqcut,
             "hiEdgeWeekly": INC_BANDS01[-1][0],
             "hiNationalShare": inc_hishare,
             "dollarsYear": 2001,

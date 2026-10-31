@@ -123,6 +123,7 @@ def sum_divisions(alloc, sa1, inc):
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "cobn": [0] * len(d13.COB_KEYS8),
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
+                                  "incq": 0.0,
                                   "incbh": [0.0] * len(d13.INC_BANDS14),
                                   "sch6": [0] * 6,
                                   "indig": 0, "indigDen": 0,
@@ -164,6 +165,7 @@ def sum_divisions(alloc, sa1, inc):
         acc["inct"] += ir[0]
         acc["incl"] += ir[1]
         acc["inch"] += ir[2]
+        acc["incq"] += ir[5]
         for i in range(len(d13.INC_BANDS14)):
             acc["incbh"][i] += ir[4][i]
         mk = r["mtw"]
@@ -191,7 +193,7 @@ def national_of(divsum):
             nat[k] += dv[k]
         for i, b in enumerate(d13.BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
-        for k in ("inct", "incl", "inch"):
+        for k in ("inct", "incl", "inch", "incq"):
             nat[k] += dv[k]
         nat.setdefault("incbh", [0.0] * len(d13.INC_BANDS14))
         for i in range(len(d13.INC_BANDS14)):
@@ -236,6 +238,8 @@ def national_of(divsum):
         if nat["inct"] else None,
         "hiinc": round(nat["inch"] / nat["inct"], 4)
         if nat["inct"] else None,
+        "hiqinc": round(nat["incq"] / nat["inct"], 4)
+        if nat["inct"] else None,
         "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
                     if nat_fbd > 0 else None)
                 for i, k in enumerate(d13.COB_KEYS8)},
@@ -267,7 +271,8 @@ def main():
     sa1 = d13.load_bcp()
     z_bcp = d13.zipfile.ZipFile(d13.BCP_ZIP)
     inc_fac, inc_nonfam = d13.income_factors()
-    inc, inc_cut, inc_hishare = d13.income_bcp(z_bcp, inc_fac, inc_nonfam)
+    inc, inc_cut, inc_hishare, inc_hiqcut = d13.income_bcp(
+        z_bcp, inc_fac, inc_nonfam)
     z_bcp.close()
     if set(inc) != set(sa1):
         fail("B01/B28 SA1 universes diverge")
@@ -278,10 +283,12 @@ def main():
     o13 = json.loads(d13.ROOT.joinpath(
         "data/booth-demo-2013.json").read_text(encoding="utf-8"))
     cut13 = o13["incomeCuts"]
-    if (round(inc_cut, 2), round(inc_hishare, 6)) != (
-            cut13["loCutWeekly"], cut13["hiNationalShare"]):
+    if (round(inc_cut, 2), round(inc_hishare, 6),
+            round(inc_hiqcut, 2)) != (
+            cut13["loCutWeekly"], cut13["hiNationalShare"],
+            cut13["hiQCutWeekly"]):
         fail(f"incomeCuts drift vs 2013 store: ({inc_cut:.2f}, "
-             f"{inc_hishare:.6f}) vs {cut13}")
+             f"{inc_hishare:.6f}, {inc_hiqcut:.2f}) vs {cut13}")
     nat13 = o13["counts"]["national"]
 
     locate, _polys, _nulls = hist.build_locate("sa1-2011")
@@ -330,6 +337,7 @@ def main():
                     "eduns": row["eduns"], "bluen": row["bluen"],
                     "occd": row["occd"], "pop15": row["pop15"],
                     "inct": ir[0], "incl": ir[1], "inch": ir[2],
+                    "incq": ir[5],
                     "incbh": list(ir[4]),
                     "sch6": list(row["sch6"]),
                     "indig": row["indig"],
@@ -455,6 +463,8 @@ def main():
             "incomeCuts": {
                 "loQuantile": d13.INC_LO_Q,
                 "loCutWeekly": inc_cut,
+                "hiQuantile": d13.INC_HI_Q,
+                "hiQCutWeekly": inc_hiqcut,
                 "hiEdgeWeekly": 4000,
                 "hiNationalShare": inc_hishare,
                 "dollarsYear": 2011,

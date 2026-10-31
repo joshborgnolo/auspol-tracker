@@ -392,16 +392,15 @@ const demoBoothCopy = (m) => (m.demoBasis === "sa1" ? DB.sa1Booth : demoCopy(m))
 // one income sentence for a seat or place facts list: both band shares,
 // then the household median, in the census year's own dollars; "" when
 // the place carries no income lane at all. Booth rows arrive as
-// {loinc, hiinc, medIncWeekly} from the demo tuple's cells and the
+// {loinc, hiqinc, medIncWeekly} from the demo tuple's cells and the
 // parallel medinc lane; seat rows arrive as the divId demo dict
 function incFact(m, dm) {
   if (!dm) return "";
-  const c = m.incomeCuts || {};
   const parts = [];
-  if (dm.loinc != null || dm.hiinc != null) {
+  if (dm.loinc != null || dm.hiqinc != null) {
     const pair = [];
     if (dm.loinc != null) pair.push(`${f0(100 * dm.loinc)}% of adults live in households earning ${incLoFrag(m)}`);
-    if (dm.hiinc != null) pair.push(`${f0(100 * dm.hiinc)}% in households earning ${mny(c.hiEdgeWeekly)} or more a week`);
+    if (dm.hiqinc != null) pair.push(`${f0(100 * dm.hiqinc)}% in households earning ${incHiQFrag(m)}`);
     parts.push(`${pair.join(", ")}${incEpoch(m)}`);
   }
   if (dm.medIncWeekly != null) parts.push(`the median weekly household income is ${mny(dm.medIncWeekly)}${incEpoch(m)}`);
@@ -781,7 +780,7 @@ function storyBooth(m, j) {
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
-  const incRow = dr ? incFact(m, { loinc: dr[6], hiinc: dr[7], medIncWeekly: raw.medinc ? raw.medinc[j] : null }) : "";
+  const incRow = dr ? incFact(m, { loinc: dr[6], hiqinc: dr[16], medIncWeekly: raw.medinc ? raw.medinc[j] : null }) : "";
   const origB = isCob() && raw.cob && raw.cob[j] ? raw.cob[j][m.cobPos[S.cob]] : null;
   const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${origB != null ? `${f0(100 * origB)}% ${COB_VERB[S.cob]}` : `${f0(100 * dr[3])}% ${DM_VERB.fborn}`}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}${dr[12] != null ? `, ${f0(100 * dr[12])}% ${DM_VERB.pt}` : ""}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}${dr[13] != null ? `<dt>Citizenship</dt><dd>${f0(100 * dr[13])}% ${DM_VERB.noncit}</dd>` : ""}${dr[14] != null ? `<dt>Children</dt><dd>${f0(100 * dr[14])}% ${DM_VERB.bigfam}</dd>` : ""}${dr[15] != null ? `<dt>Home</dt><dd>${f0(100 * dr[15])}% ${DM_VERB.hl}</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
   h += `<div class="st-sec"><h3>The neighbourhood <small>ABS census and SEIFA, national deciles</small></h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in.${isState() ? "" : " From 2016, where the AEC records it, “its voters” scores the areas its voters live in."}</p>${demoRows}</div>`;

@@ -121,7 +121,7 @@ function buildRamps() {
     seifa: seq(292, 0.15),
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
-      loinc: seq(20, 0.13), hiinc: seq(275, 0.12), incmed: seq(48, 0.14),
+      loinc: seq(20, 0.13), hiqinc: seq(275, 0.12), incmed: seq(48, 0.14),
       agemed: seq(86, 0.14), a1824: seq(185, 0.13), a3554: seq(128, 0.14), a75: seq(26, 0.14),
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
@@ -190,7 +190,7 @@ const famEraOpts = (m) => FAMS.filter((f) => !(FAM_FORMED[f] && Number.isFinite(
 // DM's order is POSITIONAL against the booth demo cell tuple, so the two
 // income share lanes keep their slots here; the menu folds them into one
 // entry via DM_MENU below
-const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"];
+const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "hiqinc"];
 // the Household-income lens lane id: its block sits below with the other
 // select lenses — declared early because the menu fold needs it
 const LENS_INC = "inc";
@@ -199,9 +199,9 @@ const LENS_AGE = "age";
 // the menu's People list: DM in order, the two income shares folded into
 // the Household-income entry where loinc sat, the two age-band reads
 // folded into the Age entry where a65 sat
-const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "a65") { ks.push(LENS_AGE); continue; } if (k === "a2034") continue; if (k === "loinc") { ks.push(LENS_INC); continue; } if (k !== "hiinc") ks.push(k); } return ks; })();
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", age: "Age", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", age: "Age", fborn: "Born overseas", uni: "University", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
+const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "a65") { ks.push(LENS_AGE); continue; } if (k === "a2034") continue; if (k === "loinc") { ks.push(LENS_INC); continue; } if (k !== "hiinc" && k !== "hiqinc") ks.push(k); } return ks; })();
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", age: "Age", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", hiqinc: "Adults in the top income quarter", hiqinc: "Adults in the top income quarter", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", age: "Age", fborn: "Born overseas", uni: "University", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", hiqinc: "Top income quarter", hiqinc: "Top income quarter", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
 const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families", pt: "of employed people travelled to work by public transport", noncit: "were not counted as Australian citizens", bigfam: "of women aged 15+ have had more than two children", hl: "were counted homeless in the ABS census estimate" };
 const DM_RANGE = { lang: [0, 60], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
 // the Religion and Housing-tenure select lenses: S.index is the menu
@@ -227,16 +227,16 @@ const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scot
 const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
 // the Household-income lane: S.index === "inc" and S.incMode the picked
 // measure — the median weekly household income spectrum lands by default;
-// the bottom-cut and $4,000+ shares (loinc/hiinc as their own menu lanes
-// until 2026-10-31) ride the same legend picker as the other views. The
-// shares name their own definitions: the year's national weekly cut in
-// the census year's dollars, as each year's incomeCuts record carries
-// them (2013 reads 2011 dollars, 2016 on 2021 dollars)
-const INC_MODES = ["med", "lo", "hi"];
-const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hi: "Adults in high-income households" };
-const INC_SHORT = { med: "Median income", lo: "Lower income", hi: "Higher income" };
-const INC_RANGE = { lo: [10, 45], hi: [0, 50] };
-const INC_TOP = { med: ["seats where households earn the most", "where they earn the least"], lo: ["seats where the most adults live in lower-income households", "with the fewest"], hi: ["seats where the most adults live in high-income households", "with the fewest"] };
+// the bottom-quartile and top-quartile shares ride the same legend picker
+// (loinc/hiqinc, each year's national 25th/75th-percentile cut computed
+// inside the edition's closed bands — edition-comparable by construction,
+// where the old edition-local top-band share hiinc was not; hiinc stays
+// in the stores as the record's raw top-band measure only)
+const INC_MODES = ["med", "lo", "hiq"];
+const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hiq: "Adults in the top income quarter" };
+const INC_SHORT = { med: "Median income", lo: "Lower income", hiq: "Top income quarter" };
+const INC_RANGE = { lo: [10, 45], hiq: [8, 60] };
+const INC_TOP = { med: ["seats where households earn the most", "where they earn the least"], lo: ["seats where the most adults live in lower-income households", "with the fewest"], hiq: ["seats where the most adults live in the top income quarter", "with the fewest"] };
 const isInc = () => S.index === LENS_INC;
 const incMed = () => isInc() && S.incMode === "med";
 const mny = (v) => (v == null ? "–" : `$${int(Math.round(v))}`);
@@ -252,10 +252,21 @@ const incLoFrag = (m) => {
   }
   return `under ${mny(m.incomeCuts && m.incomeCuts.loCutWeekly)} a week`;
 };
+// the hiq lane's own fragment, the lo lane's idiom: for the quartile
+// cut each year's record carries its edition's interpolation; blend
+// years name the range their sides span
+const incHiQFrag = (m) => {
+  const s = m.incomeCuts && m.incomeCuts.sides;
+  if (m.demoInterp && s) {
+    const cuts = Object.keys(s).sort().map((y) => s[y].hiQCutWeekly);
+    return cuts[0] === cuts[1] ? `${mny(cuts[0])} or more a week` : `${mny(Math.min(...cuts))}–${mny(Math.max(...cuts))} or more a week`;
+  }
+  return `${mny(m.incomeCuts && m.incomeCuts.hiQCutWeekly)} or more a week`;
+};
 const incEpoch = (m) => (m.demoInterp ? " in census-year dollars" : incDollars(m));
 const INC_VERB = {
   lo: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
-  hi: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
+  hiq: (m) => `live in households earning ${incHiQFrag(m)}${incEpoch(m)}`,
 };
 // the Age lens: S.index === "age" and S.ageMode the picked measure — the
 // median-age spectrum lands; the two aged-band reads that were their own
@@ -311,7 +322,7 @@ const isAnc = () => S.index === LENS_ANC && S.anc != null;
 // the active people-lane figure of a division: a share as a fraction
 // (cob-aware, religion/tenure select-aware), or the income view's datum —
 // the median lane reads DOLLARS (medIncWeekly), the shares the band keys
-const INC_KEY = { med: "medIncWeekly", lo: "loinc", hi: "hiinc" };
+const INC_KEY = { med: "medIncWeekly", lo: "loinc", hiq: "hiqinc" };
 const demoShare = (d) => {
   if (isCob()) return d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   if (isRel()) return d.demo && d.demo.rel ? d.demo.rel[S.rel] : null;
@@ -339,9 +350,9 @@ const demoBoothShare = (raw, j, pos) => {
   if (isRel()) { const r = raw.rel && raw.rel[j]; return r ? r[pos[S.rel]] : null; }
   if (isTen()) { const r = raw.ten && raw.ten[j]; return r ? r[pos[S.ten]] : null; }
   if (isAnc()) { const r = raw.anc && raw.anc[j]; return r ? r[pos[S.anc]] : null; }
-  // income: the share views ride the demo tuple's cells 6/7; the median
+  // income: the share views ride the demo tuple's cells 6/16; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
-  if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[S.incMode === "lo" ? 6 : 7] : null; }
+  if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 16 }[S.incMode]] : null; }
   // age: a65/a2034 stay at the demo tuple's cells 1/2 like every GCP lane
   if (isAge()) {
     if (S.ageMode === "med") return null; // median is years: boothValue reads raw.ageMed
@@ -382,7 +393,7 @@ const incMedRange = (m) => {
   return r;
 };
 const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : S.index];
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc)
 const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : (m.cobPos || {}));
@@ -693,7 +704,7 @@ const S = {
   // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
   infMode: "informal",
   // the Household-income lens's measure: the median spectrum, or the lower- /
-  // higher-income household shares (an INC_MODES value; median lands)
+  // top-income-quarter shares (an INC_MODES value; median lands)
   incMode: "med",
   // the Age lens's measure: the median-age spectrum, or one of the share
   // views (an AGE_MODES value; median lands)
@@ -1178,7 +1189,7 @@ async function loadYear(year) {
     {
       const divs = res.divs || [];
       const any = (k) => divs.some((d) => d.demo && d.demo[k] != null);
-      m.hasLane = Object.fromEntries(DM.map((k) => [k, k === "loinc" || k === "hiinc" ? hasInc({ incomeCuts: res.incomeCuts }) : any(k)]));
+      m.hasLane = Object.fromEntries(DM.map((k) => [k, k === "loinc" || k === "hiinc" || k === "hiqinc" ? hasInc({ incomeCuts: res.incomeCuts }) : any(k)]));
       m.hasLane[LENS_INC] = m.hasLane.loinc;
       // the Advantage indexes joined with their era print only: IRSAD
       // debuts at the 2001-census SEIFA issue (its name, the four-index

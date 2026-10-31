@@ -84,7 +84,7 @@ def main():
         fail(f"{ALLOC.name}: {len(not_in_bcp)} allocated CDs absent "
              f"from the BCP, e.g. {not_in_bcp[:8]}")
 
-    inc_map, inc_cut, inc_hishare = d06.income06()
+    inc_map, inc_cut, inc_hishare, inc_hiqcut = d06.income06()
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * 11,
                                   "eng": 0, "oth": 0, "aus": 0,
                                   "totc": 0, "cobns": 0, "uni": 0,
@@ -97,7 +97,7 @@ def main():
                                   "ten6": [0] * 6,
                                   "famN": 0, "famD": 0,
                                   "incT": 0.0, "incLo": 0.0,
-                                  "incHi": 0.0,
+                                  "incHi": 0.0, "incHiQ": 0.0,
                                   "incHH": [0] * len(d06.INC_BANDS06),
                                   "citz": 0,
                                   "mtw": {"n": 0, "t": 0, "ns": 0},
@@ -126,6 +126,7 @@ def main():
             acc["incT"] += inc[0]
             acc["incLo"] += inc[1]
             acc["incHi"] += inc[2]
+            acc["incHiQ"] += inc[5]
             for i in range(len(d06.INC_BANDS06)):
                 acc["incHH"][i] += inc[4][i]
         mk = r["mtw"]
@@ -158,7 +159,7 @@ def main():
         for i in range(len(d06.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d06.REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
-        for k in ("incT", "incLo", "incHi"):
+        for k in ("incT", "incLo", "incHi", "incHiQ"):
             nat[k] += dv[k]
         for i in range(len(d06.INC_BANDS06)):
             nat.setdefault("incHH", [0] * len(d06.INC_BANDS06))
@@ -198,6 +199,7 @@ def main():
                 for k in d06.TEN_KEYS},
         "loinc": round(nat["incLo"] / nat["incT"], 4),
         "hiinc": round(nat["incHi"] / nat["incT"], 4),
+        "hiqinc": round(nat["incHiQ"] / nat["incT"], 4),
         "incMed": round(d06.income_band_median(nat["incHH"])),
         "pt": round(nat["mtw_n"] / (nat["mtw_t"] - nat["mtw_ns"]), 4),
         "noncit": round(1 - nat["citz"] / nat["pers"], 4),
@@ -246,6 +248,7 @@ def main():
                 "ten6": list(r["ten6"]),
                 "famN": r["famN"], "famD": r["famD"],
                 **({"incT": inc[0], "incLo": inc[1], "incHi": inc[2],
+                    "incHiQ": inc[5],
                     "incHH": list(inc[4])} if inc else {}),
                 "citz": r["citz"], "mtw": r["mtw"],
                 "ceb3": r["ceb3"], "cebns": r["cebns"],
@@ -323,6 +326,8 @@ def main():
         "incomeCuts": {
             "loQuantile": d06.ilanes.INC_LO_Q,
             "loCutWeekly": inc_cut,
+            "hiQuantile": d06.ilanes.INC_HI_Q,
+            "hiQCutWeekly": inc_hiqcut,
             "hiEdgeWeekly": d06.INC_BANDS06[-1][0],
             "hiNationalShare": inc_hishare,
             "dollarsYear": 2006,

@@ -239,7 +239,7 @@ def main():
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
                                   "ancP": 0, "ancNS": 0,
-                                  "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+                                  "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -283,10 +283,11 @@ def main():
         for i in range(len(gcp_newlanes.ANC_KEYS)):
             a["ancN"][i] += ancv[i]
         a["ancP"] += ancp
-        aud, lom, him, _med, bands_ad, hh = inc[code]
+        aud, lom, him, _med, bands_ad, hh, hiqm = inc[code]
         a["incAud"] += aud
         a["incLo"] += lom
         a["incHi"] += him
+        a["incHiQ"] += hiqm
         for ii in range(len(gcp_newlanes.INC_BANDS)):
             a["incBandH"][ii] += hh[ii]
         a["ancNS"] += ancns
@@ -339,6 +340,7 @@ def main():
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
             s["hiinc"] = round(a["incHi"] / a["incAud"], 4)
+            s["hiqinc"] = round(a["incHiQ"] / a["incAud"], 4)
             med = gcp_newlanes.band_median(a["incBandH"],
                                            gcp_newlanes.INC_BANDS)
             s["medIncWeekly"] = int(round(med)) if med is not None else None
@@ -365,7 +367,7 @@ def main():
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
               "ancP": 0, "ancNS": 0,
-              "incAud": 0.0, "incLo": 0.0, "incHi": 0.0,
+              "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "hlE": 0.0}
     for a in acc.values():

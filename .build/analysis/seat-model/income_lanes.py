@@ -36,6 +36,13 @@ while not (ROOT / ".git").exists():
     ROOT = ROOT.parent
 
 INC_LO_Q = 0.25  # low lane: adults below the national 25th percentile
+# the high lane is the edition-semantic mirror — adults AT-or-above the
+# national 75th-percentile (top-quartile) cut, interpolated inside the
+# closed band the cut lands in (the top open band holds <= 16% of
+# adults in every printed edition, so the quartile cut always sits in
+# an interior closed band; what makes it edition-comparable where the
+# top-band share never was)
+INC_HI_Q = 0.75
 # each edition's stated band grid, (lo, hi) inclusive; the top band's
 # hi is None (open). Negative/Nil households fold INTO the first band
 # (they ride the low tail); partial-stated and all-not-stated
@@ -50,10 +57,52 @@ INC_BANDS_06 = [(1, 149), (150, 249), (250, 349), (350, 499),
                 (2500, 2999), (3000, None)]
 # plausible windows for the national 25% cut, per edition dollars
 GUARD_LO = {"01": (380, 660), "06": (430, 720)}
+# plausible windows for the national 75% (top-quartile) cut — first
+# measured: 2001's lands at $1,432.72 in (1200,1499] (~24% of adults
+# at $1,500+, the $2,000+ top band's own 10.3%), right-skewed ~
+# 1.8x the edition's median
+GUARD_HIQ = {"01": (1200, 1700), "06": (1500, 2200)}
 # national adults share of the top open band (the 2001 top is a
 # $2,000+ cliff — 9.2% of households, ~10.3% of adults; 2006's $3,000+
 # reads 6.6% of adults vs 5.5% of households)
 GUARD_HI = {"01": (0.05, 0.14), "06": (0.01, 0.1)}
+
+
+def below_mass(masses, bands, cut):
+    """Household/adult mass at-or-below a weekly-dollars cut, the
+    cut's own band split linearly across it — the engine's
+    band-integral convention, once, a quantile cut's left side."""
+    acc = 0.0
+    for i, (lo, hi) in enumerate(bands):
+        if cut <= lo:
+            break
+        if hi is not None and cut > hi:
+            acc += masses[i]
+            continue
+        acc += masses[i] * (cut - lo) / (hi - lo + 1)
+        break
+    return acc
+
+
+def cut_at(masses, bands, q):
+    """The q-quantile weekly-dollars cut of a band histogram,
+    interpolated linearly inside the band it lands in; the cut landing
+    in the open top band is a data attack (raise, never a figure)."""
+    tot = sum(masses)
+    if tot <= 0:
+        raise SystemExit("income quantile cut over an empty histogram")
+    cum, cut = 0.0, None
+    for i, (lo, hi) in enumerate(bands):
+        cum += masses[i] / tot
+        if cum >= q:
+            prev = cum - masses[i] / tot
+            f = (q - prev) / (masses[i] / tot)
+            if hi is None:
+                raise SystemExit(
+                    f"income {q:.2f} cut lands in the open top band")
+            cut = lo + f * (hi - lo + 1)
+            break
+    return cut
 
 
 def income_factors():
@@ -90,9 +139,12 @@ def engine(rows, bands, ad, nonfam, era):
     (couple-no-children, couple-with-children, one-parent, other;
     neg/nil types likewise folded). Returns:
        per_area: {code: (adults_total, adults_lo_mass, adults_hi_mass,
-                         adults_band_masses, household_band_masses)}
+                         adults_band_masses, household_band_masses,
+                         adults_hiq_mass)}
        nat_cut:  the national 25% cut dollar (guarded per era)
        nat_hi:   the national adults top-band share (guarded)
+       nat_hiqcut: the national top-quartile (75%) cut dollar,
+                   interpolated inside its (always closed) band
     Guards fail loud (era-locked) so a drifted source never lands an
     implausible laneset."""
     nb = len(bands)
@@ -116,19 +168,15 @@ def engine(rows, bands, ad, nonfam, era):
                                  + (1 - nat_fams[i]) * nonfam)
                   for i in range(nb)]
     nat_tot = sum(nat_adults)
-    cum, cut = 0.0, None
-    for i, (lo, hi) in enumerate(bands):
-        cum += nat_adults[i] / nat_tot
-        if cum >= INC_LO_Q:
-            prev = cum - nat_adults[i] / nat_tot
-            f = (INC_LO_Q - prev) / (nat_adults[i] / nat_tot)
-            if hi is None:
-                raise SystemExit("income 25% cut lands in the open top band")
-            cut = lo + f * (hi - lo + 1)
-            break
+    cut = cut_at(nat_adults, bands, INC_LO_Q)
     glo, ghi = GUARD_LO[era]
     if not cut or not glo <= cut <= ghi:
         raise SystemExit(f"income 25% cut {cut} outside era guard {GUARD_LO[era]}")
+    hiqcut = cut_at(nat_adults, bands, INC_HI_Q)
+    gqh, gqhi = GUARD_HIQ[era]
+    if not gqh <= hiqcut <= gqhi:
+        raise SystemExit(f"income 75% cut {hiqcut} outside era guard "
+                         f"{GUARD_HIQ[era]}")
     hi_share = nat_adults[-1] / nat_tot
     gloh, ghih = GUARD_HI[era]
     if not gloh <= hi_share <= ghih:
@@ -145,18 +193,11 @@ def engine(rows, bands, ad, nonfam, era):
             fams = min(1.0, fi[i] / hh[i]) if hh[i] > 0 else nat_fams[i]
             bands_ad.append(hh[i] * (fams * famper + (1 - fams) * nonfam))
         tsum = sum(bands_ad)
-        lo_mass = 0.0
-        for i, (lo, hi) in enumerate(bands):
-            if cut <= lo:
-                continue
-            if hi is not None and cut > hi:
-                lo_mass += bands_ad[i]
-                continue
-            lo_mass += bands_ad[i] * (cut - lo) / (hi - lo + 1)
-            break
-        out[code] = (tsum, lo_mass, bands_ad[-1],
-                     tuple(bands_ad), tuple(hh))
-    return out, round(cut, 2), round(hi_share, 6)
+        out[code] = (tsum, below_mass(bands_ad, bands, cut),
+                     bands_ad[-1],
+                     tuple(bands_ad), tuple(hh),
+                     tsum - below_mass(bands_ad, bands, hiqcut))
+    return out, round(cut, 2), round(hi_share, 6), round(hiqcut, 2)
 
 
 def band_median(masses, bands):

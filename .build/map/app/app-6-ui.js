@@ -349,7 +349,7 @@ function legendHTML(m) {
         const incHouse = m.incomeCuts && m.incomeCuts.basis === "households";
         const incNote = incMed()
           ? `Median weekly household income${incEpochBrk}${incMedNote}`
-          : `${incHouse ? "Share of households" : "Share of adults in households"} earning ${S.incMode === "lo" ? incLoFrag(m) : `${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week`}${incEpochBrk}`;
+          : `${incHouse ? "Share of households" : "Share of adults in households"} earning ${S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m)}${incEpochBrk}`;
         // the Age family's per-view notes: the median names its band
         // interpolation, the 18–24 view admits its 15–19 estimate, and a
         // frame without the band dicts says why the new views are empty
@@ -1074,12 +1074,13 @@ function readURL() {
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
   const i = p.get("i");
-  // the loinc/hiinc and a65/a2034 menu ids pre-date the merged lenses: a
-  // legacy hash naming one lands on the lens with that share view picked
-  if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hi"; }
+  // the loinc/hiinc and a65/a2034 menu ids and the hi mode id pre-date
+  // the merged lenses and the top-quarter lane: a legacy hash naming
+  // one lands on the lens with its share view picked (hiq where hi sat)
+  if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hiq"; }
   else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i; }
   else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
-  const iv = p.get("iv"); S.incMode = iv === "lo" || iv === "hi" ? iv : (i === "loinc" ? "lo" : i === "hiinc" ? "hi" : "med");
+  const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";

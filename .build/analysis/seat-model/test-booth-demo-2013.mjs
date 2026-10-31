@@ -148,6 +148,7 @@ eq(d.counts.national, {
   age65ov: 0.1401,
   loinc: 0.2517,
   hiinc: 0.043,
+  hiqinc: 0.2449,
   cob: { ind: 0.0146, chn: 0.0157, nzl: 0.0237, phl: 0.0084,
     vnm: 0.0091, zaf: 0.0072, ita: 0.0091, lka: 0.0043 },
   incMed: 1235,
@@ -159,6 +160,11 @@ eq(d.counts.national, {
     pres: 0.0305, orth: 0.0308, budd: 0.0269, isl: 0.0242, hind: 0.014,
     jew: 0.005 },
   ten: { mort: 0.3581, rent: 0.3037, own: 0.3289, rentPub: 0.0416 },
+  pt: 0.0962, noncit: 0.1505, bigfam: 0.2769, hl: 0.0048,
+  anc: { english: 0.3614, australian: 0.3544, irish: 0.1042,
+    scottish: 0.0894, chinese: 0.0433, italian: 0.0458, german: 0.0448,
+    indian: 0.0196, filipino: 0.0112, dutch: 0.0167, vietnamese: 0.011,
+    lebanese: 0.0102 },
 }, "counts.national");
 
 // 4. division anchors (measured blocks; the demoI interp block has its
@@ -185,9 +191,14 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       jew: 0.0119 },
     ten: { mort: 0.2589, rent: 0.5793, own: 0.1567, rentPub: 0.0913 },
     onepar: 0.1116,
-    loinc: 0.2038, hiinc: 0.1164, incMed: 1730,
+    loinc: 0.2038, hiinc: 0.1164, hiqinc: 0.4245, incMed: 1730,
     cob: { ind: 0.0127, chn: 0.0603, nzl: 0.0347, phl: 0.0088,
       vnm: 0.0117, zaf: 0.0066, ita: 0.0061, lka: 0.0023 },
+    pt: 0.2822, noncit: 0.3511, bigfam: 0.0786, hl: 0.0133,
+    anc: { english: 0.2928, australian: 0.2218, irish: 0.1277,
+      scottish: 0.0856, chinese: 0.1397, italian: 0.0346, german: 0.0367,
+      indian: 0.0192, filipino: 0.0115, dutch: 0.013, vietnamese: 0.013,
+      lebanese: 0.0092 },
   }, "Sydney row");
   const M = divs.get("Melbourne");
   eq([M.persons, M.langOther, M.fborn, M.uni, M.blue,
@@ -210,9 +221,14 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       jew: 0.0005 },
     ten: { mort: 0.2692, rent: 0.5562, own: 0.1584, rentPub: 0.1849 },
     onepar: 0.1903,
-    loinc: 0.1977, hiinc: 0.0449, incMed: 1504,
+    loinc: 0.1977, hiinc: 0.0449, hiqinc: 0.2885, incMed: 1504,
     cob: { ind: 0.006, chn: 0.0011, nzl: 0.0169, phl: 0.0077,
       vnm: 0.002, zaf: 0.0032, ita: 0.0015, lka: 0.0008 },
+    pt: 0.0369, noncit: 0.1371, bigfam: 0.3088, hl: 0.1297,
+    anc: { english: 0.2229, australian: 0.2902, irish: 0.0709,
+      scottish: 0.0593, chinese: 0.0133, italian: 0.013, german: 0.0368,
+      indian: 0.0081, filipino: 0.01, dutch: 0.0124, vietnamese: 0.003,
+      lebanese: 0.0006 },
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
@@ -289,6 +305,8 @@ eq(d.divisions.reduce((t, x) => t + x.persons, 0),
 eq(d.incomeCuts, {
   loQuantile: 0.25,
   loCutWeekly: 738,
+  hiQuantile: 0.75,
+  hiQCutWeekly: 2386.71,
   hiEdgeWeekly: 4000,
   hiNationalShare: 0.044354,
   dollarsYear: 2011,
@@ -349,8 +367,9 @@ eq(d.incomeCuts, {
   eq(LI.demoI.incMed, 1504, "Lingiari demoI.incMed nearest side");
   let keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
-    "blue", "age", "loinc", "hiinc", "incMed",
-    "y12less", "atsci", "u15", "onepar", "rel", "ten"]);
+    "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
+    "y12less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
+    "bigfam", "hl", "anc"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   for (const b of d.booths) {
@@ -368,7 +387,7 @@ eq(d.incomeCuts, {
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     blended++;
     for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
-      "atsci", "u15", "onepar"]) {
+      "atsci", "u15", "onepar", "loinc", "hiqinc"]) {
       const a = b.demo && b.demo[k], fb = farB.get(`${b.div}|${b.boothId}`);
       const x = fb.demo && fb.demo[k];
       if (a != null && x != null) {

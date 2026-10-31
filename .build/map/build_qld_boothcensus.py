@@ -289,7 +289,7 @@ def demo_cells(year):
         citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
-        aud, lom, him, _med, _bands_ad, _hh = inc[code]
+        aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
@@ -298,6 +298,7 @@ def demo_cells(year):
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
                       safe(lom, aud), safe(him, aud),
+                      safe(hiqm, aud),
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),

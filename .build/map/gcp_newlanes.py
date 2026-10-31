@@ -303,6 +303,7 @@ INC_BANDS = [(1, 149), (150, 299), (300, 399), (400, 499), (500, 649),
              (3000, 3499), (3500, 3999), (4000, None)]
 _INC_HIGH_EDGE = 4000
 _INC_LO_Q = 0.25
+_INC_HI_Q = 0.75  # the HIGH lane's state-universe top-quartile cut
 _INC_CUT_GUARDS = {
     # measured 2026-10-31 from the first full runs (the cuts record
     # sits inside its band; a profile migration outside its own band
@@ -313,6 +314,13 @@ _INC_CUT_GUARDS = {
     "2": (820, 980),  # Vic
     "3": (700, 950),  # Qld, covering both of its census vintages
     "4": (700, 930),  # SA
+}
+# plausible windows for each universe's 75th-percentile (top-quartile)
+# cut, era-keyed like _INC_CUT_GUARDS above
+_INC_HIQ_GUARDS = {
+    "2021": {"1": (2900, 3600), "2": (2850, 3500),
+             "3": (2700, 3300), "4": (2400, 3100)},
+    "2016": {"3": (2200, 3000)},
 }
 _INC_SITES = {}
 
@@ -441,6 +449,21 @@ def state_income(gcp_zip, era, prefix):
     if cut is None or not gloQ <= cut <= ghiQ:
         _fail(f"state {prefix}: income 25% cut {cut} outside guard "
               f"{gloQ}..{ghiQ}")
+    cum, cut75 = 0.0, None
+    for i, (lo, hi) in enumerate(bands):
+        cum += nat_adults[i] / nat_tot
+        if cum >= _INC_HI_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (_INC_HI_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                _fail(f"state {prefix}: income 75% cut lands the open band")
+            cut75 = lo + f * (hi - lo + 1)
+            break
+    guq = _INC_HIQ_GUARDS.get(str(era), {}).get(prefix)
+    if cut75 is None or (guq is not None
+                         and not guq[0] <= cut75 <= guq[1]):
+        _fail(f"state {prefix}: income 75% cut {cut75} outside guard "
+              f"{guq}")
     hi_share = nat_adults[-1] / nat_tot
     if not 0.05 <= hi_share <= 0.25:
         _fail(f"state {prefix}: income top-band share {hi_share:.4f} "
@@ -465,6 +488,15 @@ def state_income(gcp_zip, era, prefix):
                 continue
             lo_mass += bands_ad[i] * (cut - lo) / (hi - lo + 1)
             break
+        hiq_mass = tsum
+        for i, (lo, hi) in enumerate(bands):
+            if cut75 <= lo:
+                break
+            if hi is not None and cut75 > hi:
+                hiq_mass -= bands_ad[i]
+                continue
+            hiq_mass -= bands_ad[i] * (cut75 - lo) / (hi - lo + 1)
+            break
         tot = sum(hh)
         med = None
         if tot > 0:
@@ -479,8 +511,9 @@ def state_income(gcp_zip, era, prefix):
                     break
                 acc = acc2
         out[code] = (tsum, lo_mass, bands_ad[-1], med,
-                     tuple(bands_ad), tuple(hh))
+                     tuple(bands_ad), tuple(hh), hiq_mass)
     cutrec = {"loQuantile": _INC_LO_Q, "loCutWeekly": round(cut, 2),
+              "hiQuantile": _INC_HI_Q, "hiQCutWeekly": round(cut75, 2),
               "hiEdgeWeekly": _INC_HIGH_EDGE,
               "hiNationalShare": round(hi_share, 6),
               "dollarsYear": int(era)}

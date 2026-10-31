@@ -366,6 +366,8 @@ INC_LO_Q = 0.25  # low lane: adults below the national 25th percentile
 # tail model; the label carries the real national share
 INC_HI_GUARD = (0.13, 0.19)  # national adults share of the top band
 INC_LO_GUARD = (900, 1250)  # plausible $ for the 2021 national 25% cut
+INC_HI_Q = 0.75  # the HIGH lane's national top-quartile cut
+INC_HIQ_GUARD = (2700, 3700)  # plausible $ for the 2021 national 75% cut
 XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
@@ -587,11 +589,24 @@ def income_gcp(z, factors, nonfam):
             break
     if not cut25 or not INC_LO_GUARD[0] <= cut25 <= INC_LO_GUARD[1]:
         fail(f"income 25% cut {cut25} outside guard {INC_LO_GUARD}")
+    cum, cut75 = 0.0, None
+    for i, (lo, hi) in enumerate(INC_BANDS):
+        cum += nat_adults[i] / nat_tot
+        if cum >= INC_HI_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (INC_HI_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                fail("income 75% cut lands in the open top band")
+            cut75 = lo + f * (hi - lo + 1)
+            break
+    if not cut75 or not INC_HIQ_GUARD[0] <= cut75 <= INC_HIQ_GUARD[1]:
+        fail(f"income 75% cut {cut75} outside guard {INC_HIQ_GUARD}")
     hi_share = nat_adults[-1] / nat_tot
     if not INC_HI_GUARD[0] <= hi_share <= INC_HI_GUARD[1]:
         fail(f"top-band national share {hi_share:.4f} outside {INC_HI_GUARD}")
-    print(f"income: national 25% cut ${cut25:.0f}/wk (adults, 2021 $); "
-          f"top band {hi_share:.4f} of adults")
+    print(f"income: national 25% cut ${cut25:.0f}/wk, 75% cut "
+          f"${cut75:.0f}/wk (adults, 2021 $); top band "
+          f"{hi_share:.4f} of adults")
 
     out = {}
     for code in g33:
@@ -614,19 +629,25 @@ def income_gcp(z, factors, nonfam):
             bands.append(tot * (fams * famper + (1 - fams) * nonfam))
             hh.append(tot)
         tsum = sum(bands)
-        lo_mass = 0.0
-        for i, (lo, hi) in enumerate(INC_BANDS):
-            if cut25 <= lo:
-                continue
-            if hi is not None and cut25 > hi:
-                lo_mass += bands[i]
-                continue
-            lo_mass += bands[i] * (cut25 - lo) / (hi - lo + 1)
-            break
-        out[code] = (tsum, lo_mass, bands[-1], tuple(bands), tuple(hh))
+
+        def below(cut):
+            mass = 0.0
+            for i, (lo, hi) in enumerate(INC_BANDS):
+                if cut <= lo:
+                    break
+                if hi is not None and cut > hi:
+                    mass += bands[i]
+                    continue
+                mass += bands[i] * (cut - lo) / (hi - lo + 1)
+                break
+            return mass
+
+        out[code] = (tsum, below(cut25), bands[-1],
+                     tuple(bands), tuple(hh),
+                     tsum - below(cut75))
     print(f"income: G32/G33 SA1, {len(out)} rows (factors from "
           f"data/income-dist.json)")
-    return out, round(cut25, 2), round(hi_share, 6)
+    return out, round(cut25, 2), round(hi_share, 6), round(cut75, 2)
 
 
 def read_p_cols(z, member, idcol, cols, rows_pin, tag):
@@ -846,7 +867,7 @@ def load_gcp21():
         extra[tag] = d
         print(f"GCP demo: {tag} SA1, {m} rows")
     ad4, nonfam, inc_path = income_factors()
-    inc, inc_cut, inc_hishare = income_gcp(z, ad4, nonfam)
+    inc, inc_cut, inc_hishare, inc_hiqcut = income_gcp(z, ad4, nonfam)
     nlt = new_lane_tables(z, era="2021")
     out = {}
     for code, r in base.items():
@@ -879,15 +900,19 @@ def load_gcp21():
         fam = nlt["G32"][code]
         out[code] = r + (f09[0], h09[0], h09[1],
                          e49[0] + e49[1] + e49[2], e49[3],
-                         o60[2] + o60[6] + o60[7], sum(o60)) + ir + (cob,) \
+                         o60[2] + o60[6] + o60[7], sum(o60)) \
+            + ir[:5] + (cob,) \
             + (y12t, indt, relvec, (relns, reltot), ten, fam) \
             + (nlt["G01c"][code][0], nlt["Gmtw"][code],
                nlt["Gceb"][code], nlt["G08"][code]) \
-            + (HL_ALLOC[2021].get(code, {}).get("e", 0.0),)
+            + (HL_ALLOC[2021].get(code, {}).get("e", 0.0),
+               ir[5])
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
-                  "loQuantile": INC_LO_Q, "dollarsYear": 2021,
+                  "loQuantile": INC_LO_Q,
+                  "hiQuantile": INC_HI_Q, "hiQCutWeekly": inc_hiqcut,
+                  "dollarsYear": 2021,
                   "factors": str(inc_path.relative_to(ROOT))})
     return _GCP
 
@@ -1090,7 +1115,7 @@ def demo_units(units21, gcp):
            "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
            "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
            "bluen": 0.0, "occd": 0.0,
-           "inct": 0.0, "incl": 0.0, "inch": 0.0,
+           "inct": 0.0, "incl": 0.0, "inch": 0.0, "incq": 0.0,
            "incb": [0.0] * len(INC_BANDS),
            "incbh": [0.0] * len(INC_BANDS),
            "cobN": [0.0] * len(COB_KEYS),
@@ -1106,6 +1131,7 @@ def demo_units(units21, gcp):
         aust = totc = cobns = uni = eduns = pop15 = 0.0
         bluen = occd = 0.0
         inct = incl = inch = 0.0
+        incq = 0.0
         bands = [0.0] * len(DEMO_BANDS)
         incb = [0.0] * len(INC_BANDS)
         incbh = [0.0] * len(INC_BANDS)
@@ -1133,6 +1159,7 @@ def demo_units(units21, gcp):
             inct += w * r[11]
             incl += w * r[12]
             inch += w * r[13]
+            incq += w * r[-1]
             for i in range(len(INC_BANDS)):
                 incb[i] += w * r[14][i]
                 incbh[i] += w * r[15][i]
@@ -1147,7 +1174,7 @@ def demo_units(units21, gcp):
                                       "eduns": 0.0, "pop15": 0.0,
                                       "bluen": 0.0, "occd": 0.0,
                                       "inct": 0.0, "incl": 0.0,
-                                      "inch": 0.0,
+                                      "inch": 0.0, "incq": 0.0,
                                       "incb": [0.0] * len(INC_BANDS),
                                       "incbh": [0.0] * len(INC_BANDS),
                                       "cobN": [0.0] * len(COB_KEYS),
@@ -1164,6 +1191,7 @@ def demo_units(units21, gcp):
                      ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             dv[k] += v
+        dv["incq"] += incq
         for i in range(len(INC_BANDS)):
             dv["incb"][i] += incb[i]
             dv["incbh"][i] += incbh[i]
@@ -1182,6 +1210,7 @@ def demo_units(units21, gcp):
                      ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             nat[k] += v
+        nat["incq"] += incq
         for i in range(len(INC_BANDS)):
             nat["incb"][i] += incb[i]
             nat["incbh"][i] += incbh[i]
@@ -1217,6 +1246,7 @@ def demo_units(units21, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "hiqinc": round(incq / inct, 4) if inct > 0 else None,
             "incMed": band_median(incbh) if inct > 0 else None,
             "cob": {k: (round(cobacc[i] / fb_den, 4)
                         if fb_den > 0 else None)
@@ -1298,7 +1328,7 @@ def demo_units_i(units, gcp):
            "bands": [0.0] * len(DEMO_BANDS), "aust": 0.0, "totc": 0.0,
            "cobns": 0.0, "uni": 0.0, "eduns": 0.0, "pop15": 0.0,
            "bluen": 0.0, "occd": 0.0,
-           "inct": 0.0, "incl": 0.0, "inch": 0.0,
+           "inct": 0.0, "incl": 0.0, "inch": 0.0, "incq": 0.0,
            "incbh": None,
            "newL": acc_new()}
     divs = {}
@@ -1312,6 +1342,7 @@ def demo_units_i(units, gcp):
         aust = totc = cobns = uni = eduns = pop15 = 0.0
         bluen = occd = 0.0
         inct = incl = inch = 0.0
+        incq = 0.0
         bands = [0.0] * len(DEMO_BANDS)
         incbh = None
         dvn = acc_new()
@@ -1336,6 +1367,7 @@ def demo_units_i(units, gcp):
             inct += w * r[11]
             incl += w * r[12]
             inch += w * r[13]
+            incq += w * r[-1]
             if len(r) > 15 and r[15] is not None:
                 if incbh is None:
                     incbh = [0.0] * len(INC_BANDS)
@@ -1351,7 +1383,8 @@ def demo_units_i(units, gcp):
                                       "eduns": 0.0, "pop15": 0.0,
                                       "bluen": 0.0, "occd": 0.0,
                                       "inct": 0.0, "incl": 0.0,
-                                      "inch": 0.0, "incbh": None,
+                                      "inch": 0.0, "incq": 0.0,
+                                      "incbh": None,
                                       "newL": acc_new()})
         dv["votes"] += tot
         dv["cov"] += cov
@@ -1365,6 +1398,7 @@ def demo_units_i(units, gcp):
                      ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             dv[k] += v
+        dv["incq"] += incq
         if incbh is not None:
             if dv["incbh"] is None:
                 dv["incbh"] = [0.0] * len(INC_BANDS)
@@ -1383,6 +1417,7 @@ def demo_units_i(units, gcp):
                      ("bluen", bluen), ("occd", occd),
                      ("inct", inct), ("incl", incl), ("inch", inch)):
             nat[k] += v
+        nat["incq"] += incq
         if incbh is not None:
             if nat["incbh"] is None:
                 nat["incbh"] = [0.0] * len(INC_BANDS)
@@ -1408,6 +1443,7 @@ def demo_units_i(units, gcp):
                     if bsum > 0 else None),
             "loinc": round(incl / inct, 4) if inct > 0 else None,
             "hiinc": round(inch / inct, 4) if inct > 0 else None,
+            "hiqinc": round(incq / inct, 4) if inct > 0 else None,
             "incMed": band_median(incbh) if incbh is not None else None,
             "u15": (round((bands[0] + bands[1]) / bsum, 4)
                     if bsum > 0 else None),
@@ -1430,7 +1466,7 @@ def gcp11():
     bcp = d13.load_bcp()
     z = zipfile.ZipFile(d13.BCP_ZIP)
     ad4, nonfam, inc_path = income_factors()
-    inc, cut, hishare = d13.income_bcp(z, ad4, nonfam)
+    inc, cut, hishare, hiqcut = d13.income_bcp(z, ad4, nonfam)
     z.close()
     if set(inc) != set(bcp):
         fail("B01/B28 SA1 universes diverge (gcp11)")
@@ -1456,10 +1492,12 @@ def gcp11():
                                  r["mtw"]["ns"]),
                      (r["ceb3"], r["cebns"], r["cebt"]),
                      (tuple(r["ancn"]), r["ancP"], r["ancns"]),
-                     r["hle"] or 0.0)
+                     r["hle"] or 0.0,
+                     ir[5])
     print(f"gcp11: BCP 2011 in the _GCP layout, {len(out)} SA1s")
     _GCP11 = (out, {"loCutWeekly": cut, "hiEdgeWeekly": 4000,
                     "hiNationalShare": hishare, "loQuantile": INC_LO_Q,
+                    "hiQuantile": INC_HI_Q, "hiQCutWeekly": hiqcut,
                     "dollarsYear": 2011,
                     "factors": str(inc_path.relative_to(ROOT))})
     return _GCP11
@@ -1491,8 +1529,8 @@ def blend_demo(c0blk, c1blk, f):
         and c0blk["persons"] is not None and c1blk["persons"] is not None
         else None}
     for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
-              "y12less", "atsci", "u15", "onepar", "pt", "noncit",
-              "bigfam", "hl"):
+              "hiqinc", "y12less", "atsci", "u15", "onepar", "pt",
+              "noncit", "bigfam", "hl"):
         out[k] = lane_blend(c0blk.get(k) if c0blk else None,
                             c1blk.get(k) if c1blk else None, f)
     a0 = c0blk.get("age") if c0blk else None
@@ -1540,6 +1578,8 @@ def div_block(dv, votes, incbh_medians=True):
         if dv["inct"] > 0 else None,
         "hiinc": round(dv["inch"] / dv["inct"], 4)
         if dv["inct"] > 0 else None,
+        "hiqinc": round(dv["incq"] / dv["inct"], 4)
+        if dv["inct"] > 0 else None,
         "incMed": (band_median(dv["incbh"])
                    if dv["incbh"] is not None else None),
         "u15": (round((dv["bands"][0] + dv["bands"][1]) / bsum, 4)
@@ -1569,6 +1609,8 @@ def nat_block(nat):
         if nat_inc > 0 else None,
         "hiinc": round(nat["inch"] / nat_inc, 4)
         if nat_inc > 0 else None,
+        "hiqinc": round(nat["incq"] / nat_inc, 4)
+        if nat_inc > 0 else None,
         "incMed": (band_median(nat["incbh"])
                    if nat["incbh"] is not None else None),
         **emit_new(nat["newL"]),
@@ -1591,6 +1633,8 @@ def interp_side(year, conf, c):
                       "hiEdgeWeekly": meta["hiEdgeWeekly"],
                       "hiNationalShare": meta["hiNationalShare"],
                       "loQuantile": meta["loQuantile"],
+                      "hiQuantile": meta["hiQuantile"],
+                      "hiQCutWeekly": meta["hiQCutWeekly"],
                       "dollarsYear": 2021})
     if c == 2016:
         gcp, meta = g.load_gcp16()
@@ -1599,7 +1643,10 @@ def interp_side(year, conf, c):
                 {"loCutWeekly": meta["loCutWeekly"],
                  "hiEdgeWeekly": meta["hiEdgeWeekly"],
                  "hiNationalShare": meta["hiNationalShare"],
-                 "loQuantile": meta["loQuantile"], "dollarsYear": 2016})
+                 "loQuantile": meta["loQuantile"],
+                 "hiQuantile": meta["hiQuantile"],
+                 "hiQCutWeekly": meta["hiQCutWeekly"],
+                 "dollarsYear": 2016})
     if c == 2011:
         gcp, meta = gcp11()
         return (*demo_units_i(_INTERP_UNITS[year], gcp),
@@ -1861,8 +1908,8 @@ def build(year):
         nbi = {}
         nb0, nb1 = nat_block(s0["nat"]), nat_block(s1["nat"])
         for k in ("langOther", "fborn", "uni", "blue", "age0_14",
-                  "age65ov", "loinc", "hiinc", "y12less", "atsci",
-                  "onepar", "pt", "noncit", "bigfam", "hl"):
+                  "age65ov", "loinc", "hiinc", "hiqinc", "y12less",
+                  "atsci", "onepar", "pt", "noncit", "bigfam", "hl"):
             nbi[k] = lane_blend(nb0.get(k), nb1.get(k), f)
         for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
                             ("anc", ANC_KEYS)):
@@ -1902,6 +1949,8 @@ def build(year):
         incuts_i = {
             "loQuantile": INC_LO_Q,
             "loCutWeekly": meta_i[near]["loCutWeekly"],
+            "hiQuantile": INC_HI_Q,
+            "hiQCutWeekly": meta_i[near]["hiQCutWeekly"],
             "hiEdgeWeekly": meta_i[near]["hiEdgeWeekly"],
             "hiNationalShare": meta_i[near]["hiNationalShare"],
             "dollarsYear": near,
@@ -1909,6 +1958,7 @@ def build(year):
             "medianBasis": "households (shares are per-adult)",
             "sides": {
                 str(c): {"loCutWeekly": meta_i[c]["loCutWeekly"],
+                         "hiQCutWeekly": meta_i[c]["hiQCutWeekly"],
                          "dollarsYear": c,
                          "hiNationalShare":
                              meta_i[c]["hiNationalShare"]}
@@ -2113,6 +2163,8 @@ def build(year):
                 if dv["inct"] > 0 else None,
             "hiinc": round(dv["inch"] / dv["inct"], 4)
                 if dv["inct"] > 0 else None,
+            "hiqinc": round(dv["incq"] / dv["inct"], 4)
+                if dv["inct"] > 0 else None,
             "cob": {k: (round(dv["cobN"][i] / fb_den, 4)
                         if fb_den > 0 else None)
                     for i, k in enumerate(COB_KEYS)},
@@ -2227,6 +2279,8 @@ def build(year):
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],
+            "hiQuantile": gcp_meta["hiQuantile"],
+            "hiQCutWeekly": gcp_meta["hiQCutWeekly"],
             "hiEdgeWeekly": gcp_meta["hiEdgeWeekly"],
             "hiNationalShare": gcp_meta["hiNationalShare"],
             "dollarsYear": gcp_meta["dollarsYear"],

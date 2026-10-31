@@ -441,8 +441,9 @@ for (const [ys, w] of Object.entries(YEARS)) {
   ok(d.demoBasis && d.demoBasis.includes("2021 Census GCP G01"), tag("demoBasis"));
   ok(d._about.includes("GCP G01"), tag("_about names GCP G01"));
   eq(d.incomeCuts, {
-    loQuantile: 0.25, loCutWeekly: 1078.87, hiEdgeWeekly: 4000,
-    hiNationalShare: 0.156571, dollarsYear: 2021,
+    loQuantile: 0.25, loCutWeekly: 1078.87,
+    hiQuantile: 0.75, hiQCutWeekly: 3225.97,
+    hiEdgeWeekly: 4000, hiNationalShare: 0.156571, dollarsYear: 2021,
     adultsWeights: "data/income-dist.json",
     medianBasis: "households (shares are per-adult)",
   }, tag("incomeCuts"));

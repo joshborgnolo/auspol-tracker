@@ -89,6 +89,7 @@ STATE_ORDER = d13.STATE_ORDER
 BANDS = d13.BANDS
 INC_BANDS = voter.INC_BANDS          # the 16-band GCP grid
 INC_LO_Q = voter.INC_LO_Q
+INC_HI_Q = voter.INC_HI_Q
 GCP_ZIP = SM / "cache/gcp-sa1-2016.zip"
 PRE = "2016 Census GCP Statistical Area 1 for AUST/"
 MEMBERS = {t: f"{PRE}2016Census_{t}_AUS_SA1.csv"
@@ -116,6 +117,7 @@ ALLOC_PERSONS_TOL = 300
 NAT_INCMED_2016 = 1438
 INC_LO_GUARD_2016 = (750, 1050)   # 2011 was $738, 2021 ~$1,066
 INC_HI_GUARD_2016 = (0.06, 0.13)  # 2011 .0444, 2021 ~.156
+INC_HIQ_GUARD_2016 = (2000, 2800)  # plausible $ for the 2016 75% cut
 
 OCC_AGES = ("15_19", "20_24", "25_34", "35_44", "45_54", "55_64",
             "65_74", "75_84", "85_ov")
@@ -221,7 +223,7 @@ def load_gcp16():
         return (sums[2] + sums[6] + sums[7]), sum(sums)
 
     ad4, nonfam, inc_path = voter.income_factors()
-    inc, inc_cut, inc_hishare = income_gcp16(z, ad4, nonfam)
+    inc, inc_cut, inc_hishare, inc_hiqcut = income_gcp16(z, ad4, nonfam)
     nlt = voter.new_lane_tables(z, idcol="SA1_7DIGITCODE_2016",
                               era="2016")
     if set(g01) != set(inc):
@@ -259,11 +261,13 @@ def load_gcp16():
                      nlt["G37"][code], nlt["G32"][code],
                      nlt["G01c"][code][0], nlt["Gmtw"][code],
                      nlt["Gceb"][code], nlt["G08"][code],
-                     HL_ALLOC.get(code, {}).get("e", 0.0))
+                     HL_ALLOC.get(code, {}).get("e", 0.0),
+                     ir[5])                        # hiq mass (tail)
     print(f"GCP 2016: {len(out)} SA1s "
           f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
             "hiNationalShare": inc_hishare, "loQuantile": INC_LO_Q,
+            "hiQuantile": INC_HI_Q, "hiQCutWeekly": inc_hiqcut,
             "dollarsYear": 2016, "factors": inc_path}
     return out, meta
 
@@ -355,12 +359,25 @@ def income_gcp16(z, ad, nonfam):
             break
     if not cut25 or not INC_LO_GUARD_2016[0] <= cut25 <= INC_LO_GUARD_2016[1]:
         fail(f"income 25% cut {cut25} outside guard {INC_LO_GUARD_2016}")
+    cum, cut75 = 0.0, None
+    for i, (lo, hi) in enumerate(INC_BANDS):
+        cum += nat_adults[i] / nat_tot
+        if cum >= INC_HI_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (INC_HI_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                fail("income 75% cut lands in the open top band")
+            cut75 = lo + f * (hi - lo + 1)
+            break
+    if not cut75 or not INC_HIQ_GUARD_2016[0] <= cut75 <= INC_HIQ_GUARD_2016[1]:
+        fail(f"income 75% cut {cut75} outside guard {INC_HIQ_GUARD_2016}")
     hi_share = nat_adults[-1] / nat_tot
     if not INC_HI_GUARD_2016[0] <= hi_share <= INC_HI_GUARD_2016[1]:
         fail(f"top-band national share {hi_share:.4f} outside "
              f"{INC_HI_GUARD_2016}")
-    print(f"income: national 25% cut ${cut25:.0f}/wk (adults, 2016 $); "
-          f"top band {hi_share:.4f} of adults")
+    print(f"income: national 25% cut ${cut25:.0f}/wk, 75% cut "
+          f"${cut75:.0f}/wk (adults, 2016 $); top band "
+          f"{hi_share:.4f} of adults")
 
     out = {}
     for code, r29 in t29.items():
@@ -379,17 +396,22 @@ def income_gcp16(z, ad, nonfam):
             bands.append(tot * (fams * famper + (1 - fams) * nonfam))
             hh.append(tot)
         tsum = sum(bands)
-        lo_mass = 0.0
-        for i, (lo, hi) in enumerate(INC_BANDS):
-            if cut25 <= lo:
-                continue
-            if hi is not None and cut25 > hi:
-                lo_mass += bands[i]
-                continue
-            lo_mass += bands[i] * (cut25 - lo) / (hi - lo + 1)
-            break
-        out[code] = (tsum, lo_mass, bands[-1], tuple(bands), tuple(hh))
-    return out, round(cut25, 2), round(hi_share, 6)
+
+        def below(cut):
+            mass = 0.0
+            for i, (lo, hi) in enumerate(INC_BANDS):
+                if cut <= lo:
+                    break
+                if hi is not None and cut > hi:
+                    mass += bands[i]
+                    continue
+                mass += bands[i] * (cut - lo) / (hi - lo + 1)
+                break
+            return mass
+
+        out[code] = (tsum, below(cut25), bands[-1],
+                     tuple(bands), tuple(hh), tsum - below(cut75))
+    return out, round(cut25, 2), round(hi_share, 6), round(cut75, 2)
 
 
 def band_median16(masses):
@@ -428,6 +450,7 @@ def gcp_to_rec(row):
             "bluen": row[9], "occd": row[10],
             "pop15": row[0] - row[3][0] - row[3][1],
             "inct": row[11], "incl": row[12], "inch": row[13],
+            "incq": row[-1],
             "incbh": list(row[15]),
             "sch6": sc6of(row[17]),
             "indig": row[18][0],
@@ -509,6 +532,7 @@ def main():
                                   "cobns": 0, "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
+                                  "incq": 0.0,
                                   "incbh": [0.0] * len(INC_BANDS),
                                   "newL": voter.acc_new()})
     for code, dv in alloc.items():
@@ -528,6 +552,7 @@ def main():
         acc["inct"] += row[11]
         acc["incl"] += row[12]
         acc["inch"] += row[13]
+        acc["incq"] += row[-1]
         for i in range(len(INC_BANDS)):
             acc["incbh"][i] += row[15][i]
         voter.acc_row(acc["newL"], row, 1.0)
@@ -569,7 +594,7 @@ def main():
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
-        for k in ("inct", "incl", "inch"):
+        for k in ("inct", "incl", "inch", "incq"):
             nat[k] += dv[k]
         nat.setdefault("incbh", [0.0] * len(INC_BANDS))
         for i in range(len(INC_BANDS)):
@@ -592,6 +617,8 @@ def main():
         "loinc": round(nat["incl"] / nat["inct"], 4)
         if nat["inct"] else None,
         "hiinc": round(nat["inch"] / nat["inct"], 4)
+        if nat["inct"] else None,
+        "hiqinc": round(nat["incq"] / nat["inct"], 4)
         if nat["inct"] else None,
         "incMed": band_median16(nat["incbh"]),
         "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
@@ -714,6 +741,8 @@ def main():
         "incomeCuts": {
             "loQuantile": INC_LO_Q,
             "loCutWeekly": meta["loCutWeekly"],
+            "hiQuantile": INC_HI_Q,
+            "hiQCutWeekly": meta["hiQCutWeekly"],
             "hiEdgeWeekly": meta["hiEdgeWeekly"],
             "hiNationalShare": meta["hiNationalShare"],
             "dollarsYear": 2016,

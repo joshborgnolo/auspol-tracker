@@ -195,3 +195,51 @@ hand.
   code paths cheaply.
 - History-append originally tangled with no-op `if` clauses — keep it to one
   per-date dedupe: `if (!existing.some((r) => r.date === rec.date))`.
+
+## The census-income quantile lanes on the booth-demo stores (2026-11-01)
+
+A different suite's records, documented here because they tuck onto the same
+`.build/analysis/seat-model/` chains: every census-edition engine now emits
+TWO edition-semantic quantile cuts on its `incomeCuts` records —
+`loQuantile: 0.25` (`loCutWeekly`) **and** `hiQuantile: 0.75`
+(`hiQCutWeekly`, the top-quartile cut) — interpolated inside a CLOSED band of
+the edition's own grid (the open top band holds ≤16% anywhere, so the 75th
+percentile always interpolates safely; `income_lanes.cut_at` raises when a cut
+would land on the open band). Measured cuts per edition, 1991 → 2021:
+$345.51/$1,338.38 (1991 family-income print, households basis), $456.13/
+$1,432.72 (2001), $603.75/$1,851.91 (2006), $738/$2,386.71 (2011), $895.80/
+$2,655.45 (2016), $1,078.87/$3,225.97 (2021) — the hiq ladder is the figure
+list to expect in stores, and the GUARD_HIQ windows in `income_lanes.py`
+track each era's skew (`01: (1200,1700)`, `06: (1500,2200)`; the 2011/2016/
+2021 grids get their guards in `derive-booth-demo-{2013,2016}.py` resp.
+`derive-booth-seifa-voter.py` at `(1800,2700)`/`(2000,2800)`/`(2700,3700)`),
+with the state frames' GCP-engine guards per universe inside
+`.build/map/gcp_newlanes.py`'s `_INC_HIQ_GUARDS`. Each store's per-area
+demo carries **`hiqinc`** — the top-quartile share against its OWN edition's
+cut — beside the kept `loinc`/`hiinc` (the raw top-band share, record-only
+now); frames carry it at division-demo key `hiqinc` and venue-demo tuple
+cell 16 (demo_cells in `build_map_data.py` appends it; the accumulate-side
+`incq`/`incHiQ`/`hiqm` names differ per chain — read each chain's own ledger).
+
+The 1998 income gap (INCOME_SPAN in `derive-booth-demo-interp.py`): the 1996
+edition's AURIN workspace prints no income table anywhere, so the frame's
+income lanes interpolate the income-carrying 1991 and 2001 editions at the
+day-share `f = hist.interp_f(1998, 1991, 2001) ≈ 0.7157` while the people
+lanes keep their own 1996↔2001 span. The machinery: an alloc lane
+`(1991, 1998)` in `derive-cd-91-96-ced-alloc.py` (its seventh lane;
+1998-set polygons were already known), a support store
+`data/booth-demo-1998-inc91.json` from `derive-booth-demo-90s.py` (its
+seventh STORES row, 1991-edition income on the 1998 frame), the interp
+helpers `INCOME_SPAN` + `income_span_lanes` per booth/division/national.
+Records on `data/booth-demo-1998.json`: `incomeCutsI` (top-level = nearest
+income side = 2001's record; `sides: {1991, 2001}`, both cuts carried) and
+`demoInterp.incomeBlock` `{c0: 1991, c1: 2001, f, nearestSide: 2001,
+c0Store}`. `hiinc` stays null across this span by construction (its two
+era top edges $2,875/$2,000 can't definition-blend); the quantile lanes
+blend normally because the cuts are edition-semantic. 1993/1996 stay
+1991-measured by the original doctrine (no income record on the far side,
+so the measured figure stands alone).
+
+/p map UI home: `.build/map/app/app-1-base.js` INC_MODES `["med","lo","hiq"]`
+with INC_KEY `hiq: "hiqinc"`; the old top-band mode id (`hi`) maps onto
+`hiq` at URL-parse; the raw `hiinc` measure is no longer a UI lane.

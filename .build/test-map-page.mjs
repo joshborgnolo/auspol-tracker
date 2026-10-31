@@ -645,9 +645,15 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // share cell), the hash gains iv, and legacy loinc/hiinc hashes alias in
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
-  assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hi"];'), "the income lane id and its three measures, median first");
+  assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hiq"];'), "the income lane id and its three measures, median first (the high view is the top income quarter since 2026-11-01)");
   assert.ok(base.includes('if (k === "loinc") { ks.push(LENS_INC); continue; }') && base.includes('if (k === "a65") { ks.push(LENS_AGE); continue; }'), "the People menu folds the income pair into Household income and the age pair into Age (DM stays positional against the demo tuple)");
-  assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hi: "hiinc" };'), "the income view's demo key per measure");
+  assert.ok(base.includes('if (k !== "hiinc" && k !== "hiqinc") ks.push(k);'), "the menu folds hiinc's top-band and hiqinc's top-quarter lanes out of the people stack");
+  assert.ok(base.includes('"hiqinc"'), "hiqinc is a DM lane at the demo tuple's appended cell");
+  assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hiq: "hiqinc" };'), "the income view's demo key per measure (the quartile-paired demo key runs edition-comparable where the old top-band share was not)");
+  assert.ok(base.includes('const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hiq: "Adults in the top income quarter" };'), "the income view's display name per measure (top income quarter, sentence case)");
+  assert.ok(base.includes('const INC_SHORT = { med: "Median income", lo: "Lower income", hiq: "Top income quarter" };'), "the income view's short name per measure");
+  assert.ok(base.includes('const INC_RANGE = { lo: [10, 45], hiq: [8, 60] };'), "the income view's colour domains (top quarter's shares bracket the measured 8-59% seat spread)");
+  assert.ok(base.includes('hiqinc: seq(275, 0.12)'), "the top-quarter view wears the income view's hue");
   assert.ok(base.includes("incmed: seq(48, 0.14)"), "the median spectrum wears its own money-gold hue");
   assert.ok(base.includes('incMode: "med"'), "the median spectrum is the landing measure");
   assert.ok(base.includes('const incMedRange = (m) =>') && base.includes("Math.floor(lo / 100)"), "the median's colour domain measures the year's own divisions, snapped to $100s (no hand-set LUT)");
@@ -667,6 +673,10 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("INC_TOP[S.incMode]"), "the area ranking phrases follow the picked measure");
   assert.ok(base.includes('INC_TOP = { med: ["seats where households earn the most"'), "the median ranking phrase");
   assert.ok(list.includes("incMed()") && list.includes("mny(v)"), "the list column prices the median view in dollars");
+  assert.ok(base.includes('const incHiQFrag = (m) =>'), "the top-quarter lane reads its edition's own quartile cut out of the frame record, blend spans named as ranges");
+  assert.ok(base.includes('r[{ lo: 6, hiq: 16 }[S.incMode]]'), "the top-quarter booth share rides the tuple's appended cell");
+  assert.ok(ui.includes('S.incMode = i === "loinc" ? "lo" : "hiq"'), "legacy loinc/hiinc and hi hashes all steer onto the top-quarter measure (the only hi left)");
+  assert.ok(ui.includes('iv === "hiq"'), "hiq rides the url measure id as itself");
 }
 
 // ── the Age lens (2026-10-31): the income lane's sibling fold — Aged 65

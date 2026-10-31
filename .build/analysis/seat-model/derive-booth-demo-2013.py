@@ -111,6 +111,8 @@ INC_LO_Q = 0.25  # low lane: adults below the national 25th percentile
 # top band = $4,000+/wk in 2011 dollars — the same dollar edge the 2021
 # lanes pin; what moves per census year is the national share of it
 INC_LO_GUARD_2011 = (650, 850)  # plausible $ for the 2011 25% cut
+INC_HI_Q = 0.75  # the HIGH lane's national top-quartile cut (edition-semantic)
+INC_HIQ_GUARD_2011 = (1800, 2700)  # plausible $ for the 2011 75% cut
 INC_HI_GUARD_2011 = (0.03, 0.06)  # national adults share of the top band
 
 BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
@@ -515,12 +517,25 @@ def income_bcp(z, ad, nonfam):
             break
     if not cut25 or not INC_LO_GUARD_2011[0] <= cut25 <= INC_LO_GUARD_2011[1]:
         fail(f"income 25% cut {cut25} outside guard {INC_LO_GUARD_2011}")
+    cum, cut75 = 0.0, None
+    for i, (lo, hi) in enumerate(INC_BANDS14):
+        cum += nat_adults[i] / nat_tot
+        if cum >= INC_HI_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (INC_HI_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                fail("income 75% cut lands in the open top band")
+            cut75 = lo + f * (hi - lo + 1)
+            break
+    if not cut75 or not INC_HIQ_GUARD_2011[0] <= cut75 <= INC_HIQ_GUARD_2011[1]:
+        fail(f"income 75% cut {cut75} outside guard {INC_HIQ_GUARD_2011}")
     hi_share = nat_adults[-1] / nat_tot
     if not INC_HI_GUARD_2011[0] <= hi_share <= INC_HI_GUARD_2011[1]:
         fail(f"top-band national share {hi_share:.4f} outside "
              f"{INC_HI_GUARD_2011}")
-    print(f"income: national 25% cut ${cut25:.0f}/wk (adults, 2011 $); "
-          f"top band {hi_share:.4f} of adults")
+    print(f"income: national 25% cut ${cut25:.0f}/wk, 75% cut "
+          f"${cut75:.0f}/wk (adults, 2011 $); top band {hi_share:.4f} "
+          f"of adults")
 
     out = {}
     for code, r28 in b28.items():
@@ -544,19 +559,24 @@ def income_bcp(z, ad, nonfam):
             bands.append(tot * (fams * famper + (1 - fams) * nonfam))
             hh.append(tot)
         tsum = sum(bands)
-        lo_mass = 0.0
-        for i, (lo, hi) in enumerate(INC_BANDS14):
-            if cut25 <= lo:
-                continue
-            if hi is not None and cut25 > hi:
-                lo_mass += bands[i]
-                continue
-            lo_mass += bands[i] * (cut25 - lo) / (hi - lo + 1)
-            break
-        out[code] = (tsum, lo_mass, bands[-1], tuple(bands), tuple(hh))
+
+        def below(cut):
+            mass = 0.0
+            for i, (lo, hi) in enumerate(INC_BANDS14):
+                if cut <= lo:
+                    break
+                if hi is not None and cut > hi:
+                    mass += bands[i]
+                    continue
+                mass += bands[i] * (cut - lo) / (hi - lo + 1)
+                break
+            return mass
+
+        out[code] = (tsum, below(cut25), bands[-1],
+                     tuple(bands), tuple(hh), tsum - below(cut75))
     print(f"income: B26/B28 SA1, {len(out)} rows (factors from "
           f"data/income-dist.json)")
-    return out, round(cut25, 2), round(hi_share, 6)
+    return out, round(cut25, 2), round(hi_share, 6), round(cut75, 2)
 
 
 def band_median14(masses):
@@ -668,6 +688,7 @@ def shares(rec):
     if rec.get("inct") is not None:
         out["loinc"] = bounded(rec["incl"], rec["inct"])
         out["hiinc"] = bounded(rec["inch"], rec["inct"])
+        out["hiqinc"] = bounded(rec.get("incq"), rec["inct"])
         out["incMed"] = band_median14(rec["incbh"])
     if rec.get("cobn") is not None:
         out["cob"] = {k: bounded(rec["cobn"][i], fb_den)
@@ -698,7 +719,8 @@ def main():
     sa1 = load_bcp()
     z_bcp = zipfile.ZipFile(BCP_ZIP)
     inc_fac, inc_nonfam = income_factors()
-    inc, inc_cut, inc_hishare = income_bcp(z_bcp, inc_fac, inc_nonfam)
+    inc, inc_cut, inc_hishare, inc_hiqcut = income_bcp(
+        z_bcp, inc_fac, inc_nonfam)
     z_bcp.close()
     if set(inc) != set(sa1):
         fail("B01/B28 SA1 universes diverge")
@@ -734,6 +756,7 @@ def main():
                                   "uni": 0, "eduns": 0,
                                   "bluen": 0, "occd": 0, "pop15": 0,
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
+                                  "incq": 0.0,
                                   "incbh": [0.0] * len(INC_BANDS14),
                                   "sch6": [0] * 6,
                                   "indig": 0, "indigDen": 0,
@@ -764,6 +787,7 @@ def main():
         acc["inct"] += ir[0]
         acc["incl"] += ir[1]
         acc["inch"] += ir[2]
+        acc["incq"] += ir[5]
         for i in range(len(INC_BANDS14)):
             acc["incbh"][i] += ir[4][i]
         for i in range(6):
@@ -814,6 +838,7 @@ def main():
                 "eduns": row["eduns"], "bluen": row["bluen"],
                 "occd": row["occd"], "pop15": row["pop15"],
                 "inct": ir[0], "incl": ir[1], "inch": ir[2],
+                "incq": ir[5],
                 "incbh": list(ir[4]),
                 "sch6": list(row["sch6"]),
                 "indig": row["indig"], "indigDen": row["indigDen"],
@@ -840,7 +865,7 @@ def main():
             nat[k] += dv[k]
         for i, b in enumerate(BANDS):
             nat[b] = nat.get(b, 0) + dv["bands"][i]
-        for k in ("inct", "incl", "inch"):
+        for k in ("inct", "incl", "inch", "incq"):
             nat[k] += dv[k]
         for i in range(len(INC_BANDS14)):
             nat.setdefault("incbh", [0.0] * len(INC_BANDS14))
@@ -899,6 +924,8 @@ def main():
             "loinc": round(nat["incl"] / nat["inct"], 4)
             if nat["inct"] else None,
             "hiinc": round(nat["inch"] / nat["inct"], 4)
+            if nat["inct"] else None,
+            "hiqinc": round(nat["incq"] / nat["inct"], 4)
             if nat["inct"] else None,
             "cob": {k: (round(nat["cobn"][i] / nat_fbd, 4)
                         if nat_fbd > 0 else None)
@@ -1040,6 +1067,8 @@ def main():
         "incomeCuts": {
             "loQuantile": INC_LO_Q,
             "loCutWeekly": inc_cut,
+            "hiQuantile": INC_HI_Q,
+            "hiQCutWeekly": inc_hiqcut,
             "hiEdgeWeekly": 4000,
             "hiNationalShare": inc_hishare,
             "dollarsYear": 2011,

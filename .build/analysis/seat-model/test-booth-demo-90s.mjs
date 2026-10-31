@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* test-booth-demo-90s.mjs — pin data/booth-demo-{1993,1996,1998}{,-c1}.json
-   (derive-booth-demo-90s.py's six-store contract, the '90s census-people
+   and booth-demo-1998-inc91.json (the INCOME_SPAN support store:
+   derive-booth-demo-90s.py's seven-store contract, the '90s census-people
    arc extended by the map-people-fill arc with the follow-on cob/rel/
    ten/atsci/onepar cohorts). Invariants per store:
 
@@ -51,6 +52,12 @@ const STORES = [
     cobKeys: COB96, nat: { norel: 0.182 } },
   { f: "booth-demo-1998-c1.json", census: 2001, booths: 8311, divs: 148,
     cobKeys: COB96, nat: { norel: 0.1716, rentPub: 0.0472 } },
+  { f: "booth-demo-1998-inc91.json", census: 1991, booths: 8311, divs: 148,
+    cobKeys: COB91, nat: { norel: 0.1437 },
+    // 1998's income c0 (INCOME_SPAN): the 1991-edition income store on
+    // the 1998 frame — the 1996 edition its measured store sits on
+    // prints no income table anywhere
+  },
 ];
 
 const bIn = (v) => v == null || (typeof v === "number" && v >= 0 && v <= 1);
@@ -179,22 +186,45 @@ for (const spec of STORES) {
     check(Math.abs(national.noncit - 0.112) < 0.0005, `${tag}: national noncit ${national.noncit} != 0.112`);
   }
 
-  // the income print: only the 1991 era's BCP carries household income
-  // — the frame's cuts ride its weekly-equivalent conversion, the
-  // income-free eras keep the lane empty end to end
+  // the income prints: the 1991 era's weekly-equivalent family-income
+  // conversion, the 2001 era's B 30/B 31 prints via the shared
+  // income_lanes engine (same recipe as the 2004-election lane) — the
+  // 1996 AURIN workspace carries no income table at all, so only its
+  // era's lanes stay empty end to end (its own INCOME_SPAN bridge reads
+  // out through incomeCutsI on the measured store)
   if (spec.census === 1991) {
     const c = d.incomeCuts;
     check(c && c.dollarsYear === 1991 && c.basis === "households",
           `${tag}: incomeCuts record on the 1991 household basis`);
     check(Math.abs(c.loCutWeekly - 345.51) < 0.02, `${tag}: 25% cut ${c && c.loCutWeekly} != 345.51`);
+    check(c.hiQuantile === 0.75 && Math.abs(c.hiQCutWeekly - 1338.38) < 0.02,
+          `${tag}: 75% (top-quarter) cut ${c && c.hiQCutWeekly} != 1338.38`);
     check(c.hiEdgeWeekly === 2874.92, `${tag}: hi edge ${c && c.hiEdgeWeekly} != 2874.92 (150001/52.1758)`);
     check(Math.abs(c.hiNationalShare - 0.005101) < 0.00005, `${tag}: top-band share ${c && c.hiNationalShare} != 0.005101`);
     check(bIn(national.loinc) && national.loinc === 0.25, `${tag}: national loinc sits at the quantile (${national.loinc})`);
+    check(national.hiqinc === 0.25, `${tag}: national hiqinc sits at the quantile (${national.hiqinc})`);
     check(Math.abs(national.hiinc - 0.0051) < 0.0001, `${tag}: national hiinc ${national.hiinc} != 0.0051`);
     check(national.incMed === 699, `${tag}: national median ${national.incMed} != 699 ($ weeks 1991)`);
+  } else if (spec.census === 2001) {
+    const c = d.incomeCuts;
+    check(c && c.dollarsYear === 2001,
+          `${tag}: incomeCuts record on the 2001 GCP-era basis`);
+    check(Math.abs(c.loCutWeekly - 456.13) < 0.02, `${tag}: 25% cut ${c && c.loCutWeekly} != 456.13`);
+    check(c.hiQuantile === 0.75 && Math.abs(c.hiQCutWeekly - 1432.72) < 0.02,
+          `${tag}: 75% (top-quarter) cut ${c && c.hiQCutWeekly} != 1432.72`);
+    check(c.hiEdgeWeekly === 2000, `${tag}: hi edge ${c && c.hiEdgeWeekly} != 2000`);
+    check(Math.abs(c.hiNationalShare - 0.103255) < 0.00005,
+          `${tag}: top-band share ${c && c.hiNationalShare} != 0.103255`);
+    check(Math.abs(national.loinc - 0.2502) < 0.00005,
+          `${tag}: national loinc ${national.loinc} != 0.2502 (interp artifact of the quantile engineering)`);
+    check(Number.isFinite(national.loinc), `${tag}: national loinc reads (${national.loinc})`);
+    check(Math.abs(national.hiqinc - 0.2503) < 0.00005,
+          `${tag}: national hiqinc ${national.hiqinc} != 0.2503`);
+    check(Math.abs(national.hiinc - 0.1033) < 0.0001, `${tag}: national hiinc ${national.hiinc} != 0.1033`);
+    check(national.incMed === 786, `${tag}: national median ${national.incMed} != 786 ($ weeks 2001)`);
   } else {
     check(!("incomeCuts" in d), `${tag}: no incomeCuts on the ${spec.census} era print`);
-    check(national.loinc == null && national.hiinc == null && national.incMed == null,
+    check(national.loinc == null && national.hiinc == null && national.hiqinc == null && national.incMed == null,
           `${tag}: income lanes stay null on the ${spec.census} era print`);
   }
 
@@ -204,22 +234,55 @@ for (const spec of STORES) {
     check(dv.pt == null || bIn(dv.pt), `${tag} div ${dv.div}: pt bounded ${dv.pt}`);
     check(dv.noncit == null || bIn(dv.noncit), `${tag} div ${dv.div}: noncit bounded ${dv.noncit}`);
     if (dv.pt != null) withPt++;
-    if (spec.census === 1991) {
-      check((dv.loinc == null) === (dv.hiinc == null) && (dv.hiinc == null) === (dv.incMed == null),
+    if (spec.census !== 1996) {
+      check((dv.loinc == null) === (dv.hiinc == null) && (dv.hiinc == null) === (dv.hiqinc == null) && (dv.hiqinc == null) === (dv.incMed == null),
             `${tag} div ${dv.div}: income lanes move together`);
       if (dv.loinc != null) {
-        check(bIn(dv.loinc) && bIn(dv.hiinc) && Number.isInteger(dv.incMed) && dv.incMed > 0,
-              `${tag} div ${dv.div}: loinc ${dv.loinc} hiinc ${dv.hiinc} med ${dv.incMed}`);
+        check(bIn(dv.loinc) && bIn(dv.hiinc) && bIn(dv.hiqinc) && Number.isInteger(dv.incMed) && dv.incMed > 0,
+              `${tag} div ${dv.div}: loinc ${dv.loinc} hiinc ${dv.hiinc} hiqinc ${dv.hiqinc} med ${dv.incMed}`);
         withInc++;
       }
     } else {
-      check(dv.loinc == null && dv.hiinc == null && dv.incMed == null,
+      check(dv.loinc == null && dv.hiinc == null && dv.hiqinc == null && dv.incMed == null,
             `${tag} div ${dv.div}: no income lanes on the ${spec.census} print`);
     }
   }
   check(withPt > (d.divisions.length * 0.9), `${tag}: pt rides most division rows (${withPt}/${d.divisions.length})`);
-  if (spec.census === 1991) check(withInc > (d.divisions.length * 0.9),
+  if (spec.census !== 1996) check(withInc > (d.divisions.length * 0.9),
                                   `${tag}: income lanes ride most division rows (${withInc}/${d.divisions.length})`);
+
+  // INCOME_SPAN records on the measured 1998 store: the 1996 edition
+  // prints no income table, so the frame's own income lanes span the
+  // income-carrying 1991/2001 editions — the span record names them
+  // and pins the nearest income side (2001) like every interp year
+  if (d.election === 1998 && spec.census === 1996) {
+    const ic = d.incomeCutsI;
+    check(ic && ic.loQuantile === 0.25 && ic.hiQuantile === 0.75,
+          "1998: incomeCutsI marks the income-span's quantile frame");
+    check(Math.abs(ic.loCutWeekly - 456.13) < 0.02,
+          `1998: incomeCutsI lo cut ${ic.loCutWeekly} != 456.13 (nearest income side = 2001)`);
+    check(Math.abs(ic.hiQCutWeekly - 1432.72) < 0.02,
+          `1998: incomeCutsI hiQ cut ${ic.hiQCutWeekly} != 1432.72`);
+    check(ic.sides && Math.abs(ic.sides["1991"].hiQCutWeekly - 1338.38) < 0.02
+          && Math.abs(ic.sides["2001"].hiQCutWeekly - 1432.72) < 0.02,
+          "1998: incomeCutsI sides name both income editions' cuts");
+    const ib = d.demoInterp && d.demoInterp.incomeBlock;
+    check(ib && ib.c0 === 1991 && ib.c1 === 2001 && ib.nearestSide === 2001
+          && ib.c0Store === "data/booth-demo-1998-inc91.json",
+          "1998: demoInterp.incomeBlock names the income span");
+    check(Math.abs(ib.f - 0.7157) < 0.001,
+          `1998: income span day-share f ${ib.f} != 0.7157`);
+    // the measured store's demoI national row blends the income span
+    const natI = (d.counts.demoI && d.counts.demoI.national) || {};
+    check(Math.abs((natI.loinc ?? -1) - 0.2501) < 0.0005,
+          `1998: demoI national loinc ${natI.loinc} != 0.2501 (income-span blend)`);
+    check(Math.abs((natI.hiqinc ?? -1) - 0.2502) < 0.0005,
+          `1998: demoI national hiqinc ${natI.hiqinc} != 0.2502`);
+    check(natI.hiinc === null,
+          "1998: hiinc stays null through the span (its two edge dollars can't definition-blend)");
+    check(natI.incMed === 786,
+          `1998: demoI national incMed ${natI.incMed} != 786 (nearest INCOME side)`);
+  }
 }
 
 if (failures.length) {

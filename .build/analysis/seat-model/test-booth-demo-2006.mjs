@@ -75,6 +75,7 @@ const NATIONAL = {
   ten: { mort: 0.3512, rent: 0.2898, own: 0.3504, rentPub: 0.0439 },
   loinc: 0.25,
   hiinc: 0.0645,
+  hiqinc: 0.2474,
   incMed: 1027,
   // the 2026-10-31 lanes arc (2006 B 01 citizen / B 08 ancestry /
   // B 23 children / B 45 travel — same household lines as the
@@ -87,7 +88,8 @@ const NATIONAL = {
 };
 // 2006 edition's incomeCuts record (the $3,000+ top-band edition)
 const INC_CUTS = {
-  loQuantile: 0.25, loCutWeekly: 603.75, hiEdgeWeekly: 3000,
+  loQuantile: 0.25, loCutWeekly: 603.75,
+  hiQuantile: 0.75, hiQCutWeekly: 1851.91, hiEdgeWeekly: 3000,
   hiNationalShare: 0.065439, dollarsYear: 2006,
   adultsWeights: "data/income-dist.json",
   medianBasis: "households (shares are per-adult)",

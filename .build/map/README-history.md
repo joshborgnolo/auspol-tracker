@@ -211,3 +211,36 @@ node .build/map/geo_build.mjs STAGE STAGE map/data --years=2010
 node .build/map/assemble.mjs
 node .build/test-map-boundary-vintages.mjs
 ```
+
+# Boundary product recovery (November 2026)
+
+The state-frame boundary products land ignored in `.build/map/src/` and
+`.build/map/<frame>/`, so a fresh worktree (or a `git clean -dx`) lacks them.
+Canonical sources to re-fetch when they go missing:
+
+- **Vic 2022 districts** (`n-vic22.geojson`): the open-data WFS at
+  `https://opendata.maps.vic.gov.au/geoserver/ows?service=WFS&version=1.0.0
+  &request=GetFeature&typeName=open-data-platform:state_assembly_2022
+  &outputFormat=application/json&srsName=EPSG:4326` — 88 features; map the
+  `district` property (UPPERCASE) back onto `vic22_geo.EXPECTED_NAMES`'s
+  official casing as each feature's `name` property.
+- **State Electorates packages** (sa22/sa26): the data.sa.gov.au CKAN
+  dataset *State Electorates* — its geojson zips at
+  `https://www.dptiapps.com.au/dataportal/StateElectorates{2022,2026}
+  _geojson.zip`; each unzips a `StateElectorates<era>_GDA94.geojson`, which
+  is the pipeline's boundary content (the sa26 store's expected filename
+  `StateElectorates2026_GDA2020.geojson` carries the same district polygons;
+  the datum family difference is metres at SA-wide scale and immaterial to
+  SA1 joins). Reduce each to the name-per-feature form the n-*.geojson
+  contract wants (`properties.name` only).
+- **Qld 2017-era districts** (`n-qld.geojson`) and **NSW 2023 districts**
+  (`n-nsw23.geojson`): live as session-cache products in the `.worktrees/`
+  family when they vanish from `.build/map/src/` (qld-frames, nsw23-frame);
+  `harvest-qld-src.py` re-fetches the qld mirror from the ECQ ArcGIS
+  FeatureServer.
+
+The income quantile lanes' chain contract (loinc/hiqinc, hiQCutWeekly per
+edition, the 1998 INCOME_SPAN) is documented in
+`.matilda/skills/auto-skill-auspol-seat-model/SKILL.md`'s income-lane
+section; the /map lane reads at INC_MODES `["med", "lo", "hiq"]` in
+`.build/map/app/app-1-base.js`.
