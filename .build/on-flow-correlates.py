@@ -116,10 +116,10 @@ def extract():
                 # fed-class-flows.py treats it.
                 classic = any(p in ("ALP", "CLR") for p in pair) and \
                     any(p in COAL for p in pair)
-                dest = {pair[0]: han[1], pair[1]: han[2]}
+                dest = {pair[0]: int(han[1]), pair[1]: int(han[2])}
                 to_alp = dest.get("ALP", 0) + dest.get("CLR", 0)
                 to_coal = sum(dest.get(p, 0) for p in COAL)
-                to_other = han[1] + han[2] - to_alp - to_coal
+                to_other = sum(dest.values()) - to_alp - to_coal
                 exh = 0
                 r = None
             else:
@@ -395,15 +395,16 @@ def main():
               if (r["jur"] == "fed") == (fam == "fed")]
         dat = []
         for r in er:
-            need = [r["on_prim"], r["adv"], r["coal_margin"]]
-            if any(v is None for v in need):
+            if any(v is None
+                   for v in (r["on_prim"], r["adv"], r["coal_margin"])):
                 continue
             if have_cls and r["cls"] is None:
                 continue
             y0 = share(r)
             if y0 is None:
                 continue
-            x = list(need)
+            # x order must mirror `names` below: primary, margin, adv
+            x = [r["on_prim"], r["coal_margin"], r["adv"]]
             x.append(float(r["held_coal"]))
             x.append(float(r["held_xb"]))
             x.append(0.0 if r["held_known"] else 1.0)  # held unknown
@@ -498,8 +499,99 @@ def main():
           "preferential\n   exhaustion: 61% of ON ballots exhausted "
           "before a major there.)")
 
-    # ---------- 7. extremes ----------
-    print("\n=== 7. Strongest / weakest ON -> Coalition seats, "
+    # ---------- 7. THE FORMULA: deviation from the election mean ----------
+    print("\n=== 7. The formula: seat deviation from the national average "
+          "===")
+    print("dev_i (pts) = sum_k  b_k * (x_ik - election-mean_k), ballot-"
+          "weighted")
+
+    def dev_formula(yearset, label):
+        er = [r for r in cl if r["jur"] == "fed"
+              and r["year"] in yearset]
+        spec = [
+            ("advPctile", lambda r: (r["adv"] or 0) * 100),
+            ("marginPts", lambda r: (r["coal_margin"] or 0) * 100),
+            ("onPrimPts", lambda r: (r["on_prim"] or 0) * 100),
+            ("Rural", lambda r: 1.0 if r["cls"] == "Rural" else 0.0),
+            ("Provincial", lambda r: 1.0 if r["cls"] == "Provincial"
+             else 0.0),
+            ("coalHeld", lambda r: float(r["held_coal"])),
+            ("QLD", lambda r: 1.0 if r["state"] == "QLD" else 0.0),
+            ("SA", lambda r: 1.0 if r["state"] == "SA" else 0.0),
+            ("TAS", lambda r: 1.0 if r["state"] == "TAS" else 0.0),
+        ]
+        dat = []
+        for r in er:
+            if r["adv"] is None or r["coal_margin"] is None \
+               or r["on_prim"] is None or r["cls"] is None \
+               or not r["held_known"]:
+                continue
+            y0 = share(r)
+            if y0 is None:
+                continue
+            dat.append({"el": r["el"], "seat": r["seat"], "st": r["state"],
+                        "y": y0 * 100, "w": wts(r),
+                        "X": [fn(r) for _, fn in spec]})
+        els = sorted({d["el"] for d in dat})
+        means = {}
+        for e2 in els:
+            grp = [d for d in dat if d["el"] == e2]
+            W = sum(d["w"] for d in grp)
+            means[e2] = {
+                "y": sum(d["y"] * d["w"] for d in grp) / W,
+                "X": [sum(d["X"][a] * d["w"] for d in grp) / W
+                      for a in range(len(spec))],
+            }
+            for d in grp:
+                d["y_"] = d["y"] - means[e2]["y"]
+                d["X_"] = [d["X"][a] - means[e2]["X"][a]
+                           for a in range(len(spec))]
+        ys = [d["y_"] for d in dat]
+        X = [d["X_"] for d in dat]
+        ws = [d["w"] for d in dat]
+        beta, se = wls(ys, X, ws)
+        yhat = [sum(beta[a] * X[i][a] for a in range(len(spec)))
+                for i in range(len(dat))]
+        tss = sum(ws[i] * ys[i] ** 2 for i in range(len(dat)))
+        rss = sum(ws[i] * (ys[i] - yhat[i]) ** 2 for i in range(len(dat)))
+        r2 = 1 - rss / tss
+        print(f"\n  {label}  (n={len(dat)} seats, R2(within)={r2:.3f})")
+        names = [nm for nm, _ in spec]
+        terms = []
+        for nm, b, s in zip(names, beta, se):
+            t = abs(b / s) if s > 0 else 0
+            flag = "**" if t > 2.6 else ("*" if t > 1.96 else "  ")
+            print(f"    {b:+6.3f} x ({nm} - mean_e)        se {s:6.3f} "
+                  f"{flag}")
+            terms.append(f"{'+' if b >= 0 else '-'} {abs(b):.3f}"
+                         f"({nm}-mean_e)")
+        print("  =>", " ".join(terms))
+        print("  election means (to subtract), ballot-weighted:")
+        hdr = "    el       " + "".join(f"{nm:>10}" for nm in names)
+        print(hdr)
+        for e2 in els:
+            row = f"    {e2[4:]:<6}" + "".join(
+                f"{v:>10.2f}" for v in means[e2]["X"])
+            print(row)
+        return beta, names, means, dat
+
+    beta_all, names7, means_all, dat_all = dev_formula(
+        set(fedyears), "FEDERAL POOL 1998-2025")
+    beta_late, _, means_late, dat_late = dev_formula(
+        {2019, 2022, 2025}, "LATE POOL 2019-2025 (the current era)")
+
+    print("\n  worked checks (late-pool equation applied to 2025 seats):")
+    for d in dat_late:
+        if d["el"] == "res-2025" and d["seat"] in (
+                "Gippsland", "Berowra", "Grayndler", "Maranoa", "Dickson"):
+            m = means_late["res-2025"]
+            pred = sum(beta_late[a] * (d["X"][a] - m["X"][a])
+                       for a in range(len(beta_late)))
+            print(f"    {d['seat']:<12}{d['st']:<4}actual dev "
+                  f"{d['y'] - m['y']:+6.1f}   fitted {pred:+6.1f}")
+
+    # ---------- 8. extremes ----------
+    print("\n=== 8. Strongest / weakest ON -> Coalition seats, "
           "min 1500 flowed ON ballots ===")
     big = [r for r in cl if wts(r) >= 1500]
     big.sort(key=share)
