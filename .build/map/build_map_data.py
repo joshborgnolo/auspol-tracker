@@ -492,9 +492,14 @@ def build_year(year, hist, base2001):
             vstore = json.load(open(p))
             census_basis = "venue"
     bvoter = {(b["divId"], b["boothId"]): b for b in vstore["booths"]} if vstore else {}
-    cobkeys = vstore.get("cobKeys", []) if vstore else []
-    relkeys = vstore.get("relKeys", []) if vstore else []
-    tenkeys = vstore.get("tenKeys", []) if vstore else []
+    # None-when-absent (the stats builder's convention since the SEIFA-90s
+    # arc): an era frame with no such lane emits null keys, never empty
+    # menus (the read side treats both identically; the absent-lens signal
+    # stays truthful). The 2026-10-31 lanes arc's own anckeys keeps refu's
+    # [] default by design — every frame rides an ancestry row.
+    cobkeys = (vstore.get("cobKeys") or None) if vstore else None
+    relkeys = (vstore.get("relKeys") or None) if vstore else None
+    tenkeys = (vstore.get("tenKeys") or None) if vstore else None
     anckeys = vstore.get("ancKeys", []) if vstore else []
     if prev >= 2004:
         prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
@@ -718,12 +723,12 @@ def build_year(year, hist, base2001):
            # rows and rec.demo.cob dicts follow (10 keys from 2016 /
            # the state frames' GCP basis, 8 on the 2006/2011
            # venue-proxy editions — England/Scotland unreadable there)
-           "cobKeys": cobkeys if vstore else None,
+           "cobKeys": cobkeys,
            # the Religion and Housing-tenure select menus' option orders
            # (B["rel"]/B["ten"] rows and rec.demo.rel/ten dicts follow;
            # identical across the whole census era)
-           "relKeys": relkeys if vstore else None,
-           "tenKeys": tenkeys if vstore else None,
+           "relKeys": relkeys,
+           "tenKeys": tenkeys,
            # the Ancestry select menu's twelve options (B["anc"] rows +
            # rec.demo.anc dicts follow; the 2026-10-31 lanes arc)
            "ancKeys": anckeys if vstore else None}

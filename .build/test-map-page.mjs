@@ -109,7 +109,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // historical_booth_locations.py matcher. README-history.md documents the
   // source limitations and superseded ABS/venue matching recipes.
   for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "1996 lane " + f + " on disk");
-  assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 venue store (derive-1996-venues.py) is on disk");
+  assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 SEIFA venue store (derive-booth-seifa-stats90s.py; historically derive-1996-venues.py) is on disk");
   const D = JSON.parse(R("map/data/res-1996.json"));
   const r = JSON.parse(R("map/data/res-1996.json"));
   const S = JSON.parse(R("map/data/senate-1996.json"));
@@ -174,9 +174,26 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, "venue", "1996's census people basis is the venue-CD lane (the '90s people-interp arc)");
     assert.equal(f.incomeCuts, null, "1996 has no incomeCuts (the income floor is the 2001 election)");
-    assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "1996 SEIFA cuts stay null");
+    assert.equal(f.seifaCuts.irsad, null, "1996 has no irsad cut (pre-IRSAD censeration)");
+    for (const ix of ["irsd", "ier", "ieo"])
+      assert.ok(Array.isArray(f.seifaCuts[ix]) && f.seifaCuts[ix].length === 9, `1996's ${ix} cut carries the nine national decile edges`);
     assert.ok(f.demoInterp && f.demoInterp.f === 0.914067 && f.demoInterp.c0 === 1991 && f.demoInterp.c1 === 1996 && f.demoInterp.nearestSide === 1996,
       "1996's demoInterp record interpolates 1991↔1996 at f=0.914067 nearest-1996-side");
+  }
+  { // the SEIFA lens on the 1996 frame (the map-people-fill add):
+    // era division blocks via derive-division-seifa-stats90s.py, booth
+    // deciles via derive-booth-seifa-stats90s.py over the same venue seam
+    assert.equal(D.divs.filter((d) => d.seifa && Object.values(d.seifa).length).length, 148,
+      "every 1996 division carries its SEIFA cells");
+    const banks = D.divs.find((d) => d.n === "Banks");
+    assert.ok(Math.abs(banks.seifa.irsd.v - 1007.987) < 0.002 && Math.abs(banks.seifa.irsd.pct - 0.633393) < 0.000002,
+      "1996 Banks irsd cell pins (the measured 1996-census value with the 1991↔1996 pcti lane displayed; got " + JSON.stringify(banks.seifa.irsd) + ")");
+    assert.ok(!banks.seifa.irsad, "1996: no irsad cell anywhere (pre-IRSAD era)");
+    const decs = D.booths.dec || [];
+    const nDec = decs.filter((x) => x && x.some((v) => v != null)).length;
+    assert.ok(nDec > 6000, `most 1996 booths carry SEIFA deciles (got ${nDec})`);
+    assert.ok(decs.every((row) => row === null || (row.length === 4 && row[0] == null && row.slice(1, 4).every((v) => v == null || (Number.isInteger(v) && v >= 1 && v <= 10)))),
+      "1996: every landed dec row is [null + irsd/ier/ieo 1..10]");
   }
   assert.equal(D.divs.filter((d) => d.demo).length, 148, "every 1996 division carries its census CD-sum demo row");
   {
@@ -214,7 +231,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // pinned per-store at the seat-model tests; here the frames' publish-side
   // contract: interp record, division/booth demo coverage and the
   // income/SEIFA-floor invariants the rest of the page relies on
-  for (const [y, f, c0, c1, near, nDivs] of [[1993, 0.320197, 1991, 1996, 1991, 147], [1998, 0.431308, 1996, 2001, 1996, 148]]) {
+  for (const [y, f, c0, c1, near, nDivs, sf] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7]], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7]]]) {
     const D = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(D.year, y);
     assert.equal(D.divs.length, nDivs, `${y} has its ${nDivs} divisions`);
@@ -222,7 +239,32 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     assert.ok(D.demoInterp && D.demoInterp.f === f && D.demoInterp.c0 === c0 && D.demoInterp.c1 === c1 && D.demoInterp.nearestSide === near,
       `${y}'s demoInterp blends ${c0}↔${c1} at f=${f} nearest the ${near} census`);
     assert.equal(D.incomeCuts, null, `${y}: the income floor stays 2001`);
-    assert.deepEqual(D.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, `${y}: SEIFA cuts stay null`);
+    // the SEIFA lens reads on the '90s frames (derive-division-seifa-stats90s.py
+    // + derive-booth-seifa-stats90s.py): three-index era only — IRSAD predates
+    // its SEIFA-2001 invention, so irsad cut+lanes stay null here
+    {
+      const c = D.seifaCuts;
+      assert.equal(c.irsad, null, `${y} no irsad cut (pre-IRSAD censeration)`);
+      for (const ix of ["irsd", "ier", "ieo"]) {
+        assert.ok(Array.isArray(c[ix]) && c[ix].length === 9 && c[ix].every((v) => typeof v === "number"),
+          `${y}: ${ix} cut carries nine national decile edges`);
+        assert.deepEqual([...c[ix]].sort((a, b) => a - b), c[ix], `${y}: ${ix} cut edges ascending`);
+      }
+      assert.equal(D.divs.filter((d) => d.seifa && Object.values(d.seifa).length).length, nDivs,
+        `every ${y} division carries its SEIFA cells`);
+      const banks = D.divs.find((d) => d.n === "Banks");
+      const [v, pctPin, dec] = sf;
+      assert.ok(Math.abs(banks.seifa.irsd.v - v) < 0.002 && Math.abs(banks.seifa.irsd.pct - pctPin) < 0.000002,
+        `${y} Banks irsd cell pins (v ${v}, displayed pct ${pctPin} = the pcti lane; got ${JSON.stringify(banks.seifa.irsd)})`);
+      assert.equal(banks.seifa.irsd.dec, dec, `${y} Banks irsd map decile`);
+      assert.ok(!banks.seifa.irsad, `${y}: no irsad cell anywhere on the pre-IRSAD frame`);
+      const decs = D.booths.dec || [];
+      assert.equal(decs.length, D.booths.id.length, `${y} booth dec lane rides the full registry`);
+      const nDec = decs.filter((x) => x && x.some((v) => v != null)).length;
+      assert.ok(nDec > 5800, `most ${y} booths carry SEIFA deciles (got ${nDec})`);
+      assert.ok(decs.every((row) => row === null || (row.length === 4 && row[0] == null && row.slice(1, 4).every((v) => v == null || (Number.isInteger(v) && v >= 1 && v <= 10)))),
+        `${y}: every landed dec row is [null + irsd/ier/ieo 1..10]`);
+    }
     assert.equal(D.divs.filter((d) => d.demo).length, nDivs, `every ${y} division carries its census CD-sum demo row`);
     const nBooth = (D.booths.demo || []).filter((x) => x !== null).length;
     assert.ok(nBooth > 5800, `most ${y} booths carry census demo cells (got ${nBooth})`);
@@ -274,13 +316,27 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // joined to its own election (derive-booth-demo-2001-frame.py over
   // cd-2001-ced-2001set.json, pinned by test-booth-demo-2001-frame.mjs) —
   // the interp era begins at 2004, every year from here carries its
-  // own edition's income cuts, and the 2001-era sub-CED SEIFA milestone
-  // keeps the seifa lanes null
+  // own edition's income cuts; the SEIFA lens rides the venue-store's
+  // filled SEIFA 2001 lane (derive-booth-seifa-stats90s.py)
   for (const f of [r, D]) {
     assert.equal(f.demoBasis, "venue", "2001 census basis is the venue-proxy read");
     assert.ok(!f.demoInterp, "2001 is measured-only (no interp record)");
     assert.ok(f.incomeCuts && f.incomeCuts.hiEdgeWeekly === 2000 && f.incomeCuts.dollarsYear === 2001 && !f.incomeCuts.sides, "2001 incomeCuts: the 2001 edition's $2,000+ edge in 2001 dollars, single-edition (no sides)");
-    assert.deepEqual(f.seifaCuts, { irsad: null, irsd: null, ier: null, ieo: null }, "2001 SEIFA cuts stay null");
+    for (const ix of ["irsad", "irsd", "ier", "ieo"])
+      assert.ok(Array.isArray(f.seifaCuts[ix]) && f.seifaCuts[ix].length === 9 && f.seifaCuts[ix].every((v) => typeof v === "number"),
+        `2001's ${ix} cut carries the nine national decile edges`);
+  }
+  {
+    assert.equal(D.divs.filter((x) => x.seifa && Object.values(x.seifa).length).length, 150,
+      "all 150 divisions carry their measured 2001 SEIFA cells");
+    const banks = D.divs.find((x) => x.n === "Banks");
+    assert.ok(Math.abs(banks.seifa.irsd.v - 1004.211) < 0.002 && banks.seifa.irsad.v === 1020,
+      "2001 Banks cells are the measured ABS-lane figures (banks.irsad is AUS_ced published); got " + JSON.stringify(banks.seifa.irsd));
+    const decs = r.booths.dec || [];
+    const nDec = decs.filter((x) => x && x.some((v) => v != null)).length;
+    assert.ok(nDec > 6600, `most 2001 booths carry SEIFA deciles (got ${nDec})`);
+    assert.ok(decs.every((row) => row === null || (row.length === 4 && row.every((v) => v == null || (Number.isInteger(v) && v >= 1 && v <= 10)))),
+      "2001: every landed dec row carries up to four 1..10 deciles");
   }
   assert.ok(D.divs.every((d) => d.demo), "all 150 divisions carry a census demo row");
   {

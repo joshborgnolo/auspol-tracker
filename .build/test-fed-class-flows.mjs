@@ -724,9 +724,12 @@ for (const ix of Object.keys(QIDXES)) {
          points), none at 2016 — its census sat five weeks after
          election day, so pcti ≈ rank; the CD-era lanes cut coarser —
          whole-unit polygon allocation, f far from the measured census
-         (2004 21/14/66, 2007 8/2/12, 2010 30/8/39 by index) */
+         (2004 21/14/66, 2007 8/2/12, 2010 30/8/39 by index; the era-90s
+         arrival 2026-10-31 puts 1998's ieo/ier on the interpolated
+         basis too — the doctrine's "interpolated wherever a factor
+         exists", 14/36 fifths moved) */
       const moved = ents.filter(([nm, cell]) => fifthOf(raOf.get(nm), ix) !== fifthOf(rankAdvOf(ix, cell, n), ix)).length;
-      assert.equal(moved, { irsad: { 2004: 21, 2007: 8, 2010: 30, 2013: 12, 2016: 0, 2019: 10 }, ieo: { 2004: 14, 2007: 2, 2010: 8, 2013: 8, 2016: 0, 2019: 14 }, ier: { 2004: 66, 2007: 12, 2010: 39, 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
+      assert.equal(moved, { irsad: { 2004: 21, 2007: 8, 2010: 30, 2013: 12, 2016: 0, 2019: 10 }, ieo: { 1998: 14, 2004: 14, 2007: 2, 2010: 8, 2013: 8, 2016: 0, 2019: 14 }, ier: { 1998: 36, 2004: 66, 2007: 12, 2010: 39, 2013: 18, 2016: 0, 2019: 18 } }[ix][y], `${y} ${ix}: pcti v rank movement`);
     } else {
       ents.forEach(([nm, cell]) => {
         assert.ok(cell[ix].pcti === undefined, `${y} ${nm}: no pcti outside the factor years`);
@@ -1032,16 +1035,21 @@ SEIFA_IDS.forEach((q) => {
    2004+ exactly as the renderer draws them (the count-anchored fit's
    values since 2026-10-25; e5's 2004/2007/2010 re-pinned the same day
    when the pcti basis reached the CD-era lanes and re-cut those
-   elections' fifths) */
-assert.deepEqual([...FH.fed.classes.e1.grn], [73.6, 79.6, 84.2, 83.4, 82.1, 85.4, 84.1, 85.4, 89, 91.2], "e1 Green flow (IEO most-advantaged fifth)");
-assert.deepEqual([...FH.fed.classes.e5.grn], [68.6, 64.7, 75, 73.5, 75.3, 77.1, 76.9, 76.7, 80.3, 82.3], "e5 Green flow (IEO most-disadvantaged fifth)");
+   elections' fifths; the 1998 positions re-pinned 2026-10-31 when the
+   era-90s pcti lanes put 1998's IEO/IER on the interpolated basis —
+   14/5th-boundary seats moved, shifting the 1998 Green shares 73.6→74.2
+   and 68.6→67.0 on the e1/e5 rungs) */
+assert.deepEqual([...FH.fed.classes.e1.grn], [74.2, 79.6, 84.2, 83.4, 82.1, 85.4, 84.1, 85.4, 89, 91.2], "e1 Green flow (IEO most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.e5.grn], [67, 64.7, 75, 73.5, 75.3, 77.1, 76.9, 76.7, 80.3, 82.3], "e5 Green flow (IEO most-disadvantaged fifth)");
 /* the IER fifths' own Green-flow runs (economic resources beside the
    education-and-occupation ladder), merged classic 2001 + all-seats 2004+
    — the 2019/2022 values are the regenerated store's own, NOT a naive
    swap of the shipped day's pair: a reflected fifth boundary moves one
-   151st seat, so the mirror trap bites at indices 6/7 here too */
-assert.deepEqual([...FH.fed.classes.r1.grn], [70.8, 79.1, 82.1, 79.5, 79.2, 83.1, 81.2, 81.9, 85.7, 88.8], "r1 Green flow (IER most-advantaged fifth)");
-assert.deepEqual([...FH.fed.classes.r5.grn], [77.8, 73, 77.8, 80.2, 80, 83.8, 83.3, 83, 86.6, 87.6], "r5 Green flow (IER most-disadvantaged fifth)");
+   151st seat, so the mirror trap bites at indices 6/7 here too; the
+   1998 positions re-pinned 2026-10-31 with the era-90s pcti arrival
+   (70.8→70.9 and 77.8→76.1 on the r1/r5 1998 reads) */
+assert.deepEqual([...FH.fed.classes.r1.grn], [70.9, 79.1, 82.1, 79.5, 79.2, 83.1, 81.2, 81.9, 85.7, 88.8], "r1 Green flow (IER most-advantaged fifth)");
+assert.deepEqual([...FH.fed.classes.r5.grn], [76.1, 73, 77.8, 80.2, 80, 83.8, 83.3, 83, 86.6, 87.6], "r5 Green flow (IER most-disadvantaged fifth)");
 assert.ok(!Object.keys(FH).includes("classes"), "classes nests under fed, never a chip key of its own");
 
 console.log("test-fed-class-flows: all assertions passed");

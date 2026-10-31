@@ -240,6 +240,7 @@ def build(year):
                          'note':'Polling-place names and votes are from the AEC statistics pack. Historical venue coordinates are unavailable in this source; these polling places are not plotted. Census figures are unavailable.'})
     apply_locations(doc)
     with_demo(doc, year)
+    with_seifa(doc, year)
     write(f'data-{year}.json', doc)
     senate(year, byname, pids)
     print(year, len(D), 'divisions;', len(pids), 'polling places;', A['AUS']['seats'])
@@ -321,6 +322,64 @@ def with_demo(doc, year):
             'census demos do not exist at this frame.'))
     print(f"    people lanes: {n_div} divisions, {n_booth} booths "
           f"carried census demo cells")
+
+
+def with_seifa(doc, year):
+    """Attach the SEIFA lanes to the statistics-era frame: division cells
+    from data/division-seifa-indexes.json (the same store build_map_data
+    reads; era blocks via derive-division-seifa-stats90s.py) with
+    common.seifa_cells' pcti-before-pct precedence, and the per-booth
+    national-decile cells from data/booth-seifa-<year>.json keyed by the
+    frame's composite booth ids (the derive gates that registry against
+    the assembled frame). seifaCuts uses build_map_data's own midpoint
+    recipe so the 90s legend edges line up with the GCP-era lane's; an
+    index whose census era lacks it (pre-2001 censuses print no IRSAD)
+    keeps a null cut and null cells, never a cross-era substitute."""
+    p = ROOT / f'data/booth-seifa-{year}.json'
+    if not p.exists():
+        return
+    bse = json.loads(p.read_text(encoding='utf-8'))
+    blocks = json.loads((ROOT / 'data/division-seifa-indexes.json')
+                        .read_text(encoding='utf-8'))['elections'].get(str(year)) or {}
+    n_div = 0
+    for d in doc['divs']:
+        blk = blocks.get(d['n'])
+        if not blk:
+            continue
+        cells = common.seifa_cells(blk)
+        if cells:
+            d['seifa'] = cells
+            n_div += 1
+    by_booth = {b['boothId']: b for b in bse.get('booths', [])}
+    dec = []
+    for bid in doc['booths']['id']:
+        s = (by_booth.get(bid) or {}).get('seifa') or {}
+        dd = s.get('dec') or {}
+        dec.append([dd.get(ix) for ix in (
+            'irsad', 'irsd', 'ier', 'ieo')] if dd else None)
+    doc['booths']['dec'] = dec
+    cuts = {}
+    for ix in ('irsad', 'irsd', 'ier', 'ieo'):
+        lo = C.defaultdict(list)
+        for b in by_booth.values():
+            s = b.get('seifa')
+            if s and s.get(ix) is not None and (s.get('dec') or {}).get(ix):
+                lo[s['dec'][ix]].append(s[ix])
+        cuts[ix] = [round((max(lo[k]) + min(lo[k + 1])) / 2, 1)
+                    for k in range(1, 10)] if all(lo[k] for k in range(1, 11)) else None
+    doc['seifaCuts'] = cuts
+    n_booth = sum(x is not None and any(v is not None for v in x) for x in dec)
+    doc['coverage']['seifa'] = (
+        f"the {bse.get('seifaEdition')} census's CD scores via the same "
+        f"era districts (era SEIFA cubes; {len(bse.get('indexes') or [])} "
+        f"indexes; booth deciles on {n_booth:,} places); "
+        f"{bse.get('seifaEdition')} predates IRSAD"
+        if bse.get('seifaEdition') in (1991, 1996) else
+        f"the {bse.get('seifaEdition')} census's CD scores via the same "
+        f"era districts (era SEIFA cubes; booth deciles on {n_booth:,} "
+        f"places)")
+    print(f"    seifa lanes: {n_div} divisions, {n_booth} booths carried "
+          f"SEIFA cells")
 
 
 def senate(year, divs, pids):

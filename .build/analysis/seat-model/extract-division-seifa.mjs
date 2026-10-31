@@ -74,6 +74,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 const SRC_DIR = ".build/analysis/seat-model/seifa-src";
 const APH_DIR = ".build/analysis/seifa-index/src/aph";
 const ABS_DERIVED = `${SRC_DIR}/abs-derived-3idx.json`; // derive-division-seifa-abs.py
+const ERA90S = `${SRC_DIR}/era-derived-90s.json`;       // derive-division-seifa-stats90s.py
 const IRSAD_CELLS = `${SRC_DIR}/irsad-cells.json`;       // derive-irsad.py (companion emit)
 const OUT_STORE = "data/division-seifa-indexes.json";
 const OUT_FIXTURE = `${SRC_DIR}/aph-fixtures.json`;
@@ -506,8 +507,9 @@ const ABOUT =
   "cell ALSO carries pct, its within-census percentile rank (rankDis/N), and the bracketed-in-time elections " +
   "additionally carry pcti, the census-night-distance interpolation of the two bracketing censuses' pct — " +
   "the cross-census comparable quantity (percentiles are; raw scores never are, ABS re-deriving the indexes " +
-  "per census). pcti lanes shipped: 2004/2007/2010 (whole-unit era-polygon allocations, derive-ced-era-alloc.py) " +
-  "and 2013/2016/2019 (concordance-based). IRSAD lands " +
+  "per census). pcti lanes shipped: 1993/1996/1998 (era CD-cube lanes, derive-division-seifa-stats90s.py), " +
+  "2004/2007/2010 (whole-unit era-polygon allocations, derive-ced-era-alloc.py) and 2013/2016/2019 " +
+  "(concordance-based). IRSAD lands " +
   "from the sibling pipeline's irsad-cells.json (derive-irsad.py), which also owns the display store at " +
   ".build/analysis/seifa-index/irsad-by-division.json. APH lanes carry scores/ranks as PRINTED by the papers; " +
   "ABS lanes rank from their carried scores. Indexes are re-derived by the ABS per census (PCA weights " +
@@ -521,7 +523,11 @@ const ABOUT =
   "irsad-only forward block (2021-census derivation on the 2025 gazetted boundaries; the other three " +
   "indexes await a census), 1998 an irsd/ier/ieo-only one — IRSAD did not exist until the 2001 census and " +
   "the five-index-era Advantage composite the paper prints is NOT IRSAD (fixture-only, key `adv`). " +
-  "1987-1993 (five-index era) out of scope. Full map: .build/analysis/seifa-index/rr6-official-seifa-products.md.";
+  "The statistics-era frames 1993/1996/1998 stay three-index for the same reason: 1993 measures SEIFA 1991 " +
+  "CD scores x the 1993-election division set and 1996 SEIFA 1996 x its set (eraCd* vias, the ABS lane's " +
+  "same 2039.0 sect.2.2 population weighting over the committed era allocations; " +
+  "derive-division-seifa-stats90s.py). Elections before 1993 have no SEIFA coverage. Full map: " +
+  ".build/analysis/seifa-index/rr6-official-seifa-products.md.";
 
 const provenance = {};
 const elections = {};
@@ -557,6 +563,31 @@ const ABS_VIA_BY_ELECTION = {
     if (elections[y]) fail(`election ${y} claimed by both a paper and the ABS lanes`);
     const via = ABS_VIA_BY_ELECTION[y];
     if (!via || !provenance[via]) fail(`election ${y}: no ABS provenance registered`);
+    const out = {};
+    for (const [name, row] of Object.entries(block)) {
+      const rec = { state: row.state, via };
+      for (const idx of ["irsd", "ier", "ieo"]) rec[idx] = row[idx];
+      out[name] = rec;
+    }
+    elections[y] = out;
+    console.log(`${y}: ${Object.keys(out).length} divisions (via ${via})`);
+  }
+}
+
+/* ERA-90s lane (derive-division-seifa-stats90s.py output): the measured
+   nearest-census blocks of the statistics-era frames 1993 (SEIFA 1991 CD
+   cube x the 1993-election division set) and 1996 (SEIFA 1996 x its set),
+   the ABS-lane's same 2039.0 sect.2.2 population weighting over the
+   committed era allocations. Three-index era — no IRSAD before the 2001
+   census, so these two blocks and 1998's paper block stay irsd/ier/ieo. */
+{
+  const ERA90S_VIA = { 1993: "eraCd1991Ced1993set", 1996: "eraCd1996Ced1996set" };
+  const d = JSON.parse(readFileSync(ERA90S, "utf8"));
+  for (const [via, rec] of Object.entries(d._provenance)) provenance[via] = rec;
+  for (const [y, block] of Object.entries(d.elections)) {
+    if (elections[y]) fail(`election ${y} claimed by two lanes`);
+    const via = ERA90S_VIA[y];
+    if (!via || !provenance[via]) fail(`election ${y}: no era provenance registered`);
     const out = {};
     for (const [name, row] of Object.entries(block)) {
       const rec = { state: row.state, via };
@@ -640,13 +671,15 @@ const ABS_VIA_BY_ELECTION = {
    per cell: 2004/2007/2010/2013/2019's c0 and 2016's c1 are the measured
    sides). */
 const PCTI = `${SRC_DIR}/div-interp.json`;
+const PCTI90S = `${SRC_DIR}/div-interp-90s.json`;
 const interpOf = {};
 const _pcti = {
   method: "pct = rankDis/N per cell (1/N most disadvantaged … N/N most advantaged); " +
           "pcti = (1-f)*pct(c0) + f*pct(c1) on the two bracketing censuses' own " +
-          "geometries, f by census-night distance (derive-division-seifa-interp.py; " +
-          "one side of each election is the measured store row, read back — the c0 side " +
-          "for 2004/2007/2010/2013/2019, the c1 side for 2016)",
+          "geometries, f by census-night distance (derive-division-seifa-interp.py and " +
+          "derive-division-seifa-stats90s.py for the era lanes; one side of each " +
+          "election is the measured store row, read back — the c0 side " +
+          "for 1993/1998/2004/2007/2010/2013/2019, the c1 side for 1996/2016)",
 };
 {
   const d = JSON.parse(readFileSync(PCTI, "utf8"));
@@ -664,9 +697,25 @@ const _pcti = {
     censusYear: null,
   };
   _pcti.factors = factors;
+  const d90 = JSON.parse(readFileSync(PCTI90S, "utf8"));
+  for (const [via, rec] of Object.entries(d90._provenance))
+    provenance[via] = { title: rec.title, censusYear: null, derivation: "interp lattice" };
+  for (const [y, block] of Object.entries(d90.elections)) {
+    if (interpOf[y]) fail(`interp election ${y} claimed by two lanes`);
+    interpOf[y] = block;
+  }
+  Object.assign(_pcti.factors, d90.factors);
+  provenance.pcti90s = {
+    title: "Between-census percentile interpolation, era lanes (derive-division-seifa-stats90s.py): " +
+           "1993/1996/1998 the same pcti contract over the SEIFA-91/96/2001 CD cubes " +
+           "and the committed era allocations — three-index era only (no IRSAD before " +
+           "the 2001 census); 1998's pct0 is the measured aph98 paper block read back",
+    censusYear: null,
+  };
 }
 
-const MEASURED_SIDE = { 2004: "pct0", 2007: "pct0", 2010: "pct0",
+const MEASURED_SIDE = { 1993: "pct0", 1996: "pct1", 1998: "pct0",
+                        2004: "pct0", 2007: "pct0", 2010: "pct0",
                         2013: "pct0", 2016: "pct1", 2019: "pct0" };
 let pctCells = 0, pctiCells = 0;
 for (const [y, block] of Object.entries(elections)) {
@@ -688,6 +737,7 @@ for (const [y, block] of Object.entries(elections)) {
     const sideKey = MEASURED_SIDE[y];
     if (!sideKey) fail(`${y}: interp row exists but no measured-side contract declared`);
     for (const idx of INDEXES) {
+      if (!cell[idx]) continue;   // three-index-era elections carry no irsad lane
       const icell = irow[idx];
       if (!icell) fail(`${y} ${name}: div-interp.json missing ${idx}`);
       if (icell[sideKey] !== cell[idx].pct)

@@ -3,6 +3,13 @@
 matcher in historical_booth_locations.py, using corrected Handbook boundaries.
 This file retains the earlier store recipe for reproducibility.
 
+SUPERSEDED 2026-10-31 wholly: data/booth-seifa-1996.json is now written by
+.build/analysis/seat-model/derive-booth-seifa-stats90s.py in the frame's own
+booth registry (the history-location store's, asserted equal to the assembled
+frame's composite ids) with the SEIFA lane filled against the AURIN
+seifa_cd_1996 cube; this script's store recipe survives as the venue-pool
+reference for its coordinate prose only.
+
 Derive data/booth-seifa-1996.json — the /map/ 1996 federal frame's per-booth
 venue-coordinate store.
 

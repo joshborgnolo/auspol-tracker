@@ -3,12 +3,15 @@
    .build/analysis/seat-model/seifa-src/aph-fixtures.json
    (extract-division-seifa.mjs). Invariants:
 
-   1. Store elections are exactly the landed set {1998, 2001, 2004, 2007,
-      2010, 2013, 2016, 2019, 2022, 2025} plus the irsad-only forward block
-      2028, each N divisions (148 in 1998, 151 in 2019/2022, 150
-      otherwise), division-keyed, no others.
+   1. Store elections are exactly the landed set {1993, 1996, 1998, 2001,
+      2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025} plus the irsad-only
+      forward block 2028, each N divisions (147 in 1993, 148 in 1996/1998,
+      151 in 2019/2022, 150 otherwise), division-keyed, no others.
    2. Division sets are NAME-EXACT against data/division-classifications.json's
-      matching election blocks — joins must never miss (1998: the
+      matching election blocks — joins must never miss (1993: the
+      1991-2-edition set, certified against the map's own served frame —
+      the classifications file predates a 1993 block; 1996: the
+      1993-4-edition set, Namadgi in / Corinella out; 1998: the
       1997-in-force set, Blair in / Namadgi out; 2001: 2000-edition
       set with Bonython/Burke, 2007: the 2006-edition set, 2010: the 2009
       edition, 2019/2022: the 151-division editions with Macnamara and then
@@ -27,10 +30,12 @@
       2016=absSa1Ced2016, 2019=absSa1Ced2018, 2022=absMbCed2021,
       2025=absMbCed2024). The 2028 forward block carries {state, irsad, via}
       only — the other three indexes have no 2025-boundary product. The
-      1998 block mirrors that asymmetry the other way: {state, irsd, ier,
-      ieo, via} only — its paper predates IRSAD (a 2001-census invention)
-      and the five-index-era Advantage composite is no substitute (kept
-      fixture-only under the key `adv`).
+      1993/1996/1998 blocks mirror that asymmetry the other way: {state,
+      irsd, ier, ieo, via} only — their era predates IRSAD (a 2001-census
+      invention) and the five-index-era Advantage composite is no
+      substitute (kept fixture-only under the key `adv`; the 1993/1996
+      blocks derive era-cube x era-set per derive-division-seifa-stats90s.py,
+      1998's paper prints its own scores).
    4. Ranks per election x index are an exact permutation of 1..N (the APH
       prints a complete ranking; the ABS lanes compute one from their carried
       scores; ties are ordered, never shared). For irsad BOTH rank keys are
@@ -145,16 +150,20 @@ const sibling = JSON.parse(readFileSync(SIBLING, "utf8"));
 
 const IDX = ["irsd", "ier", "ieo"]; // store indexes
 const IDX4 = ["irsad", "irsd", "ier", "ieo"]; // fixture indexes (98cib04 substitutes adv for irsad)
-const COUNT_FOR = { 1998: 148, 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150, 2028: 150 };
+const COUNT_FOR = { 1993: 147, 1996: 148, 1998: 148, 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150, 2028: 150 };
 const ELECTION_SET = Object.keys(COUNT_FOR);
 const SHARED_SET = ELECTION_SET.filter((y) => y !== "2028");
+// the three-index-era elections (no IRSAD before the 2001 census — the
+// store's measured blocks carry irsd/ier/ieo only there)
+const THREE_IDX = new Set(["1993", "1996", "1998"]);
 const VIA_FOR = {
+  1993: "eraCd1991Ced1993set", 1996: "eraCd1996Ced1996set",
   1998: "aph98cib04",
   2001: "absCed01", 2004: "aph05cib01", 2007: "aph09rp02", 2010: "aph11rp01", 2013: "absSa1Ced2011",
   2016: "absSa1Ced2016", 2019: "absSa1Ced2018", 2022: "absMbCed2021", 2025: "absMbCed2024",
   2028: "irsad-weighted-2021-e2025",
 };
-const CENSUS_FOR = { 1998: 1996, 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021, 2028: 2021 };
+const CENSUS_FOR = { 1993: 1991, 1996: 1996, 1998: 1996, 2001: 2001, 2004: 2001, 2007: 2006, 2010: 2006, 2013: 2011, 2016: 2016, 2019: 2016, 2022: 2021, 2025: 2021, 2028: 2021 };
 const IRSAD_PROV_FOR = {
   2001: "irsad-published-2001", 2004: "irsad-published-2001-e2003",
   2007: "irsad-published-2006", 2010: "irsad-published-2006-e2009",
@@ -189,9 +198,12 @@ for (const y of ELECTION_SET) {
   check(Object.keys(blk).length === N, `${y}: ${Object.keys(blk).length} divisions != ${N}`);
   // 2 — name-exact division set against classifications (2028 pins against
   // its 2025-edition reference names; a classifications 2028 block landing
-  // later must agree)
+  // later must agree). The classifications file predates a 1993 block: the
+  // 1993 lane pins against the map's own served frame's name set instead.
   const mine = new Set(Object.keys(blk));
-  const theirs = y === "2028" && !klass[y] ? new Set(NAMES_2025_EDITION) : new Set(Object.keys(klass[y] || {}));
+  const theirs = y === "2028" && !klass[y] ? new Set(NAMES_2025_EDITION)
+    : y === "1993" ? new Set(JSON.parse(readFileSync("map/data/res-1993.json", "utf8")).divs.map((x) => x.n))
+    : new Set(Object.keys(klass[y] || {}));
   const missing = [...theirs].filter((n) => !mine.has(n));
   const extra = [...mine].filter((n) => !theirs.has(n));
   check(missing.length === 0 && extra.length === 0,
@@ -199,7 +211,7 @@ for (const y of ELECTION_SET) {
   // 3
   for (const [name, row] of Object.entries(blk)) {
     const wantKeys = y === "2028" ? ["irsad", "state", "via"]
-      : y === "1998" ? ["ieo", "ier", "irsd", "state", "via"]
+      : THREE_IDX.has(y) ? ["ieo", "ier", "irsd", "state", "via"]
       : ["ieo", "ier", "irsad", "irsd", "state", "via"];
     check(JSON.stringify(Object.keys(row).sort()) === JSON.stringify(wantKeys),
       `${y} ${name}: row keys ${Object.keys(row)}`);
@@ -213,7 +225,7 @@ for (const y of ELECTION_SET) {
         check(cell.value > 700 && cell.value < 1400, `${y} ${name} ${idx}: value ${cell.value} outside sanity band`);
       }
     }
-    if (y !== "1998") {
+    if (!THREE_IDX.has(y)) {
       const cell = row.irsad;
       check(cell && Number.isFinite(cell.value) && Number.isInteger(cell.rank) && Number.isInteger(cell.rankDis),
         `${y} ${name} irsad: bad cell ${JSON.stringify(cell)}`);
@@ -231,7 +243,7 @@ for (const y of ELECTION_SET) {
     check(ranks.length === N && ranks.every((r, i) => r === i + 1),
       `${y} ${idx}: ranks are not a 1..${N} permutation`);
   }
-  if (y !== "1998") for (const key of ["rank", "rankDis"]) {
+  if (!THREE_IDX.has(y)) for (const key of ["rank", "rankDis"]) {
     const ranks = Object.values(blk).map((r) => r.irsad[key]).sort((a, b) => a - b);
     check(ranks.length === N && ranks.every((r, i) => r === i + 1),
       `${y} irsad.${key}: ranks are not a 1..${N} permutation`);
@@ -254,8 +266,9 @@ for (const y of ELECTION_SET) {
 }
 
 // 11 — merged irsad cells byte-faithful to the sibling display store
-// (1998 carries no irsad — IRSAD is a 2001-census invention)
-for (const y of ELECTION_SET.filter((y) => y !== "1998")) {
+// (the three-index-era elections carry no irsad — IRSAD is a 2001-census
+// invention; 2028's forward block is irsad-only)
+for (const y of ELECTION_SET.filter((y) => !THREE_IDX.has(y))) {
   const srows = new Map(sibling.elections[y].rows.map((r) => [r.division, r]));
   const RENAME = { "Kingston-Smith": "Kingsford Smith", "McEwan": "McEwen" };
   const canon = (n) => {
@@ -444,41 +457,55 @@ for (const via of Object.keys(fixtures)) {
 
 // 13 — the percentile layer (2026-10-24 pcti directive). EVERY index cell in
 // every election carries pct = rankDis/N rounded to 6dp (rankDis is the
-// store convention, 1/N most disadvantaged). The six shipped interp lanes
-// (2004/2007/2010 CD-era plus 2013/2016/2019 SA1-era) additionally carry
-// pcti on all four indexes; NO other election carries pcti, and wherever
-// div-interp.json's measured side is, pct side == rankDis/N on the nose.
+// store convention, 1/N most disadvantaged). The shipped interp lanes —
+// the 1993/1996/1998 era-CD-cube lanes (div-interp-90s.json) and the six
+// GCP-era lanes (2004/2007/2010 CD-era plus 2013/2016/2019 SA1-era, both
+// div-interp.json) — additionally carry pcti; NO other election carries
+// pcti, and wherever a lattice file's measured side is, pct side ==
+// rankDis/N on the nose.
 // pcti itself is recomputed here from the LATTICE file's own cells and
 // f — a splice defect in the extractor (wrong division, wrong side, wrong
 // election) surfaces as a pcti mismatch; a wholesale lattice drift surfaces
 // as a literal-pin break in invariant 14.
 const INTERP_SRC = ".build/analysis/seat-model/seifa-src/div-interp.json";
+const INTERP_SRC_90S = ".build/analysis/seat-model/seifa-src/div-interp-90s.json";
 const interp = JSON.parse(readFileSync(INTERP_SRC, "utf8"));
-const INTERP_YEARS = ["2004", "2007", "2010", "2013", "2016", "2019"];
-const MEASURED = { 2004: "pct0", 2007: "pct0", 2010: "pct0", 2013: "pct0", 2016: "pct1", 2019: "pct0" };
-const CENSUS_DATE = { 2001: Date.UTC(2001, 7, 7), 2006: Date.UTC(2006, 7, 8), 2011: Date.UTC(2011, 7, 9), 2016: Date.UTC(2016, 7, 9), 2021: Date.UTC(2021, 7, 10) };
-const ELEC_DATE = { 2004: Date.UTC(2004, 9, 9), 2007: Date.UTC(2007, 10, 24), 2010: Date.UTC(2010, 7, 21), 2013: Date.UTC(2013, 8, 7), 2016: Date.UTC(2016, 6, 2), 2019: Date.UTC(2019, 4, 18) };
-check(JSON.stringify(Object.keys(interp.elections).sort()) === JSON.stringify(INTERP_YEARS),
-  `div-interp elections ${Object.keys(interp.elections)} != [2004, 2007, 2010, 2013, 2016, 2019] (a lane must land here, never silently)`);
+const interp90 = JSON.parse(readFileSync(INTERP_SRC_90S, "utf8"));
+const INTERP_YEARS_90S = ["1993", "1996", "1998"];
+const INTERP_YEARS = [...INTERP_YEARS_90S, "2004", "2007", "2010", "2013", "2016", "2019"];
+const INTERP_GCP = ["2004", "2007", "2010", "2013", "2016", "2019"];
+const MEASURED = { 1993: "pct0", 1996: "pct1", 1998: "pct0", 2004: "pct0", 2007: "pct0", 2010: "pct0", 2013: "pct0", 2016: "pct1", 2019: "pct0" };
+const CENSUS_DATE = { 1991: Date.UTC(1991, 7, 6), 1996: Date.UTC(1996, 7, 6), 2001: Date.UTC(2001, 7, 7), 2006: Date.UTC(2006, 7, 8), 2011: Date.UTC(2011, 7, 9), 2016: Date.UTC(2016, 7, 9), 2021: Date.UTC(2021, 7, 10) };
+const ELEC_DATE = { 1993: Date.UTC(1993, 2, 13), 1996: Date.UTC(1996, 2, 2), 1998: Date.UTC(1998, 9, 3), 2004: Date.UTC(2004, 9, 9), 2007: Date.UTC(2007, 10, 24), 2010: Date.UTC(2010, 7, 21), 2013: Date.UTC(2013, 8, 7), 2016: Date.UTC(2016, 6, 2), 2019: Date.UTC(2019, 4, 18) };
+const LATTICE = Object.fromEntries(INTERP_YEARS.map((y) => [y, {
+  elections: (INTERP_YEARS_90S.includes(y) ? interp90 : interp).elections[y],
+  factors: (INTERP_YEARS_90S.includes(y) ? interp90 : interp).factors[y],
+}]));
+check(JSON.stringify(Object.keys(interp.elections).sort()) === JSON.stringify(INTERP_GCP.sort()),
+  `div-interp elections ${Object.keys(interp.elections)} != the GCP-era set (a lane must land here, never silently)`);
+check(JSON.stringify(Object.keys(interp90.elections).sort()) === JSON.stringify(INTERP_YEARS_90S.sort()),
+  `div-interp-90s elections ${Object.keys(interp90.elections)} != the era-90s set (a lane must land here, never silently)`);
+check(JSON.stringify(Object.keys(interp90.factors).sort()) === JSON.stringify(INTERP_YEARS_90S.sort()),
+  "div-interp-90s factors cover exactly the era-90s set");
 {
   const DAY = 86400000;
   const F_WANT = {};
   for (const y of INTERP_YEARS) {
-    const fc = interp.factors[y];
+    const fc = LATTICE[y].factors;
     const num = (ELEC_DATE[y] - CENSUS_DATE[fc.c0]) / DAY;
     const den = (CENSUS_DATE[fc.c1] - CENSUS_DATE[fc.c0]) / DAY;
     F_WANT[y] = Math.round((num / den) * 1e6) / 1e6;
     check(fc.f === F_WANT[y], `${y}: f ${fc.f} != recomputed ${F_WANT[y]} (${num}/${den} days)`);
   }
   for (const y of INTERP_YEARS) {
-    const N = COUNT_FOR[y];
+    const YIDX = THREE_IDX.has(y) ? IDX : IDX4;
     const meKey = MEASURED[y];
-    const f = interp.factors[y].f;
+    const f = LATTICE[y].factors.f;
     for (const [name, row] of Object.entries(store.elections[y])) {
-      const irow = interp.elections[y][name];
-      check(irow != null, `${y} ${name}: absent from div-interp.json`);
+      const irow = LATTICE[y].elections[name];
+      check(irow != null, `${y} ${name}: absent from the interp lattice`);
       if (!irow) continue;
-      for (const idx of IDX4) {
+      for (const idx of YIDX) {
         const cell = row[idx], icell = irow[idx];
         check(cell.pct === icell[meKey],
           `${y} ${name} ${idx}: interp ${meKey} ${icell[meKey]} != store pct ${cell.pct}`);
@@ -518,6 +545,12 @@ for (const y of ELECTION_SET) {
 // to (a lattice swap re-derives a self-consistent but wrong pct set —
 // these literals must not move without a deliberate re-pinning).
 const PCTI_PIN = [
+  ["1993", "Corinella", "ieo", 0.29932, 0.14966, 0.251399],
+  ["1993", "O'Connor", "irsd", 0.319728, 0.387755, 0.34151],
+  ["1996", "Namadgi", "irsd", 0.966216, 0.912162, 0.916807],
+  ["1996", "Adelaide", "ieo", 0.797297, 0.837838, 0.834354],
+  ["1998", "Blair", "irsd", 0.175676, 0.243243, 0.204818],
+  ["1998", "Bradfield", "ier", 1, 1, 1],
   ["2004", "Lingiari", "irsd", 0.013333, 0.006667, 0.009104],
   ["2004", "Melbourne", "ier", 0.833333, 0.113333, 0.376584],
   ["2007", "Solomon", "irsd", 0.526667, 0.726667, 0.578446],
@@ -531,7 +564,7 @@ const PCTI_PIN = [
   ["2019", "Macnamara", "irsd", 0.89404, 0.89404, 0.89404],
 ];
 for (const [y, name, idx, pct0, pct1, pcti] of PCTI_PIN) {
-  const icell = interp.elections[y]?.[name]?.[idx];
+  const icell = LATTICE[y].elections[name]?.[idx];
   const scell = store.elections[y]?.[name]?.[idx];
   if (!icell || !scell) { failures.push(`${y} ${name} ${idx}: pcti anchor absent`); continue; }
   check(icell.pct0 === pct0 && icell.pct1 === pct1 && icell.pcti === pcti,
@@ -551,12 +584,12 @@ for (const [y, name, idx, pct0, pct1, pcti] of PCTI_PIN) {
 // ~0.457 max (2004:ier Melbourne); 2007 (f=0.259) stays close to its
 // measured side. First-era-run medians/maxes sit under these bands.
 {
-  const isEraLane = (y) => y === "2004" || y === "2007" || y === "2010";
-  const deltasPer = (y, idx, side) => Object.keys(interp.elections[y])
-    .map((n) => Math.abs(interp.elections[y][n][idx].pcti - interp.elections[y][n][idx][side]));
+  const isEraLane = (y) => THREE_IDX.has(y) || y === "2004" || y === "2007" || y === "2010";
+  const deltasPer = (y, idx, side) => Object.entries(LATTICE[y].elections)
+    .map(([, c]) => Math.abs(c[idx].pcti - c[idx][side]));
   for (const y of INTERP_YEARS) {
     const side = MEASURED[y];
-    for (const idx of IDX4) {
+    for (const idx of (THREE_IDX.has(y) ? IDX : IDX4)) {
       const ds = deltasPer(y, idx, side).sort((a, b) => a - b);
       const median = ds[Math.floor(ds.length / 2)], max = ds[ds.length - 1];
       const medBand = y === "2016" ? 0.002 : isEraLane(y) ? 0.08 : 0.03;

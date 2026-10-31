@@ -313,9 +313,21 @@ build record.
    Fenner in; Charlton/Throsby out) prove the **2016 edition** — the set in
    force at the 2016 election, one edition behind the 2018 set used in 2019.
    §7's 2019 row now records the 2016→2018 concordance requirement.
-3. For pre-1998 works (1987–1996 elections), source ABS correspondence
-   files (CD→CED) per census from ABS catalogue 1217/2900-era products or
-   the ABS Unlodged-CD catalogue (research-visit territory).
+3. ~~For pre-1998 works (1987–1996 elections), source ABS correspondence
+   files (CD→CED) per census~~ — **RESOLVED 2026-10-31**: the '90s
+   census-people arc (676678b9) derived whole-CD→CED allocations spatially
+   from the era polygon sets (dl/asgc{1991,1996,2001}.gpkg CD layer x the
+   parliamentary-handbook division layer; seifa-src/cd-YEAR-ced-ESET.json
+   committed, 100% placed). Division-level SEIFA for the 1993/1996/1998
+   elections now rides those umbilicals (era AURIN seifa_cd_<YEAR> cubes
+   x the era boundary sets per §2.2's weighting) — seifa-src/
+   era-derived-90s.json (measured blocks 1993/1996) + div-interp-90s.json
+   (pcti lanes incl. 1998, whose pct0 stays the aph98cib04 paper print)
+   feeding data/division-seifa-indexes.json (three-index era; IRSAD lands
+   from the 2001 census only), and booth deciles in
+   data/booth-seifa-{1993,1996,1998,2001}.json from
+   derive-booth-seifa-stats90s.py. Open era left: 1990 and earlier (needs
+   the SEIFA-91 cube x the 1990-in-force CED set's own alloc).
 4. Re-check map-api.aec.gov.au DNS recovery; when back, pull the GetCapabilities
    XML for every Electoral_* layer into `src/mapproxy-caps/` (the directory is
    created and waiting).
