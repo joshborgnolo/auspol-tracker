@@ -179,6 +179,7 @@ def demo_main(frame, year):
     gcp, qld_persons = load_gcp_qld(year)
     nlt = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
+    inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
         2016, "c7")
@@ -214,6 +215,7 @@ def demo_main(frame, year):
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
                                   "ancP": 0, "ancNS": 0,
+                                  "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -257,6 +259,12 @@ def demo_main(frame, year):
         for i in range(len(gcp_newlanes.ANC_KEYS)):
             a["ancN"][i] += ancv[i]
         a["ancP"] += ancp
+        aud, lom, him, _med, bands_ad, hh = inc[code]
+        a["incAud"] += aud
+        a["incLo"] += lom
+        a["incHi"] += him
+        for ii in range(len(gcp_newlanes.INC_BANDS)):
+            a["incBandH"][ii] += hh[ii]
         a["ancNS"] += ancns
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
@@ -304,6 +312,12 @@ def demo_main(frame, year):
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
         }
+        if a.get("incAud", 0) > 0:
+            s["loinc"] = round(a["incLo"] / a["incAud"], 4)
+            s["hiinc"] = round(a["incHi"] / a["incAud"], 4)
+            med = gcp_newlanes.band_median(a["incBandH"], gcp_newlanes.INC_BANDS)
+            s["medIncWeekly"] = int(round(med)) if med is not None else None
+
         return s, None
 
     demo = {}
@@ -326,13 +340,15 @@ def demo_main(frame, year):
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
               "ancP": 0, "ancNS": 0,
+              "incAud": 0.0, "incLo": 0.0, "incHi": 0.0,
+              "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:

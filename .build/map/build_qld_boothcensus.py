@@ -213,6 +213,7 @@ def demo_cells(year):
     z = zipfile.ZipFile(V["gcp"])
     newl = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
+    inc, inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
         2016, "c7")
@@ -288,6 +289,7 @@ def demo_cells(year):
         citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
+        aud, lom, him, _med, _bands_ad, _hh = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
@@ -295,7 +297,7 @@ def demo_cells(year):
                       safe(tot - cobns - aust, den09),
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
-                      None, None,
+                      safe(lom, aud), safe(him, aud),
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),
@@ -394,6 +396,9 @@ def run_frame(frame):
     data["relKeys"] = list(gcp_newlanes.REL_KEYS)
     data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
     data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
+    _unused_inc, income_cuts = gcp_newlanes.state_income(
+        VINTAGES[year]["gcp"], str(year), "3")
+    data["incomeCuts"] = income_cuts
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"{frame}: {counts['pip']} booths joined to {len(sa1s)} SA1s"

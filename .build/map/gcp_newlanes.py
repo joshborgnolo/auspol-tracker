@@ -69,12 +69,14 @@ VINTAGES = {
                  member="2021 Census GCP Statistical Area 1 for AUS/"
                         "2021Census_{table}_AUST_SA1.csv",
                  key="SA1_CODE_2021", school="G01", indig="G07",
-                 religion="G14", tenure="G37", family="G32"),
+                 religion="G14", tenure="G37", family="G32",
+                 income_family="G32", income_household="G33"),
     "2016": dict(rows=GCP16_ROWS,
                  member="2016 Census GCP Statistical Area 1 for AUST/"
                         "2016Census_{table}_AUS_SA1.csv",
                  key="SA1_7DIGITCODE_2016", school="G01", indig="G07",
-                 religion="G14", tenure="G33", family="G28"),
+                 religion="G14", tenure="G33", family="G28",
+                 income_family="G28", income_household="G29"),
 }
 DEMO_BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
               "55_64", "65_74", "75_84", "85ov"]
@@ -261,3 +263,228 @@ def y12less_cell(school6, safe):
 def u15_cell(bands, safe):
     """Under-15 share of the stated ages."""
     return safe(bands[0] + bands[1], sum(bands))
+
+
+def band_median(masses, bands=None):
+    """Interpolated median weekly household income ($) of a household-
+    band histogram at wherever it lives (matching income_lanes'
+    band_median's rule; interpolated linearly inside its median band,
+    None on an empty histogram or an open top band)."""
+    bands = bands or INC_BANDS
+    tot = sum(masses)
+    if tot <= 0:
+        return None
+    half = tot / 2
+    cum = 0.0
+    for i, (lo, hi) in enumerate(bands):
+        cum2 = cum + masses[i]
+        if cum2 >= half:
+            if hi is None or masses[i] == 0:
+                return None
+            return lo + (hi - lo + 1) * (half - cum) / masses[i]
+        cum = cum2
+    return None
+
+
+# ----- the 2021-era income lanes, state-frame profile -----------------
+# the same arithmetic the GCP venue era runs on the federal frames
+# (income_lanes.engine 01/06-era + derive-booth-seifa-voter's
+# compute): each SA1's household-band masses re-weighted to adults by
+# (fam share × adults-per-family-type factor + non-family × the lone-
+# person factor), clamped fam share, national mix as empty fallback —
+# except the cut and the top share are computed on the PREFIX-filtered
+# state universe, so every state frame's incomeCuts record is its own
+# jurisdiction figure, never a borrowed national one.
+import json as _json
+
+INC_BANDS = [(1, 149), (150, 299), (300, 399), (400, 499), (500, 649),
+             (650, 799), (800, 999), (1000, 1249), (1250, 1499),
+             (1500, 1749), (1750, 1999), (2000, 2499), (2500, 2999),
+             (3000, 3499), (3500, 3999), (4000, None)]
+_INC_HIGH_EDGE = 4000
+_INC_LO_Q = 0.25
+_INC_CUT_GUARDS = {
+    # measured 2026-10-31 from the first full runs (the cuts record
+    # sits inside its band; a profile migration outside its own band
+    # trips the chain):
+    #   2021 census: NSW 888.77 / Vic 882.13 / Qld 863.16 / SA 761.65/week
+    #   2016 census: Qld 721.76/week (qld17's own vintage)
+    "1": (820, 980),  # NSW
+    "2": (820, 980),  # Vic
+    "3": (700, 950),  # Qld, covering both of its census vintages
+    "4": (700, 930),  # SA
+}
+_INC_SITES = {}
+
+
+def _income_factors():
+    """Adults-per-household factors from data/income-dist.json (the
+    mirror lane of income_lanes.income_factors's load — kept
+    import-free so the map builders run inside their -I isolation)."""
+    path = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__)))),
+        "data", "income-dist.json")
+    if not os.path.exists(path):
+        _fail(f"missing data/income-dist.json (looked at {path})")
+    ax = _json.loads(open(path).read())["axes"]["household"]
+    adults_per = ax["adultsPer"]
+    return ((adults_per["coupleNoChildren"],
+             adults_per["coupleWithChildren"],
+             adults_per["oneParent"], adults_per["otherFamily"]),
+            adults_per["nonFamily"])
+
+
+def state_income(gcp_zip, era, prefix):
+    """Per-SA1 income cohorts for a state prefix: returns
+    (cohorts, cutrec) with cohorts keyed SA1 code ->
+    (adults, loMass, hiMass, medIncWeekly,
+    (16 adults-band masses), (16 household-band masses)),
+    and cutrec the frame's own incomeCuts record (cut over
+    the prefix universe only)"""
+    key = f"{era}:{prefix}"
+    if key in _INC_SITES:
+        return _INC_SITES[key]
+    ad, nonfam = _income_factors()
+    v = VINTAGES[era]
+    memb = v["member"].format
+    bands = INC_BANDS
+    nb = len(bands)
+    z = zipfile.ZipFile(gcp_zip)
+    pin = v["rows"]
+
+    def band_h(band):
+        lo, hi = band
+        return f"{lo}_{hi}" if hi is not None else f"{lo}_{hi}_more" \
+            .replace("_None", "")
+    cols32_extra = ["Neg_Nil_inc_cpl_fam_no_child",
+                    "Neg_Nil_inc_cpl_fam_wth_chld",
+                    "Neg_Nil_inc_One_parent_fam",
+                    "Neg_Nil_inc_Other_fam", "Neg_Nil_inc_Tot"]
+    # ABS names its OWN "with children" type-variant per band ("with"
+    # shortens to "wth" at the print's $800 figure; the Neg_Nil families
+    # use the short form for every band)
+    types_ = (("cpl_fam_no_child", "cpl_fam_no_child"),
+              ("cpl_fam_with_child", "cpl_fam_wth_chld"),
+              ("One_parent_fam", "One_parent_fam"),
+              ("Other_fam", "Other_fam"), ("Tot", "Tot"))
+    fh32nh = io.TextIOWrapper(
+        z.open(memb(table=v["income_family"])),
+        encoding="utf-8-sig")
+    have32 = next(csv.reader(fh32nh))
+    strip = next(csv.DictReader(fh32nh))
+    fh32nh.close()
+    col_of = {}
+    for (lo, hi) in bands:
+        for want_full, want_short in types_:
+            stem = f"FI_{band_h((lo, hi))}_{want_full}"
+            if stem in have32:
+                col_of[(lo, want_full)] = stem
+                continue
+            stem = f"FI_{band_h((lo, hi))}_{want_short}"
+            if stem in have32:
+                col_of[(lo, want_full)] = stem
+                continue
+            _fail(f"family-income table lacks a {want_full} column at band "
+                  f"{band_h((lo, hi))} (tried the full and short print "
+                  "forms)")
+    cols32 = [col_of[(lo, w)] for (lo, hi) in bands
+              for w, _s in types_]
+    g32 = _table(z, memb(table=v["income_family"]), v["key"],
+                 cols32_extra + cols32, pin, prefix)
+    cols33 = [f"HI_{band_h(b)}_Tot" for b in bands]
+    g33 = _table(z, memb(table=v["income_household"]), v["key"],
+                 ["Negative_Nil_income_Tot"] + cols33, pin, prefix)
+
+    rows = {}
+    for code in set(g33) & set(g32):
+        r33 = g33[code]
+        neg33 = int(r33[0])
+        hhs = [int(x) for x in r33[1:]]
+        hh = [hhs[i] + (neg33 if i == 0 else 0) for i in range(nb)]
+        r32 = g32[code]
+        fi = [int(r32[(4 + i * 5) + 4]) + (int(r32[4]) if i == 0 else 0)
+              for i in range(nb)]
+        mix = [[int(r32[(4 + i * 5) + j]) + (int(r32[j]) if i == 0 else 0)
+                for j in range(4)] for i in range(nb)]
+        rows[code] = (tuple(hh), tuple(fi), tuple(tuple(m) for m in mix))
+    nat = {"b": [0.0] * nb, "fi": [0.0] * nb,
+           "mix": [[0.0] * 4 for _ in range(nb)]}
+    for hh, fi, mix in rows.values():
+        for i in range(nb):
+            nat["b"][i] += hh[i]
+            nat["fi"][i] += fi[i]
+            for k in range(4):
+                nat["mix"][i][k] += mix[i][k]
+    nat_famper, nat_fams = [], []
+    for i in range(nb):
+        if sum(nat["mix"][i]) <= 0 or nat["b"][i] <= 0:
+            _fail(f"state {prefix}: income band {bands[i]} "
+                  "empty national mix")
+        nat_famper.append(sum(m * a for m, a in zip(nat["mix"][i], ad))
+                          / sum(nat["mix"][i]))
+        nat_fams.append(min(1.0, nat["fi"][i] / nat["b"][i]))
+    nat_adults = [nat["b"][i] * (nat_fams[i] * nat_famper[i]
+                                 + (1 - nat_fams[i]) * nonfam)
+                  for i in range(nb)]
+    nat_tot = sum(nat_adults)
+    cum, cut = 0.0, None
+    for i, (lo, hi) in enumerate(bands):
+        cum += nat_adults[i] / nat_tot
+        if cum >= _INC_LO_Q:
+            prev = cum - nat_adults[i] / nat_tot
+            f = (_INC_LO_Q - prev) / (nat_adults[i] / nat_tot)
+            if hi is None:
+                _fail(f"state {prefix}: income 25% cut lands the open band")
+            cut = lo + f * (hi - lo + 1)
+            break
+    gloQ, ghiQ = _INC_CUT_GUARDS.get(prefix, (800, 1900))
+    if cut is None or not gloQ <= cut <= ghiQ:
+        _fail(f"state {prefix}: income 25% cut {cut} outside guard "
+              f"{gloQ}..{ghiQ}")
+    hi_share = nat_adults[-1] / nat_tot
+    if not 0.05 <= hi_share <= 0.25:
+        _fail(f"state {prefix}: income top-band share {hi_share:.4f} "
+              "outside 5-25%")
+
+    out = {}
+    for code, (hh, fi, mix) in rows.items():
+        bands_ad = []
+        for i in range(nb):
+            mixn = sum(mix[i])
+            famper = (sum(m * a for m, a in zip(mix[i], ad)) / mixn
+                      if mixn > 0 else nat_famper[i])
+            fams = min(1.0, fi[i] / hh[i]) if hh[i] > 0 else nat_fams[i]
+            bands_ad.append(hh[i] * (fams * famper + (1 - fams) * nonfam))
+        tsum = sum(bands_ad)
+        lo_mass = 0.0
+        for i, (lo, hi) in enumerate(bands):
+            if cut <= lo:
+                continue
+            if hi is not None and cut > hi:
+                lo_mass += bands_ad[i]
+                continue
+            lo_mass += bands_ad[i] * (cut - lo) / (hi - lo + 1)
+            break
+        tot = sum(hh)
+        med = None
+        if tot > 0:
+            half = tot / 2
+            acc = 0.0
+            for i, (lo, hi) in enumerate(bands):
+                acc2 = acc + hh[i]
+                if acc2 >= half:
+                    if hi is not None and hh[i] > 0:
+                        med = int(round(lo + (hi - lo + 1)
+                                        * (half - acc) / hh[i]))
+                    break
+                acc = acc2
+        out[code] = (tsum, lo_mass, bands_ad[-1], med,
+                     tuple(bands_ad), tuple(hh))
+    cutrec = {"loQuantile": _INC_LO_Q, "loCutWeekly": round(cut, 2),
+              "hiEdgeWeekly": _INC_HIGH_EDGE,
+              "hiNationalShare": round(hi_share, 6),
+              "dollarsYear": int(era)}
+    _INC_SITES[key] = (out, cutrec)
+    print(f"GCP income cells: {len(out)} SA1s (prefix {prefix}, "
+          f"era {era}, cut {cut:.0f}, hi-top {hi_share:.4f})")
+    return _INC_SITES[key]

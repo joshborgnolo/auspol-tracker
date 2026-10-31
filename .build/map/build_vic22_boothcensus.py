@@ -241,6 +241,7 @@ def demo_cells():
         fail(f"GCP G01 rows {n} (pin {GCP_ROWS}), VIC {len(base)} (pin {GCP_VIC_ROWS})")
     newl = gcp_newlanes.load(GCP_ZIP, prefix="2")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="2", era="2021")
+    inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "2")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     extra = {}
     for tag, member, cols in GCP_MEMBERS:
@@ -297,6 +298,7 @@ def demo_cells():
         citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
+        aud, lom, him, _med, _bands_ad, _hh = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
@@ -304,7 +306,7 @@ def demo_cells():
                       safe(tot - cobns - aust, tot - cobns),
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
-                      None, None,
+                      safe(lom, aud), safe(him, aud),
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),
@@ -393,6 +395,8 @@ def main():
     data["relKeys"] = list(gcp_newlanes.REL_KEYS)
     data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
     data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
+    _unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "2")
+    data["incomeCuts"] = inc_cutrec
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"vic22: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

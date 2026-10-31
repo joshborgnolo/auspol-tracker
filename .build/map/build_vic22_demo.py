@@ -188,6 +188,7 @@ def main():
     gcp, vic_persons = load_gcp_vic()
     nlt = gcp_newlanes.load(GCP_ZIP, prefix="2")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="2", era="2021")
+    inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "2")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     sa1 = read_sa1_polygons()
     districts, order = load_districts()
@@ -228,6 +229,7 @@ def main():
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
                                   "ancP": 0, "ancNS": 0,
+                                  "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -271,6 +273,12 @@ def main():
         for i in range(len(gcp_newlanes.ANC_KEYS)):
             a["ancN"][i] += ancv[i]
         a["ancP"] += ancp
+        aud, lom, him, _med, bands_ad, hh = inc[code]
+        a["incAud"] += aud
+        a["incLo"] += lom
+        a["incHi"] += him
+        for ii in range(len(gcp_newlanes.INC_BANDS)):
+            a["incBandH"][ii] += hh[ii]
         a["ancNS"] += ancns
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
@@ -318,6 +326,12 @@ def main():
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
         }
+        if a.get("incAud", 0) > 0:
+            s["loinc"] = round(a["incLo"] / a["incAud"], 4)
+            s["hiinc"] = round(a["incHi"] / a["incAud"], 4)
+            med = gcp_newlanes.band_median(a["incBandH"], gcp_newlanes.INC_BANDS)
+            s["medIncWeekly"] = int(round(med)) if med is not None else None
+
         return s, None
 
     demo = {}
@@ -341,13 +355,15 @@ def main():
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
               "ancP": 0, "ancNS": 0,
+              "incAud": 0.0, "incLo": 0.0, "incHi": 0.0,
+              "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:

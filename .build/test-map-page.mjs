@@ -661,7 +661,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 {
   const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
-  assert.ok(!("incomeCuts" in sa) && !("seifaCuts" in sa), "sa26 carries no income/SEIFA distribution cuts (its booths carry venue-grade census lanes only; the cuts are voter-footprint reads)");
+  assert.ok(sa.incomeCuts && sa.incomeCuts.hiEdgeWeekly === 4000 && sa.incomeCuts.dollarsYear === 2021, "sa26 incomeCuts: GCP-era band read at its 2021-era cuts");
+  if ("seifaCuts" in sa) assert.equal(sa.seifaCuts, null, "sa26 has no voter-footprint SEIFA cuts");
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of sa.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
@@ -710,7 +711,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   // build): a fixed booth's venue coords join it to the SA1 it stands in —
   // dec is that SA1's ABS 2021 national SEIFA deciles, demo the SA1's own
   // people cells on the district lanes' ex-not-stated bases (8-wide; the two
-  // income slots stay null). Mobile teams and booths in SA1s the cube does
+  // income slots populated since the income arc). Mobile teams and booths in SA1s the cube does
   // not score stay null; vdec stays null by design — ECSA publishes no
   // votes-by-SA1, so the voter-footprint read cannot exist
   {
@@ -723,14 +724,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa26 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.slice(6, 8).every((x) => x === null) && dm.slice(0, 6).concat(dm.slice(8)).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is the ten people cells plus the four of the 2026-10-31 arc, with null income slots`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is the ten people cells plus the six of the 2026-10-31 arcs (income slots populated)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12 && an.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa26: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa26: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, null, null, 0.1675, 0.0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa26: the Adelaide booth's SA1 people cells, the four lanes of the 2026-10-31 arc");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.261, 0.0873, 0.1675, 0.0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa26: the Adelaide booth's SA1 people cells, the six lanes of the 2026-10-31 arcs");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa26: the Adelaide booth's Ancestry row (English leads)");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa26: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa26: the Adelaide booth's Housing-tenure row");
@@ -902,14 +903,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.slice(6, 8).every((x) => x === null) && dm.slice(0, 6).concat(dm.slice(8)).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is the ten people cells plus the four of the 2026-10-31 arc, with null income slots`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is the ten people cells plus the six of the 2026-10-31 arcs (income slots populated)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `sa22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa22: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa22: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, null, null, 0.1675, 0.0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa22: the Adelaide booth's SA1 people cells, the four lanes of the 2026-10-31 arc");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.261, 0.0873, 0.1675, 0.0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa22: the Adelaide booth's SA1 people cells, the six lanes of the 2026-10-31 arcs");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa22: the Adelaide booth's Ancestry row");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa22: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa22: the Adelaide booth's Housing-tenure row");
@@ -1220,7 +1221,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p"].sort(), `nsw23 ${d.n}: no income lanes, the birthplace and ancestry dicts ride`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "medIncWeekly"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `nsw23 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -1256,7 +1257,7 @@ for (const y of ["sa22", "sa26"]) {
   // data build): a fixed booth's NSWEC venue coords join it to the SA1 it
   // stands in — dec is that SA1's ABS 2021 national SEIFA deciles, demo the
   // SA1's own people cells on the district lanes' ex-not-stated bases
-  // (8-wide; the two income slots stay null). Mobile teams and booths in
+  // (income slots populated since the income arc). Mobile teams and booths in
   // SA1s the cube does not score stay null; vdec stays null by design —
   // NSWEC publishes no votes-by-SA1, so the voter-footprint read cannot
   // exist
@@ -1270,14 +1271,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `nsw23 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.slice(6, 8).every((x) => x === null) && dm.slice(0, 6).concat(dm.slice(8)).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is the ten people cells plus the four of the 2026-10-31 arc, with null income slots`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is the ten people cells plus the six of the 2026-10-31 arcs (income slots populated)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `nsw23 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const balmain = B.n.indexOf("Balmain Public");
     assert.ok(balmain >= 0, "nsw23: the Balmain Public booth exists");
     assert.deepEqual(B.dec[balmain], [10, 10, 7, 10], "nsw23: Balmain Public's SA1 national deciles");
-    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, null, null, 0.1409, 0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022], "nsw23: Balmain Public's SA1 people cells, the four lanes of the 2026-10-31 arc");
+    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, 0.1278, 0.4034, 0.1409, 0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022], "nsw23: Balmain Public's SA1 people cells, the six lanes of the 2026-10-31 arcs");
     assert.deepEqual(B.anc[balmain], [0.4446, 0.3376, 0.1996, 0.1162, 0.0254, 0.0544, 0.0417, 0.0073, 0.0109, 0.0127, 0, 0], "nsw23: Balmain Public's Ancestry row");
     assert.deepEqual(B.rel[balmain], [0.5301, 0.2477, 0.102, 0.031, 0.031, 0.0164, 0.0055, 0, 0, 0.0219], "nsw23: Balmain Public's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[balmain], [0.3252, 0.3496, 0.3049, 0], "nsw23: Balmain Public's Housing-tenure row");
@@ -1575,7 +1576,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p"].sort(), `vic22 ${d.n}: no income lanes, the birthplace and ancestry dicts ride`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "medIncWeekly"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `vic22 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -1622,14 +1623,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `vic22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.slice(6, 8).every((x) => x === null) && dm.slice(0, 6).concat(dm.slice(8)).every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is the ten people cells plus the four of the 2026-10-31 arc, with null income slots`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 16 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is the ten people cells plus the six of the 2026-10-31 arcs (income slots populated)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `vic22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const toorak = B.n.indexOf("Toorak Central");
     assert.ok(toorak >= 0, "vic22: the Toorak Central booth exists");
     assert.deepEqual(B.dec[toorak], [9, 8, 5, 9], "vic22: Toorak Central's SA1 national deciles");
-    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, null, null, 0.1627, 0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002], "vic22: Toorak Central's SA1 people cells, the four lanes of the 2026-10-31 arc");
+    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, 0.1562, 0.3525, 0.1627, 0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002], "vic22: Toorak Central's SA1 people cells, the six lanes of the 2026-10-31 arcs");
     assert.deepEqual(B.anc[toorak], [0.453, 0.2091, 0.1498, 0.1324, 0.0627, 0.0836, 0.0279, 0, 0, 0.0209, 0, 0], "vic22: Toorak Central's Ancestry row");
     assert.deepEqual(B.rel[toorak], [0.4064, 0.3039, 0.1378, 0.0212, 0.0318, 0.0353, 0, 0, 0, 0.0318], "vic22: Toorak Central's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[toorak], [0.2578, 0.3672, 0.375, 0], "vic22: Toorak Central's Housing-tenure row");
