@@ -412,13 +412,17 @@ function areaDemo(m, st, idx, where, isNowM) {
   const k = S.index, A = m.areas[st];
   if (!A.demo) return DEMO_EARLY;
   const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
+  const medAge = ageMed() ? m.ageCuts && m.ageCuts.medAge : null;
   // the median view's headline is the national line: medians never pool,
   // so a state area carries no figure of its own to print
   if (incMed() && med == null) return { hed: "Income figures start at the 2001 election", dek: "" };
+  if (ageMed() && medAge == null) return { hed: "Median-age figures arrive with the census age bands", dek: "" };
   const scored = idx.filter((i) => demoShare(m.divs[i]) != null).sort((a, b) => demoShare(m.divs[b]) - demoShare(m.divs[a]));
   const share = incMed()
     ? `${st === "AUS" ? "the median weekly household income" : "the national median weekly household income"} is ${mny(med)}${incEpoch(m)}`
-    : `${f1(demoAreaShare(A.demo))}% ${isInc() ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
+    : ageMed()
+      ? `${st === "AUS" ? "the median age" : "the national median age"} is ${medAge}`
+      : `${f1(demoAreaShare(A.demo))}% ${isInc() ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -426,11 +430,41 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
   return { hed, dek };
+}
+
+// the Seat-type lens's vote table, per AEC class: the two-party read and the
+// primaries pooled vote by vote from the seats' own counts — exact election
+// figures, never estimates. Renders nothing where the frame's seats carry no
+// type (the state and 1993 frames)
+function clsVoteBlock(m, idx) {
+  const rows = [];
+  for (const c of CLS) {
+    const xs = idx.filter((i) => m.divs[i].cls === c);
+    if (!xs.length) continue;
+    let ta = 0, tb = 0, nTpp = 0, formal = 0;
+    const fp = FAMS.map(() => 0), sc = {};
+    for (const i of xs) {
+      const d = m.divs[i];
+      const f = holdFam(d.hold); sc[f] = (sc[f] || 0) + 1;
+      // on the now frame a by-election row swaps its seat's 2025 count for the
+      // by-election's; this table answers "the election's" figures, so pool the
+      // predecessor row the swap keeps, like the aggregates above do
+      const v = d.by ? d.by.prev : d;
+      if (v.tpp != null) { ta += (v.formal * v.tpp) / 100; tb += (v.formal * (100 - v.tpp)) / 100; nTpp++; }
+      formal += v.formal;
+      for (let k = 0; k < FAMS.length; k++) fp[k] += (v.formal * (v.fp[FAMS[k]] || 0)) / 100;
+    }
+    rows.push({ c, n: xs.length, tpp: nTpp ? (100 * ta) / (ta + tb) : null, nTpp, fp: fp.map((v) => (100 * v) / formal), sc });
+  }
+  if (!rows.length) return "";
+  const bar = (r) => ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => r.sc[f]).map((f) => `<i style="width:${(100 * r.sc[f]) / r.n}%;${swc(f)}"></i>`).join("");
+  const miss = rows.reduce((a, r) => a + (r.n - r.nTpp), 0);
+  return `<div class="st-sec"><h3>By seat type <small>votes pooled from each type’s seats</small></h3><table class="tbl"><thead><tr><th>Type</th><th>Seats</th><th>Labor 2PP</th>${FAMS.map((f) => `<th>${FAM_CODE[f]}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(CLS_SHORT[r.c])}</td><td>${r.n}<span class="seatbar">${bar(r)}</span></td><td>${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
 }
 
 function storyArea(m, st) {
@@ -465,6 +499,7 @@ function storyArea(m, st) {
   if (bySt.length > 1) {
     h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${bySt.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
+  if (S.lens === "cls") h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
@@ -586,6 +621,8 @@ function seatHedDek(m, d) {
         // the median view prices the seat's figure in dollars against
         // the national household line, never a share of anything
         if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
+        // the median-age view tells it in years on the same doctrine
+        if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats; Australia’s median age is ${m.ageCuts && m.ageCuts.medAge}. ${demoCopy(m).seats}` };
         return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
@@ -702,13 +739,18 @@ function storyBooth(m, j) {
         hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure")
           : `The median household near here earns ${mny(v)} a week`;
         dek = v == null ? "" : `In ${ds(D.n)} as a whole, ${mny(dv != null ? dv : null)} a week${dv != null ? incEpoch(m) : ""}. ${demoBoothCopy(m).note}`;
+      } else if (ageMed()) {
+        const v = raw.ageMed ? raw.ageMed[j] : null;
+        hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure")
+          : `The median age near here is ${Math.round(v)}`;
+        dek = v == null ? "" : `In ${ds(D.n)} as a whole, it's ${dv != null ? Math.round(dv) : "–"}. ${demoBoothCopy(m).note}`;
       } else {
         const v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v;
         hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`;
         dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`;
       }
     }
-    else if (S.lens === "seifa") { const arr = S.basis === "voters" ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = S.basis === "voters" ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
+    else if (S.lens === "seifa") { const voter = seifaBasis(m) === "voters"; const arr = voter ? raw.vdec[j] : raw.dec[j]; const v = arr ? arr[IX.indexOf(S.index)] : null; hed = v ? `This place is in decile ${v} of 10 on ${IX_ABBR[S.index]}` : `This place has no ${IX_ABBR[S.index]} score`; dek = voter ? "Scored on where its voters live." : "Scored on the census area it stands in."; }
     if (S.lens === "cls") { hed = `${ds(D.n)} is ${/^[aeiou]/i.test(CLS_LOWER[D.cls] || "") ? "an" : "a"} ${CLS_LOWER[D.cls] || ""} seat`; }
   }
   // the flow hed needs no per-booth count: the NSWEC carries no booth 2CP,
@@ -764,7 +806,7 @@ function renderStory(force) {
     $("#story").innerHTML = storySenate(SENM);
     return;
   }
-  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.basis, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
+  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;
   const el = $("#story");

@@ -34,13 +34,14 @@ const opts = await page.evaluate(() => {
 const people = opts && opts.find((g) => g[0] === "People");
 ok("legend People optgroup exists", !!people, JSON.stringify(opts && opts.map((g) => g[0])));
 if (people) {
-  // the 2026-10-31 Household-income lens folds the loinc/hiinc menu pair
-  // into one entry (-1), the median spectrum landing inside its picker
-  ok("People has 18 options (15 measures + Religion + Housing tenure + Ancestry)", people[1].length === 18, people[1].join(" | "));
+  // the 2026-10-31 merged lenses fold the income pair AND the age pair (-2),
+  // each a single entry with its own picker (median lands on both)
+  ok("People has 17 options (14 measures + Religion + Housing tenure + Ancestry)", people[1].length === 17, people[1].join(" | "));
   ok("Born overseas listed", people[1].some((t) => /born overseas/i.test(t)));
   ok("University educated listed", people[1].some((t) => /university/i.test(t)));
   ok("Blue-collar listed", people[1].some((t) => /blue-collar/i.test(t)));
   ok("Household income listed once", people[1].filter((t) => /household income/i.test(t)).length === 1, people[1].join(" | "));
+  ok("Age folds Aged 65/20-34 into one entry", people[1].filter((t) => /^age$/i.test(t)).length === 1 && !people[1].some((t) => /65 and over|20 to 34/i.test(t)), people[1].join(" | "));
   ok("Household income sits where lower income sat (after Blue-collar)", /Blue-collar workers \| Household income/.test(people[1].join(" | ")), people[1].join(" | "));
   ok("Year 12 or less listed", people[1].some((t) => /year 12 or less/i.test(t)));
   ok("Indigenous Australians listed", people[1].some((t) => /indigenous/i.test(t)));
@@ -196,8 +197,8 @@ const y2010 = await page.evaluate(async () => {
 });
 ok("2010 basis is venue", y2010.basis === "venue", y2010.basis);
 ok("2010 legend cites the 2006 census", /2006 and 2011 censuses/.test(y2010.note), y2010.note.slice(0, 140));
-ok("2010 People optgroup carries the income lens (17: one Household-income entry, no homeless lane yet, and Ancestry joined)",
-  y2010.people && y2010.people.length === 17 && y2010.people.includes("inc") && y2010.people.includes("anc") && !y2010.people.includes("loinc") && !y2010.people.includes("hl"),
+ok("2010 People optgroup carries income + age lenses (16: their two folded entries, no homeless lane yet, and Ancestry joined)",
+  y2010.people && y2010.people.length === 16 && y2010.people.includes("inc") && y2010.people.includes("age") && y2010.people.includes("anc") && !y2010.people.includes("loinc") && !y2010.people.includes("a65") && !y2010.people.includes("hl"),
   JSON.stringify(y2010.people));
 
 // 4c. an income deep link on 2010 shows the interp income copy: the
@@ -335,7 +336,20 @@ const menuNow96 = await page.evaluate(async () => {
   const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
   return [...g.querySelectorAll("option")].map((o) => o.value);
 });
-ok("1996 People menu omits Household income (income starts 2001)", !menuNow96.includes("inc"), JSON.stringify(menuNow96));
+// the 1991-era income print revolution: 1996's frame reads income under
+// its own cut record, so the menu carries Household income here now
+// (where the menu once listed no income lanes at all); 1998's workspace
+// prints no household-income table, so its menu stays income-less
+ok("1996 People menu carries Household income (the 1991-era print landed)", menuNow96.includes("inc"), JSON.stringify(menuNow96));
+const menuNow98 = await page.evaluate(async () => {
+  const m = window.__map;
+  m.setYear(1998);
+  await m.Y[1998].ready;
+  await new Promise((r) => setTimeout(r, 400));
+  const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
+  return g ? [...g.querySelectorAll("option")].map((o) => o.value) : null;
+});
+ok("1998 People menu stays income-less (the 1996 print has no household-income table)", menuNow98 && !menuNow98.includes("inc"), JSON.stringify(menuNow98));
 await page.evaluate(async () => { const m = window.__map; m.setYear("nsw23"); await m.Y.nsw23.ready; await new Promise((r) => setTimeout(r, 400)); });
 const menuNsw = await page.evaluate(() => {
   const g = [...document.querySelectorAll('select[data-opt="index"] optgroup')].find((x) => x.label === "People");
@@ -349,6 +363,85 @@ ok("nsw23 People menu carries Household income (state-frame income arc)",
   menuNsw && menuNsw.menu.includes("inc"), JSON.stringify(menuNsw && menuNsw.menu));
 
 mark("median view done");
+// 5a. the Age lens (2026-10-31): the median-age spectrum lands on the
+// merged entry, five share views one picker away, national age line per
+// year, per-view hash, 18-24 admits its band estimate, the 85+ open band
+// stays silent about places it can't measure
+mark("age lens");
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=2025&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const age25 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[2025].ready;
+  await new Promise((r) => setTimeout(r, 600));
+  const i = m.Y[2025].byName.get("Chifley");
+  m.select({ level: "div", st: m.Y[2025].divs[i].st, div: i });
+  await new Promise((r) => setTimeout(r, 400));
+  return {
+    sel: (document.querySelector('select[data-opt="index"]') || {}).value,
+    agev: (document.querySelector('select[data-opt="agev"]') || {}).value,
+    ageOpts: [...document.querySelectorAll('select[data-opt="agev"] option')].map((o) => o.textContent),
+    note: (document.querySelector(".lg-note") || {}).textContent || "",
+    ticks: [...document.querySelectorAll(".lg-ticks span")].map((s) => s.textContent).join("|"),
+    hash: location.hash,
+    story: (document.querySelector("#story") || document.body).innerText,
+    S: { index: m.S.index, ageMode: m.S.ageMode },
+  };
+});
+ok("#i=age selects the Age lane median-first", age25.sel === "age" && age25.S.index === "age" && age25.S.ageMode === "med", JSON.stringify(age25.S));
+ok("the age picker lists the six views", age25.ageOpts.length === 6 && /median age/i.test(age25.ageOpts[0]) && /75 and over/i.test(age25.ageOpts[5]), age25.ageOpts.join(" | "));
+ok("default med view leaves av out of the hash", !/[?&]av=/.test(age25.hash), age25.hash);
+ok("2025 median-age note names its band interpolation", /Median resident age, interpolated from census age bands/.test(age25.note), age25.note.slice(0, 160));
+ok("2025 median-age ticks read whole years", /^\d+$/.test(age25.ticks.split("|")[0]), age25.ticks);
+ok("2025 median-age legend marks Australia: 39", /The line marks Australia: 39\./.test(age25.note), age25.note.slice(-140));
+ok("Chifley seat hed carries its median age", /median age in Chifley is 32/.test(age25.story), age25.story.slice(0, 200));
+ok("Chifley dek names the national median", /Australia’s median age is 39/.test(age25.story), age25.story.slice(0, 400));
+
+await page.goto("about:blank");
+await page.goto(`${base}/map/#y=1993&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.waitForFunction("window.__map", { timeout: 20000 });
+const age93 = await page.evaluate(async () => {
+  const m = window.__map;
+  await m.Y[1993].ready;
+  await new Promise((r) => setTimeout(r, 600));
+  return (document.querySelector(".lg-note") || {}).textContent || "";
+});
+ok("1993 median-age legend marks Australia: 32", /The line marks Australia: 32\./.test(age93), age93.slice(-140));
+
+// the picker idiom: swap to 65+ through the same selects; the hash follows
+await page.evaluate(async () => {
+  const m = window.__map;
+  m.setYear(2025);
+  await m.Y[2025].ready;
+  const sel = document.querySelector('select[data-opt="agev"]');
+  sel.value = "a65";
+  sel.dispatchEvent(new Event("change", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 400));
+});
+const age65Now = await page.evaluate(() => ({
+  note: (document.querySelector(".lg-note") || {}).textContent || "",
+  hash: location.hash,
+  tick: [...document.querySelectorAll(".lg-ticks span")].map((s) => s.textContent).join("|"),
+}));
+ok("switching to 65+ keeps the share note", /Share of residents aged 65 and over/.test(age65Now.note), age65Now.note.slice(0, 160));
+ok("65+ lands in the hash (av=a65)", /av=a65/.test(age65Now.hash), age65Now.hash);
+ok("65+ ticks read percentages again", /%/.test(age65Now.tick), age65Now.tick);
+
+// the 18-24 view admits its band estimate in its own note
+await page.evaluate(async () => {
+  const sel = document.querySelector('select[data-opt="agev"]');
+  sel.value = "a1824";
+  sel.dispatchEvent(new Event("change", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 400));
+});
+const age1824 = await page.evaluate(() => ({
+  note: (document.querySelector(".lg-note") || {}).textContent || "",
+  tick: [...document.querySelectorAll(".lg-ticks span")].map((s) => s.textContent).join("|"),
+}));
+ok("18-24 note admits the band estimate", /15–19 band/.test(age1824.note), age1824.note.slice(0, 200));
+
+mark("age lens done");
 // 5z. the Religion and Housing-tenure select lenses: the deep links open
 // straight on No religion and Owned-with-mortgage, a religious option swap
 // rides as rl= in the hash, and Wentworth's Jewish share is its own figure

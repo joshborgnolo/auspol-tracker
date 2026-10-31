@@ -15,6 +15,8 @@ function divValue(m, i) {
       // the income median prices divisions in dollars (no % scaling) —
       // the pinned share idiom below stays backed by every other lane
       if (incMed()) { const v = d.demo && d.demo.medIncWeekly; return v == null ? null : v; }
+      // the median age prices divisions in years on the same doctrine
+      if (ageMed()) { const v = d.demo && d.demo.ageMed; return v == null ? null : v; }
       const v = demoShare(d); return v == null ? null : 100 * v;
     }
   }
@@ -50,8 +52,10 @@ function boothValue(m, j) {
     case "seifa": {
       // the income median reads its own dollar lane, never a share cell
       if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null; return v == null ? null : v; }
+      // the median age reads its own year-lane, likewise never a share
+      if (ageMed()) { const v = b.raw.ageMed ? b.raw.ageMed[j] : null; return v == null ? null : v; }
       if (isDemo()) { const v = demoBoothShare(b.raw, j, selPos(m)); return v == null ? null : 100 * v; }
-      const arr = S.basis === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
+      const arr = seifaBasis(m) === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }
   }
   return null;
@@ -592,6 +596,9 @@ function startYearMorph(from, to, T1, dir) {
   ymorph = null;
   if (reduceMotion || !from || !to || from === to || !from.geo || !to.geo || !Wpx) return false;
   if (T1.k >= STREETS.k0 || T.k >= STREETS.k0) return false;
+  // a Handbook frame's lossless rings morph for seconds — its transitions ride
+  // the colour sweep alone (carryColours is already running it)
+  if (HANDBOOK_YEARS.has(from.year) || HANDBOOK_YEARS.has(to.year)) return false;
   const A = frameMap(from, to), cross = jurOf(from.year) !== jurOf(to.year);
   const hi = T1.k > K_HI && from.geoHi && to.geoHi;
   const go = hi ? from.geoHi : from.geo, gn = hi ? to.geoHi : to.geo;

@@ -282,6 +282,9 @@ def with_demo(doc, year):
         return dm, (common.demo_cells(dm) if dm else None)
 
     n_div = n_booth = 0
+    # the ageCuts national marker pools beside the divisions, the same
+    # weight-then-share convention the federal build uses
+    age_bands_w = [0.0, [0.0] * len(common.AGE_BAND_KEYS)]
     for d in doc['divs']:
         dv = by_div.get(d['n'])
         if not dv or dv.get('persons') in (None, 0):
@@ -289,18 +292,34 @@ def with_demo(doc, year):
         dm, dc = cells(dv, dv.get('demoI'))
         if not dc:
             continue
+        # the Age family keys sit beside the others, off the venue
+        # store's packed band dict — the same emission as build_map_data
+        a18, a35, a75x = common.age_shares(dm.get('age'))
         d['demo'] = {'lang': dc[0], 'a65': dc[1], 'a2034': dc[2],
                      'fborn': dc[3], 'uni': dc[4], 'blue': dc[5],
                      'p': dv.get('persons'),
                      'loinc': dc[6], 'hiinc': dc[7],
                      'medIncWeekly': dm.get('incMed'),
+                     'ageMed': common.age_median(dm.get('age')),
+                     'a1824': a18, 'a3554': a35, 'a75': a75x,
                      'cob': dv.get('cob'),
                      'y12less': dc[8], 'atsci': dc[9], 'u15': dc[10],
                      'onepar': dc[11], 'pt': dc[12], 'noncit': dc[13],
                      'bigfam': dc[14], 'hl': dc[15],
                      'rel': dv.get('rel'),
                      'ten': dv.get('ten')}
+        if dm and dm.get('age') and dm.get('persons'):
+            age_bands_w[0] += dm['persons']
+            for i, k in enumerate(common.AGE_BAND_KEYS):
+                age_bands_w[1][i] += dm['persons'] * (dm['age'].get(k) or 0.0)
         n_div += 1
+    if age_bands_w[0] > 0:
+        nat_age = {k: age_bands_w[1][i] / age_bands_w[0]
+                   for i, k in enumerate(common.AGE_BAND_KEYS)}
+        na18, na35, na75 = common.age_shares(nat_age)
+        doc['ageCuts'] = {'medAge': common.age_median(nat_age), 'a1824': na18,
+                          'a3554': na35, 'a75': na75,
+                          'basis': 'pool-weighted share of the packed census age bands over every seat'}
     dcol = []
     for bid in doc['booths']['id']:
         vb = by_booth.get(bid)
@@ -310,6 +329,22 @@ def with_demo(doc, year):
     if any(x is not None for x in dcol):
         doc['booths']['demo'] = dcol
         n_booth = sum(x is not None for x in dcol)
+    # the Age family's parallel booth lanes, off the same packed dicts —
+    # median in years and the three new share views as fractions, like the
+    # federal build's emission
+    for bid in doc['booths']['id']:
+        vb = by_booth.get(bid)
+        blk = (vb or {}).get('demo')
+        dm_b = common.demo_interp_of(blk, (vb or {}).get('demoI')) if blk else None
+        age_b = (dm_b or {}).get('age') if dm_b else None
+        a18, a35, a75x = common.age_shares(age_b) if age_b else (None, None, None)
+        doc['booths'].setdefault('ageMed', []).append(common.age_median(age_b) if age_b else None)
+        doc['booths'].setdefault('a1824', []).append(a18)
+        doc['booths'].setdefault('a3554', []).append(a35)
+        doc['booths'].setdefault('a75', []).append(a75x)
+    for kk in ('ageMed', 'a1824', 'a3554', 'a75'):
+        if not any(x is not None for x in doc['booths'][kk]):
+            del doc['booths'][kk]
     # the follow-on people cohorts of the 90s people-lane arc
     # (birthplace-country menu, religion, tenure): the stats frame rides
     # the measured census side's own menu (era print intersections,

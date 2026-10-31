@@ -122,6 +122,7 @@ function buildRamps() {
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
       loinc: seq(20, 0.13), hiinc: seq(275, 0.12), incmed: seq(48, 0.14),
+      agemed: seq(86, 0.14), a1824: seq(185, 0.13), a3554: seq(128, 0.14), a75: seq(26, 0.14),
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10) },
@@ -193,13 +194,16 @@ const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y
 // the Household-income lens lane id: its block sits below with the other
 // select lenses — declared early because the menu fold needs it
 const LENS_INC = "inc";
+// the Age lens lane id, beside its sibling merge — also menu-folded
+const LENS_AGE = "age";
 // the menu's People list: DM in order, the two income shares folded into
-// the single Household-income entry where loinc sat
-const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "loinc") ks.push(LENS_INC); else if (k !== "hiinc") ks.push(k); } return ks; })();
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", fborn: "Born overseas", uni: "University", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
+// the Household-income entry where loinc sat, the two age-band reads
+// folded into the Age entry where a65 sat
+const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "a65") { ks.push(LENS_AGE); continue; } if (k === "a2034") continue; if (k === "loinc") { ks.push(LENS_INC); continue; } if (k !== "hiinc") ks.push(k); } return ks; })();
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", age: "Age", fborn: "Born overseas", uni: "University educated", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in lower-income households", hiinc: "Adults in high-income households", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", age: "Age", fborn: "Born overseas", uni: "University", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
 const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families", pt: "of employed people travelled to work by public transport", noncit: "were not counted as Australian citizens", bigfam: "of women aged 15+ have had more than two children", hl: "were counted homeless in the ABS census estimate" };
-const DM_RANGE = { lang: [0, 60], a65: [5, 35], a2034: [10, 40], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
+const DM_RANGE = { lang: [0, 60], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
 // the Religion and Housing-tenure select lenses: S.index is the menu
 // ("rel"/"ten") and S.rel/S.ten the picked option; a lane share rides the
 // division dicts (demo.rel/.ten), the parallel B rows, and the pooled
@@ -220,7 +224,7 @@ const LENS_ANC = "anc";
 const ANC_NAME = { english: "English", australian: "Australian", irish: "Irish", scottish: "Scottish", chinese: "Chinese", italian: "Italian", german: "German", indian: "Indian", filipino: "Filipino", dutch: "Dutch", vietnamese: "Vietnamese", lebanese: "Lebanese" };
 const ANCISMS = { english: "named English ancestry", australian: "named Australian ancestry", irish: "named Irish ancestry", scottish: "named Scottish ancestry", chinese: "named Chinese ancestry", italian: "named Italian ancestry", german: "named German ancestry", indian: "named Indian ancestry", filipino: "named Filipino ancestry", dutch: "named Dutch ancestry", vietnamese: "named Vietnamese ancestry", lebanese: "named Lebanese ancestry" };
 const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scottish: [0, 22], chinese: [0, 35], italian: [0, 25], german: [0, 18], indian: [0, 30], filipino: [0, 18], dutch: [0, 6], vietnamese: [0, 22], lebanese: [0, 35] };
-const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
+const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
 // the Household-income lane: S.index === "inc" and S.incMode the picked
 // measure — the median weekly household income spectrum lands by default;
 // the bottom-cut and $4,000+ shares (loinc/hiinc as their own menu lanes
@@ -253,7 +257,25 @@ const INC_VERB = {
   lo: (m) => `live in households earning ${incLoFrag(m)}${incEpoch(m)}`,
   hi: (m) => `live in households earning ${mny(m.incomeCuts && m.incomeCuts.hiEdgeWeekly)} or more a week${incEpoch(m)}`,
 };
-const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : DM_VERB[k]);
+// the Age lens: S.index === "age" and S.ageMode the picked measure — the
+// median-age spectrum lands; the two aged-band reads that were their own
+// menu lanes (a65/a2034) and three new shares (18-24, 35-54, 75+) sit
+// beside it in the same legend picker, riding the income lane's idiom
+const AGE_MODES = ["med", "a1824", "a2034", "a3554", "a65", "a75"];
+const AGE_NAME = { med: "Median age", a1824: "Aged 18 to 24", a2034: "Aged 20 to 34", a3554: "Aged 35 to 54", a65: "Aged 65 and over", a75: "Aged 75 and over" };
+const AGE_SHORT = { med: "Median age", a1824: "18–24", a2034: "20–34", a3554: "35–54", a65: "65+", a75: "75+" };
+const AGE_VERB = { a1824: "are aged 18 to 24", a2034: "are aged 20 to 34", a3554: "are aged 35 to 54", a65: "are aged 65 or over", a75: "are aged 75 or over" };
+const AGE_RANGE = { a1824: [0, 28], a2034: [10, 40], a3554: [18, 45], a65: [5, 35], a75: [0, 35] };
+const AGE_TOP = { med: ["seats with the oldest residents", "with the youngest"], a1824: ["seats where the most residents are aged 18 to 24", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], a3554: ["seats with the most residents aged 35 to 54", "with the fewest"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a75: ["seats with the most residents aged 75 and over", "with the fewest"] };
+const AGE_KEY = { med: "ageMed", a1824: "a1824", a2034: "a2034", a3554: "a3554", a65: "a65", a75: "a75" };
+const isAge = () => S.index === LENS_AGE;
+const ageMed = () => isAge() && S.ageMode === "med";
+// the national age marker per year rides ageCuts (median + the three new
+// shares pool-computed by the build from the packed band dicts); frames
+// without band dicts (the state frames' GCP lanes today) carry none
+const hasAgeCuts = (m) => !!(m && m.ageCuts);
+const dmVerbAge = (m) => (AGE_VERB[S.ageMode] || "");
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : DM_VERB[k]);
 // a year carries the income lanes only when its demo store records the cuts
 // (1991's household-basis print on the 1990s frames, 2001's on the GCP
 // bases); other era-null People lanes filter the same way
@@ -296,6 +318,8 @@ const demoShare = (d) => {
   if (isTen()) return d.demo && d.demo.ten ? d.demo.ten[S.ten] : null;
   if (isAnc()) return d.demo && d.demo.anc ? d.demo.anc[S.anc] : null;
   if (isInc()) return d.demo ? d.demo[INC_KEY[S.incMode]] : null;
+  // age: median is years (ageMed); the five share views ride their keys
+  if (isAge()) return d.demo ? d.demo[AGE_KEY[S.ageMode]] : null;
   return d.demo ? d.demo[S.index] : null;
 };
 // ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
@@ -305,6 +329,7 @@ const demoAreaShare = (demo) => {
   if (isTen()) return demo && demo.ten ? demo.ten[S.ten] : null;
   if (isAnc()) return demo && demo.anc ? demo.anc[S.anc] : null;
   if (isInc()) return demo ? demo[INC_KEY[S.incMode]] : null;
+  if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   return demo ? demo[S.index] : null;
 };
 // ...and of one booth row (fraction): the select lanes ride their
@@ -317,7 +342,28 @@ const demoBoothShare = (raw, j, pos) => {
   // income: the share views ride the demo tuple's cells 6/7; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[S.incMode === "lo" ? 6 : 7] : null; }
+  // age: a65/a2034 stay at the demo tuple's cells 1/2 like every GCP lane
+  if (isAge()) {
+    if (S.ageMode === "med") return null; // median is years: boothValue reads raw.ageMed
+    if (S.ageMode === "a65" || S.ageMode === "a2034") { const r = raw.demo && raw.demo[j]; return r ? r[S.ageMode === "a65" ? 1 : 2] : null; }
+    const lane = raw[AGE_KEY[S.ageMode]]; return lane ? lane[j] : null;
+  }
   const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
+};
+// the median-age lane's colour domain per year: the year's own division
+// medians snapped outward to whole-year pairs (no hand-set LUT)
+const ageMedRange = (m) => {
+  if (m && m._ageMedRange) return m._ageMedRange;
+  let lo = Infinity, hi = -Infinity;
+  for (const d of (m && m.divs) || []) {
+    const v = d.demo && d.demo.ageMed;
+    if (v == null) continue;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const r = isFinite(lo) ? [Math.floor(lo / 2) * 2, Math.ceil(hi / 2) * 2] : [25, 70];
+  if (m) m._ageMedRange = r;
+  return r;
 };
 // the median lane's colour domain per year: the year's own division
 // medians snapped outward to $100s — each census epoch's dollars price
@@ -335,8 +381,8 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiinc") : S.index];
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc)
 const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : (m.cobPos || {}));
@@ -643,12 +689,15 @@ function walkHold(spot) {
 
 /* =============================== state =============================== */
 const S = {
-  year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", basis: "venue", tppMode: "share", fpMode: "share",
+  year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", tppMode: "share", fpMode: "share",
   // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
   infMode: "informal",
   // the Household-income lens's measure: the median spectrum, or the lower- /
   // higher-income household shares (an INC_MODES value; median lands)
   incMode: "med",
+  // the Age lens's measure: the median-age spectrum, or one of the share
+  // views (an AGE_MODES value; median lands)
+  ageMode: "med",
   // the Born overseas lens's birthplace-country sub-view (a COB_NAME key, null = all overseas-born)
   cob: null,
   // the Religion and Housing-tenure select lenses' picked options
@@ -667,6 +716,11 @@ const S = {
   // the Senate lens: a party's Senate vote less its House vote ("gap"), or its Senate share
   senMode: "gap",
 };
+/* the census-index lanes' scoring basis rides the frame, never a picker: the
+   2016+ frames carry the votes-by-SA1 footprint (voter), the earlier ones only
+   the census areas the places stand in — one basis per year, the same
+   treatment the People lanes get */
+const seifaBasis = (m) => (m && m.demoBasis === "voter" ? "voters" : "venue");
 const Y = {};
 let proj = null;
 const isNow = () => S.year === "now";
@@ -851,20 +905,22 @@ function deriveAreas(res, m) {
 // Handbook files retain the original coordinates. Apply D3 winding and
 // linear-coordinate resampling only while drawing; the source is unchanged.
 // The main viewport uses mainland parts; external islands have their insets.
+function handbookFeature(f) {
+  const ps = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+  f.geometry = { type: "MultiPolygon", coordinates: ps.filter(p => p[0].some(([x,y]) => x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9)).map(p => p.map((ring, ri) => {
+    const r = [];
+    for (let i = 0; i < ring.length - 1; i++) {
+      const a = ring[i], b = ring[i+1], n = Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[1]-a[1]) / .05));
+      for (let j = 0; j < n; j++) r.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]);
+    }
+    r.push(r[0]);
+    if ((d3.geoArea({type:"Polygon", coordinates:[r]}) > 2*Math.PI) === (ri === 0)) r.reverse();
+    return r;
+  })) };
+  return f;
+}
 function handbookDisplay(fc) {
-  for (const f of fc.features) {
-    const ps = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
-    f.geometry = { type: "MultiPolygon", coordinates: ps.filter(p => p[0].some(([x,y]) => x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9)).map(p => p.map((ring, ri) => {
-      const r = [];
-      for (let i = 0; i < ring.length - 1; i++) {
-        const a = ring[i], b = ring[i+1], n = Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[1]-a[1]) / .05));
-        for (let j = 0; j < n; j++) r.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]);
-      }
-      r.push(r[0]);
-      if ((d3.geoArea({type:"Polygon", coordinates:[r]}) > 2*Math.PI) === (ri === 0)) r.reverse();
-      return r;
-    })) };
-  }
+  for (const f of fc.features) handbookFeature(f);
   return fc;
 }
 function buildGeo(topo, m) {
@@ -901,6 +957,76 @@ function buildGeo(topo, m) {
     coast: topo.handbook ? mk({type:"MultiLineString", coordinates:fc.features.flatMap(f=>f.geometry.coordinates.flat())}) : mk(topojson.mesh(topo, o, (a, b) => a === b)),
     coastOf: (i) => coastP[i] || (coastP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
     edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
+  };
+}
+
+/* the Handbook frame in slices (2026-10-31): decoding the lossless topo and
+   building every seat's paths in one synchronous pass froze the tab for
+   5–8s on throttled hardware. Two streamed passes instead — decode each seat
+   and widen the mainland bbox (the projection's fit), then resample, wind,
+   path and outline each one — yielding to the browser whenever a slice runs
+   long, so the loading stamp and any year morph keep animating. The bounds
+   come free off the path stream (a plane-min/max at emission, gen.bounds'
+   exact result), and addPath of each seat's own path is the same outline the
+   old full re-walks drew, without the re-walk */
+async function buildHandbookGeo(topo, m) {
+  const o = topo.objects.divs;
+  let t0 = performance.now();
+  const pause = async () => { await new Promise((r) => setTimeout(r, 0)); t0 = performance.now(); };
+  const sliceDone = () => performance.now() - t0 > 32;
+  // pass one: decode each seat and widen the mainland bbox — fitting its two
+  // corners is fitting the whole filtered point cloud, streamed
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const feats = [];
+  for (const g of o.geometries) {
+    const f = topojson.feature(topo, g);
+    const cs = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const pg of cs) for (const ring of pg) for (const [x, y] of ring) if (x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    feats.push(f);
+    if (sliceDone()) await pause();
+  }
+  proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], { type: "MultiPoint", coordinates: [[x0, y0], [x1, y1]] });
+  // pass two: each seat resampled-and-wound (handbookFeature), then pathed — a
+  // stream context that writes the Path2D and takes the bounds in one emission
+  const P = proj;
+  const paths = new Array(m.divs.length), bb = new Array(m.divs.length), featsByDiv = new Array(m.divs.length);
+  const outline = new Path2D();
+  const pathAndBounds = (f) => {
+    const p = new Path2D();
+    let b0 = Infinity, b1 = Infinity, b2 = -Infinity, b3 = -Infinity;
+    const ctx = { beginPath() {}, result() {}, arc() {},
+      moveTo(x, y) { p.moveTo(x, y); if (x < b0) b0 = x; if (x > b2) b2 = x; if (y < b1) b1 = y; if (y > b3) b3 = y; },
+      lineTo(x, y) { p.lineTo(x, y); if (x < b0) b0 = x; if (x > b2) b2 = x; if (y < b1) b1 = y; if (y > b3) b3 = y; },
+      closePath() { p.closePath(); } };
+    d3.geoPath(P, ctx)(f);
+    return [p, [[b0, b1], [b2, b3]]];
+  };
+  for (const f of feats) {
+    const i = m.byName.get(f.properties.name);
+    handbookFeature(f);
+    const [p, b] = pathAndBounds(f);
+    outline.addPath(p);
+    if (i != null) { featsByDiv[i] = f; paths[i] = p; bb[i] = b; }
+    if (sliceDone()) await pause();
+  }
+  const mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  const polyP = [];
+  const ringXY = (r) => { const o = new Float64Array(2 * (r.length - 1)); for (let k = 0; k < r.length - 1; k++) { const q = P(r[k]); o[2 * k] = q[0]; o[2 * k + 1] = q[1]; } return o; };
+  const polys = (i) => {
+    if (polyP[i] || !featsByDiv[i]) return polyP[i] || null;
+    const gm = featsByDiv[i].geometry, cs = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates;
+    return (polyP[i] = cs.map((pg) => ({ outer: ringXY(pg[0]), holes: pg.slice(1).map(ringXY) })));
+  };
+  const at = (g) => m.byName.get(g.properties.name);
+  const coastP = [], edgeP = [];
+  if (sliceDone()) await pause();
+  return {
+    paths, bb, polys, topo, at, proj: P,
+    meshDiv: outline,
+    meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
+    coast: outline,
+    coastOf: (i) => coastP[i] || (coastP[i] = mk({type:"MultiLineString", coordinates:featsByDiv[i].geometry.coordinates.flat()})),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk({type:"MultiLineString", coordinates:featsByDiv[i].geometry.coordinates.flat()})),
   };
 }
 
@@ -1017,13 +1143,13 @@ async function loadYear(year) {
     // ahead (the timeline's hover) must not move the streets and the sea under
     // the year in view (setYear takes the new year's when it shows it)
     const keep = proj;
-    const fitFC = topojson.feature(lo, lo.objects.divs);
-    const fit = lo.handbook ? {type:"MultiPoint", coordinates:fitFC.features.flatMap(f=>f.geometry.coordinates.flat(2)).filter(([x,y])=>x>=112&&x<=154.5&&y>=-44.5&&y<=-9)} : fitFC;
-    proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
+    const fit = lo.handbook ? null : topojson.feature(lo, lo.objects.divs);
+    if (!lo.handbook) proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
     m.res = res;
     m.demoBasis = res.demoBasis || null;
     m.demoYear = res.demoYear || null;
     m.incomeCuts = res.incomeCuts || null;
+    m.ageCuts = res.ageCuts || null;
     // the people-interp blend record rides the year on interpolated years
     // (2007–2019); the demo copy and income epoch texts branch on it
     m.demoInterp = res.demoInterp || null;
@@ -1063,21 +1189,27 @@ async function loadYear(year) {
     m.date = res.date;
     m.divs = res.divs.map((d, i) => deriveDiv(d, i, year));
     m.byName = new Map(m.divs.map((d) => [d.n, d.i]));
-    for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     if (now) applyNow(m, now);
     m.speaker = m.byName.get(res.speaker ?? SPEAKER_DIV[year]);
     m.seating = seating;
     m.gov = GOV[year];
-    m.geo = buildGeo(lo, m);
+    m.geo = lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m);
     m.isl = buildIslands(islands, m);
     m.booth = res.booths ? deriveBooths(res.booths, m) : emptyBooths(m);
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
+    // the Handbook years' projection is only built inside their geometry
+    // pass (a direct boot on a Handbook year arrives with proj === null);
+    // projecting the label points has to wait for it
+    for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     // the national household median joins the AUS pool: medians never
     // pool, so deriveAreas leaves it off, but the incomeCuts record the
     // build stamps carries the year's own national figure
     if (m.incomeCuts && m.incomeCuts.medWeekly != null && m.areas.AUS.demo)
       m.areas.AUS.demo.medIncWeekly = m.incomeCuts.medWeekly;
+    // the national median age likewise, beside the incomeCut one
+    if (m.ageCuts && m.ageCuts.medAge != null && m.areas.AUS.demo)
+      m.areas.AUS.demo.ageMed = m.ageCuts.medAge;
     m.search = buildSearch(m);
     proj = keep || m.proj;
     // the hi detail comes up only for a frame the reader actually visits (warmHi):

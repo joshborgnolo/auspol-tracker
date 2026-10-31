@@ -168,7 +168,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 22, "17 result lanes plus approximate-location provenance + census demo rows (the '90s people-interp arc) + the map-people-fill arc's three cohort cob/rel/ten lanes, plus the medinc booth column the frame's 1991-era census income print fills");
+  assert.equal(Object.keys(D.booths).length, 26, "17 result lanes plus approximate-location provenance + census demo rows + the map-people-fill arc's three cohort cob/rel/ten lanes + the medinc booth column the frame's 1991-era census income print fills + the Age family's four lanes");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -357,7 +357,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 22, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows + the household-median dollar lane)");
+  assert.equal(Object.keys(B).length, 26, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows + the household-median dollar lane + the age family's median and three new share lanes)");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -495,6 +495,38 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     assert.equal(vals.length, boothN, `${y}: the booth median lane's row count`);
     assert.ok(vals.every((v) => v >= 100 && v < 4000), `${y}: booth medians inside the edition grids' printed edges (open-top nulls never a figure)`);
   }
+  // the Age family (the income lens's sibling, same day): its four lanes
+  // ride the packed census band dicts — national median age and the
+  // three new shares pooled from the divisions (the vote-weighted
+  // measure the legend's Australia line marks), every division records
+  // its own median, and the booth lanes sit beside the demo tuple
+  const AGE_Y = {
+    1993: [32, 0.1083, 0.0467, 6361, "Chifley", 27],
+    1996: [33, 0.1035, 0.0503, 6568, "Chifley", 28],
+    1998: [34, 0.0989, 0.0538, 6691, "Chifley", 29],
+    2001: [35, 0.0941, 0.0582, 6920, "Chifley", 30],
+    2004: [36, 0.0947, 0.0621, 6719, "Chifley", 30],
+    2007: [37, 0.0948, 0.0643, 7690, "Lingiari", 30],
+    2010: [37, 0.0941, 0.0649, 8250, "Lingiari", 30],
+    2013: [37, 0.0927, 0.0663, 8392, "Lingiari", 31],
+    2016: [38, 0.0894, 0.0696, 8194, "Lingiari", 31],
+    2019: [38, 0.0861, 0.0738, 8737, "Lingiari", 31],
+    2022: [39, 0.0835, 0.0773, 8448, "Lingiari", 32],
+    2025: [39, 0.0835, 0.0758, 8913, "Chifley", 32],
+  };
+  for (const [y, [med, a18, a75s, boothN, yng, yngAge]] of Object.entries(AGE_Y)) {
+    const J = JSON.parse(R(`map/data/res-${y}.json`));
+    assert.equal(J.ageCuts.medAge, med, `${y}: the national median age pools from the division band dicts`);
+    assert.equal(J.ageCuts.a1824, a18, `${y}: the 18–24 national share (the 15–19 estimate inside)`);
+    assert.equal(J.ageCuts.a75, a75s, `${y}: the 75-and-over national share`);
+    assert.ok(J.divs.every((d) => d.demo && d.demo.ageMed != null), `${y}: every division records its median age`);
+    assert.equal(J.divs.find((d) => d.n === yng).demo.ageMed, yngAge, `${y}: ${yng}'s median age (the national floor)`);
+    assert.ok(J.divs.find((d) => d.n === "Lyne" && d.demo && d.demo.ageMed != null), `${y}: Lyne (the oldest seat on record every year) carries its median`);
+    const vals = (J.booths.ageMed || []).filter((v) => v != null);
+    assert.equal(vals.length, boothN, `${y}: the booth median-age lane's row count`);
+    assert.ok(vals.every((v) => v >= 0 && v <= 84), `${y}: booth medians inside the printed band grid (85+ open-band stays null)`);
+    for (const k of ["a1824", "a3554", "a75"]) assert.ok((J.booths[k] || []).some((v) => v != null), `${y}: booth share lane ${k} lands`);
+  }
   // the birthplace menu matrix: every census-edition year lists its own
   // cobKeys, uk-led on the 2001 edition and GCP-era on 2016+; booth cob
   // rows ride exactly the landed demo rows everywhere
@@ -614,7 +646,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
   assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hi"];'), "the income lane id and its three measures, median first");
-  assert.ok(base.includes('"loinc") ks.push(LENS_INC)'), "the People menu folds the two share lanes into the one Household-income entry (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('if (k === "loinc") { ks.push(LENS_INC); continue; }') && base.includes('if (k === "a65") { ks.push(LENS_AGE); continue; }'), "the People menu folds the income pair into Household income and the age pair into Age (DM stays positional against the demo tuple)");
   assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hi: "hiinc" };'), "the income view's demo key per measure");
   assert.ok(base.includes("incmed: seq(48, 0.14)"), "the median spectrum wears its own money-gold hue");
   assert.ok(base.includes('incMode: "med"'), "the median spectrum is the landing measure");
@@ -625,7 +657,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('else if (k === "incv") S.incMode = t.value;'), "the picker change handler is wired");
   assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
   assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
-  assert.ok(ui.includes('S.incMode, S.party'), "the legend's refresh key re-reads on a measure switch");
+  assert.ok(ui.includes('S.incMode, S.ageMode, S.party'), "the legend's refresh key re-reads on a measure switch");
   assert.ok(ui.includes("Income: ${INC_SHORT[S.incMode]}"), "the lens head names the picked measure");
   assert.ok(ui.includes('`Median weekly household income${incEpochBrk}${incMedNote}`'), "the median legend note names itself in census-year dollars and carries the no-national-line caveat where the frame lacks it");
   assert.ok(ui.includes("mny(ausShare)"), "the Australia line formats in dollars on the median view");
@@ -635,6 +667,33 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("INC_TOP[S.incMode]"), "the area ranking phrases follow the picked measure");
   assert.ok(base.includes('INC_TOP = { med: ["seats where households earn the most"'), "the median ranking phrase");
   assert.ok(list.includes("incMed()") && list.includes("mny(v)"), "the list column prices the median view in dollars");
+}
+
+// ── the Age lens (2026-10-31): the income lane's sibling fold — Aged 65
+// and over and Aged 20 to 34 become Age's share views beside a median-age
+// spectrum and three new brackets (18–24, 35–54, 75+); median is years
+// (its own lane, never a share cell), hash gains av=, legacy a65/a2034
+// hashes alias in
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
+  assert.ok(base.includes('const LENS_AGE = "age";') && base.includes('const AGE_MODES = ["med", "a1824", "a2034", "a3554", "a65", "a75"];'), "the age lane id and its six views, median first");
+  assert.ok(base.includes('const AGE_KEY = { med: "ageMed"'), "the age view's demo key per view");
+  assert.ok(base.includes("agemed: seq(86, 0.14)"), "the median-age spectrum wears its own hue");
+  assert.ok(base.includes('ageMode: "med"'), "the median age lands as the default view");
+  assert.ok(base.includes('const ageMedRange = (m) =>') && base.includes("Math.floor(lo / 2)"), "the median-age colour domain measures the year's own divisions, snapped to whole years");
+  assert.ok(map2.includes('if (ageMed()) { const v = b.raw.ageMed ? b.raw.ageMed[j] : null;'), "booth colour reads the median-age lane, never a share cell");
+  assert.ok(base.includes('if (S.ageMode === "a65" || S.ageMode === "a2034")'), "the 65+/20–34 views ride the demo tuple's cells 1/2 untouched");
+  assert.ok(ui.includes('data-opt="agev" aria-label="Age view"'), "the legend's age picker rides the select-lens idiom");
+  assert.ok(ui.includes('else if (k === "agev") S.ageMode = t.value;'), "the age picker change handler is wired");
+  assert.ok(ui.includes('if (i === "a65" || i === "a2034") { S.index = LENS_AGE;') && ui.includes('p.set("av", S.ageMode);') && ui.includes('p.get("av")'), "legacy a65/a2034 hashes alias onto the lens and av carries the view both ways");
+  assert.ok(ui.includes("Age: ${AGE_SHORT[S.ageMode]}"), "the lens head names the picked age view");
+  assert.ok(ui.includes("Median resident age, interpolated from census age bands"), "the median-age legend note names its interpolation");
+  assert.ok(ui.includes("the 18–19 share of the 15–19 band"), "the 18–24 view admits its band-split estimate");
+  assert.ok(ui.includes("ageMed() ? Math.round(ausShare)"), "the Australia line formats whole years on the median view");
+  assert.ok(story.includes("The median age in ${ds(d.n)} is"), "the seat's median-age headline");
+  assert.ok(story.includes("The median age near here is"), "the place's median-age headline");
+  assert.ok(story.includes("AGE_TOP[S.ageMode]"), "the area ranking phrases follow the picked age view");
+  assert.ok(list.includes("ageMed()") && list.includes("yr"), "the list column prices the median-age view in whole years");
 }
 
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain

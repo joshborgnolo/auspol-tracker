@@ -303,6 +303,56 @@ def select_cells(dm, lane, keys):
     return [c.get(k) for k in keys]
 
 
+# the Age family (the merged Household-age lens, the same idiom as the
+# income lane's): medians and three new share views from the packed
+# demo.age band dicts at every record, plus the national-age marker
+AGE_BANDS = [("0_4", 0, 4), ("5_14", 5, 14), ("15_19", 15, 19), ("20_24", 20, 24),
+             ("25_34", 25, 34), ("35_44", 35, 44), ("45_54", 45, 54), ("55_64", 55, 64),
+             ("65_74", 65, 74), ("75_84", 75, 84), ("85ov", 85, None)]
+AGE_BAND_KEYS = [k for k, _, _ in AGE_BANDS]
+# the 18-19 share of the 15-19 band: two years of five split linearly —
+# the census grid's own constant, the label admits it
+AGE_1824_OF_1519 = 2 / 5
+
+
+def age_median(age):
+    """Median age of a packed band dict: linear inside the median band;
+    None when the basis is empty or the median lands in the open 85+
+    band (an open-band tail would be a fabricated year, never a read)."""
+    if not age:
+        return None
+    tot = sum(age.get(k) or 0.0 for k in AGE_BAND_KEYS)
+    if tot <= 0:
+        return None
+    half = tot / 2.0
+    acc = 0.0
+    for (k, lo, hi) in AGE_BANDS:
+        m = age.get(k) or 0.0
+        if acc + m >= half:
+            if hi is None or m <= 0:
+                return None
+            # floored, never rounded: a median whose point lands inside
+            # the printed band never wears the next band's year — the
+            # 85+ open band would otherwise collect rounded-up 84.9s
+            return min(hi, int(lo + (hi + 1 - lo) * (half - acc) / m))
+        acc += m
+    return None
+
+
+def age_shares(age):
+    """The median-lane family's new share views (a1824, a3554, a75) from
+    the packed band dict; a2034/a65 already ride the demo tuple."""
+    if not age:
+        return (None, None, None)
+    tot = sum((age.get(k) or 0.0) for k in AGE_BAND_KEYS)
+    if tot <= 0:
+        return (None, None, None)
+    a1824 = (AGE_1824_OF_1519 * (age.get("15_19") or 0.0) + (age.get("20_24") or 0.0)) / tot
+    a3554 = ((age.get("35_44") or 0.0) + (age.get("45_54") or 0.0)) / tot
+    a75 = ((age.get("75_84") or 0.0) + (age.get("85ov") or 0.0)) / tot
+    return (round(a1824, 4), round(a3554, 4), round(a75, 4))
+
+
 def seifa_cells(sf):
     S = {}
     for ix in ("irsad", "irsd", "ier", "ieo"):
@@ -553,6 +603,10 @@ def build_year(year, hist, base2001):
 
     D = []
     div_index = {}
+    # the national-age marker pools in flight beside the divisions: the
+    # pool weight times each band share — ageCuts' national line down
+    # at the out assembly, same pooling the legend pools use elsewhere
+    age_bands_w = [0.0, [0.0] * len(AGE_BANDS)]
     for d, e in divs.items():
         name = e["name"]
         fl = dflow[d]
@@ -585,12 +639,18 @@ def build_year(year, hist, base2001):
                 # The income shares are per-adult (they ride as cells 6/7);
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
+                a18, a35, a75x = age_shares(dm.get("age"))
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
-                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "cob": dd.get("cob"),
+                               "loinc": dc[6], "hiinc": dc[7], "medIncWeekly": dm.get("incMed"), "ageMed": age_median(dm.get("age")),
+                               "a1824": a18, "a3554": a35, "a75": a75x, "cob": dd.get("cob"),
                                "y12less": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
                                "pt": dc[12], "noncit": dc[13], "bigfam": dc[14], "hl": dc[15],
                                "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten"),
                                "anc": (dm or {}).get("anc")}
+                if dm.get("age") and dm.get("persons"):
+                    age_bands_w[0] += dm["persons"]
+                    for i, k in enumerate(AGE_BAND_KEYS):
+                        age_bands_w[1][i] += dm["persons"] * (dm["age"].get(k) or 0.0)
         div_index[d] = len(D)
         D.append(rec)
 
@@ -661,6 +721,14 @@ def build_year(year, hist, base2001):
         # nearest-side convention like the rest of the dollar figures;
         # a no-census block withholds it like the cob row
         B["medinc"].append(dirow.get("incMed") if dcrow else None)
+        # the Age family rides the same doctrine in parallel lanes off
+        # the packed age dicts: median in years (never a share) and the
+        # three new share views as fractions, like the second menu rows
+        a18, a35, a75x = age_shares(dirow.get("age")) if dcrow else (None, None, None)
+        B["ageMed"].append(age_median(dirow.get("age")) if dcrow else None)
+        B["a1824"].append(a18)
+        B["a3554"].append(a35)
+        B["a75"].append(a75x)
 
     if not any(B["demo"]):
         del B["demo"]  # the year's store didn't exist (pre-2004, absent
@@ -675,6 +743,9 @@ def build_year(year, hist, base2001):
         del B["anc"]
     if not any(B["medinc"]):
         del B["medinc"]
+    for k in ("ageMed", "a1824", "a3554", "a75"):
+        if not any(B[k]):
+            del B[k]
 
     # ---- state + national aggregates (all vote types) ----
     def agg(st):
@@ -721,11 +792,21 @@ def build_year(year, hist, base2001):
     if incuts is not None:
         incuts = dict(incuts)
         cnts = vstore.get("counts") or {}
-        natrec = ((cnts.get("demoI") or {}).get("national")
-                  or (cnts.get("demo") or {}).get("national")
-                  or cnts.get("national") or {})
-        if natrec.get("incMed") is not None:
+        natrec = next((n for n in ((cnts.get("demoI") or {}).get("national"),
+                                  (cnts.get("demo") or {}).get("national"),
+                                  cnts.get("national"))
+                       if n and n.get("incMed") is not None), None)
+        if natrec is not None:
             incuts["medWeekly"] = natrec["incMed"]
+    # the national-age marker beside it: the pool-weighted share of the
+    # pooled band histogram is a share of every voter-weighted seat, and
+    # its median is the legend's Australia line for the Age family
+    agecuts = None
+    if age_bands_w[0] > 0:
+        nat_age = {k: age_bands_w[1][i] / age_bands_w[0] for i, k in enumerate(AGE_BAND_KEYS)}
+        na18, na35, na75 = age_shares(nat_age)
+        agecuts = {"medAge": age_median(nat_age), "a1824": na18, "a3554": na35, "a75": na75,
+                   "basis": "pool-weighted share of the packed census age bands over every seat"}
     out = {"year": year, "event": EVENT.get(year) or None, "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
            "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,
            # what a demo row describes: where voters live (2016+) vs the
@@ -738,6 +819,11 @@ def build_year(year, hist, base2001):
            # carry incomeCutsI: the nearest census side's dollar epoch,
            # both sides' cuts under sides
            "incomeCuts": incuts,
+           # the Age family's national-age marker: pool-weighted median
+           # and the share views' national reads from the pooled bands;
+           # null on frames whose stores carry no age dicts (the state
+           # frames' GCP lanes today)
+           "ageCuts": agecuts,
            # the birthplace-country sub-view country order the B["cob"]
            # rows and rec.demo.cob dicts follow (10 keys from 2016 /
            # the state frames' GCP basis, 8 on the 2006/2011
