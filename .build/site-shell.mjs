@@ -408,7 +408,7 @@ export function shellHeader({ tab, menu, page, file } = {}) {
         ${tabs}
         <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="${menuPage ? `More pages – on ${menuPage.label}` : "More pages"}" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span>${SHELL_MENU_ICON}<span class="sh-menu-lab">${menuPage ? menuPage.label : "More"}</span>${SHELL_MENU_CHEV}</button>
       </div>
-      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
+      <div class="sh-next" hidden title="Projected from each house’s recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house’s next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>

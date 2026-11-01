@@ -53,7 +53,7 @@ function renderHead() {
   $("#md-outcomes").innerHTML = outcomesHTML(r);
   $("#md-ranges").innerHTML = rangesHTML(r);
   const days = m === "vic" ? Math.round((Date.parse(a.election) - Date.parse(new Date().toISOString().slice(0, 10))) / 864e5) : 0;
-  $("#md-meta").textContent = m === "vic" ? `Victoria's Legislative Assembly, 88 seats${days > 1 ? `, ${days} days before the election` : days === 1 ? ", the day before the election" : days === 0 ? ", on election day" : ", as the model stood before the election"}`
+  $("#md-meta").textContent = m === "vic" ? `Victoria’s Legislative Assembly, 88 seats${days > 1 ? `, ${days} days before the election` : days === 1 ? ", the day before the election" : days === 0 ? ", on election day" : ", as the model stood before the election"}`
     : m === "forecast" ? "The 2028 House on election day, about 17 months away" : "The 2028 House if an election were held now";
   $(".md-modes").hidden = m === "vic";
   for (const b of $$(".md-jur [data-jur]")) b.setAttribute("aria-pressed", String(b.dataset.jur === STATE.jur));

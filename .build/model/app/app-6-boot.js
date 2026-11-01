@@ -5,7 +5,7 @@
     const [nowcast, forecast, inputs, evidence] = await Promise.all([getJSON(URLS.nowcast), getJSON(URLS.forecast), getJSON(URLS.inputs), getJSON(URLS.evidence)]);
     Object.assign(STATE, { res: { nowcast, forecast }, inputs, evidence });
   } catch (e) {
-    const n = $("#md-note"); if (n) n.insertAdjacentHTML("beforeend", ` · <span style="color:var(--m-alp)">the page's data could not load (${esc(e.message)}); the head above is the official run</span>`);
+    const n = $("#md-note"); if (n) n.insertAdjacentHTML("beforeend", ` · <span style="color:var(--m-alp)">the page’s data could not load (${esc(e.message)}); the head above is the official run</span>`);
     return;
   }
   const q = readHash();

@@ -359,7 +359,14 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       });
       if (r.loose && !irregular(r)) {
         const a = Math.max(L, r.release - r.spread * DAY_MS), b = Math.min(R, r.release + r.spread * DAY_MS);
-        marks.push(<span key="win" className="rd-tl-win" style={{ left: pos(a) + "%", width: (pos(b) - pos(a)) + "%" }}></span>);
+        /* A window that opens wholly past the strip's right edge has b <= a:
+           the negative width declaration drops and the span shrinks to its
+           two dashed borders - a partial vertical dashed line where the
+           "Next, at the earliest" column begins (DemosAU's December window,
+           reported 1 Nov). Clip it to the same beyond-horizon pill a dated
+           slot gets. */
+        if (b > a) marks.push(<span key="win" className="rd-tl-win" style={{ left: pos(a) + "%", width: (pos(b) - pos(a)) + "%" }}></span>);
+        else if (r.release - r.spread * DAY_MS > R) marks.push(<span key="win" className="rd-tl-off rd-tl-offr" aria-hidden="true">{D.monthName(new Date(r.release).getUTCMonth() + 1)}<span className="rd-tl-ring"></span></span>);
       } else if (r.release > R) {
         marks.push(<span key="next" className="rd-tl-off rd-tl-offr" aria-hidden="true">{D.monthName(new Date(r.release).getUTCMonth() + 1)}<span className="rd-tl-ring"></span></span>);
       } else {

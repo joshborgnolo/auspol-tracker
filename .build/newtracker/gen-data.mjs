@@ -8331,7 +8331,7 @@ const changelog = JUR ? null : (() => {
   const putSig = (key, label, r) => {
     if (r && r.changeSig && r.chg) { sig[key] = r.chg > 0 ? 1 : -1; sigMeta[key] = label; }
   };
-  const PRIM_LAB = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "others'" };
+  const PRIM_LAB = { alp: "Labor’s", lnp: "the Coalition’s", grn: "the Greens’", onp: "One Nation’s", oth: "others’" };
   for (const k of PRIMARY_KEYS) putSig(`prim|${k}`, `${PRIM_LAB[k]} primary vote`, primaryChg && primaryChg[k]);
   const LEADERS = { alb: "Albanese", taylor: "Taylor", hanson: "Hanson" };
   const leaders = {};
@@ -8340,11 +8340,11 @@ const changelog = JUR ? null : (() => {
       const r = leaderNow[`${id}_${metric}`];
       if (!r) continue;
       leaders[`${id}_${metric}`] = r.v;
-      putSig(`lead|${id}_${metric}`, `${who}'s ${what}`, r);
+      putSig(`lead|${id}_${metric}`, `${who}’s ${what}`, r);
     }
   }
-  putSig("ppm|alb_taylor", "Albanese's preferred-PM margin over Taylor", ppmMarginNow);
-  putSig("ppm|alb_hanson", "Albanese's preferred-PM margin over Hanson", ppmHMarginNow);
+  putSig("ppm|alb_taylor", "Albanese’s preferred-PM margin over Taylor", ppmMarginNow);
+  putSig("ppm|alb_hanson", "Albanese’s preferred-PM margin over Hanson", ppmHMarginNow);
   putSig("dir|net", "the right-track-minus-wrong-track net", directionNow);
   for (const it of (issues && issues.list) || []) {
     const lab = String(it.label || it.id).toLowerCase();
@@ -8366,7 +8366,7 @@ const changelog = JUR ? null : (() => {
   }
   for (const g of (onSources && onSources.series) || []) {
     const grp = g.label.replace(/ voters$/, "").replace(/^Other$/, "other");
-    putSig(`onsrc|${g.id}`, `the share of One Nation's gains drawn from 2025 ${grp} voters`, g.now);
+    putSig(`onsrc|${g.id}`, `the share of One Nation’s gains drawn from 2025 ${grp} voters`, g.now);
     putSig(`onrate|${g.id}`, `the share of 2025 ${grp} voters now backing One Nation`, g.rate && g.rate.now);
   }
   const nextState = stateOf({
