@@ -3,14 +3,14 @@
  "_provenance": {
   "generated": "2026-11-01",
   "inputs": {
-   "data/polls.json": "dae3a3d75d042c7c",
+   "data/polls.json": "5cb5694440733a4c",
    "data/demographics.json": "51e4eea9e45d1a65",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0"
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 26.4 lnp 23 grn 13.4 onp 26 oth 11.3 | n=6"
+   "captured": "primaryNow: alp 26.4 lnp 23 grn 13.4 onp 26 oth 11.4 | n=6"
   }
  },
  "national": {
@@ -19,7 +19,7 @@
    "lnp": 23,
    "grn": 13.4,
    "on": 26,
-   "oth": 11.3
+   "oth": 11.4
   },
   "nPolls": 6,
   "result2025": {
@@ -34,7 +34,7 @@
    "lnp": -8.82,
    "on": 19.6,
    "grn": 1.2,
-   "oth": -3.71
+   "oth": -3.61
   },
   "note": "Δ = nowcast − certified 2025, pp, 5-key (lnp combined Coalition). Uncertainty deliberately not printed at this layer: W5 takes the estimator's own within gen-data."
  },
