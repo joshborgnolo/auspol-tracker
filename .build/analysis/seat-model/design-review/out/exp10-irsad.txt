@@ -1,0 +1,54 @@
+
+=== A. Three-way: Coalition -> Labor in Labor v One Nation finals ===
+  SA 2026 (25 seats) LOO MAE: flat 7.31 | class 6.24 | IRSAD 7.47 | uni 6.59 | Coal primary 5.78 || class+IRSAD 6.60 | IRSAD+Coal 5.79 | class+Coal 5.69
+      corr with share: IRSAD 0.01, uni 0.31, Coal primary -0.58; corr IRSAD~uni 0.81, IRSAD~Coal 0.38
+      by class: inner n7 share 41.9 IRSAD 981 [953–1004]; outer n13 share 35.7 IRSAD 928 [814–1029]; rural n5 share 28.0 IRSAD 920 [873–957]
+  Qld 2017 (13 seats) LOO MAE: flat 7.57 | class 7.89 | IRSAD 8.34 | uni 8.09 | Coal primary 7.61 || class+IRSAD 9.96 | IRSAD+Coal 8.75 | class+Coal 8.89
+      corr with share: IRSAD 0.11, uni -0.06, Coal primary -0.24; corr IRSAD~uni 0.59, IRSAD~Coal -0.08
+      by class: outer n3 share 33.7 IRSAD 976 [925–1028]; prov n7 share 31.9 IRSAD 940 [902–973]; rural n3 share 25.1 IRSAD 918 [887–971]
+  SA 2026 detail, sorted by IRSAD: Elizabeth 31 [outer, 814, Lib 6]; Ramsay 41 [outer, 823, Lib 6]; Taylor 40 [outer, 858, Lib 8]; Giles 40 [rural, 873, Lib 9]; Reynell 33 [outer, 892, Lib 8]; Hammond 21 [rural, 899, Lib 22]; Playford 46 [outer, 899, Lib 8]; Light 28 [rural, 917, Lib 12]; Hurtle Vale 33 [outer, 927, Lib 10]; Florey 42 [outer, 930, Lib 9]; Kaurna 32 [outer, 948, Lib 8]; Port Adelaide 60 [inner, 953, Lib 7]; Mawson 25 [rural, 957, Lib 17]; Ngadjuri 26 [rural, 957, Lib 25]; Cheltenham 40 [inner, 960, Lib 9]; Wright 39 [outer, 967, Lib 9]; Lee 29 [inner, 976, Lib 16]; Newland 29 [outer, 980, Lib 15]; King 27 [outer, 980, Lib 12]; Torrens 43 [inner, 984, Lib 16]; Enfield 43 [inner, 985, Lib 15]; West Torrens 41 [inner, 1002, Lib 10]; Badcoe 38 [inner, 1004, Lib 14]; Davenport 31 [outer, 1019, Lib 15]; Black 41 [outer, 1029, Lib 10]
+  Qld 2017 detail, sorted by IRSAD: Cook 24 [rural, 887, LNP 18]; Maryborough 19 [rural, 897, LNP 18]; Morayfield 35 [prov, 902, LNP 20]; Rockhampton 36 [prov, 921, LNP 18]; Waterford 28 [outer, 925, LNP 20]; Ipswich 32 [prov, 931, LNP 14]; Thuringowa 45 [prov, 945, LNP 21]; Ipswich West 33 [prov, 947, LNP 17]; Mirani 21 [prov, 962, LNP 27]; Gladstone 33 [rural, 971, LNP 12]; Keppel 21 [prov, 973, LNP 25]; Logan 46 [outer, 974, LNP 18]; Jordan 27 [outer, 1028, LNP 14]
+
+=== A2. One Nation -> Labor in Labor v Coalition finals (state + federal 2025) ===
+  SA 2026 (13 seats) LOO MAE: flat 4.01 | class 4.09 | IRSAD 3.75 | uni 4.52 | Coal primary 3.06 || class+IRSAD 4.53 | IRSAD+Coal 2.15 | class+Coal 3.11
+      corr with share: IRSAD -0.42, uni -0.15, Coal primary -0.75; corr IRSAD~uni 0.85, IRSAD~Coal 0.06
+      by class: inner n7 share 28.2 IRSAD 1059 [1005–1107]; outer n4 share 30.3 IRSAD 1032 [1003–1086]; rural n2 share 24.5 IRSAD 1032 [992–1071]
+  Qld 2017 (38 seats) LOO MAE: flat 5.92 | class 5.97 | IRSAD 6.08 | uni 5.95 | Coal primary 5.86 || class+IRSAD 6.84 | IRSAD+Coal 6.01 | class+Coal 6.63
+      corr with share: IRSAD 0.00, uni -0.17, Coal primary 0.22; corr IRSAD~uni 0.72, IRSAD~Coal 0.14
+      by class: inner n4 share 31.0 IRSAD 1033 [1012–1063]; outer n12 share 35.1 IRSAD 1015 [971–1071]; prov n10 share 32.4 IRSAD 959 [888–1033]; rural n12 share 34.2 IRSAD 981 [938–1029]
+  Fed 2025 (114 seats) LOO MAE: flat 3.74 | class 3.69 | IRSAD 3.59 | uni 3.75 | Coal primary 3.01 || class+IRSAD 3.41 | IRSAD+Coal 2.90 | class+Coal 3.05
+      corr with share: IRSAD -0.27, uni -0.13, Coal primary -0.57; corr IRSAD~uni 0.89, IRSAD~Coal 0.05
+      by class: inner n24 share 25.6 IRSAD 1046 [924–1118]; outer n40 share 27.2 IRSAD 999 [864–1131]; prov n21 share 25.9 IRSAD 974 [902–1027]; rural n29 share 24.0 IRSAD 951 [898–1030]
+
+=== A3. Labor -> Coalition in Coalition v One Nation finals ===
+  Qld 2017 (0 seats) LOO MAE: flat NaN | class NaN | IRSAD NaN | uni NaN | Coal primary NaN || class+IRSAD NaN | IRSAD+Coal NaN | class+Coal NaN
+      corr with share: IRSAD NaN, uni NaN, Coal primary NaN; corr IRSAD~uni NaN, IRSAD~Coal NaN
+      by class: 
+
+=== B. Federal classic seats: predict each seat's donor->Labor share at E, national level at E given ===
+Vote-weighted MAE (pts). Gaps/slopes fitted at E-1 and applied to the seat's values (IRSAD at E; margin = seat's E-1 Coalition 2PP).
+Columns: flat | class | IRSAD | class+IRSAD (joint) | Coal margin | IRSAD+margin | seat's own E-1 gap | 0.5 seat+0.5 class | 0.5 seat+0.5 IRSAD | in-sample at E: class R2, IRSAD R2, both R2
+  GRN 2010 n 139   3.91   3.72   3.93   3.83   3.77   3.30   3.09   2.65   2.78   R2 0.16 0.10 0.17  (IRSAD slope 2.5 pts/100)
+  GRN 2013 n 137   3.90   3.72   3.73   3.66   3.55   2.96   2.70   2.77   2.70   R2 0.13 0.08 0.16  (IRSAD slope 2.5 pts/100)
+  GRN 2016 n 126   4.06   3.86   4.06   3.87   3.67   3.45   3.07   3.05   3.16   R2 0.15 0.07 0.15  (IRSAD slope 2.3 pts/100)
+  GRN 2019 n 127   4.23   3.70   4.02   3.68   3.95   3.17   2.76   2.71   2.81   R2 0.23 0.14 0.26  (IRSAD slope 3.3 pts/100)
+  GRN 2022 n 120   3.63   2.95   3.17   2.78   2.95   2.49   2.40   2.01   2.05   R2 0.23 0.21 0.31  (IRSAD slope 3.6 pts/100)
+  GRN 2025 n 112   3.60   3.23   3.13   3.06   3.00   2.63   2.65   2.49   2.38   R2 0.18 0.26 0.28  (IRSAD slope 4.3 pts/100)
+  GRN all            3.87   3.50   3.65   3.45   3.46   2.98   2.77   2.59   2.62
+
+  ONP 2010 n  12   6.87   6.64   7.34   7.14   6.99   7.34   7.99   6.55   5.94   R2 0.14 0.01 0.16  (IRSAD slope 1.3 pts/100)
+  ONP 2013 n   3   5.09   1.68   5.14   2.60   7.23   7.30   3.50   2.58   4.31   R2 0.29 0.17 0.55  (IRSAD slope 10.9 pts/100)
+  ONP 2016 n   2   2.35   6.44   4.29  11.12   2.57   4.30  10.59   8.51   7.44   R2 0.44 0.10 0.45  (IRSAD slope -5.7 pts/100)
+  ONP 2019 n  12   3.78   4.03   4.26   4.22   3.00   3.65   3.95   3.38   3.59   R2 0.11 0.00 0.16  (IRSAD slope -0.4 pts/100)
+  ONP 2022 n  51   3.92   3.86   3.91   3.87   3.97   3.97   3.53   3.25   3.24   R2 0.13 0.00 0.14  (IRSAD slope 0.3 pts/100)
+  ONP 2025 n 111   3.65   3.42   3.67   3.29   3.23   3.12   4.28   3.13   3.14   R2 0.12 0.03 0.24  (IRSAD slope -1.6 pts/100)
+  ONP all            3.75   3.68   3.85   3.71   3.44   3.47   4.21   3.31   3.32
+
+  OTH 2010 n 132   6.46   6.02   6.43   6.05   5.97   6.00   7.79   6.48   6.64   R2 0.16 0.00 0.21  (IRSAD slope -0.6 pts/100)
+  OTH 2013 n 130   4.68   5.16   4.66   5.30   4.00   4.01   6.07   4.88   4.37   R2 0.05 0.00 0.07  (IRSAD slope -0.2 pts/100)
+  OTH 2016 n 125   7.69   7.76   7.68   7.65   6.94   6.96   6.24   6.78   6.72   R2 0.01 0.03 0.08  (IRSAD slope -2.6 pts/100)
+  OTH 2019 n 126   6.77   6.63   7.19   7.15   6.53   6.60   6.73   5.65   5.92   R2 0.03 0.02 0.03  (IRSAD slope 2.0 pts/100)
+  OTH 2022 n 120   6.23   6.24   6.29   6.25   6.32   6.35   6.90   5.60   5.61   R2 0.02 0.00 0.02  (IRSAD slope 0.7 pts/100)
+  OTH 2025 n 110   7.98   8.00   7.96   8.00   7.76   7.76   8.31   7.77   7.69   R2 0.02 0.01 0.02  (IRSAD slope 2.2 pts/100)
+  OTH all            6.63   6.67   6.70   6.77   6.27   6.29   6.95   6.16   6.10
+

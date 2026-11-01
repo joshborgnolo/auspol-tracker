@@ -1,0 +1,28 @@
+
+Coalition -> Labor share, in Labor v One Nation finals
+ SA 2026 : pooled 33.8% over 25 seats | by class: inner 40.4 (7), outer 34.7 (13), rural 26.1 (5) | range 21–60
+   SA 2026 leave-one-out MAE (pts): flat 7.31 | class 6.24 | uni-share slope 6.59 | ON-primary slope 6.12 | Coalition-primary slope 5.78   [corr with uni 0.31, ON -0.44]
+ Qld 2017: pooled 30.2% over 13 seats | by class: outer 34.1 (3), prov 30.9 (7), rural 23.8 (3) | range 19–46
+   Qld 2017 leave-one-out MAE (pts): flat 7.57 | class 7.89 | uni-share slope 8.09 | ON-primary slope 8.42 | Coalition-primary slope 7.61   [corr with uni -0.06, ON -0.12]
+ Qld 2020: pooled 26.0% over 2 seats | by class: prov 26.0 (2) | range 21–35
+ Fed 2025: pooled 17.1% over 1 seats | by class: rural 17.1 (1) | range 17–17
+
+Labor -> Coalition share, in Coalition v One Nation finals
+ SA 2026 : none
+ Qld 2017: none
+ Fed 2025: pooled 57.9% over 1 seats | by class: rural 57.9 (1) | range 58–58
+ Fed 2022: none
+
+One Nation -> Labor share, in Labor v Coalition finals (for contrast)
+ SA 2026 : pooled 28.3% over 13 seats | by class: inner 28.9 (7), outer 30.4 (4), rural 24.4 (2) | range 19–37
+   SA 2026 leave-one-out MAE (pts): flat 4.01 | class 4.09 | uni-share slope 4.52 | ON-primary slope 4.51 | Coalition-primary slope 3.06   [corr with uni -0.15, ON 0.12]
+ Qld 2017: pooled 33.7% over 38 seats | by class: inner 30.6 (4), outer 35.2 (12), prov 32.1 (10), rural 34.3 (12) | range 21–47
+   Qld 2017 leave-one-out MAE (pts): flat 5.92 | class 5.97 | uni-share slope 5.95 | ON-primary slope 6.06 | Coalition-primary slope 5.86   [corr with uni -0.17, ON -0.00]
+ Fed 2025: pooled 25.9% over 114 seats | by class: inner 26.0 (24), outer 27.6 (40), prov 26.2 (21), rural 23.8 (29) | range 14–35
+   Fed 2025 leave-one-out MAE (pts): flat 3.74 | class 3.69 | uni-share slope 3.75 | ON-primary slope 3.78 | Coalition-primary slope 3.01   [corr with uni -0.13, ON 0.04]
+
+SA 2026 Labor v ON seats, detail (class inherited from the federal footprint):
+Hammond 21 [rural, uni 11%, ON 27]; Mawson 25 [rural, uni 19%, ON 26]; Ngadjuri 26 [rural, uni 13%, ON 35]; King 27 [outer, uni 16%, ON 31]; Light 28 [rural, uni 13%, ON 35]; Lee 29 [inner, uni 22%, ON 25]; Newland 29 [outer, uni 22%, ON 25]; Davenport 31 [outer, uni 26%, ON 20]; Elizabeth 31 [outer, uni 8%, ON 33]; Kaurna 32 [outer, uni 16%, ON 27]; Hurtle Vale 33 [outer, uni 13%, ON 27]; Reynell 33 [outer, uni 12%, ON 28]; Badcoe 38 [inner, uni 37%, ON 18]; Wright 39 [outer, uni 18%, ON 28]; Cheltenham 40 [inner, uni 25%, ON 21]; Taylor 40 [outer, uni 8%, ON 34]; Giles 40 [rural, uni 11%, ON 33]; Black 41 [outer, uni 27%, ON 19]; Ramsay 41 [outer, uni 9%, ON 28]; West Torrens 41 [inner, uni 33%, ON 18]; Florey 42 [outer, uni 22%, ON 23]; Torrens 43 [inner, uni 34%, ON 21]; Enfield 43 [inner, uni 33%, ON 18]; Playford 46 [outer, uni 17%, ON 24]; Port Adelaide 60 [inner, uni 20%, ON 21]
+
+Qld 2017 Labor v ON seats, detail:
+Maryborough 19 [rural, uni 9%, ON 30]; Mirani 21 [prov, uni 8%, ON 32]; Keppel 21 [prov, uni 15%, ON 25]; Cook 24 [rural, uni 11%, ON 18]; Jordan 27 [outer, uni 17%, ON 19]; Waterford 28 [outer, uni 13%, ON 21]; Ipswich 32 [prov, uni 13%, ON 27]; Ipswich West 33 [prov, uni 12%, ON 28]; Gladstone 33 [rural, uni 13%, ON 20]; Morayfield 35 [prov, uni 9%, ON 25]; Rockhampton 36 [prov, uni 13%, ON 21]; Thuringowa 45 [prov, uni 12%, ON 20]; Logan 46 [outer, uni 10%, ON 31]

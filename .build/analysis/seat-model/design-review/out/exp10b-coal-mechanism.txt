@@ -1,0 +1,12 @@
+SA 2026, Coalition -> Labor in Labor v ON finals: same-election Lib primary vs pre-election footprints vs retention
+  SA 2026 (25) LOO MAE: flat 7.31 | lnp 5.78 | lib22 7.13 | libF25 6.30 | retain 6.27 | lost 7.54
+      corr with share: lnp -0.58, lib22 -0.31, libF25 -0.52, retain -0.49, lost 0.01
+  corr lnp~lib22 0.66, lnp~retain 0.66
+  detail: Hammond 21 [Lib26 22, Lib22 41, keep 55%]; Mawson 25 [Lib26 17, Lib22 26, keep 67%]; Ngadjuri 26 [Lib26 25, Lib22 43, keep 59%]; King 27 [Lib26 12, Lib22 35, keep 34%]; Light 28 [Lib26 12, Lib22 21, keep 60%]; Lee 29 [Lib26 16, Lib22 38, keep 42%]; Newland 29 [Lib26 15, Lib22 33, keep 46%]; Davenport 31 [Lib26 15, Lib22 42, keep 35%]; Elizabeth 31 [Lib26 6, Lib22 18, keep 35%]; Kaurna 32 [Lib26 8, Lib22 18, keep 44%]; Hurtle Vale 33 [Lib26 10, Lib22 23, keep 43%]; Reynell 33 [Lib26 8, Lib22 23, keep 35%]; Badcoe 38 [Lib26 14, Lib22 28, keep 50%]; Wright 39 [Lib26 9, Lib22 30, keep 29%]; Cheltenham 40 [Lib26 9, Lib22 25, keep 37%]; Taylor 40 [Lib26 8, Lib22 18, keep 44%]; Giles 40 [Lib26 9, Lib22 18, keep 51%]; Black 41 [Lib26 10, Lib22 49, keep 21%]; Ramsay 41 [Lib26 6, Lib22 24, keep 26%]; West Torrens 41 [Lib26 10, Lib22 27, keep 36%]; Florey 42 [Lib26 9, Lib22 27, keep 35%]; Torrens 43 [Lib26 16, Lib22 35, keep 46%]; Enfield 43 [Lib26 15, Lib22 29, keep 52%]; Playford 46 [Lib26 8, Lib22 24, keep 34%]; Port Adelaide 60 [Lib26 7, Lib22 22, keep 34%]
+
+Qld 2017, same test (pre-election footprint = federal 2016 LNP vote)
+  Qld 2017 (13) LOO MAE: flat 7.57 | lnp 7.61 | lnpF16 7.54 | retain 8.38
+      corr with share: lnp -0.24, lnpF16 -0.38, retain 0.07
+  detail: Maryborough 19 [LNP17 18, F16 38, keep 47%]; Mirani 21 [LNP17 27, F16 41, keep 66%]; Keppel 21 [LNP17 25, F16 39, keep 64%]; Cook 24 [LNP17 18, F16 29, keep 61%]; Jordan 27 [LNP17 14, F16 27, keep 53%]; Waterford 28 [LNP17 20, F16 32, keep 63%]; Ipswich 32 [LNP17 14, F16 23, keep 60%]; Ipswich West 33 [LNP17 17, F16 32, keep 52%]; Gladstone 33 [LNP17 12, F16 26, keep 44%]; Morayfield 35 [LNP17 20, F16 31, keep 66%]; Rockhampton 36 [LNP17 18, F16 33, keep 54%]; Thuringowa 45 [LNP17 21, F16 30, keep 70%]; Logan 46 [LNP17 18, F16 34, keep 53%]
+
+Levels: SA26 pooled 33.8% with Lib 19.0 (SA22 36.2); Qld17 pooled 30.2% with LNP 33.7

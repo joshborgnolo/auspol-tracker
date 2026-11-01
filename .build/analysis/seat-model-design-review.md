@@ -1,0 +1,323 @@
+# Seat model — design review (2026-10-31 to 11-01)
+
+The question, asked 2026-10-31: the site now holds polling aggregates, demographic crosstabs, the Australian Election Study and ANUpoll reports, census data back to 1993, full election results and boundaries. How should an election model be built from them? And what should we take from Collins, "Predicting Australian federal electoral seats with machine learning" (*International Journal of Forecasting* 41, 2025, 1620–1635)? Two follow-ups came later: should preference flows vary by seat type, and does IRSAD predict them better than seat type does?
+
+This is analysis only. The W5 engine (`seat-model/swing-simulate.mjs`), its flow table and every site page are unchanged. It reviews, and in places supersedes, [the 8 October plan](seat-model-plan.md).
+
+**Reproducing the numbers.** Every figure below comes from a script in `seat-model/design-review/`, run from the repo root, e.g. `node .build/analysis/seat-model/design-review/exp1-sa26.mjs`. The scripts only read the committed `map/data/res-*.json` stores and `data/polls.json`. `out/` holds each script's output as of 2026-11-01.
+
+## Verdicts
+
+1. **Build a structural simulator, not a tree model or a pendulum.** The chain: national vote, then a logit swing in each seat, then the full preference count in each seat, then thousands of simulated elections with correlated errors. About two-thirds of that already exists in W5. The missing parts are the ones that decide this race: three-way preference flows, and honest uncertainty.
+2. **Spread swings with a logit shift**, not W5's 50/50 mix of proportional and uniform swing. SA 2026 is the one real test of a surging party. There, logit missed One Nation's district vote by 2.1 pts, against 2.4 for the mix and 4.5 for uniform swing.
+3. **Grade the Coalition→Labor flow in Labor-v-One Nation seats by seat type.** W5 sends 21.5% of Coalition preferences to Labor everywhere. State results put it at about 40% in inner-city seats, falling to about 24% in rural ones. On today's primaries, that one constant is worth about 8 Labor seats.
+4. **Keep W5's Labor→Coalition flow (60%) in Coalition-v-One Nation seats.** It matches the only federal counts: Maranoa gave 65.0% in 2019 and 57.9% in 2025.
+5. **For that decisive flow, seat type beats IRSAD, and the Coalition's local vote may beat both.** IRSAD has no relationship with Coalition→Labor flows in SA 2026 (r = 0.01).
+6. **Widen the uncertainty a lot.**
+   - W5's national error is the spread between recent polls, 1.5–2.0 pts. Since 1972, the poll average 15–20 months out has missed Labor's primary by 4.9 pts RMS.
+   - W5 has almost no flow uncertainty and no shared demographic shocks.
+7. **From Collins, keep the framing, not the trees.** Correct a swing model rather than replace it, test at several lead times, and judge on the seats that change hands.
+
+## 1. Why the outside models disagree
+
+Seat figures as pasted on 2026-10-31, with DemosAU's MRP and W5 added:
+
+| Model | ALP | L/NP | ON |
+|---|---|---|---|
+| theswingison.com | 71 | 32 | 34 |
+| aeforecasts.com, forecast | 67 | 40 | 20 |
+| aeforecasts.com, nowcast | 65 | 33 | 37 |
+| earthelects.com | 72 | 28 | 35 |
+| poliwave.com | 78 | 28 | 29 |
+| auspoll.au | 82 | 23 | 33 |
+| globalelectionsimulator.com | 68 | 28 | 47 |
+| pollingforecast.com | 55 | 15 | 63 |
+| electionforecast.net | 82 | 36 | 10 |
+| DemosAU MRP (Aug–Sep 2026, n 9,740) | 84 | 34 | 24 |
+| W5 engine (polls to 6 Oct) | 63 | 25.5 | 47 |
+
+They roughly agree on Labor, but give One Nation anywhere from 10 to 63 seats.
+
+`exp4b-federal-flows.mjs` puts today's aggregate (ALP 26.6, L/NP 22.7, ON 26.1, GRN 13.7, others 11.3) onto the 150 seats with no noise. Varying just two assumptions covers almost the whole range:
+
+| What was varied | ALP | L/NP | ON |
+|---|---|---|---|
+| **Spread rule** (central flows) | | | |
+| Uniform | 78 | 58 | 8 |
+| 50/50 mix (W5) | 76 | 54 | 17 |
+| Logit | 74 | 50 | 22 |
+| Proportional | 73 | 44 | 29 |
+| **Flows** (on the logit spread) | | | |
+| Soft (Coalition→ON 55, Labor→Coalition 65) | 91 | 43 | 14 |
+| Central | 74 | 50 | 22 |
+| Right-consolidating (Coalition→ON 80, Labor→Coalition 85) | 57 | 56 | 33 |
+| W5's constants | 68 | 43 | 34 |
+
+- **The disagreement is about method, not polls.**
+- **These are sensitivities, not forecasts.** The quick party-level count mishandles independents. Replaying 2025 with it gives independents 2 seats (actual 10) and the Coalition 50 (actual 43).
+- **Flows decide many seats.** Under the logit spread, 42 of the 150 seats have the second- and third-placed of Labor, Coalition and ON within 5 pts on primaries.
+
+## 2. How a surge spreads: SA 2026 (exp1–exp3, exp7)
+
+SA in March 2026 is the closest analogue to the federal race:
+- One Nation rose from 2.6% to 22.9% and the Liberals fell from 36.2% to 19.0%.
+- One Nation made the final two in 31 of 47 seats.
+
+The test: predict each district's One Nation vote from its federal 2025 vote in the same area, given only the statewide total.
+
+| Rule | Average miss (pts) | RMSE |
+|---|---|---|
+| Uniform | 4.49 | 5.40 |
+| Proportional | 2.70 | 3.50 |
+| 50/50 mix (W5) | 2.42 | 3.05 |
+| Logit shift | 2.08 | 2.73 |
+| Demographic estimate (fitted on federal 2025), logit-calibrated | 2.47 | 3.15 |
+| Logit + demographic blend | **1.93** | 2.65 |
+| (oracle) SA 2026's own demographic fit, leave-one-out | 2.45 | 3.31 |
+
+The fitted logit elasticity was 0.95, close to a pure logit shift (1). The pre-election blend even beat a demographic model fitted to the result itself.
+
+- **Liberal collapse** (exp2; the 33 districts without a big change in the independent vote): logit 3.69, uniform 4.05, proportional 4.68, elasticity 1.27. Every rule is weak here.
+- **Labor** (exp2, exp7):
+  - Every rule misses by 5.5–5.8 pts.
+  - Labor fell most in seats with few graduates. A university-share slope (3.6 pts of swing per 10 pts of graduates) explains 36% of the seat-to-seat variation. It cuts the leave-one-out miss from 5.85 to 4.94.
+  - Adding more covariates overfits (6.61).
+  - The Liberal swing had no education gradient.
+- **Calm elections** (exp3): across federal 2016 to 2025 and Queensland 2017 to 2024, every rule misses the major parties by about 3.5 pts. That's ordinary seat-level noise, so the rule only matters for a party that is surging or collapsing.
+- **The starting point matters as much as the rule** (exp3). One Nation contested only 19 SA districts in 2022. Spreading from that vote misses those districts by 4.4 pts under logit (uniform 4.4, proportional 5.6). Spreading from its federal 2025 vote in the same area misses all 47 by 2.1 (exp1).
+
+## 3. The whole chain on SA 2026 (exp5)
+
+Given only statewide primaries, with independents' shares taken as actual:
+
+| Spread | Flows | ALP / LIB / ON / IND | Winners right |
+|---|---|---|---|
+| Logit | SA 2026 estimates (LIB→ALP 35 in ALP-v-ON) | 37 / 6 / 4 / 0 | 39/47 |
+| Logit | federal central (LIB→ALP 30) | 37 / 5 / 3 / 2 | 42/47 |
+| Proportional | SA 2026 estimates | 37 / 5 / 5 / 0 | 40/47 |
+| Uniform | either | 32–34 / 10–12 / 1–3 / 0–2 | 37/47 |
+| **Actual** | | **34 / 5 / 4 / 4** | |
+
+Uniform swing gives the Liberals about twice the seats they actually won.
+
+## 4. The W5 engine as of its last run (polls to 6 October)
+
+Expected seats: ALP 63.2, L/NP 25.5, ON 47.0, GRN 4.4, OTH 2.1, sitting members 7.8. Majority chances: ALP 7.4%, Coalition 0%.
+
+1. **Coalition→Labor in Labor-v-ON seats is 21.5% everywhere.** `flow-recipients.mjs` sets `COAL_LEAK_ALP` (11117/62419 ≈ 0.178, borrowed from a Liberal/National three-cornered leak) against `COAL_TO_ON` 0.65. That's about right for rural seats and too low everywhere else (section 6).
+2. **Labor→Coalition in Coalition-v-ON seats is 60%.** That matches the Maranoa counts, so keep it (correction 2 in section 9).
+3. **The spread rule is the 50/50 mix** (`PROP_MIX = 0.5`). Logit did better on the one real test.
+4. **The uncertainty is too narrow.**
+   - σ_nat is the dispersion between polls over 60 days: ALP 1.46, L/NP 1.92, ON 2.02 pts.
+   - Flows are drawn from a Dirichlet at vote-count scale, so they barely vary, and `FLOW_DRIFT = 0`.
+   - Besides seat noise (2.0 pts), seats share only state shocks (1.5) and age/gender shocks.
+5. **Demographics enter only as age and gender**, estimated from one Resolve difference-in-differences. Education, which this realignment runs on, is reported by 43 polls in the crosstab data.
+
+## 5. Lead time (exp6)
+
+Federal 1972–2025: the election result minus the poll mean 15–20 months before.
+
+| Measure | RMS miss, 15–20 months out | RMS miss, final month |
+|---|---|---|
+| Labor primary | 4.92 (n 20) | 2.10 |
+| Coalition primary | 3.76 (n 20) | 2.07 |
+| Labor 2PP | 4.32 (n 18) | 1.87 |
+
+- **One Nation's level 15–20 months out has faded twice:** in 1998 (11.3 → 8.4) and 2019 (8.0 → 3.1). It held or rose in 2022 (3.5 → 5.0) and 2025 (6.0 → 6.4).
+- **Only a forecast needs this.** An election-day forecast has to carry this error; an "if held today" nowcast doesn't.
+- **It explains the aeforecasts gap.** This is the difference between its forecast (ON 20) and its nowcast (ON 37).
+
+## 6. Preference flows by seat type (exp8, exp8b, exp9)
+
+**How the state flows were made:**
+- **Seat type:** state districts take the AEC class of the federal division that holds most of their booths.
+- **The flows are modelled, not counted.** `.build/estimate-state-flows.py` estimates them from each electoral commission's distribution of preferences, to about ±3 pts per seat.
+- **The gradient isn't built in:** the estimator has no seat-type term.
+
+**Coalition→Labor in Labor-v-ON finals (%):**
+
+| Source | Inner | Outer | Provincial | Rural | Pooled |
+|---|---|---|---|---|---|
+| SA 2026 (25 seats) | 40.4 (7) | 34.7 (13) | – | 26.1 (5) | 33.8 |
+| Qld 2017 (13 seats) | – | 34.1 (3) | 30.9 (7) | 23.8 (3) | 30.2 |
+| Qld 2020 (2 seats) | | | 26.0 | | |
+| Federal 2025 (Hunter, Nationals) | | | | 17.1 | |
+| DemosAU respondents (stated, not counted) | 48 | 37 | 30 (regional) | | |
+
+Predicting each seat from the others (average miss, pts):
+- **SA:** flat 7.31, seat type 6.24.
+- **Queensland 2017:** flat 7.57, seat type 7.89. Too few seats to show a gain.
+
+**Labor-v-Coalition flows, predicting each seat at the next election.** Federal 2010–25, average miss in pts, with the national level given:
+
+| Donor | Flat | Seat type | Seat's own last flow | Half seat, half type | Seat-type oracle |
+|---|---|---|---|---|---|
+| Greens | 3.87 | 3.50 | 2.77 | **2.59** | 3.48 |
+| One Nation | 3.75 | 3.68 | 4.21 | **3.31** | 3.51 |
+| Others | 6.63 | 6.67 | 6.95 | **6.16** | 6.55 |
+
+- **Labor-v-Coalition contests:** the seat's own history comes first, steadied by its seat type, steadied in turn by the national level.
+- **Three-way contests:** there's almost no seat history to use. Federally, only Hunter and Maranoa have had these finals, so seat type has to carry the weight.
+
+**Effect on seats** (exp9; logit spread, today's primaries, no noise):
+
+| Coalition→Labor / Labor→Coalition | ALP | L/NP | ON |
+|---|---|---|---|
+| W5-like, flat 21.5 / 60 | 67 | 43 | 35 |
+| Flat SA average, 33.8 / 60 | 79 | 43 | 25 |
+| Coalition→Labor graded 40 / 34.5 / 31 / 24 (inner, outer, provincial, rural); Labor→Coalition flat 60 | 75 | 43 | 28 |
+| Both graded (Labor→Coalition 75 / 70 / 65 / 60) | 75 | 45 | 27 |
+| Graded, but rural 5 pts and provincial 3 pts more pro-ON | 72 | 41 | 34 |
+
+- **Where the finals fall:** Labor-v-ON finals come in every seat type (inner 16, outer 22, provincial 17, rural 8). Coalition-v-ON finals are mostly rural (18 of 23).
+- **From W5's flat 21.5 to graded flows:** Dobell, Macquarie, Shortland, Whitlam, Dunkley, Holt and Brand go from ON to Labor.
+- **From a flat 33.8 to graded flows:** Lingiari, Braddon and McEwen go from Labor to ON.
+- **The rural and provincial levels move the most seats.**
+
+## 7. IRSAD v seat type (exp10, exp10b)
+
+This was prompted by `.build/on-flow-correlates.py`. Its fixed-effects fit for One Nation's preferences gives SEIFA advantage a significant term in 2019–25. I added the IRSAD score to the same out-of-sample tests; the score is comparable across states within one census.
+
+**Coalition→Labor in Labor-v-ON finals** (average miss in pts, predicting each seat from the others):
+
+| Predictor | SA 2026 (25) | Qld 2017 (13) |
+|---|---|---|
+| Flat | 7.31 | 7.57 |
+| Seat type | 6.24 | 7.89 |
+| IRSAD | 7.47 | 8.34 |
+| University share | 6.59 | 8.09 |
+| Coalition's previous federal vote in the same area | 6.30 | 7.54 |
+| Liberal retention since 2022 (SA only) | 6.27 | – |
+| Coalition's primary in the seat on the day | 5.78 | 7.61 |
+| Seat type + Coalition primary | 5.69 | 8.89 |
+
+- **IRSAD's correlation with the flow is 0.01 in SA and 0.11 in Queensland.**
+- **SA's poorest seats break the IRSAD idea.** Elizabeth, Ramsay, Taylor and Playford (IRSAD 814–899) gave Labor 31–46% of Liberal preferences. That's about the same as the inner suburbs, which averaged 42%.
+- **The lowest flows came where the Liberals were still strong.** Hammond 21, Mawson 25, Ngadjuri 26 and Light 28 are country seats with middling IRSAD, where the Liberals still held 12–25% of the vote.
+
+**One Nation's preferences in Labor-v-Coalition finals.** This is the flow `on-flow-correlates.py` studies. As that script found, IRSAD helps a little, and only alongside Coalition strength.
+
+| Model | Federal 2025 (114 seats) | SA 2026 (13 seats) |
+|---|---|---|
+| Flat | 3.74 | 4.01 |
+| Seat type | 3.69 | 4.09 |
+| IRSAD | 3.59 | 3.75 |
+| Coalition primary | 3.01 | 3.06 |
+| IRSAD + Coalition primary | 2.90 | 2.15 |
+
+(Average miss in pts, predicting each seat from the others in the same election.)
+
+Predicting the next election, 2010–25:
+- Coalition margin: 3.44.
+- IRSAD plus margin: 3.47.
+- IRSAD alone: 3.85, worse than the flat rate (3.75).
+- IRSAD adds anything only in 2025 (3.23 → 3.12).
+
+**Greens preferences.** IRSAD overtook seat type in 2025. It explains 26% of the seat-to-seat variation against 18%, and predicting the next election it misses by 3.13 against 3.23. Over 2010–25, seat history plus IRSAD (2.62) does about as well as seat history plus seat type (2.59).
+
+**An open question about the mechanism:**
+- **Within SA, seats where the Liberals kept less of their 2022 vote sent more to Labor** (r = −0.49). The voters who stayed Liberal look least like One Nation voters.
+- **If that held federally, the SA-based levels would be too high.** The federal Coalition is holding about 71% of its 2025 vote, against 52% in SA, so SA's seat-type levels would overstate federal Coalition→Labor flows.
+- **Queensland 2017 doesn't show it.** There's no within-state relationship (r = 0.07), and the LNP kept about 82% of its vote yet still gave Labor 30% overall.
+
+## 8. Collins (IJF 2025)
+
+Extra-trees and gradient-boosted corrections of the Mackerras pendulum, tested on the 2010–2022 federal elections at several lead times.
+
+**What it reports:**
+- Against the TPP proportional pendulum, extra trees misclassified 15 fewer seats in 2019 and five fewer in 2022, and one more in 2013.
+- Predicting "no change" already gets about 87% of seats right.
+- Pendulum and past-vote features dominate. State effects and unemployment come next, and polls add little.
+
+**Weaknesses it admits:**
+- Hyperparameters were picked retrospectively, as the best average over the five test elections (§2.2.4 and the limitations).
+- The real seat count "rarely fell within the 95% confidence interval" of the extra-trees model.
+- Crossbench winners were predicted no better than by the pendulum.
+
+**Worth keeping:**
+- Correct a swing model rather than replace it.
+- Test at several lead times.
+- Judge on seats that change hands and on marginals.
+
+**Not worth copying:**
+- Tree models can't extrapolate, and no past federal election looks like ON 26 / Coalition 23.
+- Tuning on the test elections overstates the gains.
+- Seats were simulated independently, which is why the intervals were overconfident.
+- Predicting win or lose throws away the vote shares that a preference count needs.
+
+## 9. Corrections made during the review
+
+1. **"Measured" flows.** The first answer called the SA and Queensland flows measured. They are modelled estimates, accurate to about ±3 pts per seat.
+2. **The 60% constant doesn't favour One Nation.** The first answer said W5's 60% Labor→Coalition constant also favours ON, comparing it with DemosAU's respondent-stated 72–82%.
+   - The only counts are Maranoa's 65.0% and 57.9%, both rural, and they support 60% for rural seats.
+   - The "SA 2026 flat" flow set in `exp4b` carries a DemosAU-like 77% and overstates Labor→Coalition.
+3. **Graded, not flat 33.8.** The first answer proposed a flat 33.8% Coalition→Labor, the SA average. That is too high in rural seats; the fix is to grade it by seat type (exp9).
+4. **The graded levels may still be too high.** Section 7's retention finding means the SA-derived levels (40 / 34.5 / 31 / 24) may be too generous to Labor federally. This is unresolved.
+
+## 10. Recommended build
+
+1. **National vote.** The site's aggregate, plus a model of polling error, in two modes: "if held today" and an election-day forecast. The forecast mode carries the lead-time error from section 5, and a One Nation fade fitted from history.
+2. **Seat primaries.**
+   - Logit swing from each seat's 2025 result, for every party.
+   - One Nation's starting point blends its 2025 vote with a demographic estimate. The estimate is also needed for Bean, Canberra and Fenner, where ON didn't stand.
+   - An education term from the polls' change since 2025, state terms, sitting-member effects, and carry-over for independents.
+3. **Flows.**
+   - Labor-v-Coalition contests: each seat's own 2025 flows, shrunk toward its seat type and the national level.
+   - Coalition→Labor in three-way contests: graded by seat type, with Liberals and Nationals as separate donors.
+   - Test the Coalition's local vote as a covariate: the 2025 figure now, the model's projected primary in a forecast.
+   - Labor→Coalition: about 60% in rural seats, with any gradient tested before use.
+   - Draw one shared shift per seat type in each simulation.
+4. **Count.** The full elimination in every seat, which W5 already does.
+5. **Shared errors in the simulation.**
+   - National errors that are linked across parties and allow occasional big misses.
+   - State shifts, and shocks shared by seats with similar education levels or rurality.
+   - Seat noise. SA's seat-level misses were about 4–5 pts for the majors, against about 3.5 in calm years.
+
+**Validation, before anything is published:**
+- Run the seat chain on known statewide totals for federal 2004–2025, SA 2026, Queensland 2017/20/24, NSW 2023 and Victoria 2022.
+- Run real-time backtests on federal 2010–2025 at 18, 12, 6 and 1 month out, using the poll archive.
+- Tune settings only on elections before the one being tested.
+- Score against a no-change baseline and the pendulum on:
+  - calibrated seat probabilities
+  - flips caught
+  - seat-count error
+  - how often the ranges contain the result
+
+**Order:**
+1. Fix W5's flows (graded Coalition→Labor), switch it to the logit spread, widen its uncertainty, and rerun it.
+2. Build the backtest harness.
+3. Add the forecast mode.
+4. Add the education term.
+5. Decide where the model is published. The prediction page stays unlisted unless decided otherwise.
+
+## 11. Data notes and gaps
+
+- **Coalition-v-ON flows.** The state estimator produces none for:
+  - SA 2026: Chaffey, Flinders, MacKillop, Narungga
+  - Queensland 2017: Callide, Condamine, Gregory, Gympie, Lockyer, Nanango, Scenic Rim, Southern Downs
+  - Queensland 2024: Southern Downs
+
+  Adding them would give the Labor→Coalition flow more support than Maranoa's two counts.
+- **Australian Election Study.** `.matilda/aes` holds the 2019, 2022 and 2025 reports and the trend tables. They give party identification by group, not vote by group. The 2025 respondent file would be the cleanest baseline for an education term, but it needs registration with the Australian Data Archive.
+- **ANUpoll.** Only the June 2026 report's tables are on disk.
+- **Redistributions.** The AEC's SA1-level 2025 vote file (downloaded locally, not committed) would let the 2025 results be re-cut to new boundaries.
+- **DemosAU's quarterly MRP.** It is in `data/polls.json` with seat counts and regional flows. Use it for comparison, and for the shape of flow gradients but not their level.
+
+## Scripts (`seat-model/design-review/`)
+
+| Script | Question |
+|---|---|
+| `lib.mjs` | Shared helpers: store loading, booth tables, ridge regression, logit shift |
+| `exp1-sa26.mjs` | Which spread rule best predicts One Nation's SA 2026 district vote from its federal 2025 footprint? |
+| `exp2-sa26-lib.mjs` | The same for the Liberal collapse and Labor's fall |
+| `exp3-elasticity.mjs` | Spread rules and logit elasticities across five calmer transitions |
+| `exp4-federal.mjs` | Today's primaries on the 150 seats under each spread rule and three flow sets |
+| `exp4b-federal-flows.mjs` | The same, adding W5's flows and a flat SA flow set |
+| `exp5-sa26-seats.mjs` | The whole chain on SA 2026 from statewide primaries |
+| `exp6-horizon.mjs` | Poll error 15–20 months out and in the final month, 1972–2025 |
+| `exp7-realign.mjs` | How much demographics explain SA 2026's district swings |
+| `exp8-class-flows.mjs` | Does seat type predict a seat's flows at the next election? |
+| `exp8b-threeway.mjs` | Three-way flows by seat type in SA 2026, Queensland and federal 2025 |
+| `exp9-class-seats.mjs` | Federal seats under flat and graded three-way flows |
+| `exp10-irsad.mjs` | IRSAD, university share and Coalition strength against seat type |
+| `exp10b-coal-mechanism.mjs` | Local Coalition strength or retention: why the Coalition's vote predicts its flow |

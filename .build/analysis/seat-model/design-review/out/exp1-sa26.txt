@@ -1,0 +1,64 @@
+SA-2026 ON statewide 22.9; federal-2025 ON in the same footprint 6.0 (x3.79)
+federal-2025 ON demographic fit: LOO RMSE 1.81pp at lambda 3 over 147 divisions
+
+model                                              MAE   RMSE  corr  maxErr  pred range
+uniform from fed-25                                  4.49  5.40  0.93     11.5 Narungga  19.1–28.3
+proportional from fed-25                             2.70  3.50  0.93        9.0 Stuart  8.5–43.3
+logit shift from fed-25                              2.08  2.73  0.94           6.5 Lee  9.9–38.1
+poliwave 50/50 mix from fed-25                       2.42  3.05  0.93     8.1 MacKillop  13.8–35.8
+demographic (fed-25 fit), logit-calibrated           2.47  3.15  0.92        8.1 Ramsay  8.2–36.9
+blend demo+fed-25 (logit)                            1.93  2.65  0.94           6.0 Lee  9.0–35.7
+(oracle) SA-26 demographic fit, leave-one-out        2.45  3.31  0.90        10.4 Giles  8.8–35.2
+actual range 9.1–37.5
+
+logit elasticity of SA-26 ON on fed-25 ON footprint: 0.95 (1 = logit shift; 0 = uniform-on-logit)
+linear slope 2.91 pp/pp (1 = uniform, 3.79 = proportional)
+
+district        actual  fed25  prop  logit  demo
+Narungga          37.5    9.2   35.0   32.6   30.9
+MacKillop         35.3    7.8   29.7   28.8   31.4
+Ngadjuri          34.9   11.4   43.3   38.1   32.0
+Light             34.5   10.0   37.8   34.5   31.3
+Taylor            34.3    9.9   37.5   34.3   36.9
+Chaffey           33.9    9.1   34.4   32.2   33.1
+Elizabeth         33.3    9.2   35.0   32.7   36.6
+Giles             33.2   10.1   38.2   34.8   33.3
+King              30.7    7.7   29.1   28.4   24.1
+Wright            28.5    7.5   28.4   27.9   24.0
+Flinders          28.2    8.4   31.8   30.4   27.7
+Ramsay            28.0    8.6   32.4   30.9   36.1
+Stuart            27.9    9.7   36.9   33.9   32.5
+Reynell           27.7    6.4   24.1   24.5   29.7
+Hammond           27.4    8.5   32.0   30.5   32.7
+Kaurna            26.9    6.8   25.7   25.7   26.3
+Mount Gambier     26.9    6.8   25.9   25.9   31.5
+Hurtle Vale       26.8    6.4   24.4   24.7   28.0
+Mawson            26.1    7.0   26.7   26.5   24.3
+Lee               25.4    4.7   17.6   18.9   19.9
+Newland           24.8    6.3   23.9   24.3   23.9
+Playford          24.2    7.4   28.1   27.6   27.5
+Florey            23.0    7.2   27.2   27.0   25.0
+Finniss           22.9    5.9   22.3   23.0   25.5
+Schubert          22.8    7.4   28.1   27.6   26.9
+Port Adelaide     21.4    5.7   21.4   22.2   23.3
+Cheltenham        21.1    5.3   20.0   21.0   20.7
+Torrens           20.7    3.9   14.9   16.4   17.9
+Davenport         20.2    4.9   18.7   19.8   18.5
+Kavel             19.5    5.5   20.8   21.7   23.3
+Black             18.7    5.0   19.0   20.1   17.4
+Enfield           18.5    4.6   17.3   18.5   19.6
+Morialta          18.3    4.2   16.0   17.4   14.8
+West Torrens      18.0    4.6   17.4   18.6   17.0
+Badcoe            17.8    3.5   13.2   14.7   16.3
+Colton            17.7    3.5   13.3   14.8   15.0
+Heysen            16.2    4.4   16.8   18.1   14.2
+Hartley           16.0    4.0   15.2   16.6   15.6
+Morphett          15.2    3.4   12.9   14.4   16.3
+Gibson            14.7    3.0   11.5   13.0   15.9
+Elder             14.4    2.9   10.9   12.3   15.1
+Croydon           12.7    4.4   16.8   18.1   18.1
+Waite             11.9    2.6    9.7   11.1   11.4
+Dunstan           11.7    2.8   10.6   12.0   11.5
+Adelaide          11.6    3.2   12.0   13.5   11.4
+Unley              9.4    2.5    9.5   10.9    9.6
+Bragg              9.1    2.3    8.5    9.9    8.2

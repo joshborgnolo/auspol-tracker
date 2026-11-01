@@ -1,0 +1,24 @@
+2025 national: alp 34.6 lnp 31.8 onp 6.4 grn 12.2 ind 7.4 oth 7.7
+now  national: alp 26.6 lnp 22.7 grn 13.7 onp 26.1 ind 5.5 oth 5.8
+seats with no 2025 ON candidate (demographic base used): Bean, Canberra, Fenner
+
+2025 replay (group-level, central flows): {"alp":97,"lnp":50,"onp":0,"grn":0,"ind":2,"oth":1}  actual: {"alp":94,"lnp":43,"ind":10,"oth":2,"grn":1}
+
+geometry      flows                                         ALP  L/NP   ON  GRN  IND  OTH | final pairs
+uniform       central (site FP_ON-ish)                         78   58    8    2    3    1 | alpvonp 69, alpvlnp 36, lnpvonp 24, indvlnp 9, indvonp 3, alpvind 2, alpvgrn 2, grnvonp 2, onpvoth 2, grnvlnp 1
+uniform       right-consolidating (LNP->ON 80, ALP->LNP 85)    66   63   15    3    2    1 | alpvonp 68, alpvlnp 36, lnpvonp 24, indvlnp 9, indvonp 3, grnvonp 3, alpvind 2, alpvgrn 2, onpvoth 2, grnvlnp 1
+uniform       soft right (LNP->ON 55, ALP->LNP 65)             91   50    5    0    3    1 | alpvonp 70, alpvlnp 36, lnpvonp 23, indvlnp 9, alpvgrn 4, indvonp 3, alpvind 2, onpvoth 2, grnvlnp 1
+proportional  central (site FP_ON-ish)                         73   44   29    3    1    0 | alpvonp 61, alpvlnp 45, lnpvonp 21, indvlnp 8, alpvgrn 6, alpvind 3, indvonp 2, grnvlnp 2, grnvonp 1, onpvoth 1
+proportional  right-consolidating (LNP->ON 80, ALP->LNP 85)    56   51   39    3    1    0 | alpvonp 59, alpvlnp 45, lnpvonp 23, indvlnp 8, alpvgrn 4, alpvind 3, grnvlnp 3, indvonp 2, onpvoth 2, grnvonp 1
+proportional  soft right (LNP->ON 55, ALP->LNP 65)             89   34   24    3    0    0 | alpvonp 62, alpvlnp 45, lnpvonp 20, indvlnp 8, alpvgrn 7, alpvind 3, indvonp 2, grnvlnp 2, onpvoth 1
+mix50         central (site FP_ON-ish)                         76   54   17    1    2    0 | alpvonp 67, alpvlnp 40, lnpvonp 23, indvlnp 8, alpvind 3, alpvgrn 3, indvonp 2, grnvlnp 2, onpvoth 2
+mix50         right-consolidating (LNP->ON 80, ALP->LNP 85)    64   60   23    2    1    0 | alpvonp 65, alpvlnp 38, lnpvonp 25, indvlnp 8, indvonp 3, alpvgrn 3, grnvlnp 3, alpvind 2, grnvonp 1, onpvoth 1, lnpvoth 1
+mix50         soft right (LNP->ON 55, ALP->LNP 65)             91   42   13    1    2    1 | alpvonp 65, alpvlnp 41, lnpvonp 22, indvlnp 8, alpvgrn 6, alpvind 3, indvonp 2, onpvoth 2, grnvlnp 1
+logit         central (site FP_ON-ish)                         74   50   22    3    1    0 | alpvonp 63, alpvlnp 40, lnpvonp 23, indvlnp 8, alpvgrn 6, alpvind 3, indvonp 2, grnvlnp 2, onpvoth 2, grnvonp 1
+logit         right-consolidating (LNP->ON 80, ALP->LNP 85)    57   56   33    3    1    0 | alpvonp 65, alpvlnp 40, lnpvonp 24, indvlnp 8, alpvgrn 3, grnvlnp 3, indvonp 2, alpvind 2, onpvoth 2, grnvonp 1
+logit         soft right (LNP->ON 55, ALP->LNP 65)             91   43   14    1    1    0 | alpvonp 65, alpvlnp 41, lnpvonp 23, indvlnp 8, alpvgrn 6, alpvind 3, indvonp 2, onpvoth 1, grnvlnp 1
+
+logit geometry: seats where 2nd and 3rd of ALP/L-NP/ON are within 5 pts on primaries: 42/150
+ON primary under logit: top 44.2, 10th 38.5, 30th 32.7, 50th 29.8, median 26.1, bottom 6.6
+ON primary proportional: top 50.0, 10th 41.6, 30th 33.6, median 24.9, bottom 5.3
+ON primary uniform:      top 35.1, 10th 31.3, 30th 28.3, median 25.4, bottom 20.6
