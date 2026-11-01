@@ -1,0 +1,857 @@
+{
+ "_about": "House-v-Senate preference-flow calibration for the seat model (calibrate-flows.mjs). logit(House flow share) - logit(same cohort's Senate share in that division) = delta[donor class|pair] + election shift (SD sigmaU) + seat noise (SD sigmaV). `same` uses the same election's Senate ballots, `lag` the previous election's (what a forecast has). Pairs read as the share to the first family: A Labor, C Coalition, G Greens, O One Nation. Rows: every counted 2016-2025 House flow whose final pair is two of those four families.",
+ "same": {
+  "sigmaU": 0.099,
+  "sigmaV": 0.3781,
+  "delta": {
+   "GRN|AC": {
+    "v": -0.4019,
+    "n": 508
+   },
+   "OTH-M|AC": {
+    "v": -0.1106,
+    "n": 526
+   },
+   "OTH-R|AC": {
+    "v": 0.1618,
+    "n": 1075
+   },
+   "OTH-L|AC": {
+    "v": -0.374,
+    "n": 194
+   },
+   "ON|AC": {
+    "v": 0.19,
+    "n": 309
+   },
+   "OTH-L|AG": {
+    "v": 0.0387,
+    "n": 34
+   },
+   "OTH-M|AG": {
+    "v": -0.0281,
+    "n": 24
+   },
+   "COAL|AG": {
+    "v": 0.2197,
+    "n": 21
+   },
+   "OTH-R|AG": {
+    "v": 0.0611,
+    "n": 23
+   },
+   "ALP|CG": {
+    "v": 0.1499,
+    "n": 9
+   },
+   "OTH-M|CG": {
+    "v": -0.1077,
+    "n": 14
+   },
+   "OTH-R|CG": {
+    "v": -0.0088,
+    "n": 13
+   },
+   "OTH-L|CG": {
+    "v": -0.1003,
+    "n": 10
+   },
+   "ALP|CO": {
+    "v": 0.174,
+    "n": 3
+   },
+   "OTH-R|CO": {
+    "v": 0.1343,
+    "n": 10
+   },
+   "GRN|CO": {
+    "v": -0.3833,
+    "n": 3
+   },
+   "OTH-M|CO": {
+    "v": -0.0922,
+    "n": 1
+   },
+   "ON|AG": {
+    "v": 0.0883,
+    "n": 14
+   },
+   "ON|CG": {
+    "v": 0.0626,
+    "n": 4
+   },
+   "COAL|AO": {
+    "v": 0.2206,
+    "n": 1
+   },
+   "OTH-M|AO": {
+    "v": -0.0892,
+    "n": 1
+   },
+   "OTH-L|AO": {
+    "v": -0.2483,
+    "n": 1
+   },
+   "OTH-R|AO": {
+    "v": 0.2008,
+    "n": 3
+   },
+   "GRN|AO": {
+    "v": -0.4012,
+    "n": 1
+   }
+  },
+  "classPooled": {
+   "ALP": 0.1608,
+   "COAL": 0.22,
+   "GRN": -0.401,
+   "ON": 0.1709,
+   "OTH-R": 0.1528,
+   "OTH-M": -0.1031,
+   "OTH-L": -0.2639
+  },
+  "byClass": {
+   "ALP": {
+    "rows": 12,
+    "sigmaV": 0.237,
+    "sigmaU": null,
+    "electionShifts": {}
+   },
+   "COAL": {
+    "rows": 22,
+    "sigmaV": 0.303,
+    "sigmaU": null,
+    "electionShifts": {
+     "2025": -0.014
+    }
+   },
+   "GRN": {
+    "rows": 512,
+    "sigmaV": 0.288,
+    "sigmaU": 0.029260920386799283,
+    "electionShifts": {
+     "2016": -0.062,
+     "2019": -0.007,
+     "2022": 0.021,
+     "2025": 0.06
+    }
+   },
+   "ON": {
+    "rows": 327,
+    "sigmaV": 0.263,
+    "sigmaU": 0.11816834367262623,
+    "electionShifts": {
+     "2016": -0.124,
+     "2019": 0.065,
+     "2022": -0.178,
+     "2025": 0.14
+    }
+   },
+   "OTH-R": {
+    "rows": 1124,
+    "sigmaV": 0.409,
+    "sigmaU": 0.1581716903572625,
+    "electionShifts": {
+     "2016": 0.17,
+     "2019": 0.094,
+     "2022": -0.25,
+     "2025": 0.048
+    }
+   },
+   "OTH-M": {
+    "rows": 566,
+    "sigmaV": 0.424,
+    "sigmaU": 0.04937325628249537,
+    "electionShifts": {
+     "2016": -0.078,
+     "2019": 0.017,
+     "2022": 0.027,
+     "2025": 0.083
+    }
+   },
+   "OTH-L": {
+    "rows": 239,
+    "sigmaV": 0.423,
+    "sigmaU": 0.11255599846245656,
+    "electionShifts": {
+     "2016": -0.077,
+     "2019": 0.087,
+     "2022": 0,
+     "2025": 0.218
+    }
+   }
+  },
+  "check": {
+   "2016": {
+    "senateCalibrated": 5.5,
+    "senateRaw": 7.17,
+    "flatOtherElections": 7.06,
+    "rows": 632,
+    "levelGiven": {
+     "GRN": {
+      "senate": 3.75,
+      "flat": 4.13,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "OTH-M": {
+      "senate": 7.18,
+      "flat": 6.87,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "OTH-R": {
+      "senate": 6.33,
+      "flat": 9.18,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "OTH-L": {
+      "senate": 4.87,
+      "flat": 4.02,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "ON": {
+      "senate": 2.41,
+      "flat": 3.66,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "COAL": {
+      "senate": 2.65,
+      "flat": 3.58,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     },
+     "ALP": {
+      "senate": 1.76,
+      "flat": 0.36,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     }
+    }
+   },
+   "2019": {
+    "senateCalibrated": 5,
+    "senateRaw": 6.58,
+    "flatOtherElections": 6.07,
+    "rows": 696,
+    "levelGiven": {
+     "OTH-M": {
+      "senate": 8.27,
+      "flat": 7.18,
+      "prevHouseSeat": 9.36,
+      "flatOnPrevSeats": 7.96
+     },
+     "OTH-R": {
+      "senate": 6.06,
+      "flat": 7.6,
+      "prevHouseSeat": 8.48,
+      "flatOnPrevSeats": 9.79
+     },
+     "GRN": {
+      "senate": 2.96,
+      "flat": 4.29,
+      "prevHouseSeat": 2.74,
+      "flatOnPrevSeats": 4.21
+     },
+     "OTH-L": {
+      "senate": 5.07,
+      "flat": 4.8,
+      "prevHouseSeat": 3.84,
+      "flatOnPrevSeats": 3.79
+     },
+     "ON": {
+      "senate": 4.33,
+      "flat": 4.22,
+      "prevHouseSeat": 0,
+      "flatOnPrevSeats": 3.74
+     },
+     "COAL": {
+      "senate": 5.86,
+      "flat": 4.92,
+      "prevHouseSeat": 4.42,
+      "flatOnPrevSeats": 4.23
+     },
+     "ALP": {
+      "senate": 3.27,
+      "flat": 1.05,
+      "prevHouseSeat": 0.81,
+      "flatOnPrevSeats": 0.82
+     }
+    }
+   },
+   "2022": {
+    "senateCalibrated": 6.44,
+    "senateRaw": 5.86,
+    "flatOtherElections": 5.94,
+    "rows": 789,
+    "levelGiven": {
+     "OTH-R": {
+      "senate": 6.79,
+      "flat": 7.83,
+      "prevHouseSeat": 6.98,
+      "flatOnPrevSeats": 7.39
+     },
+     "ON": {
+      "senate": 5.1,
+      "flat": 4.56,
+      "prevHouseSeat": 3.54,
+      "flatOnPrevSeats": 3.84
+     },
+     "OTH-M": {
+      "senate": 8.85,
+      "flat": 8.72,
+      "prevHouseSeat": 8.97,
+      "flatOnPrevSeats": 9.47
+     },
+     "GRN": {
+      "senate": 1.9,
+      "flat": 3.66,
+      "prevHouseSeat": 2.19,
+      "flatOnPrevSeats": 3.62
+     },
+     "COAL": {
+      "senate": 5.35,
+      "flat": 5.01,
+      "prevHouseSeat": 8.47,
+      "flatOnPrevSeats": 5.49
+     },
+     "OTH-L": {
+      "senate": 8.33,
+      "flat": 7.85,
+      "prevHouseSeat": 3.02,
+      "flatOnPrevSeats": 5.89
+     },
+     "ALP": {
+      "senate": 1.04,
+      "flat": 0.9,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     }
+    }
+   },
+   "2025": {
+    "senateCalibrated": 5.4,
+    "senateRaw": 5.81,
+    "flatOtherElections": 8.35,
+    "rows": 685,
+    "levelGiven": {
+     "OTH-R": {
+      "senate": 6.7,
+      "flat": 6.93,
+      "prevHouseSeat": 6.72,
+      "flatOnPrevSeats": 6.47
+     },
+     "OTH-M": {
+      "senate": 8.47,
+      "flat": 8.82,
+      "prevHouseSeat": 9.41,
+      "flatOnPrevSeats": 10.28
+     },
+     "COAL": {
+      "senate": 4.25,
+      "flat": 3.72,
+      "prevHouseSeat": 2.89,
+      "flatOnPrevSeats": 2.54
+     },
+     "GRN": {
+      "senate": 2.72,
+      "flat": 3.56,
+      "prevHouseSeat": 2.47,
+      "flatOnPrevSeats": 3.53
+     },
+     "ON": {
+      "senate": 3.48,
+      "flat": 3.75,
+      "prevHouseSeat": 0.26,
+      "flatOnPrevSeats": 3.74
+     },
+     "OTH-L": {
+      "senate": 6.17,
+      "flat": 6.01,
+      "prevHouseSeat": 4.5,
+      "flatOnPrevSeats": 5.51
+     },
+     "ALP": {
+      "senate": 0,
+      "flat": 0,
+      "prevHouseSeat": 0.17,
+      "flatOnPrevSeats": 0
+     }
+    }
+   }
+  }
+ },
+ "lag": {
+  "sigmaU": 0.2228,
+  "sigmaV": 0.548,
+  "delta": {
+   "OTH-M|AC": {
+    "v": -0.077,
+    "n": 349
+   },
+   "GRN|AC": {
+    "v": -0.2658,
+    "n": 367
+   },
+   "OTH-R|AC": {
+    "v": -0.1087,
+    "n": 837
+   },
+   "OTH-L|AC": {
+    "v": -0.2333,
+    "n": 141
+   },
+   "ON|AC": {
+    "v": -0.2004,
+    "n": 291
+   },
+   "OTH-L|AG": {
+    "v": -0.0427,
+    "n": 21
+   },
+   "COAL|AG": {
+    "v": 0.3852,
+    "n": 17
+   },
+   "OTH-R|AG": {
+    "v": -0.0837,
+    "n": 21
+   },
+   "ALP|CO": {
+    "v": 0.2848,
+    "n": 2
+   },
+   "OTH-R|CO": {
+    "v": -0.0952,
+    "n": 7
+   },
+   "GRN|CO": {
+    "v": -0.2567,
+    "n": 2
+   },
+   "OTH-R|CG": {
+    "v": -0.1466,
+    "n": 11
+   },
+   "OTH-M|CG": {
+    "v": -0.1139,
+    "n": 5
+   },
+   "ALP|CG": {
+    "v": 0.2249,
+    "n": 6
+   },
+   "OTH-L|CG": {
+    "v": -0.1211,
+    "n": 6
+   },
+   "ON|AG": {
+    "v": -0.1165,
+    "n": 14
+   },
+   "OTH-M|AG": {
+    "v": -0.0005,
+    "n": 11
+   },
+   "ON|CG": {
+    "v": -0.2225,
+    "n": 4
+   },
+   "COAL|AO": {
+    "v": 0.3429,
+    "n": 1
+   },
+   "OTH-M|AO": {
+    "v": -0.0709,
+    "n": 1
+   },
+   "OTH-L|AO": {
+    "v": -0.1796,
+    "n": 1
+   },
+   "OTH-R|AO": {
+    "v": -0.074,
+    "n": 3
+   },
+   "GRN|AO": {
+    "v": -0.2849,
+    "n": 1
+   }
+  },
+  "classPooled": {
+   "ALP": 0.2528,
+   "COAL": 0.369,
+   "GRN": -0.2664,
+   "ON": -0.1936,
+   "OTH-R": -0.1075,
+   "OTH-M": -0.0731,
+   "OTH-L": -0.1824
+  },
+  "byClass": {
+   "ALP": {
+    "rows": 8,
+    "sigmaV": 0.351,
+    "sigmaU": null,
+    "electionShifts": {}
+   },
+   "COAL": {
+    "rows": 18,
+    "sigmaV": 0.45,
+    "sigmaU": null,
+    "electionShifts": {
+     "2025": -0.075
+    }
+   },
+   "GRN": {
+    "rows": 370,
+    "sigmaV": 0.329,
+    "sigmaU": 0.14207244900635435,
+    "electionShifts": {
+     "2019": -0.205,
+     "2022": 0.091,
+     "2025": 0.133
+    }
+   },
+   "ON": {
+    "rows": 309,
+    "sigmaV": 0.327,
+    "sigmaU": 0.23943369168112974,
+    "electionShifts": {
+     "2019": -0.187,
+     "2022": 0.305,
+     "2025": -0.233
+    }
+   },
+   "OTH-R": {
+    "rows": 879,
+    "sigmaV": 0.703,
+    "sigmaU": 0.41196905458069577,
+    "electionShifts": {
+     "2019": -0.526,
+     "2022": 0.483,
+     "2025": -0.045
+    }
+   },
+   "OTH-M": {
+    "rows": 366,
+    "sigmaV": 0.479,
+    "sigmaU": 0.09470905239108872,
+    "electionShifts": {
+     "2019": -0.115,
+     "2022": 0.145,
+     "2025": -0.01
+    }
+   },
+   "OTH-L": {
+    "rows": 169,
+    "sigmaV": 0.488,
+    "sigmaU": 0.1293438183094197,
+    "electionShifts": {
+     "2019": -0.185,
+     "2022": 0.146,
+     "2025": 0.107
+    }
+   }
+  },
+  "check": {
+   "2019": {
+    "senateCalibrated": 11.33,
+    "senateRaw": 11.72,
+    "flatOtherElections": 6.56,
+    "rows": 658,
+    "levelGiven": {
+     "OTH-M": {
+      "senate": 8.46,
+      "flat": 7.3,
+      "prevHouseSeat": 9.3,
+      "flatOnPrevSeats": 7.91
+     },
+     "GRN": {
+      "senate": 4.21,
+      "flat": 4.26,
+      "prevHouseSeat": 2.74,
+      "flatOnPrevSeats": 4.21
+     },
+     "OTH-R": {
+      "senate": 16.64,
+      "flat": 7.61,
+      "prevHouseSeat": 8.5,
+      "flatOnPrevSeats": 9.81
+     },
+     "OTH-L": {
+      "senate": 5.02,
+      "flat": 4.87,
+      "prevHouseSeat": 3.79,
+      "flatOnPrevSeats": 3.6
+     },
+     "ON": {
+      "senate": 5.95,
+      "flat": 4.16,
+      "prevHouseSeat": 0.36,
+      "flatOnPrevSeats": 3.77
+     },
+     "COAL": {
+      "senate": 1.75,
+      "flat": 4.54,
+      "prevHouseSeat": 1.19,
+      "flatOnPrevSeats": 4.54
+     },
+     "ALP": {
+      "senate": 3.53,
+      "flat": 1.05,
+      "prevHouseSeat": 0.81,
+      "flatOnPrevSeats": 0.82
+     }
+    }
+   },
+   "2022": {
+    "senateCalibrated": 9.56,
+    "senateRaw": 6.8,
+    "flatOtherElections": 6.31,
+    "rows": 780,
+    "levelGiven": {
+     "OTH-R": {
+      "senate": 7.19,
+      "flat": 7.79,
+      "prevHouseSeat": 6.98,
+      "flatOnPrevSeats": 7.4
+     },
+     "ON": {
+      "senate": 5.8,
+      "flat": 4.56,
+      "prevHouseSeat": 3.53,
+      "flatOnPrevSeats": 3.83
+     },
+     "OTH-M": {
+      "senate": 9.94,
+      "flat": 8.68,
+      "prevHouseSeat": 8.93,
+      "flatOnPrevSeats": 9.48
+     },
+     "GRN": {
+      "senate": 3.06,
+      "flat": 3.68,
+      "prevHouseSeat": 2.19,
+      "flatOnPrevSeats": 3.62
+     },
+     "COAL": {
+      "senate": 7.92,
+      "flat": 5.01,
+      "prevHouseSeat": 8.47,
+      "flatOnPrevSeats": 5.49
+     },
+     "OTH-L": {
+      "senate": 9.41,
+      "flat": 7.82,
+      "prevHouseSeat": 3.04,
+      "flatOnPrevSeats": 5.91
+     },
+     "ALP": {
+      "senate": 1.35,
+      "flat": 0.9,
+      "prevHouseSeat": null,
+      "flatOnPrevSeats": null
+     }
+    }
+   },
+   "2025": {
+    "senateCalibrated": 6.85,
+    "senateRaw": 7.03,
+    "flatOtherElections": 7.78,
+    "rows": 681,
+    "levelGiven": {
+     "OTH-R": {
+      "senate": 6.24,
+      "flat": 6.88,
+      "prevHouseSeat": 6.7,
+      "flatOnPrevSeats": 6.46
+     },
+     "OTH-M": {
+      "senate": 10.67,
+      "flat": 8.86,
+      "prevHouseSeat": 9.4,
+      "flatOnPrevSeats": 10.28
+     },
+     "COAL": {
+      "senate": 5.83,
+      "flat": 3.72,
+      "prevHouseSeat": 2.89,
+      "flatOnPrevSeats": 2.54
+     },
+     "GRN": {
+      "senate": 2.67,
+      "flat": 3.58,
+      "prevHouseSeat": 2.48,
+      "flatOnPrevSeats": 3.53
+     },
+     "ON": {
+      "senate": 4.5,
+      "flat": 3.76,
+      "prevHouseSeat": 0.26,
+      "flatOnPrevSeats": 3.74
+     },
+     "OTH-L": {
+      "senate": 7.06,
+      "flat": 6.01,
+      "prevHouseSeat": 4.5,
+      "flatOnPrevSeats": 5.51
+     },
+     "ALP": {
+      "senate": 0,
+      "flat": 0,
+      "prevHouseSeat": 0.17,
+      "flatOnPrevSeats": 0
+     }
+    }
+   }
+  }
+ },
+ "strength": {
+  "withinElection": {
+   "b": -0.031,
+   "se": 0.013,
+   "n": 2802
+  },
+  "changeBetweenElections": {
+   "b": 0.315,
+   "se": 0.034,
+   "n": 2012
+  }
+ },
+ "rows": {
+  "same": 2802,
+  "lag": 2119,
+  "pairs": [
+   "ALP|CG",
+   "ALP|CO",
+   "COAL|AG",
+   "COAL|AO",
+   "GRN|AC",
+   "GRN|AO",
+   "GRN|CO",
+   "ON|AC",
+   "ON|AG",
+   "ON|CG",
+   "OTH-L|AC",
+   "OTH-L|AG",
+   "OTH-L|AO",
+   "OTH-L|CG",
+   "OTH-M|AC",
+   "OTH-M|AG",
+   "OTH-M|AO",
+   "OTH-M|CG",
+   "OTH-M|CO",
+   "OTH-R|AC",
+   "OTH-R|AG",
+   "OTH-R|AO",
+   "OTH-R|CG",
+   "OTH-R|CO"
+  ]
+ },
+ "_provenance": {
+  "generated": "2026-11-01",
+  "senate": [
+   "data/senate-rankings-2016.json",
+   "data/senate-rankings-2019.json",
+   "data/senate-rankings-2022.json",
+   "data/senate-rankings-2025.json"
+  ],
+  "house": [
+   "map/data/res-2016.json",
+   "map/data/res-2019.json",
+   "map/data/res-2022.json",
+   "map/data/res-2025.json"
+  ]
+ },
+ "combine": {
+  "_about": "Forecast weights: logit flow deviation = lamS x (previous-election Senate deviation) + lamH x (seat's previous House residual), national level per class|pair separate; resid SD = seat-level flow noise left over (logit).",
+  "GRN": {
+   "alone": {
+    "lamS": 0.635,
+    "lamH": 0.793
+   },
+   "rows": 370,
+   "withHouseHistory": 360,
+   "lamS": 0.207,
+   "lamH": 0.657,
+   "sigmaResid": 0.248,
+   "electionOutMAE": {
+    "combined": 2.45,
+    "senateOnly": 3.07,
+    "houseOnly": 2.43,
+    "flat": 3.82
+   }
+  },
+  "ON": {
+   "alone": {
+    "lamS": 0.264,
+    "lamH": 0.46
+   },
+   "rows": 309,
+   "withHouseHistory": 180,
+   "lamS": 0.203,
+   "lamH": 0.381,
+   "sigmaResid": 0.222,
+   "electionOutMAE": {
+    "combined": 3.7,
+    "senateOnly": 3.85,
+    "houseOnly": 3.76,
+    "flat": 4.12
+   }
+  },
+  "OTH-R": {
+   "alone": {
+    "lamS": 0.22,
+    "lamH": 0.489
+   },
+   "rows": 879,
+   "withHouseHistory": 390,
+   "lamS": 0.169,
+   "lamH": 0.355,
+   "sigmaResid": 0.411,
+   "electionOutMAE": {
+    "combined": 6.85,
+    "senateOnly": 7.36,
+    "houseOnly": 6.85,
+    "flat": 7.46
+   }
+  },
+  "OTH-M": {
+   "alone": {
+    "lamS": 0.121,
+    "lamH": 0.482
+   },
+   "rows": 366,
+   "withHouseHistory": 177,
+   "lamS": 0.07,
+   "lamH": 0.472,
+   "sigmaResid": 0.41,
+   "electionOutMAE": {
+    "combined": 8.08,
+    "senateOnly": 8.39,
+    "houseOnly": 8.04,
+    "flat": 8.41
+   }
+  },
+  "OTH-L": {
+   "alone": {
+    "lamS": 0.327,
+    "lamH": 0.68
+   },
+   "rows": 169,
+   "withHouseHistory": 70,
+   "lamS": 0.273,
+   "lamH": 0.568,
+   "sigmaResid": 0.378,
+   "electionOutMAE": {
+    "combined": 6.01,
+    "senateOnly": 5.98,
+    "houseOnly": 6.08,
+    "flat": 6.28
+   }
+  }
+ }
+}

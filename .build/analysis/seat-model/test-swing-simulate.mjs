@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-/* test-swing-simulate.mjs — W5 invariants over the committed
-   data/seat-model-2028-nowcast.json plus the engine's own null-mode GES
-   replay (run small: null draws are deterministic).
+/* test-swing-simulate.mjs — seat model v2 invariants over the committed
+   data/seat-model-2028-nowcast.json and -forecast.json, the Senate-ranking flow layer, and the
+   replay check: the certified 2025 primaries counted on the modelled flows must reproduce at least
+   146 of 150 winners (147 at commit; W5's GES invariant replayed certified count rows instead).
 
    Run from the repo root:
      node .build/analysis/seat-model/test-swing-simulate.mjs */
@@ -10,21 +11,18 @@ import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { NATIONAL_FLOWS, nationalFlowRow } from "./flow-recipients.mjs";
-import { FLOW } from "../../newtracker/flows.mjs";
+import { loadRankings, cohortTable, routing, moveFirst } from "./senate-flows.mjs";
 
 const OUT = "data/seat-model-2028-nowcast.json";
 const HISTORY = "data/seat-model-2028-history.jsonl";
 const SCRIPT = ".build/analysis/seat-model/swing-simulate.mjs";
 const INPUTS = [
-  "data/seat-vote-layer.json",
-  "data/aec-2025-seat-flows.json",
-  "data/seat-candidate-set-2028.json",
-  "data/census-2021-divisions-2025.json",
-  "data/polls.json",
-  ".build/newtracker/flows.mjs",
-  ".build/analysis/seat-model/flow-recipients.mjs",
+  "data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json",
+  "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json", "data/seat-model-flow-calibration.json",
+  "data/seat-model-calibration.json", "data/vote-switching.json", "map/data/res-2025.json",
+  ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/seat-inputs.mjs", ".build/analysis/seat-model/senate-flows.mjs",
 ];
+const FORECAST = "data/seat-model-2028-forecast.json";
 const P5 = ["alp", "lnp", "on", "grn", "oth"];
 
 let failures = 0;
@@ -45,7 +43,9 @@ for (const [f, sha] of Object.entries(S._provenance.inputs))
 // meta/structure
 check("draws >= 10,000", S.meta.draws >= 10000, String(S.meta.draws));
 check("150 seats", S.seats.length === 150, String(S.seats.length));
-for (const p of P5) check(`sigmaNat.${p} positive`, S.meta.sigmaNat[p] > 0);
+for (const p of P5) check(`sigmaNational.${p} positive`, S.meta.sigmaNational[p] > 0);
+for (const p of P5) check(`sigmaSeat.${p} positive`, S.meta.sigmaSeat[p] > 0);
+check("engine v2", S._provenance.engine === "v2");
 
 // expected seats: non-negative, sum to 150
 const es = S.national.expectedSeats;
@@ -58,11 +58,13 @@ check("expectedSeats sum to 150", Math.abs(esSum - 150) <= 0.5, String(esSum));
 
 // majority: three disjoint exhaustive outcomes share the draw budget
 const mj = S.national.majority;
-for (const k of ["alp", "coalition", "noMajority"])
+for (const k of ["alp", "coalition", "on", "noMajority"])
   check(`majority.${k} in [0,1]`, mj[k] >= 0 && mj[k] <= 1, String(mj[k]));
 check("majority props sum to 1",
-  Math.abs(mj.alp + mj.coalition + mj.noMajority - 1) <= 0.02,
-  String(mj.alp + mj.coalition + mj.noMajority));
+  Math.abs(mj.alp + mj.coalition + mj.on + mj.noMajority - 1) <= 0.02,
+  String(mj.alp + mj.coalition + mj.on + mj.noMajority));
+// seat distribution quantiles ordered
+for (const [g, d] of Object.entries(S.national.seatDistribution)) check(`${g} quantiles ordered`, d.p05 <= d.p25 && d.p25 <= d.p50 && d.p50 <= d.p75 && d.p75 <= d.p95, JSON.stringify(d));
 
 // classic 2PP: ALP share inside [0,100], mean inside its own p10-p90 band
 const tp = S.national.twoPartyClassic;
@@ -103,44 +105,40 @@ if (existsSync(HISTORY)) {
   }
 }
 
-/* ---- 2b. national fallback flow rows (W5.1) ------------------------------ */
-// every national-row row sums to 1, minor-bucket ALP shares anchor to FLOW,
-// and the lookup maps the sim's member:<name> vocabulary onto the member row
-for (const [g, row] of Object.entries(NATIONAL_FLOWS)) {
-  const t = Object.values(row).reduce((a, b) => a + b, 0);
-  check(`national flow row '${g}' sums to 1`, Math.abs(t - 1) <= 1e-9, String(t));
-  for (const [k, v] of Object.entries(row))
-    check(`national flow row '${g}' destination '${k}' in [0,1]`, v >= 0 && v <= 1, String(v));
+/* ---- 2b. the Senate-ranking flow layer -------------------------------------- */
+{
+  const R = loadRankings(2025);
+  check("150 divisions in the 2025 Senate tables", Object.keys(R.div).length === 150, String(Object.keys(R.div).length));
+  for (const key of ["ALP", "COAL", "GRN", "ON", "OTH:TOP", "OTH-M"]) {
+    const p = cohortTable(R, "Hunter", key), t = p.reduce((a, b) => a + b, 0);
+    check(`cohort table ${key} is a distribution`, Math.abs(t - 1) < 1e-9, String(t));
+    const { F, G } = routing(R, p);
+    for (let S = 1; S < 16; S++) { let f = 0; for (let y = 0; y < 4; y++) f += F[S * 4 + y]; check(`F rows sum to 1 (${key}, S=${S})`, Math.abs(f - 1) < 1e-9, String(f)); }
+    for (let x = 0; x < 4; x++) for (let S = 1; S < 16; S++) { if ((S >> x) & 1) continue; let g = 0; for (let y = 0; y < 4; y++) g += G[(x * 16 + S) * 4 + y]; check(`G rows sum to 1 (${key}, x=${x}, S=${S})`, Math.abs(g - 1) < 1e-9, String(g)); }
+  }
+  // switchers: moving One Nation first must put every ballot's first named family at O
+  const m = moveFirst(R, cohortTable(R, "Hunter", "COAL"), 3), { F } = routing(R, m);
+  check("moveFirst puts One Nation first", Math.abs(F[15 * 4 + 3] - 1) < 1e-9, String(F[15 * 4 + 3]));
 }
-check("grn fallback ALP share = FLOW.grn", NATIONAL_FLOWS.grn.alp === FLOW.grn);
-check("on fallback ALP share = FLOW.onp", NATIONAL_FLOWS.on.alp === FLOW.onp);
-check("oth fallback ALP share = FLOW.oth", NATIONAL_FLOWS.oth.alp === FLOW.oth);
-/* the W5 bias was a Coalition fallback sending ~half its pile to ALP and
-   none to ON — the derived Coalition row must send strictly more to ON
-   than to ALP (both stated constants: leak 0.178 v COAL_TO_ON 0.65) */
-for (const g of ["lp", "np", "lnp", "clp"])
-  check(`coalition fallback '${g}' favours ON over ALP`,
-    NATIONAL_FLOWS[g].on > NATIONAL_FLOWS[g].alp,
-    `on ${NATIONAL_FLOWS[g].on} vs alp ${NATIONAL_FLOWS[g].alp}`);
-check("member:<name> maps to the member row",
-  nationalFlowRow("member:wilkie") === NATIONAL_FLOWS.member);
-check("unknown group falls back to bucket row",
-  nationalFlowRow("alp") === NATIONAL_FLOWS.alp);
+{
+  const Fc = JSON.parse(readFileSync(FORECAST, "utf8"));
+  check("forecast file: 150 seats, engine v2, forecast mode", Fc.seats.length === 150 && Fc._provenance.engine === "v2" && Fc.meta.mode === "forecast");
+  const fs = Object.values(Fc.national.expectedSeats).reduce((a, b) => a + b, 0);
+  check("forecast expectedSeats sum to 150", Math.abs(fs - 150) <= 0.5, String(fs));
+}
 
-/* ---- 3. null-mode GES replay (deterministic - small draw count) -------- */
-const nullOut = join(tmpdir(), "auspol-sim-null-test.json");
+/* ---- 3. replay: certified 2025 primaries counted on the modelled flows ------ */
+const replayOut = join(tmpdir(), "auspol-sim-replay-test.json");
 const log = execFileSync(process.execPath, [SCRIPT], {
-  env: { ...process.env, AUSPOL_SIM_NULL: "1", AUSPOL_SIM_OUT: nullOut, AUSPOL_SIM_DRAWS: "250" },
+  env: { ...process.env, AUSPOL_SIM_MODE: "replay", AUSPOL_SIM_OUT: replayOut },
   encoding: "utf8", maxBuffer: 1 << 24,
 });
-const m = log.match(/2025 winners reproduced: (\d+)\/150/);
-check("null-mode replay line printed", !!m, log.slice(-400));
-if (m) check("null mode reproduces all 150 winners", +m[1] === 150, m[1] + "/150");
-if (existsSync(nullOut)) {
-  const N = JSON.parse(readFileSync(nullOut, "utf8"));
-  check("null output carries the same structural shape",
-    N.seats.length === 150 && N.meta.draws === 250 && !!N.national.expectedSeats);
+const m = log.match(/winners reproduced: (\d+)\/150; final pair right in (\d+)\/150/);
+check("replay line printed", !!m, log.slice(-400));
+if (m) {
+  check("replay reproduces at least 146 of 150 winners", +m[1] >= 146, m[1] + "/150");
+  check("replay gets at least 135 final pairs", +m[2] >= 135, m[2] + "/150");
 }
 
 if (failures) { console.error(`${failures} failures`); process.exit(1); }
-console.log(`sim OK: ${S.meta.draws.toLocaleString()} draws · expected ${Object.entries(es).map(([g, v]) => `${g} ${v}`).join("/")} · majority ALP ${(100 * mj.alp).toFixed(1)}% · classic 2PP ${tp.meanAlp}% [${tp.p10}-${tp.p90}] · null replay 150/150`);
+console.log(`sim OK (v2): ${S.meta.draws.toLocaleString()} draws · expected ${Object.entries(es).map(([g, v]) => `${g} ${v}`).join("/")} · majority ALP ${(100 * mj.alp).toFixed(1)}% · classic 2PP ${tp.meanAlp}% [${tp.p10}-${tp.p90}] · replay ${m ? m[1] + "/150 winners, " + m[2] + "/150 pairs" : "?"}`);

@@ -1,0 +1,80 @@
+{
+ "_about": "Resolve Political Monitor wave of 2025-05-03 (election eve), as data/demographics.json carried it until the Resolve monitor refresh 701b3fe5 (2026-10-11) rolled it out of the published series. Pinned here because vote-layer.mjs uses it as the age/gender baseline of its difference-in-differences; recovered verbatim from git show 701b3fe5^:data/demographics.json.",
+ "wave": {
+  "pollster": "Resolve",
+  "date": "2025-05-03",
+  "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+  "read": "published series",
+  "dims": {
+   "age": {
+    "18–34": {
+     "lnp": 21,
+     "alp": 38,
+     "grn": 26,
+     "onp": 4,
+     "oth": 11
+    },
+    "35–54": {
+     "lnp": 29,
+     "alp": 35,
+     "grn": 9,
+     "onp": 7,
+     "oth": 18
+    },
+    "55+": {
+     "lnp": 40,
+     "alp": 32,
+     "grn": 3,
+     "onp": 7,
+     "oth": 17
+    }
+   },
+   "gender": {
+    "Men": {
+     "lnp": 32,
+     "alp": 37,
+     "grn": 9,
+     "onp": 7,
+     "oth": 16
+    },
+    "Women": {
+     "lnp": 31,
+     "alp": 32,
+     "grn": 14,
+     "onp": 6,
+     "oth": 14
+    }
+   },
+   "state": {
+    "NSW": {
+     "lnp": 32,
+     "alp": 35,
+     "grn": 11,
+     "onp": 6,
+     "oth": 16
+    },
+    "Vic": {
+     "lnp": 28,
+     "alp": 34,
+     "grn": 14,
+     "onp": 6,
+     "oth": 18
+    },
+    "Qld": {
+     "lnp": 35,
+     "alp": 31,
+     "grn": 12,
+     "onp": 8,
+     "oth": 14
+    },
+    "Rest of Australia": {
+     "lnp": 29,
+     "alp": 35,
+     "grn": 12,
+     "onp": 5,
+     "oth": 15
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,36 @@
+=== A. Donor excluded with Labor, Coalition and ON all still in: share naming each first of the three ===
+donor  state | actual A / C / O   | from pairs (Luce) A / C / O | max gap
+GRN    AUS   |  88.8   7.8   3.4 |  87.8   8.3   3.9         | 1.1
+GRN    NSW   |  87.9   8.8   3.2 |  86.8   9.2   4.0         | 1.2
+GRN    VIC   |  91.9   5.9   2.2 |  91.3   6.2   2.5         | 0.6
+GRN    QLD   |  88.8   6.7   4.6 |  87.9   7.2   4.8         | 0.8
+GRN    WA    |  85.2  11.3   3.6 |  83.4  12.2   4.4         | 1.8
+GRN    SA    |  86.5   9.3   4.3 |  85.0  10.3   4.8         | 1.5
+GRN    TAS   |  89.9   5.3   4.8 |  88.9   5.8   5.3         | 1.0
+GRN    NT    |  82.4  10.3   7.3 |  78.9  12.3   8.8         | 3.5
+OTH    AUS   |  37.4  24.9  37.7 |  33.9  32.1  34.0         | 7.2
+OTH    NSW   |  29.9  27.0  43.1 |  26.5  34.7  38.8         | 7.7
+OTH    VIC   |  45.4  22.4  32.2 |  40.9  28.1  31.1         | 5.7
+OTH    QLD   |  29.6  23.4  47.0 |  28.0  31.5  40.5         | 8.1
+OTH    WA    |  35.1  28.2  36.7 |  30.5  37.5  32.0         | 9.3
+OTH    SA    |  33.4  31.0  35.6 |  30.8  38.2  31.0         | 7.2
+OTH    TAS   |  40.2  21.8  38.0 |  38.2  24.7  37.0         | 3.0
+OTH    NT    |  55.0  21.9  23.1 |  49.0  27.8  23.2         | 6.0
+OTH-R  AUS   |  16.3  27.5  56.2 |  15.8  38.7  45.5         | 11.3
+OTH-M  AUS   |  52.3  24.1  23.5 |  50.2  26.5  23.3         | 2.3
+OTH-L  AUS   |  64.3  19.7  16.0 |  62.5  21.3  16.3         | 1.8
+  all donor x state cases: mean max-gap 4.9 pts, worst 15.4
+
+=== B. Path dependence: ballots passed on through one party, then that party is excluded ===
+  via the Coalition, Labor ahead of ON:
+    GRN    those ballots 85.1 | all the donor's ballots (what an origin-tracking Luce count uses) 95.8
+    OTH    those ballots 50.2 | all the donor's ballots (what an origin-tracking Luce count uses) 49.9
+    OTH-R  those ballots 37.3 | all the donor's ballots (what an origin-tracking Luce count uses) 25.7
+    OTH-M  those ballots 65.3 | all the donor's ballots (what an origin-tracking Luce count uses) 68.3
+    OTH-L  those ballots 73.3 | all the donor's ballots (what an origin-tracking Luce count uses) 79.4
+  via Labor, Coalition ahead of ON:
+    GRN    those ballots 87.6 | all the donor's ballots (what an origin-tracking Luce count uses) 82.7
+    OTH    those ballots 75.3 | all the donor's ballots (what an origin-tracking Luce count uses) 47.9
+    OTH-R  those ballots 63.3 | all the donor's ballots (what an origin-tracking Luce count uses) 36.3
+    OTH-M  those ballots 80.8 | all the donor's ballots (what an origin-tracking Luce count uses) 62.2
+    OTH-L  those ballots 76.5 | all the donor's ballots (what an origin-tracking Luce count uses) 62.8

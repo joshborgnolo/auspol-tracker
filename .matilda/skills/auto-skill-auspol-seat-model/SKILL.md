@@ -1,6 +1,6 @@
 ---
 name: auspol-seat-model
-description: The .build/analysis/seat-model 2028-seat-simulation kit (W1-W7 build order, committed as of 2026-10-08) — file map per workstream, the GES 150/150 null-replay discipline, candidate-level (never group-level) elimination, W4 vote-layer shrinkage stack, and W5 WIP failure modes.
+description: The .build/analysis/seat-model 2028-seat-simulation kit — v2 engine (2026-11-01, Senate-ballot preference layer, logit swing, fitted errors, backtests) on top of the W1-W7 build (2026-10-08); file map, calibration and backtest scripts, the replay check, W4 vote-layer stack, and W5's history.
 source: auto-skill
 extracted_at: '2026-10-08T03:33:51.268Z'
 ---
@@ -18,6 +18,35 @@ workflow, or validate.mjs changes). All seven are committed as of 2026-10-08
 (W5 = e06f434). Deferred and NOT built: the §Validation.3 holdout gate (needs a
 2022 baseline), the β=0 demographics ablation, W8 redistribution monitor,
 Stage-3 publication.
+
+## v2 (2026-11-01) — read this first; the W5 sections below are history
+
+The user asked for "an as good-as-possible model, having regard to all available data … use your
+statistical prowess". v2 replaced W5's swing, flows and error model; W1-W4/W6 inputs are unchanged.
+
+| piece | file | output |
+|---|---|---|
+| Senate ballot rankings (2016/19/22/25, every formal ballot) | `extract-senate-rankings.py` (AEC zips cached outside the repo, `--fetch`) | `data/senate-rankings-<yr>.json` (division x first-pref cohort x order of A/C/G/O), `.build/aec-flow-src/senate-ballots/booth-rankings-<yr>.json.gz` (by PollingPlaceID — what a /map/ lens would read) |
+| flow layer | `senate-flows.mjs` | cohort tables, House tilts, switcher re-ranking, routing F/G (path-exact count, no Luce) |
+| flow calibration | `calibrate-flows.mjs` | `data/seat-model-flow-calibration.json` (chamber offsets per donor class x pair, election/seat SDs, forecast weights for Senate v the seat's own House history) |
+| swing noise | `calibrate-swing.mjs` | `data/seat-model-calibration.json` `swing` (logit residuals 2007-25 + SA26) |
+| polling error | `calibrate-national.mjs` | same file `national` (RMS by lead time, correlations, minor fade, government) |
+| engine core | `seat-engine.mjs` | logit spread solved to national (or per-state) totals; count by origin bundles |
+| 2028 seats | `seat-inputs.mjs` + `swing-simulate.mjs` | `data/seat-model-2028-nowcast.json`, `-forecast.json`, history line |
+| backtests | `backtest-chain.mjs`, `backtest-sa26.mjs` | `data/seat-model-backtest.json`, `-backtest-sa26.json` |
+
+Rules learned:
+- The REPLAY check (`AUSPOL_SIM_MODE=replay`) replaced W5's certified-row GES replay: the certified
+  2025 primaries counted on the MODELLED flows must keep >=146/150 winners (147 at commit, 148 with
+  no House history). A drop means the flow layer broke.
+- Three-cornered rows (a Coalition partner excluded with its partner standing) are not Senate
+  choices: excluded from calibration, handled by the sibling share.
+- Calibrate per donor class; Coalition offset (+0.22 logit federal) pooled toward SA26 (+0.02) as 0.15.
+- One Nation's seat noise uses its SA26 surge spread (0.16), not its 3-6%-party federal residuals.
+- Seat noise x1.3 was chosen by held-out log score (backtest-chain, 1.0/1.3/1.6 x t df 4/5).
+- vote-layer's age/gender baseline (Resolve 2025-05-03) rolled out of data/demographics.json on
+  2026-10-11; a verbatim copy is pinned in `src/baseline-wave-resolve-2025-05-03.json`.
+- `flow-recipients.mjs` is retired (kept for history).
 
 ## File map per workstream
 

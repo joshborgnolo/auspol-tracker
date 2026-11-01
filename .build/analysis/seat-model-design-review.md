@@ -283,7 +283,7 @@ Extra-trees and gradient-boosted corrections of the Mackerras pendulum, tested o
   - seat-count error
   - how often the ranges contain the result
 
-**Order:**
+**Order** (progress, 2026-11-01: steps 1–3 done as v2 in section 12, with Senate-ballot flows in place of seat-type grades; 4 open; 5 unchanged):
 1. Fix W5's flows (graded Coalition→Labor), switch it to the logit spread, widen its uncertainty, and rerun it.
 2. Build the backtest harness.
 3. Add the forecast mode.
@@ -303,6 +303,85 @@ Extra-trees and gradient-boosted corrections of the Mackerras pendulum, tested o
 - **Redistributions.** The AEC's SA1-level 2025 vote file (downloaded locally, not committed) would let the 2025 results be re-cut to new boundaries.
 - **DemosAU's quarterly MRP.** It is in `data/polls.json` with seat counts and regional flows. Use it for comparison, and for the shape of flow gradients but not their level.
 
+## 12. The rebuild on Senate ballots (2026-11-01)
+
+Asked next: is this the best possible model of preference flows, and the best use of all available data, in every direction? It wasn't. The review above never used Senate ballots, though state totals from them were already in the repo. The user then asked for the best model the data allows, online data included. Seat model v2 is that build: `swing-simulate.mjs` and the scripts named here. W5 is in git history.
+
+### Data
+- **Every formal Senate ballot, 2016–2025**, about 15 million an election, from the AEC's ballot-level files (`extract-senate-rankings.py`).
+  - Per division and first-preference cohort, it counts the order in which Labor (A), the Coalition (C), the Greens (G) and One Nation (O) first appear: `data/senate-rankings-<year>.json`.
+  - Per polling place, keyed by the PollingPlaceID that /map/ already uses: `.build/aec-flow-src/senate-ballots/booth-rankings-<year>.json.gz`.
+  - Cross-checked against `counts.json` to within 0.44 pts in every state and year. The gaps are reading rules, not errors: this reader stops a run of preferences at the first gap or repeat, as the AEC count does.
+- **The counted House flows of every excluded candidate**, 2016–2025, wherever the final pair was two of those four families: 2,830 donor-seat rows.
+
+### The flow layer
+Each candidate's voters rank the four families as that party's Senate voters in the same division did. The count replays those orders at every exclusion, so the count is exact along every path, with no pairwise table and no "share among whoever is left" assumption. That assumption misplaces right-wing minor parties' three-way splits by about 11 pts. Minor-party ballots that pass through Labor reach the Coalition 75% of the time, against 48% for all minor-party voters (exp11).
+
+Calibration (`calibrate-flows.mjs`, logit scale):
+- **House-v-Senate offsets by donor class:**
+  - Greens −0.40 (the House is less Labor-ward)
+  - One Nation +0.17
+  - Coalition voters choosing Labor over the Greens or One Nation +0.22 (pooled with SA 2026's +0.02 as 0.15 for Labor v One Nation)
+  - Labor voters choosing the Coalition +0.16
+  - right / centre / left minor parties +0.15 / −0.10 / −0.26
+- **Drift between elections** (the national flow shock) and **seat-level noise**, both fitted.
+- **Forecast weights**, fitted election-out: how much each seat's previous-election Senate deviation and its own previous House flow count.
+  - Where the House counted the flow (Labor-v-Coalition contests), the seat's own history carries most of it: Greens 0.66 House against 0.21 Senate; One Nation 0.38 against 0.20.
+  - In three-way contests no House history exists and the Senate is the signal.
+- **Minor parties go by party**, using each party's own Senate table. Per-seat error falls from 8.1 to 5.2 pts (exp12).
+- **Today's voters for each big party are mixed from their 2025 parties** by the vote-switching tables:
+  - One Nation: 23% retained, 44% ex-Coalition, 19% ex-Labor, the rest from others.
+  - Coalition: 82% its own 2025 voters, 12% ex-Labor.
+  - Switchers keep their old ranking with their new party moved first.
+
+### Tests
+- **2025 replay.** The certified 2025 primaries counted on the modelled flows reproduce 147 of 150 winners (148 on Senate ballots alone), 140 of 150 final pairs, and a 1.5–1.7 pt two-candidate error where the pair is right.
+- **SA 2026, out of sample.** Counted from its actual district primaries, with flows from the 2025 federal Senate ballots at the nearest federal booth (`backtest-sa26.mjs`):
+
+  | Flow scheme | Winners | Final pairs | Two-candidate error |
+  |---|---|---|---|
+  | W5's constants | 42/47 | 39/47 | 2.9 pts |
+  | Section 6's seat-type grades (partly fitted on SA 2026 itself) | 44/47 | 41/47 | 1.6 pts |
+  | Senate ballots | 43/47 | 41/47 | 1.7 pts |
+  | Senate ballots + switching mix | 43/47 | 42/47 | 1.9 pts |
+
+  The whole chain from the federal footprint, with noise drawn, scores Brier 0.207 for Senate + switching, 0.208 for the grades and 0.234 for W5. All schemes miss the same three independent contests.
+- **Federal chain backtests**, 2019/2022/2025 from what was known three years earlier, with the actual totals given (`backtest-chain.mjs`):
+  - 130–141 of 150 winners.
+  - Expected seats close except 2022's teal independents, which no 2019 baseline could hold.
+  - The flow variants score within noise of each other: when nearly every final is Labor v Coalition, flow geography barely moves seats.
+  - Seat noise at 1.3 times the calm-year size (Student-t, 5 degrees of freedom) maximised the held-out log score.
+
+### Swing and error settings (`calibrate-swing.mjs`, `calibrate-national.mjs`)
+- **Seat residuals from a logit swing with state totals given, 2007–2025:** Labor 0.18, Coalition 0.19, Greens 0.23 logit. Fat-tailed, and rising over time.
+- **SA 2026:** the collapsing Liberals 0.46, One Nation's surge only 0.16. The model adds a term that grows with a party's fall (k = 0.47) and uses the surge figure for One Nation.
+- **National polling error (logit RMS):**
+  - final month: Labor 0.098, Coalition 0.094, Greens 0.18, One Nation 0.29 (five cycles)
+  - 13–20 months out: 0.19, 0.15, 0.36, 0.47
+  - Labor and Coalition errors correlate at −0.68.
+- **Minor-party fade:** about 0.6 of a logit surge since the last election fades by polling day. That is fitted on small surges, so the election-day mode draws the fade from 0 to 0.6 and the nowcast applies none.
+
+### 2028 (polls to 27 October 2026: Labor 26.6, Coalition 22.7, Greens 13.7, One Nation 26.1, others 11.3)
+| Mode | Labor | Coalition | One Nation | Greens | Independents | Labor majority |
+|---|---|---|---|---|---|---|
+| If held today | 72 [53–90] | 31 [16–48] | 35 [13–61] | 4 | 8 | 41% (no majority 57%) |
+| Election day, about 17 months out | 83 [55–107] | 40 [17–64] | 15 [0–46] | 4 | 8 | 74% |
+
+Brackets are 90% ranges. In the nowcast, Labor-v-One Nation finals average 63 and 39 seats have no candidate above 60%. The election-day numbers are mostly the fade assumption.
+
+### Corrections to the sections above
+- Section 6's seat-type grades were about 8 pts too generous to Labor in provincial seats. The Senate puts provincial Coalition voters near rural ones.
+- W5's flat 60% Labor→Coalition holds in the bush only. Senate: inner 84, outer 74, provincial 63, rural 64.
+- "Others" and the minor parties' three-way splits were guesses in exp4b/exp9, worth about seven seats.
+- The "who left" composition idea fails for the Coalition: it predicts 73% on SA 2026 against 34%. It works for One Nation's own flows.
+
+### Still open
+- **How-to-vote decisions.** The 2025 Coalition card put One Nation above Labor almost everywhere. A different call would move many seats, and no card data is in the repo.
+- **The education term** (order step 4). The vote layer has no 2025 baseline wave with education.
+- **Independents' flows**, which depend on the candidate.
+- **The Queensland 2017 test**, using the 2016 ballots, now in the repo.
+- **A /map/ preference lens.** The booth tables are ready for one.
+
 ## Scripts (`seat-model/design-review/`)
 
 | Script | Question |
@@ -321,3 +400,11 @@ Extra-trees and gradient-boosted corrections of the Mackerras pendulum, tested o
 | `exp9-class-seats.mjs` | Federal seats under flat and graded three-way flows |
 | `exp10-irsad.mjs` | IRSAD, university share and Coalition strength against seat type |
 | `exp10b-coal-mechanism.mjs` | Local Coalition strength or retention: why the Coalition's vote predicts its flow |
+| `exp11-three-way-splits.mjs` | Can three-way splits be built from pairwise flows? (2025 Senate ballots) |
+| `exp12-minor-parties.mjs` | Minor parties' flows by party v lumped |
+
+v2's own scripts sit one level up in `seat-model/`:
+- `extract-senate-rankings.py`, `senate-flows.mjs`
+- `calibrate-flows.mjs`, `calibrate-swing.mjs`, `calibrate-national.mjs`
+- `seat-engine.mjs`, `seat-inputs.mjs`, `swing-simulate.mjs`
+- `backtest-chain.mjs`, `backtest-sa26.mjs`

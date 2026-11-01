@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-/* flow-recipients.mjs — W5.1: the seat sim's national flow fallback, DERIVED
+/* RETIRED 2026-11-01: seat model v2 (swing-simulate.mjs + senate-flows.mjs) no longer imports this file;
+   every candidate's preferences now come from its division's Senate ballot rankings. Kept for W5's history.
+
+   flow-recipients.mjs — W5.1: the seat sim's national flow fallback, DERIVED
    from the site's canonical 2PP flow constants (.build/newtracker/flows.mjs)
    instead of the W2 aggregate of 2025 count rows.
 

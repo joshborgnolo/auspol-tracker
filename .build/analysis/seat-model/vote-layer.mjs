@@ -272,7 +272,11 @@ for (const p of P5) {
 }
 
 /* ---- 6. β differential swings (Resolve DiD, age + gender only) ---------- */
-const baseWave = DEMO.waves.find((w) => w.pollster === BASELINE_HOUSE && w.date === BASELINE_DATE);
+/* the baseline wave rolled out of demographics.json's published series on 2026-10-11 (Resolve monitor
+   refresh 701b3fe5); a verbatim copy is pinned in src/ and used whenever the live file no longer has it */
+const PINNED_BASE = ".build/analysis/seat-model/src/baseline-wave-resolve-2025-05-03.json";
+const baseWave = DEMO.waves.find((w) => w.pollster === BASELINE_HOUSE && w.date === BASELINE_DATE)
+  || JSON.parse(readFileSync(PINNED_BASE, "utf8")).wave;
 const baseSamp = waveSample(baseWave);
 const recentResolve = currentWaves.filter((w) => w.pollster === BASELINE_HOUSE);
 const beta = {}, betaDiag = {};

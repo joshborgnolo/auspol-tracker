@@ -1,0 +1,7 @@
+2025 classic seats with minor-party flows (113), vote-weighted MAE of the minor-party flow to Labor (pts):
+  one national rate (LOO)                          8.14
+  seat's own 2022 gap + national rate              8.43
+  parties standing, 2025 rates elsewhere (LOO)     5.16
+  parties standing, 2022 rates, re-levelled        5.43
+  ... plus half the seat's 2022 residual           5.21
+  2025 rates by party (>=10k votes): GRPF 22, AUC 25, LTP 27, FFP 35, KAP 36, CYA 37, ASP 43, NAFD 48, CEC 53, HMP 61, IND 64, AJP 66, SOPA 73
