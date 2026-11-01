@@ -1,6 +1,6 @@
 ---
 name: auspol-seat-model
-description: The .build/analysis/seat-model 2028-seat-simulation kit — v2 engine (2026-11-01, Senate-ballot preference layer, logit swing, fitted errors, backtests) on top of the W1-W7 build (2026-10-08); file map, calibration and backtest scripts, the replay check, W4 vote-layer stack, and W5's history.
+description: The .build/analysis/seat-model 2028-seat-simulation kit — v2/v2.1 engine (2026-11-01, Senate-ballot preference layer, logit swing, fitted errors, backtests) on top of the W1-W7 build (2026-10-08), the /model/ page that runs it in the browser, and its gated daily run; file map, calibration and backtest scripts, the replay check, W4 vote-layer stack, and W5's history.
 source: auto-skill
 extracted_at: '2026-10-08T03:33:51.268Z'
 ---
@@ -33,7 +33,8 @@ statistical prowess". v2 replaced W5's swing, flows and error model; W1-W4/W6 in
 | polling error | `calibrate-national.mjs` | same file `national` (RMS by lead time, correlations, minor fade, government) |
 | engine core | `seat-engine.mjs` | logit spread solved to national (or per-state) totals; count by origin bundles |
 | 2028 seats | `seat-inputs.mjs` + `swing-simulate.mjs` | `data/seat-model-2028-nowcast.json`, `-forecast.json`, history line |
-| backtests | `backtest-chain.mjs`, `backtest-states.mjs` | `data/seat-model-backtest.json`, `-backtest-sa26.json` |
+| backtests | `backtest-chain.mjs`, `backtest-states.mjs` (six state elections) | `data/seat-model-backtest.json`, `-backtest-states.json` (incl. `drift`, which sizes the national flow shocks) |
+| model settings | `model-sim.mjs` `modelSettings` (pure; node and the page) | the runs' `meta` |
 
 Rules learned:
 - The REPLAY check (`AUSPOL_SIM_MODE=replay`) replaced W5's certified-row GES replay: the certified
@@ -41,12 +42,33 @@ Rules learned:
   no House history). A drop means the flow layer broke.
 - Three-cornered rows (a Coalition partner excluded with its partner standing) are not Senate
   choices: excluded from calibration, handled by the sibling share.
-- Calibrate per donor class; Coalition offset (+0.22 logit federal) pooled toward SA26 (+0.02) as 0.15.
+- Calibrate per donor class. v2.1: the Coalition's Labor-v-One Nation offset is 0, from its own four counts (Hunter +0.24, SA26 +0.02, Qld20 -0.12, Qld17 -0.58); v2's pooled 0.15 borrowed Labor-v-Greens finals.
 - One Nation's seat noise uses its SA26 surge spread (0.16), not its 3-6%-party federal residuals.
 - Seat noise x1.3 was chosen by held-out log score (backtest-chain, 1.0/1.3/1.6 x t df 4/5).
 - vote-layer's age/gender baseline (Resolve 2025-05-03) rolled out of data/demographics.json on
   2026-10-11; a verbatim copy is pinned in `src/baseline-wave-resolve-2025-05-03.json`.
 - `flow-recipients.mjs` is retired (kept for history).
+- On the six state counts the Senate ballots win on FINAL PAIRS (444/461 v grades 438, W5 425) but not on
+  winners (grades 440, Senate 436, W5 432; Qld17's level drift). Never write that the Senate beats the
+  seat-type grades on winners (design review section 13).
+- One Nation's national polling error is shrunk: min(own, max(GRN, 0.25)) logit. Its own record instead
+  moves its range 13-63 -> 12-66 now and no headline.
+
+## The /model/ page and the daily run (2026-11-01, 85daba0c)
+
+- Page sources: `.build/model/` (app-1..6 parts, `views.mjs` copy rules, `page.css`). `node
+  .build/model/export.mjs` -> `model/data/inputs.json` + `evidence.json`; `node .build/model/assemble.mjs`
+  -> `model/model.js`, `model.css`, byte-identical engine copies in `model/js/` + the worker, stamps,
+  the no-JS head. `test-model-bundle.mjs` (npm test) pins the copies and draw-for-draw reproduction.
+- swing-simulate imports `views.mjs` `headline()` and writes `national.headline`; gen-data's `seatModel`
+  and menu-lines `put("model")` quote it in the More menu.
+- Any engine or settings change: rerun swing-simulate (nowcast + forecast), export, assemble, the main
+  and vic builds, then check /model/ at 4 widths x 2 themes.
+- Daily: `.build/model/refresh.mjs` (gate: the vote layer's content, provenance aside, and the other
+  inputs' hashes v the nowcast's `_provenance.inputs`; `--force`, `--dry`; guards; `MODEL_STATUS` line)
+  driven by `.build/seat-model-refresh.sh` and `seat-model-refresh.yml` (FIXED_SLOTS 06:30 Sydney + cron
+  twin; agent-repair with `.build/seat-model-repair-prompt.md`). An average outside its own 90% range
+  is legitimate (rare-event seats), never a guard.
 
 ## File map per workstream
 

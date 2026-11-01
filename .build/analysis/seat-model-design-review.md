@@ -377,10 +377,55 @@ Brackets are 90% ranges. In the nowcast, Labor-v-One Nation finals average 63 an
 
 ### Still open
 - **How-to-vote decisions.** The 2025 Coalition card put One Nation above Labor almost everywhere. A different call would move many seats, and no card data is in the repo.
-- **The education term** (order step 4). The vote layer has no 2025 baseline wave with education.
+- **The education term** (order step 4). The vote layer has no 2025 baseline wave with education. *Tested in v2.1: no fixed term (section 13).*
 - **Independents' flows**, which depend on the candidate.
-- **The Queensland 2017 test**, using the 2016 ballots, now in the repo.
-- **A /map/ preference lens.** The booth tables are ready for one.
+- **The Queensland 2017 test**, using the 2016 ballots, now in the repo. *Done in v2.1 (`backtest-states.mjs`, section 13).*
+- **A /map/ preference lens.** The booth tables are ready for one. *Built: /map/'s Preferences lens reads the Senate ballots (d568cef8).*
+
+## 13. v2.1, the /model/ page and the daily run (2026-11-01)
+
+### v2.1 (cd06daf1)
+- **National flow shocks sized on observed drift.** The level shift between a Senate election and the next House count, pooled over federal 2019–2025 and six state elections (`backtest-states.mjs` `drift`): logit RMS One Nation 0.46, Coalition 0.30, Greens 0.27, right minors 0.48. Section 12 had capped them at 0.35.
+- **The Coalition's Labor-v-One Nation offset is 0**, from its own four counts (Hunter +0.24, SA 2026 +0.02, Queensland 2020 −0.12, Queensland 2017 −0.58). Section 12's 0.15 borrowed Labor-v-Greens finals.
+- **Education: no fixed term.** Within each pollster, the graduate gap moved One Nation +0.01, Greens +0.06, Labor +0.21, Coalition +0.17 logit (`calibrate-education.mjs`). One Nation's and the Greens' surges spread as the logit swing implies; the major parties' moves are worth at most ~1.5 pts in the most extreme seats, inside the education shock.
+- **One Nation's 2022 "sitting members last" card** shows no incumbency effect in the counts, so there is no lever for it.
+- **One implementation.** The engine is four pure modules (`seat-engine`, `senate-flows`, `seat-build`, `model-sim`) that node and the page both run.
+
+### The six state elections, read in full
+| Totals over SA 2026, Qld 2017, Vic 2022, Qld 2020, Qld 2024, SA 2022 (461 seats) | Final pairs right | Winners right |
+|---|---|---|
+| Senate ballots (the model) | **444** | 436 |
+| Seat-type grades (section 6, partly fitted on SA 2026) | 438 | **440** |
+| Fixed rates (W5) | 425 | 432 |
+| Diagnostic: Senate pattern, statewide levels set to the count | 441 | 441 |
+
+The Senate ballots pick the final pair best, which is the three-way routing doing its job. On winners they do not beat the seat-type grades: what decides most seats here is each party's statewide level, which a class average captures as well as the seat pattern, and Queensland 2017's 0.7-logit drift holds most of the gap. The model keeps the Senate for coverage (every party's voters, every pair, every direction) and because taking minor parties one by one cuts the per-seat miss on their counted flows from 8.1 to 5.2 pts (exp12; that gain is from going by party, measured with House rates). Section 12's "the Senate flows tie or beat" was about W5's constants only. The page says all of this, generated from the table.
+
+### One Nation's national polling error
+The model draws min(own RMS, max(Greens', 0.25)) logit: 0.25 now (its own five-election record says 0.285) and 0.358 on election day (own 0.468). Using its own record instead (20,000 draws each):
+
+| | One Nation seats, 90% range | One Nation majority | Labor majority |
+|---|---|---|---|
+| Now, as drawn | 36 [13–63] | 1.7% | 38.0% |
+| Now, its own record | 36 [12–66] | 2.4% | 38.4% |
+| Election day, as drawn | 16 [0–48] | 0.9% | 71.6% |
+| Election day, its own record | 17 [0–54] | 1.6% | 70.3% |
+
+The shrinkage trims One Nation's upper tail by a few seats and changes no headline. The page's polling-error table shows what the model draws, with the raw record beside it.
+
+### The page (`/model/`, 85daba0c)
+- More menu item 6, federal only. Sources in `.build/model/` (app parts, `views.mjs`, `page.css`), assembled by `assemble.mjs` into `model/model.js` and `model/model.css`; the four engine modules are copied byte-identical into `model/js/` for a module Web Worker. `export.mjs` writes `model/data/inputs.json` (unrounded, so the browser reproduces the engine) and `evidence.json`. `test-model-bundle.mjs` (npm test) pins the copies and a 300-draw reproduction.
+- The headline is written by rules in `views.mjs` (majority ≥90% / 60–90%; otherwise most seats with a majority clause at <20 / 20–40 / 40–60%), the same rules that write each official run's `national.headline` for the More menu.
+- Every figure on the page is read from the stores. The state-backtest prose is generated from its table by stated rules.
+
+### The daily run
+`.build/model/refresh.mjs` rebuilds the vote layer into a temp file and re-runs the nowcast and forecast only when its content (provenance aside) or another model input has moved; then the page's stores, the assembly, guards and the bundle test. `.build/seat-model-refresh.sh` commits through `refresh_site` and `push_main`. `seat-model-refresh.yml` runs at the dispatch clock's 06:30 Sydney slot with a cron twin; agent-repair watches it.
+
+### Still open
+- How-to-vote decisions: an explorer lever only; no card data.
+- Independents' flows, which depend on the candidate.
+- One Nation's polling-error floor (above).
+- A /map/ lens for the model's seat chances.
 
 ## Scripts (`seat-model/design-review/`)
 
