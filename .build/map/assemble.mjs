@@ -44,12 +44,21 @@ write("map/map.css", css);
 /* the page's asset URLs take a short content hash (?v=): Pages serves the
    unqueried files with only a short TTL, but a phone's heuristic cache can
    hold them long past a release (bit on 2026-10-25 – new build invisible on
-   a phone that had the old map.js pinned). */
+   a phone that had the old map.js pinned). The head's data-warm script gets
+   the same stamps: it starts the landing year's fetches (res, geo-lo,
+   islands; data-now on the "now" landing) while the scripts download, and
+   getJSON (app-1-base.js) drinks from window.__warm instead of racing it. */
 {
   const hs = { "map.js": crypto.createHash("sha1").update(js).digest("hex").slice(0, 8), "map.css": crypto.createHash("sha1").update(css).digest("hex").slice(0, 8) };
   const ip = path.join(ROOT, "map", "index.html");
   const html = fs.readFileSync(ip, "utf8");
-  const stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
+  let stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
+  const dv = dataStamps(ROOT);
+  const warmV = {};
+  for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|geo-\w+-lo)\.json$/.test(f) || f === "data-now.json" || f === "islands.json") warmV[f] = v;
+  stamped = stamped.replace(
+    /<!--map-data-warm:begin-->[\s\S]*?<!--map-data-warm:end-->/,
+    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;var b="res-"+ry+".json";if(!V[b]){y="now";ry="2025";b="res-"+ry+".json";}var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>\n<!--map-data-warm:end-->`);
   if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("map/index.html stamped", hs["map.js"], hs["map.css"]); }
   else console.log("map/index.html stamps current");
 }

@@ -429,7 +429,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
@@ -441,12 +441,15 @@ function areaDemo(m, st, idx, where, isNowM) {
 // figures, never estimates. Renders nothing where the frame's seats carry no
 // type (the state and 1993 frames)
 function clsVoteBlock(m, idx) {
+  // the primary columns omit ind and oth (this table's FAMS stay in FAM_CODE
+  // for the seat-holding bar and the party menus elsewhere)
+  const CLS_FAMS = FAMS.filter((f) => f !== "ind" && f !== "oth");
   const rows = [];
   for (const c of CLS) {
     const xs = idx.filter((i) => m.divs[i].cls === c);
     if (!xs.length) continue;
     let ta = 0, tb = 0, nTpp = 0, formal = 0;
-    const fp = FAMS.map(() => 0), sc = {};
+    const fp = CLS_FAMS.map(() => 0), sc = {};
     for (const i of xs) {
       const d = m.divs[i];
       const f = holdFam(d.hold); sc[f] = (sc[f] || 0) + 1;
@@ -456,14 +459,14 @@ function clsVoteBlock(m, idx) {
       const v = d.by ? d.by.prev : d;
       if (v.tpp != null) { ta += (v.formal * v.tpp) / 100; tb += (v.formal * (100 - v.tpp)) / 100; nTpp++; }
       formal += v.formal;
-      for (let k = 0; k < FAMS.length; k++) fp[k] += (v.formal * (v.fp[FAMS[k]] || 0)) / 100;
+      for (let k = 0; k < CLS_FAMS.length; k++) fp[k] += (v.formal * (v.fp[CLS_FAMS[k]] || 0)) / 100;
     }
     rows.push({ c, n: xs.length, tpp: nTpp ? (100 * ta) / (ta + tb) : null, nTpp, fp: fp.map((v) => (100 * v) / formal), sc });
   }
   if (!rows.length) return "";
   const bar = (r) => ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => r.sc[f]).map((f) => `<i style="width:${(100 * r.sc[f]) / r.n}%;${swc(f)}"></i>`).join("");
   const miss = rows.reduce((a, r) => a + (r.n - r.nTpp), 0);
-  return `<div class="st-sec"><h3>By seat type <small>votes pooled from each type’s seats</small></h3><table class="tbl"><thead><tr><th>Type</th><th>Seats</th><th>Labor 2PP</th>${FAMS.map((f) => `<th>${FAM_CODE[f]}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(CLS_SHORT[r.c])}</td><td>${r.n}<span class="seatbar">${bar(r)}</span></td><td>${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
+  return `<div class="st-sec"><h3>By seat type <small>votes pooled from each type’s seats</small></h3><table class="tbl"><thead><tr><th>Type</th><th>Seats</th><th>Labor 2PP</th>${CLS_FAMS.map((f) => `<th>${FAM_CODE[f]}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(CLS_SHORT[r.c])}</td><td>${r.n}<span class="seatbar">${bar(r)}</span></td><td>${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
 }
 
 function storyArea(m, st) {

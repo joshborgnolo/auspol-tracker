@@ -610,6 +610,62 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
 }
 
+// ── the preload's two brakes (2026-10-31): hi geometry waits for a real visit,
+// and the frame cache is weighted and capped. Baseline measured on the probe
+// (.matilda/map-perf-probe.mjs, 4× cpu): preloading all fifteen frames' hi
+// fetch + Path2D build fired ~42 long tasks ≈15s of main-thread jank in the
+// first minute, pulled 71MB and held a 377MB heap (545MB after a Handbook
+// visit, whose lossless geo is ~140MB). Now: hi arrives only for frames the
+// reader actually shows (warmHi on boot/setYear), preloading stops at the cap
+// and spaces itself, and the least-recently-viewed frames fall overboard
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js");
+  assert.equal((base.match(/geo-\$\{ry\}-hi\.json/g) || []).length, 1, "the hi fetch has exactly one home (warmHi) — never inline in loadYear");
+  assert.ok(base.includes("function warmHi(y)") && base.includes("if (lo.handbook) m.geoHi = m.geo;"), "warmHi owns the hi chain; the Handbook years alias lo as before");
+  assert.ok((ui.match(/warmHi\(/g) || []).length >= 2, "boot and setYear both warm the frame now in view");
+  assert.ok(base.includes("const FRAME_CAP = 12") && base.includes("const frameLoad =") && base.includes("function evictFrames()"), "the weighted frame cache and its LRU eviction (Handbook years ×4)");
+  assert.ok(ui.includes("frameLoad() < FRAME_CAP") && ui.includes("PRELOAD_GAP"), "the preload stops at the cap and paces itself between stops");
+  assert.ok(ui.includes("evictFrames();"), "setYear sweeps the cache once the new frame has landed");
+}
+
+// ── Queensland is unicameral (its Council abolished itself in 1922): no
+// senate-qld*.json can ever exist, so its frames never fetch it and never
+// offer the Council switch (before 2026-10-31 they 404'd three files a visit)
+{
+  const sen = part("app-3b-senate.js");
+  assert.ok(sen.includes('(STATE_YEARS.has(y) && !QLD_YEARS.has(y))'), "SEN_YEARS leaves the Queensland frames out");
+  assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-qld17.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld20.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld24.json")), "no Queensland upper-house files exist to fetch");
+}
+
+// ── the Handbook frame in slices (2026-10-31): the lossless-handbook click
+// used to parse, decode, resample, wind, path and outline in one synchronous
+// rush — one 5–8s task on throttled hardware (probe: 2001 loaded in 8.1s with
+// a contiguous 5.6s freeze, and ~1.5s more of morph longtasks leaving it).
+// buildHandbookGeo streams the same work in two yielded passes (decode+bbox,
+// then resample/wind/path/outline per seat with 32ms slice yields); the same
+// visit's morph is now the colour sweep alone. The licence-limited bits stand
+// untouched: files ship lossless, resampling stays a draw-time transform
+{
+  const base = part("app-1-base.js"), map2 = part("app-2-map.js");
+  assert.ok(base.includes("async function buildHandbookGeo(topo, m)"), "the sliced Handbook geometry builder exists");
+  assert.ok(base.includes("lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m)"), "loadYear routes Handbook frames through the sliced builder");
+  assert.ok(base.includes("function handbookFeature(f)") && base.includes("handbookDisplay(fc)"), "the resample-and-wind treatment keeps one shared per-feature home");
+  assert.ok(base.includes("sliceDone") && /await pause\(\)/.test(base), "the sliced builder yields to the browser between seat-sized slices");
+  assert.ok(base.includes("coast: outline"), "the fused outline serves meshDiv and coast alike (the old full re-walks' exact lines, free)");
+  assert.ok(map2.includes("if (HANDBOOK_YEARS.has(from.year) || HANDBOOK_YEARS.has(to.year)) return false;"), "a Handbook side declines the outline morph — the colour sweep carries the transition");
+}
+
+// ── the head's data-warm script (2026-10-31): the landing year's fetches
+// start while d3/topojson/map.js download (~800KB of script ahead of the
+// first data request); getJSON drinks from window.__warm, never racing it
+{
+  const base = part("app-1-base.js");
+  assert.ok(page.includes('id="map-data-warm"') && page.includes("window.__warm={}"), "the head carries the data-warm script");
+  assert.ok(/<script id="map-data-warm">[^<]*"res-2025\.json":"[0-9a-f]{8}"/.test(page), "the warm script's stamps are current for the landing year (node .build/map/assemble.mjs)");
+  assert.ok(page.includes('"geo-2025-lo.json":"') && page.includes('"data-now.json":"') && page.includes('"islands.json":"'), "the warm script prices every file it may warm");
+  assert.ok(base.includes("window.__warm[u]") && base.includes("delete window.__warm[u]"), "getJSON drinks from the warm script, once");
+}
+
 // ── the Born overseas birthplace sub-view (the cob lane): the fborn People
 // lane gains a country picker on the year's own census-edition menu — data
 // and app wiring assertions per frame follow in the blocks below
@@ -647,7 +703,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
   assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hiq"];'), "the income lane id and its three measures, median first (the high view is the top income quarter since 2026-11-01)");
   assert.ok(base.includes('if (k === "loinc") { ks.push(LENS_INC); continue; }') && base.includes('if (k === "a65") { ks.push(LENS_AGE); continue; }'), "the People menu folds the income pair into Household income and the age pair into Age (DM stays positional against the demo tuple)");
-  assert.ok(base.includes('if (k !== "hiinc" && k !== "hiqinc") ks.push(k);'), "the menu folds hiinc's top-band and hiqinc's top-quarter lanes out of the people stack");
+  assert.ok(base.includes(`"hiinc" && k !== "y12less" && k !== "hiqinc"`), "the menu folds hiinc, the schooling reads, and hiqinc out of the people stack (the three menu folds)");
   assert.ok(base.includes('"hiqinc"'), "hiqinc is a DM lane at the demo tuple's appended cell");
   assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hiq: "hiqinc" };'), "the income view's demo key per measure (the quartile-paired demo key runs edition-comparable where the old top-band share was not)");
   assert.ok(base.includes('const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hiq: "Adults in the top income quarter" };'), "the income view's display name per measure (top income quarter, sentence case)");
@@ -663,7 +719,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('else if (k === "incv") S.incMode = t.value;'), "the picker change handler is wired");
   assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
   assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
-  assert.ok(ui.includes('S.incMode, S.ageMode, S.party'), "the legend's refresh key re-reads on a measure switch");
+  assert.ok(ui.includes('S.incMode, S.ageMode, S.eduMode, S.party'), "the legend's refresh key re-reads on a measure switch");
   assert.ok(ui.includes("Income: ${INC_SHORT[S.incMode]}"), "the lens head names the picked measure");
   assert.ok(ui.includes('`Median weekly household income${incEpochBrk}${incMedNote}`'), "the median legend note names itself in census-year dollars and carries the no-national-line caveat where the frame lacks it");
   assert.ok(ui.includes("mny(ausShare)"), "the Australia line formats in dollars on the median view");
@@ -704,6 +760,34 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("The median age near here is"), "the place's median-age headline");
   assert.ok(story.includes("AGE_TOP[S.ageMode]"), "the area ranking phrases follow the picked age view");
   assert.ok(list.includes("ageMed()") && list.includes("yr"), "the list column prices the median-age view in whole years");
+}
+
+// ── the Education lens (2026-10-31): the fold's third sibling — the
+// uni/y12less schooling pair ride one People-menu entry, University
+// educated the landing read and the left-school-early share one picker
+// switch away. Each read keeps its own DM lane for the dicts, ranges,
+// ramps and area rankings, the hash gains ev, legacy uni/y12less hashes
+// alias in, and an era that never printed the schooling read (the
+// statistics-era '90s) offers it nowhere
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
+  assert.ok(base.includes('const LENS_EDU = "edu";') && base.includes('const EDU_MODES = ["uni", "y12less"];'), "the Education lane id and its two reads, university first");
+  assert.ok(base.includes('if (k === "uni") { ks.push(LENS_EDU); continue; }'), "the People menu folds the schooling pair into the one Education entry (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('uni: "University educated", edu: "Education",') && base.includes('uni: "University", edu: "Education",'), "the menu entry labels itself Education in both name tables");
+  assert.ok(base.includes('eduMode: "uni"'), "University educated is the landing read");
+  assert.ok(base.includes('if (isEdu()) return d.demo ? d.demo[S.eduMode] : null;'), "the read rides its own demo-dict key");
+  assert.ok(base.includes('DM_RANGE[S.eduMode]') && base.includes('isEdu() ? S.eduMode :'), "range and ramp follow the picked read");
+  assert.ok(base.includes("m.hasLane[LENS_EDU] = m.hasLane.uni;"), "the menu gate rides the university read");
+  assert.ok(ui.includes('data-opt="eduv" aria-label="Education view"'), "the education picker rides the select-lens idiom");
+  assert.ok(ui.includes("EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false)"), "the picker offers only reads the frame printed");
+  assert.ok(ui.includes('else if (k === "eduv") S.eduMode = t.value;'), "the picker change handler is wired");
+  assert.ok(ui.includes('if (i === "uni" || i === "y12less") { S.index = LENS_EDU;') && ui.includes('p.get("ev")'), "legacy uni/y12less hashes alias onto the lens with that read picked");
+  assert.ok(ui.includes('p.set("ev", S.eduMode);'), "the hash carries the schooling read");
+  assert.ok(ui.includes("S.ageMode, S.eduMode"), "the legend's refresh key re-reads on a schooling switch");
+  assert.ok(ui.includes("Education: ${EDU_SHORT[S.eduMode]}"), "the lens head names the picked read");
+  assert.ok(ui.includes("isEdu() ? EDU_NOTE[S.eduMode]"), "the legend note names the picked read");
+  assert.ok(ui.includes("b.hasLane[S.eduMode] === false"), "a year swap falls back to the frame's own publication when a read never printed");
+  assert.ok(story.includes("isEdu() ? DM_TOP[S.eduMode]"), "the area ranking phrases follow the picked read");
 }
 
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain
