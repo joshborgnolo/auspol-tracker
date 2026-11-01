@@ -1,7 +1,7 @@
 /* the Election model – assembled from .build/model by .build/model/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
-const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=11c9b6df","forecast":"/data/seat-model-2028-forecast.json?v=06ae23e2","inputs":"/model/data/inputs.json?v=58d5a3e2","evidence":"/model/data/evidence.json?v=3fcf9692","senate":"/data/senate-rankings-2025.json?v=edeb9db9","worker":"/model/js/worker.mjs?v=eff3432f"};
+const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=14ebd330","forecast":"/data/seat-model-2028-forecast.json?v=3ca20f0a","inputs":"/model/data/inputs.json?v=58d5a3e2","evidence":"/model/data/evidence.json?v=3fcf9692","senate":"/data/senate-rankings-2025.json?v=edeb9db9","worker":"/model/js/worker.mjs?v=eff3432f"};
 /* views.mjs: the /model/ page's written lines and head figures, by rule - one implementation.
    assemble.mjs imports it to write the page's static head (what a reader sees before the script runs,
    and what a crawler reads) and inlines the same source into model.js, which redraws the head with it
