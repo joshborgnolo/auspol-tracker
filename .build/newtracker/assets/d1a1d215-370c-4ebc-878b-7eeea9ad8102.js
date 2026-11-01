@@ -536,7 +536,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   /* a menu page swaps in place like a tab; a modified click opens its document.
      An ext entry (the Election map, a page outside this build) is a plain
      link: the browser follows its href */
-  const menuHref = (t) => (t.ext ? "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id);
+  const menuHref = (t) => (t.ext ? t.href || "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id);
   const menuPick = (id) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     if ((tabs.find((t) => t.id === id) || {}).ext) { setMenuOpen(false); return; }

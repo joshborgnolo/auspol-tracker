@@ -1706,7 +1706,10 @@ if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "map"), 1);
-if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "model"), 1);
+if (window.JUR && window.JUR.id === "vic") Object.assign(TABS.find(t => t.id === "model"), {
+  href: "/model/#j=vic",
+  tip: "Who would win Victoria's Assembly on 28 November: 20,000 simulated elections from the polls, district by district"
+});else if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "model"), 1);
 const TAB_IDS = TABS.filter(t => !t.ext).map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu && !t.ext).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";

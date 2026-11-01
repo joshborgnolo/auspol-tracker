@@ -389,7 +389,7 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
     put("model", () => {
       const M = D.seatModel;
       if (!M || !M.headline) return null;
-      const lead = ["alp", "lnp", "on"].sort((a, b) => M.mostSeats[b] - M.mostSeats[a])[0];
+      const lead = ["alp", "lnp", "on"].sort((a, b) => M.expectedSeats[b] - M.expectedSeats[a])[0];
       const party = {
         alp: "Labor",
         lnp: "Coalition",

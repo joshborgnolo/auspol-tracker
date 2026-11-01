@@ -1,5 +1,5 @@
 #!/bin/bash
-# Daily election-model run (/model/ and the More menu's Election model line):
+# Daily election-model runs, federal and Victorian (/model/ and the menus' Election model lines):
 # ff main -> node .build/model/refresh.mjs (re-runs only when the polls or
 # another model input moved) -> if it ran: validate -> refresh_site (main +
 # vic builds, asset-ref check) -> commit -> push.
@@ -65,14 +65,16 @@ if ! refresh_site; then
 fi
 
 POLLS_TO="$(node -p 'JSON.parse(require("fs").readFileSync("data/seat-vote-layer.json","utf8")).diagnostics.recentWindow.to')"
+VIC_TO="$(node -p 'JSON.parse(require("fs").readFileSync("data/seat-model-vic-2026.json","utf8")).meta.pollsTo')"
 FILES=(data/seat-vote-layer.json data/seat-model-2028-nowcast.json data/seat-model-2028-forecast.json
-  data/seat-model-2028-history.jsonl model "${SITE_FILES[@]}")
+  data/seat-model-2028-history.jsonl data/seat-model-vic-2026.json data/seat-model-vic-2026-history.jsonl
+  model "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 if git diff --cached --quiet; then
   log "nothing staged after the model run; no commit"
   exit 0
 fi
-MSG="Election model: daily run on the polls to ${POLLS_TO}"
+MSG="Election model: daily run (federal polls to ${POLLS_TO}, Victorian polls to ${VIC_TO})"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1

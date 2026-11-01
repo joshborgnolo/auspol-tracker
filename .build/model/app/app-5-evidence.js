@@ -27,6 +27,24 @@ function lineChart(host, { xs, series, yfmt = (v) => fx1(v), height = 190, ylab 
 function step(n, title, prose, fig) {
   return `<div class="md-step"><div class="md-prose"><h3><span class="n">${n}</span>${title}</h3>${prose}</div><div class="md-fig">${fig || ""}</div></div>`;
 }
+/* who meets whom in the final count: the base election's final pairs (counted) against the run's average */
+const PAIR_ORD = ["alp", "lnp", "on", "grn", "member", "oth"], PAIR_NM = { alp: "Labor", lnp: "Coalition", on: "One Nation", grn: "Greens", member: "Independent", oth: "Other" };
+function pairsFigure(skel, tcpOf, R, year, nowLabel) {
+  const pkey = (a, b) => [a, b].sort((x, y) => PAIR_ORD.indexOf(x) - PAIR_ORD.indexOf(y)).join(" v ");
+  const p25 = {}, p28 = {};
+  for (const k of skel) { const t = tcpOf(k); if (t) { const q = pkey(BUCKET(t[0].bucket), BUCKET(t[1].bucket)); p25[q] = (p25[q] || 0) + 1; } }
+  for (const [q, v] of Object.entries(R.national.finalPairs)) { const [a, b] = q.split(" v ").map(BUCKET); if (a === b) continue; const k2 = pkey(a, b); p28[k2] = (p28[k2] || 0) + v; }
+  const pk = [...new Set([...Object.keys(p25), ...Object.keys(p28)])].sort((x, y) => (p28[y] || 0) - (p28[x] || 0) || (p25[y] || 0) - (p25[x] || 0));
+  const shown = pk.filter((q) => Math.max(p25[q] || 0, p28[q] || 0) >= 1.5), rest = pk.filter((q) => !shown.includes(q));
+  const prow = (l, a, b) => ({ l, a, b }), prows = shown.map((q) => prow(q.split(" v ").map((x) => PAIR_NM[x]).join(" v "), p25[q] || 0, p28[q] || 0));
+  if (rest.length) prows.push(prow("Other pairs", rest.reduce((n, q) => n + (p25[q] || 0), 0), rest.reduce((n, q) => n + (p28[q] || 0), 0)));
+  const pmax = Math.max(...prows.flatMap((r) => [r.a, r.b]));
+  const html = `<div class="cap">Who meets whom in the final count</div>
+     <div class="md-pkey"><span><i class="y25"></i>Counted in ${year}</span><span><i class="y28"></i>${nowLabel}</span></div>
+     <div class="md-pairs">${prows.map((r) => `<span class="l">${r.l}</span><span class="b"><i class="y25" style="width:${(100 * r.a / pmax).toFixed(1)}%"></i><i class="y28" style="width:${(100 * r.b / pmax).toFixed(1)}%"></i></span><span class="v">${Math.round(r.a)} <span class="arr">→</span> <b>${Math.round(r.b)}</b></span>`).join("")}</div>
+     <div class="sub">Seats by the two candidates left at the end of the count. Today's figures average the ${R.meta.draws.toLocaleString("en-AU")} simulations, so they need not be whole numbers of seats; they are rounded here.</div>`;
+  return { p25, p28, pk, html };
+}
 function renderEvidence() {
   const E = STATE.evidence, I = STATE.inputs, now = I.vote.nowcast, a = I.asOf, R = STATE.res.nowcast;
   const sh = { alp: now.alp / 100, lnp: now.lnp / 100, grn: now.grn / 100, onp: now.on / 100 };
@@ -62,20 +80,8 @@ function renderEvidence() {
     `<table class="md-tbl"><caption>Three seats' 2025 Senate ballots</caption><thead><tr><th>Seat</th><th>Coalition voters: Labor ahead of One Nation</th><th>Labor voters: Coalition ahead of One Nation</th><th>One Nation voters: Labor ahead of the Coalition</th><th>Greens voters: Labor ahead of the Coalition</th></tr></thead><tbody>${ex}</tbody></table>
      <div class="sub">Shares of each party's Senate voters who numbered either of the two, before the House adjustments.</div>
      ${comp(E.composition.on, "Today's One Nation voters, by their 2025 vote")}${comp(E.composition.lnp, "Today's Coalition voters, by their 2025 vote")}`));
-  const PORD = ["alp", "lnp", "on", "grn", "member", "oth"], PNM = { alp: "Labor", lnp: "Coalition", on: "One Nation", grn: "Greens", member: "Independent", oth: "Other" };
-  const pkey = (a, b) => [a, b].sort((x, y) => PORD.indexOf(x) - PORD.indexOf(y)).join(" v ");
-  const p25 = {}, p28 = {};
-  for (const k of I.seats) if (k.tcp2025) { const q = pkey(BUCKET(k.tcp2025[0].bucket), BUCKET(k.tcp2025[1].bucket)); p25[q] = (p25[q] || 0) + 1; }
-  for (const [q, v] of Object.entries(R.national.finalPairs)) { const [a, b] = q.split(" v ").map(BUCKET); if (a === b) continue; const k2 = pkey(a, b); p28[k2] = (p28[k2] || 0) + v; }
-  const pk = [...new Set([...Object.keys(p25), ...Object.keys(p28)])].sort((x, y) => (p28[y] || 0) - (p28[x] || 0) || (p25[y] || 0) - (p25[x] || 0));
-  const shown = pk.filter((q) => Math.max(p25[q] || 0, p28[q] || 0) >= 1.5), rest = pk.filter((q) => !shown.includes(q));
-  const prow = (l, a, b) => ({ l, a, b }), prows = shown.map((q) => prow(q.split(" v ").map((x) => PNM[x]).join(" v "), p25[q] || 0, p28[q] || 0));
-  if (rest.length) prows.push(prow("Other pairs", rest.reduce((n, q) => n + (p25[q] || 0), 0), rest.reduce((n, q) => n + (p28[q] || 0), 0)));
-  const pmax = Math.max(...prows.flatMap((r) => [r.a, r.b]));
-  const pairFig = `<div class="cap">Who meets whom in the final count</div>
-     <div class="md-pkey"><span><i class="y25"></i>Counted in 2025</span><span><i class="y28"></i>If held today, on average</span></div>
-     <div class="md-pairs">${prows.map((r) => `<span class="l">${r.l}</span><span class="b"><i class="y25" style="width:${(100 * r.a / pmax).toFixed(1)}%"></i><i class="y28" style="width:${(100 * r.b / pmax).toFixed(1)}%"></i></span><span class="v">${Math.round(r.a)} <span class="arr">→</span> <b>${Math.round(r.b)}</b></span>`).join("")}</div>
-     <div class="sub">Seats by the two candidates left at the end of the count. Today's figures average the ${R.meta.draws.toLocaleString("en-AU")} simulations, so they need not be whole numbers of seats; they are rounded here.</div>`;
+  const { p25, p28, pk, html: pairFig } = pairsFigure(I.seats, (k) => k.tcp2025, R, 2025, "If held today, on average");
+  const PNM = PAIR_NM;
   const cl25 = p25["alp v lnp"] || 0, cl28 = p28["alp v lnp"] || 0, top28 = pk.find((q) => q !== "alp v lnp" && (p28[q] || 0) >= 1);
   html.push(step(4, "Count every seat",
     `<p>Every seat is counted as the AEC counts it: the candidate with the fewest votes is excluded, and each ballot moves to the next candidate it ranks who is still standing, until two remain. Because each group of voters' whole order is known, the count works for any final pair (Labor v One Nation, the Coalition v One Nation, a three-way race) without a table of flows, and a ballot that passed through one party moves on as its own voter would move it. Building three-way splits from pairwise flows instead misplaces the right-wing minor parties' votes by about 11 points.</p>

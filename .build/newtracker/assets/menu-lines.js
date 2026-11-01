@@ -398,7 +398,9 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     put("model", () => {
       const M = D.seatModel;
       if (!M || !M.headline) return null;
-      const lead = ["alp", "lnp", "on"].sort((a, b) => M.mostSeats[b] - M.mostSeats[a])[0];
+      // the party with the most seats on average, as the page's dek leads (a close race can have one
+      // party likelier to come first and the other ahead on average, as Victoria did on 1 November)
+      const lead = ["alp", "lnp", "on"].sort((a, b) => M.expectedSeats[b] - M.expectedSeats[a])[0];
       const party = { alp: "Labor", lnp: "Coalition", on: "One Nation" }[lead];
       return { head: M.headline, fig: { v: String(Math.round(M.expectedSeats[lead])), cap: `${party} seats on average`, tone: lead === "on" ? "onp" : lead } };
     });

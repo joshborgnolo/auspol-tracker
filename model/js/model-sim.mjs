@@ -111,7 +111,7 @@ export function simulateOnce(seats, S, R, L, sigSeat) {
 export function runMany(seats, S, { draws = 2000, seed = 20261101, onProgress = null, progressEvery = 100 } = {}) {
   const R = rng(seed), L = cholesky(S.corr);
   const sigSeat = seatSigmas(S, S.now5);
-  const n = seats.length;
+  const n = seats.length, MAJ = S.majority || Math.floor(n / 2) + 1; // 76 of 150; 45 of Victoria's 88
   const seatWin = seats.map(() => ({})), seatFinal = seats.map(() => ({})), pairShare = seats.map(() => ({}));
   const primSum = seats.map((s) => new Float64Array(s.cands.length));
   const tallies = Object.fromEntries(KEYS.map((k) => [k, new Int16Array(draws)]));
@@ -131,7 +131,7 @@ export function runMany(seats, S, { draws = 2000, seed = 20261101, onProgress = 
       const ps = sim.prim[i]; for (let j = 0; j < ps.length; j++) primSum[i][j] += ps[j];
     }
     for (const k of KEYS) { tallies[k][d] = t[k]; hist[k][t[k]]++; }
-    if (t.alp >= 76) maj.alp++; else if (t.lnp >= 76) maj.coalition++; else if (t.on >= 76) maj.on++; else maj.none++;
+    if (t.alp >= MAJ) maj.alp++; else if (t.lnp >= MAJ) maj.coalition++; else if (t.on >= MAJ) maj.on++; else maj.none++;
     const top = Math.max(...KEYS.map((k) => t[k])); const leaders = KEYS.filter((k) => t[k] === top); for (const k of leaders) most[k] += 1 / leaders.length;
     tcpSamples.push(sim.tcpAlp.length ? sim.tcpAlp.reduce((a, b) => a + b, 0) / sim.tcpAlp.length : null);
     if (d < 2000) natDraws.push(sim.targets);

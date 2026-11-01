@@ -5,6 +5,7 @@
    2. Seats rebuilt the browser's way - model/data/inputs.json + /data/senate-rankings-2025.json through
       the copied modules - simulate EXACTLY as the node pipeline's do, draw for draw, at a fixed seed.
    3. The bundle's settings are the ones the official nowcast ran with.
+   4. The same for Victoria (model/data/inputs-vic.json against the Victorian run).
    Run from the repo root: node .build/model/test-model-bundle.mjs */
 import fs from "node:fs";
 import assert from "node:assert/strict";
@@ -37,4 +38,17 @@ assert.ok(M.projectOnce(lev, S).seats.alp > M.projectOnce(browserSeats, S).seats
 const off = JSON.parse(fs.readFileSync("data/seat-model-2028-nowcast.json", "utf8"));
 assert.deepEqual(Object.values(off.meta.sigmaNational), S.sigNat.map((x) => Math.round(x * 10000) / 10000), "bundle polling error = the official run's");
 assert.deepEqual(off.meta.nowcast, inputs.vote.nowcast, "bundle nowcast = the official run's");
-console.log(`model bundle OK: ${MODS.length} modules identical, browser rebuild reproduces the node engine draw for draw (300 draws, ${browserSeats.length} seats), levers live`);
+// 4. Victoria: the page's inputs-vic.json through the copied modules reproduces the official Victorian run's
+//    own seats (built in node from the stores, state-tables.mjs) draw for draw, and its majority is 45 of 88
+const VI = JSON.parse(fs.readFileSync("model/data/inputs-vic.json", "utf8")), VR = JSON.parse(fs.readFileSync("data/seat-model-vic-2026.json", "utf8"));
+const VN = await imp(".build/analysis/seat-model/vic-inputs.mjs"), NB = await imp(".build/analysis/seat-model/seat-build.mjs");
+const vNode = VN.prepVic({ vote: { nowcast: VR.meta.nowcast } });
+const vb = B.buildSeatsFrom({ seats: VI.seats, hist: VI.build.hist, comp: VI.build.comp, ST: VI.build.ST, SEN, pre: VI.pre }, { composition: true });
+const vn = NB.buildSeatsFrom({ seats: vNode.seats, comp: vNode.comp, ST: vNode.ST, SEN: vNode.SEN, pre: vNode.pre, hist: { bySeat: {}, mean: {} } }, { composition: true });
+const VS = VI.settings.vic;
+assert.equal(VS.majority, 45, "Victoria: 45 for a majority");
+const va = M.runMany(vb, VS, { draws: 300, seed: 7 }), vz = NM.runMany(vn, VS, { draws: 300, seed: 7 });
+assert.deepEqual(va.seats, vz.seats, "Victoria: same district-by-district results");
+assert.deepEqual(VI.vote.nowcast, VR.meta.nowcast, "Victoria: bundle vote = the official run's");
+assert.deepEqual(M.projectOnce(vb, VS).seats, VR.national.central, "Victoria: the bundle's central projection = the official run's");
+console.log(`model bundle OK: ${MODS.length} modules identical, browser rebuild reproduces the node engine draw for draw (300 draws, ${browserSeats.length} seats; Victoria ${vb.length} districts), levers live`);

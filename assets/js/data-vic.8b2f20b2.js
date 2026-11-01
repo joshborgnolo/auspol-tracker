@@ -3913,7 +3913,33 @@ window.AUSPOL = function () {
   const publicOpinionTopics = null;
   const publicOpinionLatest = null;
   const house = null;
-  const seatModel = null;
+  const seatModel = {
+    "headline": "Labor and the Coalition are close on seats, and a hung parliament is likely",
+    "pollsTo": "2026-10-29",
+    "draws": 20000,
+    "expectedSeats": {
+      "alp": 36.18,
+      "lnp": 36.6,
+      "on": 7.77,
+      "grn": 6.17,
+      "oth": 0,
+      "member": 1.27
+    },
+    "mostSeats": {
+      "alp": 0.5046,
+      "lnp": 0.4835,
+      "on": 0.0118,
+      "grn": 0.0001,
+      "oth": 0,
+      "member": 0
+    },
+    "majority": {
+      "alp": 0.1424,
+      "coalition": 0.1371,
+      "on": 0.0042,
+      "noMajority": 0.7165
+    }
+  };
   const publicOpinionByRow = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,

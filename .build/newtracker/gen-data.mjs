@@ -8523,13 +8523,15 @@ const house = (() => {
 /* the seat model's latest official run, for the More menu's Election model line (/model/, built by
    .build/analysis/seat-model and .build/model): its headline (written by the page's own rules,
    .build/model/views.mjs, and stored in the run), the leading parties' average seats and chances, and the
-   date its polls run to. Federal only; null when the run is absent */
+   date its polls run to. /vic/ quotes the Victorian run (the page's Victorian view); any other
+   jurisdiction has none; null when the run is absent */
 const seatModel = (() => {
-  if (JUR) return null;
+  const file = JUR ? (JUR.id === "vic" ? "seat-model-vic-2026.json" : null) : "seat-model-2028-nowcast.json";
+  if (!file) return null;
   try {
-    const r = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "seat-model-2028-nowcast.json"), "utf8"));
+    const r = JSON.parse(fs.readFileSync(path.join(ROOT, "data", file), "utf8"));
     const n = r.national;
-    return { headline: n.headline || null, pollsTo: r.meta.window ? r.meta.window.to : null, draws: r.meta.draws,
+    return { headline: n.headline || null, pollsTo: r.meta.window ? r.meta.window.to : r.meta.pollsTo || null, draws: r.meta.draws,
       expectedSeats: n.expectedSeats, mostSeats: n.mostSeats, majority: n.majority };
   } catch (e) { console.warn("gen-data: the seat model's run is unreadable (" + e.message + ")"); return null; }
 })();

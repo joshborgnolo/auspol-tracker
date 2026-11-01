@@ -14,10 +14,9 @@
    the logit swing with the statewide totals given, noise drawn, scored by Brier and log score.
    Writes data/seat-model-backtest-states.json. */
 import { readFileSync, writeFileSync } from "node:fs";
-import { gunzipSync } from "node:zlib";
 import { rng, spreadShares, count, FLOW_CLASSES } from "./seat-engine.mjs";
-import { stateTable, tiltPair, moveFirst, mix, routing, subOfName, SUB_CLASS, FAM_OF_GROUP } from "./senate-flows.mjs";
-import { loadRankings } from "./senate-io.mjs";
+import { tiltPair, moveFirst, mix, routing, subOfName, SUB_CLASS, FAM_OF_GROUP } from "./senate-flows.mjs";
+import { stateDistrictTables } from "./state-tables.mjs";
 import { settings, switching, flowClassOf } from "./seat-inputs.mjs";
 
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
@@ -31,9 +30,7 @@ const ELECTIONS = [
 ];
 const ST = settings(J("data/seat-model-flow-calibration.json"));
 const COMP = switching(J("data/vote-switching.json"));
-const km = (a, b) => { const R = 6371, r = Math.PI / 180; const x = (b.lon - a.lon) * r * Math.cos((a.lat + b.lat) / 2 * r), y = (b.lat - a.lat) * r; return R * Math.sqrt(x * x + y * y); };
 const COH = ["ALP", "COAL", "GRN", "ON", "OTH-R", "OTH-M", "OTH-L"];
-const bucketOfCoh = { ALP: "alp", COAL: "lnp", GRN: "grn", ON: "onp" };
 const B = (g) => (g === "alp" ? "alp" : ["lp", "np", "lnp", "clp"].includes(g) ? "lnp" : g === "on" ? "onp" : g === "grn" ? "grn" : g.startsWith("member") ? "ind" : "oth");
 const W5 = { ALP: [100, 0.6, 0.8, 0.4], COAL: [0.215, 100, 0.1, 0.785], GRN: [0.8819, 0.1181, 100, 1e-6], ON: [0.255, 0.745, 0.02, 100], "OTH-R": [0.5455, 0.4545, 0.1, 1e-6], "OTH-M": [0.5455, 0.4545, 0.1, 1e-6], "OTH-L": [0.5455, 0.4545, 0.1, 1e-6] };
 const CENTRAL = { ALP: [100, 0.30, 0.40, 0.10], GRN: [0.62, 0.10, 100, 0.04], ON: [0.15, 0.50, 0.02, 100], "OTH-R": [0.25, 0.25, 0.10, 0.25], "OTH-M": [0.25, 0.25, 0.10, 0.25], "OTH-L": [0.25, 0.25, 0.10, 0.25] };
@@ -42,47 +39,8 @@ const GRADE_A = { "Inner Metropolitan": 0.75, "Outer Metropolitan": 0.70, "Provi
 const IOTA = { ALP: 0.73, COAL: 0.73, GRN: 0.49, ON: 0.28, "OTH-R": 0.23, "OTH-M": 0.23, "OTH-L": 0.23, _: 0.23 };
 
 function runElection(E) {
-  const SEN = loadRankings(E.sen), L = SEN.P.length;
-  const fed = J(`map/data/res-${E.sen}.json`), sd = J(`map/data/${E.res}.json`);
-  const BT = JSON.parse(gunzipSync(readFileSync(`.build/aec-flow-src/senate-ballots/booth-rankings-${E.sen}.json.gz`)).toString());
-  const vec = (sparse) => { const v = new Float64Array(L); for (const [k, n] of Object.entries(sparse || {})) v[+k] = n; return v; };
-  const FB = fed.booths, fb = [], fbAll = [];
-  for (let i = 0; i < FB.id.length; i++) {
-    const dv = fed.divs[FB.d[i]]; if (dv.st !== E.st || FB.lat[i] == null) continue;
-    const t = BT.booths[String(FB.id[i])];
-    const pt = { lat: FB.lat[i], lon: FB.lon[i], t, cls: dv.cls };
-    if (t) fb.push(pt);
-    if (FB.v[i]) { const tot = FB.v[i].reduce((a, b) => a + b, 0); if (tot >= 30) { const sh = {}; FB.v[i].forEach((x, j) => { const c = dv.c[j]; if (c) sh[c[3]] = (sh[c[3]] || 0) + x / tot; }); fbAll.push({ ...pt, sh }); } }
-  }
-  const SB = sd.booths;
-  const distT = sd.divs.map(() => Object.fromEntries(COH.map((k) => [k, new Float64Array(L)])));
-  const clsVotes = sd.divs.map(() => ({})), foot = sd.divs.map(() => ({ w: 0 }));
-  for (let i = 0; i < SB.id.length; i++) {
-    if (SB.lat[i] == null || !SB.v[i]) continue;
-    const b = { lat: SB.lat[i], lon: SB.lon[i] };
-    let best = null, bd = 1e9; for (const f of fb) { const d = km(b, f); if (d < bd) { bd = d; best = f; } }
-    let bestA = null, bdA = 1e9; for (const f of fbAll) { const d = km(b, f); if (d < bdA) { bdA = d; bestA = f; } }
-    const dv = sd.divs[SB.d[i]], v = SB.v[i], tot = v.reduce((a, x) => a + x, 0);
-    if (bestA && bdA <= 25) { clsVotes[SB.d[i]][bestA.cls] = (clsVotes[SB.d[i]][bestA.cls] || 0) + tot; const F = foot[SB.d[i]]; F.w += tot; for (const k of ["alp", "lnp", "grn", "onp"]) F[k] = (F[k] || 0) + tot * (bestA.sh[k] || 0); }
-    if (!best || bd > 25) continue;
-    const votesFor = (bk) => v.reduce((a, x, j) => a + (dv.c[j] && (bk === "oth" ? ["oth", "ind"].includes(dv.c[j][3]) : dv.c[j][3] === bk) ? x : 0), 0);
-    for (const k of COH) {
-      const src = best.t[k]; if (!src) continue;
-      const w = votesFor(bucketOfCoh[k] || "oth"); if (w <= 0) continue;
-      const s = vec(src), n = s.reduce((a, x) => a + x, 0); if (!n) continue;
-      const T = distT[SB.d[i]][k]; for (let p = 0; p < L; p++) T[p] += w * s[p] / n;
-    }
-  }
-  const stT = Object.fromEntries(COH.map((k) => [k, stateTable(SEN, E.st, k)]));
-  const finish = (T, k) => {
-    const n = T.reduce((a, x) => a + x, 0), q = new Float64Array(L);
-    for (let i = 0; i < L; i++) q[i] = n > 0 ? (T[i] / n) * (n / (n + 400)) + stT[k][i] * (400 / (n + 400)) : stT[k][i];
-    let out = q;
-    for (const [kk, d] of Object.entries(ST.delta)) { const [c, pair] = kk.split("|"); if (c !== k) continue; out = tiltPair(SEN, out, "ACGO".indexOf(pair[0]), "ACGO".indexOf(pair[1]), d); }
-    return out;
-  };
-  const tables = distT.map((o) => Object.fromEntries(COH.map((k) => [k, finish(o[k], k)])));
-  const distCls = clsVotes.map((o) => Object.entries(o).sort((a, b) => b[1] - a[1])[0]?.[0] || "Rural");
+  // the districts' Senate tables, federal seat types and footprint: shared with the Victorian model
+  const { SEN, L, sd, tables, distCls, foot } = stateDistrictTables({ sen: E.sen, st: E.st, res: E.res, ST });
   /* diagnostic: the same tables with each donor class's statewide level per final pair set to the state's
      own (modelled) count, so what is left is the Senate's seat-to-seat pattern - separates level drift
      between the two elections from the geography */

@@ -8,6 +8,7 @@
      app/app-3-seats.js seat by seat, with a card per seat
      app/app-4-explore.js  "Try your own numbers": the reader's settings, run in a worker
      app/app-5-evidence.js how it works, how well it has done, what it cannot know, the files
+     app/app-5b-vic.js  the Victorian view: loading it, the switch, its method notes
      app/app-6-boot.js  loading and wiring
      worker.mjs         the worker that runs the engine
      page.css           the page's own styles (the palette is inline in the page)
@@ -53,10 +54,12 @@ const URLS = {
   inputs: stamp("model/data/inputs.json"),
   evidence: stamp("model/data/evidence.json"),
   senate: stamp("data/senate-rankings-2025.json"),
+  vic: stamp("data/seat-model-vic-2026.json"),
+  inputsVic: stamp("model/data/inputs-vic.json"),
   worker: `/model/js/worker.mjs?v=${hash(worker + engine)}`,
 };
 const views = fs.readFileSync(path.join(HERE, "views.mjs"), "utf8").replace(/^export /gm, "");
-const parts = ["app-1-base.js", "app-2-dist.js", "app-3-seats.js", "app-4-explore.js", "app-5-evidence.js", "app-6-boot.js"].map((f) => fs.readFileSync(path.join(HERE, "app", f), "utf8")).join("\n");
+const parts = ["app-1-base.js", "app-2-dist.js", "app-3-seats.js", "app-4-explore.js", "app-5-evidence.js", "app-5b-vic.js", "app-6-boot.js"].map((f) => fs.readFileSync(path.join(HERE, "app", f), "utf8")).join("\n");
 const js = `/* the Election model – assembled from .build/model by .build/model/assemble.mjs; edit the parts, not this file */\n(() => {\n"use strict";\nconst URLS = ${JSON.stringify(URLS)};\n${views}\n${parts}\n})();\n`;
 const css = fs.readFileSync(path.join(HERE, "page.css"), "utf8");
 write("model/model.js", js);

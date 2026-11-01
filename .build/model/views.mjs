@@ -31,17 +31,28 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 export const longDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
 export const shortDate = (iso) => { const [, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[m - 1]}`; };
 
+/* the run's House: 150 seats and 76 for a majority federally; a state run says its own (meta.seatsTotal, meta.majority) */
+export const majOf = (res) => res.meta?.majority || 76;
+export const totalOf = (res) => res.meta?.seatsTotal || 150;
+
+/* mode: "nowcast" (an election held now), "forecast" (election day, months out) or "vic" (the Victorian
+   election, weeks out, on today's polls) - the last two speak of the election to come */
 export function headline(res, mode) {
   const nat = res.national;
   const cands = ["alp", "lnp", "on"].sort((a, b) => nat.mostSeats[b] - nat.mostSeats[a]);
   const L = cands[0], pMost = nat.mostSeats[L], pMaj = nat.majority[MAJ_KEY[L]];
-  const who = PARTY[L].name, now = mode !== "forecast";
+  const who = PARTY[L].name, now = mode === "nowcast" || mode == null;
   const clause = pMaj < 0.2 ? "probably short of a majority" : pMaj < 0.4 ? "more likely short of a majority than not" : "with a majority about as likely as not";
   if (pMaj >= 0.9) return now ? `${who} would win a majority` : `${who} is very likely to win a majority`;
   if (pMaj >= 0.6) return now ? `${who} would probably win a majority` : `${who} is likely to win a majority`;
   if (pMost >= 0.9) return now ? `${who} would win the most seats, ${clause}` : `${who} is very likely to win the most seats, ${clause}`;
   if (pMost >= 0.6) return now ? `${who} would probably win the most seats, ${clause}` : `${who} is favoured to win the most seats, ${clause}`;
-  return "No party is clearly ahead on seats";
+  // no clear leader: name a two-party race when the top two share nearly every simulation (each at least
+  // 30%, together 80%+), then say how likely a hung parliament is (60% / 90%; 40-60% "as likely as not")
+  const B = cands[1], pB = nat.mostSeats[B], noMaj = nat.majority.noMajority;
+  const race = pMost >= 0.3 && pB >= 0.3 && pMost + pB >= 0.8 ? `${who} and ${PARTY[B].lower} are close on seats` : "No party is clearly ahead on seats";
+  const hung = noMaj >= 0.9 ? ", and a hung parliament is very likely" : noMaj >= 0.6 ? ", and a hung parliament is likely" : noMaj >= 0.4 ? ", and a hung parliament is about as likely as not" : "";
+  return race + hung;
 }
 
 /* "In 20,000 simulated elections held on the polls to 27 October, Labor wins 71 seats on average (51 to 90
@@ -53,15 +64,19 @@ export function dek(res, mode, asOf) {
   const sims = res.meta.draws.toLocaleString("en-AU");
   const lead = mode === "forecast"
     ? `Projected to election day, ${sims} simulated elections from the polls to ${shortDate(asOf)} give ${PARTY[a].lower}`
-    : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
+    : mode === "vic"
+      ? `On the polls to ${shortDate(asOf)}, ${sims} simulated elections for ${shortDate(res.meta.election)} give ${PARTY[a].lower}`
+      : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
   const rest = (k) => `${PARTY[k].lower} ${Math.round(e[k])} (${d[k].p05} to ${d[k].p95})`;
   const pMaj = nat.majority[MAJ_KEY[a]];
   return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${rest(b)} and ${rest(c)}. `
-    + `${PARTY[a].name} reaches the 76 seats needed to govern alone in ${pct(pMaj)} of them.`;
+    + `${PARTY[a].name} reaches the ${majOf(res)} seats needed to govern alone in ${pct(pMaj)} of them.`;
 }
 
 /* the run's provenance line under the dek */
 export function headNote(res, mode, asOf) {
+  if (mode === "vic") return `Polls to <b>${longDate(asOf.pollsTo)}</b> (the /vic/ page's trend through ${asOf.polls} polls this term) · model run ${longDate(asOf.modelRun)} · `
+    + `${res.meta.draws.toLocaleString("en-AU")} simulated elections · election ${res.meta.electionLabel} · <a href="#vic-how">how it works</a>`;
   const n = asOf.waves ? asOf.waves.length : null;
   return `Polls to <b>${longDate(asOf.pollsTo)}</b>${n ? ` (${n} polls since ${shortDate(asOf.windowFrom)})` : ""} · model run ${longDate(asOf.modelRun)} · `
     + `${res.meta.draws.toLocaleString("en-AU")} simulated elections`
@@ -94,11 +109,12 @@ export function outcomesHTML(res) {
    average; `compare` (another run) leaves a grey tick at its median and a signed change beside the number */
 export const RANGE_PARTIES = ["alp", "on", "lnp", "member", "grn"];
 export function axisMaxFor(...runs) {
-  const top = Math.max(100, ...runs.filter(Boolean).flatMap((r) => RANGE_PARTIES.map((k) => r.national.seatDistribution[k].p95)));
+  const rs = runs.filter(Boolean);
+  const top = Math.max(Math.round(totalOf(rs[0]) * 2 / 3), ...rs.flatMap((r) => RANGE_PARTIES.map((k) => r.national.seatDistribution[k].p95)));
   return Math.ceil((top + 4) / 25) * 25;
 }
 export function rangesHTML(res, { compare = null, axisMax = axisMaxFor(res, compare), labels = true } = {}) {
-  const nat = res.national, X = (v) => `${(100 * v / axisMax).toFixed(2)}%`;
+  const nat = res.national, X = (v) => `${(100 * v / axisMax).toFixed(2)}%`, M = majOf(res);
   const order = RANGE_PARTIES.slice().sort((a, b) => nat.expectedSeats[b] - nat.expectedSeats[a]);
   const rows = order.map((k, i) => {
     const d = nat.seatDistribution[k], e = nat.expectedSeats[k];
@@ -111,7 +127,7 @@ export function rangesHTML(res, { compare = null, axisMax = axisMaxFor(res, comp
     const ghost = compare ? `<span class="ghost" style="left:${X(compare.national.seatDistribution[k].p50)}"></span>` : "";
     return `<div class="md-rrow t-${k}">
       <div class="md-rname"><span class="dot"></span>${esc(PARTY[k].name)}${labels && sub ? ` <small>${sub}</small>` : ""}</div>
-      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:${X(76)}"></span>${i === 0 ? `<span class="md-maj-lab" style="left:${X(76)}">76 for a majority</span>` : ""}<span class="b90" style="left:${X(d.p05)};width:${X(Math.max(0.6, d.p95 - d.p05))}"></span><span class="b50" style="left:${X(d.p25)};width:${X(Math.max(0.6, d.p75 - d.p25))}"></span>${ghost}<span class="med" style="left:${X(d.p50)}"></span></div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:${X(M)}"></span>${i === 0 ? `<span class="md-maj-lab" style="left:${X(M)}">${M} for a majority</span>` : ""}<span class="b90" style="left:${X(d.p05)};width:${X(Math.max(0.6, d.p95 - d.p05))}"></span><span class="b50" style="left:${X(d.p25)};width:${X(Math.max(0.6, d.p75 - d.p25))}"></span>${ghost}<span class="med" style="left:${X(d.p50)}"></span></div>
       <div class="md-rnum">${Math.round(e)}${delta}<small>${d.p05}–${d.p95}</small></div>
     </div>`;
   }).join("");

@@ -18,7 +18,10 @@
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     const next = STATE.mode === "nowcast" ? "forecast" : "nowcast"; setMode(next); $(`#mode-${next}`).focus();
   });
-  if (EX.applyHash(q)) $("#explore").scrollIntoView({ block: "start" }); else EX.init();
+  $(".md-jur").addEventListener("click", (e) => { const b = e.target.closest("[data-jur]"); if (b) setJur(b.dataset.jur); });
+  document.addEventListener("click", (e) => { const a = e.target.closest("[data-jur-go]"); if (!a) return; e.preventDefault(); setJur(a.dataset.jurGo).then(() => $(a.getAttribute("href")).scrollIntoView({ block: "start" })); });
+  if (q.j === "vic") await setJur("vic");
+  if (EX.applyHash(q)) $("#explore").scrollIntoView({ block: "start" }); else if (STATE.jur !== "vic") EX.init();
   let lastW = innerWidth;
   addEventListener("resize", debounce(() => { if (Math.abs(innerWidth - lastW) < 8) return; lastW = innerWidth; renderDist(); const n = $("#fig-noise"), c = $("#fig-cal"); if (n && c) { renderEvidence(); } }, 150));
   window.__model = { STATE, EX };

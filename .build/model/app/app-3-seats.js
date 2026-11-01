@@ -5,7 +5,7 @@ const SEATS = { filter: "close", st: null, q: "", sort: null, shown: 20, open: n
 const FILTERS = [["close", "Closest"], ["flip", "Changing hands"], ["all", "All seats"]];
 function seatList() {
   let L = seatsJoined();
-  if (SEATS.st) L = L.filter((s) => s.state === SEATS.st);
+  if (SEATS.st && STATE.jur !== "vic") L = L.filter((s) => s.state === SEATS.st);
   const q = SEATS.q.trim().toLowerCase();
   if (q) L = L.filter((s) => s.name.toLowerCase().includes(q) || (s.seat.held.member || "").toLowerCase().includes(q));
   if (SEATS.filter === "flip") L = L.filter((s) => s.lead.b !== s.heldB);
@@ -41,15 +41,16 @@ function renderSeats() {
     $("#seat-more").addEventListener("click", (e) => { if (e.target.closest("[data-more]")) { SEATS.shown = 1e9; renderSeats(); } });
   }
   const L = seatList(), shown = L.slice(0, SEATS.shown), r = run();
-  const flips = seatsJoined().filter((s) => s.lead.b !== s.heldB).length, toss = seatsJoined().filter((s) => s.lead.p < 0.6).length;
-  $("#seats-meta").textContent = `${toss} seats where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that won in 2025`;
+  const flips = seatsJoined().filter((s) => s.lead.b !== s.heldB).length, toss = seatsJoined().filter((s) => s.lead.p < 0.6).length, vic = STATE.jur === "vic";
+  $("#seat-states").hidden = vic;
+  $("#seats-meta").textContent = `${toss} ${vic ? "districts" : "seats"} where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that ${vic ? "holds it now" : "won in 2025"}`;
   const sortBtn = (k, label) => { const cur = SEATS.sort; const on = cur && cur.k === k; return `<button type="button" data-sort="${k}"${on ? ` aria-sort="${cur.dir > 0 ? "ascending" : "descending"}"` : ""}>${label}</button>`; };
-  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">Won in 2025</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
+  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">${vic ? "Held now" : "Won in 2025"}</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
   const rows = shown.map((s) => {
     const open = SEATS.open.has(s.name), h = s.seat.held;
     const flip = s.lead.b !== s.heldB ? `<span class="flip">from ${esc(PARTY[s.heldB].short)}</span>` : "";
     const tr = `<tr class="row" tabindex="0" data-seat="${esc(s.name)}" aria-expanded="${open}">
-      <td><span class="nm">${esc(s.name)}</span><span class="st">${s.state}</span></td>
+      <td><span class="nm">${esc(s.name)}</span>${STATE.jur === "vic" ? "" : `<span class="st">${s.state}</span>`}</td>
       <td class="c-held"><span class="held t-${s.heldB}"><span class="dot"></span>${esc(GROUP_NAME[h.group] || (s.heldB === "member" ? "Independent" : h.party))}</span></td>
       <td><div class="md-chance">${pbarHTML(s)}<span class="lead">${esc(PARTY[s.lead.b].name)} <small>${pctShort(s.lead.p)}</small></span>${flip}</div></td>
       <td class="c-ct"><span class="ct">${s.topPair ? esc(pairName(s.topPair.key, s.seat)) + ` <small>${pctShort(s.topPair.p)}</small>` : ""}</span></td>
@@ -74,11 +75,14 @@ function seatCard(s) {
     ["Coalition voters putting Labor ahead of One Nation", f.coalLaborOverOn], ["Labor voters putting the Coalition ahead of One Nation", f.laborCoalitionOverOn],
     ["One Nation voters putting Labor ahead of the Coalition", f.onLaborOverCoalition], ["Greens voters putting Labor ahead of the Coalition", f.greensLaborOverCoalition],
   ].filter(([, v]) => v != null).map(([l, v]) => `<span>${l}</span><b>${Math.round(100 * v)}%</b>`).join("");
-  const t = k.tcp2025, tot = t ? t[0].votes + t[1].votes : 0;
+  const t = k.tcp2025 || k.tcp2022, tot = t ? t[0].votes + t[1].votes : 0, Y = BASE().year, vic = STATE.jur === "vic";
   const res25 = t ? `${esc(t[0].name)} (${esc(t[0].party)}) ${(100 * t[0].votes / tot).toFixed(1)}, ${esc(t[1].name)} (${esc(t[1].party)}) ${(100 * t[1].votes / tot).toFixed(1)}` : "";
+  const added = k.cands.some((c) => c.added);
+  // a Victorian district whose holder changed since 2022 (a by-election, a defection) says so: the base is the 2022 count
+  const changed = vic && k.won2022 && BUCKET(k.won2022.group) !== BUCKET(k.held.group) ? ` Won by ${esc(k.won2022.name)} (${esc(k.won2022.party)}) in 2022; held now by ${esc(k.held.member)} (${k.held.party === "L/N" ? "Liberal" : k.held.party === "IND" ? "independent" : esc(k.held.party)}). The model starts from the 2022 count.` : "";
   return `<div class="md-card">
-    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: 2025. Thick bar and figure: the simulations' average${STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
+    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: ${Y}${added ? " (One Nation, which did not stand here in 2022: its federal 2025 vote at the nearest polling places)" : ""}. Thick bar and figure: the simulations' average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
     <div><h4>How often each wins</h4><div class="md-kv">${wins}</div><h4 style="margin-top:14px">The contest it comes down to</h4><div class="md-kv">${pairs}</div></div>
-    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">From this seat's 2025 Senate ballots, adjusted to how House voters differ and mixed for today's voters. The 2025 count: ${res25}.</p></div>
+    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district's own" : "From this seat's 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house" : "House"} voters differ and mixed for today's voters. The ${Y} count: ${res25}.${changed}</p></div>
   </div>`;
 }

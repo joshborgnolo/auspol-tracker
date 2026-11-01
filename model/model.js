@@ -1,7 +1,7 @@
 /* the Election model – assembled from .build/model by .build/model/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
-const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=14ebd330","forecast":"/data/seat-model-2028-forecast.json?v=3ca20f0a","inputs":"/model/data/inputs.json?v=58d5a3e2","evidence":"/model/data/evidence.json?v=3fcf9692","senate":"/data/senate-rankings-2025.json?v=edeb9db9","worker":"/model/js/worker.mjs?v=eff3432f"};
+const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=450c96d0","forecast":"/data/seat-model-2028-forecast.json?v=236a8cbf","inputs":"/model/data/inputs.json?v=58d5a3e2","evidence":"/model/data/evidence.json?v=3fcf9692","senate":"/data/senate-rankings-2025.json?v=edeb9db9","vic":"/data/seat-model-vic-2026.json?v=75f5ac38","inputsVic":"/model/data/inputs-vic.json?v=f76a32af","worker":"/model/js/worker.mjs?v=ecd8c0e4"};
 /* views.mjs: the /model/ page's written lines and head figures, by rule - one implementation.
    assemble.mjs imports it to write the page's static head (what a reader sees before the script runs,
    and what a crawler reads) and inlines the same source into model.js, which redraws the head with it
@@ -35,17 +35,28 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const longDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
 const shortDate = (iso) => { const [, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[m - 1]}`; };
 
+/* the run's House: 150 seats and 76 for a majority federally; a state run says its own (meta.seatsTotal, meta.majority) */
+const majOf = (res) => res.meta?.majority || 76;
+const totalOf = (res) => res.meta?.seatsTotal || 150;
+
+/* mode: "nowcast" (an election held now), "forecast" (election day, months out) or "vic" (the Victorian
+   election, weeks out, on today's polls) - the last two speak of the election to come */
 function headline(res, mode) {
   const nat = res.national;
   const cands = ["alp", "lnp", "on"].sort((a, b) => nat.mostSeats[b] - nat.mostSeats[a]);
   const L = cands[0], pMost = nat.mostSeats[L], pMaj = nat.majority[MAJ_KEY[L]];
-  const who = PARTY[L].name, now = mode !== "forecast";
+  const who = PARTY[L].name, now = mode === "nowcast" || mode == null;
   const clause = pMaj < 0.2 ? "probably short of a majority" : pMaj < 0.4 ? "more likely short of a majority than not" : "with a majority about as likely as not";
   if (pMaj >= 0.9) return now ? `${who} would win a majority` : `${who} is very likely to win a majority`;
   if (pMaj >= 0.6) return now ? `${who} would probably win a majority` : `${who} is likely to win a majority`;
   if (pMost >= 0.9) return now ? `${who} would win the most seats, ${clause}` : `${who} is very likely to win the most seats, ${clause}`;
   if (pMost >= 0.6) return now ? `${who} would probably win the most seats, ${clause}` : `${who} is favoured to win the most seats, ${clause}`;
-  return "No party is clearly ahead on seats";
+  // no clear leader: name a two-party race when the top two share nearly every simulation (each at least
+  // 30%, together 80%+), then say how likely a hung parliament is (60% / 90%; 40-60% "as likely as not")
+  const B = cands[1], pB = nat.mostSeats[B], noMaj = nat.majority.noMajority;
+  const race = pMost >= 0.3 && pB >= 0.3 && pMost + pB >= 0.8 ? `${who} and ${PARTY[B].lower} are close on seats` : "No party is clearly ahead on seats";
+  const hung = noMaj >= 0.9 ? ", and a hung parliament is very likely" : noMaj >= 0.6 ? ", and a hung parliament is likely" : noMaj >= 0.4 ? ", and a hung parliament is about as likely as not" : "";
+  return race + hung;
 }
 
 /* "In 20,000 simulated elections held on the polls to 27 October, Labor wins 71 seats on average (51 to 90
@@ -57,15 +68,19 @@ function dek(res, mode, asOf) {
   const sims = res.meta.draws.toLocaleString("en-AU");
   const lead = mode === "forecast"
     ? `Projected to election day, ${sims} simulated elections from the polls to ${shortDate(asOf)} give ${PARTY[a].lower}`
-    : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
+    : mode === "vic"
+      ? `On the polls to ${shortDate(asOf)}, ${sims} simulated elections for ${shortDate(res.meta.election)} give ${PARTY[a].lower}`
+      : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
   const rest = (k) => `${PARTY[k].lower} ${Math.round(e[k])} (${d[k].p05} to ${d[k].p95})`;
   const pMaj = nat.majority[MAJ_KEY[a]];
   return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${rest(b)} and ${rest(c)}. `
-    + `${PARTY[a].name} reaches the 76 seats needed to govern alone in ${pct(pMaj)} of them.`;
+    + `${PARTY[a].name} reaches the ${majOf(res)} seats needed to govern alone in ${pct(pMaj)} of them.`;
 }
 
 /* the run's provenance line under the dek */
 function headNote(res, mode, asOf) {
+  if (mode === "vic") return `Polls to <b>${longDate(asOf.pollsTo)}</b> (the /vic/ page's trend through ${asOf.polls} polls this term) · model run ${longDate(asOf.modelRun)} · `
+    + `${res.meta.draws.toLocaleString("en-AU")} simulated elections · election ${res.meta.electionLabel} · <a href="#vic-how">how it works</a>`;
   const n = asOf.waves ? asOf.waves.length : null;
   return `Polls to <b>${longDate(asOf.pollsTo)}</b>${n ? ` (${n} polls since ${shortDate(asOf.windowFrom)})` : ""} · model run ${longDate(asOf.modelRun)} · `
     + `${res.meta.draws.toLocaleString("en-AU")} simulated elections`
@@ -98,11 +113,12 @@ function outcomesHTML(res) {
    average; `compare` (another run) leaves a grey tick at its median and a signed change beside the number */
 const RANGE_PARTIES = ["alp", "on", "lnp", "member", "grn"];
 function axisMaxFor(...runs) {
-  const top = Math.max(100, ...runs.filter(Boolean).flatMap((r) => RANGE_PARTIES.map((k) => r.national.seatDistribution[k].p95)));
+  const rs = runs.filter(Boolean);
+  const top = Math.max(Math.round(totalOf(rs[0]) * 2 / 3), ...rs.flatMap((r) => RANGE_PARTIES.map((k) => r.national.seatDistribution[k].p95)));
   return Math.ceil((top + 4) / 25) * 25;
 }
 function rangesHTML(res, { compare = null, axisMax = axisMaxFor(res, compare), labels = true } = {}) {
-  const nat = res.national, X = (v) => `${(100 * v / axisMax).toFixed(2)}%`;
+  const nat = res.national, X = (v) => `${(100 * v / axisMax).toFixed(2)}%`, M = majOf(res);
   const order = RANGE_PARTIES.slice().sort((a, b) => nat.expectedSeats[b] - nat.expectedSeats[a]);
   const rows = order.map((k, i) => {
     const d = nat.seatDistribution[k], e = nat.expectedSeats[k];
@@ -115,7 +131,7 @@ function rangesHTML(res, { compare = null, axisMax = axisMaxFor(res, compare), l
     const ghost = compare ? `<span class="ghost" style="left:${X(compare.national.seatDistribution[k].p50)}"></span>` : "";
     return `<div class="md-rrow t-${k}">
       <div class="md-rname"><span class="dot"></span>${esc(PARTY[k].name)}${labels && sub ? ` <small>${sub}</small>` : ""}</div>
-      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:${X(76)}"></span>${i === 0 ? `<span class="md-maj-lab" style="left:${X(76)}">76 for a majority</span>` : ""}<span class="b90" style="left:${X(d.p05)};width:${X(Math.max(0.6, d.p95 - d.p05))}"></span><span class="b50" style="left:${X(d.p25)};width:${X(Math.max(0.6, d.p75 - d.p25))}"></span>${ghost}<span class="med" style="left:${X(d.p50)}"></span></div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:${X(M)}"></span>${i === 0 ? `<span class="md-maj-lab" style="left:${X(M)}">${M} for a majority</span>` : ""}<span class="b90" style="left:${X(d.p05)};width:${X(Math.max(0.6, d.p95 - d.p05))}"></span><span class="b50" style="left:${X(d.p25)};width:${X(Math.max(0.6, d.p75 - d.p25))}"></span>${ghost}<span class="med" style="left:${X(d.p50)}"></span></div>
       <div class="md-rnum">${Math.round(e)}${delta}<small>${d.p05}–${d.p95}</small></div>
     </div>`;
   }).join("");
@@ -162,12 +178,18 @@ const getJSON = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u + " "
 const svg = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (parent) parent.appendChild(e); return e; };
 const debounce = (f, ms) => { let t = 0; return (...a) => { clearTimeout(t); t = setTimeout(() => f(...a), ms); }; };
 
-const STATE = { mode: "nowcast", res: {}, inputs: null, evidence: null, bySeat: null };
-const run = () => STATE.res[STATE.mode];
+const STATE = { jur: "fed", mode: "nowcast", res: {}, inputs: null, vicInputs: null, evidence: null, bySeat: null };
+/* the election on show: the federal run in its mode, or the Victorian run (one mode: the election weeks
+   away, on today's polls); INP() its inputs, VMODE() the mode the copy rules speak in, BASE() its base
+   election and House */
+const run = () => (STATE.jur === "vic" ? STATE.res.vic : STATE.res[STATE.mode]);
+const INP = () => (STATE.jur === "vic" ? STATE.vicInputs : STATE.inputs);
+const VMODE = () => (STATE.jur === "vic" ? "vic" : STATE.mode);
+const BASE = () => (STATE.jur === "vic" ? { year: 2022, chamber: "Assembly", seat: "district" } : { year: 2025, chamber: "House", seat: "seat" });
 
 /* join each seat's run results with its skeleton (2025 field, flows, holder) */
 function seatsJoined() {
-  const r = run(), inp = new Map(STATE.inputs.seats.map((s) => [s.name, s]));
+  const r = run(), inp = new Map(INP().seats.map((s) => [s.name, s]));
   return r.seats.map((s) => {
     const k = inp.get(s.name);
     const byB = {}; for (const [g, p] of Object.entries(s.win)) byB[BUCKET(g)] = (byB[BUCKET(g)] || 0) + p;
@@ -179,13 +201,17 @@ function seatsJoined() {
 }
 
 function renderHead() {
-  const r = run(), m = STATE.mode, a = STATE.inputs.asOf;
+  const r = run(), m = VMODE(), a = INP().asOf;
   $("#md-hed").textContent = headline(r, m);
   $("#md-dek").textContent = dek(r, m, a.pollsTo);
   $("#md-note").innerHTML = headNote(r, m, a);
   $("#md-outcomes").innerHTML = outcomesHTML(r);
   $("#md-ranges").innerHTML = rangesHTML(r);
-  $("#md-meta").textContent = m === "forecast" ? "The 2028 House on election day, about 17 months away" : "The 2028 House if an election were held now";
+  const days = m === "vic" ? Math.round((Date.parse(a.election) - Date.parse(new Date().toISOString().slice(0, 10))) / 864e5) : 0;
+  $("#md-meta").textContent = m === "vic" ? `Victoria's Legislative Assembly, 88 seats${days > 1 ? `, ${days} days before the election` : days === 1 ? ", the day before the election" : days === 0 ? ", on election day" : ", as the model stood before the election"}`
+    : m === "forecast" ? "The 2028 House on election day, about 17 months away" : "The 2028 House if an election were held now";
+  $(".md-modes").hidden = m === "vic";
+  for (const b of $$(".md-jur [data-jur]")) b.setAttribute("aria-pressed", String(b.dataset.jur === STATE.jur));
 }
 
 function setMode(mode, { scroll = false } = {}) {
@@ -198,14 +224,15 @@ function setMode(mode, { scroll = false } = {}) {
 }
 
 /* app-2-dist.js: how many seats each party wins across the simulations - the run's histograms, lightly
-   smoothed for the eye (the tooltip reads the raw counts), the majority line at 76, a reading of every
+   smoothed for the eye (the tooltip reads the raw counts), the majority line (76; Victoria 45), a reading of every
    seat count under the pointer. The Greens and independents sit at small counts and in the head's
    ranges instead, so the three parties that can lead are drawn here. */
 const DIST_PARTIES = ["alp", "on", "lnp"];
 function renderDist() {
   const host = $("#dist"), r = run(), H = r.national.histogram, draws = r.meta.draws;
   $("#dist-meta").textContent = `Share of the ${draws.toLocaleString("en-AU")} simulated elections in which each party wins each number of seats`;
-  let top = 100;
+  const M = majOf(r), TOT = totalOf(r);
+  let top = Math.round(TOT * 2 / 3);
   for (const k of DIST_PARTIES) for (let x = H[k].length - 1; x >= 0; x--) if (H[k][x] / draws >= 0.0005) { top = Math.max(top, x); break; }
   const xmax = Math.ceil((top + 3) / 10) * 10;
   const ser = DIST_PARTIES.map((k) => {
@@ -224,9 +251,10 @@ function renderDist() {
   const step = ymax > 0.06 ? 0.02 : ymax > 0.03 ? 0.01 : 0.005;
   for (let y = 0; y <= ymax; y += step) { svg("line", { x1: m.l, x2: W - m.r, y1: Y(y), y2: Y(y) }, g); const t = svg("text", { x: m.l - 6, y: Y(y) + 4, "text-anchor": "end", class: "lab" }, s); t.textContent = `${Math.round(y * 1000) / 10}%`; }
   const ax = svg("g", { class: "axis" }, s);
-  for (let x = 0; x <= xmax; x += 25) { const t = svg("text", { x: X(x), y: Hh - 6, "text-anchor": "middle" }, ax); t.textContent = x; }
-  svg("line", { x1: X(76), x2: X(76), y1: m.t - 8, y2: Hh - m.b, class: "maj" }, s);
-  const ml = svg("text", { x: X(76) + 5, y: m.t - 10, class: "lab" }, s); ml.textContent = "76 for a majority";
+  for (let x = 0; x <= xmax; x += xmax > 100 ? 25 : 10) { const t = svg("text", { x: X(x), y: Hh - 6, "text-anchor": "middle" }, ax); t.textContent = x; }
+  svg("line", { x1: X(M), x2: X(M), y1: m.t - 8, y2: Hh - m.b, class: "maj" }, s);
+  const ml = svg("text", { x: X(M) + 5, y: m.t - 10, class: "lab" }, s); ml.textContent = `${M} for a majority`;
+  const labs = [];
   for (const q of ser) {
     const pts = q.sm.map((y, x) => `${X(x).toFixed(1)},${Y(y).toFixed(1)}`);
     const gp = svg("g", { class: `t-${q.k}` }, s);
@@ -234,6 +262,18 @@ function renderDist() {
     svg("path", { class: "ln", d: `M${pts.join("L")}` }, gp);
     const peak = q.sm.indexOf(Math.max(...q.sm));
     const lab = svg("text", { x: X(peak), y: Y(q.sm[peak]) - 7, "text-anchor": "middle", class: "plab" }, gp); lab.textContent = PARTY[q.k].name;
+    labs.push({ lab, x: X(peak), y: Y(q.sm[peak]) - 7, w: lab.getComputedTextLength ? lab.getComputedTextLength() : 7 * PARTY[q.k].name.length });
+  }
+  // peaks that sit together (Victoria: Labor and the Coalition) would print one name over the other: the
+  // left one ends at its peak, the right one starts there, and a pair still touching steps up a line
+  labs.sort((a, b) => a.x - b.x);
+  for (let i = 1; i < labs.length; i++) {
+    const A = labs[i - 1], B = labs[i];
+    if (Math.abs(A.y - B.y) < 14 && Math.abs(A.x - B.x) < (A.w + B.w) / 2 + 6) {
+      A.lab.setAttribute("text-anchor", "end"); A.lab.setAttribute("x", A.x - 3);
+      B.lab.setAttribute("text-anchor", "start"); B.lab.setAttribute("x", B.x + 3);
+      if (Math.abs(A.x - B.x) < 6) { const up = Math.min(A.y, B.y) - 14; (A.y <= B.y ? B : A).lab.setAttribute("y", Math.max(12, up)); }
+    }
   }
   const guide = svg("line", { class: "guide", y1: m.t, y2: Hh - m.b, visibility: "hidden" }, s);
   const tip = document.createElement("div"); tip.className = "md-tip"; tip.hidden = true; host.appendChild(tip);
@@ -261,7 +301,7 @@ const SEATS = { filter: "close", st: null, q: "", sort: null, shown: 20, open: n
 const FILTERS = [["close", "Closest"], ["flip", "Changing hands"], ["all", "All seats"]];
 function seatList() {
   let L = seatsJoined();
-  if (SEATS.st) L = L.filter((s) => s.state === SEATS.st);
+  if (SEATS.st && STATE.jur !== "vic") L = L.filter((s) => s.state === SEATS.st);
   const q = SEATS.q.trim().toLowerCase();
   if (q) L = L.filter((s) => s.name.toLowerCase().includes(q) || (s.seat.held.member || "").toLowerCase().includes(q));
   if (SEATS.filter === "flip") L = L.filter((s) => s.lead.b !== s.heldB);
@@ -297,15 +337,16 @@ function renderSeats() {
     $("#seat-more").addEventListener("click", (e) => { if (e.target.closest("[data-more]")) { SEATS.shown = 1e9; renderSeats(); } });
   }
   const L = seatList(), shown = L.slice(0, SEATS.shown), r = run();
-  const flips = seatsJoined().filter((s) => s.lead.b !== s.heldB).length, toss = seatsJoined().filter((s) => s.lead.p < 0.6).length;
-  $("#seats-meta").textContent = `${toss} seats where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that won in 2025`;
+  const flips = seatsJoined().filter((s) => s.lead.b !== s.heldB).length, toss = seatsJoined().filter((s) => s.lead.p < 0.6).length, vic = STATE.jur === "vic";
+  $("#seat-states").hidden = vic;
+  $("#seats-meta").textContent = `${toss} ${vic ? "districts" : "seats"} where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that ${vic ? "holds it now" : "won in 2025"}`;
   const sortBtn = (k, label) => { const cur = SEATS.sort; const on = cur && cur.k === k; return `<button type="button" data-sort="${k}"${on ? ` aria-sort="${cur.dir > 0 ? "ascending" : "descending"}"` : ""}>${label}</button>`; };
-  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">Won in 2025</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
+  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">${vic ? "Held now" : "Won in 2025"}</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
   const rows = shown.map((s) => {
     const open = SEATS.open.has(s.name), h = s.seat.held;
     const flip = s.lead.b !== s.heldB ? `<span class="flip">from ${esc(PARTY[s.heldB].short)}</span>` : "";
     const tr = `<tr class="row" tabindex="0" data-seat="${esc(s.name)}" aria-expanded="${open}">
-      <td><span class="nm">${esc(s.name)}</span><span class="st">${s.state}</span></td>
+      <td><span class="nm">${esc(s.name)}</span>${STATE.jur === "vic" ? "" : `<span class="st">${s.state}</span>`}</td>
       <td class="c-held"><span class="held t-${s.heldB}"><span class="dot"></span>${esc(GROUP_NAME[h.group] || (s.heldB === "member" ? "Independent" : h.party))}</span></td>
       <td><div class="md-chance">${pbarHTML(s)}<span class="lead">${esc(PARTY[s.lead.b].name)} <small>${pctShort(s.lead.p)}</small></span>${flip}</div></td>
       <td class="c-ct"><span class="ct">${s.topPair ? esc(pairName(s.topPair.key, s.seat)) + ` <small>${pctShort(s.topPair.p)}</small>` : ""}</span></td>
@@ -330,12 +371,15 @@ function seatCard(s) {
     ["Coalition voters putting Labor ahead of One Nation", f.coalLaborOverOn], ["Labor voters putting the Coalition ahead of One Nation", f.laborCoalitionOverOn],
     ["One Nation voters putting Labor ahead of the Coalition", f.onLaborOverCoalition], ["Greens voters putting Labor ahead of the Coalition", f.greensLaborOverCoalition],
   ].filter(([, v]) => v != null).map(([l, v]) => `<span>${l}</span><b>${Math.round(100 * v)}%</b>`).join("");
-  const t = k.tcp2025, tot = t ? t[0].votes + t[1].votes : 0;
+  const t = k.tcp2025 || k.tcp2022, tot = t ? t[0].votes + t[1].votes : 0, Y = BASE().year, vic = STATE.jur === "vic";
   const res25 = t ? `${esc(t[0].name)} (${esc(t[0].party)}) ${(100 * t[0].votes / tot).toFixed(1)}, ${esc(t[1].name)} (${esc(t[1].party)}) ${(100 * t[1].votes / tot).toFixed(1)}` : "";
+  const added = k.cands.some((c) => c.added);
+  // a Victorian district whose holder changed since 2022 (a by-election, a defection) says so: the base is the 2022 count
+  const changed = vic && k.won2022 && BUCKET(k.won2022.group) !== BUCKET(k.held.group) ? ` Won by ${esc(k.won2022.name)} (${esc(k.won2022.party)}) in 2022; held now by ${esc(k.held.member)} (${k.held.party === "L/N" ? "Liberal" : k.held.party === "IND" ? "independent" : esc(k.held.party)}). The model starts from the 2022 count.` : "";
   return `<div class="md-card">
-    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: 2025. Thick bar and figure: the simulations' average${STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
+    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: ${Y}${added ? " (One Nation, which did not stand here in 2022: its federal 2025 vote at the nearest polling places)" : ""}. Thick bar and figure: the simulations' average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
     <div><h4>How often each wins</h4><div class="md-kv">${wins}</div><h4 style="margin-top:14px">The contest it comes down to</h4><div class="md-kv">${pairs}</div></div>
-    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">From this seat's 2025 Senate ballots, adjusted to how House voters differ and mixed for today's voters. The 2025 count: ${res25}.</p></div>
+    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district's own" : "From this seat's 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house" : "House"} voters differ and mixed for today's voters. The ${Y} count: ${res25}.${changed}</p></div>
   </div>`;
 }
 
@@ -357,7 +401,7 @@ const EX = (() => {
   let built = false;
   const lid = (k) => k.replace("|", "-"); // element ids: "|" is not valid in a selector
   // the aggregate's own printed figures (they need not sum to exactly 100; the engine renormalises)
-  const defaults = () => { const n = STATE.inputs.vote.nowcast; st.vote = P5.map((k) => n[k]); };
+  const defaults = () => { const n = INP().vote.nowcast; st.vote = P5.map((k) => n[k]); };
   const fill = (inp) => { const a = +inp.min, b = +inp.max; inp.style.setProperty("--fill", `${(100 * (+inp.value - a) / (b - a)).toFixed(1)}%`); };
   const levDelta = (k) => { const L = W.levels && W.levels[k]; const pts = st.lev[k] || 0; if (L == null || !pts) return 0; return logit(clamp(L + pts / 100, 0.01, 0.99)) - logit(L); };
   const status = (t) => { const e = $("#ex-status"); if (e) e.textContent = t; };
@@ -368,7 +412,7 @@ const EX = (() => {
     defaults();
     const host = $("#ex");
     host.innerHTML = `<div class="md-ctl">
-      <div class="md-grp" id="ex-vote"><h3>The national vote <button type="button" data-reset="vote">Back to the polls</button></h3></div>
+      <div class="md-grp" id="ex-vote"><h3>The ${STATE.jur === "vic" ? "statewide" : "national"} vote <button type="button" data-reset="vote">Back to the polls</button></h3></div>
       <div class="md-grp" id="ex-lev"><h3>How voters order their preferences <button type="button" data-reset="lev">Back to the model</button></h3>
         <div class="md-preset"><button type="button" class="md-btn" data-preset="card">Coalition card puts Labor above One Nation</button></div></div>
       <div class="md-grp" id="ex-unc"><h3>How unsure the model is <button type="button" data-reset="unc">Back to the model</button></h3>
@@ -386,7 +430,7 @@ const EX = (() => {
     </div>`;
     const vote = $("#ex-vote");
     P5.forEach((k, i) => vote.insertAdjacentHTML("beforeend", `<div class="md-sl t-${P5_TONE[k]}"><label for="v-${k}"><span class="dot"></span>${P5_NAME[k]}</label><output id="vo-${k}"></output><input type="range" id="v-${k}" min="0" max="50" step="0.1" data-v="${i}"></div>`));
-    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls' figures are this site's aggregate to ${shortDate(STATE.inputs.asOf.pollsTo)}.</p>`);
+    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls' figures are ${STATE.jur === "vic" ? "the /vic/ page's polling average" : "this site's aggregate"} to ${shortDate(INP().asOf.pollsTo)}.</p>`);
     const lev = $("#ex-lev");
     for (const [k, l, unit] of LEV) lev.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="l-${lid(k)}">${l}</label><output id="lo-${lid(k)}"></output><input type="range" id="l-${lid(k)}" min="-30" max="40" step="1" value="0" data-l="${k}" data-unit="${unit}"></div>`);
     lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group's choice in every seat by the same amount (on the logit scale), keeping each seat's own leaning. The card button assumes about a third of Coalition voters follow their party's how-to-vote card; switching the card's order moves them, about 35 points.</p>`);
@@ -408,7 +452,7 @@ const EX = (() => {
     }
     for (const k of ["pol", "seat", "flow"]) { const inp = $(`#u-${k}`); inp.value = st[k]; inp.disabled = !st.unc; fill(inp); $(`#uo-${k}`).textContent = `× ${st[k]}`; }
     $("#ex-unc-on").checked = st.unc;
-    $("#ex-fade").hidden = STATE.mode !== "forecast";
+    $("#ex-fade").hidden = VMODE() !== "forecast";
     const fd = $("#ex-fade-draw"), fv = $("#ex-fade-v");
     fd.checked = st.fade == null; fv.disabled = st.fade == null; if (st.fade != null) fv.value = st.fade; fill(fv);
     $("#ex-fade-o").textContent = st.fade == null ? "0–60%" : `${st.fade}%`;
@@ -437,15 +481,15 @@ const EX = (() => {
     if (p && p.dataset.preset === "card") { const L = W.levels && W.levels["COAL|AO"]; st.lev["COAL|AO"] = L == null ? 35 : Math.min(35, Math.round(95 - 100 * L)); st.touched = true; syncControls(); schedule(); }
     if (e.target.closest("[data-copy]")) { navigator.clipboard && navigator.clipboard.writeText(location.href); e.target.textContent = "Link copied"; }
   }
-  const voteIsPolls = () => { const n = STATE.inputs.vote.nowcast; return st.vote.every((x, i) => Math.abs(x - n[P5[i]]) < 0.051); };
+  const voteIsPolls = () => { const n = INP().vote.nowcast; return st.vote.every((x, i) => Math.abs(x - n[P5[i]]) < 0.051); };
   const isOfficial = () => voteIsPolls() && !Object.values(st.lev).some((v) => v) && st.unc && st.pol === 1 && st.seat === 1 && st.flow === 1 && st.fade == null;
   const schedule = debounce(() => { writeHash(); runJob(); }, 220);
   function job() {
     const tot = st.vote.reduce((a, b) => a + b, 0);
     const levers = {}; for (const [k] of LEV) { const d = levDelta(k); if (d) levers[k] = d; }
-    return { type: "run", mode: STATE.mode, now5: st.vote.map((x) => x / tot), levers: Object.keys(levers).length ? levers : null,
+    return { type: "run", mode: VMODE(), now5: st.vote.map((x) => x / tot), levers: Object.keys(levers).length ? levers : null,
       uncertainty: st.unc, polErrMult: st.pol, seatNoiseMult: st.seat, flowNoiseMult: st.flow,
-      fade: STATE.mode === "forecast" ? (st.fade == null ? null : { fixed: st.fade / 100 }) : null, draws: DRAWS, seed: 20261101 };
+      fade: VMODE() === "forecast" ? (st.fade == null ? null : { fixed: st.fade / 100 }) : null, draws: DRAWS, seed: 20261101 };
   }
   function start() {
     if (W.w) return;
@@ -454,8 +498,8 @@ const EX = (() => {
     W.ready = false; W.busy = false;
     W.w.onmessage = onMsg;
     W.w.onerror = (e) => status("The model could not start in this browser" + (e.message ? `: ${e.message}` : "") + ".");
-    W.w.postMessage({ type: "init", inputsUrl: URLS.inputs, senateUrl: URLS.senate });
-    if (!W.levels) status("Loading the model (about 300 KB)…");
+    W.w.postMessage({ type: "init", inputsUrl: STATE.jur === "vic" ? URLS.inputsVic : URLS.inputs, senateUrl: URLS.senate });
+    if (!W.levels) status(`Loading the model (about ${STATE.jur === "vic" ? 450 : 300} KB)…`);
   }
   function runJob() {
     if (isOfficial()) { st.touched = false; showOfficial(); return; }
@@ -506,17 +550,17 @@ const EX = (() => {
     if (!st.unc) {
       // no errors: one election, so each party's range collapses onto its central figure
       const s = c.seats, top = ["alp", "on", "lnp"].sort((a, b) => s[b] - s[a])[0];
-      const pseudo = { meta: { draws: 1 }, national: {
+      const M = majOf(run()), pseudo = { meta: { ...run().meta, draws: 1 }, national: {
         expectedSeats: s, seatDistribution: Object.fromEntries(Object.entries(s).map(([k, v]) => [k, { p05: v, p25: v, p50: v, p75: v, p95: v }])),
         mostSeats: { alp: 0, on: 0, lnp: 0, [top]: 1 },
-        majority: { alp: top === "alp" && s.alp >= 76 ? 1 : 0, coalition: top === "lnp" && s.lnp >= 76 ? 1 : 0, on: top === "on" && s.on >= 76 ? 1 : 0, noMajority: s[top] >= 76 ? 0 : 1 } } };
+        majority: { alp: top === "alp" && s.alp >= M ? 1 : 0, coalition: top === "lnp" && s.lnp >= M ? 1 : 0, on: top === "on" && s.on >= M ? 1 : 0, noMajority: s[top] >= M ? 0 : 1 } } };
       $("#ex-out").innerHTML = outcomesHTML(pseudo);
       $("#ex-ranges").innerHTML = rangesHTML(pseudo, { compare: run(), labels: false });
     }
     $("#ex-share").innerHTML = `This scenario is in the address bar. <button type="button" class="md-btn" data-copy>Copy the link</button>`;
   }
   function showResult(res) {
-    const wrapped = { national: res, meta: { draws: res.draws } };
+    const wrapped = { national: res, meta: { ...run().meta, draws: res.draws } };
     status(`${res.draws.toLocaleString("en-AU")} simulated elections on your settings`);
     $("#ex-out").innerHTML = outcomesHTML(wrapped);
     $("#ex-ranges").innerHTML = rangesHTML(wrapped, { compare: run(), labels: false });
@@ -525,6 +569,14 @@ const EX = (() => {
     if (!built) return;
     if (!st.touched) { defaults(); syncControls(); showOfficial(); return; }
     syncControls(); schedule();
+  }
+  /* the other election chosen: everything back to that run's official settings, a fresh worker on its inputs */
+  function onJur() {
+    if (W.w) { W.w.terminate(); W.w = null; }
+    Object.assign(W, { ready: false, levels: null, busy: false, pending: null });
+    Object.assign(st, { vote: null, lev: {}, unc: true, pol: 1, seat: 1, flow: 1, fade: null, touched: false });
+    const was = built; built = false; $("#ex").innerHTML = "";
+    if (was) { build(); start(); } else init();
   }
   function hashParts() {
     if (!st.touched) return [];
@@ -553,12 +605,13 @@ const EX = (() => {
     if ("IntersectionObserver" in window) { const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: "600px 0px" }); io.observe(sec); }
     else go();
   }
-  return { init, onMode, applyHash, hashParts, state: st };
+  return { init, onMode, onJur, applyHash, hashParts, state: st };
 })();
 function readHash() { const q = {}; for (const kv of location.hash.replace(/^#/, "").split("&")) { const [k, v] = kv.split("="); if (k && v != null) q[k] = decodeURIComponent(v); } return q; }
 function writeHash() {
   const parts = [];
-  if (STATE.mode === "forecast") parts.push("mode=forecast");
+  if (STATE.jur === "vic") parts.push("j=vic");
+  else if (STATE.mode === "forecast") parts.push("mode=forecast");
   parts.push(...EX.hashParts());
   const h = parts.length ? "#" + parts.join("&") : "";
   if (location.hash.replace(/^#/, "") === h.replace(/^#/, "")) return;
@@ -595,6 +648,24 @@ function lineChart(host, { xs, series, yfmt = (v) => fx1(v), height = 190, ylab 
 function step(n, title, prose, fig) {
   return `<div class="md-step"><div class="md-prose"><h3><span class="n">${n}</span>${title}</h3>${prose}</div><div class="md-fig">${fig || ""}</div></div>`;
 }
+/* who meets whom in the final count: the base election's final pairs (counted) against the run's average */
+const PAIR_ORD = ["alp", "lnp", "on", "grn", "member", "oth"], PAIR_NM = { alp: "Labor", lnp: "Coalition", on: "One Nation", grn: "Greens", member: "Independent", oth: "Other" };
+function pairsFigure(skel, tcpOf, R, year, nowLabel) {
+  const pkey = (a, b) => [a, b].sort((x, y) => PAIR_ORD.indexOf(x) - PAIR_ORD.indexOf(y)).join(" v ");
+  const p25 = {}, p28 = {};
+  for (const k of skel) { const t = tcpOf(k); if (t) { const q = pkey(BUCKET(t[0].bucket), BUCKET(t[1].bucket)); p25[q] = (p25[q] || 0) + 1; } }
+  for (const [q, v] of Object.entries(R.national.finalPairs)) { const [a, b] = q.split(" v ").map(BUCKET); if (a === b) continue; const k2 = pkey(a, b); p28[k2] = (p28[k2] || 0) + v; }
+  const pk = [...new Set([...Object.keys(p25), ...Object.keys(p28)])].sort((x, y) => (p28[y] || 0) - (p28[x] || 0) || (p25[y] || 0) - (p25[x] || 0));
+  const shown = pk.filter((q) => Math.max(p25[q] || 0, p28[q] || 0) >= 1.5), rest = pk.filter((q) => !shown.includes(q));
+  const prow = (l, a, b) => ({ l, a, b }), prows = shown.map((q) => prow(q.split(" v ").map((x) => PAIR_NM[x]).join(" v "), p25[q] || 0, p28[q] || 0));
+  if (rest.length) prows.push(prow("Other pairs", rest.reduce((n, q) => n + (p25[q] || 0), 0), rest.reduce((n, q) => n + (p28[q] || 0), 0)));
+  const pmax = Math.max(...prows.flatMap((r) => [r.a, r.b]));
+  const html = `<div class="cap">Who meets whom in the final count</div>
+     <div class="md-pkey"><span><i class="y25"></i>Counted in ${year}</span><span><i class="y28"></i>${nowLabel}</span></div>
+     <div class="md-pairs">${prows.map((r) => `<span class="l">${r.l}</span><span class="b"><i class="y25" style="width:${(100 * r.a / pmax).toFixed(1)}%"></i><i class="y28" style="width:${(100 * r.b / pmax).toFixed(1)}%"></i></span><span class="v">${Math.round(r.a)} <span class="arr">→</span> <b>${Math.round(r.b)}</b></span>`).join("")}</div>
+     <div class="sub">Seats by the two candidates left at the end of the count. Today's figures average the ${R.meta.draws.toLocaleString("en-AU")} simulations, so they need not be whole numbers of seats; they are rounded here.</div>`;
+  return { p25, p28, pk, html };
+}
 function renderEvidence() {
   const E = STATE.evidence, I = STATE.inputs, now = I.vote.nowcast, a = I.asOf, R = STATE.res.nowcast;
   const sh = { alp: now.alp / 100, lnp: now.lnp / 100, grn: now.grn / 100, onp: now.on / 100 };
@@ -630,20 +701,8 @@ function renderEvidence() {
     `<table class="md-tbl"><caption>Three seats' 2025 Senate ballots</caption><thead><tr><th>Seat</th><th>Coalition voters: Labor ahead of One Nation</th><th>Labor voters: Coalition ahead of One Nation</th><th>One Nation voters: Labor ahead of the Coalition</th><th>Greens voters: Labor ahead of the Coalition</th></tr></thead><tbody>${ex}</tbody></table>
      <div class="sub">Shares of each party's Senate voters who numbered either of the two, before the House adjustments.</div>
      ${comp(E.composition.on, "Today's One Nation voters, by their 2025 vote")}${comp(E.composition.lnp, "Today's Coalition voters, by their 2025 vote")}`));
-  const PORD = ["alp", "lnp", "on", "grn", "member", "oth"], PNM = { alp: "Labor", lnp: "Coalition", on: "One Nation", grn: "Greens", member: "Independent", oth: "Other" };
-  const pkey = (a, b) => [a, b].sort((x, y) => PORD.indexOf(x) - PORD.indexOf(y)).join(" v ");
-  const p25 = {}, p28 = {};
-  for (const k of I.seats) if (k.tcp2025) { const q = pkey(BUCKET(k.tcp2025[0].bucket), BUCKET(k.tcp2025[1].bucket)); p25[q] = (p25[q] || 0) + 1; }
-  for (const [q, v] of Object.entries(R.national.finalPairs)) { const [a, b] = q.split(" v ").map(BUCKET); if (a === b) continue; const k2 = pkey(a, b); p28[k2] = (p28[k2] || 0) + v; }
-  const pk = [...new Set([...Object.keys(p25), ...Object.keys(p28)])].sort((x, y) => (p28[y] || 0) - (p28[x] || 0) || (p25[y] || 0) - (p25[x] || 0));
-  const shown = pk.filter((q) => Math.max(p25[q] || 0, p28[q] || 0) >= 1.5), rest = pk.filter((q) => !shown.includes(q));
-  const prow = (l, a, b) => ({ l, a, b }), prows = shown.map((q) => prow(q.split(" v ").map((x) => PNM[x]).join(" v "), p25[q] || 0, p28[q] || 0));
-  if (rest.length) prows.push(prow("Other pairs", rest.reduce((n, q) => n + (p25[q] || 0), 0), rest.reduce((n, q) => n + (p28[q] || 0), 0)));
-  const pmax = Math.max(...prows.flatMap((r) => [r.a, r.b]));
-  const pairFig = `<div class="cap">Who meets whom in the final count</div>
-     <div class="md-pkey"><span><i class="y25"></i>Counted in 2025</span><span><i class="y28"></i>If held today, on average</span></div>
-     <div class="md-pairs">${prows.map((r) => `<span class="l">${r.l}</span><span class="b"><i class="y25" style="width:${(100 * r.a / pmax).toFixed(1)}%"></i><i class="y28" style="width:${(100 * r.b / pmax).toFixed(1)}%"></i></span><span class="v">${Math.round(r.a)} <span class="arr">→</span> <b>${Math.round(r.b)}</b></span>`).join("")}</div>
-     <div class="sub">Seats by the two candidates left at the end of the count. Today's figures average the ${R.meta.draws.toLocaleString("en-AU")} simulations, so they need not be whole numbers of seats; they are rounded here.</div>`;
+  const { p25, p28, pk, html: pairFig } = pairsFigure(I.seats, (k) => k.tcp2025, R, 2025, "If held today, on average");
+  const PNM = PAIR_NM;
   const cl25 = p25["alp v lnp"] || 0, cl28 = p28["alp v lnp"] || 0, top28 = pk.find((q) => q !== "alp v lnp" && (p28[q] || 0) >= 1);
   html.push(step(4, "Count every seat",
     `<p>Every seat is counted as the AEC counts it: the candidate with the fewest votes is excluded, and each ballot moves to the next candidate it ranks who is still standing, until two remain. Because each group of voters' whole order is known, the count works for any final pair (Labor v One Nation, the Coalition v One Nation, a three-way race) without a table of flows, and a ballot that passed through one party moves on as its own voter would move it. Building three-way splits from pairwise flows instead misplaces the right-wing minor parties' votes by about 11 points.</p>
@@ -734,6 +793,77 @@ function calChart(host, cal) {
   for (const c of cal) svg("circle", { cx: X(c.p), cy: Y(c.o), r: 3 + Math.sqrt(c.n) / 4, fill: "var(--ink-2)", "fill-opacity": 0.75 }, gp);
 }
 
+/* app-5b-vic.js: the Victorian view - its run and inputs load on first use (about 500 KB), the switch
+   between the two elections, and the notes on how the Victorian model differs from the federal one.
+   Every figure is read from data/seat-model-vic-2026.json and model/data/inputs-vic.json. */
+let vicLoad = null;
+const ensureVic = () => (vicLoad = vicLoad || Promise.all([getJSON(URLS.vic), getJSON(URLS.inputsVic)]).then(([r, i]) => { STATE.res.vic = r; STATE.vicInputs = i; }));
+
+async function setJur(j, { scroll = false } = {}) {
+  j = j === "vic" ? "vic" : "fed";
+  if (j === STATE.jur) return;
+  if (j === "vic") {
+    for (const b of $$(".md-jur [data-jur]")) b.setAttribute("aria-busy", String(b.dataset.jur === "vic"));
+    try { await ensureVic(); }
+    catch (e) { const n = $("#md-note"); if (n) n.insertAdjacentHTML("beforeend", ` · <span style="color:var(--m-alp)">the Victorian run could not load (${esc(e.message)})</span>`); return; }
+    finally { for (const b of $$(".md-jur [data-jur]")) b.removeAttribute("aria-busy"); }
+  }
+  STATE.jur = j;
+  Object.assign(SEATS, { filter: "close", st: null, sort: null, shown: 20, open: new Set() });
+  for (const x of $$("[data-f]", $("#seat-filters"))) x.setAttribute("aria-selected", String(x.dataset.f === "close"));
+  for (const x of $$("[data-st]")) x.setAttribute("aria-pressed", String(!x.dataset.st));
+  renderHead(); renderDist(); renderSeats(); renderJurSections(); EX.onJur();
+  writeHash();
+  if (scroll) $("#sh-content").scrollIntoView({ block: "start" });
+}
+
+function renderJurSections() {
+  const vic = STATE.jur === "vic";
+  for (const id of ["how", "tests", "limits", "files"]) $(`#${id}`).hidden = vic;
+  $("#vic-how").hidden = !vic;
+  if (vic && !$("#vic-steps").childElementCount) renderVic();
+}
+
+function renderVic() {
+  const I = STATE.vicInputs, R = STATE.res.vic, a = I.asOf, now = I.vote.nowcast, was = I.vote.result2022, S = I.settings.vic, E = I.evidence;
+  const days = Math.round((Date.parse(a.election) - Date.parse(a.pollsTo)) / 864e5);
+  const P = [["lnp", "lnp", "the Coalition"], ["alp", "alp", "Labor"], ["on", "onp", "One Nation"], ["grn", "grn", "the Greens"], ["oth", null, "others"]];
+  const byNow = P.slice().sort((x, y) => now[y[0]] - now[x[0]]);
+  const sh = (k) => now[k] / 100, sigI = { alp: 0, lnp: 1, on: 2, grn: 3 };
+  const voteTbl = `<table class="md-tbl"><caption>The vote, 2022 and now, and the polling error the model draws (one standard deviation, in points)</caption><thead><tr><th>Party</th><th>2022</th><th>Now</th><th>Change</th><th>Polling error</th></tr></thead><tbody>${P.map(([k, , n]) => `<tr><td>${n[0].toUpperCase() + n.slice(1)}</td><td>${fx1(was[k])}</td><td>${fx1(now[k])}</td><td>${now[k] - was[k] >= 0 ? "+" : "−"}${fx1(Math.abs(now[k] - was[k]))}</td><td>${sigI[k] != null ? "±" + fx1(ptsAt(S.sigNat[sigI[k]], sh(k))) : ""}</td></tr>`).join("")}</tbody></table>`;
+  const html = [];
+  html.push(step(1, "Start from the Victorian polls",
+    `<p>The model starts from the /vic/ page's polling average, its trend through the ${a.polls} Victorian polls of this term, to ${shortDate(a.pollsTo)}: <b>${byNow.map(([k, , n]) => `${n} ${fx1(now[k])}`).join(", ").replace(/, ([^,]+)$/, " and $1")}</b>. In 2022 Victoria voted Labor ${fx1(was.alp)}, the Coalition ${fx1(was.lnp)}, the Greens ${fx1(was.grn)} and One Nation ${fx1(was.on)}.</p>
+     <p>With the election ${days} days after the latest poll, the polls' error is drawn at the size seen in the final month of federal campaigns since 1972, linked and fat-tailed as in the federal model. No record of Victorian polls against Victorian results is in the repo to fit a state's own size, and state polls are fewer, so if anything this is too small.</p>
+     <p class="src"><a href="/vic/">The /vic/ page</a>, <a href="${GH}.build/analysis/seat-model/vic-inputs.mjs">vic-inputs.mjs</a>.</p>`, voteTbl));
+  const pf = pairsFigure(I.seats, (k) => k.tcp2022, R, 2022, "On 28 November, on average");
+  html.push(step(2, "Spread it across the districts",
+    `<p>Each of the 88 districts starts from its 2022 count, on boundaries that stand for 2026. Each party's vote moves by one shift on the logit scale, solved so the statewide totals come out exactly: the rule that predicted One Nation's SA 2026 vote district by district.</p>
+     <p>One Nation stood in only five districts in 2022. In the other ${E.onAdded} it starts from its federal 2025 vote at the federal polling places nearest each district's own, and rises from there with everyone else. Every 2022 candidate's party is assumed to stand again, independents included.</p>
+     <p>Districts then stray from the rule by the federal model's fitted amounts. Labor's stray most, because it has fallen furthest since 2022: ${R.meta.sigmaSeat.alp.toFixed(2)} on the logit scale, against ${R.meta.sigmaSeat.lnp.toFixed(2)} for the Coalition.</p>
+     <p>In 2022, ${pf.p25["alp v lnp"] || 0} of the 88 counts ended with Labor against the Coalition. On these polls about ${Math.round(pf.p28["alp v lnp"] || 0)} would, and about ${Math.round((pf.p28["alp v on"] || 0) + (pf.p28["lnp v on"] || 0))} would end with One Nation in the final two.</p>`, pf.html));
+  const flowRow = (key, label) => { const v = I.seats.filter((s) => s.flows[key] != null); if (!v.length) return ""; const avg = v.reduce((n, s) => n + s.w * s.flows[key], 0) / v.reduce((n, s) => n + s.w, 0), xs = v.map((s) => s.flows[key]); return `<tr><td style="white-space:normal">${label}</td><td>${Math.round(100 * avg)}%</td><td>${Math.round(100 * Math.min(...xs))}–${Math.round(100 * Math.max(...xs))}%</td></tr>`; };
+  const v22 = E.vic22.replay, sen = v22["Senate ballots (this model)"], fixed = v22["W5 constants"], grades = v22["design review: seat-type grades"];
+  html.push(step(3, "Order every voter's preferences",
+    `<p>No record of Victorian ballots shows each voter's whole order, so the model reads the federal Senate's, as it does federally: for each district, the 2025 Senate ballots cast at the federal polling places nearest its own, adjusted for how lower-house voters differ from Senate voters, then mixed for today's voters by the federal vote-switching polls (no Victorian ones are in the repo).</p>
+     <p>Read this way from the 2022 Senate ballots and counted on Victoria's actual 2022 first preferences, the preferences gave <b>${sen.winners} of the 88 winners</b> and ${sen.pairs} of the final pairs, with a typical two-candidate error of ${fx1(sen.tcpMaePts)} points. The fixed rates of the model's first version got ${fixed.winners}, rates graded by seat type ${grades.winners}.</p>
+     <p class="src"><a href="${GH}.build/analysis/seat-model/state-tables.mjs">state-tables.mjs</a>, <a href="${GH}.build/analysis/seat-model/backtest-states.mjs">backtest-states.mjs</a>.</p>`,
+    `<table class="md-tbl"><caption>The preferences the model holds, across the 88 districts</caption><thead><tr><th>Voters</th><th>Average</th><th>District range</th></tr></thead><tbody>${flowRow("coalLaborOverOn", "Coalition voters putting Labor ahead of One Nation")}${flowRow("laborCoalitionOverOn", "Labor voters putting the Coalition ahead of One Nation")}${flowRow("onLaborOverCoalition", "One Nation voters putting Labor ahead of the Coalition")}${flowRow("greensLaborOverCoalition", "Greens voters putting Labor ahead of the Coalition")}</tbody></table><div class="sub">Today's voters, after the mixing; averages weighted by each district's 2022 vote.</div>`));
+  const chain = E.sa26chain["Senate ballots (this model)"];
+  html.push(step(4, "Count, and simulate",
+    `<p>The rest is the federal model unchanged: every district counted as the VEC counts it, from the last candidate up, with each group of voters' whole order replayed at every exclusion; ${R.meta.draws.toLocaleString("en-AU")} simulated elections, each drawing the polling error, the district noise, seat-type and education shocks and the preference drift afresh.</p>
+     <p>The nearest test of a surge like One Nation's is SA 2026, where it went from 2.6% to 22.9%. Run the same way from the federal footprint with the statewide totals given, the chain picked the likeliest winner in ${chain.modal} of ${E.sa26.seats} districts.</p>
+     <p>The engine and every fitted setting are set out in full in <a href="#how" data-jur-go="fed">the federal view</a>.</p>`, ""));
+  const changed = I.seats.filter((s) => s.won2022 && BUCKET(s.won2022.group) !== BUCKET(s.held.group));
+  $("#vic-steps").innerHTML = html.join("") + `<div class="md-limits">${[
+    ["Who stands", "It assumes every 2022 candidate's party stands again, independents included, with One Nation in every district. The candidates are not read from the nominations."],
+    ["Changes since 2022", `The base is the 2022 count. ${changed.length ? `${changed.map((s) => `${esc(s.name)} (now ${s.held.party === "L/N" ? "Liberal" : s.held.party === "IND" ? "independent" : esc(s.held.party)})`).join(", ").replace(/, ([^,]+)$/, " and $1")} changed hands or members since, by by-election or defection; the table shows who holds each district now.` : ""}`],
+    ["Borrowed pieces", "Polling error, district noise, the House-v-Senate offsets and today's-voter mixing are the federal model's, fitted on federal elections. No age or gender term: no Victorian baseline poll measures them."],
+    ["The upper house", "The Legislative Council is not modelled."],
+  ].map(([h, p]) => `<div><h3>${h}</h3><p>${p}</p></div>`).join("")}</div>
+  <p class="md-fine" style="margin-top:18px">The run: <a href="/data/seat-model-vic-2026.json">data/seat-model-vic-2026.json</a> · what the explorer runs on: <a href="/model/data/inputs-vic.json">inputs-vic.json</a> · the code: <a href="${GH}.build/analysis/seat-model/vic-simulate.mjs">vic-simulate.mjs</a>, <a href="${GH}.build/analysis/seat-model/vic-inputs.mjs">vic-inputs.mjs</a>.</p>`;
+}
+
 /* app-6-boot.js: load the official runs and the page's data, draw everything, wire the mode switch,
    restore a shared scenario from the address, and redraw the charts when the page changes width. */
 (async function boot() {
@@ -754,7 +884,10 @@ function calChart(host, cal) {
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     const next = STATE.mode === "nowcast" ? "forecast" : "nowcast"; setMode(next); $(`#mode-${next}`).focus();
   });
-  if (EX.applyHash(q)) $("#explore").scrollIntoView({ block: "start" }); else EX.init();
+  $(".md-jur").addEventListener("click", (e) => { const b = e.target.closest("[data-jur]"); if (b) setJur(b.dataset.jur); });
+  document.addEventListener("click", (e) => { const a = e.target.closest("[data-jur-go]"); if (!a) return; e.preventDefault(); setJur(a.dataset.jurGo).then(() => $(a.getAttribute("href")).scrollIntoView({ block: "start" })); });
+  if (q.j === "vic") await setJur("vic");
+  if (EX.applyHash(q)) $("#explore").scrollIntoView({ block: "start" }); else if (STATE.jur !== "vic") EX.init();
   let lastW = innerWidth;
   addEventListener("resize", debounce(() => { if (Math.abs(innerWidth - lastW) < 8) return; lastW = innerWidth; renderDist(); const n = $("#fig-noise"), c = $("#fig-cal"); if (n && c) { renderEvidence(); } }, 150));
   window.__model = { STATE, EX };

@@ -33,7 +33,8 @@ const build = R(".build/newtracker/build.mjs");
 assert.ok(!/\{ id: "map", label:/.test(build), "build.mjs emits no tab document for the map");
 
 // ---- the menu: an ext row is a plain link to /map/, in both designs
-assert.ok(views.includes('const menuHref = (t) => (t.ext ? "/" + t.id + "/"'), "the menu's href for an ext row is its own path");
+assert.ok(views.includes('const menuHref = (t) => (t.ext ? t.href || "/" + t.id + "/"'), "the menu's href for an ext row is its own path (or its href: /vic/'s Election model row opens /model/#j=vic)");
+assert.ok(!/id: "map"[^}]*href:/.test(app), "the map row carries no href override: it links to /map/");
 assert.equal((views.match(/href=\{menuHref\(t\)\}/g) || []).length, 2, "both designs' menus link through menuHref");
 assert.ok(views.includes("if ((tabs.find((t) => t.id === id) || {}).ext) { setMenuOpen(false); return; }"), "a click on the map's row follows its link");
 

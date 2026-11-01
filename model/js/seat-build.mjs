@@ -102,7 +102,9 @@ export function buildSeatsFrom(inputs, { composition = true, levers = null } = {
   return inputs.seats.map((sk) => {
     const s = { ...sk, cands: sk.cands.map((c) => ({ ...c })) };
     const tables = {};
-    const tableFor = (key) => (tables[key] = tables[key] || calibratedTable(SEN, ST, { st: s.st }, s.name, key, hist));
+    // inputs.pre: each seat's tables already read and calibrated per donor class (a state election's
+    // districts, state-tables.mjs), in place of the federal division tables
+    const tableFor = (key) => (tables[key] = tables[key] || (inputs.pre ? Float64Array.from(inputs.pre[s.name][flowClassOf(key)]) : calibratedTable(SEN, ST, { st: s.st }, s.name, key, hist)));
     for (const c of s.cands) {
       let p = tableFor(c.key);
       if (c.fam >= 0 && composition && comp) {

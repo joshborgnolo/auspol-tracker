@@ -429,7 +429,7 @@ function Tabs({
   const menuLines = React.useMemo(() => menuOpen && rdMenu && window.AP.menuLines ? window.AP.menuLines({
     pub: tppBasis === "resp"
   }) : null, [menuOpen, rdMenu, tppBasis]);
-  const menuHref = t => t.ext ? "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id;
+  const menuHref = t => t.ext ? t.href || "/" + t.id + "/" : window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id;
   const menuPick = id => e => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     if ((tabs.find(t => t.id === id) || {}).ext) {

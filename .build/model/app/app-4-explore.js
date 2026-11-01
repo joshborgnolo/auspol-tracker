@@ -16,7 +16,7 @@ const EX = (() => {
   let built = false;
   const lid = (k) => k.replace("|", "-"); // element ids: "|" is not valid in a selector
   // the aggregate's own printed figures (they need not sum to exactly 100; the engine renormalises)
-  const defaults = () => { const n = STATE.inputs.vote.nowcast; st.vote = P5.map((k) => n[k]); };
+  const defaults = () => { const n = INP().vote.nowcast; st.vote = P5.map((k) => n[k]); };
   const fill = (inp) => { const a = +inp.min, b = +inp.max; inp.style.setProperty("--fill", `${(100 * (+inp.value - a) / (b - a)).toFixed(1)}%`); };
   const levDelta = (k) => { const L = W.levels && W.levels[k]; const pts = st.lev[k] || 0; if (L == null || !pts) return 0; return logit(clamp(L + pts / 100, 0.01, 0.99)) - logit(L); };
   const status = (t) => { const e = $("#ex-status"); if (e) e.textContent = t; };
@@ -27,7 +27,7 @@ const EX = (() => {
     defaults();
     const host = $("#ex");
     host.innerHTML = `<div class="md-ctl">
-      <div class="md-grp" id="ex-vote"><h3>The national vote <button type="button" data-reset="vote">Back to the polls</button></h3></div>
+      <div class="md-grp" id="ex-vote"><h3>The ${STATE.jur === "vic" ? "statewide" : "national"} vote <button type="button" data-reset="vote">Back to the polls</button></h3></div>
       <div class="md-grp" id="ex-lev"><h3>How voters order their preferences <button type="button" data-reset="lev">Back to the model</button></h3>
         <div class="md-preset"><button type="button" class="md-btn" data-preset="card">Coalition card puts Labor above One Nation</button></div></div>
       <div class="md-grp" id="ex-unc"><h3>How unsure the model is <button type="button" data-reset="unc">Back to the model</button></h3>
@@ -45,7 +45,7 @@ const EX = (() => {
     </div>`;
     const vote = $("#ex-vote");
     P5.forEach((k, i) => vote.insertAdjacentHTML("beforeend", `<div class="md-sl t-${P5_TONE[k]}"><label for="v-${k}"><span class="dot"></span>${P5_NAME[k]}</label><output id="vo-${k}"></output><input type="range" id="v-${k}" min="0" max="50" step="0.1" data-v="${i}"></div>`));
-    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls' figures are this site's aggregate to ${shortDate(STATE.inputs.asOf.pollsTo)}.</p>`);
+    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls' figures are ${STATE.jur === "vic" ? "the /vic/ page's polling average" : "this site's aggregate"} to ${shortDate(INP().asOf.pollsTo)}.</p>`);
     const lev = $("#ex-lev");
     for (const [k, l, unit] of LEV) lev.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="l-${lid(k)}">${l}</label><output id="lo-${lid(k)}"></output><input type="range" id="l-${lid(k)}" min="-30" max="40" step="1" value="0" data-l="${k}" data-unit="${unit}"></div>`);
     lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group's choice in every seat by the same amount (on the logit scale), keeping each seat's own leaning. The card button assumes about a third of Coalition voters follow their party's how-to-vote card; switching the card's order moves them, about 35 points.</p>`);
@@ -67,7 +67,7 @@ const EX = (() => {
     }
     for (const k of ["pol", "seat", "flow"]) { const inp = $(`#u-${k}`); inp.value = st[k]; inp.disabled = !st.unc; fill(inp); $(`#uo-${k}`).textContent = `× ${st[k]}`; }
     $("#ex-unc-on").checked = st.unc;
-    $("#ex-fade").hidden = STATE.mode !== "forecast";
+    $("#ex-fade").hidden = VMODE() !== "forecast";
     const fd = $("#ex-fade-draw"), fv = $("#ex-fade-v");
     fd.checked = st.fade == null; fv.disabled = st.fade == null; if (st.fade != null) fv.value = st.fade; fill(fv);
     $("#ex-fade-o").textContent = st.fade == null ? "0–60%" : `${st.fade}%`;
@@ -96,15 +96,15 @@ const EX = (() => {
     if (p && p.dataset.preset === "card") { const L = W.levels && W.levels["COAL|AO"]; st.lev["COAL|AO"] = L == null ? 35 : Math.min(35, Math.round(95 - 100 * L)); st.touched = true; syncControls(); schedule(); }
     if (e.target.closest("[data-copy]")) { navigator.clipboard && navigator.clipboard.writeText(location.href); e.target.textContent = "Link copied"; }
   }
-  const voteIsPolls = () => { const n = STATE.inputs.vote.nowcast; return st.vote.every((x, i) => Math.abs(x - n[P5[i]]) < 0.051); };
+  const voteIsPolls = () => { const n = INP().vote.nowcast; return st.vote.every((x, i) => Math.abs(x - n[P5[i]]) < 0.051); };
   const isOfficial = () => voteIsPolls() && !Object.values(st.lev).some((v) => v) && st.unc && st.pol === 1 && st.seat === 1 && st.flow === 1 && st.fade == null;
   const schedule = debounce(() => { writeHash(); runJob(); }, 220);
   function job() {
     const tot = st.vote.reduce((a, b) => a + b, 0);
     const levers = {}; for (const [k] of LEV) { const d = levDelta(k); if (d) levers[k] = d; }
-    return { type: "run", mode: STATE.mode, now5: st.vote.map((x) => x / tot), levers: Object.keys(levers).length ? levers : null,
+    return { type: "run", mode: VMODE(), now5: st.vote.map((x) => x / tot), levers: Object.keys(levers).length ? levers : null,
       uncertainty: st.unc, polErrMult: st.pol, seatNoiseMult: st.seat, flowNoiseMult: st.flow,
-      fade: STATE.mode === "forecast" ? (st.fade == null ? null : { fixed: st.fade / 100 }) : null, draws: DRAWS, seed: 20261101 };
+      fade: VMODE() === "forecast" ? (st.fade == null ? null : { fixed: st.fade / 100 }) : null, draws: DRAWS, seed: 20261101 };
   }
   function start() {
     if (W.w) return;
@@ -113,8 +113,8 @@ const EX = (() => {
     W.ready = false; W.busy = false;
     W.w.onmessage = onMsg;
     W.w.onerror = (e) => status("The model could not start in this browser" + (e.message ? `: ${e.message}` : "") + ".");
-    W.w.postMessage({ type: "init", inputsUrl: URLS.inputs, senateUrl: URLS.senate });
-    if (!W.levels) status("Loading the model (about 300 KB)…");
+    W.w.postMessage({ type: "init", inputsUrl: STATE.jur === "vic" ? URLS.inputsVic : URLS.inputs, senateUrl: URLS.senate });
+    if (!W.levels) status(`Loading the model (about ${STATE.jur === "vic" ? 450 : 300} KB)…`);
   }
   function runJob() {
     if (isOfficial()) { st.touched = false; showOfficial(); return; }
@@ -165,17 +165,17 @@ const EX = (() => {
     if (!st.unc) {
       // no errors: one election, so each party's range collapses onto its central figure
       const s = c.seats, top = ["alp", "on", "lnp"].sort((a, b) => s[b] - s[a])[0];
-      const pseudo = { meta: { draws: 1 }, national: {
+      const M = majOf(run()), pseudo = { meta: { ...run().meta, draws: 1 }, national: {
         expectedSeats: s, seatDistribution: Object.fromEntries(Object.entries(s).map(([k, v]) => [k, { p05: v, p25: v, p50: v, p75: v, p95: v }])),
         mostSeats: { alp: 0, on: 0, lnp: 0, [top]: 1 },
-        majority: { alp: top === "alp" && s.alp >= 76 ? 1 : 0, coalition: top === "lnp" && s.lnp >= 76 ? 1 : 0, on: top === "on" && s.on >= 76 ? 1 : 0, noMajority: s[top] >= 76 ? 0 : 1 } } };
+        majority: { alp: top === "alp" && s.alp >= M ? 1 : 0, coalition: top === "lnp" && s.lnp >= M ? 1 : 0, on: top === "on" && s.on >= M ? 1 : 0, noMajority: s[top] >= M ? 0 : 1 } } };
       $("#ex-out").innerHTML = outcomesHTML(pseudo);
       $("#ex-ranges").innerHTML = rangesHTML(pseudo, { compare: run(), labels: false });
     }
     $("#ex-share").innerHTML = `This scenario is in the address bar. <button type="button" class="md-btn" data-copy>Copy the link</button>`;
   }
   function showResult(res) {
-    const wrapped = { national: res, meta: { draws: res.draws } };
+    const wrapped = { national: res, meta: { ...run().meta, draws: res.draws } };
     status(`${res.draws.toLocaleString("en-AU")} simulated elections on your settings`);
     $("#ex-out").innerHTML = outcomesHTML(wrapped);
     $("#ex-ranges").innerHTML = rangesHTML(wrapped, { compare: run(), labels: false });
@@ -184,6 +184,14 @@ const EX = (() => {
     if (!built) return;
     if (!st.touched) { defaults(); syncControls(); showOfficial(); return; }
     syncControls(); schedule();
+  }
+  /* the other election chosen: everything back to that run's official settings, a fresh worker on its inputs */
+  function onJur() {
+    if (W.w) { W.w.terminate(); W.w = null; }
+    Object.assign(W, { ready: false, levels: null, busy: false, pending: null });
+    Object.assign(st, { vote: null, lev: {}, unc: true, pol: 1, seat: 1, flow: 1, fade: null, touched: false });
+    const was = built; built = false; $("#ex").innerHTML = "";
+    if (was) { build(); start(); } else init();
   }
   function hashParts() {
     if (!st.touched) return [];
@@ -212,12 +220,13 @@ const EX = (() => {
     if ("IntersectionObserver" in window) { const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: "600px 0px" }); io.observe(sec); }
     else go();
   }
-  return { init, onMode, applyHash, hashParts, state: st };
+  return { init, onMode, onJur, applyHash, hashParts, state: st };
 })();
 function readHash() { const q = {}; for (const kv of location.hash.replace(/^#/, "").split("&")) { const [k, v] = kv.split("="); if (k && v != null) q[k] = decodeURIComponent(v); } return q; }
 function writeHash() {
   const parts = [];
-  if (STATE.mode === "forecast") parts.push("mode=forecast");
+  if (STATE.jur === "vic") parts.push("j=vic");
+  else if (STATE.mode === "forecast") parts.push("mode=forecast");
   parts.push(...EX.hashParts());
   const h = parts.length ? "#" + parts.join("&") : "";
   if (location.hash.replace(/^#/, "") === h.replace(/^#/, "")) return;

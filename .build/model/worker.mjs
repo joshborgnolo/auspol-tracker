@@ -3,8 +3,8 @@
    .build/analysis/seat-model/*.mjs, pinned by .build/model/test-model-bundle.mjs) on a reader's settings.
 
    Messages in:
-     { type: "init", inputsUrl, senateUrl }
-     { type: "run", id, mode, now5, levers, uncertainty, polErrMult, seatNoiseMult, flowNoiseMult, fade, draws, seed }
+     { type: "init", inputsUrl, senateUrl }    (federal inputs, or Victoria's: model/data/inputs-vic.json, with `pre`)
+     { type: "run", id, mode (nowcast | forecast | vic), now5, levers, uncertainty, polErrMult, seatNoiseMult, flowNoiseMult, fade, draws, seed }
    Messages out:
      { type: "ready", levels }                       the levers' levels as the model stands
      { type: "central", id, result }                 the single no-noise projection (immediate)
@@ -23,7 +23,7 @@ const seatsFor = (levers) => {
   const k = JSON.stringify(levers || {});
   if (!cache.has(k)) {
     if (cache.size > 6) cache.delete(cache.keys().next().value);
-    cache.set(k, buildSeatsFrom({ seats: INPUTS.seats, hist: INPUTS.build.hist, comp: INPUTS.build.comp, ST: INPUTS.build.ST, SEN }, { composition: true, levers }));
+    cache.set(k, buildSeatsFrom({ seats: INPUTS.seats, hist: INPUTS.build.hist, comp: INPUTS.build.comp, ST: INPUTS.build.ST, SEN, pre: INPUTS.pre }, { composition: true, levers }));
   }
   return cache.get(k);
 };
@@ -40,7 +40,7 @@ self.onmessage = async (ev) => {
     }
     if (m.type === "run") {
       const seats = seatsFor(m.levers);
-      const base = INPUTS.settings[m.mode === "forecast" ? "forecast" : "nowcast"];
+      const base = INPUTS.settings[m.mode === "forecast" ? "forecast" : m.mode === "vic" ? "vic" : "nowcast"];
       const S = { ...base,
         now5: m.now5 || base.now5,
         uncertainty: m.uncertainty !== false,
