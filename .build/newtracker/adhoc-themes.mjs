@@ -1,5 +1,5 @@
 /* ---- Public opinion: the topic map -----------------------------------------
-   Where every question in the eight one-off stores lands on the /public-opinion/
+   Where every question in the nine one-off stores lands on the /public-opinion/
    page (the ☰ menu page that was /ad-hocs/ until 2026-10-18, then
    /beyond-the-vote/ until 2026-10-21). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic
@@ -84,6 +84,8 @@ export const THEME_OF = {
   "trump-presidency-effects": "trump-us",
   "national-security-priorities": "trump-us",
   "country-relations": "trump-us",
+  // ausinst (YouGov for The Australia Institute)
+  "friends-threats-countries": "trump-us",
 
   /* immigration */
   // essential

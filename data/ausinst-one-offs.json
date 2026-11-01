@@ -1,0 +1,76 @@
+{
+ "_about": "YouGov polls commissioned by The Australia Institute that do NOT channel into the auspol-tracker data model (no voting intention is published - the reports' own methodology statements record 'Is voting intention published? No'). Compiled by reading the Institute's published full-report PDFs; filed 2026-11-01 with the October 2026 'Friends and threats to Australia' brief. YouGov's own fortnightly News24 series is a separate house (news24-one-offs.json).",
+ "generated": "2026-11-01",
+ "_readme": "Verification: every figure was read from the published report PDF (Polling - Friends and threats to Australia, October 2026; cdn.australiainstitute.org.au .../Polling-Friends-and-threats-to-Australia-Web.pdf). The main table transposes the report's summary Table 1 (fact-checked column-wise against the country narratives, which put the United States first) so its rows read the answer options; rows reconcile to 100 within 0dp rounding, and every country column likewise sums to its summary-table row. The United States cuts are the report's appendix Tables 3, 4 and 5 verbatim (its gender and age columns are filed as separate by-gender / by-age tables per store convention); the report's ALP/COA/GRE/ON/IND/UND abbreviations are expanded to the site's group names. Each country beyond the United States also has gender/age/state/vote crosstabs in appendix Tables 2 and 6-16; those are not filed, so the one entry's cut tables stay the United States' own. Fieldwork 6-12 October 2026, n=1,100, online panel, Australian Polling Council compliant.",
+ "entries": [
+  {
+   "id": "friends-threats-countries",
+   "waveDate": "2026-10-12",
+   "dateStart": "2026-10-06",
+   "dateEnd": "2026-10-12",
+   "published": "2026-10-29T06:30",
+   "sample": 1100,
+   "url": "https://australiainstitute.org.au/post/australians-unfriend-trumps-america-new-poll/",
+   "question": "A friendly country is one you view as safe and trustworthy. A threatening country is one you view with caution or suspicion. For each country below, do you view them as a friend or a threat to Australia?",
+   "notes": "The five countries were presented in a random order. Only 16% see the United States as a close friend (50% a friend or close friend against 42% a threat or major threat); New Zealand is a friend or close friend to 97% (77% close), Indonesia to 64%, China to 24% and Russia to 7%. By voting intention, One Nation voters are warmest on the US (36% close friend, 69% friend or close friend, 23% threat) and Greens voters the coldest (1% close friend, 70% threat). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd), APC methodology statement linked from the report.",
+   "tables": [
+    {
+     "title": null,
+     "headers": ["", "United States", "New Zealand", "Indonesia", "China", "Russia"],
+     "rows": [
+      ["Close friend", 16, 77, 7, 1, 1],
+      ["Friend", 34, 20, 57, 23, 6],
+      ["Threat", 29, 1, 18, 36, 42],
+      ["Major threat", 13, 0, 2, 30, 40],
+      ["Don't know/not sure", 8, 2, 16, 10, 11]
+     ],
+     "source": "https://cdn.australiainstitute.org.au/2026/10/28043101/Polling-Friends-and-threats-to-Australia-Web.pdf"
+    },
+    {
+     "title": "By gender",
+     "headers": ["", "Male", "Female"],
+     "rows": [
+      ["Close friend", 22, 11],
+      ["Friend", 39, 30],
+      ["Threat", 23, 35],
+      ["Major threat", 11, 13],
+      ["Don't know/not sure", 5, 11]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": ["", "18-24", "25-34", "35-49", "50-64", "65+"],
+     "rows": [
+      ["Close friend", 4, 12, 16, 15, 25],
+      ["Friend", 32, 37, 35, 33, 33],
+      ["Threat", 40, 27, 26, 31, 26],
+      ["Major threat", 15, 14, 13, 14, 10],
+      ["Don't know/not sure", 9, 10, 10, 7, 6]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": ["", "Labor", "Coalition", "Greens", "One Nation", "Independent", "Other", "Undecided"],
+     "rows": [
+      ["Close friend", 12, 16, 1, 36, 6, 12, 4],
+      ["Friend", 31, 47, 26, 33, 29, 39, 34],
+      ["Threat", 34, 26, 47, 14, 27, 36, 30],
+      ["Major threat", 15, 8, 23, 9, 23, 11, 7],
+      ["Don't know/not sure", 8, 3, 3, 8, 15, 2, 25]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": ["", "NSW", "VIC", "QLD", "WA", "SA", "Other states"],
+     "rows": [
+      ["Close friend", 20, 16, 14, 12, 9, 21],
+      ["Friend", 34, 34, 40, 29, 29, 33],
+      ["Threat", 26, 26, 30, 37, 36, 20],
+      ["Major threat", 13, 13, 9, 14, 16, 21],
+      ["Don't know/not sure", 7, 11, 7, 8, 10, 5]
+     ]
+    }
+   ]
+  }
+ ]
+}

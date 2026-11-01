@@ -38,7 +38,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { THEMES, themeOf } from "./adhoc-themes.mjs";
 
-/* ---- the eight stores, read into one shape ----------------------------------
+/* ---- the nine stores, read into one shape -----------------------------------
    The stores are hand-curated research products, each on its own pipeline
    and commit; this reshapes them to one entry shape and drops what the page
    never reads (RedBridge's verification haystacks, News24's embed ids). No
@@ -78,8 +78,9 @@ export function readStores(root) {
         prose: [] });
     }
   }
-  /* Essential, Resolve, Freshwater: .entries, tables already [label, ...values] */
-  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"]]) {
+  /* Essential, Resolve, Freshwater, Australia Institute (via YouGov):
+     .entries, tables already [label, ...values] */
+  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"]]) {
     for (const e of read(file, (j) => j.entries || [])) {
       entries.push({ house, id: e.id, waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
@@ -102,6 +103,7 @@ export const HOUSES = {
   redbridge: { short: "RedBridge", full: "RedBridge/Accent" },
   freshwater: { short: "Freshwater", full: "Freshwater Strategy" },
   demosau: { short: "DemosAU", full: "DemosAU" },
+  ausinst: { short: "Australia Inst", full: "YouGov for The Australia Institute" },
 };
 
 const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1727,6 +1729,7 @@ const TITLES = {
   "relationships-with-countries": "How positive is Australia’s relationship with each country?",
   "country-to-strengthen": "Which relationship would it pay most to strengthen, the US or China?",
   "aukus-delivery": "Will AUKUS deliver?",
+  "friends-threats-countries": "Which countries are friends — and which are threats — to Australia?",
   /* One Nation and the Coalition */
   "vote-recall-2025-flows": "Where 2025 Labor and Coalition voters have gone",
   "one-nation-motivations": "Why One Nation’s supporters back it: the party or a dislike of the others?",
