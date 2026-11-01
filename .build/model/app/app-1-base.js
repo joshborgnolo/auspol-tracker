@@ -41,8 +41,23 @@ function seatsJoined() {
     const lead = Object.entries(byB).sort((a, b) => b[1] - a[1])[0];
     const topPair = Object.entries(s.finalPairs)[0];
     return { ...s, seat: k, byB, lead: { b: lead[0], p: lead[1] }, topPair: topPair ? { key: topPair[0], p: topPair[1], share: s.pairShare[topPair[0]] } : null,
-      heldB: BUCKET(k.held.group) };
+      heldB: heldBucket(k) };
   });
+}
+/* who holds the seat, as the table counts it: a sitting member standing again as their own candidate is
+   the holder even when elected for a one-member party (Sharkie's Centre Alliance and Katter's KAP are
+   "others" in the 2025 result), so their re-election is not a change of hands */
+function heldBucket(k) {
+  const h = k.held || {};
+  if (h.member && k.cands.some((c) => String(c.group).startsWith("member") && c.label === h.member)) return "member";
+  return BUCKET(h.group);
+}
+function heldLabel(k) {
+  const h = k.held || {};
+  if (GROUP_NAME[h.group] && heldBucket(k) !== "member") return GROUP_NAME[h.group];
+  if (!h.party || /^(IND|Independent)$/i.test(h.party)) return "Independent";
+  const ab = /\(([A-Z]{2,6})\)/.exec(h.party);
+  return ab ? ab[1] : h.party;
 }
 
 function renderHead() {

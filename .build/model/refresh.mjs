@@ -12,7 +12,7 @@
        own, and the run's other inputs by hash (data/vic-polls.json aside: the vote stands for it).
        Moved -> vic-simulate.mjs (+ its history line), export-vic.mjs. After election day the run is
        left as it stood: the page shows it as the model's last word before the election.
-   Then, if either ran: the page assembly, the guards below and the bundle test (the page must still
+   Then, if either ran: the changing-hands reasons (reasons.mjs), the page assembly, the guards below and the bundle test (the page must still
    reproduce the engine draw for draw). A guard that fails exits 1 before the wrapper commits anything.
    Nothing moved -> a no-op, so the clock's run and the cron twin can both fire every day.
 
@@ -74,6 +74,7 @@ if (vic.changed) {
   process.stdout.write(run([".build/analysis/seat-model/vic-simulate.mjs"]));
   process.stdout.write(run([".build/model/export-vic.mjs"]));
 }
+process.stdout.write(run([".build/model/reasons.mjs"]));
 process.stdout.write(run([".build/model/assemble.mjs"]));
 
 // ---- guards: a run that breaks these is not published ------------------------------------

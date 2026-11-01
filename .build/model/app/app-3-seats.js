@@ -47,11 +47,11 @@ function renderSeats() {
   const sortBtn = (k, label) => { const cur = SEATS.sort; const on = cur && cur.k === k; return `<button type="button" data-sort="${k}"${on ? ` aria-sort="${cur.dir > 0 ? "ascending" : "descending"}"` : ""}>${label}</button>`; };
   const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">${vic ? "Held now" : "Won in 2025"}</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
   const rows = shown.map((s) => {
-    const open = SEATS.open.has(s.name), h = s.seat.held;
+    const open = SEATS.open.has(s.name);
     const flip = s.lead.b !== s.heldB ? `<span class="flip">from ${esc(PARTY[s.heldB].short)}</span>` : "";
     const tr = `<tr class="row" tabindex="0" data-seat="${esc(s.name)}" aria-expanded="${open}">
       <td><span class="nm">${esc(s.name)}</span>${STATE.jur === "vic" ? "" : `<span class="st">${s.state}</span>`}</td>
-      <td class="c-held"><span class="held t-${s.heldB}"><span class="dot"></span>${esc(GROUP_NAME[h.group] || (s.heldB === "member" ? "Independent" : h.party))}</span></td>
+      <td class="c-held"><span class="held t-${s.heldB}"><span class="dot"></span>${esc(heldLabel(s.seat))}</span></td>
       <td><div class="md-chance">${pbarHTML(s)}<span class="lead">${esc(PARTY[s.lead.b].name)} <small>${pctShort(s.lead.p)}</small></span>${flip}</div></td>
       <td class="c-ct"><span class="ct">${s.topPair ? esc(pairName(s.topPair.key, s.seat)) + ` <small>${pctShort(s.topPair.p)}</small>` : ""}</span></td>
       <td class="c-tcp">${tcpText(s)}</td></tr>`;
@@ -80,9 +80,73 @@ function seatCard(s) {
   const added = k.cands.some((c) => c.added);
   // a Victorian district whose holder changed since 2022 (a by-election, a defection) says so: the base is the 2022 count
   const changed = vic && k.won2022 && BUCKET(k.won2022.group) !== BUCKET(k.held.group) ? ` Won by ${esc(k.won2022.name)} (${esc(k.won2022.party)}) in 2022; held now by ${esc(k.held.member)} (${k.held.party === "L/N" ? "Liberal" : k.held.party === "IND" ? "independent" : esc(k.held.party)}). The model starts from the 2022 count.` : "";
-  return `<div class="md-card">
+  return `<div class="md-card">${whyHTML(s)}
     <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: ${Y}${added ? " (One Nation, which did not stand here in 2022: its federal 2025 vote at the nearest polling places)" : ""}. Thick bar and figure: the simulations’ average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
     <div><h4>How often each wins</h4><div class="md-kv">${wins}</div><h4 style="margin-top:14px">The contest it comes down to</h4><div class="md-kv">${pairs}</div></div>
     <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district’s own" : "From this seat’s 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house" : "House"} voters differ and mixed for today’s voters. The ${Y} count: ${res25}.${changed}</p></div>
+  </div>`;
+}
+/* why a changing-hands seat changes hands: the central projection's margin between the winner's candidate
+   and the holder's, split over the model's inputs (.build/model/reasons.mjs, Shapley values: each input's
+   average effect over every order the changes could be made in, so they add up to the whole turn), the
+   three that move it most toward the winner, the biggest working the other way, and how the count goes */
+const ST_NAME = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "The ACT", NT: "The Northern Territory" };
+const PKEY = (g) => (BUCKET(g) === "member" ? g : BUCKET(g));
+const pts = (x) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x).toFixed(1)}`;
+const P5_THE = { alp: "Labor", lnp: "the Coalition", on: "One Nation", grn: "the Greens", oth: "others" };
+const listPP = (vals) => vals.map((v, i) => [P5[i], v]).filter(([, v]) => Math.abs(v) >= 0.3).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 2).map(([p, v]) => `${P5_THE[p]} ${pts(v)}`).join(", ");
+const votersOf = (k, seat) => (String(k).startsWith("member") ? `${groupName(k, seat)}’s voters` : { alp: "Labor voters", lnp: "Coalition voters", on: "One Nation voters", grn: "Greens voters", oth: "Minor-party voters" }[k] || "Other voters");
+const cap1 = (t) => t.replace(/^./, (c) => c.toUpperCase());
+const poss = (n) => (/s$/.test(n) ? `${n}’` : `${n}’s`);
+/* a candidate in running prose: the party (the Liberal, Labor) or the independent's name */
+const WHO = { alp: "Labor", lp: "the Liberal", np: "the National", lnp: "the LNP", clp: "the CLP", on: "One Nation", grn: "the Green", oth: "another candidate" };
+const whoOf = (g, seat) => esc(WHO[g] || groupName(g, seat));
+function whyHTML(s) {
+  if (s.lead.b === s.heldB) return "";
+  const R = STATE.reasons && STATE.reasons[STATE.jur === "vic" ? "vic" : STATE.mode];
+  if (!R) return STATE.reasons === false ? "" : `<div class="md-why"><h4>Why it changes hands</h4><p class="md-fine">Loading…</p></div>`;
+  const d = R.seats[s.name]; if (!d) return "";
+  const k = s.seat, Y = BASE().year, vic = STATE.jur === "vic", when = STATE.mode === "forecast" && !vic ? "on election day" : "now";
+  const S = INP().settings[vic ? "vic" : STATE.mode];
+  const W = whoOf(d.w, k), H = whoOf(d.h, k);
+  const nat = (i, name) => {
+    const a = R.nat25[i], b = R.now[i], key = P5[i];
+    const local = key === "oth" ? k.cands.filter((c) => String(c.group).startsWith("member")).map((c) => c.group) : [key];
+    const loc = local.filter((g) => d.prim25[g] != null && d.primNow[g] != null).map((g) => `${key === "oth" ? esc(groupName(g, k)) + " " : ""}${d.prim25[g].toFixed(1)} to ${d.primNow[g].toFixed(1)}`).join("; ");
+    return `${name.replace("%", vic ? "statewide" : "national")} ${b < a ? "falls" : "rises"} from ${a.toFixed(1)}% in ${Y} to ${b.toFixed(1)}% ${when}${loc ? ` (here ${loc})` : ""}`;
+  };
+  const adjC = k.cands.filter((c) => Math.abs(c.adj || 0) >= 0.005).sort((a, b) => Math.abs(b.adj) - Math.abs(a.adj)).slice(0, 2);
+  const TXT = {
+    alp: () => nat(0, "Labor’s % vote"), lnp: () => nat(1, "The Coalition’s % vote"), on: () => nat(2, "One Nation’s % vote"), grn: () => nat(3, "The Greens’ % vote"),
+    oth: () => nat(4, k.cands.some((c) => c.isInd) ? "The % vote for other candidates, independents included," : "Other candidates’ % vote"),
+    state: () => { const v = S.states && S.states[k.st]; const l = v ? listPP(v.dev) : ""; return `${poss(ST_NAME[k.st] || k.st)} polls against the ${vic ? "statewide" : "national"} swing${l ? `: ${l} points` : ""}`; },
+    demo: () => { const l = k.demoPP ? listPP(k.demoPP) : ""; return `The seat’s age and gender mix${l ? `: ${l} points against the average seat` : ""}`; },
+    terms: () => `Seat terms: the sitting member’s personal vote, defections and part of ${Y}’s surprise going back${adjC.length ? ` (${adjC.map((c) => `${esc(groupName(c.group, k))} ${c.adj > 0 ? "up" : "down"}`).join(", ")})` : ""}`,
+    comp: () => `Today’s voters’ preferences: people who have changed party since ${Y} keep part of their old party’s preferences`,
+  };
+  const ph = Object.entries(d.phi).filter(([f]) => TXT[f]);
+  const pro = ph.filter(([, v]) => v >= 0.5).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const con = ph.filter(([, v]) => v <= -0.5).sort((a, b) => a[1] - b[1])[0];
+  const row = ([f, v], cls) => `<li${cls ? ` class="${cls}"` : ""}><span>${TXT[f]()}</span><b>${pts(v)}</b></li>`;
+  // the count in the central projection
+  const pw = d.primNow[PKEY(d.w)], phh = d.primNow[PKEY(d.h)];
+  let cnt;
+  if (d.meet) {
+    const fav = (d.prefs || []).find(([, v]) => v > 0), agn = (d.prefs || []).find(([, v]) => v < 0);
+    const pv = (x) => `${poss(votersOf(x, k))} preferences`;
+    const prefTxt = fav ? `${pv(fav[0])} give ${W} ${fav[1].toFixed(1)} points more than ${H}${agn ? `, while ${votersOf(agn[0], k)} favour ${H} by ${(-agn[1]).toFixed(1)}` : ""}`
+      : agn ? `${pv(agn[0])} favour ${H} by ${(-agn[1]).toFixed(1)} points` : "";
+    const m = d.mNow, a = 50 + m / 2;
+    cnt = `In the central projection ${W} ${pw >= phh ? "leads" : "trails"} ${H} on first preferences, ${pw.toFixed(1)} to ${phh.toFixed(1)}.${prefTxt ? ` ${cap1(prefTxt)}.` : ""} ${m >= 0 ? `${cap1(W)} wins about ${a.toFixed(0)}–${(100 - a).toFixed(0)}` : `${cap1(H)} holds on about ${(100 - a).toFixed(0)}–${a.toFixed(0)}, and ${W} wins more of the simulated elections`}.`;
+  } else {
+    const O = d.other ? esc(groupName(d.other, k)) : "the other finalist";
+    cnt = `In the central projection ${H} (${phh.toFixed(1)} on first preferences) drops out of the count before the end${d.centralW === d.w ? `, and ${W} (${pw.toFixed(1)}) beats ${O}` : `; ${whoOf(d.centralW, k)} wins it there, ${W} in more of the simulated elections`}.`;
+  }
+  const turn = d.m25 < 0 ? `from ${H} ${Math.abs(d.m25).toFixed(1)} points ahead at ${Y}’s vote` : `from ${W} already ${d.m25.toFixed(1)} ahead at ${Y}’s vote (the model’s count of ${Y}’s vote with this election’s candidates, though ${H} ${vic ? "holds the seat now" : `won the seat in ${Y}`})`;
+  const end = d.mNow >= 0 ? `${W} ${d.mNow.toFixed(1)} ahead` : `${H} ${Math.abs(d.mNow).toFixed(1)} ahead`;
+  return `<div class="md-why"><h4>Why it changes hands</h4>
+    <ol>${pro.map((x) => row(x)).join("")}${con ? row(con, "con") : ""}</ol>
+    <p>${cnt}</p>
+    <p class="md-fine">The figures are points of the margin between ${W} and ${H}${con ? " (the grey row works the other way)" : ""}, ${turn} to ${end} in the central projection. Each one is that input’s average effect over every order the changes could be made in, so together they add up to the whole turn; the smallest are left out. <a href="${GH}.build/model/reasons.mjs">reasons.mjs</a></p>
   </div>`;
 }

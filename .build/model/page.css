@@ -145,6 +145,13 @@ table.md-seats { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 
 /* a seat's card (the expanded row) */
 .md-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 28px; }
+.md-why { grid-column: 1 / -1; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.md-why ol { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 6px; }
+.md-why li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.md-why li b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.md-why li.con, .md-why li.con b { color: var(--ink-3); }
+.md-why li.con b { font-weight: 500; }
+.md-why p + p { margin-top: 6px; }
 .md-card h4 { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 8px; }
 .md-card p { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .md-prim { display: grid; grid-template-columns: 92px minmax(0, 1fr) 44px; align-items: center; gap: 4px 8px; font-size: 12.5px; }

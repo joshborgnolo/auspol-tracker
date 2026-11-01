@@ -56,6 +56,7 @@ const URLS = {
   senate: stamp("data/senate-rankings-2025.json"),
   vic: stamp("data/seat-model-vic-2026.json"),
   inputsVic: stamp("model/data/inputs-vic.json"),
+  reasons: stamp("model/data/reasons.json"),
   worker: `/model/js/worker.mjs?v=${hash(worker + engine)}`,
 };
 const views = fs.readFileSync(path.join(HERE, "views.mjs"), "utf8").replace(/^export /gm, "");

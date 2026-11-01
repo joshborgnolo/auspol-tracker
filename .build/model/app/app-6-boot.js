@@ -13,6 +13,8 @@
   for (const b of $$(".md-modes .rd-tab")) b.setAttribute("aria-selected", String(b.dataset.mode === STATE.mode));
   if (STATE.mode !== "nowcast") renderHead();
   renderDist(); renderSeats(); renderEvidence();
+  // the changing-hands reasons load behind the page; an open card redraws when they land
+  getJSON(URLS.reasons).then((r) => { STATE.reasons = r; }, () => { STATE.reasons = false; }).then(() => { if (SEATS.open.size) renderSeats(); });
   $(".md-modes").addEventListener("click", (e) => { const b = e.target.closest("[data-mode]"); if (b && b.dataset.mode !== STATE.mode) setMode(b.dataset.mode); });
   $(".md-modes").addEventListener("keydown", (e) => {
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
