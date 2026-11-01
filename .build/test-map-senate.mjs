@@ -96,6 +96,6 @@ for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 202
   else assert.ok(hit / ids.length > 0.97, `${y}: ${hit} of ${ids.length} House polling places have a Senate count`);
 }
 assert.ok(js.includes('{ id: "senate", label: "Senate" }'), "the Senate is a lens");
-assert.ok(js.includes("getJSON(`/map/data/senate-vote-${k}.json`)"), "the lens loads each election's Senate votes");
+assert.ok(js.includes("getJSON(`/map/data/senate-vote-${k}.json`, bg)"), "the lens loads each election's Senate votes (bg: the background preload's, at low priority)");
 
 console.log(`test-map-senate: ok – ${S.length} senators as at ${now.asOf}, floor ${floor.plan}`);

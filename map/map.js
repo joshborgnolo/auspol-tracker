@@ -775,13 +775,14 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw23.json":"c257a350","core-qld17.json":"17564521","core-qld20.json":"6d08f6a0","core-qld24.json":"8cdaceda","core-sa22.json":"8d569e44","core-sa26.json":"2edbbb5b","core-vic22.json":"0fe5446f","data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
-const getJSON = (u) => {
+// (bg: a background preload's, fetched at low priority so it yields to the reader's own)
+const getJSON = (u, bg) => {
   const w = window.__warm && window.__warm[u];
-  if (w) { delete window.__warm[u]; return w.catch(() => getJSON(u)); }
-  const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+  if (w) { delete window.__warm[u]; return w.catch(() => getJSON(u, bg)); }
+  const v = DATA_V[u.slice(u.lastIndexOf("/") + 1)]; return fetch(v ? `${u}?v=${v}` : u, bg ? { priority: "low" } : undefined).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
 };
 
 function cleanBooth(name, div, ty) {
@@ -945,46 +946,107 @@ function deriveAreas(res, m) {
 // Handbook files retain the original coordinates. Apply D3 winding and
 // linear-coordinate resampling only while drawing; the source is unchanged.
 // The main viewport uses mainland parts; external islands have their insets.
-function handbookFeature(f) {
+// A seat's mainland polygons come back as flat [lon, lat, ...] rings, closing point
+// kept: each edge cut into pieces of at most 0.05° (so the plane draws it straight in
+// lon/lat, not as a great circle), each ring wound as d3 reads it (outer clockwise).
+// The winding is read off the ring's planar area, which agrees with d3.geoArea on
+// every Handbook ring and costs a three-hundredth of it (2026-11-01); a ring of next
+// to no area still asks d3.geoArea, as every ring once did
+const hbPairs = (r) => { const o = new Array(r.length >> 1); for (let i = 0; i < r.length; i += 2) o[i >> 1] = [r[i], r[i + 1]]; return o; };
+function handbookRings(f) {
   const ps = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
-  f.geometry = { type: "MultiPolygon", coordinates: ps.filter(p => p[0].some(([x,y]) => x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9)).map(p => p.map((ring, ri) => {
-    const r = [];
+  return ps.filter(p => p[0].some(([x,y]) => x >= 112 && x <= 154.5 && y >= -44.5 && y <= -9)).map(p => p.map((ring, ri) => {
+    const pieces = (a, b) => Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[1]-a[1]) / .05));
+    let n = 1;
+    for (let i = 0; i < ring.length - 1; i++) n += pieces(ring[i], ring[i+1]);
+    const r = new Float64Array(2 * n);
+    let w = 0;
     for (let i = 0; i < ring.length - 1; i++) {
-      const a = ring[i], b = ring[i+1], n = Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[1]-a[1]) / .05));
-      for (let j = 0; j < n; j++) r.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]);
+      const a = ring[i], b = ring[i+1], k = pieces(a, b);
+      for (let j = 0; j < k; j++) { r[w++] = a[0]+(b[0]-a[0])*j/k; r[w++] = a[1]+(b[1]-a[1])*j/k; }
     }
-    r.push(r[0]);
-    if ((d3.geoArea({type:"Polygon", coordinates:[r]}) > 2*Math.PI) === (ri === 0)) r.reverse();
+    r[w++] = r[0]; r[w++] = r[1];
+    let s2 = 0;
+    for (let i = 0; i < r.length - 2; i += 2) s2 += r[i] * r[i+3] - r[i+2] * r[i+1];
+    const inverted = Math.abs(s2) > 1e-6 ? s2 > 0 : d3.geoArea({type:"Polygon", coordinates:[hbPairs(r)]}) > 2*Math.PI;
+    if (inverted === (ri === 0)) for (let i = 0, j = r.length - 2; i < j; i += 2, j -= 2) { const x = r[i], y = r[i+1]; r[i] = r[j]; r[i+1] = r[j+1]; r[j] = x; r[j+1] = y; }
     return r;
-  })) };
-  return f;
+  }));
 }
-function handbookDisplay(fc) {
-  for (const f of fc.features) handbookFeature(f);
-  return fc;
+/* a frame's seats on the plane, each topology arc projected once (2026-11-01).
+   d3.geoPath walked every arc four to six times - once for each seat on either
+   side of it, again for the seats' bounds, again for each mesh - and the hi
+   geometry's build was a ~1s long task that landed in the middle of the year
+   morph. Here each arc goes through the projection's own stream once (its
+   rotation, clip and adaptive resampling: the very points d3.geoPath draws, as
+   test-map-geo-build checks against it), and a seat's rings, its bounds and the
+   meshes are those arcs end to end. A generator, so warmHi can run it in slices
+   between frames; buildGeo runs it straight through */
+// /*@geo-core:begin*/
+function arcProjector(topo, P) {
+  const tr = topo.transform, kx = tr ? tr.scale[0] : 1, ky = tr ? tr.scale[1] : 1, dx = tr ? tr.translate[0] : 0, dy = tr ? tr.translate[1] : 0;
+  let buf = [];
+  const st = P.stream({ point(x, y) { buf.push(x, y); }, lineStart() {}, lineEnd() {}, polygonStart() {}, polygonEnd() {}, sphere() {} });
+  const out = new Array(topo.arcs.length);
+  const one = (i) => {
+    const a = topo.arcs[i];
+    buf = [];
+    st.lineStart();
+    if (tr) { let x = 0, y = 0; for (let k = 0; k < a.length; k++) { x += a[k][0]; y += a[k][1]; st.point(x * kx + dx, y * ky + dy); } }
+    else for (let k = 0; k < a.length; k++) st.point(a[k][0], a[k][1]);
+    st.lineEnd();
+    return (out[i] = Float64Array.from(buf));
+  };
+  return { n: out.length, one, get: (i) => out[i] || one(i) };
 }
-function buildGeo(topo, m) {
-  const raw = topojson.feature(topo, topo.objects.divs);
-  const fc = topo.handbook ? handbookDisplay(raw) : raw;
-  const gen = d3.geoPath(proj);
-  const paths = new Array(m.divs.length), bb = new Array(m.divs.length), feats = new Array(m.divs.length);
-  for (const f of fc.features) {
-    const i = m.byName.get(f.properties.name);
-    if (i == null) continue;
-    const p = new Path2D(); d3.geoPath(proj, p)(f); paths[i] = p;
-    bb[i] = gen.bounds(f); feats[i] = f;
+// a run of arcs end to end into a path, as topojson joins them: each arc after the
+// first drops the point it shares with the one before; a ring (close) also drops its
+// last point, the first again, and closes instead, as d3's polygon stream does; bx,
+// when given, takes the run's bounds [x0, y0, x1, y1]. A ring is drawn in a path of
+// its own and added: Chrome's closePath costs the length of the whole path it closes
+// in, so a seat of a thousand islands paid for itself a thousand times
+function arcsTo(p0, run, A, close, bx) {
+  const p = close ? new Path2D() : p0;
+  let first = true;
+  for (let r = 0; r < run.length; r++) {
+    const ai = run[r], pts = A.get(ai < 0 ? ~ai : ai), n = pts.length >> 1, end = close && r === run.length - 1 ? n - 1 : n;
+    for (let s = r ? 1 : 0; s < end; s++) {
+      const k = ai < 0 ? n - 1 - s : s, x = pts[2 * k], y = pts[2 * k + 1];
+      if (first) { p.moveTo(x, y); first = false; } else p.lineTo(x, y);
+      if (bx) { if (x < bx[0]) bx[0] = x; if (x > bx[2]) bx[2] = x; if (y < bx[1]) bx[1] = y; if (y > bx[3]) bx[3] = y; }
+    }
   }
-  const P = proj, mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  if (close && !first) { p.closePath(); p0.addPath(p); }
+}
+function* geoSteps(topo, m, P) {
+  const o = topo.objects.divs, at = (g) => m.byName.get(g.properties.name);
+  const A = arcProjector(topo, P);
+  // every arc first, in runs (the slices' unit of work)
+  for (let i = 0; i < A.n; i++) { A.get(i); if ((i & 255) === 255) yield; }
+  const N = m.divs.length, paths = new Array(N), bb = new Array(N), geoms = new Array(N);
+  let k = 0;
+  for (const g of o.geometries) {
+    const i = at(g);
+    if (i == null) continue;
+    const pg = g.type === "Polygon" ? [g.arcs] : g.type === "MultiPolygon" ? g.arcs : [];
+    const p = new Path2D(), bx = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const poly of pg) for (const ring of poly) arcsTo(p, ring, A, true, bx);
+    paths[i] = p; bb[i] = [[bx[0], bx[1]], [bx[2], bx[3]]]; geoms[i] = g;
+    if ((++k & 31) === 0) yield;
+  }
+  const mk = (filter) => { const p = new Path2D(); for (const line of topojson.meshArcs(topo, o, filter).arcs) arcsTo(p, line, A, false); return p; };
+  const meshDiv = mk((a, b) => a !== b && a.properties.st === b.properties.st); yield;
+  const meshState = mk((a, b) => a !== b && a.properties.st !== b.properties.st); yield;
+  const coast = mk((a, b) => a === b);
   // each seat's polygons on the plane, flat [x0, y0, x1, y1, ...] rings (the closing point
   // dropped), made when a change of election first morphs them (the year morph, app-2)
   const polyP = [];
-  const ringXY = (r) => { const o = new Float64Array(2 * (r.length - 1)); for (let k = 0; k < r.length - 1; k++) { const q = P(r[k]); o[2 * k] = q[0]; o[2 * k + 1] = q[1]; } return o; };
+  const ringXY = (r) => { const q = new Float64Array(2 * (r.length - 1)); for (let j = 0; j < r.length - 1; j++) { const c = P(r[j]); q[2 * j] = c[0]; q[2 * j + 1] = c[1]; } return q; };
   const polys = (i) => {
-    if (polyP[i] || !feats[i]) return polyP[i] || null;
-    const gm = feats[i].geometry, cs = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates;
+    if (polyP[i] || !geoms[i]) return polyP[i] || null;
+    const gm = topojson.feature(topo, geoms[i]).geometry, cs = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates;
     return (polyP[i] = cs.map((pg) => ({ outer: ringXY(pg[0]), holes: pg.slice(1).map(ringXY) })));
   };
-  const o = topo.objects.divs, at = (g) => m.byName.get(g.properties.name);
   // each seat's coast and its borders with other seats, apart, made when the
   // streets first need them (the streets' own sea draws the coast there)
   const coastP = [], edgeP = [];
@@ -992,12 +1054,26 @@ function buildGeo(topo, m) {
     paths, bb, polys,
     // the topology itself and a geometry's seat, for the seats' waters (app-2)
     topo, at, proj: P,
-    meshDiv: topo.handbook ? mk({type:"MultiLineString", coordinates:fc.features.flatMap(f=>f.geometry.coordinates.flat())}) : mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === b.properties.st)),
-    meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
-    coast: topo.handbook ? mk({type:"MultiLineString", coordinates:fc.features.flatMap(f=>f.geometry.coordinates.flat())}) : mk(topojson.mesh(topo, o, (a, b) => a === b)),
-    coastOf: (i) => coastP[i] || (coastP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a === b && at(a) === i))),
-    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(topo.handbook ? {type:"MultiLineString", coordinates:feats[i].geometry.coordinates.flat()} : topojson.mesh(topo, o, (a, b) => a !== b && (at(a) === i || at(b) === i)))),
+    meshDiv, meshState, coast,
+    coastOf: (i) => coastP[i] || (coastP[i] = mk((a, b) => a === b && at(a) === i)),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk((a, b) => a !== b && (at(a) === i || at(b) === i))),
   };
+}
+// /*@geo-core:end*/
+// the whole build at once (a frame's lo geometry, while its election loads)
+function buildGeo(topo, m, P = proj) {
+  const it = geoSteps(topo, m, P);
+  for (;;) { const r = it.next(); if (r.done) return r.value; }
+}
+// the same build in slices of about a frame's spare time, never during a year morph
+// or an election's wait (the hi geometry: warmHi)
+async function buildGeoSliced(topo, m, P) {
+  const it = geoSteps(topo, m, P), idle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 400 }) : setTimeout(fn, 16));
+  for (;;) {
+    await new Promise((go) => { const w = () => (ymorph || ywait ? setTimeout(w, 120) : idle(go)); w(); });
+    const t0 = performance.now();
+    for (;;) { const r = it.next(); if (r.done) return r.value; if (performance.now() - t0 > 8) break; }
+  }
 }
 
 /* the Handbook frame in slices (2026-10-31): decoding the lossless topo and
@@ -1026,37 +1102,49 @@ async function buildHandbookGeo(topo, m) {
     if (sliceDone()) await pause();
   }
   proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], { type: "MultiPoint", coordinates: [[x0, y0], [x1, y1]] });
-  // pass two: each seat resampled-and-wound (handbookFeature), then pathed — a
-  // stream context that writes the Path2D and takes the bounds in one emission
+  // pass two: each seat resampled-and-wound (handbookRings), then pathed: each ring
+  // through the projection's own stream as a line, its closing point dropped and the
+  // path closed, which is the polygon d3.geoPath draws without its clip's buffering
+  // and spherical containment walk (test-map-geo-build compares the two); the bounds
+  // are taken at emission
   const P = proj;
-  const paths = new Array(m.divs.length), bb = new Array(m.divs.length), featsByDiv = new Array(m.divs.length);
+  const paths = new Array(m.divs.length), bb = new Array(m.divs.length), ringsByDiv = new Array(m.divs.length);
   const outline = new Path2D();
-  const pathAndBounds = (f) => {
-    const p = new Path2D();
-    let b0 = Infinity, b1 = Infinity, b2 = -Infinity, b3 = -Infinity;
-    const ctx = { beginPath() {}, result() {}, arc() {},
-      moveTo(x, y) { p.moveTo(x, y); if (x < b0) b0 = x; if (x > b2) b2 = x; if (y < b1) b1 = y; if (y > b3) b3 = y; },
-      lineTo(x, y) { p.lineTo(x, y); if (x < b0) b0 = x; if (x > b2) b2 = x; if (y < b1) b1 = y; if (y > b3) b3 = y; },
-      closePath() { p.closePath(); } };
-    d3.geoPath(P, ctx)(f);
-    return [p, [[b0, b1], [b2, b3]]];
+  let p = null, px = 0, py = 0, has = false, first = true, b0 = 0, b1 = 0, b2 = 0, b3 = 0;
+  const st = P.stream({ point(x, y) {
+    if (has) { if (first) { p.moveTo(px, py); first = false; } else p.lineTo(px, py); if (px < b0) b0 = px; if (px > b2) b2 = px; if (py < b1) b1 = py; if (py > b3) b3 = py; }
+    px = x; py = y; has = true;
+  }, lineStart() {}, lineEnd() {}, polygonStart() {}, polygonEnd() {}, sphere() {} });
+  const pathAndBounds = (rings) => {
+    p = new Path2D(); b0 = b1 = Infinity; b2 = b3 = -Infinity;
+    const seat = p;
+    for (const poly of rings) for (const r of poly) {
+      // each ring in a path of its own, added (arcsTo: closePath's cost is its path's length)
+      p = new Path2D(); has = false; first = true;
+      st.lineStart();
+      for (let k = 0; k < r.length; k += 2) st.point(r[k], r[k + 1]);
+      st.lineEnd();
+      if (!first) { p.closePath(); seat.addPath(p); }
+    }
+    p = seat;
+    return [seat, [[b0, b1], [b2, b3]]];
   };
   for (const f of feats) {
     const i = m.byName.get(f.properties.name);
-    handbookFeature(f);
-    const [p, b] = pathAndBounds(f);
-    outline.addPath(p);
-    if (i != null) { featsByDiv[i] = f; paths[i] = p; bb[i] = b; }
+    const rings = handbookRings(f);
+    const [q, b] = pathAndBounds(rings);
+    outline.addPath(q);
+    if (i != null) { ringsByDiv[i] = rings; paths[i] = q; bb[i] = b; }
     if (sliceDone()) await pause();
   }
-  const mk = (g) => { const p = new Path2D(); d3.geoPath(P, p)(g); return p; };
+  const mk = (g) => { const q = new Path2D(); d3.geoPath(P, q)(g); return q; };
   const polyP = [];
-  const ringXY = (r) => { const o = new Float64Array(2 * (r.length - 1)); for (let k = 0; k < r.length - 1; k++) { const q = P(r[k]); o[2 * k] = q[0]; o[2 * k + 1] = q[1]; } return o; };
+  const ringXY = (r) => { const o = new Float64Array(r.length - 2); for (let k = 0; k < r.length - 2; k += 2) { const c = P([r[k], r[k + 1]]); o[k] = c[0]; o[k + 1] = c[1]; } return o; };
   const polys = (i) => {
-    if (polyP[i] || !featsByDiv[i]) return polyP[i] || null;
-    const gm = featsByDiv[i].geometry, cs = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates;
-    return (polyP[i] = cs.map((pg) => ({ outer: ringXY(pg[0]), holes: pg.slice(1).map(ringXY) })));
+    if (polyP[i] || !ringsByDiv[i]) return polyP[i] || null;
+    return (polyP[i] = ringsByDiv[i].map((pg) => ({ outer: ringXY(pg[0]), holes: pg.slice(1).map(ringXY) })));
   };
+  const ringLines = (i) => ({ type: "MultiLineString", coordinates: ringsByDiv[i].flat().map(hbPairs) });
   const at = (g) => m.byName.get(g.properties.name);
   const coastP = [], edgeP = [];
   if (sliceDone()) await pause();
@@ -1065,8 +1153,8 @@ async function buildHandbookGeo(topo, m) {
     meshDiv: outline,
     meshState: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st !== b.properties.st)),
     coast: outline,
-    coastOf: (i) => coastP[i] || (coastP[i] = mk({type:"MultiLineString", coordinates:featsByDiv[i].geometry.coordinates.flat()})),
-    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk({type:"MultiLineString", coordinates:featsByDiv[i].geometry.coordinates.flat()})),
+    coastOf: (i) => coastP[i] || (coastP[i] = mk(ringLines(i))),
+    edgeOf: (i) => edgeP[i] || (edgeP[i] = mk(ringLines(i))),
   };
 }
 
@@ -1169,7 +1257,7 @@ const SEATED_LC = new Set(["sa26", "vic22"]);
 // the Speaker's district where the results files name none: each state's, as its
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023)
 const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw23: "Lake Macquarie", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine" };
-async function loadYear(year) {
+async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
   if (Y[year]) return Y[year].ready.then((mm) => { proj = mm.proj; return mm; });
@@ -1177,8 +1265,11 @@ async function loadYear(year) {
   Y[year] = m;
   m.ready = (async () => {
     const ry = year === "now" ? 2025 : year;
-    const [res, lo, now, seating, islands] = await Promise.all([getJSON(`/map/data/res-${ry}.json`), getJSON(`/map/data/geo-${ry}-lo.json`), year === "now" ? getJSON("/map/data/data-now.json") : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`).catch(() => null) : null, loadIslands()]);
+    // the results without the polling places' census lanes (core-split.mjs), unless the
+    // lens is reading them now or the page's warmup already asked for the full file
+    const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), year === "now" ? getJSON("/map/data/data-now.json", bg) : null,
+      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own projection, then the live one put back: a year loaded
     // ahead (the timeline's hover) must not move the streets and the sea under
     // the year in view (setYear takes the new year's when it shows it)
@@ -1186,6 +1277,8 @@ async function loadYear(year) {
     const fit = lo.handbook ? null : topojson.feature(lo, lo.objects.divs);
     if (!lo.handbook) proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
     m.res = res;
+    m.pplLanes = res.pplLanes || null;
+    m.ppl = !m.pplLanes; // the census lanes are here (a full file, or a frame with none)
     m.demoBasis = res.demoBasis || null;
     m.demoYear = res.demoYear || null;
     m.incomeCuts = res.incomeCuts || null;
@@ -1261,18 +1354,42 @@ async function loadYear(year) {
   })();
   return m.ready;
 }
-/* a frame's hi geometry, fetched the first time it's shown and built in an idle
-   slice after it lands, so the year-morph it interrupts nothing interactive.
+/* the polling places' census lanes (core-split.mjs): a frame loads its results
+   without them, and the full file comes the first time they're wanted - the Census
+   lens's People measures (needPpl) or an opened polling place's neighbourhood -
+   its lanes merged into the frame's booths by index (the same file, the same order) */
+const needPpl = () => S.lens === "seifa" && isDemo();
+function loadPpl(y) {
+  const m = Y[y];
+  if (!m || !m.divs || m.ppl) return Promise.resolve(m);
+  return (m.pplP ??= getJSON(`/map/data/res-${y === "now" ? 2025 : y}.json`).then((full) => {
+    const B = m.booth.raw, F = full.booths;
+    if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
+    m.ppl = true;
+    return m;
+  }).catch((e) => { m.pplP = null; throw e; }));
+}
+// the frame in view's lanes, then everything that reads them drawn again (the seats
+// never wait: their census figures ride the core file; the places' fill in)
+function pplThen(m) {
+  if (!m || m.ppl || m.pplP) return;
+  loadPpl(m.year).then(() => { if (M() !== m) return; recolor(false); renderLegend(); renderStory(true); if (S.view === "list") renderList(true); }).catch(() => {});
+}
+/* a frame's hi geometry, fetched the first time it's shown and built in slices
+   once it lands and any year morph or election wait is over (buildGeoSliced),
+   so it interrupts nothing interactive (built whole, it was a ~1s long task in
+   the middle of every first visit's morph).
    geoOf (app-2) draws lo at any zoom until it lands, so a miss just keeps the
    lo edges a little longer — the same shape boot already tolerates */
 function warmHi(y) {
   const m = Y[y];
   if (!m || !m.divs || m.geoHi || m._hiP) return m && m._hiP;
   const ry = y === "now" ? 2025 : y;
-  // the hi detail can land after the reader has moved to another year — build
-  // and bake its paths under this year's projection, then put the live one back
+  // the hi detail can land after the reader has moved to another year — its paths
+  // are baked under this year's own projection, whatever the live one is by then
   m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
-    .then((hi) => new Promise((done) => (window.requestIdleCallback ? requestIdleCallback : setTimeout)(() => { const keep = proj; proj = m.proj; m.geoHi = buildGeo(hi, m); proj = keep; schedule(); done(); }, { timeout: 1500 })))
+    .then((hi) => buildGeoSliced(hi, m, m.proj))
+    .then((g) => { m.geoHi = g; schedule(); })
     .catch(() => { m._hiP = null; });
   return m._hiP;
 }
@@ -1397,6 +1514,7 @@ const lensNumeric = () => !(S.lens === "winner" || S.lens === "cls");
 /* =============================== colours per year =============================== */
 let fade = null, fadeT = 1;
 function recolor(animate) {
+  if (needPpl()) pplThen(M()); // the polling places' census lanes, the first time a People measure is shown
   for (const m of [...Object.values(Y), ...Object.values(SENY)]) {
     if (!m || !m.divs) continue;
     if (animate && m.divCol && !reduceMotion) { m.prevDivCol = m.divCol; m.prevBoothCol = m.boothCol; }
@@ -5054,11 +5172,11 @@ function senSearchItems(m) {
    Senate counts by polling place for 2004; a state election (SA 2026) has no Senate. Loaded with the lens. */
 const SV = {}, SVP = {};
 const svYear = (y) => (y === "now" ? 2025 : typeof y === "number" ? y : null);
-function loadSenateVote(y) {
+function loadSenateVote(y, bg) {
   const k = svYear(y);
   if (k == null) return Promise.resolve(null);
   if (SV[k]) return Promise.resolve(SV[k]);
-  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
@@ -6244,6 +6362,7 @@ function byChange(c, d, prevDiv) {
 
 /* ----- a polling place ----- */
 function storyBooth(m, j) {
+  pplThen(m); // the neighbourhood's census lanes, if the frame hasn't fetched them (it redraws this on arrival)
   const b = m.booth, D = m.divs[b.d[j]], raw = b.raw;
   const where = [b.prem[j], [b.sub[j], b.pc[j]].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const tc = raw.tcp[j];
@@ -7543,7 +7662,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -7611,6 +7730,7 @@ async function setYear(y) {
   stampDone(ymorph ? ymorph.dur : 300);
   // now that it's shown, this frame earns its hi geometry and its place in the
   // cache; the morph above keeps its own references, so eviction can't hurt it
+  // (the hi download runs under the morph, when the network has nothing else to do)
   warmHi(y);
   Y[y].viewedAt = performance.now();
   evictFrames();
@@ -7722,7 +7842,9 @@ function frame(ts) {
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, Wpx, Hpx);
-  if (!m) return;
+  // (nor a frame not yet coloured: at boot the landing election can land before the
+  // legend's metadata, and a resize's frame in that gap had no colours to fill with)
+  if (!m || !m.divCol) return;
   let again = false;
   fadeT = 1;
   if (fade) { fadeT = clamp((ts - fade.t0) / fade.dur, 0, 1); if (fadeT < 1) again = true; else { fade = null; for (const y of Object.values(Y)) { y.prevDivCol = y.prevBoothCol = null; } } }
@@ -8029,16 +8151,28 @@ function preloadYears() {
   if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
   const at = YEARS.indexOf(S.year);
   const stops = YEARS.filter((y) => !Y[y] && !HANDBOOK_YEARS.has(y)).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
+  // (the reader waiting on an election of their own: theirs goes first, alone)
+  const later = (fn) => setTimeout(fn, 500);
   const senateLane = () => {
     // the chambers' lane, cheap beside the years: every Senate (~7KB each) and
-    // its floor, then the Senate-vote lens files (the AEC served no 2004 count)
+    // its floor, then the Senate-vote lens files (the AEC served no 2004 count),
+    // one at a time - all twelve at once (~1.3MB) slowed whichever election the
+    // reader opened meanwhile by half again
     loadSenates().catch(() => {});
     loadSenateFloor().catch(() => {});
-    for (const sy of SEN_YEARS) { const k = svYear(sy); if (k != null && k !== 2004) loadSenateVote(sy).catch(() => {}); }
+    const ks = SEN_YEARS.filter((sy) => { const k = svYear(sy); return k != null && k !== 2004; });
+    const one = () => {
+      if (ywait) return void later(one);
+      const sy = ks.shift();
+      if (sy != null) loadSenateVote(sy, true).catch(() => {}).then(() => idleSlice(() => setTimeout(one, 400)));
+    };
+    one();
   };
   const next = () => {
+    if (ywait) return void later(next);
     const y = frameLoad() < FRAME_CAP ? stops.shift() : null;
-    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
+    if (y != null && Y[y]) return void next(); // the reader got there first
+    if (y != null) return void loadYear(y, true).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
     senateLane();
   };
   idleSlice(next);

@@ -827,7 +827,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -895,6 +895,7 @@ async function setYear(y) {
   stampDone(ymorph ? ymorph.dur : 300);
   // now that it's shown, this frame earns its hi geometry and its place in the
   // cache; the morph above keeps its own references, so eviction can't hurt it
+  // (the hi download runs under the morph, when the network has nothing else to do)
   warmHi(y);
   Y[y].viewedAt = performance.now();
   evictFrames();
@@ -1006,7 +1007,9 @@ function frame(ts) {
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, Wpx, Hpx);
-  if (!m) return;
+  // (nor a frame not yet coloured: at boot the landing election can land before the
+  // legend's metadata, and a resize's frame in that gap had no colours to fill with)
+  if (!m || !m.divCol) return;
   let again = false;
   fadeT = 1;
   if (fade) { fadeT = clamp((ts - fade.t0) / fade.dur, 0, 1); if (fadeT < 1) again = true; else { fade = null; for (const y of Object.values(Y)) { y.prevDivCol = y.prevBoothCol = null; } } }
@@ -1313,16 +1316,28 @@ function preloadYears() {
   if (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "")) return;
   const at = YEARS.indexOf(S.year);
   const stops = YEARS.filter((y) => !Y[y] && !HANDBOOK_YEARS.has(y)).sort((a, b) => Math.abs(YEARS.indexOf(a) - at) - Math.abs(YEARS.indexOf(b) - at));
+  // (the reader waiting on an election of their own: theirs goes first, alone)
+  const later = (fn) => setTimeout(fn, 500);
   const senateLane = () => {
     // the chambers' lane, cheap beside the years: every Senate (~7KB each) and
-    // its floor, then the Senate-vote lens files (the AEC served no 2004 count)
+    // its floor, then the Senate-vote lens files (the AEC served no 2004 count),
+    // one at a time - all twelve at once (~1.3MB) slowed whichever election the
+    // reader opened meanwhile by half again
     loadSenates().catch(() => {});
     loadSenateFloor().catch(() => {});
-    for (const sy of SEN_YEARS) { const k = svYear(sy); if (k != null && k !== 2004) loadSenateVote(sy).catch(() => {}); }
+    const ks = SEN_YEARS.filter((sy) => { const k = svYear(sy); return k != null && k !== 2004; });
+    const one = () => {
+      if (ywait) return void later(one);
+      const sy = ks.shift();
+      if (sy != null) loadSenateVote(sy, true).catch(() => {}).then(() => idleSlice(() => setTimeout(one, 400)));
+    };
+    one();
   };
   const next = () => {
+    if (ywait) return void later(next);
     const y = frameLoad() < FRAME_CAP ? stops.shift() : null;
-    if (y != null) return void loadYear(y).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
+    if (y != null && Y[y]) return void next(); // the reader got there first
+    if (y != null) return void loadYear(y, true).catch(() => { if (Y[y] && !Y[y].divs) delete Y[y]; }).then(() => idleSlice(() => setTimeout(next, PRELOAD_GAP)));
     senateLane();
   };
   idleSlice(next);

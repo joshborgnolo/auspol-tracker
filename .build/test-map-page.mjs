@@ -17,6 +17,7 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { SHELL_PAGES, shellHeader, shellCss, shellJs } from "./site-shell.mjs";
 import { dataStamps, stampData, metaFacts, stampMeta } from "./map/data-stamp.mjs";
+import { coreText } from "./map/core-split.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
@@ -100,7 +101,18 @@ assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assem
   for (const y of LC_YEARS) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the upper-house line for ${y}`);
   assert.ok(js.includes("const META_FACTS = /*@meta-facts*/{};"), "holdEyebrow reads the stamped meta facts");
 }
-assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u)"), "getJSON asks for each data file by its stamped hash");
+assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u"), "getJSON asks for each data file by its stamped hash");
+// each results file's core (core-split.mjs: the file without its polling places' census lanes) is
+// current and committed, and a frame loads it first, the full file only for those lanes (loadPpl)
+for (const f of fs.readdirSync(path.join(ROOT, "map/data")).sort()) {
+  const m = f.match(/^res-(\w+)\.json$/);
+  if (!m) continue;
+  const c = `map/data/core-${m[1]}.json`;
+  assert.ok(fs.existsSync(path.join(ROOT, c)) && R(c) === coreText(R("map/data/" + f)), `${c} is current (node .build/map/assemble.mjs after rebuilding ${f})`);
+  if (dataStamps(ROOT)["res-" + m[1] + ".json"]) assert.ok(dataStamps(ROOT)["core-" + m[1] + ".json"], `${c} is committed beside ${f} (git add it: the page asks for it by its stamp)`);
+}
+assert.ok(js.includes("getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
+assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("map/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
 // 2001-census edition's own nine (its B 06 prints a whole-UK row the
@@ -613,7 +625,13 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(part("app-1-base.js").includes("const HANDBOOK_YEARS = new Set([1993, 1996, 1998, 2001])"), "the Handbook years' lossless geometry files are the idle preload's skip set");
   assert.ok(ui.includes("conn.saveData") && ui.includes("effectiveType"), "the background preload yields to save-data and 2g connections");
   assert.ok(ui.includes("delete Y[y]"), "a failed background load frees the year for a real retry");
-  assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy)"), "the preload also fills the chambers and the Senate-vote lane");
+  assert.ok(ui.includes("loadSenates()") && ui.includes("loadSenateFloor()") && ui.includes("loadSenateVote(sy, true)"), "the preload also fills the chambers and the Senate-vote lane");
+  // (2026-11-01) the background work yields to the reader's own: low-priority fetches, one
+  // Senate-vote file at a time (all twelve at once slowed the election opened meanwhile by
+  // half again), and nothing new started while the reader waits on an election (ywait)
+  assert.ok(ui.includes("loadYear(y, true)") && part("app-1-base.js").includes('bg ? { priority: "low" } : undefined'), "preload fetches go at low priority");
+  assert.ok((ui.match(/if \(ywait\) return void later\((next|one)\);/g) || []).length === 2, "the year preload and the Senate-vote lane both hold while the reader waits on an election");
+  assert.ok(ui.includes("if (sy != null) loadSenateVote(sy, true).catch(() => {}).then(() => idleSlice(() => setTimeout(one, 400)));"), "the Senate-vote lane fetches one file at a time");
   assert.ok(ui.includes("k !== 2004"), "no senate-vote-2004 fetch (no such file)");
   assert.ok(ui.includes(" preloadYears();\n})();"), "boot ends by kicking the background preload");
 }
@@ -657,7 +675,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const base = part("app-1-base.js"), map2 = part("app-2-map.js");
   assert.ok(base.includes("async function buildHandbookGeo(topo, m)"), "the sliced Handbook geometry builder exists");
   assert.ok(base.includes("lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m)"), "loadYear routes Handbook frames through the sliced builder");
-  assert.ok(base.includes("function handbookFeature(f)") && base.includes("handbookDisplay(fc)"), "the resample-and-wind treatment keeps one shared per-feature home");
+  assert.ok(base.includes("function handbookRings(f)") && (base.match(/handbookRings\(f\)/g) || []).length === 2, "the resample-and-wind treatment keeps one shared per-feature home (handbookRings, 2026-11-01: flat rings, planar winding; test-map-geo-build holds it to the old drawing)");
   assert.ok(base.includes("sliceDone") && /await pause\(\)/.test(base), "the sliced builder yields to the browser between seat-sized slices");
   assert.ok(base.includes("coast: outline"), "the fused outline serves meshDiv and coast alike (the old full re-walks' exact lines, free)");
   assert.ok(map2.includes("if (HANDBOOK_YEARS.has(from.year) || HANDBOOK_YEARS.has(to.year)) return false;"), "a Handbook side declines the outline morph — the colour sweep carries the transition");

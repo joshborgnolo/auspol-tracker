@@ -531,11 +531,11 @@ function senSearchItems(m) {
    Senate counts by polling place for 2004; a state election (SA 2026) has no Senate. Loaded with the lens. */
 const SV = {}, SVP = {};
 const svYear = (y) => (y === "now" ? 2025 : typeof y === "number" ? y : null);
-function loadSenateVote(y) {
+function loadSenateVote(y, bg) {
   const k = svYear(y);
   if (k == null) return Promise.resolve(null);
   if (SV[k]) return Promise.resolve(SV[k]);
-  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);

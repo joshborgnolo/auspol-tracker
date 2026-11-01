@@ -17,15 +17,21 @@
      node .build/map/assemble.mjs
    The data in map/data comes from build_map_data.py, geo_build.mjs and
    islands_build.mjs (the islands past the mainland frame, drawn inset); each tracked file's hash
-   is stamped into map.js (data-stamp.mjs), so re-run this after rebuilding any data file. */
+   is stamped into map.js (data-stamp.mjs), so re-run this after rebuilding any data file.
+   It also writes each res-<frame>.json's core-<frame>.json (core-split.mjs): the results
+   without the polling places' census lanes, which the map loads first; commit them too. */
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dataStamps, stampData, metaFacts, stampMeta } from "./data-stamp.mjs";
+import { writeCores } from "./core-split.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
+// each results file's core (core-split.mjs: the file without its polling places' census
+// lanes, what a frame loads first), written before the data stamps are taken
+writeCores(ROOT);
 const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
 const app = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
 // each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
@@ -45,8 +51,9 @@ write("map/map.css", css);
    unqueried files with only a short TTL, but a phone's heuristic cache can
    hold them long past a release (bit on 2026-10-25 – new build invisible on
    a phone that had the old map.js pinned). The head's data-warm script gets
-   the same stamps: it starts the landing year's fetches (res, geo-lo,
-   islands; data-now on the "now" landing) while the scripts download, and
+   the same stamps: it starts the landing year's fetches (core, or res on a
+   Census-lens landing; geo-lo, islands; data-now on the "now" landing) while
+   the scripts download, and
    getJSON (app-1-base.js) drinks from window.__warm instead of racing it. */
 {
   const hs = { "map.js": crypto.createHash("sha1").update(js).digest("hex").slice(0, 8), "map.css": crypto.createHash("sha1").update(css).digest("hex").slice(0, 8) };
@@ -55,10 +62,10 @@ write("map/map.css", css);
   let stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
   const dv = dataStamps(ROOT);
   const warmV = {};
-  for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|geo-\w+-lo)\.json$/.test(f) || f === "data-now.json" || f === "islands.json") warmV[f] = v;
+  for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|core-\w+|geo-\w+-lo)\.json$/.test(f) || f === "data-now.json" || f === "islands.json") warmV[f] = v;
   stamped = stamped.replace(
     /<!--map-data-warm:begin-->[\s\S]*?<!--map-data-warm:end-->/,
-    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;var b="res-"+ry+".json";if(!V[b]){y="now";ry="2025";b="res-"+ry+".json";}var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>\n<!--map-data-warm:end-->`);
+    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>\n<!--map-data-warm:end-->`);
   if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("map/index.html stamped", hs["map.js"], hs["map.css"]); }
   else console.log("map/index.html stamps current");
 }

@@ -725,6 +725,7 @@ function byChange(c, d, prevDiv) {
 
 /* ----- a polling place ----- */
 function storyBooth(m, j) {
+  pplThen(m); // the neighbourhood's census lanes, if the frame hasn't fetched them (it redraws this on arrival)
   const b = m.booth, D = m.divs[b.d[j]], raw = b.raw;
   const where = [b.prem[j], [b.sub[j], b.pc[j]].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const tc = raw.tcp[j];

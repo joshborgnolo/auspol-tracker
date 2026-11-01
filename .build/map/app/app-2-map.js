@@ -91,6 +91,7 @@ const lensNumeric = () => !(S.lens === "winner" || S.lens === "cls");
 /* =============================== colours per year =============================== */
 let fade = null, fadeT = 1;
 function recolor(animate) {
+  if (needPpl()) pplThen(M()); // the polling places' census lanes, the first time a People measure is shown
   for (const m of [...Object.values(Y), ...Object.values(SENY)]) {
     if (!m || !m.divs) continue;
     if (animate && m.divCol && !reduceMotion) { m.prevDivCol = m.divCol; m.prevBoothCol = m.boothCol; }
