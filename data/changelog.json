@@ -7,7 +7,7 @@
     },
     "imp": 51.2,
     "pub": 49.6,
-    "on": 52,
+    "on": 51.8,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -209,16 +209,16 @@
       "2026-10-11|Roy Morgan",
       "2026-10-20|YouGov",
       "2026-10-25|Roy Morgan",
+      "2026-10-26|DemosAU",
       "2026-10-27|Essential",
-      "2026-10-28|DemosAU",
       "2026-10-29|Newspoll"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
       "alp|education|University": 1,
+      "alp|language|English only": -1,
       "alp|state|Non-NSW/Vic/Qld": 1,
       "grn|age|35–54": -1,
-      "grn|education|TAFE or trade": 1,
       "grn|education|Year 12 or less": -1,
       "grn|language|English only": -1,
       "grn|working|Full time": -1,
@@ -244,6 +244,11 @@
         "group": "University",
         "setLabel": "Education"
       },
+      "alp|language|English only": {
+        "party": "alp",
+        "group": "English only",
+        "setLabel": "By language at home"
+      },
       "alp|state|Non-NSW/Vic/Qld": {
         "party": "alp",
         "group": "Non-NSW/Vic/Qld",
@@ -253,11 +258,6 @@
         "party": "grn",
         "group": "35–54",
         "setLabel": "By age"
-      },
-      "grn|education|TAFE or trade": {
-        "party": "grn",
-        "group": "TAFE or trade",
-        "setLabel": "Education"
       },
       "grn|education|Year 12 or less": {
         "party": "grn",
@@ -327,24 +327,24 @@
     },
     "prim": {
       "alp": 26.4,
-      "grn": 13.5,
+      "grn": 13.4,
       "lnp": 23,
-      "onp": 25.6,
-      "oth": 11.6
+      "onp": 26,
+      "oth": 11.4
     },
     "leaders": {
-      "alb_fav": -19.2,
+      "alb_fav": -19.3,
       "alb_net": -22.7,
       "hanson_fav": -8,
       "hanson_net": -1.7,
-      "taylor_fav": -1.5,
+      "taylor_fav": -1.6,
       "taylor_net": -4.7
     },
     "lean": {
       "key": "alp_lnp|imp",
       "v": {
         "Agenda C Synesis": 0.8,
-        "DemosAU": -0.6,
+        "DemosAU": -0.7,
         "DemosAU (MRP)": 0.2,
         "Essential": -1,
         "Fox & Hedgehog": -1,
@@ -388,16 +388,14 @@
     "sig": {
       "iss|crime|imp": -1,
       "iss|housing|alp": -1,
-      "onrate|oth": 1,
       "onsrc|oth": 1,
       "prim|lnp": 1
     },
     "sigMeta": {
       "iss|crime|imp": "the share naming crime a top-three issue",
-      "iss|housing|alp": "Labor's share as the best party on housing",
-      "onrate|oth": "the share of 2025 other voters now backing One Nation",
-      "onsrc|oth": "the share of One Nation's gains drawn from 2025 other voters",
-      "prim|lnp": "the Coalition's primary vote"
+      "iss|housing|alp": "Labor’s share as the best party on housing",
+      "onsrc|oth": "the share of One Nation’s gains drawn from 2025 other voters",
+      "prim|lnp": "the Coalition’s primary vote"
     },
     "conf": {
       "business": 76.5,
@@ -576,6 +574,24 @@
       "label": "1 Nov 2026",
       "kind": "finding",
       "text": "The rise in the Coalition’s primary vote over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-11-02",
+      "label": "2 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month rise in the share of 2025 other voters now backing One Nation is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-02",
+      "label": "2 Nov 2026",
+      "kind": "finding",
+      "text": "English only voters (by language at home) now break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-02",
+      "label": "2 Nov 2026",
+      "kind": "finding",
+      "text": "TAFE or trade voters (by education) no longer break significantly toward the Greens, relative to all voters."
     }
   ]
 }

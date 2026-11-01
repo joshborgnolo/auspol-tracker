@@ -1858,6 +1858,53 @@
     "ind": 5,
     "oth": 5
    }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-10-26",
+   "dateStart": "2026-10-23",
+   "sample": 1500,
+   "article": "https://www.capitalbrief.com/article/coalition-gets-crucial-polling-boost-ahead-of-bruising-week-for-labor-1cdc69fb-9d9a-4995-9640-6f8e3304cb8c/",
+   "onp": 26,
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 68,
+     "grn": 6,
+     "lnp": 9,
+     "onp": 12,
+     "oth": 5
+    },
+    "lnp": {
+     "alp": 4,
+     "grn": 1,
+     "lnp": 61,
+     "onp": 32,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 4,
+     "grn": 79,
+     "lnp": 3,
+     "onp": 8,
+     "oth": 6
+    },
+    "onp": {
+     "alp": 3,
+     "grn": 1,
+     "lnp": 4,
+     "onp": 91,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 6,
+     "grn": 7,
+     "lnp": 9,
+     "onp": 26,
+     "oth": 52
+    }
+   }
   }
  ],
  "skipped": [

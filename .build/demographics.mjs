@@ -23,9 +23,16 @@
                  Offcuts tables (the Newspoll pooled waves' religion dims
                  likewise; its Other residual row stays facet-only too,
                  no other house printing it).
-     DemosAU   – the Gender, Age, Education, Location and Housing Tenure
-                 charts (and Language Status from May) in the wave's report
-                 PDF, measured from the rendered bars (.build/demosau-charts
+     DemosAU   – the poll-trends page (capital-brief-poll-trends-2026.html),
+                 the house's standing release form for every table since
+                 January 2026: the seven breakdown dims as exact figures
+                 (.build/demosau-trends.mjs, provenance cache beside the
+                 extractor's own; measured waves only carry five-to-seven
+                 through April – the page back-fills them per wave). The
+                 wave's report PDF stays the fallback for a wave the page
+                 doesn't carry – the Gender, Age, Education, Location and
+                 Housing Tenure charts (and Language Status from May)
+                 measured from the rendered bars (.build/demosau-charts
                  .mjs); from the April 2026 report. The four 2025–26 national
                  waves before it print the same breakdowns in layouts the
                  measurer doesn't know (July 2025, 6 Jan, 21 Jan and 20 Feb
@@ -199,8 +206,33 @@ import { ROOT, youGovSource, youGovCrosstab, demosauReport, resolveData } from "
 import { youGovDims, DEMOS_DIM, demosLabel, demosauMrpDemo, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 import { measureCharts, FIT_LIMIT, layoutText } from "./demosau-charts.mjs";
 import { watchReminders } from "./demo-watch.mjs";
+import { loadTrends, pollOf as trendsPollOf, trendDims, TRENDS_URL } from "./demosau-trends.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
+
+/* The poll-trends page's parsed data, once per run: refetched (and the
+   committed copy rewritten) while the network will allow it, falling back
+   to the committed copy without a murmur. Never blocks the build. */
+let _trendsData = null;
+async function trendsData() {
+  if (_trendsData) return _trendsData;
+  let data = null, why = null;
+  try { data = await loadTrends({ net: true }); }
+  catch (e) {
+    why = String(e.message || e).slice(0, 120);
+    try { data = await loadTrends(); } catch {}
+  }
+  if (data) console.log(`DemosAU: poll-trends page read (${data.polls.length} waves${why ? "; the live fetch failed – " + why : ""})`);
+  else console.log("DemosAU: the poll-trends page could not be read (no network, no committed copy) – its lane is quiet this run");
+  return (_trendsData = { data, why });
+}
+async function trendsWaveFor(p) {
+  const t = await trendsData();
+  if (!t.data) return null;
+  const w = trendsPollOf(t.data, p.date);
+  return w ? { data: t.data, poll: w } : null;
+}
+
 const FIRST = "2026-02-01";            // the automated readers' window opens here; earlier waves with
                                        // breakdowns ride FIRST_EXTRA (read through the readers) or the
                                        // hand-entered tables below (checked by hand, figure by figure)
@@ -1673,6 +1705,23 @@ try {
         push({ ...base, source: t.source, read: "published table", dims: d.dims, total: d.total });
         console.log(`${k}: ${Object.entries(d.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
       } else if (p.pollster === "DemosAU") {
+        /* The house's poll-trends page is its standing release form for
+           every table since January 2026 (the same data the report PDF
+           printed, as exact figures). Read it first and file what it
+           carries; the report-PDF lane below stays as the fallback for a
+           wave the page doesn't carry yet. */
+        const td = await trendsWaveFor(p);
+        if (td) {
+          const { dims, unknown, total } = trendDims(td.data, td.poll.poll);
+          const bad = Object.keys(dims).length ? (dimsProblem(dims) || totalProblem(total, p)) : `no group tables for wave ${td.poll.poll}`;
+          if (!bad) {
+            if (unknown.length) console.log(`${k}: trends page gaps (${unknown.slice(0, 3).join("; ")})`);
+            push({ ...base, source: TRENDS_URL, read: "published table", dims });
+            console.log(`${k}: ${Object.keys(dims).join(", ")} (the trends page)`);
+            continue;
+          }
+          console.log(`${k}: the trends page's rows didn't read cleanly – ${bad}; falling back to the report PDF`);
+        }
         const rep = await demosauReport(p, tmp);
         if (!rep) { pend(k, "the report PDF isn't reachable yet"); continue; }
         const charts = measureCharts(rep.file, Object.keys(DEMOS_DIM));

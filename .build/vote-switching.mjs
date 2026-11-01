@@ -9,8 +9,13 @@
    doesn't hold yet. Sources (read through
    .build/crosstab-sources.mjs, shared with .build/demographics.mjs):
      YouGov   – the 2025-vote columns of each Pulse wave's crosstab chart.
-     DemosAU  – the "Voting Intention: Past Election Vote" chart in the
-                wave's report PDF, measured from the rendered bars by
+     DemosAU  – the poll-trends page (capital-brief-poll-trends-2026.html),
+                the house's standing release form for every table since
+                January 2026: the past-election rows as exact figures
+                (.build/demosau-trends.mjs, provenance cache beside the
+                extractor's own). The report PDF stays the fallback for a
+                wave the page doesn't carry – measured there from the
+                "Voting Intention: Past Election Vote" chart by
                 .build/demosau-charts.mjs, since the PDF prints small
                 segments without a label.
      DemosAU (MRP) – the MRP report's "By 2025 Election Result" (Feb–Mar
@@ -51,10 +56,30 @@ import path from "node:path";
 import { ROOT, youGovSource, youGovCrosstab, demosauReport } from "./crosstab-sources.mjs";
 import { switchingOf, sharesProblem, totalProblem } from "./crosstab-parse.mjs";
 import { measure as demosauMeasure, measureMrp, FIT_LIMIT } from "./demosau-charts.mjs";
+import { loadTrends, pollOf as trendsPollOf, trendSwitches, TRENDS_URL } from "./demosau-trends.mjs";
 
 const OUT = path.join(ROOT, "data", "vote-switching.json");
 const FIRST_TABLE = "2026-02-01";
 const HOUSES = ["YouGov", "DemosAU", "DemosAU (MRP)"];
+
+/* The poll-trends page's parsed data, once per run (re-fetched, and the
+   committed copy rewritten, while the network will allow it; never blocks
+   the build) */
+let _trendsData = null;
+async function trendsData() {
+  if (_trendsData) return _trendsData;
+  let data = null;
+  try { data = await loadTrends({ net: true }); }
+  catch { try { data = await loadTrends(); } catch {} }
+  if (data) console.log(`DemosAU: poll-trends page read (${data.polls.length} waves)`);
+  return (_trendsData = { data });
+}
+async function trendsWaveFor(p) {
+  const t = await trendsData();
+  if (!t.data) return null;
+  const w = trendsPollOf(t.data, p.date);
+  return w ? { data: t.data, poll: w } : null;
+}
 const STALE_DAYS = 16;                 // a week to publish, then a weekly retry, then someone looks
 
 const WEIGHTS_2025 = { alp: 34.56, lnp: 31.82, grn: 12.20, onp: 6.40, ind: 7.27, oth: 7.74,
@@ -100,6 +125,26 @@ try {
       } else {
         // an MRP filed from Capital Brief has no report until DemosAU posts it
         if (p.fieldworkPending) { pend(k, "the report isn't out yet (fieldwork TBC)"); continue; }
+        /* DemosAU's poll-trends page is its standing release form for the
+           past-election rows (the same table the report PDF's chart gave,
+           exact figures). Read it first; the report lane stays as the
+           fallback for a wave the page doesn't carry. Only the plain
+           pollster – the MRP models have no trends lane (their reports
+           remain the source). */
+        if (p.pollster === "DemosAU") {
+          const td = await trendsWaveFor(p);
+          if (td) {
+            const { rows, unknown } = trendSwitches(td.data, td.poll.poll);
+            const bad = Object.keys(rows).length ? sharesProblem(rows) : `no past-vote rows for wave ${td.poll.poll}`;
+            if (!bad) {
+              if (unknown.length) console.log(`${k}: trends page gaps (${unknown.slice(0, 3).join("; ")})`);
+              push({ ...base, source: TRENDS_URL, read: "published table", rows });
+              console.log(`${k}: ${Object.keys(rows).join(",")} (the trends page)`);
+              continue;
+            }
+            console.log(`${k}: the trends page's rows didn't read cleanly – ${bad}; falling back to the report PDF`);
+          }
+        }
         const rep = await demosauReport(p, tmp);
         if (!rep) { pend(k, "the report PDF isn't reachable yet (not on record, the site's captcha, or not up)"); continue; }
         const t = p.pollster === "DemosAU (MRP)" ? measureMrp(rep.file) : demosauMeasure(rep.file);

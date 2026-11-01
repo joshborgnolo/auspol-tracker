@@ -14494,6 +14494,165 @@
    }
   },
   {
+   "pollster": "DemosAU",
+   "date": "2026-10-26",
+   "dateStart": "2026-10-23",
+   "dateEnd": "2026-10-26",
+   "sample": 1500,
+   "article": "https://www.capitalbrief.com/article/coalition-gets-crucial-polling-boost-ahead-of-bruising-week-for-labor-1cdc69fb-9d9a-4995-9640-6f8e3304cb8c/",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "grn": 11,
+      "lnp": 25,
+      "onp": 26,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 24,
+      "grn": 15,
+      "lnp": 23,
+      "onp": 26,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "grn": 30,
+      "lnp": 21,
+      "onp": 18,
+      "oth": 5
+     },
+     "35–54": {
+      "alp": 27,
+      "grn": 10,
+      "lnp": 20,
+      "onp": 29,
+      "oth": 14
+     },
+     "55+": {
+      "alp": 27,
+      "grn": 5,
+      "lnp": 28,
+      "onp": 28,
+      "oth": 12
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 26,
+      "grn": 13,
+      "lnp": 21,
+      "onp": 28,
+      "oth": 12
+     },
+     "TAFE": {
+      "alp": 26,
+      "grn": 10,
+      "lnp": 23,
+      "onp": 30,
+      "oth": 11
+     },
+     "University": {
+      "alp": 28,
+      "grn": 17,
+      "lnp": 28,
+      "onp": 19,
+      "oth": 8
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 25,
+      "grn": 13,
+      "lnp": 22,
+      "onp": 27,
+      "oth": 13
+     },
+     "$45–125k": {
+      "alp": 30,
+      "grn": 12,
+      "lnp": 24,
+      "onp": 25,
+      "oth": 9
+     },
+     "$125k+": {
+      "alp": 22,
+      "grn": 16,
+      "lnp": 30,
+      "onp": 23,
+      "oth": 9
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "grn": 18,
+      "lnp": 24,
+      "onp": 18,
+      "oth": 8
+     },
+     "Outer metro": {
+      "alp": 25,
+      "grn": 11,
+      "lnp": 27,
+      "onp": 24,
+      "oth": 13
+     },
+     "Regional or rural": {
+      "alp": 22,
+      "grn": 11,
+      "lnp": 17,
+      "onp": 39,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 28,
+      "grn": 20,
+      "lnp": 13,
+      "onp": 27,
+      "oth": 12
+     },
+     "Mortgage": {
+      "alp": 26,
+      "grn": 12,
+      "lnp": 24,
+      "onp": 28,
+      "oth": 10
+     },
+     "Own outright": {
+      "alp": 26,
+      "grn": 8,
+      "lnp": 33,
+      "onp": 23,
+      "oth": 10
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 24,
+      "grn": 13,
+      "lnp": 22,
+      "onp": 30,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 36,
+      "grn": 16,
+      "lnp": 31,
+      "onp": 10,
+      "oth": 7
+     }
+    }
+   }
+  },
+  {
    "pollster": "Essential",
    "date": "2026-10-27",
    "dateStart": "2026-10-22",
