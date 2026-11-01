@@ -4,7 +4,7 @@
   "generated": "2026-11-01",
   "inputs": {
    "data/polls.json": "5cb5694440733a4c",
-   "data/demographics.json": "51e4eea9e45d1a65",
+   "data/demographics.json": "2557e9503b16e4d2",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0"
   },
@@ -729,6 +729,7 @@
     "Resolve 2026-10-11",
     "Roy Morgan 2026-10-11",
     "YouGov 2026-10-20",
+    "DemosAU 2026-10-26",
     "Essential 2026-10-27"
    ]
   },
