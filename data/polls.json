@@ -6219,6 +6219,23 @@
       "releaseUrl": "https://essentialreport.com.au/reports/28-october-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/10/Essential-Report-Disclosure-Statement-Full-Questionnaire-.pdf",
       "assimilated": true
+    },
+    {
+      "date": "2026-10-29",
+      "published": "2026-11-01T20:00",
+      "dateStart": "2026-10-26",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1200,
+      "alp": 27,
+      "lnp": 21,
+      "grn": 13,
+      "onp": 28,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9"
     }
   ],
   "ppm": [
@@ -7039,6 +7056,15 @@
       "firm": "YouGov",
       "alb": 41,
       "opp": 39,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-10-29",
+      "firm": "Newspoll",
+      "alb": 42,
+      "opp": 40,
       "oppName": "Taylor",
       "han": null,
       "extra": null
@@ -8952,6 +8978,15 @@
           "dis": 40
         }
       }
+    },
+    {
+      "date": "2026-10-29",
+      "firm": "Newspoll",
+      "alb": -23,
+      "opp": -10,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": null
     }
   ],
   "ppmHeadToHead": [

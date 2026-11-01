@@ -1,0 +1,32 @@
+{
+  "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9",
+  "textHash": "c791b10e93feb0b0",
+  "readAt": "2026-11-01T09:10:46.868Z",
+  "reading": {
+    "scope": "newspoll",
+    "fields": {
+      "alp": null,
+      "lnp": null,
+      "grn": null,
+      "onp": null,
+      "ind": null,
+      "oth": null,
+      "tpp_alp": null,
+      "pmApp": null,
+      "pmDis": null,
+      "pmNet": null,
+      "oppApp": null,
+      "oppDis": null,
+      "oppNet": null,
+      "hanApp": null,
+      "hanDis": null,
+      "hanNet": null,
+      "ppmA": null,
+      "ppmO": null,
+      "ppm3A": null,
+      "ppm3O": null,
+      "ppm3H": null
+    },
+    "notes": "bundle contains only the article headline (para 0) — no figures are stated anywhere in the supplied text"
+  }
+}
