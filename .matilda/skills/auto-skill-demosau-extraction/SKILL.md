@@ -164,10 +164,11 @@ what closes the gate. Hand-entered rows must NEVER carry `methodUrl`.
   seat ranges ride THAT row as a `seats` block — same home as the Aug 2026
   row's: `{total:150, rangeOnly:true, method, p:{alp:{lo,hi},
   lnp:{lo,hi,note:"Nat 6–13"}, onp:{lo,hi}}}`; unstated grn/oth keys are
-  simply omitted (renderer tolerates absent `seats.p` ids), `method` credits
-  the model in the article's words. Null/omitted primaries are legal where
-  the article doesn't print them (grn/ind null precedent: Wolf & Smith
-  2025-07-30).
+  simply omitted (renderer tolerates absent `seats.p` ids), `method` stays
+  TERSE ("MRP"): the All-polls ledger line can't hold a credit sentence on
+  a phone (user call 2026-11-01, "just say modelled – MRP"). Null/omitted
+  primaries are legal where the article doesn't print them (grn/ind null
+  precedent: Wolf & Smith 2025-07-30).
 - **Approval nets hand-entered with the wave**: reconcile every quoted change
   against the latest committed DemosAU `approval` row first (worked: Sep
   -16/-4/-12 → "fell 4 points to -20", "+5 to +1", "-2 to -14" — all exact),

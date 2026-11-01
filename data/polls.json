@@ -6230,16 +6230,16 @@
       "sample": 1500,
       "alp": 26,
       "lnp": 24,
-      "grn": null,
-      "onp": 24,
-      "ind": null,
+      "grn": 13,
+      "onp": 26,
+      "ind": 11,
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
       "seats": {
         "total": 150,
         "rangeOnly": true,
-        "method": "Multilevel regression and post-stratification, published with the poll",
+        "method": "MRP",
         "p": {
           "alp": {
             "lo": 64,

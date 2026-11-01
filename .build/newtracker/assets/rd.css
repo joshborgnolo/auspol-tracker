@@ -4052,7 +4052,8 @@ body.rd .rd-ldg-dircut-r b { font-weight: 600; font-variant-numeric: tabular-num
 body.rd .rd-ldg-dircut-note { font-style: normal; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-ldg-conf { font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
-/* the lines: a label, then units that wrap between themselves, never inside */
+/* the lines: a label, then units that wrap between themselves; figures never
+   break inside — prose tails may (see rd-ldg-lisoft below) */
 body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
 body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
 body.rd .rd-ldg-line {
@@ -4071,6 +4072,11 @@ body.rd .rd-ldg-lbody b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ldg-lbody em { font-style: normal; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
 body.rd .rd-ldg-li { white-space: nowrap; }
 body.rd .rd-ldg-li.lbl { margin-right: -6px; }
+/* soft/label units are PROSE tails, not figure pairs: they break inside
+   themselves rather than ever push the line past its container — a
+   sentence-long seats method credit overflowed the document on a phone
+   (user report 2026-11-01: it must go on a new line before it overflows) */
+body.rd .rd-ldg-li.rd-ldg-lisoft { white-space: normal; }
 body.rd .rd-ldg-lisoft { color: var(--ink-3); }
 /* the Preferences line's region cycler: a chip no taller than the line it
    sits in (13.5px × 1.25 + 2px border < the line's 19.6px), every region's
