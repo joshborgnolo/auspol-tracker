@@ -213,18 +213,21 @@ const twinFile = (name) => writeFileSync(path.join(dir, name), [
 ].join("\n"));
 twinFile("np-score.yml");
 twinFile("prediction-refresh.yml");
+twinFile("seat-model-refresh.yml");
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
-assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated"], "the first tune writes both twin lines");
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated", "updated"], "the first tune writes every twin line");
 assert.ok(crons(readFileSync(path.join(dir, "np-score.yml"), "utf8")).some((c) => c.cron === "15 21 * * *"), "07:15 Sydney is 21:15 UTC in AEST");
 assert.ok(crons(readFileSync(path.join(dir, "prediction-refresh.yml"), "utf8")).some((c) => c.cron === "0 3 * * *"), "13:00 Sydney is 03:00 UTC in AEST");
+assert.ok(crons(readFileSync(path.join(dir, "seat-model-refresh.yml"), "utf8")).some((c) => c.cron === "30 20 * * *"), "06:30 Sydney is 20:30 UTC the day before in AEST");
 res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
-assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated"], "the DST switch moves the twins");
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated", "updated"], "the DST switch moves the twins");
 assert.ok(crons(readFileSync(path.join(dir, "np-score.yml"), "utf8")).some((c) => c.cron === "15 20 * * *"), "07:15 Sydney is 20:15 UTC in AEDT");
 assert.ok(crons(readFileSync(path.join(dir, "prediction-refresh.yml"), "utf8")).some((c) => c.cron === "0 2 * * *"), "13:00 Sydney is 02:00 UTC in AEDT");
+assert.ok(crons(readFileSync(path.join(dir, "seat-model-refresh.yml"), "utf8")).some((c) => c.cron === "30 19 * * *"), "06:30 Sydney is 19:30 UTC the day before in AEDT");
 res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
-assert.deepEqual(res.fixedTwins.map((t) => t.status), ["current", "current"], "and then they rest");
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["current", "current", "current"], "and then they rest");
 // a fixture (or fork) without the twin files: reported, not fatal
 res = tune({ data, workflowsDir: mkdtempSync(path.join(tmpdir(), "tune-empty-")), now: new Date("2026-09-22T00:00:00Z"), apply: false });
-assert.deepEqual(res.fixedTwins.map((t) => t.status), ["no-file", "no-file"], "absent twin files are reported, skipped");
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["no-file", "no-file", "no-file"], "absent twin files are reported, skipped");
 
 console.log("test-tune-schedules: ok");

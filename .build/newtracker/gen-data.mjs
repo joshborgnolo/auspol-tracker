@@ -8520,6 +8520,20 @@ const house = (() => {
   } catch (e) { console.warn("gen-data: the map's House data is unreadable (" + e.message + ")"); return null; }
 })();
 
+/* the seat model's latest official run, for the More menu's Election model line (/model/, built by
+   .build/analysis/seat-model and .build/model): its headline (written by the page's own rules,
+   .build/model/views.mjs, and stored in the run), the leading parties' average seats and chances, and the
+   date its polls run to. Federal only; null when the run is absent */
+const seatModel = (() => {
+  if (JUR) return null;
+  try {
+    const r = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "seat-model-2028-nowcast.json"), "utf8"));
+    const n = r.national;
+    return { headline: n.headline || null, pollsTo: r.meta.window ? r.meta.window.to : null, draws: r.meta.draws,
+      expectedSeats: n.expectedSeats, mostSeats: n.mostSeats, majority: n.majority };
+  } catch (e) { console.warn("gen-data: the seat model's run is unreadable (" + e.message + ")"); return null; }
+})();
+
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
    Generated from ${JUR ? "data/vic-polls.json (via .build/vic/to-main-schema.mjs)" : "data/polls.json"} by .build/newtracker/gen-data.mjs – do
@@ -8907,6 +8921,8 @@ window.AUSPOL = (function () {
   const publicOpinionLatest = ${JSON.stringify(publicOpinionLatest)};
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = ${JSON.stringify(house)};
+  /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
+  const seatModel = ${JSON.stringify(seatModel)};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -8958,7 +8974,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house,
+    loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)

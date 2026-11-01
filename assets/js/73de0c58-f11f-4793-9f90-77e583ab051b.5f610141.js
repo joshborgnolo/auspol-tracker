@@ -1680,6 +1680,12 @@ const TABS = [{
   ext: true,
   tip: "Every federal seat and polling place since 2004, on the map and in the chamber"
 }, {
+  id: "model",
+  label: "Election model",
+  menu: true,
+  ext: true,
+  tip: "Who would win the House: 20,000 simulated elections from the polls, seat by seat"
+}, {
   id: "public-opinion",
   label: "Public opinion",
   menu: true,
@@ -1700,6 +1706,7 @@ if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "map"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "model"), 1);
 const TAB_IDS = TABS.filter(t => !t.ext).map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu && !t.ext).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";

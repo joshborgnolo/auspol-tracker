@@ -459,6 +459,7 @@ export const TABLE_ABOUT = "Dispatch table for the external clock (.build/dispat
 export const FIXED_SLOTS = [
   { workflow: "np-score.yml", day: "daily", time: "07:15", label: "daily score (twin of its cron line)" },
   { workflow: "prediction-refresh.yml", day: "daily", time: "13:00", label: "daily model read (twin of its cron line)" },
+  { workflow: "seat-model-refresh.yml", day: "daily", time: "06:30", label: "daily election model run (twin of its cron line)" },
 ];
 export function dispatchTable(blocks, { previous = null, now = new Date() } = {}) {
   const slots = [];

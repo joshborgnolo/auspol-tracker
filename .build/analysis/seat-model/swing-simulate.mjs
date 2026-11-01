@@ -24,6 +24,7 @@ import { join } from "node:path";
 import { count, P5 } from "./seat-engine.mjs";
 import { prepInputs, buildSeatsFrom } from "./seat-inputs.mjs";
 import { modelSettings, runMany, projectOnce, bucketOf, KEYS } from "./model-sim.mjs";
+import { headline } from "../../model/views.mjs";
 
 const MODE = process.env.AUSPOL_SIM_MODE || (process.env.AUSPOL_SIM_NULL === "1" ? "replay" : "nowcast");
 const DRAWS = +(process.env.AUSPOL_SIM_DRAWS || 20000);
@@ -83,6 +84,8 @@ const out = {
     finalPairs: res.finalPairs, twoPartyClassic: res.twoPartyClassic, nationalVote: res.nationalVote, central: central.seats },
   seats: res.seats.map((s, i) => ({ ...s, central: { w: central.perSeat[i].w, pair: central.perSeat[i].pair, share: central.perSeat[i].share } })),
 };
+// the run's headline, by the /model/ page's own rules (.build/model/views.mjs) - the More menu quotes it
+out.national.headline = headline(out, MODE);
 writeFileSync(OUT_PATH, JSON.stringify(out) + "\n");
 if (MODE === "nowcast" && !process.env.AUSPOL_SIM_OUT) {
   const rec = { date: VOTE.diagnostics.recentWindow.to, engine: "v2.1", expectedSeats: res.expectedSeats, majority: res.majority,

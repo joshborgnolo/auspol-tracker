@@ -43,6 +43,8 @@
                          tone, under "Labor holds 94 of the 150 seats" (and
                          how many seats have changed hands or party since the
                          election, where any have)
+     Election model      the leading party's average seats in the latest official run, in its
+                         tone, under that run's own headline
      Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
@@ -388,6 +390,17 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
         ? { v: `${share(n, H.total)} | ${share(S.seats[lead], S.total)}`, cap: `${party}’s share of HoR and Senate seats`, tone: lead }
         : { v: share(n, H.total), cap: `${party} seats`, tone: lead };
       return { head, fig };
+    });
+    /* the seat model (/model/, a page outside this build): the headline its latest official run wrote by
+       the page's own rules (.build/model/views.mjs, stored in data/seat-model-2028-nowcast.json, so the
+       menu never says what the page doesn't), and as the figure that party's average seats across the
+       simulations, in its tone. A federal-less build files no line */
+    put("model", () => {
+      const M = D.seatModel;
+      if (!M || !M.headline) return null;
+      const lead = ["alp", "lnp", "on"].sort((a, b) => M.mostSeats[b] - M.mostSeats[a])[0];
+      const party = { alp: "Labor", lnp: "Coalition", on: "One Nation" }[lead];
+      return { head: M.headline, fig: { v: String(Math.round(M.expectedSeats[lead])), cap: `${party} seats on average`, tone: lead === "on" ? "onp" : lead } };
     });
     /* the catalogue's newest wave as a date figure, as the changelog row's */
     put("public-opinion", () => {

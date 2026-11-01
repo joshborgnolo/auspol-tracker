@@ -343,6 +343,8 @@ window.AUSPOL = (function () {
   const publicOpinionLatest = "2026-10-29";
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4,"senate":{"asOf":"2026-10-09","total":76,"seats":{"alp":30,"lnp":27,"grn":10,"onp":4,"ind":2,"oth":3}}};
+  /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
+  const seatModel = {"headline":"Labor would win the most seats, more likely short of a majority than not","pollsTo":"2026-10-27","draws":20000,"expectedSeats":{"alp":71.36,"lnp":30.75,"on":35.98,"grn":4.31,"oth":0.01,"member":7.58},"mostSeats":{"alp":0.9066,"lnp":0.0113,"on":0.0821,"grn":0,"oth":0,"member":0},"majority":{"alp":0.3804,"coalition":0.0014,"on":0.0168,"noMajority":0.6015}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -394,7 +396,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house,
+    loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };

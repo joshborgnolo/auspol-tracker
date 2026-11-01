@@ -56,7 +56,7 @@ push_main_regen_attrs() {
 # never needs to.
 PUSH_MAIN_SELF=""
 case "$0" in
-  *-updater.sh|*prediction-refresh.sh) PUSH_MAIN_SELF="${REPO:-.}/.build/$(basename "$0")" ;;
+  *-updater.sh|*prediction-refresh.sh|*seat-model-refresh.sh) PUSH_MAIN_SELF="${REPO:-.}/.build/$(basename "$0")" ;;
 esac
 PUSH_MAIN_ARGV=("$@")
 

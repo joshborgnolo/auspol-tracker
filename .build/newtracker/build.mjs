@@ -2309,6 +2309,9 @@ const PREDICTION_STAMP = "2026-11-01";
 /* map/ is hand-built (.build/map/): its data is the House as at this date (the
    "Now" overlay's asOf); bump it with each rebuild of map/data */
 const MAP_STAMP = "2026-10-25";
+/* model/ is the seat model's page (.build/model/): dated by its latest official run, read from the
+   run itself, so the daily model refresh moves it with no stamp to bump */
+const MODEL_STAMP = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "seat-model-2028-nowcast.json"), "utf8"))._provenance.generated; } catch { return "2026-11-01"; } })();
 /* Tab pages are born the day the build first emits them; a page younger
    than the data it carries must not be dated before it existed, so their
    lastmod is the later of the go-live stamp and the data stamp (the
@@ -2395,6 +2398,10 @@ ${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explai
   <url>
     <loc>${SITE_URL}map/</loc>
     <lastmod>${MAP_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}model/</loc>
+    <lastmod>${MODEL_STAMP}</lastmod>
   </url>
   <url>
     <loc>${SITE_URL}prediction/</loc>

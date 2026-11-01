@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Election model – auspol tracker</title>
+<!-- The Election model: the 2028 House as the polls stand, simulated 20,000 times - every seat, the
+     preferences that decide it, and every setting open to change. Hand-maintained page; its script
+     and styles (model.js, model.css) are assembled from .build/model by node .build/model/assemble.mjs,
+     which also writes the static head between the md-static markers from the official run; the
+     engine in model/js/ is a byte-identical copy of .build/analysis/seat-model (test-model-bundle.mjs).
+     A ☰ menu page outside the main build (TABS’ ext entry "model"). Shell (header/footer) filled by
+     node .build/site-shell.mjs. -->
+<meta name="description" content="Who would win the House if an election were held now, and on election day: 20,000 simulated elections from the polls, every seat, the preferences behind it, how well the model has done, and every setting open to change.">
+<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="Election model – auspol tracker">
+<meta property="og:description" content="The 2028 House as the polls stand: 20,000 simulated elections, every seat, the preferences behind it and how well the model has done.">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://auspoltracker.com/model/">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/favicon-192.png">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<style>
+/* ------- fonts: the cuts the page runs ------- */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------- palette: the editorial surfaces the live site runs in ------- */
+:root {
+  --bg:        oklch(0.975 0.009 80);
+  --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
+  --ink-3:     oklch(0.52 0.010 58);
+  --ink-faint: oklch(0.70 0.008 65);
+  --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
+  --accent:    oklch(0.50 0.070 205);
+  --surface:   oklch(0.992 0.004 85);
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the map's own party fills: the site's hues, re-stepped so every pair of
+     touching seats stays apart for colour-blind readers (all-pairs check:
+     worst protan/deutan dE 8.7 light, 8.6 dark; normal vision 15) */
+  --m-alp: #af3d36; --m-lnp: #386695; --m-grn: #50a064; --m-onp: #d27306; --m-ind: #977b9d; --m-csa: #008a9c; --m-oth: #938a81;
+  /* the pinned tab bar's height: the view sticks just under it */
+  --pin-top: 62px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.sh-light) {
+    --bg:        oklch(0.205 0.010 65);
+    --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
+    --ink-3:     oklch(0.670 0.009 72);
+    --ink-faint: oklch(0.545 0.009 68);
+    --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
+    --accent:    oklch(0.70 0.080 205);
+    --surface:   oklch(0.235 0.010 65);
+    --m-alp: #e45e51; --m-lnp: #4092e7; --m-grn: #5dc47e; --m-onp: #f69828; --m-ind: #ba96bf; --m-csa: #00b4cd; --m-oth: #a69d93;
+    color-scheme: dark;
+  }
+}
+</style>
+<link rel="stylesheet" href="/model/model.css?v=4e34494f">
+<!--shell:head-->
+<link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site-shell.css?v=27b8dec3dd">
+<script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
+<style>
+/* this page's dark-mode rules, for a reader who chose dark on a light device */
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #e45e51; --m-lnp: #4092e7; --m-grn: #5dc47e; --m-onp: #f69828; --m-ind: #ba96bf; --m-csa: #00b4cd; --m-oth: #a69d93; color-scheme: dark; }
+</style>
+<!--/shell:head-->
+</head>
+<body>
+<!--shell:header-->
+<a class="sh-skip" href="#sh-content">Skip to content</a>
+<div class="sh-frame sh-top">
+  <header class="sh-head">
+    <div class="sh-brand">
+    <div class="sh-lockup">
+      <a class="wordmark stacked" href="/" title="The interactive tracker">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <span class="wm-sr">– Australian federal polling</span>
+      </a>
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-label="Wind the dial back through the term" aria-describedby="wm-action">
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian federal election, and for all since <span class="sh-past">1943</span>.</p>
+    <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>Latest poll</b> <span class="sh-latest"></span>, <span class="sh-rel"></span>, <span class="sh-npolls"></span> polls</span></p>
+    </div>
+    <div class="sh-right">
+    <div class="sh-meta" hidden>
+      <div class="sh-meta-item"><span class="sh-meta-k">Latest poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-latest"></span></span><span class="sh-meta-s">published <span class="sh-rel"></span></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">This term</span><span class="sh-meta-v sh-tracked"></span><span class="sh-meta-s sh-houses"></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span><span class="sh-meta-s sh-duein"></span></div>
+    </div>
+    <div class="sh-theme" role="group" aria-label="Colour theme">
+      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg></button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg></button>
+    </div>
+    </div>
+  </header>
+</div>
+<div class="sh-tabs-sentinel" aria-hidden="true"></div>
+<nav class="sh-tabs" aria-label="Site">
+  <div class="sh-frame">
+    <div class="sh-tabs-inner">
+      <div class="sh-tabs-set">
+        <a class="sh-tab" href="/">Now</a>
+        <a class="sh-tab" href="/cycles/"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
+        <a class="sh-tab" href="/allpolls/">All polls</a>
+        <a class="sh-tab sh-tab-pinhide" href="/info/">Info</a>
+        <button type="button" class="sh-tab sh-menu-btn active" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages – on Election model" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span><svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg><span class="sh-menu-lab">Election model</span><svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></button>
+      </div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
+      <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to Now"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+    </div>
+  </div>
+  <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/map/" data-id="map"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Election map</span><span class="sh-menu-d">Every federal seat and polling place since 2004, on the map and in the chamber</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item on" href="/model/" data-id="model" aria-current="page"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Election model</span><span class="sh-menu-d">Who would win the House: 20,000 simulated elections from the polls, seat by seat</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">8</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">9</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
+</nav>
+<!--/shell:header-->
+<main id="sh-content" class="sh-page md">
+  <div class="sh-arow">
+    <h1 class="sh-atitle">Election model</h1>
+    <span class="sh-ameta" id="md-meta">The 2028 House as the polls stand</span>
+    <span class="rd-grow"></span>
+    <div class="md-modes" role="tablist" aria-label="When the election is held">
+      <button type="button" class="rd-tab" role="tab" id="mode-nowcast" data-mode="nowcast" aria-selected="true"><span class="tw" data-t="If held today">If held today</span></button>
+      <button type="button" class="rd-tab" role="tab" id="mode-forecast" data-mode="forecast" aria-selected="false"><span class="tw" data-t="On election day">On election day</span></button>
+    </div>
+  </div>
+<!--md-static:begin-->
+  <h2 class="sh-hed" id="md-hed">Labor would win the most seats, more likely short of a majority than not</h2>
+  <p class="sh-dek" id="md-dek">In 20,000 simulated elections held on the polls to 27 October, Labor wins 71 seats on average (51 to 90 in nine of ten), One Nation 36 (13 to 63) and the Coalition 31 (15 to 48). Labor reaches the 76 seats needed to govern alone in 38% of them.</p>
+  <p class="md-head-note" id="md-note">Polls to <b>27 October 2026</b> (16 polls since 28 August) · model run 1 November 2026 · 20,000 simulated elections · <a href="#how">how it works</a></p>
+  <div class="md-outcomes" id="md-outcomes"><div class="md-obar" role="img" aria-label="Labor majority 38%, Labor most seats, no majority 53%, One Nation majority 2%, One Nation most seats, no majority 7%, Coalition majority &lt;1%, Coalition most seats, no majority 1%"><span class="t-alp" style="flex-grow:380.4" title="Labor majority: 38%"></span><span class="t-alp soft" style="flex-grow:526.2" title="Labor most seats, no majority: 53%"></span><span class="t-on" style="flex-grow:16.8" title="One Nation majority: 2%"></span><span class="t-on soft" style="flex-grow:65.3" title="One Nation most seats, no majority: 7%"></span><span class="t-lnp" style="flex-grow:1.4" title="Coalition majority: <1%"></span><span class="t-lnp soft" style="flex-grow:9.9" title="Coalition most seats, no majority: 1%"></span></div><div class="md-olegend"><span class="it t-alp"><span class="sw"></span>Labor majority <b>38%</b></span><span class="it t-alp"><span class="sw soft"></span>Labor most seats, no majority <b>53%</b></span><span class="it t-on"><span class="sw"></span>One Nation majority <b>2%</b></span><span class="it t-on"><span class="sw soft"></span>One Nation most seats, no majority <b>7%</b></span><span class="it t-lnp"><span class="sw soft"></span>Coalition most seats, no majority <b>1%</b></span></div></div>
+  <div class="md-ranges" id="md-ranges"><p class="md-sr">Labor 71 seats on average, 51 to 90 in nine simulations of ten; One Nation 36 seats on average, 13 to 63 in nine simulations of ten; The Coalition 31 seats on average, 15 to 48 in nine simulations of ten; Independents 8 seats on average, 4 to 11 in nine simulations of ten; The Greens 4 seats on average, 1 to 9 in nine simulations of ten.</p><div class="md-rrow t-alp">
+      <div class="md-rname"><span class="dot"></span>Labor <small>most seats 91%</small></div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:60.80%"></span><span class="md-maj-lab" style="left:60.80%">76 for a majority</span><span class="b90" style="left:40.80%;width:31.20%"></span><span class="b50" style="left:51.20%;width:12.80%"></span><span class="med" style="left:57.60%"></span></div>
+      <div class="md-rnum">71<small>51–90</small></div>
+    </div><div class="md-rrow t-on">
+      <div class="md-rname"><span class="dot"></span>One Nation <small>most seats 8%</small></div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:60.80%"></span><span class="b90" style="left:10.40%;width:40.00%"></span><span class="b50" style="left:20.00%;width:16.00%"></span><span class="med" style="left:27.20%"></span></div>
+      <div class="md-rnum">36<small>13–63</small></div>
+    </div><div class="md-rrow t-lnp">
+      <div class="md-rname"><span class="dot"></span>The Coalition <small>most seats 1%</small></div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:60.80%"></span><span class="b90" style="left:12.00%;width:26.40%"></span><span class="b50" style="left:19.20%;width:10.40%"></span><span class="med" style="left:24.00%"></span></div>
+      <div class="md-rnum">31<small>15–48</small></div>
+    </div><div class="md-rrow t-member">
+      <div class="md-rname"><span class="dot"></span>Independents</div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:60.80%"></span><span class="b90" style="left:3.20%;width:5.60%"></span><span class="b50" style="left:4.80%;width:2.40%"></span><span class="med" style="left:6.40%"></span></div>
+      <div class="md-rnum">8<small>4–11</small></div>
+    </div><div class="md-rrow t-grn">
+      <div class="md-rname"><span class="dot"></span>The Greens</div>
+      <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:60.80%"></span><span class="b90" style="left:0.80%;width:6.40%"></span><span class="b50" style="left:1.60%;width:3.20%"></span><span class="med" style="left:3.20%"></span></div>
+      <div class="md-rnum">4<small>1–9</small></div>
+    </div><div class="md-raxis" aria-hidden="true"><span></span><div class="ax"><span style="left:0.00%">0</span><span style="left:20.00%">25</span><span style="left:40.00%">50</span><span style="left:60.00%">75</span><span style="left:80.00%">100</span><span style="left:100.00%">125</span></div><span></span></div></div>
+  <div class="md-rkey"><span><i></i>nine simulations in ten</span><span><i class="k50"></i>the middle half</span><span><i class="kmed"></i>the median</span><span>The large figure is the average; the small range is the nine-in-ten band.</span></div>
+<!--md-static:end-->
+  <section class="md-sec" id="chances" aria-labelledby="chances-t">
+    <div class="md-sh"><h2 id="chances-t">How many seats each party wins</h2><span class="md-shm" id="dist-meta"></span></div>
+    <div class="md-dist" id="dist"></div>
+  </section>
+  <section class="md-sec" id="seats" aria-labelledby="seats-t">
+    <div class="md-sh"><h2 id="seats-t">Seat by seat</h2><span class="md-shm" id="seats-meta"></span></div>
+    <div class="md-seatbar">
+      <div class="md-filters" role="tablist" aria-label="Which seats" id="seat-filters"></div>
+      <div class="md-states" id="seat-states" role="group" aria-label="State"></div>
+      <label class="md-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg><input id="seat-q" type="search" autocomplete="off" spellcheck="false" placeholder="Find a seat" aria-label="Find a seat"></label>
+    </div>
+    <div class="md-tbl-wrap"><table class="md-seats" id="seat-table"></table></div>
+    <div class="md-more" id="seat-more"></div>
+  </section>
+  <section class="md-sec" id="explore" aria-labelledby="explore-t">
+    <div class="md-sh"><h2 id="explore-t">Try your own numbers</h2><span class="md-shm">The same model, run in your browser</span></div>
+    <p class="md-lede">Change the national vote, how voters order their preferences, or how much the model is unsure of, and the model re-runs on your settings: one central projection straight away, then a thousand simulated elections. Everything else stays as the official run has it.</p>
+    <div class="md-ex" id="ex"></div>
+  </section>
+  <section class="md-sec" id="how" aria-labelledby="how-t">
+    <div class="md-sh"><h2 id="how-t">How the model works</h2><span class="md-shm">Five steps, every setting fitted on past elections</span></div>
+    <div class="md-steps" id="how-steps"></div>
+  </section>
+  <section class="md-sec" id="tests" aria-labelledby="tests-t">
+    <div class="md-sh"><h2 id="tests-t">How well it has done</h2><span class="md-shm">Past elections, counted again with only what was known beforehand</span></div>
+    <div class="md-steps" id="tests-body"></div>
+  </section>
+  <section class="md-sec" id="limits" aria-labelledby="limits-t">
+    <div class="md-sh"><h2 id="limits-t">What it cannot know</h2></div>
+    <div class="md-limits" id="limits-body"></div>
+  </section>
+  <section class="md-sec" id="files" aria-labelledby="files-t">
+    <div class="md-sh"><h2 id="files-t">The data and the code</h2><span class="md-shm" id="files-meta"></span></div>
+    <div class="md-files" id="files-body"></div>
+  </section>
+  <noscript><p class="md-lede">The seat table, the charts and the explorer need JavaScript; the head above is the official run.</p></noscript>
+</main>
+<script src="/model/model.js?v=de5cc096"></script>
+<!--shell:footer-->
+<div class="sh-frame">
+  <footer class="sh-foot">
+    <div class="sh-colo">
+      <div class="sh-about" data-nosnippet>
+        <p class="sh-lede">auspol tracker is an unofficial aggregator of published federal opinion polling.</p>
+        <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
+      </div>
+      <div class="sh-ways">
+        <p class="sh-fb">How the figures are built is in <a href="/info/">Info</a>. Spot an error, a missing poll, or have any other feedback? Please <a class="sh-fb-link" href="/feedback/">let me know</a>.</p>
+        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/provenance/">here</a> for safekeeping and convenience.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+<div class="sh-band" aria-hidden="true"></div>
+<script src="/assets/site-shell.js?v=27b8dec3dd" defer></script>
+<!--/shell:footer-->
+</body>
+</html>

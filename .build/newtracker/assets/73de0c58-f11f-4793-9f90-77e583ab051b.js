@@ -1987,6 +1987,11 @@ const TABS = [
      page turn and no menu-page view, and build.mjs emits no document for it */
   { id: "map", label: "Election map", menu: true, ext: true,
     tip: "Every federal seat and polling place since 2004, on the map and in the chamber" },
+  /* Election model (2026-11-01), the menu's sixth page: who would win the House, from 20,000
+     simulated elections on the polls, seat by seat, with every setting open to change - a page
+     OUTSIDE this build (ext), the satellite at /model/ (.build/model/), linked as the map is */
+  { id: "model", label: "Election model", menu: true, ext: true,
+    tip: "Who would win the House: 20,000 simulated elections from the polls, seat by seat" },
   /* Public opinion, the ☰ menu's fifth page: what the pollsters ask
      beyond voting intention, by topic, the recurring questions charted
      across pollsters. It was the /ad-hocs/ catalogue of every one-off
@@ -2022,6 +2027,8 @@ if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "public-opinion"), 1)
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);
 /* the map is federal: /vic/'s menu never holds it */
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "map"), 1);
+/* the seat model is federal too */
+if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "model"), 1);
 /* this page's own views: an ext entry is a link out, never a view */
 const TAB_IDS = TABS.filter((t) => !t.ext).map((t) => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu && !t.ext).map((t) => [t.id, t]));

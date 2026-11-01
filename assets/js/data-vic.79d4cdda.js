@@ -3913,6 +3913,7 @@ window.AUSPOL = function () {
   const publicOpinionTopics = null;
   const publicOpinionLatest = null;
   const house = null;
+  const seatModel = null;
   const publicOpinionByRow = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
@@ -4120,6 +4121,7 @@ window.AUSPOL = function () {
     publicOpinionLatest,
     publicOpinionByRow,
     house,
+    seatModel,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,

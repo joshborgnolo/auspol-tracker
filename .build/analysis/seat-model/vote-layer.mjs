@@ -357,7 +357,8 @@ const out = {
   },
 };
 const { writeFileSync } = await import("node:fs");
-writeFileSync("data/seat-vote-layer.json", JSON.stringify(out, null, 1) + "\n");
+// AUSPOL_VOTE_OUT: write elsewhere (the daily refresh, .build/model/refresh.mjs, compares before it commits)
+writeFileSync(process.env.AUSPOL_VOTE_OUT || "data/seat-vote-layer.json", JSON.stringify(out, null, 1) + "\n");
 
 /* ---- 8. console report --------------------------------------------------- */
 console.log("W4 vote layer —", latestWave, "(window from", recentFrom + ")", "\n");

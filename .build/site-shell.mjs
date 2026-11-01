@@ -93,6 +93,7 @@ export const SHELL_PAGES = [
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
   { file: "lef-success/index.html" },
+  { file: "model/index.html", menu: "model" },              // the Election model: built by .build/model/assemble.mjs (+ export.mjs), a ☰ menu page outside the main build (TABS' ext entry "model")
   { file: "map/index.html", menu: "map" },                  // the Election map: built by .build/map/assemble.mjs, a ☰ menu page outside the main build (TABS' ext entry)                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
   { file: "provenance/index.html", page: "archives" },        // hand-maintained: the Provenance hub (moved from /archives/ 2026-10-24, which reverted to a redirect stub)
