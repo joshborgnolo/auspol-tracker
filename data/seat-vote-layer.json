@@ -3,25 +3,25 @@
  "_provenance": {
   "generated": "2026-11-01",
   "inputs": {
-   "data/polls.json": "828d2068bae9b9d6",
+   "data/polls.json": "dae3a3d75d042c7c",
    "data/demographics.json": "51e4eea9e45d1a65",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0"
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 26.6 lnp 22.7 grn 13.7 onp 26.1 oth 11.3 | n=5"
+   "captured": "primaryNow: alp 26.4 lnp 23 grn 13.4 onp 26 oth 11.3 | n=6"
   }
  },
  "national": {
   "nowcast": {
-   "alp": 26.6,
-   "lnp": 22.7,
-   "grn": 13.7,
-   "on": 26.1,
+   "alp": 26.4,
+   "lnp": 23,
+   "grn": 13.4,
+   "on": 26,
    "oth": 11.3
   },
-  "nPolls": 5,
+  "nPolls": 6,
   "result2025": {
    "alp": 34.56,
    "lnp": 31.82,
@@ -30,10 +30,10 @@
    "oth": 15.01
   },
   "delta": {
-   "alp": -7.96,
-   "lnp": -9.12,
-   "on": 19.7,
-   "grn": 1.5,
+   "alp": -8.16,
+   "lnp": -8.82,
+   "on": 19.6,
+   "grn": 1.2,
    "oth": -3.71
   },
   "note": "Δ = nowcast − certified 2025, pp, 5-key (lnp combined Coalition). Uncertainty deliberately not printed at this layer: W5 takes the estimator's own within gen-data."
