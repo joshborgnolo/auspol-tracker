@@ -437,7 +437,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   return { hed, dek };
 }
 
-// the Seat-type lens's vote table, per AEC class: the two-party read and the
+// the area story's vote table, per AEC class, shared across lenses: the two-party read and the
 // primaries pooled vote by vote from the seats' own counts — exact election
 // figures, never estimates. Renders nothing where the frame's seats carry no
 // type (the state and 1993 frames)
@@ -500,7 +500,7 @@ function storyArea(m, st) {
   if (bySt.length > 1) {
     h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${bySt.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
-  if (S.lens === "cls") h += clsVoteBlock(m, idx);
+  h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
