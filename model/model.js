@@ -108,18 +108,22 @@ function rangesHTML(res, { compare = null, axisMax = axisMaxFor(res, compare), l
     const d = nat.seatDistribution[k], e = nat.expectedSeats[k];
     const ms = nat.mostSeats[k] ?? 0;
     const sub = k === "alp" || k === "on" || k === "lnp" ? `most seats ${pctShort(ms)}` : "";
+    // against the official run: a short signed badge beside the average (the key under the explorer's
+    // chart says what it is); written out in full for screen readers in the summary paragraph
     let delta = "";
-    if (compare) { const dv = Math.round(e) - Math.round(compare.national.expectedSeats[k]); delta = `<span class="md-delta">${dv > 0 ? "+" : dv < 0 ? "−" : "±"}${Math.abs(dv)} on the official run</span>`; }
+    if (compare) { const dv = Math.round(e) - Math.round(compare.national.expectedSeats[k]); delta = `<span class="md-delta${dv === 0 ? " zero" : ""}" title="${dv === 0 ? "The same as" : `${Math.abs(dv)} ${dv > 0 ? "more" : "fewer"} than`} the official run's average">${dv > 0 ? "+" : dv < 0 ? "−" : "±"}${Math.abs(dv)}</span>`; }
     const ghost = compare ? `<span class="ghost" style="left:${X(compare.national.seatDistribution[k].p50)}"></span>` : "";
     return `<div class="md-rrow t-${k}">
       <div class="md-rname"><span class="dot"></span>${esc(PARTY[k].name)}${labels && sub ? ` <small>${sub}</small>` : ""}</div>
       <div class="md-rtrack" aria-hidden="true"><span class="majl" style="left:${X(76)}"></span>${i === 0 ? `<span class="md-maj-lab" style="left:${X(76)}">76 for a majority</span>` : ""}<span class="b90" style="left:${X(d.p05)};width:${X(Math.max(0.6, d.p95 - d.p05))}"></span><span class="b50" style="left:${X(d.p25)};width:${X(Math.max(0.6, d.p75 - d.p25))}"></span>${ghost}<span class="med" style="left:${X(d.p50)}"></span></div>
-      <div class="md-rnum">${Math.round(e)}<small>${d.p05}–${d.p95}</small>${delta}</div>
+      <div class="md-rnum">${Math.round(e)}${delta}<small>${d.p05}–${d.p95}</small></div>
     </div>`;
   }).join("");
   const ticks = [0, 25, 50, 75, 100, 125, 150].filter((t) => t <= axisMax).map((t) => `<span style="left:${X(t)}">${t}</span>`).join("");
-  const sr = order.map((k) => `${PARTY[k].name} ${Math.round(nat.expectedSeats[k])} seats on average, ${nat.seatDistribution[k].p05} to ${nat.seatDistribution[k].p95} in nine simulations of ten`).join("; ");
-  return `<p class="md-sr">${esc(sr)}.</p>${rows}<div class="md-raxis" aria-hidden="true"><span></span><div class="ax">${ticks}</div><span></span></div>`;
+  const srDelta = (k) => { if (!compare) return ""; const dv = Math.round(nat.expectedSeats[k]) - Math.round(compare.national.expectedSeats[k]); return dv === 0 ? " (the same as the official run)" : ` (${Math.abs(dv)} ${dv > 0 ? "more" : "fewer"} than the official run)`; };
+  const sr = order.map((k) => `${PARTY[k].name} ${Math.round(nat.expectedSeats[k])} seats on average${srDelta(k)}, ${nat.seatDistribution[k].p05} to ${nat.seatDistribution[k].p95} in nine simulations of ten`).join("; ");
+  const key = compare ? `<p class="md-ckey" aria-hidden="true"><span class="i"><span class="md-delta">+3</span>change in the average on the official run</span><span class="i"><span class="kghost"></span>the official run's median</span></p>` : "";
+  return `<p class="md-sr">${esc(sr)}.</p>${rows}<div class="md-raxis" aria-hidden="true"><span></span><div class="ax">${ticks}</div><span></span></div>${key}`;
 }
 const RANGE_KEY = `<div class="md-rkey"><span><i></i>nine simulations in ten</span><span><i class="k50"></i>the middle half</span><span><i class="kmed"></i>the median</span><span>The large figure is the average; the small range is the nine-in-ten band.</span></div>`;
 
