@@ -583,15 +583,21 @@ const senGapWords = (g) => (Math.abs(g) < 0.25 ? "polled about the same in the S
 const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "their", It: "They", Its: "Their" } : { it: "it", its: "its", It: "It", Its: "Its" });
 
 /* =========================== the Senate preferences lens ===========================
-   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016 (the
-   AEC published none while group tickets ran), by seat and polling place (map/data/senate-prefs-<year>.json,
-   .build/map/senate_prefs.mjs). Three contests (Labor v the Coalition, Labor v One Nation, the Coalition v
-   One Nation), each read for the voters whose preferences decide it: the third big party's, the Greens'
-   and everyone else's. A seat's figure is the share of that group's ballots ranking the first-named party
+   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016, by
+   seat and polling place (map/data/senate-prefs-<year>.json, .build/map/senate_prefs.mjs). Before 2016
+   the AEC's machine record of preferences is the parties' lodged group voting tickets — a party-box vote
+   copied its party's ticket — so 2004-2013 comes from the tickets themselves (.build/map/senate_gvt_prefs.py,
+   marked gvt: true) and the lens presents those years as party tickets, never as ballot tallies. Three
+   contests (Labor v the Coalition, Labor v One Nation, the Coalition v One Nation), each read for the
+   voters whose preferences decide it: the third big party's, the Greens' and everyone else's. A seat's
+   figure is the share of that cohort's ballots (or ticket-bound ballots) ranking the first-named party
    ahead, of those numbering either; ballots numbering neither are set aside (and counted in the story).
    Loaded with the lens. */
 const SPD = {}, SPDP = {};
-const SP_YEARS = new Set([2016, 2019, 2022, 2025]);
+const SP_YEARS = new Set([2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]);
+// the ticket era: figures are the parties' lodged group voting tickets (.build/map/senate_gvt_prefs.py)
+const SP_GVT = new Set([2004, 2007, 2010, 2013]);
+const spGvtYear = (y) => { const k = spYear(y); return k != null && SP_GVT.has(k) ? k : null; };
 const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
 const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
 const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
@@ -630,9 +636,10 @@ const spDonorOpts = () => SP_DONORS[S.spPair].map((f) => [f, f === "oth" ? "othe
 const spRamp = () => (S.spPair === "AC" ? RAMP.div : S.spPair === "AO" ? RAMP.divOn : RAMP.divCo);
 function spNoValue(m, kind, d) {
   if (svYear(m.year) == null) return "A state election has no Senate";
-  if (spYear(m.year) == null) return "No Senate ballot file before 2016";
+  if (spYear(m.year) == null) return "No Senate preference record before 2004";
   if (d && d.by) return "No Senate vote at the by-election";
   const ab = d && spAbsent(m, d.st);
   if (ab) return `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[d.st] || d.st}`;
+  if (kind === "booth" && spYear(m.year) === 2004) return "No Senate count by polling place in 2004";
   return kind === "booth" ? "Too few of these ballots here" : "Too few of these ballots";
 }

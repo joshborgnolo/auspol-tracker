@@ -270,13 +270,16 @@ function areaHedDek(m, st) {
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections from 2016; choose one on the timeline.` };
-      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Until 2016 most Senate voters ticked a party's group voting ticket, so the AEC published no ballot-by-ballot preferences. Choose 2016 or later.` };
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections; choose one on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's machine record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later.` };
+      const gvt = spGvtYear(m.year) != null;
       const r = spArea(m, idx);
-      if (!spOf(m)) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      if (!spOf(m)) return { hed: `The Senate’s record is loading`, dek: "" };
       if (!r) { const ab = idx.length ? spAbsent(m, m.divs[idx[0]].st) : null; return { hed: ab ? `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[m.divs[idx[0]].st]}` : `Too few of these ballots to read here`, dek: ab ? `So no ballot there could rank it against ${ab === SP_PAIRS[S.spPair][0] ? spB() : spA()}. Choose another contest in the key.` : "" }; }
       const per = idx.map((i) => ({ i, v: spDivValue(m, m.divs[i]) })).filter((x) => x.v != null).sort((p, q) => q.v - p.v);
       const hi = per[0], lo = per[per.length - 1];
+      if (gvt) return { hed: `${f0(r.share)}% of ${spWho()} Senate tickets put ${spA()} ahead of ${spB()}${where}`,
+        dek: `In ${m.year} a party-box vote copied the party's lodged group voting ticket, so these shares read the parties' own orders over ${int(r.n)} ticket-bound ballots — how voters numbered their own papers is published only from 2016.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""}` };
       return { hed: `${f0(r.share)}% of ${spWho()} Senate voters ranked ${spA()} ahead of ${spB()}${where}`,
         dek: `${int(r.n)} of these ballots numbered either party; another ${f0(r.nei)}% numbered neither.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""} Senate ballots show how voters rank parties everywhere, including contests the House never counted.` };
     }
@@ -597,12 +600,15 @@ function seatHedDek(m, d) {
     }
     case "senpref": {
       if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
-      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Choose 2016 or later on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later on the timeline.` };
       if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to read ${ds(d.n)}’s Senate ballots.` };
       const s = spOf(m);
-      if (!s) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      if (!s) return { hed: `The Senate’s record is loading`, dek: "" };
+      const gvt = spGvtYear(m.year) != null;
       const c = spCells(s.divs[d.n]), v = spDivValue(m, d), aus = spArea(m, m.areas.AUS.idx);
-      if (v == null) return { hed: `Too few ${spWho()} Senate ballots in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
+      if (v == null) return { hed: `Too few ${spWho()} Senate ${gvt ? "tickets" : "ballots"} in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
+      if (gvt) return { hed: `${f0(v)}% of ${spWho()} Senate tickets in ${ds(d.n)} put ${spA()} ahead of ${spB()}`,
+        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
       return { hed: `${f0(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
         dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
     }

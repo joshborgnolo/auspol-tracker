@@ -775,7 +775,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 const getJSON = (u) => {
@@ -5106,15 +5106,21 @@ const senGapWords = (g) => (Math.abs(g) < 0.25 ? "polled about the same in the S
 const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "their", It: "They", Its: "Their" } : { it: "it", its: "its", It: "It", Its: "Its" });
 
 /* =========================== the Senate preferences lens ===========================
-   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016 (the
-   AEC published none while group tickets ran), by seat and polling place (map/data/senate-prefs-<year>.json,
-   .build/map/senate_prefs.mjs). Three contests (Labor v the Coalition, Labor v One Nation, the Coalition v
-   One Nation), each read for the voters whose preferences decide it: the third big party's, the Greens'
-   and everyone else's. A seat's figure is the share of that group's ballots ranking the first-named party
+   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016, by
+   seat and polling place (map/data/senate-prefs-<year>.json, .build/map/senate_prefs.mjs). Before 2016
+   the AEC's machine record of preferences is the parties' lodged group voting tickets — a party-box vote
+   copied its party's ticket — so 2004-2013 comes from the tickets themselves (.build/map/senate_gvt_prefs.py,
+   marked gvt: true) and the lens presents those years as party tickets, never as ballot tallies. Three
+   contests (Labor v the Coalition, Labor v One Nation, the Coalition v One Nation), each read for the
+   voters whose preferences decide it: the third big party's, the Greens' and everyone else's. A seat's
+   figure is the share of that cohort's ballots (or ticket-bound ballots) ranking the first-named party
    ahead, of those numbering either; ballots numbering neither are set aside (and counted in the story).
    Loaded with the lens. */
 const SPD = {}, SPDP = {};
-const SP_YEARS = new Set([2016, 2019, 2022, 2025]);
+const SP_YEARS = new Set([2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]);
+// the ticket era: figures are the parties' lodged group voting tickets (.build/map/senate_gvt_prefs.py)
+const SP_GVT = new Set([2004, 2007, 2010, 2013]);
+const spGvtYear = (y) => { const k = spYear(y); return k != null && SP_GVT.has(k) ? k : null; };
 const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
 const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
 const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
@@ -5153,10 +5159,11 @@ const spDonorOpts = () => SP_DONORS[S.spPair].map((f) => [f, f === "oth" ? "othe
 const spRamp = () => (S.spPair === "AC" ? RAMP.div : S.spPair === "AO" ? RAMP.divOn : RAMP.divCo);
 function spNoValue(m, kind, d) {
   if (svYear(m.year) == null) return "A state election has no Senate";
-  if (spYear(m.year) == null) return "No Senate ballot file before 2016";
+  if (spYear(m.year) == null) return "No Senate preference record before 2004";
   if (d && d.by) return "No Senate vote at the by-election";
   const ab = d && spAbsent(m, d.st);
   if (ab) return `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[d.st] || d.st}`;
+  if (kind === "booth" && spYear(m.year) === 2004) return "No Senate count by polling place in 2004";
   return kind === "booth" ? "Too few of these ballots here" : "Too few of these ballots";
 }
 
@@ -5782,13 +5789,16 @@ function areaHedDek(m, st) {
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections from 2016; choose one on the timeline.` };
-      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Until 2016 most Senate voters ticked a party's group voting ticket, so the AEC published no ballot-by-ballot preferences. Choose 2016 or later.` };
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections; choose one on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's machine record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later.` };
+      const gvt = spGvtYear(m.year) != null;
       const r = spArea(m, idx);
-      if (!spOf(m)) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      if (!spOf(m)) return { hed: `The Senate’s record is loading`, dek: "" };
       if (!r) { const ab = idx.length ? spAbsent(m, m.divs[idx[0]].st) : null; return { hed: ab ? `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[m.divs[idx[0]].st]}` : `Too few of these ballots to read here`, dek: ab ? `So no ballot there could rank it against ${ab === SP_PAIRS[S.spPair][0] ? spB() : spA()}. Choose another contest in the key.` : "" }; }
       const per = idx.map((i) => ({ i, v: spDivValue(m, m.divs[i]) })).filter((x) => x.v != null).sort((p, q) => q.v - p.v);
       const hi = per[0], lo = per[per.length - 1];
+      if (gvt) return { hed: `${f0(r.share)}% of ${spWho()} Senate tickets put ${spA()} ahead of ${spB()}${where}`,
+        dek: `In ${m.year} a party-box vote copied the party's lodged group voting ticket, so these shares read the parties' own orders over ${int(r.n)} ticket-bound ballots — how voters numbered their own papers is published only from 2016.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""}` };
       return { hed: `${f0(r.share)}% of ${spWho()} Senate voters ranked ${spA()} ahead of ${spB()}${where}`,
         dek: `${int(r.n)} of these ballots numbered either party; another ${f0(r.nei)}% numbered neither.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""} Senate ballots show how voters rank parties everywhere, including contests the House never counted.` };
     }
@@ -6109,12 +6119,15 @@ function seatHedDek(m, d) {
     }
     case "senpref": {
       if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
-      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Choose 2016 or later on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later on the timeline.` };
       if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to read ${ds(d.n)}’s Senate ballots.` };
       const s = spOf(m);
-      if (!s) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      if (!s) return { hed: `The Senate’s record is loading`, dek: "" };
+      const gvt = spGvtYear(m.year) != null;
       const c = spCells(s.divs[d.n]), v = spDivValue(m, d), aus = spArea(m, m.areas.AUS.idx);
-      if (v == null) return { hed: `Too few ${spWho()} Senate ballots in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
+      if (v == null) return { hed: `Too few ${spWho()} Senate ${gvt ? "tickets" : "ballots"} in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
+      if (gvt) return { hed: `${f0(v)}% of ${spWho()} Senate tickets in ${ds(d.n)} put ${spA()} ahead of ${spB()}`,
+        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
       return { hed: `${f0(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
         dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
     }
@@ -6790,7 +6803,7 @@ const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || 
 const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
-const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? "Senate ballots" : "Counted in the House"}<span>⇄</span></button>`);
+const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -7022,11 +7035,11 @@ function legendHTML(m) {
       break;
     }
     case "senpref": {
-      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null;
-      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate voters ranked ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
+      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null, gvt = spGvtYear(m.year) != null;
+      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(spRamp(), 0, 200)}">${A ? mark(A.share, 10, 90) : ""}</div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-${SP_PAIRS[S.spPair][0]}">◀ ${spA(true)} ahead</span><span class="t-${SP_PAIRS[S.spPair][1]}">${spB().replace(/^the /, "The ")} ahead ▶</span></div>`;
-      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "The AEC has published every Senate ballot only since 2016, when group voting tickets ended." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
+      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016. The line marks Australia.` : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
     }
     case "informal": {

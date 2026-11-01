@@ -87,7 +87,7 @@ const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || 
 const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
-const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? "Senate ballots" : "Counted in the House"}<span>⇄</span></button>`);
+const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
@@ -319,11 +319,11 @@ function legendHTML(m) {
       break;
     }
     case "senpref": {
-      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null;
-      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate voters ranked ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
+      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null, gvt = spGvtYear(m.year) != null;
+      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(spRamp(), 0, 200)}">${A ? mark(A.share, 10, 90) : ""}</div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-${SP_PAIRS[S.spPair][0]}">◀ ${spA(true)} ahead</span><span class="t-${SP_PAIRS[S.spPair][1]}">${spB().replace(/^the /, "The ")} ahead ▶</span></div>`;
-      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "The AEC has published every Senate ballot only since 2016, when group voting tickets ended." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
+      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016. The line marks Australia.` : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
     }
     case "informal": {
