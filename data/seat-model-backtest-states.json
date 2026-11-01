@@ -1,0 +1,686 @@
+{
+ "_about": "backtest-states.mjs: state elections counted on their actual primaries with preferences from the previous federal Senate ballots (nearest federal booth to each state booth, House-calibrated as the 2028 model is), against W5's constants and the design review's seat-type grades, plus a diagnostic with each donor class's statewide level set to the state's own count (the Senate pattern alone); for the three-way elections (SA 2026, Queensland 2017) also the whole chain from the federal booth footprint with noise. Out of sample: no state count went into any setting. `drift` = RMS of the level shifts per donor class pooled with the federal previous-election shifts: the 2028 model's national flow shocks.",
+ "drift": {
+  "GRN": {
+   "sigma": 0.27,
+   "n": 11
+  },
+  "ON": {
+   "sigma": 0.462,
+   "n": 8
+  },
+  "OTH-M": {
+   "sigma": 0.334,
+   "n": 11
+  },
+  "COAL": {
+   "sigma": 0.301,
+   "n": 4
+  },
+  "OTH-R": {
+   "sigma": 0.475,
+   "n": 10
+  },
+  "OTH-L": {
+   "sigma": 0.35,
+   "n": 8
+  }
+ },
+ "results": {
+  "sa26": {
+   "label": "SA 2026",
+   "senate": 2025,
+   "seats": 47,
+   "actualSeats": {
+    "alp": 34,
+    "lnp": 5,
+    "ind": 4,
+    "onp": 4
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 42,
+     "pairs": 39,
+     "tcpMaePts": 2.93,
+     "seats": {
+      "alp": 35,
+      "lnp": 6,
+      "ind": 5,
+      "onp": 1
+     },
+     "misses": [
+      "Finniss (ind->lnp)",
+      "Hammond (onp->lnp)",
+      "Heysen (lnp->alp)",
+      "MacKillop (onp->ind)",
+      "Narungga (onp->ind)"
+     ]
+    },
+    "design review: seat-type grades": {
+     "winners": 44,
+     "pairs": 41,
+     "tcpMaePts": 1.64,
+     "seats": {
+      "alp": 34,
+      "lnp": 6,
+      "onp": 2,
+      "ind": 5
+     },
+     "misses": [
+      "Finniss (ind->lnp)",
+      "MacKillop (onp->ind)",
+      "Narungga (onp->ind)"
+     ]
+    },
+    "Senate ballots (this model)": {
+     "winners": 43,
+     "pairs": 41,
+     "tcpMaePts": 1.6,
+     "seats": {
+      "alp": 33,
+      "lnp": 7,
+      "onp": 2,
+      "ind": 5
+     },
+     "misses": [
+      "Finniss (ind->lnp)",
+      "MacKillop (onp->ind)",
+      "Morphett (alp->lnp)",
+      "Narungga (onp->ind)"
+     ]
+    },
+    "Senate ballots + vote-switching mix": {
+     "winners": 43,
+     "pairs": 42,
+     "tcpMaePts": 1.75,
+     "seats": {
+      "alp": 35,
+      "lnp": 5,
+      "onp": 2,
+      "ind": 5
+     },
+     "misses": [
+      "Finniss (ind->lnp)",
+      "Heysen (lnp->alp)",
+      "MacKillop (onp->ind)",
+      "Narungga (onp->ind)"
+     ]
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 44,
+     "pairs": 41,
+     "tcpMaePts": 1.3,
+     "seats": {
+      "alp": 34,
+      "lnp": 6,
+      "onp": 2,
+      "ind": 5
+     },
+     "misses": [
+      "Finniss (ind->lnp)",
+      "MacKillop (onp->ind)",
+      "Narungga (onp->ind)"
+     ]
+    }
+   },
+   "chain": {
+    "W5 constants": {
+     "brier": 0.2337,
+     "logScore": -0.4396,
+     "modal": 40,
+     "expected": {
+      "alp": 35.3,
+      "lnp": 7,
+      "onp": 2.2,
+      "grn": 0,
+      "ind": 2.5,
+      "oth": 0
+     }
+    },
+    "design review: seat-type grades": {
+     "brier": 0.2069,
+     "logScore": -0.3868,
+     "modal": 39,
+     "expected": {
+      "alp": 33.6,
+      "lnp": 5.9,
+      "onp": 4.2,
+      "grn": 0,
+      "ind": 3.3,
+      "oth": 0
+     }
+    },
+    "Senate ballots (this model)": {
+     "brier": 0.2191,
+     "logScore": -0.4,
+     "modal": 39,
+     "expected": {
+      "alp": 33.3,
+      "lnp": 6.6,
+      "onp": 3.8,
+      "grn": 0,
+      "ind": 3.2,
+      "oth": 0
+     }
+    },
+    "Senate ballots + vote-switching mix": {
+     "brier": 0.2119,
+     "logScore": -0.3924,
+     "modal": 39,
+     "expected": {
+      "alp": 34.6,
+      "lnp": 6.1,
+      "onp": 3.1,
+      "grn": 0,
+      "ind": 3.2,
+      "oth": 0
+     }
+    }
+   },
+   "levelShift": {
+    "GRN|AC": 0.022,
+    "ON|AC": 0.854,
+    "OTH-M|AC": -0.233,
+    "GRN|AO": -0.212,
+    "COAL|AO": 0.017,
+    "OTH-R|AO": 0.346,
+    "OTH-M|AO": -0.187,
+    "OTH-L|AC": -0.54,
+    "OTH-R|AC": 1.02,
+    "OTH-L|AO": -0.424
+   }
+  },
+  "qld17": {
+   "label": "Queensland 2017",
+   "senate": 2016,
+   "seats": 93,
+   "actualSeats": {
+    "alp": 48,
+    "lnp": 39,
+    "oth": 3,
+    "grn": 1,
+    "onp": 1,
+    "ind": 1
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 88,
+     "pairs": 76,
+     "tcpMaePts": 1.78,
+     "seats": {
+      "alp": 50,
+      "lnp": 40,
+      "onp": 1,
+      "ind": 1,
+      "oth": 1
+     },
+     "misses": [
+      "Bonney (lnp->alp)",
+      "Hill (oth->alp)",
+      "Hinchinbrook (oth->lnp)",
+      "Maiwar (grn->alp)",
+      "Redlands (alp->lnp)"
+     ]
+    },
+    "design review: seat-type grades": {
+     "winners": 87,
+     "pairs": 85,
+     "tcpMaePts": 1.78,
+     "seats": {
+      "alp": 47,
+      "lnp": 43,
+      "onp": 1,
+      "ind": 1,
+      "oth": 1
+     },
+     "misses": [
+      "Aspley (alp->lnp)",
+      "Hill (oth->alp)",
+      "Hinchinbrook (oth->lnp)",
+      "Maiwar (grn->alp)",
+      "Redlands (alp->lnp)",
+      "Townsville (alp->lnp)"
+     ]
+    },
+    "Senate ballots (this model)": {
+     "winners": 84,
+     "pairs": 88,
+     "tcpMaePts": 3.58,
+     "seats": {
+      "alp": 55,
+      "lnp": 32,
+      "onp": 3,
+      "grn": 1,
+      "ind": 1,
+      "oth": 1
+     },
+     "misses": [
+      "Bonney (lnp->alp)",
+      "Bundaberg (lnp->alp)",
+      "Burdekin (lnp->alp)",
+      "Hill (oth->alp)",
+      "Hinchinbrook (oth->onp)",
+      "Lockyer (lnp->onp)",
+      "Nicklin (lnp->alp)",
+      "Pumicestone (lnp->alp)",
+      "Whitsunday (lnp->alp)"
+     ]
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 86,
+     "pairs": 86,
+     "tcpMaePts": 2.1,
+     "seats": {
+      "alp": 47,
+      "lnp": 39,
+      "onp": 4,
+      "grn": 1,
+      "ind": 1,
+      "oth": 1
+     },
+     "misses": [
+      "Aspley (alp->lnp)",
+      "Callide (lnp->onp)",
+      "Hill (oth->lnp)",
+      "Hinchinbrook (oth->onp)",
+      "Lockyer (lnp->onp)",
+      "Pumicestone (lnp->alp)",
+      "Redlands (alp->lnp)"
+     ]
+    }
+   },
+   "chain": {
+    "W5 constants": {
+     "brier": 0.3834,
+     "logScore": -0.7303,
+     "modal": 67,
+     "expected": {
+      "alp": 46.4,
+      "lnp": 32.3,
+      "onp": 12.1,
+      "grn": 0.1,
+      "ind": 0.9,
+      "oth": 1.3
+     }
+    },
+    "design review: seat-type grades": {
+     "brier": 0.4495,
+     "logScore": -0.8341,
+     "modal": 62,
+     "expected": {
+      "alp": 43.7,
+      "lnp": 31.4,
+      "onp": 15.5,
+      "grn": 0.1,
+      "ind": 1,
+      "oth": 1.3
+     }
+    },
+    "Senate ballots (this model)": {
+     "brier": 0.4727,
+     "logScore": -0.9385,
+     "modal": 64,
+     "expected": {
+      "alp": 50.2,
+      "lnp": 24.3,
+      "onp": 15.6,
+      "grn": 0.7,
+      "ind": 1,
+      "oth": 1.3
+     }
+    }
+   },
+   "levelShift": {
+    "ON|AC": -0.72,
+    "GRN|AC": -0.447,
+    "OTH-M|AC": -0.593,
+    "COAL|AO": -0.582,
+    "OTH-R|AO": -0.191,
+    "GRN|AO": -0.667,
+    "OTH-M|AO": 0.023,
+    "OTH-R|AC": 0.317
+   }
+  },
+  "vic22": {
+   "label": "Victoria 2022",
+   "senate": 2022,
+   "seats": 88,
+   "actualSeats": {
+    "alp": 56,
+    "lnp": 28,
+    "grn": 4
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 80,
+     "pairs": 81,
+     "tcpMaePts": 3.43,
+     "seats": {
+      "alp": 62,
+      "lnp": 23,
+      "ind": 2,
+      "grn": 1
+     },
+     "misses": [
+      "Brunswick (grn->alp)",
+      "Croydon (lnp->alp)",
+      "Melbourne (grn->alp)",
+      "Mildura (lnp->ind)",
+      "Morwell (lnp->alp)",
+      "Polwarth (lnp->alp)",
+      "Richmond (grn->alp)",
+      "Shepparton (lnp->ind)"
+     ]
+    },
+    "design review: seat-type grades": {
+     "winners": 83,
+     "pairs": 83,
+     "tcpMaePts": 2.92,
+     "seats": {
+      "alp": 59,
+      "lnp": 25,
+      "grn": 2,
+      "ind": 2
+     },
+     "misses": [
+      "Melbourne (grn->alp)",
+      "Mildura (lnp->ind)",
+      "Morwell (lnp->alp)",
+      "Richmond (grn->alp)",
+      "Shepparton (lnp->ind)"
+     ]
+    },
+    "Senate ballots (this model)": {
+     "winners": 84,
+     "pairs": 85,
+     "tcpMaePts": 3.33,
+     "seats": {
+      "alp": 58,
+      "lnp": 24,
+      "grn": 4,
+      "ind": 2
+     },
+     "misses": [
+      "Mildura (lnp->ind)",
+      "Morwell (lnp->alp)",
+      "Polwarth (lnp->alp)",
+      "Shepparton (lnp->ind)"
+     ]
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 84,
+     "pairs": 85,
+     "tcpMaePts": 3.33,
+     "seats": {
+      "alp": 58,
+      "lnp": 24,
+      "grn": 4,
+      "ind": 2
+     },
+     "misses": [
+      "Mildura (lnp->ind)",
+      "Morwell (lnp->alp)",
+      "Polwarth (lnp->alp)",
+      "Shepparton (lnp->ind)"
+     ]
+    }
+   },
+   "chain": {},
+   "levelShift": {}
+  },
+  "qld20": {
+   "label": "Queensland 2020",
+   "senate": 2019,
+   "seats": 93,
+   "actualSeats": {
+    "alp": 52,
+    "lnp": 34,
+    "oth": 3,
+    "grn": 2,
+    "onp": 1,
+    "ind": 1
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 88,
+     "pairs": 92,
+     "tcpMaePts": 1.75,
+     "seats": {
+      "alp": 56,
+      "lnp": 32,
+      "oth": 2,
+      "grn": 1,
+      "onp": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Burleigh (lnp->alp)",
+      "Currumbin (lnp->alp)",
+      "Hinchinbrook (oth->lnp)",
+      "South Brisbane (grn->alp)",
+      "Whitsunday (lnp->alp)"
+     ]
+    },
+    "design review: seat-type grades": {
+     "winners": 91,
+     "pairs": 92,
+     "tcpMaePts": 1.57,
+     "seats": {
+      "alp": 53,
+      "lnp": 35,
+      "oth": 2,
+      "grn": 1,
+      "onp": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Hinchinbrook (oth->lnp)",
+      "South Brisbane (grn->alp)"
+     ]
+    },
+    "Senate ballots (this model)": {
+     "winners": 91,
+     "pairs": 93,
+     "tcpMaePts": 1.46,
+     "seats": {
+      "alp": 51,
+      "lnp": 36,
+      "oth": 2,
+      "grn": 2,
+      "onp": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Hinchinbrook (oth->lnp)",
+      "Nicklin (alp->lnp)"
+     ]
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 91,
+     "pairs": 93,
+     "tcpMaePts": 1.53,
+     "seats": {
+      "alp": 51,
+      "lnp": 36,
+      "oth": 2,
+      "grn": 2,
+      "onp": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Hinchinbrook (oth->lnp)",
+      "Nicklin (alp->lnp)"
+     ]
+    }
+   },
+   "chain": {},
+   "levelShift": {
+    "GRN|AC": 0.09,
+    "ON|AC": -0.067,
+    "OTH-M|AC": -0.231,
+    "OTH-R|AC": 0.392,
+    "COAL|AO": -0.13,
+    "GRN|AO": -0.105,
+    "OTH-L|AC": -0.278,
+    "OTH-M|AO": -0.716
+   }
+  },
+  "qld24": {
+   "label": "Queensland 2024",
+   "senate": 2022,
+   "seats": 93,
+   "actualSeats": {
+    "alp": 36,
+    "lnp": 52,
+    "oth": 3,
+    "grn": 1,
+    "ind": 1
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 87,
+     "pairs": 91,
+     "tcpMaePts": 1.94,
+     "seats": {
+      "alp": 38,
+      "lnp": 54,
+      "ind": 1
+     },
+     "misses": [
+      "Cook (lnp->alp)",
+      "Hill (oth->lnp)",
+      "Hinchinbrook (oth->lnp)",
+      "Maiwar (grn->lnp)",
+      "Rockhampton (lnp->alp)",
+      "Traeger (oth->lnp)"
+     ]
+    },
+    "design review: seat-type grades": {
+     "winners": 88,
+     "pairs": 91,
+     "tcpMaePts": 1.56,
+     "seats": {
+      "alp": 37,
+      "lnp": 55,
+      "ind": 1
+     },
+     "misses": [
+      "Cook (lnp->alp)",
+      "Hill (oth->lnp)",
+      "Hinchinbrook (oth->lnp)",
+      "Maiwar (grn->lnp)",
+      "Traeger (oth->lnp)"
+     ]
+    },
+    "Senate ballots (this model)": {
+     "winners": 87,
+     "pairs": 91,
+     "tcpMaePts": 1.95,
+     "seats": {
+      "alp": 39,
+      "lnp": 52,
+      "grn": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Hill (oth->lnp)",
+      "Hinchinbrook (oth->lnp)",
+      "Maryborough (lnp->alp)",
+      "Pumicestone (lnp->alp)",
+      "Rockhampton (lnp->alp)",
+      "Traeger (oth->lnp)"
+     ]
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 89,
+     "pairs": 91,
+     "tcpMaePts": 1.35,
+     "seats": {
+      "alp": 37,
+      "lnp": 54,
+      "grn": 1,
+      "ind": 1
+     },
+     "misses": [
+      "Hill (oth->lnp)",
+      "Hinchinbrook (oth->lnp)",
+      "Rockhampton (lnp->alp)",
+      "Traeger (oth->lnp)"
+     ]
+    }
+   },
+   "chain": {},
+   "levelShift": {
+    "GRN|AC": -0.084,
+    "ON|AC": -0.483,
+    "OTH-M|AC": -0.382,
+    "OTH-R|AC": 0.038,
+    "OTH-L|AC": -0.478
+   }
+  },
+  "sa22": {
+   "label": "SA 2022",
+   "senate": 2019,
+   "seats": 47,
+   "actualSeats": {
+    "alp": 27,
+    "lnp": 16,
+    "ind": 4
+   },
+   "replay": {
+    "W5 constants": {
+     "winners": 47,
+     "pairs": 46,
+     "tcpMaePts": 1.63,
+     "seats": {
+      "alp": 27,
+      "lnp": 16,
+      "ind": 4
+     },
+     "misses": []
+    },
+    "design review: seat-type grades": {
+     "winners": 47,
+     "pairs": 46,
+     "tcpMaePts": 1.59,
+     "seats": {
+      "alp": 27,
+      "lnp": 16,
+      "ind": 4
+     },
+     "misses": []
+    },
+    "Senate ballots (this model)": {
+     "winners": 47,
+     "pairs": 46,
+     "tcpMaePts": 1.36,
+     "seats": {
+      "alp": 27,
+      "lnp": 16,
+      "ind": 4
+     },
+     "misses": []
+    },
+    "diagnostic: Senate pattern, levels set to the count": {
+     "winners": 47,
+     "pairs": 46,
+     "tcpMaePts": 1.23,
+     "seats": {
+      "alp": 27,
+      "lnp": 16,
+      "ind": 4
+     },
+     "misses": []
+    }
+   },
+   "chain": {},
+   "levelShift": {
+    "GRN|AC": 0.141,
+    "OTH-M|AC": -0.207,
+    "OTH-L|AC": -0.369,
+    "ON|AC": 0.207,
+    "OTH-R|AC": 0.537
+   }
+  }
+ }
+}

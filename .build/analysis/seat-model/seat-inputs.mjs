@@ -1,57 +1,42 @@
-/* seat-inputs.mjs: builds the 2028 seat specs for seat-engine.mjs from the committed stores.
-   Shared by swing-simulate.mjs (nowcast / forecast / replay) and its test. */
+/* seat-inputs.mjs: node side of the seat build - reads the committed stores and prepares the 2028 seat
+   skeleton that seat-build.mjs (pure, shared with the /model/ page) turns into countable seats.
+   prepInputs() is also what swing-simulate.mjs writes out as the page's model/data/inputs.json. */
 import { readFileSync } from "node:fs";
-import { loadRankings, cohortTable, stateTable, pairShare, tiltPair, moveFirst, mix, routing, cohortKeyFor, subOfName, SUB_CLASS, FAM_OF_GROUP } from "./senate-flows.mjs";
-import { FLOW_CLASSES } from "./seat-engine.mjs";
+import { cohortTable, pairShare, cohortKeyFor, FAM_OF_GROUP } from "./senate-flows.mjs";
+import { loadRankings } from "./senate-io.mjs";
+import { FLOW_CLASSES, P5 } from "./seat-engine.mjs";
+import { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, seatGroups, LEVERS, leverLevels } from "./seat-build.mjs";
+export { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, LEVERS, leverLevels };
 
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
 const logit = (p) => Math.log(p / (1 - p));
 const clamp = (p) => Math.min(0.995, Math.max(0.005, p));
-export const P5_OF = (g) => (g === "alp" ? 0 : ["lp", "np", "lnp", "clp"].includes(g) ? 1 : g === "on" ? 2 : g === "grn" ? 3 : 4);
-export const flowClassOf = (key) => (key === "ALP" ? "ALP" : key.startsWith("COAL") ? "COAL" : key === "GRN" ? "GRN" : key === "ON" ? "ON"
-  : key.startsWith("OTH:") ? "OTH-" + (SUB_CLASS[key.slice(4)] || "M") : key.startsWith("OTH-") ? key : "OTH-M");
 
-/* pattern-shrink weights (Senate deviation kept) per flow class: calibrate-flows.mjs `combine`
-   (previous-election Senate alone). COAL and ALP have no House classic cells to fit on: COAL is set
-   from the SA 2026 test (exp12: the mapped Senate carried both level and pattern), ALP is a stated
-   middle value. */
-export function settings(FCAL) {
-  const c = FCAL.combine || {};
-  const lamAlone = { ALP: 0.6, COAL: 0.8, GRN: c.GRN?.alone.lamS ?? 0.6, ON: c.ON?.alone.lamS ?? 0.3, "OTH-R": c["OTH-R"]?.alone.lamS ?? 0.2, "OTH-M": c["OTH-M"]?.alone.lamS ?? 0.1, "OTH-L": c["OTH-L"]?.alone.lamS ?? 0.3 };
-  const lamComb = Object.fromEntries(FLOW_CLASSES.map((k) => [k, c[k] ? { S: c[k].lamS, H: c[k].lamH } : null]));
-  // chamber offsets (same-election fit); the Coalition's Labor-v-ON offset is pooled with SA 2026 (see header of calibrate-flows)
-  const delta = {};
-  for (const [k, d] of Object.entries(FCAL.same.delta)) delta[k] = d.v;
-  delta["COAL|AO"] = 0.15;
-  return { lamAlone, lamComb, delta };
-}
-
-export function buildSeats({ year = 2025, composition = true, replay = false, root = "." } = {}) {
+export function prepInputs({ year = 2025, composition = true, replay = false, root = "." } = {}) {
   const FLOWS = J(`${root}/data/aec-2025-seat-flows.json`);
   const CAND = J(`${root}/data/seat-candidate-set-2028.json`);
   const RES = J(`${root}/map/data/res-2025.json`);
   const FCAL = J(`${root}/data/seat-model-flow-calibration.json`);
   const SW = J(`${root}/data/vote-switching.json`);
+  const VOTE = J(`${root}/data/seat-vote-layer.json`);
+  const CENSUS = J(`${root}/data/census-2021-divisions-2025.json`);
   const SEN = loadRankings(year, root);
   const ST = settings(FCAL);
   const resBy = new Map(RES.divs.map((d) => [d.n, d]));
   const flowsBy = new Map(FLOWS.seats.map((s) => [s.name, s]));
+  const censusBy = new Map(CENSUS.divisions.map((d) => [d.name, d]));
 
-  /* --- One Nation's 2025-style base where it did not stand (the ACT): ridge on demographics, as E9 */
+  /* One Nation's 2025-style base where it did not stand (the ACT): ridge on demographics, as E9 */
   const DK = ["uni", "y12less", "blue", "a65", "a2034", "lang", "atsci"];
   const xOf = (d) => [...DK.map((k) => d.demo?.[k] ?? 0), d.demo?.rel?.norel ?? 0, d.demo?.ten?.own ?? 0];
   const onShare = (d) => { const t = d.c.reduce((a, c) => a + c[4], 0); return d.c.filter((c) => c[3] === "onp").reduce((a, c) => a + c[4], 0) / t; };
   const fitRows = RES.divs.filter((d) => onShare(d) > 0.005);
   const onBase = ridgePredict(fitRows.map(xOf), fitRows.map((d) => logit(onShare(d))), 3);
 
-  /* --- 2025 national mean logit flow per class|pair (for House-history residuals) */
   const hist = process.env.AUSPOL_SIM_NOHIST === "1" ? { bySeat: {}, mean: {} } : houseHistory(RES, SEN);
-
-  /* --- composition: today's vote for each big-four party, by 2025 vote, pooled over recent waves */
   const comp = composition ? switching(SW) : null;
-
-  /* --- sitting independents' capture shares and Coalition partner shares from the 2025 counts */
   const { capNat, capBySeat, sibBySeat } = certifiedShares(FLOWS);
+  const PW = VOTE.beta.populationWeights;
 
   const seats = [];
   for (const cs of CAND.seats) {
@@ -61,8 +46,8 @@ export function buildSeats({ year = 2025, composition = true, replay = false, ro
     const pnameBy = new Map(D.c.map((c) => [c[0], c[2]]));
     const cands = F.candidates.filter((c) => want.has(c.group)).map((c) => ({
       label: c.name, group: c.group, party: c.party, partyName: pnameBy.get(c.name) || c.party, base: c.votes / total }));
-    if (!replay && want.has("on") && !cands.some((c) => c.group === "on")) cands.push({ label: "One Nation (assumed)", group: "on", party: "ON", partyName: "Pauline Hanson's One Nation", base: Math.exp(onBase(xOf(D))) / (1 + Math.exp(onBase(xOf(D)))) });
-    if (!replay) for (const [k, i] of cs.contest.ind.filter((i) => i.kind !== "held").entries()) cands.push({ label: i.label, group: "ind-declared", party: "IND", partyName: "Independent", base: 0.08 });
+    if (!replay && want.has("on") && !cands.some((c) => c.group === "on")) cands.push({ label: "One Nation (assumed)", group: "on", party: "ON", partyName: "Pauline Hanson's One Nation", base: 1 / (1 + Math.exp(-onBase(xOf(D)))) });
+    if (!replay) for (const i of cs.contest.ind.filter((i) => i.kind !== "held")) cands.push({ label: i.label, group: "ind-declared", party: "IND", partyName: "Independent", base: 0.08 });
     for (const c of cands) {
       c.p5 = P5_OF(c.group);
       c.fam = FAM_OF_GROUP[c.group] ?? -1;
@@ -71,73 +56,33 @@ export function buildSeats({ year = 2025, composition = true, replay = false, ro
       c.cls = flowClassOf(c.key);
       c.clsIdx = FLOW_CLASSES.indexOf(c.cls);
     }
-    const tables = {};
-    const tableFor = (key) => (tables[key] = tables[key] || calibratedTable(SEN, ST, D, cs.name, key, hist));
-    for (const c of cands) {
-      let p = tableFor(c.key);
-      if (c.fam >= 0 && comp) {
-        const X = ["alp", "lnp", "grn", "on"][c.fam === 0 ? 0 : c.fam === 1 ? 1 : c.fam === 2 ? 2 : 3];
-        const parts = [];
-        for (const [g, w] of Object.entries(comp[X])) {
-          if (w <= 0) continue;
-          const gk = { alp: "ALP", lnp: "COAL", grn: "GRN", onp: "ON", ind: "OTH-M", oth: "OTH" }[g];
-          const same = (g === "alp" && c.fam === 0) || (g === "lnp" && c.fam === 1) || (g === "grn" && c.fam === 2) || (g === "onp" && c.fam === 3);
-          parts.push([w, same ? p : moveFirst(SEN, tableFor(gk), c.fam)]);
-        }
-        p = mix(parts);
-      }
-      c.table = p;
-      c.route = routing(SEN, p);
+    // the vote layer's age/gender differential (points per party) for this seat's census mix
+    const d = censusBy.get(cs.name);
+    let demoPP = [0, 0, 0, 0, 0];
+    if (d) {
+      const a = d.ageCounts, a1834 = 0.4 * a["15_19"] + a["20_24"] + a["25_34"], a3554 = a["35_44"] + a["45_54"], a55 = a["55_64"] + a["65_74"] + a["75_84"] + a["85ov"], t = a1834 + a3554 + a55;
+      const X = { age: { "18–34": a1834 / t, "35–54": a3554 / t, "55+": a55 / t }, gender: { Men: d.gender.m / (d.gender.m + d.gender.f), Women: d.gender.f / (d.gender.m + d.gender.f) } };
+      demoPP = P5.map((p) => { let v = 0; for (const dim of ["age", "gender"]) for (const cell of Object.keys(PW[dim])) v += VOTE.beta.dims[dim][cell][p].beta * (X[dim][cell] - PW[dim][cell]); return v; });
     }
     const cap = capBySeat[cs.name] || {};
+    const won = D.c.find((c) => c[6] === 1);
     seats.push({
-      name: cs.name, st: cs.state, cls: D.cls, w: total, uni: D.demo?.uni ?? null,
+      name: cs.name, st: cs.state, cls: D.cls, w: total, uni: D.demo?.uni ?? null, demoPP,
       cands, iota: Object.fromEntries(FLOW_CLASSES.map((k) => [k, cap[k] ?? capNat[k] ?? capNat._])),
       sib: sibBySeat[cs.name] != null ? 0.5 * sibBySeat[cs.name] + 0.5 * 0.72 : 0.72,
+      held: { member: won ? won[0] : null, party: won ? won[2] : null, group: won ? groupOfRes(won) : null },
     });
   }
-  // education z-score over seats (university share)
   const us = seats.map((s) => s.uni).filter((v) => v != null), mu = us.reduce((a, b) => a + b, 0) / us.length, sd = Math.sqrt(us.reduce((a, b) => a + (b - mu) ** 2, 0) / us.length);
   for (const s of seats) s.z = s.uni == null ? 0 : (s.uni - mu) / sd;
-  return { seats, SEN, ST, comp };
+  return { seats, hist, comp, ST, SEN };
 }
+const groupOfRes = (c) => (c[3] === "alp" ? "alp" : c[3] === "grn" ? "grn" : c[3] === "onp" ? "on" : c[3] === "lnp" ? ({ LP: "lp", NP: "np", LNP: "lnp", CLP: "clp" }[c[1]] || "lnp") : c[3] === "ind" ? "ind" : "oth");
 
-function seatGroups(cs) {
-  const g = [];
-  if (cs.contest.alp) g.push("alp");
-  for (const c of cs.contest.coalition) g.push(c);
-  if (cs.contest.on) g.push("on");
-  if (cs.contest.grn) g.push("grn");
-  for (const i of cs.contest.ind) if (i.kind === "held") g.push(i.key);
-  if (cs.contest.othCount2025 > 0) g.push("oth");
-  return g;
-}
-
-/* division table -> shrink toward the state table (Senate deviation weight lamAlone[class]) ->
-   chamber offsets (delta) -> House-history tilt where the 2025 House counted this cohort's flow */
-export function calibratedTable(SEN, ST, D, divName, key, hist) {
-  const cls = flowClassOf(key);
-  const st = SEN.div[divName]?.st || D?.st;
-  const ps = stateTable(SEN, st, key);
-  const pd = SEN.div[divName] ? cohortTable(SEN, divName, key) : ps;
-  const lam = ST.lamAlone[cls] ?? 0.5;
-  let p = mix([[lam, pd], [1 - lam, ps]]);
-  for (const [k, v] of Object.entries(ST.delta)) {
-    const [c, pair] = k.split("|"); if (c !== cls) continue;
-    p = tiltPair(SEN, p, "ACGO".indexOf(pair[0]), "ACGO".indexOf(pair[1]), v);
-  }
-  // House history: the 2025 count's residual for this seat/cohort/pair, at the forecast weights
-  const comb = ST.lamComb[cls];
-  const obs = hist.bySeat[divName]?.[key];
-  if (comb && obs) for (const [pair, h] of Object.entries(obs)) {
-    const x = "ACGO".indexOf(pair[0]), y = "ACGO".indexOf(pair[1]);
-    const m = hist.mean[cls + "|" + pair]; if (m == null) continue;
-    const xH = logit(clamp(h)) - m.house;
-    const xS = logit(clamp(pairShare(SEN, pd, x, y))) - m.senate;
-    const want = comb.S * xS + comb.H * xH, have = lam * xS;
-    p = tiltPair(SEN, p, x, y, want - have);
-  }
-  return p;
+/* back-compatible: prepare and build in one call (backtests, tests) */
+export function buildSeats(opts = {}) {
+  const inp = prepInputs(opts);
+  return { seats: buildSeatsFrom(inp, opts), SEN: inp.SEN, ST: inp.ST, comp: inp.comp, inputs: inp };
 }
 
 export function houseHistory(RES, SEN) {

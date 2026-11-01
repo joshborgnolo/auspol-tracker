@@ -11,7 +11,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadRankings, cohortTable, routing, moveFirst } from "./senate-flows.mjs";
+import { cohortTable, routing, moveFirst } from "./senate-flows.mjs";
+import { loadRankings } from "./senate-io.mjs";
 
 const OUT = "data/seat-model-2028-nowcast.json";
 const HISTORY = "data/seat-model-2028-history.jsonl";
@@ -19,8 +20,9 @@ const SCRIPT = ".build/analysis/seat-model/swing-simulate.mjs";
 const INPUTS = [
   "data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json",
   "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json", "data/seat-model-flow-calibration.json",
-  "data/seat-model-calibration.json", "data/vote-switching.json", "map/data/res-2025.json",
-  ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/seat-inputs.mjs", ".build/analysis/seat-model/senate-flows.mjs",
+  "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "map/data/res-2025.json",
+  ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs",
+  ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
 ];
 const FORECAST = "data/seat-model-2028-forecast.json";
 const P5 = ["alp", "lnp", "on", "grn", "oth"];
@@ -45,7 +47,9 @@ check("draws >= 10,000", S.meta.draws >= 10000, String(S.meta.draws));
 check("150 seats", S.seats.length === 150, String(S.seats.length));
 for (const p of P5) check(`sigmaNational.${p} positive`, S.meta.sigmaNational[p] > 0);
 for (const p of P5) check(`sigmaSeat.${p} positive`, S.meta.sigmaSeat[p] > 0);
-check("engine v2", S._provenance.engine === "v2");
+check("engine v2.1", S._provenance.engine === "v2.1");
+for (const [g, h] of Object.entries(S.national.histogram)) check(`${g} histogram counts every draw`, h.reduce((a, b) => a + b, 0) === S.meta.draws, String(h.reduce((a, b) => a + b, 0)));
+for (const seat of S.seats) check(`${seat.name} has a central projection`, !!seat.central && !!seat.central.w);
 
 // expected seats: non-negative, sum to 150
 const es = S.national.expectedSeats;
@@ -122,7 +126,7 @@ if (existsSync(HISTORY)) {
 }
 {
   const Fc = JSON.parse(readFileSync(FORECAST, "utf8"));
-  check("forecast file: 150 seats, engine v2, forecast mode", Fc.seats.length === 150 && Fc._provenance.engine === "v2" && Fc.meta.mode === "forecast");
+  check("forecast file: 150 seats, engine v2.1, forecast mode", Fc.seats.length === 150 && Fc._provenance.engine === "v2.1" && Fc.meta.mode === "forecast");
   const fs = Object.values(Fc.national.expectedSeats).reduce((a, b) => a + b, 0);
   check("forecast expectedSeats sum to 150", Math.abs(fs - 150) <= 0.5, String(fs));
 }
@@ -141,4 +145,4 @@ if (m) {
 }
 
 if (failures) { console.error(`${failures} failures`); process.exit(1); }
-console.log(`sim OK (v2): ${S.meta.draws.toLocaleString()} draws · expected ${Object.entries(es).map(([g, v]) => `${g} ${v}`).join("/")} · majority ALP ${(100 * mj.alp).toFixed(1)}% · classic 2PP ${tp.meanAlp}% [${tp.p10}-${tp.p90}] · replay ${m ? m[1] + "/150 winners, " + m[2] + "/150 pairs" : "?"}`);
+console.log(`sim OK (v2.1): ${S.meta.draws.toLocaleString()} draws · expected ${Object.entries(es).map(([g, v]) => `${g} ${v}`).join("/")} · majority ALP ${(100 * mj.alp).toFixed(1)}% · classic 2PP ${tp.meanAlp}% [${tp.p10}-${tp.p90}] · replay ${m ? m[1] + "/150 winners, " + m[2] + "/150 pairs" : "?"}`);

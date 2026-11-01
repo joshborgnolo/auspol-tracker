@@ -18,7 +18,8 @@
    Writes data/seat-model-backtest.json. */
 import { readFileSync, writeFileSync } from "node:fs";
 import { rng, spreadShares, count, FLOW_CLASSES } from "./seat-engine.mjs";
-import { loadRankings, cohortTable, pairShare, routing, cohortKeyFor, FAM_OF_GROUP, FAM } from "./senate-flows.mjs";
+import { cohortTable, pairShare, routing, cohortKeyFor, FAM_OF_GROUP, FAM } from "./senate-flows.mjs";
+import { loadRankings } from "./senate-io.mjs";
 import { calibratedTable, houseHistory, flowClassOf, P5_OF } from "./seat-inputs.mjs";
 
 const DRAWS = +(process.env.AUSPOL_BT_DRAWS || 2000);
@@ -92,7 +93,7 @@ function settingsFor(E, variant) {
     lamAlone[k] = variant === "noGeo" ? 0 : (k === "COAL" || k === "ALP") ? DEFAULT_LAM[k] : Math.max(0, Math.min(1, wts[k]?.alone ?? DEFAULT_LAM[k]));
     lamComb[k] = variant === "full" ? (wts[k] ? { S: Math.max(0, Math.min(1, wts[k].S)), H: Math.max(0, Math.min(1, wts[k].H)) } : { S: lamAlone[k], H: 0.5 }) : null;
   }
-  delta["COAL|AO"] = delta["COAL|AO"] ?? 0.15;
+  delta["COAL|AO"] = 0; // as seat-build.settings: the pair's own counts average about zero
   return { lamAlone, lamComb, delta };
 }
 

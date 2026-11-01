@@ -336,7 +336,7 @@ Calibration (`calibrate-flows.mjs`, logit scale):
 
 ### Tests
 - **2025 replay.** The certified 2025 primaries counted on the modelled flows reproduce 147 of 150 winners (148 on Senate ballots alone), 140 of 150 final pairs, and a 1.5–1.7 pt two-candidate error where the pair is right.
-- **SA 2026, out of sample.** Counted from its actual district primaries, with flows from the 2025 federal Senate ballots at the nearest federal booth (`backtest-sa26.mjs`):
+- **SA 2026, out of sample.** Counted from its actual district primaries, with flows from the 2025 federal Senate ballots at the nearest federal booth (`backtest-states.mjs`):
 
   | Flow scheme | Winners | Final pairs | Two-candidate error |
   |---|---|---|---|
@@ -407,4 +407,4 @@ v2's own scripts sit one level up in `seat-model/`:
 - `extract-senate-rankings.py`, `senate-flows.mjs`
 - `calibrate-flows.mjs`, `calibrate-swing.mjs`, `calibrate-national.mjs`
 - `seat-engine.mjs`, `seat-inputs.mjs`, `swing-simulate.mjs`
-- `backtest-chain.mjs`, `backtest-sa26.mjs`
+- `backtest-chain.mjs`, `backtest-states.mjs`

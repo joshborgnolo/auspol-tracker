@@ -23,7 +23,8 @@
                                      G[x][S][y]: the same for ballots currently held by x
                                      (first among S+x is x), so later rounds stay path-exact
 */
-import { readFileSync } from "node:fs";
+/* Pure: no node imports, so the /model/ page runs this same file in the browser (copied there by
+   .build/model/assemble.mjs). senate-io.mjs holds the node file loader. */
 
 export const FAM = ["A", "C", "G", "O"];
 export const FAM_OF_GROUP = { alp: 0, lp: 1, np: 1, lnp: 1, clp: 1, grn: 2, on: 3 };
@@ -66,9 +67,9 @@ export function cohortKeyFor(c) {
   return k.startsWith("OTH:") ? k : "OTH-M";
 }
 
-/* ---- rankings ---- */
-export function loadRankings(year, root = ".") {
-  const j = JSON.parse(readFileSync(`${root}/data/senate-rankings-${year}.json`, "utf8"));
+/* ---- rankings: from the parsed data/senate-rankings-<year>.json (senate-io.mjs reads the file in node;
+   the /model/ page's worker fetches it) ---- */
+export function rankingsFrom(j, year = j.year) {
   const P = j.patterns, L = P.length;
   const pat = P.map((p) => [...p].map((ch) => FAM.indexOf(ch)));
   const pidx = Object.fromEntries(P.map((p, i) => [p, i]));

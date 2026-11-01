@@ -19,7 +19,8 @@
    relative-strength term (the two finalists' primary ratio) is tested both within an election and
    as a change between elections. Writes data/seat-model-flow-calibration.json. */
 import { readFileSync, writeFileSync } from "node:fs";
-import { loadRankings, cohortTable, pairShare, cohortKeyFor, FAM } from "./senate-flows.mjs";
+import { cohortTable, pairShare, cohortKeyFor, FAM } from "./senate-flows.mjs";
+import { loadRankings } from "./senate-io.mjs";
 
 const YEARS = [2016, 2019, 2022, 2025];
 const LAG = { 2019: 2016, 2022: 2019, 2025: 2022 };

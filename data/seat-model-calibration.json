@@ -414,5 +414,187 @@
     "n": 21
    }
   }
+ },
+ "education": {
+  "_about": "calibrate-education.mjs: within-house change in each party's logit gap between graduates and the rest, earliest post-election crosstabs (to 2025-10-31) v the vote layer's window; seat effect = that change applied in proportion to each seat's university share, re-solved to the nowcast. No fixed term is added: One Nation's and the Greens' surges spread by education as the logit swing implies, and Labor's and the Coalition's changes are worth at most ~1.5 pts in the most extreme seats, within the model's random education shock, with the houses disagreeing by about as much.",
+  "earlyTo": "2025-10-31",
+  "lateFrom": "2026-08-28",
+  "houses": [
+   {
+    "house": "DemosAU",
+    "early": [
+     "2025-07-06"
+    ],
+    "late": 2,
+    "alp": 0.122,
+    "lnp": 0.188,
+    "grn": 0.146,
+    "onp": -0.084
+   },
+   {
+    "house": "Newspoll",
+    "early": [
+     "2025-09-11"
+    ],
+    "late": 1,
+    "alp": 0.388,
+    "lnp": 0.296,
+    "grn": -0.179,
+    "onp": -0.106
+   },
+   {
+    "house": "RedBridge/Accent",
+    "early": [
+     "2025-10-07"
+    ],
+    "late": 2,
+    "alp": 0.117,
+    "lnp": 0.024,
+    "grn": 0.198,
+    "onp": 0.229
+   }
+  ],
+  "estimate": {
+   "alp": {
+    "gapChange": 0.209,
+    "spreadAcrossHouses": 0.155,
+    "seatEffect": {
+     "meanAbsPts": 0.39,
+     "mostNegative": [
+      [
+       "Spence",
+       -0.85
+      ],
+      [
+       "Lyons",
+       -0.68
+      ],
+      [
+       "Brand",
+       -0.67
+      ]
+     ],
+     "mostPositive": [
+      [
+       "Sydney",
+       1.48
+      ],
+      [
+       "Canberra",
+       1.37
+      ],
+      [
+       "Melbourne",
+       1.15
+      ]
+     ]
+    }
+   },
+   "lnp": {
+    "gapChange": 0.169,
+    "spreadAcrossHouses": 0.137,
+    "seatEffect": {
+     "meanAbsPts": 0.29,
+     "mostNegative": [
+      [
+       "Barker",
+       -0.62
+      ],
+      [
+       "Maranoa",
+       -0.61
+      ],
+      [
+       "Grey",
+       -0.55
+      ]
+     ],
+     "mostPositive": [
+      [
+       "Kooyong",
+       1.04
+      ],
+      [
+       "Wentworth",
+       1.01
+      ],
+      [
+       "Bradfield",
+       0.96
+      ]
+     ]
+    }
+   },
+   "grn": {
+    "gapChange": 0.055,
+    "spreadAcrossHouses": 0.204,
+    "seatEffect": {
+     "meanAbsPts": 0.07,
+     "mostNegative": [
+      [
+       "Spence",
+       -0.15
+      ],
+      [
+       "Brand",
+       -0.11
+      ],
+      [
+       "Page",
+       -0.1
+      ]
+     ],
+     "mostPositive": [
+      [
+       "Melbourne",
+       0.38
+      ],
+      [
+       "Sydney",
+       0.27
+      ],
+      [
+       "Macnamara",
+       0.26
+      ]
+     ]
+    }
+   },
+   "onp": {
+    "gapChange": 0.013,
+    "spreadAcrossHouses": 0.188,
+    "seatEffect": {
+     "meanAbsPts": 0.02,
+     "mostNegative": [
+      [
+       "Flynn",
+       -0.04
+      ],
+      [
+       "Hinkler",
+       -0.04
+      ],
+      [
+       "Longman",
+       -0.04
+      ]
+     ],
+     "mostPositive": [
+      [
+       "Sydney",
+       0.06
+      ],
+      [
+       "Melbourne",
+       0.05
+      ],
+      [
+       "Cooper",
+       0.05
+      ]
+     ]
+    }
+   }
+  }
  }
 }

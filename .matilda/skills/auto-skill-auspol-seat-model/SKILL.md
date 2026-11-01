@@ -33,7 +33,7 @@ statistical prowess". v2 replaced W5's swing, flows and error model; W1-W4/W6 in
 | polling error | `calibrate-national.mjs` | same file `national` (RMS by lead time, correlations, minor fade, government) |
 | engine core | `seat-engine.mjs` | logit spread solved to national (or per-state) totals; count by origin bundles |
 | 2028 seats | `seat-inputs.mjs` + `swing-simulate.mjs` | `data/seat-model-2028-nowcast.json`, `-forecast.json`, history line |
-| backtests | `backtest-chain.mjs`, `backtest-sa26.mjs` | `data/seat-model-backtest.json`, `-backtest-sa26.json` |
+| backtests | `backtest-chain.mjs`, `backtest-states.mjs` | `data/seat-model-backtest.json`, `-backtest-sa26.json` |
 
 Rules learned:
 - The REPLAY check (`AUSPOL_SIM_MODE=replay`) replaced W5's certified-row GES replay: the certified
