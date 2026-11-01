@@ -47,8 +47,11 @@ pushes `HEAD:main` itself after your session ends.
       from `.build/analysis/seat-model/` — re-run assemble.mjs; never edit
       the copies by hand.
 3. If the failure is in the model's own statistics (a guard: seats not
-   summing to 150, an average outside its range), do NOT tune the model:
-   leave the tree as it was and say so in your final message.
+   summing to 150, an average below 0 or above 150, a 90% range out of
+   order, a run on another vote than the vote layer's), do NOT tune the
+   model: leave the tree as it was and say so in your final message. An
+   average outside its own 90% range is NOT a failure (rare-event seats:
+   others average 0.01 on a 0-0 range).
 4. Once fixed: `bash .build/seat-model-refresh.sh --force` must end with a
    commit, and `node .build/model/test-model-bundle.mjs` and
    `node .build/newtracker/validate.mjs` must pass.
