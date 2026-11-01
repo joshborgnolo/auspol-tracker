@@ -241,15 +241,22 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // pinned per-store at the seat-model tests; here the frames' publish-side
   // contract: interp record, division/booth demo coverage and the
   // income/SEIFA-floor invariants the rest of the page relies on
-  for (const [y, f, c0, c1, near, nDivs, sf, cuts] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7], { dy: 1991, basis: "households", lo: 345.51 }], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7], null]]) {
+  for (const [y, f, c0, c1, near, nDivs, sf, cuts] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7], { dy: 1991, basis: "households", lo: 345.51 }], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7], "income-span"]]) {
     const D = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(D.year, y);
     assert.equal(D.divs.length, nDivs, `${y} has its ${nDivs} divisions`);
     assert.equal(D.demoBasis, "venue", `${y}'s census people basis is the venue-CD lane`);
     assert.ok(D.demoInterp && D.demoInterp.f === f && D.demoInterp.c0 === c0 && D.demoInterp.c1 === c1 && D.demoInterp.nearestSide === near,
       `${y}'s demoInterp blends ${c0}↔${c1} at f=${f} nearest the ${near} census`);
-    if (cuts === null) {
-      assert.equal(D.incomeCuts, null, `${y}: the 1996-census side prints no income table, so the frame keeps money cuts null`);
+    if (cuts === "income-span") {
+      const ic = D.incomeCuts, ib = D.demoInterp.incomeBlock;
+      assert.ok(ic && ic.dollarsYear === 2001 && ic.hiQuantile === 0.75 &&
+        Math.abs(ic.loCutWeekly - 456.13) < 0.02 && Math.abs(ic.hiQCutWeekly - 1432.72) < 0.02 &&
+        ic.sides && ic.sides["1991"] && Math.abs(ic.sides["1991"].loCutWeekly - 345.51) < 0.02 && ic.sides["1991"].dollarsYear === 1991 &&
+        ic.sides["2001"] && ic.sides["2001"].dollarsYear === 2001,
+        y + ": the 1996-census side prints no income table, so the money lanes interpolate the income-carrying 1991 and 2001 editions (incomeCuts rides the 2001 nearest side, both sides named)");
+      assert.ok(ib && ib.c0 === 1991 && ib.c1 === 2001 && ib.nearestSide === 2001 && Math.abs(ib.f - 0.715654) < 0.0005,
+        `${y}'s incomeBlock blends 1991↔2001 at the wider day's share, nearest 2001`);
     } else {
       assert.ok(D.incomeCuts && D.incomeCuts.dollarsYear === cuts.dy && D.incomeCuts.basis === cuts.basis && Math.abs(D.incomeCuts.loCutWeekly - cuts.lo) < 0.02, `${y}: income cuts ride the ${cuts.dy} ${cuts.basis}-basis era print`);
     }
@@ -830,7 +837,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.ok(Array.isArray(d.relKeys) && d.relKeys[0] === "norel" && d.relKeys.length === 10, `${y}: relKeys leads with norel (10 options)`);
     assert.ok(Array.isArray(d.tenKeys) && d.tenKeys[0] === "mort" && d.tenKeys.length === 4, `${y}: tenKeys leads with mort (4 options)`);
     const i = d.booths.demo.findIndex((x) => x !== null);
-    assert.equal(d.booths.demo[i].length, 16, `${y}: demo rows are 16-wide (12 + 4 lanes of the 2026-10-31 arc)`);
+    assert.equal(d.booths.demo[i].length, 17, `${y}: demo rows are 17-wide (12 + 4 lanes of the 2026-10-31 arc + hiqinc, the top-quarter income share)`);
     assert.ok(Array.isArray(d.booths.rel[i]) && d.booths.rel[i].length === 10, `${y}: parallel booth religion rows`);
     assert.ok(Array.isArray(d.booths.ten[i]) && d.booths.ten[i].length === 4, `${y}: parallel booth tenure rows`);
     assert.ok(Array.isArray(d.booths.anc[i]) && d.booths.anc[i].length === 12, `${y}: parallel booth ancestry rows`);
@@ -1301,6 +1308,24 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/map/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
   for (const y of [2016, 2019, 2022, 2025]) { const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`)); assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`); assert.ok(f.divs.Hunter && f.divs.Hunter.length === 27, `senate-prefs-${y} rows carry 27 counts`); }
   assert.deepEqual(JSON.parse(R("map/data/senate-prefs-2025.json")).absent, { ACT: ["onp"] }, "One Nation had no Senate ticket in the ACT in 2025");
+  // the group-ticket era reads the parties' lodged tickets (2004-2013, .build/map/senate_gvt_prefs.py),
+  // presented as tickets never ballot tallies; the record starts in 2004 because the AEC's machine
+  // record does, and 2004 keeps seats only (no per-place Senate product was ever served)
+  assert.ok(js.includes("const SP_YEARS = new Set([2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]);"), "SP_YEARS spans the ticket era and the ballot era, and nothing before 2004");
+  for (const y of [2004, 2007, 2010, 2013]) {
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`));
+    assert.equal(f.gvt, true, `senate-prefs-${y} is marked a group-ticket reading`);
+    assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`);
+    assert.ok(f.divs.Hunter && f.divs.Hunter.length === 27, `senate-prefs-${y} rows carry 27 counts`);
+    assert.deepEqual(f.absent, { TAS: ["onp"], ACT: ["onp"], NT: ["onp"] }, `senate-prefs-${y}: One Nation sat out Tasmania, the ACT and the NT`);
+  }
+  assert.equal(Object.keys(JSON.parse(R("map/data/senate-prefs-2004.json")).booths).length, 0, "2004's ticket record holds no polling places");
+  for (const y of [2007, 2010, 2013]) assert.ok(Object.keys(JSON.parse(R(`map/data/senate-prefs-${y}.json`)).booths).length > 8000, `senate-prefs-${y} reads polling places too`);
+  for (const y of [2016, 2019, 2022, 2025]) assert.ok(!JSON.parse(R(`map/data/senate-prefs-${y}.json`)).gvt, `senate-prefs-${y} stays a ballot tally`);
+  assert.ok(js.includes('spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots"'), "the Preferences key's switch calls the ticket years tickets");
+  assert.ok(js.includes(" Senate tickets put ") && js.includes("Lodged group voting tickets,"), "the story and the legend present the ticket years as the parties' orders");
+  assert.ok(js.includes("No Senate preference record for "), "years before the AEC's record get their own message");
+  assert.ok(js.includes('kind === "booth" && spYear(m.year) === 2004) return "No Senate count by polling place in 2004"'), "2004's booth view explains its seat-only record");
   assert.ok(js.includes("if (FED_LENS.has(id) && STATE_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on a state frame outright");
   // the legend-height probe used to sweep every lens for a global max; since the
   // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens
