@@ -157,7 +157,7 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
     "roymorgan-direction-groups.json", "sec-direction-states.json",
     "essential-direction-groups.json", "redbridge-direction-groups.json",
     "primary-history.json", "2pp-history.json", "informal-history.json",
-    "booth-primary.json", "booth-tpp.json", "booth-flows.json"])
+    "booth-primary.json", "booth-tpp.json", "booth-flows.json", "macro.json"])
     fs.copyFileSync(path.join(ROOT, "data", f), path.join(sb, "data", f));
   for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs", "field-tbc.mjs"])
     fs.copyFileSync(path.join(ROOT, ".build", "newtracker", f), path.join(sb, ".build", "newtracker", f));
