@@ -477,7 +477,7 @@ function chamberKey(m, d, bloc) {
       if (S.tppMode === "swing") return d.tppSw == null ? null : bloc === "lnp" ? -d.tppSw : d.tppSw;
       return bloc === "alp" || bloc === "lnp" ? own(d.tpp) : d.winPct;
     case "fp": case "senate": return divValue(m, d.i);
-    case "flow": case "informal": case "seifa": { const v = divValue(m, d.i); return v == null ? null : v + (S.lens === "seifa" && !isDemo() && d.seifa[S.index] ? d.seifa[S.index].pct / 100 : 0); }
+    case "flow": case "senpref": case "informal": case "seifa": { const v = divValue(m, d.i); return v == null ? null : v + (S.lens === "seifa" && !isDemo() && d.seifa[S.index] ? d.seifa[S.index].pct / 100 : 0); }
     case "cls": return d.cls ? 10 - CLS.indexOf(d.cls) + d.winPct / 1000 : null;
     default: return d.winPct;
   }
@@ -505,7 +505,7 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.spPair}|${S.spFrom}|${S.index}`;
   if (m._chKey === key) return m._ch;
   const geom = chamberGeom(m);
   const keyOf = m.house === "senate" ? senateKey : chamberKey;

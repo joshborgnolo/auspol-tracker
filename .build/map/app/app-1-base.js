@@ -114,6 +114,8 @@ function buildRamps() {
     div: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
     // Labor against One Nation, for preferences split between the two
     divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
+    // the Coalition against One Nation, for the Senate preferences lens
+    divCo: div(deepen(th.party.lnp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
@@ -498,7 +500,8 @@ const LENSES = [
 ];
 // the Senate vote and the AEC's seat types are federal reads — the state frames
 // (state legislatures, state-commission boundaries) don't offer them
-const FED_LENS = new Set(["senate", "cls"]);
+// ("senpref" is the Preferences tab's Senate-ballot reading, flipped from its key: not a tab of its own)
+const FED_LENS = new Set(["senate", "senpref", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens and row walks
@@ -522,7 +525,7 @@ function walkLane(dir) {
 }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
-  const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
+  const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === (S.lens === "senpref" ? "flow" : S.lens)) + dir + L.length) % L.length;
   setLens(L[k].id);
   const b = $(`#lenses [data-lens="${L[k].id}"]`);
   // the row reveals the chip horizontally itself — the scrollIntoView this
@@ -748,6 +751,8 @@ const S = {
   house: "reps", senLens: "party", ssel: { level: "aus" },
   // the Senate lens: a party's Senate vote less its House vote ("gap"), or its Senate share
   senMode: "gap",
+  // the Senate preferences lens: the contest (Labor v One Nation first) and whose ballots
+  spPair: "AO", spFrom: "lnp",
 };
 /* the census-index lanes' scoring basis rides the frame, never a picker: the
    2016+ frames carry the votes-by-SA1 footprint (voter), the earlier ones only

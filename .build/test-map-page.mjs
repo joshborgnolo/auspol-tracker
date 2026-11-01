@@ -1291,11 +1291,16 @@ for (const y of ["sa22", "sa26"]) {
 // but never out of LENSES itself (a federal year's row still carries both)
 {
   assert.ok(js.includes('{ id: "senate", label: "Senate" },') && js.includes('{ id: "cls", label: "Seat type" },'), "the Senate and Seat-type lenses still exist for the federal years");
-  assert.ok(js.includes('const FED_LENS = new Set(["senate", "cls"]);') && js.includes("const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;"), "yearLenses filters the two federal-only lenses for the state frames");
+  assert.ok(js.includes('const FED_LENS = new Set(["senate", "senpref", "cls"]);') && js.includes("const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;"), "yearLenses filters the federal-only lenses (Senate vote, Senate preferences, seat type) for the state frames");
   assert.ok(js.includes("const list = sen ? SEN_LENSES : yearLenses(S.year)"), "renderLenses draws the year's own lenses");
   assert.ok(js.includes("const L = yearLenses(S.year), k = (L.findIndex("), "walkLens walks the year's own lenses");
-  assert.ok(js.includes('const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;'), "readURL refuses a federal-only lens on a state deep link");
-  assert.ok(js.includes('if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";'), "setYear drops a federal-only lens on the walk into a state frame");
+  assert.ok(js.includes('const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && !STATE_YEARS.has(S.year)))) S.lens = l;'), "readURL refuses a federal-only lens on a state deep link (the Preferences tab's Senate-ballot reading only on a federal one)");
+  assert.ok(js.includes('if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = S.lens === "senpref" ? "flow" : "winner";'), "setYear drops a federal-only lens on the walk into a state frame (the Senate-ballot reading back to the House's preferences)");
+  // the Senate's ballot rankings live inside the Preferences tab, not as a tab of their own
+  assert.ok(!js.includes('{ id: "senpref"'), "no Senate preferences tab");
+  assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/map/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
+  for (const y of [2016, 2019, 2022, 2025]) { const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`)); assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`); assert.ok(f.divs.Hunter && f.divs.Hunter.length === 27, `senate-prefs-${y} rows carry 27 counts`); }
+  assert.deepEqual(JSON.parse(R("map/data/senate-prefs-2025.json")).absent, { ACT: ["onp"] }, "One Nation had no Senate ticket in the ACT in 2025");
   assert.ok(js.includes("if (FED_LENS.has(id) && STATE_YEARS.has(S.year)) return;"), "setLens refuses a federal-only lens on a state frame outright");
   // the legend-height probe used to sweep every lens for a global max; since the
   // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens

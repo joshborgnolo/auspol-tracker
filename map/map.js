@@ -116,6 +116,8 @@ function buildRamps() {
     div: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
     // Labor against One Nation, for preferences split between the two
     divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
+    // the Coalition against One Nation, for the Senate preferences lens
+    divCo: div(deepen(th.party.lnp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
@@ -500,7 +502,8 @@ const LENSES = [
 ];
 // the Senate vote and the AEC's seat types are federal reads — the state frames
 // (state legislatures, state-commission boundaries) don't offer them
-const FED_LENS = new Set(["senate", "cls"]);
+// ("senpref" is the Preferences tab's Senate-ballot reading, flipped from its key: not a tab of its own)
+const FED_LENS = new Set(["senate", "senpref", "cls"]);
 const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens and row walks
@@ -524,7 +527,7 @@ function walkLane(dir) {
 }
 function walkLens(dir) {
   if (S.view === "chamber" && S.house === "senate") { const L = SEN_LENSES, j = (L.findIndex((l) => l.id === S.senLens) + dir + L.length) % L.length; setSenLens(L[j].id); return; }
-  const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === S.lens) + dir + L.length) % L.length;
+  const L = yearLenses(S.year), k = (L.findIndex((l) => l.id === (S.lens === "senpref" ? "flow" : S.lens)) + dir + L.length) % L.length;
   setLens(L[k].id);
   const b = $(`#lenses [data-lens="${L[k].id}"]`);
   // the row reveals the chip horizontally itself — the scrollIntoView this
@@ -750,6 +753,8 @@ const S = {
   house: "reps", senLens: "party", ssel: { level: "aus" },
   // the Senate lens: a party's Senate vote less its House vote ("gap"), or its Senate share
   senMode: "gap",
+  // the Senate preferences lens: the contest (Labor v One Nation first) and whose ballots
+  spPair: "AO", spFrom: "lnp",
 };
 /* the census-index lanes' scoring basis rides the frame, never a picker: the
    2016+ frames carry the votes-by-SA1 footprint (voter), the earlier ones only
@@ -770,7 +775,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"1bc1d88e","res-1996.json":"105a910c","res-1998.json":"f3e5d6d8","res-2001.json":"71e40491","res-2004.json":"a524e173","res-2007.json":"1b23ab44","res-2010.json":"55654cd5","res-2013.json":"e6669639","res-2016.json":"1a79a369","res-2019.json":"352c71a4","res-2022.json":"2b090495","res-2025.json":"a8256835","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+const DATA_V = /*@data-stamps*/{"data-now.json":"6e97359d","data-nsw23.json":"89afdfe1","data-qld17.json":"e23d786d","data-qld20.json":"6ccb35c1","data-qld24.json":"544a5b54","data-sa22.json":"1c5d48be","data-sa26.json":"809a8a52","data-vic22.json":"9a094d73","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"1bc1d88e","res-1996.json":"105a910c","res-1998.json":"f3e5d6d8","res-2001.json":"71e40491","res-2004.json":"a524e173","res-2007.json":"1b23ab44","res-2010.json":"55654cd5","res-2013.json":"e6669639","res-2016.json":"1a79a369","res-2019.json":"352c71a4","res-2022.json":"2b090495","res-2025.json":"a8256835","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw23.json":"05315cda","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 const getJSON = (u) => {
@@ -1308,6 +1313,7 @@ function divValue(m, i) {
     case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "senate": return senDivValue(m, d);
+    case "senpref": return spDivValue(m, d);
     case "flow": return flowSeat(d) ? nn(d.flowAlp[S.from]) : null;
     case "informal": return infModeOf(m) === "exhaust" ? nn(d.exhPct) : nn(d.infPct);
     case "cls": return d.cls || null;
@@ -1348,6 +1354,7 @@ function boothValue(m, j) {
     }
     case "flow": return flowSeat(m.divs[b.d[j]]) ? nn(b.flowAlp[S.from][j]) : null;
     case "senate": return senBoothValue(m, j);
+    case "senpref": return spBoothValue(m, j);
     case "informal": return infModeOf(m) === "exhaust" ? nn(m.divs[b.d[j]].exhPct) : nn(b.infPct[j]);
     case "cls": return m.divs[b.d[j]].cls || null;
     case "seifa": {
@@ -1371,6 +1378,7 @@ function colorOf(v) {
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
     case "flow": return (S.vs === "onp" ? RAMP.divOn : RAMP.div)[dIdx((50 - v) / 40)];
+    case "senpref": return spRamp()[dIdx((50 - v) / 40)];
     // the Senate gap reads as a change does: the party's own ramp above zero, the warm grey of losses below
     case "senate": return senGap()
       ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
@@ -3793,7 +3801,7 @@ function chamberKey(m, d, bloc) {
       if (S.tppMode === "swing") return d.tppSw == null ? null : bloc === "lnp" ? -d.tppSw : d.tppSw;
       return bloc === "alp" || bloc === "lnp" ? own(d.tpp) : d.winPct;
     case "fp": case "senate": return divValue(m, d.i);
-    case "flow": case "informal": case "seifa": { const v = divValue(m, d.i); return v == null ? null : v + (S.lens === "seifa" && !isDemo() && d.seifa[S.index] ? d.seifa[S.index].pct / 100 : 0); }
+    case "flow": case "senpref": case "informal": case "seifa": { const v = divValue(m, d.i); return v == null ? null : v + (S.lens === "seifa" && !isDemo() && d.seifa[S.index] ? d.seifa[S.index].pct / 100 : 0); }
     case "cls": return d.cls ? 10 - CLS.indexOf(d.cls) + d.winPct / 1000 : null;
     default: return d.winPct;
   }
@@ -3821,7 +3829,7 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
 const seatMode = (m) => (!m.seating ? "sort" : S.seat || ((m.house === "senate" ? S.senLens === "party" : S.lens === "winner") ? "plan" : "sort"));
 function chamberOrder(m) {
   const plan = seatMode(m) === "plan" ? m.seating : null;
-  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.index}`;
+  const key = plan ? `${m.year}|plan` : m.house === "senate" ? `${m.year}|${S.senLens}` : `${m.year}|${S.lens}|${S.tppMode}|${S.fpMode}|${S.party}|${S.from}|${S.vs}|${S.spPair}|${S.spFrom}|${S.index}`;
   if (m._chKey === key) return m._ch;
   const geom = chamberGeom(m);
   const keyOf = m.house === "senate" ? senateKey : chamberKey;
@@ -5097,6 +5105,61 @@ const senGapWords = (g) => (Math.abs(g) < 0.25 ? "polled about the same in the S
 // a family as the copy refers back to it: the parties singular, independents and other candidates plural
 const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "their", It: "They", Its: "Their" } : { it: "it", its: "its", It: "It", Its: "Its" });
 
+/* =========================== the Senate preferences lens ===========================
+   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016 (the
+   AEC published none while group tickets ran), by seat and polling place (map/data/senate-prefs-<year>.json,
+   .build/map/senate_prefs.mjs). Three contests (Labor v the Coalition, Labor v One Nation, the Coalition v
+   One Nation), each read for the voters whose preferences decide it: the third big party's, the Greens'
+   and everyone else's. A seat's figure is the share of that group's ballots ranking the first-named party
+   ahead, of those numbering either; ballots numbering neither are set aside (and counted in the story).
+   Loaded with the lens. */
+const SPD = {}, SPDP = {};
+const SP_YEARS = new Set([2016, 2019, 2022, 2025]);
+const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
+const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
+const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
+const spYear = (y) => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; };
+function loadSenatePrefs(y) {
+  const k = spYear(y);
+  if (k == null) return Promise.resolve(null);
+  if (SPD[k]) return Promise.resolve(SPD[k]);
+  return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
+}
+const spOf = (m) => SPD[spYear(m.year)] || null;
+// the slot of the chosen contest and voters in a seat's 27 counts
+function spSlot() {
+  let k = 0;
+  for (const p of ["AC", "AO", "CO"]) for (const d of SP_DONORS[p]) { if (p === S.spPair && d === S.spFrom) return 3 * k; k++; }
+  return -1;
+}
+function spCells(arr) { const k = spSlot(); return arr && k >= 0 ? { x: arr[k], y: arr[k + 1], nei: arr[k + 2] } : null; }
+function spVal(arr) { const c = spCells(arr); return c && c.x + c.y >= SP_MIN ? (100 * c.x) / (c.x + c.y) : null; }
+// a party of the contest with no group on the state's Senate ballot (One Nation in the ACT, and in the NT until 2025)
+const spAbsent = (m, st) => { const s = spOf(m), a = s && s.absent && s.absent[st]; return a ? SP_PAIRS[S.spPair].find((f) => a.includes(f)) || null : null; };
+function spDivValue(m, d) { if (d.by) return null; const s = spOf(m); return s && !spAbsent(m, d.st) ? spVal(s.divs[d.n]) : null; }
+function spBoothValue(m, j) { const s = spOf(m), D = m.divs[m.booth.d[j]]; if (!s || D.by || spAbsent(m, D.st)) return null; return spVal(s.booths[m.booth.id[j]]); }
+function spArea(m, idx) {
+  const s = spOf(m); if (!s) return null;
+  let x = 0, y = 0, nei = 0;
+  for (const i of idx) { const d = m.divs[i]; if (d.by || spAbsent(m, d.st)) continue; const c = spCells(s.divs[d.n]); if (c) { x += c.x; y += c.y; nei += c.nei; } }
+  return x + y ? { share: (100 * x) / (x + y), n: x + y, nei: (100 * nei) / (x + y + nei) } : null;
+}
+// the contest's parties as the copy names them, and the voters
+const spName = (fam, cap) => (fam === "alp" ? "Labor" : fam === "onp" ? "One Nation" : STATE_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+const spA = (cap) => spName(SP_PAIRS[S.spPair][0], cap), spB = () => spName(SP_PAIRS[S.spPair][1]);
+const spWho = () => (S.spFrom === "oth" ? "other parties’ and independents’" : POSS[S.spFrom]);
+const SP_PAIR_OPTS = [["AO", "Labor v One Nation"], ["AC", "Labor v the Coalition"], ["CO", "the Coalition v One Nation"]];
+const spDonorOpts = () => SP_DONORS[S.spPair].map((f) => [f, f === "oth" ? "other parties’ and independents’" : POSS[f]]);
+const spRamp = () => (S.spPair === "AC" ? RAMP.div : S.spPair === "AO" ? RAMP.divOn : RAMP.divCo);
+function spNoValue(m, kind, d) {
+  if (svYear(m.year) == null) return "A state election has no Senate";
+  if (spYear(m.year) == null) return "No Senate ballot file before 2016";
+  if (d && d.by) return "No Senate vote at the by-election";
+  const ab = d && spAbsent(m, d.st);
+  if (ab) return `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[d.st] || d.st}`;
+  return kind === "booth" ? "Too few of these ballots here" : "Too few of these ballots";
+}
+
 /* ===================== South Australia's chambers — and New South Wales' Council =====================
    The House of Assembly and the Legislative Council as they are built, after the Parliament of
    South Australia's chamber maps (chamber-maps.parliament.sa.gov.au): two rooms of the same size,
@@ -5718,6 +5781,17 @@ function areaHedDek(m, st) {
       }
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
+    case "senpref": {
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections from 2016; choose one on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Until 2016 most Senate voters ticked a party's group voting ticket, so the AEC published no ballot-by-ballot preferences. Choose 2016 or later.` };
+      const r = spArea(m, idx);
+      if (!spOf(m)) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      if (!r) { const ab = idx.length ? spAbsent(m, m.divs[idx[0]].st) : null; return { hed: ab ? `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[m.divs[idx[0]].st]}` : `Too few of these ballots to read here`, dek: ab ? `So no ballot there could rank it against ${ab === SP_PAIRS[S.spPair][0] ? spB() : spA()}. Choose another contest in the key.` : "" }; }
+      const per = idx.map((i) => ({ i, v: spDivValue(m, m.divs[i]) })).filter((x) => x.v != null).sort((p, q) => q.v - p.v);
+      const hi = per[0], lo = per[per.length - 1];
+      return { hed: `${f0(r.share)}% of ${spWho()} Senate voters ranked ${spA()} ahead of ${spB()}${where}`,
+        dek: `${int(r.n)} of these ballots numbered either party; another ${f0(r.nei)}% numbered neither.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""} Senate ballots show how voters rank parties everywhere, including contests the House never counted.` };
+    }
     case "flow": {
       const F = S.from, name = possW(F), rival = vsW();
       let toA = 0, tot = 0, xN = 0, xT = 0;
@@ -6033,6 +6107,17 @@ function seatHedDek(m, d) {
       if (senGap()) return { hed: `${SUBJ[P]} ${senGapWords(sv - h)} in ${ds(d.n)}`, dek: `${f1(sv)}% of Senate first preferences against ${f1(h)}% for ${pr.its} House ${cands > 1 ? "candidates" : "candidate"}.${aus ? ` Across Australia the gap was ${sgn(aus.gap)} points.` : ""}` };
       return { hed: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote in ${ds(d.n)}`, dek: `${pr.Its} House ${cands > 1 ? "candidates" : "candidate"} won ${f1(h)}%${aus ? `; across Australia ${pr.its} Senate vote was ${f1(aus.sen)}%` : ""}.` };
     }
+    case "senpref": {
+      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
+      if (spYear(m.year) == null) return { hed: `No Senate ballots were published for ${m.year}`, dek: `Choose 2016 or later on the timeline.` };
+      if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to read ${ds(d.n)}’s Senate ballots.` };
+      const s = spOf(m);
+      if (!s) return { hed: `The Senate’s ballots are loading`, dek: "" };
+      const c = spCells(s.divs[d.n]), v = spDivValue(m, d), aus = spArea(m, m.areas.AUS.idx);
+      if (v == null) return { hed: `Too few ${spWho()} Senate ballots in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
+      return { hed: `${f0(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
+        dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
+    }
     case "flow": {
       const F = S.from, nm = possW(F), rival = vsW();
       if (!flowSeat(d)) return { hed: `${ds(d.n)}’s count didn’t end Labor against ${rival}`, dek: `Its final two were ${ds(d.win.n)} and ${ds(d.run.n)}, so its preferences weren’t split between Labor and ${rival}.${d.vs && d.vs !== S.vs ? ` Set the preferences lens to Labor against ${d.vs === "onp" ? "One Nation" : coalW()} to read it.` : ""}` };
@@ -6175,6 +6260,11 @@ function storyBooth(m, j) {
       else if (senGap()) { hed = `${SUBJ[S.party]} ${senGapWords(v)} here`; dek = `${f1(svShare(svOf(m).booths[b.id[j]], S.party))}% of Senate first preferences against ${f1(b.fp[S.party][j])}% in the House.${dv != null ? ` Across ${ds(D.n)} the gap was ${sgn(dv)} points.` : ""}`; }
       else { hed = `${SUBJ[S.party]} won ${f1(v)}% of the Senate vote here`; dek = dv != null ? `In ${ds(D.n)} as a whole, ${f1(dv)}%.` : ""; }
     }
+    if (S.lens === "senpref") {
+      const v = spBoothValue(m, j), dv = spDivValue(m, D);
+      if (v == null) { hed = spNoValue(m, "booth", D); dek = ""; }
+      else { const c = spCells(spOf(m).booths[b.id[j]]); hed = `${f0(v)}% of ${spWho()} Senate voters here ranked ${spA()} ahead of ${spB()}`; dek = `${int(c.x + c.y)} of their ballots here numbered either party.${dv != null ? ` In ${ds(D.n)} as a whole, ${f0(dv)}%.` : ""}`; }
+    }
     if (S.lens === "informal") {
       if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
       else { hed = Number.isFinite(b.infPct[j]) ? `${f1(b.infPct[j])}% of ballots here were informal` : "This place has no informal count on record"; dek = `In ${ds(D.n)} as a whole, ${f1(D.infPct)}%.`; }
@@ -6255,7 +6345,7 @@ function renderStory(force) {
     $("#story").innerHTML = storySenate(SENM);
     return;
   }
-  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
+  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   storyKey = key;
   const el = $("#story");
@@ -6306,7 +6396,7 @@ function lensColumn(get, colOf) {
   const yr = S.lens === "seifa" && ageMed();
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
-  const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
+  const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" || S.lens === "senpref" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
   return { key: "lens", label: lensHead(), short: lab, get, num: S.lens !== "cls", txt: S.lens === "cls", w: "minmax(120px,1fr)", lens: true, dist: S.lens !== "cls",
     fmt: dol ? (v) => mny(v) : yr ? (v) => String(Math.round(v)) : dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
     color: (v) => colorOf(v), decile: dec, diverge: signed,
@@ -6450,6 +6540,7 @@ function lensRef() {
   const m = M(), a = m.areas[S.sel.level === "aus" || !S.sel.st ? "AUS" : S.sel.st];
   if (S.lens === "fp") return S.fpMode === "change" ? a.fpSw[S.party] : a.fp[S.party];
   if (S.lens === "senate") { const r = senArea(m, a.idx, S.party); return r ? (senGap() ? r.gap : r.sen) : null; }
+  if (S.lens === "senpref") { const r = spArea(m, a.idx); return r ? r.share : null; }
   if (S.lens === "seifa" && isDemo()) return demoAreaShare(a.demo);
   if (S.lens === "flow") { let toA = 0, tot = 0; for (const i of a.idx) { const d = m.divs[i]; if (!flowSeat(d)) continue; for (const f of d.flows) if (f.cand.b === S.from) { toA += d.alpSide === 0 ? f.ta : f.tb; tot += f.ta + f.tb; } } return tot ? (100 * toA) / tot : null; }
   return null;
@@ -6618,6 +6709,7 @@ function lensShort() {
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} change` : `${famLeg(S.party)} primary`;
     case "senate": return senGap() ? `${famLeg(S.party)}, Senate v House` : `${famLeg(S.party)} Senate vote`;
     case "flow": return `${famLeg(S.from)} to Labor`;
+    case "senpref": return `${famLeg(S.spFrom)} Senate: ${spA(true)} v ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
     case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
@@ -6630,6 +6722,7 @@ function lensHead() {
     case "fp": return S.fpMode === "change" ? `${FAM_CODE[S.party]} change` : `${FAM_CODE[S.party]} primary`;
     case "senate": return senGap() ? `${FAM_CODE[S.party]} gap` : `${FAM_CODE[S.party]} Senate`;
     case "flow": return `${FAM_CODE[S.from]} to Labor`;
+    case "senpref": return `${FAM_CODE[S.spFrom]} Senate to ${FAM_CODE[SP_PAIRS[S.spPair][0]]}`;
     default: return lensShort();
   }
 }
@@ -6639,6 +6732,7 @@ function valueText(v, kind, ctx) {
       case "senate": return ctx ? senNoValue(ctx.m, kind, ctx.d) : "No Senate count here";
       case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
+      case "senpref": return ctx ? spNoValue(ctx.m, kind, ctx.d) : "Too few of these ballots";
       case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 1993 on" : "No census figure here") : "No score here";
       case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
       default: return "No data";
@@ -6650,6 +6744,7 @@ function valueText(v, kind, ctx) {
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} ${sgn(v)} points` : `${famLeg(S.party)} ${f1(v)}%`;
     case "senate": return senGap() ? `${famLeg(S.party)} ${Math.abs(v) < 0.05 ? "level" : `${pts(v)} ${v > 0 ? "higher" : "lower"}`} in the Senate` : `${famLeg(S.party)} ${f1(v)}% in the Senate`;
     case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
+    case "senpref": return `${f0(v)}% ranked ${spA()} ahead of ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
     case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : `${f1(v)}% ${dmVerb(M(), S.index)}`) : `Decile ${v} of 10`;
@@ -6679,7 +6774,7 @@ function lensOverflow() {
 // the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
   const sen = S.view === "chamber" && S.house === "senate";
-  const list = sen ? SEN_LENSES : yearLenses(S.year), cur = sen ? S.senLens : S.lens, attr = sen ? "data-slens" : "data-lens";
+  const list = sen ? SEN_LENSES : yearLenses(S.year), cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens, attr = sen ? "data-slens" : "data-lens";
   $("#lenses").innerHTML = list.map((l) => `<button type="button" class="rd-tab" role="tab" ${attr}="${l.id}" aria-selected="${cur === l.id}"><span class="tw" data-t="${l.label}">${l.label}</span></button>`).join("");
   $("#lenses").setAttribute("aria-label", sen ? "Colour the senators by" : "Colour the seats by");
   $("#lenses").addEventListener("scroll", lensOverflow, { passive: true });
@@ -6692,14 +6787,17 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL));
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+// the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
+let lensFlip = false;
+const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? "Senate ballots" : "Counted in the House"}<span>⇄</span></button>`);
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
     case "tpp": return S.tppMode === "swing" ? [-10, 10] : [30, 70];
     case "fp": return S.fpMode === "change" ? [-15, 15] : [0, FPMAX[S.party]];
     case "senate": return senGap() ? [-10, 10] : [0, FPMAX[S.party]];
-    case "flow": return [10, 90];
+    case "flow": case "senpref": return [10, 90];
     case "informal": return [0, infHi(M())];
     case "seifa": return isDemo() ? demoRange() : [1, 10];
   }
@@ -6709,7 +6807,7 @@ function legendHist(m, lo, hi) {
   const vals = m.divs.map((d) => divValue(m, d.i)).filter((v) => v != null);
   // a stand-in year (holdLegendHeight) keeps the bars' room even where the loaded year has no values
   // (the Senate lens before its votes load, or in a year without them, holds the bars' room too)
-  if (vals.length < 10) return m.standIn || S.lens === "senate" ? '<div class="lg-hist" aria-hidden="true"></div>' : "";
+  if (vals.length < 10) return m.standIn || S.lens === "senate" || S.lens === "senpref" ? '<div class="lg-hist" aria-hidden="true"></div>' : "";
   const dec = S.lens === "seifa" && !isDemo();
   const n = dec ? 10 : 20, w = (hi - lo) / n, counts = new Array(n).fill(0);
   for (const v of vals) counts[clamp(Math.floor((v - lo) / w + (dec ? 0.5 : 0)), 0, n - 1)]++;
@@ -6915,12 +7013,20 @@ function legendHTML(m) {
       // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
       // the groups whose preferences can be read are the other parties'
       const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", STATE_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
-      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}</div>`;
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}${flowSrcBtn(m)}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
       const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
       if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
       if (m.res.flOpv) h += `<div class="lg-note">Counted, not modelled — New South Wales re-counted every ballot paper. Preferences there are optional, so a ballot can exhaust before the final two; a share reads the ballots that reached them.</div>`;
+      break;
+    }
+    case "senpref": {
+      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null;
+      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate voters ranked ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
+      h += legendHist(m, 10, 90);
+      h += `<div class="lg-ramp" style="background:${grad(spRamp(), 0, 200)}">${A ? mark(A.share, 10, 90) : ""}</div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-${SP_PAIRS[S.spPair][0]}">◀ ${spA(true)} ahead</span><span class="t-${SP_PAIRS[S.spPair][1]}">${spB().replace(/^the /, "The ")} ahead ▶</span></div>`;
+      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "The AEC has published every Senate ballot only since 2016, when group voting tickets ended." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
     }
     case "informal": {
@@ -7319,6 +7425,8 @@ function setView(v, quiet) {
 }
 function setLens(id) {
   if (S.lens === id) return;
+  // the Preferences tab, clicked while it reads the Senate's ballots, stays where it is
+  if (id === "flow" && S.lens === "senpref" && !lensFlip) return;
   if (FED_LENS.has(id) && STATE_YEARS.has(S.year)) return;
   // the Senate's votes load with their lens (about 120KB a year, gzipped)
   if (id === "senate" && svYear(S.year) != null && !SV[svYear(S.year)]) {
@@ -7326,6 +7434,14 @@ function setLens(id) {
     showLoading(true);
     loadSenateVote(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
       .catch(() => showLoading(true, "The Senate’s votes didn’t load. Try again."));
+    return;
+  }
+  // ... and the Senate's ballot rankings with theirs (about 300KB a year, gzipped)
+  if (id === "senpref" && spYear(S.year) != null && !SPD[spYear(S.year)]) {
+    const spot = takeSpot();
+    showLoading(true);
+    loadSenatePrefs(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
+      .catch(() => showLoading(true, "The Senate’s ballots didn’t load. Try again."));
     return;
   }
   const hold = walkHold(takeSpot());
@@ -7406,7 +7522,7 @@ async function setYear(y) {
   // a state election on the timeline has no Senate: it opens in the House's chamber
   if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // ... and the Senate-vote/seat-type lenses are AEC reads the state frames don't offer
-  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = "winner";
+  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = S.lens === "senpref" ? "flow" : "winner";
   // the stamp names the election at the press; while it loads the stamp's rule runs and a
   // sheen crosses the map (an election already loaded lands within the frame)
   const dir = yearDir(from, y), tok = ++yearTok;
@@ -7414,7 +7530,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -7670,6 +7786,7 @@ function writeURL() {
   if (S.lens === "fp") { p.set("p", S.party); if (S.fpMode === "change") p.set("m", "change"); }
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
+  if (S.lens === "senpref") { p.set("sp", S.spPair); p.set("p", S.spFrom); }
   if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.view !== "map") p.set("v", S.view);
@@ -7694,9 +7811,11 @@ function writeURL() {
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
   const yr = p.get("y"); if (yr && YEARS.includes(yearOf(yr))) S.year = yearOf(yr);
-  const l = p.get("l"); if (l && yearLenses(S.year).some((x) => x.id === l)) S.lens = l;
+  const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && !STATE_YEARS.has(S.year)))) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
-  const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else S.party = pp; }
+  const spp = p.get("sp"); if (spp && SP_PAIRS[spp]) S.spPair = spp;
+  const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else if (S.lens === "senpref") { if (SP_DONORS[S.spPair].includes(pp)) S.spFrom = pp; } else S.party = pp; }
+  if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0];
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";
   const i = p.get("i");
   // the loinc/hiinc, a65/a2034 and uni/y12less menu ids and the hi mode id
@@ -7804,6 +7923,7 @@ document.addEventListener("click", (e) => {
   if (t.dataset.seat) { if (t.dataset.seat !== seatMode(CM() || M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
   if (t.dataset.flip === "tpp") { S.tppMode = S.tppMode === "swing" ? "share" : "swing"; lensParamChanged(); return; }
   if (t.dataset.flip === "fp") { S.fpMode = S.fpMode === "change" ? "share" : "change"; lensParamChanged(); return; }
+  if (t.dataset.flip === "flowsrc") { lensFlip = true; setLens(S.lens === "senpref" ? "flow" : "senpref"); lensFlip = false; return; }
   if (t.dataset.flip === "sen") { S.senMode = senGap() ? "share" : "gap"; lensParamChanged(); return; }
   if (t.dataset.dist) { S.dist = S.dist === t.dataset.dist ? null : t.dataset.dist; renderList(true); return; }
   if (t.hasAttribute("data-distclose")) { S.dist = null; renderList(true); return; }
@@ -7822,6 +7942,9 @@ document.addEventListener("change", (e) => {
     const k = t.dataset.opt;
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
+    // (a new contest keeps the voters where it can: the Greens' and everyone else's read in all three)
+    if (k === "sppair") { S.spPair = t.value; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
+    if (k === "spfrom") S.spFrom = t.value;
     if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "incv") S.incMode = t.value; else if (k === "agev") S.ageMode = t.value; else if (k === "eduv") S.eduMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
     lensParamChanged(); return;
   }
@@ -7917,7 +8040,7 @@ function preloadYears() {
   $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
   const meta = loadLegendMeta();
   showLoading(true);
-  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
   Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print

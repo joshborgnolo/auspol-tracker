@@ -581,3 +581,58 @@ function senNoValue(m, kind, d) {
 const senGapWords = (g) => (Math.abs(g) < 0.25 ? "polled about the same in the Senate as in the House" : `polled ${pts(g)} ${g > 0 ? "higher" : "lower"} in the Senate than in the House`);
 // a family as the copy refers back to it: the parties singular, independents and other candidates plural
 const senPron = (fam) => (fam === "ind" || fam === "oth" ? { it: "they", its: "their", It: "They", Its: "Their" } : { it: "it", its: "its", It: "It", Its: "Its" });
+
+/* =========================== the Senate preferences lens ===========================
+   How a group of voters ranked two parties on their Senate ballots: every formal ballot since 2016 (the
+   AEC published none while group tickets ran), by seat and polling place (map/data/senate-prefs-<year>.json,
+   .build/map/senate_prefs.mjs). Three contests (Labor v the Coalition, Labor v One Nation, the Coalition v
+   One Nation), each read for the voters whose preferences decide it: the third big party's, the Greens'
+   and everyone else's. A seat's figure is the share of that group's ballots ranking the first-named party
+   ahead, of those numbering either; ballots numbering neither are set aside (and counted in the story).
+   Loaded with the lens. */
+const SPD = {}, SPDP = {};
+const SP_YEARS = new Set([2016, 2019, 2022, 2025]);
+const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
+const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
+const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
+const spYear = (y) => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; };
+function loadSenatePrefs(y) {
+  const k = spYear(y);
+  if (k == null) return Promise.resolve(null);
+  if (SPD[k]) return Promise.resolve(SPD[k]);
+  return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
+}
+const spOf = (m) => SPD[spYear(m.year)] || null;
+// the slot of the chosen contest and voters in a seat's 27 counts
+function spSlot() {
+  let k = 0;
+  for (const p of ["AC", "AO", "CO"]) for (const d of SP_DONORS[p]) { if (p === S.spPair && d === S.spFrom) return 3 * k; k++; }
+  return -1;
+}
+function spCells(arr) { const k = spSlot(); return arr && k >= 0 ? { x: arr[k], y: arr[k + 1], nei: arr[k + 2] } : null; }
+function spVal(arr) { const c = spCells(arr); return c && c.x + c.y >= SP_MIN ? (100 * c.x) / (c.x + c.y) : null; }
+// a party of the contest with no group on the state's Senate ballot (One Nation in the ACT, and in the NT until 2025)
+const spAbsent = (m, st) => { const s = spOf(m), a = s && s.absent && s.absent[st]; return a ? SP_PAIRS[S.spPair].find((f) => a.includes(f)) || null : null; };
+function spDivValue(m, d) { if (d.by) return null; const s = spOf(m); return s && !spAbsent(m, d.st) ? spVal(s.divs[d.n]) : null; }
+function spBoothValue(m, j) { const s = spOf(m), D = m.divs[m.booth.d[j]]; if (!s || D.by || spAbsent(m, D.st)) return null; return spVal(s.booths[m.booth.id[j]]); }
+function spArea(m, idx) {
+  const s = spOf(m); if (!s) return null;
+  let x = 0, y = 0, nei = 0;
+  for (const i of idx) { const d = m.divs[i]; if (d.by || spAbsent(m, d.st)) continue; const c = spCells(s.divs[d.n]); if (c) { x += c.x; y += c.y; nei += c.nei; } }
+  return x + y ? { share: (100 * x) / (x + y), n: x + y, nei: (100 * nei) / (x + y + nei) } : null;
+}
+// the contest's parties as the copy names them, and the voters
+const spName = (fam, cap) => (fam === "alp" ? "Labor" : fam === "onp" ? "One Nation" : STATE_YEARS.has(S.year) ? (cap ? "The Liberals" : "the Liberals") : cap ? "The Coalition" : "the Coalition");
+const spA = (cap) => spName(SP_PAIRS[S.spPair][0], cap), spB = () => spName(SP_PAIRS[S.spPair][1]);
+const spWho = () => (S.spFrom === "oth" ? "other parties’ and independents’" : POSS[S.spFrom]);
+const SP_PAIR_OPTS = [["AO", "Labor v One Nation"], ["AC", "Labor v the Coalition"], ["CO", "the Coalition v One Nation"]];
+const spDonorOpts = () => SP_DONORS[S.spPair].map((f) => [f, f === "oth" ? "other parties’ and independents’" : POSS[f]]);
+const spRamp = () => (S.spPair === "AC" ? RAMP.div : S.spPair === "AO" ? RAMP.divOn : RAMP.divCo);
+function spNoValue(m, kind, d) {
+  if (svYear(m.year) == null) return "A state election has no Senate";
+  if (spYear(m.year) == null) return "No Senate ballot file before 2016";
+  if (d && d.by) return "No Senate vote at the by-election";
+  const ab = d && spAbsent(m, d.st);
+  if (ab) return `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[d.st] || d.st}`;
+  return kind === "booth" ? "Too few of these ballots here" : "Too few of these ballots";
+}
