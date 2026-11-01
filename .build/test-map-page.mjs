@@ -706,7 +706,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes(`"hiinc" && k !== "y12less" && k !== "hiqinc"`), "the menu folds hiinc, the schooling reads, and hiqinc out of the people stack (the three menu folds)");
   assert.ok(base.includes('"hiqinc"'), "hiqinc is a DM lane at the demo tuple's appended cell");
   assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hiq: "hiqinc" };'), "the income view's demo key per measure (the quartile-paired demo key runs edition-comparable where the old top-band share was not)");
-  assert.ok(base.includes('const INC_NAME = { med: "Median household income", lo: "Adults in lower-income households", hiq: "Adults in the top income quarter" };'), "the income view's display name per measure (top income quarter, sentence case)");
+  assert.ok(base.includes('const INC_NAME = { med: "Median household income", lo: "Adults in bottom household-income quarter", hiq: "Adults in top household-income quarter" };'), "the income view's display name per measure (top and bottom household-income quarters, sentence case)");
   assert.ok(base.includes('const INC_SHORT = { med: "Median income", lo: "Lower income", hiq: "Top income quarter" };'), "the income view's short name per measure");
   assert.ok(base.includes('const INC_RANGE = { lo: [10, 45], hiq: [8, 60] };'), "the income view's colour domains (top quarter's shares bracket the measured 8-59% seat spread)");
   assert.ok(base.includes('hiqinc: seq(275, 0.12)'), "the top-quarter view wears the income view's hue");
