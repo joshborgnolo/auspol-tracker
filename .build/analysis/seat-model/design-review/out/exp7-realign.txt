@@ -1,0 +1,6 @@
+ALP swing ~ uni only                             R2 0.36  LOO MAE 4.94 vs uniform 5.85  (n=33)  slope 36.0 pts per unit uni share
+ALP swing ~ uni+y12less+a65+lang                 R2 0.42  LOO MAE 4.92 vs uniform 5.85  (n=33)
+ALP swing ~ uni+y12less+a65+lang+blue+atsci+own  R2 0.52  LOO MAE 6.61 vs uniform 5.85  (n=33)
+LNP swing ~ uni only                             R2 0.00  LOO MAE 4.29 vs uniform 4.05  (n=33)  slope -1.1 pts per unit uni share
+LNP swing ~ uni+y12less+a65+lang                 R2 0.17  LOO MAE 4.40 vs uniform 4.05  (n=33)
+LNP swing ~ uni+y12less+a65+lang+blue+atsci+own  R2 0.46  LOO MAE 4.77 vs uniform 4.05  (n=33)

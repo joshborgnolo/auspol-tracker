@@ -1,0 +1,31 @@
+Predicting each classic seat's donor->Labor share at election E, given the national level at E (so only the seat-to-seat pattern is tested).
+Vote-weighted mean absolute error, pts. 'class(E-1)' = national(E) + that class's gap at E-1; 'seat(E-1)' = national(E) + the seat's own gap at E-1;
+'shrunk' = national(E) + 0.5*seat gap + 0.5*class gap; 'class(E) oracle' = the class rates of election E itself (the ceiling for any class adjustment).
+
+GRN   E      n   flat   class(E-1)  seat(E-1)  shrunk   class(E) oracle
+      2010   139    3.91       3.72       3.09    2.65          3.74
+      2013   137    3.90       3.72       2.70    2.77          3.65
+      2016   126    4.06       3.86       3.07    3.05          3.88
+      2019   127    4.23       3.70       2.76    2.71          3.63
+      2022   120    3.63       2.95       2.40    2.01          2.96
+      2025   112    3.60       3.23       2.65    2.49          3.21
+      all           3.87       3.50       2.77    2.59          3.48
+
+ONP   E      n   flat   class(E-1)  seat(E-1)  shrunk   class(E) oracle
+      2010    12    6.87       6.64       7.99    6.55          5.40
+      2013     3   (too few)
+      2016     2   (too few)
+      2019    12    3.78       4.03       3.95    3.38          3.16
+      2022    51    3.92       3.86       3.53    3.25          4.01
+      2025   111    3.65       3.42       4.28    3.13          3.40
+      all           3.75       3.68       4.21    3.31          3.51
+
+OTH   E      n   flat   class(E-1)  seat(E-1)  shrunk   class(E) oracle
+      2010   132    6.46       6.02       7.79    6.48          5.97
+      2013   130    4.68       5.16       6.07    4.88          4.71
+      2016   125    7.69       7.76       6.24    6.78          7.68
+      2019   126    6.77       6.63       6.73    5.65          6.54
+      2022   120    6.23       6.24       6.90    5.60          6.21
+      2025   110    7.98       8.00       8.31    7.77          8.02
+      all           6.63       6.67       6.95    6.16          6.55
+

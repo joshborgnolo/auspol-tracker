@@ -1,5 +1,7 @@
 # Seat model — the plan (draft, 2026-10-08)
 
+> **Review, 2026-10-31 to 11-01:** [seat-model-design-review.md](seat-model-design-review.md) tests this plan's choices against SA 2026 and the federal elections 2007–25. It favours a logit swing over W5's 50/50 mix, Coalition→Labor flows in Labor-v-One Nation seats graded by seat type rather than the flat 21.5%, and much wider, correlated errors. Read it before changing W5.
+
 A demographically-adjusted swing model that turns the site's current-cycle polling
 into per-seat win probabilities and a national seat distribution. **Not MRP** —
 the repo holds published marginal crosstabs, never respondent-level data, and the

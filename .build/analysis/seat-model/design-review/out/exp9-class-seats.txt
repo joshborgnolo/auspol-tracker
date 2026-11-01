@@ -1,0 +1,15 @@
+today's primaries, logit spread, deterministic, group-level count (independents unreliable)
+
+flow spec                                   ALP  L/NP   ON  GRN  IND  OTH
+engine-like flat (C->L 21.5, L->C 60)        67   43   35    4    1    0
+flat SA pooled (C->L 33.8, L->C 60)          79   43   25    2    1    0
+graded C->L by class, L->C flat 60           75   43   28    3    1    0
+graded both by class                         75   45   27    2    1    0
+graded, rural -5 / prov -3 pts (more pro-ON)   72   41   34    2    1    0
+
+Labor v ON finals by class (graded run): {"inner":16,"outer":22,"prov":17,"rural":8}
+Coalition v ON finals by class (graded run): {"prov":2,"rural":18,"outer":3}
+
+flat 33.8 -> graded: Richmond (rural): alp->grn; Lingiari (rural): alp->onp; Brisbane (inner): grn->lnp; Braddon (rural): alp->onp; McEwen (rural): alp->onp; Canning (outer): onp->lnp
+
+engine-like 21.5 -> graded: Dobell (prov): onp->alp; Macquarie (prov): onp->alp; Shortland (prov): onp->alp; Whitlam (prov): onp->alp; Brisbane (inner): grn->lnp; Dunkley (outer): onp->alp; Holt (outer): onp->alp; Melbourne (inner): grn->alp; Brand (outer): onp->alp; Canning (outer): onp->lnp

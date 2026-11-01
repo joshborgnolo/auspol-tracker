@@ -1,0 +1,22 @@
+statewide (oracle): alp 37.5 lnp 19.0 onp 22.9 grn 10.4 | actual seats {"alp":34,"lnp":5,"ind":4,"onp":4}
+
+geometry      ON base          flows                                  seats (ALP/LIB/ON/IND)  winners  final pair
+uniform       fed              SA-2026 estimates (LIB->ALP 35 in ALP v ON)       34/10/3/0     37/47      38/47
+uniform       fed              federal central (LIB->ALP 30)                 32/12/1/2     37/47      37/47
+uniform       demo             SA-2026 estimates (LIB->ALP 35 in ALP v ON)       34/10/3/0     37/47      37/47
+uniform       demo             federal central (LIB->ALP 30)                 32/12/1/2     37/47      37/47
+uniform       blend            SA-2026 estimates (LIB->ALP 35 in ALP v ON)       34/10/3/0     37/47      38/47
+uniform       blend            federal central (LIB->ALP 30)                 32/12/1/2     37/47      37/47
+proportional  fed              SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/5/5/0     40/47      38/47
+proportional  fed              federal central (LIB->ALP 30)                  37/5/3/2     42/47      37/47
+proportional  demo             SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/5/5/0     40/47      39/47
+proportional  demo             federal central (LIB->ALP 30)                  38/4/3/2     42/47      39/47
+proportional  blend            SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/5/5/0     40/47      38/47
+proportional  blend            federal central (LIB->ALP 30)                  37/5/3/2     42/47      38/47
+logit         fed              SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/6/4/0     39/47      38/47
+logit         fed              federal central (LIB->ALP 30)                  37/5/3/2     42/47      38/47
+logit         demo             SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/6/4/0     39/47      40/47
+logit         demo             federal central (LIB->ALP 30)                  37/6/2/2     41/47      40/47
+logit         blend            SA-2026 estimates (LIB->ALP 35 in ALP v ON)        37/6/4/0     39/47      39/47
+logit         blend            federal central (LIB->ALP 30)                  37/6/2/2     41/47      39/47
+actual: 34/5/4/4
