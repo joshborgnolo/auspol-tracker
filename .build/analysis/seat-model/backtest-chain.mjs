@@ -11,9 +11,14 @@
      flows      P's Senate ballots, calibrated with offsets fitted on elections up to P only, Senate
                 weights and House-history weights fitted on elections before E only, and each seat's
                 own P House flows
-     noise      seat noise sized on elections before E; flow shocks; seat-type/education shocks
+     seat terms the logit swing's seat terms (swing-fit.mjs: sitting members, defections, reversion of each
+                seat's surprise at P) fitted on elections 1996..P only, as the 2028 run uses its 1996-2025 fit
+     noise      seat noise sized on the three elections before E (the residuals after those terms) times the
+                calibrated multiplier (calibrate-swing.mjs from backtest-long.mjs); flow shocks; seat-type and
+                education shocks
    Variants: full model; no seat-level Senate geography and no House history (state tables only);
-   Senate geography without House history. Scores: Brier and log score of the seat winner (by
+   Senate geography without House history; noTerms = the full flows with the model before the seat terms
+   (no terms, noise from the plain swing's residuals at x1.3). Scores: Brier and log score of the seat winner (by
    party group), modal winners right, final pairs right, two-candidate error, expected seats v actual.
    Writes data/seat-model-backtest.json. */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -21,9 +26,11 @@ import { rng, spreadShares, count, FLOW_CLASSES } from "./seat-engine.mjs";
 import { cohortTable, pairShare, routing, cohortKeyFor, FAM_OF_GROUP, FAM } from "./senate-flows.mjs";
 import { loadRankings } from "./senate-io.mjs";
 import { calibratedTable, houseHistory, flowClassOf, P5_OF } from "./seat-inputs.mjs";
+import { loadHistory, historyRows, fitTerms, stage1Residuals, termsFor, rmsOf, LONG_YEARS } from "./swing-fit.mjs";
 
 const DRAWS = +(process.env.AUSPOL_BT_DRAWS || 2000);
-const SIGMULT = +(process.env.AUSPOL_BT_SIGMULT || 1.3), TDF = +(process.env.AUSPOL_BT_TDF || 5), ONLY = process.env.AUSPOL_BT_ONLY || null;
+const CAL0 = JSON.parse(readFileSync("data/seat-model-calibration.json", "utf8"));
+const SIGMULT = +(process.env.AUSPOL_BT_SIGMULT || CAL0.swing?.sigMult?.value || 1.3), TDF = +(process.env.AUSPOL_BT_TDF || 5), ONLY = process.env.AUSPOL_BT_ONLY || null;
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
 const logit = (p) => Math.log(p / (1 - p)), ilogit = (x) => 1 / (1 + Math.exp(-x));
 const clamp = (p) => Math.min(0.995, Math.max(0.005, p));
@@ -97,9 +104,24 @@ function settingsFor(E, variant) {
   return { lamAlone, lamComb, delta };
 }
 
+/* ---- the seat terms and noise known at E (fitted on 1996..P) ---- */
+const HIST = loadHistory(), HROWS = historyRows(HIST), known = {};
+function knownAt(E) {
+  if (known[E]) return known[E];
+  const train = LONG_YEARS.filter((y) => y >= 1996 && y < E), last3 = train.slice(-3);
+  const fit = fitTerms(HROWS, train);
+  const s1 = stage1Residuals(HROWS, train, fit.terms);
+  const zero = { incE: 0, incP: 0, defect: 0, rho: 0 };
+  const plain = stage1Residuals(HROWS, last3, { alp: zero, lnp: zero, grn: zero, onp: zero });
+  const sigT = (b) => rmsOf(fit.rows.filter((r) => r.b === b && last3.includes(r.E)).map((r) => r.e));
+  const sigP = (b) => rmsOf([...plain.entries()].filter(([k]) => k.endsWith("|" + b)).map(([, v]) => v));
+  return (known[E] = { terms: fit.terms, s1, sigTerms: [sigT("alp"), sigT("lnp"), sigT("onp") || 0.33, sigT("grn"), 0.35], sigPlain: [sigP("alp"), sigP("lnp"), sigP("onp") || 0.33, sigP("grn"), 0.35] });
+}
+const TERM_GROUP = { alp: "alp", lnp: "lnp", grn: "grn" };
 function seatsFor(E, variant) {
-  const P = E - 3, Rs = SEN[P], D = RES[E], ST = settingsFor(E, variant);
-  const hist = variant === "full" ? houseHistory(RES[P], Rs) : { bySeat: {}, mean: {} };
+  const P = E - 3, Rs = SEN[P], D = RES[E], ST = settingsFor(E, variant === "noTerms" ? "full" : variant);
+  const INC_E = HIST.INC[E], INC_P = HIST.INC[P];
+  const hist = variant === "full" || variant === "noTerms" ? houseHistory(RES[P], Rs) : { bySeat: {}, mean: {} };
   // One Nation's House/Senate vote ratio at P where it stood for the House
   let hon = 0, son = 0;
   for (const dv of RES[P].divs) { const t = dv.c.reduce((a, c) => a + c[4], 0); const h = dv.c.filter((c) => c[3] === "onp").reduce((a, c) => a + c[4], 0); const sd = Rs.div[dv.n]; if (h > 0 && sd?.t.ON) { hon += h / t; son += sd.t.ON.reduce((a, b) => a + b, 0) / sd.n; } }
@@ -114,7 +136,9 @@ function seatsFor(E, variant) {
       if (base <= 0.002 && b === "on") { const sd = Rs.div[dv.n]; base = sd?.t.ON ? kON * sd.t.ON.reduce((a, x) => a + x, 0) / sd.n : 0.02; }
       if (base <= 0.002) base = b === "ind" ? 0.01 : 0.004;
       const key = cohortKeyFor({ group: g.startsWith("member") ? "member" : g, party: c[1], partyName: c[2] }), cls = flowClassOf(key);
-      return { label: c[0], group: g, p5: P5_OF(g.startsWith("member") ? "oth" : g), fam: FAM_OF_GROUP[g] ?? -1, isInd: g.startsWith("member"), base, key, cls, clsIdx: FLOW_CLASSES.indexOf(cls) };
+      let adj = 0;
+      if (variant !== "noTerms" && TERM_GROUP[b]) { const K = knownAt(E), t = K.terms[TERM_GROUP[b]]; if (t) { const dp = RES[P].divs.find((d) => d.n === dv.n); const tt = termsFor(dv, INC_E[dv.n], dp, dp ? INC_P[dv.n] : null, TERM_GROUP[b]); adj = t.incE * tt.incE + t.incP * tt.incP + t.defect * tt.defect + t.rho * (dp ? K.s1.get(P + "|" + dv.n + "|" + TERM_GROUP[b]) ?? 0 : 0); } }
+      return { label: c[0], group: g, p5: P5_OF(g.startsWith("member") ? "oth" : g), fam: FAM_OF_GROUP[g] ?? -1, isInd: g.startsWith("member"), base, adj, key, cls, clsIdx: FLOW_CLASSES.indexOf(cls) };
     });
     const tables = {};
     for (const c of cands) { const p = (tables[c.key] = tables[c.key] || calibratedTable(Rs, ST, { st: dv.st }, dv.n, c.key, hist)); c.route = routing(Rs, p); }
@@ -132,9 +156,7 @@ function run(E, variant, stateOracle) {
   const shareP5 = (divs) => { const v = [0, 0, 0, 0, 0]; let t = 0; for (const dv of divs) for (const c of dv.c) { const g = GROUP(c); v[P5_OF(g.startsWith("member") ? "oth" : g)] += c[4]; t += c[4]; } return v.map((x) => x / t); };
   const natT = shareP5(D.divs);
   const groups = stateOracle ? [...new Set(seats.map((s) => s.st))].map((st) => ({ idx: seats.map((s, i) => (s.st === st ? i : -1)).filter((i) => i >= 0), targets: shareP5(D.divs.filter((d) => d.st === st)) })) : null;
-  const sw = CAL.swing.stateOracle, years = [2007, 2010, 2013, 2016, 2019, 2022].filter((y) => y < E);
-  const rmsB = (b) => Math.sqrt(years.map((y) => sw[b]?.rmsByElection?.[y]).filter((x) => x != null).reduce((a, x, _, arr) => a + x * x / arr.length, 0));
-  const SIG = [rmsB("alp"), rmsB("lnp"), rmsB("onp") || 0.33, rmsB("grn"), 0.35];
+  const K = knownAt(E), SIG = variant === "noTerms" ? K.sigPlain : K.sigTerms, MULT = variant === "noTerms" ? 1.3 : SIGMULT;
   const stateSD = CAL.swing.stateDev;
   const R = rng(1000 + E);
   const win = seats.map(() => ({})), pairs = seats.map(() => ({})), shareW = seats.map(() => []);
@@ -144,7 +166,7 @@ function run(E, variant, stateOracle) {
     const stShift = {}; for (const st of new Set(seats.map((s) => s.st))) stShift[st] = det || stateOracle ? [0, 0, 0, 0, 0] : [stateSD.alp, stateSD.lnp, stateSD.onp, stateSD.grn, 0.15].map((s) => R.norm() * s);
     const cl = {}; for (const c of ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"]) cl[c] = [0, 1, 2, 3, 4].map(() => (det ? 0 : R.norm() * 0.04));
     const edu = [0, 1, 2, 3, 4].map(() => (det ? 0 : R.norm() * 0.04));
-    const dev = (i, j) => { if (det) return 0; const s = seats[i], c = s.cands[j], k = c.p5; return stShift[s.st][k] + (cl[s.cls]?.[k] ?? 0) + edu[k] * s.z + R.t(TDF) * (c.isInd ? 0.3 : SIG[k]) * SIGMULT; };
+    const dev = (i, j) => { const s = seats[i], c = s.cands[j], k = c.p5; if (det) return c.adj || 0; return (c.adj || 0) + stShift[s.st][k] + (cl[s.cls]?.[k] ?? 0) + edu[k] * s.z + R.t(TDF) * (c.isInd ? 0.3 : SIG[k]) * MULT; };
     const sh = spreadShares(seats, natT, dev, R, groups);
     let shock = null;
     if (!det) { shock = new Float64Array(FLOW_CLASSES.length * 4); FLOW_CLASSES.forEach((k, ci) => { for (let y = 0; y < 4; y++) shock[ci * 4 + y] = R.norm() * (k === "ON" ? 0.25 : 0.15) / Math.SQRT2; }); }
@@ -182,7 +204,7 @@ function run(E, variant, stateOracle) {
 }
 
 const results = [];
-for (const E of [2019, 2022, 2025]) for (const stateOracle of [true, false]) for (const variant of ["full", "noHist", "noGeo"]) {
+for (const E of [2019, 2022, 2025]) for (const stateOracle of [true, false]) for (const variant of ["full", "noHist", "noGeo", "noTerms"]) {
   if (ONLY && variant !== ONLY) continue;
   const r = run(E, variant, stateOracle); results.push(r);
   console.log(`${E} ${stateOracle ? "state totals " : "nation total "} ${variant.padEnd(6)} Brier ${r.brier.toFixed(4)} log ${r.logScore.toFixed(3)} | winners ${r.modalRight}/150 (no-noise ${r.deterministicRight}) pairs ${r.pairsRight} TCP ${r.tcpMaePts} | exp ALP ${r.expected.alp} L/NP ${r.expected.lnp} ON ${r.expected.on} GRN ${r.expected.grn} IND ${r.expected.ind} v actual ${r.actual.alp}/${r.actual.lnp}/${r.actual.on}/${r.actual.grn}/${r.actual.ind} | in 90%: ${Object.entries(r.in90).filter(([, v]) => !v).map(([k]) => k).join(",") || "all"}`);
@@ -190,5 +212,5 @@ for (const E of [2019, 2022, 2025]) for (const stateOracle of [true, false]) for
 console.log("\ncalibration, full model, national totals only, pooled 2019-2025 (mean predicted v observed):");
 const pool = {}; for (const r of results.filter((r) => r.variant === "full" && !r.stateOracle)) for (const b of r.calibration) { (pool[b.bin] = pool[b.bin] || { p: 0, o: 0, n: 0 }); pool[b.bin].p += b.meanP * b.n; pool[b.bin].o += b.observed * b.n; pool[b.bin].n += b.n; }
 for (const [k, v] of Object.entries(pool)) console.log(`  ${k.padEnd(8)} predicted ${(v.p / v.n).toFixed(3)}  observed ${(v.o / v.n).toFixed(3)}  (n ${v.n})`);
-if (!process.env.AUSPOL_BT_NOWRITE) writeFileSync("data/seat-model-backtest.json", JSON.stringify({ sigmaMultiplier: SIGMULT, tDf: TDF, _about: "backtest-chain.mjs: seat noise scale 1.3 (chosen by held-out log score over 1.0/1.3/1.6 x t df 4/5). the seat chain for 2019, 2022 and 2025 from what was known three years earlier, with the actual vote totals given (state totals, or national with state shocks). Variants: full (Senate geography + House history), noHist (Senate geography only), noGeo (state-level Senate tables only). Brier/log score of the seat winner by party group; winners right by modal and no-noise prediction; pairs right; TCP MAE where the pair is right.", draws: DRAWS, results, calibrationPooled: pool }, null, 1) + "\n");
+if (!process.env.AUSPOL_BT_NOWRITE) writeFileSync("data/seat-model-backtest.json", JSON.stringify({ sigmaMultiplier: SIGMULT, tDf: TDF, _about: "backtest-chain.mjs: the seat chain for 2019, 2022 and 2025 from what was known three years earlier, with the actual vote totals given (state totals, or national with state shocks): seat terms (sitting members, defections, reversion) fitted on 1996 to the previous election, seat noise from the three elections before at the calibrated multiplier (calibrate-swing.mjs, from backtest-long.mjs over 2001-2025). Variants: full (Senate geography + House history), noHist (Senate geography only), noGeo (state-level Senate tables only), noTerms (full flows, the model before the seat terms: plain-swing noise x1.3). Brier/log score of the seat winner by party group; winners right by modal and no-noise prediction; pairs right; TCP MAE where the pair is right.", draws: DRAWS, results, calibrationPooled: pool }, null, 1) + "\n");
 console.log("wrote data/seat-model-backtest.json");

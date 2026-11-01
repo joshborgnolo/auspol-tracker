@@ -11,7 +11,8 @@
         back a share of their logit move since 2025 (fade, drawn uniform lo-hi unless fixed); then a
         correlated, fat-tailed polling error on the logit scale (sigNat x corr, Student-t df)
      2. state shifts (poll deviation + its se + residual), seat-type and education shocks
-     3. seat noise per candidate (Student-t), the age/gender terms, then one shift per party solved so
+     3. each candidate's seat terms (c.adj: sitting member, defection, reversion of the 2025 surprise),
+        seat noise per candidate (Student-t), the age/gender terms, then one shift per party solved so
         the national totals hold exactly (seat-engine.spreadShares)
      4. flow shocks: national per donor class and recipient, a shared One Nation acceptability shock,
         and seat-level flow noise
@@ -26,7 +27,7 @@ export const KEYS = ["alp", "lnp", "on", "grn", "oth", "member"];
 const CLASS_IDX = { "Inner Metropolitan": 0, "Outer Metropolitan": 1, "Provincial": 2, "Rural": 3 };
 
 /* ---- settings from the calibration files (node builds this; the page reads it) ---- */
-export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast" }) {
+export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast", plainNoise = false }) {
   const nat25 = P5.map((p) => VOTE.national.result2025[p] / 100);
   const v = P5.map((p) => VOTE.national.nowcast[p] / 100), t = v.reduce((a, b) => a + b, 0);
   const now5 = v.map((x) => x / t);
@@ -36,7 +37,9 @@ export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast" }) {
   // floored at the Greens' value (the best-measured minor party), One Nation capped at its own RMS
   const sigNat = [sigN.alp[band], sigN.lnp[band], Math.min(sigN.onp[band], Math.max(sigN.grn[band], 0.25)), sigN.grn[band], Math.max(sigN.grn[band], 0.25)];
   const corr = [[1, -0.6, -0.15, -0.1, 0], [-0.6, 1, -0.4, 0, 0], [-0.15, -0.4, 1, 0, 0], [-0.1, 0, 0, 1, -0.3], [0, 0, 0, -0.3, 1]];
-  const SW = CAL.swing.stateOracle;
+  // seat noise: the residuals left after the seat terms; a run whose seats carry no terms (Victoria: no
+  // sitting-member record in its stores) reads the residuals of the plain swing instead
+  const SW = (plainNoise && CAL.swing.plain) || CAL.swing.stateOracle;
   const rmsRecent = (b) => { const xs = [2019, 2022, 2025].map((y) => SW[b]?.rmsByElection?.[y]).filter((x) => x != null); return xs.length ? Math.sqrt(xs.reduce((a, x) => a + x * x, 0) / xs.length) : null; };
   // One Nation: its federal 2022/2025 residuals are a 3-6% party's; at surge size its spread was far
   // more even (SA 2026 from the federal footprint), which is used
@@ -52,7 +55,7 @@ export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast" }) {
   return {
     mode, nat25, now5, band, sigNat, corr, df: 5, sig0,
     kFall: 0.47,      // SA 2026 Liberals: residual 0.456 logit after a 0.88 logit fall, calm-year 0.20
-    sigMult: 1.3,     // the seat-noise scale that maximised the held-out log score (backtest-chain.mjs)
+    sigMult: CAL.swing?.sigMult?.value ?? 1.3, // the seat-noise scale the held-out elections scored best (backtest-long.mjs, rule in calibrate-swing.mjs)
     sigMember: 0.30, sigStateResid: 0.10, sigClass: [0.06, 0.06, 0.09, 0.06, 0.06], sigEdu: 0.06,
     flowNat, flowOn: 0.15, flowSeat, states,
     fade: mode === "forecast" ? { lo: 0, hi: 0.6 } : null,
@@ -84,7 +87,7 @@ export function simulateOnce(seats, S, R, L, sigSeat) {
   const dev = (i, j) => {
     const s = seats[i], c = s.cands[j], k = c.p5;
     const noise = unc ? R.t(S.df) * (c.isInd ? S.sigMember * S.seatNoiseMult : sigSeat[k]) : 0;
-    return (stateShift[s.st]?.[k] ?? 0) + toLogit(s.demoPP?.[k] ?? 0, k) + classShock[CLASS_IDX[s.cls] ?? 1][k] + eduSlope[k] * (s.z || 0) + noise;
+    return (c.adj || 0) + (stateShift[s.st]?.[k] ?? 0) + toLogit(s.demoPP?.[k] ?? 0, k) + classShock[CLASS_IDX[s.cls] ?? 1][k] + eduSlope[k] * (s.z || 0) + noise;
   };
   const shares = spreadShares(seats, targets, dev, R);
   let shock = null;

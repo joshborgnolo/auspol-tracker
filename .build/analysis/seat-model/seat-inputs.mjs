@@ -6,6 +6,7 @@ import { cohortTable, pairShare, cohortKeyFor, FAM_OF_GROUP } from "./senate-flo
 import { loadRankings } from "./senate-io.mjs";
 import { FLOW_CLASSES, P5 } from "./seat-engine.mjs";
 import { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, seatGroups, LEVERS, leverLevels } from "./seat-build.mjs";
+import { loadHistory, historyRows, stage1Residuals, personKey } from "./swing-fit.mjs";
 export { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, LEVERS, leverLevels };
 
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
@@ -34,6 +35,25 @@ export function prepInputs({ year = 2025, composition = true, replay = false, ro
   const onBase = ridgePredict(fitRows.map(xOf), fitRows.map((d) => logit(onShare(d))), 3);
 
   const hist = process.env.AUSPOL_SIM_NOHIST === "1" ? { bySeat: {}, mean: {} } : houseHistory(RES, SEN);
+
+  /* seat terms of the logit swing (calibrate-swing.mjs, fitted on 1996-2025): the sitting member's personal
+     vote (gained where the party's 2028 candidate is the seat's member, lost where its 2025 candidate was the
+     sitting member and no longer is), defections, and the share of each seat's 2025 surprise carried forward.
+     Offsets on the logit scale, per candidate (c.adj); none in the 2025 replay. */
+  const TERMS = replay || process.env.AUSPOL_SIM_NOTERMS === "1" ? null : J(`${root}/data/seat-model-calibration.json`).swing?.terms || null;
+  let s1 = null, INC25 = null;
+  if (TERMS) { const H = loadHistory(root, [2022, 2025]); s1 = stage1Residuals(historyRows(H), [2025], TERMS); INC25 = H.INC[2025]; }
+  const FAM_TERMS = (g) => (g === "alp" ? "alp" : ["lp", "np", "lnp", "clp"].includes(g) ? "lnp" : g === "grn" ? "grn" : null);
+  const adjFor = (cs, D, group) => {
+    const b = FAM_TERMS(group); if (!TERMS || !b || !TERMS[b]) return 0;
+    const t = TERMS[b], inc = INC25[D.n];
+    const incP = D.c.some((c, i) => c[3] === b && inc.sit[i] === 1) ? 1 : 0;          // 2025: its candidate was the sitting member
+    const ig = cs.incumbent?.group, incE = cs.incumbent?.recontests !== false && FAM_TERMS(ig) === b ? 1 : 0; // 2028: its candidate is
+    let defect = 0;                                                                    // its 2025 sitting member now stands for someone else
+    if (cs.incumbent?.name && FAM_TERMS(ig) !== b) D.c.forEach((c, i) => { if (c[3] === b && inc.sit[i] === 1 && personKey(D.st, c[0]) === personKey(D.st, cs.incumbent.name)) defect = 1; });
+    const prevE = s1.get("2025|" + D.n + "|" + b) ?? 0;
+    return t.incE * incE + t.incP * incP + t.defect * defect + t.rho * prevE;
+  };
   const comp = composition ? switching(SW) : null;
   const { capNat, capBySeat, sibBySeat } = certifiedShares(FLOWS);
   const PW = VOTE.beta.populationWeights;
@@ -49,6 +69,7 @@ export function prepInputs({ year = 2025, composition = true, replay = false, ro
     if (!replay && want.has("on") && !cands.some((c) => c.group === "on")) cands.push({ label: "One Nation (assumed)", group: "on", party: "ON", partyName: "Pauline Hanson's One Nation", base: 1 / (1 + Math.exp(-onBase(xOf(D)))) });
     if (!replay) for (const i of cs.contest.ind.filter((i) => i.kind !== "held")) cands.push({ label: i.label, group: "ind-declared", party: "IND", partyName: "Independent", base: 0.08 });
     for (const c of cands) {
+      const a = adjFor(cs, D, c.group); if (a) c.adj = Math.round(a * 1e4) / 1e4;
       c.p5 = P5_OF(c.group);
       c.fam = FAM_OF_GROUP[c.group] ?? -1;
       c.isInd = c.group.startsWith("member") || c.group === "ind-declared";

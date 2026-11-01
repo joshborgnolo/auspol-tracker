@@ -1,15 +1,176 @@
 {
  "swing": {
-  "_about": "calibrate-swing.mjs: seat residuals from a logit swing with oracle state totals, federal 2007-2025 (logit units). sigmaSeat = within election x class; sigmaClass = shared by AEC class within an election; tDf from excess kurtosis; stateDev = SD of state deviations with only the national total known; sa26 = realignment check from the federal-2025 footprint.",
+  "_about": "calibrate-swing.mjs: seat residuals from a logit swing with oracle state totals, federal 1996-2025 (logit units), after the seat terms (sitting members, defections, reversion; swing-fit.mjs). sigmaSeat = within election x class; sigmaClass = shared by AEC class within an election; tDf from excess kurtosis; stateDev = SD of state deviations with only the national total known; plain = the same with no seat terms; oos = the terms refitted before each election 2001-2025 and scored on it; falls = residual RMS when a party fell more than 0.2 logit, against its calm years (k = extra noise per unit fall, the model's kFall); sa26 = realignment check from the federal-2025 footprint; sigMult = backtest-long.mjs's best noise multiplier.",
+  "years": [
+   1996,
+   1998,
+   2001,
+   2004,
+   2007,
+   2010,
+   2013,
+   2016,
+   2019,
+   2022,
+   2025
+  ],
+  "terms": {
+   "alp": {
+    "incE": 0.099,
+    "incP": -0.075,
+    "defect": -0.237,
+    "rho": -0.204
+   },
+   "lnp": {
+    "incE": 0.098,
+    "incP": -0.125,
+    "defect": -0.208,
+    "rho": -0.1
+   },
+   "grn": {
+    "incE": 0.099,
+    "incP": -0.1,
+    "defect": 0,
+    "rho": -0.252,
+    "borrowed": true
+   }
+  },
+  "termsByEra": {
+   "1996-2007": {
+    "alp": {
+     "incE": 0.08,
+     "incP": -0.074,
+     "defect": -0.244,
+     "rho": -0.239
+    },
+    "lnp": {
+     "incE": 0.117,
+     "incP": -0.166,
+     "defect": -1.01,
+     "rho": -0.074
+    },
+    "grn": {
+     "incE": 0.098,
+     "incP": -0.12,
+     "defect": 0,
+     "rho": -0.215
+    }
+   },
+   "2010-2025": {
+    "alp": {
+     "incE": 0.122,
+     "incP": -0.08,
+     "defect": -0.198,
+     "rho": -0.193
+    },
+    "lnp": {
+     "incE": 0.081,
+     "incP": -0.092,
+     "defect": -0.129,
+     "rho": -0.103
+    },
+    "grn": {
+     "incE": 0.102,
+     "incP": -0.086,
+     "defect": 0,
+     "rho": -0.273
+    }
+   }
+  },
   "stateOracle": {
    "alp": {
-    "n": 1052,
-    "sigmaSeat": 0.182,
-    "sigmaClass": 0.042,
-    "excessKurtosis": 4.13,
-    "tDf": 5.5,
-    "maePts": 2.77,
+    "n": 1648,
+    "sigmaSeat": 0.159,
+    "sigmaClass": 0.035,
+    "excessKurtosis": 5.8,
+    "tDf": 5,
+    "maePts": 2.39,
     "rmsByElection": {
+     "1996": 0.138,
+     "1998": 0.11,
+     "2001": 0.154,
+     "2004": 0.124,
+     "2007": 0.124,
+     "2010": 0.153,
+     "2013": 0.155,
+     "2016": 0.191,
+     "2019": 0.195,
+     "2022": 0.218,
+     "2025": 0.204
+    }
+   },
+   "lnp": {
+    "n": 1647,
+    "sigmaSeat": 0.204,
+    "sigmaClass": 0.054,
+    "excessKurtosis": 17.5,
+    "tDf": 4.3,
+    "maePts": 3.06,
+    "rmsByElection": {
+     "1996": 0.256,
+     "1998": 0.218,
+     "2001": 0.309,
+     "2004": 0.192,
+     "2007": 0.175,
+     "2010": 0.167,
+     "2013": 0.177,
+     "2016": 0.212,
+     "2019": 0.203,
+     "2022": 0.218,
+     "2025": 0.181
+    }
+   },
+   "grn": {
+    "n": 1429,
+    "sigmaSeat": 0.221,
+    "sigmaClass": 0.051,
+    "excessKurtosis": 2.87,
+    "tDf": 6.1,
+    "maePts": 1.28,
+    "rmsByElection": {
+     "1996": 0.259,
+     "1998": 0.215,
+     "2001": 0.251,
+     "2004": 0.229,
+     "2007": 0.166,
+     "2010": 0.215,
+     "2013": 0.261,
+     "2016": 0.185,
+     "2019": 0.204,
+     "2022": 0.256,
+     "2025": 0.278
+    }
+   },
+   "onp": {
+    "n": 437,
+    "sigmaSeat": 0.271,
+    "sigmaClass": 0.067,
+    "excessKurtosis": 2.75,
+    "tDf": 6.2,
+    "maePts": 1.06,
+    "rmsByElection": {
+     "2001": 0.25,
+     "2004": 0.267,
+     "2007": 0.251,
+     "2019": 0.242,
+     "2022": 0.386,
+     "2025": 0.271
+    }
+   }
+  },
+  "plain": {
+   "alp": {
+    "n": 1648,
+    "sigmaSeat": 0.167,
+    "sigmaClass": 0.037,
+    "excessKurtosis": 5.47,
+    "tDf": 5.1,
+    "maePts": 2.54,
+    "rmsByElection": {
+     "1996": 0.154,
+     "1998": 0.115,
+     "2001": 0.164,
+     "2004": 0.134,
      "2007": 0.132,
      "2010": 0.161,
      "2013": 0.172,
@@ -20,13 +181,17 @@
     }
    },
    "lnp": {
-    "n": 1052,
-    "sigmaSeat": 0.193,
-    "sigmaClass": 0.038,
-    "excessKurtosis": 8.58,
-    "tDf": 4.7,
-    "maePts": 2.94,
+    "n": 1647,
+    "sigmaSeat": 0.219,
+    "sigmaClass": 0.048,
+    "excessKurtosis": 16.4,
+    "tDf": 4.4,
+    "maePts": 3.21,
     "rmsByElection": {
+     "1996": 0.278,
+     "1998": 0.248,
+     "2001": 0.33,
+     "2004": 0.203,
      "2007": 0.179,
      "2010": 0.184,
      "2013": 0.188,
@@ -37,13 +202,17 @@
     }
    },
    "grn": {
-    "n": 1052,
+    "n": 1429,
     "sigmaSeat": 0.23,
-    "sigmaClass": 0.044,
-    "excessKurtosis": 3.74,
-    "tDf": 5.6,
-    "maePts": 1.46,
+    "sigmaClass": 0.051,
+    "excessKurtosis": 3.12,
+    "tDf": 5.9,
+    "maePts": 1.32,
     "rmsByElection": {
+     "1996": 0.266,
+     "1998": 0.215,
+     "2001": 0.247,
+     "2004": 0.239,
      "2007": 0.185,
      "2010": 0.228,
      "2013": 0.29,
@@ -54,89 +223,347 @@
     }
    },
    "onp": {
-    "n": 203,
-    "sigmaSeat": 0.298,
-    "sigmaClass": 0.094,
-    "excessKurtosis": 2.97,
-    "tDf": 6,
-    "maePts": 1.35,
+    "n": 437,
+    "sigmaSeat": 0.271,
+    "sigmaClass": 0.067,
+    "excessKurtosis": 2.75,
+    "tDf": 6.2,
+    "maePts": 1.06,
     "rmsByElection": {
+     "2001": 0.25,
+     "2004": 0.267,
+     "2007": 0.251,
+     "2019": 0.242,
      "2022": 0.386,
      "2025": 0.271
     }
    }
   },
-  "nationalOracle": {
+  "recent": {
    "alp": {
-    "n": 1052,
-    "sigmaSeat": 0.215,
-    "sigmaClass": 0.037,
-    "excessKurtosis": 2.49,
-    "tDf": 6.4,
-    "maePts": 3.49,
+    "n": 902,
+    "sigmaSeat": 0.181,
+    "sigmaClass": 0.043,
+    "excessKurtosis": 4.08,
+    "tDf": 5.5,
+    "maePts": 2.71,
     "rmsByElection": {
-     "2007": 0.171,
-     "2010": 0.208,
-     "2013": 0.201,
-     "2016": 0.217,
-     "2019": 0.235,
-     "2022": 0.271,
-     "2025": 0.23
+     "2010": 0.153,
+     "2013": 0.155,
+     "2016": 0.191,
+     "2019": 0.195,
+     "2022": 0.218,
+     "2025": 0.204
     }
    },
    "lnp": {
-    "n": 1052,
-    "sigmaSeat": 0.216,
-    "sigmaClass": 0.039,
-    "excessKurtosis": 6.08,
-    "tDf": 5,
-    "maePts": 3.53,
+    "n": 902,
+    "sigmaSeat": 0.186,
+    "sigmaClass": 0.047,
+    "excessKurtosis": 7.92,
+    "tDf": 4.8,
+    "maePts": 2.93,
     "rmsByElection": {
-     "2007": 0.187,
-     "2010": 0.22,
-     "2013": 0.212,
-     "2016": 0.237,
-     "2019": 0.234,
-     "2022": 0.236,
-     "2025": 0.224
+     "2010": 0.167,
+     "2013": 0.177,
+     "2016": 0.212,
+     "2019": 0.203,
+     "2022": 0.218,
+     "2025": 0.181
     }
    },
    "grn": {
-    "n": 1052,
-    "sigmaSeat": 0.262,
-    "sigmaClass": 0.055,
-    "excessKurtosis": 2.09,
-    "tDf": 6.9,
-    "maePts": 1.75,
+    "n": 902,
+    "sigmaSeat": 0.228,
+    "sigmaClass": 0.046,
+    "excessKurtosis": 3.2,
+    "tDf": 5.9,
+    "maePts": 1.5,
     "rmsByElection": {
-     "2007": 0.208,
-     "2010": 0.278,
-     "2013": 0.329,
-     "2016": 0.258,
-     "2019": 0.261,
-     "2022": 0.265,
-     "2025": 0.285
+     "2010": 0.215,
+     "2013": 0.261,
+     "2016": 0.185,
+     "2019": 0.204,
+     "2022": 0.256,
+     "2025": 0.278
     }
    },
    "onp": {
-    "n": 203,
-    "sigmaSeat": 0.36,
-    "sigmaClass": 0.057,
-    "excessKurtosis": 2.38,
-    "tDf": 6.5,
-    "maePts": 1.67,
+    "n": 225,
+    "sigmaSeat": 0.29,
+    "sigmaClass": 0.092,
+    "excessKurtosis": 3.08,
+    "tDf": 5.9,
+    "maePts": 1.35,
     "rmsByElection": {
-     "2022": 0.417,
-     "2025": 0.345
+     "2019": 0.242,
+     "2022": 0.386,
+     "2025": 0.271
     }
    }
   },
   "stateDev": {
-   "alp": 0.146,
-   "lnp": 0.138,
-   "grn": 0.164,
-   "onp": 0.223
+   "alp": 0.13,
+   "lnp": 0.137,
+   "grn": 0.188,
+   "onp": 0.225
   },
+  "oos": {
+   "alp": {
+    "rmsPlain": 0.181,
+    "rmsTerms": 0.173,
+    "byElection": {
+     "2001": {
+      "plain": 0.164,
+      "terms": 0.156,
+      "maePlain": 2.42,
+      "maeTerms": 2.22
+     },
+     "2004": {
+      "plain": 0.134,
+      "terms": 0.124,
+      "maePlain": 1.93,
+      "maeTerms": 1.9
+     },
+     "2007": {
+      "plain": 0.132,
+      "terms": 0.123,
+      "maePlain": 2.24,
+      "maeTerms": 2.09
+     },
+     "2010": {
+      "plain": 0.161,
+      "terms": 0.155,
+      "maePlain": 2.55,
+      "maeTerms": 2.53
+     },
+     "2013": {
+      "plain": 0.172,
+      "terms": 0.157,
+      "maePlain": 2.54,
+      "maeTerms": 2.3
+     },
+     "2016": {
+      "plain": 0.199,
+      "terms": 0.191,
+      "maePlain": 3.01,
+      "maeTerms": 2.88
+     },
+     "2019": {
+      "plain": 0.207,
+      "terms": 0.193,
+      "maePlain": 2.86,
+      "maeTerms": 2.65
+     },
+     "2022": {
+      "plain": 0.222,
+      "terms": 0.222,
+      "maePlain": 2.95,
+      "maeTerms": 2.88
+     },
+     "2025": {
+      "plain": 0.209,
+      "terms": 0.205,
+      "maePlain": 3.2,
+      "maeTerms": 3.17
+     }
+    }
+   },
+   "lnp": {
+    "rmsPlain": 0.218,
+    "rmsTerms": 0.21,
+    "byElection": {
+     "2001": {
+      "plain": 0.33,
+      "terms": 0.29,
+      "maePlain": 3.29,
+      "maeTerms": 3.02
+     },
+     "2004": {
+      "plain": 0.203,
+      "terms": 0.195,
+      "maePlain": 3.31,
+      "maeTerms": 3.3
+     },
+     "2007": {
+      "plain": 0.179,
+      "terms": 0.178,
+      "maePlain": 2.62,
+      "maeTerms": 2.74
+     },
+     "2010": {
+      "plain": 0.184,
+      "terms": 0.182,
+      "maePlain": 2.89,
+      "maeTerms": 2.87
+     },
+     "2013": {
+      "plain": 0.188,
+      "terms": 0.194,
+      "maePlain": 2.72,
+      "maeTerms": 2.66
+     },
+     "2016": {
+      "plain": 0.213,
+      "terms": 0.218,
+      "maePlain": 3.27,
+      "maeTerms": 3.45
+     },
+     "2019": {
+      "plain": 0.213,
+      "terms": 0.206,
+      "maePlain": 2.87,
+      "maeTerms": 3
+     },
+     "2022": {
+      "plain": 0.219,
+      "terms": 0.223,
+      "maePlain": 3.38,
+      "maeTerms": 3.61
+     },
+     "2025": {
+      "plain": 0.193,
+      "terms": 0.182,
+      "maePlain": 2.84,
+      "maeTerms": 2.7
+     }
+    }
+   },
+   "grn": {
+    "rmsPlain": 0.238,
+    "rmsTerms": 0.231,
+    "byElection": {
+     "2001": {
+      "plain": 0.247,
+      "terms": 0.251,
+      "maePlain": 0.92,
+      "maeTerms": 0.93
+     },
+     "2004": {
+      "plain": 0.239,
+      "terms": 0.233,
+      "maePlain": 1.11,
+      "maeTerms": 1.09
+     },
+     "2007": {
+      "plain": 0.185,
+      "terms": 0.17,
+      "maePlain": 0.93,
+      "maeTerms": 0.85
+     },
+     "2010": {
+      "plain": 0.228,
+      "terms": 0.217,
+      "maePlain": 1.56,
+      "maeTerms": 1.49
+     },
+     "2013": {
+      "plain": 0.29,
+      "terms": 0.261,
+      "maePlain": 1.45,
+      "maeTerms": 1.35
+     },
+     "2016": {
+      "plain": 0.203,
+      "terms": 0.184,
+      "maePlain": 1.33,
+      "maeTerms": 1.25
+     },
+     "2019": {
+      "plain": 0.206,
+      "terms": 0.205,
+      "maePlain": 1.32,
+      "maeTerms": 1.33
+     },
+     "2022": {
+      "plain": 0.259,
+      "terms": 0.257,
+      "maePlain": 1.68,
+      "maeTerms": 1.65
+     },
+     "2025": {
+      "plain": 0.27,
+      "terms": 0.28,
+      "maePlain": 1.95,
+      "maeTerms": 1.99
+     }
+    }
+   }
+  },
+  "falls": [
+   {
+    "E": 1996,
+    "b": "alp",
+    "move": -0.254,
+    "rms": 0.138,
+    "n": 148,
+    "calm": 0.131,
+    "k": 0.175
+   },
+   {
+    "E": 2010,
+    "b": "alp",
+    "move": -0.224,
+    "rms": 0.153,
+    "n": 150,
+    "calm": 0.169,
+    "k": 0
+   },
+   {
+    "E": 2013,
+    "b": "alp",
+    "move": -0.201,
+    "rms": 0.155,
+    "n": 150,
+    "calm": 0.185,
+    "k": 0
+   },
+   {
+    "E": 1998,
+    "b": "lnp",
+    "move": -0.316,
+    "rms": 0.218,
+    "n": 147,
+    "calm": 0.257,
+    "k": 0
+   },
+   {
+    "E": 2022,
+    "b": "lnp",
+    "move": -0.243,
+    "rms": 0.218,
+    "n": 151,
+    "calm": 0.198,
+    "k": 0.376
+   },
+   {
+    "E": 2013,
+    "b": "grn",
+    "move": -0.342,
+    "rms": 0.261,
+    "n": 150,
+    "calm": 0.186,
+    "k": 0.535
+   },
+   {
+    "E": 2001,
+    "b": "onp",
+    "move": -0.708,
+    "rms": 0.25,
+    "n": 124,
+    "calm": null,
+    "k": 0
+   },
+   {
+    "E": 2004,
+    "b": "onp",
+    "move": -1.322,
+    "rms": 0.267,
+    "n": 69,
+    "calm": null,
+    "k": 0
+   }
+  ],
   "sa26": {
    "alp": {
     "n": 47,
@@ -158,6 +585,54 @@
     "rmsLogit": 0.164,
     "maePts": 1.99
    }
+  },
+  "sigMult": {
+   "value": 1.3,
+   "bestAll": 1,
+   "recentFrom": 2016,
+   "grid": [
+    {
+     "mult": 1,
+     "brierRecent": 0.1837,
+     "logRecent": -0.3954,
+     "brierAll": 0.1517,
+     "logAll": -0.3158,
+     "elections": 9
+    },
+    {
+     "mult": 1.15,
+     "brierRecent": 0.1826,
+     "logRecent": -0.3912,
+     "brierAll": 0.1521,
+     "logAll": -0.3163,
+     "elections": 9
+    },
+    {
+     "mult": 1.3,
+     "brierRecent": 0.1812,
+     "logRecent": -0.3852,
+     "brierAll": 0.1527,
+     "logAll": -0.3168,
+     "elections": 9
+    },
+    {
+     "mult": 1.5,
+     "brierRecent": 0.1812,
+     "logRecent": -0.3842,
+     "brierAll": 0.1545,
+     "logAll": -0.3213,
+     "elections": 9
+    },
+    {
+     "mult": 1.7,
+     "brierRecent": 0.1815,
+     "logRecent": -0.3816,
+     "brierAll": 0.1569,
+     "logAll": -0.3247,
+     "elections": 9
+    }
+   ],
+   "rule": "smallest multiplier within 0.0005 of the best mean Brier score over 2016-2025 (house flows, national vote given); bestAll = best mean Brier over 2001-2025"
   }
  },
  "national": {

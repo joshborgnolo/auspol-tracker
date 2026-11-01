@@ -427,6 +427,103 @@ The shrinkage trims One Nation's upper tail by a few seats and changes no headli
 - One Nation's polling-error floor (above).
 - A /map/ lens for the model's seat chances.
 
+## 14. v2.2: every election since 1993 (2026-11-01)
+
+The user asked why the backtest started at 2019 and the flow fit at 2016, when the repo holds results back to 1993.
+
+**Why those dates.** The flow model reads Senate ballots. Before 2016 about 95% of Senate votes were a single 1 above the line, adopting the party's group ticket, so no voter's own order is recorded. The House-v-Senate calibration (2,802 rows) pairs a seat's House flow with its Senate rankings, which only exists from 2016. The Senate-mode backtest needs the previous election's ballots, so it starts at 2019.
+
+**What the older data could test.** The House results, swing columns and counted flows go back further: every seat from 1996 to 2025, and 123 of 147 seats in 1993. The repo also holds the full distribution of preferences for every election since 1993. None of the swing or noise needs the Senate. This section uses all of it.
+
+### Sitting members (`extract-incumbency.mjs` -> `data/house-incumbency.json`)
+- **The res stores' sitting column is wrong.** It is 0 from 2007, marks the *winner* in 2004, and is a same-name match before that.
+- **Sources:**
+  - 2007–2025: the AEC's HistoricElected. It includes by-election winners (Phelps 2019) and renamed seats (Leigh, Fenner). It also flags any sitting MP, so Banks in Flinders 2019 is classed as a mover.
+  - 1993–2004: the previous general election's winners re-contesting, plus a by-election list. The 1990 winners come from psephos, from the final count's capitalised name.
+- **The 1996/2001 CD-ROM SittingMemberFl is not used.** It misses by-election winners (Abbott, Latham, Georgiou) and long-serving members (Cadman, Jones, Pyne).
+- **Checks:** sitting members standing per election run from 115 to 140 seats, and the lost-seat counts look right (1996 lost 32; 2001 lost 7).
+
+### Seat terms (`swing-fit.mjs`, `calibrate-swing.mjs`)
+**Model:** logit swing from the notional previous share, with state totals given and Huber IRLS (k 1.5). Reversion is fitted in a second stage on the first stage's residuals.
+
+| 1996–2025, logit | Sitting member | Previous member gone | Defection | Reversion |
+|---|---|---|---|---|
+| Labor | +0.099 | −0.075 | −0.237 | −0.204 |
+| Coalition | +0.098 | −0.125 | −0.208 | −0.100 |
+| Greens | +0.099 (borrowed) | −0.100 (borrowed) | – | −0.252 |
+
+- **Stable by era.** 2010–2025: Labor +0.122 / −0.080 / −0.193; Coalition +0.081 / −0.092 / −0.103.
+- **The Greens' sitting members are too few to fit.** There are nine contests. Their own estimate, +0.28 / −0.29, points the same way, so they take the major parties' average.
+- **Out of sample** (terms refitted before each of 2001–2025, scored on it), typical seat miss:
+  - Labor: RMS 0.181 → 0.173, better in 8 of 9 elections.
+  - Coalition: RMS 0.218 → 0.210, better in 6 of 9, though the MAE is worse in 2007, 2016, 2019 and 2022.
+  - Greens: RMS 0.238 → 0.231, better in 7 of 9.
+- **Seat noise left** (1996–2025): Labor 0.167 → 0.159, Coalition 0.219 → 0.204, Greens 0.230 → 0.221. Kurtosis gives t df 5.0 / 4.3 / 6.1, so df 5 stands.
+- **Seat-type shocks:** 0.035–0.054 measured, against the model's stated 0.06 (0.09 for One Nation). Left as stated.
+- **State deviations:** Labor 0.13, Coalition 0.137, Greens 0.188, One Nation 0.225.
+- **State elections:** sitting members against open seats their party held, recovered from the previous state winners:
+
+  | Election | Labor | Liberals / LNP |
+  |---|---|---|
+  | SA 2026 | +0.44 | +0.44 |
+  | Qld 2024 | +0.32 | −0.07 |
+  | Qld 2020 | +0.21 | +0.18 |
+
+  So in a realignment the personal vote cushions a collapse. The federal sizes may be conservative for 2028.
+- **Independents:** established independents re-standing move little (mean about 0, SD about 0.25 logit). That supports sigMember 0.30 and no sophomore term. Defectors collapse.
+- **kFall:** the federal record has no fall the size of the 2028 Coalition's. Falls of 0.2–0.35 logit show extra noise of 0–0.5 per unit fall, inconclusive. kFall stays at SA 2026's 0.47.
+
+### The long backtest (`backtest-long.mjs` -> `data/seat-model-backtest-long.json`)
+**Setup:** every election 2001–2025 from the one before, with the national vote given and state shocks drawn. Seat terms are fitted before E. Noise is the RMS of the three previous elections' residuals × a multiplier.
+
+**Flows ("house" mode):** the previous House count's flows by party, set on the 2016 Senate ballots' shape by tilting each observed pair to P's state and national level, then each seat toward its own P flow (n/(n+1500)). The 2016 shape is the only borrowed piece, and it matters only for three-way splits.
+
+| 2001–2025, 1,352 seats | Brier | Log | Winners right |
+|---|---|---|---|
+| v2.1 (no seat terms, ×1.3) | 0.1569 | −0.3221 | 1,218 |
+| v2.2 (terms, ×1.3) | 0.1527 | −0.3170 | 1,221 |
+| Sitting-member terms only | 0.1530 | −0.3163 | 1,218 |
+| Reversion only | 0.1564 | −0.3201 | 1,214 |
+
+**Candidly, by election:**
+- The terms win clearly in 2001, 2004 and 2007, which is where the pooled gain comes from.
+- They lose in 2013, 2019 and 2022, so the four elections from 2016 slightly favour v2.1 (mean Brier 0.1779 v 0.1812; 2001-2013 0.1400 v 0.1299).
+- The two terms pull opposite ways in seats that changed hands last time. In 2016 and 2019 those seats swung back, and reversion was right. In 2022 and 2025 the new members held, and the sitting-member term was right.
+- On the Senate ballots (`backtest-chain.mjs`, out-of-sample flow settings), 2019 / 2022 / 2025 winners: 140 / 130 / 130 with the terms against 140 / 131 / 131 without.
+- Adopted anyway, on the nine-election pooled scores, the out-of-sample vote shares and SA 2026. The page says the gain is before 2016.
+
+**The noise multiplier.** Mean Brier over 2016–2025:
+
+| Multiplier | 1.0 | 1.15 | 1.3 | 1.5 | 1.7 |
+|---|---|---|---|---|---|
+| Brier | 0.1837 | 0.1826 | 0.1812 | 0.1812 | 0.1815 |
+
+- Over 2001–2025, 1.0 is best (0.1517), because seats strayed less in the 2000s.
+- The rule: the recent window by Brier, ties to the smaller multiplier. **1.3 stays**, now on nine elections, not three.
+- Not log score. From 1.3 up it keeps rising only through wins no starting point foresees: new independents, Mayo 2016 (Curtin 2022: p 0.0000 → 0.0010). Those buy a net +2.2 log points while 522 of the 602 recent seats lose a combined 15.7 (`AUSPOL_BL_DUMP`).
+- df 4 ≈ 5 > 8 on both scores.
+
+### Preferences, cross-checked (`flow-drift.mjs` -> `data/seat-model-flow-drift.json`)
+National House splits between Labor and the Coalition, 1993–2025, and their logit drift between elections:
+
+| | Greens | One Nation | Right minors | Other minors | Left minors |
+|---|---|---|---|---|---|
+| Split, first to last year | 68 → 87.5% | 46 → 26% | | | |
+| House drift since 1993 | 0.205 | 0.282 | 0.18 | 0.17 | 0.30 |
+| Model draws | 0.27 | 0.46 | 0.48 | 0.33 | 0.35 |
+
+- One Nation's drift has two card-driven jumps, −0.63 in 2019 and −0.49 in 2025.
+- The model's draws are wider in every group. That is right: they measure Senate-to-count drift, which includes model error, not only time.
+- Unchanged. The page says so.
+
+### 2028 effect
+- **The terms, by seat:**
+  - Labor's 2025 first-termers gain about +0.10 (Dickson +0.12, with the LNP −0.11 for Dutton's lost personal vote).
+  - Brisbane and Melbourne move about 0.05–0.09 from the Greens to Labor.
+  - Calwell's Labor vote recovers +0.21 from its 2025 collapse.
+- **Means over seats** (national totals still solved exactly): Labor +0.03, Coalition −0.01, Greens 0.
+- **Victoria** has no sitting-member record in its stores, so it keeps the plain-swing noise (`modelSettings({plainNoise: true})`).
+
 ## Scripts (`seat-model/design-review/`)
 
 | Script | Question |
@@ -453,3 +550,4 @@ v2's own scripts sit one level up in `seat-model/`:
 - `calibrate-flows.mjs`, `calibrate-swing.mjs`, `calibrate-national.mjs`
 - `seat-engine.mjs`, `seat-inputs.mjs`, `swing-simulate.mjs`
 - `backtest-chain.mjs`, `backtest-states.mjs`
+- v2.2: `extract-incumbency.mjs`, `swing-fit.mjs`, `backtest-long.mjs`, `flow-drift.mjs`

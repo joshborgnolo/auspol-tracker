@@ -1,25 +1,25 @@
 {
  "sigmaMultiplier": 1.3,
  "tDf": 5,
- "_about": "backtest-chain.mjs: seat noise scale 1.3 (chosen by held-out log score over 1.0/1.3/1.6 x t df 4/5). the seat chain for 2019, 2022 and 2025 from what was known three years earlier, with the actual vote totals given (state totals, or national with state shocks). Variants: full (Senate geography + House history), noHist (Senate geography only), noGeo (state-level Senate tables only). Brier/log score of the seat winner by party group; winners right by modal and no-noise prediction; pairs right; TCP MAE where the pair is right.",
+ "_about": "backtest-chain.mjs: the seat chain for 2019, 2022 and 2025 from what was known three years earlier, with the actual vote totals given (state totals, or national with state shocks): seat terms (sitting members, defections, reversion) fitted on 1996 to the previous election, seat noise from the three elections before at the calibrated multiplier (calibrate-swing.mjs, from backtest-long.mjs over 2001-2025). Variants: full (Senate geography + House history), noHist (Senate geography only), noGeo (state-level Senate tables only), noTerms (full flows, the model before the seat terms: plain-swing noise x1.3). Brier/log score of the seat winner by party group; winners right by modal and no-noise prediction; pairs right; TCP MAE where the pair is right.",
  "draws": 2000,
  "results": [
   {
    "E": 2019,
    "variant": "full",
    "stateOracle": true,
-   "brier": 0.1073,
-   "logScore": -0.2275,
+   "brier": 0.1143,
+   "logScore": -0.236,
    "modalRight": 140,
-   "deterministicRight": 139,
-   "pairsRight": 142,
-   "tcpMaePts": 3.68,
+   "deterministicRight": 140,
+   "pairsRight": 141,
+   "tcpMaePts": 3.6,
    "expected": {
-    "alp": 72.1,
-    "lnp": 74.7,
-    "on": 0.1,
-    "grn": 1.4,
-    "ind": 2.6,
+    "alp": 73.3,
+    "lnp": 73.5,
+    "on": 0,
+    "grn": 1.3,
+    "ind": 2.8,
     "oth": 0.1
    },
    "actual": {
@@ -41,38 +41,38 @@
     {
      "bin": "0-0.1",
      "meanP": 0.014,
-     "observed": 0.015,
-     "n": 196
+     "observed": 0.023,
+     "n": 175
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.185,
-     "observed": 0.045,
-     "n": 22
+     "meanP": 0.19,
+     "observed": 0.107,
+     "n": 28
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.413,
-     "observed": 0.471,
-     "n": 17
+     "meanP": 0.395,
+     "observed": 0.364,
+     "n": 11
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.61,
-     "observed": 0.571,
-     "n": 14
+     "meanP": 0.604,
+     "observed": 0.667,
+     "n": 12
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.818,
-     "observed": 0.909,
-     "n": 22
+     "meanP": 0.814,
+     "observed": 0.857,
+     "n": 28
     },
     {
      "bin": "0.9-1",
-     "meanP": 0.978,
-     "observed": 0.982,
-     "n": 113
+     "meanP": 0.98,
+     "observed": 0.973,
+     "n": 111
     }
    ]
   },
@@ -80,16 +80,160 @@
    "E": 2019,
    "variant": "noHist",
    "stateOracle": true,
-   "brier": 0.1046,
-   "logScore": -0.2247,
+   "brier": 0.1104,
+   "logScore": -0.232,
    "modalRight": 140,
    "deterministicRight": 140,
-   "pairsRight": 142,
-   "tcpMaePts": 3.71,
+   "pairsRight": 141,
+   "tcpMaePts": 3.65,
    "expected": {
-    "alp": 71.7,
-    "lnp": 75.1,
-    "on": 0.1,
+    "alp": 72.9,
+    "lnp": 73.9,
+    "on": 0,
+    "grn": 1.3,
+    "ind": 2.8,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": true
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.014,
+     "observed": 0.017,
+     "n": 176
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.19,
+     "observed": 0.107,
+     "n": 28
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.397,
+     "observed": 0.417,
+     "n": 12
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.602,
+     "observed": 0.615,
+     "n": 13
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.815,
+     "observed": 0.857,
+     "n": 28
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.98,
+     "observed": 0.982,
+     "n": 110
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "variant": "noGeo",
+   "stateOracle": true,
+   "brier": 0.1115,
+   "logScore": -0.2347,
+   "modalRight": 141,
+   "deterministicRight": 140,
+   "pairsRight": 141,
+   "tcpMaePts": 3.66,
+   "expected": {
+    "alp": 72.6,
+    "lnp": 74.3,
+    "on": 0,
+    "grn": 1.2,
+    "ind": 2.7,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": true
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.014,
+     "observed": 0.017,
+     "n": 178
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.196,
+     "observed": 0.097,
+     "n": 31
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.425,
+     "observed": 0.4,
+     "n": 10
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.577,
+     "observed": 0.636,
+     "n": 11
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.812,
+     "observed": 0.844,
+     "n": 32
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.98,
+     "observed": 0.991,
+     "n": 108
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "variant": "noTerms",
+   "stateOracle": true,
+   "brier": 0.1084,
+   "logScore": -0.2298,
+   "modalRight": 139,
+   "deterministicRight": 139,
+   "pairsRight": 142,
+   "tcpMaePts": 3.68,
+   "expected": {
+    "alp": 72.1,
+    "lnp": 74.7,
+    "on": 0,
     "grn": 1.4,
     "ind": 2.6,
     "oth": 0.1
@@ -113,20 +257,20 @@
     {
      "bin": "0-0.1",
      "meanP": 0.015,
-     "observed": 0.015,
-     "n": 196
+     "observed": 0.016,
+     "n": 189
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.194,
-     "observed": 0.043,
-     "n": 23
+     "meanP": 0.185,
+     "observed": 0.042,
+     "n": 24
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.406,
-     "observed": 0.533,
-     "n": 15
+     "meanP": 0.417,
+     "observed": 0.529,
+     "n": 17
     },
     {
      "bin": "0.5-0.7",
@@ -136,34 +280,34 @@
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.808,
-     "observed": 0.913,
-     "n": 23
+     "meanP": 0.819,
+     "observed": 0.917,
+     "n": 24
     },
     {
      "bin": "0.9-1",
      "meanP": 0.978,
      "observed": 0.982,
-     "n": 113
+     "n": 111
     }
    ]
   },
   {
    "E": 2019,
-   "variant": "noGeo",
-   "stateOracle": true,
-   "brier": 0.1067,
-   "logScore": -0.2278,
+   "variant": "full",
+   "stateOracle": false,
+   "brier": 0.1297,
+   "logScore": -0.2433,
    "modalRight": 140,
-   "deterministicRight": 140,
-   "pairsRight": 142,
-   "tcpMaePts": 3.73,
+   "deterministicRight": 141,
+   "pairsRight": 143,
+   "tcpMaePts": 3.71,
    "expected": {
-    "alp": 71.4,
-    "lnp": 75.6,
+    "alp": 72,
+    "lnp": 74.2,
     "on": 0.1,
-    "grn": 1.3,
-    "ind": 2.6,
+    "grn": 1.8,
+    "ind": 2.8,
     "oth": 0.1
    },
    "actual": {
@@ -184,57 +328,201 @@
    "calibration": [
     {
      "bin": "0-0.1",
-     "meanP": 0.013,
-     "observed": 0.015,
-     "n": 195
+     "meanP": 0.015,
+     "observed": 0.022,
+     "n": 182
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.178,
-     "observed": 0.038,
-     "n": 26
+     "meanP": 0.188,
+     "observed": 0.143,
+     "n": 28
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.391,
-     "observed": 0.467,
-     "n": 15
+     "meanP": 0.373,
+     "observed": 0.158,
+     "n": 19
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.609,
-     "observed": 0.563,
-     "n": 16
+     "meanP": 0.626,
+     "observed": 0.882,
+     "n": 17
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.825,
-     "observed": 0.923,
-     "n": 26
+     "meanP": 0.809,
+     "observed": 0.786,
+     "n": 28
     },
     {
      "bin": "0.9-1",
-     "meanP": 0.979,
-     "observed": 0.982,
-     "n": 109
+     "meanP": 0.977,
+     "observed": 0.981,
+     "n": 105
     }
    ]
   },
   {
    "E": 2019,
-   "variant": "full",
+   "variant": "noHist",
    "stateOracle": false,
-   "brier": 0.1207,
-   "logScore": -0.2322,
+   "brier": 0.1276,
+   "logScore": -0.2409,
+   "modalRight": 140,
+   "deterministicRight": 141,
+   "pairsRight": 143,
+   "tcpMaePts": 3.74,
+   "expected": {
+    "alp": 71.6,
+    "lnp": 74.5,
+    "on": 0.1,
+    "grn": 1.8,
+    "ind": 2.8,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": true
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.016,
+     "observed": 0.016,
+     "n": 183
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.189,
+     "observed": 0.148,
+     "n": 27
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.381,
+     "observed": 0.2,
+     "n": 20
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.618,
+     "observed": 0.833,
+     "n": 18
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.808,
+     "observed": 0.778,
+     "n": 27
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.975,
+     "observed": 0.99,
+     "n": 105
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "variant": "noGeo",
+   "stateOracle": false,
+   "brier": 0.128,
+   "logScore": -0.2423,
+   "modalRight": 140,
+   "deterministicRight": 141,
+   "pairsRight": 143,
+   "tcpMaePts": 3.74,
+   "expected": {
+    "alp": 71.4,
+    "lnp": 74.9,
+    "on": 0,
+    "grn": 1.7,
+    "ind": 2.8,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": true
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.015,
+     "observed": 0.017,
+     "n": 180
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.185,
+     "observed": 0.133,
+     "n": 30
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.388,
+     "observed": 0.2,
+     "n": 20
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.611,
+     "observed": 0.833,
+     "n": 18
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.813,
+     "observed": 0.8,
+     "n": 30
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.976,
+     "observed": 0.99,
+     "n": 102
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "variant": "noTerms",
+   "stateOracle": false,
+   "brier": 0.1214,
+   "logScore": -0.2333,
    "modalRight": 140,
    "deterministicRight": 141,
    "pairsRight": 144,
    "tcpMaePts": 3.8,
    "expected": {
     "alp": 70.8,
-    "lnp": 75.2,
-    "on": 0.2,
-    "grn": 1.9,
+    "lnp": 75.3,
+    "on": 0.1,
+    "grn": 2,
     "ind": 2.7,
     "oth": 0.1
    },
@@ -258,179 +546,35 @@
      "bin": "0-0.1",
      "meanP": 0.014,
      "observed": 0.016,
-     "n": 191
+     "n": 188
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.176,
+     "meanP": 0.179,
      "observed": 0.034,
      "n": 29
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.381,
+     "meanP": 0.383,
      "observed": 0.304,
      "n": 23
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.614,
+     "meanP": 0.615,
      "observed": 0.714,
      "n": 21
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.821,
+     "meanP": 0.818,
      "observed": 0.897,
      "n": 29
     },
     {
      "bin": "0.9-1",
      "meanP": 0.978,
-     "observed": 0.99,
-     "n": 100
-    }
-   ]
-  },
-  {
-   "E": 2019,
-   "variant": "noHist",
-   "stateOracle": false,
-   "brier": 0.1189,
-   "logScore": -0.2309,
-   "modalRight": 141,
-   "deterministicRight": 142,
-   "pairsRight": 144,
-   "tcpMaePts": 3.83,
-   "expected": {
-    "alp": 70.5,
-    "lnp": 75.5,
-    "on": 0.2,
-    "grn": 1.9,
-    "ind": 2.7,
-    "oth": 0.1
-   },
-   "actual": {
-    "alp": 68,
-    "lnp": 77,
-    "on": 0,
-    "grn": 1,
-    "ind": 3,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": true
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.014,
-     "observed": 0.016,
-     "n": 192
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.177,
-     "observed": 0.034,
-     "n": 29
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.385,
-     "observed": 0.261,
-     "n": 23
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.609,
-     "observed": 0.762,
-     "n": 21
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.82,
-     "observed": 0.897,
-     "n": 29
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.977,
-     "observed": 0.99,
-     "n": 100
-    }
-   ]
-  },
-  {
-   "E": 2019,
-   "variant": "noGeo",
-   "stateOracle": false,
-   "brier": 0.12,
-   "logScore": -0.2325,
-   "modalRight": 140,
-   "deterministicRight": 141,
-   "pairsRight": 144,
-   "tcpMaePts": 3.83,
-   "expected": {
-    "alp": 70.3,
-    "lnp": 76,
-    "on": 0.1,
-    "grn": 1.8,
-    "ind": 2.7,
-    "oth": 0.1
-   },
-   "actual": {
-    "alp": 68,
-    "lnp": 77,
-    "on": 0,
-    "grn": 1,
-    "ind": 3,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": true
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.014,
-     "observed": 0.016,
-     "n": 192
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.181,
-     "observed": 0.034,
-     "n": 29
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.382,
-     "observed": 0.304,
-     "n": 23
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.616,
-     "observed": 0.714,
-     "n": 21
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.816,
-     "observed": 0.897,
-     "n": 29
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.976,
      "observed": 0.99,
      "n": 100
     }
@@ -440,160 +584,16 @@
    "E": 2022,
    "variant": "full",
    "stateOracle": true,
-   "brier": 0.1953,
-   "logScore": -0.4829,
-   "modalRight": 132,
-   "deterministicRight": 132,
-   "pairsRight": 132,
-   "tcpMaePts": 3.3,
-   "expected": {
-    "alp": 73.4,
-    "lnp": 71.3,
-    "on": 0.1,
-    "grn": 2.8,
-    "ind": 3,
-    "oth": 0.5
-   },
-   "actual": {
-    "alp": 77,
-    "lnp": 58,
-    "on": 0,
-    "grn": 4,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": false,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.012,
-     "observed": 0.039,
-     "n": 230
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.164,
-     "observed": 0.185,
-     "n": 27
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.406,
-     "observed": 0.429,
-     "n": 14
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.602,
-     "observed": 0.467,
-     "n": 15
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.835,
-     "observed": 0.864,
-     "n": 22
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.979,
-     "observed": 0.929,
-     "n": 113
-    }
-   ]
-  },
-  {
-   "E": 2022,
-   "variant": "noHist",
-   "stateOracle": true,
-   "brier": 0.1974,
-   "logScore": -0.4862,
+   "brier": 0.2061,
+   "logScore": -0.5047,
    "modalRight": 131,
    "deterministicRight": 132,
-   "pairsRight": 131,
-   "tcpMaePts": 3.28,
+   "pairsRight": 132,
+   "tcpMaePts": 3.33,
    "expected": {
-    "alp": 73.2,
-    "lnp": 71.4,
-    "on": 0.1,
-    "grn": 2.8,
-    "ind": 3,
-    "oth": 0.5
-   },
-   "actual": {
-    "alp": 77,
-    "lnp": 58,
+    "alp": 74,
+    "lnp": 70.9,
     "on": 0,
-    "grn": 4,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": false,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.013,
-     "observed": 0.039,
-     "n": 230
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.17,
-     "observed": 0.172,
-     "n": 29
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.415,
-     "observed": 0.538,
-     "n": 13
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.593,
-     "observed": 0.357,
-     "n": 14
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.829,
-     "observed": 0.875,
-     "n": 24
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.978,
-     "observed": 0.929,
-     "n": 112
-    }
-   ]
-  },
-  {
-   "E": 2022,
-   "variant": "noGeo",
-   "stateOracle": true,
-   "brier": 0.1979,
-   "logScore": -0.4893,
-   "modalRight": 132,
-   "deterministicRight": 132,
-   "pairsRight": 131,
-   "tcpMaePts": 3.28,
-   "expected": {
-    "alp": 73.4,
-    "lnp": 71.5,
-    "on": 0.1,
     "grn": 2.5,
     "ind": 3,
     "oth": 0.5
@@ -617,38 +617,254 @@
     {
      "bin": "0-0.1",
      "meanP": 0.012,
-     "observed": 0.039,
-     "n": 228
+     "observed": 0.049,
+     "n": 203
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.169,
-     "observed": 0.161,
-     "n": 31
+     "meanP": 0.17,
+     "observed": 0.152,
+     "n": 33
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.421,
+     "meanP": 0.394,
+     "observed": 0.417,
+     "n": 12
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.644,
+     "observed": 0.5,
+     "n": 10
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.825,
+     "observed": 0.828,
+     "n": 29
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.98,
+     "observed": 0.927,
+     "n": 110
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "variant": "noHist",
+   "stateOracle": true,
+   "brier": 0.2076,
+   "logScore": -0.5077,
+   "modalRight": 131,
+   "deterministicRight": 132,
+   "pairsRight": 132,
+   "tcpMaePts": 3.34,
+   "expected": {
+    "alp": 74,
+    "lnp": 71,
+    "on": 0,
+    "grn": 2.5,
+    "ind": 3,
+    "oth": 0.5
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": false,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.013,
+     "observed": 0.05,
+     "n": 202
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.168,
+     "observed": 0.152,
+     "n": 33
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.394,
+     "observed": 0.385,
+     "n": 13
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.639,
+     "observed": 0.545,
+     "n": 11
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.822,
+     "observed": 0.852,
+     "n": 27
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.978,
+     "observed": 0.919,
+     "n": 111
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "variant": "noGeo",
+   "stateOracle": true,
+   "brier": 0.2087,
+   "logScore": -0.5107,
+   "modalRight": 132,
+   "deterministicRight": 132,
+   "pairsRight": 133,
+   "tcpMaePts": 3.36,
+   "expected": {
+    "alp": 74.2,
+    "lnp": 71.1,
+    "on": 0,
+    "grn": 2.3,
+    "ind": 3,
+    "oth": 0.5
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": false,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.013,
+     "observed": 0.049,
+     "n": 203
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.176,
+     "observed": 0.147,
+     "n": 34
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.402,
+     "observed": 0.417,
+     "n": 12
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.621,
+     "observed": 0.556,
+     "n": 9
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.814,
+     "observed": 0.833,
+     "n": 30
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.978,
+     "observed": 0.918,
+     "n": 110
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "variant": "noTerms",
+   "stateOracle": true,
+   "brier": 0.195,
+   "logScore": -0.4853,
+   "modalRight": 132,
+   "deterministicRight": 132,
+   "pairsRight": 132,
+   "tcpMaePts": 3.3,
+   "expected": {
+    "alp": 73.4,
+    "lnp": 71.2,
+    "on": 0,
+    "grn": 2.8,
+    "ind": 3,
+    "oth": 0.5
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": false,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.014,
+     "observed": 0.041,
+     "n": 218
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.167,
+     "observed": 0.167,
+     "n": 30
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.411,
      "observed": 0.429,
      "n": 14
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.595,
-     "observed": 0.5,
-     "n": 12
+     "meanP": 0.594,
+     "observed": 0.467,
+     "n": 15
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.819,
-     "observed": 0.84,
-     "n": 25
+     "meanP": 0.83,
+     "observed": 0.875,
+     "n": 24
     },
     {
      "bin": "0.9-1",
      "meanP": 0.977,
-     "observed": 0.929,
-     "n": 112
+     "observed": 0.928,
+     "n": 111
     }
    ]
   },
@@ -656,17 +872,17 @@
    "E": 2022,
    "variant": "full",
    "stateOracle": false,
-   "brier": 0.2233,
-   "logScore": -0.5242,
-   "modalRight": 131,
-   "deterministicRight": 131,
-   "pairsRight": 133,
-   "tcpMaePts": 3.93,
+   "brier": 0.2306,
+   "logScore": -0.5385,
+   "modalRight": 130,
+   "deterministicRight": 130,
+   "pairsRight": 135,
+   "tcpMaePts": 3.95,
    "expected": {
-    "alp": 73,
-    "lnp": 71.4,
-    "on": 0.2,
-    "grn": 2.7,
+    "alp": 73.4,
+    "lnp": 71.3,
+    "on": 0.1,
+    "grn": 2.5,
     "ind": 3.1,
     "oth": 0.6
    },
@@ -688,39 +904,39 @@
    "calibration": [
     {
      "bin": "0-0.1",
-     "meanP": 0.011,
-     "observed": 0.04,
-     "n": 249
+     "meanP": 0.013,
+     "observed": 0.043,
+     "n": 233
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.185,
-     "observed": 0.189,
-     "n": 37
+     "meanP": 0.196,
+     "observed": 0.2,
+     "n": 35
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.386,
-     "observed": 0.214,
-     "n": 14
+     "meanP": 0.392,
+     "observed": 0.364,
+     "n": 11
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.611,
-     "observed": 0.667,
+     "meanP": 0.615,
+     "observed": 0.533,
      "n": 15
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.808,
-     "observed": 0.774,
-     "n": 31
+     "meanP": 0.799,
+     "observed": 0.8,
+     "n": 30
     },
     {
      "bin": "0.9-1",
-     "meanP": 0.978,
-     "observed": 0.933,
-     "n": 104
+     "meanP": 0.976,
+     "observed": 0.925,
+     "n": 106
     }
    ]
   },
@@ -728,17 +944,17 @@
    "E": 2022,
    "variant": "noHist",
    "stateOracle": false,
-   "brier": 0.2249,
-   "logScore": -0.5277,
-   "modalRight": 130,
+   "brier": 0.2321,
+   "logScore": -0.5413,
+   "modalRight": 131,
    "deterministicRight": 130,
-   "pairsRight": 133,
-   "tcpMaePts": 3.94,
+   "pairsRight": 134,
+   "tcpMaePts": 3.97,
    "expected": {
-    "alp": 72.7,
-    "lnp": 71.6,
-    "on": 0.2,
-    "grn": 2.7,
+    "alp": 73.2,
+    "lnp": 71.5,
+    "on": 0.1,
+    "grn": 2.5,
     "ind": 3.1,
     "oth": 0.6
    },
@@ -760,38 +976,38 @@
    "calibration": [
     {
      "bin": "0-0.1",
-     "meanP": 0.012,
-     "observed": 0.04,
-     "n": 249
+     "meanP": 0.013,
+     "observed": 0.043,
+     "n": 231
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.182,
-     "observed": 0.171,
-     "n": 35
+     "meanP": 0.188,
+     "observed": 0.167,
+     "n": 36
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.39,
-     "observed": 0.313,
-     "n": 16
+     "meanP": 0.383,
+     "observed": 0.308,
+     "n": 13
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.607,
+     "meanP": 0.621,
      "observed": 0.588,
      "n": 17
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.815,
-     "observed": 0.8,
-     "n": 30
+     "meanP": 0.81,
+     "observed": 0.839,
+     "n": 31
     },
     {
      "bin": "0.9-1",
      "meanP": 0.977,
-     "observed": 0.932,
+     "observed": 0.922,
      "n": 103
     }
    ]
@@ -800,17 +1016,89 @@
    "E": 2022,
    "variant": "noGeo",
    "stateOracle": false,
-   "brier": 0.227,
-   "logScore": -0.5318,
+   "brier": 0.2345,
+   "logScore": -0.546,
+   "modalRight": 130,
+   "deterministicRight": 130,
+   "pairsRight": 135,
+   "tcpMaePts": 3.97,
+   "expected": {
+    "alp": 73.3,
+    "lnp": 71.6,
+    "on": 0.1,
+    "grn": 2.3,
+    "ind": 3.1,
+    "oth": 0.6
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": false,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.013,
+     "observed": 0.043,
+     "n": 233
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.189,
+     "observed": 0.171,
+     "n": 35
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.382,
+     "observed": 0.357,
+     "n": 14
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.617,
+     "observed": 0.588,
+     "n": 17
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.806,
+     "observed": 0.839,
+     "n": 31
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.976,
+     "observed": 0.913,
+     "n": 103
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "variant": "noTerms",
+   "stateOracle": false,
+   "brier": 0.2227,
+   "logScore": -0.5233,
    "modalRight": 131,
    "deterministicRight": 131,
-   "pairsRight": 134,
+   "pairsRight": 133,
    "tcpMaePts": 3.93,
    "expected": {
-    "alp": 72.8,
-    "lnp": 71.8,
+    "alp": 72.9,
+    "lnp": 71.4,
     "on": 0.1,
-    "grn": 2.5,
+    "grn": 2.8,
     "ind": 3.1,
     "oth": 0.6
    },
@@ -833,38 +1121,38 @@
     {
      "bin": "0-0.1",
      "meanP": 0.012,
-     "observed": 0.04,
-     "n": 251
+     "observed": 0.037,
+     "n": 241
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.182,
-     "observed": 0.171,
-     "n": 35
+     "meanP": 0.183,
+     "observed": 0.194,
+     "n": 36
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.381,
-     "observed": 0.235,
-     "n": 17
+     "meanP": 0.377,
+     "observed": 0.25,
+     "n": 16
     },
     {
      "bin": "0.5-0.7",
-     "meanP": 0.616,
-     "observed": 0.667,
+     "meanP": 0.624,
+     "observed": 0.611,
      "n": 18
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.819,
-     "observed": 0.774,
-     "n": 31
+     "meanP": 0.813,
+     "observed": 0.821,
+     "n": 28
     },
     {
      "bin": "0.9-1",
-     "meanP": 0.978,
-     "observed": 0.941,
-     "n": 101
+     "meanP": 0.976,
+     "observed": 0.933,
+     "n": 104
     }
    ]
   },
@@ -872,18 +1160,18 @@
    "E": 2025,
    "variant": "full",
    "stateOracle": true,
-   "brier": 0.171,
-   "logScore": -0.3012,
+   "brier": 0.1671,
+   "logScore": -0.3019,
    "modalRight": 131,
-   "deterministicRight": 131,
-   "pairsRight": 135,
-   "tcpMaePts": 3.77,
+   "deterministicRight": 133,
+   "pairsRight": 136,
+   "tcpMaePts": 3.68,
    "expected": {
-    "alp": 91.5,
-    "lnp": 42.1,
+    "alp": 91.7,
+    "lnp": 41.6,
     "on": 0.3,
-    "grn": 2.5,
-    "ind": 13.4,
+    "grn": 2.6,
+    "ind": 13.5,
     "oth": 0.3
    },
    "actual": {
@@ -905,253 +1193,37 @@
     {
      "bin": "0-0.1",
      "meanP": 0.009,
-     "observed": 0.019,
-     "n": 260
+     "observed": 0.016,
+     "n": 253
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.197,
+     "meanP": 0.189,
      "observed": 0.167,
-     "n": 30
+     "n": 36
     },
     {
      "bin": "0.3-0.5",
      "meanP": 0.406,
-     "observed": 0.435,
-     "n": 23
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.594,
-     "observed": 0.435,
-     "n": 23
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.81,
-     "observed": 0.958,
-     "n": 24
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.983,
-     "observed": 0.96,
-     "n": 101
-    }
-   ]
-  },
-  {
-   "E": 2025,
-   "variant": "noHist",
-   "stateOracle": true,
-   "brier": 0.1707,
-   "logScore": -0.3022,
-   "modalRight": 131,
-   "deterministicRight": 130,
-   "pairsRight": 135,
-   "tcpMaePts": 3.83,
-   "expected": {
-    "alp": 91.7,
-    "lnp": 41.9,
-    "on": 0.3,
-    "grn": 2.5,
-    "ind": 13.4,
-    "oth": 0.3
-   },
-   "actual": {
-    "alp": 94,
-    "lnp": 43,
-    "on": 0,
-    "grn": 1,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.009,
-     "observed": 0.019,
-     "n": 260
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.201,
-     "observed": 0.161,
-     "n": 31
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.413,
-     "observed": 0.478,
-     "n": 23
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.597,
-     "observed": 0.429,
+     "observed": 0.476,
      "n": 21
     },
     {
-     "bin": "0.7-0.9",
-     "meanP": 0.803,
-     "observed": 0.92,
-     "n": 25
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.983,
-     "observed": 0.96,
-     "n": 101
-    }
-   ]
-  },
-  {
-   "E": 2025,
-   "variant": "noGeo",
-   "stateOracle": true,
-   "brier": 0.1703,
-   "logScore": -0.3006,
-   "modalRight": 132,
-   "deterministicRight": 131,
-   "pairsRight": 135,
-   "tcpMaePts": 3.82,
-   "expected": {
-    "alp": 92.6,
-    "lnp": 41.3,
-    "on": 0.3,
-    "grn": 2.2,
-    "ind": 13.4,
-    "oth": 0.3
-   },
-   "actual": {
-    "alp": 94,
-    "lnp": 43,
-    "on": 0,
-    "grn": 1,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.009,
-     "observed": 0.015,
-     "n": 267
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.204,
-     "observed": 0.194,
-     "n": 31
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.414,
-     "observed": 0.417,
-     "n": 24
-    },
-    {
      "bin": "0.5-0.7",
-     "meanP": 0.607,
-     "observed": 0.524,
-     "n": 21
+     "meanP": 0.605,
+     "observed": 0.5,
+     "n": 22
     },
     {
      "bin": "0.7-0.9",
-     "meanP": 0.805,
-     "observed": 0.875,
-     "n": 24
+     "meanP": 0.813,
+     "observed": 0.857,
+     "n": 28
     },
     {
      "bin": "0.9-1",
-     "meanP": 0.982,
-     "observed": 0.97,
-     "n": 101
-    }
-   ]
-  },
-  {
-   "E": 2025,
-   "variant": "full",
-   "stateOracle": false,
-   "brier": 0.1898,
-   "logScore": -0.3379,
-   "modalRight": 131,
-   "deterministicRight": 131,
-   "pairsRight": 136,
-   "tcpMaePts": 4.51,
-   "expected": {
-    "alp": 90.1,
-    "lnp": 43.2,
-    "on": 0.5,
-    "grn": 2.9,
-    "ind": 13.1,
-    "oth": 0.2
-   },
-   "actual": {
-    "alp": 94,
-    "lnp": 43,
-    "on": 0,
-    "grn": 1,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.008,
-     "observed": 0.017,
-     "n": 291
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.178,
-     "observed": 0.188,
-     "n": 32
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.402,
-     "observed": 0.36,
-     "n": 25
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.596,
-     "observed": 0.6,
-     "n": 25
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.824,
-     "observed": 0.84,
-     "n": 25
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.983,
-     "observed": 0.959,
+     "meanP": 0.984,
+     "observed": 0.969,
      "n": 98
     }
    ]
@@ -1159,16 +1231,448 @@
   {
    "E": 2025,
    "variant": "noHist",
+   "stateOracle": true,
+   "brier": 0.1673,
+   "logScore": -0.3039,
+   "modalRight": 132,
+   "deterministicRight": 133,
+   "pairsRight": 136,
+   "tcpMaePts": 3.74,
+   "expected": {
+    "alp": 92,
+    "lnp": 41.3,
+    "on": 0.3,
+    "grn": 2.6,
+    "ind": 13.5,
+    "oth": 0.3
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.009,
+     "observed": 0.016,
+     "n": 253
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.196,
+     "observed": 0.154,
+     "n": 39
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.41,
+     "observed": 0.474,
+     "n": 19
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.597,
+     "observed": 0.474,
+     "n": 19
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.801,
+     "observed": 0.875,
+     "n": 32
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.984,
+     "observed": 0.969,
+     "n": 97
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "noGeo",
+   "stateOracle": true,
+   "brier": 0.1675,
+   "logScore": -0.3015,
+   "modalRight": 132,
+   "deterministicRight": 134,
+   "pairsRight": 136,
+   "tcpMaePts": 3.74,
+   "expected": {
+    "alp": 92.8,
+    "lnp": 40.7,
+    "on": 0.3,
+    "grn": 2.4,
+    "ind": 13.5,
+    "oth": 0.3
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.01,
+     "observed": 0.02,
+     "n": 256
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.202,
+     "observed": 0.111,
+     "n": 36
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.399,
+     "observed": 0.45,
+     "n": 20
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.6,
+     "observed": 0.474,
+     "n": 19
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.795,
+     "observed": 0.903,
+     "n": 31
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.982,
+     "observed": 0.969,
+     "n": 98
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "noTerms",
+   "stateOracle": true,
+   "brier": 0.1719,
+   "logScore": -0.3042,
+   "modalRight": 131,
+   "deterministicRight": 131,
+   "pairsRight": 135,
+   "tcpMaePts": 3.77,
+   "expected": {
+    "alp": 91.5,
+    "lnp": 42.2,
+    "on": 0.3,
+    "grn": 2.5,
+    "ind": 13.3,
+    "oth": 0.3
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.01,
+     "observed": 0.016,
+     "n": 258
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.194,
+     "observed": 0.133,
+     "n": 30
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.403,
+     "observed": 0.48,
+     "n": 25
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.588,
+     "observed": 0.435,
+     "n": 23
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.805,
+     "observed": 0.923,
+     "n": 26
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.981,
+     "observed": 0.97,
+     "n": 99
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "full",
    "stateOracle": false,
-   "brier": 0.1908,
-   "logScore": -0.3383,
+   "brier": 0.1905,
+   "logScore": -0.338,
    "modalRight": 130,
    "deterministicRight": 130,
-   "pairsRight": 136,
-   "tcpMaePts": 4.52,
+   "pairsRight": 134,
+   "tcpMaePts": 4.47,
    "expected": {
-    "alp": 90.2,
+    "alp": 89.8,
+    "lnp": 43.1,
+    "on": 0.4,
+    "grn": 3.1,
+    "ind": 13.3,
+    "oth": 0.2
+   },
+   "actual": {
+    "alp": 94,
     "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.01,
+     "observed": 0.018,
+     "n": 285
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.177,
+     "observed": 0.226,
+     "n": 31
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.417,
+     "observed": 0.385,
+     "n": 26
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.597,
+     "observed": 0.591,
+     "n": 22
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.82,
+     "observed": 0.783,
+     "n": 23
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.979,
+     "observed": 0.96,
+     "n": 101
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "noHist",
+   "stateOracle": false,
+   "brier": 0.1919,
+   "logScore": -0.3391,
+   "modalRight": 128,
+   "deterministicRight": 127,
+   "pairsRight": 134,
+   "tcpMaePts": 4.5,
+   "expected": {
+    "alp": 90.1,
+    "lnp": 42.8,
+    "on": 0.5,
+    "grn": 3.2,
+    "ind": 13.3,
+    "oth": 0.2
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.01,
+     "observed": 0.017,
+     "n": 288
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.19,
+     "observed": 0.2,
+     "n": 35
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.425,
+     "observed": 0.524,
+     "n": 21
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.583,
+     "observed": 0.478,
+     "n": 23
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.813,
+     "observed": 0.8,
+     "n": 25
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.979,
+     "observed": 0.96,
+     "n": 100
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "noGeo",
+   "stateOracle": false,
+   "brier": 0.1918,
+   "logScore": -0.3377,
+   "modalRight": 128,
+   "deterministicRight": 128,
+   "pairsRight": 134,
+   "tcpMaePts": 4.48,
+   "expected": {
+    "alp": 90.7,
+    "lnp": 42.4,
+    "on": 0.4,
+    "grn": 2.9,
+    "ind": 13.3,
+    "oth": 0.2
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "in90": {
+    "alp": true,
+    "lnp": true,
+    "on": true,
+    "grn": true,
+    "ind": false
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "meanP": 0.01,
+     "observed": 0.014,
+     "n": 286
+    },
+    {
+     "bin": "0.1-0.3",
+     "meanP": 0.192,
+     "observed": 0.222,
+     "n": 36
+    },
+    {
+     "bin": "0.3-0.5",
+     "meanP": 0.426,
+     "observed": 0.545,
+     "n": 22
+    },
+    {
+     "bin": "0.5-0.7",
+     "meanP": 0.582,
+     "observed": 0.429,
+     "n": 21
+    },
+    {
+     "bin": "0.7-0.9",
+     "meanP": 0.807,
+     "observed": 0.778,
+     "n": 27
+    },
+    {
+     "bin": "0.9-1",
+     "meanP": 0.979,
+     "observed": 0.97,
+     "n": 99
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "variant": "noTerms",
+   "stateOracle": false,
+   "brier": 0.1901,
+   "logScore": -0.3377,
+   "modalRight": 131,
+   "deterministicRight": 131,
+   "pairsRight": 136,
+   "tcpMaePts": 4.51,
+   "expected": {
+    "alp": 90,
+    "lnp": 43.3,
     "on": 0.5,
     "grn": 2.9,
     "ind": 13.1,
@@ -1192,145 +1696,73 @@
    "calibration": [
     {
      "bin": "0-0.1",
-     "meanP": 0.008,
+     "meanP": 0.009,
      "observed": 0.017,
-     "n": 290
+     "n": 292
     },
     {
      "bin": "0.1-0.3",
-     "meanP": 0.187,
+     "meanP": 0.186,
      "observed": 0.171,
      "n": 35
     },
     {
      "bin": "0.3-0.5",
-     "meanP": 0.402,
-     "observed": 0.429,
-     "n": 21
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.585,
-     "observed": 0.556,
-     "n": 27
-    },
-    {
-     "bin": "0.7-0.9",
-     "meanP": 0.826,
-     "observed": 0.846,
-     "n": 26
-    },
-    {
-     "bin": "0.9-1",
-     "meanP": 0.983,
-     "observed": 0.959,
-     "n": 97
-    }
-   ]
-  },
-  {
-   "E": 2025,
-   "variant": "noGeo",
-   "stateOracle": false,
-   "brier": 0.1913,
-   "logScore": -0.3384,
-   "modalRight": 130,
-   "deterministicRight": 130,
-   "pairsRight": 136,
-   "tcpMaePts": 4.51,
-   "expected": {
-    "alp": 90.9,
-    "lnp": 42.7,
-    "on": 0.4,
-    "grn": 2.6,
-    "ind": 13.1,
-    "oth": 0.2
-   },
-   "actual": {
-    "alp": 94,
-    "lnp": 43,
-    "on": 0,
-    "grn": 1,
-    "ind": 10,
-    "oth": 2
-   },
-   "in90": {
-    "alp": true,
-    "lnp": true,
-    "on": true,
-    "grn": true,
-    "ind": false
-   },
-   "calibration": [
-    {
-     "bin": "0-0.1",
-     "meanP": 0.008,
-     "observed": 0.017,
-     "n": 296
-    },
-    {
-     "bin": "0.1-0.3",
-     "meanP": 0.187,
-     "observed": 0.194,
-     "n": 36
-    },
-    {
-     "bin": "0.3-0.5",
-     "meanP": 0.401,
-     "observed": 0.409,
-     "n": 22
-    },
-    {
-     "bin": "0.5-0.7",
-     "meanP": 0.585,
-     "observed": 0.542,
+     "meanP": 0.41,
+     "observed": 0.375,
      "n": 24
     },
     {
+     "bin": "0.5-0.7",
+     "meanP": 0.591,
+     "observed": 0.6,
+     "n": 25
+    },
+    {
      "bin": "0.7-0.9",
-     "meanP": 0.812,
-     "observed": 0.821,
-     "n": 28
+     "meanP": 0.82,
+     "observed": 0.852,
+     "n": 27
     },
     {
      "bin": "0.9-1",
      "meanP": 0.982,
-     "observed": 0.959,
-     "n": 97
+     "observed": 0.958,
+     "n": 96
     }
    ]
   }
  ],
  "calibrationPooled": {
   "0-0.1": {
-   "p": 7.741,
-   "o": 17.963,
-   "n": 731
+   "p": 8.609,
+   "o": 19.153,
+   "n": 700
   },
   "0.1-0.3": {
-   "p": 17.645,
-   "o": 13.995000000000001,
-   "n": 98
+   "p": 17.611,
+   "o": 18.009999999999998,
+   "n": 94
   },
   "0.3-0.5": {
-   "p": 24.217,
-   "o": 18.988,
-   "n": 62
+   "p": 22.241,
+   "o": 17.016,
+   "n": 56
   },
   "0.5-0.7": {
-   "p": 36.958999999999996,
-   "o": 39.999,
-   "n": 61
+   "p": 33.001,
+   "o": 35.991,
+   "n": 54
   },
   "0.7-0.9": {
-   "p": 69.457,
-   "o": 71.007,
-   "n": 85
+   "p": 65.482,
+   "o": 64.017,
+   "n": 81
   },
   "0.9-1": {
-   "p": 295.846,
-   "o": 290.014,
-   "n": 302
+   "p": 304.92,
+   "o": 298.015,
+   "n": 312
   }
  }
 }

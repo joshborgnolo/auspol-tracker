@@ -150,6 +150,6 @@ export function prepVic({ vote }) {
      changed no winner (backtest-states). */
   const comp = null;
   const pseudo = { national: { result2025: result2022, nowcast: vote.nowcast }, states: { weights: {}, dev: {} } };
-  const S = { ...modelSettings({ VOTE: pseudo, CAL, FCAL, DRIFT, mode: "nowcast" }), majority: VIC.majority };
+  const S = { ...modelSettings({ VOTE: pseudo, CAL, FCAL, DRIFT, mode: "nowcast", plainNoise: true }), majority: VIC.majority }; // no seat terms here: the plain swing's noise
   return { SEN, ST, comp, pre, seats, result2022, S, calib };
 }

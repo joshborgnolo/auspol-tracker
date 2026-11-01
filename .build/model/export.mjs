@@ -9,8 +9,10 @@
                                levers and their levels as the model stands. The Senate ranking tables
                                themselves are fetched from /data/senate-rankings-2025.json.
      model/data/evidence.json  what the page's method and validation sections draw: polling error by lead
-                               time, seat noise by election, the flow calibration, the state and federal
-                               backtests, the 2025 replay, the education test, the run history.
+                               time, seat noise by election and the seat terms, the flow calibration and the
+                               House flows' drift since 1993, the state and federal backtests (2019-2025 on
+                               the Senate ballots; every election 2001-2025 from the one before), the 2025
+                               replay, the education test, the run history.
    Run after the model's runs (swing-simulate.mjs nowcast + forecast), then .build/model/assemble.mjs. */
 import fs from "node:fs";
 import path from "node:path";
@@ -28,6 +30,8 @@ const r4 = (x) => Math.round(x * 10000) / 10000;
 
 const VOTE = J("data/seat-vote-layer.json"), CAL = J("data/seat-model-calibration.json"), FCAL = J("data/seat-model-flow-calibration.json");
 const STATES = J("data/seat-model-backtest-states.json"), FED = J("data/seat-model-backtest.json");
+const LONG = fs.existsSync("data/seat-model-backtest-long.json") ? J("data/seat-model-backtest-long.json") : null;
+const DRIFTH = fs.existsSync("data/seat-model-flow-drift.json") ? J("data/seat-model-flow-drift.json") : null;
 const NOW = J("data/seat-model-2028-nowcast.json");
 const RES = J("map/data/res-2025.json");
 const inp = prepInputs({ composition: true });
@@ -82,17 +86,37 @@ const ex = ["Hunter", "Dickson", "Kooyong"].map((n) => {
   const t = (k) => cohortTable(inp.SEN, n, k);
   return { seat: n, coalitionLaborOverOn: r4(pairShare(inp.SEN, t("COAL"), 0, 3)), onLaborOverCoalition: r4(pairShare(inp.SEN, t("ON"), 0, 1)), greensLaborOverCoalition: r4(pairShare(inp.SEN, t("GRN"), 0, 1)), laborCoalitionOverOn: r4(pairShare(inp.SEN, t("ALP"), 1, 3)) };
 });
+/* the long federal backtest (backtest-long.mjs): every election 2001-2025 from the one before, house flows,
+   national vote given - the model as run (seat terms, the calibrated noise multiplier) beside the model
+   before the seat terms (v21); the 2019-2025 runs on the Senate ballots are the `federal` block */
+function longEvidence(L, mult) {
+  const prodV = mult === 1.3 ? "terms" : `terms-m${mult}`;
+  const pick = (E, v) => L.results.find((r) => r.mode === "house" && !r.stateOracle && r.E === E && r.variant === v);
+  const tests = [...new Set(L.results.filter((r) => r.mode === "house" && !r.stateOracle && r.variant === prodV).map((r) => r.E))].sort();
+  const rows = tests.map((E) => { const a = pick(E, prodV), b = pick(E, "v21"); return { E, seats: a.seats, modalRight: a.modalRight, modalPlain: b?.modalRight ?? null, pairsRight: a.pairsRight, tcpMaePts: a.tcpMaePts, brier: a.brier, brierPlain: b?.brier ?? null, logScore: a.logScore, logPlain: b?.logScore ?? null, expected: a.expected, actual: a.actual, range90: a.range90 }; });
+  const pool = (f) => { const cal = {}; for (const E of tests.filter(f)) for (const b of pick(E, prodV).calibration) { const c = (cal[b.bin] = cal[b.bin] || { p: 0, o: 0, n: 0 }); c.p += b.p; c.o += b.o; c.n += b.n; } return cal; };
+  const RF = CAL.swing.sigMult?.recentFrom ?? 2016;
+  // upsets (a winner given under 10%) from the recent window, and how many were independents or minor-party members
+  const ups = tests.filter((E) => E >= RF).flatMap((E) => (pick(E, prodV).upsets || []).map((u) => ({ E, ...u })));
+  return { draws: L.draws, variant: prodV, multiplier: mult, rows, calibration: pool(() => true), calibrationEarly: pool((E) => E < RF), calibrationRecent: pool((E) => E >= RF), recentFrom: RF,
+    recentUpsets: { n: ups.length, indOth: ups.filter((u) => u.winner === "ind" || u.winner === "oth").length, ind: ups.filter((u) => u.winner === "ind").length } };
+}
+const flowDrift = DRIFTH ? Object.fromEntries(["GRN|AC", "ON|AC", "OTH-R|AC", "OTH-M|AC", "OTH-L|AC"].filter((k) => DRIFTH.series[k]).map((k) => [k, { rms: DRIFTH.series[k].rms, n: DRIFTH.series[k].n, first: +Object.keys(DRIFTH.series[k].level)[0], last: +Object.keys(DRIFTH.series[k].level).slice(-1)[0], level: DRIFTH.series[k].level }])) : null;
 const history = fs.readFileSync("data/seat-model-2028-history.jsonl", "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)).map((r) => ({ date: r.date, engine: r.engine || "W5", expectedSeats: r.expectedSeats, majority: r.majority }));
 const evidence = round({
   _about: "What the /model/ page's method and validation sections show (built by .build/model/export.mjs from the calibration and backtest stores in data/).",
   national: { bands: CAL.national.bands, sigma: CAL.national.sigma, bias: CAL.national.bias, n: CAL.national.n, corr: CAL.national.corrFinalMonth, fade: Object.fromEntries(Object.entries(CAL.national.fade).map(([k, v]) => [k, { lambda: v.lambda, se: v.se, n: v.n }])), govt: CAL.national.govt },
-  swing: { stateOracle: Object.fromEntries(Object.entries(CAL.swing.stateOracle).map(([k, v]) => [k, { sigmaSeat: v.sigmaSeat, sigmaClass: v.sigmaClass, tDf: v.tDf, maePts: v.maePts, rmsByElection: v.rmsByElection }])), stateDev: CAL.swing.stateDev, sa26: CAL.swing.sa26 },
+  swing: { stateOracle: Object.fromEntries(Object.entries(CAL.swing.stateOracle).map(([k, v]) => [k, { sigmaSeat: v.sigmaSeat, sigmaClass: v.sigmaClass, tDf: v.tDf, maePts: v.maePts, rmsByElection: v.rmsByElection }])), stateDev: CAL.swing.stateDev, sa26: CAL.swing.sa26,
+    years: CAL.swing.years || null, terms: CAL.swing.terms || null, oos: CAL.swing.oos || null, sigMult: CAL.swing.sigMult || null,
+    plain: CAL.swing.plain ? Object.fromEntries(Object.entries(CAL.swing.plain).map(([k, v]) => [k, { rmsByElection: v.rmsByElection }])) : null },
   education: CAL.education,
+  flowDrift,
   flows: { delta: FCAL.same.delta, classPooled: FCAL.same.classPooled, sigmaSame: { u: FCAL.same.sigmaU, v: FCAL.same.sigmaV }, sigmaLag: { u: FCAL.lag.sigmaU, v: FCAL.lag.sigmaV }, combine: FCAL.combine, drift: STATES.drift, rows: FCAL.rows, coalitionLaborOnOffset: inp.ST.delta["COAL|AO"] },
   composition: inp.comp,
   replay2025: { winners: ok, pairs: pairOk, tcpMaePts: Math.round(10000 * tcpE.reduce((a, b) => a + b, 0) / tcpE.length) / 100, misses },
   states: Object.fromEntries(Object.entries(STATES.results).map(([k, v]) => [k, { label: v.label, senate: v.senate, seats: v.seats, actualSeats: v.actualSeats, replay: v.replay, chain: v.chain }])),
   federal: { draws: FED.draws, sigmaMultiplier: FED.sigmaMultiplier, results: FED.results.map((r) => ({ E: r.E, variant: r.variant, stateOracle: r.stateOracle, brier: r.brier, logScore: r.logScore, modalRight: r.modalRight, pairsRight: r.pairsRight, tcpMaePts: r.tcpMaePts, expected: r.expected, actual: r.actual })), calibration: FED.calibrationPooled },
+  federalLong: LONG ? longEvidence(LONG, CAL.swing.sigMult?.value ?? 1.3) : null,
   examples: ex,
   history,
 });

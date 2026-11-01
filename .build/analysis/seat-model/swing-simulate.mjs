@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 /* swing-simulate.mjs: the 2028 seat model's official runs (layers 3-5 of .build/analysis/seat-model-plan.md).
    v2, 2026-11-01; v2.1 the same day (shared pure modules for the /model/ page, national flow shocks
-   sized on observed drift, the Coalition's Labor-v-One Nation offset set from its own counts).
-   Design and evidence: .build/analysis/seat-model-design-review.md, sections 12-13.
+   sized on observed drift, the Coalition's Labor-v-One Nation offset set from its own counts); v2.2
+   the same night (seat terms fitted on every election 1996-2025 - sitting members, defections, reversion
+   of each seat's 2025 surprise - and the seat noise and its multiplier tested on 2001-2025, swing-fit.mjs,
+   calibrate-swing.mjs, backtest-long.mjs).
+   Design and evidence: .build/analysis/seat-model-design-review.md, sections 12-14.
 
    The model itself lives in pure modules the /model/ page runs too (one implementation):
      seat-engine.mjs   logit spread, the count
@@ -72,10 +75,12 @@ const res = runMany(seats, S, { draws: DRAWS, seed: SEED });
 const central = projectOnce(seats, S);
 const INPUTS = ["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json", "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json",
   "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "map/data/res-2025.json",
-  ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs"];
+  "data/house-incumbency.json", "map/data/res-2022.json",
+  ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
+  ".build/analysis/seat-model/swing-fit.mjs"];
 const out = {
-  _about: `2028 seat model v2.1 (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025; preferences replayed on each division's 2025 Senate rankings (House-calibrated, today's voters mixed from their 2025 parties); fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: the 2025 candidate field is assumed (W6); independents' votes carry over with noise; how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
-  _provenance: { generated: new Date().toISOString().slice(0, 10), engine: "v2.1", inputs: Object.fromEntries(INPUTS.map((f) => [f, sha16(f)])) },
+  _about: `2028 seat model v2.2 (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025 with seat terms fitted on 1996-2025 (sitting members, defections, reversion of each seat's 2025 surprise); preferences replayed on each division's 2025 Senate rankings (House-calibrated, today's voters mixed from their 2025 parties); fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: the 2025 candidate field is assumed (W6); independents' votes carry over with noise; how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
+  _provenance: { generated: new Date().toISOString().slice(0, 10), engine: "v2.2", inputs: Object.fromEntries(INPUTS.map((f) => [f, sha16(f)])) },
   meta: { mode: MODE, draws: DRAWS, seed: SEED, nowcast: VOTE.national.nowcast, window: VOTE.diagnostics.recentWindow, band: S.band,
     sigmaNational: Object.fromEntries(P5.map((p, k) => [p, r4(S.sigNat[k])])), corr: S.corr, tDf: S.df,
     sigmaSeat: res.sigmaSeat, sigmaSeatMultiplier: S.sigMult, kFall: S.kFall, sigmaMember: S.sigMember, sigmaStateResid: S.sigStateResid, sigmaClass: S.sigClass, sigmaEdu: S.sigEdu,
@@ -88,7 +93,7 @@ const out = {
 out.national.headline = headline(out, MODE);
 writeFileSync(OUT_PATH, JSON.stringify(out) + "\n");
 if (MODE === "nowcast" && !process.env.AUSPOL_SIM_OUT) {
-  const rec = { date: VOTE.diagnostics.recentWindow.to, engine: "v2.1", expectedSeats: res.expectedSeats, majority: res.majority,
+  const rec = { date: VOTE.diagnostics.recentWindow.to, engine: "v2.2", expectedSeats: res.expectedSeats, majority: res.majority,
     seats: Object.fromEntries(res.seats.map((s) => { const top = Object.entries(s.win)[0]; return [s.name, [top[0], top[1]]]; })) };
   const existing = existsSync(HISTORY_PATH) ? readFileSync(HISTORY_PATH, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
   const same = existing.findIndex((r) => r.date === rec.date);
@@ -96,7 +101,7 @@ if (MODE === "nowcast" && !process.env.AUSPOL_SIM_OUT) {
   else appendFileSync(HISTORY_PATH, JSON.stringify(rec) + "\n");
 }
 const e = res.expectedSeats, d = res.seatDistribution, m = res.majority;
-console.log(`seat model v2.1, ${MODE} — ${DRAWS.toLocaleString()} draws (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
+console.log(`seat model v2.2, ${MODE} — ${DRAWS.toLocaleString()} draws (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
 console.log("expected seats: " + KEYS.map((k) => `${k} ${e[k]} [${d[k].p05}-${d[k].p95}]`).join("  "));
 console.log(`majority: ALP ${(100 * m.alp).toFixed(1)}% · Coalition ${(100 * m.coalition).toFixed(1)}% · ON ${(100 * m.on).toFixed(1)}% · none ${(100 * m.noMajority).toFixed(1)}%`);
 console.log("most seats: " + KEYS.map((k) => `${k} ${(100 * res.mostSeats[k]).toFixed(1)}%`).join(" · "));
