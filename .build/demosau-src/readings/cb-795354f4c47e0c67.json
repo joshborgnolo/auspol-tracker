@@ -1,0 +1,31 @@
+{
+  "url": "https://www.capitalbrief.com/article/coalition-gets-crucial-polling-boost-ahead-of-bruising-week-for-labor-1cdc69fb-9d9a-4995-9640-6f8e3304cb8c/",
+  "textHash": "bd25ec7b702bd433",
+  "readAt": "2026-11-01T09:30:05.822Z",
+  "reading": {
+    "scope": "demosau",
+    "fields": {
+      "alp": {
+        "para": 3,
+        "quote": "but still behind Labor at 26%",
+        "value": 26,
+        "from": null
+      },
+      "lnp": {
+        "para": 3,
+        "quote": "the Coalition's primary vote support climbing four percentage points over the past month to 24%",
+        "value": 24,
+        "from": 20
+      },
+      "onp": {
+        "para": 3,
+        "quote": "to 24%, equal with One Nation",
+        "value": 24,
+        "from": null
+      },
+      "grn": null,
+      "oth": null
+    },
+    "notes": "One Nation's 24% is stated only as equality with the Coalition ('equal with One Nation'), with no change phrase; no change stated for Labor either. Greens and others not stated anywhere. Seat ranges in paras 5–6 are MRP seat projections, not primary votes."
+  }
+}

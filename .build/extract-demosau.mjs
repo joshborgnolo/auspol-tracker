@@ -716,7 +716,9 @@ async function capitalBriefAheadOf(anchorDay) {
   if (!list) throw new Error("capitalbrief topic page: no ItemList (site restructured?)");
   const urls = [].concat(list.itemListElement || [])
     .map((el) => (typeof el === "string" ? el : el.url || el.item?.url || el.item?.["@id"] || el["@id"]))
-    .filter((u) => typeof u === "string" && u.includes("/newsletter/"));
+    // CB articles have lived under both /newsletter/ and /article/ (the 1 Nov
+    // 2026 wave's piece was /article/-pathed and the watch walked past it)
+    .filter((u) => typeof u === "string" && (u.includes("/newsletter/") || u.includes("/article/")));
   const ahead = [];
   let fetched = 0;
   for (const url of urls) {

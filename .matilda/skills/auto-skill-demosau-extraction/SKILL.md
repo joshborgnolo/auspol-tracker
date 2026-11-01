@@ -142,6 +142,53 @@ up within the hour it lands, and the human reconciliation that adds
 `methodUrl` (Sept 2026: also corrected `date` to the PDF's field end) is
 what closes the gate. Hand-entered rows must NEVER carry `methodUrl`.
 
+### Traps worked 2026-11-01 (the 24–28 Oct wave)
+
+- **CB articles live under BOTH `/newsletter/` and `/article/` paths.** The
+  watch filtered the topic-page ItemList to `/newsletter/` only (one line in
+  `capitalBriefAheadOf`, from the watch's original 84f87109) and walked
+  silently past the 1 Nov 2026 piece — an `/article/` URL already existed in
+  May 2026. Symptom is SILENCE, not an error: the run stays clean with
+  `changed:false` and no `cb_ahead` while the article sits on the topic page
+  (grep the page for the slug to prove it). Fixed to accept both prefixes;
+  no test pins the walk (extract-demosau.mjs exports no lib mode), so the
+  live run is the acceptance check — after the fix the same run must surface
+  the article in `cb_ahead`.
+- **A monthly poll can CARRY MRP-modelled seat projections.** If the article
+  mentions "multilevel regression", `MRP_TEXT` sends `planCapitalBrief` to the
+  previous `DemosAU (MRP)` row first; the tell that it's really a monthly
+  wave is the rejection note `the quote's earlier figure 20 is not the
+  previous DemosAU MRP's 22` — the quoted change reconciles with the MONTHLY
+  wave (LNP 20→24 ✓), and n=1,500 is monthly-poll scale (MRPs run 7–10k).
+  Hand-entry then files a plain `DemosAU` row (never `DemosAU (MRP)`) and the
+  seat ranges ride THAT row as a `seats` block — same home as the Aug 2026
+  row's: `{total:150, rangeOnly:true, method, p:{alp:{lo,hi},
+  lnp:{lo,hi,note:"Nat 6–13"}, onp:{lo,hi}}}`; unstated grn/oth keys are
+  simply omitted (renderer tolerates absent `seats.p` ids), `method` credits
+  the model in the article's words. Null/omitted primaries are legal where
+  the article doesn't print them (grn/ind null precedent: Wolf & Smith
+  2025-07-30).
+- **Approval nets hand-entered with the wave**: reconcile every quoted change
+  against the latest committed DemosAU `approval` row first (worked: Sep
+  -16/-4/-12 → "fell 4 points to -20", "+5 to +1", "-2 to -14" — all exact),
+  then one row `{date, firm, alb, opp, oppName:'Taylor', han, detail:null}`
+  appended to the `approval` array (nets-only Jan/Feb 2026 rows are the
+  committed shape). Tradeoff to flag to the user: existing rows are NEVER
+  overwritten, so a hand-entered net-only row will not gain the PDF's app/dis
+  `detail` when the PDF lands — waiting ~1 day for the extractor's PDF
+  backfill preserves the detail.
+- **Exit-3 hand-entry verify chain** (as run): provisional window =
+  published-day − `CB_FIELD_LAG`(4) for `date`, −4 more for `dateStart`,
+  `fieldworkPending:true`, NO `methodUrl`; `published` from the NewsArticle
+  `datePublished` converted to Sydney wall clock (09:00Z = 20:00 AEDT);
+  sequential single-file edits (the `data/polls.json` `polls` and `approval`
+  arrays are separate edits — do NOT batch two edits to this file in one
+  turn); then `node .build/extract-demosau.mjs` exits 0 with `cb_ahead` GONE
+  (the row's `published` now covers the article — the anchor is max
+  date/published-day), `node .build/newtracker/validate.mjs` exit 0, rebuild,
+  bundle-probe the row's `fieldPending`+`fieldUrl`+`seats`, and
+  `.build/demosau-pending.mjs` reports `pending:1` (sweep armed).
+
 ## `published` on the VI rows is hand-curated — the extractor will NEVER fill it
 
 Every extractor route into `polls.json` omits `published`: the new-wave row

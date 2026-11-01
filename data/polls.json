@@ -6221,6 +6221,44 @@
       "assimilated": true
     },
     {
+      "date": "2026-10-28",
+      "dateStart": "2026-10-24",
+      "published": "2026-11-01T20:00",
+      "pollster": "DemosAU",
+      "client": "Capital Brief",
+      "sample": 1500,
+      "alp": 26,
+      "lnp": 24,
+      "grn": null,
+      "onp": 24,
+      "ind": null,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "seats": {
+        "total": 150,
+        "rangeOnly": true,
+        "method": "Multilevel regression and post-stratification, published with the poll",
+        "p": {
+          "alp": {
+            "lo": 64,
+            "hi": 77
+          },
+          "lnp": {
+            "lo": 37,
+            "hi": 56,
+            "note": "Nat 6–13"
+          },
+          "onp": {
+            "lo": 18,
+            "hi": 32
+          }
+        }
+      },
+      "url": "https://www.capitalbrief.com/article/coalition-gets-crucial-polling-boost-ahead-of-bruising-week-for-labor-1cdc69fb-9d9a-4995-9640-6f8e3304cb8c/",
+      "fieldworkPending": true
+    },
+    {
       "date": "2026-10-29",
       "published": "2026-11-01T20:00",
       "dateStart": "2026-10-26",
@@ -8978,6 +9016,15 @@
           "dis": 40
         }
       }
+    },
+    {
+      "date": "2026-10-28",
+      "firm": "DemosAU",
+      "alb": -20,
+      "opp": 1,
+      "oppName": "Taylor",
+      "han": -14,
+      "detail": null
     },
     {
       "date": "2026-10-29",
