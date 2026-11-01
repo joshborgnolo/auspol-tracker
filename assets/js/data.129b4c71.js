@@ -4618,19 +4618,19 @@ window.AUSPOL = function () {
     "bt": {
       "points": [{
         "x": 2025.4583333333333,
-        "y": 56.95384615384615
+        "y": 56.97692307692308
       }, {
         "x": 2025.5416666666667,
         "y": 56.650000000000006
       }, {
         "x": 2025.625,
-        "y": 56.287499999999994
+        "y": 56.275
       }, {
         "x": 2025.7083333333333,
         "y": 55.95
       }, {
         "x": 2025.7916666666667,
-        "y": 55.6
+        "y": 55.5375
       }, {
         "x": 2025.875,
         "y": 55.1
@@ -4642,19 +4642,19 @@ window.AUSPOL = function () {
         "y": 54.2
       }, {
         "x": 2026.125,
-        "y": 53.9
+        "y": 54
       }, {
         "x": 2026.2083333333333,
         "y": 53.56666666666667
       }, {
         "x": 2026.2916666666667,
-        "y": 53.2
+        "y": 53.1
       }, {
         "x": 2026.375,
         "y": 52.8
       }, {
         "x": 2026.4583333333333,
-        "y": 52.849999999999994
+        "y": 52.9
       }, {
         "x": 2026.5416666666667,
         "y": 52.7
@@ -4668,8 +4668,8 @@ window.AUSPOL = function () {
         "x": 2026.7916666666667,
         "y": 51.72222222222222
       }, {
-        "x": 2026.8163242009134,
-        "y": 51.7
+        "x": 2026.8272831050228,
+        "y": 51.5
       }],
       "feed": "www.pollbludger.net/fed2028/bludgertrack"
     },
@@ -5139,26 +5139,26 @@ window.AUSPOL = function () {
     "pollsTo": "2026-10-27",
     "draws": 20000,
     "expectedSeats": {
-      "alp": 71.07,
-      "lnp": 31.44,
+      "alp": 71.1,
+      "lnp": 31.4,
       "on": 35.78,
       "grn": 4.06,
       "oth": 0.01,
       "member": 7.64
     },
     "mostSeats": {
-      "alp": 0.9035,
-      "lnp": 0.0135,
+      "alp": 0.9037,
+      "lnp": 0.0134,
       "on": 0.083,
       "grn": 0,
       "oth": 0,
       "member": 0
     },
     "majority": {
-      "alp": 0.3703,
+      "alp": 0.3717,
       "coalition": 0.0017,
       "on": 0.0169,
-      "noMajority": 0.6112
+      "noMajority": 0.6098
     }
   };
   const publicOpinionByRow = JSON.parse("{\"YouGov|2026-01-27\":{\"h\":\"news24\",\"n\":4,\"t\":[\"Immigration\",\"One Nation\",\"Bondi and cohesion\",\"Tech and society\"],\"w\":[\"2026-01-27\"]},\"YouGov|2026-02-10\":{\"h\":\"news24\",\"n\":2,\"t\":[\"One Nation\",\"Cost of living\"],\"w\":[\"2026-02-10\"]},\"YouGov|2026-02-24\":{\"h\":\"news24\",\"n\":3,\"t\":[\"Immigration\",\"One Nation\",\"Trust and democracy\"],\"w\":[\"2026-02-24\"]},\"YouGov|2026-03-10\":{\"h\":\"news24\",\"n\":4,\"t\":[\"Cost of living\",\"War and fuel\"],\"w\":[\"2026-03-10\"]},\"YouGov|2026-04-07\":{\"h\":\"news24\",\"n\":4,\"t\":[\"Cost of living\",\"War and fuel\"],\"w\":[\"2026-04-07\"]},\"YouGov|2026-04-21\":{\"h\":\"news24\",\"n\":3,\"t\":[\"Cost of living\",\"War and fuel\",\"Climate and energy\"],\"w\":[\"2026-04-21\"]},\"YouGov|2026-05-05\":{\"h\":\"news24\",\"n\":2,\"t\":[\"Housing and the budget\",\"Cost of living\"],\"w\":[\"2026-05-05\"]},\"YouGov|2026-05-19\":{\"h\":\"news24\",\"n\":3,\"t\":[\"Immigration\",\"Housing and the budget\"],\"w\":[\"2026-05-19\"]},\"YouGov|2026-06-02\":{\"h\":\"news24\",\"n\":2,\"t\":[\"One Nation\"],\"w\":[\"2026-06-02\"]},\"YouGov|2026-06-16\":{\"h\":\"news24\",\"n\":1,\"t\":[\"One Nation\"],\"w\":[\"2026-06-16\"]},\"YouGov|2026-06-30\":{\"h\":\"news24\",\"n\":1,\"t\":[\"Cost of living\"],\"w\":[\"2026-06-30\"]},\"YouGov|2026-07-14\":{\"h\":\"news24\",\"n\":1,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-07-14\"]},\"YouGov|2026-07-28\":{\"h\":\"news24\",\"n\":1,\"t\":[\"Immigration\"],\"w\":[\"2026-07-28\"]},\"YouGov|2026-08-24\":{\"h\":\"news24\",\"n\":1,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-08-24\"]},\"YouGov|2026-09-08\":{\"h\":\"news24\",\"n\":2,\"t\":[\"Immigration\",\"One Nation\"],\"w\":[\"2026-09-08\"]},\"YouGov|2026-09-21\":{\"h\":\"news24\",\"n\":4,\"t\":[\"Cost of living\",\"Tech and society\"],\"w\":[\"2026-09-21\"]},\"YouGov|2026-10-06\":{\"h\":\"news24\",\"n\":2,\"t\":[\"Immigration\",\"Cost of living\"],\"w\":[\"2026-10-06\"]},\"YouGov|2026-10-20\":{\"h\":\"news24\",\"n\":5,\"t\":[\"Cost of living\",\"Bondi and cohesion\"],\"w\":[\"2026-10-20\"]},\"Newspoll|2025-11-20\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"One Nation\"],\"w\":[\"2025-11-20\"]},\"Newspoll|2026-01-16\":{\"h\":\"newspoll\",\"n\":2,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-01-16\"]},\"Newspoll|2026-03-26\":{\"h\":\"newspoll\",\"n\":2,\"t\":[\"War and fuel\"],\"w\":[\"2026-03-26\"]},\"Newspoll|2026-04-16\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-04-16\"]},\"Newspoll|2026-05-17\":{\"h\":\"newspoll\",\"n\":5,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-05-17\"]},\"Newspoll|2026-06-04\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-06-04\"]},\"Newspoll|2026-06-25\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"One Nation\"],\"w\":[\"2026-06-25\"]},\"Newspoll|2026-08-28\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-08-28\"]},\"Newspoll|2026-09-17\":{\"h\":\"newspoll\",\"n\":3,\"t\":[\"Immigration\",\"One Nation\"],\"w\":[\"2026-09-17\"]},\"Newspoll|2026-10-08\":{\"h\":\"newspoll\",\"n\":1,\"t\":[\"Cost of living\"],\"w\":[\"2026-10-08\"]},\"Newspoll|2025-10-30\":{\"h\":\"newspoll\",\"n\":2,\"t\":[\"Immigration\"],\"w\":[\"2025-10-30\"]},\"DemosAU|2025-07-06\":{\"h\":\"demosau\",\"n\":2,\"t\":[\"Tech and society\"],\"w\":[\"2025-07-06\"]},\"DemosAU|2026-01-06\":{\"h\":\"demosau\",\"n\":5,\"t\":[\"Tech and society\"],\"w\":[\"2026-01-06\"]},\"DemosAU|2026-04-14\":{\"h\":\"demosau\",\"n\":6,\"t\":[\"Trump and the US\",\"Housing and the budget\",\"Trust and democracy\"],\"w\":[\"2026-04-14\"]},\"DemosAU|2026-05-20\":{\"h\":\"demosau\",\"n\":6,\"t\":[\"One Nation\",\"Housing and the budget\",\"Trust and democracy\"],\"w\":[\"2026-05-20\"]},\"DemosAU|2026-06-18\":{\"h\":\"demosau\",\"n\":3,\"t\":[\"One Nation\",\"Housing and the budget\",\"Trust and democracy\"],\"w\":[\"2026-06-18\"]},\"DemosAU|2026-07-08\":{\"h\":\"demosau\",\"n\":4,\"t\":[\"Trump and the US\",\"One Nation\",\"Trust and democracy\"],\"w\":[\"2026-07-08\"]},\"DemosAU|2026-09-14\":{\"h\":\"demosau\",\"n\":4,\"t\":[\"Housing and the budget\",\"Tech and society\"],\"w\":[\"2026-09-14\"]},\"DemosAU|2026-08-20\":{\"h\":\"demosau\",\"n\":4,\"t\":[\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-08-20\"]},\"RedBridge/Accent|2025-11-13\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"Cost of living\"],\"w\":[\"2025-11-13\"]},\"RedBridge/Accent|2025-12-12\":{\"h\":\"redbridge\",\"n\":3,\"t\":[\"Housing and the budget\",\"Cost of living\"],\"w\":[\"2025-12-12\"]},\"RedBridge/Accent|2026-01-29\":{\"h\":\"redbridge\",\"n\":2,\"t\":[\"Trump and the US\",\"Trust and democracy\"],\"w\":[\"2026-01-29\"]},\"RedBridge/Accent|2026-02-27\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"One Nation\"],\"w\":[\"2026-02-27\"]},\"RedBridge/Accent|2026-04-30\":{\"h\":\"redbridge\",\"n\":3,\"t\":[\"Trump and the US\",\"One Nation\"],\"w\":[\"2026-04-30\"]},\"RedBridge/Accent|2026-05-28\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-05-28\"]},\"RedBridge/Accent|2026-06-26\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"Cost of living\"],\"w\":[\"2026-06-26\"]},\"RedBridge/Accent|2026-07-30\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-07-30\"]},\"RedBridge/Accent|2026-08-28\":{\"h\":\"redbridge\",\"n\":1,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-08-28\"]},\"RedBridge/Accent|2026-10-02\":{\"h\":\"redbridge\",\"n\":2,\"t\":[\"Trump and the US\",\"Housing and the budget\"],\"w\":[\"2026-10-02\"]},\"SEC Newgate|2025-07-16\":{\"h\":\"secnewgate\",\"n\":6,\"t\":[\"Trump and the US\",\"Housing and the budget\",\"Cost of living\",\"War and fuel\",\"Trust and democracy\"],\"w\":[\"2025-07-16\"]},\"SEC Newgate|2025-09-15\":{\"h\":\"secnewgate\",\"n\":5,\"t\":[\"Trump and the US\",\"Housing and the budget\",\"Cost of living\",\"Climate and energy\"],\"w\":[\"2025-09-15\"]},\"SEC Newgate|2025-11-03\":{\"h\":\"secnewgate\",\"n\":11,\"t\":[\"Trump and the US\",\"Housing and the budget\",\"Bondi and cohesion\",\"Climate and energy\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2025-11-03\"]},\"SEC Newgate|2026-02-09\":{\"h\":\"secnewgate\",\"n\":12,\"t\":[\"Immigration\",\"Trump and the US\",\"One Nation\",\"Cost of living\",\"Bondi and cohesion\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-02-09\"]},\"SEC Newgate|2026-05-18\":{\"h\":\"secnewgate\",\"n\":14,\"t\":[\"Trump and the US\",\"Housing and the budget\",\"Cost of living\",\"War and fuel\",\"Bondi and cohesion\"],\"w\":[\"2026-05-18\"]},\"SEC Newgate|2026-07-13\":{\"h\":\"secnewgate\",\"n\":11,\"t\":[\"Immigration\",\"Trump and the US\",\"One Nation\",\"Housing and the budget\",\"Cost of living\",\"Tech and society\"],\"w\":[\"2026-07-13\"]},\"SEC Newgate|2026-09-14\":{\"h\":\"secnewgate\",\"n\":13,\"t\":[\"Immigration\",\"Trump and the US\",\"One Nation\",\"Housing and the budget\",\"Cost of living\",\"War and fuel\"],\"w\":[\"2026-09-14\"]},\"Essential|2025-07-29\":{\"h\":\"essential\",\"n\":8,\"t\":[\"Trump and the US\",\"War and fuel\",\"Bondi and cohesion\"],\"w\":[\"2025-07-29\"]},\"Essential|2025-08-26\":{\"h\":\"essential\",\"n\":12,\"t\":[\"Cost of living\",\"War and fuel\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2025-08-26\"]},\"Essential|2025-09-29\":{\"h\":\"essential\",\"n\":13,\"t\":[\"Immigration\",\"Trump and the US\",\"War and fuel\",\"Bondi and cohesion\",\"Climate and energy\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2025-09-30\"]},\"Essential|2025-10-27\":{\"h\":\"essential\",\"n\":7,\"t\":[\"Trump and the US\",\"One Nation\",\"Climate and energy\",\"Tech and society\"],\"w\":[\"2025-10-28\"]},\"Essential|2025-11-24\":{\"h\":\"essential\",\"n\":11,\"t\":[\"Immigration\",\"One Nation\",\"Cost of living\",\"Climate and energy\",\"Tech and society\"],\"w\":[\"2025-11-25\"]},\"Essential|2025-12-08\":{\"h\":\"essential\",\"n\":10,\"t\":[\"One Nation\",\"Cost of living\",\"Bondi and cohesion\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2025-12-10\"]},\"Essential|2026-01-23\":{\"h\":\"essential\",\"n\":8,\"t\":[\"Bondi and cohesion\",\"Trust and democracy\"],\"w\":[\"2026-01-28\"]},\"Essential|2026-02-23\":{\"h\":\"essential\",\"n\":5,\"t\":[\"One Nation\",\"Bondi and cohesion\",\"Trust and democracy\"],\"w\":[\"2026-02-24\"]},\"Essential|2026-03-23\":{\"h\":\"essential\",\"n\":6,\"t\":[\"Trump and the US\",\"Cost of living\",\"War and fuel\"],\"w\":[\"2026-03-24\"]},\"Essential|2026-04-27\":{\"h\":\"essential\",\"n\":8,\"t\":[\"Immigration\",\"One Nation\",\"Housing and the budget\",\"Cost of living\",\"War and fuel\",\"Climate and energy\"],\"w\":[\"2026-04-28\"]},\"Essential|2026-05-24\":{\"h\":\"essential\",\"n\":14,\"t\":[\"Housing and the budget\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-05-26\"]},\"Essential|2026-06-29\":{\"h\":\"essential\",\"n\":12,\"t\":[\"Trump and the US\",\"One Nation\",\"Housing and the budget\",\"Climate and energy\",\"Tech and society\"],\"w\":[\"2026-06-30\"]},\"Essential|2026-07-27\":{\"h\":\"essential\",\"n\":7,\"t\":[\"Cost of living\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-07-28\"]},\"Essential|2026-08-31\":{\"h\":\"essential\",\"n\":10,\"t\":[\"Housing and the budget\",\"Cost of living\",\"Tech and society\"],\"w\":[\"2026-09-01\"]},\"Essential|2026-09-29\":{\"h\":\"essential\",\"n\":9,\"t\":[\"Immigration\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-09-29\"]},\"Essential|2026-10-27\":{\"h\":\"essential\",\"n\":9,\"t\":[\"Trump and the US\",\"One Nation\",\"Cost of living\",\"Tech and society\",\"Trust and democracy\"],\"w\":[\"2026-10-27\"]},\"Resolve|2025-07-18\":{\"h\":\"resolve\",\"n\":1,\"t\":[\"One Nation\"],\"w\":[\"2025-07-18\"]},\"Resolve|2025-10-12\":{\"h\":\"resolve\",\"n\":2,\"t\":[\"Immigration\",\"One Nation\"],\"w\":[\"2025-10-12\"]},\"Resolve|2025-11-08\":{\"h\":\"resolve\",\"n\":5,\"t\":[\"Cost of living\",\"Trust and democracy\"],\"w\":[\"2025-11-08\"]},\"Resolve|2025-12-07\":{\"h\":\"resolve\",\"n\":5,\"t\":[\"Immigration\",\"One Nation\",\"Trust and democracy\"],\"w\":[\"2025-12-07\"]},\"Resolve|2025-12-20\":{\"h\":\"resolve\",\"n\":5,\"t\":[\"Bondi and cohesion\"],\"w\":[\"2025-12-20\"]},\"Resolve|2026-01-16\":{\"h\":\"resolve\",\"n\":2,\"t\":[\"Bondi and cohesion\"],\"w\":[\"2026-01-16\"]},\"Resolve|2026-02-14\":{\"h\":\"resolve\",\"n\":3,\"t\":[\"One Nation\",\"Trust and democracy\"],\"w\":[\"2026-02-14\"]},\"Resolve|2026-03-14\":{\"h\":\"resolve\",\"n\":1,\"t\":[\"Trust and democracy\"],\"w\":[\"2026-03-14\"]},\"Resolve|2026-04-18\":{\"h\":\"resolve\",\"n\":2,\"t\":[\"War and fuel\",\"Trust and democracy\"],\"w\":[\"2026-04-18\"]},\"Resolve|2026-05-16\":{\"h\":\"resolve\",\"n\":6,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-05-16\"]},\"Resolve|2026-06-13\":{\"h\":\"resolve\",\"n\":4,\"t\":[\"Housing and the budget\",\"Trust and democracy\"],\"w\":[\"2026-06-13\"]},\"Resolve|2026-07-11\":{\"h\":\"resolve\",\"n\":6,\"t\":[\"Immigration\",\"One Nation\"],\"w\":[\"2026-07-11\"]},\"Resolve|2026-08-15\":{\"h\":\"resolve\",\"n\":7,\"t\":[\"Immigration\",\"One Nation\",\"Housing and the budget\",\"Trust and democracy\"],\"w\":[\"2026-08-15\"]},\"Resolve|2026-09-12\":{\"h\":\"resolve\",\"n\":6,\"t\":[\"Housing and the budget\"],\"w\":[\"2026-09-12\"]},\"Resolve|2026-10-10\":{\"h\":\"resolve\",\"n\":4,\"t\":[\"Cost of living\",\"Trust and democracy\"],\"w\":[\"2026-10-10\"]},\"Freshwater|2025-10-20\":{\"h\":\"freshwater\",\"n\":1,\"t\":[\"Trump and the US\"],\"w\":[\"2025-10-20\"]},\"Freshwater|2026-01-18\":{\"h\":\"freshwater\",\"n\":1,\"t\":[\"Trump and the US\"],\"w\":[\"2026-01-18\"]},\"Freshwater|2026-03-29\":{\"h\":\"freshwater\",\"n\":1,\"t\":[\"Trump and the US\"],\"w\":[\"2026-03-29\"]},\"Freshwater|2026-04-30\":{\"h\":\"freshwater\",\"n\":1,\"t\":[\"Trump and the US\"],\"w\":[\"2026-04-30\"]},\"Freshwater|2026-05-15\":{\"h\":\"freshwater\",\"n\":1,\"t\":[\"Trump and the US\"],\"w\":[\"2026-05-15\"]}}");
