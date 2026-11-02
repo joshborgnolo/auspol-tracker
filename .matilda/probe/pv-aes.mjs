@@ -1,6 +1,8 @@
 /* Pins the AES diamonds in the Primary-vote panel's subpopulation view
-   (2026-11-02, follow-up to 30071f5e's Who-votes wiring): for the two cuts
-   the survey prints (gender, generations) each party's reported 2025 vote
+   (2026-11-02, follow-up to 30071f5e's Who-votes wiring; e779e049 moved the
+   figures to the AES respondent file): for every cut the survey measures
+   the site's way (gender, age, generations, education, housing, work
+   status) each party's 2025 vote, One Nation and Others included,
    sits as a hollow diamond at the election month, lead-ins join the lines,
    hovering the election stop tips the AES figures, every other subpop view
    and the all-voters view stay untouch­ed, and nothing hits the boundary.
@@ -64,11 +66,13 @@ const cardState = () => page.evaluate(() => {
   return { diamonds, dashLeads, keyText: key ? key.textContent : "", burned };
 });
 
-for (const [grp, expD] of [["Men", 3], ["Women", 3], ["Gen Z", 3], ["Millennials", 3], ["Gen X", 3], ["Boomers", 3]]) {
+/* since e779e049 the AES figures come from its respondent file: every party
+   (One Nation coded apart), every cut it measures the site's way */
+for (const [grp, expD] of [["Men", 5], ["Women", 5], ["Gen Z", 5], ["Millennials", 5], ["Gen X", 5], ["Boomers", 5], ["18–34", 5], ["University", 5], ["Renting", 5], ["Retired", 5]]) {
   await choose(grp);
   await new Promise((r) => setTimeout(r, 800));
   const s = await cardState();
-  ok(`${grp}: three diamonds (ALP/LNP/GRN)`, s.diamonds === expD, `diamond paths=${s.diamonds}`);
+  ok(`${grp}: five diamonds (every party)`, s.diamonds === expD, `diamond paths=${s.diamonds}`);
   ok(`${grp}: key names the source`, /Australian Election Study 2025/.test(s.keyText));
   ok(`${grp}: dotted lead-ins present`, s.dashLeads >= 4, `dashed paths=${s.dashLeads}`);
   ok(`${grp}: no boundary`, !s.burned);
@@ -100,20 +104,20 @@ for (const [grp, expD] of [["Men", 3], ["Women", 3], ["Gen Z", 3], ["Millennials
       await new Promise((r) => setTimeout(r, 500));
       const t1 = await tipText();
       ok("Gen Z: on-diamond tip names the survey", /Australian Election Study 2025/.test(t1), t1.replace(/\s+/g, " ").slice(0, 80));
-      ok("Gen Z: on-diamond tip prints a whole share", /\b\d{1,2}\b/.test(t1) && !/\d\.\d/.test(t1.split("2025")[1] || ""), t1.replace(/\s+/g, " ").slice(0, 120));
+      ok("Gen Z: on-diamond tip prints the AES share and the group's respondents", /\d\.\d/.test(t1.split("2025")[1] || "") && /231 respondents/.test(t1), t1.replace(/\s+/g, " ").slice(0, 140));
       ok("Gen Z: on-diamond tip says not pooled", /not pooled/.test(t1));
       /* column stop: same x, clear of the dots */
       await page.mouse.move(diaBox.x, diaBox.top + diaBox.h * 0.12);
       await new Promise((r) => setTimeout(r, 500));
       const t2 = await tipText();
       ok("Gen Z: stop tip titles May 2025", /May 2025/.test(t2), t2.replace(/\s+/g, " ").slice(0, 60));
-      ok("Gen Z: stop tip names the AES figures as printed", /Australian Election Study 2025, as printed/.test(t2), t2.replace(/\s+/g, " ").slice(0, 140));
+      ok("Gen Z: stop tip names the AES and its respondents", /Australian Election Study 2025, 231 respondents/.test(t2), t2.replace(/\s+/g, " ").slice(0, 140));
     }
   }
 }
 
 /* negative controls */
-for (const grp of ["18–34", "University", "NSW", "Rural", ""]) {
+for (const grp of ["NSW", "Rural", "English only", ""]) {
   await choose(grp);
   await new Promise((r) => setTimeout(r, 700));
   const s = await cardState();
