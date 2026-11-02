@@ -29,7 +29,7 @@ const ELECTIONS = [
   { id: "sa22", label: "SA 2022", res: "res-sa22", sen: 2019, st: "SA" },
 ];
 const ST = settings(J("data/seat-model-flow-calibration.json"));
-const COMP = switching(J("data/vote-switching.json"));
+const COMP = switching(J("data/vote-switching.json"), J("data/polls.json"));
 const COH = ["ALP", "COAL", "GRN", "ON", "OTH-R", "OTH-M", "OTH-L"];
 const B = (g) => (g === "alp" ? "alp" : ["lp", "np", "lnp", "clp"].includes(g) ? "lnp" : g === "on" ? "onp" : g === "grn" ? "grn" : g.startsWith("member") ? "ind" : "oth");
 const W5 = { ALP: [100, 0.6, 0.8, 0.4], COAL: [0.215, 100, 0.1, 0.785], GRN: [0.8819, 0.1181, 100, 1e-6], ON: [0.255, 0.745, 0.02, 100], "OTH-R": [0.5455, 0.4545, 0.1, 1e-6], "OTH-M": [0.5455, 0.4545, 0.1, 1e-6], "OTH-L": [0.5455, 0.4545, 0.1, 1e-6] };

@@ -54,7 +54,7 @@ export function prepInputs({ year = 2025, composition = true, replay = false, ro
     const prevE = s1.get("2025|" + D.n + "|" + b) ?? 0;
     return t.incE * incE + t.incP * incP + t.defect * defect + t.rho * prevE;
   };
-  const comp = composition ? switching(SW) : null;
+  const comp = composition ? switching(SW, J(`${root}/data/polls.json`)) : null;
   const { capNat, capBySeat, sibBySeat } = certifiedShares(FLOWS);
   const PW = VOTE.beta.populationWeights;
 
@@ -133,19 +133,51 @@ export function houseHistory(RES, SEN) {
 
 /* today's vote for each big-four party by 2025 vote: share of party X's current voters who were
    g voters in 2025 = weights2025[g] x P(now X | g), pooled over waves fielded from 1 Aug 2026 */
-export function switching(SW, from = "2026-08-01") {
+/* Today's voters by their 2025 vote, from the vote-switching tables: built as the site reads the same
+   tables (gen-data §5b, the "where they're going" readings), i.e. the six-week sparse window of every
+   sparse figure (SPARSE_K: 42 days, 14-day half-life, cosine taper from day 28) anchored at the newest
+   poll's fieldwork end; each wave weighted by its sample (polls.json sampleEff x design effect, else
+   sample capped at 3000, as rowN) x the 2025 group's share, and a house with m waves in the window
+   counting for sqrt(m); an MRP that reuses its house's own waves sits out, as it sits out of the
+   aggregates. A group no wave in the window prints falls back to the waves nearest the window
+   (widened 42 days at a time) rather than to nothing. Until 2 Nov 2026 this pooled every wave since
+   1 Aug 2026 by sample alone. */
+export const SWITCH_K = { window: 42, half: 14, taper: 28 };
+const DAY = 86400000;
+const sparseW = (d, k = SWITCH_K) => Math.exp(-Math.LN2 * d / k.half) * (d <= k.taper ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - k.taper) / (k.window - k.taper))));
+export function switching(SW, POLLS, { ref = null } = {}) {
   const G = ["alp", "lnp", "grn", "onp", "ind", "oth"], X = ["alp", "lnp", "grn", "on"];
+  const list = Array.isArray(POLLS) ? POLLS : POLLS?.polls || [];
+  const byKey = new Map(list.map((p) => [p.date + "|" + p.pollster, p]));
+  const refMs = new Date(ref || list.reduce((m, p) => (p.date > m ? p.date : m), "0000")).getTime();
+  const reuses = (w) => {
+    const house = /\(MRP\)$/.test(w.pollster || "") && w.dateStart ? w.pollster.replace(/ \(MRP\)$/, "") : null;
+    return !!house && list.some((q) => q.pollster === house && (q.dateStart || q.date) >= w.dateStart && q.date <= w.date);
+  };
+  const waves = SW.waves.filter((w) => !reuses(w)).map((w) => {
+    const p = byKey.get(w.date + "|" + w.pollster);
+    const n = p?.sampleEff != null ? p.sampleEff * 1.6 : Math.min(p?.sample || w.sample || 1200, 3000);
+    const mid = (new Date(w.dateStart || w.date).getTime() + new Date(w.date).getTime()) / 2;
+    return { w, n, d: (refMs - mid) / DAY };
+  }).filter((x) => x.d >= 0);
   const M = Object.fromEntries(G.map((g) => [g, Object.fromEntries([...X, "_other"].map((x) => [x, 0]))])), Wt = Object.fromEntries(G.map((g) => [g, 0]));
-  for (const w of SW.waves) {
-    if ((w.date || "") < from) continue;
-    for (const g of G) {
-      const row = w.rows[g]; if (!row) continue;
-      const keys = Object.keys(row).filter((k) => !["dnr", "und"].includes(k));
-      const tot = keys.reduce((a, k) => a + (row[k] || 0), 0); if (!tot) continue;
-      const n = (w.sample || 1000) * (SW.weights2025[g] || 1) / 100;
-      for (const k of keys) { const x = k === "onp" ? "on" : X.includes(k) ? k : "_other"; M[g][x] += n * (row[k] || 0) / tot; }
-      Wt[g] += n;
+  const used = {};
+  for (const g of G) {
+    let k = SWITCH_K, inWin = [];
+    for (let i = 0; i < 12 && !inWin.length; i++) {
+      k = { window: SWITCH_K.window * (i + 1), half: SWITCH_K.half * (i + 1), taper: SWITCH_K.taper * (i + 1) };
+      inWin = waves.filter((x) => x.d <= k.window && x.w.rows[g] && Object.keys(x.w.rows[g]).some((c) => !["dnr", "und"].includes(c) && x.w.rows[g][c]));
     }
+    const m = new Map(); for (const x of inWin) m.set(x.w.pollster, (m.get(x.w.pollster) || 0) + 1);
+    for (const x of inWin) {
+      const row = x.w.rows[g];
+      const keys = Object.keys(row).filter((c) => !["dnr", "und"].includes(c));
+      const tot = keys.reduce((a, c) => a + (row[c] || 0), 0);
+      const wt = x.n * (SW.weights2025[g] || 1) / 100 * sparseW(x.d, k) / Math.sqrt(m.get(x.w.pollster));
+      for (const c of keys) { const t = c === "onp" ? "on" : X.includes(c) ? c : "_other"; M[g][t] += wt * (row[c] || 0) / tot; }
+      Wt[g] += wt;
+    }
+    used[g] = { window: k.window, waves: inWin.map((x) => x.w.pollster + " " + x.w.date) };
   }
   const comp = {};
   for (const x of X) {
@@ -153,6 +185,7 @@ export function switching(SW, from = "2026-08-01") {
     const t = Object.values(parts).reduce((a, b) => a + b, 0);
     comp[x] = Object.fromEntries(Object.entries(parts).map(([g, v]) => [g, v / t]));
   }
+  Object.defineProperty(comp, "window", { value: { ref: new Date(refMs).toISOString().slice(0, 10), used }, enumerable: false });
   return comp;
 }
 
