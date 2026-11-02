@@ -765,7 +765,7 @@
       /* a "band" (a party-coloured 95% interval) is a shade at the faint
          weight the chart draws it, not a line: drawn as one, "95% interval"
          read as a second series in the series' own colour */
-      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
+      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring", "diamond"].includes(l.kind) ? l.kind : "line",
                                  fill: paint(l.color), alpha: l.kind === "band" ? 0.4 : 1 }))
       : readLegend(target);
     if (!stated && !legend.length && board0) legend = boardLegend();
@@ -1025,6 +1025,11 @@
               /* an election result: a count, drawn open as the chart draws it */
               c.strokeStyle = it.fill; c.lineWidth = 2;
               c.beginPath(); c.arc(lx + 6, my, 5, 0, 7); c.stroke();
+            } else if (it.kind === "diamond") {
+              /* a survey reading kept apart from the polls (the Who-votes
+                 charts' Australian Election Study points): open, as drawn */
+              c.strokeStyle = it.fill; c.lineWidth = 1.6;
+              c.beginPath(); c.moveTo(lx + 6, my - 5.5); c.lineTo(lx + 11.5, my); c.lineTo(lx + 6, my + 5.5); c.lineTo(lx + 0.5, my); c.closePath(); c.stroke();
             } else {
               c.fillStyle = it.fill;
               c.beginPath(); c.arc(lx + 5, my, 4.5, 0, 7); c.fill();

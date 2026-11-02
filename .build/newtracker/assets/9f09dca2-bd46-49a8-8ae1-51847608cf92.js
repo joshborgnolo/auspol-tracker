@@ -245,6 +245,9 @@ window.AUSPOL = (function () {
   /* The By-location chart's 2025 election marks (§7g), same shape: one ring
      per classification line at May 2025. */
   const demoLocElection = {"x":2025.375,"groups":{"Nat":[34.56,31.82,6.4,12.2,15.01],"Inner metro":[38.35,27.98,3.49,16.5,13.68],"Outer metro":[39.28,30.21,6.18,11.87,12.45],"Provincial":[35.2,32.6,8.01,11.22,12.97],"Rural":[24.41,37.68,8.94,8.41,20.56]}};
+  /* The Australian Election Study 2025's vote by gender and generation
+     (§7g DEMO_AES): plain reference points on those charts, never pooled. */
+  const demoAes = {"x":2025.375,"n":2070,"src":"https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf","elec":{"alp":34.56,"lnp":31.82,"grn":12.2},"sets":{"gender":{"read":false,"tot":{"alp":33.6,"lnp":32.4,"grn":13.1},"groups":{"Women":{"alp":[36,37],"lnp":[28,27.4],"grn":[18,17.1]},"Men":{"alp":[31,32],"lnp":[37,36.4],"grn":[8,7.1]}}},"generation":{"read":true,"tot":{"alp":34.8,"lnp":32.2,"grn":12.3},"groups":{"Gen Z":{"alp":[41,40.7],"lnp":[28,27.6],"grn":[27,26.9]},"Millennials":{"alp":[37,36.7],"lnp":[21,20.6],"grn":[19,18.9]},"Gen X":{"alp":[35,34.7],"lnp":[31,30.6],"grn":[7,6.9]},"Boomers":{"alp":[30,29.7],"lnp":[44,43.6],"grn":[4,3.9]}}}}};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -344,7 +347,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4,"senate":{"asOf":"2026-10-09","total":76,"seats":{"alp":30,"lnp":27,"grn":10,"onp":4,"ind":2,"oth":3}}};
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"Labor would win the most seats, more likely short of a majority than not","pollsTo":"2026-10-27","draws":20000,"expectedSeats":{"alp":71.1,"lnp":31.4,"on":35.78,"grn":4.06,"oth":0.01,"member":7.64},"mostSeats":{"alp":0.9037,"lnp":0.0134,"on":0.083,"grn":0,"oth":0,"member":0},"majority":{"alp":0.3717,"coalition":0.0017,"on":0.0169,"noMajority":0.6098}};
+  const seatModel = {"headline":"Labor would win the most seats, with a majority about as likely as not","pollsTo":"2026-10-27","draws":20000,"expectedSeats":{"alp":72.02,"lnp":30.77,"on":35.49,"grn":4.06,"oth":0.01,"member":7.65},"mostSeats":{"alp":0.9114,"lnp":0.0113,"on":0.0773,"grn":0,"oth":0,"member":0},"majority":{"alp":0.403,"coalition":0.0017,"on":0.0164,"noMajority":0.579}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -387,7 +390,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

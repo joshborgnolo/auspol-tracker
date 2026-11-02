@@ -4611,6 +4611,68 @@ window.AUSPOL = function () {
       "Rural": [24.41, 37.68, 8.94, 8.41, 20.56]
     }
   };
+  const demoAes = {
+    "x": 2025.375,
+    "n": 2070,
+    "src": "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
+    "elec": {
+      "alp": 34.56,
+      "lnp": 31.82,
+      "grn": 12.2
+    },
+    "sets": {
+      "gender": {
+        "read": false,
+        "tot": {
+          "alp": 33.6,
+          "lnp": 32.4,
+          "grn": 13.1
+        },
+        "groups": {
+          "Women": {
+            "alp": [36, 37],
+            "lnp": [28, 27.4],
+            "grn": [18, 17.1]
+          },
+          "Men": {
+            "alp": [31, 32],
+            "lnp": [37, 36.4],
+            "grn": [8, 7.1]
+          }
+        }
+      },
+      "generation": {
+        "read": true,
+        "tot": {
+          "alp": 34.8,
+          "lnp": 32.2,
+          "grn": 12.3
+        },
+        "groups": {
+          "Gen Z": {
+            "alp": [41, 40.7],
+            "lnp": [28, 27.6],
+            "grn": [27, 26.9]
+          },
+          "Millennials": {
+            "alp": [37, 36.7],
+            "lnp": [21, 20.6],
+            "grn": [19, 18.9]
+          },
+          "Gen X": {
+            "alp": [35, 34.7],
+            "lnp": [31, 30.6],
+            "grn": [7, 6.9]
+          },
+          "Boomers": {
+            "alp": [30, 29.7],
+            "lnp": [44, 43.6],
+            "grn": [4, 3.9]
+          }
+        }
+      }
+    }
+  };
   const issues = {};
   const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired", "Lower earners (bottom 50%)", "Higher earners (top 15%)"];
   const accuracy = JSON.parse("{\"windowDays\":14,\"cycles\":[{\"year\":1946,\"eDate\":\"1946-09-28\",\"result\":54.1,\"mean\":54.8,\"err\":0.7,\"absErr\":0.7,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1946-09-27\",\"alp2pp\":54.8,\"err\":0.7,\"alp2ppImp\":54.8,\"errImp\":0.7}],\"n\":1,\"sameSide\":false,\"worst\":0.7,\"meanImp\":54.8,\"errImp\":0.7,\"absErrImp\":0.7,\"sameSideImp\":false,\"worstImp\":0.7},{\"year\":1949,\"eDate\":\"1949-12-10\",\"result\":49,\"mean\":49.3,\"err\":0.3,\"absErr\":0.3,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1949-12-03\",\"alp2pp\":49.3,\"err\":0.3,\"alp2ppImp\":49.3,\"errImp\":0.3}],\"n\":1,\"sameSide\":false,\"worst\":0.3,\"meanImp\":49.3,\"errImp\":0.3,\"absErrImp\":0.3,\"sameSideImp\":false,\"worstImp\":0.3},{\"year\":1951,\"eDate\":\"1951-04-28\",\"result\":49.3,\"mean\":47.8,\"err\":-1.5,\"absErr\":1.5,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1951-04-22\",\"alp2pp\":47.8,\"err\":-1.5,\"alp2ppImp\":47.8,\"errImp\":-1.5}],\"n\":1,\"sameSide\":false,\"worst\":1.5,\"meanImp\":47.8,\"errImp\":-1.5,\"absErrImp\":1.5,\"sameSideImp\":false,\"worstImp\":1.5},{\"year\":1954,\"eDate\":\"1954-05-29\",\"result\":50.7,\"mean\":48.8,\"err\":-1.9,\"absErr\":1.9,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1954-05-23\",\"alp2pp\":48.8,\"err\":-1.9,\"alp2ppImp\":48.8,\"errImp\":-1.9}],\"n\":1,\"sameSide\":false,\"worst\":1.9,\"meanImp\":48.8,\"errImp\":-1.9,\"absErrImp\":1.9,\"sameSideImp\":false,\"worstImp\":1.9},{\"year\":1972,\"eDate\":\"1972-12-02\",\"result\":52.7,\"mean\":52.7,\"err\":0,\"absErr\":0,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1972-11-25\",\"alp2pp\":52.7,\"err\":0,\"alp2ppImp\":52.7,\"errImp\":0}],\"n\":1,\"sameSide\":false,\"worst\":0,\"meanImp\":52.7,\"errImp\":0,\"absErrImp\":0,\"sameSideImp\":false,\"worstImp\":0},{\"year\":1974,\"eDate\":\"1974-05-18\",\"result\":51.7,\"mean\":50.4,\"err\":-1.3,\"absErr\":1.3,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1974-05-15\",\"alp2pp\":50.4,\"err\":-1.3,\"alp2ppImp\":50.4,\"errImp\":-1.3}],\"n\":1,\"sameSide\":false,\"worst\":1.3,\"meanImp\":50.4,\"errImp\":-1.3,\"absErrImp\":1.3,\"sameSideImp\":false,\"worstImp\":1.3},{\"year\":1975,\"eDate\":\"1975-12-13\",\"result\":44.3,\"mean\":41.8,\"err\":-2.5,\"absErr\":2.5,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1975-12-06\",\"alp2pp\":41.8,\"err\":-2.5,\"alp2ppImp\":41.8,\"errImp\":-2.5}],\"n\":1,\"sameSide\":false,\"worst\":2.5,\"meanImp\":41.8,\"errImp\":-2.5,\"absErrImp\":2.5,\"sameSideImp\":false,\"worstImp\":2.5},{\"year\":1977,\"eDate\":\"1977-12-10\",\"result\":45.4,\"mean\":48.6,\"err\":3.2,\"absErr\":3.2,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1977-11-27\",\"alp2pp\":48.6,\"err\":3.2,\"alp2ppImp\":48.6,\"errImp\":3.2}],\"n\":1,\"sameSide\":false,\"worst\":3.2,\"meanImp\":48.6,\"errImp\":3.2,\"absErrImp\":3.2,\"sameSideImp\":false,\"worstImp\":3.2},{\"year\":1980,\"eDate\":\"1980-10-18\",\"result\":49.6,\"mean\":51,\"err\":1.4,\"absErr\":1.4,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1980-10-12\",\"alp2pp\":51,\"err\":1.4,\"alp2ppImp\":51,\"errImp\":1.4}],\"n\":1,\"sameSide\":false,\"worst\":1.4,\"meanImp\":51,\"errImp\":1.4,\"absErrImp\":1.4,\"sameSideImp\":false,\"worstImp\":1.4},{\"year\":1983,\"eDate\":\"1983-03-05\",\"result\":53.2,\"mean\":53.8,\"err\":0.6,\"absErr\":0.6,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1983-03-03\",\"alp2pp\":53.8,\"err\":0.6,\"alp2ppImp\":53.8,\"errImp\":0.6}],\"n\":1,\"sameSide\":false,\"worst\":0.6,\"meanImp\":53.8,\"errImp\":0.6,\"absErrImp\":0.6,\"sameSideImp\":false,\"worstImp\":0.6},{\"year\":1984,\"eDate\":\"1984-12-01\",\"result\":51.8,\"mean\":55,\"err\":3.2,\"absErr\":3.2,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1984-11-18\",\"alp2pp\":55,\"err\":3.2,\"alp2ppImp\":55,\"errImp\":3.2}],\"n\":1,\"sameSide\":false,\"worst\":3.2,\"meanImp\":55,\"errImp\":3.2,\"absErrImp\":3.2,\"sameSideImp\":false,\"worstImp\":3.2},{\"year\":1987,\"eDate\":\"1987-07-11\",\"result\":50.8,\"mean\":53.4,\"err\":2.6,\"absErr\":2.6,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1987-06-28\",\"alp2pp\":53.4,\"err\":2.6,\"alp2ppImp\":53.4,\"errImp\":2.6}],\"n\":1,\"sameSide\":false,\"worst\":2.6,\"meanImp\":53.4,\"errImp\":2.6,\"absErrImp\":2.6,\"sameSideImp\":false,\"worstImp\":2.6},{\"year\":1993,\"eDate\":\"1993-03-13\",\"result\":51.4,\"mean\":50.1,\"err\":-1.3,\"absErr\":1.3,\"houses\":[{\"firm\":\"Saulwick\",\"date\":\"1993-03-12\",\"alp2pp\":51,\"err\":-0.4,\"alp2ppImp\":52.1,\"errImp\":0.7},{\"firm\":\"Roy Morgan\",\"date\":\"1993-03-11\",\"alp2pp\":50.5,\"err\":-0.9,\"alp2ppImp\":50.9,\"errImp\":-0.5},{\"firm\":\"AGB McNair\",\"date\":\"1993-03-11\",\"alp2pp\":49.5,\"err\":-1.9,\"alp2ppImp\":48.5,\"errImp\":-2.9},{\"firm\":\"Newspoll\",\"date\":\"1993-03-11\",\"alp2pp\":49.5,\"err\":-1.9,\"alp2ppImp\":50.7,\"errImp\":-0.7}],\"n\":4,\"sameSide\":true,\"worst\":1.9,\"meanImp\":50.6,\"errImp\":-0.9,\"absErrImp\":0.9,\"sameSideImp\":false,\"worstImp\":2.9},{\"year\":1996,\"eDate\":\"1996-03-02\",\"result\":46.4,\"mean\":48.3,\"err\":1.9,\"absErr\":1.9,\"houses\":[{\"firm\":\"Newspoll\",\"date\":\"1996-02-29\",\"alp2pp\":46.5,\"err\":0.1,\"alp2ppImp\":47.4,\"errImp\":1},{\"firm\":\"Roy Morgan\",\"date\":\"1996-02-29\",\"alp2pp\":50,\"err\":3.6,\"alp2ppImp\":51,\"errImp\":4.6}],\"n\":2,\"sameSide\":true,\"worst\":3.6,\"meanImp\":49.2,\"errImp\":2.8,\"absErrImp\":2.8,\"sameSideImp\":true,\"worstImp\":4.6},{\"year\":1998,\"eDate\":\"1998-10-03\",\"result\":51,\"mean\":50.8,\"err\":-0.2,\"absErr\":0.2,\"houses\":[{\"firm\":\"Quadrant\",\"date\":\"1998-09-29\",\"alp2pp\":51,\"err\":0,\"alp2ppImp\":52.7,\"errImp\":1.7},{\"firm\":\"Roy Morgan\",\"date\":\"1998-10-03\",\"alp2pp\":50,\"err\":-1,\"alp2ppImp\":50.6,\"errImp\":-0.4},{\"firm\":\"ACNielsen\",\"date\":\"1998-10-01\",\"alp2pp\":50,\"err\":-1,\"alp2ppImp\":49.2,\"errImp\":-1.8},{\"firm\":\"ARS\",\"date\":\"1998-10-01\",\"alp2pp\":50,\"err\":-1,\"alp2ppImp\":49.9,\"errImp\":-1.1},{\"firm\":\"Newspoll\",\"date\":\"1998-10-01\",\"alp2pp\":53,\"err\":2,\"alp2ppImp\":52.7,\"errImp\":1.7}],\"n\":5,\"sameSide\":false,\"worst\":2,\"meanImp\":51,\"errImp\":0,\"absErrImp\":0,\"sameSideImp\":false,\"worstImp\":1.8},{\"year\":2001,\"eDate\":\"2001-11-10\",\"result\":49,\"mean\":49.8,\"err\":0.8,\"absErr\":0.8,\"houses\":[{\"firm\":\"ACNielsen\",\"date\":\"2001-11-08\",\"alp2pp\":48,\"err\":-1,\"alp2ppImp\":48,\"errImp\":-1},{\"firm\":\"Newspoll\",\"date\":\"2001-11-08\",\"alp2pp\":47,\"err\":-2,\"alp2ppImp\":47.5,\"errImp\":-1.5},{\"firm\":\"Roy Morgan\",\"date\":\"2001-11-04\",\"alp2pp\":54.5,\"err\":5.5,\"alp2ppImp\":51.9,\"errImp\":2.9}],\"n\":3,\"sameSide\":false,\"worst\":5.5,\"meanImp\":49.1,\"errImp\":0.1,\"absErrImp\":0.1,\"sameSideImp\":false,\"worstImp\":2.9},{\"year\":2004,\"eDate\":\"2004-10-09\",\"result\":47.3,\"mean\":48.8,\"err\":1.5,\"absErr\":1.5,\"houses\":[{\"firm\":\"Galaxy\",\"date\":\"2004-10-04\",\"alp2pp\":48,\"err\":0.7,\"alp2ppImp\":48.5,\"errImp\":1.2},{\"firm\":\"ACNielsen\",\"date\":\"2004-10-07\",\"alp2pp\":46,\"err\":-1.3,\"alp2ppImp\":46.1,\"errImp\":-1.2},{\"firm\":\"Newspoll\",\"date\":\"2004-10-07\",\"alp2pp\":50,\"err\":2.7,\"alp2ppImp\":49.2,\"errImp\":1.9},{\"firm\":\"Roy Morgan\",\"date\":\"2004-10-08\",\"alp2pp\":51,\"err\":3.7,\"alp2ppImp\":46.8,\"errImp\":-0.5}],\"n\":4,\"sameSide\":false,\"worst\":3.7,\"meanImp\":47.7,\"errImp\":0.4,\"absErrImp\":0.4,\"sameSideImp\":false,\"worstImp\":1.9},{\"year\":2007,\"eDate\":\"2007-11-24\",\"result\":52.7,\"mean\":53.6,\"err\":0.9,\"absErr\":0.9,\"houses\":[{\"firm\":\"Newspoll\",\"date\":\"2007-11-22\",\"alp2pp\":52,\"err\":-0.7,\"alp2ppImp\":52.4,\"errImp\":-0.3},{\"firm\":\"Galaxy\",\"date\":\"2007-11-23\",\"alp2pp\":52,\"err\":-0.7,\"alp2ppImp\":52.3,\"errImp\":-0.4},{\"firm\":\"Roy Morgan\",\"date\":\"2007-11-23\",\"alp2pp\":53.5,\"err\":0.8,\"alp2ppImp\":53.3,\"errImp\":0.6},{\"firm\":\"ACNielsen\",\"date\":\"2007-11-21\",\"alp2pp\":57,\"err\":4.3,\"alp2ppImp\":56.3,\"errImp\":3.6}],\"n\":4,\"sameSide\":false,\"worst\":4.3,\"meanImp\":53.6,\"errImp\":0.9,\"absErrImp\":0.9,\"sameSideImp\":false,\"worstImp\":3.6},{\"year\":2010,\"eDate\":\"2010-08-21\",\"result\":50.1,\"mean\":51.2,\"err\":1.1,\"absErr\":1.1,\"houses\":[{\"firm\":\"Newspoll\",\"date\":\"2010-08-19\",\"alp2pp\":50.2,\"err\":0.1,\"alp2ppImp\":50.3,\"errImp\":0.2},{\"firm\":\"Essential\",\"date\":\"2010-08-15\",\"alp2pp\":51,\"err\":0.9,\"alp2ppImp\":50.2,\"errImp\":0.1},{\"firm\":\"Roy Morgan\",\"date\":\"2010-08-21\",\"alp2pp\":51.5,\"err\":1.4,\"alp2ppImp\":52.1,\"errImp\":2},{\"firm\":\"Galaxy\",\"date\":\"2010-08-19\",\"alp2pp\":52,\"err\":1.9,\"alp2ppImp\":52.4,\"errImp\":2.3}],\"n\":4,\"sameSide\":true,\"worst\":1.9,\"meanImp\":51.3,\"errImp\":1.1,\"absErrImp\":1.1,\"sameSideImp\":true,\"worstImp\":2.3},{\"year\":2013,\"eDate\":\"2013-09-07\",\"result\":46.5,\"mean\":47.1,\"err\":0.6,\"absErr\":0.6,\"houses\":[{\"firm\":\"Newspoll\",\"date\":\"2013-09-05\",\"alp2pp\":46,\"err\":-0.5,\"alp2ppImp\":45.2,\"errImp\":-1.3},{\"firm\":\"ReachTEL\",\"date\":\"2013-09-05\",\"alp2pp\":47,\"err\":0.5,\"alp2ppImp\":47.1,\"errImp\":0.6},{\"firm\":\"Galaxy\",\"date\":\"2013-09-04\",\"alp2pp\":47,\"err\":0.5,\"alp2ppImp\":46.8,\"errImp\":0.3},{\"firm\":\"Nielsen\",\"date\":\"2013-09-05\",\"alp2pp\":46,\"err\":-0.5,\"alp2ppImp\":45.9,\"errImp\":-0.6},{\"firm\":\"Roy Morgan\",\"date\":\"2013-09-06\",\"alp2pp\":45.5,\"err\":-1,\"alp2ppImp\":44.9,\"errImp\":-1.6},{\"firm\":\"Essential\",\"date\":\"2013-09-04\",\"alp2pp\":48,\"err\":1.5,\"alp2ppImp\":48,\"errImp\":1.5},{\"firm\":\"AMR\",\"date\":\"2013-09-01\",\"alp2pp\":48,\"err\":1.5,\"alp2ppImp\":47,\"errImp\":0.5},{\"firm\":\"Lonergan\",\"date\":\"2013-09-03\",\"alp2pp\":49.2,\"err\":2.7,\"alp2ppImp\":50.3,\"errImp\":3.8}],\"n\":8,\"sameSide\":false,\"worst\":2.7,\"meanImp\":46.9,\"errImp\":0.4,\"absErrImp\":0.4,\"sameSideImp\":false,\"worstImp\":3.8},{\"year\":2016,\"eDate\":\"2016-07-02\",\"result\":49.6,\"mean\":49.4,\"err\":-0.2,\"absErr\":0.2,\"houses\":[{\"firm\":\"Newspoll\",\"date\":\"2016-07-01\",\"alp2pp\":49.5,\"err\":-0.1,\"alp2ppImp\":49.5,\"errImp\":-0.1},{\"firm\":\"Essential\",\"date\":\"2016-06-30\",\"alp2pp\":49.5,\"err\":-0.1,\"alp2ppImp\":49.8,\"errImp\":0.2},{\"firm\":\"Ipsos\",\"date\":\"2016-06-29\",\"alp2pp\":50,\"err\":0.4,\"alp2ppImp\":50.5,\"errImp\":0.9},{\"firm\":\"Galaxy\",\"date\":\"2016-06-29\",\"alp2pp\":49,\"err\":-0.6,\"alp2ppImp\":49.6,\"errImp\":0},{\"firm\":\"ReachTEL\",\"date\":\"2016-06-30\",\"alp2pp\":49,\"err\":-0.6,\"alp2ppImp\":49.2,\"errImp\":-0.4}],\"n\":5,\"sameSide\":false,\"worst\":0.6,\"meanImp\":49.7,\"errImp\":0.1,\"absErrImp\":0.1,\"sameSideImp\":false,\"worstImp\":0.9},{\"year\":2019,\"eDate\":\"2019-05-18\",\"result\":48.47,\"mean\":51.4,\"err\":2.9,\"absErr\":2.9,\"houses\":[{\"firm\":\"Ipsos\",\"date\":\"2019-05-15\",\"alp2pp\":51,\"err\":2.5,\"alp2ppImp\":51.2,\"errImp\":2.7},{\"firm\":\"YouGov-Galaxy\",\"date\":\"2019-05-15\",\"alp2pp\":51,\"err\":2.5,\"alp2ppImp\":51.9,\"errImp\":3.4},{\"firm\":\"Newspoll\",\"date\":\"2019-05-16\",\"alp2pp\":51.5,\"err\":3,\"alp2ppImp\":52.4,\"errImp\":3.9},{\"firm\":\"Essential\",\"date\":\"2019-05-14\",\"alp2pp\":51.5,\"err\":3,\"alp2ppImp\":51.8,\"errImp\":3.3},{\"firm\":\"Roy Morgan\",\"date\":\"2019-05-12\",\"alp2pp\":52,\"err\":3.5,\"alp2ppImp\":51.7,\"errImp\":3.2}],\"n\":5,\"sameSide\":true,\"worst\":3.5,\"meanImp\":51.8,\"errImp\":3.3,\"absErrImp\":3.3,\"sameSideImp\":true,\"worstImp\":3.9},{\"year\":2022,\"eDate\":\"2022-05-21\",\"result\":52.1,\"mean\":52.3,\"err\":0.2,\"absErr\":0.2,\"houses\":[{\"firm\":\"Ipsos\",\"date\":\"2022-05-18\",\"alp2pp\":53,\"err\":0.9,\"alp2ppImp\":53.6,\"errImp\":1.5},{\"firm\":\"Newspoll\",\"date\":\"2022-05-19\",\"alp2pp\":53,\"err\":0.9,\"alp2ppImp\":53.2,\"errImp\":1.1},{\"firm\":\"Roy Morgan\",\"date\":\"2022-05-15\",\"alp2pp\":53,\"err\":0.9,\"alp2ppImp\":53.1,\"errImp\":1},{\"firm\":\"Resolve\",\"date\":\"2022-05-17\",\"alp2pp\":51.2,\"err\":-0.9,\"alp2ppImp\":51.4,\"errImp\":-0.7},{\"firm\":\"Essential\",\"date\":\"2022-05-16\",\"alp2pp\":51.1,\"err\":-1,\"alp2ppImp\":51.6,\"errImp\":-0.5}],\"n\":5,\"sameSide\":false,\"worst\":1,\"meanImp\":52.6,\"errImp\":0.5,\"absErrImp\":0.5,\"sameSideImp\":false,\"worstImp\":1.5},{\"year\":2025,\"eDate\":\"2025-05-03\",\"result\":55.2,\"mean\":52.4,\"err\":-2.8,\"absErr\":2.8,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"2025-05-02\",\"alp2pp\":53,\"err\":-2.2,\"alp2ppImp\":53.2,\"errImp\":-2},{\"firm\":\"Resolve\",\"date\":\"2025-04-28\",\"alp2pp\":53,\"err\":-2.2,\"alp2ppImp\":52,\"errImp\":-3.2},{\"firm\":\"Spectre\",\"date\":\"2025-04-28\",\"alp2pp\":53,\"err\":-2.2,\"alp2ppImp\":52.3,\"errImp\":-2.9},{\"firm\":\"RedBridge\",\"date\":\"2025-04-29\",\"alp2pp\":53,\"err\":-2.2,\"alp2ppImp\":53.2,\"errImp\":-2},{\"firm\":\"YouGov MRP\",\"date\":\"2025-04-25\",\"alp2pp\":52.9,\"err\":-2.3,\"alp2ppImp\":53.3,\"errImp\":-1.9},{\"firm\":\"Newspoll\",\"date\":\"2025-05-01\",\"alp2pp\":52.5,\"err\":-2.7,\"alp2ppImp\":53,\"errImp\":-2.2},{\"firm\":\"YouGov\",\"date\":\"2025-05-01\",\"alp2pp\":52.2,\"err\":-3,\"alp2ppImp\":53.9,\"errImp\":-1.3},{\"firm\":\"Essential\",\"date\":\"2025-04-27\",\"alp2pp\":52.1,\"err\":-3.1,\"alp2ppImp\":52.2,\"errImp\":-3},{\"firm\":\"DemosAU\",\"date\":\"2025-04-30\",\"alp2pp\":52,\"err\":-3.2,\"alp2ppImp\":52,\"errImp\":-3.2},{\"firm\":\"Freshwater\",\"date\":\"2025-05-01\",\"alp2pp\":51.5,\"err\":-3.7,\"alp2ppImp\":51.2,\"errImp\":-4},{\"firm\":\"Ipsos\",\"date\":\"2025-05-01\",\"alp2pp\":51,\"err\":-4.2,\"alp2ppImp\":50.7,\"errImp\":-4.5}],\"n\":11,\"sameSide\":true,\"worst\":4.2,\"meanImp\":52.5,\"errImp\":-2.7,\"absErrImp\":2.7,\"sameSideImp\":true,\"worstImp\":4.5}],\"firms\":[{\"firm\":\"Roy Morgan\",\"n\":23,\"cycles\":[{\"year\":1946,\"err\":0.7},{\"year\":1949,\"err\":0.3},{\"year\":1951,\"err\":-1.5},{\"year\":1954,\"err\":-1.9},{\"year\":1972,\"err\":0},{\"year\":1974,\"err\":-1.3},{\"year\":1975,\"err\":-2.5},{\"year\":1977,\"err\":3.2},{\"year\":1980,\"err\":1.4},{\"year\":1983,\"err\":0.6},{\"year\":1984,\"err\":3.2},{\"year\":1987,\"err\":2.6},{\"year\":1993,\"err\":-0.9},{\"year\":1996,\"err\":3.6},{\"year\":1998,\"err\":-1},{\"year\":2001,\"err\":5.5},{\"year\":2004,\"err\":3.7},{\"year\":2007,\"err\":0.8},{\"year\":2010,\"err\":1.4},{\"year\":2013,\"err\":-1},{\"year\":2019,\"err\":3.5},{\"year\":2022,\"err\":0.9},{\"year\":2025,\"err\":-2.2}],\"meanErr\":0.8,\"meanAbs\":1.9},{\"firm\":\"Newspoll\",\"n\":12,\"cycles\":[{\"year\":1993,\"err\":-1.9},{\"year\":1996,\"err\":0.1},{\"year\":1998,\"err\":2},{\"year\":2001,\"err\":-2},{\"year\":2004,\"err\":2.7},{\"year\":2007,\"err\":-0.7},{\"year\":2010,\"err\":0.1},{\"year\":2013,\"err\":-0.5},{\"year\":2016,\"err\":-0.1},{\"year\":2019,\"err\":3},{\"year\":2022,\"err\":0.9},{\"year\":2025,\"err\":-2.7}],\"meanErr\":0.1,\"meanAbs\":1.4},{\"firm\":\"Essential\",\"n\":6,\"cycles\":[{\"year\":2010,\"err\":0.9},{\"year\":2013,\"err\":1.5},{\"year\":2016,\"err\":-0.1},{\"year\":2019,\"err\":3},{\"year\":2022,\"err\":-1},{\"year\":2025,\"err\":-3.1}],\"meanErr\":0.2,\"meanAbs\":1.6},{\"firm\":\"Galaxy\",\"n\":5,\"cycles\":[{\"year\":2004,\"err\":0.7},{\"year\":2007,\"err\":-0.7},{\"year\":2010,\"err\":1.9},{\"year\":2013,\"err\":0.5},{\"year\":2016,\"err\":-0.6}],\"meanErr\":0.4,\"meanAbs\":0.9},{\"firm\":\"ACNielsen\",\"n\":4,\"cycles\":[{\"year\":1998,\"err\":-1},{\"year\":2001,\"err\":-1},{\"year\":2004,\"err\":-1.3},{\"year\":2007,\"err\":4.3}],\"meanErr\":0.3,\"meanAbs\":1.9},{\"firm\":\"Ipsos\",\"n\":4,\"cycles\":[{\"year\":2016,\"err\":0.4},{\"year\":2019,\"err\":2.5},{\"year\":2022,\"err\":0.9},{\"year\":2025,\"err\":-4.2}],\"meanErr\":-0.1,\"meanAbs\":2},{\"firm\":\"ReachTEL\",\"n\":2,\"cycles\":[{\"year\":2013,\"err\":0.5},{\"year\":2016,\"err\":-0.6}],\"meanErr\":0,\"meanAbs\":0.6},{\"firm\":\"Resolve\",\"n\":2,\"cycles\":[{\"year\":2022,\"err\":-0.9},{\"year\":2025,\"err\":-2.2}],\"meanErr\":-1.5,\"meanAbs\":1.6},{\"firm\":\"Quadrant\",\"n\":1,\"cycles\":[{\"year\":1998,\"err\":0}],\"meanErr\":0,\"meanAbs\":0},{\"firm\":\"Saulwick\",\"n\":1,\"cycles\":[{\"year\":1993,\"err\":-0.4}],\"meanErr\":-0.4,\"meanAbs\":0.4},{\"firm\":\"Nielsen\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":-0.5}],\"meanErr\":-0.5,\"meanAbs\":0.5},{\"firm\":\"ARS\",\"n\":1,\"cycles\":[{\"year\":1998,\"err\":-1}],\"meanErr\":-1,\"meanAbs\":1},{\"firm\":\"AMR\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":1.5}],\"meanErr\":1.5,\"meanAbs\":1.5},{\"firm\":\"AGB McNair\",\"n\":1,\"cycles\":[{\"year\":1993,\"err\":-1.9}],\"meanErr\":-1.9,\"meanAbs\":1.9},{\"firm\":\"Spectre\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-2.2}],\"meanErr\":-2.2,\"meanAbs\":2.2},{\"firm\":\"RedBridge\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-2.2}],\"meanErr\":-2.2,\"meanAbs\":2.2},{\"firm\":\"YouGov MRP\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-2.3}],\"meanErr\":-2.3,\"meanAbs\":2.3},{\"firm\":\"YouGov-Galaxy\",\"n\":1,\"cycles\":[{\"year\":2019,\"err\":2.5}],\"meanErr\":2.5,\"meanAbs\":2.5},{\"firm\":\"Lonergan\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":2.7}],\"meanErr\":2.7,\"meanAbs\":2.7},{\"firm\":\"YouGov\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-3}],\"meanErr\":-3,\"meanAbs\":3},{\"firm\":\"DemosAU\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-3.2}],\"meanErr\":-3.2,\"meanAbs\":3.2},{\"firm\":\"Freshwater\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-3.7}],\"meanErr\":-3.7,\"meanAbs\":3.7}],\"firmsImp\":[{\"firm\":\"Roy Morgan\",\"n\":23,\"cycles\":[{\"year\":1946,\"err\":0.7},{\"year\":1949,\"err\":0.3},{\"year\":1951,\"err\":-1.5},{\"year\":1954,\"err\":-1.9},{\"year\":1972,\"err\":0},{\"year\":1974,\"err\":-1.3},{\"year\":1975,\"err\":-2.5},{\"year\":1977,\"err\":3.2},{\"year\":1980,\"err\":1.4},{\"year\":1983,\"err\":0.6},{\"year\":1984,\"err\":3.2},{\"year\":1987,\"err\":2.6},{\"year\":1993,\"err\":-0.5},{\"year\":1996,\"err\":4.6},{\"year\":1998,\"err\":-0.4},{\"year\":2001,\"err\":2.9},{\"year\":2004,\"err\":-0.5},{\"year\":2007,\"err\":0.6},{\"year\":2010,\"err\":2},{\"year\":2013,\"err\":-1.6},{\"year\":2019,\"err\":3.2},{\"year\":2022,\"err\":1},{\"year\":2025,\"err\":-2}],\"meanErr\":0.6,\"meanAbs\":1.7},{\"firm\":\"Newspoll\",\"n\":12,\"cycles\":[{\"year\":1993,\"err\":-0.7},{\"year\":1996,\"err\":1},{\"year\":1998,\"err\":1.7},{\"year\":2001,\"err\":-1.5},{\"year\":2004,\"err\":1.9},{\"year\":2007,\"err\":-0.3},{\"year\":2010,\"err\":0.2},{\"year\":2013,\"err\":-1.3},{\"year\":2016,\"err\":-0.1},{\"year\":2019,\"err\":3.9},{\"year\":2022,\"err\":1.1},{\"year\":2025,\"err\":-2.2}],\"meanErr\":0.3,\"meanAbs\":1.3},{\"firm\":\"Essential\",\"n\":6,\"cycles\":[{\"year\":2010,\"err\":0.1},{\"year\":2013,\"err\":1.5},{\"year\":2016,\"err\":0.2},{\"year\":2019,\"err\":3.3},{\"year\":2022,\"err\":-0.5},{\"year\":2025,\"err\":-3}],\"meanErr\":0.3,\"meanAbs\":1.4},{\"firm\":\"Galaxy\",\"n\":5,\"cycles\":[{\"year\":2004,\"err\":1.2},{\"year\":2007,\"err\":-0.4},{\"year\":2010,\"err\":2.3},{\"year\":2013,\"err\":0.3},{\"year\":2016,\"err\":0}],\"meanErr\":0.7,\"meanAbs\":0.8},{\"firm\":\"ACNielsen\",\"n\":4,\"cycles\":[{\"year\":1998,\"err\":-1.8},{\"year\":2001,\"err\":-1},{\"year\":2004,\"err\":-1.2},{\"year\":2007,\"err\":3.6}],\"meanErr\":-0.1,\"meanAbs\":1.9},{\"firm\":\"Ipsos\",\"n\":4,\"cycles\":[{\"year\":2016,\"err\":0.9},{\"year\":2019,\"err\":2.7},{\"year\":2022,\"err\":1.5},{\"year\":2025,\"err\":-4.5}],\"meanErr\":0.1,\"meanAbs\":2.4},{\"firm\":\"ReachTEL\",\"n\":2,\"cycles\":[{\"year\":2013,\"err\":0.6},{\"year\":2016,\"err\":-0.4}],\"meanErr\":0.1,\"meanAbs\":0.5},{\"firm\":\"Resolve\",\"n\":2,\"cycles\":[{\"year\":2022,\"err\":-0.7},{\"year\":2025,\"err\":-3.2}],\"meanErr\":-1.9,\"meanAbs\":2},{\"firm\":\"AMR\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":0.5}],\"meanErr\":0.5,\"meanAbs\":0.5},{\"firm\":\"Nielsen\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":-0.6}],\"meanErr\":-0.6,\"meanAbs\":0.6},{\"firm\":\"Saulwick\",\"n\":1,\"cycles\":[{\"year\":1993,\"err\":0.7}],\"meanErr\":0.7,\"meanAbs\":0.7},{\"firm\":\"ARS\",\"n\":1,\"cycles\":[{\"year\":1998,\"err\":-1.1}],\"meanErr\":-1.1,\"meanAbs\":1.1},{\"firm\":\"YouGov\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-1.3}],\"meanErr\":-1.3,\"meanAbs\":1.3},{\"firm\":\"Quadrant\",\"n\":1,\"cycles\":[{\"year\":1998,\"err\":1.7}],\"meanErr\":1.7,\"meanAbs\":1.7},{\"firm\":\"YouGov MRP\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-1.9}],\"meanErr\":-1.9,\"meanAbs\":1.9},{\"firm\":\"RedBridge\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-2}],\"meanErr\":-2,\"meanAbs\":2},{\"firm\":\"AGB McNair\",\"n\":1,\"cycles\":[{\"year\":1993,\"err\":-2.9}],\"meanErr\":-2.9,\"meanAbs\":2.9},{\"firm\":\"Spectre\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-2.9}],\"meanErr\":-2.9,\"meanAbs\":2.9},{\"firm\":\"DemosAU\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-3.2}],\"meanErr\":-3.2,\"meanAbs\":3.2},{\"firm\":\"YouGov-Galaxy\",\"n\":1,\"cycles\":[{\"year\":2019,\"err\":3.4}],\"meanErr\":3.4,\"meanAbs\":3.4},{\"firm\":\"Lonergan\",\"n\":1,\"cycles\":[{\"year\":2013,\"err\":3.8}],\"meanErr\":3.8,\"meanAbs\":3.8},{\"firm\":\"Freshwater\",\"n\":1,\"cycles\":[{\"year\":2025,\"err\":-4}],\"meanErr\":-4,\"meanAbs\":4}],\"meanAbs\":1.4,\"meanAbsImp\":1.3,\"worstCycle\":{\"year\":1977,\"eDate\":\"1977-12-10\",\"result\":45.4,\"mean\":48.6,\"err\":3.2,\"absErr\":3.2,\"houses\":[{\"firm\":\"Roy Morgan\",\"date\":\"1977-11-27\",\"alp2pp\":48.6,\"err\":3.2,\"alp2ppImp\":48.6,\"errImp\":3.2}],\"n\":1,\"sameSide\":false,\"worst\":3.2,\"meanImp\":48.6,\"errImp\":3.2,\"absErrImp\":3.2,\"sameSideImp\":false,\"worstImp\":3.2}}");
@@ -4618,19 +4680,19 @@ window.AUSPOL = function () {
     "bt": {
       "points": [{
         "x": 2025.4583333333333,
-        "y": 56.95384615384615
+        "y": 56.97692307692308
       }, {
         "x": 2025.5416666666667,
         "y": 56.650000000000006
       }, {
         "x": 2025.625,
-        "y": 56.287499999999994
+        "y": 56.275
       }, {
         "x": 2025.7083333333333,
         "y": 55.95
       }, {
         "x": 2025.7916666666667,
-        "y": 55.6
+        "y": 55.5375
       }, {
         "x": 2025.875,
         "y": 55.1
@@ -4642,19 +4704,19 @@ window.AUSPOL = function () {
         "y": 54.2
       }, {
         "x": 2026.125,
-        "y": 53.9
+        "y": 54
       }, {
         "x": 2026.2083333333333,
         "y": 53.56666666666667
       }, {
         "x": 2026.2916666666667,
-        "y": 53.2
+        "y": 53.1
       }, {
         "x": 2026.375,
         "y": 52.8
       }, {
         "x": 2026.4583333333333,
-        "y": 52.849999999999994
+        "y": 52.9
       }, {
         "x": 2026.5416666666667,
         "y": 52.7
@@ -4668,8 +4730,8 @@ window.AUSPOL = function () {
         "x": 2026.7916666666667,
         "y": 51.72222222222222
       }, {
-        "x": 2026.8163242009134,
-        "y": 51.7
+        "x": 2026.8272831050228,
+        "y": 51.5
       }],
       "feed": "www.pollbludger.net/fed2028/bludgertrack"
     },
@@ -5342,6 +5404,7 @@ window.AUSPOL = function () {
     demoTrend,
     demoStateElection,
     demoLocElection,
+    demoAes,
     demoGroups,
     issues,
     accuracy,

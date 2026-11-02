@@ -200,7 +200,9 @@ function straightPath(pts, sx, sy) {
  *            window can only describe one of them. `wipe` is how much of the line has been
  *            ERASED from the left, 0..1 – a line that has nowhere to travel to
  *            when the chart changes question is rubbed out rather than dimmed
- *  scatter: [{ x, y, color, meta, shape?, label?, sub? }]  shape is "triangle" or
+ *  scatter: [{ x, y, color, meta, shape?, size?, label?, sub? }]  size scales
+ *           the resting dot (default 1: a lone reference reading among the
+ *           cloud, the Who-votes AES points, takes 1.6). shape is "triangle" or
  *           "diamond"; anything else (or absent) is a circle. Only reach for
  *           one when two clouds on the same chart share a colour. `sub`
  *           replaces the tooltip's default "n = …" line (the primary-vote
@@ -1256,7 +1258,7 @@ function TrendChart(props) {
   const RING_R = PX(11);
   const dotEls = (arr, live) => arr.map((d, i) => {
     if (rd && live && dot === d) return null;
-    const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R;
+    const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R * (d.size || 1);
     /* no per-dot pointer listeners: both inputs pick from the svg root, so
        nothing here depends on a browser firing enter/leave on an SVG child */
     /* `hollow`: an open ring on the chart's ground rather than a disc, for

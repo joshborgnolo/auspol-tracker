@@ -4280,6 +4280,63 @@ function RdDemographics({
         y: leN
       }, allSeries.points[0]]
     }] : []) : [];
+    const ae = D.demoAes && D.demoAes.sets && D.demoAes.sets[c.st.id];
+    const aeOf = g => ae && ae.groups[g.label] && ae.groups[g.label][party] || null;
+    const aeOn = !!ae && !pm && !leOn && c.allPts.length && D.demoAes.x < c.allPts[0].x && rowsOf.some(r => aeOf(r.l.g)) && (xDom[0] <= D.demoAes.x + 1e-6 || rangeId === "all");
+    const aeX = aeOn ? D.demoAes.x : null;
+    const aeSub = "Vote at the May 2025 election, post-election survey, n = " + (D.demoAes ? D.demoAes.n.toLocaleString() : "") + (ae && ae.read ? ", read off the report’s chart" : "") + ", not pooled";
+    const aeRows = aeOn ? rowsOf.filter(r => aeOf(r.l.g)) : [];
+    const aePts = aeRows.map(r => ({
+      x: aeX,
+      y: aeOf(r.l.g)[1],
+      gv: aeOf(r.l.g)[0],
+      color: colorOf(r),
+      shape: "diamond",
+      hollow: true,
+      size: 1.6,
+      label: r.l.g.label,
+      meta: {
+        pollster: "Australian Election Study 2025"
+      },
+      sub: aeSub
+    }));
+    const aeN = aeOn ? D.demoAes.elec[party] : null;
+    const aeLeads = aeOn ? aeRows.filter(r => r.rows.length).map(r => ({
+      id: "ae-" + r.l.g.label,
+      label: r.l.g.label,
+      color: colorOf(r),
+      dash: RD_ELECTION_LEAD,
+      rdWidth: 2.2,
+      endCap: false,
+      clipX: r.clip,
+      points: [{
+        x: aeX,
+        y: aeOf(r.l.g)[1],
+        gv: aeOf(r.l.g)[0]
+      }, {
+        x: r.rows[0].x,
+        y: r.rows[0].y
+      }]
+    })).concat(allSeries.points.length ? [{
+      id: "ae-all-" + c.st.id,
+      label: "All voters",
+      color: "var(--ink)",
+      dash: RD_ELECTION_LEAD,
+      dashed: true,
+      rdWidth: 1.5,
+      endCap: false,
+      points: [{
+        x: aeX,
+        y: aeN
+      }, allSeries.points[0]]
+    }] : []) : [];
+    const xDomA = aeOn && aeX < xDomL[0] ? [aeX - 0.05, xDomL[1]] : xDomL;
+    const yDomA = aePts.length ? [yDom[0], Math.max(yDom[1], Math.ceil(Math.max(...aePts.map(p => p.y)) / 10) * 10)] : yDom;
+    const lead0 = leOn || aeOn;
+    const ciLead = i => i === 0 ? [{
+      label: "",
+      value: leOn ? "The election result" : "Groups: Australian Election Study 2025, as printed; all voters: the result"
+    }] : ciLoc(i - 1);
     return (React.createElement("div", {
         className: "card rd-card rd-wv-chart",
         key: c.st.id,
@@ -4302,43 +4359,40 @@ function RdDemographics({
           t: 12,
           b: 30
         },
-        xDomain: xDomL,
-        yDomain: yDom,
-        yTicks: rdYTicks(0, yMax, 10),
+        xDomain: xDomA,
+        yDomain: yDomA,
+        yTicks: rdYTicks(0, yDomA[1], 10),
         yTickFmt: v => v === 0 ? "0" : v + "%",
-        xTicks: leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
+        xTicks: leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : aeOn ? rdElectionTicks(xDomA[0], c.x1, narrow || c.span < 0.8, aeX) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
         baseline: true,
         driven: !!A,
-        series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))].concat(leLeads),
+        series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))].concat(leLeads, aeLeads),
         areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
-        spine: leN != null ? [{
+        spine: (leN != null ? [{
           x: le.x,
           y: leN
-        }].concat(c.allPts.map(d => ({
+        }] : aeN != null ? [{
+          x: aeX,
+          y: aeN
+        }] : []).concat(c.allPts.map(d => ({
           x: d.x,
           y: d.y
-        }))) : c.allPts.map(d => ({
-          x: d.x,
-          y: d.y
-        })),
+        }))),
         marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
           x: le.x,
           y: leY(r.l.g),
           color: colorOf(r)
         })) : [],
         ringAtX: leOn ? le.x : null,
-        scatter: cross ? cross.scatter : c.dots,
+        scatter: aePts.length ? (cross ? cross.scatter : c.dots).concat(aePts) : cross ? cross.scatter : c.dots,
         scatterOut: cross ? cross.scatterOut : [],
         scatterMove: cross ? cross.scatterMove : [],
         fade: A ? t : 1,
         pollFacet: "demographics",
         pollSplit: tab.id,
-        tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
-        extraRows: leOn ? i => i === 0 ? [{
-          label: "",
-          value: "The election result"
-        }] : ciLoc(i - 1) : ciLoc,
-        fmt: v => v.toFixed(1),
+        tooltipTitle: i => lead0 && i === 0 ? monthLabelFull("2025-05") : c.allPts[lead0 ? i - 1 : i] ? monthLabelFull(c.allPts[lead0 ? i - 1 : i].ym) : "",
+        extraRows: lead0 ? ciLead : ciLoc,
+        fmt: (v, pt) => pt && pt.gv != null ? String(pt.gv) : v.toFixed(1),
         copy: {
           title: rdCap(pVote) + " " + (c.st.label || "By " + tab.label).toLowerCase(),
           sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
@@ -4354,7 +4408,11 @@ function RdDemographics({
             label: "All voters",
             color: "var(--ink)",
             kind: "dashed"
-          }])
+          }]).concat(aePts.length ? [{
+            label: "Australian Election Study 2025",
+            color: pColor,
+            kind: "diamond"
+          }] : [])
         }
       }))
     );
@@ -4489,7 +4547,12 @@ function RdDemographics({
       kind: "dash",
       color: "var(--ink)",
       label: "All voters"
-    }]
+    }].concat(D.demoAes && tab.sets.some(st => D.demoAes.sets[st.id] && Object.values(D.demoAes.sets[st.id].groups).some(g => g[party] != null)) ? [{
+      kind: "diamond",
+      color: "var(--ink-3)",
+      label: "Australian Election Study 2025",
+      href: D.demoAes.src
+    }] : [])
   }), sigSets.length > 0 && React.createElement("details", {
     className: "rd-evdrop rd-tsig"
   }, React.createElement("summary", null, "Trend-significance table"), React.createElement("div", {
