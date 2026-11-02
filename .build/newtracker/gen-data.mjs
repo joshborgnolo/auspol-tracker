@@ -533,10 +533,12 @@ function houseEffectsFor(rows) {
   // devs grouped per firm once (push order preserved = the flat list's
   // filtered order): at() is queried per row by aroundPts/heV across every
   // series and used to re-scan this whole list for its firm each time
+  const evidenceLast = {};
   const devsByFirm = Object.create(null);
   for (const d of devs) {
     evidenceN[d.firm] = (evidenceN[d.firm] || 0) + 1;
     if (evidenceFrom[d.firm] == null || d.mid < evidenceFrom[d.firm]) evidenceFrom[d.firm] = d.mid;
+    if (evidenceLast[d.firm] == null || d.mid > evidenceLast[d.firm]) evidenceLast[d.firm] = d.mid;
     (devsByFirm[d.firm] || (devsByFirm[d.firm] = [])).push(d);
   }
   const at = (firm, t) => {
@@ -557,7 +559,7 @@ function houseEffectsFor(rows) {
   const snapshot = (t) => Object.fromEntries(
     Object.keys(evidenceN).map((f) => [f, { v: r1(at(f, t)), n: evidenceN[f] }])
   );
-  return { at, evidenceN, evidenceFrom, snapshot, estimable: devs.length > 0 };
+  return { at, evidenceN, evidenceFrom, evidenceLast, snapshot, estimable: devs.length > 0 };
 }
 /* Two pollsters asking different questions about one thing – RedBridge's
    and Ipsos's top three issues (§7h) – sit a steady distance apart, set by
@@ -1083,6 +1085,13 @@ const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
    different quantities (Roy Morgan runs +1.6 on its published figure and
    -0.6/-1.7 on the ALP/ON primaries that drive its implied one), so both are
    emitted and the panel names which is which. */
+/* A house leaves the leans panel when its newest measurable poll is ≈3.5
+   months old, and re-enters when it next polls: a lean that stale is
+   history, not a reading of how the house currently runs (the estimate
+   itself already decays toward zero on the HE_HALF clock; this drops the
+   series entirely). The clock is the dataset's newest poll (LATEST_ISO),
+   the same "now" the aggregates read at. */
+const LEAN_STALE_DAYS = 107;
 const houseLean = Object.fromEntries([
   ["imp", synthEffect], ["tpp", houseEffect],
   /* The panel offers the SAME two bases on the other Labor contest. A house's
@@ -1095,11 +1104,13 @@ const houseLean = Object.fromEntries([
   ["onimp", synthOnEffect], ["onpub", altAON.he],
   ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp],
   ["grn", primaryHE.grn], ["oth", primaryHE.oth]]
-  .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
-    firm,
-    MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
-      .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
-  ]))]),
+  .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN)
+    .filter(([firm, n]) => n >= 3 && ddays(Date.parse(LATEST_ISO), he.evidenceLast[firm]) < LEAN_STALE_DAYS)
+    .map(([firm]) => [
+      firm,
+      MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
+        .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
+    ]))]),
 );
 
 /* ---- 3b. each poll's footprint on the aggregates (leave-one-out) ---------
