@@ -2452,6 +2452,26 @@ const directionStateNote = (() => {
   const d = dates[dates.length - 1];
   return d ? { date: d, ...RM_DIR_GROUPS.waves[d].stateExtremes } : null;
 })();
+/* §5t Trust in the federal government – the National mood section's Trust
+   view. Hand-filed in data/trust-government.json: every survey words the
+   question its own way (confidence v trust, four-point v 0–10, "the
+   national government" v "people in government"), so nothing here is
+   pooled or lean-adjusted. ANUpoll (role "line") is the only one asked
+   quarterly and draws the line; its 2024 move from the Life in Australia
+   panel to ORU's opt-in panel is a break the chart keeps visible (`panel`).
+   "dot" series ride as their own readings over that line; "long" series
+   draw the long view, each on its own. Every reading gains its x. */
+const trustGov = (() => {
+  if (JUR) return null; // federal trust only; a state build has no Trust view
+  let src;
+  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "trust-government.json"), "utf8")); }
+  catch { return null; }
+  const series = (src.series || []).map((s) => ({
+    ...s,
+    readings: [...s.readings].sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ ...r, x: mx(r.date) })),
+  }));
+  return series.some((s) => s.role === "line") ? { series } : null;
+})();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;
   // the states bank keys by month; the tip row resolves the wave-END month
@@ -8936,6 +8956,8 @@ window.AUSPOL = (function () {
   const directionStates = ${JSON.stringify(directionStates)};
   const directionGroups = ${JSON.stringify(directionGroups)};
   const directionStateNote = ${JSON.stringify(directionStateNote)};
+  /* §5t: trust in the federal government, hand-filed, never pooled */
+  const trustGov = ${JSON.stringify(trustGov)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
   const directionHouses = ${JSON.stringify(directionHouses)};
   /* name-list for the direction card's caption: the active houses plus any
@@ -9168,7 +9190,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

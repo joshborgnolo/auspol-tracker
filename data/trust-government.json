@@ -1,0 +1,498 @@
+{
+  "_about": "Trust and confidence in the federal government, hand-filed for the National mood section's Trust view (gen-data §5t). Every survey words the question its own way, so the series are never pooled: ANUpoll draws the line (the only one asked quarterly), the rest ride as their own dots or their own lines. Each series names its question, its measure (which answers count) and its source; a reading's `date` is the fieldwork month (YYYY-MM), `field` the printed fieldwork dates where known.",
+  "series": [
+    {
+      "id": "anupoll",
+      "house": "ANUpoll",
+      "question": "How much confidence do you have in the Federal Government in Canberra?",
+      "measure": "A great deal or quite a lot of confidence",
+      "role": "line",
+      "source": "https://polis.cass.anu.edu.au/research/publications/steady-not-recovering-wellbeing-democratic-attitudes-and-interpersonal-trust",
+      "sources": [
+        {
+          "label": "Steady, but not recovering (June 2026 ANUpoll), Figure 7",
+          "url": "https://polis.cass.anu.edu.au/research/publications/steady-not-recovering-wellbeing-democratic-attitudes-and-interpersonal-trust"
+        },
+        {
+          "label": "Holding together, just (March 2026 ANUpoll), Figure 5",
+          "url": "https://polis.cass.anu.edu.au/research/publications"
+        }
+      ],
+      "digitised": "The reports print only their own wave's figure (March 2026 32.0, June 2026 30.9, plus 37.8 before and 43.1 after the May 2025 election); every other wave is read off Figure 7 of the June 2026 report from its 95% whiskers' midpoints, and cross-checked against Figure 5 of the March 2026 report (the two agree within 0.2 on every wave). Read-off values are good to about ±0.3.",
+      "panels": [
+        {
+          "id": "lia",
+          "label": "Life in Australia",
+          "note": "ANU's probability-recruited panel, 20 waves October 2019 to January 2024"
+        },
+        {
+          "id": "acp",
+          "label": "ORU Australian Consumer Panel",
+          "note": "an opt-in online panel run with the Online Research Unit, from October 2024 (the 2024–25 election-period waves were branded EMSS)"
+        }
+      ],
+      "readings": [
+        {
+          "date": "2020-01",
+          "v": 27.2,
+          "ci": 1.9,
+          "panel": "lia"
+        },
+        {
+          "date": "2020-04",
+          "v": 56.6,
+          "ci": 2.3,
+          "panel": "lia"
+        },
+        {
+          "date": "2020-05",
+          "v": 60.5,
+          "ci": 2.3,
+          "panel": "lia"
+        },
+        {
+          "date": "2020-08",
+          "v": 58.2,
+          "ci": 2.4,
+          "panel": "lia"
+        },
+        {
+          "date": "2020-11",
+          "v": 59.9,
+          "ci": 2.4,
+          "panel": "lia"
+        },
+        {
+          "date": "2021-01",
+          "v": 54.2,
+          "ci": 2.1,
+          "panel": "lia"
+        },
+        {
+          "date": "2021-04",
+          "v": 45.4,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2021-08",
+          "v": 40.6,
+          "ci": 2.1,
+          "panel": "lia"
+        },
+        {
+          "date": "2021-10",
+          "v": 41.4,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2022-01",
+          "v": 34.5,
+          "ci": 2.0,
+          "panel": "lia"
+        },
+        {
+          "date": "2022-04",
+          "v": 35.7,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2022-08",
+          "v": 52.8,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2022-10",
+          "v": 51.3,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2023-01",
+          "v": 51.2,
+          "ci": 2.2,
+          "panel": "lia"
+        },
+        {
+          "date": "2023-04",
+          "v": 48.3,
+          "ci": 1.9,
+          "panel": "lia"
+        },
+        {
+          "date": "2023-08",
+          "v": 43.6,
+          "ci": 2.0,
+          "panel": "lia"
+        },
+        {
+          "date": "2023-10",
+          "v": 40.2,
+          "ci": 1.9,
+          "panel": "lia"
+        },
+        {
+          "date": "2024-01",
+          "v": 38.5,
+          "ci": 1.9,
+          "panel": "lia"
+        },
+        {
+          "date": "2024-10",
+          "v": 37.8,
+          "ci": 1.9,
+          "panel": "acp"
+        },
+        {
+          "date": "2025-01",
+          "v": 33.7,
+          "ci": 1.8,
+          "panel": "acp"
+        },
+        {
+          "date": "2025-03",
+          "v": 37.8,
+          "ci": 1.9,
+          "panel": "acp",
+          "printed": true
+        },
+        {
+          "date": "2025-05",
+          "v": 43.1,
+          "ci": 2.1,
+          "panel": "acp",
+          "printed": true
+        },
+        {
+          "date": "2025-09",
+          "v": 37.8,
+          "ci": 2.3,
+          "panel": "acp"
+        },
+        {
+          "date": "2025-10",
+          "v": 37.8,
+          "ci": 2.3,
+          "panel": "acp"
+        },
+        {
+          "date": "2025-12",
+          "v": 35.2,
+          "ci": 2.2,
+          "panel": "acp"
+        },
+        {
+          "date": "2026-03",
+          "v": 32.0,
+          "ci": 1.8,
+          "panel": "acp",
+          "printed": true,
+          "field": "11–26 March 2026",
+          "n": 3662
+        },
+        {
+          "date": "2026-06",
+          "v": 30.9,
+          "ci": 2.0,
+          "panel": "acp",
+          "printed": true,
+          "field": "18 June – 6 July 2026",
+          "n": 3543
+        }
+      ]
+    },
+    {
+      "id": "essential",
+      "house": "Essential",
+      "question": "How much trust do you have in the national government?",
+      "measure": "A lot or quite a bit of trust",
+      "role": "dot",
+      "source": "https://essentialreport.com.au/reports/25-february-2026",
+      "readings": [
+        {
+          "date": "2024-10",
+          "v": 37,
+          "field": "October 2024",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2026-02",
+          "v": 43,
+          "field": "18–23 February 2026",
+          "n": 1002,
+          "url": "https://essentialreport.com.au/reports/25-february-2026"
+        }
+      ]
+    },
+    {
+      "id": "mckinnon",
+      "house": "McKinnon Index",
+      "question": "On a scale of 0–10, how much do you trust the Federal Government?",
+      "measure": "6 or more out of 10",
+      "role": "dot",
+      "source": "https://a-ap.storyblok.com/f/3001038/x/241a2c3f06/mckinnon-index-2026-key-findings-report.pdf",
+      "note": "Fieldwork by Roy Morgan, online. The 2025 figure is the 2026 report's 33.1 plus its printed 4.5-point fall; the report does not give the 2025 wave's fieldwork dates, so it is placed at July 2025 like the 2026 wave. The report underlines its statistically significant year-on-year changes; the Federal Government's 4.5-point fall is underlined (sigChange).",
+      "readings": [
+        {
+          "date": "2025-07",
+          "v": 37.6,
+          "approxDate": true
+        },
+        {
+          "date": "2026-07",
+          "v": 33.1,
+          "field": "19 June – 21 July 2026",
+          "n": 4273,
+          "sigChange": true
+        }
+      ]
+    },
+    {
+      "id": "scanlon",
+      "house": "Scanlon Institute",
+      "question": "How often do you think the government in Canberra can be trusted to do the right thing for the Australian people?",
+      "measure": "Almost always or most of the time",
+      "role": "long",
+      "source": "https://scanloninstitute.org.au/wp-content/uploads/SI0001_MappingSocialCohesion_2025_v6.pdf",
+      "note": "Mapping Social Cohesion, Figure 8. A telephone survey to 2018, then ANU's Life in Australia panel (2018 was run both ways). Fieldwork is mid-year; 2020 was asked in July and November.",
+      "modes": [
+        {
+          "id": "tel",
+          "label": "Telephone"
+        },
+        {
+          "id": "lia",
+          "label": "Life in Australia"
+        }
+      ],
+      "readings": [
+        {
+          "date": "2007-07",
+          "v": 39,
+          "mode": "tel"
+        },
+        {
+          "date": "2009-07",
+          "v": 48,
+          "mode": "tel"
+        },
+        {
+          "date": "2010-07",
+          "v": 31,
+          "mode": "tel"
+        },
+        {
+          "date": "2011-07",
+          "v": 30,
+          "mode": "tel"
+        },
+        {
+          "date": "2012-07",
+          "v": 26,
+          "mode": "tel"
+        },
+        {
+          "date": "2013-07",
+          "v": 27,
+          "mode": "tel"
+        },
+        {
+          "date": "2014-07",
+          "v": 30,
+          "mode": "tel"
+        },
+        {
+          "date": "2015-07",
+          "v": 30,
+          "mode": "tel"
+        },
+        {
+          "date": "2016-07",
+          "v": 29,
+          "mode": "tel"
+        },
+        {
+          "date": "2017-07",
+          "v": 28,
+          "mode": "tel"
+        },
+        {
+          "date": "2018-07",
+          "v": 30,
+          "mode": "tel"
+        },
+        {
+          "date": "2018-07",
+          "v": 28,
+          "mode": "lia"
+        },
+        {
+          "date": "2019-07",
+          "v": 36,
+          "mode": "lia"
+        },
+        {
+          "date": "2020-07",
+          "v": 54,
+          "mode": "lia"
+        },
+        {
+          "date": "2020-11",
+          "v": 56,
+          "mode": "lia"
+        },
+        {
+          "date": "2021-07",
+          "v": 44,
+          "mode": "lia"
+        },
+        {
+          "date": "2022-07",
+          "v": 41,
+          "mode": "lia"
+        },
+        {
+          "date": "2023-07",
+          "v": 36,
+          "mode": "lia"
+        },
+        {
+          "date": "2024-07",
+          "v": 33,
+          "mode": "lia"
+        },
+        {
+          "date": "2025-07",
+          "v": 37,
+          "mode": "lia"
+        }
+      ]
+    },
+    {
+      "id": "aes",
+      "house": "Australian Election Study",
+      "question": "In general, do you feel that the people in government are too often interested in looking after themselves, or do you feel that they can be trusted to do the right thing nearly all the time?",
+      "measure": "Usually or sometimes can be trusted",
+      "role": "long",
+      "source": "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
+      "note": "Figure 5.1 of the 2025 report; asked after each election (the series as printed skips 1987 and 1990). Dated to the month after polling day.",
+      "readings": [
+        {
+          "date": "1969-11",
+          "v": 51
+        },
+        {
+          "date": "1979-07",
+          "v": 29,
+          "approxDate": true
+        },
+        {
+          "date": "1993-04",
+          "v": 34
+        },
+        {
+          "date": "1996-04",
+          "v": 48
+        },
+        {
+          "date": "1998-11",
+          "v": 34
+        },
+        {
+          "date": "2001-12",
+          "v": 32
+        },
+        {
+          "date": "2004-11",
+          "v": 40
+        },
+        {
+          "date": "2007-12",
+          "v": 43
+        },
+        {
+          "date": "2010-09",
+          "v": 37
+        },
+        {
+          "date": "2013-10",
+          "v": 34
+        },
+        {
+          "date": "2016-08",
+          "v": 26
+        },
+        {
+          "date": "2019-06",
+          "v": 25
+        },
+        {
+          "date": "2022-06",
+          "v": 30
+        },
+        {
+          "date": "2025-06",
+          "v": 32
+        }
+      ]
+    },
+    {
+      "id": "oecd-au",
+      "house": "OECD Trust Survey",
+      "question": "On a scale of 0 to 10, how much do you trust the national government?",
+      "measure": "6 or more out of 10 (high or moderately high trust)",
+      "role": "long",
+      "source": "https://www.oecd.org/en/publications/oecd-survey-on-drivers-of-trust-in-public-institutions-2026-results_c88c8869-en/australia_2996fc72-en.html",
+      "note": "Australia's figures, as the APSC reports them (apsc.gov.au/node/3492). 2021 fieldwork 26 November – 15 December 2021 (n 2,014); 2023 from 25 October 2023 (n 2,020); the 2025 wave's dates are not yet read, placed at November 2025.",
+      "readings": [
+        {
+          "date": "2021-12",
+          "v": 38,
+          "field": "26 November – 15 December 2021",
+          "n": 2014
+        },
+        {
+          "date": "2023-11",
+          "v": 46,
+          "field": "from 25 October 2023",
+          "n": 2020
+        },
+        {
+          "date": "2025-11",
+          "v": 51,
+          "approxDate": true
+        }
+      ]
+    },
+    {
+      "id": "oecd-avg",
+      "house": "OECD average",
+      "question": "On a scale of 0 to 10, how much do you trust the national government?",
+      "measure": "6 or more out of 10, averaged across the countries surveyed",
+      "role": "long",
+      "source": "https://www.oecd.org/en/publications/oecd-survey-on-drivers-of-trust-in-public-institutions-2026-results_c88c8869-en/australia_2996fc72-en.html",
+      "note": "The average covers whoever took part that round – 22 countries in 2021, 30 in 2023, 38 (33 members, 5 accession) in 2025 – so part of its movement is who was counted. 2021: 41.4 (Building Trust to Reinforce Democracy, 2022); 2023: 39; 2025: 40.",
+      "readings": [
+        {
+          "date": "2021-12",
+          "v": 41.4,
+          "countries": 22
+        },
+        {
+          "date": "2023-11",
+          "v": 39,
+          "countries": 30
+        },
+        {
+          "date": "2025-11",
+          "v": 40,
+          "countries": 38,
+          "approxDate": true
+        }
+      ]
+    }
+  ]
+}

@@ -8224,7 +8224,7 @@ function infoTerms(D) {
           {" "}{xref("approval", "favourability", "approval")} and favourability are never averaged
           together.</>) },
       ] },
-    { id: "s-direction", title: "National direction", nav: "Direction",
+    { id: "s-direction", title: "National mood", nav: "Mood",
       lead: { id: "direction", body: (
         <>Whether voters think the country is heading in the right direction or is on the wrong
         track. Only {(D.directionHouses || []).length} pollsters ask it, with slightly different
@@ -8236,7 +8236,29 @@ function infoTerms(D) {
         figures at the top come from the last three weeks of polls. With so few pollsters asking,
         some months rest on a single poll, and their
         {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>) },
-      entries: [] },
+      entries: [
+        { id: "trust-government", term: "Trust in government", body: (
+          <>The National mood section’s second view: how far Australians trust the federal
+          government. No pollster asks it every month, and every survey that asks words it its own
+          way, so unlike direction it is never averaged and no pollster’s lean is estimated.
+          <span className="info-p"><b>Since 2020.</b> The line is ANUpoll’s share with “a great deal”
+          or “quite a lot” of confidence in the Federal Government in Canberra, asked about every
+          three months since January 2020, each wave shaded with its 95% interval. ANU’s reports
+          print only their latest wave’s figure, so earlier waves are read off their charts, to
+          within about 0.3 of a point. The line breaks in 2024, when ANUpoll moved from ANU’s
+          Life in Australia panel, recruited at random, to an opt-in online panel. The open dots
+          are other surveys at their own levels: Essential (“a lot” or “quite a bit” of trust in the
+          national government), the McKinnon Index and the OECD (6 or more out of 10), Scanlon and
+          the Australian Election Study.</span>
+          <span className="info-p"><b>The long view.</b> The Australian Election Study has asked
+          after each election since 1969 whether people in government can be trusted to do the
+          right thing; Scanlon’s Mapping Social Cohesion has asked yearly since 2007 how often the
+          government in Canberra can be trusted to, by telephone until 2018 and on Life in
+          Australia since. The OECD’s Trust Survey (2021, 2023, 2025) is the only one with an
+          international average, so that average is drawn beside the OECD’s Australian figure
+          and nowhere else: on the OECD’s 0–10 question Australia sits above it, while other
+          surveys’ questions put Australia’s level lower – a matter of wording, not rank.</span></>) },
+      ] },
     { id: "s-who", title: "Who votes for whom", nav: "Who votes",
       lead: { id: "vote-by-group", body: (
         <>How each group says it will vote, from the tables pollsters publish with their polls:
