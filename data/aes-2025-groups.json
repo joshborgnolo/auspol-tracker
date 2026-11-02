@@ -1,0 +1,171 @@
+{
+ "_about": "Australian Election Study 2025 (ADA 100279, general release): House first preference by group, weighted (GREG `weight`), percent of the group's formal first preferences; n = unweighted respondents. Built by .build/extract-aes-2025.py – see its header for the coding.",
+ "source": "https://dataverse.ada.edu.au/dataset.xhtml?persistentId=doi:10.26193/A9VEXA",
+ "respondents": 2070,
+ "all": {
+  "n": 1957,
+  "alp": 33.5,
+  "lnp": 32.1,
+  "onp": 6.5,
+  "grn": 12.4,
+  "oth": 15.5
+ },
+ "sets": {
+  "gender": {
+   "Men": {
+    "n": 940,
+    "alp": 30.9,
+    "lnp": 36.3,
+    "onp": 7.6,
+    "grn": 7.5,
+    "oth": 17.6
+   },
+   "Women": {
+    "n": 1004,
+    "alp": 36.2,
+    "lnp": 28.1,
+    "onp": 5.5,
+    "grn": 17.4,
+    "oth": 12.9
+   }
+  },
+  "age": {
+   "18–34": {
+    "n": 366,
+    "alp": 36.0,
+    "lnp": 26.4,
+    "onp": 1.3,
+    "grn": 26.1,
+    "oth": 10.3
+   },
+   "35–54": {
+    "n": 470,
+    "alp": 34.3,
+    "lnp": 27.3,
+    "onp": 6.6,
+    "grn": 12.9,
+    "oth": 19.0
+   },
+   "55+": {
+    "n": 1079,
+    "alp": 31.2,
+    "lnp": 41.8,
+    "onp": 8.3,
+    "grn": 3.9,
+    "oth": 14.8
+   }
+  },
+  "generation": {
+   "Gen Z": {
+    "n": 231,
+    "alp": 40.7,
+    "lnp": 29.4,
+    "onp": 0.0,
+    "grn": 26.7,
+    "oth": 3.2
+   },
+   "Millennials": {
+    "n": 363,
+    "alp": 34.9,
+    "lnp": 22.8,
+    "onp": 3.7,
+    "grn": 20.2,
+    "oth": 18.4
+   },
+   "Gen X": {
+    "n": 421,
+    "alp": 31.9,
+    "lnp": 31.7,
+    "onp": 9.0,
+    "grn": 6.8,
+    "oth": 20.5
+   },
+   "Boomers": {
+    "n": 725,
+    "alp": 30.2,
+    "lnp": 44.2,
+    "onp": 8.2,
+    "grn": 4.2,
+    "oth": 13.2
+   }
+  },
+  "education": {
+   "Year 12 or less": {
+    "n": 358,
+    "alp": 32.9,
+    "lnp": 33.7,
+    "onp": 6.4,
+    "grn": 17.3,
+    "oth": 9.8
+   },
+   "TAFE or trade": {
+    "n": 661,
+    "alp": 32.4,
+    "lnp": 34.8,
+    "onp": 6.6,
+    "grn": 9.8,
+    "oth": 16.3
+   },
+   "University": {
+    "n": 914,
+    "alp": 35.7,
+    "lnp": 26.8,
+    "onp": 5.9,
+    "grn": 13.1,
+    "oth": 18.6
+   }
+  },
+  "housing": {
+   "Own outright": {
+    "n": 924,
+    "alp": 28.3,
+    "lnp": 39.7,
+    "onp": 8.7,
+    "grn": 6.2,
+    "oth": 17.2
+   },
+   "Mortgage": {
+    "n": 602,
+    "alp": 36.2,
+    "lnp": 28.8,
+    "onp": 6.1,
+    "grn": 13.9,
+    "oth": 15.0
+   },
+   "Renting": {
+    "n": 277,
+    "alp": 36.8,
+    "lnp": 26.3,
+    "onp": 3.7,
+    "grn": 15.7,
+    "oth": 17.5
+   }
+  },
+  "working": {
+   "Full time": {
+    "n": 628,
+    "alp": 33.8,
+    "lnp": 31.1,
+    "onp": 5.9,
+    "grn": 12.2,
+    "oth": 16.9
+   },
+   "Part time": {
+    "n": 361,
+    "alp": 33.8,
+    "lnp": 28.2,
+    "onp": 3.4,
+    "grn": 18.6,
+    "oth": 16.0
+   },
+   "Retired": {
+    "n": 670,
+    "alp": 31.1,
+    "lnp": 40.5,
+    "onp": 11.2,
+    "grn": 3.4,
+    "oth": 13.8
+   }
+  }
+ }
+}

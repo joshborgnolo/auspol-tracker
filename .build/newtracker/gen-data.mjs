@@ -5603,69 +5603,47 @@ const DEMO_LOC_ELECTION = {
 };
 
 /* The Australian Election Study 2025 (ANU/Griffith; post-election
-   self-completion survey, n = 2,070, weighted to the electorate): each
-   group's reported House first-preference vote at the 3 May 2025 election.
-   Source: "The 2025 Australian Federal Election: Results from the
-   Australian Election Study" (Cameron, McAllister, Jackman, Sheppard, Nov
-   2025), australianelectionstudy.org.
-     Gender: Figure 4.3's printed labels (Women 28/36/18/18, Men 37/31/8/25
-       for Coalition/Labor/Greens/Other).
-     Generations: Figure 4.2 prints no labels, so its 2025 points are read off
-       the PDF's vector paths, the y scale least-squares fitted to the five
-       shares the report's text states (Millennials Labor 37, Coalition 21;
-       Gen Z Labor 41, Coalition 28, Greens 27: residuals ≤ 0.3, and the scale
-       matches the axis ticks). Readings rounded to whole points, as the
-       report prints; good to about ±0.5. The Boomers point is the AES's
-       Boomers (1946–64) alone; its Silent generation (1928–45, read 30/46/3)
-       joins no group, as YouGov's doesn't, but counts in the set's
-       all-voters figure.
-   The AES files One Nation inside "Other", so only Labor, the Coalition and
-   the Greens get points; One Nation and Others & independents get none.
+   self-completion survey, 2,070 respondents, GREG-weighted to the
+   electorate): each group's House first preference at the 3 May 2025
+   election, computed from the AES's own respondent file (ADA 100279,
+   general release) by .build/extract-aes-2025.py into
+   data/aes-2025-groups.json – weighted, out of formal first preferences,
+   One Nation coded apart. The respondent file is the ADA's and is not
+   committed; its header has the coding. Shares computed this way sit within
+   about 1 point of the AES report's printed gender figures (Women
+   36/28/17, report 36/28/18) and 0.5–2.5 points of a few of its generation
+   figures (Millennials Labor 34.9, report 37) – the report's own vote
+   variable and adjustment aren't published with the general file.
+   Charts with a group the AES measures the same way get it: gender, age,
+   generation, education, housing, work status. State and location keep the
+   AEC's counted result instead.
 
    Election-time marks, as the By-state and By-location election rings are
    (user ruling 2026-11-02: plotted like a poll, kept out of the pools).
    Each point is placed as a poll dot is: the group's gap from the AES's own
-   all-voters figure, added to the 2025 result (DEMO_STATE_ELECTION's Nat
-   row), so the survey's own lean drops out and the diamond sits on the
-   lines' scale; the tip quotes the printed share. A set's all-voters figure
-   is its groups weighted by their share of the electorate (gender by
-   SEX_SHARE; generations by the report's 2025 electorate shares – Silent 7,
-   Boomers 25, Gen X 24, Millennials 27, Gen Z 15 – taken to 100), so each
-   set's gaps sum to zero as a poll's do. Never in a pooled figure, a monthly
-   line or §7gb's trend test: one recalled-vote survey at the head of a
-   series would steer the slope tests by its method, not by any change. */
+   all-respondents figure, added to the 2025 result (DEMO_STATE_ELECTION's
+   Nat row), so the survey's own lean drops out and the diamond sits on the
+   lines' scale; the tip quotes the AES's share and the respondents behind
+   it. Never in a pooled figure, a monthly line or §7gb's trend test: one
+   recalled-vote survey at the head of a series would steer the slope tests
+   by its method, not by any change. */
 const DEMO_AES = (() => {
+  if (JUR) return null;
+  let src;
+  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "aes-2025-groups.json"), "utf8")); }
+  catch { return null; }
   const nat = DEMO_STATE_ELECTION.groups.Nat;
   const elec = Object.fromEntries(DEMO_KEYS.map((k, i) => [k, nat[i]]));
-  const sets = {
-    gender: { read: false, weights: SEX_SHARE, groups: {
-      "Women": { alp: 36, lnp: 28, grn: 18 },
-      "Men": { alp: 31, lnp: 37, grn: 8 },
-    } },
-    generation: { read: true, weights: { Silent: 7, Boomers: 25, "Gen X": 24, Millennials: 27, "Gen Z": 15 },
-      extra: { Silent: { alp: 30, lnp: 46, grn: 3 } }, groups: {
-        "Gen Z": { alp: 41, lnp: 28, grn: 27 },
-        "Millennials": { alp: 37, lnp: 21, grn: 19 },
-        "Gen X": { alp: 35, lnp: 31, grn: 7 },
-        "Boomers": { alp: 30, lnp: 44, grn: 4 },
-      } },
-  };
-  const P = ["alp", "lnp", "grn"];
-  const out = {};
-  for (const [id, s] of Object.entries(sets)) {
-    const all = { ...s.groups, ...(s.extra || {}) };
-    const W = Object.keys(all).reduce((a, g) => a + s.weights[g], 0);
-    const tot = Object.fromEntries(P.map((k) => [k, Object.keys(all).reduce((a, g) => a + s.weights[g] * all[g][k], 0) / W]));
-    out[id] = { read: s.read, tot: Object.fromEntries(P.map((k) => [k, r1(tot[k])])),
-      // per group and party: [printed share, plotted y = the result + the gap from the AES's own figure]
-      groups: Object.fromEntries(Object.entries(s.groups).map(([g, v]) => [g,
-        Object.fromEntries(P.map((k) => [k, [v[k], r1(elec[k] + (v[k] - tot[k]))]]))])) };
+  const all = src.all;
+  const sets = {};
+  for (const [id, groups] of Object.entries(src.sets)) {
+    sets[id] = { groups: Object.fromEntries(Object.entries(groups).map(([g, v]) => [g, {
+      n: v.n,
+      // per party: [the AES's share, plotted y = the result + the gap from the AES's own figure]
+      ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [v[k], r1(Math.max(0, elec[k] + (v[k] - all[k])))]])),
+    }])) };
   }
-  return {
-    x: DEMO_STATE_ELECTION.x, n: 2070,
-    src: "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
-    elec: Object.fromEntries(P.map((k) => [k, elec[k]])), sets: out,
-  };
+  return { x: DEMO_STATE_ELECTION.x, respondents: src.respondents, src: src.source, elec, sets };
 })();
 
 /* One figure per group and party, built as the headline is. Each poll says
@@ -8902,8 +8880,8 @@ window.AUSPOL = (function () {
   /* The By-location chart's 2025 election marks (§7g), same shape: one ring
      per classification line at May 2025. */
   const demoLocElection = ${JSON.stringify(DEMO_LOC_ELECTION)};
-  /* The Australian Election Study 2025's vote by gender and generation
-     (§7g DEMO_AES): plain reference points on those charts, never pooled. */
+  /* The Australian Election Study 2025's vote by group (§7g DEMO_AES,
+     from its respondent file): election-time marks, never pooled. */
   const demoAes = ${JSON.stringify(DEMO_AES)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by

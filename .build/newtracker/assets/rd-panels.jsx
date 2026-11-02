@@ -3495,26 +3495,24 @@ function RdDemographics({ rangeId = "all" }) {
         ? [{ id: "lead-all-" + c.st.id, label: "All voters", color: "var(--ink)", dash: RD_ELECTION_LEAD, dashed: true, rdWidth: 1.5,
              endCap: false, points: [{ x: le.x, y: leN }, allSeries.points[0]] }]
         : []) : [];
-    /* The Australian Election Study 2025 (gen-data DEMO_AES): each gender's
-       and generation's reported vote at the May 2025 election, drawn as the
-       location rings are - an election-time mark, never pooled (user ruling
-       2026-11-02). A hollow diamond per group in its line's colour, placed
-       as a poll dot is (the result plus the group's gap from the AES's own
-       all-voters figure; the tip quotes the printed share), with the rings'
-       dotted lead-in to the line's first month and the all-voters line led
-       back to the result. Labor, the Coalition and the Greens only (the AES
-       files One Nation inside Other). The window widens to hold them, and
-       nothing is drawn mid-party-switch */
+    /* The Australian Election Study 2025 (gen-data DEMO_AES, from its
+       respondent file): each group's vote at the May 2025 election, drawn
+       as the location rings are - an election-time mark, never pooled (user
+       ruling 2026-11-02). A hollow diamond per group in its line's colour,
+       placed as a poll dot is (the result plus the group's gap from the
+       AES's own all-respondents figure; the tip quotes the AES's share and
+       the respondents behind it), with the rings' dotted lead-in to the
+       line's first month and the all-voters line led back to the result.
+       The window widens to hold them, and nothing is drawn mid-party-switch */
     const ae = D.demoAes && D.demoAes.sets && D.demoAes.sets[c.st.id];
     const aeOf = (g) => (ae && ae.groups[g.label] && ae.groups[g.label][party]) || null;
     const aeOn = !!ae && !pm && !leOn && c.allPts.length && D.demoAes.x < c.allPts[0].x && rowsOf.some((r) => aeOf(r.l.g))
       && (xDom[0] <= D.demoAes.x + 1e-6 || rangeId === "all");
     const aeX = aeOn ? D.demoAes.x : null;
-    const aeSub = "Vote at the May 2025 election, post-election survey, n = " + (D.demoAes ? D.demoAes.n.toLocaleString() : "")
-      + (ae && ae.read ? ", read off the report’s chart" : "") + ", not pooled";
+    const aeSub = (g) => "Vote at the May 2025 election, post-election survey, " + ae.groups[g.label].n.toLocaleString() + " respondents in this group, not pooled";
     const aeRows = aeOn ? rowsOf.filter((r) => aeOf(r.l.g)) : [];
     const aePts = aeRows.map((r) => ({ x: aeX, y: aeOf(r.l.g)[1], gv: aeOf(r.l.g)[0], color: colorOf(r), shape: "diamond", hollow: true, size: 1.6,
-      label: r.l.g.label, meta: { pollster: "Australian Election Study 2025" }, sub: aeSub }));
+      label: r.l.g.label, meta: { pollster: "Australian Election Study 2025" }, sub: aeSub(r.l.g) }));
     const aeN = aeOn ? D.demoAes.elec[party] : null;
     const aeLeads = aeOn ? aeRows.filter((r) => r.rows.length)
       .map((r) => ({ id: "ae-" + r.l.g.label, label: r.l.g.label, color: colorOf(r), dash: RD_ELECTION_LEAD, rdWidth: 2.2,
@@ -3528,7 +3526,7 @@ function RdDemographics({ rangeId = "all" }) {
     /* the lead row the guide tip reads at the election x: rings or diamonds */
     const lead0 = leOn || aeOn;
     const ciLead = (i) => (i === 0
-      ? [{ label: "", value: leOn ? "The election result" : "Groups: Australian Election Study 2025, as printed; all voters: the result" }]
+      ? [{ label: "", value: leOn ? "The election result" : "Groups: Australian Election Study 2025; all voters: the result" }]
       : ciLoc(i - 1));
     return (
     /* A lone card on the row must always fill it, but the data-driven
@@ -3560,8 +3558,8 @@ function RdDemographics({ rangeId = "all" }) {
         tooltipTitle={(i) => (lead0 && i === 0 ? monthLabelFull("2025-05") : c.allPts[lead0 ? i - 1 : i] ? monthLabelFull(c.allPts[lead0 ? i - 1 : i].ym) : "")}
         extraRows={lead0 ? ciLead : ciLoc}
         /* an AES point (diamond or lead end) is drawn on the lines' scale
-           but tips the whole share the report prints */
-        fmt={(v, pt) => (pt && pt.gv != null ? String(pt.gv) : v.toFixed(1))}
+           but tips the AES's own share */
+        fmt={(v, pt) => (pt && pt.gv != null ? pt.gv : v).toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
         copy={{ title: rdCap(pVote) + " " + (c.st.label || "By " + tab.label).toLowerCase(), sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
