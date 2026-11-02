@@ -257,6 +257,11 @@ function RdPrimary({ rangeId, setRangeId }) {
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost "
         + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its")
         + (aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
+      /* a generation's AES baseline compares across instruments: the polls'
+         figure is the generation cuts of one or two houses alone (user call
+         2026-11-02) - the margins measure sampling, not that */
+      if (aesGrp && sel.setId === "generation" && G.houses && G.houses.length)
+        dek += " The polls’ figures for " + sel.who + " come only from the generation cuts of " + rdList(G.houses.map(demoHouse)) + ", so that comparison is across instruments.";
     }
     /* a party the polls only began reporting apart long after the election
        (/vic/'s One Nation, among others until February 2026) says where its
@@ -2848,7 +2853,8 @@ const RD_TREND_GROUP = {
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s",
   "Gen Z": "Gen Z", Millennials: "Millennials", "Gen X": "Gen X", Boomers: "Boomers",
   Men: "men", Women: "women",
-  University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "voters with Year 12 or less",
+  /* "Year 12 or less" in the trend copy: user dictate 2026-11-02 */
+  University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "high school-educated voters (or less)",
   "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
   "Lower earners (bottom 50%)": "lower earners", "Higher earners (top 15%)": "higher earners",
@@ -2911,11 +2917,23 @@ function rdDemoShift(dt, T, party) {
     }
     for (const r of pass) {
       if (men && women && (r === men || r === women)) continue;
-      claims.push({ k: Math.abs(r.d) / r.ci,
+      claims.push({ k: Math.abs(r.d) / r.ci, g: r.group,
         s: "it has " + (r.d > 0 ? "gained" : "lost") + " ground among " + (RD_TREND_GROUP[r.group] || r.group) + " (" + sgnE(r.d) + " points relative to all voters)" });
     }
     claims.sort((a, b) => b.k - a.k);
-    return "Measured from the election (Australian Election Study 2025), " + serial(claims.slice(0, 2).map((c) => c.s));
+    const chosen = claims.slice(0, 2);
+    /* a Gen Z claim compares across instruments: the polls' Gen Z figures
+       are the generation cuts of one or two houses alone, and those read
+       young voters differently from the age-band houses (user call
+       2026-11-02, after Essential's April 2025 18–34s matched the AES's
+       18–34s while the generation cuts ran well below both on the
+       Coalition) - the margins measure sampling, not that, so the sentence
+       says so */
+    const genSet = (T.tabs || []).flatMap((t) => t.sets).find((s) => s.id === "generation");
+    const genNote = chosen.some((c) => c.g === "Gen Z") && genSet
+      ? ". The Gen Z comparison is across instruments: the polls’ Gen Z figures come only from the generation cuts of " + rdList(genSet.houses.map(demoHouse))
+      : "";
+    return "Measured from the election (Australian Election Study 2025), " + serial(chosen.map((c) => c.s)) + genNote;
   };
   if (!solid.length) {
     const skew = RD_TREND_SKEW[party];
@@ -3790,7 +3808,11 @@ function RdDemographics({ rangeId = "all" }) {
                   ))}
                 </table>
               </div>
-              <p className="rd-note rd-tsig-note">The election gap is the group’s in the Australian Election Study 2025 (its share less all respondents’, from the survey’s respondent file); the gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above.</p>
+              <p className="rd-note rd-tsig-note">The election gap is the group’s in the Australian Election Study 2025 (its share less all respondents’, from the survey’s respondent file); the gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above.{(() => {
+                const gs = elecSets.find((s) => s.key.endsWith("|generation"));
+                const st = gs && Tdemo.tabs.flatMap((t) => t.sets).find((s) => s.id === "generation");
+                return st ? " The generations compare across instruments as well: the polls’ Gen Z, Millennial, Gen X and Boomer figures come only from the generation cuts of " + rdList(st.houses.map(demoHouse)) + ", which the margins can’t account for." : "";
+              })()}</p>
             </>
           )}
         </details>
