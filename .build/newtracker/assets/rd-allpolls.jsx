@@ -112,6 +112,15 @@ const rdApLeanDot = (v, onM) => (v == null || Math.abs(v) < 0.05 ? "var(--ink-3)
 const rdApLeanInk = (v, onM) => (v == null || Math.abs(v) < 0.05 ? "var(--ink-3)" : v > 0 ? "var(--alp-text)" : onM ? "var(--onp-text)" : "var(--lnp-text)");
 const rdApSigned = (v) => (Math.abs(v) < 0.05 ? "0.0" : rdSigned(v, 1));
 const rdApDays = (iso) => Date.parse(String(iso).slice(0, 10) + "T00:00:00Z");
+/* a month window ending at a row's own month, spine-independent: the
+   aggregate month spine (D.MONTHS) only reaches the newest poll's field
+   end, so a release published ahead of it (DemosAU's inaugural consumer
+   index, 2026-11-02) was out-of-range upstream — every detail-rail mini
+   chart crashed into its own error boundary once someone asked for the
+   detail (ms came out empty and the code read it backwards) */
+const rdApYmIdx = (ym) => +String(ym).slice(0, 4) * 12 + (+String(ym).slice(5, 7) - 1);
+const rdApYmOf = (i) => Math.floor(i / 12) + "-" + String((i % 12) + 1).padStart(2, "0");
+const rdApYmTrail = (ym, n) => { const end = rdApYmIdx(ym), out = []; for (let i = Math.max(0, end - n); i <= end; i++) out.push(rdApYmOf(i)); return out; };
 /* the age the window counts on in the headline facets: the fieldwork midpoint,
    as gen-data's nowcast judges a wave in/out (mid in [ref - 21d, ref]) - the row's
    displayed end date can sit inside a window its midpoint has left. `mid` rides
@@ -339,8 +348,7 @@ function RdApMini({ p, onM, pub }) {
   const box = React.useRef(null);
   const W = useRdWidth(box, 470);
   const H = 176;
-  const iM = D.MONTHS.indexOf(p.ym);
-  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const ms = rdApYmTrail(p.ym, 6);
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
@@ -517,8 +525,7 @@ function RdApDirMini({ p }) {
   const box = React.useRef(null);
   const W = useRdWidth(box, 470);
   const H = 176;
-  const iM = D.MONTHS.indexOf(p.ym);
-  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const ms = rdApYmTrail(p.ym, 6);
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
@@ -633,8 +640,7 @@ function RdApConfMini({ p }) {
   const box = React.useRef(null);
   const W = useRdWidth(box, 470);
   const H = 176;
-  const iM = D.MONTHS.indexOf(p.ym);
-  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const ms = rdApYmTrail(p.ym, 6);
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
@@ -784,8 +790,7 @@ const rdApLdJoin = (list) => (list.length > 2 ? list.slice(0, -1).join(", ") + "
 /* the pollster's seven-month window of waves with a gap to draw */
 function rdApLdWindow(p) {
   const D = window.AUSPOL;
-  const iM = D.MONTHS.indexOf(p.ym);
-  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const ms = rdApYmTrail(p.ym, 6);
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
@@ -966,8 +971,7 @@ function RdApIssMini({ p }) {
   const iss = p.iss || {};
   const item = iss.top && D.issues && D.issues.list ? (Array.isArray(D.issues.list) ? D.issues.list.find((it) => it.id === iss.top) : D.issues.list[iss.top]) || null : null;
   if (!item || !item.monthly || item.monthly.length < 2) return <div ref={box}></div>;
-  const iM = D.MONTHS.indexOf(p.ym);
-  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const ms = rdApYmTrail(p.ym, 6);
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
@@ -1044,7 +1048,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const inside = rdApInside(ydHe != null ? adj : lean, moe);
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "TBC" : p.field} ${yr} – `);
-  const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
+  const from = rdApYmTrail(p.ym, 6)[0];
   /* on the direction facet the rail counts toward the DIRECTION headline
      instead: same steps, read off the national-direction series - the
      other readings around it are the average (gen-data's dir.yd, the
