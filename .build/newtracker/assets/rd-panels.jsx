@@ -5668,23 +5668,25 @@ function RdUndecided({ rangeId }) {
 }
 
 /* ------------------------------------------------ Economic confidence --
-   Four published gauges of business and consumer confidence in TWO views
+   Five published gauges of business and consumer confidence in TWO views
    on one card, switched by the tabs above it — Consumers (the weekly
-   ANZ–Roy Morgan index with Westpac–MI's monthly sentiment joining it)
-   opens first, and Businesses (Roy Morgan's monthly index with the NAB
-   survey joining it) — each drawn as published from the 2025 election
-   on. Each
+   ANZ–Roy Morgan index with Westpac–MI's monthly sentiment and DemosAU's
+   national index joining it) opens first, and Businesses (Roy Morgan's
+   monthly index with the NAB survey joining it) — each drawn as published
+   from the 2025 election on. Each
    dot is the published reading; each line is a recency-weighted smooth
    of those readings
    (half-life 14 days on the weekly index, 60 days on the monthly ones),
    so release-to-release noise reads as trend while every quoted figure
-   stays the raw print. The first three are 100-neutral indices; NAB
-   prints a NET BALANCE (0 = neutral) and its line is drawn +100 so the
-   shared neutral line holds — the read rows and tooltips print NAB's own
-   figures off each point's `raw`. Colour splits each view's pair — the
-   Roy Morgan gauge plum, the other house's deep gold, both full lines
-   (a dash marked the second gauge until 2026-10-08; colour took the
-   job over). NAB's conditions reading rides the read row, not a fifth
+   stays the raw print. ANZ–Roy Morgan's and Westpac–MI's indices are
+   100-neutral; NAB prints a NET BALANCE (0 = neutral), its line drawn
+   +100; DemosAU's is 50-neutral, its line drawn doubled — all so the
+   shared neutral line holds, and the read rows and tooltips print each
+   house's own figures off each point's `raw`. Colour splits each view's
+   lanes — plum for the Roy Morgan gauge, deep gold for the second house's,
+   teal for DemosAU (a dash marked the second gauge until 2026-10-08;
+   colour took the job over). NAB's conditions reading rides the read
+   row, not a sixth
    line. No aggregation, no house effects — context, not a predictor.
    The bottom axis counts MONTHS since the election, not calendar years,
    and the view's main gauge carries its own past terms behind the
@@ -5720,6 +5722,7 @@ const confDownloadCsv = (filename, rows) => {
 const CONF_SHEET = {
   consumer: "ANZ–Roy Morgan Consumer Confidence",
   westpacConsumer: "Westpac–MI Consumer Sentiment",
+  demosauConsumer: "DemosAU Consumer Sentiment Index (50-neutral)",
   business: "Roy Morgan Business Confidence",
   nabBusiness: "NAB Monthly Business Survey (net balance)",
 };
@@ -6084,6 +6087,9 @@ function RdConfidence({ rangeId }) {
     { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60,
       period: "month", color: "var(--confidence-alt)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household confidence; 100 is neutral on this scale too." },
+    { k: "demosauConsumer", view: "consumer", s: M.demosauConsumer, name: "Consumers", dekName: "Consumers on DemosAU’s index", by: "DemosAU", hl: 60,
+      period: "month", color: "var(--confidence-third)", dash: null, shift: 0, scale: 2, vfmt: (v) => v.toFixed(1),
+      short: "DemosAU’s national consumer-sentiment index — 50 is neutral on DemosAU’s scale, so its lane is drawn doubled to sit on the 100-neutral line with the others. Prints and read rows keep the true figure." },
     { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60,
       period: "month", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
@@ -6093,7 +6099,14 @@ function RdConfidence({ rangeId }) {
   ].filter((l) => l.s && l.s.polls.length);
   if (!lanes.length) return null;
   for (const l of lanes) l.lat = l.s.latest;
-  /* the tabs over the chart open on the consumer pair; each view draws
+  /* the chart's display transforms: shift is additive (NAB's net balances
+     ride +100), scale multiplicative (DemosAU's 50-neutral index is drawn
+     doubled). Both commute through the linear kernel, so applying them to
+     plotted points is identical to transforming the raw series first —
+     and points carry `raw` so every tooltip and read row still prints the
+     figure the house published. */
+  const plotOf = (l, v) => (l.scale ? v * l.scale : v) + l.shift;
+  /* the tabs over the chart open on the consumer lanes; each view draws
      only its own lanes, dots and domain */
   const [view, setView] = useState("consumer");
   /* the Inflation & growth tab joins the row when gen-data §5m's payload
@@ -6125,7 +6138,7 @@ function RdConfidence({ rangeId }) {
   const deepPoints = new Map((D.confDeep ? viewLanes.filter((l) => (D.confDeep[l.k] || []).length > 1) : []).map((l) => {
     const live0 = l.s.polls[0].x;
     return [l.k, D.confDeep[l.k]
-      .map((r) => ({ ym: r.ym, x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, y: r.v + l.shift }))
+      .map((r) => ({ ym: r.ym, x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, y: plotOf(l, r.v) }))
       .filter((p) => p.x < live0)];
   }));
   const deepDrawn = [...deepPoints.keys()].filter((k) => deepPoints.get(k).length > 1);
@@ -6147,7 +6160,7 @@ function RdConfidence({ rangeId }) {
       return { x: p.x, y: wtot / wsum };
     });
   };
-  const neut = (l) => 100 - l.shift;   // the published-scale reading that sits on the 100 line
+  const neut = (l) => (100 - l.shift) / (l.scale || 1);   // the published-scale reading that sits on the 100 line
   const water = (l, v) => v < neut(l) ? "pessimists lead" : "optimists lead";
   const nab = lanes.find((l) => l.k === "nabBusiness");
   if (nab) nab.short = "Business confidence as a net balance — optimistic firms minus pessimistic ones, 0 = neutral on NAB’s own scale. The line is drawn 100 points up so the neutral line is shared; the figure here is NAB’s own. Conditions printed "
@@ -6214,14 +6227,14 @@ function RdConfidence({ rangeId }) {
      constant, so smoothing then shifting equals shifting and smoothing —
      the smooth runs on the printed figures themselves. Only the view's
      own lanes price the domain, so the two views fit their own ranges. */
-  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: p.v + l.shift, ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...(l.shift ? { raw: p.v } : {}) }))]));
-  const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: toM(p.x), y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
+  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: plotOf(l, p.v), ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...((l.shift || l.scale) ? { raw: p.v } : {}) }))]));
+  const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: toM(p.x), y: plotOf(l, p.y), ym: rows.get(l.k)[i].ym, ...((l.shift || l.scale) ? { raw: rows.get(l.k)[i].v } : {}) }))]));
   /* The complete-history window draws on the calendar, in the release
      file's own year-fraction x (no toM re-base): the same dots and kernel
      over every release the house has printed, with the deep monthly rows
      as a lighter line underneath where they reach further back */
-  const wideRaw = histOn ? new Map(viewLanes.map((l) => [l.k, l.s.polls.map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...(l.shift ? { raw: p.v } : {}) }))])) : null;
-  const wideSe = histOn ? new Map(viewLanes.map((l) => [l.k, smooth(l.s.polls, l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: l.s.polls[i].ym, ...(l.shift ? { raw: l.s.polls[i].v } : {}) }))])) : null;
+  const wideRaw = histOn ? new Map(viewLanes.map((l) => [l.k, l.s.polls.map((p) => ({ x: p.x, y: plotOf(l, p.v), ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...((l.shift || l.scale) ? { raw: p.v } : {}) }))])) : null;
+  const wideSe = histOn ? new Map(viewLanes.map((l) => [l.k, smooth(l.s.polls, l.hl).map((p, i) => ({ x: p.x, y: plotOf(l, p.y), ym: l.s.polls[i].ym, ...((l.shift || l.scale) ? { raw: l.s.polls[i].v } : {}) }))])) : null;
   const deepSeries = histOn ? deepDrawn.map((k) => {
     const l = viewLanes.find((v) => v.k === k);
     return { id: "deep-" + k, label: l.by + " (monthly history)", color: l.color,
@@ -6383,11 +6396,11 @@ function RdConfidence({ rangeId }) {
      speak only for the view's own pair */
   const vc = view === "consumer" ? {
     title: "Consumer confidence",
-    note: "100 = neutral on both gauges",
-    altKey: "The Westpac–MI monthly read of the same household confidence",
-    copyTitle: "Consumer confidence (two gauges)",
-    copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and drawn dotted in its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold where its series reaches back that far. No combining, no adjustment.",
+    note: "100 = neutral; DemosAU’s 50-neutral index is drawn doubled",
+    altKey: "Westpac–MI’s monthly read; DemosAU’s national index, drawn doubled",
+    copyTitle: "Consumer confidence (three gauges)",
+    copySub: head + " Three published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index, Westpac–MI’s monthly consumer sentiment, and DemosAU’s national consumer-sentiment index, drawn doubled.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). DemosAU prints to a 50-neutral scale, so its lane is drawn doubled to share the neutral line while read rows, tooltips and this caption carry each house’s own figures. The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and drawn dotted in its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold where its series reaches back that far. No combining, no adjustment.",
     copyHist: "Consumer confidence as far back as the series go, on one 100-neutral scale. The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series); the lighter lines underneath are the houses’ own monthly history files — ANZ–Roy Morgan consumer confidence from 1973, Westpac–MI consumer sentiment from 1974. No combining, no adjustment.",
   } : {
     title: "Business confidence",
@@ -6404,7 +6417,7 @@ function RdConfidence({ rangeId }) {
   if (nowM < xMax - 1.4) xTicks.push({ x: +nowM.toFixed(1), label: "Now" });
   xTicks.sort((a, b) => a.x - b.x);
   return (
-    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
+    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", five published series")}>
       <RdHed head={isMacro && mStory ? mStory.head : head} dek={isMacro && mStory ? mStory.dek : dek} />
       {/* the views are pages of their own, so the row walks them by arrow
           keys (focused, or hovering the panel) and a phone swipe;
@@ -6521,9 +6534,9 @@ function RdConfidence({ rangeId }) {
       {isMacro && <RdMacro />}
       </RdCrossfade>
       <HowTo paras={[
-        <>Four published gauges of economic confidence, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
+        <>Five published gauges of economic confidence, split into two views — the consumer lanes and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment and DemosAU’s national consumer-sentiment index, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
-        <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
+        <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>The Inflation &amp; growth tab charts the ABS’s and OECD’s official figures exactly as published: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) and real GDP per person (the annual change in chain-volume GDP per capita, seasonally adjusted), beside the OECD-wide averages and the G20’s wider inflation aggregate drawn as dashed context lines. The shaded band marks the Reserve Bank’s 2–3% inflation target. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />

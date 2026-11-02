@@ -594,7 +594,7 @@ fs.writeFileSync(path.join(tmp, "data", "confidence.json"), JSON.stringify(seede
 const cohort = run(FEED, ["--enrich-all", "2026-09-20"]);
 assert.equal(cohort.status, 0, cohort.out);
 const cst = JSON.parse(cohort.out.match(/CONFIDENCE_STATUS (\{.*\})/)[1]);
-assert.deepEqual(cst.rows, { consumer: 4, business: 4, westpacConsumer: 2, nabBusiness: 2 }, "a bound never costs a wave row");
+assert.deepEqual(cst.rows, { consumer: 4, business: 4, westpacConsumer: 2, nabBusiness: 2, demosauConsumer: 0 }, "a bound never costs a wave row");
 assert.deepEqual(cst.enrich.consumer, { n: 2, fw: 2 }, "bound 09-20 re-reads the 09-22 and 09-29 waves only");
 assert.deepEqual(cst.enrich.business, { n: 0, fw: 4 }, "every business wave is pre-bound: no n fetched, but fwm still derives off the slug");
 assert.deepEqual(cst.enrich.westpacConsumer, { n: 0, fw: 0 }, "September's bulletin is pre-bound; October's has none");

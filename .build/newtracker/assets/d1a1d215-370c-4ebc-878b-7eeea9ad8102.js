@@ -8528,14 +8528,15 @@ function infoTerms(D) {
       entries: [] },
     { id: "s-mood", title: "Economic sentiment", nav: "Sentiment",
       lead: { id: "mood", body: (
-        <>Four published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
+        <>Five published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
         Confidence index, published weekly; the Westpac–Melbourne Institute Consumer Sentiment
-        index, monthly; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
-        Business Survey. The consumer pair and the business pair sit in two views, switched by
-        the tabs over the chart — the consumer pair opens first. The chart opens at the May
+        index, monthly; DemosAU’s national Consumer Sentiment Index, from November
+        2026; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
+        Business Survey. The consumer lanes and the business pair sit in two views, switched by
+        the tabs over the chart — the consumer lanes open first. The chart opens at the May
         2025 election; the figures on file run
         further back — 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
-        <span className="info-p"><b>100 is neutral.</b> The three index series are built from the
+        <span className="info-p"><b>100 is neutral.</b> The 100-neutral series are built from the
         balance of optimists and pessimists on each house’s questions, so a reading above 100
         means optimists outnumber pessimists and one below 100 the reverse.</span>
         <span className="info-p"><b>NAB is drawn 100 points up.</b> NAB reports a net balance —
@@ -8543,6 +8544,10 @@ function infoTerms(D) {
         drawn 100 points up to share the neutral line with the others. The figure shown beside
         it and in its tooltips is NAB’s own printed number; the row also carries the survey’s
         conditions reading, which is not charted.</span>
+        <span className="info-p"><b>DemosAU is drawn doubled.</b> DemosAU’s national
+        Consumer Sentiment Index puts 50 at the neutral mark, so its line is drawn doubled to
+        share the neutral line with the others; read rows and tooltips carry DemosAU’s
+        own figure.</span>
         <span className="info-p"><b>Smoothed, not averaged across sources.</b> Each dot is a
         release’s own headline figure, linked to it; each line is the same readings smoothed
         with a recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days

@@ -3133,7 +3133,7 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
 const confFieldLabel = (r) => (r.fwStart ? fwLabel(r.fwStart, r.fwEnd || r.date)
   : r.fwm ? monthName(+r.fwm.slice(5, 7))
   : fwLabel(null, r.date));
-const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness"].map((k) => {
+const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness", "demosauConsumer"].map((k) => {
   const s = CONF_FILE[k];
   if (!s) return [k, null];   // a lane added to the file later never breaks an older checkout
   const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url, dateLabel: confFieldLabel(r),
@@ -3173,6 +3173,7 @@ const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer"
 const CONF_LANES = [
   ["consumer", "ANZ–Roy Morgan", "Consumer confidence", 100, null],
   ["westpacConsumer", "Westpac–MI", "Consumer sentiment", 100, 1200],
+  ["demosauConsumer", "DemosAU", "Consumer sentiment", 50, null],
   ["business", "Roy Morgan", "Business confidence", 100, null],
   ["nabBusiness", "NAB", "Business confidence", 0, null],
 ];

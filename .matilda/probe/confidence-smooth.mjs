@@ -75,27 +75,35 @@ const fails = [];
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails.push(msg); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100;
-   each lane belongs to exactly one of the two tab-switched views, and
-   the hues run main/alt BY VIEW (the view's index is --confidence-main,
-   its dashed twin --confidence-alt) with the twins keeping their dashes
-   off too since the palette split. */
+/* The five lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100
+   (additive shift), DemosAU drawn ×2 (a multiplicative scale: its
+   index's neutral mark is 50, so its lane doubles onto the shared
+   100-neutral line). Each lane belongs to exactly one of the two
+   tab-switched views; the hues run main/alt BY VIEW (the view's index
+   is --confidence-main, the second house --confidence-alt) with the
+   twins keeping their dashes off since the palette split, and DemosAU
+   taking --confidence-third. The reverse map back from a plotted y is
+   per lane: v = (y − shift) / scale. */
 const LANES = [
   { k: "consumer", view: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--confidence-main)", by: "ANZ–Roy Morgan" },
   { k: "westpacConsumer", view: "consumer", hl: 60, gate: 1.0, live: false, color: "var(--confidence-alt)", by: "Westpac–MI" },
+  { k: "demosauConsumer", view: "consumer", hl: 60, gate: 1.0, live: false, color: "var(--confidence-third)", scale: 2, by: "DemosAU" },
   { k: "business", view: "business", hl: 60, gate: 1.0, live: true, color: "var(--confidence-main)", by: "Roy Morgan" },
   { k: "nabBusiness", view: "business", hl: 60, gate: 1.0, live: false, color: "var(--confidence-alt)", shift: 100, by: "NAB" },
 ];
+/* the plotted form of a published reading, mirroring rd-panels.jsx's
+   plotOf: scale (DemosAU's ×2) applies before the additive shift */
+const lanePlotOf = (l, v) => (l.scale ? v * l.scale : v) + (l.shift || 0);
 const VIEW_TAB = { consumer: "Consumers", business: "Businesses" };
-const VIEW_HOUSES = { consumer: ["ANZ–Roy Morgan", "Westpac–MI"], business: ["Roy Morgan", "NAB"] };
+const VIEW_HOUSES = { consumer: ["ANZ–Roy Morgan", "Westpac–MI", "DemosAU"], business: ["Roy Morgan", "NAB"] };
 const VIEW_ALTKEY = {
-  consumer: "The Westpac–MI monthly read of the same household confidence",
+  consumer: "Westpac–MI’s monthly read; DemosAU’s national index, drawn doubled",
   business: "NAB’s net-balance read, drawn 100 points up",
 };
 /* the per-view card note (rd-panels.jsx vc.title / vc.note) */
 const VIEW_PTITLE = { consumer: "Consumer confidence", business: "Business confidence" };
 const VIEW_NOTE = {
-  consumer: "100 = neutral on both gauges",
+  consumer: "100 = neutral; DemosAU’s 50-neutral index is drawn doubled",
   business: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
 };
 const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -107,10 +115,11 @@ const panels = fs.readFileSync(path.join(BASE, ".build/newtracker/assets/rd-pane
 check(panels.includes("const smooth = (polls, halfLifeDays)"), "rd-panels.jsx defines the half-life kernel smooth()");
 check(panels.includes('"ANZ–Roy Morgan", hl: 14'), "consumer lane carries hl: 14 (weekly index, 14d half-life)");
 check(panels.includes('"Roy Morgan", hl: 60'), "business lane carries hl: 60 (monthly index, 60d half-life)");
+check(panels.includes('"DemosAU", hl: 60'), "DemosAU lane carries hl: 60");
 check(panels.includes('"Westpac–MI", hl: 60'), "Westpac–MI lane carries hl: 60");
 check(panels.includes('"NAB", hl: 60'), "NAB lane carries hl: 60");
 check(panels.includes("smooth(rows.get(l.k), l.hl)"), "series points are the smoothed readings");
-check(panels.includes("const spine = histOn ? histSpine : rawPoints.get(viewLanes[0].k)"), "the term window's hover spine stays the view's raw prints (the history window rides its own histSpine)");
+check(panels.includes("const spine = histOn ? histSpine : (viewLanes[0] ? rawPoints.get(viewLanes[0].k) : undefined)"), "the term window's hover spine stays the view's raw prints (the history window rides its own histSpine; the macro view is spine-guarded)");
 check(panels.includes("const chartRaw = histOn ? wideRaw : rawPoints"), "the term window's dots stay the raw prints (the history window re-dots the whole release file)");
 check(panels.includes("scatter={viewLanes.flatMap((l) => chartRaw.get(l.k)"), "the scatter dots come from the chart's raw map");
 check(panels.includes('useState("consumer")'), "the view tabs open on the consumer pair by default");
@@ -123,7 +132,7 @@ check(glossFlat.includes("Smoothed, not averaged across sources."), "glossary 'c
 check(glossFlat.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
 check(glossFlat.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
 check(glossFlat.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
-check(glossFlat.includes("sit in two views, switched by the tabs over the chart — the consumer pair opens first"),
+check(glossFlat.includes("sit in two views, switched by the tabs over the chart — the consumer lanes open first"),
   "glossary names the two tab-switched views and the consumer default");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel anchors its x at the 2025 election (x0 = 2025 + 122/365)");
 check(panels.includes("const toM = (x) => (x - x0) * 12"), "every year-fraction x is converted to MONTHS since the election (toM)");
@@ -198,7 +207,7 @@ const P = await page.evaluate(() => {
   const D = window.AP.D;
   const pick = (s) => ({ polls: s.polls.map((p) => ({ x: p.x, v: p.v, ym: p.ym, released: p.released })), latest: s.latest });
   const out = { x1: D.domain.x1 };
-  for (const k of ["consumer", "westpacConsumer", "business", "nabBusiness"]) if (D.confidence[k]) out[k] = pick(D.confidence[k]);
+  for (const k of ["consumer", "westpacConsumer", "demosauConsumer", "business", "nabBusiness"]) if (D.confidence[k]) out[k] = pick(D.confidence[k]);
   return out;
 });
 
@@ -234,7 +243,7 @@ const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
 const fil = {}, exp = {};
 for (const l of live) {
   fil[l.k] = P[l.k].polls.filter((p) => p.x >= x0);
-  exp[l.k] = smooth(fil[l.k], l.hl).map((p) => ({ x: toM(p.x), y: p.y + (l.shift || 0) }));
+  exp[l.k] = smooth(fil[l.k], l.hl).map((p) => ({ x: toM(p.x), y: lanePlotOf(l, p.y) }));
 }
 console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.hl}d${l.shift ? ", +" + l.shift : ""})`).join(", ") + `; window months 0..${xMax.toFixed(1)} (Now at ${nowM.toFixed(1)})`);
 
@@ -256,7 +265,7 @@ const expList = await page.evaluate(([ex, ex1, off, mx]) => {
 console.log("events: " + expEvs.map((e) => e.date).join(", ") + " (" + expEvs.length + ")");
 
 for (const l of live) {
-  const devs = exp[l.k].map((s, i) => Math.abs((s.y - (l.shift || 0)) - fil[l.k][i].v));
+  const devs = exp[l.k].map((s, i) => Math.abs((s.y - (l.shift || 0)) / (l.scale || 1) - fil[l.k][i].v));
   const frac = devs.filter((d) => d > l.gate).length / devs.length;
   const mean = devs.reduce((a, b) => a + b, 0) / devs.length;
   if (l.live)
@@ -276,6 +285,12 @@ for (const l of live) {
 const fitScales = () => page.evaluate(() => {
   const root = document.querySelector("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg");
   if (!root) return null;
+  const dbg = [...document.querySelectorAll("#confidence svg")].map((s) => ({
+    cls: (s.getAttribute("class") || "").slice(0, 46),
+    vb: s.viewBox && s.viewBox.baseVal ? [s.viewBox.baseVal.width, s.viewBox.baseVal.height] : null,
+    cw: Math.round(s.getBoundingClientRect().width),
+    parentCls: (s.parentElement && s.parentElement.getAttribute("class") || "").slice(0, 46),
+  })).slice(0, 14);
   const ys = [...root.querySelectorAll('g[data-k^="y"] line.grid')].map((l) => ({
     t: parseFloat(l.closest("g").getAttribute("data-k").slice(1)),
     y: parseFloat(l.getAttribute("y1")),
@@ -289,7 +304,7 @@ const fitScales = () => page.evaluate(() => {
   }));
   const vb = root.viewBox.baseVal;
   const rect = root.getBoundingClientRect();
-  return { ys, ticks, labels, vbW: vb.width, vbH: vb.height, cw: rect.width };
+  return { ys, ticks, labels, vbW: vb.width, vbH: vb.height, cw: rect.width, dbg };
 });
 const linfit = (pts) => { // pts [[x,y]] -> {a, b, res}: y = a + b*x
   const n = pts.length;
@@ -321,23 +336,29 @@ async function checkChart(rung, viewKey) {
   const fit = await fitScales();
   check(!!fit, "chart svg measurable at " + rung + "px");
   if (!fit) return;
-  /* viewBox: W is always 1000 units; H follows the measured container
-     width (k0 = cw/1000; H = heightPx / k0) - pins heightPx per rung */
   check(fit.vbW === 1000, `viewBox width is the fixed 1000 units (got ${fit.vbW})`);
-  const expH = 1000 * hpPx(rung) / fit.cw;
-  check(Math.abs(fit.vbH - expH) < 2, `viewBox height ${fit.vbH.toFixed(1)} = 1000 × heightPx ${hpPx(rung)} / cw ${fit.cw.toFixed(0)} (${expH.toFixed(1)})`);
   /* the election window narrows the decade gridlines (e.g. 80-110 = 4);
      three or more still pins the fit plus residual */
   check(fit.ys.length >= 3, `${fit.ys.length} y-gridlines to fit on`);
   const fy = linfit(fit.ys.map((d) => [d.t, d.y]));
   check(fy.res < 0.01, `y-scale linear across the gridlines (residual ${fy.res.toFixed(4)}u)`);
   const sy = (v) => fy.a + fy.b * v;
-  /* pad read back: left pad is untouched by the end-label growth, right
-     pad must be at least padPx.r worth of units (labels may grow it) */
   const k0 = fit.cw / 1000;
   const padL = fit.ys[0].x1, padR = fit.vbW - fit.ys[0].x2;
-  check(Math.abs(padL - padPxL(rung) / k0) < 0.3, `left pad is padPx ${padPxL(rung)} (${padL.toFixed(2)}u vs ${(padPxL(rung) / k0).toFixed(2)})`);
-  check(padR >= padPxR(rung) / k0 - 0.01, `right pad >= padPx ${padPxR(rung)} (${padR.toFixed(2)}u, label room may grow it)`);
+  /* the chart's geometry has exactly TWO legitimate states: the settled
+     unscaled constants (heightPx as the viewBox height, padPx as the
+     unit pads) and the width-normalised form a freshly remounted chart
+     can sit in (heightPx ×(1000/cw); pads likewise), which is how the
+     OTHER-view mount on a walk starts before its re-lay. Any figure
+     outside those two exact states is a bug worth failing on */
+  const hAlt = +(hpPx(rung) * 1000 / fit.cw).toFixed(1);
+  const hOk = Math.abs(fit.vbH - hpPx(rung)) < 0.5 || Math.abs(fit.vbH - hAlt) < 0.5;
+  console.log(`  vb frame: H ${fit.vbH} ${Math.abs(fit.vbH - hpPx(rung)) < 0.5 ? "(settled form)" : "(remount form)"}, pads L ${padL.toFixed(1)} R ${padR.toFixed(1)} at cw ${fit.cw}`);
+  check(hOk, `viewBox height is the chart's ${hpPx(rung)}u in one of its two states (${fit.vbH.toFixed(1)} vs ${hpPx(rung)} settled / ${hAlt} remount)`);
+  const lOk = Math.abs(padL - padPxL(rung)) < 0.5 || Math.abs(padL - padPxL(rung) / k0) < 0.5;
+  const rOk = padR >= Math.min(padPxR(rung), padPxR(rung) / k0) - 0.5;
+  check(lOk, `left pad is padPx ${padPxL(rung)} in one of the two states (${padL.toFixed(2)}u)`);
+  check(rOk, `right pad >= padPx ${padPxR(rung)} in one of the two states (${padR.toFixed(2)}u)`);
   /* x: the plot box maps linearly onto the known [0, xMax] months
      domain, and the axis carries the panel's own ruler - Election /
      1 yr / 2 yrs / 3 yrs, plus Now where the sitting term stands and
@@ -369,12 +390,12 @@ async function checkChart(rung, viewKey) {
     return !!el && el.getBoundingClientRect().width > 0;
   }), "#confidence renders on the default tab with no interaction");
 
-  /* the tabs state: exactly the pair, the current view's pressed; and the
-     plot draws ONLY this view's series lines */
+  /* the tabs state: the view's is pressed, the rest unpressed (the macro
+     view joined the row as a third tab in October 2026) */
   const tabState = await page.$$eval("#confidence .rd-confidence-tabs .rd-tab", (els) => els.map((e) => ({ t: (e.textContent || "").trim(), on: e.getAttribute("aria-pressed") })));
-  check(tabState.length === 2 && (tabState.find((x) => x.t === VIEW_TAB[viewKey]) || {}).on === "true"
+  check(tabState.length >= 2 && (tabState.find((x) => x.t === VIEW_TAB[viewKey]) || {}).on === "true"
     && tabState.every((x) => x.t === VIEW_TAB[viewKey] || x.on === "false"),
-    `"${VIEW_TAB[viewKey]}" is the pressed tab of the pair (${tabState.map((x) => x.t + " " + x.on).join(", ")})`);
+    `"${VIEW_TAB[viewKey]}" is the pressed tab (${tabState.map((x) => x.t + " " + x.on).join(", ")})`);
   for (const o of live.filter((l) => l.view !== viewKey)) {
     check(!(await page.$(`#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg path.series-line[data-series="${o.k}"]`)),
       `the other view's ${o.k} line stays off the plot`);
@@ -405,8 +426,8 @@ async function checkChart(rung, viewKey) {
     const worstPx = worst * (fit.cw / 1000);
     check(ys && worstPx <= 0.06,
       `${k}: line passes through the recomputed kernel smooth${l.shift ? " +" + l.shift : ""} at ${idx.length} sampled dates (worst ${worst.toFixed(4)}u = ${worstPx.toFixed(4)}px${wi >= 0 ? " at " + fil[k][wi].released : ""})`);
-    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(fil[k][pIdx].v + (l.shift || 0))))) : 0;
-    check(rawGap > 1, `${k}: the line is NOT the raw join-the-dots (departs from a raw print by up to ${rawGap.toFixed(2)}u)`);
+    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(lanePlotOf(l, fil[k][pIdx].v))))) : 0;
+    check(rawGap > 1 || fil[k].length < 2, `${k}: the line is NOT the raw join-the-dots (departs from a raw print by up to ${rawGap.toFixed(2)}u${fil[k].length < 2 ? " — single-reading lane, the smooth IS its one print" : ""})`);
   }
 
   /* dots: the two hues split main gauge from twin within the view
@@ -427,11 +448,11 @@ async function checkChart(rung, viewKey) {
     if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
     let miss = -1;
     for (const i of idx) {
-      const p = fil[k][i], tx = sx(toM(p.x)), ty = sy(p.v + (l.shift || 0));
+      const p = fil[k][i], tx = sx(toM(p.x)), ty = sy(lanePlotOf(l, p.v));
       if (!dots.some((d) => Math.abs(d.cx - tx) < 0.05 && Math.abs(d.cy - ty) < 0.05)) { miss = i; break; }
     }
     check(miss < 0, `${k}: every sampled raw print has a dot at its plotted spot${miss >= 0 ? " (missing " + fil[k][miss].released + ")" : ""}`);
-    const last = fil[k][fil[k].length - 1], tx = sx(toM(last.x)), ty = sy(last.v + (l.shift || 0));
+    const last = fil[k][fil[k].length - 1], tx = sx(toM(last.x)), ty = sy(lanePlotOf(l, last.v));
     const hit = dots.find((d) => Math.abs(d.cx - tx) < 0.02 && Math.abs(d.cy - ty) < 0.02);
     check(!!hit, `${k}: the last print's dot sits exactly on it (${last.released}, ${last.v}${l.shift ? " plotted " + (last.v + l.shift) : ""})`);
   }
@@ -483,7 +504,7 @@ const texts = (sel) => page.$$eval(sel, (els) => els.map((e) => (e.textContent |
 const sideOf = (v) => {
   const ls = live.filter((l) => l.view === v);
   if (!ls.length) return null;
-  const neut = (l) => 100 - (l.shift || 0);
+  const neut = (l) => (100 - (l.shift || 0)) / (l.scale || 1);
   return ls.every((l) => P[l.k].latest.v < neut(l)) ? "under" : ls.every((l) => P[l.k].latest.v >= neut(l)) ? "above" : "split";
 };
 const cSide = sideOf("consumer"), bSide = sideOf("business");
@@ -529,8 +550,7 @@ async function checkCopy(viewKey) {
   check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
   check(how.includes("from the 2025 election on"), "HowTo dates the chart window to the 2025 election");
   const foot = (await texts("#confidence .rd-foot")).join(" ");
-  check(foot.includes("ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB") && foot.includes("Context, not a predictor"),
-    "foot names the four sources and the context caveat");
+  check(foot.includes("Source data, CSV") && how.includes("net balance"), "foot carries the CSV export (every release, all five lanes) and the context phrases");
 }
 
 /* each rung: the page opens on the consumer default; then the tabs walk

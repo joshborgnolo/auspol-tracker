@@ -1253,6 +1253,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
     westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
     business: "Business confidence – how firms rate trading conditions and the year ahead, read monthly by Roy Morgan.",
+    demosauConsumer: "DemosAU’s national consumer-sentiment index, launched November 2026 – 50 is neutral on this scale; on the panel it is drawn doubled.",
     nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey.",
   };
 
@@ -2412,7 +2413,7 @@ function rdApFacetStory(facet, upd, demSplit, confBw) {
        reads the two household gauges, business the business pair */
     const G = (confBw
       ? [["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]]
-      : [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100]])
+      : [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100], ["demosauConsumer", "DemosAU’s consumer sentiment index", 50]])
       .filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null)
       .map(([k, name, neut]) => ({ k, name, neut, lat: M[k].latest }));
     if (!G.length) return null;
@@ -3159,11 +3160,13 @@ function RdAllPolls(P) {
      the note sitting with the only rows it explains. */
   const CF_LO = 40, CF_HI = 120;
   const cfx = (v) => ((Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO)) * 100;
-  const confPlot = (c) => c.v + (c.vs === 0 ? 100 : 0);
+  /* NAB adds 100 to its net balance; DemosAU's 50-neutral index doubles,
+     exactly as the panel chart draws them; the figures shown are the houses' own */
+  const confPlot = (c) => c.v * (c.vs === 50 ? 2 : 1) + (c.vs === 0 ? 100 : 0);
   /* the confidence panel's inks, per house as the panel splits them: the
      Roy Morgan gauges plum, the other house's gold - the table can't dash
      one dot, so the twin's house is named in the row */
-  const confInk = (c) => (c.k === "consumer" || c.k === "business" ? "var(--confidence-main)" : "var(--confidence-alt)");
+  const confInk = (c) => (c.k === "consumer" || c.k === "business" ? "var(--confidence-main)" : c.k === "demosauConsumer" ? "var(--confidence-third)" : "var(--confidence-alt)");
   /* each house's own print: the indices carry decimals, NAB's net balance
      whole numbers (the panel's NICE does the same) */
   const confFig = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));

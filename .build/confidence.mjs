@@ -1,6 +1,6 @@
 /* confidence.mjs – builds data/confidence.json, the business- and consumer-confidence
    series behind the Snapshot panel "The confidence" (below Decidedness) and its
-   Info glossary entry. Four series, two per side of the confidence:
+   Info glossary entry. Five series, three consumer, two business:
      consumer – ANZ-Roy Morgan Consumer Confidence, weekly; the feed's topic
                 index is dense from August 2019 (a few isolated items earlier).
      business – Roy Morgan Business Confidence, monthly since 2019.
@@ -112,7 +112,7 @@ const STRAGGLER_MARGIN_DAYS = 40;
 // A row this old means a release was missed. The consumer series pauses
 // 18–25 days every Christmas (2019–2025 dump: worst routine gap 25d), so the
 // alarm sits past that: four weeks silent is a genuinely stuck series.
-const STALE_DAYS = { consumer: 28, business: 45, westpacConsumer: 45, nabBusiness: 45 };
+const STALE_DAYS = { consumer: 28, business: 45, westpacConsumer: 45, nabBusiness: 45, demosauConsumer: 45 };
 
 const UP = "(?:up|upward|rises[^a-z]|rose|lift(?:ed|s)?|jump(?:ed|s)?|increas(?:ed|es|ing)|improv(?:ed|es|ing)|rebound(?:ed|s)?|recover(?:ed|s|ing)?|bounc(?:e[sd]|ing)|climb(?:ed|s)?|strengthen(?:ed|s)?|gained|gains|consolidat(?:e[sd]?|ing)|revers(?:e[sd]?|ing))";
 const DN = "(?:down|drop(?:ped|s)?|fell|fall(?:en|s|ing)?|slip(?:ped|s|ping)?|declin(?:ed|es|ing)?|decreas(?:ed|es)|plung(?:ed|es|ing)?|plummet(?:ed|s|ing)?|tumbl(?:ed|es|ing)|los(?:t|es|ing)|sinks?|sank|eas(?:e|ed|es|ing)|slumps?|slumped|falters?|dives?|losing|hits\\s+a\\s+new\\s+record\\s+low)";
@@ -899,6 +899,82 @@ async function fetchFeedPage(topic, page) {
 
 // ------------------------------------------------------------------- main
 const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
+
+// --------------------------- DemosAU Consumer Sentiment Index -----------------------------
+/* DemosAU's national consumer-sentiment index (inaugural 2 Nov 2026). Its
+   release form: a news post on the WP index ("…DemosAU Consumer Sentiment
+   Index") that links a data page (…/uploads/DemosAU/…-sentiment-…-YYYY.html);
+   the page's one JSON block carries `index` (the headline per group),
+   `survey` (sample, effective n, MOE, weighting, fieldwork window) and
+   `index_meta` (component IDs). National only, per the user call that day:
+   the sister state indexes (today: Queensland's) wear a state name and stay
+   out — in the titles AND the meta. Guards, at the other lanes' discipline:
+   the data page's total index must land in band, its survey block must
+   carry sample and a real window, and the post's own print of the value
+   must agree with the page's (a two-witness disagreement drops the wave
+   rather than picking a side). chg stays null until a release prints one
+   (the page's `prev_poll` block is empty so far). The figure prints to a
+   50-neutral scale and files RAW — the rd-panels lane's `scale` plots it
+   ×2 to the shared 100-neutral line, the pattern NAB's +100 shift set. */
+import { fetchBuffer as daFetchBuffer } from "./demosau-fetch.mjs";
+const DA_CSI_SEARCH = "https://demosau.com/wp-json/wp/v2/search?search=consumer+sentiment+index&per_page=20";
+const DA_CSI_TITLE = /consumer sentiment index/i;
+const DA_CSI_STATE = /queensland|\bqld\b|victoria|new south wales|western australia|south australia|tasmania/i;
+const DA_CSI_PAGE = /https:\/\/demosau\.com\/wp-content\/uploads[^"<>\s']+\.html/;
+const sydneyDayCsi = (s) => new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(String(s) + "Z"));
+
+function csiParseBlock(html) {
+  const i = html.indexOf('{"results"');
+  if (i < 0) return null;
+  let depth = 0, inStr = false, esc = false;
+  for (let j = i; j < html.length; j++) {
+    const c = html[j];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+    } else if (c === '"') inStr = true;
+    else if (c === "{") depth++;
+    else if (c === "}" && --depth === 0) {
+      try { return JSON.parse(html.slice(i, j + 1)); } catch { return null; }
+    }
+  }
+  return null;
+}
+
+async function demosauConfidenceRows() {
+  const out = [];
+  const search = JSON.parse((await daFetchBuffer(DA_CSI_SEARCH)).toString("utf8"));
+  const cand = search.filter((x) => DA_CSI_TITLE.test(x.title || "") && !DA_CSI_STATE.test(x.title || "")).slice(0, 6);
+  for (const c of cand) {
+    let post = null, html = null, link = null;
+    try {
+      post = JSON.parse((await daFetchBuffer(`https://demosau.com/wp-json/wp/v2/posts/${c.id}`)).toString("utf8"));
+      link = (post.content?.rendered || "").match(DA_CSI_PAGE);
+      if (!link) continue;
+      html = (await daFetchBuffer(link[0])).toString("utf8");
+    } catch { continue; }
+    const d = csiParseBlock(html);
+    if (!d) { console.log(`demosauConsumer ${c.id}: the data page's block didn't read — skipped`); continue; }
+    const meta = Array.isArray(d.index_meta) && d.index_meta[0];
+    const sv = Array.isArray(d.survey) && d.survey[0];
+    const tot = Array.isArray(d.index) && d.index.find((r) => r.group === "total");
+    if (!meta || !sv || !tot || !Number.isFinite(tot.index)) continue;
+    if (DA_CSI_STATE.test(String(meta.index_name || "") + " " + String(meta.workbook_name || ""))) continue;
+    const v = Math.round(tot.index * 10) / 10;
+    if (!(v >= 5 && v <= 95)) { console.log(`demosauConsumer ${c.id}: index ${v} out of band — skipped`); continue; }
+    const prose = (post.content?.rendered || "").replace(/<[^>]+>/g, " ");
+    if (!prose.includes(parseFloat(v.toFixed(1)).toString())) { console.log(`demosauConsumer ${c.id}: page prints ${v} but the post never says it — two-witness disagreement, dropped`); continue; }
+    const fs = String(sv.start || "").slice(0, 10), fe = String(sv.end || "").slice(0, 10);
+    out.push({
+      date: sydneyDayCsi(post.date_gmt || post.date), v, chg: null, url: link[0], slug: post.slug,
+      ...(Number.isFinite(sv.sample_size) && sv.sample_size >= 200 && sv.sample_size <= 20000 ? { n: sv.sample_size } : {}),
+      ...(fs.length === 10 && fe.length === 10 ? { fwStart: fs, fwEnd: fe } : {}),
+    });
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
+
 const slugBare = (s) => String(s || "").replace(/^\d+-/, "");
 
 async function rowsFor(name) {
@@ -994,6 +1070,9 @@ await enrichRmRows("consumer", consumer);
 await enrichRmRows("business", business);
 const westpac = await westpacRows();
 const nab = await nabRows();
+/* the DemosAU lane follows the fixture rule like every lane above: a
+   --feed-dir run reads committed rows, never the live site */
+const demosau = FIXTURE ? (((prev || {}).demosauConsumer || {}).rows || []) : await demosauConfidenceRows();
 
 const doc = {
   _about: "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/confidence.mjs header.",
@@ -1001,10 +1080,11 @@ const doc = {
   business: { label: SERIES.business.label, base: "Roy Morgan, index, 100 = neutral", rows: business },
   westpacConsumer: { label: "Westpac–MI Consumer Sentiment", base: "Westpac–Melbourne Institute, index, 100 = neutral", rows: westpac },
   nabBusiness: { label: "NAB Business Confidence", base: "NAB, net balance, 0 = neutral (plotted +100)", rows: nab },
+  demosauConsumer: { label: "DemosAU Consumer Sentiment Index", base: "DemosAU, index, 50 = neutral (plotted ×2)", rows: demosau },
 };
 const next = JSON.stringify(doc, null, 1) + "\n";
 const changed = !prev || readFileSync(OUT, "utf8") !== next;
-const KEYS = ["consumer", "business", "westpacConsumer", "nabBusiness"];
+const KEYS = ["consumer", "business", "westpacConsumer", "nabBusiness", "demosauConsumer"];
 const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
 const added = {};
 for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);

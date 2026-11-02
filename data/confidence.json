@@ -4036,5 +4036,21 @@
     "fwEnd": "2026-09-30"
    }
   ]
+ },
+ "demosauConsumer": {
+  "label": "DemosAU Consumer Sentiment Index",
+  "base": "DemosAU, index, 50 = neutral (plotted ×2)",
+  "rows": [
+   {
+    "date": "2026-11-02",
+    "v": 38.7,
+    "chg": null,
+    "url": "https://demosau.com/wp-content/uploads/DemosAU/australian-consumer-sentiment-oct-2026.html",
+    "slug": "six-in-ten-australians-expect-economy-to-worsen-according-to-inaugural-demosau-consumer-sentiment-index",
+    "n": 1061,
+    "fwStart": "2026-10-23",
+    "fwEnd": "2026-10-26"
+   }
+  ]
  }
 }
