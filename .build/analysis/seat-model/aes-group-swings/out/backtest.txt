@@ -1,0 +1,47 @@
+Seat-share error after the model's swing fit (vote-weighted RMSE, points), by election:
+  1996  alp 2.93 (148 seats)  lnp 6.09 (148 seats)  grn 1.21 (32 seats)  onp -
+  1998  alp 2.43 (148 seats)  lnp 4.89 (147 seats)  grn 0.69 (70 seats)  onp -
+  2001  alp 3.00 (150 seats)  lnp 5.21 (150 seats)  grn 1.37 (125 seats)  onp 1.37 (124 seats)
+  2004  alp 2.48 (150 seats)  lnp 4.55 (150 seats)  grn 1.60 (150 seats)  onp 0.64 (69 seats)
+  2007  alp 2.86 (150 seats)  lnp 4.03 (150 seats)  grn 1.19 (150 seats)  onp 0.43 (19 seats)
+  2010  alp 3.29 (150 seats)  lnp 4.01 (150 seats)  grn 1.93 (150 seats)  onp 0.41 (6 seats)
+  2013  alp 2.96 (150 seats)  lnp 4.11 (150 seats)  grn 1.91 (150 seats)  onp 0.33 (2 seats)
+  2016  alp 3.66 (150 seats)  lnp 4.97 (150 seats)  grn 1.70 (150 seats)  onp 0.00 (1 seats)
+  2019  alp 3.56 (151 seats)  lnp 4.17 (151 seats)  grn 2.01 (151 seats)  onp 2.74 (13 seats)
+  2022  alp 3.86 (151 seats)  lnp 4.85 (151 seats)  grn 2.63 (151 seats)  onp 2.02 (60 seats)
+  2025  alp 3.95 (150 seats)  lnp 3.70 (150 seats)  grn 2.48 (150 seats)  onp 1.74 (143 seats)
+
+With the AES's real group swings applied at full scale: pooled RMSE 1996-2025 (change) [elections better / elections with a term]
+  none       alp 3.270 (+0.000) [0/0]  lnp 4.601 (+0.000) [0/0]  grn 1.919 (+0.000) [0/0]  onp 1.587 (+0.000) [0/0]
+  age_pp     alp 3.278 (+0.007) [5/11]  lnp 4.619 (+0.018) [6/11]  grn 1.975 (+0.056) [4/10]  onp 1.573 (-0.014) [3/4]
+  age_lg     alp 3.278 (+0.008) [5/11]  lnp 4.617 (+0.017) [5/11]  grn 1.989 (+0.069) [5/10]  onp 1.575 (-0.012) [3/4]
+  edu_pp     alp 3.268 (-0.002) [7/11]  lnp 4.540 (-0.061) [7/11]  grn 1.923 (+0.003) [4/10]  onp 1.594 (+0.007) [0/4]
+  edu_lg     alp 3.269 (-0.001) [7/11]  lnp 4.536 (-0.064) [7/11]  grn 1.909 (-0.011) [5/10]  onp 1.582 (-0.004) [1/4]
+  ten_lg     alp 3.267 (-0.004) [6/10]  lnp 4.613 (+0.013) [7/10]  grn 1.924 (+0.005) [5/10]  onp 1.573 (-0.014) [3/4]
+  age_edu_lg alp 3.274 (+0.004) [7/11]  lnp 4.544 (-0.057) [7/11]  grn 1.932 (+0.012) [5/10]  onp 1.568 (-0.019) [4/4]
+  all3_lg    alp 3.266 (-0.004) [6/11]  lnp 4.561 (-0.039) [8/11]  grn 1.981 (+0.062) [5/10]  onp 1.561 (-0.026) [4/4]
+  joint      alp 3.280 (+0.010) [6/11]  lnp 4.538 (-0.062) [8/11]  grn 1.934 (+0.014) [4/10]  onp 1.561 (-0.026) [4/4]
+
+Scale fitted on all elections (1 = the AES change as measured), and the change when each election takes the scale fitted on the others:
+  age_pp     alp k 0.02 out-of-sample +0.006  lnp k -0.18 out-of-sample +0.018  grn k 0.41 out-of-sample +0.018  onp k -0.06 out-of-sample +0.006
+  age_lg     alp k -0.02 out-of-sample +0.006  lnp k -0.09 out-of-sample +0.018  grn k 0.07 out-of-sample +0.018  onp k -0.17 out-of-sample +0.018
+  edu_pp     alp k 0.46 out-of-sample +0.018  lnp k 1.24 out-of-sample -0.042  grn k 0.52 out-of-sample -0.012  onp k -0.68 out-of-sample -0.002
+  edu_lg     alp k 0.43 out-of-sample +0.019  lnp k 1.25 out-of-sample -0.045  grn k 0.81 out-of-sample -0.009  onp k 0.81 out-of-sample +0.012
+  ten_lg     alp k 0.82 out-of-sample +0.011  lnp k 0.01 out-of-sample +0.038  grn k 0.25 out-of-sample -0.002  onp k 0.15 out-of-sample -0.003
+  age_edu_lg alp k 0.38 out-of-sample +0.016  lnp k 1.14 out-of-sample -0.044  grn k 0.51 out-of-sample +0.021  onp k 0.19 out-of-sample -0.007
+  all3_lg    alp k 0.53 out-of-sample +0.015  lnp k 0.70 out-of-sample -0.037  grn k 0.32 out-of-sample +0.015  onp k 0.16 out-of-sample -0.013
+  joint      alp k 0.30 out-of-sample +0.019  lnp k 0.94 out-of-sample -0.058  grn k 0.37 out-of-sample -0.006  onp k 0.19 out-of-sample -0.009
+
+Ceiling: each election's own slopes on degree, young, old, renter, mortgage, fitted in-sample - pooled RMSE:
+  alp: 3.270 -> 2.987
+  lnp: 4.601 -> 4.294
+  grn: 1.919 -> 1.775
+  onp: 1.587 -> 1.504
+
+AES gap change (logit) v the seats' own fitted slope on the same group (univariate, logit per unit share), election by election:
+  degree       alp: r -0.01, seats' slope per unit of the AES's -0.02   1996 0.30/0.42  1998 -0.43/0.32  2001 0.36/-0.25  2004 -0.17/0.47  2007 0.20/-0.34  2010 -0.17/-0.46  2013 0.16/0.20  2016 -0.12/-0.66  2019 0.09/0.47  2022 0.04/0.16  2025 0.04/0.48
+  degree       lnp: r 0.65, seats' slope per unit of the AES's 1.14   1996 -0.21/-1.21  1998 0.56/0.68  2001 -0.70/-0.56  2004 -0.00/-1.02  2007 -0.09/0.15  2010 0.19/0.08  2013 -0.03/-0.01  2016 0.24/-0.07  2019 -0.09/-0.43  2022 -0.31/-0.89  2025 0.16/-0.06
+  degree       grn: r 0.81, seats' slope per unit of the AES's 1.13   1998 0.20/1.05  2001 0.73/0.90  2004 0.10/0.46  2007 -0.31/-0.13  2010 -0.25/0.02  2013 0.25/0.83  2016 -0.30/-0.09  2019 -0.24/0.08  2022 0.06/-0.32  2025 -0.58/-0.38
+  55+ v 18-34  alp: r -0.05, seats' slope per unit of the AES's -0.03   1996 0.22/0.03  1998 -0.27/0.05  2001 0.24/0.18  2004 0.27/0.02  2007 -0.09/0.14  2010 -0.16/0.23  2013 -0.03/-0.14  2016 0.00/-0.04  2019 0.06/-0.03  2022 -0.16/-0.13  2025 0.14/-0.17
+  55+ v 18-34  lnp: r -0.23, seats' slope per unit of the AES's -0.27   1996 0.04/0.73  1998 0.01/-0.44  2001 -0.05/0.15  2004 -0.34/0.59  2007 0.18/0.28  2010 0.29/0.03  2013 -0.20/0.10  2016 0.26/0.36  2019 0.38/0.16  2022 -0.44/0.37  2025 -0.07/0.34
+  55+ v 18-34  grn: r -0.20, seats' slope per unit of the AES's -0.05   1998 -1.27/-0.29  2001 2.26/-0.53  2004 -0.31/-0.27  2007 0.09/0.25  2010 -0.13/-0.46  2013 0.22/-0.00  2016 -0.71/-0.05  2019 -0.82/-0.33  2022 0.99/-0.42  2025 -0.68/-0.58

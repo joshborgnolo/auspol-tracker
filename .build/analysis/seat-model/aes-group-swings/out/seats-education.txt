@@ -1,0 +1,18 @@
+University share across the seats: mean 0.283, SD 0.124, 0.11-0.59. The model's random education shock: SD 0.06 logit per SD of it = 0.48 per unit share.
+Gap changes tested (logit per unit university share): Coalition, same-house: lnp +0.17; all four, same-house: alp +0.21 lnp +0.17 grn +0.06 on +0.01; Coalition, AES baseline: lnp +0.60; Coalition+Greens, AES: lnp +0.60 grn +0.19; all four, AES baseline: alp +0.25 lnp +0.60 grn +0.19 on -0.66
+
+nowcast: expected seats, Labor majority, central-projection flips
+  official                 ALP 71.4  L/NP 30.3  ON 36.6  GRN 4.1  IND+OTH 7.7  majority 39.6%  flips 0
+  Coalition, same-house    ALP 71.4  L/NP 30.1  ON 36.8  GRN 4.1  IND+OTH 7.5  majority 39.7%  flips 0
+  all four, same-house     ALP 71.4  L/NP 30.0  ON 37.0  GRN 3.9  IND+OTH 7.6  majority 39.4%  flips 2: Brand alp→on, Braddon alp→on
+  Coalition, AES baseline  ALP 71.4  L/NP 29.8  ON 37.5  GRN 4.1  IND+OTH 7.2  majority 40.4%  flips 2: Melbourne grn→alp, Curtin member→lnp
+  Coalition+Greens, AES    ALP 71.2  L/NP 29.8  ON 37.5  GRN 4.2  IND+OTH 7.2  majority 39.3%  flips 2: Macnamara alp→grn, Curtin member→lnp
+  all four, AES baseline   ALP 70.4  L/NP 28.4  ON 39.8  GRN 4.1  IND+OTH 7.4  majority 36.4%  flips 6: Nicholls lnp→on, Grey lnp→on, Brand alp→on, Canning lnp→on, O'Connor lnp→on, Braddon alp→on
+
+forecast: expected seats, Labor majority, central-projection flips
+  official                 ALP 83.3  L/NP 39.8  ON 15.5  GRN 3.6  IND+OTH 7.8  majority 73.0%  flips 0
+  Coalition, same-house    ALP 83.4  L/NP 39.6  ON 15.7  GRN 3.6  IND+OTH 7.7  majority 73.1%  flips 0
+  all four, same-house     ALP 83.3  L/NP 39.6  ON 15.8  GRN 3.5  IND+OTH 7.8  majority 73.0%  flips 1: Wide Bay on→lnp
+  Coalition, AES baseline  ALP 83.6  L/NP 39.2  ON 16.1  GRN 3.6  IND+OTH 7.5  majority 73.7%  flips 2: Fowler member→alp, Parkes lnp→on
+  Coalition+Greens, AES    ALP 83.4  L/NP 39.2  ON 16.2  GRN 3.7  IND+OTH 7.5  majority 73.2%  flips 2: Fowler member→alp, Parkes lnp→on
+  all four, AES baseline   ALP 82.9  L/NP 38.4  ON 17.5  GRN 3.6  IND+OTH 7.6  majority 71.5%  flips 1: Parkes lnp→on

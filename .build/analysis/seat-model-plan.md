@@ -2,6 +2,7 @@
 
 > **Review, 2026-10-31 to 11-01:** [seat-model-design-review.md](seat-model-design-review.md) tests this plan's choices against SA 2026 and the federal elections 2007–25. It favours a logit swing over W5's 50/50 mix, Coalition→Labor flows in Labor-v-One Nation seats graded by seat type rather than the flat 21.5%, and much wider, correlated errors. Read it before changing W5.
 > **v2, 2026-11-01:** the engine was rebuilt on Senate-ballot preference rankings, a logit swing and fitted errors, with backtests. See section 12 of the review. W5's sections below describe the superseded engine.
+> **AES group swings, 2026-11-02:** [seat-model/aes-group-swings/](seat-model/aes-group-swings/README.md) tests education, housing and age terms against every AES 1993–2025. No change: Coalition education is the only real signal, and even the polls' shift against the AES 2025 moves expected seats by under one.
 
 A demographically-adjusted swing model that turns the site's current-cycle polling
 into per-seat win probabilities and a national seat distribution. **Not MRP** —
