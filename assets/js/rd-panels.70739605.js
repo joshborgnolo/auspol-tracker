@@ -78,7 +78,10 @@ function RdPrimary({
     election: true,
     ...Object.fromEntries(T.order.map((kk, i) => [kk, gElec.groups[sel.label][i]]))
   } : null : allBase;
-  const gWas = G && !base && G.monthly && G.monthly.length > 1 ? (() => {
+  const aesGrp = G && !base && D.demoAes && D.demoAes.sets && sel.setId && D.demoAes.sets[sel.setId] ? D.demoAes.sets[sel.setId].groups[sel.label] || null : null;
+  const aesWas = aesGrp ? Object.fromEntries(T.order.filter(kk => aesGrp[kk]).map(kk => [kk, aesGrp[kk][1]])) : null;
+  const aesWasCi = aesGrp ? Object.fromEntries(T.order.filter(kk => aesGrp[kk]).map(kk => [kk, aesGrp[kk][2] || 0])) : null;
+  const gWas = G && !base && !aesGrp && G.monthly && G.monthly.length > 1 ? (() => {
     const o = {
       ym: G.monthly[0][0]
     };
@@ -88,13 +91,14 @@ function RdPrimary({
     return o;
   })() : null;
   const GRPV_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
-  const mkParts = (V, C, W) => ["alp", "lnp", "grn", "onp", "oth"].map(id => ({
+  const mkParts = (V, C, W, WC) => ["alp", "lnp", "grn", "onp", "oth"].map(id => ({
     id,
     color: D.PARTIES[id].color,
     name: id === "oth" ? "Others & independents" : D.PARTIES[id].name,
     v: V[id],
     was: W ? W[id] : null,
-    ci: C[id] || 0
+    ci: C[id] || 0,
+    wasCi: WC ? WC[id] || 0 : 0
   })).sort((a, b) => b.v - a.v);
   const levelRuns = ps => {
     const rs = [];
@@ -108,7 +112,7 @@ function RdPrimary({
   const nowPrim = pvx ? pvx.now : D.latest.primary;
   const partsAll = nowPrim ? mkParts(nowPrim, lastM.ci || {}, allBase) : null;
   const kAll = partsAll ? levelCount(partsAll) : 0;
-  const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
+  const parts = G ? mkParts(G.v, G.ci, base || aesWas, base ? null : aesWasCi) : partsAll;
   const partsDry = pvxDry ? (() => {
     const lastWithFig = aggPrim.slice().reverse().find(d => !d.election && GRPV_KEYS.some(k => d[k] != null));
     return lastWithFig ? mkParts(lastWithFig, lastM.ci || {}, allBase) : null;
@@ -186,10 +190,10 @@ function RdPrimary({
     runs.slice(1).filter(r => r.length >= 2).forEach(r => {
       dek += " " + pcSeg(r) + ", are too close to separate.";
     });
-    const fallers = parts.slice(k).filter(p => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15 && p.was - p.v > (p.ci || 0)).sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
+    const fallers = parts.slice(k).filter(p => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15 && p.was - p.v > Math.sqrt((p.ci || 0) ** 2 + (p.wasCi || 0) ** 2)).sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
     if (fallers.length) {
       const f = fallers[0];
-      dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost " + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + " election-night vote.";
+      dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost " + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + (aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
     }
     for (const id of lateParties) {
       dek += " " + rdPartyStart(id) + "’s line starts in " + rdMonthYear(firstPolled[id].ym) + ": until then, the polls counted " + (rdPlural(id) ? "them" : "it") + " among others.";
@@ -307,7 +311,8 @@ function RdPrimary({
     }).concat(inDom(q.x) ? soloDotsOf(q) : []);
   }), [T, G, xDomain[0], xDomain[1], hvKey]);
   const aeSet = G && !base && D.demoAes && D.demoAes.sets ? D.demoAes.sets[sel.setId] || null : null;
-  const aeOf = kk => aeSet && aeSet.groups[sel.label] && aeSet.groups[sel.label][kk] || null;
+  const aeGrp = aeSet ? aeSet.groups[sel.label] || null : null;
+  const aeOf = kk => aeGrp && aeGrp[kk] || null;
   const aeOn = !!(aeSet && parts && parts.some(p => aeOf(p.id)) && D.demoAes.x >= xDomain[0] - 1e-6);
   const aePts = aeOn ? parts.filter(p => aeOf(p.id)).map(p => ({
     x: D.demoAes.x,
@@ -322,7 +327,7 @@ function RdPrimary({
     meta: {
       pollster: "Australian Election Study 2025"
     },
-    sub: "Vote at the May 2025 election, post-election survey, n = " + D.demoAes.n.toLocaleString() + (aeSet.read ? ", read off the report’s chart" : "") + ", not pooled"
+    sub: "Vote at the May 2025 election, post-election survey, " + aeGrp.n.toLocaleString() + " respondents in this group, not pooled"
   })) : [];
   const aeLeads = aeOn ? parts.filter(p => aeOf(p.id)).map(p => {
     const pLive = series(live(p.id), p.id);
@@ -430,13 +435,14 @@ function RdPrimary({
   }, "%")), (() => {
     const w = p.was != null ? {
       v: p.was,
-      since: "the election"
+      since: aesGrp ? "the election (AES)" : "the election"
     } : gWas && gWas[p.id] != null ? {
       v: gWas[p.id],
       since: rdMonthYear(gWas.ym)
     } : null;
     return w && React.createElement("span", {
-      className: "rd-pv-chg"
+      className: "rd-pv-chg",
+      title: aesGrp && p.was != null ? "Measured from the Australian Election Study 2025’s figure for this group, ±" + (p.wasCi || 0).toFixed(1) + " points" : undefined
     }, rdArrow(p.v - w.v), " ", Math.abs(p.v - w.v).toFixed(1), " since ", w.since);
   })());
   const rangeLive = React.useRef(null);
@@ -647,7 +653,7 @@ function RdPrimary({
         value: "The election result"
       }] : [{
         label: "",
-        value: "Australian Election Study 2025, as printed" + (aeSet && aeSet.read ? " (generation figures read off the report’s chart)" : "") + "; never pooled"
+        value: "Australian Election Study 2025" + (aeGrp ? ", " + aeGrp.n.toLocaleString() + " respondents" : "") + "; never pooled"
       }];
       const d = pts[elecStop ? i - 1 : i];
       if (!d || !d.ci || d.election) return d && d.election ? [{
@@ -659,11 +665,11 @@ function RdPrimary({
         value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
       }];
     },
-    fmt: (v, pt) => G && pt && pt.gv != null ? String(pt.gv) : v.toFixed(1),
+    fmt: (v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1),
     copy: {
       title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""),
       sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : pvx ? ". Monthly averages of " + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (aeOn ? " The diamonds at the election are the Australian Election Study 2025’s figures" + (aeSet && aeSet.read ? ", read off the report’s chart" : "") + ", never pooled." : "") + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "") + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
+      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (aeOn ? " The diamonds at the election are the Australian Election Study 2025’s figures, never pooled." : "") + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "") + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -3548,14 +3554,48 @@ function rdDemoShift(dt, T, party) {
   const allOf = party === "oth" ? "all voters for others & independents" : "all " + (RD_TREND_BARE[party] || nameD) + " voters";
   const serial = ls => rdSerial(ls, "and");
   const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
+  const pct = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  const named = new Set();
+  const elecSentence = () => {
+    const pass = (dt.elec || []).filter(r => r.sig && !named.has(r.group)).sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
+    if (!pass.length) return null;
+    const sgnE = v => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
+    const men = pass.find(r => r.group === "Men"),
+      women = pass.find(r => r.group === "Women");
+    const claims = [];
+    if (men && women) {
+      const was = men.then - women.then,
+        now = men.now - women.now;
+      const flip = Math.sign(was) !== Math.sign(now);
+      const nowSig = Math.abs(now) > Math.sqrt((men.ciNow || 0) ** 2 + (women.ciNow || 0) ** 2);
+      const how = flip ? nowSig ? "reversed" : "closed" : Math.abs(now) < Math.abs(was) ? "narrowed" : "widened";
+      claims.push({
+        k: Math.max(Math.abs(men.d) / men.ci, Math.abs(women.d) / women.ci),
+        s: "its gender gap has " + how + " (men " + sgnE(men.d) + ", women " + sgnE(women.d) + " points relative to all voters)"
+      });
+    }
+    for (const r of pass) {
+      if (men && women && (r === men || r === women)) continue;
+      claims.push({
+        k: Math.abs(r.d) / r.ci,
+        s: "it has " + (r.d > 0 ? "gained" : "lost") + " ground among " + (RD_TREND_GROUP[r.group] || r.group) + " (" + sgnE(r.d) + " points relative to all voters)"
+      });
+    }
+    claims.sort((a, b) => b.k - a.k);
+    return "Measured from the election (Australian Election Study 2025), " + serial(claims.slice(0, 2).map(c => c.s));
+  };
   if (!solid.length) {
     const skew = RD_TREND_SKEW[party];
+    const es = elecSentence();
+    if (es) return {
+      head: "The composition of " + voteOf + " has shifted since the election",
+      dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters. " + es + "."
+    };
     return {
       head: "The composition of " + voteOf + " is unchanged",
       dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : ".")
     };
   }
-  const pct = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
   const sgnPts = v => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
   const relPts = m => sgnPts(m.g1 - m.g0 - (m.a1 - m.a0));
   const bestOf = ms => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
@@ -3689,7 +3729,9 @@ function rdDemoShift(dt, T, party) {
   });
   if (groupMoves.length) parts.push(groupSentence(groupMoves, !parts.length));
   if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves, false));
-  const ordered = parts.concat(thinParts);
+  groupMoves.concat(thinGroupMoves).forEach(m => named.add(m.group));
+  const es = elecSentence();
+  const ordered = parts.concat(thinParts, es ? [es] : []);
   return {
     head,
     dek: since + ordered.map((s, i) => i === 0 ? s : rdCap(s)).join(". ") + "."
@@ -3837,7 +3879,10 @@ function RdDemographics({
     dek: rdDemoDek(T, tab, party)
   };
   const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
-  const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
+  const sgn1 = (v, s) => {
+    const r = Math.round(v * 10) / 10;
+    return (r < 0 ? "−" : s && r > 0 ? "+" : "") + Math.abs(r).toFixed(1);
+  };
   const sigSets = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
     const seen = new Map();
@@ -3854,6 +3899,20 @@ function RdDemographics({
       s.rows.push(r);
       if (r.from < s.from) s.from = r.from;
       if (r.to > s.to) s.to = r.to;
+    }
+    return [...seen.values()];
+  })();
+  const elecSets = (() => {
+    const dt = D.demoTrend && D.demoTrend[party];
+    const seen = new Map();
+    for (const r of dt && dt.elec || []) {
+      const k = r.tab + "|" + r.set;
+      if (!seen.has(k)) seen.set(k, {
+        key: k,
+        label: r.setLabel,
+        rows: []
+      });
+      seen.get(k).rows.push(r);
     }
     return [...seen.values()];
   })();
@@ -4337,7 +4396,7 @@ function RdDemographics({
     const aeOf = g => ae && ae.groups[g.label] && ae.groups[g.label][party] || null;
     const aeOn = !!ae && !pm && !leOn && c.allPts.length && D.demoAes.x < c.allPts[0].x && rowsOf.some(r => aeOf(r.l.g)) && (xDom[0] <= D.demoAes.x + 1e-6 || rangeId === "all");
     const aeX = aeOn ? D.demoAes.x : null;
-    const aeSub = "Vote at the May 2025 election, post-election survey, n = " + (D.demoAes ? D.demoAes.n.toLocaleString() : "") + (ae && ae.read ? ", read off the report’s chart" : "") + ", not pooled";
+    const aeSub = g => "Vote at the May 2025 election, post-election survey, " + ae.groups[g.label].n.toLocaleString() + " respondents in this group, not pooled";
     const aeRows = aeOn ? rowsOf.filter(r => aeOf(r.l.g)) : [];
     const aePts = aeRows.map(r => ({
       x: aeX,
@@ -4351,7 +4410,7 @@ function RdDemographics({
       meta: {
         pollster: "Australian Election Study 2025"
       },
-      sub: aeSub
+      sub: aeSub(r.l.g)
     }));
     const aeN = aeOn ? D.demoAes.elec[party] : null;
     const aeLeads = aeOn ? aeRows.filter(r => r.rows.length).map(r => ({
@@ -4388,7 +4447,7 @@ function RdDemographics({
     const lead0 = leOn || aeOn;
     const ciLead = i => i === 0 ? [{
       label: "",
-      value: leOn ? "The election result" : "Groups: Australian Election Study 2025, as printed; all voters: the result"
+      value: leOn ? "The election result" : "Groups: Australian Election Study 2025; all voters: the result"
     }] : ciLoc(i - 1);
     return (React.createElement("div", {
         className: "card rd-card rd-wv-chart",
@@ -4445,7 +4504,7 @@ function RdDemographics({
         pollSplit: tab.id,
         tooltipTitle: i => lead0 && i === 0 ? monthLabelFull("2025-05") : c.allPts[lead0 ? i - 1 : i] ? monthLabelFull(c.allPts[lead0 ? i - 1 : i].ym) : "",
         extraRows: lead0 ? ciLead : ciLoc,
-        fmt: (v, pt) => pt && pt.gv != null ? String(pt.gv) : v.toFixed(1),
+        fmt: (v, pt) => (pt && pt.gv != null ? pt.gv : v).toFixed(1),
         copy: {
           title: rdCap(pVote) + " " + (c.st.label || "By " + tab.label).toLowerCase(),
           sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
@@ -4644,7 +4703,43 @@ function RdDemographics({
     className: r.sig ? "rd-tsig-yes" : ""
   }, r.sig ? "Yes" : "No"))))))), React.createElement("p", {
     className: "rd-note rd-tsig-note"
-  }, "Support figures are fitted monthly trends over each set\u2019s window, not single polls. A group\u2019s change vs all voters is its fitted change less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " national fitted change, in points; a move counts as significant only when both trend tests \u2014 on the group\u2019s gap to all voters and on its ratio \u2014 clear a t statistic of 1.96, in the same direction. \u2020 Seven or fewer monthly readings: the trend summary above hedges these (\u201Cappears to\u201D).")), React.createElement(RdFoot, {
+  }, "Support figures are fitted monthly trends over each set\u2019s window, not single polls. A group\u2019s change vs all voters is its fitted change less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " national fitted change, in points; a move counts as significant only when both trend tests \u2014 on the group\u2019s gap to all voters and on its ratio \u2014 clear a t statistic of 1.96, in the same direction. \u2020 Seven or fewer monthly readings: the trend summary above hedges these (\u201Cappears to\u201D)."), elecSets.length > 0 && React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-tsig-wrap"
+  }, React.createElement("table", {
+    className: "rd-tsig-table"
+  }, React.createElement("caption", {
+    className: "rd-tsig-cap"
+  }, "Since the election, against the Australian Election Study 2025"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "col"
+  }, React.createElement("span", {
+    className: "sr-only"
+  }, "Group")), React.createElement("th", {
+    scope: "col"
+  }, "Gap to all voters, election \u2192 now, pts"), React.createElement("th", {
+    scope: "col"
+  }, "Change, pts"), React.createElement("th", {
+    scope: "col"
+  }, "95% margin, pts"), React.createElement("th", {
+    scope: "col"
+  }, "Rate vs all voters, election \u2192 now"), React.createElement("th", {
+    scope: "col"
+  }, "AES respondents"), React.createElement("th", {
+    scope: "col"
+  }, "Significant"))), elecSets.map(s => React.createElement("tbody", {
+    key: s.key
+  }, React.createElement("tr", {
+    className: "rd-tsig-set"
+  }, React.createElement("th", {
+    colSpan: 7
+  }, s.label)), s.rows.map(r => React.createElement("tr", {
+    key: r.group
+  }, React.createElement("th", {
+    scope: "row"
+  }, r.group), React.createElement("td", null, sgn1(r.then, true), " \u2192 ", sgn1(r.now, true)), React.createElement("td", null, sgn1(r.d, true)), React.createElement("td", null, "\xB1", r.ci.toFixed(1)), React.createElement("td", null, r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)), React.createElement("td", null, r.n.toLocaleString()), React.createElement("td", {
+    className: r.sig ? "rd-tsig-yes" : ""
+  }, r.sig ? "Yes" : "No"))))))), React.createElement("p", {
+    className: "rd-note rd-tsig-note"
+  }, "The election gap is the group\u2019s in the Australian Election Study 2025 (its share less all respondents\u2019, from the survey\u2019s respondent file); the gap now is the group\u2019s current pooled figure less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " current primary. The margin combines both figures\u2019 sampling error. A change counts only when it clears that margin and the group\u2019s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn\u2019t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above."))), React.createElement(RdFoot, {
     how: {
       term: "vote-by-group",
       from: "Who votes for whom"
