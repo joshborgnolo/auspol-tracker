@@ -5639,11 +5639,18 @@ const DEMO_AES = (() => {
   for (const [id, groups] of Object.entries(src.sets)) {
     sets[id] = { groups: Object.fromEntries(Object.entries(groups).map(([g, v]) => [g, {
       n: v.n,
-      // per party: [the AES's share, plotted y = the result + the gap from the AES's own figure]
-      ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [v[k], r1(Math.max(0, elec[k] + (v[k] - all[k])))]])),
+      /* per party: [the AES's share, plotted y = the result + the gap from
+         the AES's own figure, that gap's 95% margin (the extractor's
+         gap_ci: GREG weights' effective n, group and rest independent)] -
+         the margin is the baseline's own error wherever a figure is read
+         "since the election" off it (rdPrimary's stat rows and faller,
+         §7gb's election test) */
+      ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [v[k], r1(Math.max(0, elec[k] + (v[k] - all[k]))), v.ci ? v.ci[k] : null]])),
     }])) };
   }
-  return { x: DEMO_STATE_ELECTION.x, respondents: src.respondents, src: src.source, elec, sets };
+  // all: the AES's own all-respondents shares, each group's gap measured from them
+  return { x: DEMO_STATE_ELECTION.x, respondents: src.respondents, src: src.source, elec,
+           all: Object.fromEntries(DEMO_KEYS.map((k) => [k, all[k]])), sets };
 })();
 
 /* One figure per group and party, built as the headline is. Each poll says
@@ -6150,7 +6157,49 @@ const demoTrend = (() => {
       }
     }
     moves.sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
-    out[party] = { windowYm, moves, rows };
+    /* The election test (user ruling 2026-11-02), beside – never inside –
+       the slope test above: for every group the Australian Election Study
+       2025 measures the site's way (DEMO_AES), has its gap from all voters
+       moved since the election? The gap now is the group's current pooled
+       figure less the current primaries (the dot plot's own "vs all
+       voters"); the gap then is the AES's (group less all respondents).
+       Significant when the change clears both margins combined – the
+       pooled figure's and the AES cell's (gap_ci) – so a thin AES cell
+       (One Nation: 38 respondents) gates its own claims out. Two different
+       instruments, one recalled vote and one intention, so this is an
+       endpoint comparison and never a point in the slope fit: one survey
+       at the head of a series would steer the slope by its method. */
+    const elecRows = [];
+    if (DEMO_AES) for (const tab of demographics.tabs) for (const st of tab.sets) {
+      const ae = DEMO_AES.sets[st.id];
+      if (!ae) continue;
+      for (const g of st.groups) {
+        const a = ae.groups[g.label] && ae.groups[g.label][party];
+        if (!a || a[2] == null || g.v[party] == null) continue;
+        const now = g.v[party] - demographics.all[party], then = a[1] - DEMO_AES.elec[party];
+        const ci = Math.sqrt((g.ci[party] || 0) ** 2 + a[2] ** 2);
+        const d = now - then;
+        /* and the ratio half, as the slope test pairs its two: a party that
+           has grown everywhere widens a low group's point gap while the
+           group keeps its share of it (One Nation, ~6 to ~25 since the
+           election), so the gap alone reads pace-keeping as divergence.
+           ln(group / all) now against then, each side's error carried onto
+           the log scale (delta method) off its own margin; a zero AES share
+           has no ratio to test, so it can't pass */
+        const aesAll = DEMO_AES.all[party];
+        const gNow = g.v[party], allNow = demographics.all[party];
+        const lrOk = gNow > 0.05 && allNow > 0.05 && a[0] > 0.05 && aesAll > 0.05;
+        const lr = lrOk ? Math.log(gNow / allNow) - Math.log(a[0] / aesAll) : null;
+        const lrCi = lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (a[2] / a[0]) ** 2) : null;
+        const sigLR = lr != null && Math.abs(lr) > lrCi;
+        elecRows.push({ tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
+          then: rr(then), now: rr(now), d: rr(d), ci: rr(ci), ciNow: rr(g.ci[party] || 0), ciThen: rr(a[2]), n: ae.groups[g.label].n,
+          rThen: lrOk ? rr(a[0] / aesAll) : null, rNow: lrOk ? rr(gNow / allNow) : null,
+          sigGap: Math.abs(d) > ci, sigLR,
+          sig: Math.abs(d) > ci && sigLR && Math.sign(d) === Math.sign(lr) });
+      }
+    }
+    out[party] = { windowYm, moves, rows, elec: elecRows };
   }
   return out;
 })();

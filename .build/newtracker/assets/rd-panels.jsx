@@ -102,19 +102,35 @@ function RdPrimary({ rangeId, setRangeId }) {
   const base = G
     ? (gElec ? { x: gElec.x, election: true, ...Object.fromEntries(T.order.map((kk, i) => [kk, gElec.groups[sel.label][i]])) } : null)
     : allBase;
+  /* Where the count was never cut but the Australian Election Study 2025
+     measures the group (D.demoAes: gender, age, generation, education,
+     housing, work status), "since the election" reads off the AES instead
+     (user ruling 2026-11-02): each party's figure is the diamond the chart
+     draws - the 2025 result plus the group's AES gap from all respondents -
+     so every such group shares the election as its baseline rather than
+     whichever month the polls first cut it. Unlike a count, the baseline
+     carries sampling error (aesWasCi, the AES cell's margin), which the
+     faller test adds to the current figure's. */
+  const aesGrp = G && !base && D.demoAes && D.demoAes.sets && sel.setId && D.demoAes.sets[sel.setId]
+    ? D.demoAes.sets[sel.setId].groups[sel.label] || null : null;
+  const aesWas = aesGrp ? Object.fromEntries(T.order.filter((kk) => aesGrp[kk]).map((kk) => [kk, aesGrp[kk][1]])) : null;
+  const aesWasCi = aesGrp ? Object.fromEntries(T.order.filter((kk) => aesGrp[kk]).map((kk) => [kk, aesGrp[kk][2] || 0])) : null;
   /* the baseline named above: the group line's first monthly row, keyed by
      party as the election rows are - a party unpolled that month keeps no
-     change row, as it had no election row before */
-  const gWas = G && !base && G.monthly && G.monthly.length > 1
+     change row, as it had no election row before; the AES's election
+     figures take its place wherever they exist */
+  const gWas = G && !base && !aesGrp && G.monthly && G.monthly.length > 1
     ? (() => { const o = { ym: G.monthly[0][0] }; T.order.forEach((kk, i) => { o[kk] = G.monthly[0][1 + i]; }); return o; })()
     : null;
   /* a poll row's grp.v slots are gen-data's alp/lnp/grn/onp/oth order, NOT
      §7g's DEMO_KEYS (alp/lnp/onp/grn/oth): map by key, never by a shared
      index across the two */
   const GRPV_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
-  const mkParts = (V, C, W) => ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
+  /* WC: the baseline's own margin per party - zero for a count, the AES
+     cell's for an AES baseline */
+  const mkParts = (V, C, W, WC) => ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
     id, color: D.PARTIES[id].color, name: (id === "oth" ? "Others & independents" : D.PARTIES[id].name),
-    v: V[id], was: W ? W[id] : null, ci: C[id] || 0,
+    v: V[id], was: W ? W[id] : null, ci: C[id] || 0, wasCi: WC ? WC[id] || 0 : 0,
   })).sort((a, b) => b.v - a.v);
   /* the level test, walking the ranking the way the share card's ladder
      and the og:alt sentence already do (make-card.js, build.mjs
@@ -141,7 +157,7 @@ function RdPrimary({ rangeId, setRangeId }) {
   const nowPrim = pvx ? pvx.now : D.latest.primary;
   const partsAll = nowPrim ? mkParts(nowPrim, lastM.ci || {}, allBase) : null;
   const kAll = partsAll ? levelCount(partsAll) : 0;
-  const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
+  const parts = G ? mkParts(G.v, G.ci, base || aesWas, base ? null : aesWasCi) : partsAll;
   /* a dry subset (pvxDry: no poll in the three-week window) has no `parts`
      to quote, but its monthly lines still draw - the CHART's party list
      then comes from the newest subset month that carries figures (the
@@ -230,15 +246,17 @@ function RdPrimary({ rangeId, setRangeId }) {
       dek += " " + pcSeg(r) + ", are too close to separate.";
     });
     /* the biggest faller outside the leading group, if the fall is big (15%
-       of its election vote or more) AND clears the current figure's own
-       margin - the count it is measured from carries no sampling error, but
-       a group's figure can carry ±5 or more */
-    const fallers = parts.slice(k).filter((p) => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15 && p.was - p.v > (p.ci || 0))
+       of its election vote or more) AND clears the margins - the current
+       figure's, and the baseline's own: none for a count, the AES cell's
+       for an AES baseline (wasCi), combined in quadrature */
+    const fallers = parts.slice(k).filter((p) => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15
+        && p.was - p.v > Math.sqrt((p.ci || 0) ** 2 + (p.wasCi || 0) ** 2))
       .sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
     if (fallers.length) {
       const f = fallers[0];
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost "
-        + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + " election-night vote.";
+        + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its")
+        + (aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
     }
     /* a party the polls only began reporting apart long after the election
        (/vic/'s One Nation, among others until February 2026) says where its
@@ -473,9 +491,11 @@ function RdPrimary({ rangeId, setRangeId }) {
       </span>
       <span className="rd-pv-val">{p.v.toFixed(1)}<span className="rd-pv-pct">%</span></span>
       {(() => {
-        const w = p.was != null ? { v: p.was, since: "the election" } : (gWas && gWas[p.id] != null ? { v: gWas[p.id], since: rdMonthYear(gWas.ym) } : null);
+        /* an AES baseline names itself, and its margin rides in the title:
+           a survey's election figure, not the count */
+        const w = p.was != null ? { v: p.was, since: aesGrp ? "the election (AES)" : "the election" } : (gWas && gWas[p.id] != null ? { v: gWas[p.id], since: rdMonthYear(gWas.ym) } : null);
         return w && (
-          <span className="rd-pv-chg">{rdArrow(p.v - w.v)} {Math.abs(p.v - w.v).toFixed(1)} since {w.since}</span>
+          <span className="rd-pv-chg" title={aesGrp && p.was != null ? "Measured from the Australian Election Study 2025’s figure for this group, ±" + (p.wasCi || 0).toFixed(1) + " points" : undefined}>{rdArrow(p.v - w.v)} {Math.abs(p.v - w.v).toFixed(1)} since {w.since}</span>
         );
       })()}
     </button>
@@ -2860,14 +2880,58 @@ function rdDemoShift(dt, T, party) {
   const allOf = party === "oth" ? "all voters for others & independents" : "all " + (RD_TREND_BARE[party] || nameD) + " voters";
   const serial = (ls) => rdSerial(ls, "and");
   const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
+  const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  /* The election test's sentence (gen-data §7gb `elec`, user ruling
+     2026-11-02): groups whose gap from all voters has moved since the
+     election, measured against the Australian Election Study 2025 with
+     both margins combined and the ratio agreeing. Its own closing sentence,
+     worded "since the election", never merged into the slope test's
+     claims; the two strongest passes (|change| / margin), a group the dek
+     already names left out (one group, one figure); men and women passing
+     together are one finding, the gender gap. `named` is filled as the
+     slope claims are chosen below. */
+  const named = new Set();
+  const elecSentence = () => {
+    const pass = (dt.elec || []).filter((r) => r.sig && !named.has(r.group))
+      .sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
+    if (!pass.length) return null;
+    const sgnE = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
+    const men = pass.find((r) => r.group === "Men"), women = pass.find((r) => r.group === "Women");
+    const claims = [];
+    if (men && women) {
+      /* the test says the gap MOVED; "reversed" also says where it now
+         sits, so it needs the men-v-women gap now to clear its own margin
+         the other way - a flip inside that margin has only "closed" */
+      const was = men.then - women.then, now = men.now - women.now;
+      const flip = Math.sign(was) !== Math.sign(now);
+      const nowSig = Math.abs(now) > Math.sqrt((men.ciNow || 0) ** 2 + (women.ciNow || 0) ** 2);
+      const how = flip ? (nowSig ? "reversed" : "closed") : Math.abs(now) < Math.abs(was) ? "narrowed" : "widened";
+      claims.push({ k: Math.max(Math.abs(men.d) / men.ci, Math.abs(women.d) / women.ci),
+        s: "its gender gap has " + how + " (men " + sgnE(men.d) + ", women " + sgnE(women.d) + " points relative to all voters)" });
+    }
+    for (const r of pass) {
+      if (men && women && (r === men || r === women)) continue;
+      claims.push({ k: Math.abs(r.d) / r.ci,
+        s: "it has " + (r.d > 0 ? "gained" : "lost") + " ground among " + (RD_TREND_GROUP[r.group] || r.group) + " (" + sgnE(r.d) + " points relative to all voters)" });
+    }
+    claims.sort((a, b) => b.k - a.k);
+    return "Measured from the election (Australian Election Study 2025), " + serial(claims.slice(0, 2).map((c) => c.s));
+  };
   if (!solid.length) {
     const skew = RD_TREND_SKEW[party];
+    const es = elecSentence();
+    /* the polls' months show nothing, but the election test does: the head
+       can't call the composition unchanged, and the skew line (a claim of
+       no change) gives way */
+    if (es) return {
+      head: "The composition of " + voteOf + " has shifted since the election",
+      dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters. " + es + ".",
+    };
     return {
       head: "The composition of " + voteOf + " is unchanged",
       dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
     };
   }
-  const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
   /* a move's points relative to the all-voters shift over the same window:
      (g1−g0) − (a1−a0) — also a group claim's change in gap vs all voters */
   const sgnPts = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
@@ -3025,7 +3089,10 @@ function rdDemoShift(dt, T, party) {
   /* thin group moves close the dek in their own sentence (all-thin, so
      groupSentence hedges it) — never mixed unhedged into the solid one */
   if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves, false));
-  const ordered = parts.concat(thinParts);
+  // the groups the slope claims name (a set's state/location claims cover groups the AES never cuts)
+  groupMoves.concat(thinGroupMoves).forEach((m) => named.add(m.group));
+  const es = elecSentence();
+  const ordered = parts.concat(thinParts, es ? [es] : []);
   /* sentences after the first start a sentence of their own, so a
      lower-case name ("others & independents") still opens capitalised */
   return { head, dek: since + ordered.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
@@ -3202,7 +3269,8 @@ function RdDemographics({ rangeId = "all" }) {
      or fail, in the tabs' own order — the Trend-significance table dropdown
      under the trend legend. A signed figure the site's way: true minus, the
      plus only where the sign is the claim (s = always sign) */
-  const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
+  // signed from the ROUNDED figure, so −0.04 prints 0.0, never "−0.0"
+  const sgn1 = (v, s) => { const r = Math.round(v * 10) / 10; return (r < 0 ? "−" : s && r > 0 ? "+" : "") + Math.abs(r).toFixed(1); };
   const sigSets = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
     const seen = new Map();
@@ -3213,6 +3281,18 @@ function RdDemographics({ rangeId = "all" }) {
       s.rows.push(r);
       if (r.from < s.from) s.from = r.from;
       if (r.to > s.to) s.to = r.to;
+    }
+    return [...seen.values()];
+  })();
+  /* the election test's rows (gen-data §7gb `elec`), by set in the tabs'
+     order - the second table under the same dropdown */
+  const elecSets = (() => {
+    const dt = D.demoTrend && D.demoTrend[party];
+    const seen = new Map();
+    for (const r of (dt && dt.elec) || []) {
+      const k = r.tab + "|" + r.set;
+      if (!seen.has(k)) seen.set(k, { key: k, label: r.setLabel, rows: [] });
+      seen.get(k).rows.push(r);
     }
     return [...seen.values()];
   })();
@@ -3676,6 +3756,43 @@ function RdDemographics({ rangeId = "all" }) {
             </table>
           </div>
           <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96, in the same direction. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>
+          {elecSets.length > 0 && (
+            <>
+              <div className="rd-tsig-wrap">
+                <table className="rd-tsig-table">
+                  <caption className="rd-tsig-cap">Since the election, against the Australian Election Study 2025</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col"><span className="sr-only">Group</span></th>
+                      <th scope="col">Gap to all voters, election → now, pts</th>
+                      <th scope="col">Change, pts</th>
+                      <th scope="col">95% margin, pts</th>
+                      <th scope="col">Rate vs all voters, election → now</th>
+                      <th scope="col">AES respondents</th>
+                      <th scope="col">Significant</th>
+                    </tr>
+                  </thead>
+                  {elecSets.map((s) => (
+                    <tbody key={s.key}>
+                      <tr className="rd-tsig-set"><th colSpan={7}>{s.label}</th></tr>
+                      {s.rows.map((r) => (
+                        <tr key={r.group}>
+                          <th scope="row">{r.group}</th>
+                          <td>{sgn1(r.then, true)} → {sgn1(r.now, true)}</td>
+                          <td>{sgn1(r.d, true)}</td>
+                          <td>±{r.ci.toFixed(1)}</td>
+                          <td>{r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)}</td>
+                          <td>{r.n.toLocaleString()}</td>
+                          <td className={r.sig ? "rd-tsig-yes" : ""}>{r.sig ? "Yes" : "No"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  ))}
+                </table>
+              </div>
+              <p className="rd-note rd-tsig-note">The election gap is the group’s in the Australian Election Study 2025 (its share less all respondents’, from the survey’s respondent file); the gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above.</p>
+            </>
+          )}
         </details>
       )}
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>

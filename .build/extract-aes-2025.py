@@ -104,6 +104,37 @@ def table(rows):
     return {"n": len(rows), **{k: round(100 * w[k] / t, 1) for k in KEYS}}
 
 
+def shares(rows):
+    """weighted shares (0..1), total weight and Kish effective n"""
+    w = defaultdict(float)
+    s1 = s2 = 0.0
+    for r, p in rows:
+        x = float(r["weight"])
+        w[p] += x
+        s1 += x
+        s2 += x * x
+    return {k: w[k] / s1 for k in KEYS}, s1, s1 * s1 / s2
+
+
+def gap_ci(group, rest):
+    """95% margin, in points, of the group's gap from all respondents.
+    All respondents = f·group + (1−f)·rest, so the gap is (1−f)(group −
+    rest), and group and rest are independent samples: its variance is
+    (1−f)²(p_g(1−p_g)/n_g + p_r(1−p_r)/n_r), each n the Kish effective n of
+    the GREG weights (deff ≈ 1.6 on this file). A share of zero (no One
+    Nation voter among Gen Z respondents) is floored at half a respondent
+    so its cell still carries sampling error."""
+    pg, wg, ng = shares(group)
+    pr, wr, nr = shares(rest)
+    f = wg / (wg + wr)
+    out = {}
+    for k in KEYS:
+        a = max(pg[k], 0.5 / ng)
+        b = max(pr[k], 0.5 / nr)
+        out[k] = round(196 * (1 - f) * ((a * (1 - a) / ng + b * (1 - b) / nr) ** 0.5), 1)
+    return out
+
+
 def main(src):
     with open(src, encoding="cp1252", newline="") as f:
         rows = [(r, PARTY.get(r["B9_1_r"])) for r in csv.DictReader(f)]
@@ -123,7 +154,13 @@ def main(src):
             g = f(r)
             if g:
                 by[g].append((r, p))
-        out["sets"][sid] = {g: table(by[g]) for g in ORDER[sid] if by[g]}
+        out["sets"][sid] = {}
+        for g in ORDER[sid]:
+            if not by[g]:
+                continue
+            ids = {id(x) for x in by[g]}
+            rest = [x for x in voted if id(x) not in ids]
+            out["sets"][sid][g] = {**table(by[g]), "ci": gap_ci(by[g], rest)}
     dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "aes-2025-groups.json")
     with open(dst, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
@@ -132,7 +169,7 @@ def main(src):
     print("all", out["all"])
     for sid, gs in out["sets"].items():
         for g, v in gs.items():
-            print(f"  {sid:<10} {g:<16} n={v['n']:<5}", "  ".join(f"{k} {v[k]:5.1f}" for k in KEYS))
+            print(f"  {sid:<10} {g:<16} n={v['n']:<5}", "  ".join(f"{k} {v[k]:5.1f}±{v['ci'][k]:<4}" for k in KEYS))
 
 
 if __name__ == "__main__":
