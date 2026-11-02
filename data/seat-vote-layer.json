@@ -3,10 +3,11 @@
  "_provenance": {
   "generated": "2026-11-02",
   "inputs": {
-   "data/polls.json": "5cb5694440733a4c",
+   "data/polls.json": "08b7755167e877c6",
    "data/demographics.json": "2557e9503b16e4d2",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
-   "data/seats-2025-baseline.json": "a076ea5a2877dfa0"
+   "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
+   "data/aes-2025-groups.json": "00823a6ddedb8345"
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
@@ -748,6 +749,180 @@
     "grn": 0.21,
     "oth": -4.83
    }
+  },
+  "aesBaseline": {
+   "note": "Each cell's gap from all voters at the election, pp: Resolve's 2025-05-03 baseline wave (self-centred over the population weights, as β) v the AES 2025 (group less all respondents). conflict = the two differ beyond both margins combined. Diagnostic only - β and the seats don't read it.",
+   "cells": {
+    "age": {
+     "18–34": {
+      "alp": {
+       "resolve": 3.24,
+       "aes": 2.5,
+       "margin": 6.25,
+       "conflict": false
+      },
+      "lnp": {
+       "resolve": -9.76,
+       "aes": -5.7,
+       "margin": 5.79,
+       "conflict": false
+      },
+      "on": {
+       "resolve": -2.13,
+       "aes": -5.2,
+       "margin": 2.23,
+       "conflict": true
+      },
+      "grn": {
+       "resolve": 14.29,
+       "aes": 13.7,
+       "margin": 5.39,
+       "conflict": false
+      },
+      "oth": {
+       "resolve": -4.59,
+       "aes": -5.2,
+       "margin": 4.17,
+       "conflict": false
+      }
+     },
+     "35–54": {
+      "alp": {
+       "resolve": 0.24,
+       "aes": 0.8,
+       "margin": 5.37,
+       "conflict": false
+      },
+      "lnp": {
+       "resolve": -1.76,
+       "aes": -4.8,
+       "margin": 5.12,
+       "conflict": false
+      },
+      "on": {
+       "resolve": 0.87,
+       "aes": 0.1,
+       "margin": 2.8,
+       "conflict": false
+      },
+      "grn": {
+       "resolve": -2.71,
+       "aes": 0.5,
+       "margin": 3.65,
+       "conflict": false
+      },
+      "oth": {
+       "resolve": 2.41,
+       "aes": 3.5,
+       "margin": 4.33,
+       "conflict": false
+      }
+     },
+     "55+": {
+      "alp": {
+       "resolve": -2.76,
+       "aes": -2.3,
+       "margin": 4.28,
+       "conflict": false
+      },
+      "lnp": {
+       "resolve": 9.24,
+       "aes": 9.7,
+       "margin": 4.34,
+       "conflict": false
+      },
+      "on": {
+       "resolve": 0.87,
+       "aes": 1.8,
+       "margin": 2.33,
+       "conflict": false
+      },
+      "grn": {
+       "resolve": -8.71,
+       "aes": -8.5,
+       "margin": 2.31,
+       "conflict": false
+      },
+      "oth": {
+       "resolve": 1.41,
+       "aes": -0.7,
+       "margin": 3.26,
+       "conflict": false
+      }
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": {
+       "resolve": 2.53,
+       "aes": -2.6,
+       "margin": 3.9,
+       "conflict": true
+      },
+      "lnp": {
+       "resolve": 0.51,
+       "aes": 4.2,
+       "margin": 3.95,
+       "conflict": false
+      },
+      "on": {
+       "resolve": 0.51,
+       "aes": 1.1,
+       "margin": 2.14,
+       "conflict": false
+      },
+      "grn": {
+       "resolve": -2.53,
+       "aes": -4.9,
+       "margin": 2.49,
+       "conflict": false
+      },
+      "oth": {
+       "resolve": 1.01,
+       "aes": 2.1,
+       "margin": 3.09,
+       "conflict": false
+      }
+     },
+     "Women": {
+      "alp": {
+       "resolve": -2.47,
+       "aes": 2.7,
+       "margin": 3.86,
+       "conflict": true
+      },
+      "lnp": {
+       "resolve": -0.49,
+       "aes": -4,
+       "margin": 3.67,
+       "conflict": false
+      },
+      "on": {
+       "resolve": -0.49,
+       "aes": -1,
+       "margin": 1.87,
+       "conflict": false
+      },
+      "grn": {
+       "resolve": 2.47,
+       "aes": 5,
+       "margin": 2.8,
+       "conflict": false
+      },
+      "oth": {
+       "resolve": -0.99,
+       "aes": -2.6,
+       "margin": 2.82,
+       "conflict": false
+      }
+     }
+    }
+   },
+   "conflicts": [
+    "age 18–34 on: Resolve -2.13 v AES -5.2 (±2.23)",
+    "gender Men alp: Resolve +2.53 v AES -2.6 (±3.9)",
+    "gender Women alp: Resolve -2.47 v AES +2.7 (±3.86)"
+   ]
   },
   "cellDetail": {
    "age": {
