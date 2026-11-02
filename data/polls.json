@@ -3006,6 +3006,7 @@
       "pollster": "Redbridge",
       "client": "Australia Inst.",
       "sample": 2010,
+      "sampleEff": 1497,
       "alp": 34,
       "lnp": 17,
       "grn": 11,
@@ -3519,7 +3520,8 @@
       "oth": 6,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf"
+      "url": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
+      "methodUrl": "https://cdn.australiainstitute.org.au/2026/05/18024445/Polling-Gas-tax-LDS-March-2026.pdf"
     },
     {
       "date": "2026-03-19",
