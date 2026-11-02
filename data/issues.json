@@ -16105,6 +16105,28 @@
    }
   },
   {
+   "pollster": "Essential",
+   "date": "2025-08-26",
+   "dateStart": "2025-08-20",
+   "sample": null,
+   "sampleEff": null,
+   "source": "https://essentialreport.com.au/reports/27-august-2025",
+   "read": "report",
+   "question": "most trusted to manage the economy",
+   "options": [
+    "alp",
+    "lnp",
+    "equal"
+   ],
+   "issues": {
+    "economy": {
+     "alp": 41,
+     "equal": 31,
+     "lnp": 28
+    }
+   }
+  },
+  {
    "pollster": "Resolve",
    "date": "2025-09-13",
    "dateStart": "2025-09-09",
@@ -20031,6 +20053,30 @@
      "oth": 9.33,
      "unsure": 21.11,
      "onp": 25.92
+    }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-10-27",
+   "dateStart": "2026-10-22",
+   "sample": 1003,
+   "sampleEff": 722,
+   "source": "https://essentialreport.com.au/reports/28-october-2026",
+   "read": "report",
+   "question": "most trusted to manage the economy",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "equal"
+   ],
+   "issues": {
+    "economy": {
+     "alp": 31,
+     "lnp": 23,
+     "onp": 25,
+     "equal": 22
     }
    }
   }

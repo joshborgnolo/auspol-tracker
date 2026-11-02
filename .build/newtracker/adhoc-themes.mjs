@@ -454,7 +454,6 @@ export const THEME_OF = {
   "happiness-personal": "trust-democracy",
   "issue-importance": "trust-democracy",
   "new-government-issues": "trust-democracy",
-  "party-trust-economy": "trust-democracy",
   "government-issue-performance": "trust-democracy",
   "health-services-performance": "trust-democracy",
   "party-trust-best-interests": "trust-democracy",

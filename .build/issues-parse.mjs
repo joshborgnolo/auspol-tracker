@@ -332,6 +332,46 @@ function parseCsvLine(s) {
   return out;
 }
 
+// ---- Essential ----------------------------------------------------------------------
+/* "Party trust to manage the economy" (E535, E535b from October 2026):
+   "Which party do you most trust to manage the economy generally?" – an
+   occasional read, off data/essential-report.csv (the same CSV the
+   one-offs builder reads; the extractor mirrors the reports' figures, so
+   reading it is reading the reports). The question's item is fixed –
+   "Manage the economy generally" – and beside it sits a sibling battery,
+   "ensure the economy works in the interests of everyday Australians"
+   (E535a), which is a public-opinion one-off
+   (.build/essential-oneoffs.mjs's party-trust-best-interests), not this
+   question. One Nation joined the offered options at the October 2026
+   wave; "No difference" rides as `equal`, the all-about-equal option the
+   other houses print. Only the all-voters "Overall" lines are read: the
+   trend stanzas restamp the newest wave monthly, and the folds aren't a
+   figure of their own. Waves this term only (ES_FIRST); the 2021 wave
+   stays out.   → one wave per date: { date, issues: { economy: sh } }.
+   Unknown/again fields: unknown answers are reported, never guessed on. */
+export const ES_FIRST = "2025-05-12";
+const ES_ANSWER = { labor: "alp", coalition: "lnp", "one nation": "onp", "no difference": "equal" };
+export function essentialOwnership(csvText) {
+  const rows = csvText.split("\n").map(parseCsvLine);
+  const at = (name) => rows[0].indexOf(name);
+  const [iDs, iVis, iAns, iKey, iT, iV] = ["dataset", "visual", "answer", "key", "date", "value_pct"].map(at);
+  const byDate = new Map(), unknown = new Set();
+  for (const c of rows.slice(1)) {
+    if (c[iDs] !== "party_trust_to_manage_the_economy") continue;
+    if (norm(c[iVis]) !== "overall") continue;
+    if (c[iKey] !== "Manage the economy generally") continue;
+    const date = (c[iT] || "").slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < ES_FIRST) continue;
+    const a = ES_ANSWER[norm(c[iAns])];
+    if (!a) { unknown.add("answer: " + c[iAns]); continue; }
+    const sh = byDate.get(date) || {};
+    sh[a] = Number(c[iV]);
+    byDate.set(date, sh);
+  }
+  return { waves: [...byDate.entries()].sort().map(([date, sh]) => ({ date, issues: { economy: sh } })),
+           unknown: [...unknown] };
+}
+
 // ---- YouGov -------------------------------------------------------------------------
 /* A News24 Pulse chart "Which party is best at handling…": rows are issues,
    columns Labor, Coalition, One Nation, The Greens and Don't know. Found by

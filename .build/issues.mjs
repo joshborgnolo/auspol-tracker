@@ -53,6 +53,12 @@
                  someone else' print combined from that wave; oth carries
                  the two); the wave's dates come from its direction row.
                  The secnewgate updater runs this script too.
+     Essential – "most trusted to manage the economy generally", asked
+                 occasionally (2025 and October 2026 so far), read off
+                 data/essential-report.csv like the one-offs builder.
+                 One Nation joined the options at the October 2026 wave;
+                 no house cron is needed – the extractor writes the CSV
+                 and the daily crosstabs run runs this script.
    Shares are stored as published, each house's options as it offers them
    (see issues-parse.mjs for the keys). Nothing is saved on a guess: every
    row passes the gate in issues-parse.mjs, a wave printed twice (a report's
@@ -74,6 +80,7 @@ import { infographicDataOf } from "./infogram.mjs";
 import {
   ISSUES, rbSalienceSummary, rbOwnershipSummary, rbGroupTables, resolveOwnership, ygIssuesOf,
   ipReports, ipStatement, IP_FIRST, daOwnership, salienceProblem, ownershipProblem,
+  essentialOwnership,
 } from "./issues-parse.mjs";
 
 const OUT = path.join(ROOT, "data", "issues.json");
@@ -408,6 +415,38 @@ try {
   }
 } catch (e) {
   pending.push(`${SEC}: ${String(e.message || e).slice(0, 160)}`);
+}
+
+// ---- Essential --------------------------------------------------------------------------
+/* "Which party do you most trust to manage the economy generally?" – the
+   occasional E535 read, off the assimilated CSV mirror (see the reader's
+   note in issues-parse.mjs). One Nation joined the offered options only at
+   the October 2026 wave: the waves before file with the three-party-less
+   set they offered and, not reading as the three-party question, never
+   pool. The wave's dates, n and link come from its poll row where one
+   exists, else from its polls.json direction row (August 2025's wave
+   predates the assimilated VI series; its direction row carries the same
+   fieldwork end). */
+const ES = "Essential";
+try {
+  const csv = fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8");
+  const esDir = (JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).direction || [])
+    .filter((d) => d.pollster === ES);
+  const es = essentialOwnership(csv);
+  for (const u of es.unknown) unknown.add(`Essential: ${u}`);
+  for (const w of es.waves) {
+    const p = rowOf(ES, w.date);
+    const d = !p && esDir.find((x) => x.date === w.date);
+    if (!p && !d) { pending.push(`${ES}|${w.date}: no poll or direction row for the wave`); continue; }
+    const col = w.issues.economy;
+    const err = ownershipProblem(col);
+    if (err) { pending.push(`${ES}|${w.date}: economic management (most trusted): ${err}`); continue; }
+    ownership.push(base({ ...(p || d), pollster: ES }, { read: "report", question: "most trusted to manage the economy",
+      options: ["alp", "lnp", "onp", "equal"].filter((q) => col[q] != null),
+      issues: { economy: col } }));
+  }
+} catch (e) {
+  pending.push(`${ES}: ${String(e.message || e).slice(0, 160)}`);
 }
 
 // ---- write -----------------------------------------------------------------------------

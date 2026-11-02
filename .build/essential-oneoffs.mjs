@@ -96,7 +96,8 @@ const MANIFEST = [
   { id: "economy-outlook-6m", ds: "six_month_economy_predictions" },
   { id: "better-or-worse-off", ds: "better_or_worse_off" },
   { id: "groups-views-economy", ds: "attitudes_to_groups_views_of_the_economy" },
-  { id: "party-trust-economy", ds: "party_trust_to_manage_the_economy" },
+  /* party_trust_to_manage_the_economy is EXCLUDE channelled (see below):
+     the best-party-on-issues home is data/issues.json */
   { id: "economic-roundtable", ds: "views_on_the_economic_roundtable", note: "The August 2025 productivity roundtable battery." },
   { id: "productivity-definition", ds: "definition_of_productivity" },
   { id: "regulation-australia", ds: "regulation_in_australia" },
@@ -310,6 +311,7 @@ const EXCLUDE = {
   national_mood: "channelled – right/wrong direction reads land in polls.json direction[]",
   political_party_consideration: "channelled – the 2026-06-29 polls.json row carries it as the consideration map",
   openness_to_one_nation: "channelled – its 'I would definitely vote for One Nation' cell is the consideration map on the 2026-02-25 polls.json row (cut 2026-10-18: the store entry duplicated the All-polls consideration view)",
+  party_trust_to_manage_the_economy: "channelled – 'most trusted to manage the economy' is a best-party-on-issues battery; those live in data/issues.json (cut 2026-11-03: the entry duplicated the Issues panel's ownership family. Its sibling battery, party-trust-best-interests, stays: stewardship trust, not best-party)",
 };
 
 /* ==================================================================== */
@@ -482,9 +484,10 @@ const DIM_OF_VIS = { "by gender": "gender", gender: "gender", "by age": "age", a
    all-voters answers are party names, so a voting-intention fold row
    carries party words on BOTH sides – the vocab test cannot place the
    group. Declared per dataset: the voter group is ALWAYS on ans, the
-   trusted-party answer on key. */
+   trusted-party answer on key. (party_trust_to_manage_the_economy once
+   belonged here; it's channelled to data/issues.json now, so nothing of
+   it folds.) */
 const PARTY_ANSWER_BATTERY = new Set([
-  "party_trust_to_manage_the_economy",
   "party_trust_to_ensure_economic_best_interests_of_australians",
 ]);
 

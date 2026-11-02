@@ -3,7 +3,9 @@
    and .build/ipsos-src, tracked) and the YouGov chart fixtures
    (.build/news24-src/ig-fixtures-*), plus synthetic Resolve rows for the
    file's known quirks. DemosAU's February 2026 "trust more to handle"
-   table from .build/demosau-src.
+   table from .build/demosau-src. Essential's "most trusted to manage the
+   economy" comes off data/essential-report.csv, so its pins run against
+   the committed CSV and its committed issues.json rows.
    Run: node .build/test-issues.mjs */
 import fs from "node:fs";
 import path from "node:path";
@@ -11,6 +13,7 @@ import assert from "node:assert/strict";
 import {
   rbSalienceSummary, rbOwnershipSummary, rbGroupTables, resolveOwnership, ygIssuesOf,
   ipReports, ipStatement, daOwnership, salienceProblem, ownershipProblem, rbIssue,
+  essentialOwnership, ES_FIRST,
 } from "./issues-parse.mjs";
 import { coverOf } from "./extract-ipsos.mjs";
 import { infographicDataOf } from "./infogram.mjs";
@@ -287,6 +290,46 @@ assert.equal(daOwnership(daRep("Capital-BriefDemosAU-Federal-Poll-August-2026"))
     assert.deepEqual(row.options, ["alp", "lnp", "onp", "grn", "oth", "unsure"]);
     assert.ok(!("unsure" in row.issues.col) && !("rest" in row.issues.col),
       `${ym}: no separate can't-say or rest key leaks into the row`);
+  }
+}
+
+// ---- Essential: "most trusted to manage the economy" off the CSV mirror ------
+// E535's all-voters Overall lines only: the trend stanzas restamp a wave
+// monthly, the folds aren't a figure of their own, and the sibling E535a
+// battery (ensure-best-interests, a public-opinion one-off) is never read.
+{
+  const csv = fs.readFileSync("data/essential-report.csv", "utf8");
+  const es = essentialOwnership(csv);
+  const oct = es.waves.find((w) => w.date === "2026-10-27");
+  assert.deepEqual(oct.issues.economy, { alp: 31, lnp: 23, onp: 25, equal: 22 },
+    "October 2026: One Nation an option from this wave; 'No difference' rides as equal");
+  const aug = es.waves.find((w) => w.date === "2025-08-26");
+  assert.deepEqual(aug.issues.economy, { alp: 41, lnp: 28, equal: 31 },
+    "August 2025: asked before One Nation was an option");
+  assert.ok(es.waves.every((w) => w.date >= ES_FIRST), "waves this term only (no 2021)");
+  assert.ok(es.waves.every((w) => w.issues.economy.equal != null), "every wave carries its no-difference read");
+  for (const w of es.waves) assert.equal(ownershipProblem(w.issues.economy), null, `${w.date} passes the gate`);
+  // the committed rows: one per wave, the wave riding its poll row where one
+  // exists (October 2026) and its direction row where not (August 2025, for
+  // which the assimilated VI series hasn't a row)
+  const iss = JSON.parse(fs.readFileSync("data/issues.json", "utf8"));
+  const rows = iss.ownership.filter((r) => r.pollster === "Essential");
+  assert.deepEqual(rows.map((r) => r.date).sort(), es.waves.map((w) => w.date).sort(), "one ownership row per wave");
+  const dirs = JSON.parse(fs.readFileSync("data/polls.json", "utf8")).direction.filter((d) => d.pollster === "Essential");
+  for (const w of es.waves) {
+    const row = rows.find((r) => r.date === w.date);
+    assert.ok(row, `${w.date}: its ownership row exists`);
+    for (const [q, v] of Object.entries(w.issues.economy)) assert.equal(row.issues.economy[q], v, `${w.date} ${q} as printed`);
+    assert.equal(row.question, "most trusted to manage the economy");
+    const p = JSON.parse(fs.readFileSync("data/polls.json", "utf8")).polls.find((x) => x.pollster === "Essential" && x.date === w.date);
+    const d = dirs.find((x) => x.date === w.date);
+    assert.ok(p || d, `${w.date}: a poll or direction row carries the wave's dates`);
+    const anchor = p || d;
+    assert.deepEqual([row.dateStart, row.sample, row.source],
+      [anchor.dateStart ?? null, anchor.sample ?? null, anchor.releaseUrl || anchor.url || null],
+      `${w.date}: dates, sample and link are the row's`);
+    assert.deepEqual(row.options, ["alp", "lnp", "onp", "equal"].filter((q) => q in w.issues.economy),
+      `${w.date}: options are the offered set`);
   }
 }
 
