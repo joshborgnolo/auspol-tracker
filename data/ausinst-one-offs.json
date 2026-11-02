@@ -1,8 +1,2950 @@
 {
- "_about": "YouGov polls commissioned by The Australia Institute that do NOT channel into the auspol-tracker data model (no voting intention is published - the reports' own methodology statements record 'Is voting intention published? No'). Compiled by reading the Institute's published full-report PDFs; filed 2026-11-01 with the October 2026 'Friends and threats to Australia' brief. YouGov's own fortnightly News24 series is a separate house (news24-one-offs.json).",
- "generated": "2026-11-01",
- "_readme": "Verification: every figure was read from the published report PDF (Polling - Friends and threats to Australia, October 2026; cdn.australiainstitute.org.au .../Polling-Friends-and-threats-to-Australia-Web.pdf). The main table transposes the report's summary Table 1 (fact-checked column-wise against the country narratives, which put the United States first) so its rows read the answer options; rows reconcile to 100 within 0dp rounding, and every country column likewise sums to its summary-table row. The United States cuts are the report's appendix Tables 3, 4 and 5 verbatim (its gender and age columns are filed as separate by-gender / by-age tables per store convention); the report's ALP/COA/GRE/ON/IND/UND abbreviations are expanded to the site's group names. Each country beyond the United States also has gender/age/state/vote crosstabs in appendix Tables 2 and 6-16; those are not filed, so the one entry's cut tables stay the United States' own. Fieldwork 6-12 October 2026, n=1,100, online panel, Australian Polling Council compliant.",
+ "_about": "YouGov polls commissioned by The Australia Institute that do NOT channel into the auspol-tracker data model (no voting intention is published - the reports' own methodology statements record 'Is voting intention published? No'). Compiled by reading the Institute's published full-report PDFs; filed 2026-11-01 with the October 2026 'Friends and threats to Australia' brief; the October 2025 'Poll on US' brief (eleven questions on Trump, the alliance and AUKUS, n=1,500) was added 2026-11-02. YouGov's own fortnightly News24 series is a separate house (news24-one-offs.json).",
+ "generated": "2026-11-02",
+ "_readme": "Verification: every figure was read from the published report PDF (Polling - Friends and threats to Australia, October 2026; cdn.australiainstitute.org.au .../Polling-Friends-and-threats-to-Australia-Web.pdf). The main table transposes the report's summary Table 1 (fact-checked column-wise against the country narratives, which put the United States first) so its rows read the answer options; rows reconcile to 100 within 0dp rounding, and every country column likewise sums to its summary-table row. The United States cuts are the report's appendix Tables 3, 4 and 5 verbatim (its gender and age columns are filed as separate by-gender / by-age tables per store convention); the report's ALP/COA/GRE/ON/IND/UND abbreviations are expanded to the site's group names. Each country beyond the United States also has gender/age/state/vote crosstabs in appendix Tables 2 and 6-16; those are not filed, so the one entry's cut tables stay the United States' own. Fieldwork 6-12 October 2026, n=1,100, online panel, Australian Polling Council compliant. Verification (October 2025 brief added 2026-11-02): every figure was read by a scripted parse of the report PDF (Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf) and reconciled - every option-row column sums to 100 within 0dp rounding in both of the report's banners, and wrapped labels were re-joined before filing. Each question files its Total summary plus By gender and By age (the report's banner AI 1) and By state and By voting intention (banner AI 2); the report's ALP/COA/GRE/ON/IND/UND abbreviations are expanded to the site's group names, and NET rows are kept verbatim as printed. US5 asked about Australia, the United States and the world - its summary table carries all three; group cuts are filed for the Australia answer only. Fieldwork 23-30 October 2025, n=1,500 (effective 1,050), online panel; the poll published no voting intention (its APC long disclosure statement records 'Is voting intention published? No'), so nothing of it lands in the tracker's poll tables: cdn.australiainstitute.org.au .../AI_October_US_Poll_Polling_Council_Methodology_Statement_Oct25.pdf.",
  "entries": [
+  {
+   "id": "aus-security-since-trump",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you feel more or less secure in Australia since the election of Donald Trump as President of the United States?",
+   "notes": "Half (48%) feel less secure in Australia since Donald Trump's election as US President; only 13% feel more secure. Greens voters are the most uneasy (72% less secure); One Nation's divide between no change (41%) and more secure (28%). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "More secure",
+       13
+      ],
+      [
+       "No change",
+       31
+      ],
+      [
+       "Less secure",
+       48
+      ],
+      [
+       "Don't know / Not sure",
+       8
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "More secure",
+       17,
+       9
+      ],
+      [
+       "No change",
+       33,
+       29
+      ],
+      [
+       "Less secure",
+       44,
+       53
+      ],
+      [
+       "Don't know / Not sure",
+       6,
+       9
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "More secure",
+       10,
+       13,
+       14,
+       10,
+       17
+      ],
+      [
+       "No change",
+       29,
+       35,
+       37,
+       26,
+       28
+      ],
+      [
+       "Less secure",
+       48,
+       40,
+       42,
+       57,
+       52
+      ],
+      [
+       "Don't know / Not sure",
+       13,
+       12,
+       7,
+       7,
+       3
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "More secure",
+       13,
+       13,
+       14,
+       14,
+       16,
+       10
+      ],
+      [
+       "No change",
+       29,
+       31,
+       33,
+       36,
+       29,
+       19
+      ],
+      [
+       "Less secure",
+       48,
+       49,
+       46,
+       48,
+       44,
+       65
+      ],
+      [
+       "Don't know / Not sure",
+       10,
+       7,
+       7,
+       2,
+       11,
+       6
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "More secure",
+       8,
+       20,
+       7,
+       28,
+       2,
+       18,
+       3
+      ],
+      [
+       "No change",
+       32,
+       36,
+       15,
+       41,
+       19,
+       25,
+       29
+      ],
+      [
+       "Less secure",
+       55,
+       39,
+       72,
+       26,
+       74,
+       50,
+       35
+      ],
+      [
+       "Don't know / Not sure",
+       5,
+       5,
+       6,
+       5,
+       5,
+       7,
+       33
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "us-reliable-ally",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you think the United States is a reliable or unreliable security ally for Australia?",
+   "notes": "Australians split on the United States as a security ally - 44% reliable against 47% unreliable. Coalition (62% reliable) and One Nation (64%) voters are comfortable; Greens (18%) and Labor (39%) voters are not. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Very reliable",
+       16
+      ],
+      [
+       "Somewhat reliable",
+       27
+      ],
+      [
+       "Somewhat unreliable",
+       25
+      ],
+      [
+       "Very unreliable",
+       23
+      ],
+      [
+       "Don't know / Not sure",
+       9
+      ],
+      [
+       "NET Reliable (Very + Somewhat)",
+       44
+      ],
+      [
+       "NET Unreliable (Very + Somewhat)",
+       47
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Very reliable",
+       23,
+       9
+      ],
+      [
+       "Somewhat reliable",
+       29,
+       26
+      ],
+      [
+       "Somewhat unreliable",
+       22,
+       28
+      ],
+      [
+       "Very unreliable",
+       20,
+       25
+      ],
+      [
+       "Don't know / Not sure",
+       6,
+       12
+      ],
+      [
+       "NET Reliable (Very + Somewhat)",
+       52,
+       35
+      ],
+      [
+       "NET Unreliable (Very + Somewhat)",
+       42,
+       53
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Very reliable",
+       12,
+       20,
+       14,
+       13,
+       20
+      ],
+      [
+       "Somewhat reliable",
+       21,
+       27,
+       30,
+       27,
+       29
+      ],
+      [
+       "Somewhat unreliable",
+       29,
+       20,
+       22,
+       27,
+       25
+      ],
+      [
+       "Very unreliable",
+       30,
+       20,
+       23,
+       25,
+       20
+      ],
+      [
+       "Don't know / Not sure",
+       8,
+       13,
+       11,
+       8,
+       6
+      ],
+      [
+       "NET Reliable (Very + Somewhat)",
+       33,
+       47,
+       45,
+       40,
+       49
+      ],
+      [
+       "NET Unreliable (Very + Somewhat)",
+       59,
+       40,
+       44,
+       52,
+       45
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Very reliable",
+       16,
+       15,
+       19,
+       17,
+       14,
+       8
+      ],
+      [
+       "Somewhat reliable",
+       27,
+       29,
+       24,
+       33,
+       27,
+       30
+      ],
+      [
+       "Somewhat unreliable",
+       24,
+       24,
+       27,
+       23,
+       27,
+       20
+      ],
+      [
+       "Very unreliable",
+       24,
+       24,
+       20,
+       21,
+       20,
+       30
+      ],
+      [
+       "Don't know / Not sure",
+       9,
+       8,
+       10,
+       6,
+       12,
+       12
+      ],
+      [
+       "NET Reliable (Very + Somewhat)",
+       43,
+       43,
+       43,
+       50,
+       41,
+       39
+      ],
+      [
+       "NET Unreliable (Very + Somewhat)",
+       48,
+       48,
+       47,
+       44,
+       47,
+       50
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Very reliable",
+       9,
+       26,
+       6,
+       34,
+       2,
+       23,
+       3
+      ],
+      [
+       "Somewhat reliable",
+       31,
+       36,
+       12,
+       30,
+       26,
+       20,
+       16
+      ],
+      [
+       "Somewhat unreliable",
+       28,
+       20,
+       30,
+       18,
+       30,
+       24,
+       26
+      ],
+      [
+       "Very unreliable",
+       25,
+       11,
+       50,
+       12,
+       37,
+       20,
+       21
+      ],
+      [
+       "Don't know / Not sure",
+       7,
+       7,
+       2,
+       6,
+       5,
+       13,
+       34
+      ],
+      [
+       "NET Reliable (Very + Somewhat)",
+       39,
+       62,
+       18,
+       64,
+       28,
+       43,
+       19
+      ],
+      [
+       "NET Unreliable (Very + Somewhat)",
+       53,
+       31,
+       80,
+       29,
+       67,
+       43,
+       47
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-defend-australia",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "If Australia was threatened, how confident are you that United States President Donald Trump would defend Australia and Australia's interests?",
+   "notes": "51% are confident President Trump would defend Australia and Australia's interests if it was threatened; 40% are not at all confident. Coalition (65%) and One Nation (71%) voters are confident, Greens (29%) deeply not. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Very confident",
+       16
+      ],
+      [
+       "Somewhat confident",
+       34
+      ],
+      [
+       "Not at all confident",
+       40
+      ],
+      [
+       "Don't know / Not sure",
+       10
+      ],
+      [
+       "NET Confident (Very + Somewhat)",
+       51
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Very confident",
+       23,
+       10
+      ],
+      [
+       "Somewhat confident",
+       38,
+       31
+      ],
+      [
+       "Not at all confident",
+       34,
+       45
+      ],
+      [
+       "Don't know / Not sure",
+       5,
+       14
+      ],
+      [
+       "NET Confident (Very + Somewhat)",
+       61,
+       41
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Very confident",
+       11,
+       20,
+       17,
+       12,
+       21
+      ],
+      [
+       "Somewhat confident",
+       34,
+       35,
+       35,
+       32,
+       34
+      ],
+      [
+       "Not at all confident",
+       45,
+       31,
+       38,
+       47,
+       38
+      ],
+      [
+       "Don't know / Not sure",
+       10,
+       14,
+       10,
+       9,
+       7
+      ],
+      [
+       "NET Confident (Very + Somewhat)",
+       45,
+       55,
+       52,
+       45,
+       55
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Very confident",
+       14,
+       16,
+       21,
+       18,
+       13,
+       19
+      ],
+      [
+       "Somewhat confident",
+       33,
+       34,
+       34,
+       44,
+       33,
+       22
+      ],
+      [
+       "Not at all confident",
+       43,
+       38,
+       36,
+       34,
+       40,
+       53
+      ],
+      [
+       "Don't know / Not sure",
+       10,
+       12,
+       9,
+       4,
+       14,
+       6
+      ],
+      [
+       "NET Confident (Very + Somewhat)",
+       47,
+       50,
+       55,
+       62,
+       46,
+       40
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Very confident",
+       11,
+       25,
+       5,
+       32,
+       5,
+       17,
+       9
+      ],
+      [
+       "Somewhat confident",
+       35,
+       40,
+       23,
+       39,
+       31,
+       33,
+       24
+      ],
+      [
+       "Not at all confident",
+       47,
+       26,
+       66,
+       22,
+       57,
+       37,
+       36
+      ],
+      [
+       "Don't know / Not sure",
+       7,
+       9,
+       6,
+       7,
+       7,
+       13,
+       31
+      ],
+      [
+       "NET Confident (Very + Somewhat)",
+       46,
+       65,
+       29,
+       71,
+       37,
+       50,
+       33
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "closer-us-vs-independent",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you think Australia's interests are served better by:",
+   "notes": "46% say Australia's interests are served better by a more independent foreign policy; 32% say a closer alliance with the United States. Coalition voters break the other way (51% alliance, 28% independent). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "A closer alliance with the United States",
+       32
+      ],
+      [
+       "A more independent foreign policy",
+       46
+      ],
+      [
+       "Don't know / Not sure",
+       22
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "A closer alliance with the United States",
+       39,
+       26
+      ],
+      [
+       "A more independent foreign policy",
+       47,
+       44
+      ],
+      [
+       "Don't know / Not sure",
+       14,
+       30
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "A closer alliance with the United States",
+       23,
+       31,
+       32,
+       28,
+       42
+      ],
+      [
+       "A more independent foreign policy",
+       50,
+       47,
+       41,
+       50,
+       41
+      ],
+      [
+       "Don't know / Not sure",
+       27,
+       22,
+       27,
+       22,
+       17
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "A closer alliance with the United States",
+       28,
+       30,
+       40,
+       38,
+       30,
+       28
+      ],
+      [
+       "A more independent foreign policy",
+       48,
+       48,
+       37,
+       44,
+       45,
+       51
+      ],
+      [
+       "Don't know / Not sure",
+       24,
+       22,
+       23,
+       18,
+       25,
+       21
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "A closer alliance with the United States",
+       24,
+       51,
+       7,
+       55,
+       12,
+       38,
+       12
+      ],
+      [
+       "A more independent foreign policy",
+       57,
+       28,
+       74,
+       27,
+       72,
+       42,
+       31
+      ],
+      [
+       "Don't know / Not sure",
+       19,
+       21,
+       19,
+       18,
+       16,
+       20,
+       57
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-election-good-bad",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you think Donald Trump being elected as President of the United States is a good or bad thing for Australia, the United States and the world?",
+   "notes": "Asked for Australia, the United States and the world separately (the summary table's three columns; group cuts are filed for the Australia answer). Half (50%) call Trump's election bad for Australia - and 54% say bad for the United States itself, 56% for the world. One Nation voters are the lone enthusiasts (47% good, for Australia). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Australia",
+      "The United States",
+      "The world"
+     ],
+     "rows": [
+      [
+       "Very good thing",
+       9,
+       13,
+       11
+      ],
+      [
+       "Good thing",
+       14,
+       15,
+       12
+      ],
+      [
+       "Neither good nor bad thing",
+       22,
+       13,
+       16
+      ],
+      [
+       "Bad thing",
+       26,
+       16,
+       23
+      ],
+      [
+       "Very bad thing",
+       24,
+       38,
+       33
+      ],
+      [
+       "Don't know / Not sure",
+       5,
+       5,
+       5
+      ],
+      [
+       "NET Good (Very Good + Good Thing)",
+       23,
+       28,
+       23
+      ],
+      [
+       "NET Bad (Very Bad + Bad Thing)",
+       50,
+       54,
+       56
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Very good thing",
+       12,
+       7
+      ],
+      [
+       "Good thing",
+       17,
+       11
+      ],
+      [
+       "Neither good nor bad thing",
+       23,
+       20
+      ],
+      [
+       "Bad thing",
+       25,
+       27
+      ],
+      [
+       "Very bad thing",
+       21,
+       27
+      ],
+      [
+       "Don't know / Not sure",
+       2,
+       8
+      ],
+      [
+       "NET Good (Very Good + Good Thing)",
+       29,
+       18
+      ],
+      [
+       "NET Bad (Very Bad + Bad Thing)",
+       46,
+       54
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Very good thing",
+       10,
+       11,
+       8,
+       7,
+       11
+      ],
+      [
+       "Good thing",
+       12,
+       14,
+       19,
+       10,
+       12
+      ],
+      [
+       "Neither good nor bad thing",
+       17,
+       24,
+       23,
+       19,
+       25
+      ],
+      [
+       "Bad thing",
+       25,
+       18,
+       23,
+       34,
+       27
+      ],
+      [
+       "Very bad thing",
+       28,
+       26,
+       23,
+       25,
+       22
+      ],
+      [
+       "Don't know / Not sure",
+       8,
+       7,
+       4,
+       5,
+       3
+      ],
+      [
+       "NET Good (Very Good + Good Thing)",
+       23,
+       25,
+       28,
+       17,
+       23
+      ],
+      [
+       "NET Bad (Very Bad + Bad Thing)",
+       53,
+       44,
+       46,
+       59,
+       49
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Very good thing",
+       9,
+       9,
+       11,
+       13,
+       8,
+       3
+      ],
+      [
+       "Good thing",
+       10,
+       13,
+       17,
+       18,
+       11,
+       19
+      ],
+      [
+       "Neither good nor bad thing",
+       21,
+       23,
+       23,
+       20,
+       28,
+       10
+      ],
+      [
+       "Bad thing",
+       29,
+       25,
+       21,
+       24,
+       27,
+       28
+      ],
+      [
+       "Very bad thing",
+       24,
+       25,
+       23,
+       22,
+       25,
+       30
+      ],
+      [
+       "Don't know / Not sure",
+       7,
+       5,
+       5,
+       3,
+       1,
+       10
+      ],
+      [
+       "NET Good (Very Good + Good Thing)",
+       19,
+       22,
+       28,
+       31,
+       19,
+       22
+      ],
+      [
+       "NET Bad (Very Bad + Bad Thing)",
+       54,
+       50,
+       44,
+       46,
+       52,
+       58
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Very good thing",
+       6,
+       12,
+       4,
+       27,
+       1,
+       6,
+       2
+      ],
+      [
+       "Good thing",
+       11,
+       21,
+       4,
+       20,
+       9,
+       16,
+       8
+      ],
+      [
+       "Neither good nor bad thing",
+       22,
+       29,
+       10,
+       26,
+       5,
+       26,
+       14
+      ],
+      [
+       "Bad thing",
+       29,
+       22,
+       38,
+       14,
+       40,
+       18,
+       27
+      ],
+      [
+       "Very bad thing",
+       29,
+       12,
+       44,
+       10,
+       42,
+       27,
+       21
+      ],
+      [
+       "Don't know / Not sure",
+       3,
+       4,
+       0,
+       3,
+       3,
+       7,
+       28
+      ],
+      [
+       "NET Good (Very Good + Good Thing)",
+       17,
+       32,
+       8,
+       47,
+       10,
+       22,
+       10
+      ],
+      [
+       "NET Bad (Very Bad + Bad Thing)",
+       58,
+       34,
+       81,
+       24,
+       82,
+       45,
+       48
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "us-democracy-under-trump",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you believe the United States has become more or less democratic under President Donald Trump?",
+   "notes": "Half (50%) believe the United States has become less democratic under President Trump; 15% say more. Greens (69%) and Labor (59%) voters lead the less-democratic read; One Nation (28%) leads the more. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "More democratic",
+       15
+      ],
+      [
+       "No change",
+       16
+      ],
+      [
+       "Less democratic",
+       50
+      ],
+      [
+       "Don't know / Not sure",
+       19
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "More democratic",
+       17,
+       14
+      ],
+      [
+       "No change",
+       19,
+       12
+      ],
+      [
+       "Less democratic",
+       55,
+       46
+      ],
+      [
+       "Don't know / Not sure",
+       9,
+       28
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "More democratic",
+       18,
+       22,
+       15,
+       11,
+       16
+      ],
+      [
+       "No change",
+       17,
+       23,
+       20,
+       11,
+       9
+      ],
+      [
+       "Less democratic",
+       45,
+       35,
+       43,
+       60,
+       61
+      ],
+      [
+       "Don't know / Not sure",
+       20,
+       20,
+       22,
+       18,
+       14
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "More democratic",
+       16,
+       17,
+       15,
+       10,
+       19,
+       14
+      ],
+      [
+       "No change",
+       13,
+       14,
+       16,
+       24,
+       14,
+       15
+      ],
+      [
+       "Less democratic",
+       50,
+       52,
+       53,
+       52,
+       43,
+       45
+      ],
+      [
+       "Don't know / Not sure",
+       21,
+       17,
+       16,
+       14,
+       24,
+       26
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "More democratic",
+       14,
+       17,
+       12,
+       28,
+       8,
+       19,
+       4
+      ],
+      [
+       "No change",
+       14,
+       23,
+       9,
+       22,
+       0,
+       14,
+       7
+      ],
+      [
+       "Less democratic",
+       59,
+       43,
+       69,
+       28,
+       76,
+       46,
+       37
+      ],
+      [
+       "Don't know / Not sure",
+       13,
+       17,
+       10,
+       22,
+       16,
+       21,
+       52
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "travel-to-us-safety",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "How safe or unsafe would you feel travelling to the United States?",
+   "notes": "51% would feel unsafe travelling to the United States, against 40% who would feel safe. Men (48%) feel safer about the trip than women (33%). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Very safe",
+       10
+      ],
+      [
+       "Mostly safe",
+       30
+      ],
+      [
+       "Mostly unsafe",
+       23
+      ],
+      [
+       "Very unsafe",
+       28
+      ],
+      [
+       "Don't know / Not sure",
+       9
+      ],
+      [
+       "NET Safe (Very + Mostly)",
+       40
+      ],
+      [
+       "NET Unsafe (Very + Mostly)",
+       51
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Very safe",
+       14,
+       6
+      ],
+      [
+       "Mostly safe",
+       35,
+       26
+      ],
+      [
+       "Mostly unsafe",
+       23,
+       23
+      ],
+      [
+       "Very unsafe",
+       21,
+       35
+      ],
+      [
+       "Don't know / Not sure",
+       7,
+       10
+      ],
+      [
+       "NET Safe (Very + Mostly)",
+       48,
+       33
+      ],
+      [
+       "NET Unsafe (Very + Mostly)",
+       45,
+       57
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Very safe",
+       6,
+       12,
+       11,
+       10,
+       9
+      ],
+      [
+       "Mostly safe",
+       22,
+       36,
+       32,
+       27,
+       32
+      ],
+      [
+       "Mostly unsafe",
+       26,
+       26,
+       20,
+       23,
+       22
+      ],
+      [
+       "Very unsafe",
+       34,
+       21,
+       28,
+       31,
+       28
+      ],
+      [
+       "Don't know / Not sure",
+       12,
+       5,
+       9,
+       9,
+       9
+      ],
+      [
+       "NET Safe (Very + Mostly)",
+       27,
+       47,
+       43,
+       38,
+       41
+      ],
+      [
+       "NET Unsafe (Very + Mostly)",
+       61,
+       47,
+       48,
+       54,
+       50
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Very safe",
+       9,
+       11,
+       10,
+       7,
+       9,
+       10
+      ],
+      [
+       "Mostly safe",
+       31,
+       26,
+       35,
+       36,
+       26,
+       24
+      ],
+      [
+       "Mostly unsafe",
+       20,
+       27,
+       23,
+       21,
+       30,
+       19
+      ],
+      [
+       "Very unsafe",
+       30,
+       28,
+       24,
+       28,
+       30,
+       36
+      ],
+      [
+       "Don't know / Not sure",
+       10,
+       8,
+       8,
+       8,
+       5,
+       11
+      ],
+      [
+       "NET Safe (Very + Mostly)",
+       41,
+       37,
+       45,
+       44,
+       35,
+       34
+      ],
+      [
+       "NET Unsafe (Very + Mostly)",
+       50,
+       55,
+       47,
+       48,
+       60,
+       54
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Very safe",
+       7,
+       13,
+       4,
+       23,
+       8,
+       11,
+       0
+      ],
+      [
+       "Mostly safe",
+       27,
+       39,
+       18,
+       41,
+       14,
+       36,
+       23
+      ],
+      [
+       "Mostly unsafe",
+       29,
+       21,
+       23,
+       15,
+       23,
+       20,
+       19
+      ],
+      [
+       "Very unsafe",
+       33,
+       16,
+       48,
+       15,
+       50,
+       27,
+       28
+      ],
+      [
+       "Don't know / Not sure",
+       4,
+       11,
+       7,
+       6,
+       5,
+       6,
+       30
+      ],
+      [
+       "NET Safe (Very + Mostly)",
+       33,
+       53,
+       22,
+       64,
+       23,
+       47,
+       23
+      ],
+      [
+       "NET Unsafe (Very + Mostly)",
+       62,
+       37,
+       71,
+       30,
+       73,
+       47,
+       47
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "shares-values-with-us",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Australian Defence Minister Richard Marles said Australia and the United States “share values” of “democracy and the rule of law”. Do you agree or disagree that Australia “shares values” with the United States under President Trump?",
+   "notes": "Asked whether Australia “shares values” with the United States under President Trump (Defence Minister Marles had said the two share values of “democracy and the rule of law”), only 32% agree; 49% disagree. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Strongly agree",
+       8
+      ],
+      [
+       "Agree",
+       24
+      ],
+      [
+       "Disagree",
+       31
+      ],
+      [
+       "Strongly disagree",
+       18
+      ],
+      [
+       "Don't know / Not sure",
+       19
+      ],
+      [
+       "NET Agree (Strongly + Agree)",
+       32
+      ],
+      [
+       "NET Disagree (Strongly + Disagree)",
+       49
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Strongly agree",
+       13,
+       3
+      ],
+      [
+       "Agree",
+       30,
+       19
+      ],
+      [
+       "Disagree",
+       29,
+       33
+      ],
+      [
+       "Strongly disagree",
+       17,
+       19
+      ],
+      [
+       "Don't know / Not sure",
+       11,
+       26
+      ],
+      [
+       "NET Agree (Strongly + Agree)",
+       43,
+       22
+      ],
+      [
+       "NET Disagree (Strongly + Disagree)",
+       47,
+       52
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Strongly agree",
+       6,
+       12,
+       8,
+       5,
+       9
+      ],
+      [
+       "Agree",
+       24,
+       25,
+       28,
+       19,
+       24
+      ],
+      [
+       "Disagree",
+       28,
+       26,
+       29,
+       36,
+       33
+      ],
+      [
+       "Strongly disagree",
+       22,
+       19,
+       14,
+       21,
+       18
+      ],
+      [
+       "Don't know / Not sure",
+       20,
+       18,
+       21,
+       19,
+       16
+      ],
+      [
+       "NET Agree (Strongly + Agree)",
+       30,
+       36,
+       37,
+       24,
+       33
+      ],
+      [
+       "NET Disagree (Strongly + Disagree)",
+       51,
+       45,
+       43,
+       57,
+       51
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Strongly agree",
+       6,
+       8,
+       9,
+       6,
+       10,
+       10
+      ],
+      [
+       "Agree",
+       24,
+       22,
+       26,
+       28,
+       22,
+       23
+      ],
+      [
+       "Disagree",
+       29,
+       34,
+       28,
+       36,
+       30,
+       36
+      ],
+      [
+       "Strongly disagree",
+       20,
+       19,
+       19,
+       16,
+       16,
+       13
+      ],
+      [
+       "Don't know / Not sure",
+       21,
+       17,
+       18,
+       14,
+       22,
+       18
+      ],
+      [
+       "NET Agree (Strongly + Agree)",
+       30,
+       31,
+       36,
+       34,
+       32,
+       33
+      ],
+      [
+       "NET Disagree (Strongly + Disagree)",
+       49,
+       53,
+       46,
+       52,
+       46,
+       49
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Strongly agree",
+       7,
+       11,
+       2,
+       16,
+       1,
+       12,
+       1
+      ],
+      [
+       "Agree",
+       24,
+       35,
+       10,
+       29,
+       16,
+       22,
+       13
+      ],
+      [
+       "Disagree",
+       36,
+       23,
+       36,
+       29,
+       36,
+       28,
+       30
+      ],
+      [
+       "Strongly disagree",
+       18,
+       9,
+       44,
+       11,
+       37,
+       20,
+       10
+      ],
+      [
+       "Don't know / Not sure",
+       15,
+       22,
+       8,
+       15,
+       10,
+       18,
+       46
+      ],
+      [
+       "NET Agree (Strongly + Agree)",
+       31,
+       45,
+       12,
+       44,
+       17,
+       34,
+       13
+      ],
+      [
+       "NET Disagree (Strongly + Disagree)",
+       54,
+       32,
+       80,
+       40,
+       73,
+       47,
+       40
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-best-interests",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "AUKUS is a $368 billion agreement between Australia, the United States and the United Kingdom under which Australia is supposed to acquire nuclear-powered submarines. Do you think pursuing the AUKUS security agreement is in Australia’s best interests?",
+   "notes": "41% think pursuing the AUKUS security agreement is in Australia's best interests, 26% think it is not, and a third (33%) are unsure. Coalition (56%) and One Nation (50%) voters are sold; 54% of Greens say no. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Yes",
+       41
+      ],
+      [
+       "No",
+       26
+      ],
+      [
+       "Don't know / Not sure",
+       33
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Yes",
+       52,
+       30
+      ],
+      [
+       "No",
+       27,
+       26
+      ],
+      [
+       "Don't know / Not sure",
+       21,
+       44
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Yes",
+       33,
+       42,
+       37,
+       39,
+       49
+      ],
+      [
+       "No",
+       32,
+       30,
+       25,
+       27,
+       22
+      ],
+      [
+       "Don't know / Not sure",
+       35,
+       28,
+       38,
+       34,
+       29
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Yes",
+       37,
+       38,
+       44,
+       52,
+       44,
+       34
+      ],
+      [
+       "No",
+       29,
+       28,
+       25,
+       21,
+       20,
+       28
+      ],
+      [
+       "Don't know / Not sure",
+       34,
+       34,
+       31,
+       27,
+       36,
+       38
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Yes",
+       43,
+       56,
+       21,
+       50,
+       25,
+       35,
+       14
+      ],
+      [
+       "No",
+       29,
+       14,
+       54,
+       28,
+       42,
+       21,
+       12
+      ],
+      [
+       "Don't know / Not sure",
+       28,
+       30,
+       25,
+       22,
+       33,
+       44,
+       74
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-makes-safer",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Do you think the AUKUS security agreement between Australia, the United States and the United Kingdom makes Australia more safe or less safe?",
+   "notes": "46% think the AUKUS security agreement makes Australia more safe, 17% less safe; 37% are unsure. Men (57%) are much surer it helps than women (36%). Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "More safe",
+       46
+      ],
+      [
+       "Less safe",
+       17
+      ],
+      [
+       "Don't know / Not sure",
+       37
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "More safe",
+       57,
+       36
+      ],
+      [
+       "Less safe",
+       16,
+       18
+      ],
+      [
+       "Don't know / Not sure",
+       27,
+       46
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "More safe",
+       39,
+       39,
+       48,
+       46,
+       52
+      ],
+      [
+       "Less safe",
+       20,
+       22,
+       15,
+       18,
+       14
+      ],
+      [
+       "Don't know / Not sure",
+       41,
+       39,
+       37,
+       36,
+       34
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "More safe",
+       45,
+       43,
+       52,
+       49,
+       46,
+       38
+      ],
+      [
+       "Less safe",
+       18,
+       18,
+       14,
+       21,
+       18,
+       15
+      ],
+      [
+       "Don't know / Not sure",
+       37,
+       39,
+       34,
+       30,
+       36,
+       47
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "More safe",
+       48,
+       61,
+       24,
+       56,
+       38,
+       37,
+       23
+      ],
+      [
+       "Less safe",
+       18,
+       11,
+       36,
+       11,
+       32,
+       14,
+       9
+      ],
+      [
+       "Don't know / Not sure",
+       34,
+       28,
+       40,
+       33,
+       30,
+       49,
+       68
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-inquiry-support",
+   "waveDate": "2025-10-30",
+   "dateStart": "2025-10-23",
+   "dateEnd": "2025-10-30",
+   "published": "2025-10-30",
+   "sample": 1500,
+   "sampleEff": 1050,
+   "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+   "question": "Would you support or oppose an Australian parliamentary inquiry into the AUKUS security agreement?",
+   "notes": "53% would support an Australian parliamentary inquiry into the AUKUS security agreement; 16% would oppose. Support is highest among Greens (76%) and Labor (61%) voters. Commissioned by The Australia Institute; fieldwork and weighting by YouGov (YouGov Galaxy Pty Ltd).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+     "headers": [
+      "",
+      "Total"
+     ],
+     "rows": [
+      [
+       "Strongly support",
+       18
+      ],
+      [
+       "Support",
+       35
+      ],
+      [
+       "Oppose",
+       12
+      ],
+      [
+       "Strongly oppose",
+       4
+      ],
+      [
+       "Don't know / Not sure",
+       31
+      ],
+      [
+       "NET Support (Strongly + Support)",
+       53
+      ],
+      [
+       "NET Oppose (Strongly + Oppose)",
+       16
+      ]
+     ]
+    },
+    {
+     "title": "By gender",
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
+     "rows": [
+      [
+       "Strongly support",
+       23,
+       13
+      ],
+      [
+       "Support",
+       37,
+       34
+      ],
+      [
+       "Oppose",
+       11,
+       12
+      ],
+      [
+       "Strongly oppose",
+       6,
+       3
+      ],
+      [
+       "Don't know / Not sure",
+       23,
+       38
+      ],
+      [
+       "NET Support (Strongly + Support)",
+       59,
+       47
+      ],
+      [
+       "NET Oppose (Strongly + Oppose)",
+       18,
+       15
+      ]
+     ]
+    },
+    {
+     "title": "By age",
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
+     "rows": [
+      [
+       "Strongly support",
+       25,
+       22,
+       14,
+       16,
+       17
+      ],
+      [
+       "Support",
+       33,
+       36,
+       39,
+       33,
+       34
+      ],
+      [
+       "Oppose",
+       5,
+       11,
+       13,
+       11,
+       15
+      ],
+      [
+       "Strongly oppose",
+       2,
+       2,
+       3,
+       5,
+       7
+      ],
+      [
+       "Don't know / Not sure",
+       35,
+       29,
+       31,
+       35,
+       27
+      ],
+      [
+       "NET Support (Strongly + Support)",
+       58,
+       58,
+       53,
+       49,
+       51
+      ],
+      [
+       "NET Oppose (Strongly + Oppose)",
+       7,
+       13,
+       16,
+       16,
+       22
+      ]
+     ]
+    },
+    {
+     "title": "By state",
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
+     "rows": [
+      [
+       "Strongly support",
+       22,
+       18,
+       14,
+       13,
+       15,
+       17
+      ],
+      [
+       "Support",
+       31,
+       33,
+       41,
+       49,
+       34,
+       22
+      ],
+      [
+       "Oppose",
+       11,
+       15,
+       12,
+       8,
+       9,
+       17
+      ],
+      [
+       "Strongly oppose",
+       4,
+       4,
+       8,
+       2,
+       6,
+       1
+      ],
+      [
+       "Don't know / Not sure",
+       32,
+       30,
+       25,
+       28,
+       36,
+       43
+      ],
+      [
+       "NET Support (Strongly + Support)",
+       53,
+       51,
+       55,
+       62,
+       49,
+       39
+      ],
+      [
+       "NET Oppose (Strongly + Oppose)",
+       14,
+       19,
+       20,
+       10,
+       15,
+       18
+      ]
+     ]
+    },
+    {
+     "title": "By voting intention",
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
+     "rows": [
+      [
+       "Strongly support",
+       20,
+       8,
+       40,
+       17,
+       31,
+       14,
+       4
+      ],
+      [
+       "Support",
+       41,
+       36,
+       35,
+       28,
+       35,
+       39,
+       19
+      ],
+      [
+       "Oppose",
+       10,
+       19,
+       6,
+       13,
+       7,
+       13,
+       5
+      ],
+      [
+       "Strongly oppose",
+       4,
+       4,
+       4,
+       12,
+       1,
+       2,
+       1
+      ],
+      [
+       "Don't know / Not sure",
+       25,
+       33,
+       15,
+       30,
+       26,
+       32,
+       71
+      ],
+      [
+       "NET Support (Strongly + Support)",
+       61,
+       44,
+       76,
+       45,
+       66,
+       53,
+       23
+      ],
+      [
+       "NET Oppose (Strongly + Oppose)",
+       14,
+       24,
+       10,
+       25,
+       8,
+       15,
+       6
+      ]
+     ]
+    }
+   ]
+  },
   {
    "id": "friends-threats-countries",
    "waveDate": "2026-10-12",
@@ -16,58 +2958,268 @@
    "tables": [
     {
      "title": null,
-     "headers": ["", "United States", "New Zealand", "Indonesia", "China", "Russia"],
+     "headers": [
+      "",
+      "United States",
+      "New Zealand",
+      "Indonesia",
+      "China",
+      "Russia"
+     ],
      "rows": [
-      ["Close friend", 16, 77, 7, 1, 1],
-      ["Friend", 34, 20, 57, 23, 6],
-      ["Threat", 29, 1, 18, 36, 42],
-      ["Major threat", 13, 0, 2, 30, 40],
-      ["Don't know/not sure", 8, 2, 16, 10, 11]
+      [
+       "Close friend",
+       16,
+       77,
+       7,
+       1,
+       1
+      ],
+      [
+       "Friend",
+       34,
+       20,
+       57,
+       23,
+       6
+      ],
+      [
+       "Threat",
+       29,
+       1,
+       18,
+       36,
+       42
+      ],
+      [
+       "Major threat",
+       13,
+       0,
+       2,
+       30,
+       40
+      ],
+      [
+       "Don't know/not sure",
+       8,
+       2,
+       16,
+       10,
+       11
+      ]
      ],
      "source": "https://cdn.australiainstitute.org.au/2026/10/28043101/Polling-Friends-and-threats-to-Australia-Web.pdf"
     },
     {
      "title": "By gender",
-     "headers": ["", "Male", "Female"],
+     "headers": [
+      "",
+      "Male",
+      "Female"
+     ],
      "rows": [
-      ["Close friend", 22, 11],
-      ["Friend", 39, 30],
-      ["Threat", 23, 35],
-      ["Major threat", 11, 13],
-      ["Don't know/not sure", 5, 11]
+      [
+       "Close friend",
+       22,
+       11
+      ],
+      [
+       "Friend",
+       39,
+       30
+      ],
+      [
+       "Threat",
+       23,
+       35
+      ],
+      [
+       "Major threat",
+       11,
+       13
+      ],
+      [
+       "Don't know/not sure",
+       5,
+       11
+      ]
      ]
     },
     {
      "title": "By age",
-     "headers": ["", "18-24", "25-34", "35-49", "50-64", "65+"],
+     "headers": [
+      "",
+      "18-24",
+      "25-34",
+      "35-49",
+      "50-64",
+      "65+"
+     ],
      "rows": [
-      ["Close friend", 4, 12, 16, 15, 25],
-      ["Friend", 32, 37, 35, 33, 33],
-      ["Threat", 40, 27, 26, 31, 26],
-      ["Major threat", 15, 14, 13, 14, 10],
-      ["Don't know/not sure", 9, 10, 10, 7, 6]
+      [
+       "Close friend",
+       4,
+       12,
+       16,
+       15,
+       25
+      ],
+      [
+       "Friend",
+       32,
+       37,
+       35,
+       33,
+       33
+      ],
+      [
+       "Threat",
+       40,
+       27,
+       26,
+       31,
+       26
+      ],
+      [
+       "Major threat",
+       15,
+       14,
+       13,
+       14,
+       10
+      ],
+      [
+       "Don't know/not sure",
+       9,
+       10,
+       10,
+       7,
+       6
+      ]
      ]
     },
     {
      "title": "By voting intention",
-     "headers": ["", "Labor", "Coalition", "Greens", "One Nation", "Independent", "Other", "Undecided"],
+     "headers": [
+      "",
+      "Labor",
+      "Coalition",
+      "Greens",
+      "One Nation",
+      "Independent",
+      "Other",
+      "Undecided"
+     ],
      "rows": [
-      ["Close friend", 12, 16, 1, 36, 6, 12, 4],
-      ["Friend", 31, 47, 26, 33, 29, 39, 34],
-      ["Threat", 34, 26, 47, 14, 27, 36, 30],
-      ["Major threat", 15, 8, 23, 9, 23, 11, 7],
-      ["Don't know/not sure", 8, 3, 3, 8, 15, 2, 25]
+      [
+       "Close friend",
+       12,
+       16,
+       1,
+       36,
+       6,
+       12,
+       4
+      ],
+      [
+       "Friend",
+       31,
+       47,
+       26,
+       33,
+       29,
+       39,
+       34
+      ],
+      [
+       "Threat",
+       34,
+       26,
+       47,
+       14,
+       27,
+       36,
+       30
+      ],
+      [
+       "Major threat",
+       15,
+       8,
+       23,
+       9,
+       23,
+       11,
+       7
+      ],
+      [
+       "Don't know/not sure",
+       8,
+       3,
+       3,
+       8,
+       15,
+       2,
+       25
+      ]
      ]
     },
     {
      "title": "By state",
-     "headers": ["", "NSW", "VIC", "QLD", "WA", "SA", "Other states"],
+     "headers": [
+      "",
+      "NSW",
+      "VIC",
+      "QLD",
+      "WA",
+      "SA",
+      "Other states"
+     ],
      "rows": [
-      ["Close friend", 20, 16, 14, 12, 9, 21],
-      ["Friend", 34, 34, 40, 29, 29, 33],
-      ["Threat", 26, 26, 30, 37, 36, 20],
-      ["Major threat", 13, 13, 9, 14, 16, 21],
-      ["Don't know/not sure", 7, 11, 7, 8, 10, 5]
+      [
+       "Close friend",
+       20,
+       16,
+       14,
+       12,
+       9,
+       21
+      ],
+      [
+       "Friend",
+       34,
+       34,
+       40,
+       29,
+       29,
+       33
+      ],
+      [
+       "Threat",
+       26,
+       26,
+       30,
+       37,
+       36,
+       20
+      ],
+      [
+       "Major threat",
+       13,
+       13,
+       9,
+       14,
+       16,
+       21
+      ],
+      [
+       "Don't know/not sure",
+       7,
+       11,
+       7,
+       8,
+       10,
+       5
+      ]
      ]
     }
    ]

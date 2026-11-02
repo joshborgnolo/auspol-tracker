@@ -86,6 +86,17 @@ export const THEME_OF = {
   "country-relations": "trump-us",
   // ausinst (YouGov for The Australia Institute)
   "friends-threats-countries": "trump-us",
+  "aus-security-since-trump": "trump-us",
+  "us-reliable-ally": "trump-us",
+  "trump-defend-australia": "trump-us",
+  "closer-us-vs-independent": "trump-us",
+  "trump-election-good-bad": "trump-us",
+  "us-democracy-under-trump": "trump-us",
+  "travel-to-us-safety": "trump-us",
+  "shares-values-with-us": "trump-us",
+  "aukus-best-interests": "trump-us",
+  "aukus-makes-safer": "trump-us",
+  "aukus-inquiry-support": "trump-us",
 
   /* immigration */
   // essential
