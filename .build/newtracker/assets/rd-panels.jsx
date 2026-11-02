@@ -55,7 +55,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       /* t.id is the group's demographics split (age/gender/education/
          place/home) - the dot-open hands it to All polls so the opened
          poll's Demographics detail already shows the clicked view's cut */
-      if (g) return { label: grpId, g, who: RD_DEMO_SHORT[grpId] || grpId, tabId: t.id };
+      if (g) return { label: grpId, g, who: RD_DEMO_SHORT[grpId] || grpId, tabId: t.id, setId: s.id };
     }
     return null;
   })();
@@ -356,7 +356,37 @@ function RdPrimary({ rangeId, setRangeId }) {
         }).filter(Boolean);
       }).concat(inDom(q.x) ? soloDotsOf(q) : []);
     }), [T, G, xDomain[0], xDomain[1], hvKey]);
-  const shownScatter = React.useMemo(() => scatter.map((d) => (hideC[d.party] ? { ...d, op: 0 } : d)), [scatter, hideC]);
+  /* The Australian Election Study 2025 (D.demoAes), the same contract the
+     Who-votes charts carry: where the AEC never counts the cut (gender,
+     generations - those groups can never have a counted `base` or ring)
+     each party's reported vote among the group at the May 2025 election
+     sits as a hollow diamond, placed as a poll dot is (the 2025 result
+     plus the group's gap from the AES's own all-voters figure, so the
+     survey's own lean drops out of where it lands), the tip quoting the
+     printed share, with the ring's dotted lead-in to the line's first
+     month. Labor, the Coalition and the Greens only (the AES files One
+     Nation inside Other). Never pooled, never in the monthly lines; a
+     window that doesn't reach the election skips it. */
+  const aeSet = G && !base && D.demoAes && D.demoAes.sets ? D.demoAes.sets[sel.setId] || null : null;
+  const aeOf = (kk) => (aeSet && aeSet.groups[sel.label] && aeSet.groups[sel.label][kk]) || null;
+  const aeOn = !!(aeSet && parts && parts.some((p) => aeOf(p.id)) && D.demoAes.x >= xDomain[0] - 1e-6);
+  const aePts = aeOn ? parts.filter((p) => aeOf(p.id))
+    .map((p) => ({ x: D.demoAes.x, y: aeOf(p.id)[1], gv: aeOf(p.id)[0], color: p.color, label: p.name, party: p.id,
+                   shape: "diamond", hollow: true, size: 1.6,
+                   meta: { pollster: "Australian Election Study 2025" },
+                   sub: "Vote at the May 2025 election, post-election survey, n = " + D.demoAes.n.toLocaleString()
+                      + (aeSet.read ? ", read off the report’s chart" : "") + ", not pooled" })) : [];
+  /* each diamond joins its line at the first month the houses polled the
+     cut, exactly as an election ring's lead-in does */
+  const aeLeads = aeOn ? parts.filter((p) => aeOf(p.id)).map((p) => {
+    const pLive = series(live(p.id), p.id);
+    return pLive.length && pLive[0].x > D.demoAes.x
+      ? { id: "ae-ld-" + p.id, label: p.name, color: p.color, dash: RD_ELECTION_LEAD, rdWidth: 2.5,
+          endCap: false, opacity: hidden[p.id] ? 0 : 1,
+          points: [{ x: D.demoAes.x, y: aeOf(p.id)[1], gv: aeOf(p.id)[0] }, pLive[0]] }
+      : null;
+  }).filter(Boolean) : [];
+  const shownScatter = React.useMemo(() => scatter.concat(aePts).map((d) => (hideC[d.party] ? { ...d, op: 0 } : d)), [scatter, aePts, hideC]);
   const marks = base && partsChart ? partsChart.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hideC[p.id] })) : [];
   /* a group's lines open at the first month the houses polled the cut,
      sometimes nearly a year after the election, and the months between
@@ -383,6 +413,12 @@ function RdPrimary({ rangeId, setRangeId }) {
      left the window, or already IS the first monthly row's x */
   const gElecStop = G && base && base.x >= xDomain[0] - 1e-6 && (!pts.length || pts[0].x > base.x + 1e-6)
     ? { x: base.x, y: base.alp } : null;
+  /* the diamonds' spine stop, as gElecStop is the rings': without it a
+     hover at the election month snaps past the diamonds to the first
+     month polled. The two stops never coexist (a counted base excludes
+     the AES's cuts by construction) */
+  const aesStop = aeOn ? { x: D.demoAes.x, y: aeOf("alp") ? aeOf("alp")[1] : aePts[0].y } : null;
+  const elecStop = gElecStop || aesStop;
   /* the numbered events: the same set the 2PP hero marks, over this chart's
      window */
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
@@ -414,7 +450,7 @@ function RdPrimary({ rangeId, setRangeId }) {
      fixed [0,40] frame; a pollster subset's window is its own months', so
      its frame lifts to the next five over the subset's peak instead */
   const yTop = G ? Math.max(40, Math.ceil(Math.max(...gMonths.flatMap((m) =>
-    GRPV_KEYS.map((kk) => m[kk] + m.ci[kk]))) * 1.0001 / 10) * 10)
+    GRPV_KEYS.map((kk) => m[kk] + m.ci[kk])).concat(aePts.map((d) => d.y))) * 1.0001 / 10) * 10)
     : pvx ? Math.max(40, Math.ceil(Math.max(...pvx.months.flatMap((m) =>
       GRPV_KEYS.map((kk) => (m[kk] || 0) + ((m.ci && m.ci[kk]) || 0)))) * 1.0001 / 5) * 5)
     : 40;
@@ -639,8 +675,8 @@ function RdPrimary({ rangeId, setRangeId }) {
              opens on election night, so without it the first tick reads
              "May 2025" against the all-voters chart's "Election" */
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null)}
-          series={leads.length ? chartSeries.concat(leads) : chartSeries}
-          spine={gElecStop ? [gElecStop].concat(series(live("alp"), "alp")) : series(live("alp"), "alp")}
+          series={chartSeries.concat(leads).concat(aeLeads)}
+          spine={(elecStop ? [elecStop] : []).concat(series(live("alp"), "alp"))}
           areas={areas}
           /* a group view's dots open the poll on All polls' Demographics
              facet, its split the view's own (Gen Z → Age, Renting → Home);
@@ -650,21 +686,26 @@ function RdPrimary({ rangeId, setRangeId }) {
           marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
-          /* gElecStop shifts title/row lookups one place: stop 0 is the
-             count itself (the by-state panels' "2025-05" title + ring row),
-             the months sit one index back */
-          tooltipTitle={(i) => (gElecStop && i === 0 ? monthLabelFull("2025-05") : pts[gElecStop ? i - 1 : i] ? monthLabelFull(pts[gElecStop ? i - 1 : i].ym) : "")}
+          /* elecStop shifts title/row lookups one place: stop 0 is the
+             count itself (the rings' "2025-05" title + ring row) or the
+             AES diamonds' stop, the months sit one index back */
+          tooltipTitle={(i) => (elecStop && i === 0 ? monthLabelFull("2025-05") : pts[elecStop ? i - 1 : i] ? monthLabelFull(pts[elecStop ? i - 1 : i].ym) : "")}
           extraRows={(i) => {
-            if (gElecStop && i === 0) return [{ label: "", value: "The election result" }];
-            const d = pts[gElecStop ? i - 1 : i];
+            if (elecStop && i === 0) return gElecStop
+              ? [{ label: "", value: "The election result" }]
+              : [{ label: "", value: "Australian Election Study 2025, as printed"
+                    + (aeSet && aeSet.read ? " (generation figures read off the report’s chart)" : "") + "; never pooled" }];
+            const d = pts[elecStop ? i - 1 : i];
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
             return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
           }}
           /* a group view's dot is drawn at a lifted y (the trend plus this
              wave's group-vs-all-voters gap) but tips the figure the wave
              printed - the engine's own display-transform precedent (the
-             mood panel's NAB line, drawn +100, tips the net balance) */
-          fmt={(v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1)}
+             mood panel's NAB line, drawn +100, tips the net balance). The
+             printed figure rides as-is (AES shares are whole numbers),
+             everything else to the tenth */
+          fmt={(v, pt) => (G && pt && pt.gv != null ? String(pt.gv) : v.toFixed(1))}
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
@@ -672,12 +713,14 @@ function RdPrimary({ rangeId, setRangeId }) {
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
                     : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
+                      + (aeOn ? " The diamonds at the election are the Australian Election Study 2025’s figures" + (aeSet && aeSet.read ? ", read off the report’s chart" : "") + ", never pooled." : "")
                       /* the income bands' own caveat, from the payload's one
                          copy of it (the Who-votes dek's note is the same) */
                       + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "")
                       + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
                     : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
-                  legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
+                  legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
+                    .concat(aeOn ? [{ label: "Australian Election Study 2025", color: "var(--ink-3)", kind: "diamond" }] : []) }}
         />
         {/* the 2PP card above already lists this window's events under its
             own chart, so two or more fold away behind a disclosure the
@@ -705,6 +748,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           base ? { kind: "ring", label: rdElecYear + " election result" } : null,
+          aeOn ? { kind: "diamond", color: "var(--ink-3)", label: "Australian Election Study 2025", href: D.demoAes.src } : null,
         ]}>
           <span className="rd-grow"></span>
           <RdHow term="primary-vote" from="Primary vote" />
