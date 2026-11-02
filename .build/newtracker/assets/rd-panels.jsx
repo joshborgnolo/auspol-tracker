@@ -6161,7 +6161,7 @@ function RdConfidence({ rangeId }) {
     });
   };
   const neut = (l) => (100 - l.shift) / (l.scale || 1);   // the published-scale reading that sits on the 100 line
-  const water = (l, v) => v < neut(l) ? "pessimists lead" : "optimists lead";
+  const water = (l, v) => v < neut(l) ? "Pessimists lead" : "Optimists lead";
   const nab = lanes.find((l) => l.k === "nabBusiness");
   if (nab) nab.short = "Business confidence as a net balance — optimistic firms minus pessimistic ones, 0 = neutral on NAB’s own scale. The line is drawn 100 points up so the neutral line is shared; the figure here is NAB’s own. Conditions printed "
     + NICE(nab.lat.cond) + (nab.lat.condChg == null ? "" : ", " + (nab.lat.condChg < 0 ? "down " : "up ") + NICE(Math.abs(nab.lat.condChg))) + " on the month. " + water(nab, nab.lat.v) + ".";
