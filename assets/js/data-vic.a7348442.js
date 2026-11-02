@@ -3454,6 +3454,68 @@ window.AUSPOL = function () {
       "Rural": [24.41, 37.68, 8.94, 8.41, 20.56]
     }
   };
+  const demoAes = {
+    "x": 2025.375,
+    "n": 2070,
+    "src": "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
+    "elec": {
+      "alp": 34.56,
+      "lnp": 31.82,
+      "grn": 12.2
+    },
+    "sets": {
+      "gender": {
+        "read": false,
+        "tot": {
+          "alp": 33.6,
+          "lnp": 32.4,
+          "grn": 13.1
+        },
+        "groups": {
+          "Women": {
+            "alp": [36, 37],
+            "lnp": [28, 27.4],
+            "grn": [18, 17.1]
+          },
+          "Men": {
+            "alp": [31, 32],
+            "lnp": [37, 36.4],
+            "grn": [8, 7.1]
+          }
+        }
+      },
+      "generation": {
+        "read": true,
+        "tot": {
+          "alp": 34.8,
+          "lnp": 32.2,
+          "grn": 12.3
+        },
+        "groups": {
+          "Gen Z": {
+            "alp": [41, 40.7],
+            "lnp": [28, 27.6],
+            "grn": [27, 26.9]
+          },
+          "Millennials": {
+            "alp": [37, 36.7],
+            "lnp": [21, 20.6],
+            "grn": [19, 18.9]
+          },
+          "Gen X": {
+            "alp": [35, 34.7],
+            "lnp": [31, 30.6],
+            "grn": [7, 6.9]
+          },
+          "Boomers": {
+            "alp": [30, 29.7],
+            "lnp": [44, 43.6],
+            "grn": [4, 3.9]
+          }
+        }
+      }
+    }
+  };
   const issues = null;
   const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired", "Lower earners (bottom 50%)", "Higher earners (top 15%)"];
   const accuracy = null;
@@ -4121,6 +4183,7 @@ window.AUSPOL = function () {
     demoTrend,
     demoStateElection,
     demoLocElection,
+    demoAes,
     demoGroups,
     issues,
     accuracy,

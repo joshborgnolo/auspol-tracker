@@ -936,7 +936,7 @@ function TrendChart(props) {
     if (rd && live && dot === d) return null;
     const cx = sx(d.x),
       cy = sy(d.y),
-      r = live && dot === d ? DOT_R_LIVE : DOT_R;
+      r = live && dot === d ? DOT_R_LIVE : DOT_R * (d.size || 1);
     const common = d.hollow ? {
       className: "scatter-dot",
       fill: "var(--chart-bg)",

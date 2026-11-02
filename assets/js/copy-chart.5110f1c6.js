@@ -494,7 +494,7 @@
     const stated = !!(own && Array.isArray(own.legend));
     let legend = stated ? own.legend.map(l => ({
       label: l.label,
-      kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
+      kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring", "diamond"].includes(l.kind) ? l.kind : "line",
       fill: paint(l.color),
       alpha: l.kind === "band" ? 0.4 : 1
     })) : readLegend(target);
@@ -797,6 +797,16 @@
               c.lineWidth = 2;
               c.beginPath();
               c.arc(lx + 6, my, 5, 0, 7);
+              c.stroke();
+            } else if (it.kind === "diamond") {
+              c.strokeStyle = it.fill;
+              c.lineWidth = 1.6;
+              c.beginPath();
+              c.moveTo(lx + 6, my - 5.5);
+              c.lineTo(lx + 11.5, my);
+              c.lineTo(lx + 6, my + 5.5);
+              c.lineTo(lx + 0.5, my);
+              c.closePath();
               c.stroke();
             } else {
               c.fillStyle = it.fill;
