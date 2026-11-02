@@ -5591,6 +5591,72 @@ const DEMO_LOC_ELECTION = {
   },
 };
 
+/* The Australian Election Study 2025 (ANU/Griffith; post-election
+   self-completion survey, n = 2,070, weighted to the electorate): each
+   group's reported House first-preference vote at the 3 May 2025 election.
+   Source: "The 2025 Australian Federal Election: Results from the
+   Australian Election Study" (Cameron, McAllister, Jackman, Sheppard, Nov
+   2025), australianelectionstudy.org.
+     Gender: Figure 4.3's printed labels (Women 28/36/18/18, Men 37/31/8/25
+       for Coalition/Labor/Greens/Other).
+     Generations: Figure 4.2 prints no labels, so its 2025 points are read off
+       the PDF's vector paths, the y scale least-squares fitted to the five
+       shares the report's text states (Millennials Labor 37, Coalition 21;
+       Gen Z Labor 41, Coalition 28, Greens 27: residuals ≤ 0.3, and the scale
+       matches the axis ticks). Readings rounded to whole points, as the
+       report prints; good to about ±0.5. The Boomers point is the AES's
+       Boomers (1946–64) alone; its Silent generation (1928–45, read 30/46/3)
+       joins no group, as YouGov's doesn't, but counts in the set's
+       all-voters figure.
+   The AES files One Nation inside "Other", so only Labor, the Coalition and
+   the Greens get points; One Nation and Others & independents get none.
+
+   Election-time marks, as the By-state and By-location election rings are
+   (user ruling 2026-11-02: plotted like a poll, kept out of the pools).
+   Each point is placed as a poll dot is: the group's gap from the AES's own
+   all-voters figure, added to the 2025 result (DEMO_STATE_ELECTION's Nat
+   row), so the survey's own lean drops out and the diamond sits on the
+   lines' scale; the tip quotes the printed share. A set's all-voters figure
+   is its groups weighted by their share of the electorate (gender by
+   SEX_SHARE; generations by the report's 2025 electorate shares – Silent 7,
+   Boomers 25, Gen X 24, Millennials 27, Gen Z 15 – taken to 100), so each
+   set's gaps sum to zero as a poll's do. Never in a pooled figure, a monthly
+   line or §7gb's trend test: one recalled-vote survey at the head of a
+   series would steer the slope tests by its method, not by any change. */
+const DEMO_AES = (() => {
+  const nat = DEMO_STATE_ELECTION.groups.Nat;
+  const elec = Object.fromEntries(DEMO_KEYS.map((k, i) => [k, nat[i]]));
+  const sets = {
+    gender: { read: false, weights: SEX_SHARE, groups: {
+      "Women": { alp: 36, lnp: 28, grn: 18 },
+      "Men": { alp: 31, lnp: 37, grn: 8 },
+    } },
+    generation: { read: true, weights: { Silent: 7, Boomers: 25, "Gen X": 24, Millennials: 27, "Gen Z": 15 },
+      extra: { Silent: { alp: 30, lnp: 46, grn: 3 } }, groups: {
+        "Gen Z": { alp: 41, lnp: 28, grn: 27 },
+        "Millennials": { alp: 37, lnp: 21, grn: 19 },
+        "Gen X": { alp: 35, lnp: 31, grn: 7 },
+        "Boomers": { alp: 30, lnp: 44, grn: 4 },
+      } },
+  };
+  const P = ["alp", "lnp", "grn"];
+  const out = {};
+  for (const [id, s] of Object.entries(sets)) {
+    const all = { ...s.groups, ...(s.extra || {}) };
+    const W = Object.keys(all).reduce((a, g) => a + s.weights[g], 0);
+    const tot = Object.fromEntries(P.map((k) => [k, Object.keys(all).reduce((a, g) => a + s.weights[g] * all[g][k], 0) / W]));
+    out[id] = { read: s.read, tot: Object.fromEntries(P.map((k) => [k, r1(tot[k])])),
+      // per group and party: [printed share, plotted y = the result + the gap from the AES's own figure]
+      groups: Object.fromEntries(Object.entries(s.groups).map(([g, v]) => [g,
+        Object.fromEntries(P.map((k) => [k, [v[k], r1(elec[k] + (v[k] - tot[k]))]]))])) };
+  }
+  return {
+    x: DEMO_STATE_ELECTION.x, n: 2070,
+    src: "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
+    elec: Object.fromEntries(P.map((k) => [k, elec[k]])), sets: out,
+  };
+})();
+
 /* One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
    ten points lower among 18–34s, say. Those gaps are pooled over the six-week
@@ -8825,6 +8891,9 @@ window.AUSPOL = (function () {
   /* The By-location chart's 2025 election marks (§7g), same shape: one ring
      per classification line at May 2025. */
   const demoLocElection = ${JSON.stringify(DEMO_LOC_ELECTION)};
+  /* The Australian Election Study 2025's vote by gender and generation
+     (§7g DEMO_AES): plain reference points on those charts, never pooled. */
+  const demoAes = ${JSON.stringify(DEMO_AES)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -8967,7 +9036,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
