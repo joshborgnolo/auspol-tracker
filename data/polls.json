@@ -2147,6 +2147,7 @@
       "published": "2025-10-30T17:34",
       "dateStart": "2025-10-23",
       "pollster": "YouGov",
+      "noAgg": "combined",
       "client": "Australia Inst.",
       "sample": 4578,
       "alp": 33,
@@ -2157,7 +2158,8 @@
       "oth": 8,
       "tpp_alp": 56,
       "tpp_lnp": 44,
-      "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf"
+      "url": "https://x.com/AnalyseDis/status/1985476608057356648",
+      "releaseUrl": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf"
     },
     {
       "date": "2025-10-30",
@@ -3512,6 +3514,7 @@
       "pollster": "YouGov",
       "client": "Australia Inst.",
       "sample": 1502,
+      "sampleEff": 934,
       "alp": 28,
       "lnp": 21,
       "grn": 13,

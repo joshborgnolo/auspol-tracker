@@ -304,7 +304,7 @@ export function validate(D) {
     //     release and must be one gen-data has a note for. A whole no-
     //     aggregate HOUSE files under a suffix label instead (NO_AGG in
     //     pollsterRules / gen-data's NO_AGG_HOUSES).
-    if (p.noAgg != null && !["shifts"].includes(p.noAgg))
+    if (p.noAgg != null && !["shifts", "combined"].includes(p.noAgg))
       fail("no-agg", `noAgg token "${p.noAgg}": gen-data has no NO_AGG_ROW_NOTE for it`);
     // 3. dates are real ISO YYYY-MM-DD days, not in the future, run
     //    oldest→newest, and fieldwork starts before it ends

@@ -147,6 +147,7 @@ const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newsp
    publishes no figures those series could read. */
 const NO_AGG_ROW_NOTE = {
   shifts: "Because this super-poll release (n=5,563) published state and demographic breakdowns only - no national headline figures - it does not count towards any aggregates.",
+  combined: "Because this release combines YouGov's federal polls over the last 30 days (n=4,578) into a single reading rather than a single fieldwork wave, it does not count towards any aggregates.",
 };
 /* An MRP whose fieldwork CONTAINS the house's own regular waves is taken to
    reuse their respondents (ruling 2026-10-11, "assume overlap"): DemosAU's
