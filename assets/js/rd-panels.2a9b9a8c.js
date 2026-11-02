@@ -194,6 +194,7 @@ function RdPrimary({
     if (fallers.length) {
       const f = fallers[0];
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost " + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + (aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
+      if (aesGrp && sel.setId === "generation" && G.houses && G.houses.length) dek += " The polls’ figures for " + sel.who + " come only from the generation cuts of " + rdList(G.houses.map(demoHouse)) + ", so that comparison is across instruments.";
     }
     for (const id of lateParties) {
       dek += " " + rdPartyStart(id) + "’s line starts in " + rdMonthYear(firstPolled[id].ym) + ": until then, the polls counted " + (rdPlural(id) ? "them" : "it") + " among others.";
@@ -3531,7 +3532,7 @@ const RD_TREND_GROUP = {
   Women: "women",
   University: "university graduates",
   "TAFE or trade": "TAFE-qualified voters",
-  "Year 12 or less": "voters with Year 12 or less",
+  "Year 12 or less": "high school-educated voters (or less)",
   "Own outright": "outright homeowners",
   Mortgage: "mortgage holders",
   Renting: "renters",
@@ -3557,7 +3558,7 @@ function rdDemoShift(dt, T, party) {
   const pct = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
   const named = new Set();
   const elecSentence = () => {
-    const pass = (dt.elec || []).filter(r => r.sig && !named.has(r.group)).sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
+    const pass = (dt.elec || []).filter(r => (r.claim ?? r.sig) && !named.has(r.group)).sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
     if (!pass.length) return null;
     const sgnE = v => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
     const men = pass.find(r => r.group === "Men"),
@@ -3578,11 +3579,15 @@ function rdDemoShift(dt, T, party) {
       if (men && women && (r === men || r === women)) continue;
       claims.push({
         k: Math.abs(r.d) / r.ci,
+        g: r.group,
         s: "it has " + (r.d > 0 ? "gained" : "lost") + " ground among " + (RD_TREND_GROUP[r.group] || r.group) + " (" + sgnE(r.d) + " points relative to all voters)"
       });
     }
     claims.sort((a, b) => b.k - a.k);
-    return "Measured from the election (Australian Election Study 2025), " + serial(claims.slice(0, 2).map(c => c.s));
+    const chosen = claims.slice(0, 2);
+    const genSet = (T.tabs || []).flatMap(t => t.sets).find(s => s.id === "generation");
+    const genNote = chosen.some(c => c.g === "Gen Z") && genSet ? ". The Gen Z comparison is across instruments: the polls’ Gen Z figures come only from the generation cuts of " + rdList(genSet.houses.map(demoHouse)) : "";
+    return "Measured from the election (Australian Election Study 2025), " + serial(chosen.map(c => c.s)) + genNote;
   };
   if (!solid.length) {
     const skew = RD_TREND_SKEW[party];
@@ -4725,21 +4730,27 @@ function RdDemographics({
     scope: "col"
   }, "AES respondents"), React.createElement("th", {
     scope: "col"
+  }, "Resolve\u2019s own change, pts"), React.createElement("th", {
+    scope: "col"
   }, "Significant"))), elecSets.map(s => React.createElement("tbody", {
     key: s.key
   }, React.createElement("tr", {
     className: "rd-tsig-set"
   }, React.createElement("th", {
-    colSpan: 7
+    colSpan: 8
   }, s.label)), s.rows.map(r => React.createElement("tr", {
     key: r.group
   }, React.createElement("th", {
     scope: "row"
-  }, r.group), React.createElement("td", null, sgn1(r.then, true), " \u2192 ", sgn1(r.now, true)), React.createElement("td", null, sgn1(r.d, true)), React.createElement("td", null, "\xB1", r.ci.toFixed(1)), React.createElement("td", null, r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)), React.createElement("td", null, r.n.toLocaleString()), React.createElement("td", {
-    className: r.sig ? "rd-tsig-yes" : ""
-  }, r.sig ? "Yes" : "No"))))))), React.createElement("p", {
+  }, r.group), React.createElement("td", null, sgn1(r.then, true), " \u2192 ", sgn1(r.now, true)), React.createElement("td", null, sgn1(r.d, true)), React.createElement("td", null, "\xB1", r.ci.toFixed(1)), React.createElement("td", null, r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)), React.createElement("td", null, r.n.toLocaleString()), React.createElement("td", null, r.check ? sgn1(r.check.beta, true) + " ±" + r.check.ci.toFixed(1) + (r.check.conflict ? ", disagrees" : "") : "–"), React.createElement("td", {
+    className: r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""
+  }, !r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"))))))), React.createElement("p", {
     className: "rd-note rd-tsig-note"
-  }, "The election gap is the group\u2019s in the Australian Election Study 2025 (its share less all respondents\u2019, from the survey\u2019s respondent file); the gap now is the group\u2019s current pooled figure less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " current primary. The margin combines both figures\u2019 sampling error. A change counts only when it clears that margin and the group\u2019s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn\u2019t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above."))), React.createElement(RdFoot, {
+  }, "The election gap is the group\u2019s in the Australian Election Study 2025 (its share less all respondents\u2019, from the survey\u2019s respondent file); the gap now is the group\u2019s current pooled figure less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " current primary. The margin combines both figures\u2019 sampling error. A change counts only when it clears that margin and the group\u2019s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn\u2019t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above. For age and gender, Resolve\u2019s own polls give a second reading of the same change \u2013 its recent polls against its election-day poll, so its house lean cancels; where that reading disagrees beyond both margins, the change is withheld from the summary above.", (() => {
+    const gs = elecSets.find(s => s.key.endsWith("|generation"));
+    const st = gs && Tdemo.tabs.flatMap(t => t.sets).find(s => s.id === "generation");
+    return st ? " The generations compare across instruments as well: the polls’ Gen Z, Millennial, Gen X and Boomer figures come only from the generation cuts of " + rdList(st.houses.map(demoHouse)) + ", which the margins can’t account for." : "";
+  })()))), React.createElement(RdFoot, {
     how: {
       term: "vote-by-group",
       from: "Who votes for whom"
