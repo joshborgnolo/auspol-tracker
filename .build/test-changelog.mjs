@@ -118,7 +118,7 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   const next = S({ polls: [...S().polls, k], flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 });
   const a = diff(prev, next, { [k]: { name: "Newspoll", fw: "9–11 Oct", sample: 1250, url: null } }).appended;
   assert.deepEqual(a.map((e) => e.kind), ["flows", "poll"]);
-  assert.equal(a[0].text, "The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%.");
+  assert.equal(a[0].text, "The preference-flow assumptions were updated: Coalition voters’ preferences to Labor over One Nation 30.0% → 33.0%.");
   assert.equal(a[1].text, "Newspoll (fieldwork 9–11 Oct, n=1,250) added — the two-party preferred estimate moved 52.3 → 52.6 (Labor v One Nation, implied flows), with the preference-flow update the same day.");
 }
 
@@ -158,7 +158,7 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   assert.equal(appended.length, 1);
   const e = appended[0];
   assert.equal(e.kind, "flows");
-  assert.match(e.text, /^The preference-flow assumptions were updated: Greens voters' preferences to Labor 88\.2% → 87\.4%\. The two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\. The implied-basis Labor v the Coalition estimate moved 52\.3 → 52\.1\.$/);
+  assert.match(e.text, /^The preference-flow assumptions were updated: Greens voters’ preferences to Labor 88\.2% → 87\.4%\. The two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\. The implied-basis Labor v the Coalition estimate moved 52\.3 → 52\.1\.$/);
 }
 
 /* the Labor v One Nation table moves: named, and the headline's own move
@@ -168,7 +168,7 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   const next = S({ flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 });
   const { appended } = diff(prev, next);
   assert.equal(appended.length, 1);
-  assert.equal(appended[0].text, "The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%. The two-party preferred estimate moved 52.3 → 52.6 (Labor v One Nation, implied flows).");
+  assert.equal(appended[0].text, "The preference-flow assumptions were updated: Coalition voters’ preferences to Labor over One Nation 30.0% → 33.0%. The two-party preferred estimate moved 52.3 → 52.6 (Labor v One Nation, implied flows).");
 }
 
 /* the headline on the counted table: one estimate sentence, not two */
@@ -176,7 +176,7 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   const L = { pair: "alp_lnp", basis: "imp", alp: 52.3 };
   const prev = S({ lead: L, imp: 52.3 });
   const next = S({ lead: { ...L, alp: 52.1 }, imp: 52.1, flows: flowsOf({ ...FLOW0, grn: 0.874 }, FP0, null) });
-  assert.equal(diff(prev, next).appended[0].text, "The preference-flow assumptions were updated: Greens voters' preferences to Labor 88.2% → 87.4%. The two-party preferred estimate moved 52.3 → 52.1 (Labor v the Coalition, implied flows).");
+  assert.equal(diff(prev, next).appended[0].text, "The preference-flow assumptions were updated: Greens voters’ preferences to Labor 88.2% → 87.4%. The two-party preferred estimate moved 52.3 → 52.1 (Labor v the Coalition, implied flows).");
 }
 
 /* per-cell bands (flows.mjs FP_ON_BAND is an object): stored, compared, and
@@ -186,7 +186,7 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   assert.deepEqual(flowsOf(FLOW0, FP0, B0).band, { lnp: 3, grn: 2.5, oth: 4 });
   const moved = diff(S({ flows: flowsOf(FLOW0, FP0, B0) }), S({ flows: flowsOf(FLOW0, FP0, { ...B0, lnp: 0.04 }) })).appended;
   assert.equal(moved.length, 1);
-  assert.match(moved[0].text, /the doubt allowed on Coalition voters' flow to Labor over One Nation ±3\.0 → ±4\.0 points\./);
+  assert.match(moved[0].text, /the doubt allowed on Coalition voters’ flow to Labor over One Nation ±3\.0 → ±4\.0 points\./);
   assert.equal(diff(S(), S({ flows: flowsOf(FLOW0, FP0, B0) })).appended.length, 0, "null → per-cell band is a migration, not an update");
 }
 
@@ -290,7 +290,7 @@ const RM_INFO = { [RM]: { name: "Roy Morgan", fw: "28 Sep–11 Oct", sample: 265
   const t = appended[0].text;
   assert.match(t, /^From today the log also records the primary votes/);
   assert.match(t, /Primary votes: Labor 27\.5, the Coalition 21\.6, One Nation 26\.1, the Greens 13\.4, others 11\.4\./);
-  assert.match(t, /Leader ratings: Albanese's net approval −21\.6, Taylor's net approval −6\.9, Hanson's net favourability −5\.6\./);
+  assert.match(t, /Leader ratings: Albanese’s net approval −21\.6, Taylor’s net approval −6\.9, Hanson’s net favourability −5\.6\./);
   assert.match(t, /National direction: right track 27\.1, wrong track 62\.2 \(net −35\.1\)\./);
   assert.match(t, /Leading significantly as the best party: the Coalition on economic management\./);
   assert.match(t, /Moving significantly over the past month: One Nation's primary vote \(up\); Albanese's net approval \(down\)\.$/, "primaries listed first");
@@ -326,7 +326,7 @@ assert.equal(diff(W(), W()).appended.length, 0);
   assert.equal(appended[0].text,
     "Roy Morgan (fieldwork 28 Sep–11 Oct, n=2,655) added — the two-party preferred estimate held at 52.3 (Labor v One Nation, implied flows)." +
     " Primary votes: Labor 27.5 → 27.3, One Nation 26.1 → 26.4." +
-    " Leader ratings: Albanese's net approval −21.6 → −20.0." +
+    " Leader ratings: Albanese’s net approval −21.6 → −20.0." +
     " National direction: right track 27.1 → 28.0, wrong track held at 62.2 (net −35.1 → −34.2)." +
     " House effect (Labor v One Nation, implied flows; positive leans Labor): Roy Morgan +0.7 → +0.8.");
 }
@@ -389,7 +389,7 @@ assert.equal(diff(W(), W()).appended.length, 0);
   const k = "2026-10-12|Newspoll";
   assert.deepEqual(gist(S(), S({ polls: [...S().polls, k], flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 }),
     { [k]: { name: "Newspoll", fw: "9–11 Oct", sample: 1250, url: null } }),
-    ["The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%",
+    ["The preference-flow assumptions were updated: Coalition voters’ preferences to Labor over One Nation 30.0% → 33.0%",
      "Newspoll added — the two-party preferred estimate moved 52.3 → 52.6, with the preference-flow update the same day"]);
   assert.deepEqual(gist(S({ lead: { pair: "alp_lnp", basis: "imp", alp: 56.4 } }), S()),
     ["The headline pairing is now Labor v One Nation (it was Labor v the Coalition); the estimate reads 52.3"], "the meta entry keeps what it was");

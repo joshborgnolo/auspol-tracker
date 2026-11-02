@@ -232,9 +232,9 @@ function eq(name, got, want) {
   eq("Essential not overdue, slipped to THIS week's Wed 2 Sep", [es && es.overdue, es && es.missed], [false, false]);
   eq("panel counts to tomorrow, no 'or' alternative", es && panelWhen(es), "tomorrow");
   // DemosAU's calendar-month window is the house's measured filing range,
-  // the 9th to the 27th, so on the 1st it hasn't opened yet: Essential's
-  // slipped slot leads, and DemosAU counts the days to its own range with
-  // the loose-house hedge on
+  // opening on the 1st of the month, so on the 1st it is already open:
+  // Essential's slipped slot leads, and DemosAU rides the bar's tail as
+  // "any day now" with the loose-house hedge on
   eq("Essential's slipped slot leads the ticker", items[0] && [items[0].firm, items[0].when], ["Essential", "tomorrow"]);
   // the slipped slot already sits on the house's measured late step (35 days)
   // - the projection IS the alternative, so neither column may name a
@@ -250,20 +250,21 @@ function eq(name, got, want) {
   // the roll is every house's nearest slot, unsliced - on the live bar the
   // fit pass trims this to the room it actually has; the roll itself never
   // caps (a weekly house appears once, not twice inside the same week).
-  // DemosAU's window doesn't open until the 9th, so it is OFF the bar here
-  // now (window houses are bar-visible only while open) - a dated-house
-  // ticket from Essential on down, with YouGov and Spectre's standing slots
-  // at the tail: the horizon bounds further slots, never the first, and both
-  // houses' next slots sit past 28 days (YouGov re-anchored 2026-10-07 when
-  // its 6 Oct wave landed; Spectre's 139-day cadence is ~twenty weeks out).
+  // DemosAU's window opens on the 1st, so it already rides the bar's tail
+  // as "any day now" here (window houses are bar-visible only while open) -
+  // a dated-house ticket from Essential on down, with YouGov and Spectre's
+  // standing slots ahead of it: the horizon bounds further slots, never the
+  // first, and both houses' next slots sit past 28 days (YouGov re-anchored
+  // 2026-10-07 when its 6 Oct wave landed; Spectre's 139-day cadence is
+  // ~twenty weeks out).
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
      ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "50 days"],
-     ["Spectre Strategy", "82 days"]]);
+     ["Spectre Strategy", "82 days"], ["DemosAU", "any day now"]]);
   {
     const da = firm(rows, "DemosAU");
-    eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
-    eq("window not open → DemosAU off the bar", items.some((i) => i.firm === "DemosAU"), false);
+    eq("DemosAU's window opens on the measured 1st, and is open on the 1st", da && panelWhen(da), "open now");
+    eq("window open → DemosAU on the bar", items.some((i) => i.firm === "DemosAU"), true);
   }
   // the hold-the-slot rule, in force while a slot is inside its two days
   // of grace: the same seed-stripped cadHold world one day past the Wed
@@ -508,8 +509,8 @@ function eq(name, got, want) {
     ["Wed 2 Sep", "Wed 9 Sep", "Wed 16 Sep", "Wed 23 Sep", "Wed 30 Sep", "Wed 7 Oct"]);
 }
 
-// S8 – Mon 28 Sep, 10am: September's measured window (9–27) closed yesterday
-// and the skip-confirm agent has verified the publisher lists no September
+// S8 – Mon 28 Sep, 10am: September's measured window closed days ago and
+// the skip-confirm agent has verified the publisher lists no September
 // wave, so skippedMonths rolls the slot to October's range. No red, no
 // "open now" hanging on a month confirmed never filed - the row just counts
 // to the next UNVERIFIED month, exactly as Essential's week-grain roll does.
@@ -522,7 +523,7 @@ function eq(name, got, want) {
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const da = firm(rows, "DemosAU");
   eq("rolled to the October window, not red", da && [da.overdue, da.missed], [false, false]);
-  eq("panel counts to the 9 Oct open", da && panelWhen(da), "opens in 11 days");
+  eq("panel counts to the 1 Oct open", da && panelWhen(da), "opens in 3 days");
   // and the bar keeps its window rule: the October window isn't open yet,
   // (and September's miss earns no red row there) so DemosAU sits it out
   eq("window house off the bar until its window opens", items.some((i) => i.firm === "DemosAU"), false);
@@ -545,10 +546,10 @@ function eq(name, got, want) {
 }
 
 // S8c – Mon 5 Oct with BOTH September and October confirmed absent: the slot
-// rolls to November, whose open (9 Nov) sits past the 28-day horizon. A
-// rolled slot is still the house's one standing claim, so it keeps its panel
-// seat counting to the far-off range; on the bar the window-open-only rule
-// is untouched, so nothing shows there until 9 Nov.
+// rolls to November, whose open (1 Nov) is still 27 days off. A rolled slot
+// is still the house's one standing claim, so it keeps its panel seat
+// counting to the far-off range; on the bar the window-open-only rule
+// is untouched, so nothing shows there until 1 Nov.
 {
   const cad2 = JSON.parse(JSON.stringify(cad));
   cad2.find((c) => c.pollster === "DemosAU").skippedMonths = ["2026-09", "2026-10"];
@@ -557,8 +558,8 @@ function eq(name, got, want) {
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const da = firm(rows, "DemosAU");
-  eq("rolled past the horizon: panel keeps the standing window", da && panelWhen(da), "opens in 35 days");
-  eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
+  eq("rolled to a far window: panel keeps the standing window", da && panelWhen(da), "opens in 27 days");
+  eq("rolled to a far window: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
 }
 
 // S8d – Wed 23 Sep, against the SHIPPED cadence table exactly as built (no
@@ -749,11 +750,16 @@ function eq(name, got, want) {
 
 // S12b – the bar names the EARLIEST date, so a weekday house whose record
 // holds a later slot too is hedged: Newspoll's Sunday or the one after
-// reads "tomorrow (maybe)" on the Saturday
+// reads "tomorrow (maybe)" on the Saturday. The live record has tightened
+// to an exact every-21-days Sunday habit (spreadLate 0), which yields NO
+// future-day hedge by design - so the rule is pinned on a table that owns
+// a one-week late tail, exactly the state it was written for.
 {
-  const npRel = firm(project(cad, Date.parse("2026-09-10T00:00:00Z"), Date.parse("2026-09-10T00:00:00Z")), "Newspoll").release;
+  const cadH = JSON.parse(JSON.stringify(cad));
+  cadH.find((c) => c.pollster === "Newspoll").spreadLate = 7;
+  const npRel = firm(project(cadH, Date.parse("2026-09-10T00:00:00Z"), Date.parse("2026-09-10T00:00:00Z")), "Newspoll").release;
   const { t0, nowMs, label } = scen("eve of Newspoll's slot", new Date(npRel - DAY).toISOString().slice(0, 10), 600);
-  const items = ticker(project(cad, t0, nowMs), t0, nowMs);
+  const items = ticker(project(cadH, t0, nowMs), t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const np = items.find((i) => i.firm === "Newspoll");
   eq("a later slot on record hedges the count", np && [np.when, np.maybe], ["tomorrow", true]);

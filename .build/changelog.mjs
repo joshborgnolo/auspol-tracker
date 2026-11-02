@@ -274,7 +274,7 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
      where everything stands, rather than logging every figure as a move */
   if (!prevState.prim && nextState.prim) {
     appended.push(entry(iso, "seed",
-      "From today the log also records the primary votes, the leaders’  ratings, national direction and the house effect of each pollster that publishes, " +
+      "From today the log also records the primary votes, the leaders’ ratings, national direction and the house effect of each pollster that publishes, " +
       "every measure whose month-on-month move becomes, or stops being, statistically significant, and changes in which party leads significantly as the best on each issue." +
       standingText(nextState)));
   }
@@ -309,16 +309,16 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     const cmp = (a, b, lab, unit = "%") => {
       if (a != null && b != null && f1(a) !== f1(b)) bits.push(`${lab} ${f1(a)}${unit} → ${f1(b)}${unit}`);
     };
-    for (const [k, lab] of [["grn", "Greens voters’  preferences to Labor"], ["onp", "One Nation voters’  preferences to Labor"], ["oth", "other voters’  preferences to Labor"]]) cmp(A[k], B[k], lab);
+    for (const [k, lab] of [["grn", "Greens voters’ preferences to Labor"], ["onp", "One Nation voters’ preferences to Labor"], ["oth", "other voters’ preferences to Labor"]]) cmp(A[k], B[k], lab);
     const classicMoved = bits.length > 0;
     for (const [k, lab] of [["lnp", "Coalition"], ["grn", "Greens"], ["oth", "other"]]) {
-      cmp(A.on && A.on[k], B.on && B.on[k], `${lab} voters’  preferences to Labor over One Nation`);
+      cmp(A.on && A.on[k], B.on && B.on[k], `${lab} voters’ preferences to Labor over One Nation`);
     }
     const bandOf = (b, k) => (b == null ? null : typeof b === "number" ? b : b[k]);
     if (A.band != null && B.band != null) {
       for (const [k, lab] of [["lnp", "Coalition"], ["grn", "Greens"], ["oth", "other"]]) {
         const a = bandOf(A.band, k), b = bandOf(B.band, k);
-        if (a != null && b != null && f1(a) !== f1(b)) bits.push(`the doubt allowed on ${lab} voters’  flow to Labor over One Nation ±${f1(a)} → ±${f1(b)} points`);
+        if (a != null && b != null && f1(a) !== f1(b)) bits.push(`the doubt allowed on ${lab} voters’ flow to Labor over One Nation ±${f1(a)} → ±${f1(b)} points`);
       }
     }
     if (bits.length) {
