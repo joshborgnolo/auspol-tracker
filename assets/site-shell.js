@@ -221,6 +221,11 @@ let npProjMemo = null;
 function npProject(nowOverride, opts) {
   const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
   const tracked = !!(opts && opts.includeTracked);
+  /* opts.cadence projects a supplied list instead of D.pollCadence - the
+     Latest-and-next table's sub-rows pass D.subCadence (a house's MRP or
+     pooled series), which no other consumer walks. Not memoised: one
+     caller, a handful of rows */
+  if (opts && opts.cadence) return npProjectAt(nowOverride || easternNow(), horizonDays, true, opts.cadence);
   if (!nowOverride) {
     const e = easternNow(), k = e.day + e.mins * 60000;
     if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays && npProjMemo.t === tracked) return npProjMemo.v;
@@ -230,9 +235,9 @@ function npProject(nowOverride, opts) {
   }
   return npProjectAt(nowOverride, horizonDays, tracked);
 }
-function npProjectAt(nowOverride, horizonDays, includeTracked) {
+function npProjectAt(nowOverride, horizonDays, includeTracked, series) {
   const { D } = window.AP;
-  const cad = (D.pollCadence || []).filter((c) => includeTracked || !c.tracked);
+  const cad = (series || D.pollCadence || []).filter((c) => includeTracked || !c.tracked);
   if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };
   const eNow = nowOverride || easternNow();
   const t0 = eNow.day;
@@ -403,7 +408,9 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
       /* a slot in the summer break: the house's next claim is the
          resumption window (NP_SUMMER_BACK of the January after), shaped as
          a loose row; a further slot there is not projected at all */
-      if (npInSummer(release)) {
+      /* (noSummer: a series that publishes from waves already in hand -
+         the pooled Newspoll quarter came out on 26 Dec 2025) */
+      if (!c.noSummer && npInSummer(release)) {
         if (i === 0) {
           const d = new Date(release);
           const y = d.getUTCFullYear() + (d.getUTCMonth() === 11 ? 1 : 0);

@@ -34,10 +34,10 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../../assets/js/data-vic.69b83696.js" as="script">
+  <link rel="preload" href="../../assets/js/data-vic.a4264b72.js" as="script">
   <link rel="preload" href="../../assets/js/data-vic-late.afe474e5.js" as="script">
   <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js" as="script">
-  <link rel="preload" href="../../assets/js/np-project.ab528b77.js" as="script">
+  <link rel="preload" href="../../assets/js/np-project.5ac769ce.js" as="script">
   <link rel="preload" href="../../assets/js/pv-agg.981ce406.js" as="script">
   <link rel="preload" href="../../assets/js/menu-lines.5c1a151d.js" as="script">
   <link rel="preload" href="../../assets/js/copy-chart.5110f1c6.js" as="script">
@@ -51,7 +51,7 @@
   <link rel="preload" href="../../assets/js/rd.4f929cab.js" as="script">
   <link rel="preload" href="../../assets/js/rd-hero.09f16144.js" as="script">
   <link rel="preload" href="../../assets/js/rd-panels.2a9b9a8c.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-polls.fc77845c.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-polls.97e20ee7.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../../assets/js/rd-allpolls.3b7112fd.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.0883ebcd.js" as="script">
@@ -4557,6 +4557,48 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
 }
 body.rd .rd-pl-fig, body.rd .rd-pl-lead { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 body.rd .rd-pl-exp { font-size: 13px; }
+body.rd .rd-pl-item.rd-pl-hassub { border-bottom: 0; }
+body.rd .rd-pl-subitem > .rd-pl-row { position: relative; min-height: 34px; height: 34px; }
+body.rd .rd-pl-subitem.open > .rd-pl-row, body.rd .rd-pl-subitem > .rd-pl-row:hover { background: var(--surface-2); }
+body.rd .rd-pl-subitem > .rd-pl-row::before {
+  content: ""; position: absolute; left: 14px; top: 0; width: 8px; height: 50%;
+  border-left: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); pointer-events: none;
+}
+body.rd .rd-pl-subitem > .rd-pl-row > [role="cell"] { padding: 0; align-self: center; }
+body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-name,
+body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-latest,
+body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-next { flex-direction: row; align-items: baseline; gap: 6px; white-space: nowrap; overflow: hidden; }
+body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-name { padding-left: 18px; }
+body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-tl { align-self: stretch; }
+body.rd .rd-pl-subitem .rd-tl { min-height: 0; }
+body.rd .rd-pl-subitem .rd-pl-main { font-size: 13px; color: var(--ink-2); }
+body.rd .rd-pl-subitem .rd-pl-sub { overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+body.rd .rd-pl-subitem .rd-pl-c-figs .rd-pl-main { font-size: 13px; }
+body.rd .rd-pl-subitem .rd-pl-c-figs .rd-pl-sub { display: none; }
+body.rd .rd-pl-subitem .rd-pl-prim { font-size: 13px; color: var(--ink-2); }
+body.rd .rd-pl-subitem .rd-pl-tag { font-size: 11px; }
+body.rd .rd-pl-subitem .rd-pl-none { font-size: 12px; }
+body.rd .rd-pl-subitem .rd-tl-latest { width: 8px; height: 8px; }
+body.rd .rd-pl-subitem .rd-tl-next { width: 10px; height: 10px; }
+@media (max-width: 1100px) and (min-width: 901px) {
+  body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-name { padding-left: 15px; gap: 5px; }
+  body.rd .rd-pl-subitem > .rd-pl-row::before { left: 12px; width: 6px; }
+  body.rd .rd-pl-subitem .rd-pl-c-name .rd-pl-sub { font-size: 11.5px; }
+}
+@media (max-width: 900px) {
+  body.rd .rd-pl-subitem > .rd-pl-row {
+    height: auto; min-height: 0;
+    grid-template-rows: 20px auto; grid-template-areas: "name figs" "foot foot";
+    padding: 5px 0 7px; row-gap: 2px;
+  }
+  body.rd .rd-pl-subitem > .rd-pl-row::before { left: 3px; height: 15px; }
+  body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-name { padding-left: 15px; }
+  body.rd .rd-pl-subitem > .rd-pl-row > .rd-pl-c-tl { display: none; }
+  body.rd .rd-pl-subitem .rd-pl-c-figs .rd-pl-main,
+  body.rd .rd-polls[data-facet="leadership"] .rd-pl-subitem > .rd-pl-row > .rd-pl-c-figs .rd-pl-main { font-size: 14px; }
+  body.rd .rd-pl-subitem .rd-pl-prim { min-width: 150px; }
+  body.rd .rd-pl-subitem .rd-pl-foot1 { font-size: 11.5px; padding-left: 15px; }
+}
 body.rd .rd-ld-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; margin-top: 8px; }
 body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 1001px) {
@@ -6463,6 +6505,7 @@ body.rd .rd-ldg-note, body.rd .rd-ldg-foot1 { margin: 8px 0 0; font-size: 12px; 
 body.rd .rd-ldg-foot1 b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ldg-noagg { margin: 12px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 body.rd .rd-ldg-noagg b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-noagg + .rd-pld-rhythm { margin-top: 20px; }
 body.rd .rd-ldg-t { border-collapse: collapse; width: 100%; font-size: 14px; }
 body.rd .rd-ldg-t thead th { padding: 0 10px 6px 0; border-bottom: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; }
 body.rd .rd-ldg-t thead th.on { color: var(--ink); }
@@ -6707,10 +6750,10 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../../assets/js/react.d949f1c3.js"></script>
   <script src="../../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../../assets/js/data-vic.69b83696.js"></script>
+  <script src="../../assets/js/data-vic.a4264b72.js"></script>
   <script src="../../assets/js/data-vic-late.afe474e5.js"></script>
   <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js"></script>
-  <script src="../../assets/js/np-project.ab528b77.js"></script>
+  <script src="../../assets/js/np-project.5ac769ce.js"></script>
   <script src="../../assets/js/pv-agg.981ce406.js"></script>
   <script src="../../assets/js/menu-lines.5c1a151d.js"></script>
   <script src="../../assets/js/copy-chart.5110f1c6.js"></script>
@@ -6724,7 +6767,7 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../../assets/js/rd.4f929cab.js"></script>
   <script src="../../assets/js/rd-hero.09f16144.js"></script>
   <script src="../../assets/js/rd-panels.2a9b9a8c.js"></script>
-  <script src="../../assets/js/rd-polls.fc77845c.js"></script>
+  <script src="../../assets/js/rd-polls.97e20ee7.js"></script>
   <script src="../../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../../assets/js/rd-allpolls.3b7112fd.js"></script>
   <script src="../../assets/js/rd-public-opinion.0883ebcd.js"></script>

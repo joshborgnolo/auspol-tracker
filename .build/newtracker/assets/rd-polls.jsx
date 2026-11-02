@@ -36,6 +36,7 @@ function rdPollRow(p) {
            published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample,
            alpImp: p.alpImp, alpOnImp: p.alpOnImp, alp2pp: p.alp, lnp2pp: p.lnp, p: p.p || {},
            tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl, links: p.links,
+           ...(p.noAgg ? { noAgg: true, noAggWhy: p.noAggWhy } : {}),
            // fieldwork not yet published: shown as TBC (see rdFieldTxt)
            ...(p.fieldPending ? { fieldPending: true, fieldUrl: p.fieldUrl } : {}) };
 }
@@ -69,13 +70,20 @@ function rdPollLinks(links) {
    poll's own release where there is one, else the report it was read from -
    never its methodology statement, nor a page about the house as a whole.
    The title says which, since the name can't. */
-function rdPollNameLink(p, mark = "plink-mark") {
+function rdPollNameLink(p, mark = "plink-mark", label = p.pollster) {
   const ok = (p.links || []).filter((x) => !x.pending);
   const l = ok.find((x) => x.k === "release") || ok.find((x) => x.k === "cite");
   return l
-    ? <a href={l.href} target="_blank" rel="noopener noreferrer" title={"Opens " + l.t} onClick={(ev) => ev.stopPropagation()}>{p.pollster}<span className={mark} aria-hidden="true">↗</span></a>
-    : p.pollster;
+    ? <a href={l.href} target="_blank" rel="noopener noreferrer" title={"Opens " + l.t} onClick={(ev) => ev.stopPropagation()}>{label}<span className={mark} aria-hidden="true">↗</span></a>
+    : label;
 }
+
+/* A house's SUB-SERIES - its MRP, or a pooled re-cut of its waves - sits as
+   a compact row directly under the house's own, whatever the sort (user call
+   2026-11-02): "DemosAU (MRP)" under DemosAU, "Newspoll (pooled)" under
+   Newspoll. The parent is the name with the suffix taken off. */
+const RD_PL_SUB_RE = /^(.*\S)\s+\((MRP|pooled)\)$/;
+const RD_PL_SUB_LABEL = { MRP: "MRP", pooled: "Pooled" };
 
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const { D } = window.AP;
@@ -128,10 +136,39 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (e.order == null) e.order = i;
     e.proj.push(r);
   });
+  /* the sub-series: every MRP or pooled series on record whose parent house
+     has a row here comes out of the top level (a recent MRP has a Latest
+     row of its own, gen-data §7) and rides under the parent, with its
+     newest release and its own projection - D.subCadence, measured like a
+     house's rhythm but walked by nothing else on the site. A series whose
+     parent has no row keeps whatever row it had. */
+  const subProj = window.AP.nextPolls && D.subCadence && D.subCadence.length
+    ? window.AP.nextPolls(null, { cadence: D.subCadence }) : { rows: [] };
+  const subsOf = new Map();
+  const subRels = new Map();
+  D.individualPolls.forEach((q) => {
+    if (!RD_PL_SUB_RE.test(q.pollster)) return;
+    const prev = subRels.get(q.pollster);
+    subRels.set(q.pollster, { n: (prev ? prev.n : 0) + 1, last: !prev || q.released > prev.last.released ? q : prev.last });
+  });
+  [...subRels.keys()].sort().forEach((name) => {
+    const [, parent, kind] = RD_PL_SUB_RE.exec(name);
+    if (!byP.has(parent)) return;
+    const own = byP.get(name);
+    byP.delete(name);
+    const poll = own ? own.poll : rdPollRow(subRels.get(name).last);
+    const proj = subProj.rows.filter((r) => r.pollster === name);
+    const pubMs = Date.parse(poll.pubSort.slice(0, 10));
+    if (!subsOf.has(parent)) subsOf.set(parent, []);
+    subsOf.get(parent).push({ poll, proj, pubMs, stale: false, sub: true, parent,
+      kind: RD_PL_SUB_LABEL[kind], releases: subRels.get(name).n,
+      next: proj.find((r) => r.ahead === 0) || proj[0] || null });
+  });
   const entries = [...byP.values()].map((e) => {
     const pubMs = Date.parse(e.poll.pubSort.slice(0, 10));
     const stale = t0 - pubMs > RD_STALE_DAYS * DAY_MS;
-    return { ...e, pubMs, stale, next: e.proj.find((r) => r.ahead === 0) || e.proj[0] || null };
+    return { ...e, pubMs, stale, subs: subsOf.get(e.poll.pollster) || [],
+             next: e.proj.find((r) => r.ahead === 0) || e.proj[0] || null };
   });
   const sorted = entries.slice().sort((a, b) => {
     if (sort.key === "next") {
@@ -141,9 +178,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (sort.key === "pollster") return sort.dir < 0 ? a.poll.pollster.localeCompare(b.poll.pollster) : b.poll.pollster.localeCompare(a.poll.pollster);
     return sort.dir < 0 ? (b.poll.pubSort > a.poll.pubSort ? 1 : -1) : (a.poll.pubSort > b.poll.pubSort ? 1 : -1);
   });
+  // the rows as drawn: each house, then its sub-series, whatever the sort
+  const ordered = sorted.flatMap((e) => [e, ...e.subs]);
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const caret = (key) => (sort.key === key ? (sort.dir < 0 ? "▾" : "▴") : "▿");
-  const newest = entries.slice().sort((a, b) => b.pubMs - a.pubMs)[0];
+  const newest = ordered.slice().sort((a, b) => b.pubMs - a.pubMs)[0];
   const staleOnes = entries.filter((e) => e.stale);
 
   /* ---- words ------------------------------------------------------------- */
@@ -151,6 +190,14 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const dm = (ms) => { const d = new Date(ms); return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1); };
   const wdm = (ms) => WDs(ms) + " " + dm(ms);
   const isoD = (iso) => dm(Date.parse(iso.slice(0, 10)));
+  /* the newest release's date, with its year once it is more than ten
+     months old - a sub-series can sit a year back (YouGov's MRP, 20 Nov
+     2025), and a bare "20 Nov" reads as a date still to come */
+  const OLD_MS = 300 * DAY_MS;
+  const latestLab = (e) => {
+    const r = e.poll, lab = r.publishedLabel || r.releasedLabel;
+    return t0 - e.pubMs > OLD_MS ? lab + " " + new Date(e.pubMs).getUTCFullYear() : lab;
+  };
   const when = (n) => (n === -1 ? "yesterday" : n < 0 ? -n + " days overdue" : n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days");
   const inHours = (r) => {
     if (r.inDays !== 0 || r.releaseMins == null) return null;
@@ -181,11 +228,22 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   };
   const irregular = (r) => r && r.cadence > 60;
   const cadWords = (e) => (!e.next ? "" : irregular(e.next) ? "irregular" : e.next.calMonth ? "monthly" : cadenceLabel(e.next.cadence));
+  /* a sub-series' rhythm in a word or two: quarterly where it is (the
+     pooled Newspoll, 86-101 days), else the interval in months; with too
+     few releases to measure, how many there have been */
+  const subRhythm = (e) => {
+    const c = e.next && e.next.cadence;
+    if (!c) return rdNumWord(e.releases) + (e.releases === 1 ? " release" : " releases");
+    if (c >= 80 && c <= 100) return "quarterly";
+    if (c < 45) return cadenceLabel(c);
+    const m = Math.round((c / 30.44) * 2) / 2;
+    return "every " + Math.floor(m) + (m % 1 ? "½" : "") + " months";
+  };
   /* the Next column: a date and, under it, how far off and the hour or the
      week-late alternative */
   const nextWords = (e) => {
     const r = e.next;
-    if (!r) return { date: "—", sub: "" };
+    if (!r) return { date: "—", sub: e.sub ? "too few releases to project" : "" };
     if (r.loose && !irregular(r)) {
       const a = r.release - r.spread * DAY_MS, b = r.release + r.spread * DAY_MS;
       const da = new Date(a), db = new Date(b);
@@ -193,7 +251,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         ? da.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b);
       return { date: span, sub: r.missed ? when(r.closesIn) : r.opensIn <= 0 ? "window open now" : "window opens " + when(r.opensIn), missed: r.missed };
     }
-    if (irregular(r)) return { date: "About " + dm(r.release), sub: "give or take " + Math.round(r.spread) + " days", far: true };
+    if (irregular(r)) return r.missed
+      ? { date: "About " + dm(r.release), sub: when(r.closesIn), missed: true }
+      : { date: "About " + dm(r.release), sub: "give or take " + Math.round(r.spread) + " days", far: true };
     if (r.missed) return { date: wdm(r.release), sub: when(r.closesIn), missed: true };
     if (r.overdue) {
       const edge = r.release + r.winHalf * DAY_MS;
@@ -349,7 +409,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                          }}></button>);
     });
     if (e.pubMs >= L) marks.push(<span key="latest" className="rd-tl-latest" style={{ left: pos(e.pubMs) + "%" }}></span>);
-    else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl" aria-hidden="true"><span className="rd-tl-dot"></span>{dm(e.pubMs)}</span>);
+    else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl" aria-hidden="true"><span className="rd-tl-dot"></span>{latestLab(e)}</span>);
     if (r) {
       /* an × where a promised date came and went, the ghost of the ring the
          rollover carried onto the next plausible date */
@@ -578,7 +638,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const plRef = React.useRef(null);
   const rowNav = (e, i) => {
     if (e.target !== e.currentTarget) return;
-    const r = sorted[i].poll, isOpen = open === r.pollster;
+    const r = ordered[i].poll, isOpen = open === r.pollster;
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(isOpen ? null : r.pollster); return; }
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
@@ -589,7 +649,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const j = i + (e.key === "ArrowDown" ? 1 : -1);
-    const nx = sorted[j];
+    const nx = ordered[j];
     if (!nx) return;
     if (isOpen) setOpen(nx.poll.pollster);
     const rows = plRef.current ? plRef.current.querySelectorAll(".rd-pl-item > .rd-pl-row") : [];
@@ -672,7 +732,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
-           meta={new Set(entries.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
+           meta={new Set(ordered.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
@@ -697,11 +757,47 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             <button type="button" className={"rd-pl-sort" + (sort.key === "next" ? " on" : "")} onClick={() => onSort("next")}>Next, at the earliest <span aria-hidden="true">{caret("next")}</span></button></span>
           <span className="rd-pl-c-exp" aria-hidden="true"></span>
         </div>
-        {sorted.map((e, i) => {
+        {ordered.map((e, i) => {
           const r = e.poll, isOpen = open === r.pollster, nx = nextWords(e);
           const cad = cadWords(e);
+          /* the one-line form of the Next words: an irregular window's
+             "give or take" as a ± */
+          const nxSub = e.sub && nx.far && e.next ? "± " + Math.round(e.next.spread) + " days" : !e.next && e.sub ? "too few to project" : nx.sub;
+          if (e.sub) return (
+            /* the compact sub-row: one line a cell - the series, its newest
+               release's date, its figures' main line, a short strip and its
+               next window - the rest in the row's expansion */
+            <div key={r.pollster} className={"rd-pl-item rd-pl-subitem" + (isOpen ? " open" : "")}>
+              <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)} tabIndex={0} aria-expanded={isOpen} onKeyDown={(ev) => rowNav(ev, i)}
+                   aria-label={r.pollster}>
+                <span role="cell" className="rd-pl-c-name">
+                  <span className="rd-pl-main">{rdPollNameLink(r, "plink-mark", e.kind)}</span>
+                  <span className="rd-pl-sub">{subRhythm(e)}</span>
+                </span>
+                <span role="cell" className="rd-pl-c-latest">
+                  <span className="rd-pl-main">{latestLab(e)}</span>
+                </span>
+                <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
+                <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>
+                <span role="cell" className={"rd-pl-c-next" + (nx.missed ? " missed" : "")}>
+                  <span className="rd-pl-main">{nx.date}</span>
+                  {nxSub ? <span className="rd-pl-sub">{nxSub}</span> : null}
+                </span>
+                <span className="rd-pl-c-exp">
+                  <button type="button" className={"rd-pl-exp" + (isOpen ? " open" : "")} aria-expanded={isOpen}
+                          aria-label={(isOpen ? "Close " : "Open ") + r.pollster + "’s release"}
+                          onClick={(ev) => { ev.stopPropagation(); setOpen(isOpen ? null : r.pollster); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
+                </span>
+                <span className="rd-pl-foot1" aria-hidden="true">
+                  <span><b>{latestLab(e)}</b></span>
+                  <span className={nx.missed ? "missed" : ""}>{e.next ? <>Next <b>{nx.date}</b>{nx.sub ? ", " + nx.sub : ""}</> : "Too few releases to project the next"}</span>
+                </span>
+              </div>
+              {isOpen && detail(e)}
+            </div>
+          );
           return (
-            <div key={r.pollster} className={"rd-pl-item" + (isOpen ? " open" : "") + (e.stale ? " stale" : "")}>
+            <div key={r.pollster} className={"rd-pl-item" + (isOpen ? " open" : "") + (e.stale ? " stale" : "") + (e.subs.length ? " rd-pl-hassub" : "")}>
               <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)} tabIndex={0} aria-expanded={isOpen} onKeyDown={(ev) => rowNav(ev, i)}>
                 <span role="cell" className="rd-pl-c-name">
                   <span className="rd-pl-main">
@@ -710,7 +806,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   <span className="rd-pl-sub">{r.client}{cad ? ", " + cad : ""}{e.stale ? <span className="rd-pl-long">, no poll in six weeks</span> : null}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-latest">
-                  <span className="rd-pl-main">{r.publishedLabel || r.releasedLabel}</span>
+                  <span className="rd-pl-main">{latestLab(e)}</span>
                   <span className="rd-pl-sub">{r.fieldPending ? <>fieldwork {rdFieldTbc(r)}</> : r.field}{r.sample ? ", " + r.sample.toLocaleString() : ""}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
@@ -730,7 +826,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                           onClick={(ev) => { ev.stopPropagation(); setOpen(isOpen ? null : r.pollster); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
                 </span>
                 <span className="rd-pl-foot1" aria-hidden="true">
-                  <span><b>{r.publishedLabel || r.releasedLabel}</b>, {r.fieldPending ? <>fieldwork {rdFieldTbc(r, -1)}</> : r.field}</span>
+                  <span><b>{latestLab(e)}</b>, {r.fieldPending ? <>fieldwork {rdFieldTbc(r, -1)}</> : r.field}</span>
                   <span className={nx.missed ? "missed" : ""}>Next <b>{nx.date}</b>{nx.sub ? ", " + nx.sub.replace(/, .*$/, "") : ""}</span>
                 </span>
               </div>

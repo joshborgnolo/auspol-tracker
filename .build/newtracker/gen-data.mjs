@@ -8003,6 +8003,68 @@ for (const p of POLLS) {
   }
 }
 const pollCadence = [];
+/* A house's SUB-SERIES - its MRP, or a pooled re-cut of its waves - is
+   measured here too, but into a list of its own (subCadence) that only the
+   Latest-and-next table reads, where the series sits as a compact row under
+   its parent (user call 2026-11-02). Kept out of pollCadence for the reasons
+   the skip below gives: the ticker, the release calendar, the scorer and
+   the skip-confirm agents all walk pollCadence, and none of them should
+   see a second Newspoll- or DemosAU-branded slot.
+
+   The measurement is the plain interval one, with no house machinery: these
+   series keep no weekday or hour, are released a handful of times a year,
+   and are read off the published sequence whenever every release carries
+   its date (at CAD_MIN_POLLS releases the house rule's CAD_PUB_MIN would put
+   DemosAU's MRP on fieldwork gaps plus a one-day default lag, when its real
+   lag is three weeks). Always a window, never a dated slot: a quarterly
+   product's ± is weeks, and a missed window holds its seat rather than
+   rolling a whole quarter on. And no summer break: the pooled Newspoll
+   quarter came out on 26 Dec 2025, from waves already in hand. */
+const SUB_RE = /^(.*\S)\s+\((MRP|pooled)\)$/;
+const subCadence = [];
+const subCadenceOf = (firm, rows) => {
+  if (rows.length < CAD_MIN_POLLS) return null;
+  const allPub = rows.every((r) => r.pub);
+  const seq = allPub ? rows.map((r) => r.pub) : rows.map((r) => r.date);
+  const gaps = seq.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(seq[i])) / 86400000));
+  const g8 = gaps.slice(-8);
+  const cadence = medianOf(g8);
+  if (!cadence || cadence <= 0) return null;
+  const trimmed = [...g8].sort((a, b) => a - b);
+  if (trimmed.length >= CAD_SPREAD_TRIM) {
+    if (trimmed[trimmed.length - 1] > cadence * (1 + CAD_TRIM_FREAK)) trimmed.pop();
+    if (trimmed[0] < cadence * (1 - CAD_TRIM_FREAK)) trimmed.shift();
+  }
+  const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
+  if (spread / cadence > CAD_LOOSE_MAX_REL_SPREAD) return null;
+  const ls = lagSamples[firm] || [];
+  const start = Math.max(0, rows.length - CAD_SHOW);
+  const at = (r) => (r && (allPub ? r.pub : r.date)) || null;
+  return {
+    pollster: firm, sub: SUB_RE.exec(firm)[1],
+    last: seq[seq.length - 1], cadence, loose: true, noSummer: true,
+    spread, spreadEarly: Math.max(0, cadence - trimmed[0]), spreadLate: Math.max(0, trimmed[trimmed.length - 1] - cadence),
+    basis: allPub ? "published" : "fieldwork",
+    lag: allPub ? 0 : (ls.length >= 2 ? medianOf(ls) : CAD_DEFAULT_LAG),
+    lagMeasured: allPub ? 0 : ls.length,
+    releaseFrom: null, releaseTo: null, releaseMid: null, releaseTimed: 0, releaseVals: null,
+    releaseMins: null, releaseDow: null, releaseDowN: 0, declared: [],
+    waves: rows.length, site: (D.pollsterRules?.[firm] || {}).site || null,
+    skipped: [], skippedMonths: [],
+    recent: rows.slice(start).map((r, i) => {
+      const from = at(rows[start + i - 1]), to = at(r);
+      return { field: r.date, pub: r.pub, mins: r.mins, url: r.url, since: from,
+               gap: from && to ? Math.round((Date.parse(to) - Date.parse(from)) / 86400000) : null };
+    }),
+    gapsUsed: g8.length,
+  };
+};
+for (const [firm, rows] of Object.entries(byHouse)) {
+  if (SUB_RE.test(firm)) {
+    const c = subCadenceOf(firm, rows);
+    if (c) subCadence.push(c);
+  }
+}
 for (const [firm, rows] of Object.entries(byHouse)) {
   const dates = rows.map((r) => r.date).sort();
   /* a NO_AGG series has no "next poll" to project: the quarterly pooled
@@ -9051,6 +9113,9 @@ window.AUSPOL = (function () {
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
   const pollCadence = ${JSON.stringify(pollCadence)};
+  /* the same measure for each house's MRP or pooled series (subCadence,
+     §cadence) - read only by the Latest-and-next table's compact sub-rows */
+  const subCadence = ${JSON.stringify(subCadence)};
   /* the /public-opinion/ page's count of topics (§8e) - null off the federal page */
   const publicOpinionTopics = ${JSON.stringify(publicOpinionTopics)};
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
@@ -9111,7 +9176,7 @@ window.AUSPOL = (function () {
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,
-    pollCadence,
+    pollCadence, subCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)
     jur: ${JSON.stringify(JUR)},` : ""}
@@ -9175,6 +9240,7 @@ console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
       + (c.releaseDow == null ? "" : ` ${WDS[c.releaseDow]}${c.releaseDowN ? "(" + c.releaseDowN + "/" + Math.min(CAD_RECENT, (dowSamples[c.pollster] || []).length) + ")" : ""}`)
       + hh + ` <${c.basis}>` + (c.declared.length ? ` [declared ${c.declared.join("+")}]` : "") + (c.loose ? " LOOSE" : "");
   }).join(" | "));
+console.log("subCadence:", subCadence.map((c) => `${c.pollster} ${c.cadence}d±${c.spread} <${c.basis}> last ${c.last}`).join(" | ") || "none");
 console.log("events:", events.length, "(major:", events.filter((e) => e.major).length + ")");
 console.log("cycles:", CYCLE_DEFS.map((c) => `${c.year} m0..${c.months.at(-1)} tpp ${c.tpp[0]}→${c.tpp.at(-1)} prim ${c.primary[0]}→${c.primary.at(-1)} net ${c.net[0]}→${c.net.at(-1)} opp ${c.oppnet[0]}→${c.oppnet.at(-1)}`).join("\n        "));
 console.log("cycle ranges: tpp", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.tpp); return [Math.min(...v), Math.max(...v)]; })(), "| prim", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.primary); return [Math.min(...v), Math.max(...v)]; })(), "| net", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.net); return [Math.min(...v), Math.max(...v)]; })(), "| oppnet", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.oppnet); return [Math.min(...v), Math.max(...v)]; })());
