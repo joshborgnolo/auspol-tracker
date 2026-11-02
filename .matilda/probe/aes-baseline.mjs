@@ -45,7 +45,7 @@ const wv = await page.evaluate(() => {
     const after = window.rdDemoShift(dt, D.demographics, p);
     const before = window.rdDemoShift({ ...dt, elec: [] }, D.demographics, p);
     const named = new Set((dt.moves || []).map((m) => m.group));
-    out[p] = { before, after, pass: dt.elec.filter((r) => r.sig).map((r) => r.group), named: [...named] };
+    out[p] = { before, after, pass: dt.elec.filter((r) => r.claim ?? r.sig).map((r) => r.group), named: [...named] };
   }
   return out;
 });

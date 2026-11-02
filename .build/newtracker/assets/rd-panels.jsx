@@ -2898,7 +2898,9 @@ function rdDemoShift(dt, T, party) {
      slope claims are chosen below. */
   const named = new Set();
   const elecSentence = () => {
-    const pass = (dt.elec || []).filter((r) => r.sig && !named.has(r.group))
+    /* r.claim: significant AND not contradicted by Resolve's same-house
+       estimate where one exists (age, gender) - gen-data §7gb */
+    const pass = (dt.elec || []).filter((r) => (r.claim ?? r.sig) && !named.has(r.group))
       .sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
     if (!pass.length) return null;
     const sgnE = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
@@ -3787,12 +3789,13 @@ function RdDemographics({ rangeId = "all" }) {
                       <th scope="col">95% margin, pts</th>
                       <th scope="col">Rate vs all voters, election → now</th>
                       <th scope="col">AES respondents</th>
+                      <th scope="col">Resolve’s own change, pts</th>
                       <th scope="col">Significant</th>
                     </tr>
                   </thead>
                   {elecSets.map((s) => (
                     <tbody key={s.key}>
-                      <tr className="rd-tsig-set"><th colSpan={7}>{s.label}</th></tr>
+                      <tr className="rd-tsig-set"><th colSpan={8}>{s.label}</th></tr>
                       {s.rows.map((r) => (
                         <tr key={r.group}>
                           <th scope="row">{r.group}</th>
@@ -3801,14 +3804,17 @@ function RdDemographics({ rangeId = "all" }) {
                           <td>±{r.ci.toFixed(1)}</td>
                           <td>{r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)}</td>
                           <td>{r.n.toLocaleString()}</td>
-                          <td className={r.sig ? "rd-tsig-yes" : ""}>{r.sig ? "Yes" : "No"}</td>
+                          <td>{r.check ? sgn1(r.check.beta, true) + " ±" + r.check.ci.toFixed(1) + (r.check.conflict ? ", disagrees" : "") : "–"}</td>
+                          {/* significant but contradicted by the same-house
+                              check: withheld from the copy, not highlighted */}
+                          <td className={r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""}>{!r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"}</td>
                         </tr>
                       ))}
                     </tbody>
                   ))}
                 </table>
               </div>
-              <p className="rd-note rd-tsig-note">The election gap is the group’s in the Australian Election Study 2025 (its share less all respondents’, from the survey’s respondent file); the gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above.{(() => {
+              <p className="rd-note rd-tsig-note">The election gap is the group’s in the Australian Election Study 2025 (its share less all respondents’, from the survey’s respondent file); the gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. The survey is a separate instrument (recalled vote, not intention), so this is a comparison of two endpoints, never a point in the trend fit above. For age and gender, Resolve’s own polls give a second reading of the same change – its recent polls against its election-day poll, so its house lean cancels; where that reading disagrees beyond both margins, the change is withheld from the summary above.{(() => {
                 const gs = elecSets.find((s) => s.key.endsWith("|generation"));
                 const st = gs && Tdemo.tabs.flatMap((t) => t.sets).find((s) => s.id === "generation");
                 return st ? " The generations compare across instruments as well: the polls’ Gen Z, Millennial, Gen X and Boomer figures come only from the generation cuts of " + rdList(st.houses.map(demoHouse)) + ", which the margins can’t account for." : "";

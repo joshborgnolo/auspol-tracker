@@ -5649,8 +5649,21 @@ const DEMO_AES = (() => {
     }])) };
   }
   // all: the AES's own all-respondents shares, each group's gap measured from them
+  // (DEMO_RESOLVE_BETA, below, is the same-house check §7gb's election test reads)
   return { x: DEMO_STATE_ELECTION.x, respondents: src.respondents, src: src.source, elec,
            all: Object.fromEntries(DEMO_KEYS.map((k) => [k, all[k]])), sets };
+})();
+/* Resolve's same-house differential swings since the election, from the
+   seat model's vote layer (data/seat-vote-layer.json β: each age and gender
+   cell's movement less the national, Resolve's recent waves against its
+   2025-05-03 election-day wave, self-centred; party keys alp/lnp/on/grn/oth).
+   The check §7gb's election test runs a claim against; null where the file
+   is absent (a clone without the model's outputs builds the test without
+   the check). */
+const DEMO_RESOLVE_BETA = (() => {
+  if (JUR) return null;
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "seat-vote-layer.json"), "utf8")).beta.dims; }
+  catch { return null; }
 })();
 
 /* One figure per group and party, built as the headline is. Each poll says
@@ -6192,11 +6205,25 @@ const demoTrend = (() => {
         const lr = lrOk ? Math.log(gNow / allNow) - Math.log(a[0] / aesAll) : null;
         const lrCi = lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (a[2] / a[0]) ** 2) : null;
         const sigLR = lr != null && Math.abs(lr) > lrCi;
+        /* the same-house check (user ruling 2026-11-02): where Resolve's own
+           election-day wave gives the same quantity - the cell's movement
+           less the national, within one house so its lean cancels (the
+           model's vote layer, data/seat-vote-layer.json β, age and gender) -
+           a claim stands only if that estimate doesn't disagree with ours
+           beyond the two margins combined. Labor's gender gap is the case
+           that made the rule: this test read it closing, Resolve's own waves
+           read it widening */
+        const rb = DEMO_RESOLVE_BETA && DEMO_RESOLVE_BETA[st.id] && DEMO_RESOLVE_BETA[st.id][g.label]
+          && DEMO_RESOLVE_BETA[st.id][g.label][party === "onp" ? "on" : party];
+        const check = rb ? { beta: rr(rb.beta), ci: rr(1.96 * rb.se),
+          conflict: Math.abs(d - rb.beta) > Math.sqrt(ci ** 2 + (1.96 * rb.se) ** 2) } : null;
+        const sig = Math.abs(d) > ci && sigLR && Math.sign(d) === Math.sign(lr);
         elecRows.push({ tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
           then: rr(then), now: rr(now), d: rr(d), ci: rr(ci), ciNow: rr(g.ci[party] || 0), ciThen: rr(a[2]), n: ae.groups[g.label].n,
           rThen: lrOk ? rr(a[0] / aesAll) : null, rNow: lrOk ? rr(gNow / allNow) : null,
-          sigGap: Math.abs(d) > ci, sigLR,
-          sig: Math.abs(d) > ci && sigLR && Math.sign(d) === Math.sign(lr) });
+          sigGap: Math.abs(d) > ci, sigLR, sig, check,
+          // what the copy may cite: significant AND not contradicted by the same-house check
+          claim: sig && !(check && check.conflict) });
       }
     }
     out[party] = { windowYm, moves, rows, elec: elecRows };

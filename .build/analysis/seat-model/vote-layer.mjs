@@ -314,6 +314,50 @@ for (const dim of BETA_DIMS) {
   }
 }
 
+/* ---- 6b. diagnostic: the β baseline against the Australian Election Study --
+   (user ruling 2026-11-02) β rests on ONE election-day Resolve wave. The
+   AES 2025 (data/aes-2025-groups.json, .build/extract-aes-2025.py: the
+   respondent file, GREG-weighted, formal first preferences) measures the
+   same thing at the same moment from a different instrument: each age and
+   gender cell's gap from all voters. Each cell's two gaps are compared –
+   Resolve's self-centred over the dim's population weights, as β is, its
+   variance β's own formula over the baseline cells; the AES's with the
+   extractor's gap margin – and a cell whose two baselines differ beyond
+   both margins combined is listed. Diagnostic only: nothing here moves β or
+   any seat. It's how a bad baseline wave would show up in the daily run. */
+let aesBaseline = null;
+try {
+  const AES = JSON.parse(readFileSync("data/aes-2025-groups.json", "utf8"));
+  const AK = { alp: "alp", lnp: "lnp", on: "onp", grn: "grn", oth: "oth" };
+  const cells = {}, conflicts = [];
+  for (const dim of BETA_DIMS) {
+    const wmap = CELL_W[dim], A = AES.sets[dim];
+    if (!A) continue;
+    cells[dim] = {};
+    for (const [cell, w] of Object.entries(wmap)) {
+      if (!A[cell]) continue;
+      cells[dim][cell] = {};
+      for (const p of P5) {
+        const meanB = Object.entries(wmap).reduce((s, [c, wc]) => s + wc * baseWave.dims[dim][c][key5(p)], 0);
+        const res = baseWave.dims[dim][cell][key5(p)] - meanB;
+        const vRes = Object.entries(wmap).reduce((s, [c, wc]) => {
+          const k = c === cell ? 1 - w : -wc;
+          return s + k * k * vShare(baseWave.dims[dim][c][key5(p)], baseSamp.n * wc);
+        }, 0);
+        const aes = A[cell][AK[p]] - AES.all[AK[p]], aesCi = A[cell].ci[AK[p]];
+        const margin = Math.sqrt((1.96 * Math.sqrt(vRes)) ** 2 + aesCi ** 2);
+        const conflict = Math.abs(res - aes) > margin;
+        cells[dim][cell][p] = { resolve: r2(res), aes: r2(aes), margin: r2(margin), conflict };
+        if (conflict) conflicts.push(`${dim} ${cell} ${p}: Resolve ${res >= 0 ? "+" : ""}${r2(res)} v AES ${aes >= 0 ? "+" : ""}${r2(aes)} (±${r2(margin)})`);
+      }
+    }
+  }
+  aesBaseline = {
+    note: "Each cell's gap from all voters at the election, pp: Resolve's 2025-05-03 baseline wave (self-centred over the population weights, as β) v the AES 2025 (group less all respondents). conflict = the two differ beyond both margins combined. Diagnostic only - β and the seats don't read it.",
+    cells, conflicts,
+  };
+} catch { /* no AES file: no diagnostic */ }
+
 /* ---- 7. output ---------------------------------------------------------- */
 const out = {
   _about: "W4 of .build/analysis/seat-model-plan.md — vote layer: national nowcast ΔV (gen-data §7e primaryNow vs certified 2025), per-state swing deviations (self-centred per house, DL-pooled, shrunk toward 0), and differential-swing β for age/gender (Resolve difference-in-differences vs its 2025-05-03 baseline wave, self-centred so Σ w_g β_g = 0). lnp = combined Coalition. Deviations/β are pp. NOT ESTIMABLE: education/income/location/housing/generation — no May-2025 baseline wave carries them (the polling-day Resolve wave carries age/gender/state only). Tas/NT/ACT are composition-only. Marginals, not joints; no interaction terms exist for layer 3. Structural uncertainty exceeds everything these SEs express — intervals are floor, not ceiling.",
@@ -324,6 +368,7 @@ const out = {
       "data/demographics.json": sha16("data/demographics.json"),
       "data/census-2021-divisions.json": sha16("data/census-2021-divisions.json"),
       "data/seats-2025-baseline.json": sha16("data/seats-2025-baseline.json"),
+      ...(aesBaseline ? { "data/aes-2025-groups.json": sha16("data/aes-2025-groups.json") } : {}),
     },
     genData: { spawnedWith: "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs", captured: pnLine },
   },
@@ -349,6 +394,7 @@ const out = {
   diagnostics: {
     recentWindow: { from: recentFrom, to: latestWave, waves: currentWaves.map((w) => `${w.pollster} ${w.date}`) },
     resolveImpliedNational: Object.fromEntries(BETA_DIMS.map((d) => [d, betaDiag[d].impliedNational])),
+    ...(aesBaseline ? { aesBaseline } : {}),
     cellDetail: betaDiag,
     stateDetail: Object.fromEntries(STATE_ORDER.map((st) => [st, Object.fromEntries(P5.map((p) => [p, stateMeta[st][p] ? {
       rawDev: stateMeta[st][p].rawDev ?? null, rawSe: stateMeta[st][p].rawSe ?? null,
@@ -376,6 +422,10 @@ for (const dim of BETA_DIMS) {
   for (const cell of Object.keys(beta[dim]))
     console.log(`    ${cell.padEnd(8)}` + P5.map((p) => `${p} ${beta[dim][cell][p].beta >= 0 ? "+" : ""}${beta[dim][cell][p].beta}±${beta[dim][cell][p].se}`).join("  "));
   console.log(`    implied national movement (diag): ` + P5.map((p) => `${p} ${betaDiag[dim].impliedNational[p] >= 0 ? "+" : ""}${betaDiag[dim].impliedNational[p]}`).join("  "));
+}
+if (aesBaseline) {
+  console.log("\nβ baseline v the Australian Election Study 2025 (diagnostic):");
+  console.log(aesBaseline.conflicts.length ? aesBaseline.conflicts.map((c) => "  DISAGREES " + c).join("\n") : "  every age/gender cell agrees within both margins");
 }
 console.log("\nNOT ESTIMABLE (no May-2025 baseline wave):", NO_BASELINE_DIMS.join(", "));
 if (baseSamp.inferred) console.log(`baseline wave sample inferred: median ${BASELINE_HOUSE} n=${baseSamp.n}`);
