@@ -1334,6 +1334,9 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
      (RedBridge/Accent's covered its ppm line by 75px). The row's expansion
      carries the full name, as it already does the client line above */
   body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main { overflow: hidden; text-overflow: ellipsis; }
+  /* a parent with sub-rows: the name ellipsizes, its +/− never does */
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main:has(.rd-pl-subtog) { display: flex; align-items: center; min-width: 0; }
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   body.rd .rd-pl-row > .rd-pl-c-figs { grid-area: figs; padding: 0; align-items: flex-end; text-align: right; }
   body.rd .rd-pl-row > .rd-pl-c-tl { grid-area: tl; min-height: 36px; }
   body.rd .rd-pl-row > .rd-pl-c-latest, body.rd .rd-pl-row > .rd-pl-c-next, body.rd .rd-pl-row > .rd-pl-c-exp { display: none; }
@@ -1365,6 +1368,18 @@ body.rd .rd-pl-exp { font-size: 13px; }
    and a fixed height so a facet switch moves nothing (the figures' second
    lines are dropped in every facet, so each facet's cell is one line) */
 body.rd .rd-pl-item.rd-pl-hassub { border-bottom: 0; }
+/* the parent's +/− that shows or hides its sub-rows (folded by default
+   unless due within a week, rd-polls.jsx subAuto): a small ring beside the
+   name, sized inside the name's line so it never changes the row's height */
+body.rd .rd-pl-subtog {
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: 1px;
+  width: 15px; height: 15px; margin-left: 6px; padding: 0; flex: none;
+  border: 1px solid var(--line-2); border-radius: 50%; background: transparent;
+  color: var(--ink-3); cursor: pointer; line-height: 0;
+}
+body.rd .rd-pl-subtog svg path { stroke: currentColor; stroke-width: 1.4; fill: none; stroke-linecap: round; }
+body.rd .rd-pl-subtog:hover, body.rd .rd-pl-subtog:focus-visible { color: var(--ink); border-color: var(--ink-3); }
+body.rd .rd-pl-subtog.on { color: var(--ink-2); }
 body.rd .rd-pl-subitem > .rd-pl-row { position: relative; min-height: 34px; height: 34px; }
 body.rd .rd-pl-subitem.open > .rd-pl-row, body.rd .rd-pl-subitem > .rd-pl-row:hover { background: var(--surface-2); }
 body.rd .rd-pl-subitem > .rd-pl-row::before {

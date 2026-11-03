@@ -98,6 +98,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "latest", dir: -1 });
   const [open, setOpen] = useState(null);
+  /* a house's sub-rows the reader has shown or hidden with its +/− button:
+     parent -> true | false, over the default (subShown below) */
+  const [subPick, setSubPick] = useState({});
   /* an earlier release's readout, as a chart's poll dot has one:
      { id, row, key, left, src } - src is the input that raised it */
   const [tl, setTl] = useState(null);
@@ -178,11 +181,32 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (sort.key === "pollster") return sort.dir < 0 ? a.poll.pollster.localeCompare(b.poll.pollster) : b.poll.pollster.localeCompare(a.poll.pollster);
     return sort.dir < 0 ? (b.poll.pubSort > a.poll.pubSort ? 1 : -1) : (a.poll.pubSort > b.poll.pubSort ? 1 : -1);
   });
-  // the rows as drawn: each house, then its sub-series, whatever the sort
-  const ordered = sorted.flatMap((e) => [e, ...e.subs]);
+  /* A sub-row is folded away by default (user call 2026-11-03: the table
+     read busy for no gain) and shows on its own only while it is news: its
+     window is open, opens within a week or has just been missed, or its
+     newest release is under a week old. A series with too few releases to
+     project stays folded whatever. The parent's +/− shows or hides them. */
+  const SUB_NEAR = 7;
+  const subAuto = (s) => {
+    const r = s.next;
+    if (!r) return false;
+    if (t0 - s.pubMs <= SUB_NEAR * DAY_MS) return true;
+    const opens = r.opensIn != null ? r.opensIn : r.inDays - Math.round(r.spread || 0);
+    return !!(r.missed || r.overdue || opens <= SUB_NEAR);
+  };
+  const subShown = (e) => (e.poll.pollster in subPick ? subPick[e.poll.pollster] : e.subs.some(subAuto));
+  const subVis = (e) => {
+    if (!e.subs.length) return [];
+    if (e.poll.pollster in subPick) return subPick[e.poll.pollster] ? e.subs : [];
+    return e.subs.filter(subAuto);
+  };
+  const toggleSubs = (e) => setSubPick((m) => ({ ...m, [e.poll.pollster]: !subShown(e) }));
+  // the rows as drawn: each house, then its shown sub-series, whatever the sort
+  const ordered = sorted.flatMap((e) => [e, ...subVis(e)]);
+  const allRows = sorted.flatMap((e) => [e, ...e.subs]);
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const caret = (key) => (sort.key === key ? (sort.dir < 0 ? "▾" : "▴") : "▿");
-  const newest = ordered.slice().sort((a, b) => b.pubMs - a.pubMs)[0];
+  const newest = allRows.slice().sort((a, b) => b.pubMs - a.pubMs)[0];
   const staleOnes = entries.filter((e) => e.stale);
 
   /* ---- words ------------------------------------------------------------- */
@@ -732,7 +756,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
-           meta={new Set(ordered.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
+           meta={new Set(allRows.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
@@ -796,12 +820,23 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               {isOpen && detail(e)}
             </div>
           );
+          const subsOn = e.subs.length ? subVis(e).length > 0 : false;
+          const subWord = [...new Set(e.subs.map((s) => s.kind === "Pooled" ? "pooled" : s.kind))].join(" and ");
           return (
-            <div key={r.pollster} className={"rd-pl-item" + (isOpen ? " open" : "") + (e.stale ? " stale" : "") + (e.subs.length ? " rd-pl-hassub" : "")}>
+            <div key={r.pollster} className={"rd-pl-item" + (isOpen ? " open" : "") + (e.stale ? " stale" : "") + (subsOn ? " rd-pl-hassub" : "")}>
               <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)} tabIndex={0} aria-expanded={isOpen} onKeyDown={(ev) => rowNav(ev, i)}>
                 <span role="cell" className="rd-pl-c-name">
                   <span className="rd-pl-main">
-                    {rdPollNameLink(r)}
+                    <span className="rd-pl-nm">{rdPollNameLink(r)}</span>
+                    {e.subs.length ? (
+                      <button type="button" className={"rd-pl-subtog" + (subsOn ? " on" : "")} aria-expanded={subsOn}
+                              aria-label={(subsOn ? "Hide " : "Show ") + r.pollster + "’s " + subWord + " row" + (e.subs.length > 1 ? "s" : "")}
+                              title={(subsOn ? "Hide " : "Show ") + r.pollster + "’s " + subWord + (e.subs.length > 1 ? " rows" : " row")}
+                              onClick={(ev) => { ev.stopPropagation(); toggleSubs(e); }}
+                              onKeyDown={(ev) => ev.stopPropagation()}>
+                        <svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><path d={subsOn ? "M2 5h6" : "M2 5h6M5 2v6"}></path></svg>
+                      </button>
+                    ) : null}
                   </span>
                   <span className="rd-pl-sub">{r.client}{cad ? ", " + cad : ""}{e.stale ? <span className="rd-pl-long">, no poll in six weeks</span> : null}</span>
                 </span>

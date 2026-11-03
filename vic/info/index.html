@@ -51,7 +51,7 @@
   <link rel="preload" href="../../assets/js/rd.c32013aa.js" as="script">
   <link rel="preload" href="../../assets/js/rd-hero.46bff042.js" as="script">
   <link rel="preload" href="../../assets/js/rd-panels.c1798e97.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-polls.2ad6d272.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-polls.34a07a02.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../../assets/js/rd-allpolls.2a0d7aec.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.0883ebcd.js" as="script">
@@ -4576,6 +4576,8 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-row > .rd-pl-c-name { grid-area: name; padding: 0; }
   body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main { overflow: hidden; text-overflow: ellipsis; }
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main:has(.rd-pl-subtog) { display: flex; align-items: center; min-width: 0; }
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   body.rd .rd-pl-row > .rd-pl-c-figs { grid-area: figs; padding: 0; align-items: flex-end; text-align: right; }
   body.rd .rd-pl-row > .rd-pl-c-tl { grid-area: tl; min-height: 36px; }
   body.rd .rd-pl-row > .rd-pl-c-latest, body.rd .rd-pl-row > .rd-pl-c-next, body.rd .rd-pl-row > .rd-pl-c-exp { display: none; }
@@ -4594,6 +4596,15 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-fig, body.rd .rd-pl-lead { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 body.rd .rd-pl-exp { font-size: 13px; }
 body.rd .rd-pl-item.rd-pl-hassub { border-bottom: 0; }
+body.rd .rd-pl-subtog {
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: 1px;
+  width: 15px; height: 15px; margin-left: 6px; padding: 0; flex: none;
+  border: 1px solid var(--line-2); border-radius: 50%; background: transparent;
+  color: var(--ink-3); cursor: pointer; line-height: 0;
+}
+body.rd .rd-pl-subtog svg path { stroke: currentColor; stroke-width: 1.4; fill: none; stroke-linecap: round; }
+body.rd .rd-pl-subtog:hover, body.rd .rd-pl-subtog:focus-visible { color: var(--ink); border-color: var(--ink-3); }
+body.rd .rd-pl-subtog.on { color: var(--ink-2); }
 body.rd .rd-pl-subitem > .rd-pl-row { position: relative; min-height: 34px; height: 34px; }
 body.rd .rd-pl-subitem.open > .rd-pl-row, body.rd .rd-pl-subitem > .rd-pl-row:hover { background: var(--surface-2); }
 body.rd .rd-pl-subitem > .rd-pl-row::before {
@@ -6814,7 +6825,7 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../../assets/js/rd.c32013aa.js"></script>
   <script src="../../assets/js/rd-hero.46bff042.js"></script>
   <script src="../../assets/js/rd-panels.c1798e97.js"></script>
-  <script src="../../assets/js/rd-polls.2ad6d272.js"></script>
+  <script src="../../assets/js/rd-polls.34a07a02.js"></script>
   <script src="../../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../../assets/js/rd-allpolls.2a0d7aec.js"></script>
   <script src="../../assets/js/rd-public-opinion.0883ebcd.js"></script>
