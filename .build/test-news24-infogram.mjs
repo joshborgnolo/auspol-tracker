@@ -121,6 +121,29 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
   eq("tpp crosstab tolerates extra rows", parseN24Tpp(crowded).tpp, { oneNation: { alp: 53, onp: 47 } });
 }
 
+// ---- 2PP, one project carrying BOTH pairings (3 Nov 2026 wave): the
+// Coalition pairing's table cornered "Party" (the VI crosstab's corner)
+// inside the ON-pairing's project; the same wave retitled the VI crosstab
+// "N24P PV" with a "Column %" corner. Both shapes were "unmodelled" until
+// the corner rules were dropped — the figures below are canon checks
+// against the 3 Nov 2026 wave (primaries 25/23/27/13/5/7, TPP 50/50,
+// ALP-v-ONP 54/46).
+{
+  const FX11 = path.join(DIR, ".build/news24-src/ig-fixtures-2026-11-03");
+  const d11 = (id) => infographicDataOf(readFileSync(path.join(FX11, `ig-${id}.html`), "utf8"));
+  eq("tpp one project, both pairings", parseN24Tpp(d11("LX5nXsEu4PiniSV81sIC")).tpp,
+    { coalition: { alp: 50, lnp: 50 }, oneNation: { alp: 54, onp: 46 } });
+  const ct11 = parseN24Crosstab(d11("hbIimtcTS0562loHae5L"));
+  eq("PV crosstab (Column % corner) vi", ct11.vi, { alp: 25, lnp: 23, onp: 27, grn: 13, ind: 5, oth: 7 });
+  eq("PV crosstab oth decomposition", ct11.detail, { other: 5, csa: 2 });
+  eq("tpp pairing tables are not read as VI crosstabs",
+    parseN24Crosstab(d11("LX5nXsEu4PiniSV81sIC")).vi, null);
+  const fx11 = (id) => readFileSync(path.join(FX11, `ig-${id.replace("_/", "")}.html`), "utf8");
+  const kinds11 = await n24InfogramFetch(async (id) => fx11(id),
+    ["_/hbIimtcTS0562loHae5L", "_/LX5nXsEu4PiniSV81sIC"]);
+  eq("3 Nov shapes classify as standing kinds", kinds11.map((p) => p.kind), ["crosstab", "tpp"]);
+}
+
 // ---- unknown chart kinds: the issues embed is classified, anything else is
 // a genuine "unmodelled" the extractor pages on
 {

@@ -123,20 +123,27 @@ export function parseN24Ppm(data) {
   return out.length ? out : null;
 }
 
-// 2PP, two layouts. Until Sep 2026 one table, cornerless, header ["",
-// "Labor vs Coalition", "Labor vs One Nation"]; blanks are structural (each
-// pairing occupies its own column). From the 6 Oct 2026 wave, one embed per
-// pairing, a demographic crosstab: corner "Column %" (any corner that is
-// not the voting-intention crosstab's "Party"), second column "Total", two
-// party rows - Labor and Coalition, or Labor and One Nation (the
-// Labor-v-One-Nation one went unread for a wave as "unmodelled"). Shape
-// detection, not a row-count gate: extra rows (demographics, an undecided
-// row) must not throw the table back to "unmodelled". The Total pair must
-// sum to 100.
+// 2PP, three layouts seen so far. Until Sep 2026 one table, cornerless,
+// header ["", "Labor vs Coalition", "Labor vs One Nation"]; blanks are
+// structural (each pairing occupies its own column). From the 6 Oct 2026
+// wave, one table per pairing as a demographic crosstab: second column
+// "Total", two party rows - Labor and Coalition, or Labor and One Nation
+// (the Labor-v-One-Nation one went unread for a wave as "unmodelled").
+// That shape's corner varied too: "Column %" on 6 Oct (one embed per
+// pairing), then on 3 Nov 2026 BOTH pairings shipped in ONE project, the
+// Coalition pairing's table cornered "Party" (the VI crosstab's own
+// corner). So there is no usable corner rule: pairings accumulate over
+// every "Total"-headed table, and the rival-rows disjunction below (the
+// VI crosstab carries BOTH rivals, so it can never match either pairing)
+// is what keeps it out. Shape detection, not a row-count gate: extra rows
+// (demographics, an undecided row) must not throw the table back to
+// "unmodelled". The Total pair must sum to 100.
 export function parseN24Tpp(data) {
+  const out = {};
+  let unfilled = null;
   for (const t of chartEntitiesOf(data)) {
     const head = t.rows[0];
-    if (head[0] !== "Party" && /^total$/i.test(head[1] ?? "")) {
+    if (/^total$/i.test(head[1] ?? "")) {
       const lab = t.rows.find((r) => /^labor$/i.test(r[0]));
       const coa = t.rows.find((r) => /^coalition$/i.test(r[0]));
       const onp = t.rows.find((r) => /^one nation$/i.test(r[0]));
@@ -145,36 +152,43 @@ export function parseN24Tpp(data) {
       const a = num(lab[1]), o = num(rival[1]);
       if (a == null || o == null) return { tpp: null, why: "2pp Total cell missing" };
       if (Math.abs(a + o - 100) > 0.5) return { tpp: null, why: `2pp Total Σ=${a + o}` };
-      return { tpp: rival === coa ? { coalition: { alp: a, lnp: o } } : { oneNation: { alp: a, onp: o } }, why: null };
+      if (rival === coa) out.coalition ??= { alp: a, lnp: o };
+      else out.oneNation ??= { alp: a, onp: o };
+      continue;
     }
     const ci = head.findIndex((h) => /labor vs coalition/i.test(h));
     const hi = head.findIndex((h) => /labor vs one nation/i.test(h));
     if (ci < 0 && hi < 0) continue;
     const rowVals = (re) => t.rows.find((r) => re.test(r[0]));
     const lab = rowVals(/^labor$/i), coa = rowVals(/^coalition$/i), onp = rowVals(/^one nation$/i);
-    const out = {};
     if (ci > 0 && lab && coa && num(lab[ci]) != null && num(coa[ci]) != null)
-      out.coalition = { alp: num(lab[ci]), lnp: num(coa[ci]) };
+      out.coalition ??= { alp: num(lab[ci]), lnp: num(coa[ci]) };
     if (hi > 0 && lab && onp && num(lab[hi]) != null && num(onp[hi]) != null)
-      out.oneNation = { alp: num(lab[hi]), onp: num(onp[hi]) };
+      out.oneNation ??= { alp: num(lab[hi]), onp: num(onp[hi]) };
     if (!out.coalition && !out.oneNation)
-      return { tpp: null, why: `2pp header matched but no filled pairing (labor=${JSON.stringify(lab?.slice(1))})` };
-    return { tpp: out, why: null };
+      unfilled = `2pp header matched but no filled pairing (labor=${JSON.stringify(lab?.slice(1))})`;
   }
-  return { tpp: null, why: "no 2pp table" };
+  if (!out.coalition && !out.oneNation)
+    return { tpp: null, why: unfilled ?? "no 2pp table" };
+  return { tpp: out, why: null };
 }
 
-// Crosstab: corner "Party", second column "Total". `oth` = Other + Community
-// Strong (verified vs canon oth:7 = 5+2 on 2026-08-24); both constituents are
+// Crosstab: second column "Total", party-name rows. Corner was "Party"
+// through Oct 2026; the 3 Nov 2026 wave retitled the project "N24P PV
+// <date>" and cornered it "Column %" (the same corner the 2PP pairing
+// tables use). `oth` = Other + Community Strong (verified vs canon
+// oth:7 = 5+2 on 2026-08-24); both constituents are
 // returned separately as provenance. Σ100 on the Total column is the
 // authority gate — fail ⇒ null, the caller falls back to prose/Wikipedia.
-// The CSA row's label drifts between waves: "Community Strong" (Aug–Sep
+// A 2PP pairing table shares the corner+Total shape but lacks the core
+// four party rows, so it dies at the core-row gate below. The CSA row's
+// label drifts between waves: "Community Strong" (Aug–Sep
 // 2026) and "Community Strong Australia" (6 Oct 2026) — a missed row folds
 // CSA out of oth silently (canon 2026-10-06 oth:6 = 5+1), so match both.
 export function parseN24Crosstab(data) {
   for (const t of chartEntitiesOf(data)) {
     const head = t.rows[0];
-    if (head[0] !== "Party" || head[1] !== "Total") continue;
+    if (!/^(party|column %)$/i.test(head[0] ?? "") || head[1] !== "Total") continue;
     const get = (re) => { const r = t.rows.find((x) => re.test(x[0])); return r ? num(r[1]) : null; };
     const vi = {
       alp: get(/^labor$/i), lnp: get(/^coalition$/i), onp: get(/^one nation$/i),

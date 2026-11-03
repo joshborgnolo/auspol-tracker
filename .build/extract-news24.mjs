@@ -512,11 +512,12 @@ function news24Sat(s) {
 function parseNews24Article(html, url) {
   const { published, pubIso } = news24Published(html);
   const t = normaliseNews24(clean(html));
-  // Series gate, both house styles seen in the wild: the original
-  // "News24[.com.au] Pulse / YouGov poll" methodology sentence, and the
+  // Series gate, the house styles seen in the wild: the original
+  // "News24[.com.au] Pulse / YouGov poll" methodology sentence, the
   // Sept 2026 style "News24.com.au/YouGov poll" (Pulse unstated; the Pulse
-  // branding survives in the News24 Pulse Infogram embeds downstream).
-  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+poll/i);
+  // branding survives in the News24 Pulse Infogram embeds downstream),
+  // and the Nov 2026 style "News24 Pulse/YouGov results" (3 Nov 2026 wave).
+  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+(?:poll|results)/i);
   if (!gate) return null;
 
   const block = t.slice(gate.index, gate.index + 2200);
@@ -1140,7 +1141,7 @@ if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
   if (!art.html) { console.error("News24 fetch failed: set NEWSIE_CHROME=1 or N24_NEWS24_FILE"); process.exit(1); }
   const rec = parseNews24Article(art.html, NEWS24_OF);
   if (!rec) { console.error("not a News24 Pulse / YouGov federal-poll article"); process.exit(1); }
-  const { ig, problems, notes } = await infogramEnrichNews24(art.html, rec, rec,
+  const { ig, problems, notes, warnings } = await infogramEnrichNews24(art.html, rec, rec,
     (d) => d && n24PrevWave(JSON.parse(readFileSync(OUT, "utf8")), d));
   console.log(JSON.stringify({
     url: rec.url, via: art.via, date: rec.date, dateStart: rec.dateStart, sample: rec.sample,
