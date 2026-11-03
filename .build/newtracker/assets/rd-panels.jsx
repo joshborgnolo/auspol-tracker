@@ -234,13 +234,15 @@ function RdPrimary({ rangeId, setRangeId }) {
     const list = (arr) => arr.length === 2 ? arr.join(" and ") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
     const pc = (v) => v.toFixed(1) + "%";
     /* "Labor, on 28.4%, and One Nation, on 26.0%" - the leader sentence's
-       party-and-figure list, its shape wherever a tie needs naming */
-    const pcSeg = (ps) => ps.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
+       party-and-figure list, its shape wherever a tie needs naming; `mid`
+       when the list follows "Among <group>, " inside the sentence, so its
+       first party takes the running form ("the Coalition", not "The") */
+    const pcSeg = (ps, mid) => ps.map((p, i) => (i === 0 && !mid ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
       s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
     let head, dek;
     if (k >= 2) {
       head = rdCap(list(level.map((p) => rdPartyIn(p.id)))) + " are level" + (G ? " among " + sel.who : "");
-      dek = (G ? "Among " + sel.who + ", " : "") + pcSeg(level);
+      dek = (G ? "Among " + sel.who + ", " : "") + pcSeg(level, !!G);
       /* a group's level call is pooled from few polls, so the dek quotes the
          gap it cannot read as a margin (the all-voters dek doesn't need to);
          shares level to the tenth are simply dead level, not "0.0 points" */
