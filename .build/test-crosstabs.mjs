@@ -132,6 +132,23 @@ const dupOf = (offset) => ({ head: ["", "Total", "Household income: <100k", "Inc
 assert.deepEqual(youGovDims(dupOf(0)).dims.income,
   { "Under $100k": { alp: 29, lnp: 19, onp: 29, grn: 13, oth: 10 } }, "an identical copy reads once");
 assert.match(sharesProblem(youGovDims(dupOf(2)).dims.income), /sum to/, "a copy that disagrees stays and trips the gate");
+// the 3 Nov 2026 PV table's education pair: bare "Up to Year 12" beside the
+// series' "Up to Year 12 education", DISAGREEING – the series-named column
+// reads (and a same-name conflict would still trip the gate for any other dim)
+const eduDup = { head: ["", "Total", "Up to Year 12", "Up to Year 12 education", "TAFE/College education", "Tertiary Education"], rows: [
+  ["Labor", "25", "24", "22", "30", "29"], ["Coalition", "23", "22", "24", "23", "23"],
+  ["One Nation", "27", "32", "27", "20", "21"], ["The Greens", "13", "12", "14", "12", "13"],
+  ["Community Strong Australia", "2", "2", "1", "3", "3"], ["Independent", "5", "3", "6", "7", "8"],
+  ["Other", "5", "4", "5", "4", "3"]] };
+assert.deepEqual(youGovDims(eduDup).dims.education["Year 12 or less"],
+  { alp: 22, lnp: 24, onp: 27, grn: 14, oth: 12 }, "a disagreeing education duplicate reads the series-named column");
+// … and the wave's own capture: education reads the named column, and every
+// education group sums ~100 across the parties now the interloper is dropped
+const t3 = crosstabOfHtml(readFileSync(path.join(ROOT, ".build/news24-src/ig-fixtures-2026-11-03/ig-hbIimtcTS0562loHae5L.html"), "utf8"));
+const d3 = youGovDims(t3);
+assert.deepEqual(d3.dims.education["Year 12 or less"], { alp: 22, lnp: 24, onp: 27, grn: 14, oth: 12 },
+  "3 Nov 2026 education reads the named column");
+assert.equal(sharesProblem(d3.dims.education), null, "education groups sum ~100 after the fold");
 
 // ---- RedBridge: the first-preference table, read by its own column header ---------------
 const RB_DIR = path.join(ROOT, ".build", "redbridge-src");

@@ -265,6 +265,9 @@ const KNOWN_DROP = {
   // two-bracket under/over $100k
   "YouGov|income|$100–149k|2026-02-24": "YouGov's four-bracket household-income scheme ran 27 Jan–10 Feb 2026; no income columns until 7 Apr's two-bracket under/over-$100k scheme",
   "YouGov|income|$150k+|2026-02-24": "YouGov's four-bracket household-income scheme ran 27 Jan–10 Feb 2026; no income columns until 7 Apr's two-bracket under/over-$100k scheme",
+  // the 3 Nov 2026 PV table (saved capture) prints no other-language column
+  // beside "Only English spoken at home" – the pair ran Jun 2025–20 Oct 2026
+  "YouGov|language|Other language|2026-11-03": "the 3 Nov 2026 PV table has no Other-language column (checked against the saved capture)",
 };
 
 /* Roy Morgan breakdowns, hand-entered from the releases (see the house note

@@ -115,14 +115,14 @@ export function youGovDims(t) {
   // the all-voters column: headed "Total", or "National" pre-switching-columns
   // (27 Jan 2026); totalProblem then checks it against the poll row
   const totalAt = t.head.findIndex((h) => /^total$/i.test(h) || /^national$/i.test(h));
-  const cols = t.head.map((h, n) => [ygGroup(h), n]).filter(([g]) => g);
+  const cols = t.head.map((h, n) => [ygGroup(h), n, h]).filter(([g]) => g);
   // a wave can print the same group as two columns (21 Apr 2026: "Household
   // income: <100k" beside an identical copy headed "Income: <100k") – the
   // first sighting of each column pair stands (checked row by row, so the
   // folded Independent/Other party rows are untouched); a copy that
   // disagrees is kept and piles up, tripping the gate's sum-to-100 instead
   const firstAt = new Map(), kept = [];
-  for (const [g, n] of cols) {
+  for (const [g, n, h] of cols) {
     const k = g[0] + "|" + g[1];
     if (firstAt.has(k) && t.rows.every((r) => {
       const a = r[firstAt.get(k)], b = r[n];
@@ -130,12 +130,27 @@ export function youGovDims(t) {
       return a !== "" && a != null && Math.abs(+a - +b) <= 1;
     })) continue;
     if (!firstAt.has(k)) firstAt.set(k, n);
-    kept.push([g, n]);
+    kept.push([g, n, h]);
+  }
+  /* …except education, where a DISAGREEING duplicate resolves in favour of
+     the column named with "education": News24's 3 Nov 2026 PV table printed
+     its Year-12 group twice - a bare "Up to Year 12" beside the series'
+     established "Up to Year 12 education", each a complete ~100 partition
+     with differing cells - and the named column is the one every earlier
+     wave carried. Only education gets the name preference; any other
+     disagreeing duplicate still piles up and trips the gate. */
+  for (const k of new Set(kept.map(([g]) => g[0] + "|" + g[1]))) {
+    const inds = [...kept.keys()].filter((i) => kept[i] && kept[i][0][0] + "|" + kept[i][0][1] === k && kept[i][0][0] === "education");
+    if (inds.length < 2) continue;
+    const named = inds.filter((i) => /education/i.test(kept[i][2]));
+    if (named.length) for (const i of inds) if (!named.includes(i)) kept[i] = null;
   }
   for (const r of t.rows) {
     const p = ygParty(r[0]);
     if (totalAt >= 0 && r[totalAt] !== "") total[p] = (total[p] || 0) + +r[totalAt];
-    for (const [[dim, label], n] of kept) {
+    for (const e of kept) {
+      if (!e) continue;
+      const [[dim, label], n] = e;
       if (r[n] === "" || r[n] == null) continue;
       const g = ((dims[dim] ||= {})[label] ||= {});
       g[p] = (g[p] || 0) + +r[n];
