@@ -147,6 +147,7 @@ export const THEME_OF = {
   // essential
   "one-nation-government-impact": "one-nation",
   // news24
+  "one-nation-cartoons": "one-nation",
   "coalition-one-nation-cooperation": "one-nation",
   "one-nation-readiness-to-govern": "one-nation",
   "reason-considering-one-nation": "one-nation",
