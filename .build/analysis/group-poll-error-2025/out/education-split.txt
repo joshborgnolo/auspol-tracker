@@ -1,0 +1,29 @@
+Graduate gap, logit(graduates) − logit(everyone else), before and after the 2025 election, same house; AES 2025 for reference.
+AES 2025: alp +0.12  lnp -0.38  grn +0.08  onp -0.16
+
+YouGov  (final window: 2025-03-28..2025-04-03, 2025-04-04..2025-04-10, 2025-04-11..2025-04-15, 2025-04-18..2025-04-22, 2025-04-24..2025-05-01; pre-campaign: 7 releases)
+  alp  pre-campaign +0.21±0.07  final +0.32±0.07  | instrument (final − AES) +0.20  | early post (0)   –   change   –    | late (4) +0.35 change +0.03
+  lnp  pre-campaign -0.08±0.06  final -0.22±0.07  | instrument (final − AES) +0.16  | early post (0)   –   change   –    | late (4) +0.08 change +0.30
+  grn  pre-campaign +0.14±0.09  final +0.09±0.10  | instrument (final − AES) +0.02  | early post (0)   –   change   –    | late (4) +0.25 change +0.15
+  onp  pre-campaign -0.77±0.14  final -0.87±0.15  | instrument (final − AES) -0.71  | early post (0)   –   change   –    | late (4) -0.75 change +0.12
+Newspoll  (final window: 2025-03-27..2025-04-17; pre-campaign: 3 releases)
+  alp  pre-campaign +0.13±0.05  final +0.16±0.07  | instrument (final − AES) +0.04  | early post (1) +0.18 change +0.02  | late (1) +0.55 change +0.39
+  lnp  pre-campaign +0.01±0.04  final -0.13±0.07  | instrument (final − AES) +0.26  | early post (1) -0.02 change +0.11  | late (1) +0.30 change +0.43
+  grn  pre-campaign +0.12±0.07  final +0.16±0.10  | instrument (final − AES) +0.09  | early post (1) +0.30 change +0.14  | late (1) +0.13 change -0.03
+  onp  pre-campaign -1.04±0.11  final -0.75±0.15  | instrument (final − AES) -0.59  | early post (1) -0.89 change -0.14  | late (1) -1.00 change -0.25
+RedBridge  (final window: 2025-03-28..2025-04-01, 2025-04-24..2025-04-29; pre-campaign: 2 releases)
+  alp  pre-campaign -0.01±0.09  final +0.30±0.13  | instrument (final − AES) +0.17  | early post (1) +0.33 change +0.03  | late (2) +0.45 change +0.16
+  lnp  pre-campaign +0.03±0.08  final -0.15±0.13  | instrument (final − AES) +0.23  | early post (1) +0.13 change +0.28  | late (2) +0.15 change +0.30
+  grn  pre-campaign +0.30±0.13  final +0.01±0.20  | instrument (final − AES) -0.07  | early post (1) +0.15 change +0.14  | late (2) +0.35 change +0.34
+  onp  pre-campaign   –    final   –    | instrument (- − AES)   –    | early post (1) -1.17 change   –    | late (2) -0.94 change   –  
+DemosAU  (final window: none; pre-campaign: 1 releases)
+  alp  pre-campaign -0.39±0.17  final   –    | instrument (pre − AES) -0.51  | early post (1) +0.07 change +0.45  | late (3) +0.13 change +0.52
+  lnp  pre-campaign +0.02±0.16  final   –    | instrument (pre − AES) +0.40  | early post (1) +0.09 change +0.06  | late (3) +0.35 change +0.33
+  grn  pre-campaign +0.47±0.23  final   –    | instrument (pre − AES) +0.39  | early post (1) +0.12 change -0.35  | late (3) +0.34 change -0.13
+  onp  pre-campaign -0.29±0.31  final   –    | instrument (pre − AES) -0.13  | early post (1) -0.59 change -0.30  | late (3) -0.62 change -0.33
+
+Across houses (mean, sd across houses, houses):
+  instrument: pre-election poll − AES     alp -0.03 (sd 0.33, 4)  lnp +0.26 (sd 0.10, 4)  grn +0.11 (sd 0.20, 4)  onp -0.47 (sd 0.30, 3)
+  early post-election − AES (poll-gaps)   alp +0.07 (sd 0.13, 3)  lnp +0.45 (sd 0.08, 3)  grn +0.11 (sd 0.10, 3)  onp -0.58 (sd 0.21, 2)
+  early change: early post − pre, same housealp +0.17 (sd 0.25, 3)  lnp +0.15 (sd 0.12, 3)  grn -0.02 (sd 0.28, 3)  onp -0.22 (sd 0.11, 2)
+  late change: late − pre, same house     alp +0.27 (sd 0.22, 4)  lnp +0.34 (sd 0.06, 4)  grn +0.08 (sd 0.21, 4)  onp -0.15 (sd 0.24, 3)

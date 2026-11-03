@@ -1,0 +1,225 @@
+Group poll error at the 2025 federal election: the polls' group gaps (group − all voters) against the count
+(state, AEC region class) and the AES 2025 (everything else). Points. Final window = fieldwork ending
+2025-03-29 – 2025-05-03; pre = 2024-07-01 – 2025-03-28. err = poll gap − reference gap; z = err / combined SE.
+
+Design effects (mean squared standardised change between consecutive releases; real change inflates it):
+  Newspoll   deff 1.31 (raw 1.31, 672 cell-party changes over 6 release pairs)
+  YouGov     deff 2.23 (raw 2.23, 1284 cell-party changes over 13 release pairs)
+  RedBridge  deff 1.55 (raw 1.55, 153 cell-party changes over 4 release pairs)
+  Resolve    deff 1.27 (raw 1.27, 400 cell-party changes over 20 release pairs)
+  Essential  deff 1.52 (raw 1.52, 318 cell-party changes over 40 release pairs)
+  DemosAU    assumed 1.5 (too few consecutive releases)
+
+Dropped releases and cells:
+  YouGov 2023-10-06..2023-10-10: gender cells sum to 1150 of n 1582
+  YouGov 2023-11-10..2023-11-14: gender cells sum to 1150 of n 1582
+  YouGov 2023-12-01..2023-12-05: gender cells sum to 1123 of n 1555
+  YouGov 2025-01-09..2025-01-15: age cells sum to 2372 of n 1504
+  RedBridge 2025-02-03..2025-02-07: age cells sum to 1237 of n 1013
+  YouGov 2025-03-14..2025-03-19: gender cells sum to 1014 of n 1500; age cells sum to 1015 of n 1500
+  RedBridge 2025-03-13..2025-03-24: age cells sum to 1683 of n 2039
+  Newspoll 2024-04-15..2024-06-07 Christian: primaries imply 2PP 50.4, printed 41
+  Newspoll 2024-04-15..2024-06-07 Own outright: primaries imply 2PP 51.2, printed 45
+  Newspoll 2024-04-15..2024-06-07 Rent: primaries imply 2PP 55.9, printed 62; others -3.0
+  YouGov 2024-11-15..2024-11-21 LOTE: primaries imply 2PP 61.4, printed 55
+  Newspoll 2024-10-07..2024-12-06 LOTE: primaries imply 2PP 55.9, printed 46
+  Newspoll 2025-03-27..2025-04-17 Rent: primaries imply 2PP 59.6, printed 65
+
+Each house's final-window national miss (all voters − result), for scale – it cancels in every gap below:
+  Newspoll   alp -1.2  lnp +3.5  grn -0.2  onp +0.9  oth -3.0
+  YouGov     alp -2.8  lnp +0.8  grn +1.5  onp +1.9  oth -1.4
+  RedBridge  alp -1.1  lnp +3.2  grn -0.2  onp +1.1  oth -3.0
+  Resolve    alp -4.5  lnp +3.9  grn +1.1  onp +0.4  oth -0.8
+  Essential  alp -2.5  lnp +2.3  grn +1.0  onp +3.0  oth -3.9
+  DemosAU    alp -4.4  lnp +0.6  grn +0.1  onp +2.6  oth +1.1
+
+1. Against the count: states
+  NSW
+    alp  count +0.6  polls +0.5±0.5  err -0.1 z -0.2  [houses Q 2.0/4]  Newspoll -0.0±1.2  YouGov -0.2±1.1  RedBridge +1.9±2.0  Resolve +1.3±1.0  DemosAU +0.0±1.3  | AES +2.5 err +1.9 z +0.9
+    lnp  count -0.3  polls +0.2±0.5  err +0.5 z +1.0  [houses Q 6.7/4]  Newspoll +0.5±1.2  YouGov -1.5±1.1  RedBridge -2.4±2.0  Resolve +1.1±1.0  DemosAU +2.0±1.4  | AES -2.5 err -2.2 z -1.1
+    grn  count -1.1  polls -1.0±0.4  err +0.1 z +0.3  [houses Q 22.1/4]  Newspoll -1.0±0.8  YouGov +2.2±0.8  RedBridge -3.5±1.3  Resolve -2.1±0.7  DemosAU -2.0±0.9  | AES -0.8 err +0.4 z +0.3
+    onp  count -0.4  polls -0.1±0.3  err +0.2 z +0.7  [houses Q 1.3/3]  Newspoll +0.5±0.7  YouGov -0.4±0.7  Resolve -0.5±0.5  DemosAU +0.0±0.9  | AES +2.0 err +2.3 z +2.1
+    oth  count +1.2  polls -0.0±0.4  err -1.2 z -2.9  [houses Q 0.1/3]  Newspoll +0.0±0.8  YouGov -0.2±0.8  Resolve +0.1±0.7  DemosAU +0.0±1.1  | AES -1.2 err -2.4 z -1.6
+  VIC
+    alp  count -0.6  polls -0.9±0.6  err -0.3 z -0.4  [houses Q 2.6/4]  Newspoll -1.0±1.4  YouGov -0.5±1.2  RedBridge -1.0±2.3  Resolve -2.0±1.1  DemosAU +1.0±1.6  | AES -2.7 err -2.1 z -0.9
+    lnp  count +0.4  polls -0.0±0.6  err -0.4 z -0.6  [houses Q 6.6/4]  Newspoll +2.5±1.4  YouGov +0.8±1.3  RedBridge -0.0±2.3  Resolve -1.3±1.1  DemosAU -2.0±1.6  | AES +2.5 err +2.1 z +0.9
+    grn  count +1.4  polls +0.8±0.5  err -0.6 z -1.3  [houses Q 2.0/4]  Newspoll +1.0±1.0  YouGov +0.3±0.9  RedBridge +2.5±1.7  Resolve +1.1±0.8  DemosAU +0.0±1.1  | AES +1.2 err -0.2 z -0.1
+    onp  count -0.6  polls -1.3±0.4  err -0.7 z -1.8  [houses Q 3.5/3]  Newspoll -1.5±0.7  YouGov -2.1±0.7  Resolve -0.9±0.6  DemosAU +0.0±1.0  | AES -3.7 err -3.1 z -3.0
+    oth  count -0.5  polls +1.3±0.5  err +1.8 z +3.7  [houses Q 10.4/3]  Newspoll -1.0±0.9  YouGov +1.6±0.9  Resolve +3.2±0.9  DemosAU +1.0±1.2  | AES +2.7 err +3.2 z +1.7
+  QLD
+    alp  count -3.6  polls -4.7±0.7  err -1.1 z -1.6  [houses Q 2.0/4]  Newspoll -5.0±1.5  YouGov -5.5±1.4  RedBridge -6.1±2.6  Resolve -3.3±1.2  DemosAU -5.0±1.7  | AES -1.0 err +2.6 z +0.9
+    lnp  count +3.1  polls +4.6±0.7  err +1.5 z +2.0  [houses Q 6.7/4]  Newspoll +4.5±1.6  YouGov +5.4±1.5  RedBridge +9.0±2.8  Resolve +2.2±1.3  DemosAU +6.0±1.8  | AES +4.3 err +1.2 z +0.4
+    grn  count -0.4  polls -0.1±0.5  err +0.4 z +0.7  [houses Q 2.0/4]  Newspoll -0.0±1.1  YouGov -0.8±1.0  RedBridge -1.5±1.8  Resolve +0.3±1.0  DemosAU +1.0±1.3  | AES -2.7 err -2.2 z -1.2
+    onp  count +1.4  polls +1.2±0.4  err -0.2 z -0.5  [houses Q 17.0/3]  Newspoll +1.5±0.9  YouGov +0.7±0.9  Resolve +3.4±0.8  DemosAU -2.0±1.0  | AES +2.6 err +1.1 z +0.7
+    oth  count -0.5  polls -1.1±0.5  err -0.6 z -1.1  [houses Q 4.8/3]  Newspoll -1.0±1.0  YouGov +0.2±1.1  Resolve -2.6±0.9  DemosAU +0.0±1.4  | AES -3.2 err -2.7 z -1.4
+  WA
+    alp  count +1.0  polls +2.7±1.4  err +1.7 z +1.2  [houses Q 0.1/2]  Newspoll +2.0±2.3  YouGov +3.1±2.3  DemosAU +3.0±2.7  | AES +1.8 err +0.8 z +0.2
+    lnp  count -0.3  polls -1.3±1.4  err -1.1 z -0.8  [houses Q 0.1/2]  Newspoll -1.5±2.3  YouGov -0.8±2.2  DemosAU -2.0±2.7  | AES -2.5 err -2.2 z -0.5
+    grn  count -0.2  polls -0.2±1.0  err -0.0 z -0.0  [houses Q 3.2/2]  Newspoll -1.0±1.6  YouGov -1.4±1.6  DemosAU +3.0±2.1  | AES +4.0 err +4.2 z +1.3
+    onp  count +1.2  polls +2.6±0.9  err +1.4 z +1.5  [houses Q 0.2/2]  Newspoll +2.5±1.4  YouGov +3.1±1.5  DemosAU +2.0±1.8  | AES +0.7 err -0.5 z -0.2
+    oth  count -1.7  polls -3.8±0.9  err -2.1 z -2.4  [houses Q 3.1/2]  Newspoll -2.0±1.5  YouGov -4.1±1.4  DemosAU -6.0±1.7  | AES -4.1 err -2.4 z -0.8
+  SA
+    alp  count +3.7  polls +3.5±1.9  err -0.3 z -0.2  [houses Q 3.1/1]  Newspoll -0.0±2.7  YouGov +6.5±2.6  | AES -5.5 err -9.2 z -1.9
+    lnp  count -3.4  polls -6.2±1.8  err -2.8 z -1.6  [houses Q 0.8/1]  Newspoll -4.5±2.7  YouGov -7.5±2.3  | AES -4.8 err -1.5 z -0.3
+    grn  count +1.2  polls -2.0±1.2  err -3.2 z -2.6  [houses Q 1.9/1]  Newspoll -0.0±1.9  YouGov -3.5±1.6  | AES +2.9 err +1.6 z +0.4
+    onp  count -0.3  polls +3.6±1.2  err +3.9 z +3.2  [houses Q 1.0/1]  Newspoll +2.5±1.7  YouGov +4.9±1.8  | AES -1.4 err -1.2 z -0.5
+    oth  count -1.3  polls +0.7±1.3  err +2.0 z +1.5  [houses Q 0.8/1]  Newspoll +2.0±2.0  YouGov -0.4±1.8  | AES +8.9 err +10.2 z +2.3
+  TAS
+
+2. Against the count: AEC region class (RedBridge's split)
+  Inner Metropolitan
+    alp  count +3.8  polls +4.0±2.3  err +0.2 z +0.1  [houses Q 0.0/0]  RedBridge +4.0±2.3  | AES +4.7 err +0.9 z +0.4
+    lnp  count -3.8  polls -1.0±2.2  err +2.9 z +1.3  [houses Q 0.0/0]  RedBridge -1.0±2.2  | AES -2.0 err +1.8 z +0.9
+    grn  count +4.3  polls +1.0±1.6  err -3.3 z -2.1  [houses Q 0.0/0]  RedBridge +1.0±1.6  | AES +0.6 err -3.7 z -2.7
+  Outer Metropolitan
+    alp  count +4.6  polls +2.0±2.2  err -2.6 z -1.2  [houses Q 0.0/0]  RedBridge +2.0±2.2  | AES +1.7 err -2.9 z -1.3
+    lnp  count -1.7  polls -1.5±2.2  err +0.2 z +0.1  [houses Q 0.0/0]  RedBridge -1.5±2.2  | AES -3.7 err -2.0 z -0.9
+    grn  count -0.4  polls +2.0±1.6  err +2.3 z +1.5  [houses Q 0.0/0]  RedBridge +2.0±1.6  | AES -0.2 err +0.2 z +0.1
+  Provincial
+    alp  count +0.6  polls -3.8±2.5  err -4.4 z -1.7  [houses Q 0.0/0]  RedBridge -3.8±2.5  | AES +3.0 err +2.4 z +0.7
+    lnp  count +0.8  polls +2.8±2.6  err +2.1 z +0.8  [houses Q 0.0/0]  RedBridge +2.8±2.6  | AES -1.3 err -2.1 z -0.7
+    grn  count -1.0  polls +0.7±1.8  err +1.7 z +0.9  [houses Q 0.0/0]  RedBridge +0.7±1.8  | AES -2.2 err -1.2 z -0.6
+  Rural
+    alp  count -10.2  polls -4.1±2.3  err +6.0 z +2.6  [houses Q 0.0/0]  RedBridge -4.1±2.3  | AES -10.5 err -0.4 z -0.2
+    lnp  count +5.9  polls +0.0±2.4  err -5.8 z -2.5  [houses Q 0.0/0]  RedBridge +0.0±2.4  | AES +8.1 err +2.2 z +0.8
+    grn  count -3.8  polls -5.5±1.4  err -1.7 z -1.2  [houses Q 0.0/0]  RedBridge -5.5±1.4  | AES +1.1 err +4.9 z +2.6
+
+3. Against the AES: demographic groups
+  Male
+    alp  AES -2.6±1.4  polls +0.6±0.4  err +3.2 z +2.2  [houses Q 6.2/4]  Newspoll -1.0±0.9  YouGov +0.9±0.8  RedBridge +0.0±1.3  Resolve +1.6±0.7  Essential +0.4±1.0
+    lnp  AES +4.2±1.4  polls +1.8±0.4  err -2.3 z -1.6  [houses Q 9.2/4]  Newspoll +2.5±0.9  YouGov +1.6±0.8  RedBridge +2.0±1.4  Resolve +0.5±0.7  Essential +4.1±1.0
+    grn  AES -4.8±0.9  polls -2.5±0.3  err +2.3 z +2.4  [houses Q 2.0/4]  Newspoll -2.0±0.6  YouGov -2.6±0.6  RedBridge -2.0±0.9  Resolve -2.5±0.5  Essential -3.3±0.8
+    onp  AES +1.1±0.7  polls -0.1±0.3  err -1.2 z -1.5  [houses Q 3.5/3]  Newspoll -0.5±0.5  YouGov -0.4±0.5  Resolve +0.5±0.4  Essential -0.5±0.7
+    oth  AES +2.1±1.1  polls +0.2±0.3  err -1.9 z -1.7  [houses Q 3.0/3]  Newspoll +1.0±0.6  YouGov +0.4±0.6  Resolve -0.1±0.5  Essential -0.6±0.7
+  Female
+    alp  AES +2.7±1.4  polls -0.4±0.4  err -3.1 z -2.1  [houses Q 5.4/4]  Newspoll +1.0±0.8  YouGov -0.9±0.7  RedBridge +1.0±1.3  Resolve -1.1±0.7  Essential -0.6±1.0
+    lnp  AES -4.1±1.4  polls -1.9±0.4  err +2.1 z +1.5  [houses Q 4.1/4]  Newspoll -2.5±0.8  YouGov -1.7±0.7  RedBridge -3.0±1.4  Resolve -1.0±0.7  Essential -3.1±1.0
+    grn  AES +5.0±1.0  polls +2.1±0.3  err -2.8 z -2.8  [houses Q 4.5/4]  Newspoll +2.0±0.6  YouGov +2.6±0.5  RedBridge +1.5±0.9  Resolve +1.5±0.5  Essential +3.2±0.8
+    onp  AES -1.0±0.7  polls +0.3±0.2  err +1.3 z +1.7  [houses Q 3.9/3]  Newspoll +0.5±0.5  YouGov +0.3±0.5  Resolve -0.2±0.4  Essential +1.3±0.7
+    oth  AES -2.6±1.1  polls -0.2±0.3  err +2.3 z +2.1  [houses Q 5.6/3]  Newspoll -1.0±0.6  YouGov -0.3±0.5  Resolve +0.8±0.5  Essential -0.8±0.7
+  Age 18-34
+    alp  AES +2.5±2.6  polls +0.5±0.9  err -1.9 z -0.7  [houses Q 3.8/2]  Newspoll -1.0±1.3  YouGov +2.3±1.3  RedBridge -1.0±2.3
+    lnp  AES -5.7±2.4  polls -12.9±0.8  err -7.2 z -2.8  [houses Q 0.6/2]  Newspoll -12.5±1.3  YouGov -13.5±1.1  RedBridge -12.2±2.1
+    grn  AES +13.7±2.2  polls +16.2±0.8  err +2.5 z +1.1  [houses Q 0.3/2]  Newspoll +16.0±1.2  YouGov +16.7±1.1  RedBridge +15.5±2.0
+    onp  AES -5.2±0.9  polls -2.2±0.5  err +3.0 z +3.0  [houses Q 8.8/1]  Newspoll -0.5±0.8  YouGov -3.5±0.7
+    oth  AES -5.3±1.8  polls -2.0±0.6  err +3.3 z +1.8  [houses Q 0.0/1]  Newspoll -2.0±0.9  YouGov -2.0±0.9
+  Age 35-49
+    alp  AES +1.2±2.6  polls +2.8±0.9  err +1.6 z +0.6  [houses Q 1.2/2]  Newspoll +4.0±1.4  YouGov +2.0±1.4  RedBridge +2.0±2.4
+    lnp  AES -8.0±2.4  polls -5.6±0.9  err +2.4 z +0.9  [houses Q 1.5/2]  Newspoll -4.5±1.4  YouGov -6.0±1.3  RedBridge -7.6±2.3
+    grn  AES +2.4±1.9  polls -0.4±0.6  err -2.8 z -1.4  [houses Q 0.9/2]  Newspoll -1.0±1.0  YouGov -0.1±1.0  RedBridge +0.6±1.7
+    onp  AES +0.3±1.4  polls +2.1±0.6  err +1.8 z +1.2  [houses Q 1.3/1]  Newspoll +1.5±0.8  YouGov +2.9±0.9
+    oth  AES +4.1±2.2  polls +0.6±0.7  err -3.5 z -1.5  [houses Q 0.8/1]  Newspoll +0.0±1.0  YouGov +1.3±1.1
+  Age 50-64
+    alp  AES -0.6±2.4  polls -0.9±0.9  err -0.2 z -0.1  [houses Q 3.2/2]  Newspoll -0.0±1.4  YouGov -2.4±1.3  RedBridge +1.9±2.4
+    lnp  AES +4.5±2.4  polls +4.0±0.9  err -0.5 z -0.2  [houses Q 6.4/2]  Newspoll +4.5±1.4  YouGov +5.3±1.3  RedBridge -1.5±2.4
+    grn  AES -6.2±1.4  polls -6.4±0.5  err -0.2 z -0.1  [houses Q 6.2/2]  Newspoll -7.0±0.8  YouGov -6.7±0.8  RedBridge -2.9±1.5
+    onp  AES +0.9±1.3  polls +2.0±0.6  err +1.2 z +0.8  [houses Q 0.9/1]  Newspoll +1.5±0.8  YouGov +2.6±0.8
+    oth  AES +1.4±1.9  polls +1.1±0.7  err -0.3 z -0.1  [houses Q 0.0/1]  Newspoll +1.0±1.0  YouGov +1.2±1.0
+  Age 65+
+    alp  AES -3.4±2.1  polls -3.3±0.8  err +0.1 z +0.0  [houses Q 2.7/2]  Newspoll -5.0±1.3  YouGov -2.2±1.2  RedBridge -2.5±2.3
+    lnp  AES +12.8±2.2  polls +15.1±0.9  err +2.3 z +1.0  [houses Q 0.6/2]  Newspoll +15.5±1.4  YouGov +15.3±1.2  RedBridge +13.5±2.4
+    grn  AES -9.3±1.2  polls -9.8±0.5  err -0.6 z -0.5  [houses Q 4.9/2]  Newspoll -9.0±0.7  YouGov -10.9±0.7  RedBridge -8.5±1.2
+    onp  AES +1.8±1.2  polls -1.4±0.5  err -3.3 z -2.5  [houses Q 0.0/1]  Newspoll -1.5±0.7  YouGov -1.4±0.7
+    oth  AES -2.0±1.6  polls -0.5±0.7  err +1.5 z +0.9  [houses Q 0.5/1]  Newspoll +0.0±1.0  YouGov -0.9±0.9
+  No tertiary
+    alp  AES -0.7±2.7  polls -1.5±0.8  err -0.8 z -0.3  [houses Q 0.3/2]  Newspoll -2.0±1.3  YouGov -1.2±1.1  RedBridge -1.0±2.2
+    lnp  AES +1.5±2.7  polls +3.2±0.8  err +1.7 z +0.6  [houses Q 0.9/2]  Newspoll +2.5±1.3  YouGov +3.3±1.2  RedBridge +5.0±2.3
+    grn  AES +4.9±2.1  polls -0.9±0.6  err -5.8 z -2.7  [houses Q 1.3/2]  Newspoll -0.0±0.9  YouGov -1.4±0.8  RedBridge -1.5±1.5
+    onp  AES -0.1±1.4  polls +0.8±0.5  err +0.9 z +0.6  [houses Q 0.3/1]  Newspoll +0.5±0.8  YouGov +1.0±0.7
+    oth  AES -5.7±1.8  polls -1.4±0.6  err +4.3 z +2.2  [houses Q 0.4/1]  Newspoll -1.0±0.9  YouGov -1.7±0.8
+  TAFE/Tech
+    alp  AES -1.1±1.5  polls -2.5±0.7  err -1.4 z -0.8  [houses Q 2.3/2]  Newspoll -1.0±1.2  YouGov -3.4±1.1  RedBridge -3.0±1.8
+    lnp  AES +2.7±1.5  polls -1.2±0.7  err -3.9 z -2.4  [houses Q 0.6/2]  Newspoll -0.5±1.2  YouGov -1.4±1.1  RedBridge -2.0±1.8
+    grn  AES -2.6±1.0  polls -0.6±0.5  err +2.0 z +1.8  [houses Q 6.0/2]  Newspoll -2.0±0.8  YouGov +0.9±0.8  RedBridge -0.5±1.3
+    onp  AES +0.1±0.8  polls +3.1±0.5  err +3.0 z +3.2  [houses Q 0.5/1]  Newspoll +3.5±0.8  YouGov +2.8±0.7
+    oth  AES +0.8±1.1  polls +0.6±0.6  err -0.2 z -0.2  [houses Q 1.0/1]  Newspoll +0.0±0.9  YouGov +1.2±0.8
+  University
+    alp  AES +2.2±1.9  polls +3.8±0.6  err +1.6 z +0.8  [houses Q 6.1/2]  Newspoll +2.0±1.0  YouGov +5.1±0.9  RedBridge +5.0±1.9
+    lnp  AES -5.4±1.8  polls -2.2±0.6  err +3.2 z +1.7  [houses Q 1.8/2]  Newspoll -1.5±1.0  YouGov -3.0±0.9  RedBridge -1.0±1.9
+    grn  AES +0.7±1.3  polls +0.5±0.5  err -0.1 z -0.1  [houses Q 1.8/2]  Newspoll +1.0±0.7  YouGov +0.6±0.7  RedBridge -1.0±1.3
+    onp  AES -0.6±1.0  polls -3.2±0.4  err -2.6 z -2.5  [houses Q 3.1/1]  Newspoll -2.5±0.6  YouGov -3.9±0.5
+    oth  AES +3.1±1.5  polls +1.1±0.5  err -2.0 z -1.3  [houses Q 0.0/1]  Newspoll +1.0±0.7  YouGov +1.2±0.7
+  Up to $50k
+    alp  AES -2.5±2.4  polls -0.0±1.3  err +2.5 z +0.9  [houses Q 0.0/0]  Newspoll -0.0±1.3
+    lnp  AES +4.2±2.5  polls -0.5±1.3  err -4.6 z -1.7  [houses Q 0.0/0]  Newspoll -0.5±1.3
+    grn  AES -2.4±1.6  polls -0.0±0.9  err +2.4 z +1.3  [houses Q 0.0/0]  Newspoll -0.0±0.9
+    onp  AES +1.6±1.4  polls +0.5±0.8  err -1.2 z -0.7  [houses Q 0.0/0]  Newspoll +0.5±0.8
+    oth  AES -0.9±1.8  polls +0.0±0.9  err +0.9 z +0.4  [houses Q 0.0/0]  Newspoll +0.0±0.9
+  $50k-$99k
+    alp  AES +2.1±2.3  polls -2.0±1.2  err -4.1 z -1.6  [houses Q 0.0/0]  Newspoll -2.0±1.2
+    lnp  AES +1.9±2.2  polls +1.5±1.2  err -0.3 z -0.1  [houses Q 0.0/0]  Newspoll +1.5±1.2
+    grn  AES -2.5±1.5  polls -2.0±0.8  err +0.4 z +0.3  [houses Q 0.0/0]  Newspoll -2.0±0.8
+    onp  AES -0.3±1.1  polls +1.5±0.7  err +1.8 z +1.4  [houses Q 0.0/0]  Newspoll +1.5±0.7
+    oth  AES -1.2±1.7  polls +1.0±0.9  err +2.2 z +1.2  [houses Q 0.0/0]  Newspoll +1.0±0.9
+  $100k-$150k
+    alp  AES -4.6±2.7  polls -0.0±1.6  err +4.6 z +1.4  [houses Q 0.0/0]  Newspoll -0.0±1.6
+    lnp  AES -1.6±2.8  polls -1.5±1.6  err +0.1 z +0.0  [houses Q 0.0/0]  Newspoll -1.5±1.6
+    grn  AES +1.9±2.1  polls +3.0±1.2  err +1.1 z +0.5  [houses Q 0.0/0]  Newspoll +3.0±1.2
+    onp  AES +1.6±1.6  polls +1.5±0.9  err -0.1 z -0.1  [houses Q 0.0/0]  Newspoll +1.5±0.9
+    oth  AES +2.7±2.3  polls -3.0±1.0  err -5.7 z -2.3  [houses Q 0.0/0]  Newspoll -3.0±1.0
+  $150k+
+    alp  AES +2.6±2.3  polls +3.0±1.9  err +0.4 z +0.1  [houses Q 0.0/0]  Newspoll +3.0±1.9
+    lnp  AES -4.3±2.1  polls +0.5±1.9  err +4.8 z +1.7  [houses Q 0.0/0]  Newspoll +0.5±1.9
+    grn  AES +4.0±1.7  polls -1.0±1.3  err -5.1 z -2.4  [houses Q 0.0/0]  Newspoll -1.0±1.3
+    onp  AES -3.0±1.0  polls -1.5±0.9  err +1.5 z +1.1  [houses Q 0.0/0]  Newspoll -1.5±0.9
+    oth  AES +0.7±1.7  polls -1.0±1.3  err -1.7 z -0.8  [houses Q 0.0/0]  Newspoll -1.0±1.3
+  Full time
+    alp  AES +0.3±1.8  polls +0.7±0.7  err +0.4 z +0.2  [houses Q 0.1/1]  Newspoll +1.0±1.0  YouGov +0.5±0.9
+    lnp  AES -1.0±1.8  polls -0.2±0.7  err +0.8 z +0.4  [houses Q 1.0/1]  Newspoll +0.5±1.0  YouGov -0.8±0.9
+    grn  AES -0.1±1.2  polls -0.5±0.5  err -0.4 z -0.3  [houses Q 0.8/1]  Newspoll -1.0±0.7  YouGov -0.1±0.7
+    onp  AES -0.6±0.9  polls +0.5±0.4  err +1.1 z +1.1  [houses Q 0.0/1]  Newspoll +0.5±0.6  YouGov +0.5±0.6
+    oth  AES +1.4±1.4  polls -0.5±0.5  err -1.9 z -1.3  [houses Q 1.0/1]  Newspoll -1.0±0.7  YouGov -0.0±0.7
+  Part time
+    alp  AES +0.3±2.8  polls +1.9±1.0  err +1.6 z +0.5  [houses Q 6.8/1]  Newspoll -1.0±1.5  YouGov +4.2±1.3
+    lnp  AES -4.0±2.7  polls -7.9±0.9  err -3.9 z -1.4  [houses Q 0.2/1]  Newspoll -7.5±1.5  YouGov -8.2±1.2
+    grn  AES +6.3±2.2  polls +6.1±0.8  err -0.2 z -0.1  [houses Q 0.9/1]  Newspoll +7.0±1.2  YouGov +5.4±1.1
+    onp  AES -3.1±1.2  polls -0.0±0.6  err +3.1 z +2.3  [houses Q 5.1/1]  Newspoll +1.5±0.9  YouGov -1.1±0.8
+    oth  AES +0.5±2.2  polls -0.1±0.7  err -0.7 z -0.3  [houses Q 0.0/1]  Newspoll +0.0±1.1  YouGov -0.3±1.0
+  Retired
+    alp  AES -2.5±2.2  polls -2.6±1.0  err -0.2 z -0.1  [houses Q 0.1/1]  Newspoll -3.0±1.4  YouGov -2.3±1.3
+    lnp  AES +8.3±2.3  polls +15.4±1.0  err +7.1 z +2.8  [houses Q 0.7/1]  Newspoll +14.5±1.5  YouGov +16.2±1.4
+    grn  AES -9.0±1.2  polls -10.2±0.5  err -1.3 z -1.0  [houses Q 0.2/1]  Newspoll -10.0±0.7  YouGov -10.4±0.7
+    onp  AES +4.7±1.4  polls -1.5±0.5  err -6.2 z -4.2  [houses Q 0.0/1]  Newspoll -1.5±0.7  YouGov -1.5±0.8
+    oth  AES -1.7±1.7  polls -1.0±0.7  err +0.6 z +0.3  [houses Q 2.0/1]  Newspoll +0.0±1.0  YouGov -1.9±0.9
+  Other
+    alp  AES +1.6±3.0  polls -3.0±1.4  err -4.6 z -1.4  [houses Q 7.8/1]  Newspoll +1.0±2.0  YouGov -6.7±1.9
+    lnp  AES -2.9±2.9  polls -12.6±1.3  err -9.7 z -3.0  [houses Q 5.9/1]  Newspoll -15.5±1.7  YouGov -9.3±1.9
+    grn  AES +4.6±2.3  polls +9.7±1.2  err +5.1 z +1.9  [houses Q 1.2/1]  Newspoll +11.0±1.7  YouGov +8.2±1.8
+    onp  AES -1.4±1.4  polls +2.5±0.9  err +3.9 z +2.3  [houses Q 2.1/1]  Newspoll +1.5±1.2  YouGov +4.1±1.4
+    oth  AES -1.9±2.2  polls +2.7±1.1  err +4.6 z +1.9  [houses Q 0.5/1]  Newspoll +2.0±1.5  YouGov +3.6±1.6
+  Own outright
+    alp  AES -5.3±1.7  polls -2.3±0.7  err +3.0 z +1.6  [houses Q 0.7/1]  Newspoll -3.0±1.2  YouGov -1.8±1.0
+    lnp  AES +7.6±1.8  polls +11.5±0.8  err +3.9 z +2.0  [houses Q 0.0/1]  Newspoll +11.5±1.2  YouGov +11.4±1.0
+    grn  AES -6.1±1.1  polls -7.1±0.5  err -1.0 z -0.8  [houses Q 0.0/1]  Newspoll -7.0±0.7  YouGov -7.2±0.7
+    onp  AES +2.2±1.0  polls -0.6±0.4  err -2.8 z -2.6  [houses Q 0.0/1]  Newspoll -0.5±0.7  YouGov -0.6±0.6
+    oth  AES +1.6±1.4  polls -1.5±0.5  err -3.1 z -2.1  [houses Q 0.6/1]  Newspoll -1.0±0.8  YouGov -1.8±0.7
+  Mortgage
+    alp  AES +2.7±1.9  polls +0.8±0.8  err -1.9 z -0.9  [houses Q 1.2/1]  Newspoll -0.0±1.1  YouGov +1.7±1.1
+    lnp  AES -3.4±1.8  polls -1.0±0.8  err +2.4 z +1.2  [houses Q 0.4/1]  Newspoll -1.5±1.1  YouGov -0.5±1.1
+    grn  AES +1.6±1.3  polls -1.5±0.6  err -3.0 z -2.1  [houses Q 18.4/1]  Newspoll +1.0±0.8  YouGov -3.9±0.8
+    onp  AES -0.4±1.0  polls +1.5±0.5  err +1.9 z +1.7  [houses Q 0.0/1]  Newspoll +1.5±0.7  YouGov +1.5±0.7
+    oth  AES -0.5±1.4  polls +0.0±0.6  err +0.5 z +0.3  [houses Q 3.6/1]  Newspoll -1.0±0.8  YouGov +1.2±0.9
+  Rent
+    alp  AES +3.3±3.3  polls -1.0±1.2  err -4.3 z -1.2  [houses Q 0.0/0]  YouGov -1.0±1.2
+    lnp  AES -5.8±3.0  polls -8.2±1.2  err -2.4 z -0.7  [houses Q 0.0/0]  YouGov -8.2±1.2
+    grn  AES +3.4±2.5  polls +8.1±1.0  err +4.7 z +1.8  [houses Q 0.0/0]  YouGov +8.1±1.0
+    onp  AES -2.8±1.4  polls +0.3±0.8  err +3.1 z +2.0  [houses Q 0.0/0]  YouGov +0.3±0.8
+    oth  AES +2.0±2.6  polls +0.8±0.9  err -1.2 z -0.4  [houses Q 0.0/0]  YouGov +0.8±0.9
+
+4. Summary: mean z² of the pooled errors (≈1 if polls and reference measure the same gaps), by dim and party
+                alp    lnp    grn    onp    oth   AES v count
+  state        0.85   1.73   1.82   3.34   6.16   1.58 (25)
+  region       2.86   2.09   2.20      –      –   1.63 (12)
+  gender       4.62   2.43   6.73   2.62   3.70   
+  age          0.21   2.47   0.81   4.33   1.56   
+  education    0.48   2.91   3.45   5.75   2.23   
+  income       1.39   1.41   1.93   0.92   1.83   
+  work         0.55   4.82   1.17   7.41   1.34   
+  housing      1.62   2.02   2.73   4.63   1.60   
+
+5. Did a house's gaps move between the pre-campaign months and the final window? mean z² of (final − pre), same house
+  Newspoll   1.44 over 120 cell-parties
+  YouGov     1.46 over 105 cell-parties
+  RedBridge  1.16 over 39 cell-parties
+  Resolve    1.59 over 25 cell-parties
+  Essential  1.13 over 10 cell-parties

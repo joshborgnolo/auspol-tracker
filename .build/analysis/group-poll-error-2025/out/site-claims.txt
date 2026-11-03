@@ -1,0 +1,43 @@
+The site's election test (data-late.5ea811ab.js, current primaries alp 26.4 lnp 23 grn 13.4 onp 26 oth 11.4), each row re-asked against the
+polls' own election-time gap. then/now/d are the site's (AES baseline); polls-then is the pre-election polls' pooled gap ±95%;
+d' = now − polls-then, ±' its margin (the row's ciNow and polls-then's combined). CLAIM = the site's copy may cite it today.
+
+Rows the site's test passes (sig) today:
+  alp  gender     Men              then -2.6 now +1.2 d +3.8±3.7 sig         | polls-then +0.6±0.8 (AES−polls -3.1)  d' +0.6±2.0 no change
+  alp  gender     Women            then +2.7 now -1.0 d -3.7±3.6 sig         | polls-then -0.4±0.7 (AES−polls +3.1)  d' -0.6±1.9 no change
+  lnp  education  University       then -5.3 now +1.8 d +7.1±4.8 sig CLAIM   | polls-then -2.2±1.2 (AES−polls -3.2)  d' +4.0±3.5 moved
+  grn  gender     Men              then -4.9 now -1.5 d +3.4±2.4 sig CLAIM   | polls-then -2.5±0.6 (AES−polls -2.4)  d' +1.0±1.4 no change
+  grn  gender     Women            then +5.0 now +1.3 d -3.7±2.8 sig CLAIM   | polls-then +2.1±0.6 (AES−polls +2.9)  d' -0.8±1.5 no change
+  grn  education  Year 12 or less  then +4.9 now -0.7 d -5.6±4.7 sig CLAIM   | polls-then -0.9±1.1 (AES−polls +5.8)  d' +0.2±2.3 no change
+  oth  generation Gen Z            then -12.3 now -2.0 d +10.3±3.8 sig CLAIM   | no pre-election poll cut
+  oth  gender     Men              then +2.1 now -1.7 d -3.8±2.9 sig CLAIM   | polls-then +0.2±0.6 (AES−polls +1.9)  d' -1.9±1.3 moved
+  oth  gender     Women            then -2.6 now +1.0 d +3.6±2.6 sig CLAIM   | polls-then -0.2±0.6 (AES−polls -2.4)  d' +1.2±1.4 no change
+  oth  housing    Own outright     then +1.7 now -2.0 d -3.7±3.4 sig CLAIM   | polls-then -1.5±1.1 (AES−polls +3.2)  d' -0.5±2.3 no change
+
+Rows only the same-instrument test passes:
+  lnp  age        18–34            then -5.7 now -5.3 d +0.4±5.5             | polls-then -12.9±1.5 (AES−polls +7.2)  d' +7.6±2.8 moved
+  lnp  age        55+              then +9.7 now +4.8 d -4.9±3.9             | polls-then +11.5±1.4 (AES−polls -1.8)  d' -6.7±2.5 moved
+  lnp  working    Retired          then +8.4 now +10.0 d +1.6±6.7             | polls-then +15.4±2.0 (AES−polls -7.0)  d' -5.4±5.3 moved
+  onp  age        18–34            then -5.2 now -10.9 d -5.7±2.9             | polls-then -2.2±1.0 (AES−polls -3.0)  d' -8.7±2.6 moved
+  onp  age        55+              then +1.8 now +5.8 d +4.0±3.8             | polls-then -0.1±0.9 (AES−polls +1.9)  d' +5.9±3.4 moved
+  onp  education  University       then -0.6 now -8.6 d -8.0±3.6             | polls-then -3.2±0.8 (AES−polls +2.6)  d' -5.4±3.2 moved
+  onp  working    Part time        then -3.1 now -7.7 d -4.6±4.7             | polls-then -0.0±1.1 (AES−polls -3.1)  d' -7.7±4.3 moved
+  onp  working    Retired          then +4.7 now +6.7 d +2.0±5.6             | polls-then -1.5±1.0 (AES−polls +6.2)  d' +8.2±5.0 moved
+  grn  education  University       then +0.7 now +3.6 d +2.9±3.8             | polls-then +0.5±0.9 (AES−polls +0.2)  d' +3.1±2.8 moved
+
+Where the AES and the polls disagreed at the election by more than both margins (|polls-then − then| > √(ciThen² + polls-ci²)):
+  lnp  age        18–34            AES -5.7±4.9  polls -12.9±1.5
+  lnp  working    Retired          AES +8.4±4.5  polls +15.4±2.0
+  onp  age        18–34            AES -5.2±1.6  polls -2.2±1.0
+  onp  education  TAFE or trade    AES +0.1±1.9  polls +3.1±1.0
+  onp  education  University       AES -0.6±1.8  polls -3.2±0.8
+  onp  housing    Own outright     AES +2.2±2.1  polls -0.6±0.9
+  onp  housing    Renting          AES -2.8±2.7  polls +0.3±1.5
+  onp  working    Part time        AES -3.1±2.3  polls -0.0±1.1
+  onp  working    Retired          AES +4.7±2.8  polls -1.5±1.0
+  grn  gender     Men              AES -4.9±2.0  polls -2.5±0.6
+  grn  gender     Women            AES +5.0±2.4  polls +2.1±0.6
+  grn  education  Year 12 or less  AES +4.9±4.2  polls -0.9±1.1
+  oth  gender     Women            AES -2.6±2.3  polls -0.2±0.6
+  oth  education  Year 12 or less  AES -5.7±3.5  polls -1.4±1.2
+  oth  housing    Own outright     AES +1.7±2.8  polls -1.5±1.1

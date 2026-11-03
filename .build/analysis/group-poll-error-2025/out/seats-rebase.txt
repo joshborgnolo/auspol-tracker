@@ -1,0 +1,14 @@
+Mainland state deviations, official → rebased (points; alp lnp on grn oth):
+  NSW  alp -0.45→-0.32  lnp -0.67→-0.47  on +1.19→+1.14  grn +0.34→-0.04  oth -0.35→-0.20
+  VIC  alp +0.14→+0.13  lnp +1.97→+1.71  on -2.17→-1.70  grn +0.25→+0.22  oth -0.16→-0.27
+  QLD  alp +0.67→+0.82  lnp -3.22→-3.36  on +1.61→+1.60  grn -0.28→-0.06  oth +0.03→+0.22
+  SA   alp -0.09→-0.11  lnp +1.67→+2.93  on -1.26→-2.08  grn -0.46→+0.03  oth -0.12→-0.52
+  WA   alp -0.61→-0.97  lnp +0.30→+0.41  on -0.05→-0.22  grn -0.85→-0.37  oth +0.71→+0.69
+
+nowcast: expected seats, Labor majority, central-projection flips
+  official         ALP 71.4  L/NP 30.3  ON 36.6  GRN 4.1  IND+OTH 7.7  majority 39.6%  flips 0
+  rebased states   ALP 71.3  L/NP 30.2  ON 36.7  GRN 4.1  IND+OTH 7.7  majority 39.6%  flips 0
+
+forecast: expected seats, Labor majority, central-projection flips
+  official         ALP 83.3  L/NP 39.8  ON 15.5  GRN 3.6  IND+OTH 7.8  majority 73.0%  flips 0
+  rebased states   ALP 83.3  L/NP 39.8  ON 15.5  GRN 3.6  IND+OTH 7.8  majority 73.0%  flips 0

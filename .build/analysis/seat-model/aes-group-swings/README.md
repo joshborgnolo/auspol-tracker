@@ -97,7 +97,9 @@ The official inputs at 2,000 draws.
 - The polls' Coalition graduate gap keeps moving well past +0.6 against the AES, or One Nation's same-house gap starts
   to move.
 - A poll fielded before the 2025 election with education crosstabs turns up. It would split the +0.45 into instrument
-  and real change.
+  and real change. *Done 2026-11-03:* four houses' pre-election crosstabs, from BludgerTrack's 2022–25 feed, put
+  +0.26 of it before the election (instrument). The real shift to the latest window is about +0.34. The verdict
+  stands. See [../../group-poll-error-2025](../../group-poll-error-2025/README.md) §3.
 - The AES 2028 is released: add the wave and rerun the backtest.
 
 ## Files and rerunning (from the repo root)

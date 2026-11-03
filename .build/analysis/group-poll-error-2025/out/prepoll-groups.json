@@ -1,0 +1,642 @@
+{
+ "_about": "The polls' own gaps from all voters at the 2025 election (fieldwork ending 29 Mar – 2 May 2025), on the site's Who-votes sets, pooled across houses: gap (points) and its 95% margin; per-house gaps beside. Built by site-claims.mjs from bludgertrack-2022-25.json.",
+ "sets": {
+  "gender": {
+   "Men": {
+    "alp": {
+     "gap": 0.58,
+     "ci": 0.76,
+     "houses": {
+      "Resolve": 1.59,
+      "Essential": 0.37,
+      "RedBridge": 0,
+      "YouGov": 0.87,
+      "Newspoll": -1.01
+     }
+    },
+    "lnp": {
+     "gap": 1.83,
+     "ci": 0.77,
+     "houses": {
+      "Resolve": 0.47,
+      "Essential": 4.07,
+      "RedBridge": 2,
+      "YouGov": 1.64,
+      "Newspoll": 2.53
+     }
+    },
+    "grn": {
+     "gap": -2.49,
+     "ci": 0.57,
+     "houses": {
+      "Resolve": -2.53,
+      "Essential": -3.34,
+      "RedBridge": -2,
+      "YouGov": -2.55,
+      "Newspoll": -2.02
+     }
+    },
+    "onp": {
+     "gap": -0.09,
+     "ci": 0.5,
+     "houses": {
+      "Resolve": 0.53,
+      "Essential": -0.54,
+      "YouGov": -0.36,
+      "Newspoll": -0.51
+     }
+    },
+    "oth": {
+     "gap": 0.22,
+     "ci": 0.6,
+     "houses": {
+      "Resolve": -0.06,
+      "Essential": -0.56,
+      "YouGov": 0.4,
+      "Newspoll": 1.01
+     }
+    }
+   },
+   "Women": {
+    "alp": {
+     "gap": -0.39,
+     "ci": 0.74,
+     "houses": {
+      "Resolve": -1.06,
+      "Essential": -0.64,
+      "RedBridge": 1,
+      "YouGov": -0.94,
+      "Newspoll": 0.99
+     }
+    },
+    "lnp": {
+     "gap": -1.94,
+     "ci": 0.75,
+     "houses": {
+      "Resolve": -1,
+      "Essential": -3.06,
+      "RedBridge": -3,
+      "YouGov": -1.72,
+      "Newspoll": -2.47
+     }
+    },
+    "grn": {
+     "gap": 2.14,
+     "ci": 0.56,
+     "houses": {
+      "Resolve": 1.53,
+      "Essential": 3.18,
+      "RedBridge": 1.5,
+      "YouGov": 2.64,
+      "Newspoll": 1.98
+     }
+    },
+    "onp": {
+     "gap": 0.3,
+     "ci": 0.49,
+     "houses": {
+      "Resolve": -0.24,
+      "Essential": 1.31,
+      "YouGov": 0.35,
+      "Newspoll": 0.49
+     }
+    },
+    "oth": {
+     "gap": -0.21,
+     "ci": 0.58,
+     "houses": {
+      "Resolve": 0.77,
+      "Essential": -0.79,
+      "YouGov": -0.33,
+      "Newspoll": -0.99
+     }
+    }
+   }
+  },
+  "education": {
+   "Year 12 or less": {
+    "alp": {
+     "gap": -1.5,
+     "ci": 1.57,
+     "houses": {
+      "RedBridge": -1,
+      "YouGov": -1.23,
+      "Newspoll": -2.01
+     }
+    },
+    "lnp": {
+     "gap": 3.24,
+     "ci": 1.61,
+     "houses": {
+      "RedBridge": 5,
+      "YouGov": 3.3,
+      "Newspoll": 2.53
+     }
+    },
+    "grn": {
+     "gap": -0.88,
+     "ci": 1.13,
+     "houses": {
+      "RedBridge": -1.5,
+      "YouGov": -1.36,
+      "Newspoll": -0.02
+     }
+    },
+    "onp": {
+     "gap": 0.79,
+     "ci": 1.02,
+     "houses": {
+      "YouGov": 1.04,
+      "Newspoll": 0.49
+     }
+    },
+    "oth": {
+     "gap": -1.4,
+     "ci": 1.21,
+     "houses": {
+      "YouGov": -1.75,
+      "Newspoll": -0.99
+     }
+    }
+   },
+   "TAFE or trade": {
+    "alp": {
+     "gap": -2.45,
+     "ci": 1.44,
+     "houses": {
+      "RedBridge": -3,
+      "YouGov": -3.43,
+      "Newspoll": -1.01
+     }
+    },
+    "lnp": {
+     "gap": -1.16,
+     "ci": 1.46,
+     "houses": {
+      "RedBridge": -2,
+      "YouGov": -1.43,
+      "Newspoll": -0.47
+     }
+    },
+    "grn": {
+     "gap": -0.56,
+     "ci": 1.05,
+     "houses": {
+      "RedBridge": -0.5,
+      "YouGov": 0.87,
+      "Newspoll": -2.02
+     }
+    },
+    "onp": {
+     "gap": 3.12,
+     "ci": 1.03,
+     "houses": {
+      "YouGov": 2.79,
+      "Newspoll": 3.49
+     }
+    },
+    "oth": {
+     "gap": 0.62,
+     "ci": 1.18,
+     "houses": {
+      "YouGov": 1.2,
+      "Newspoll": 0.01
+     }
+    }
+   },
+   "University": {
+    "alp": {
+     "gap": 3.79,
+     "ci": 1.22,
+     "houses": {
+      "RedBridge": 5,
+      "YouGov": 5.12,
+      "Newspoll": 1.99
+     }
+    },
+    "lnp": {
+     "gap": -2.16,
+     "ci": 1.21,
+     "houses": {
+      "RedBridge": -1,
+      "YouGov": -3.03,
+      "Newspoll": -1.47
+     }
+    },
+    "grn": {
+     "gap": 0.54,
+     "ci": 0.9,
+     "houses": {
+      "RedBridge": -1,
+      "YouGov": 0.57,
+      "Newspoll": 0.98
+     }
+    },
+    "onp": {
+     "gap": -3.24,
+     "ci": 0.75,
+     "houses": {
+      "YouGov": -3.87,
+      "Newspoll": -2.51
+     }
+    },
+    "oth": {
+     "gap": 1.11,
+     "ci": 0.96,
+     "houses": {
+      "YouGov": 1.2,
+      "Newspoll": 1.01
+     }
+    }
+   }
+  },
+  "age": {
+   "18–34": {
+    "alp": {
+     "gap": 0.52,
+     "ci": 1.67,
+     "houses": {
+      "RedBridge": -1,
+      "YouGov": 2.3,
+      "Newspoll": -1.01
+     }
+    },
+    "lnp": {
+     "gap": -12.94,
+     "ci": 1.53,
+     "houses": {
+      "RedBridge": -12.15,
+      "YouGov": -13.53,
+      "Newspoll": -12.47
+     }
+    },
+    "grn": {
+     "gap": 16.22,
+     "ci": 1.47,
+     "houses": {
+      "RedBridge": 15.47,
+      "YouGov": 16.67,
+      "Newspoll": 15.98
+     }
+    },
+    "onp": {
+     "gap": -2.19,
+     "ci": 0.97,
+     "houses": {
+      "YouGov": -3.47,
+      "Newspoll": -0.51
+     }
+    },
+    "oth": {
+     "gap": -1.98,
+     "ci": 1.25,
+     "houses": {
+      "YouGov": -1.97,
+      "Newspoll": -1.99
+     }
+    }
+   },
+   "35–54": {
+    "alp": {
+     "gap": 2.13,
+     "ci": 1.42,
+     "houses": {
+      "RedBridge": 2.11,
+      "YouGov": 1.11,
+      "Newspoll": 3.39
+     }
+    },
+    "lnp": {
+     "gap": -4.19,
+     "ci": 1.4,
+     "houses": {
+      "RedBridge": -6.82,
+      "YouGov": -4.22,
+      "Newspoll": -3.15
+     }
+    },
+    "grn": {
+     "gap": -1.42,
+     "ci": 1.02,
+     "houses": {
+      "RedBridge": 0.16,
+      "YouGov": -1.31,
+      "Newspoll": -2.15
+     }
+    },
+    "onp": {
+     "gap": 2.35,
+     "ci": 0.97,
+     "houses": {
+      "YouGov": 3.03,
+      "Newspoll": 1.59
+     }
+    },
+    "oth": {
+     "gap": 0.78,
+     "ci": 1.14,
+     "houses": {
+      "YouGov": 1.27,
+      "Newspoll": 0.22
+     }
+    }
+   },
+   "55+": {
+    "alp": {
+     "gap": -2.55,
+     "ci": 1.31,
+     "houses": {
+      "RedBridge": -0.88,
+      "YouGov": -2.39,
+      "Newspoll": -3.37
+     }
+    },
+    "lnp": {
+     "gap": 11.53,
+     "ci": 1.35,
+     "houses": {
+      "RedBridge": 8.25,
+      "YouGov": 12.18,
+      "Newspoll": 11.94
+     }
+    },
+    "grn": {
+     "gap": -8.72,
+     "ci": 0.84,
+     "houses": {
+      "RedBridge": -6.61,
+      "YouGov": -9.59,
+      "Newspoll": -8.47
+     }
+    },
+    "onp": {
+     "gap": -0.14,
+     "ci": 0.87,
+     "houses": {
+      "YouGov": 0.1,
+      "Newspoll": -0.43
+     }
+    },
+    "oth": {
+     "gap": 0.08,
+     "ci": 1.06,
+     "houses": {
+      "YouGov": -0.2,
+      "Newspoll": 0.42
+     }
+    }
+   }
+  },
+  "housing": {
+   "Own outright": {
+    "alp": {
+     "gap": -2.27,
+     "ci": 1.46,
+     "houses": {
+      "YouGov": -1.77,
+      "Newspoll": -3.01
+     }
+    },
+    "lnp": {
+     "gap": 11.46,
+     "ci": 1.5,
+     "houses": {
+      "YouGov": 11.41,
+      "Newspoll": 11.53
+     }
+    },
+    "grn": {
+     "gap": -7.11,
+     "ci": 0.97,
+     "houses": {
+      "YouGov": -7.17,
+      "Newspoll": -7.02
+     }
+    },
+    "onp": {
+     "gap": -0.58,
+     "ci": 0.87,
+     "houses": {
+      "YouGov": -0.64,
+      "Newspoll": -0.51
+     }
+    },
+    "oth": {
+     "gap": -1.47,
+     "ci": 1.06,
+     "houses": {
+      "YouGov": -1.82,
+      "Newspoll": -0.99
+     }
+    }
+   },
+   "Mortgage": {
+    "alp": {
+     "gap": 0.8,
+     "ci": 1.55,
+     "houses": {
+      "YouGov": 1.71,
+      "Newspoll": -0.01
+     }
+    },
+    "lnp": {
+     "gap": -1.01,
+     "ci": 1.55,
+     "houses": {
+      "YouGov": -0.52,
+      "Newspoll": -1.47
+     }
+    },
+    "grn": {
+     "gap": -1.47,
+     "ci": 1.1,
+     "houses": {
+      "YouGov": -3.86,
+      "Newspoll": 0.98
+     }
+    },
+    "onp": {
+     "gap": 1.48,
+     "ci": 0.95,
+     "houses": {
+      "YouGov": 1.46,
+      "Newspoll": 1.49
+     }
+    },
+    "oth": {
+     "gap": 0,
+     "ci": 1.14,
+     "houses": {
+      "YouGov": 1.22,
+      "Newspoll": -0.99
+     }
+    }
+   },
+   "Renting": {
+    "alp": {
+     "gap": -1.01,
+     "ci": 2.39,
+     "houses": {
+      "YouGov": -1.01
+     }
+    },
+    "lnp": {
+     "gap": -8.21,
+     "ci": 2.3,
+     "houses": {
+      "YouGov": -8.21
+     }
+    },
+    "grn": {
+     "gap": 8.12,
+     "ci": 1.99,
+     "houses": {
+      "YouGov": 8.12
+     }
+    },
+    "onp": {
+     "gap": 0.34,
+     "ci": 1.47,
+     "houses": {
+      "YouGov": 0.34
+     }
+    },
+    "oth": {
+     "gap": 0.76,
+     "ci": 1.82,
+     "houses": {
+      "YouGov": 0.76
+     }
+    }
+   }
+  },
+  "working": {
+   "Full time": {
+    "alp": {
+     "gap": 0.71,
+     "ci": 1.29,
+     "houses": {
+      "YouGov": 0.49,
+      "Newspoll": 0.99
+     }
+    },
+    "lnp": {
+     "gap": -0.21,
+     "ci": 1.3,
+     "houses": {
+      "YouGov": -0.81,
+      "Newspoll": 0.53
+     }
+    },
+    "grn": {
+     "gap": -0.55,
+     "ci": 0.95,
+     "houses": {
+      "YouGov": -0.13,
+      "Newspoll": -1.02
+     }
+    },
+    "onp": {
+     "gap": 0.48,
+     "ci": 0.79,
+     "houses": {
+      "YouGov": 0.46,
+      "Newspoll": 0.49
+     }
+    },
+    "oth": {
+     "gap": -0.47,
+     "ci": 0.95,
+     "houses": {
+      "YouGov": -0.01,
+      "Newspoll": -0.99
+     }
+    }
+   },
+   "Part time": {
+    "alp": {
+     "gap": 1.89,
+     "ci": 1.96,
+     "houses": {
+      "YouGov": 4.23,
+      "Newspoll": -1.01
+     }
+    },
+    "lnp": {
+     "gap": -7.91,
+     "ci": 1.86,
+     "houses": {
+      "YouGov": -8.24,
+      "Newspoll": -7.47
+     }
+    },
+    "grn": {
+     "gap": 6.12,
+     "ci": 1.58,
+     "houses": {
+      "YouGov": 5.44,
+      "Newspoll": 6.98
+     }
+    },
+    "onp": {
+     "gap": -0.03,
+     "ci": 1.13,
+     "houses": {
+      "YouGov": -1.15,
+      "Newspoll": 1.49
+     }
+    },
+    "oth": {
+     "gap": -0.15,
+     "ci": 1.41,
+     "houses": {
+      "YouGov": -0.28,
+      "Newspoll": 0.01
+     }
+    }
+   },
+   "Retired": {
+    "alp": {
+     "gap": -2.65,
+     "ci": 1.87,
+     "houses": {
+      "YouGov": -2.33,
+      "Newspoll": -3.01
+     }
+    },
+    "lnp": {
+     "gap": 15.42,
+     "ci": 1.97,
+     "houses": {
+      "YouGov": 16.21,
+      "Newspoll": 14.53
+     }
+    },
+    "grn": {
+     "gap": -10.22,
+     "ci": 0.98,
+     "houses": {
+      "YouGov": -10.41,
+      "Newspoll": -10.02
+     }
+    },
+    "onp": {
+     "gap": -1.52,
+     "ci": 1.04,
+     "houses": {
+      "YouGov": -1.53,
+      "Newspoll": -1.51
+     }
+    },
+    "oth": {
+     "gap": -1.03,
+     "ci": 1.35,
+     "houses": {
+      "YouGov": -1.95,
+      "Newspoll": 0.01
+     }
+    }
+   }
+  }
+ }
+}
