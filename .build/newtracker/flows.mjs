@@ -20,6 +20,8 @@
    anchor. The full provenance table and the three-cuts explanation live in
    the project skill auto-skill-aec-preference-flow-constants; re-derive from
    the SAME cut so constants stay comparable across refreshes. */
+/* The /model/ page sets One Nation voters' national Labor-v-Coalition level to FLOW.onp (seat-inputs
+   prepInputs), as it sets the Coalition's Labor-v-One Nation level to FP_ON.lnp below. */
 export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
 
 

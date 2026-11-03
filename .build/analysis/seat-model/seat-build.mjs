@@ -30,7 +30,7 @@ export function settings(FCAL) {
   // Greens last): Hunter 2025 +0.24 logit (House v same-election Senate), SA 2026 +0.02, Queensland 2020
   // -0.12, Queensland 2017 -0.58 (state counts v the previous federal Senate; backtest-states.mjs). They
   // average about zero, so zero, with the level drift they show carried as a national flow shock. The 2028
-  // runs replace it with solveCoalAO's offset, which sets the national level to the site's own Labor v One
+  // runs replace it (and ON|AC) with solveLevel's offset, which sets the national level to the site's own Labor v One
   // Nation table (flows.mjs FP_ON.lnp, built on these counts and Secret Harbour's); backtests keep zero.
   const delta = {};
   for (const [k, d] of Object.entries(FCAL.same.delta)) delta[k] = d.v;
@@ -102,17 +102,18 @@ export function leverLevels(SEN, seats) {
   return out;
 }
 
-/* the Coalition's Labor-v-One Nation offset that puts its national level (as leverLevels reads it, before
-   levers) on `target`: bisection on the logit offset; the Coalition's voters are not mixed (MIX_FAMS), so
-   their tables are calibratedTable's alone */
-export function solveCoalAO(inputs, target) {
+/* the chamber offset ("CLASS|XY") that puts a class's national share to X over Y (as leverLevels reads it,
+   before levers) on `target`: bisection on the logit offset. No voters are mixed (MIX_FAMS), so the tables
+   are calibratedTable's alone; the seat-history tilt rides on top unchanged, so the level is monotone. */
+export function solveLevel(inputs, key, target) {
   const { SEN, ST, hist } = inputs;
+  const [cls, pair] = key.split("|"), x = "ACGO".indexOf(pair[0]), y = "ACGO".indexOf(pair[1]);
   const rows = [];
-  for (const s of inputs.seats) if (!noOnBallots(SEN, s.st)) for (const c of s.cands) if (flowClassOf(c.key) === "COAL") rows.push([s, c, s.w * c.base]);
+  for (const s of inputs.seats) if (!noOnBallots(SEN, s.st)) for (const c of s.cands) if (flowClassOf(c.key) === cls) rows.push([s, c, s.w * c.base]);
   const level = (d) => {
-    const st = { ...ST, delta: { ...ST.delta, "COAL|AO": d } };
+    const st = { ...ST, delta: { ...ST.delta, [key]: d } };
     let a = 0, w = 0;
-    for (const [s, c, v] of rows) { a += v * pairShare(SEN, calibratedTable(SEN, st, { st: s.st }, s.name, c.key, hist), 0, 3); w += v; }
+    for (const [s, c, v] of rows) { a += v * pairShare(SEN, calibratedTable(SEN, st, { st: s.st }, s.name, c.key, hist), x, y); w += v; }
     return a / w;
   };
   let lo = -2, hi = 2;
@@ -121,16 +122,15 @@ export function solveCoalAO(inputs, target) {
 }
 
 const COMP_KEY = { alp: "ALP", lnp: "COAL", grn: "GRN", onp: "ON", ind: "OTH-M", oth: "OTH" };
-/* Which parties' voters are mixed from their 2025 parties (family indexes, A=0 C=1 G=2 O=3): One Nation's
-   only. Its voters are mostly new (under a quarter voted for it in 2025), and the one count to test it on
-   bears the mix out: in SA 2026 One Nation's preferences reached Labor in classic districts at 28.3%
-   against the Senate ballots' 17. The other parties' tables are already set on counts of their own flows
-   (the Coalition's Labor-v-One Nation level on the four counts of that contest), and the mix would move
-   them off those levels on recalled votes alone: today's Coalition voters who recall a 2025 Labor vote
-   (13% on 3 Nov 2026), given Labor's order with the Coalition moved first, lifted Coalition-to-Labor
-   against One Nation from 26 to 39 and Labor's nowcast by about 5 seats. Recall leans towards the party
-   that won, and no count shows that shift. */
-export const MIX_FAMS = [3];
+/* Which parties' voters are mixed from their 2025 parties (family indexes, A=0 C=1 G=2 O=3): none, since
+   2026-11-03. The mix reads switchers from recalled 2025 votes, which lean towards the party that won, and
+   gives each its old party's order with the new party moved first. For the Coalition it lifted Coalition-to-
+   Labor against One Nation from 26 to 39; for One Nation it lifted One Nation-to-Labor against the Coalition
+   from 23 to 32 (17% of today's One Nation voters recall a Labor vote), above the Coalition's own flow the
+   other way, when RedBridge's respondents put One Nation voters at 15-25% to Labor and Coalition voters at
+   31-44%. The national levels of the two flows that decide most seats are set to the site's own tables
+   instead (prepInputs: solveLevel on COAL|AO and ON|AC). */
+export const MIX_FAMS = [];
 export function buildSeatsFrom(inputs, { composition = true, levers = null, mixFams = MIX_FAMS } = {}) {
   const { hist, comp, ST, SEN } = inputs;
   return inputs.seats.map((sk) => {

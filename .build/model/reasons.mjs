@@ -13,7 +13,7 @@
      state                the state's poll deviation from the national swing
      demo                 the seat's age and gender mix (the vote layer's differentials)
      terms                seat terms: sitting member, defection, part of 2025's surprise going back
-     comp                 One Nation voters' preferences (its new voters carry part of their 2025 party's)
+     comp                 today's voters' preferences (switchers carry part of their 2025 party's; off since no voters are mixed)
 
    Plus the central count's preferences: each origin's net transfer between the two, when they meet in
    the final count.

@@ -5,8 +5,8 @@ import { readFileSync } from "node:fs";
 import { cohortTable, pairShare, cohortKeyFor, FAM_OF_GROUP } from "./senate-flows.mjs";
 import { loadRankings } from "./senate-io.mjs";
 import { FLOW_CLASSES, P5 } from "./seat-engine.mjs";
-import { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, seatGroups, LEVERS, leverLevels, solveCoalAO } from "./seat-build.mjs";
-import { FP_ON } from "../../newtracker/flows.mjs";
+import { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, seatGroups, LEVERS, leverLevels, solveLevel } from "./seat-build.mjs";
+import { FP_ON, FLOW } from "../../newtracker/flows.mjs";
 import { loadHistory, historyRows, stage1Residuals, personKey } from "./swing-fit.mjs";
 export { settings, calibratedTable, flowClassOf, P5_OF, buildSeatsFrom, LEVERS, leverLevels };
 
@@ -97,8 +97,12 @@ export function prepInputs({ year = 2025, composition = true, replay = false, ro
   }
   const us = seats.map((s) => s.uni).filter((v) => v != null), mu = us.reduce((a, b) => a + b, 0) / us.length, sd = Math.sqrt(us.reduce((a, b) => a + (b - mu) ** 2, 0) / us.length);
   for (const s of seats) s.z = s.uni == null ? 0 : (s.uni - mu) / sd;
-  /* 2028 runs: the Coalition's Labor-v-One Nation level is the site's own table (flows.mjs FP_ON.lnp) */
-  if (!replay) { ST.delta["COAL|AO"] = solveCoalAO({ seats, SEN, ST, hist }, FP_ON.lnp); ST.coalAOTarget = FP_ON.lnp; }
+  /* 2028 runs: the two flows that decide most seats sit at the site's own tables - Coalition voters, Labor v
+     One Nation (flows.mjs FP_ON.lnp), and One Nation voters, Labor v Coalition (FLOW.onp, the 2025 count) */
+  if (!replay) {
+    ST.targets = { "COAL|AO": FP_ON.lnp, "ON|AC": FLOW.onp };
+    for (const [k, t] of Object.entries(ST.targets)) ST.delta[k] = solveLevel({ seats, SEN, ST, hist }, k, t);
+  }
   return { seats, hist, comp, ST, SEN };
 }
 const groupOfRes = (c) => (c[3] === "alp" ? "alp" : c[3] === "grn" ? "grn" : c[3] === "onp" ? "on" : c[3] === "lnp" ? ({ LP: "lp", NP: "np", LNP: "lnp", CLP: "clp" }[c[1]] || "lnp") : c[3] === "ind" ? "ind" : "oth");

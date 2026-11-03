@@ -62,7 +62,7 @@ const inputs = {
   asOf: { pollsTo: VOTE.diagnostics.recentWindow.to, windowFrom: VOTE.diagnostics.recentWindow.from, waves: VOTE.diagnostics.recentWindow.waves, modelRun: NOW._provenance.generated },
   vote: { nowcast: VOTE.national.nowcast, result2025: VOTE.national.result2025 },
   settings,
-  build: { ST: inp.ST, comp: inp.comp, hist: { bySeat: histBySeat, mean: inp.hist.mean } },
+  build: { ST: inp.ST, comp: MIX_FAMS.length ? inp.comp : null, hist: { bySeat: histBySeat, mean: inp.hist.mean } },
   levers: Object.fromEntries(Object.entries(LEVERS).map(([k, L]) => [k, { label: L.label, cls: L.cls, x: L.x, y: L.y, also: L.also || null }])),
   leverLevels: Object.fromEntries(Object.entries(leverLevels(inp.SEN, built)).map(([k, v]) => [k, r4(v)])),
   seats,
@@ -114,14 +114,16 @@ const evidence = round({
   flowDrift,
   flows: { delta: FCAL.same.delta, classPooled: FCAL.same.classPooled, sigmaSame: { u: FCAL.same.sigmaU, v: FCAL.same.sigmaV }, sigmaLag: { u: FCAL.lag.sigmaU, v: FCAL.lag.sigmaV }, combine: FCAL.combine, drift: STATES.drift, rows: FCAL.rows, coalitionLaborOnOffset: inp.ST.delta["COAL|AO"] },
   composition: inp.comp,
-  /* whose voters the model mixes from their 2025 parties, and what mixing the Coalition's too would do to
-     its Labor-v-One Nation level (the page says why it doesn't) */
+  /* the two flows set to the site's tables: the level used, the target, what mixing that party's voters by
+     recalled 2025 vote would give (the page says why the model doesn't), and the Coalition's Senate reading */
   compositionUse: (() => {
-    const lv = (seatsB) => leverLevels(inp.SEN, seatsB)["COAL|AO"];
+    const lv = (seatsB, k) => r4(leverLevels(inp.SEN, seatsB)[k]);
+    const T = inp.ST.targets || {};
+    const one = (k, fam) => ({ used: lv(built, k), target: T[k] ?? null, offset: inp.ST.delta[k],
+      ifMixed: lv(buildSeatsFrom(inp, { composition: true, mixFams: [...MIX_FAMS, fam] }), k) });
     return { mixed: MIX_FAMS.map((f) => ["alp", "lnp", "grn", "on"][f]),
-      coalLaborOverOn: { used: r4(lv(built)), ifMixed: r4(lv(buildSeatsFrom(inp, { composition: true, mixFams: [...MIX_FAMS, 1] }))),
-        target: inp.ST.coalAOTarget ?? null, offset: inp.ST.delta["COAL|AO"],
-        senate: r4(lv(buildSeatsFrom({ ...inp, ST: { ...inp.ST, delta: { ...inp.ST.delta, "COAL|AO": 0 } } }, { composition: true }))) } };
+      coalLaborOverOn: { ...one("COAL|AO", 1), senate: lv(buildSeatsFrom({ ...inp, ST: { ...inp.ST, delta: { ...inp.ST.delta, "COAL|AO": 0 } } }, { composition: true }), "COAL|AO") },
+      onLaborOverCoalition: one("ON|AC", 3) };
   })(),
   replay2025: { winners: ok, pairs: pairOk, tcpMaePts: Math.round(10000 * tcpE.reduce((a, b) => a + b, 0) / tcpE.length) / 100, misses },
   states: Object.fromEntries(Object.entries(STATES.results).map(([k, v]) => [k, { label: v.label, senate: v.senate, seats: v.seats, actualSeats: v.actualSeats, replay: v.replay, chain: v.chain }])),
