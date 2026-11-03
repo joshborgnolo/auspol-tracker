@@ -50,6 +50,10 @@ const ACC_CANON = {
   "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
 };
 const accCanon = (f) => ACC_CANON[f] || f;
+/* mirrors gen-data's ACC_EXCLUDED: modelled waves (YouGov MRP 2025) never
+   reach the board – the same firm filed a later conventional poll, and a
+   model is not a poll. Pin the row's absence, not just its non-counting. */
+const ACC_EXCLUDED = new Set(["YouGov MRP"]);
 /* FLOW_LEF is keyed by the election that OPENED the term: the flow table a
    called-election cycle is scored through is the one for the election
    immediately before it. */
@@ -75,11 +79,13 @@ const replayCycle = (src) => {
   for (const p of [...inWindow].sort((a, b) => a.date.localeCompare(b.date)))
     byHouse.set(accCanon(p.firm), p);
   const t = lefFor(Number(src));
-  const raw = [...byHouse.entries()].map(([firm, p]) => {
-    const alp = share2pp(p);
-    const imp = p.tppEra != null ? alp : impliedLefAlp2pp(t, p);
-    return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp, imp };
-  });
+  const raw = [...byHouse.entries()]
+    .filter(([firm]) => !ACC_EXCLUDED.has(firm))
+    .map(([firm, p]) => {
+      const alp = share2pp(p);
+      const imp = p.tppEra != null ? alp : impliedLefAlp2pp(t, p);
+      return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp, imp };
+    });
   if (!raw.length) return null;
   const houses = raw.map((h) => ({
     firm: h.firm, date: h.date, alp2pp: r1(h.alp), err: r1(h.errRaw),
@@ -198,6 +204,16 @@ for (const c of A.cycles) {
   const gal07 = y07 && y07.houses.find((h) => h.firm === "Galaxy");
   ok("2007 Galaxy: printed 52, implied-through-2004-flows 52.3",
     !!gal07 && gal07.alp2pp === 52 && gal07.alp2ppImp === 52.3, JSON.stringify(gal07));
+  /* ACC_EXCLUDED (2026-11-04, user call): the MRP wave never reaches the
+     board – absent from 2025's rows, not merely discounted in them */
+  ok("2025 YouGov MRP is absent from the row set",
+    !y25.houses.some((h) => h.firm === "YouGov MRP"));
+  ok("2025: 10 pollsters, mean 52.3 (miss -2.9), implied mean 52.4 (-2.8)",
+    y25.n === 10 && y25.houses.length === 10 && y25.mean === 52.3 && y25.err === -2.9
+      && y25.meanImp === 52.4 && y25.errImp === -2.8,
+    JSON.stringify({ n: y25.n, rows: y25.houses.length, mean: y25.mean, err: y25.err, meanImp: y25.meanImp, errImp: y25.errImp }));
+  ok("YouGov MRP joins no firms record",
+    !(A.firms || []).some((f) => f.firm === "YouGov MRP") && !(A.firmsImp || []).some((f) => f.firm === "YouGov MRP"));
 }
 
 /* the report line, so a run shows what the toggle's imp side currently says */

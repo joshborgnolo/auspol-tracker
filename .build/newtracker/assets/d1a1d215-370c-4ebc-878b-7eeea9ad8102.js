@@ -3338,6 +3338,9 @@ function AccuracyPanel() {
     const imp = basis === "imp";
     const alpOf = (h) => imp ? (h.alp2ppImp ?? h.alp2pp) : h.alp2pp;
     const errOf = (h) => imp ? (h.errImp ?? h.err) : h.err;
+    /* the modelled waves of gen-data's ACC_EXCLUDED never reach c.houses –
+       they are excluded over there, where the count happens, so this panel
+       needs no filter of its own */
     const hh = (c) => imp ? c.houses.filter((h) => h.errImp != null) : c.houses;
     const cMean = (c) => imp ? (c.meanImp ?? c.mean) : c.mean;
     const cErr = (c) => imp ? (c.errImp ?? c.err) : c.err;
@@ -3525,7 +3528,7 @@ function AccuracyPanel() {
           ))}
         </div>
         <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls have done" }}>
-          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
+          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. YouGov MRP’s modelled 2025 wave is left off entirely – a model is not a poll, and YouGov’s later conventional poll stands as that house’s final word. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
         </RdFoot>
       </RdSec>
     );

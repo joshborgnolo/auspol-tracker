@@ -90,7 +90,10 @@ const restored = await firmBoard();
 ok("flipping back restores the published board", restored === before, restored.slice(0, 120));
 
 // the summary strip and pollster table under the chips follow the basis;
-// figures pinned from the worktree bundle (72 polls, 6 level at 50-50)
+// figures pinned from the worktree bundle (71 polls – the YouGov MRP wave
+// left the board 2026-11-04 – 6 level at 50-50)
+ok("YouGov MRP is nowhere on the board", await page.evaluate(() =>
+  ![...document.querySelectorAll("#final-polls .acc-dot")].some((d) => /YouGov MRP/.test(d.getAttribute("aria-label") || ""))));
 const sumCells = () => page.evaluate(() =>
   [...document.querySelectorAll(".rd-acc-sum .rd-acc-firm")].map((d) => d.innerText.replace(/\s+/g, " ").trim()));
 const statRows = () => page.evaluate(() =>
@@ -101,8 +104,8 @@ ok("table heads are sentence case", thead.length && thead.every((t) => t === "no
 
 let sum = await sumCells(), rows = await statRows();
 ok("strip has four cells", sum.length === 4, sum.join(" | "));
-ok("average miss 1.4, 34 high / 36 low", /^Average miss 1\.4 pts 34 polls too high on Labor, 36 too low/.test(sum[0] || ""), sum[0]);
-ok("wrong side ahead 11 of 72", /^Wrong side ahead 11 of 72 polls/.test(sum[1] || ""), sum[1]);
+ok("average miss 1.4, 34 high / 35 low", /^Average miss 1\.4 pts 34 polls too high on Labor, 35 too low/.test(sum[0] || ""), sum[0]);
+ok("wrong side ahead 11 of 71", /^Wrong side ahead 11 of 71 polls/.test(sum[1] || ""), sum[1]);
 ok("closest is 2016 among multi-pollster elections (not 1972)", /^Closest election 2016 Five pollsters, 0\.4/.test(sum[2] || ""), sum[2]);
 ok("furthest is 2019 (not 1984)", /^Furthest election 2019 Five pollsters, 2\.9/.test(sum[3] || ""), sum[3]);
 /* Ipsos sits out (no longer a current house) and YouGov's single final poll
@@ -118,8 +121,8 @@ ok("note names the six level polls", await page.evaluate(() =>
 await page.evaluate(() => { [...document.querySelectorAll(".rd-acc-basis .rd-chip")][1].click(); });
 await new Promise((r) => setTimeout(r, 400));
 sum = await sumCells(); rows = await statRows();
-ok("implied: 36 high / 34 low", /36 polls too high on Labor, 34 too low/.test(sum[0] || ""), sum[0]);
-ok("implied: wrong side ahead 14 of 72", /^Wrong side ahead 14 of 72/.test(sum[1] || ""), sum[1]);
+ok("implied: 36 high / 33 low", /36 polls too high on Labor, 33 too low/.test(sum[0] || ""), sum[0]);
+ok("implied: wrong side ahead 14 of 71", /^Wrong side ahead 14 of 71/.test(sum[1] || ""), sum[1]);
 ok("implied: furthest 2019 at 3.3", /^Furthest election 2019 Five pollsters, 3\.3/.test(sum[3] || ""), sum[3]);
 ok("implied: Essential 1.4, 0.3 Labor", rows.includes("Essential = 6 = 1.4 pts = 0.3 Labor = 1 of 6"), rows.join(" | "));
 ok("implied: YouGov 1.3, 1.3 Coalition", rows.includes("YouGov = 1 = 1.3 pts = 1.3 Coalition = 0 of 1"), rows.join(" | "));
@@ -131,7 +134,7 @@ ok("implied: no level-poll clause", await page.evaluate(() =>
 await page.evaluate(() => { [...document.querySelectorAll(".rd-acc-basis .rd-chip")][0].click(); });
 await new Promise((r) => setTimeout(r, 400));
 sum = await sumCells();
-ok("flipping back restores 11 of 72", /^Wrong side ahead 11 of 72/.test(sum[1] || ""), sum[1]);
+ok("flipping back restores 11 of 71", /^Wrong side ahead 11 of 71/.test(sum[1] || ""), sum[1]);
 
 await browser.close();
 server.close();

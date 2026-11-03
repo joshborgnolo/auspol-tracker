@@ -7412,7 +7412,11 @@ function sparseSeries(points, months, cap) {
    The campaign's actual final wave (fieldwork 26/27 Nov, printed in The
    Bulletin's election-day issue) is restored in the data and lands 13 days
    out, so 1977 is scored under the standard window like every other
-   election. */
+   election. One wave never reaches the board: an ACC_EXCLUDED row
+   (YouGov MRP's 2025 modelled wave) is a seat model's national readout,
+   not a poll answering the question the field was asked - and the same
+   firm fielded a later conventional poll, which stands as its final word.
+   It is drawn nowhere and counted nowhere here. */
 const ACC_WINDOW_DAYS = 14;
 /* Same operation, renamed on the letterhead. Only renames go in here - Galaxy
    and YouGov are NOT merged, because merging houses to build one longer record
@@ -7424,6 +7428,12 @@ const ACC_CANON = {
   "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
 };
 const accCanon = (f) => ACC_CANON[f] || f;
+/* Left off the board entirely: a modelled wave is not a poll, and where the
+   same firm also filed a later conventional final poll the model is not
+   even its freshest word - one attempt per house is the rule, and two name
+   strings do not make two houses. The fixture test pins the exclusion.
+   User call 2026-11-04. */
+const ACC_EXCLUDED = new Set(["YouGov MRP"]);
 const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   const e = ELECTIONS["e" + c.src];
   const eMs = new Date(e.date).getTime();
@@ -7449,11 +7459,13 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
      (FLOW_LEF) – the eve-of-poll-fair normaliser, which takes each house's
      own allocation method out of its score. Era rows already score implied
      figures (tppEra, FLOW_ERAS), so for them both bases are the one number. */
-  const raw = [...byHouse.entries()].map(([firm, p]) => {
-    const alp = share2pp(p);
-    const imp = p.tppEra != null ? alp : impliedLefAlp2pp(FLOW_LEF[c.year], p);
-    return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp, imp };
-  });
+  const raw = [...byHouse.entries()]
+    .filter(([firm]) => !ACC_EXCLUDED.has(firm))
+    .map(([firm, p]) => {
+      const alp = share2pp(p);
+      const imp = p.tppEra != null ? alp : impliedLefAlp2pp(FLOW_LEF[c.year], p);
+      return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp, imp };
+    });
   if (!raw.length) return null;
   const houses = raw.map((h) => ({
     firm: h.firm, date: h.date, alp2pp: r1(h.alp), err: r1(h.errRaw),
