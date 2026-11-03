@@ -189,6 +189,10 @@ async function fetchIgEmbed(id) {
 // stated, else null until Wikipedia lists it). Spin-off stories can embed
 // the same wave's charts, so one wave per window: the earliest published.
 const storyId = (u) => (String(u ?? "").match(/news-story\/([0-9a-f]{32})/) || [])[1] ?? null;
+const isNews24Url = (u) => {
+  try { return /(^|\.)news24\.com\.au$/.test(new URL(u ?? "").hostname) ? u : null; }
+  catch { return null; }
+};
 async function pulseWaves(D, wikiWaves, notes) {
   if (process.env.N24_PULSE === "0" || WIKI_FILE || NEWS24_FILE || IG_DIR) return []; // test runs stay offline
   const yg = D.polls.filter((p) => p.pollster === "YouGov");
@@ -469,6 +473,52 @@ function news24Published(html) {
   if (!t || isNaN(t)) return { published: null, pubIso: null };
   const published = melbourneMinute(t);
   return published ? { published, pubIso: published.slice(0, 10) } : { published: null, pubIso: null };
+}
+
+// ------------------------------------------------------ provisional stamps
+// News24 drops its waves ~9pm Sydney and its CMS REWRITES the displayed
+// byline overnight to the next-morning edition stamp ("November 4, 2026 -
+// 5:00AM"; the JSON-LD datePublished keeps the true instant in parallel —
+// the 8 Sep 2026 wave was the first observed rewrite). Canon `published` is
+// the FINAL display byline (the T05:00 series). Until 3 Nov 2026 every wave
+// was filed after the rewrite, so the provisional form never reached canon;
+// with the evening comb filing waves hours after they drop, the provisional
+// stamp can land — and this leg keeps the row honest afterwards: every run
+// re-reads a fresh evening-stamped YouGov row until the byline takes its
+// final form, then stops (the rewrite habit is overnight, so tries stop
+// after RESTAMP_DAYS rather than re-fetching forever).
+const N24_PRO_STAMP = /T(?:1[89]|2[0-3]):\d{2}$/;
+const RESTAMP_DAYS = 10;
+function needsRestamp(date, published, todayIso) {
+  if (!published || !N24_PRO_STAMP.test(published)) return false;
+  const age = Math.round((Date.parse(`${todayIso}T00:00:00Z`) - Date.parse(`${date}T00:00:00Z`)) / 86400000);
+  return age >= 0 && age <= RESTAMP_DAYS;
+}
+// Adopt only a stamp inside the wave's plausible window — a byline landing
+// outside [wave day − 1, wave day + 3] is a parse fault, not a rewrite.
+function restampOk(date, next) {
+  const d = Date.parse(`${date}T00:00:00Z`);
+  const n = Date.parse(`${String(next).slice(0, 10)}T00:00:00Z`);
+  return Number.isFinite(n) && n >= d - 86400000 && n <= d + 3 * 86400000;
+}
+// fetchArticle(url) -> article html or null. Mutates rows it re-stamps and
+// returns the dates it changed; a wave whose byline still shows the
+// provisional stamp is retried on later runs. Never throws: a hiccup retry
+// is cheaper than a red run over a display stamp.
+async function restampProvisional(rows, { fetchArticle, todayIso }) {
+  const out = [];
+  for (const row of rows) {
+    if (!needsRestamp(row.date, row.published, todayIso)) continue;
+    try {
+      const html = await fetchArticle(row.url);
+      if (!html) continue;
+      const { published } = news24Published(html);
+      if (!published || published === row.published || !restampOk(row.date, published)) continue;
+      row.published = published;
+      out.push(row.date);
+    } catch { /* a fetch/parse hiccup retries quietly next run */ }
+  }
+  return out;
 }
 
 function news24Window(t, pubIso) {
@@ -1132,7 +1182,7 @@ const readOr = (f) => { try { return readFileSync(f, "utf8"); } catch { return n
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, wikiEfns, wikiLnpQld, wikiUndecided, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, wikiEfns, wikiLnpQld, wikiUndecided, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction, needsRestamp, restampProvisional, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [], warnings: [] };
 
@@ -1322,10 +1372,6 @@ try {
     const addDerived = (key, rows, row) => {
       if (!firmRowExists(key, row.date)) rows.push(row);
     };
-    const isNews24Url = (u) => {
-      try { return /(^|\.)news24\.com\.au$/.test(new URL(u ?? "").hostname) ? u : null; }
-      catch { return null; }
-    };
     // Unfinished upgrades, walk-back (2026-10-07): this gate once upgraded
     // the LATEST wave alone, so a wave whose enrichment leg failed two
     // fortnights running could never catch up. Any existing News24-client
@@ -1483,6 +1529,26 @@ try {
   // run's output is green otherwise and these vanish into the log tail.
   for (const u of status.fallback?.unparsed ?? []) status.warnings.push(`wave not filed: ${u}`);
 
+  // Re-stamp a provisional evening publication stamp with the FINAL display
+  // byline News24 writes overnight (restampProvisional) — the evening comb
+  // can file a wave hours before the rewrite lands, and canon is the final
+  // stamp. Offline-kept test runs skip it like the Pulse-topic legs.
+  if (!WIKI_FILE && !NEWS24_FILE && !IG_DIR && process.env.N24_RESTAMP !== "0") {
+    try {
+      const dates = await restampProvisional(
+        D.polls.filter((p) => p.pollster === "YouGov" && isNews24Url(p.url)),
+        {
+          fetchArticle: async (url) => {
+            try { return (await fetchNews24Article(url)).html; } catch { return null; }
+          },
+          todayIso: today(),
+        });
+      if (dates.length) status.news24.restamped = dates;
+    } catch (e) {
+      console.error(`N24_NOTE restamp: ${e?.message ?? e}`);
+    }
+  }
+
   // One-off questions (Beyond the vote) are filed by hand into
   // data/news24-one-offs.json, and companion stories carry some of each
   // wave's — so each run audits the Pulse stories since the latest wave
@@ -1513,7 +1579,7 @@ try {
     process.exit(2);
   }
 
-  if (sources.length || status.releaseFilled.length || status.news24?.stamped?.length) {
+  if (sources.length || status.releaseFilled.length || status.news24?.stamped?.length || status.news24?.restamped?.length) {
     if (newPolls.length) D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr], ["altTpp", newAlt], ["ppmHeadToHead", newPpmH]]) {
       if (!rows.length) continue;
@@ -1531,6 +1597,7 @@ try {
       if (newPolls.length) parts.push(`+${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
       if (status.news24.upgraded.length) parts.push(`enriched latest News24 wave: ${status.news24.upgraded.join(", ")}`);
       if (status.news24?.stamped?.length) parts.push(`published stamp only (source conflict): ${status.news24.stamped.join(", ")}`);
+      if (status.news24?.restamped?.length) parts.push(`restamped final publication byline: ${status.news24.restamped.join(", ")}`);
       if (status.releaseFilled.length) parts.push(`releaseUrl filled: ${status.releaseFilled.join(", ")}`);
       console.log(`wrote ${OUT}: ${parts.join(", ")}`);
     }
