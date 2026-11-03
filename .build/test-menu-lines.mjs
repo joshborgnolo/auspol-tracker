@@ -136,7 +136,7 @@ const fresh = (mutate) => {
   const S0 = { asOf: "2026-10-09", total: 76, seats: { alp: 30, lnp: 27, grn: 10, onp: 4, ind: 2, oth: 3 } };
   const H0 = { asOf: "2026-10-25", total: 150, seats: { alp: 94, lnp: 41, grn: 1, onp: 2, ind: 10, oth: 2 }, changed: 4, senate: S0 };
   assert.deepEqual(line(H0), { head: "Labor holds 94 of the 150 seats; four have changed hands or party since the election",
-    fig: { v: "63% | 39%", cap: "Labor’s share of HoR and Senate seats", tone: "alp" } },
+    fig: { v: "63% | 39%", cap: "Labor’s share of House and Senate seats", tone: "alp" } },
     "one line, House then Senate: the largest party's share of each (94/150 = 63%, 30/76 = 39%), the House count in the head");
   assert.equal(line({ ...H0, senate: { ...S0, seats: { ...S0.seats, alp: 31 } } }).fig.v, "63% | 41%",
     "the Senate share reads the data assembly, not a restated constant");
@@ -145,14 +145,14 @@ const fresh = (mutate) => {
   const coalition = { ...H0, seats: { alp: 60, lnp: 80, grn: 2, onp: 1, ind: 6, oth: 1 }, changed: 0,
     senate: { asOf: "2026-10-09", total: 76, seats: { alp: 25, lnp: 38, grn: 5, onp: 3, ind: 3, oth: 2 } } };
   assert.deepEqual(line(coalition), { head: "The Coalition holds 80 of the 150 seats",
-    fig: { v: "53% | 50%", cap: "Coalition’s share of HoR and Senate seats", tone: "lnp" } }, "the Coalition's 80/150 and 38/76 when it holds most");
+    fig: { v: "53% | 50%", cap: "Coalition’s share of House and Senate seats", tone: "lnp" } }, "the Coalition's 80/150 and 38/76 when it holds most");
   /* a House-only dataset keeps the pre-Senate single share */
   const houseOnly = { ...H0 }; delete houseOnly.senate;
   assert.deepEqual(line(houseOnly).fig, { v: "63%", cap: "Labor seats", tone: "alp" }, "no Senate tally, the House figure alone");
   assert.equal(line(null), null, "no House data (the /vic/ page), no line: the tip stands");
   const built = fresh().menuLines().map;
   assert.ok(built && /^(Labor|The Coalition) holds \d+ of the \d+ seats/.test(built.head), "the built dataset carries the House");
-  assert.ok(built && built.fig && /^\d+% \| \d+%$/.test(built.fig.v) && /’s share of HoR and Senate seats$/.test(built.fig.cap),
+  assert.ok(built && built.fig && /^\d+% \| \d+%$/.test(built.fig.v) && /’s share of House and Senate seats$/.test(built.fig.cap),
     "the built dataset carries both chambers' shares on one line");
 }
 

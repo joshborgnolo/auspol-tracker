@@ -387,7 +387,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const party = lead === "alp" ? "Labor" : "Coalition", share = (x, t) => `${Math.round((100 * x) / t)}%`;
       const S = H.senate;
       const fig = S && S.seats && typeof S.seats[lead] === "number"
-        ? { v: `${share(n, H.total)} | ${share(S.seats[lead], S.total)}`, cap: `${party}’s share of HoR and Senate seats`, tone: lead }
+        ? { v: `${share(n, H.total)} | ${share(S.seats[lead], S.total)}`, cap: `${party}’s share of House and Senate seats`, tone: lead }
         : { v: share(n, H.total), cap: `${party} seats`, tone: lead };
       return { head, fig };
     });
