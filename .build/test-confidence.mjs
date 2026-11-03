@@ -20,7 +20,8 @@ const CONFIDENCE = path.join(ROOT, ".build", "confidence.mjs");
 
 process.env.CONFIDENCE_LIB = "1";
 const { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName,
-        resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf } = await import("./confidence.mjs");
+        resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf,
+        daJson } = await import("./confidence.mjs");
 
 /* ---------------------------------------------------------------- 1. grammar */
 const C = { anchor: SERIES.consumer.anchor, band: SERIES.consumer.band };
@@ -314,6 +315,37 @@ console.log("1b. westpac+NAB grammar: OK");
 assert.deepEqual(surveyMonthOf({ slug: "10336-roy-morgan-business-confidence-august-2026", date: "2026-09-08" }), { mon: 7, yr: 2026 });
 assert.deepEqual(surveyMonthOf({ slug: "roy-morgan-business-confidence-plummeted-14-2pts", date: "2026-05-04" }), { mon: 3, yr: 2026 });
 console.log("1c. enrichment grammar: OK");
+
+/* ------------------------------------- 1d. demosau sgcaptcha wall recovery */
+// live 2026-11-03: demosau.com's WP JSON answered with the SiteGround
+// wall's HTML and the lane's unguarded JSON.parse crashed the whole step
+// (FAIL "did not finish: confidence"). daJson solves the wall in-process
+// and re-reads; a page that still isn't JSON throws as loudly as before.
+{
+  const SEARCH = "https://demosau.com/wp-json/wp/v2/search?search=test";
+  const WALL = '<html><head><meta http-equiv="refresh" content="0;https://demosau.com/sgcaptcha/check"></head><body>sgcaptcha</body></html>';
+  const CHAL = 'sgchallenge="12:confidencetest" sgsubmit_url="https://demosau.com/?sgcaptcha=solve"';
+  const JSON_BODY = JSON.stringify([{ id: 1, title: "ok" }]);
+  let walled = true;
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u === SEARCH) return new Response(walled ? WALL : JSON_BODY);
+    if (u === "https://demosau.com/sgcaptcha/check") return new Response(CHAL);
+    if (u.includes("sol=")) { walled = false; return new Response("ok"); }
+    throw new Error("unexpected fetch " + u);
+  };
+  try {
+    const got = await daJson(SEARCH);
+    assert.deepEqual(got, [{ id: 1, title: "ok" }], "the wall solves and the JSON re-reads");
+    // a plain HTML error page (no sgcaptcha offer) still throws loudly
+    globalThis.fetch = async () => new Response("<html><head><title>405</title></head><body>no</body></html>");
+    await assert.rejects(() => daJson(SEARCH), SyntaxError, "a non-JSON HTML page never parses silently");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+console.log("1d. demosau wall recovery: OK");
 
 /* ------------------------------------------------------- 2. full pipeline */
 const tmp = fs.mkdtempSync(path.join(fs.realpathSync.native ? "/tmp/" : "/tmp/", "confidence-test-"));

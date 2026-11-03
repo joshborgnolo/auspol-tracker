@@ -916,7 +916,7 @@ const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
    (the page's `prev_poll` block is empty so far). The figure prints to a
    50-neutral scale and files RAW — the rd-panels lane's `scale` plots it
    ×2 to the shared 100-neutral line, the pattern NAB's +100 shift set. */
-import { fetchBuffer as daFetchBuffer } from "./demosau-fetch.mjs";
+import { fetchBuffer as daFetchBuffer, passSgCaptcha as daPassSgCaptcha } from "./demosau-fetch.mjs";
 const DA_CSI_SEARCH = "https://demosau.com/wp-json/wp/v2/search?search=consumer+sentiment+index&per_page=20";
 const DA_CSI_TITLE = /consumer sentiment index/i;
 const DA_CSI_STATE = /queensland|\bqld\b|victoria|new south wales|western australia|south australia|tasmania/i;
@@ -942,14 +942,28 @@ function csiParseBlock(html) {
   return null;
 }
 
+/* The WP JSON endpoints answer CI traffic with the SiteGround wall's HTML
+   some of the time; an unguarded JSON.parse on that page crashed the whole
+   step (live 2026-11-03 run). Solve the wall in-process once — the pass
+   cookie then rides demosau-fetch's shared jar for everything after — the
+   same pattern crosstab-sources.mjs and extract-sampleeff.mjs use. A page
+   that still isn't JSON throws, as loudly as every other fetch error. */
+async function daJson(url) {
+  let text = (await daFetchBuffer(url)).toString("utf8");
+  if (text.includes("sgcaptcha") && (await daPassSgCaptcha(text, url))) {
+    text = (await daFetchBuffer(url)).toString("utf8");
+  }
+  return JSON.parse(text);
+}
+
 async function demosauConfidenceRows() {
   const out = [];
-  const search = JSON.parse((await daFetchBuffer(DA_CSI_SEARCH)).toString("utf8"));
+  const search = await daJson(DA_CSI_SEARCH);
   const cand = search.filter((x) => DA_CSI_TITLE.test(x.title || "") && !DA_CSI_STATE.test(x.title || "")).slice(0, 6);
   for (const c of cand) {
     let post = null, html = null, link = null;
     try {
-      post = JSON.parse((await daFetchBuffer(`https://demosau.com/wp-json/wp/v2/posts/${c.id}`)).toString("utf8"));
+      post = await daJson(`https://demosau.com/wp-json/wp/v2/posts/${c.id}`);
       link = (post.content?.rendered || "").match(DA_CSI_PAGE);
       if (!link) continue;
       html = (await daFetchBuffer(link[0])).toString("utf8");
@@ -1062,7 +1076,7 @@ async function rowsFor(name) {
 
 // -------------------------------------------------------------------- main
 export { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName, htmlToText,
-         resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf };
+         resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf, daJson };
 if (!process.env.CONFIDENCE_LIB) {
 const consumer = await rowsFor("consumer");
 const business = await rowsFor("business");
