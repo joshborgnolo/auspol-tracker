@@ -1,0 +1,25 @@
+{
+  "source": "wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b",
+  "published": null,
+  "fieldwork": {
+    "date": "2026-11-03",
+    "dateStart": "2026-10-27",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 25,
+    "lnp": 23,
+    "grn": 13,
+    "onp": 27,
+    "ind": 5,
+    "oth": 7,
+    "tpp_alp": 50,
+    "tpp_lnp": 50
+  },
+  "satisfaction": null,
+  "ppm": null,
+  "altTpp": null,
+  "infogram": null
+}

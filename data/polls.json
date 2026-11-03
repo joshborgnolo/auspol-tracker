@@ -6297,6 +6297,22 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9"
+    },
+    {
+      "date": "2026-11-03",
+      "dateStart": "2026-10-27",
+      "pollster": "YouGov",
+      "client": "News24",
+      "sample": 1500,
+      "alp": 25,
+      "lnp": 23,
+      "grn": 13,
+      "onp": 27,
+      "ind": 5,
+      "oth": 7,
+      "tpp_alp": 50,
+      "tpp_lnp": 50,
+      "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b"
     }
   ],
   "ppm": [
