@@ -4036,7 +4036,7 @@ function RdAllPolls(P) {
         {facet === "twopp" && !ctlNarrow && (
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>{flip}
-            <span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span>{qpop}
+            <span className="rd-pl-ctl-l">, {pub ? "as published" : window.AP.flowsUser ? "your flows" : "implied flows"}</span>{qpop}
           </span>
         )}
         {facet === "demographics" && !ctlNarrow && splitPicker}
@@ -4058,7 +4058,7 @@ function RdAllPolls(P) {
           {ctlRow && (
             <div className="rd-ap-ctlslot">
               {facet === "twopp" && (
-                <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
+                <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : window.AP.flowsUser ? "your flows" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
               )}
               {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
               {facet === "primary" && <div className="rd-ap-pctl">{consFlip}<span className="rd-grow"></span>{consQpop}</div>}

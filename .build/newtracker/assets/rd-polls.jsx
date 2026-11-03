@@ -537,7 +537,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const flipPick = () => { pinPl(); if (setTppMatchup) setTppMatchup(onMatch ? "alp_lnp" : "alp_on"); };
   const basisPick = () => { pinPl(); setTppBasis(basis === "imp" ? "resp" : "imp"); };
 
-  const basisWord = onMatch ? (basis === "resp" ? "as published" : "implied flows") : (basis === "resp" ? "as published" : "implied flows");
+  const basisWord = basis === "resp" ? "as published" : window.AP.flowsUser ? "your flows" : "implied flows";
   const controls = facet === "twopp" && (
     <span className="rd-pl-ctl">
       {!narrow && <span className="rd-pl-ctl-l">Two-party:</span>}

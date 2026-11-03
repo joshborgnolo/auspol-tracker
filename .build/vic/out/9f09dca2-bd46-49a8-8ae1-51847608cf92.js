@@ -93,7 +93,7 @@ window.AUSPOL = (function () {
      Nation the built one (flows.mjs FP_ON) with its ± range. One home, so
      All polls' implied sampling floors and Info's working read the numbers
      the estimator reads. */
-  const flowTables = {"lnp":{"alp":1,"lnp":0,"grn":0.86,"onp":0.255,"oth":0.491},"onp":{"alp":1,"lnp":0.27,"grn":0.91,"onp":0,"oth":0.55},"onBand":{"lnp":0.04,"grn":0.025,"oth":0.04}};
+  const flowTables = {"lnp":{"alp":1,"lnp":0,"grn":0.86,"onp":0.255,"oth":0.491},"onp":{"alp":1,"lnp":0.27,"grn":0.91,"onp":0,"oth":0.55},"onBand":{"lnp":0.04,"grn":0.025,"oth":0.04},"cnr":0,"onp22":null};
   /* The preference-flow history chart's per-jurisdiction series: the share
      of each bucket's ballots that ended with Labor at each election, per
      cent. fed is the FLOW_HISTORY display table typed in flows.mjs; each
@@ -272,7 +272,7 @@ window.AUSPOL = (function () {
      the estimator constants it runs on (the source lines carry the drift
      rule: change a constant there, it tracks here) and the canonical
      house roster the menu lists (aggregable houses, first-seen order) */
-  const aggSpec = {"window":21,"half":7,"taper":14,"deff":1.6,"sampleCap":3000,"heWindow":28,"heHalf":90,"shrinkK":1.5};
+  const aggSpec = {"window":21,"half":7,"taper":14,"deff":1.6,"sampleCap":3000,"heWindow":28,"heHalf":90,"shrinkK":1.5,"leanStaleDays":107};
   const pvHouses = ["Resolve","Roy Morgan","RedBridge/Accent","Wolf & Smith","DemosAU","Newspoll","Freshwater","YouGov (MRP)"];
   const showWorking = {};
   const events = [{"date":"2023-09-27","x":2023.7369863013698,"short":"Allan Premier","label":"Jacinta Allan becomes Premier","desc":"Daniel Andrews resigns; Jacinta Allan is elected Labor leader and sworn in as Premier.","major":true},{"date":"2024-12-27","x":2024.9863387978141,"short":"Battin leads Libs","label":"Brad Battin becomes Liberal leader","desc":"A party-room spill replaces John Pesutto with Brad Battin as Opposition Leader.","major":false},{"date":"2025-11-18","x":2025.8794520547945,"short":"Wilson leads Libs","label":"Jess Wilson becomes Liberal leader","desc":"Jess Wilson replaces Brad Battin as Liberal leader and Opposition Leader.","major":false},{"date":"2026-07-28","x":2026.5698630136985,"short":"Carroll Premier","label":"Ben Carroll becomes Premier","desc":"Jacinta Allan steps down; Ben Carroll is elected unopposed as Labor leader and becomes Premier.","major":true},{"date":"2026-08-02","x":2026.5835616438355,"short":"Pickering leads ON","label":"Warren Pickering leads One Nation in Victoria","desc":"One Nation names Warren Pickering its Victorian leader for the state election.","major":false}];

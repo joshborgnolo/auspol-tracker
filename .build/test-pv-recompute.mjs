@@ -80,4 +80,73 @@ const fresh = (mutate) => {
   assert.equal(out.months.length, 0, "no polls, no months");
 }
 
-console.log("PASS: pv recompute – all-house parity with the build's estimator, subset month scoping, the dry state");
+/* ---- the More menu's flow editor (flowAgg / setFlows): at the site's own
+   table it reproduces every implied figure the build emitted, exactly; a
+   reader's table moves them as the arithmetic says; a reset puts back
+   precisely what was built */
+{
+  const AP = fresh();
+  const D = AP.D, J = JSON.stringify;
+  const o = AP.flowAgg(D.flowTables);
+  assert.equal(J(o.synth2pp), J(D.synth2pp), "synth2pp (§1b) reproduced");
+  assert.equal(J(o.synthLatest), J(D.synthLatest), "synthLatest (§7b) reproduced");
+  assert.equal(J(o.flowSens), J(D.flowSens), "flowSens (§1c) reproduced");
+  assert.equal(J(o.synthOn), J(D.synthOn), "synthOn (§1d) reproduced");
+  assert.equal(J(o.onImp), J(D.latest.onImp), "latest.onImp (§7f) reproduced");
+  assert.equal(J(o.rivalWalk), J(D.rivalWalk), "rivalWalk (§8) reproduced");
+  assert.equal(o.rivalLead, D.latest.rivalLead, "rivalLead reproduced");
+  let polls = 0;
+  for (const q of [...D.individualPolls, ...(D.pollsterTable || [])]) {
+    const r = o.pollImp(q);
+    if (!r) continue;
+    polls++;
+    assert.equal(r.alpImp, q.alpImp, q.pollster + " " + q.released + " alpImp");
+    if (q.alpOnImp != null) assert.equal(r.alpOnImp, q.alpOnImp, q.pollster + " " + q.released + " alpOnImp");
+  }
+  assert.ok(polls > 100, "every poll's implied pair re-read (" + polls + ")");
+  /* All polls' yardsticks (§3c yd, yardLine) and pulls (§3b eff) on the
+     two implied series - every entry the build emitted, the Latest table's
+     rows read through their archive twins */
+  assert.equal(J(o.yardLine.imp), J(D.yardLine.imp), "yardLine.imp reproduced");
+  assert.equal(J(o.yardLine.onimp), J(D.yardLine.onimp), "yardLine.onimp reproduced");
+  let yards = 0;
+  for (const q of [...D.individualPolls, ...(D.pollsterTable || [])]) {
+    const y = o.pollYard(q);
+    for (const k of ["imp", "onimp"]) {
+      if (q.yd && q.yd[k]) { yards++; assert.equal(J(y.yd[k]), J(q.yd[k]), `${q.pollster} ${q.released} yd.${k}`); }
+      if (q.eff && q.eff[k]) { yards++; assert.equal(J(y.eff[k]), J(q.eff[k]), `${q.pollster} ${q.released} eff.${k}`); }
+    }
+  }
+  assert.ok(yards > 300, "yardsticks and pulls checked (" + yards + ")");
+  /* Pollster leans on the implied series: the monthly walk and the snapshot */
+  assert.equal(J(o.houseLean.imp), J(D.houseLean.imp), "houseLean.imp reproduced");
+  assert.equal(J(o.houseLean.onimp), J(D.houseLean.onimp), "houseLean.onimp reproduced");
+  assert.equal(J(o.houseEffects.synth), J(D.houseEffects.synth), "houseEffects.synth reproduced");
+  assert.equal(J(o.houseEffects.synthOn), J(D.houseEffects.synthOn), "houseEffects.synthOn reproduced");
+
+  /* Greens 10 points lower: the Labor v Coalition level falls by about a
+     tenth of the Greens primary; the One Nation contest's table is untouched */
+  const before = { s: D.synthLatest, on: D.latest.onImp, ft: D.flowTables };
+  assert.equal(AP.setFlows({ lnp: { grn: D.flowTables.lnp.grn - 0.1 } }), true, "setFlows runs");
+  const drop = before.s.alp - D.synthLatest.alp, g = D.latest.primary.grn / 10;
+  assert.ok(Math.abs(drop - g) < 0.4, `Greens -10: ${drop.toFixed(2)} pts down v ~${g.toFixed(2)}`);
+  assert.equal(J(D.latest.onImp), J(before.on), "the other table's figures stand");
+  assert.ok(AP.flowsUser && D.flowTables !== before.ft, "the reader's table is in the data");
+  assert.equal(AP.flowsSite(), before.ft, "the site's table is kept aside");
+  AP.setFlows(null);
+  assert.equal(AP.flowsUser, null, "reset");
+  assert.equal(D.synthLatest, before.s, "reset restores the built object itself");
+  assert.equal(D.flowTables, before.ft);
+  const q0 = D.individualPolls.find((q) => q.yd && q.yd.imp && q.eff && q.eff.imp);
+  const k0 = { yd: q0.yd, eff: q0.eff, line: D.yardLine };
+  AP.setFlows({ onp: { lnp: 0.5 } });
+  assert.notEqual(J(q0.yd.onimp), J(k0.yd.onimp), "a reader's One Nation table moves the poll's yardstick on it");
+  assert.equal(J(q0.yd.imp), J(k0.yd.imp), "and leaves the classic one");
+  AP.setFlows(null);
+  assert.ok(q0.yd === k0.yd && q0.eff === k0.eff && D.yardLine === k0.line, "reset hands back the built yardsticks");
+  /* typing the site's own cell back is the site's table, not a custom one */
+  AP.setFlows({ lnp: { grn: before.ft.lnp.grn } });
+  assert.equal(AP.flowsUser, null, "a table equal to the site's is no table of the reader's");
+}
+
+console.log("PASS: pv recompute – all-house parity with the build's estimator, subset month scoping, the dry state, the flow editor's exact parity");

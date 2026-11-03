@@ -222,10 +222,11 @@ window.AP = (function () {
       val: (p) => (p.p.lnp != null && p.p.onp != null ? p.p.lnp + p.p.onp : null), share: (p) => p.p.lnp + p.p.onp },
     { id: "rd_on_imp",  facet: "rd", label: "ALP v ON (implied)", color: "var(--onp)",
       val: (p) => p.alpOnImp, share: (p) => p.alpOnImp,
-      flows: D.flowTables.onp },
+      // read when used: a reader's own table (the More menu's flow editor) swaps flowTables
+      get flows() { return window.AUSPOL.flowTables.onp; } },
     { id: "rd_lnp_imp", facet: "rd", label: "ALP v L/NP (implied)", color: "var(--lnp)",
       val: (p) => p.alpImp, share: (p) => p.alpImp,
-      flows: D.flowTables.lnp },
+      get flows() { return window.AUSPOL.flowTables.lnp; } },
   ];
   /* the variance of a respondent's flow to Labor over a poll's primaries */
   const flowVar = (p, F) => {

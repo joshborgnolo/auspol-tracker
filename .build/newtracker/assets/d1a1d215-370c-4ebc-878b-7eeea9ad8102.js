@@ -42,6 +42,71 @@ const DownloadIcon = () => (
 // hands it down): the same definitions and the same nowcast accessor as the
 // hero readout, so the two figures can never disagree.
 // ====================================================================
+/* ====================================================================
+   TmFlowCell - one editable share in the More menu's flows explainer row.
+   The row's six numbers are the two flow tables every implied two-party
+   figure is read through (menu-lines.js flowsExplainedFig). A reader can
+   type their own share over any of them: pv-agg.js setFlows re-reads every
+   implied figure through the new table, and App remounts the views on it.
+   Commits on Enter, on leaving the field, or once typing pauses; arrow
+   keys step it one point (Shift: five) and commit at once; Escape puts the
+   draft back. A number typed back to the site's own rounded share restores
+   the site's exact cell (88 is 88.19, not 88.00). The keys stay inside the
+   field: the menu's own Tab, Space, arrows and digits would otherwise act
+   on the row.
+   ==================================================================== */
+const TM_FLOW_WHO = { grn: "Greens", onp: "One Nation", lnp: "Coalition", oth: "Other" };
+function TmFlowCell({ table, k, tone }) {
+  const AP = window.AP;
+  const cur = AP.D.flowTables[table][k], site = AP.flowsSite()[table][k];
+  const shown = String(Math.round(cur * 100));
+  const [draft, setDraft] = React.useState(null);
+  const timer = React.useRef(0);
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const commit = (txt) => {
+    clearTimeout(timer.current);
+    setDraft(null);
+    const v = parseInt(txt, 10);
+    if (!Number.isFinite(v)) return;
+    const x = Math.max(0, Math.min(100, v));
+    if (x === Math.round(cur * 100)) return;
+    const U = AP.flowsUser || {};
+    const share = x === Math.round(site * 100) ? site : x / 100;
+    AP.setFlows({ lnp: { ...(U.lnp || {}) }, onp: { ...(U.onp || {}) }, [table]: { ...(U[table] || {}), [k]: share } });
+  };
+  const val = draft != null ? draft : shown;
+  const rival = table === "lnp" ? "the Coalition" : "One Nation";
+  return (
+    <input className={"tm-in tm-" + tone + (cur !== site ? " tm-ed" : "")} type="text" inputMode="numeric" pattern="[0-9]*"
+           autoComplete="off" spellCheck={false} maxLength={3}
+           style={{ width: Math.max(1, val.length) + 0.25 + "ch" }}
+           value={val}
+           title={"Change the share of " + TM_FLOW_WHO[k] + " voters’ preferences reaching Labor against " + rival}
+           aria-label={TM_FLOW_WHO[k] + " voters’ preferences to Labor against " + rival + ", per cent"
+             + (cur !== site ? " (yours; the site uses " + Math.round(site * 100) + ")" : "")}
+           onFocus={(e) => e.target.select()}
+           onChange={(e) => {
+             const d = e.target.value.replace(/[^0-9]/g, "").slice(0, 3);
+             setDraft(d);
+             clearTimeout(timer.current);
+             if (d) timer.current = setTimeout(() => commit(d), 700);
+           }}
+           onBlur={() => { if (draft != null) commit(draft); }}
+           onKeyDown={(e) => {
+             if (e.key === "Enter") { e.preventDefault(); commit(val); }
+             else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+               e.preventDefault();
+               const base = parseInt(val, 10);
+               commit(String((Number.isFinite(base) ? base : Math.round(cur * 100)) + (e.key === "ArrowUp" ? 1 : -1) * (e.shiftKey ? 5 : 1)));
+             } else if (e.key === "Escape") {
+               if (draft == null) return;           // nothing typed: the menu's Escape closes it
+               e.preventDefault(); clearTimeout(timer.current); setDraft(null);
+             }
+             e.stopPropagation();
+           }} />
+  );
+}
+
 function TabScore({ onGoHero, matchup, tppBasis = "imp" }) {
   const MM = window.AP.tppMatchups;
   // the 2PP basis (respondent-allocated vs implied) comes down as a prop
@@ -531,8 +596,16 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
      while the menu is open; a page whose finding can't be read keeps its
      tip */
   const rdMenu = !!window.AP.rd;
+  /* a reader's own flow table (TmFlowCell, pv-agg.js setFlows) moves the
+     explainer's figure and the implied basis under the other lines */
+  const [flowsTick, setFlowsTick] = useState(0);
+  React.useEffect(() => {
+    const on = () => setFlowsTick((n) => n + 1);
+    window.addEventListener("ap:flows", on);
+    return () => window.removeEventListener("ap:flows", on);
+  }, []);
   const menuLines = React.useMemo(() => (menuOpen && rdMenu && window.AP.menuLines
-    ? window.AP.menuLines({ pub: tppBasis === "resp" }) : null), [menuOpen, rdMenu, tppBasis]);
+    ? window.AP.menuLines({ pub: tppBasis === "resp" }) : null), [menuOpen, rdMenu, tppBasis, flowsTick]);
   /* a menu page swaps in place like a tab; a modified click opens its document.
      An ext entry (the Election map, a page outside this build) is a plain
      link: the browser follows its href */
@@ -846,6 +919,40 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                    wider column than the single-figure rows, taken out of the
                    text cell, so each trio's caption holds one line */
                 const rows = fig && fig.rows;
+                /* the explainer's numbers are fields (TmFlowCell) once the
+                   editor has loaded: the row becomes a link over the
+                   numeral and line, stretched across the row, with the
+                   figure beside it rather than inside it (a field inside a
+                   link would follow it on every click) */
+                const editable = rows && !(ln && ln.chip) && rows.every((r) => r.table) && window.AP.flowsEditable && window.AP.flowsEditable();
+                if (editable) return (
+                  <div key={t.id} role="none" data-id={t.id}
+                       className={"tab-menu-item tab-menu-wide tab-menu-split" + (active === t.id ? " on" : "")}>
+                    <a role="menuitem" tabIndex={-1} className="tab-menu-link" href={menuHref(t)}
+                       aria-current={active === t.id ? "page" : undefined}
+                       onClick={menuPick(t.id)}>
+                      <span className="tab-menu-n" aria-hidden="true">{i + 1}</span>
+                      <span className="tab-menu-txt">
+                        <span className="tab-menu-t">{t.label}</span>
+                        <span className="tab-menu-d">{ln.head}</span>
+                      </span>
+                    </a>
+                    <span className="tab-menu-f" role="group" aria-label="Preference flows to Labor, per cent: change any number">
+                      {fig.rows.map((r) => (
+                        <span className="tab-menu-fr" key={r.table}>
+                          <span className="tab-menu-fv">
+                            {r.cells.map((c) => <TmFlowCell key={c.k} table={r.table} k={c.k} tone={c.tone} />)}
+                          </span>
+                          <span className="tab-menu-fc">{r.cap}</span>
+                        </span>
+                      ))}
+                      {window.AP.flowsUser && (
+                        <span className="tab-menu-fc tm-yours">Your flows · <button type="button" className="tm-reset"
+                          onClick={() => window.AP.setFlows(null)}>Reset</button></span>
+                      )}
+                    </span>
+                  </div>
+                );
                 return (
                   <a key={t.id} role="menuitem" tabIndex={-1}
                      className={"tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : "")}

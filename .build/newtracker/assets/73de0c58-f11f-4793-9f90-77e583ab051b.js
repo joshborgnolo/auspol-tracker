@@ -865,6 +865,13 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
    and the pairs are the same arrays every time they are asked for). */
 const HERO_VIEWS = {};
 const HERO_PAIRS = {};
+/* a reader's own flow table (the More menu's editor, pv-agg.js setFlows)
+   re-reads the implied series and every poll's implied pair: drop the
+   kept views before App remounts the views on the same event */
+window.addEventListener("ap:flows", () => {
+  for (const k of Object.keys(HERO_VIEWS)) delete HERO_VIEWS[k];
+  for (const k of Object.keys(HERO_PAIRS)) delete HERO_PAIRS[k];
+});
 function heroPairs(key, fn) {
   const memo = HERO_PAIRS[key] || (HERO_PAIRS[key] = { fn, map: new WeakMap() });
   return (p) => {
@@ -2485,6 +2492,23 @@ function App() {
      for the same reason the matchup is: the docked 2PP score must follow
      it, and the hero unmounts when the reader walks off the Snapshot tab. */
   const [tppBasis, setTppBasis] = useState("imp");
+  /* The More menu's flow editor (pv-agg.js setFlows) swaps a reader's own
+     table into the data and re-reads every implied figure through it. The
+     views are built from the data as they mount - kept series, memoised
+     findings, copy written from them - so they remount on each change
+     (flowEpoch keys them) rather than each learning to listen. The hero
+     follows the rival ruling where it was on the ruled contest: a reader
+     who chose the other contest keeps it. */
+  const [flowEpoch, setFlowEpoch] = useState(0);
+  React.useEffect(() => {
+    const on = (e) => {
+      const d = e.detail || {};
+      setTppMatchup((m) => (d.lead && m === d.prevLead ? d.lead : m));
+      setFlowEpoch((n) => n + 1);
+    };
+    window.addEventListener("ap:flows", on);
+    return () => window.removeEventListener("ap:flows", on);
+  }, []);
   React.useEffect(() => {
     window.AP.tppBasis = tppBasis;
     return () => { if (window.AP.tppBasis === tppBasis) delete window.AP.tppBasis; };
@@ -3112,7 +3136,7 @@ function App() {
                  if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
                }}>
             <ParkedPanel active={id === tab} render={() => (
-            <ViewBoundary active={id === tab}>
+            <ViewBoundary active={id === tab} key={"fl-" + flowEpoch}>
               {id === "now" && (
                 <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
                               tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}

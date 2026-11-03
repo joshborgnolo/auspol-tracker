@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_SENATE_CON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON, FLOW_HISTORY_NSW_LC_CON } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_3CNR, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_SENATE_CON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON, FLOW_HISTORY_NSW_LC_CON } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -429,11 +429,16 @@ const impShowRow = (p) => {
    Latest pollsterTable row must agree on which waves carry alpImp/alpOnImp,
    so both spread this helper. */
 const impFields = (p) => {
-  if (!impShow(p)) return {};
+  /* impOut: a wave kept out of the standing implied series (impOk fails).
+     The More menu's flow editor (pv-agg.js flowAgg) re-runs that series in
+     the browser and must leave out exactly the waves the server does - a
+     shown figure (impShow) is no test of that */
+  const out = impOk(p) ? {} : { impOut: true };
+  if (!impShow(p)) return out;
   const q = impShowRow(p);
   // the ALP-v-ON reading needs One Nation as a column of its own: folded into
   // "others" (onpOptional waves), its voters would be read as preferencing
-  return { alpImp: r1(impliedAlp2pp(q)), ...(p.onp != null ? { alpOnImp: r1(impliedOn(q)) } : {}) };
+  return { alpImp: r1(impliedAlp2pp(q)), ...(p.onp != null ? { alpOnImp: r1(impliedOn(q)) } : {}), ...out };
 };
 /* The frozen flow table for the ALP-v-ON PAIRING, in ALP-shares, with the
    set's own ± range: FP_ON / FP_ON_BAND, imported from flows.mjs, where the
@@ -5508,7 +5513,9 @@ const primaryChg = KF ? null : Object.fromEntries(PRIMARY_KEYS.map((k) => {
    over the emitted individualPolls - whose noAgg flag already bakes in
    every eligibility decision made above - fed the same rows. */
 const aggSpec = { window: HL_WINDOW, half: HL_HALF, taper: HL_TAPER, deff: HL_DEFF,
-                  sampleCap: SAMPLE_CAP, heWindow: HE_WINDOW, heHalf: HE_HALF, shrinkK: SHRINK_K };
+                  sampleCap: SAMPLE_CAP, heWindow: HE_WINDOW, heHalf: HE_HALF, shrinkK: SHRINK_K,
+                  // the leans panel's staleness cut (houseLean), which the flow editor re-draws
+                  leanStaleDays: LEAN_STALE_DAYS };
 /* the menu's ticks: every house that feeds the term's aggregates, in
    first-appearance order (a stopped house stays - its months still count) */
 const pvHouses = [...new Set(POLLS.filter((p) => !noAggPoll(p)).map((p) => p.pollster))];
@@ -8979,6 +8986,12 @@ window.AUSPOL = (function () {
     lnp: { alp: 1, lnp: 0, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth },
     onp: { alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, onp: 0, oth: FP_ON.oth },
     onBand: FP_ON_BAND,
+    /* for the More menu's flow editor (pv-agg.js flowAgg), which re-reads
+       every poll through a reader's own table: the three-cornered term the
+       classic formula adds, and the 2022 One Nation cell §1c's band is
+       drawn against (null where there is no band) */
+    cnr: JUR ? (JUR.flows.threeCorner || 0) : FLOW_3CNR,
+    onp22: synthBand ? ONP_FLOW_2022 : null,
   })};
   /* The preference-flow history chart's per-jurisdiction series: the share
      of each bucket's ballots that ended with Labor at each election, per

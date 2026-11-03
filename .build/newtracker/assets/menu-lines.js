@@ -335,12 +335,16 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
   AP.flowsExplainedFig = function flowsExplainedFig() {
     const T = D.flowTables;
     if (!T || !T.lnp || !T.onp) return null;
-    const row = (tab, keys, cap) => {
-      const cells = keys.map(([k, tone]) => (typeof tab[k] === "number" ? { v: String(Math.round(tab[k] * 100)), tone } : null));
-      return cells.every(Boolean) ? { cap, cells } : null;
+    /* each row names its table and each cell its group (table, k), so the
+       More menu's editor (Tabs, pv-agg.js setFlows) knows which cell a
+       reader's number replaces */
+    const row = (table, keys, cap) => {
+      const tab = T[table];
+      const cells = keys.map(([k, tone]) => (typeof tab[k] === "number" ? { v: String(Math.round(tab[k] * 100)), tone, k } : null));
+      return cells.every(Boolean) ? { cap, table, cells } : null;
     };
-    const co = row(T.lnp, [["grn", "grn"], ["onp", "onp"], ["oth", "oth"]], "To Labor v Coalition");
-    const on = row(T.onp, [["grn", "grn"], ["lnp", "lnp"], ["oth", "oth"]], "To Labor v One Nation");
+    const co = row("lnp", [["grn", "grn"], ["onp", "onp"], ["oth", "oth"]], "To Labor v Coalition");
+    const on = row("onp", [["grn", "grn"], ["lnp", "lnp"], ["oth", "oth"]], "To Labor v One Nation");
     if (!co || !on) return null;
     return { rows: ((D.latest || {}).rivalLead || "alp_lnp") === "alp_on" ? [on, co] : [co, on] };
   };

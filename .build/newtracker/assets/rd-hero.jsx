@@ -527,7 +527,12 @@ function RdHero(p) {
   const onImp = hasBases && b0 === "imp";
   /* a phone's words are the short ones either way, so flipping the basis
      keeps the line to one line */
+  /* a reader's own flow table (the More menu's editor, pv-agg.js setFlows)
+     names itself wherever the implied figures it drives are quoted, the
+     copied chart's caption included, with the way back beside it */
+  const yours = onImp && !!window.AP.flowsUser;
   const basisWords = !hasBases ? (m.real ? "Pollsters’ published figures" : "Published head-to-heads")
+    : yours ? (narrow ? "Your flows" : "Your preference flows")
     : onImp ? (narrow ? "Implied flows" : "Implied preference flows") : (narrow ? "As published" : "Pollsters’ published figures");
   const provenance = (
     <>
@@ -540,6 +545,7 @@ function RdHero(p) {
         {adjusted ? "weighted aggregate" : "monthly average"}</RdTerm>
       {unc && <>{" "}of {unc.n} poll{unc.n === 1 ? "" : "s"} {narrow ? "to " : "in the " + D.latest.method.windowDays + " days to "}{rdDate(D.latest.updatedISO)}</>}
       </>)}
+      {yours && <> · <button type="button" className="rd-tpp-reset" onClick={() => window.AP.setFlows(null)}>Use the site’s flows</button></>}
     </>
   );
   /* what the other basis would say, quoted in the "?" before anyone switches */
@@ -548,7 +554,14 @@ function RdHero(p) {
     ? (other.a >= other.b ? m.a.name + " ahead " + other.a.toFixed(1) + "–" + other.b.toFixed(1)
                           : m.b.name + " ahead " + other.b.toFixed(1) + "–" + other.a.toFixed(1))
     : null;
-  const howCounted = !hasBases
+  const yourTable = yours && D.flowTables[matchup === "alp_on" ? "onp" : "lnp"];
+  const howCounted = yours
+    ? "Each poll’s primary votes, run through your own preference flows from the More menu instead of the site’s: "
+      + (matchup === "alp_on"
+        ? "Greens " + Math.round(100 * yourTable.grn) + "%, Coalition " + Math.round(100 * yourTable.lnp) + "% and others " + Math.round(100 * yourTable.oth) + "%"
+        : "Greens " + Math.round(100 * yourTable.grn) + "%, One Nation " + Math.round(100 * yourTable.onp) + "% and others " + Math.round(100 * yourTable.oth) + "%")
+      + " to Labor. Everything else is counted as usual: the same polls, weighted the same way and adjusted for each pollster’s lean. Reloading the page puts the site’s flows back."
+    : !hasBases
     ? "The pollsters’ own head-to-head figures, averaged. Too few pollsters ask this pairing for it to be weighted or corrected for each one’s lean."
     : !onImp
       ? (KAL ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, as a smoothed trend through every poll, adjusted for each pollster’s lean. The ± is its 95% interval."
@@ -1130,7 +1143,7 @@ function RdHero(p) {
              eight polls, when that is the latest window */
           copy={{ title: chartTitle.replace(/, %$/, ""),
                   sub: (story && M[matchup].vsLabor ? story.head + ". " : "")
-                    + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures")
+                    + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^Your flows$/, "Your preference flows").replace(/^As published$/, "Pollsters’ published figures")
                     + (KAL ? ", smoothed trend through every poll" + (unc ? ", " + unc.n + " polls to " + rdDate(D.latest.updatedISO, true) : "")
                       : ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "")) + ".",
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}

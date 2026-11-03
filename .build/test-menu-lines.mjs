@@ -111,8 +111,8 @@ const fresh = (mutate) => {
    rival-ordering swap and the no-table fallback */
 {
   const rows = (m) => JSON.parse(JSON.stringify(m["flows-explained"].fig || {})).rows;
-  const coRow = { cap: "To Labor v Coalition", cells: [{ v: "88", tone: "grn" }, { v: "26", tone: "onp" }, { v: "55", tone: "oth" }] };
-  const onRow = { cap: "To Labor v One Nation", cells: [{ v: "91", tone: "grn" }, { v: "27", tone: "lnp" }, { v: "55", tone: "oth" }] };
+  const coRow = { cap: "To Labor v Coalition", table: "lnp", cells: [{ v: "88", tone: "grn", k: "grn" }, { v: "26", tone: "onp", k: "onp" }, { v: "55", tone: "oth", k: "oth" }] };
+  const onRow = { cap: "To Labor v One Nation", table: "onp", cells: [{ v: "91", tone: "grn", k: "grn" }, { v: "27", tone: "lnp", k: "lnp" }, { v: "55", tone: "oth", k: "oth" }] };
   const AP = fresh();
   const L = AP.menuLines();
   assert.deepEqual(rows(L), [coRow, onRow], "the Coalition row first while it is Labor's main rival");

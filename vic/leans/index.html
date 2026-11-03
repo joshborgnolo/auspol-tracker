@@ -34,28 +34,28 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../../assets/js/data-vic.896acac9.js" as="script">
+  <link rel="preload" href="../../assets/js/data-vic.c5107531.js" as="script">
   <link rel="preload" href="../../assets/js/data-vic-late.598cac9c.js" as="script">
-  <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js" as="script">
+  <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js" as="script">
   <link rel="preload" href="../../assets/js/np-project.5ac769ce.js" as="script">
-  <link rel="preload" href="../../assets/js/pv-agg.981ce406.js" as="script">
-  <link rel="preload" href="../../assets/js/menu-lines.e11e9917.js" as="script">
+  <link rel="preload" href="../../assets/js/pv-agg.3917be66.js" as="script">
+  <link rel="preload" href="../../assets/js/menu-lines.39cedf7a.js" as="script">
   <link rel="preload" href="../../assets/js/copy-chart.ca384e87.js" as="script">
   <link rel="preload" href="../../assets/js/copy-poll.feb389c5.js" as="script">
   <link rel="preload" href="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.bfb1283c.js" as="script">
   <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js" as="script">
-  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.3d497b03.js" as="script">
+  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js" as="script">
   <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.4e41890b.js" as="script">
   <link rel="preload" href="../../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../../assets/js/rd.c32013aa.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-hero.09f16144.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-hero.46bff042.js" as="script">
   <link rel="preload" href="../../assets/js/rd-panels.c1798e97.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-polls.97e20ee7.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-polls.2ad6d272.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.ecc621d4.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-allpolls.c09cf5ea.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-allpolls.2a0d7aec.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.0883ebcd.js" as="script">
-  <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.9de14f48.js" as="script">
+  <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.37c2344a.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Pollster leans","url":"https://auspoltracker.com/vic/leans/","description":"How each Victorian pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
   <style>
 @font-face {
@@ -4200,6 +4200,38 @@ body.rd .tab-menu-fc {
   display: block; margin-top: 1px; font-size: 10.5px; font-weight: 500; line-height: 13px;
   color: var(--ink-3);
 }
+body.rd .tab-menu-split .tab-menu-link {
+  grid-column: 1 / 3; display: grid; grid-template-columns: subgrid; align-items: start;
+  color: inherit; text-decoration: none;
+}
+body.rd .tab-menu-split .tab-menu-link::after { content: ""; position: absolute; inset: 0; }
+body.rd .tab-menu-split .tab-menu-link:focus { outline: none; }
+body.rd .tab-menu-split:has(> .tab-menu-link:focus-visible) {
+  background: color-mix(in oklab, var(--ink) 4.5%, transparent); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3));
+}
+body.rd .tab-menu-split:has(> .tab-menu-link:focus-visible) .tab-menu-n { color: var(--ink); }
+body.rd .tab-menu-split .tab-menu-f { position: relative; z-index: 1; pointer-events: none; }
+body.rd .tm-in {
+  pointer-events: auto; box-sizing: content-box; margin: 0; padding: 0 1px; border: 0; border-radius: 2px 2px 0 0;
+  border-bottom: 1px dotted currentColor; background: transparent; -webkit-appearance: none; appearance: none;
+  font: inherit; letter-spacing: inherit; font-variant-numeric: tabular-nums; text-align: right; cursor: text;
+}
+body.rd .tab-menu-fv > .tm-in + .tm-in { margin-left: 6px; }
+body.rd .tm-in:hover { background: color-mix(in oklab, currentColor 9%, transparent); }
+body.rd .tm-in:focus { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 1px; border-bottom-style: solid; background: var(--surface, var(--bg)); }
+body.rd .tm-in.tm-ed { border-bottom: 2px solid currentColor; }
+body.rd .tab-menu-split .tab-menu-fc { margin-top: 3px; }
+body.rd .tm-yours { margin-top: 5px; }
+body.rd .tm-reset {
+  pointer-events: auto; margin: 0; padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px;
+}
+body.rd .tm-reset:hover { color: var(--ink); }
+body.rd .rd-tpp-reset {
+  margin: 0; padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+}
+body.rd .rd-tpp-reset:hover { color: var(--ink); }
 body.rd .tab-menu-item:hover, body.rd .tab-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
 body.rd .tab-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
 body.rd .tab-menu-item:hover .tab-menu-n, body.rd .tab-menu-item:focus-visible .tab-menu-n, body.rd .tab-menu-item.on .tab-menu-n { color: var(--ink); }
@@ -4222,6 +4254,8 @@ body.rd .tab-menu-item.tab-menu-info { display: none; }
   body.rd .tab-menu-fv { font-size: 13.5px; line-height: 16px; }
   body.rd .tab-menu-fv > span + span { margin-left: 5px; }
   body.rd .tab-menu-fc { font-size: 9.5px; line-height: 12px; }
+  body.rd .tab-menu-split .tab-menu-fv { font-size: 16px; line-height: 19px; }
+  body.rd .tab-menu-fv > .tm-in + .tm-in { margin-left: 4px; }
 }
 @media (orientation: landscape) and (max-height: 480px) {
   body.rd .tabs.sticky { position: relative; top: auto; }
@@ -6751,28 +6785,28 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../../assets/js/react.d949f1c3.js"></script>
   <script src="../../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../../assets/js/data-vic.896acac9.js"></script>
+  <script src="../../assets/js/data-vic.c5107531.js"></script>
   <script src="../../assets/js/data-vic-late.598cac9c.js"></script>
-  <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.2e560221.js"></script>
+  <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js"></script>
   <script src="../../assets/js/np-project.5ac769ce.js"></script>
-  <script src="../../assets/js/pv-agg.981ce406.js"></script>
-  <script src="../../assets/js/menu-lines.e11e9917.js"></script>
+  <script src="../../assets/js/pv-agg.3917be66.js"></script>
+  <script src="../../assets/js/menu-lines.39cedf7a.js"></script>
   <script src="../../assets/js/copy-chart.ca384e87.js"></script>
   <script src="../../assets/js/copy-poll.feb389c5.js"></script>
   <script src="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.bfb1283c.js"></script>
   <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js"></script>
-  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.3d497b03.js"></script>
+  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js"></script>
   <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.4e41890b.js"></script>
   <script src="../../assets/js/wm-story.63f19861.js"></script>
   <script src="../../assets/js/rd.c32013aa.js"></script>
-  <script src="../../assets/js/rd-hero.09f16144.js"></script>
+  <script src="../../assets/js/rd-hero.46bff042.js"></script>
   <script src="../../assets/js/rd-panels.c1798e97.js"></script>
-  <script src="../../assets/js/rd-polls.97e20ee7.js"></script>
+  <script src="../../assets/js/rd-polls.2ad6d272.js"></script>
   <script src="../../assets/js/rd-cycles.ecc621d4.js"></script>
-  <script src="../../assets/js/rd-allpolls.c09cf5ea.js"></script>
+  <script src="../../assets/js/rd-allpolls.2a0d7aec.js"></script>
   <script src="../../assets/js/rd-public-opinion.0883ebcd.js"></script>
-  <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.9de14f48.js"></script>
+  <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.37c2344a.js"></script>
 
 
 </body></html>
