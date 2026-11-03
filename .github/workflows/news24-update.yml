@@ -19,6 +19,10 @@ on:
     # or add hand-authored slots after the end marker. Eastern UTC+11 at generation.
     # YouGov: Wed habit (12/12 recent dated releases); files 05:00–05:20 eastern (last 8 timed releases, newest 2026-11-04T05:00)
     - cron: '20 19 * * *'               # daily 06:20 — daily sweep
+    - cron: '53 9 * * 2'                # Tue 20:53 — drop eve (files ~9pm the evening before its stamped date), every 20 min
+    - cron: '13,33,53 10 * * 2'         # Tue 21:13–21:53 — drop eve (files ~9pm the evening before its stamped date), every 20 min
+    - cron: '13,33,53 11 * * 2'         # Tue 22:13–22:53 — drop eve (files ~9pm the evening before its stamped date), every 20 min
+    - cron: '13,33 12 * * 2'            # Tue 23:13–23:33 — drop eve (files ~9pm the evening before its stamped date), every 20 min
     - cron: '53 17 * * 2'               # Wed 04:53 — release window, every 10 min
     - cron: '3,13,23,33,43,53 18 * * 2' # Wed 05:03–05:53 — release window, every 10 min
     - cron: '3 19 * * 2'                # Wed 06:03 — release window, every 10 min

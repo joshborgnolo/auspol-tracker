@@ -129,8 +129,15 @@ const TARGETS = [
   // embargo itself (a 10-second job), so it combs the habitual hour itself
   // — figures land through the extractor, not here.
   { workflow: "newspoll-watch.yml", houses: ["Newspoll"], mode: "watch", phase: 4 },
-  // fortnightly Wednesday ~05:00; Essential's Wednesday comb ends by ~02:00
-  { workflow: "news24-update.yml", houses: ["YouGov"], mode: "dense", sweep: "06:20", phase: 3 },
+  // fortnightly Wednesday ~05:00 on the STAMP; the wave itself is readable
+  // from ~9pm TUESDAY (News24 shows a 21:00 byline, then its CMS rewrites it
+  // overnight to next-morning 5:00AM — the canon stamp). `eve` combs the
+  // drop evening: the Wednesday comb stays as the post-rewrite net, and
+  // extract-news24.mjs's restamp leg turns any provisional 9pm stamp the eve
+  // files back into the final byline once it lands. Essential's Wednesday
+  // comb ends by ~02:00.
+  { workflow: "news24-update.yml", houses: ["YouGov"], mode: "dense", sweep: "06:20", phase: 3,
+    eve: { window: ["20:50", "23:30"], step: 20 } },
   // the daily 07:05 sweep stays hand-authored in the file (the run gate
   // names its cron string), so the tuner adds the bracketing checks only
   // `medianComb`: a house with no weekday still has a habitual HOUR — Capital
@@ -341,6 +348,17 @@ function layout(target, m) {
   // the slip day: the same hours, a lighter comb (see `slip` on TARGETS)
   if (target.slip && target.mode === "dense")
     for (let t = start; t <= end; t += target.slip) addP(next, t, `slip day (a release a day late), every ${target.slip} min`);
+  // the drop eve (`eve` on TARGETS): the release is readable the EVENING
+  // BEFORE its stamped date (YouGov's wave drops ~9pm Tuesday; News24's CMS
+  // rewrites the byline to the stamped 5:00AM overnight, which is what the
+  // Wednesday habit measurement keeps seeing). Comb the eve on a declared
+  // window; canon stamps stay the final byline via extract-news24.mjs's
+  // restamp leg, so the habit measurement is never polluted by them.
+  if (target.eve?.window && target.mode === "dense") {
+    const eve = (d + 6) % 7;
+    for (let t = toMins(target.eve.window[0]); t <= toMins(target.eve.window[1]); t += target.eve.step)
+      addP(eve, t, `drop eve (files ~9pm the evening before its stamped date), every ${target.eve.step} min`);
+  }
   // follow-ups on the hour from the last comb slot, then the evening backstop
   const firstHour = ceilTo(lastSlot + 1, 60);
   for (let i = 0; i < FOLLOW_HOURS; i++) addP(d, firstHour + i * 60, "follow-up");

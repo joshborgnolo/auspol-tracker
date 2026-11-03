@@ -76,7 +76,10 @@
       "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd"
     },
     "YouGov": {
-      "site": "https://www.news24.com.au/politics/australian-politics"
+      "site": "https://www.news24.com.au/politics/australian-politics",
+      "release": {
+        "eveningBefore": "21:00"
+      }
     },
     "YouGov (MRP)": {
       "site": "https://www.news24.com.au/politics/australian-politics"

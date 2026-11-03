@@ -198,6 +198,23 @@ function npProjectAt(nowOverride, horizonDays, includeTracked, series) {
   const rows = [];
   const horizon = t0 + (horizonDays || NP_HORIZON_DAYS) * DAY_MS;
   cad.forEach((c) => {
+    /* eveningBeforeMins (gen-data, from pollsterRules.release.eveningBefore):
+       the house's wave is readable the EVENING BEFORE its canon stamp -
+       News24's wave drops ~9pm Tuesday while its byline, rewritten overnight,
+       reads next-morning 5:00AM. Everything gen-data measures (habit day,
+       releaseMins, the anchors) is read off those canon stamps, so the row
+       arrives claiming a Wednesday-morning release a reader has never seen.
+       Shift the projection onto the eve it can act on: the stamped
+       "Wednesday 5am" becomes "Tuesday 9pm", and the walker, the overdue
+       arithmetic and every label downstream then run on the true
+       availability. The measured span/anchors are stamp facts and would
+       contradict the shifted day, so the declared drop time replaces them. */
+    if (c.eveningBeforeMins != null && c.releaseDow != null)
+      c = { ...c,
+        releaseDow: (c.releaseDow + 6) % 7,
+        releaseMins: c.eveningBeforeMins,
+        releaseFrom: c.eveningBeforeMins, releaseTo: c.eveningBeforeMins,
+        releaseMid: c.eveningBeforeMins, releaseVals: null };
     /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
        month on no particular day of it, so the slot IS the month - the
        day-of-month range the house has actually filed on (calDays, measured

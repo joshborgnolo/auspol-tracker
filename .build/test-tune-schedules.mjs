@@ -34,6 +34,10 @@ const polls = [
     .map((p) => poll("DemosAU", p)),
   // a duplicate publication minute — one release recorded twice
   poll("Resolve", "2026-09-13T18:00"), poll("Resolve", "2026-09-13T18:00"),
+  // YouGov: canon stamps keep the final byline — Wednesdays 05:00
+  ...["2026-08-12T05:00", "2026-08-26T05:00", "2026-09-09T05:00",
+      "2026-09-23T05:00", "2026-10-07T05:00", "2026-10-21T05:00", "2026-11-04T05:00"]
+    .map((p) => poll("YouGov", p)),
   // Fox & Hedgehog: declared stopped
   poll("Fox & Hedgehog", "2026-05-31T06:42"),
 ];
@@ -102,6 +106,15 @@ assert.ok(readFileSync(path.join(dir, "newspoll-update.yml"), "utf8").includes("
 const nw = crons(readFileSync(path.join(dir, "newspoll-watch.yml"), "utf8"));
 assert.ok(nw.some((c) => c.cron === "4,24,44 10 * * 0"), "watch comb 20:04–20:44 (phase 4) " + JSON.stringify(nw));
 assert.ok(nw.some((c) => c.cron === "4,24 11 * * 0"), "watch comb 21:04–21:24");
+
+// YouGov's drop eve: the wave is readable from ~9pm Tuesday even though the
+// canon stamps all read Wednesday 05:00 — the eve comb runs the evening
+// BEFORE the stamped-morning habit day
+const yg = crons(readFileSync(path.join(dir, "news24-update.yml"), "utf8"));
+const eve = yg.filter((c) => /drop eve/.test(c.note));
+assert.ok(eve.length >= 3, "drop-eve comb spans the evening " + JSON.stringify(yg));
+assert.ok(eve.every((c) => c.cron.endsWith(" * * 2")), "drop-eve slots are Tuesdays");
+assert.ok(readFileSync(path.join(dir, "news24-update.yml"), "utf8").includes("Wed habit"), "habit day measured from the stamps");
 
 // DemosAU: no weekday → trimmed daily bracket (05:00–08:51 once the midnight
 // and 20:30 strays are set aside): 04:50, 08:30 (median floor), 10:00

@@ -174,8 +174,10 @@ const cad = JSON.parse(JSON.stringify(D.pollCadence));
 // scenarios count around). YouGov's tail slots (S1's "50 days", S14's
 // "11 days") were written against its 6 Oct wave, landed 7 Oct; it was
 // left unpinned and was re-pinned by hand each fortnight, until the 20 Oct
-// wave turned the suite red. cadSlip/cadHold derive from this, so their own
-// steps ride on top.
+// wave turned the suite red. They sit a day lower each now (49, 10): the
+// 3 Nov 2026 eveningBefore declaration shifts YouGov's projection onto
+// the drop eve, per np-project. cadSlip/cadHold derive from this, so
+// their own steps ride on top.
 for (const [firm, last] of [["Roy Morgan", "2026-09-07"],
                             ["Resolve", "2026-08-16"],
                             ["Newspoll", "2026-08-30"],
@@ -259,7 +261,7 @@ function eq(name, got, want) {
   // ~twenty weeks out).
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
-     ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "50 days"],
+     ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "49 days"],
      ["Spectre Strategy", "82 days"], ["DemosAU", "any day now"]]);
   {
     const da = firm(rows, "DemosAU");
@@ -494,7 +496,7 @@ function eq(name, got, want) {
   eq("ticker: dated houses rolled to plausible dates, no red", items.map((i) => [i.firm, i.when]),
     [["Resolve", "tomorrow"], ["Newspoll", "tomorrow"],
      ["Roy Morgan", "2 days"], ["Essential", "4 days"],
-     ["YouGov", "11 days"], ["RedBridge/Accent", "22 days"],
+     ["YouGov", "10 days"], ["RedBridge/Accent", "22 days"],
      ["Spectre Strategy", "43 days"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);

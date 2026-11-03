@@ -8384,6 +8384,16 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      enough `published` values exist to measure the same thing. */
   const declMins = decl && /^\d{1,2}:\d{2}$/.test(decl.time || "")
     ? Number(decl.time.split(":")[0]) * 60 + Number(decl.time.split(":")[1]) : null;
+  /* eveningBefore (pollsterRules.release.eveningBefore): the wave is
+     readable the EVENING BEFORE its canon stamp - News24's wave drops ~9pm
+     Tuesday while the byline the next morning says 5:00AM, having been
+     rewritten overnight. Canon `published` stays the final byline (the
+     restamp leg in extract-news24.mjs keeps that true even for a wave the
+     drop-eve comb files), so everything measured here keeps saying
+     Wednesday; this datum is how the projection (np-project) shows what a
+     reader can actually act on - "Tuesday 9pm" - beside the canon record. */
+  const eveMins = decl && /^\d{1,2}:\d{2}$/.test(decl.eveningBefore || "")
+    ? Number(decl.eveningBefore.split(":")[0]) * 60 + Number(decl.eveningBefore.split(":")[1]) : null;
   const releaseDow = calMonth ? null : (decl && decl.dow != null ? decl.dow : dowHabit);
   const timed = ts.length >= 5;
   /* The SPAN is taken with one sample trimmed off each end once there are
@@ -8467,7 +8477,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     releaseDowN: releaseDow == null ? 0 : (decl && decl.dow != null ? 0 : dowTop[1]),
     // which parts of this are stated rather than measured, so the panel can say so
     declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour",
-      calMonth && "calendar-month rhythm", monthEnd && "month-end rhythm"].filter(Boolean) : [],
+      calMonth && "calendar-month rhythm", monthEnd && "month-end rhythm",
+      eveMins != null && "evening-before availability"].filter(Boolean) : [],
+    // the wave readable the evening BEFORE its canon stamp (declared; see above)
+    ...(eveMins != null ? { eveningBeforeMins: eveMins } : {}),
     /* the month-end rule and how many of the last monthEndN releases it
        named exactly - the panel's foot says so instead of quoting a median
        interval the projection no longer steps by */
