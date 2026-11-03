@@ -1685,7 +1685,7 @@ const TABS = [{
   tip: "Every federal seat and polling place since 2004, on the map and in the chamber"
 }, {
   id: "model",
-  label: "Election model",
+  label: "Election model (beta)",
   menu: true,
   ext: true,
   tip: "Who would win the House: 20,000 simulated elections from the polls, seat by seat"

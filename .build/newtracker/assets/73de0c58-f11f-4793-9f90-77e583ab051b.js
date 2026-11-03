@@ -1997,7 +1997,7 @@ const TABS = [
   /* Election model (2026-11-01), the menu's sixth page: who would win the House, from 20,000
      simulated elections on the polls, seat by seat, with every setting open to change - a page
      OUTSIDE this build (ext), the satellite at /model/ (.build/model/), linked as the map is */
-  { id: "model", label: "Election model", menu: true, ext: true,
+  { id: "model", label: "Election model (beta)", menu: true, ext: true,
     tip: "Who would win the House: 20,000 simulated elections from the polls, seat by seat" },
   /* Public opinion, the ☰ menu's fifth page: what the pollsters ask
      beyond voting intention, by topic, the recurring questions charted
