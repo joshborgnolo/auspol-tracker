@@ -7,23 +7,23 @@
     },
     "imp": 51.2,
     "pub": 49.6,
-    "on": 51.8,
+    "on": 51.1,
     "momSig": false,
     "flows": {
       "grn": 88.2,
       "onp": 25.5,
       "oth": 54.6,
       "on": {
-        "lnp": 30,
+        "lnp": 27,
         "grn": 91,
         "oth": 55
       },
       "band": {
-        "lnp": 3,
+        "lnp": 4,
         "grn": 2.5,
         "oth": 4
       },
-      "hash": "41627225df7c"
+      "hash": "9aa3b3f97941"
     },
     "polls": [
       "2025-06-01|Roy Morgan",
@@ -348,7 +348,7 @@
         "DemosAU (MRP)": 0.2,
         "Essential": -1,
         "Fox & Hedgehog": -1,
-        "Freshwater": -0.6,
+        "Freshwater": -0.7,
         "Newspoll": 1.4,
         "RedBridge/Accent": 0.3,
         "RedBridge/Accent (MRP)": 0.1,
@@ -356,7 +356,7 @@
         "Roy Morgan": 0.1,
         "Spectre Strategy": -0.8,
         "Wolf & Smith": 0,
-        "YouGov": 0.1,
+        "YouGov": 0.2,
         "YouGov (MRP)": -0.2
       }
     },
@@ -400,6 +400,7 @@
     "conf": {
       "business": 76.5,
       "consumer": 67.9,
+      "demosauConsumer": 38.7,
       "nabBusiness": -13,
       "westpacConsumer": 80.4
     }
@@ -592,6 +593,12 @@
       "label": "2 Nov 2026",
       "kind": "finding",
       "text": "TAFE or trade voters (by education) no longer break significantly toward the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-03",
+      "label": "3 Nov 2026",
+      "kind": "flows",
+      "text": "The preference-flow assumptions were updated: Coalition voters’ preferences to Labor over One Nation 30.0% → 27.0%; the doubt allowed on Coalition voters’ flow to Labor over One Nation ±3.0 → ±4.0 points. The two-party preferred estimate held at 51.2 (Labor v the Coalition, implied flows)."
     }
   ]
 }
