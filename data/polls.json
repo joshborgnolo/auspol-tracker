@@ -6312,7 +6312,8 @@
       "oth": 7,
       "tpp_alp": 50,
       "tpp_lnp": 50,
-      "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b"
+      "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b",
+      "published": "2026-11-03T21:00"
     }
   ],
   "ppm": [
@@ -7156,6 +7157,15 @@
       "firm": "Newspoll",
       "alb": 42,
       "opp": 40,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "YouGov",
+      "alb": 39,
+      "opp": 41,
       "oppName": "Taylor",
       "han": null,
       "extra": null
@@ -9100,6 +9110,24 @@
       "oppName": "Taylor",
       "han": null,
       "detail": null
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "YouGov",
+      "alb": -29,
+      "opp": -12,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 62
+        },
+        "opp": {
+          "app": 36,
+          "dis": 48
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -9228,6 +9256,12 @@
       "firm": "DemosAU",
       "alb": 43,
       "han": 33
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "YouGov",
+      "alb": 51,
+      "han": 39
     }
   ],
   "altTpp": [
@@ -9607,6 +9641,12 @@
       "date": "2026-10-25",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 55,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "YouGov",
+      "alpVsOnp_alp": 54,
       "lnpVsOnp_lnp": null
     }
   ],

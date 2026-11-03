@@ -1905,6 +1905,81 @@
      "oth": 52
     }
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-11-03",
+   "dateStart": "2026-10-27",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b",
+   "onp": 27,
+   "source": "https://e.infogram.com/_/hbIimtcTS0562loHae5L",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 67,
+     "lnp": 12,
+     "onp": 10,
+     "grn": 5,
+     "community-strong-australia": 3,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 2,
+     "lnp": 57,
+     "onp": 38,
+     "grn": 0,
+     "community-strong-australia": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 5,
+     "lnp": 2,
+     "onp": 3,
+     "grn": 85,
+     "community-strong-australia": 2,
+     "ind": 2,
+     "oth": 1
+    },
+    "onp": {
+     "alp": 4,
+     "lnp": 3,
+     "onp": 90,
+     "grn": 1,
+     "community-strong-australia": 0,
+     "ind": 1,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 3,
+     "lnp": 5,
+     "onp": 18,
+     "grn": 7,
+     "community-strong-australia": 9,
+     "ind": 56,
+     "oth": 2
+    },
+    "oth": {
+     "alp": 1,
+     "lnp": 5,
+     "onp": 43,
+     "grn": 3,
+     "community-strong-australia": 1,
+     "ind": 5,
+     "oth": 42
+    }
+   },
+   "total": {
+    "alp": 25,
+    "lnp": 23,
+    "onp": 27,
+    "grn": 13,
+    "community-strong-australia": 2,
+    "ind": 5,
+    "oth": 5
+   }
   }
  ],
  "skipped": [

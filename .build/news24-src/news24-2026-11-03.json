@@ -1,0 +1,105 @@
+{
+  "source": "news24+wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b",
+  "published": "2026-11-03T21:00",
+  "fieldwork": {
+    "date": "2026-11-03",
+    "dateStart": "2026-10-27",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 25,
+    "lnp": 23,
+    "grn": 13,
+    "onp": 27,
+    "ind": 5,
+    "oth": 7,
+    "tpp_alp": 50,
+    "tpp_lnp": 50
+  },
+  "satisfaction": {
+    "pmApp": 33,
+    "pmDis": 62,
+    "pmNet": -29,
+    "oppApp": 36,
+    "oppDis": 48,
+    "oppNet": -12
+  },
+  "ppm": {
+    "alb": 39,
+    "opp": 41,
+    "albVsHanson": 51,
+    "hanson": 39
+  },
+  "altTpp": {
+    "alpVsOnp_alp": 54,
+    "alpVsOnp_onp": 46
+  },
+  "infogram": {
+    "via": "anon",
+    "ids": [
+      "_/AJwIKFPKMzRJBFrpl07s",
+      "_/hbIimtcTS0562loHae5L",
+      "_/SDoBv1o4KJcABW8SyMHx",
+      "_/LX5nXsEu4PiniSV81sIC",
+      "_/qN3PQqVYOg8FpbEK48TY"
+    ],
+    "kinds": [
+      "horserace",
+      "crosstab",
+      "ppm",
+      "tpp",
+      "approvals"
+    ],
+    "window": {
+      "start": "2026-10-27",
+      "end": "2026-11-03"
+    },
+    "vi": {
+      "alp": 25,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 13,
+      "ind": 5,
+      "oth": 7
+    },
+    "tpp": {
+      "tpp_alp": 50,
+      "tpp_lnp": 50
+    },
+    "altTpp": {
+      "alpVsOnp_alp": 54,
+      "alpVsOnp_onp": 46
+    },
+    "approval": {
+      "alb": {
+        "app": 33,
+        "dis": 62,
+        "unc": 5
+      },
+      "opp": {
+        "app": 36,
+        "dis": 48,
+        "unc": 16
+      },
+      "oppName": "taylor"
+    },
+    "ppm": [
+      {
+        "alb": 51,
+        "dk": 10,
+        "opp": 39,
+        "oppRaw": "Pauline Hanson",
+        "table": "ppm"
+      },
+      {
+        "alb": 39,
+        "dk": 20,
+        "opp": 41,
+        "oppRaw": "Angus Taylor",
+        "table": "ppm"
+      }
+    ]
+  }
+}
