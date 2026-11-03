@@ -125,6 +125,44 @@ if (existsSync(HISTORY)) {
   const m = moveFirst(R, cohortTable(R, "Hunter", "COAL"), 3), { F } = routing(R, m);
   check("moveFirst puts One Nation first", Math.abs(F[15 * 4 + 3] - 1) < 1e-9, String(F[15 * 4 + 3]));
 }
+/* ---- 2c. the zero-One-Nation-state graft (ACT: no Senate ticket, so no ACT ballot ranks O) -- */
+{
+  const R = loadRankings(2025);
+  const raw = JSON.parse(readFileSync("data/senate-rankings-2025.json", "utf8"));
+  const L = R.P.length, oAt = R.P.map((p) => p.includes("O"));
+  /* One Nation ran no ACT Senate ticket in our four years, and no NT one before 2025 - those are
+     the tables the graft fires on; read the raw files so the check survives the grafted tables */
+  check("the only no-Senate-One-Nation states are ACT (+NT to 2022)", [2016, 2019, 2022, 2025].every((y) => {
+    const j = JSON.parse(readFileSync(`data/senate-rankings-${y}.json`, "utf8"));
+    const P = j.patterns, noO = new Set(Object.values(j.divisions).map((d) => d.st));
+    for (const d of Object.values(j.divisions)) for (const sparse of Object.values(d.t))
+      for (const [k, n] of Object.entries(sparse)) if (n > 0 && P[+k].includes("O")) { noO.delete(d.st); break; }
+    return [...noO].sort().join(",") === (y < 2025 ? "ACT,NT" : "ACT");
+  }), "");
+  /* grafted ACT tables: cohort masses preserved, every O-free routing row identical to the raw
+     file's rows, and real mass lands on O-naming patterns */
+  for (const key of ["ALP", "COAL:LIB", "GRN"]) {
+    const sparse = raw.divisions.Canberra.t[key];
+    if (!sparse) { check(`Canberra raw cohort ${key} exists`, false, "no such cohort key in the file"); continue; }
+    const vRaw = new Float64Array(L);
+    let tRaw = 0;
+    for (const [k, n] of Object.entries(sparse)) { vRaw[+k] = n; tRaw += n; }
+    const vAct = R.div.Canberra.t[key];
+    const tAct = vAct.reduce((a, b) => a + b, 0);
+    check(`ACT graft preserves mass (${key})`, Math.abs(tAct - tRaw) < 1e-6 * Math.max(tRaw, 1), `${tRaw} -> ${tAct}`);
+    const oMass = vAct.reduce((a, x, i) => a + (oAt[i] ? x : 0), 0) / tAct;
+    check(`ACT graft puts real mass on O patterns (${key})`, oMass > 0.01, oMass.toFixed(3));
+    const r0 = routing(R, vRaw), r1 = routing(R, vAct);
+    let maxD = 0;
+    for (let S = 1; S < 16; S++) { if (S & 8) continue; for (let y = 0; y < 4; y++) maxD = Math.max(maxD, Math.abs(r0.F[S * 4 + y] - r1.F[S * 4 + y])); }
+    check(`ACT graft leaves O-free routing rows untouched (${key})`, maxD < 1e-9, maxD.toExponential(2));
+  }
+  /* the point of it: the ACT's assumed One Nation candidates take real Coalition transfers */
+  const { F: coalF } = routing(R, cohortTable(R, "Bean", "COAL"));
+  check("ACT Coalition tables route 20-80% of a pile to One Nation over Labor",
+    coalF[0b1001 * 4 + 3] > 0.2 && coalF[0b1001 * 4 + 3] < 0.8,
+    `{A,O} -> O = ${(100 * coalF[0b1001 * 4 + 3]).toFixed(1)}%`);
+}
 {
   const Fc = JSON.parse(readFileSync(FORECAST, "utf8"));
   check("forecast file: 150 seats, engine v2.2, forecast mode", Fc.seats.length === 150 && Fc._provenance.engine === "v2.2" && Fc.meta.mode === "forecast");

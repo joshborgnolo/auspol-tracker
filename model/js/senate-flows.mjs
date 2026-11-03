@@ -87,6 +87,57 @@ export function rankingsFrom(j, year = j.year) {
       for (const k of keys) { add(D.t, k, v); add(S, k, v); add(nat, k, v); }
     }
   }
+  /* ---- zero-One-Nation states: ACT every year so far, NT 2016-2022 - One Nation never stood a
+     Senate ticket there, so no ACT/NT ballot can rank O anywhere and a House count with One Nation
+     standing (the ACT's real 2022 field had one House candidate per seat; the model's 2028
+     assumption adds one there too) would receive ~no transfers to it, however its voters would
+     have marked it. Graft O into the state's tables: each base order's ballots re-split among O's
+     insertion positions - and the never-rank-it base itself - by how the same cohort's ballots
+     placed O in the states where it stood (the raw national tables net of the zero-O states).
+     Every split lands on patterns projecting back to the same base, so masses are preserved and
+     every routing, tilt and pair share over a standing set without O is identical: the 2025
+     replay and every O-free count run bitwise unchanged. */
+  {
+    const byBase = new Array(L);
+    for (let i = 0; i < L; i++) (byBase[pidx[P[i].replace("O", "")]] ||= []).push(i);
+    const hasO = {};
+    for (const d of Object.values(j.divisions)) for (const sparse of Object.values(d.t))
+      for (const [k, n] of Object.entries(sparse)) if (n > 0 && P[+k].includes("O")) hasO[d.st] = true;
+    const zeroO = new Set();
+    for (const d of Object.values(j.divisions)) zeroO.add(d.st);
+    for (const st of Object.keys(hasO)) zeroO.delete(st);
+    if (zeroO.size) {
+      const natX = {};
+      for (const [name, d] of Object.entries(j.divisions)) {
+        if (zeroO.has(d.st)) continue;
+        for (const [c, sparse] of Object.entries(d.t)) {
+          const v = new Float64Array(L);
+          for (const [k, n] of Object.entries(sparse)) v[+k] = n;
+          const keys = [c];
+          if (c.startsWith("COAL:")) keys.push("COAL");
+          if (c.startsWith("OTH:")) keys.push("OTH", "OTH-" + (j.subClass[c.slice(4)] || "M"));
+          for (const k of keys) add(natX, k, v);
+        }
+      }
+      const refFor = (key) => { for (const k of fallbackKeys(key)) if (natX[k] && total(natX[k]) > 0) return natX[k]; return null; };
+      const graft = (v, ref) => {
+        const out = new Float64Array(L);
+        for (let b = 0; b < L; b++) {
+          const w = v[b]; if (!w) continue;
+          const ins = byBase[b];
+          let rt = 0;
+          for (const i of ins) rt += ref[i];
+          if (rt <= 0) { out[b] += w; continue; }
+          for (const i of ins) out[i] += w * ref[i] / rt;
+        }
+        return out;
+      };
+      for (const st of zeroO) {
+        for (const [k, v] of Object.entries(state[st] || {})) { const ref = refFor(k); if (ref) state[st][k] = graft(v, ref); }
+        for (const d of Object.values(div)) if (d.st === st) for (const [k, v] of Object.entries(d.t)) { const ref = refFor(k); if (ref) d.t[k] = graft(v, ref); }
+      }
+    }
+  }
   return { year, P, pat, pidx, div, state, nat };
 }
 const total = (v) => { let s = 0; for (let i = 0; i < v.length; i++) s += v[i]; return s; };
