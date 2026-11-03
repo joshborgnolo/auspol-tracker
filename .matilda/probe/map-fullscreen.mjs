@@ -44,10 +44,12 @@ s = await page.evaluate(() => ({ on: __map.fs.on, lvl: __map.S.sel.level }));
 ok("Esc from a state walks up to the country, staying in", s.on && s.lvl === "aus", JSON.stringify(s));
 // Space plays; the year moves; Space pauses
 await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); });
-await page.keyboard.press("Space"); await wait(300);
+await page.keyboard.press("Space");
+// (the first stop's lossless Handbook boundaries may still be downloading: wait for them, not a fixed beat)
+await page.waitForFunction("window.__map.S.year === 1993 || !window.__map.fs.playing", { timeout: 30000 }).catch(() => {});
 s = await page.evaluate(() => ({ playing: __map.fs.playing, y: __map.S.year }));
 ok("Space plays from Now back round to the first election", s.playing && s.y === 1993, JSON.stringify(s));
-await wait(9000);
+await page.waitForFunction("window.__map.S.year !== 1993 || !window.__map.fs.playing", { timeout: 30000 }).catch(() => {});
 s = await page.evaluate(() => ({ playing: __map.fs.playing, y: __map.S.year }));
 ok("the play-through moves on", s.playing && s.y !== 1993, JSON.stringify(s));
 await page.keyboard.press("ArrowRight"); await wait(200);
