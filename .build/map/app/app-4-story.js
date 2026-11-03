@@ -836,16 +836,20 @@ function renderStory(force) {
     if (!SENM) return;
     const ss = S.ssel, key = ["senate", S.senLens, ss.level, ss.st, ss.i].join("|");
     if (!force && key === storyKey) return;
+    const was = storyKey;
     storyKey = key;
     $("#story").innerHTML = storySenate(SENM);
+    if (FS.on) fsStory(was !== key);
     return;
   }
   const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
+  const was = storyKey;
   storyKey = key;
   const el = $("#story");
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
   // the charts fill in now, not a frame on: a block that grows after the
   // story paints moves everything below it, and a walk's hold with it
   paintMiniChamber(); hydrateDists();
+  if (FS.on) fsStory(was !== key);
 }

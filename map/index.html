@@ -95,7 +95,7 @@
   }
 }
 </style>
-<link rel="stylesheet" href="/map/map.css?v=5e23300e">
+<link rel="stylesheet" href="/map/map.css?v=ec9be889">
 <!--map-data-warm:begin-->
 <script id="map-data-warm">(function(){var V={"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw23.json":"c257a350","core-qld17.json":"17564521","core-qld20.json":"6d08f6a0","core-qld24.json":"8cdaceda","core-sa22.json":"8d569e44","core-sa26.json":"2edbbb5b","core-vic22.json":"0fe5446f","data-now.json":"6e97359d","geo-1993-lo.json":"d5b83add","geo-1996-lo.json":"b3def3ba","geo-1998-lo.json":"e2c51765","geo-2001-lo.json":"a6606c1d","geo-2004-lo.json":"f1a3ae40","geo-2007-lo.json":"5cb6dd10","geo-2010-lo.json":"2f3e4725","geo-2013-lo.json":"f8051359","geo-2016-lo.json":"da0f2884","geo-2019-lo.json":"17e396f0","geo-2022-lo.json":"3d3e3056","geo-2025-lo.json":"194abc94","geo-nsw23-lo.json":"23ad692a","geo-qld17-lo.json":"e66797d1","geo-qld20-lo.json":"e66797d1","geo-qld24-lo.json":"e66797d1","geo-sa22-lo.json":"75ee7453","geo-sa26-lo.json":"73866149","geo-vic22-lo.json":"7dd2d4e3","islands.json":"10fe4949","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw23.json":"648c1a0d","res-qld17.json":"e29e6c97","res-qld20.json":"1c422972","res-qld24.json":"ffaba026","res-sa22.json":"f4621bd5","res-sa26.json":"71276935","res-vic22.json":"c44db2f7"};var y=(location.hash.match(/[#&]y=(\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>
 <!--map-data-warm:end-->
@@ -178,6 +178,7 @@
         <button type="button" class="rd-tab" role="tab" data-view="chamber" aria-selected="false"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M3 2.5v5.2a5 5 0 0 0 10 0V2.5"/><path d="M5.8 2.5v5.2a2.2 2.2 0 0 0 4.4 0V2.5"/></svg><span class="tw" data-t="Chamber">Chamber</span></button>
         <button type="button" class="rd-tab" role="tab" data-view="list" aria-selected="false"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5.5 4h8M5.5 8h8M5.5 12h8"/><path d="M2.5 4h.01M2.5 8h.01M2.5 12h.01" stroke-width="2"/></svg><span class="tw" data-t="List">List</span></button>
       </div>
+      <button type="button" class="mp-fsgo" id="fsgo" aria-label="Full screen" title="Full screen (F)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
     </div>
     <div class="rd-tabs mp-lensrow">
       <div class="mp-lenses" id="lenses" role="tablist" aria-label="Colour the seats by"></div>
@@ -194,7 +195,7 @@
           <div class="mp-loading" id="loading">Loading the map</div>
           <div class="mp-tl"><div class="mp-cities" id="cities" role="group" aria-label="Go to a city"></div><div class="mp-hint" id="hint"></div></div>
           <div class="mp-filter" id="filterpill" hidden></div>
-          <div class="mp-zoom" id="zoomer"><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button><button type="button" id="zhome" aria-label="Show the whole country" title="Show the whole country"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+          <div class="mp-zoom" id="zoomer"><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button><button type="button" id="zhome" aria-label="Show the whole country" title="Show the whole country"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.8 11.2 12 4.4l8.2 6.8"/><path d="M6.3 9.4V19.6h11.4V9.4"/><path d="M10.2 19.6v-5.2h3.6v5.2"/></svg></button><button type="button" id="zfs" aria-label="Full screen" title="Full screen (F)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
           <div class="mp-credit" id="credit" hidden><span class="mp-credit-long">Streets: </span>Powered by <a href="https://www.esri.com/" rel="noopener">Esri</a> · <span class="mp-credit-long">Esri, </span>TomTom, Garmin, © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a><span class="mp-credit-long"> contributors</span></div>
           <div class="mp-list" id="list" hidden></div>
           <div class="mp-tip" id="tip" hidden></div>
@@ -233,7 +234,7 @@
 </main>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
 <script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
-<script src="/map/map.js?v=7ac567fb"></script>
+<script src="/map/map.js?v=6d82c96c"></script>
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">

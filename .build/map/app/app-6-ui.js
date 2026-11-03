@@ -66,7 +66,8 @@ function fitSearchPlaceholder() {
 const lensRowEl = $(".mp-lensrow");
 function lensOverflow() {
   const el = $("#lenses"); if (!el || !lensRowEl) return;
-  lensRowEl.classList.toggle("more", el.scrollWidth - el.clientWidth - el.scrollLeft > 4);
+  // (the row's holder: the page's lens row, or in full screen its plate)
+  el.parentElement.classList.toggle("more", el.scrollWidth - el.clientWidth - el.scrollLeft > 4);
 }
 // the House's lenses, or in the Senate's chamber the Senate's own
 function renderLenses() {
@@ -530,6 +531,7 @@ function renderTimeline() {
     }
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian and Queensland state elections; choose one">${g}</svg>`;
+  if (FS.on) fsRail();
 }
 
 /* =============================== tooltip =============================== */
@@ -704,7 +706,10 @@ function setView(v, quiet) {
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
-  for (const id of ["#cities", "#zoomer", "#hint"]) $(id).hidden = v !== "map";
+  for (const id of ["#cities", "#hint"]) $(id).hidden = v !== "map";
+  // the zoom plate stays up in the chamber, for its full-screen button alone
+  $("#zoomer").hidden = list; $("#zoomer").dataset.view = v;
+  if (FS.on) fsView();
   updateCanvasVis();
   canvas.classList.toggle("grab", v === "map");
   updateTouch();
@@ -813,6 +818,7 @@ function showLoading(on, msg) {
 }
 async function setYear(y) {
   if (y === S.year) return;
+  if (!FS.auto) fsStop();
 
   // the spot is taken now, while it's fresh: the election may take a while to load
   const from = S.year, a = M(), spot = takeSpot();
@@ -917,9 +923,10 @@ const stampEl = (() => {
   return el;
 })();
 let stampShown = "", stampOff = 0;
+const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : "South Australian");
 function stampParts(y) {
   if (y === "now") return ["The House today", "Now"];
-  if (STATE_YEARS.has(y)) return [`${NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : "South Australian"} election`, "20" + String(y).slice(-2)];
+  if (STATE_YEARS.has(y)) return [`${stateAdj(y)} election`, "20" + String(y).slice(-2)];
   return ["Federal election", String(y)];
 }
 function showStamp(y, dir) {
@@ -943,6 +950,9 @@ function showStamp(y, dir) {
 function stampDone(after = 300) {
   stampEl.classList.remove("wait");
   clearTimeout(stampOff);
+  // (full screen keeps the election up on a wide screen, the map's own title plate;
+  // a phone's small map shows it only while it turns, as the page does)
+  if (FS.on && !FS.phone) return;
   stampOff = setTimeout(() => stampEl.classList.remove("on"), after + 900);
 }
 // the timeline's underline glides from the stop it left to the one chosen
@@ -958,7 +968,7 @@ function tlGlide(r0) {
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${NSW_YEARS.has(m.year) ? "New South Wales" : VIC_YEARS.has(m.year) ? "Victorian" : "South Australian"} election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${stateAdj(m.year)} election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 /* the eyebrow holds the height of its jurisdiction family's longest line, so a walk through one
    family never moves the figure under it: between 414 and 600px an election's line wraps to two
@@ -1052,19 +1062,29 @@ function frame(ts) {
 function resize() {
   const r = $("#stage").getBoundingClientRect();
   if (!r.width || !r.height) return;
+  // (full screen: the plates' room is read before any framing below uses it)
+  if (FS.on) fsMeasure(true);
   const first = !Wpx;
   dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // full screen on a big retina display would be a 15-megapixel canvas, drawn every frame
+  // the map moves (2560 x 1440 at 2x dropped one frame in eight): its backing store keeps to a
+  // budget, the resolution falling only as far as that needs (FS.px, app-7-full.js)
+  if (FS.on) dpr = Math.max(1, Math.min(dpr, Math.sqrt(FS.px / (r.width * r.height))));
   const changed = Math.abs(Wpx - r.width) > 0.5 || Math.abs(Hpx - r.height) > 0.5;
   // only the height moved (the key above the stage grew or shrank): a view the page framed
   // glides to the new fit; one the reader has moved keeps its zoom, centred as before
-  const dh = r.height - Hpx, keyOnly = !first && Math.abs(Wpx - r.width) <= 0.5 && changed && S.view === "map";
+  const dh = r.height - Hpx, dw = r.width - Wpx, keyOnly = !first && Math.abs(Wpx - r.width) <= 0.5 && changed && S.view === "map";
   const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
   if (M()) {
     setExtent();
-    if (moved) d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(T.x, T.y + dh / 2).scale(T.k));
-    else if (flight && keyOnly) flight.redo();
+    // the step into or out of full screen brings its own camera (app-7-full.js)
+    if (FS.move) { const mv = FS.move; FS.move = null; mv(); }
+    // (full screen resized under a view the reader moved: the middle holds, the zoom too)
+    else if (FS.on && changed && !first && S.view === "map" && !atLastFit() && !flight) d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(T.x + dw / 2, T.y + dh / 2).scale(T.k));
+    else if (moved) d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(T.x, T.y + dh / 2).scale(T.k));
+    else if (flight && (keyOnly || FS.on)) flight.redo();
     else if (first || changed) fitSelection(keyOnly && !reduceMotion ? 320 : 0);
   }
   updateCanvasVis();
@@ -1105,8 +1125,9 @@ function writeURL() {
     else if (s.level === "booth") p.set("s", m.divs[s.div].n + "/" + m.booth.id[s.booth]);
     if (s.isl) p.set("at", s.isl);
   }
+  if (FS.on) p.set("fs", "1");
   const h = p.toString();
-  try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
+  try { history.replaceState(FS.on ? { mpFs: 1 } : null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
 }
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
@@ -1137,9 +1158,10 @@ function readURL() {
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
   if (p.get("c") === "senate") { S.house = "senate"; if (SEN_LENSES.some((l) => l.id === p.get("sl"))) S.senLens = p.get("sl"); senFromURL = p.get("ss"); }
+  fsFromURL = p.get("fs") === "1";
   return p.get("s");
 }
-let senFromURL = null;
+let senFromURL = null, fsFromURL = false;
 function applySenFromURL() {
   const v = senFromURL; senFromURL = null;
   if (!v || !SENM) return;
@@ -1383,9 +1405,12 @@ function preloadYears() {
   fitSelection(0, true); // frame the map's transform even when the page opened on the chamber
   urlReady = true; writeURL();
   renderLegend(); updateHint(); renderTimeline(); renderBack();
+  $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
+  if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
   window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
+    fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
     landAt(px, py) { const m = M(); if (!m) return false; const g = geoOf(m); if (!g || !g.paths) return false; const bx = (px - T.x) / T.k, by = (py - T.y) / T.k; for (let i = 0; i < m.divs.length; i++) { const q = g.bb[i]; if (!q || bx < q[0][0] || bx > q[1][0] || by < q[0][1] || by > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[i], bx, by)) return true; } return false; },
     drawNow() { const t0 = performance.now(); frame(t0); if (raf) { cancelAnimationFrame(raf); raf = 0; } return performance.now() - t0; },

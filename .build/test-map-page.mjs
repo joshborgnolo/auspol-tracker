@@ -74,7 +74,7 @@ assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git 
 // block's two identical arms and the map's IIFE ran twice on the live page
 assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
 // era-impossible options drop from the frame's own menus: the IRSAD
 // 'Advantage and disadvantage' index before the 2001-census four-index
 // suite, and One Nation's family option before its April 1997 formation
@@ -2130,6 +2130,28 @@ for (const y of ["sa22", "sa26"]) {
   // federal four-char keys was why it was written that way)
   assert.ok(base.includes("`${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}`"), "a state frame's label is the jurisdiction word + full year, no space (nsw23 → 'NSW2023', never 'NSW w23' or 'NSW 23')");
   assert.ok(ui.includes('short ? "’" + String(y).slice(-2) : yearLabel(y)'), "the timeline's short row shows the two-digit year only (nsw23 → '’23')");
+}
+
+// the full-screen view (app-7-full.js, 2026-11-03): its way in on the zoom plate (the
+// corner brackets are its glyph; the whole-country button wears a house), the plates'
+// room in every framing (the map's pads, the chamber's, its labels' and the islands'),
+// the hash and history entry, Queensland's elections named as such (they read "South
+// Australian election" in the stamp and the eyebrow), and the part assembled in order.
+// The behaviour itself is driven by .matilda/probe/map-fullscreen.mjs
+{
+  const base = part("app-1-base.js"), map2 = part("app-2-map.js"), ch = part("app-3-chamber.js"), ui = part("app-6-ui.js"), fsj = part("app-7-full.js"), css = part("page.css");
+  assert.ok(/<button type="button" id="zfs" aria-label="Full screen" title="Full screen \(F\)"><svg[^>]*><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"\/><\/svg><\/button><\/div>/.test(page), "the zoom plate ends in the full-screen button, the corner brackets its glyph");
+  assert.ok(/id="zhome"[^>]*>(?:(?!<\/button>).)*M3\.8 11\.2 12 4\.4l8\.2 6\.8/.test(page), "the whole-country button wears a house, not the full-screen brackets");
+  assert.ok(base.includes("const FS = { on: false, ins: { t: 0, r: 0, b: 0, l: 0 }, move: null };"), "the full-screen state lives in the base part, readable by every part from the start");
+  assert.ok(map2.includes("if (FS.on && !page) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }"), "the map's fit keeps the plates' room clear");
+  assert.ok(ch.includes("if (FS.on) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }") && ch.includes("const eL = opts.big && FS.on ? FS.ins.l : 0, eR = opts.big && FS.on ? w - FS.ins.r : w;"), "the chamber and its labels keep to the clear ground");
+  assert.ok(map2.includes("const q = FS.on ? FS.ins : { l: 0, r: 0, b: 0 }, L = q.l + 4, R = Wpx - q.r - 4, B = Hpx - q.b - 4;"), "the island boxes stay off the plates");
+  assert.ok(ui.includes('if (FS.on) p.set("fs", "1");') && ui.includes('fsFromURL = p.get("fs") === "1";') && fsj.includes('history.pushState({ mpFs: 1 }, "", location.href)'), "full screen rides the hash, and its own history entry makes Back the way out");
+  assert.ok(ui.includes('QLD_YEARS.has(y) ? "Queensland" : "South Australian"') && !ui.includes('VIC_YEARS.has(m.year) ? "Victorian" : "South Australian"'), "Queensland's elections are Queensland's in the stamp and the eyebrow");
+  assert.ok(fsj.includes("if (FS.on || FS.leaving || !M()) return;") && fsj.includes("fsUnpark(true);"), "the way in parks the page's own elements; the way out sends them home ahead of the stage");
+  assert.ok(base.includes("if (!PHONE.matches || y == null || FS.on) return;") && base.includes("if (!spot || !PHONE.matches || FS.on) return null;"), "the phone's walk hold stands down in full screen (no page to hold)");
+  assert.ok(css.includes(".fs:not(.phone) .mp-legend { min-height: 0 !important; }"), "the wide panel's key takes its own height (its hold is the page stage's)");
+  assert.ok(!/\.fs[^{]*\{[^}]*text-transform:\s*uppercase/.test(css), "no small caps in the full-screen plates");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 and Victoria's 2022 frames on their own timeline rows, in the sitemap");

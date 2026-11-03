@@ -1525,7 +1525,7 @@ function seaSpots(m, hb, A, p) {
     for (const el of [cities, hint]) if (el.offsetHeight) top = Math.max(top, el.getBoundingClientRect().bottom - st.top + 14);
     seaTop = { w: Wpx, top };
   }
-  const top = seaTop.w === Wpx ? seaTop.top : isPhone() ? 4 : p.t + 22;
+  const top = seaTop.w === Wpx ? seaTop.top : isPhone() ? (FS.on ? FS.ins.t : 0) + 4 : p.t + 22;
   const memo = [m.year, Wpx, Hpx, HOME.k, HOME.x, HOME.y, top].join();
   if (seaMemo && seaMemo.memo === memo) return seaMemo.out;
   const room = Hpx - p.t - p.b - (hb[1][1] - hb[0][1]) * HOME.k, at = ISL_AT[room >= 2 * (A + ISL_CAP + 8) ? "stacked" : "side"];
@@ -1540,7 +1540,9 @@ function seaSpots(m, hb, A, p) {
       const [x, y] = c[key], half = Math.max(A, ctx.measureText(name).width + 6) / 2;
       x0 = Math.min(x0, x - half); x1 = Math.max(x1, x + half); y0 = Math.min(y0, y - A / 2); y1 = Math.max(y1, y + A / 2 + ISL_CAP);
     }
-    const sx = x0 < 4 ? 4 - x0 : x1 > Wpx - 4 ? Wpx - 4 - x1 : 0, sy = y0 < top ? top - y0 : y1 > Hpx - 4 ? Hpx - 4 - y1 : 0;
+    // (kept on the clear ground: in full screen, off the plates)
+    const q = FS.on ? FS.ins : { l: 0, r: 0, b: 0 }, L = q.l + 4, R = Wpx - q.r - 4, B = Hpx - q.b - 4;
+    const sx = x0 < L ? L - x0 : x1 > R ? R - x1 : 0, sy = y0 < top ? top - y0 : y1 > B ? B - y1 : 0;
     // the hint's clearance can push a pair down onto the coast: step it back out to
     // sea until no box edge or caption line touches a division's land
     const g = geoOf(m);
@@ -1563,7 +1565,7 @@ function seaSpots(m, hb, A, p) {
         }
         return false;
       };
-      while (out2 <= 60 && touches() && x0 + sx + dir * (out2 + 6) >= 4 && x1 + sx + dir * (out2 + 6) <= Wpx - 4) out2 += 6;
+      while (out2 <= 60 && touches() && x0 + sx + dir * (out2 + 6) >= L && x1 + sx + dir * (out2 + 6) <= R) out2 += 6;
       for (const key of [ne, sw]) c[key][0] += dir * out2;
     }
     for (const key of [ne, sw]) out[key] = [c[key][0] + sx, c[key][1] + sy];
@@ -1692,20 +1694,28 @@ function drawIslands(m, alpha = 1) {
 }
 
 /* ----- framing ----- */
-function stagePads() {
+// in full screen the plates' room is added at each edge (FS.ins), so a fit centres in the
+// clear ground between them; page: true asks for the page's own (the step out of full screen)
+function stagePads(page) {
   const phone = isPhone();
-  return { t: phone ? 12 : 36, b: phone ? 12 : 18, l: phone ? 8 : 12, r: phone ? 44 : 50 };
+  const p = { t: phone ? 12 : 36, b: phone ? 12 : 18, l: phone ? 8 : 12, r: phone ? 44 : 50 };
+  if (FS.on && !page) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }
+  return p;
+}
+// a box framed in a w x h stage inside its pads
+function fitFor(bb, w, h, p, maxK) {
+  const [[x0, y0], [x1, y1]] = bb;
+  const bw = Math.max(x1 - x0, 0.05), bh = Math.max(y1 - y0, 0.05);
+  const k = Math.min((w - p.l - p.r) / bw, (h - p.t - p.b) / bh, maxK || 2400);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  return d3.zoomIdentity.translate(p.l + (w - p.l - p.r) / 2 - cx * k, p.t + (h - p.t - p.b) / 2 - cy * k).scale(k);
 }
 // res: room kept clear at the stage's left (l) or foot (b), for docked island
 // boxes, or its top (t), for the way back from an island and its name
 function fitTransform(bb, maxK, res) {
   const p = stagePads();
   if (res) { p.l += res.l || 0; p.b += res.b || 0; p.t += res.t || 0; }
-  const [[x0, y0], [x1, y1]] = bb;
-  const w = Math.max(x1 - x0, 0.05), h = Math.max(y1 - y0, 0.05);
-  const k = Math.min((Wpx - p.l - p.r) / w, (Hpx - p.t - p.b) / h, maxK || 2400);
-  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-  return d3.zoomIdentity.translate(p.l + (Wpx - p.l - p.r) / 2 - cx * k, p.t + (Hpx - p.t - p.b) / 2 - cy * k).scale(k);
+  return fitFor(bb, Wpx, Hpx, p, maxK);
 }
 function unionBB(list) { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const b of list) { if (!b) continue; x0 = Math.min(x0, b[0][0]); y0 = Math.min(y0, b[0][1]); x1 = Math.max(x1, b[1][0]); y1 = Math.max(y1, b[1][1]); } return [[x0, y0], [x1, y1]]; }
 function homeBox(m) {

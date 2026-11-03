@@ -768,6 +768,8 @@ function drawChamberFurniture(g, F, geom, opts = {}) {
 function drawChamber(g, m, w, h, opts) {
   const geom = chamberGeom(m);
   const pad = opts.pad || { t: 8, r: 8, b: 8, l: 8 };
+  // the labels' room: the canvas, or in full screen the clear ground between the plates
+  const eL = opts.big && FS.on ? FS.ins.l : 0, eR = opts.big && FS.on ? w - FS.ins.r : w;
   const F = chamberFrame(geom, w, h, pad);
   const th = TH, s = F.s, now = performance.now();
   const ch = chamberOrder(m);
@@ -952,7 +954,7 @@ function drawChamber(g, m, w, h, opts) {
       // wrap the make-up to the room on that side, and find where the block's box falls
       const lay = (side, by, mode) => {
         const bx = X(side === "left" ? rO + 0.95 : -rO - 0.95);
-        const maxW = Math.max(120, side === "left" ? w - bx - 4 : bx - 4);
+        const maxW = Math.max(120, side === "left" ? eR - bx - 4 : bx - eL - 4);
         g.font = `400 12px ${SANS}`;
         // one middot-joined line if the whole make-up fits; otherwise a
         // stacked list, one party to a line — packing two to a line leaves a
@@ -975,7 +977,7 @@ function drawChamber(g, m, w, h, opts) {
         g.font = `600 13px ${SANS}`; wMax = Math.max(wMax, g.measureText(`Crossbench ${ch.nCross}`).width + 10);
         const x0 = side === "left" ? bx : bx - wMax, ht = 17 + lines.length * 15;
         // no room beside the chamber on a narrow screen: the key below gives the counts
-        const room = (side === "left" ? w - bx : bx) >= wMax + 4;
+        const room = (side === "left" ? eR - bx : bx - eL) >= wMax + 4;
         // clear of the other labels, and off the chamber's floor (a phone has no room beside it)
         const onFloor = (px, py) => { const u = (px - F.ox) / s, v = (py - F.oy) / s; return geom.rect ? saOnFloor(geom, u, v) : v <= 0 ? v >= geom.box.y0 && Math.abs(u) <= floorR : Math.hypot(u, v) <= floorR; };
         const clear = by + ht <= h - 2 && !occ.some((o) => x0 < o.x1 + 4 && x0 + wMax > o.x0 - 4 && by < o.y1 + 3 && by + ht > o.y0 - 3)
@@ -1048,7 +1050,7 @@ function drawChamber(g, m, w, h, opts) {
       const y0 = side ? ly - th2 / 2 : ly + 5;
       return { x0, y0, x1: x0 + tw, y1: y0 + th2 };
     };
-    const free = (b) => b.x0 >= 4 && b.x1 <= w - 4 && b.y0 >= 0 && b.y1 <= h - 2
+    const free = (b) => b.x0 >= eL + 4 && b.x1 <= eR - 4 && b.y0 >= 0 && b.y1 <= h - 2
       && !occ.some((o) => b.x0 < o.x1 + 4 && b.x1 > o.x0 - 4 && b.y0 < o.y1 + 3 && b.y1 > o.y0 - 3)
       && ![[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1], [(b.x0 + b.x1) / 2, b.y0], [(b.x0 + b.x1) / 2, b.y1]].some(([px, py]) => onFloor(px, py));
     let box = boxAt(ax, ay), found = free(box);
@@ -1063,7 +1065,7 @@ function drawChamber(g, m, w, h, opts) {
     g.textAlign = "left"; g.textBaseline = "middle";
     if (!found) {
       // no free room outside the benches (a phone): the name sits on a plate above its chair
-      box = { x0: clamp(q.x - tw / 2, 4, w - 4 - tw), y0: Math.max(2, q.y - q.r - 22) };
+      box = { x0: clamp(q.x - tw / 2, eL + 4, eR - 4 - tw), y0: Math.max(2, q.y - q.r - 22) };
       g.fillStyle = css(th.bg, 0.92);
       g.beginPath(); if (g.roundRect) g.roundRect(box.x0 - 5, box.y0 - 1, tw + 10, 18, 4); else g.rect(box.x0 - 5, box.y0 - 1, tw + 10, 18); g.fill();
       g.fillStyle = css(th.ink); g.fillText(txt, box.x0, box.y0 + 8);
@@ -1119,7 +1121,12 @@ function chamberHit(m, px, py) {
   return best == null ? null : { kind: m.house === "senate" ? "sen" : "div", i: best };
 }
 // a phone has no room beside the chamber: it fills the width, its bloc labels in a band above
-function chamberPads(w = Wpx) { return isPhone() ? (w < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 36, l: 10 }) : { t: 34, r: 150, b: 36, l: 150 }; }
+function chamberPads(w = Wpx) {
+  const p = isPhone() ? (w < 600 ? { t: 62, r: 3, b: 24, l: 3 } : { t: 30, r: 10, b: 36, l: 10 }) : { t: 34, r: 150, b: 36, l: 150 };
+  // (full screen: the chamber sits in the clear ground between the plates)
+  if (FS.on) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }
+  return p;
+}
 function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;

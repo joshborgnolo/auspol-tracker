@@ -21,6 +21,11 @@ const sgn = (v, d = 1) => (v == null || Number.isNaN(v) ? "–" : (v > 0.049 ? "
 const pts = (v) => { const a = Math.abs(v); return `${a.toFixed(1)} point${a.toFixed(1) === "1.0" ? "" : "s"}`; };
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isPhone = () => matchMedia("(max-width: 860px)").matches;
+/* the full-screen view's state (app-7-full.js), here so every part reads it from the start:
+   on, and the room its plates take at each edge of the stage (ins, stage px), which the
+   map's and the chamber's framing keep clear; move is resize()'s one-shot camera for the
+   step into or out of it */
+const FS = { on: false, ins: { t: 0, r: 0, b: 0, l: 0 }, move: null };
 const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one"];
 const words = (n) => (n >= 0 && n < WORDS.length ? WORDS[n] : String(n));
 const Words = (n) => { const w = words(n); return w[0].toUpperCase() + w.slice(1); };
@@ -608,7 +613,8 @@ function storyBlocks() {
 // a gesture at viewport y names the block under it (a note's spot goes to the keyed block below it)
 function walkAim(y) {
   walkSpot = null;
-  if (!PHONE.matches || y == null) return;
+  // (full screen has no page to hold: its story scrolls in its own panel)
+  if (!PHONE.matches || y == null || FS.on) return;
   for (const sel of FIXED_SPOTS) {
     const el = $(sel), r = el && !el.hidden && el.getBoundingClientRect();
     if (r && y >= r.top && y < r.bottom) { walkSpot = { el, at: performance.now() }; return; }
@@ -631,7 +637,7 @@ addEventListener("scroll", () => { lastScrollAt = performance.now(); }, { passiv
 let walkMark = null;
 let holdEnd = null;
 function walkHold(spot) {
-  if (!spot || !PHONE.matches) return null;
+  if (!spot || !PHONE.matches || FS.on) return null;
   let cands;
   if (spot.el) cands = [{ el: spot.el, key: null }];
   else {
