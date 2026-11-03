@@ -97,7 +97,17 @@ export function leverLevels(SEN, seats) {
 }
 
 const COMP_KEY = { alp: "ALP", lnp: "COAL", grn: "GRN", onp: "ON", ind: "OTH-M", oth: "OTH" };
-export function buildSeatsFrom(inputs, { composition = true, levers = null } = {}) {
+/* Which parties' voters are mixed from their 2025 parties (family indexes, A=0 C=1 G=2 O=3): One Nation's
+   only. Its voters are mostly new (under a quarter voted for it in 2025), and the one count to test it on
+   bears the mix out: in SA 2026 One Nation's preferences reached Labor in classic districts at 28.3%
+   against the Senate ballots' 17. The other parties' tables are already set on counts of their own flows
+   (the Coalition's Labor-v-One Nation level on the four counts of that contest), and the mix would move
+   them off those levels on recalled votes alone: today's Coalition voters who recall a 2025 Labor vote
+   (13% on 3 Nov 2026), given Labor's order with the Coalition moved first, lifted Coalition-to-Labor
+   against One Nation from 26 to 39 and Labor's nowcast by about 5 seats. Recall leans towards the party
+   that won, and no count shows that shift. */
+export const MIX_FAMS = [3];
+export function buildSeatsFrom(inputs, { composition = true, levers = null, mixFams = MIX_FAMS } = {}) {
   const { hist, comp, ST, SEN } = inputs;
   return inputs.seats.map((sk) => {
     const s = { ...sk, cands: sk.cands.map((c) => ({ ...c })) };
@@ -107,7 +117,7 @@ export function buildSeatsFrom(inputs, { composition = true, levers = null } = {
     const tableFor = (key) => (tables[key] = tables[key] || (inputs.pre ? Float64Array.from(inputs.pre[s.name][flowClassOf(key)]) : calibratedTable(SEN, ST, { st: s.st }, s.name, key, hist)));
     for (const c of s.cands) {
       let p = tableFor(c.key);
-      if (c.fam >= 0 && composition && comp) {
+      if (c.fam >= 0 && composition && comp && mixFams.includes(c.fam)) {
         const X = ["alp", "lnp", "grn", "on"][c.fam];
         const parts = [];
         for (const [g, w] of Object.entries(comp[X])) {

@@ -18,6 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { prepInputs, buildSeatsFrom, LEVERS, leverLevels } from "../analysis/seat-model/seat-inputs.mjs";
+import { MIX_FAMS } from "../analysis/seat-model/seat-build.mjs";
 import { modelSettings } from "../analysis/seat-model/model-sim.mjs";
 import { count } from "../analysis/seat-model/seat-engine.mjs";
 import { pairShare, cohortTable } from "../analysis/seat-model/senate-flows.mjs";
@@ -113,6 +114,13 @@ const evidence = round({
   flowDrift,
   flows: { delta: FCAL.same.delta, classPooled: FCAL.same.classPooled, sigmaSame: { u: FCAL.same.sigmaU, v: FCAL.same.sigmaV }, sigmaLag: { u: FCAL.lag.sigmaU, v: FCAL.lag.sigmaV }, combine: FCAL.combine, drift: STATES.drift, rows: FCAL.rows, coalitionLaborOnOffset: inp.ST.delta["COAL|AO"] },
   composition: inp.comp,
+  /* whose voters the model mixes from their 2025 parties, and what mixing the Coalition's too would do to
+     its Labor-v-One Nation level (the page says why it doesn't) */
+  compositionUse: (() => {
+    const lv = (seatsB) => leverLevels(inp.SEN, seatsB)["COAL|AO"];
+    return { mixed: MIX_FAMS.map((f) => ["alp", "lnp", "grn", "on"][f]),
+      coalLaborOverOn: { used: r4(lv(built)), ifMixed: r4(lv(buildSeatsFrom(inp, { composition: true, mixFams: [...MIX_FAMS, 1] }))) } };
+  })(),
   replay2025: { winners: ok, pairs: pairOk, tcpMaePts: Math.round(10000 * tcpE.reduce((a, b) => a + b, 0) / tcpE.length) / 100, misses },
   states: Object.fromEntries(Object.entries(STATES.results).map(([k, v]) => [k, { label: v.label, senate: v.senate, seats: v.seats, actualSeats: v.actualSeats, replay: v.replay, chain: v.chain }])),
   federal: { draws: FED.draws, sigmaMultiplier: FED.sigmaMultiplier, results: FED.results.map((r) => ({ E: r.E, variant: r.variant, stateOracle: r.stateOracle, brier: r.brier, logScore: r.logScore, modalRight: r.modalRight, pairsRight: r.pairsRight, tcpMaePts: r.tcpMaePts, expected: r.expected, actual: r.actual })), calibration: FED.calibrationPooled },

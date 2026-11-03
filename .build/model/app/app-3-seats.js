@@ -83,7 +83,7 @@ function seatCard(s) {
   return `<div class="md-card">${whyHTML(s)}
     <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">Thin bar: ${Y}${added ? " (One Nation, which did not stand here in 2022: its federal 2025 vote at the nearest polling places)" : ""}. Thick bar and figure: the simulations’ average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
     <div><h4>How often each wins</h4><div class="md-kv">${wins}</div><h4 style="margin-top:14px">The contest it comes down to</h4><div class="md-kv">${pairs}</div></div>
-    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district’s own" : "From this seat’s 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house" : "House"} voters differ and mixed for today’s voters. The ${Y} count: ${res25}.${changed}</p></div>
+    <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district’s own" : "From this seat’s 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house voters differ" : "House voters differ, with One Nation’s voters mixed for where they came from"}. The ${Y} count: ${res25}.${changed}</p></div>
   </div>`;
 }
 /* why a changing-hands seat changes hands: the central projection's margin between the winner's candidate
@@ -122,7 +122,7 @@ function whyHTML(s) {
     state: () => { const v = S.states && S.states[k.st]; const l = v ? listPP(v.dev) : ""; return `${poss(ST_NAME[k.st] || k.st)} polls against the ${vic ? "statewide" : "national"} swing${l ? `: ${l} points` : ""}`; },
     demo: () => { const l = k.demoPP ? listPP(k.demoPP) : ""; return `The seat’s age and gender mix${l ? `: ${l} points against the average seat` : ""}`; },
     terms: () => `Seat terms: the sitting member’s personal vote, defections and part of ${Y}’s surprise going back${adjC.length ? ` (${adjC.map((c) => `${esc(groupName(c.group, k))} ${c.adj > 0 ? "up" : "down"}`).join(", ")})` : ""}`,
-    comp: () => `Today’s voters’ preferences: people who have changed party since ${Y} keep part of their old party’s preferences`,
+    comp: () => `One Nation’s new voters’ preferences: people who have moved to it since ${Y} keep part of their old party’s preferences`,
   };
   const ph = Object.entries(d.phi).filter(([f]) => TXT[f]);
   const pro = ph.filter(([, v]) => v >= 0.5).sort((a, b) => b[1] - a[1]).slice(0, 3);

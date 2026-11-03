@@ -10,7 +10,7 @@
    The model itself lives in pure modules the /model/ page runs too (one implementation):
      seat-engine.mjs   logit spread, the count
      senate-flows.mjs  Senate-ballot ranking tables and the routing they give
-     seat-build.mjs    every candidate's table: House-calibrated, today's voters mixed, levers
+     seat-build.mjs    every candidate's table: House-calibrated, One Nation's voters mixed, levers
      model-sim.mjs     one election, many elections, the no-noise projection
    This file is the node side: it prepares the seat skeleton from the committed stores
    (seat-inputs.mjs), takes the settings from the calibration files (model-sim.modelSettings) and
@@ -79,7 +79,7 @@ const INPUTS = ["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "d
   ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
   ".build/analysis/seat-model/swing-fit.mjs"];
 const out = {
-  _about: `2028 seat model v2.2 (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025 with seat terms fitted on 1996-2025 (sitting members, defections, reversion of each seat's 2025 surprise); preferences replayed on each division's 2025 Senate rankings (House-calibrated, today's voters mixed from their 2025 parties); fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: the 2025 candidate field is assumed (W6); independents' votes carry over with noise; how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
+  _about: `2028 seat model v2.2 (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025 with seat terms fitted on 1996-2025 (sitting members, defections, reversion of each seat's 2025 surprise); preferences replayed on each division's 2025 Senate rankings (House-calibrated, One Nation's voters mixed from their 2025 parties); fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: the 2025 candidate field is assumed (W6); independents' votes carry over with noise; how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
   _provenance: { generated: new Date().toISOString().slice(0, 10), engine: "v2.2", inputs: Object.fromEntries(INPUTS.map((f) => [f, sha16(f)])) },
   meta: { mode: MODE, draws: DRAWS, seed: SEED, nowcast: VOTE.national.nowcast, window: VOTE.diagnostics.recentWindow, band: S.band,
     sigmaNational: Object.fromEntries(P5.map((p, k) => [p, r4(S.sigNat[k])])), corr: S.corr, tDf: S.df,

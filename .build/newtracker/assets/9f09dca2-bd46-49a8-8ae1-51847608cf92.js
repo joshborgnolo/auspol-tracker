@@ -356,7 +356,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = {"asOf":"2026-10-25","total":150,"seats":{"alp":94,"lnp":41,"grn":1,"onp":2,"ind":10,"oth":2},"changed":4,"senate":{"asOf":"2026-10-09","total":76,"seats":{"alp":30,"lnp":27,"grn":10,"onp":4,"ind":2,"oth":3}}};
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"Labor would win the most seats, with a majority about as likely as not","pollsTo":"2026-10-27","draws":20000,"expectedSeats":{"alp":72.02,"lnp":30.77,"on":35.49,"grn":4.06,"oth":0.01,"member":7.65},"mostSeats":{"alp":0.9114,"lnp":0.0113,"on":0.0773,"grn":0,"oth":0,"member":0},"majority":{"alp":0.403,"coalition":0.0017,"on":0.0164,"noMajority":0.579}};
+  const seatModel = {"headline":"Labor would probably win the most seats, more likely short of a majority than not","pollsTo":"2026-10-27","draws":20000,"expectedSeats":{"alp":66.91,"lnp":30.35,"on":40.64,"grn":4.44,"oth":0.01,"member":7.65},"mostSeats":{"alp":0.8452,"lnp":0.0138,"on":0.1411,"grn":0,"oth":0,"member":0},"majority":{"alp":0.241,"coalition":0.0016,"on":0.0256,"noMajority":0.7319}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
