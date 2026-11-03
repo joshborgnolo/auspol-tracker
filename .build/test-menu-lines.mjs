@@ -112,7 +112,7 @@ const fresh = (mutate) => {
 {
   const rows = (m) => JSON.parse(JSON.stringify(m["flows-explained"].fig || {})).rows;
   const coRow = { cap: "To Labor v Coalition", cells: [{ v: "88", tone: "grn" }, { v: "26", tone: "onp" }, { v: "55", tone: "oth" }] };
-  const onRow = { cap: "To Labor v One Nation", cells: [{ v: "91", tone: "grn" }, { v: "30", tone: "lnp" }, { v: "55", tone: "oth" }] };
+  const onRow = { cap: "To Labor v One Nation", cells: [{ v: "91", tone: "grn" }, { v: "27", tone: "lnp" }, { v: "55", tone: "oth" }] };
   const AP = fresh();
   const L = AP.menuLines();
   assert.deepEqual(rows(L), [coRow, onRow], "the Coalition row first while it is Labor's main rival");

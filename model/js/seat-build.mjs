@@ -29,7 +29,9 @@ export function settings(FCAL) {
   // real counts of that pair, not borrowed from its Labor-v-Greens finals (where Coalition cards put the
   // Greens last): Hunter 2025 +0.24 logit (House v same-election Senate), SA 2026 +0.02, Queensland 2020
   // -0.12, Queensland 2017 -0.58 (state counts v the previous federal Senate; backtest-states.mjs). They
-  // average about zero, so zero, with the level drift they show carried as a national flow shock.
+  // average about zero, so zero, with the level drift they show carried as a national flow shock. The 2028
+  // runs replace it with solveCoalAO's offset, which sets the national level to the site's own Labor v One
+  // Nation table (flows.mjs FP_ON.lnp, built on these counts and Secret Harbour's); backtests keep zero.
   const delta = {};
   for (const [k, d] of Object.entries(FCAL.same.delta)) delta[k] = d.v;
   delta["COAL|AO"] = 0;
@@ -81,6 +83,9 @@ function applyLevers(SEN, c, p, levers) {
   }
   return p;
 }
+/* states whose Senate ballots had no One Nation group (the ACT in 2025): every table there leaves One Nation
+   unranked, so they say nothing about a choice involving it and stay out of the national levels */
+export const noOnBallots = (SEN, st) => !!SEN.state && !SEN.state[st]?.ON;
 /* each lever's national level as the model stands: the class's share to X over Y, weighted by its
    candidates' votes - what the page prints beside each slider */
 export function leverLevels(SEN, seats) {
@@ -88,12 +93,31 @@ export function leverLevels(SEN, seats) {
   for (const [k, L] of Object.entries(LEVERS)) {
     let a = 0, w = 0;
     for (const s of seats) for (const c of s.cands) {
+      if (noOnBallots(SEN, s.st)) continue;
       if (!L.cls.includes(c.cls) || !c.table) continue;
       const v = s.w * c.base; a += v * pairShare(SEN, c.table, L.x, L.y); w += v;
     }
     out[k] = w ? a / w : null;
   }
   return out;
+}
+
+/* the Coalition's Labor-v-One Nation offset that puts its national level (as leverLevels reads it, before
+   levers) on `target`: bisection on the logit offset; the Coalition's voters are not mixed (MIX_FAMS), so
+   their tables are calibratedTable's alone */
+export function solveCoalAO(inputs, target) {
+  const { SEN, ST, hist } = inputs;
+  const rows = [];
+  for (const s of inputs.seats) if (!noOnBallots(SEN, s.st)) for (const c of s.cands) if (flowClassOf(c.key) === "COAL") rows.push([s, c, s.w * c.base]);
+  const level = (d) => {
+    const st = { ...ST, delta: { ...ST.delta, "COAL|AO": d } };
+    let a = 0, w = 0;
+    for (const [s, c, v] of rows) { a += v * pairShare(SEN, calibratedTable(SEN, st, { st: s.st }, s.name, c.key, hist), 0, 3); w += v; }
+    return a / w;
+  };
+  let lo = -2, hi = 2;
+  for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (level(m) < target) lo = m; else hi = m; }
+  return Math.round(((lo + hi) / 2) * 1e6) / 1e6;
 }
 
 const COMP_KEY = { alp: "ALP", lnp: "COAL", grn: "GRN", onp: "ON", ind: "OTH-M", oth: "OTH" };

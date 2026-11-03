@@ -119,7 +119,9 @@ const evidence = round({
   compositionUse: (() => {
     const lv = (seatsB) => leverLevels(inp.SEN, seatsB)["COAL|AO"];
     return { mixed: MIX_FAMS.map((f) => ["alp", "lnp", "grn", "on"][f]),
-      coalLaborOverOn: { used: r4(lv(built)), ifMixed: r4(lv(buildSeatsFrom(inp, { composition: true, mixFams: [...MIX_FAMS, 1] }))) } };
+      coalLaborOverOn: { used: r4(lv(built)), ifMixed: r4(lv(buildSeatsFrom(inp, { composition: true, mixFams: [...MIX_FAMS, 1] }))),
+        target: inp.ST.coalAOTarget ?? null, offset: inp.ST.delta["COAL|AO"],
+        senate: r4(lv(buildSeatsFrom({ ...inp, ST: { ...inp.ST, delta: { ...inp.ST.delta, "COAL|AO": 0 } } }, { composition: true }))) } };
   })(),
   replay2025: { winners: ok, pairs: pairOk, tcpMaePts: Math.round(10000 * tcpE.reduce((a, b) => a + b, 0) / tcpE.length) / 100, misses },
   states: Object.fromEntries(Object.entries(STATES.results).map(([k, v]) => [k, { label: v.label, senate: v.senate, seats: v.seats, actualSeats: v.actualSeats, replay: v.replay, chain: v.chain }])),

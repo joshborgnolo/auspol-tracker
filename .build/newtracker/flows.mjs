@@ -27,25 +27,38 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    that reaches Labor, with its own ± range in FP_ON_BAND. No count of that
    final pairing has ever run nationally, so unlike FLOW this table is built,
    not counted. Revised 2026-10-11 from .315/.89/.53 (bands .025/.03/.03);
-   the Coalition cell then to .30 the same day, towards Bonham's .29;
+   the Coalition cell then to .30 the same day, towards Bonham's .29, and
+   to .27 ± .04 on 2026-11-03;
    the working, with sources, is on /flows-explained/.
 
-     Coalition .30 ± .03. 2025 Senate ballots put One Nation ahead of Labor
-       on 74.7% of Coalition ballots (75.5 without the ACT, where it ran no
-       group). The two 2026 lower-house readings of LIBERAL voters sit lower:
-       South Australia ~66 (Kevin Bonham's estimate from the published
-       distributions; ECSA's flows by first preference are due late 2026) and
-       Secret Harbour in the high 60s (Antony Green's early-voting-centre
-       count, 70.2, read against the full distribution). Neither holds
-       Nationals voters (Farrer: 69 to One Nation against the Liberals' 59;
-       Hunter's 82.9 was a Nationals flow), and SA and WA are the big states
-       least inclined to One Nation: together 2-4 points towards One Nation
-       nationally. The counts' One Nation-strong seats, and the 2025 cards
-       that put Labor first in seven urban seats, pull back. Net 30-32 to
-       Labor on this reading; Kevin Bonham's independent estimate is 29 (71%
-       to One Nation). Set at 30 on 2026-10-11 (was .315): with the evidence
-       genuinely split, meeting an independent estimate partway beats
-       either alone. The band (27-33) takes in both and SA's raw ~34.
+     Coalition .27 ± .04 (revised 2026-11-03 from .30 ± .03).
+       Start: 2025 Senate ballots put One Nation ahead of Labor on 74.7% of
+       Coalition ballots (75.5 without the ACT, where it ran no group;
+       Bonham's above-the-line reading 75.6) - about 25 to Labor.
+       House v Senate: every lower-house count of this pairing, read against
+       the Senate ballots of the same places (backtest-states.mjs levelShift
+       COAL|AO; seat-build.mjs): Hunter 2025 +0.24 logit (17.1 v 13.9),
+       SA 2026 +0.02 (33.8 v 33.3 across the districts where Liberal
+       preferences were distributed), Secret Harbour 2026 about +0.15 (the
+       whole-seat 32.4 v 29.2 on the Senate ballots at the Secret Harbour and
+       Golden Bay polling places), Queensland 2020 -0.13, 2017 -0.58. All
+       five average about -0.06 (24 to Labor); the three since 2025 +0.14
+       (28). The cards that put Labor above One Nation in seven city seats
+       in 2025 are in no count and lean towards Labor.
+       Bonham's 29 (71 to One Nation) is the same Senate base plus his own
+       judgment of about four points for the House, so it is not a second
+       measurement.
+       What the old .30 rested on: SA's ~34 and Secret Harbour's high 60s
+       read against their WHOLE states' Senate ballots (SA 70.6, WA 73.5 to
+       One Nation) as if the House ran lower. SA's ~34 comes only from the
+       districts where the Liberals ran third, which lean towards Labor: the
+       Senate ballots there say 33.3 against 29 statewide. Matched place for
+       place, the gap all but closes.
+       Set at .27: the Senate's 25 plus the recent counts' lean and the city
+       cards, a point short of Bonham. The band (23-31) takes in all five
+       counts' average and the recent three's, Bonham and Hunter's reading.
+       The /model/ page's Coalition level is solved to this cell (seat-inputs
+       prepInputs), so the two cannot part again.
      Greens .91 ± .025. 88.2 reached Labor against the Coalition in 2025,
        and every like-for-like comparison has Greens voters favouring Labor
        more against One Nation: Senate ballots +4.6, Green's SA three-way
@@ -59,8 +72,8 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    FP_ON_BAND is a range, not a sampling interval. gen-data stacks it
    linearly at each poll's primaries, and quotes the figure with that range
    and the polls' own sampling margin added in quadrature. */
-export const FP_ON = Object.freeze({ lnp: 0.30, grn: 0.91, oth: 0.55 });
-export const FP_ON_BAND = Object.freeze({ lnp: 0.03, grn: 0.025, oth: 0.04 });
+export const FP_ON = Object.freeze({ lnp: 0.27, grn: 0.91, oth: 0.55 });
+export const FP_ON_BAND = Object.freeze({ lnp: 0.04, grn: 0.025, oth: 0.04 });
 
 /* Three-cornered contests — the term the formula below was missing.
    Points of national 2PP that leak from the Coalition to Labor in seats where

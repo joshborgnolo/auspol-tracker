@@ -4506,12 +4506,13 @@ const flowDrift = {
       — and no election count of an ALP-v-ON pairing exists, so the frozen
       table cannot be election-anchored like §7c's. It is BUILT: the 2025
       Senate ballots' ranking of Labor against One Nation, read through the
-      2026 lower-house contests where One Nation made the final two (Bonham's
-      SA estimate, Green's Secret Harbour count) with the adjustments a
-      national figure needs (Nationals voters, state lean). Cells and
-      provenance live with FP_ON in flows.mjs: 30 / 91 / 55 to Labor,
-      ± 3 / 2.5 / 4 (revised 2026-10-11 from 31.5 / 89 / 53, ± 2.5 / 3 / 3;
-      the Coalition cell came down from 72% to One Nation on 2026-09-11).
+      lower-house counts of that pairing, each set beside the Senate ballots
+      of the same places (Hunter 2025, SA 2026, Secret Harbour 2026,
+      Queensland 2017/2020). Cells and provenance live with FP_ON in
+      flows.mjs: 27 / 91 / 55 to Labor, ± 4 / 2.5 / 4 (Coalition cell
+      revised 2026-11-03 from 30 ± 3; 2026-10-11 from 31.5 / 89 / 53,
+      ± 2.5 / 3 / 3; the Coalition cell came down from 72% to One Nation on
+      2026-09-11).
       This is the
       table the page QUOTES the pairing on (§7f), and it was chosen over
       RedBridge/Accent's respondent-allocated splits (tpp_split_on — the
