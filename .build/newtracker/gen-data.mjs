@@ -5687,6 +5687,80 @@ const DEMO_RESOLVE_BETA = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "seat-vote-layer.json"), "utf8")).beta.dims; }
   catch { return null; }
 })();
+/* The polls at the election (user call 2026-11-03, after
+   .build/analysis/group-poll-error-2025): each group's figure in the six
+   weeks before the 3 May 2025 election, from the houses' own published
+   tables (data/demographics-2025-election.json, written by
+   .build/extract-demographics-2025-election.mjs from BludgerTrack's record
+   of every release's crosstabs). It is built exactly as each group's
+   current figure is:
+   - every poll's gap from its own all-voters figure, pooled over the
+     six-week window with the same recency and sample weights;
+   - a house's repeat waves as sqrt(m), a pooled release read as its own
+     waves;
+   - but the window ends on election day, anchored on the 2025 result.
+   "Since the election" is measured from this wherever a house cut the
+   group before the election (gender, age, education, housing, work status,
+   language at home), so both ends are the same instruments and a
+   difference is movement. The AES (DEMO_AES) stays on the charts as its
+   own reading. Before the election it differed from these polls by more
+   than both margins on several gaps (Labor's and the Greens' gender gaps,
+   the Coalition among the young and the retired), and the polls' readings
+   held all term, so measured against the AES, part of the "change" was
+   the two instruments. Generations keep the AES baseline: no house cut
+   them before the election.
+   A table that never printed One Nation (RedBridge's crosstabs) keeps it
+   and others null, and its printed shares, already decided voters'
+   percentages, are taken as printed rather than rescaled over three
+   parties. Null on /vic/ and where the file is absent. */
+const DEMO_ELECTION = (() => {
+  if (JUR) return null;
+  let src;
+  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics-2025-election.json"), "utf8")); }
+  catch { return null; }
+  const nat = DEMO_STATE_ELECTION.groups.Nat;
+  const ELEC = Object.fromEntries(DEMO_KEYS.map((k, i) => [k, nat[i]]));
+  const ELEC_T = total(ELEC);
+  const ref = Date.parse(src.election + "T00:00:00Z");
+  const norm = (s) => (s && DEMO_KEYS.every((k) => s[k] != null) ? demoNorm(s) : s);
+  const rows = {};
+  for (const w of src.waves) {
+    const tot = norm(w.total);
+    if (!tot) continue;
+    // a pooled release reads as its own waves, each at its own dates and sample
+    const reads = (w.parts || [w]).map((q) => ({ mid: midMs(q), n: rowN(q) }));
+    const h = harmonize(w);
+    for (const set of DEMO_SETS) for (const group of set.groups) {
+      const g = h[set.id] && h[set.id][group] && norm(h[set.id][group]);
+      if (!g) continue;
+      for (const { mid, n } of reads) for (const k of DEMO_KEYS) {
+        if (g[k] == null || tot[k] == null) continue;
+        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ELEC[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, rel: w.date });
+      }
+    }
+  }
+  const inW = (r) => { const d = ddays(ref, r.mid); return d >= 0 && d <= SPARSE_K.window; };
+  const sets = {};
+  for (const set of DEMO_SETS) for (const group of set.groups) {
+    const key = (k) => set.id + "|" + group + "|" + k;
+    const est = Object.fromEntries(DEMO_KEYS.map((k) => [k, weightedWithSe(nowcastPts(rows[key(k)] || [], null, ref, SPARSE_K))]));
+    if (DEMO_KEYS.some((k) => !est[k])) continue;
+    const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
+    const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
+    // polls, not rows: a pooled release's waves count once
+    const inRows = (rows[key("alp")] || []).filter(inW);
+    (sets[set.id] ||= { groups: {} }).groups[group] = {
+      n: new Set(inRows.map((r) => r.firm + "|" + r.rel)).size,
+      houses: [...new Set(inRows.map((r) => r.firm))],
+      /* per party: [the group's figure on the result's scale (the 2025
+         result plus the pooled gap: where the chart marks it), its 95%
+         margin] - the gap itself is the first less elec */
+      ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [r1(ELEC_T * raw[k] / t), r1(1.96 * est[k].se)]])),
+    };
+  }
+  if (!Object.keys(sets).length) return null;
+  return { x: DEMO_STATE_ELECTION.x, window: SPARSE_K.label, src: src.source, elec: ELEC, sets };
+})();
 
 /* One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
@@ -6192,40 +6266,61 @@ const demoTrend = (() => {
       }
     }
     moves.sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
-    /* The election test (user ruling 2026-11-02), beside – never inside –
-       the slope test above: for every group the Australian Election Study
-       2025 measures the site's way (DEMO_AES), has its gap from all voters
-       moved since the election? The gap now is the group's current pooled
-       figure less the current primaries (the dot plot's own "vs all
-       voters"); the gap then is the AES's (group less all respondents).
-       Significant when the change clears both margins combined – the
-       pooled figure's and the AES cell's (gap_ci) – so a thin AES cell
-       (One Nation: 38 respondents) gates its own claims out. Two different
-       instruments, one recalled vote and one intention, so this is an
-       endpoint comparison and never a point in the slope fit: one survey
-       at the head of a series would steer the slope by its method. */
+    /* The election test (user rulings 2026-11-02 and 2026-11-03), beside
+       – never inside – the slope test above: for every group with an
+       election-time figure, has its gap from all voters moved since the
+       election? The gap now is the group's current pooled figure less the
+       current primaries (the dot plot's own "vs all voters").
+       The gap then is the polls' own at the election (DEMO_ELECTION: the
+       same houses' tables over the six weeks before 3 May 2025, pooled as
+       the current figure is), so both ends are the same instruments.
+       Measured against the Australian Election Study instead, part of the
+       "change" was the two instruments disagreeing: Labor's and the
+       Greens' gender gaps, the Greens among voters with Year 12 or less
+       and others among outright owners read as shifts that the polls'
+       own readings don't show (.build/analysis/group-poll-error-2025 §4).
+       Where no house cut the group before the election (the generations)
+       the gap then is still the AES's (group less all respondents), and
+       the row says so (base "aes").
+       Significant when the change clears both margins combined: the
+       current figure's and the baseline's (the polls' pooled margin, or
+       the AES cell's gap_ci, so a thin AES cell gates its own claims out).
+       An endpoint comparison, never a point in the slope fit. */
     const elecRows = [];
-    if (DEMO_AES) for (const tab of demographics.tabs) for (const st of tab.sets) {
-      const ae = DEMO_AES.sets[st.id];
-      if (!ae) continue;
+    if (DEMO_ELECTION || DEMO_AES) for (const tab of demographics.tabs) for (const st of tab.sets) {
+      const pe = DEMO_ELECTION && DEMO_ELECTION.sets[st.id];
+      const ae = DEMO_AES && DEMO_AES.sets[st.id];
+      if (!pe && !ae) continue;
       for (const g of st.groups) {
-        const a = ae.groups[g.label] && ae.groups[g.label][party];
-        if (!a || a[2] == null || g.v[party] == null) continue;
-        const now = g.v[party] - demographics.all[party], then = a[1] - DEMO_AES.elec[party];
-        const ci = Math.sqrt((g.ci[party] || 0) ** 2 + a[2] ** 2);
+        if (g.v[party] == null) continue;
+        /* the baseline: the polls' election-time figure where the houses cut
+           the group then, else the AES's - gThen/allThen are the group's
+           and all voters' shares on that baseline's own scale, for the
+           ratio half below */
+        const pg = pe && pe.groups[g.label], p = pg && pg[party];
+        const ag = !p && ae && ae.groups[g.label], a = ag && ag[party];
+        let base, then, ciThen, gThen, allThen, nBase, houses = null;
+        if (p) {
+          base = "polls"; then = p[0] - DEMO_ELECTION.elec[party]; ciThen = p[1];
+          gThen = p[0]; allThen = DEMO_ELECTION.elec[party]; nBase = pg.n; houses = pg.houses;
+        } else if (a && a[2] != null) {
+          base = "aes"; then = a[1] - DEMO_AES.elec[party]; ciThen = a[2];
+          gThen = a[0]; allThen = DEMO_AES.all[party]; nBase = ag.n;
+        } else continue;
+        const now = g.v[party] - demographics.all[party];
+        const ci = Math.sqrt((g.ci[party] || 0) ** 2 + ciThen ** 2);
         const d = now - then;
         /* and the ratio half, as the slope test pairs its two: a party that
            has grown everywhere widens a low group's point gap while the
            group keeps its share of it (One Nation, ~6 to ~25 since the
            election), so the gap alone reads pace-keeping as divergence.
            ln(group / all) now against then, each side's error carried onto
-           the log scale (delta method) off its own margin; a zero AES share
-           has no ratio to test, so it can't pass */
-        const aesAll = DEMO_AES.all[party];
+           the log scale (delta method) off its own margin; a zero share
+           then has no ratio to test, so it can't pass */
         const gNow = g.v[party], allNow = demographics.all[party];
-        const lrOk = gNow > 0.05 && allNow > 0.05 && a[0] > 0.05 && aesAll > 0.05;
-        const lr = lrOk ? Math.log(gNow / allNow) - Math.log(a[0] / aesAll) : null;
-        const lrCi = lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (a[2] / a[0]) ** 2) : null;
+        const lrOk = gNow > 0.05 && allNow > 0.05 && gThen > 0.05 && allThen > 0.05;
+        const lr = lrOk ? Math.log(gNow / allNow) - Math.log(gThen / allThen) : null;
+        const lrCi = lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (ciThen / gThen) ** 2) : null;
         const sigLR = lr != null && Math.abs(lr) > lrCi;
         /* the same-house check (user ruling 2026-11-02): where Resolve's own
            election-day wave gives the same quantity - the cell's movement
@@ -6233,16 +6328,18 @@ const demoTrend = (() => {
            model's vote layer, data/seat-vote-layer.json β, age and gender) -
            a claim stands only if that estimate doesn't disagree with ours
            beyond the two margins combined. Labor's gender gap is the case
-           that made the rule: this test read it closing, Resolve's own waves
-           read it widening */
+           that made the rule: measured from the AES this test read it
+           closing, Resolve's own waves read it widening */
         const rb = DEMO_RESOLVE_BETA && DEMO_RESOLVE_BETA[st.id] && DEMO_RESOLVE_BETA[st.id][g.label]
           && DEMO_RESOLVE_BETA[st.id][g.label][party === "onp" ? "on" : party];
         const check = rb ? { beta: rr(rb.beta), ci: rr(1.96 * rb.se),
           conflict: Math.abs(d - rb.beta) > Math.sqrt(ci ** 2 + (1.96 * rb.se) ** 2) } : null;
         const sig = Math.abs(d) > ci && sigLR && Math.sign(d) === Math.sign(lr);
-        elecRows.push({ tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
-          then: rr(then), now: rr(now), d: rr(d), ci: rr(ci), ciNow: rr(g.ci[party] || 0), ciThen: rr(a[2]), n: ae.groups[g.label].n,
-          rThen: lrOk ? rr(a[0] / aesAll) : null, rNow: lrOk ? rr(gNow / allNow) : null,
+        elecRows.push({ tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label, base,
+          then: rr(then), now: rr(now), d: rr(d), ci: rr(ci), ciNow: rr(g.ci[party] || 0), ciThen: rr(ciThen),
+          // the baseline's own count: polls in the election window, or AES respondents in the group
+          n: nBase, ...(houses ? { houses } : {}),
+          rThen: lrOk ? rr(gThen / allThen) : null, rNow: lrOk ? rr(gNow / allNow) : null,
           sigGap: Math.abs(d) > ci, sigLR, sig, check,
           // what the copy may cite: significant AND not contradicted by the same-house check
           claim: sig && !(check && check.conflict) });
@@ -9045,6 +9142,10 @@ window.AUSPOL = (function () {
   /* The Australian Election Study 2025's vote by group (§7g DEMO_AES,
      from its respondent file): election-time marks, never pooled. */
   const demoAes = ${JSON.stringify(DEMO_AES)};
+  /* The polls at the 2025 election (§7g DEMO_ELECTION): each group's figure
+     over the six weeks before polling day, pooled as the current figures
+     are - the baseline "since the election" reads from. */
+  const demoElection = ${JSON.stringify(DEMO_ELECTION)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -9190,7 +9291,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

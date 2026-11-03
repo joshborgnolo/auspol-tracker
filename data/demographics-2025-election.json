@@ -1,0 +1,1886 @@
+{
+ "_about": "Each house's published group tables from the weeks before the 2025 federal election (fieldwork ending 1 Mar – 2 May 2025), copied from BludgerTrack's 2022–25 poll table by .build/extract-demographics-2025-election.mjs – see its header. Shares are decided voters' (%); onp/oth null where the house printed no One Nation; total = the release's all-voters row; parts = a pooled release's own waves. gen-data §7g pools these over the six weeks ending on election day as it pools the current figures, and measures 'since the election' from them.",
+ "source": "https://www.pollbludger.net/fed2025/bludgertrack/xml/current.xml",
+ "feedDate": "2025-10-05 07:54:20.082466",
+ "election": "2025-05-03",
+ "waves": [
+  {
+   "pollster": "Essential",
+   "date": "2025-03-02",
+   "dateStart": "2025-02-26",
+   "sample": 1150,
+   "total": {
+    "alp": 30.5,
+    "lnp": 36.8,
+    "grn": 13.7,
+    "onp": 8.4,
+    "oth": 10.5
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 38.1,
+      "grn": 11.3,
+      "onp": 7.2,
+      "oth": 11.3
+     },
+     "Women": {
+      "alp": 29.8,
+      "lnp": 35.1,
+      "grn": 14.9,
+      "onp": 8.5,
+      "oth": 11.7
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-03-06",
+   "dateStart": "2025-02-28",
+   "sample": 1504,
+   "total": {
+    "alp": 31,
+    "lnp": 36,
+    "grn": 13,
+    "onp": 7,
+    "oth": 13
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 38,
+      "grn": 11,
+      "onp": 7,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 31,
+      "lnp": 34,
+      "grn": 14,
+      "onp": 8,
+      "oth": 13
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 23,
+      "grn": 27,
+      "onp": 3,
+      "oth": 12
+     },
+     "35–49": {
+      "alp": 30,
+      "lnp": 33,
+      "grn": 15,
+      "onp": 9,
+      "oth": 13
+     },
+     "50–64": {
+      "alp": 32,
+      "lnp": 38,
+      "grn": 6,
+      "onp": 11,
+      "oth": 13
+     },
+     "65+": {
+      "alp": 28,
+      "lnp": 51,
+      "grn": 2,
+      "onp": 6,
+      "oth": 13
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 34,
+      "lnp": 35,
+      "grn": 12,
+      "onp": 8,
+      "oth": 11
+     },
+     "TAFE or trade": {
+      "alp": 25,
+      "lnp": 38,
+      "grn": 14,
+      "onp": 9,
+      "oth": 14
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 35,
+      "grn": 13,
+      "onp": 4,
+      "oth": 14
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 30,
+      "lnp": 46,
+      "grn": 7,
+      "onp": 6,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 29,
+      "lnp": 43,
+      "grn": 7,
+      "onp": 10,
+      "oth": 11
+     },
+     "Renting": {
+      "alp": 35,
+      "lnp": 24,
+      "grn": 21,
+      "onp": 6,
+      "oth": 14
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 30,
+      "lnp": 38,
+      "grn": 15,
+      "onp": 6,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 34,
+      "lnp": 26,
+      "grn": 15,
+      "onp": 9,
+      "oth": 16
+     },
+     "Retired": {
+      "alp": 30,
+      "lnp": 49,
+      "grn": 2,
+      "onp": 7,
+      "oth": 12
+     },
+     "Other": {
+      "alp": 34,
+      "lnp": 23,
+      "grn": 18,
+      "onp": 10,
+      "oth": 15
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 30,
+      "lnp": 37,
+      "grn": 12,
+      "onp": 8,
+      "oth": 13
+     },
+     "Other language": {
+      "alp": 38,
+      "lnp": 31,
+      "grn": 16,
+      "onp": 4,
+      "oth": 11
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Newspoll (pooled)",
+   "date": "2025-03-07",
+   "dateStart": "2025-01-20",
+   "sample": 3757,
+   "total": {
+    "alp": 31.5,
+    "lnp": 39,
+    "grn": 12,
+    "onp": 6.5,
+    "oth": 11
+   },
+   "parts": [
+    {
+     "dateStart": "2025-01-20",
+     "date": "2025-01-24",
+     "sample": 1259
+    },
+    {
+     "dateStart": "2025-02-10",
+     "date": "2025-02-14",
+     "sample": 1244
+    },
+    {
+     "dateStart": "2025-03-03",
+     "date": "2025-03-07",
+     "sample": 1255
+    }
+   ],
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 40,
+      "grn": 9,
+      "onp": 6,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 38,
+      "grn": 15,
+      "onp": 7,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 28,
+      "grn": 28,
+      "onp": 6,
+      "oth": 7
+     },
+     "35–49": {
+      "alp": 33,
+      "lnp": 35,
+      "grn": 12,
+      "onp": 7,
+      "oth": 13
+     },
+     "50–64": {
+      "alp": 32,
+      "lnp": 41,
+      "grn": 5,
+      "onp": 10,
+      "oth": 12
+     },
+     "65+": {
+      "alp": 29,
+      "lnp": 52,
+      "grn": 3,
+      "onp": 5,
+      "oth": 11
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 29,
+      "lnp": 39,
+      "grn": 13,
+      "onp": 9,
+      "oth": 10
+     },
+     "TAFE or trade": {
+      "alp": 31,
+      "lnp": 39,
+      "grn": 11,
+      "onp": 8,
+      "oth": 11
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 39,
+      "grn": 12,
+      "onp": 3,
+      "oth": 12
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 31,
+      "lnp": 46,
+      "grn": 6,
+      "onp": 6,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 32,
+      "lnp": 39,
+      "grn": 11,
+      "onp": 7,
+      "oth": 11
+     },
+     "Renting": {
+      "alp": 32,
+      "lnp": 27,
+      "grn": 24,
+      "onp": 9,
+      "oth": 8
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 33,
+      "lnp": 38,
+      "grn": 11,
+      "onp": 8,
+      "oth": 10
+     },
+     "Part time": {
+      "alp": 30,
+      "lnp": 34,
+      "grn": 18,
+      "onp": 6,
+      "oth": 12
+     },
+     "Retired": {
+      "alp": 30,
+      "lnp": 51,
+      "grn": 3,
+      "onp": 5,
+      "oth": 11
+     },
+     "Other": {
+      "alp": 27,
+      "lnp": 29,
+      "grn": 24,
+      "onp": 10,
+      "oth": 10
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 31,
+      "lnp": 39,
+      "grn": 12,
+      "onp": 7,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 35,
+      "lnp": 35,
+      "grn": 16,
+      "onp": 5,
+      "oth": 9
+     }
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-03-11",
+   "dateStart": "2025-03-03",
+   "sample": 2007,
+   "total": {
+    "alp": 32,
+    "lnp": 37,
+    "grn": 12,
+    "onp": 7,
+    "oth": 12
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 33,
+      "lnp": 37,
+      "grn": 11,
+      "onp": null,
+      "oth": null
+     },
+     "Women": {
+      "alp": 31,
+      "lnp": 38,
+      "grn": 13,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 33,
+      "lnp": 24,
+      "grn": 27,
+      "onp": null,
+      "oth": null
+     },
+     "35–49": {
+      "alp": 36,
+      "lnp": 33,
+      "grn": 11,
+      "onp": null,
+      "oth": null
+     },
+     "50–64": {
+      "alp": 26,
+      "lnp": 43,
+      "grn": 8,
+      "onp": null,
+      "oth": null
+     },
+     "65+": {
+      "alp": 30,
+      "lnp": 50,
+      "grn": 3,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 34,
+      "lnp": 38,
+      "grn": 12,
+      "onp": null,
+      "oth": null
+     },
+     "TAFE or trade": {
+      "alp": 32,
+      "lnp": 37,
+      "grn": 9,
+      "onp": null,
+      "oth": null
+     },
+     "University": {
+      "alp": 30,
+      "lnp": 39,
+      "grn": 15,
+      "onp": null,
+      "oth": null
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-03-13",
+   "dateStart": "2025-03-07",
+   "sample": 1526,
+   "total": {
+    "alp": 31,
+    "lnp": 36,
+    "grn": 13.5,
+    "onp": 7.5,
+    "oth": 12
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 35.5,
+      "lnp": 36,
+      "grn": 9,
+      "onp": 6,
+      "oth": 13.5
+     },
+     "Women": {
+      "alp": 26.5,
+      "lnp": 36.5,
+      "grn": 18,
+      "onp": 8.5,
+      "oth": 10.5
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 38,
+      "lnp": 18.5,
+      "grn": 29.5,
+      "onp": 5,
+      "oth": 9
+     },
+     "35–49": {
+      "alp": 29,
+      "lnp": 33,
+      "grn": 16.5,
+      "onp": 7.5,
+      "oth": 14
+     },
+     "50–64": {
+      "alp": 31.5,
+      "lnp": 36.5,
+      "grn": 5,
+      "onp": 11,
+      "oth": 16
+     },
+     "65+": {
+      "alp": 25,
+      "lnp": 58,
+      "grn": 2,
+      "onp": 6,
+      "oth": 9
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 30,
+      "lnp": 41.5,
+      "grn": 12,
+      "onp": 8,
+      "oth": 8.5
+     },
+     "TAFE or trade": {
+      "alp": 30,
+      "lnp": 30.5,
+      "grn": 14.5,
+      "onp": 10,
+      "oth": 15
+     },
+     "University": {
+      "alp": 33.5,
+      "lnp": 36,
+      "grn": 13.5,
+      "onp": 4,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 25,
+      "lnp": 50.5,
+      "grn": 6,
+      "onp": 6.5,
+      "oth": 12
+     },
+     "Mortgage": {
+      "alp": 38.5,
+      "lnp": 31.5,
+      "grn": 12.5,
+      "onp": 6,
+      "oth": 11.5
+     },
+     "Renting": {
+      "alp": 32,
+      "lnp": 25,
+      "grn": 22.5,
+      "onp": 9,
+      "oth": 11.5
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 36,
+      "lnp": 32.5,
+      "grn": 14.5,
+      "onp": 6.5,
+      "oth": 10.5
+     },
+     "Part time": {
+      "alp": 29,
+      "lnp": 28.5,
+      "grn": 19,
+      "onp": 9.5,
+      "oth": 14
+     },
+     "Retired": {
+      "alp": 24,
+      "lnp": 57.5,
+      "grn": 2.5,
+      "onp": 6,
+      "oth": 10
+     },
+     "Other": {
+      "alp": 27.5,
+      "lnp": 28.5,
+      "grn": 18,
+      "onp": 9.5,
+      "oth": 16.5
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 30,
+      "lnp": 37,
+      "grn": 13,
+      "onp": 7,
+      "oth": 13
+     },
+     "Other language": {
+      "alp": 36,
+      "lnp": 32,
+      "grn": 16,
+      "onp": 9,
+      "oth": 7
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2025-03-17",
+   "dateStart": "2025-03-12",
+   "sample": 2256,
+   "total": {
+    "alp": 30.9,
+    "lnp": 37.2,
+    "grn": 12.8,
+    "onp": 8.5,
+    "oth": 10.6
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31.3,
+      "lnp": 39.6,
+      "grn": 10.4,
+      "onp": 9.4,
+      "oth": 9.4
+     },
+     "Women": {
+      "alp": 31.2,
+      "lnp": 33.3,
+      "grn": 15.1,
+      "onp": 7.5,
+      "oth": 12.9
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-03-30",
+   "dateStart": "2025-03-26",
+   "sample": 3237,
+   "total": {
+    "alp": 29,
+    "lnp": 37,
+    "grn": 13,
+    "onp": 7,
+    "oth": 14
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 38,
+      "grn": 11,
+      "onp": 7,
+      "oth": 15
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 36,
+      "grn": 14,
+      "onp": 7,
+      "oth": 14
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2025-03-31",
+   "dateStart": "2025-03-26",
+   "sample": 1144,
+   "total": {
+    "alp": 31.6,
+    "lnp": 35.8,
+    "grn": 12.6,
+    "onp": 9.5,
+    "oth": 10.5
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 39.2,
+      "grn": 9.3,
+      "onp": 8.2,
+      "oth": 11.3
+     },
+     "Women": {
+      "alp": 30.4,
+      "lnp": 33.7,
+      "grn": 15.2,
+      "onp": 10.9,
+      "oth": 9.8
+     }
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-04-01",
+   "dateStart": "2025-03-28",
+   "sample": 1006,
+   "total": {
+    "alp": 33,
+    "lnp": 36,
+    "grn": 12,
+    "onp": 7,
+    "oth": 12
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 38,
+      "grn": 10,
+      "onp": null,
+      "oth": null
+     },
+     "Women": {
+      "alp": 36,
+      "lnp": 33,
+      "grn": 13,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 32,
+      "lnp": 27,
+      "grn": 28,
+      "onp": null,
+      "oth": null
+     },
+     "35–49": {
+      "alp": 35,
+      "lnp": 30,
+      "grn": 10,
+      "onp": null,
+      "oth": null
+     },
+     "50–64": {
+      "alp": 36,
+      "lnp": 34,
+      "grn": 7,
+      "onp": null,
+      "oth": null
+     },
+     "65+": {
+      "alp": 30,
+      "lnp": 51,
+      "grn": 2,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 33,
+      "lnp": 42,
+      "grn": 10,
+      "onp": null,
+      "oth": null
+     },
+     "TAFE or trade": {
+      "alp": 29,
+      "lnp": 33,
+      "grn": 12,
+      "onp": null,
+      "oth": null
+     },
+     "University": {
+      "alp": 38,
+      "lnp": 36,
+      "grn": 10,
+      "onp": null,
+      "oth": null
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-04-03",
+   "dateStart": "2025-03-28",
+   "sample": 1622,
+   "total": {
+    "alp": 30,
+    "lnp": 35,
+    "grn": 13,
+    "onp": 7,
+    "oth": 15
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 30,
+      "lnp": 38,
+      "grn": 10,
+      "onp": 5,
+      "oth": 17
+     },
+     "Women": {
+      "alp": 30,
+      "lnp": 32,
+      "grn": 17,
+      "onp": 9,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "lnp": 24,
+      "grn": 30,
+      "onp": 7,
+      "oth": 13
+     },
+     "35–49": {
+      "alp": 33,
+      "lnp": 27,
+      "grn": 14,
+      "onp": 9,
+      "oth": 17
+     },
+     "50–64": {
+      "alp": 31,
+      "lnp": 39,
+      "grn": 6,
+      "onp": 7,
+      "oth": 17
+     },
+     "65+": {
+      "alp": 29,
+      "lnp": 50,
+      "grn": 2,
+      "onp": 8,
+      "oth": 11
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 28,
+      "lnp": 40,
+      "grn": 10,
+      "onp": 10,
+      "oth": 12
+     },
+     "TAFE or trade": {
+      "alp": 27,
+      "lnp": 33,
+      "grn": 15,
+      "onp": 7,
+      "oth": 18
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 31,
+      "grn": 15,
+      "onp": 4,
+      "oth": 16
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 29,
+      "lnp": 46,
+      "grn": 6,
+      "onp": 7,
+      "oth": 12
+     },
+     "Mortgage": {
+      "alp": 34,
+      "lnp": 36,
+      "grn": 9,
+      "onp": 5,
+      "oth": 16
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 25,
+      "grn": 25,
+      "onp": 8,
+      "oth": 15
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 28,
+      "lnp": 36,
+      "grn": 15,
+      "onp": 6,
+      "oth": 15
+     },
+     "Part time": {
+      "alp": 36,
+      "lnp": 26,
+      "grn": 18,
+      "onp": 5,
+      "oth": 15
+     },
+     "Retired": {
+      "alp": 30,
+      "lnp": 48,
+      "grn": 3,
+      "onp": 7,
+      "oth": 12
+     },
+     "Other": {
+      "alp": 25,
+      "lnp": 24,
+      "grn": 18,
+      "onp": 16,
+      "oth": 17
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 30,
+      "lnp": 36,
+      "grn": 12,
+      "onp": 8,
+      "oth": 14
+     },
+     "Other language": {
+      "alp": 28,
+      "lnp": 29,
+      "grn": 20,
+      "onp": 6,
+      "oth": 17
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-04-10",
+   "dateStart": "2025-04-04",
+   "sample": 1505,
+   "total": {
+    "alp": 32,
+    "lnp": 33.5,
+    "grn": 13,
+    "onp": 8.5,
+    "oth": 13
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 34,
+      "grn": 10,
+      "onp": 8,
+      "oth": 14
+     },
+     "Women": {
+      "alp": 30,
+      "lnp": 33,
+      "grn": 16,
+      "onp": 9,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 34,
+      "lnp": 21,
+      "grn": 28,
+      "onp": 6,
+      "oth": 11
+     },
+     "35–49": {
+      "alp": 36,
+      "lnp": 29,
+      "grn": 13,
+      "onp": 7,
+      "oth": 15
+     },
+     "50–64": {
+      "alp": 29,
+      "lnp": 38,
+      "grn": 6,
+      "onp": 13,
+      "oth": 14
+     },
+     "65+": {
+      "alp": 29,
+      "lnp": 47,
+      "grn": 4,
+      "onp": 8,
+      "oth": 12
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 32,
+      "lnp": 34,
+      "grn": 11,
+      "onp": 11,
+      "oth": 12
+     },
+     "TAFE or trade": {
+      "alp": 30,
+      "lnp": 31,
+      "grn": 17,
+      "onp": 9,
+      "oth": 13
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 35,
+      "grn": 12,
+      "onp": 4,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 31,
+      "lnp": 43,
+      "grn": 8,
+      "onp": 8,
+      "oth": 10
+     },
+     "Mortgage": {
+      "alp": 32,
+      "lnp": 34,
+      "grn": 9,
+      "onp": 10,
+      "oth": 15
+     },
+     "Renting": {
+      "alp": 33,
+      "lnp": 24,
+      "grn": 17,
+      "onp": 9,
+      "oth": 17
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 33,
+      "lnp": 35,
+      "grn": 12,
+      "onp": 8,
+      "oth": 12
+     },
+     "Part time": {
+      "alp": 34,
+      "lnp": 26,
+      "grn": 15,
+      "onp": 11,
+      "oth": 14
+     },
+     "Retired": {
+      "alp": 30,
+      "lnp": 47,
+      "grn": 5,
+      "onp": 7,
+      "oth": 11
+     },
+     "Other": {
+      "alp": 27,
+      "lnp": 21,
+      "grn": 25,
+      "onp": 10,
+      "oth": 17
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 32,
+      "lnp": 34,
+      "grn": 12,
+      "onp": 9,
+      "oth": 13
+     },
+     "Other language": {
+      "alp": 37,
+      "lnp": 30,
+      "grn": 17,
+      "onp": 5,
+      "oth": 11
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2025-04-13",
+   "dateStart": "2025-04-09",
+   "sample": 2254,
+   "total": {
+    "alp": 32.3,
+    "lnp": 33.3,
+    "grn": 13.5,
+    "onp": 9.4,
+    "oth": 11.5
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32.7,
+      "lnp": 37.8,
+      "grn": 10.2,
+      "onp": 9.2,
+      "oth": 10.2
+     },
+     "Women": {
+      "alp": 31.9,
+      "lnp": 29.8,
+      "grn": 17,
+      "onp": 10.6,
+      "oth": 10.6
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-04-13",
+   "dateStart": "2025-04-09",
+   "sample": 1642,
+   "total": {
+    "alp": 31,
+    "lnp": 34,
+    "grn": 13,
+    "onp": 6,
+    "oth": 16
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 34,
+      "grn": 10,
+      "onp": 7,
+      "oth": 15
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 33,
+      "grn": 15,
+      "onp": 5,
+      "oth": 18
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-04-15",
+   "dateStart": "2025-04-11",
+   "sample": 1506,
+   "total": {
+    "alp": 33,
+    "lnp": 33,
+    "grn": 13,
+    "onp": 7,
+    "oth": 14
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 34,
+      "grn": 12,
+      "onp": 7,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 32,
+      "lnp": 32,
+      "grn": 14,
+      "onp": 7,
+      "oth": 15
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 19,
+      "grn": 30,
+      "onp": 4,
+      "oth": 12
+     },
+     "35–49": {
+      "alp": 38,
+      "lnp": 26,
+      "grn": 11,
+      "onp": 10,
+      "oth": 15
+     },
+     "50–64": {
+      "alp": 32,
+      "lnp": 38,
+      "grn": 5,
+      "onp": 9,
+      "oth": 16
+     },
+     "65+": {
+      "alp": 27,
+      "lnp": 51,
+      "grn": 3,
+      "onp": 6,
+      "oth": 13
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 29,
+      "lnp": 36,
+      "grn": 14,
+      "onp": 7,
+      "oth": 14
+     },
+     "TAFE or trade": {
+      "alp": 30,
+      "lnp": 34,
+      "grn": 10,
+      "onp": 11,
+      "oth": 15
+     },
+     "University": {
+      "alp": 42,
+      "lnp": 27,
+      "grn": 14,
+      "onp": 4,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 31,
+      "lnp": 43,
+      "grn": 6,
+      "onp": 8,
+      "oth": 12
+     },
+     "Mortgage": {
+      "alp": 36,
+      "lnp": 33,
+      "grn": 7,
+      "onp": 9,
+      "oth": 15
+     },
+     "Renting": {
+      "alp": 35,
+      "lnp": 28,
+      "grn": 17,
+      "onp": 6,
+      "oth": 14
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 36,
+      "lnp": 31,
+      "grn": 13,
+      "onp": 9,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 32,
+      "lnp": 27,
+      "grn": 19,
+      "onp": 4,
+      "oth": 18
+     },
+     "Retired": {
+      "alp": 29,
+      "lnp": 52,
+      "grn": 1,
+      "onp": 5,
+      "oth": 13
+     },
+     "Other": {
+      "alp": 29,
+      "lnp": 21,
+      "grn": 18,
+      "onp": 11,
+      "oth": 21
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 32,
+      "lnp": 34,
+      "grn": 12,
+      "onp": 8,
+      "oth": 14
+     },
+     "Other language": {
+      "alp": 41,
+      "lnp": 25,
+      "grn": 16,
+      "onp": 2,
+      "oth": 16
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Newspoll (pooled)",
+   "date": "2025-04-17",
+   "dateStart": "2025-03-27",
+   "sample": 5033,
+   "total": {
+    "alp": 34,
+    "lnp": 35.5,
+    "grn": 12,
+    "onp": 6.5,
+    "oth": 12
+   },
+   "parts": [
+    {
+     "dateStart": "2025-03-27",
+     "date": "2025-03-30",
+     "sample": 1249
+    },
+    {
+     "dateStart": "2025-03-31",
+     "date": "2025-04-04",
+     "sample": 1250
+    },
+    {
+     "dateStart": "2025-04-07",
+     "date": "2025-04-10",
+     "sample": 1271
+    },
+    {
+     "dateStart": "2025-04-14",
+     "date": "2025-04-17",
+     "sample": 1263
+    }
+   ],
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 33,
+      "lnp": 38,
+      "grn": 10,
+      "onp": 6,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 35,
+      "lnp": 33,
+      "grn": 14,
+      "onp": 7,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 33,
+      "lnp": 23,
+      "grn": 28,
+      "onp": 6,
+      "oth": 10
+     },
+     "35–49": {
+      "alp": 38,
+      "lnp": 31,
+      "grn": 11,
+      "onp": 8,
+      "oth": 12
+     },
+     "50–64": {
+      "alp": 34,
+      "lnp": 40,
+      "grn": 5,
+      "onp": 8,
+      "oth": 13
+     },
+     "65+": {
+      "alp": 29,
+      "lnp": 51,
+      "grn": 3,
+      "onp": 5,
+      "oth": 12
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 32,
+      "lnp": 38,
+      "grn": 12,
+      "onp": 7,
+      "oth": 11
+     },
+     "TAFE or trade": {
+      "alp": 33,
+      "lnp": 35,
+      "grn": 10,
+      "onp": 10,
+      "oth": 12
+     },
+     "University": {
+      "alp": 36,
+      "lnp": 34,
+      "grn": 13,
+      "onp": 4,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 31,
+      "lnp": 47,
+      "grn": 5,
+      "onp": 6,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 34,
+      "lnp": 34,
+      "grn": 13,
+      "onp": 8,
+      "oth": 11
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 35,
+      "lnp": 36,
+      "grn": 11,
+      "onp": 7,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 33,
+      "lnp": 28,
+      "grn": 19,
+      "onp": 8,
+      "oth": 12
+     },
+     "Retired": {
+      "alp": 31,
+      "lnp": 50,
+      "grn": 2,
+      "onp": 5,
+      "oth": 12
+     },
+     "Other": {
+      "alp": 35,
+      "lnp": 20,
+      "grn": 23,
+      "onp": 8,
+      "oth": 14
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 33,
+      "lnp": 36,
+      "grn": 12,
+      "onp": 7,
+      "oth": 12
+     },
+     "Other language": {
+      "alp": 35,
+      "lnp": 35,
+      "grn": 14,
+      "onp": 6,
+      "oth": 10
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-04-22",
+   "dateStart": "2025-04-18",
+   "sample": 1500,
+   "total": {
+    "alp": 33.5,
+    "lnp": 31,
+    "grn": 14,
+    "onp": 10.5,
+    "oth": 11
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 36,
+      "lnp": 33,
+      "grn": 9,
+      "onp": 10,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 31,
+      "lnp": 28,
+      "grn": 19,
+      "onp": 11,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 40,
+      "lnp": 16,
+      "grn": 30,
+      "onp": 4,
+      "oth": 10
+     },
+     "35–49": {
+      "alp": 33,
+      "lnp": 24,
+      "grn": 13,
+      "onp": 16,
+      "oth": 14
+     },
+     "50–64": {
+      "alp": 28,
+      "lnp": 38,
+      "grn": 9,
+      "onp": 15,
+      "oth": 10
+     },
+     "65+": {
+      "alp": 33,
+      "lnp": 47,
+      "grn": 2,
+      "onp": 8,
+      "oth": 10
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 33,
+      "lnp": 36,
+      "grn": 14,
+      "onp": 9,
+      "oth": 8
+     },
+     "TAFE or trade": {
+      "alp": 29,
+      "lnp": 29,
+      "grn": 13,
+      "onp": 18,
+      "oth": 11
+     },
+     "University": {
+      "alp": 39,
+      "lnp": 26,
+      "grn": 15,
+      "onp": 5,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 35,
+      "lnp": 44,
+      "grn": 7,
+      "onp": 7,
+      "oth": 7
+     },
+     "Mortgage": {
+      "alp": 33,
+      "lnp": 29,
+      "grn": 10,
+      "onp": 15,
+      "oth": 13
+     },
+     "Renting": {
+      "alp": 28,
+      "lnp": 23,
+      "grn": 23,
+      "onp": 11,
+      "oth": 15
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 35,
+      "lnp": 30,
+      "grn": 11,
+      "onp": 10,
+      "oth": 14
+     },
+     "Part time": {
+      "alp": 42,
+      "lnp": 19,
+      "grn": 23,
+      "onp": 9,
+      "oth": 7
+     },
+     "Retired": {
+      "alp": 32,
+      "lnp": 47,
+      "grn": 3,
+      "onp": 10,
+      "oth": 8
+     },
+     "Other": {
+      "alp": 18,
+      "lnp": 29,
+      "grn": 25,
+      "onp": 15,
+      "oth": 13
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 32,
+      "lnp": 32,
+      "grn": 14,
+      "onp": 11,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 42,
+      "lnp": 25,
+      "grn": 16,
+      "onp": 7,
+      "oth": 10
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-04-28",
+   "dateStart": "2025-04-23",
+   "sample": 2010,
+   "total": {
+    "alp": 31,
+    "lnp": 35,
+    "grn": 14,
+    "onp": 7,
+    "oth": 13
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 35,
+      "grn": 11,
+      "onp": 8,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 34,
+      "grn": 16,
+      "onp": 7,
+      "oth": 14
+     }
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-04-29",
+   "dateStart": "2025-04-24",
+   "sample": 1011,
+   "total": {
+    "alp": 34,
+    "lnp": 34,
+    "grn": 12,
+    "onp": 8,
+    "oth": 12
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 35,
+      "lnp": 36,
+      "grn": 10,
+      "onp": null,
+      "oth": null
+     },
+     "Women": {
+      "alp": 33,
+      "lnp": 31,
+      "grn": 14,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 33,
+      "lnp": 19,
+      "grn": 27,
+      "onp": null,
+      "oth": null
+     },
+     "35–49": {
+      "alp": 36,
+      "lnp": 25,
+      "grn": 15,
+      "onp": null,
+      "oth": null
+     },
+     "50–64": {
+      "alp": 35,
+      "lnp": 33,
+      "grn": 11,
+      "onp": null,
+      "oth": null
+     },
+     "65+": {
+      "alp": 32,
+      "lnp": 46,
+      "grn": 5,
+      "onp": null,
+      "oth": null
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 32,
+      "lnp": 38,
+      "grn": 11,
+      "onp": null,
+      "oth": null
+     },
+     "TAFE or trade": {
+      "alp": 32,
+      "lnp": 33,
+      "grn": 11,
+      "onp": null,
+      "oth": null
+     },
+     "University": {
+      "alp": 39,
+      "lnp": 32,
+      "grn": 12,
+      "onp": null,
+      "oth": null
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2025-05-01",
+   "dateStart": "2025-04-24",
+   "sample": 3003,
+   "total": {
+    "alp": 31.1,
+    "lnp": 31.4,
+    "grn": 14.6,
+    "onp": 8.5,
+    "oth": 14.4
+   },
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 33,
+      "grn": 13,
+      "onp": 9,
+      "oth": 14
+     },
+     "Women": {
+      "alp": 31,
+      "lnp": 30,
+      "grn": 16,
+      "onp": 8,
+      "oth": 15
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 17,
+      "grn": 32,
+      "onp": 4,
+      "oth": 12
+     },
+     "35–49": {
+      "alp": 31,
+      "lnp": 27,
+      "grn": 15,
+      "onp": 13,
+      "oth": 14
+     },
+     "50–64": {
+      "alp": 28,
+      "lnp": 37,
+      "grn": 8,
+      "onp": 11,
+      "oth": 16
+     },
+     "65+": {
+      "alp": 30,
+      "lnp": 46,
+      "grn": 3,
+      "onp": 6,
+      "oth": 15
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 31,
+      "lnp": 34,
+      "grn": 13,
+      "onp": 9,
+      "oth": 13
+     },
+     "TAFE or trade": {
+      "alp": 27,
+      "lnp": 30,
+      "grn": 16,
+      "onp": 11,
+      "oth": 16
+     },
+     "University": {
+      "alp": 36,
+      "lnp": 29,
+      "grn": 15,
+      "onp": 5,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 27,
+      "lnp": 44,
+      "grn": 6,
+      "onp": 8,
+      "oth": 15
+     },
+     "Mortgage": {
+      "alp": 33,
+      "lnp": 30,
+      "grn": 12,
+      "onp": 10,
+      "oth": 15
+     },
+     "Renting": {
+      "alp": 31,
+      "lnp": 23,
+      "grn": 24,
+      "onp": 9,
+      "oth": 13
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 31,
+      "lnp": 29,
+      "grn": 15,
+      "onp": 10,
+      "oth": 15
+     },
+     "Part time": {
+      "alp": 36,
+      "lnp": 24,
+      "grn": 20,
+      "onp": 7,
+      "oth": 13
+     },
+     "Retired": {
+      "alp": 28,
+      "lnp": 49,
+      "grn": 4,
+      "onp": 6,
+      "oth": 13
+     },
+     "Other": {
+      "alp": 26,
+      "lnp": 22,
+      "grn": 23,
+      "onp": 11,
+      "oth": 18
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 30,
+      "lnp": 32,
+      "grn": 14,
+      "onp": 9,
+      "oth": 15
+     },
+     "Other language": {
+      "alp": 35,
+      "lnp": 28,
+      "grn": 16,
+      "onp": 7,
+      "oth": 14
+     }
+    }
+   }
+  }
+ ]
+}

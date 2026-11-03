@@ -8305,6 +8305,15 @@ function infoTerms(D) {
         direction. Each test is a line
         through the monthly readings, tighter months counting for more. A group needs five monthly
         readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</span>
+        <span className="info-p"><b>Since the election.</b> The sentence also asks whether a group
+        has moved since the 2025 election, on the same two tests. It starts from the polls’ own
+        figure for the group over the six weeks before polling day: the pollsters’ published
+        tables then, pooled just as today’s figures are, and drawn on the charts as an open
+        triangle. Both ends are the same polls, so a difference is movement. The Australian
+        Election Study, a survey after the election of how people voted, is drawn beside it as a
+        diamond. At the election it read several groups differently from the polls by more than
+        both margins, among them Labor’s and the Greens’ gender gaps, so it is the starting point
+        only for generations, which no pollster cut before the election.</span>
         <span className="info-p"><b>Limits.</b> The margins can’t see pollsters defining or
         weighting a group differently, and a pollster that joins the series part-way, reading a
         group its own way, can move a monthly line by that alone. The test looks for steady change,

@@ -17,8 +17,8 @@ cuts (see `.matilda/skills/auto-skill-auspol-bludgertrack-archive`), so 2025 is 
 - **Against the AES, the houses agree with each other but not with the AES.** On several demographic gaps the
   houses differ from the AES by more than both margins. They agree with each other, and the differences held
   across the whole 2022–25 term, so this is the two instruments measuring differently, not a campaign event.
-- **The site's election test.** It measures "since the election" from the AES. Some of what it reports as change
-  is this instrument difference. Re-asked against the polls' own election-time readings:
+- **The site's election test.** It measured "since the election" from the AES (changed 2026-11-03, see §4). Some
+  of what it reported as change was this instrument difference. Re-asked against the polls' own election-time readings:
   - **Holds:** the Coalition among graduates (smaller: +4.0 rather than +7.1) and others among men.
   - **No change:** the Greens' gender-gap narrowing, the Greens among voters with Year 12 or less, and others among
     outright owners.
@@ -136,9 +136,16 @@ read off the four-band tables with the site's own `ageStandardise`.
   - The pooled pre-election gap mixes the houses that printed each cut. The current figure pools today's houses.
     Group-level house effects were small in the final window (Q/df ≈ 1–2), so this leaks little.
   - The ratio half of the site's test isn't repeated.
-- **Recommendation, not made.** Measure "since the election" from the polls' own election-time gaps where a cut
-  exists (every set but generation), keep the AES diamonds as the AES's reading, and fall back to the AES for
-  generation. This would reverse the 2026-11-02 ruling, so it waits for the owner.
+- **Made 2026-11-03 (owner: "proceed as you see fit").** The site now measures "since the election" from the polls'
+  own election-time figures wherever a pre-election cut exists. That is every set but generation, and language at
+  home is now tested too.
+  - **How it's built:** gen-data §7g `DEMO_ELECTION`, from `data/demographics-2025-election.json`, written by
+    `.build/extract-demographics-2025-election.mjs` from this folder's table. Groups are pooled over the six weeks
+    ending on election day, as the current figures are.
+  - **On the charts:** the figures are drawn as open triangles with the lead-ins. The AES diamonds stay, nudged
+    right of the election column, and generations keep the AES baseline.
+  - **The check:** `site-claims.mjs` now re-asks the site's own baseline. Its `d′` equals the site's `d` for every
+    row but the generations.
 
 ## 5. The seat model (`house-baselines.mjs`, `seats-rebase.mjs` → `out/`)
 
