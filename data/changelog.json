@@ -7,7 +7,7 @@
     },
     "imp": 51,
     "pub": 49.8,
-    "on": 51,
+    "on": 50.9,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -215,12 +215,9 @@
       "2026-11-03|YouGov"
     ],
     "moves": {
-      "alp|education|TAFE or trade": -1,
-      "alp|education|University": 1,
-      "alp|language|English only": -1,
       "alp|state|Non-NSW/Vic/Qld": 1,
       "grn|age|35–54": -1,
-      "grn|education|Year 12 or less": -1,
+      "grn|education|TAFE or trade": 1,
       "grn|language|English only": -1,
       "grn|working|Full time": -1,
       "lnp|housing|Renting": -1,
@@ -228,28 +225,14 @@
       "lnp|location|Inner metro": 1,
       "lnp|location|Provincial": -1,
       "lnp|location|Rural": -1,
+      "lnp|state|NSW": -1,
       "lnp|state|Qld": -1,
       "lnp|state|Vic": 1,
+      "onp|state|ACT/NT/Tas": -1,
       "oth|state|Non-NSW/Vic/Qld": -1,
-      "oth|state|WA": 1,
       "oth|working|Retired": -1
     },
     "movesMeta": {
-      "alp|education|TAFE or trade": {
-        "party": "alp",
-        "group": "TAFE or trade",
-        "setLabel": "Education"
-      },
-      "alp|education|University": {
-        "party": "alp",
-        "group": "University",
-        "setLabel": "Education"
-      },
-      "alp|language|English only": {
-        "party": "alp",
-        "group": "English only",
-        "setLabel": "By language at home"
-      },
       "alp|state|Non-NSW/Vic/Qld": {
         "party": "alp",
         "group": "Non-NSW/Vic/Qld",
@@ -260,9 +243,9 @@
         "group": "35–54",
         "setLabel": "By age"
       },
-      "grn|education|Year 12 or less": {
+      "grn|education|TAFE or trade": {
         "party": "grn",
-        "group": "Year 12 or less",
+        "group": "TAFE or trade",
         "setLabel": "Education"
       },
       "grn|language|English only": {
@@ -300,6 +283,11 @@
         "group": "Rural",
         "setLabel": "By location"
       },
+      "lnp|state|NSW": {
+        "party": "lnp",
+        "group": "NSW",
+        "setLabel": "By state"
+      },
       "lnp|state|Qld": {
         "party": "lnp",
         "group": "Qld",
@@ -310,14 +298,14 @@
         "group": "Vic",
         "setLabel": "By state"
       },
+      "onp|state|ACT/NT/Tas": {
+        "party": "onp",
+        "group": "ACT/NT/Tas",
+        "setLabel": "By state"
+      },
       "oth|state|Non-NSW/Vic/Qld": {
         "party": "oth",
         "group": "Non-NSW/Vic/Qld",
-        "setLabel": "By state"
-      },
-      "oth|state|WA": {
-        "party": "oth",
-        "group": "WA",
         "setLabel": "By state"
       },
       "oth|working|Retired": {
@@ -328,18 +316,18 @@
     },
     "prim": {
       "alp": 26.4,
-      "grn": 13.3,
+      "grn": 13.2,
       "lnp": 23.1,
       "onp": 26.1,
       "oth": 11.3
     },
     "leaders": {
-      "alb_fav": -19,
-      "alb_net": -22.6,
+      "alb_fav": -19.1,
+      "alb_net": -23.3,
       "hanson_fav": -8,
       "hanson_net": -1.6,
       "taylor_fav": -1.5,
-      "taylor_net": -4.5
+      "taylor_net": -4.7
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -627,6 +615,54 @@
       "label": "3 Nov 2026",
       "kind": "finding",
       "text": "The month-on-month rise in the share of One Nation’s gains drawn from 2025 other voters is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "TAFE or trade voters (by education) now break significantly toward the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "NSW voters (by state) now break significantly away from the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "ACT/NT/Tas voters (by state) now break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "TAFE or trade voters (by education) no longer break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "University voters (by education) no longer break significantly toward Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "English only voters (by language at home) no longer break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "Year 12 or less voters (by education) no longer break significantly away from the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-04",
+      "label": "4 Nov 2026",
+      "kind": "finding",
+      "text": "WA voters (by state) no longer break significantly toward others, relative to all voters."
     }
   ]
 }

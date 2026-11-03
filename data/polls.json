@@ -6291,6 +6291,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1200,
+      "sampleEff": 932,
       "alp": 27,
       "lnp": 21,
       "grn": 13,
@@ -6299,7 +6300,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/29057920/NewspollMethodologyStatement2November2026byPyxis-q9y5IgIL6HJD5Ixfy18XkA.pdf"
     },
     {
       "date": "2026-11-03",
