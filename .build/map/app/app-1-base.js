@@ -438,7 +438,7 @@ const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : ANC_N
 const DEMO_FROM = 1993;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "qld17", "vic18", 2019, "nsw19", "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
+const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "qld17", "vic18", 2019, "nsw19", "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "nswnow", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw15/nsw19/nsw23/
 // sa22/sa26/vic14/vic18/vic22 — non-federal stops, drawn on their own
@@ -446,11 +446,22 @@ const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15",
 // the year. (The 2013-redistribution era New South Wales and Victorian
 // stops ran their own rows in from 2026-11-04.)
 const SA_YEARS = new Set(["sa22", "sa26"]);
-const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23"]);
+const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);
 const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);
-const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+// the "as it stands" overlays: a now-key rides one election frame (nswnow is
+// the 2023 Assembly plus its four by-elections and the members' moves since,
+// now is the 2025 House plus Farrer and the parliament's moves since), with
+// its own overlay file listing who holds each changed seat today
+const NOW_OF = { now: 2025, nswnow: "nsw23" };
+const NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json" };
+const isNowY = (y) => y in NOW_OF;
+const nowRy = (y) => (y in NOW_OF ? NOW_OF[y] : y);
+// the election an "as it stands" frame's numbers measure against: the base
+// count itself (the 2025 count for "now", the 2023 one for "nswnow")
+const frameBaseY = (y) => (isNowY(y) ? FRAME_YEAR[NOW_OF[y]] ?? NOW_OF[y] : FRAME_YEAR[y] ?? y);
 // an election's count word follows the view: divisions on the map, seats in
 // the chamber, members in the list — never "districts"
 const seatNoun = () => (S.view === "map" ? "divisions" : S.view === "chamber" ? "seats" : "members");
@@ -465,9 +476,9 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
+const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
+const FRAME_YEAR = { now: 2026, nswnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
 // Queensland's 2015 (31 January) precedes the row's three stops
 const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086 };
@@ -481,7 +492,7 @@ const QLD_PREV_X = { 2015: STATE_PREV_X.qld };
 // frame naming nothing (the 2015 election was fought on the 89-district map);
 // the 2013-era stops chain too (nsw15←2011→nsw19←2015→nsw23; vic14←2010→vic18
 // ←2014→vic22), nsw15 and vic14 the row's first stops
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qld20: 2017, qld17: null };
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qld20: 2017, qld17: null };
 const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
@@ -489,14 +500,14 @@ const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
 const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" } };
-const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
+const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -514,7 +525,10 @@ const LENSES = [
 // (state legislatures, state-commission boundaries) don't offer them
 // ("senpref" is the Preferences tab's Senate-ballot reading, flipped from its key: not a tab of its own)
 const FED_LENS = new Set(["senate", "senpref", "cls"]);
-const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
+// New South Wales' Legislative Council preferences exist per-ballot since 2015 (the NSWEC's
+// "LC Pref Data Statewide" zips): its state frames keep the senpref reading beside them
+const SEN_PREF_STATE_FRAMES = new Set(["nsw15", "nsw19", "nsw23"]);
+const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id) || (l.id === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens and row walks
 // are keyboard only — a phone scrolls the lens row itself, and its vertical
@@ -774,9 +788,9 @@ const S = {
 const seifaBasis = (m) => (m && m.demoBasis === "voter" ? "voters" : "venue");
 const Y = {};
 let proj = null;
-const isNow = () => S.year === "now";
-// a state frame names itself "SA2022"/"NSW2023": the state's abbreviation + full year
-const yearLabel = (y) => (y === "now" ? "Now" : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}` : String(y));
+// a state frame names itself "SA2022"/"NSW2023": the state's abbreviation + full
+// year; its "as it stands" overlay key is "NSW now"
+const yearLabel = (y) => (y === "now" ? "Now" : isNowY(y) ? `${stOfYear(y)} now` : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}` : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -1209,7 +1223,7 @@ function buildSearch(m) {
   for (const st of STATES) { const a = m.areas[st]; if (!a) continue; items.push({ k: "state", st, t: STATE_TITLE[st], s: `${a.idx.length} seats`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 }); }
   for (const d of m.divs) {
     items.push({ k: "div", i: d.i, t: d.n, s: `${STATE_SHORT[d.st]} · ${d.hold.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.n), rank: 1 });
-    items.push({ k: "mp", i: d.i, t: d.hold.n, s: `${isNow() || m.year === "now" ? "Member" : "Elected"} for ${d.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.hold.n), rank: 2 });
+    items.push({ k: "mp", i: d.i, t: d.hold.n, s: `${isNowY(m.year) ? "Member" : "Elected"} for ${d.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.hold.n), rank: 2 });
     for (const c of d.c) if (c !== d.win && c.v / d.formal > 0.06) items.push({ k: "cand", i: d.i, t: c.n, s: `Candidate in ${d.n}, ${partyName(c.ab, c.pn)}`, h: norm(c.n), rank: 3 });
   }
   const b = m.booth;
@@ -1221,35 +1235,43 @@ function buildSearch(m) {
   return { items };
 }
 
-/* "Now": the 2025 House with the Farrer by-election and every change of party since */
+/* the "as it stands" overlay: each by-election replaces its district's
+   general-election count, booth by booth, and the members' moves rewrite who
+   holds the seat today (the federal Now's Farrer lane, generalised for the
+   NSW Now's four by-elections — the overlay file's districts are entries,
+   never a hardcoded seat) */
 function applyNow(m, now) {
-  const fi = m.byName.get("Farrer");
-  const by = now.byelections.Farrer;
-  // the by-election replaces Farrer's 2025 count, booth by booth
-  const D = deriveDiv(by.div, fi, "now");
-  D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
-  D.by = { date: by.date, event: by.event, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
-  D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
-  m.divs[fi] = D;
-  // the 2025 count at each by-election place, by family, for the swings at the same place
-  const B25 = m.res.booths, D25 = m.res.divs[fi];
-  const fams25 = D25.c.map((c) => c[3]);
-  const prevFp = by.booths.prev.map((j) => {
-    if (j == null) return null;
-    const v = B25.v[j], tot = v.reduce((a, b) => a + b, 0), acc = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
-    if (!tot) return null;
-    v.forEach((x, k) => (acc[fams25[k]] += x));
-    for (const f in acc) acc[f] = (100 * acc[f]) / tot;
-    return acc;
-  });
-  const B = m.res.booths, keep = [];
-  for (let j = 0; j < B.id.length; j++) if (B.d[j] !== fi) keep.push(j);
-  const nb = {};
-  for (const k of Object.keys(B)) nb[k] = keep.map((j) => B[k][j]);
-  const BB = by.booths;
-  for (let j = 0; j < BB.id.length; j++) for (const k of Object.keys(B)) nb[k].push(k === "d" ? fi : BB[k] ? BB[k][j] : null);
-  nb.prevFp = keep.map(() => null).concat(prevFp);
-  m.res = { ...m.res, booths: nb };
+  for (const [name, by] of Object.entries(now.byelections || {})) {
+    const fi = m.byName.get(name);
+    if (fi == null) continue;
+    const D = deriveDiv(by.div, fi, m.year);
+    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
+    D.by = { date: by.date, event: by.event ?? by.nswEvent, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
+    D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
+    m.divs[fi] = D;
+    // the base count at each by-election place, by family, for the swings at
+    // the same place
+    const B0 = m.res.booths, D0 = m.res.divs[fi];
+    const fams0 = D0.c.map((c) => c[3]);
+    const prevFp = by.booths.prev.map((j) => {
+      if (j == null) return null;
+      const v = B0.v[j], tot = v.reduce((a, b) => a + b, 0), acc = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
+      if (!tot) return null;
+      v.forEach((x, k) => (acc[fams0[k]] += x));
+      for (const f in acc) acc[f] = (100 * acc[f]) / tot;
+      return acc;
+    });
+    const B = m.res.booths, keep = [], hadFp = B.prevFp || [];
+    for (let j = 0; j < B.id.length; j++) if (B.d[j] !== fi) keep.push(j);
+    const nb = {};
+    for (const k of Object.keys(B)) nb[k] = keep.map((j) => B[k][j]);
+    const BB = by.booths;
+    for (let j = 0; j < BB.id.length; j++) for (const k of Object.keys(B)) nb[k].push(k === "d" ? fi : BB[k] ? BB[k][j] : null);
+    // the earlier districts' prevFp ride through — a second by-election only
+    // appends its own
+    nb.prevFp = keep.map((j) => hadFp[j] == null ? null : hadFp[j]).concat(prevFp);
+    m.res = { ...m.res, booths: nb };
+  }
   // who sits for each changed seat today
   for (const [name, h] of Object.entries(now.holders)) {
     const i = m.byName.get(name);
@@ -1269,7 +1291,7 @@ const SEATED_LC = new Set(["sa26", "vic22"]);
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023;
 // Shelley Hancock, 2 May 2011; Jonathan O'Dea, 27 May 2019; Christine Fyffe, 24 December 2014;
 // Colin Brooks, 27 March 2017)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine" };
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine" };
 async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
@@ -1277,11 +1299,11 @@ async function loadYear(year, bg) {
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
-    const ry = year === "now" ? 2025 : year;
+    const ry = nowRy(year);
     // the results without the polling places' census lanes (core-split.mjs), unless the
     // lens is reading them now or the page's warmup already asked for the full file
     const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
-    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), year === "now" ? getJSON("/map/data/data-now.json", bg) : null,
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own projection, then the live one put back: a year loaded
     // ahead (the timeline's hover) must not move the streets and the sea under
@@ -1342,7 +1364,10 @@ async function loadYear(year, bg) {
     m.gov = GOV[year];
     m.geo = lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m);
     m.isl = buildIslands(islands, m);
-    m.booth = res.booths ? deriveBooths(res.booths, m) : emptyBooths(m);
+    // the booths the year in view actually held — for an "as it stands"
+    // frame that's the overlay-corrected lanes in m.res, never the raw
+    // event's lanes the frame's base election fetched
+    m.booth = m.res.booths ? deriveBooths(m.res.booths, m) : emptyBooths(m);
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     // the Handbook years' projection is only built inside their geometry
@@ -1375,7 +1400,7 @@ const needPpl = () => S.lens === "seifa" && isDemo();
 function loadPpl(y) {
   const m = Y[y];
   if (!m || !m.divs || m.ppl) return Promise.resolve(m);
-  return (m.pplP ??= getJSON(`/map/data/res-${y === "now" ? 2025 : y}.json`).then((full) => {
+  return (m.pplP ??= getJSON(`/map/data/res-${nowRy(y)}.json`).then((full) => {
     const B = m.booth.raw, F = full.booths;
     if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
     m.ppl = true;
@@ -1397,9 +1422,9 @@ function pplThen(m) {
 function warmHi(y) {
   const m = Y[y];
   if (!m || !m.divs || m.geoHi || m._hiP) return m && m._hiP;
-  const ry = y === "now" ? 2025 : y;
   // the hi detail can land after the reader has moved to another year — its paths
   // are baked under this year's own projection, whatever the live one is by then
+  const ry = nowRy(y);
   m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
     .then((hi) => buildGeoSliced(hi, m, m.proj))
     .then((g) => { m.geoHi = g; schedule(); })

@@ -32,8 +32,10 @@ const SEN_SEATS = 76;
 // on their frames, from map/data/senate-<year>.json
 // (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py, build_vic22_lc.py).
 // Queensland's parliament is unicameral (its Legislative Council was abolished in 1922), so the
-// qld frames take no upper-house lane — their one chamber is the Legislative Assembly.
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y)));
+// qld frames take no upper-house lane — their one chamber is the Legislative Assembly. A state's
+// "as it stands" frame (nswnow) takes none either — its Assembly alone is overlaid; the Council's
+// own since-the-election changes are a ledger of their own the overlay never pretends to.
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !isNowY(y)));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -601,7 +603,7 @@ const spGvtYear = (y) => { const k = spYear(y); return k != null && SP_GVT.has(k
 const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
 const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
 const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
-const spYear = (y) => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; };
+const spYear = (y) => (SEN_PREF_STATE_FRAMES.has(y) ? y : (() => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; })());
 function loadSenatePrefs(y) {
   const k = spYear(y);
   if (k == null) return Promise.resolve(null);

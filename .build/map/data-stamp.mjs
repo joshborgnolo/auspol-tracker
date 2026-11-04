@@ -52,9 +52,14 @@ export function metaFacts(root) {
     m = f.match(/^senate-(\w+)\.json$/);
     if (m) { const r = read(f); if (r) senate[m[1]] = [r.asOf, r.senators.length]; }
   }
-  const now = read("data-now.json");
-  // Now is the 2025 House with its changes since
-  if (now && house["2025"]) house.now = [now.asOf, house["2025"][1], house["2025"][2]];
+  // each "as it stands" overlay inherits its base election's House line with
+  // its own as-of date (the same year-key <-> overlay-file <-> base-year table
+  // the app's NOW_OF/NOW_DATA and assemble's warm script carry)
+  const NOW_OF = { now: "2025", nswnow: "nsw23" }, NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json" };
+  for (const [y, base] of Object.entries(NOW_OF)) {
+    const n = read(NOW_DATA[y]);
+    if (n && n.asOf && house[base]) house[y] = [n.asOf, house[base][1], house[base][2]];
+  }
   return { house, senate, mix };
 }
 export function stampMeta(js, facts) {

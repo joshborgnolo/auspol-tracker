@@ -31,9 +31,9 @@ const legW = (b) => famLeg(b);
 // a family's preferences, possessive: the Liberals' on an SA or Victorian frame,
 // the LNP's on a Queensland frame, the Coalition's elsewhere
 const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && (isSA() || isVic()) ? "the Liberals’" : POSS[b]);
-// the "now" view: today’s holder won the last count under another banner — the
-// winner’s row in the count stays historical but earns a "· now X" note
-const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
+// an "as it stands" view: today’s holder won the last count under another
+// banner — the winner’s row in the count stays historical but earns a note
+const movedTo = (m, d) => (isNowY(m.year) && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
 function swingPhrase(sw, prev) {
   if (sw == null) return "";
   if (Math.abs(sw) < 0.05) return `no swing since ${prev}`;
@@ -46,7 +46,7 @@ function rankWords(r, n, hi = "highest", lo = "lowest") { const q = n - r + 1; i
 const SUBJ = { alp: "Labor", lnp: "The Coalition", grn: "The Greens", onp: "One Nation", ind: "Independents", oth: "Other candidates" };
 const subj = (f) => (f === "alp" || f === "onp" ? SUBJ[f] : SUBJ[f].charAt(0).toLowerCase() + SUBJ[f].slice(1));
 const ofN = (k, n) => (k === n ? `all ${n}` : `${k} of the ${n}`);
-const byNote = (d) => (d && d.by ? ", at the 2026 by-election" : "");
+const byNote = (d) => (d && d.by ? `, at the ${d.by.date.slice(0, 4)} by-election` : "");
 function seatCount(m, idx, fam) { return idx.filter((i) => m.divs[i].hold.fam === fam).length; }
 
 /* ----- small figure builders ----- */
@@ -188,18 +188,25 @@ function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const where = aus ? "" : ` in ${STATE_NAME[st]}`;
   const ofSeats = aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
   const lead = A.tpp >= 50 ? "alp" : "lnp", leadPct = Math.max(A.tpp, 100 - A.tpp);
 
-  const isNowM = m.year === "now";
+  const isNowM = isNowY(m.year);
+  // the seats an "as it stands" frame holds that the election itself never
+  // delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
+  // and Pittwater (from the Liberals to the crossbench)
+  const NOW_AUS_DEK = {
+    now: " One Nation has two seats it didn’t win at the election: Barnaby Joyce joined it in December 2025, and David Farley won Farrer at the May 2026 by-election.",
+    nswnow: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.",
+  };
   switch (S.lens) {
     case "winner": {
       const g = cnt[gov] || 0, o = cnt[opp] || 0, c = N - g - o;
       if (isNowM) {
         const hed = aus ? `Labor holds ${g} of the ${N} seats` : `Labor holds ${g} ${ofSeats}`;
-        let dek = `The Coalition holds ${o}. ${crossSentence(m, idx, "holds")}`;
-        if (aus) dek += ` One Nation has two seats it didn’t win at the election: Barnaby Joyce joined it in December 2025, and David Farley won Farrer at the May 2026 by-election.`;
+        let dek = `${coalW(1)} ${o === 1 ? "holds" : "hold"} ${o}. ${crossSentence(m, idx, "holds")}`;
+        if (aus) dek += NOW_AUS_DEK[m.year] ?? "";
         if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) dek += ` Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
         return { hed, dek };
       }
@@ -231,12 +238,18 @@ function areaHedDek(m, st) {
         const toward = sw.filter((x) => (s >= 0 ? x.v > 0 : x.v < 0)).length;
         const big = [...sw].sort((a, b) => (s >= 0 ? b.v - a.v : a.v - b.v))[0];
         const dek = sw.length ? `${toward === 0 ? "None" : cap(ofN(toward, sw.length))} ${toward === 0 ? `of the ${sw.length}` : ""} seats with a measured swing moved towards ${to}.`.replace("  ", " ") + ` The biggest swing that way was ${big ? `${ds(m.divs[big.i].n)}’s, ${pts(big.v)}` : "–"}.` : "";
-        return { hed, dek: dek + (isNowM ? " These are the 2025 election’s swings." : "") };
+        return { hed, dek: dek + (isNowM ? ` These are the ${frameBaseY(m.year)} election’s swings.` : "") };
       }
       const hed = `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
       const ahead = withData.filter((i) => m.divs[i].tpp > 50).length;
       const sp = swingPhrase(A.tppSw, prev);
-      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? " These are the 2025 election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none." : ""}`;
+      // the figures an "as it stands" frame mixes counts from: the base
+      // election, and any seat whose by-election replaced it
+      const NOW_TPP_NOTE = {
+        now: ` These are the ${frameBaseY(m.year)} election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none.`,
+        nswnow: ` These are the ${frameBaseY(m.year)} election’s figures; Kiama’s two-party read is its by-election count, and the other by-election seats carry none (their final pairs weren’t Labor against the Coalition).`,
+      };
+      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? NOW_TPP_NOTE[m.year] ?? "" : ""}`;
       return { hed, dek };
     }
     case "fp": {
@@ -270,7 +283,7 @@ function areaHedDek(m, st) {
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections; choose one on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections and New South Wales' state elections; choose one on the timeline.` };
       if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's machine record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later.` };
       const gvt = spGvtYear(m.year) != null;
       const r = spArea(m, idx);
@@ -483,11 +496,11 @@ function clsVoteBlock(m, idx) {
 
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek } = areaHedDek(m, st);
-  const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${seatNoun()}`) : (m.year === "now" ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
+  const meta = aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
@@ -495,12 +508,12 @@ function storyArea(m, st) {
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
     const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
-    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
-  if (m.year === "now" && aus) {
+  if (isNowY(m.year) && aus) {
     const ch = m.changes.slice().reverse();
     h += `<div class="st-sec"><h3>Since the election <small>${ch.length} changes</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
-    h += `<p class="st-note" style="margin-top:22px">The figures below are the 2025 election’s.</p>`;
+    h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // the two-party read
   const swp = swingPhrase(A.tppSw, prev);
@@ -521,9 +534,10 @@ function storyArea(m, st) {
 }
 
 /* ----- a seat ----- */
-// the election a seat's swings are measured against: "Now" shows the 2025
-// count (against 2022) everywhere but Farrer, whose by-election is set against 2025
-const prevFor = (m, d) => (m.year === "now" ? (d && d.by ? 2025 : 2022) : prevYearOf(m.year) ?? (m.res && m.res.prev));
+// the election a seat's swings are measured against: an "as it stands" frame
+// shows the base count (against the election before it) everywhere but the
+// by-election seats, whose own count is judged against that base
+const prevFor = (m, d) => (isNowY(m.year) ? (d && d.by ? frameBaseY(m.year) : m.res.prev) : prevYearOf(m.year) ?? (m.res && m.res.prev));
 function seatHedDek(m, d) {
   const prev = prevFor(m, d);
   const [wn, rn] = pairNames(d.win, d.run);
@@ -532,11 +546,17 @@ function seatHedDek(m, d) {
   switch (S.lens) {
     case "winner": {
       if (d.by) {
-        const hed = `One Nation’s David Farley won Farrer at the May 2026 by-election`;
-        const dek = `He beat the independent Michelle Milthorpe ${f1(d.winPct)}–${f1(100 - d.winPct)} after preferences. Sussan Ley had held the seat for the Liberals since 2001; their candidate, Raissa Butkowski, ran third on ${f1(d.fp.lnp ? (100 * d.c.find((c) => c.ab === "LP").v) / d.formal : 0)}% of first preferences. Labor didn’t stand.`;
+        if (m.year === "now" && d.n === "Farrer") {
+          const hed = `One Nation’s David Farley won Farrer at the May 2026 by-election`;
+          const dek = `He beat the independent Michelle Milthorpe ${f1(d.winPct)}–${f1(100 - d.winPct)} after preferences. Sussan Ley had held the seat for the Liberals since 2001; their candidate, Raissa Butkowski, ran third on ${f1(d.fp.lnp ? (100 * d.c.find((c) => c.ab === "LP").v) / d.formal : 0)}% of first preferences. Labor didn’t stand.`;
+          return { hed, dek };
+        }
+        // every other by-election seat: the record speaks for itself
+        const hed = `${ds(d.win.n)} won ${ds(d.n)} at the ${monthYear(d.by.date)} by-election`;
+        const dek = `${ds(d.win.n)} won the final count ${f1(d.winPct)}–${f1(100 - d.winPct)} against ${ds(rn)} (${esc(rParty)}).`;
         return { hed, dek };
       }
-      const hold = d.hold, switched = m.year === "now" && (hold.n !== d.win.n || hold.ab !== d.win.ab);
+      const hold = d.hold, switched = isNowY(m.year) && (hold.n !== d.win.n || hold.ab !== d.win.ab);
       if (switched) {
         const ch = m.changes.filter((c) => c.div === d.n).pop();
         const hed = hold.ab === "CSA" ? `${ds(hold.n)} now sits for Community Strong` : `${ds(hold.n)} now sits for ${esc(leaderName(hold))}`;
@@ -559,7 +579,7 @@ function seatHedDek(m, d) {
       dek += ".";
       if (fpLead !== d.win) dek += ` ${ds(surname(fpLead.n))} led on first preferences, ${f1((100 * fpLead.v) / d.formal)}% to ${f1((100 * d.win.v) / d.formal)}%.`;
       dek += ` ${isState() ? "On the usual scale" : "By the AEC’s measure"} that makes ${ds(d.n)} ${statusOf(d.winPct)}.`;
-      if (ch.kind === "re" && ch.since < (m.year === "now" ? 2025 : m.year)) dek += ` ${ds(surname(d.win.n))} has held it since ${ch.since}.`;
+      if (ch.kind === "re" && ch.since < (isNowY(m.year) ? frameBaseY(m.year) : m.year)) dek += ` ${ds(surname(d.win.n))} has held it since ${ch.since}.`;
       return { hed, dek };
     }
     case "tpp": {
@@ -581,7 +601,7 @@ function seatHedDek(m, d) {
       if (S.fpMode === "change") {
         const c = fpChange(m, d, P);
         if (c == null) return { hed: `${SUBJ[P]} didn’t stand in ${ds(d.n)} both times`, dek: "" };
-        return { hed: Math.abs(c) < 0.05 ? `${Poss(P)} primary vote in ${ds(d.n)} was unchanged` : `${Poss(P)} primary vote ${c >= 0 ? "rose" : "fell"} ${pts(c)} in ${ds(d.n)}`, dek: `${SUBJ[P]} won ${f1(v)}% of first preferences${d.by ? " at the by-election, against the seat’s 2025 count" : ""}.` };
+        return { hed: Math.abs(c) < 0.05 ? `${Poss(P)} primary vote in ${ds(d.n)} was unchanged` : `${Poss(P)} primary vote ${c >= 0 ? "rose" : "fell"} ${pts(c)} in ${ds(d.n)}`, dek: `${SUBJ[P]} won ${f1(v)}% of first preferences${d.by ? ` at the by-election, against the seat’s ${frameBaseY(m.year)} count` : ""}.` };
       }
       if (!v) return { hed: `${name === "Independents" ? "No independent" : name} didn’t stand in ${ds(d.n)}`.replace("No independent didn’t", "No independent stood"), dek: "" };
       const aus = m.areas.AUS.fp[P];
@@ -599,7 +619,7 @@ function seatHedDek(m, d) {
       return { hed: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote in ${ds(d.n)}`, dek: `${pr.Its} House ${cands > 1 ? "candidates" : "candidate"} won ${f1(h)}%${aus ? `; across Australia ${pr.its} Senate vote was ${f1(aus.sen)}%` : ""}.` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
+      if (spYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
       if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later on the timeline.` };
       if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to read ${ds(d.n)}’s Senate ballots.` };
       const s = spOf(m);
@@ -666,7 +686,7 @@ function storyDiv(m, i) {
   const d = m.divs[i];
   const prev = prevFor(m, d);
   const { hed, dek } = seatHedDek(m, d);
-  const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? " · by-election, 9 May 2026" : ""}`;
+  const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
   let h = head(d.n, meta, hed, dek);
   const [wn, rn] = pairNames(d.win, d.run);
   h += `<div class="st-sec"><h3>Final count <small>${d.by ? "the by-election’s" : "two candidates"}</small></h3><div class="hero">${heroPair(wn, d.winPct, d.win.fam, rn, 100 - d.winPct, d.run.fam)}${marginBar(wn, d.win.fam, rn, d.run.fam, 2 * d.winPct - 100)}<p class="hero-verdict"><b>${ds(wn)}</b> by ${int(d.votesMargin)} votes · ${statusOf(d.winPct)}</p></div></div>`;
@@ -674,7 +694,7 @@ function storyDiv(m, i) {
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? " on 2025" : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
+  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? ` on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
   if (d.vt) {
@@ -811,7 +831,7 @@ function storyBooth(m, j) {
   const moved = movedTo(m, D);
   const wk = D.c.indexOf(D.win);
   const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? " · change on 2025 here" : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
+  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? ` · change on ${frameBaseY(m.year)} here` : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
@@ -825,7 +845,9 @@ function storyBooth(m, j) {
 }
 
 function foot(m) {
-  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH"
+    : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
+    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
   return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }
 let storyKey = "";

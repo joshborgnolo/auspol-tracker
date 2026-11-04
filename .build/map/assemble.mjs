@@ -63,10 +63,10 @@ write("map/map.css", css);
   let stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
   const dv = dataStamps(ROOT);
   const warmV = {};
-  for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|core-\w+|geo-\w+-lo)\.json$/.test(f) || f === "data-now.json" || f === "islands.json") warmV[f] = v;
+  for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|core-\w+|geo-\w+-lo)\.json$/.test(f) || /^data-now(-\w+)?\.json$/.test(f) || f === "islands.json") warmV[f] = v;
   stamped = stamped.replace(
     /<!--map-data-warm:begin-->[\s\S]*?<!--map-data-warm:end-->/,
-    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=y==="now"?"2025":y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(y==="now")go("data-now.json");})();</script>\n<!--map-data-warm:end-->`);
+    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var NOW_OF={"now":"2025","nswnow":"nsw23"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json"};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>\n<!--map-data-warm:end-->`);
   if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("map/index.html stamped", hs["map.js"], hs["map.css"]); }
   else console.log("map/index.html stamps current");
 }

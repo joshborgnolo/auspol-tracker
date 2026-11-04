@@ -490,8 +490,9 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"],
   // South Australia's Premier and Leader of the Opposition, at the front benches' seats nearest the Speaker
   sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
-  // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
-  nsw23: ["Kogarah", "Cronulla"],
+  // New South Wales' (Minns at Kogarah, Speakman at Cronulla — Sloane succeeds
+  // Speakman as Opposition Leader 21 November 2025)
+  nsw23: ["Kogarah", "Cronulla"], nswnow: ["Kogarah", "Vaucluse"],
   // Queensland's Premier and Leader of the Opposition, at the front benches' heads:
   // Palaszczuk/Nicholls at 2017, Palaszczuk/Frecklington at 2020, and 2024's incoming
   // front-runners: the LNP's Crisafulli flips the chamber to Broadwater against Labor's Miles

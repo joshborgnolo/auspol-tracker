@@ -440,7 +440,7 @@ const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : ANC_N
 const DEMO_FROM = 1993;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
-const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "qld17", "vic18", 2019, "nsw19", "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "now"];
+const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "qld17", "vic18", 2019, "nsw19", "qld20", "nsw23", "sa22", 2022, "vic22", "qld24", 2025, "sa26", "nswnow", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw15/nsw19/nsw23/
 // sa22/sa26/vic14/vic18/vic22 — non-federal stops, drawn on their own
@@ -448,11 +448,22 @@ const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15",
 // the year. (The 2013-redistribution era New South Wales and Victorian
 // stops ran their own rows in from 2026-11-04.)
 const SA_YEARS = new Set(["sa22", "sa26"]);
-const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23"]);
+const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);
 const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);
-const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+// the "as it stands" overlays: a now-key rides one election frame (nswnow is
+// the 2023 Assembly plus its four by-elections and the members' moves since,
+// now is the 2025 House plus Farrer and the parliament's moves since), with
+// its own overlay file listing who holds each changed seat today
+const NOW_OF = { now: 2025, nswnow: "nsw23" };
+const NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json" };
+const isNowY = (y) => y in NOW_OF;
+const nowRy = (y) => (y in NOW_OF ? NOW_OF[y] : y);
+// the election an "as it stands" frame's numbers measure against: the base
+// count itself (the 2025 count for "now", the 2023 one for "nswnow")
+const frameBaseY = (y) => (isNowY(y) ? FRAME_YEAR[NOW_OF[y]] ?? NOW_OF[y] : FRAME_YEAR[y] ?? y);
 // an election's count word follows the view: divisions on the map, seats in
 // the chamber, members in the list — never "districts"
 const seatNoun = () => (S.view === "map" ? "divisions" : S.view === "chamber" ? "seats" : "members");
@@ -467,9 +478,9 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
+const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, now: 2026.8 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
+const FRAME_YEAR = { now: 2026, nswnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
 // Queensland's 2015 (31 January) precedes the row's three stops
 const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086 };
@@ -483,7 +494,7 @@ const QLD_PREV_X = { 2015: STATE_PREV_X.qld };
 // frame naming nothing (the 2015 election was fought on the 89-district map);
 // the 2013-era stops chain too (nsw15←2011→nsw19←2015→nsw23; vic14←2010→vic18
 // ←2014→vic22), nsw15 and vic14 the row's first stops
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qld20: 2017, qld17: null };
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qld20: 2017, qld17: null };
 const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
@@ -491,14 +502,14 @@ const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
 const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" } };
-const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
+const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", now: "Anthony Albanese" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -516,7 +527,10 @@ const LENSES = [
 // (state legislatures, state-commission boundaries) don't offer them
 // ("senpref" is the Preferences tab's Senate-ballot reading, flipped from its key: not a tab of its own)
 const FED_LENS = new Set(["senate", "senpref", "cls"]);
-const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id)) : LENSES;
+// New South Wales' Legislative Council preferences exist per-ballot since 2015 (the NSWEC's
+// "LC Pref Data Statewide" zips): its state frames keep the senpref reading beside them
+const SEN_PREF_STATE_FRAMES = new Set(["nsw15", "nsw19", "nsw23"]);
+const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.has(l.id) || (l.id === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) : LENSES;
 // the arrow-key walks: the year walk is shared by the keyboard and the phone's
 // figure swipes (a swipe cycles all the way around); the lens and row walks
 // are keyboard only — a phone scrolls the lens row itself, and its vertical
@@ -776,9 +790,9 @@ const S = {
 const seifaBasis = (m) => (m && m.demoBasis === "voter" ? "voters" : "venue");
 const Y = {};
 let proj = null;
-const isNow = () => S.year === "now";
-// a state frame names itself "SA2022"/"NSW2023": the state's abbreviation + full year
-const yearLabel = (y) => (y === "now" ? "Now" : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}` : String(y));
+// a state frame names itself "SA2022"/"NSW2023": the state's abbreviation + full
+// year; its "as it stands" overlay key is "NSW now"
+const yearLabel = (y) => (y === "now" ? "Now" : isNowY(y) ? `${stOfYear(y)} now` : STATE_YEARS.has(y) ? `${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}` : String(y));
 // a year as the URL and data-year attributes carry it: numeral digits, or a word
 // year ("now", "sa26") that stays a word - a bare +s gives NaN for those
 const yearOf = (s) => (YEARS.includes(s) ? s : +s);
@@ -788,7 +802,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"a31e3c68"};
+const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now-nsw.json":"c190e4d7","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"83997d0f"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1211,7 +1225,7 @@ function buildSearch(m) {
   for (const st of STATES) { const a = m.areas[st]; if (!a) continue; items.push({ k: "state", st, t: STATE_TITLE[st], s: `${a.idx.length} seats`, h: norm(STATE_TITLE[st] + " " + st), rank: 0 }); }
   for (const d of m.divs) {
     items.push({ k: "div", i: d.i, t: d.n, s: `${STATE_SHORT[d.st]} · ${d.hold.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.n), rank: 1 });
-    items.push({ k: "mp", i: d.i, t: d.hold.n, s: `${isNow() || m.year === "now" ? "Member" : "Elected"} for ${d.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.hold.n), rank: 2 });
+    items.push({ k: "mp", i: d.i, t: d.hold.n, s: `${isNowY(m.year) ? "Member" : "Elected"} for ${d.n}, ${partyName(d.hold.ab, d.hold.pn)}`, h: norm(d.hold.n), rank: 2 });
     for (const c of d.c) if (c !== d.win && c.v / d.formal > 0.06) items.push({ k: "cand", i: d.i, t: c.n, s: `Candidate in ${d.n}, ${partyName(c.ab, c.pn)}`, h: norm(c.n), rank: 3 });
   }
   const b = m.booth;
@@ -1223,35 +1237,43 @@ function buildSearch(m) {
   return { items };
 }
 
-/* "Now": the 2025 House with the Farrer by-election and every change of party since */
+/* the "as it stands" overlay: each by-election replaces its district's
+   general-election count, booth by booth, and the members' moves rewrite who
+   holds the seat today (the federal Now's Farrer lane, generalised for the
+   NSW Now's four by-elections — the overlay file's districts are entries,
+   never a hardcoded seat) */
 function applyNow(m, now) {
-  const fi = m.byName.get("Farrer");
-  const by = now.byelections.Farrer;
-  // the by-election replaces Farrer's 2025 count, booth by booth
-  const D = deriveDiv(by.div, fi, "now");
-  D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
-  D.by = { date: by.date, event: by.event, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
-  D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
-  m.divs[fi] = D;
-  // the 2025 count at each by-election place, by family, for the swings at the same place
-  const B25 = m.res.booths, D25 = m.res.divs[fi];
-  const fams25 = D25.c.map((c) => c[3]);
-  const prevFp = by.booths.prev.map((j) => {
-    if (j == null) return null;
-    const v = B25.v[j], tot = v.reduce((a, b) => a + b, 0), acc = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
-    if (!tot) return null;
-    v.forEach((x, k) => (acc[fams25[k]] += x));
-    for (const f in acc) acc[f] = (100 * acc[f]) / tot;
-    return acc;
-  });
-  const B = m.res.booths, keep = [];
-  for (let j = 0; j < B.id.length; j++) if (B.d[j] !== fi) keep.push(j);
-  const nb = {};
-  for (const k of Object.keys(B)) nb[k] = keep.map((j) => B[k][j]);
-  const BB = by.booths;
-  for (let j = 0; j < BB.id.length; j++) for (const k of Object.keys(B)) nb[k].push(k === "d" ? fi : BB[k] ? BB[k][j] : null);
-  nb.prevFp = keep.map(() => null).concat(prevFp);
-  m.res = { ...m.res, booths: nb };
+  for (const [name, by] of Object.entries(now.byelections || {})) {
+    const fi = m.byName.get(name);
+    if (fi == null) continue;
+    const D = deriveDiv(by.div, fi, m.year);
+    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
+    D.by = { date: by.date, event: by.event ?? by.nswEvent, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
+    D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
+    m.divs[fi] = D;
+    // the base count at each by-election place, by family, for the swings at
+    // the same place
+    const B0 = m.res.booths, D0 = m.res.divs[fi];
+    const fams0 = D0.c.map((c) => c[3]);
+    const prevFp = by.booths.prev.map((j) => {
+      if (j == null) return null;
+      const v = B0.v[j], tot = v.reduce((a, b) => a + b, 0), acc = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
+      if (!tot) return null;
+      v.forEach((x, k) => (acc[fams0[k]] += x));
+      for (const f in acc) acc[f] = (100 * acc[f]) / tot;
+      return acc;
+    });
+    const B = m.res.booths, keep = [], hadFp = B.prevFp || [];
+    for (let j = 0; j < B.id.length; j++) if (B.d[j] !== fi) keep.push(j);
+    const nb = {};
+    for (const k of Object.keys(B)) nb[k] = keep.map((j) => B[k][j]);
+    const BB = by.booths;
+    for (let j = 0; j < BB.id.length; j++) for (const k of Object.keys(B)) nb[k].push(k === "d" ? fi : BB[k] ? BB[k][j] : null);
+    // the earlier districts' prevFp ride through — a second by-election only
+    // appends its own
+    nb.prevFp = keep.map((j) => hadFp[j] == null ? null : hadFp[j]).concat(prevFp);
+    m.res = { ...m.res, booths: nb };
+  }
   // who sits for each changed seat today
   for (const [name, h] of Object.entries(now.holders)) {
     const i = m.byName.get(name);
@@ -1271,7 +1293,7 @@ const SEATED_LC = new Set(["sa26", "vic22"]);
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023;
 // Shelley Hancock, 2 May 2011; Jonathan O'Dea, 27 May 2019; Christine Fyffe, 24 December 2014;
 // Colin Brooks, 27 March 2017)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine" };
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine" };
 async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
@@ -1279,11 +1301,11 @@ async function loadYear(year, bg) {
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
-    const ry = year === "now" ? 2025 : year;
+    const ry = nowRy(year);
     // the results without the polling places' census lanes (core-split.mjs), unless the
     // lens is reading them now or the page's warmup already asked for the full file
     const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
-    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), year === "now" ? getJSON("/map/data/data-now.json", bg) : null,
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own projection, then the live one put back: a year loaded
     // ahead (the timeline's hover) must not move the streets and the sea under
@@ -1344,7 +1366,10 @@ async function loadYear(year, bg) {
     m.gov = GOV[year];
     m.geo = lo.handbook ? await buildHandbookGeo(lo, m) : buildGeo(lo, m);
     m.isl = buildIslands(islands, m);
-    m.booth = res.booths ? deriveBooths(res.booths, m) : emptyBooths(m);
+    // the booths the year in view actually held — for an "as it stands"
+    // frame that's the overlay-corrected lanes in m.res, never the raw
+    // event's lanes the frame's base election fetched
+    m.booth = m.res.booths ? deriveBooths(m.res.booths, m) : emptyBooths(m);
     for (const s of m.isl) if (s.seat == null && s.booths.length) s.seat = m.booth.d[s.booths[0]];
     m.areas = deriveAreas(res, m);
     // the Handbook years' projection is only built inside their geometry
@@ -1377,7 +1402,7 @@ const needPpl = () => S.lens === "seifa" && isDemo();
 function loadPpl(y) {
   const m = Y[y];
   if (!m || !m.divs || m.ppl) return Promise.resolve(m);
-  return (m.pplP ??= getJSON(`/map/data/res-${y === "now" ? 2025 : y}.json`).then((full) => {
+  return (m.pplP ??= getJSON(`/map/data/res-${nowRy(y)}.json`).then((full) => {
     const B = m.booth.raw, F = full.booths;
     if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
     m.ppl = true;
@@ -1399,9 +1424,9 @@ function pplThen(m) {
 function warmHi(y) {
   const m = Y[y];
   if (!m || !m.divs || m.geoHi || m._hiP) return m && m._hiP;
-  const ry = y === "now" ? 2025 : y;
   // the hi detail can land after the reader has moved to another year — its paths
   // are baked under this year's own projection, whatever the live one is by then
+  const ry = nowRy(y);
   m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
     .then((hi) => buildGeoSliced(hi, m, m.proj))
     .then((g) => { m.geoHi = g; schedule(); })
@@ -3957,8 +3982,9 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   2022: ["Grayndler", "Dickson"], 2025: ["Grayndler", "Farrer"], now: ["Grayndler", "Hume"],
   // South Australia's Premier and Leader of the Opposition, at the front benches' seats nearest the Speaker
   sa22: ["Croydon", "Black"], sa26: ["Croydon", "Schubert"],
-  // New South Wales' (Minns at Kogarah, Speakman at Cronulla)
-  nsw23: ["Kogarah", "Cronulla"],
+  // New South Wales' (Minns at Kogarah, Speakman at Cronulla — Sloane succeeds
+  // Speakman as Opposition Leader 21 November 2025)
+  nsw23: ["Kogarah", "Cronulla"], nswnow: ["Kogarah", "Vaucluse"],
   // Queensland's Premier and Leader of the Opposition, at the front benches' heads:
   // Palaszczuk/Nicholls at 2017, Palaszczuk/Frecklington at 2020, and 2024's incoming
   // front-runners: the LNP's Crisafulli flips the chamber to Broadwater against Labor's Miles
@@ -4705,8 +4731,10 @@ const SEN_SEATS = 76;
 // on their frames, from map/data/senate-<year>.json
 // (.build/map/build_sa22_past.py, build_sa26_past.py, build_nsw23_past.py, build_vic22_lc.py).
 // Queensland's parliament is unicameral (its Legislative Council was abolished in 1922), so the
-// qld frames take no upper-house lane — their one chamber is the Legislative Assembly.
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y)));
+// qld frames take no upper-house lane — their one chamber is the Legislative Assembly. A state's
+// "as it stands" frame (nswnow) takes none either — its Assembly alone is overlaid; the Council's
+// own since-the-election changes are a ledger of their own the overlay never pretends to.
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !isNowY(y)));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -5274,7 +5302,7 @@ const spGvtYear = (y) => { const k = spYear(y); return k != null && SP_GVT.has(k
 const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
 const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
 const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
-const spYear = (y) => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; };
+const spYear = (y) => (SEN_PREF_STATE_FRAMES.has(y) ? y : (() => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; })());
 function loadSenatePrefs(y) {
   const k = spYear(y);
   if (k == null) return Promise.resolve(null);
@@ -5700,9 +5728,9 @@ const legW = (b) => famLeg(b);
 // a family's preferences, possessive: the Liberals' on an SA or Victorian frame,
 // the LNP's on a Queensland frame, the Coalition's elsewhere
 const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && (isSA() || isVic()) ? "the Liberals’" : POSS[b]);
-// the "now" view: today’s holder won the last count under another banner — the
-// winner’s row in the count stays historical but earns a "· now X" note
-const movedTo = (m, d) => (m.year === "now" && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
+// an "as it stands" view: today’s holder won the last count under another
+// banner — the winner’s row in the count stays historical but earns a note
+const movedTo = (m, d) => (isNowY(m.year) && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
 function swingPhrase(sw, prev) {
   if (sw == null) return "";
   if (Math.abs(sw) < 0.05) return `no swing since ${prev}`;
@@ -5715,7 +5743,7 @@ function rankWords(r, n, hi = "highest", lo = "lowest") { const q = n - r + 1; i
 const SUBJ = { alp: "Labor", lnp: "The Coalition", grn: "The Greens", onp: "One Nation", ind: "Independents", oth: "Other candidates" };
 const subj = (f) => (f === "alp" || f === "onp" ? SUBJ[f] : SUBJ[f].charAt(0).toLowerCase() + SUBJ[f].slice(1));
 const ofN = (k, n) => (k === n ? `all ${n}` : `${k} of the ${n}`);
-const byNote = (d) => (d && d.by ? ", at the 2026 by-election" : "");
+const byNote = (d) => (d && d.by ? `, at the ${d.by.date.slice(0, 4)} by-election` : "");
 function seatCount(m, idx, fam) { return idx.filter((i) => m.divs[i].hold.fam === fam).length; }
 
 /* ----- small figure builders ----- */
@@ -5857,18 +5885,25 @@ function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const where = aus ? "" : ` in ${STATE_NAME[st]}`;
   const ofSeats = aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
   const lead = A.tpp >= 50 ? "alp" : "lnp", leadPct = Math.max(A.tpp, 100 - A.tpp);
 
-  const isNowM = m.year === "now";
+  const isNowM = isNowY(m.year);
+  // the seats an "as it stands" frame holds that the election itself never
+  // delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
+  // and Pittwater (from the Liberals to the crossbench)
+  const NOW_AUS_DEK = {
+    now: " One Nation has two seats it didn’t win at the election: Barnaby Joyce joined it in December 2025, and David Farley won Farrer at the May 2026 by-election.",
+    nswnow: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.",
+  };
   switch (S.lens) {
     case "winner": {
       const g = cnt[gov] || 0, o = cnt[opp] || 0, c = N - g - o;
       if (isNowM) {
         const hed = aus ? `Labor holds ${g} of the ${N} seats` : `Labor holds ${g} ${ofSeats}`;
-        let dek = `The Coalition holds ${o}. ${crossSentence(m, idx, "holds")}`;
-        if (aus) dek += ` One Nation has two seats it didn’t win at the election: Barnaby Joyce joined it in December 2025, and David Farley won Farrer at the May 2026 by-election.`;
+        let dek = `${coalW(1)} ${o === 1 ? "holds" : "hold"} ${o}. ${crossSentence(m, idx, "holds")}`;
+        if (aus) dek += NOW_AUS_DEK[m.year] ?? "";
         if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) dek += ` Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
         return { hed, dek };
       }
@@ -5900,12 +5935,18 @@ function areaHedDek(m, st) {
         const toward = sw.filter((x) => (s >= 0 ? x.v > 0 : x.v < 0)).length;
         const big = [...sw].sort((a, b) => (s >= 0 ? b.v - a.v : a.v - b.v))[0];
         const dek = sw.length ? `${toward === 0 ? "None" : cap(ofN(toward, sw.length))} ${toward === 0 ? `of the ${sw.length}` : ""} seats with a measured swing moved towards ${to}.`.replace("  ", " ") + ` The biggest swing that way was ${big ? `${ds(m.divs[big.i].n)}’s, ${pts(big.v)}` : "–"}.` : "";
-        return { hed, dek: dek + (isNowM ? " These are the 2025 election’s swings." : "") };
+        return { hed, dek: dek + (isNowM ? ` These are the ${frameBaseY(m.year)} election’s swings.` : "") };
       }
       const hed = `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
       const ahead = withData.filter((i) => m.divs[i].tpp > 50).length;
       const sp = swingPhrase(A.tppSw, prev);
-      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? " These are the 2025 election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none." : ""}`;
+      // the figures an "as it stands" frame mixes counts from: the base
+      // election, and any seat whose by-election replaced it
+      const NOW_TPP_NOTE = {
+        now: ` These are the ${frameBaseY(m.year)} election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none.`,
+        nswnow: ` These are the ${frameBaseY(m.year)} election’s figures; Kiama’s two-party read is its by-election count, and the other by-election seats carry none (their final pairs weren’t Labor against the Coalition).`,
+      };
+      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? NOW_TPP_NOTE[m.year] ?? "" : ""}`;
       return { hed, dek };
     }
     case "fp": {
@@ -5939,7 +5980,7 @@ function areaHedDek(m, st) {
       return { hed: `${SUBJ[P]} won ${f1(r.sen)}% of the Senate vote${where}`, dek: `Against ${f1(r.house)}% in the House${stoodTxt}.${per.length ? ` ${pr.Its} best Senate seat was ${ds(m.divs[per[0].i].n)}, at ${f1(per[0].v)}%.` : ""}` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections; choose one on the timeline.` };
+      if (spYear(m.year) == null) return { hed: `A state election has no Senate`, dek: `The Senate-ballot reading of preferences covers federal elections and New South Wales' state elections; choose one on the timeline.` };
       if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's machine record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later.` };
       const gvt = spGvtYear(m.year) != null;
       const r = spArea(m, idx);
@@ -6152,11 +6193,11 @@ function clsVoteBlock(m, idx) {
 
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek } = areaHedDek(m, st);
-  const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${seatNoun()}`) : (m.year === "now" ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
+  const meta = aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
@@ -6164,12 +6205,12 @@ function storyArea(m, st) {
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
     const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
-    h += `<div class="st-sec"><h3>${m.year === "now" ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
-  if (m.year === "now" && aus) {
+  if (isNowY(m.year) && aus) {
     const ch = m.changes.slice().reverse();
     h += `<div class="st-sec"><h3>Since the election <small>${ch.length} changes</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
-    h += `<p class="st-note" style="margin-top:22px">The figures below are the 2025 election’s.</p>`;
+    h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // the two-party read
   const swp = swingPhrase(A.tppSw, prev);
@@ -6190,9 +6231,10 @@ function storyArea(m, st) {
 }
 
 /* ----- a seat ----- */
-// the election a seat's swings are measured against: "Now" shows the 2025
-// count (against 2022) everywhere but Farrer, whose by-election is set against 2025
-const prevFor = (m, d) => (m.year === "now" ? (d && d.by ? 2025 : 2022) : prevYearOf(m.year) ?? (m.res && m.res.prev));
+// the election a seat's swings are measured against: an "as it stands" frame
+// shows the base count (against the election before it) everywhere but the
+// by-election seats, whose own count is judged against that base
+const prevFor = (m, d) => (isNowY(m.year) ? (d && d.by ? frameBaseY(m.year) : m.res.prev) : prevYearOf(m.year) ?? (m.res && m.res.prev));
 function seatHedDek(m, d) {
   const prev = prevFor(m, d);
   const [wn, rn] = pairNames(d.win, d.run);
@@ -6201,11 +6243,17 @@ function seatHedDek(m, d) {
   switch (S.lens) {
     case "winner": {
       if (d.by) {
-        const hed = `One Nation’s David Farley won Farrer at the May 2026 by-election`;
-        const dek = `He beat the independent Michelle Milthorpe ${f1(d.winPct)}–${f1(100 - d.winPct)} after preferences. Sussan Ley had held the seat for the Liberals since 2001; their candidate, Raissa Butkowski, ran third on ${f1(d.fp.lnp ? (100 * d.c.find((c) => c.ab === "LP").v) / d.formal : 0)}% of first preferences. Labor didn’t stand.`;
+        if (m.year === "now" && d.n === "Farrer") {
+          const hed = `One Nation’s David Farley won Farrer at the May 2026 by-election`;
+          const dek = `He beat the independent Michelle Milthorpe ${f1(d.winPct)}–${f1(100 - d.winPct)} after preferences. Sussan Ley had held the seat for the Liberals since 2001; their candidate, Raissa Butkowski, ran third on ${f1(d.fp.lnp ? (100 * d.c.find((c) => c.ab === "LP").v) / d.formal : 0)}% of first preferences. Labor didn’t stand.`;
+          return { hed, dek };
+        }
+        // every other by-election seat: the record speaks for itself
+        const hed = `${ds(d.win.n)} won ${ds(d.n)} at the ${monthYear(d.by.date)} by-election`;
+        const dek = `${ds(d.win.n)} won the final count ${f1(d.winPct)}–${f1(100 - d.winPct)} against ${ds(rn)} (${esc(rParty)}).`;
         return { hed, dek };
       }
-      const hold = d.hold, switched = m.year === "now" && (hold.n !== d.win.n || hold.ab !== d.win.ab);
+      const hold = d.hold, switched = isNowY(m.year) && (hold.n !== d.win.n || hold.ab !== d.win.ab);
       if (switched) {
         const ch = m.changes.filter((c) => c.div === d.n).pop();
         const hed = hold.ab === "CSA" ? `${ds(hold.n)} now sits for Community Strong` : `${ds(hold.n)} now sits for ${esc(leaderName(hold))}`;
@@ -6228,7 +6276,7 @@ function seatHedDek(m, d) {
       dek += ".";
       if (fpLead !== d.win) dek += ` ${ds(surname(fpLead.n))} led on first preferences, ${f1((100 * fpLead.v) / d.formal)}% to ${f1((100 * d.win.v) / d.formal)}%.`;
       dek += ` ${isState() ? "On the usual scale" : "By the AEC’s measure"} that makes ${ds(d.n)} ${statusOf(d.winPct)}.`;
-      if (ch.kind === "re" && ch.since < (m.year === "now" ? 2025 : m.year)) dek += ` ${ds(surname(d.win.n))} has held it since ${ch.since}.`;
+      if (ch.kind === "re" && ch.since < (isNowY(m.year) ? frameBaseY(m.year) : m.year)) dek += ` ${ds(surname(d.win.n))} has held it since ${ch.since}.`;
       return { hed, dek };
     }
     case "tpp": {
@@ -6250,7 +6298,7 @@ function seatHedDek(m, d) {
       if (S.fpMode === "change") {
         const c = fpChange(m, d, P);
         if (c == null) return { hed: `${SUBJ[P]} didn’t stand in ${ds(d.n)} both times`, dek: "" };
-        return { hed: Math.abs(c) < 0.05 ? `${Poss(P)} primary vote in ${ds(d.n)} was unchanged` : `${Poss(P)} primary vote ${c >= 0 ? "rose" : "fell"} ${pts(c)} in ${ds(d.n)}`, dek: `${SUBJ[P]} won ${f1(v)}% of first preferences${d.by ? " at the by-election, against the seat’s 2025 count" : ""}.` };
+        return { hed: Math.abs(c) < 0.05 ? `${Poss(P)} primary vote in ${ds(d.n)} was unchanged` : `${Poss(P)} primary vote ${c >= 0 ? "rose" : "fell"} ${pts(c)} in ${ds(d.n)}`, dek: `${SUBJ[P]} won ${f1(v)}% of first preferences${d.by ? ` at the by-election, against the seat’s ${frameBaseY(m.year)} count` : ""}.` };
       }
       if (!v) return { hed: `${name === "Independents" ? "No independent" : name} didn’t stand in ${ds(d.n)}`.replace("No independent didn’t", "No independent stood"), dek: "" };
       const aus = m.areas.AUS.fp[P];
@@ -6268,7 +6316,7 @@ function seatHedDek(m, d) {
       return { hed: `${SUBJ[P]} won ${f1(sv)}% of the Senate vote in ${ds(d.n)}`, dek: `${pr.Its} House ${cands > 1 ? "candidates" : "candidate"} won ${f1(h)}%${aus ? `; across Australia ${pr.its} Senate vote was ${f1(aus.sen)}%` : ""}.` };
     }
     case "senpref": {
-      if (svYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
+      if (spYear(m.year) == null) return { hed: `A state election has no Senate`, dek: "" };
       if (spYear(m.year) == null) return { hed: `No Senate preference record for ${m.year}`, dek: `The AEC's record opens with the 2004 group voting tickets; every ballot's own order is published from 2016. Choose 2004 or later on the timeline.` };
       if (d.by) return { hed: `${ds(d.n)}’s by-election had no Senate vote`, dek: `Choose 2025 on the timeline to read ${ds(d.n)}’s Senate ballots.` };
       const s = spOf(m);
@@ -6335,7 +6383,7 @@ function storyDiv(m, i) {
   const d = m.divs[i];
   const prev = prevFor(m, d);
   const { hed, dek } = seatHedDek(m, d);
-  const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? " · by-election, 9 May 2026" : ""}`;
+  const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
   let h = head(d.n, meta, hed, dek);
   const [wn, rn] = pairNames(d.win, d.run);
   h += `<div class="st-sec"><h3>Final count <small>${d.by ? "the by-election’s" : "two candidates"}</small></h3><div class="hero">${heroPair(wn, d.winPct, d.win.fam, rn, 100 - d.winPct, d.run.fam)}${marginBar(wn, d.win.fam, rn, d.run.fam, 2 * d.winPct - 100)}<p class="hero-verdict"><b>${ds(wn)}</b> by ${int(d.votesMargin)} votes · ${statusOf(d.winPct)}</p></div></div>`;
@@ -6343,7 +6391,7 @@ function storyDiv(m, i) {
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? " on 2025" : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
+  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? ` on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
   if (d.vt) {
@@ -6480,7 +6528,7 @@ function storyBooth(m, j) {
   const moved = movedTo(m, D);
   const wk = D.c.indexOf(D.win);
   const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? " · change on 2025 here" : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
+  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? ` · change on ${frameBaseY(m.year)} here` : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
@@ -6494,7 +6542,9 @@ function storyBooth(m, j) {
 }
 
 function foot(m) {
-  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH" : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH"
+    : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
+    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
   return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }
 let storyKey = "";
@@ -6572,7 +6622,7 @@ function lensColumn(get, colOf) {
 }
 const fig2 = (a, af, b, bf) => `<span class="fig"><span class="${tx(af)}">${f1(a)}</span><span style="color:var(--ink-faint)"> – </span><span class="${tx(bf)}">${f1(b)}</span></span>`;
 function seatCols(m) {
-  const now = m.year === "now";
+  const now = isNowY(m.year);
   const cols = [
     { key: "name", label: "Seat", get: (d) => d.n, txt: true, w: "minmax(140px,1.25fr)", html: (d) => `<span class="c1">${ds(d.n)}</span><span class="c2">${STATE_SHORT[d.st]}${d.cls ? " · " + esc(CLS_SHORT[d.cls]) : ""}</span>` },
     { key: "win", label: now ? "Held by" : "Won by", get: (d) => holdFam(d.hold) + d.hold.n, txt: true, w: "minmax(150px,1.35fr)", cat: true, html: (d) => `<span class="c1"><span class="sw" style="${swc(holdFam(d.hold))}"></span>${ds(d.hold.n)}</span><span class="c2">${ds(leaderName(d.hold))}${now && (d.hold.n !== d.win.n || d.hold.ab !== d.win.ab) ? (d.by ? " · by-election" : " · changed party") : ""}</span>` },
@@ -6730,7 +6780,7 @@ function hydrateDists() {
     const W = Math.max(200, el.clientWidth || 300), H = r.opts.compact ? 74 : 150;
     const n = D.vals.length, unitWord = r.unit === "seats" ? plural(n, "seat") : plural(n, "polling place");
     const stacked = r.unit === "seats" && D.c.decile;
-    el.innerHTML = distSVG(D, W, H, r.opts) + (r.opts.compact ? `<p class="st-note">${stacked ? `Each bar is a tenth of the ${n} seats, from the least advantaged on the left, split by who ${M().year === "now" ? "holds" : "won"} them` : `${n.toLocaleString("en-AU")} ${unitWord}. Each bar counts the ${r.unit === "seats" ? "seats" : "places"} in its range`}; choose one to pick them out${S.view === "list" ? "" : " on the " + (S.view === "chamber" ? "chamber" : "map")}.</p>` : "");
+    el.innerHTML = distSVG(D, W, H, r.opts) + (r.opts.compact ? `<p class="st-note">${stacked ? `Each bar is a tenth of the ${n} seats, from the least advantaged on the left, split by who ${isNowY(M().year) ? "holds" : "won"} them` : `${n.toLocaleString("en-AU")} ${unitWord}. Each bar counts the ${r.unit === "seats" ? "seats" : "places"} in its range`}; choose one to pick them out${S.view === "list" ? "" : " on the " + (S.view === "chamber" ? "chamber" : "map")}.</p>` : "");
   }
 }
 // hover, click and drag on any distribution chart
@@ -6815,7 +6865,7 @@ function renderList(keepScroll) {
   if (unit === "booths" && sd != null) bar += `<button type="button" class="ls-chip" data-unseat title="Show every polling place">In ${ds(m.divs[sd].n)} ✕</button>`;
   else {
     bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
-    bar += sel(m.year === "now" ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, famLeg(f)]), S.f.win);
+    bar += sel(isNowY(m.year) ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, famLeg(f)]), S.f.win);
     bar += sel("Seat type", "cls", CLS.map((c) => [c, CLS_SHORT[c]]), S.f.cls);
     bar += sel("Margin", "margin", Object.entries(MARGINS).map(([k, v]) => [k, v[2]]), S.f.margin);
   }
@@ -6872,7 +6922,7 @@ function paintRows() {
 /* =============================== lens words =============================== */
 function lensShort() {
   switch (S.lens) {
-    case "winner": return isNow() ? "Held by" : "Winner";
+    case "winner": return isNowY(S.year) ? "Held by" : "Winner";
     case "tpp": return S.tppMode === "swing" ? "Swing to Labor" : "Labor 2PP";
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} change` : `${famLeg(S.party)} primary`;
     case "senate": return senGap() ? `${famLeg(S.party)}, Senate v House` : `${famLeg(S.party)} Senate vote`;
@@ -7127,7 +7177,7 @@ function censusSelects(m, cls = "") {
   return out;
 }
 function legendHTML(m) {
-  const prev = m.year === "now" ? 2022 : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const grad = (tbl, from, to) => { const st = []; for (let k = 0; k <= 10; k++) st.push(`${css(tbl[Math.round(lerp(from, to, k / 10))])} ${k * 10}%`); return `linear-gradient(90deg, ${st.join(",")})`; };
   const ticks = (vals, lo, hi, fmt) => `<div class="lg-ticks">${vals.map((v) => `<span style="left:${(100 * (v - lo)) / (hi - lo)}%">${fmt(v)}</span>`).join("")}</div>`;
   const mark = (v, lo, hi) => (v == null ? "" : `<span class="mk" style="left:${(100 * (clamp(v, lo, hi) - lo)) / (hi - lo)}%" title="Australia ${f1(v)}"></span>`);
@@ -7140,7 +7190,7 @@ function legendHTML(m) {
   switch (S.lens) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
-      h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNow() ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
+      h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
       // in the chamber the counts are on the canvas's bloc labels and in the story, not three times
       h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (cnt[f] || boothsOn) && famEraOpts(m).includes(f)).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
@@ -7195,7 +7245,7 @@ function legendHTML(m) {
       h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
       h += legendHist(m, 10, 90);
       h += `<div class="lg-ramp" style="background:${grad(spRamp(), 0, 200)}">${A ? mark(A.share, 10, 90) : ""}</div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-${SP_PAIRS[S.spPair][0]}">◀ ${spA(true)} ahead</span><span class="t-${SP_PAIRS[S.spPair][1]}">${spB().replace(/^the /, "The ")} ahead ▶</span></div>`;
-      h += `<div class="lg-note">${svYear(m.year) == null ? "A state election: there was no Senate vote." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016. The line marks Australia.` : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
+      h += `<div class="lg-note">${spYear(m.year) == null ? "A state election has no Senate-ballot preference record here." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016. The line marks Australia.` : STATE_YEARS.has(m.year) ? "Every formal upper-house ballot in New South Wales, by which of the two it numbered first; ballots numbering neither are set aside. The line marks New South Wales." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
     }
     case "informal": {
@@ -7343,9 +7393,10 @@ function renderTimeline() {
     g += `<line x1="0" x2="${W}" y1="${yv(50)}" y2="${yv(50)}" stroke="var(--line)" stroke-dasharray="2 3"/><polyline points="${pl}" fill="none" stroke="var(--ink-faint)" stroke-width="1.4"/>`;
     for (const r of hh) {
       const cy = r[1] != null ? yv(r[1]) : yv(50);
-      g += `<circle cx="${r[4] ? X("now") : gx(r[0])}" cy="${cy}" r="${(r[4] ? "now" : r[0]) === cur ? 5 : 3.6}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="1.5"><title>${r[4] ? "By-election" : r[0]}: ${ds(r[3])} (${esc(partyName(r[2]))})${r[1] != null ? `, Labor two-party ${f1(r[1])}` : ""}</title></circle>`;
+      // a by-election stop glues to its frame's "now" stop, on its own row
+      g += `<circle cx="${r[4] ? X(isNowY(cur) ? cur : "now") : gx(r[0])}" cy="${cy}" r="${(r[4] ? (isNowY(cur) ? cur : "now") : r[0]) === cur ? 5 : 3.6}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="1.5"><title>${r[4] ? "By-election" : r[0]}: ${ds(r[3])} (${esc(partyName(r[2]))})${r[1] != null ? `, Labor two-party ${f1(r[1])}` : ""}</title></circle>`;
     }
-    if (cur === "now" && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X("now")}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
+    if (isNowY(cur) && !hh.some((r) => r[4])) { const last = hh[hh.length - 1]; if (last) g += `<circle cx="${X(cur)}" cy="${last[1] != null ? yv(last[1]) : yv(50)}" r="5" fill="var(--m-${holdFam(m.divs[sd].hold)})" stroke="var(--bg)" stroke-width="1.5"/>`; }
   } else if (SUM) {
     // in the Senate's chamber each stop reads that election's upper house
     const sen = senOn();
@@ -7369,12 +7420,13 @@ function renderTimeline() {
   if (!tlCtx) tlCtx = document.createElement("canvas").getContext("2d");
   tlCtx.font = `400 12px ${getComputedStyle(el).fontFamily}`;
   const tW = (s) => tlCtx.measureText(s).width;
+  const tlStops = (ys) => ys.map((y) => ({ y, lab: isNowY(y) ? (short || y === "now" ? "Now" : yearLabel(y)) : short ? (typeof y === "number" ? "’" + String(y).slice(2) : "’" + String(y).slice(-2)) : yearLabel(y) }));
   const rowsOf = [
-    { i: 0, items: YEARS_FED.map((y) => ({ y, lab: short && y !== "now" ? "’" + String(y).slice(2) : yearLabel(y) })) },
-    { i: 1, items: YEARS_VIC.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
-    { i: 2, items: YEARS_NSW.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
-    { i: 3, items: YEARS_SA.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
-    { i: 4, items: YEARS_QLD.map((y) => ({ y, lab: short ? "’" + String(y).slice(-2) : yearLabel(y) })) },
+    { i: 0, items: tlStops(YEARS_FED) },
+    { i: 1, items: tlStops(YEARS_VIC) },
+    { i: 2, items: tlStops(YEARS_NSW) },
+    { i: 3, items: tlStops(YEARS_SA) },
+    { i: 4, items: tlStops(YEARS_QLD) },
   ];
   for (const R of rowsOf) {
     const r = rows[R.i], labY = r.base + 15;
@@ -7508,7 +7560,7 @@ function runSearch() {
   for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" || it.k === "sen" ? 6 : 4)) g.push(it); }
   sugg = [...groups.state, ...groups.sen, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
   suggAt = sugg.length ? 0 : -1;
-  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNow() ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
+  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNowY(S.year) ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
   let html = "", n = 0;
   for (const k of ["state", "sen", "div", "mp", "cand", "booth"]) {
     if (!groups[k].length) continue;
@@ -7603,7 +7655,7 @@ function setLens(id) {
   if (S.lens === id) return;
   // the Preferences tab, clicked while it reads the Senate's ballots, stays where it is
   if (id === "flow" && S.lens === "senpref" && !lensFlip) return;
-  if (FED_LENS.has(id) && STATE_YEARS.has(S.year)) return;
+  if (FED_LENS.has(id) && STATE_YEARS.has(S.year) && !(id === "senpref" && SEN_PREF_STATE_FRAMES.has(S.year))) return;
   // the Senate's votes load with their lens (about 120KB a year, gzipped)
   if (id === "senate" && svYear(S.year) != null && !SV[svYear(S.year)]) {
     const spot = takeSpot();
@@ -7699,7 +7751,7 @@ async function setYear(y) {
   // a state election on the timeline has no Senate: it opens in the House's chamber
   if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // ... and the Senate-vote/seat-type lenses are AEC reads the state frames don't offer
-  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens)) S.lens = S.lens === "senpref" ? "flow" : "winner";
+  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens) && !(S.lens === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) S.lens = S.lens === "senpref" ? "flow" : "winner";
   // the stamp names the election at the press; while it loads the stamp's rule runs and a
   // sheen crosses the map (an election already loaded lands within the frame)
   const dir = yearDir(from, y), tok = ++yearTok;
@@ -7707,7 +7759,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -7782,8 +7834,9 @@ async function setYear(y) {
   schedule();
 }
 let yearTok = 0;
-// +1 going forward in time, -1 back (Now is the latest of all)
-const yearWhen = (y) => (y === "now" ? "9999" : Y[y] && Y[y].date ? Y[y].date : META_FACTS.house && META_FACTS.house[y] ? META_FACTS.house[y][0] : String(xOfYear(y)));
+// +1 going forward in time, -1 back (the "as it stands" frames are the latest
+// of all, the federal Now on top)
+const yearWhen = (y) => (y === "now" ? "9999" : isNowY(y) ? "9998" : Y[y] && Y[y].date ? Y[y].date : META_FACTS.house && META_FACTS.house[y] ? META_FACTS.house[y][0] : String(xOfYear(y)));
 const yearDir = (a, b) => (yearWhen(b) < yearWhen(a) ? -1 : 1);
 /* the stamp: the election just chosen, set large in the stage's corner while the map turns
    to it, rolling over from the one before like a counter (up going forward in time, down
@@ -7800,6 +7853,7 @@ let stampShown = "", stampOff = 0;
 const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : "South Australian");
 function stampParts(y) {
   if (y === "now") return ["The House today", "Now"];
+  if (isNowY(y)) return ["The Assembly today", "Now"];
   if (STATE_YEARS.has(y)) return [`${stateAdj(y)} election`, "20" + String(y).slice(-2)];
   return ["Federal election", String(y)];
 }
@@ -7842,7 +7896,7 @@ function tlGlide(r0) {
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${stateAdj(m.year)} election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : isNowY(m.year) ? `The Legislative Assembly as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${stateAdj(m.year)} election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 /* the eyebrow holds the height of its jurisdiction family's longest line, so a walk through one
    family never moves the figure under it: between 414 and 600px an election's line wraps to two
@@ -7851,7 +7905,7 @@ function metaLine(m = M(), sen = senOn() ? SENM : null) {
    hold — with a family walk moving the head once. Every unloaded year's line is measured from the
    facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate (and
    back to the House at SA 2026), so only it floors on its family's Senate lines too */
-const META_FACTS = /*@meta-facts*/{"house":{"1993":["1993-03-13",147,8431],"1996":["1996-03-02",148,8463],"1998":["1998-10-03",148,8311],"2001":["2001-11-10",150,8213],"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw15":["2015-03-28",93,3324],"nsw19":["2019-03-23",93,2946],"nsw23":["2023-03-25",93,3117],"qld17":["2017-11-25",93,1701],"qld20":["2020-10-31",93,1810],"qld24":["2024-10-26",93,1668],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic14":["2014-11-29",88,1786],"vic18":["2018-11-24",88,1794],"vic22":["2022-11-26",88,1755],"now":["2026-10-25",150,8940]},"senate":{"1993":["1993-07-01",76],"1996":["1996-07-01",76],"1998":["1999-07-01",75],"2001":["2002-07-01",76],"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw15":["2015-03-28",42],"nsw19":["2019-03-23",42],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22],"vic14":["2014-11-29",40],"vic18":["2018-11-24",40],"vic22":["2026-10-27",40]},"mix":{"nsw15":{"lnp":54,"alp":34,"grn":3,"ind":2},"nsw19":{"lnp":48,"alp":36,"grn":3,"oth":3,"ind":3},"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"qld17":{"alp":48,"lnp":39,"oth":3,"grn":1,"onp":1,"ind":1},"qld20":{"alp":52,"lnp":34,"oth":3,"grn":2,"onp":1,"ind":1},"qld24":{"alp":36,"lnp":52,"oth":3,"grn":1,"ind":1},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic14":{"alp":47,"lnp":38,"grn":2,"ind":1},"vic18":{"alp":55,"lnp":27,"grn":3,"ind":3},"vic22":{"alp":56,"lnp":28,"grn":4}}};
+const META_FACTS = /*@meta-facts*/{"house":{"1993":["1993-03-13",147,8431],"1996":["1996-03-02",148,8463],"1998":["1998-10-03",148,8311],"2001":["2001-11-10",150,8213],"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw15":["2015-03-28",93,3324],"nsw19":["2019-03-23",93,2946],"nsw23":["2023-03-25",93,3117],"qld17":["2017-11-25",93,1701],"qld20":["2020-10-31",93,1810],"qld24":["2024-10-26",93,1668],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic14":["2014-11-29",88,1786],"vic18":["2018-11-24",88,1794],"vic22":["2022-11-26",88,1755],"now":["2026-10-25",150,8940],"nswnow":["2026-11-04",93,3117]},"senate":{"1993":["1993-07-01",76],"1996":["1996-07-01",76],"1998":["1999-07-01",75],"2001":["2002-07-01",76],"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw15":["2015-03-28",42],"nsw19":["2019-03-23",42],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22],"vic14":["2014-11-29",40],"vic18":["2018-11-24",40],"vic22":["2026-10-27",40]},"mix":{"nsw15":{"lnp":54,"alp":34,"grn":3,"ind":2},"nsw19":{"lnp":48,"alp":36,"grn":3,"oth":3,"ind":3},"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"qld17":{"alp":48,"lnp":39,"oth":3,"grn":1,"onp":1,"ind":1},"qld20":{"alp":52,"lnp":34,"oth":3,"grn":2,"onp":1,"ind":1},"qld24":{"alp":36,"lnp":52,"oth":3,"grn":1,"ind":1},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic14":{"alp":47,"lnp":38,"grn":2,"ind":1},"vic18":{"alp":55,"lnp":27,"grn":3,"ind":3},"vic22":{"alp":56,"lnp":28,"grn":4}}};
 const ebHeights = new Map();
 function holdEyebrow() {
   const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
@@ -8008,7 +8062,7 @@ function writeURL() {
 function readURL() {
   const p = new URLSearchParams(location.hash.slice(1));
   const yr = p.get("y"); if (yr && YEARS.includes(yearOf(yr))) S.year = yearOf(yr);
-  const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && !STATE_YEARS.has(S.year)))) S.lens = l;
+  const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && (!STATE_YEARS.has(S.year) || SEN_PREF_STATE_FRAMES.has(S.year))))) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const spp = p.get("sp"); if (spp && SP_PAIRS[spp]) S.spPair = spp;
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else if (S.lens === "senpref") { if (SP_DONORS[S.spPair].includes(pp)) S.spFrom = pp; } else S.party = pp; }
@@ -8676,16 +8730,17 @@ function fsView() {
 /* ----- the dock: the elections of the jurisdiction on show, as a rail ----- */
 function fsStopName(y) {
   if (y === "now") return "The House today";
+  if (isNowY(y)) return "The Assembly today";
   if (STATE_YEARS.has(y)) return `${stateAdj(y)} election, 20${String(y).slice(-2)}`;
   return `${y} federal election`;
 }
 // who held the chosen seat at each stop on its rail (its history's rows: [year, Labor 2PP, party, member, by-election])
 function fsHolder(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
-  if (y === "now") {
-    if (m.year === "now") return holdFam(d.hold);
-    const nw = Y.now && Y.now.divs ? Y.now.byName.get(d.n) : null;
-    if (nw != null) return holdFam(Y.now.divs[nw].hold);
+  if (isNowY(y)) {
+    if (m.year === y) return holdFam(d.hold);
+    const nw = Y[y] && Y[y].divs ? Y[y].byName.get(d.n) : null;
+    if (nw != null) return holdFam(Y[y].divs[nw].hold);
     const by = hh.filter((r) => r[4]).pop();
     return by ? FAM(by[2]) : null;
   }
@@ -8705,7 +8760,7 @@ function fsRail() {
   FS.rail.classList.toggle("short", short);
   let h = "";
   for (const y of lane) {
-    const on = y === S.year, lab = y === "now" ? "Now" : short ? `’${String(y).slice(-2)}` : STATE_YEARS.has(y) ? `20${String(y).slice(-2)}` : String(y);
+    const on = y === S.year, lab = isNowY(y) ? "Now" : short ? `’${String(y).slice(-2)}` : STATE_YEARS.has(y) ? `20${String(y).slice(-2)}` : String(y);
     let mk = "";
     if (sd != null && m && !sen) {
       const f = fsHolder(m, sd, y);
@@ -8811,8 +8866,8 @@ const fsFamNm = (f, n) => (f === "ind" ? (n === 1 ? "Independent" : "Independent
 // the seat's result at a stop: its member, party and Labor two-party share then
 function fsSeatAt(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
-  if (y === "now") {
-    const nm = m.year === "now" ? m : Y.now && Y.now.divs ? Y.now : null, j = nm ? (nm === m ? i : nm.byName.get(d.n)) : null;
+  if (isNowY(y)) {
+    const nm = m.year === y ? m : Y[y] && Y[y].divs ? Y[y] : null, j = nm ? (nm === m ? i : nm.byName.get(d.n)) : null;
     if (j != null) { const h = nm.divs[j].hold; return { fam: holdFam(h), who: h.n, party: h.pn || partyName(h.ab), tpp: null }; }
     const by = hh.filter((r) => r[4]).pop();
     return by ? { fam: FAM(by[2]), who: by[3], party: partyName(by[2]), tpp: by[1] } : null;
@@ -8837,7 +8892,7 @@ function fsCard(b) {
       + (r ? `<div class="fs-cd-seat"><i style="background:var(--m-${r.fam})"></i><span><b>${ds(r.who)}</b> ${esc(r.party)}</span></div>${r.tpp != null ? `<div class="fs-cd-s">Labor two-party ${f1(r.tpp)}%</div>` : ""}`
         : `<div class="fs-cd-s">No seat of that name at this election</div>`);
   } else {
-    const s = fsMix(y), date = f ? (y === "now" ? `As it stands, ${longDate(f[0])}` : longDate(f[0])) : "";
+    const s = fsMix(y), date = f ? (isNowY(y) ? `As it stands, ${longDate(f[0])}` : longDate(f[0])) : "";
     h = `<div class="fs-cd-t">${esc(sen ? fsStopName(y).replace("The House today", "The Senate today") : fsStopName(y))}</div>${date && !sen ? `<div class="fs-cd-s">${esc(date)}</div>` : ""}`;
     if (s) {
       const fams = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((k) => s[k]), tot = sum(fams.map((k) => s[k])), maj = Math.floor(tot / 2) + 1;

@@ -379,16 +379,17 @@ function fsView() {
 /* ----- the dock: the elections of the jurisdiction on show, as a rail ----- */
 function fsStopName(y) {
   if (y === "now") return "The House today";
+  if (isNowY(y)) return "The Assembly today";
   if (STATE_YEARS.has(y)) return `${stateAdj(y)} election, 20${String(y).slice(-2)}`;
   return `${y} federal election`;
 }
 // who held the chosen seat at each stop on its rail (its history's rows: [year, Labor 2PP, party, member, by-election])
 function fsHolder(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
-  if (y === "now") {
-    if (m.year === "now") return holdFam(d.hold);
-    const nw = Y.now && Y.now.divs ? Y.now.byName.get(d.n) : null;
-    if (nw != null) return holdFam(Y.now.divs[nw].hold);
+  if (isNowY(y)) {
+    if (m.year === y) return holdFam(d.hold);
+    const nw = Y[y] && Y[y].divs ? Y[y].byName.get(d.n) : null;
+    if (nw != null) return holdFam(Y[y].divs[nw].hold);
     const by = hh.filter((r) => r[4]).pop();
     return by ? FAM(by[2]) : null;
   }
@@ -408,7 +409,7 @@ function fsRail() {
   FS.rail.classList.toggle("short", short);
   let h = "";
   for (const y of lane) {
-    const on = y === S.year, lab = y === "now" ? "Now" : short ? `’${String(y).slice(-2)}` : STATE_YEARS.has(y) ? `20${String(y).slice(-2)}` : String(y);
+    const on = y === S.year, lab = isNowY(y) ? "Now" : short ? `’${String(y).slice(-2)}` : STATE_YEARS.has(y) ? `20${String(y).slice(-2)}` : String(y);
     let mk = "";
     if (sd != null && m && !sen) {
       const f = fsHolder(m, sd, y);
@@ -514,8 +515,8 @@ const fsFamNm = (f, n) => (f === "ind" ? (n === 1 ? "Independent" : "Independent
 // the seat's result at a stop: its member, party and Labor two-party share then
 function fsSeatAt(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
-  if (y === "now") {
-    const nm = m.year === "now" ? m : Y.now && Y.now.divs ? Y.now : null, j = nm ? (nm === m ? i : nm.byName.get(d.n)) : null;
+  if (isNowY(y)) {
+    const nm = m.year === y ? m : Y[y] && Y[y].divs ? Y[y] : null, j = nm ? (nm === m ? i : nm.byName.get(d.n)) : null;
     if (j != null) { const h = nm.divs[j].hold; return { fam: holdFam(h), who: h.n, party: h.pn || partyName(h.ab), tpp: null }; }
     const by = hh.filter((r) => r[4]).pop();
     return by ? { fam: FAM(by[2]), who: by[3], party: partyName(by[2]), tpp: by[1] } : null;
@@ -540,7 +541,7 @@ function fsCard(b) {
       + (r ? `<div class="fs-cd-seat"><i style="background:var(--m-${r.fam})"></i><span><b>${ds(r.who)}</b> ${esc(r.party)}</span></div>${r.tpp != null ? `<div class="fs-cd-s">Labor two-party ${f1(r.tpp)}%</div>` : ""}`
         : `<div class="fs-cd-s">No seat of that name at this election</div>`);
   } else {
-    const s = fsMix(y), date = f ? (y === "now" ? `As it stands, ${longDate(f[0])}` : longDate(f[0])) : "";
+    const s = fsMix(y), date = f ? (isNowY(y) ? `As it stands, ${longDate(f[0])}` : longDate(f[0])) : "";
     h = `<div class="fs-cd-t">${esc(sen ? fsStopName(y).replace("The House today", "The Senate today") : fsStopName(y))}</div>${date && !sen ? `<div class="fs-cd-s">${esc(date)}</div>` : ""}`;
     if (s) {
       const fams = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((k) => s[k]), tot = sum(fams.map((k) => s[k])), maj = Math.floor(tot / 2) + 1;
