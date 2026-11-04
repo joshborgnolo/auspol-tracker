@@ -55,7 +55,7 @@ export function metaFacts(root) {
   // each "as it stands" overlay inherits its base election's House line with
   // its own as-of date (the same year-key <-> overlay-file <-> base-year table
   // the app's NOW_OF/NOW_DATA and assemble's warm script carry)
-  const NOW_OF = { now: "2025", nswnow: "nsw23" }, NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json" };
+  const NOW_OF = { now: "2025", nswnow: "nsw23", qldnow: "qld24" }, NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json", qldnow: "data-now-qld.json" };
   for (const [y, base] of Object.entries(NOW_OF)) {
     const n = read(NOW_DATA[y]);
     if (n && n.asOf && house[base]) house[y] = [n.asOf, house[base][1], house[base][2]];

@@ -496,7 +496,7 @@ const LEADERS = { 2004: ["Bennelong", "Werriwa"], 2007: ["Griffith", "Bradfield"
   // Queensland's Premier and Leader of the Opposition, at the front benches' heads:
   // Palaszczuk/Nicholls at 2017, Palaszczuk/Frecklington at 2020, and 2024's incoming
   // front-runners: the LNP's Crisafulli flips the chamber to Broadwater against Labor's Miles
-  qld17: ["Inala", "Clayfield"], qld20: ["Inala", "Nanango"], qld24: ["Broadwater", "Murrumba"],
+  qld17: ["Inala", "Clayfield"], qld20: ["Inala", "Nanango"], qld24: ["Broadwater", "Murrumba"], qldnow: ["Broadwater", "Murrumba"],
   // Victoria's, three a side at the table in the 60th Parliament's plan: the Premier, the Leader
   // of the House and the Deputy Premier facing the Opposition Leader, the Deputy Leader of the
   // Opposition and the Nationals' leader (Carroll, Carbines, Williams against Wilson, Southwick, O'Brien)

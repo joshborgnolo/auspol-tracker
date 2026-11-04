@@ -199,13 +199,18 @@ function areaHedDek(m, st) {
   const NOW_AUS_DEK = {
     now: " One Nation has two seats it didn’t win at the election: Barnaby Joyce joined it in December 2025, and David Farley won Farrer at the May 2026 by-election.",
     nswnow: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.",
+    qldnow: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.",
   };
   switch (S.lens) {
     case "winner": {
       const g = cnt[gov] || 0, o = cnt[opp] || 0, c = N - g - o;
       if (isNowM) {
-        const hed = aus ? `Labor holds ${g} of the ${N} seats` : `Labor holds ${g} ${ofSeats}`;
-        let dek = `${coalW(1)} ${o === 1 ? "holds" : "hold"} ${o}. ${crossSentence(m, idx, "holds")}`;
+        // the governing family, named the way the frame names it — Labor in
+        // Canberra and Springwood, the Coalition in Canberra, the LNP in George St
+        const govW = gov === "alp" ? "Labor" : coalW(1);
+        const oppW = gov === "alp" ? coalW(1) : "Labor";
+        const hed = aus ? `${govW} holds ${g} of the ${N} seats` : `${govW} holds ${g} ${ofSeats}`;
+        let dek = `${oppW} ${o === 1 ? "holds" : "hold"} ${o}. ${crossSentence(m, idx, "holds")}`;
         if (aus) dek += NOW_AUS_DEK[m.year] ?? "";
         if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) dek += ` Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
         return { hed, dek };
@@ -248,8 +253,12 @@ function areaHedDek(m, st) {
       const NOW_TPP_NOTE = {
         now: ` These are the ${frameBaseY(m.year)} election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none.`,
         nswnow: ` These are the ${frameBaseY(m.year)} election’s figures; Kiama’s two-party read is its by-election count, and the other by-election seats carry none (their final pairs weren’t Labor against the Coalition).`,
+        qldnow: ` These are the ${frameBaseY(m.year)} election’s figures; Stafford’s two-party read is its by-election count, and Hinchinbrook’s by-election didn’t finish Labor against the LNP, so it carries none.`,
       };
-      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && (aus || st === "NSW") ? NOW_TPP_NOTE[m.year] ?? "" : ""}`;
+      // the figure set the note qualifies contains the overlay's seats only
+      // in the frame's own jurisdiction (or at its whole-frame level)
+      const nowScope = YEAR_JUR[m.year] ? (aus || st === stOfYear(m.year)) : (aus || st === "NSW");
+      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && nowScope ? NOW_TPP_NOTE[m.year] ?? "" : ""}`;
       return { hed, dek };
     }
     case "fp": {
@@ -847,6 +856,7 @@ function storyBooth(m, j) {
 function foot(m) {
   const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH"
     : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
+    : m.year === "qldnow" ? "ECQ results for the 2024 state general election, the 2025 Hinchinbrook and 2026 Stafford state by-elections; leaders and members’ moves from Queensland Labor and the Parliament"
     : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
   return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
 }

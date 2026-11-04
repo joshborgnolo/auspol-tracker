@@ -669,7 +669,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // Kiama's September 2025 by-elections)
 {
   const base = part("app-1-base.js");
-  assert.ok(base.includes('const NOW_OF = { now: 2025, nswnow: "nsw23" };') && base.includes('const NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json" };'), "the as-it-stands overlay table names each frame's base and overlay file");
+  assert.ok(base.includes('const NOW_OF = { now: 2025, nswnow: "nsw23", qldnow: "qld24" };') && base.includes('const NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json", qldnow: "data-now-qld.json" };'), "the as-it-stands overlay table names each frame's base and overlay file");
   assert.ok(base.includes('const isNowY = (y) => y in NOW_OF;') && base.includes('const nowRy = (y) =>'), "isNowY/nowRy generalise the federal Now's hardcodes");
   assert.equal((base.match(/m\.year === "now"/g) || []).length, 1, "app-1-base keeps one federal-only fork (the islands' owner — a state now-frame's islands are the empty set upstream)");
   const now = JSON.parse(R("map/data/data-now-nsw.json"));
@@ -690,6 +690,29 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(now.holders.Hornsby.n, "James Wallace", "nswnow: Hornsby's member");
   const sum = JSON.parse(R("map/data/summary.json"));
   assert.deepEqual(sum.seats.nswnow.NSW, { alp: 46, lnp: 35, grn: 3, ind: 9 }, "summary.json pins the Assembly as it stands");
+}
+
+// the Qld "now" frame on the same generalised overlay (2026-11-04: the 2024
+// Assembly as it stands after Hinchinbrook's November 2025 and Stafford's May 2026
+// by-elections — Dametto's resignation, Sullivan's expulsion and death in office)
+{
+  const now = JSON.parse(R("map/data/data-now-qld.json"));
+  assert.ok(now && now.asOf && now.changes.length === 5 && Object.keys(now.holders).length === 2, "data-now-qld.json: asOf, 5 member events, 2 holders");
+  assert.deepEqual(Object.keys(now.byelections || {}).sort(), ["Hinchinbrook", "Stafford"], "the two by-elections");
+  for (const [dist, by] of Object.entries(now.byelections)) {
+    assert.ok(by.formal > 25000 && by.informal > 0 && by.turnout === by.formal + by.informal, `qldnow ${dist}: the count reconciles`);
+    assert.ok(by.div.c.some((c) => c[6] === 1), `qldnow ${dist}: an elected candidate`);
+    assert.ok(by.formal === by.div.c.reduce((a, c) => a + c[4], 0), `qldnow ${dist}: the candidates reach the formal total`);
+    assert.ok(by.booths.v.every((v) => v.length === by.div.c.length), `qldnow ${dist}: booth votes align with the candidate roll`);
+    assert.ok(by.booths.prev.some((j) => j != null), `qldnow ${dist}: at least one 2024 place returned for the same-place read`);
+  }
+  assert.equal(now.holders.Hinchinbrook.n, "Wayde Chiesa", "qldnow: Hinchinbrook's member");
+  assert.equal(now.holders.Stafford.n, "Luke Richmond", "qldnow: Stafford's member");
+  assert.equal(now.byelections.Stafford.div.tpp != null && now.byelections.Stafford.div.tpp.length === 3, true, "qldnow Stafford: its classic 2PP files (ALP v LNP)");
+  assert.ok(now.byelections.Hinchinbrook.div.tpp == null, "qldnow: no 2PP where the final pair wasn't Labor v the LNP");
+  assert.ok(Array.isArray(now.byelections.Stafford.div.fl) && now.byelections.Stafford.div.fl.some((r) => r[1] + r[2] > 2500), "qldnow: Stafford files the counted distribution chain to the final pair (Jess Lane's transfers)");
+  const sum = JSON.parse(R("map/data/summary.json"));
+  assert.deepEqual(sum.seats.qldnow.QLD, { alp: 36, lnp: 53, grn: 1, ind: 1, oth: 2 }, "summary.json pins the Assembly as it stands");
 }
 
 // ── the Handbook frame in slices (2026-10-31): the lossless-handbook click
@@ -2308,11 +2331,11 @@ for (const y of ["sa22", "sa26"]) {
 // SyntaxError — and the page never booted, 2026-10-27)
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);'), "NSW_YEARS, VIC_YEARS and QLD_YEARS name the state frames (the 2013-redistribution era boxes joined 2026-11-04 — and NSW now rides its 2023 frame)");
-  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };'), "YEAR_JUR maps a frame year to its jurisdiction");
+  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);'), "NSW_YEARS, VIC_YEARS and QLD_YEARS name the state frames (the 2013-redistribution era boxes joined 2026-11-04 — and NSW/Qld now ride their last-election frames)");
+  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld" };'), "YEAR_JUR maps a frame year to its jurisdiction");
   assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
-  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qld20: 2017, qld17: null };"), "the state frames' past joins (qld17 names none — the 2015 election rode the 89-district map)");
-  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
+  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null };"), "the state frames' past joins (qld17 names none — the 2015 election rode the 89-district map)");
+  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
