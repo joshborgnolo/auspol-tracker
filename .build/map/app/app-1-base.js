@@ -451,6 +451,9 @@ const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);
 const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+// an election's count word follows the view: divisions on the map, seats in
+// the chamber, members in the list — never "districts"
+const seatNoun = () => (S.view === "map" ? "divisions" : S.view === "chamber" ? "seats" : "members");
 // the Handbook years' geometry ships lossless both levels (its licence bars a
 // simplified lo derivative), 6.5–19MB a stop — too heavy for the boot-time idle
 // preload, which skips them; the timeline's hover preload (app-6) still fetches

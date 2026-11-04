@@ -487,7 +487,7 @@ function storyArea(m, st) {
   const { hed, dek } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${STATE_YEARS.has(m.year) ? "districts" : "seats"}`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${yearLabel(m.year)} election`);
+  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${seatNoun()}`) : (m.year === "now" ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;

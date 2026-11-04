@@ -453,6 +453,9 @@ const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24"]);
 const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
+// an election's count word follows the view: divisions on the map, seats in
+// the chamber, members in the list — never "districts"
+const seatNoun = () => (S.view === "map" ? "divisions" : S.view === "chamber" ? "seats" : "members");
 // the Handbook years' geometry ships lossless both levels (its licence bars a
 // simplified lo derivative), 6.5–19MB a stop — too heavy for the boot-time idle
 // preload, which skips them; the timeline's hover preload (app-6) still fetches
@@ -6153,7 +6156,7 @@ function storyArea(m, st) {
   const { hed, dek } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${STATE_YEARS.has(m.year) ? "districts" : "seats"}`) : (m.year === "now" ? `${N} seats · members today` : `${N} seats · ${yearLabel(m.year)} election`);
+  const meta = aus ? (m.year === "now" ? `${N} members` : `${N} ${seatNoun()}`) : (m.year === "now" ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
@@ -7569,7 +7572,10 @@ function setView(v, quiet) {
   const senate = S.house === "senate" && (prev === "chamber" || v === "chamber");
   S.view = v;
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
-  if (senate) { renderLenses(); $("#mp-meta").textContent = metaLine(); if (v === "chamber") needSenateFloor(); }
+  if (senate) { renderLenses(); if (v === "chamber") needSenateFloor(); }
+  // the count word follows the view (divisions / seats / members), so the
+  // eyebrow re-words on every swap even when the election stays the same
+  $("#mp-meta").textContent = metaLine();
   holdEyebrow();
   const list = v === "list";
   $("#list").hidden = !list;
@@ -7836,7 +7842,7 @@ function tlGlide(r0) {
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
-  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${stateAdj(m.year)} election, ${longDate(m.date)} · ${m.divs.length} districts · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} seats · ${m.booth.n.toLocaleString("en-AU")} polling places`;
+  return m.year === "now" ? `The House as it stands, ${longDate(m.asOf)} · ${m.booth.n.toLocaleString("en-AU")} polling places` : STATE_YEARS.has(m.year) ? `${stateAdj(m.year)} election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places` : `The ${m.year} federal election, ${longDate(m.date)} · ${m.divs.length} ${seatNoun()} · ${m.booth.n.toLocaleString("en-AU")} polling places`;
 }
 /* the eyebrow holds the height of its jurisdiction family's longest line, so a walk through one
    family never moves the figure under it: between 414 and 600px an election's line wraps to two
@@ -7851,7 +7857,9 @@ function holdEyebrow() {
   const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
   if (!w || !M()) return;
   const famOf = (y) => YEAR_JUR[y] || "fed";
-  const ch = S.view === "chamber", fam = famOf(S.year), at = `${w}|${ch}|${fam}`;
+  // the hold keys on the view now the count word does (divisions wraps longer
+  // than seats or members)
+  const ch = S.view === "chamber", fam = famOf(S.year), at = `${w}|${S.view}|${fam}`;
   if (!ebHeights.has(at)) {
     const keep = meta.textContent, lines = [], H = META_FACTS.house || {}, SN = META_FACTS.senate || {};
     for (const y of YEARS) {
