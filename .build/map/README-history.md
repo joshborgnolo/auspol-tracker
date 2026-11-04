@@ -278,6 +278,29 @@ Canonical sources to re-fetch when they go missing:
   no `name`) in `.build/map/src/vic22/n-vic22.geojson` — normalised to its
   committed `vic22_geo.EXPECTED_NAMES` casing on re-derivation.
 
+## Upper-house preference data (NSWLC senpref files, November 2026)
+
+`map/data/senate-prefs-nsw{15,19,23}.json` derives from the NSW Electoral
+Commission's per-ballot Legislative Council ZipLC files (`LC Pref Data
+Statewide.zip`, one per modern state election): `.build/map/
+build_nsw_lc_prefs.py` groups ballots into Labor/Liberals-Nationals/Greens/
+One Nation/other via `.build/nswec-lc-flow-src/analyse_nsw_lc.py`'s
+committed `GROUP_LABELS` + `family(label)` mapping and flattens them into
+the federal senate-prefs schema (`PAIRS` AC/AO/CO, donors `grn`/`onp`/`oth`,
+`absent` per jurisdiction). It joins ballots to the frame's polling-place
+roll by (district, venue) and carries its own `venueJoin` provenance record.
+
+Standing sources (each re-fetchable; sizes pinned in
+`.build/nswec-lc-flow-src/README.md`):
+- `…/SG2301/LC/statewide/SG2301%20LC%20Pref%20Data%20Statewide.zip` — 124,431,335 B
+- `…/SG1901/LC/state/SGE2019%20LC%20Pref%20Data%20Statewide.zip` — 124,075,355 B
+- `…/SGE2015/data/lc/SGE2015%20LC%20Pref%20Data%20Statewide.zip` — 103,565,020 B
+(`…` = `https://pastvtr.elections.nsw.gov.au/`; SGE2011 has its own older-format
+`sge_2011_lc_preferences.zip`.) Cross-checks inside the emitted files: per-family
+ATL totals equal `.build/nswec-lc-flow-src/counts.json`'s recorded `atlByFamily`
+(byte-exact, fail-loud), and joined + unjoinable ballots equal each event's ATL
+total.
+
 ## The 2013-era state frames (nsw15/nsw19/vic14/vic18, 4 November 2026)
 
 Four frames joined on two boundary vintages — New South Wales's and
