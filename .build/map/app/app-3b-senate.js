@@ -23,7 +23,7 @@ const senOn = () => S.view === "chamber" && S.house === "senate" && !!SENM;
 const syncSenate = () => { SENM = SENY[S.year] || null; };
 // the model the chamber view draws: the House's year, or the Senate — the Victorian council's
 // floor is baked into the app's code like the House's, so it never waits on the federal floor file
-const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && (senFloor || SENM.year === "vic22") ? SENM : null) : M());
+const CM = () => (S.view === "chamber" && S.house === "senate" ? (SENM && (senFloor || VIC_YEARS.has(SENM.year)) ? SENM : null) : M());
 const SEN_SEATS = 76;
 // every year whose upper house is in this lane: the federal elections, and the states' — a state
 // election chooses no federal Senate, but the states' own upper houses (their Legislative
@@ -297,7 +297,7 @@ function senateLegendHTML(m) {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
     h += `<div class="lg-t">${nv(m, "Who faces", "Who faced")} the voters at ${nextEl(m)}</div>`;
     h += `${cats(up, SEN_FAMS)}${stay ? `<span><i style="background:${css(SEN_STAY(TH))}"></i>Term to ${m.lc ? `the ${m.later} election` : m.later} <b>${stay}</b></span>` : ""}</div>`;
-    h += `<div class="lg-note">${m.lc ? (m.year === "nsw23" ? "Twenty-one of the council’s forty-two members are elected as one statewide electorate at each state election; the rest sit until the next one." : m.year === "vic22" ? "All forty of the council’s members are elected together — five in each of Victoria’s eight regions — so every member faces the voters at each state election." : "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one.") : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
+    h += `<div class="lg-note">${m.lc ? (NSW_YEARS.has(m.year) ? "Twenty-one of the council’s forty-two members are elected as one statewide electorate at each state election; the rest sit until the next one." : VIC_YEARS.has(m.year) ? "All forty of the council’s members are elected together — five in each of Victoria’s eight regions — so every member faces the voters at each state election." : "Eleven of the council’s 22 members are elected as one statewide electorate at each state election; the rest sit until the next one.") : m.nextDD ? "The double dissolution of 9 May 2016 put all 76 seats to the voters." : m.dd ? "The double dissolution elected all 76: each state’s last six elected, and the territories’ four, faced the voters again in 2019." : "Each state elects half its 12 senators at a time; the territories’ four are elected every time."}</div>`;
   } else {
     h += `<div class="lg-t">${senNow(m) ? "Who sits in the Senate today" : m.lc ? `The Legislative Council after ${yearLabel(m.year)}` : `The Senate after the ${m.year} election`}</div>`;
     h += `${cats(senCounts(m), SEN_FAMS)}</div>`;

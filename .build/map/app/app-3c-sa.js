@@ -117,7 +117,7 @@ const SA_PAD = 4; // a bench's margin round its chairs
 const saGeomC = {};
 // the chamber the year's House or council is drawn in (nsw23's Assembly never reaches here:
 // chamberGeom routes it to app-3-chamber.js's nswGeom first)
-const saFloorOf = (m) => (m.year === "nsw23" ? "nswLC" : m.house === "senate" ? "lc" : "ha");
+const saFloorOf = (m) => (NSW_YEARS.has(m.year) ? "nswLC" : m.house === "senate" ? "lc" : "ha");
 function saGeom(key) {
   if (saGeomC[key]) return saGeomC[key];
   const F = SAF[key], P = (v) => v / SAU;

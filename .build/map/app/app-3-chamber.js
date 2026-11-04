@@ -271,7 +271,7 @@ const benchS = (x, y, a = 0) => (y > 0 ? Math.atan2(y, -(x < 0 ? x + a : x - a))
    senateGeom (app-3b-senate.js), South Australia's two chambers and New South Wales' Council
    from saGeom (app-3c-sa.js) */
 let chGeomC = null, vicGeomC = null, vicLCGeomC = null, nswGeomC = null, qldGeomC = null;
-const chamberGeom = (m) => (m && m.year === "vic22" ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && m.year === "nsw23" && m.house !== "senate" ? nswGeom() : m && QLD_YEARS.has(m.year) ? qldGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
+const chamberGeom = (m) => (m && VIC_YEARS.has(m.year) ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && NSW_YEARS.has(m.year) && m.house !== "senate" ? nswGeom() : m && QLD_YEARS.has(m.year) ? qldGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());
 // the House's layout builder, shared by Victoria's and New South Wales' variants: the extra block
 // carries what differs — the table's chairs, the head clerks, and for Spring Street the clean
 // table, for Macquarie Street the rectangular one with no Hansard

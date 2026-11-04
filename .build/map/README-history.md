@@ -239,8 +239,59 @@ Canonical sources to re-fetch when they go missing:
   `harvest-qld-src.py` re-fetches the qld mirror from the ECQ ArcGIS
   FeatureServer.
 
-The income quantile lanes' chain contract (loinc/hiqinc, hiQCutWeekly per
-edition, the 1998 INCOME_SPAN) is documented in
-`.matilda/skills/auto-skill-auspol-seat-model/SKILL.md`'s income-lane
-section; the /map lane reads at INC_MODES `["med", "lo", "hiq"]` in
-`.build/map/app/app-1-base.js`.
+## The 2013-era state frames (nsw15/nsw19/vic14/vic18, 4 November 2026)
+
+Four frames joined on two boundary vintages — New South Wales's and
+Victoria's 2013 redistributions, the 2015/2019 (NSW) and 2014/2018 (Vic)
+state elections.
+
+Boundaries (src is gitignored; re-fetch):
+- **NSW 2013 redistribution** (`nsw13-raw.geojson`): NSW's ArcGIS
+  FeatureServer `2013_NSW_Electoral_Boundaries` — query
+  `https://portal.spatial.nsw.gov.au/server/rest/services/Hosted/2013_NSW_Electoral_Boundaries/FeatureServer/0/query?where=1%3D1&outFields=districtname&returnGeometry=true&outSR=4326&f=geojson`
+  (93 features, UPPERCASE `districtname`; catalogue entry "NSW
+  Administrative Boundaries Theme – State Electoral District 2013" on
+  data.nsw.gov.au).
+- **Vic 2013 redistribution** (`vic13a.geojson`): the VEC open-data WFS
+  layer `state_assembly_2013` — same endpoint family as vic22's
+  `state_assembly_2022` (88 features, UPPERCASE `district`). The layer has
+  a genuine topology defect: the Hastings polygon is missing its Pearcedale
+  part (a ~1.3 km hole the Pearcedale–Tooradin SA2's SA1s sit in). The
+  SA1-join documents this as pinned rescues in `.build/map/vic13_geo.py`
+  (PINNED_RESCUES: Pearcedale → Hastings, incl. Tooradin airfield's edge,
+  plus the San Remo and Killarney coast clips and Albert Park's foreshore
+  fan; nsw13_geo.py's Red Rock estuary one). Rescues are per-(year, code)
+  named-and-ceilinged; anything unlisted fails loudly.
+- `make-n13-geojson.py` reduces each fetch to the name-per-feature
+  n-<frame>.geojson contract, verifying the boundary roster against each
+  jurisdiction's own election pages verbatim (NSW's committed pastvtr
+  `State Electoral District of` lines; VEC's committed pages' H2s) and
+  writes n-nsw15/n-nsw19.geojson (identical content) and
+  n-vic14/n-vic18.geojson (identical), plus `n13-roster.json`.
+
+Results mirrors (committed): `.build/state-flow-src/nsw/<year>/` (2007,
+2015, 2019, 2023 fp/dop pages + counted flow banks; the `nswec-lc-flow-src`
+NSW LC ATL flow lane covers 2011→2023) and `.build/state-flow-src/vic/
+<year>/` (2006, 2010, 2014, 2018, 2022; fpv-by-centre + tcp + distribution
+pages topped up from `itsitecoreblobvecprd01` `historical-results/state
+<year>/` via `.build/harvest-vic-state-flows.py` — manifests per year in
+`.build/state-flow-src/vic/manifest-<year>.txt`). NSW's 2014 Legislative
+Council fp-summary/elected pages are cached as
+`.build/state-flow-src/nsw/2015/lc-{fp,elected}.html.gz` (fetched
+2026-11-04 from pastvtr `SGE2015/lc/state/cc/fp_summary/index.htm` and
+`SGE2015/lc/state/candidates_elected/index.htm`; NSWEC keeps no pre-2015
+lc-fp on that host — the 2011 LC figures come from the committed printed
+reports in `.build/nswec-lc-flow-src/published/`).
+
+Census vintages: each frame's `demoYear` is its era census; the frame file
+carries it (the 2021 default is the only elided year) — nsw19 vic18 → 2016
+(GCP `gcp-sa1-2016.zip`; SA1 `1270055001_sa1_2016_aust_shape.zip`), nsw15
+vic14 → 2011 (BCP `bcp-sa1-2011.zip`; SA1 `1270055001_sa1_2011_aust_shape`
+.zip). The SA1→district rep-point joins `\{nsw13,vic13\}_geo.py` write per-
+vintage caches `.build/map/<jur>/assign-sa1-<cy>.json`.
+
+Booth locations: NSW's 2019 booths ride the committed SG1901 placemark
+roll (`.build/map/src/nsw23/venues/SG1901/`); 2015's name-match that roll
+(match counts pinned in `build_nsw15_data.py`). Victoria's join the 2022
+Democracy Sausage roll per district (same fallbacks the federal 1993–98
+frames use), pinned in `build_vic{14,18}_data.py`.
