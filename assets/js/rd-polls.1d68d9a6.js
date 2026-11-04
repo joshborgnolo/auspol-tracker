@@ -230,13 +230,14 @@ function RdPolls({
     if (sort.key === "pollster") return sort.dir < 0 ? a.poll.pollster.localeCompare(b.poll.pollster) : b.poll.pollster.localeCompare(a.poll.pollster);
     return sort.dir < 0 ? b.poll.pubSort > a.poll.pubSort ? 1 : -1 : a.poll.pubSort > b.poll.pubSort ? 1 : -1;
   });
-  const SUB_NEAR = 7;
+  const SUB_RECENT_DAYS = 30;
+  const SUB_SOON_DAYS = 14;
   const subAuto = s => {
     const r = s.next;
+    if (t0 - s.pubMs <= SUB_RECENT_DAYS * DAY_MS) return true;
     if (!r) return false;
-    if (t0 - s.pubMs <= SUB_NEAR * DAY_MS) return true;
     const opens = r.opensIn != null ? r.opensIn : r.inDays - Math.round(r.spread || 0);
-    return !!(r.missed || r.overdue || opens <= SUB_NEAR);
+    return !!(r.missed || r.overdue || opens <= SUB_SOON_DAYS);
   };
   const subShown = e => e.poll.pollster in subPick ? subPick[e.poll.pollster] : e.subs.some(subAuto);
   const subVis = e => {

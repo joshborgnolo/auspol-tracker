@@ -183,16 +183,17 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   });
   /* A sub-row is folded away by default (user call 2026-11-03: the table
      read busy for no gain) and shows on its own only while it is news: its
-     window is open, opens within a week or has just been missed, or its
-     newest release is under a week old. A series with too few releases to
-     project stays folded whatever. The parent's +/− shows or hides them. */
-  const SUB_NEAR = 7;
+     newest release is under a month old, or its next one is projected
+     within a fortnight — window open, opening or just missed (windows
+     widened 2026-11-04, user call). The parent's +/− shows or hides them. */
+  const SUB_RECENT_DAYS = 30;
+  const SUB_SOON_DAYS = 14;
   const subAuto = (s) => {
     const r = s.next;
+    if (t0 - s.pubMs <= SUB_RECENT_DAYS * DAY_MS) return true;
     if (!r) return false;
-    if (t0 - s.pubMs <= SUB_NEAR * DAY_MS) return true;
     const opens = r.opensIn != null ? r.opensIn : r.inDays - Math.round(r.spread || 0);
-    return !!(r.missed || r.overdue || opens <= SUB_NEAR);
+    return !!(r.missed || r.overdue || opens <= SUB_SOON_DAYS);
   };
   const subShown = (e) => (e.poll.pollster in subPick ? subPick[e.poll.pollster] : e.subs.some(subAuto));
   const subVis = (e) => {
