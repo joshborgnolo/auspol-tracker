@@ -8388,6 +8388,9 @@ const FS_ICON = {
   side: `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.45" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="2.2"/><path d="M7 3v12"/><path d="M3.9 6.2h1.3M3.9 8.4h1.3M3.9 10.6h1.3" stroke-linecap="round"/></svg>`,
 };
 const FS_LANES = ["Federal", "Victoria", "New South Wales", "South Australia", "Queensland"];
+/* the phone rung caps the jurisdiction picker at 98px — a name that can't
+   stand there goes to its short form ("South Australia" → "SA") */
+const FS_LANE_ABBR = { Victoria: "Vic", "New South Wales": "NSW", "South Australia": "SA", Queensland: "Qld" };
 const FS_HOLD = 2300; // ms the play-through rests on each election once the map has turned to it
 const FS_EASE = "cubic-bezier(.22,.8,.24,1)";
 const fsNativeEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
@@ -8478,7 +8481,7 @@ function fsUnpark(keepStage) {
 // where each parked piece sits: the wide layout (a panel) or the phone's (a sheet)
 function fsLayout() {
   const phone = isPhone(), views = $(".mp-views:not(.fs-ph)"), legend = $("#legend");
-  FS.phone = phone;
+  FS.phone = phone; fsLaneNames();
   FS.el.classList.toggle("phone", phone);
   if (phone) {
     FS.tviews.appendChild(views);
@@ -8800,6 +8803,18 @@ function fsRail() {
 
 // the jurisdiction's select as wide as the name it shows (a select runs to its longest option)
 let fsLaneCtx = null;
+function fsLaneNames() {
+  if (!FS.lane) return;
+  const cs = getComputedStyle(FS.lane), cap = FS.phone ? parseFloat(cs.maxWidth) || 0 : 0;
+  if (!fsLaneCtx) fsLaneCtx = document.createElement("canvas").getContext("2d");
+  fsLaneCtx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+  for (const opt of FS.lane.options) {
+    const full = FS_LANES[+opt.value];
+    const want = (cap && fsLaneCtx.measureText(full).width + pad > cap) ? (FS_LANE_ABBR[full] || full) : full;
+    if (opt.text !== want) opt.text = want;
+  }
+}
 function fsLaneWidth() {
   const sel = FS.lane, cs = getComputedStyle(sel);
   if (!fsLaneCtx) fsLaneCtx = document.createElement("canvas").getContext("2d");
