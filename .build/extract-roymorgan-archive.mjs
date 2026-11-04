@@ -236,10 +236,34 @@ function parseLtPrimary(rows, srcName) {
         independents: "", other_parties: "", other: cellNum(oth, cells[0]), undecided: "",
       },
     };
+    natDoubleCount(rec.cols, `${srcName} ${cells[0]}`);
     put(primary, keyOf(lab), rec);
     n++;
   }
   note(`${srcName}: ${n} rows parsed`);
+}
+
+// RM's long-term table prints, for every poll wave from Aug 1998 to the
+// 7/8 Oct 2004 wave, a "Liberal" figure that already INCLUDES the
+// Nationals, and an "L-NP" figure that adds the Nationals again (L-NP =
+// Liberal + National). Those rows overshoot 100 by exactly the National
+// share; from the 2004 election on every row sums to 100. Proof on the
+// final 2004 wave: L-NP 45.5 (not the printed 50.5) is the only reading
+// consistent with RM's own 51-49 ALP two-party figure. So where a row
+// overshoots 100 by its National share (+/-0.6, half a rounding step
+// each way) and L-NP = Liberal + National, the printed Liberal is the
+// Coalition total and the Liberal-only share is Liberal - National.
+function natDoubleCount(c, ctx) {
+  const parts = ["alp", "coalition", "greens", "family_first", "democrats", "one_nation", "other"];
+  const num = (v) => (v === "" || /[<#]/.test(v) ? 0 : Number(v));
+  if (c.lib === "" || c.nat === "" || c.coalition === "" || /[<#]/.test(c.coalition + c.lib + c.nat)) return;
+  const lib = Number(c.lib), nat = Number(c.nat), lnp = Number(c.coalition);
+  if (!(nat > 0) || Math.abs(lib + nat - lnp) > 0.01) return;
+  const over = parts.reduce((s, k) => s + num(c[k]), 0) - 100;
+  if (Math.abs(over - nat) > 0.6) return;
+  note(`${ctx}: National double-count corrected (L-NP ${lnp} -> ${lib}, Liberal ${lib} -> ${+(lib - nat).toFixed(2)})`);
+  c.coalition = String(lib);
+  c.lib = String(+(lib - nat).toFixed(2));
 }
 
 function parseCurrentElections(rows, srcName) {
