@@ -441,33 +441,36 @@ _INC_HIGH_EDGE = 4000
 _INC_LO_Q = 0.25
 _INC_HI_Q = 0.75  # the HIGH lane's state-universe top-quartile cut
 _INC_CUT_GUARDS = {
-    # measured 2026-10-31 from the first full runs (the cuts record
-    # sits inside its band; a profile migration outside its own band
-    # trips the chain):
-    #   2021 census: NSW 888.77 / Vic 882.13 / Qld 863.16 / SA 761.65/week
-    #   2016 census: Qld 721.76/week (qld17's own vintage)
-    "1": (820, 980),  # NSW
-    "2": (820, 980),  # Vic
-    "3": (700, 950),  # Qld, covering both of its census vintages
-    "4": (700, 930),  # SA
+    # re-measured 2026-11-04 after the family-block offset fix: the
+    # previous values had read each band's one-parent column as the
+    # family total — these are the corrected cuts (the federal
+    # name-resolved engine's national anchors sit consistently around
+    # them; NSW/Vic above national, SA below, Qld between):
+    #   2021 census: NSW 1109.00 / Vic 1092.46 / Qld 1050.32 / SA 927.33
+    #   2016 census: NSW 911.45 / Vic 888.43 / Qld 888.70 / SA" (none)
+    "1": (820, 1000),   # NSW — 2016's own 911.45; 2021 goes by-era below
+    "2": (800, 980),    # Vic — 2016's own 888.43; 2021 goes by-era below
+    "3": (810, 970),    # Qld — its 2016 888.70
+    "4": (840, 1010),   # SA — its 2021 927.33
 }
 # plausible windows for each universe's 75th-percentile (top-quartile)
-# cut, era-keyed like _INC_CUT_GUARDS above
+# cut, era-keyed like _INC_CUT_GUARDS above (re-measured with the same
+# fix: 2021's NSW/Vic outs were previously understated by ~5–8%)
 _INC_HIQ_GUARDS = {
-    "2021": {"1": (2900, 3600), "2": (2850, 3500),
-             "3": (2700, 3300), "4": (2400, 3100)},
-    "2016": {"1": (2600, 3000), "2": (2200, 2600), "3": (2200, 3000)},
-    # NSW 2016-era 75% cut measured $2,794.98/wk 2026-11-04 (the
-    # shared _INC_CUT_GUARDS 820-980 window holds its 25% cut 911.45,
-    # so no by-era lo-guard entry is needed for it)
+    "2021": {"1": (3300, 3510), "2": (3120, 3300),
+             "3": (2960, 3120), "4": (2700, 2890)},
+    "2016": {"1": (2700, 2890), "2": (2500, 2660), "3": (2440, 2600)},
+    # corrected values: 2021 NSW 3395.13 / Vic 3213.76 / Qld 3051.35 /
+    # SA 2799.46; 2016 NSW 2794.98 / Vic 2587.98 / Qld 2523.81
 }
 # era-specific 25th-percentile cut windows, keyed (era, prefix); these
-# override _INC_CUT_GUARDS when the same prefix's window moves between
-# census editions (Vic's own cut measured $882.13/wk at 2021 but
-# $741.01/wk at the 2016 edition, 2026-11-04 — unlike Qld's, one window
-# cannot span both)
+# override _INC_CUT_GUARDS when the same prefix's measure moves between
+# census editions (all four do — Qld and Vic widely):
 _INC_CUT_GUARDS_BY_ERA = {
-    ("2016", "2"): (680, 810),
+    ("2021", "1"): (1030, 1180),
+    ("2021", "2"): (1000, 1170),
+    ("2021", "3"): (960, 1130),
+    ("2016", "2"): (810, 970),
 }
 _INC_SITES = {}
 
@@ -557,9 +560,13 @@ def state_income(gcp_zip, era, prefix):
         hhs = [int(x) for x in r33[1:]]
         hh = [hhs[i] + (neg33 if i == 0 else 0) for i in range(nb)]
         r32 = g32[code]
-        fi = [int(r32[(4 + i * 5) + 4]) + (int(r32[4]) if i == 0 else 0)
+        # r32 = the five Neg_Nil cells first (cols32_extra), then the
+        # 16 bands' five type columns each — an offset of FIVE, not 4
+        # (the shipped 4+i*5 read the one-parent column as the family
+        # total, caught by build_nsw19_demo's era reader, 2026-11-04)
+        fi = [int(r32[(5 + i * 5) + 4]) + (int(r32[4]) if i == 0 else 0)
               for i in range(nb)]
-        mix = [[int(r32[(4 + i * 5) + j]) + (int(r32[j]) if i == 0 else 0)
+        mix = [[int(r32[(5 + i * 5) + j]) + (int(r32[j]) if i == 0 else 0)
                 for j in range(4)] for i in range(nb)]
         rows[code] = (tuple(hh), tuple(fi), tuple(tuple(m) for m in mix))
     nat = {"b": [0.0] * nb, "fi": [0.0] * nb,

@@ -316,6 +316,10 @@ def main():
         demo_col.append(list(dm))
     B["dec"] = dec_col
     B["demo"] = demo_col
+    # the frame's own 2011-dollars income-cuts record (2011 is BCP-era;
+    # the GCP-era offset drift never touched this engine)
+    _unused_inc, inc_cutrec = gcp_newlanes.state_income_bcp(BCP_ZIP, "2")
+    data["incomeCuts"] = inc_cutrec
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"{FRAME}: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

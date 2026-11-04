@@ -12,26 +12,18 @@ voter.py (the G01/G09F/G09G/G09H/G46B/G57B member and column choices are
 the qld17 frame's identical, so a federal figure and an nsw19 figure are
 commensurate).
 
-INCOME-LANE NOTE (2026-11-04, flagged for the orchestrator): this frame
-does NOT ride gcp_newlanes.state_income for its income cohorts. Measured
-2026-11-04 against the federal engines' national pins ($/wk lo·hiq·top:
-2016 $895.80/$2,655.45, 2021 $1,078.87/$3,225.97), the shared GCP-era
-function computes its family block ONE TUPLE COLUMN EARLY (the five
-Neg_Nil columns widen cols32_extra to five, but its (4 + i*5) block
-offsets were never bumped — fi lands on each band's Other_fam column and
-mix's first type is the neg-nil Tot), understating the family share of
-every GCP-era lane (NSW-2021 lo-cut measures $888.77 shipped vs $1,109.00
-corrected; NSW-2016 $754.25 vs $911.45; the seven committed state frames
-carry the shipped figures, and _INC_CUT_GUARDS/_INC_HIQ_GUARDS windows
-were measured under the bug). Until the orchestrator reconciles the
-shared module (and the frames that ride it), build_nsw19 computes its
-income cohorts LOCALLY below with the corrected arithmetic (name-resolved
-columns, derive-booth-seifa-voter.py income_gcp's own discipline), so
-this file's loinc/hiinc/hiqinc/medIncWeekly are the corrected figures —
-they will NOT tie out bitwise against a sibling frame's until the shared
-fix lands. The 2011 era is unaffected: gcp_newlanes.state_income_bcp
-mirrors the federal income_bcp, which is oracle-verified against
-booth-demo-2013.
+INCOME LANE (2026-11-04): this frame rides the one shared
+gcp_newlanes.state_income engine, after the 2026-11-04 family-block fix
+in that module (its per-band tuple base read (4+i*5) while five Neg_Nil
+cells widened the block by five — a one-left skip that understated every
+committed GCP-era frame's family share; measured and pinned corrected
+the same day: NSW-2016 lo-cut $911.45/hiq $2,794.98/top 0.1080, NSW-2021
+$1,109.00/$3,395.13/0.1814). An earlier same-day revision of this file
+computed those figures in a LOCAL corrected reader; it was superseded
+the moment gcp_newlanes itself was repaired and is deleted here.
+(The 2011 era rides gcp_newlanes.state_income_bcp, untouched by the
+offset drift: that engine mirrors the federal income_bcp, oracle-verified
+against booth-demo-2013.)
 
 Method: every SA1 counts whole to the district its own polygon CENTROID
 lies in — boundary-straddling SA1s land on the side their centre sits, not
@@ -100,17 +92,9 @@ GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
                  "P_Sri_Lanka_Tot"]
 MEMBER = V["member"].format       # 2016 Census GCP .../2016Census_{t}_AUS_SA1.csv
 
-# ---- the income lane's NSW-2016 constants (see the INCOME-LANE NOTE above)
-INC_BANDS = gcp_newlanes.INC_BANDS      # the 16-band GCP grid, 2016 $
-INC_LO_Q, INC_HI_Q = 0.25, 0.75
-#: measured 2026-11-04 from the committed pack with the corrected
-#: family-share arithmetic (log lines cross-check at run time):
-#:   NSW-2016 25% cut $911.45/wk, 75% cut $2,794.98/wk, top band 0.1080
-#:   (federal national pins: lo $895.80, hiq $2,655.45 — NSW-above, as
-#:   peer ordering requires)
-INC_LO_GUARD_2016 = (860, 960)
-INC_HIQ_GUARD_2016 = (2600, 3000)
-INC_HI_GUARD_2016 = (0.08, 0.14)
+# ---- NSW-2016 constants: everything income rides the one shared
+# gcp_newlanes.state_income (its guard windows in the module pin
+# NSW-2016 $911.45 / $2,794.98 / 0.1080 — the corrected figures)
 
 
 def fail(msg):
@@ -123,196 +107,6 @@ def hash16(path):
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()[:16]
-
-
-# ---------------------------------------- the corrected local income reader
-def income_2016_nsw():
-    """Per-SA1 income cohorts keyed NSW SA1 -> (adults, loMass, hiMass,
-    medIncWeekly, (16 adult masses), (16 household masses), hiqMass);
-    plus the frame's incomeCuts record. income_gcp's arithmetic verbatim
-    (columns resolved by NAME against the live headers, never position
-    (the shared state_income's tuple offsets shift one column left —
-    see the INCOME-LANE NOTE), the cuts computed on the NSW-prefixed
-    universe, matching the state-frame convention)."""
-    ad, nonfam = gcp_newlanes._income_factors()
-    z = zipfile.ZipFile(GCP_ZIP)
-
-    def members(table):
-        m = MEMBER(table=table)
-        if m not in z.namelist():
-            fail(f"GCP zip lacks {m}")
-        return m
-
-    def head_errors(table, want):
-        memb = members(table)
-        with io.TextIOWrapper(z.open(memb), encoding="utf-8-sig") as fh:
-            head = [h.strip() for h in next(csv.reader(fh))]
-        miss = [c for c in want if c not in head]
-        if miss:
-            fail(f"GCP {table} header drift, missing {miss}")
-        return head
-
-    negf, negh = "Neg_Nil_inc_Tot", "Negative_Nil_income_Tot"
-    neg_types = ("Neg_Nil_inc_cpl_fam_no_child",
-                 "Neg_Nil_inc_cpl_fam_wth_chld",
-                 "Neg_Nil_inc_One_parent_fam",
-                 "Neg_Nil_inc_Other_fam")
-    h28 = head_errors("G28", [negf, *neg_types])
-    h29 = head_errors("G29", [negh])
-    plan = []
-    for lo, hi in INC_BANDS:
-        stem = f"{lo}_{hi if hi is not None else 'more'}"
-        hi_tot, fi_tot = f"HI_{stem}_Tot", f"FI_{stem}_Tot"
-        if hi_tot not in h29:
-            fail(f"GCP G29 lacks {hi_tot}")
-        if fi_tot not in h28:
-            fail(f"GCP G28 lacks {fi_tot}")
-        types = []
-        for want in (r"cpl_fam_no_child$", r"cpl_fam_(with|wth)_ch",
-                     r"One_parent_fam$", r"Other_fam$"):
-            c = next((h for h in h28
-                      if h.startswith(f"FI_{stem}_")
-                      and re.search(want, h)), None)
-            if c is None:
-                fail(f"GCP G28 lacks {fi_tot} {want}")
-            types.append(c)
-        plan.append((hi_tot, fi_tot, types))
-
-    def read(table, cols):
-        out = {}
-        n = 0
-        memb = members(table)
-        with io.TextIOWrapper(z.open(memb), encoding="utf-8-sig") as fh:
-            rdr = csv.DictReader(fh)
-            for row in rdr:
-                n += 1
-                code = row[GCP_KEY]
-                if not code.startswith("1"):
-                    continue
-                if code in out:
-                    fail(f"GCP {table} dup NSW code {code}")
-                out[code] = tuple(int(row[c]) for c in cols)
-        if n != GCP_ROWS:
-            fail(f"GCP {table} rows {n} != pin {GCP_ROWS}")
-        return out
-
-    # r28 tuple layout: [0] Neg_Nil_inc_Tot, [1..4] the four Neg_Nil
-    # type columns (no-child/wth-chld/one-parent/other), then per band
-    # [5+i*5] FI Tot, [6+i*5 .. 9+i*5] the band's four type counts —
-    # every consumer below folds band 0's neg mass off these positions
-    cols28 = [negf, *neg_types] + [c for hi_tot, fi_tot, types in plan
-                                   for c in (fi_tot, *types)]
-    cols29 = [negh] + [p[0] for p in plan]
-    g28 = read("G28", cols28)
-    g29 = read("G29", cols29)
-    if set(g28) != set(g29):
-        fail("GCP G28/G29 NSW universe drift")
-    nb = len(INC_BANDS)
-    nat = {"b": [0.0] * nb, "fi": [0.0] * nb,
-           "mix": [[0.0] * 4 for _ in range(nb)]}
-    for code in g28:
-        r29, r28 = g29[code], g28[code]
-        for i in range(nb):
-            ne = i == 0
-            nat["b"][i] += r29[i + 1] + (r29[0] if ne else 0)
-            nat["fi"][i] += r28[5 + i * 5] + (r28[0] if ne else 0)
-            for k in range(4):
-                nat["mix"][i][k] += r28[6 + i * 5 + k] + (r28[1 + k]
-                                                          if ne else 0)
-    nat_famper, nat_fams = [], []
-    for i in range(nb):
-        m = nat["mix"][i]
-        if sum(m) <= 0 or nat["b"][i] <= 0:
-            fail(f"NSW-2016 income band {INC_BANDS[i]} empty universe mix")
-        nat_famper.append(sum(x * a for x, a in zip(m, ad)) / sum(m))
-        nat_fams.append(min(1.0, nat["fi"][i] / nat["b"][i]))
-    nat_adults = [nat["b"][i] * (nat_fams[i] * nat_famper[i]
-                                 + (1 - nat_fams[i]) * nonfam)
-                  for i in range(nb)]
-    nat_tot = sum(nat_adults)
-    cuts = {}
-    for Q, tag in ((INC_LO_Q, "lo"), (INC_HI_Q, "hiq")):
-        cum = 0.0
-        for i, (lo, hi) in enumerate(INC_BANDS):
-            share = nat_adults[i] / nat_tot
-            prev = cum
-            cum += share
-            if cum >= Q:
-                if hi is None:
-                    fail(f"NSW-2016 income {tag} cut lands the open band")
-                cuts[tag] = lo + (Q - prev) / share * (hi - lo + 1)
-                break
-    cut, cut75 = cuts["lo"], cuts["hiq"]
-    if not INC_LO_GUARD_2016[0] <= cut <= INC_LO_GUARD_2016[1]:
-        fail(f"NSW-2016 income 25% cut {cut} outside guard "
-             f"{INC_LO_GUARD_2016}")
-    if not INC_HIQ_GUARD_2016[0] <= cut75 <= INC_HIQ_GUARD_2016[1]:
-        fail(f"NSW-2016 income 75% cut {cut75} outside guard "
-             f"{INC_HIQ_GUARD_2016}")
-    hi_share = nat_adults[-1] / nat_tot
-    if not INC_HI_GUARD_2016[0] <= hi_share <= INC_HI_GUARD_2016[1]:
-        fail(f"NSW-2016 income top-band share {hi_share:.4f} outside "
-             f"guard {INC_HI_GUARD_2016}")
-    print(f"NSW-2016 income: 25% cut ${cut:.2f}/wk, 75% cut "
-          f"${cut75:.2f}/wk, top band {hi_share:.4f} (adults, 2016 $)")
-
-    out = {}
-    for code in g29:
-        r29, r28 = g29[code], g28[code]
-        bands_ad = []
-        hh = []
-        for i in range(nb):
-            ne = i == 0
-            tot = float(r29[i + 1]) + (float(r29[0]) if ne else 0.0)
-            fi = float(r28[5 + i * 5]) + (float(r28[0]) if ne else 0.0)
-            mix = [float(r28[6 + i * 5 + k]) + (float(r28[1 + k])
-                                                if ne else 0.0)
-                   for k in range(4)]
-            mixn = sum(mix)
-            famper = (sum(x * a for x, a in zip(mix, ad)) / mixn
-                      if mixn > 0 else nat_famper[i])
-            # fam share of the band's households, clamped: an SA1 cell's
-            # independently perturbed G28 FI Tot can momentarily exceed
-            # the G29 HI Tot it shares its basis with
-            fams = min(1.0, fi / tot) if tot > 0 else nat_fams[i]
-            bands_ad.append(tot * (fams * famper + (1 - fams) * nonfam))
-            hh.append(tot)
-        tsum = sum(bands_ad)
-
-        def below(cutv):
-            mass = 0.0
-            for i, (lo, hi) in enumerate(INC_BANDS):
-                if cutv <= lo:
-                    break
-                if hi is not None and cutv > hi:
-                    mass += bands_ad[i]
-                    continue
-                mass += bands_ad[i] * (cutv - lo) / (hi - lo + 1)
-                break
-            return mass
-
-        thh = sum(hh)
-        med = None
-        if thh > 0:
-            half = thh / 2
-            accx = 0.0
-            for i, (lo, hi) in enumerate(INC_BANDS):
-                if accx + hh[i] >= half:
-                    if hi is not None and hh[i] > 0:
-                        med = int(round(lo + (hi - lo + 1)
-                                        * (half - accx) / hh[i]))
-                    break
-                accx += hh[i]
-        out[code] = (tsum, below(cut), bands_ad[-1], med,
-                     tuple(bands_ad), tuple(hh), tsum - below(cut75))
-    cutrec = {"loQuantile": INC_LO_Q, "loCutWeekly": round(cut, 2),
-              "hiQuantile": INC_HI_Q, "hiQCutWeekly": round(cut75, 2),
-              "hiEdgeWeekly": 4000,
-              "hiNationalShare": round(hi_share, 6),
-              "dollarsYear": 2016}
-    print(f"GCP income cells: {len(out)} NSW SA1s (era 2016, corrected "
-          f"family block)")
-    return out, cutrec
 
 
 # --------------------------------------------------------------- GCP (NSW rows)
@@ -421,7 +215,7 @@ def main():
     gcp, nsw_persons = load_gcp_nsw()
     nlt = gcp_newlanes.load(GCP_ZIP, prefix="1", era="2016")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="1", era="2016")
-    inc, _inc_cutrec = income_2016_nsw()
+    inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "1")
     HL = gcp_newlanes.hl_alloc_of(2016, "c7")
     assign = load_assign_map(YEAR)
     sent = NSW_SENTINELS[YEAR]

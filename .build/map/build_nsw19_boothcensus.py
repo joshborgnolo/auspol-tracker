@@ -59,6 +59,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nsw13_geo import (NSW_SENTINELS, VINTAGES, in_geometry,  # noqa: E402
                        read_sa1_polygons)
+import gcp_newlanes  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 YEAR = 2016
@@ -401,6 +402,10 @@ def main():
         demo_col.append(list(dm))
     B["dec"] = dec_col
     B["demo"] = demo_col
+    # the frame's own income-cuts record (the shared engine post its
+    # 2026-11-04 family-block fix is NSW-2016's only rider)
+    _unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "1")
+    data["incomeCuts"] = inc_cutrec
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"{YEAR_TAG}: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

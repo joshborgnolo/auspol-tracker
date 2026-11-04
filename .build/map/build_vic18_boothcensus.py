@@ -315,6 +315,10 @@ def main():
         demo_col.append(list(dm))
     B["dec"] = dec_col
     B["demo"] = demo_col
+    # the frame's own income-cuts record (the shared engine post its
+    # 2026-11-04 family-block fix; Vic 2016's measure is 888.43/2587.98)
+    _unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "2")
+    data["incomeCuts"] = inc_cutrec
     with open(path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
     print(f"{FRAME}: {counts['pip']} booths joined to {len(out_sa1)} SA1s "

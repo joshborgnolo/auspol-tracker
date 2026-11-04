@@ -1,3 +1,29 @@
+# The shared weekly-income engine's family-block offset (reconciled 2026-11-04)
+
+`gcp_newlanes.state_income`'s per-band family reads were computed one tuple
+column left of the ABS layout (the block's prepended `Neg_Nil` cells are
+five wide; its `fi`/`mix` block base was pinned `(4 + i*5)` when first
+measured): each band's `One_parent_fam` column was being read as its FI
+Tot and the family-mix block was left-skewed with it, understating EVERY
+GCP-era frame's weekly-income cohorts by up to 22% at the low cut (NSW
+2021 printed $888.77 shipped vs $1,109.00 corrected; the federal engines
+(income_lanes, derive-booth-seifa-voter) resolve their columns BY NAME and
+were the oracle cross-check, never affected). The following surfaces were
+all re-measured, re-pinned and rebuilt with the fix on 2026-11-04:
+
+- `gcp_newlanes.py` — offsets `(5 + i*5) + j` / `(5 + i*5) + 4`; guards
+  re-pinned from the corrected measures: lo cuts 2021 NSW 1109.00 / Vic
+  1092.46 / Qld 1050.32 / SA 927.33; 2016 NSW 911.45 / Vic 888.43 / Qld
+  888.70; hi cuts 2021 NSW 3395.13 / Vic 3213.76 / Qld 3051.35 / SA
+  2799.46; 2016 NSW 2794.98 / Vic 2587.98 / Qld 2523.81.
+- the eight GCP-era state frames' demo stores, data joins, booth lanes and
+  `incomeCuts` resume records (nsw23, vic22, sa22, sa26, qld17/20/24,
+  vic18 + the nsw19 frame which briefly carried a same-corrected local
+  reader the same day — superseded once the shared engine was repaired;
+  its current store is byte-identical under both). The 2011-era frames
+  (nsw15, vic14) are untouched: `state_income_bcp` mirrors the federal
+  income_bcp engine, oracle-verified.
+
 # Federal map: 1993–2001 and the 2010 vintage correction
 
 The public frames use the Parliamentary Handbook's historical polygons,
@@ -238,6 +264,19 @@ Canonical sources to re-fetch when they go missing:
   family when they vanish from `.build/map/src/` (qld-frames, nsw23-frame);
   `harvest-qld-src.py` re-fetches the qld mirror from the ECQ ArcGIS
   FeatureServer.
+- **SA's electorate files** (`.build/map/sa26/
+  StateElectorates2026_GDA2020.geojson`, `.build/map/src/sa26/
+  n-sa{22,26}.geojson`): ECSA/DPTI's own dataportal zips —
+  `https://www.dptiapps.com.au/dataportal/StateElectorates<YEAR>_geojson.zip`
+  (2014→latest; sha1-pinned files, `electorate` property uppercase),
+  normalised name-case-insensitively against the sa22_geo/sa26_geo rosters
+  plus `map/data/data-sa26.json`'s own district list by the same rule the
+  2013-era frames' `make-n13-geojson.py` uses. The sa26 chain reads its
+  full-res file for provenance (`electorate` intact); the res stage rides
+  the n-sa*.geojson copies on `properties.name`. Recovered 2026-11-04: the
+  prior local copy of vic22's boundary layer had sat RAW (WFS properties,
+  no `name`) in `.build/map/src/vic22/n-vic22.geojson` — normalised to its
+  committed `vic22_geo.EXPECTED_NAMES` casing on re-derivation.
 
 ## The 2013-era state frames (nsw15/nsw19/vic14/vic18, 4 November 2026)
 
