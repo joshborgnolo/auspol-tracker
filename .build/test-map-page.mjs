@@ -758,6 +758,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(win[3], "onp", "wanow: its winner files in the onp fam");
   assert.ok(by.div.tpp == null, "wanow: no 2PP lane on a Labor-v-One Nation final");
   assert.equal(now.holders["Secret Harbour"].n, "Luke Herdegen", "wanow: Secret Harbour's member");
+  const sum2 = JSON.parse(R("map/data/summary.json"));
+  assert.deepEqual(sum2.seats.wanow.WA, { alp: 45, lnp: 13, onp: 1 }, "summary.json pins the Assembly as it stands (wa)");
 }
 
 // ── the Handbook frame in slices (2026-10-31): the lossless-handbook click
