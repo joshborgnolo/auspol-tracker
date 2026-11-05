@@ -445,6 +445,26 @@ const GROUP_OF_TOKEN = new Map([
   ...G_PARTY.map((g) => [g, "By voting intention"]),
 ]);
 
+/* A "By state" crosstab panel arrives as one row-set per COLUMN HEAD:
+   vis="Overall" (the all-voters column – files as all-voters) plus one
+   vis=<state name> column per printed state (the qld-ir pair @ 2026-10-27,
+   added by the 4 Nov 2026 incremental crawl re-reading the report page:
+   35 vis=Queensland rows, full answer breakdowns of the Queensland
+   subsample). The store models no state cut – its folds are the five
+   CONTEXT_GROUPS cuts only – so a state column left in the row stream
+   mints phantom all-voters rows that collide with the wave's real ones
+   (33 guard failures on the pair). Dropping is by the closed state-name
+   vocab below, never by figure: the rows are real subsample reads of the
+   SAME question the all-voters table already carries, and the only
+   datasets seen to carry a state panel are adjudicated theme-cut, so no
+   display path wants them. A state-named vis on a dataset that ever needs
+   the cut modelled is a new fold context – build it here, don't let this
+   set grow fuzzy. */
+const STATE_PANEL_VIS = new Set([
+  "new south wales", "victoria", "queensland", "western australia",
+  "south australia", "tasmania", "northern territory", "australian capital territory",
+]);
+
 const DIM_NAMES = {
   gender: "By gender", age: "By age",
   voting_intention: "By voting intention", vote: "By voting intention",
@@ -979,6 +999,7 @@ for (const st of MANIFEST_ALL) {
     for (const [bk, i] of info) if (!i.clean && cleanSigs.has(i.sig)) skipBlocks.add(bk);
   }
   const notedBlocks = new Set();
+  const notedStatePanels = new Set();
 
   for (const r of rows) {
     const w = waveOf(r);
@@ -989,6 +1010,14 @@ for (const st of MANIFEST_ALL) {
       if (!notedBlocks.has(bk)) {
         notedBlocks.add(bk);
         console.log(`NOTE: duplicate fold block skipped in ${ids.join("/")} @ ${w} vis="${r.vis}" dim="${r.dim}" (byte-identical to a cleanly folded block)`);
+      }
+      continue;
+    }
+    if (STATE_PANEL_VIS.has(norm(r.vis))) {
+      const sk = w + "|" + norm(r.vis);
+      if (!notedStatePanels.has(sk)) {
+        notedStatePanels.add(sk);
+        console.log(`NOTE: state-panel subsample rows dropped in ${ids.join("/")} @ ${w} vis="${r.vis}" (a "By state" crosstab panel's non-Overall column; the store models no state cut)`);
       }
       continue;
     }
