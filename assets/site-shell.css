@@ -20,11 +20,11 @@
   /* the main page's party tokens, lifted verbatim from its template
      (shell-copy:tokens), so this page's dial uses the site's own colours */
   /* .build/site-shell.mjs ships these to the satellites */
-  --alp: oklch(0.55 0.150 27);   /* Labor red    */
-  --lnp: oklch(0.50 0.095 250);  /* Coalition blue */
-  --grn: oklch(0.60 0.120 150);  /* Greens       */
-  --onp: oklch(0.66 0.130 58);   /* One Nation orange */
-  --oth: oklch(0.64 0.018 70);   /* Others grey  */
+  --alp: oklch(0.631 0.235 32);     /* Labor red (#f7310a) */
+  --lnp: oklch(0.52 0.268 263.3);   /* Coalition blue (#014dff) */
+  --grn: oklch(0.654 0.182 148.4);  /* Greens (#14ad4a) */
+  --onp: oklch(0.751 0.179 58.3);   /* One Nation orange (#ff8c00) */
+  --oth: oklch(0.686 0 89.9);       /* Others neutral grey (#9a9a9a) */
   /* the named minor families of the primary-vote history (the flows-explained
      chart's "View: Primary votes" flip, 2026-10-23): hues fanned through the
      free ranges of the wheel, one family one hue, marks only – a family
@@ -32,20 +32,20 @@
   --dem: oklch(0.62 0.110 80);   /* Democrats gold */
   --dlp: oklch(0.60 0.095 340);  /* Democratic Labor rose */
   --uap: oklch(0.66 0.125 95);   /* United Australia yellow */
-  --xnt: oklch(0.62 0.085 185);  /* Xenophon teal */
+  --xnt: oklch(0.676 0.119 214.4); /* Xenophon cyan (#00a9c4, the map's CSA) */
   --jln: oklch(0.60 0.105 280);  /* Lambie violet */
-  --ind: oklch(0.62 0.060 225);  /* Independents slate */
---alp-text: var(--alp);
-  --lnp-text: var(--lnp);
-  --grn-text: oklch(0.52 0.120 150);
-  --onp-text: oklch(0.52 0.130 58);
-  --oth-text: oklch(0.52 0.018 70);
+  --ind: oklch(0.606 0.168 305.9); /* Independents purple (#9b62d0) */
+--alp-text: oklch(0.55 0.235 32);     /* 5.2:1 */
+  --lnp-text: var(--lnp);               /* 5.9:1 as-is */
+  --grn-text: oklch(0.52 0.182 148.4);  /* 4.8:1 */
+  --onp-text: oklch(0.55 0.179 58.3);   /* 5.0:1 */
+  --oth-text: oklch(0.55 0 89.9);       /* 4.7:1 */
   --dem-text: oklch(0.52 0.110 80);
   --dlp-text: oklch(0.52 0.095 340);
   --uap-text: oklch(0.52 0.125 95);
-  --xnt-text: oklch(0.52 0.085 185);
+  --xnt-text: oklch(0.52 0.119 214.4);  /* 5.0:1 */
   --jln-text: oklch(0.52 0.105 280);
-  --ind-text: oklch(0.52 0.060 225);
+  --ind-text: oklch(0.55 0.168 305.9);  /* 5.1:1 */
   --sh-surface: oklch(0.992 0.004 85); --sh-surface-2: oklch(0.980 0.006 80);
   --sh-sw-plate: color-mix(in oklch, var(--ink) 5%, var(--sh-surface)); --sh-sw-cap: var(--sh-surface);
   --sh-sw-well: color-mix(in oklch, var(--ink) 13%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
@@ -55,22 +55,22 @@
   --sh-mood-pos: oklch(0.52 0.085 200); --sh-mood-neg: oklch(0.44 0.045 50);
 }
 @media (prefers-color-scheme: dark) { :root:not(.sh-light) {
-    --alp: oklch(0.660 0.165 28);
-    --lnp: oklch(0.680 0.130 252);
-    --grn: oklch(0.720 0.135 152);
-    --onp: oklch(0.760 0.135 64);
-    --oth: oklch(0.700 0.018 72);
+    --alp: oklch(0.631 0.235 32);     /* #f7310a */
+    --lnp: oklch(0.52 0.268 263.3);   /* #014dff */
+    --grn: oklch(0.717 0.193 149);    /* #22c35a */
+    --onp: oklch(0.765 0.175 62.6);   /* #ff9500 */
+    --oth: oklch(0.59 0 89.9);        /* #7d7d7d */
     --dem: oklch(0.730 0.115 82);
     --dlp: oklch(0.710 0.105 342);
     --uap: oklch(0.760 0.130 97);
-    --xnt: oklch(0.720 0.095 187);
+    --xnt: oklch(0.749 0.132 214);    /* #00c2e0 */
     --jln: oklch(0.720 0.110 282);
-    --ind: oklch(0.720 0.070 227);
-  --alp-text: var(--alp);
-    --lnp-text: var(--lnp);
+    --ind: oklch(0.681 0.148 306.4);  /* #b07ee0 */
+  --alp-text: oklch(0.66 0.235 32);   /* 4.6:1 */
+    --lnp-text: oklch(0.66 0.268 263.3); /* 4.8:1 */
     --grn-text: var(--grn);
     --onp-text: var(--onp);
-    --oth-text: var(--oth);
+    --oth-text: oklch(0.64 0 89.9);     /* 4.7:1 */
     --dem-text: var(--dem);
     --dlp-text: var(--dlp);
     --uap-text: var(--uap);
@@ -86,22 +86,22 @@
   --sh-mood-pos: oklch(0.70 0.105 200); --sh-mood-neg: oklch(0.68 0.05 45);
 } }
 :root.sh-dark {
-    --alp: oklch(0.660 0.165 28);
-    --lnp: oklch(0.680 0.130 252);
-    --grn: oklch(0.720 0.135 152);
-    --onp: oklch(0.760 0.135 64);
-    --oth: oklch(0.700 0.018 72);
+    --alp: oklch(0.631 0.235 32);     /* #f7310a */
+    --lnp: oklch(0.52 0.268 263.3);   /* #014dff */
+    --grn: oklch(0.717 0.193 149);    /* #22c35a */
+    --onp: oklch(0.765 0.175 62.6);   /* #ff9500 */
+    --oth: oklch(0.59 0 89.9);        /* #7d7d7d */
     --dem: oklch(0.730 0.115 82);
     --dlp: oklch(0.710 0.105 342);
     --uap: oklch(0.760 0.130 97);
-    --xnt: oklch(0.720 0.095 187);
+    --xnt: oklch(0.749 0.132 214);    /* #00c2e0 */
     --jln: oklch(0.720 0.110 282);
-    --ind: oklch(0.720 0.070 227);
-  --alp-text: var(--alp);
-    --lnp-text: var(--lnp);
+    --ind: oklch(0.681 0.148 306.4);  /* #b07ee0 */
+  --alp-text: oklch(0.66 0.235 32);   /* 4.6:1 */
+    --lnp-text: oklch(0.66 0.268 263.3); /* 4.8:1 */
     --grn-text: var(--grn);
     --onp-text: var(--onp);
-    --oth-text: var(--oth);
+    --oth-text: oklch(0.64 0 89.9);     /* 4.7:1 */
     --dem-text: var(--dem);
     --dlp-text: var(--dlp);
     --uap-text: var(--uap);

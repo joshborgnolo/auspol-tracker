@@ -255,10 +255,10 @@ function renderPage(sections, fetchedIso) {
   --ink-faint: oklch(0.70 0.008 65);
   --line:      oklch(0.895 0.008 75);
   --line-2:    oklch(0.935 0.006 78);
-  --alp: oklch(0.55 0.150 27);
-  --lnp: oklch(0.50 0.095 250);
-  --grn: oklch(0.60 0.120 150);
-  --onp: oklch(0.66 0.130 58);
+  --alp: oklch(0.631 0.235 32);
+  --lnp: oklch(0.52 0.268 263.3);
+  --grn: oklch(0.654 0.182 148.4);
+  --onp: oklch(0.751 0.179 58.3);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --maxw: 1200px;
