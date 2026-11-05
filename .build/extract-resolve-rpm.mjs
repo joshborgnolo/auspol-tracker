@@ -19,6 +19,11 @@
 //   Q28NSW preferred_premier_nsw NSW premier vs opposition leader
 //   Q29VIC primary_vote_vic      VIC state primary vote
 //   Q32VIC preferred_premier_vic VIC premier vs opposition leader
+//   Q20VIC leader_favourability_vic VIC leaders net favourable view (favourable
+//                                minus unfavourable per the Favourable Chart
+//                                visual; answer labels are leader names, and
+//                                past leaders stay in the section) — added
+//                                upstream 2026-11, in the state-campaign run-up
 //   Q33QLD primary_vote_qld      QLD state primary vote (2026 rebuild onward)
 //   Q34QLD preferred_premier_qld QLD premier vs opposition leader (2026 rebuild onward)
 //
@@ -159,6 +164,7 @@ const DATASETS = {
   Q28NSW: "preferred_premier_nsw",
   Q29VIC: "primary_vote_vic",
   Q32VIC: "preferred_premier_vic",
+  Q20VIC: "leader_favourability_vic",
   Q33QLD: "primary_vote_qld",
   Q34QLD: "preferred_premier_qld",
 };
