@@ -841,9 +841,14 @@ function drawLabels(m) {
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
+  // the towns: ahead of the seats' names while the view is wide (a city names
+  // the country, a seat named for it gives way), after the polling places closer in
+  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set();
+  if (wide) drawTowns(m, placed, seatNm, town, [], groundOf);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
+      if (town.has(d.n.toLowerCase())) continue;
       if (d.i === sd && T.k > 20) continue;
       if (S.sel.level === "state" && d.st !== S.sel.st) continue;
       const bb = g.bb[d.i]; if (!bb) continue;
@@ -854,7 +859,7 @@ function drawLabels(m) {
       cand.push({ d, x, y, a: w * h });
     }
     cand.sort((p, q) => (q.d.i === sd) - (p.d.i === sd) || q.a - p.a);
-    for (const c of cand) put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2);
+    for (const c of cand) if (put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2)) seatNm.add(c.d.n.toLowerCase());
   }
   // an island where it lies: its name over its north coast once it shows (under
   // its south coast where the way back holds the top)
@@ -878,17 +883,137 @@ function drawLabels(m) {
       if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
     }
   }
+  // every booth's dot, which the towns' and the streets' names keep clear of
+  const obst = [];
+  for (const j of m._vis || []) {
+    const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
+    if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
+  }
+  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, groundOf);
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
-  if (sA > 0.02 && streetDrawn.length) {
-    const obst = [];
-    for (const j of m._vis || []) {
-      const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
-      if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
-    }
-    drawStreetNames(placed, obst, sA);
-  }
+  if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
   ctx.restore();
+}
+
+/* ----- the towns -----
+   Every town of 200 people or more (map/data/places.json, places_build.py:
+   ABS 2021 Urban Centres and Localities, at GeoNames' town-centre points),
+   named as the zoom makes room: the capitals and the cities of a million
+   from the whole country's view, then each town once the map's scale
+   (screen pixels to the kilometre, the same on every frame) passes its
+   population's threshold. Biggest first, each claims its room, so a small
+   town shows in empty country where a bigger one near a city has no space.
+   A name fades in over TOWN_FADE ms from the frame it first finds room (a
+   fade over a stretch of zoom left names half-drawn on a map at rest). */
+let PLACES = null, placesP = null, townSince = new Map();
+const TOWN_FADE = 220;
+const TOWN_CAP = new Set(["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Hobart", "Canberra", "Darwin"]);
+// the scale (px/km) a town of p people first shows at: the capitals and a million always;
+// 250k at the country's view on a desktop, 20k at a state's, 5k a few seats', 1k a rural seat's
+const townAt = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? 0 : 0.3 * Math.pow(1e5 / p, 0.75));
+// wider than this (px/km) the towns' names go ahead of the seats'
+const TOWN_FIRST = 4;
+// the frame's projection units to a kilometre, and each town's point in them, kept per projection
+const townProj = new WeakMap();
+function townPts() {
+  if (!PLACES || !proj) return null;
+  let t = townProj.get(proj);
+  if (!t) {
+    const a = proj([134, -28]), c = proj([134, -29]), xy = new Float64Array(PLACES.length * 2);
+    PLACES.forEach((q, i) => { const p = proj([q[1], q[2]]); xy[2 * i] = p ? p[0] : NaN; xy[2 * i + 1] = p ? p[1] : NaN; });
+    townProj.set(proj, (t = { upk: Math.hypot(c[0] - a[0], c[1] - a[1]) / 111.2, xy }));
+  }
+  return t;
+}
+// the map's scale on screen, px per km (0 until the towns are in)
+function townScale() {
+  if (!placesP) placesP = getJSON("/map/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
+  const t = townPts();
+  return t ? T.k * t.upk : 0;
+}
+// the seat under a point of the map (-1: the sea, or beyond the frame's seats)
+function divUnder(m, x, y) {
+  const g = geoOf(m);
+  for (let d = 0; d < m.divs.length; d++) { const q = g.bb[d]; if (!q || x < q[0][0] || x > q[1][0] || y < q[0][1] || y > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[d], x, y)) return d; }
+  return -1;
+}
+// the seats under a label's two ends and middle, at one spot beside a town: kept per
+// year, town, spot and zoom step (a pan moves a label with its ground; only a zoom
+// slides it over another), so a still or panning map asks nothing again
+function townGrounds(m, key, box, cy) {
+  const c = m._townG || (m._townG = new Map());
+  let v = c.get(key);
+  if (!v) {
+    if (c.size > 6000) c.clear();
+    const at = (px) => divUnder(m, (px - T.x) / T.k, (cy - T.y) / T.k);
+    c.set(key, (v = [at(box[0] + 3), at((box[0] + box[2]) / 2), at(box[2] - 3)]));
+  }
+  return v;
+}
+// the towns' own lettering: a dot, the name beside it; bigger towns heavier
+const townType = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? [13, 600, 3] : p >= 1e5 ? [12, 600, 2.6] : p >= 2e4 ? [11.5, 500, 2.2] : p >= 5e3 ? [11, 400, 2] : [10.5, 400, 1.8]);
+function drawTowns(m, placed, skip, shown, obst, groundOf) {
+  const t = townPts(); if (!t) return;
+  const th = TH, s = T.k * t.upk, xy = t.xy;
+  const hits = (r) => { for (const q of placed) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; for (const q of obst) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; return false; };
+  ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+  // the zoom buttons over the stage's corner: no name runs under them
+  const zr = $("#zoomer"), cr = canvas.getBoundingClientRect();
+  if (zr && zr.offsetParent) { const q = zr.getBoundingClientRect(); obst = obst.concat([[q.left - cr.left - 4, q.top - cr.top - 4, q.right - cr.left + 4, q.bottom - cr.top + 4]]); }
+  const now = performance.now(), since = new Map();
+  let n = 0, fading = false;
+  for (let i = 0; i < PLACES.length && n < 70; i++) {
+    const [name, , , p, st] = PLACES[i];
+    const at = townAt(name, p);
+    if (s < at) continue;
+    // the frame's own states (Canberra on the NSW frames, the ACT being their hole); one state chosen, its towns
+    if (!m.areas[st] && !(st === "ACT" && m.areas.NSW)) continue;
+    if (S.sel.level === "state" && st !== S.sel.st && !(st === "ACT" && S.sel.st === "NSW")) continue;
+    const key = name.toLowerCase();
+    if (skip.has(key) || shown.has(key)) continue;
+    const x = xy[2 * i] * T.k + T.x, y = xy[2 * i + 1] * T.k + T.y;
+    if (!(x > 4 && y > 4 && x < Wpx - 4 && y < Hpx - 4)) continue;
+    const [size, weight, r] = townType(name, p), txt = dn(name);
+    ctx.font = `${weight} ${size}px ${SANS}`;
+    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - r - 1, y - r - 1, x + r + 1, y + r + 1];
+    if (hits(dot)) continue;
+    // beside the dot: right, left, above, below - the first with room whose text lies
+    // on one kind of ground (all dark seats, or all light: a coastal town's name keeps
+    // to the land rather than run white onto the paper sea); failing that, the first with room
+    const spots = [[x + r + 4, y, "left"], [x - r - 4, y, "right"], [x, y - r - hh - 1, "center"], [x, y + r + hh + 1, "center"]];
+    const zk = Math.round(Math.log2(T.k) * 12);
+    const gOf = (d) => (d >= 0 ? groundOf(d) : th.bg);
+    let box = null, pick = null, gr = null;
+    for (let si = 0; si < 4; si++) {
+      const sp = spots[si], x0 = sp[2] === "left" ? sp[0] - 2 : sp[2] === "right" ? sp[0] - w - 2 : sp[0] - w / 2 - 2;
+      const bx = [x0, sp[1] - hh, x0 + w + 4, sp[1] + hh];
+      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2 || hits(bx)) continue;
+      const g3 = townGrounds(m, `${i}|${si}|${zk}`, bx, sp[1]), dk = g3.map((d) => lumL(gOf(d)) < 0.6);
+      if (!box) { box = bx; pick = sp; gr = g3; }
+      if (dk[0] === dk[1] && dk[1] === dk[2]) { box = bx; pick = sp; gr = g3; break; }
+    }
+    if (!box) continue;
+    placed.push(box, dot); shown.add(key); n++;
+    const t0 = townSince.get(key) ?? now, fa = reduceMotion ? 1 : clamp((now - t0) / TOWN_FADE, 0, 1);
+    since.set(key, t0); if (fa < 1) fading = true;
+    // lettered as the seats' names are: on a dark ground near-white with a faint
+    // shadow, on a light one ink with a halo of the ground (the seat under the
+    // text's middle); the dot the text's colour
+    const ground = gOf(gr[1]), dark = lumL(ground) < 0.6;
+    const fg = dark ? "rgba(255,255,255,0.96)" : css(th.ink2), halo = dark ? "rgba(0,0,0,0.22)" : css(ground, 0.85);
+    ctx.save();
+    ctx.globalAlpha = ovA * fa * fa * (3 - 2 * fa);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.lineWidth = 1.6; ctx.strokeStyle = halo; ctx.stroke(); ctx.fillStyle = fg; ctx.fill();
+    ctx.textAlign = pick[2];
+    ctx.lineWidth = dark ? 2.4 : 2.6; ctx.strokeStyle = halo; ctx.strokeText(txt, pick[0], pick[1]);
+    ctx.fillStyle = fg; ctx.fillText(txt, pick[0], pick[1]);
+    ctx.restore();
+  }
+  townSince = since;
+  if (fading) schedule();
+  ctx.textAlign = "center";
 }
 
 /* ----- the streets -----

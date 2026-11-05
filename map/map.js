@@ -802,7 +802,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"d5be66a8"};
+const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"208f312b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"d5be66a8"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -2304,9 +2304,14 @@ function drawLabels(m) {
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
+  // the towns: ahead of the seats' names while the view is wide (a city names
+  // the country, a seat named for it gives way), after the polling places closer in
+  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set();
+  if (wide) drawTowns(m, placed, seatNm, town, [], groundOf);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
+      if (town.has(d.n.toLowerCase())) continue;
       if (d.i === sd && T.k > 20) continue;
       if (S.sel.level === "state" && d.st !== S.sel.st) continue;
       const bb = g.bb[d.i]; if (!bb) continue;
@@ -2317,7 +2322,7 @@ function drawLabels(m) {
       cand.push({ d, x, y, a: w * h });
     }
     cand.sort((p, q) => (q.d.i === sd) - (p.d.i === sd) || q.a - p.a);
-    for (const c of cand) put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2);
+    for (const c of cand) if (put(dn(c.d.n), c.x, c.y, c.d.i === sd ? 13.5 : 12, c.d.i === sd ? 600 : 500, groundOf(c.d.i), sd != null && c.d.i !== sd ? th.ink3 : th.ink2)) seatNm.add(c.d.n.toLowerCase());
   }
   // an island where it lies: its name over its north coast once it shows (under
   // its south coast where the way back holds the top)
@@ -2341,17 +2346,137 @@ function drawLabels(m) {
       if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
     }
   }
+  // every booth's dot, which the towns' and the streets' names keep clear of
+  const obst = [];
+  for (const j of m._vis || []) {
+    const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
+    if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
+  }
+  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, groundOf);
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
-  if (sA > 0.02 && streetDrawn.length) {
-    const obst = [];
-    for (const j of m._vis || []) {
-      const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
-      if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
-    }
-    drawStreetNames(placed, obst, sA);
-  }
+  if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
   ctx.restore();
+}
+
+/* ----- the towns -----
+   Every town of 200 people or more (map/data/places.json, places_build.py:
+   ABS 2021 Urban Centres and Localities, at GeoNames' town-centre points),
+   named as the zoom makes room: the capitals and the cities of a million
+   from the whole country's view, then each town once the map's scale
+   (screen pixels to the kilometre, the same on every frame) passes its
+   population's threshold. Biggest first, each claims its room, so a small
+   town shows in empty country where a bigger one near a city has no space.
+   A name fades in over TOWN_FADE ms from the frame it first finds room (a
+   fade over a stretch of zoom left names half-drawn on a map at rest). */
+let PLACES = null, placesP = null, townSince = new Map();
+const TOWN_FADE = 220;
+const TOWN_CAP = new Set(["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Hobart", "Canberra", "Darwin"]);
+// the scale (px/km) a town of p people first shows at: the capitals and a million always;
+// 250k at the country's view on a desktop, 20k at a state's, 5k a few seats', 1k a rural seat's
+const townAt = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? 0 : 0.3 * Math.pow(1e5 / p, 0.75));
+// wider than this (px/km) the towns' names go ahead of the seats'
+const TOWN_FIRST = 4;
+// the frame's projection units to a kilometre, and each town's point in them, kept per projection
+const townProj = new WeakMap();
+function townPts() {
+  if (!PLACES || !proj) return null;
+  let t = townProj.get(proj);
+  if (!t) {
+    const a = proj([134, -28]), c = proj([134, -29]), xy = new Float64Array(PLACES.length * 2);
+    PLACES.forEach((q, i) => { const p = proj([q[1], q[2]]); xy[2 * i] = p ? p[0] : NaN; xy[2 * i + 1] = p ? p[1] : NaN; });
+    townProj.set(proj, (t = { upk: Math.hypot(c[0] - a[0], c[1] - a[1]) / 111.2, xy }));
+  }
+  return t;
+}
+// the map's scale on screen, px per km (0 until the towns are in)
+function townScale() {
+  if (!placesP) placesP = getJSON("/map/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
+  const t = townPts();
+  return t ? T.k * t.upk : 0;
+}
+// the seat under a point of the map (-1: the sea, or beyond the frame's seats)
+function divUnder(m, x, y) {
+  const g = geoOf(m);
+  for (let d = 0; d < m.divs.length; d++) { const q = g.bb[d]; if (!q || x < q[0][0] || x > q[1][0] || y < q[0][1] || y > q[1][1]) continue; if (hitCtx.isPointInPath(g.paths[d], x, y)) return d; }
+  return -1;
+}
+// the seats under a label's two ends and middle, at one spot beside a town: kept per
+// year, town, spot and zoom step (a pan moves a label with its ground; only a zoom
+// slides it over another), so a still or panning map asks nothing again
+function townGrounds(m, key, box, cy) {
+  const c = m._townG || (m._townG = new Map());
+  let v = c.get(key);
+  if (!v) {
+    if (c.size > 6000) c.clear();
+    const at = (px) => divUnder(m, (px - T.x) / T.k, (cy - T.y) / T.k);
+    c.set(key, (v = [at(box[0] + 3), at((box[0] + box[2]) / 2), at(box[2] - 3)]));
+  }
+  return v;
+}
+// the towns' own lettering: a dot, the name beside it; bigger towns heavier
+const townType = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? [13, 600, 3] : p >= 1e5 ? [12, 600, 2.6] : p >= 2e4 ? [11.5, 500, 2.2] : p >= 5e3 ? [11, 400, 2] : [10.5, 400, 1.8]);
+function drawTowns(m, placed, skip, shown, obst, groundOf) {
+  const t = townPts(); if (!t) return;
+  const th = TH, s = T.k * t.upk, xy = t.xy;
+  const hits = (r) => { for (const q of placed) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; for (const q of obst) if (!(r[2] < q[0] || r[0] > q[2] || r[3] < q[1] || r[1] > q[3])) return true; return false; };
+  ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+  // the zoom buttons over the stage's corner: no name runs under them
+  const zr = $("#zoomer"), cr = canvas.getBoundingClientRect();
+  if (zr && zr.offsetParent) { const q = zr.getBoundingClientRect(); obst = obst.concat([[q.left - cr.left - 4, q.top - cr.top - 4, q.right - cr.left + 4, q.bottom - cr.top + 4]]); }
+  const now = performance.now(), since = new Map();
+  let n = 0, fading = false;
+  for (let i = 0; i < PLACES.length && n < 70; i++) {
+    const [name, , , p, st] = PLACES[i];
+    const at = townAt(name, p);
+    if (s < at) continue;
+    // the frame's own states (Canberra on the NSW frames, the ACT being their hole); one state chosen, its towns
+    if (!m.areas[st] && !(st === "ACT" && m.areas.NSW)) continue;
+    if (S.sel.level === "state" && st !== S.sel.st && !(st === "ACT" && S.sel.st === "NSW")) continue;
+    const key = name.toLowerCase();
+    if (skip.has(key) || shown.has(key)) continue;
+    const x = xy[2 * i] * T.k + T.x, y = xy[2 * i + 1] * T.k + T.y;
+    if (!(x > 4 && y > 4 && x < Wpx - 4 && y < Hpx - 4)) continue;
+    const [size, weight, r] = townType(name, p), txt = dn(name);
+    ctx.font = `${weight} ${size}px ${SANS}`;
+    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - r - 1, y - r - 1, x + r + 1, y + r + 1];
+    if (hits(dot)) continue;
+    // beside the dot: right, left, above, below - the first with room whose text lies
+    // on one kind of ground (all dark seats, or all light: a coastal town's name keeps
+    // to the land rather than run white onto the paper sea); failing that, the first with room
+    const spots = [[x + r + 4, y, "left"], [x - r - 4, y, "right"], [x, y - r - hh - 1, "center"], [x, y + r + hh + 1, "center"]];
+    const zk = Math.round(Math.log2(T.k) * 12);
+    const gOf = (d) => (d >= 0 ? groundOf(d) : th.bg);
+    let box = null, pick = null, gr = null;
+    for (let si = 0; si < 4; si++) {
+      const sp = spots[si], x0 = sp[2] === "left" ? sp[0] - 2 : sp[2] === "right" ? sp[0] - w - 2 : sp[0] - w / 2 - 2;
+      const bx = [x0, sp[1] - hh, x0 + w + 4, sp[1] + hh];
+      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2 || hits(bx)) continue;
+      const g3 = townGrounds(m, `${i}|${si}|${zk}`, bx, sp[1]), dk = g3.map((d) => lumL(gOf(d)) < 0.6);
+      if (!box) { box = bx; pick = sp; gr = g3; }
+      if (dk[0] === dk[1] && dk[1] === dk[2]) { box = bx; pick = sp; gr = g3; break; }
+    }
+    if (!box) continue;
+    placed.push(box, dot); shown.add(key); n++;
+    const t0 = townSince.get(key) ?? now, fa = reduceMotion ? 1 : clamp((now - t0) / TOWN_FADE, 0, 1);
+    since.set(key, t0); if (fa < 1) fading = true;
+    // lettered as the seats' names are: on a dark ground near-white with a faint
+    // shadow, on a light one ink with a halo of the ground (the seat under the
+    // text's middle); the dot the text's colour
+    const ground = gOf(gr[1]), dark = lumL(ground) < 0.6;
+    const fg = dark ? "rgba(255,255,255,0.96)" : css(th.ink2), halo = dark ? "rgba(0,0,0,0.22)" : css(ground, 0.85);
+    ctx.save();
+    ctx.globalAlpha = ovA * fa * fa * (3 - 2 * fa);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.lineWidth = 1.6; ctx.strokeStyle = halo; ctx.stroke(); ctx.fillStyle = fg; ctx.fill();
+    ctx.textAlign = pick[2];
+    ctx.lineWidth = dark ? 2.4 : 2.6; ctx.strokeStyle = halo; ctx.strokeText(txt, pick[0], pick[1]);
+    ctx.fillStyle = fg; ctx.fillText(txt, pick[0], pick[1]);
+    ctx.restore();
+  }
+  townSince = since;
+  if (fading) schedule();
+  ctx.textAlign = "center";
 }
 
 /* ----- the streets -----
