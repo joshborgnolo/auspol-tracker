@@ -105,7 +105,8 @@ function readTheme() {
   T.state = dk ? lch(0.88, 0.009, 78) : lch(0.30, 0.012, 55);
   T.veil = dk ? 0.66 : 0.6;
   T.seqL = dk ? [0.29, 0.88] : [0.955, 0.33];
-  T.cls = dk ? [lch(0.88, 0.030, 78), lch(0.70, 0.040, 70), lch(0.53, 0.045, 62), lch(0.38, 0.035, 58)] : [lch(0.34, 0.040, 58), lch(0.50, 0.045, 62), lch(0.68, 0.040, 70), lch(0.85, 0.028, 78)];
+  // seat types walk the outback ramp: city cream out to red earth (dark end carries the red ochre)
+  T.cls = dk ? [lch(0.88, 0.030, 78), lch(0.70, 0.048, 62), lch(0.53, 0.060, 48), lch(0.38, 0.075, 38)] : [lch(0.34, 0.055, 44), lch(0.50, 0.058, 50), lch(0.68, 0.048, 60), lch(0.85, 0.032, 70)];
   T.floor = dk ? lch(0.235, 0.012, 150) : lch(0.958, 0.012, 150);
   return T;
 }
