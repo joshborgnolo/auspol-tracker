@@ -98,6 +98,9 @@ function readTheme() {
   T.mid = dk ? lch(0.36, 0.008, 66) : lch(0.905, 0.006, 78);
   T.nodata = dk ? lch(0.265, 0.008, 65) : lch(0.935, 0.005, 78);
   T.hatch = dk ? lch(0.39, 0.010, 66) : lch(0.80, 0.008, 70);
+  // seat borders: a thin white hairline over the fills (as theoelections.com draws them),
+  // half see-through on dark paper; the state lines the same white, a touch heavier
+  T.seam = [255, 255, 255]; T.seamA = dk ? 0.5 : 0.85; T.stateA = dk ? 0.85 : 1;
   T.coast = dk ? lch(0.62, 0.010, 70) : lch(0.56, 0.010, 62);
   T.state = dk ? lch(0.88, 0.009, 78) : lch(0.30, 0.012, 55);
   T.veil = dk ? 0.66 : 0.6;
@@ -106,6 +109,9 @@ function readTheme() {
   T.floor = dk ? lch(0.235, 0.012, 150) : lch(0.958, 0.012, 150);
   return T;
 }
+
+// the seat hairline's screen width: thin at the whole map, a little firmer zoomed in
+const seamW = k => Math.min(0.9, 0.45 + k * 0.12);
 
 /* ramps: 101-step sequential lookups and 201-step diverging (index 0..200, mid 100) */
 let RAMP = {};
