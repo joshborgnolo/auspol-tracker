@@ -579,7 +579,8 @@ function showTipAt(html, cx, cy) {
   if (ty + r.height > innerHeight - 8) ty = cy - r.height - 14;
   tip.style.transform = `translate(${Math.max(6, tx)}px, ${Math.max(6, ty)}px)`;
 }
-let tipAt = null; // the pointer on the map's plane, for the surface's own reading of the spot
+let tipAt = null, tipClient = null; // the pointer on the map's plane, for the surface's own reading of the spot, and on the screen
+const tipRefresh = () => { if (S.hover && !tip.hidden && tipClient) showTipAt(tipFor(S.hover), tipClient[0], tipClient[1]); };
 function tipFor(h) {
   if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
@@ -592,7 +593,7 @@ function tipFor(h) {
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
     // on a surface the pointer reads the spot first; the seat's own figure follows
-    const here = drawOf(m) === "surface" && tipAt ? surfaceAt(tipAt[0], tipAt[1]) : null;
+    const here = drawOf(m) === "surface" ? SF.here : null;
     const around = here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
     return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${around}<div class="${here ? "ts" : "tv"}">${here ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
@@ -1241,7 +1242,8 @@ canvas.addEventListener("pointermove", (e) => {
   if (e.buttons || e.pointerType === "touch") return;
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
-  tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k];
+  tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k]; tipClient = [e.clientX, e.clientY];
+  if (h && drawOf(M()) === "surface") surfaceAsk(tipAt[0], tipAt[1]);
   const same = (h && S.hover && h.kind === S.hover.kind && h.i === S.hover.i) || (!h && !S.hover);
   if (!same) { S.hover = h; schedule(); }
   if (h) showTipAt(tipFor(h), e.clientX, e.clientY); else hideTip();

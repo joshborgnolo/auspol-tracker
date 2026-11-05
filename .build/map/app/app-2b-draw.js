@@ -11,12 +11,16 @@
    carry over. They apply to the map view alone: the chamber and the list keep their seats.
 
    The surface's field is an estimate at every point and says so in its key. It comes from
-   the polling places' votes on a pyramid of grids (surfaceRaster): each level, coarser
+   the polling places' votes on a pyramid of grids (surfaceEngine): each level, coarser
    than the last, holds the votes and the vote-weighted figure within a cell or so of each
    node; walking back down, a node keeps its own level's figure where enough votes stand
    behind it and otherwise takes the level above's, smoothly (cubic B-spline subdivision).
    So a suburb reads its own booths while the Simpson Desert reads the nearest towns a
    long way off, and the whole costs a pass over the grid, not over booths times pixels.
+   There is one field for a reading, set in kilometres: the zoom never enters into it, so
+   zooming magnifies a place and can't change what it reads. (It used to be smoothed by the
+   screen, seven pixels' worth, and a spot read differently at every zoom and even, by the
+   way a raster was reused, at the same zoom by the way the reader came to it.)
 
    Colour is decided a cell at a time: a cell whose corners share a step is filled flat,
    and only the few cells a step's edge crosses are worked out pixel by pixel, antialiased,
@@ -251,6 +255,12 @@ function nominalSpot(m, i, [x, y], k) {
   const a = ((k + 1) * 0.6180339887) % 1, c = ((k + 1) * 0.7548776662) % 1, jx = x + (a - 0.5) * step * 0.9, jy = y + (c - 0.5) * step * 0.9;
   return hitCtx.isPointInPath(m.geo.paths[i], jx, jy) ? [jx, jy] : [x, y];
 }
+// a frame's map units to the kilometre, at the middle of its map (each frame's plane has its own scale)
+function unitsPerKm(m) {
+  const [[x0, y0], [x1, y1]] = homeBox(m), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, a = m.proj.invert([cx, cy]), b = m.proj.invert([cx + 10, cy]);
+  const R = Math.PI / 180, dLat = (b[1] - a[1]) * R, dLon = (b[0] - a[0]) * R * Math.cos(a[1] * R);
+  return 10 / (6371 * Math.hypot(dLat, dLon));
+}
 // polling places, in the pyramid's terms
 function surfaceData(m) {
   const b = m.booth, fam = S.lens === "winner", n = b.n;
@@ -281,15 +291,16 @@ function surfaceData(m) {
   }
   const c = idx.length + extra.length, x = new Float32Array(c), y = new Float32Array(c), w = new Float32Array(c), late = new Float32Array(c);
   let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+  const u = unitsPerKm(m), lateAt = SURF_LATE * u;
   idx.forEach((j, k) => {
     x[k] = b.x[j]; y[k] = b.y[j]; w[k] = surfaceWeight(m, j);
     // an early voting centre takes its votes from across a district, so it joins from the coarser levels only
-    late[k] = b.ty[j] === 5 ? SURF_LATE : 0;
+    late[k] = b.ty[j] === 5 ? lateAt : 0;
     bx0 = Math.min(bx0, x[k]); bx1 = Math.max(bx1, x[k]); by0 = Math.min(by0, y[k]); by1 = Math.max(by1, y[k]);
   });
-  extra.forEach(([sx, sy, sw, sv], e) => { const k = idx.length + e; x[k] = sx; y[k] = sy; w[k] = sw; late[k] = SURF_LATE; vals.push(sv); });
+  extra.forEach(([sx, sy, sw, sv], e) => { const k = idx.length + e; x[k] = sx; y[k] = sy; w[k] = sw; late[k] = lateAt; vals.push(sv); });
   const none = m.divs.map((d) => seatN[d.i] === 0);
-  const th = TH, D = { n: c, x, y, w, late, bx0, by0, bx1, by1, M0: SURF_M0, ink: rgba32(th.ink) };
+  const th = TH, D = { n: c, x, y, w, late, bx0, by0, bx1, by1, u, M0: SURF_M0, ink: rgba32(th.ink) };
   if (fam) {
     // only the groups that lead somewhere, or finish in anyone's two, get a channel of their own
     const used = fams.filter((f, k) => vals.some((q) => q[0] === k || q[1] === k));
@@ -311,25 +322,23 @@ function surfaceData(m) {
   }
   return { D, none };
 }
-const SURF_M0 = 3500;     // votes: under this a level's figure gives way to the level above
-const SURF_LATE = 1.5;    // map units (~7km): the cell at which an early voting centre joins
-const SURF_FLOOR = 7;     // px: no detail finer than this on screen, however many votes lie under it
-const SURF_MIN = 0.06;    // map units (~270m): nor finer than this on the ground
+const SURF_M0 = 6000;     // votes: under this a level's figure gives way to the level above
+const SURF_LATE = 7;      // km: the cell at which an early voting centre joins
 
-/* the field and its picture, for the window J. Self-contained: a worker runs this very text */
-function surfaceRaster(D, J) {
-  const CELL = 3, PAD = 3, { n, x, y, w, late, ch, M0 } = D, nc = ch.length;
-  const p = J.px, c0 = CELL * p, rx0 = J.x0, ry0 = J.y0, rx1 = rx0 + J.nx * p, ry1 = ry0 + J.ny * p;
-  const ext = Math.max(D.bx1 - D.bx0, D.by1 - D.by0, rx1 - rx0, ry1 - ry0);
-  let top = 0; while (c0 * 2 ** top < ext / 2) top++;
-  const floorL = Math.min(top, Math.max(0, Math.ceil(Math.log2(J.floor / c0))));
-  const Ls = [];
-  for (let l = 0; l <= top; l++) {
-    const c = c0 * 2 ** l, ix = Math.floor(rx0 / c) - PAD, iy = Math.floor(ry0 / c) - PAD;
-    Ls.push({ c, ix, iy, nx: Math.ceil(rx1 / c) + PAD - ix + 1, ny: Math.ceil(ry1 / c) + PAD - iy + 1 });
-  }
-  let sumW = 0; const sumN = new Float64Array(nc);
-  for (let k = 0; k < n; k++) { sumW += w[k]; for (let q = 0; q < nc; q++) sumN[q] += w[k] * ch[q][k]; }
+/* the surface: one field for a reading, made once, and pictures of it. Self-contained: a worker runs
+   this very text. D is a reading's places; the field is a function of the spot alone, so a view, a zoom
+   and a screen only choose where to look at it (what the map is for: zooming in magnifies a place, it
+   doesn't ask a different question of it).
+   A lattice in kilometres, never in pixels. The whole frame comes first (build), every 8km (C0, D.u being
+   map units a kilometre), filled from a pyramid above it. Finer levels, to 1km, are only worth having where
+   votes stand behind them, so they live in tiles made as a view first needs them (tile): a level's figure
+   counts where its votes reach M0 and otherwise gives way to the level above, smoothly (cubic B-spline
+   subdivision). Sampling is a cubic B-spline too, so the field is smooth at any magnification. A view too
+   wide to show a tile's finest lattice reads its mip, the average of the field over that coarser cell, and
+   one as wide as the frame's own 8km reads the frame: the whole country needs no tiles at all, so a
+   reading's first picture is quick, and the tiles a closer view asks for are made once and kept. */
+function surfaceEngine() {
+  const CELL = 3, PAD = 3, KA = 7, TN = 128, MG = 20, FINE = 3, built = new WeakMap(), wx = new Float64Array(4), wy = new Float64Array(4);
   // [1 4 6 4 1]/16 each way, on a whole grid
   const blur = (a, nx, ny) => {
     const t = new Float32Array(nx * ny);
@@ -342,27 +351,6 @@ function surfaceRaster(D, J) {
       for (let i = 0; i < nx; i++) a[o + i] = (t[j2 + i] + 4 * t[j1 + i] + 6 * t[o + i] + 4 * t[j3 + i] + t[j4 + i]) / 16;
     }
   };
-  // each level's votes and vote-weighted figures, within a cell or so of its nodes
-  for (let l = floorL; l <= top; l++) {
-    const G = Ls[l], { c, ix, iy, nx, ny } = G, W = new Float32Array(nx * ny), N = Array.from({ length: nc }, () => new Float32Array(nx * ny));
-    for (let k = 0; k < n; k++) {
-      if (c < late[k]) continue;
-      const gx = x[k] / c - ix, gy = y[k] / c - iy, i = Math.floor(gx), j = Math.floor(gy);
-      if (i < 0 || j < 0 || i >= nx - 1 || j >= ny - 1) continue;
-      const fx = gx - i, fy = gy - j, o = j * nx + i, wa = w[k] * (1 - fx) * (1 - fy), wb = w[k] * fx * (1 - fy), wc = w[k] * (1 - fx) * fy, wd = w[k] * fx * fy;
-      W[o] += wa; W[o + 1] += wb; W[o + nx] += wc; W[o + nx + 1] += wd;
-      for (let q = 0; q < nc; q++) { const v = ch[q][k], A = N[q]; A[o] += wa * v; A[o + 1] += wb * v; A[o + nx] += wc * v; A[o + nx + 1] += wd * v; }
-    }
-    blur(W, nx, ny); for (let q = 0; q < nc; q++) blur(N[q], nx, ny);
-    G.W = W; G.N = N;
-  }
-  // down the pyramid
-  const T0 = Ls[top], F = [];
-  for (let q = 0; q < nc; q++) {
-    const a = new Float32Array(T0.nx * T0.ny), mean = sumN[q] / sumW;
-    for (let k = 0; k < a.length; k++) a[k] = T0.W[k] > 1e-3 ? T0.N[q][k] / T0.W[k] : mean;
-    F.push(a);
-  }
   // a coarse level's nodes fall on every second node of the one below it: the cubic B-spline's rule
   const subdivide = (a, Co, Fi) => {
     const ox = Fi.ix - 2 * Co.ix, oy = Fi.iy - 2 * Co.iy, cnx = Co.nx, cny = Co.ny;
@@ -381,77 +369,181 @@ function surfaceRaster(D, J) {
     }
     return out;
   };
-  const KA = 7, M2 = M0 * M0;
-  for (let l = top - 1; l >= 0; l--) {
-    const G = Ls[l], Co = Ls[l + 1];
-    for (let q = 0; q < nc; q++) {
-      const U = subdivide(F[q], Co, G);
-      if (l >= floorL) { const W = G.W, A = G.N[q]; for (let k = 0; k < U.length; k++) { const wv = W[k]; if (!(wv > 1e-3)) continue; const m = wv * KA, t = (m * m) / (m * m + M2); U[k] += t * (A[k] / wv - U[k]); } }
-      F[q] = U;
+  // a level's votes and vote-weighted figures, within a cell or so of its nodes
+  const pile = (D, G, on) => {
+    const { n, x, y, w, late, ch } = D, nc = ch.length, { c, ix, iy, nx, ny } = G, W = new Float32Array(nx * ny), N = ch.map((_, q) => (!on || on[q] ? new Float32Array(nx * ny) : null));
+    for (let k = 0; k < n; k++) {
+      if (c < late[k]) continue;
+      const gx = x[k] / c - ix, gy = y[k] / c - iy, i = Math.floor(gx), j = Math.floor(gy);
+      if (i < 0 || j < 0 || i >= nx - 1 || j >= ny - 1) continue;
+      const fx = gx - i, fy = gy - j, o = j * nx + i, wa = w[k] * (1 - fx) * (1 - fy), wb = w[k] * fx * (1 - fy), wc = w[k] * (1 - fx) * fy, wd = w[k] * fx * fy;
+      W[o] += wa; W[o + 1] += wb; W[o + nx] += wc; W[o + nx + 1] += wd;
+      for (let q = 0; q < nc; q++) { const A = N[q]; if (!A) continue; const v = ch[q][k]; A[o] += wa * v; A[o + 1] += wb * v; A[o + nx] += wc * v; A[o + nx + 1] += wd * v; }
     }
-    Co.W = Co.N = null;
-  }
-  // the picture
-  const L0 = Ls[0], nx0 = L0.nx, ox = Math.round(rx0 / c0) - L0.ix, oy = Math.round(ry0 / c0) - L0.iy;
-  const W = J.nx, H = J.ny, out = new Uint32Array(W * H), cw = Math.ceil(W / CELL), chh = Math.ceil(H / CELL);
-  const { band, col, lo, hi, line, fam, nb, ink } = D, sc = 4095 / (hi - lo);
-  const bandOf = (v) => { const k = ((v - lo) * sc) | 0; return band[k < 0 ? 0 : k > 4095 ? 4095 : k]; };
-  const CL = new Int16Array((cw + 1) * (chh + 1)), SD = new Int8Array((cw + 1) * (chh + 1));
-  const lead = (at) => { let a = 0, b = -1, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const v = at(q); if (v > va) { vb = va; b = a; va = v; a = q; } else if (v > vb) { vb = v; b = q; } } return [a, b, va, vb < 0 ? 0 : vb]; };
-  for (let j = 0, o = 0; j <= chh; j++) for (let i = 0; i <= cw; i++, o++) {
-    const k = (j + oy) * nx0 + i + ox;
-    if (fam) { let a = 0, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const v = F[q][k]; if (v > va) { vb = va; va = v; a = q; } else if (v > vb) vb = v; } CL[o] = a * nb + bandOf(100 * (va - Math.max(vb, 0))); SD[o] = a; }
-    else { const v = F[0][k]; CL[o] = bandOf(v); SD[o] = line != null && v >= line ? 1 : 0; }
-  }
-  // flat cells, edge cells, and those the line crosses or nearly does
-  const FL = new Uint8Array(cw * chh), row = cw + 1;
-  for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-    const a = j * row + i, b = a + 1, c = a + row, d = c + 1;
-    if (CL[a] !== CL[b] || CL[a] !== CL[c] || CL[a] !== CL[d]) FL[j * cw + i] = 1;
-    if (line != null && (SD[a] !== SD[b] || SD[a] !== SD[c] || SD[a] !== SD[d])) FL[j * cw + i] = 2;
-  }
-  if (line != null) for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-    if (FL[j * cw + i] !== 2) continue;
-    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ni = i + di, nj = j + dj; if (ni >= 0 && nj >= 0 && ni < cw && nj < chh && FL[nj * cw + ni] < 2) FL[nj * cw + ni] = 3; }
-  }
-  const LN = CELL + 1, lc = new Int32Array(LN * LN), ls = new Float32Array(LN * LN), lw = J.lw;
-  const inkR = ink & 255, inkG = (ink >> 8) & 255, inkB = (ink >> 16) & 255;
-  for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-    const f = FL[j * cw + i], px0 = i * CELL, py0 = j * CELL;
-    if (!f) {
-      const c = col[CL[j * row + i]], xe = Math.min(W, px0 + CELL), ye = Math.min(H, py0 + CELL);
-      for (let yy = py0; yy < ye; yy++) { const o = yy * W; for (let xx = px0; xx < xe; xx++) out[o + xx] = c; }
-      continue;
+    blur(W, nx, ny); for (let q = 0; q < nc; q++) if (N[q]) blur(N[q], nx, ny);
+    G.W = W; G.N = N;
+  };
+  // a level's figures over the one above it, where its votes reach
+  const settle = (D, G, U, q) => {
+    const W = G.W, A = G.N[q], M2 = D.M0 * D.M0;
+    for (let k = 0; k < U.length; k++) { const wv = W[k]; if (!(wv > 1e-3)) continue; const m = wv * KA, t = (m * m) / (m * m + M2); U[k] += t * (A[k] / wv - U[k]); }
+    return U;
+  };
+  // the whole frame, every 8km
+  function build(D) {
+    let S = built.get(D);
+    if (S) return S;
+    const { n, w, ch } = D, nc = ch.length, C0 = 8 * D.u, CF = C0 / 2 ** FINE, pad = 8 * C0;
+    const x0 = D.bx0 - pad, y0 = D.by0 - pad, x1 = D.bx1 + pad, y1 = D.by1 + pad, ext = Math.max(x1 - x0, y1 - y0);
+    let top = 0; while (C0 * 2 ** top < ext / 3) top++;
+    const Ls = [];
+    for (let l = 0; l <= top; l++) {
+      const c = C0 * 2 ** l, ix = Math.floor(x0 / c) - PAD, iy = Math.floor(y0 / c) - PAD, G = { c, ix, iy, nx: Math.ceil(x1 / c) + PAD - ix + 1, ny: Math.ceil(y1 / c) + PAD - iy + 1 };
+      pile(D, G); Ls.push(G);
     }
-    const k00 = (j + oy) * nx0 + i + ox, k10 = k00 + 1, k01 = k00 + nx0, k11 = k01 + 1;
-    const lineOn = line != null && f >= 2;
-    let ta = 0, tb = 1;
-    if (fam) { const r = lead((q) => (F[q][k00] + F[q][k10] + F[q][k01] + F[q][k11]) / 4); ta = r[0]; tb = r[1] < 0 ? r[0] : r[1]; }
-    for (let b = 0, o = 0; b < LN; b++) { const v = b / CELL; for (let a = 0; a < LN; a++, o++) {
-      const u = a / CELL, w00 = (1 - u) * (1 - v), w10 = u * (1 - v), w01 = (1 - u) * v, w11 = u * v;
-      if (fam) {
-        let ia = 0, va = -1, vb = -1;
-        for (let q = 0; q < nc; q++) { const A = F[q], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11; if (s > va) { vb = va; va = s; ia = q; } else if (s > vb) vb = s; }
-        lc[o] = col[ia * nb + bandOf(100 * (va - Math.max(vb, 0)))];
-        const A = F[ta], B = F[tb]; ls[o] = (A[k00] - B[k00]) * w00 + (A[k10] - B[k10]) * w10 + (A[k01] - B[k01]) * w01 + (A[k11] - B[k11]) * w11;
-      } else {
-        const A = F[0], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11;
-        lc[o] = col[bandOf(s)]; if (lineOn) ls[o] = s - line;
-      }
-    } }
-    for (let b = 0; b < CELL; b++) { const yy = py0 + b; if (yy >= H) break; for (let a = 0; a < CELL; a++) {
-      const xx = px0 + a; if (xx >= W) break;
-      const o = b * LN + a, c0a = lc[o], c1 = lc[o + 1], c2 = lc[o + LN], c3 = lc[o + LN + 1];
-      let R = ((c0a & 255) + (c1 & 255) + (c2 & 255) + (c3 & 255)) / 4, G = (((c0a >> 8) & 255) + ((c1 >> 8) & 255) + ((c2 >> 8) & 255) + ((c3 >> 8) & 255)) / 4, B = (((c0a >> 16) & 255) + ((c1 >> 16) & 255) + ((c2 >> 16) & 255) + ((c3 >> 16) & 255)) / 4;
-      if (lineOn) {
-        const s0 = ls[o], s1 = ls[o + 1], s2 = ls[o + LN], s3 = ls[o + LN + 1], m = (s0 + s1 + s2 + s3) / 4, gx = (s1 + s3 - s0 - s2) / 2, gy = (s2 + s3 - s0 - s1) / 2, g = Math.sqrt(gx * gx + gy * gy);
-        const dist = g > 1e-6 ? Math.abs(m) / g : 9, cov = dist >= lw / 2 + 0.5 ? 0 : dist <= lw / 2 - 0.5 ? 1 : lw / 2 + 0.5 - dist;
-        if (cov > 0) { R += (inkR - R) * cov; G += (inkG - G) * cov; B += (inkB - B) * cov; }
-      }
-      out[yy * W + xx] = ((255 << 24) | (B << 16) | (G << 8) | (R | 0)) >>> 0;
-    } }
+    let sw = 0; const sn = new Float64Array(nc);
+    for (let k = 0; k < n; k++) { sw += w[k]; for (let q = 0; q < nc; q++) sn[q] += w[k] * ch[q][k]; }
+    const T0 = Ls[top], F = [];
+    for (let q = 0; q < nc; q++) { const a = new Float32Array(T0.nx * T0.ny), mean = sn[q] / sw; for (let k = 0; k < a.length; k++) a[k] = T0.W[k] > 1e-3 ? T0.N[q][k] / T0.W[k] : mean; F.push(a); }
+    for (let l = top - 1; l >= 0; l--) { for (let q = 0; q < nc; q++) F[q] = settle(D, Ls[l], subdivide(F[q], Ls[l + 1], Ls[l]), q); if (l) Ls[l].W = Ls[l].N = null; }
+    // the tiles worth making: where a fine level's votes could reach M0, and a little round
+    const G = Ls[0], want = new Set(), span = TN * CF, reach = 2 * C0, floorM = 0.5 * D.M0;
+    for (let j = 0, o = 0; j < G.ny; j++) for (let i = 0; i < G.nx; i++, o++) {
+      if (G.W[o] * KA < floorM) continue;
+      const x = (G.ix + i) * C0, y = (G.iy + j) * C0;
+      for (const dx of [-reach, reach]) for (const dy of [-reach, reach]) want.add(Math.floor((x + dx) / span) * 65536 + Math.floor((y + dy) / span));
+    }
+    G.W = G.N = null;
+    S = { C0, CF, span, G, F, want, tiles: new Map(), nc };
+    built.set(D, S);
+    return S;
   }
-  return { rgba: out.buffer, f: F, grid: { ix: L0.ix, iy: L0.iy, nx: L0.nx, ny: L0.ny, c: c0 } };
+  // a tile: its lattice's finest levels over the frame's, and each coarser cell's average for a wide view
+  function tile(D, S, tx, ty) {
+    const key = tx * 65536 + ty;
+    let t = S.tiles.get(key);
+    if (t !== undefined) return t;
+    if (!S.want.has(key)) { S.tiles.set(key, null); return null; }
+    const ix0 = tx * TN - MG, iy0 = ty * TN - MG, ix1 = ix0 + TN + 2 * MG, iy1 = iy0 + TN + 2 * MG, Ls = [];
+    for (let l = 0; l <= FINE; l++) { const s = 2 ** l, ix = Math.floor(ix0 / s) - PAD, iy = Math.floor(iy0 / s) - PAD; Ls.push({ c: S.CF * s, ix, iy, nx: Math.ceil(ix1 / s) + PAD - ix + 1, ny: Math.ceil(iy1 / s) + PAD - iy + 1 }); }
+    // (a group with nothing here stays at nothing: most tiles need two or three of a Winner field's six)
+    const Top = Ls[FINE], g = S.G, on = new Array(S.nc).fill(false), F = S.F.map((A, q) => { const a = new Float32Array(Top.nx * Top.ny); for (let j = 0, o = 0; j < Top.ny; j++) { const v = Math.max(0, Math.min(g.ny - 1, Top.iy + j - g.iy)); for (let i = 0; i < Top.nx; i++, o++) { const s = A[v * g.nx + Math.max(0, Math.min(g.nx - 1, Top.ix + i - g.ix))]; a[o] = s; if (s > 1e-3) on[q] = true; } } return a; });
+    if (!D.fam) on.fill(true);
+    for (let l = 0; l < FINE; l++) pile(D, Ls[l], on);
+    for (let l = FINE - 1; l >= 0; l--) { for (let q = 0; q < S.nc; q++) F[q] = on[q] ? settle(D, Ls[l], subdivide(F[q], Ls[l + 1], Ls[l]), q) : null; Ls[l].W = Ls[l].N = null; }
+    const G0 = Ls[0], mips = [{ G: G0, F }];
+    for (let m = 1; m <= FINE; m++) {
+      const P = mips[m - 1], g0 = P.G, ix = Math.ceil(g0.ix / 2) + 1, iy = Math.ceil(g0.iy / 2) + 1, nx = Math.floor((g0.ix + g0.nx - 2) / 2) - ix + 1, ny = Math.floor((g0.iy + g0.ny - 2) / 2) - iy + 1, G = { c: g0.c * 2, ix, iy, nx, ny };
+      const down = P.F.map((A) => {
+        if (!A) return null;
+        const a = new Float32Array(nx * ny), r = g0.nx;
+        for (let j = 0, o = 0; j < ny; j++) { const c = (2 * (iy + j) - g0.iy) * r; for (let i = 0; i < nx; i++, o++) { const k = c + 2 * (ix + i) - g0.ix; a[o] = (4 * A[k] + 2 * (A[k - 1] + A[k + 1] + A[k - r] + A[k + r]) + A[k - r - 1] + A[k - r + 1] + A[k + r - 1] + A[k + r + 1]) / 16; } }
+        return a;
+      });
+      mips.push({ G, F: down });
+    }
+    S.tiles.set(key, (t = mips));
+    return t;
+  }
+  // the field at a spot, off a lattice: a cubic B-spline of its four nearest nodes each way
+  function read(G, F, x, y, out) {
+    const u = x / G.c - G.ix, v = y / G.c - G.iy, i = Math.floor(u), j = Math.floor(v), a = u - i, b = v - j, nx = G.nx, ny = G.ny;
+    const a2 = a * a, a3 = a2 * a, b2 = b * b, b3 = b2 * b;
+    wx[0] = (1 - 3 * a + 3 * a2 - a3) / 6; wx[1] = (4 - 6 * a2 + 3 * a3) / 6; wx[2] = (1 + 3 * a + 3 * a2 - 3 * a3) / 6; wx[3] = a3 / 6;
+    wy[0] = (1 - 3 * b + 3 * b2 - b3) / 6; wy[1] = (4 - 6 * b2 + 3 * b3) / 6; wy[2] = (1 + 3 * b + 3 * b2 - 3 * b3) / 6; wy[3] = b3 / 6;
+    const inner = i >= 1 && j >= 1 && i < nx - 2 && j < ny - 2;
+    for (let q = 0; q < F.length; q++) {
+      const A = F[q];
+      if (!A) { out[q] = 0; continue; }
+      let s = 0;
+      if (inner) {
+        for (let dj = 0, o = (j - 1) * nx + i - 1; dj < 4; dj++, o += nx) s += wy[dj] * (wx[0] * A[o] + wx[1] * A[o + 1] + wx[2] * A[o + 2] + wx[3] * A[o + 3]);
+      } else for (let dj = 0; dj < 4; dj++) {
+        const jj = j + dj - 1, r = (jj < 0 ? 0 : jj >= ny ? ny - 1 : jj) * nx; let row = 0;
+        for (let di = 0; di < 4; di++) { const ii = i + di - 1; row += wx[di] * A[r + (ii < 0 ? 0 : ii >= nx ? nx - 1 : ii)]; }
+        s += wy[dj] * row;
+      }
+      out[q] = s;
+    }
+  }
+  let lastKey = null, lastTile = null, lastS = null;
+  function sample(D, S, x, y, mip, out) {
+    if (mip >= FINE) { read(S.G, S.F, x, y, out); return; }
+    const tx = Math.floor(x / S.span), ty = Math.floor(y / S.span), key = tx * 65536 + ty;
+    if (S !== lastS || key !== lastKey) { lastS = S; lastKey = key; lastTile = tile(D, S, tx, ty); }
+    const t = lastTile;
+    if (t) read(t[mip].G, t[mip].F, x, y, out); else read(S.G, S.F, x, y, out);
+  }
+  // the reading at a spot, whatever is on the screen
+  function at(D, x, y) {
+    const S = build(D), out = new Float64Array(S.nc);
+    sample(D, S, x, y, 0, out);
+    return out;
+  }
+  // the picture of a window J of the field
+  function raster(D, J) {
+    const S = build(D), nc = S.nc, p = J.px, c0 = CELL * p, W = J.nx, H = J.ny, cw = Math.ceil(W / CELL), chh = Math.ceil(H / CELL), row = cw + 1;
+    const mip = Math.max(0, Math.min(FINE, Math.round(Math.log2(c0 / S.CF)))), F = Array.from({ length: nc }, () => new Float32Array(row * (chh + 1))), v = new Float64Array(nc);
+    for (let j = 0, o = 0; j <= chh; j++) for (let i = 0; i <= cw; i++, o++) { sample(D, S, J.x0 + i * c0, J.y0 + j * c0, mip, v); for (let q = 0; q < nc; q++) F[q][o] = v[q]; }
+    const out = new Uint32Array(W * H);
+    const { band, col, lo, hi, line, fam, nb, ink } = D, sc = 4095 / (hi - lo);
+    const bandOf = (s) => { const k = ((s - lo) * sc) | 0; return band[k < 0 ? 0 : k > 4095 ? 4095 : k]; };
+    const CL = new Int16Array(row * (chh + 1)), SD = new Int8Array(row * (chh + 1));
+    const lead = (at2) => { let a = 0, b = -1, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const s = at2(q); if (s > va) { vb = va; b = a; va = s; a = q; } else if (s > vb) { vb = s; b = q; } } return [a, b, va, vb < 0 ? 0 : vb]; };
+    for (let o = 0; o < CL.length; o++) {
+      if (fam) { let a = 0, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const s = F[q][o]; if (s > va) { vb = va; va = s; a = q; } else if (s > vb) vb = s; } CL[o] = a * nb + bandOf(100 * (va - Math.max(vb, 0))); SD[o] = a; }
+      else { const s = F[0][o]; CL[o] = bandOf(s); SD[o] = line != null && s >= line ? 1 : 0; }
+    }
+    // flat cells, edge cells, and those the line crosses or nearly does
+    const FL = new Uint8Array(cw * chh);
+    for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
+      const a = j * row + i, b = a + 1, c = a + row, d = c + 1;
+      if (CL[a] !== CL[b] || CL[a] !== CL[c] || CL[a] !== CL[d]) FL[j * cw + i] = 1;
+      if (line != null && (SD[a] !== SD[b] || SD[a] !== SD[c] || SD[a] !== SD[d])) FL[j * cw + i] = 2;
+    }
+    if (line != null) for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
+      if (FL[j * cw + i] !== 2) continue;
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ni = i + di, nj = j + dj; if (ni >= 0 && nj >= 0 && ni < cw && nj < chh && FL[nj * cw + ni] < 2) FL[nj * cw + ni] = 3; }
+    }
+    const LN = CELL + 1, lc = new Int32Array(LN * LN), ls = new Float32Array(LN * LN), lw = J.lw;
+    const inkR = ink & 255, inkG = (ink >> 8) & 255, inkB = (ink >> 16) & 255;
+    for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
+      const f = FL[j * cw + i], px0 = i * CELL, py0 = j * CELL;
+      if (!f) {
+        const c = col[CL[j * row + i]], xe = Math.min(W, px0 + CELL), ye = Math.min(H, py0 + CELL);
+        for (let yy = py0; yy < ye; yy++) { const o = yy * W; for (let xx = px0; xx < xe; xx++) out[o + xx] = c; }
+        continue;
+      }
+      const k00 = j * row + i, k10 = k00 + 1, k01 = k00 + row, k11 = k01 + 1, lineOn = line != null && f >= 2;
+      let ta = 0, tb = 1;
+      if (fam) { const r = lead((q) => (F[q][k00] + F[q][k10] + F[q][k01] + F[q][k11]) / 4); ta = r[0]; tb = r[1] < 0 ? r[0] : r[1]; }
+      for (let b = 0, o = 0; b < LN; b++) { const t = b / CELL; for (let a = 0; a < LN; a++, o++) {
+        const u = a / CELL, w00 = (1 - u) * (1 - t), w10 = u * (1 - t), w01 = (1 - u) * t, w11 = u * t;
+        if (fam) {
+          let ia = 0, va = -1, vb = -1;
+          for (let q = 0; q < nc; q++) { const A = F[q], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11; if (s > va) { vb = va; va = s; ia = q; } else if (s > vb) vb = s; }
+          lc[o] = col[ia * nb + bandOf(100 * (va - Math.max(vb, 0)))];
+          const A = F[ta], B = F[tb]; ls[o] = (A[k00] - B[k00]) * w00 + (A[k10] - B[k10]) * w10 + (A[k01] - B[k01]) * w01 + (A[k11] - B[k11]) * w11;
+        } else {
+          const A = F[0], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11;
+          lc[o] = col[bandOf(s)]; if (lineOn) ls[o] = s - line;
+        }
+      } }
+      for (let b = 0; b < CELL; b++) { const yy = py0 + b; if (yy >= H) break; for (let a = 0; a < CELL; a++) {
+        const xx = px0 + a; if (xx >= W) break;
+        const o = b * LN + a, c0a = lc[o], c1 = lc[o + 1], c2 = lc[o + LN], c3 = lc[o + LN + 1];
+        let R = ((c0a & 255) + (c1 & 255) + (c2 & 255) + (c3 & 255)) / 4, G = (((c0a >> 8) & 255) + ((c1 >> 8) & 255) + ((c2 >> 8) & 255) + ((c3 >> 8) & 255)) / 4, B = (((c0a >> 16) & 255) + ((c1 >> 16) & 255) + ((c2 >> 16) & 255) + ((c3 >> 16) & 255)) / 4;
+        if (lineOn) {
+          const s0 = ls[o], s1 = ls[o + 1], s2 = ls[o + LN], s3 = ls[o + LN + 1], m = (s0 + s1 + s2 + s3) / 4, gx = (s1 + s3 - s0 - s2) / 2, gy = (s2 + s3 - s0 - s1) / 2, g = Math.sqrt(gx * gx + gy * gy);
+          const dist = g > 1e-6 ? Math.abs(m) / g : 9, cov = dist >= lw / 2 + 0.5 ? 0 : dist <= lw / 2 - 0.5 ? 1 : lw / 2 + 0.5 - dist;
+          if (cov > 0) { R += (inkR - R) * cov; G += (inkG - G) * cov; B += (inkB - B) * cov; }
+        }
+        out[yy * W + xx] = ((255 << 24) | (B << 16) | (G << 8) | (R | 0)) >>> 0;
+      } }
+    }
+    return { rgba: out.buffer };
+  }
+  return { at, raster };
 }
 
 /* ----- the rasters -----
@@ -464,23 +556,27 @@ const SF = { wk: null, dead: false, key: null, m: null, data: null, none: null, 
 function surfaceWorker() {
   if (SF.wk || SF.dead) return SF.wk;
   try {
-    const src = `const run=${surfaceRaster};const sets=new Map();onmessage=async(e)=>{const q=e.data;if(q.t==="set"){sets.set(q.key,q.D);while(sets.size>3)sets.delete(sets.keys().next().value);return;}
-const D=sets.get(q.key);if(!D){postMessage({id:q.id,key:q.key,J:q.J,gone:true});return;}
-const r=run(D,q.J);let bitmap=null;try{bitmap=await createImageBitmap(new ImageData(new Uint8ClampedArray(r.rgba),q.J.nx,q.J.ny));}catch(x){}
-const moved=r.f.map((a)=>a.buffer);if(bitmap)moved.push(bitmap);else moved.push(r.rgba);postMessage({id:q.id,key:q.key,J:q.J,bitmap,rgba:bitmap?null:r.rgba,f:r.f,grid:r.grid},moved);};`;
+    const src = `const E=(${surfaceEngine})();const sets=new Map();onmessage=async(e)=>{const q=e.data;if(q.t==="set"){sets.set(q.key,q.D);while(sets.size>3)sets.delete(sets.keys().next().value);return;}
+const D=sets.get(q.key);
+if(q.t==="at"){if(D)postMessage({t:"at",key:q.key,id:q.id,x:q.x,y:q.y,v:E.at(D,q.x,q.y)});return;}
+if(!D){postMessage({id:q.id,key:q.key,J:q.J,gone:true});return;}
+const r=E.raster(D,q.J);let bitmap=null;try{bitmap=await createImageBitmap(new ImageData(new Uint8ClampedArray(r.rgba),q.J.nx,q.J.ny));}catch(x){}
+const moved=bitmap?[bitmap]:[r.rgba];postMessage({id:q.id,key:q.key,J:q.J,bitmap,rgba:bitmap?null:r.rgba},moved);};`;
     SF.wk = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
-    SF.wk.onmessage = (e) => surfaceDone(e.data);
+    SF.wk.onmessage = (e) => (e.data.t === "at" ? surfaceHeard(e.data) : surfaceDone(e.data));
     SF.wk.onerror = () => { SF.dead = true; SF.wk = null; SF.busy = false; SF.sent = null; schedule(); };
   } catch (e) { SF.dead = true; SF.wk = null; }
   return SF.wk;
 }
+let pageEngineMade = null;
+const pageEngine = () => (pageEngineMade ??= surfaceEngine()); // (where no worker will start)
 function surfaceJob(J) {
   SF.busy = true;
   const id = ++SF.id, key = SF.key, wk = surfaceWorker();
   if (wk) {
     if (SF.sent !== key) { wk.postMessage({ t: "set", key, D: SF.data }); SF.sent = key; }
     wk.postMessage({ t: "job", id, key, J });
-  } else setTimeout(() => { if (key !== SF.key) { SF.busy = false; schedule(); return; } const r = surfaceRaster(SF.data, J); surfaceDone({ id, key, J, bitmap: null, rgba: r.rgba, f: r.f, grid: r.grid }); }, 0);
+  } else setTimeout(() => { if (key !== SF.key) { SF.busy = false; schedule(); return; } const r = pageEngine().raster(SF.data, J); surfaceDone({ id, key, J, bitmap: null, rgba: r.rgba }); }, 0);
 }
 async function surfaceDone(q) {
   SF.busy = false;
@@ -492,7 +588,7 @@ async function surfaceDone(q) {
   }
   const J = q.J, pat = ctx.createPattern(src, "no-repeat");
   pat.setTransform(new DOMMatrix([J.px, 0, 0, J.px, J.x0, J.y0]));
-  const L = { pat, src, J, x0: J.x0, y0: J.y0, x1: J.x0 + J.nx * J.px, y1: J.y0 + J.ny * J.px, f: q.f, grid: q.grid };
+  const L = { pat, src, J, x0: J.x0, y0: J.y0, x1: J.x0 + J.nx * J.px, y1: J.y0 + J.ny * J.px };
   const was = J.base ? SF.base : SF.view;
   if (J.base) { SF.base = L; SF.t1 = performance.now(); if (drawFade) drawFade.t0 = SF.t1; } else SF.view = L;
   if (was) closeLayer(was);
@@ -510,7 +606,7 @@ function surfaceStart(m, key) {
     old.forEach((L) => L.pat.setTransform(new DOMMatrix([A.a * L.J.px, 0, 0, A.a * L.J.px, A.a * L.J.x0 + A.bx, A.a * L.J.y0 + A.by])));
     SF.old = old;
   } else old.forEach(closeLayer);
-  SF.key = key; SF.m = m; SF.sent = null;
+  SF.key = key; SF.m = m; SF.sent = null; SF.here = null;
   const d = surfaceData(m);
   SF.empty = !d; SF.data = d ? d.D : null; SF.none = d ? d.none : null; SF.ids = d ? d.D.ids || null : null;
   SF.t1 = performance.now();
@@ -523,7 +619,7 @@ function surfaceTick(m) {
   const [[hx0, hy0], [hx1, hy1]] = homeBox(m), hw = hx1 - hx0, hh = hy1 - hy0;
   if (!SF.base) {
     const px = Math.max(hw, hh) / 1500, c = 3 * px, x0 = SNAP(hx0 - 0.08 * hw, c), y0 = SNAP(hy0 - 0.08 * hh, c);
-    surfaceJob({ base: true, px, x0, y0, nx: Math.ceil((1.16 * hw) / c + 1) * 3, ny: Math.ceil((1.16 * hh) / c + 1) * 3, floor: Math.max(SURF_MIN, Math.max(hw, hh) / 130), lw: 1.5 });
+    surfaceJob({ base: true, px, x0, y0, nx: Math.ceil((1.16 * hw) / c + 1) * 3, ny: Math.ceil((1.16 * hh) / c + 1) * 3, lw: 1.5 });
     return;
   }
   const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
@@ -531,7 +627,7 @@ function surfaceTick(m) {
   const [vx0, vy0, vx1, vy1] = viewBox(), V = SF.view;
   if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.x0 <= vx0 && V.y0 <= vy0 && V.x1 >= vx1 && V.y1 >= vy1) return;
   const vw = vx1 - vx0, vh = vy1 - vy0, c = 3 * want, x0 = SNAP(vx0 - 0.25 * vw, c), y0 = SNAP(vy0 - 0.25 * vh, c);
-  surfaceJob({ px: want, x0, y0, nx: Math.ceil((1.5 * vw) / c + 1) * 3, ny: Math.ceil((1.5 * vh) / c + 1) * 3, floor: Math.max(SURF_MIN, SURF_FLOOR / T.k), lw: 1.25 * Math.min(q, 1.5) });
+  surfaceJob({ px: want, x0, y0, nx: Math.ceil((1.5 * vw) / c + 1) * 3, ny: Math.ceil((1.5 * vh) / c + 1) * 3, lw: 1.25 * Math.min(q, 1.5) });
 }
 // what the seats' fill draws this frame: the layers, under the view's raster where it reaches
 function surfaceLook(m, a) {
@@ -549,17 +645,37 @@ function surfaceLook(m, a) {
   if (!ls.length) return null;
   return { ls, top: ls[ls.length - 1].pat, under: a < 1 || (!SF.old && ls[0].a < 1), none: SF.none };
 }
-// the field at a spot on the plane: a figure, or who leads there and by how much
-function surfaceAt(x, y) {
-  const L = [SF.view, SF.base].find((q) => q && x >= q.x0 && x <= q.x1 && y >= q.y0 && y <= q.y1);
-  if (!L) return null;
-  const g = L.grid, u = x / g.c - g.ix, v = y / g.c - g.iy, i = Math.floor(u), j = Math.floor(v);
-  if (i < 0 || j < 0 || i >= g.nx - 1 || j >= g.ny - 1) return null;
-  const fx = u - i, fy = v - j, o = j * g.nx + i;
-  const at = (A) => A[o] * (1 - fx) * (1 - fy) + A[o + 1] * fx * (1 - fy) + A[o + g.nx] * (1 - fx) * fy + A[o + g.nx + 1] * fx * fy;
-  if (!SF.ids) return { v: at(L.f[0]) };
-  const r = L.f.map((A, k) => [SF.ids[k], at(A)]).sort((p, q) => q[1] - p[1]);
+// the field at a spot on the plane: a figure, or who leads there and by how much. It's the one field's
+// own value, asked of whoever holds it, so nothing on the screen can touch it
+const surfaceWords = (v) => {
+  if (!SF.ids) return { v: v[0] };
+  const r = [...v].map((x, k) => [SF.ids[k], x]).sort((p, q) => q[1] - p[1]);
   return { fam: r[0][0], lead: 100 * (r[0][1] - Math.max(r[1] ? r[1][1] : 0, 0)) };
+};
+let askId = 0;
+const askWaiting = new Map();
+function surfaceAt(x, y) {
+  return new Promise((done) => {
+    if (!SF.data) { done(null); return; }
+    if (!SF.wk) { done(surfaceWords(pageEngine().at(SF.data, x, y))); return; }
+    if (SF.sent !== SF.key) { SF.wk.postMessage({ t: "set", key: SF.key, D: SF.data }); SF.sent = SF.key; }
+    const id = ++askId; askWaiting.set(id, done);
+    SF.wk.postMessage({ t: "at", key: SF.key, id, x, y });
+  });
+}
+function surfaceHeard(q) {
+  const done = askWaiting.get(q.id); askWaiting.delete(q.id);
+  if (done) done(q.key === SF.key ? surfaceWords(q.v) : null);
+}
+// the tooltip's reading: the latest answer for the pointer, the next on its way
+function surfaceAsk(x, y) {
+  if (SF.asking) { SF.askNext = [x, y]; return; }
+  SF.asking = true;
+  surfaceAt(x, y).then((a) => {
+    SF.asking = false; SF.here = a;
+    if (SF.askNext) { const [nx, ny] = SF.askNext; SF.askNext = null; surfaceAsk(nx, ny); }
+    tipRefresh();
+  });
 }
 
 /* ----- the change of drawing: a crossfade of the fills under the balloons' rise ----- */

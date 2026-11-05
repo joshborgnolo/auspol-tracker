@@ -1,9 +1,12 @@
 /* test-map-draw.mjs – pins /map/'s drawings (app-2b-draw.js): seats, balloons and the surface.
 
-   - surfaceRaster, the field and its picture, is a worker's text: it runs here in a bare vm
+   - surfaceEngine, the field and its pictures, is a worker's text: it runs here in a bare vm
      context, so anything it reached for outside itself would fail. On small made-up elections
      it must give back what went in: a flat field, a line where two sides meet, the votes'
      weight, and no neighbourhood claimed by a handful of votes.
+   - there is one field: what a spot reads can't turn on the zoom, the window or what was
+     asked before it, and a picture at any grain shows the same side (a reader found a seat's
+     patch flipping sides as they zoomed, and two answers at one zoom, on 2026-11-06).
    - the contests' numbers are the site's: FP_ON and the Senate tables in flows.mjs.
    - the contests are offered where the data says they should be: One Nation in three seats
      in four, with Senate orders to read.
@@ -25,10 +28,11 @@ const draw = R(".build/map/app/app-2b-draw.js"), ui = R(".build/map/app/app-6-ui
 const between = (a, b) => { const i = draw.indexOf(a), j = draw.indexOf(b, i); assert.ok(i >= 0 && j > i, a); return draw.slice(i, j); };
 
 /* ----- the raster, alone ----- */
-const src = between("function surfaceRaster(D, J) {", "\n/* ----- the rasters -----");
-const raster = vm.runInNewContext(`(${src})`, {});
+const src = between("function surfaceEngine() {", "\n/* ----- the rasters -----");
+const engine = () => vm.runInNewContext(`(${src})()`, {});
+const E = engine(), raster = E.raster;
 const pts = (list) => {
-  const n = list.length, D = { n, x: new Float32Array(n), y: new Float32Array(n), w: new Float32Array(n), late: new Float32Array(n), bx0: Infinity, by0: Infinity, bx1: -Infinity, by1: -Infinity };
+  const n = list.length, D = { u: 1, n, x: new Float32Array(n), y: new Float32Array(n), w: new Float32Array(n), late: new Float32Array(n), bx0: Infinity, by0: Infinity, bx1: -Infinity, by1: -Infinity };
   list.forEach(([x, y, w], k) => { D.x[k] = x; D.y[k] = y; D.w[k] = w; D.bx0 = Math.min(D.bx0, x); D.bx1 = Math.max(D.bx1, x); D.by0 = Math.min(D.by0, y); D.by1 = Math.max(D.by1, y); });
   return D;
 };
@@ -39,9 +43,8 @@ const steps = (D, line = null) => {
   D.col = Uint32Array.from({ length: 10 }, (_, k) => (0xff000000 | (k * 20 + 10)) >>> 0);
   return D;
 };
-const J = { px: 1, x0: 0, y0: 0, nx: 300, ny: 300, floor: 8, lw: 1.5 };
+const J = { px: 1, x0: 0, y0: 0, nx: 300, ny: 300, lw: 1.5 };
 const px = (r, x, y) => new Uint32Array(r.rgba)[y * J.nx + x];
-const fieldAt = (r, x, y) => { const g = r.grid, i = Math.round(x / g.c) - g.ix, j = Math.round(y / g.c) - g.iy; return r.f[0][j * g.nx + i]; };
 const grid = (fn) => { const l = []; for (let y = 10; y < 300; y += 40) for (let x = 10; x < 300; x += 40) l.push(fn(x, y)); return l; };
 
 { // the same figure everywhere gives one colour and no line
@@ -49,7 +52,7 @@ const grid = (fn) => { const l = []; for (let y = 10; y < 300; y += 40) for (let
   const r = raster(D, J), a = new Uint32Array(r.rgba);
   assert.ok(a.every((c) => c === a[0]), "a flat reading is one colour");
   assert.equal(a[0], D.col[6], "in its own step");
-  assert.ok(Math.abs(fieldAt(r, 150, 150) - 62) < 1e-3, "and reads as itself");
+  assert.ok(Math.abs(E.at(D, 150, 150)[0] - 62) < 1e-3, "and reads as itself");
 }
 { // two sides: each keeps its figure, and the line runs between them
   const l = grid((x, y) => [x, y, 2000]), D = steps(pts(l), 50); D.ch = [Float32Array.from(l, ([x]) => (x < 150 ? 35 : 75))];
@@ -66,18 +69,18 @@ const grid = (fn) => { const l = []; for (let y = 10; y < 300; y += 40) for (let
 }
 { // votes weigh: a big place outweighs a small one beside it
   const l = [[140, 150, 40000], [160, 150, 400]], D = steps(pts([...l, [10, 10, 1], [290, 290, 1]]), null); D.ch = [Float32Array.from([40, 60, 50, 50])];
-  const r = raster(D, J);
-  assert.ok(Math.abs(fieldAt(r, 150, 150) - 40) < 2, `the big place's figure leads (${fieldAt(r, 150, 150).toFixed(1)})`);
+  const v = E.at(D, 150, 150)[0];
+  assert.ok(Math.abs(v - 40) < 2, `the big place's figure leads (${v.toFixed(1)})`);
 }
 { // a handful of votes can't claim a neighbourhood: the level above speaks for it
   const l = [...grid((x, y) => [x, y, 3000]).filter(([x, y]) => Math.hypot(x - 150, y - 150) > 70), [150, 150, 10]];
   const D = steps(pts(l), null); D.ch = [Float32Array.from(l, (q, k) => (k === l.length - 1 ? 95 : 40))];
-  const r = raster(D, J);
-  assert.ok(fieldAt(r, 150, 150) < 50, `ten votes at 95 don't move the ground around them (${fieldAt(r, 150, 150).toFixed(1)})`);
+  const v = E.at(D, 150, 150)[0];
+  assert.ok(v < 50, `ten votes at 95 don't move the ground around them (${v.toFixed(1)})`);
 }
 { // where nobody voted the field still reaches, smoothly, from the nearest places
   const l = [[20, 150, 9000], [280, 150, 9000]], D = steps(pts(l), null); D.ch = [Float32Array.from([20, 80])];
-  const r = raster(D, J), mid = fieldAt(r, 150, 150);
+  const mid = E.at(D, 150, 150)[0];
   assert.ok(mid > 30 && mid < 70, `the empty middle lies between its two towns (${mid.toFixed(1)})`);
 }
 { // who leads: two groups, each ahead on its own ground, deeper as the lead grows, a line where they meet
@@ -87,6 +90,33 @@ const grid = (fn) => { const l = []; for (let y = 10; y < 300; y += 40) for (let
   const r = raster(D, J);
   assert.equal(px(r, 40, 150), D.col[0 * 4 + 3], "the first leads the left by forty");
   assert.equal(px(r, 260, 150), D.col[1 * 4 + 2], "the second leads the right by twenty-five");
+}
+
+{ // one field: a small town of one side in a big district of the other, as a Hume in Sydney's shadow
+  const l = [], at = [];
+  for (let y = 10; y < 900; y += 30) for (let x = 10; x < 900; x += 30) { if (Math.hypot(x - 450, y - 450) < 60) continue; l.push([x, y, 9000]); at.push(70); } // the district, at 70
+  for (const [x, y] of [[450, 450], [444, 456], [456, 444], [456, 456], [444, 444]]) { l.push([x, y, 3000]); at.push(25); } // the town, at 25
+  const D = steps(pts(l), 50); D.ch = [Float32Array.from(at)];
+  const read = () => [...E.at(D, 450, 450)], first = read();
+  assert.ok(first[0] < 50, `the town keeps its own side (${first[0].toFixed(1)})`);
+  // every grain, every window, either way, wide or close, with a stranger's question in between
+  const looks = [];
+  for (const px of [4, 2.83, 2, 1.41, 1, 0.71, 0.5, 0.25, 0.125, 0.5, 2, 4]) {
+    const nx = 3 * Math.ceil(600 / 3), c = 3 * px, x0 = Math.floor((450 - (nx * px) / 2) / c) * c, y0 = Math.floor((450 - (nx * px) / 2) / c) * c;
+    const r = raster(D, { px, x0, y0, nx, ny: nx, lw: 1.5 }), a = new Uint32Array(r.rgba);
+    looks.push((a[Math.round((450 - y0) / px) * nx + Math.round((450 - x0) / px)] & 255));
+    assert.deepEqual(read(), first, `at grain ${px} the spot reads what it read`);
+  }
+  assert.ok(looks.every((v) => v < 110), `the picture holds the town's side at every grain (its side's steps are under 110): ${looks.join(" ")}`);
+  const other = engine(), D2 = steps(pts(l), 50); D2.ch = [Float32Array.from(at)];
+  other.at(D2, 10, 10); other.at(D2, 880, 880);
+  assert.equal(other.at(D2, 450, 450)[0], first[0], "a fresh engine, asked in another order, gives the same figure to the digit");
+}
+{ // a frame's scale is in kilometres: the same places at a different scale give the same reading
+  const l = [...grid((x, y) => [x, y, 2000]), [150, 150, 9000]], val = l.map(([x], k) => (k === l.length - 1 ? 20 : x < 150 ? 40 : 60));
+  const A = steps(pts(l), 50); A.ch = [Float32Array.from(val)];
+  const B = steps(pts(l.map(([x, y, w]) => [x * 2, y * 2, w])), 50); B.u = 2; B.ch = [Float32Array.from(val)];
+  assert.ok(Math.abs(E.at(A, 150, 150)[0] - E.at(B, 300, 300)[0]) < 0.05, "a kilometre is a kilometre on any frame's plane");
 }
 
 /* ----- the contests' numbers ----- */

@@ -57,12 +57,12 @@ await page.close();
 page = await open("y=2025&l=tpp&draw=surface");
 for (const n of ["Grayndler", "Melbourne"]) {
   await page.evaluate((n) => { const m = __map.M(); __map.goDiv(m.byName.get(n), { dur: 0 }); }, n); await wait(2200);
-  const r = await page.evaluate((n) => {
+  const r = await page.evaluate(async (n) => {
     const m = __map.M(), b = m.booth; let wv = 0, w = 0, fv = 0;
-    for (const j of b.byDiv[m.byName.get(n)]) { const v = b.tpp[j]; if (Number.isNaN(v) || Number.isNaN(b.x[j]) || !b.formal[j]) continue; const f = __map.surfaceAt(b.x[j], b.y[j]); if (!f) continue; wv += v * b.formal[j]; w += b.formal[j]; fv += f.v * b.formal[j]; }
+    for (const j of b.byDiv[m.byName.get(n)]) { const v = b.tpp[j]; if (Number.isNaN(v) || Number.isNaN(b.x[j]) || !b.formal[j]) continue; const f = await __map.surfaceAt(b.x[j], b.y[j]); if (!f) continue; wv += v * b.formal[j]; w += b.formal[j]; fv += f.v * b.formal[j]; }
     return [wv / w, fv / w];
   }, n);
-  ok(`${n}: at seat zoom the field comes back to its booths`, Math.abs(r[0] - r[1]) < 5, r.map((v) => v.toFixed(1)).join(" v "));
+  ok(`${n}: the field keeps to its booths`, Math.abs(r[0] - r[1]) < 5, r.map((v) => v.toFixed(1)).join(" v "));
 }
 await page.evaluate(() => __map.goAus({ dur: 0 })); await wait(1200);
 for (const y of [1993, 2004, 2013, 2022, "now", "sa26", "qld24", "qld17", "vic22", "nsw23", "wa25"]) {
