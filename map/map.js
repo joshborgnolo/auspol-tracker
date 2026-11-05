@@ -8380,16 +8380,25 @@ canvas.addEventListener("click", (e) => {
   if (h && h.kind === "sen") { selectSen({ level: "sen", st: SENM.divs[h.i].st, i: h.i }); return; }
   if (!h && senOn()) { if (S.ssel.level !== "aus") selectSen({ level: "aus" }); return; }
   if (!h) {
-    // a miss lets the selection go — on the map only near the whole-country
-    // fit (a zoomed miss is a pan mis-tap); the chamber has no camera, so a
-    // click away from the seats always deselects
+    // a click on open water lets the selection out — always in the chamber,
+    // which has no camera to move; on the map it leaves the camera alone at
+    // any zoom, and the double click below is the one that takes it home
     if (S.sel.level === "aus") return;
-    if (S.view === "chamber" || (S.view === "map" && T.k < HOME.k * 1.4)) goAus();
+    if (S.view === "chamber") goAus();
+    else if (S.view === "map") select({ level: "aus" }, { fly: false });
     return;
   }
   if (h.go) goIsland(h.go);
   else if (h.kind === "booth") goBooth(h.i);
   else goDiv(h.i, { fly: S.view === "map" });
+});
+// a double click on open water takes the map all the way out home (the pair's
+// first click has already let any selection out where the camera stands)
+canvas.addEventListener("dblclick", (e) => {
+  if (S.view !== "map") return;
+  const r = canvas.getBoundingClientRect();
+  if (hitTest(e.clientX - r.left, e.clientY - r.top)) return;
+  goAus();
 });
 // the small chamber in the story
 $("#story").addEventListener("pointermove", (e) => {
