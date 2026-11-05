@@ -2,7 +2,7 @@
 function lensShort() {
   switch (S.lens) {
     case "winner": return isNowY(S.year) ? "Held by" : "Winner";
-    case "tpp": return S.tppMode === "swing" ? "Swing to Labor" : "Labor 2PP";
+    case "tpp": return S.tppMode === "swing" ? "Swing to Labor" : axisNow(M()) !== "AC" ? `${axisCap()[0]} v ${axisNames()[1]}` : "Labor 2PP";
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} change` : `${famLeg(S.party)} primary`;
     case "senate": return senGap() ? `${famLeg(S.party)}, Senate v House` : `${famLeg(S.party)} Senate vote`;
     case "flow": return `${famLeg(S.from)} to Labor`;
@@ -27,7 +27,7 @@ function valueText(v, kind, ctx) {
   if (v == null) {
     switch (S.lens) {
       case "senate": return ctx ? senNoValue(ctx.m, kind, ctx.d) : "No Senate count here";
-      case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : "No Labor v Coalition count";
+      case "tpp": return S.tppMode === "swing" ? (kind === "booth" ? "New place, so no swing" : "No swing recorded") : axisNow(M()) !== "AC" ? "These two didn’t both stand here" : "No Labor v Coalition count";
       case "flow": return "Final two weren’t Labor and the Coalition";
       case "senpref": return ctx ? spNoValue(ctx.m, kind, ctx.d) : "Too few of these ballots";
       case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 1993 on" : "No census figure here") : "No score here";
@@ -37,7 +37,10 @@ function valueText(v, kind, ctx) {
   }
   switch (S.lens) {
     case "winner": return kind === "booth" ? `${FAM_NAME[v]} led here` : FAM_NAME[v];
-    case "tpp": return S.tppMode === "swing" ? (Math.abs(v) < 0.05 ? "No swing" : `${f1(Math.abs(v))} swing to ${v > 0 ? "Labor" : "the Coalition"}`) : `Labor ${f1(v)} · Coalition ${f1(100 - v)}`;
+    case "tpp": {
+      if (S.tppMode !== "swing" && axisNow(M()) !== "AC") { const [A, B] = axisCap(); return `${A} ${f1(v)} · ${B.replace(/^The /, "")} ${f1(100 - v)}`; }
+      return S.tppMode === "swing" ? (Math.abs(v) < 0.05 ? "No swing" : `${f1(Math.abs(v))} swing to ${v > 0 ? "Labor" : "the Coalition"}`) : `Labor ${f1(v)} · Coalition ${f1(100 - v)}`;
+    }
     case "fp": return S.fpMode === "change" ? `${famLeg(S.party)} ${sgn(v)} points` : `${famLeg(S.party)} ${f1(v)}%`;
     case "senate": return senGap() ? `${famLeg(S.party)} ${Math.abs(v) < 0.05 ? "level" : `${pts(v)} ${v > 0 ? "higher" : "lower"}`} in the Senate` : `${famLeg(S.party)} ${f1(v)}% in the Senate`;
     case "flow": return `${f0(v)}% of ${famLeg(S.from)} preferences to Labor`;
@@ -84,15 +87,15 @@ function renderLenses() {
 let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
-const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL));
-const legendState = () => [S.view, boothsShown(), S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL || drawOf(M()) !== "seats"));
+const legendState = () => [S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
 const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
 function legendIfChanged() { if (legendState() !== legendKey) renderLegend(); }
 const RANGE = () => {
   switch (S.lens) {
-    case "tpp": return S.tppMode === "swing" ? [-10, 10] : [30, 70];
+    case "tpp": return S.tppMode === "swing" ? [-10, 10] : axisNow(M()) !== "AC" ? [50 - axisSpan(), 50 + axisSpan()] : [30, 70];
     case "fp": return S.fpMode === "change" ? [-15, 15] : [0, FPMAX[S.party]];
     case "senate": return senGap() ? [-10, 10] : [0, FPMAX[S.party]];
     case "flow": case "senpref": return [10, 90];
@@ -110,7 +113,10 @@ function legendHist(m, lo, hi) {
   const n = dec ? 10 : 20, w = (hi - lo) / n, counts = new Array(n).fill(0);
   for (const v of vals) counts[clamp(Math.floor((v - lo) / w + (dec ? 0.5 : 0)), 0, n - 1)]++;
   const max = Math.max(...counts);
-  return `<div class="lg-hist" aria-hidden="true">${counts.map((c, k) => `<i style="height:${(100 * c) / max}%;background:${colCss(colorOf(lo + (k + 0.5) * w))}"></i>`).join("")}</div>`;
+  const bars = counts.map((c, k) => `<i style="height:${(100 * c) / max}%;background:${colCss(colorOf(lo + (k + 0.5) * w))}"></i>`);
+  // these keys read Labor's side first (◀ Labor ahead), the high end of the figure: the bars stand over their own part of the ramp
+  if (S.lens === "tpp" || S.lens === "flow" || S.lens === "senpref") bars.reverse();
+  return `<div class="lg-hist" aria-hidden="true">${bars.join("")}</div>`;
 }
 function renderLegend() {
   legendKey = legendState();
@@ -121,6 +127,8 @@ function renderLegend() {
   if (!m) { el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
+  // a surface goes in steps, and its key with it
+  if (!senOn() && drawOf(m) === "surface") { const r = el.querySelector(".lg-ramp"), g = r ? surfaceRampCss(m) : null; if (g) r.style.background = g; }
   holdLegendHeight(m);
 }
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
@@ -160,15 +168,15 @@ function legendHeightOf(m, y, w, probe) {
   // to the places (or out of them) never moves the stage under the reader
   const key = [w, S.view, y, real, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.seat].join("|");
   if (!legendHeights.has(key)) {
-    const keep = { seat: S.seat, year: S.year };
+    const keep = { seat: S.seat, year: S.year, draw: S.draw };
     let hMax = 0;
     try {
       S.year = y;
       const my = legendStandIn(m, y);
       for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
         S.seat = seat;
-        for (const bo of S.view === "map" ? [false, true] : [false]) {
-          boothsAs = bo;
+        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of S.view === "map" ? DRAWS.map(([k]) => k) : [S.draw]) {
+          boothsAs = bo; S.draw = dw;
           probe.innerHTML = legendHTML(my);
           hMax = Math.max(hMax, probe.getBoundingClientRect().height);
         }
@@ -192,7 +200,8 @@ function holdLegendHeight(m) {
     // current-lens key joins the hold, so the switch between Senates stays quiet
     if (S.view === "chamber") for (const sm of new Set([...Object.values(SENY), SENM])) if (sm) h = Math.max(h, senLegendHeight(sm, w, probe));
   } finally { probe.remove(); }
-  el.style.minHeight = h + "px";
+  // (on a 4px lattice: frames load behind the reader and each can round a pixel taller, which would nudge the stage)
+  el.style.minHeight = Math.ceil(h / 4) * 4 + "px";
   el.style.boxSizing = "border-box";
 }
 // the Senate's key, current lens, as seated and sorted
@@ -275,8 +284,18 @@ function legendHTML(m) {
       break;
     }
     case "tpp": {
-      const sw = S.tppMode === "swing";
+      const sw = S.tppMode === "swing", pair = axisNow(m);
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
+      // as balloons or a surface, where One Nation stood widely, the two parties can be another two
+      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts())}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      if (pair !== "AC") {
+        const [fa, fb] = SP_PAIRS[pair], [A, B] = axisCap(pair), v = m.standIn ? null : axisArea(m, aus.idx), span = axisSpan(pair), lo = 50 - span, hi = 50 + span;
+        h += legendHist(m, lo, hi);
+        h += `<div class="lg-ramp" style="background:${grad(axisRamp(pair), 0, 200)}">${mark(v == null ? null : 100 - v, lo, hi)}</div>`;
+        h += ticks([lo, 50 - span / 2, 50, 50 + span / 2, hi], lo, hi, (x) => (x === 50 ? "50" : x < 50 ? `${100 - x}` : `${x}`));
+        h += `<div class="lg-ends"><span class="t-${fa}">◀ ${A} ahead</span><span class="t-${fb}">${B} ahead ▶</span></div>`;
+        break;
+      }
       const [lo, hi] = RANGE();
       h += legendHist(m, lo, hi);
       h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}">${mark(sw ? -aus.tppSw : 100 - aus.tpp, lo, hi)}</div>`;
@@ -419,7 +438,15 @@ function legendHTML(m) {
     const by = { winner: "winning share", tpp: S.tppMode === "swing" ? "swing" : "two-party share", fp: "primary vote", flow: "preference flow", informal: "informal vote", cls: "seat type", seifa: "census measure" }[S.lens];
     h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s seating plan of ${m.seating.plan}${m.seating.note ? `, ${m.seating.note}` : ""}.` : `By ${by}, each side from the Speaker’s end.`}</span></div>`;
   }
-  if (boothsOn) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
+  if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
+  if (S.view === "map") {
+    h += drawRowHTML(m) + drawNoteHTML(m);
+    // the left-hand lines stack in a column of their own, free of the scale's rows beside them
+    const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
+    t.innerHTML = h; left.className = "lg-left";
+    for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-note, .lg-shapes, .lg-draw, .lg-bal")) left.appendChild(c);
+    t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
+  }
   return h;
 }
 
@@ -550,9 +577,11 @@ function showTipAt(html, cx, cy) {
   if (ty + r.height > innerHeight - 8) ty = cy - r.height - 14;
   tip.style.transform = `translate(${Math.max(6, tx)}px, ${Math.max(6, ty)}px)`;
 }
+let tipAt = null; // the pointer on the map's plane, for the surface's own reading of the spot
 function tipFor(h) {
   if (h && h.kind === "sen") return SENM ? senTip(SENM, h.i) : "";
   const m = M(); if (!h || !m) return "";
+  if (h.kind === "bal") return balloonTip(m, h.g);
   const goes = h.go ? `<div class="ts">Click to go out to the island</div>` : "";
   if (h.kind === "isl") return `<div class="tn">${esc(h.isl)}</div><div class="ts">In no seat at this election</div>${goes}`;
   if (h.kind === "div") {
@@ -560,11 +589,15 @@ function tipFor(h) {
     const v = divValue(m, h.i);
     const sp = h.i === m.speaker ? " · Speaker" : "";
     const holder = d.hold;
-    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div><div class="tv">${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
+    // on a surface the pointer reads the spot first; the seat's own figure follows
+    const here = drawOf(m) === "surface" && tipAt ? surfaceAt(tipAt[0], tipAt[1]) : null;
+    const around = here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
+    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${around}<div class="${here ? "ts" : "tv"}">${here ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
-  return `<div class="tn">${ds(b.name[j])}<span>${ds(D.n)}</span></div><div class="tv">${esc(valueText(boothValue(m, j), "booth", { m, d: D }))}</div><div class="ts">${int(b.votes[j])} votes${ld ? ` · ${esc(lname)} ${f1(b.leadPct[j])}` : ""}</div>`;
+  const nominal = Number.isNaN(b.x[j]) ? `<div class="ts">No fixed spot: placed nominally in its seat</div>` : "";
+  return `<div class="tn">${ds(b.name[j])}<span>${ds(D.n)}</span></div><div class="tv">${esc(valueText(drawOf(m) === "seats" ? boothValue(m, j) : drawValue(m, j), "booth", { m, d: D }))}</div><div class="ts">${int(b.votes[j])} votes${ld ? ` · ${esc(lname)} ${f1(b.leadPct[j])}` : ""}</div>${nominal}`;
 }
 
 /* =============================== selection =============================== */
@@ -617,8 +650,8 @@ function filtersChanged() {
 }
 function updateHint() {
   const el = $("#hint"); if (!el) return;
-  const show = S.view === "map" && selDiv() == null && T.k < K_ALL && !!M();
-  el.textContent = show ? "Zoom in, or choose a seat, to see its polling places" : "";
+  const show = S.view === "map" && selDiv() == null && (T.k < K_ALL || drawOf(M()) === "surface") && !!M();
+  el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover for the reading at any spot, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   $("#cities").hidden = S.view !== "map" || selDiv() != null || T.k > HOME.k * 3;
 }
@@ -709,6 +742,8 @@ function setView(v, quiet) {
   // the Senate has no map: into or out of its chamber the view changes without the morph
   const senate = S.house === "senate" && (prev === "chamber" || v === "chamber");
   S.view = v;
+  // (a built contest is the map's alone: the chamber and the list go back to the counted figures, colours too)
+  if (S.axis !== "AC" && S.lens === "tpp" && S.draw !== "seats") recolor(false);
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
   if (senate) { renderLenses(); if (v === "chamber") needSenateFloor(); }
   // the count word follows the view (divisions / seats / members), so the
@@ -845,7 +880,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateVote(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[y] != null && !STATE_YEARS.has(y) ? loadSenatePrefs(AXIS_FRAMES[y]) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -903,7 +938,9 @@ async function setYear(y) {
     const C0 = intoFrame(T, frameMap(a, b));
     glideCancel(); flight = null; d3.select(canvas).interrupt().call(zoom.transform, C0);
     if (framed || C0.k < HOME.k * 0.999) fitSelection(jurOf(a.year) !== jurOf(y) ? 1000 : 640);
-    if (!startYearMorph(a, b, framed && lastFit ? lastFit : T, dir)) carryColours(a, b);
+    // (balloons and a surface change election by a crossfade: they aren't made of the seats that morph)
+    balloonsLeave(a, b);
+    if (drawOf(b) !== "seats" || !startYearMorph(a, b, framed && lastFit ? lastFit : T, dir)) carryColours(a, b);
   }
   const ul = tlMark();
   renderTimeline(); tlGlide(ul); renderLegend(); renderStory(true); renderFilterPill(); renderBack(); writeURL();
@@ -1125,6 +1162,8 @@ function writeURL() {
   if (S.lens === "senpref") { p.set("sp", S.spPair); p.set("p", S.spFrom); }
   if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
+  if (S.draw !== "seats") p.set("draw", S.draw);
+  if (S.lens === "tpp" && S.draw !== "seats" && S.axis !== "AC") p.set("ax", S.axis);
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
   if (S.house === "senate") {
@@ -1150,6 +1189,8 @@ function readURL() {
   const yr = p.get("y"); if (yr && YEARS.includes(yearOf(yr))) S.year = yearOf(yr);
   const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && (!STATE_YEARS.has(S.year) || SEN_PREF_STATE_FRAMES.has(S.year))))) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
+  const dw = p.get("draw"); if (dw && DRAWS.some(([k]) => k === dw)) S.draw = dw;
+  const ax = p.get("ax"); if (ax && SP_PAIRS[ax]) S.axis = ax;
   const spp = p.get("sp"); if (spp && SP_PAIRS[spp]) S.spPair = spp;
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else if (S.lens === "senpref") { if (SP_DONORS[S.spPair].includes(pp)) S.spFrom = pp; } else S.party = pp; }
   if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0];
@@ -1198,6 +1239,7 @@ canvas.addEventListener("pointermove", (e) => {
   if (e.buttons || e.pointerType === "touch") return;
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
+  tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k];
   const same = (h && S.hover && h.kind === S.hover.kind && h.i === S.hover.i) || (!h && !S.hover);
   if (!same) { S.hover = h; schedule(); }
   if (h) showTipAt(tipFor(h), e.clientX, e.clientY); else hideTip();
@@ -1220,6 +1262,7 @@ canvas.addEventListener("click", (e) => {
   }
   if (h.go) goIsland(h.go);
   else if (h.kind === "booth") goBooth(h.i);
+  else if (h.kind === "bal") goBalloon(h.g);
   else goDiv(h.i, { fly: S.view === "map" });
 });
 // a double click on open water takes the map all the way out home (the pair's
@@ -1252,7 +1295,7 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
-  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo]");
+  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
@@ -1268,6 +1311,7 @@ document.addEventListener("click", (e) => {
   if (t.dataset.sgo && SENM) { const [k, v] = t.dataset.sgo.split(":"); selectSen(k === "aus" ? { level: "aus" } : k === "state" ? { level: "state", st: v } : { level: "sen", st: SENM.divs[+v].st, i: +v }); return; }
   if (t.dataset.view) { setView(t.dataset.view); return; }
   if (t.dataset.seat) { if (t.dataset.seat !== seatMode(CM() || M())) { S.seat = t.dataset.seat; startChamberGlide(); renderLegend(); writeURL(); schedule(); miniCh.dirty = true; } return; }
+  if (t.dataset.draw) { setDraw(t.dataset.draw); return; }
   if (t.dataset.flip === "tpp") { S.tppMode = S.tppMode === "swing" ? "share" : "swing"; lensParamChanged(); return; }
   if (t.dataset.flip === "fp") { S.fpMode = S.fpMode === "change" ? "share" : "change"; lensParamChanged(); return; }
   if (t.dataset.flip === "flowsrc") { lensFlip = true; setLens(S.lens === "senpref" ? "flow" : "senpref"); lensFlip = false; return; }
@@ -1287,6 +1331,7 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.opt) {
     const k = t.dataset.opt;
+    if (k === "axis") { setAxis(t.value); return; }
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
     // (a new contest keeps the voters where it can: the Greens' and everyone else's read in all three)
@@ -1399,7 +1444,7 @@ function preloadYears() {
   $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
   const meta = loadLegendMeta();
   showLoading(true);
-  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
   Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print
@@ -1433,7 +1478,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, SF, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, estBooths, drawOf, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },

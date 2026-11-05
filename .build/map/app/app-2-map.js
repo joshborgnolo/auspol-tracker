@@ -4,7 +4,7 @@ function divValue(m, i) {
   const d = m.divs[i];
   switch (S.lens) {
     case "winner": return holdFam(d.hold);
-    case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : nn(d.tpp);
+    case "tpp": return S.tppMode === "swing" ? nn(d.tppSw) : axisNow(m) !== "AC" ? axisSeat(m, i) : nn(d.tpp);
     case "fp": return S.fpMode === "change" ? fpChange(m, d, S.party) : d.fp[S.party];
     case "senate": return senDivValue(m, d);
     case "senpref": return spDivValue(m, d);
@@ -38,7 +38,7 @@ function boothValue(m, j) {
   const b = m.booth;
   switch (S.lens) {
     case "winner": return b.lead[j] ? b.lead[j].fam : null;
-    case "tpp": return S.tppMode === "swing" ? nn(b.tppSw[j]) : nn(b.tpp[j]);
+    case "tpp": return S.tppMode === "swing" ? nn(b.tppSw[j]) : axisNow(m) !== "AC" ? axisBooth(m, j) : nn(b.tpp[j]);
     case "fp": {
       if (S.fpMode !== "change") return nn(b.fp[S.party][j]);
       const pf = b.raw.prevFp ? b.raw.prevFp[j] : null;
@@ -67,7 +67,7 @@ function colorOf(v) {
   if (v == null) return null;
   switch (S.lens) {
     case "winner": return TH.party[v];
-    case "tpp": return S.tppMode === "swing" ? RAMP.div[dIdx(-v / 10)] : RAMP.div[dIdx((50 - v) / 20)];
+    case "tpp": return S.tppMode === "swing" ? RAMP.div[dIdx(-v / 10)] : axisNow(M()) !== "AC" ? axisRamp()[dIdx((50 - v) / axisSpan())] : RAMP.div[dIdx((50 - v) / 20)];
     case "fp": return S.fpMode === "change"
       ? (v >= 0 ? RAMP.gain[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
@@ -160,7 +160,7 @@ const selDiv = () => (S.sel.level === "div" || S.sel.level === "booth" ? S.sel.d
 // the opened seat as soon as it is chosen.
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 let quietSince = 0, needFrame = false;
-const quietAll = () => 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k);
+const quietAll = () => (drawOf(M()) === "surface" ? 0 : 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k));
 function quietness(i, now) {
   const all = quietAll();
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
@@ -194,15 +194,19 @@ function drawGeo(m, alpha, streetA) {
   const [x0, y0, x1, y1] = viewBox();
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
   const filt = filtersOn();
+  // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface is laid through these same fills
+  const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf : null;
+  if (look) ballNow = ball;
   const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
     if (!inBox(g.bb[i], x0, y0, x1, y1) && !sa) continue;
     let c = fillDiv(m, i);
+    if (ball > 0) c = ball >= 1 || !c ? th.nodata : mixC(c, th.nodata, ball);
     // (another year's map, under a year morph, quiets with the zoom alone)
     const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
     if (m === M() && qn > 0 && qn < 0.72 && i === selDiv()) needFrame = true;
-    fillOf[i] = [c ? css(c) : pat, filt && !passes(m, i)];
+    fillOf[i] = [c ? css(c) : pat, filt && !passes(m, i), qn];
     if (inBox(g.bb[i], x0, y0, x1, y1)) fills.push(i);
   }
   // the islands where they lie, past the mainland frame: their seat's colour, quieted
@@ -216,13 +220,32 @@ function drawGeo(m, alpha, streetA) {
   };
   if (sa) {
     const islOf = (m.isl || []).map(islFill);
-    const look = (lab) => (lab < m.divs.length ? fillOf[lab] : islOf[lab - m.divs.length]);
-    layWaters(m, g, st, look, alpha * sa);
+    const waterOf = (lab) => {
+      if (lab >= m.divs.length) return islOf[lab - m.divs.length];
+      const f = fillOf[lab]; return f && sf && !(sf.none && sf.none[lab]) ? [sf.top, f[1]] : f;
+    };
+    layWaters(m, g, st, waterOf, alpha * sa);
   }
+  const under = !sf || sf.under;
   for (const i of fills) {
     const [f, out] = fillOf[i];
-    ctx.fillStyle = f; ctx.fill(g.paths[i]);
-    if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
+    if (under || (sf.none && sf.none[i])) { ctx.fillStyle = f; ctx.fill(g.paths[i]); }
+    if (!sf && out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
+  }
+  if (sf) {
+    // the raster through the seats' paths, then along their shared edges (two antialiased
+    // fills leave a hairline of what's beneath, which a flat map hides under its seams)
+    for (const L of sf.ls) {
+      ctx.globalAlpha = alpha * L.a; ctx.fillStyle = L.pat;
+      for (const i of fills) if (!(sf.none && sf.none[i])) ctx.fill(g.paths[i]);
+      ctx.strokeStyle = L.pat; ctx.lineWidth = 1.2 / T.k; ctx.stroke(g.meshDiv);
+    }
+    ctx.globalAlpha = alpha;
+    for (const i of fills) {
+      const [, out, qn] = fillOf[i];
+      if (qn > 0 && !(sf.none && sf.none[i])) { ctx.fillStyle = css(th.bg, qn * 0.6); ctx.fill(g.paths[i]); }
+      if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(g.paths[i]); }
+    }
   }
   for (const q of isls) {
     const [f, out] = islFill(q);
@@ -230,8 +253,11 @@ function drawGeo(m, alpha, streetA) {
     if (out) { ctx.fillStyle = css(th.bg, 0.8); ctx.fill(q.mpath); }
   }
   if (st) layStreets(st);
-  ctx.strokeStyle = css(th.seam, th.seamA); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv);
-  ctx.strokeStyle = css(th.seam, th.stateA); ctx.lineWidth = 1.3 / T.k; ctx.stroke(g.meshState);
+  // (paper-white seams vanish on plain land, and a surface's own lines are the story: its seats are a faint guide)
+  const surfA = look ? look.surf : 0;
+  if (ball < 1) { ctx.strokeStyle = css(th.seam, th.seamA * (1 - 0.72 * surfA) * (1 - ball)); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
+  if (ball > 0) { ctx.strokeStyle = css(th.coast, 0.3 * ball); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
+  ctx.strokeStyle = ball > 0.5 ? css(th.coast, 0.75) : css(th.seam, th.stateA * (1 - 0.35 * surfA)); ctx.lineWidth = 1.3 / T.k; ctx.stroke(g.meshState);
   // the AEC's coast: whole where no sea of Esri's has come in, fading out where one has
   if (sa < 1) {
     const aec = () => { ctx.stroke(g.coast); for (const q of isls) ctx.stroke(q.mpath); };
@@ -774,7 +800,8 @@ function visibleBooths(m) {
   if (sd == null && T.k < K_IN) return out;
   const [x0, y0, x1, y1] = viewBox(), pad = 24 / T.k;
   if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j])) out.push(j);
-  if (T.k >= K_IN) for (let j = 0; j < b.n; j++) {
+  // (a surface is the reading of the whole ground: only an opened seat lays its own places on it)
+  if (T.k >= K_IN && drawOf(m) !== "surface") for (let j = 0; j < b.n; j++) {
     if (b.d[j] === sd || b.ty[j] !== 1) continue;
     const x = b.x[j], y = b.y[j];
     if (Number.isNaN(x) || x < x0 - pad || x > x1 + pad || y < y0 - pad || y > y1 + pad) continue;
@@ -789,6 +816,7 @@ function boothShape(g, ty, x, y, r) {
   else g.arc(x, y, r, 0, Math.PI * 2);
 }
 function drawBooths(m) {
+  if (ballNow > 0) { m._vis = []; drawBalloons(m, ballNow); return; }
   const list = visibleBooths(m); m._vis = list;
   if (!list.length) return;
   const b = m.booth, th = TH, sd = selDiv();
@@ -842,7 +870,9 @@ function drawLabels(m) {
     return true;
   };
   const sd = selDiv(), b = m.booth;
-  const groundOf = (i) => { const c = fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
+  // (a surface's ground changes under a label, so it takes the lettering that holds on anything)
+  const dw = drawOf(m);
+  const groundOf = (i) => { if (dw === "surface") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
@@ -1813,7 +1843,7 @@ function drawIslands(m, alpha = 1) {
     const k = Math.min((r.w - 2 * pad) / s.w, (r.h - top - 2 * pad) / s.h);
     const ox = r.x + (r.w - s.w * k) / 2, oy = r.y + top + (r.h - top - s.h * k) / 2;
     const places = c.docked && sd != null && s.seat === sd && s.booths.length > 0;
-    let col = own == null ? th.nodata : fillDiv(m, own);
+    let col = own == null || drawOf(m) === "balloons" ? th.nodata : fillDiv(m, own);
     if (col && own != null) {
       if (own === sd) col = towards(col, th.bg, quietness(own, now));
       if (sd != null && own !== sd) col = towards(col, th.bg, th.veil);
@@ -2273,6 +2303,7 @@ function hitTest(px, py) {
     if (cj != null) return { kind: "booth", i: cj };
     return c.s.owner != null ? { kind: "div", i: c.s.owner, isl: c.s.name, go: c.s.key } : { kind: "isl", go: c.s.key, isl: c.s.name };
   }
+  if (drawOf(m) === "balloons") { const q = balloonHit(m, px, py); if (q) return q; }
   const b = m.booth; let bj = null, bd = Infinity;
   for (const j of m._vis || []) {
     if (T.k < K_ALL && b.d[j] !== selDiv()) continue; // still coming up

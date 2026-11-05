@@ -240,6 +240,7 @@ function areaHedDek(m, st) {
     nswnow: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.",
     qldnow: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.",
   };
+  if (S.lens === "tpp" && axisNow(m) !== "AC") return axisHedDek(m, idx, where);
   switch (S.lens) {
     case "winner": {
       const g = cnt[gov] || 0, o = cnt[opp] || 0, c = N - g - o;
@@ -635,6 +636,7 @@ function seatHedDek(m, d) {
       return { hed, dek };
     }
     case "tpp": {
+      if (axisNow(m) !== "AC") return axisSeatHedDek(m, d);
       if (d.tpp == null) return { hed: `There was no Labor v ${oppNameW()} count in ${ds(d.n)}`, dek: isState() ? `The ${commX()} publishes a two-party count only where the final pair is Labor against ${coalW(0)}.` : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
       if (S.tppMode === "swing") {
         const s = d.tppSw;
@@ -809,6 +811,10 @@ function storyBooth(m, j) {
     const [ln, rn] = pairNames(left, right);
     switch (S.lens) {
       case "tpp":
+        if (axisNow(m) !== "AC" && S.tppMode !== "swing") {
+          const v = axisBooth(m, j), [A, B] = axisCap();
+          if (v != null) { const a = v >= 50; hed = `${a ? A : B} would lead ${a ? B.replace(/^The /, "the ") : A.replace(/^The /, "the ")} ${f1(Math.max(v, 100 - v))} to ${f1(Math.min(v, 100 - v))} here`; dek = `An estimate: it takes this place’s first preferences and ${axisHow(m, axisNow(m), [b.d[j]])}.`; break; }
+        }
         if (!Number.isNaN(b.tpp[j])) {
           if (S.tppMode === "swing") { const s = nn(b.tppSw[j]); hed = s == null ? `This place has no swing on record` : `${pts(s)} swing to ${s >= 0 ? "Labor" : "the Coalition"} here`; dek = s == null ? "It wasn’t used at the previous election." : ""; }
           else { const t2 = b.tpp[j]; hed = `${t2 >= 50 ? "Labor" : "The Coalition"} won ${f1(Math.max(t2, 100 - t2))}% of the two-party vote here`; }
@@ -917,7 +923,7 @@ function renderStory(force) {
     if (FS.on) fsStory(was !== key);
     return;
   }
-  const key = [S.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
+  const key = [S.year, S.lens, S.draw, S.axis, S.tppMode, S.fpMode, S.senMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.view, s.level, s.st, s.div, s.booth, filtersKey()].join("|");
   if (!force && key === storyKey) return;
   const was = storyKey;
   storyKey = key;

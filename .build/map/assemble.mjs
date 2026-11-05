@@ -5,6 +5,7 @@
      app-1-base.js     helpers, colour, the theme's tokens, the data loaders,
                        the "Now" overlay (Farrer by-election, changes of party)
      app-2-map.js      lens values and colours, the canvas map, zoom and pan
+     app-2b-draw.js    how the map is drawn: seats, balloons, the surface and its contests
      app-3-chamber.js  the House in its chamber, seat by seat, and the morph
      app-3b-senate.js  the Senate as it sits, drawn by the same renderer
      app-3c-sa.js      South Australia's House of Assembly and Legislative Council floors
@@ -34,7 +35,7 @@ const ROOT = path.resolve(HERE, "..", "..");
 // lanes, what a frame loads first), written before the data stamps are taken
 writeCores(ROOT);
 const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
-const app = ["app-1-base.js", "app-2-map.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
+const app = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
 // each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
 // and each election's eyebrow facts, so the eyebrow's floor reads every year's real line (data-stamp.mjs)
 const js = stampMeta(stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT));

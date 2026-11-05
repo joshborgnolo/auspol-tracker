@@ -787,6 +787,8 @@ function walkHold(spot) {
 /* =============================== state =============================== */
 const S = {
   year: "now", lens: "winner", party: "onp", from: "onp", vs: "lnp", index: "irsad", tppMode: "share", fpMode: "share",
+  // how the map view draws the lens (app-2b-draw.js), and the contest the Two-party lens reads when it isn't seats
+  draw: "seats", axis: "AC",
   // the informal lens's exhausted-ballot view (New South Wales' optional-preferential count)
   infMode: "informal",
   // the Household-income lens's measure: the median spectrum, or the lower- /

@@ -178,6 +178,20 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-legend > .lg-t, .mp-legend > .lg-note, .mp-legend > .lg-shapes { grid-column: 1; }
 .mp-legend > :nth-child(2) { margin-top: 4px; }
 .mp-legend > .lg-cats { margin-top: 1px; }
+/* how the map is drawn: under the lens's title, its note under that */
+.mp-legend > .lg-left { grid-column: 1; grid-row: 1 / span 12; min-width: 0; }
+.lg-left .lg-shapes { border-top: 0; padding-top: 0; margin-top: 6px; }
+.lg-draw { display: flex; align-items: baseline; gap: 2px 10px; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--ink-3); }
+.lg-draw span { font-size: 12px; }
+.lg-draw button { padding: 2px 0 1px; color: var(--ink-2); border-bottom: 1.5px solid transparent; }
+.lg-draw button:hover:not(:disabled) { color: var(--ink); }
+.lg-draw button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.lg-draw button:disabled { color: var(--ink-faint); cursor: not-allowed; }
+.lg-contest { margin-top: 1px; font-weight: 400; }
+.lg-contest span { font-size: 12px; color: var(--ink-3); }
+.lg-left .lg-draw ~ .lg-note { margin-top: 3px; }
+.lg-bal { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 12px; color: var(--ink-3); }
+.lg-bal svg { flex: none; fill: none; stroke: var(--ink-3); stroke-width: 1; }
 .mp-legend > .lg-shapes { border-top: 0; padding-top: 0; }
 .mp-legend > .lg-shapes { margin-top: 6px; }
 @media (max-width: 1100px) { .mp-legend { column-gap: 22px; min-height: 124px; } }
@@ -555,6 +569,7 @@ button { cursor: pointer; background: none; border: 0; }
   .st-tpp, .st-seats { font-size: 44px; }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }
+  .mp-legend .lg-left .lg-draw ~ .lg-note { display: block; }
   .mp-legend .lg-cats { gap: 3px 10px; font-size: 12px; }
   .ls-csv span { display: none; }
   .ls-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
