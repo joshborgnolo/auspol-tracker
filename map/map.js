@@ -7204,7 +7204,7 @@ function seatStat(m, st, label) {
     fpBloc.sort((p, q) => q[1] - p[1]);
     const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
     const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
-    fpRow = `<span class="st-lab">Primary vote</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+    fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
   }
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
@@ -8547,8 +8547,10 @@ function legendHTML(m) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
-      // in the chamber the counts are on the canvas's bloc labels and in the story, not three times
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : (cnt[f] || boothsOn) && famEraOpts(m).includes(f))).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
+      // the seats are in every view. Over polling places they sit under a place-by-place title, so the
+      // row says they're seats, and Community Strong folds into independents, as its places are drawn
+      const nOf = (f) => (boothsOn && f === "ind" ? (cnt.ind || 0) + (cnt.csa || 0) : cnt[f]);
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : (nOf(f) || boothsOn) && famEraOpts(m).includes(f))).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)}${nOf(f) ? ` <b>${nOf(f)}</b>` : ""}</span>`).join("")}${boothsOn ? `<span class="lg-unit">seats</span>` : ""}</div>`;
       break;
     }
     case "tpp": {

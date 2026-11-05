@@ -248,7 +248,7 @@ function seatStat(m, st, label) {
     fpBloc.sort((p, q) => q[1] - p[1]);
     const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
     const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
-    fpRow = `<span class="st-lab">Primary vote</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+    fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
   }
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
