@@ -526,7 +526,6 @@ function fsPlate() {
 }
 
 /* ----- a stop's card: the election, its date, the House it made (or the chosen seat's result) ----- */
-const fsFamNm = (f, n) => (f === "ind" ? (n === 1 ? "Independent" : "Independents") : f === "oth" ? (n === 1 ? "Other" : "Others") : FAM_NAME[f]);
 // the seat's result at a stop: its member, party and Labor two-party share then
 function fsSeatAt(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
@@ -561,7 +560,7 @@ function fsCard(b) {
     if (s) {
       const fams = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((k) => s[k]), tot = sum(fams.map((k) => s[k])), maj = Math.floor(tot / 2) + 1;
       h += `<div class="fs-cd-bar">${fams.map((k) => `<b style="flex:${s[k]};background:var(--m-${k})"></b>`).join("")}<u style="left:${((maj / tot) * 100).toFixed(2)}%"></u></div>`
-        + `<div class="fs-cd-n">${fams.slice().sort((a, c) => s[c] - s[a]).map((k) => `<span><i style="background:var(--m-${k})"></i>${esc(fsFamNm(k, s[k]))} <b>${s[k]}</b></span>`).join("")}</div>`;
+        + `<div class="fs-cd-n">${fams.slice().sort((a, c) => s[c] - s[a]).map((k) => `<span><i style="background:var(--m-${k})"></i>${famTag(k)} <b>${s[k]}</b></span>`).join("")}</div>`;
     }
   }
   const first = card.hidden;

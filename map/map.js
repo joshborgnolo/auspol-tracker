@@ -93,8 +93,8 @@ function readTheme() {
   const P = dk
     // bright, poster-flat party colours (Labor and the Coalition are theoelections.com's
     // red and blue); One Nation a clear orange off Labor's red, everyone else neutral grey
-    ? { alp: "#f7310a", lnp: "#014dff", grn: "#22c35a", onp: "#ff9500", ind: "#b07ee0", csa: "#00c2e0", oth: "#7d7d7d" }
-    : { alp: "#f7310a", lnp: "#014dff", grn: "#14ad4a", onp: "#ff8c00", ind: "#9b62d0", csa: "#00a9c4", oth: "#9a9a9a" };
+    ? { alp: "#f7310a", lnp: "#014dff", grn: "#22c35a", onp: "#ff9500", ind: "#b07ee0", csa: "#00c2e0", oth: "#7d7d7d", nxt: "#ff9500", dem: "#1fc7b4" }
+    : { alp: "#f7310a", lnp: "#014dff", grn: "#14ad4a", onp: "#ff8c00", ind: "#9b62d0", csa: "#00a9c4", oth: "#9a9a9a", nxt: "#ff8c00", dem: "#00a08f" };
   T.party = {}; for (const k in P) T.party[k] = hex(P[k]);
   T.dark = dk;
   T.mid = dk ? lch(0.36, 0.008, 66) : lch(0.905, 0.006, 78);
@@ -177,7 +177,10 @@ const FAM_LEG = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Natio
 // a family's name in the legend's words: a state frame's opposition is the Liberals
 const famLeg = (f) => (f === "lnp" && STATE_YEARS.has(S.year) ? "Liberals" : FAM_LEG[f]);
 /* the parties as compact column-head codes (the list table's lens header) */
-const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
+const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", csa: "CS", oth: "OTH" };
+// the same codes on the seat tallies, the frame's own name for the right: LIB where the state has
+// no Coalition (SA, Victoria, WA say Liberals, as coalW does), LNP in Queensland
+const famTag = (f) => (f !== "lnp" || !STATE_YEARS.has(S.year) ? FAM_CODE[f] : QLD_YEARS.has(S.year) ? "LNP" : NSW_YEARS.has(S.year) ? "L/NP" : "LIB");
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
 const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "NATS", "LNQ", "LIB"].includes(ab) ? "lnp" : ["GRN", "GWA", "TG", "GVIC", "AGV", "GA", "QG", "CCG", "ESG", "GDA", "GLO", "GSA", "RCG", "VGA", "WSG"].includes(ab) ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
 const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", NATS: "Nationals", CLP: "Country Liberal", GRN: "Greens", GA: "Greens", GWA: "Greens (WA)", TG: "Tasmanian Greens", GVIC: "Victorian Greens", AD: "Democrats", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
@@ -6248,7 +6251,7 @@ function houseSwitchHTML() {
   return `<div class="lg-house" role="group" aria-label="Which chamber"><button type="button" data-house="reps" data-t="${lo}" aria-pressed="${S.house !== "senate"}">${lo}</button><button type="button" data-house="senate" data-t="${up}" aria-pressed="${S.house === "senate"}">${up}</button></div>`;
 }
 function senateLegendHTML(m) {
-  const cats = (cnt, list) => `<div class="lg-cats">${list.filter((f) => cnt[f]).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)} <b>${cnt[f]}</b></span>`).join("")}`;
+  const cats = (cnt, list) => `<div class="lg-cats">${list.filter((f) => cnt[f]).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("")}`;
   let h = houseSwitchHTML();
   if (S.senLens === "term") {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
@@ -6325,7 +6328,7 @@ function senBar(m) {
   let acc = 0;
   const segs = order.map((f) => { const x = (100 * acc) / b.N, w = (100 * cnt[f]) / b.N; acc += cnt[f]; return `<i style="left:${x}%;width:${w}%;${swc(f)}" title="${famLeg(f)} ${cnt[f]}"></i>`; }).join("");
   const mx = (100 * b.maj) / b.N;
-  const lab = order.map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)} <b>${cnt[f]}</b></span>`).join("") + (m.vacant.length ? `<span><i style="background:var(--line-2)"></i>Vacant <b>${m.vacant.length}</b></span>` : "");
+  const lab = order.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("") + (m.vacant.length ? `<span><i style="background:var(--line-2)"></i>Vacant <b>${m.vacant.length}</b></span>` : "");
   return `<div class="sn-bar" role="img" aria-label="${order.map((f) => `${famLeg(f)} ${cnt[f]}`).join(", ")}; ${b.maj} for a majority"><div class="sn-track">${segs}<span class="sn-maj" style="left:${mx}%"></span></div><div class="sn-majlab" style="left:${mx}%">${b.maj} to pass a bill</div></div><div class="counts">${lab}</div>`;
 }
 function storySenate(m) {
@@ -7154,12 +7157,26 @@ function seatBase(m, st) {
   if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };
   return st === "AUS" || st === stOfYear(y) ? { y: pv, c: META_FACTS.mix[pv] } : null;
 }
+// the parties inside the "oth" family that have passed 10% somewhere, in their own colours
+const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
-  const { A, N, cnt } = areaStats(m, st);
+  const { A, idx, N, cnt } = areaStats(m, st);
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
   const a = cnt.alp || 0, l = cnt.lnp || 0, base = seatBase(m, st);
-  const seats = [["alp", a], ["lnp", l], ["oth", N - a - l]];
+  // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
+  // (none has yet, at any level: the Greens and One Nation are the likely first)
+  const parties = new Map();
+  for (const i of idx) {
+    const h = m.divs[i].hold, k = crossLabel(h);
+    if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
+    parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
+  }
+  const bloc = [...parties.values()].filter((r) => r[1] > 14).sort((p, q) => q[1] - p[1]);
+  const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
+  const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
+  // the base counts seats by family, and "oth" there is several parties, so it can't split one out
+  const unsplit = bloc.some((r) => r[0] === "oth");
   let two = "";
   if (A.tpp != null) {
     const s = A.tppSw;
@@ -7169,12 +7186,27 @@ function seatStat(m, st, label) {
   const change = (f, n) => {
     if (!base) return "";
     if (!base.c) return " "; // summary.json still on its way: the line keeps its place
-    const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - (base.c.alp || 0) - (base.c.lnp || 0) : base.c[f] || 0;
+    if (unsplit && f === "oth") return " ";
+    const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - ["alp", "lnp", ...bloc.map((r) => r[0])].reduce((x, k) => x + (base.c[k] || 0), 0) : base.c[f] || 0;
     return sgn(n - was, 0);
   };
-  const cells = seats.map(([f, n], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${n}</b>`).join("");
-  const under = base ? seats.map(([f, n], i) => `<small style="grid-column:${2 * i + 1}">${change(f, n)}</small>`).join("") : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span><span class="st-seats">${cells}${under}</span></h3>`;
+  // a row of figures with a line of changes under them, its size set by how many columns it has
+  const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)">${cols.map(([f, t], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${t}</b>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
+  // the primary vote: a party on 10% or more stands apart from "others". Greens and One Nation are
+  // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates
+  const fpA = A.fp.alp, fpL = A.fp.lnp;
+  let fpRow = "";
+  if (fpA != null && fpL != null) {
+    const fpBloc = ["grn", "onp"].filter((f) => A.fp[f] >= 10).map((f) => [f, A.fp[f], A.fpSw[f]]);
+    const vote = new Map(); let formal = 0;
+    for (const i of idx) { const d = m.divs[i]; formal += d.formal; for (const c of d.c) if (c.fam === "oth") { const k = partyShort(c.ab, c.pn); vote.set(k, (vote.get(k) || 0) + c.v); } }
+    for (const [k, v] of vote) if ((100 * v) / formal >= 10) fpBloc.push([FP_TONE[k] || "oth", (100 * v) / formal, null]);
+    fpBloc.sort((p, q) => q[1] - p[1]);
+    const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
+    const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
+    fpRow = `<span class="st-lab">Primary vote</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+  }
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
@@ -7513,7 +7545,7 @@ function storyArea(m, st) {
   // the House: who holds the seats
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
-    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
+    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("");
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
   if (isNowY(m.year) && aus) {
@@ -8516,7 +8548,7 @@ function legendHTML(m) {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
       // in the chamber the counts are on the canvas's bloc labels and in the story, not three times
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (cnt[f] || boothsOn) && famEraOpts(m).includes(f)).map((f) => `<span><i style="${swc(f)}"></i>${famLeg(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
+      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : (cnt[f] || boothsOn) && famEraOpts(m).includes(f))).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)}${boothsOn || S.view === "chamber" ? "" : ` <b>${cnt[f]}</b>`}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
@@ -10253,7 +10285,6 @@ function fsPlate() {
 }
 
 /* ----- a stop's card: the election, its date, the House it made (or the chosen seat's result) ----- */
-const fsFamNm = (f, n) => (f === "ind" ? (n === 1 ? "Independent" : "Independents") : f === "oth" ? (n === 1 ? "Other" : "Others") : FAM_NAME[f]);
 // the seat's result at a stop: its member, party and Labor two-party share then
 function fsSeatAt(m, i, y) {
   const d = m.divs[i], hh = d.h || [];
@@ -10288,7 +10319,7 @@ function fsCard(b) {
     if (s) {
       const fams = ["alp", "grn", "ind", "oth", "onp", "lnp"].filter((k) => s[k]), tot = sum(fams.map((k) => s[k])), maj = Math.floor(tot / 2) + 1;
       h += `<div class="fs-cd-bar">${fams.map((k) => `<b style="flex:${s[k]};background:var(--m-${k})"></b>`).join("")}<u style="left:${((maj / tot) * 100).toFixed(2)}%"></u></div>`
-        + `<div class="fs-cd-n">${fams.slice().sort((a, c) => s[c] - s[a]).map((k) => `<span><i style="background:var(--m-${k})"></i>${esc(fsFamNm(k, s[k]))} <b>${s[k]}</b></span>`).join("")}</div>`;
+        + `<div class="fs-cd-n">${fams.slice().sort((a, c) => s[c] - s[a]).map((k) => `<span><i style="background:var(--m-${k})"></i>${famTag(k)} <b>${s[k]}</b></span>`).join("")}</div>`;
     }
   }
   const first = card.hidden;

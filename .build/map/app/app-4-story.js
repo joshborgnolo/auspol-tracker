@@ -201,12 +201,26 @@ function seatBase(m, st) {
   if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };
   return st === "AUS" || st === stOfYear(y) ? { y: pv, c: META_FACTS.mix[pv] } : null;
 }
+// the parties inside the "oth" family that have passed 10% somewhere, in their own colours
+const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
-  const { A, N, cnt } = areaStats(m, st);
+  const { A, idx, N, cnt } = areaStats(m, st);
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
   const a = cnt.alp || 0, l = cnt.lnp || 0, base = seatBase(m, st);
-  const seats = [["alp", a], ["lnp", l], ["oth", N - a - l]];
+  // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
+  // (none has yet, at any level: the Greens and One Nation are the likely first)
+  const parties = new Map();
+  for (const i of idx) {
+    const h = m.divs[i].hold, k = crossLabel(h);
+    if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
+    parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
+  }
+  const bloc = [...parties.values()].filter((r) => r[1] > 14).sort((p, q) => q[1] - p[1]);
+  const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
+  const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
+  // the base counts seats by family, and "oth" there is several parties, so it can't split one out
+  const unsplit = bloc.some((r) => r[0] === "oth");
   let two = "";
   if (A.tpp != null) {
     const s = A.tppSw;
@@ -216,12 +230,27 @@ function seatStat(m, st, label) {
   const change = (f, n) => {
     if (!base) return "";
     if (!base.c) return " "; // summary.json still on its way: the line keeps its place
-    const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - (base.c.alp || 0) - (base.c.lnp || 0) : base.c[f] || 0;
+    if (unsplit && f === "oth") return " ";
+    const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - ["alp", "lnp", ...bloc.map((r) => r[0])].reduce((x, k) => x + (base.c[k] || 0), 0) : base.c[f] || 0;
     return sgn(n - was, 0);
   };
-  const cells = seats.map(([f, n], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${n}</b>`).join("");
-  const under = base ? seats.map(([f, n], i) => `<small style="grid-column:${2 * i + 1}">${change(f, n)}</small>`).join("") : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span><span class="st-seats">${cells}${under}</span></h3>`;
+  // a row of figures with a line of changes under them, its size set by how many columns it has
+  const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)">${cols.map(([f, t], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${t}</b>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
+  // the primary vote: a party on 10% or more stands apart from "others". Greens and One Nation are
+  // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates
+  const fpA = A.fp.alp, fpL = A.fp.lnp;
+  let fpRow = "";
+  if (fpA != null && fpL != null) {
+    const fpBloc = ["grn", "onp"].filter((f) => A.fp[f] >= 10).map((f) => [f, A.fp[f], A.fpSw[f]]);
+    const vote = new Map(); let formal = 0;
+    for (const i of idx) { const d = m.divs[i]; formal += d.formal; for (const c of d.c) if (c.fam === "oth") { const k = partyShort(c.ab, c.pn); vote.set(k, (vote.get(k) || 0) + c.v); } }
+    for (const [k, v] of vote) if ((100 * v) / formal >= 10) fpBloc.push([FP_TONE[k] || "oth", (100 * v) / formal, null]);
+    fpBloc.sort((p, q) => q[1] - p[1]);
+    const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
+    const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
+    fpRow = `<span class="st-lab">Primary vote</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+  }
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
@@ -560,7 +589,7 @@ function storyArea(m, st) {
   // the House: who holds the seats
   if (S.view !== "chamber") {
     const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
-    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${legW(f)} <b>${cnt[f]}</b></span>`).join("");
+    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("");
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
   }
   if (isNowY(m.year) && aus) {

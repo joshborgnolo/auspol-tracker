@@ -291,13 +291,17 @@ button { cursor: pointer; background: none; border: 0; }
 .st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 16px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; }
 .st-stat b { font-weight: 700; }
 .st-stat i { font-style: normal; font-weight: 500; color: var(--ink-faint); padding: 0 0.1em; }
-.st-lab { font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink-3); }
-.st-lab + .st-tpp, .st-lab + .st-seats { margin-top: 6px; }
-.st-swing + .st-lab, .st-tpp + .st-lab { margin-top: 22px; }
+.st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink-3); }
+.st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
+.st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab { margin-top: 22px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
 .st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; }
-.st-seats { display: inline-grid; grid-template-columns: repeat(5, auto); justify-items: center; align-items: baseline; }
-.st-seats small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink-2); }
+.st-grid { display: inline-grid; justify-items: center; align-items: baseline; }
+.st-grid small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink-2); }
+.st-seats.st-n4, .st-seats.st-n5 { font-size: 42px; }
+.st-fps { font-size: 28px; letter-spacing: -0.01em; }
+.st-fps.st-n5, .st-fps.st-n6 { font-size: 23px; }
+.st-fps small { margin-top: 6px; font-size: 14px; }
 .st-stat + .st-dek { margin-top: 16px; }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
