@@ -917,7 +917,7 @@ function deriveBooths(B, m) {
     o.name[j] = cleanBooth(B.n[j], D.n, B.ty[j]);
     const k = B.lat[j] == null ? -1 : m.isl.findIndex((s) => B.lon[j] >= s.near[0] && B.lon[j] <= s.near[2] && B.lat[j] >= s.near[1] && B.lat[j] <= s.near[3]);
     if (k >= 0) { o.isl[j] = k; m.isl[k].booths.push(j); }
-    if (B.lat[j] != null) { const p = proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
+    if (B.lat[j] != null) { const p = m.proj([B.lon[j], B.lat[j]]); if (p) { o.x[j] = p[0]; o.y[j] = p[1]; } }
     const v = B.v[j]; let formal = 0; for (const x of v) formal += x;
     o.formal[j] = formal; o.votes[j] = B.inf[j] == null ? NaN : formal + B.inf[j];
     if (B.inf[j] != null && o.votes[j]) o.infPct[j] = (100 * B.inf[j]) / o.votes[j];
@@ -1103,7 +1103,7 @@ function* geoSteps(topo, m, P) {
 }
 // /*@geo-core:end*/
 // the whole build at once (a frame's lo geometry, while its election loads)
-function buildGeo(topo, m, P = proj) {
+function buildGeo(topo, m, P = m.proj) {
   const it = geoSteps(topo, m, P);
   for (;;) { const r = it.next(); if (r.done) return r.value; }
 }
@@ -1143,13 +1143,13 @@ async function buildHandbookGeo(topo, m) {
     feats.push(f);
     if (sliceDone()) await pause();
   }
-  proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], { type: "MultiPoint", coordinates: [[x0, y0], [x1, y1]] });
+  m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], { type: "MultiPoint", coordinates: [[x0, y0], [x1, y1]] });
   // pass two: each seat resampled-and-wound (handbookRings), then pathed: each ring
   // through the projection's own stream as a line, its closing point dropped and the
   // path closed, which is the polygon d3.geoPath draws without its clip's buffering
   // and spherical containment walk (test-map-geo-build compares the two); the bounds
   // are taken at emission
-  const P = proj;
+  const P = m.proj;
   const paths = new Array(m.divs.length), bb = new Array(m.divs.length), ringsByDiv = new Array(m.divs.length);
   const outline = new Path2D();
   let p = null, px = 0, py = 0, has = false, first = true, b0 = 0, b1 = 0, b2 = 0, b3 = 0;
@@ -1223,7 +1223,7 @@ function buildIslands(data, m) {
     const mpath = new Path2D();
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const r of s.rings) {
-      r.forEach((ll, i) => { const [x, y] = proj(ll); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); (i ? mpath.lineTo : mpath.moveTo).call(mpath, x, y); });
+      r.forEach((ll, i) => { const [x, y] = m.proj(ll); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); (i ? mpath.lineTo : mpath.moveTo).call(mpath, x, y); });
       mpath.closePath();
     }
     const o = own[s.key] != null ? m.byName.get(own[s.key]) : null;
@@ -1312,7 +1312,7 @@ const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", 
 async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
-  if (Y[year]) return Y[year].ready.then((mm) => { proj = mm.proj; return mm; });
+  if (Y[year]) return Y[year].ready.then((mm) => { if (year === S.year) proj = mm.proj; return mm; });
   const m = { year, ready: null };
   Y[year] = m;
   m.ready = (async () => {
@@ -1322,12 +1322,12 @@ async function loadYear(year, bg) {
     const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
     const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
       SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
-    // built under its own projection, then the live one put back: a year loaded
-    // ahead (the timeline's hover) must not move the streets and the sea under
-    // the year in view (setYear takes the new year's when it shows it)
-    const keep = proj;
+    // built under its own m.proj, never the page's: `proj` is the year on screen's alone
+    // (setYear hands it over). A load borrowing it, as this one did until 2026-11-05, moved
+    // the towns, streets and sea under the year in view for as long as the load ran, seconds
+    // for a Handbook year, and outward: a wider fit, so Perth west into the sea, Sydney east
     const fit = lo.handbook ? null : topojson.feature(lo, lo.objects.divs);
-    if (!lo.handbook) proj = m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
+    if (!lo.handbook) m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
     m.res = res;
     m.pplLanes = res.pplLanes || null;
     m.ppl = !m.pplLanes; // the census lanes are here (a full file, or a frame with none)
@@ -1390,7 +1390,7 @@ async function loadYear(year, bg) {
     // the Handbook years' projection is only built inside their geometry
     // pass (a direct boot on a Handbook year arrives with proj === null);
     // projecting the label points has to wait for it
-    for (const d of m.divs) { const p = proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
+    for (const d of m.divs) { const p = m.proj(d.lp); d.lpx = p[0]; d.lpy = p[1]; }
     // the national household median joins the AUS pool: medians never
     // pool, so deriveAreas leaves it off, but the incomeCuts record the
     // build stamps carries the year's own national figure
@@ -1400,7 +1400,7 @@ async function loadYear(year, bg) {
     if (m.ageCuts && m.ageCuts.medAge != null && m.areas.AUS.demo)
       m.areas.AUS.demo.ageMed = m.ageCuts.medAge;
     m.search = buildSearch(m);
-    proj = keep || m.proj;
+    if (year === S.year) proj = m.proj;
     // the hi detail comes up only for a frame the reader actually visits (warmHi):
     // preloading paths +15 frames and building all their hi Path2Ds was the 2026-10
     // long-task storm. The Handbook years are lossless at both levels: no hi download
@@ -8646,7 +8646,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
