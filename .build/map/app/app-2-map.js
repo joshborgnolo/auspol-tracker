@@ -913,10 +913,53 @@ let PLACES = null, placesP = null, townSince = new Map();
 // ringed until the next choice of anything
 let townPick = -1;
 const TOWN_FADE = 220;
-const TOWN_CAP = new Set(["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Hobart", "Canberra", "Darwin"]);
+// the capitals, by state too: Tasmania has a Perth of its own
+const TOWN_CAP = { Sydney: "NSW", Melbourne: "VIC", Brisbane: "QLD", Perth: "WA", Adelaide: "SA", Hobart: "TAS", Canberra: "ACT", Darwin: "NT" };
+const isCapital = (q) => TOWN_CAP[q[0]] === q[4] || q[3] >= 1e6;
 // the scale (px/km) a town of p people first shows at: the capitals and a million always;
 // 250k at the country's view on a desktop, 20k at a state's, 5k a few seats', 1k a rural seat's
-const townAt = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? 0 : 0.3 * Math.pow(1e5 / p, 0.75));
+const townPopAt = (q) => (isCapital(q) ? 0 : 0.3 * Math.pow(1e5 / q[3], 0.75));
+/* Size alone leaves the sparse states blank: Adelaide was South Australia's only name on its
+   own frame. So a town also shows once it stands TOWN_GAP screen pixels from the nearest
+   bigger town in the frame: the only place for miles earns its name at a size a town near
+   a city doesn't (Alice Springs before Geelong, a reference map's choice, not a ranking).
+   Looser on a state's frame, whose reader wants the local landmarks; fixed in pixels, so a
+   phone's whole country stays near its capitals. TOWN_ISLE_MIN people and up; on a state's
+   frame a town of 3,000 needs the full gap, a smaller one up to 1.5 of it, a bigger one down to 0.38
+   (Port Augusta beside Whyalla; Ceduna, Coober Pedy and Yulara out on their own). */
+const TOWN_GAP = { federal: 74, state: 62 }, TOWN_ISLE_MIN = { federal: 3000, state: 800 };
+const inFrame = (m, st) => !!(m.areas[st] || (st === "ACT" && m.areas.NSW));
+// each town's km to the nearest bigger town anywhere, state lines or not: a border town
+// beside a bigger one over the line isn't alone (Moama, Echuca's other bank). 0: under the lower minimum
+let townIsleD = null;
+function townIsle() {
+  if (townIsleD) return townIsleD;
+  const d = (townIsleD = new Float64Array(PLACES.length)), seen = [];
+  PLACES.forEach((q, i) => {
+    if (q[4] === "OT") return;
+    if (q[3] >= TOWN_ISLE_MIN.state) {
+      let best = Infinity;
+      const c = Math.cos((q[2] * Math.PI) / 180);
+      for (const r of seen) best = Math.min(best, Math.hypot((q[1] - r[1]) * c, q[2] - r[2]) * 111.2);
+      d[i] = best;
+    }
+    seen.push(q); // (biggest first: all before it are bigger)
+  });
+  return d;
+}
+// (and a state's frame opens on its regional cities: TOWN_STATE_POP and up from its home view,
+// the bar falling as it zooms from there, or the isolation rule would show Newman and not Bunbury)
+const TOWN_STATE_POP = 3e4, TOWN_STATE_K = 1.25, TOWN_STATE_SCALE = 0.4; // (px/km, a big state's home view)
+const townAt = (m, i) => {
+  // (the state's rules hold on a state's frame, and on the federal map from TOWN_STATE_K times
+  // its home zoom: the NT has no frame of its own, and a state reached by zooming in reads the same)
+  const frame = STATE_YEARS.has(m.year), st = frame || T.k > HOME.k * TOWN_STATE_K, q = PLACES[i], d = townIsle()[i];
+  let at = townPopAt(q);
+  if (st) at = Math.min(at, (frame ? HOME.k * townPts().upk : TOWN_STATE_SCALE) * Math.pow(TOWN_STATE_POP / q[3], 0.75));
+  if (!d) return at;
+  if (st) return Math.min(at, (TOWN_GAP.state * clamp(Math.pow(3000 / q[3], 0.65), 0.38, 1.5)) / d);
+  return q[3] >= TOWN_ISLE_MIN.federal ? Math.min(at, TOWN_GAP.federal / d) : at;
+};
 // wider than this (px/km) the towns' names go ahead of the seats'
 const TOWN_FIRST = 4;
 // the frame's projection units to a kilometre, and each town's point in them, kept per projection
@@ -958,7 +1001,7 @@ function townOffLand(m, key, box, cy) {
 }
 // the towns' own lettering: a dot, the name beside it; bigger towns heavier
 // one weight and colour for every town, so none reads fainter than another; the capitals a size up
-const townType = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? [13.5, 600, 3] : [12.5, 600, 2.5]);
+const townType = (q) => (isCapital(q) ? [13.5, 600, 3] : [12.5, 600, 2.5]);
 // (only: draw just that town - the search's choice - at any zoom, and where it has no
 // clear room, in the first spot on the screen regardless)
 function drawTowns(m, placed, skip, shown, obst, since, only) {
@@ -975,17 +1018,16 @@ function drawTowns(m, placed, skip, shown, obst, since, only) {
   const now = performance.now(), one = only != null;
   let n = 0, fading = false;
   for (let i = one ? only : 0; one ? i === only : i < PLACES.length && n < 70; i++) {
-    const [name, , , p, st] = PLACES[i];
-    const at = townAt(name, p);
-    if (!one && s < at) continue;
+    const [name, , , , st] = PLACES[i];
+    if (!one && (i === townPick || s < townAt(m, i))) continue;
     // the frame's own states (Canberra on the NSW frames, the ACT being their hole); one state chosen, its towns
-    if (!m.areas[st] && !(st === "ACT" && m.areas.NSW)) continue;
+    if (!inFrame(m, st)) continue;
     if (S.sel.level === "state" && st !== S.sel.st && !(st === "ACT" && S.sel.st === "NSW")) continue;
     const key = name.toLowerCase();
-    if ((!one && skip.has(key)) || shown.has(key)) continue;
+    if (!one && skip.has(key)) continue;
     const x = xy[2 * i] * T.k + T.x, y = xy[2 * i + 1] * T.k + T.y;
     if (!(x > 4 && y > 4 && x < Wpx - 4 && y < Hpx - 4)) continue;
-    const [size0, weight, r] = townType(name, p), size = one ? size0 + 1 : size0, txt = dn(name), ring = one ? r + 3.4 : r;
+    const [size0, weight, r] = townType(PLACES[i]), size = one ? size0 + 1 : size0, txt = dn(name), ring = one ? r + 3.4 : r;
     ctx.font = `${weight} ${size}px ${SANS}`;
     const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - ring - 1, y - ring - 1, x + ring + 1, y + ring + 1];
     if (!one && hits(dot)) continue;
@@ -1005,8 +1047,8 @@ function drawTowns(m, placed, skip, shown, obst, since, only) {
     }
     if (!box) continue;
     placed.push(box, dot); shown.add(key); n++;
-    const t0 = townSince.get(key) ?? now, fa = reduceMotion ? 1 : clamp((now - t0) / TOWN_FADE, 0, 1);
-    since.set(key, t0); if (fa < 1) fading = true;
+    const t0 = townSince.get(i) ?? now, fa = reduceMotion ? 1 : clamp((now - t0) / TOWN_FADE, 0, 1);
+    since.set(i, t0); if (fa < 1) fading = true;
     ctx.save();
     ctx.globalAlpha = ovA * fa * fa * (3 - 2 * fa);
     ctx.textAlign = pick[2];
@@ -2007,7 +2049,7 @@ function townSearchItems(m) {
   if (m._townItems) return m._townItems;
   const out = [];
   PLACES.forEach((q, i) => {
-    if (!m.areas[q[4]] && !(q[4] === "ACT" && m.areas.NSW)) return;
+    if (!inFrame(m, q[4])) return;
     out.push({ k: "town", ti: i, t: q[0], h: norm(q[0]), rank: 1.5 - Math.log10(q[3]) / 100 });
   });
   return (m._townItems = out);
@@ -2029,12 +2071,12 @@ function flyToTown(i, opts = {}) {
   dock = null;
   const go = (dur) => {
     if (!PLACES || !townPts()) return;
-    if (!M().areas[q[4]] && !(q[4] === "ACT" && M().areas.NSW)) { reframe = null; fitSelection(dur); return; }
+    if (!inFrame(M(), q[4])) { reframe = null; fitSelection(dur); return; }
     const [w0, s0, e0, n0] = q[5], pts = [[w0, s0], [w0, n0], [e0, s0], [e0, n0], [q[1], q[2]]].map((ll) => proj(ll));
     let x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0])), y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
     let t = fitTransform([[x0, y0], [x1, y1]]);
     // no wider than the zoom its name shows at (a touch inside it), no closer than TOWN_SPAN km across
-    const at = townAt(q[0], q[3]), kLo = at ? (at * 1.3) / tp.upk : 0, kHi = Math.max(kLo, Math.min(Wpx, Hpx) / (TOWN_SPAN * tp.upk));
+    const at = townAt(M(), i), kLo = at ? (at * 1.3) / tp.upk : 0, kHi = Math.max(kLo, Math.min(Wpx, Hpx) / (TOWN_SPAN * tp.upk));
     const want = clamp(t.k, kLo, kHi);
     if (Math.abs(want / t.k - 1) > 0.01) {
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, f = t.k / want;
