@@ -611,6 +611,21 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes("setYear(yearOf(g.dataset.year))"), "the timeline stop click hands setYear a word-year-safe year");
 }
 
+// ── open-water clicks (2026-11-05): on the map a single click on the sea lets
+// the selection out where the camera stands (a zoomed miss used to be swallowed
+// as a pan mis-tap, so a chosen seat could never be let go from the water;
+// only the near-home miss worked) — the double click on the sea is the gesture
+// that takes the camera all the way out home. The chamber's miss keeps its
+// own always-deselect (it has no camera)
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes('else if (S.view === "map") select({ level: "aus" }, { fly: false });'), "a single click on open water lets the selection out where the camera stands");
+  assert.ok(!/T\.k < HOME\.k \* 1\.4/.test(ui), "the map's water miss no longer waits for the near-home zoom");
+  const dbl = ui.match(/canvas\.addEventListener\("dblclick", \(e\) => \{\n([\s\S]*?)\n\}\);/);
+  assert.ok(dbl, "the canvas carries a dblclick listener");
+  assert.ok(/if \(S\.view !== "map"\) return;/.test(dbl[1]) && /hitTest\(e\.clientX - r\.left, e\.clientY - r\.top\)\) return;/.test(dbl[1]) && /\n\s+goAus\(\);/.test(dbl[1]), "a double click on open water (map view only) takes the map out to the home fit");
+}
+
 // the background year preload (2026-10-26): once the page is up, every other
 // election loads in the background — nearest timeline stops first, one idle
 // slice at a time — so a timeline jump, a chamber switch or the Senate lens
@@ -2346,7 +2361,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
-  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds six jurisdiction rows (169px; 148px on the phone rung)");
+  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 200px;/.test(css) && /\.mp-time \{ height: 174px; \}/.test(css), "the timeline bar holds six jurisdiction rows at the five-row pitch (200px; 174px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
   assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
   // the rung order itself, in all four spots that encode it: the rail's rows
