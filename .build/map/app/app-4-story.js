@@ -211,7 +211,7 @@ function seatStat(m, st, label) {
   if (A.tpp != null) {
     const s = A.tppSw;
     const sw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
-    two = `<span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
+    two = `<span class="st-lab">Two-party preferred</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
   }
   const change = (f, n) => {
     if (!base) return "";
@@ -221,7 +221,7 @@ function seatStat(m, st, label) {
   };
   const cells = seats.map(([f, n], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${n}</b>`).join("");
   const under = base ? seats.map(([f, n], i) => `<small style="grid-column:${2 * i + 1}">${change(f, n)}</small>`).join("") : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-seats">${cells}${under}</span></h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span><span class="st-seats">${cells}${under}</span></h3>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
