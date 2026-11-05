@@ -1,5 +1,5 @@
 /* ---- Public opinion: the topic map -----------------------------------------
-   Where every question in the nine one-off stores lands on the /public-opinion/
+   Where every question in the ten one-off stores lands on the /public-opinion/
    page (the ☰ menu page that was /ad-hocs/ until 2026-10-18, then
    /beyond-the-vote/ until 2026-10-21). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic
@@ -124,6 +124,8 @@ export const THEME_OF = {
   "hanson-immigration-settings": "immigration",
   // resolve+secnewgate
   "immigration-level": "immigration",
+  // scanlon
+  "immigration-too-high": "immigration",
 
   /* one-nation */
   // demosau

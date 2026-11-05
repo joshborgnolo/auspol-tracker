@@ -21,7 +21,10 @@
 const { useState: pubopUseState, useEffect: pubopUseEffect, useMemo: pubopUseMemo, useDeferredValue: pubopUseDeferred } = React;
 
 const PUBOP_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const pubopDay = (iso) => Number(iso.slice(8, 10)) + " " + PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+/* a wave filed at month precision ("2026-07", fieldwork printed to the
+   month) reads as its month, never as a day it does not carry */
+const pubopDay = (iso) => iso.length > 7 ? Number(iso.slice(8, 10)) + " " + PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4)
+  : PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 const pubopMonth = (iso) => PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 /* a month as the chart's axis writes it ("Dec 25") */
 const pubopMonYY = (iso) => PUBOP_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(2, 4);
@@ -633,7 +636,7 @@ function PubOpTracker({ c, houses, topic }) {
               return qs.flatMap((q) => {
                 const pre = qs.length > 1 ? pubopHouse(q, houses) + ": " : "";
                 return net ? [{ label: pre + pubopCap(c.names[0]), value: pubopPct(q.a) }, { label: pre + pubopCap(c.names[1]), value: pubopPct(q.b) }]
-                  : [{ label: pre + pubopCap(c.names[1]), value: pubopPct(q.b) }];
+                  : q.b == null ? [] : [{ label: pre + pubopCap(c.names[1]), value: pubopPct(q.b) }];
               });
             }}
             fmt={fmt}
@@ -680,7 +683,7 @@ function PubOpTracker({ c, houses, topic }) {
                 <tr key={i}>
                   <td className="pubop-l">{pubopHouse(q, houses)}</td><td className="pubop-l">{pubopSpan(q.field)}</td>
                   <td>{q.n ? q.n.toLocaleString("en-AU") : "–"}</td>
-                  <td>{pubopN(q.a)}</td><td>{pubopN(q.m)}</td><td>{pubopN(q.b)}</td>
+                  <td>{pubopN(q.a)}</td><td>{q.m == null ? "–" : pubopN(q.m)}</td><td>{q.b == null ? "–" : pubopN(q.b)}</td>
                   {net ? <td><b>{pubopSigned(q.v)}</b></td> : null}
                   <td>{q.url ? <a href={q.url} target="_blank" rel="noopener">Source ↗</a> : null}</td>
                 </tr>

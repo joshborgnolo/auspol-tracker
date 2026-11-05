@@ -256,8 +256,8 @@
       "question": "How often do you think the government in Canberra can be trusted to do the right thing for the Australian people?",
       "measure": "Almost always or most of the time",
       "role": "long",
-      "source": "https://scanloninstitute.org.au/wp-content/uploads/SI0001_MappingSocialCohesion_2025_v6.pdf",
-      "note": "Mapping Social Cohesion, Figure 8. A telephone survey to 2018, then ANU's Life in Australia panel (2018 was run both ways). Fieldwork is mid-year; 2020 was asked in July and November.",
+      "source": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+      "note": "Mapping Social Cohesion, Figure 8. A telephone survey to 2018, then ANU's Life in Australia panel (2018 was run both ways); since 2025 a blended Life in Australia + non-probability (ORU) sample, which Scanlon reports leaves the time series unaffected. Fieldwork is mid-year (June-July); 2020 was asked in July and November.",
       "modes": [
         {
           "id": "tel",
@@ -367,6 +367,11 @@
         {
           "date": "2025-07",
           "v": 37,
+          "mode": "lia"
+        },
+        {
+          "date": "2026-07",
+          "v": 31,
           "mode": "lia"
         }
       ]

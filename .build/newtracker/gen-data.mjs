@@ -8762,7 +8762,7 @@ const changelog = JUR ? null : (() => {
    The /public-opinion/ page (the ☰ menu page that was the /ad-hocs/
    catalogue, and until 2026-10-21 /beyond-the-vote/): what the pollsters
    ask beyond voting intention, by topic.
-   public-opinion.mjs reads the nine hand-curated one-off stores
+   public-opinion.mjs reads the ten hand-curated one-off stores
    (data/*-one-offs.json), files every question on adhoc-themes.mjs's topic
    map (an unmapped id throws, so a new wave fails the build rather than
    landing unsorted), and builds the page's trackers and cards with their

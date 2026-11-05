@@ -1,0 +1,48 @@
+{
+ "_about": "Non-standing-battery questions from the Scanlon Institute's Mapping Social Cohesion survey, hand-entered from the annual report. The standing cohesion battery (trust, belonging, participation, acceptance, worth) is excluded: its trust-in-government item channels into data/trust-government.json.",
+ "generated": "2026-11-05",
+ "_readme": "Verification: every figure was read from the published report PDF (Mapping Social Cohesion 2026, scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf). For the immigration item the report prints only the share agreeing it is too high (Figure 17's black line and the report text); the balance (disagreement, any don't-knows) is never printed, so the unprinted sides show as unprinted on the page rather than as zero. The report dates fieldwork only to the middle of the year ('in June and July') and the sample only as 'more than 10,000 Australian adults', so the store carries month-precision fieldwork and no sample; exact dates and margins live in the unpublished Technical Report. Filed with the 2026 report's first day of public release (5 November 2026; the report's media embargo lifted that morning).",
+ "entries": [
+  {
+   "id": "immigration-too-high",
+   "waveDate": "2025-07",
+   "dateStart": null,
+   "question": "Share believing the number of immigrants accepted into Australia at present is too high",
+   "notes": "Mapping Social Cohesion 2025's reading, restated in the 2026 report (Figure 17 and its text: 'an increase from 52% in 2025'). Fieldwork mid-2025; the reports date the annual wave only to the middle of the year. From 2025 the survey rides a blended Life in Australia + non-probability (ORU) sample, which Scanlon reports leaves the time series unaffected.",
+   "url": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+     "rows": [
+      [
+       "Too high",
+       52
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "immigration-too-high",
+   "waveDate": "2026-07",
+   "dateStart": null,
+   "published": "2026-11-05",
+   "question": "Share believing the number of immigrants accepted into Australia at present is too high",
+   "notes": "Mapping Social Cohesion 2026, Figure 17 and the report text ('In 2026, approximately three-in-five adults (59%) believe that the level of immigration to Australia is currently too high, the highest proportion in the history of the Mapping Social Cohesion survey and an increase from 52% in 2025 and an average of 39% in the 2010s'; the all-time low was 24% in 2022). Fieldwork June-July 2026 (the report names no exact dates); a nationally representative survey of over 10,000 Australian adults on the blended Life in Australia + non-probability sample introduced in 2025.",
+   "url": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+     "rows": [
+      [
+       "Too high",
+       59
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

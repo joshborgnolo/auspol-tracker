@@ -38,7 +38,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { THEMES, themeOf } from "./adhoc-themes.mjs";
 
-/* ---- the nine stores, read into one shape -----------------------------------
+/* ---- the ten stores, read into one shape -----------------------------------
    The stores are hand-curated research products, each on its own pipeline
    and commit; this reshapes them to one entry shape and drops what the page
    never reads (RedBridge's verification haystacks, News24's embed ids). No
@@ -78,9 +78,9 @@ export function readStores(root) {
         prose: [] });
     }
   }
-  /* Essential, Resolve, Freshwater, Australia Institute (via YouGov):
-     .entries, tables already [label, ...values] */
-  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"]]) {
+  /* Essential, Resolve, Freshwater, Australia Institute (via YouGov),
+     Scanlon Institute: .entries, tables already [label, ...values] */
+  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"], ["scanlon", "scanlon-one-offs.json"]]) {
     for (const e of read(file, (j) => j.entries || [])) {
       entries.push({ house, id: e.id, waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
@@ -104,15 +104,19 @@ export const HOUSES = {
   freshwater: { short: "Freshwater", full: "Freshwater Strategy" },
   demosau: { short: "DemosAU", full: "DemosAU" },
   ausinst: { short: "Australia Inst", full: "YouGov for The Australia Institute" },
+  scanlon: { short: "Scanlon", full: "Scanlon Institute" },
 };
 
 const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthYear = (iso) => MONF[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
-/* gen-data's dx: an exact decimal year, leap years 366 days long */
+/* gen-data's dx: an exact decimal year, leap years 366 days long. A wave
+   filed at month precision (Scanlon prints only a fieldwork month) reads
+   as its month's end, matching the wave-date-is-fieldwork-end contract */
 const dx = (iso) => {
   const [y, m, d] = iso.split("-").map(Number);
+  const day = d || new Date(Date.UTC(y, m, 0)).getUTCDate();
   const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
-  return y + (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000 / yrLen;
+  return y + (Date.UTC(y, m - 1, day) - Date.UTC(y, 0, 1)) / 86400000 / yrLen;
 };
 const num = (v) => {
   if (v == null || v === "") return null;
@@ -445,7 +449,11 @@ function buildTracker(spec, ix, deff, rowKeys) {
       const neff = neffOf(e, deff);
       const v = spec.measure === "net" ? r1(s.a - s.b) : s.a;
       const se = neff ? (spec.measure === "net" ? seNet(s.a, s.b, neff) : seShare(s.a, neff)) : null;
-      return { ...rkAttach(rowKeys, sourceOf(e)), x: Math.round(dx(fieldOf(e).end) * 1e4) / 1e4, a: s.a, b: s.b, m: r1(s.m + s.x), v,
+      /* onlyA: a pollster that prints just its agreeing share. The unprinted
+         middle and other side read null – never 0, which would put a figure
+         in its mouth ("0% want more") the wave never published */
+      return { ...rkAttach(rowKeys, sourceOf(e)), x: Math.round(dx(fieldOf(e).end) * 1e4) / 1e4, a: s.a,
+        b: sr.onlyA ? null : s.b, m: sr.onlyA ? null : r1(s.m + s.x), v,
         se: se != null ? r1(se) : null };
     }).sort((p, q) => p.x - q.x);
     if (!spec.families[sr.fam]) throw new Error("beyond-the-vote: " + spec.key + " / " + sr.house + " names no wording family");
@@ -508,17 +516,26 @@ const TRACKER_COPY = {
     return { head, dek: dek.trim() };
   },
   /* Immigration: a majority only when every pollster's latest share wanting
-     less clears 50% by its own margin */
+     less clears 50% by its own margin. An onlyA series (Scanlon prints just
+     its too-high share) joins the too-high range beside it but is silent on
+     every margin claim, "most common answer", "want more" and anything
+     reading b/m */
   immigration(panels) {
     const latest = panels.map((p) => p.points[p.points.length - 1]);
-    const major = latest.every((l) => l.se != null && l.v - 1.96 * l.se > 50);
-    const most = latest.every((l) => l.v > Math.max(l.b, l.m));
+    const major = latest.every((l) => l.se == null || l.v - 1.96 * l.se > 50);
+    const most = latest.every((l) => l.b == null || l.v > Math.max(l.b, l.m));
     const head = major ? "In every poll, a majority want less immigration"
       : most ? "In every poll, wanting less immigration is the most common answer"
       : "Pollsters differ on whether Australians want less immigration";
-    const rng = (k) => { const v = latest.map((l) => Math.round(l[k])); const lo = Math.min(...v), hi = Math.max(...v); return lo === hi ? lo + "%" : lo + "–" + hi + "%"; };
-    const dek = "In each pollster’s latest reading, " + rng("v") + " say immigration is too high or should be cut, and "
-      + rng("b") + " want more. " + movementSentences(panels);
+    const rng = (k) => {
+      const v = latest.map((l) => l[k]).filter((x) => x != null).map(Math.round);
+      if (!v.length) return null;
+      const lo = Math.min(...v), hi = Math.max(...v);
+      return lo === hi ? lo + "%" : lo + "–" + hi + "%";
+    };
+    const wantMore = rng("b");
+    const dek = "In each pollster’s latest reading, " + rng("v") + " say immigration is too high or should be cut"
+      + (wantMore ? ", and " + wantMore + " want more" : "") + ". " + movementSentences(panels);
     return { head, dek: dek.trim() };
   },
 };
@@ -631,6 +648,10 @@ export const FEATURES = {
           } },
         { house: "newspoll", id: "immigration-levels", label: "Fewer immigrants?", fam: 1 },
         { house: "essential", id: "immigration-intake", label: "Should the intake fall?", fam: 1 },
+        /* Scanlon prints only its too-high agreement share: its unprinted
+           sides draw as – in the ledger and stay out of the "want more"
+           copy, never as a 0% the survey did not publish */
+        { house: "scanlon", id: "immigration-too-high", label: "Is the number accepted too high?", fam: 0, onlyA: true },
       ] },
     { kind: "split", title: "Would people still want immigration cut if housing and services kept pace?", ref: R("immigration-if-services", "essential"),
       names: ["still want cuts", "would not"] },
