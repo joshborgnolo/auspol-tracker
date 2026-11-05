@@ -802,7 +802,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"208f312b","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"d5be66a8"};
+const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"eeb6dd6d","core-1998.json":"bf97a929","core-2001.json":"022996cd","core-2004.json":"c452b4dc","core-2007.json":"3de43a1b","core-2010.json":"c601372b","core-2013.json":"21485c84","core-2016.json":"dc03acf2","core-2019.json":"f6e278e1","core-2022.json":"50a5def4","core-2025.json":"f7324059","core-nsw15.json":"5f3e3e15","core-nsw19.json":"e865ec9a","core-nsw23.json":"03e4a5c2","core-qld17.json":"3982f5a4","core-qld20.json":"0c01703b","core-qld24.json":"c802dc65","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"1928fa3f","core-vic22.json":"4203c0e7","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"171b3a9c","res-1998.json":"af8ed171","res-2001.json":"c2e0a5f7","res-2004.json":"36a5e78e","res-2007.json":"d9febb1f","res-2010.json":"1b70d079","res-2013.json":"f40fa44b","res-2016.json":"0315a226","res-2019.json":"88f442f2","res-2022.json":"950194d7","res-2025.json":"9eb693ab","res-nsw15.json":"f39f4406","res-nsw19.json":"9bc77b50","res-nsw23.json":"20182d77","res-qld17.json":"6c812a4c","res-qld20.json":"a0aa704c","res-qld24.json":"93568b37","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"b19526f5","res-vic22.json":"d2f77af1","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"d5be66a8"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -2306,8 +2306,10 @@ function drawLabels(m) {
   }
   // the towns: ahead of the seats' names while the view is wide (a city names
   // the country, a seat named for it gives way), after the polling places closer in
-  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set();
-  if (wide) drawTowns(m, placed, seatNm, town, []);
+  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set(), since = new Map();
+  // a town chosen in the search goes first of all, ringed, at any zoom
+  if (tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
+  if (wide) drawTowns(m, placed, seatNm, town, [], since);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
@@ -2343,7 +2345,8 @@ function drawLabels(m) {
       if (S.sel.level === "booth" && j === S.sel.booth) continue;
       const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y;
       if (x < 0 || y < 0 || x > Wpx || y > Hpx) continue;
-      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
+      // (a polling place named for its town takes the name: the town's own label gives way)
+      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) { n++; seatNm.add(b.name[j].replace(" early voting centre", "").toLowerCase()); }
     }
   }
   // every booth's dot, which the towns' and the streets' names keep clear of
@@ -2352,7 +2355,8 @@ function drawLabels(m) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
     if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
   }
-  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst);
+  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
+  townSince = since;
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
   if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
@@ -2370,6 +2374,9 @@ function drawLabels(m) {
    A name fades in over TOWN_FADE ms from the frame it first finds room (a
    fade over a stretch of zoom left names half-drawn on a map at rest). */
 let PLACES = null, placesP = null, townSince = new Map();
+// the town last chosen in the search (an index into PLACES; -1 none): drawn first and
+// ringed until the next choice of anything
+let townPick = -1;
 const TOWN_FADE = 220;
 const TOWN_CAP = new Set(["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Hobart", "Canberra", "Darwin"]);
 // the scale (px/km) a town of p people first shows at: the capitals and a million always;
@@ -2417,7 +2424,9 @@ function townOffLand(m, key, box, cy) {
 // the towns' own lettering: a dot, the name beside it; bigger towns heavier
 // one weight and colour for every town, so none reads fainter than another; the capitals a size up
 const townType = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? [13.5, 600, 3] : [12.5, 600, 2.5]);
-function drawTowns(m, placed, skip, shown, obst) {
+// (only: draw just that town - the search's choice - at any zoom, and where it has no
+// clear room, in the first spot on the screen regardless)
+function drawTowns(m, placed, skip, shown, obst, since, only) {
   const t = townPts(); if (!t) return;
   const s = T.k * t.upk, xy = t.xy;
   // the lettering, whatever the seat under it: black with a white outline on the light
@@ -2428,34 +2437,35 @@ function drawTowns(m, placed, skip, shown, obst) {
   // the zoom buttons over the stage's corner: no name runs under them
   const zr = $("#zoomer"), cr = canvas.getBoundingClientRect();
   if (zr && zr.offsetParent) { const q = zr.getBoundingClientRect(); obst = obst.concat([[q.left - cr.left - 4, q.top - cr.top - 4, q.right - cr.left + 4, q.bottom - cr.top + 4]]); }
-  const now = performance.now(), since = new Map();
+  const now = performance.now(), one = only != null;
   let n = 0, fading = false;
-  for (let i = 0; i < PLACES.length && n < 70; i++) {
+  for (let i = one ? only : 0; one ? i === only : i < PLACES.length && n < 70; i++) {
     const [name, , , p, st] = PLACES[i];
     const at = townAt(name, p);
-    if (s < at) continue;
+    if (!one && s < at) continue;
     // the frame's own states (Canberra on the NSW frames, the ACT being their hole); one state chosen, its towns
     if (!m.areas[st] && !(st === "ACT" && m.areas.NSW)) continue;
     if (S.sel.level === "state" && st !== S.sel.st && !(st === "ACT" && S.sel.st === "NSW")) continue;
     const key = name.toLowerCase();
-    if (skip.has(key) || shown.has(key)) continue;
+    if ((!one && skip.has(key)) || shown.has(key)) continue;
     const x = xy[2 * i] * T.k + T.x, y = xy[2 * i + 1] * T.k + T.y;
     if (!(x > 4 && y > 4 && x < Wpx - 4 && y < Hpx - 4)) continue;
-    const [size, weight, r] = townType(name, p), txt = dn(name);
+    const [size0, weight, r] = townType(name, p), size = one ? size0 + 1 : size0, txt = dn(name), ring = one ? r + 3.4 : r;
     ctx.font = `${weight} ${size}px ${SANS}`;
-    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - r - 1, y - r - 1, x + r + 1, y + r + 1];
-    if (hits(dot)) continue;
+    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - ring - 1, y - ring - 1, x + ring + 1, y + ring + 1];
+    if (!one && hits(dot)) continue;
     // beside the dot: right, left, above, below - the first with room whose text lies
     // wholly on land (a coastal town's name keeps off the sea), else the first with room
-    const spots = [[x + r + 4, y, "left"], [x - r - 4, y, "right"], [x, y - r - hh - 1, "center"], [x, y + r + hh + 1, "center"]];
+    const spots = [[x + ring + 4, y, "left"], [x - ring - 4, y, "right"], [x, y - ring - hh - 1, "center"], [x, y + ring + hh + 1, "center"]];
     const zk = Math.round(Math.log2(T.k) * 12);
     let box = null, pick = null;
     for (let si = 0; si < 4; si++) {
       const sp = spots[si], x0 = sp[2] === "left" ? sp[0] - 2 : sp[2] === "right" ? sp[0] - w - 2 : sp[0] - w / 2 - 2;
       const bx = [x0, sp[1] - hh, x0 + w + 4, sp[1] + hh];
-      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2 || hits(bx)) continue;
+      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2) continue;
+      if (hits(bx)) { if (one && !box) { box = bx; pick = sp; } continue; }
       const off = townOffLand(m, `${i}|${si}|${zk}`, bx, sp[1]);
-      if (!box) { box = bx; pick = sp; }
+      if (!box || (one && hits(box))) { box = bx; pick = sp; }
       if (!off) { box = bx; pick = sp; break; }
     }
     if (!box) continue;
@@ -2469,9 +2479,9 @@ function drawTowns(m, placed, skip, shown, obst) {
     ctx.fillStyle = fg; ctx.fillText(txt, pick[0], pick[1]);
     ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.lineWidth = 2; ctx.stroke(); ctx.fill();
+    if (one) { ctx.beginPath(); ctx.arc(x, y, ring, 0, 2 * Math.PI); ctx.lineWidth = 3.6; ctx.strokeStyle = rim; ctx.stroke(); ctx.lineWidth = 1.6; ctx.strokeStyle = fg; ctx.stroke(); }
     ctx.restore();
   }
-  townSince = since;
   if (fading) schedule();
   ctx.textAlign = "center";
 }
@@ -3405,8 +3415,13 @@ function fly(t, dur, redo) {
   s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t)
     .on("end.flight interrupt.flight", () => { if (flight === me) flight = null; });
 }
+// a framing of the page's own other than the selection's box - a town chosen in the search,
+// a capital's button - which every later re-fit (the key growing under it, a resize, a new
+// year) repeats instead of falling back to the selection's box; cleared by the next selection
+let reframe = null;
 function fitSelection(dur, force) {
   if (!M() || !Wpx || (S.view !== "map" && !force)) return;
+  if (reframe && S.view === "map") { reframe(dur); return; }
   const q = selIsland();
   if ((q ? q.key : null) !== away) { away = q ? q.key : null; setExtent(); }
   const n = heldIslands(M()).length;
@@ -3418,19 +3433,100 @@ function fitSelection(dur, force) {
   if (!dur || reduceMotion) { glideCancel(); flight = null; s.interrupt(); s.call(zoom.transform, t); }
   else fly(t, dur, () => fitSelection(Math.min(dur, 320)));
 }
+/* ----- a town chosen in the search -----
+   It selects the seat it stands in; a city across several seats (half and more of
+   its area outside the seat at its centre) selects its state instead, as the
+   capitals' buttons do. The map then frames the town's ABS boundary, no wider
+   than its name's own zoom and no closer than a view TOWN_SPAN km across. */
+const TOWN_SPAN = 10;
+// where a town lies on this year's map: { div, others } - the seat at its point (or,
+// at a coast the simplified seats miss, the seat most of it lies in) and the other
+// seats found across its boundary's extent (points within the ellipse the box holds)
+function townSeat(m, i) {
+  const c = m._townSeat || (m._townSeat = new Map());
+  if (c.has(i)) return c.get(i);
+  const q = PLACES[i], [w0, s0, e0, n0] = q[5], cnt = new Map();
+  let land = 0;
+  for (let a = 0; a < 9; a++) for (let b = 0; b < 9; b++) {
+    const u = (a + 0.5) / 9 - 0.5, v = (b + 0.5) / 9 - 0.5;
+    if (u * u + v * v > 0.25) continue;
+    const p = proj([w0 + (e0 - w0) * (u + 0.5), s0 + (n0 - s0) * (v + 0.5)]), d = p ? divUnder(m, p[0], p[1]) : -1;
+    if (d < 0) continue;
+    land++; cnt.set(d, (cnt.get(d) || 0) + 1);
+  }
+  const pt = proj([q[1], q[2]]);
+  let div = pt ? divUnder(m, pt[0], pt[1]) : -1;
+  if (div < 0 && cnt.size) div = [...cnt].sort((x, y) => y[1] - x[1])[0][0];
+  const share = land && div >= 0 ? (cnt.get(div) || 0) / land : 1;
+  // the seats holding a good part of it (15% and more of the points), its own first
+  const main = [...cnt].filter(([d, n]) => d !== div && n / land >= 0.15).sort((x, y) => y[1] - x[1]).map(([d]) => d);
+  const r = { div, share, main: div >= 0 ? [div, ...main] : main, others: [...cnt.keys()].filter((d) => d !== div) };
+  c.set(i, r);
+  return r;
+}
+// a city spread across seats: it selects its state, not the seat at its centre
+const townSpread = (r) => r.share < 0.5 && r.others.length > 0;
+// the search's items for the towns in this year's frame, once the towns are in
+function townSearchItems(m) {
+  if (!PLACES) return [];
+  if (m._townItems) return m._townItems;
+  const out = [];
+  PLACES.forEach((q, i) => {
+    if (!m.areas[q[4]] && !(q[4] === "ACT" && m.areas.NSW)) return;
+    out.push({ k: "town", ti: i, t: q[0], h: norm(q[0]), rank: 1.5 - Math.log10(q[3]) / 100 });
+  });
+  return (m._townItems = out);
+}
+// the line under a town in the search: its state, its people and its seat(s)
+function townSub(m, it) {
+  const q = PLACES[it.ti], r = townSeat(m, it.ti), all = (r.div >= 0 ? 1 : 0) + r.others.length, nm = (d) => dn(m.divs[d].n);
+  // in one seat, in two (its own first), or across many (a count of the seats its extent reached)
+  const where = !all ? "" : r.main.length >= 3 || (townSpread(r) && r.main.length < 2) ? `across ${all} seats` : r.main.length === 2 ? `in ${nm(r.main[0])} and ${nm(r.main[1])}` : `in ${nm(r.main[0])}`;
+  return [STATE_SHORT[q[4]], `${int(q[3])} people`, where].filter(Boolean).join(" · ");
+}
+function flyToTown(i, opts = {}) {
+  const m = M(), q = PLACES && PLACES[i], tp = townPts();
+  if (!m || !q || !tp) return;
+  const r = townSeat(m, i), st = q[4] === "ACT" && !m.areas.ACT ? "NSW" : q[4];
+  townPick = i;
+  const sel = r.div >= 0 && !townSpread(r) ? { level: "div", st: m.divs[r.div].st, div: r.div } : m.areas[st] ? { level: "state", st } : { level: "aus" };
+  select(sel, { fly: false, keepTown: true, view: opts.view });
+  dock = null;
+  const go = (dur) => {
+    if (!PLACES || !townPts()) return;
+    if (!M().areas[q[4]] && !(q[4] === "ACT" && M().areas.NSW)) { reframe = null; fitSelection(dur); return; }
+    const [w0, s0, e0, n0] = q[5], pts = [[w0, s0], [w0, n0], [e0, s0], [e0, n0], [q[1], q[2]]].map((ll) => proj(ll));
+    let x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0])), y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
+    let t = fitTransform([[x0, y0], [x1, y1]]);
+    // no wider than the zoom its name shows at (a touch inside it), no closer than TOWN_SPAN km across
+    const at = townAt(q[0], q[3]), kLo = at ? (at * 1.3) / tp.upk : 0, kHi = Math.max(kLo, Math.min(Wpx, Hpx) / (TOWN_SPAN * tp.upk));
+    const want = clamp(t.k, kLo, kHi);
+    if (Math.abs(want / t.k - 1) > 0.01) {
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, f = t.k / want;
+      t = fitTransform([[cx + (x0 - cx) * f, cy + (y0 - cy) * f], [cx + (x1 - cx) * f, cy + (y1 - cy) * f]]);
+    }
+    lastFit = t;
+    if (!dur || reduceMotion) { flight = null; d3.select(canvas).interrupt(); d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
+  };
+  reframe = go;
+  go(S.view === "map" ? 900 : 0);
+}
 function flyToCity(k) {
   const [, st, ll] = CITIES[k];
-  const a = proj(ll[0]), b = proj(ll[1]);
   // a year whose jurisdiction holds no seats there (sa26: South Australia only,
   // so Adelaide alone flies)
   if (!M() || !M().areas[st]) return;
   select({ level: "state", st }, { fly: false });
   dock = null; // a city's view keeps no room for its state's islands
   const go = (dur) => {
+    // (repeated on a later year: one whose frame has lost the city frames the selection instead)
+    if (!M().areas[st]) { reframe = null; fitSelection(dur); return; }
+    const a = proj(ll[0]), b = proj(ll[1]);
     const t = fitTransform([[Math.min(a[0], b[0]), Math.min(a[1], b[1])], [Math.max(a[0], b[0]), Math.max(a[1], b[1])]]);
     lastFit = t;
-    if (reduceMotion) { flight = null; d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
+    if (!dur || reduceMotion) { flight = null; d3.select(canvas).interrupt(); d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
   };
+  reframe = go;
   go(900);
 }
 // zoomed right out from an island, the reader is home: the selection keeps its
@@ -7107,7 +7203,7 @@ function valueText(v, kind, ctx) {
 let phCtx = null;
 function fitSearchPlaceholder() {
   const input = $("#q"), sen = S.view === "chamber" && S.house === "senate";
-  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, member or place", "Search a seat or member", "Search"];
+  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, town, member or place", "Search a seat, member or place", "Search a seat or member", "Search"];
   if (!phCtx) phCtx = document.createElement("canvas").getContext("2d");
   const cs = getComputedStyle(input);
   phCtx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
@@ -7623,6 +7719,8 @@ function tipFor(h) {
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
+  if (!opts.keepTown) townPick = -1;
+  reframe = null; // (a town's or city's flight sets its own again, after this)
   if (selDiv() !== prevDiv) quietSince = performance.now();
   S.hover = null; hideTip();
   if (opts.view && opts.view !== S.view) setView(opts.view, true);
@@ -7681,37 +7779,41 @@ function runSearch() {
   if (!m || q.length < 2) { el.hidden = true; sugg = []; $("#q").setAttribute("aria-expanded", "false"); return; }
   const toks = norm(q).split(/\s+/).filter(Boolean);
   const scored = [];
-  for (const it of sen ? (SENM.search ??= senSearchItems(SENM)) : m.search.items) {
+  // (the towns ahead of the long run of polling places, which can fill the match cap)
+  for (const list of sen ? [SENM.search ??= senSearchItems(SENM)] : [townSearchItems(m), m.search.items]) for (const it of list) {
     const h = it.h; let ok = true, score = it.rank * 10;
     for (const t of toks) { const p = h.indexOf(t); if (p < 0) { ok = false; break; } if (p === 0) score -= 4; else if (h[p - 1] === " ") score -= 2; }
     if (ok) scored.push([score, it]);
     if (scored.length > 4000) break;
   }
   scored.sort((a, b) => a[0] - b[0]);
-  const groups = { state: [], sen: [], div: [], mp: [], cand: [], booth: [] };
+  const groups = { state: [], sen: [], div: [], town: [], mp: [], cand: [], booth: [] };
   for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" || it.k === "sen" ? 6 : 4)) g.push(it); }
-  sugg = [...groups.state, ...groups.sen, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
+  const order = ["state", "sen", "div", "town", "mp", "cand", "booth"];
+  sugg = order.flatMap((k) => groups[k]);
   suggAt = sugg.length ? 0 : -1;
-  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNowY(S.year) ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
+  const label = { state: "States and territories", sen: "Senators", div: "Seats", town: "Towns and cities", mp: isNowY(S.year) ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
   let html = "", n = 0;
-  for (const k of ["state", "sen", "div", "mp", "cand", "booth"]) {
+  for (const k of order) {
     if (!groups[k].length) continue;
     html += `<div class="g">${label[k]}</div>`;
     for (const it of groups[k]) {
-      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
-      html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw" style="background:${color}"></i><span class="t">${ds(it.t)}</span><span class="s">${ds(it.s)}</span></button>`;
+      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "town" ? "var(--ink)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
+      const sub = it.k === "town" ? townSub(m, it) : it.s;
+      html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw${it.k === "town" ? " sw-town" : ""}" style="background:${color}"></i><span class="t">${ds(it.t)}</span><span class="s">${ds(sub)}</span></button>`;
       n++;
     }
   }
-  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, member or place"} matches “${esc(q)}”.</div>`;
+  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, town, member or place"} matches “${esc(q)}”.</div>`;
   el.hidden = false; $("#q").setAttribute("aria-expanded", "true");
 }
 function chooseSugg(k) {
   const it = sugg[k]; if (!it) return;
   $("#sugg").hidden = true; $("#q").value = ""; S.q = ""; $("#q").blur();
   if (senOn()) { selectSen(it.k === "state" ? { level: "state", st: it.st } : { level: "sen", st: SENM.divs[it.i].st, i: it.i }); return; }
-  const view = it.k === "booth" && S.view === "chamber" ? "map" : undefined;
-  if (it.k === "state") goState(it.st, { view });
+  const view = (it.k === "booth" || it.k === "town") && S.view === "chamber" ? "map" : undefined;
+  if (it.k === "town") flyToTown(it.ti, { view });
+  else if (it.k === "state") goState(it.st, { view });
   else if (it.k === "div" || it.k === "mp" || it.k === "cand") goDiv(it.i, { view });
   else goBooth(it.j, { view });
 }
@@ -8470,7 +8572,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },

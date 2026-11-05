@@ -21,7 +21,9 @@ Needs pyshp and shapely.
 
 usage: python3 .build/map/places_build.py <srcDir> map/data/places.json
 Then: node .build/map/assemble.mjs (the data stamp).
-Output: {"src": ..., "p": [[name, lon, lat, pop, state], ...]} biggest first.
+Output: {"src": ..., "p": [[name, lon, lat, pop, state, [west, south, east, north]], ...]}
+biggest first; the box is the UCL boundary's extent (what the map frames when the
+town is chosen in the search).
 """
 import csv, io, json, re, sys, zipfile
 from collections import defaultdict
@@ -87,7 +89,8 @@ for sr in r.iterShapeRecords():
         big = max(geom.geoms, key=lambda g: g.area) if geom.geom_type == "MultiPolygon" else geom
         c = polylabel(big, tolerance=0.0005)
         pt = (c.x, c.y)
-    places.append([nm, round(pt[0], 4), round(pt[1], 4), p, STATE[rec["STE_CODE21"]]])
+    x0, y0, x1, y1 = geom.bounds
+    places.append([nm, round(pt[0], 4), round(pt[1], 4), p, STATE[rec["STE_CODE21"]], [round(x0, 3), round(y0, 3), round(x1, 3), round(y1, 3)]])
 
 # one name to a state: a split locality ("Mareeba - South") or a second
 # "Richmond" in the state keeps only its biggest

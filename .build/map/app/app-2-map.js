@@ -843,8 +843,10 @@ function drawLabels(m) {
   }
   // the towns: ahead of the seats' names while the view is wide (a city names
   // the country, a seat named for it gives way), after the polling places closer in
-  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set();
-  if (wide) drawTowns(m, placed, seatNm, town, []);
+  const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set(), since = new Map();
+  // a town chosen in the search goes first of all, ringed, at any zoom
+  if (tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
+  if (wide) drawTowns(m, placed, seatNm, town, [], since);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
@@ -880,7 +882,8 @@ function drawLabels(m) {
       if (S.sel.level === "booth" && j === S.sel.booth) continue;
       const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y;
       if (x < 0 || y < 0 || x > Wpx || y > Hpx) continue;
-      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) n++;
+      // (a polling place named for its town takes the name: the town's own label gives way)
+      if (put(dn(b.name[j].replace(" early voting centre", " (early)")), x, y - rad(boothSizeVotes(b, j)) - 9, 11, 400, groundOf(b.d[j]), sd != null && b.d[j] !== sd ? th.faint : th.ink2)) { n++; seatNm.add(b.name[j].replace(" early voting centre", "").toLowerCase()); }
     }
   }
   // every booth's dot, which the towns' and the streets' names keep clear of
@@ -889,7 +892,8 @@ function drawLabels(m) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
     if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
   }
-  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst);
+  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
+  townSince = since;
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
   if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
@@ -907,6 +911,9 @@ function drawLabels(m) {
    A name fades in over TOWN_FADE ms from the frame it first finds room (a
    fade over a stretch of zoom left names half-drawn on a map at rest). */
 let PLACES = null, placesP = null, townSince = new Map();
+// the town last chosen in the search (an index into PLACES; -1 none): drawn first and
+// ringed until the next choice of anything
+let townPick = -1;
 const TOWN_FADE = 220;
 const TOWN_CAP = new Set(["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Hobart", "Canberra", "Darwin"]);
 // the scale (px/km) a town of p people first shows at: the capitals and a million always;
@@ -954,7 +961,9 @@ function townOffLand(m, key, box, cy) {
 // the towns' own lettering: a dot, the name beside it; bigger towns heavier
 // one weight and colour for every town, so none reads fainter than another; the capitals a size up
 const townType = (name, p) => (TOWN_CAP.has(name) || p >= 1e6 ? [13.5, 600, 3] : [12.5, 600, 2.5]);
-function drawTowns(m, placed, skip, shown, obst) {
+// (only: draw just that town - the search's choice - at any zoom, and where it has no
+// clear room, in the first spot on the screen regardless)
+function drawTowns(m, placed, skip, shown, obst, since, only) {
   const t = townPts(); if (!t) return;
   const s = T.k * t.upk, xy = t.xy;
   // the lettering, whatever the seat under it: black with a white outline on the light
@@ -965,34 +974,35 @@ function drawTowns(m, placed, skip, shown, obst) {
   // the zoom buttons over the stage's corner: no name runs under them
   const zr = $("#zoomer"), cr = canvas.getBoundingClientRect();
   if (zr && zr.offsetParent) { const q = zr.getBoundingClientRect(); obst = obst.concat([[q.left - cr.left - 4, q.top - cr.top - 4, q.right - cr.left + 4, q.bottom - cr.top + 4]]); }
-  const now = performance.now(), since = new Map();
+  const now = performance.now(), one = only != null;
   let n = 0, fading = false;
-  for (let i = 0; i < PLACES.length && n < 70; i++) {
+  for (let i = one ? only : 0; one ? i === only : i < PLACES.length && n < 70; i++) {
     const [name, , , p, st] = PLACES[i];
     const at = townAt(name, p);
-    if (s < at) continue;
+    if (!one && s < at) continue;
     // the frame's own states (Canberra on the NSW frames, the ACT being their hole); one state chosen, its towns
     if (!m.areas[st] && !(st === "ACT" && m.areas.NSW)) continue;
     if (S.sel.level === "state" && st !== S.sel.st && !(st === "ACT" && S.sel.st === "NSW")) continue;
     const key = name.toLowerCase();
-    if (skip.has(key) || shown.has(key)) continue;
+    if ((!one && skip.has(key)) || shown.has(key)) continue;
     const x = xy[2 * i] * T.k + T.x, y = xy[2 * i + 1] * T.k + T.y;
     if (!(x > 4 && y > 4 && x < Wpx - 4 && y < Hpx - 4)) continue;
-    const [size, weight, r] = townType(name, p), txt = dn(name);
+    const [size0, weight, r] = townType(name, p), size = one ? size0 + 1 : size0, txt = dn(name), ring = one ? r + 3.4 : r;
     ctx.font = `${weight} ${size}px ${SANS}`;
-    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - r - 1, y - r - 1, x + r + 1, y + r + 1];
-    if (hits(dot)) continue;
+    const w = ctx.measureText(txt).width, hh = size / 2 + 2, dot = [x - ring - 1, y - ring - 1, x + ring + 1, y + ring + 1];
+    if (!one && hits(dot)) continue;
     // beside the dot: right, left, above, below - the first with room whose text lies
     // wholly on land (a coastal town's name keeps off the sea), else the first with room
-    const spots = [[x + r + 4, y, "left"], [x - r - 4, y, "right"], [x, y - r - hh - 1, "center"], [x, y + r + hh + 1, "center"]];
+    const spots = [[x + ring + 4, y, "left"], [x - ring - 4, y, "right"], [x, y - ring - hh - 1, "center"], [x, y + ring + hh + 1, "center"]];
     const zk = Math.round(Math.log2(T.k) * 12);
     let box = null, pick = null;
     for (let si = 0; si < 4; si++) {
       const sp = spots[si], x0 = sp[2] === "left" ? sp[0] - 2 : sp[2] === "right" ? sp[0] - w - 2 : sp[0] - w / 2 - 2;
       const bx = [x0, sp[1] - hh, x0 + w + 4, sp[1] + hh];
-      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2 || hits(bx)) continue;
+      if (bx[0] < 2 || bx[2] > Wpx - 2 || bx[1] < 2 || bx[3] > Hpx - 2) continue;
+      if (hits(bx)) { if (one && !box) { box = bx; pick = sp; } continue; }
       const off = townOffLand(m, `${i}|${si}|${zk}`, bx, sp[1]);
-      if (!box) { box = bx; pick = sp; }
+      if (!box || (one && hits(box))) { box = bx; pick = sp; }
       if (!off) { box = bx; pick = sp; break; }
     }
     if (!box) continue;
@@ -1006,9 +1016,9 @@ function drawTowns(m, placed, skip, shown, obst) {
     ctx.fillStyle = fg; ctx.fillText(txt, pick[0], pick[1]);
     ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.lineWidth = 2; ctx.stroke(); ctx.fill();
+    if (one) { ctx.beginPath(); ctx.arc(x, y, ring, 0, 2 * Math.PI); ctx.lineWidth = 3.6; ctx.strokeStyle = rim; ctx.stroke(); ctx.lineWidth = 1.6; ctx.strokeStyle = fg; ctx.stroke(); }
     ctx.restore();
   }
-  townSince = since;
   if (fading) schedule();
   ctx.textAlign = "center";
 }
@@ -1942,8 +1952,13 @@ function fly(t, dur, redo) {
   s.transition().duration(dur).ease(d3.easeCubicInOut).call(zoom.transform, t)
     .on("end.flight interrupt.flight", () => { if (flight === me) flight = null; });
 }
+// a framing of the page's own other than the selection's box - a town chosen in the search,
+// a capital's button - which every later re-fit (the key growing under it, a resize, a new
+// year) repeats instead of falling back to the selection's box; cleared by the next selection
+let reframe = null;
 function fitSelection(dur, force) {
   if (!M() || !Wpx || (S.view !== "map" && !force)) return;
+  if (reframe && S.view === "map") { reframe(dur); return; }
   const q = selIsland();
   if ((q ? q.key : null) !== away) { away = q ? q.key : null; setExtent(); }
   const n = heldIslands(M()).length;
@@ -1955,19 +1970,100 @@ function fitSelection(dur, force) {
   if (!dur || reduceMotion) { glideCancel(); flight = null; s.interrupt(); s.call(zoom.transform, t); }
   else fly(t, dur, () => fitSelection(Math.min(dur, 320)));
 }
+/* ----- a town chosen in the search -----
+   It selects the seat it stands in; a city across several seats (half and more of
+   its area outside the seat at its centre) selects its state instead, as the
+   capitals' buttons do. The map then frames the town's ABS boundary, no wider
+   than its name's own zoom and no closer than a view TOWN_SPAN km across. */
+const TOWN_SPAN = 10;
+// where a town lies on this year's map: { div, others } - the seat at its point (or,
+// at a coast the simplified seats miss, the seat most of it lies in) and the other
+// seats found across its boundary's extent (points within the ellipse the box holds)
+function townSeat(m, i) {
+  const c = m._townSeat || (m._townSeat = new Map());
+  if (c.has(i)) return c.get(i);
+  const q = PLACES[i], [w0, s0, e0, n0] = q[5], cnt = new Map();
+  let land = 0;
+  for (let a = 0; a < 9; a++) for (let b = 0; b < 9; b++) {
+    const u = (a + 0.5) / 9 - 0.5, v = (b + 0.5) / 9 - 0.5;
+    if (u * u + v * v > 0.25) continue;
+    const p = proj([w0 + (e0 - w0) * (u + 0.5), s0 + (n0 - s0) * (v + 0.5)]), d = p ? divUnder(m, p[0], p[1]) : -1;
+    if (d < 0) continue;
+    land++; cnt.set(d, (cnt.get(d) || 0) + 1);
+  }
+  const pt = proj([q[1], q[2]]);
+  let div = pt ? divUnder(m, pt[0], pt[1]) : -1;
+  if (div < 0 && cnt.size) div = [...cnt].sort((x, y) => y[1] - x[1])[0][0];
+  const share = land && div >= 0 ? (cnt.get(div) || 0) / land : 1;
+  // the seats holding a good part of it (15% and more of the points), its own first
+  const main = [...cnt].filter(([d, n]) => d !== div && n / land >= 0.15).sort((x, y) => y[1] - x[1]).map(([d]) => d);
+  const r = { div, share, main: div >= 0 ? [div, ...main] : main, others: [...cnt.keys()].filter((d) => d !== div) };
+  c.set(i, r);
+  return r;
+}
+// a city spread across seats: it selects its state, not the seat at its centre
+const townSpread = (r) => r.share < 0.5 && r.others.length > 0;
+// the search's items for the towns in this year's frame, once the towns are in
+function townSearchItems(m) {
+  if (!PLACES) return [];
+  if (m._townItems) return m._townItems;
+  const out = [];
+  PLACES.forEach((q, i) => {
+    if (!m.areas[q[4]] && !(q[4] === "ACT" && m.areas.NSW)) return;
+    out.push({ k: "town", ti: i, t: q[0], h: norm(q[0]), rank: 1.5 - Math.log10(q[3]) / 100 });
+  });
+  return (m._townItems = out);
+}
+// the line under a town in the search: its state, its people and its seat(s)
+function townSub(m, it) {
+  const q = PLACES[it.ti], r = townSeat(m, it.ti), all = (r.div >= 0 ? 1 : 0) + r.others.length, nm = (d) => dn(m.divs[d].n);
+  // in one seat, in two (its own first), or across many (a count of the seats its extent reached)
+  const where = !all ? "" : r.main.length >= 3 || (townSpread(r) && r.main.length < 2) ? `across ${all} seats` : r.main.length === 2 ? `in ${nm(r.main[0])} and ${nm(r.main[1])}` : `in ${nm(r.main[0])}`;
+  return [STATE_SHORT[q[4]], `${int(q[3])} people`, where].filter(Boolean).join(" · ");
+}
+function flyToTown(i, opts = {}) {
+  const m = M(), q = PLACES && PLACES[i], tp = townPts();
+  if (!m || !q || !tp) return;
+  const r = townSeat(m, i), st = q[4] === "ACT" && !m.areas.ACT ? "NSW" : q[4];
+  townPick = i;
+  const sel = r.div >= 0 && !townSpread(r) ? { level: "div", st: m.divs[r.div].st, div: r.div } : m.areas[st] ? { level: "state", st } : { level: "aus" };
+  select(sel, { fly: false, keepTown: true, view: opts.view });
+  dock = null;
+  const go = (dur) => {
+    if (!PLACES || !townPts()) return;
+    if (!M().areas[q[4]] && !(q[4] === "ACT" && M().areas.NSW)) { reframe = null; fitSelection(dur); return; }
+    const [w0, s0, e0, n0] = q[5], pts = [[w0, s0], [w0, n0], [e0, s0], [e0, n0], [q[1], q[2]]].map((ll) => proj(ll));
+    let x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0])), y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
+    let t = fitTransform([[x0, y0], [x1, y1]]);
+    // no wider than the zoom its name shows at (a touch inside it), no closer than TOWN_SPAN km across
+    const at = townAt(q[0], q[3]), kLo = at ? (at * 1.3) / tp.upk : 0, kHi = Math.max(kLo, Math.min(Wpx, Hpx) / (TOWN_SPAN * tp.upk));
+    const want = clamp(t.k, kLo, kHi);
+    if (Math.abs(want / t.k - 1) > 0.01) {
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, f = t.k / want;
+      t = fitTransform([[cx + (x0 - cx) * f, cy + (y0 - cy) * f], [cx + (x1 - cx) * f, cy + (y1 - cy) * f]]);
+    }
+    lastFit = t;
+    if (!dur || reduceMotion) { flight = null; d3.select(canvas).interrupt(); d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
+  };
+  reframe = go;
+  go(S.view === "map" ? 900 : 0);
+}
 function flyToCity(k) {
   const [, st, ll] = CITIES[k];
-  const a = proj(ll[0]), b = proj(ll[1]);
   // a year whose jurisdiction holds no seats there (sa26: South Australia only,
   // so Adelaide alone flies)
   if (!M() || !M().areas[st]) return;
   select({ level: "state", st }, { fly: false });
   dock = null; // a city's view keeps no room for its state's islands
   const go = (dur) => {
+    // (repeated on a later year: one whose frame has lost the city frames the selection instead)
+    if (!M().areas[st]) { reframe = null; fitSelection(dur); return; }
+    const a = proj(ll[0]), b = proj(ll[1]);
     const t = fitTransform([[Math.min(a[0], b[0]), Math.min(a[1], b[1])], [Math.max(a[0], b[0]), Math.max(a[1], b[1])]]);
     lastFit = t;
-    if (reduceMotion) { flight = null; d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
+    if (!dur || reduceMotion) { flight = null; d3.select(canvas).interrupt(); d3.select(canvas).call(zoom.transform, t); } else fly(t, dur, () => go(320));
   };
+  reframe = go;
   go(900);
 }
 // zoomed right out from an island, the reader is home: the selection keeps its

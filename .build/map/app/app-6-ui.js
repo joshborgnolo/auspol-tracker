@@ -54,7 +54,7 @@ function valueText(v, kind, ctx) {
 let phCtx = null;
 function fitSearchPlaceholder() {
   const input = $("#q"), sen = S.view === "chamber" && S.house === "senate";
-  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, member or place", "Search a seat or member", "Search"];
+  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, town, member or place", "Search a seat, member or place", "Search a seat or member", "Search"];
   if (!phCtx) phCtx = document.createElement("canvas").getContext("2d");
   const cs = getComputedStyle(input);
   phCtx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
@@ -570,6 +570,8 @@ function tipFor(h) {
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
+  if (!opts.keepTown) townPick = -1;
+  reframe = null; // (a town's or city's flight sets its own again, after this)
   if (selDiv() !== prevDiv) quietSince = performance.now();
   S.hover = null; hideTip();
   if (opts.view && opts.view !== S.view) setView(opts.view, true);
@@ -628,37 +630,41 @@ function runSearch() {
   if (!m || q.length < 2) { el.hidden = true; sugg = []; $("#q").setAttribute("aria-expanded", "false"); return; }
   const toks = norm(q).split(/\s+/).filter(Boolean);
   const scored = [];
-  for (const it of sen ? (SENM.search ??= senSearchItems(SENM)) : m.search.items) {
+  // (the towns ahead of the long run of polling places, which can fill the match cap)
+  for (const list of sen ? [SENM.search ??= senSearchItems(SENM)] : [townSearchItems(m), m.search.items]) for (const it of list) {
     const h = it.h; let ok = true, score = it.rank * 10;
     for (const t of toks) { const p = h.indexOf(t); if (p < 0) { ok = false; break; } if (p === 0) score -= 4; else if (h[p - 1] === " ") score -= 2; }
     if (ok) scored.push([score, it]);
     if (scored.length > 4000) break;
   }
   scored.sort((a, b) => a[0] - b[0]);
-  const groups = { state: [], sen: [], div: [], mp: [], cand: [], booth: [] };
+  const groups = { state: [], sen: [], div: [], town: [], mp: [], cand: [], booth: [] };
   for (const [, it] of scored) { const g = groups[it.k]; if (g.length < (it.k === "booth" || it.k === "sen" ? 6 : 4)) g.push(it); }
-  sugg = [...groups.state, ...groups.sen, ...groups.div, ...groups.mp, ...groups.cand, ...groups.booth];
+  const order = ["state", "sen", "div", "town", "mp", "cand", "booth"];
+  sugg = order.flatMap((k) => groups[k]);
   suggAt = sugg.length ? 0 : -1;
-  const label = { state: "States and territories", sen: "Senators", div: "Seats", mp: isNowY(S.year) ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
+  const label = { state: "States and territories", sen: "Senators", div: "Seats", town: "Towns and cities", mp: isNowY(S.year) ? "Members" : "Members elected", cand: "Candidates", booth: "Polling places" };
   let html = "", n = 0;
-  for (const k of ["state", "sen", "div", "mp", "cand", "booth"]) {
+  for (const k of order) {
     if (!groups[k].length) continue;
     html += `<div class="g">${label[k]}</div>`;
     for (const it of groups[k]) {
-      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
-      html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw" style="background:${color}"></i><span class="t">${ds(it.t)}</span><span class="s">${ds(it.s)}</span></button>`;
+      const color = it.k === "booth" ? colCss(m.boothCol[it.j]) : it.k === "state" ? "var(--line)" : it.k === "town" ? "var(--ink)" : it.k === "sen" ? colCss(SENM.divCol[it.i]) : colCss(m.divCol[it.i]);
+      const sub = it.k === "town" ? townSub(m, it) : it.s;
+      html += `<button type="button" role="option" data-n="${n}" aria-selected="${n === suggAt}"><i class="sw${it.k === "town" ? " sw-town" : ""}" style="background:${color}"></i><span class="t">${ds(it.t)}</span><span class="s">${ds(sub)}</span></button>`;
       n++;
     }
   }
-  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, member or place"} matches “${esc(q)}”.</div>`;
+  el.innerHTML = html || `<div class="none">${sen ? "No senator or state" : "No seat, town, member or place"} matches “${esc(q)}”.</div>`;
   el.hidden = false; $("#q").setAttribute("aria-expanded", "true");
 }
 function chooseSugg(k) {
   const it = sugg[k]; if (!it) return;
   $("#sugg").hidden = true; $("#q").value = ""; S.q = ""; $("#q").blur();
   if (senOn()) { selectSen(it.k === "state" ? { level: "state", st: it.st } : { level: "sen", st: SENM.divs[it.i].st, i: it.i }); return; }
-  const view = it.k === "booth" && S.view === "chamber" ? "map" : undefined;
-  if (it.k === "state") goState(it.st, { view });
+  const view = (it.k === "booth" || it.k === "town") && S.view === "chamber" ? "map" : undefined;
+  if (it.k === "town") flyToTown(it.ti, { view });
+  else if (it.k === "state") goState(it.st, { view });
   else if (it.k === "div" || it.k === "mp" || it.k === "cand") goDiv(it.i, { view });
   else goBooth(it.j, { view });
 }
@@ -1417,7 +1423,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
