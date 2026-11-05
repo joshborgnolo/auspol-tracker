@@ -844,7 +844,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"2c12c5d2","core-2007.json":"db5945af","core-2010.json":"8913d7e6","core-2013.json":"d4ec43d0","core-2016.json":"66c53637","core-2019.json":"8a7430f1","core-2022.json":"7f87cabc","core-2025.json":"ba7b0ddf","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"e4cad3a7","res-2007.json":"6cd3a820","res-2010.json":"a7e35b2b","res-2013.json":"d4a44230","res-2016.json":"237687b5","res-2019.json":"e3bb3296","res-2022.json":"88c31dfa","res-2025.json":"aea57650","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"2c12c5d2","core-2007.json":"db5945af","core-2010.json":"8913d7e6","core-2013.json":"d4ec43d0","core-2016.json":"66c53637","core-2019.json":"8a7430f1","core-2022.json":"7f87cabc","core-2025.json":"ba7b0ddf","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"f1a3ae40","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"5cb6dd10","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"2f3e4725","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"f8051359","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"da0f2884","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"17e396f0","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"3d3e3056","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"194abc94","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"e4cad3a7","res-2007.json":"6cd3a820","res-2010.json":"a7e35b2b","res-2013.json":"d4a44230","res-2016.json":"237687b5","res-2019.json":"e3bb3296","res-2022.json":"88c31dfa","res-2025.json":"aea57650","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"973c60bc","senate-prefs-2025.json":"61659360","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1669,7 +1669,7 @@ const selDiv = () => (S.sel.level === "div" || S.sel.level === "booth" ? S.sel.d
 // the opened seat as soon as it is chosen.
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 let quietSince = 0, needFrame = false;
-const quietAll = () => (drawOf(M()) === "surface" ? 0 : 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k));
+const quietAll = () => (drawOf(M()) === "surface" || drawOf(M()) === "areas" ? 0 : 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k));
 function quietness(i, now) {
   const all = quietAll();
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
@@ -1703,8 +1703,9 @@ function drawGeo(m, alpha, streetA) {
   const [x0, y0, x1, y1] = viewBox();
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
   const filt = filtersOn();
-  // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface is laid through these same fills
-  const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf : null;
+  // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface (or the
+  // census's own areas raster) is laid through these same fills
+  const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf || look.ar : null;
   if (look) ballNow = ball;
   const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
@@ -1763,7 +1764,7 @@ function drawGeo(m, alpha, streetA) {
   }
   if (st) layStreets(st);
   // (paper-white seams vanish on plain land, and a surface's own lines are the story: its seats are a faint guide)
-  const surfA = look ? look.surf : 0;
+  const surfA = look ? look.surf + (look.are || 0) : 0;
   if (ball < 1) { ctx.strokeStyle = css(th.seam, th.seamA * (1 - 0.72 * surfA) * (1 - ball)); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
   if (ball > 0) { ctx.strokeStyle = css(th.coast, 0.3 * ball); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
   ctx.strokeStyle = ball > 0.5 ? css(th.coast, 0.75) : css(th.seam, th.stateA * (1 - 0.35 * surfA)); ctx.lineWidth = 1.3 / T.k; ctx.stroke(g.meshState);
@@ -2309,8 +2310,9 @@ function visibleBooths(m) {
   if (sd == null && T.k < K_IN) return out;
   const [x0, y0, x1, y1] = viewBox(), pad = 24 / T.k;
   if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j])) out.push(j);
-  // (a surface is the reading of the whole ground: only an opened seat lays its own places on it)
-  if (T.k >= K_IN && drawOf(m) !== "surface") for (let j = 0; j < b.n; j++) {
+  // (a surface, or the census areas' own ground, is the reading of the whole ground:
+  // only an opened seat lays its own places on either)
+  if (T.k >= K_IN && drawOf(m) !== "surface" && drawOf(m) !== "areas") for (let j = 0; j < b.n; j++) {
     if (b.d[j] === sd || b.ty[j] !== 1) continue;
     const x = b.x[j], y = b.y[j];
     if (Number.isNaN(x) || x < x0 - pad || x > x1 + pad || y < y0 - pad || y > y1 + pad) continue;
@@ -2381,7 +2383,7 @@ function drawLabels(m) {
   const sd = selDiv(), b = m.booth;
   // (a surface's ground changes under a label, so it takes the lettering that holds on anything)
   const dw = drawOf(m);
-  const groundOf = (i) => { if (dw === "surface") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
+  const groundOf = (i) => { if (dw === "surface" || dw === "areas") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
@@ -3922,11 +3924,21 @@ function hitTest(px, py) {
    seats' own fill paths (drawGeo), so the coast, the sea cut, the islands, the filters and
    the veil over an opened seat all work on it as they do on a flat fill. */
 
-const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"]];
+const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"], ["areas", "Areas"]];
 // a seat type belongs to the whole seat, and so does its exhausted share: nothing to blend
 const surfaceFits = (m) => !(S.lens === "cls" || (S.lens === "informal" && infModeOf(m) === "exhaust"));
+// Areas is the Census lens's own drawing: it needs a census pack for the frame's vintage
+// and a lane the pack serves (the homeless lane is an SA2 estimate, never an SA1 count)
+const areasFits = (m) => {
+  if (S.lens !== "seifa" || !m) return false;
+  if (AREAS_FILES[areasVintage(m)] == null) return false;
+  const lane = areasLane();
+  if (!lane || !AREAS_LANES.has(lane)) return false;
+  if ((lane === "loinc" || lane === "hiqinc") && !(m.incomeCuts && m.incomeCuts.loCutWeekly > 0 && m.incomeCuts.hiQCutWeekly > 0)) return false;
+  return true;
+};
 // the drawing in force on an election (the chamber and the list keep their seats)
-const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" ? "seats" : S.draw === "surface" && !surfaceFits(m) ? "seats" : S.draw);
+const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" ? "seats" : (S.draw === "surface" && !surfaceFits(m)) || (S.draw === "areas" && !areasFits(m)) ? "seats" : S.draw);
 
 /* ----- the contest -----
    Labor v the Coalition is counted at every polling place. Labor v One Nation and the
@@ -4571,6 +4583,382 @@ function surfaceAsk(x, y) {
   });
 }
 
+/* ----- the Areas drawing: the census's own areas, painted as counted -----
+   Seats rolls the census up to each seat, and Surface smooths it between the polling
+   places; Areas stops at the finest rung the census itself publishes: the SA1 areas,
+   each painted with the figure the census counted there — a counted figure at every
+   point the census counted people, paper where it counted none (empty land) and where
+   the ABS suppresses a figure. The whole Census lens carries over — every People
+   measure, every Advantage index — read off one lazy pack per census vintage
+   (.build/map/build_areas_sa1.py): the 2021 pack is 61,811 areas over about sixty
+   lanes plus the shape itself, fetched the first time a frame wants them. The income
+   quartile lanes ride the frame in view's own incomeCuts over the pack's sixteen
+   adults-basis band masses per area, exactly as its seat stores compute them.
+   The drawing runs the surface's own bookkeeping: a whole-frame raster at the frame's
+   home zoom, a view raster on settle once the zoom outruns it, both composited through
+   the seats' fill paths in drawGeo, so the coast cut, the islands, the filters and the
+   veil work as they do on a surface. Mid-gesture the last raster just takes the new
+   transform. The key runs each lane's own extents from the pack (a population-weighted
+   99.5th percentile, rounded up), so only the lanes whose areas really reach ~100%
+   run that far — never the seats' 60% that flattens a Fairfield. */
+const AREAS_FILES = { 2021: "areas-sa1-2021" };
+// the frame's census vintage: its own demoYear, and a blend's nearest single side
+const areasVintage = (m) => (m ? m.demoInterp ? m.demoInterp.nearestSide : (m.demoYear == null ? 2021 : m.demoYear) : null);
+// the pack's lane for the Census lens's current measure (mirrors demoRamp's family map)
+function areasLane() {
+  if (S.lens !== "seifa") return null;
+  if (!isDemo()) return `sf.${S.index}`;
+  if (isCob()) return `cob.${S.cob}`;
+  if (isRel()) return `rel.${S.rel}`;
+  if (isTen()) return `ten.${S.ten}`;
+  if (isAnc()) return `anc.${S.anc}`;
+  if (isInc()) return S.incMode === "med" ? "incMed" : S.incMode === "lo" ? "loinc" : "hiqinc";
+  if (isAge()) return S.ageMode === "med" ? "ageMed" : S.ageMode;
+  if (isEdu()) return S.eduMode;
+  return S.index;
+}
+// the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+  "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
+  "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
+  "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
+  "anc.english", "anc.australian", "anc.irish", "anc.scottish", "anc.chinese", "anc.italian", "anc.german", "anc.indian", "anc.filipino", "anc.dutch", "anc.vietnamese", "anc.lebanese",
+  "ageMed", "incMed",
+  "sf.irsad", "sf.irsd", "sf.ier", "sf.ieo"]);
+// gcp_newlanes.INC_BANDS, verbatim: the weekly income bands the masses follow
+const AREAS_INC_BANDS = [[1, 149], [150, 299], [300, 399], [400, 499], [500, 649], [650, 799], [800, 999], [1000, 1249], [1250, 1499], [1500, 1749], [1750, 1999], [2000, 2499], [2500, 2999], [3000, 3499], [3500, 3999], [4000, null]];
+
+const AR = { packs: {}, pack: null, packOf: null, proj: null, projs: new WeakMap(),
+             vintage: null, m: null, key: null, lane: null, vals: null, pal: null, palRaw: null,
+             base: null, view: null, old: null, t1: 0, id: 0, busy: false, wantJ: null,
+             askedShow: false, here: null };
+
+function loadAreas(vin) {
+  if (AREAS_FILES[vin] == null) return null;
+  const got = AR.packs[vin];
+  if (got) return got.pack || got.P;
+  const P = getJSON(`/map/data/${AREAS_FILES[vin]}.json`)
+    .then((D) => {
+      const pack = areasUnpack(D);
+      AR.packs[vin] = { pack };
+      const m = M(), want = m && drawOf(m) === "areas" && areasVintage(m) === vin;
+      AR.key = null; schedule();
+      if (want) renderLegend();
+      showLoading(false);
+      return pack;
+    })
+    .catch((e) => { delete AR.packs[vin]; console.error(e); showLoading(false); return null; });
+  AR.packs[vin] = { P };
+  return P;
+}
+/* one national unpack: lane buffers decoded, geometries readied (projection is per
+   frame, made lazily and cached on the frame itself) */
+function areasUnpack(D) {
+  const U8 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const lanes = {}, types = {};
+  for (const [k, o] of Object.entries(D.lanes)) {
+    types[k] = o.t;
+    if (o.t === "u16") lanes[k] = new Uint16Array(U8(o.b).buffer);
+    else lanes[k] = U8(o.b);
+  }
+  const { scale, translate } = D.topo.transform;
+  const arcs = D.topo.arcs.map((a) => {
+    const o = new Float64Array(a.length * 2);
+    let x = 0, y = 0;
+    for (let i = 0; i < a.length; i++) {
+      x += a[i][0]; y += a[i][1];
+      o[2 * i] = x * scale[0] + translate[0]; o[2 * i + 1] = y * scale[1] + translate[1];
+    }
+    return o;
+  });
+  const geoms = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map((g) => {
+    const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
+    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
+  });
+  const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
+  const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
+  for (const [k, arr] of Object.entries(lanes)) if (arr.length !== n) throw new Error(`areas pack lane ${k} length ${arr.length} != ${n}`);
+  if (incBands.length !== n * 16 || pop.length !== n || area.length !== n || sa2i.length !== n) throw new Error("areas pack meta length drift");
+  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
+}
+// the income-quartile shares at the frame's own cuts: the builder's walk, verbatim
+function areasIncShare(P, m, i, lane) {
+  const b = P.incBands, o = i * 16;
+  let tot = 0;
+  for (let k = 0; k < 16; k++) tot += b[o + k];
+  if (!tot) return null;
+  const cut = lane === "loinc" ? m.incomeCuts.loCutWeekly : m.incomeCuts.hiQCutWeekly;
+  if (!(cut > 0)) return null;
+  let mass = lane === "loinc" ? 0 : tot;
+  for (let k = 0; k < 16; k++) {
+    const [lo, hi] = AREAS_INC_BANDS[k], w = b[o + k];
+    if (cut <= lo) { if (lane === "loinc") continue; break; }
+    if (hi != null && cut > hi) { mass += lane === "loinc" ? w : -w; continue; }
+    mass += (lane === "loinc" ? 1 : -1) * (w * (cut - lo)) / (hi - lo + 1);
+    break;
+  }
+  return mass / tot;
+}
+// a lane's display figure at area i, in the key's own units (percent for shares,
+// years/dollars the medians, deciles the indexes; null = nothing published there)
+function areasValue(P, m, i, lane) {
+  const inc = lane === "loinc" || lane === "hiqinc";
+  if (inc) { const v = areasIncShare(P, m, i, lane); return v == null ? null : 100 * v; }
+  const L = P.lanes[lane], t = P.types[lane];
+  if (!L) return null;
+  const v = L[i];
+  if (t === "u8x2") return v === 255 ? null : v / 2;
+  if (t === "u8z") return v === 0 ? null : v;
+  if (t === "u8") return v === 255 ? null : v;
+  if (t === "u16") return v === 65535 ? null : v;
+  return null;
+}
+const AR_NULLI = 251;
+// the reading's per-area key-line indexes over the pack (0..240 into AR.pal; 251 = none)
+function areasVals(P, m, lane) {
+  const n = P.geoms.length, vals = new Uint8Array(n).fill(AR_NULLI);
+  const [lo, hi] = P.caps[lane];
+  for (let i = 0; i < n; i++) {
+    const v = areasValue(P, m, i, lane);
+    if (v != null) vals[i] = Math.min(240, Math.max(0, Math.round(((v - lo) / (hi - lo)) * 240)));
+  }
+  return vals;
+}
+// the key's palette, raw and stringed (the density fade needs the numbers)
+function areasPalette(lane) {
+  const ramp = lane.startsWith("sf.") ? RAMP.seifa : demoRamp(), pal = new Array(241), raw = new Array(241);
+  for (let k = 0; k <= 240; k++) raw[k] = ramp[Math.round((k / 240) * 100)];
+  for (let k = 0; k <= 240; k++) pal[k] = css(raw[k]);
+  return { pal, raw };
+}
+// the frame's projection of every arc, the areas' projected bounds, and the tooltip's
+// spatial grid — made once, kept on the frame it belongs to
+function areasProj(m, vin) {
+  let pr = AR.projs.get(m);
+  if (pr && pr.vin === vin) return pr;
+  const P = AR.packs[vin] && AR.packs[vin].pack;
+  if (!P) return null;
+  const arcsXY = P.arcs.map((a) => {
+    const o = new Float32Array(a.length);
+    for (let i = 0; i < a.length; i += 2) {
+      const p = m.proj([a[i], a[i + 1]]);
+      o[i] = p ? p[0] : NaN;
+      o[i + 1] = p ? p[1] : NaN;
+    }
+    return o;
+  });
+  const bb = P.geoms.map(() => [Infinity, Infinity, -Infinity, -Infinity]);
+  P.geoms.forEach((g, gi) => {
+    const b = bb[gi];
+    for (const ring of g.r) {
+      for (const aid of ring) {
+        const A = arcsXY[aid < 0 ? ~aid : aid];
+        for (let k = 0; k < A.length; k += 2) {
+          const x = A[k], y = A[k + 1];
+          if (!(x === x)) continue;
+          if (x < b[0]) b[0] = x; if (y < b[1]) b[1] = y;
+          if (x > b[2]) b[2] = x; if (y > b[3]) b[3] = y;
+        }
+      }
+    }
+  });
+  let X0 = Infinity, Y0 = Infinity, X1 = -Infinity, Y1 = -Infinity;
+  for (const b of bb) { if (b[0] === Infinity) continue; if (b[0] < X0) X0 = b[0]; if (b[1] < Y0) Y0 = b[1]; if (b[2] > X1) X1 = b[2]; if (b[3] > Y1) Y1 = b[3]; }
+  const span = Math.max(X1 - X0, 1e-6), cell = span / 160, W = Math.ceil((X1 - X0) / cell) + 1, H = Math.ceil((Y1 - Y0) / cell) + 1;
+  const grid = new Array(W * H).fill(null);
+  P.geoms.forEach((g, gi) => {
+    const b = bb[gi];
+    if (b[0] === Infinity) return;
+    const c0 = clamp(Math.floor((b[0] - X0) / cell), 0, W - 1), c1 = clamp(Math.floor((b[2] - X0) / cell), 0, W - 1);
+    const d0 = clamp(Math.floor((b[1] - Y0) / cell), 0, H - 1), d1 = clamp(Math.floor((b[3] - Y0) / cell), 0, H - 1);
+    for (let d = d0; d <= d1; d++) for (let c = c0; c <= c1; c++) {
+      const o = d * W + c;
+      (grid[o] || (grid[o] = [])).push(gi);
+    }
+  });
+  pr = { vin, arcsXY, bb, grid, X0, Y0, cell, W, H };
+  AR.projs.set(m, pr);
+  return pr;
+}
+// odd-even ray cast over all of an area's rings at once (ring-agnostic: holes fall out)
+function areasInside(pr, g, x, y) {
+  let odd = false;
+  for (const ring of g.r) {
+    let fx = 0, fy = 0, lx = 0, ly = 0, first = true, px = 0, py = 0;
+    const visit = (qx, qy) => {
+      if (first) { fx = qx; fy = qy; first = false; }
+      else if ((py > y) !== (qy > y) && x < px + ((qx - px) * (y - py)) / (qy - py)) odd = !odd;
+      px = qx; py = qy;
+    };
+    for (const aid0 of ring) {
+      const A = pr.arcsXY[aid0 < 0 ? ~aid0 : aid0], n = A.length;
+      if (aid0 < 0) { for (let k = n - 2; k >= 0; k -= 2) visit(A[k], A[k + 1]); }
+      else { for (let k = 0; k < n; k += 2) visit(A[k], A[k + 1]); }
+    }
+    // close the ring if the topology left it open
+    if (!first && (px !== fx || py !== fy) && (py > y) !== (fy > y) && x < px + ((fx - px) * (y - py)) / (fy - py)) odd = !odd;
+  }
+  return odd;
+}
+// the area under a point on the frame's plane: the tooltip's ground truth
+function areasHit(m, x, y) {
+  const pr = m ? areasProj(m, areasVintage(m)) : null;
+  if (!pr || !AR.pack) return null;
+  const c = Math.floor((x - pr.X0) / pr.cell), d = Math.floor((y - pr.Y0) / pr.cell);
+  if (c < 0 || d < 0 || c >= pr.W || d >= pr.H) return null;
+  const cell2 = pr.grid[d * pr.W + c];
+  if (!cell2) return null;
+  for (const gi of cell2) {
+    const b = pr.bb[gi];
+    if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+  }
+  return null;
+}
+
+function areasStart(m, key) {
+  const old = [AR.base, AR.view].filter(Boolean);
+  AR.old = AR.m === m ? old : null;   // a change of reading fades the old rasters out
+  AR.base = AR.view = null;
+  AR.key = key; AR.m = m; AR.vintage = areasVintage(m); AR.lane = areasLane();
+  AR.busy = false; AR.wantJ = null; AR.id++;
+  AR.vals = null; AR.proj = null;
+  AR.askedShow = false;
+  AR.t1 = performance.now();
+}
+// pack, projection, values and palette in place for this frame's reading
+function areasEnsure(m) {
+  const vin = AR.vintage, got = AR.packs[vin] && AR.packs[vin].pack;
+  if (!got) {
+    const P = loadAreas(vin);
+    if (P && P.then && !AR.askedShow) { AR.askedShow = true; showLoading(true, "Loading the census areas…"); }
+    return false;
+  }
+  if (AR.vals && AR.packOf === vin) return true;
+  AR.pack = got; AR.packOf = vin;
+  AR.proj = areasProj(m, vin);
+  AR.vals = areasVals(got, m, AR.lane);
+  const { pal, raw } = areasPalette(AR.lane);
+  AR.pal = pal; AR.palRaw = raw;
+  AR.base = AR.view = null;
+  return true;
+}
+/* the raster job: draws the window's visible areas in slices, so a whole-country
+   settle never long-tasks the page; the last finished raster keeps taking the
+   transform while the reader is mid-gesture */
+function areasJob(J) {
+  if (AR.busy) { AR.wantJ = J; return; }
+  AR.busy = true; AR.wantJ = null;
+  const P = AR.pack, pr = AR.proj;
+  if (!P || !pr) { AR.busy = false; return; }
+  const id = ++AR.id;
+  const cv = document.createElement("canvas");
+  cv.width = Math.max(2, Math.ceil(J.nx)); cv.height = Math.max(2, Math.ceil(J.ny));
+  const c2 = cv.getContext("2d");
+  c2.setTransform(1 / J.px, 0, 0, 1 / J.px, -J.x0 / J.px, -J.y0 / J.px);
+  const x1 = J.x0 + cv.width * J.px, y1 = J.y0 + cv.height * J.px;
+  const m = AR.m, u = unitsPerKm(m), fadeAmt = smooth(0.09, 0.03, J.px / u); // a city-and-closer density fade
+  const vals = AR.vals, pal = AR.pal, raw = AR.palRaw, nodata = css(TH.nodata), paper = TH.bg;
+  const popD = P.pop, areaD = P.area, geoms = P.geoms, bb = pr.bb, arcsXY = pr.arcsXY;
+  c2.lineJoin = "round"; c2.lineWidth = 0.8 * J.px;
+  let last = null;
+  const mixes = new Map();
+  const fadeCss = (slot, qq) => {
+    const key = slot * 32 + Math.round(qq * 8);
+    let got = mixes.get(key);
+    if (!got) { got = css(towards(raw[slot], paper, Math.min(1, Math.max(0, qq)))); mixes.set(key, got); }
+    return got;
+  };
+  const setCss = (i) => {
+    const slot = vals[i];
+    if (slot === AR_NULLI) { if (last !== nodata) { c2.fillStyle = c2.strokeStyle = last = nodata; } return; }
+    let cssv = pal[slot];
+    if (fadeAmt > 0) {
+      const dens = (popD[i] * 100) / Math.max(areaD[i], 1);   // persons per km²
+      const t = clamp(Math.log10(Math.max(dens, 1e-3)) / 2, 0, 1);
+      const qq = fadeAmt * (1 - (0.06 + 0.94 * t));
+      cssv = qq < 0.02 ? pal[slot] : fadeCss(slot, qq);
+    }
+    if (cssv !== last) { c2.fillStyle = c2.strokeStyle = last = cssv; }
+  };
+  const SUB = 1.4, N = geoms.length;
+  let gi = 0;
+  const step = () => {
+    if (id !== AR.id) return;
+    const tend = performance.now() + 26;
+    for (; gi < N; gi++) {
+      const b = bb[gi];
+      if (b[0] > x1 || b[2] < J.x0 || b[1] > y1 || b[3] < J.y0) continue;
+      setCss(gi);
+      const w = (b[2] - b[0]) / J.px, h = (b[3] - b[1]) / J.px;
+      if (w < SUB && h < SUB) { c2.fillRect(b[0], b[1], J.px * 1.3, J.px * 1.3); continue; }
+      const g = geoms[gi];
+      c2.beginPath();
+      for (const ring of g.r) {
+        let first = true;
+        for (const aid0 of ring) {
+          const A = arcsXY[aid0 < 0 ? ~aid0 : aid0], n = A.length;
+          if (aid0 < 0) {
+            for (let k = n - 2; k >= 0; k -= 2) { if (first) { c2.moveTo(A[k], A[k + 1]); first = false; } else c2.lineTo(A[k], A[k + 1]); }
+          } else {
+            for (let k = 0; k < n; k += 2) { if (first) { c2.moveTo(A[k], A[k + 1]); first = false; } else c2.lineTo(A[k], A[k + 1]); }
+          }
+        }
+        c2.closePath();
+      }
+      c2.fill("evenodd");
+      c2.stroke();
+      if ((gi & 1023) === 0 && performance.now() > tend) { setTimeout(step, 0); return; }
+    }
+    AR.busy = false;
+    if (J.base) AR.base = { cv, J, pat: null };
+    else AR.view = { cv, J, pat: null };
+    AR.t1 = performance.now();
+    schedule();
+    if (AR.wantJ) areasJob(AR.wantJ);
+  };
+  setTimeout(step, 0);
+}
+function areasTick(m) {
+  if (!AR.vals || !AR.proj) return;
+  const [[hx0, hy0], [hx1, hy1]] = homeBox(m), hw = hx1 - hx0, hh = hy1 - hy0;
+  if (!AR.base) {
+    const px = Math.max(hw, hh) / 1500;
+    areasJob({ base: true, px, x0: hx0 - 0.08 * hw, y0: hy0 - 0.08 * hh, nx: (1.16 * hw) / px, ny: (1.16 * hh) / px });
+    return;
+  }
+  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  if (want >= AR.base.J.px * 0.8) { AR.view = null; return; }
+  const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view;
+  if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1) return;
+  const vw = vx1 - vx0, vh = vy1 - vy0;
+  areasJob({ base: false, px: want, x0: vx0 - 0.25 * vw, y0: vy0 - 0.25 * vh, nx: (1.5 * vw) / want, ny: (1.5 * vh) / want });
+}
+function areasPattern(L) {
+  if (!L.pat) {
+    L.pat = ctx.createPattern(L.cv, "no-repeat");
+    L.pat.setTransform(new DOMMatrix([L.J.px, 0, 0, L.J.px, L.J.x0, L.J.y0]));
+  }
+  return L.pat;
+}
+// the areas layers the seats' fill draws this frame, in the surface's own shape
+function areasLook(m) {
+  const key = readingKey(m) + "|a" + areasVintage(m);
+  if (key !== AR.key) areasStart(m, key);
+  if (!areasEnsure(m)) { areasTick(m); return { ls: [], top: null, under: true, none: null }; }
+  areasTick(m);
+  const now = performance.now(), ls = [], fa = AR.base ? clamp((now - AR.t1) / 340, 0, 1) : 0;
+  if (AR.old) {
+    if (fa < 1) { needFrame = true; for (const L of AR.old) ls.push({ pat: areasPattern(L), a: 1 - ease(fa) }); }
+    else AR.old = null;
+  }
+  const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view, full = V && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1;
+  if (AR.base && !full) ls.push({ pat: areasPattern(AR.base), a: AR.view ? 1 : ease(Math.max(fa, 0.05)) });
+  if (V) ls.push({ pat: areasPattern(V), a: 1 });
+  if (!ls.length) return { ls: [], top: null, under: true, none: null };
+  return { ls, top: ls[ls.length - 1].pat, under: false, none: null };
+}
+
 /* ----- the change of drawing: a crossfade of the fills under the balloons' rise ----- */
 let drawFade = null, ballNow = 0;
 const DRAW_MS = 420;
@@ -4602,7 +4990,8 @@ function drawLook(m) {
   let e = 1, from = d;
   if (drawFade) { const t = clamp((now - drawFade.t0) / DRAW_MS, 0, 1); if (t < 1) { needFrame = true; e = ease(t); from = drawFade.from; } else drawFade = null; }
   const surf = (d === "surface" ? e : 0) + (from === "surface" && d !== "surface" ? 1 - e : 0), ball = (d === "balloons" ? e : 0) + (from === "balloons" && d !== "balloons" ? 1 - e : 0);
-  return { surf, ball, sf: surf > 0 && m.booth.n ? surfaceLook(m, surf) : null };
+  const are = (d === "areas" ? e : 0) + (from === "areas" && d !== "areas" ? 1 - e : 0);
+  return { surf, ball, sf: surf > 0 && m.booth.n ? surfaceLook(m, surf) : null, are, ar: are > 0 ? areasLook(m) : null };
 }
 
 /* ----- the balloons -----
@@ -4899,7 +5288,8 @@ function balloonKey(m, est) {
 }
 function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}>${t}</button>`; }).join("")}</div>`;
+  const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
@@ -4953,6 +5343,10 @@ function drawNoteHTML(m) {
   if (d === "seats") return "";
   const est = !m.standIn && placesLackMemo(m);
   if (d === "balloons") return balloonKey(m, est) + undrawnHTML(m, est);
+  if (d === "areas") {
+    const vin = areasVintage(m), got = AR.packs[vin] && AR.packs[vin].pack, near = m.demoInterp && m.demoInterp.nearestSide === vin;
+    return `<div class="lg-note">${got ? `The census’s ${int(got.geoms.length)} census areas, each as counted at the ${vin} census${near ? ` — the nearest single census, ${vin}, since this frame blends two` : ""}. Empty land stays paper, and so does any area the ABS suppresses a figure for.` : "Loading the census areas…"}</div>`;
+  }
   if (axisNow(m) !== "AC") return `<div class="lg-note">Built from first preferences and ${axisByBonham(m, axisNow(m)) ? "estimated flows" : "Senate ballots"}.</div>${undrawnHTML(m, est)}`;
   const off = S.axis !== "AC" && S.lens === "tpp" && S.tppMode !== "swing" && axisFrame(m) == null;
   return `<div class="lg-note">${off ? "One Nation stood too thinly here for its contests." : est ? "Smoothed, from first preferences: an estimate." : S.lens === "winner" ? "A smoothed estimate. Deeper means a bigger lead." : "A smoothed estimate, not a count."}</div>${undrawnHTML(m, est)}`;
@@ -8923,11 +9317,17 @@ function legendHTML(m) {
       // the same selects out too (this legend is hidden in the list view)
       for (const s of censusSelects(m)) h += `<div class="lg-t">${s}</div>`;
       if (isDemo()) {
-        const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
+        const early = m.year !== "now" && m.year < DEMO_FROM;
+        // the Areas drawing keys off the pack's own per-lane extents (a
+        // population-weighted 99.5th percentile rounded up), never the seats'
+        // caps; a lane's little histogram is the SEATS' spread, so it stays out
+        const arOn = drawOf(m) === "areas" && AR.packOf != null && AR.pack, arLane = arOn && areasLane();
+        const arCap = arOn && arLane && arOn.caps[arLane];
+        const [lo, hi] = arCap || demoRange();
         // an income lane can arrive by hash on a year whose store carries
         // none (income starts 2001); it reads as its own kind of early
         const noInc = isInc() && !hasInc(m);
-        if (!early) h += legendHist(m, lo, hi);
+        if (!early && !arOn) h += legendHist(m, lo, hi);
         // the Australia's-line marker: pooled shares as ever; the Age
         // family's median and three new views ride the ageCuts record
         // (medians and pool-computed national reads, never pooled here)
@@ -8983,11 +9383,15 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
+        // the Areas drawing names its own ground: the census's areas as counted
+        const arTail = arOn ? `${areasVintage(m)} census, as counted in each of the census’s own areas${m.demoInterp && m.demoInterp.nearestSide === areasVintage(m) ? " (this frame’s figures blend two censuses — the areas paint the nearest single one)" : ""}.` : null;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${arOn ? arTail : isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
+      const arSf = drawOf(m) === "areas" && AR.packOf != null && AR.pack;
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
-      h += boothsOn ? `<div class="lg-note">Places scored ${seifaBasis(m) === "voters" ? "where each place’s voters live" : "on the census areas they stand in"}.</div>` : `<div class="lg-note">Seats ranked into tenths of the ${m.divs.length}.</div>`;
+      h += arSf ? `<div class="lg-note">Each census area with the ABS’s own national decile for its SA1, as published with the ${areasVintage(m)} census — the areas ranked into tenths across Australia, not this sheet’s seats into tenths of themselves.</div>`
+        : boothsOn ? `<div class="lg-note">Places scored ${seifaBasis(m) === "voters" ? "where each place’s voters live" : "on the census areas they stand in"}.</div>` : `<div class="lg-note">Seats ranked into tenths of the ${m.divs.length}.</div>`;
       break;
     }
   }
@@ -9151,8 +9555,12 @@ function tipFor(h) {
     const holder = d.hold;
     // on a surface the pointer reads the spot first; the seat's own figure follows
     const here = drawOf(m) === "surface" ? SF.here : null;
-    const around = here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
-    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${around}<div class="${here ? "ts" : "tv"}">${here ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
+    // on Areas the census's own area answers first, with its counted figure
+    const arh = drawOf(m) === "areas" && AR.pack ? AR.here : null;
+    const first = arh && arh.v != null
+      ? `<div class="tv">In ${esc(arh.sa2)}: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
+      : here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
+    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${first}<div class="${here || first ? "ts" : "tv"}">${here || first ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -9801,12 +10209,16 @@ canvas.addEventListener("pointermove", (e) => {
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
   tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k]; tipClient = [e.clientX, e.clientY];
   if (h && drawOf(M()) === "surface") surfaceAsk(tipAt[0], tipAt[1]);
+  if (drawOf(M()) === "areas") {
+    const mm = M(), hit = h && AR.pack ? areasHit(mm, tipAt[0], tipAt[1]) : null;
+    AR.here = hit ? { ...hit, v: areasValue(AR.pack, mm, hit.i, AR.lane) } : null;
+  }
   const same = (h && S.hover && h.kind === S.hover.kind && h.i === S.hover.i) || (!h && !S.hover);
   if (!same) { S.hover = h; schedule(); }
   if (h) showTipAt(tipFor(h), e.clientX, e.clientY); else hideTip();
   canvas.style.cursor = h ? "pointer" : "";
 });
-canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); schedule(); });
+canvas.addEventListener("pointerleave", () => { S.hover = null; AR.here = null; hideTip(); schedule(); });
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
@@ -10039,7 +10451,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, SF, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },

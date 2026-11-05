@@ -160,7 +160,7 @@ const selDiv = () => (S.sel.level === "div" || S.sel.level === "booth" ? S.sel.d
 // the opened seat as soon as it is chosen.
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 let quietSince = 0, needFrame = false;
-const quietAll = () => (drawOf(M()) === "surface" ? 0 : 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k));
+const quietAll = () => (drawOf(M()) === "surface" || drawOf(M()) === "areas" ? 0 : 0.72 * smooth(K_ALL * 0.75, K_ALL * 1.15, T.k));
 function quietness(i, now) {
   const all = quietAll();
   if (i === selDiv()) return Math.max(all, 0.72 * clamp((now - quietSince) / 450, 0, 1));
@@ -194,8 +194,9 @@ function drawGeo(m, alpha, streetA) {
   const [x0, y0, x1, y1] = viewBox();
   const pat = hatch(); pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
   const filt = filtersOn();
-  // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface is laid through these same fills
-  const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf : null;
+  // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface (or the
+  // census's own areas raster) is laid through these same fills
+  const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf || look.ar : null;
   if (look) ballNow = ball;
   const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
@@ -254,7 +255,7 @@ function drawGeo(m, alpha, streetA) {
   }
   if (st) layStreets(st);
   // (paper-white seams vanish on plain land, and a surface's own lines are the story: its seats are a faint guide)
-  const surfA = look ? look.surf : 0;
+  const surfA = look ? look.surf + (look.are || 0) : 0;
   if (ball < 1) { ctx.strokeStyle = css(th.seam, th.seamA * (1 - 0.72 * surfA) * (1 - ball)); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
   if (ball > 0) { ctx.strokeStyle = css(th.coast, 0.3 * ball); ctx.lineWidth = seamW(T.k) / T.k; ctx.stroke(g.meshDiv); }
   ctx.strokeStyle = ball > 0.5 ? css(th.coast, 0.75) : css(th.seam, th.stateA * (1 - 0.35 * surfA)); ctx.lineWidth = 1.3 / T.k; ctx.stroke(g.meshState);
@@ -800,8 +801,9 @@ function visibleBooths(m) {
   if (sd == null && T.k < K_IN) return out;
   const [x0, y0, x1, y1] = viewBox(), pad = 24 / T.k;
   if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j])) out.push(j);
-  // (a surface is the reading of the whole ground: only an opened seat lays its own places on it)
-  if (T.k >= K_IN && drawOf(m) !== "surface") for (let j = 0; j < b.n; j++) {
+  // (a surface, or the census areas' own ground, is the reading of the whole ground:
+  // only an opened seat lays its own places on either)
+  if (T.k >= K_IN && drawOf(m) !== "surface" && drawOf(m) !== "areas") for (let j = 0; j < b.n; j++) {
     if (b.d[j] === sd || b.ty[j] !== 1) continue;
     const x = b.x[j], y = b.y[j];
     if (Number.isNaN(x) || x < x0 - pad || x > x1 + pad || y < y0 - pad || y > y1 + pad) continue;
@@ -872,7 +874,7 @@ function drawLabels(m) {
   const sd = selDiv(), b = m.booth;
   // (a surface's ground changes under a label, so it takes the lettering that holds on anything)
   const dw = drawOf(m);
-  const groundOf = (i) => { if (dw === "surface") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
+  const groundOf = (i) => { if (dw === "surface" || dw === "areas") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
   if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }

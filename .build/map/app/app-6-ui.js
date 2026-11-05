@@ -367,11 +367,17 @@ function legendHTML(m) {
       // the same selects out too (this legend is hidden in the list view)
       for (const s of censusSelects(m)) h += `<div class="lg-t">${s}</div>`;
       if (isDemo()) {
-        const [lo, hi] = demoRange(), early = m.year !== "now" && m.year < DEMO_FROM;
+        const early = m.year !== "now" && m.year < DEMO_FROM;
+        // the Areas drawing keys off the pack's own per-lane extents (a
+        // population-weighted 99.5th percentile rounded up), never the seats'
+        // caps; a lane's little histogram is the SEATS' spread, so it stays out
+        const arOn = drawOf(m) === "areas" && AR.packOf != null && AR.pack, arLane = arOn && areasLane();
+        const arCap = arOn && arLane && arOn.caps[arLane];
+        const [lo, hi] = arCap || demoRange();
         // an income lane can arrive by hash on a year whose store carries
         // none (income starts 2001); it reads as its own kind of early
         const noInc = isInc() && !hasInc(m);
-        if (!early) h += legendHist(m, lo, hi);
+        if (!early && !arOn) h += legendHist(m, lo, hi);
         // the Australia's-line marker: pooled shares as ever; the Age
         // family's median and three new views ride the ageCuts record
         // (medians and pool-computed national reads, never pooled here)
@@ -427,11 +433,15 @@ function legendHTML(m) {
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
+        // the Areas drawing names its own ground: the census's areas as counted
+        const arTail = arOn ? `${areasVintage(m)} census, as counted in each of the census’s own areas${m.demoInterp && m.demoInterp.nearestSide === areasVintage(m) ? " (this frame’s figures blend two censuses — the areas paint the nearest single one)" : ""}.` : null;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${arOn ? arTail : isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
+      const arSf = drawOf(m) === "areas" && AR.packOf != null && AR.pack;
       h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
-      h += boothsOn ? `<div class="lg-note">Places scored ${seifaBasis(m) === "voters" ? "where each place’s voters live" : "on the census areas they stand in"}.</div>` : `<div class="lg-note">Seats ranked into tenths of the ${m.divs.length}.</div>`;
+      h += arSf ? `<div class="lg-note">Each census area with the ABS’s own national decile for its SA1, as published with the ${areasVintage(m)} census — the areas ranked into tenths across Australia, not this sheet’s seats into tenths of themselves.</div>`
+        : boothsOn ? `<div class="lg-note">Places scored ${seifaBasis(m) === "voters" ? "where each place’s voters live" : "on the census areas they stand in"}.</div>` : `<div class="lg-note">Seats ranked into tenths of the ${m.divs.length}.</div>`;
       break;
     }
   }
@@ -595,8 +605,12 @@ function tipFor(h) {
     const holder = d.hold;
     // on a surface the pointer reads the spot first; the seat's own figure follows
     const here = drawOf(m) === "surface" ? SF.here : null;
-    const around = here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
-    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${around}<div class="${here ? "ts" : "tv"}">${here ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
+    // on Areas the census's own area answers first, with its counted figure
+    const arh = drawOf(m) === "areas" && AR.pack ? AR.here : null;
+    const first = arh && arh.v != null
+      ? `<div class="tv">In ${esc(arh.sa2)}: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
+      : here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
+    return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${first}<div class="${here || first ? "ts" : "tv"}">${here || first ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
   const b = m.booth, j = h.i, D = m.divs[b.d[j]];
   const ld = b.lead[j], lname = ld ? pairNames(ld, ld === D.A ? D.B : D.A)[0] : "";
@@ -1245,12 +1259,16 @@ canvas.addEventListener("pointermove", (e) => {
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
   tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k]; tipClient = [e.clientX, e.clientY];
   if (h && drawOf(M()) === "surface") surfaceAsk(tipAt[0], tipAt[1]);
+  if (drawOf(M()) === "areas") {
+    const mm = M(), hit = h && AR.pack ? areasHit(mm, tipAt[0], tipAt[1]) : null;
+    AR.here = hit ? { ...hit, v: areasValue(AR.pack, mm, hit.i, AR.lane) } : null;
+  }
   const same = (h && S.hover && h.kind === S.hover.kind && h.i === S.hover.i) || (!h && !S.hover);
   if (!same) { S.hover = h; schedule(); }
   if (h) showTipAt(tipFor(h), e.clientX, e.clientY); else hideTip();
   canvas.style.cursor = h ? "pointer" : "";
 });
-canvas.addEventListener("pointerleave", () => { S.hover = null; hideTip(); schedule(); });
+canvas.addEventListener("pointerleave", () => { S.hover = null; AR.here = null; hideTip(); schedule(); });
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
@@ -1483,7 +1501,7 @@ function preloadYears() {
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, SF, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },

@@ -29,11 +29,21 @@
    seats' own fill paths (drawGeo), so the coast, the sea cut, the islands, the filters and
    the veil over an opened seat all work on it as they do on a flat fill. */
 
-const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"]];
+const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"], ["areas", "Areas"]];
 // a seat type belongs to the whole seat, and so does its exhausted share: nothing to blend
 const surfaceFits = (m) => !(S.lens === "cls" || (S.lens === "informal" && infModeOf(m) === "exhaust"));
+// Areas is the Census lens's own drawing: it needs a census pack for the frame's vintage
+// and a lane the pack serves (the homeless lane is an SA2 estimate, never an SA1 count)
+const areasFits = (m) => {
+  if (S.lens !== "seifa" || !m) return false;
+  if (AREAS_FILES[areasVintage(m)] == null) return false;
+  const lane = areasLane();
+  if (!lane || !AREAS_LANES.has(lane)) return false;
+  if ((lane === "loinc" || lane === "hiqinc") && !(m.incomeCuts && m.incomeCuts.loCutWeekly > 0 && m.incomeCuts.hiQCutWeekly > 0)) return false;
+  return true;
+};
 // the drawing in force on an election (the chamber and the list keep their seats)
-const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" ? "seats" : S.draw === "surface" && !surfaceFits(m) ? "seats" : S.draw);
+const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" ? "seats" : (S.draw === "surface" && !surfaceFits(m)) || (S.draw === "areas" && !areasFits(m)) ? "seats" : S.draw);
 
 /* ----- the contest -----
    Labor v the Coalition is counted at every polling place. Labor v One Nation and the
@@ -678,6 +688,382 @@ function surfaceAsk(x, y) {
   });
 }
 
+/* ----- the Areas drawing: the census's own areas, painted as counted -----
+   Seats rolls the census up to each seat, and Surface smooths it between the polling
+   places; Areas stops at the finest rung the census itself publishes: the SA1 areas,
+   each painted with the figure the census counted there — a counted figure at every
+   point the census counted people, paper where it counted none (empty land) and where
+   the ABS suppresses a figure. The whole Census lens carries over — every People
+   measure, every Advantage index — read off one lazy pack per census vintage
+   (.build/map/build_areas_sa1.py): the 2021 pack is 61,811 areas over about sixty
+   lanes plus the shape itself, fetched the first time a frame wants them. The income
+   quartile lanes ride the frame in view's own incomeCuts over the pack's sixteen
+   adults-basis band masses per area, exactly as its seat stores compute them.
+   The drawing runs the surface's own bookkeeping: a whole-frame raster at the frame's
+   home zoom, a view raster on settle once the zoom outruns it, both composited through
+   the seats' fill paths in drawGeo, so the coast cut, the islands, the filters and the
+   veil work as they do on a surface. Mid-gesture the last raster just takes the new
+   transform. The key runs each lane's own extents from the pack (a population-weighted
+   99.5th percentile, rounded up), so only the lanes whose areas really reach ~100%
+   run that far — never the seats' 60% that flattens a Fairfield. */
+const AREAS_FILES = { 2021: "areas-sa1-2021" };
+// the frame's census vintage: its own demoYear, and a blend's nearest single side
+const areasVintage = (m) => (m ? m.demoInterp ? m.demoInterp.nearestSide : (m.demoYear == null ? 2021 : m.demoYear) : null);
+// the pack's lane for the Census lens's current measure (mirrors demoRamp's family map)
+function areasLane() {
+  if (S.lens !== "seifa") return null;
+  if (!isDemo()) return `sf.${S.index}`;
+  if (isCob()) return `cob.${S.cob}`;
+  if (isRel()) return `rel.${S.rel}`;
+  if (isTen()) return `ten.${S.ten}`;
+  if (isAnc()) return `anc.${S.anc}`;
+  if (isInc()) return S.incMode === "med" ? "incMed" : S.incMode === "lo" ? "loinc" : "hiqinc";
+  if (isAge()) return S.ageMode === "med" ? "ageMed" : S.ageMode;
+  if (isEdu()) return S.eduMode;
+  return S.index;
+}
+// the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+  "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
+  "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
+  "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
+  "anc.english", "anc.australian", "anc.irish", "anc.scottish", "anc.chinese", "anc.italian", "anc.german", "anc.indian", "anc.filipino", "anc.dutch", "anc.vietnamese", "anc.lebanese",
+  "ageMed", "incMed",
+  "sf.irsad", "sf.irsd", "sf.ier", "sf.ieo"]);
+// gcp_newlanes.INC_BANDS, verbatim: the weekly income bands the masses follow
+const AREAS_INC_BANDS = [[1, 149], [150, 299], [300, 399], [400, 499], [500, 649], [650, 799], [800, 999], [1000, 1249], [1250, 1499], [1500, 1749], [1750, 1999], [2000, 2499], [2500, 2999], [3000, 3499], [3500, 3999], [4000, null]];
+
+const AR = { packs: {}, pack: null, packOf: null, proj: null, projs: new WeakMap(),
+             vintage: null, m: null, key: null, lane: null, vals: null, pal: null, palRaw: null,
+             base: null, view: null, old: null, t1: 0, id: 0, busy: false, wantJ: null,
+             askedShow: false, here: null };
+
+function loadAreas(vin) {
+  if (AREAS_FILES[vin] == null) return null;
+  const got = AR.packs[vin];
+  if (got) return got.pack || got.P;
+  const P = getJSON(`/map/data/${AREAS_FILES[vin]}.json`)
+    .then((D) => {
+      const pack = areasUnpack(D);
+      AR.packs[vin] = { pack };
+      const m = M(), want = m && drawOf(m) === "areas" && areasVintage(m) === vin;
+      AR.key = null; schedule();
+      if (want) renderLegend();
+      showLoading(false);
+      return pack;
+    })
+    .catch((e) => { delete AR.packs[vin]; console.error(e); showLoading(false); return null; });
+  AR.packs[vin] = { P };
+  return P;
+}
+/* one national unpack: lane buffers decoded, geometries readied (projection is per
+   frame, made lazily and cached on the frame itself) */
+function areasUnpack(D) {
+  const U8 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const lanes = {}, types = {};
+  for (const [k, o] of Object.entries(D.lanes)) {
+    types[k] = o.t;
+    if (o.t === "u16") lanes[k] = new Uint16Array(U8(o.b).buffer);
+    else lanes[k] = U8(o.b);
+  }
+  const { scale, translate } = D.topo.transform;
+  const arcs = D.topo.arcs.map((a) => {
+    const o = new Float64Array(a.length * 2);
+    let x = 0, y = 0;
+    for (let i = 0; i < a.length; i++) {
+      x += a[i][0]; y += a[i][1];
+      o[2 * i] = x * scale[0] + translate[0]; o[2 * i + 1] = y * scale[1] + translate[1];
+    }
+    return o;
+  });
+  const geoms = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map((g) => {
+    const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
+    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
+  });
+  const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
+  const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
+  for (const [k, arr] of Object.entries(lanes)) if (arr.length !== n) throw new Error(`areas pack lane ${k} length ${arr.length} != ${n}`);
+  if (incBands.length !== n * 16 || pop.length !== n || area.length !== n || sa2i.length !== n) throw new Error("areas pack meta length drift");
+  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
+}
+// the income-quartile shares at the frame's own cuts: the builder's walk, verbatim
+function areasIncShare(P, m, i, lane) {
+  const b = P.incBands, o = i * 16;
+  let tot = 0;
+  for (let k = 0; k < 16; k++) tot += b[o + k];
+  if (!tot) return null;
+  const cut = lane === "loinc" ? m.incomeCuts.loCutWeekly : m.incomeCuts.hiQCutWeekly;
+  if (!(cut > 0)) return null;
+  let mass = lane === "loinc" ? 0 : tot;
+  for (let k = 0; k < 16; k++) {
+    const [lo, hi] = AREAS_INC_BANDS[k], w = b[o + k];
+    if (cut <= lo) { if (lane === "loinc") continue; break; }
+    if (hi != null && cut > hi) { mass += lane === "loinc" ? w : -w; continue; }
+    mass += (lane === "loinc" ? 1 : -1) * (w * (cut - lo)) / (hi - lo + 1);
+    break;
+  }
+  return mass / tot;
+}
+// a lane's display figure at area i, in the key's own units (percent for shares,
+// years/dollars the medians, deciles the indexes; null = nothing published there)
+function areasValue(P, m, i, lane) {
+  const inc = lane === "loinc" || lane === "hiqinc";
+  if (inc) { const v = areasIncShare(P, m, i, lane); return v == null ? null : 100 * v; }
+  const L = P.lanes[lane], t = P.types[lane];
+  if (!L) return null;
+  const v = L[i];
+  if (t === "u8x2") return v === 255 ? null : v / 2;
+  if (t === "u8z") return v === 0 ? null : v;
+  if (t === "u8") return v === 255 ? null : v;
+  if (t === "u16") return v === 65535 ? null : v;
+  return null;
+}
+const AR_NULLI = 251;
+// the reading's per-area key-line indexes over the pack (0..240 into AR.pal; 251 = none)
+function areasVals(P, m, lane) {
+  const n = P.geoms.length, vals = new Uint8Array(n).fill(AR_NULLI);
+  const [lo, hi] = P.caps[lane];
+  for (let i = 0; i < n; i++) {
+    const v = areasValue(P, m, i, lane);
+    if (v != null) vals[i] = Math.min(240, Math.max(0, Math.round(((v - lo) / (hi - lo)) * 240)));
+  }
+  return vals;
+}
+// the key's palette, raw and stringed (the density fade needs the numbers)
+function areasPalette(lane) {
+  const ramp = lane.startsWith("sf.") ? RAMP.seifa : demoRamp(), pal = new Array(241), raw = new Array(241);
+  for (let k = 0; k <= 240; k++) raw[k] = ramp[Math.round((k / 240) * 100)];
+  for (let k = 0; k <= 240; k++) pal[k] = css(raw[k]);
+  return { pal, raw };
+}
+// the frame's projection of every arc, the areas' projected bounds, and the tooltip's
+// spatial grid — made once, kept on the frame it belongs to
+function areasProj(m, vin) {
+  let pr = AR.projs.get(m);
+  if (pr && pr.vin === vin) return pr;
+  const P = AR.packs[vin] && AR.packs[vin].pack;
+  if (!P) return null;
+  const arcsXY = P.arcs.map((a) => {
+    const o = new Float32Array(a.length);
+    for (let i = 0; i < a.length; i += 2) {
+      const p = m.proj([a[i], a[i + 1]]);
+      o[i] = p ? p[0] : NaN;
+      o[i + 1] = p ? p[1] : NaN;
+    }
+    return o;
+  });
+  const bb = P.geoms.map(() => [Infinity, Infinity, -Infinity, -Infinity]);
+  P.geoms.forEach((g, gi) => {
+    const b = bb[gi];
+    for (const ring of g.r) {
+      for (const aid of ring) {
+        const A = arcsXY[aid < 0 ? ~aid : aid];
+        for (let k = 0; k < A.length; k += 2) {
+          const x = A[k], y = A[k + 1];
+          if (!(x === x)) continue;
+          if (x < b[0]) b[0] = x; if (y < b[1]) b[1] = y;
+          if (x > b[2]) b[2] = x; if (y > b[3]) b[3] = y;
+        }
+      }
+    }
+  });
+  let X0 = Infinity, Y0 = Infinity, X1 = -Infinity, Y1 = -Infinity;
+  for (const b of bb) { if (b[0] === Infinity) continue; if (b[0] < X0) X0 = b[0]; if (b[1] < Y0) Y0 = b[1]; if (b[2] > X1) X1 = b[2]; if (b[3] > Y1) Y1 = b[3]; }
+  const span = Math.max(X1 - X0, 1e-6), cell = span / 160, W = Math.ceil((X1 - X0) / cell) + 1, H = Math.ceil((Y1 - Y0) / cell) + 1;
+  const grid = new Array(W * H).fill(null);
+  P.geoms.forEach((g, gi) => {
+    const b = bb[gi];
+    if (b[0] === Infinity) return;
+    const c0 = clamp(Math.floor((b[0] - X0) / cell), 0, W - 1), c1 = clamp(Math.floor((b[2] - X0) / cell), 0, W - 1);
+    const d0 = clamp(Math.floor((b[1] - Y0) / cell), 0, H - 1), d1 = clamp(Math.floor((b[3] - Y0) / cell), 0, H - 1);
+    for (let d = d0; d <= d1; d++) for (let c = c0; c <= c1; c++) {
+      const o = d * W + c;
+      (grid[o] || (grid[o] = [])).push(gi);
+    }
+  });
+  pr = { vin, arcsXY, bb, grid, X0, Y0, cell, W, H };
+  AR.projs.set(m, pr);
+  return pr;
+}
+// odd-even ray cast over all of an area's rings at once (ring-agnostic: holes fall out)
+function areasInside(pr, g, x, y) {
+  let odd = false;
+  for (const ring of g.r) {
+    let fx = 0, fy = 0, lx = 0, ly = 0, first = true, px = 0, py = 0;
+    const visit = (qx, qy) => {
+      if (first) { fx = qx; fy = qy; first = false; }
+      else if ((py > y) !== (qy > y) && x < px + ((qx - px) * (y - py)) / (qy - py)) odd = !odd;
+      px = qx; py = qy;
+    };
+    for (const aid0 of ring) {
+      const A = pr.arcsXY[aid0 < 0 ? ~aid0 : aid0], n = A.length;
+      if (aid0 < 0) { for (let k = n - 2; k >= 0; k -= 2) visit(A[k], A[k + 1]); }
+      else { for (let k = 0; k < n; k += 2) visit(A[k], A[k + 1]); }
+    }
+    // close the ring if the topology left it open
+    if (!first && (px !== fx || py !== fy) && (py > y) !== (fy > y) && x < px + ((fx - px) * (y - py)) / (fy - py)) odd = !odd;
+  }
+  return odd;
+}
+// the area under a point on the frame's plane: the tooltip's ground truth
+function areasHit(m, x, y) {
+  const pr = m ? areasProj(m, areasVintage(m)) : null;
+  if (!pr || !AR.pack) return null;
+  const c = Math.floor((x - pr.X0) / pr.cell), d = Math.floor((y - pr.Y0) / pr.cell);
+  if (c < 0 || d < 0 || c >= pr.W || d >= pr.H) return null;
+  const cell2 = pr.grid[d * pr.W + c];
+  if (!cell2) return null;
+  for (const gi of cell2) {
+    const b = pr.bb[gi];
+    if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+  }
+  return null;
+}
+
+function areasStart(m, key) {
+  const old = [AR.base, AR.view].filter(Boolean);
+  AR.old = AR.m === m ? old : null;   // a change of reading fades the old rasters out
+  AR.base = AR.view = null;
+  AR.key = key; AR.m = m; AR.vintage = areasVintage(m); AR.lane = areasLane();
+  AR.busy = false; AR.wantJ = null; AR.id++;
+  AR.vals = null; AR.proj = null;
+  AR.askedShow = false;
+  AR.t1 = performance.now();
+}
+// pack, projection, values and palette in place for this frame's reading
+function areasEnsure(m) {
+  const vin = AR.vintage, got = AR.packs[vin] && AR.packs[vin].pack;
+  if (!got) {
+    const P = loadAreas(vin);
+    if (P && P.then && !AR.askedShow) { AR.askedShow = true; showLoading(true, "Loading the census areas…"); }
+    return false;
+  }
+  if (AR.vals && AR.packOf === vin) return true;
+  AR.pack = got; AR.packOf = vin;
+  AR.proj = areasProj(m, vin);
+  AR.vals = areasVals(got, m, AR.lane);
+  const { pal, raw } = areasPalette(AR.lane);
+  AR.pal = pal; AR.palRaw = raw;
+  AR.base = AR.view = null;
+  return true;
+}
+/* the raster job: draws the window's visible areas in slices, so a whole-country
+   settle never long-tasks the page; the last finished raster keeps taking the
+   transform while the reader is mid-gesture */
+function areasJob(J) {
+  if (AR.busy) { AR.wantJ = J; return; }
+  AR.busy = true; AR.wantJ = null;
+  const P = AR.pack, pr = AR.proj;
+  if (!P || !pr) { AR.busy = false; return; }
+  const id = ++AR.id;
+  const cv = document.createElement("canvas");
+  cv.width = Math.max(2, Math.ceil(J.nx)); cv.height = Math.max(2, Math.ceil(J.ny));
+  const c2 = cv.getContext("2d");
+  c2.setTransform(1 / J.px, 0, 0, 1 / J.px, -J.x0 / J.px, -J.y0 / J.px);
+  const x1 = J.x0 + cv.width * J.px, y1 = J.y0 + cv.height * J.px;
+  const m = AR.m, u = unitsPerKm(m), fadeAmt = smooth(0.09, 0.03, J.px / u); // a city-and-closer density fade
+  const vals = AR.vals, pal = AR.pal, raw = AR.palRaw, nodata = css(TH.nodata), paper = TH.bg;
+  const popD = P.pop, areaD = P.area, geoms = P.geoms, bb = pr.bb, arcsXY = pr.arcsXY;
+  c2.lineJoin = "round"; c2.lineWidth = 0.8 * J.px;
+  let last = null;
+  const mixes = new Map();
+  const fadeCss = (slot, qq) => {
+    const key = slot * 32 + Math.round(qq * 8);
+    let got = mixes.get(key);
+    if (!got) { got = css(towards(raw[slot], paper, Math.min(1, Math.max(0, qq)))); mixes.set(key, got); }
+    return got;
+  };
+  const setCss = (i) => {
+    const slot = vals[i];
+    if (slot === AR_NULLI) { if (last !== nodata) { c2.fillStyle = c2.strokeStyle = last = nodata; } return; }
+    let cssv = pal[slot];
+    if (fadeAmt > 0) {
+      const dens = (popD[i] * 100) / Math.max(areaD[i], 1);   // persons per km²
+      const t = clamp(Math.log10(Math.max(dens, 1e-3)) / 2, 0, 1);
+      const qq = fadeAmt * (1 - (0.06 + 0.94 * t));
+      cssv = qq < 0.02 ? pal[slot] : fadeCss(slot, qq);
+    }
+    if (cssv !== last) { c2.fillStyle = c2.strokeStyle = last = cssv; }
+  };
+  const SUB = 1.4, N = geoms.length;
+  let gi = 0;
+  const step = () => {
+    if (id !== AR.id) return;
+    const tend = performance.now() + 26;
+    for (; gi < N; gi++) {
+      const b = bb[gi];
+      if (b[0] > x1 || b[2] < J.x0 || b[1] > y1 || b[3] < J.y0) continue;
+      setCss(gi);
+      const w = (b[2] - b[0]) / J.px, h = (b[3] - b[1]) / J.px;
+      if (w < SUB && h < SUB) { c2.fillRect(b[0], b[1], J.px * 1.3, J.px * 1.3); continue; }
+      const g = geoms[gi];
+      c2.beginPath();
+      for (const ring of g.r) {
+        let first = true;
+        for (const aid0 of ring) {
+          const A = arcsXY[aid0 < 0 ? ~aid0 : aid0], n = A.length;
+          if (aid0 < 0) {
+            for (let k = n - 2; k >= 0; k -= 2) { if (first) { c2.moveTo(A[k], A[k + 1]); first = false; } else c2.lineTo(A[k], A[k + 1]); }
+          } else {
+            for (let k = 0; k < n; k += 2) { if (first) { c2.moveTo(A[k], A[k + 1]); first = false; } else c2.lineTo(A[k], A[k + 1]); }
+          }
+        }
+        c2.closePath();
+      }
+      c2.fill("evenodd");
+      c2.stroke();
+      if ((gi & 1023) === 0 && performance.now() > tend) { setTimeout(step, 0); return; }
+    }
+    AR.busy = false;
+    if (J.base) AR.base = { cv, J, pat: null };
+    else AR.view = { cv, J, pat: null };
+    AR.t1 = performance.now();
+    schedule();
+    if (AR.wantJ) areasJob(AR.wantJ);
+  };
+  setTimeout(step, 0);
+}
+function areasTick(m) {
+  if (!AR.vals || !AR.proj) return;
+  const [[hx0, hy0], [hx1, hy1]] = homeBox(m), hw = hx1 - hx0, hh = hy1 - hy0;
+  if (!AR.base) {
+    const px = Math.max(hw, hh) / 1500;
+    areasJob({ base: true, px, x0: hx0 - 0.08 * hw, y0: hy0 - 0.08 * hh, nx: (1.16 * hw) / px, ny: (1.16 * hh) / px });
+    return;
+  }
+  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  if (want >= AR.base.J.px * 0.8) { AR.view = null; return; }
+  const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view;
+  if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1) return;
+  const vw = vx1 - vx0, vh = vy1 - vy0;
+  areasJob({ base: false, px: want, x0: vx0 - 0.25 * vw, y0: vy0 - 0.25 * vh, nx: (1.5 * vw) / want, ny: (1.5 * vh) / want });
+}
+function areasPattern(L) {
+  if (!L.pat) {
+    L.pat = ctx.createPattern(L.cv, "no-repeat");
+    L.pat.setTransform(new DOMMatrix([L.J.px, 0, 0, L.J.px, L.J.x0, L.J.y0]));
+  }
+  return L.pat;
+}
+// the areas layers the seats' fill draws this frame, in the surface's own shape
+function areasLook(m) {
+  const key = readingKey(m) + "|a" + areasVintage(m);
+  if (key !== AR.key) areasStart(m, key);
+  if (!areasEnsure(m)) { areasTick(m); return { ls: [], top: null, under: true, none: null }; }
+  areasTick(m);
+  const now = performance.now(), ls = [], fa = AR.base ? clamp((now - AR.t1) / 340, 0, 1) : 0;
+  if (AR.old) {
+    if (fa < 1) { needFrame = true; for (const L of AR.old) ls.push({ pat: areasPattern(L), a: 1 - ease(fa) }); }
+    else AR.old = null;
+  }
+  const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view, full = V && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1;
+  if (AR.base && !full) ls.push({ pat: areasPattern(AR.base), a: AR.view ? 1 : ease(Math.max(fa, 0.05)) });
+  if (V) ls.push({ pat: areasPattern(V), a: 1 });
+  if (!ls.length) return { ls: [], top: null, under: true, none: null };
+  return { ls, top: ls[ls.length - 1].pat, under: false, none: null };
+}
+
 /* ----- the change of drawing: a crossfade of the fills under the balloons' rise ----- */
 let drawFade = null, ballNow = 0;
 const DRAW_MS = 420;
@@ -709,7 +1095,8 @@ function drawLook(m) {
   let e = 1, from = d;
   if (drawFade) { const t = clamp((now - drawFade.t0) / DRAW_MS, 0, 1); if (t < 1) { needFrame = true; e = ease(t); from = drawFade.from; } else drawFade = null; }
   const surf = (d === "surface" ? e : 0) + (from === "surface" && d !== "surface" ? 1 - e : 0), ball = (d === "balloons" ? e : 0) + (from === "balloons" && d !== "balloons" ? 1 - e : 0);
-  return { surf, ball, sf: surf > 0 && m.booth.n ? surfaceLook(m, surf) : null };
+  const are = (d === "areas" ? e : 0) + (from === "areas" && d !== "areas" ? 1 - e : 0);
+  return { surf, ball, sf: surf > 0 && m.booth.n ? surfaceLook(m, surf) : null, are, ar: are > 0 ? areasLook(m) : null };
 }
 
 /* ----- the balloons -----
@@ -1006,7 +1393,8 @@ function balloonKey(m, est) {
 }
 function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}>${t}</button>`; }).join("")}</div>`;
+  const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
@@ -1060,6 +1448,10 @@ function drawNoteHTML(m) {
   if (d === "seats") return "";
   const est = !m.standIn && placesLackMemo(m);
   if (d === "balloons") return balloonKey(m, est) + undrawnHTML(m, est);
+  if (d === "areas") {
+    const vin = areasVintage(m), got = AR.packs[vin] && AR.packs[vin].pack, near = m.demoInterp && m.demoInterp.nearestSide === vin;
+    return `<div class="lg-note">${got ? `The census’s ${int(got.geoms.length)} census areas, each as counted at the ${vin} census${near ? ` — the nearest single census, ${vin}, since this frame blends two` : ""}. Empty land stays paper, and so does any area the ABS suppresses a figure for.` : "Loading the census areas…"}</div>`;
+  }
   if (axisNow(m) !== "AC") return `<div class="lg-note">Built from first preferences and ${axisByBonham(m, axisNow(m)) ? "estimated flows" : "Senate ballots"}.</div>${undrawnHTML(m, est)}`;
   const off = S.axis !== "AC" && S.lens === "tpp" && S.tppMode !== "swing" && axisFrame(m) == null;
   return `<div class="lg-note">${off ? "One Nation stood too thinly here for its contests." : est ? "Smoothed, from first preferences: an estimate." : S.lens === "winner" ? "A smoothed estimate. Deeper means a bigger lead." : "A smoothed estimate, not a count."}</div>${undrawnHTML(m, est)}`;
