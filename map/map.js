@@ -106,7 +106,7 @@ function readTheme() {
   T.coast = dk ? lch(0.62, 0.010, 70) : lch(0.56, 0.010, 62);
   T.state = dk ? lch(0.88, 0.009, 78) : lch(0.30, 0.012, 55);
   T.veil = dk ? 0.66 : 0.6;
-  T.seqL = dk ? [0.29, 0.86] : [0.955, 0.36];
+  T.seqL = dk ? [0.29, 0.88] : [0.955, 0.33];
   T.cls = dk ? [lch(0.88, 0.030, 78), lch(0.70, 0.040, 70), lch(0.53, 0.045, 62), lch(0.38, 0.035, 58)] : [lch(0.34, 0.040, 58), lch(0.50, 0.045, 62), lch(0.68, 0.040, 70), lch(0.85, 0.028, 78)];
   T.floor = dk ? lch(0.235, 0.012, 150) : lch(0.958, 0.012, 150);
   return T;
@@ -119,7 +119,21 @@ const seamW = k => Math.min(0.9, 0.45 + k * 0.12);
 let RAMP = {};
 function buildRamps() {
   const th = TH;
-  const seq = (H, Cmax) => { const [L0, L1] = th.seqL; const t = []; for (let i = 0; i <= 100; i++) { const u = i / 100; t.push(lch(lerp(L0, L1, u), lerp(0.014, Cmax, Math.pow(u, 0.75)), H)); } return t; };
+  // chroma climbs fast and peaks past the middle of the ramp, then eases off into the deep end, so a
+  // hue reads as that hue well before it reads as dark (lab2rgb trims whatever the gamut can't hold)
+  const seq = (H, Cmax) => { const [L0, L1] = th.seqL; const t = []; for (let i = 0; i <= 100; i++) { const u = i / 100; t.push(lch(lerp(L0, L1, u), u < 0.6 ? lerp(0.014, Cmax * 1.45, u / 0.6) : lerp(Cmax * 1.45, Cmax, (u - 0.6) / 0.4), H)); } return t; };
+  // a party's path: paper, its own poster colour, then its deepest shade (t runs 0..1 along it)
+  const FP_AT = 0.6;
+  const fpPath = (fam) => {
+    const P = rgb2lab(th.party[fam]), D = rgb2lab(lch(...FP_DEEP[th.dark ? "dark" : "light"][fam])), A = rgb2lab(lch(th.seqL[0], 0.014, (Math.atan2(P[2], P[1]) * 180) / Math.PI));
+    return (t) => lab2rgb(t < FP_AT ? [0, 1, 2].map((k) => lerp(A[k], P[k], t / FP_AT)) : [0, 1, 2].map((k) => lerp(P[k], D[k], (t - FP_AT) / (1 - FP_AT))));
+  };
+  // the share ramp is indexed by value (index = v / FPMAX, as ever), so bending it here carries to every
+  // reader at once: map, booths, chamber, list, legend and its bars. The party's own colour lands on
+  // FPKNEE, a strong result for that party, which spends the ramp on the range seats actually fill
+  const fpShare = (fam) => { const path = fpPath(fam), k = FPKNEE[fam], hi = FPMAX[fam], t = []; for (let i = 0; i <= 100; i++) { const v = (i / 100) * hi; t.push(path(v <= k ? (FP_AT * v) / k : FP_AT + ((1 - FP_AT) * (v - k)) / (hi - k))); } return t; };
+  // the same path evenly spaced, for a gain: a change has no typical range to bend towards
+  const fpEven = (fam) => { const path = fpPath(fam), t = []; for (let i = 0; i <= 100; i++) t.push(path(i / 100)); return t; };
   const div = (neg, mid, pos) => { const N = rgb2lab(neg), M = rgb2lab(mid), P = rgb2lab(pos); const t = []; for (let i = -100; i <= 100; i++) { const u = Math.pow(Math.abs(i) / 100, 0.85); const E = i < 0 ? N : P; t.push(lab2rgb([lerp(M[0], E[0], u), lerp(M[1], E[1], u), lerp(M[2], E[2], u)])); } return t; };
   const deepen = (c, dL) => { const l = rgb2lab(c); return lab2rgb([l[0] + dL, l[1] * 1.04, l[2] * 1.04]); };
   const dk = th.dark;
@@ -131,7 +145,8 @@ function buildRamps() {
     divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     // the Coalition against One Nation, for the Senate preferences lens
     divCo: div(deepen(th.party.lnp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
-    fp: { alp: seq(27, 0.16), lnp: seq(250, 0.12), grn: seq(150, 0.15), onp: seq(58, 0.15), ind: seq(320, 0.09), oth: seq(250, 0.022) },
+    fp: Object.fromEntries(FAMS.map((f) => [f, fpShare(f)])),
+    gain: Object.fromEntries(FAMS.map((f) => [f, fpEven(f)])),
     inf: seq(345, 0.13),
     // a party's losses: paper to a warm grey, so a fall never borrows another party's colour
     loss: seq(70, 0.025),
@@ -448,6 +463,13 @@ const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : ANC_N
 const DEMO_FROM = 1993;
 const TYPE = { 1: "Polling place", 2: "Hospital team", 3: "Remote mobile team", 4: "Mobile team", 5: "Early voting centre" };
 const FPMAX = { alp: 70, lnp: 70, grn: 50, onp: 40, ind: 55, oth: 35 };
+// where each share ramp reaches the party's own colour: a strong result for that party
+const FPKNEE = { alp: 45, lnp: 45, grn: 15, onp: 15, ind: 20, oth: 15 };
+// the far end of each party's ramp, [L, C, H]: darkest on paper, brightest on the dark theme
+const FP_DEEP = {
+  light: { alp: [0.32, 0.12, 25], lnp: [0.25, 0.13, 265], grn: [0.31, 0.09, 155], onp: [0.44, 0.155, 42], ind: [0.29, 0.12, 310], oth: [0.26, 0, 0] },
+  dark: { alp: [0.91, 0.06, 30], lnp: [0.90, 0.05, 255], grn: [0.93, 0.11, 150], onp: [0.93, 0.11, 85], ind: [0.91, 0.06, 310], oth: [0.93, 0, 0] },
+};
 const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "wa17", "qld17", "vic18", 2019, "nsw19", "qld20", "wa21", "nsw23", "sa22", 2022, "vic22", "qld24", "wa25", 2025, "sa26", "nswnow", "qldnow", "wanow", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw15/nsw19/nsw23/
@@ -1547,13 +1569,13 @@ function colorOf(v) {
     case "winner": return TH.party[v];
     case "tpp": return S.tppMode === "swing" ? RAMP.div[dIdx(-v / 10)] : RAMP.div[dIdx((50 - v) / 20)];
     case "fp": return S.fpMode === "change"
-      ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
+      ? (v >= 0 ? RAMP.gain[S.party][Math.round(clamp(v / 15, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 15, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
     case "flow": return (S.vs === "onp" ? RAMP.divOn : RAMP.div)[dIdx((50 - v) / 40)];
     case "senpref": return spRamp()[dIdx((50 - v) / 40)];
     // the Senate gap reads as a change does: the party's own ramp above zero, the warm grey of losses below
     case "senate": return senGap()
-      ? (v >= 0 ? RAMP.fp[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
+      ? (v >= 0 ? RAMP.gain[S.party][Math.round(clamp(v / 10, 0, 1) * 100)] : RAMP.loss[Math.round(clamp(-v / 10, 0, 1) * 100)])
       : RAMP.fp[S.party][Math.round(clamp(v / FPMAX[S.party], 0, 1) * 100)];
     case "informal": return RAMP.inf[Math.round(clamp(v / infHi(), 0, 1) * 100)];
     case "cls": { const k = CLS.indexOf(v); return k < 0 ? null : TH.cls[k]; }
@@ -7510,7 +7532,7 @@ function legendHTML(m) {
       h += `<div class="lg-t">${opt("party", S.party, partyOpts)} first preferences: <button type="button" class="flip" data-flip="fp">${ch ? `change on ${prev}` : "share"}<span>⇄</span></button></div>`;
       const [lo, hi] = RANGE();
       h += legendHist(m, lo, hi);
-      if (ch) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.fp[S.party][45])} 70%, ${css(RAMP.fp[S.party][100])} 100%)">${mark(aus.fpSw[S.party], lo, hi)}</div>${ticks([-15, -5, 0, 5, 15], -15, 15, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Lost ground</span><span class="t-${S.party}">Gained ▶</span></div>`;
+      if (ch) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.gain[S.party][45])} 70%, ${css(RAMP.gain[S.party][100])} 100%)">${mark(aus.fpSw[S.party], lo, hi)}</div>${ticks([-15, -5, 0, 5, 15], -15, 15, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Lost ground</span><span class="t-${S.party}">Gained ▶</span></div>`;
       else h += `<div class="lg-ramp" style="background:${grad(RAMP.fp[S.party], 0, 100)}">${mark(aus.fp[S.party], 0, FPMAX[S.party])}</div>${ticks([0, FPMAX[S.party] / 2, FPMAX[S.party]], 0, FPMAX[S.party], (v) => `${v}%${v === FPMAX[S.party] ? "+" : ""}`)}`;
       h += `<div class="lg-note">The line marks Australia: ${ch ? sgn(aus.fpSw[S.party]) + " points" : f1(aus.fp[S.party]) + "%"}.</div>`;
       break;
@@ -7520,7 +7542,7 @@ function legendHTML(m) {
       h += `<div class="lg-t">${opt("party", S.party, partyOpts)} <button type="button" class="flip" data-flip="sen">${gap ? "Senate less House" : "Senate share"}<span>⇄</span></button></div>`;
       const [lo, hi] = RANGE();
       h += legendHist(m, lo, hi);
-      if (gap) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.fp[S.party][45])} 70%, ${css(RAMP.fp[S.party][100])} 100%)">${A ? mark(A.gap, lo, hi) : ""}</div>${ticks([-10, -5, 0, 5, 10], -10, 10, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Better in the House</span><span class="t-${S.party}">Better in the Senate ▶</span></div>`;
+      if (gap) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.gain[S.party][45])} 70%, ${css(RAMP.gain[S.party][100])} 100%)">${A ? mark(A.gap, lo, hi) : ""}</div>${ticks([-10, -5, 0, 5, 10], -10, 10, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Better in the House</span><span class="t-${S.party}">Better in the Senate ▶</span></div>`;
       else h += `<div class="lg-ramp" style="background:${grad(RAMP.fp[S.party], 0, 100)}">${A ? mark(A.sen, 0, FPMAX[S.party]) : ""}</div>${ticks([0, FPMAX[S.party] / 2, FPMAX[S.party]], 0, FPMAX[S.party], (v) => `${v}%${v === FPMAX[S.party] ? "+" : ""}`)}`;
       // (the note's words don't wait on the votes: the key's height is measured before they load, and the
       // story gives Australia's figure)
