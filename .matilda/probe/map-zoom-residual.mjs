@@ -31,11 +31,13 @@ const home = () => page.evaluate(() => window.__map.goAus({ dur: 0 }));
 // 15 a second here, like a busy map): the same rules must hold at both, in any browser
 let trusted = false;
 const pinch = async (deltas) => {
-  if (trusted) { for (const d of deltas) await cdp.send("Input.dispatchMouseEvent", { type: "mouseWheel", x: box.x, y: box.y, deltaX: 0, deltaY: d, modifiers: 2, pointerType: "mouse" }); return; }
+  // (measured afresh: the story's height changes with the selection, and with it the canvas's spot on the screen)
+  const at = await page.evaluate(() => { document.querySelector("#stage").scrollIntoView({ block: "center", behavior: "instant" }); const r = document.querySelector("#cv").getBoundingClientRect(); return { x: r.left + r.width * 0.7, y: r.top + r.height * 0.6 }; });
+  if (trusted) { for (const d of deltas) await cdp.send("Input.dispatchMouseEvent", { type: "mouseWheel", x: at.x, y: at.y, deltaX: 0, deltaY: d, modifiers: 2, pointerType: "mouse" }); return; }
   await page.evaluate(async (deltas, x, y) => {
     const c = document.querySelector("#cv");
     for (const d of deltas) { c.dispatchEvent(new WheelEvent("wheel", { deltaY: d, deltaMode: 0, ctrlKey: true, clientX: x, clientY: y, bubbles: true, cancelable: true })); await new Promise((r) => setTimeout(r, 16)); }
-  }, deltas, box.x, box.y);
+  }, deltas, at.x, at.y);
 };
 const after = async (deltas) => { await pinch(deltas); const k0 = await k(); await wait(1100); const k1 = await k(); return Math.log2(k1 / k0); };
 const steady = (n, d) => Array.from({ length: n }, () => d);
