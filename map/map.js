@@ -3443,17 +3443,29 @@ function homeBox(m) {
   return b;
 }
 /* ----- zoom easing -----
-   Nothing here guesses when a gesture has ended. A trackpad pinch (a
-   ctrl-wheel stream in Chrome and Firefox) follows the fingers 1:1 and stops
-   when they stop: those browsers never say when the fingers lift, and a fling
-   timed off a gap in the stream fired whether the fingers had lifted or only
-   paused, so the map lurched on a beat after they had stopped. A wheel notch
-   eases in over a few frames instead of jumping, and the notches of one spin
-   add up into one run. Only Safari's pinch, which does report the lift
-   (gestureend), glides on after it, at the pace the fingers had then. */
-const Z_EASE = 0.07,  // s: a wheel notch's ease
-  Z_TAU = 0.2,        // s: the release glide's friction (it adds pace × Z_TAU octaves)
-  Z_MAX_V = 4;        // octaves/s: cap on the release pace (at most 0.8 octaves of glide)
+   A zoom carries on past the gesture and runs down, at the pace the gesture
+   left off, so its start can't be seen. A wheel notch eases in over a few
+   frames, and the notches of one spin add up into one run.
+   Safari (gestureend) and a phone (touchend) report the lift, so they glide on
+   it. Chrome and Firefox never do: a pinch there is a stream of ctrl-wheel
+   events that simply ends, whether the fingers lifted or only stopped. An
+   earlier glide (5d1d1ff3) waited 140ms and fired at a slow average of the
+   pace, so it set off after the fingers had stopped, and the map lurched. Here
+   the end is read within a few of the stream's own beats, whatever the browser
+   and the machine are managing (a busy map's stream can run at 15 a second, and
+   a fixed gap reads every event of that as a stream of its own), and it carries
+   on at the pace the fingers ended at, read over the stream's last few events
+   alone (pinchPace). Fingers coming to rest end at next to nothing, so they
+   stop with the map; fingers lifted still moving carry on as they were, slowing
+   or not. Any new event takes the zoom back at once. */
+const Z_EASE = 0.12,  // s: a wheel notch's ease
+  Z_TAU = 0.26,       // s: the release glide's friction (it adds pace × Z_TAU octaves)
+  Z_MIN_V = 0.6,      // octaves/s: under this a release has no glide
+  Z_MAX_V = 5,        // octaves/s: cap on the release pace (at most 1.3 octaves of glide)
+  Z_GAP = 48,         // ms: a pinch stream this quiet has ended, or 2.6 of its beats if it runs slower
+  Z_GAP_MAX = 150,    // ms: and never quieter than this
+  Z_NOW = 40,         // ms: the end of the stream, whose pace carries on (or 2.5 of its beats)
+  Z_BEFORE = 90;      // ms: the stretch before it (or 5 of its beats)
 let glide = null;     // {left: octaves still to go, tau, px, py, at, raf}
 function glideCancel() {
   if (!glide) return;
@@ -3483,6 +3495,33 @@ function zoomEase(px, py, oct, tau) {
   glideCancel();
   if (Math.abs(tgt - lk) < 1e-4) return;
   glide = { left: tgt - lk, tau, px, py, at: performance.now(), raf: requestAnimationFrame(glideFrame) };
+}
+const zoomRelease = (px, py, v) => { if (S.view === "map" && !reduceMotion && Math.abs(v) >= Z_MIN_V) zoomEase(px, py, Math.sign(v) * Math.min(Math.abs(v), Z_MAX_V) * Z_TAU, Z_TAU); };
+// the pace a pinch stream ended at (octaves/s): nothing if it was too short to read or had
+// just turned, and fading out only as it falls right away, the last of a stop rather than a lift
+function pinchPace(ss, beat) {
+  const end = ss[ss.length - 1][0], nowMs = Math.max(Z_NOW, 2.5 * beat), wasMs = Math.max(Z_BEFORE, 5 * beat), pace = (from, to) => {
+    let o = 0, t = 0, n = 0;
+    for (let i = 1; i < ss.length; i++) { const age = end - ss[i][0]; if (age >= from && age < to) { o += ss[i][1]; t += ss[i][0] - ss[i - 1][0]; n++; } }
+    return n >= 2 && t > 0 ? (1000 * o) / t : null;
+  };
+  const now = pace(0, nowMs), was = pace(nowMs, nowMs + wasMs);
+  if (now == null || was == null || now * was <= 0) return 0;
+  return now * smooth(0.15, 0.4, Math.abs(now) / Math.abs(was));
+}
+let pinch = null; // {ss: [[ms, octaves]...], beat: ms between events, px, py, timer}
+function pinchStep(px, py, oct, at) {
+  if (!pinch) pinch = { ss: [], beat: 0 };
+  clearTimeout(pinch.timer);
+  const ss = pinch.ss, last = ss.length ? ss[ss.length - 1][0] : null;
+  // (a stopped pinch's next start is a new stream, not a slow beat of this one)
+  if (last != null && at - last < Z_GAP_MAX) pinch.beat = pinch.beat ? pinch.beat + (at - last - pinch.beat) * 0.3 : at - last;
+  ss.push([at, oct]);
+  while (ss.length > 2 && at - ss[0][0] > 3 * Z_GAP_MAX) ss.shift();
+  Object.assign(pinch, { px, py });
+  // the first events have no beat to go by: the stream gets the long wait
+  const wait = pinch.beat ? clamp(2.6 * pinch.beat, Z_GAP, Z_GAP_MAX) : Z_GAP_MAX;
+  pinch.timer = setTimeout(() => { const p = pinch; pinch = null; if (p) zoomRelease(p.px, p.py, pinchPace(p.ss, p.beat)); }, wait);
 }
 // the map may pan anywhere inside the frame of the whole-country view, and no
 // further out: at that zoom nothing moves, so a scroll there scrolls the page
@@ -3714,6 +3753,7 @@ canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
     glideCancel();
     zoomAt(px, py, Math.exp(-e.deltaY / 100));
+    pinchStep(px, py, -e.deltaY / (100 * Math.LN2), e.timeStamp);
     return;
   }
   if (notch) wheelMode = "zoom";
@@ -3758,6 +3798,26 @@ canvas.addEventListener("touchmove", (e) => {
 }, { passive: false });
 canvas.addEventListener("touchend", (e) => { if (e.touches.length < 2) homePinch = null; });
 canvas.addEventListener("touchcancel", () => { homePinch = null; });
+// a phone's pinch runs on past the lift too, whoever moved the map under it (d3 or the home pinch)
+let touchPace = null; // {d, v, at, px, py}
+canvas.addEventListener("touchmove", (e) => {
+  if (e.touches.length !== 2 || S.view !== "map") { touchPace = null; return; }
+  const p = e.touches[0], q = e.touches[1], d = Math.hypot(p.clientX - q.clientX, p.clientY - q.clientY), now = performance.now();
+  if (!d) return;
+  const r = canvas.getBoundingClientRect(), px = (p.clientX + q.clientX) / 2 - r.left, py = (p.clientY + q.clientY) / 2 - r.top;
+  if (!touchPace) { touchPace = { d, v: 0, at: now, px, py }; return; }
+  const dt = Math.max((now - touchPace.at) / 1000, 1 / 240);
+  touchPace.v += (Math.log2(d / touchPace.d) / dt - touchPace.v) * (1 - Math.exp(-dt / 0.05));
+  touchPace.beat = touchPace.beat ? touchPace.beat + (dt * 1000 - touchPace.beat) * 0.3 : dt * 1000;
+  Object.assign(touchPace, { d, at: now, px, py });
+}, { passive: true });
+canvas.addEventListener("touchend", (e) => {
+  const g = touchPace; if (!g || e.touches.length >= 2) return;
+  touchPace = null;
+  // (faded by any hold before the lift, a long one by this stream's own beat: fingers held still and then lifted glide nowhere)
+  zoomRelease(g.px, g.py, g.v * Math.exp(-(performance.now() - g.at) / Math.max(50, 1.5 * (g.beat || 0))));
+});
+canvas.addEventListener("touchcancel", () => { touchPace = null; });
 // a swipe anywhere in the map figure — the canvas, its overlays, the
 // timeline, the story — cycles the years: on the chamber always, on the map
 // at the whole-country fit (a zoomed-in map pans instead). Native controls
@@ -3787,11 +3847,10 @@ canvas.addEventListener("gesturechange", (e) => {
 canvas.addEventListener("gestureend", (e) => {
   e.preventDefault();
   const g = gesture; gesture = null;
-  if (!g || S.view !== "map" || reduceMotion) return;
+  if (!g) return;
   // the pace at the lift, faded by any hold before it: fingers held still and
   // then lifted glide nowhere
-  const v = g.v * Math.exp(-(performance.now() - g.at) / 50);
-  if (Math.abs(v) >= 0.8) zoomEase(g.px, g.py, Math.sign(v) * Math.min(Math.abs(v), Z_MAX_V) * Z_TAU, Z_TAU);
+  zoomRelease(g.px, g.py, g.v * Math.exp(-(performance.now() - g.at) / 50));
 });
 
 /* ----- hit testing ----- */

@@ -123,4 +123,24 @@ assert.ok(ui.includes('recolor(false);\n  $$(".mp-views .rd-tab")'), "leaving th
 const index = R("map/index.html");
 assert.ok(index.includes("Labor v One Nation and the Coalition v One Nation are not counted"), "the page's notes say what the built contests are");
 
+/* ----- the zoom carries on past the gesture, the same in every browser -----
+   (it went missing in Chrome and Firefox for ten days: their pinch sends no lift, so it had been
+   switched off for them. The pace rule runs here on made-up streams; real input is in
+   .matilda/probe/map-zoom-residual.mjs) */
+const mapSrc = R(".build/map/app/app-2-map.js");
+const rule = /function pinchPace\(ss, beat\) \{[\s\S]*?\n\}\n/.exec(mapSrc)[0];
+const consts = /Z_NOW = (\d+)[\s\S]*?Z_BEFORE = (\d+)/.exec(mapSrc);
+const pinchPace = vm.runInNewContext(`const Z_NOW = ${consts[1]}, Z_BEFORE = ${consts[2]}; const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }; (${rule.trim()})`, { Math });
+const stream = (ds, beat = 16) => ds.map((d, i) => [i * beat, d]);
+const flat = (n, d) => Array.from({ length: n }, () => d);
+assert.ok(Math.abs(pinchPace(stream(flat(26, 0.087)), 16) - 5.4) < 0.3, "lifted in motion, it carries on at that pace");
+assert.ok(Math.abs(pinchPace(stream(flat(26, -0.087)), 16) + 5.4) < 0.3, "out as well as in");
+assert.ok(Math.abs(pinchPace(stream(flat(20, 0.087), 65), 65) - 1.34) < 0.1, "at a busy map's slow beat too");
+assert.ok(pinchPace(stream([...flat(22, 0.087), ...[0.9, 0.8, 0.7, 0.6, 0.55, 0.5].map((f) => 0.087 * f)]), 16) > 2, "slowing but still moving at the lift, it carries on");
+assert.ok(pinchPace(stream([...flat(22, 0.087), ...[1, 0.8, 0.6, 0.42, 0.28, 0.17, 0.09, 0.04].map((f) => 0.087 * f)]), 16) < 0.6, "coming to rest, it doesn't");
+assert.equal(pinchPace(stream([0.087, 0.087]), 16), 0, "a twitch has no pace to read");
+assert.ok(mapSrc.includes("pinchStep(px, py, -e.deltaY / (100 * Math.LN2), e.timeStamp);"), "a ctrl-wheel pinch (Chrome, Firefox) feeds the release");
+assert.equal((mapSrc.match(/zoomRelease\(/g) || []).length, 3, "the one release rule serves the ctrl-wheel pinch, Safari's and a phone's");
+assert.ok(!/navigator\.userAgent|isSafari|isChrome|isFirefox/.test(mapSrc), "nothing in the map turns on the browser");
+
 console.log("test-map-draw: ok");
