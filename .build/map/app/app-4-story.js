@@ -223,7 +223,9 @@ function seatStat(m, st, label) {
   const unsplit = bloc.some((r) => r[0] === "oth");
   let two = "";
   if (A.tpp != null) {
-    const s = A.tppSw;
+    // an "as it stands" frame's tallies carry the base election's swing, which is not a change
+    // since: only the seats row gets the now-frame's change line
+    const s = isNowY(m.year) ? null : A.tppSw;
     const sw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     two = `<span class="st-lab">Two-party preferred</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
   }
@@ -248,7 +250,7 @@ function seatStat(m, st, label) {
     fpBloc.sort((p, q) => q[1] - p[1]);
     const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
     const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
-    fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+    fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null || isNowY(m.year) ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
   }
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
@@ -597,16 +599,19 @@ function storyArea(m, st) {
     h += `<div class="st-sec"><h3>Since the election <small>${ch.length} changes</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
-  // the two-party read
-  const swp = swingPhrase(A.tppSw, prev);
-  const classicN = m.divs.filter((d) => d.tpp != null).length;
-  h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
+  // the two-party read — skipped on the Winner lens, whose head has already given the
+  // figures and swing in the head's own grid; every other lens still opens with the hero
+  if (!(S.lens === "winner" && A.tpp != null)) {
+    const swp = swingPhrase(A.tppSw, prev);
+    const classicN = m.divs.filter((d) => d.tpp != null).length;
+    h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
+  }
   h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null && m.res.agg[st].pprim != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const bySt = aus ? STATES.filter((s) => m.areas[s]) : [];
   // a one-row "by state" table says nothing the headline didn't (SA frames list SA alone)
   if (bySt.length > 1) {
-    h += `<div class="st-sec"><h3>By state</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${bySt.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="width:${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
+    h += `<div class="st-sec"><h3>By state or territory</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${bySt.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
   }
   h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));

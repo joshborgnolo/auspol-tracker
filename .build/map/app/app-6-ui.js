@@ -280,9 +280,10 @@ function legendHTML(m) {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
       // the seats are in every view, and a party with none is left out. Over polling places they sit under a place-by-place title, so the
-      // row says they're seats, and Community Strong folds into independents, as its places are drawn
+      // last category's chip says they're seats, and Community Strong folds into independents, as its places are drawn
       const nOf = (f) => (boothsOn && f === "ind" ? (cnt.ind || 0) + (cnt.csa || 0) : cnt[f]);
-      h += `<div class="lg-cats">${["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : nOf(f) && famEraOpts(m).includes(f))).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${nOf(f)}</b></span>`).join("")}${boothsOn ? `<span class="lg-unit">seats</span>` : ""}</div>`;
+      const catFams = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : nOf(f) && famEraOpts(m).includes(f)));
+      h += `<div class="lg-cats">${catFams.map((f, i) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${nOf(f)}</b>${boothsOn && i === catFams.length - 1 ? `<span class="lg-unit">seats</span>` : ""}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {

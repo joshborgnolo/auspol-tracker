@@ -1005,7 +1005,11 @@ function deriveAreas(res, m) {
     // the lens-level exhausted share is counted off the divisions' own flow rows
     const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
     const exhPct = exd.length ? (100 * sum(exd.map((d) => (d.exhPct / 100) * d.formal))) / sum(exd.map((d) => d.formal)) : null;
-    out[st] = { st, fp, fpSw, tpp: (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]), tppSw: a.tpp[2], infPct: (100 * a.inf) / (a.inf + a.formal), exhPct, idx, formal: a.formal, demo };
+    // state frames store no ready swing; like the primary lane they carry the previous election's
+    // two-party totals, so the change reads off those (stamp-agg-prev-tpp.mjs fills agg.ptpp)
+    const t2 = (100 * a.tpp[0]) / (a.tpp[0] + a.tpp[1]);
+    const tppSw = a.tpp[2] != null ? a.tpp[2] : a.ptpp && a.ptpp[0] + a.ptpp[1] ? t2 - (100 * a.ptpp[0]) / (a.ptpp[0] + a.ptpp[1]) : null;
+    out[st] = { st, fp, fpSw, tpp: t2, tppSw, infPct: (100 * a.inf) / (a.inf + a.formal), exhPct, idx, formal: a.formal, demo };
   }
   return out;
 }

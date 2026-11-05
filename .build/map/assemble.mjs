@@ -28,9 +28,13 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dataStamps, stampData, metaFacts, stampMeta } from "./data-stamp.mjs";
 import { writeCores } from "./core-split.mjs";
+import { stampPrevTpp } from "./stamp-agg-prev-tpp.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
+// each state frame's previous-election two-party totals ride into its own aggregate
+// (stamp-agg-prev-tpp.mjs), before the cores split off
+stampPrevTpp(ROOT);
 // each results file's core (core-split.mjs: the file without its polling places' census
 // lanes, what a frame loads first), written before the data stamps are taken
 writeCores(ROOT);
