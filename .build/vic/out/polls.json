@@ -141,6 +141,7 @@
     "DemosAU": {},
     "Freshwater": {},
     "Newspoll": {},
+    "Online Research Unit": {},
     "RedBridge/Accent": {},
     "Resolve": {},
     "Roy Morgan": {},
@@ -1373,6 +1374,22 @@
       "tpp_lnp": 55,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-on-track-to-end-12-years-of-labor-rule-in-victoria/news-story/de80200643073b5304702a952a05b3ec",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28885773/VictoriaNewspollMethodologyStatement26October2026byPyxis-pBBqdFZRLovuHeSHQef6CQ.pdf"
+    },
+    {
+      "date": "2026-10-26",
+      "dateStart": "2026-10-14",
+      "pollster": "Online Research Unit",
+      "client": "Victorian Greens",
+      "sample": 1488,
+      "alp": 25,
+      "lnp": 32,
+      "grn": 15,
+      "onp": 14,
+      "ind": 14,
+      "oth": null,
+      "tpp_alp": 46,
+      "tpp_lnp": 54,
+      "url": "https://www.theguardian.com/australia-news/2026/nov/01/is-one-nation-losing-steam-victoria-new-polling-greens-state-election-ntwnfb"
     },
     {
       "date": "2026-10-29",

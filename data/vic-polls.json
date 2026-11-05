@@ -1823,6 +1823,33 @@
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28885773/VictoriaNewspollMethodologyStatement26October2026byPyxis-pBBqdFZRLovuHeSHQef6CQ.pdf"
     },
     {
+      "firmRaw": "Online Research Unit",
+      "firm": "online-research-unit",
+      "client": "Victorian Greens",
+      "sample": 1488,
+      "dateLabel": "14–26 Oct",
+      "fwStart": "2026-10-14",
+      "fwEnd": "2026-10-26",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 32,
+        "grn": 15,
+        "onp": 14,
+        "ind": null,
+        "oth": 14
+      },
+      "tpp2": {
+        "alp": 46
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theguardian.com/australia-news/2026/nov/01/is-one-nation-losing-steam-victoria-new-polling-greens-state-election-ntwnfb"
+    },
+    {
       "firmRaw": "Roy Morgan",
       "firm": "roymorgan",
       "client": null,
