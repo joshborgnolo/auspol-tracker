@@ -657,12 +657,18 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 
 // ── Queensland is unicameral (its Council abolished itself in 1922): no
 // senate-qld*.json can ever exist, so its frames never fetch it and never
-// offer the Council switch (before 2026-10-31 they 404'd three files a visit)
+// offer the Council switch (before 2026-10-31 they 404'd three files a visit);
+// Western Australia's Council is deliberately unmodeled in this land (the
+// 2025 single statewide 37-member electorate has no analogue in the
+// machinery — SEN_YEARS leaves the wa frames out until it does)
 {
   const sen = part("app-3b-senate.js");
-  assert.ok(sen.includes('(STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !isNowY(y))'), "SEN_YEARS leaves the Queensland frames and the state now-keys out (a state now-frame's overlay is Assembly-only)");
+  assert.ok(sen.includes("&& !QLD_YEARS.has(y)"), "SEN_YEARS leaves the Queensland frames out (multicameral only where the Council lane exists)");
+  assert.ok(sen.includes("&& !isNowY(y)"), "SEN_YEARS leaves the state now-keys out (a state now-frame's overlay is Assembly-only)");
+  assert.ok(sen.includes("&& !WA_YEARS.has(y)"), "SEN_YEARS leaves the Western Australian frames out (no LC lane is shipped for them)");
   assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-qld17.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld20.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld24.json")), "no Queensland upper-house files exist to fetch");
   assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-nswnow.json")), "no senate file for nswnow (the Council's own since-2023 moves are not the overlay's)");
+  for (const wf of ["wa17", "wa21", "wa25"]) assert.ok(!fs.existsSync(path.join(ROOT, `map/data/senate-${wf}.json`)), `no senate file for ${wf} (Assembly-only land)`);
 }
 // the NSW "now" frame rides the generalised overlay table (2026-11-04: the
 // Assembly as it stands after Epping/Hornsby/Pittwater's October 2024 and
@@ -2324,35 +2330,36 @@ for (const y of ["sa22", "sa26"]) {
 // the state frames on the timeline and in the constants: the per-jurisdiction
 // rows (federal top, then Victoria, New South Wales, South Australia — Vic
 // rides above NSW since the 2026-10-28 user call, Queensland appended below at
-// the 2026-10-29 user call, five rungs now) and the
+// the 2026-10-29 user call, Western Australia appended below at 2026-11-05,
+// six rungs now) and the
 // YEAR_JUR contract — the frame-year→jurisdiction map is YEAR_JUR; only the
 // federal abbreviation→name map keeps STATE_NAME (a second top-level
 // `const STATE_NAME` beside it killed the assembled bundle at parse —
 // SyntaxError — and the page never booted, 2026-10-27)
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);'), "NSW_YEARS, VIC_YEARS and QLD_YEARS name the state frames (the 2013-redistribution era boxes joined 2026-11-04 — and NSW/Qld now ride their last-election frames)");
-  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld" };'), "YEAR_JUR maps a frame year to its jurisdiction");
+  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25"]);'), "NSW/VIC/QLD/WA year sets name the state frames (the wa family joined 2026-11-05)");
+  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa" };'), "YEAR_JUR maps a frame year to its jurisdiction");
   assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
-  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null };"), "the state frames' past joins (qld17 names none — the 2015 election rode the 89-district map)");
-  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
+  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021 };"), "the state frames' past joins (qld17 names none — the 2015 election rode the 89-district map; the wa stops prev-chain 2013→2017→2021→2025)");
+  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025 };'), "the frames' calendar years (qld24's is 2024)");
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
-  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds five jurisdiction rows (169px; 148px on the phone rung)");
+  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 169px;/.test(css) && /\.mp-time \{ height: 148px; \}/.test(css), "the timeline bar holds six jurisdiction rows (169px; 148px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
-  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian and Queensland state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
+  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
   // the rung order itself, in all four spots that encode it: the rail's rows
-  // stack federal, Victoria, New South Wales, South Australia, Queensland (the
-  // 2026-10-29 user call appended the Qld row at the bottom); labels, the
+  // stack federal, Victoria, New South Wales, South Australia, Queensland,
+  // Western Australia (2026-11-05: appended at the bottom); labels, the
   // glyph's row lookup and the up/down-arrow walk follow
-  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD];"), "the up/down row walk follows the rail's rung order (Vic above NSW, Qld below SA)");
-  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1, a qld stop → row 4)");
+  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA];"), "the up/down row walk follows the rail's rung order (Vic above NSW, Qld below SA, WA below Qld)");
+  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1, a wa stop → row 5)");
   const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
-  const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
-  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs stack federal, Victoria, New South Wales, South Australia, Queensland top to bottom");
+  const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
+  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs stack federal, Victoria, New South Wales, South Australia, Queensland, Western Australia top to bottom");
   const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
-  const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD"].map((k) => labelsSlice.indexOf(`tlStops(${k})`));
+  const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => labelsSlice.indexOf(`tlStops(${k})`));
   assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
@@ -2376,7 +2383,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ch.includes("if (FS.on) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }") && ch.includes("const eL = opts.big && FS.on ? FS.ins.l : 0, eR = opts.big && FS.on ? w - FS.ins.r : w;"), "the chamber and its labels keep to the clear ground");
   assert.ok(map2.includes("const q = FS.on ? FS.ins : { l: 0, r: 0, b: 0 }, L = q.l + 4, R = Wpx - q.r - 4, B = Hpx - q.b - 4;"), "the island boxes stay off the plates");
   assert.ok(ui.includes('if (FS.on) p.set("fs", "1");') && ui.includes('fsFromURL = p.get("fs") === "1";') && fsj.includes('history.pushState({ mpFs: 1 }, "", location.href)'), "full screen rides the hash, and its own history entry makes Back the way out");
-  assert.ok(ui.includes('QLD_YEARS.has(y) ? "Queensland" : "South Australian"') && !ui.includes('VIC_YEARS.has(m.year) ? "Victorian" : "South Australian"'), "Queensland's elections are Queensland's in the stamp and the eyebrow");
+  assert.ok(ui.includes('QLD_YEARS.has(y) ? "Queensland" ') && !ui.includes('VIC_YEARS.has(m.year) ? "Victorian" : "South Australian"'), "each jurisdiction names itself in the stamp and the eyebrow (Queensland's arm, Western Australia's arm amongst them)");
   assert.ok(fsj.includes("if (FS.on || FS.leaving || !M()) return;") && fsj.includes("fsUnpark(true);"), "the way in parks the page's own elements; the way out sends them home ahead of the stage");
   assert.ok(base.includes("if (!PHONE.matches || y == null || FS.on) return;") && base.includes("if (!spot || !PHONE.matches || FS.on) return null;"), "the phone's walk hold stands down in full screen (no page to hold)");
   assert.ok(css.includes(".fs:not(.phone) .mp-legend { min-height: 0 !important; }"), "the wide panel's key takes its own height (its hold is the page stage's)");

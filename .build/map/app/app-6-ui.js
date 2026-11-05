@@ -441,22 +441,22 @@ function renderTimeline() {
   const NX = (nx) => 22 + ((nx - FED0) / (YEAR_X.now - FED0)) * (W - 44);
   // a state row's cursor: its own previous elections (2018/2019 before the frames
   // open, 2022 on the SA row is sa22, not the federal 2022), then the frames' spots
-  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X };
+  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X };
   const stGx = (st) => (ry) => NX(STATE_ROW_PREV_X[st][ry] ?? YEAR_X[st + String(ry).slice(2)] ?? ry);
   const short = W < 560, cur = S.year;
-  /* five rows since the Queensland stops landed (2026-10-29, user call appending
-     the jurisdiction at the bottom): equal pitch, one labels band under the
-     lowest base, each row's whole read (line, labels, the selected stop's
-     underline) inside its band */
-  const pitch = (H - 17) / 5;
+  /* six rows since the Western Australian stops landed (2026-11-05): equal
+     pitch, one labels band under the lowest base, each row's whole read
+     (line, labels, the selected stop's underline) inside its band */
+  const pitch = (H - 17) / 6;
   const rows = [
     { ys: YEARS_FED, base: Math.round(pitch), top: 2 },
     { ys: YEARS_VIC, base: Math.round(pitch * 2), top: Math.round(pitch) + 16, gx: stGx("vic") },
     { ys: YEARS_NSW, base: Math.round(pitch * 3), top: Math.round(pitch * 2) + 16, gx: stGx("nsw") },
     { ys: YEARS_SA, base: Math.round(pitch * 4), top: Math.round(pitch * 3) + 16, gx: stGx("sa") },
     { ys: YEARS_QLD, base: Math.round(pitch * 5), top: Math.round(pitch * 4) + 16, gx: stGx("qld") },
+    { ys: YEARS_WA, base: Math.round(pitch * 6), top: Math.round(pitch * 5) + 16, gx: stGx("wa") },
   ];
-  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : 0);
+  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);
   const sd = m ? selDiv() : null;
   let g = "";
   for (const r of rows) g += `<line x1="0" x2="${W}" y1="${r.base}" y2="${r.base}" stroke="var(--line)"/>`;
@@ -506,6 +506,7 @@ function renderTimeline() {
     { i: 2, items: tlStops(YEARS_NSW) },
     { i: 3, items: tlStops(YEARS_SA) },
     { i: 4, items: tlStops(YEARS_QLD) },
+    { i: 5, items: tlStops(YEARS_WA) },
   ];
   for (const R of rowsOf) {
     const r = rows[R.i], labY = r.base + 15;
@@ -532,7 +533,7 @@ function renderTimeline() {
       g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${hitLeft}" y="${hitTop}" width="${hitRight - hitLeft}" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian and Queensland state elections; choose one">${g}</svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one">${g}</svg>`;
   if (FS.on) fsRail();
 }
 
@@ -935,7 +936,7 @@ const stampEl = (() => {
   return el;
 })();
 let stampShown = "", stampOff = 0;
-const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : "South Australian");
+const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : WA_YEARS.has(y) ? "Western Australian" : "South Australian");
 function stampParts(y) {
   if (y === "now") return ["The House today", "Now"];
   if (isNowY(y)) return ["The Assembly today", "Now"];

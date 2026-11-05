@@ -35,7 +35,11 @@ const SEN_SEATS = 76;
 // qld frames take no upper-house lane — their one chamber is the Legislative Assembly. A state's
 // "as it stands" frame (nswnow) takes none either — its Assembly alone is overlaid; the Council's
 // own since-the-election changes are a ledger of their own the overlay never pretends to.
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !isNowY(y)));
+// Western Australia's Council sits out against the same predicate in this land: the 2025
+// election was the first on a single statewide 37-member electorate, and before that shape is
+// modelled the wa frames carry the Assembly only (2017/2021's six six-member regions model
+// cleanly, but splitting the frames by Council system helps nobody).
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !WA_YEARS.has(y) && !isNowY(y)));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));

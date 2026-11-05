@@ -26,10 +26,10 @@ const FS_ICON = {
   next: `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5.2 2.8 9.4 7l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   side: `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.45" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="2.2"/><path d="M7 3v12"/><path d="M3.9 6.2h1.3M3.9 8.4h1.3M3.9 10.6h1.3" stroke-linecap="round"/></svg>`,
 };
-const FS_LANES = ["Federal", "Victoria", "New South Wales", "South Australia", "Queensland"];
+const FS_LANES = ["Federal", "Victoria", "New South Wales", "South Australia", "Queensland", "Western Australia"];
 /* the phone rung caps the jurisdiction picker at 98px — a name that can't
    stand there goes to its short form ("South Australia" → "SA") */
-const FS_LANE_ABBR = { Victoria: "Vic", "New South Wales": "NSW", "South Australia": "SA", Queensland: "Qld" };
+const FS_LANE_ABBR = { Victoria: "Vic", "New South Wales": "NSW", "South Australia": "SA", Queensland: "Qld", "Western Australia": "WA" };
 const FS_HOLD = 2300; // ms the play-through rests on each election once the map has turned to it
 const FS_EASE = "cubic-bezier(.22,.8,.24,1)";
 const fsNativeEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
