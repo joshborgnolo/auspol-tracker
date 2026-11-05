@@ -1051,7 +1051,7 @@ function undrawnHTML(m, est) {
   const u = m.standIn ? { n: 3.2e6, lead: -242000 } : undrawnOf(m);
   if (!u) return "";
   const led = S.lens === "tpp" && S.tppMode !== "swing" && axisNow(m) === "AC" && !est && u.lead != null;
-  const lead = !led ? "" : Math.abs(u.lead) < 0.5 ? ", level" : `, ${u.lead > 0 ? "Labor" : coalW(0)} by ${roughly(Math.abs(u.lead))}`;
+  const lead = !led ? "" : Math.abs(u.lead) < 0.5 ? ", level" : `, ${u.lead > 0 ? "Labor" : "Coalition"} by ${roughly(Math.abs(u.lead))}`;
   return `<div class="lg-undrawn">Not drawn: ${roughly(u.n)} postal and other votes${lead}</div>`;
 }
 // the note under the drawing's name: what the picture is, and for a built contest what it stands on

@@ -57,7 +57,7 @@ ok("so do the NT's, at state level, get a row", r.rows.some((x) => x[0] === "Mob
 await p.close();
 
 p = await open("y=2019&l=tpp&draw=balloons"); r = await read(p);
-ok("2019's lead runs the other way", r.key === "Not drawn: 2.6m postal and other votes, the Coalition by 163,000", r.key);
+ok("2019's lead runs the other way", r.key === "Not drawn: 2.6m postal and other votes, Coalition by 163,000", r.key);
 await p.close();
 p = await open("y=2025&l=tpp&draw=surface"); r = await read(p);
 ok("the surface has the line too", /^Not drawn: 3\.2m/.test(r.key || ""), r.key);
