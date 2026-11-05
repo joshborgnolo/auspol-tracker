@@ -813,6 +813,9 @@ function drawBooths(m) {
   ctx.restore();
 }
 
+// WCAG contrast of two rgb colours (1-21)
+const relLum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+const contrastOf = (a, b) => { const x = relLum(a), y = relLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 function drawLabels(m) {
   const th = TH, placed = islDrawn.map((c) => c.box), now = performance.now();
   ctx.save();
@@ -830,7 +833,11 @@ function drawLabels(m) {
     placed.push(r);
     const dark = lumL(ground) < 0.6;
     if (dark) { ctx.lineWidth = 2.4; ctx.strokeStyle = "rgba(0,0,0,0.22)"; ctx.strokeText(txt, x, y); ctx.fillStyle = "rgba(255,255,255,0.96)"; }
-    else { ctx.lineWidth = 2.6; ctx.strokeStyle = css(ground, 0.85); ctx.strokeText(txt, x, y); ctx.fillStyle = css(tone || th.ink2); }
+    else if ((!tone || tone === th.ink2 || tone === th.ink) && contrastOf(tone || th.ink2, ground) < 4.5) {
+      // the page's ink can't hold on a bright fill (the dark page's light grey on One Nation's
+      // orange, its halo of the same fill no help): the towns' lettering, a weight lighter
+      ctx.lineWidth = 3; ctx.strokeStyle = th.dark ? "#000" : "#fff"; ctx.strokeText(txt, x, y); ctx.fillStyle = th.dark ? "#fff" : "#000";
+    } else { ctx.lineWidth = 2.6; ctx.strokeStyle = css(ground, 0.85); ctx.strokeText(txt, x, y); ctx.fillStyle = css(tone || th.ink2); }
     ctx.fillText(txt, x, y);
     return true;
   };
