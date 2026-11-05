@@ -578,6 +578,63 @@ function clsVoteBlock(m, idx) {
   return `<div class="st-sec st-cls-votes"><h3>By seat type</h3><p class="cls-vote-dek" id="cls-vote-note">Votes pooled from each type’s seats</p><div class="cls-vote-scroll" role="region" aria-label="Votes by seat type" tabindex="0"><table class="cls-votes" aria-label="Vote shares by seat type" aria-describedby="cls-vote-note"><colgroup><col class="cls-vote-type"><col class="cls-vote-tpp"></colgroup><colgroup span="${CLS_FAMS.length}"></colgroup><thead><tr><th scope="col" rowspan="2">Type<span class="cls-vote-unit">Seats</span></th><th scope="col" rowspan="2" class="cls-vote-2pp">Labor<span class="cls-vote-unit">2PP %</span></th><th scope="colgroup" colspan="${CLS_FAMS.length}" class="cls-vote-group">Primary vote %</th></tr><tr>${CLS_FAMS.map((f) => `<th scope="col"><span class="cls-vote-party" style="--cls-party:var(--m-${f})">${FAM_CODE[f]}</span></th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><th scope="row"><span class="cls-vote-name"><i aria-hidden="true" style="background:${css(TH.cls[CLS.indexOf(r.c)])}"></i>${esc(CLS_SHORT[r.c])}</span><span class="cls-vote-seats">${r.n} ${r.n === 1 ? "seat" : "seats"}</span></th><td class="cls-vote-2pp">${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
 }
 
+/* ----- how the votes were cast -----
+   A seat's or an area's formal votes by how they were cast, and Labor's two-party share of
+   each pile where the count gives it (vt2, build_vote_piles.py): every seat from 2016, before
+   that the seats whose final two were Labor and the Coalition, and none in 1993.
+   Mobile teams take votes in the days before the election, in remote communities above all,
+   so they can't count as "on the day": from VT_MOB of the votes they have a row of their own
+   (Lingiari, the NT). Below it they stay in the day's row, where they change nothing.
+   The piles are counts, not samples, so any gap between two is real. The sentence's rules are
+   about what's worth saying: it compares the day with the two big kinds of early vote, skips a
+   pile too small to tell us about a seat (VT_SAY), and calls a gap under VT_LEVEL much the same. */
+const VT_MOB = 0.05, VT_CELL = 100, VT_SAY = 500, VT_LEVEL = 0.5;
+const VT_ROWS = [["day", "On the day", "var(--ink-2)"], ["mob", "Mobile teams", "var(--ink-3)"], ["ppvc", "Early centres", "var(--ink-faint)"], ["pre", "Early, by declaration", "color-mix(in oklch, var(--ink-faint) 50%, var(--line))"], ["post", "Postal", "var(--accent)"], ["other", "Absent and other", "var(--line)"]];
+function vtRows(divs) {
+  const two = {}, add = (k, p) => { const t = (two[k] ??= [0, 0]); t[0] += p[0]; t[1] += p[1]; };
+  const votes = { ppvc: 0, pre: 0, post: 0, other: 0 };
+  let ord = 0, seats2 = 0;
+  for (const d of divs) {
+    const v = d.vt;
+    ord += v.ord; votes.ppvc += v.ppvc || 0; votes.pre += v.pre || 0; votes.post += v.post || 0; votes.other += (v.abs || 0) + (v.prov || 0);
+    if (!d.vt2) continue;
+    seats2++;
+    for (const [k, p] of Object.entries(d.vt2)) add(k === "abs" || k === "prov" ? "other" : k, p);
+  }
+  const tot = ord + votes.pre + votes.post + votes.other;
+  votes.mob = two.mob ? two.mob[0] + two.mob[1] : 0;
+  if (votes.mob >= VT_MOB * tot) votes.day = ord - votes.ppvc - votes.mob;
+  else { votes.day = ord - votes.ppvc; votes.mob = 0; if (two.mob) add("day", two.mob); }
+  const rows = VT_ROWS.filter(([k]) => votes[k] > 0).map(([k, l, c]) => {
+    const t = two[k], n = t ? t[0] + t[1] : 0;
+    return { k, l, c, v: votes[k], n, lab: n >= VT_CELL ? (100 * t[0]) / n : null };
+  });
+  return { rows, tot, seats2 };
+}
+function vtFinding(rows) {
+  const at = (k) => { const r = rows.find((x) => x.k === k); return r && r.n >= VT_SAY ? r.lab : null; };
+  const day = at("day");
+  if (day == null) return "";
+  const piles = [["post", "by post"], ["ppvc", "at early centres"]].filter(([k]) => at(k) != null).map(([k, w]) => ({ w, g: at(k) - day }));
+  if (!piles.length) return "";
+  const moved = piles.filter((p) => Math.abs(p.g) >= VT_LEVEL), flat = piles.filter((p) => Math.abs(p.g) < VT_LEVEL);
+  if (!moved.length) return `Labor’s two-party share was much the same ${piles.map((p) => p.w).join(" and ")} as on the day.`;
+  const way = (p) => `${p.g > 0 ? "higher" : "lower"} ${p.w}`;
+  let say = `Labor’s two-party share was ${pts(moved[0].g)} ${way(moved[0])} than on the day`;
+  if (moved[1]) say += `, and ${f1(Math.abs(moved[1].g))} ${way(moved[1])}`;
+  if (flat[0]) say += `, and much the same ${flat[0].w}`;
+  return `${say}.`;
+}
+// (area: a state's or the country's, which also says what the balloons and the surface leave out)
+function vtBlock(divs, area) {
+  const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
+  const notes = [vtFinding(rows)];
+  if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
+  else if (area && seats2 < divs.length) notes.push(`Labor’s share comes from the ${seats2} of ${divs.length} seats whose final two were Labor and ${coalW(0)}.`);
+  if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
+  return `<div class="st-sec"><h3>How votes were cast <small>${int(tot)} formal</small></h3><div class="stack">${rows.map((r) => `<i style="width:${(100 * r.v) / tot}%;background:${r.c}" title="${r.l}"></i>`).join("")}</div><table class="tbl vt-tbl"><thead><tr><th>Vote</th><th>Share</th>${two ? "<th>Labor 2PP</th>" : ""}</tr></thead><tbody>${rows.map((r) => `<tr><td><i class="sw" style="background:${r.c}"></i>${r.l}</td><td>${f1((100 * r.v) / tot)}%</td>${two ? `<td>${f1(r.lab)}</td>` : ""}</tr>`).join("")}</tbody></table>${notes.filter(Boolean).map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+}
+
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -607,6 +664,9 @@ function storyArea(m, st) {
     h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
   }
   h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null && m.res.agg[st].pprim != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
+  // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
+  const cast = m.res.divs.filter((d) => d.vt && (aus || d.st === st));
+  if (cast.length) h += vtBlock(cast, true);
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const bySt = aus ? STATES.filter((s) => m.areas[s]) : [];
   // a one-row "by state" table says nothing the headline didn't (SA frames list SA alone)
@@ -785,11 +845,7 @@ function storyDiv(m, i) {
   h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? ` on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
-  if (d.vt) {
-    const vt = d.vt, tot = vt.ord + vt.pre + vt.post + vt.abs + vt.prov;
-    const parts = [["On the day", vt.ord - vt.ppvc, "var(--ink-2)"], ["Early, in person", vt.ppvc + vt.pre, "var(--ink-faint)"], ["Postal", vt.post, "var(--accent)"], ["Absent and other", vt.abs + vt.prov, "var(--line)"]];
-    h += `<div class="st-sec"><h3>How votes were cast <small>${int(tot)} formal</small></h3><div class="stack">${parts.map(([l, v, c]) => `<i style="width:${(100 * v) / tot}%;background:${c}" title="${l}"></i>`).join("")}</div><div class="stackl">${parts.map(([l, v, c]) => `<span><i style="background:${c}"></i>${l}<b>${f0((100 * v) / tot)}%</b></span>`).join("")}</div></div>`;
-  }
+  if (d.vt) h += vtBlock([d]);
   h += `<div class="st-sec"><h3>Informal</h3><div class="big"><span class="v">${f1(d.infPct)}%</span><span class="l">of ballots · Australia ${f1(m.areas.AUS.infPct)}%</span></div>${d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : ""}</div>`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
   const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;

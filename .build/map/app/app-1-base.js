@@ -922,7 +922,7 @@ function deriveDiv(d, i, year) {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
     exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
     A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
-    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
+    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };
 }

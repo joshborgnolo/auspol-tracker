@@ -767,6 +767,9 @@ function balloonColor(m, v) {
   const [mid, R] = two, d = v - mid;
   return colorOf(mid + (d < 0 ? -1 : 1) * R * (0.6 + 0.4 * Math.min(1, Math.abs(d) / R)));
 }
+// the places a balloon can stand for: not the islands, whose boxes are their own, nor a place with no spot on
+// the land, as most hospital teams are; remote and mobile teams are shared over their seat's
+const balloonPlace = (b, j) => b.isl[j] < 0 && (!Number.isNaN(b.x[j]) || b.ty[j] === 3 || b.ty[j] === 4);
 // each place's part in a balloon: its votes, its figure, and whether a shared balloon nets it off or adds it up
 function balloonSet(m) {
   const key = readingKey(m);
@@ -775,11 +778,10 @@ function balloonSet(m) {
   const b = m.booth, n = b.n, J = [], C = [], W = [], V = [], X = [], Y2 = [], two = twoSided(m), taken = new Map();
   const cat = S.lens === "winner" || S.lens === "cls", net = (two && S.lens !== "flow" && S.lens !== "senpref") || S.lens === "winner";
   for (let j = 0; j < n; j++) {
-    if (b.isl[j] >= 0) continue;
+    if (!balloonPlace(b, j)) continue;
     // a remote or mobile team has no spot of its own: it takes its turn on its seat's land (seatSpots)
     let x = b.x[j], y = b.y[j];
     if (Number.isNaN(x)) {
-      if (b.ty[j] !== 3 && b.ty[j] !== 4) continue;
       const spots = seatSpots(m, b.d[j]), k = taken.get(b.d[j]) || 0; if (!spots.length) continue;
       taken.set(b.d[j], k + 1); [x, y] = nominalSpot(m, b.d[j], spots[(k * 7) % spots.length], k);
     }
@@ -1006,15 +1008,61 @@ function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
   return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}>${t}</button>`; }).join("")}</div>`;
 }
+/* ----- what the balloons and the surface leave out -----
+   Postal, absent and declaration votes are counted by seat, not at a place, so neither
+   drawing has anywhere to put them; nor have the places with no spot (balloonPlace). The key
+   says how many votes that is in the place chosen and, where the balloons read the two-party
+   lead, which way they went. That lead is each seat's count less the lead its balloons draw,
+   so the key and the balloons add up exactly to the real result. A seat with a drawn place
+   that has no two-party figure (some of 1998's) leaves it unsaid. */
+function undrawnBySeat(m) {
+  if (m._undrawn) return m._undrawn;
+  const b = m.booth, N = m.divs.length, off = new Float64Array(N), drawn = new Float64Array(N), gap = new Uint8Array(N);
+  for (let j = 0; j < b.n; j++) {
+    const i = b.d[j], t = b.raw && b.raw.tpp && b.raw.tpp[j];
+    if (!balloonPlace(b, j)) off[i] += b.formal[j] || 0;
+    else if (t) drawn[i] += t[0] - t[1];
+    else gap[i] = 1;
+  }
+  return (m._undrawn = m.divs.map((d, i) => {
+    const v = d.vt, r = m.res.divs[i];
+    if (!v) return null;
+    return { n: (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0) + off[i], lead: r && r.tpp && !gap[i] ? r.tpp[0] - r.tpp[1] - drawn[i] : null };
+  }));
+}
+function undrawnOf(m) {
+  const by = undrawnBySeat(m), sd = selDiv(), st = S.sel.level === "state" ? S.sel.st : null;
+  let n = 0, lead = 0;
+  for (let i = 0; i < by.length; i++) {
+    if (!by[i] || (sd != null ? i !== sd : st && m.divs[i].st !== st)) continue;
+    n += by[i].n; lead = lead == null || by[i].lead == null ? null : lead + by[i].lead;
+  }
+  return n ? { n, lead } : null;
+}
+// to three figures, which is all the key needs: 3.2m, 242,000, 21,300
+function roughly(v) {
+  if (v >= 999500) return `${(v / 1e6).toFixed(1)}m`;
+  const p = 10 ** Math.max(0, Math.floor(Math.log10(Math.max(1, v))) - 2);
+  return int(Math.round(v / p) * p);
+}
+function undrawnHTML(m, est) {
+  if (STATE_YEARS.has(m.year)) return "";
+  // an election not yet loaded holds the room for its line
+  const u = m.standIn ? { n: 3.2e6, lead: -242000 } : undrawnOf(m);
+  if (!u) return "";
+  const led = S.lens === "tpp" && S.tppMode !== "swing" && axisNow(m) === "AC" && !est && u.lead != null;
+  const lead = !led ? "" : Math.abs(u.lead) < 0.5 ? ", level" : `, ${u.lead > 0 ? "Labor" : coalW(0)} by ${roughly(Math.abs(u.lead))}`;
+  return `<div class="lg-undrawn">Not drawn: ${roughly(u.n)} postal and other votes${lead}</div>`;
+}
 // the note under the drawing's name: what the picture is, and for a built contest what it stands on
 function drawNoteHTML(m) {
   const d = drawOf(m);
   if (d === "seats") return "";
   const est = !m.standIn && placesLackMemo(m);
-  if (d === "balloons") return balloonKey(m, est);
-  if (axisNow(m) !== "AC") return `<div class="lg-note">Built from first preferences and ${axisByBonham(m, axisNow(m)) ? "estimated flows" : "Senate ballots"}.</div>`;
+  if (d === "balloons") return balloonKey(m, est) + undrawnHTML(m, est);
+  if (axisNow(m) !== "AC") return `<div class="lg-note">Built from first preferences and ${axisByBonham(m, axisNow(m)) ? "estimated flows" : "Senate ballots"}.</div>${undrawnHTML(m, est)}`;
   const off = S.axis !== "AC" && S.lens === "tpp" && S.tppMode !== "swing" && axisFrame(m) == null;
-  return `<div class="lg-note">${off ? "One Nation stood too thinly here for its contests." : est ? "Smoothed, from first preferences: an estimate." : S.lens === "winner" ? "A smoothed estimate. Deeper means a bigger lead." : "A smoothed estimate, not a count."}</div>`;
+  return `<div class="lg-note">${off ? "One Nation stood too thinly here for its contests." : est ? "Smoothed, from first preferences: an estimate." : S.lens === "winner" ? "A smoothed estimate. Deeper means a bigger lead." : "A smoothed estimate, not a count."}</div>${undrawnHTML(m, est)}`;
 }
 // the key's ramp in the surface's steps
 function surfaceRampCss(m) {

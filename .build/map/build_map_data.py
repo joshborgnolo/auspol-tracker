@@ -600,7 +600,7 @@ def build_year(year, hist, base2001):
     ppvc = collections.Counter()
     for (bd, pp), b in bfpv.items():
         if gpp.get((bd, pp), {}).get("type") == 5:
-            ppvc[bd] += sum(b["votes"].values()) + b["inf"]
+            ppvc[bd] += sum(b["votes"].values())  # formal, as every other pile in vt is
 
     D = []
     div_index = {}

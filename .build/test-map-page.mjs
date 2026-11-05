@@ -21,6 +21,7 @@ import { coreText } from "./map/core-split.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
+const sum2 = (p) => (p ? p[0] + p[1] : 0);
 const app = R(".build/newtracker/assets/73de0c58-f11f-4793-9f90-77e583ab051b.js");
 const views = R(".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js");
 
@@ -115,6 +116,43 @@ for (const f of fs.readdirSync(path.join(ROOT, "map/data")).sort()) {
 assert.ok(js.includes("getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
 assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("map/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
 assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
+// how votes were cast: each seat's Labor and Coalition votes by pile (build_vote_piles.py, re-run after anything that
+// rewrites a res file) add up to its final count; every seat from 2016, before that the Labor v Coalition pairs, none in 1993
+{
+  const FEDERAL = [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+  const add = (v2) => Object.values(v2).reduce((t, p) => [t[0] + p[0], t[1] + p[1]], [0, 0]);
+  for (const y of FEDERAL) {
+    const r = JSON.parse(R(`map/data/res-${y}.json`)), b = r.booths;
+    const early = new Array(r.divs.length).fill(0);
+    b.d.forEach((d, j) => { if (b.ty[j] === 5) early[d] += b.v[j].reduce((a, v) => a + v, 0); });
+    r.divs.forEach((d, i) => {
+      assert.equal(d.vt.ppvc, early[i], `${y} ${d.n}: vt.ppvc counts formal votes at early centres, as every other pile in vt does`);
+      const fam = d.tcp.map(([c]) => d.c[c][3]), classic = fam.includes("alp") && fam.includes("lnp");
+      if (y >= 2016) {
+        assert.ok(d.vt2, `${y} ${d.n} has piles (python3 -I .build/map/build_vote_piles.py, then assemble)`);
+        assert.deepEqual(add(d.vt2), d.tpp.slice(0, 2), `${y} ${d.n}: the piles add up to the two-party count`);
+        for (const [k, p] of Object.entries(d.vt2)) assert.ok(k in d.vt || ["day", "mob"].includes(k), `${y} ${d.n}: unknown pile ${k}`);
+        assert.equal(sum2(d.vt2.pre), d.vt.pre, `${y} ${d.n}: declaration pre-poll votes all reach the two-party count`);
+        assert.equal(sum2(d.vt2.post), d.vt.post, `${y} ${d.n}: postal votes all reach the two-party count`);
+      } else if (classic) {
+        assert.ok(d.vt2, `${y} ${d.n}: a Labor v Coalition seat has piles`);
+        const A = d.tcp[fam.indexOf("alp")][1], C = d.tcp[fam.indexOf("lnp")][1];
+        assert.deepEqual(add(d.vt2), [A, C], `${y} ${d.n}: the piles add up to the final two`);
+      } else assert.ok(!d.vt2, `${y} ${d.n}: no two-party split from a final two of another pair`);
+    });
+  }
+  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2), "1993's count stops at the division: no piles");
+  // the national figures quoted when this shipped: the headline is the AEC's own, and the piles reach it
+  const r = JSON.parse(R("map/data/res-2025.json")), T = {};
+  for (const d of r.divs) for (const [k, p] of Object.entries(d.vt2)) { const t = (T[k] ??= [0, 0]); t[0] += p[0]; t[1] += p[1]; }
+  const lab = (k) => Math.round((1000 * T[k][0]) / (T[k][0] + T[k][1])) / 10;
+  assert.deepEqual([lab("day"), lab("ppvc"), lab("post")], [58.0, 53.0, 51.6], "2025 on the day, early centres, postal");
+  assert.deepEqual(add(Object.fromEntries(Object.entries(T))), r.agg.AUS.tpp.slice(0, 2), "2025's piles add up to the national two-party count");
+}
+assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true);"), "a seat, a state and the country share one How votes were cast block");
+assert.ok(js.includes("const cast = m.res.divs.filter(") , "the area block reads the results file, since Now blanks a by-election's piles");
+assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
+assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
 // 2001-census edition's own nine (its B 06 prints a whole-UK row the
 // menu leads with, as eng leads the GCP menu — used by both the 2001
