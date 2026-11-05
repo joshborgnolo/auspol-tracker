@@ -134,7 +134,7 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),

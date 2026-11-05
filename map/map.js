@@ -179,8 +179,8 @@ const famLeg = (f) => (f === "lnp" && STATE_YEARS.has(S.year) ? "Liberals" : FAM
 /* the parties as compact column-head codes (the list table's lens header) */
 const FAM_CODE = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
 // the ECSA's own codes ride the same rails: LIB is the Coalition, ONP One Nation
-const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"].includes(ab) ? "lnp" : ["GRN", "GWA", "TG", "GVIC", "AGV", "GA", "QG", "CCG", "ESG", "GDA", "GLO", "GSA", "RCG", "VGA", "WSG"].includes(ab) ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
-const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", CLP: "Country Liberal", GRN: "Greens", GA: "Greens", GWA: "Greens (WA)", TG: "Tasmanian Greens", GVIC: "Victorian Greens", AD: "Democrats", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
+const FAM = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "NATS", "LNQ", "LIB"].includes(ab) ? "lnp" : ["GRN", "GWA", "TG", "GVIC", "AGV", "GA", "QG", "CCG", "ESG", "GDA", "GLO", "GSA", "RCG", "VGA", "WSG"].includes(ab) ? "grn" : ab === "ON" || ab === "HAN" || ab === "ONP" ? "onp" : ab === "IND" || ab === "" || ab === "NAFD" || ab === "CSA" ? "ind" : "oth");
+const PARTY = { ALP: "Labor", LP: "Liberal", LIB: "Liberal", LNP: "Liberal National", LNQ: "Liberal National", NP: "Nationals", NAT: "Nationals", NATS: "Nationals", CLP: "Country Liberal", GRN: "Greens", GA: "Greens", GWA: "Greens (WA)", TG: "Tasmanian Greens", GVIC: "Victorian Greens", AD: "Democrats", IND: "Independent", NAFD: "Independent", ON: "One Nation", ONP: "One Nation", HAN: "One Nation", KAP: "Katter’s Australian", PUP: "Palmer United", UAPP: "United Australia", LDP: "Liberal Democrats", AJP: "Animal Justice", CYA: "Trumpet of Patriots", FFP: "Family First", FFPA: "Family First", LTP: "Libertarian", HMP: "Legalise Cannabis", GRPF: "People First", SAL: "Socialist Alliance", VNS: "Victorian Socialists", ASP: "Shooters, Fishers and Farmers", AUC: "Australian Christians", CEC: "Citizens Party", IMO: "HEART", SOPA: "FUSION", AUD: "Australian Democrats", DEM: "Democrats", GAP: "Great Australian", IAP: "Indigenous-Aboriginal", JLN: "Jacqui Lambie Network", TNL: "TNL", SPP: "Sustainable Australia", DHJP: "Justice Party", AUVA: "Australian Values", WAP: "Western Australia Party", AUP: "Australian Progressives", TLOC: "The Local Party", DPDA: "Democratic Alliance", CA: "Centre Alliance", AMEP: "Motoring Enthusiast", AC: "Australian Conservatives", APA: "Progressive Alliance", GLT: "Glenn Lazarus Team", AV: "Australia’s Voice", REAS: "Reason", CDP: "Christian Democrats", CSA: "Community Strong", RUA: "Rise Up Australia", SEP: "Socialist Equality", DLP: "Democratic Labour", FACN: "Fraser Anning’s Conservative Nationals", NGST: "No GST", SPA: "Secular Party", AFN: "Australia First", BTA: "Bullet Train for Australia" };
 const partyName = (ab, pn) => (ab === "XEN" ? (pn && /xenophon/i.test(pn) ? "Nick Xenophon Team" : "Centre Alliance") : PARTY[ab] || (pn ? pn.replace(/^The /, "") : "") || ab || "Independent");
 // a party as a sentence names it: "won Kooyong from the Liberals"
 const THE = { Liberal: "the Liberals", Nationals: "the Nationals", Greens: "the Greens", "Liberal National": "the LNP", "Country Liberal": "the Country Liberals", Independent: "an independent", "Liberal Democrats": "the Liberal Democrats", Democrats: "the Democrats", "Palmer United": "Palmer United", "Nick Xenophon Team": "the Nick Xenophon Team", "Jacqui Lambie Network": "the Jacqui Lambie Network", "Australian Democrats": "the Democrats", "Family First": "Family First", "Democratic Labour": "the DLP", "Palmer United": "Palmer United", "Motoring Enthusiast": "the Motoring Enthusiast Party", "Australian Conservatives": "the Australian Conservatives", "Progressive Alliance": "the Progressive Alliance" };
@@ -6065,8 +6065,8 @@ function upLink() {
   const go = s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
   return `<button type="button" class="st-up" data-go="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${ds(label)}</button>`;
 }
-function head(title, meta, hed, dek) {
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+function head(title, meta, hed, dek, stat) {
+  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || `<h3 class="st-hed">${hed}</h3>`}${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
 }
 // the Now page's two-party read: two names, two big figures, a rule between
 function heroPair(aName, aPct, aFam, bName, bPct, bFam) {
@@ -6192,6 +6192,40 @@ function crossSentence(m, idx, verb) {
   }
   return `The crossbench ${verb === "holds" ? "holds" : "took"} ${c}: ${crossbenchWords(m, idx)}.`;
 }
+/* the seats a frame's change is counted against: an "as it stands" frame's own election (what has
+   changed in the chamber since), otherwise the previous election on its row. The first stop of a
+   row has none. Federal counts by state come from summary.json; a state election's from the facts
+   stamped into the script, which only count the whole state */
+function seatBase(m, st) {
+  const y = m.year;
+  const row = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA].find((r) => r.includes(y));
+  const stops = row.filter((v) => !isNowY(v)), pv = isNowY(y) ? NOW_OF[y] : stops[stops.indexOf(y) - 1];
+  if (pv == null) return null;
+  if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };
+  return st === "AUS" || st === stOfYear(y) ? { y: pv, c: META_FACTS.mix[pv] } : null;
+}
+// the Winner lens's head: the two-party result, its swing, then the seats with each side's change
+function seatStat(m, st, label) {
+  const { A, N, cnt } = areaStats(m, st);
+  const tone = (f) => `style="color:${css(TH.party[f])}"`;
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = seatBase(m, st);
+  const seats = [["alp", a], ["lnp", l], ["oth", N - a - l]];
+  let two = "";
+  if (A.tpp != null) {
+    const s = A.tppSw;
+    const sw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
+    two = `<span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
+  }
+  const change = (f, n) => {
+    if (!base) return "";
+    if (!base.c) return " "; // summary.json still on its way: the line keeps its place
+    const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - (base.c.alp || 0) - (base.c.lnp || 0) : base.c[f] || 0;
+    return sgn(n - was, 0);
+  };
+  const cells = seats.map(([f, n], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${n}</b>`).join("");
+  const under = base ? seats.map(([f, n], i) => `<small style="grid-column:${2 * i + 1}">${change(f, n)}</small>`).join("") : "";
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-seats">${cells}${under}</span></h3>`;
+}
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const where = aus ? "" : ` in ${STATE_NAME[st]}`;
@@ -6219,9 +6253,12 @@ function areaHedDek(m, st) {
         const oppW = gov === "alp" ? coalW(1) : "Labor";
         const hed = aus ? `${govW} holds ${g} of the ${N} seats` : `${govW} holds ${g} ${ofSeats}`;
         let dek = `${oppW} ${o === 1 ? "holds" : "hold"} ${o}. ${crossSentence(m, idx, "holds")}`;
+        // what the figures can't say stays in words: the seats that moved since the election
+        let note = aus ? (NOW_AUS_DEK[m.year] ?? "").trim() : "";
+        if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) note = `Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
         if (aus) dek += NOW_AUS_DEK[m.year] ?? "";
-        if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) dek += ` Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
-        return { hed, dek };
+        else if (note) dek += ` ${note}`;
+        return { hed, dek: note, stat: seatStat(m, st, `${hed}. ${dek}`) };
       }
       const maj = Math.floor(N / 2) + 1;
       // a state frame's prev lives under its jurisdiction when the federal GOV
@@ -6239,7 +6276,8 @@ function areaHedDek(m, st) {
       let dek = aus
         ? `${g < maj ? "" : `${opp === "alp" ? "Labor" : coalW(1)} won ${o}. `}${crossSentence(m, idx, "won")}${c ? " " : ""}${m.year === 2010 ? "Labor kept government with the support of the Greens’ member and three independents. " : ""}${PM[m.year]} ${changed ? "became" : "remained"} ${leaderT()}.`
         : `${(cnt.alp || 0) >= (cnt.lnp || 0) ? coalW(1) : "Labor"} won ${(cnt.alp || 0) >= (cnt.lnp || 0) ? cnt.lnp || 0 : cnt.alp || 0}. ${crossSentence(m, idx, "won")}${c ? " " : ""}Labor’s two-party vote${where} was ${f1(A.tpp)}%${swingPhrase(A.tppSw, prev) ? ", " + swingPhrase(A.tppSw, prev) : ""}.`;
-      return { hed, dek };
+      // (a hung parliament's government isn't in the figures, so that one stays in words)
+      return { hed, dek: aus && m.year === 2010 ? "Labor kept government with the support of the Greens’ member and three independents." : "", stat: seatStat(m, st, `${hed}. ${dek}`) };
     }
     case "tpp": {
       const withData = idx.filter((i) => m.divs[i].tpp != null);
@@ -6514,11 +6552,11 @@ function clsVoteBlock(m, idx) {
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
-  const { hed, dek } = areaHedDek(m, st);
+  const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
   const meta = aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
-  let h = head(title, meta, hed, dek);
+  let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats
@@ -7376,7 +7414,7 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),

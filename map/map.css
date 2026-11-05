@@ -273,6 +273,15 @@ button { cursor: pointer; background: none; border: 0; }
 .st-head h2 { font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; }
 .st-head .rd-meta { flex-basis: 100%; margin-top: 3px; }
 .st-hed { margin-top: 14px; font-family: var(--serif); font-weight: 700; font-size: 32px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+/* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
+.st-stat { display: inline-flex; flex-direction: column; align-items: center; margin-top: 16px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; }
+.st-stat b { font-weight: 700; }
+.st-stat i { font-style: normal; font-weight: 500; color: var(--ink-faint); padding: 0 0.1em; }
+.st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
+.st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; }
+.st-seats { display: inline-grid; grid-template-columns: repeat(5, auto); justify-items: center; align-items: baseline; margin-top: 20px; }
+.st-seats small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink-2); }
+.st-stat + .st-dek { margin-top: 16px; }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
 .st-sec { margin-top: 26px; padding-top: 11px; border-top: 1px solid var(--line); }
@@ -505,6 +514,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-fig { grid-template-columns: 300px minmax(0, 1fr); column-gap: 28px; }
   .mp-search { width: 240px; }
   .st-hed { font-size: 28px; }
+  .st-tpp, .st-seats { font-size: 46px; }
   .hero-num { font-size: 46px; }
 }
 @media (max-width: 860px) {
@@ -539,6 +549,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-lenses .rd-tab { padding: 0 10px; font-size: 14.5px; }
   .mp-time { height: 174px; }
   .st-hed { font-size: 27px; }
+  .st-tpp, .st-seats { font-size: 44px; }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }
   .mp-legend .lg-cats { gap: 3px 10px; font-size: 12px; }
