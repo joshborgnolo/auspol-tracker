@@ -150,16 +150,12 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-frames button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
 .mp-cities button { padding: 4px 0; color: var(--ink-2); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }
 .mp-cities button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
-.mp-zoom { position: absolute; right: 0; top: 0; display: flex; flex-direction: column; z-index: 3;
-  border-radius: 9px; background: var(--sh-sw-plate, var(--surface)); padding: 3px; gap: 3px;
-  box-shadow: inset 0 1px 2px oklch(0.3 0.02 60 / 0.16); }
+.mp-zoom { position: absolute; right: 0; top: 0; display: flex; flex-direction: column; z-index: 3; padding: 0; gap: 8px; }
 .mp-zoom button {
-  width: 34px; height: 32px; display: grid; place-items: center; border-radius: 7px; color: var(--ink-2);
-  background: var(--sh-sw-cap, var(--surface));
-  box-shadow: inset 0 1px 0 var(--sh-btn-lit, white), 0 1px 1.5px var(--sh-btn-shade, oklch(0.4 0.02 60 / .16)), 0 3px 6px -3px var(--sh-btn-shade, oklch(0.4 0.02 60 / .16));
+  width: 34px; height: 32px; display: grid; place-items: center; color: var(--ink-2);
+  text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg);
 }
 .mp-zoom button:hover { color: var(--ink); }
-.mp-zoom button:active { transform: translateY(1px); box-shadow: inset 0 1px 2px var(--sh-btn-press, oklch(0.3 0.02 60 / .2)); }
 .mp-filter {
   position: absolute; left: 50%; top: 4px; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 10px;
   padding: 5px 6px 5px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--ink-2);
