@@ -252,8 +252,9 @@ function seatStat(m, st, label) {
     const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
     fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null || isNowY(m.year) ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
   }
-  // on the Seats label itself: the governing family's share of the chamber, in its wording
-  const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} has ${f1((100 * gN) / N)}% of ${N})` : "";
+  // on the Seats label itself: the governing family's share of the chamber, in its wording —
+  // "won" what an election delivered, "has" what an as-it-stands frame holds
+  const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
 }
 function areaHedDek(m, st) {
