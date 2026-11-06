@@ -62,12 +62,12 @@ function click(kind,action,index) {
   return el.outerHTML;
 }
 let html = click("states","cycle");
-assert.match(html,/New South Wales primaries/);
-assert.match(html,/New South Wales 2PP/);
-assert.ok(html.indexOf("New South Wales primaries")<html.indexOf("New South Wales 2PP"));
+assert.match(html,/NSW primaries/);
+assert.match(html,/NSW 2PP/);
+assert.ok(html.indexOf("NSW primaries")<html.indexOf("NSW 2PP"));
 assert.match(html,/55\.3/);
 for(let i=0;i<8;i++) html=click("states","cycle");
-assert.match(html,/New South Wales primaries/,"cycle wraps around");
+assert.match(html,/NSW primaries/,"cycle wraps around");
 html=click("states","list");
 assert.equal((html.match(/data-pv-action="pick"/g)||[]).length,8);
 assert.match(html,/aria-expanded="true"/);
@@ -77,7 +77,7 @@ assert.match(html,/Tasmania 2PP/);
 click("states","list");
 assert.match(click("states","list"),/id="st-pv-states" hidden/,"list can collapse");
 assert.equal(api.statBreakdownView(current,"AUS","classes").mode,"closed","groups are independent");
-assert.match(click("classes","cycle"),/Inner metro 2PP/);
+assert.match(click("classes","cycle"),/Inner-metro 2PP/);
 assert.ok(focusCount>0,"replacing a group restores keyboard focus");
 
 const now = model(2025); now.year="now";

@@ -203,6 +203,28 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
+// the head's "figures" menu: its choice lives per frame; "aus" is the whole
+// frame's own jurisdiction (Nationwide on the federal frames)
+const statScopes = new WeakMap();
+const statScopeOf = (m) => { let s = statScopes.get(m); if (!s) { s = { k: "aus" }; statScopes.set(m, s); } return s; };
+function statScopeLabel(m, sel) {
+  if (sel.k !== "st") return sel.k === "cls" ? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` : STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures";
+  const s = sel.st;
+  return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`;
+}
+// a scope's own area-payload: states ride their stored aggregates, classes are pooled
+function statScopeArea(m, st, sel) {
+  if (sel.k === "st") {
+    const A = m.areas[sel.st], idx = A.idx, cnt = {};
+    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+    return { A, idx, N: idx.length, cnt };
+  }
+  const row = statBreakdownRows(m, st).classes.find((r) => r.key === sel.cls);
+  if (!row) return areaStats(m, st);
+  const A = row.A, cnt = {};
+  for (const i of A.idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+  return { A, idx: A.idx, N: A.idx.length, cnt };
+}
 // Use the headline's party threshold in both breakdown modes. Lists share a
 // column set, so a party does not change columns between adjacent states.
 function statPrimaryCols(m, A, keys = null) {
@@ -321,9 +343,10 @@ function statBreakdownClick(button) {
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
-  const { A, idx, N, cnt } = areaStats(m, st);
+  const statSel = statScopeOf(m);
+  const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = seatBase(m, st);
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : null;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();
@@ -364,7 +387,19 @@ function seatStat(m, st, label) {
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>${fpRow ? statBreakdowns(m, st) : ""}`;
+  // the make-up bar under the seat row, the timeline rungs' read
+  const mk = N ? `<span class="st-makeup" aria-hidden="true"><i style="width:${((100 * (cnt.alp || 0)) / N)}%;background:var(--m-alp)"></i><i style="width:${((100 * (cnt.lnp || 0)) / N)}%;background:var(--m-lnp)"></i><i style="width:${((100 * (N - (cnt.alp || 0) - (cnt.lnp || 0))) / N)}%;background:var(--m-oth)"></i></span>` : "";
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${fpRow}</h3>`;
+}
+// the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
+// its states or its seat types once named — the head's own figures then follow it
+function statScopeMenu(m, st) {
+  const sel = statScopeOf(m);
+  const item = (v, txt, on) => `<button type="button" data-scope="${v}" role="menuitem"${on ? ' aria-pressed="true"' : ""}>${txt}</button>`;
+  const items = [item("aus", esc(STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"), sel.k === "aus")];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) items.push(item(`st:${s}`, esc(`${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`), sel.k === "st" && sel.st === s));
+  for (const r of statBreakdownRows(m, st).classes) items.push(item(`cls:${r.key}`, esc(`${CLS_SHORT[r.key].replace(" ", "-")} figures`), sel.k === "cls" && sel.cls === r.key));
+  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, sel))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
@@ -753,7 +788,9 @@ function storyArea(m, st) {
   const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
+  // the Winner head's meta is the scope menu: "Nationwide figures" by default,
+  // and its head follows whichever state or seat type is picked there
+  const meta = S.lens === "winner" && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;

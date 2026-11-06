@@ -579,12 +579,10 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 // (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
-// the up/down-arrows row walk: the timeline's rows top to bottom, in
-// renderTimeline's `rows` order (Vic above NSW since 2026-10-28, Queensland's
-// row appended below), walking
-// round the ends; a row holds the stop it was left on (setYear keeps the
-// memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA];
+// the up/down-arrows walk: the "View elections" strip's order (federal, then
+// the states as they are listed there), walking round the ends; a lane holds
+// the stop it was left on (setYear keeps the memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];
 const laneMem = new Map();
 function walkLane(dir) {
   const cur = yearLane(S.year);
@@ -7847,6 +7845,28 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
+// the head's "figures" menu: its choice lives per frame; "aus" is the whole
+// frame's own jurisdiction (Nationwide on the federal frames)
+const statScopes = new WeakMap();
+const statScopeOf = (m) => { let s = statScopes.get(m); if (!s) { s = { k: "aus" }; statScopes.set(m, s); } return s; };
+function statScopeLabel(m, sel) {
+  if (sel.k !== "st") return sel.k === "cls" ? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` : STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures";
+  const s = sel.st;
+  return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`;
+}
+// a scope's own area-payload: states ride their stored aggregates, classes are pooled
+function statScopeArea(m, st, sel) {
+  if (sel.k === "st") {
+    const A = m.areas[sel.st], idx = A.idx, cnt = {};
+    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+    return { A, idx, N: idx.length, cnt };
+  }
+  const row = statBreakdownRows(m, st).classes.find((r) => r.key === sel.cls);
+  if (!row) return areaStats(m, st);
+  const A = row.A, cnt = {};
+  for (const i of A.idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+  return { A, idx: A.idx, N: A.idx.length, cnt };
+}
 // Use the headline's party threshold in both breakdown modes. Lists share a
 // column set, so a party does not change columns between adjacent states.
 function statPrimaryCols(m, A, keys = null) {
@@ -7965,9 +7985,10 @@ function statBreakdownClick(button) {
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
-  const { A, idx, N, cnt } = areaStats(m, st);
+  const statSel = statScopeOf(m);
+  const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = seatBase(m, st);
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : null;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();
@@ -8008,7 +8029,19 @@ function seatStat(m, st, label) {
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>${fpRow ? statBreakdowns(m, st) : ""}`;
+  // the make-up bar under the seat row, the timeline rungs' read
+  const mk = N ? `<span class="st-makeup" aria-hidden="true"><i style="width:${((100 * (cnt.alp || 0)) / N)}%;background:var(--m-alp)"></i><i style="width:${((100 * (cnt.lnp || 0)) / N)}%;background:var(--m-lnp)"></i><i style="width:${((100 * (N - (cnt.alp || 0) - (cnt.lnp || 0))) / N)}%;background:var(--m-oth)"></i></span>` : "";
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${fpRow}</h3>`;
+}
+// the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
+// its states or its seat types once named — the head's own figures then follow it
+function statScopeMenu(m, st) {
+  const sel = statScopeOf(m);
+  const item = (v, txt, on) => `<button type="button" data-scope="${v}" role="menuitem"${on ? ' aria-pressed="true"' : ""}>${txt}</button>`;
+  const items = [item("aus", esc(STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"), sel.k === "aus")];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) items.push(item(`st:${s}`, esc(`${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`), sel.k === "st" && sel.st === s));
+  for (const r of statBreakdownRows(m, st).classes) items.push(item(`cls:${r.key}`, esc(`${CLS_SHORT[r.key].replace(" ", "-")} figures`), sel.k === "cls" && sel.cls === r.key));
+  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, sel))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
@@ -8397,7 +8430,9 @@ function storyArea(m, st) {
   const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  const meta = aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
+  // the Winner head's meta is the scope menu: "Nationwide figures" by default,
+  // and its head follows whichever state or seat type is picked there
+  const meta = S.lens === "winner" && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
@@ -9711,11 +9746,15 @@ function renderTimeline() {
   if (FS.on) fsRail();
 }
 
-/* the Jump to: row's cities, filtered to the frame's own jurisdiction on a state election */
+/* the Jump to: row's cities; a state election keeps just its capital, unlabelled */
 function renderCities() {
   const j = stOfYear(S.year);
-  const lis = j ? CITIES.filter(([, st]) => st === j) : CITIES;
-  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st]) => `<div class="mp-ca"><button type="button" data-city="${CITIES.findIndex((c) => c[0] === n)}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
+  if (j) {
+    const k = CITIES.findIndex(([, st]) => st === j);
+    if (k >= 0) { $("#cities").innerHTML = `<b>Jump to:</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>`; renderJumpSel(); return; }
+  }
+  const lis = CITIES;
+  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
   renderJumpSel();
 }
 /* the selected entry keeps the hover underline (the city/state column and the election alike) */
@@ -9801,6 +9840,12 @@ const goState = (st, o) => select({ level: "state", st }, o);
 const goDiv = (i, o) => { const m = M(); select({ level: "div", st: m.divs[i].st, div: i }, o); };
 const goBooth = (j, o) => { const m = M(); const i = m.booth.d[j]; select({ level: "booth", st: m.divs[i].st, div: i, booth: j }, o); };
 function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else if (s.level === "div") goState(s.st); else if (s.level === "state") goAus(); }
+
+function setStatScope(sel) {
+  const m = M(); if (!m) return;
+  statScopes.set(m, sel);
+  renderStory(true);
+}
 
 function renderFilterPill() {
   const el = $("#filterpill"), m = M();
@@ -10476,6 +10521,17 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
+  const scT = e.target.closest("[data-scope-trigger]");
+  if (scT) {
+    const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
+    $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
+    $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
+    if (!was) { pop.hidden = false; scT.setAttribute("aria-expanded", "true"); }
+    return;
+  }
+  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); }
+  const scO = e.target.closest("[data-scope]");
+  if (scO) { const v = scO.dataset.scope.split(":"); setStatScope(v[0] === "aus" ? { k: "aus" } : v[0] === "st" ? { k: "st", st: v[1] } : { k: "cls", cls: v[1] }); return; }
   const stj = e.target.closest("[data-state]");
   if (stj) { goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
@@ -10550,6 +10606,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") {
+    const open = $(".st-scm:not([hidden])");
+    if (open) { open.hidden = true; $(".st-scwrap [data-scope-trigger]")?.setAttribute("aria-expanded", "false"); return; }
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
   }

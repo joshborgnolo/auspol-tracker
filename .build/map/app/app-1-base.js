@@ -577,12 +577,10 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 // (walkHold below), and has no scroll side effects of its own
 const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
-// the up/down-arrows row walk: the timeline's rows top to bottom, in
-// renderTimeline's `rows` order (Vic above NSW since 2026-10-28, Queensland's
-// row appended below), walking
-// round the ends; a row holds the stop it was left on (setYear keeps the
-// memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA];
+// the up/down-arrows walk: the "View elections" strip's order (federal, then
+// the states as they are listed there), walking round the ends; a lane holds
+// the stop it was left on (setYear keeps the memory), its newest stop until then
+const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];
 const laneMem = new Map();
 function walkLane(dir) {
   const cur = yearLane(S.year);

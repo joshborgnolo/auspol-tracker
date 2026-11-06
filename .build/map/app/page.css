@@ -140,7 +140,7 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-tl { position: absolute; left: 0; top: 2px; max-width: calc(100% - 56px); z-index: 3; pointer-events: none; }
 .mp-tl > * { pointer-events: auto; }
 .mp-cities { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; }
-.mp-cities b { padding: 4px 0; font-weight: 600; color: var(--ink); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }
+.mp-cities b { padding: 4px 0; font-weight: 600; color: var(--ink); text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
 .mp-ca { display: flex; flex-direction: column; align-items: center; }
 .mp-ca button:first-child { padding-bottom: 0; }
 .mp-ca button + button { padding-top: 1px; }
@@ -148,7 +148,7 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-frames b { padding: 4px 0; font-weight: 600; color: var(--ink); }
 .mp-frames button { padding: 4px 0; color: var(--ink-2); }
 .mp-frames button:hover, .mp-frames button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
-.mp-cities button { padding: 4px 0; color: var(--ink-2); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }
+.mp-cities button { padding: 4px 0; color: var(--ink-2); text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
 .mp-cities button:hover, .mp-ca.on button { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
 .mp-zoom { position: absolute; right: 0; top: 0; display: flex; flex-direction: column; z-index: 3; padding: 0; gap: 8px; }
 .mp-zoom button {
@@ -262,7 +262,7 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-credit[hidden] { display: none; }
 @media (max-width: 560px) { .mp-credit { white-space: nowrap; } .mp-credit-long { display: none; } }
 .mp-credit a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 2px; }
-.mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: 0 0 4px var(--bg); }
+.mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
 
 /* the timeline: an election axis under the view (six rows — federal, Vic, NSW, SA, Qld, WA; the WA stops landed 2026-11-05 and the rail grew back to the five-row pitch) */
 .mp-time { flex: none; position: relative; height: 200px; border-top: 1px solid var(--line); margin-top: 6px; }
@@ -309,6 +309,17 @@ button { cursor: pointer; background: none; border: 0; }
 .st-fps { font-size: 28px; letter-spacing: -0.01em; }
 .st-fps.st-n5, .st-fps.st-n6 { font-size: 23px; }
 .st-fps small { margin-top: 6px; font-size: 14px; }
+.st-makeup { display: flex; height: 7px; width: 140px; margin-top: 9px; overflow: hidden; border-radius: 1px; }
+.st-makeup i { display: block; height: 100%; }
+/* the head meta's figures scope menu */
+.st-scwrap { position: relative; display: inline-block; }
+.st-sclab { display: inline-flex; align-items: baseline; gap: 3px; padding: 0; font: inherit; color: inherit; }
+.st-sclab:hover { color: var(--ink); }
+.st-sclab[aria-expanded="true"] svg { transform: rotate(180deg); }
+.st-scm { position: absolute; left: 0; top: calc(100% + 6px); z-index: 30; display: flex; flex-direction: column; min-width: 200px; padding: 5px; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 8px 24px -10px oklch(0.3 0.02 60 / 0.4); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-2); }
+.st-scm button { display: block; text-align: left; padding: 6px 9px; border-radius: 5px; }
+.st-scm button:hover { background: var(--lean-ink-bg); color: var(--ink); }
+.st-scm button[aria-pressed="true"] { font-weight: 600; color: var(--ink); }
 .st-breakdowns { margin: 16px 0 0 14px; }
 .st-pv + .st-pv { margin-top: 8px; }
 .st-pv-head { display: flex; align-items: center; gap: 2px; min-height: 36px; }

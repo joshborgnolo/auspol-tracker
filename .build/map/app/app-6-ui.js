@@ -582,11 +582,15 @@ function renderTimeline() {
   if (FS.on) fsRail();
 }
 
-/* the Jump to: row's cities, filtered to the frame's own jurisdiction on a state election */
+/* the Jump to: row's cities; a state election keeps just its capital, unlabelled */
 function renderCities() {
   const j = stOfYear(S.year);
-  const lis = j ? CITIES.filter(([, st]) => st === j) : CITIES;
-  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st]) => `<div class="mp-ca"><button type="button" data-city="${CITIES.findIndex((c) => c[0] === n)}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
+  if (j) {
+    const k = CITIES.findIndex(([, st]) => st === j);
+    if (k >= 0) { $("#cities").innerHTML = `<b>Jump to:</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>`; renderJumpSel(); return; }
+  }
+  const lis = CITIES;
+  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
   renderJumpSel();
 }
 /* the selected entry keeps the hover underline (the city/state column and the election alike) */
@@ -672,6 +676,12 @@ const goState = (st, o) => select({ level: "state", st }, o);
 const goDiv = (i, o) => { const m = M(); select({ level: "div", st: m.divs[i].st, div: i }, o); };
 const goBooth = (j, o) => { const m = M(); const i = m.booth.d[j]; select({ level: "booth", st: m.divs[i].st, div: i, booth: j }, o); };
 function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else if (s.level === "div") goState(s.st); else if (s.level === "state") goAus(); }
+
+function setStatScope(sel) {
+  const m = M(); if (!m) return;
+  statScopes.set(m, sel);
+  renderStory(true);
+}
 
 function renderFilterPill() {
   const el = $("#filterpill"), m = M();
@@ -1347,6 +1357,17 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
+  const scT = e.target.closest("[data-scope-trigger]");
+  if (scT) {
+    const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
+    $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
+    $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
+    if (!was) { pop.hidden = false; scT.setAttribute("aria-expanded", "true"); }
+    return;
+  }
+  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); }
+  const scO = e.target.closest("[data-scope]");
+  if (scO) { const v = scO.dataset.scope.split(":"); setStatScope(v[0] === "aus" ? { k: "aus" } : v[0] === "st" ? { k: "st", st: v[1] } : { k: "cls", cls: v[1] }); return; }
   const stj = e.target.closest("[data-state]");
   if (stj) { goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
@@ -1421,6 +1442,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") {
+    const open = $(".st-scm:not([hidden])");
+    if (open) { open.hidden = true; $(".st-scwrap [data-scope-trigger]")?.setAttribute("aria-expanded", "false"); return; }
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
   }

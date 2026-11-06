@@ -2430,9 +2430,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
   // the rung order itself, in all four spots that encode it: the rail's rows
   // stack federal, Victoria, New South Wales, South Australia, Queensland,
-  // Western Australia (2026-11-05: appended at the bottom); labels, the
-  // glyph's row lookup and the up/down-arrow walk follow
-  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA];"), "the up/down row walk follows the rail's rung order (Vic above NSW, Qld below SA, WA below Qld)");
+  // Western Australia (2026-11-05: appended at the bottom); labels and the
+  // glyph's row lookup follow. The up/down-arrow walk runs in the
+  // "View elections" strip's own order instead (Queensland before South Australia,
+  // 2026-11-06) since the timeline now shows only the selected jurisdiction's rung
+  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];"), "the up/down walk follows the View elections strip's order (Qld before SA)");
   assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1, a wa stop → row 5)");
   const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
   const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
@@ -2445,6 +2447,22 @@ for (const y of ["sa22", "sa26"]) {
   // federal four-char keys was why it was written that way)
   assert.ok(base.includes("`${YEAR_JUR[y].toUpperCase()}20${String(y).slice(-2)}`"), "a state frame's label is the jurisdiction word + full year, no space (nsw23 → 'NSW2023', never 'NSW w23' or 'NSW 23')");
   assert.ok(ui.includes("const tlStops = (ys) => ys.map((y) => ({ y, lab:") && ui.includes('isNowY(y) ? (short || y === "now" ? "Now" : yearLabel(y))'), "the timeline's short row shows the two-digit year only; a state's own Now stop names itself Now too");
+}
+
+// the Winner head's figures scope menu (2026-11-06): "Nationwide figures" opens a
+// menu of the frame's states and seat types; the head recomposes scoped (figures,
+// seat share and the make-up bar all follow it), and the cycle/list breakdown
+// cards it replaced are gone from the head's trail
+{
+  const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css");
+  assert.ok(st.includes("const statScopes = new WeakMap();") && st.includes("const statSel = statScopeOf(m);"), "the figures scope lives per frame, read at the head");
+  assert.ok(st.includes('"Nationwide figures"') && st.includes('? `${STATE_TITLE[stOfYear(m.year)]} figures`'), "the neutral scope names itself after the frame");
+  assert.ok(st.includes('? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` :'), "a seat-type scope compounds hyphenated (Inner-metro figures)");
+  assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
+  assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
+  assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
+  assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
+  assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
 }
 
 // the full-screen view (app-7-full.js, 2026-11-03): its way in opens the zoom plate —
