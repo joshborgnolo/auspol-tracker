@@ -497,9 +497,11 @@ function renderTimeline() {
     { ys: YEARS_WA, base: Math.round(pitch * 6), top: Math.round(pitch * 5) + 16, gx: stGx("wa") },
   ];
   const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);
+  // a rung belongs to the selected election alone — the rest of the timeline steps aside
+  const activeIx = rowIx(m ? m.year : cur);
   const sd = m ? selDiv() : null;
   let g = "";
-  for (const r of rows) g += `<line x1="0" x2="${W}" y1="${r.base}" y2="${r.base}" stroke="var(--line)"/>`;
+  for (const r of rows.filter((_, i) => i === activeIx)) g += `<line x1="0" x2="${W}" y1="${r.base}" y2="${r.base}" stroke="var(--line)"/>`;
   // the glyph above a stop: the House's make-up, or the chosen seat's two-party line
   if (sd != null && m) {
     const d = m.divs[sd], hh = d.h, row = rows[rowIx(m.year)];
@@ -549,6 +551,7 @@ function renderTimeline() {
     { i: 5, items: tlStops(YEARS_WA) },
   ];
   for (const R of rowsOf) {
+    if (R.i !== activeIx) continue; // only the selected jurisdiction's rung shows
     const r = rows[R.i], labY = r.base + 15;
     const its = R.items.map((t) => ({ ...t, x: NX(xOfYear(t.y)), w: tW(t.lab), dx: 0, on: t.y === cur }));
     for (const t of its) { t.dx = -t.w / 2; }
@@ -574,7 +577,23 @@ function renderTimeline() {
     }
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one">${g}</svg>`;
+  // the strips follow the frame and the selection
+  renderCities(); renderJumpSel();
   if (FS.on) fsRail();
+}
+
+/* the Jump to: row's cities, filtered to the frame's own jurisdiction on a state election */
+function renderCities() {
+  const j = stOfYear(S.year);
+  const lis = j ? CITIES.filter(([, st]) => st === j) : CITIES;
+  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st]) => `<div class="mp-ca"><button type="button" data-city="${CITIES.findIndex((c) => c[0] === n)}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
+  renderJumpSel();
+}
+/* the selected entry keeps the hover underline (the city/state column and the election alike) */
+function renderJumpSel() {
+  const on = S.sel.level === "state" ? S.sel.st : null;
+  $$("#cities .mp-ca").forEach((ca) => { const b = $("button[data-state]", ca); ca.classList.toggle("on", !!(on && b && b.dataset.state === on)); });
+  FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
 }
 
 /* =============================== tooltip =============================== */
@@ -1479,7 +1498,6 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   const selFromURL = readURL();
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
-  $("#cities").innerHTML = `<b>Jump to:</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
   $("#frames-jump").innerHTML = `<b>View elections:</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}">${n}</button>`).join("")}`;
   const meta = loadLegendMeta();
   showLoading(true);

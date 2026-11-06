@@ -144,12 +144,12 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-ca { display: flex; flex-direction: column; align-items: center; }
 .mp-ca button:first-child { padding-bottom: 0; }
 .mp-ca button + button { padding-top: 1px; }
-.mp-frames { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-top: 8px; font-size: 13px; }
+.mp-frames { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-top: 8px; padding: 4px 0; font-size: 13px; background: var(--bg); }
 .mp-frames b { padding: 4px 0; font-weight: 600; color: var(--ink); }
 .mp-frames button { padding: 4px 0; color: var(--ink-2); }
-.mp-frames button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
+.mp-frames button:hover, .mp-frames button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
 .mp-cities button { padding: 4px 0; color: var(--ink-2); text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg); }
-.mp-cities button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
+.mp-cities button:hover, .mp-ca.on button { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
 .mp-zoom { position: absolute; right: 0; top: 0; display: flex; flex-direction: column; z-index: 3; padding: 0; gap: 8px; }
 .mp-zoom button {
   width: 34px; height: 32px; display: grid; place-items: center; color: var(--ink-2);
