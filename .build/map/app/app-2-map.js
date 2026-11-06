@@ -881,6 +881,9 @@ function drawLabels(m) {
   // the towns: ahead of the seats' names while the view is wide (a city names
   // the country, a seat named for it gives way), after the polling places closer in
   const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set(), since = new Map();
+  // the labels' click targets for this pass; and the picked town's white edge under its ringed name
+  townHits.length = 0;
+  if (tw > 0 && townPick >= 0) drawUrban();
   // a town chosen in the search goes first of all, ringed, at any zoom
   if (tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
   if (wide) drawTowns(m, placed, seatNm, town, [], since);
@@ -1086,13 +1089,16 @@ function drawTowns(m, placed, skip, shown, obst, since, only) {
     }
     if (!box) continue;
     placed.push(box, dot); shown.add(key); n++;
+    // the label's own click target: the map flies to the town when this rectangle is clicked
+    townHits.push([i, Math.min(box[0], dot[0]) - 4, Math.min(box[1], dot[1]) - 4, Math.max(box[2], dot[2]) + 4, Math.max(box[3], dot[3]) + 4]);
     const t0 = townSince.get(i) ?? now, fa = reduceMotion ? 1 : clamp((now - t0) / TOWN_FADE, 0, 1);
     since.set(i, t0); if (fa < 1) fading = true;
     ctx.save();
     ctx.globalAlpha = ovA * fa * fa * (3 - 2 * fa);
     ctx.textAlign = pick[2];
-    ctx.lineWidth = 3.6; ctx.strokeStyle = rim; ctx.strokeText(txt, pick[0], pick[1]);
-    ctx.fillStyle = fg; ctx.fillText(txt, pick[0], pick[1]);
+    const hi = i === townHiIdx; // (the pointer's town: its lettering inverts, as a click target's hint)
+    ctx.lineWidth = 3.6; ctx.strokeStyle = hi ? fg : rim; ctx.strokeText(txt, pick[0], pick[1]);
+    ctx.fillStyle = hi ? rim : fg; ctx.fillText(txt, pick[0], pick[1]);
     ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.lineWidth = 2; ctx.stroke(); ctx.fill();
     if (one) { ctx.beginPath(); ctx.arc(x, y, ring, 0, 2 * Math.PI); ctx.lineWidth = 3.6; ctx.strokeStyle = rim; ctx.stroke(); ctx.lineWidth = 1.6; ctx.strokeStyle = fg; ctx.stroke(); }
@@ -1100,6 +1106,66 @@ function drawTowns(m, placed, skip, shown, obst, since, only) {
   }
   if (fading) schedule();
   ctx.textAlign = "center";
+}
+
+/* ----- the urban extents -----
+   The picked town keeps its true ABS outline on the map: its Urban Centre
+   (or Locality) boundary as a white edge under its ringed name
+   (map/data/urban.json, urban_build.mjs - the 2021 UCL outlines keyed to
+   places.json's rows by their extents), fetched the first time a town is
+   picked and faded in like the names. And the names above are themselves the
+   way to a town: drawTowns records where each label landed (townHits, reset
+   at each drawLabels pass), the canvas's click flies to the town whose label
+   was clicked, and the pointer inverts the label's lettering to hint it. */
+let URBAN = null, urbanP = null, urbanId = -1, urbanSince = 0;
+const urbanDeg = new Map(), townHits = [];
+let townHiIdx = -1;
+// the town's decoded rings in degrees, or null (not fetched yet, or the town has no outline)
+function urbanEntry(i) {
+  if (urbanDeg.has(i)) return urbanDeg.get(i);
+  if (!URBAN) {
+    if (!urbanP) urbanP = getJSON("/map/data/urban.json", true).then((d) => { URBAN = d.u; schedule(); }).catch(() => {});
+    return null;
+  }
+  const e = URBAN[i];
+  const rings = e ? e.flat().map((ring) => {
+    const out = new Float64Array(ring.length);
+    let x = 0, y = 0;
+    for (let j = 0; j < ring.length; j += 2) { x += ring[j]; y += ring[j + 1]; out[j] = x / 1e5; out[j + 1] = y / 1e5; }
+    return out;
+  }) : null;
+  urbanDeg.set(i, rings);
+  return rings;
+}
+// the white edge itself - a dark ground line carrying white, the reads-black-or-white towns' lettering rule
+function drawUrban() {
+  const rings = urbanEntry(townPick);
+  if (!rings) return;
+  if (urbanId !== townPick) { urbanId = townPick; urbanSince = performance.now(); }
+  const fa = reduceMotion ? 1 : clamp((performance.now() - urbanSince) / TOWN_FADE, 0, 1);
+  ctx.save();
+  ctx.globalAlpha = ovA * fa * fa;
+  for (const ring of rings) {
+    ctx.beginPath();
+    let ok = true;
+    for (let j = 0; j < ring.length; j += 2) {
+      const p = proj([ring[j], ring[j + 1]]);
+      if (!p) { ok = false; break; }
+      const x = p[0] * T.k + T.x, y = p[1] * T.k + T.y;
+      if (!j) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    if (!ok) continue;
+    ctx.closePath();
+    ctx.lineWidth = 5; ctx.strokeStyle = "rgba(0,0,0,0.30)"; ctx.stroke();
+    ctx.lineWidth = 2.2; ctx.strokeStyle = "#fff"; ctx.stroke();
+  }
+  ctx.restore();
+  if (fa < 1) schedule();
+}
+// the town whose label (as drawn last pass, in canvas pixels) holds the point, -1 none
+function townAtPoint(x, y) {
+  for (const h of townHits) if (x >= h[1] && y >= h[2] && x <= h[3] && y <= h[4]) return h[0];
+  return -1;
 }
 
 /* ----- the streets -----

@@ -1277,6 +1277,9 @@ function applySelFromURL(sv) {
 canvas.addEventListener("pointermove", (e) => {
   if (e.buttons || e.pointerType === "touch") return;
   const r = canvas.getBoundingClientRect();
+  // a town's label under the pointer reads as a click target (the label inverts here, the click flies)
+  const ti = townAtPoint(e.clientX - r.left, e.clientY - r.top);
+  if (ti !== townHiIdx) { townHiIdx = ti; schedule(); }
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
   tipAt = [(e.clientX - r.left - T.x) / T.k, (e.clientY - r.top - T.y) / T.k]; tipClient = [e.clientX, e.clientY];
   if (h && drawOf(M()) === "surface") surfaceAsk(tipAt[0], tipAt[1]);
@@ -1289,9 +1292,12 @@ canvas.addEventListener("pointermove", (e) => {
   if (h) showTipAt(tipFor(h), e.clientX, e.clientY); else hideTip();
   canvas.style.cursor = h ? "pointer" : "";
 });
-canvas.addEventListener("pointerleave", () => { S.hover = null; AR.here = null; hideTip(); schedule(); });
+canvas.addEventListener("pointerleave", () => { S.hover = null; AR.here = null; townHiIdx = -1; hideTip(); schedule(); });
 canvas.addEventListener("click", (e) => {
   const r = canvas.getBoundingClientRect();
+  // a town's label is a click target of its own: the map flies to the town and rings it
+  const ti = townAtPoint(e.clientX - r.left, e.clientY - r.top);
+  if (ti >= 0) { flyToTown(ti); return; }
   const h = hitTest(e.clientX - r.left, e.clientY - r.top);
   if (h && h.kind === "sen") { selectSen({ level: "sen", st: SENM.divs[h.i].st, i: h.i }); return; }
   if (!h && senOn()) { if (S.ssel.level !== "aus") selectSen({ level: "aus" }); return; }
@@ -1535,7 +1541,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get townHitsNow() { return townHits.map((h) => h.slice()); }, get urbanOk() { return townPick >= 0 && !!urbanEntry(townPick); }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },
