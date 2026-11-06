@@ -318,8 +318,13 @@ button { cursor: pointer; background: none; border: 0; }
 .st-othx-r i { flex: none; align-self: center; width: 7px; height: 7px; border-radius: 1px; }
 .st-othx-r b { color: var(--ink); }
 .st-othx-r small { font-size: 11px; color: var(--ink-3); }
-.st-makeup { display: flex; height: 7px; width: 140px; margin-top: 9px; overflow: hidden; border-radius: 1px; }
-.st-makeup i { display: block; height: 100%; }
+.st-seat-mix { display: flex; flex-direction: column; width: 100%; margin: 12px 0 18px; gap: 10px; }
+.st-makeup { display: flex; height: 10px; width: 100%; overflow: hidden; border-radius: 2px; }
+.st-makeup > span { display: block; flex: none; height: 100%; }
+.st-seat-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--ink-2); }
+.st-seat-key { display: inline-flex; align-items: baseline; gap: 5px; }
+.st-seat-key::before { content: ""; flex: none; width: 7px; height: 7px; align-self: center; border-radius: 1px; background: var(--seat-colour); }
+.st-seat-key b { color: var(--ink); }
 /* the head meta's figures scope menu */
 .st-scwrap { position: relative; display: inline-block; }
 .st-sclab { display: inline-flex; align-items: baseline; gap: 3px; padding: 0; font: inherit; color: inherit; }
