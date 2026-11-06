@@ -277,7 +277,7 @@ function statOthersToggle() {
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
-  let formal = 0, alp = 0, lnp = 0, nTpp = 0;
+  let formal = 0, alp = 0, lnp = 0, nTpp = 0, inf = 0;
   const votes = Object.fromEntries(FAMS.map((f) => [f, 0]));
   // changes pool vote-weighted over each family's own complete subset: a seat counts
   // toward a family's swing pool only where every one of that family's candidates
@@ -289,6 +289,7 @@ function statClassArea(m, idx) {
     const d = m.res.divs[i];
     let dFormal = 0;
     for (const c of d.c) { votes[c[3]] += c[4]; formal += c[4]; dFormal += c[4]; }
+    if (d.inf != null) inf += d.inf;
     if (d.tpp && d.tpp[0] + d.tpp[1] > 0) { alp += d.tpp[0]; lnp += d.tpp[1]; nTpp++; }
     if (dFormal && d.tpp && d.tpp[2] != null) { tNum += dFormal * d.tpp[2]; tDen += dFormal; }
     for (const f of FAMS) {
@@ -298,7 +299,8 @@ function statClassArea(m, idx) {
   }
   return { idx, formal, fp: Object.fromEntries(FAMS.map((f) => [f, formal ? 100 * votes[f] / formal : null])),
     fpSw: Object.fromEntries(FAMS.map((f) => [f, swDen[f] ? swNum[f] / swDen[f] : null])),
-    tpp: alp + lnp ? 100 * alp / (alp + lnp) : null, tppSw: tDen ? tNum / tDen : null, nTpp };
+    tpp: alp + lnp ? 100 * alp / (alp + lnp) : null, tppSw: tDen ? tNum / tDen : null, nTpp,
+    infPct: formal + inf ? (100 * inf) / (formal + inf) : null };
 }
 const statBreakdownCache = new WeakMap(), statBreakdownViews = new Map();
 function statBreakdownRows(m, st) {
@@ -433,7 +435,9 @@ function seatStat(m, st, label) {
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
   const mk = statSeatMakeup(m, idx);
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}</h3>`;
+  // the rate the Informal st-sec used to headline, as one more label line under Seats
+  const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
@@ -886,7 +890,6 @@ function storyArea(m, st) {
   const castScope = m.year === 2025 ? vtScope(m, st) : null;
   const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true, castScope?.geography);
-  h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
