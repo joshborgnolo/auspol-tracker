@@ -1,5 +1,6 @@
-// Probe: /map/'s "Closest seats" list shows a second decimal for margins that
-// round to 0.0 at one decimal (Bradfield '25), one decimal otherwise.
+// Probe: /map/'s "Closest seats" list widens its decimal places until a hairline
+// margin shows (1dp → 2dp → 3dp), and every row carries its vote margin
+// "(26 votes)" beside the figure.
 // usage: node .matilda/probe/map-closest-margins.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
@@ -21,7 +22,8 @@ const sec = await page.evaluate(() => {
   return [...h3.parentElement.querySelectorAll(".links button")].map((b) => ({
     nm: b.querySelector(".nm")?.childNodes[0]?.textContent.trim(),
     st: b.querySelector(".nm small")?.textContent.trim(),
-    v: b.querySelector("b")?.textContent.trim(),
+    v: b.querySelector("b")?.childNodes[0]?.textContent.trim(),
+    votes: b.querySelector("b small")?.textContent.trim(),
   }));
 });
 console.log("rows:", JSON.stringify(sec, null, 1));
@@ -30,10 +32,14 @@ if (sec) {
   ok("six seats", sec.length === 6, `${sec.length}`);
   const br = sec.find((r) => r.nm === "Bradfield");
   ok("Bradfield listed", !!br);
-  // margin is winPct − 50 (56114/56088 votes → 0.0116 pt) — one decimal printed "0.0"
-  if (br) ok("Bradfield margin two decimals", br.v === "0.01", br.v);
+  // margin is winPct − 50 (56,114/56,088 votes → 0.0116 pt over 26 votes) — one decimal printed "0.0"
+  if (br) {
+    ok("Bradfield margin two decimals", br.v === "0.01", br.v);
+    ok("Bradfield votes margin shown", br.votes === "(26 votes)", br.votes);
+  }
   ok("no 0.0 row remains", sec.every((r) => r.v !== "0.0"), sec.map((r) => r.v).join(","));
   ok("rest stay one decimal", sec.filter((r) => r !== br).every((r) => /^\d+\.\d$/.test(r.v)), sec.map((r) => r.v).join(","));
+  ok("every row carries (x votes)", sec.every((r) => /^\((\d[\d,]*|…) votes?\)$/.test(r.votes || "")), sec.map((r) => r.votes).join(","));
 }
 ok("no page errors", errs.length === 0, errs[0] || "");
 await browser.close();

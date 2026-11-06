@@ -8512,8 +8512,11 @@ function storyArea(m, st) {
   }
   h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
-  // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show two
-  h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => (f1(v) === "0.0" ? v.toFixed(2) : f1(v)), (i) => colCss(m.divCol[i]))}</div>`;
+  // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
+  // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
+  const closeFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f1(v));
+  const closeRow = (v, d) => `${closeFmt(v)} <small>(${int(d.votesMargin)} vote${d.votesMargin === 1 ? "" : "s"})</small>`;
+  h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
   return h;
 }

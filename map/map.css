@@ -423,6 +423,7 @@ button { cursor: pointer; background: none; border: 0; }
 .links button .nm { font-size: 14px; font-weight: 600; color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .links button .nm small { font-size: 12px; font-weight: 400; color: var(--ink-3); margin-left: 6px; }
 .links button b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.links button b small { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-left: 4px; white-space: nowrap; }
 .links button:hover .nm { text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 3px; }
 
 /* states table */
