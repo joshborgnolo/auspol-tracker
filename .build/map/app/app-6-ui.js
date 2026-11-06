@@ -1357,7 +1357,7 @@ $("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-
 $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = yearOf(g.dataset.year); if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
-  if (city) { flyToCity(+city.dataset.city); return; }
+  if (city) { const k = +city.dataset.city; if (S.sel.level === "state" && S.sel.st === CITIES[k][1]) goAus(); else flyToCity(k); return; }
   const scT = e.target.closest("[data-scope-trigger]");
   if (scT) {
     const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
@@ -1370,7 +1370,7 @@ document.addEventListener("click", (e) => {
   const scO = e.target.closest("[data-scope]");
   if (scO) { const v = scO.dataset.scope.split(":"); setStatScope(v[0] === "aus" ? { k: "aus" } : v[0] === "st" ? { k: "st", st: v[1] } : { k: "cls", cls: v[1] }); return; }
   const stj = e.target.closest("[data-state]");
-  if (stj) { goState(stj.dataset.state); return; }
+  if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
   if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
