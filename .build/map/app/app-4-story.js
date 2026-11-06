@@ -246,7 +246,8 @@ function statBreakdownRows(m, st) {
   const states = st === "AUS" && !STATE_YEARS.has(m.year) ? STATES.filter((s) => m.areas[s] && m.areas[s].formal > 0).map((s) => ({ key: s, label: STATE_TITLE[s], short: s, A: m.areas[s] })) : [];
   const classes = CLS.map((c) => {
     const idx = m.areas[st].idx.filter((i) => m.res.divs[i].cls === c);
-    return idx.length ? { key: c, label: CLS_SHORT[c], short: CLS_SHORT[c], A: statClassArea(m, idx) } : null;
+    // the compound reads hyphenated over the figures: "Inner-metro primaries"
+    return idx.length ? { key: c, label: CLS_SHORT[c], short: CLS_SHORT[c].replace(" ", "-"), A: statClassArea(m, idx) } : null;
   }).filter((r) => r && r.A.formal > 0);
   const result = { states: states.length > 1 ? states : [], classes };
   cache.set(st, result);
