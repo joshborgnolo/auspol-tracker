@@ -264,8 +264,8 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-credit a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 2px; }
 .mp-hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; transition: opacity .3s; pointer-events: none; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
 
-/* the timeline: an election axis under the view (six rows — federal, Vic, NSW, SA, Qld, WA; the WA stops landed 2026-11-05 and the rail grew back to the five-row pitch) */
-.mp-time { flex: none; position: relative; height: 200px; border-top: 1px solid var(--line); margin-top: 6px; }
+/* the timeline: an election axis under the view — only the selected jurisdiction's rung shows at a time, every rung collapsed onto the top rail's old band (54px; 48px on the phone rung) */
+.mp-time { flex: none; position: relative; height: 54px; border-top: 1px solid var(--line); margin-top: 6px; }
 .mp-time svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .mp-time .yr { font: 400 12px var(--sans); fill: var(--ink-3); cursor: pointer; }
 .mp-time .yr.on { font-weight: 600; fill: var(--ink); }
@@ -612,7 +612,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-views .rd-tab svg { margin: 0; width: 18px; height: 18px; }
   .rd-eyebrow .rd-meta { order: 4; flex-basis: 100%; }
   .mp-lenses .rd-tab { padding: 0 10px; font-size: 14.5px; }
-  .mp-time { height: 174px; }
+  .mp-time { height: 48px; }
   .st-hed { font-size: 27px; }
   .st-tpp, .st-seats { font-size: 44px; }
   .hero-num { font-size: 44px; }

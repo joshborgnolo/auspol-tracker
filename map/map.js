@@ -9637,13 +9637,12 @@ function legendHTML(m) {
 /* =============================== the timeline =============================== */
 let SUM = null;
 let tlCtx = null; // shared canvas context for measuring stop-label widths
-/* one dated row per jurisdiction: the federal elections on top, Victoria's,
-   New South Wales' and South Australia's state ones on their own rows below
-   (2026-10-28 user call — Vic rides above NSW on the rail), each stop
-   at its date on the one scale */
+/* one dated rung for the selected jurisdiction alone, in the top rail's old
+   spot (rows declared federal, Vic, NSW, SA, Qld, WA — the rowIx order); each
+   stop at its date on the one scale */
 function renderTimeline() {
   const el = $("#time"); if (!el) return;
-  const W = el.clientWidth || 600, H = el.clientHeight || 106, m = M();
+  const W = el.clientWidth || 600, H = el.clientHeight || 54, m = M();
   // the rail's left anchor is the years list's own head – 2004 when the span
   // opened there, 2001 now: a year before the literal anchor used to render
   // off the left edge with a NaN-ish hit rect (the 2001 stop the first day)
@@ -9655,17 +9654,17 @@ function renderTimeline() {
   const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X };
   const stGx = (st) => (ry) => NX(STATE_ROW_PREV_X[st][ry] ?? YEAR_X[st + String(ry).slice(2)] ?? ry);
   const short = W < 560, cur = S.year;
-  /* six rows since the Western Australian stops landed (2026-11-05): equal
-     pitch, one labels band under the lowest base, each row's whole read
-     (line, labels, the selected stop's underline) inside its band */
-  const pitch = (H - 17) / 6;
+  /* only the selected jurisdiction's rung draws at a time, so the rows all
+     collapse onto the one band — the position the top (federal) rail sat in:
+     the rail a shade under the strip's middle, its labels tucked under it */
+  const TOP = 2, BASE = H - 23;
   const rows = [
-    { ys: YEARS_FED, base: Math.round(pitch), top: 2 },
-    { ys: YEARS_VIC, base: Math.round(pitch * 2), top: Math.round(pitch) + 16, gx: stGx("vic") },
-    { ys: YEARS_NSW, base: Math.round(pitch * 3), top: Math.round(pitch * 2) + 16, gx: stGx("nsw") },
-    { ys: YEARS_SA, base: Math.round(pitch * 4), top: Math.round(pitch * 3) + 16, gx: stGx("sa") },
-    { ys: YEARS_QLD, base: Math.round(pitch * 5), top: Math.round(pitch * 4) + 16, gx: stGx("qld") },
-    { ys: YEARS_WA, base: Math.round(pitch * 6), top: Math.round(pitch * 5) + 16, gx: stGx("wa") },
+    { ys: YEARS_FED, base: BASE, top: TOP },
+    { ys: YEARS_VIC, base: BASE, top: TOP, gx: stGx("vic") },
+    { ys: YEARS_NSW, base: BASE, top: TOP, gx: stGx("nsw") },
+    { ys: YEARS_SA, base: BASE, top: TOP, gx: stGx("sa") },
+    { ys: YEARS_QLD, base: BASE, top: TOP, gx: stGx("qld") },
+    { ys: YEARS_WA, base: BASE, top: TOP, gx: stGx("wa") },
   ];
   const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);
   // a rung belongs to the selected election alone — the rest of the timeline steps aside
@@ -9743,7 +9742,8 @@ function renderTimeline() {
       const centre = (v) => v.x + v.dx + v.w / 2;
       const hitLeft = i ? Math.max(lx - 24, (centre(its[i - 1]) + lx) / 2) : lx - 24;
       const hitRight = i + 1 < its.length ? Math.min(lx + 24, (lx + centre(its[i + 1])) / 2) : lx + 24;
-      const hitTop = R.i ? r.top : 0, hitBot = R.i + 1 < rows.length ? rows[R.i + 1].top : H;
+      // the one visible rung takes the whole strip's height as its touch window
+      const hitTop = 0, hitBot = H;
       const uline = t.on ? `<line x1="${lx - t.w / 2}" x2="${lx + t.w / 2}" y1="${labY + 2}" y2="${labY + 2}" stroke="var(--ink)" stroke-width="2"/>` : "";
       g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${hitLeft}" y="${hitTop}" width="${hitRight - hitLeft}" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
@@ -9853,6 +9853,15 @@ function setStatScope(sel) {
   const m = M(); if (!m) return;
   statScopes.set(m, sel);
   renderStory(true);
+}
+// armed once a scope-menu choice has been made (item picked, or the menu shut
+// by its label): the spacebar then steps through the menu's views in order
+let scopeSpace = false;
+function cycleStatScope(step) {
+  const m = M(); if (!m) return;
+  const opts = statScopeOpts(m, "AUS").map((o) => o[0]);
+  if (!opts.length) return;
+  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeOf(m))) + step + opts.length) % opts.length]));
 }
 
 function renderFilterPill() {
@@ -10536,11 +10545,12 @@ document.addEventListener("click", (e) => {
     $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
     $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
     if (!was) { pop.hidden = false; scT.setAttribute("aria-expanded", "true"); }
+    scopeSpace = was;
     return;
   }
-  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); }
+  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); scopeSpace = false; }
   const scO = e.target.closest("[data-scope]");
-  if (scO) { const v = scO.dataset.scope.split(":"); setStatScope(v[0] === "aus" ? { k: "aus" } : v[0] === "st" ? { k: "st", st: v[1] } : { k: "cls", cls: v[1] }); return; }
+  if (scO) { scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope)); return; }
   const stj = e.target.closest("[data-state]");
   if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
@@ -10619,6 +10629,12 @@ document.addEventListener("keydown", (e) => {
     if (open) { open.hidden = true; $(".st-scwrap [data-scope-trigger]")?.setAttribute("aria-expanded", "false"); return; }
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
+  }
+  // the spacebar steps the figures menu along once a choice has been made there
+  if (e.key === " " && scopeSpace) {
+    const wrap = $(".st-scwrap");
+    if (!wrap || !wrap.querySelector(".st-scm").hidden) { scopeSpace = false; return; }
+    e.preventDefault(); cycleStatScope(e.shiftKey ? -1 : 1); return;
   }
   if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }

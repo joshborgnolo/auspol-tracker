@@ -2425,17 +2425,20 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
-  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 200px;/.test(css) && /\.mp-time \{ height: 174px; \}/.test(css), "the timeline bar holds six jurisdiction rows at the five-row pitch (200px; 174px on the phone rung)");
+  assert.ok(/\.mp-time \{ flex: none; position: relative; height: 54px;/.test(css) && /\.mp-time \{ height: 48px; \}/.test(css), "the timeline bar holds one jurisdiction rung — the top rail's old band (54px; 48px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
   assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
-  // the rung order itself, in all four spots that encode it: the rail's rows
-  // stack federal, Victoria, New South Wales, South Australia, Queensland,
-  // Western Australia (2026-11-05: appended at the bottom); labels and the
-  // glyph's row lookup follow. The up/down-arrow walk runs in the
-  // "View elections" strip's own order instead (Queensland before South Australia,
-  // 2026-11-06) since the timeline now shows only the selected jurisdiction's rung
+  // the rung order itself, in the spots that encode it: the rows declare
+  // federal, Victoria, New South Wales, South Australia, Queensland, Western
+  // Australia (2026-11-05: appended at the bottom) — and SINCE 2026-11-06 they
+  // all collapse onto the ONE visible band in the top rail's spot, only the
+  // selected jurisdiction's rung drawing at a time; labels and the glyph's row
+  // lookup follow the same order. The up/down-arrow walk runs in the
+  // "View elections" strip's own order instead (Queensland before South Australia)
   assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];"), "the up/down walk follows the View elections strip's order (Qld before SA)");
-  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1, a wa stop → row 5)");
+  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);"), "the rung index per jurisdiction (vic22 → 1, a wa stop → 5)");
+  assert.ok(ui.includes("const TOP = 2, BASE = H - 23;") && (ui.match(/\{ ys: YEARS_\w+, base: BASE, top: TOP(?:, gx: [^}]+)? \}/g) || []).length === 6, "all six jurisdiction rows collapse onto the one band in the top rail's spot (BASE = H - 23)");
+  assert.ok(ui.includes("const hitTop = 0, hitBot = H;"), "the one visible rung takes the whole strip's height for its stops' touch windows");
   // one rung at a time (2026-11-06): the rail line, the stop labels AND the
   // seat-count make-up bars all draw for the selected election's row alone —
   // the bars' loop was the one unfiltered tier left when the rail and labels
@@ -2444,7 +2447,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("if (R.i !== activeIx) continue;"), "the stop-label tier keeps its activeIx gate too");
   const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
   const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
-  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs stack federal, Victoria, New South Wales, South Australia, Queensland, Western Australia top to bottom");
+  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs declare federal, Victoria, New South Wales, South Australia, Queensland, Western Australia in order");
   const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
   const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => labelsSlice.indexOf(`tlStops(${k})`));
   assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
