@@ -2448,15 +2448,16 @@ for (const y of ["sa22", "sa26"]) {
 }
 
 // the full-screen view (app-7-full.js, 2026-11-03): its way in on the zoom plate (the
-// corner brackets are its glyph; the whole-country button wears a house), the plates'
-// room in every framing (the map's pads, the chamber's, its labels' and the islands'),
+// jump-back's return arrow sits to its left — the whole-country home became "Jump
+// back" 2026-11-06 — and its own glyph is two corner brackets), the plates' room in
+// every framing (the map's pads, the chamber's, its labels' and the islands'),
 // the hash and history entry, Queensland's elections named as such (they read "South
 // Australian election" in the stamp and the eyebrow), and the part assembled in order.
 // The behaviour itself is driven by .matilda/probe/map-fullscreen.mjs
 {
   const base = part("app-1-base.js"), map2 = part("app-2-map.js"), ch = part("app-3-chamber.js"), ui = part("app-6-ui.js"), fsj = part("app-7-full.js"), css = part("page.css");
-  assert.ok(/<button type="button" id="zfs" aria-label="Full screen" title="Full screen \(F\)"><svg[^>]*><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"\/><\/svg><\/button><\/div>/.test(page), "the zoom plate ends in the full-screen button, the corner brackets its glyph");
-  assert.ok(/id="zhome"[^>]*>(?:(?!<\/button>).)*M3\.8 11\.2 12 4\.4l8\.2 6\.8/.test(page), "the whole-country button wears a house, not the full-screen brackets");
+  assert.ok(/<button type="button" id="zfs" aria-label="Full screen" title="Full screen \(F\)"><svg[^>]*>(?:(?!<\/svg>).)*M20 9V4h-5(?:(?!<\/svg>).)*M4 15v5h5(?:(?!<\/svg>).)*<\/svg><\/button><\/div>/.test(page), "the zoom plate ends in the full-screen button, its glyph two corner brackets");
+  assert.ok(/<button type="button" id="zback" aria-label="Jump back" title="Jump back \(B\)" hidden><svg[^>]*>(?:(?!<\/svg>).)*M9 5 4 10l5 5(?:(?!<\/svg>).)*<\/svg><\/button>/.test(page), "the jump-back button sits before it: return-arrow glyph, Jump back (B), hidden until off the default view");
   assert.ok(base.includes("const FS = { on: false, ins: { t: 0, r: 0, b: 0, l: 0 }, move: null };"), "the full-screen state lives in the base part, readable by every part from the start");
   assert.ok(map2.includes("if (FS.on && !page) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }"), "the map's fit keeps the plates' room clear");
   assert.ok(ch.includes("if (FS.on) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }") && ch.includes("const eL = opts.big && FS.on ? FS.ins.l : 0, eR = opts.big && FS.on ? w - FS.ins.r : w;"), "the chamber and its labels keep to the clear ground");

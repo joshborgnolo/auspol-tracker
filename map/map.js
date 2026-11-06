@@ -9735,6 +9735,8 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover for the reading at any spot, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   $("#cities").hidden = S.view !== "map" || selDiv() != null || T.k > HOME.k * 3;
+  // the jump-back control lives wherever the default view no longer is
+  $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
 
 /* =============================== search =============================== */
@@ -10385,6 +10387,8 @@ document.addEventListener("click", (e) => {
   if (city) { flyToCity(+city.dataset.city); return; }
   const stj = e.target.closest("[data-state]");
   if (stj) { goState(stj.dataset.state); return; }
+  const fj = e.target.closest("[data-fjump]");
+  if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
@@ -10458,12 +10462,13 @@ document.addEventListener("keydown", (e) => {
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
   }
+  if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
   if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
 });
 $("#zin").addEventListener("click", () => zoomBy(1.8));
 $("#zout").addEventListener("click", () => zoomBy(1 / 1.8));
-$("#zhome").addEventListener("click", () => goAus());
+$("#zback").addEventListener("click", () => goAus());
 function themeChanged() {
   TH = readTheme(); buildRamps(); hatchCanvas = null; recolor(false); renderLegend(); renderStory(true); renderTimeline();
   if (S.view === "list") renderList(true);
@@ -10525,8 +10530,11 @@ function preloadYears() {
   idleSlice(next);
 }
 
-/* the states line under the city jumps: leaps to a state view on the frame */
-const STATE_JUMP = [["NSW", "NSW"], ["VIC", "Vic"], ["QLD", "Qld"], ["WA", "WA"], ["SA", "SA"], ["TAS", "Tas"], ["ACT", "ACT"], ["NT", "NT"]];
+/* the state each capital sits in, named the short way (NSW Vic Qld WA SA Tas ACT NT) */
+const STATE_ABBR = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
+
+/* the "View elections" strip under the timeline: each jurisdiction's newest frame */
+const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA]];
 
 /* =============================== boot =============================== */
 (async () => {
@@ -10534,7 +10542,8 @@ const STATE_JUMP = [["NSW", "NSW"], ["VIC", "Vic"], ["QLD", "Qld"], ["WA", "WA"]
   const selFromURL = readURL();
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
-  $("#cities").innerHTML = `<b>Jump to:</b>${CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("")}<span class="mp-states-jump">${STATE_JUMP.map(([s, ab]) => `<button type="button" data-state="${s}">${ab}</button>`).join("")}</span>`;
+  $("#cities").innerHTML = `<b>Jump to:</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
+  $("#frames-jump").innerHTML = `<b>View elections:</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}">${n}</button>`).join("")}`;
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
