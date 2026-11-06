@@ -189,8 +189,8 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
   assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
     "the fp-change legend explains the unjoined booths' hatch");
 }
-assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true);"), "a seat, a state and the country share one How votes were cast block");
-assert.ok(js.includes("const cast = m.res.divs.filter(") , "the area block reads the results file, since Now blanks a by-election's piles");
+assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true, castScope?.geography);"), "a seat, a state and the country share one How votes were cast block");
+assert.ok(js.includes('const castScope = m.year === 2025 ? vtScope(m, st) : null;') && js.includes("castScope.divs : m.res.divs.filter("), "the 2025 chart follows the selected figures scope; the area block reads election results, since Now blanks a by-election's piles");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
 assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the

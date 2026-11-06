@@ -792,7 +792,60 @@ function vtFinding(rows) {
   return `${say}.`;
 }
 // (area: a state's or the country's, which also says what the balloons and the surface leave out)
-function vtBlock(divs, area) {
+// The 2025 graphic pools counts before taking shares or subtracting the area's
+// two-party result. Mobile teams stay with ordinary on-the-day votes, as in
+// the national vote-type table; they must not disappear in a three-band chart.
+const VT_BANDS = [
+  ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+  ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
+  ["day", "On the day", ["day", "mob"], "From about 7 pm"],
+];
+function vtBands(divs) {
+  const counts = {}, total2 = [0, 0];
+  let tot = 0;
+  for (const d of divs) {
+    const v = d.vt;
+    tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
+    for (const [k, p] of Object.entries(d.vt2 || {})) {
+      const t = (counts[k] ??= [0, 0]);
+      t[0] += p[0]; t[1] += p[1];
+      total2[0] += p[0]; total2[1] += p[1];
+    }
+  }
+  // The vote-type counts exhaust each seat's official two-party total.
+  const base = total2[0] + total2[1] > 0 ? 100 * total2[0] / (total2[0] + total2[1]) : null;
+  const complete = divs.every((d) => d.vt2);
+  const bands = VT_BANDS.map(([k, l, keys, time]) => {
+    const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
+    const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
+    const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
+    return { k, l, time, v, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
+  });
+  return { bands, tot, base };
+}
+// A figures-menu choice changes the chart's electorate pool as well as its
+// heading. A map state or seat selection takes precedence over that menu.
+function vtScope(m, st) {
+  const sel = st === "AUS" && S.lens === "winner" ? statScopeOf(m) : { k: st === "AUS" ? "aus" : "st", st };
+  const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)));
+  const geography = sel.k === "aus" ? "nationwide" : sel.k === "st" ? STATE_TITLE[sel.st] : `${sel.cls.toLowerCase()} seats`;
+  return { divs, geography };
+}
+function vtBandsBlock(divs, area, geography) {
+  const { bands, tot } = vtBands(divs);
+  if (!tot) return "";
+  const heading = `Skew on ${geography || divs[0].n.replace(/'/g, "’")} 2PP`;
+  const rows = bands.map((r) => {
+    const skew = r.skew, text = sgn(skew), tone = skew != null && Math.abs(skew) >= 0.05 ? (skew > 0 ? "vt-alp" : "vt-lnp") : "";
+    const reading = skew == null ? "two-party skew unavailable" : `${text} percentage points on ${geography || divs[0].n} Labor 2PP`;
+    return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
+  }).join("");
+  const notes = ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
+  if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
+  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3><p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="Formal vote shares and two-party skews">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+}
+function vtBlock(divs, area, geography) {
+  if (M().year === 2025) return vtBandsBlock(divs, area, geography);
   const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
   const notes = [vtFinding(rows)];
   if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
@@ -830,8 +883,9 @@ function storyArea(m, st) {
     h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
   }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  const cast = m.res.divs.filter((d) => d.vt && (aus || d.st === st));
-  if (cast.length) h += vtBlock(cast, true);
+  const castScope = m.year === 2025 ? vtScope(m, st) : null;
+  const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
+  if (cast.length) h += vtBlock(cast, true, castScope?.geography);
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
