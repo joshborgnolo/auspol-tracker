@@ -31,7 +31,12 @@ function valueText(v, kind, ctx) {
       case "flow": return "Final two weren’t Labor and the Coalition";
       case "senpref": return ctx ? spNoValue(ctx.m, kind, ctx.d) : "Too few of these ballots";
       case "seifa": return isDemo() ? (S.year !== "now" && S.year < DEMO_FROM ? "Counted from 1993 on" : "No census figure here") : "No score here";
-      case "fp": return S.fpMode === "change" ? "Didn’t stand both times" : "Didn’t stand";
+      case "fp":
+        if (S.fpMode !== "change") return "Didn’t stand";
+        if (kind !== "booth") return "Didn’t stand both times";
+        // a booth's null is never about the party: it's a lapsed venue (the
+        // frame carries the same-place lane) or no lane existed for the year
+        return ctx && ctx.m.res.booths && ctx.m.res.booths.prevFp ? "New place since last time, so no change" : "No like-for-like count on file for this election";
       default: return "No data";
     }
   }
@@ -315,6 +320,7 @@ function legendHTML(m) {
       if (ch) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.gain[S.party][45])} 70%, ${css(RAMP.gain[S.party][100])} 100%)">${mark(aus.fpSw[S.party], lo, hi)}</div>${ticks([-15, -5, 0, 5, 15], -15, 15, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Lost ground</span><span class="t-${S.party}">Gained ▶</span></div>`;
       else h += `<div class="lg-ramp" style="background:${grad(RAMP.fp[S.party], 0, 100)}">${mark(aus.fp[S.party], 0, FPMAX[S.party])}</div>${ticks([0, FPMAX[S.party] / 2, FPMAX[S.party]], 0, FPMAX[S.party], (v) => `${v}%${v === FPMAX[S.party] ? "+" : ""}`)}`;
       h += `<div class="lg-note">The line marks Australia: ${ch ? sgn(aus.fpSw[S.party]) + " points" : f1(aus.fp[S.party]) + "%"}.</div>`;
+      if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
     }
     case "senate": {

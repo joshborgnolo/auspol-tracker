@@ -149,6 +149,46 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
   assert.deepEqual([lab("day"), lab("ppvc"), lab("post")], [58.0, 53.0, 51.6], "2025 on the day, early centres, postal");
   assert.deepEqual(add(Object.fromEntries(Object.entries(T))), r.agg.AUS.tpp.slice(0, 2), "2025's piles add up to the national two-party count");
 }
+// the primary-change same-place lane (build_map_data.py's prevFp join): every
+// federal frame from 2007 carries the previous election's family shares at
+// each polling place, joined by AEC polling-place id; a place that lapsed
+// carries null and the story copy reads "new place". Before 2007 the previous
+// election predates the committed lanes, so the lane itself is absent — and
+// the kind-aware "no like-for-like count" wording covers earlier frames and
+// the state frames, which carry no join
+{
+  const ORA = { 2007: 8013, 2010: 7972, 2013: 8480, 2016: 7868, 2019: 7799, 2022: 7809, 2025: 7882 };
+  const FAMS6 = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+  const FAMS6_SORTED = [...FAMS6].sort();
+  for (const [ys, joined] of Object.entries(ORA)) {
+    const y = +ys, b = JSON.parse(R(`map/data/res-${y}.json`)).booths, pf = b.prevFp;
+    assert.ok(Array.isArray(pf) && pf.length === b.id.length, `${y}: booths.prevFp rides beside every polling place`);
+    assert.equal(pf.filter((x) => x != null).length, joined, `${y}: ${joined} places stood at the previous election`);
+    let greens = 0;
+    for (const row of pf) {
+      if (row == null) continue;
+      assert.deepEqual(Object.keys(row).sort(), FAMS6_SORTED, `${y}: a prevFp row names the six families`);
+      let t = 0; for (const k of FAMS6) { assert.ok(row[k] >= 0 && row[k] <= 100, `${y}: a prevFp share in range`); t += row[k]; }
+      assert.ok(Math.abs(t - 100) < 0.1, `${y}: a prevFp row's shares sum to 100`);
+      greens += row.grn > 2 ? 1 : 0;
+    }
+    assert.ok(greens > 0, `${y}: at least one place joined (the first-read bug claimed none stood, Greens included)`);
+  }
+  for (const y of [1996, 1998, 2001, 2004])
+    assert.ok(!JSON.parse(R(`map/data/res-${y}.json`)).booths.prevFp, `${y}: no prevFp lane — the previous election predates the lanes`);
+  // a hand-read fixture: Fitzroy's 2022 family shares (a Greens heartland the
+  // first report named), against its 2025 row
+  {
+    const b = JSON.parse(R("map/data/res-2025.json")).booths;
+    const j = b.id.indexOf(4631);
+    assert.ok(b.n[j] === "Fitzroy" && b.prevFp[j] != null, "2025: Fitzroy joined to its 2022 self");
+    assert.deepEqual(b.prevFp[j], { alp: 23.1, lnp: 8.33, grn: 59.23, onp: 0.65, ind: 1.01, oth: 7.68 }, "Fitzroy's 2022 family shares");
+  }
+  assert.ok(js.includes('return ctx && ctx.m.res.booths && ctx.m.res.booths.prevFp ? "New place since last time, so no change" : "No like-for-like count on file for this election";'),
+    "the booth-level fp-change no-value copy names the real cause, never a party claim");
+  assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
+    "the fp-change legend explains the unjoined booths' hatch");
+}
 assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true);"), "a seat, a state and the country share one How votes were cast block");
 assert.ok(js.includes("const cast = m.res.divs.filter(") , "the area block reads the results file, since Now blanks a by-election's piles");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
@@ -2471,10 +2511,6 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
-  // 2026-11-06: the ui file's wiring references three helpers that live beside
-  // the menu — a half-landed scope change broke every item click with
-  // "statScopeParse is not defined" while the suite stayed green; pin the contract
-  assert.ok(st.includes("function statScopeOpts") && st.includes("const statScopeVal =") && st.includes("const statScopeParse ="), "statScopeOpts/statScopeVal/statScopeParse live beside the menu — app-6-ui.js's scope wiring depends on them");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
 }
 

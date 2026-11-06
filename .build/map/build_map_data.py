@@ -552,13 +552,27 @@ def build_year(year, hist, base2001):
     relkeys = (vstore.get("relKeys") or None) if vstore else None
     tenkeys = (vstore.get("tenKeys") or None) if vstore else None
     anckeys = vstore.get("ancKeys", []) if vstore else []
-    if prev >= 2004:
-        prev_pp = {(int(r["DivisionID"]), int(r["PollingPlaceID"])) for r in rows(BOOTH + f"/tpp-pp/{prev}.csv.gz")}
-        prev_ids = {pp for (_, pp) in prev_pp}
-        had_prev = lambda d, pp, name: pp in prev_ids
-    else:
-        names01 = base2001[2]
-        had_prev = lambda d, pp, name: (divs[d]["name"], norm_pp(name)) in names01
+    # the previous election's ordinary first preferences at each polling
+    # place, summed to the family's shares — the same-place read every booth's
+    # primary-change number (and the booth card's change column) reads off
+    prev_fp = None
+    if divs_prev is not None:
+        fam_of = {c["cid"]: c["b"] for e in divs_prev.values() for c in e["cands"]}
+        bfpv_prev = load_booth_fpv(prev)
+        by_pp = collections.defaultdict(dict)
+        for (d, pp), b in bfpv_prev.items():
+            by_pp[pp][d] = b
+        dup = {pp for pp, ds in by_pp.items() if len(ds) > 1}
+        assert not dup, f"{prev}: polling-place ids stand in more than one division ({sorted(dup)[:5]})"
+        prev_fp = {}
+        for pp, ds in by_pp.items():
+            b = next(iter(ds.values()))
+            fam = collections.Counter()
+            for cid, n in b["votes"].items():
+                fam[fam_of[cid]] += n
+            tot = sum(fam.values())
+            if tot:
+                prev_fp[pp] = {k: round(100 * fam[k] / tot, 2) for k in BUCKETS}
 
     # ---- recompose: booth ordinary FPV must sum to the division oracle ----
     sums = collections.defaultdict(collections.Counter)
@@ -683,6 +697,8 @@ def build_year(year, hist, base2001):
         vs = (bvoter.get((d, pp)) or {}).get("seifa") or {}
         B["d"].append(div_index[d])
         B["id"].append(pp)
+        if prev_fp is not None:
+            B["prevFp"].append(prev_fp.get(pp))
         B["n"].append(b["name"])
         B["ty"].append(g.get("type", 0))
         B["prem"].append(g.get("prem", ""))
@@ -852,7 +868,8 @@ def build_year(year, hist, base2001):
     p = os.path.join(OUT, f"data-{year}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
-    print(year, "divisions", len(D), "booths", len(B["id"]), "with coords", n_coords, "->", os.path.getsize(p), "bytes",
+    fp_join = sum(1 for x in (B.get("prevFp") or []) if x is not None)
+    print(year, "divisions", len(D), "booths", len(B["id"]), "with coords", n_coords, ",", fp_join, "fp-joined" if prev_fp is not None else "", "->", os.path.getsize(p), "bytes",
           "| 2PP", round(100 * A["AUS"]["tpp"][0] / (A["AUS"]["tpp"][0] + A["AUS"]["tpp"][1]), 2), "swing", A["AUS"]["tpp"][2],
           "| informal", round(100 * A["AUS"]["inf"] / (A["AUS"]["inf"] + A["AUS"]["formal"]), 2))
     return out
