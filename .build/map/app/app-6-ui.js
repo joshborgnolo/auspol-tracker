@@ -1361,8 +1361,6 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
-  const seatsOth = e.target.closest("[data-othxs]");
-  if (seatsOth) { statSeatsOthersToggle(); return; }
   const oth = e.target.closest("[data-othx]");
   if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");

@@ -274,30 +274,6 @@ function statOthersToggle() {
   renderStory(true);
   const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }
-/* the seats row's "Others" figure, opened out: the crossbench groups that
-   share it — every group without its own column (a crossbench party gets one
-   only past 14 seats, and independents never do). The row shape matches
-   statOthersRows; a change rides the group's own family in the base counts,
-   so a party that shares "oth" never claims the family's whole shift */
-function statSeatsOthersRows(m, idx, colGroups, base) {
-  const cols = new Set(colGroups), groups = new Map();
-  for (const i of idx) {
-    const h = m.divs[i].hold, f = holdFam(h);
-    if (f === "alp" || f === "lnp") continue;
-    const k = crossLabel(h);
-    if (!groups.has(k)) groups.set(k, [k, f, 0]);
-    groups.get(k)[2]++;
-  }
-  return [...groups.values()].filter((g) => !cols.has(g[0])).sort((p, q) => q[2] - p[2] || p[0].localeCompare(q[0]))
-    .map(([k, f, n]) => [f, n, base && base.c && f !== "oth" && base.c[f] != null ? n - base.c[f] : null, k, k]);
-}
-/* the seats open is its own switch, not the primary row's */
-function statSeatsOthersToggle() {
-  const m = M(); if (!m) return;
-  const sel = statScopeOf(m); sel.openS = !sel.openS;
-  renderStory(true);
-  const b = $("#story [data-othxs]"); if (b) b.focus({ preventScroll: true });
-}
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
@@ -443,18 +419,8 @@ function seatStat(m, st, label) {
     const was = f === "oth" ? Object.values(base.c).reduce((x, v) => x + v, 0) - ["alp", "lnp", ...bloc.map((r) => r[0])].reduce((x, k) => x + (base.c[k] || 0), 0) : base.c[f] || 0;
     return sgn(n - was, 0);
   };
-  // the Seats row's "Others" cell opens like the primary row's, into the
-  // crossbench groups that share the figure
-  const colGroups = [...parties.entries()].filter(([, [, n]]) => n > 14).map(([k]) => k);
-  const soRows = statSeatsOthersRows(m, idx, colGroups, base);
-  const soOpen = soRows.length > 0 && !!statSel.openS;
-  const sCols = soOpen ? seats.slice(0, -1) : seats;
-  const sCell = (c, i) => `${i ? `<i>–</i>` : ""}` + (!soOpen && soRows.length && c === seats[seats.length - 1] && c[0] === "oth"
-    ? `<button type="button" class="st-othb" data-othxs aria-expanded="false" ${tone("oth")} title="Others. Show who holds these seats" aria-label="Others ${c[1]}. Show who holds these seats"><b>${c[1]}</b></button>`
-    : `<b ${tone(c[0])}>${c[1]}</b>`);
   // a row of figures with a line of changes under them, its size set by how many columns it has
-  const seatsRow = `<span class="st-grid st-seats st-n${seats.length}" style="grid-template-columns:repeat(${2 * sCols.length - 1},auto)">${sCols.map(sCell).join("")}${base ? sCols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${change(c[0], c[1])}</small>`).join("") : ""}</span>`;
-  const soLine = soOpen ? `<button type="button" class="st-othx" data-othxs aria-expanded="true" title="Fold the crossbench back into Others" aria-label="The Others seats: ${esc(soRows.map((r) => `${r[3]} ${r[1]}`).join(", "))}. Fold back into Others">${soRows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:var(--m-${r[0]})"></i>${esc(r[3])} <b>${r[1]}</b>${base && base.c && r[2] != null ? `<small>${sgn(r[2], 0)}</small>` : ""}</span>`).join("")}</button>` : "";
+  const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)">${cols.map(([f, t], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${t}</b>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
   // the primary vote: a party on 10% or more stands apart from "others". Greens and One Nation are
   // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates
   const fpA = A.fp.alp, fpL = A.fp.lnp;
@@ -467,7 +433,7 @@ function seatStat(m, st, label) {
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
   const mk = statSeatMakeup(m, idx);
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${seatsRow}${soLine}${mk}</h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
