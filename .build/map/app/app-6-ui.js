@@ -791,6 +791,7 @@ function setView(v, quiet) {
   // the Senate has no map: into or out of its chamber the view changes without the morph
   const senate = S.house === "senate" && (prev === "chamber" || v === "chamber");
   S.view = v;
+  townHits.length = 0; townHiIdx = -1;
   // (a built contest is the map's alone: the chamber and the list go back to the counted figures, colours too)
   if (S.axis !== "AC" && S.lens === "tpp" && S.draw !== "seats") recolor(false);
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));

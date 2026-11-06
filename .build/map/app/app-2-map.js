@@ -1120,13 +1120,18 @@ function drawTowns(m, placed, skip, shown, obst, since, only) {
 let URBAN = null, urbanP = null, urbanId = -1, urbanSince = 0;
 const urbanDeg = new Map(), townHits = [];
 let townHiIdx = -1;
+// A selection starts the download. A failed request can retry on the next
+// selection, but drawing frames and probe reads never start a retry loop.
+function loadUrban() {
+  if (URBAN || urbanP) return;
+  urbanP = getJSON("/map/data/urban.json", true)
+    .then((d) => { URBAN = d.u; schedule(); })
+    .catch(() => { urbanP = null; });
+}
 // the town's decoded rings in degrees, or null (not fetched yet, or the town has no outline)
 function urbanEntry(i) {
   if (urbanDeg.has(i)) return urbanDeg.get(i);
-  if (!URBAN) {
-    if (!urbanP) urbanP = getJSON("/map/data/urban.json", true).then((d) => { URBAN = d.u; schedule(); }).catch(() => {});
-    return null;
-  }
+  if (!URBAN) return null;
   const e = URBAN[i];
   const rings = e ? e.flat().map((ring) => {
     const out = new Float64Array(ring.length);
@@ -1164,6 +1169,7 @@ function drawUrban() {
 }
 // the town whose label (as drawn last pass, in canvas pixels) holds the point, -1 none
 function townAtPoint(x, y) {
+  if (S.view !== "map" || morph) return -1;
   for (const h of townHits) if (x >= h[1] && y >= h[2] && x <= h[3] && y <= h[4]) return h[0];
   return -1;
 }
@@ -2210,6 +2216,7 @@ function flyToTown(i, opts = {}) {
   if (!m || !q || !tp) return;
   const r = townSeat(m, i), st = q[4] === "ACT" && !m.areas.ACT ? "NSW" : q[4];
   townPick = i;
+  loadUrban();
   const sel = r.div >= 0 && !townSpread(r) ? { level: "div", st: m.divs[r.div].st, div: r.div } : m.areas[st] ? { level: "state", st } : { level: "aus" };
   select(sel, { fly: false, keepTown: true, view: opts.view });
   dock = null;

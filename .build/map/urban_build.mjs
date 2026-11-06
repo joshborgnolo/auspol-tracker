@@ -32,11 +32,18 @@ const CACHE = path.join(SRC_DIR, "ucl-2021.geojson");
 const URL_ = "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/UCL/MapServer/0/query?where=1%3D1&outFields=UCL_CODE_2021%2CUCL_NAME_2021%2CSTATE_CODE_2021&returnGeometry=true&outSR=4326&resultRecordCount=2000&f=geojson";
 const OUT = path.join(root, "map/data/urban.json");
 
-const SERVICE = (await fetch(CACHE).then((r) => r.ok ? r.json() : fetch(URL_).then((r) => {
+async function loadSource() {
+  try { return JSON.parse(fs.readFileSync(CACHE, "utf8")); }
+  catch (e) { if (e.code !== "ENOENT") throw e; }
+  const r = await fetch(URL_);
   if (!r.ok) throw new Error(`ArcGIS ${r.status}`);
-  return r.json();
-})).then((d) => { fs.mkdirSync(SRC_DIR, { recursive: true }); fs.writeFileSync(CACHE, JSON.stringify(d)); return d; }).catch(() => null))
-  ?? JSON.parse(fs.readFileSync(CACHE, "utf8"));
+  const d = await r.json();
+  if (!Array.isArray(d.features) || !d.features.length) throw new Error("ArcGIS returned no UCL features");
+  fs.mkdirSync(SRC_DIR, { recursive: true });
+  fs.writeFileSync(CACHE, JSON.stringify(d));
+  return d;
+}
+const SERVICE = await loadSource();
 
 const PLACES = JSON.parse(fs.readFileSync(path.join(root, "map/data/places.json"), "utf8")).p;
 const r3 = (v) => Math.round(v * 1000) / 1000;
