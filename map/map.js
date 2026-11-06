@@ -7990,23 +7990,6 @@ function statBreakdownClick(button) {
   if (replacement) replacement.focus({ preventScroll: true });
   if (FS.on) fsStory(false);
 }
-// Keep every represented crossbench group in the bar, even a single-seat party.
-function statSeatMakeup(m, idx) {
-  if (!idx.length) return "";
-  const groups = new Map();
-  for (const i of idx) {
-    const h = m.divs[i].hold, f = holdFam(h);
-    const name = f === "alp" || f === "lnp" ? famLeg(f) : crossLabel(h);
-    if (!groups.has(name)) groups.set(name, { name, f, n: 0 });
-    groups.get(name).n++;
-  }
-  const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"];
-  const rows = [...groups.values()].sort((a, b) => order.indexOf(a.f) - order.indexOf(b.f) || b.n - a.n || a.name.localeCompare(b.name));
-  const colour = (r) => `var(--m-${FP_TONE[r.name] || r.f})`;
-  const bars = rows.map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${r.n} ${r.n === 1 ? "seat" : "seats"} (${f1(100 * r.n / idx.length)}%)"></span>`).join("");
-  const legend = rows.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("");
-  return `<span class="st-seat-mix"><span class="st-makeup" aria-hidden="true">${bars}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
-}
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
   const statSel = statScopeOf(m);
@@ -8054,7 +8037,7 @@ function seatStat(m, st, label) {
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
-  const mk = statSeatMakeup(m, idx);
+  const mk = N ? `<span class="st-makeup" aria-hidden="true"><i style="width:${((100 * (cnt.alp || 0)) / N)}%;background:var(--m-alp)"></i><i style="width:${((100 * (cnt.lnp || 0)) / N)}%;background:var(--m-lnp)"></i><i style="width:${((100 * (N - (cnt.alp || 0) - (cnt.lnp || 0))) / N)}%;background:var(--m-oth)"></i></span>` : "";
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${fpRow}</h3>`;
 }
 // the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
