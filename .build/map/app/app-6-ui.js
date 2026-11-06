@@ -710,7 +710,8 @@ function updateHint() {
   const show = S.view === "map" && selDiv() == null && (T.k < K_ALL || drawOf(M()) === "surface") && !!M();
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover for the reading at any spot, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
-  $("#cities").hidden = S.view !== "map" || selDiv() != null || T.k > HOME.k * 3;
+  // the row stays while a jump selection is live, so it can be toggled back off
+  $("#cities").hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
@@ -1354,6 +1355,8 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
+  const oth = e.target.closest("[data-othx]");
+  if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");
   if (primary) { statBreakdownClick(primary); return; }
   const c = e.target.closest("#minich");

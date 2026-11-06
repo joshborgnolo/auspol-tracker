@@ -7892,9 +7892,42 @@ function statPrimaryCols(m, A, keys = null) {
   return [["alp", A.fp.alp, dA, "Labor", "alp"], ["lnp", A.fp.lnp, dL, oppNameW(), "lnp"], ...fpBloc,
     ["oth", Math.max(0, 100 - A.fp.alp - A.fp.lnp - fpBloc.reduce((x, r) => x + r[1], 0)), changes.some((v) => v == null) ? null : -changes.reduce((x, v) => x + v, 0), "Others", "oth"]];
 }
-function statPrimaryGrid(m, A, cls = "") {
-  const cols = statPrimaryCols(m, A), showChange = A.fpSw.alp != null && !isNowY(m.year);
-  return `<span class="st-grid st-fps st-n${cols.length} ${cls}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map((c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}${showChange ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
+/* the head's "Others" figure, opened out: the families not standing as their
+   own column there (independents never do), then one lump for whatever stays
+   inside "oth" — the minor parties the vote shares never break out on their
+   own. Same row shape as statPrimaryCols: [tone, share, change, label, key]. */
+function statOthersRows(A, cols) {
+  const shown = new Set(cols.map((c) => c[4])), named = [];
+  for (const f of ["grn", "onp", "ind"])
+    if (!shown.has(f) && A.fp[f] != null && A.fp[f] >= 0.05) named.push([f, A.fp[f], A.fpSw[f] != null ? A.fpSw[f] : null, famLeg(f), f]);
+  named.sort((p, q) => q[1] - p[1]);
+  const breakouts = cols.filter((c) => c[4].startsWith("party:")).reduce((x, c) => x + c[1], 0);
+  const lump = (A.fp.oth || 0) - breakouts;
+  if (lump >= 0.05) named.push(["oth", lump, breakouts ? null : A.fpSw.oth != null ? A.fpSw.oth : null, "All other parties", "oth"]);
+  return named;
+}
+/* the primary row, the head's "Others" cell optionally an opener: clicked, the
+   remainder column drops out (the rest recentre) and its contents list in a
+   smaller line under the row; clicked again they fold back into the figure */
+function statPrimaryGrid(m, A, cls = "", othx = false) {
+  const all = statPrimaryCols(m, A), showChange = A.fpSw.alp != null && !isNowY(m.year);
+  const rows = othx ? statOthersRows(A, all) : [];
+  const open = othx && !!statScopeOf(m).open && rows.length > 0;
+  const cols = open ? all.slice(0, -1) : all;
+  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${othx && !open && rows.length && c[4] === "oth"
+    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
+    : `<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`}`;
+  const grid = `<span class="st-grid st-fps st-n${all.length} ${cls}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map(cell).join("")}${showChange ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
+  if (!open) return grid;
+  const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
+  return `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>`;
+}
+/* the "Others" open is part of the frame's figure view, like the scope choice */
+function statOthersToggle() {
+  const m = M(); if (!m) return;
+  const sel = statScopeOf(m); sel.open = !sel.open;
+  renderStory(true);
+  const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
@@ -8031,7 +8064,7 @@ function seatStat(m, st, label) {
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
   if (fpA != null && fpL != null) {
-    fpRow = `<span class="st-lab">Primaries</span>${statPrimaryGrid(m, A)}`;
+    fpRow = `<span class="st-lab">Primaries</span>${statPrimaryGrid(m, A, "", true)}`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
@@ -8042,13 +8075,19 @@ function seatStat(m, st, label) {
 }
 // the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
 // its states or its seat types once named — the head's own figures then follow it
+// (statScopeOpts is the menu's item list in order; the spacebar cycle walks it too)
+function statScopeOpts(m, st) {
+  const opts = [["aus", STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"]];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`]);
+  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, `${CLS_SHORT[r.key].replace(" ", "-")} figures`]);
+  return opts;
+}
+const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
+const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
 function statScopeMenu(m, st) {
-  const sel = statScopeOf(m);
-  const item = (v, txt, on) => `<button type="button" data-scope="${v}" role="menuitem"${on ? ' aria-pressed="true"' : ""}>${txt}</button>`;
-  const items = [item("aus", esc(STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"), sel.k === "aus")];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) items.push(item(`st:${s}`, esc(`${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`), sel.k === "st" && sel.st === s));
-  for (const r of statBreakdownRows(m, st).classes) items.push(item(`cls:${r.key}`, esc(`${CLS_SHORT[r.key].replace(" ", "-")} figures`), sel.k === "cls" && sel.cls === r.key));
-  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, sel))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
+  const cur = statScopeVal(statScopeOf(m));
+  const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
+  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
@@ -9881,7 +9920,8 @@ function updateHint() {
   const show = S.view === "map" && selDiv() == null && (T.k < K_ALL || drawOf(M()) === "surface") && !!M();
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover for the reading at any spot, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
-  $("#cities").hidden = S.view !== "map" || selDiv() != null || T.k > HOME.k * 3;
+  // the row stays while a jump selection is live, so it can be toggled back off
+  $("#cities").hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
@@ -10525,6 +10565,8 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
+  const oth = e.target.closest("[data-othx]");
+  if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");
   if (primary) { statBreakdownClick(primary); return; }
   const c = e.target.closest("#minich");
