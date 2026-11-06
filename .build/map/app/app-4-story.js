@@ -326,7 +326,7 @@ function seatStat(m, st, label) {
     // since: only the seats row gets the now-frame's change line
     const s = isNowY(m.year) ? null : A.tppSw;
     const sw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
-    two = `<span class="st-lab">Two-party preferred</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
+    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
   }
   const change = (f, n) => {
     if (!base) return "";
