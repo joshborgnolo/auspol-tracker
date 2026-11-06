@@ -824,7 +824,8 @@ function storyArea(m, st) {
   }
   h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
-  h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => f1(v), (i) => colCss(m.divCol[i]))}</div>`;
+  // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show two
+  h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, (v, d) => (f1(v) === "0.0" ? v.toFixed(2) : f1(v)), (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
   return h;
 }
