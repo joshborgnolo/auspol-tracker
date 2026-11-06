@@ -293,7 +293,7 @@ button { cursor: pointer; background: none; border: 0; }
 /* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
 .st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 16px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; }
 .st-stat b { font-weight: 700; }
-.st-stat i { font-style: normal; font-family: var(--sans); font-weight: 300; color: var(--ink-2); padding: 0 0.1em; }
+.st-stat i { font-style: normal; font-family: var(--sans); font-weight: 300; color: var(--ink-2); padding: 0 0.1em; display: inline-block; transform: scaleX(0.72); }
 .st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 .st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab { margin-top: 22px; }
