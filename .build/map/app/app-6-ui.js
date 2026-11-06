@@ -1306,6 +1306,8 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
+  const primary = e.target.closest("[data-pv-action]");
+  if (primary) { statBreakdownClick(primary); return; }
   const c = e.target.closest("#minich");
   if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
   const g = e.target.closest("g[data-year]"); if (g) { setYear(yearOf(g.dataset.year)); }

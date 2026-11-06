@@ -305,6 +305,32 @@ button { cursor: pointer; background: none; border: 0; }
 .st-fps { font-size: 28px; letter-spacing: -0.01em; }
 .st-fps.st-n5, .st-fps.st-n6 { font-size: 23px; }
 .st-fps small { margin-top: 6px; font-size: 14px; }
+.st-breakdowns { margin: 16px 0 0 14px; }
+.st-pv + .st-pv { margin-top: 8px; }
+.st-pv-head { display: flex; align-items: center; gap: 2px; min-height: 36px; }
+.st-pv-head h4 { font: 400 13px/1.3 var(--sans); color: var(--ink); margin-right: 5px; }
+.st-pv-control { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; color: var(--ink-2); border-radius: 4px; }
+.st-pv-control svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.st-pv-control:hover, .st-pv-row:hover { background: var(--surface); color: var(--ink); }
+.st-pv-control:focus-visible, .st-pv-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.st-pv-list { margin: 2px 0 12px 8px; }
+.st-pv-row, .st-pv-columns { display: grid; grid-template-columns: minmax(76px, 1.65fr) repeat(var(--pv-cols), minmax(0, 1fr)); gap: 5px; align-items: baseline; width: 100%; padding: 6px 3px; text-align: right; font-size: 12.5px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.st-pv-row > :first-child, .st-pv-columns > :first-child { text-align: left; }
+.st-pv-row b { font-family: "Commissioner", var(--sans); font-weight: 500; }
+.st-pv-columns { font-size: 10px; color: var(--ink-3); overflow-wrap: anywhere; }
+.st-pv-full { margin: 8px 0 20px 8px; container-type: inline-size; }
+.st-pv-full .st-fps { font-size: clamp(20px, 9cqw, 28px); }
+.st-pv-full .st-fps.st-n5 { font-size: clamp(17px, 7cqw, 23px); }
+.st-pv-full .st-fps.st-n6 { font-size: clamp(15px, 6cqw, 23px); }
+.st-pv-full .st-lab { font-weight: 400; }
+.st-pv-full .st-pv-tpp-label { margin-top: 18px; }
+.st-pv-tpp { margin-top: 6px; font-size: 28px; letter-spacing: -0.01em; }
+.st-pv-full .st-note { align-self: flex-start; font: 400 11px/1.4 var(--sans); }
+.st-breakdowns + .st-dek { margin-top: 16px; }
+@media (pointer: coarse) {
+  .st-pv-control { width: 44px; height: 44px; }
+  .st-pv-row { min-height: 44px; align-items: center; }
+}
 .st-stat + .st-dek { margin-top: 16px; }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }

@@ -203,6 +203,105 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
+// Use the headline's party threshold in both breakdown modes. Lists share a
+// column set, so a party does not change columns between adjacent states.
+function statPrimaryCols(m, A, keys = null) {
+  const wanted = (key, share) => keys ? keys.includes(key) : share >= 10;
+  const fpBloc = ["grn", "onp"].filter((f) => wanted(f, A.fp[f])).map((f) => [f, A.fp[f], A.fpSw[f], legW(f), f]);
+  const vote = new Map(); let formal = 0;
+  for (const i of A.idx) {
+    const d = m.divs[i].by ? m.divs[i].by.prev : m.divs[i];
+    formal += d.formal;
+    for (const c of d.c) if (c.fam === "oth") { const k = partyShort(c.ab, c.pn); vote.set(k, (vote.get(k) || 0) + c.v); }
+  }
+  for (const k of keys || []) if (k.startsWith("party:") && !vote.has(k.slice(6))) vote.set(k.slice(6), 0);
+  for (const [k, v] of vote) if (formal && wanted("party:" + k, (100 * v) / formal)) fpBloc.push([FP_TONE[k] || "oth", (100 * v) / formal, null, k, "party:" + k]);
+  fpBloc.sort((p, q) => keys ? keys.indexOf(p[4]) - keys.indexOf(q[4]) : q[1] - p[1]);
+  const dA = A.fpSw.alp, dL = A.fpSw.lnp, changes = [dA, dL, ...fpBloc.map((r) => r[2])];
+  return [["alp", A.fp.alp, dA, "Labor", "alp"], ["lnp", A.fp.lnp, dL, oppNameW(), "lnp"], ...fpBloc,
+    ["oth", Math.max(0, 100 - A.fp.alp - A.fp.lnp - fpBloc.reduce((x, r) => x + r[1], 0)), changes.some((v) => v == null) ? null : -changes.reduce((x, v) => x + v, 0), "Others", "oth"]];
+}
+function statPrimaryGrid(m, A, cls = "") {
+  const cols = statPrimaryCols(m, A), showChange = A.fpSw.alp != null && !isNowY(m.year);
+  return `<span class="st-grid st-fps st-n${cols.length} ${cls}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map((c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}${showChange ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
+}
+// Pool actual election counts, not averages of seat percentages. On a Now
+// frame res.divs remains the base election; by-elections only replace m.divs.
+function statClassArea(m, idx) {
+  let formal = 0, alp = 0, lnp = 0, nTpp = 0;
+  const votes = Object.fromEntries(FAMS.map((f) => [f, 0]));
+  for (const i of idx) {
+    const d = m.res.divs[i];
+    for (const c of d.c) { votes[c[3]] += c[4]; formal += c[4]; }
+    if (d.tpp && d.tpp[0] + d.tpp[1] > 0) { alp += d.tpp[0]; lnp += d.tpp[1]; nTpp++; }
+  }
+  return { idx, formal, fp: Object.fromEntries(FAMS.map((f) => [f, formal ? 100 * votes[f] / formal : null])),
+    fpSw: Object.fromEntries(FAMS.map((f) => [f, null])), tpp: alp + lnp ? 100 * alp / (alp + lnp) : null, nTpp };
+}
+const statBreakdownCache = new WeakMap(), statBreakdownViews = new Map();
+function statBreakdownRows(m, st) {
+  if (!statBreakdownCache.has(m)) statBreakdownCache.set(m, new Map());
+  const cache = statBreakdownCache.get(m);
+  if (cache.has(st)) return cache.get(st);
+  const states = st === "AUS" && !STATE_YEARS.has(m.year) ? STATES.filter((s) => m.areas[s] && m.areas[s].formal > 0).map((s) => ({ key: s, label: STATE_TITLE[s], short: s, A: m.areas[s] })) : [];
+  const classes = CLS.map((c) => {
+    const idx = m.areas[st].idx.filter((i) => m.res.divs[i].cls === c);
+    return idx.length ? { key: c, label: CLS_SHORT[c], short: CLS_SHORT[c], A: statClassArea(m, idx) } : null;
+  }).filter((r) => r && r.A.formal > 0);
+  const result = { states: states.length > 1 ? states : [], classes };
+  cache.set(st, result);
+  return result;
+}
+const statBreakdownKey = (m, st, kind) => `${m.year}|${st}|${kind}`;
+function statBreakdownView(m, st, kind) {
+  const key = statBreakdownKey(m, st, kind);
+  if (!statBreakdownViews.has(key)) statBreakdownViews.set(key, { mode: "closed", index: -1 });
+  return statBreakdownViews.get(key);
+}
+function statBreakdown(m, st, kind, rows) {
+  if (!rows.length) return "";
+  const title = kind === "states" ? "States & territories" : "Seat types", view = statBreakdownView(m, st, kind);
+  const next = rows[(view.index + 1) % rows.length], id = `st-pv-${kind}`;
+  const cycleIcon = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 7A6.5 6.5 0 1 0 16 13M16.5 2.5V7h-4.5"/></svg>`;
+  const listIcon = `<svg width="23" height="15" viewBox="0 0 29 20" aria-hidden="true"><path d="M2 5h12M2 10h12M2 15h12M20 8l3.5 3.5L27 8"/></svg>`;
+  let body = "";
+  if (view.mode === "list") {
+    const keys = [...new Set(rows.flatMap((r) => statPrimaryCols(m, r.A).map((c) => c[4])))].filter((k) => k !== "alp" && k !== "lnp" && k !== "oth");
+    const cols = statPrimaryCols(m, rows[0].A, keys);
+    const names = cols.map((c) => c[4] === "alp" ? "ALP" : c[4] === "lnp" ? "L/NP" : c[4] === "grn" ? "GRN" : c[4] === "onp" ? "ON" : c[4] === "oth" ? "Other" : c[3]);
+    body = `<div class="st-pv-list" style="--pv-cols:${cols.length}" role="group" aria-label="${esc(title)} primary vote percentages"><div class="st-pv-columns" aria-hidden="true"><span></span>${names.map((name) => `<span>${esc(name)}</span>`).join("")}</div>${rows.map((r, i) => {
+      const cells = statPrimaryCols(m, r.A, keys);
+      return `<button type="button" class="st-pv-row" data-pv-action="pick" data-pv-index="${i}" aria-label="${esc(r.label + ' primaries: ' + cells.map((c) => c[3] + ' ' + f1(c[1]) + '%').join(', ') + '. Show full result')}"><span>${esc(r.short)}</span>${cells.map((c) => `<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}</button>`;
+    }).join("")}</div>`;
+  } else if (view.mode === "cycle") {
+    const r = rows[view.index], A = r.A;
+    const pair = Number.isFinite(A.tpp) ? `<span class="st-pv-tpp" role="group" aria-label="Labor ${f1(A.tpp)}%, ${esc(oppNameW())} ${f1(100 - A.tpp)}%"><b style="color:${css(TH.party.alp)}">${f1(A.tpp)}</b><i aria-hidden="true">–</i><b style="color:${css(TH.party.lnp)}">${f1(100 - A.tpp)}</b></span>` : `<span class="st-note">No two-party count available.</span>`;
+    body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(r.label)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(r.label)} 2PP</span>${pair}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
+  }
+  return `<section class="st-pv" data-pv-kind="${kind}" data-pv-area="${esc(st)}" aria-label="${esc(title)}"><div class="st-pv-head"><h4>${esc(title)}</h4><button type="button" class="st-pv-control" data-pv-action="cycle" title="Cycle through ${title.toLowerCase()}" aria-label="Show ${esc(next.label)} primaries and 2PP" aria-controls="${id}">${cycleIcon}</button><button type="button" class="st-pv-control" data-pv-action="list" title="${view.mode === 'list' ? 'Collapse list' : 'Show all results'}" aria-label="${view.mode === 'list' ? 'Collapse' : 'Show all'} ${title.toLowerCase()}" aria-expanded="${view.mode === 'list'}" aria-controls="${id}">${listIcon}</button></div><div id="${id}"${view.mode === "closed" ? " hidden" : ""}>${body}</div></section>`;
+}
+function statBreakdowns(m, st) {
+  const groups = statBreakdownRows(m, st);
+  const content = Object.entries(groups).map(([kind, rows]) => statBreakdown(m, st, kind, rows)).join("");
+  return content ? `<div class="st-breakdowns">${content}</div>` : "";
+}
+function statBreakdownClick(button) {
+  const el = button.closest(".st-pv"), m = M();
+  if (!el || !m) return;
+  const kind = el.dataset.pvKind, st = el.dataset.pvArea, rows = statBreakdownRows(m, st)[kind];
+  if (!rows || !rows.length) return;
+  const view = statBreakdownView(m, st, kind), action = button.dataset.pvAction;
+  if (action === "list") view.mode = view.mode === "list" ? "closed" : "list";
+  else {
+    const index = action === "pick" ? Number(button.dataset.pvIndex) : (view.index + 1) % rows.length;
+    if (!Number.isInteger(index) || index < 0 || index >= rows.length) return;
+    view.index = index; view.mode = "cycle";
+  }
+  el.outerHTML = statBreakdown(m, st, kind, rows);
+  const replacement = $(`#story .st-pv[data-pv-kind="${kind}"] [data-pv-action="${action === "pick" ? "cycle" : action}"]`);
+  if (replacement) replacement.focus({ preventScroll: true });
+  if (FS.on) fsStory(false);
+}
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label) {
   const { A, idx, N, cnt } = areaStats(m, st);
@@ -243,19 +342,12 @@ function seatStat(m, st, label) {
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
   if (fpA != null && fpL != null) {
-    const fpBloc = ["grn", "onp"].filter((f) => A.fp[f] >= 10).map((f) => [f, A.fp[f], A.fpSw[f]]);
-    const vote = new Map(); let formal = 0;
-    for (const i of idx) { const d = m.divs[i]; formal += d.formal; for (const c of d.c) if (c.fam === "oth") { const k = partyShort(c.ab, c.pn); vote.set(k, (vote.get(k) || 0) + c.v); } }
-    for (const [k, v] of vote) if ((100 * v) / formal >= 10) fpBloc.push([FP_TONE[k] || "oth", (100 * v) / formal, null]);
-    fpBloc.sort((p, q) => q[1] - p[1]);
-    const dA = A.fpSw.alp, dL = A.fpSw.lnp, ds = [dA, dL, ...fpBloc.map((r) => r[2])];
-    const fpCols = [["alp", fpA, dA], ["lnp", fpL, dL], ...fpBloc, ["oth", 100 - fpA - fpL - fpBloc.reduce((x, r) => x + r[1], 0), ds.some((v) => v == null) ? null : -ds.reduce((x, v) => x + v, 0)]];
-    fpRow = `<span class="st-lab">Primaries</span>${row("st-fps", fpCols.map(([f, v, d]) => [f, f1(v), d]), dA == null || isNowY(m.year) ? null : (c) => (c[2] == null ? " " : sgn(c[2])))}`;
+    fpRow = `<span class="st-lab">Primaries</span>${statPrimaryGrid(m, A)}`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${fpRow}</h3>${fpRow ? statBreakdowns(m, st) : ""}`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
