@@ -11,34 +11,33 @@
 body.rd {
   --rd-rule: var(--ink);
   --band-opacity: 0.14;
-  --onp-deep: oklch(0.52 0.150 58.3);
+  --onp-deep: oklch(0.52 0.130 58);
   --tint-alp: color-mix(in oklab, var(--alp) 16%, var(--surface));
   --tint-lnp: color-mix(in oklab, var(--lnp) 16%, var(--surface));
   --tint-grn: color-mix(in oklab, var(--grn) 16%, var(--surface));
   --tint-oth: color-mix(in oklab, var(--oth) 16%, var(--surface));
   --tint-onp: color-mix(in oklab, var(--onp) 20%, var(--surface));
-  /* ordered groups: light runs pale to dark (hues + chroma re-anchored to the
-     poster-flat marks 2026-11-06, each ladder keeping its lightness steps) */
-  --ramp-onp-1: oklch(0.66 0.179 58.3);
-  --ramp-onp-2: oklch(0.56 0.176 56.3);
-  --ramp-onp-3: oklch(0.45 0.151 54.3);
-  --ramp-onp-4: oklch(0.34 0.110 52.3);
-  --ramp-grn-1: oklch(0.63 0.174 148.4);
-  --ramp-grn-2: oklch(0.52 0.182 148.4);
-  --ramp-grn-3: oklch(0.42 0.158 148.4);
-  --ramp-grn-4: oklch(0.32 0.127 148.4);
-  --ramp-alp-1: oklch(0.66 0.204 32);
-  --ramp-alp-2: oklch(0.55 0.235 32);
-  --ramp-alp-3: oklch(0.44 0.204 32);
-  --ramp-alp-4: oklch(0.34 0.157 32);
-  --ramp-lnp-1: oklch(0.64 0.254 263.3);
-  --ramp-lnp-2: oklch(0.50 0.268 263.3);
-  --ramp-lnp-3: oklch(0.40 0.240 263.3);
-  --ramp-lnp-4: oklch(0.31 0.197 263.3);
-  --ramp-oth-1: oklch(0.70 0 89.9);
-  --ramp-oth-2: oklch(0.60 0 89.9);
-  --ramp-oth-3: oklch(0.47 0 89.9);
-  --ramp-oth-4: oklch(0.35 0 89.9);
+  /* ordered groups: light runs pale to dark */
+  --ramp-onp-1: oklch(0.66 0.130 58);
+  --ramp-onp-2: oklch(0.56 0.128 56);
+  --ramp-onp-3: oklch(0.45 0.110 54);
+  --ramp-onp-4: oklch(0.34 0.080 52);
+  --ramp-grn-1: oklch(0.63 0.110 150);
+  --ramp-grn-2: oklch(0.52 0.115 150);
+  --ramp-grn-3: oklch(0.42 0.100 150);
+  --ramp-grn-4: oklch(0.32 0.080 150);
+  --ramp-alp-1: oklch(0.66 0.130 27);
+  --ramp-alp-2: oklch(0.55 0.150 27);
+  --ramp-alp-3: oklch(0.44 0.130 27);
+  --ramp-alp-4: oklch(0.34 0.100 27);
+  --ramp-lnp-1: oklch(0.64 0.090 250);
+  --ramp-lnp-2: oklch(0.50 0.095 250);
+  --ramp-lnp-3: oklch(0.40 0.085 250);
+  --ramp-lnp-4: oklch(0.31 0.070 250);
+  --ramp-oth-1: oklch(0.70 0.018 70);
+  --ramp-oth-2: oklch(0.60 0.016 70);
+  --ramp-oth-3: oklch(0.47 0.014 70);
+  --ramp-oth-4: oklch(0.35 0.012 70);
   /* text set inside party-coloured fills */
   --on-fill-alp: #ffffff;
   --on-fill-lnp: #ffffff;
@@ -51,34 +50,33 @@ body.rd {
 }
 body.rd.dark {
   --band-opacity: 0.22;
-  --onp-deep: oklch(0.62 0.135 62.6);
+  --onp-deep: oklch(0.62 0.120 58);
   --tint-alp: color-mix(in oklab, var(--alp) 24%, var(--surface));
   --tint-lnp: color-mix(in oklab, var(--lnp) 24%, var(--surface));
   --tint-grn: color-mix(in oklab, var(--grn) 24%, var(--surface));
   --tint-oth: color-mix(in oklab, var(--oth) 24%, var(--surface));
   --tint-onp: color-mix(in oklab, var(--onp) 26%, var(--surface));
-  /* dark runs dim to bright, so the last group keeps the most contrast
-     (same re-anchor to the poster-flat dark marks 2026-11-06) */
-  --ramp-onp-1: oklch(0.58 0.135 58.6);
-  --ramp-onp-2: oklch(0.66 0.162 60.6);
-  --ramp-onp-3: oklch(0.74 0.175 62.6);
-  --ramp-onp-4: oklch(0.82 0.162 66.6);
-  --ramp-grn-1: oklch(0.55 0.139 149);
-  --ramp-grn-2: oklch(0.64 0.170 149);
-  --ramp-grn-3: oklch(0.73 0.193 151);
-  --ramp-grn-4: oklch(0.82 0.185 151);
-  --ramp-alp-1: oklch(0.52 0.188 32);
-  --ramp-alp-2: oklch(0.62 0.235 32);
-  --ramp-alp-3: oklch(0.71 0.235 32);
-  --ramp-alp-4: oklch(0.80 0.188 34);
-  --ramp-lnp-1: oklch(0.52 0.201 263.3);
-  --ramp-lnp-2: oklch(0.62 0.257 263.3);
-  --ramp-lnp-3: oklch(0.72 0.268 263.3);
-  --ramp-lnp-4: oklch(0.81 0.223 263.3);
-  --ramp-oth-1: oklch(0.58 0 89.9);
-  --ramp-oth-2: oklch(0.66 0 89.9);
-  --ramp-oth-3: oklch(0.74 0 89.9);
-  --ramp-oth-4: oklch(0.82 0 89.9);
+  /* dark runs dim to bright, so the last group keeps the most contrast */
+  --ramp-onp-1: oklch(0.58 0.100 58);
+  --ramp-onp-2: oklch(0.66 0.120 60);
+  --ramp-onp-3: oklch(0.74 0.130 62);
+  --ramp-onp-4: oklch(0.82 0.120 66);
+  --ramp-grn-1: oklch(0.55 0.090 150);
+  --ramp-grn-2: oklch(0.64 0.110 150);
+  --ramp-grn-3: oklch(0.73 0.125 152);
+  --ramp-grn-4: oklch(0.82 0.120 152);
+  --ramp-alp-1: oklch(0.52 0.120 28);
+  --ramp-alp-2: oklch(0.62 0.150 28);
+  --ramp-alp-3: oklch(0.71 0.150 28);
+  --ramp-alp-4: oklch(0.80 0.120 30);
+  --ramp-lnp-1: oklch(0.52 0.090 252);
+  --ramp-lnp-2: oklch(0.62 0.115 252);
+  --ramp-lnp-3: oklch(0.72 0.120 252);
+  --ramp-lnp-4: oklch(0.81 0.100 252);
+  --ramp-oth-1: oklch(0.58 0.012 70);
+  --ramp-oth-2: oklch(0.66 0.014 70);
+  --ramp-oth-3: oklch(0.74 0.015 70);
+  --ramp-oth-4: oklch(0.82 0.016 70);
   --on-fill-alp: oklch(0.20 0.020 28);
   --on-fill-lnp: oklch(0.20 0.020 252);
   --on-fill-onp: oklch(0.20 0.030 58);
