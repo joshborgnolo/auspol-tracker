@@ -1320,6 +1320,8 @@ $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
+  const stj = e.target.closest("[data-state]");
+  if (stj) { goState(stj.dataset.state); return; }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
@@ -1460,13 +1462,16 @@ function preloadYears() {
   idleSlice(next);
 }
 
+/* the states line under the city jumps: leaps to a state view on the frame */
+const STATE_JUMP = [["NSW", "NSW"], ["VIC", "Vic"], ["QLD", "Qld"], ["WA", "WA"], ["SA", "SA"], ["TAS", "Tas"], ["ACT", "ACT"], ["NT", "NT"]];
+
 /* =============================== boot =============================== */
 (async () => {
   TH = readTheme(); buildRamps();
   const selFromURL = readURL();
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
-  $("#cities").innerHTML = CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("");
+  $("#cities").innerHTML = `<b>Jump to:</b>${CITIES.map(([n], k) => `<button type="button" data-city="${k}">${n}</button>`).join("")}<span class="mp-states-jump">${STATE_JUMP.map(([s, ab]) => `<button type="button" data-state="${s}">${ab}</button>`).join("")}</span>`;
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
