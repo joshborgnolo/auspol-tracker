@@ -1,0 +1,21 @@
+{
+  "url": "https://www.capitalbrief.com/newsletter/data-centre-boom-leaves-voters-cold-d50374c3-d0a9-47fd-ad97-dd9b5944d5ab/",
+  "textHash": "2bfc9393f116ffe1",
+  "readAt": "2026-11-06T10:02:21.449Z",
+  "reading": {
+    "scope": "demosau",
+    "fields": {
+      "alp": null,
+      "lnp": {
+        "para": 5,
+        "quote": "the Coalition, led by Opposition Leader Angus Taylor , has gained four percentage points in primary support over the past month to reach 24%.",
+        "value": 24,
+        "from": 20
+      },
+      "grn": null,
+      "onp": null,
+      "oth": null
+    },
+    "notes": "Only the Coalition primary is stated for this DemosAU poll; the Labor 27% in para 6 is Newspoll (another pollster) and is excluded."
+  }
+}
