@@ -7748,12 +7748,6 @@ function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
   const more = limit && sorted.length > limit ? `<button type="button" class="more" data-more>All ${sorted.length} candidates</button>` : "";
   return `<div class="rows">${rows.join("")}</div>${more}`;
 }
-function famRows(fp, fpSw) {
-  const order = FAMS.filter((b) => fp[b] > 0.05).sort((a, b) => fp[b] - fp[a]);
-  const top = Math.max(40, fp[order[0]]);
-  // a year with no previous count carries fpSw as an object of nulls (sa26)
-  return `<div class="rows">${order.map((b) => `<div class="row"><div class="nm">${legW(b)}</div><div class="bar"><i style="width:${(100 * fp[b]) / top}%;${swc(b)}"></i></div><div class="v ${tx(b)}">${f1(fp[b])}</div><div class="d">${fpSw && fpSw[b] != null ? sgn(fpSw[b]) : ""}</div></div>`).join("")}</div>`;
-}
 function flowRows(flows, pairA, pairB) {
   const agg = {};
   for (const f of flows) { const b = f.cand.b; (agg[b] = agg[b] || { b, ta: 0, tb: 0, names: [] }); agg[b].ta += f.ta; agg[b].tb += f.tb; agg[b].names.push(f.cand.n); }
@@ -8088,7 +8082,7 @@ function seatStat(m, st, label) {
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
   const mk = statSeatMakeup(m, idx);
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${fpRow}</h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
@@ -8399,37 +8393,6 @@ function areaDemo(m, st, idx, where, isNowM) {
   return { hed, dek };
 }
 
-// the area story's vote table, per AEC class, shared across lenses: the two-party read and the
-// primaries pooled vote by vote from the seats' own counts — exact election
-// figures, never estimates. Renders nothing where the frame's seats carry no
-// type (the state and 1993 frames)
-function clsVoteBlock(m, idx) {
-  // the primary columns omit ind and oth (this table's FAMS stay in FAM_CODE
-  // for the seat-holding bar and the party menus elsewhere)
-  const CLS_FAMS = FAMS.filter((f) => f !== "ind" && f !== "oth");
-  const rows = [];
-  for (const c of CLS) {
-    const xs = idx.filter((i) => m.divs[i].cls === c);
-    if (!xs.length) continue;
-    let ta = 0, tb = 0, nTpp = 0, formal = 0;
-    const fp = CLS_FAMS.map(() => 0);
-    for (const i of xs) {
-      const d = m.divs[i];
-      // on the now frame a by-election row swaps its seat's 2025 count for the
-      // by-election's; this table answers "the election's" figures, so pool the
-      // predecessor row the swap keeps, like the aggregates above do
-      const v = d.by ? d.by.prev : d;
-      if (v.tpp != null) { ta += (v.formal * v.tpp) / 100; tb += (v.formal * (100 - v.tpp)) / 100; nTpp++; }
-      formal += v.formal;
-      for (let k = 0; k < CLS_FAMS.length; k++) fp[k] += (v.formal * (v.fp[CLS_FAMS[k]] || 0)) / 100;
-    }
-    rows.push({ c, n: xs.length, tpp: nTpp ? (100 * ta) / (ta + tb) : null, nTpp, fp: fp.map((v) => (100 * v) / formal) });
-  }
-  if (!rows.length) return "";
-  const miss = rows.reduce((a, r) => a + (r.n - r.nTpp), 0);
-  return `<div class="st-sec st-cls-votes"><h3>By seat type</h3><p class="cls-vote-dek" id="cls-vote-note">Votes pooled from each type’s seats</p><div class="cls-vote-scroll" role="region" aria-label="Votes by seat type" tabindex="0"><table class="cls-votes" aria-label="Vote shares by seat type" aria-describedby="cls-vote-note"><colgroup><col class="cls-vote-type"><col class="cls-vote-tpp"></colgroup><colgroup span="${CLS_FAMS.length}"></colgroup><thead><tr><th scope="col" rowspan="2">Type<span class="cls-vote-unit">Seats</span></th><th scope="col" rowspan="2" class="cls-vote-2pp">Labor<span class="cls-vote-unit">2PP %</span></th><th scope="colgroup" colspan="${CLS_FAMS.length}" class="cls-vote-group">Primary vote %</th></tr><tr>${CLS_FAMS.map((f) => `<th scope="col"><span class="cls-vote-party" style="--cls-party:var(--m-${f})">${FAM_CODE[f]}</span></th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr><th scope="row"><span class="cls-vote-name"><i aria-hidden="true" style="background:${css(TH.cls[CLS.indexOf(r.c)])}"></i>${esc(CLS_SHORT[r.c])}</span><span class="cls-vote-seats">${r.n} ${r.n === 1 ? "seat" : "seats"}</span></th><td class="cls-vote-2pp">${r.tpp != null ? f1(r.tpp) : "–"}</td>${r.fp.map((v) => `<td>${f1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${miss ? `<p class="st-note">${miss === 1 ? "One seat" : `${miss} seats`} carried no Labor two-party count; that type’s two-party read pools the rest.</p>` : ""}</div>`;
-}
-
 /* ----- how the votes were cast -----
    A seat's or an area's formal votes by how they were cast, and Labor's two-party share of
    each pile where the count gives it (vt2, build_vote_piles.py): every seat from 2016, before
@@ -8488,7 +8451,7 @@ function vtBlock(divs, area) {
 }
 
 function storyArea(m, st) {
-  const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
+  const aus = st === "AUS", { A, idx, N } = areaStats(m, st);
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
@@ -8499,11 +8462,9 @@ function storyArea(m, st) {
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
-  // the House: who holds the seats
+  // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
   if (S.view !== "chamber") {
-    const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => cnt[f]);
-    const counts = order.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("");
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div><div class="counts">${counts}</div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
   if (isNowY(m.year) && aus) {
     const ch = m.changes.slice().reverse();
@@ -8517,17 +8478,10 @@ function storyArea(m, st) {
     const classicN = m.divs.filter((d) => d.tpp != null).length;
     h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
   }
-  h += `<div class="st-sec"><h3>Primary vote <small>% of formal votes${prev != null && m.res.agg[st].pprim != null ? ` · change on ${prev}` : ""}</small></h3>${famRows(A.fp, A.fpSw)}</div>`;
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
   const cast = m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true);
   h += `<div class="st-sec"><h3>Informal <small>% of ballots cast</small></h3><div class="big"><span class="v">${f1(A.infPct)}%</span><span class="l">${aus ? "" : `${ausW()} ${f1(m.areas.AUS.infPct)}%`}</span></div></div>`;
-  const bySt = aus ? STATES.filter((s) => m.areas[s]) : [];
-  // a one-row "by state" table says nothing the headline didn't (SA frames list SA alone)
-  if (bySt.length > 1) {
-    h += `<div class="st-sec"><h3>By state or territory</h3><table class="tbl"><thead><tr><th>State</th><th>Seats</th><th>Labor 2PP</th><th>Swing</th></tr></thead><tbody>${bySt.map((s) => { const a = m.areas[s]; const sc = {}; for (const i of a.idx) { const f = holdFam(m.divs[i].hold); sc[f] = (sc[f] || 0) + 1; } const bar = ["alp", "grn", "ind", "csa", "oth", "onp", "lnp"].filter((f) => sc[f]).map((f) => `<i style="${(100 * sc[f]) / a.idx.length}%;${swc(f)}"></i>`).join(""); return `<tr data-go="state:${s}"><td>${STATE_TITLE[s].replace("Australian Capital Territory", "ACT").replace("Northern Territory", "NT")}</td><td>${a.idx.length}<span class="seatbar">${bar}</span></td><td>${f1(a.tpp)}</td><td>${a.tppSw != null ? sgn(a.tppSw) : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
-  }
-  h += clsVoteBlock(m, idx);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)

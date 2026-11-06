@@ -442,36 +442,6 @@ button { cursor: pointer; background: none; border: 0; }
 .tbl .seatbar { display: inline-flex; width: 64px; height: 8px; border-radius: 2px; overflow: hidden; vertical-align: 0; margin-left: 8px; background: var(--line-2); }
 .tbl .seatbar i { height: 100%; }
 
-/* seat-type votes: counts sit under the type so six readable columns fit the
-   story column. The two-party column stays distinct from the primary shares. */
-.cls-vote-dek { margin-top: 4px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
-.cls-vote-scroll { margin-top: 12px; overflow-x: auto; scrollbar-width: thin; }
-.cls-vote-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.cls-votes { width: 100%; min-width: 280px; table-layout: fixed; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.cls-vote-type { width: 30%; }
-.cls-vote-tpp { width: 18%; }
-.cls-votes th, .cls-votes td { padding: 0 5px; text-align: right; }
-.cls-votes thead th { font-size: 11px; line-height: 1.4; font-weight: 500; color: var(--ink-3); }
-.cls-votes thead tr:first-child th { padding-top: 6px; padding-bottom: 5px; }
-.cls-votes thead tr:last-child th { padding-top: 4px; padding-bottom: 8px; }
-.cls-votes thead th[rowspan] { vertical-align: bottom; padding-bottom: 8px; }
-.cls-votes thead { border-bottom: 1px solid var(--ink-faint); }
-.cls-votes th:first-child[rowspan], .cls-votes tbody th { padding-left: 0; text-align: left; }
-.cls-votes .cls-vote-group { text-align: center; border-bottom: 1px solid var(--line-2); }
-.cls-vote-unit { display: block; }
-.cls-vote-party { display: inline-block; padding-top: 3px; border-top: 2px solid var(--cls-party); font-weight: 600; white-space: nowrap; color: var(--ink-2); }
-.cls-votes tbody tr { border-bottom: 1px solid var(--line-2); }
-.cls-votes tbody th, .cls-votes tbody td { padding-top: 12px; padding-bottom: 12px; }
-.cls-votes tbody th { font-size: 12.5px; line-height: 1.35; font-weight: 600; color: var(--ink); }
-.cls-votes tbody td { font-size: 13px; color: var(--ink-2); }
-.cls-vote-name { display: flex; align-items: center; gap: 6px; }
-.cls-vote-name i { flex: none; width: 7px; height: 7px; border-radius: 2px; box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 12%, transparent); }
-.cls-vote-seats { display: block; margin: 4px 0 0 13px; font-size: 11px; font-weight: 400; color: var(--ink-3); }
-.cls-votes .cls-vote-2pp { background: color-mix(in oklch, var(--ink) 4%, transparent); }
-.cls-votes thead .cls-vote-2pp { color: var(--ink-2); }
-.cls-votes tbody .cls-vote-2pp { font-weight: 600; color: var(--ink); }
-.cls-votes tr > :last-child { padding-right: 0; }
-
 /* flows */
 .flow { margin-top: 12px; }
 .flow .fh { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); }
