@@ -9693,7 +9693,8 @@ function renderTimeline() {
     // in the Senate's chamber each stop reads that election's upper house
     const sen = senOn();
     const st = sen ? (S.ssel.level !== "aus" ? S.ssel.st : "AUS") : S.sel.level === "state" ? S.sel.st : "AUS";
-    for (const r of rows) {
+    // as the rail and the labels do, the bars draw on the selected election's row alone
+    for (const r of rows.filter((_, i) => i === activeIx)) {
       // as wide as the row's closest two stops allow (2025 and Now sit close on a phone)
       const xs = r.ys.map(X), bw = Math.min(30, ...xs.slice(1).map((x, j) => x - xs[j] - 4));
       for (const y of r.ys) {

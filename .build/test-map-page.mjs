@@ -2436,6 +2436,12 @@ for (const y of ["sa22", "sa26"]) {
   // 2026-11-06) since the timeline now shows only the selected jurisdiction's rung
   assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];"), "the up/down walk follows the View elections strip's order (Qld before SA)");
   assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);"), "the per-seat glyph's row index follows the rail (vic22 → row 1, a wa stop → row 5)");
+  // one rung at a time (2026-11-06): the rail line, the stop labels AND the
+  // seat-count make-up bars all draw for the selected election's row alone —
+  // the bars' loop was the one unfiltered tier left when the rail and labels
+  // were cut over, so every jurisdiction's bars floated at once
+  assert.ok((ui.match(/rows\.filter\(\(_, i\) => i === activeIx\)/g) || []).length >= 2, "the timeline's rail and its seat-count bars draw on the selected jurisdiction's rung alone (rows filtered to activeIx in both tiers)");
+  assert.ok(ui.includes("if (R.i !== activeIx) continue;"), "the stop-label tier keeps its activeIx gate too");
   const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
   const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
   assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs stack federal, Victoria, New South Wales, South Australia, Queensland, Western Australia top to bottom");
