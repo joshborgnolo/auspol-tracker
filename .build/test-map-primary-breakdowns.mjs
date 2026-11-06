@@ -12,20 +12,26 @@ const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const names = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "Australian Capital Territory", NT: "Northern Territory" };
 const labels = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", oth: "Others" };
 let current, focusCount = 0;
+// the app's own holdFam/crossLabel, for the test both as ctx globals and as oracle
+const holdFamT = (h) => (h.ab === "CSA" ? "csa" : h.fam);
+const crossLabelT = (h) => (h.ab === "CSA" ? "Community Strong" : h.fam === "ind" ? "Independents" : h.fam === "grn" ? "Greens" : h.fam === "onp" ? "One Nation" : (h.ab === "XEN" ? "Nick Xenophon Team" : h.ab === "CS" ? "Community Strong" : ({ KAP: "Katter", CA: "Centre Alliance", ASP: "Shooters", LNQ: "LNP", CLP: "CLP", JLN: "Lambie Network" })[h.ab] || h.pn || h.ab));
 const ctx = vm.createContext({
   FAMS, CLS, STATES, STATE_TITLE: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
   STATE_YEARS: new Set(["nsw23"]), S: { year: 2025 }, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
   SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(),
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
-  famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab,
+  famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab, holdFam: holdFamT, crossLabel: crossLabelT,
   isNowY: (y) => y === "now", frameBaseY: () => 2025, M: () => current, FS: { on: false },
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statSeatsOthersRows,statPrimaryGrid,statScopeOf,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
-  const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
+  const divs = res.divs.map((d,i) => {
+    const w = (d.h && d.h.length && d.c.find((c) => c[1] === d.h[d.h.length-1][2])) || d.c.reduce((a,b) => (a[4] > b[4] ? a : b));
+    return {i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]})), hold:{ab:w[1],pn:w[2],fam:w[3]}};
+  });
   const areas = Object.fromEntries(Object.entries(res.agg).map(([st,a]) => [st, {
     idx:divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i), formal:a.formal,
     fp:Object.fromEntries(FAMS.map((f) => [f,100*a.prim[f]/a.formal])),
@@ -131,4 +137,26 @@ const rowsSa16=api.statOthersRows(old.areas.SA,colsSa16);
 close(rowsSa16.reduce((n,r)=>n+r[1],0),colsSa16[colsSa16.length-1][1],"SA's breakdown reproduces its Others figure");
 close(rowsSa16.find((r)=>r[4]==="oth")[1],old.areas.SA.fp.oth-nxt16[1],"the lump excludes the broken-out party");
 assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout carries no change");
-console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");
+// the Seats row's "Others" figure opens into the crossbench groups inside it
+const idx25=current.areas.AUS.idx,want25={};
+for (const i of idx25) {
+  const h=current.divs[i].hold,f=holdFamT(h);
+  if(f==="alp"||f==="lnp") continue;
+  const k=crossLabelT(h);
+  want25[k]=(want25[k]||0)+1;
+}
+const sRows25=api.statSeatsOthersRows(current,idx25,[],null);
+assert.deepEqual(JSON.parse(JSON.stringify(Object.fromEntries(sRows25.map((r)=>[r[3],r[1]])))),want25,"the seats breakdown names every crossbench group once");
+close(sRows25.reduce((n,r)=>n+r[1],0),Object.values(want25).reduce((a,b)=>a+b,0),"the seats breakdown reproduces the Others tally");
+assert.equal(sRows25[0][3],"Independents","independents lead the 2025 crossbench");
+const sN25=sRows25.map((r)=>r[1]);
+assert.ok(sN25.every((v,k)=>k===0||sN25[k-1]>=v),"seat groups sort biggest first");
+assert.ok(sRows25.every((r)=>r[2]===null),"no base means no changes");
+const noKatter=api.statSeatsOthersRows(current,idx25,["Katter"],null);
+assert.ok(!noKatter.some((r)=>r[3]==="Katter"),"a group with its own seat column stays out");
+assert.equal(noKatter.reduce((n,r)=>n+r[1],0),Object.values(want25).reduce((a,b)=>a+b,0)-1);
+const withBase=api.statSeatsOthersRows(current,idx25,[],{c:{ind:10,grn:4,onp:0,oth:1}});
+assert.equal(withBase.find((r)=>r[3]==="Independents")[2],0,"a group's change rides its family's own base");
+assert.equal(withBase.find((r)=>r[3]==="Greens")[2],-3);
+assert.equal(withBase.find((r)=>r[3]==="Katter")[2],null,"a party sharing 'oth' claims none of the family's shift");
+console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion (votes and seats), historical and Now frames passed.");
