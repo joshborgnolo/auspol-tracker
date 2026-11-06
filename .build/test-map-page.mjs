@@ -2471,6 +2471,10 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
+  // 2026-11-06: the ui file's wiring references three helpers that live beside
+  // the menu — a half-landed scope change broke every item click with
+  // "statScopeParse is not defined" while the suite stayed green; pin the contract
+  assert.ok(st.includes("function statScopeOpts") && st.includes("const statScopeVal =") && st.includes("const statScopeParse ="), "statScopeOpts/statScopeVal/statScopeParse live beside the menu — app-6-ui.js's scope wiring depends on them");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
 }
 

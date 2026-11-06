@@ -391,15 +391,21 @@ function seatStat(m, st, label) {
   const mk = N ? `<span class="st-makeup" aria-hidden="true"><i style="width:${((100 * (cnt.alp || 0)) / N)}%;background:var(--m-alp)"></i><i style="width:${((100 * (cnt.lnp || 0)) / N)}%;background:var(--m-lnp)"></i><i style="width:${((100 * (N - (cnt.alp || 0) - (cnt.lnp || 0))) / N)}%;background:var(--m-oth)"></i></span>` : "";
   return `<h3 class="st-stat" aria-label="${esc(label)}">${two}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${fpRow}</h3>`;
 }
+/* the menu's item list in order (the spacebar cycle walks it too) */
+function statScopeOpts(m, st) {
+  const opts = [["aus", STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"]];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`]);
+  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, `${CLS_SHORT[r.key].replace(" ", "-")} figures`]);
+  return opts;
+}
+const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
+const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
 // the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
 // its states or its seat types once named — the head's own figures then follow it
 function statScopeMenu(m, st) {
-  const sel = statScopeOf(m);
-  const item = (v, txt, on) => `<button type="button" data-scope="${v}" role="menuitem"${on ? ' aria-pressed="true"' : ""}>${txt}</button>`;
-  const items = [item("aus", esc(STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"), sel.k === "aus")];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) items.push(item(`st:${s}`, esc(`${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`), sel.k === "st" && sel.st === s));
-  for (const r of statBreakdownRows(m, st).classes) items.push(item(`cls:${r.key}`, esc(`${CLS_SHORT[r.key].replace(" ", "-")} figures`), sel.k === "cls" && sel.cls === r.key));
-  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, sel))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
+  const cur = statScopeVal(statScopeOf(m));
+  const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
+  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
