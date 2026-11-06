@@ -230,24 +230,36 @@ function statPrimaryGrid(m, A, cls = "") {
 function statClassArea(m, idx) {
   let formal = 0, alp = 0, lnp = 0, nTpp = 0;
   const votes = Object.fromEntries(FAMS.map((f) => [f, 0]));
+  // changes pool vote-weighted over each family's own complete subset: a seat counts
+  // toward a family's swing pool only where every one of that family's candidates
+  // in it carries a swing figure (the majors: effectively every election seat)
+  const swNum = {}, swDen = {};
+  for (const f of FAMS) { swNum[f] = 0; swDen[f] = 0; }
+  let tNum = 0, tDen = 0;
   for (const i of idx) {
     const d = m.res.divs[i];
-    for (const c of d.c) { votes[c[3]] += c[4]; formal += c[4]; }
+    let dFormal = 0;
+    for (const c of d.c) { votes[c[3]] += c[4]; formal += c[4]; dFormal += c[4]; }
     if (d.tpp && d.tpp[0] + d.tpp[1] > 0) { alp += d.tpp[0]; lnp += d.tpp[1]; nTpp++; }
+    if (dFormal && d.tpp && d.tpp[2] != null) { tNum += dFormal * d.tpp[2]; tDen += dFormal; }
+    for (const f of FAMS) {
+      const cs = d.c.filter((c) => c[3] === f);
+      if (cs.length && cs.every((c) => c[5] != null) && dFormal) { swNum[f] += dFormal * cs.reduce((x, c) => x + c[5], 0); swDen[f] += dFormal; }
+    }
   }
   return { idx, formal, fp: Object.fromEntries(FAMS.map((f) => [f, formal ? 100 * votes[f] / formal : null])),
-    fpSw: Object.fromEntries(FAMS.map((f) => [f, null])), tpp: alp + lnp ? 100 * alp / (alp + lnp) : null, nTpp };
+    fpSw: Object.fromEntries(FAMS.map((f) => [f, swDen[f] ? swNum[f] / swDen[f] : null])),
+    tpp: alp + lnp ? 100 * alp / (alp + lnp) : null, tppSw: tDen ? tNum / tDen : null, nTpp };
 }
 const statBreakdownCache = new WeakMap(), statBreakdownViews = new Map();
 function statBreakdownRows(m, st) {
   if (!statBreakdownCache.has(m)) statBreakdownCache.set(m, new Map());
   const cache = statBreakdownCache.get(m);
   if (cache.has(st)) return cache.get(st);
-  const states = st === "AUS" && !STATE_YEARS.has(m.year) ? STATES.filter((s) => m.areas[s] && m.areas[s].formal > 0).map((s) => ({ key: s, label: STATE_TITLE[s], short: s, A: m.areas[s] })) : [];
+  const states = st === "AUS" && !STATE_YEARS.has(m.year) ? STATES.filter((s) => m.areas[s] && m.areas[s].formal > 0).map((s) => ({ key: s, label: STATE_TITLE[s], short: s === "NSW" || s === "ACT" ? s : STATE_TITLE[s], A: m.areas[s] })) : [];
   const classes = CLS.map((c) => {
     const idx = m.areas[st].idx.filter((i) => m.res.divs[i].cls === c);
-    // the compound reads hyphenated over the figures: "Inner-metro primaries"
-    return idx.length ? { key: c, label: CLS_SHORT[c], short: CLS_SHORT[c].replace(" ", "-"), A: statClassArea(m, idx) } : null;
+    return idx.length ? { key: c, label: CLS_SHORT[c], short: CLS_SHORT[c], A: statClassArea(m, idx) } : null;
   }).filter((r) => r && r.A.formal > 0);
   const result = { states: states.length > 1 ? states : [], classes };
   cache.set(st, result);
@@ -279,7 +291,9 @@ function statBreakdown(m, st, kind, rows) {
     const pair = Number.isFinite(A.tpp) ? `<span class="st-pv-tpp" role="group" aria-label="Labor ${f1(A.tpp)}%, ${esc(oppNameW())} ${f1(100 - A.tpp)}%"><b style="color:${css(TH.party.alp)}">${f1(A.tpp)}</b><i aria-hidden="true">–</i><b style="color:${css(TH.party.lnp)}">${f1(100 - A.tpp)}</b></span>` : `<span class="st-note">No two-party count available.</span>`;
     // the head's swing line, per area that carries one (states; not as-it-stands frames)
     const sw = isNowY(m.year) || A.tppSw == null ? "" : Math.abs(A.tppSw) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b style="color:${css(TH.party[A.tppSw > 0 ? "alp" : "lnp"])}">+${Math.abs(A.tppSw).toFixed(1)}</b> swing</span>`;
-    body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(r.short)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(r.short)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
+    // metro types set as compound modifiers over the figures: "Inner-metro primaries"
+    const nm = kind === "classes" ? r.short.replace(" ", "-") : r.short;
+    body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(nm)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(nm)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
   }
   return `<section class="st-pv" data-pv-kind="${kind}" data-pv-area="${esc(st)}" aria-label="${esc(title)}"><div class="st-pv-head"><h4>${esc(title)}</h4><button type="button" class="st-pv-control" data-pv-action="cycle" title="Cycle through ${title.toLowerCase()}" aria-label="Show ${esc(next.label)} primaries and 2PP" aria-controls="${id}">${cycleIcon}</button><button type="button" class="st-pv-control" data-pv-action="list" title="${view.mode === 'list' ? 'Collapse list' : 'Show all results'}" aria-label="${view.mode === 'list' ? 'Collapse' : 'Show all'} ${title.toLowerCase()}" aria-expanded="${view.mode === 'list'}" aria-controls="${id}">${listIcon}</button></div><div id="${id}"${view.mode === "closed" ? " hidden" : ""}>${body}</div></section>`;
 }
