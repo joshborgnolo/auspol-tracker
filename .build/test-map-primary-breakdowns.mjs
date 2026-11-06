@@ -22,7 +22,7 @@ const ctx = vm.createContext({
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -98,4 +98,37 @@ for(const r of oldRows) {
   assert.equal(cols.map((c)=>c[4]).join("|"),order,"every comparison row has the same party order");
   close(cols.reduce((n,c)=>n+c[1],0),100,"shared columns preserve the primary total");
 }
-console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, historical and Now frames passed.");
+// the head's "Others" figure opens into the bloc inside it
+const cols25=api.statPrimaryCols(current,current.areas.AUS),oth25=cols25[cols25.length-1][1];
+const rows25=api.statOthersRows(current.areas.AUS,cols25);
+close(rows25.reduce((n,r)=>n+r[1],0),oth25,"the Others breakdown reproduces the Others figure");
+assert.deepEqual(JSON.parse(JSON.stringify(rows25.map((r)=>r[3]))),["Independents","One Nation","All other parties"]);
+assert.ok(!rows25.some((r)=>r[4]==="grn"),"the Greens' own column stays out of the breakdown");
+let g=api.statPrimaryGrid(current,current.areas.AUS,"",true);
+assert.match(g,/class="st-othb"/,"the figure carries its opener when shut");
+assert.match(g,/aria-expanded="false"/);
+assert.ok(g.includes(`<b>${oth25.toFixed(1)}</b>`),"the shut figure shows the Others total");
+assert.ok(!g.includes("st-othx"),"nothing lists while shut");
+api.statScopeOf(current).open=true;
+g=api.statPrimaryGrid(current,current.areas.AUS,"",true);
+assert.ok(!g.includes("st-othb"),"the figure button is gone once open");
+assert.match(g,/repeat\(5,auto\)/,"the remaining figures recentre on one fewer column");
+assert.match(g,/class="st-othx"/);
+for(const r of rows25) {
+  assert.ok(g.includes(`${r[3]} <b>${r[1].toFixed(1)}</b>`),`open line shows ${r[3]}`);
+  assert.ok(g.includes(`<small>${(r[2]>=0?"+":"−")+Math.abs(r[2]).toFixed(1)}</small>`),`open line shows ${r[3]}'s change`);
+}
+assert.ok(!api.statPrimaryGrid(current,current.areas.AUS).includes("st-othb"),"the breakdown cycle view's grid keeps a plain figure");
+api.statScopeOf(current).open=false;
+api.statScopeOf(now).open=true;
+const gNow=api.statPrimaryGrid(now,now.areas.AUS,"",true);
+assert.ok(gNow.includes("st-othx"),"an as-it-stands frame lists its Others too");
+assert.ok(!gNow.includes("<small"),"an as-it-stands frame carries no change figures");
+api.statScopeOf(now).open=false;
+const colsSa16=api.statPrimaryCols(old,old.areas.SA),nxt16=colsSa16.find((c)=>c[4].startsWith("party:"));
+assert.ok(nxt16,"Xenophon stands out of South Australia's Others");
+const rowsSa16=api.statOthersRows(old.areas.SA,colsSa16);
+close(rowsSa16.reduce((n,r)=>n+r[1],0),colsSa16[colsSa16.length-1][1],"SA's breakdown reproduces its Others figure");
+close(rowsSa16.find((r)=>r[4]==="oth")[1],old.areas.SA.fp.oth-nxt16[1],"the lump excludes the broken-out party");
+assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout carries no change");
+console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");
