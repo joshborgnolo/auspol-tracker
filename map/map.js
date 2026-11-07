@@ -9630,18 +9630,15 @@ function legendHTML(m) {
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
+  // the Drawn-as switch rides the winner lens's title line (user call 2026-11-07)
+  const drawRow = S.view === "map" ? drawRowHTML(m) : "";
   // the chamber view chooses its chamber first
   let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
     case "winner": {
-      const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
-      h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
-      // the seats are in every view, and a party with none is left out; their tallies
-      // live in the head's Seats row, so the legend stays colour and tag (2026-11-07).
-      // Community Strong folds into independents over polling places, as its places are drawn
-      const nOf = (f) => (boothsOn && f === "ind" ? (cnt.ind || 0) + (cnt.csa || 0) : cnt[f]);
-      const catFams = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : nOf(f) && famEraOpts(m).includes(f)));
-      h += `<div class="lg-cats">${catFams.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)}</span>`).join("")}</div>`;
+      // title and switch share one line, and there is no seat legend at all — the
+      // tallies live in the head's Seats row and the colours say themselves on the map
+      h += `<div class="lg-head"><div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>${drawRow}</div>`;
       break;
     }
     case "tpp": {
@@ -9812,12 +9809,16 @@ function legendHTML(m) {
   }
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
-    h += drawRowHTML(m) + drawNoteHTML(m);
-    // the left-hand lines stack in a column of their own, free of the scale's rows beside them
-    const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
-    t.innerHTML = h; left.className = "lg-left";
-    for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-note, .lg-shapes, .lg-draw, .lg-bal")) left.appendChild(c);
-    t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
+    if (S.lens !== "winner") h += drawRow;
+    h += drawNoteHTML(m);
+    // the left-hand lines stack in a column of their own, free of the scale's rows
+    // beside them — the winner lens skips this: its title line spans the legend
+    if (S.lens !== "winner") {
+      const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
+      t.innerHTML = h; left.className = "lg-left";
+      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-note, .lg-shapes, .lg-draw, .lg-bal")) left.appendChild(c);
+      t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
+    }
   }
   return h;
 }

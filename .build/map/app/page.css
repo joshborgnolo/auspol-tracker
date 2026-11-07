@@ -194,6 +194,9 @@ button { cursor: pointer; background: none; border: 0; }
 .lg-contest { margin-top: 1px; font-weight: 400; }
 .lg-contest span { font-size: 12px; color: var(--ink-3); }
 .lg-left .lg-draw ~ .lg-note { margin-top: 3px; }
+/* the winner lens's title and Drawn-as switch share one line across the legend */
+.mp-legend > .lg-head { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 4px 20px; flex-wrap: wrap; min-width: 0; }
+.lg-head .lg-draw { margin-top: 0; }
 .lg-bal { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 12px; color: var(--ink-3); }
 .lg-bal svg { flex: none; fill: none; stroke: var(--ink-3); stroke-width: 1; }
 /* under the scale, the shorter column and the wider: in the left one it would wrap and the strip would grow */

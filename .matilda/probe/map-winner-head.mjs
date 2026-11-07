@@ -3,9 +3,9 @@
       (agg.ptpp stamped from the shipped previous frame; sa26 stays bare
       because its notional tally covers 28% of the roll v sa22's 88%);
    2. 'now' frames show NO primary or two-party deltas (seats keep theirs);
-   3. the winner legend is colour and tag only — the seat tallies live in
-      the head's Seats row, so neither counts nor a "seats" unit chip
-      shows, over seats or over polling places (2026-11-07);
+   3. the winner lens has NO seat legend at all — its title and the
+      Drawn-as switch share one full-width .lg-head line, and the seat
+      tallies stay solely in the head's Seats row (2026-11-07);
    4. the winner head retires the duplicate Two-party-preferred hero
       section below it (kept on the tpp lens);
    5. the by-state table is headed "By state or territory". */
@@ -140,25 +140,49 @@ const stat = (page) => page.evaluate(() => {
   check("now: winner head also retires the 2PP hero", s.tppHero === false);
   await p.close();
 }
-// ---- now legend: colour and tag only — the head's Seats row owns the tallies
+// ---- winner legend: no seat legend at all; its title and the Drawn-as switch share one line
 {
   const p = await open("now");
-  const seats = await p.evaluate(() => ({
-    key: [...document.querySelectorAll(".lg-cats > span")].map((e) => e.textContent.trim().replace(/\s+/g, " ")),
-    counts: document.querySelectorAll(".lg-cats b").length,
-    unit: !!document.querySelector(".lg-unit"),
-  }));
-  check("legend: seven colour chips on the now frame", seats.key.length === 7, JSON.stringify(seats.key));
-  check("legend: no counts, no seats-unit chip", seats.counts === 0 && seats.unit === false, JSON.stringify(seats));
-  check("legend: tags carry no digits", seats.key.every((s) => !/\d/.test(s)), JSON.stringify(seats.key));
+  const head = await p.evaluate(() => {
+    const hd = document.querySelector(".lg-head");
+    if (!hd) return { missing: true };
+    const t = hd.querySelector(".lg-t").getBoundingClientRect();
+    const d = hd.querySelector(".lg-draw");
+    const dr = d && d.getBoundingClientRect();
+    return {
+      missing: false,
+      grid: getComputedStyle(hd).gridColumn,
+      nestedInLeft: !!hd.closest(".lg-left"),
+      cats: document.querySelectorAll(".lg-cats").length,
+      drawInside: !!d,
+      sameRow: dr ? Math.abs((t.top + t.height / 2) - (dr.top + dr.height / 2)) <= 6 : null,
+      buttons: d ? [...d.querySelectorAll("button")].map((b) => b.textContent.trim()).join(",") : "",
+      label: d ? d.querySelector("span").textContent.trim() : "",
+      over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  check("legend: no .lg-head missing", !head.missing, JSON.stringify(head));
+  check("legend: the title line spans the legend, outside lg-left", head.grid === "1 / -1" && head.nestedInLeft === false, JSON.stringify(head));
+  check("legend: no seat-legend chips at all", head.cats === 0, String(head.cats));
+  check("legend: Drawn as rides the title line", head.drawInside && head.sameRow === true, JSON.stringify(head));
+  check("legend: Drawn as keeps its label and four buttons", head.label === "Drawn as" && head.buttons === "Seats,Balloons,Surface,Areas", JSON.stringify(head));
+  check("legend: no horizontal overflow", head.over <= 0, String(head.over));
   await p.evaluate(() => window.__map.setDraw("balloons"));
   await new Promise((r) => setTimeout(r, 700));
-  const overBooths = await p.evaluate(() => ({
-    counts: document.querySelectorAll(".lg-cats b").length,
-    unit: !!document.querySelector(".lg-unit"),
-    cats: document.querySelectorAll(".lg-cats > span").length,
+  const balloons = await p.evaluate(() => ({
+    cats: document.querySelectorAll(".lg-cats").length,
+    bal: !!document.querySelector(".lg-bal"),
+    draw: !!document.querySelector(".lg-head > .lg-draw"),
+    over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
   }));
-  check("over booths too: no counts, no unit chip, six chips (CS folds into IND)", overBooths.counts === 0 && overBooths.unit === false && overBooths.cats === 6, JSON.stringify(overBooths));
+  check("over booths too: no seat legend, head line stands, balloons key drawn", balloons.cats === 0 && balloons.draw && balloons.bal && balloons.over <= 0, JSON.stringify(balloons));
+  await p.evaluate(() => { window.__map.setDraw("seats"); window.__map.setYear(2025); });
+  await new Promise((r) => setTimeout(r, 900));
+  const y2025 = await p.evaluate(() => ({
+    headText: (document.querySelector(".lg-head .lg-t") || {}).textContent || "",
+    cats: document.querySelectorAll(".lg-cats").length,
+  }));
+  check("2025: head line names the election, still no chips", y2025.cats === 0 && /Who won each seat in 2025/.test(y2025.headText), JSON.stringify(y2025));
   await p.close();
 }
 
