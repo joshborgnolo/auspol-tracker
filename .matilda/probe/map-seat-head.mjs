@@ -3,9 +3,10 @@
 // the unlabelled First-preferences figure row, and the phantom-styled
 // Informal .big block with .st-secstat blocks over the shared twoPartyFigures
 // spine):
-//   1. Final count: candidate surnames name the figures, the winner's tag
-//      chip reads "elected"/"re-elected" off the left figure, swing · status
-//      ride one line under them ("+5.5 swing · safe");
+//   1. Final count: separator on top, "margin of M · status" inside the
+//      eyebrow, candidate surnames ABOVE black figures in the swing font and
+//      the parties' own colours, the winner's "retain"/"win" chip hung left,
+//      swing line beneath, no narrating dek;
 //   2. Primaries: the plain "Primaries" eyebrow, the family figures ≥10 in
 //      the head's order with change smalls, an independent heavyweight its
 //      own column;
@@ -48,29 +49,50 @@ const raw = async (y) => page.evaluate(async (yy) => {
 const seat = () => page.evaluate(() => {
   const blocks = [...document.querySelectorAll("#story .st-secstat")];
   const head = blocks[0];
+  const prim = blocks.find((b) => { const l = b.querySelector(".st-lab"); return l && l.textContent.trim() === "Primaries"; });
+  const notion = blocks.find((b) => { const l = b.querySelector(".st-lab"); return l && /^Two-party preferred \(notional/.test(l.textContent.trim()); });
   const tpp = head && head.querySelector(".st-tpp");
   const nmL = tpp && tpp.querySelector(".st-nm-l"), nmR = tpp && tpp.querySelector(".st-nm-r");
+  const figs = tpp ? [...tpp.querySelectorAll(":scope > b")] : [];
+  const figL = figs[0] || null, figR = figs[figs.length - 1] || null;
   const fg = head && head.querySelector(".st-fg");
   const sw = head && head.querySelector(".st-swing");
   const lab = head && head.querySelector(".st-lab");
   const stat = head && head.getBoundingClientRect();
   const fgr = fg && fg.getBoundingClientRect();
+  const nmLr = nmL && nmL.getBoundingClientRect(), figLr = figL && figL.getBoundingClientRect();
+  const storyTxt = document.getElementById("story").textContent;
+  const notionTpp = notion && notion.querySelector(".st-tpp");
+  const notionNmL = notionTpp && notionTpp.querySelector(".st-nm-l");
+  const notionFig = notionTpp && notionTpp.querySelector(".fig-l");
   return {
     blocks: blocks.length,
     lab: lab ? lab.textContent.trim() : null,
+    sep: head && head.firstElementChild ? head.firstElementChild.classList.contains("st-sep") : null,
     nmL: nmL ? nmL.textContent.trim() : null,
     nmR: nmR ? nmR.textContent.trim() : null,
-    leftFlush: nmL ? Math.abs(nmL.getBoundingClientRect().right - tpp.children[0].getBoundingClientRect().right) : null,
-    rightFlush: nmR ? Math.abs(nmR.getBoundingClientRect().left - tpp.children[2].getBoundingClientRect().left) : null,
+    nmAboveFigures: nmLr && figLr ? nmLr.bottom <= figLr.top + 0.5 : null,
+    leftFlush: nmLr && figLr ? Math.abs(nmLr.right - figLr.right) : null,
+    rightFlush: nmR && figR ? Math.abs(nmR.getBoundingClientRect().left - figR.getBoundingClientRect().left) : null,
+    figUncoloured: figL != null && !/color/.test(figL.getAttribute("style") || ""),
+    nmPartyColoured: nmL != null && /color/.test(nmL.getAttribute("style") || ""),
     tag: fg ? fg.textContent.trim() : null,
     tagCls: fg ? fg.className : null,
     tagInnerL: fg ? Math.round((fgr.left - stat.left) * 10) / 10 : null,
     nmFont: nmL ? getComputedStyle(nmL).fontSize : null,
     swing: sw ? sw.textContent.trim() : null,
+    oldDekGone: !/won the final count/.test(storyTxt),
+    notionLab: notion ? notion.querySelector(".st-lab").textContent.trim() : null,
+    notionNmL: notionNmL ? notionNmL.textContent.trim() : null,
+    notionNmFont: notionNmL ? getComputedStyle(notionNmL).fontSize : null,
+    notionNmAbove: notionNmL && notionFig ? notionNmL.getBoundingClientRect().bottom <= notionFig.getBoundingClientRect().top + 0.5 : null,
+    notionSwing: notion && notion.querySelector(".st-swing") ? notion.querySelector(".st-swing").textContent.trim() : null,
+    notionSep: notion && notion.firstElementChild ? notion.firstElementChild.classList.contains("st-sep") : null,
+    oldSwingNoteGone: !/A swing of [\d.]+ points?/.test(storyTxt),
     heroCount: document.querySelectorAll("#story .hero").length,
-    primLab: blocks[1] ? blocks[1].querySelector(".st-lab").textContent.trim() : null,
-    primCells: blocks[1] ? [...blocks[1].querySelectorAll(".st-grid > b")].map((b) => b.textContent.trim()) : [],
-    primSmalls: blocks[1] ? [...blocks[1].querySelectorAll(".st-grid small")].map((s) => s.textContent.trim()) : [],
+    primLab: prim ? prim.querySelector(".st-lab").textContent.trim() : null,
+    primCells: prim ? [...prim.querySelectorAll(".st-grid > b")].map((b) => b.textContent.trim()) : [],
+    primSmalls: prim ? [...prim.querySelectorAll(".st-grid small")].map((s) => s.textContent.trim()) : [],
     infText: document.querySelector("#story .st-inf") ? document.querySelector("#story .st-inf").textContent.trim() : null,
     infNote: document.querySelector("#story .st-inf + .st-note") ? document.querySelector("#story .st-inf + .st-note").textContent.trim() : null,
     bigCount: document.querySelectorAll("#story .big").length,
@@ -107,18 +129,22 @@ let x = await raw("2025").then((r) => {
 const f1g = (v) => (v == null || Number.isNaN(v) ? "–" : v.toFixed(1));
 ok("Durack: first block is the head-idiom Final count", t.blocks === 2 && /^Final count \(margin of /.test(t.lab || ""), JSON.stringify(t));
 const tight = (v) => { const f = f1g(v); return f === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f; };
-ok("Durack: margin label matches data", t.lab === `Final count (margin of ${tight(Math.abs(x.winPct - 50))})`, `${t.lab} vs margin of ${tight(Math.abs(x.winPct - 50))}`);
-ok("Durack: names are the finalists' surnames, not party names", t.nmL === "Price" && t.nmR === "Wheatland", `${t.nmL} · ${t.nmR}`);
-ok("Durack: candidate names render legibly large under the figures", t.nmFont === "15px", t.nmFont);
-ok("Durack: names flush with their figures' inside edges", t.leftFlush != null && t.leftFlush <= 2 && t.rightFlush != null && t.rightFlush <= 2, JSON.stringify({ L: t.leftFlush, R: t.rightFlush }));
-ok("Durack: winner's tag reads re-elected off the left figure", t.tag === "re-elected" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
-ok("Durack: tag's inner face hugged to the content edge", t.tagInnerL != null && Math.abs(t.tagInnerL) <= 2, `${t.tagInnerL}px`);
 const swSt = (w) => (w < 56 ? "marginal" : w < 60 ? "fairly safe" : "safe");
-ok("Durack: swing · status line", t.swing === `+${Math.abs(x.sw).toFixed(1)} swing · ${swSt(x.winPct)}`, `${t.swing} vs +${Math.abs(x.sw).toFixed(1)} swing · ${swSt(x.winPct)}`);
+ok("Durack: a separator crowns the block", t.sep === true);
+ok("Durack: eyebrow carries margin · classification", t.lab === `Final count (margin of ${tight(Math.abs(x.winPct - 50))} · ${swSt(x.winPct)})`, t.lab);
+ok("Durack: names are the finalists' surnames, not party names", t.nmL === "Price" && t.nmR === "Wheatland", `${t.nmL} · ${t.nmR}`);
+ok("Durack: names in the swing font size", t.nmFont === "20px", t.nmFont);
+ok("Durack: names ride above the figures, party-coloured", t.nmAboveFigures === true && t.nmPartyColoured === true, JSON.stringify({ up: t.nmAboveFigures, col: t.nmPartyColoured }));
+ok("Durack: figures render uncoloured (black)", t.figUncoloured === true);
+ok("Durack: names flush with their figures' inside edges", t.leftFlush != null && t.leftFlush <= 2 && t.rightFlush != null && t.rightFlush <= 2, JSON.stringify({ L: t.leftFlush, R: t.rightFlush }));
+ok("Durack: winner's tag reads retain off the left figure", t.tag === "retain" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
+ok("Durack: tag's inner face hugged to the content edge", t.tagInnerL != null && Math.abs(t.tagInnerL) <= 2, `${t.tagInnerL}px`);
+ok("Durack: swing line carries no status tail", t.swing === `+${Math.abs(x.sw).toFixed(1)} swing`, t.swing);
+ok("Durack: the old narrating dek is gone", t.oldDekGone === true);
 ok("Durack: no hero/margin-bar remnants", t.heroCount === 0 && t.bigCount === 0, `hero ${t.heroCount} big ${t.bigCount}`);
 ok("Durack: primaries eyebrow reads 'Primaries' plain", t.primLab === "Primaries", t.primLab);
 ok("Durack: per-family figures with changes under each", t.primCells.length === t.primSmalls.length && t.primSmalls.some((s) => /‑|\-/.test(s) || s === "+0.0" || /^[+-0]/.test(s)), JSON.stringify({ cells: t.primCells, smalls: t.primSmalls }));
-ok("Durack: candidate table kept its rows under 'The candidates'", t.candRows >= 5 && t.candH3.some((h) => /^The candidates/.test(h)), `${t.candRows} rows, heads ${t.candH3.join("/")}`);
+ok("Durack: candidate table kept its rows under 'The candidates by primary vote'", t.candRows >= 5 && t.candH3.some((h) => /^The candidates by primary vote/.test(h)), `${t.candRows} rows, heads ${t.candH3.join("/")}`);
 ok("Durack: the census section heads itself 'Census data' plain", t.candH3.includes("Census data"), t.candH3.join("/"));
 ok("Durack: informal rides the national-view line with the comparison inside", t.infText === `Informal votes: ${f1g(x.st)}% (vs national average ${f1g(x.infPool)}%)`, t.infText);
 
@@ -126,9 +152,15 @@ ok("Durack: informal rides the national-view line with the comparison inside", t
 let hd = await hist();
 ok("Durack: the chart titles itself by the name's own record", hd.found && hd.title === "Since 2010" && hd.firstLab === "’10", JSON.stringify(hd));
 
-/* Melbourne 2025 — its series runs to 1993 in the data; domain and heading follow */
+/* Melbourne 2025 — non-classic finish, so the AEC's notional 2PP is a third
+   head block; its record-to-1993 drives the chart */
 await div("Melbourne");
 await wait(800);
+t = await seat();
+ok("Melbourne: notional 2PP rides the seat head idiom", t.blocks === 3 && /^Two-party preferred \(notional, margin of \d+\.\d+\)$/.test(t.notionLab || ""), t.notionLab);
+ok("Melbourne: notional named parties above the figures", t.notionNmL === "Labor" && t.notionNmFont === "20px" && t.notionNmAbove === true, JSON.stringify({ l: t.notionNmL, f: t.notionNmFont, up: t.notionNmAbove }));
+ok("Melbourne: notional block separated like the final count's", t.notionSep === true);
+ok("Melbourne: the old hero render and its narration are gone", t.heroCount === 0 && t.oldSwingNoteGone === true, JSON.stringify({ hero: t.heroCount, note: t.oldSwingNoteGone }));
 let h = await hist();
 ok("Melbourne: the deep record sets domain, heading and origin label", h.found && h.title === "Since 1993" && h.minLineX >= 25.9 && h.minDotX >= 25.9 && h.firstLab === "’93" && h.minLabX >= 25.9, JSON.stringify(h));
 
@@ -138,25 +170,26 @@ await wait(800);
 t = await seat();
 x = await raw("2025").then((r) => r.divs.find((q) => q.n === "Bradfield"));
 const bWin = (100 * x.tpp[0]) / (x.tpp[0] + x.tpp[1]);
-ok("Bradfield: margin widens decimals until it shows", /^Final count \(margin of 0\.0\d+\)$/.test(t.lab || ""), `${t.lab} (share ${bWin.toFixed(4)})`);
+ok("Bradfield: margin widens decimals until it shows", /^Final count \(margin of 0\.0\d+ · (marginal|fairly safe|safe)\)$/.test(t.lab || ""), `${t.lab} (share ${bWin.toFixed(4)})`);
 
 /* Farrer on the now frame — by-election misfire: elected tag, named-led primaries */
 await show("now");
 await div("Farrer");
 await wait(800);
 t = await seat();
-ok("Farrer: tag reads elected, left-hung", t.tag === "elected" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
+ok("Farrer: tag reads win, left-hung", t.tag === "win" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
+ok("Farrer: no swing line where nothing swings", t.swing === null, `${t.swing}`);
 ok("Farrer: primaries eyebrow reads 'Primaries' plain", t.primLab === "Primaries", t.primLab);
 ok("Farrer: no phantom Labor 0.0 column", !t.primCells.some((c) => c.startsWith("0.0") || c.startsWith("-0.0") || c === "–"), JSON.stringify(t.primCells));
 ok("Farrer: informal rides the national-view line (or says honestly none is filed)", /^(Informal votes: \d+\.\d% \(vs national average \d+\.\d%\)|Informal votes: no count filed for the by-election yet)$/.test(t.infText || ""), t.infText);
 ok("Farrer: turnout note rides its head block", /^Turnout was \d+\.\d% of [\d,]+ enrolled\.$/.test(t.infNote || ""), t.infNote);
 
-/* 2013 · Durack — first election for this member: elected */
+/* 2013 · Durack — first election for this member: win */
 await show("2013");
 await div("Durack");
 await wait(800);
 t = await seat();
-ok("2013 Durack: a first election is 'elected'", t.tag === "elected", t.tag);
+ok("2013 Durack: a first election reads 'win'", t.tag === "win", t.tag);
 
 /* scope menu: a tall menu clamps to the viewport and a pick returns focus to
    the trigger (the handler-side fixes shipped with the seat heads) */

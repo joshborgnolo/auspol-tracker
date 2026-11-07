@@ -7802,26 +7802,28 @@ function statusOf(winPct) { return winPct < 56 ? "marginal" : winPct < 60 ? "fai
    view speaks the head's figure language instead of the old hero/margin-bar
    layout (shipped 2026-11-08) */
 const tone = (f) => `style="color:${css(TH.party[f])}"`;
-/* the head's swing figure. "side" names a family whose colour the figure
-   wears (the seat add-ons pass the winner's own family when a swing isn't
-   meaningful for the count shown); "trail" appends the seat's own verdict
-   ("+5.5 swing · safe") */
-function swingFigure(s, side = null, trail = "") {
+/* the head's swing figure: no figure under a quarter point reads "No swing".
+   "side" names a family whose colour the figure wears (the seat's Final
+   count passes the winner's own when a swing isn't meaningful) */
+function swingFigure(s, side = null) {
   if (s == null) return "";
-  if (Math.abs(s) < 0.05) return `<span class="st-swing">No swing${trail}</span>`;
+  if (Math.abs(s) < 0.05) return `<span class="st-swing">No swing</span>`;
   const f = side || (s > 0 ? "alp" : "lnp");
-  return `<span class="st-swing"><b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b> swing${trail}</span>`;
+  return `<span class="st-swing"><b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
 }
 /* margin figures widen decimals until the figure shows: a hairline margin
    (Bradfield '25, 26 votes) vanishes at one decimal — show two, or three if
    two would still print zeros (the f1 check keeps null/NaN "–" safe) */
 const tightFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f1(v));
 /* the head's two-party figure block: eyebrow, the pair of figures, the names
-   row under them, and the chip hung off the block's edge. One spine for the
-   head (party names + gov tag) and the seat's Final count (candidate
-   surnames + the winner's elected/re-elected tag) */
-const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "") =>
-  `<span class="st-lab">${label}</span><span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span>${tag}</span>`;
+   row, and the chip hung off the block's edge. One spine for the head (party
+   names + gov tag) and the seat's Final count (candidate surnames + the
+   winner's elected/re-elected tag); the seat's variant puts the names ABOVE
+   black figures in the swing line's font (user call 2026-11-09) */
+const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "", namesUp = false) =>
+  namesUp
+    ? `<span class="st-lab">${label}</span><span class="st-tpp st-nmup"><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span><b class="fig-l">${f1(aPct)}</b><i>–</i><b class="fig-r">${f1(bPct)}</b>${tag}</span>`
+    : `<span class="st-lab">${label}</span><span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span>${tag}</span>`;
 
 /* a seat's stat payload: win family × run family (charged on the final two),
    their shares, per-family first-preference shares and per-family changes
@@ -7849,18 +7851,18 @@ function seatStatOf(m, d, py) {
   return o;
 }
 /* the seat's Final count section in the head's figure idiom: surname names
-   row, the winner's tag chip, and the swing · status tail */
+   row over black figures, the winner's tag chip, the swing line, and the
+   seat's own classification inside the eyebrow's margin parenthetical */
 function seatFinalStat(m, d) {
   const p = seatStatOf(m, d, prevFor(m, d));
   const [wn, rn] = pairNames(d.win, d.run);
-  /* "re-elected" only where the same member won; a new member held on for
-     their party or took it off someone — for a by-election the record speaks
-     for itself (change is unfiled there) — and both read "elected" */
-  const tag = `<span class="st-fg st-fg-l"><b>${d.change && d.change.kind === "re" ? "re-elected" : "elected"}</b></span>`;
-  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag);
-  const trail = ` · ${statusOf(p.tpp[0])}`;
-  const sw = p.swing != null ? swingFigure(p.swing, null, trail) : `<span class="st-swing">${statusOf(p.tpp[0])}</span>`;
-  return `<div class="st-sec"><div class="st-stat st-secstat">${two}${sw}</div></div>`;
+  /* "retain" only where the same member won; a new member held on for their
+     party or took it off someone — for a by-election the record speaks for
+     itself (change is unfiled there) — and both read "win" */
+  const tag = `<span class="st-fg st-fg-l"><b>${d.change && d.change.kind === "re" ? "retain" : "win"}</b></span>`;
+  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true);
+  const sw = swingFigure(p.swing);
+  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-sep" aria-hidden="true"></span>${two}${sw}</div></div>`;
 }
 /* the seat's Primaries head: one column per family at ten per cent or more
    (an independent heavyweight included — unlike the head, where independents
@@ -8904,7 +8906,7 @@ function storyArea(m, st) {
 const prevFor = (m, d) => (isNowY(m.year) ? (d && d.by ? frameBaseY(m.year) : m.res.prev) : prevYearOf(m.year) ?? (m.res && m.res.prev));
 function seatHedDek(m, d) {
   const prev = prevFor(m, d);
-  const [wn, rn] = pairNames(d.win, d.run);
+  const [, rn] = pairNames(d.win, d.run);
   const wParty = theParty(d.win.ab, d.win.pn), rParty = partyName(d.run.ab, d.run.pn);
   const close = d.votesMargin < 1500 && d.margin < 1;
   switch (S.lens) {
@@ -8937,14 +8939,9 @@ function seatHedDek(m, d) {
       else if (ch.kind === "new") hed = `${ds(d.win.n)} won the new seat of ${ds(d.n)}`;
       else hed = `${ds(d.win.n)} won ${ds(d.n)}`;
       if (close && ch.kind !== "re") hed += ` by ${int(d.votesMargin)} votes`;
-      const fpLead = [...d.c].sort((a, b) => b.v - a.v)[0];
-      let dek = `${ds(wn)} won the final count ${f1(d.winPct)}–${f1(100 - d.winPct)} against ${ds(rn)} (${esc(rParty)})`;
-      if (d.classic && d.tppSw != null) dek += `, ${swingPhrase(d.tppSw, prev)}`;
-      dek += ".";
-      if (fpLead !== d.win) dek += ` ${ds(surname(fpLead.n))} led on first preferences, ${f1((100 * fpLead.v) / d.formal)}% to ${f1((100 * d.win.v) / d.formal)}%.`;
-      dek += ` ${isState() ? "On the usual scale" : "By the AEC’s measure"} that makes ${ds(d.n)} ${statusOf(d.winPct)}.`;
-      if (ch.kind === "re" && ch.since < (isNowY(m.year) ? frameBaseY(m.year) : m.year)) dek += ` ${ds(surname(d.win.n))} has held it since ${ch.since}.`;
-      return { hed, dek };
+      // the Final count block beneath now carries everything the dek used to
+      // narrate (margin, swing, classification); the headline stands alone
+      return { hed, dek: "" };
     }
     case "tpp": {
       if (axisNow(m) !== "AC") return axisSeatHedDek(m, d);
@@ -9054,12 +9051,18 @@ function storyDiv(m, i) {
   const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
   let h = head(d.n, meta, hed, dek);
   h += seatFinalStat(m, d);
-  if (d.tpp != null && !d.classic) h += `<div class="st-sec"><h3>Two-party preferred <small>the AEC’s notional count</small></h3><div class="hero">${heroPair("Labor", d.tpp, "alp", "Coalition", 100 - d.tpp, "lnp")}</div><p class="st-note">${swingPhrase(d.tppSw, prev).replace(/^./, (c) => c.toUpperCase())}.</p></div>`;
+  /* the AEC's notional two-party count, where the final pair wasn't the
+     majors: the same head-block idiom as the Final count (the name of the
+     minority coalition partner comes through coalW on state frames) */
+  if (d.tpp != null && !d.classic) {
+    const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coalW(1).replace(/^The /, ""), "", true);
+    h += `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-sep" aria-hidden="true"></span>${two}${swingFigure(d.tppSw)}</div></div>`;
+  }
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
   h += seatPrimariesStat(m, d);
-  h += `<div class="st-sec"><h3>The candidates <small>first preferences${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
+  h += `<div class="st-sec"><h3>The candidates <small>by primary vote${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
   if (d.vt) h += vtBlock([d]);
