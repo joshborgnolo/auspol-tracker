@@ -1195,7 +1195,10 @@ function paintMiniChamber() {
   g.setTransform(r, 0, 0, r, 0, 0);
   g.clearRect(0, 0, w, h);
   const sd = selDiv();
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, pad, labels: true });
+  // a Winner-lens state slice keeps the whole-frame layout's full chamber
+  // (the map beside it is what marks the state); a state picked any other
+  // way still lights only its own members here
+  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" && !sliceState(m) ? S.sel.st : null, pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {

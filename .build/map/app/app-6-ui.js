@@ -671,6 +671,14 @@ function tipFor(h) {
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
+  // a Winner-lens state slice is one pick shared with the head's figures
+  // menu: a state arrived at any side writes the menu's store, and the whole
+  // frame again ("All seats") clears it back
+  const sm = M();
+  if (S.lens === "winner" && sm && !STATE_YEARS.has(sm.year)) {
+    if (sel.level === "state" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0) statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
+    else if (sel.level === "aus") statScopeStore = { k: "aus", open: statScopeStore.open };
+  }
   if (!opts.keepTown) townPick = -1;
   reframe = null; // (a town's or city's flight sets its own again, after this)
   if (selDiv() !== prevDiv) quietSince = performance.now();
@@ -705,6 +713,11 @@ function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else i
 
 function setStatScope(sel) {
   const m = M(); if (!m) return;
+  // a state named in the menu is selected on the map too — the slice is the
+  // one pick (select re-stamps the store). A class or the whole frame steps
+  // the selection back out first.
+  if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
+  if (S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
 }
@@ -882,6 +895,12 @@ function setLens(id) {
   }
   const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
+  // the slice follows its lens: a state the figures menu had under Winner
+  // re-selects on the map when the lens comes back to it
+  if (id === "winner" && S.sel.level === "aus" && statScopeStore.k === "st" && !STATE_YEARS.has(S.year)) {
+    const mm = M();
+    if (mm && mm.areas[statScopeStore.st] && mm.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
+  }
   if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
@@ -1004,6 +1023,13 @@ async function setYear(y) {
   if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
   // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole frame
   if (S.sel.level === "state" && !b.areas[S.sel.st]) S.sel = { level: "aus" };
+  // …and the slice's other side catches up: a state kept on the new frame
+  // re-stamps the menu's store, a pick the frame can't select waits in the
+  // store, and it selects again on a frame that has it
+  if (S.lens === "winner" && !STATE_YEARS.has(y)) {
+    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0) statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
+    else if (S.sel.level === "aus" && statScopeStore.k === "st" && b.areas[statScopeStore.st] && b.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
+  }
   const hold = walkHold(spot);
   startChamberGlide();
   S.year = y;

@@ -6,6 +6,15 @@
 // the midday "… figures" compounds ("Nationwide figures", "Inner-metro
 // figures", and the demonym era's variants) all died by user call on
 // 2026-11-07: no suffix, no hyphen anywhere, NOW FRAMES INCLUDED.
+//
+// UNIFICATION (later on 2026-11-07): a state named in the menu and a state
+// selected on the map are ONE slice — the menu's pick selects the state on
+// the map (no camera move), the map's pick re-stamps the store, and the
+// whole-frame layout keeps only three state marks: the head title in the
+// state's name, the "All seats" way out above it, and the state selected in
+// the map. "All seats" (goAus) clears the slice — so year() below must NOT
+// reset the navigation after each year, or the persistence this probe pins
+// never gets exercised.
 // Start a local server from the repo root, then
 // MAP_URL=http://127.0.0.1:8765 node .build/map/probe-scope.mjs
 import assert from "node:assert/strict";
@@ -14,6 +23,9 @@ const browser = await puppeteer.launch({ executablePath: process.env.CHROME || "
 const base = process.env.MAP_URL || "http://127.0.0.1:8765";
 const label = (page) => page.$eval("#story .st-scwrap [data-scope-trigger]", (e) => e.textContent.trim());
 const menuLabels = (page) => page.$$eval("#story .st-scwrap [data-scope]", (els) => els.map((e) => `${e.dataset.scope} = ${e.textContent.trim()}${e.getAttribute("aria-pressed") ? " [pressed]" : ""}`));
+const selLevel = (page) => page.evaluate(() => ({ ...__map.S.sel }));
+const headTitle = (page) => page.$eval("#story .st-head h2", (e) => e.textContent.trim());
+const upLabel = (page) => page.$eval("#story .st-up", (e) => e.textContent.trim()).catch(() => null);
 // pick a menu item by its data-scope value, through the real trigger-open click chain
 async function pick(page, scope) {
   await page.click("#story .st-scwrap [data-scope-trigger]");
@@ -21,7 +33,7 @@ async function pick(page, scope) {
   await page.waitForFunction((s) => document.querySelector(`#story .st-scwrap [data-scope="${s}"]`)?.getAttribute("aria-pressed") === "true", { timeout: 15000 }, scope);
 }
 async function year(page, y) {
-  await page.evaluate(async (y) => { await __map.setYear(y); __map.goAus(); __map.setView("map"); }, y);
+  await page.evaluate(async (y) => { await __map.setYear(y); __map.setView("map"); }, y);
   await page.waitForFunction((y) => __map.S.year === y && __map.Y[y]?.divs, { timeout: 60000 }, y);
   await page.waitForNetworkIdle({ idleTime: 300, timeout: 15000 });
 }
@@ -50,6 +62,11 @@ try {
   // a federal state pick rides across federal years, wording following the frame…
   await pick(page, "st:NSW");
   assert.equal(await label(page), "NSW", "picked NSW on Now");
+  // the unification: a menu pick IS a map selection — the state is selected
+  // (no camera move), the head is its name, and "All seats" sits above it
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "picking NSW in the menu selects NSW in the map");
+  assert.equal(await headTitle(page), "New South Wales", "the head titles itself by the state");
+  assert.equal(await upLabel(page), "All seats", "the 'All seats' way out sits above the head");
   assert.ok(await noteShown(), "NSW keep the note — New England and Farrer are NSW seats");
   await year(page, 2025);
   await labelIs(page, "NSW", "the pick rides Now → 2025, plain on the election frame");
@@ -63,9 +80,11 @@ try {
   // …falls back where a frame has no such scope, and returns when one does
   await year(page, "vic22");
   await labelIs(page, "Victoria", "a state election frame falls back to its own jurisdiction, plain");
+  assert.equal((await selLevel(page)).level, "aus", "a frame that can't show the slice carries no map selection");
   console.log("vic22 menu:", (await menuLabels(page)).join(" | "));
   await year(page, 2025);
   await labelIs(page, "NSW", "back on a federal frame the pick returns");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "the slice re-selects itself on a frame that has it");
   await year(page, "now");
   await labelIs(page, "NSW", "and words itself plainly again on Now");
 
@@ -83,6 +102,7 @@ try {
   assert.ok(clsElection, `a seat-type scope is on the menu: ${clsScope}`);
   await pick(page, clsScope);
   assert.equal(await label(page), clsNow, `picked ${clsNow} on Now`);
+  assert.equal((await selLevel(page)).level, "aus", "a seat-type pick steps the state selection out");
   assert.ok(!(await noteShown()), `${clsNow} drops the note — its seats aren't in this class`);
   await year(page, 2025);
   await labelIs(page, clsElection, `${clsElection} — plain — survives Now → 2025`);
@@ -95,7 +115,14 @@ try {
   // and the note follows its seats: no Queensland view, back on the Rural one
   await year(page, "now");
   await pick(page, "st:QLD");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "QLD" }, "Queensland selects in the map too");
   assert.ok(!(await noteShown()), "Queensland drop the One Nation note");
+  // "All seats" clears the slice from whichever side named it: store, map and head return together
+  await page.click("#story .st-up");
+  await labelIs(page, "National", "the 'All seats' way out drops back to National");
+  assert.deepEqual(await selLevel(page), { level: "aus" }, "…and clears the map's selection");
+  assert.equal(await headTitle(page), "The House today", "…and the head is the frame's own again");
+  assert.equal(await upLabel(page), null, "…with no way further out");
   await pick(page, "cls:Rural");
   const ruralSmalls = await seatSmalls();
   assert.ok(ruralSmalls.length && ruralSmalls.some((t) => /[−+][1-9]/.test(t)), `Rural on Now carries the seat deltas: ${ruralSmalls.join(" ")}`);

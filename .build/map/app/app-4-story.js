@@ -226,7 +226,15 @@ const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
 let statScopeStore = { k: "aus" };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
   : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
-const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
+// a state slice is ONE pick, whether it came from the map or from the head's
+// figures menu: the map keeps it selected, the menu keeps its store — each
+// side writes the other, and the render reads the slice from the selection
+const sliceState = (m) => (S.lens === "winner" && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null);
+const statScopeOf = (m) => {
+  const slice = sliceState(m);
+  if (slice) return { k: "st", st: slice, open: statScopeStore.open };
+  return statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
+};
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -943,9 +951,13 @@ function vtBlock(divs, area, geography) {
 
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N } = areaStats(m, st);
+  // the state slice keeps the whole-frame layout: the head's own marks are a
+  // title in the state's name and the "All seats" way out (upLink reads the
+  // same selection) — its figures scope in through statScopeOf below
+  const slice = aus ? sliceState(m) : null;
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek, stat } = areaHedDek(m, st);
-  const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const title = slice ? STATE_TITLE[slice] : aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
   // the Winner head's meta is the scope menu (statScopeLabel words it), and
   // its head follows whichever state or seat type is picked there
@@ -1325,7 +1337,9 @@ function renderStory(force) {
   storyKey = key;
   const el = $("#story");
   el.dataset.lens = S.lens;
-  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
+  // a Winner-lens state slice renders the whole-frame layout (route "AUS"):
+  // the menu, the sections, the head — storyArea names the state's head title
+  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st)) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
   anchorGovtTag(el);
   // a second pass after the frame settles: chip width can grow a few px once
   // Commissioner lands, which is what makes the first-read clamp stale

@@ -2512,7 +2512,7 @@ for (const y of ["sa22", "sa26"]) {
 // plainly ("National", "NSW", "Inner metro") since 2026-11-07 — the "…
 // figures" run-ons and their hyphens died even on the now views, user call
 {
-  const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css");
+  const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css"), ch3 = part("app-3-chamber.js");
   // one pick shared across frames (2026-11-07): a year switch keeps the named
   // figures; a frame that can't express the pick falls back to its own "aus"
   assert.ok(st.includes("let statScopeStore = { k: \"aus\" };") && !st.includes("statScopes = new WeakMap()"), "the figures scope is one pick shared across frames, surviving a year switch");
@@ -2529,6 +2529,17 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
   assert.ok(st.includes("noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))") && st.includes('seats: ["New England", "Farrer"]') && st.includes('<span class="st-seat-note">'), "the moved-seats note follows its named seats' scope — National keeps it, NSW and Rural keep it, other figures views drop it");
+  // the slice is ONE state picked from either side (2026-11-07): the menu and
+  // the map write each other, the render reads the slice from the selection,
+  // and the whole-frame layout keeps only its own three state marks
+  assert.ok(st.includes("const sliceState = (m) =>") && st.includes('S.sel.level === "state"'), "the slice is defined from the map's state selection");
+  assert.ok(st.includes('if (slice) return { k: "st", st: slice, open: statScopeStore.open };'), "a live slice outranks the store as the head's scope");
+  assert.ok(st.includes('s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st))'), "a Winner-lens state slice renders the whole-frame layout");
+  assert.ok(st.includes("const slice = aus ? sliceState(m) : null;") && st.includes("slice ? STATE_TITLE[slice]"), "the slice's head mark is the title in the state's name (and upLink's 'All seats' reads the same selection)");
+  assert.ok(ui.includes('statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open }'), "a state arrived at any side writes the menu's store");
+  assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
+  assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
+  assert.ok(ch3.includes('S.sel.level === "state" && !sliceState(m) ? S.sel.st : null'), "the slice keeps the whole-frame chamber in the story column");
 }
 
 // the full-screen view (app-7-full.js, 2026-11-03): its way in opens the zoom plate —
