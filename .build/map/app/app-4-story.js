@@ -657,13 +657,13 @@ function informalHTML(m, st) {
   return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
 }
 /* the dropdown's item list in order (the spacebar cycle walks it too): the
-   open axis — states until sliced, then "None" and the seat types over it
+   open axis — states until sliced, then "All" and the seat types over it
    (2026-11-08, user calls) */
 function statScopeOpts(m, st) {
-  // a sliced state's axis is taken, so the menu offers the OTHER one: "None"
+  // a sliced state's axis is taken, so the menu offers the OTHER one: "All"
   // (the bare state), then the seat types over it (another state is picked on
   // the strip instead)
-  if (sliceState(m)) return [["aus", "None"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
+  if (sliceState(m)) return [["aus", "All"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
   const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
   if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
   return opts;

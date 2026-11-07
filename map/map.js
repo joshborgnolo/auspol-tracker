@@ -8363,13 +8363,13 @@ function informalHTML(m, st) {
   return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
 }
 /* the dropdown's item list in order (the spacebar cycle walks it too): the
-   open axis — states until sliced, then "None" and the seat types over it
+   open axis — states until sliced, then "All" and the seat types over it
    (2026-11-08, user calls) */
 function statScopeOpts(m, st) {
-  // a sliced state's axis is taken, so the menu offers the OTHER one: "None"
+  // a sliced state's axis is taken, so the menu offers the OTHER one: "All"
   // (the bare state), then the seat types over it (another state is picked on
   // the strip instead)
-  if (sliceState(m)) return [["aus", "None"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
+  if (sliceState(m)) return [["aus", "All"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
   const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
   if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
   return opts;
@@ -10379,9 +10379,9 @@ function setStatScope(sel) {
   // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
   // state selection instead of clearing it; anything else steps the state out.
   if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  // "None" (aus) inside a sliced, typed view lets the type go alone —
-  // the state stays (the map's own pick); elsewhere it steps the state out
-  if (sel.k === "aus" && statScopeStore.k === "cls" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
+  // "All" (aus) inside a sliced view lets the type go alone — the state
+  // always stays, whether or not a type was on
+  if (sel.k === "aus" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
   if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
