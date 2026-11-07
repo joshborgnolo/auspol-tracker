@@ -880,7 +880,7 @@ function vtBandsBlock(divs, area, geography) {
   return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
 function vtBlock(divs, area, geography) {
-  if (M().year === 2025) return vtBandsBlock(divs, area, geography);
+  if (M().year === 2025 || M().year === "now") return vtBandsBlock(divs, area, geography);
   const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
   const notes = [vtFinding(rows)];
   if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
@@ -918,7 +918,7 @@ function storyArea(m, st) {
     h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
   }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  const castScope = m.year === 2025 ? vtScope(m, st) : null;
+  const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;
   const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true, castScope?.geography);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
