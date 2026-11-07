@@ -2505,10 +2505,12 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("const tlStops = (ys) => ys.map((y) => ({ y, lab:") && ui.includes('isNowY(y) ? (short || y === "now" ? "Now" : yearLabel(y))'), "the timeline's short row shows the two-digit year only; a state's own Now stop names itself Now too");
 }
 
-// the Winner head's figures scope menu (2026-11-06): "Nationwide figures" opens a
-// menu of the frame's states and seat types; the head recomposes scoped (figures,
-// seat share and the make-up bar all follow it), and the cycle/list breakdown
-// cards it replaced are gone from the head's trail
+// the Winner head's scope menu (2026-11-06): the frame's own jurisdiction opens a
+// menu of its states and seat types; the head recomposes scoped (figures, seat
+// share and the make-up bar all follow it), and the cycle/list breakdown cards
+// it replaced are gone from the head's trail. Election views name the menu plain
+// ("National", "NSW", the CLS_SHORT seat types) since 2026-11-07; the now views
+// keep the "… figures" wording ("Nationwide figures", "Inner-metro figures")
 {
   const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css");
   // one pick shared across frames (2026-11-07): a year switch keeps the named
@@ -2517,8 +2519,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const statScopeOk = (m, s) =>") && st.includes("? statScopeStore : { k: \"aus\", open: statScopeStore.open }"), "a frame that can't express the pick falls back to its own jurisdiction figures");
   assert.ok(ui.includes("statScopeStore = sel;"), "a scope pick rewrites the shared store");
   assert.ok(st.includes("const statSel = statScopeOf(m);"), "the scope is read at the head");
-  assert.ok(st.includes('"Nationwide figures"') && st.includes('? `${STATE_TITLE[stOfYear(m.year)]} figures`'), "the neutral scope names itself after the frame");
-  assert.ok(st.includes('? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` :'), "a seat-type scope compounds hyphenated (Inner-metro figures)");
+  assert.ok(st.includes('const fig = isNowY(m.year) ? " figures" : "";') && st.includes('return fig ? "Nationwide figures" : "National";'), "the neutral scope is the frame's own name — plain on an election view (National, New South Wales), the … figures wording only on a now view (Nationwide figures)");
+  assert.ok(st.includes('statScopeLabel(m, { k: "cls", cls: r.key })') && st.includes('return fig ? `${CLS_SHORT[sel.cls].replace(" ", "-")}${fig}` : CLS_SHORT[sel.cls];'), "the menu items ride the trigger's wording — a seat-type scope stays hyphenated only while it compounds with figures (Inner-metro figures; Inner metro)");
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
