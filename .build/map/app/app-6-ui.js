@@ -270,7 +270,7 @@ function basisHTML() {
   const sen = S.view === "chamber" && S.house === "senate";
   const list = sen ? SEN_LENSES : yearLenses(S.year);
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
-  return `<label class="lg-t lg-basis">Basis <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
+  return `<label class="lg-t lg-basis"><span class="lg-label">Basis</span> <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
 }
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -1575,7 +1575,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   const selFromURL = readURL();
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
-  $("#frames-jump").innerHTML = `<b>View elections:</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}">${n}</button>`).join("")}`;
+  $("#frames-jump").innerHTML = `<b>View elections</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}">${n}</button>`).join("")}`;
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
