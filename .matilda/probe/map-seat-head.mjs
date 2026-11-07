@@ -260,16 +260,17 @@ const booth = await page.evaluate(() => {
   const h3s = [...document.querySelectorAll("#story .st-sec > h3")];
   const heads = h3s.map((h) => h.textContent.trim());
   const candH3 = h3s.find((x) => /^\s*The candidates/.test(x.textContent));
-  const smalls = candH3 ? [...candH3.querySelectorAll("small")].map((s) => ({ t: s.textContent.trim(), l: Math.round(s.getBoundingClientRect().left * 2) / 2, top: Math.round(s.getBoundingClientRect().top * 2) / 2 })) : [];
+  const smalls = candH3 ? candH3.querySelectorAll("small") : [];
+  const storyTxt = document.getElementById("story").textContent;
   const cand = {
     head: candH3 ? candH3.childNodes[0].textContent.trim() : null,
-    small: smalls[0] ? smalls[0].t : null,
-    tick: smalls[1] ? smalls[1].t : null,
-    tickAligned: smalls.length === 2 ? Math.abs(smalls[0].l - smalls[1].l) <= 0.5 && smalls[1].top > smalls[0].top : null,
+    small: smalls.length === 1 ? smalls[0].textContent.trim() : null,
     changesGone: candH3 ? !/change on \d+/.test(candH3.textContent) : null,
   };
   return {
     lab: sec ? sec.querySelector(".st-lab").textContent.trim() : null,
+    swing: sec && sec.querySelector(".st-swing") ? sec.querySelector(".st-swing").textContent.trim() : null,
+    oldSwingSentence: /A two-party swing of/.test(storyTxt),
     nmFont: nm ? getComputedStyle(nm).fontSize : null,
     heroCount: document.querySelectorAll("#story .hero").length,
     neighHead: heads.find((h) => /profile from census data/.test(h)) || null,
@@ -277,9 +278,10 @@ const booth = await page.evaluate(() => {
   };
 });
 ok("booth: the count here rides the head-block idiom", booth.lab && /^Final count here \(margin of \d+\.\d+\)/.test(booth.lab) && booth.nmFont === "20px" && booth.heroCount === 0, JSON.stringify(booth));
+ok("booth: the swing rides its count block in figure form", booth.swing == null || /^(No swing|\+\d+\.\d+ swing)$/.test(booth.swing), booth.swing);
+ok("booth: no narrating swing sentence remains", booth.oldSwingSentence === false);
 ok("booth: the census section heads the neighbourhood profile", booth.neighHead === "Neighbourhood profile from census data", booth.neighHead);
-ok("booth: candidates head carries its measure as lighter subtext", booth.cand.head === "The candidates" && booth.cand.small === "by primary vote here", JSON.stringify(booth.cand));
-ok("booth: tick caption sits beneath the subtext, aligned", booth.cand.tick === "tick = the whole seat" && booth.cand.tickAligned === true, JSON.stringify(booth.cand));
+ok("booth: candidates head runs its single subtext line", booth.cand.head === "The candidates" && booth.cand.small === "by primary vote here. Tick = whole seat", JSON.stringify(booth.cand));
 ok("booth: the change qualifier is gone", booth.cand.changesGone === true);
 
 /* a state-frame seat's census head names the state (nsw23 · Barwon) */

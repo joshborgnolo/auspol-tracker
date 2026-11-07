@@ -1510,25 +1510,29 @@ function storyBooth(m, j) {
   if (loc) h += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
   else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
   if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
+  /* the place's two-party swing rides its count block in the seats' figure
+     form (no narrating sentence) — attached to whichever block the count
+     belongs to, classical or notional */
+  const swingHere = !Number.isNaN(b.tpp[j]) ? nn(b.tppSw[j]) : null;
   if (lead && tc) {
     const ta = tc[0], tb = tc[1], tot = ta + tb, pct = (100 * Math.max(ta, tb)) / tot;
     const lw = ta >= tb ? D.A : D.B, lrun = lw === D.A ? D.B : D.A;
     const [lwn, lrn] = pairNames(lw, lrun);
     // the polling place's own count rides the same head-block idiom as the
     // seat's Final count, with the place-level winner's figure on the left
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), "", true, [partyName(lw.ab, lw.pn), partyName(lrun.ab, lrun.pn)])}</div></div>`;
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), "", true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
   }
   if (!Number.isNaN(b.tpp[j]) && !D.classic) {
     const coal = coalW(1).replace(/^The /, "");
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}</div></div>`;
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}${swingFigure(swingHere)}</div></div>`;
   }
-  if (!Number.isNaN(b.tpp[j])) { const s0 = nn(b.tppSw[j]); h += `<p class="st-note">${s0 == null ? "This place wasn’t used at the previous election, so it has no swing." : Math.abs(s0) < 0.05 ? "No two-party swing here." : `A two-party swing of ${pts(s0)} to ${s0 > 0 ? "Labor" : "the Coalition"} here.`}</p>`; }
+  if (!Number.isNaN(b.tpp[j]) && swingHere == null) h += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
   const cands = D.c.map((c, k) => ({ ...c, v: raw.v[j][k], el: false }));
   const pf = raw.prevFp ? raw.prevFp[j] : null;
   const moved = movedTo(m, D);
   const wk = D.c.indexOf(D.win);
   const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  if (b.formal[j]) h += `<div class="st-sec"><h3>The candidates <span class="st-hgc"><small>by primary vote here</small><small>tick = the whole seat</small></span></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
+  if (b.formal[j]) h += `<div class="st-sec"><h3>The candidates <small>by primary vote here. Tick = whole seat</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
