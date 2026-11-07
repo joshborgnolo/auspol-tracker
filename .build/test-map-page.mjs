@@ -888,7 +888,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(map2.includes("demoShare(d); return v == null ? null : 100 * v"), "division colour reads the country share");
   assert.ok(map2.includes("demoBoothShare(b.raw, j, selPos(m))"), "booth colour reads the positional select row via selPos");
   assert.ok(map2.includes("demoRange(); return demoRamp()"), "the sewn ramp stays the fborn family");
-  assert.ok(ui.includes('data-opt="cob" aria-label="Birthplace country"'), "the legend's country picker, the informal lens's own switcher idiom");
+  assert.ok(ui.includes('lgMenu("cob",' ), "the legend's country picker rides the panel dropdown idiom");
   assert.ok(ui.includes("All overseas-born") && ui.includes("Born in ${COB_BORN[k]}") && base.includes('phl: "the Philippines"'), "the picker's all-plus-countries options, the Philippines with its article");
   assert.ok(ui.includes('if (isCob()) p.set("cb", S.cob);'), "the hash carries cb on the fborn lens only");
   assert.ok(ui.includes('S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;'), "readURL restores the country");
@@ -919,8 +919,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('const incMedRange = (m) =>') && base.includes("Math.floor(lo / 100)"), "the median's colour domain measures the year's own divisions, snapped to $100s (no hand-set LUT)");
   assert.ok(map2.includes('if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null;'), "booth colour reads the median's own dollar lane, never a share cell");
   assert.ok(map2.includes('const v = demoShare(d); return v == null ? null : 100 * v;'), "the pinned share idiom survives beside the median guard");
-  assert.ok(ui.includes('data-opt="incv" aria-label="Income measure"'), "the legend's income picker rides the select-lens idiom");
-  assert.ok(ui.includes('else if (k === "incv") S.incMode = t.value;'), "the picker change handler is wired");
+  assert.ok(ui.includes('lgMenu("incv",' ), "the legend's income picker rides the panel dropdown idiom");
+  assert.ok(ui.includes('else if (k === "incv") S.incMode = v;'), "the picker change handler is wired");
   assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
   assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
   assert.ok(ui.includes('S.incMode, S.ageMode, S.eduMode, S.party'), "the legend's refresh key re-reads on a measure switch");
@@ -953,8 +953,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('const ageMedRange = (m) =>') && base.includes("Math.floor(lo / 2)"), "the median-age colour domain measures the year's own divisions, snapped to whole years");
   assert.ok(map2.includes('if (ageMed()) { const v = b.raw.ageMed ? b.raw.ageMed[j] : null;'), "booth colour reads the median-age lane, never a share cell");
   assert.ok(base.includes('if (S.ageMode === "a65" || S.ageMode === "a2034")'), "the 65+/20–34 views ride the demo tuple's cells 1/2 untouched");
-  assert.ok(ui.includes('data-opt="agev" aria-label="Age view"'), "the legend's age picker rides the select-lens idiom");
-  assert.ok(ui.includes('else if (k === "agev") S.ageMode = t.value;'), "the age picker change handler is wired");
+  assert.ok(ui.includes('lgMenu("agev",' ), "the legend's age picker rides the panel dropdown idiom");
+  assert.ok(ui.includes('else if (k === "agev") S.ageMode = v;'), "the age picker change handler is wired");
   assert.ok(ui.includes('if (i === "a65" || i === "a2034") { S.index = LENS_AGE;') && ui.includes('p.set("av", S.ageMode);') && ui.includes('p.get("av")'), "legacy a65/a2034 hashes alias onto the lens and av carries the view both ways");
   assert.ok(ui.includes("Age: ${AGE_SHORT[S.ageMode]}"), "the lens head names the picked age view");
   assert.ok(ui.includes("Median resident age, interpolated from census age bands"), "the median-age legend note names its interpolation");
@@ -982,9 +982,9 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('if (isEdu()) return d.demo ? d.demo[S.eduMode] : null;'), "the read rides its own demo-dict key");
   assert.ok(base.includes('DM_RANGE[S.eduMode]') && base.includes('isEdu() ? S.eduMode :'), "range and ramp follow the picked read");
   assert.ok(base.includes("m.hasLane[LENS_EDU] = m.hasLane.uni;"), "the menu gate rides the university read");
-  assert.ok(ui.includes('data-opt="eduv" aria-label="Education view"'), "the education picker rides the select-lens idiom");
+  assert.ok(ui.includes('lgMenu("eduv",' ), "the education picker rides the panel dropdown idiom");
   assert.ok(ui.includes("EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false)"), "the picker offers only reads the frame printed");
-  assert.ok(ui.includes('else if (k === "eduv") S.eduMode = t.value;'), "the picker change handler is wired");
+  assert.ok(ui.includes('else if (k === "eduv") S.eduMode = v;'), "the picker change handler is wired");
   assert.ok(ui.includes('if (i === "uni" || i === "y12less") { S.index = LENS_EDU;') && ui.includes('p.get("ev")'), "legacy uni/y12less hashes alias onto the lens with that read picked");
   assert.ok(ui.includes('p.set("ev", S.eduMode);'), "the hash carries the schooling read");
   assert.ok(ui.includes("S.ageMode, S.eduMode"), "the legend's refresh key re-reads on a schooling switch");
@@ -1016,8 +1016,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes("demo.rel = {};"), "the Religion pools sum shares of residents the cob way");
   assert.ok(base.includes("demo.ten = {};"), "the Tenure pools do too");
   assert.ok(base.includes('const selPos = (m) =>'), "selPos: the select-aware positional map at the booth seams");
-  assert.ok(ui.includes('data-opt="rel" aria-label="Religion"'), "the legend's Religion picker");
-  assert.ok(ui.includes('data-opt="ten" aria-label="Housing tenure"'), "the legend's Housing tenure picker");
+  assert.ok(ui.includes('lgMenu("rel",' ), "the legend's Religion picker");
+  assert.ok(ui.includes('lgMenu("ten",' ), "the legend's Housing tenure picker");
   assert.ok(ui.includes('[[LENS_REL, "Religion"]]') && ui.includes('[[LENS_TEN, "Housing tenure"]]'), "the People optgroup lists both new lenses");
   assert.ok(ui.includes('if (isRel() && S.rel !== "norel") p.set("rl", S.rel);') && ui.includes('if (isTen() && S.ten !== "mort") p.set("tn", S.ten);'), "the hash carries rl/tn choices past their defaults");
   assert.ok(ui.includes('S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";'), "readURL restores No-religion by default");
@@ -1059,8 +1059,8 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 {
   const ui = part("app-6-ui.js"), list = part("app-5-list.js");
   assert.ok(ui.includes("function censusSelects(m, cls = \"\")"), "the shared census-picker builder");
-  assert.ok(ui.includes('const out = [`<select${c} data-opt="index" aria-label="Census measure">'), "the measure select is the builder's first line");
-  assert.ok(ui.includes('out.push(`<select${c} data-opt="cob" aria-label="Birthplace country"') && ui.includes('out.push(`<select${c} data-opt="rel" aria-label="Religion"') && ui.includes('out.push(`<select${c} data-opt="ten" aria-label="Housing tenure"'), "the active lane's own pickers ride the builder too");
+  assert.ok(ui.includes("[null, \"Advantage, ABS SEIFA\"]"), "the census measure dropdown opens with its ABS group, panel-idiom");
+  assert.ok(ui.includes('out.push(lgMenu("cob",') && ui.includes('out.push(lgMenu("rel",') && ui.includes('out.push(lgMenu("ten",'), "the active lane's own pickers ride the panel builder too");
   assert.ok(ui.includes('for (const s of censusSelects(m)) h += `<div class="lg-t">${s}</div>`;'), "the legend lays each picker out in its own block");
   assert.ok(ui.includes("if (!m) { el.hidden = true; return; }"), "the legend renders regardless of view");
   assert.ok(!ui.includes('S.view === "list") { el.hidden = true; return; }'), "the legend no longer hides in the list view");
@@ -1665,13 +1665,13 @@ for (const y of ["sa22", "sa26"]) {
   // offered only where the count ran optional-preferential (res.flOpv); the
   // booths (no per-place re-count) and the state's rundown read the
   // district's figure
-  assert.ok(js.includes('data-opt="infm"') && js.includes(">Exhausted ballots</option>"), "map.js: the informal lens's Informal / Exhausted ballots switcher");
-  assert.ok(js.includes('else if (k === "infm") S.infMode = t.value;') && js.includes('p.set("im", "exhaust")') && js.includes('p.get("im")'), "map.js: infMode's change handler + the im URL param both ways");
+  assert.ok(js.includes('lgMenu("infm"') && js.includes("Exhausted ballots"), "map.js: the informal lens's Informal / Exhausted ballots switcher");
+  assert.ok(js.includes('else if (k === "infm") S.infMode = v;') && js.includes('p.set("im", "exhaust")') && js.includes('p.get("im")'), "map.js: infMode's change handler + the im URL param both ways");
   assert.ok(js.includes("const infModeOf = (m) =>") && js.includes("const infHi =") && js.includes("? 25 : 12"), "map.js: infModeOf and infHi (the 25 exhausted ceiling)");
   assert.ok(js.includes("nn(d.exhPct)") && js.includes("nn(m.divs[b.d[j]].exhPct)"), "map.js: the exhausted datum reads the flow rows, booths falling back to the district's");
   assert.ok(js.includes('"Exhausted ballots" : "Informal"') && js.includes("ballots exhausting before the final two"), "map.js: the exhausted view's scale word and legend title");
   assert.ok(js.includes("optional-preferential, so a ballot leaves the count when its numbered candidates are gone"), "map.js: the exhausted legend note explains the scheme");
-  assert.ok(js.includes('m.res.flOpv ? `<select data-opt="infm"'), "map.js: the switcher is offered only on the optional-preferential frame");
+  assert.ok(js.includes('m.res.flOpv ? lgMenu("infm",'), "map.js: the switcher is offered only on the optional-preferential frame");
   // the census lanes (the same splice contract as the SA frames')
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {

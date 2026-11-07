@@ -1082,3 +1082,4 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-bmenu { position: relative; display: inline-block; font-size: 13px; font-weight: 400; color: var(--ink-3); }
 .lg-bmenu .st-scm button[aria-checked="true"] { font-weight: 600; color: var(--ink); }
 .lg-bmenu .st-scm button:focus-visible { background: var(--lean-ink-bg); color: var(--ink); outline-offset: -2px; }
+.lg-bmenu .lg-mgroup { display: block; padding: 5px 12px 1px; font-size: 11px; font-weight: 400; color: var(--ink-3); }

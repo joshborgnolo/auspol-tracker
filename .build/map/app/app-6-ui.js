@@ -229,24 +229,63 @@ function senLegendHeight(sm, w, probe) {
    then the active lane's own option picker. The legend lays each line out in
    its own .lg-t block on the map and chamber; the list bar lays the same
    selects out bare in its row (the legend is hidden in the list view) */
+// Every dropdown list in the control panel rides ONE idiom — the Base row's:
+// the current pick's own word beside its chevron, the panel opening to its
+// items (2026-11-08: native <select>s leave the panel for it)
+const LG_CHEVRON = `<svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+function lgMenu(key, items, cur, aria) {
+  const text = (items.find(([v]) => v === cur) || items.find(([v, t]) => t != null))[1] ?? "";
+  // a curious value of `null` is a group heading, not a pickable item
+  const itemHtml = ([v, t]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1">${esc(t)}</button>`;
+  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
+}
+function lgMenuParts(wrap) {
+  return !wrap ? null : { menu: wrap.querySelector(":scope > .st-scm"), trigger: wrap.querySelector("[data-lg-trigger],[data-basis-trigger]") };
+}
+function closePanelMenus() {
+  for (const wrap of $$(".lg-bmenu")) {
+    const m = wrap.querySelector(":scope > .st-scm"); if (m) m.hidden = true;
+    wrap.querySelector("[data-lg-trigger],[data-basis-trigger]")?.setAttribute("aria-expanded", "false");
+  }
+}
+function openPanelMenu(wrap) {
+  const p = lgMenuParts(wrap); if (!p || !p.menu || !p.trigger) return;
+  closePanelMenus();
+  p.menu.hidden = false; p.trigger.setAttribute("aria-expanded", "true");
+  (p.menu.querySelector('[aria-checked="true"]') || p.menu.querySelector("button"))?.focus();
+}
+// one applier for any dropdown item picked in the panel (the native select
+// handler's branches verbatim)
+function applyOpt(k, v) {
+  if (k === "axis") return setAxis(v);
+  if (k === "vs") { S.vs = v; if (S.from === v) S.from = v === "onp" ? "lnp" : "onp"; }
+  else if (k === "sppair") { S.spPair = v; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
+  else if (k === "spfrom") S.spFrom = v;
+  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english";
+  lensParamChanged();
+}
 function censusSelects(m, cls = "") {
-  const c = cls ? ` class="${cls}"` : "";
-  const og = (label, list) => `<optgroup label="${label}">${list.map(([v, t]) => `<option value="${v}"${S.index === v ? " selected" : ""}>${t}</option>`).join("")}</optgroup>`;
   const peopleExtra = [
     ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
     ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
     ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
   ];
-  const out = [`<select${c} data-opt="index" aria-label="Census measure">${og("Advantage, ABS SEIFA", ixFor(m).map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]))}${og("People", [...dmFor(m).map((x) => [x, DM_NAME[x]]), ...peopleExtra])}</select>`];
+  const out = [lgMenu("index", [
+    [null, "Advantage, ABS SEIFA"],
+    ...ixFor(m).map((x) => [x, `${IX_NAME[x]} (${IX_ABBR[x]})`]),
+    [null, "People"],
+    ...dmFor(m).map((x) => [x, DM_NAME[x]]),
+    ...peopleExtra,
+  ], S.index, "Census measure")];
   if (isDemo()) {
     // on Household income a second picker reads the measure: the median
     // spectrum lands; the two share views sit beside it (loinc/hiinc as
     // standalone menu lanes until 2026-10-31)
-    if (S.index === LENS_INC && hasInc(m)) out.push(`<select${c} data-opt="incv" aria-label="Income measure">${INC_MODES.map((k) => `<option value="${k}"${S.incMode === k ? " selected" : ""}>${INC_NAME[k]}</option>`).join("")}</select>`);
+    if (S.index === LENS_INC && hasInc(m)) out.push(lgMenu("incv", INC_MODES.map((k) => [k, INC_NAME[k]]), S.incMode, "Income measure"));
     // on Age the same picker reads the six views: the median-age spectrum
     // lands, the aged shares beside it (a65/a2034 as menu lanes until
     // 2026-10-31, three new brackets same day)
-    if (S.index === LENS_AGE) out.push(`<select${c} data-opt="agev" aria-label="Age view">${AGE_MODES.map((k) => `<option value="${k}"${S.ageMode === k ? " selected" : ""}>${AGE_NAME[k]}</option>`).join("")}</select>`);
+    if (S.index === LENS_AGE) out.push(lgMenu("agev", AGE_MODES.map((k) => [k, AGE_NAME[k]]), S.ageMode, "Age view"));
     // on Education the same picker reads the two schooling views: the
     // university share lands, the left-school-early read beside it
     // (uni/y12less as standalone menu lanes until 2026-10-31). The picker
@@ -254,17 +293,17 @@ function censusSelects(m, cls = "") {
     // statistics-era frames carry the qualification read alone
     {
       const eduOpts = EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
-      if (S.index === LENS_EDU && eduOpts.length > 1) out.push(`<select${c} data-opt="eduv" aria-label="Education view">${eduOpts.map((k) => `<option value="${k}"${S.eduMode === k ? " selected" : ""}>${EDU_NAME[k]}</option>`).join("")}</select>`);
+      if (S.index === LENS_EDU && eduOpts.length > 1) out.push(lgMenu("eduv", eduOpts.map((k) => [k, EDU_NAME[k]]), S.eduMode, "Education view"));
     }
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
     // measure-switcher idiom)
-    if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) out.push(`<select${c} data-opt="cob" aria-label="Birthplace country"><option value=""${!S.cob ? " selected" : ""}>All overseas-born</option>${m.cobKeys.map((k) => `<option value="${k}"${S.cob === k ? " selected" : ""}>Born in ${COB_BORN[k]}</option>`).join("")}</select>`);
+    if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) out.push(lgMenu("cob", [["", "All overseas-born"], ...m.cobKeys.map((k) => [k, `Born in ${COB_BORN[k]}`])], S.cob, "Birthplace country"));
     // the Religion and Housing-tenure lenses' own option pickers
     // (No religion and owned-with-mortgage are the landing views)
-    if (S.index === LENS_REL && m.relKeys && m.relKeys.length) out.push(`<select${c} data-opt="rel" aria-label="Religion">${m.relKeys.map((k) => `<option value="${k}"${S.rel === k ? " selected" : ""}>${REL_NAME[k]}</option>`).join("")}</select>`);
-    if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) out.push(`<select${c} data-opt="ten" aria-label="Housing tenure">${m.tenKeys.map((k) => `<option value="${k}"${S.ten === k ? " selected" : ""}>${TEN_NAME[k]}</option>`).join("")}</select>`);
-    if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(`<select${c} data-opt="anc" aria-label="Ancestry">${m.ancKeys.map((k) => `<option value="${k}"${S.anc === k ? " selected" : ""}>${ANC_NAME[k]}</option>`).join("")}</select>`);
+    if (S.index === LENS_REL && m.relKeys && m.relKeys.length) out.push(lgMenu("rel", m.relKeys.map((k) => [k, REL_NAME[k]]), S.rel, "Religion"));
+    if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) out.push(lgMenu("ten", m.tenKeys.map((k) => [k, TEN_NAME[k]]), S.ten, "Housing tenure"));
+    if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(lgMenu("anc", m.ancKeys.map((k) => [k, ANC_NAME[k]]), S.anc, "Ancestry"));
   }
   return out;
 }
@@ -280,7 +319,7 @@ function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
-  const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
+  const opt = (name, cur, list) => lgMenu(name, list, cur, name);
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
   // the Drawn-as switch closes the winner strip's bottom line (user call 2026-11-07)
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
@@ -337,7 +376,7 @@ function legendHTML(m) {
       const exh = infModeOf(m) === "exhaust";
       // the exhausted view is offered only where the count is optional-preferential —
       // like the census switcher, the same legend swaps measure under the lens
-      const opts = m.res && m.res.flOpv ? `<select data-opt="infm" aria-label="Informal lens view"><option value="informal"${S.infMode === "informal" ? " selected" : ""}>Informal</option><option value="exhaust"${S.infMode === "exhaust" ? " selected" : ""}>Exhausted ballots</option></select> ` : "";
+      const opts = m.res && m.res.flOpv ? lgMenu("infm", [["informal", "Informal"], ["exhaust", "Exhausted ballots"]], S.infMode, "Informal lens view") : "";
       h += `<div class="lg-t">${opts}${exh ? "ballots exhausting before the final two" : "Informal ballots"}</div>`;
       if (exh) h += `<div class="lg-note">Share of formal ballots that ran out of preferences — New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. ${stNameCap(m.year)}: ${f1(aus.exhPct)}%.</div>`;
       else h += `<div class="lg-note">Australia: ${f1(aus.infPct)}%.</div>`;
@@ -1408,6 +1447,7 @@ function openBaseMenu() {
   if (!menu || !trigger) return;
   $$(".st-scwrap .st-scm").forEach((m) => { m.hidden = true; });
   $$("[data-scope-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+  closePanelMenus();
   scopeSpace = false;
   menu.hidden = false; trigger.setAttribute("aria-expanded", "true");
   (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button"))?.focus();
@@ -1415,6 +1455,20 @@ function openBaseMenu() {
 document.addEventListener("click", (e) => {
   const baseTrigger = e.target.closest("[data-basis-trigger]");
   if (baseTrigger) { if (baseTrigger.getAttribute("aria-expanded") === "true") closeBaseMenu(); else openBaseMenu(); return; }
+  const lgTrigger = e.target.closest("[data-lg-trigger]");
+  if (lgTrigger) {
+    const wrap = lgTrigger.closest(".lg-bmenu"), p = lgMenuParts(wrap);
+    if (p.menu.hidden) openPanelMenu(wrap);
+    else { p.menu.hidden = true; p.trigger.setAttribute("aria-expanded", "false"); }
+    return;
+  }
+  const lgVal = e.target.closest("[data-lg-val]");
+  if (lgVal) {
+    const wrap = lgVal.closest(".lg-bmenu"), p = lgMenuParts(wrap);
+    p.menu.hidden = true; p.trigger?.setAttribute("aria-expanded", "false"); p.trigger?.focus({ preventScroll: true });
+    const [k, ...vv] = lgVal.dataset.lgVal.split(":"); applyOpt(k, vv.join(":"));
+    return;
+  }
   const baseOption = e.target.closest("[data-base]");
   if (baseOption) {
     closeBaseMenu(); $("[data-basis-trigger]")?.focus({ preventScroll: true });
@@ -1422,7 +1476,7 @@ document.addEventListener("click", (e) => {
     else setLens(baseOption.dataset.base);
     return;
   }
-  if (!e.target.closest(".lg-bmenu")) closeBaseMenu();
+  if (!e.target.closest(".lg-bmenu")) { closeBaseMenu(); closePanelMenus(); }
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
   const scT = e.target.closest("[data-scope-trigger]");
@@ -1478,17 +1532,7 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("change", (e) => {
   const t = e.target;
-  if (t.dataset.opt) {
-    const k = t.dataset.opt;
-    if (k === "axis") { setAxis(t.value); return; }
-    // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
-    if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
-    // (a new contest keeps the voters where it can: the Greens' and everyone else's read in all three)
-    if (k === "sppair") { S.spPair = t.value; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
-    if (k === "spfrom") S.spFrom = t.value;
-    if (k === "party") S.party = t.value; else if (k === "from") S.from = t.value; else if (k === "index") S.index = t.value; else if (k === "infm") S.infMode = t.value; else if (k === "incv") S.incMode = t.value; else if (k === "agev") S.ageMode = t.value; else if (k === "eduv") S.eduMode = t.value; else if (k === "cob") S.cob = t.value || null; else if (k === "rel") S.rel = t.value || "norel"; else if (k === "ten") S.ten = t.value || "mort"; else if (k === "anc") S.anc = t.value || "english";
-    lensParamChanged(); return;
-  }
+  if (t.dataset.opt) { applyOpt(t.dataset.opt, t.value); return; }
   if (t.dataset.fsel) { S.f[t.dataset.fsel] = t.value || null; filtersChanged(); return; }
 });
 document.addEventListener("keydown", (e) => {
