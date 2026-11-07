@@ -610,6 +610,10 @@ button { cursor: pointer; background: none; border: 0; }
    pair with). [data-lens] in the selector keeps this one ahead of the
    adjacent-suppressors' specificity */
 #story[data-view="booth"][data-lens] .st-sec { border-top: 4px double var(--line); }
+/* the polling-place dek is running copy; it reads in the winner story's
+   Commissioner and takes the same double rule above it as the sections that
+   follow it (both user calls made on the opening dek's rendering) */
+#story[data-view="booth"][data-lens] .st-dek { font-family: "Commissioner", var(--sans); border-top: 4px double var(--line); padding-top: 7px; }
 /* and the credit line closes the story on the same twin rule, under the margin
    list and its informal line */
 #story[data-lens="winner"] .st-foot { border-top: 4px double var(--line); }

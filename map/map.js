@@ -9226,9 +9226,11 @@ function storyBooth(m, j) {
     const lw = ta >= tb ? D.A : D.B, lrun = lw === D.A ? D.B : D.A;
     const [lwn, lrn] = pairNames(lw, lrun);
     // the polling place's own count rides the same head-block idiom as the
-    // seat's Final count, with the place-level winner's figure on the left
-    // and the seat outcome's tag chip where the seat's own block carries it
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg st-fg-l"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
+    // seat's Final count, with the place-level winner's figure on the left;
+    // the seat outcome's tag hangs off the SEAT winner's figure — the party
+    // that holds the seat needn't be the place's leader
+    const tagSide = D.win.fam === lw.fam ? "st-fg-l" : "st-fg-r";
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg ${tagSide}"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
   }
   if (!Number.isNaN(b.tpp[j]) && !D.classic) {
     const coal = coalW(1).replace(/^The /, "");

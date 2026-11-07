@@ -271,6 +271,18 @@ const booth = await page.evaluate(() => {
     lab: sec ? sec.querySelector(".st-lab").textContent.trim() : null,
     swing: sec && sec.querySelector(".st-swing") ? sec.querySelector(".st-swing").textContent.trim() : null,
     tag: sec && sec.querySelector(".st-fg") ? sec.querySelector(".st-fg").textContent.trim() : null,
+    tagCls: sec && sec.querySelector(".st-fg") ? sec.querySelector(".st-fg").className : null,
+    dekStyle: (() => {
+      const dek = document.querySelector("#story .st-dek");
+      if (!dek) return null;
+      const cs = getComputedStyle(dek);
+      return { font: cs.fontFamily.split(",")[0].replace(/"/g, ""), borderTop: `${cs.borderTopWidth} ${cs.borderTopStyle}`, text: dek.textContent.trim().slice(0, 80) };
+    })(),
+    expectedTagSide: (() => {
+      const m = window.__map.M(), D = m.divs.find((d2) => d2.n === "Durack");
+      const tc = m.booth.raw.tcp[m.booth.byDiv[D.i][0]], lw = tc[0] >= tc[1] ? D.A : D.B;
+      return D.win.fam === lw.fam ? "st-fg-l" : "st-fg-r";
+    })(),
     oldSwingSentence: /A two-party swing of/.test(storyTxt),
     nmFont: nm ? getComputedStyle(nm).fontSize : null,
     heroCount: document.querySelectorAll("#story .hero").length,
@@ -280,6 +292,8 @@ const booth = await page.evaluate(() => {
 });
 ok("booth: the count here rides the head-block idiom", booth.lab && /^Final count here \(margin of \d+\.\d+\)/.test(booth.lab) && booth.nmFont === "20px" && booth.heroCount === 0, JSON.stringify(booth));
 ok("booth: the seat's gain/retain tag chip rides the count here too", booth.tag === "retain" || booth.tag === "gain" || booth.tag === "win", booth.tag);
+ok("booth: the chip hangs off the seat winner's figure, not the place's", booth.tagCls && booth.tagCls.includes(booth.expectedTagSide), `${booth.tagCls} vs ${booth.expectedTagSide}`);
+ok("booth: the dek reads in Commissioner under a double rule", booth.dekStyle && /Commissioner/.test(booth.dekStyle.font) && booth.dekStyle.borderTop === "4px double", JSON.stringify(booth.dekStyle));
 ok("booth: the swing rides its count block in figure form", booth.swing == null || /^(No swing|\+\d+\.\d+ swing)$/.test(booth.swing), booth.swing);
 ok("booth: no narrating swing sentence remains", booth.oldSwingSentence === false);
 ok("booth: the census section heads the neighbourhood profile", booth.neighHead === "Neighbourhood profile from census data", booth.neighHead);
