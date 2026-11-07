@@ -1,7 +1,9 @@
 // Probe: the /map/ Winner head's sections each close on a double rule —
-// two hairlines, tightly spaced (one after Two-party, one after Primaries,
-// one closing the Seats block) — and the rules survive a scope change
-// without piling up. usage: node .matilda/probe/map-head-separators.mjs <baseUrl>  (serve the repo root first)
+// two hairlines, tightly spaced (one after the two-party block, one after
+// Primaries, one closing the Seats block) — over the named-sides figures
+// grid and the formed-govt tag, and across election and Now frames. The map
+// reads the frame from the hash at BOOT ONLY: goto a frame, then reload.
+// usage: node .matilda/probe/map-head-separators.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
 const base = process.argv[2];
@@ -11,17 +13,17 @@ const fails = []; const ok = (n, c, d = "") => { console.log(`${c ? "ok  " : "FA
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+const kinds = () => page.evaluate(() => [...document.querySelector(".st-stat").children].map((x) => x.classList.contains("st-sep") ? "SEP" : x.classList.contains("st-lab") ? `LAB(${x.textContent.trim().split(/[ (]/)[0]})` : x.className.split(" ")[0].replace("st-", "")));
+const frame = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2", timeout: 60000 }); await wait(1200); };
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
-await page.goto(`${base}/map/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
-await wait(1500);
 
-// the head's child sequence, separators included
-const seps = await page.evaluate(() => document.querySelectorAll(".st-stat > .st-sep").length);
-ok("three separators in the head", seps === 3, `got ${seps}`);
-const kinds = (await page.evaluate(() => [...document.querySelector(".st-stat").children].map((x) => x.classList.contains("st-sep") ? "SEP" : x.classList.contains("st-lab") ? `LAB(${x.textContent.trim().split(/[ (]/)[0]})` : x.className.split(" ")[0].replace("st-", ""))));
-ok("separator after the two-party block, before Primaries", kinds.some((k, i) => k === "SEP" && kinds[i + 1] === "LAB(Primaries)"), JSON.stringify(kinds));
-ok("separator after the primary grid, before Seats", kinds.some((k, i) => k === "SEP" && kinds[i + 1] === "LAB(Seats)"), JSON.stringify(kinds));
-ok("closing separator last, after Informal", kinds.length > 1 && kinds[kinds.length - 1] === "SEP" && kinds[kinds.length - 2] === "LAB(Informal:)", JSON.stringify(kinds.slice(-3)));
+// election frame: figures+names grid (the tag rides inside it), swing, THEN the rule
+await frame(2025);
+let ks = await kinds();
+ok("2025: three separators", ks.filter((k) => k === "SEP").length === 3, JSON.stringify(ks));
+ok("2025: two-party block (lab, tpp, swing) closes on its rule", JSON.stringify(ks.slice(0, 5)) === JSON.stringify(["LAB(Two-party)", "tpp", "swing", "SEP", "LAB(Primaries)"]), JSON.stringify(ks.slice(0, 5)));
+ok("2025: rule after the primary grid, before Seats", ks.some((k, i) => k === "SEP" && ks[i + 1] === "LAB(Seats)"), JSON.stringify(ks));
+ok("2025: closing rule last, after Informal", ks.length > 1 && ks[ks.length - 1] === "SEP" && ks[ks.length - 2] === "LAB(Informal:)", JSON.stringify(ks.slice(-3)));
 
 // the rule itself: two 1px hairlines, tightly spaced, full width of the head
 const geom = await page.evaluate(() => {
@@ -45,13 +47,11 @@ await wait(400);
 const seps2 = await page.evaluate(() => document.querySelectorAll(".st-stat > .st-sep").length);
 ok("three separators after a scope change", seps2 === 3, `got ${seps2}`);
 
-// a real election frame: the formed-govt tag rides the two-party block ahead of its rule
-await page.goto(`${base}/map/#y=2022`, { waitUntil: "networkidle2", timeout: 60000 });
-await wait(1200);
-const kinds22 = await page.evaluate(() => [...document.querySelector(".st-stat").children].map((x) => x.classList.contains("st-sep") ? "SEP" : x.classList.contains("st-lab") ? `LAB(${x.textContent.trim().split(/[ (]/)[0]})` : x.className.split(" ")[0].replace("st-", "")));
-const iFg = kinds22.indexOf("fg");
-ok("2022: formed-govt tag sits inside the two-party block, rule after it", iFg > 0 && kinds22[iFg + 1] === "SEP" && kinds22[iFg + 2] === "LAB(Primaries)", JSON.stringify(kinds22.slice(0, 8)));
-ok("2022: three separators too", kinds22.filter((k) => k === "SEP").length === 3, `${kinds22.filter((k) => k === "SEP").length}`);
+// the Now frame: no tag, no swing — the rule still closes the figures block
+await frame("now");
+ks = await kinds();
+ok("now: no formed-govt tag", !ks.includes("fg"), JSON.stringify(ks.slice(0, 4)));
+ok("now: three separators, first right after the figures", ks.filter((k) => k === "SEP").length === 3 && JSON.stringify(ks.slice(0, 3)) === JSON.stringify(["LAB(Two-party)", "tpp", "SEP"]), JSON.stringify(ks.slice(0, 6)));
 
 // phone rung: rules don't add overflow
 await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });

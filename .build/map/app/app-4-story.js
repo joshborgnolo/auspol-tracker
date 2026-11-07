@@ -414,17 +414,18 @@ function seatStat(m, st, label) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the "formed govt" tag rides under the Two-party eyebrow, on the governing family's
-  // side; an as-it-stands frame holds rather than won, so it's an election view only
-  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>formed govt</b></span>` : "";
+  // the "formed govt" tag rides the figures' names row, centred under the dash;
+  // an as-it-stands frame holds rather than won, so it's an election view only
+  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg"><b>formed govt</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
     // an "as it stands" frame's tallies carry the base election's swing, which is not a change
     // since: only the seats row gets the now-frame's change line
     const s = isNowY(m.year) ? null : A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
-    // the pair's names close the figures grid, each anchored to its figure's inside edge
-    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span>${fg}<span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span></span>`;
+    // the pair's names close the figures grid, each anchored to its figure's inside edge;
+    // the tag shares their row, in the dash's middle column
+    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
   }
   const change = (f, n) => {
     if (!base) return "";
@@ -449,7 +450,9 @@ function seatStat(m, st, label) {
   const mk = statSeatMakeup(m, idx);
   // the rate the Informal st-sec used to headline, as one more label line under Seats
   const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${twoSw}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
+  // each section of the head closes on a double rule — two hairlines, tightly spaced
+  const sep = `<span class="st-sep" aria-hidden="true"></span>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two ? two + twoSw + sep : ""}${fpRow ? fpRow + sep : ""}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}${sep}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
