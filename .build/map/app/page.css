@@ -1008,18 +1008,34 @@ html.mp-fs .mp-tip { z-index: 260; }
   .fs-side, .fs-top, .fs-dock, .fs-stop u { transition: none !important; }
 }
 
-/* The basis belongs to the key, alongside its measure and map controls. */
+/* Shared control styling follows Drawn as: quiet labels, plain choices,
+   and a solid underline for the current selection. */
 #lenses[hidden], .fs-lensbar:has(#lenses[hidden]) { display: none; }
 .mp-lensrow { justify-content: flex-end; }
-.mp-legend .lg-basis { margin: 0 0 10px; gap: 8px; font-weight: 400; color: var(--ink-3); }
-.mp-legend .lg-basis select { font-size: 15px; padding-bottom: 3px; border-bottom-style: solid; }
-.mp-legend > .lg-basis { grid-column: 1 / -1; }
-.mp-legend .lg-left .lg-basis { margin-bottom: 10px; }
-.mp-legend .lg-jump { margin-top: 8px; }
-.mp-legend .lg-draw { margin-top: 8px; }
-.lg-types { margin-top: 4px; gap: 4px 12px; }
-.lg-types button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 0; color: var(--ink-2); border-bottom: 2px solid transparent; white-space: nowrap; }
+.mp-legend { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.mp-legend > * { width: 100%; }
+.mp-legend .lg-t, .mp-legend .lg-basis, .mp-legend .lg-jump,
+.mp-legend .lg-draw, .mp-legend .lg-seat, .mp-legend .lg-house {
+  margin: 0; font-size: 13px; font-weight: 400; color: var(--ink-3);
+  align-items: baseline; gap: 2px 10px;
+}
+.mp-legend .lg-t select, .mp-legend .lg-t button.flip {
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
+  padding-top: 2px; padding-bottom: 1px; border-bottom: 1.5px solid var(--ink);
+}
+.mp-legend .lg-t select { max-width: 100%; }
+.mp-legend .lg-basis, .mp-legend .lg-jump b, .mp-legend .lg-draw > span {
+  font-size: 12px; font-weight: 400; color: var(--ink-3);
+}
+.mp-legend .lg-jump b { padding: 2px 0 1px; }
+.mp-legend .lg-jump button { padding: 2px 0 1px; border-bottom: 1.5px solid transparent; }
+.mp-legend .lg-jump .mp-ca.on button, .mp-legend .lg-jtoggle[aria-pressed="true"] {
+  color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); text-decoration: none;
+}
+.mp-legend .lg-note { margin-top: 0; }
+.lg-types { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.lg-types button { display: inline-flex; align-items: center; gap: 6px; padding: 2px 0 1px; font-size: 13px; font-weight: 400; color: var(--ink-2); border-bottom: 1.5px solid transparent; white-space: nowrap; }
+.lg-types i { width: 9px; height: 9px; border-radius: 2px; flex: none; }
 .lg-types button:hover { color: var(--ink); }
 .lg-types button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: currentColor; }
-.lg-types button:focus-visible, .lg-basis select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.ls-bar .lg-types { margin-top: 0; font-size: 12px; }
+.lg-types button:focus-visible, .mp-legend select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

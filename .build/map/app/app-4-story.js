@@ -552,6 +552,7 @@ const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? 
 const statScopeTrigger = (sel) => (sel.k === "aus" ? (S.lens === "cls" ? "Filter by seat type" : "Filter by state/territory and seat type") : "Change filter");
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
+  if (S.lens === "cls") return `<span class="lg-types st-typefilters" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-scope="${cur === `cls:${c}` ? "aus" : `cls:${c}`}" aria-pressed="${cur === `cls:${c}`}" title="${cur === `cls:${c}` ? "Clear" : "Filter by"} ${CLS_SHORT[c]}"><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]}</button>` : "").join("")}</span>`;
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
   return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }

@@ -2555,14 +2555,13 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const chamberMark = pickTitle"), "the chamber section's small names the filter it marks");
 }
 
-// the Jump-to cities row's two homes (fixed later on 2026-11-07): a direct
-// legend child on Winner, nested in the left column everywhere else — its own
-// row layout must hold in BOTH (the `>` rule alone had non-winner lenses
-// stacking every city/button on its own line, found by user report)
+// Controls share one stack; basis scales are no longer part of the panel.
 {
-  const ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(ui.includes('c.matches(".lg-t, .lg-jump, .lg-note, .lg-shapes, .lg-draw, .lg-bal, .lg-hint")'), "non-winner lenses nest the Jump-to row in the legend's left column");
-  assert.ok(css.includes(".mp-legend .lg-jump { display: flex; flex-wrap: wrap;") && css.includes(".mp-legend > .lg-jump { grid-column: 1 / -1; }"), "the Jump-to row lays out wherever it sits — nested too — and spans full width only as the legend's direct child");
+  const ui = part("app-6-ui.js"), css = part("page.css"), st = part("app-4-story.js");
+  const legend = ui.slice(ui.indexOf("function legendHTML"), ui.indexOf("/* =============================== the timeline"));
+  assert.ok(!/lg-ramp|lg-ticks|lg-ends|seatTypeFilters/.test(legend), "basis controls contain no scales or seat-type filters");
+  assert.ok(css.includes(".mp-legend { display: flex; flex-direction: column;"), "every basis shares the same control layout");
+  assert.ok(st.includes('class="lg-types st-typefilters"') && st.includes('data-scope="${cur === `cls:${c}` ? "aus"'), "seat-type labels replace the story dropdown and toggle the existing figures scope");
 }
 
 // the now views carry the base election's swings (user call 2026-11-07 —

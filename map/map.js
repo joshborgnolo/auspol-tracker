@@ -8258,6 +8258,7 @@ const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? 
 const statScopeTrigger = (sel) => (sel.k === "aus" ? (S.lens === "cls" ? "Filter by seat type" : "Filter by state/territory and seat type") : "Change filter");
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
+  if (S.lens === "cls") return `<span class="lg-types st-typefilters" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-scope="${cur === `cls:${c}` ? "aus" : `cls:${c}`}" aria-pressed="${cur === `cls:${c}`}" title="${cur === `cls:${c}` ? "Clear" : "Filter by"} ${CLS_SHORT[c]}"><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]}</button>` : "").join("")}</span>`;
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
   return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
@@ -9432,7 +9433,7 @@ function renderList(keepScroll) {
   else {
     bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
     bar += sel(isNowY(m.year) ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, famLeg(f)]), S.f.win);
-    if (S.lens !== "cls") bar += seatTypeFilters(m);
+    bar += sel("Seat type", "cls", CLS.map((c) => [c, CLS_SHORT[c]]), S.f.cls);
     bar += sel("Margin", "margin", Object.entries(MARGINS).map(([k, v]) => [k, v[2]]), S.f.margin);
   }
   if (S.f.range) { const c = colByKey(m, S.f.range.unit, S.f.range.key); if (c) bar += `<button type="button" class="ls-chip" data-unrange title="Clear this range">${esc(c.short || c.label)} ${esc(rangeText(S.f.range, c))} ✕</button>`; }
@@ -9602,10 +9603,8 @@ function renderLegend() {
   if (!m) { el.hidden = true; return; }
   el.hidden = false;
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
-  // a surface goes in steps, and its key with it
-  if (!senOn() && drawOf(m) === "surface") { const r = el.querySelector(".lg-ramp"), g = r ? surfaceRampCss(m) : null; if (g) r.style.background = g; }
   renderJumpSel();
-  holdLegendHeight(m);
+  el.style.minHeight = "";
 }
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
    through the years never moves the figure (the stage below it on a wide screen, the
@@ -9748,14 +9747,8 @@ function basisHTML() {
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
   return `<label class="lg-t lg-basis">Basis: <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
 }
-function seatTypeFilters(m) {
-  return `<div class="lg-cats lg-types" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-cls="${c}" aria-pressed="${S.f.cls === c}" title="${S.f.cls === c ? "Clear" : "Filter by"} ${CLS_SHORT[c]}"><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]}</button>` : "").join("")}</div>`;
-}
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
-  const grad = (tbl, from, to) => { const st = []; for (let k = 0; k <= 10; k++) st.push(`${css(tbl[Math.round(lerp(from, to, k / 10))])} ${k * 10}%`); return `linear-gradient(90deg, ${st.join(",")})`; };
-  const ticks = (vals, lo, hi, fmt) => `<div class="lg-ticks">${vals.map((v) => `<span style="left:${(100 * (v - lo)) / (hi - lo)}%">${fmt(v)}</span>`).join("")}</div>`;
-  const mark = (v, lo, hi) => (v == null ? "" : `<span class="mk" style="left:${(100 * (clamp(v, lo, hi) - lo)) / (hi - lo)}%" title="Australia ${f1(v)}"></span>`);
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
@@ -9773,43 +9766,23 @@ function legendHTML(m) {
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
       // as balloons or a surface, where One Nation stood widely, the two parties can be another two
       if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts(m))}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
-      if (pair !== "AC") {
-        const [fa, fb] = SP_PAIRS[pair], [A, B] = axisCap(pair), v = m.standIn ? null : axisArea(m, aus.idx), span = axisSpan(pair), lo = 50 - span, hi = 50 + span;
-
-        h += `<div class="lg-ramp" style="background:${grad(axisRamp(pair), 0, 200)}">${mark(v == null ? null : 100 - v, lo, hi)}</div>`;
-        h += ticks([lo, 50 - span / 2, 50, 50 + span / 2, hi], lo, hi, (x) => (x === 50 ? "50" : x < 50 ? `${100 - x}` : `${x}`));
-        h += `<div class="lg-ends"><span class="t-${fa}">◀ ${A} ahead</span><span class="t-${fb}">${B} ahead ▶</span></div>`;
-        break;
-      }
-      const [lo, hi] = RANGE();
-
-      h += `<div class="lg-ramp" style="background:${grad(RAMP.div, 0, 200)}">${mark(sw ? -aus.tppSw : 100 - aus.tpp, lo, hi)}</div>`;
-      h += sw ? ticks([-10, -5, 0, 5, 10], -10, 10, (v) => (v === 0 ? "0" : Math.abs(v))) : ticks([30, 40, 50, 60, 70], 30, 70, (v) => (v === 50 ? "50" : v < 50 ? `${100 - v}` : `${v}`));
-      h += `<div class="lg-ends"><span class="t-alp">◀ ${sw ? "To Labor" : "Labor ahead"}</span><span class="t-lnp">${sw ? "To the Coalition" : "Coalition ahead"} ▶</span></div>`;
+      if (pair !== "AC") break;
       if (boothsOn && sw) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
     }
     case "fp": {
       const ch = S.fpMode === "change";
       h += `<div class="lg-t">${opt("party", S.party, partyOpts)} first preferences: <button type="button" class="flip" data-flip="fp">${ch ? `change on ${prev}` : "share"}<span>⇄</span></button></div>`;
-      const [lo, hi] = RANGE();
 
-      if (ch) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.gain[S.party][45])} 70%, ${css(RAMP.gain[S.party][100])} 100%)">${mark(aus.fpSw[S.party], lo, hi)}</div>${ticks([-15, -5, 0, 5, 15], -15, 15, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Lost ground</span><span class="t-${S.party}">Gained ▶</span></div>`;
-      else h += `<div class="lg-ramp" style="background:${grad(RAMP.fp[S.party], 0, 100)}">${mark(aus.fp[S.party], 0, FPMAX[S.party])}</div>${ticks([0, FPMAX[S.party] / 2, FPMAX[S.party]], 0, FPMAX[S.party], (v) => `${v}%${v === FPMAX[S.party] ? "+" : ""}`)}`;
-      h += `<div class="lg-note">The line marks Australia: ${ch ? sgn(aus.fpSw[S.party]) + " points" : f1(aus.fp[S.party]) + "%"}.</div>`;
+      h += `<div class="lg-note">Australia: ${ch ? sgn(aus.fpSw[S.party]) + " points" : f1(aus.fp[S.party]) + "%"}.</div>`;
       if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
     }
     case "senate": {
-      const gap = senGap(), A = senArea(m, m.areas.AUS.idx, S.party), none = svYear(m.year) == null;
+      const gap = senGap(), none = svYear(m.year) == null;
       h += `<div class="lg-t">${opt("party", S.party, partyOpts)} <button type="button" class="flip" data-flip="sen">${gap ? "Senate less House" : "Senate share"}<span>⇄</span></button></div>`;
-      const [lo, hi] = RANGE();
 
-      if (gap) h += `<div class="lg-ramp" style="background:linear-gradient(90deg, ${css(RAMP.loss[100])} 0%, ${css(RAMP.loss[45])} 30%, ${css(RAMP.loss[0])} 50%, ${css(RAMP.gain[S.party][45])} 70%, ${css(RAMP.gain[S.party][100])} 100%)">${A ? mark(A.gap, lo, hi) : ""}</div>${ticks([-10, -5, 0, 5, 10], -10, 10, (v) => (v > 0 ? "+" + v : v < 0 ? "−" + -v : "0"))}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Better in the House</span><span class="t-${S.party}">Better in the Senate ▶</span></div>`;
-      else h += `<div class="lg-ramp" style="background:${grad(RAMP.fp[S.party], 0, 100)}">${A ? mark(A.sen, 0, FPMAX[S.party]) : ""}</div>${ticks([0, FPMAX[S.party] / 2, FPMAX[S.party]], 0, FPMAX[S.party], (v) => `${v}%${v === FPMAX[S.party] ? "+" : ""}`)}`;
-      // (the note's words don't wait on the votes: the key's height is measured before they load, and the
-      // story gives Australia's figure)
-      h += `<div class="lg-note">${none ? "A state election: there was no Senate vote." : `The line marks Australia${gap ? "; drawn where the party stood for the House" : ""}.${boothsOn && svYear(m.year) === 2004 ? " The AEC published no 2004 Senate counts by polling place." : ""}`}</div>`;
+      if (none || gap || (boothsOn && svYear(m.year) === 2004)) h += `<div class="lg-note">${none ? "A state election: there was no Senate vote." : `${gap ? "Drawn where the party stood for the House." : ""}${boothsOn && svYear(m.year) === 2004 ? " The AEC published no 2004 Senate counts by polling place." : ""}`}</div>`;
       break;
     }
     case "flow": {
@@ -9818,32 +9791,30 @@ function legendHTML(m) {
       const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", STATE_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
       h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}${flowSrcBtn(m)}</div>`;
 
-      h += `<div class="lg-ramp" style="background:${grad(S.vs === "onp" ? RAMP.divOn : RAMP.div, 0, 200)}"></div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-alp">◀ Mostly to Labor</span><span class="${S.vs === "onp" ? "t-onp" : "t-lnp"}">Mostly to ${vsW()} ▶</span></div><div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
+      h += `<div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
       const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
       if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
       if (m.res.flOpv) h += `<div class="lg-note">Counted, not modelled — New South Wales re-counted every ballot paper. Preferences there are optional, so a ballot can exhaust before the final two; a share reads the ballots that reached them.</div>`;
       break;
     }
     case "senpref": {
-      const A = spArea(m, m.areas.AUS.idx), none = spYear(m.year) == null, gvt = spGvtYear(m.year) != null;
+      const none = spYear(m.year) == null, gvt = spGvtYear(m.year) != null;
       h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
 
-      h += `<div class="lg-ramp" style="background:${grad(spRamp(), 0, 200)}">${A ? mark(A.share, 10, 90) : ""}</div>${ticks([10, 30, 50, 70, 90], 10, 90, (v) => `${v}%`)}<div class="lg-ends"><span class="t-${SP_PAIRS[S.spPair][0]}">◀ ${spA(true)} ahead</span><span class="t-${SP_PAIRS[S.spPair][1]}">${spB().replace(/^the /, "The ")} ahead ▶</span></div>`;
-      h += `<div class="lg-note">${spYear(m.year) == null ? "A state election has no Senate-ballot preference record here." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016. The line marks Australia.` : STATE_YEARS.has(m.year) ? "Every formal upper-house ballot in New South Wales, by which of the two it numbered first; ballots numbering neither are set aside. The line marks New South Wales." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside. The line marks Australia."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
+      h += `<div class="lg-note">${spYear(m.year) == null ? "A state election has no Senate-ballot preference record here." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016.` : STATE_YEARS.has(m.year) ? "Every formal upper-house ballot in New South Wales, by which of the two it numbered first; ballots numbering neither are set aside." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
     }
     case "informal": {
-      const exh = infModeOf(m) === "exhaust", hi = infHi(m);
+      const exh = infModeOf(m) === "exhaust";
       // the exhausted view is offered only where the count is optional-preferential —
       // like the census switcher, the same legend swaps measure under the lens
       const opts = m.res && m.res.flOpv ? `<select data-opt="infm" aria-label="Informal lens view"><option value="informal"${S.infMode === "informal" ? " selected" : ""}>Informal</option><option value="exhaust"${S.infMode === "exhaust" ? " selected" : ""}>Exhausted ballots</option></select> ` : "";
       h += `<div class="lg-t">${opts}${exh ? "ballots exhausting before the final two" : "Informal ballots"}</div>`;
-      if (exh) h += `<div class="lg-ramp" style="background:${grad(RAMP.inf, 0, 100)}">${mark(aus.exhPct, 0, hi)}</div>${ticks([0, 6, 12, 18, 25], 0, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}<div class="lg-note">Share of formal ballots that ran out of preferences — New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. The line marks ${stNameCap(m.year)}: ${f1(aus.exhPct)}%.</div>`;
-      else h += `<div class="lg-ramp" style="background:${grad(RAMP.inf, 0, 100)}">${mark(aus.infPct, 0, hi)}</div>${ticks([0, 3, 6, 9, 12], 0, hi, (v) => `${v}%${v === hi ? "+" : ""}`)}<div class="lg-note">The line marks Australia: ${f1(aus.infPct)}%.</div>`;
+      if (exh) h += `<div class="lg-note">Share of formal ballots that ran out of preferences — New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. ${stNameCap(m.year)}: ${f1(aus.exhPct)}%.</div>`;
+      else h += `<div class="lg-note">Australia: ${f1(aus.infPct)}%.</div>`;
       break;
     }
     case "cls":
-      h += seatTypeFilters(m);
       break;
     case "seifa": {
       // the census pickers come from the shared builder: the list bar lays
@@ -9870,7 +9841,6 @@ function legendHTML(m) {
         // the median lanes price their axes in dollars and years; every
         // other people lane reads percentages
         const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : ageMed() ? (v) => `${Math.round(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
-        h += `<div class="lg-ramp" style="background:${grad(demoRamp(), 0, 100)}">${early || !aus.demo || ausShare == null ? "" : mark(ausShare, lo, hi)}</div>${ticks([lo, (lo + hi) / 2, hi], lo, hi, demoTick)}`;
         // the income lanes' note names their own cut in the census
         // year's dollars — the median spectrum reads the national
         // household line straight — then the same census-basis tail
@@ -9918,11 +9888,10 @@ function legendHTML(m) {
         const cobTail = m.demoBasis === "venue" ? `${m.year < 2007 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
         // the Areas drawing names its own ground: the census's areas as counted
         const arTail = arOn ? `${areasVintage(m)} census, as counted in each of the census’s own areas${m.demoInterp && m.demoInterp.nearestSide === areasVintage(m) ? " (this frame’s figures blend two censuses — the areas paint the nearest single one)" : ""}.` : null;
-        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${arOn ? arTail : isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` The line marks ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
+        h += `<div class="lg-note">${early ? "Census people figures start at the 1993 election: 1993, 1996 and 1998 read blended census shares over the two censuses that bracket each election; 2001 reads its own census; 2004 to 2019 blend between the two censuses that bracket them; 2022 reads the 2021 census." : noInc ? "Income figures follow the era prints — the 1991 household share (weekly-equivalent) on the 1993 and 1996 elections, 2001 onward per-adult (the 1996 census prints no household-income table at all): 2001 to 2013 read the census areas the polling places stand in, from 2016 they follow the voters." : `${headNote}${headNote.endsWith(")") || headNote.endsWith('"') || headNote.endsWith(".") ? " " : ", "}${arOn ? arTail : isCob() ? cobTail : basisTail}${aus.demo && ausShare != null ? ` ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}: ${incMed() ? mny(ausShare) : ageMed() ? Math.round(ausShare) : `${f1(ausShare)}%`}.` : ""}`}</div>`;
         break;
       }
       const arSf = drawOf(m) === "areas" && AR.packOf != null && AR.pack;
-      h += `<div class="lg-ramp" style="background:${grad(RAMP.seifa, 0, 100)}"></div>${ticks([1, 10], 1, 10, (v) => `${v}`)}<div class="lg-ends"><span style="color:var(--ink-3)">◀ Least advantaged</span><span style="color:var(--ink-3)">Most ▶</span></div>`;
       h += arSf ? `<div class="lg-note">Each census area with the ABS’s own national decile for its SA1, as published with the ${areasVintage(m)} census — the areas ranked into tenths across Australia, not this sheet’s seats into tenths of themselves.</div>`
         : boothsOn ? `<div class="lg-note">Places scored ${seifaBasis(m) === "voters" ? "where each place’s voters live" : "on the census areas they stand in"}.</div>` : `<div class="lg-note">Seats ranked into tenths of the ${m.divs.length}.</div>`;
       break;
@@ -9945,15 +9914,8 @@ function legendHTML(m) {
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     h += `<div class="lg-hint mp-hint" id="hint"></div>`;
-    // the left-hand lines stack in a column of their own, free of the scale's rows
-    // beside them — the winner lens skips this: its own rows span the legend
-    if (S.lens !== "winner") {
-      const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
-      t.innerHTML = h; left.className = "lg-left";
-      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-jump, .lg-note, .lg-shapes, .lg-draw, .lg-bal, .lg-hint")) left.appendChild(c);
-      t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
-    }
   }
+
   return h;
 }
 
@@ -10922,10 +10884,9 @@ document.addEventListener("click", (e) => {
   const tn = e.target.closest("[data-towns]");
   // the Jump-to row's city-names toggle: the map stops (restart) painting town names
   if (tn) { S.townsOff = !S.townsOff; renderLegend(); schedule(); return; }
-  const t = e.target.closest("[data-cls],[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
+  const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
-  if (t.dataset.cls) { S.f.cls = S.f.cls === t.dataset.cls ? null : t.dataset.cls; filtersChanged(); return; }
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
   if (t.dataset.go != null) {
     const [k, ...rest] = t.dataset.go.split(":"); const v = rest.join(":");
