@@ -123,7 +123,7 @@ api.statScopeOf(current).open=false;
 api.statScopeOf(now).open=true;
 const gNow=api.statPrimaryGrid(now,now.areas.AUS,"",true);
 assert.ok(gNow.includes("st-othx"),"an as-it-stands frame lists its Others too");
-assert.ok(!gNow.includes("<small"),"an as-it-stands frame carries no change figures");
+assert.ok(gNow.includes("<small"),"an as-it-stands frame carries its base election's change figures too (user call, 2026-11-07)");
 api.statScopeOf(now).open=false;
 const colsSa16=api.statPrimaryCols(old,old.areas.SA),nxt16=colsSa16.find((c)=>c[4].startsWith("party:"));
 assert.ok(nxt16,"Xenophon stands out of South Australia's Others");

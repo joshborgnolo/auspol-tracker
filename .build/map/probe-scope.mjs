@@ -60,6 +60,13 @@ try {
   await page.waitForFunction(() => window.__map, { timeout: 60000 });
   await page.evaluate(() => { __map.setLens("winner"); __map.goAus(); __map.setView("map"); });
   await labelIs(page, "Filter seats", "the trigger invites the filter by default, on every frame");
+  // the now view carries the base election's swings (user call, 2026-11-07)
+  const nowSw = await page.evaluate(() => ({
+    swing: document.querySelector("#story .st-stat .st-swing")?.textContent.trim() ?? null,
+    smalls: [...document.querySelectorAll("#story .st-fps small")].length,
+  }));
+  assert.ok(nowSw.swing && /swing$/.test(nowSw.swing), `the now view's head shows its swing: ${nowSw.swing}`);
+  assert.ok(nowSw.smalls > 0, "…and its primaries row carries change smalls");
   const menuNow = await menuLabels(page);
   assert.ok(menuNow.some((l) => l.startsWith("aus = National")) && menuNow.some((l) => l.startsWith("st:NSW = NSW"))
     && menuNow.some((l) => l.startsWith("st:VIC = Victoria")) && menuNow.some((l) => l.startsWith("st:QLD = Queensland"))

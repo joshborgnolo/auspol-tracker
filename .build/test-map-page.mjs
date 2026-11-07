@@ -2555,6 +2555,15 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".mp-legend .lg-jump { display: flex; flex-wrap: wrap;") && css.includes(".mp-legend > .lg-jump { grid-column: 1 / -1; }"), "the Jump-to row lays out wherever it sits — nested too — and spans full width only as the legend's direct child");
 }
 
+// the now views carry the base election's swings (user call 2026-11-07 —
+// reversing the old "not a change since" suppression): the winner head's 2PP
+// swing chip and its primaries change smalls show on every frame alike
+{
+  const st = part("app-4-story.js");
+  assert.ok(st.includes("const s = A.tppSw;") && !st.includes("isNowY(m.year) ? null : A.tppSw"), "the now view's two-party swing shows like any frame's");
+  assert.ok(st.includes("showChange = A.fpSw.alp != null;") && !st.includes("fpSw.alp != null && !isNowY(m.year)"), "…and its primaries row carries change smalls");
+}
+
 // the full-screen view (app-7-full.js, 2026-11-03): its way in opens the zoom plate —
 // the top-rightmost control since 2026-11-06, the jump-back's return arrow down the
 // stack below it, its own glyph two corner brackets — the plates' room in

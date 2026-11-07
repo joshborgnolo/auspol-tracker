@@ -295,7 +295,9 @@ function statOthersRows(A, cols) {
    remainder column drops out (the rest recentre) and its contents list in a
    smaller line under the row; clicked again they fold back into the figure */
 function statPrimaryGrid(m, A, cls = "", othx = false) {
-  const all = statPrimaryCols(m, A), showChange = A.fpSw.alp != null && !isNowY(m.year);
+  // the change smalls ride every frame's primaries — an as-it-stands frame's
+  // are the base election's (user call: the now views carry swings too)
+  const all = statPrimaryCols(m, A), showChange = A.fpSw.alp != null;
   const rows = othx ? statOthersRows(A, all) : [];
   const open = othx && !!statScopeOf(m).open && rows.length > 0;
   const cols = open ? all.slice(0, -1) : all;
@@ -380,8 +382,9 @@ function statBreakdown(m, st, kind, rows) {
   } else if (view.mode === "cycle") {
     const r = rows[view.index], A = r.A;
     const pair = Number.isFinite(A.tpp) ? `<span class="st-pv-tpp" role="group" aria-label="Labor ${f1(A.tpp)}%, ${esc(oppNameW())} ${f1(100 - A.tpp)}%"><b style="color:${css(TH.party.alp)}">${f1(A.tpp)}</b><i aria-hidden="true">–</i><b style="color:${css(TH.party.lnp)}">${f1(100 - A.tpp)}</b></span>` : `<span class="st-note">No two-party count available.</span>`;
-    // the head's swing line, per area that carries one (states; not as-it-stands frames)
-    const sw = isNowY(m.year) || A.tppSw == null ? "" : Math.abs(A.tppSw) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b style="color:${css(TH.party[A.tppSw > 0 ? "alp" : "lnp"])}">+${Math.abs(A.tppSw).toFixed(1)}</b> swing</span>`;
+    // the head's swing line, per area that carries one — as-it-stands frames
+    // show theirs too (the base election's is the read there)
+    const sw = A.tppSw == null ? "" : Math.abs(A.tppSw) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b style="color:${css(TH.party[A.tppSw > 0 ? "alp" : "lnp"])}">+${Math.abs(A.tppSw).toFixed(1)}</b> swing</span>`;
     // metro types set as compound modifiers over the figures: "Inner-metro primaries"
     const nm = kind === "classes" ? r.short.replace(" ", "-") : r.short;
     body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(nm)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(nm)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
@@ -460,9 +463,9 @@ function seatStat(m, st, label, noteDef = null) {
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
-    // an "as it stands" frame's tallies carry the base election's swing, which is not a change
-    // since: only the seats row gets the now-frame's change line
-    const s = isNowY(m.year) ? null : A.tppSw;
+    // an "as it stands" frame's swing is the base election's — shown like any
+    // election frame's (user call: the now views carry swings too)
+    const s = A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
     // the govt tag rides the names row with them (anchorGovtTag then hugs the head's content edge)
