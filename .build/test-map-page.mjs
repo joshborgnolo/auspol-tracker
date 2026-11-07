@@ -2592,6 +2592,7 @@ for (const y of ["sa22", "sa26"]) {
   const ui = part("app-6-ui.js"), css = part("page.css");
   assert.ok(ui.includes("h += drawRow;") && ui.indexOf("h += drawRow;") < ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf("h += drawNoteHTML(m);") < ui.indexOf('h += `<div class="lg-hint'), "the Draw row, then its note, then the hint — no note above the row");
   assert.ok(!css.includes(".fs .mp-legend .mp-search { flex-basis: 100%; width: 100%; }"), "fullscreen's search shares the Base row — no full-width line under it");
+  assert.ok(css.includes(".mp-legend .mp-search label { height: 23px; border-radius: 2px; }"), "the legend's search matches the 23px row rhythm — no tall row over the Filter row");
   assert.ok(ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') > ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') < ui.indexOf('h += `<div class="lg-hint'), "the flow lens's final-two key rides the panel's closing rows ahead of the zoom hint");
 }
 

@@ -1057,7 +1057,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
 .mp-legend .lg-toolbar .lg-basis { flex: 1 0 auto; width: auto; }
 .mp-legend .mp-search { flex: 0 1 300px; width: 300px; max-width: 100%; order: 0; margin: 0; align-self: auto; }
-.mp-legend .mp-search label { height: 27px; border-radius: 2px; }
+.mp-legend .mp-search label { height: 23px; border-radius: 2px; }
 .fs-sbox { display: none; }
 .fs .mp-legend .lg-toolbar { flex-wrap: nowrap; }
 .fs .mp-legend .mp-search { flex: 0 1 300px; width: auto; min-width: 0; }
