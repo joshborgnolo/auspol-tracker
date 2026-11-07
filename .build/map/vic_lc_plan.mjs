@@ -1,4 +1,4 @@
-/* vic_lc_plan.mjs – build map/data/lc-seating-plan-vic-2026-10-27.json, the 60th
+/* vic_lc_plan.mjs – build maps/data/lc-seating-plan-vic-2026-10-27.json, the 60th
    Parliament's Legislative Council seating plan, from the Parliament's own
    councilseatingplan page.
 
@@ -15,7 +15,7 @@
    Nothing is re-fetched here: the snapshot is the record, and this script is the
    deterministic extraction of it. A plan rebuild = a fresh committed snapshot,
    then this script again (see ./vic_lc_seating.mjs for the seats-vic22-lc.json
-   side and map/data/lc-seating-plan-vic-2026-10-27.md for provenance).
+   side and maps/data/lc-seating-plan-vic-2026-10-27.md for provenance).
 
    The desk art is the 58x58 rounded square at the group; its centre is what the
    plan binds a member to. The plan's own desk numbers (the seat-N ids) are kept
@@ -37,7 +37,7 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const SRC = path.join(HERE, "src", "vic22-lc-plan", "councilseatingplan-2026-10-27.html");
-const OUT = path.join(ROOT, "map", "data", "lc-seating-plan-vic-2026-10-27.json");
+const OUT = path.join(ROOT, "maps", "data", "lc-seating-plan-vic-2026-10-27.json");
 const CAPTURED = "27 October 2026";
 const URL = "https://www.parliament.vic.gov.au/councilseatingplan";
 

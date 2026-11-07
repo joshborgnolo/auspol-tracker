@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The vic22 frame's upper house: map/data/senate-vic22.json — Victoria's
+"""The vic22 frame's upper house: maps/data/senate-vic22.json — Victoria's
 Legislative Council, in the federal Senate files' own shape with lc:true.
 
 Victoria's council is NOT staggered like South Australia's or New South
@@ -27,7 +27,7 @@ Sources (read-only, committed):
       the 2018 election's region pages (the state preference-flows
       pipeline's own mirror): per-party first-preference sums give `pvotes`
       and the 2018 formal total `pformal`.
-  map/data/lc-seating-plan-vic-2026-10-27.json (.build/map/vic_lc_plan.mjs)
+  maps/data/lc-seating-plan-vic-2026-10-27.json (.build/map/vic_lc_plan.mjs)
       the Parliament's own council seating plan captured 27 October 2026:
       the council as it sits today. The file's roster therefore runs four
       term-time changes since polling day, marked in the senators' rows the
@@ -44,7 +44,7 @@ Sources (read-only, committed):
       David Limbrick's party renamed itself (Liberal Democrats to
       Libertarian Party in 2023): a rename, not a move — no electedAs.
 
-usage: python3 .build/map/build_vic22_lc.py <map_data_dir>     # e.g. map/data
+usage: python3 .build/map/build_vic22_lc.py <map_data_dir>     # e.g. maps/data
 """
 import json
 import os
@@ -58,7 +58,7 @@ import xlrd  # noqa: E402
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 XLC = os.path.join(REPO, ".build", "map", "src", "vic22", "xlc")
 SRC18 = os.path.join(REPO, ".build", "state-flow-src", "vic", "lc", "2018")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
 
 ELECTION = "2022-11-26"
 AS_OF = "2026-10-27"  # the plan's date: the council as it sits now

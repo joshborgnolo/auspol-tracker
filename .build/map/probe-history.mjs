@@ -1,5 +1,5 @@
 // Manual browser regression probe: start a local server, then
-// MAP_URL=http://127.0.0.1:8765 node .build/map/probe-history.mjs
+// MAP_URL=http://127.0.0.1:8765 node .build/maps/probe-history.mjs
 import assert from 'node:assert/strict';
 import puppeteer from 'puppeteer-core';
 const browser = await puppeteer.launch({executablePath:process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:true, args:['--force-prefers-reduced-motion']});
@@ -18,7 +18,7 @@ try {
         return arc.apply(this,args);
       };
     });
-    await page.goto(`${base}/map/#y=${width < 500 ? 2010 : 2001}`,{waitUntil:'domcontentloaded'});
+    await page.goto(`${base}/maps/#y=${width < 500 ? 2010 : 2001}`,{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>window.__map,{timeout:60000});
     if (width < 500) {
       for (const year of [1993,1996,1998,2001,2010]) {

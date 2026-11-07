@@ -1,7 +1,7 @@
 """The nsw23 frame's past election and its upper house.
 
 1. The previous NSW election (23 March 2019, SG1901), lower house, joined
-   INTO map/data/data-nsw23.json exactly as build_sa22_past.py joined 2018
+   INTO maps/data/data-nsw23.json exactly as build_sa22_past.py joined 2018
    into the sa22 frame: `prev` 2019, agg pprim/pformal, each district's `h`
    history row, every candidate's c[5] change on 2019 (same party code as
    2023, else the whole share), and classic-pair districts' tpp[2] swings
@@ -18,7 +18,7 @@
    parsers; district sums are proved against the hard-coded REF_2019_* key
    (the statewide figures the NSWEC's own pages report) and fail loudly.
 
-2. The Legislative Council, map/data/senate-nsw23.json, in the federal
+2. The Legislative Council, maps/data/senate-nsw23.json, in the federal
    Senate files' shape with lc:true — as of the 25 March 2023 election.
    NSW's council is 42 members elected statewide, half (21) at each state
    election to terms ending at the election eight years on: the 2023
@@ -55,7 +55,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build_nsw23_data as B  # noqa: E402  (parsers, PARTY_AB, flat_name)
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(B.REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(B.REPO, "maps", "data")
 E19, E23 = "2019-03-23", "2023-03-25"
 
 # the 2019 statewide answer key — the summed districts pinned once and

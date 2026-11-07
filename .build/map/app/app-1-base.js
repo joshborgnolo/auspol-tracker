@@ -1240,7 +1240,7 @@ async function buildHandbookGeo(topo, m) {
    in (seat: the owner, else the places' own); and the same coast on the
    map's own plane (mpath, its bounds mbb), where the camera flies out to it */
 let islandsP = null;
-const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
+const loadIslands = () => islandsP || (islandsP = getJSON("/maps/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
   if (!data) return [];
   // the federal seat islands have no home in a state election's frame
@@ -1351,9 +1351,9 @@ async function loadYear(year, bg) {
     const ry = nowRy(year);
     // the results without the polling places' census lanes (core-split.mjs), unless the
     // lens is reading them now or the page's warmup already asked for the full file
-    const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
-    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
+    const fullU = `/maps/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/maps/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/maps/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/maps/data/${NOW_DATA[year]}`, bg) : null,
+      SEATED.has(year) ? getJSON(`/maps/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own m.proj, never the page's: `proj` is the year on screen's alone
     // (setYear hands it over). A load borrowing it, as this one did until 2026-11-05, moved
     // the towns, streets and sea under the year in view for as long as the load ran, seconds
@@ -1449,7 +1449,7 @@ const needPpl = () => S.lens === "seifa" && isDemo();
 function loadPpl(y) {
   const m = Y[y];
   if (!m || !m.divs || m.ppl) return Promise.resolve(m);
-  return (m.pplP ??= getJSON(`/map/data/res-${nowRy(y)}.json`).then((full) => {
+  return (m.pplP ??= getJSON(`/maps/data/res-${nowRy(y)}.json`).then((full) => {
     const B = m.booth.raw, F = full.booths;
     if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
     m.ppl = true;
@@ -1474,7 +1474,7 @@ function warmHi(y) {
   // the hi detail can land after the reader has moved to another year — its paths
   // are baked under this year's own projection, whatever the live one is by then
   const ry = nowRy(y);
-  m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
+  m._hiP = getJSON(`/maps/data/geo-${ry}-hi.json`)
     .then((hi) => buildGeoSliced(hi, m, m.proj))
     .then((g) => { m.geoHi = g; schedule(); })
     .catch(() => { m._hiP = null; });

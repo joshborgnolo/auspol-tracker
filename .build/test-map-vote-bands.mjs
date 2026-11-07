@@ -12,7 +12,7 @@ const STATE_YEARS = new Set(Object.keys({ sa22: 1, sa26: 1, nsw15: 1, nsw19: 1, 
 const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const CLS = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };
-let current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
+let current = { year: 2025, res: JSON.parse(read("maps/data/core-2025.json")) };
 const S = { lens: "winner" };
 // statScopeOk/statBreakdownRows read m.areas[st].{formal,idx}; the app derives them in deriveAreas
 current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));

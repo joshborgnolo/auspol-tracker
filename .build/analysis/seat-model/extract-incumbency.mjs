@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* extract-incumbency.mjs: who was the sitting member in every House contest 1993-2025, aligned with the
-   candidates of map/data/res-<year>.json (same division, same ballot order), written to
+   candidates of maps/data/res-<year>.json (same division, same ballot order), written to
    data/house-incumbency.json for the seat model's long calibration (calibrate-swing.mjs, backtest-chain.mjs).
 
    The res stores' own sitting column (c[7]) cannot be used: from 2007 it is always 0 (the AEC file has no
@@ -95,7 +95,7 @@ function psephos1990() { // winners of 1990: the capitalised name in each divisi
   return out;
 }
 const titleDiv = (s) => norm(s);
-const RES = Object.fromEntries(YEARS.map((y) => [y, JSON.parse(readFileSync(`map/data/res-${y}.json`, "utf8"))]));
+const RES = Object.fromEntries(YEARS.map((y) => [y, JSON.parse(readFileSync(`maps/data/res-${y}.json`, "utf8"))]));
 
 /* winners per year: { st|DIV -> {surname, given} } from the AEC files */
 function winnersOf(year) {

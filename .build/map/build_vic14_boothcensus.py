@@ -34,7 +34,7 @@ Inputs (all caches already ride this repo's other pipelines):
   .build/analysis/seat-model/cache/bcp-sa1-2011.zip      (2011 BCP SA1 datapack)
   .matilda/seifa-irsad-abs/abs-seifa-2011-sa1-indexes.xls (SEIFA 2011 SA1 cube)
   .matilda/seifa-irsad-abs/dl/1270055001_sa1_2011_aust_shape.zip (SA1 2011 polygons)
-  map/data/data-vic14.json (build_vic14_data.py's output; this script
+  maps/data/data-vic14.json (build_vic14_data.py's output; this script
         splices the two lanes in in place and rewrites it — it runs
         after that build and is itself rerun after it, since the
         data build wipes the lanes)
@@ -65,7 +65,7 @@ CUBE_XLS = os.path.join(
 CUBE_ROWS = 52678               # build_vic14_seifa.py's pins, same cube
 CUBE_VIC_ROWS = 12954
 CUBE_CODE_LEN = 7
-DATA_JSON = os.path.join(REPO, "map", "data", "data-vic14.json")
+DATA_JSON = os.path.join(REPO, "maps", "data", "data-vic14.json")
 VENUES = 1786                   # the data build's GEO_PINS venues
 UNLOCATED = 73                  # ... and its GEO_PINS miss
 

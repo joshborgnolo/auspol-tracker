@@ -169,8 +169,8 @@ def main():
              'sourceSHA256':files, 'elections':{}}
     docs = {}
     for y in YEARS:
-        doc = read(ROOT / f'map/data/res-{y}.json'); docs[y] = doc
-        path = ROOT / f'map/data/geo-{y}-lo.json'
+        doc = read(ROOT / f'maps/data/res-{y}.json'); docs[y] = doc
+        path = ROOT / f'maps/data/geo-{y}-lo.json'
         store['sourceSHA256'][str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
         geom = boundaries(path)
         places, counts = {}, collections.Counter()
@@ -185,7 +185,7 @@ def main():
     write(STORE, store)
     for y, doc in docs.items():
         apply_locations(doc, store)
-        write(ROOT / f'map/data/res-{y}.json', doc)
+        write(ROOT / f'maps/data/res-{y}.json', doc)
 
 
 if __name__ == '__main__':

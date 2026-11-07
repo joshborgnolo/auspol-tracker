@@ -5,7 +5,7 @@ const pairs = [["res-2016", "res-2019"], ["res-2019", "res-2022"], ["res-2022", 
 for (const party of ["onp", "lnp", "alp", "grn"]) {
   console.log(`\n=== ${party.toUpperCase()} ===   transition          n   state  ->  new   elast  MAE: uniform  prop  logit`);
   for (const [, b] of pairs) {
-    const D = load(`map/data/${b}.json`);
+    const D = load(`maps/data/${b}.json`);
     const R = divRows(D).filter((r) => r.baseKnown);
     // contested at both: candidate present now AND notional base > 0.3%
     const sel = R.filter((r) => r.c.some((c) => c[3] === party) && r.base[party] > 0.003 && r.sh[party] > 0.003);

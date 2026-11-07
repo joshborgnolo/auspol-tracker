@@ -1989,10 +1989,11 @@ const TABS = [
     tip: "How preferences decide the two-party figure" },
   /* Election map (2026-10-25): every federal seat and polling place since
      2004, on the map, in the chamber and in a list - a page OUTSIDE this
-     build (ext), the satellite at /map/ (.build/map/). The menu links it;
-     it has no view here, so it takes no path of this page's, no stop on the
-     page turn and no menu-page view, and build.mjs emits no document for it */
-  { id: "map", label: "Electoral maps", menu: true, ext: true,
+     build (ext), the satellite renamed Electoral maps at /maps/ (sources
+     .build/map/; the old /map/ is a redirect). The menu links it; it has no
+     view here, so it takes no path of this page's, no stop on the page turn
+     and no menu-page view, and build.mjs emits no document for it */
+  { id: "map", label: "Electoral maps", menu: true, ext: true, href: "/maps/",
     tip: "Every federal seat and polling place since 2004, on the map and in the chamber" },
   /* Election model (2026-11-01), the menu's sixth page: who would win the House, from 20,000
      simulated elections on the polls, seat by seat, with every setting open to change - a page

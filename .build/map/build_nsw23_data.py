@@ -67,7 +67,7 @@ in .build/map/src/nsw23/n-nsw23.geojson), spliced exactly as sa26 does.
 
 usage: python3 -I .build/map/build_nsw23_data.py <out_dir>
 then:  python3 -I .build/map/build_nsw23_past.py <out_dir>
-then:  node .build/map/geo_build.mjs .build/map/src/nsw23 <out_dir> map/data --years=nsw23
+then:  node .build/map/geo_build.mjs .build/map/src/nsw23 <out_dir> maps/data --years=nsw23
 """
 import collections, csv, gzip, html as H, json, os, re, sys
 
@@ -79,7 +79,7 @@ DEMO_STORE = os.path.join(REPO, "data", "nsw23-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "nsw23-seifa.json")
 DIST_IDS = os.path.join(NSW23, "district-ids.json")
 FLOW_COUNTS = os.path.join(FLOW, "2023", "counts.csv")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
 
 ELECTION = "2023-03-25"
 EXPECTED_SEATS = {"ALP": 45, "LIB": 25, "NAT": 11, "GRN": 3, "IND": 9}

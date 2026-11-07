@@ -32,7 +32,7 @@ Re-fetch manifest when a cache is missing:
 
 Deps: python3 stdlib only. Guards fail loud.
 usage: python3 -I .build/map/build_nsw23_demo.py
-then:  python3 -I .build/map/build_nsw23_data.py map/data
+then:  python3 -I .build/map/build_nsw23_data.py maps/data
 """
 import csv
 import hashlib

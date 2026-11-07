@@ -20,7 +20,7 @@ const bucketOfCoh = { ALP: "alp", COAL: "lnp", GRN: "grn", ON: "onp" };
 
 export function stateDistrictTables({ sen, st, res, ST }) {
   const SEN = loadRankings(sen), L = SEN.P.length;
-  const fed = J(`map/data/res-${sen}.json`), sd = J(`map/data/${res}.json`);
+  const fed = J(`maps/data/res-${sen}.json`), sd = J(`maps/data/${res}.json`);
   const BT = JSON.parse(gunzipSync(readFileSync(`.build/aec-flow-src/senate-ballots/booth-rankings-${sen}.json.gz`)).toString());
   const vec = (sparse) => { const v = new Float64Array(L); for (const [k, n] of Object.entries(sparse || {})) v[+k] = n; return v; };
   const FB = fed.booths, fb = [], fbAll = [];

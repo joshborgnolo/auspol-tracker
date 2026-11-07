@@ -7,7 +7,7 @@ const LEFT = new Set(["AJP", "VNS", "SAL", "SOPA", "FUT", "AUP", "SEP", "IAP", "
 const fam = (code) => (code === "IND" || code === "NAFD" ? "IND" : RIGHT.has(code) ? "R" : LEFT.has(code) ? "L" : "M");
 const MAP25 = { UAPP: "CYA", LDP: "LTP" }; // 2022 registrations whose 2025 successors carry another code
 function seats(y) {
-  const D = load(`map/data/res-${y}.json`), out = {};
+  const D = load(`maps/data/res-${y}.json`), out = {};
   for (const dv of D.divs) {
     if (!dv.tcp || dv.tcp.length !== 2) continue;
     const pr = dv.tcp.map((t) => dv.c[t[0]][3]); if (!(pr.includes("alp") && pr.includes("lnp"))) continue;

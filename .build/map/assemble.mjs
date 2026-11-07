@@ -17,7 +17,7 @@
    This writes map/map.js (one closure, so nothing leaks to window but the
    __map test hook) and map/map.css. Run after editing a part:
      node .build/map/assemble.mjs
-   The data in map/data comes from build_map_data.py, geo_build.mjs and
+   The data in maps/data comes from build_map_data.py, geo_build.mjs and
    islands_build.mjs (the islands past the mainland frame, drawn inset); each tracked file's hash
    is stamped into map.js (data-stamp.mjs), so re-run this after rebuilding any data file.
    It also writes each res-<frame>.json's core-<frame>.json (core-split.mjs): the results
@@ -50,8 +50,8 @@ const write = (rel, body) => {
   fs.writeFileSync(p, body);
   console.log(rel, body.length, "bytes");
 };
-write("map/map.js", js);
-write("map/map.css", css);
+write("maps/map.js", js);
+write("maps/map.css", css);
 
 /* the page's asset URLs take a short content hash (?v=): Pages serves the
    unqueried files with only a short TTL, but a phone's heuristic cache can
@@ -63,15 +63,15 @@ write("map/map.css", css);
    getJSON (app-1-base.js) drinks from window.__warm instead of racing it. */
 {
   const hs = { "map.js": crypto.createHash("sha1").update(js).digest("hex").slice(0, 8), "map.css": crypto.createHash("sha1").update(css).digest("hex").slice(0, 8) };
-  const ip = path.join(ROOT, "map", "index.html");
+  const ip = path.join(ROOT, "maps", "index.html");
   const html = fs.readFileSync(ip, "utf8");
-  let stamped = html.replace(/(src|href)="\/map\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/map/${f}?v=${hs[f]}"`);
+  let stamped = html.replace(/(src|href)="\/maps\/(map\.js|map\.css)(\?v=[0-9a-f]{8})?"/g, (m, attr, f) => `${attr}="/maps/${f}?v=${hs[f]}"`);
   const dv = dataStamps(ROOT);
   const warmV = {};
   for (const [f, v] of Object.entries(dv)) if (/^(res-\w+|core-\w+|geo-\w+-lo)\.json$/.test(f) || /^data-now(-\w+)?\.json$/.test(f) || f === "islands.json") warmV[f] = v;
   stamped = stamped.replace(
     /<!--map-data-warm:begin-->[\s\S]*?<!--map-data-warm:end-->/,
-    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var NOW_OF={"now":"2025","nswnow":"nsw23","qldnow":"qld24","wanow":"wa25"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json","qldnow":"data-now-qld.json","wanow":"data-now-wa.json"};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>\n<!--map-data-warm:end-->`);
-  if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("map/index.html stamped", hs["map.js"], hs["map.css"]); }
-  else console.log("map/index.html stamps current");
+    `<!--map-data-warm:begin-->\n<script id="map-data-warm">(function(){var V=${JSON.stringify(warmV)};var NOW_OF={"now":"2025","nswnow":"nsw23","qldnow":"qld24","wanow":"wa25"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json","qldnow":"data-now-qld.json","wanow":"data-now-wa.json"};var y=(location.hash.match(/[#&]y=(\\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/maps/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/maps/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>\n<!--map-data-warm:end-->`);
+  if (stamped !== html) { fs.writeFileSync(ip, stamped); console.log("maps/index.html stamped", hs["map.js"], hs["map.css"]); }
+  else console.log("maps/index.html stamps current");
 }

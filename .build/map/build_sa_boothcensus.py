@@ -25,7 +25,7 @@ manifests live in those pipelines' docstrings):
   .build/analysis/seat-model/cache/gcp-sa1-2021.zip           (GCP 2021 SA1 datapack)
   .build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip (SA1 2021 polygons)
   .matilda/seifa-irsad-abs/abs-seifa-2021-sa1-indexes.xlsx    (SEIFA 2021 SA1 cube)
-  map/data/data-sa22.json / map/data/data-sa26.json           (the map data builds;
+  maps/data/data-sa22.json / maps/data/data-sa26.json           (the map data builds;
         this script splices the two lanes into them and rewrites them — it
         runs after build_sa22_data.py / build_sa26_data.py and is itself rerun
         after them whenever the data builds change, since those wipe the lanes)
@@ -33,8 +33,8 @@ manifests live in those pipelines' docstrings):
 Chain:
   python3 -I .build/map/build_sa26_data.py && python3 -I .build/map/build_sa22_data.py
   python3 -I .build/map/build_sa_boothcensus.py
-  python3 -I .build/map/build_sa26_past.py map/data && python3 -I .build/map/build_sa22_past.py map/data
-  node .build/map/geo_build.mjs .build/map/src/sa26 map/data map/data --years=sa22,sa26
+  python3 -I .build/map/build_sa26_past.py maps/data && python3 -I .build/map/build_sa22_past.py maps/data
+  node .build/map/geo_build.mjs .build/map/src/sa26 maps/data maps/data --years=sa22,sa26
   node .build/map/assemble.mjs
 
 Deps: stdlib + openpyxl (the SEIFA pipelines' cube-reader library).
@@ -321,7 +321,7 @@ def main():
     decs = seifa_deciles()
     demos = demo_cells()
     for year in YEARS:
-        path = os.path.join(REPO, "map", "data", f"data-{year}.json")
+        path = os.path.join(REPO, "maps", "data", f"data-{year}.json")
         if not os.path.exists(path):
             fail(f"missing {path} — run its data build first")
         with open(path) as f:

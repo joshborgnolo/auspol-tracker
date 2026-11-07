@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* urban_build.mjs - map/data/urban.json: the 2021 ABS Urban Centre and Locality (UCL)
+/* urban_build.mjs - maps/data/urban.json: the 2021 ABS Urban Centre and Locality (UCL)
    outlines the map draws as a town's white edge when the town is picked.
 
    One entry per places.json row, in places.json's exact order (the app keys a town to
@@ -21,7 +21,7 @@
    guess at a shifted vintage).
 
    usage: node .build/map/urban_build.mjs
-   then: git add map/data/urban.json && node .build/map/assemble.mjs (the data stamp) */
+   then: git add maps/data/urban.json && node .build/map/assemble.mjs (the data stamp) */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,7 +30,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
 const SRC_DIR = path.join(root, ".build/map/src/urban");
 const CACHE = path.join(SRC_DIR, "ucl-2021.geojson");
 const URL_ = "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/UCL/MapServer/0/query?where=1%3D1&outFields=UCL_CODE_2021%2CUCL_NAME_2021%2CSTATE_CODE_2021&returnGeometry=true&outSR=4326&resultRecordCount=2000&f=geojson";
-const OUT = path.join(root, "map/data/urban.json");
+const OUT = path.join(root, "maps/data/urban.json");
 
 async function loadSource() {
   try { return JSON.parse(fs.readFileSync(CACHE, "utf8")); }
@@ -45,7 +45,7 @@ async function loadSource() {
 }
 const SERVICE = await loadSource();
 
-const PLACES = JSON.parse(fs.readFileSync(path.join(root, "map/data/places.json"), "utf8")).p;
+const PLACES = JSON.parse(fs.readFileSync(path.join(root, "maps/data/places.json"), "utf8")).p;
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 function* ringsOf(geom) {

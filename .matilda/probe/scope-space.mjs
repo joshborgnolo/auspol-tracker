@@ -20,7 +20,7 @@ const port = server.address().port;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new" });
 const page = await browser.newPage();
 page.on("pageerror", (e) => console.log("PAGEERROR:", e.message));
-await page.goto(`http://127.0.0.1:${port}/map/`, { waitUntil: "networkidle0" });
+await page.goto(`http://127.0.0.1:${port}/maps/`, { waitUntil: "networkidle0" });
 await page.waitForSelector(".st-scwrap [data-scope-trigger]", { timeout: 20000 });
 
 const labels = () => page.$$eval(".st-scm [data-scope]", (bs) => bs.map((b) => b.textContent));

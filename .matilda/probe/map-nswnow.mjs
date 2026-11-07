@@ -1,4 +1,4 @@
-/* The /map/ NSW "now" frame (nswnow) end to end, headless: the 2023
+/* The /maps/ NSW "now" frame (nswnow) end to end, headless: the 2023
    Assembly plus the four by-elections since (Epping, Hornsby, Pittwater
    19 Oct 2024; Kiama 13 Sep 2025) and the members' moves, riding the
    federal Now's overlay machinery generalised by NOW_OF. Asserts the frame
@@ -51,7 +51,7 @@ const boot = async (url) => {
 
 // deep link boots the frame
 {
-  const { page, errors } = await boot(base + "/map/#y=nswnow");
+  const { page, errors } = await boot(base + "/maps/#y=nswnow");
   const st = await page.evaluate(() => {
     const S = window.__map.S, m = window.__map.Y[S.year];
     const story = document.querySelector("#story") ? document.querySelector("#story").innerText : "";
@@ -80,7 +80,7 @@ const boot = async (url) => {
 
 // each by-election winner holds its seat, and Kiama's by-election page reads its count
 {
-  const { page, errors } = await boot(base + "/map/#y=nswnow");
+  const { page, errors } = await boot(base + "/maps/#y=nswnow");
   const out = await page.evaluate(async () => {
     const seen = (n) => Array.from(document.querySelectorAll("*")).some((el) => el.children.length === 0 && el.textContent.includes(n));
     window.__map.goState("NSW");
@@ -116,7 +116,7 @@ const boot = async (url) => {
 
 // the same-place onset: a Kiama booth reads its change against the 2023 count
 {
-  const { page, errors } = await boot(base + "/map/#y=nswnow");
+  const { page, errors } = await boot(base + "/maps/#y=nswnow");
   const out = await page.evaluate(async () => {
     const m = window.__map.Y.nswnow;
     const b = m.booth, js = b.byDiv[m.byName.get("Kiama")];
@@ -135,7 +135,7 @@ const boot = async (url) => {
 
 // search labels members, never "elected"
 {
-  const { page, errors } = await boot(base + "/map/#y=nswnow");
+  const { page, errors } = await boot(base + "/maps/#y=nswnow");
   const hit = await page.evaluate(async () => {
     const inp = document.querySelector("#q");
     inp.value = "McInerney";
@@ -150,7 +150,7 @@ const boot = async (url) => {
 
 // the federal Now is untouched by the generalisation
 {
-  const { page, errors } = await boot(base + "/map/#y=now");
+  const { page, errors } = await boot(base + "/maps/#y=now");
   const st = await page.evaluate(() => ({
     year: window.__map.S.year,
     meta: document.querySelector("#mp-meta").innerText,

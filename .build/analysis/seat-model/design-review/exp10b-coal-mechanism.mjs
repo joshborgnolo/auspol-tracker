@@ -48,7 +48,7 @@ function loo(rows, vars, label) {
   console.log(`  ${label} (${rows.length}) LOO MAE: ` + Object.entries(res).map(([k, v]) => `${k} ${v}`).join(" | "));
   console.log(`      corr with share: ` + vars.map((v) => `${v} ${corr(rows.map((r) => r[v]), act).toFixed(2)}`).join(", "));
 }
-const sa26 = load("map/data/res-sa26.json"), sa22 = load("map/data/res-sa22.json"), fed25 = load("map/data/res-2025.json");
+const sa26 = load("maps/data/res-sa26.json"), sa22 = load("maps/data/res-sa22.json"), fed25 = load("maps/data/res-2025.json");
 const lib22 = footprint(sa26, sa22, null, "lnp"), libF25 = footprint(sa26, fed25, "SA", "lnp"), on22 = footprint(sa26, sa22, null, "onp");
 const sa = rowsFor(sa26, ["alp", "onp"], "lnp", "alp", { lib22, libF25, on22 });
 for (const r of sa) { r.retain = r.lnp / r.lib22; r.lost = r.lib22 - r.lnp; }
@@ -57,7 +57,7 @@ loo(sa, ["lnp", "lib22", "libF25", "retain", "lost"], "SA 2026");
 console.log("  corr lnp~lib22 " + corr(sa.map((r) => r.lnp), sa.map((r) => r.lib22)).toFixed(2) + ", lnp~retain " + corr(sa.map((r) => r.lnp), sa.map((r) => r.retain)).toFixed(2));
 console.log("  detail: " + [...sa].sort((a, b) => a.share - b.share).map((r) => `${r.name} ${(100 * r.share).toFixed(0)} [Lib26 ${(100 * r.lnp).toFixed(0)}, Lib22 ${(100 * r.lib22).toFixed(0)}, keep ${(100 * r.retain).toFixed(0)}%]`).join("; "));
 // Qld 2017 with Qld 2015? not on the map; use federal 2016 footprint as the pre-election Coalition footprint
-const q17 = load("map/data/res-qld17.json"), fed16 = load("map/data/res-2016.json");
+const q17 = load("maps/data/res-qld17.json"), fed16 = load("maps/data/res-2016.json");
 const lnpF16 = footprint(q17, fed16, "QLD", "lnp");
 const q = rowsFor(q17, ["alp", "onp"], "lnp", "alp", { lnpF16 });
 for (const r of q) { r.retain = r.lnp / r.lnpF16; }

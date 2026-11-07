@@ -1,7 +1,7 @@
 // E1: where did One Nation's SA-2026 surge land? Compare swing geometries that use only pre-election data.
 import { load, divRows, boothRows, km, sum, mean, logit, ilogit, ridge, logitShift, mae, rmse, corr } from "./lib.mjs";
-const fed = load("map/data/res-2025.json");
-const sa = load("map/data/res-sa26.json");
+const fed = load("maps/data/res-2025.json");
+const sa = load("maps/data/res-sa26.json");
 const F = divRows(fed), S = divRows(sa);
 const fedB = boothRows(fed).filter((b) => b.st === "SA" && b.tot >= 30);
 const saB = boothRows(sa);

@@ -1,4 +1,4 @@
-// Probe: /map/'s full-screen view (app-7-full.js).
+// Probe: /maps/'s full-screen view (app-7-full.js).
 // usage: node .matilda/probe/map-fullscreen.mjs <baseUrl> [shotDir]   (serve the repo root first)
 //  - the zoom plate's button enters (the browser's own full screen too), the page behind goes inert
 //  - Esc from the whole map leaves; the page's scroll and the stage's spot come back to the pixel
@@ -14,7 +14,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 await page.setViewport({ width: 1280, height: 800 });
-await page.goto(`${base}/map/`, { waitUntil: "networkidle0" });
+await page.goto(`${base}/maps/`, { waitUntil: "networkidle0" });
 await page.waitForFunction("window.__map && window.__map.T"); await wait(800);
 // scroll the page a little first, to check it comes back
 await page.evaluate(() => window.scrollTo(0, 140)); await wait(300);
@@ -68,7 +68,7 @@ ok("the × leaves", !s.on, JSON.stringify(s));
 // a link naming full screen opens it
 const p2 = await browser.newPage(); p2.on("pageerror", (e) => errs.push(e.message));
 await p2.setViewport({ width: 1024, height: 768 });
-await p2.goto(`${base}/map/#y=2022&s=Kooyong&fs=1`, { waitUntil: "networkidle0" });
+await p2.goto(`${base}/maps/#y=2022&s=Kooyong&fs=1`, { waitUntil: "networkidle0" });
 await p2.waitForFunction("window.__map && window.__map.T"); await wait(2500);
 s = await p2.evaluate(() => ({ on: __map.fs.on, y: __map.S.year, lvl: __map.S.sel.level, ins: __map.fs.ins }));
 ok("a link with fs=1 opens full screen on its seat", s.on && s.y === 2022 && s.lvl === "div", JSON.stringify(s));

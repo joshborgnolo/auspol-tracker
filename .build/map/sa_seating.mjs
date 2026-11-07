@@ -5,8 +5,8 @@
    member at their desk in the floors the app draws (the @sa-cells block of app/app-3c-sa.js, read
    as is): a desk the app doesn't draw, a member who isn't the frame's, a party that disagrees with
    the results, a district or member seated twice or left out, all fail the build. Writes
-     map/data/seats-<year>.json     { plan, source, at: { district: desk } }   the House of Assembly
-     map/data/seats-<year>-lc.json  { plan, source, roles, at: { member: desk } }   the Council
+     maps/data/seats-<year>.json     { plan, source, at: { district: desk } }   the House of Assembly
+     maps/data/seats-<year>-lc.json  { plan, source, roles, at: { member: desk } }   the Council
    The Speaker's chair (T1) and the President's (N1) aren't desks: their holder must be the one the
    app puts there (SPEAKER_DIV in app-1-base.js; the council's President is filed as a role, with
    the leaders on the desks the floor plan names "Leader of the Government" and "of the Opposition").
@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const DATA = path.join(ROOT, "map", "data");
+const DATA = path.join(ROOT, "maps", "data");
 const SRC = path.join(HERE, "src", "sa-chambers");
 const YEAR = "sa26";
 const SPEAKER = { desk: "T1", div: "Hurtle Vale" };
@@ -65,7 +65,7 @@ function read(key) {
 const longDate = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const partyOf = (p, who) => { if (!(p in PARTY)) throw new Error(`${who}: unknown party "${p}"`); return PARTY[p]; };
 const once = (list, what) => { const seen = new Set(); for (const x of list) { if (seen.has(x)) throw new Error(`${what} ${x} seated twice`); seen.add(x); } };
-const write = (f, j) => { fs.writeFileSync(path.join(DATA, f), JSON.stringify(j, null, 1) + "\n"); console.log(`map/data/${f}`, Object.keys(j.at).length, "seated"); };
+const write = (f, j) => { fs.writeFileSync(path.join(DATA, f), JSON.stringify(j, null, 1) + "\n"); console.log(`maps/data/${f}`, Object.keys(j.at).length, "seated"); };
 
 // ----- the House of Assembly -----
 {

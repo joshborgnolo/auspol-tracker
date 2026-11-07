@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* senate_prefs.mjs: the Election map's Senate preferences lens data, map/data/senate-prefs-<year>.json
+/* senate_prefs.mjs: the Election map's Senate preferences lens data, maps/data/senate-prefs-<year>.json
    (2016, 2019, 2022, 2025: the elections with every Senate ballot published; group tickets before).
 
    From the ballot rankings the seat model uses (.build/analysis/seat-model/extract-senate-rankings.py):
@@ -63,7 +63,7 @@ for (const year of YEARS) {
   for (const [id, t] of Object.entries(B.booths)) if (!id.startsWith("special:")) booths[id] = cells(t, B.patterns, pairs, donors);
   // check: each division's place counts never exceed its all-ballot counts
   const out = { year, pairs, donors, absent, source: `Every formal Senate ballot, ${year} (AEC ballot-level files), by the order it ranked the pair's two parties; via data/senate-rankings-${year}.json and the polling-place table beside it`, divs, booths };
-  const f = path.join(ROOT, `map/data/senate-prefs-${year}.json`);
+  const f = path.join(ROOT, `maps/data/senate-prefs-${year}.json`);
   fs.writeFileSync(f, JSON.stringify(out));
   console.log(`senate-prefs-${year}.json: absent ${JSON.stringify(absent)}, ${Object.keys(divs).length} divisions, ${Object.keys(booths).length} polling places, ${fs.statSync(f).size} bytes`);
 }

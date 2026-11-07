@@ -1,13 +1,13 @@
 /* seating.mjs – where each member sits, from the Parliament's seating plans.
 
-   Reads map/data/house-seating-plan-<date>.json (each plan's printed labels:
+   Reads maps/data/house-seating-plan-<date>.json (each plan's printed labels:
    surname, division, the label's north-west corner in page points) and seats
    every member in the chamber's physical seats, the chamberCells() block of
    app/app-3-chamber.js: each label goes to the nearest free seat, nearest
    pairs first. A label is printed inside its seat round the curve and in the
    side blocks, and beside it along the front bench, so the front bench's
    labels sit some 20pt off their seats; anything further off fails the build.
-   Writes map/data/seats-<key>.json: { plan, source, at: { division: seat id } }.
+   Writes maps/data/seats-<key>.json: { plan, source, at: { division: seat id } }.
    PLANS says which plan each view of the map uses: "now" the latest; an
    election year the first plan printed after it, as they are filed (add the
    year to SEATED in app/app-1-base.js too). Each page draws the chamber at
@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const DATA = path.join(ROOT, "map", "data");
+const DATA = path.join(ROOT, "maps", "data");
 // the 46th Parliament's earliest archived plan is March 2021's (none survives from 2019)
 const PLANS = { now: "2026-08-13", 2025: "2025-10-27", 2022: "2022-07-29", 2019: "2021-03", 2016: "2016-08-31", 2013: "2013-11-12", 2010: "2012-02-27" };
 // what the legend adds after the plan's date, where the plan isn't the term's first

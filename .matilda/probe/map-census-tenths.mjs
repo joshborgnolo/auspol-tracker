@@ -47,7 +47,7 @@ const read = () => page.evaluate(() => {
 const show = async (url) => { await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1600); };
 
 // median age: ten stacked tenths, year tick labels, no % suffix
-await show(`${base}/map/#y=2025&l=seifa&i=age`);
+await show(`${base}/maps/#y=2025&l=seifa&i=age`);
 let d = await read();
 ok("age: Across-the-seats section rendered", d.found, (d.secs || []).join("|"));
 ok("age: ten bins", d.nBins === 10, String(d.nBins));
@@ -58,26 +58,26 @@ ok("age: not the SEIFA wording", !/least advantaged/.test(d.note), d.note);
 ok("age: year ticks at the ends and the mid cut, no %", d.ticks.length === 3 && !d.ticks.some((t) => t.includes("%")), d.ticks.join(","));
 
 // born overseas (a share): ten tenths, percent-suffixed top tick
-await show(`${base}/map/#y=2025&l=seifa&i=fborn`);
+await show(`${base}/maps/#y=2025&l=seifa&i=fborn`);
 d = await read();
 ok("fborn: ten stacked tenths", d.nBins === 10 && d.pieces.some((p) => p > 1), `${d.nBins} bins, ${d.pieces}`);
 ok("fborn: tenths near-equal in height", d.heights.length === 10 && Math.max(...d.heights) - Math.min(...d.heights) <= 8, String(d.heights));
 ok("fborn: share ticks, top end carries %", d.ticks.length === 3 && d.ticks[2].endsWith("%"), d.ticks.join(","));
 
 // SEIFA decile lens unchanged: data deciles, its own note, 1/5/10 ticks
-await show(`${base}/map/#y=2025&l=seifa&i=ieo`);
+await show(`${base}/maps/#y=2025&l=seifa&i=ieo`);
 d = await read();
 ok("ieo: decile ticks 1/5/10", d.ticks.join(",") === "1,5,10", d.ticks.join(","));
 ok("ieo: the SEIFA wording stands", /least advantaged/.test(d.note), d.note);
 
 // a state frame: SA 2026's 47 districts still rank into ten tenths
-await show(`${base}/map/#y=sa26&l=seifa&i=fborn`);
+await show(`${base}/maps/#y=sa26&l=seifa&i=fborn`);
 d = await read();
 ok("sa26 fborn: ten bins", d.nBins === 10, String(d.nBins));
 ok("sa26 fborn: tenths note with its own seat count", /a tenth of the 47 seats/.test(d.note), d.note);
 
 // phone width: no page overflow from the compact chart
-await show(`${base}/map/#y=2025&l=seifa&i=age`);
+await show(`${base}/maps/#y=2025&l=seifa&i=age`);
 for (const w of [390, 320]) {
   await page.setViewport({ width: w, height: 844, deviceScaleFactor: 2 });
   await wait(500);

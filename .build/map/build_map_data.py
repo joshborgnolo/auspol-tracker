@@ -28,14 +28,14 @@ from the results page, the TCP-flow and distribution-of-preferences by
 polling place from the "x" downloads).
 
 usage: python3 -I .build/map/build_map_data.py <out_dir> [<farrer_dir>]
-then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> map/data
+then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> maps/data
 """
 import csv, gzip, json, os, re, sys, collections
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = REPO + "/.build/aec-flow-src"
 BOOTH = SRC + "/booth"
-OUT = sys.argv[1] if len(sys.argv) > 1 else REPO + "/map/data"
+OUT = sys.argv[1] if len(sys.argv) > 1 else REPO + "/maps/data"
 FARRER = sys.argv[2] if len(sys.argv) > 2 else os.path.join(REPO, ".build", "map", "src", "farrer-31633")
 STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]
 YEARS = [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]

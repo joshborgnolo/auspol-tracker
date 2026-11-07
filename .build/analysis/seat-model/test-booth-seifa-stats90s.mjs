@@ -107,7 +107,7 @@ for (const [ys, spec] of Object.entries(YEARS)) {
     check(counts[k] === v, `${y}: counts.${k} ${counts[k]} != pin ${v}`);
   }
   if (spec.registry === "frame") {
-    const r = R(`map/data/res-${y}.json`);
+    const r = R(`maps/data/res-${y}.json`);
     const frameIds = new Set(r.booths.id);
     const storeIds = new Set(s.booths.map((b) => b.boothId));
     check(frameIds.size === storeIds.size && [...frameIds].every((id) => storeIds.has(id)),

@@ -202,7 +202,7 @@ for (const y of ELECTION_SET) {
   // 1993 lane pins against the map's own served frame's name set instead.
   const mine = new Set(Object.keys(blk));
   const theirs = y === "2028" && !klass[y] ? new Set(NAMES_2025_EDITION)
-    : y === "1993" ? new Set(JSON.parse(readFileSync("map/data/res-1993.json", "utf8")).divs.map((x) => x.n))
+    : y === "1993" ? new Set(JSON.parse(readFileSync("maps/data/res-1993.json", "utf8")).divs.map((x) => x.n))
     : new Set(Object.keys(klass[y] || {}));
   const missing = [...theirs].filter((n) => !mine.has(n));
   const extra = [...mine].filter((n) => !theirs.has(n));

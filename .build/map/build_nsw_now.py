@@ -71,8 +71,8 @@ import re
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 CACHE = os.path.join(REPO, ".build", "state-flow-src", "nsw", "byelections")
 NSW23_DIR = os.path.join(REPO, ".build", "map", "src", "nsw23")
-RES_NSW23 = os.path.join(REPO, "map", "data", "res-nsw23.json")
-OUT = os.path.join(REPO, "map", "data", "data-now-nsw.json")
+RES_NSW23 = os.path.join(REPO, "maps", "data", "res-nsw23.json")
+OUT = os.path.join(REPO, "maps", "data", "data-now-nsw.json")
 
 AS_OF = "2026-11-04"
 EVENTS = {

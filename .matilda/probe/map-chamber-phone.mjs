@@ -1,4 +1,4 @@
-/* Pins the phone-band label geometry on the /map/ chamber view
+/* Pins the phone-band label geometry on the /maps/ chamber view
    (shipped 2026-10-27 after the user's phone report: nsw23's
    "Crossbench 11" read as overlapping the "Speaker" label at 390px -
    the ship-time baselines y0-46 / y0-34 / y0-12 left a 3px ink gap).
@@ -76,7 +76,7 @@ for (const [year, widths, pres] of FRAMES) {
         return of.call(this, text, x, y, mx);
       };
     });
-    await page.goto(base + "/map/", { waitUntil: "load" });
+    await page.goto(base + "/maps/", { waitUntil: "load" });
     await page.waitForFunction(() => window.__map && window.__map.S, { timeout: 15000 });
     await page.evaluate(async (y) => {
       await window.__map.setYear(y);

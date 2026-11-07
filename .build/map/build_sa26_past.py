@@ -5,7 +5,7 @@ Two products, one cache (the build_sa26_data.py pipeline knows neither):
 1. The previous SA election (19 March 2022), lower AND upper house, STORED but
    never rendered as its own frame (a user call: "do not display this past
    election data in a map/chamber though, just store it"). The lower house's
-   district figures are joined INTO map/data/data-sa26.json so the frame can
+   district figures are joined INTO maps/data/data-sa26.json so the frame can
    speak of change: `prev` becomes 2022, the aggregate gains pprim/pformal,
    every district gains an `h` history row ([year, TCP%, party, member], the
    federal years' shape), every candidate's change column (c[5], the written
@@ -17,7 +17,7 @@ Two products, one cache (the build_sa26_data.py pipeline knows neither):
    that. The raw payloads stay cached (committed) in .build/map/src/sa26/ as
    the stored record; nothing draws a 2022 map from them.
 
-2. The Legislative Council, map/data/senate-sa26.json, in the federal Senate
+2. The Legislative Council, maps/data/senate-sa26.json, in the federal Senate
    files' own shape (year/asOf/senators[{n,st,ab,pn,term,elected}] etc.) with
    lc:true so the app's house toggle labels it "Legislative Council" and its
    copy speaks of 22 members and 12 to pass a bill. SA's council is 22
@@ -33,7 +33,7 @@ Two products, one cache (the build_sa26_data.py pipeline knows neither):
 
 usage: python3 -I .build/map/build_sa26_data.py <map_data_dir>   (first: the frame)
        python3 -I .build/map/build_sa26_past.py <map_data_dir> [--fetch]
-then:  node .build/map/geo_build.mjs .build/map/src/sa26 map/data map/data --years=sa26
+then:  node .build/map/geo_build.mjs .build/map/src/sa26 maps/data maps/data --years=sa26
 """
 import gzip, json, os, re, sys, urllib.request
 

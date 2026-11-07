@@ -1,6 +1,6 @@
 /* data-stamp.mjs – each Election map data file's content hash, stamped into map.js.
 
-   The data files keep their names (map/data/res-2025.json …) and Pages serves them with a ten-minute
+   The data files keep their names (maps/data/res-2025.json …) and Pages serves them with a ten-minute
    cache, while map.js itself is fetched by a hashed URL. A release that changes a file's shape could
    pair the new script with a browser's cached older copy and draw nothing (the Senate's floor,
    2026-10-26: the new script read a field the cached file didn't have). So assemble.mjs writes every
@@ -16,10 +16,10 @@ export const TOKEN = "/*@data-stamps*/{}";
 // the tracked JSON files only: a session's untracked build output must not change what map.js says
 export function dataStamps(root) {
   let files;
-  try { files = execFileSync("git", ["ls-files", "map/data/*.json"], { cwd: root, encoding: "utf8" }).split("\n").filter(Boolean); }
-  catch { files = fs.readdirSync(path.join(root, "map/data")).filter((f) => f.endsWith(".json")).map((f) => "map/data/" + f); }
+  try { files = execFileSync("git", ["ls-files", "maps/data/*.json"], { cwd: root, encoding: "utf8" }).split("\n").filter(Boolean); }
+  catch { files = fs.readdirSync(path.join(root, "maps/data")).filter((f) => f.endsWith(".json")).map((f) => "maps/data/" + f); }
   const out = {};
-  for (const f of files.filter((f) => path.dirname(f) === "map/data").sort()) {
+  for (const f of files.filter((f) => path.dirname(f) === "maps/data").sort()) {
     const p = path.join(root, f);
     if (fs.existsSync(p)) out[path.basename(f)] = crypto.createHash("sha1").update(fs.readFileSync(p)).digest("hex").slice(0, 8);
   }
@@ -38,9 +38,9 @@ export function stampData(js, stamps) {
    make-up glyph over its stop: the federal years' come from summary.json, which has none of them */
 export const META_TOKEN = "/*@meta-facts*/{}";
 export function metaFacts(root) {
-  const read = (f) => { try { return JSON.parse(fs.readFileSync(path.join(root, "map/data", f), "utf8")); } catch { return null; } };
+  const read = (f) => { try { return JSON.parse(fs.readFileSync(path.join(root, "maps/data", f), "utf8")); } catch { return null; } };
   const house = {}, senate = {}, mix = {};
-  for (const f of fs.readdirSync(path.join(root, "map/data")).sort()) {
+  for (const f of fs.readdirSync(path.join(root, "maps/data")).sort()) {
     let m = f.match(/^res-(\w+)\.json$/);
     if (m) {
       const r = read(f);

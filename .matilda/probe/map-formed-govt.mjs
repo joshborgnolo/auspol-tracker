@@ -1,4 +1,4 @@
-// Probe: the /map/ Winner head's two-party block —
+// Probe: the /maps/ Winner head's two-party block —
 //   1. the govt ink tag rides the figures' NAMES ROW on every frame, flush
 //      with the governing family's OUTER edge of the figures — left of them
 //      for Labor, right for the Coalition, never hanging PAST the edge
@@ -58,7 +58,7 @@ const names = () => page.evaluate(() => {
 });
 // the app reads the frame key from the hash at boot only — a hash navigation
 // alone won't re-render, so each frame switch needs a reload
-const show = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1500); };
+const show = async (y) => { await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1500); };
 
 // 2025: Labor won — tag flush with the figures' LEFT edge, on the names row
 await show("2025");

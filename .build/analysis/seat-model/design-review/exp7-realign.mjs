@@ -1,6 +1,6 @@
 // E7: SA-2026 district swings (2026 minus notional 2022) — how much do demographics explain? (in-sample + LOO)
 import { load, divRows, sum, mean, ridge } from "./lib.mjs";
-const S = divRows(load("map/data/res-sa26.json"));
+const S = divRows(load("maps/data/res-sa26.json"));
 const steady = S.filter((s) => Math.abs(s.sh.ind - s.base.ind) < 0.05);
 for (const party of ["alp", "lnp"]) {
   const y = steady.map((s) => 100 * (s.sh[party] - s.base[party]));

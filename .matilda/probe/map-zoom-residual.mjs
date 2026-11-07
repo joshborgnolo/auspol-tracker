@@ -1,4 +1,4 @@
-// Probe: /map/'s zoom carries on past the gesture, and doesn't lurch (app-2-map.js, zoom easing).
+// Probe: /maps/'s zoom carries on past the gesture, and doesn't lurch (app-2-map.js, zoom easing).
 // usage: node .matilda/probe/map-zoom-residual.mjs <baseUrl>   (serve the repo root first)
 // Real, trusted input through CDP: a pinch as Chrome sends it (ctrl-wheel), and touches. Each
 // pinch has a shape, since what must be told apart is how the stream ENDS:
@@ -20,7 +20,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
-await page.goto(`${base}/map/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
+await page.goto(`${base}/maps/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
 await wait(2500);
 await page.evaluate(() => document.querySelector("#stage").scrollIntoView({ block: "center", behavior: "instant" })); await wait(300);
 const box = await page.evaluate(() => { const r = document.querySelector("#cv").getBoundingClientRect(); return { x: r.left + r.width * 0.7, y: r.top + r.height * 0.6 }; });

@@ -1,7 +1,7 @@
 /* vic_seating.mjs – where each member of Victoria's 60th Parliament sits, from the
    Parliament's own Legislative Assembly seating plan of 11 August 2026.
 
-   Reads map/data/la-seating-plan-vic-2026-08-11.json (built by .matilda/vic-seating from
+   Reads maps/data/la-seating-plan-vic-2026-08-11.json (built by .matilda/vic-seating from
    the 60th-parliament-la-seating-plan-gallery-perspective-combined-11-august-2026.pdf linked
    from parliament.vic.gov.au/assembly — mirrored at
    .build/map/src/vic22-seating/la-seating-2026-08-11.pdf, method and provenance in the
@@ -15,7 +15,7 @@
    Nepean; Ringwood and South Barwon to the crossbench): a member who isn't the frame's, a
    party that disagrees, a district or desk seated twice or left out, all fail the build.
    The Speaker (Maree Edwards, Bendigo West) keeps the chair. Writes
-     map/data/seats-vic22.json   { plan, note, source, at: { district: desk } }. Run:
+     maps/data/seats-vic22.json   { plan, note, source, at: { district: desk } }. Run:
      node .build/map/vic_seating.mjs */
 import fs from "node:fs";
 import path from "node:path";
@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const DATA = path.join(ROOT, "map", "data");
+const DATA = path.join(ROOT, "maps", "data");
 const SPEAKER_DIV = "Bendigo West"; // app-1-base SPEAKER_DIV.vic22 — the frame's chair holds her
 const SPEAKER = { member: "Maree Edwards", party: "ALP" };
 // members whose holder or party moved after election day (26 November 2022): five by-elections
@@ -110,4 +110,4 @@ const out = {
   at,
 };
 fs.writeFileSync(path.join(DATA, "seats-vic22.json"), JSON.stringify(out, null, 1) + "\n");
-console.log("map/data/seats-vic22.json", Object.keys(at).length, "seated (+ Bendigo West in the chair)");
+console.log("maps/data/seats-vic22.json", Object.keys(at).length, "seated (+ Bendigo West in the chair)");

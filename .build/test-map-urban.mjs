@@ -54,10 +54,10 @@ assert.equal(requests, 2, "loaded geometry is reused");
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "map-urban-test-"));
 try {
   fs.mkdirSync(path.join(tmp, ".build/map"), { recursive: true });
-  fs.mkdirSync(path.join(tmp, "map/data"), { recursive: true });
+  fs.mkdirSync(path.join(tmp, "maps/data"), { recursive: true });
   const builder = path.join(tmp, ".build/map/urban_build.mjs");
   fs.copyFileSync(path.join(ROOT, ".build/map/urban_build.mjs"), builder);
-  fs.writeFileSync(path.join(tmp, "map/data/places.json"), JSON.stringify({ p: [["Test town", 151.005, -32.995, 1000, "NSW", [151, -33, 151.01, -32.99]]] }));
+  fs.writeFileSync(path.join(tmp, "maps/data/places.json"), JSON.stringify({ p: [["Test town", 151.005, -32.995, 1000, "NSW", [151, -33, 151.01, -32.99]]] }));
   const fixture = { features: [{ geometry: { type: "Polygon", coordinates: [[[151, -33], [151.01, -33], [151.01, -32.99], [151, -32.99], [151, -33]]] } }] };
   const mock = path.join(tmp, "fetch.mjs"), calls = path.join(tmp, "calls.txt");
   fs.writeFileSync(mock, `import fs from 'node:fs';
@@ -71,7 +71,7 @@ globalThis.fetch = async (url) => {
   assert.equal(result.status, 0, result.stderr);
   const cache = path.join(tmp, ".build/map/src/urban/ucl-2021.geojson");
   assert.deepEqual(JSON.parse(fs.readFileSync(cache, "utf8")), fixture);
-  const out = JSON.parse(fs.readFileSync(path.join(tmp, "map/data/urban.json"), "utf8"));
+  const out = JSON.parse(fs.readFileSync(path.join(tmp, "maps/data/urban.json"), "utf8"));
   assert.equal(out.u.length, 1);
   assert.ok(out.u[0]?.[0]?.[0]?.length >= 8, "fresh build emits an outline");
   result = build({ URBAN_TEST_STATUS: "503" });

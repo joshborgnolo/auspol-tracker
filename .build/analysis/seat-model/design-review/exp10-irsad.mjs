@@ -76,8 +76,8 @@ function looThree(rows, label) {
   return rows;
 }
 
-const fed25 = load("map/data/res-2025.json"), fed16 = load("map/data/res-2016.json");
-const sa26 = load("map/data/res-sa26.json"), qld17 = load("map/data/res-qld17.json");
+const fed25 = load("maps/data/res-2025.json"), fed16 = load("maps/data/res-2016.json");
+const sa26 = load("maps/data/res-sa26.json"), qld17 = load("maps/data/res-qld17.json");
 const saCls = inheritClass(sa26, fed25, "SA"), q17Cls = inheritClass(qld17, fed16, "QLD");
 
 console.log("\n=== A. Three-way: Coalition -> Labor in Labor v One Nation finals ===");
@@ -98,7 +98,7 @@ const YEARS = [2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const bucketOf = (b) => (b === "grn" ? "grn" : b === "onp" ? "onp" : b === "alp" || b === "lnp" ? null : "oth");
 const data = {};
 for (const y of YEARS) {
-  const D = load(`map/data/res-${y}.json`);
+  const D = load(`maps/data/res-${y}.json`);
   const seats = {};
   for (const dv of D.divs) {
     if (!dv.tcp || dv.tcp.length !== 2) continue;

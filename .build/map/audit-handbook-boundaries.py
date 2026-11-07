@@ -302,7 +302,7 @@ def main():
     collie04 = next(r for r in booth04 if r['state'] == 'WA' and r['booth'] == 'Collie')
     point = shapely.geometry.Point(collie04['lon'], collie04['lat'])
     node_script = ('const fs=require("fs"),t=require("topojson-client");'
-                   'const a=JSON.parse(fs.readFileSync("map/data/geo-1996-hi.json"));'
+                   'const a=JSON.parse(fs.readFileSync("maps/data/geo-1996-hi.json"));'
                    'process.stdout.write(JSON.stringify(t.feature(a,a.objects.divs).features'
                    '.find(f=>f.properties.name==="Brand")));')
     published = json.loads(subprocess.check_output(['node', '-e', node_script], cwd=ROOT))
@@ -313,7 +313,7 @@ def main():
         'handbook1998_brand_contains': bool(assembled['1998'][1]['Brand'].covers(point)),
         'abs1996_brand_contains': bool(baseline[key('Brand')].covers(point)),
         'published1996_brand_contains': bool(shape(published['geometry']).covers(point)),
-        'published1996_geometry_sha256': digest(ROOT / 'map/data/geo-1996-hi.json'),
+        'published1996_geometry_sha256': digest(ROOT / 'maps/data/geo-1996-hi.json'),
         'booth_assignments_sha256': digest(ROOT / 'data/booth-seifa-1996.json'),
         'coordinate_source_sha256': digest(ROOT / 'data/booth-seifa-2004.json')}
     REPORT.write_text(json.dumps(report, indent=2) + '\n')

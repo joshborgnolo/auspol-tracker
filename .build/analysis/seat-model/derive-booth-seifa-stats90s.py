@@ -254,7 +254,7 @@ def frame_booth_names(year):
     stats frame (the tracked res-<year>.json; data-<year>.json is the
     gitignored build intermediate) — the oracle for the join registry's
     name/id discipline."""
-    d = json.loads((ROOT / f"map/data/res-{year}.json")
+    d = json.loads((ROOT / f"maps/data/res-{year}.json")
                    .read_text(encoding="utf-8"))
     divs = d["divs"]
     b = d["booths"]

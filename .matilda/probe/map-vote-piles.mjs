@@ -1,4 +1,4 @@
-// Probe: /map/'s "How votes were cast" block and the key's "Not drawn" line (build_vote_piles.py, app-4-story vtBlock, app-2b-draw undrawnHTML).
+// Probe: /maps/'s "How votes were cast" block and the key's "Not drawn" line (build_vote_piles.py, app-4-story vtBlock, app-2b-draw undrawnHTML).
 // usage: node .matilda/probe/map-vote-piles.mjs <baseUrl>   (serve the repo root first, not with python's http.server)
 //  - 2025's rows, the sentence, and the key's lead, which with the balloons' net ink must come to the AEC's national lead
 //  - the line and the block follow the selection; 2019's lead runs the other way
@@ -17,7 +17,7 @@ const open = async (hash, w = 1440, h = 1000) => {
   const page = await browser.newPage();
   page.on("pageerror", (e) => errs.push(`${hash}: ${e.message}`));
   await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
-  await page.goto(`${base}/map/#${hash}`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${base}/maps/#${hash}`, { waitUntil: "networkidle2", timeout: 60000 });
   for (let i = 0; i < 80; i++) { if (await page.evaluate("!!(window.__map && window.__map.M())")) break; await wait(200); }
   await wait(1500);
   return page;

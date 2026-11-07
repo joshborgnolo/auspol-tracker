@@ -1242,7 +1242,7 @@ async function buildHandbookGeo(topo, m) {
    in (seat: the owner, else the places' own); and the same coast on the
    map's own plane (mpath, its bounds mbb), where the camera flies out to it */
 let islandsP = null;
-const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
+const loadIslands = () => islandsP || (islandsP = getJSON("/maps/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
   if (!data) return [];
   // the federal seat islands have no home in a state election's frame
@@ -1353,9 +1353,9 @@ async function loadYear(year, bg) {
     const ry = nowRy(year);
     // the results without the polling places' census lanes (core-split.mjs), unless the
     // lens is reading them now or the page's warmup already asked for the full file
-    const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
-    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
-      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
+    const fullU = `/maps/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/maps/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/maps/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/maps/data/${NOW_DATA[year]}`, bg) : null,
+      SEATED.has(year) ? getJSON(`/maps/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own m.proj, never the page's: `proj` is the year on screen's alone
     // (setYear hands it over). A load borrowing it, as this one did until 2026-11-05, moved
     // the towns, streets and sea under the year in view for as long as the load ran, seconds
@@ -1451,7 +1451,7 @@ const needPpl = () => S.lens === "seifa" && isDemo();
 function loadPpl(y) {
   const m = Y[y];
   if (!m || !m.divs || m.ppl) return Promise.resolve(m);
-  return (m.pplP ??= getJSON(`/map/data/res-${nowRy(y)}.json`).then((full) => {
+  return (m.pplP ??= getJSON(`/maps/data/res-${nowRy(y)}.json`).then((full) => {
     const B = m.booth.raw, F = full.booths;
     if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
     m.ppl = true;
@@ -1476,7 +1476,7 @@ function warmHi(y) {
   // the hi detail can land after the reader has moved to another year — its paths
   // are baked under this year's own projection, whatever the live one is by then
   const ry = nowRy(y);
-  m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
+  m._hiP = getJSON(`/maps/data/geo-${ry}-hi.json`)
     .then((hi) => buildGeoSliced(hi, m, m.proj))
     .then((g) => { m.geoHi = g; schedule(); })
     .catch(() => { m._hiP = null; });
@@ -2531,7 +2531,7 @@ function townPts() {
 }
 // the map's scale on screen, px per km (0 until the towns are in)
 function townScale() {
-  if (!placesP) placesP = getJSON("/map/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
+  if (!placesP) placesP = getJSON("/maps/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
   const t = townPts();
   return t ? T.k * t.upk : 0;
 }
@@ -2637,7 +2637,7 @@ let townHiIdx = -1;
 // selection, but drawing frames and probe reads never start a retry loop.
 function loadUrban() {
   if (URBAN || urbanP) return;
-  urbanP = getJSON("/map/data/urban.json", true)
+  urbanP = getJSON("/maps/data/urban.json", true)
     .then((d) => { URBAN = d.u; schedule(); })
     .catch(() => { urbanP = null; });
 }
@@ -4721,7 +4721,7 @@ function loadAreas(vin) {
   if (AREAS_FILES[vin] == null) return null;
   const got = AR.packs[vin];
   if (got) return got.pack || got.P;
-  const P = getJSON(`/map/data/${AREAS_FILES[vin]}.json`)
+  const P = getJSON(`/maps/data/${AREAS_FILES[vin]}.json`)
     .then((D) => {
       const pack = areasUnpack(D);
       AR.packs[vin] = { pack };
@@ -6736,8 +6736,8 @@ function withCouncilPlan(raw, plan) {
 }
 function loadSenate(year = S.year) {
   if (SENY[year]) return Promise.resolve(SENY[year]);
-  const plan = SEATED_LC.has(year) ? getJSON(`/map/data/seats-${year}-lc.json`).catch(() => null) : null;
-  return (SENP[year] ??= Promise.all([getJSON(`/map/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
+  const plan = SEATED_LC.has(year) ? getJSON(`/maps/data/seats-${year}-lc.json`).catch(() => null) : null;
+  return (SENP[year] ??= Promise.all([getJSON(`/maps/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
     .catch((e) => { delete SENP[year]; throw e; }));
 }
 // every election's Senate, for the timeline's make-up glyphs (about 7KB each)
@@ -6746,7 +6746,7 @@ function loadSenates() {
 }
 // the floor is today's plan's, the chamber the same since 1988
 function loadSenateFloor() {
-  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
+  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/maps/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
 }
 
 /* ----- the floor ----- */
@@ -7200,7 +7200,7 @@ function loadSenateVote(y, bg) {
   const k = svYear(y);
   if (k == null) return Promise.resolve(null);
   if (SV[k]) return Promise.resolve(SV[k]);
-  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+  return (SVP[k] ??= getJSON(`/maps/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
@@ -7274,7 +7274,7 @@ function loadSenatePrefs(y) {
   const k = spYear(y);
   if (k == null) return Promise.resolve(null);
   if (SPD[k]) return Promise.resolve(SPD[k]);
-  return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
+  return (SPDP[k] ??= getJSON(`/maps/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
 }
 const spOf = (m) => SPD[spYear(m.year)] || null;
 // the slot of the chosen contest and voters in a seat's 27 counts
@@ -9514,11 +9514,11 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
+    SUM ? null : getJSON("/maps/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
-    ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
+    ...[...SEATED].map((y) => getJSON(`/maps/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
 function legendStandIn(m, y) {

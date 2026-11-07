@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The Senate's first preferences by seat and polling place, for the Election map's Senate lens:
-map/data/senate-vote-<year>.json, 2004-2025.
+maps/data/senate-vote-<year>.json, 2004-2025.
 
 From the AEC's Virtual Tally Room (.build/aec-flow-src/senate-fpv/, landed by .build/harvest-aec-senate.py):
   div-<year>.csv.gz       every group ticket's and candidate's Senate votes in every division, all vote types
@@ -116,7 +116,7 @@ for year in YEARS:
         B = {k: v for k, v in B.items() if not k.endswith("/d") and v[0] > 0}
     out = {"year": year, "fams": FAMS, "divs": dict(D), "booths": B,
            "source": f"AEC Virtual Tally Room, Senate first preferences by division (all votes) and by polling place (ordinary votes), {year}"}
-    with open(os.path.join(ROOT, f"map/data/senate-vote-{year}.json"), "w") as f:
+    with open(os.path.join(ROOT, f"maps/data/senate-vote-{year}.json"), "w") as f:
         json.dump(out, f, separators=(",", ":"))
         f.write("\n")
     T = [sum(d[i] for d in D.values()) for i in range(7)]

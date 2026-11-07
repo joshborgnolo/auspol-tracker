@@ -75,7 +75,7 @@ boundary source; the geo stage reduces n-sa22.geojson beside the results.
 
 usage: python3 -I .build/map/build_sa22_data.py <out_dir> [--fetch]
 then:  python3 -I .build/map/build_sa22_past.py <out_dir>
-then:  node .build/map/geo_build.mjs .build/map/src/sa26 <out_dir> map/data --years=sa22
+then:  node .build/map/geo_build.mjs .build/map/src/sa26 <out_dir> maps/data --years=sa22
 """
 import collections, gzip, json, os, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

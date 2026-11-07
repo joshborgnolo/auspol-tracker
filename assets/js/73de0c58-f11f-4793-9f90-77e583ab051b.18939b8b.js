@@ -1679,9 +1679,10 @@ const TABS = [{
   tip: "How preferences decide the two-party figure"
 }, {
   id: "map",
-  label: "Election map",
+  label: "Electoral maps",
   menu: true,
   ext: true,
+  href: "/maps/",
   tip: "Every federal seat and polling place since 2004, on the map and in the chamber"
 }, {
   id: "model",

@@ -11,7 +11,7 @@ page.on("pageerror", (e) => console.log("PAGEERR", e.message));
 let bad = 0;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 for (const seq of [["2001"], ["1993"], ["1998", "2001"], ["2001", "2022"], ["1996", "2019", "2001"]]) {
-  await page.goto(`${base}/map/`, { waitUntil: "domcontentloaded" }); await page.reload({ waitUntil: "domcontentloaded" });
+  await page.goto(`${base}/maps/`, { waitUntil: "domcontentloaded" }); await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForFunction("window.__map && window.__map.T && window.__map.projDrift", { timeout: 40000 });
   await wait(1500);
   const loaded = await page.evaluate(() => Object.keys(window.__map.Y).join());

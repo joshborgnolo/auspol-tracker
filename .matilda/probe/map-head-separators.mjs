@@ -1,4 +1,4 @@
-// Probe: the /map/ Winner head is ruled top and bottom, with a double rule
+// Probe: the /maps/ Winner head is ruled top and bottom, with a double rule
 // between its sections — so every label in the head (Two-party, Primaries,
 // Seats) sits just below one, tightly-spaced twin hairlines — across
 // election and Now frames. The informal line left the head for below the
@@ -15,7 +15,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 const kinds = () => page.evaluate(() => [...document.querySelector(".st-stat").children].map((x) => x.classList.contains("st-sep") ? "SEP" : x.classList.contains("st-lab") ? `LAB(${x.textContent.trim().split(/[ (]/)[0]})` : x.className.split(" ")[0].replace("st-", "")));
-const frame = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2", timeout: 60000 }); await wait(1200); };
+const frame = async (y) => { await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2", timeout: 60000 }); await wait(1200); };
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
 const labelsAboveRules = (ks) => ks.every((k, i) => !k.startsWith("LAB(") || ks[i - 1] === "SEP");
 

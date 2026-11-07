@@ -28,7 +28,7 @@ Output:
                                      {pattern index: ballots} table (pattern list in the file)
   .build/aec-flow-src/senate-ballots/booth-rankings-<year>.json.gz
                                      the same per polling place (keyed by the AEC PollingPlaceID
-                                     used by map/data/res-<year>.json and senate-vote-<year>.json,
+                                     used by maps/data/res-<year>.json and senate-vote-<year>.json,
                                      matched on division + name; postal, absent, pre-poll,
                                      provisional and other non-place points are pooled per
                                      division under "special"); cohorts pooled to the big four +
@@ -264,7 +264,7 @@ def main():
             if year == 2016: fetch(URL_CI, os.path.join(cache, "aec-senate-candidateinformation-20499.zip"))
         lay16 = layout_2016(cache) if year == 2016 else None
         # booth names -> PollingPlaceID from the House store (same AEC place register)
-        res = json.load(open(os.path.join(ROOT, f"map/data/res-{year}.json")))
+        res = json.load(open(os.path.join(ROOT, f"maps/data/res-{year}.json")))
         B = res["booths"]; ppid = {}
         for i in range(len(B["id"])):
             ppid[(res["divs"][B["d"][i]]["n"].lower(), B["n"][i].strip().lower())] = B["id"][i]
@@ -320,7 +320,7 @@ def main():
         op = os.path.join(ROOT, f"data/senate-rankings-{year}.json")
         with open(op, "w") as f: json.dump(out, f, separators=(",", ":"))
         bdir = os.path.join(ROOT, ".build/aec-flow-src/senate-ballots"); os.makedirs(bdir, exist_ok=True)
-        bout = {"_about": "Per polling place (AEC PollingPlaceID, as map/data/res-<year>.json booths) the same ranking tables as data/senate-rankings-<year>.json, cohorts pooled to ALP, COAL, GRN, ON and minor-party classes OTH-R/L/M; non-place vote collection points pooled per division as special:<division>.", "year": year, "patterns": PATTERNS,
+        bout = {"_about": "Per polling place (AEC PollingPlaceID, as maps/data/res-<year>.json booths) the same ranking tables as data/senate-rankings-<year>.json, cohorts pooled to ALP, COAL, GRN, ON and minor-party classes OTH-R/L/M; non-place vote collection points pooled per division as special:<division>.", "year": year, "patterns": PATTERNS,
                 "booths": {str(k): {c: enc(t) for c, t in sorted(v.items())} for k, v in booths.items()}}
         with gzip.open(os.path.join(bdir, f"booth-rankings-{year}.json.gz"), "wt") as f: json.dump(bout, f, separators=(",", ":"))
         print(f"{year}: wrote {op} ({os.path.getsize(op)} bytes) and booth table ({len(booths)} places)")

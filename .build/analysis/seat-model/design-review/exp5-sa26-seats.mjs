@@ -1,7 +1,7 @@
 // E5: full seat chain on SA-2026 given only statewide primaries (oracle national) + pre-election seat information.
 // IND/OTH per district taken as actual (known candidacies; their shares are not the question here).
 import { load, divRows, boothRows, km, sum, mean, logit, ilogit, ridge, logitShift } from "./lib.mjs";
-const fed = load("map/data/res-2025.json"), sa = load("map/data/res-sa26.json");
+const fed = load("maps/data/res-2025.json"), sa = load("maps/data/res-sa26.json");
 const S = divRows(sa), F = divRows(fed);
 const fedB = boothRows(fed).filter((b) => b.st === "SA" && b.tot >= 30), saB = boothRows(sa);
 const foot = S.map(() => ({ w: 0, on: 0 }));

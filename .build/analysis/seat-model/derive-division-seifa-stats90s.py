@@ -131,7 +131,7 @@ def frame_states():
     side)."""
     out = {}
     for y in (1993, 1996, 1998):
-        d = json.loads((ROOT / f"map/data/res-{y}.json")
+        d = json.loads((ROOT / f"maps/data/res-{y}.json")
                        .read_text(encoding="utf-8"))
         for dv in d["divs"]:
             out.setdefault(y, {})[dv["n"]] = dv["st"]

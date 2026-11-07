@@ -34,7 +34,7 @@ then:  python3 -I .build/map/build_vic22_seifa.py
 then:  python3 -I .build/map/build_vic22_data.py .build/map/vic22
 then:  python3 .build/map/build_vic22_boothcensus.py
 then:  python3 -I .build/map/build_vic22_past.py .build/map/vic22
-then:  node .build/map/geo_build.mjs .build/map/src/vic22 .build/map/vic22 map/data --years=vic22
+then:  node .build/map/geo_build.mjs .build/map/src/vic22 .build/map/vic22 maps/data --years=vic22
 """
 import csv
 import hashlib

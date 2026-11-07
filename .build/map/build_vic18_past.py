@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The vic18 frame's past election: the 29 November 2014 Victorian state
-election, joined into map/data/data-vic18.json the cell-for-cell way
+election, joined into maps/data/data-vic18.json the cell-for-cell way
 build_vic22_past.py joined 2018 into the vic22 frame (and build_sa26_past
 joined SA 2022 into sa26).
 
@@ -100,7 +100,7 @@ Joined into the frame (mirroring build_vic22_past.py cell for cell):
                     2018 lane is a classic ALP-v-(LIB|NAT) pair AND the
                     2014 certified final pair is classic too; else null
 
-usage: python3 -I .build/map/build_vic18_past.py <out_dir>   # default: map/data
+usage: python3 -I .build/map/build_vic18_past.py <out_dir>   # default: maps/data
 deps: stdlib + xlrd (2ppvote2014.xls) + openpyxl (the stale appendix)
 """
 import collections
@@ -119,7 +119,7 @@ SRC = os.path.join(REPO, ".build", "state-flow-src", "vic", "2014")
 PP_FILE = os.path.join(SRC, "2ppvote2014.xls")
 APPENDIX_FILE = os.path.join(REPO, ".build", "state-flow-src", "vic", "2018",
                              "2ppvote2018-final.xlsx")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
 
 N_DISTRICTS = 88
 # the VEC's official 2014 tally (see WINNER AUTHORITY): ALP 47, LIB 30,
@@ -938,7 +938,7 @@ def main():
     for st_k in data["agg"]:
         if "pprim" in data["agg"][st_k] or "pformal" in data["agg"][st_k]:
             fail("frame already carries pprim/pformal — rerun build_vic18_data.py "
-                 "map/data first (the lanes are not this script's on a stale build)")
+                 "maps/data first (the lanes are not this script's on a stale build)")
 
     if len(data["divs"]) != 88:
         fail(f"frame carries {len(data['divs'])} districts, expected 88")

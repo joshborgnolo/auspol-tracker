@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
 const logit = (p) => Math.log(p / (1 - p)), ilogit = (x) => 1 / (1 + Math.exp(-x));
-const D = J("data/demographics.json"), V = J("data/seat-vote-layer.json"), R = J("map/data/res-2025.json");
+const D = J("data/demographics.json"), V = J("data/seat-vote-layer.json"), R = J("maps/data/res-2025.json");
 const P = ["alp", "lnp", "grn", "onp"];
 const EARLY_TO = "2025-10-31", LATE_FROM = V.diagnostics.recentWindow.from;
 const isUni = (k) => /univ|undergrad|postgrad|degree|bachelor/i.test(k) && !/no |less/i.test(k);

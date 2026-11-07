@@ -36,7 +36,7 @@ Inputs (all caches already ride this repo's other pipelines):
   .build/analysis/seat-model/cache/gcp-sa1-2016.zip           (GCP 2016 SA1 datapack)
   .matilda/seifa-irsad-abs/abs-seifa-2016-sa1-indexes.xls     (SEIFA 2016 SA1 cube, legacy .xls)
   .matilda/seifa-irsad-abs/dl/1270055001_sa1_2016_aust_shape.zip (SA1 2016 polygons)
-  map/data/data-nsw19.json                                    (the map data build;
+  maps/data/data-nsw19.json                                    (the map data build;
         this script splices the two lanes into it and rewrites it — it
         runs after build_nsw19_data.py and is itself rerun after it
         whenever that build changes, since that build wipes the lanes)
@@ -334,7 +334,7 @@ def demo_cells():
 def main():
     decs = seifa_deciles()
     demos = demo_cells()
-    path = os.path.join(REPO, "map", "data", f"data-{YEAR_TAG}.json")
+    path = os.path.join(REPO, "maps", "data", f"data-{YEAR_TAG}.json")
     if not os.path.exists(path):
         fail(f"missing {path} — run build_{YEAR_TAG}_data.py first")
     with open(path) as f:

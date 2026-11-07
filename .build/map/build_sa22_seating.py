@@ -1,4 +1,4 @@
-"""The sa22 frame's House of Assembly seating plan (map/data/house-seating-plan-sa-2024-12-28.json).
+"""The sa22 frame's House of Assembly seating plan (maps/data/house-seating-plan-sa-2024-12-28.json).
 
 The Parliament of South Australia's chamber maps (chamber-maps.parliament.sa.gov.au,
 a "staffmap" floor-plan app, project psa1) hold who sits in which desk in each
@@ -18,8 +18,8 @@ crawl before Sep 2024 recorded). This script reads the committed capture
 .build/map/src/sa-hoa-2024-12-28/ajaxaction-20241228133435.json (with the floor
 artwork hoa-chamber-map-final-v2.png) and writes:
 
-  map/data/house-seating-plan-sa-2024-12-28.json   the plan, in the federal files' shape
-  map/data/house-seating-plan-sa-2024-12-28.md     its provenance notes
+  maps/data/house-seating-plan-sa-2024-12-28.json   the plan, in the federal files' shape
+  maps/data/house-seating-plan-sa-2024-12-28.md     its provenance notes
 
 Between election day (19 Mar 2022) and the capture (28 Dec 2024) four members'
 places changed, and the plan records their successors' desks:
@@ -50,7 +50,7 @@ import json, os, re
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa-hoa-2024-12-28")
-DATA = os.path.join(REPO, "map", "data")
+DATA = os.path.join(REPO, "maps", "data")
 DATE = "sa-2024-12-28"
 CAPTURE_TS = "20241228133435"
 CAPTURE_DAY = "28 December 2024"
@@ -165,7 +165,7 @@ def main():
         "planDate": "December 2024",
         "source": "chamber-maps.parliament.sa.gov.au (Parliament of South Australia's staffmap floor plan, project psa1, floor 2020111280982479 \u2014 'House of Assembly'), retrieved via the Internet Archive Wayback Machine capture of 2024-12-28 13:34:35 (web.archive.org/web/" + CAPTURE_TS + ") of its AjaxAction.aspx getfloorwindows response, the earliest preserved version of this floor; the floor artwork 'HOA Chamber Map Final - v2.png' from the same day's capture (web.archive.org/web/20241228133437)",
         "harvested": "2026-10-26",
-        "method": "The captured floor-windows response lists every desk as a positioned panel (CSS top/left on the 1375\u00d71226 px floor) and every member as an 'employeepanel' (surname + electorate) bound to a desk; desks and members are paired one-to-one by desk id (47/47), then each division's member is verified against the 2022 election-night roster in map/data/res-sa22.json (44/47; Bragg, Dunstan and Black had changed hands at by-elections \u2014 each successor's member record is dated after its by-election, 2022-07-11, 2024-04-03, 2024-11-24). Employee records carry their creation date: the benches below were filed 25 March/1 April 2022, the current term's own seating, and were unchanged at the capture except as the by-elections and the Speaker's change forced. The Speaker label's printed centre (894, 120) is the coordinate origin.",
+        "method": "The captured floor-windows response lists every desk as a positioned panel (CSS top/left on the 1375\u00d71226 px floor) and every member as an 'employeepanel' (surname + electorate) bound to a desk; desks and members are paired one-to-one by desk id (47/47), then each division's member is verified against the 2022 election-night roster in maps/data/res-sa22.json (44/47; Bragg, Dunstan and Black had changed hands at by-elections \u2014 each successor's member record is dated after its by-election, 2022-07-11, 2024-04-03, 2024-11-24). Employee records carry their creation date: the benches below were filed 25 March/1 April 2022, the current term's own seating, and were unchanged at the capture except as the by-elections and the Speaker's change forced. The Speaker label's printed centre (894, 120) is the coordinate origin.",
         "page": "The floor is drawn on 'HOA Chamber Map Final - v2.png' (1100\u00d7981, displayed at 1375\u00d71226 CSS px): the Speaker's chair at the top, the Clerk and Chairman of Committees below it, the government's column of desks down the middle-left, the opposition's down the right, the crossbench off the opposition's foot. Seat coordinates are the desk's centre in that shifted frame, y increasing downward.",
     }
     officials = {

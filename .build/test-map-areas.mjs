@@ -1,6 +1,6 @@
-/* test-map-areas.mjs – pins the /map/ Areas drawing's census pack and wiring.
+/* test-map-areas.mjs – pins the /maps/ Areas drawing's census pack and wiring.
 
-   - the pack (map/data/areas-sa1-2021.json, built by .build/map/build_areas_sa1.py)
+   - the pack (maps/data/areas-sa1-2021.json, built by .build/map/build_areas_sa1.py)
      is nationally complete and honestly encoded: 61,811 SA1s, every lane present,
      lengths aligned, caps sane, and the pooled marks the legend's benchmark lines
      ride recomputed from the bytes themselves.
@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 
-const PACK_PATH = "map/data/areas-sa1-2021.json";
+const PACK_PATH = "maps/data/areas-sa1-2021.json";
 const pack = JSON.parse(R(PACK_PATH));
 const N = 61811; // national shaped SA1 areas at the 2021 census (33 no-polygon sentinel codes held out)
 const ranNum = (s) => (s === null ? null : s);
@@ -161,7 +161,7 @@ const sasum = (lane) => {
 assert.ok(Math.abs(sasum("lang") - marks.lang.SA) < 0.01, `pooled SA lang ${sasum("lang")} ≈ pack mark ${marks.lang.SA}`);
 
 /* ---------------- app wiring ---------------- */
-const js = R("map/map.js");
+const js = R("maps/map.js");
 const src = R(".build/map/app/app-2b-draw.js");
 // the drawing's own row and its fallback to seats
 assert.ok(js.includes('["areas", "Areas"]'), "DRAWS carries Areas (its fourth button)");
@@ -173,7 +173,7 @@ const appLanes = [...appSet[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]).sort();
 assert.deepEqual(appLanes, [...EXPECT_LANES].sort(), "the app's AREAS_LANES mirrors the pack's lane set");
 // the lazy load asks for the pack by its stamped name pattern every other file uses
 assert.ok(js.includes("areas-sa1-"), "the fetch name pattern is in the bundle");
-assert.ok(src.includes("/map/data/${AREAS_FILES[vin]}.json"), "the pack is fetched as data, on demand");
+assert.ok(src.includes("/maps/data/${AREAS_FILES[vin]}.json"), "the pack is fetched as data, on demand");
 // the income-quarter lanes read the frame in view's cuts, never a constant
 assert.ok(src.includes("m.incomeCuts.loCutWeekly") && src.includes("m.incomeCuts.hiQCutWeekly"), "quartile lanes ride the frame's own cuts");
 assert.ok(!src.includes("loinc: 10") && !src.includes("1079"), "no national-income constant leaked into the app");

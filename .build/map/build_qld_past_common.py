@@ -9,7 +9,7 @@ rather than take a rename table.
 
 The build reads the previous election through qld_ecq's load() — the same
 committed mirrors its sister data builder just turned into data-qld<prev>.
-It then joins INTO map/data/data-<frame>.json so the frame can speak of
+It then joins INTO maps/data/data-<frame>.json so the frame can speak of
 change:
   prev            the previous election's year (2017 / 2020)
   agg.pprim/pformal   the previous election's party-total primitives
@@ -25,17 +25,17 @@ change:
 Wipe doctrine: build_qld<yy>_data.py rewrites data-<yy>.json wholesale
 (prev:null, swings 0/null), so this script reruns whenever its data builder
 does — and ALWAYS before geo_build/assemble. The chain, per frame:
-  python3 -I .build/map/build_<yy>_data.py map/data
+  python3 -I .build/map/build_<yy>_data.py maps/data
   python3 -I .build/map/build_qld_boothcensus.py <yy>
-  python3 -I .build/map/build_<yy>_past.py map/data
-  node .build/map/geo_build.mjs .build/map/src/qld map/data map/data --years=qld<yy>
+  python3 -I .build/map/build_<yy>_past.py maps/data
+  node .build/map/geo_build.mjs .build/map/src/qld maps/data maps/data --years=qld<yy>
 """
 import collections, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import qld_ecq
 
 REPO = qld_ecq.REPO
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
 
 #: previous-election lookup per frame. qld17 has none: the 2015 election
 #: was fought on the 89-district map, so the "previous election" lanes
@@ -69,7 +69,7 @@ def past_main(frame):
 
     data_path = os.path.join(OUT, f"data-{frame}.json")
     if not os.path.exists(data_path):
-        ffail(f"{data_path} missing — run build_{frame}_data.py map/data")
+        ffail(f"{data_path} missing — run build_{frame}_data.py maps/data")
     with open(data_path) as f:
         data = json.load(f)
     if data.get("year") != frame:

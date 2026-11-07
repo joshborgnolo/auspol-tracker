@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* The Senate as it sits: map/data/senate-now.json, from the Parliament's Senate seating plan
+/* The Senate as it sits: maps/data/senate-now.json, from the Parliament's Senate seating plan
    (aph.gov.au/About_Parliament/Senate/Seating_Plan, filed in .build/map/src/senate-aph-<date>/:
    the page's own seat-by-seat SVG and the senators.json it fills the seats from) and the AEC's
    Senators Elected lists for 2022 and 2025 (.build/map/src/senate-aec/), which give each senator's
@@ -11,7 +11,7 @@
    along the bench and its depth), in the plan's own units about the centre of the far curve. The
    furniture keeps its SVG path data, drawn as is by the app.
 
-     node .build/map/senate.mjs            writes map/data/senate-now.json and senate-floor-<date>.json
+     node .build/map/senate.mjs            writes maps/data/senate-now.json and senate-floor-<date>.json
      SENATE_PLAN=<dir> node …              reads another filed plan */
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -206,8 +206,8 @@ const out = {
 const counts = {};
 for (const s of out.senators) counts[s.ab] = (counts[s.ab] || 0) + 1;
 if (out.senators.length !== 76) throw new Error(`expected 76 senators, have ${out.senators.length}`);
-writeFileSync(join(ROOT, "map/data", FLOOR), JSON.stringify(floor) + "\n");
-writeFileSync(join(ROOT, "map/data/senate-now.json"), JSON.stringify(out) + "\n");
+writeFileSync(join(ROOT, "maps/data", FLOOR), JSON.stringify(floor) + "\n");
+writeFileSync(join(ROOT, "maps/data/senate-now.json"), JSON.stringify(out) + "\n");
 console.log(`${FLOOR}: ${seats.length} seats, centre ${floor.centre}; senate-now.json: ${out.senators.length} senators, as at ${AS_OF}`);
 console.log(Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(" · "));
 console.log("casual:", out.senators.filter((s) => s.casual).map((s) => `${s.n} for ${s.casual.for} (${s.term})`).join("; "));

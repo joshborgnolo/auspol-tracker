@@ -7,7 +7,7 @@
 // frames ("National figures", "NSW figures", "Inner-metro figures") — a
 // state with a natural demonym words itself by it ("Victorian figures").
 // Start a local server from the repo root, then
-// MAP_URL=http://127.0.0.1:8765 node .build/map/probe-scope.mjs
+// MAP_URL=http://127.0.0.1:8765 node .build/maps/probe-scope.mjs
 import assert from "node:assert/strict";
 import puppeteer from "puppeteer-core";
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true, args: ["--force-prefers-reduced-motion"] });
@@ -35,7 +35,7 @@ try {
   const errors = []; page.on("pageerror", (e) => errors.push(e.message));
   page.on("requestfailed", (r) => console.log("requestfailed:", r.url(), r.failure()?.errorText));
   await page.setViewport({ width: 1280, height: 900 });
-  await page.goto(`${base}/map/#y=now`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${base}/maps/#y=now`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__map, { timeout: 60000 });
   await page.evaluate(() => { __map.setLens("winner"); __map.goAus(); __map.setView("map"); });
   await labelIs(page, "National figures", "default scope on the Now frame keeps the figures wording");

@@ -33,7 +33,7 @@ const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 // topojson-client from the copy the page itself ships, not the npm package:
 // the repo declares no such dependency, so CI's npm ci never installs it and
 // a bare import failed every run from the test's first commit
-const topojson = (() => { const g = {}; vm.runInNewContext(R("map/vendor/topojson-client-3.1.0.min.js"), g); return g.topojson; })();
+const topojson = (() => { const g = {}; vm.runInNewContext(R("maps/vendor/topojson-client-3.1.0.min.js"), g); return g.topojson; })();
 // Handbook frames are lossless and tested separately in test-map-history.mjs.
 // These checks concern the later mapshaper simplification/shared-arc recipe.
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
@@ -62,10 +62,10 @@ const CRAGGY = [147.67806, -39.68722]; // 39°41'14"S 147°40'41"E, 0.39km2, Bas
 const DEAL = [147.31667, -39.46667];   // ca. 2.6km2, above the old floor
 
 for (const y of YEARS) {
-  const res = JSON.parse(R(`map/data/res-${y}.json`));
+  const res = JSON.parse(R(`maps/data/res-${y}.json`));
   const want = new Set(res.divs.map((d) => d.n));
   for (const lvl of ["lo", "hi"]) {
-    const t = JSON.parse(R(`map/data/geo-${y}-${lvl}.json`));
+    const t = JSON.parse(R(`maps/data/geo-${y}-${lvl}.json`));
     assert.equal(t.objects.divs.geometries.length, want.size, `${y} ${lvl}: one geometry per division`);
     const got = new Set(t.objects.divs.geometries.map((g) => g.properties.name));
     assert.deepEqual([...want].filter((n) => !got.has(n)), [], `${y} ${lvl}: no division missing`);
@@ -145,7 +145,7 @@ const PROBES = [
 
 for (const y of YEARS) {
   for (const lvl of ["lo", "hi"]) {
-    const t = JSON.parse(R(`map/data/geo-${y}-${lvl}.json`));
+    const t = JSON.parse(R(`maps/data/geo-${y}-${lvl}.json`));
     const ntqld = sharedKm(t, "NT", "QLD");
     assert.ok(ntqld > 1000, `${y} ${lvl}: NT/QLD state border is drawn end to end (shared ${ntqld.toFixed(0)}km — 2004's defect left 794km and a gap from the Gulf coast to -18.87)`);
     const fc = topojson.feature(t, t.objects.divs);

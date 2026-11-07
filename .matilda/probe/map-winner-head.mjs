@@ -47,7 +47,7 @@ async function open(y, width = 1280) {
   await page.setViewport({ width, height: 950 });
   page.errors = [];
   page.on("pageerror", (e) => page.errors.push(e.message));
-  await page.goto(`${base}/map/#y=${y}`, { waitUntil: "load", timeout: 30000 });
+  await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "load", timeout: 30000 });
   const waitA = () => page.waitForFunction(() => window.__map && window.__map.M && window.__map.M(), { timeout: 45000 });
   try { await waitA(); }
   catch (e) {

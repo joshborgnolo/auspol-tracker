@@ -1,4 +1,4 @@
-/* Pins the nsw23 NSW Legislative Assembly chamber design on /map/
+/* Pins the nsw23 NSW Legislative Assembly chamber design on /maps/
    (shipped 2026-10-27 after the user's direction: Sydney's Assembly
    resembles Victoria's, except the central table is one RECTANGLE -
    no T head, no Hansard desk at its foot - and no members sit at it;
@@ -89,7 +89,7 @@ for (const year of ["nsw23", "2025"]) {
     hook("beginPath", 0); hook("moveTo", 2); hook("lineTo", 2);
     hook("closePath", 0); hook("roundRect", 4); hook("rect", 4); hook("arc", 3);
   });
-  await page.goto(base + "/map/", { waitUntil: "load" });
+  await page.goto(base + "/maps/", { waitUntil: "load" });
   await page.waitForFunction(() => window.__map && window.__map.S, { timeout: 15000 });
   await page.evaluate(async (y) => {
     await window.__map.setYear(y);

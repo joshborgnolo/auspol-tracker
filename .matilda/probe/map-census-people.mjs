@@ -20,7 +20,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // (the 2026-10-31 arcs: public transport to work, non-citizens, more than
 // two children, homeless, the Ancestry select-with-twelve menu, and the
 // income/age/education folds' merged entries)
-await page.goto(`${base}/map/`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 mark("boot ok");
 const opts = await page.evaluate(() => {
@@ -59,7 +59,7 @@ if (people) {
 mark("section 1 done");
 // 2. #l=seifa&i=fborn deep link selects the lane and colours the map on 'now'
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const fbornState = await page.evaluate(async () => {
   const m = window.__map;
@@ -74,7 +74,7 @@ ok("now legend cites 2021 census / voters", /2021 census/.test(fbornState.note),
 mark("section 2 done");
 // 2b. #i=loinc deep link selects lower-income on 'now'; legend note names the cut in 2021 dollars
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const loNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -100,7 +100,7 @@ ok("now AUS loinc ≈ 24.5% (app persons-weighted pool)", loNow.aus && Math.abs(
 mark("section 2b done");
 // 2c. #i=hiinc on 2016: legend names $4,000-or-more in 2021 dollars
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2016&l=seifa&i=hiinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2016&l=seifa&i=hiinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const hi2016 = await page.evaluate(async () => {
   const m = window.__map;
@@ -118,7 +118,7 @@ ok("2016 hiinc legend names $4,000 or more (census-year dollars)", /earning \$4,
 mark("section 2c done");
 // 3. 2013 renders venue-proxy lanes with 2011-census copy, division story and booth facts
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2013&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2013&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const y2013 = await page.evaluate(async () => {
   const m = window.__map;
@@ -144,7 +144,7 @@ ok("2013 Income row gives the household median (Watson $1,046)", /median weekly 
 mark("section 3 done");
 // 3b. 2013 + loinc: venue cut shown in 2011 dollars, seat facts Income row carries the median
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2013&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2013&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const lo2013 = await page.evaluate(async () => {
   const m = window.__map;
@@ -182,7 +182,7 @@ ok("1996 legend interpolates 1991↔1996 (the '90s arc floor)",
 // 4b. 2010 sits inside the lifted income floor: venue lanes on the
 // interp blend, the income pair IS in the optgroup
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2010&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2010&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const y2010 = await page.evaluate(async () => {
   const m = window.__map;
@@ -205,7 +205,7 @@ ok("2010 People optgroup carries the folded lenses (15: the income/age/education
 // 4c. an income deep link on 2010 shows the interp income copy: the
 // two bracketing editions' cuts span-named in census-year dollars
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2010&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2010&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const lo2010 = await page.evaluate(async () => {
   const m = window.__map;
@@ -218,7 +218,7 @@ ok("2010 income lane shows the interp income copy (2010 between the 2006 and 201
 
 // 4d. the lifted floor's own ends: 2001's single 2001-census cuts and 2004's 2001/2006 span
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2001&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2001&l=seifa&i=loinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const lo2001 = await page.evaluate(async () => {
   const m = window.__map;
@@ -229,7 +229,7 @@ const lo2001 = await page.evaluate(async () => {
 ok("2001 income lane shows the single-edition 2001 cut",
   /earning under \$456 a week \(2001 dollars\)/.test(lo2001), lo2001.slice(0, 190));
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2004&l=seifa&i=hiinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2004&l=seifa&i=hiinc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const hi2004 = await page.evaluate(async () => {
   const m = window.__map;
@@ -243,7 +243,7 @@ ok("2004 income lane shows the nearest-side $3,000 edge",
 mark("section 4 done");
 // 5. booth story on 2013 carries venue 'who' phrasing and an Income row WITHOUT a median
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2013&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2013&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const booth = await page.evaluate(async () => {
   const m = window.__map;
@@ -270,7 +270,7 @@ mark("section 5 done");
 // one picker away
 mark("median view");
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2025&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2025&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const med25 = await page.evaluate(async () => {
   const m = window.__map;
@@ -295,7 +295,7 @@ ok("2025 median legend ticks price in dollars", /\$\d,\d/.test(med25.ticks), med
 ok("2025 median legend marks the national line", /The line marks Australia: \$1,801/.test(med25.note), med25.note.slice(-140));
 
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2013&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2013&l=seifa&i=inc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const med13 = await page.evaluate(async () => {
   const m = window.__map;
@@ -371,7 +371,7 @@ mark("median view done");
 // statistics-era frames offer the qualification read alone
 mark("section 5e (Education fold)");
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=uni`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=uni`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const eduUni = await page.evaluate(async () => {
   const m = window.__map;
@@ -415,7 +415,7 @@ ok("y12less legend names the schooling read", /Share of people aged 15\+ who lef
 ok("y12less legend marks Australia 39.2%", /The line marks Australia: 39\.2%/.test(eduY12.note), eduY12.note.slice(-80));
 
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=y12less`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=y12less`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const eduLegacy = await page.evaluate(async () => {
   const m = window.__map;
@@ -457,7 +457,7 @@ mark("section 5e done");
 // stays silent about places it can't measure
 mark("age lens");
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=2025&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=2025&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const age25 = await page.evaluate(async () => {
   const m = window.__map;
@@ -487,7 +487,7 @@ ok("Chifley seat hed carries its median age", /median age in Chifley is 32/.test
 ok("Chifley dek names the national median", /Australia’s median age is 39/.test(age25.story), age25.story.slice(0, 400));
 
 await page.goto("about:blank");
-await page.goto(`${base}/map/#y=1993&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#y=1993&l=seifa&i=age`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const age93 = await page.evaluate(async () => {
   const m = window.__map;
@@ -534,7 +534,7 @@ mark("age lens done");
 // straight on No religion and Owned-with-mortgage, a religious option swap
 // rides as rl= in the hash, and Wentworth's Jewish share is its own figure
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=rel`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=rel`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const relNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -559,7 +559,7 @@ ok("now AUS norel ≈ 41.5%", relNow.aus && Math.abs(relNow.aus.rel.norel - 41.5
 ok("Wentworth jew ≈ 12.9%", relNow.wen && Math.abs(relNow.wen.rel.jew - 0.129) < 0.01, JSON.stringify(relNow.wen && relNow.wen.rel));
 
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=rel&rl=isl`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=rel&rl=isl`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const islNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -574,7 +574,7 @@ ok("#rl=isl restores Islam", islNow.relSelVal === "isl", islNow.relSelVal);
 ok("now legend says are Muslim", /Share of residents who are Muslim/.test(islNow.note), islNow.note.slice(0, 160));
 
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=ten`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=ten`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const tenNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -603,7 +603,7 @@ mark("section 5z done");
 // pt: the commute share of employed people per the census's own
 // method-of-travel table.
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=pt`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=pt`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const ptNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -621,7 +621,7 @@ ok("now AUS pt ≈ 3.4% (post-pandemic JTW read)", ptNow.aus && Math.abs(ptNow.a
 
 // noncit: residents not listed as Australian citizens by the census
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=noncit`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=noncit`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const ncNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -635,7 +635,7 @@ ok("now AUS noncit ≈ 15%", ncNow.aus && Math.abs(ncNow.aus.noncit - 15.1) < 0.
 
 // bigfam: women who've had three or more children
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=bigfam`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=bigfam`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const bfNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -649,7 +649,7 @@ ok("now AUS bigfam ≈ 24.7%", bfNow.aus && Math.abs(bfNow.aus.bigfam - 24.7) < 
 
 // hl: the ABS homelessness estimate, at SA2-area basis of copy
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=hl`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=hl`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const hlNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -665,7 +665,7 @@ ok("now AUS hl ≈ 0.45%", hlNow.aus && Math.abs(hlNow.aus.hl - 0.45) < 0.08, JS
 
 // anc: the Ancestry select menu — #i=anc&an=scottish deep-link restores
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=anc&an=scottish`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=anc&an=scottish`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const ancNow = await page.evaluate(async () => {
   const m = window.__map;
@@ -687,7 +687,7 @@ ok("now legend names Scottish ancestry", /English ancestry|Scottish ancestry/.te
 ok("ancestry note mentions two ancestries", /up to two ancestries|two ancestries/.test(ancNow.note), ancNow.note.slice(0, 260));
 ok("now AUS scottish ≈ 9.3%", ancNow.aus && ancNow.aus.anc && Math.abs(ancNow.aus.anc.scottish - 9.3) < 0.4, JSON.stringify(ancNow.aus && ancNow.aus.anc));
 await page.goto("about:blank");
-await page.goto(`${base}/map/#l=seifa&i=anc`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/maps/#l=seifa&i=anc`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const ancDef = await page.evaluate(async () => {
   const m = window.__map;

@@ -4,7 +4,7 @@
 Ballot-level Senate files exist only from 2016 (.build/analysis/seat-model/extract-senate-rankings.py);
 before that the AEC's machine record of preferences is the parties' lodged group voting tickets — an
 above-the-line "1" was counted as that ticket's full order. This builds the same
-map/data/senate-prefs-<year>.json the post-2016 builder (.build/map/senate_prefs.mjs) writes, marked
+maps/data/senate-prefs-<year>.json the post-2016 builder (.build/map/senate_prefs.mjs) writes, marked
 gvt: true so the lens presents the era as party tickets, never as ballot tallies. Below-the-line
 voters (a few per cent per group — UseOfGvt reports the split) are invisible to the record; the
 lens copy says so.
@@ -15,7 +15,7 @@ Inputs (all committed caches):
   .build/aec-flow-src/senate-gvt/usegvt-<event>.csv.gz  SenateUseOfGvtByGroupDownload: ticket v non-ticket vote split
   .build/aec-flow-src/senate-fpv/div-<year>.csv.gz   per-division "X Ticket Votes" rows (BallotPosition 0)
   .build/aec-flow-src/senate-fpv/pp-<year>-<ST>.csv.gz  the same rows per polling place (ordinary votes; none for 2004)
-  map/data/senate-vote-<year>.json                   the Senate lens's booth-id space, intersected into
+  maps/data/senate-vote-<year>.json                   the Senate lens's booth-id space, intersected into
 
 Guards: every lodged ticket numbers every candidate in its state (the GVT completeness invariant);
 every owner letter seen with votes maps to a lodged ticket; the division files' ticket-vote totals per
@@ -158,7 +158,7 @@ for year, ev in EVENT.items():
 
     booths = {}
     if year != 2004:
-        lens_booths = set(json.load(open(os.path.join(ROOT, f"map/data/senate-vote-{year}.json")))["booths"])
+        lens_booths = set(json.load(open(os.path.join(ROOT, f"maps/data/senate-vote-{year}.json")))["booths"])
         atl_pp, pp_state = collections.defaultdict(collections.Counter), {}
         for st in STATES:
             for r in rows(os.path.join(FPV, f"pp-{year}-{st}.csv.gz")):
@@ -175,7 +175,7 @@ for year, ev in EVENT.items():
     out = {"year": year, "pairs": PAIRS, "donors": DONORS, "absent": absent, "gvt": True,
            "source": f"The parties' lodged group voting tickets, {year} (AEC SenateGroupVotingTicketsDownload, SenateFirstPrefsByDivision/PollingPlaceByVoteType); every above-the-line ballot was counted as its party's ticket — below-the-line voters are outside this record",
            "divs": divs, "booths": booths}
-    p = os.path.join(ROOT, f"map/data/senate-prefs-{year}.json")
+    p = os.path.join(ROOT, f"maps/data/senate-prefs-{year}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"))
         f.write("\n")

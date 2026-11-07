@@ -79,7 +79,7 @@ committed-free like the federal n-YYYY.geojson era files; the reducer keeps
 one `name` property per feature (title case, the ECSA names it joins to).
 
 usage: python3 -I .build/map/build_sa26_data.py <out_dir> [--fetch]
-then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> map/data --years=sa26
+then:  node .build/map/geo_build.mjs <boundary_src_dir> <out_dir> maps/data --years=sa26
 """
 import collections, gzip, json, os, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

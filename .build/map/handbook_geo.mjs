@@ -14,7 +14,7 @@ import polylabel from 'polylabel';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const cache = process.argv.slice(2).find(a=>!a.startsWith('--')) || `${root}/.matilda/handbook-boundaries`;
 const fetchMissing = process.argv.includes('--fetch');
-const out = `${root}/map/data`;
+const out = `${root}/maps/data`;
 const audit = JSON.parse(fs.readFileSync(`${root}/.build/map/handbook-boundaries-audit.json`));
 audit.elections[2001] = JSON.parse(fs.readFileSync(`${root}/.build/map/handbook-2001-audit.json`));
 const yearsFlag = process.argv.find(a=>a.startsWith('--years='));
@@ -71,7 +71,7 @@ for (const year of years) {
   if (seen.size !== byName.size) throw Error(`${year}: missing division`);
   const topo = {type:'Topology', objects:{divs:{type:'GeometryCollection', geometries}}, arcs,
     handbook:true, sourceRevision:audit.revision, copyright:sources.copyright, licence:sources.licence,
-    source:audit.source, attribution:'/map/data/historical-boundary-sources.json'};
+    source:audit.source, attribution:'/maps/data/historical-boundary-sources.json'};
   const roundtrip = topojson.feature(topo, topo.objects.divs);
   for (let i = 0; i < fc.features.length; i++) {
     if (JSON.stringify(roundtrip.features[i].geometry) !== JSON.stringify(fc.features[i].geometry)) throw Error(`${year}: geometry changed`);

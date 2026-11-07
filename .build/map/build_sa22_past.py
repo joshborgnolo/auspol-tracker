@@ -6,7 +6,7 @@ results API; build_sa22_data.py reads the 2022 caches the sa26 pipeline
 committed in .build/map/src/sa26/):
 
 1. The previous SA election (17 March 2018), lower AND upper house, STORED
-   but never rendered as its own frame — joined INTO map/data/data-sa22.json
+   but never rendered as its own frame — joined INTO maps/data/data-sa22.json
    exactly as build_sa26_past.py joined 2022 into the sa26 frame: `prev`
    2018, agg pprim/pformal, each district's `h` history row ([year, TCP%,
    party, member]), every candidate's c[5] change on 2018, and classic-pair
@@ -30,7 +30,7 @@ committed in .build/map/src/sa26/):
    answer key fails the build loudly rather than filing a close-enough row.
    The fetched pages stay cached (committed) in .build/map/src/sa22/.
 
-2. The Legislative Council, map/data/senate-sa22.json, in the federal
+2. The Legislative Council, maps/data/senate-sa22.json, in the federal
    Senate files' own shape with lc:true — as of the 19 March 2022 election.
    SA's council is 22 members elected statewide, half (11) at each state
    election to terms ending at the election eight years on: the 2022 cohort

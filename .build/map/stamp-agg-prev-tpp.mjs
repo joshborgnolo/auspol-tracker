@@ -3,7 +3,7 @@
    two-party "change on <year>" for a state frame the way it already reads a primary
    change from agg.pprim/pformal (deriveAreas computes the share delta at read time).
 
-   The previous election is another frame the map itself ships, read from map/data:
+   The previous election is another frame the map itself ships, read from maps/data:
    nsw19 stands on nsw15, wa25 on wa21, and so on, via each frame's own recorded
    `prev` year. A frame whose predecessor isn't shipped (vic14 ← vic10) keeps no
    two-party change figure, and neither does a pair whose official tallies are
@@ -23,7 +23,7 @@ const COVER_BAND = [0.7, 1.4]; // … and be counted on a like share of it (qld1
 // 92% still reads like-for-like; sa26's 28% against sa22's 88% does not)
 
 export function stampPrevTpp(ROOT) {
-  const dataDir = path.join(ROOT, "map", "data");
+  const dataDir = path.join(ROOT, "maps", "data");
   const read = (y) => {
     const p = path.join(dataDir, `res-${y}.json`);
     return fs.existsSync(p) ? { path: p, data: JSON.parse(fs.readFileSync(p, "utf8")) } : null;

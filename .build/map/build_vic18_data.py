@@ -145,7 +145,7 @@ writes build_vicXX_demo.py/_seifa.py/boothcensus clones, so this script
 writes null dec/vdec booth lanes and no demo lane, exactly as the
 SA/NSW builders do.
 
-usage: python3 -I .build/map/build_vic18_data.py <out_dir>   # default: map/data
+usage: python3 -I .build/map/build_vic18_data.py <out_dir>   # default: maps/data
 deps: stdlib + openpyxl (the Brunswick workbook + the 2ppvote workbooks)
 """
 import collections
@@ -168,7 +168,7 @@ DS_STORE = os.path.join(REPO, ".build", "map", "src", "vic22", "demsausage", "vi
 PP_FILE = os.path.join(SRC, "2ppvote2018-final.xlsx")
 PP_FILE_EARLY = os.path.join(SRC, "2ppvote2018.xlsx")
 BR_XLSX = os.path.join(SRC, "brunswickdistrict.xlsx")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
 DEMO_STORE = os.path.join(REPO, "data", "vic18-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "vic18-seifa.json")
 

@@ -1,4 +1,4 @@
-// Probe: /map/'s drawings (app-2b-draw.js) in the browser.
+// Probe: /maps/'s drawings (app-2b-draw.js) in the browser.
 // usage: node .matilda/probe/map-draw.mjs <baseUrl>   (serve the repo root first; python's http.server
 //        resets connections under the page's parallel fetches, so use something sturdier)
 //  - the buttons work by click, and a change of drawing moves no stage, at four widths
@@ -18,7 +18,7 @@ const open = async (hash, w = 1280, h = 860) => {
   const page = await browser.newPage();
   page.on("pageerror", (e) => errs.push(e.message));
   await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
-  await page.goto(`${base}/map/#${hash}`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${base}/maps/#${hash}`, { waitUntil: "networkidle2", timeout: 60000 });
   for (let i = 0; i < 80; i++) { if (await page.evaluate("!!(window.__map && window.__map.M())")) break; await wait(200); }
   await wait(3000);
   return page;

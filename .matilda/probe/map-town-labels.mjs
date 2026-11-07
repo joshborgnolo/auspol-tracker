@@ -1,4 +1,4 @@
-// Probe: which towns /map/ names at each frame's home view (collisions included), via __map.townsDrawn.
+// Probe: which towns /maps/ names at each frame's home view (collisions included), via __map.townsDrawn.
 // usage: node .matilda/probe/map-town-labels.mjs <baseUrl> [width height]   (serve the repo root first)
 import puppeteer from "puppeteer-core";
 const [, , base, w = "1400", h = "1000"] = process.argv;
@@ -8,7 +8,7 @@ for (const y of ["now", "sa26", "wa25", "qld24", "vic22", "nsw23"]) {
   const page = await browser.newPage();
   await page.setViewport({ width: +w, height: +h, deviceScaleFactor: 1 });
   page.on("pageerror", (e) => { if (!/Failed to fetch/.test(e.message)) { console.log("PAGEERR", y, e.message); fails.push(y); } });
-  await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForFunction("window.__map && window.__map.T", { timeout: 30000 });
   await new Promise((r) => setTimeout(r, 2500));
   const names = await page.evaluate(() => { window.__map.drawNow(); return window.__map.townsDrawn; });

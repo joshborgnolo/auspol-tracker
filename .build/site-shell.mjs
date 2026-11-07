@@ -92,9 +92,9 @@ export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
-  { file: "lef-success/index.html" },
+  { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "model/index.html", menu: "model" },              // the Election model: built by .build/model/assemble.mjs (+ export.mjs), a ☰ menu page outside the main build (TABS' ext entry "model")
-  { file: "map/index.html", menu: "map" },                  // the Election map: built by .build/map/assemble.mjs, a ☰ menu page outside the main build (TABS' ext entry)                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
+  { file: "maps/index.html", menu: "map" },                 // Electoral maps: built by .build/map/assemble.mjs, a ☰ menu page outside the main build (TABS' ext entry); the old /map/index.html is a hand-maintained redirect stub (2026-11-07)
   { file: "feedback/index.html", page: "feedback" },
   { file: "provenance/index.html", page: "archives" },        // hand-maintained: the Provenance hub (moved from /archives/ 2026-10-24, which reverted to a redirect stub)
   { file: "archives/newspoll/index.html", page: "archives" },
@@ -150,7 +150,7 @@ const mainTabs = (() => {
     const body = fs.readFileSync(path.join(dir, file), "utf8").match(/const TABS = \[([\s\S]*?)\n\s*\];/);
     if (!body) throw new Error("site-shell: TABS array in " + file + " did not parse");
     const tabs = [...body[1].matchAll(/\{ id: "([^"]+)", label: "([^"]+)"([\s\S]*?)\}/g)]
-      .map((m) => ({ id: m[1], label: m[2], href: m[1] === "now" ? "/" : "/" + m[1] + "/",
+      .map((m) => ({ id: m[1], label: m[2], href: (m[3].match(/href: "([^"]+)"/) || [])[1] || (m[1] === "now" ? "/" : "/" + m[1] + "/"),
                      ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
                      ...(/menu:\s*true/.test(m[3]) ? { menu: true } : {}),
                      ...((m[3].match(/tip: "([^"]+)"/) || [])[1] && /menu:\s*true/.test(m[3]) ? { tip: m[3].match(/tip: "([^"]+)"/)[1] } : {}),

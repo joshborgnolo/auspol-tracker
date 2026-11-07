@@ -1,6 +1,6 @@
 """data-nsw19.json's past election: the New South Wales state election of
 28 March 2015 (93 districts, Legislative Assembly), joined INTO
-map/data/data-nsw19.json exactly as build_nsw23_past.py joined 2019 into
+maps/data/data-nsw19.json exactly as build_nsw23_past.py joined 2019 into
 the nsw23 frame: `prev` 2015 (already wired by build_nsw19_data.py —
 asserted here, never rewritten), agg pprim/pformal on AUS+NSW, each
 district's `h` history row, every candidate's c[5] change on 2015 (same
@@ -67,7 +67,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build_nsw19_data as B  # noqa: E402  (read_page, flat_name, bucket, helpers)
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(B.REPO, "map", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(B.REPO, "maps", "data")
 
 # ------------------------------------------------------------------ 2015 grammar
 # Lifted verbatim from build_nsw15_data.py (that module is the 2015 frame's

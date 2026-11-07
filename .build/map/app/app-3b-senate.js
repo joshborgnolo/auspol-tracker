@@ -77,8 +77,8 @@ function withCouncilPlan(raw, plan) {
 }
 function loadSenate(year = S.year) {
   if (SENY[year]) return Promise.resolve(SENY[year]);
-  const plan = SEATED_LC.has(year) ? getJSON(`/map/data/seats-${year}-lc.json`).catch(() => null) : null;
-  return (SENP[year] ??= Promise.all([getJSON(`/map/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
+  const plan = SEATED_LC.has(year) ? getJSON(`/maps/data/seats-${year}-lc.json`).catch(() => null) : null;
+  return (SENP[year] ??= Promise.all([getJSON(`/maps/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
     .catch((e) => { delete SENP[year]; throw e; }));
 }
 // every election's Senate, for the timeline's make-up glyphs (about 7KB each)
@@ -87,7 +87,7 @@ function loadSenates() {
 }
 // the floor is today's plan's, the chamber the same since 1988
 function loadSenateFloor() {
-  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
+  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/maps/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
 }
 
 /* ----- the floor ----- */
@@ -541,7 +541,7 @@ function loadSenateVote(y, bg) {
   const k = svYear(y);
   if (k == null) return Promise.resolve(null);
   if (SV[k]) return Promise.resolve(SV[k]);
-  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+  return (SVP[k] ??= getJSON(`/maps/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
@@ -615,7 +615,7 @@ function loadSenatePrefs(y) {
   const k = spYear(y);
   if (k == null) return Promise.resolve(null);
   if (SPD[k]) return Promise.resolve(SPD[k]);
-  return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
+  return (SPDP[k] ??= getJSON(`/maps/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
 }
 const spOf = (m) => SPD[spYear(m.year)] || null;
 // the slot of the chosen contest and voters in a seat's 27 counts

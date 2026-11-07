@@ -1,4 +1,4 @@
-// shared helpers for the seat-model design-review experiments (read-only on the committed map/data/res-*.json stores and data/polls.json)
+// shared helpers for the seat-model design-review experiments (read-only on the committed maps/data/res-*.json stores and data/polls.json)
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
