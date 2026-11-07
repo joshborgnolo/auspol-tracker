@@ -40,9 +40,12 @@ function lensColumn(get, colOf) {
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
   const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" || S.lens === "senpref" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
+  // the census people lenses rank their seats into tenths on the
+  // distribution chart — the SEIFA decile chart's contract on a measure with no decile
+  const dem = S.lens === "seifa" && !dec;
   return { key: "lens", label: lensHead(), short: lab, get, num: S.lens !== "cls", txt: S.lens === "cls", w: "minmax(120px,1fr)", lens: true, dist: S.lens !== "cls",
     fmt: dol ? (v) => mny(v) : yr ? (v) => String(Math.round(v)) : dec ? (v) => String(Math.round(v)) : signed ? (v) => sgn(v) : f1,
-    color: (v) => colorOf(v), decile: dec, diverge: signed,
+    color: (v) => colorOf(v), decile: dec, qt10: dem, qtPct: dem && !(dol || yr), diverge: signed,
     html: (r) => { const v = get(r); if (v == null || Number.isNaN(v)) return `<span class="c2">–</span>`; if (S.lens === "cls") return esc(CLS_SHORT[v]); const w = scale ? clamp((100 * v) / scale, 3, 100) : 100; return `<div class="lv">${scale ? `<i style="width:${0.6 * w}px;background:${colCss(colorOf(v))}"></i>` : `<i style="width:9px;height:9px;background:${colCss(colorOf(v))}"></i>`}<span>${dol ? mny(v) : yr ? Math.round(v) : dec ? v : signed ? sgn(v) : f1(v)}</span></div>`; } };
 }
 const fig2 = (a, af, b, bf) => `<span class="fig"><span class="${tx(af)}">${f1(a)}</span><span style="color:var(--ink-faint)"> – </span><span class="${tx(bf)}">${f1(b)}</span></span>`;
@@ -111,12 +114,28 @@ function binsFor(vals, c, target) {
   lo = Math.floor(lo / w) * w; hi = Math.ceil(hi / w) * w; if (hi <= lo) hi = lo + w;
   return { lo, hi, w, n: Math.round((hi - lo) / w), loOpen: sorted[0] < lo - 1e-9, hiOpen: sorted[sorted.length - 1] > hi + 1e-9 };
 }
-function distData(m, unit, rows, key, target) {
+/* the census lens's tenths: the seats ranked into ten bars of near-equal
+   count, each spanning the values its members hold — the SEIFA chart's
+   "a tenth of the seats" contract on a measure with no decile of its own.
+   Membership is by RANK, never the value cuts: an integer-valued measure
+   (median age) ties too often for a value cut to split evenly. */
+function distData(m, unit, rows, key, target, plain) {
   const c = colByKey(m, unit, key);
   if (!c || !c.num) return null;
   const vals = [], ids = [];
   for (const r of rows) { const v = c.get(r); if (v != null && !Number.isNaN(v)) { vals.push(v); ids.push(r); } }
   if (vals.length < 3) return { c, vals, empty: true };
+  // tenths only where the rows are seats and there are enough for the bars to mean a tenth each
+  if (c.qt10 && unit === "seats" && !plain && vals.length >= 10) {
+    const order = vals.map((v, k) => [v, k]).sort((a, b) => a[0] - b[0]), n = order.length, sorted = order.map(([v]) => v);
+    const cuts = [sorted[0]];
+    for (let k = 1; k < 10; k++) { const i = Math.floor((k * n) / 10); cuts.push((sorted[i - 1] + sorted[i]) / 2); }
+    cuts.push(sorted[n - 1]);
+    const B = { qt: true, lo: cuts[0], hi: cuts[10], w: 0, n: 10, cuts };
+    const counts = new Array(10).fill(0), members = Array.from({ length: 10 }, () => []);
+    order.forEach(([, k], rk) => { const b = Math.min(9, Math.floor((10 * rk) / n)); counts[b]++; members[b].push(ids[k]); });
+    return { c, B, counts, members, vals, ids, unit };
+  }
   const B = binsFor(vals, c, target || (unit === "seats" ? 22 : 44));
   const counts = new Array(B.n).fill(0), members = Array.from({ length: B.n }, () => []);
   vals.forEach((v, k) => { const bi = clamp(Math.floor((v - B.lo) / B.w + 1e-9), 0, B.n - 1); counts[bi]++; members[bi].push(ids[k]); });
@@ -127,16 +146,19 @@ const distReg = new Map(); // id -> { m, unit, key, rows, d, opts }
 function distSVG(D, W, H, opts) {
   const { c, B, counts } = D;
   const padL = 2, padR = 2, padT = opts.compact ? 6 : 14, padB = opts.compact ? 18 : 22;
-  const x = (v) => padL + ((v - B.lo) / (B.hi - B.lo)) * (W - padL - padR);
+  const bw = (W - padL - padR) / B.n, gap = bw > 6 ? 2 : bw > 3 ? 1 : 0;
+  // the tenths chart is ordinal (equal-width bars), so a value's x interpolates inside the bin that holds it
+  const x = B.qt
+    ? (v) => { if (v <= B.cuts[0]) return padL; for (let k = 0; k < B.n; k++) { if (v < B.cuts[k + 1] || k === B.n - 1) { const w2 = B.cuts[k + 1] - B.cuts[k]; return padL + (k + (w2 > 1e-9 ? clamp((v - B.cuts[k]) / w2, 0, 1) : 0.5)) * bw; } } return W - padR; }
+    : (v) => padL + ((v - B.lo) / (B.hi - B.lo)) * (W - padL - padR);
   const max = Math.max(...counts, 1);
   const y = (n) => H - padB - (n / max) * (H - padT - padB);
-  const bw = (W - padL - padR) / B.n, gap = bw > 6 ? 2 : bw > 3 ? 1 : 0;
   const r = S.f.range && S.f.range.unit === D.unit && S.f.range.key === c.key ? S.f.range : null;
   let s = "";
-  const stack = D.unit === "seats" && c.decile;
+  const stack = D.unit === "seats" && (c.decile || B.qt);
   for (let k = 0; k < B.n; k++) {
     const n = counts[k]; if (!n) continue;
-    const v0 = B.lo + k * B.w, mid = v0 + B.w / 2;
+    const v0 = B.qt ? B.cuts[k] : B.lo + k * B.w, mid = B.qt ? (v0 + B.cuts[k + 1]) / 2 : v0 + B.w / 2;
     const col = c.color ? c.color(mid) : null;
     const on = !r || (mid >= r.lo && mid <= r.hi);
     const bx = (x(v0) + gap / 2).toFixed(1), bwd = Math.max(1, bw - gap).toFixed(1);
@@ -156,9 +178,9 @@ function distSVG(D, W, H, opts) {
   }
   // the baseline and ticks
   s += `<line x1="${padL}" x2="${W - padR}" y1="${H - padB + 0.5}" y2="${H - padB + 0.5}" stroke="var(--ink-faint)" stroke-width="1"/>`;
-  const ticks = B.decile ? [1, 5, 10] : d3.ticks(B.lo, B.hi, opts.compact ? 4 : 7).filter((t) => t >= B.lo && t <= B.hi);
+  const ticks = B.decile ? [1, 5, 10] : B.qt ? [0, 5, 10] : d3.ticks(B.lo, B.hi, opts.compact ? 4 : 7).filter((t) => t >= B.lo && t <= B.hi);
   const fmt = c.fmt || f1;
-  ticks.forEach((t, k) => { const tx0 = B.decile ? x(t) : x(t); const anchor = tx0 < 14 ? "start" : tx0 > W - 14 ? "end" : "middle"; s += `<line x1="${tx0}" x2="${tx0}" y1="${H - padB}" y2="${H - padB + 4}" stroke="var(--ink-faint)"/><text x="${tx0}" y="${H - padB + 15}" text-anchor="${anchor}" font-size="11" fill="var(--ink-3)">${B.decile ? t : t === 0 && c.zero ? "0" : fmt(t).replace(/\.0$/, "")}${!B.decile && k === ticks.length - 1 && /tpp|inf|final|lens|lead/.test(c.key) && !c.diverge && c.key !== "votes" ? "%" : ""}</text>`; });
+  ticks.forEach((t, k) => { const tx0 = B.qt ? x(B.cuts[t]) : x(t); const anchor = tx0 < 14 ? "start" : tx0 > W - 14 ? "end" : "middle"; s += `<line x1="${tx0}" x2="${tx0}" y1="${H - padB}" y2="${H - padB + 4}" stroke="var(--ink-faint)"/><text x="${tx0}" y="${H - padB + 15}" text-anchor="${anchor}" font-size="11" fill="var(--ink-3)">${B.decile ? t : B.qt ? fmt(B.cuts[t]) : t === 0 && c.zero ? "0" : fmt(t).replace(/\.0$/, "")}${B.qt ? (t === B.n && c.qtPct ? "%" : "") : !B.decile && k === ticks.length - 1 && /tpp|inf|final|lens|lead/.test(c.key) && !c.diverge && c.key !== "votes" ? "%" : ""}</text>`; });
   // the country's figure
   const ref = c.ref ? c.ref(M().areas[S.sel.level === "aus" || !S.sel.st ? "AUS" : S.sel.st]) : c.key === "lens" ? lensRef() : null;
   if (ref != null && ref >= B.lo && ref <= B.hi) {
@@ -204,8 +226,8 @@ function hydrateDists() {
     if (!D || D.empty) { el.innerHTML = `<p class="st-note">Not enough values to chart.</p>`; continue; }
     const W = Math.max(200, el.clientWidth || 300), H = r.opts.compact ? 74 : 150;
     const n = D.vals.length, unitWord = r.unit === "seats" ? plural(n, "seat") : plural(n, "polling place");
-    const stacked = r.unit === "seats" && D.c.decile;
-    el.innerHTML = distSVG(D, W, H, r.opts) + (r.opts.compact ? `<p class="st-note">${stacked ? `Each bar is a tenth of the ${n} seats, from the least advantaged on the left, split by who ${isNowY(M().year) ? "holds" : "won"} them` : `${n.toLocaleString("en-AU")} ${unitWord}. Each bar counts the ${r.unit === "seats" ? "seats" : "places"} in its range`}; choose one to pick them out${S.view === "list" ? "" : " on the " + (S.view === "chamber" ? "chamber" : "map")}.</p>` : "");
+    const stacked = r.unit === "seats" && (D.c.decile || D.B.qt);
+    el.innerHTML = distSVG(D, W, H, r.opts) + (r.opts.compact ? `<p class="st-note">${stacked ? `Each bar is a tenth of the ${n} seats, from the ${D.c.decile ? "least advantaged" : "lowest"} on the left, split by who ${isNowY(M().year) ? "holds" : "won"} them` : `${n.toLocaleString("en-AU")} ${unitWord}. Each bar counts the ${r.unit === "seats" ? "seats" : "places"} in its range`}; choose one to pick them out${S.view === "list" ? "" : " on the " + (S.view === "chamber" ? "chamber" : "map")}.</p>` : "");
   }
 }
 // hover, click and drag on any distribution chart
@@ -218,7 +240,7 @@ function hydrateDists() {
     const r = distReg.get(el.dataset.distId); if (!r || !r.D || !r.D.B) return;
     const k = binAt(el, r, e.clientX); if (k == null) return;
     if (drag && drag.el === el) { drag.k1 = k; previewDrag(el, r, drag); }
-    const D = r.D, B = D.B, n = D.counts[k], v0 = B.lo + k * B.w, v1 = v0 + B.w;
+    const D = r.D, B = D.B, n = D.counts[k], v0 = B.qt ? B.cuts[k] : B.lo + k * B.w, v1 = B.qt ? B.cuts[k + 1] : v0 + B.w;
     const fmt = D.c.fmt || f1, unitWord = r.unit === "seats" ? plural(n, "seat") : plural(n, "polling place");
     const names = D.members[k].slice(0, 4).map((id) => (r.unit === "seats" ? M().divs[id.i].n : M().booth.name[id])).map(esc).join(", ");
     const range = B.decile ? `decile ${k + 1}` : k === 0 && B.loOpen ? `under ${fmt(v1)}` : k === B.n - 1 && B.hiOpen ? `${fmt(v0)} or more` : `${fmt(v0)} to ${fmt(v1)}`;
@@ -237,7 +259,7 @@ function hydrateDists() {
     if (!drag) return;
     const { r, k0, k1 } = drag; drag = null;
     const D = r.D, B = D.B, a = Math.min(k0, k1), b = Math.max(k0, k1);
-    const lo = B.lo + a * B.w, hi = B.lo + (b + 1) * B.w;
+    const lo = B.qt ? B.cuts[a] : B.lo + a * B.w, hi = B.qt ? B.cuts[b + 1] : B.lo + (b + 1) * B.w;
     const cur = S.f.range;
     if (cur && cur.unit === r.unit && cur.key === D.c.key && Math.abs(cur.lo - lo) < 1e-9 && Math.abs(cur.hi - hi) < 1e-9) S.f.range = null;
     else S.f.range = { unit: r.unit, key: D.c.key, lo, hi, loOpen: a === 0 && B.loOpen, hiOpen: b === B.n - 1 && B.hiOpen, last: b === B.n - 1 };
@@ -321,7 +343,7 @@ function rowsForDist(m, unit) {
   return rows;
 }
 function sparkSVG(m, unit, rows, c) {
-  const D = distData(m, unit, rows, c.key, 12);
+  const D = distData(m, unit, rows, c.key, 12, true); // the plain histogram: the spark's job is the distribution's shape, not ten like-sized bars
   if (!D || D.empty) return "";
   const W = 46, H = 13, max = Math.max(...D.counts, 1), bw = W / D.B.n;
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${D.counts.map((n, k) => (n ? `<rect x="${(k * bw + 0.5).toFixed(1)}" y="${(H - (n / max) * H).toFixed(1)}" width="${Math.max(0.8, bw - 1).toFixed(1)}" height="${((n / max) * H).toFixed(1)}" fill="${c.color ? css(c.color(D.B.lo + (k + 0.5) * D.B.w)) : "var(--ink-faint)"}"/>` : "")).join("")}</svg>`;
