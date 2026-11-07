@@ -461,19 +461,20 @@ function legendHTML(m) {
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
+    if (S.lens !== "winner") h += drawRow;
+    h += drawNoteHTML(m);
+    // the switch then the hint at the strip's close — user call: Drawn-as sits
+    // above the zoom hint, not the other way round
+    if (S.lens === "winner") h += drawRow;
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     h += `<div class="lg-hint mp-hint" id="hint"></div>`;
-    if (S.lens !== "winner") h += drawRow;
-    h += drawNoteHTML(m);
-    // the winner strip's switch is its bottom line, full width and left
-    if (S.lens === "winner") h += drawRow;
     // the left-hand lines stack in a column of their own, free of the scale's rows
     // beside them — the winner lens skips this: its own rows span the legend
     if (S.lens !== "winner") {
       const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
       t.innerHTML = h; left.className = "lg-left";
-      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-note, .lg-shapes, .lg-draw, .lg-bal")) left.appendChild(c);
+      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-jump, .lg-note, .lg-shapes, .lg-draw, .lg-bal, .lg-hint")) left.appendChild(c);
       t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
     }
   }

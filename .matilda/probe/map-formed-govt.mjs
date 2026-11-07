@@ -38,12 +38,12 @@ const tag = () => page.evaluate(() => {
     text: fg.textContent.trim(),
     cls: fg.className,
     parent: fg.parentElement ? fg.parentElement.className.split(" ")[0] : "",
-    // + means tucked INTO the section past the content edge; 0±1 is flush
-    outLeft: Math.round(((sb.left - r.right)) * 10) / 10,
-    outRight: Math.round((r.left - sb.right) * 10) / 10,
-    fgL: Math.round(r.left), fgR: Math.round(r.right), fgW: w, tuck, vw: innerWidth,
+    // inner-flush deltas: 0±2 means the tag's inner face rides its edge exactly
+    innerL: Math.round((r.left - sb.left) * 10) / 10,
+    innerR: Math.round((sb.right - r.right) * 10) / 10,
+    fgL: Math.round(r.left), fgR: Math.round(r.right), fgW: w, vw: innerWidth,
     rowDY: nm ? Math.abs((r.top + r.height / 2) - (nm.getBoundingClientRect().top + nm.getBoundingClientRect().height / 2)) : null,
-    // sub-pixel text metrics make a flush 0 read as −0.5: 2px of slack, not a bug
+    // any run of the tag sits inside the section by design: the roomy check
     inView: r.left >= -2 && r.right <= innerWidth + 2,
   };
 });
@@ -63,11 +63,10 @@ const names = () => page.evaluate(() => {
     aboveSwing: nL.getBoundingClientRect().bottom <= (swing ? swing.getBoundingClientRect().top + 1 : Infinity),
   };
 });
-// an anchor check with the same maths the tag computes: flush ⇒ gap≈0; the
-// viewport clamp ⇒ tucked inside by exactly `tuck` — one invariant covers both
+// inner-flush: deltas read ~0 when the tag's inner face rides its edge exactly
 const flushCheck = (okFn, prefix, t, side = "left") => {
-  const gap = side === "left" ? t.outLeft : t.outRight;
-  okFn(`${prefix}: flush at its content edge`, Math.abs(gap + t.tuck) <= 2 && (side === "left" ? t.fgL >= -1 : t.fgR <= t.vw + 1), JSON.stringify({ gap, tuck: t.tuck, fgL: t.fgL, fgR: t.fgR }));
+  const d = side === "left" ? t.innerL : t.innerR;
+  okFn(`${prefix}: inner face flush at its content edge`, Math.abs(d) <= 2 && (side === "left" ? t.fgL >= 0 : t.fgR <= t.vw), JSON.stringify({ d, fgL: t.fgL, fgR: t.fgR }));
 };
 // the app reads the frame key from the hash at boot only — a hash navigation
 // alone won't re-render, so each frame switch needs a reload
@@ -150,7 +149,7 @@ await wait(500);
   const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   ok("now: no horizontal overflow at 320px", over <= 0, `${over}px`);
   const t4 = await tag();
-  ok("now: tag inside the viewport at 320px", t4.found && t4.inView, `outLeft ${t4.outLeft}px`);
+  ok("now: tag inside the viewport at 320px", t4.found && t4.inView, `innerL ${t4.innerL}px`);
 }
 ok("no page errors", errs.length === 0, errs[0] || "");
 await browser.close();

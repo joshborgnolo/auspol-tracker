@@ -56,13 +56,22 @@ const inf = () => page.evaluate(() => {
 });
 let t = await inf();
 ok("informal line exists, once, outside the head", t.found && t.count === 1 && t.inHead === false, JSON.stringify(t));
-ok("one-decimal figure", !!t.text && /^Informal: \d+\.\d%$/.test(t.text), t.text);
-ok("figure matches pooled 2025 rate", t.text === `Informal: ${f1(expect.aus)}%`, `${t.text} vs Informal: ${f1(expect.aus)}%`);
+ok("one-decimal figure", !!t.text && /^Informal votes: \d+\.\d%$/.test(t.text), t.text);
+ok("figure matches pooled 2025 rate", t.text === `Informal votes: ${f1(expect.aus)}%`, `${t.text} vs Informal votes: ${f1(expect.aus)}%`);
+// centred inside its twin-rule pair: the gap above its text matches the gap below
+const centred = await page.evaluate(() => {
+  const inf = document.querySelector(".st-inf"), next = inf && inf.nextElementSibling;
+  if (!inf || !next) return {};
+  const padUp = parseFloat(getComputedStyle(inf).paddingTop);
+  const dn = next.getBoundingClientRect().top - inf.getBoundingClientRect().bottom;
+  return { padUp, dn: Math.round(dn * 2) / 2, nextRule: parseFloat(getComputedStyle(next).borderTopWidth) };
+});
+ok("informal line centred in its rule pair", centred.padUp && centred.padUp >= 9 && Math.abs(centred.padUp - centred.dn) <= 3, JSON.stringify(centred));
 ok("directly under the How-votes-were-cast section", t.prev === "st-sec" && /^How votes were cast/.test(t.prevH3), `prev: ${t.prev} (h3: ${t.prevH3})`);
 ok("and before the Closest seats section", t.topAboveVt === true && t.aboveClosest === true, JSON.stringify(t));
 
 // it used to live in the head — make sure the head left nothing behind
-const headGhost = await page.evaluate(() => [...document.querySelectorAll(".st-stat .st-lab")].some((x) => /^Informal:/.test(x.textContent)));
+const headGhost = await page.evaluate(() => [...document.querySelectorAll(".st-stat .st-lab")].some((x) => /^Informal votes:/.test(x.textContent)));
 ok("no Informal label left in the winner head", headGhost === false);
 const stale = await page.evaluate(() => [...document.querySelectorAll("#story .st-sec h3")].some((h) => /^Informal(\s|$)/.test(h.textContent)));
 ok("no standalone Informal section either", !stale);
@@ -82,9 +91,9 @@ ok("scope menu offers seat classes", !!picked && !["closed", "none"].includes(pi
 if (picked && !["closed", "none"].includes(picked)) {
   await wait(400);
   t = await inf();
-  const vals = Object.values(expect.byCls).map((v) => `Informal: ${f1(v)}%`);
+  const vals = Object.values(expect.byCls).map((v) => `Informal votes: ${f1(v)}%`);
   ok("class scope pools its own rate, still outside the head", !!t.text && vals.includes(t.text) && t.inHead === false, `${t.text} (class rates ${vals.join(", ")})`);
-  if (t.text && vals.length > 1) ok("class rates genuinely differ from national", t.text !== `Informal: ${f1(expect.aus)}%`, `${t.text} vs national Informal: ${f1(expect.aus)}%`);
+  if (t.text && vals.length > 1) ok("class rates genuinely differ from national", t.text !== `Informal votes: ${f1(expect.aus)}%`, `${t.text} vs national Informal votes: ${f1(expect.aus)}%`);
 }
 
 // phone rung: the line fits, no new horizontal overflow

@@ -7891,15 +7891,13 @@ let statScopeStore = { k: "aus" };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
   : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
 const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
-// states whose "… figures" compound words itself by demonym; the rest stay bare
-const FIG_DEMONYM = { VIC: "Victorian", SA: "South Australian", WA: "Western Australian", TAS: "Tasmanian" };
+// every word in the scope menu stays plain — no "figures" suffix, no hyphens
+// the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
-  const fig = isNowY(m.year) ? " figures" : "";
-  const figName = (s) => (fig && FIG_DEMONYM[s]) || STATE_TITLE[s];
-  if (sel.k === "cls") return fig ? `${CLS_SHORT[sel.cls].replace(" ", "-")}${fig}` : CLS_SHORT[sel.cls];
-  if (sel.k === "st") { const s = sel.st; return `${s === "NSW" || s === "ACT" ? s : figName(s)}${fig}`; }
-  if (STATE_YEARS.has(m.year)) return `${figName(stOfYear(m.year))}${fig}`;
-  return fig ? "National figures" : "National";
+  if (sel.k === "cls") return CLS_SHORT[sel.cls];
+  if (sel.k === "st") { const s = sel.st; return s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]; }
+  if (STATE_YEARS.has(m.year)) return STATE_TITLE[stOfYear(m.year)];
+  return "National";
 }
 // a scope's own area-payload: states ride their stored aggregates, classes are pooled
 function statScopeArea(m, st, sel) {
@@ -8157,7 +8155,7 @@ function seatStat(m, st, label, noteDef = null) {
 function informalHTML(m, st) {
   const sel = statScopeOf(m);
   const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
-  return A.infPct != null ? `<div class="st-inf">Informal: ${f1(A.infPct)}%</div>` : "";
+  return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
@@ -8621,11 +8619,12 @@ function storyArea(m, st) {
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
   if (S.view !== "chamber") {
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
   if (isNowY(m.year) && aus) {
     const ch = m.changes.slice().reverse();
-    h += `<div class="st-sec"><h3>Since the election <small>${ch.length} changes</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
+    const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
+    h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // the two-party read — skipped on the Winner lens, whose head has already given the
@@ -9000,22 +8999,23 @@ function renderStory(force) {
   paintMiniChamber(); hydrateDists();
   if (FS.on) fsStory(was !== key);
 }
-/* the govt tag rides the figures' names row, and is then hugged against the
-   whole head's OUTSIDE content edge on its family's side (computed per render:
-   an absolute child of the figures grid can only sample its box's x, and the
-   section edge sits wherever the panel's own zone anchors). The viewport clamp
-   is arithmetic: when a flush run would leave the page, the tag tucks just
-   enough inside the section for its text to stay on screen. Reruns on resize
-   and every story render. */
+/* the govt tag rides the figures' names row, tucked INSIDE the whole head's
+   content frame: its inner-section face flush with the head's content edge on
+   its family's side — the first cut hung the tag outside the line with its
+   FAR face against it ("…flush to the section's edge"), which read exactly
+   wrong ("Labor … govt": the stamp stops AT the edge, inside it). Computed
+   per render because an absolute child of the centred figures grid can only
+   sample its own box's x, and the content edge anchors at the panel's line;
+   rerun on resize and every story render (rAF + fonts-ready too — chip width
+   grows a px or two as Commissioner lands). */
 function anchorGovtTag(el) {
   const stat = el && el.querySelector(".st-stat"), fg = el && el.querySelector(".st-stat .st-fg");
   if (!stat || !fg) return;
   const alp = fg.classList.contains("st-fg-alp");
-  const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect(), w = fg.offsetWidth;
-  const gap = alp ? tb.left - sb.left : sb.right - tb.right;
-  const room = alp ? sb.left : innerWidth - sb.right;
-  fg.style[alp ? "left" : "right"] = "auto";
-  fg.style[alp ? "right" : "left"] = `calc(100% + ${gap - Math.max(0, w - Math.max(0, room))}px)`;
+  const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect();
+  // an inline right is MINUS the gap between the figures' edge and the section's
+  fg.style[alp ? "right" : "left"] = "auto";
+  fg.style[alp ? "left" : "right"] = alp ? `${sb.left - tb.left}px` : `${tb.right - sb.right}px`;
 }
 if (typeof addEventListener === "function") addEventListener("resize", () => anchorGovtTag($("#story")));
 if (typeof document !== "undefined" && document.fonts && document.fonts.ready) document.fonts.ready.then(() => anchorGovtTag($("#story")));
@@ -9851,19 +9851,20 @@ function legendHTML(m) {
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
+    if (S.lens !== "winner") h += drawRow;
+    h += drawNoteHTML(m);
+    // the switch then the hint at the strip's close — user call: Drawn-as sits
+    // above the zoom hint, not the other way round
+    if (S.lens === "winner") h += drawRow;
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     h += `<div class="lg-hint mp-hint" id="hint"></div>`;
-    if (S.lens !== "winner") h += drawRow;
-    h += drawNoteHTML(m);
-    // the winner strip's switch is its bottom line, full width and left
-    if (S.lens === "winner") h += drawRow;
     // the left-hand lines stack in a column of their own, free of the scale's rows
     // beside them — the winner lens skips this: its own rows span the legend
     if (S.lens !== "winner") {
       const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
       t.innerHTML = h; left.className = "lg-left";
-      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-note, .lg-shapes, .lg-draw, .lg-bal")) left.appendChild(c);
+      for (const c of [...t.content.children]) if (c.matches(".lg-t, .lg-jump, .lg-note, .lg-shapes, .lg-draw, .lg-bal, .lg-hint")) left.appendChild(c);
       t.content.prepend(left); box.appendChild(t.content); h = box.innerHTML;
     }
   }

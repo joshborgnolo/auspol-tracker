@@ -170,6 +170,8 @@ const stat = (page) => page.evaluate(() => {
       togglePressed: jump ? jump.querySelector("[data-towns]").getAttribute("aria-pressed") : null,
       drawCount: draw.length,
       drawIsLast: d ? legend.children[legend.children.length - 1] === d : null,
+      nextAfterDraw: d && d.nextElementSibling ? [...d.nextElementSibling.classList] : null,
+      lastClass: legend.children.length ? legend.children[legend.children.length - 1].className.split(" ")[0] : null,
       drawCol: d ? getComputedStyle(d).gridColumn : null,
       drawButtons: d ? [...d.querySelectorAll("button")].map((b) => b.textContent.trim()).join(",") : "",
       over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -180,7 +182,7 @@ const stat = (page) => page.evaluate(() => {
   check("legend: the Jump-to row rides the strip with all eight capital cities", strip.jumpId === "cities" && strip.jumpLabel === "Jump to:" && strip.jumpChips === 8, JSON.stringify(strip));
   check("legend: the zoom hint rides the strip too, its overlay gone", strip.hintId === "hint" && /Zoom in, or choose a seat/.test(strip.hintText) && strip.hintNotOnStage, JSON.stringify(strip));
   check("legend: starter City names toggle, pressed (names on)", strip.toggleText === "City names" && strip.togglePressed === "true", JSON.stringify(strip));
-  check("legend: Drawn-as closes the section, its own last row at full width", strip.drawCount === 1 && strip.drawIsLast === true && strip.drawCol === "1 / -1" && strip.drawButtons === "Seats,Balloons,Surface,Areas", JSON.stringify(strip));
+  check("legend: Drawn-as sits above the zoom hint, hint last, at full width", strip.drawCount === 1 && strip.nextAfterDraw && strip.nextAfterDraw.includes("lg-hint") && strip.lastClass === "lg-hint" && strip.drawCol === "1 / -1" && strip.drawButtons === "Seats,Balloons,Surface,Areas", JSON.stringify(strip));
   check("legend: no horizontal overflow", strip.over <= 0, String(strip.over));
   // the Title on the Zoom-selected frame later keeps this shape; first the toggle works
   const shotOn = await p.evaluate(() => document.querySelector("#cv").toDataURL().length);
@@ -197,10 +199,10 @@ const stat = (page) => page.evaluate(() => {
     cats: document.querySelectorAll(".lg-cats").length,
     bal: !!document.querySelector(".lg-bal"),
     chips: document.querySelectorAll(".lg-jump .mp-ca").length,
-    drawIsLast: document.querySelector("#legend").lastElementChild.classList.contains("lg-draw"),
+    lastClass: document.querySelector("#legend").lastElementChild.className.split(" ")[0],
     over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
   }));
-  check("over booths too: no seat legend, jump row stands, draw closes the strip", balloons.cats === 0 && balloons.bal && balloons.chips === 8 && balloons.drawIsLast && balloons.over <= 0, JSON.stringify(balloons));
+  check("over booths too: no seat legend, jump row stands, hint closes after Drawn-as", balloons.cats === 0 && balloons.bal && balloons.chips === 8 && balloons.lastClass === "lg-hint" && balloons.over <= 0, JSON.stringify(balloons));
   await p.evaluate(() => { window.__map.setDraw("seats"); window.__map.setYear(2025); });
   await new Promise((r) => setTimeout(r, 900));
   const y2025 = await p.evaluate(() => ({
