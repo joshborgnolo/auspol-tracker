@@ -321,7 +321,7 @@ function legendHTML(m) {
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => lgMenu(name, list, cur, name);
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
-  // the Drawn-as switch closes the winner strip's bottom line (user call 2026-11-07)
+  // the Draw switch leads the strip's close on the map view — its note right after
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
   // the chamber view chooses its chamber first
   let h = (S.view === "chamber" ? houseSwitchHTML() : "") + basisHTML();
@@ -474,11 +474,10 @@ function legendHTML(m) {
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
-    if (S.lens !== "winner") h += drawRow;
+    h += drawRow;
+    // the note on the picture follows the row that picks the picture (user
+    // call 2026-11-08: no note floats above Draw); the hint the strip's close
     h += drawNoteHTML(m);
-    // the switch then the hint at the strip's close — user call: Drawn-as sits
-    // above the zoom hint, not the other way round
-    if (S.lens === "winner") h += drawRow;
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     h += `<div class="lg-hint mp-hint" id="hint"></div>`;

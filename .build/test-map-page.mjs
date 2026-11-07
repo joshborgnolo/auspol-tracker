@@ -2585,6 +2585,13 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".lg-toolbar"), "the panel's toolbar row carries its flex rule");
 }
 
+// the strip's draw note rides UNDER the Draw row on every lens (user call
+// 2026-11-08 — it floated above it on the winner lens)
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes("h += drawRow;") && ui.indexOf("h += drawRow;") < ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf("h += drawNoteHTML(m);") < ui.indexOf('h += `<div class="lg-hint'), "the Draw row, then its note, then the hint — no note above the row");
+}
+
 // the now views carry the base election's swings (user call 2026-11-07 —
 // reversing the old "not a change since" suppression): the winner head's 2PP
 // swing chip and its primaries change smalls show on every frame alike
