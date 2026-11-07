@@ -1379,6 +1379,8 @@ $("#story").addEventListener("pointermove", (e) => {
 $("#story").addEventListener("click", (e) => {
   const voteMode = e.target.closest("[data-vt-mode]");
   if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
+  const closeTgl = e.target.closest("[data-close-toggle]");
+  if (closeTgl) { setCloseSafe(!closeSafe); return; }
   const oth = e.target.closest("[data-othx]");
   if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");

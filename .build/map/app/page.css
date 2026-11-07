@@ -400,8 +400,12 @@ button { cursor: pointer; background: none; border: 0; }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
 .st-sec { margin-top: 16px; padding-top: 7px; border-top: 1px solid var(--line); }
-.st-sec > h3 { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 8px; }
+.st-sec > h3 { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 8px; position: relative; }
 .st-sec > h3 small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+/* the marginal/safest swap pinches its size and hover from .st-pv-control; it's
+   parked on the head's right edge and centres on the TEXT line (absolute, so
+   the hitbox can't stretch the head's height) */
+.st-sec > h3 .st-cls-swap { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
 .st-inf { margin-top: 16px; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 /* the informal line opens on the same twin rule the winner story's junctions wear,
    and centres inside its rule-pair: its margin below matches its padding above */

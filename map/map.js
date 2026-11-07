@@ -8647,6 +8647,15 @@ function setVtMode(mode) {
   renderStory(true);
   $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true });
 }
+// the margin list's two reads — tightest margins ("Most marginal") or widest
+// ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
+let closeSafe = false;
+function setCloseSafe(safe) {
+  if (safe === closeSafe) return;
+  closeSafe = safe;
+  renderStory(true);
+  $("#story [data-close-toggle]")?.focus({ preventScroll: true });
+}
 function vtBands(divs) {
   const counts = {}, total2 = [0, 0];
   let tot = 0;
@@ -8767,12 +8776,16 @@ function storyArea(m, st) {
   const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true, castScope?.geography);
   h += informalHTML(m, st);
-  const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
+  const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
   const closeFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f1(v));
   const closeRow = (v, d) => `${closeFmt(v)} <small>(${int(d.votesMargin)} vote${d.votesMargin === 1 ? "" : "s"})</small>`;
-  h += `<div class="st-sec"><h3>Closest seats <small>winning margin, points</small></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
+  // up arrow lit on Safest, down arrow lit on Most marginal — the arrows ride
+  // the right edge of the head, inline with its words
+  const closeNext = closeSafe ? "Show most marginal seats" : "Show safest seats";
+  const closeArrows = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 17V3.5M3.2 7.2 6.5 3.7l3.3 3.5" stroke="var(--ink${closeSafe ? "" : "-3"})"/><path d="M13.5 3v13.5M10.2 12.8l3.3 3.5 3.3-3.5" stroke="var(--ink${closeSafe ? "-3" : ""})"/></svg>`;
+  h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
   return h;
 }
@@ -10899,6 +10912,8 @@ $("#story").addEventListener("pointermove", (e) => {
 $("#story").addEventListener("click", (e) => {
   const voteMode = e.target.closest("[data-vt-mode]");
   if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
+  const closeTgl = e.target.closest("[data-close-toggle]");
+  if (closeTgl) { setCloseSafe(!closeSafe); return; }
   const oth = e.target.closest("[data-othx]");
   if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");
