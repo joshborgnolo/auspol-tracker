@@ -8128,7 +8128,7 @@ function seatStat(m, st, label, seatsNote = "") {
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
   if (fpA != null && fpL != null) {
-    fpRow = `<span class="st-lab">Primaries (Labor and ${coalW()} have ${f1(fpA + fpL)}%)</span>${statPrimaryGrid(m, A, "", true)}`;
+    fpRow = `<span class="st-lab">Primaries (Labor and ${coalW()} share ${f1(fpA + fpL)}%)</span>${statPrimaryGrid(m, A, "", true)}`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
