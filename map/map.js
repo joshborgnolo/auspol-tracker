@@ -8281,9 +8281,13 @@ function statScopeOpts(m, st) {
 }
 const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the dropdown's trigger names its job: invites by the state axis, then offers
-// to add the type axis on the sliced state — changing the pick once it's on
-const statScopeTrigger = (m) => (sliceState(m) ? (poolParts(m).cls ? "Change filter" : "Add filter") : "Filter by state/territory");
+// the dropdown's trigger names its job — until there's a pick: invites by the
+// state axis, then by the type axis over a sliced state; a pick names itself
+const statScopeTrigger = (m) => {
+  if (!sliceState(m)) return "Filter by state/territory";
+  const cls = poolParts(m).cls;
+  return cls ? statScopeLabel(m, { k: "cls", cls }) : "Filter by seat type";
+};
 // what the chip row marks: the store's own class pick when it's expressible —
 // a class compounding a map-side state stays marked beside the map's own evidence
 const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
