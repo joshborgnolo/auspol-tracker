@@ -414,10 +414,10 @@ function seatStat(m, st, label) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the "formed govt" tag rides the figures' names row, just out past the
-  // governing family's OUTSIDE edge; an as-it-stands frame holds rather than
-  // won, so it's an election view only
-  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>formed govt</b></span>` : "";
+  // the govt tag rides the figures' names row, just out past the governing
+  // family's OUTSIDE edge — "formed govt" where an election delivered the
+  // government, "govt" on an as-it-stands frame (which holds rather than won)
+  const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
     // an "as it stands" frame's tallies carry the base election's swing, which is not a change

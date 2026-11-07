@@ -1,8 +1,8 @@
 // Probe: the /map/ Winner head's two-party block —
-//   1. the "formed govt" ink tag rides the figures' NAMES ROW on ELECTION
-//      frames only, set just OUTSIDE the governing family's edge of the
-//      figures — left of them for Labor, right for the Coalition
-//      (ink/bg per theme);
+//   1. the govt ink tag rides the figures' NAMES ROW on every frame, set just
+//      OUTSIDE the governing family's edge of the figures — left of them for
+//      Labor, right for the Coalition (ink/bg per theme). It READS "formed
+//      govt" on an election frame, just "govt" on an as-it-stands now frame;
 //   2. the figures grid names both sides ("Labor" · "Coalition"/"LNP"…), each
 //      name flush with its figure's inside edge, above the swing line.
 // usage: node .matilda/probe/map-formed-govt.mjs <baseUrl>  (serve the repo root first)
@@ -111,10 +111,14 @@ await show("2010");
 t = await tag();
 ok("2010: alp side, left of the figures", t.found && /st-fg-alp/.test(t.cls) && t.outLeft >= 2, JSON.stringify(t));
 
-// now frame: no tag — but the figures' names still label the sides
+// now frame: the as-it-stands government gets a plain "govt" tag — same
+// names-row placement, out past Labor's outside edge
 await show("now");
 t = await tag(); nm = await names();
-ok("now frame: no tag", !t.found, JSON.stringify(t));
+ok("now frame: lowercase 'govt' tag, rendered once", t.found && t.count === 1 && t.text === "govt", JSON.stringify(t));
+ok("now frame: alp-side class", /st-fg-alp/.test(t.cls), t.cls);
+ok("now frame: just out past the figures' left edge", t.outLeft != null && t.outLeft >= 2 && t.outLeft <= 9, `gap ${t.outLeft}px`);
+ok("now frame: on the names row", t.rowDY != null && t.rowDY <= 4, `${t.rowDY}px`);
 ok("now frame: names present", nm.found === true && nm.left === "Labor" && nm.right === "Coalition", JSON.stringify(nm));
 
 // a state election: Queensland 2024 (LNP government) — right-side tag, right name reads LNP
@@ -144,6 +148,17 @@ await wait(500);
   ok("2013: no horizontal overflow at 320px", over <= 0, `${over}px`);
   const t3 = await tag();
   ok("2013: tag inside the viewport at 320px", t3.inView, `outRight ${t3.outRight}px`);
+}
+// the now frame's "govt" tag at the phone rung too
+await show("now");
+await wait(1200);
+await page.setViewport({ width: 320, height: 844, deviceScaleFactor: 2 });
+await wait(500);
+{
+  const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  ok("now: no horizontal overflow at 320px", over <= 0, `${over}px`);
+  const t4 = await tag();
+  ok("now: tag inside the viewport at 320px", t4.found && t4.inView, `outLeft ${t4.outLeft}px`);
 }
 ok("no page errors", errs.length === 0, errs[0] || "");
 await browser.close();

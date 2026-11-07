@@ -53,10 +53,11 @@ await wait(400);
   ok("labels still ruled above after the scope change", labelsAboveRules(ks2), JSON.stringify(ks2));
 }
 
-// the Now frame: no tag, no swing — the crown and the dividers stand the same
+// the Now frame: no swing line, and its "govt" tag rides inside the figures
+// grid — so the top-level crown and dividers stand the same
 await frame("now");
 ks = await kinds();
-ok("now: no formed-govt tag", !ks.includes("fg"), JSON.stringify(ks.slice(0, 5)));
+ok("now: no top-level govt tag (it nests in the grid)", !ks.includes("fg"), JSON.stringify(ks.slice(0, 5)));
 ok("now: five rules, crown first", ks.filter((k) => k === "SEP").length === 5 && ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 4)));
 ok("now: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
 
