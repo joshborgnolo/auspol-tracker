@@ -191,7 +191,6 @@ function fsEnter(o = {}) {
   FS.stagePh = fsPark(stage, el);
   el.prepend(stage);
   fsPark($("#lenses"), FS.lensbar);
-  fsPark($(".mp-search"), FS.sbox);
   fsPark($(".mp-views"), FS.vslot);
   fsPark($("#legend"), FS.lslot);
   fsPark($("#story"), FS.scroll);

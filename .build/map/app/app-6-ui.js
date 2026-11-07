@@ -114,7 +114,20 @@ function renderLegend() {
   // census measure picker, ramps and switchers included
   if (!m) { el.hidden = true; return; }
   el.hidden = false;
+  // Keep the live search field (and its listeners/focus) when rebuilding controls.
+  const search = el.querySelector(".mp-search");
+  const searching = search && search.contains(document.activeElement);
+  if (search) search.remove();
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
+  const basis = el.querySelector(".lg-basis");
+  if (search && basis) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "lg-toolbar";
+    basis.before(toolbar);
+    toolbar.append(basis, search);
+    if (searching) $("#q").focus({ preventScroll: true });
+    fitSearchPlaceholder();
+  }
   renderJumpSel();
   el.style.minHeight = "";
 }
@@ -257,7 +270,7 @@ function basisHTML() {
   const sen = S.view === "chamber" && S.house === "senate";
   const list = sen ? SEN_LENSES : yearLenses(S.year);
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
-  return `<label class="lg-t lg-basis">Basis: <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
+  return `<label class="lg-t lg-basis">Basis <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
 }
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -561,9 +574,9 @@ function jumpHTML() {
   const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}" aria-label="City names on the map">City names</button></div>`;
   if (j) {
     const k = CITIES.findIndex(([, st]) => st === j);
-    if (k >= 0) return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to:</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>${toggle}`;
+    if (k >= 0) return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>${toggle}`;
   }
-  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to:</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}${toggle}`;
+  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}${toggle}`;
 }
 /* the selected entry keeps the hover underline (the city/state column and the election alike) */
 function renderJumpSel() {

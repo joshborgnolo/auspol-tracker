@@ -1039,3 +1039,36 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-types button:hover { color: var(--ink); }
 .lg-types button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: currentColor; }
 .lg-types button:focus-visible, .mp-legend select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Search is part of the control panel, sharing the Basis row on laptops. */
+.mp-lensrow[hidden] { display: none; }
+.lg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+.mp-legend .lg-toolbar .lg-basis { flex: 1 0 auto; width: auto; }
+.mp-legend .mp-search { flex: 0 1 300px; width: 300px; max-width: 100%; order: 0; margin: 0; align-self: auto; }
+.mp-legend .mp-search label { border-radius: 2px; }
+.fs-sbox { display: none; }
+.fs .mp-legend .mp-search { flex-basis: 100%; width: 100%; }
+.fs .mp-legend .mp-search label { box-shadow: none; }
+/* Selectable facets use the ink-and-paper treatment of the formed-govt tag. */
+.mp-legend .lg-t select, .mp-legend .lg-t button.flip,
+.mp-legend .lg-jump button, .mp-legend .lg-draw button,
+.mp-legend .lg-seat button, .mp-legend .lg-house button,
+.lg-types button {
+  background-color: var(--ink); color: var(--bg); border: 0; border-radius: 2px;
+  padding: 2px 4px 3px; font-family: var(--sans); font-size: 11px;
+  font-weight: 600; line-height: 1.3; letter-spacing: .04em; text-decoration: none;
+}
+.mp-legend .lg-t select { padding-right: 18px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1.4 1.3l3.6 3.4 3.6-3.4' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.mp-legend .lg-t select option, .mp-legend .lg-t select optgroup { color: var(--ink); background: var(--bg); }
+.mp-legend button[aria-pressed="true"], .mp-legend .lg-jump .mp-ca.on button,
+.mp-legend .lg-jump .lg-jtoggle[aria-pressed="true"],
+.lg-types button[aria-pressed="true"] { color: var(--bg); outline: 1px solid var(--ink); outline-offset: 2px; }
+.mp-legend .lg-t button.flip span { color: inherit; }
+.mp-legend .lg-jump button:hover, .mp-legend .lg-draw button:hover:not(:disabled),
+.mp-legend .lg-seat button:hover, .mp-legend .lg-house button:hover, .lg-types button:hover { color: var(--bg); opacity: .8; text-decoration: none; }
+.mp-legend .lg-draw button:disabled { background: var(--line-2); color: var(--ink-faint); outline: none; }
+.mp-legend .mp-ca { gap: 6px; }
+.mp-legend button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+@media (max-width: 560px) {
+  .mp-legend .mp-search { flex-basis: 100%; width: 100%; }
+}
