@@ -1,27 +1,26 @@
-// Manual regression probe for the Winner head's figures menu and the cls
-// lens's figures controls, across year switches and lens switches.
+// Manual regression probe for the Winner head's figures-filter menu and the
+// cls lens's companion row, across year switches and lens switches.
 //
 // UNIFICATION (2026-11-07): a state named in the menu and a state selected on
 // the map are ONE slice — the menu's pick selects the state on the map (no
 // camera move), the whole-frame layout keeps the head title in the state's
 // name, the "All seats" way out above it, and the state selected in the map.
-// "All seats" (goAus) clears the slice — so year() must NOT reset the
-// navigation after each year, or the persistence this probe pins never fires.
 //
-// AXIS SPLIT (2026-11-08, user call): the state/territory dropdown and the
-// seat-type row are separate homes on separate lenses — the dropdown names
-// only state/territory wherever it sits ("Filter by state/territory" /
-// "Change filter"), and on the cls lens it stacks ABOVE the types toggle row.
-// A seat type filters on the cls lens alone; the two axes compound wherever
-// the state is selected (a class named inside it, or a state named beside the
-// class — the pair pools their intersection). "All seats" leaves its own axis.
+// MENU-AS-OPEN-AXIS (2026-11-08, user calls): the dropdown always offers the
+// axis that is OPEN — unsliced, the states ("Filter by state/territory"); a
+// sliced state's menu is the SEAT TYPES ("Add filter", since changing the
+// state needs no menu), pressed on the pick once one compounds ("Change
+// filter"). The cls lens mirrors this beside its own chips row. A class pick
+// only ever filters where the page can show it: sliced, or on its own lens —
+// elsewhere it reads as National and wakes the moment a state slices. "All
+// seats" ejects both axes.
 // Start a local server from the repo root, then
 // MAP_URL=http://127.0.0.1:8765 node .build/map/probe-scope.mjs
 import assert from "node:assert/strict";
 import puppeteer from "puppeteer-core";
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true, args: ["--force-prefers-reduced-motion"] });
 const base = process.env.MAP_URL || "http://127.0.0.1:8765";
-const label = (page) => page.$eval("#story .st-scwrap [data-scope-trigger]", (e) => e.textContent.trim());
+const label = (page) => page.$eval("#story .st-scwrap [data-scope-trigger]", (e) => e.textContent.replace(/\s+/g, " ").trim());
 const menuLabels = (page) => page.$$eval("#story .st-scwrap [data-scope]", (els) => els.map((e) => `${e.dataset.scope} = ${e.textContent.trim()}${e.getAttribute("aria-pressed") ? " [pressed]" : ""}`));
 const pressedItem = (page) => page.$eval(`#story .st-scwrap [data-scope][aria-pressed="true"]`, (e) => `${e.dataset.scope} = ${e.textContent.trim()}`);
 const selLevel = (page) => page.evaluate(() => ({ ...__map.S.sel }));
@@ -40,11 +39,14 @@ async function chipPick(page, name) {
   await page.evaluate((name) => { const el = [...document.querySelectorAll(`#story .lg-types.st-typefilters [data-scope^="cls:"]`)].find((e) => e.textContent.trim() === name); if (el) el.click(); }, name);
   await page.waitForFunction(() => document.querySelector(`#story .lg-types.st-typefilters [aria-pressed="true"]`), { timeout: 15000 });
 }
-// pick a menu item by its data-scope value, through the real trigger-open click chain
+// pick a menu item by its data-scope value, through the real trigger-open click
+// chain. A state pick swaps the menu to the types alongside it (its own item
+// leaves the list), so its landing is the SELECTION, not a pressed item
 async function pick(page, scope) {
   await page.click("#story .st-scwrap [data-scope-trigger]");
   await page.click(`#story .st-scwrap [data-scope="${scope}"]`);
-  await page.waitForFunction((s) => document.querySelector(`#story .st-scwrap [data-scope="${s}"]`)?.getAttribute("aria-pressed") === "true", { timeout: 15000 }, scope);
+  if (scope.startsWith("cls:")) await page.waitForFunction((s) => document.querySelector(`#story .st-scwrap [data-scope="${s}"]`)?.getAttribute("aria-pressed") === "true", { timeout: 15000 }, scope);
+  else await page.waitForFunction((s) => __map.S.sel.level === (s === "aus" ? "aus" : "state"), { timeout: 15000 }, scope);
 }
 async function year(page, y) {
   await page.evaluate(async (y) => { await __map.setYear(y); __map.setView("map"); }, y);
@@ -52,7 +54,7 @@ async function year(page, y) {
   await page.waitForNetworkIdle({ idleTime: 300, timeout: 15000 });
 }
 async function labelIs(page, want, ctx) {
-  await page.waitForFunction((w) => document.querySelector("#story .st-scwrap [data-scope-trigger]")?.textContent.trim() === w, { timeout: 15000 }, want);
+  await page.waitForFunction((w) => document.querySelector("#story .st-scwrap [data-scope-trigger]")?.textContent.includes(w), { timeout: 15000 }, want);
   const got = await label(page);
   assert.equal(got, want, ctx);
 }
@@ -62,6 +64,10 @@ async function pressedIs(page, want, ctx) {
   const got = await pressedItem(page);
   assert.equal(got, want, ctx);
 }
+async function clsItemsAreTypes(page, ctx) {
+  const menu = await menuLabels(page);
+  assert.deepEqual(menu.map((l2) => l2.split(" = ")[0]), ["cls:Inner Metropolitan", "cls:Outer Metropolitan", "cls:Provincial", "cls:Rural"], ctx + `: ${menu.join(" | ")}`);
+}
 try {
   const page = await browser.newPage();
   const errors = []; page.on("pageerror", (e) => errors.push(e.message));
@@ -70,7 +76,7 @@ try {
   await page.goto(`${base}/map/#y=now`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__map, { timeout: 60000 });
   await page.evaluate(() => { __map.setLens("winner"); __map.goAus(); __map.setView("map"); });
-  await labelIs(page, "Filter by state/territory", "the dropdown invites by its one axis, on every frame");
+  await labelIs(page, "Filter by state/territory", "the trigger invites by the state axis");
   // the now view carries the base election's swings (user call, 2026-11-07)
   const nowSw = await page.evaluate(() => ({
     swing: document.querySelector("#story .st-stat .st-swing")?.textContent.trim() ?? null,
@@ -79,58 +85,101 @@ try {
   assert.ok(nowSw.swing && /swing$/.test(nowSw.swing), `the now view's head shows its swing: ${nowSw.swing}`);
   assert.ok(nowSw.smalls > 0, "…and its primaries row carries change smalls");
   const menuNow = await menuLabels(page);
-  assert.ok(menuNow.some((l) => l.startsWith("aus = National")) && menuNow.some((l) => l.startsWith("st:NSW = NSW"))
+  assert.ok(menuNow.some((l) => l.startsWith("aus = National [pressed]")) && menuNow.some((l) => l.startsWith("st:NSW = NSW"))
     && menuNow.some((l) => l.startsWith("st:VIC = Victoria")) && menuNow.some((l) => l.startsWith("st:QLD = Queensland"))
     && menuNow.some((l) => l.startsWith("st:WA = Western Australia")) && menuNow.some((l) => l.startsWith("st:SA = South Australia"))
-    && menuNow.some((l) => l.startsWith("st:TAS = Tasmania")) && !menuNow.some((l) => l.startsWith("cls:")), `the Now menu items are states alone: ${menuNow.join(" | ")}`);
+    && menuNow.some((l) => l.startsWith("st:TAS = Tasmania")) && !menuNow.some((l) => l.startsWith("cls:")), `the unsliced menu is the states, plainly named: ${menuNow.join(" | ")}`);
   const noteShown = () => page.evaluate(() => !!document.querySelector("#story .st-seat-note"));
   assert.ok(await noteShown(), "the moved-seats note shows at National");
 
-  // a federal state pick rides across federal years, its pressed item following the frame…
+  // a state pick goes on the map and flips the menu to the OTHER axis: the types
   await pick(page, "st:NSW");
-  assert.equal(await label(page), "Change filter", "a picked filter turns the trigger into its changer");
-  // the unification: a menu pick IS a map selection — the state is selected
-  // (no camera move), the head is its name, and "All seats" sits above it
+  await labelIs(page, "Add filter", "a sliced state's trigger offers to add the type axis");
   assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "picking NSW in the menu selects NSW in the map");
   assert.equal(await headTitle(page), "New South Wales", "the head titles itself by the state");
   assert.equal(await upLabel(page), "All seats", "the 'All seats' way out sits above the head");
   assert.ok(await noteShown(), "NSW keep the note — New England and Farrer are NSW seats");
+  await clsItemsAreTypes(page, "the sliced menu is the seat types, plainly named");
+  assert.ok(!(await menuLabels(page)).some((l) => l.endsWith("[pressed]")), "…with nothing pressed until a type is on");
+
+  // the slice rides federal years, falls back on a state frame, and returns
   await year(page, 2025);
-  await labelIs(page, "Change filter", "the trigger's job wording rides Now → 2025");
-  await pressedIs(page, "st:NSW = NSW", "the pressed item is NSW on the election frame");
+  await labelIs(page, "Add filter", "the type offer rides Now → 2025");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "NSW lives on the election frame too");
   assert.equal(await headTitle(page), "New South Wales · 2025", "the filtered head's title carries the middot year on an election frame");
-  const menu25 = await menuLabels(page);
-  assert.ok(menu25.some((l) => l.startsWith("aus = National")) && menu25.some((l) => l.startsWith("st:NSW = NSW")) && !menu25.some((l) => l.endsWith("figures")), `the 2025 menu names itself plainly: ${menu25.join(" | ")}`);
   const nswFig = await page.$eval("#story .st-stat", (e) => e.textContent);
   assert.ok(!/NaN|undefined|Infinity/.test(nswFig), `2025 NSW-scoped head figures clean: ${nswFig.slice(0, 160)}`);
   await year(page, 2022);
-  await pressedIs(page, "st:NSW = NSW", "NSW survives 2025 → 2022");
-
-  // …falls back where a frame has no such scope, and returns when one does
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "NSW survives 2025 → 2022");
   await year(page, "vic22");
-  await labelIs(page, "Filter by state/territory", "a state election frame falls back to unfiltered — the inviter returns");
-  await pressedIs(page, "aus = Victoria", "…its pressed item the frame's own jurisdiction, plain");
+  await labelIs(page, "Filter by state/territory", "a state frame falls back — the invite returns");
+  await pressedIs(page, "aus = Victoria", "…its pressed jurisdiction item, plainly named");
   assert.equal((await selLevel(page)).level, "aus", "a frame that can't show the slice carries no map selection");
   assert.equal(await headTitle(page), "Victorian election", "…and the head is the frame's own, unmarked by the dormant pick");
-  console.log("vic22 menu:", (await menuLabels(page)).join(" | "));
   await year(page, 2025);
-  await pressedIs(page, "st:NSW = NSW", "back on a federal frame the pick's item returns");
-  await labelIs(page, "Change filter", "…and the trigger is its changer again");
-  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "the slice re-selects itself on a frame that has it");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "back on a federal frame the slice re-selects itself");
+  await labelIs(page, "Add filter", "…and the type offer returns with it");
   await year(page, "now");
-  await pressedIs(page, "st:NSW = NSW", "and the pick's item survives back to Now");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "and rides back to Now");
 
-  // a scoped Now seats row keeps its change line (the coalition's NSW losses)
+  // the NSW Now seats line carries the coalition's losses, and conserves them
   const seatSmalls = () => page.$$eval("#story .st-seats small", (els) => els.map((e) => e.textContent.trim()));
   const nswSmalls = await seatSmalls();
   assert.ok(nswSmalls.length && nswSmalls.some((t) => /[−+][1-9]/.test(t)), `NSW carry the Now seat deltas: ${nswSmalls.join(" ")}`);
   assert.equal(nswSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "scoped seat changes conserve");
 
-  // the cls lens: the type chips compound with a selected state (2026-11-08).
-  // The probe arrives with NSW already selected on the map from the state runs.
-  await page.evaluate(() => __map.setLens("cls"));
+  // type compounds INSIDE the slice: the pool is New South Wales's inner metros
+  const pairN = await page.evaluate(() => __map.Y.now.divs.filter((d) => d.st === "NSW" && d.cls === "Inner Metropolitan").length);
+  assert.ok(pairN > 5 && pairN < 25, `New South Wales's inner-metropolitan seats: ${pairN}`);
+  await pick(page, "cls:Inner Metropolitan");
+  await labelIs(page, "Change filter", "a type on the sliced state turns the offer into its changer");
+  await pressedIs(page, "cls:Inner Metropolitan = Inner metro", "…its item pressed, plainly named");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "…and NSW stays selected beside it");
+  assert.equal(await headTitle(page), "New South Wales", "the state keeps its head title over the pair");
+  assert.equal(await seatLabN(page), pairN, `the seats pool IS the inner-metros of New South Wales (${pairN})`);
+  assert.ok(!(await noteShown()), "NSW's inner-metro pair names no such seats — the note drops");
+  const compSmalls = await seatSmalls();
+  assert.equal(compSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "…and the pair's changes conserve");
+
+  // the pair rides years; a state frame ejects both axes for good
+  await year(page, 2025);
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "the pair — state and type — rides Now → 2025");
+  assert.equal(await headTitle(page), "New South Wales · 2025", "…titled by the state with the middot year");
+  assert.equal(await seatLabN(page), await page.evaluate(() => __map.Y[2025].divs.filter((d) => d.st === "NSW" && d.cls === "Inner Metropolitan").length), "its seats row names the same intersection");
+  await year(page, "vic22");
+  await labelIs(page, "Filter by state/territory", "a state frame drops both axes");
+  assert.equal((await selLevel(page)).level, "aus", "…and the state doesn't resurrect (a compound keeps no ride-home)");
+  await year(page, "now");
+  assert.equal((await selLevel(page)).level, "aus", "…nor on Now after the fallback took them");
+  await labelIs(page, "Filter by state/territory", "…the page back at the invite, a settled compound reads National there");
+
+  // the compound wakes when a state slices again (the pick survived the fallback)
+  await page.evaluate(() => __map.goState("NSW", { fly: false }));
+  await page.waitForFunction(() => __map.S.sel.level === "state", { timeout: 15000 });
+  await labelIs(page, "Change filter", "a slice re-wakes the settled compound");
+  await pressedIs(page, "cls:Inner Metropolitan = Inner metro", "…its own pick still pressed");
+  await page.click("#story .st-up");
+  await labelIs(page, "Filter by state/territory", "…and 'All seats' evicts it");
+
+  // a fresh pair from the map side: New South Wales, then Rural over it
+  await page.evaluate(() => __map.goState("NSW", { fly: false }));
+  await page.waitForFunction(() => __map.S.sel.level === "state", { timeout: 15000 });
+  await labelIs(page, "Add filter", "…with the offer arming clean each time");
+  await pick(page, "cls:Rural");
+  const ruralSmalls = await seatSmalls();
+  assert.ok(ruralSmalls.length && ruralSmalls.some((t) => /[−+][1-9]/.test(t)), `NSW's rural pair carries the deltas: ${ruralSmalls.join(" ")}`);
+  assert.ok(await noteShown(), "NSW's rural pair keeps the One Nation note");
+  await page.click("#story .st-up");
+  await labelIs(page, "Filter by state/territory", "'All seats' ejects both axes");
+  assert.deepEqual(await selLevel(page), { level: "aus" }, "…and the map is out of it too");
+  assert.equal(await headTitle(page), "The House today", "…with the head the frame's own again");
+  assert.equal(await upLabel(page), null, "…and nothing left to step out from");
+
+  // the cls lens's types are chips; its dropdown joins the same sliced family
+  await page.evaluate(() => { __map.setLens("cls"); __map.goState("NSW", { fly: false }); });
+  await page.waitForFunction(() => __map.S.lens === "cls" && __map.S.sel.level === "state", { timeout: 15000 });
   await page.waitForNetworkIdle({ idleTime: 300, timeout: 15000 });
-  await labelIs(page, "Change filter", "the cls lens's dropdown wears the state its run carried in");
+  await labelIs(page, "Add filter", "the cls lens's sliced state arms the same offer");
   const stacked = await page.evaluate(() => {
     const wrap = document.querySelector("#story .st-clsmeta"); if (!wrap) return "missing";
     const a = wrap.querySelector(".st-scwrap"), b = wrap.querySelector(".lg-types.st-typefilters");
@@ -138,53 +187,41 @@ try {
   });
   assert.equal(stacked, "dropdown-above", "…and the dropdown stacks above the types toggle");
   assert.deepEqual(await chipsRow(page), ["Inner metro", "Outer metro", "Provincial", "Rural"], "…whose row names the four types");
-  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "…and NSW comes along from the state runs");
+  await clsItemsAreTypes(page, "…and its sliced menu the types too");
   const ruralNSW = await page.evaluate(() => __map.Y.now.divs.filter((d) => d.st === "NSW" && d.cls === "Rural").length);
-  const imNSW = await page.evaluate(() => __map.Y.now.divs.filter((d) => d.st === "NSW" && d.cls === "Inner Metropolitan").length);
   const ruralAus = await page.evaluate(() => __map.Y.now.divs.filter((d) => d.cls === "Rural").length);
 
-  // the pair forms: Rural inside New South Wales
+  // the pair forms from the chip row: Rural inside New South Wales
   await chipPick(page, "Rural");
   assert.equal(await chipPressed(page), "Rural", "the Rural chip presses");
-  assert.equal(await label(page), "Change filter", "…with the state's changer beside it");
+  await labelIs(page, "Change filter", "…and the sliced menu becomes its changer");
   assert.equal(await headTitle(page), "New South Wales", "…while the state keeps its head title over the pair");
   assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "…selected beside it");
   assert.equal(await seatLabN(page), ruralNSW, `the seats pool IS the rurals of New South Wales (${ruralNSW})`);
   assert.ok(await noteShown(), "NSW's rural pair names both One Nation seats");
-  const geo = await page.evaluate(() => document.querySelector("#story .vt-skew-head")?.textContent.trim() ?? "");
-  assert.ok(geo.includes("in NSW"), `the cast chart reads its pool's place (${geo.slice(0, 46)})`);
   assert.equal(await upLabel(page), "All seats", "…and the state's way out sits above");
 
-  // the pair rides frames; on a frame with no types the class pips sleep
+  // the cls pair rides federal years; a state frame's frame lacks the types' chips
   await year(page, 2025);
   assert.equal(await chipPressed(page), "Rural", "the Rural chip rides Now → 2025");
   assert.equal(await headTitle(page), "New South Wales · 2025", "…and the state's middot year heads the pair");
-  const pair25 = await page.evaluate(() => __map.Y[2025].divs.filter((d) => d.st === "NSW" && d.cls === "Rural").length);
-  assert.equal(await seatLabN(page), pair25, `its seats row names the intersection's own count (${pair25})`);
-  const ruralSmalls = await seatSmalls();
-  assert.ok(ruralSmalls.length && ruralSmalls.every((t) => /[−+\d]/.test(t)), `the pair carries the frame's seat deltas of these seats: ${ruralSmalls.join(" ")}`);
-  assert.equal(ruralSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "…summing to zero inside the scope");
+  assert.equal(await seatLabN(page), await page.evaluate(() => __map.Y[2025].divs.filter((d) => d.st === "NSW" && d.cls === "Rural").length), "its election seats row is the same intersection");
   await year(page, "vic22");
-  await labelIs(page, "Filter by state/territory", "a state election frame falls back to unfiltered — the inviter returns");
+  await labelIs(page, "Filter by state/territory", "a state frame drops both axes — the invite returns");
   assert.deepEqual(await chipsRow(page), [], "…and the types' own chips don't live on its frame");
   assert.equal((await selLevel(page)).level, "aus", "the state axis sleeps with it");
-  await year(page, 2025);
-  assert.equal(await chipPressed(page), "Rural", "the Rural chip returns on the federal frame");
-  assert.equal(await headTitle(page), "Rural · 2025", "…and the class names the head alone again");
-  assert.equal((await selLevel(page)).level, "aus", "…the state doesn't resurrect from a frame that dropped it");
   await year(page, "now");
-  assert.equal(await headTitle(page), "Rural", "…and the class-its-own head back on Now");
+  assert.equal(await chipPressed(page), "Rural", "the Rural chip returns on Now");
+  assert.equal(await headTitle(page), "Rural", "…and names the head alone");
   assert.equal(await seatLabN(page), ruralAus, `its pool back to the frame's rurals (${ruralAus})`);
 
-  // the class survives its own axis's moves but clears with its lens
-  await page.evaluate(() => __map.goAus({ fly: false }));
-  assert.equal(await chipPressed(page), "Rural", "clearing the map leaves the class alone");
+  // leaving the cls lens evicts the type — a pick never reads invisible
   await page.evaluate(() => __map.setLens("winner"));
   await page.waitForNetworkIdle({ idleTime: 300, timeout: 15000 });
   assert.equal(await chipPressed(page), null, "…and going home evicts the type");
   await labelIs(page, "Filter by state/territory", "…with Winner's own one-axis invitation up");
 
   assert.deepEqual(errors, [], "no page exceptions");
-  console.log("PASS: the dropdown names only state/territory on both lenses (Filter by state/territory / Change filter), the cls lens's types are a chip row beneath it, the pairs compound, each axis survives only its own moves");
+  console.log("PASS: unsliced, the menu is the states; sliced, it's the types (Add filter → Change filter with the pick pressed); pairs compound and ride frames; a class never filters where nothing marks it; 'All seats' ejects both axes");
   await page.close();
 } finally { await browser.close(); }

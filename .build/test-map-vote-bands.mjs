@@ -76,6 +76,9 @@ for (const st of Object.keys(states)) {
   assert.ok(api.vtBlock(scope.divs, true, scope.geography).includes(`Skew on ${short[st]} 2PP`));
   checkPool(scope.divs, st);
 }
+// a seat-type pick only ever scopes where the page shows it (a sliced state,
+// or its own lens) — drive those reads from the cls lens
+S.lens = "cls";
 for (const cls of new Set(current.res.divs.map((d) => d.cls))) {
   Object.assign(api.statScopeOf(current), { k: "cls", cls });
   const scope = api.vtScope(current, "AUS");
@@ -83,10 +86,13 @@ for (const cls of new Set(current.res.divs.map((d) => d.cls))) {
   assert.equal(scope.geography, `${cls.toLowerCase()} seats`);
   checkPool(scope.divs, cls);
 }
+S.lens = "winner";
 for (const d of current.res.divs) checkPool([d], d.n);
 
 // Navigating to a map state overrides a lingering figures-menu filter.
+S.lens = "cls";
 Object.assign(api.statScopeOf(current), { k: "cls", cls: "Rural" });
+S.lens = "winner";
 let scope = api.vtScope(current, "NSW");
 assert.equal(scope.geography, "NSW");
 assert.equal(scope.divs.length, current.res.divs.filter((d) => d.st === "NSW").length);

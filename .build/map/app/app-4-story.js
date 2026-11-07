@@ -252,7 +252,10 @@ const sliceState = (m) => poolParts(m).st;
 const statScopeOf = (m) => {
   const slice = sliceState(m);
   if (slice) return { k: "st", st: slice, open: statScopeStore.open };
-  return statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
+  // a dormant class pick reads as National where nothing marks it — it wakes
+  // back up the moment a state slices (or the cls lens is reached)
+  const store = statScopeStore.k === "cls" && S.lens !== "cls" ? { k: "aus", open: statScopeStore.open } : statScopeStore;
+  return statScopeOk(m, store) ? store : { k: "aus", open: statScopeStore.open };
 };
 // the lenses whose story shows the Winner head's figures design (the cls lens
 // shares it wholesale since 2026-11-08, its filter simply seat types only)
@@ -261,11 +264,13 @@ const pickerLens = () => S.lens === "winner" || S.lens === "cls";
 // the menu's own class pick. Either rides alone, and when both are on the
 // pools intersect — a class can be picked "within" the state (2026-11-08, the
 // report of NSW staying selected with no seat type reachable inside it)
-const poolParts = (m) => ({
-  st: pickerLens() && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null,
-  // seat types filter on the cls lens alone (2026-11-08, user call)
-  cls: S.lens === "cls" && !STATE_YEARS.has(m.year) && statScopeOk(m, statScopeStore) && statScopeStore.k === "cls" ? statScopeStore.cls : null,
-});
+const poolParts = (m) => {
+  const st = pickerLens() && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null;
+  // a seat type rides a sliced state's menu (2026-11-08, the menu's own "Add
+  // filter" over the state) — and the cls lens beyond a slice; never invisible
+  const cls = !STATE_YEARS.has(m.year) && statScopeOk(m, statScopeStore) && statScopeStore.k === "cls" && (S.lens === "cls" || st) ? statScopeStore.cls : null;
+  return { st, cls };
+};
 // the figures menu's seat-type pick, for the views that mark it outside the
 // head's figures (the chambers paint and dim by it)
 const clsFilter = (m) => poolParts(m).cls;
@@ -561,23 +566,27 @@ function informalHTML(m, st) {
    and territories alone, whichever lens holds the menu — seat types moved to
    their own toggle row on the cls lens (2026-11-08, user call) */
 function statScopeOpts(m, st) {
+  // a sliced state's axis is taken, so the menu offers the OTHER one: the
+  // seat types over the state (another state is picked on the strip instead)
+  if (sliceState(m)) return CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })]);
   const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
   if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
   return opts;
 }
 const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the dropdown's trigger names its job: invites by the one axis every lens
-// shares (state/territory), becomes the change-offer once a state's selected
-const statScopeTrigger = (m) => (sliceState(m) ? "Change filter" : "Filter by state/territory");
+// the dropdown's trigger names its job: invites by the state axis, then offers
+// to add the type axis on the sliced state — changing the pick once it's on
+const statScopeTrigger = (m) => (sliceState(m) ? (poolParts(m).cls ? "Change filter" : "Add filter") : "Filter by state/territory");
 // what the chip row marks: the store's own class pick when it's expressible —
 // a class compounding a map-side state stays marked beside the map's own evidence
 const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
 function statScopeMenu(m, st) {
-  const slice = sliceState(m), stCur = slice ? `st:${slice}` : "aus";
-  // the dropdown is the STATE filter in both filter lenses: states and
-  // territories alone, marked by the slice's own evidence
-  const dropdown = () => `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(m))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${stCur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`).join("")}</span></span>`;
+  const slice = sliceState(m), clsPicked = slice ? poolParts(m).cls : null;
+  const picked = slice ? (clsPicked ? `cls:${clsPicked}` : null) : "aus";
+  // the dropdown is the figures filter in both picker lenses: the open axis —
+  // states until one's sliced, then the types over it — marked by the pick
+  const dropdown = () => `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(m))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${picked === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`).join("")}</span></span>`;
   if (S.lens === "cls") {
     const cur = statScopeVal(statScopeMenuCur(m));
     // the dropdown goes above the seat-type labels' own toggle row (user call)
