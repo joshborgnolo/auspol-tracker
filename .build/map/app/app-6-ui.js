@@ -470,7 +470,7 @@ function legendHTML(m) {
     const by = { winner: "winning share", tpp: S.tppMode === "swing" ? "swing" : "two-party share", fp: "primary vote", flow: "preference flow", informal: "informal vote", cls: "seat type", seifa: "census measure" }[S.lens];
     h += `<div class="lg-seat" role="group" aria-label="How the chamber is arranged"><button type="button" data-seat="plan" aria-pressed="${md === "plan"}">As seated</button><button type="button" data-seat="sort" aria-pressed="${md === "sort"}">Sorted</button><span>${md === "plan" ? `From the Parliament’s seating plan of ${m.seating.plan}${m.seating.note ? `, ${m.seating.note}` : ""}.` : `By ${by}, each side from the Speaker’s end.`}</span></div>`;
   }
-  if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
+  if (S.view !== "map" && boothsOn && drawOf(m) !== "balloons") h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
     h += drawRow;
@@ -482,6 +482,10 @@ function legendHTML(m) {
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     h += `<div class="lg-hint mp-hint" id="hint"></div>`;
+    // the polling-places key forms the control panel's tail under the Draw row
+    // once polling places are on the picture — zoomed deep enough, or equally
+    // by its draw (seats) or a chosen seat (user call, 2026-11-08)
+    if (boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   }
 
   return h;

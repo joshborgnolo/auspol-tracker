@@ -2595,6 +2595,17 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') > ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') < ui.indexOf('h += `<div class="lg-hint'), "the flow lens's final-two key rides the panel's closing rows ahead of the zoom hint");
 }
 
+// the polling-places key forms the control panel's tail, after the Draw row's
+// note and hint (user call 2026-11-08): emitted last in the map tail, gated by
+// the panel already carrying polling places (deep zoom, a chosen seat, or the
+// seats draw — never over balloon dots, which join where they'd overlap)
+{
+  const ui = part("app-6-ui.js");
+  const hintIx = ui.indexOf('id="hint"'), shapesIx = ui.indexOf("lg-shapes", hintIx);
+  assert.ok(shapesIx > hintIx, "gated as its emission place — the polling-places key rides after the hint");
+  assert.ok(ui.includes('if (boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL))'), "…showing only when polling places are on the picture");
+}
+
 // the now views carry the base election's swings (user call 2026-11-07 —
 // reversing the old "not a change since" suppression): the winner head's 2PP
 // swing chip and its primaries change smalls show on every frame alike
