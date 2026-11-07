@@ -143,6 +143,30 @@ for (const f of fs.readdirSync(path.join(ROOT, "map/data")).filter((n) => /^core
 }
 for (const y of new Set(Object.entries(frames).filter(([f]) => !/^(qld|sa)/.test(f)).map(([, v]) => v))) assert.ok(fs.existsSync(path.join(ROOT, `map/data/senate-prefs-${y}.json`)), `${y}'s Senate orders are on file`);
 
+/* ----- the Greens pairings ----- */
+{ // menued on the federal frames only: they read the ballot files' own tallies (54 counts a row), which the constant-rate state frames' series don't carry
+  assert.ok(ui.includes('const AXIS_GREEN_PAIRS = [["GO", "Greens v One Nation"], ["GA", "Greens v Labor"], ["GC", "Greens v the Coalition"]];') || draw.includes('const AXIS_GREEN_PAIRS = [["GO", "Greens v One Nation"], ["GA", "Greens v Labor"], ["GC", "Greens v the Coalition"]];'), "the three Greens pairings are menued: against One Nation, Labor, the Coalition");
+  assert.ok(draw.includes("...(m && STATE_YEARS.has(m.year) ? [] : AXIS_GREEN_PAIRS)]"), "the Greens pairings ride only the federal frames' menus");
+  assert.ok(draw.includes('const axisOffers = (m, pair) => SP_PAIRS[pair] != null && (!AXIS_GREEN_SET.has(pair) || !STATE_YEARS.has(m.year));'), "a pairing is offered only where its evidence carries it");
+  assert.ok(draw.includes('return axisOffers(m, S.axis) ? S.axis : "AC";'), "a pairing the frame can't carry falls back to the count, the choice kept for the walk back");
+  assert.ok(draw.includes('pair === "CO" || pair === "GO" ? 40 : 30'), "the One Nation pairings run the long-spread scale, the others' the usual");
+  assert.ok(draw.includes('(cap ? "The Greens" : "the Greens")'), "a pairing names its Greens");
+  assert.ok(ui.includes("axisOpts(m)"), "the key's contest menu is the frame's own");
+  assert.ok(ui.includes("!AXIS_GREEN_SET.has(spp)"), "the Senate preferences lens keeps its own three (a crafted Greens sp address can't reach it)");
+  for (const y of [2022, 2025]) {
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`));
+    assert.deepEqual(f.pairs, ["AC", "AO", "CO", "GO", "GA", "GC"], `senate-prefs-${y}'s slots run AC AO CO GO GA GC, the order the app's k0 walks`);
+    assert.ok(f.donors.GO.join() === "alp,lnp,oth" && f.donors.GA.join() === "lnp,onp,oth" && f.donors.GC.join() === "alp,onp,oth", `senate-prefs-${y}: each Greens pairing tallies the three groups whose preferences decide it`);
+  }
+  // where a seat really ran the pairing, its count stands: Melbourne's 2025 final two were Labor and
+  // the Greens, Ryan's the LNP and the Greens
+  const core25 = JSON.parse(R("map/data/core-2025.json"));
+  const finalFams = (n) => { const d = core25.divs.find((x) => x.n === n); return d.tcp.map(([i]) => d.c[i][3]).sort().join("+"); };
+  assert.equal(finalFams("Melbourne"), "alp+grn", "Melbourne 2025's final two were Labor and the Greens, the count Greens v Labor reads there");
+  assert.equal(finalFams("Ryan"), "grn+lnp", "Ryan 2025's final two were the LNP and the Greens, the count Greens v the Coalition reads there");
+  assert.ok(draw.includes("fs.includes(fa) && fs.includes(fb)"), "a seat whose final two was the pairing keeps its count inside it");
+}
+
 /* ----- the wiring ----- */
 assert.ok(/closest\("[^"]*\[data-draw\][^"]*"\)/.test(ui), "the page's click handler listens for the drawing's buttons");
 assert.ok(ui.includes('if (t.dataset.draw) { setDraw(t.dataset.draw); return; }'), "and acts on them");
@@ -151,7 +175,7 @@ assert.ok(ui.includes('p.set("ax", S.axis)') && ui.includes('p.get("ax")'), "the
 assert.ok(/for \(const dw of S\.view === "map" \? DRAWS\.map/.test(ui), "the key holds the height of its tallest drawing, so a change of drawing moves no stage");
 assert.ok(ui.includes('recolor(false);\n  $$(".mp-views .rd-tab")'), "leaving the map for the chamber or the list drops a built contest's colours");
 const index = R("map/index.html");
-assert.ok(index.includes("Labor v One Nation and the Coalition v One Nation are not counted"), "the page's notes say what the built contests are");
+assert.ok(index.includes("Labor v One Nation, the Coalition v One Nation, and the Greens v One Nation, Labor and the Coalition are not counted"), "the page's notes name the built contests, the Greens pairings among them");
 
 /* ----- the zoom carries on past the gesture, the same in every browser -----
    (it went missing in Chrome and Firefox for ten days: their pinch sends no lift, so it had been

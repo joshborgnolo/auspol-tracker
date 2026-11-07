@@ -1502,7 +1502,13 @@ for (const y of ["sa22", "sa26"]) {
   // the Senate's ballot rankings live inside the Preferences tab, not as a tab of their own
   assert.ok(!js.includes('{ id: "senpref"'), "no Senate preferences tab");
   assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/map/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
-  for (const y of [2016, 2019, 2022, 2025]) { const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`)); assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`); assert.ok(f.divs.Hunter && f.divs.Hunter.length === 27, `senate-prefs-${y} rows carry 27 counts`); }
+  for (const y of [2016, 2019, 2022, 2025]) {
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`)), six = y >= 2022, want = six ? 54 : 27;
+    assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`);
+    assert.ok(f.divs.Hunter && f.divs.Hunter.length === want, `senate-prefs-${y} rows carry ${want} counts`);
+    assert.deepEqual(f.pairs, six ? ["AC", "AO", "CO", "GO", "GA", "GC"] : ["AC", "AO", "CO"], `senate-prefs-${y}: the two-party lens's three Greens pairings ride after the Senate orders' three on the frames that build them`);
+    assert.deepEqual(f.donors[six ? "GO" : "AC"], six ? ["alp", "lnp", "oth"] : ["grn", "onp", "oth"], `senate-prefs-${y} names its donor groups`);
+  }
   assert.deepEqual(JSON.parse(R("map/data/senate-prefs-2025.json")).absent, { ACT: ["onp"] }, "One Nation had no Senate ticket in the ACT in 2025");
   // the group-ticket era reads the parties' lodged tickets (2004-2013, .build/map/senate_gvt_prefs.py),
   // presented as tickets never ballot tallies; the record starts in 2004 because the AEC's machine

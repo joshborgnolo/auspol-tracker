@@ -604,8 +604,11 @@ const SP_YEARS = new Set([2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]);
 // the ticket era: figures are the parties' lodged group voting tickets (.build/map/senate_gvt_prefs.py)
 const SP_GVT = new Set([2004, 2007, 2010, 2013]);
 const spGvtYear = (y) => { const k = spYear(y); return k != null && SP_GVT.has(k) ? k : null; };
-const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"] };
-const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"] };
+/* the pairings the Senate orders are tallied for. The first three serve this lens; the two-party
+   lens's built contests add the three Greens pairings (their counts ride after these in the 2022
+   and 2025 files — senate-prefs-*.json carries them where a contest can be built from them) */
+const SP_PAIRS = { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"], GO: ["grn", "onp"], GA: ["grn", "alp"], GC: ["grn", "lnp"] };
+const SP_DONORS = { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"], GO: ["alp", "lnp", "oth"], GA: ["lnp", "onp", "oth"], GC: ["alp", "onp", "oth"] };
 const SP_MIN = 30; // fewer ballots naming either party than this, and a place shows no figure
 const spYear = (y) => (SEN_PREF_STATE_FRAMES.has(y) ? y : (() => { const k = svYear(y); return k != null && SP_YEARS.has(k) ? k : null; })());
 function loadSenatePrefs(y) {

@@ -295,7 +295,7 @@ function legendHTML(m) {
       const sw = S.tppMode === "swing", pair = axisNow(m);
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
       // as balloons or a surface, where One Nation stood widely, the two parties can be another two
-      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts())}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts(m))}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
       if (pair !== "AC") {
         const [fa, fb] = SP_PAIRS[pair], [A, B] = axisCap(pair), v = m.standIn ? null : axisArea(m, aus.idx), span = axisSpan(pair), lo = 50 - span, hi = 50 + span;
         h += legendHist(m, lo, hi);
@@ -1258,7 +1258,7 @@ function readURL() {
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const dw = p.get("draw"); if (dw && DRAWS.some(([k]) => k === dw)) S.draw = dw;
   const ax = p.get("ax"); if (ax && SP_PAIRS[ax]) S.axis = ax;
-  const spp = p.get("sp"); if (spp && SP_PAIRS[spp]) S.spPair = spp;
+  const spp = p.get("sp"); if (spp && SP_PAIRS[spp] && !AXIS_GREEN_SET.has(spp)) S.spPair = spp;
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else if (S.lens === "senpref") { if (SP_DONORS[S.spPair].includes(pp)) S.spFrom = pp; } else S.party = pp; }
   if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0];
   S.vs = p.get("f") === "onp" ? "onp" : "lnp";

@@ -144,6 +144,10 @@ function buildRamps() {
     divOn: div(deepen(th.party.alp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
     // the Coalition against One Nation, for the Senate preferences lens
     divCo: div(deepen(th.party.lnp, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
+    // the Greens' own pairings in the two-party lens: against One Nation, Labor and the Coalition
+    divGo: div(deepen(th.party.grn, dk ? 0.03 : -0.06), th.mid, deepen(th.party.onp, dk ? 0.03 : -0.06)),
+    divGa: div(deepen(th.party.grn, dk ? 0.03 : -0.06), th.mid, deepen(th.party.alp, dk ? 0.03 : -0.06)),
+    divGc: div(deepen(th.party.grn, dk ? 0.03 : -0.06), th.mid, deepen(th.party.lnp, dk ? 0.03 : -0.06)),
     fp: Object.fromEntries(FAMS.map((f) => [f, fpShare(f)])),
     gain: Object.fromEntries(FAMS.map((f) => [f, fpEven(f)])),
     inf: seq(345, 0.13),

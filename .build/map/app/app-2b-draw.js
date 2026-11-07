@@ -61,8 +61,13 @@ const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" ? "seats" 
 const AXIS_FRAMES = { 2022: 2022, 2025: 2025, now: 2025, qld20: 2019, qld24: 2025, qldnow: 2025, sa26: 2025 };
 const AXIS_K = 30;
 // the contest's parties as the frame names them: the Coalition, or the Liberals, or the LNP
-const axisName = (f, cap) => (f === "alp" ? "Labor" : f === "onp" ? "One Nation" : coalW(cap ? 1 : 0));
-const axisOpts = () => [["AC", `Labor v ${coalW(0)}`], ["AO", "Labor v One Nation"], ["CO", `${coalW(1).replace(/^The /, "")} v One Nation`]];
+const axisName = (f, cap) => (f === "alp" ? "Labor" : f === "onp" ? "One Nation" : f === "grn" ? (cap ? "The Greens" : "the Greens") : coalW(cap ? 1 : 0));
+// the three Greens pairings are built from the ballot files' own counts, which only the federal
+// frames' stores carry; the constant-rate frames have no Greens series to stand on
+const AXIS_GREEN_PAIRS = [["GO", "Greens v One Nation"], ["GA", "Greens v Labor"], ["GC", "Greens v the Coalition"]];
+const AXIS_GREEN_SET = new Set(AXIS_GREEN_PAIRS.map(([p]) => p));
+const axisOpts = (m) => [["AC", `Labor v ${coalW(0)}`], ["AO", "Labor v One Nation"], ["CO", `${coalW(1).replace(/^The /, "")} v One Nation`], ...(m && STATE_YEARS.has(m.year) ? [] : AXIS_GREEN_PAIRS)];
+const axisOffers = (m, pair) => SP_PAIRS[pair] != null && (!AXIS_GREEN_SET.has(pair) || !STATE_YEARS.has(m.year));
 // the state frames' shares reaching the pair's first-named party (flows.mjs FLOW_HISTORY_SENATE_ON,
 // _CON, pinned in test-map-page): Queensland's Senate ballots of 2019 and 2025, South Australia's of
 // 2025, and for South Australia 2026's Labor v One Nation Kevin Bonham's estimates of that election's own splits
@@ -79,13 +84,15 @@ const axisFrame = (m) => (m ? AXIS_FRAMES[m.year] ?? null : null);
 // the contest in force: only the Two-party lens's share, only as balloons or a surface
 function axisNow(m) {
   if (S.axis === "AC" || S.lens !== "tpp" || S.tppMode === "swing" || S.view !== "map" || S.draw === "seats") return "AC";
-  return axisFrame(m) == null ? "AC" : S.axis;
+  if (axisFrame(m) == null) return "AC";
+  return axisOffers(m, S.axis) ? S.axis : "AC";
 }
 const axisNames = (pair = S.axis) => SP_PAIRS[pair].map((f) => axisName(f));
 const axisCap = (pair = S.axis) => SP_PAIRS[pair].map((f) => axisName(f, true));
-// how far from even the contest's colours run: to where its places actually spread (the Coalition's lead over One Nation runs longest)
-const axisSpan = (pair = S.axis) => (pair === "CO" ? 40 : 30);
-const axisRamp = (pair = S.axis) => (pair === "AO" ? RAMP.divOn : pair === "CO" ? RAMP.divCo : RAMP.div);
+// how far from even the contest's colours run: to where its places actually spread (the One Nation
+// pairings' spreads run longest — the Greens' sweep of them out of town is their mirror)
+const axisSpan = (pair = S.axis) => (pair === "CO" || pair === "GO" ? 40 : 30);
+const axisRamp = (pair = S.axis) => (pair === "AO" ? RAMP.divOn : pair === "CO" ? RAMP.divCo : pair === "GO" ? RAMP.divGo : pair === "GA" ? RAMP.divGa : pair === "GC" ? RAMP.divGc : RAMP.div);
 const logit = (p) => Math.log(p / (1 - p)), expit = (x) => 1 / (1 + Math.exp(-x));
 // the shift that carries a group's local rates, votes-weighted, to a whole's level
 function levelShift(r, wt, target) {
@@ -109,8 +116,8 @@ function axisOf(m, pair = axisNow(m)) {
   const out = { v: new Float32Array(n).fill(NaN), a: new Float32Array(n), t: new Float32Array(n), counted: 0, est: 0, seatSkip: new Uint8Array(m.divs.length) };
   // a seat missing either party, or a by-election's, has nothing to split
   for (const d of m.divs) if (d.by || !(d.fp[fa] > 0) || !(d.fp[fb] > 0)) out.seatSkip[d.i] = 1;
-  // each group's rate at each place
-  const k0 = (() => { let k = 0; for (const p of ["AC", "AO", "CO"]) { if (p === pair) return k; k += SP_DONORS[p].length; } return 0; })();
+  // each group's rate at each place, at its slot in the file's pair order (SP_PAIRS)
+  const k0 = (() => { let k = 0; for (const p of Object.keys(SP_PAIRS)) { if (p === pair) return k; k += SP_DONORS[p].length; } return 0; })();
   const rates = donors.map((f, q) => {
     const r = new Float32Array(n).fill(NaN);
     if (!fed) { r.fill(AXIS_RATES[m.year][pair][f] / 100); return r; }
