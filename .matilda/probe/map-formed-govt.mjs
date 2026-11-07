@@ -1,8 +1,9 @@
 // Probe: the /map/ Winner head's two-party block —
-//   1. the govt ink tag rides the figures' NAMES ROW on every frame, set just
-//      OUTSIDE the governing family's edge of the figures — left of them for
-//      Labor, right for the Coalition (ink/bg per theme). It READS "formed
-//      govt" on an election frame, just "govt" on an as-it-stands now frame;
+//   1. the govt ink tag rides the figures' NAMES ROW on every frame, flush
+//      with the governing family's OUTER edge of the figures — left of them
+//      for Labor, right for the Coalition, never hanging PAST the edge
+//      (ink/bg per theme). It READS "formed govt" on an election frame,
+//      just "govt" on an as-it-stands now frame;
 //   2. the figures grid names both sides ("Labor" · "Coalition"/"LNP"…), each
 //      name flush with its figure's inside edge, above the swing line.
 // usage: node .matilda/probe/map-formed-govt.mjs <baseUrl>  (serve the repo root first)
@@ -59,14 +60,14 @@ const names = () => page.evaluate(() => {
 // alone won't re-render, so each frame switch needs a reload
 const show = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1500); };
 
-// 2025: Labor won — tag just out past the figures' LEFT edge, on the names row
+// 2025: Labor won — tag flush with the figures' LEFT edge, on the names row
 await show("2025");
 let t = await tag();
 ok("2025: tag rendered once", t.found && t.count === 1, JSON.stringify(t));
 ok("2025: lowercase 'formed govt'", t.text === "formed govt", t.text);
 ok("2025: alp-side class", /st-fg-alp/.test(t.cls), t.cls);
 ok("2025: inside the figures grid", t.parent === "st-tpp", t.parent);
-ok("2025: just out past the figures' left edge", t.outLeft != null && t.outLeft >= 2 && t.outLeft <= 9, `gap ${t.outLeft}px`);
+ok("2025: flush with the figures' left edge, not past it", t.outLeft != null && Math.abs(t.outLeft) <= 1, `gap ${t.outLeft}px`);
 ok("2025: on the names row", t.rowDY != null && t.rowDY <= 4, `${t.rowDY}px`);
 ok("2025: tight box, ≤5px side padding", t.padX && t.padX.every((p) => p <= 5), String(t.padX));
 let nm = await names();
@@ -100,31 +101,31 @@ t = await tag(); nm = await names();
 ok("2025 under a class scope: tag still there", t.found && t.count === 1, JSON.stringify(t));
 ok("2025 under a class scope: names still there", nm.found === true, JSON.stringify(nm));
 
-// 2013: Coalition won — tag just out past the figures' RIGHT edge
+// 2013: Coalition won — tag flush with the figures' RIGHT edge
 await show("2013");
 t = await tag();
 ok("2013: lnp-side class", /st-fg-lnp/.test(t.cls), t.cls);
-ok("2013: just out past the figures' right edge", t.outRight != null && t.outRight >= 2 && t.outRight <= 9, `gap ${t.outRight}px`);
+ok("2013: flush with the figures' right edge, not past it", t.outRight != null && Math.abs(t.outRight) <= 1, `gap ${t.outRight}px`);
 
 // 2010: hung parliament, Labor kept government — alp side again
 await show("2010");
 t = await tag();
-ok("2010: alp side, left of the figures", t.found && /st-fg-alp/.test(t.cls) && t.outLeft >= 2, JSON.stringify(t));
+ok("2010: alp side, flush with the figures' left edge", t.found && /st-fg-alp/.test(t.cls) && Math.abs(t.outLeft) <= 1, JSON.stringify(t));
 
 // now frame: the as-it-stands government gets a plain "govt" tag — same
-// names-row placement, out past Labor's outside edge
+// names-row placement, flush at Labor's outer edge
 await show("now");
 t = await tag(); nm = await names();
 ok("now frame: lowercase 'govt' tag, rendered once", t.found && t.count === 1 && t.text === "govt", JSON.stringify(t));
 ok("now frame: alp-side class", /st-fg-alp/.test(t.cls), t.cls);
-ok("now frame: just out past the figures' left edge", t.outLeft != null && t.outLeft >= 2 && t.outLeft <= 9, `gap ${t.outLeft}px`);
+ok("now frame: flush with the figures' left edge, not past it", t.outLeft != null && Math.abs(t.outLeft) <= 1, `gap ${t.outLeft}px`);
 ok("now frame: on the names row", t.rowDY != null && t.rowDY <= 4, `${t.rowDY}px`);
 ok("now frame: names present", nm.found === true && nm.left === "Labor" && nm.right === "Coalition", JSON.stringify(nm));
 
 // a state election: Queensland 2024 (LNP government) — right-side tag, right name reads LNP
 await show("qld24");
 t = await tag(); nm = await names();
-ok("qld24: tag out past the figures' right edge", t.found && t.outRight >= 2 && t.outRight <= 9, JSON.stringify(t));
+ok("qld24: tag flush with the figures' right edge", t.found && Math.abs(t.outRight) <= 1, JSON.stringify(t));
 ok("qld24: right figure named LNP", nm.found === true && nm.right === "LNP", JSON.stringify(nm));
 
 // phone rungs: the hanging tag never takes the page out of the viewport

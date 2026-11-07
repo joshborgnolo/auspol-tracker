@@ -440,7 +440,7 @@ function seatStat(m, st, label, noteDef = null) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the govt tag rides the figures' names row, just out past the governing
+  // the govt tag rides the figures' names row, flush with the governing
   // family's OUTSIDE edge — "formed govt" where an election delivered the
   // government, "govt" on an as-it-stands frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
@@ -451,7 +451,7 @@ function seatStat(m, st, label, noteDef = null) {
     const s = isNowY(m.year) ? null : A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
-    // the tag rides the names row, out past the governing family's side
+    // the tag rides the names row, flush at the governing family's side
     two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
   }
   const change = (f, n) => {
