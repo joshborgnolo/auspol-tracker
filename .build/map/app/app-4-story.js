@@ -992,7 +992,7 @@ function areaDemo(m, st, idx, where, isNowM) {
     ? `${st === "AUS" ? "the median weekly household income" : "the national median weekly household income"} is ${mny(med)}${incEpoch(m)}`
     : ageMed()
       ? `${st === "AUS" ? "the median age" : "the national median age"} is ${medAge}`
-      : `${f1(demoAreaShare(A.demo))}% ${isInc() ? "of the adults" : "of residents"}${where} ${dmVerb(m, k)}`;
+      : `${f1(demoAreaShare(A.demo))}% of ${censusWho(m, k).pop}${where} ${censusWho(m, k).pred}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -1169,7 +1169,8 @@ function storyArea(m, st) {
   const meta = pickerLens() && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
-  if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
+  // (under a chart the stage already draws the seats' spread, so the rail doesn't repeat it)
+  if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
   if (S.view !== "chamber") {
     // the chamber section's small names the filter it marks: the state's own
@@ -1349,7 +1350,7 @@ function seatHedDek(m, d) {
         if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
         // the median-age view tells it in years on the same doctrine
         if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats; Australia’s median age is ${m.ageCuts && m.ageCuts.medAge}. ${demoCopy(m).seats}` };
-        return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${isInc(k) ? "adults" : "residents"} ${dmVerb(m, k)}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
+        return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${censusWho(m, k).pop} ${censusWho(m, k).pred}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
       if (!c || !c.dec) return { hed: `${ds(d.n)} has no ${IX_ABBR[S.index]} score`, dek: "" };
@@ -1492,7 +1493,7 @@ function storyBooth(m, j) {
         dek = v == null ? "" : `In ${ds(D.n)} as a whole, it's ${dv != null ? Math.round(dv) : "–"}. ${demoBoothCopy(m).note}`;
       } else {
         const v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v;
-        hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who} ${dmVerb(m, k)}`;
+        hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${(isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who).replace(/^of (the adults|residents)/, `of ${censusWho(m, k).pop}`)} ${censusWho(m, k).pred}`;
         dek = pct == null ? "" : `In ${ds(D.n)} as a whole, ${dv != null ? f1(100 * dv) : "–"}%. ${demoBoothCopy(m).note}`;
       }
     }

@@ -1116,3 +1116,62 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-bmenu .st-scm button[aria-checked="true"] { font-weight: 600; color: var(--ink); }
 .lg-bmenu .st-scm button:focus-visible { background: var(--lean-ink-bg); color: var(--ink); outline-offset: -2px; }
 .lg-bmenu .lg-mgroup { display: block; padding: 5px 12px 1px; font-size: 11px; font-weight: 400; color: var(--ink-3); }
+/* ----- the chart drawing (app-2c-chart.js): the seats as dots, over the stage ----- */
+.mp-chart { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; gap: 6px; padding: 6px 2px 4px; background: var(--bg); overflow: hidden; }
+.mp-chart[hidden] { display: none; }
+.mp-chart.ch-point .ch-plot { cursor: pointer; }
+.ch-head { flex: none; display: flex; flex-direction: column; gap: 3px; }
+.ch-hed { font-size: 17px; font-weight: 600; line-height: 1.25; color: var(--ink); text-wrap: balance; padding-right: 36px; } /* (clear of the stage's full-screen button) */
+.fs .ch-hed { padding-right: 0; }
+.ch-dek { margin: 0; font-size: 13.5px; line-height: 1.4; color: var(--ink-2); text-wrap: pretty; }
+.ch-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; }
+.ch-ctl { margin-top: 2px; }
+.ch-key { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--ink-3); margin-left: auto; }
+.ch-key span { display: inline-flex; align-items: center; gap: 4px; }
+.ch-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.ch-key .ch-kopen { background: var(--bg); box-shadow: inset 0 0 0 1.4px var(--ink-2); }
+.ch-key .ch-kfill { background: var(--ink-2); }
+.ch-plot { flex: 1 1 auto; min-height: 0; position: relative; border-radius: 3px; outline: none; }
+.ch-plot:focus-visible { box-shadow: 0 0 0 2px var(--ink); }
+.ch-plot svg { position: absolute; inset: 0; display: block; overflow: visible; font-family: var(--sans); }
+.ch-note { flex: none; margin: 0; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); text-wrap: pretty; }
+.ch-fold summary { cursor: pointer; color: var(--ink-2); width: max-content; }
+.ch-fold summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ch-fold[open] { max-height: 40%; overflow: auto; }
+.ch-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.ch-grid line { stroke: var(--line); stroke-width: 1; opacity: 0.6; }
+.ch-base { stroke: var(--ink-faint); stroke-width: 1; }
+.ch-tick text { font-size: 11px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ch-lab { font-size: 11.5px; fill: var(--ink-2); }
+.ch-ref { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.ch-nat { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 1 2.5; }
+.ch-natlab { font-size: 11px; fill: var(--ink-2); paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.ch-diag { stroke: var(--ink-faint); stroke-width: 1.2; }
+.ch-qlab { font-size: 11px; fill: var(--ink-3); }
+.ch-dot { stroke: var(--bg); stroke-width: 0.8; }
+.ch-dot.ch-hollow { fill: var(--bg); stroke-width: 1.4; }
+.ch-off { opacity: 0.16; }
+.ch-sel { fill: none; stroke: var(--ink); stroke-width: 1.8; }
+.ch-hov { fill: none; stroke: var(--ink-2); stroke-width: 1.4; pointer-events: none; }
+.ch-name { font-size: 11px; fill: var(--ink-2); paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.ch-band { fill: var(--ink); opacity: 0.08; }
+.ch-fit { stroke: var(--ink); stroke-width: 1.6; }
+.ch-fit-weak { stroke: var(--ink-3); stroke-dasharray: 4 3; }
+.ch-ptitle { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+.ch-psub { font-weight: 400; fill: var(--ink-3); font-size: 11.5px; }
+.ch-rname { font-size: 11.5px; fill: var(--ink-2); }
+.ch-rname.ch-rx { font-weight: 600; fill: var(--ink); }
+.ch-xrow { opacity: 0.08; }
+.ch-conn { stroke: var(--ink-faint); stroke-width: 1.4; }
+.ch-open { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.3; }
+/* the map's own furniture has nothing to say over a chart: zoom, city jumps, the zoom hint, the
+   street tiles' credit, and the key's colour scale (the dots wear who holds each seat instead) */
+.ch-on #hint, .ch-on #cities, .ch-on .mp-zoom > :not(#zfs), .ch-on #credit,
+.ch-on .mp-legend > .lg-ramp, .ch-on .mp-legend > .lg-ticks, .ch-on .mp-legend > .lg-ends, .ch-on .mp-legend .lg-note:has(> .lg-hatch) { display: none !important; }
+.fs .mp-chart {
+  inset: calc(var(--fs-t) + 10px) var(--fs-r) calc(var(--fs-b) + 10px) var(--fs-l); padding: 14px 18px 10px;
+  background: var(--bg); border: 1px solid var(--fs-rim); border-radius: 14px; box-shadow: var(--fs-lift);
+}
+@media (max-width: 860px) {
+  .fs .mp-chart { inset: calc(var(--fs-t) + 8px) 8px calc(var(--fs-peek) + 8px) 8px; padding: 10px 12px 8px; }
+}
