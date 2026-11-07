@@ -2522,9 +2522,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('return "National";') && !st.includes('? " figures" : ""'), "the neutral scope words itself plainly on every frame — National, never 'figures'");
   assert.ok(!st.includes("FIG_DEMONYM"), "the demonym compounds (Victorian figures, Western Australian figures) are gone too");
   assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: r.key })'), "the menu items share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
-  assert.ok(st.includes('const statScopeTrigger = (sel) => (sel.k === "aus" ? "Filter seats" : "Change filter");') && st.includes("esc(statScopeTrigger(statScopeOf(m)))"), "the trigger names the menu's job — Filter seats by default, Change filter once a pick is on — never the pick itself");
+  assert.ok(st.includes('"Filter by seat type" : "Filter by state/territory and seat type"') && st.includes("esc(statScopeTrigger(statScopeOf(m)))"), "the trigger names the menu's job — the axes' inviter by default (seat types alone on their own lens), its changer once a pick is on");
+  assert.ok(st.includes('S.lens !== "cls" && !STATE_YEARS.has(m.year)'), "the cls lens's menu carries only its own axis (no states)");
+  assert.ok(st.includes('const pickerLens = () => S.lens === "winner" || S.lens === "cls";'), "the winner-story gates ride one shared picker-lens idiom, defined where its consumers live (the VM harnesses eval the story part alone)");
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
-  assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
+  assert.ok(st.includes('meta = pickerLens() && aus ? statScopeMenu(m, st)'), "the scope menu owns the head meta on the winner-design lenses");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
   assert.ok(st.includes("function scopeSeatBase(m, sel, idx, cnt)") && st.includes("scopeSeatBase(m, statSel, idx, cnt)") && st.includes('ab === "CSA" ? "csa" : FAM(ab)') && st.includes("m.changes"), "a now frame keeps its seat-change line under scoped views too — the base is the overlay's own chains reverted inside the scope (NSW figures and Rural figures keep the Coalition's minus-two)");
   assert.ok(st.includes('statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st)'), "a state pick on an election frame takes the official per-state seat base (smalls sum to the redistribution drift, as the aus row's does)");
@@ -2545,7 +2547,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
   assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
   assert.ok(st.includes("const clsFilter = (m) =>") && ch3.includes('S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m)'), "the story chamber marks the pick — a state's seats lit, a seat type's kind lit in its lens colours");
-  assert.ok(ch3.includes("CLS.indexOf(m.divs[i].cls)") && ch3.includes("if (clsSel && d.cls !== clsSel)") && ch3.includes("cls: sen ? null : clsFilter(m)"), "a figures-menu seat type both colours and filters the chambers (never the Senate's) via the seat-type lens's own ladder");
+  // the cls lens shares the Winner design wholesale (2026-11-08): same head
+  // card, same sections, the menu as its meta — with the type alone as its
+  // axis and the trigger named so
+  assert.ok(st.includes('switch (S.lens === "cls" ? "winner" : S.lens)') && !st.includes("carries no AEC type"), "the cls lens falls through to the Winner story design");
+  assert.ok(ch3.includes("CLS.indexOf(m.divs[i].cls)") && ch3.includes("clsSel && d.cls !== clsSel") && ch3.includes("offType ? th.ink") && ch3.includes("cls: sen ? null : clsFilter(m)"), "only the picked type wears the ladder tone in the chambers — every other kind ghosts to an ink wisp (the rungs are too close to read by alpha), never the Senate");
   assert.ok(st.includes("const chamberMark = pickTitle"), "the chamber section's small names the filter it marks");
 }
 

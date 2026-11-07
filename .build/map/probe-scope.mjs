@@ -4,7 +4,7 @@
 // state pick) shows its own jurisdiction until one can. The wording stays
 // PLAIN on the menu's items ("National", "NSW", "Victoria", "Inner metro") —
 // the midday "… figures" compounds all died by user call on 2026-11-07 — and
-// the menu's TRIGGER names its JOB, not the pick: "Filter seats" by default,
+// the menu's TRIGGER names its JOB, not the pick: "Filter by state/territory and seat type" by default,
 // "Change filter" once a pick is on (later the same day, user call). The
 // persistence assertions below therefore read the PRESSED ITEM, not the
 // trigger.
@@ -59,7 +59,7 @@ try {
   await page.goto(`${base}/map/#y=now`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__map, { timeout: 60000 });
   await page.evaluate(() => { __map.setLens("winner"); __map.goAus(); __map.setView("map"); });
-  await labelIs(page, "Filter seats", "the trigger invites the filter by default, on every frame");
+  await labelIs(page, "Filter by state/territory and seat type", "the trigger invites the filter by its axes, on every frame");
   // the now view carries the base election's swings (user call, 2026-11-07)
   const nowSw = await page.evaluate(() => ({
     swing: document.querySelector("#story .st-stat .st-swing")?.textContent.trim() ?? null,
@@ -97,7 +97,7 @@ try {
 
   // …falls back where a frame has no such scope, and returns when one does
   await year(page, "vic22");
-  await labelIs(page, "Filter seats", "a state election frame falls back to unfiltered — the inviter returns");
+  await labelIs(page, "Filter by state/territory and seat type", "a state election frame falls back to unfiltered — the inviter returns");
   await pressedIs(page, "aus = Victoria", "…its pressed item the frame's own jurisdiction, plain");
   assert.equal((await selLevel(page)).level, "aus", "a frame that can't show the slice carries no map selection");
   assert.equal(await headTitle(page), "Victorian election", "…and the head is the frame's own, unmarked by the dormant pick");
@@ -134,7 +134,7 @@ try {
   assert.ok(clsSmalls.length && clsSmalls.every((t) => /[−+\d]/.test(t)), `a seat type on an election frame carries seat deltas of these seats: ${clsSmalls.join(" ")}`);
   assert.equal(clsSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "…summing to zero inside the scope");
   await year(page, "vic22");
-  await labelIs(page, "Filter seats", "a seat-type pick falls back on a state frame too");
+  await labelIs(page, "Filter by state/territory and seat type", "a seat-type pick falls back on a state frame too");
   await year(page, 2025);
   await pressedIs(page, `${clsScope} = ${clsElection}`, "and returns on the federal election frame");
 
@@ -146,7 +146,7 @@ try {
   assert.ok(!(await noteShown()), "Queensland drop the One Nation note");
   // "All seats" clears the slice from whichever side named it: store, map and head return together
   await page.click("#story .st-up");
-  await labelIs(page, "Filter seats", "the 'All seats' way out drops back to the inviter");
+  await labelIs(page, "Filter by state/territory and seat type", "the 'All seats' way out drops back to the inviter");
   assert.deepEqual(await selLevel(page), { level: "aus" }, "…and clears the map's selection");
   assert.equal(await headTitle(page), "The House today", "…and the head is the frame's own again");
   assert.equal(await upLabel(page), null, "…with no way further out");
@@ -158,11 +158,33 @@ try {
   // a seat-type filter's "All seats" clears through the menu's store too
   assert.equal(await upLabel(page), "All seats", "Rural shows its own way out");
   await page.click("#story .st-up");
-  await labelIs(page, "Filter seats", "…and 'All seats' clears a seat-type filter as well");
+  await labelIs(page, "Filter by state/territory and seat type", "…and 'All seats' clears a seat-type filter as well");
   assert.equal(await headTitle(page), "The House today", "…with the head back to the frame's own");
   assert.equal(await upLabel(page), null, "…and nothing left to step out from");
 
+  // the cls lens tells the Winner story, filtered by seat types alone (2026-11-08)
+  await page.evaluate(() => __map.setLens("cls"));
+  await page.waitForNetworkIdle({ idleTime: 300, timeout: 15000 });
+  await labelIs(page, "Filter by seat type", "the cls lens invites by its own axis");
+  assert.equal(await page.$$eval(`#story .st-scwrap [data-scope^="st:"]`, (els) => els.length), 0, "…and its menu carries no states");
+  const clsHed = await page.evaluate(() => ({
+    aria: document.querySelector("#story .st-stat")?.getAttribute("aria-label") ?? null,
+    hero: !document.querySelector("#story .hero"),
+  }));
+  assert.ok(clsHed.aria && /holds \d+ of the \d+ seats/.test(clsHed.aria), `its story is the winner design's (${clsHed.aria?.slice(0, 70)})`);
+  assert.ok(clsHed.hero, "…and the two-party hero folds into the head, winner-style");
+  const clsScope2 = await page.$eval(`#story .st-scwrap [data-scope^="cls:"]`, (e) => e.dataset.scope);
+  await pick(page, clsScope2);
+  await labelIs(page, "Change filter", "the cls lens's pick turns it to its changer");
+  assert.equal(await headTitle(page), clsElection, "…its title names the pick too (bare on Now)");
+  assert.equal(await upLabel(page), "All seats", "…and earns the type's way out");
+  await page.click("#story .st-up");
+  await labelIs(page, "Filter by seat type", "…'All seats' clears back to its own invitation");
+  await page.evaluate(() => __map.setLens("winner"));
+  await page.waitForNetworkIdle({ idleTime: 200, timeout: 15000 });
+  await labelIs(page, "Filter by state/territory and seat type", "…and the winner lens's invitation is its own two axes");
+
   assert.deepEqual(errors, [], "no page exceptions");
-  console.log("PASS: the trigger invites (Filter seats) or offers its changer (Change filter); the pick rides frames as the pressed item, plainly named; the slice stays unified");
+  console.log("PASS: the trigger invites (Filter by state/territory and seat type; Filter by seat type on the cls lens) or offers its changer (Change filter); the pick rides frames as the pressed item, plainly named; the slice stays unified");
   await page.close();
 } finally { await browser.close(); }

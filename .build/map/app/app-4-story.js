@@ -59,7 +59,7 @@ function upLink() {
   const s = S.sel, m = M();
   // a seat-type filter has no map selection of its own but earns the same way
   // out above the title (goAus clears the store through select's sync)
-  const clsScoped = m && s.level === "aus" && S.lens === "winner" && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls";
+  const clsScoped = m && s.level === "aus" && pickerLens() && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls";
   if (s.level === "aus" && !clsScoped) return "";
   const label = s.level === "aus" || s.level === "state" ? "All seats" : s.level === "div" ? STATE_TITLE[s.st] : m.divs[s.div].n;
   const go = s.level === "aus" || s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
@@ -253,9 +253,12 @@ const statScopeOf = (m) => {
   if (slice) return { k: "st", st: slice, open: statScopeStore.open };
   return statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
 };
+// the lenses whose story shows the Winner head's figures design (the cls lens
+// shares it wholesale since 2026-11-08, its filter simply seat types only)
+const pickerLens = () => S.lens === "winner" || S.lens === "cls";
 // the figures menu's seat-type pick, for the views that mark it outside the
 // head's figures (the chambers paint and dim by it)
-const clsFilter = (m) => (S.lens === "winner" && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls" ? statScopeOf(m).cls : null);
+const clsFilter = (m) => (pickerLens() && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls" ? statScopeOf(m).cls : null);
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -534,7 +537,8 @@ function informalHTML(m, st) {
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
   const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
+  // the cls lens's menu carries only its own axis: no states
+  if (S.lens !== "cls" && !STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
   for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, statScopeLabel(m, { k: "cls", cls: r.key })]);
   return opts;
 }
@@ -542,9 +546,10 @@ const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "s
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
 // the head meta's scope menu: frame-wide by default, one of its states or its
 // seat types once named — the head's own figures then follow it. The trigger
-// names the menu's JOB, not the pick: invites the filter by default, offers
-// to change it once one is on (the items below keep the pick's own names)
-const statScopeTrigger = (sel) => (sel.k === "aus" ? "Filter seats" : "Change filter");
+// names the menu's JOB, not the pick: the default invites by the axes the lens
+// offers (state and type on Winner; the type alone on the cls lens), and once
+// a pick is on it's the changer
+const statScopeTrigger = (sel) => (sel.k === "aus" ? (S.lens === "cls" ? "Filter by seat type" : "Filter by state/territory and seat type") : "Change filter");
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
@@ -571,7 +576,10 @@ function areaHedDek(m, st) {
     qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
   };
   if (S.lens === "tpp" && axisNow(m) !== "AC") return axisHedDek(m, idx, where);
-  switch (S.lens) {
+  // the cls lens tells its story with the Winner design from end to end
+  // (2026-11-08, user call — its own class-tally story is retired)
+  switch (S.lens === "cls" ? "winner" : S.lens) {
+    case "cls":
     case "winner": {
       const g = cnt[gov] || 0, o = cnt[opp] || 0, c = N - g - o;
       if (isNowM) {
@@ -710,16 +718,6 @@ function areaHedDek(m, st) {
       }
       const pa = prev && Y[prev] && Y[prev].areas ? Y[prev].areas[st] : null;
       const dek = `${pa ? `${Math.abs(A.infPct - pa.infPct) < 0.05 ? "Unchanged" : A.infPct >= pa.infPct ? "Up" : "Down"} from ${f1(pa.infPct)}% in ${prev}. ` : ""}The highest rate was ${ds(m.divs[r[0].i].n)}’s ${f1(r[0].v)}%${byNote(m.divs[r[0].i])}; the lowest ${ds(m.divs[r[r.length - 1].i].n)}’s ${f1(r[r.length - 1].v)}%.`;
-      return { hed, dek };
-    }
-    case "cls": {
-      if (isState()) return { hed: `${ausW()}’s seats carry no AEC type`, dek: `The inner-metropolitan to rural scale is the AEC’s federal classification; the ${commX()} publishes none of its own.` };
-      let best = null;
-      const per = CLS.map((c) => { const xs = idx.filter((i) => m.divs[i].cls === c); const a = seatCount(m, xs, "alp"), l = seatCount(m, xs, "lnp"); return { c, n: xs.length, a, l }; });
-      for (const p of per) { if (p.n < (aus ? 10 : 3)) continue; for (const [fam, k] of [["alp", p.a], ["lnp", p.l]]) { const sh = k / p.n; if (!best || sh > best.sh) best = { fam, k, n: p.n, c: p.c, sh }; } }
-      const verb = isNowM ? "holds" : "won";
-      const hed = best ? `${best.fam === "alp" ? "Labor" : "The Coalition"} ${verb} ${best.k === best.n ? `all ${best.n}` : `${best.k} of the ${best.n}`} ${CLS_LOWER[best.c]} seats${where}` : `Seats${where} by the AEC’s type`;
-      const dek = per.filter((p) => p.n).map((p) => `${CLS_SHORT[p.c]}: Labor ${p.a}, Coalition ${p.l}${p.n - p.a - p.l ? `, others ${p.n - p.a - p.l}` : ""}`).join(". ") + ".";
       return { hed, dek };
     }
     case "seifa": {
@@ -947,7 +945,7 @@ function vtBands(divs) {
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
 function vtScope(m, st) {
-  const sel = st === "AUS" && S.lens === "winner" ? statScopeOf(m) : { k: st === "AUS" ? "aus" : "st", st };
+  const sel = st === "AUS" && pickerLens() ? statScopeOf(m) : { k: st === "AUS" ? "aus" : "st", st };
   const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)));
   const geography = sel.k === "aus" ? "nationwide" : sel.k === "st" ? STATE_SHORT[sel.st] : `${sel.cls.toLowerCase()} seats`;
   return { divs, geography };
@@ -989,7 +987,7 @@ function storyArea(m, st) {
   // frames (user call: "New South Wales · 2025", "Inner metro · 2025"); the
   // state slice's "All seats" rides its map selection, and upLink's sibling
   // read above gives the seat type the same way out
-  const pick = aus && S.lens === "winner" && !STATE_YEARS.has(m.year) ? statScopeOf(m) : { k: "aus" };
+  const pick = aus && pickerLens() && !STATE_YEARS.has(m.year) ? statScopeOf(m) : { k: "aus" };
   const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek, stat } = areaHedDek(m, st);
@@ -997,7 +995,7 @@ function storyArea(m, st) {
   // never the date — the eyebrow line above the map already carries it
   // the Winner head's meta is the scope menu (statScopeLabel words it), and
   // its head follows whichever state or seat type is picked there
-  const meta = S.lens === "winner" && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
+  const meta = pickerLens() && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
@@ -1005,7 +1003,8 @@ function storyArea(m, st) {
   if (S.view !== "chamber") {
     // the chamber section's small names the filter it marks: the state's own
     // members, or the seat type whose kind stays lit (and each kind its colour)
-    const chamberMark = pickTitle ? (pick.k === "cls" ? `${pickTitle} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
+    // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
+    const chamberMark = pickTitle ? (pick.k === "cls" ? `${pickTitle.replace(" ", "-")} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
   if (isNowY(m.year) && aus) {
@@ -1019,7 +1018,7 @@ function storyArea(m, st) {
   }
   // the two-party read — skipped on the Winner lens, whose head has already given the
   // figures and swing in the head's own grid; every other lens still opens with the hero
-  if (!(S.lens === "winner" && A.tpp != null)) {
+  if (!(pickerLens() && A.tpp != null)) {
     const swp = swingPhrase(A.tppSw, prev);
     const classicN = m.divs.filter((d) => d.tpp != null).length;
     h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;

@@ -813,19 +813,22 @@ function drawChamber(g, m, w, h, opts) {
   // the chairs
   // the list's filters are the House's seats'; the Senate answers only to the chosen state
   const filt = m.house !== "senate" && filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
-  // a figures-menu seat type colours its chamber too: the seat-type lens's own
-  // ladder, with seats of every other kind sat back (no type asked for, no mark)
+  // a figures-menu seat type colours its chamber too: only ITS OWN kind wears
+  // the ladder tone — the ladder's neighbours sit a mere alpha-step from it,
+  // so every other kind ghosts to an ink wisp (user call: the lit kind must
+  // read at a glance, 2026-11-08)
   const clsSel = opts.cls, clsTone = clsSel ? (i) => { const k = CLS.indexOf(m.divs[i].cls); return k < 0 ? null : TH.cls[k]; } : null;
   const pat = opts.pattern;
   const backOf = (c) => towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22);
   const drawn = [];
   const paint = (i, x, y, fa, W, D, sp) => {
     const d = m.divs[i];
-    let c = (clsTone && clsTone(i)) || fillDiv(m, i);
+    const offType = clsSel && d.cls !== clsSel;
+    let c = (clsTone && !offType && clsTone(i)) || (offType ? th.ink : fillDiv(m, i));
     let a = 1;
     if (filt && !passes(m, i)) a = 0.16;
     if (stSel && d.st !== stSel) a = Math.min(a, 0.2);
-    if (clsSel && d.cls !== clsSel) a = Math.min(a, 0.2);
+    if (offType) a = Math.min(a, 0.28);
     if (opts.only != null && i !== opts.only) a = Math.min(a, 0.22);
     if (!c) { drawChair(g, x, y, fa, W, D, pat || css(th.nodata), css(th.hatch), a); }
     else drawChair(g, x, y, fa, W, D, css(c), css(backOf(c)), a);

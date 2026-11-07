@@ -148,7 +148,7 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && pickerLens()) renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
@@ -675,8 +675,8 @@ function select(sel, opts = {}) {
   // menu: a state arrived at any side writes the menu's store, and the whole
   // frame again ("All seats") clears it back
   const sm = M();
-  if (S.lens === "winner" && sm && !STATE_YEARS.has(sm.year)) {
-    if (sel.level === "state" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0) statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
+  if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
+    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0) statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
     else if (sel.level === "aus") statScopeStore = { k: "aus", open: statScopeStore.open };
   }
   if (!opts.keepTown) townPick = -1;
