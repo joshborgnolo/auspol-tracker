@@ -564,28 +564,22 @@ function renderTimeline() {
   if (FS.on) fsRail();
 }
 
-/* the Jump to: row, off the map's top-left overlay and into the legend strip
-   (2026-11-07). Its cities pair name and state, a state election keeps just
-   its capital unlabelled — and the row closes with the city-names toggle,
-   which governs the names the map canvas paints (the Jump-to links stay) */
+/* States filter the map in their own row; cities are independent jump targets. */
 function jumpHTML() {
-  const j = stOfYear(S.year);
-  const on = !S.townsOff;
-  const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}" aria-label="City names on the map">City names</button></div>`;
-  if (j) {
-    const k = CITIES.findIndex(([, st]) => st === j);
-    if (k >= 0) return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>${toggle}`;
-  }
-  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}${toggle}`;
+  const j = stOfYear(S.year), on = !S.townsOff;
+  const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${on ? "Hide city names" : "Show city names"}</button></div>`;
+  const states = j ? "" : `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>Filter</b>${CITIES.map(([, st]) => `<button type="button" data-state="${st}" aria-pressed="${S.sel.level === "state" && S.sel.st === st}">${STATE_ABBR[st] || st}</button>`).join("")}</div>`;
+  const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
+  return `${states}<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
 }
-/* the selected entry keeps the hover underline (the city/state column and the election alike) */
+/* State filters and election links show their current selection. */
 function renderJumpSel() {
   const on = S.sel.level === "state" ? S.sel.st : null;
   const cit = $("#cities");
   // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
   // re-fixed here because renderLegend re-creates it on every render
   if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
-  $$("#cities .mp-ca").forEach((ca) => { const b = $("button[data-state]", ca); ca.classList.toggle("on", !!(on && b && b.dataset.state === on)); });
+  $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === on)));
   FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
 }
 
@@ -817,7 +811,7 @@ function setView(v, quiet) {
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
-  for (const id of ["#cities", "#hint"]) { const e = $(id); if (e) e.hidden = v !== "map"; }
+  for (const id of ["#state-filters", "#cities", "#hint"]) { const e = $(id); if (e) e.hidden = v !== "map"; }
   // the zoom plate stays up in the chamber, for its full-screen button alone
   $("#zoomer").hidden = list; $("#zoomer").dataset.view = v;
   if (FS.on) fsView();
@@ -1390,7 +1384,7 @@ $("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-
 $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = yearOf(g.dataset.year); if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });
 document.addEventListener("click", (e) => {
   const city = e.target.closest("[data-city]");
-  if (city) { const k = +city.dataset.city; if (S.sel.level === "state" && S.sel.st === CITIES[k][1]) goAus(); else flyToCity(k); return; }
+  if (city) { flyToCity(+city.dataset.city); return; }
   const scT = e.target.closest("[data-scope-trigger]");
   if (scT) {
     const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;

@@ -1061,3 +1061,9 @@ html.mp-fs .mp-tip { z-index: 260; }
 @media (max-width: 560px) {
   .mp-legend .mp-search { flex-basis: 100%; width: 100%; }
 }
+
+/* State filters and city jumps are independent, wrapping rows. */
+.mp-legend .lg-jump > b { display: inline-block; }
+.mp-legend .lg-filter button[aria-pressed="true"] {
+  color: var(--ink); font-weight: 600; border-bottom-color: var(--ink);
+}
