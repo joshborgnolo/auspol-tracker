@@ -174,19 +174,10 @@ function seatPrimariesStat(m, d) {
   const bigness = cols.some((c) => c[2] == null) ? null : cols.reduce((x, c) => x + c[2], 0);
   cols.push(["oth", Math.max(0.05, 100 - cols.reduce((x, c) => x + c[1], 0)), bigness == null ? null : -bigness, "Others", "oth"]);
   const cells = cols.map((c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`).join("");
-  const majors = (p.fp.alp != null ? p.fp.alp : 0) + (p.fp.lnp != null ? p.fp.lnp : 0);
-  /* "Labor and the Coalition share…" names the pair the majors' figures
-     belong to — where neither stood, or the contest squeezed one under ten
-     (a by-election misfire, an independent's seat), say who instead */
-  const lnpWord = coalW(0).replace(/^The /, "the ");
-  let parens = null, pref = "Primaries";
-  if ((p.fp.alp || 0) >= 10 && (p.fp.lnp || 0) >= 10) parens = `(Labor and ${lnpWord} share ${f1(majors)}%)`;
-  else if ((p.fp.lnp || 0) >= 10) {
-    const top = cols.filter((c) => c[4] !== "lnp" && c[1] != null).sort((a, b) => b[1] - a[1])[0];
-    if (top) { pref = `${top[3] === "Independents" ? "Independent" : top[3]}-led primaries`; parens = `(${top[3] === "Independents" ? "an independent" : top[3]} and ${lnpWord} share ${f1(top[1] + (p.fp.lnp || 0))}%)`; }
-  } else if ((p.fp.alp || 0) >= 10) parens = `(Labor's share is ${f1(p.fp.alp)}%)`;
+  // the eyebrow reads "Primaries" plain (user call 2026-11-08): who is in and
+  // share of what is told by the columns themselves, not a parenthetical
   const grid = `<span class="st-grid st-fps st-n${cols.length} st-seatfps" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cells}${bigness != null ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
-  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">${pref}${parens ? ` ${parens}` : ""}</span>${grid}</div></div>`;
+  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Primaries</span>${grid}</div></div>`;
 }
 
 function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
@@ -219,15 +210,14 @@ function linkRows(m, items, fmt, colOf) {
 const colCss = (c) => (c ? css(c) : "var(--line)");
 
 function historyChart(d) {
-  const y0 = 2004;
   const yx = (y) => (y === 2026 ? YEAR_X.now - 0.3 : y);
-  /* richer backfill rows (the 1987 merge) predate the labelled domain and
-     once drew past the y axis; they stay in d.h for the hed's "held since"
-     wording, but the chart and its holders list keep to "Since 2004" */
-  const h = d.h.filter((r) => (r[1] != null || r[3]) && yx(r[0]) >= y0);
+  /* the domain is the name's own record: a seat whose ledger reaches back
+     past 2004 (Kennedy's to 1993) draws all of it, and the heading names the
+     earliest year — "Since 1993" — instead of the fixed 2004 origin */
+  const h = d.h.filter((r) => r[1] != null || r[3]);
   if (!h.length) return "";
   const W = 340, H = 120, padL = 26, padR = 10, padT = 10, padB = 22;
-  const years = h.map((r) => yx(r[0])), y1 = Math.max(2025, years[years.length - 1]);
+  const years = h.map((r) => yx(r[0])), y0 = Math.min(...years), y1 = Math.max(2025, ...years);
   const x = (y) => padL + ((yx(y) - y0) / Math.max(1, y1 - y0)) * (W - padL - padR);
   const vals = h.map((r) => r[1]).filter((v) => v != null);
   const lo = Math.min(30, Math.floor(Math.min(...vals, 50) / 10) * 10), hi = Math.max(70, Math.ceil(Math.max(...vals, 50) / 10) * 10);
@@ -241,13 +231,13 @@ function historyChart(d) {
     const title = r[4] ? `${r[0]} by-election: won by ${r[3]} (${partyName(r[2])}); no Labor v Coalition count` : `${r[0]}: Labor two-party ${f1(r[1])}; won by ${r[3]} (${partyName(r[2])})`;
     return `<g data-year="${yr}" style="cursor:pointer"><title>${ds(title)}</title><circle cx="${x(r[0])}" cy="${yy(yv)}" r="${on ? 5.5 : 4.2}" fill="var(--m-${FAM(r[2])})" stroke="var(--bg)" stroke-width="2"${r[1] == null ? ' fill-opacity="0.9"' : ""}/>${on ? `<circle cx="${x(r[0])}" cy="${yy(yv)}" r="8.5" fill="none" stroke="var(--ink)" stroke-width="1.4"/>` : ""}</g>`;
   }).join("");
-  const xl = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025].map((y) => `<text x="${x(y)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="${y === cur ? "var(--ink)" : "var(--ink-3)"}" font-weight="${y === cur ? 600 : 400}">’${String(y).slice(2)}</text>`).join("") + (h.some((r) => r[0] === 2026) ? `<text x="${x(2026)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">by</text>` : "");
+  const xl = [...new Set([y0, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025].filter((y) => y >= y0 && y <= y1))].sort((a, b) => a - b).map((y) => `<text x="${x(y)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="${y === cur ? "var(--ink)" : "var(--ink-3)"}" font-weight="${y === cur ? 600 : 400}">’${String(y).slice(2)}</text>`).join("") + (h.some((r) => r[0] === 2026) ? `<text x="${x(2026)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">by</text>` : "");
   const runs = [];
   for (const r of h) { const last = runs[runs.length - 1]; if (last && last.n === r[3] && last.ab === r[2]) last.to = r[0]; else runs.push({ n: r[3], ab: r[2], from: r[0], to: r[0], by: r[4] }); }
   const now = S.year === "now" ? M() : null, hold = now ? now.divs[d.i].hold : null;
   if (hold && runs.length && (runs[runs.length - 1].n !== hold.n || runs[runs.length - 1].ab !== hold.ab)) runs.push({ n: hold.n, ab: hold.ab, from: "now", to: "now", switched: true });
   const holders = runs.reverse().map((r) => `<div><i style="${swc(FAM(r.ab))}"></i><span>${ds(r.n)}<small>${esc(leaderName({ ab: r.ab, pn: "" }))}</small></span><span>${r.switched ? "now" : r.by ? `${r.from} by-election` : r.from === r.to ? r.from : `${r.from}–${String(r.to).slice(2)}`}</span></div>`).join("");
-  return `<div class="st-sec hist"><h3>Since 2004 <small>Labor’s two-party vote, and who won</small></h3><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Labor’s two-party share in ${ds(d.n)} at each election since 2004">${grid}<polyline points="${ptsLine}" fill="none" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linejoin="round"/>${dots}${xl}</svg><div class="holders">${holders}</div><p class="st-note">Boundaries are redrawn between some elections, so the area behind a name can change.</p></div>`;
+  return `<div class="st-sec hist"><h3>Since ${y0} <small>Labor’s two-party vote, and who won</small></h3><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Labor’s two-party share in ${ds(d.n)} at each election since ${y0}">${grid}<polyline points="${ptsLine}" fill="none" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linejoin="round"/>${dots}${xl}</svg><div class="holders">${holders}</div><p class="st-note">Boundaries are redrawn between some elections, so the area behind a name can change.</p></div>`;
 }
 
 /* ----- the national and state stories ----- */
@@ -1369,15 +1359,19 @@ function storyDiv(m, i) {
   if (d.vt) h += vtBlock([d]);
   const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
-  h += d.infPct == null && d.by ? `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Informal (no count filed for the by-election yet)</span></div>${byTurnout}</div>` : `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Informal (${f1(d.infPct)}% of ballots)</span><span class="st-tpp"><b>${f1(d.infPct)}</b></span>${infCmp != null ? `<span class="st-ext">${ausW()} ${f1(infCmp)}%</span>` : ""}</div>${byTurnout}</div>`;
+  /* the national view's plain line, with the seat's comparison inside it
+     (user call 2026-11-08 — the big-figure head block lasted the day) */
+  const infWhere = m.areas.AUS ? "national average" : `${ausW()} average`;
+  h += d.infPct == null && d.by ? `<div class="st-inf"><b>Informal votes:</b> no count filed for the by-election yet</div>${byTurnout}` : `<div class="st-inf"><b>Informal votes:</b> ${f1(d.infPct)}%${infCmp != null ? ` (vs ${infWhere} ${f1(infCmp)}%)` : ""}</div>${byTurnout}`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
   const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${origV != null ? `${f0(100 * origV)}% ${COB_VERB[S.cob]}` : `${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}`}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}${d.demo.pt != null ? `, ${f0(100 * d.demo.pt)}% ${DM_VERB.pt}` : ""}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${d.demo.noncit != null ? `<dt>Citizenship</dt><dd>${f0(100 * d.demo.noncit)}% ${DM_VERB.noncit}</dd>` : ""}${d.demo.bigfam != null ? `<dt>Children</dt><dd>${f0(100 * d.demo.bigfam)}% ${DM_VERB.bigfam}</dd>` : ""}${d.demo.hl != null ? `<dt>Home</dt><dd>${f0(100 * d.demo.hl)}% ${DM_VERB.hl}</dd>` : ""}` : "";
   const hasDeciles = IX.some((ix) => d.seifa[ix] && d.seifa[ix].dec);
   const deciles = hasDeciles ? decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec) : "";
   const seatNote = `${demoCopy(m).note}${deciles ? ` 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.` : ""}`;
-  const seatSmall = m.demoBasis === "sa1" ? `ABS census, ${m.demoYear ?? 2021}` : "AEC type · ABS census and SEIFA, deciles among seats";
-  if (d.cls || d.demo || deciles) h += `<div class="st-sec"><h3>The seat <small>${seatSmall}</small></h3>${d.cls || d.demo ? `<dl class="facts">${d.cls ? `<dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>` : ""}${demoFacts}</dl>` : ""}${deciles}<p class="st-note">${seatNote}</p></div>`;
+  /* the head reads "Census data" plain (user call 2026-11-08): the source and
+     measure live in the note beneath, not in a two-line straddling title */
+  if (d.cls || d.demo || deciles) h += `<div class="st-sec"><h3>Census data</h3>${d.cls || d.demo ? `<dl class="facts">${d.cls ? `<dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>` : ""}${demoFacts}</dl>` : ""}${deciles}<p class="st-note">${seatNote}</p></div>`;
   h += historyChart(d);
   // polling places
   const b = m.booth, js = b.byDiv[i];

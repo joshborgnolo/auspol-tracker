@@ -6,12 +6,14 @@
 //   1. Final count: candidate surnames name the figures, the winner's tag
 //      chip reads "elected"/"re-elected" off the left figure, swing · status
 //      ride one line under them ("+5.5 swing · safe");
-//   2. Primaries: the majors-share eyebrow, family figures ≥10 in the head's
-//      order with change smalls, an independent heavyweight its own column,
-//      and the majors-rewording where a by-election squeezed one out;
-//   3. Informal: worded eyebrow + big figure + the national comparison, the
-//      by-election turnout note beside;
-//   4. the history chart draws nothing before its labelled 2004 origin;
+//   2. Primaries: the plain "Primaries" eyebrow, the family figures ≥10 in
+//      the head's order with change smalls, an independent heavyweight its
+//      own column;
+//   3. Informal: the national view's plain line — "Informal votes: x% (vs
+//      national average y%)" — with the by-election turnout note beside;
+//   4. the history chart's domain AND heading follow the name's own earliest
+//      record — "Since 1993" for Kennedy, "Since 2010" for Durack — with the
+//      origin itself a labelled tick;
 //   5. the figures-scope menu clamps to the viewport on open and a pick
 //      returns focus to the trigger.
 // usage: node .matilda/probe/map-seat-head.mjs <baseUrl>  (serve the repo root first)
@@ -63,31 +65,32 @@ const seat = () => page.evaluate(() => {
     tag: fg ? fg.textContent.trim() : null,
     tagCls: fg ? fg.className : null,
     tagInnerL: fg ? Math.round((fgr.left - stat.left) * 10) / 10 : null,
+    nmFont: nmL ? getComputedStyle(nmL).fontSize : null,
     swing: sw ? sw.textContent.trim() : null,
     heroCount: document.querySelectorAll("#story .hero").length,
     primLab: blocks[1] ? blocks[1].querySelector(".st-lab").textContent.trim() : null,
     primCells: blocks[1] ? [...blocks[1].querySelectorAll(".st-grid > b")].map((b) => b.textContent.trim()) : [],
     primSmalls: blocks[1] ? [...blocks[1].querySelectorAll(".st-grid small")].map((s) => s.textContent.trim()) : [],
-    infLab: blocks[2] && blocks[2].querySelector(".st-lab") ? blocks[2].querySelector(".st-lab").textContent.trim() : null,
-    infFig: blocks[2] && blocks[2].querySelector(".st-tpp b") ? blocks[2].querySelector(".st-tpp b").textContent.trim() : null,
-    infExt: blocks[2] && blocks[2].querySelector(".st-ext") ? blocks[2].querySelector(".st-ext").textContent.trim() : null,
-    infNote: document.querySelector("#story .st-secstat + .st-note") ? document.querySelector("#story .st-secstat + .st-note").textContent.trim() : null,
+    infText: document.querySelector("#story .st-inf") ? document.querySelector("#story .st-inf").textContent.trim() : null,
+    infNote: document.querySelector("#story .st-inf + .st-note") ? document.querySelector("#story .st-inf + .st-note").textContent.trim() : null,
     bigCount: document.querySelectorAll("#story .big").length,
     candRows: document.querySelectorAll("#story .rows .row").length,
     candH3: [...document.querySelectorAll("#story .st-sec > h3")].map((h) => h.textContent.trim()),
   };
 });
 
-// Since-2004 chart: nothing left of the labelled origin
+// Since <earliest> chart: title and domain follow the record's own start
 const hist = () => page.evaluate(() => {
   const svg = document.querySelector("#story .hist svg");
   if (!svg) return { found: false };
+  const h3 = document.querySelector("#story .hist h3");
+  const title = h3 && h3.firstChild ? h3.firstChild.textContent.trim() : null;
   const line = svg.querySelector("polyline");
   const pts = line ? line.getAttribute("points").split(" ").map((p) => p.split(",").map(Number)) : [];
   const dots = [...svg.querySelectorAll("circle")].map((c) => +c.getAttribute("cx"));
   // the x labels are the middle-anchor texts near the bottom row (y ≈ H − 6)
   const xlabs = [...svg.querySelectorAll("text")].filter((t) => +t.getAttribute("y") > 100 && t.getAttribute("text-anchor") === "middle").map((t) => ({ x: +t.getAttribute("x"), text: t.textContent.trim() }));
-  return { found: true, minLineX: pts.length ? Math.min(...pts.map((p) => p[0])) : null, minDotX: dots.length ? Math.min(...dots) : null, firstLab: xlabs.length ? xlabs.reduce((a, b) => (b.x < a.x ? b : a)).text : null, minLabX: xlabs.length ? Math.min(...xlabs.map((l) => l.x)) : null };
+  return { found: true, title, minLineX: pts.length ? Math.min(...pts.map((p) => p[0])) : null, minDotX: dots.length ? Math.min(...dots) : null, firstLab: xlabs.length ? xlabs.reduce((a, b) => (b.x < a.x ? b : a)).text : null, minLabX: xlabs.length ? Math.min(...xlabs.map((l) => l.x)) : null };
 });
 
 /* 2025 · Durack — a classic contest the headlines wrote themselves on */
@@ -102,26 +105,32 @@ let x = await raw("2025").then((r) => {
   return { winPct, sw: d.tppSw, st: d.infPct, fp: d.fams, infPool: r.infPool, n: "Durack" };
 });
 const f1g = (v) => (v == null || Number.isNaN(v) ? "–" : v.toFixed(1));
-ok("Durack: first block is the head-idiom Final count", t.blocks >= 3 && /^Final count \(margin of /.test(t.lab || ""), JSON.stringify(t));
+ok("Durack: first block is the head-idiom Final count", t.blocks === 2 && /^Final count \(margin of /.test(t.lab || ""), JSON.stringify(t));
 const tight = (v) => { const f = f1g(v); return f === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f; };
 ok("Durack: margin label matches data", t.lab === `Final count (margin of ${tight(Math.abs(x.winPct - 50))})`, `${t.lab} vs margin of ${tight(Math.abs(x.winPct - 50))}`);
 ok("Durack: names are the finalists' surnames, not party names", t.nmL === "Price" && t.nmR === "Wheatland", `${t.nmL} · ${t.nmR}`);
+ok("Durack: candidate names render legibly large under the figures", t.nmFont === "15px", t.nmFont);
 ok("Durack: names flush with their figures' inside edges", t.leftFlush != null && t.leftFlush <= 2 && t.rightFlush != null && t.rightFlush <= 2, JSON.stringify({ L: t.leftFlush, R: t.rightFlush }));
 ok("Durack: winner's tag reads re-elected off the left figure", t.tag === "re-elected" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
 ok("Durack: tag's inner face hugged to the content edge", t.tagInnerL != null && Math.abs(t.tagInnerL) <= 2, `${t.tagInnerL}px`);
 const swSt = (w) => (w < 56 ? "marginal" : w < 60 ? "fairly safe" : "safe");
 ok("Durack: swing · status line", t.swing === `+${Math.abs(x.sw).toFixed(1)} swing · ${swSt(x.winPct)}`, `${t.swing} vs +${Math.abs(x.sw).toFixed(1)} swing · ${swSt(x.winPct)}`);
 ok("Durack: no hero/margin-bar remnants", t.heroCount === 0 && t.bigCount === 0, `hero ${t.heroCount} big ${t.bigCount}`);
-ok("Durack: primaries eyebrow with the majors share", t.primLab === `Primaries (Labor and the Coalition share ${f1g((x.fp.alp || 0) + (x.fp.lnp || 0))}%)`, t.primLab);
+ok("Durack: primaries eyebrow reads 'Primaries' plain", t.primLab === "Primaries", t.primLab);
 ok("Durack: per-family figures with changes under each", t.primCells.length === t.primSmalls.length && t.primSmalls.some((s) => /‑|\-/.test(s) || s === "+0.0" || /^[+-0]/.test(s)), JSON.stringify({ cells: t.primCells, smalls: t.primSmalls }));
 ok("Durack: candidate table kept its rows under 'The candidates'", t.candRows >= 5 && t.candH3.some((h) => /^The candidates/.test(h)), `${t.candRows} rows, heads ${t.candH3.join("/")}`);
-ok("Durack: informal head-idiom with national comparison", t.infLab === `Informal (${f1g(x.st)}% of ballots)` && t.infFig === f1g(x.st) && t.infExt === `Australia ${f1g(x.infPool)}%`, JSON.stringify({ lab: t.infLab, fig: t.infFig, ext: t.infExt }));
+ok("Durack: the census section heads itself 'Census data' plain", t.candH3.includes("Census data"), t.candH3.join("/"));
+ok("Durack: informal rides the national-view line with the comparison inside", t.infText === `Informal votes: ${f1g(x.st)}% (vs national average ${f1g(x.infPool)}%)`, t.infText);
 
-/* Melbourne 2025 — its series runs to 1993 in the data; the chart stays at its labelled 2004 origin */
+/* Durack's record starts at the seat's 2010 founding — the chart says so */
+let hd = await hist();
+ok("Durack: the chart titles itself by the name's own record", hd.found && hd.title === "Since 2010" && hd.firstLab === "’10", JSON.stringify(hd));
+
+/* Melbourne 2025 — its series runs to 1993 in the data; domain and heading follow */
 await div("Melbourne");
 await wait(800);
 let h = await hist();
-ok("Melbourne: Since-2004 chart starts at the labelled origin, never before it", h.found && h.minLineX >= 25.9 && h.minDotX >= 25.9 && h.firstLab === "’04" && h.minLabX >= 25.9, JSON.stringify(h));
+ok("Melbourne: the deep record sets domain, heading and origin label", h.found && h.title === "Since 1993" && h.minLineX >= 25.9 && h.minDotX >= 25.9 && h.firstLab === "’93" && h.minLabX >= 25.9, JSON.stringify(h));
 
 /* Bradfield 2025 — a hairline margin carries more decimals */
 await div("Bradfield");
@@ -137,9 +146,9 @@ await div("Farrer");
 await wait(800);
 t = await seat();
 ok("Farrer: tag reads elected, left-hung", t.tag === "elected" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
-ok("Farrer: One Nation-led primaries eyebrow", /^One Nation-led primaries/.test(t.primLab || ""), t.primLab);
+ok("Farrer: primaries eyebrow reads 'Primaries' plain", t.primLab === "Primaries", t.primLab);
 ok("Farrer: no phantom Labor 0.0 column", !t.primCells.some((c) => c.startsWith("0.0") || c.startsWith("-0.0") || c === "–"), JSON.stringify(t.primCells));
-ok("Farrer: informal head-idiom carries the by-election's own figure or says honestly none is filed", /^(Informal \(\d+\.\d% of ballots\)|Informal \(no count filed for the by-election yet\))$/.test(t.infLab || ""), t.infLab);
+ok("Farrer: informal rides the national-view line (or says honestly none is filed)", /^(Informal votes: \d+\.\d% \(vs national average \d+\.\d%\)|Informal votes: no count filed for the by-election yet)$/.test(t.infText || ""), t.infText);
 ok("Farrer: turnout note rides its head block", /^Turnout was \d+\.\d% of [\d,]+ enrolled\.$/.test(t.infNote || ""), t.infNote);
 
 /* 2013 · Durack — first election for this member: elected */

@@ -361,11 +361,9 @@ button { cursor: pointer; background: none; border: 0; }
 .st-seat-key b { color: var(--ink); }
 /* the federal Now head's word-note under the count's legend — the Stat block's Commissioner, one rung down */
 .st-seat-note { align-self: flex-start; width: 100%; margin-top: 0; font-size: 12.5px; font-weight: 400; line-height: 1.45; text-align: left; text-wrap: pretty; color: var(--ink-2); }
-/* the seat story's own head blocks (Final count / Primaries / Informal):
-   the winner-head figure idiom reused inside a plain st-sec */
-.st-secstat .st-nm { font-weight: 500; max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* a seat's lone big-figure head block's comparison line (Informal) */
-.st-ext { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+/* the seat story's own head blocks (Final count / Primaries): the winner-
+   head figure idiom reused inside a plain st-sec */
+.st-secstat .st-nm { font-weight: 500; font-size: 15px; max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* the seat's tag hangs off the winner's figure, which always sits left — the
    head's family-side classes describe majors; the seat's side is positional */
 .st-fg.st-fg-l { right: 100%; }
