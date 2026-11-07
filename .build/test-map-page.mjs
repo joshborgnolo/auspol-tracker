@@ -2575,6 +2575,16 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('class="lg-types st-typefilters"') && st.includes('data-scope="${cur === `cls:${c}` ? "aus"'), "the cls lens's types are their own toggle row — a state dropdown sits above it — sharing the one scope store");
 }
 
+// the search field lives INSIDE the control panel (the lensrow's floating row
+// is retired 2026-11-08): seeded in #legend, and renderLegend re-adopts the
+// live field into the toolbar beside the Basis select at every rebuild
+{
+  const html = R("map/index.html"), css = part("page.css");
+  assert.ok(html.indexOf('id="legend"') > 0 && html.indexOf('id="q"') > html.indexOf('id="legend"'), "the search field is seeded inside the control panel");
+  assert.ok(js.includes('toolbar.className = "lg-toolbar"'), "renderLegend re-adopts the live search field into the toolbar beside the Basis select");
+  assert.ok(css.includes(".lg-toolbar"), "the panel's toolbar row carries its flex rule");
+}
+
 // the now views carry the base election's swings (user call 2026-11-07 —
 // reversing the old "not a change since" suppression): the winner head's 2PP
 // swing chip and its primaries change smalls show on every frame alike

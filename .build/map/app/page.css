@@ -1028,6 +1028,10 @@ html.mp-fs .mp-tip { z-index: 260; }
   padding-top: 2px; padding-bottom: 1px; border-bottom: 1.5px solid var(--ink);
 }
 .mp-legend .lg-t select { max-width: 100%; }
+/* the panel's own toolbar row: the Basis select and the search field inside
+   the control panel (the lensrow's floating search row is retired) */
+.lg-toolbar { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; }
+.lg-toolbar .mp-search { margin-left: auto; }
 .mp-legend .lg-basis, .mp-legend .lg-jump b, .mp-legend .lg-draw > span {
   font-size: 12px; font-weight: 400; color: var(--ink-3);
 }
