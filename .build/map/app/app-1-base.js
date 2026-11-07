@@ -336,9 +336,31 @@ const dmVerbAge = (m) => (AGE_VERB[S.ageMode] || "");
 const EDU_MODES = ["uni", "y12less"];
 const EDU_NAME = { uni: "University educated", y12less: "Year 12 or less" };
 const EDU_SHORT = { uni: "University", y12less: "No Year 12" };
-const EDU_NOTE = { uni: "Share of residents who hold a university qualification", y12less: "Share of people aged 15+ who left schooling before Year 12" };
+const EDU_NOTE = { uni: "Share of people aged 15+ who hold a university qualification", y12less: "Share of people aged 15+ who left schooling before Year 12" };
 const isEdu = () => S.index === LENS_EDU;
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : DM_VERB[k]);
+// whose share a census measure is, and what it says of them: the bases the builders divide by
+// (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
+// the wrong people. Most measures are shares of residents; schooling and degrees are of people
+// aged 15+, occupation and the journey to work of employed people, one-parent families of
+// families, children ever born of women aged 15+, tenure of dwellings, and the income shares of
+// adults (households, in the era prints that count households)
+const DM_POP = { uni: "people aged 15+", y12less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+" };
+const DM_PRED = { y12less: "left schooling before Year 12", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children" };
+function censusWho(m, k = S.index) {
+  let pop = "residents", pred;
+  if (k === LENS_TEN) { pop = "dwellings"; pred = TENESMS[S.ten]; }
+  else if (k === LENS_INC) {
+    const hh = m && m.incomeCuts && m.incomeCuts.basis === "households", frag = S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m);
+    pop = hh ? "households" : "adults"; pred = hh ? `earn ${frag}${incEpoch(m)}` : INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "";
+  } else {
+    const key = k === LENS_EDU ? S.eduMode : k;
+    pop = DM_POP[key] || "residents";
+    pred = DM_PRED[key] || dmVerb(m, k);
+  }
+  const rel = pop === "dwellings" || pop === "families" || pop === "households" ? "that" : "who";
+  return { pop, pred, rel, phrase: `${pop} ${rel} ${pred}` };
+}
 // a year carries the income lanes only when its demo store records the cuts
 // (1991's household-basis print on the 1990s frames, 2001's on the GCP
 // bases); other era-null People lanes filter the same way

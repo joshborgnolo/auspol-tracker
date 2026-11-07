@@ -52,7 +52,7 @@ function valueText(v, kind, ctx) {
     case "senpref": return `${f0(v)}% ranked ${spA()} ahead of ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : `${f1(v)}% ${dmVerb(M(), S.index)}`) : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : `${f1(v)}% ${censusWho(M()).pop === "residents" ? censusWho(M()).pred : `of ${censusWho(M()).pop} ${censusWho(M()).pred}`}`) : `Decile ${v} of 10`;
   }
   return "";
 }
@@ -109,6 +109,7 @@ const RANGE = () => {
 function renderLegend() {
   legendKey = legendState();
   const el = $("#legend"), m = M();
+  chartSync(m); // (a chart hides the map's colour scale: set before the key is measured)
   // the key shows in all three views: the list reads the same lens values
   // (its coloured cells) as the map and chamber, so it needs the same key —
   // census measure picker, ramps and switchers included
@@ -179,7 +180,7 @@ function legendHeightOf(m, y, w, probe) {
         S.seat = seat;
         // the hold is the current draw's two faces (seats · polling places), not
         // every surface's — slimmer views stop inheriting taller surfaces' peaks
-        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of [S.draw]) {
+        for (const bo of S.view === "map" && !(S.draw === "chart" && chartFits(my)) ? [false, true] : [false]) for (const dw of [S.draw]) {
           boothsAs = bo; S.draw = dw;
           probe.innerHTML = legendHTML(my);
           hMax = Math.max(hMax, probe.getBoundingClientRect().height);
@@ -445,10 +446,10 @@ function legendHTML(m) {
           : isEdu() ? EDU_NOTE[S.eduMode]
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
-          : isTen() ? `Share of residents whose dwellings ${TENESMS[S.ten]}`
+          : isTen() ? `Share of dwellings that ${TENESMS[S.ten]}`
           : isAnc() ? `Share of residents who ${ANCISMS[S.anc]} (people could name up to two ancestries, so the options don't add up to a whole)`
           : S.index === "pt" ? ptNote
-          : NOTE_ARC[S.index] || "Share of residents";
+          : NOTE_ARC[S.index] || `Share of ${censusWho(m).phrase}`;
         const basisTail = m.demoInterp ? `interpolated between the ${m.demoInterp.c0} and ${m.demoInterp.c1} censuses to election day${m.demoBasis === "venue" ? `, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in` : `, where each ${boothsOn ? "place’s" : "seat’s"} voters live`}.` : m.demoBasis === "venue" ? `${m.year < 2004 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
         // a birthplace sub-view's tail ignores the blend epoch (cob rides
         // the measured census — 2004's measured side is the 2001 census)
@@ -842,7 +843,7 @@ function updateCanvasVis() {
   }
   const stage = canvas.parentElement.getBoundingClientRect();
   canvas.style.visibility =
-    S.view === "list" || stage.bottom <= 0 || stage.top >= vh ? "hidden" : "visible";
+    S.view === "list" || (CH.el && !CH.el.hidden) || stage.bottom <= 0 || stage.top >= vh ? "hidden" : "visible";
   if (miniCh.canvas) {
     const r = miniCh.canvas.getBoundingClientRect();
     miniCh.canvas.style.visibility = r.bottom < -vh * 0.5 || r.top > vh * 1.5 ? "hidden" : "";
@@ -1200,6 +1201,7 @@ let raf = 0;
 function schedule() { if (!raf) raf = requestAnimationFrame(frame); }
 function frame(ts) {
   raf = 0;
+  chartTick();
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, Wpx, Hpx);
@@ -1296,6 +1298,8 @@ function writeURL() {
   if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.draw !== "seats") p.set("draw", S.draw);
+  // the chart's own switches ride along: the seat-type split and the vote-type comparison
+  if (S.draw === "chart") { if (CH.split) p.set("cs", "type"); if (CH.tpp === "cast") p.set("cv", CH.vs); }
   if (S.lens === "tpp" && S.draw !== "seats" && S.axis !== "AC") p.set("ax", S.axis);
   if (S.view !== "map") p.set("v", S.view);
   if (S.seat) p.set("o", S.seat);
@@ -1323,6 +1327,8 @@ function readURL() {
   const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && (!STATE_YEARS.has(S.year) || SEN_PREF_STATE_FRAMES.has(S.year))))) S.lens = l;
   const mm = p.get("m"); if (mm === "swing") S.tppMode = "swing"; if (mm === "change") S.fpMode = "change"; if (mm === "share" && S.lens === "senate") S.senMode = "share";
   const dw = p.get("draw"); if (dw && DRAWS.some(([k]) => k === dw)) S.draw = dw;
+  if (p.get("cs") === "type") CH.split = true;
+  const cv = p.get("cv"); if (cv && CH_VS[cv]) { CH.tpp = "cast"; CH.vs = cv; }
   const ax = p.get("ax"); if (ax && SP_PAIRS[ax]) S.axis = ax;
   const spp = p.get("sp"); if (spp && SP_PAIRS[spp] && !AXIS_GREEN_SET.has(spp)) S.spPair = spp;
   const pp = p.get("p"); if (pp && FAMS.includes(pp)) { if (S.lens === "flow") S.from = pp; else if (S.lens === "senpref") { if (SP_DONORS[S.spPair].includes(pp)) S.spFrom = pp; } else S.party = pp; }

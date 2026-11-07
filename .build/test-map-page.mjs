@@ -75,7 +75,7 @@ assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git 
 // block's two identical arms and the map's IIFE ran twice on the live page
 assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
 // era-impossible options drop from the frame's own menus: the IRSAD
 // 'Advantage and disadvantage' index before the 2001-census four-index
 // suite, and One Nation's family option before its April 1997 formation
@@ -1537,7 +1537,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes("w, S.view, y, real, S.lens, S.draw, S.tppMode"), "the legend-height hold key carries the lens, its draw, and its mode");
   // the hold follows the CURRENT draw's booth faces (seats · polling places), so
   // slimmer views stop inheriting taller surfaces' peaks (2026-11-07: 58px slack gone)
-  assert.ok(js.includes('for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of [S.draw])') && !js.includes('for (const dw of S.view === "map" ? DRAWS.map'), "the key's hold measures the current draw's two faces, not every surface's");
+  // (a chart never zooms to polling places, so its key holds the seats' face alone: the white space a reader found under Informal, 2026-11-08)
+  assert.ok(js.includes('for (const bo of S.view === "map" && !(S.draw === "chart" && chartFits(my)) ? [false, true] : [false]) for (const dw of [S.draw])') && !js.includes('for (const dw of S.view === "map" ? DRAWS.map'), "the key's hold measures the current draw's two faces (one, under a chart), not every surface's");
 }
 
 // ── the nsw23 frame: New South Wales' 25 March 2023 state election — the
