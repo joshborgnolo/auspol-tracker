@@ -1,0 +1,72 @@
+# GitHub Pages deployment (added 2026-11-07). The legacy "pages build and
+# deployment" builder publishes the whole branch — fine until the tree
+# crossed Pages' 1 GB published limit (state-frame map data + booth-level
+# stores carried main to ~1.21 GB), after which every build errored in
+# seconds and the site sat three pushes behind. This workflow deploys from
+# Actions instead and stages only the published set:
+#
+#   * build sources (.build), agent/notes dirs and CI config never ship;
+#   * data/ stays, minus the analysis-only stores the site never fetches
+#     (booth-*, division-seifa-indexes, the Essential/Resolve source CSVs —
+#     gen-data bakes what the page shows into assets/);
+#   * a size gate fails loudly long before the next silent limit trip.
+#
+# A new path must be EXCLUDED consciously here, not found later on Pages'
+# quota page. If the site needs a new runtime file, just don't exclude it.
+name: pages-deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# pushes land several times an hour; a stale push's deploy never beats the
+# newest one (a cancelled deploy publishes nothing partial)
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Stage the published set
+        run: |
+          mkdir pagesite
+          rsync -a \
+            --exclude=/.git \
+            --exclude=/.build \
+            --exclude=/.claude \
+            --exclude=/.github \
+            --exclude=/.impeccable \
+            --exclude=/.matilda \
+            --exclude=/.matilda-session \
+            --exclude=/.worktrees \
+            --exclude=/worktrees-seifa-land \
+            --exclude=/data/booth-demo-\*.json \
+            --exclude=/data/booth-seifa-\*.json \
+            --exclude=/data/booth-locations-history.json \
+            --exclude=/data/division-seifa-indexes.json \
+            --exclude=/data/essential-report.csv \
+            --exclude=/data/resolve-political-monitor.csv \
+            ./ pagesite/
+      - name: Size gate (Pages publishes 1 GB max)
+        run: |
+          mb=$(du -sm pagesite | cut -f1)
+          echo "published set: ${mb} MB, $(find pagesite -type f | wc -l) files"
+          test "$mb" -lt 900
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: pagesite
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

@@ -17,9 +17,11 @@
 # lists: the satellites share the main page's shell assets.
 #
 # Two triggers for two failures:
-#   * workflow_run of "pages-build-deployment" — checks the commit the
-#     deploy actually built (head_sha, NOT main, which may have moved on),
+#   * workflow_run of "pages-deploy" — checks the commit the deploy
+#     actually built (head_sha, NOT main, which may have moved on),
 #     with a 5-minute grace window because Pages is asynchronous
+#     ("pages-build-deployment" was the legacy whole-branch builder,
+#     retired 2026-11-07 once the tree crossed the 1 GB limit)
 #   * a daily backstop against main's head — TLS/DNS breakage, Pages
 #     reverting, a stale object long after a green deploy
 
@@ -27,7 +29,7 @@ name: site-check
 
 on:
   workflow_run:
-    workflows: ["pages-build-deployment"]
+    workflows: ["pages-deploy"]
     types: [completed]
   schedule:
     - cron: '0 23 * * *' # 09:00 AEST daily
