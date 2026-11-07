@@ -2522,6 +2522,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('return "National";') && !st.includes('? " figures" : ""'), "the neutral scope words itself plainly on every frame — National, never 'figures'");
   assert.ok(!st.includes("FIG_DEMONYM"), "the demonym compounds (Victorian figures, Western Australian figures) are gone too");
   assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: r.key })'), "the menu items share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
+  assert.ok(st.includes('const statScopeTrigger = (sel) => (sel.k === "aus" ? "Filter seats" : "Change filter");') && st.includes("esc(statScopeTrigger(statScopeOf(m)))"), "the trigger names the menu's job — Filter seats by default, Change filter once a pick is on — never the pick itself");
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
@@ -2540,6 +2541,16 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
   assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
   assert.ok(ch3.includes('S.sel.level === "state" && !sliceState(m) ? S.sel.st : null'), "the slice keeps the whole-frame chamber in the story column");
+}
+
+// the Jump-to cities row's two homes (fixed later on 2026-11-07): a direct
+// legend child on Winner, nested in the left column everywhere else — its own
+// row layout must hold in BOTH (the `>` rule alone had non-winner lenses
+// stacking every city/button on its own line, found by user report)
+{
+  const ui = part("app-6-ui.js"), css = part("page.css");
+  assert.ok(ui.includes('c.matches(".lg-t, .lg-jump, .lg-note, .lg-shapes, .lg-draw, .lg-bal, .lg-hint")'), "non-winner lenses nest the Jump-to row in the legend's left column");
+  assert.ok(css.includes(".mp-legend .lg-jump { display: flex; flex-wrap: wrap;") && css.includes(".mp-legend > .lg-jump { grid-column: 1 / -1; }"), "the Jump-to row lays out wherever it sits — nested too — and spans full width only as the legend's direct child");
 }
 
 // the full-screen view (app-7-full.js, 2026-11-03): its way in opens the zoom plate —

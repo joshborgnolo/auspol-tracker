@@ -511,11 +511,14 @@ function statScopeOpts(m, st) {
 const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
 // the head meta's scope menu: frame-wide by default, one of its states or its
-// seat types once named — the head's own figures then follow it
+// seat types once named — the head's own figures then follow it. The trigger
+// names the menu's JOB, not the pick: invites the filter by default, offers
+// to change it once one is on (the items below keep the pick's own names)
+const statScopeTrigger = (sel) => (sel.k === "aus" ? "Filter seats" : "Change filter");
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
-  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeLabel(m, statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
+  return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
 }
 function areaHedDek(m, st) {
   const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
