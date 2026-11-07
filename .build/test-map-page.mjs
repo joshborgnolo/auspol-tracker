@@ -2613,7 +2613,7 @@ for (const y of ["sa22", "sa26"]) {
 // swing chip and its primaries change smalls show on every frame alike
 {
   const st = part("app-4-story.js");
-  assert.ok(st.includes("const s = A.tppSw;") && !st.includes("isNowY(m.year) ? null : A.tppSw"), "the now view's two-party swing shows like any frame's");
+  assert.ok(st.includes("swingFigure(A.tppSw)") && !st.includes("isNowY(m.year) ? null : A.tppSw"), "the now view's two-party swing shows like any frame's");
   assert.ok(st.includes("showChange = A.fpSw.alp != null;") && !st.includes("fpSw.alp != null && !isNowY(m.year)"), "…and its primaries row carries change smalls");
 }
 
