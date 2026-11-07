@@ -1,8 +1,9 @@
 // Probe: the /map/ Winner head is ruled top and bottom, with a double rule
 // between its sections — so every label in the head (Two-party, Primaries,
-// Seats, Informal) sits just below one, tightly-spaced twin hairlines —
-// across election and Now frames. The map reads the frame from the hash at
-// BOOT ONLY: goto a frame, then reload.
+// Seats) sits just below one, tightly-spaced twin hairlines — across
+// election and Now frames. The informal line left the head for below the
+// How-votes-were-cast section 2026-11-07, so the head closes on Seats.
+// The map reads the frame from the hash at BOOT ONLY: goto, then reload.
 // usage: node .matilda/probe/map-head-separators.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
@@ -18,15 +19,14 @@ const frame = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil:
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
 const labelsAboveRules = (ks) => ks.every((k, i) => !k.startsWith("LAB(") || ks[i - 1] === "SEP");
 
-// election frame: crowned by a rule, four sections (labels Two-party,
-// Primaries, Seats, Informal), ruled between, closed by a rule
+// election frame: crowned by a rule, three sections (labels Two-party,
+// Primaries, Seats), ruled between, closed by a rule after Seats
 await frame(2025);
 let ks = await kinds();
-ok("2025: five rules — crown, three dividers, close", ks.filter((k) => k === "SEP").length === 5, JSON.stringify(ks));
+ok("2025: four rules — crown, two dividers, close after Seats", ks.filter((k) => k === "SEP").length === 4, JSON.stringify(ks));
 ok("2025: crown rule opens the head", ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 2)));
 ok("2025: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
-ok("2025: a rule directly above the Informal line", ks[ks.indexOf("LAB(Informal:)") - 1] === "SEP", JSON.stringify(ks.slice(-4)));
-ok("2025: closing rule last, after Informal", ks[ks.length - 1] === "SEP" && ks[ks.length - 2] === "LAB(Informal:)", JSON.stringify(ks.slice(-3)));
+ok("2025: closing rule last, after the Seats section's final label of the head", ks[ks.length - 1] === "SEP" && /^LAB\(Seats/.test([...ks].reverse().find((k) => k.startsWith("LAB("))), JSON.stringify(ks.slice(-4)));
 
 // the rule itself: two 1px hairlines, tightly spaced, full width of the head
 const geom = await page.evaluate(() => {
@@ -49,7 +49,7 @@ await page.evaluate(() => {
 await wait(400);
 {
   const ks2 = await kinds();
-  ok("five rules after a scope change", ks2.filter((k) => k === "SEP").length === 5, `got ${ks2.filter((k) => k === "SEP").length}`);
+  ok("four rules after a scope change", ks2.filter((k) => k === "SEP").length === 4, `got ${ks2.filter((k) => k === "SEP").length}`);
   ok("labels still ruled above after the scope change", labelsAboveRules(ks2), JSON.stringify(ks2));
 }
 
@@ -58,7 +58,7 @@ await wait(400);
 await frame("now");
 ks = await kinds();
 ok("now: no top-level govt tag (it nests in the grid)", !ks.includes("fg"), JSON.stringify(ks.slice(0, 5)));
-ok("now: five rules, crown first", ks.filter((k) => k === "SEP").length === 5 && ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 4)));
+ok("now: four rules, crown first", ks.filter((k) => k === "SEP").length === 4 && ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 4)));
 ok("now: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
 
 // phone rung: rules don't add overflow

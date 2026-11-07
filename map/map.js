@@ -8138,18 +8138,24 @@ function seatStat(m, st, label, noteDef = null) {
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
   const mk = statSeatMakeup(m, idx);
-  // the rate the Informal st-sec used to headline, as one more label line under Seats
-  const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
   // a double rule crowns the head, divides the sections and closes it — every
-  // label (Two-party, Primaries, Seats, Informal) sits just under one
+  // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;
   const sections = [];
   if (two) sections.push(two + twoSw);
   if (fpRow) sections.push(fpRow);
   // the word-note about seats that moved since the election sits under the count's legend
   sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote}`);
-  if (infLine) sections.push(infLine);
   return `<h3 class="st-stat" aria-label="${esc(label)}">${sep}${sections.join(sep)}${sep}</h3>`;
+}
+/* the informal rate belongs with the count's own story: it hangs under the
+   How-votes-were-cast section instead of closing the winner head (user call
+   2026-11-07), keeping the head's figures scope — a class or state pick
+   pools its own rate (statScopeArea), exactly as the head's figure did */
+function informalHTML(m, st) {
+  const sel = statScopeOf(m);
+  const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
+  return A.infPct != null ? `<div class="st-inf">Informal: ${f1(A.infPct)}%</div>` : "";
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
@@ -8631,6 +8637,7 @@ function storyArea(m, st) {
   const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;
   const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true, castScope?.geography);
+  h += informalHTML(m, st);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)

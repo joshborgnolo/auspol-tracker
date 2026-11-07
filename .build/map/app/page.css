@@ -386,6 +386,7 @@ button { cursor: pointer; background: none; border: 0; }
 .st-sec { margin-top: 26px; padding-top: 11px; border-top: 1px solid var(--line); }
 .st-sec > h3 { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 8px; }
 .st-sec > h3 small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.st-inf { margin-top: 22px; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 .st-note { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
 .st-note b { color: var(--ink-2); font-weight: 600; }
 .t-alp { color: var(--alp-text); } .t-lnp { color: var(--lnp-text); } .t-grn { color: var(--grn-text); } .t-onp { color: var(--onp-text); } .t-oth { color: var(--oth-text); }

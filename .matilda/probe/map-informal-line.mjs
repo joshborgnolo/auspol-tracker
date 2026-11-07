@@ -1,6 +1,8 @@
-// Probe: /map/'s Informal figure is a label line under the Seats row in the
-// Winner head (no more standalone st-sec), pooled from counts — verified
-// against the raw 2025 data, and pooled per seat class under the scope menu.
+// Probe: /map/'s Informal figure hangs as a label line UNDER the How-votes-
+// were-cast section (moved out of the winner head 2026-11-07 — it closed the
+// head before; user call: it belongs with the count's cast-type story). The
+// figure keeps the head's figures scope, verified against the raw 2025 data
+// — pooled nationally, and per seat class under the scope menu.
 // usage: node .matilda/probe/map-informal-line.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
@@ -33,16 +35,37 @@ const expect = await page.evaluate(async () => {
   return { aus: pool(j.divs), byCls: Object.fromEntries(Object.entries(byCls).map(([k, t]) => [k, (100 * t.inf) / (t.formal + t.inf)])) };
 });
 
-const labs = () => page.evaluate(() => [...document.querySelectorAll(".st-stat .st-lab")].map((x) => x.textContent.trim()));
-let ls = await labs();
-const inf = ls.find((t) => /^Informal:/.test(t));
-ok("informal label line exists in the head", !!inf, JSON.stringify(ls));
-ok("one-decimal figure", !!inf && /^Informal: \d+\.\d%$/.test(inf), inf);
-ok("figure matches pooled 2025 rate", !!inf && inf === `Informal: ${f1(expect.aus)}%`, `${inf} vs Informal: ${f1(expect.aus)}%`);
-const iInf = ls.findIndex((t) => /^Informal:/.test(t)), iSeats = ls.findIndex((t) => /^Seats/.test(t));
-ok("informal sits under Seats", iInf > iSeats && iInf === ls.length - 1, `${iInf} after seats ${iSeats}`);
+const inf = () => page.evaluate(() => {
+  const el = document.querySelector(".st-inf");
+  if (!el) return { found: false };
+  const heads = [...document.querySelectorAll("#story > .st-sec > h3")];
+  const vt = heads.find((h) => /^How votes were cast/.test(h.textContent));
+  const close = heads.find((h) => /^Closest seats/.test(h.textContent));
+  const secs = heads.map((h) => h.textContent.trim().split(" ")[0]);
+  return {
+    found: true,
+    count: document.querySelectorAll(".st-inf").length,
+    text: el.textContent.trim(),
+    inHead: !!el.closest(".st-stat"),
+    prev: el.previousElementSibling ? el.previousElementSibling.className.split(" ")[0] : null,
+    prevH3: el.previousElementSibling ? (el.previousElementSibling.querySelector("h3") || {}).textContent || "" : "",
+    storyOrder: { vt: vt ? secs.indexOf(vt.textContent.trim().split(" ")[0]) : -1, close: close ? secs.indexOf(close.textContent.trim().split(" ")[0]) : -1 },
+    topAboveVt: vt ? el.getBoundingClientRect().top >= vt.parentElement.getBoundingClientRect().bottom - 1 : null,
+    aboveClosest: close ? el.getBoundingClientRect().bottom <= close.parentElement.getBoundingClientRect().top + 1 : null,
+  };
+});
+let t = await inf();
+ok("informal line exists, once, outside the head", t.found && t.count === 1 && t.inHead === false, JSON.stringify(t));
+ok("one-decimal figure", !!t.text && /^Informal: \d+\.\d%$/.test(t.text), t.text);
+ok("figure matches pooled 2025 rate", t.text === `Informal: ${f1(expect.aus)}%`, `${t.text} vs Informal: ${f1(expect.aus)}%`);
+ok("directly under the How-votes-were-cast section", t.prev === "st-sec" && /^How votes were cast/.test(t.prevH3), `prev: ${t.prev} (h3: ${t.prevH3})`);
+ok("and before the Closest seats section", t.topAboveVt === true && t.aboveClosest === true, JSON.stringify(t));
+
+// it used to live in the head — make sure the head left nothing behind
+const headGhost = await page.evaluate(() => [...document.querySelectorAll(".st-stat .st-lab")].some((x) => /^Informal:/.test(x.textContent)));
+ok("no Informal label left in the winner head", headGhost === false);
 const stale = await page.evaluate(() => [...document.querySelectorAll("#story .st-sec h3")].some((h) => /^Informal(\s|$)/.test(h.textContent)));
-ok("standalone Informal section is gone", !stale);
+ok("no standalone Informal section either", !stale);
 
 // a seat-class scope: the figure must pool that class's rate too, not sit on the national one
 const picked = await page.evaluate(() => {
@@ -58,11 +81,10 @@ const picked = await page.evaluate(() => {
 ok("scope menu offers seat classes", !!picked && !["closed", "none"].includes(picked), String(picked));
 if (picked && !["closed", "none"].includes(picked)) {
   await wait(400);
-  ls = await labs();
-  const inf2 = ls.find((t) => /^Informal:/.test(t));
+  t = await inf();
   const vals = Object.values(expect.byCls).map((v) => `Informal: ${f1(v)}%`);
-  ok("class scope pools its own rate", !!inf2 && vals.includes(inf2), `${inf2} (class rates ${vals.join(", ")})`);
-  if (inf2 && vals.length > 1) ok("class rates genuinely differ from national", inf2 !== `Informal: ${f1(expect.aus)}%`, `${inf2} vs national Informal: ${f1(expect.aus)}%`);
+  ok("class scope pools its own rate, still outside the head", !!t.text && vals.includes(t.text) && t.inHead === false, `${t.text} (class rates ${vals.join(", ")})`);
+  if (t.text && vals.length > 1) ok("class rates genuinely differ from national", t.text !== `Informal: ${f1(expect.aus)}%`, `${t.text} vs national Informal: ${f1(expect.aus)}%`);
 }
 
 // phone rung: the line fits, no new horizontal overflow
