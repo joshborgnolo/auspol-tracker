@@ -8203,7 +8203,7 @@ function areaHedDek(m, st) {
   // named seat sits inside the choice (Rural and NSW keep the One Nation
   // note; Inner-metro and Queensland don't)
   const NOW_AUS_DEK = {
-    now: { t: " Since the election, One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
+    now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. Most notably, One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
     nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
     qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
   };
@@ -8643,7 +8643,10 @@ function storyArea(m, st) {
     const ch = m.changes.slice().reverse();
     const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
     h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
-    h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
+    // the federal Now's figures-basis qualifier leads its seats note in the
+    // head instead ("The figures here are the 2025 election's, adjusted for
+    // seat changes…", user call) — the state Now frames keep it here
+    if (m.year !== "now") h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // the two-party read — skipped on the Winner lens, whose head has already given the
   // figures and swing in the head's own grid; every other lens still opens with the hero
