@@ -81,6 +81,8 @@ const seat = () => page.evaluate(() => {
     nmUncoloured: nmL != null && !/color/.test(nmL.getAttribute("style") || ""),
     partyNmL: pnmL ? pnmL.textContent.trim() : null,
     partyNmR: pnmR ? pnmR.textContent.trim() : null,
+    pnmRclip: pnmR ? pnmR.scrollWidth - pnmR.clientWidth : null,
+    pnmLclip: pnmL ? pnmL.scrollWidth - pnmL.clientWidth : null,
     partyNmFont: pnmL ? getComputedStyle(pnmL).fontSize : null,
     partyNmBelow: pnmLr && figLr ? pnmLr.top >= figLr.bottom - 0.5 : null,
     partyFlushL: pnmLr && figLr ? Math.abs(pnmLr.right - figLr.right) : null,
@@ -154,7 +156,7 @@ ok("Durack: names ride above the figures, rendered black", t.nmAboveFigures === 
 ok("Durack: figures wear their parties' colours", t.figPartyColoured === true);
 ok("Durack: party names return below the figures, national style", t.partyNmL === "Liberal" && t.partyNmR === "Labor" && t.partyNmFont === "12px" && t.partyNmBelow === true, JSON.stringify([t.partyNmL, t.partyNmR, t.partyNmFont, t.partyNmBelow]));
 ok("Durack: names and party names flush with their figures' inside edges", t.leftFlush != null && t.leftFlush <= 2 && t.rightFlush != null && t.rightFlush <= 2 && t.partyFlushL != null && t.partyFlushL <= 2 && t.partyFlushR != null && t.partyFlushR <= 2, JSON.stringify({ L: t.leftFlush, R: t.rightFlush, PL: t.partyFlushL, PR: t.partyFlushR }));
-ok("Durack: the chip says the party retains", t.tag === "Liberal retains" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
+ok("Durack: the chip says retain", t.tag === "retain" && /st-fg-l/.test(t.tagCls), `${t.tag} (${t.tagCls})`);
 ok("Durack: tag's inner face hugged to the content edge", t.tagInnerL != null && Math.abs(t.tagInnerL) <= 2, `${t.tagInnerL}px`);
 ok("Durack: swing line carries no status tail", t.swing === `+${Math.abs(x.sw).toFixed(1)} swing`, t.swing);
 ok("Durack: the old narrating dek is gone", t.oldDekGone === true);
@@ -182,6 +184,19 @@ ok("Melbourne: the old hero render and its narration are gone", t.heroCount === 
 let h = await hist();
 ok("Melbourne: the deep record sets domain, heading and origin label", h.found && h.title === "Since 1993" && h.minLineX >= 25.9 && h.minDotX >= 25.9 && h.firstLab === "’93" && h.minLabX >= 25.9, JSON.stringify(h));
 
+/* Lingiari 2025 — Country Liberal fits without clipping (once "Country Li…"
+   ended up ellipsized against an easy margin) */
+await div("Lingiari");
+await wait(800);
+t = await seat();
+ok("Lingiari: Country Liberal fits full and unclipped", t.partyNmR === "Country Liberal" && t.pnmRclip != null && t.pnmRclip <= 0.5, JSON.stringify({ n: t.partyNmR, clip: t.pnmRclip }));
+
+/* Kennedy 2025 — Katter's Australian is too long for the cell: KAP */
+await div("Kennedy");
+await wait(800);
+t = await seat();
+ok("Kennedy: long party names abbreviate", t.partyNmL === "KAP" && t.pnmLclip != null && t.pnmLclip <= 0.5, JSON.stringify({ n: t.partyNmL, clip: t.pnmLclip }));
+
 /* Bradfield 2025 — a hairline margin carries more decimals */
 await div("Bradfield");
 await wait(800);
@@ -195,7 +210,7 @@ await show("now");
 await div("Farrer");
 await wait(800);
 t = await seat();
-ok("Farrer: the chip says who gained from whom", /^One Nation gains from /.test(t.tag || "") && /st-fg-l/.test(t.tagCls), t.tag);
+ok("Farrer: the chip says gain", t.tag === "gain" && /st-fg-l/.test(t.tagCls), t.tag);
 ok("Farrer: no swing line where nothing swings", t.swing === null, `${t.swing}`);
 ok("Farrer: primaries eyebrow reads 'Primaries' plain", t.primLab === "Primaries", t.primLab);
 ok("Farrer: no phantom Labor 0.0 column", !t.primCells.some((c) => c.startsWith("0.0") || c.startsWith("-0.0") || c === "–"), JSON.stringify(t.primCells));
@@ -207,7 +222,7 @@ await show("2013");
 await div("Durack");
 await wait(800);
 t = await seat();
-ok("2013 Durack: a party hold reads 'retains'", t.tag === "Liberal retains", t.tag);
+ok("2013 Durack: a party hold reads 'retain'", t.tag === "retain", t.tag);
 
 /* scope menu: a tall menu clamps to the viewport and a pick returns focus to
    the trigger (the handler-side fixes shipped with the seat heads) */

@@ -151,24 +151,26 @@ function seatStatOf(m, d, py) {
 /* the seat's Final count section in the head's figure idiom: surname names
    row over black figures, the winner's tag chip, the swing line, and the
    seat's own classification inside the eyebrow's margin parenthetical */
+/* the seat head's party labels: full names by default, an official
+   abbreviation where the name can't wear it (KAP, CLP, LNP…); Country
+   Liberal — 15 glyphs, the Lingiari case the user called out — is the
+   boundary: it wears its full name, everything past it takes the
+   abbreviation */
+const PNM_ABBR = { "Katter’s Australian": "KAP", "Country Liberal": "CLP", "Liberal National": "LNP", "The Nationals": "NAT", "Liberal Democrats": "LDP" };
+const pnmOf = (c) => { const n = partyName(c.ab, c.pn); return n.length > 15 && PNM_ABBR[n] ? PNM_ABBR[n] : n; };
 function seatFinalStat(m, d) {
   const p = seatStatOf(m, d, prevFor(m, d));
   const [wn, rn] = pairNames(d.win, d.run);
-  /* the chip names the party (or "Independent") behind the winner: "X
-     retains" where the party kept the seat, "X gains from Y" where it
-     changed hands, "X wins" where the ledger can't say (new seat,
-     by-election pop-in) */
-  const famNm = (c) => (c.fam === "ind" ? "Independent" : partyName(c.ab, c.pn));
+  /* the chip says it in one verb (user call 2026-11-09 — the party that did
+     it needs no repeating beside the figures): "retain" where the party kept
+     the seat, "gain" where it changed hands, "win" where the ledger can't
+     say (new seat). The by-election overlay row files no change of its own —
+     its base holder tells the same story */
   const ch = d.change, kind = ch && ch.kind;
-  // a by-election overlay row files no change of its own; its base row's
-  // holder tells the same story (retains if the party held on, gains if not)
   const byHold = d.by && d.by.prev && d.by.prev.hold, byGain = byHold && byHold.fam !== d.win.fam;
-  const tagWords = kind === "re" || kind === "held" ? `${famNm(d.win)} retains`
-    : kind === "gain" ? `${famNm(d.win)} gains from ${ds(theParty(ch.prev[2]))}`
-    : byHold ? `${famNm(d.win)} ${byGain ? "gains from" : "retains"}${byGain ? ` ${famNm(byHold)}` : ""}`
-    : `${famNm(d.win)} wins`;
+  const tagWords = kind === "re" || kind === "held" ? "retain" : kind === "gain" || byGain ? "gain" : byHold ? "retain" : "win";
   const tag = `<span class="st-fg st-fg-l"><b>${tagWords}</b></span>`;
-  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true, [partyName(d.win.ab, d.win.pn), partyName(d.run.ab, d.run.pn)]);
+  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true, [pnmOf(d.win), pnmOf(d.run)]);
   const sw = swingFigure(p.swing);
   return `<div class="st-sec"><div class="st-stat st-secstat">${two}${sw}</div></div>`;
 }

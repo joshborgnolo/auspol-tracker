@@ -372,8 +372,9 @@ button { cursor: pointer; background: none; border: 0; }
 .st-tpp.st-nmup > .fig-l { grid-area: 2 / 1; justify-self: end; }
 .st-tpp.st-nmup > .fig-r { grid-area: 2 / 3; justify-self: start; }
 /* the party names the national block carries under its figures, re-added to
-   the seat's names-above variant as its third row (user call 2026-11-09) */
-.st-pnm { font-weight: 600; font-size: 12px; letter-spacing: 0.02em; max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+   the seat's names-above variant as its third row (user call 2026-11-09) —
+   long enough for "Country Liberal" to wear unclipped */
+.st-pnm { font-weight: 600; font-size: 12px; letter-spacing: 0.02em; max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-tpp.st-nmup .st-pnm-l { grid-area: 3 / 1; justify-self: end; }
 .st-tpp.st-nmup .st-pnm-r { grid-area: 3 / 3; justify-self: start; }
 /* the seat's tag hangs off the winner's figure, which always sits left — the
