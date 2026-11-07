@@ -130,6 +130,9 @@ try {
   await year(page, 2025);
   await pressedIs(page, `${clsScope} = ${clsElection}`, `${clsElection} — plain — survives Now → 2025`);
   assert.equal(await headTitle(page), `${clsElection} · 2025`, "…with the middot year on the election frame");
+  const clsSmalls = await seatSmalls();
+  assert.ok(clsSmalls.length && clsSmalls.every((t) => /[−+\d]/.test(t)), `a seat type on an election frame carries seat deltas of these seats: ${clsSmalls.join(" ")}`);
+  assert.equal(clsSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "…summing to zero inside the scope");
   await year(page, "vic22");
   await labelIs(page, "Filter seats", "a seat-type pick falls back on a state frame too");
   await year(page, 2025);

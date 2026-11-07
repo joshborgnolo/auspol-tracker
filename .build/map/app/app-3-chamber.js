@@ -813,15 +813,19 @@ function drawChamber(g, m, w, h, opts) {
   // the chairs
   // the list's filters are the House's seats'; the Senate answers only to the chosen state
   const filt = m.house !== "senate" && filtersOn(), sd = opts.sel, hv = opts.hover, stSel = opts.state;
+  // a figures-menu seat type colours its chamber too: the seat-type lens's own
+  // ladder, with seats of every other kind sat back (no type asked for, no mark)
+  const clsSel = opts.cls, clsTone = clsSel ? (i) => { const k = CLS.indexOf(m.divs[i].cls); return k < 0 ? null : TH.cls[k]; } : null;
   const pat = opts.pattern;
   const backOf = (c) => towards(c, th.dark ? [0, 0, 0] : th.ink, th.dark ? 0.32 : 0.22);
   const drawn = [];
   const paint = (i, x, y, fa, W, D, sp) => {
     const d = m.divs[i];
-    let c = fillDiv(m, i);
+    let c = (clsTone && clsTone(i)) || fillDiv(m, i);
     let a = 1;
     if (filt && !passes(m, i)) a = 0.16;
     if (stSel && d.st !== stSel) a = Math.min(a, 0.2);
+    if (clsSel && d.cls !== clsSel) a = Math.min(a, 0.2);
     if (opts.only != null && i !== opts.only) a = Math.min(a, 0.22);
     if (!c) { drawChair(g, x, y, fa, W, D, pat || css(th.nodata), css(th.hatch), a); }
     else drawChair(g, x, y, fa, W, D, css(c), css(backOf(c)), a);
@@ -1165,7 +1169,7 @@ function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;
   chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sen ? (sel.level === "sen" ? sel.i : null) : selDiv(), hover: S.hover && S.hover.kind === (sen ? "sen" : "div") ? S.hover.i : null,
-    state: sel.level === "state" ? sel.st : null, pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
+    state: sel.level === "state" ? sel.st : null, cls: sen ? null : clsFilter(m), pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
   ctx.restore();
 }
 
@@ -1228,10 +1232,9 @@ function paintMiniChamber() {
   g.setTransform(r, 0, 0, r, 0, 0);
   g.clearRect(0, 0, w, h);
   const sd = selDiv();
-  // a Winner-lens state slice keeps the whole-frame layout's full chamber
-  // (the map beside it is what marks the state); a state picked any other
-  // way still lights only its own members here
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" && !sliceState(m) ? S.sel.st : null, pad, labels: true });
+  // the chamber keeps its own marks of the figures-menu pick: a state's seats
+  // lit, a seat type in its lens colours with other kinds sat back
+  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m), pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {

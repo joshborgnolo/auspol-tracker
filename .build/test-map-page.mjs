@@ -2527,6 +2527,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
   assert.ok(st.includes("function scopeSeatBase(m, sel, idx, cnt)") && st.includes("scopeSeatBase(m, statSel, idx, cnt)") && st.includes('ab === "CSA" ? "csa" : FAM(ab)') && st.includes("m.changes"), "a now frame keeps its seat-change line under scoped views too — the base is the overlay's own chains reverted inside the scope (NSW figures and Rural figures keep the Coalition's minus-two)");
+  assert.ok(st.includes('statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st)'), "a state pick on an election frame takes the official per-state seat base (smalls sum to the redistribution drift, as the aus row's does)");
+  assert.ok(st.includes("m.divs[i].change && m.divs[i].change.prev") && st.includes("to = holdFam(m.divs[i].hold)"), "a seat type on an election frame reverts each scoped seat to its previous holder — every scoped view carries the change line");
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
   assert.ok(st.includes("noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))") && st.includes('seats: ["New England", "Farrer"]') && st.includes('<span class="st-seat-note">'), "the moved-seats note follows its named seats' scope — National keeps it, NSW and Rural keep it, other figures views drop it");
@@ -2542,7 +2544,9 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes('statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open }'), "a state arrived at any side writes the menu's store");
   assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
   assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
-  assert.ok(ch3.includes('S.sel.level === "state" && !sliceState(m) ? S.sel.st : null'), "the slice keeps the whole-frame chamber in the story column");
+  assert.ok(st.includes("const clsFilter = (m) =>") && ch3.includes('S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m)'), "the story chamber marks the pick — a state's seats lit, a seat type's kind lit in its lens colours");
+  assert.ok(ch3.includes("CLS.indexOf(m.divs[i].cls)") && ch3.includes("if (clsSel && d.cls !== clsSel)") && ch3.includes("cls: sen ? null : clsFilter(m)"), "a figures-menu seat type both colours and filters the chambers (never the Senate's) via the seat-type lens's own ladder");
+  assert.ok(st.includes("const chamberMark = pickTitle"), "the chamber section's small names the filter it marks");
 }
 
 // the Jump-to cities row's two homes (fixed later on 2026-11-07): a direct

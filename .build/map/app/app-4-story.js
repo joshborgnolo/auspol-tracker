@@ -200,10 +200,25 @@ function seatBase(m, st) {
 }
 /* a now frame's scoped change base: the overlay's own change chains reverted off
    the scope's current tallies — the seat set is the base election's in every
-   scope, only holders move. Election frames keep aus-only bases. */
+   scope, only holders move. An election frame's seat-type scope has no official
+   series to read, so it derives the same way per seat: each one reverted to its
+   own prior holder ("of these seats" — new ones read as gains, gone ones never
+   sat inside this class to lose; 2026-11-07, user call on Inner metro). */
 function scopeSeatBase(m, sel, idx, cnt) {
-  if (!isNowY(m.year)) return null;
   const famOf = (ab) => (ab === "CSA" ? "csa" : FAM(ab)); // holdFam's code side
+  if (!isNowY(m.year)) {
+    // an election frame's seat-type base: revert each seat in the scope to its
+    // own previous holder
+    const c = { ...cnt };
+    for (const i of idx) {
+      const p = m.divs[i].change && m.divs[i].change.prev;
+      if (!p) continue;
+      const from = famOf(p[2]), to = holdFam(m.divs[i].hold);
+      if (from === to) continue;
+      c[from] = (c[from] || 0) + 1; c[to] = (c[to] || 0) - 1;
+    }
+    return { y: prevYearOf(m.year) ?? (m.res && m.res.prev), c };
+  }
   const inScope = new Set(idx.map((i) => m.divs[i].n)), chains = new Map();
   for (const ch of m.changes || []) {
     if (!inScope.has(ch.div)) continue;
@@ -238,6 +253,9 @@ const statScopeOf = (m) => {
   if (slice) return { k: "st", st: slice, open: statScopeStore.open };
   return statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
 };
+// the figures menu's seat-type pick, for the views that mark it outside the
+// head's figures (the chambers paint and dim by it)
+const clsFilter = (m) => (S.lens === "winner" && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls" ? statScopeOf(m).cls : null);
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -442,7 +460,9 @@ function seatStat(m, st, label, noteDef = null) {
   // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
   const seatsNote = noteDef && (statSel.k === "aus" || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : scopeSeatBase(m, statSel, idx, cnt);
+  // the change line's base: the whole frame's official series, a state's own
+  // series where one is picked, else the scope's seat-by-seat reversion
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st) : scopeSeatBase(m, statSel, idx, cnt);
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();
@@ -983,7 +1003,10 @@ function storyArea(m, st) {
   if (lensNumeric() && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
   // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
   if (S.view !== "chamber") {
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
+    // the chamber section's small names the filter it marks: the state's own
+    // members, or the seat type whose kind stays lit (and each kind its colour)
+    const chamberMark = pickTitle ? (pick.k === "cls" ? `${pickTitle} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
   if (isNowY(m.year) && aus) {
     const ch = m.changes.slice().reverse();
