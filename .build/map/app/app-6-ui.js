@@ -625,6 +625,10 @@ function tipFor(h) {
 }
 
 /* =============================== selection =============================== */
+// the cls lens shelves itself rather than pinging back to winner when a state
+// frame steps in: a federal frame that can hold it returns it, chip store and
+// all — an explicit lens pick drops the shelf (2026-11-08)
+let clsLensShelved = false;
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
@@ -635,7 +639,8 @@ function select(sel, opts = {}) {
   if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
     // a class filter survives the map side's state move — the pair compounds
     if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
-    else if (sel.level === "aus") statScopeStore = { k: "aus", open: statScopeStore.open };
+    // "All seats" leaves the state's slice alone; a class pick rides on independently of it
+    else if (sel.level === "aus" && (S.lens !== "cls" || statScopeStore.k !== "cls")) statScopeStore = { k: "aus", open: statScopeStore.open };
   }
   if (!opts.keepTown) townPick = -1;
   reframe = null; // (a town's or city's flight sets its own again, after this)
@@ -853,6 +858,9 @@ function setLens(id) {
   }
   const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
+  clsLensShelved = false; // an explicit pick drops the cls lens's shelf
+  // a seat-type pick belongs to its own lens — anywhere else it's set aside
+  if (id !== "cls" && statScopeStore.k === "cls") statScopeStore = { k: "aus", open: statScopeStore.open };
   // the slice follows its lens: a state the figures menu had under Winner
   // re-selects on the map when the lens comes back to it
   if (id === "winner" && S.sel.level === "aus" && statScopeStore.k === "st" && !STATE_YEARS.has(S.year)) {
@@ -936,7 +944,9 @@ async function setYear(y) {
   // a state election on the timeline has no Senate: it opens in the House's chamber
   if (S.house === "senate" && !SEN_YEARS.includes(y)) { S.house = "reps"; chAnim = null; chLast.clear(); renderLenses(); }
   // ... and the Senate-vote/seat-type lenses are AEC reads the state frames don't offer
-  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens) && !(S.lens === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) S.lens = S.lens === "senpref" ? "flow" : "winner";
+  if (STATE_YEARS.has(y) && FED_LENS.has(S.lens) && !(S.lens === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) { clsLensShelved ||= S.lens === "cls"; S.lens = S.lens === "senpref" ? "flow" : "winner"; }
+  // the shelved cls lens returns itself on the federal frame that can hold it
+  if (!STATE_YEARS.has(y) && clsLensShelved && S.lens === "winner") { S.lens = "cls"; clsLensShelved = false; }
   // the stamp names the election at the press; while it loads the stamp's rule runs and a
   // sheen crosses the map (an election already loaded lands within the frame)
   const dir = yearDir(from, y), tok = ++yearTok;

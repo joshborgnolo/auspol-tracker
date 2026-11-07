@@ -1033,6 +1033,8 @@ html.mp-fs .mp-tip { z-index: 260; }
   color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); text-decoration: none;
 }
 .mp-legend .lg-note { margin-top: 0; }
+/* the cls lens's two head-meta controls stack: the state dropdown above the types toggle */
+.st-clsmeta { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .lg-types { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
 .lg-types button { display: inline-flex; align-items: center; gap: 6px; padding: 2px 0 1px; font-size: 13px; font-weight: 400; color: var(--ink-2); border-bottom: 1.5px solid transparent; white-space: nowrap; }
 .lg-types i { width: 9px; height: 9px; border-radius: 2px; flex: none; }

@@ -1499,7 +1499,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes("const list = sen ? SEN_LENSES : yearLenses(S.year)"), "renderLenses draws the year's own lenses");
   assert.ok(js.includes("const L = yearLenses(S.year), k = (L.findIndex("), "walkLens walks the year's own lenses");
   assert.ok(js.includes('const l = p.get("l"); if (l && (yearLenses(S.year).some((x) => x.id === l) || (l === "senpref" && (!STATE_YEARS.has(S.year) || SEN_PREF_STATE_FRAMES.has(S.year))))) S.lens = l;'), "readURL opens the Senate-ballot reading for federal links and New South Wales' LC ones, not for a state without per-ballot LC data");
-  assert.ok(js.includes('if (STATE_YEARS.has(y) && FED_LENS.has(S.lens) && !(S.lens === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) S.lens = S.lens === "senpref" ? "flow" : "winner";'), "setYear drops a federal-only lens on the walk into a state frame, New South Wales' frames excepted (the Senate-ballot reading back to the House's preferences)");
+  assert.ok(js.includes('clsLensShelved ||= S.lens === "cls"') && js.includes('clsLensShelved && S.lens === "winner") { S.lens = "cls"; clsLensShelved = false; }'), "the cls lens shelves through a state frame and returns itself (and its chips) on a federal one; every other federal-only lens drops to winner and returns when named");
   // the Senate's ballot rankings live inside the Preferences tab, not as a tab of their own
   assert.ok(!js.includes('{ id: "senpref"'), "no Senate preferences tab");
   assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/map/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
@@ -2521,9 +2521,13 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const clsPart = poolParts(m).cls;") && st.includes('const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);'), "the head's scope reads the cls axis first, compounding wherever the map has a state down");
   assert.ok(st.includes('return "National";') && !st.includes('? " figures" : ""'), "the neutral scope words itself plainly on every frame — National, never 'figures'");
   assert.ok(!st.includes("FIG_DEMONYM"), "the demonym compounds (Victorian figures, Western Australian figures) are gone too");
-  assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: r.key })'), "the menu items share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
-  assert.ok(st.includes('"Filter by seat type" : "Filter by state/territory and seat type"') && st.includes("esc(statScopeTrigger(statScopeOf(m)))"), "the trigger names the menu's job — the axes' inviter by default (seat types alone on their own lens), its changer once a pick is on");
-  assert.ok(st.includes('S.lens !== "cls" && !STATE_YEARS.has(m.year)'), "the cls lens's menu carries only its own axis (no states)");
+  assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: c })'), "the dropdown items and the types toggle share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
+  assert.ok(st.includes('const statScopeTrigger = (m) => (sliceState(m) ? "Change filter" : "Filter by state/territory");'), "the trigger names the dropdown's one axis everywhere — states only; types moved to the cls lens's own toggle row");
+  assert.ok(st.includes("for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push") && !st.includes('`cls:${r.key}`'), "the dropdown's items are states and territories alone on both lenses");
+  assert.ok(st.includes('cls: S.lens === "cls" && !STATE_YEARS.has(m.year)') && st.includes('if (!STATE_YEARS.has(m.year))'), "a seat type filters only on its own lens");
+  assert.ok(ui.includes('id !== "cls" && statScopeStore.k === "cls"'), "a type pick's store clears on any other lens");
+  assert.ok(ui.includes('clsLensShelved ||= S.lens === "cls"') && ui.includes('S.lens = "cls"; clsLensShelved = false'), "the cls lens shelves through a state frame and returns itself (and its chips) on a federal one");
+  assert.ok(st.includes('st-clsmeta">${dropdown()}${chips}<'), "the state dropdown stacks above the types toggle row in the cls lens's head meta (DOM order: dropdown, then chips)");
   assert.ok(st.includes('const pickerLens = () => S.lens === "winner" || S.lens === "cls";'), "the winner-story gates ride one shared picker-lens idiom, defined where its consumers live (the VM harnesses eval the story part alone)");
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
   assert.ok(st.includes('meta = pickerLens() && aus ? statScopeMenu(m, st)'), "the scope menu owns the head meta on the winner-design lenses");
@@ -2568,7 +2572,7 @@ for (const y of ["sa22", "sa26"]) {
   const legend = ui.slice(ui.indexOf("function legendHTML"), ui.indexOf("/* =============================== the timeline"));
   assert.ok(!/lg-ramp|lg-ticks|lg-ends|seatTypeFilters/.test(legend), "basis controls contain no scales or seat-type filters");
   assert.ok(css.includes(".mp-legend { display: flex; flex-direction: column;"), "every basis shares the same control layout");
-  assert.ok(st.includes('class="lg-types st-typefilters"') && st.includes('data-scope="${cur === `cls:${c}` ? "aus"'), "seat-type labels replace the story dropdown and toggle the existing figures scope");
+  assert.ok(st.includes('class="lg-types st-typefilters"') && st.includes('data-scope="${cur === `cls:${c}` ? "aus"'), "the cls lens's types are their own toggle row — a state dropdown sits above it — sharing the one scope store");
 }
 
 // the now views carry the base election's swings (user call 2026-11-07 —
