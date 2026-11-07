@@ -8362,13 +8362,14 @@ function informalHTML(m, st) {
   const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
   return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
 }
-/* the dropdown's item list in order (the spacebar cycle walks it too): states
-   and territories alone, whichever lens holds the menu — seat types moved to
-   their own toggle row on the cls lens (2026-11-08, user call) */
+/* the dropdown's item list in order (the spacebar cycle walks it too): the
+   open axis — states until sliced, then "None" and the seat types over it
+   (2026-11-08, user calls) */
 function statScopeOpts(m, st) {
-  // a sliced state's axis is taken, so the menu offers the OTHER one: the
-  // seat types over the state (another state is picked on the strip instead)
-  if (sliceState(m)) return CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })]);
+  // a sliced state's axis is taken, so the menu offers the OTHER one: "None"
+  // (the bare state), then the seat types over it (another state is picked on
+  // the strip instead)
+  if (sliceState(m)) return [["aus", "None"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
   const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
   if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
   return opts;
@@ -8387,7 +8388,7 @@ const statScopeTrigger = (m) => {
 const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
 function statScopeMenu(m, st) {
   const slice = sliceState(m), clsPicked = slice ? poolParts(m).cls : null;
-  const picked = slice ? (clsPicked ? `cls:${clsPicked}` : null) : "aus";
+  const picked = slice ? (clsPicked ? `cls:${clsPicked}` : "aus") : "aus";
   // the dropdown is the figures filter in both picker lenses: the open axis —
   // states until one's sliced, then the types over it — marked by the pick
   const dropdown = () => `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(m))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${picked === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`).join("")}</span></span>`;
@@ -10378,6 +10379,9 @@ function setStatScope(sel) {
   // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
   // state selection instead of clearing it; anything else steps the state out.
   if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
+  // "None" (aus) inside a sliced, typed view lets the type go alone —
+  // the state stays (the map's own pick); elsewhere it steps the state out
+  if (sel.k === "aus" && statScopeStore.k === "cls" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
   if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
