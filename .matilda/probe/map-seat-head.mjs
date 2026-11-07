@@ -330,6 +330,25 @@ await wait(800);
 let lb = await page.evaluate(() => [...document.querySelectorAll("#story .st-pnm")].map((s) => s.textContent.trim()));
 ok("Longman: the polling place head reads LNP", lb.length === 2 && !/Liberal National/.test(lb.join(" ")) && lb.includes("LNP"), JSON.stringify(lb));
 
+/* the two-party basis fronts the head's own figures block */
+await page.evaluate(() => window.__map.setLens("tpp"));
+await page.evaluate(() => window.__map.goAus());
+await wait(900);
+const tppHead = await page.evaluate(() => {
+  const stat = document.querySelector("#story h3.st-stat");
+  return stat ? {
+    lab: stat.querySelector(".st-lab").textContent.trim(),
+    figs: [...stat.querySelectorAll(".st-tpp > b")].map((b) => b.textContent.trim()),
+    names: [...stat.querySelectorAll(".st-nm")].map((n) => n.textContent.trim()),
+    tag: stat.querySelector(".st-fg") ? stat.querySelector(".st-fg").textContent.trim() : null,
+    swing: stat.querySelector(".st-swing") ? stat.querySelector(".st-swing").textContent.trim() : null,
+    hed: !!document.querySelector("#story .st-hed"),
+    dekNarr: document.getElementById("story").textContent.includes("moved towards"),
+  } : null;
+});
+ok("tpp basis fronts the winner-head figures block", tppHead && tppHead.lab === "Two-party preferred (margin of 5.2)" && tppHead.names.join(",") === "Labor,Coalition" && tppHead.figs.join(",") === "55.2,44.8" && tppHead.tag === "formed govt" && tppHead.swing === "+3.1 swing", JSON.stringify(tppHead));
+ok("tpp basis: the swung-that-way narration is gone", tppHead && tppHead.hed === false && tppHead.dekNarr === false);
+
 /* a state-frame seat's census head names the state (nsw23 · Barwon) */
 await show("nsw23");
 await page.evaluate(() => { const i = window.__map.M().divs.findIndex((d) => d.n === "Barwon"); window.__map.goDiv(i); });

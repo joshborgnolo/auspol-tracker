@@ -9121,32 +9121,24 @@ function areaHedDek(m, st) {
       return { hed, dek: aus && m.year === 2010 ? "Labor kept government with the support of the Greens’ member and three independents." : "", stat: seatStat(m, st, `${hed}. ${dek}`) };
     }
     case "tpp": {
-      const withData = idx.filter((i) => m.divs[i].tpp != null);
-      if (S.tppMode === "swing") {
-        const s = A.tppSw;
-        const to = s >= 0 ? "Labor" : "the Coalition";
-        const hed = Math.abs(s) < 0.05 ? `There was no two-party swing${where}` : `The two-party vote${where} swung ${pts(s)} to ${to}`;
-        const sw = withData.map((i) => ({ i, v: m.divs[i].tppSw })).filter((x) => x.v != null);
-        const toward = sw.filter((x) => (s >= 0 ? x.v > 0 : x.v < 0)).length;
-        const big = [...sw].sort((a, b) => (s >= 0 ? b.v - a.v : a.v - b.v))[0];
-        const dek = sw.length ? `${toward === 0 ? "None" : cap(ofN(toward, sw.length))} ${toward === 0 ? `of the ${sw.length}` : ""} seats with a measured swing moved towards ${to}.`.replace("  ", " ") + ` The biggest swing that way was ${big ? `${ds(m.divs[big.i].n)}’s, ${pts(big.v)}` : "–"}.` : "";
-        return { hed, dek: dek + (isNowM ? ` These are the ${frameBaseY(m.year)} election’s swings.` : "") };
-      }
-      const hed = `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
-      const ahead = withData.filter((i) => m.divs[i].tpp > 50).length;
-      const sp = swingPhrase(A.tppSw, prev);
-      // the figures an "as it stands" frame mixes counts from: the base
-      // election, and any seat whose by-election replaced it
+      // an as-it-stands frame mixes base and by-election counts; the figure
+      // trail qualifies itself only inside the frame's own jurisdiction
       const NOW_TPP_NOTE = {
         now: ` These are the ${frameBaseY(m.year)} election’s figures; Labor didn’t stand at the Farrer by-election, so Farrer has none.`,
         nswnow: ` These are the ${frameBaseY(m.year)} election’s figures; Kiama’s two-party read is its by-election count, and the other by-election seats carry none (their final pairs weren’t Labor against the Coalition).`,
         qldnow: ` These are the ${frameBaseY(m.year)} election’s figures; Stafford’s two-party read is its by-election count, and Hinchinbrook’s by-election didn’t finish Labor against the LNP, so it carries none.`,
       };
-      // the figure set the note qualifies contains the overlay's seats only
-      // in the frame's own jurisdiction (or at its whole-frame level)
       const nowScope = YEAR_JUR[m.year] ? (aus || st === stOfYear(m.year)) : (aus || st === "NSW");
-      const dek = `${sp ? `That’s ${sp}. ` : ""}On the two-party count Labor led in ${ahead} of the ${withData.length === N ? N : `${withData.length} counted`} seats${where}, ${coalW()} in ${withData.length - ahead}.${isNowM && nowScope ? NOW_TPP_NOTE[m.year] ?? "" : ""}`;
-      return { hed, dek };
+      const hedWord = S.tppMode === "swing" ? (Math.abs(A.tppSw) < 0.05 ? `There was no two-party swing${where}` : `The two-party vote${where} swung ${pts(A.tppSw)} to ${A.tppSw >= 0 ? "Labor" : "the Coalition"}`) : `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
+      if (!Number.isFinite(A.tpp)) return { hed: hedWord, dek: "" };
+      /* the two-party lens fronts the head's own figures block, like the
+         winner page's (user call 2026-11-09) — hed and dek give way to
+         "Two-party preferred (margin of M)" with the names, the government
+         tag and the swing line */
+      const fg = m.gov === "alp" || m.gov === "lnp" ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
+      const sep = `<span class="st-sep" aria-hidden="true"></span>`;
+      const stat = `<h3 class="st-stat" aria-label="${esc(hedWord)}.">${sep}${twoPartyFigures(`Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg)}${swingFigure(A.tppSw)}${sep}</h3>${isNowM && nowScope && NOW_TPP_NOTE[m.year] ? `<p class="st-note">${NOW_TPP_NOTE[m.year].trim()}</p>` : ""}`;
+      return { hed: hedWord, dek: "", stat };
     }
     case "fp": {
       const P = S.party, name = legW(P);
