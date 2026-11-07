@@ -55,7 +55,9 @@ const readState = () => page.evaluate(() => {
     boundary: t.includes("hit an error"),
     tabInflation: q(".rd-confidence-tabs button").some((b) => /Inflation & growth/i.test(b.textContent)),
     ptitle: t.includes("Inflation & growth") && t.includes("annual change, per cent"),
+    rnndRow: t.includes("Real net national disposable income per person"),
     oecdRow: t.includes("OECD average inflation"),
+    medRow: t.includes("OECD median inflation"),
     g20Row: t.includes("G20 average inflation"),
     rbaBand: q("svg .rba-band").length > 0,
     histChip: t.includes("Show complete history"),
@@ -76,14 +78,20 @@ const check = (name, got, want) => {
 };
 
 /* file-grounded expectations: the read rows must quote macro.json's own
-   newest figures, never a recalculation (lane order: AU solid lanes,
-   then OECD CPI, G20 CPI, OECD GDP) */
-const expectedFigs = [
-  MACRO.cpiMonthly.rows.at(-1).v.toFixed(1) + "%",
-  MACRO.gdppc.rows.at(-1).v.toFixed(1) + "%",
-  MACRO.oecdCpi.rows.at(-1).v.toFixed(1) + "%",
-  MACRO.g20Cpi.rows.at(-1).v.toFixed(1) + "%",
+   newest figures, never a recalculation. The panel's lane order, mirrored:
+   CPI (its monthly read row), the two ABS growth lanes, then the OECD
+   average, OECD member median, G20 and OECD GDP context lines — each
+   optional like the component's own concat chain */
+const laneRows = [
+  MACRO.cpiMonthly,
+  MACRO.gdppc,
+  ...(MACRO.rnndi && MACRO.rnndi.rows.length ? [MACRO.rnndi] : []),
+  ...(MACRO.oecdCpi && MACRO.oecdCpi.rows.length ? [MACRO.oecdCpi] : []),
+  ...(MACRO.oecdCpiMed && MACRO.oecdCpiMed.rows.length ? [MACRO.oecdCpiMed] : []),
+  ...(MACRO.g20Cpi && MACRO.g20Cpi.rows.length ? [MACRO.g20Cpi] : []),
+  ...(MACRO.oecdGdp && MACRO.oecdGdp.rows.length ? [MACRO.oecdGdp] : []),
 ];
+const expectedFigs = laneRows.map((l) => l.rows.at(-1).v.toFixed(1) + "%");
 
 const s0 = await readState();
 check("consumer view opens", s0, { found: true, boundary: false, tabInflation: true });
@@ -93,10 +101,10 @@ if (!(await clickText(/Inflation & growth/))) fails.push("no Inflation & growth 
 await new Promise((r) => setTimeout(r, 800));
 const s1 = await readState();
 check("macro term view", s1, {
-  found: true, boundary: false, ptitle: true, oecdRow: true, g20Row: true,
+  found: true, boundary: false, ptitle: true, rnndRow: true, oecdRow: true, medRow: true, g20Row: true,
   rbaBand: true, histChip: true, backLabel: false, eventNow: true, tick1960: false, head: true,
 });
-if (s1.figs.length >= 4) {
+if (s1.figs.length >= expectedFigs.length) {
   expectedFigs.forEach((want, i) => {
     if (s1.figs[i] !== want) fails.push(`read row ${i + 1} shows ${s1.figs[i]}, want the file's own ${want}`);
     else console.log(`read row ${i + 1}: ok (${s1.figs[i]})`);
