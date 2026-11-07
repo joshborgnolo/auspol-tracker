@@ -3,8 +3,9 @@
       (agg.ptpp stamped from the shipped previous frame; sa26 stays bare
       because its notional tally covers 28% of the roll v sa22's 88%);
    2. 'now' frames show NO primary or two-party deltas (seats keep theirs);
-   3. the now-frame booths legend can no longer orphan-wrap "seats" onto
-      a line of its own (the unit rides inside the last category's chip);
+   3. the winner legend is colour and tag only — the seat tallies live in
+      the head's Seats row, so neither counts nor a "seats" unit chip
+      shows, over seats or over polling places (2026-11-07);
    4. the winner head retires the duplicate Two-party-preferred hero
       section below it (kept on the tpp lens);
    5. the by-state table is headed "By state or territory". */
@@ -139,34 +140,25 @@ const stat = (page) => page.evaluate(() => {
   check("now: winner head also retires the 2PP hero", s.tppHero === false);
   await p.close();
 }
-// ---- now legend: 'seats' rides inside the last chip, same row as it
+// ---- now legend: colour and tag only — the head's Seats row owns the tallies
 {
   const p = await open("now");
-  const plain = await p.evaluate(() => !!document.querySelector(".lg-unit"));
-  check("no seats-unit without booths on", plain === false);
+  const seats = await p.evaluate(() => ({
+    key: [...document.querySelectorAll(".lg-cats > span")].map((e) => e.textContent.trim().replace(/\s+/g, " ")),
+    counts: document.querySelectorAll(".lg-cats b").length,
+    unit: !!document.querySelector(".lg-unit"),
+  }));
+  check("legend: seven colour chips on the now frame", seats.key.length === 7, JSON.stringify(seats.key));
+  check("legend: no counts, no seats-unit chip", seats.counts === 0 && seats.unit === false, JSON.stringify(seats));
+  check("legend: tags carry no digits", seats.key.every((s) => !/\d/.test(s)), JSON.stringify(seats.key));
   await p.evaluate(() => window.__map.setDraw("balloons"));
   await new Promise((r) => setTimeout(r, 700));
-  const legend = await p.evaluate(() => {
-    const unit = document.querySelector(".lg-cats .lg-unit");
-    if (!unit) return { missing: true };
-    const chip = unit.parentElement;
-    const last = document.querySelector(".lg-cats > span:last-child");
-    const u = unit.getBoundingClientRect(), c = chip.getBoundingClientRect();
-    return {
-      missing: false,
-      text: unit.textContent.trim(),
-      nested: chip === last && !!chip.querySelector("b"),
-      chipText: chip.textContent.trim(),
-      sameRow: Math.abs(u.top - c.top) < 2,
-      cats: document.querySelectorAll(".lg-cats > span").length,
-    };
-  });
-  check("legend: the unit exists over booths", !legend.missing);
-  if (!legend.missing) {
-    check("legend: 'seats' rides inside the last chip", legend.nested && /seats$/.test(legend.chipText), JSON.stringify(legend));
-    check("legend: unit sits on its chip's own row", legend.sameRow, JSON.stringify(legend));
-    check("legend: six categories on the now frame", legend.cats === 6, String(legend.cats));
-  }
+  const overBooths = await p.evaluate(() => ({
+    counts: document.querySelectorAll(".lg-cats b").length,
+    unit: !!document.querySelector(".lg-unit"),
+    cats: document.querySelectorAll(".lg-cats > span").length,
+  }));
+  check("over booths too: no counts, no unit chip, six chips (CS folds into IND)", overBooths.counts === 0 && overBooths.unit === false && overBooths.cats === 6, JSON.stringify(overBooths));
   await p.close();
 }
 

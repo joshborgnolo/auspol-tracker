@@ -9612,11 +9612,12 @@ function legendHTML(m) {
     case "winner": {
       const cnt = {}; for (const d of m.divs) cnt[holdFam(d.hold)] = (cnt[holdFam(d.hold)] || 0) + 1;
       h += `<div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>`;
-      // the seats are in every view, and a party with none is left out. Over polling places they sit under a place-by-place title, so the
-      // last category's chip says they're seats, and Community Strong folds into independents, as its places are drawn
+      // the seats are in every view, and a party with none is left out; their tallies
+      // live in the head's Seats row, so the legend stays colour and tag (2026-11-07).
+      // Community Strong folds into independents over polling places, as its places are drawn
       const nOf = (f) => (boothsOn && f === "ind" ? (cnt.ind || 0) + (cnt.csa || 0) : cnt[f]);
       const catFams = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => (f === "csa" ? cnt.csa && !boothsOn : nOf(f) && famEraOpts(m).includes(f)));
-      h += `<div class="lg-cats">${catFams.map((f, i) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${nOf(f)}</b>${boothsOn && i === catFams.length - 1 ? `<span class="lg-unit">seats</span>` : ""}</span>`).join("")}</div>`;
+      h += `<div class="lg-cats">${catFams.map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)}</span>`).join("")}</div>`;
       break;
     }
     case "tpp": {
