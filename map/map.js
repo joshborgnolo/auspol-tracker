@@ -7864,18 +7864,19 @@ function seatStatOf(m, d, py) {
    abbreviation */
 const PNM_ABBR = { "Katter’s Australian": "KAP", "Country Liberal": "CLP", "Liberal National": "LNP", "The Nationals": "NAT", "Liberal Democrats": "LDP" };
 const pnmOf = (c) => { const n = partyName(c.ab, c.pn); return n.length > 15 && PNM_ABBR[n] ? PNM_ABBR[n] : n; };
+/* the seat's outcome verb in one word (user call chain 2026-11-09): "retain"
+   where the party kept the seat, "gain" where it changed hands, "win" where
+   the ledger can't say (new seat). A by-election overlay row files no change
+   of its own — its base holder tells the same story */
+function seatTag(d) {
+  const ch = d.change, kind = ch && ch.kind;
+  const byHold = d.by && d.by.prev && d.by.prev.hold, byGain = byHold && byHold.fam !== d.win.fam;
+  return kind === "re" || kind === "held" ? "retain" : kind === "gain" || byGain ? "gain" : byHold ? "retain" : "win";
+}
 function seatFinalStat(m, d) {
   const p = seatStatOf(m, d, prevFor(m, d));
   const [wn, rn] = pairNames(d.win, d.run);
-  /* the chip says it in one verb (user call 2026-11-09 — the party that did
-     it needs no repeating beside the figures): "retain" where the party kept
-     the seat, "gain" where it changed hands, "win" where the ledger can't
-     say (new seat). The by-election overlay row files no change of its own —
-     its base holder tells the same story */
-  const ch = d.change, kind = ch && ch.kind;
-  const byHold = d.by && d.by.prev && d.by.prev.hold, byGain = byHold && byHold.fam !== d.win.fam;
-  const tagWords = kind === "re" || kind === "held" ? "retain" : kind === "gain" || byGain ? "gain" : byHold ? "retain" : "win";
-  const tag = `<span class="st-fg st-fg-l"><b>${tagWords}</b></span>`;
+  const tag = `<span class="st-fg st-fg-l"><b>${seatTag(d)}</b></span>`;
   const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true, [pnmOf(d.win), pnmOf(d.run)]);
   const sw = swingFigure(p.swing);
   return `<div class="st-sec"><div class="st-stat st-secstat">${two}${sw}</div></div>`;
@@ -9226,7 +9227,8 @@ function storyBooth(m, j) {
     const [lwn, lrn] = pairNames(lw, lrun);
     // the polling place's own count rides the same head-block idiom as the
     // seat's Final count, with the place-level winner's figure on the left
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), "", true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
+    // and the seat outcome's tag chip where the seat's own block carries it
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg st-fg-l"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
   }
   if (!Number.isNaN(b.tpp[j]) && !D.classic) {
     const coal = coalW(1).replace(/^The /, "");
@@ -9279,6 +9281,9 @@ function renderStory(force) {
   storyKey = key;
   const el = $("#story");
   el.dataset.lens = S.lens;
+  // the polling-place story outfits its own separator family; CSS scoping
+  // below reads this instead of inferring from the lens
+  el.dataset.view = s.level;
   // a Winner-lens state slice renders the whole-frame layout (route "AUS"):
   // the menu, the sections, the head — storyArea names the state's head title
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st)) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);

@@ -270,6 +270,7 @@ const booth = await page.evaluate(() => {
   return {
     lab: sec ? sec.querySelector(".st-lab").textContent.trim() : null,
     swing: sec && sec.querySelector(".st-swing") ? sec.querySelector(".st-swing").textContent.trim() : null,
+    tag: sec && sec.querySelector(".st-fg") ? sec.querySelector(".st-fg").textContent.trim() : null,
     oldSwingSentence: /A two-party swing of/.test(storyTxt),
     nmFont: nm ? getComputedStyle(nm).fontSize : null,
     heroCount: document.querySelectorAll("#story .hero").length,
@@ -278,11 +279,42 @@ const booth = await page.evaluate(() => {
   };
 });
 ok("booth: the count here rides the head-block idiom", booth.lab && /^Final count here \(margin of \d+\.\d+\)/.test(booth.lab) && booth.nmFont === "20px" && booth.heroCount === 0, JSON.stringify(booth));
+ok("booth: the seat's gain/retain tag chip rides the count here too", booth.tag === "retain" || booth.tag === "gain" || booth.tag === "win", booth.tag);
 ok("booth: the swing rides its count block in figure form", booth.swing == null || /^(No swing|\+\d+\.\d+ swing)$/.test(booth.swing), booth.swing);
 ok("booth: no narrating swing sentence remains", booth.oldSwingSentence === false);
 ok("booth: the census section heads the neighbourhood profile", booth.neighHead === "Neighbourhood profile from census data", booth.neighHead);
 ok("booth: candidates head runs its single subtext line", booth.cand.head === "The candidates" && booth.cand.small === "by primary vote here. Tick = whole seat", JSON.stringify(booth.cand));
 ok("booth: the change qualifier is gone", booth.cand.changesGone === true);
+
+/* polling-place separators: the head double rule under every lens, starting
+   at the first junction */
+const sepRun = async (lens) => page.evaluate(async (l) => {
+  window.__map.setLens(l);
+  await new Promise((r) => setTimeout(r, 500));
+  const m = window.__map.M();
+  const i = m.divs.findIndex((d) => d.n === "Durack");
+  window.__map.goDiv(i);
+  await new Promise((r) => setTimeout(r, 500));
+  window.__map.goBooth(m.booth.byDiv[i][0]);
+  await new Promise((r) => setTimeout(r, 700));
+  return [...document.querySelectorAll("#story .st-sec")].slice(0, 4).map((s) => { const cs = getComputedStyle(s); return `${cs.borderTopWidth} ${cs.borderTopStyle}`; });
+}, lens);
+const sepW = await sepRun("winner");
+ok("booth: winner lens separators double from the first junction", sepW.every((x) => x.startsWith("4px double")), JSON.stringify(sepW));
+const sepP = await sepRun("people");
+ok("booth: non-winner lenses also carry the double rule", sepP.every((x) => x.startsWith("4px double")), JSON.stringify(sepP));
+
+/* Longman 2025 — the Liberal National read stays LNP at seat and place levels */
+await show("2025");
+await page.evaluate(() => window.__map.setLens("winner"));
+await page.evaluate(() => { const m = window.__map.M(); window.__map.goDiv(m.divs.findIndex((d) => d.n === "Longman")); });
+await wait(800);
+t = await seat();
+ok("Longman: the seat head reads LNP", !/Liberal National/.test([t.partyNmL, t.partyNmR].join(" ")) && (t.partyNmL === "LNP" || t.partyNmR === "LNP"), JSON.stringify([t.partyNmL, t.partyNmR]));
+await page.evaluate(() => { const m = window.__map.M(); window.__map.goBooth(m.booth.byDiv[m.divs.findIndex((d) => d.n === "Longman")][0]); });
+await wait(800);
+let lb = await page.evaluate(() => [...document.querySelectorAll("#story .st-pnm")].map((s) => s.textContent.trim()));
+ok("Longman: the polling place head reads LNP", lb.length === 2 && !/Liberal National/.test(lb.join(" ")) && lb.includes("LNP"), JSON.stringify(lb));
 
 /* a state-frame seat's census head names the state (nsw23 · Barwon) */
 await show("nsw23");

@@ -604,6 +604,12 @@ button { cursor: pointer; background: none; border: 0; }
 #story[data-lens="winner"] .st-sec { border-top: 4px double var(--line); }
 #story[data-lens="winner"] .st-stat + .st-sec,
 #story[data-lens="winner"] .st-dek + .st-sec { border-top: 0; }
+/* the polling-place story separates with the head double rule under every
+   lens — that includes its FIRST junction, where the winner page's adjacent
+   suppression wrongly zeroes the line (there is no head rule above it to
+   pair with). [data-lens] in the selector keeps this one ahead of the
+   adjacent-suppressors' specificity */
+#story[data-view="booth"][data-lens] .st-sec { border-top: 4px double var(--line); }
 /* and the credit line closes the story on the same twin rule, under the margin
    list and its informal line */
 #story[data-lens="winner"] .st-foot { border-top: 4px double var(--line); }
