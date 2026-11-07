@@ -845,10 +845,13 @@ function drawChamber(g, m, w, h, opts) {
     const y0 = base === "top" ? y : base === "middle" ? y - ht / 2 : y - ht;
     occ.push({ x0, y0, x1: x0 + wd, y1: y0 + ht });
   };
-  // The majority threshold counts from the Speaker's end in both the seating
-  // plan and the sorted views. Keep the same solid marker under every lens.
+  // Federal seating plans use the sorted chamber's threshold geometry too:
+  // changing the lens or choosing As seated must not move the majority line.
+  // Sorting changes which members occupy the slots, not the threshold itself.
+  const majorityCh = ch.plan && !STATE_YEARS.has(m.year)
+    ? (m._majorityCh ||= chamberOrder({ ...m, seating: null, _chKey: null })) : ch;
   // Sydney's Council retains its standalone figure below the floor.
-  const cuts = opts.labels !== false && geom.key !== "nswLC" ? majorityCuts(ch, geom) : null;
+  const cuts = opts.labels !== false && geom.key !== "nswLC" ? majorityCuts(majorityCh, geom) : null;
   if (!cuts && geom.key === "nswLC" && opts.labels !== false && (opts.big || s > 6)) {
     const mt = `${ch.maj} for a majority`, my = Yp(geom.box.y1 + 0.62);
     g.font = `600 ${opts.big ? 12 : 11}px ${SANS}`; g.fillStyle = css(th.ink2);
