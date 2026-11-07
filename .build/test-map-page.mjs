@@ -2525,6 +2525,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
   assert.ok(st.includes('meta = S.lens === "winner" && aus ? statScopeMenu(m, st)'), "the scope menu only owns the Winner head's meta");
   assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
+  assert.ok(st.includes("function scopeSeatBase(m, sel, idx, cnt)") && st.includes("scopeSeatBase(m, statSel, idx, cnt)") && st.includes('ab === "CSA" ? "csa" : FAM(ab)') && st.includes("m.changes"), "a now frame keeps its seat-change line under scoped views too — the base is the overlay's own chains reverted inside the scope (NSW figures and Rural figures keep the Coalition's minus-two)");
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
 }

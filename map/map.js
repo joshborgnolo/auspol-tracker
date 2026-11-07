@@ -7858,6 +7858,26 @@ function seatBase(m, st) {
   if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };
   return st === "AUS" || st === stOfYear(y) ? { y: pv, c: META_FACTS.mix[pv] } : null;
 }
+/* a now frame's scoped change base: the overlay's own change chains reverted off
+   the scope's current tallies — the seat set is the base election's in every
+   scope, only holders move. Election frames keep aus-only bases. */
+function scopeSeatBase(m, sel, idx, cnt) {
+  if (!isNowY(m.year)) return null;
+  const famOf = (ab) => (ab === "CSA" ? "csa" : FAM(ab)); // holdFam's code side
+  const inScope = new Set(idx.map((i) => m.divs[i].n)), chains = new Map();
+  for (const ch of m.changes || []) {
+    if (!inScope.has(ch.div)) continue;
+    if (!chains.has(ch.div)) chains.set(ch.div, []);
+    chains.get(ch.div).push(ch);
+  }
+  const c = { ...cnt };
+  for (const chain of chains.values()) {
+    const from = chain[0].from && famOf(chain[0].from), to = chain[chain.length - 1].to && famOf(chain[chain.length - 1].to);
+    if (!from || !to || from === to) continue;
+    c[from] = (c[from] || 0) + 1; c[to] = (c[to] || 0) - 1;
+  }
+  return { y: NOW_OF[m.year], c };
+}
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
 // the head's scope menu: the choice is one pick shared across frames, so
@@ -8066,7 +8086,7 @@ function seatStat(m, st, label) {
   const statSel = statScopeOf(m);
   const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : null;
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : scopeSeatBase(m, statSel, idx, cnt);
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();

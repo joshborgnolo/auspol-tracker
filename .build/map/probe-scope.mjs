@@ -66,6 +66,12 @@ try {
   await year(page, "now");
   await labelIs(page, "NSW figures", "and words itself with figures again on Now");
 
+  // a scoped Now seats row keeps its change line (the coalition's NSW losses)
+  const seatSmalls = () => page.$$eval("#story .st-seats small", (els) => els.map((e) => e.textContent.trim()));
+  const nswSmalls = await seatSmalls();
+  assert.ok(nswSmalls.length && nswSmalls.some((t) => /[−+][1-9]/.test(t)), `NSW figures carry the Now seat deltas: ${nswSmalls.join(" ")}`);
+  assert.equal(nswSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "scoped seat changes conserve");
+
   // a seat-type pick rides across years too
   const clsScope = await page.$eval('#story .st-scwrap [data-scope^="cls:"]', (e) => e.dataset.scope);
   const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };
@@ -80,6 +86,12 @@ try {
   await labelIs(page, "Victoria", "a seat-type pick falls back on a state frame too");
   await year(page, 2025);
   await labelIs(page, clsElection, "and returns on the federal election frame");
+
+  // Rural keeps the Now deltas as well (both coalition losses are rural seats)
+  await year(page, "now");
+  await pick(page, "cls:Rural");
+  const ruralSmalls = await seatSmalls();
+  assert.ok(ruralSmalls.length && ruralSmalls.some((t) => /[−+][1-9]/.test(t)), `Rural figures carry the Now seat deltas: ${ruralSmalls.join(" ")}`);
 
   assert.deepEqual(errors, [], "no page exceptions");
   console.log("PASS: the scope pick survives year switches, words itself plainly on election frames, keeps the figures wording on now frames");
