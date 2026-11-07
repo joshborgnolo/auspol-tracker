@@ -80,6 +80,7 @@ try {
   await year(page, 2025);
   await labelIs(page, "Change filter", "the trigger's job wording rides Now → 2025");
   await pressedIs(page, "st:NSW = NSW", "the pressed item is NSW on the election frame");
+  assert.equal(await headTitle(page), "New South Wales · 2025", "the filtered head's title carries the middot year on an election frame");
   const menu25 = await menuLabels(page);
   assert.ok(menu25.some((l) => l.startsWith("aus = National")) && menu25.some((l) => l.startsWith("st:NSW = NSW")) && !menu25.some((l) => l.endsWith("figures")), `the 2025 menu names itself plainly: ${menu25.join(" | ")}`);
   const nswFig = await page.$eval("#story .st-stat", (e) => e.textContent);
@@ -92,6 +93,7 @@ try {
   await labelIs(page, "Filter seats", "a state election frame falls back to unfiltered — the inviter returns");
   await pressedIs(page, "aus = Victoria", "…its pressed item the frame's own jurisdiction, plain");
   assert.equal((await selLevel(page)).level, "aus", "a frame that can't show the slice carries no map selection");
+  assert.equal(await headTitle(page), "Victorian election", "…and the head is the frame's own, unmarked by the dormant pick");
   console.log("vic22 menu:", (await menuLabels(page)).join(" | "));
   await year(page, 2025);
   await pressedIs(page, "st:NSW = NSW", "back on a federal frame the pick's item returns");
@@ -114,10 +116,13 @@ try {
   await pick(page, clsScope);
   assert.equal(await label(page), "Change filter", `picked ${clsElection} on Now`);
   await pressedIs(page, `${clsScope} = ${clsElection}`, "its item pressed, plainly named");
+  assert.equal(await headTitle(page), clsElection, "a seat-type pick titles the head by the class too (bare on Now)");
+  assert.equal(await upLabel(page), "All seats", "…and earns the same 'All seats' way out as a state");
   assert.equal((await selLevel(page)).level, "aus", "a seat-type pick steps the state selection out");
   assert.ok(!(await noteShown()), `${clsElection} drops the note — its seats aren't in this class`);
   await year(page, 2025);
   await pressedIs(page, `${clsScope} = ${clsElection}`, `${clsElection} — plain — survives Now → 2025`);
+  assert.equal(await headTitle(page), `${clsElection} · 2025`, "…with the middot year on the election frame");
   await year(page, "vic22");
   await labelIs(page, "Filter seats", "a seat-type pick falls back on a state frame too");
   await year(page, 2025);
@@ -140,6 +145,12 @@ try {
   const ruralSmalls = await seatSmalls();
   assert.ok(ruralSmalls.length && ruralSmalls.some((t) => /[−+][1-9]/.test(t)), `Rural on Now carries the seat deltas: ${ruralSmalls.join(" ")}`);
   assert.ok(await noteShown(), "Rural on Now keeps the One Nation note");
+  // a seat-type filter's "All seats" clears through the menu's store too
+  assert.equal(await upLabel(page), "All seats", "Rural shows its own way out");
+  await page.click("#story .st-up");
+  await labelIs(page, "Filter seats", "…and 'All seats' clears a seat-type filter as well");
+  assert.equal(await headTitle(page), "The House today", "…with the head back to the frame's own");
+  assert.equal(await upLabel(page), null, "…and nothing left to step out from");
 
   assert.deepEqual(errors, [], "no page exceptions");
   console.log("PASS: the trigger invites (Filter seats) or offers its changer (Change filter); the pick rides frames as the pressed item, plainly named; the slice stays unified");

@@ -7724,9 +7724,12 @@ function seatCount(m, idx, fam) { return idx.filter((i) => m.divs[i].hold.fam ==
 /* ----- small figure builders ----- */
 function upLink() {
   const s = S.sel, m = M();
-  if (s.level === "aus") return "";
-  const label = s.level === "state" ? "All seats" : s.level === "div" ? STATE_TITLE[s.st] : m.divs[s.div].n;
-  const go = s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
+  // a seat-type filter has no map selection of its own but earns the same way
+  // out above the title (goAus clears the store through select's sync)
+  const clsScoped = m && s.level === "aus" && S.lens === "winner" && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls";
+  if (s.level === "aus" && !clsScoped) return "";
+  const label = s.level === "aus" || s.level === "state" ? "All seats" : s.level === "div" ? STATE_TITLE[s.st] : m.divs[s.div].n;
+  const go = s.level === "aus" || s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
   return `<button type="button" class="st-up" data-go="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${ds(label)}</button>`;
 }
 function head(title, meta, hed, dek, stat) {
@@ -8621,13 +8624,16 @@ function vtBlock(divs, area, geography) {
 
 function storyArea(m, st) {
   const aus = st === "AUS", { A, idx, N } = areaStats(m, st);
-  // the state slice keeps the whole-frame layout: the head's own marks are a
-  // title in the state's name and the "All seats" way out (upLink reads the
-  // same selection) — its figures scope in through statScopeOf below
-  const slice = aus ? sliceState(m) : null;
+  // a filtered Winner head titles itself by the filter — the state's own name
+  // or the seat type's — with the election's year after a middot on election
+  // frames (user call: "New South Wales · 2025", "Inner metro · 2025"); the
+  // state slice's "All seats" rides its map selection, and upLink's sibling
+  // read above gives the seat type the same way out
+  const pick = aus && S.lens === "winner" && !STATE_YEARS.has(m.year) ? statScopeOf(m) : { k: "aus" };
+  const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const { hed, dek, stat } = areaHedDek(m, st);
-  const title = slice ? STATE_TITLE[slice] : aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  const title = pickTitle ? `${pickTitle}${isNowY(m.year) ? "" : ` · ${m.year}`}` : aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
   // the Winner head's meta is the scope menu (statScopeLabel words it), and
   // its head follows whichever state or seat type is picked there

@@ -2537,7 +2537,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const sliceState = (m) =>") && st.includes('S.sel.level === "state"'), "the slice is defined from the map's state selection");
   assert.ok(st.includes('if (slice) return { k: "st", st: slice, open: statScopeStore.open };'), "a live slice outranks the store as the head's scope");
   assert.ok(st.includes('s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st))'), "a Winner-lens state slice renders the whole-frame layout");
-  assert.ok(st.includes("const slice = aus ? sliceState(m) : null;") && st.includes("slice ? STATE_TITLE[slice]"), "the slice's head mark is the title in the state's name (and upLink's 'All seats' reads the same selection)");
+  assert.ok(st.includes('const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;') && st.includes("` · ${m.year}`"), "a filtered Winner head titles itself by the filter, election frames carrying the year after a middot (New South Wales · 2025, Inner metro · 2025)");
+  assert.ok(st.includes('const clsScoped = m && s.level === "aus"'), "a seat-type filter earns the same 'All seats' way out above the title as a state slice (goAus clears the store through the sync)");
   assert.ok(ui.includes('statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open }'), "a state arrived at any side writes the menu's store");
   assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
   assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
