@@ -303,6 +303,12 @@ button { cursor: pointer; background: none; border: 0; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
 .st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; color: var(--ink); }
+/* the "formed govt" tag: an ink box hugging the governing family's side (ink/bg invert with the theme) */
+.st-fg { align-self: flex-start; display: flex; }
+.st-fg.st-fg-lnp { align-self: flex-end; }
+.st-fg > b { padding: 2px 6px 3px; background: var(--ink); color: var(--bg); font-size: 11px; font-weight: 600; line-height: 1.3; letter-spacing: 0.04em; border-radius: 2px; }
+.st-swing + .st-fg, .st-tpp + .st-fg { margin-top: 9px; }
+.st-fg + .st-lab { margin-top: 22px; }
 .st-grid { display: inline-grid; justify-items: center; align-items: baseline; }
 .st-grid small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink); }
 .st-seats.st-n4, .st-seats.st-n5 { font-size: 42px; }

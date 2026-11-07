@@ -414,6 +414,9 @@ function seatStat(m, st, label) {
     const sw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b></span>${sw}`;
   }
+  // the "formed govt" tag rides the two-party block on the governing family's side;
+  // an as-it-stands frame holds rather than won, so it's an election view only
+  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>formed govt</b></span>` : "";
   const change = (f, n) => {
     if (!base) return "";
     if (!base.c) return " "; // summary.json still on its way: the line keeps its place
@@ -437,7 +440,7 @@ function seatStat(m, st, label) {
   const mk = statSeatMakeup(m, idx);
   // the rate the Informal st-sec used to headline, as one more label line under Seats
   const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fg}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
