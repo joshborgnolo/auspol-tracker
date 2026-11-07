@@ -3755,10 +3755,10 @@ function flyToTown(i, opts = {}) {
 function flyToCity(k) {
   const [, st, ll] = CITIES[k];
   // a year whose jurisdiction holds no seats there (sa26: South Australia only,
-  // so Adelaide alone flies)
+  // so Adelaide alone flies). A jump is a camera move only — the state is not
+  // selected, a lit one lets go, and the jump never marks itself off a selection
   if (!M() || !M().areas[st]) return;
-  select({ level: "state", st }, { fly: false });
-  dock = null; // a city's view keeps no room for its state's islands
+  if (S.sel.level !== "aus") { select({ level: "aus" }, { fly: false }); dock = null; }
   const go = (dur) => {
     // (repeated on a later year: one whose frame has lost the city frames the selection instead)
     if (!M().areas[st]) { reframe = null; fitSelection(dur); return; }
