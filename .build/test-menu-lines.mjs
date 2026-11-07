@@ -130,7 +130,7 @@ const fresh = (mutate) => {
   assert.equal(flat.fig, null, "not half a figure");
 }
 
-/* ---- Election map: both chambers on one figure line (/maps/'s data, gen-data's house) */
+/* ---- Election map: both chambers on one figure line (/map/'s data, gen-data's house) */
 {
   const line = (H) => J(fresh((D) => { D.house = H; }).menuLines().map || null);
   const S0 = { asOf: "2026-10-09", total: 76, seats: { alp: 30, lnp: 27, grn: 10, onp: 4, ind: 2, oth: 3 } };

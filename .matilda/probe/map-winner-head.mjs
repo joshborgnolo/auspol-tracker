@@ -47,7 +47,7 @@ async function open(y, width = 1280) {
   await page.setViewport({ width, height: 950 });
   page.errors = [];
   page.on("pageerror", (e) => page.errors.push(e.message));
-  await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "load", timeout: 30000 });
+  await page.goto(`${base}/map/#y=${y}`, { waitUntil: "load", timeout: 30000 });
   const waitA = () => page.waitForFunction(() => window.__map && window.__map.M && window.__map.M(), { timeout: 45000 });
   try { await waitA(); }
   catch (e) {
@@ -163,6 +163,9 @@ const stat = (page) => page.evaluate(() => {
       jumpId: jump ? jump.id : null,
       jumpLabel: jump ? jump.querySelector("b").textContent.trim() : null,
       jumpChips: jump ? jump.querySelectorAll(".mp-ca").length : 0,
+      hintId: legend.querySelector(".lg-hint") ? legend.querySelector(".lg-hint").id : null,
+      hintText: legend.querySelector(".lg-hint") ? legend.querySelector(".lg-hint").textContent.trim() : null,
+      hintNotOnStage: !document.querySelector(".mp-tl #hint"),
       toggleText: jump ? jump.querySelector("[data-towns]").textContent.trim() : null,
       togglePressed: jump ? jump.querySelector("[data-towns]").getAttribute("aria-pressed") : null,
       drawCount: draw.length,
@@ -175,6 +178,7 @@ const stat = (page) => page.evaluate(() => {
   check("legend: title alone in the head line, outside lg-left, no seat legend", strip.headInLeft === false && strip.headChildren.length === 1 && strip.headChildren[0] === "lg-t" && strip.cats === 0, JSON.stringify(strip));
   check("legend: the old top-left cities overlay is gone", strip.mpCitiesGone && strip.citiesInOverlay);
   check("legend: the Jump-to row rides the strip with all eight capital cities", strip.jumpId === "cities" && strip.jumpLabel === "Jump to:" && strip.jumpChips === 8, JSON.stringify(strip));
+  check("legend: the zoom hint rides the strip too, its overlay gone", strip.hintId === "hint" && /Zoom in, or choose a seat/.test(strip.hintText) && strip.hintNotOnStage, JSON.stringify(strip));
   check("legend: starter City names toggle, pressed (names on)", strip.toggleText === "City names" && strip.togglePressed === "true", JSON.stringify(strip));
   check("legend: Drawn-as closes the section, its own last row at full width", strip.drawCount === 1 && strip.drawIsLast === true && strip.drawCol === "1 / -1" && strip.drawButtons === "Seats,Balloons,Surface,Areas", JSON.stringify(strip));
   check("legend: no horizontal overflow", strip.over <= 0, String(strip.over));

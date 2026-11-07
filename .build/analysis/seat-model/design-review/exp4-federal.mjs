@@ -1,7 +1,7 @@
 // E4: project today's national primaries onto the 150 seats under different swing geometries and flow sets,
 // deterministic (no noise) — how much does each modelling choice move the seat count?
 import { load, divRows, sum, mean, logit, ilogit, ridge, logitShift } from "./lib.mjs";
-const fed = load("maps/data/res-2025.json");
+const fed = load("map/data/res-2025.json");
 const R = divRows(fed);
 const P = ["alp", "lnp", "onp", "grn", "ind", "oth"];
 const w = R.map((r) => r.tot), W = sum(w);

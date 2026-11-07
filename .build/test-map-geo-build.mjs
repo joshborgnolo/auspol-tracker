@@ -1,5 +1,5 @@
 /* test-map-geo-build.mjs – pins the Election map's arc-once geometry build
-   (2026-11-01, the /maps/ speed pass) to what d3.geoPath draws.
+   (2026-11-01, the /map/ speed pass) to what d3.geoPath draws.
 
    buildGeo (app-1-base.js, the geo-core block) projects each topology
    arc once through the projection's own stream and draws a seat's rings, its
@@ -14,7 +14,7 @@
    same standard against the drawing they had before: the old handbookFeature
    (copied below as the reference: 0.05° pieces, d3.geoArea winding) through
    d3.geoPath, seat by seat, with bounds.
-   Run after editing the geometry build or rebuilding maps/data:
+   Run after editing the geometry build or rebuilding map/data:
      node .build/test-map-geo-build.mjs [--years=2025,sa26] */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -37,7 +37,7 @@ class Rec {
 }
 // d3 and topojson-client from the copies the page itself ships (CI's npm ci installs neither)
 const ctx = vm.createContext({ Path2D: Rec, performance, setTimeout });
-for (const f of ["maps/vendor/d3-7.9.0.min.js", "maps/vendor/topojson-client-3.1.0.min.js"]) vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8"), ctx);
+for (const f of ["map/vendor/d3-7.9.0.min.js", "map/vendor/topojson-client-3.1.0.min.js"]) vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8"), ctx);
 vm.runInContext(src.slice(m0, m1) + "\nthis.geoSteps = geoSteps;", ctx);
 // the Handbook build: its ring helpers and the async two-pass build, under a proj of its own
 const cut = (a, b) => { const i = src.indexOf(a), j = src.indexOf(b, i); assert.ok(i > 0 && j > i, `found ${a}`); return src.slice(i, j); };
@@ -66,7 +66,7 @@ const sameCmds = (a, b, what) => {
 };
 
 const yf = process.argv.find((a) => a.startsWith("--years="));
-const DATA = path.join(ROOT, "maps/data");
+const DATA = path.join(ROOT, "map/data");
 let years = fs.readdirSync(DATA).map((f) => /^geo-(\w+)-lo\.json$/.exec(f)).filter(Boolean).map((r) => r[1]);
 if (yf) years = yf.slice(8).split(",");
 let frames = 0, seats = 0;

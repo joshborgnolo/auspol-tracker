@@ -1,4 +1,4 @@
-// Probe: /maps/'s Informal figure hangs as a label line UNDER the How-votes-
+// Probe: /map/'s Informal figure hangs as a label line UNDER the How-votes-
 // were-cast section (moved out of the winner head 2026-11-07 — it closed the
 // head before; user call: it belongs with the count's cast-type story). The
 // figure keeps the head's figures scope, verified against the raw 2025 data
@@ -15,12 +15,12 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
-await page.goto(`${base}/maps/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
+await page.goto(`${base}/map/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
 await wait(1500);
 
 // what the raw data says the rates are, pooled the way the app pools them
 const expect = await page.evaluate(async () => {
-  const r = await fetch("/maps/data/core-2025.json"), j = await r.json();
+  const r = await fetch("/map/data/core-2025.json"), j = await r.json();
   const pool = (rows) => {
     let inf = 0, formal = 0;
     for (const d of rows) { inf += d.inf || 0; for (const c of d.c) formal += c[4]; }

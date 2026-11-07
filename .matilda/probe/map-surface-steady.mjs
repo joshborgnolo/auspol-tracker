@@ -18,7 +18,7 @@ for (const dsf of [2, 1]) {
   const page = await browser.newPage();
   page.on("pageerror", (e) => errs.push(e.message));
   await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: dsf });
-  await page.goto(`${base}/maps/#draw=surface`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${base}/map/#draw=surface`, { waitUntil: "networkidle2", timeout: 60000 });
   for (let i = 0; i < 80; i++) { if (await page.evaluate("!!(window.__map && window.__map.SF && window.__map.SF.base)")) break; await wait(250); }
   await wait(2500);
   await page.evaluate(() => document.querySelector("#stage").scrollIntoView({ block: "center", behavior: "instant" })); await wait(300);

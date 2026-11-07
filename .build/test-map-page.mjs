@@ -1,9 +1,9 @@
-/* test-map-page.mjs – pins the Electoral-maps page (/maps/, 2026-10-25) into the site:
+/* test-map-page.mjs – pins the Electoral-maps page (/map/, 2026-10-25) into the site:
    a ☰ menu page OUTSIDE the main build (TABS' ext entry), so
    - the main page's TABS lists it as a menu page with ext, and keeps it out
      of every view of its own: the paths, the page turn, the menu-page view,
      the build's tab documents, and /vic/'s menu;
-   - the menu links it at /maps/ in both designs and in the shell, and the
+   - the menu links it at /map/ in both designs and in the shell, and the
      map page's own shell marks its row current and names the button;
    - the menu splits into two column sheets from 1060px in the main page and
      the shell alike;
@@ -26,7 +26,7 @@ const app = R(".build/newtracker/assets/73de0c58-f11f-4793-9f90-77e583ab051b.js"
 const views = R(".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js");
 
 // ---- TABS: a menu page with ext, never a view of the main page
-assert.ok(app.includes('{ id: "map", label: "Electoral maps", menu: true, ext: true,'), "TABS lists the map as an ext menu page");
+assert.ok(app.includes('{ id: "map", label: "Electoral map", menu: true, ext: true,'), "TABS lists the map as an ext menu page");
 assert.ok(app.includes("const TAB_IDS = TABS.filter((t) => !t.ext).map((t) => t.id);"), "no path of the main page is the map's");
 assert.ok(app.includes("TABS.filter((t) => t.menu && !t.ext)"), "no menu-page view for the map");
 assert.equal((app.match(/const ids = TAB_IDS;/g) || []).length, 2, "the swipe and the arrow keys turn only the main page's own pages");
@@ -34,9 +34,9 @@ assert.ok(app.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id =
 const build = R(".build/newtracker/build.mjs");
 assert.ok(!/\{ id: "map", label:/.test(build), "build.mjs emits no tab document for the map");
 
-// ---- the menu: an ext row is a plain link to /maps/, in both designs
+// ---- the menu: an ext row is a plain link to /map/, in both designs
 assert.ok(views.includes('const menuHref = (t) => (t.ext ? t.href || "/" + t.id + "/"'), "the menu's href for an ext row is its own path (or its href: /vic/'s Election model row opens /model/#j=vic)");
-assert.ok(/id: "map"[^}]*href: "\/maps\/"/.test(app), "the map row keeps its id but links /maps/ explicitly (the old /map/ path is a redirect stub)");
+assert.ok(!/id: "map"[^}]*href:/.test(app), "the map row needs no href override: its id derives /map/ already (the /maps/ habitation is a redirect stub)");
 // three: both designs' rows, and the redesign's flows-explainer row once its numbers are fields (its link sits beside them)
 assert.equal((views.match(/href=\{menuHref\(t\)\}/g) || []).length, 3, "both designs' menus link through menuHref");
 assert.ok(views.includes("if ((tabs.find((t) => t.id === id) || {}).ext) { setMenuOpen(false); return; }"), "a click on the map's row follows its link");
@@ -48,32 +48,32 @@ assert.ok(/body\.rd \.tab-menu-pop\.tab-menu-two \{ background: none; border: 0;
 assert.ok(shellJs().includes("var two = vw >= 1060") && shellJs().includes('"sh-menu-col"'), "the shell's menu splits from 1060px");
 assert.ok(shellCss().includes(".sh-menu.sh-menu-two { background: none; border: 0; box-shadow: none; }") && shellCss().includes(".sh-menu-col {"), "each column a sheet of its own (shell)");
 
-// ---- the shell: every satellite's menu links /maps/; the map page marks itself
-const opts = SHELL_PAGES.find((p) => p.file === "maps/index.html");
-assert.ok(opts && opts.menu === "map", "maps/index.html carries the shell as the map's menu page");
-assert.ok(/<a role="menuitem"[^>]*href="\/maps\/"[^>]*data-id="map"/.test(shellHeader({})), "the shell's menu links /maps/");
+// ---- the shell: every satellite's menu links /map/; the map page marks itself
+const opts = SHELL_PAGES.find((p) => p.file === "map/index.html");
+assert.ok(opts && opts.menu === "map", "map/index.html carries the shell as the map's menu page");
+assert.ok(/<a role="menuitem"[^>]*href="\/map\/"[^>]*data-id="map"/.test(shellHeader({})), "the shell's menu links /map/");
 const own = shellHeader(opts);
-assert.ok(/class="sh-menu-item on" href="\/maps\/" data-id="map" aria-current="page"/.test(own), "the map's row is current on its own page");
-assert.ok(own.includes('<span class="sh-menu-lab">Electoral maps</span>') && own.includes('aria-label="More pages – on Electoral maps"'), "the button names the page");
-assert.ok(!/<span class="sh-menu-lab">Electoral maps/.test(shellHeader({})), "other pages' buttons still say More");
+assert.ok(/class="sh-menu-item on" href="\/map\/" data-id="map" aria-current="page"/.test(own), "the map's row is current on its own page");
+assert.ok(own.includes('<span class="sh-menu-lab">Electoral map</span>') && own.includes('aria-label="More pages – on Electoral map"'), "the button names the page");
+assert.ok(!/<span class="sh-menu-lab">Electoral map/.test(shellHeader({})), "other pages' buttons still say More");
 
 // ---- the page: its assembled script and styles current, its data present, the sitemap
-const page = R("maps/index.html");
-for (const src of ["/maps/vendor/d3-7.9.0.min.js", "/maps/vendor/topojson-client-3.1.0.min.js", "/maps/map.js", "/maps/map.css"]) {
+const page = R("map/index.html");
+for (const src of ["/map/vendor/d3-7.9.0.min.js", "/map/vendor/topojson-client-3.1.0.min.js", "/map/map.js", "/map/map.css"]) {
   assert.ok(page.includes(src), "the page loads " + src);
   assert.ok(fs.existsSync(path.join(ROOT, src.slice(1))), src + " exists");
 }
 // the asset URLs carry assemble.mjs's content hash, so a browser cache
 // holding an old map.js can't survive a release (phone stuck 2026-10-25)
-const hs = (f) => crypto.createHash("sha1").update(fs.readFileSync(path.join(ROOT, "maps", f))).digest("hex").slice(0, 8);
-assert.ok(page.includes(`src="/maps/map.js?v=${hs("map.js")}"`), "the page's map.js URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
-assert.ok(page.includes(`href="/maps/map.css?v=${hs("map.css")}"`), "the page's map.css URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
+const hs = (f) => crypto.createHash("sha1").update(fs.readFileSync(path.join(ROOT, "map", f))).digest("hex").slice(0, 8);
+assert.ok(page.includes(`src="/map/map.js?v=${hs("map.js")}"`), "the page's map.js URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
+assert.ok(page.includes(`href="/map/map.css?v=${hs("map.css")}"`), "the page's map.css URL is stamped with the file's current hash (node .build/map/assemble.mjs)");
 // a botched merge resolution ships its markers to the live page (7ae2bbe4's
 // rebase landed <<<<<<< HEAD above the footer, 2026-10-26)
-assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "maps/index.html carries no git conflict-marker lines");
+assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git conflict-marker lines");
 // one loader tag, once: 6a08ba3f's raced rebase staging shipped the marker
 // block's two identical arms and the map's IIFE ran twice on the live page
-assert.equal(page.split('src="/maps/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
+assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
 const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
 // era-impossible options drop from the frame's own menus: the IRSAD
@@ -84,7 +84,7 @@ assert.ok(/const ixFor = \(m\) => IX\.filter\(\(k\) => !m\.hasIx \|\| m\.hasIx\[
 assert.ok(js.includes("famEraOpts = (m) => FAMS.filter") && js.includes("FAM_FORMED = { onp: 1998 }"), "the family menu drops One Nation before its first possible federal votes");
 assert.ok(js.includes('if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";'), "a year swap onto an era before One Nation drops S.party to the Coalition family");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
-assert.equal(R("maps/map.js"), stampMeta(stampData(`/* the Electoral maps – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "maps/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any maps/data file)");
+assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Electoral map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
 // the eyebrow's floor measures every election's real meta line from the facts stamped in (data-stamp.mjs);
 // a year the stamp lacks would be left out of the floor, and walking to it would move the map
 {
@@ -94,9 +94,9 @@ assert.equal(R("maps/map.js"), stampMeta(stampData(`/* the Electoral maps – as
   // an upper-house file exists only for the frames that have one (sa26/sa22's
   // Legislative Council and vic22's ride senate-<year>.json with lc:true)
   const LC_YEARS = [], SEN_FILES = [];
-  for (const f of fs.readdirSync(path.join(ROOT, "maps/data"))) {
+  for (const f of fs.readdirSync(path.join(ROOT, "map/data"))) {
     const m = f.match(/^senate-(\w+)\.json$/);
-    if (m) { const s = JSON.parse(R("maps/data/" + f)); if (s && s.lc) LC_YEARS.push(m[1]); SEN_FILES.push(m[1]); }
+    if (m) { const s = JSON.parse(R("map/data/" + f)); if (s && s.lc) LC_YEARS.push(m[1]); SEN_FILES.push(m[1]); }
   }
   assert.ok(LC_YEARS.includes("vic22") && F.senate.vic22, "meta facts: vic22's council has its Senate line (the Legislative Council rides senate-vic22.json)");
   for (const y of years.filter((y) => y !== "now" && !LC_YEARS.includes(y) && SEN_FILES.includes(y))) assert.ok(F.senate[y] && F.senate[y][0] && F.senate[y][1] > 0, `meta facts: the Senate line for ${y}`);
@@ -106,23 +106,23 @@ assert.equal(R("maps/map.js"), stampMeta(stampData(`/* the Electoral maps – as
 assert.ok(js.includes("const DATA_V = /*@data-stamps*/{};") && js.includes("fetch(v ? `${u}?v=${v}` : u"), "getJSON asks for each data file by its stamped hash");
 // each results file's core (core-split.mjs: the file without its polling places' census lanes) is
 // current and committed, and a frame loads it first, the full file only for those lanes (loadPpl)
-for (const f of fs.readdirSync(path.join(ROOT, "maps/data")).sort()) {
+for (const f of fs.readdirSync(path.join(ROOT, "map/data")).sort()) {
   const m = f.match(/^res-(\w+)\.json$/);
   if (!m) continue;
-  const c = `maps/data/core-${m[1]}.json`;
-  assert.ok(fs.existsSync(path.join(ROOT, c)) && R(c) === coreText(R("maps/data/" + f)), `${c} is current (node .build/map/assemble.mjs after rebuilding ${f})`);
+  const c = `map/data/core-${m[1]}.json`;
+  assert.ok(fs.existsSync(path.join(ROOT, c)) && R(c) === coreText(R("map/data/" + f)), `${c} is current (node .build/map/assemble.mjs after rebuilding ${f})`);
   if (dataStamps(ROOT)["res-" + m[1] + ".json"]) assert.ok(dataStamps(ROOT)["core-" + m[1] + ".json"], `${c} is committed beside ${f} (git add it: the page asks for it by its stamp)`);
 }
-assert.ok(js.includes("getJSON(`/maps/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
-assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("maps/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
-assert.equal(R("maps/map.css"), part("page.css"), "maps/map.css is current (node .build/map/assemble.mjs)");
+assert.ok(js.includes("getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
+assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("map/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
+assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
 // how votes were cast: each seat's Labor and Coalition votes by pile (build_vote_piles.py, re-run after anything that
 // rewrites a res file) add up to its final count; every seat from 2016, before that the Labor v Coalition pairs, none in 1993
 {
   const FEDERAL = [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
   const add = (v2) => Object.values(v2).reduce((t, p) => [t[0] + p[0], t[1] + p[1]], [0, 0]);
   for (const y of FEDERAL) {
-    const r = JSON.parse(R(`maps/data/res-${y}.json`)), b = r.booths;
+    const r = JSON.parse(R(`map/data/res-${y}.json`)), b = r.booths;
     const early = new Array(r.divs.length).fill(0);
     b.d.forEach((d, j) => { if (b.ty[j] === 5) early[d] += b.v[j].reduce((a, v) => a + v, 0); });
     r.divs.forEach((d, i) => {
@@ -141,9 +141,9 @@ assert.equal(R("maps/map.css"), part("page.css"), "maps/map.css is current (node
       } else assert.ok(!d.vt2, `${y} ${d.n}: no two-party split from a final two of another pair`);
     });
   }
-  assert.ok(JSON.parse(R("maps/data/res-1993.json")).divs.every((d) => !d.vt2), "1993's count stops at the division: no piles");
+  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2), "1993's count stops at the division: no piles");
   // the national figures quoted when this shipped: the headline is the AEC's own, and the piles reach it
-  const r = JSON.parse(R("maps/data/res-2025.json")), T = {};
+  const r = JSON.parse(R("map/data/res-2025.json")), T = {};
   for (const d of r.divs) for (const [k, p] of Object.entries(d.vt2)) { const t = (T[k] ??= [0, 0]); t[0] += p[0]; t[1] += p[1]; }
   const lab = (k) => Math.round((1000 * T[k][0]) / (T[k][0] + T[k][1])) / 10;
   assert.deepEqual([lab("day"), lab("ppvc"), lab("post")], [58.0, 53.0, 51.6], "2025 on the day, early centres, postal");
@@ -161,7 +161,7 @@ assert.equal(R("maps/map.css"), part("page.css"), "maps/map.css is current (node
   const FAMS6 = ["alp", "lnp", "grn", "onp", "ind", "oth"];
   const FAMS6_SORTED = [...FAMS6].sort();
   for (const [ys, joined] of Object.entries(ORA)) {
-    const y = +ys, b = JSON.parse(R(`maps/data/res-${y}.json`)).booths, pf = b.prevFp;
+    const y = +ys, b = JSON.parse(R(`map/data/res-${y}.json`)).booths, pf = b.prevFp;
     assert.ok(Array.isArray(pf) && pf.length === b.id.length, `${y}: booths.prevFp rides beside every polling place`);
     assert.equal(pf.filter((x) => x != null).length, joined, `${y}: ${joined} places stood at the previous election`);
     let greens = 0;
@@ -175,11 +175,11 @@ assert.equal(R("maps/map.css"), part("page.css"), "maps/map.css is current (node
     assert.ok(greens > 0, `${y}: at least one place joined (the first-read bug claimed none stood, Greens included)`);
   }
   for (const y of [1996, 1998, 2001, 2004])
-    assert.ok(!JSON.parse(R(`maps/data/res-${y}.json`)).booths.prevFp, `${y}: no prevFp lane — the previous election predates the lanes`);
+    assert.ok(!JSON.parse(R(`map/data/res-${y}.json`)).booths.prevFp, `${y}: no prevFp lane — the previous election predates the lanes`);
   // a hand-read fixture: Fitzroy's 2022 family shares (a Greens heartland the
   // first report named), against its 2025 row
   {
-    const b = JSON.parse(R("maps/data/res-2025.json")).booths;
+    const b = JSON.parse(R("map/data/res-2025.json")).booths;
     const j = b.id.indexOf(4631);
     assert.ok(b.n[j] === "Fitzroy" && b.prevFp[j] != null, "2025: Fitzroy joined to its 2022 self");
     assert.deepEqual(b.prevFp[j], { alp: 23.1, lnp: 8.33, grn: 59.23, onp: 0.65, ind: 1.01, oth: 7.68 }, "Fitzroy's 2022 family shares");
@@ -193,7 +193,7 @@ assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.l
 assert.ok(js.includes('const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;') && js.includes("castScope.divs : m.res.divs.filter("), "the 2025 and Now charts follow the selected figures scope; the area block reads election results, since Now blanks a by-election's piles");
 assert.ok(js.includes('if (M().year === 2025 || M().year === "now") return vtBandsBlock('), "the Now frame shows the band chart, not the old table");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
-assert.ok(!/\.stackl/.test(R("maps/map.css")), "the old two-column legend is gone");
+assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
 // 2001-census edition's own nine (its B 06 prints a whole-UK row the
 // menu leads with, as eng leads the GCP menu — used by both the 2001
@@ -203,17 +203,17 @@ const CENSUS01_COB_KEYS = ["uk", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita"
 // the Ancestry select menu's twelve options (the 2026-10-31 lanes arc; full words so it can't collide with the birthplace menu's abbreviated keys)
 const ANC_GCP = ["english", "australian", "irish", "scottish", "chinese", "italian", "german", "indian", "filipino", "dutch", "vietnamese", "lebanese"];
 for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-  for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+  for (const f of [`res-${y}.json`, `geo-${y}-lo.json`, `geo-${y}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
 }
 { // 1996: AEC statistics-pack results, Handbook polygons and the common
   // historical_booth_locations.py matcher. README-history.md documents the
   // source limitations and superseded ABS/venue matching recipes.
-  for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "1996 lane " + f + " on disk");
+  for (const f of ["senate-1996.json", "senate-vote-1996.json", "res-1996.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "1996 lane " + f + " on disk");
   assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-1996.json")), "the 1996 SEIFA venue store (derive-booth-seifa-stats90s.py; historically derive-1996-venues.py) is on disk");
-  const D = JSON.parse(R("maps/data/res-1996.json"));
-  const r = JSON.parse(R("maps/data/res-1996.json"));
-  const S = JSON.parse(R("maps/data/senate-1996.json"));
-  const SV = JSON.parse(R("maps/data/senate-vote-1996.json"));
+  const D = JSON.parse(R("map/data/res-1996.json"));
+  const r = JSON.parse(R("map/data/res-1996.json"));
+  const S = JSON.parse(R("map/data/senate-1996.json"));
+  const SV = JSON.parse(R("map/data/senate-vote-1996.json"));
   assert.equal(D.year, 1996);
   assert.equal(D.divs.length, 148, "1996 has its 148 divisions (Namadgi's only term)");
   assert.equal(D.date, "1996-03-02");
@@ -228,7 +228,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // (its 2001 class line landed the same way in b5eb8d35's recital): bind
   // it to the certified lanes it must never drift from
   {
-    const SUM_J = JSON.parse(R("maps/data/summary.json"));
+    const SUM_J = JSON.parse(R("map/data/summary.json"));
     assert.ok(SUM_J.seats["1996"] && SUM_J.tpp["1996"], "summary.json carries the 1996 record (seats + tpp)");
     const fam = (p) => (p === "ALP" ? "alp" : ["LP", "NP", "CLP"].includes(p) ? "lnp" : "ind");
     const want = {};
@@ -335,7 +335,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // contract: interp record, division/booth demo coverage and the
   // income/SEIFA-floor invariants the rest of the page relies on
   for (const [y, f, c0, c1, near, nDivs, sf, cuts] of [[1993, 0.320197, 1991, 1996, 1991, 147, [1011.837, 0.625583, 7], { dy: 1991, basis: "households", lo: 345.51 }], [1998, 0.431308, 1996, 2001, 1996, 148, [1008.1, 0.615664, 7], "income-span"]]) {
-    const D = JSON.parse(R(`maps/data/res-${y}.json`));
+    const D = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(D.year, y);
     assert.equal(D.divs.length, nDivs, `${y} has its ${nDivs} divisions`);
     assert.equal(D.demoBasis, "venue", `${y}'s census people basis is the venue-CD lane`);
@@ -431,12 +431,12 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   // v310-2001.txt.gz official per-place flows, asgc2001.gpkg boundary plus the
   // senate lanes on the handbook caches and sppvote). AsOf is the election's day and
   // seats/total figures are the AEC's own (howard 82 seats, TISBHG-independent 1 seat).
-  for (const f of ["senate-2001.json", "senate-vote-2001.json", "res-2001.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "2001 lane " + f + " on disk");
+  for (const f of ["senate-2001.json", "senate-vote-2001.json", "res-2001.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "2001 lane " + f + " on disk");
   assert.ok(fs.existsSync(path.join(ROOT, "data", "booth-seifa-2001.json")), "the 2001 venue store (derive-2001-venues.py) is on disk");
-  const D = JSON.parse(R("maps/data/res-2001.json"));
-  const r = JSON.parse(R("maps/data/res-2001.json"));
-  const S = JSON.parse(R("maps/data/senate-2001.json"));
-  const SV = JSON.parse(R("maps/data/senate-vote-2001.json"));
+  const D = JSON.parse(R("map/data/res-2001.json"));
+  const r = JSON.parse(R("map/data/res-2001.json"));
+  const S = JSON.parse(R("map/data/senate-2001.json"));
+  const SV = JSON.parse(R("map/data/senate-vote-2001.json"));
   assert.equal(D.year, 2001);
   assert.equal(D.divs.length, 150, "2001 has its 150 divisions");
   assert.equal(D.date, "2001-11-10");
@@ -535,7 +535,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
 {
   const INTERP = { 2004: [2001, 2006, 2006, 0.634373], 2007: [2006, 2011, 2006, 0.258894], 2010: [2006, 2011, 2011, 0.806787], 2013: [2011, 2016, 2011, 0.415982], 2016: [2011, 2016, 2016, 0.979201], 2019: [2016, 2021, 2021, 0.553914] };
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-    const r = JSON.parse(R(`maps/data/res-${y}.json`));
+    const r = JSON.parse(R(`map/data/res-${y}.json`));
     if (!INTERP[y]) {
       assert.ok(!r.demoInterp, `${y} has no demoInterp record`);
       continue;
@@ -564,14 +564,14 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     2019: [4000, 2021, [2016, 2021]],
   };
   for (const [y, [edge, dollars]] of Object.entries(CUTS_I)) {
-    const rc = JSON.parse(R(`maps/data/res-${y}.json`)).incomeCuts;
+    const rc = JSON.parse(R(`map/data/res-${y}.json`)).incomeCuts;
     assert.ok(rc && rc.hiEdgeWeekly === edge && rc.dollarsYear === dollars, `${y} incomeCuts: nearest-side ${edge} edge in ${dollars} dollars`);
   }
-  const r04 = JSON.parse(R("maps/data/res-2004.json"));
+  const r04 = JSON.parse(R("map/data/res-2004.json"));
   assert.ok(r04.incomeCuts.sides && r04.incomeCuts.sides["2001"] && r04.incomeCuts.sides["2006"], "2004 incomeCuts names its 2001/2006 bracketing editions in sides");
-  const r10 = JSON.parse(R("maps/data/res-2010.json"));
+  const r10 = JSON.parse(R("map/data/res-2010.json"));
   assert.ok(r10.incomeCuts.sides && r10.incomeCuts.sides["2006"] && r10.incomeCuts.sides["2011"], "2010 incomeCuts names its 2006/2011 bracketing editions in sides");
-  const r19 = JSON.parse(R("maps/data/res-2019.json"));
+  const r19 = JSON.parse(R("map/data/res-2019.json"));
   assert.ok(r19.incomeCuts.sides && r19.incomeCuts.sides["2016"] && r19.incomeCuts.sides["2021"], "2019 incomeCuts names both bracketing epochs in sides");
   // the Household-income lens's median spectrum (2026-10-31): every
   // income year carries the national household median at its nearest
@@ -586,7 +586,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     2025: [1801, 2021, 8907, 1161],
   };
   for (const [y, [med, dollars, boothN, hin]] of Object.entries(MED_Y)) {
-    const J = JSON.parse(R(`maps/data/res-${y}.json`));
+    const J = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(J.incomeCuts.medWeekly, med, `${y}: the national household median rides its nearest census epoch`);
     assert.equal(J.incomeCuts.dollarsYear, dollars, `${y}: the median's dollar epoch matches the incomeCuts nearest side`);
     assert.equal(J.divs.every((d) => d.demo && d.demo.medIncWeekly != null), true, `${y}: every division carries its household median`);
@@ -615,7 +615,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     2025: [39, 0.0835, 0.0758, 8913, "Chifley", 32],
   };
   for (const [y, [med, a18, a75s, boothN, yng, yngAge]] of Object.entries(AGE_Y)) {
-    const J = JSON.parse(R(`maps/data/res-${y}.json`));
+    const J = JSON.parse(R(`map/data/res-${y}.json`));
     assert.equal(J.ageCuts.medAge, med, `${y}: the national median age pools from the division band dicts`);
     assert.equal(J.ageCuts.a1824, a18, `${y}: the 18–24 national share (the 15–19 estimate inside)`);
     assert.equal(J.ageCuts.a75, a75s, `${y}: the 75-and-over national share`);
@@ -633,7 +633,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   const VENUE08 = CENSUS01_COB_KEYS.slice(1);
   const MENUS = { 2001: CENSUS01_COB_KEYS, 2004: CENSUS01_COB_KEYS, 2007: VENUE08, 2010: VENUE08, 2013: VENUE08, 2016: GCP_COB_KEYS, 2019: GCP_COB_KEYS, 2022: GCP_COB_KEYS, 2025: GCP_COB_KEYS };
   for (const [y, menu] of Object.entries(MENUS)) {
-    const r = JSON.parse(R(`maps/data/res-${y}.json`));
+    const r = JSON.parse(R(`map/data/res-${y}.json`));
     assert.deepEqual(r.cobKeys, menu, `${y} birthplace menu rides its own census edition`);
     assert.equal(r.booths.cob.length, r.booths.n.length, `${y} cob rows ride the full booth lane`);
     assert.equal(r.booths.cob.filter(Boolean).length, r.booths.demo.filter(Boolean).length, `${y} cob rows ride exactly the landed demo rows`);
@@ -642,12 +642,12 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
 }
 // the islands past the mainland frame, drawn in inset boxes (node .build/map/islands_build.mjs)
 {
-  const isl = JSON.parse(R("maps/data/islands.json"));
+  const isl = JSON.parse(R("map/data/islands.json"));
   assert.deepEqual(isl.islands.map((s) => s.key), ["norfolk", "lordhowe", "christmas", "cocos"], "islands.json holds the four inset islands");
   assert.ok(isl.islands.every((s) => s.rings.length), "every inset island has a coast");
   assert.equal(isl.owner[2025].norfolk, "Bean", "Norfolk Island is in Bean in 2025");
 }
-const now = JSON.parse(R("maps/data/data-now.json"));
+const now = JSON.parse(R("map/data/data-now.json"));
 assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the Now overlay carries the Farrer by-election");
 // the chamber seats each year's members where the Parliament's seating plan puts them (node .build/map/seating.mjs)
 {
@@ -657,7 +657,7 @@ assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the 
     // Assembly variant of this chamber's floor: pinned below)
     .filter((y) => !/^sa/.test(y) && y !== "vic22");
   for (const y of seated) {
-    const seats = JSON.parse(R(`maps/data/seats-${y}.json`)), res = JSON.parse(R(`maps/data/res-${y === "now" ? 2025 : y}.json`));
+    const seats = JSON.parse(R(`map/data/seats-${y}.json`)), res = JSON.parse(R(`map/data/res-${y === "now" ? 2025 : y}.json`));
     const ids = Object.values(seats.at), names = new Set(res.divs.map((d) => d.n));
     assert.equal(ids.length, res.divs.length - 1, `${y}: the seating plan seats every member but the Speaker`);
     assert.equal(new Set(ids).size, ids.length, `${y}: no two members share a seat`);
@@ -665,7 +665,7 @@ assert.ok(now.byelections && now.byelections.Farrer && now.holders.Farrer, "the 
     assert.ok(ids.every((id) => cells.includes(id)), `${y}: every seat id is one of the chamber's seats`);
   }
 }
-assert.ok(/<loc>https:\/\/auspoltracker\.com\/maps\/<\/loc>/.test(R("sitemap.xml")), "the sitemap lists /maps/");
+assert.ok(/<loc>https:\/\/auspoltracker\.com\/map\/<\/loc>/.test(R("sitemap.xml")), "the sitemap lists /map/");
 assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|atlas|vic)\//.test(page), "the map links none of the unlisted pages");
 
 // a state election's agg holds only its own state (sa26: SA and AUS), so
@@ -675,13 +675,13 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const src = part("app-1-base.js");
   const fn = src.match(/function buildSearch\(m\) \{[\s\S]*?\n\}/)[0];
   assert.ok(!/m\.areas\[st\]\.idx/.test(fn), "buildSearch never dereferences a state that has no area");
-  const sa = JSON.parse(R("maps/data/res-sa26.json"));
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.deepEqual(Object.keys(sa.agg), ["AUS", "SA"], "sa26 carries only the SA frame's areas");
 }
 // a timeline year from the DOM is a WORD ("sa26", "now"), never unary-+
 // coerced: +g.dataset.year turned "sa26" into NaN and the stop click fetched
 // res-NaN.json (404 -> "That election didn't load", 2026-10-26). yearOf keeps
-// a word year a word; the /maps/ and #y=2025 stop clicks were pinned end-to-end
+// a word year a word; the /map/ and #y=2025 stop clicks were pinned end-to-end
 // with .matilda/sa26-load-probe.mjs
 {
   const ui = part("app-6-ui.js");
@@ -760,9 +760,9 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(sen.includes("&& !QLD_YEARS.has(y)"), "SEN_YEARS leaves the Queensland frames out (multicameral only where the Council lane exists)");
   assert.ok(sen.includes("&& !isNowY(y)"), "SEN_YEARS leaves the state now-keys out (a state now-frame's overlay is Assembly-only)");
   assert.ok(sen.includes("&& !WA_YEARS.has(y)"), "SEN_YEARS leaves the Western Australian frames out (no LC lane is shipped for them)");
-  assert.ok(!fs.existsSync(path.join(ROOT, "maps/data/senate-qld17.json")) && !fs.existsSync(path.join(ROOT, "maps/data/senate-qld20.json")) && !fs.existsSync(path.join(ROOT, "maps/data/senate-qld24.json")), "no Queensland upper-house files exist to fetch");
-  assert.ok(!fs.existsSync(path.join(ROOT, "maps/data/senate-nswnow.json")), "no senate file for nswnow (the Council's own since-2023 moves are not the overlay's)");
-  for (const wf of ["wa17", "wa21", "wa25"]) assert.ok(!fs.existsSync(path.join(ROOT, `maps/data/senate-${wf}.json`)), `no senate file for ${wf} (Assembly-only land)`);
+  assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-qld17.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld20.json")) && !fs.existsSync(path.join(ROOT, "map/data/senate-qld24.json")), "no Queensland upper-house files exist to fetch");
+  assert.ok(!fs.existsSync(path.join(ROOT, "map/data/senate-nswnow.json")), "no senate file for nswnow (the Council's own since-2023 moves are not the overlay's)");
+  for (const wf of ["wa17", "wa21", "wa25"]) assert.ok(!fs.existsSync(path.join(ROOT, `map/data/senate-${wf}.json`)), `no senate file for ${wf} (Assembly-only land)`);
 }
 // the NSW "now" frame rides the generalised overlay table (2026-11-04: the
 // Assembly as it stands after Epping/Hornsby/Pittwater's October 2024 and
@@ -772,7 +772,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('const NOW_OF = { now: 2025, nswnow: "nsw23", qldnow: "qld24", wanow: "wa25" };') && base.includes('const NOW_DATA = { now: "data-now.json", nswnow: "data-now-nsw.json", qldnow: "data-now-qld.json", wanow: "data-now-wa.json" };'), "the as-it-stands overlay table names each frame's base and overlay file (wanow joined 2026-11-05)");
   assert.ok(base.includes('const isNowY = (y) => y in NOW_OF;') && base.includes('const nowRy = (y) =>'), "isNowY/nowRy generalise the federal Now's hardcodes");
   assert.equal((base.match(/m\.year === "now"/g) || []).length, 1, "app-1-base keeps one federal-only fork (the islands' owner — a state now-frame's islands are the empty set upstream)");
-  const now = JSON.parse(R("maps/data/data-now-nsw.json"));
+  const now = JSON.parse(R("map/data/data-now-nsw.json"));
   assert.ok(now && now.asOf && now.changes.length === 8 && Object.keys(now.holders).length === 4, "data-now-nsw.json: asOf, 8 member events, 4 holders");
   assert.deepEqual(Object.keys(now.byelections || {}).sort(), ["Epping", "Hornsby", "Kiama", "Pittwater"], "the four by-elections");
   for (const [dist, by] of Object.entries(now.byelections)) {
@@ -788,7 +788,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(now.holders.Pittwater.n, "Jacqui Scruby", "nswnow: Pittwater's member");
   assert.equal(now.holders.Epping.n, "Monica Tudehope", "nswnow: Epping's member");
   assert.equal(now.holders.Hornsby.n, "James Wallace", "nswnow: Hornsby's member");
-  const sum = JSON.parse(R("maps/data/summary.json"));
+  const sum = JSON.parse(R("map/data/summary.json"));
   assert.deepEqual(sum.seats.nswnow.NSW, { alp: 46, lnp: 35, grn: 3, ind: 9 }, "summary.json pins the Assembly as it stands");
 }
 
@@ -796,7 +796,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // Assembly as it stands after Hinchinbrook's November 2025 and Stafford's May 2026
 // by-elections — Dametto's resignation, Sullivan's expulsion and death in office)
 {
-  const now = JSON.parse(R("maps/data/data-now-qld.json"));
+  const now = JSON.parse(R("map/data/data-now-qld.json"));
   assert.ok(now && now.asOf && now.changes.length === 5 && Object.keys(now.holders).length === 2, "data-now-qld.json: asOf, 5 member events, 2 holders");
   assert.deepEqual(Object.keys(now.byelections || {}).sort(), ["Hinchinbrook", "Stafford"], "the two by-elections");
   for (const [dist, by] of Object.entries(now.byelections)) {
@@ -811,7 +811,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(now.byelections.Stafford.div.tpp != null && now.byelections.Stafford.div.tpp.length === 3, true, "qldnow Stafford: its classic 2PP files (ALP v LNP)");
   assert.ok(now.byelections.Hinchinbrook.div.tpp == null, "qldnow: no 2PP where the final pair wasn't Labor v the LNP");
   assert.ok(Array.isArray(now.byelections.Stafford.div.fl) && now.byelections.Stafford.div.fl.some((r) => r[1] + r[2] > 2500), "qldnow: Stafford files the counted distribution chain to the final pair (Jess Lane's transfers)");
-  const sum = JSON.parse(R("maps/data/summary.json"));
+  const sum = JSON.parse(R("map/data/summary.json"));
   assert.deepEqual(sum.seats.qldnow.QLD, { alp: 36, lnp: 53, grn: 1, ind: 1, oth: 2 }, "summary.json pins the Assembly as it stands");
 }
 
@@ -823,7 +823,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // .build/map/harvest-wa-byelections.py and flattened by
 // .build/map/build_wa_now.py)
 {
-  const now = JSON.parse(R("maps/data/data-now-wa.json"));
+  const now = JSON.parse(R("map/data/data-now-wa.json"));
   assert.ok(now && now.asOf && now.changes.length === 2 && Object.keys(now.holders).length === 1, "data-now-wa.json: asOf, 2 member events, 1 holder");
   assert.deepEqual(Object.keys(now.byelections || {}), ["Secret Harbour"], "the one by-election");
   const by = now.byelections["Secret Harbour"];
@@ -837,7 +837,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(win[3], "onp", "wanow: its winner files in the onp fam");
   assert.ok(by.div.tpp == null, "wanow: no 2PP lane on a Labor-v-One Nation final");
   assert.equal(now.holders["Secret Harbour"].n, "Luke Herdegen", "wanow: Secret Harbour's member");
-  const sum2 = JSON.parse(R("maps/data/summary.json"));
+  const sum2 = JSON.parse(R("map/data/summary.json"));
   assert.deepEqual(sum2.seats.wanow.WA, { alp: 45, lnp: 13, onp: 1 }, "summary.json pins the Assembly as it stands (wa)");
 }
 
@@ -997,7 +997,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain
 // lanes + Religion (norel-first) and Housing-tenure (mort-first) select
 // families. Every lane rides every census edition (2001 BCP → 2021 GCP), the
-// venue stores, the GCP-era readers and the /maps/ lens machinery
+// venue stores, the GCP-era readers and the /map/ lens machinery
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
   assert.ok(base.includes('"y12less", "atsci", "u15", "onepar"') && base.includes('"loinc", "hiinc", "y12less"'), "the DM list carries the four plain lanes after the income pair");
@@ -1030,7 +1030,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   // the data files' structure at every fed stop: relKeys (norel first),
   // tenKeys (mort first), 12-wide demo rows, division rel/ten dicts
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-    const d = JSON.parse(R(`maps/data/res-${y}.json`));
+    const d = JSON.parse(R(`map/data/res-${y}.json`));
     assert.ok(Array.isArray(d.relKeys) && d.relKeys[0] === "norel" && d.relKeys.length === 10, `${y}: relKeys leads with norel (10 options)`);
     assert.ok(Array.isArray(d.tenKeys) && d.tenKeys[0] === "mort" && d.tenKeys.length === 4, `${y}: tenKeys leads with mort (4 options)`);
     const i = d.booths.demo.findIndex((x) => x !== null);
@@ -1085,7 +1085,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // division rows; the end-to-end page contract (legend tenths note, story
 // decile explainer, picker groups) is probed with .matilda/sa26-demo-probe.mjs
 {
-  const sa = JSON.parse(R("maps/data/res-sa26.json"));
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
   assert.ok(sa.incomeCuts && sa.incomeCuts.hiEdgeWeekly === 4000 && sa.incomeCuts.dollarsYear === 2021, "sa26 incomeCuts: GCP-era band read at its 2021-era cuts");
   if ("seifaCuts" in sa) assert.equal(sa.seifaCuts, null, "sa26 has no voter-footprint SEIFA cuts");
@@ -1116,7 +1116,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // fixed venue and stay null. The census lanes (dec, demo — vdec is left
 // empty by design) are then spliced in by .build/map/build_sa_boothcensus.py.
 {
-  const sa = JSON.parse(R("maps/data/res-sa26.json"));
+  const sa = JSON.parse(R("map/data/res-sa26.json"));
   const B = sa.booths;
   assert.ok(B, "sa26 res carries a booths record");
   const LANES = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
@@ -1199,7 +1199,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // agg pprim/pformal, per-district h rows, candidate c[5] and classic-pair
 // tpp[2] swings) and never drawn as a map/chamber of their own
 {
-  const sen = JSON.parse(R("maps/data/senate-sa26.json"));
+  const sen = JSON.parse(R("map/data/senate-sa26.json"));
   assert.equal(sen.year, "sa26", "senate-sa26: year");
   assert.equal(sen.lc, true, "senate-sa26: lc flag");
   assert.equal(sen.seatsN, 22, "senate-sa26: 22-member council");
@@ -1221,7 +1221,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(sen.pformal, 1088840, "senate-sa26: 2022 LC formal vote");
   assert.ok(sen.votes && sen.pvotes, "senate-sa26: statewide party votes for both elections");
 
-  const res = JSON.parse(R("maps/data/res-sa26.json"));
+  const res = JSON.parse(R("map/data/res-sa26.json"));
   assert.equal(res.prev, 2022, "sa26: prev names the 2022 state election");
   let nSw = 0, nC5 = 0, nTpp = 0;
   for (const d of res.divs) {
@@ -1249,7 +1249,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 }
 
 // ── the sa22 frame: South Australia's 19 March 2022 state election, the
-// second state frame on /maps/ (build_sa22_data.py on the committed 2022 ECSA
+// second state frame on /map/ (build_sa22_data.py on the committed 2022 ECSA
 // caches — an older payload vintage than 2026's: districts key on NAME,
 // candidates carry ordinaryVotes+declarationVotes+per-candidate
 // distributionVotes, the 2CP lane reconciles exactly, and the twoPartyPref
@@ -1258,7 +1258,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // the 2018 static-HTML records in. Its preferences lane is modelled
 // (data/sa22-flows.json, pinned with sa26's below)
 {
-  const res = JSON.parse(R("maps/data/res-sa22.json"));
+  const res = JSON.parse(R("map/data/res-sa22.json"));
   assert.equal(res.year, "sa22", "sa22: year id");
   assert.equal(res.date, "2022-03-19", "sa22: polling day");
   assert.equal(res.prev, 2018, "sa22: prev names the 2018 state election");
@@ -1266,7 +1266,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(res.jurisdiction, "SA", "sa22: jurisdiction");
   assert.deepEqual(Object.keys(res.agg), ["AUS", "SA"], "sa22 carries only the SA frame's areas");
   assert.equal(res.divs.length, 47, "sa22: 47 districts");
-  for (const f of ["geo-sa22-lo.json", "geo-sa22-hi.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+  for (const f of ["geo-sa22-lo.json", "geo-sa22-hi.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
   let nSw = 0, nC5 = 0, nTpp = 0, nH = 0;
   for (const d of res.divs) {
     assert.ok(Array.isArray(d.h) && d.h.length === 1 && d.h[0][0] === 2018 && typeof d.h[0][1] === "number" && typeof d.h[0][3] === "string",
@@ -1377,7 +1377,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // 2026, the hard-coded roster the ECSA never published) — both written by
 // build_sa22_past.py from the committed 2022-LC cache
 {
-  const sen = JSON.parse(R("maps/data/senate-sa22.json"));
+  const sen = JSON.parse(R("map/data/senate-sa22.json"));
   assert.equal(sen.year, "sa22", "senate-sa22: year");
   assert.equal(sen.lc, true, "senate-sa22: lc flag");
   assert.equal(sen.seatsN, 22, "senate-sa22: 22-member council");
@@ -1433,7 +1433,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
         `${k}: the room's southern wall ends with its seats plus the carpet skirt (wall at ${F.room[3]}, the lowest bench at ${bottom(F).toFixed(1)})`);
   }
   const ids = (cells) => new Set(cells.map((c) => c.id));
-  const seats = JSON.parse(R("maps/data/seats-sa26.json")), res = JSON.parse(R("maps/data/res-sa26.json"));
+  const seats = JSON.parse(R("map/data/seats-sa26.json")), res = JSON.parse(R("map/data/res-sa26.json"));
   const seated = Object.keys(seats.at);
   assert.equal(seated.length, 46, "seats-sa26: every member but the Speaker at a desk");
   assert.ok(!seated.includes("Hurtle Vale") && res.divs.some((d) => d.n === "Hurtle Vale"), "seats-sa26: the Speaker (Hurtle Vale) in the chair, not at a desk");
@@ -1442,7 +1442,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(new Set(Object.values(seats.at)).size, 46, "seats-sa26: one member a desk");
   assert.equal(seats.at.Croydon, "A1", "seats-sa26: the Premier nearest the Speaker on the government front bench");
   assert.equal(seats.at.Schubert, "F1", "seats-sa26: the Leader of the Opposition across from the Premier");
-  const lcs = JSON.parse(R("maps/data/seats-sa26-lc.json")), council = JSON.parse(R("maps/data/senate-sa26.json"));
+  const lcs = JSON.parse(R("map/data/seats-sa26-lc.json")), council = JSON.parse(R("map/data/senate-sa26.json"));
   assert.equal(Object.keys(lcs.at).length, 21, "seats-sa26-lc: every member but the President at a desk");
   assert.ok(Object.keys(lcs.at).every((n) => council.senators.some((s) => s.n === n)), "seats-sa26-lc: members of the frame's council");
   assert.ok(Object.values(lcs.at).every((d) => ids(lc).has(d)) && new Set(Object.values(lcs.at)).size === 21, "seats-sa26-lc: one member a desk, every desk drawn");
@@ -1450,7 +1450,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(!(lcs.roles.president in lcs.at), "seats-sa26-lc: the President in the chair, not at a desk");
   // sa22, seated from the Parliament's archived plan of 28 December 2024 (.build/map/sa22_seating.mjs)
   {
-    const seats = JSON.parse(R("maps/data/seats-sa22.json")), res = JSON.parse(R("maps/data/res-sa22.json"));
+    const seats = JSON.parse(R("map/data/seats-sa22.json")), res = JSON.parse(R("map/data/res-sa22.json"));
     const seated = Object.keys(seats.at);
     assert.equal(seats.plan, "28 December 2024", "seats-sa22: the archived plan's capture date");
     assert.ok(seats.note && seats.note.includes("Bignell"), "seats-sa22: the note owns the late-Speaker placement");
@@ -1472,7 +1472,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // through the Labor side as the app reads them — a Labor-first row in a Liberal-first count reads
 // Greens preferences as running to the Liberals (six SA26 districts did, before 2026-10-26)
 for (const y of ["sa22", "sa26"]) {
-  const r = JSON.parse(R(`maps/data/res-${y}.json`));
+  const r = JSON.parse(R(`map/data/res-${y}.json`));
   assert.equal(r.flBasis, "modelled", `${y}: the preferences lane is modelled`);
   let nCl = 0, nOn = 0;
   for (const d of r.divs) {
@@ -1502,29 +1502,29 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes('if (STATE_YEARS.has(y) && FED_LENS.has(S.lens) && !(S.lens === "senpref" && SEN_PREF_STATE_FRAMES.has(y))) S.lens = S.lens === "senpref" ? "flow" : "winner";'), "setYear drops a federal-only lens on the walk into a state frame, New South Wales' frames excepted (the Senate-ballot reading back to the House's preferences)");
   // the Senate's ballot rankings live inside the Preferences tab, not as a tab of their own
   assert.ok(!js.includes('{ id: "senpref"'), "no Senate preferences tab");
-  assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/maps/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
+  assert.ok(js.includes('data-flip="flowsrc"') && js.includes("getJSON(`/map/data/senate-prefs-${k}.json`)"), "the Preferences key switches to the Senate's ballots, loaded with the switch");
   for (const y of [2016, 2019, 2022, 2025]) {
-    const f = JSON.parse(R(`maps/data/senate-prefs-${y}.json`)), six = y >= 2022, want = six ? 54 : 27;
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`)), six = y >= 2022, want = six ? 54 : 27;
     assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`);
     assert.ok(f.divs.Hunter && f.divs.Hunter.length === want, `senate-prefs-${y} rows carry ${want} counts`);
     assert.deepEqual(f.pairs, six ? ["AC", "AO", "CO", "GO", "GA", "GC"] : ["AC", "AO", "CO"], `senate-prefs-${y}: the two-party lens's three Greens pairings ride after the Senate orders' three on the frames that build them`);
     assert.deepEqual(f.donors[six ? "GO" : "AC"], six ? ["alp", "lnp", "oth"] : ["grn", "onp", "oth"], `senate-prefs-${y} names its donor groups`);
   }
-  assert.deepEqual(JSON.parse(R("maps/data/senate-prefs-2025.json")).absent, { ACT: ["onp"] }, "One Nation had no Senate ticket in the ACT in 2025");
+  assert.deepEqual(JSON.parse(R("map/data/senate-prefs-2025.json")).absent, { ACT: ["onp"] }, "One Nation had no Senate ticket in the ACT in 2025");
   // the group-ticket era reads the parties' lodged tickets (2004-2013, .build/map/senate_gvt_prefs.py),
   // presented as tickets never ballot tallies; the record starts in 2004 because the AEC's machine
   // record does, and 2004 keeps seats only (no per-place Senate product was ever served)
   assert.ok(js.includes("const SP_YEARS = new Set([2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]);"), "SP_YEARS spans the ticket era and the ballot era, and nothing before 2004");
   for (const y of [2004, 2007, 2010, 2013]) {
-    const f = JSON.parse(R(`maps/data/senate-prefs-${y}.json`));
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`));
     assert.equal(f.gvt, true, `senate-prefs-${y} is marked a group-ticket reading`);
     assert.equal(Object.keys(f.divs).length >= 150, true, `senate-prefs-${y} has every division`);
     assert.ok(f.divs.Hunter && f.divs.Hunter.length === 27, `senate-prefs-${y} rows carry 27 counts`);
     assert.deepEqual(f.absent, { TAS: ["onp"], ACT: ["onp"], NT: ["onp"] }, `senate-prefs-${y}: One Nation sat out Tasmania, the ACT and the NT`);
   }
-  assert.equal(Object.keys(JSON.parse(R("maps/data/senate-prefs-2004.json")).booths).length, 0, "2004's ticket record holds no polling places");
-  for (const y of [2007, 2010, 2013]) assert.ok(Object.keys(JSON.parse(R(`maps/data/senate-prefs-${y}.json`)).booths).length > 8000, `senate-prefs-${y} reads polling places too`);
-  for (const y of [2016, 2019, 2022, 2025]) assert.ok(!JSON.parse(R(`maps/data/senate-prefs-${y}.json`)).gvt, `senate-prefs-${y} stays a ballot tally`);
+  assert.equal(Object.keys(JSON.parse(R("map/data/senate-prefs-2004.json")).booths).length, 0, "2004's ticket record holds no polling places");
+  for (const y of [2007, 2010, 2013]) assert.ok(Object.keys(JSON.parse(R(`map/data/senate-prefs-${y}.json`)).booths).length > 8000, `senate-prefs-${y} reads polling places too`);
+  for (const y of [2016, 2019, 2022, 2025]) assert.ok(!JSON.parse(R(`map/data/senate-prefs-${y}.json`)).gvt, `senate-prefs-${y} stays a ballot tally`);
   assert.ok(js.includes('spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots"'), "the Preferences key's switch calls the ticket years tickets");
   assert.ok(js.includes(" Senate tickets put ") && js.includes("Lodged group voting tickets,"), "the story and the legend present the ticket years as the parties' orders");
   assert.ok(js.includes("No Senate preference record for "), "years before the AEC's record get their own message");
@@ -1534,21 +1534,21 @@ for (const y of ["sa22", "sa26"]) {
   // per-lens hold (2026-10-26) it measures the CURRENT lens only, and setYear/setLens
   // above keep that lens one the year can show
   assert.ok(js.includes("const my = legendStandIn(m, y);") && !js.includes("for (const lens of yearLenses(y).map("), "the legend-height probe measures the current lens's stand-in (no lens sweep)");
-  assert.ok(js.includes("w, S.view, y, real, S.lens, S.tppMode"), "the legend-height hold key carries the lens and its mode");
-  // the map's key holds the taller of its seats and polling-places faces, so the
-  // stage never moves as the zoom crosses to the places (2026-10-28: 23px at 1400)
-  assert.ok(js.includes('for (const bo of S.view === "map" ? [false, true] : [false])') && !js.includes("real, boothsShown(), S.lens"), "the key's hold measures both booth faces, not the one showing");
+  assert.ok(js.includes("w, S.view, y, real, S.lens, S.draw, S.tppMode"), "the legend-height hold key carries the lens, its draw, and its mode");
+  // the hold follows the CURRENT draw's booth faces (seats · polling places), so
+  // slimmer views stop inheriting taller surfaces' peaks (2026-11-07: 58px slack gone)
+  assert.ok(js.includes('for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of [S.draw])') && !js.includes('for (const dw of S.view === "map" ? DRAWS.map'), "the key's hold measures the current draw's two faces, not every surface's");
 }
 
 // ── the nsw23 frame: New South Wales' 25 March 2023 state election — the
-// first second-jurisdiction frame on /maps/ (build_nsw23_data.py on the
+// first second-jurisdiction frame on /map/ (build_nsw23_data.py on the
 // committed NSWEC caches in .build/map/src/nsw23), 93 districts on their own
 // timeline row, the 2019 state election as its past join (build_nsw23_past.py:
 // prev, the agg pprim/pformal and per-candidate c[5] swings), the ABS 2021
 // census lanes spliced by build_nsw23_demo.py/build_nsw23_seifa.py off the
 // SA1→district join in .build/map/nsw23/assign-sa1.json
 {
-  const res = JSON.parse(R("maps/data/res-nsw23.json"));
+  const res = JSON.parse(R("map/data/res-nsw23.json"));
   assert.equal(res.year, "nsw23", "nsw23: year id");
   assert.equal(res.date, "2023-03-25", "nsw23: polling day");
   assert.equal(res.prev, 2019, "nsw23: prev names the 2019 state election");
@@ -1556,7 +1556,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(res.demoBasis, "sa1", "nsw23 records the SA1 census basis");
   assert.deepEqual(Object.keys(res.agg), ["AUS", "NSW"], "nsw23 carries only its frame's areas");
   assert.equal(res.divs.length, 93, "nsw23: 93 districts");
-  for (const f of ["geo-nsw23-lo.json", "geo-nsw23-hi.json", "data-nsw23.json", "senate-nsw23.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+  for (const f of ["geo-nsw23-lo.json", "geo-nsw23-hi.json", "data-nsw23.json", "senate-nsw23.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
   // the winners: derived from the 2CP tallies exactly as the app reads them
   // (tcp entries are [candidate index, votes], so the winner's CANDIDATE is
   // c[d.tcp[slot][0]], never c[slot] — the slot-read miscounts the tally);
@@ -1779,7 +1779,7 @@ for (const y of ["sa22", "sa26"]) {
              geocoded: 2855, flRows: 382, c5: 568, h: 93, c5nz: 566, tpp2: 70,
              pformal: 4404334, demoYear: 2016 },
   })) {
-    const res = JSON.parse(R(`maps/data/res-${tag}.json`));
+    const res = JSON.parse(R(`map/data/res-${tag}.json`));
     assert.equal(res.year, tag, `${tag}: year id`);
     assert.equal(res.date, want.date, `${tag}: polling day`);
     assert.equal(res.prev ?? null, want.prev, `${tag}: prev`);
@@ -1790,7 +1790,7 @@ for (const y of ["sa22", "sa26"]) {
     assert.equal(res.divs.length, 93, `${tag}: 93 districts`);
     assert.equal(res.flBasis, "counted", `${tag}: counted preferences`);
     assert.equal(res.flOpv, true, `${tag}: optional-preferential flag`);
-    for (const f of [`geo-${tag}-lo.json`, `geo-${tag}-hi.json`, `data-${tag}.json`, `senate-${tag}.json`, `core-${tag}.json`]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+    for (const f of [`geo-${tag}-lo.json`, `geo-${tag}-hi.json`, `data-${tag}.json`, `senate-${tag}.json`, `core-${tag}.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
     const tally = {};
     let h = 0, c5 = 0, c5nz = 0, tpp2 = 0;
     for (const d of res.divs) {
@@ -1837,7 +1837,7 @@ for (const y of ["sa22", "sa26"]) {
              formal: 3514474, booths: 1794, geocoded: 1726, c5: 507, c5nz: 507,
              h: 88, tpp2: 76, pformal: 3355707, demoYear: 2016 },
   })) {
-    const res = JSON.parse(R(`maps/data/res-${tag}.json`));
+    const res = JSON.parse(R(`map/data/res-${tag}.json`));
     assert.equal(res.year, tag, `${tag}: year id`);
     assert.equal(res.date, want.date, `${tag}: polling day`);
     assert.equal(res.prev ?? null, want.prev, `${tag}: prev`);
@@ -1846,7 +1846,7 @@ for (const y of ["sa22", "sa26"]) {
     assert.equal(res.demoYear, want.demoYear, `${tag}: demoYear names its era census`);
     assert.deepEqual(Object.keys(res.agg), ["AUS", "VIC"], `${tag}: its frame's two areas`);
     assert.equal(res.divs.length, 88, `${tag}: 88 districts`);
-    for (const f of [`geo-${tag}-lo.json`, `geo-${tag}-hi.json`, `data-${tag}.json`, `senate-${tag}.json`, `core-${tag}.json`]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+    for (const f of [`geo-${tag}-lo.json`, `geo-${tag}-hi.json`, `data-${tag}.json`, `senate-${tag}.json`, `core-${tag}.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
     const tally = {};
     let h = 0, c5 = 0, c5nz = 0, tpp2 = 0;
     for (const d of res.divs) {
@@ -1886,7 +1886,7 @@ for (const y of ["sa22", "sa26"]) {
     vic18: { date: "2018-11-24", later: 2022, seatsN: 40, fam: { ALP: 18, LIB: 10 }, formal: 3583478, pformal: 3418671, jur: "vic" },
   };
   for (const [tag, want] of Object.entries(LC_ACTS)) {
-    const p = JSON.parse(R(`maps/data/senate-${tag}.json`));
+    const p = JSON.parse(R(`map/data/senate-${tag}.json`));
     assert.equal(p.year, tag, `${tag} LC: year id`);
     assert.equal(p.lc, true, `${tag}: the file is a Legislative Council one`);
     assert.equal(p.date, want.date, `${tag}: polling day`);
@@ -1915,7 +1915,7 @@ for (const y of ["sa22", "sa26"]) {
   const EVENT = { nsw15: "2015", nsw19: "2019", nsw23: "2023" };
   const bank = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "nswec-lc-flow-src", "counts.json")));
   for (const [tag, ev] of Object.entries(EVENT)) {
-    const p = JSON.parse(R(`maps/data/senate-prefs-${tag}.json`));
+    const p = JSON.parse(R(`map/data/senate-prefs-${tag}.json`));
     assert.equal(p.year, tag, `${tag} LC prefs: its frame's year id`);
     assert.equal(p.lc, true, `${tag}: a Legislative Council preference record`);
     assert.deepEqual(p.pairs, ["AC", "AO", "CO"], `${tag}: the three federal pair slots`);
@@ -1941,7 +1941,7 @@ for (const y of ["sa22", "sa26"]) {
 // over from 2019 (terms to 2027) — parties and vacancy fills off Parliament
 // of NSW records; the statewide first-preference tallies for both elections
 {
-  const sen = JSON.parse(R("maps/data/senate-nsw23.json"));
+  const sen = JSON.parse(R("map/data/senate-nsw23.json"));
   assert.equal(sen.year, "nsw23", "senate-nsw23: year");
   assert.equal(sen.lc, true, "senate-nsw23: lc flag");
   assert.equal(sen.seatsN, 42, "senate-nsw23: 42-member council");
@@ -2014,7 +2014,7 @@ for (const y of ["sa22", "sa26"]) {
     const keySource = senate.slice(senate.indexOf("const SEN_PARTY_ORDER"), senate.indexOf("const senLensOf"));
     const S = { senLens: "party" };
     const order = new Function("geom", "S", `const chamberGeom = () => geom, seatMode = () => "sort", holdFam = h => h.fam, LEADERS = {}, STATES = ["NSW"], upNext = d => d.up; ${keySource} ${blocSource} ${orderSource}; return chamberOrder;`)(geom, S);
-    const raw = JSON.parse(R("maps/data/senate-nsw23.json"));
+    const raw = JSON.parse(R("map/data/senate-nsw23.json"));
     const fam = { ALP: "alp", LIB: "lnp", NAT: "lnp", GRN: "grn", ONP: "onp" };
     const divs = raw.senators.map((d, i) => ({ ...d, i, up: d.term !== raw.later, hold: { ab: d.ab, fam: fam[d.ab] || "oth" } }));
     const m = { year: "nsw23", house: "senate", gov: "alp", divs, leaders: [], speaker: null, seatsN: 42, byName: new Map(divs.map((d) => [d.n, d.i])) };
@@ -2054,7 +2054,7 @@ for (const y of ["sa22", "sa26"]) {
 // ── vic22's chamber: Victoria's Legislative Assembly on the House's own floor
 // (the @vic-cells VCHB table in app-3-chamber.js — three chairs a side at a
 // table drawn without panels, three clerks at its head), seated from the 60th
-// Parliament's own plan (maps/data/la-seating-plan-vic-2026-08-11.json; node
+// Parliament's own plan (map/data/la-seating-plan-vic-2026-08-11.json; node
 // .build/map/vic_seating.mjs): the six the plan seats at the table take its
 // chairs, the rest fill the benches in chamber order, the Speaker in the chair
 {
@@ -2064,7 +2064,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(new Set(ids).size, cells.length, "vic floor: desk ids unique");
   assert.equal(cells.filter((c) => c.x < 0).length, cells.filter((c) => c.x > 0).length, "vic floor: the sides mirror each other");
   assert.ok(js.includes('vic22: ["Niddrie", "Kew", "Ivanhoe", "Caulfield", "Dandenong", "Gippsland South"]'), "LEADERS.vic22 names the six table seats in desk order");
-  const seats = JSON.parse(R("maps/data/seats-vic22.json")), res = JSON.parse(R("maps/data/res-vic22.json"));
+  const seats = JSON.parse(R("map/data/seats-vic22.json")), res = JSON.parse(R("map/data/res-vic22.json"));
   const seated = Object.keys(seats.at), desks = Object.values(seats.at);
   assert.equal(seats.plan, "11 August 2026", "seats-vic22: the 60th Parliament's plan date");
   assert.ok(seats.note && seats.note.includes("the six at the table"), "seats-vic22: the note owns the table seatings");
@@ -2081,7 +2081,7 @@ for (const y of ["sa22", "sa26"]) {
 // ── vic22's upper house: Victoria's Legislative Council on its own floor (the
 // @viclc-cells VCLC table in app-3-chamber.js — the Parliament's chamber plan
 // masked into 44 member desks plus the President's chair, from the committed
-// snapshot maps/data/lc-seating-plan-vic-2026-10-27.json), the council as it
+// snapshot map/data/lc-seating-plan-vic-2026-10-27.json), the council as it
 // sits from the Parliament's own council seating plan of 27 October 2026
 // (seats-vic22-lc.json, node .build/map/vic_lc_seating.mjs), its membership
 // and the statewide vote from the VEC's 2022 distribution-of-preferences and
@@ -2098,7 +2098,7 @@ for (const y of ["sa22", "sa26"]) {
     const [px, py] = VCLC.desks[id];
     assert.ok(Number.isFinite(px) && Number.isFinite(py), `viclc desk ${id} has a place`);
   }
-  const sen = JSON.parse(R("maps/data/senate-vic22.json"));
+  const sen = JSON.parse(R("map/data/senate-vic22.json"));
   assert.equal(sen.year, "vic22", "senate-vic22: year");
   assert.equal(sen.lc, true, "senate-vic22: lc flag");
   assert.equal(sen.date, "2022-11-26", "senate-vic22: polling day");
@@ -2125,7 +2125,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(sen.pformal, 3583478, "senate-vic22: 2018 LC formal vote");
   assert.ok(sen.votes && sen.pvotes, "senate-vic22: statewide party votes for both elections");
   assert.ok(Object.keys(sen.votes).includes("IND") && !Object.keys(sen.votes).includes("ind"), "senate-vic22: the votes keys are the FAM-able codes (IND, never ind)");
-  const seats = JSON.parse(R("maps/data/seats-vic22-lc.json"));
+  const seats = JSON.parse(R("map/data/seats-vic22-lc.json"));
   assert.equal(seats.plan, "27 October 2026", "seats-vic22-lc: the plan's date");
   assert.deepEqual(seats.roles, { president: "Shaun Leane", leader: "Jaclyn Symes", oppLeader: "Bev McArthur" }, "seats-vic22-lc: the chair and the two leaders");
   const seated = Object.keys(seats.at), desks = Object.values(seats.at);
@@ -2139,7 +2139,7 @@ for (const y of ["sa22", "sa26"]) {
 }
 
 // ── vic22: the Victorian state election of 26 November 2022, the third state
-// frame on /maps/ (build_vic22_data.py on the committed VEC caches in
+// frame on /map/ (build_vic22_data.py on the committed VEC caches in
 // .build/map/src/vic22), 88 Legislative Assembly districts on their own
 // timeline row, the 2018 state election as its past join (build_vic22_past.py:
 // prev, the agg pprim/pformal and per-candidate c[5] swings), the ABS 2021
@@ -2149,7 +2149,7 @@ for (const y of ["sa22", "sa26"]) {
 // poll (.build/map/src/vic22/certified/), not the VEC's interim 2CP annex;
 // their per-booth lanes stay as the annex published them
 {
-  const res = JSON.parse(R("maps/data/res-vic22.json"));
+  const res = JSON.parse(R("map/data/res-vic22.json"));
   assert.equal(res.year, "vic22", "vic22: year id");
   assert.equal(res.date, "2022-11-26", "vic22: polling day");
   assert.equal(res.prev, 2018, "vic22: prev names the 2018 state election");
@@ -2157,8 +2157,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(res.demoBasis, "sa1", "vic22 records the SA1 census basis");
   assert.deepEqual(Object.keys(res.agg), ["AUS", "VIC"], "vic22 carries only its frame's areas");
   assert.equal(res.divs.length, 88, "vic22: 88 districts");
-  for (const f of ["geo-vic22-lo.json", "geo-vic22-hi.json", "data-vic22.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
-  for (const f of ["senate-vic22.json", "seats-vic22-lc.json"]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+  for (const f of ["geo-vic22-lo.json", "geo-vic22-hi.json", "data-vic22.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+  for (const f of ["senate-vic22.json", "seats-vic22-lc.json"]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
   // the winners: derived from the 2CP tallies exactly as the app reads them
   // (tcp entries are [candidate index, votes], so the winner's CANDIDATE is
   // c[d.tcp[slot][0]], never c[slot] — Mulgrave's tcp slots are index 0 and
@@ -2334,7 +2334,7 @@ for (const y of ["sa22", "sa26"]) {
              fl: 78, tppsw: 0, swings: 0, hist: 0, demoYear: 2016 },
   };
   for (const [frame, ora] of Object.entries(FR)) {
-    const res = JSON.parse(R(`maps/data/res-${frame}.json`));
+    const res = JSON.parse(R(`map/data/res-${frame}.json`));
     assert.equal(res.year, frame, `${frame}: year id`);
     assert.equal(res.date, ora.date, `${frame}: polling day`);
     assert.equal(res.prev, ora.prev, `${frame}: prev ${ora.prev ?? "names nothing (2015 rode the 89-district map)"}`);
@@ -2343,7 +2343,7 @@ for (const y of ["sa22", "sa26"]) {
     assert.equal(res.jurisdiction, "QLD", `${frame}: jurisdiction`);
     assert.deepEqual(Object.keys(res.agg), ["AUS", "QLD"], `${frame} carries only the QLD frame's areas`);
     assert.equal(res.divs.length, 93, `${frame}: 93 Legislative Assembly districts`);
-    for (const f of [`geo-${frame}-lo.json`, `geo-${frame}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "maps", "data", f)), "maps/data/" + f);
+    for (const f of [`geo-${frame}-lo.json`, `geo-${frame}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
     assert.deepEqual(res.agg.QLD.seats, ora.seats, `${frame}: the ECQ's declared seat count`);
     assert.deepEqual(res.agg.AUS.seats, ora.seats, `${frame}: the AUS mirror carries the same seats`);
     assert.equal(res.agg.QLD.formal, ora.formal, `${frame}: formal vote`);

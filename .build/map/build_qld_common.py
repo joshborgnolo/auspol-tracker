@@ -48,7 +48,7 @@ preferences, never where each party's own voters ended).
 
 usage: python3 -I .build/map/build_qld<yy>_data.py <out_dir>
 then:  MAPSHAPER="$PWD/node_modules/.bin/mapshaper" \\
-         node .build/map/geo_build.mjs .build/map/src/qld maps/data maps/data --years=qld<yy>
+         node .build/map/geo_build.mjs .build/map/src/qld map/data map/data --years=qld<yy>
 """
 import collections, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -57,7 +57,7 @@ from qld_ecq import BUCKETS, bucket, fail
 from qld_flow_lane import load_store, flow_rows
 
 REPO = qld_ecq.REPO
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 FRAMES = {
     "qld24": {

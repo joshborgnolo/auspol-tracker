@@ -4,7 +4,7 @@
    The same model as the federal 2028 runs, on Victoria's own base:
      - the vote: the /vic/ page's polling average (its Kalman trend on data/vic-polls.json, read from
        gen-data's `primaryNow:` line on the Victorian dataset, .build/vic/to-main-schema.mjs);
-     - the seats: the 88 Assembly districts on their 2022 counts (maps/data/res-vic22.json; the boundaries
+     - the seats: the 88 Assembly districts on their 2022 counts (map/data/res-vic22.json; the boundaries
        stand for 2026), every 2022 candidate's party standing again, and One Nation in every district
        (it stood in five in 2022): where it did not stand, its base is its federal 2025 vote at the
        federal polling places nearest the district's own (state-tables.mjs `foot`);
@@ -80,7 +80,7 @@ export function prepVic({ vote }) {
   const FCAL = J("data/seat-model-flow-calibration.json"), CAL = J("data/seat-model-calibration.json"), DRIFT = J("data/seat-model-backtest-states.json").drift;
   const ST = settings(FCAL);
   const { SEN, sd, tables, distCls, foot } = stateDistrictTables({ sen: VIC.senate, st: "VIC", res: "res-vic22", ST });
-  const plan = J("maps/data/la-seating-plan-vic-2026-08-11.json").divisions;
+  const plan = J("map/data/la-seating-plan-vic-2026-08-11.json").divisions;
   // the statewide 2022 result, in the model's five
   const t5 = { alp: 0, lnp: 0, on: 0, grn: 0, oth: 0 }; let T = 0;
   for (const dv of sd.divs) for (const c of dv.c) { const k = ["alp", "lnp", "on", "grn", "oth"][P5I(GROUP_OF(c))]; t5[k] += c[4]; T += c[4]; }

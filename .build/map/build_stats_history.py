@@ -23,7 +23,7 @@ from historical_booth_locations import apply_locations
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / '.build/aec-flow-src'
-OUT = ROOT / 'maps/data'
+OUT = ROOT / 'map/data'
 DECL = {'ABSENT': 'abs', 'PRE POLL': 'pre', 'POSTAL': 'post', 'PROVISIONAL': 'prov'}
 BASE = dict(zip(['ACT', 'NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT'], range(100, 900, 100)))
 FAMS = ['alp', 'lnp', 'grn', 'onp', 'ind', 'oth']

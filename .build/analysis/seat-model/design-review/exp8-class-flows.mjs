@@ -6,7 +6,7 @@ const CLS = { "Inner Metropolitan": "inner", "Outer Metropolitan": "outer", "Pro
 const bucketOf = (b) => (b === "grn" ? "grn" : b === "onp" ? "onp" : b === "alp" || b === "lnp" ? null : "oth");
 const data = {};
 for (const y of YEARS) {
-  const D = load(`maps/data/res-${y}.json`);
+  const D = load(`map/data/res-${y}.json`);
   const seats = {};
   for (const dv of D.divs) {
     if (!dv.tcp || dv.tcp.length !== 2) continue;

@@ -40,14 +40,14 @@ classic-paired districts like qld's.
 
 usage: python3 -I .build/map/build_wa<yy>_data.py <out_dir>
 then:  MAPSHAPER="$PWD/node_modules/.bin/mapshaper" \\
-         node .build/map/geo_build.mjs .build/map/src/wa maps/data maps/data --years=wa<yy>
+         node .build/map/geo_build.mjs .build/map/src/wa map/data map/data --years=wa<yy>
 """
 import collections, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import wa_eis
 
 REPO = wa_eis.REPO
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 FRAMES = {
     "wa17": {"year": "wa17", "date": "2017-03-11", "jurisdiction": "WA",

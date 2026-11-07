@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """NSW Legislative Council upper-house preference lenses for the /map/ state frames.
 
-Emits maps/data/senate-prefs-<frame>.json for nsw15/nsw19/nsw23 in the federal
+Emits map/data/senate-prefs-<frame>.json for nsw15/nsw19/nsw23 in the federal
 senate-prefs-<year>.json schema (see .build/map/senate_prefs.mjs, whose output
 contract this mirrors key-for-key, plus "lc": true and a venueJoin provenance
 block), computed from the NSWEC's per-ballot LC preference statewide zips
@@ -55,7 +55,7 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC_DIR = os.path.join(ROOT, ".build", "nswec-lc-flow-src")
 COUNTS = json.load(open(os.path.join(SRC_DIR, "counts.json")))
-MAP_DATA = os.path.join(ROOT, "maps", "data")
+MAP_DATA = os.path.join(ROOT, "map", "data")
 
 FRAMES = [  # (frame id, election year, zip name, absent record)
     ("nsw15", 2015, "SGE2015-LC-Statewide.zip", {"NSW": ["onp"]}),

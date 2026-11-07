@@ -103,7 +103,7 @@ wave writes build_vicXX_demo.py/_seifa.py/boothcensus clones, so this
 script writes null dec/vdec booth lanes and no demo lane, exactly as
 the SA/NSW builders do.
 
-usage: python3 -I .build/map/build_vic14_data.py <out_dir>   # default: maps/data
+usage: python3 -I .build/map/build_vic14_data.py <out_dir>   # default: map/data
 deps: stdlib + xlrd (2ppvote2014.xls) + openpyxl (the stale appendix)
 """
 import collections
@@ -126,7 +126,7 @@ SRC = os.path.join(REPO, ".build", "state-flow-src", "vic", "2014")
 DS_STORE = os.path.join(REPO, ".build", "map", "src", "vic22", "demsausage", "vic-2022.json")
 PP_FILE = os.path.join(SRC, "2ppvote2014.xls")
 APPENDIX_FILE = os.path.join(REPO, ".build", "state-flow-src", "vic", "2018", "2ppvote2018-final.xlsx")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 DEMO_STORE = os.path.join(REPO, "data", "vic14-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "vic14-seifa.json")
 

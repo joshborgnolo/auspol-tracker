@@ -10,14 +10,14 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const json=p=>JSON.parse(read(p));
-const ctx={}; vm.runInNewContext(read('maps/vendor/topojson-client-3.1.0.min.js'),ctx);
+const ctx={}; vm.runInNewContext(read('map/vendor/topojson-client-3.1.0.min.js'),ctx);
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
-const source=json('maps/data/historical-boundary-sources.json');
+const source=json('map/data/historical-boundary-sources.json');
 const certified=json('data/division-results.json').elections;
 const expected={1993:{NSW:50,VIC:38,QLD:25,WA:14,SA:12,TAS:5,ACT:2,NT:1},1996:{NSW:50,VIC:37,QLD:26,WA:14,SA:12,TAS:5,ACT:3,NT:1},1998:{NSW:50,VIC:37,QLD:27,WA:14,SA:12,TAS:5,ACT:2,NT:1}};
 const frame={};
 for (const y of [1993,1996,1998]) {
-  const r=json(`maps/data/res-${y}.json`), rec=source.elections[y];
+  const r=json(`map/data/res-${y}.json`), rec=source.elections[y];
   assert.equal(r.divs.length,y===1993?147:148);
   const counts={};
   for(const d of r.divs) {
@@ -34,10 +34,10 @@ for (const y of [1993,1996,1998]) {
     assert.ok(d.h.some(h=>h[0]===1998)||!certified[1998][d.n]);
   }
   assert.deepEqual(counts,expected[y]);
-  const t=json(`maps/data/geo-${y}-lo.json`);
+  const t=json(`map/data/geo-${y}-lo.json`);
   assert.equal(t.handbook,true);assert.equal(t.transform,undefined,'no quantization');
-  assert.equal(read(`maps/data/geo-${y}-lo.json`),read(`maps/data/geo-${y}-hi.json`),'no lossy low-resolution variant');
-  assert.equal(hash(read(`maps/data/geo-${y}-lo.json`)),rec.geometrySHA256);
+  assert.equal(read(`map/data/geo-${y}-lo.json`),read(`map/data/geo-${y}-hi.json`),'no lossy low-resolution variant');
+  assert.equal(hash(read(`map/data/geo-${y}-lo.json`)),rec.geometrySHA256);
   const fc=ctx.topojson.feature(t,t.objects.divs); frame[y]=fc;
   assert.deepEqual(fc.features.map(f=>f.properties.name).sort(),r.divs.map(d=>d.n).sort());
   for (const f of fc.features) {
@@ -50,7 +50,7 @@ for (const y of [1993,1996,1998]) {
 for(const [a,b,states] of [[1993,1996,['ACT','QLD','VIC']],[1996,1998,['ACT','QLD','WA']]]) {
   const before=source.elections[a].maps,after=source.elections[b].maps;
   const changed=new Set();
-  for(const y of [a,b]) for(const d of json(`maps/data/res-${y}.json`).divs) {
+  for(const y of [a,b]) for(const d of json(`map/data/res-${y}.json`).divs) {
     if(before.find(r=>r.canonical_name===d.n)?.map_id!==after.find(r=>r.canonical_name===d.n)?.map_id)changed.add(d.st);
   }
   assert.deepEqual([...changed].sort(),states);
@@ -61,13 +61,13 @@ function contains(f,p) {return f.geometry.coordinates.some(poly=>inRing(poly[0],
 // probe catches the old ABS frame's later-era WA geometry.
 for(const y of [1993,1996,1998]) assert.equal(contains(frame[y].features.find(f=>f.properties.name==='Brand'),[116.156801,-33.36357]),y!==1998,`${y}: Collie/Brand redistribution`);
 for(const y of [1993,1998]) {
-  const r=json(`maps/data/res-${y}.json`);
+  const r=json(`map/data/res-${y}.json`);
   assert.equal(r.booths.id.length,y===1993?8431:8311);
   assert.equal(r.coverage.boothCoordinates,'approximate');
   assert.equal(r.booths.location.filter(Boolean).length,r.booths.lat.filter(x=>x!==null).length,'every estimated coordinate has provenance');
   assert.ok(r.booths.inf.some(x=>x>0),'recorded informal votes retained');
   assert.equal(r.divs.find(d=>d.n===r.speaker).c.find(c=>c[6])[0],y===1993?'Stephen Paul Martin':'Neil Andrew');
-  const national=r.agg.AUS, sv=json(`maps/data/senate-vote-${y}.json`);
+  const national=r.agg.AUS, sv=json(`map/data/senate-vote-${y}.json`);
   assert.equal(national.formal,r.divs.reduce((s,d)=>s+d.c.reduce((s,c)=>s+c[4],0),0));
   assert.equal(national.inf,r.divs.reduce((s,d)=>s+d.inf,0));
   for(const d of r.divs)assert.ok(sv.divs[d.n]);
@@ -78,7 +78,7 @@ for(const y of [1993,1998]) {
     assert.ok(r.booths.tpp.every(x=>x===null)&&r.booths.tcp.every(x=>x===null));
   } else assert.equal(r.divs.find(d=>d.n==='Newcastle').tpp,null);
 }
-assert.equal(json('maps/data/senate-1998.json').senators.find(s=>s.n==='Kay Denman').term,2005,'Denman elected in 1998, not continuing class');
+assert.equal(json('map/data/senate-1998.json').senators.find(s=>s.n==='Kay Denman').term,2005,'Denman elected in 1998, not continuing class');
 // Each estimate is traceable to an actual source venue and inside the original
 // historical polygon. This JS containment check is independent of the builder.
 const locations=json('data/booth-locations-history.json');
@@ -86,7 +86,7 @@ for(const [p,h] of Object.entries(locations.sourceSHA256)) assert.equal(hash(fs.
 const venueSources={};
 for(const y of [2007,2010,2013,2016,2019,2022,2025]) venueSources[y]=new Map(json(`data/booth-seifa-${y}.json`).booths.map(b=>[`${b.div}|${b.boothId}`,b]));
 for(const y of [1993,1996,1998]) {
-  const r=json(`maps/data/res-${y}.json`), B=r.booths, saved=locations.elections[y];
+  const r=json(`map/data/res-${y}.json`), B=r.booths, saved=locations.elections[y];
   const geoms=new Map(frame[y].features.map(f=>[f.properties.name,f]));
   const counts={};
   for(let j=0;j<B.id.length;j++) {

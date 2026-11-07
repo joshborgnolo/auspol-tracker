@@ -17,7 +17,7 @@ const clamp = (p) => Math.min(0.995, Math.max(0.005, p));
 export function prepInputs({ year = 2025, composition = true, replay = false, root = "." } = {}) {
   const FLOWS = J(`${root}/data/aec-2025-seat-flows.json`);
   const CAND = J(`${root}/data/seat-candidate-set-2028.json`);
-  const RES = J(`${root}/maps/data/res-2025.json`);
+  const RES = J(`${root}/map/data/res-2025.json`);
   const FCAL = J(`${root}/data/seat-model-flow-calibration.json`);
   const SW = J(`${root}/data/vote-switching.json`);
   const VOTE = J(`${root}/data/seat-vote-layer.json`);

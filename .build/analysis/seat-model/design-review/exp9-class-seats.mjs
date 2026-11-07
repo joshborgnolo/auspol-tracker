@@ -1,6 +1,6 @@
 // E9: federal deterministic projection (logit geometry, today's primaries) with three-way flows flat vs graded by AEC class.
 import { load, divRows, sum, logit, ilogit, ridge, logitShift } from "./lib.mjs";
-const fed = load("maps/data/res-2025.json");
+const fed = load("map/data/res-2025.json");
 const R = divRows(fed);
 const P = ["alp", "lnp", "onp", "grn", "ind", "oth"];
 const CLS = { "Inner Metropolitan": "inner", "Outer Metropolitan": "outer", "Provincial": "prov", "Rural": "rural" };

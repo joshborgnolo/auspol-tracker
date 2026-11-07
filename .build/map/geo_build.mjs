@@ -1,6 +1,6 @@
 // Boundaries + label anchors for every election the page loads.
 // (The islands that frame leaves out - Norfolk, Lord Howe, Christmas, Cocos -
-// are drawn in inset boxes from maps/data/islands.json, islands_build.mjs.)
+// are drawn in inset boxes from map/data/islands.json, islands_build.mjs.)
 //  1. mapshaper: clip to the mainland frame, simplify to two absolute
 //     tolerances (lo for the country, hi once zoomed past a state), drop
 //     specks, write TopoJSON (object "divs", properties name, st). The
@@ -28,7 +28,7 @@
 // file, so no slivers between states, and the same Queensland coast as
 // 2004-16); the other states' coasts already match and stay as drawn. Needs mapshaper on PATH (or MAPSHAPER) and the npm
 // packages topojson-client, d3 and polylabel.
-// usage: node .build/map/geo_build.mjs <srcDir with n-YYYY.geojson> <dataDir with data-YYYY.json> maps/data
+// usage: node .build/map/geo_build.mjs <srcDir with n-YYYY.geojson> <dataDir with data-YYYY.json> map/data
 //        [--years=sa26] to run a non-federal set (the SA 2026 state map:
 //        n-sa26.geojson + data-sa26.json; 2013 land dissolve skipped)
 import fs from "fs";

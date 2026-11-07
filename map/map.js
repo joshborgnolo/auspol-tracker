@@ -1,4 +1,4 @@
-/* the Electoral maps – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */
+/* the Electoral map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
 /* =============================== helpers =============================== */
@@ -1242,7 +1242,7 @@ async function buildHandbookGeo(topo, m) {
    in (seat: the owner, else the places' own); and the same coast on the
    map's own plane (mpath, its bounds mbb), where the camera flies out to it */
 let islandsP = null;
-const loadIslands = () => islandsP || (islandsP = getJSON("/maps/data/islands.json").catch(() => null));
+const loadIslands = () => islandsP || (islandsP = getJSON("/map/data/islands.json").catch(() => null));
 function buildIslands(data, m) {
   if (!data) return [];
   // the federal seat islands have no home in a state election's frame
@@ -1353,9 +1353,9 @@ async function loadYear(year, bg) {
     const ry = nowRy(year);
     // the results without the polling places' census lanes (core-split.mjs), unless the
     // lens is reading them now or the page's warmup already asked for the full file
-    const fullU = `/maps/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
-    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/maps/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/maps/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/maps/data/${NOW_DATA[year]}`, bg) : null,
-      SEATED.has(year) ? getJSON(`/maps/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
+    const fullU = `/map/data/res-${ry}.json`, full = needPpl() || !!(window.__warm && window.__warm[fullU]);
+    const [res, lo, now, seating, islands] = await Promise.all([full ? getJSON(fullU, bg) : getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg)), getJSON(`/map/data/geo-${ry}-lo.json`, bg), isNowY(year) ? getJSON(`/map/data/${NOW_DATA[year]}`, bg) : null,
+      SEATED.has(year) ? getJSON(`/map/data/seats-${year}.json`, bg).catch(() => null) : null, loadIslands()]);
     // built under its own m.proj, never the page's: `proj` is the year on screen's alone
     // (setYear hands it over). A load borrowing it, as this one did until 2026-11-05, moved
     // the towns, streets and sea under the year in view for as long as the load ran, seconds
@@ -1451,7 +1451,7 @@ const needPpl = () => S.lens === "seifa" && isDemo();
 function loadPpl(y) {
   const m = Y[y];
   if (!m || !m.divs || m.ppl) return Promise.resolve(m);
-  return (m.pplP ??= getJSON(`/maps/data/res-${nowRy(y)}.json`).then((full) => {
+  return (m.pplP ??= getJSON(`/map/data/res-${nowRy(y)}.json`).then((full) => {
     const B = m.booth.raw, F = full.booths;
     if (B && F && F.id.length === B.id.length) for (const k of m.pplLanes) if (F[k]) B[k] = F[k];
     m.ppl = true;
@@ -1476,7 +1476,7 @@ function warmHi(y) {
   // the hi detail can land after the reader has moved to another year — its paths
   // are baked under this year's own projection, whatever the live one is by then
   const ry = nowRy(y);
-  m._hiP = getJSON(`/maps/data/geo-${ry}-hi.json`)
+  m._hiP = getJSON(`/map/data/geo-${ry}-hi.json`)
     .then((hi) => buildGeoSliced(hi, m, m.proj))
     .then((g) => { m.geoHi = g; schedule(); })
     .catch(() => { m._hiP = null; });
@@ -2531,7 +2531,7 @@ function townPts() {
 }
 // the map's scale on screen, px per km (0 until the towns are in)
 function townScale() {
-  if (!placesP) placesP = getJSON("/maps/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
+  if (!placesP) placesP = getJSON("/map/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
   const t = townPts();
   return t ? T.k * t.upk : 0;
 }
@@ -2637,7 +2637,7 @@ let townHiIdx = -1;
 // selection, but drawing frames and probe reads never start a retry loop.
 function loadUrban() {
   if (URBAN || urbanP) return;
-  urbanP = getJSON("/maps/data/urban.json", true)
+  urbanP = getJSON("/map/data/urban.json", true)
     .then((d) => { URBAN = d.u; schedule(); })
     .catch(() => { urbanP = null; });
 }
@@ -4721,7 +4721,7 @@ function loadAreas(vin) {
   if (AREAS_FILES[vin] == null) return null;
   const got = AR.packs[vin];
   if (got) return got.pack || got.P;
-  const P = getJSON(`/maps/data/${AREAS_FILES[vin]}.json`)
+  const P = getJSON(`/map/data/${AREAS_FILES[vin]}.json`)
     .then((D) => {
       const pack = areasUnpack(D);
       AR.packs[vin] = { pack };
@@ -6736,8 +6736,8 @@ function withCouncilPlan(raw, plan) {
 }
 function loadSenate(year = S.year) {
   if (SENY[year]) return Promise.resolve(SENY[year]);
-  const plan = SEATED_LC.has(year) ? getJSON(`/maps/data/seats-${year}-lc.json`).catch(() => null) : null;
-  return (SENP[year] ??= Promise.all([getJSON(`/maps/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
+  const plan = SEATED_LC.has(year) ? getJSON(`/map/data/seats-${year}-lc.json`).catch(() => null) : null;
+  return (SENP[year] ??= Promise.all([getJSON(`/map/data/senate-${year}.json`), plan]).then(([raw, p]) => { SENY[year] = senateModel(withCouncilPlan(raw, p), year); syncSenate(); recolor(false); return SENY[year]; })
     .catch((e) => { delete SENP[year]; throw e; }));
 }
 // every election's Senate, for the timeline's make-up glyphs (about 7KB each)
@@ -6746,7 +6746,7 @@ function loadSenates() {
 }
 // the floor is today's plan's, the chamber the same since 1988
 function loadSenateFloor() {
-  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/maps/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
+  return (senFloorP ??= loadSenate("now").then((m) => getJSON(`/map/data/${m.floor}`)).then((f) => { senFloor = f; senGeomC = null; senPaths = null; return f; }).catch((e) => { senFloorP = null; throw e; }));
 }
 
 /* ----- the floor ----- */
@@ -7200,7 +7200,7 @@ function loadSenateVote(y, bg) {
   const k = svYear(y);
   if (k == null) return Promise.resolve(null);
   if (SV[k]) return Promise.resolve(SV[k]);
-  return (SVP[k] ??= getJSON(`/maps/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
+  return (SVP[k] ??= getJSON(`/map/data/senate-vote-${k}.json`, bg).then((j) => (SV[k] = j)).catch((e) => { delete SVP[k]; throw e; }));
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
@@ -7274,7 +7274,7 @@ function loadSenatePrefs(y) {
   const k = spYear(y);
   if (k == null) return Promise.resolve(null);
   if (SPD[k]) return Promise.resolve(SPD[k]);
-  return (SPDP[k] ??= getJSON(`/maps/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
+  return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
 }
 const spOf = (m) => SPD[spYear(m.year)] || null;
 // the slot of the chosen contest and voters in a seat's 27 counts
@@ -8104,9 +8104,10 @@ function seatStat(m, st, label, noteDef = null) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the govt tag rides the figures' names row, flush with the governing
-  // family's OUTSIDE edge — "formed govt" where an election delivered the
-  // government, "govt" on an as-it-stands frame (which holds rather than won)
+  // the govt tag rides the figures' names row, flush with the whole head's
+  // OUTSIDE content edge on the governing family's side — "formed govt"
+  // where an election delivered the government, "govt" on an as-it-stands
+  // frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
@@ -8115,7 +8116,7 @@ function seatStat(m, st, label, noteDef = null) {
     const s = isNowY(m.year) ? null : A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
-    // the tag rides the names row, flush at the governing family's side
+    // the govt tag rides the names row with them (anchorGovtTag then hugs the head's content edge)
     two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
   }
   const change = (f, n) => {
@@ -8990,11 +8991,34 @@ function renderStory(force) {
   const el = $("#story");
   el.dataset.lens = S.lens;
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
+  anchorGovtTag(el);
+  // a second pass after the frame settles: chip width can grow a few px once
+  // Commissioner lands, which is what makes the first-read clamp stale
+  requestAnimationFrame(() => anchorGovtTag(el));
   // the charts fill in now, not a frame on: a block that grows after the
   // story paints moves everything below it, and a walk's hold with it
   paintMiniChamber(); hydrateDists();
   if (FS.on) fsStory(was !== key);
 }
+/* the govt tag rides the figures' names row, and is then hugged against the
+   whole head's OUTSIDE content edge on its family's side (computed per render:
+   an absolute child of the figures grid can only sample its box's x, and the
+   section edge sits wherever the panel's own zone anchors). The viewport clamp
+   is arithmetic: when a flush run would leave the page, the tag tucks just
+   enough inside the section for its text to stay on screen. Reruns on resize
+   and every story render. */
+function anchorGovtTag(el) {
+  const stat = el && el.querySelector(".st-stat"), fg = el && el.querySelector(".st-stat .st-fg");
+  if (!stat || !fg) return;
+  const alp = fg.classList.contains("st-fg-alp");
+  const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect(), w = fg.offsetWidth;
+  const gap = alp ? tb.left - sb.left : sb.right - tb.right;
+  const room = alp ? sb.left : innerWidth - sb.right;
+  fg.style[alp ? "left" : "right"] = "auto";
+  fg.style[alp ? "right" : "left"] = `calc(100% + ${gap - Math.max(0, w - Math.max(0, room))}px)`;
+}
+if (typeof addEventListener === "function") addEventListener("resize", () => anchorGovtTag($("#story")));
+if (typeof document !== "undefined" && document.fonts && document.fonts.ready) document.fonts.ready.then(() => anchorGovtTag($("#story")));
 
 /* =============================== filters =============================== */
 const MARGINS = { marginal: [0, 6, "Marginal, under 6 points"], fair: [6, 10, "Fairly safe, 6 to 10"], safe: [10, 100, "Safe, over 10"] };
@@ -9514,11 +9538,11 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/maps/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
-    ...[...SEATED].map((y) => getJSON(`/maps/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
+    ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
 function legendStandIn(m, y) {
@@ -9538,7 +9562,7 @@ function legendHeightOf(m, y, w, probe) {
   // its flip) re-holds it once, which reads as the key's own change. On the map
   // it holds the taller of its two faces, seats and polling places, so zooming in
   // to the places (or out of them) never moves the stage under the reader
-  const key = [w, S.view, y, real, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.seat].join("|");
+  const key = [w, S.view, y, real, S.lens, S.draw, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.seat].join("|");
   if (!legendHeights.has(key)) {
     const keep = { seat: S.seat, year: S.year, draw: S.draw };
     let hMax = 0;
@@ -9547,7 +9571,9 @@ function legendHeightOf(m, y, w, probe) {
       const my = legendStandIn(m, y);
       for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
         S.seat = seat;
-        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of S.view === "map" ? DRAWS.map(([k]) => k) : [S.draw]) {
+        // the hold is the current draw's two faces (seats · polling places), not
+        // every surface's — slimmer views stop inheriting taller surfaces' peaks
+        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of [S.draw]) {
           boothsAs = bo; S.draw = dw;
           probe.innerHTML = legendHTML(my);
           hMax = Math.max(hMax, probe.getBoundingClientRect().height);
@@ -9825,6 +9851,9 @@ function legendHTML(m) {
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
+    // the zoom hint rides the strip too, off the stage's top-left overlay with
+    // the cities — re-rendered fresh every write, and updateHint fills it by id
+    h += `<div class="lg-hint mp-hint" id="hint"></div>`;
     if (S.lens !== "winner") h += drawRow;
     h += drawNoteHTML(m);
     // the winner strip's switch is its bottom line, full width and left
@@ -11036,7 +11065,7 @@ function fsBuild() {
   if (FS.el) return;
   const el = document.createElement("div");
   el.className = "fs"; el.id = "fs"; el.hidden = true; el.tabIndex = -1;
-  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Electoral maps, full screen");
+  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Electoral map, full screen");
   el.innerHTML = `<div class="fs-top">
       <div class="fs-lensbar fs-plate"></div>
       <div class="fs-sbox"></div>
@@ -11046,7 +11075,7 @@ function fsBuild() {
     <aside class="fs-side fs-plate" aria-label="The story">
       <div class="fs-grab" role="button" tabindex="0" aria-label="Show more of the story"><i></i></div>
       <div class="fs-head">
-        <div class="fs-title"><h2>Electoral maps</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
+        <div class="fs-title"><h2>Electoral map</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
         <p class="fs-meta"></p>
         <div class="fs-vslot"></div>
       </div>

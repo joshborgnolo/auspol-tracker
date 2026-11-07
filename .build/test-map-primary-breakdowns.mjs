@@ -24,7 +24,7 @@ const ctx = vm.createContext({
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
 const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
 function model(year) {
-  const res = JSON.parse(read(`maps/data/core-${year}.json`));
+  const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
   const areas = Object.fromEntries(Object.entries(res.agg).map(([st,a]) => [st, {
     idx:divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i), formal:a.formal,

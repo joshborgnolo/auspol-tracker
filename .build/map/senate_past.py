@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The Senate after each election 2004-2025, for the Election map: maps/data/senate-<year>.json.
+"""The Senate after each election 2004-2025, for the Election map: map/data/senate-<year>.json.
 
 Each is the Senate on the day the election's senators took their seats: 1 July after a half-Senate
 election (2004's on 1 July 2005, and so on), and 2 July 2016 for the double dissolution. Sources, all
@@ -27,7 +27,7 @@ import collections, datetime as dt, gzip, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(ROOT, ".build/map/src/senate-handbook")
-OUT = os.path.join(ROOT, "maps/data")
+OUT = os.path.join(ROOT, "map/data")
 D = dt.date.fromisoformat
 ELECTIONS = {1993: "1993-03-13", 1996: "1996-03-02", 1998: "1998-10-03", 2001: "2001-11-10", 2004: "2004-10-09", 2007: "2007-11-24", 2010: "2010-08-21", 2013: "2013-09-07", 2016: "2016-07-02", 2019: "2019-05-18", 2022: "2022-05-21", 2025: "2025-05-03"}
 TERRITORY = {"ACT", "NT"}

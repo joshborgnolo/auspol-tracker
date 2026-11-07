@@ -37,7 +37,7 @@ def main():
         with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
             list(pool.map(a.fetch, ['geojson/' + r['geojson_file'] for r in selected]))
     fc, records, shapes = a.load_handbook(selected, certified)
-    old = subprocess.check_output(['git','show',f'{BASELINE}:maps/data/geo-2001-hi.json'], cwd=a.ROOT)
+    old = subprocess.check_output(['git','show',f'{BASELINE}:map/data/geo-2001-hi.json'], cwd=a.ROOT)
     decode = "const fs=require('fs'),vm=require('vm'),c={};vm.runInNewContext(fs.readFileSync('map/vendor/topojson-client-3.1.0.min.js','utf8'),c);const t=JSON.parse(fs.readFileSync(0));process.stdout.write(JSON.stringify(c.topojson.feature(t,t.objects.divs)));"
     baseline = json.loads(subprocess.check_output(['node','-e',decode],input=old,cwd=a.ROOT))
     old_shapes = {f['properties']['name']:a.shape(f['geometry']) for f in baseline['features']}

@@ -148,11 +148,11 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/maps/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && S.lens === "winner") renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
-    ...[...SEATED].map((y) => getJSON(`/maps/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
+    ...[...SEATED].map((y) => getJSON(`/map/data/seats-${y}.json`).then((j) => SEAT_META.set(y, { plan: j.plan, note: j.note }))),
   ].map((p) => p && p.catch(() => {}))).then(() => { legendHeights.clear(); if (M()) renderLegend(); })); // a measure taken before the words were in is dropped
 }
 function legendStandIn(m, y) {
@@ -172,7 +172,7 @@ function legendHeightOf(m, y, w, probe) {
   // its flip) re-holds it once, which reads as the key's own change. On the map
   // it holds the taller of its two faces, seats and polling places, so zooming in
   // to the places (or out of them) never moves the stage under the reader
-  const key = [w, S.view, y, real, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.seat].join("|");
+  const key = [w, S.view, y, real, S.lens, S.draw, S.tppMode, S.fpMode, S.senMode, S.infMode, S.index, S.cob, S.seat].join("|");
   if (!legendHeights.has(key)) {
     const keep = { seat: S.seat, year: S.year, draw: S.draw };
     let hMax = 0;
@@ -181,7 +181,9 @@ function legendHeightOf(m, y, w, probe) {
       const my = legendStandIn(m, y);
       for (const seat of S.view === "chamber" && my.seating ? ["plan", "sort"] : [keep.seat]) {
         S.seat = seat;
-        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of S.view === "map" ? DRAWS.map(([k]) => k) : [S.draw]) {
+        // the hold is the current draw's two faces (seats · polling places), not
+        // every surface's — slimmer views stop inheriting taller surfaces' peaks
+        for (const bo of S.view === "map" ? [false, true] : [false]) for (const dw of [S.draw]) {
           boothsAs = bo; S.draw = dw;
           probe.innerHTML = legendHTML(my);
           hMax = Math.max(hMax, probe.getBoundingClientRect().height);
@@ -459,6 +461,9 @@ function legendHTML(m) {
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
     h += jumpHTML();
+    // the zoom hint rides the strip too, off the stage's top-left overlay with
+    // the cities — re-rendered fresh every write, and updateHint fills it by id
+    h += `<div class="lg-hint mp-hint" id="hint"></div>`;
     if (S.lens !== "winner") h += drawRow;
     h += drawNoteHTML(m);
     // the winner strip's switch is its bottom line, full width and left

@@ -3,7 +3,7 @@
 
    Every counted House flow 2016-2025 whose final pair is two of Labor (A), Coalition (C),
    Greens (G), One Nation (O) is set against the same division's Senate ballots for the donor's
-   cohort (maps/data/res-<year>.json `fl` rows = the AEC's two-candidate-preferred flow of each
+   cohort (map/data/res-<year>.json `fl` rows = the AEC's two-candidate-preferred flow of each
    excluded candidate's own first preferences). On the logit scale,
 
        logit(House share) - logit(Senate share) = delta[class, pair] + u[election, class] + v
@@ -37,7 +37,7 @@ const donorClass = (key) => classOf(key) || "OTH-" + (SUBCLASS[key.slice(4)] || 
 const CLS = { "Inner Metropolitan": "inner", "Outer Metropolitan": "outer", "Provincial": "prov", "Rural": "rural" };
 
 function rowsFor(E, senYear) {
-  const D = JSON.parse(readFileSync(`maps/data/res-${E}.json`, "utf8"));
+  const D = JSON.parse(readFileSync(`map/data/res-${E}.json`, "utf8"));
   const Rs = R[senYear], out = [];
   for (const dv of D.divs) {
     if (!dv.tcp || dv.tcp.length !== 2 || !Rs.div[dv.n]) continue;
@@ -179,7 +179,7 @@ const out = {
   lag: { sigmaU: +fLag.sigmaU.toFixed(4), sigmaV: +fLag.sigmaV.toFixed(4), delta: fLag.delta, classPooled: fLag.classPooled, byClass: fLag.byClass, check: cLag },
   strength,
   rows: { same: same.length, lag: lag.length, pairs: [...new Set(same.map((r) => r.cls + "|" + r.pair))].sort() },
-  _provenance: { generated: new Date().toISOString().slice(0, 10), senate: YEARS.map((y) => `data/senate-rankings-${y}.json`), house: YEARS.map((y) => `maps/data/res-${y}.json`) },
+  _provenance: { generated: new Date().toISOString().slice(0, 10), senate: YEARS.map((y) => `data/senate-rankings-${y}.json`), house: YEARS.map((y) => `map/data/res-${y}.json`) },
 };
 writeFileSync("data/seat-model-flow-calibration.json", JSON.stringify(out, null, 1) + "\n");
 console.log("\nwrote data/seat-model-flow-calibration.json");

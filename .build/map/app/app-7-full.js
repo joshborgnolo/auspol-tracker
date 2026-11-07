@@ -43,7 +43,7 @@ function fsBuild() {
   if (FS.el) return;
   const el = document.createElement("div");
   el.className = "fs"; el.id = "fs"; el.hidden = true; el.tabIndex = -1;
-  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Electoral maps, full screen");
+  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Electoral map, full screen");
   el.innerHTML = `<div class="fs-top">
       <div class="fs-lensbar fs-plate"></div>
       <div class="fs-sbox"></div>
@@ -53,7 +53,7 @@ function fsBuild() {
     <aside class="fs-side fs-plate" aria-label="The story">
       <div class="fs-grab" role="button" tabindex="0" aria-label="Show more of the story"><i></i></div>
       <div class="fs-head">
-        <div class="fs-title"><h2>Electoral maps</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
+        <div class="fs-title"><h2>Electoral map</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
         <p class="fs-meta"></p>
         <div class="fs-vslot"></div>
       </div>

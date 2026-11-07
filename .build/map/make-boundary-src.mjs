@@ -17,7 +17,7 @@
 // The downloads live at aec.gov.au/Electorates/gis/gis_datadownload.htm; fetch
 // them into <stageDir>/dl first. Every output feature carries only the
 // division name as `name`; the output set is gated on exact name equality
-// (case/punctuation-insensitive) with that year's maps/data/data-YYYY.json
+// (case/punctuation-insensitive) with that year's map/data/data-YYYY.json
 // results, the same join geo_build re-checks. Needs mapshaper on PATH (or
 // MAPSHAPER) for the ESRI sources.
 // 2004's QLD MIF carries a defect geo_build cannot see: Kennedy's upper
@@ -40,7 +40,7 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
 const MS = process.env.MAPSHAPER || "mapshaper";
 const MIF2 = REPO + "/.build/map/mif2geojson.mjs";
 const ERAS = REPO + "/.matilda/seifa-irsad-abs/dl/aec-ced-eras";
-const DATA = REPO + "/maps/data";
+const DATA = REPO + "/map/data";
 const stage = process.argv[2];
 if (!stage) throw new Error("usage: node make-boundary-src.mjs <stageDir> [--years=...]");
 const dl = (f) => path.join(stage, "dl", f);

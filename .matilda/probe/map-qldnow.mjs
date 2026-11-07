@@ -1,4 +1,4 @@
-/* The /maps/ Qld "now" frame (qldnow) end to end, headless: the 2024
+/* The /map/ Qld "now" frame (qldnow) end to end, headless: the 2024
    Legislative Assembly with the two by-elections since (Hinchinbrook
    29 Nov 2025, Stafford 16 May 2026) and the members' moves (Sullivan's
    May-2025 expulsion from Labor, his death, Dametto's resignation),
@@ -51,7 +51,7 @@ const boot = async (url) => {
 
 // deep link boots the frame
 {
-  const { page, errors } = await boot(base + "/maps/#y=qldnow");
+  const { page, errors } = await boot(base + "/map/#y=qldnow");
   const st = await page.evaluate(() => {
     const S = window.__map.S, m = window.__map.Y[S.year];
     const story = document.querySelector("#story") ? document.querySelector("#story").innerText : "";
@@ -80,7 +80,7 @@ const boot = async (url) => {
 
 // each by-election winner holds its seat
 {
-  const { page, errors } = await boot(base + "/maps/#y=qldnow");
+  const { page, errors } = await boot(base + "/map/#y=qldnow");
   const out = await page.evaluate(() => {
     const m = window.__map.Y.qldnow;
     const D = m.divs[m.byName.get("Hinchinbrook")];
@@ -102,7 +102,7 @@ const boot = async (url) => {
 
 // Stafford's seat page reads its own by-election
 {
-  const { page, errors } = await boot(base + "/maps/#y=qldnow");
+  const { page, errors } = await boot(base + "/map/#y=qldnow");
   const out = await page.evaluate(async () => {
     window.__map.goDiv(window.__map.Y.qldnow.byName.get("Stafford"));
     await new Promise((r) => setTimeout(r, 700));
@@ -117,7 +117,7 @@ const boot = async (url) => {
 
 // the federal Now is untouched by the generalisation
 {
-  const { page, errors } = await boot(base + "/maps/#y=now");
+  const { page, errors } = await boot(base + "/map/#y=now");
   const st = await page.evaluate(() => ({
     year: window.__map.S.year,
     meta: document.querySelector("#mp-meta").innerText,

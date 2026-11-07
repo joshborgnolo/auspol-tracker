@@ -30,7 +30,7 @@ export const personKey = (st, name) => { const nm = String(name).split(" "); ret
 
 export function loadHistory(root = ".", years = LONG_YEARS) {
   const J = (f) => JSON.parse(readFileSync(`${root}/${f}`, "utf8"));
-  const RES = Object.fromEntries(years.map((y) => [y, J(`maps/data/res-${y}.json`)]));
+  const RES = Object.fromEntries(years.map((y) => [y, J(`map/data/res-${y}.json`)]));
   const INC = J("data/house-incumbency.json").years;
   return { RES, INC };
 }

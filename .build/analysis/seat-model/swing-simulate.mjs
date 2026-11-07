@@ -47,7 +47,7 @@ const inputs = prepInputs({ composition: MODE !== "replay", replay: MODE === "re
 const seats = buildSeatsFrom(inputs, { composition: MODE !== "replay" });
 
 if (MODE === "replay") {
-  const RES = J("maps/data/res-2025.json");
+  const RES = J("map/data/res-2025.json");
   const groupOfRes = (c, s) => {
     if (c[3] === "alp") return "alp"; if (c[3] === "grn") return "grn"; if (c[3] === "onp") return "on";
     if (c[3] === "lnp") return ({ LP: "lp", NP: "np", LNP: "lnp", CLP: "clp" }[c[1]] || "lnp");
@@ -74,8 +74,8 @@ const S = modelSettings({ VOTE, CAL, FCAL, DRIFT, mode: MODE });
 const res = runMany(seats, S, { draws: DRAWS, seed: SEED });
 const central = projectOnce(seats, S);
 const INPUTS = ["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json", "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json",
-  "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "maps/data/res-2025.json",
-  "data/house-incumbency.json", "maps/data/res-2022.json",
+  "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "map/data/res-2025.json",
+  "data/house-incumbency.json", "map/data/res-2022.json",
   ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
   ".build/analysis/seat-model/swing-fit.mjs", ".build/newtracker/flows.mjs"];
 const out = {

@@ -1,4 +1,4 @@
-/* map/map.css – the Election map's own styles (.build/map/app/page.css,
+/* map/map.css – the Electoral map's own styles (.build/map/app/page.css,
    copied by .build/map/assemble.mjs). The palette tokens live in the page's
    inline <style>, where site-shell.mjs scopes their dark copies; the shell
    brings the masthead, tab bar, menu and colophon. */
@@ -136,9 +136,9 @@ button { cursor: pointer; background: none; border: 0; }
 @media (prefers-reduced-motion: reduce) { .mp-stamp, .mp-stamp.on { transform: none; } .mp-stamp.wait .mp-stamp-r i { animation-duration: 2.4s; } }
 
 /* overlays on the stage */
-/* the zoom hint runs the width of the stage, clear of the zoom buttons */
-.mp-tl { position: absolute; left: 0; top: 2px; max-width: calc(100% - 56px); z-index: 3; pointer-events: none; }
-.mp-tl > * { pointer-events: auto; }
+/* the zoom hint, which used to run the width of the stage's top-left overlay */
+.lg-hint { text-shadow: none !important; white-space: normal !important; }
+.mp-legend > .lg-hint { grid-column: 1 / -1; display: block; margin-top: 6px; }
 .mp-ca { display: flex; flex-direction: column; align-items: center; }
 .mp-ca button:first-child { padding-bottom: 0; }
 .mp-ca button + button { padding-top: 1px; }
@@ -209,6 +209,9 @@ button { cursor: pointer; background: none; border: 0; }
 .lg-bal svg { flex: none; fill: none; stroke: var(--ink-3); stroke-width: 1; }
 /* under the scale, the shorter column and the wider: in the left one it would wrap and the strip would grow */
 .lg-undrawn { margin-top: 2px; font-size: 12px; color: var(--ink-3); }
+/* direct strip children (the winner lens, whose title/jump/draw rows span the
+   strip): the guide notes stack in the left column with everything else */
+.mp-legend > .lg-bal, .mp-legend > .lg-undrawn { grid-column: 1; }
 .mp-legend > .lg-shapes { border-top: 0; padding-top: 0; }
 .mp-legend > .lg-shapes { margin-top: 6px; }
 @media (max-width: 1100px) { .mp-legend { column-gap: 22px; min-height: 124px; } }
@@ -305,15 +308,15 @@ button { cursor: pointer; background: none; border: 0; }
 .st-head .rd-meta { flex-basis: 100%; margin-top: 3px; }
 .st-hed { margin-top: 14px; font-family: var(--serif); font-weight: 700; font-size: 32px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
 /* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
-.st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; }
+.st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; position: relative; }
 .st-stat b { font-weight: 700; }
 .st-stat i { font-style: normal; font-family: var(--sans); font-weight: 300; color: var(--ink-2); padding: 0 0.1em; display: inline-block; transform: scaleX(0.72); }
 .st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 .st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
 /* each section of the stat head closes on a double rule — two hairlines, tightly spaced */
-.st-sep { align-self: stretch; height: 4px; margin-top: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.st-sep + .st-lab { margin-top: 20px; }
+.st-sep { align-self: stretch; height: 4px; margin-top: 10px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.st-sep + .st-lab { margin-top: 10px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
 /* the figures grid: the pair's numbers across row one, each side's name under its figure's inside edge */
 .st-tpp { display: inline-grid; grid-template-columns: auto auto auto; align-items: baseline; position: relative; }
@@ -322,9 +325,10 @@ button { cursor: pointer; background: none; border: 0; }
 .st-nm-l { grid-column: 1; justify-self: end; }
 .st-nm-r { grid-column: 3; justify-self: start; }
 .st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; color: var(--ink); }
-/* the govt tag rides the figures' names row, flush with the governing
-   family's outside edge (ink/bg invert with the theme); absolute, so the
-   figures never reflow around it */
+/* the govt tag rides the figures' names row, flush with the whole head's
+   outside content edge (ink/bg invert with the theme); absolute, and placed
+   exactly per render by anchorGovtTag: where the run would leave the viewport
+   it tucks inside enough to stop there */
 .st-fg { position: absolute; bottom: 1px; font-size: 11px; }
 .st-fg.st-fg-alp { right: 100%; }
 .st-fg.st-fg-lnp { left: 100%; }
@@ -391,10 +395,12 @@ button { cursor: pointer; background: none; border: 0; }
 .st-stat + .st-dek { margin-top: 16px; }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
-.st-sec { margin-top: 26px; padding-top: 11px; border-top: 1px solid var(--line); }
+.st-sec { margin-top: 26px; padding-top: 7px; border-top: 1px solid var(--line); }
 .st-sec > h3 { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 8px; }
 .st-sec > h3 small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
 .st-inf { margin-top: 22px; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
+/* the informal line opens on the same twin rule the winner story's junctions wear */
+#story[data-lens="winner"] .st-inf { padding-top: 10px; border-top: 4px double var(--line); }
 .st-note { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
 .st-note b { color: var(--ink-2); font-weight: 600; }
 .t-alp { color: var(--alp-text); } .t-lnp { color: var(--lnp-text); } .t-grn { color: var(--grn-text); } .t-onp { color: var(--onp-text); } .t-oth { color: var(--oth-text); }
@@ -674,11 +680,8 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-time { height: 48px; }
   .st-hed { font-size: 27px; }
   .st-tpp, .st-seats { font-size: 44px; }
-  /* the hanging govt chip shrinks and tucks 12px into the figures'
-     outer whitespace so it stays inside the phone viewport */
+  /* the hanging govt chip shrinks; its viewport-safe tuck is runtime-computed */
   .st-fg > b { font-size: 10px; letter-spacing: 0.02em; padding: 2px 3px; }
-  .st-fg.st-fg-alp { right: calc(100% - 12px); }
-  .st-fg.st-fg-lnp { left: calc(100% - 12px); }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }
   .mp-legend .lg-left .lg-draw ~ .lg-note { display: block; }

@@ -13,7 +13,7 @@ try {
   await page.evaluateOnNewDocument(()=>Object.defineProperty(navigator,'connection',{value:{saveData:true}}));
   const boot = async (frag) => {
     for (let i = 0; i < 4; i++) {
-      await page.goto(`${base}/maps/${frag}`, {waitUntil:'domcontentloaded'});
+      await page.goto(`${base}/map/${frag}`, {waitUntil:'domcontentloaded'});
       try { await page.waitForFunction(()=>window.__map, {timeout:15000}); return; } catch (e) { /* flake: reload */ }
     }
     throw new Error('map boot never completed: ' + frag);

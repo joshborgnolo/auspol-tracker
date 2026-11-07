@@ -1,5 +1,5 @@
 /* core-split.mjs – each Election map results file without its polling places'
-   census lanes: maps/data/core-<frame>.json, written beside res-<frame>.json by
+   census lanes: map/data/core-<frame>.json, written beside res-<frame>.json by
    assemble.mjs (2026-11-01, the /map/ speed pass).
 
    The lanes (each polling place's People shares: demo, cob, rel, ten, anc,
@@ -29,15 +29,15 @@ export function coreText(resText) {
   if (lanes.length) r.pplLanes = lanes;
   return JSON.stringify(r);
 }
-// every res-<frame>.json in maps/data → its core-<frame>.json, written when it changed
+// every res-<frame>.json in map/data → its core-<frame>.json, written when it changed
 export function writeCores(root, log = console.log) {
-  const dir = path.join(root, "maps", "data");
+  const dir = path.join(root, "map", "data");
   for (const f of fs.readdirSync(dir).sort()) {
     const m = f.match(/^res-(\w+)\.json$/);
     if (!m) continue;
     const out = path.join(dir, `core-${m[1]}.json`), body = coreText(fs.readFileSync(path.join(dir, f), "utf8"));
     if (fs.existsSync(out) && fs.readFileSync(out, "utf8") === body) continue;
     fs.writeFileSync(out, body);
-    log(`maps/data/core-${m[1]}.json`, body.length, "bytes");
+    log(`map/data/core-${m[1]}.json`, body.length, "bytes");
   }
 }

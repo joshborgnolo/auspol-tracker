@@ -21,8 +21,8 @@ const V = prepVic({ vote });
 const seats = buildSeatsFrom({ seats: V.seats, comp: V.comp, ST: V.ST, SEN: V.SEN, pre: V.pre, hist: { bySeat: {}, mean: {} } }, { composition: true });
 const res = runMany(seats, V.S, { draws: DRAWS, seed: SEED });
 const central = projectOnce(seats, V.S);
-const INPUTS = ["data/vic-polls.json", "maps/data/res-vic22.json", "maps/data/res-2025.json", "maps/data/la-seating-plan-vic-2026-08-11.json", "data/senate-rankings-2025.json",
-  ".build/aec-flow-src/senate-ballots/booth-rankings-2025.json.gz", "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/aec-2025-tcp-flow-by-division.csv", "maps/data/res-2022.json", ".build/aec-flow-src/senate-ballots/booth-rankings-2022.json.gz", "data/senate-rankings-2022.json", ".build/vic/to-main-schema.mjs",
+const INPUTS = ["data/vic-polls.json", "map/data/res-vic22.json", "map/data/res-2025.json", "map/data/la-seating-plan-vic-2026-08-11.json", "data/senate-rankings-2025.json",
+  ".build/aec-flow-src/senate-ballots/booth-rankings-2025.json.gz", "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/aec-2025-tcp-flow-by-division.csv", "map/data/res-2022.json", ".build/aec-flow-src/senate-ballots/booth-rankings-2022.json.gz", "data/senate-rankings-2022.json", ".build/vic/to-main-schema.mjs",
   ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs",
   ".build/analysis/seat-model/state-tables.mjs", ".build/analysis/seat-model/vic-inputs.mjs"];
 const out = {

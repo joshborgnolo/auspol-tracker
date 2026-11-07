@@ -1,7 +1,7 @@
 // E2: the SA-2026 Liberal collapse (36.2 -> 19.0) and Labor's small fall — which geometry predicts district shares?
 import { load, divRows, boothRows, km, sum, mean, logit, ilogit, logitShift, mae, rmse, corr } from "./lib.mjs";
-const fed = load("maps/data/res-2025.json");
-const sa = load("maps/data/res-sa26.json");
+const fed = load("map/data/res-2025.json");
+const sa = load("map/data/res-sa26.json");
 const S = divRows(sa);
 const fedB = boothRows(fed).filter((b) => b.st === "SA" && b.tot >= 30);
 const saB = boothRows(sa);

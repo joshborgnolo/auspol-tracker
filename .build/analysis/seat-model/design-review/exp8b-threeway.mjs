@@ -59,8 +59,8 @@ function loo(rows, label) {
   const m = (p) => (100 * mean(p.map((x, i) => Math.abs(x - act[i])))).toFixed(2);
   console.log(`   ${label} leave-one-out MAE (pts): flat ${m(preds.flat)} | class ${m(preds.cls)} | uni-share slope ${m(preds.uni)} | ON-primary slope ${m(preds.on)} | Coalition-primary slope ${m(preds.lnp)}   [corr with uni ${corr(rows.map((r) => r.uni), act).toFixed(2)}, ON ${corr(rows.map((r) => r.on), act).toFixed(2)}]`);
 }
-const fed25 = load("maps/data/res-2025.json"), fed16 = load("maps/data/res-2016.json"), fed22 = load("maps/data/res-2022.json");
-const sa26 = load("maps/data/res-sa26.json"), qld17 = load("maps/data/res-qld17.json"), qld20 = load("maps/data/res-qld20.json"), qld24 = load("maps/data/res-qld24.json");
+const fed25 = load("map/data/res-2025.json"), fed16 = load("map/data/res-2016.json"), fed22 = load("map/data/res-2022.json");
+const sa26 = load("map/data/res-sa26.json"), qld17 = load("map/data/res-qld17.json"), qld20 = load("map/data/res-qld20.json"), qld24 = load("map/data/res-qld24.json");
 const saCls = inheritClass(sa26, fed25, "SA"), q17Cls = inheritClass(qld17, fed16, "QLD"), q20Cls = inheritClass(qld20, fed22, "QLD");
 
 console.log("\nCoalition -> Labor share, in Labor v One Nation finals");

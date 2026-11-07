@@ -440,9 +440,10 @@ function seatStat(m, st, label, noteDef = null) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the govt tag rides the figures' names row, flush with the governing
-  // family's OUTSIDE edge — "formed govt" where an election delivered the
-  // government, "govt" on an as-it-stands frame (which holds rather than won)
+  // the govt tag rides the figures' names row, flush with the whole head's
+  // OUTSIDE content edge on the governing family's side — "formed govt"
+  // where an election delivered the government, "govt" on an as-it-stands
+  // frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
@@ -451,7 +452,7 @@ function seatStat(m, st, label, noteDef = null) {
     const s = isNowY(m.year) ? null : A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
-    // the tag rides the names row, flush at the governing family's side
+    // the govt tag rides the names row with them (anchorGovtTag then hugs the head's content edge)
     two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
   }
   const change = (f, n) => {
@@ -1326,8 +1327,31 @@ function renderStory(force) {
   const el = $("#story");
   el.dataset.lens = S.lens;
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
+  anchorGovtTag(el);
+  // a second pass after the frame settles: chip width can grow a few px once
+  // Commissioner lands, which is what makes the first-read clamp stale
+  requestAnimationFrame(() => anchorGovtTag(el));
   // the charts fill in now, not a frame on: a block that grows after the
   // story paints moves everything below it, and a walk's hold with it
   paintMiniChamber(); hydrateDists();
   if (FS.on) fsStory(was !== key);
 }
+/* the govt tag rides the figures' names row, and is then hugged against the
+   whole head's OUTSIDE content edge on its family's side (computed per render:
+   an absolute child of the figures grid can only sample its box's x, and the
+   section edge sits wherever the panel's own zone anchors). The viewport clamp
+   is arithmetic: when a flush run would leave the page, the tag tucks just
+   enough inside the section for its text to stay on screen. Reruns on resize
+   and every story render. */
+function anchorGovtTag(el) {
+  const stat = el && el.querySelector(".st-stat"), fg = el && el.querySelector(".st-stat .st-fg");
+  if (!stat || !fg) return;
+  const alp = fg.classList.contains("st-fg-alp");
+  const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect(), w = fg.offsetWidth;
+  const gap = alp ? tb.left - sb.left : sb.right - tb.right;
+  const room = alp ? sb.left : innerWidth - sb.right;
+  fg.style[alp ? "left" : "right"] = "auto";
+  fg.style[alp ? "right" : "left"] = `calc(100% + ${gap - Math.max(0, w - Math.max(0, room))}px)`;
+}
+if (typeof addEventListener === "function") addEventListener("resize", () => anchorGovtTag($("#story")));
+if (typeof document !== "undefined" && document.fonts && document.fonts.ready) document.fonts.ready.then(() => anchorGovtTag($("#story")));

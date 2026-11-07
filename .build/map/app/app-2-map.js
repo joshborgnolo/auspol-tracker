@@ -1019,7 +1019,7 @@ function townPts() {
 }
 // the map's scale on screen, px per km (0 until the towns are in)
 function townScale() {
-  if (!placesP) placesP = getJSON("/maps/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
+  if (!placesP) placesP = getJSON("/map/data/places.json", true).then((d) => { PLACES = d.p; schedule(); }).catch(() => {});
   const t = townPts();
   return t ? T.k * t.upk : 0;
 }
@@ -1125,7 +1125,7 @@ let townHiIdx = -1;
 // selection, but drawing frames and probe reads never start a retry loop.
 function loadUrban() {
   if (URBAN || urbanP) return;
-  urbanP = getJSON("/maps/data/urban.json", true)
+  urbanP = getJSON("/map/data/urban.json", true)
     .then((d) => { URBAN = d.u; schedule(); })
     .catch(() => { urbanP = null; });
 }

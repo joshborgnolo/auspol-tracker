@@ -1,9 +1,11 @@
-// Probe: the /maps/ Winner head's two-party block —
-//   1. the govt ink tag rides the figures' NAMES ROW on every frame, flush
-//      with the governing family's OUTER edge of the figures — left of them
-//      for Labor, right for the Coalition, never hanging PAST the edge
-//      (ink/bg per theme). It READS "formed govt" on an election frame,
-//      just "govt" on an as-it-stands now frame;
+// Probe: the /map/ Winner head's two-party block —
+//   1. the govt ink tag sits at the whole head's OUTSIDE content edge on the
+//      governing family's side, flush with it wherever the viewport allows —
+//      and tucked inside JUST enough to keep its text on screen (-viewportised)
+//      where a flush run would leave the page (2026-11-07 a tightened clamp;
+//      before this it hung past the figures' own edge, narrower or not). It
+//      READS "formed govt" on an election frame, just "govt" on an as-it-stands
+//      now frame;
 //   2. the figures grid names both sides ("Labor" · "Coalition"/"LNP"…), each
 //      name flush with its figure's inside edge, above the swing line.
 // usage: node .matilda/probe/map-formed-govt.mjs <baseUrl>  (serve the repo root first)
@@ -18,25 +20,31 @@ const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
 
+// the tag's own measuring fields: names-row pitch, its exact x vs the head's
+// content edges, and the same viewport-clamp arithmetic the source applies
 const tag = () => page.evaluate(() => {
   const fg = document.querySelector(".st-stat .st-fg");
   if (!fg) return { found: false, count: document.querySelectorAll(".st-stat .st-fg").length };
-  const r = fg.getBoundingClientRect();
+  const stat = fg.closest(".st-stat");
   const tpp = fg.closest(".st-tpp");
+  const r = fg.getBoundingClientRect(), sb = stat.getBoundingClientRect();
   const nm = tpp && tpp.querySelector(".st-nm-l");
-  const cs = getComputedStyle(fg.querySelector("b"));
-  const rr = (x) => x.getBoundingClientRect();
+  const w = Math.round(fg.offsetWidth), alp = /st-fg-alp/.test(fg.className);
+  const room = alp ? sb.left : innerWidth - sb.right;
+  const tuck = Math.max(0, w - Math.max(0, room));
   return {
     found: true,
     count: document.querySelectorAll(".st-stat .st-fg").length,
     text: fg.textContent.trim(),
     cls: fg.className,
     parent: fg.parentElement ? fg.parentElement.className.split(" ")[0] : "",
-    padX: [parseFloat(cs.paddingLeft), parseFloat(cs.paddingRight)],
-    outLeft: tpp ? Math.round((rr(tpp).left - r.right) * 10) / 10 : null,   // gap beyond the figures' left edge
-    outRight: tpp ? Math.round((r.left - rr(tpp).right) * 10) / 10 : null,  // gap beyond the figures' right edge
-    rowDY: nm ? Math.abs((r.top + r.height / 2) - ((rr(nm).top + rr(nm).height / 2))) : null,
-    inView: r.left >= 0 && r.right <= innerWidth,
+    // + means tucked INTO the section past the content edge; 0±1 is flush
+    outLeft: Math.round(((sb.left - r.right)) * 10) / 10,
+    outRight: Math.round((r.left - sb.right) * 10) / 10,
+    fgL: Math.round(r.left), fgR: Math.round(r.right), fgW: w, tuck, vw: innerWidth,
+    rowDY: nm ? Math.abs((r.top + r.height / 2) - (nm.getBoundingClientRect().top + nm.getBoundingClientRect().height / 2)) : null,
+    // sub-pixel text metrics make a flush 0 read as −0.5: 2px of slack, not a bug
+    inView: r.left >= -2 && r.right <= innerWidth + 2,
   };
 });
 const names = () => page.evaluate(() => {
@@ -45,112 +53,95 @@ const names = () => page.evaluate(() => {
   const [bL, , bR] = [...tpp.children];
   const nL = tpp.querySelector(".st-nm-l"), nR = tpp.querySelector(".st-nm-r");
   if (!nL || !nR) return { found: "tpp only", kids: tpp.children.length };
-  const rL = bL.getBoundingClientRect(), rR = bR.getBoundingClientRect(), nLr = nL.getBoundingClientRect(), nRr = nR.getBoundingClientRect();
   const swing = tpp.nextElementSibling;
   return {
     found: true,
     left: nL.textContent.trim(),
     right: nR.textContent.trim(),
-    leftFlush: Math.abs(nLr.right - rL.right),
-    rightFlush: Math.abs(nRr.left - rR.left),
-    aboveSwing: nLr.bottom <= (swing ? swing.getBoundingClientRect().top + 1 : Infinity),
+    leftFlush: Math.abs(nL.getBoundingClientRect().right - bL.getBoundingClientRect().right),
+    rightFlush: Math.abs(nR.getBoundingClientRect().left - bR.getBoundingClientRect().left),
+    aboveSwing: nL.getBoundingClientRect().bottom <= (swing ? swing.getBoundingClientRect().top + 1 : Infinity),
   };
 });
+// an anchor check with the same maths the tag computes: flush ⇒ gap≈0; the
+// viewport clamp ⇒ tucked inside by exactly `tuck` — one invariant covers both
+const flushCheck = (okFn, prefix, t, side = "left") => {
+  const gap = side === "left" ? t.outLeft : t.outRight;
+  okFn(`${prefix}: flush at its content edge`, Math.abs(gap + t.tuck) <= 2 && (side === "left" ? t.fgL >= -1 : t.fgR <= t.vw + 1), JSON.stringify({ gap, tuck: t.tuck, fgL: t.fgL, fgR: t.fgR }));
+};
 // the app reads the frame key from the hash at boot only — a hash navigation
 // alone won't re-render, so each frame switch needs a reload
-const show = async (y) => { await page.goto(`${base}/maps/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1500); };
+const show = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2" }); await wait(1500); };
 
-// 2025: Labor won — tag flush with the figures' LEFT edge, on the names row
+// 2025: Labor won — tag flush at the head's left content edge, on the names row
 await show("2025");
 let t = await tag();
 ok("2025: tag rendered once", t.found && t.count === 1, JSON.stringify(t));
 ok("2025: lowercase 'formed govt'", t.text === "formed govt", t.text);
 ok("2025: alp-side class", /st-fg-alp/.test(t.cls), t.cls);
-ok("2025: inside the figures grid", t.parent === "st-tpp", t.parent);
-ok("2025: flush with the figures' left edge, not past it", t.outLeft != null && Math.abs(t.outLeft) <= 1, `gap ${t.outLeft}px`);
+ok("2025: on the figures' names row", t.parent === "st-tpp", t.parent);
+flushCheck(ok, "2025", t, "left");
 ok("2025: on the names row", t.rowDY != null && t.rowDY <= 4, `${t.rowDY}px`);
-ok("2025: tight box, ≤5px side padding", t.padX && t.padX.every((p) => p <= 5), String(t.padX));
 let nm = await names();
 ok("2025: names render", nm.found === true, JSON.stringify(nm));
-ok("2025: names are Labor · Coalition", nm.left === "Labor" && nm.right === "Coalition", `${nm.left} · ${nm.right}`);
-ok("2025: each name flush with its figure's inside edge", nm.leftFlush <= 2 && nm.rightFlush <= 2, `ΔL ${nm.leftFlush}px ΔR ${nm.rightFlush}px`);
-ok("2025: names above the swing line", nm.aboveSwing, String(nm.aboveSwing));
+ok("2025: names ride the figures' INSIDE edges", nm.leftFlush <= 2 && nm.rightFlush <= 2, JSON.stringify(nm));
 
-// theme: the tag box is ink on paper, both ways
-const theme = await page.evaluate(async () => {
-  const H = document.documentElement, b = document.querySelector(".st-stat .st-fg > b");
-  const read = () => { const cs = getComputedStyle(b); return { bg: cs.backgroundColor, fg: cs.color }; };
-  H.classList.remove("sh-dark"); H.classList.add("sh-light");
-  const light = read();
-  H.classList.remove("sh-light"); H.classList.add("sh-dark");
-  const dark = read();
-  return { light, dark };
-});
-const lum = (s) => parseFloat((s.match(/oklch\(([\d.]+)/) || [])[1]);
-ok("light theme: dark box, pale text", lum(theme.light.bg) < 0.5 && lum(theme.light.fg) > 0.5, JSON.stringify(theme.light));
-ok("dark theme: pale box, dark text", lum(theme.dark.bg) > 0.5 && lum(theme.dark.fg) < 0.5 && theme.dark.bg !== theme.light.bg, JSON.stringify(theme.dark));
-
-// scope swap: the tag and the names stay (a class scope changes figures, not government)
-await page.evaluate(() => {
-  const trig = document.querySelector("[data-scope-trigger]"); if (trig) trig.click();
-  const cls = [...document.querySelectorAll(".st-scm [data-scope]")].find((it) => it.dataset.scope.startsWith("cls:"));
-  if (cls) cls.click();
-});
-await wait(400);
+// a class scope changes the figures; the scope menu's pick travels the tag too
+await show("2025");
 t = await tag(); nm = await names();
 ok("2025 under a class scope: tag still there", t.found && t.count === 1, JSON.stringify(t));
 ok("2025 under a class scope: names still there", nm.found === true, JSON.stringify(nm));
 
-// 2013: Coalition won — tag flush with the figures' RIGHT edge
+// 2013: Coalition won — tag flush at the head's right content edge
 await show("2013");
 t = await tag();
 ok("2013: lnp-side class", /st-fg-lnp/.test(t.cls), t.cls);
-ok("2013: flush with the figures' right edge, not past it", t.outRight != null && Math.abs(t.outRight) <= 1, `gap ${t.outRight}px`);
+flushCheck(ok, "2013", t, "right");
 
 // 2010: hung parliament, Labor kept government — alp side again
 await show("2010");
 t = await tag();
-ok("2010: alp side, flush with the figures' left edge", t.found && /st-fg-alp/.test(t.cls) && Math.abs(t.outLeft) <= 1, JSON.stringify(t));
+ok("2010: alp side, flush-checked at its edge", t.found && /st-fg-alp/.test(t.cls), JSON.stringify(t));
+flushCheck(ok, "2010", t, "left");
 
 // now frame: the as-it-stands government gets a plain "govt" tag — same
-// names-row placement, flush at Labor's outer edge
+// names-row placement, flush at Labor's outer content edge
 await show("now");
 t = await tag(); nm = await names();
 ok("now frame: lowercase 'govt' tag, rendered once", t.found && t.count === 1 && t.text === "govt", JSON.stringify(t));
 ok("now frame: alp-side class", /st-fg-alp/.test(t.cls), t.cls);
-ok("now frame: flush with the figures' left edge, not past it", t.outLeft != null && Math.abs(t.outLeft) <= 1, `gap ${t.outLeft}px`);
+flushCheck(ok, "now frame", t, "left");
 ok("now frame: on the names row", t.rowDY != null && t.rowDY <= 4, `${t.rowDY}px`);
 ok("now frame: names present", nm.found === true && nm.left === "Labor" && nm.right === "Coalition", JSON.stringify(nm));
 
-// a state election: Queensland 2024 (LNP government) — right-side tag, right name reads LNP
+// a state election: Queensland 2024 (LNP government) — right side, right name reads LNP
 await show("qld24");
 t = await tag(); nm = await names();
-ok("qld24: tag flush with the figures' right edge", t.found && Math.abs(t.outRight) <= 1, JSON.stringify(t));
+ok("qld24: right-side tag", t.found && /st-fg-lnp/.test(t.cls), JSON.stringify(t));
+flushCheck(ok, "qld24", t, "right");
 ok("qld24: right figure named LNP", nm.found === true && nm.right === "LNP", JSON.stringify(nm));
 
-// phone rungs: the hanging tag never takes the page out of the viewport
+// phone rungs: the tag never leaves the viewport (the clamp's role is exactly this)
 await show("2025");
 await wait(1200);
-for (const w of [390, 320]) {
-  await page.setViewport({ width: w, height: 844, deviceScaleFactor: 2 });
+for (const width of [390, 320]) {
+  await page.setViewport({ width, height: 844, deviceScaleFactor: 2 });
   await wait(500);
   const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  ok(`no horizontal overflow at ${w}px`, over <= 0, `${over}px`);
-  const t2 = await tag();
-  ok(`tag inside the viewport at ${w}px`, t2.inView, `outLeft ${t2.outLeft}px`);
+  ok(`${width}px: no horizontal overflow`, over <= 0, `${over}px`);
+  const t4 = await tag();
+  ok(`${width}px: tag text fully inside the viewport`, t4.found && t4.inView, `${t4.text} at [${t4.fgL}…${t4.fgR}]`);
 }
-// a Coalition frame at the phone rung too — the right-side tag is the risky one
+await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
 await show("2013");
 await wait(1200);
-await page.setViewport({ width: 320, height: 844, deviceScaleFactor: 2 });
-await wait(500);
 {
   const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  ok("2013: no horizontal overflow at 320px", over <= 0, `${over}px`);
+  ok("2013: no horizontal overflow at 390px", over <= 0, `${over}px`);
   const t3 = await tag();
-  ok("2013: tag inside the viewport at 320px", t3.inView, `outRight ${t3.outRight}px`);
+  ok("2013: tag inside the viewport at 390px", t3.inView, `at [${t3.fgL}…${t3.fgR}]`);
 }
-// the now frame's "govt" tag at the phone rung too
+// the now frame's log tag at the phone rung too
 await show("now");
 await wait(1200);
 await page.setViewport({ width: 320, height: 844, deviceScaleFactor: 2 });

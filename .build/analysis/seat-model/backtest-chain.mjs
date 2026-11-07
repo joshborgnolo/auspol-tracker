@@ -37,7 +37,7 @@ const clamp = (p) => Math.min(0.995, Math.max(0.005, p));
 const CAL = J("data/seat-model-calibration.json");
 const YEARS = [2016, 2019, 2022, 2025];
 const SEN = Object.fromEntries(YEARS.map((y) => [y, loadRankings(y)]));
-const RES = Object.fromEntries(YEARS.map((y) => [y, J(`maps/data/res-${y}.json`)]));
+const RES = Object.fromEntries(YEARS.map((y) => [y, J(`map/data/res-${y}.json`)]));
 const GROUP = (c) => (c[3] === "alp" ? "alp" : c[3] === "grn" ? "grn" : c[3] === "onp" ? "on" : c[3] === "lnp" ? ({ LP: "lp", NP: "np", NAT: "np", LNP: "lnp", LNQ: "lnp", CLP: "clp" }[c[1]] || "lnp") : c[3] === "ind" ? "member:" + c[0] : "oth");
 const BUCKET = (g) => (g === "alp" ? "alp" : ["lp", "np", "lnp", "clp"].includes(g) ? "lnp" : g === "on" ? "on" : g === "grn" ? "grn" : g.startsWith("member") ? "ind" : "oth");
 const BKS = ["alp", "lnp", "on", "grn", "ind", "oth"];

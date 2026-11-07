@@ -27,7 +27,7 @@ manifests live in those pipelines' docstrings):
   .build/analysis/seat-model/cache/gcp-sa1-2021.zip           (GCP 2021 SA1 datapack)
   .build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip (SA1 2021 polygons)
   .matilda/seifa-irsad-abs/abs-seifa-2021-sa1-indexes.xlsx    (SEIFA 2021 SA1 cube)
-  maps/data/data-nsw23.json                                    (the map data build;
+  map/data/data-nsw23.json                                    (the map data build;
         this script splices the two lanes into it and rewrites it — it
         runs after build_nsw23_data.py and is itself rerun after it whenever
         that build changes, since that build wipes the lanes)
@@ -36,7 +36,7 @@ Chain:
   python3 -I .build/map/build_nsw23_data.py
   python3 -I .build/map/build_nsw23_boothcensus.py
   python3 -I .build/map/build_nsw23_past.py
-  node .build/map/geo_build.mjs .build/map/src/nsw23 maps/data maps/data --years=nsw23
+  node .build/map/geo_build.mjs .build/map/src/nsw23 map/data map/data --years=nsw23
   node .build/map/assemble.mjs
 
 Deps: stdlib + openpyxl (the SEIFA pipelines' cube-reader library).
@@ -322,7 +322,7 @@ def main():
     decs = seifa_deciles()
     demos = demo_cells()
     for year in YEARS:
-        path = os.path.join(REPO, "maps", "data", f"data-{year}.json")
+        path = os.path.join(REPO, "map", "data", f"data-{year}.json")
         if not os.path.exists(path):
             fail(f"missing {path} — run its data build first")
         with open(path) as f:

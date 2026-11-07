@@ -1,4 +1,4 @@
-// Probe: /maps/'s islands at street zoom and the stage across the polling-places zoom.
+// Probe: /map/'s islands at street zoom and the stage across the polling-places zoom.
 // usage: node .matilda/probe/map-islands-sea.mjs <baseUrl>   (serve the repo root first)
 //  1. Curtis Island (Bass) - drawn by the AEC, under Esri's sea whole - keeps its seat's colour
 //     from the streets' first zoom in (it vanished there before 2026-10-28)
@@ -16,7 +16,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 await page.setViewport({ width: 1400, height: 1000, deviceScaleFactor: 1 });
 page.on("pageerror", (e) => ok("no page error", false, e.message));
-await page.goto(`${base}/maps/`, { waitUntil: "networkidle0", timeout: 60000 });
+await page.goto(`${base}/map/`, { waitUntil: "networkidle0", timeout: 60000 });
 await page.waitForFunction("window.__map && window.__map.T", { timeout: 30000 });
 await wait(1500);
 // the canvas's pixel at the stage's middle (where __map.view puts the point), and its plain-white count

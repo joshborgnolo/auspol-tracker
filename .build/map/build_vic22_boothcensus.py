@@ -40,7 +40,7 @@ Chain:
   python3 -I .build/map/build_vic22_data.py .build/map/vic22
   python3 -I .build/map/build_vic22_boothcensus.py
   python3 -I .build/map/build_vic22_past.py .build/map/vic22
-  node .build/map/geo_build.mjs .build/map/src/vic22 .build/map/vic22 maps/data --years=vic22
+  node .build/map/geo_build.mjs .build/map/src/vic22 .build/map/vic22 map/data --years=vic22
   node .build/map/assemble.mjs
 
 Deps: stdlib + openpyxl (the SEIFA pipelines' cube-reader library).

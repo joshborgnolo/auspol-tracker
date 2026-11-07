@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""The vic14 and vic18 frames' upper house: maps/data/senate-vic14.json and
-maps/data/senate-vic18.json — Victoria's Legislative Council in the vic22
+"""The vic14 and vic18 frames' upper house: map/data/senate-vic14.json and
+map/data/senate-vic18.json — Victoria's Legislative Council in the vic22
 frame's own shape (build_vic22_lc.py's child; read it first).
 
 Victoria's council is NOT staggered: all 40 members (five a region, eight
@@ -54,7 +54,7 @@ Sources (read-only, committed; the 2022 parent files the same discipline):
       `Greens`): vic14's `pvotes`/`pformal`.
   .build/map/src/vic22/xlc/ is the PARENT frame's source — here only as the
       schema reference, never read.
-  maps/data/senate-vic22.json (read): vic18's `votes` must EQUAL the parent
+  map/data/senate-vic22.json (read): vic18's `votes` must EQUAL the parent
       file's committed `pvotes` — both parse the 2018 pages; likewise
       pformal. A drift there fails the build loudly.
 
@@ -98,7 +98,7 @@ Reconciliation (all asserted, fail-loud):
     (the known council compositions; Tally Room's published summaries
     agree).
 
-usage: python3 -I .build/map/build_vic_lc.py <map_data_dir>     # e.g. maps/data
+usage: python3 -I .build/map/build_vic_lc.py <map_data_dir>     # e.g. map/data
 """
 import html as htmlm
 import json
@@ -108,7 +108,7 @@ import sys
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 LC = os.path.join(REPO, ".build", "state-flow-src", "vic", "lc")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 # the parent vic22 file's declaration order verbatim — Eastern Metropolitan
 # (2010-2018 pages) files its last slot under the 2022 redistribution's

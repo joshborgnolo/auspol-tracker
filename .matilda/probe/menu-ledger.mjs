@@ -115,7 +115,7 @@ const headOf = async (url, sel) => {
     ok(JSON.stringify(got) === JSON.stringify(want) && row("flows-explained").chip == null,
       `explainer: the two frozen tables as its figure (${want.map((w) => w.cells.join("·")).join(", ")})`);
   }
-  /* the map row: its head and both chambers' shares recomputed from /maps/'s
+  /* the map row: its head and both chambers' shares recomputed from /map/'s
      own committed data (res-2025 + data-now, senate-now), the tally gen-data
      reads for the line */
   {
@@ -140,7 +140,7 @@ const headOf = async (url, sel) => {
     const head = `${who} holds ${ln} of the ${res.divs.length} seats`
       + (changed ? `; ${W[changed] || changed} ${changed === 1 ? "has" : "have"} changed hands or party since the election` : "");
     const pct = (x, t) => Math.round((100 * x) / t) + "%";
-    ok(mr.d === head, `map: the line is today's House off /maps/'s own data ("${mr.d}")`);
+    ok(mr.d === head, `map: the line is today's House off /map/'s own data ("${mr.d}")`);
     ok(mr.v === pct(ln, res.divs.length) + " | " + pct(ss[lead] || 0, sen.senators.length),
       `map: ${mr.v} is ${capP}'s House then Senate share on one line`);
     ok(mr.c === capP + "’s share of HoR and Senate seats", `map: the caption names both chambers ("${mr.c}")`);

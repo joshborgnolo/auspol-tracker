@@ -27,7 +27,7 @@ const fails = [];
 const ok = (name, cond, detail = "") => { console.log(`${cond ? "ok" : "FAIL"} ${name}${detail ? ` — ${detail}` : ""}`); if (!cond) fails.push(name); };
 
 // 1. the legend's People optgroup on 2001 carries the SIX lanes, no income
-await page.goto(`${base}/maps/#y=2001&l=seifa&i=uni`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/map/#y=2001&l=seifa&i=uni`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const st1 = await page.evaluate(async () => {
   const m = window.__map;
@@ -66,7 +66,7 @@ ok("division card cites the 2001 census basis", st2.found, st2.txt.replace(/\s+/
 
 // 3. the birthplace-country picker on 2001: 9-menu + all-overseas, uk-led
 await page.goto("about:blank");
-await page.goto(`${base}/maps/#y=2001&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/map/#y=2001&l=seifa&i=fborn`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const st3 = await page.evaluate(async () => {
   const m = window.__map;
@@ -98,7 +98,7 @@ ok("2001 AUS uk share ≈ 5.85% (app pool)", st4.uk && Math.abs(st4.uk - 5.85) <
 
 // 5. the 2004 frame: same edition's menu + edition ladder reads 2001 census
 await page.goto("about:blank");
-await page.goto(`${base}/maps/#y=2004&l=seifa&i=fborn&cb=uk`, { waitUntil: "domcontentloaded", timeout: 30000 });
+await page.goto(`${base}/map/#y=2004&l=seifa&i=fborn&cb=uk`, { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForFunction("window.__map", { timeout: 20000 });
 const st5 = await page.evaluate(async () => {
   const m = window.__map;

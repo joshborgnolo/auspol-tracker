@@ -6,7 +6,7 @@
      class to 2031, the territories to the next election), casual senators traced to a vacancy;
    - the floor: the plan's 90 senators' seats in three rows with the table's two chairs, the
      President's chair and six officers' chairs (Black Rod's among them);
-   - each election's Senate (maps/data/senate-<year>.json, .build/map/senate_past.py): 76 seats, twelve a
+   - each election's Senate (map/data/senate-<year>.json, .build/map/senate_past.py): 76 seats, twelve a
      state and two a territory (a vacant seat counted), one President and the two leaders, every term
      either the election's own (six years on) or up at the next;
    - the app: the Senate's part assembled into map.js, one renderer for both chambers, the Senate
@@ -19,8 +19,8 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
-const now = JSON.parse(R("maps/data/senate-now.json"));
-const floor = JSON.parse(R(`maps/data/${now.floor}`));
+const now = JSON.parse(R("map/data/senate-now.json"));
+const floor = JSON.parse(R(`map/data/${now.floor}`));
 
 // ---- the senators
 const S = now.senators;
@@ -59,7 +59,7 @@ assert.ok(floor.furniture.blackRod.length === 1 && floor.furniture.blackRod[0].b
 assert.ok(!floor.furniture.outlines, "the plan's line work left out, as the House's drawing leaves out its desks");
 
 // ---- the app
-const js = R("maps/map.js");
+const js = R("map/map.js");
 const part = R(".build/map/app/app-3b-senate.js");
 assert.ok(js.includes(part.trim()), "map.js carries app-3b-senate.js as is (run node .build/map/assemble.mjs)");
 assert.ok(js.includes('const chamberGeom = (m) => (m && VIC_YEARS.has(m.year) ? (m.house === "senate" ? vicLCGeom() : vicGeom()) : m && NSW_YEARS.has(m.year) && m.house !== "senate" ? nswGeom() : m && QLD_YEARS.has(m.year) ? qldGeom() : m && STATE_YEARS.has(m.year) ? saGeom(saFloorOf(m)) : m && m.house === "senate" ? senateGeom() : houseGeom());'), "one renderer, the chamber's geometry chosen by the model (every Victorian frame's Legislative Council on its own floor, its Assembly on the House-style floor, every NSW Assembly on its Macquarie Street floor, Queensland's frames on their own Brisbane floor, the other state frames on their own floors)");
@@ -69,7 +69,7 @@ assert.ok(js.includes('loadSenate("now"),'), "today's senators load with the key
 
 // ---- each election's Senate
 for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-  const p = JSON.parse(R(`maps/data/senate-${y}.json`)), ss = p.senators, vac = p.vacant || [];
+  const p = JSON.parse(R(`map/data/senate-${y}.json`)), ss = p.senators, vac = p.vacant || [];
   assert.equal(ss.length + vac.length, 76, `${y}: 76 seats`);
   const by = {};
   for (const s of [...ss, ...vac]) by[s.st] = (by[s.st] || 0) + 1;
@@ -82,11 +82,11 @@ for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 202
   assert.equal(new Set(ss.map((s) => s.n)).size, ss.length, `${y}: names key the chairs`);
 }
 // the Handbook's totals, checked by the builder; the new Senates it can be held to exactly
-const coal = (y) => JSON.parse(R(`maps/data/senate-${y}.json`)).senators.filter((s) => ["LP", "NP", "LNP", "CLP"].includes(s.ab)).length;
+const coal = (y) => JSON.parse(R(`map/data/senate-${y}.json`)).senators.filter((s) => ["LP", "NP", "LNP", "CLP"].includes(s.ab)).length;
 assert.deepEqual([2004, 2016, 2019, 2022, 2025].map(coal), [39, 30, 35, 32, 27], "the Coalition's seats: 2005's majority, then as the Handbook gives each new Senate");
 // ---- the Senate lens: each seat's and polling place's Senate vote (.build/map/senate_vote.py)
 for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
-  const sv = JSON.parse(R(`maps/data/senate-vote-${y}.json`)), res = JSON.parse(R(`maps/data/res-${y}.json`));
+  const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)), res = JSON.parse(R(`map/data/res-${y}.json`));
   assert.deepEqual(sv.fams, ["alp", "lnp", "grn", "onp", "ind", "oth"], `${y}: the families in the map's order`);
   for (const d of res.divs) assert.ok(sv.divs[d.n], `${y}: ${d.n} has its Senate vote`);
   for (const [n, r] of Object.entries(sv.divs)) assert.equal(r.slice(1).reduce((a, b) => a + b, 0), r[0], `${y}: ${n}'s families add to its formal votes`);
@@ -96,6 +96,6 @@ for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 202
   else assert.ok(hit / ids.length > 0.97, `${y}: ${hit} of ${ids.length} House polling places have a Senate count`);
 }
 assert.ok(js.includes('{ id: "senate", label: "Senate" }'), "the Senate is a lens");
-assert.ok(js.includes("getJSON(`/maps/data/senate-vote-${k}.json`, bg)"), "the lens loads each election's Senate votes (bg: the background preload's, at low priority)");
+assert.ok(js.includes("getJSON(`/map/data/senate-vote-${k}.json`, bg)"), "the lens loads each election's Senate votes (bg: the background preload's, at low priority)");
 
 console.log(`test-map-senate: ok – ${S.length} senators as at ${now.asOf}, floor ${floor.plan}`);

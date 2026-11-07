@@ -1,14 +1,14 @@
 /* vic_lc_seating.mjs – where each member of Victoria's Legislative Council sits, from the
    Parliament's own council seating plan.
 
-   Reads maps/data/lc-seating-plan-vic-2026-10-27.json (built by vic_lc_plan.mjs from the
+   Reads map/data/lc-seating-plan-vic-2026-10-27.json (built by vic_lc_plan.mjs from the
    Parliament's councilseatingplan page — nothing is re-fetched here): every desk's member,
    and the council's presiding roles as the plan's own position strings name them. Seats every
    member at their desk on the floor the app draws (the @viclc-cells block of
    app/app-3-chamber.js, read as is): a desk the app doesn't draw, a member who isn't the
    council file's, a party that disagrees with it, a desk seated twice or a member left out,
    all fail the build. Writes
-     maps/data/seats-vic22-lc.json  { plan, source, roles, at: { member: desk } }
+     map/data/seats-vic22-lc.json  { plan, source, roles, at: { member: desk } }
    The President's chair (desk 1) isn't a bench desk: its holder is filed as the role, with the
    two leaders' desks (9 and 25, the third down each front column) checked against the floor's
    own table ids so the sorted view parks the leaders where the plan does.
@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const DATA = path.join(ROOT, "maps", "data");
+const DATA = path.join(ROOT, "map", "data");
 const YEAR = "vic22";
 const PLAN_FILE = path.join(DATA, "lc-seating-plan-vic-2026-10-27.json");
 
@@ -69,5 +69,5 @@ if (Object.keys(at).length !== council.senators.length - 1) fail(`${Object.keys(
 
 const out = { plan: plan.captured, source: "the Parliament of Victoria’s council seating plan", roles, at };
 fs.writeFileSync(path.join(DATA, `seats-${YEAR}-lc.json`), `${JSON.stringify(out, null, 1)}\n`);
-console.log(`maps/data/seats-${YEAR}-lc.json`, Object.keys(at).length, "seated;");
+console.log(`map/data/seats-${YEAR}-lc.json`, Object.keys(at).length, "seated;");
 console.log(`roles: ${roles.president} / ${roles.leader} / ${roles.oppLeader}`);

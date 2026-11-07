@@ -8840,8 +8840,8 @@ const publicOpinionLatest = oneOffsSource
 const house = (() => {
   if (JUR) return null;
   try {
-    const res = JSON.parse(fs.readFileSync(path.join(ROOT, "maps", "data", "res-2025.json"), "utf8"));
-    const now = JSON.parse(fs.readFileSync(path.join(ROOT, "maps", "data", "data-now.json"), "utf8"));
+    const res = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "res-2025.json"), "utf8"));
+    const now = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "data-now.json"), "utf8"));
     const fam = (ab) => (ab === "ALP" ? "alp" : ["LP", "LNP", "NP", "CLP", "NAT", "LNQ"].includes(ab) ? "lnp" : ab === "GRN" ? "grn"
       : ab === "ON" || ab === "HAN" ? "onp" : ["IND", "", "NAFD", "CSA"].includes(ab) ? "ind" : "oth");
     const seats = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
@@ -8857,7 +8857,7 @@ const house = (() => {
        missing floor file costs only the Senate figure, never the House line */
     const senate = (() => {
       try {
-        const sen = JSON.parse(fs.readFileSync(path.join(ROOT, "maps", "data", "senate-now.json"), "utf8"));
+        const sen = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "senate-now.json"), "utf8"));
         const s = { alp: 0, lnp: 0, grn: 0, onp: 0, ind: 0, oth: 0 };
         for (const m of sen.senators) s[fam(m.ab)]++;
         return { asOf: sen.asOf, total: sen.senators.length, seats: s };

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Each federal seat's Labor and Coalition votes by how they were cast.
 
-Adds vt2 to every division of maps/data/res-<year>.json, beside vt (the formal
+Adds vt2 to every division of map/data/res-<year>.json, beside vt (the formal
 votes in each pile): {pile: [labor, coalition]}, a pile left out when it holds
 no votes. The story column reads it for "How votes were cast".
 
@@ -41,7 +41,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / ".build/aec-flow-src"
 ORACLE = SRC / "booth/oracle"
-OUT = ROOT / "maps/data"
+OUT = ROOT / "map/data"
 COALITION = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ"}  # as build_map_data.py
 TYPES = (("Ordinary", "ord"), ("Absent", "abs"), ("Provisional", "prov"), ("PrePoll", "pre"), ("Postal", "post"))
 DECL = {"ABSENT": "abs", "PRE POLL": "pre", "POSTAL": "post", "PROVISIONAL": "prov"}

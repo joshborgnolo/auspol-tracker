@@ -37,10 +37,10 @@ import os
 import re
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-RES25 = os.path.join(REPO, "maps", "data", "data-wa25.json")
+RES25 = os.path.join(REPO, "map", "data", "data-wa25.json")
 SRC = os.path.join(REPO, ".build", "state-flow-src", "wa",
                    "byelections", "2026-secret-harbour", "overview.json")
-OUT = os.path.join(REPO, "maps", "data", "data-now-wa.json")
+OUT = os.path.join(REPO, "map", "data", "data-now-wa.json")
 #: ISO day the overlay speaks of (its sibling files' shape); the banner reads
 #: "The Legislative Assembly as it stands, <longDate(asOf)>"
 AS_OF = "2026-11-05"

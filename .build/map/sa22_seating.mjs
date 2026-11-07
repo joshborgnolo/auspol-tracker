@@ -1,7 +1,7 @@
 /* sa22_seating.mjs – where each member of South Australia's 47th Parliament sat, from the
    Parliament's archived chamber map.
 
-   Reads maps/data/house-seating-plan-sa-2024-12-28.json (written by .build/map/build_sa22_seating.py
+   Reads map/data/house-seating-plan-sa-2024-12-28.json (written by .build/map/build_sa22_seating.py
    from the Wayback Machine's 28 December 2024 capture of chamber-maps.parliament.sa.gov.au — the
    only archived contentful copy of the floor; the seats the plan prints are the term's end
    arrangement) and seats every member at their desk in the House of Assembly floor the app draws
@@ -13,7 +13,7 @@
    shows the Parliament as elected: Cregan (Kavel) keeps the chair (SPEAKER_DIV in app-1-base.js)
    and Bignell, the plan's Speaker, takes the free government-side desk off the front bench nearest
    the chair — the 2010 Slipper precedent in .build/map/seating.mjs. Writes
-     maps/data/seats-sa22.json   { plan, note, source, at: { district: desk } }. Run:
+     map/data/seats-sa22.json   { plan, note, source, at: { district: desk } }. Run:
      node .build/map/sa22_seating.mjs */
 import fs from "node:fs";
 import path from "node:path";
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const DATA = path.join(ROOT, "maps", "data");
+const DATA = path.join(ROOT, "map", "data");
 const PLAN_DATE = "sa-2024-12-28";
 const SPEAKER_DIV = "Kavel"; // app-1-base SPEAKER_DIV.sa22 — the frame's chair holds him
 // the plan's chair (desk T1) holds the Speaker who took over mid-term: their division, and the
@@ -88,4 +88,4 @@ const out = {
   at,
 };
 fs.writeFileSync(path.join(DATA, "seats-sa22.json"), JSON.stringify(out, null, 1) + "\n");
-console.log("maps/data/seats-sa22.json", Object.keys(at).length, "seated (+ Kavel in the chair)");
+console.log("map/data/seats-sa22.json", Object.keys(at).length, "seated (+ Kavel in the chair)");

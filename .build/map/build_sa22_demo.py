@@ -28,9 +28,9 @@ Re-fetch manifest when a cache is missing:
 Deps: python3 stdlib only. Guards fail loud.
 usage: python3 -I .build/map/build_sa22_demo.py
 then:  python3 -I .build/map/build_sa22_seifa.py
-       python3 -I .build/map/build_sa22_data.py maps/data
-       python3 -I .build/map/build_sa22_past.py maps/data
-       node .build/map/geo_build.mjs .build/map/src/sa26 maps/data maps/data --years=sa22
+       python3 -I .build/map/build_sa22_data.py map/data
+       python3 -I .build/map/build_sa22_past.py map/data
+       node .build/map/geo_build.mjs .build/map/src/sa26 map/data map/data --years=sa22
 """
 import csv
 import hashlib

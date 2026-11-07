@@ -13,7 +13,7 @@ tions across a redraw, never notional estimates).
 The build reads the previous election through wa_eis.load (the same
 committed EIS mirror its sister data builder consumed — the 2013 mirror
 is also committed for wa17's past lane). It then joins INTO
-maps/data/data-<frame>.json so the frame can speak of change:
+map/data/data-<frame>.json so the frame can speak of change:
   prev            the previous election's year
   agg.pprim/pformal   the previous election's party-total primitives
   div.h           [[prevYear, winner-TCP%, winner's party, member]],
@@ -27,16 +27,16 @@ maps/data/data-<frame>.json so the frame can speak of change:
 Wipe doctrine: build_wa<yy>_data.py rewrites data-<yy>.json wholesale
 (prev:null, swings 0/null), so this script reruns whenever its data
 builder does — and ALWAYS before geo_build/assemble. The chain, per frame:
-  python3 -I .build/map/build_<yy>_data.py maps/data
-  python3 -I .build/map/build_<yy>_past.py maps/data
-  node .build/map/geo_build.mjs .build/map/src/wa maps/data maps/data --years=wa<yy>
+  python3 -I .build/map/build_<yy>_data.py map/data
+  python3 -I .build/map/build_<yy>_past.py map/data
+  node .build/map/geo_build.mjs .build/map/src/wa map/data map/data --years=wa<yy>
 """
 import collections, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import wa_eis
 
 REPO = wa_eis.REPO
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 #: the join contract per frame — names are the EIS role names; NEW districts
 #: keep empty h + zeroed swings (vic22's convention); ABOLISHED ride the
@@ -84,7 +84,7 @@ def past_main(frame):
 
     data_path = os.path.join(OUT, f"data-{frame}.json")
     if not os.path.exists(data_path):
-        ffail(f"{data_path} missing — run build_{frame}_data.py maps/data")
+        ffail(f"{data_path} missing — run build_{frame}_data.py map/data")
     with open(data_path) as f:
         data = json.load(f)
     if data.get("year") != frame:

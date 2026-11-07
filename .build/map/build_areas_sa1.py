@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""maps/data/areas-sa1-2021.json — the /map/ Areas draw's census pack (2021 vintage).
+"""map/data/areas-sa1-2021.json — the /map/ Areas draw's census pack (2021 vintage).
 
 The map's Seats and Surface drawings paint census figures seat-by-seat: the
 seat stores pool SA1s up to each seat (sa1/venue/voter bases, depending on
@@ -57,7 +57,7 @@ SA1_ZIP = os.path.join(REPO, ".build", "analysis", "seat-model", "cache", "SA1_2
 CUBE_XLSX = os.path.join(REPO, ".matilda", "seifa-irsad-abs", "abs-seifa-2021-sa1-indexes.xlsx")
 SA26_DEMO = os.path.join(REPO, "data", "sa26-demo.json")
 SA26_ASSIGN = os.path.join(REPO, ".build", "map", "sa26", "assign-sa1.json")
-OUT = os.path.join(REPO, "maps", "data", "areas-sa1-2021.json")
+OUT = os.path.join(REPO, "map", "data", "areas-sa1-2021.json")
 MAPSHAPER = os.environ.get("MAPSHAPER", os.path.join(REPO, "node_modules", ".bin", "mapshaper"))
 
 try:

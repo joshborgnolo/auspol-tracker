@@ -1,4 +1,4 @@
-/* test-map-draw.mjs – pins /maps/'s drawings (app-2b-draw.js): seats, balloons and the surface.
+/* test-map-draw.mjs – pins /map/'s drawings (app-2b-draw.js): seats, balloons and the surface.
 
    - surfaceEngine, the field and its pictures, is a worker's text: it runs here in a bare vm
      context, so anything it reached for outside itself would fail. On small made-up elections
@@ -134,14 +134,14 @@ for (const [frame, st, y] of [["qld20", "qld", 2019], ["qld24", "qld", 2025], ["
 
 /* ----- where the contests are offered ----- */
 const frames = vm.runInNewContext(`(${/const AXIS_FRAMES = (\{[^}]*\})/.exec(draw)[1]})`, {});
-const stood = (y) => { const d = JSON.parse(R(`maps/data/core-${y}.json`)).divs; return d.filter((x) => x.c.some((c) => c[3] === "onp")).length / d.length; };
+const stood = (y) => { const d = JSON.parse(R(`map/data/core-${y}.json`)).divs; return d.filter((x) => x.c.some((c) => c[3] === "onp")).length / d.length; };
 const NOW_OF = { now: "2025", qldnow: "qld24" };
 for (const f of Object.keys(frames)) assert.ok(stood(NOW_OF[f] || f) >= 0.75, `${f}: One Nation stood in three seats in four`);
-for (const f of fs.readdirSync(path.join(ROOT, "maps/data")).filter((n) => /^core-\w+\.json$/.test(n)).map((n) => n.slice(5, -5))) {
+for (const f of fs.readdirSync(path.join(ROOT, "map/data")).filter((n) => /^core-\w+\.json$/.test(n)).map((n) => n.slice(5, -5))) {
   // (1998 and 2001 qualify on candidates but have no Senate ballots to read)
   if (frames[f] == null && f !== "1998" && f !== "2001") assert.ok(stood(f) < 0.75, `${f}: One Nation stood widely, so it should offer the contests`);
 }
-for (const y of new Set(Object.entries(frames).filter(([f]) => !/^(qld|sa)/.test(f)).map(([, v]) => v))) assert.ok(fs.existsSync(path.join(ROOT, `maps/data/senate-prefs-${y}.json`)), `${y}'s Senate orders are on file`);
+for (const y of new Set(Object.entries(frames).filter(([f]) => !/^(qld|sa)/.test(f)).map(([, v]) => v))) assert.ok(fs.existsSync(path.join(ROOT, `map/data/senate-prefs-${y}.json`)), `${y}'s Senate orders are on file`);
 
 /* ----- the Greens pairings ----- */
 { // menued on the federal frames only: they read the ballot files' own tallies (54 counts a row), which the constant-rate state frames' series don't carry
@@ -154,13 +154,13 @@ for (const y of new Set(Object.entries(frames).filter(([f]) => !/^(qld|sa)/.test
   assert.ok(ui.includes("axisOpts(m)"), "the key's contest menu is the frame's own");
   assert.ok(ui.includes("!AXIS_GREEN_SET.has(spp)"), "the Senate preferences lens keeps its own three (a crafted Greens sp address can't reach it)");
   for (const y of [2022, 2025]) {
-    const f = JSON.parse(R(`maps/data/senate-prefs-${y}.json`));
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`));
     assert.deepEqual(f.pairs, ["AC", "AO", "CO", "GO", "GA", "GC"], `senate-prefs-${y}'s slots run AC AO CO GO GA GC, the order the app's k0 walks`);
     assert.ok(f.donors.GO.join() === "alp,lnp,oth" && f.donors.GA.join() === "lnp,onp,oth" && f.donors.GC.join() === "alp,onp,oth", `senate-prefs-${y}: each Greens pairing tallies the three groups whose preferences decide it`);
   }
   // where a seat really ran the pairing, its count stands: Melbourne's 2025 final two were Labor and
   // the Greens, Ryan's the LNP and the Greens
-  const core25 = JSON.parse(R("maps/data/core-2025.json"));
+  const core25 = JSON.parse(R("map/data/core-2025.json"));
   const finalFams = (n) => { const d = core25.divs.find((x) => x.n === n); return d.tcp.map(([i]) => d.c[i][3]).sort().join("+"); };
   assert.equal(finalFams("Melbourne"), "alp+grn", "Melbourne 2025's final two were Labor and the Greens, the count Greens v Labor reads there");
   assert.equal(finalFams("Ryan"), "grn+lnp", "Ryan 2025's final two were the LNP and the Greens, the count Greens v the Coalition reads there");
@@ -172,9 +172,9 @@ assert.ok(/closest\("[^"]*\[data-draw\][^"]*"\)/.test(ui), "the page's click han
 assert.ok(ui.includes('if (t.dataset.draw) { setDraw(t.dataset.draw); return; }'), "and acts on them");
 assert.ok(ui.includes('p.set("draw", S.draw)') && ui.includes('p.get("draw")'), "the URL carries the drawing both ways");
 assert.ok(ui.includes('p.set("ax", S.axis)') && ui.includes('p.get("ax")'), "the URL carries the contest both ways");
-assert.ok(/for \(const dw of S\.view === "map" \? DRAWS\.map/.test(ui), "the key holds the height of its tallest drawing, so a change of drawing moves no stage");
+assert.ok(!/for \(const dw of S\.view === "map" \? DRAWS\.map/.test(ui) && /for \(const dw of \[S\.draw\]\)/.test(ui), "the key holds only the current drawing's booth faces, so slimmer views stop inheriting taller surfaces' peaks");
 assert.ok(ui.includes('recolor(false);\n  $$(".mp-views .rd-tab")'), "leaving the map for the chamber or the list drops a built contest's colours");
-const index = R("maps/index.html");
+const index = R("map/index.html");
 assert.ok(index.includes("Labor v One Nation, the Coalition v One Nation, and the Greens v One Nation, Labor and the Coalition are not counted"), "the page's notes name the built contests, the Greens pairings among them");
 
 /* ----- the zoom carries on past the gesture, the same in every browser -----

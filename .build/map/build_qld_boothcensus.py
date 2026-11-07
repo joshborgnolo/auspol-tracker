@@ -318,7 +318,7 @@ def run_frame(frame):
     year = FRAMES[frame]
     decs = seifa_deciles(year)
     demos = demo_cells(year)
-    path = os.path.join(REPO, "maps", "data", f"data-{frame}.json")
+    path = os.path.join(REPO, "map", "data", f"data-{frame}.json")
     if not os.path.exists(path):
         fail(f"missing {path} — run its data build first")
     with open(path) as f:

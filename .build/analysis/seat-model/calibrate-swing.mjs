@@ -122,8 +122,8 @@ function boothRows(D) {
 function shift(xs, ws, target) { let c = 0; for (let it = 0; it < 60; it++) { let f = 0, d = 0, W = 0; for (let i = 0; i < xs.length; i++) { const p = ilogit(xs[i] + c); f += ws[i] * p; d += ws[i] * p * (1 - p); W += ws[i]; } const g = f / W - target; if (Math.abs(g) < 1e-10) break; c -= g / (d / W); } return c; }
 const km = (a, b) => { const R = 6371, r = Math.PI / 180; const x = (b.lon - a.lon) * r * Math.cos((a.lat + b.lat) / 2 * r), y = (b.lat - a.lat) * r; return R * Math.sqrt(x * x + y * y); };
 const sa = {};
-if (existsSync("maps/data/res-sa26.json")) {
-  const fed = load("maps/data/res-2025.json"), s26 = load("maps/data/res-sa26.json");
+if (existsSync("map/data/res-sa26.json")) {
+  const fed = load("map/data/res-2025.json"), s26 = load("map/data/res-sa26.json");
   const fb = boothRows(fed).filter((b) => b.st === "SA" && b.tot >= 30), tb = boothRows(s26);
   const foot = s26.divs.map(() => ({ w: 0 }));
   for (const b of tb) { let best = null, bd = 1e9; for (const f of fb) { const d = km(b, f); if (d < bd) { bd = d; best = f; } } if (!best || bd > 25) continue; const F = foot[b.d]; F.w += b.tot; for (const g of GROUPS) F[g] = (F[g] || 0) + b.tot * (best.sh[g] || 0); }

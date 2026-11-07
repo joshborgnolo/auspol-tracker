@@ -3,30 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Electoral maps – auspol tracker</title>
-<!-- Hand-maintained redirect stub: /map/ (the Electoral-maps page, renamed
-     and moved to /maps/ on 2026-11-07) lands there, hash carried along.
-     Not part of the .build/newtracker pipeline. -->
-<meta http-equiv="refresh" content="0; url=/maps/">
-<meta name="description" content="Every federal seat and polling place since 2004, on the map, in the chamber and in a list.">
+<title>Electoral map – auspol tracker</title>
+<!-- Electoral map: every federal seat and polling place since 2004, on the
+     map, in the chamber and in a list. Hand-maintained page; its script and
+     styles (map.js, map.css) are assembled from .build/map/app by
+     node .build/map/assemble.mjs, its data (data/) built by
+     .build/map/build_map_data.py and geo_build.mjs from the AEC's counts and
+     boundaries. A ☰ menu page outside the main build (TABS' ext entry "map").
+     Shell (header/footer) filled by node .build/site-shell.mjs. -->
+<meta name="description" content="Every federal seat and polling place since 2004, on the map, in the House chamber and in a list: who won, the two-party vote, primaries, preferences, informal ballots, seat types, advantage, language and age.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://auspoltracker.com/maps/">
-<link rel="icon" href="/assets/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="Electoral map – auspol tracker">
+<meta property="og:description" content="Every federal seat and polling place since 2004: who won, the two-party vote, primaries, preferences, informal ballots, seat types, advantage, language and age.">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://auspoltracker.com/map/">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/favicon-192.png">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <style>
-:root { --bg: oklch(0.975 0.009 80); --ink: oklch(0.27 0.012 55); --ink-3: oklch(0.52 0.010 58); }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg); color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 14px; min-height: 100vh; min-height: 100dvh;
-  display: flex; align-items: center; justify-content: center; text-align: center;
+/* ------- fonts: the cuts the page runs ------- */
+@font-face {
+  font-family: 'Commissioner';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/assets/fonts/commissioner-latin.737ec8f2.woff2") format('woff2');
 }
-p { padding: 0 24px; }
-a { color: inherit; }
-small { display: block; margin-top: 6px; color: var(--ink-3); }
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------- palette: the editorial surfaces the live site runs in ------- */
+:root {
+  --bg:        oklch(0.975 0.009 80);
+  --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
+  --ink-3:     oklch(0.52 0.010 58);
+  --ink-faint: oklch(0.70 0.008 65);
+  --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
+  --accent:    oklch(0.50 0.070 205);
+  --surface:   oklch(0.992 0.004 85);
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the party colours outside the canvas: keys, tallies, timeline, the same
+     bright set the map paints (readTheme's table in app-1-base.js; keep in step) */
+  --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #14ad4a; --m-onp: #ff8c00; --m-ind: #9b62d0; --m-csa: #00a9c4; --m-oth: #9a9a9a;
+  /* the pinned tab bar's height: the view sticks just under it */
+  --pin-top: 62px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.sh-light) {
+    --bg:        oklch(0.205 0.010 65);
+    --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
+    --ink-3:     oklch(0.670 0.009 72);
+    --ink-faint: oklch(0.545 0.009 68);
+    --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
+    --accent:    oklch(0.70 0.080 205);
+    --surface:   oklch(0.235 0.010 65);
+    --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d;
+    color-scheme: dark;
+  }
+}
 </style>
-<script>location.replace("/maps/" + location.hash);</script>
+<link rel="stylesheet" href="/map/map.css?v=12027b9c">
+<!--map-data-warm:begin-->
+<script id="map-data-warm">(function(){var V={"core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"2c12c5d2","core-2007.json":"acc73f77","core-2010.json":"8fd8f038","core-2013.json":"1a0e8c2e","core-2016.json":"81c04117","core-2019.json":"0a749a5f","core-2022.json":"3874ab49","core-2025.json":"2ed4fa65","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","geo-1993-lo.json":"d5b83add","geo-1996-lo.json":"b3def3ba","geo-1998-lo.json":"e2c51765","geo-2001-lo.json":"a6606c1d","geo-2004-lo.json":"f1a3ae40","geo-2007-lo.json":"5cb6dd10","geo-2010-lo.json":"2f3e4725","geo-2013-lo.json":"f8051359","geo-2016-lo.json":"da0f2884","geo-2019-lo.json":"17e396f0","geo-2022-lo.json":"3d3e3056","geo-2025-lo.json":"194abc94","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-lo.json":"23ad692a","geo-qld17-lo.json":"e66797d1","geo-qld20-lo.json":"e66797d1","geo-qld24-lo.json":"e66797d1","geo-sa22-lo.json":"75ee7453","geo-sa26-lo.json":"73866149","geo-vic14-lo.json":"54485f1e","geo-vic18-lo.json":"54485f1e","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-lo.json":"46e32585","geo-wa21-lo.json":"1cd95bf6","geo-wa25-lo.json":"513ef944","islands.json":"10fe4949","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"e4cad3a7","res-2007.json":"2aef0639","res-2010.json":"5f093c88","res-2013.json":"45d956da","res-2016.json":"fb36f9cc","res-2019.json":"e190b88e","res-2022.json":"45d4952c","res-2025.json":"f26d4506","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a"};var NOW_OF={"now":"2025","nswnow":"nsw23","qldnow":"qld24","wanow":"wa25"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json","qldnow":"data-now-qld.json","wanow":"data-now-wa.json"};var y=(location.hash.match(/[#&]y=(\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>
+<!--map-data-warm:end-->
+<link rel="preload" href="/assets/fonts/commissioner-latin.737ec8f2.woff2" as="font" type="font/woff2" crossorigin>
 <!--shell:head-->
 <link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
@@ -34,6 +113,10 @@ small { display: block; margin-top: 6px; color: var(--ink-3); }
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site-shell.css?v=e924ae499d">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
+<style>
+/* this page's dark-mode rules, for a reader who chose dark on a light device */
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d; color-scheme: dark; }
+</style>
 <!--/shell:head-->
 </head>
 <body>
@@ -82,17 +165,87 @@ small { display: block; margin-top: 6px; color: var(--ink-3); }
         <a class="sh-tab" href="/cycles/"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
         <a class="sh-tab" href="/allpolls/">All polls</a>
         <a class="sh-tab sh-tab-pinhide" href="/info/">Info</a>
-        <button type="button" class="sh-tab sh-menu-btn active" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages – on Electoral maps" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span><svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg><span class="sh-menu-lab">Electoral maps</span><svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></button>
+        <button type="button" class="sh-tab sh-menu-btn active" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages – on Electoral map" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span><svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg><span class="sh-menu-lab">Electoral map</span><svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></button>
       </div>
       <div class="sh-next" hidden title="Projected from each house’s recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house’s next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to Now"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
-  <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item on" href="/maps/" data-id="map" aria-current="page"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Electoral maps</span><span class="sh-menu-d">Every federal seat and polling place since 2004, on the map and in the chamber</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/model/" data-id="model"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Election model (beta)</span><span class="sh-menu-d">Who would win the House: 20,000 simulated elections from the polls, seat by seat</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">8</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">9</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
+  <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item on" href="/map/" data-id="map" aria-current="page"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Electoral map</span><span class="sh-menu-d">Every federal seat and polling place since 2004, on the map and in the chamber</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/model/" data-id="model"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Election model (beta)</span><span class="sh-menu-d">Who would win the House: 20,000 simulated elections from the polls, seat by seat</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">8</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">9</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
 </nav>
 <!--/shell:header-->
-<p><a href="/maps/">Election map &rarr; Electoral maps</a>
-<small>Redirecting to Electoral maps, at /maps/.</small></p>
+<main id="sh-content" class="mp">
+  <section class="sh-frame mp-sec" aria-labelledby="mp-title">
+    <div class="rd-eyebrow">
+      <h1 class="rd-title" id="mp-title">Electoral map</h1>
+      <span class="rd-meta" id="mp-meta">Every seat and polling place since 2004</span>
+      <span class="rd-grow"></span>
+      <div class="mp-views" role="tablist" aria-label="View">
+        <button type="button" class="rd-tab" role="tab" data-view="map" aria-selected="true"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M14 11.1L13.7 12.1L12.5 12.7L12 12.2L11.5 12.6L10.5 12.2L9.6 10.7L9.2 11.2L9.5 10.1L8.8 11L8.3 10.1L7.2 9.7L2.1 11.1L1.6 10.8L1.9 9.8L1 7.6L1.4 7.7L1.2 6.2L3.8 5L5.5 2.8L6.7 3.3L7 2.2L7.7 2.1L7.5 1.7L9.1 2L8.7 3.2L10.5 4.3L11.2 1.5L12.5 4.8L14.8 7.5L14.8 9.5zM12.6 13.5L12.7 14.5z"/></svg><span class="tw" data-t="Map">Map</span></button>
+        <button type="button" class="rd-tab" role="tab" data-view="chamber" aria-selected="false"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M3 2.5v5.2a5 5 0 0 0 10 0V2.5"/><path d="M5.8 2.5v5.2a2.2 2.2 0 0 0 4.4 0V2.5"/></svg><span class="tw" data-t="Chamber">Chamber</span></button>
+        <button type="button" class="rd-tab" role="tab" data-view="list" aria-selected="false"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5.5 4h8M5.5 8h8M5.5 12h8"/><path d="M2.5 4h.01M2.5 8h.01M2.5 12h.01" stroke-width="2"/></svg><span class="tw" data-t="List">List</span></button>
+      </div>
+      <button type="button" class="mp-fsgo" id="fsgo" aria-label="Full screen" title="Full screen (F)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+    </div>
+    <div class="rd-tabs mp-lensrow">
+      <div class="mp-lenses" id="lenses" role="tablist" aria-label="Colour the seats by"></div>
+      <div class="mp-search">
+        <label><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+          <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search a seat, member or place" aria-label="Search seats, members, suburbs and polling places" aria-controls="sugg" aria-expanded="false"><kbd aria-hidden="true">/</kbd></label>
+        <div class="sugg" id="sugg" role="listbox" hidden></div>
+      </div>
+    </div>
+    <div class="mp-fig">
+      <div class="mp-view" id="view">
+        <div class="mp-stage" id="stage">
+          <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Choose a seat with search or the list view."></canvas>
+          <div class="mp-loading" id="loading">Loading the map</div>
+          <div class="mp-filter" id="filterpill" hidden></div>
+          <div class="mp-zoom" id="zoomer"><button type="button" id="zfs" aria-label="Full screen" title="Full screen (F)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 9V4h-5M4 15v5h5" stroke="white" stroke-width="4.1"/><path d="M20 9V4h-5M4 15v5h5" stroke="currentColor" stroke-width="1.9"/></svg></button><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="white" stroke-width="3.9"/><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2 7h10" stroke="white" stroke-width="3.9"/><path d="M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zback" aria-label="Jump back" title="Jump back (B)" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="white" stroke-width="4.1"/><path d="M9 5 4 10l5 5" stroke="currentColor" stroke-width="1.9"/><path d="M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="currentColor" stroke-width="1.9"/></svg></button></div>
+          <div class="mp-credit" id="credit" hidden><span class="mp-credit-long">Streets: </span>Powered by <a href="https://www.esri.com/" rel="noopener">Esri</a> · <span class="mp-credit-long">Esri, </span>TomTom, Garmin, © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a><span class="mp-credit-long"> contributors</span></div>
+          <div class="mp-list" id="list" hidden></div>
+          <div class="mp-tip" id="tip" hidden></div>
+        </div>
+        <div class="mp-legend" id="legend" hidden></div>
+        <div class="mp-frames" id="frames-jump" role="group" aria-label="View elections"></div>
+        <div class="mp-time" id="time" role="group" aria-label="Election"></div>
+      </div>
+      <article class="mp-story" id="story"></article>
+    </div>
+  </section>
+
+  <section class="sh-frame mp-notes" aria-labelledby="mp-notes-t">
+    <h2 id="mp-notes-t">How the map is built</h2>
+    <div class="cols">
+      <div>
+        <h3>Results</h3>
+        <p>Every figure is the Australian Electoral Commission’s final count for that election: first preferences, the final two candidates, the two-party count against Labor and the Coalition, informal ballots and the flow of each excluded candidate’s preferences. Polling places are the AEC’s own booths; their ordinary votes add up, candidate by candidate, to each seat’s ordinary-vote total.</p>
+        <p>The map can be drawn three ways. Seats fills each seat with its figure. Balloons puts a circle at each polling place, its area the votes behind the reading, such as a lead in votes; where balloons would overlap they join, and a shared balloon shows its places’ net. Surface blends the polling places into one continuous field, weighted by their votes, using each neighbourhood’s own figure where enough votes stand behind it and reaching further where few people live. It is a smoothed estimate, not a count, and it paints country where nobody voted. Postal, absent and declaration votes have no place on the map, nor do most hospital teams, so neither view includes them. The key gives their number and, on the two-party count, which way they went. Remote and mobile teams move between communities and have no fixed spot, so their votes are shared across their seat’s land.</p>
+        <p>How votes were cast splits formal votes by the way they were cast. Early centres take ordinary votes, counted like those on the day, and they began in 2010. A declaration vote is sealed in an envelope and checked against the roll first: most early votes cast outside a person’s own seat, and every early vote before 2010. The 2025 graphic groups early centres with postal votes, and declaration votes with absent and other votes; each skew is Labor’s share of that group’s two-party count minus its share of the selected area’s full two-party count. The Effect on count option shows the change in cumulative Labor 2PP as the groups are added from bottom to top, using the selected area’s two-party vote totals. This is an illustrative sequence, not actual election-night reporting; batches overlap and postal and declaration votes arrive over several days. Mobile teams take votes before election day; the 2025 bands include them with on-the-day ordinary votes. Earlier elections give mobile teams their own row where they took at least 5% of the votes. Labor’s two-party share of each pile is the AEC’s two-party count by vote type from 2016. From 1996 to 2013 it is the final two by vote type, in seats where those were Labor and the Coalition. The 1993 count stops short of that.</p>
+        <p>Where an election has no two-party or final count by polling place, which covers every state election’s two-party count, 1993, and several states’ final counts, each place is estimated from its first preferences, then adjusted so the seat’s places add up to its real count.</p>
+        <p>Labor v One Nation, the Coalition v One Nation, and the Greens v One Nation, Labor and the Coalition are not counted, except in the few seats whose final two were that pair. Everywhere else they are built: each place’s first preferences, with other parties’ votes split by how those parties’ voters ranked the two on the Senate ballot at that place, or in that state for a state election. In the 2025 frames, Labor v One Nation is levelled to the site’s own preference table. South Australia 2026’s Labor v One Nation uses estimates of that election’s own splits. The One Nation pairings are offered only where One Nation stood in at least three seats in four and those orderings exist; the Greens pairings ride the federal frames’ ballots alone.</p>
+        <p>The 2026 Farrer by-election is the AEC’s count for that by-election. “Now” shows who holds each seat today: the 2025 result, the Farrer by-election, and members who have changed party since.</p>
+        <p>The chamber view also shows the Senate. Today’s puts each senator in their seat on the Parliament’s Senate seating plan, with terms from the AEC’s lists of senators elected in 2022 and 2025. Each election’s Senate is the one that sat when its new senators took their seats: 1 July after a half-Senate election, or July 2016 for the double dissolution. Who sat, and for which party, comes from the Parliamentary Handbook’s records of each senator’s terms and changes of party. These Senates are sorted, since no seating plan survives for them, and drawn on today’s floor; the chamber has not changed since 1988.</p>
+      </div>
+      <div>
+        <h3>Boundaries and places</h3>
+        <p>The 1993, 1996, 1998 and 2001 boundaries come from the <a href="https://handbook.aph.gov.au/">Parliamentary Handbook</a>, Commonwealth of Australia, extracted by <a href="https://github.com/wragge/historical-federal-electorate-boundaries">Tim Sherratt</a>. They are shared for non-commercial use under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>, retaining the original polygon coordinates through a lossless format conversion. See the <a href="/map/data/historical-boundary-sources.json">dated source index and attribution</a>. The historical digitisation includes small border discrepancies and self-intersections in 1993 Dickson and 2001 Braddon; these source features have not been redrawn.</p>
+        <p>From 2004 to 2025, seats use the AEC’s boundaries for each election. The 2010 frame uses the AEC’s election-day archive; Victoria’s December 2010 and South Australia’s December 2011 redistributions first appear in the 2013 frame. Census figures retain their stated ABS statistical geography, which can differ slightly from electoral boundary linework.</p>
+        <p>Polling-place locations for 1993, 1996 and 1998 are approximate: names are matched to later AEC venue records and checked against each election’s electorate boundaries. Each matched place identifies its source year and venue on its card. Unresolved places and mobile teams have no marker; their recorded votes remain searchable. Later places use AEC venue records; 2004’s places carry coordinates matched from 2007. Early voting centres are drawn as squares and sized, like the other places, by votes cast.</p>
+        <p>The map’s party colours are the site’s, re-stepped so that touching seats stay distinguishable for colour-blind readers.</p>
+      </div>
+      <div>
+        <h3>The seats’ character</h3>
+        <p>Seat types are the AEC’s own classes. The census tab’s advantage measures are the ABS’s SEIFA indexes, ranked into tenths among each election’s seats; between censuses the rank is interpolated to election day. For a polling place, they score either the census area it sits in or, from 2016, the areas its voters live in.</p>
+        <p>Language and age are shares of residents at the 2021 census, counted where each polling place’s voters live and weighted by their votes; a seat pools its places. The AEC has recorded where voters live only since 2016, so earlier elections have no figures. They describe neighbourhoods, not the voters themselves.</p>
+        <p>Unfortunately, a polling place’s swing is shown only where the AEC could set it against the previous election, so new places have none.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/map/vendor/d3-7.9.0.min.js"></script>
+<script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
+<script src="/map/map.js?v=d19ed41c"></script>
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">

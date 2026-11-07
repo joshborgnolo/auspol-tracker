@@ -2306,8 +2306,8 @@ const ARCHIVE_STAMP = "2026-10-24";
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
 const PREDICTION_STAMP = "2026-11-07";
-/* /maps/ is hand-built (.build/map/): its data is the House as at this date (the
-   "Now" overlay's asOf); bump it with each rebuild of maps/data */
+/* /map/ is hand-built (.build/map/): its data is the House as at this date (the
+   "Now" overlay's asOf); bump it with each rebuild of map/data */
 const MAP_STAMP = "2026-11-07";
 /* model/ is the seat model's page (.build/model/): dated by its latest official run, read from the
    run itself, so the daily model refresh moves it with no stamp to bump */
@@ -2396,7 +2396,7 @@ ${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explai
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>
-    <loc>${SITE_URL}maps/</loc>
+    <loc>${SITE_URL}map/</loc>
     <lastmod>${MAP_STAMP}</lastmod>
   </url>
   <url>

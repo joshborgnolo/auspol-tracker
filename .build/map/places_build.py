@@ -1,4 +1,4 @@
-"""places_build.py - the towns and cities named on the Election map, as maps/data/places.json.
+"""places_build.py - the towns and cities named on the Election map, as map/data/places.json.
 
 Every ABS 2021 Urban Centre and Locality (UCL: a town of 200 people or more),
 with its 2021 Census population, set at a point:
@@ -19,7 +19,7 @@ Sources (not in the repo, ~60MB; fetch into one directory):
   AU.zip  download.geonames.org/export/dump (CC BY 4.0)
 Needs pyshp and shapely.
 
-usage: python3 .build/map/places_build.py <srcDir> maps/data/places.json
+usage: python3 .build/map/places_build.py <srcDir> map/data/places.json
 Then: node .build/map/assemble.mjs (the data stamp).
 Output: {"src": ..., "p": [[name, lon, lat, pop, state, [west, south, east, north]], ...]}
 biggest first; the box is the UCL boundary's extent (what the map frames when the

@@ -749,7 +749,7 @@ function loadAreas(vin) {
   if (AREAS_FILES[vin] == null) return null;
   const got = AR.packs[vin];
   if (got) return got.pack || got.P;
-  const P = getJSON(`/maps/data/${AREAS_FILES[vin]}.json`)
+  const P = getJSON(`/map/data/${AREAS_FILES[vin]}.json`)
     .then((D) => {
       const pack = areasUnpack(D);
       AR.packs[vin] = { pack };

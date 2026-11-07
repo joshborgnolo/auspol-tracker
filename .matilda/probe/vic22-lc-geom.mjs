@@ -1,5 +1,5 @@
 /* Pins the vic22 Legislative Council chamber redraw (2026-10-27, the user's
-   seven-point annotation pass over the chamber photograph) on /maps/
+   seven-point annotation pass over the chamber photograph) on /map/
    (#y=vic22&v=chamber&c=senate), headlessly against canvas primitives:
      - the floor keeps the federal chambers' own outline: straight side walls down to
        the backings' centreline, the southern wall a semicircle at the carpet radius
@@ -83,7 +83,7 @@ await page.evaluateOnNewDocument(() => {
     return ofFT.call(this, text, x, y);
   };
 });
-await page.goto(base + "/maps/#y=vic22&v=chamber&c=senate", { waitUntil: "networkidle0", timeout: 30000 });
+await page.goto(base + "/map/#y=vic22&v=chamber&c=senate", { waitUntil: "networkidle0", timeout: 30000 });
 await page.waitForFunction(() => window.__map && window.__map.S && window.__map.S.house === "senate" && window.__map.S.view === "chamber" && window.__map.S.year === "vic22", { timeout: 15000 })
   .catch(() => { throw new Error("state never reached vic22/chamber/senate"); });
 // let the glide settle, then mark and nudge one repaint to replay a clean frame

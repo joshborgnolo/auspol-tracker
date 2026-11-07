@@ -1,4 +1,4 @@
-// Probe: /maps/'s "Closest seats" list widens its decimal places until a hairline
+// Probe: /map/'s "Closest seats" list widens its decimal places until a hairline
 // margin shows (1dp → 2dp → 3dp), and every row carries its vote margin
 // "(26 votes)" beside the figure.
 // usage: node .matilda/probe/map-closest-margins.mjs <baseUrl>  (serve the repo root first)
@@ -12,7 +12,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const page = await browser.newPage();
 const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
-await page.goto(`${base}/maps/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
+await page.goto(`${base}/map/#y=2025`, { waitUntil: "networkidle2", timeout: 60000 });
 await wait(1500);
 
 const sec = await page.evaluate(() => {

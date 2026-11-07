@@ -20,10 +20,10 @@ const SCRIPT = ".build/analysis/seat-model/swing-simulate.mjs";
 const INPUTS = [
   "data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json",
   "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json", "data/seat-model-flow-calibration.json",
-  "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "maps/data/res-2025.json",
+  "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "map/data/res-2025.json",
   ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs",
   ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
-  "data/house-incumbency.json", "maps/data/res-2022.json", ".build/analysis/seat-model/swing-fit.mjs",
+  "data/house-incumbency.json", "map/data/res-2022.json", ".build/analysis/seat-model/swing-fit.mjs",
 ];
 const FORECAST = "data/seat-model-2028-forecast.json";
 const P5 = ["alp", "lnp", "on", "grn", "oth"];

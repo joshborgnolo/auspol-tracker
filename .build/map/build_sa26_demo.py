@@ -38,7 +38,7 @@ Test: npm test's .build/test-map-page.mjs data pin; the served page contract
 is probed with .matilda/sa26-demo-probe.mjs (people + SEIFA lanes end to end).
 usage: python3 -I .build/map/build_sa26_demo.py
 then:  python3 -I .build/map/build_sa26_data.py .build/map/sa26
-then:  node .build/map/geo_build.mjs .build/map/sa26 .build/map/sa26 maps/data --years=sa26
+then:  node .build/map/geo_build.mjs .build/map/sa26 .build/map/sa26 map/data --years=sa26
 """
 import csv
 import hashlib

@@ -3,7 +3,7 @@
    from one federal election to the next - the cross-check on the model's national preference shocks
    (which are sized on the drift from a Senate election to the next count, backtest-states.mjs `drift`).
 
-   From every counted flow in maps/data/res-<year>.json (each excluded candidate's votes split between the
+   From every counted flow in map/data/res-<year>.json (each excluded candidate's votes split between the
    final two): the vote-weighted share to the first of each pair, per donor class (flowClassOf on the
    candidate's Senate cohort key; the statistics-era files carry party codes, mapped as backtest-long.mjs
    does), kept where at least 5,000 votes moved. Drift = the logit change between consecutive elections.
@@ -20,7 +20,7 @@ const keyOf = (c) => { const g = GROUP(c); if (g === "oth" && CODE_KEY[c[1]]) re
 const FAMB = { alp: 0, lnp: 1, grn: 2, onp: 3 };
 const lev = {};
 for (const y of LONG_YEARS) {
-  const D = JSON.parse(readFileSync(`maps/data/res-${y}.json`, "utf8"));
+  const D = JSON.parse(readFileSync(`map/data/res-${y}.json`, "utf8"));
   for (const dv of D.divs) {
     if (!dv.tcp || dv.tcp.length !== 2) continue;
     const fins = dv.tcp.map((t) => FAMB[dv.c[t[0]][3]]);

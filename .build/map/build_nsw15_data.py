@@ -116,7 +116,7 @@ DIST_IDS = os.path.join(NSW23, "district-ids.json")
 FLOW_COUNTS = os.path.join(FLOW, "2015", "counts.csv")
 DEMO_STORE = os.path.join(REPO, "data", "nsw15-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "nsw15-seifa.json")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 ELECTION = "2015-03-28"
 EVENT = "SG1901"     # venue roll loaned from the 2019 event — see docstring

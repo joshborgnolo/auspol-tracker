@@ -130,7 +130,7 @@ null dec/vdec lanes and no demo lane, exactly as the SA/NSW builders do.
 usage: python3 .build/map/build_vic22_data.py <out_dir>   # no -I: xlrd rides the env's site-packages
 then:  python3 .build/map/build_vic22_boothcensus.py
 then:  python3 .build/map/build_vic22_past.py <out_dir>
-then:  node .build/map/geo_build.mjs .build/map/src/vic22 <out_dir> maps/data --years=vic22
+then:  node .build/map/geo_build.mjs .build/map/src/vic22 <out_dir> map/data --years=vic22
 """
 import collections
 import html as H
@@ -156,7 +156,7 @@ DEMO_STORE = os.path.join(REPO, "data", "vic22-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "vic22-seifa.json")
 SUMMARY_PAGE = os.path.join(SRC, "results-summary.html")
 NARR_SUPP_PAGE = os.path.join(SRC, "narracan-supplementary.html")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 ELECTION = "2022-11-26"
 # the VEC's declared 2022 tally: 87 general-election districts from the

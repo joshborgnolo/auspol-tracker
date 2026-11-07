@@ -1,5 +1,5 @@
-"""The nsw15 and nsw19 frames' upper houses — maps/data/senate-nsw15.json and
-maps/data/senate-nsw19.json, in the exact shape of maps/data/senate-nsw23.json
+"""The nsw15 and nsw19 frames' upper houses — map/data/senate-nsw15.json and
+map/data/senate-nsw19.json, in the exact shape of map/data/senate-nsw23.json
 (lc:true), to the discipline of .build/map/build_nsw23_past.py § 2.
 
 NSW's Legislative Council is 42 members elected statewide, half (21) at each
@@ -115,7 +115,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 FLOW = os.path.join(REPO, ".build", "state-flow-src", "nsw")
 LC_FLOW = os.path.join(REPO, ".build", "nswec-lc-flow-src")
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "maps", "data")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
 E15, E19 = "2015-03-28", "2019-03-23"
 
@@ -607,7 +607,7 @@ def main():
     el11, el15, el19 = elected_2011(), lc_elected("2015"), lc_elected("2019")
     # the 2019 vectors are reproduced byte-for-byte in senate-nsw23.json's
     # pvotes/pformal — the two files must never disagree on them
-    with open(os.path.join(REPO, "maps", "data", "senate-nsw23.json")) as f:
+    with open(os.path.join(REPO, "map", "data", "senate-nsw23.json")) as f:
         nsw23 = json.load(f)
     if v19["votes"] != nsw23["pvotes"] or v19["formal"] != nsw23["pformal"]:
         fail("2019 LC vectors drifted from senate-nsw23.json's pvotes block")

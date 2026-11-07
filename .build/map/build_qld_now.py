@@ -60,8 +60,8 @@ import xml.etree.ElementTree as ET
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 CACHE = os.path.join(REPO, ".build", "state-flow-src", "qld", "byelections")
-RES_QLD24 = os.path.join(REPO, "maps", "data", "res-qld24.json")
-OUT = os.path.join(REPO, "maps", "data", "data-now-qld.json")
+RES_QLD24 = os.path.join(REPO, "map", "data", "res-qld24.json")
+OUT = os.path.join(REPO, "map", "data", "data-now-qld.json")
 sys.path.insert(0, os.path.join(REPO, ".build", "map"))
 import qld_ecq  # the feed grammar's authority — helpers only (names, party
                  # codes, the venue roll, pseudo-lane vocab, booth types)

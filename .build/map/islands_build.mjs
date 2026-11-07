@@ -3,7 +3,7 @@
 // Norfolk Island (Canberra 2016, Bean from 2019), Lord Howe Island (Sydney),
 // Christmas Island and the Cocos (Keeling) Islands (Lingiari) never reach
 // the map's own shapes; this writes their coasts once and, per election, the
-// seat each belongs to, as maps/data/islands.json.
+// seat each belongs to, as map/data/islands.json.
 //  - shape: the rings of the 2025 boundary file lying wholly inside the
 //    island's frame (the frame leaves out Ball's Pyramid and North Keeling,
 //    uninhabited and tens of km off), Douglas-Peucker simplified to TOL
@@ -14,7 +14,7 @@
 //    law (Norfolk Island Legislation Amendment Act 2015), hence OWNER_FIX.
 //    In 2010 and 2013 Norfolk Islanders could enrol in Canberra without the
 //    island being in it: no owner, and the page reads the booths' seat.
-// usage: node .build/map/islands_build.mjs <srcDir with n-YYYY.geojson> maps/data
+// usage: node .build/map/islands_build.mjs <srcDir with n-YYYY.geojson> map/data
 import fs from "fs";
 
 const [, , srcDir, outDir] = process.argv;
