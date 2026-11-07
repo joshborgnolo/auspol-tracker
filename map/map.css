@@ -1055,10 +1055,12 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
 .mp-legend .lg-toolbar .lg-basis { flex: 1 0 auto; width: auto; }
 .mp-legend .mp-search { flex: 0 1 300px; width: 300px; max-width: 100%; order: 0; margin: 0; align-self: auto; }
-.mp-legend .mp-search label { border-radius: 2px; }
+.mp-legend .mp-search label { height: 27px; border-radius: 2px; }
 .fs-sbox { display: none; }
-.fs .mp-legend .mp-search { flex-basis: 100%; width: 100%; }
-.fs .mp-legend .mp-search label { box-shadow: none; }
+.fs .mp-legend .lg-toolbar { flex-wrap: nowrap; }
+.fs .mp-legend .mp-search { flex: 0 1 300px; width: auto; min-width: 0; }
+.fs .mp-legend .mp-search label { min-width: 0; box-shadow: none; }
+.fs .mp-legend .mp-search input { min-width: 0; width: 100%; }
 /* Category labels use the govt tag; their choices stay plain and underlined. */
 .mp-legend .lg-label, .mp-legend .lg-jump > b,
 .mp-legend .lg-draw > span, .mp-frames > b {

@@ -2586,10 +2586,13 @@ for (const y of ["sa22", "sa26"]) {
 }
 
 // the strip's draw note rides UNDER the Draw row on every lens (user call
-// 2026-11-08 — it floated above it on the winner lens)
+// 2026-11-08 — it floated above it on the winner lens); and fullscreen keeps
+// the search on the Base row, not on its own line under it
 {
-  const ui = part("app-6-ui.js");
+  const ui = part("app-6-ui.js"), css = part("page.css");
   assert.ok(ui.includes("h += drawRow;") && ui.indexOf("h += drawRow;") < ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf("h += drawNoteHTML(m);") < ui.indexOf('h += `<div class="lg-hint'), "the Draw row, then its note, then the hint — no note above the row");
+  assert.ok(!css.includes(".fs .mp-legend .mp-search { flex-basis: 100%; width: 100%; }"), "fullscreen's search shares the Base row — no full-width line under it");
+  assert.ok(ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') > ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') < ui.indexOf('h += `<div class="lg-hint'), "the flow lens's final-two key rides the panel's closing rows ahead of the zoom hint");
 }
 
 // the now views carry the base election's swings (user call 2026-11-07 —
