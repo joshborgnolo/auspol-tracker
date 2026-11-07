@@ -301,6 +301,9 @@ button { cursor: pointer; background: none; border: 0; }
 .st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 .st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
+/* each section of the stat head closes on a double rule — two hairlines, tightly spaced */
+.st-sep { align-self: stretch; height: 4px; margin-top: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.st-sep + .st-lab { margin-top: 20px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
 .st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; color: var(--ink); }
 /* the "formed govt" tag: an ink box hugging the governing family's side (ink/bg invert with the theme) */

@@ -440,7 +440,9 @@ function seatStat(m, st, label) {
   const mk = statSeatMakeup(m, idx);
   // the rate the Informal st-sec used to headline, as one more label line under Seats
   const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${fg}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
+  // each section of the head closes on a double rule — two hairlines, tightly spaced
+  const sep = `<span class="st-sep" aria-hidden="true"></span>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two ? two + fg + sep : ""}${fpRow ? fpRow + sep : ""}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}${sep}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
