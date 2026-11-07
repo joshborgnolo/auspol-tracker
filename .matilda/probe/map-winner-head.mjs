@@ -3,9 +3,11 @@
       (agg.ptpp stamped from the shipped previous frame; sa26 stays bare
       because its notional tally covers 28% of the roll v sa22's 88%);
    2. 'now' frames show NO primary or two-party deltas (seats keep theirs);
-   3. the winner lens has NO seat legend at all — its title and the
-      Drawn-as switch share one full-width .lg-head line, and the seat
-      tallies stay solely in the head's Seats row (2026-11-07);
+   3. the winner lens has NO seat legend at all — its title alone opens the
+      strip's .lg-head line, the Jump-to cities and the City-names toggle
+      ride the strip (off the map's top-left overlay), and the Drawn-as
+      switch closes it as the bottom line; the seat tallies stay solely in
+      the head's Seats row (2026-11-07);
    4. the winner head retires the duplicate Two-party-preferred hero
       section below it (kept on the tpp lens);
    5. the by-state table is headed "By state or territory". */
@@ -140,49 +142,68 @@ const stat = (page) => page.evaluate(() => {
   check("now: winner head also retires the 2PP hero", s.tppHero === false);
   await p.close();
 }
-// ---- winner legend: no seat legend at all; its title and the Drawn-as switch share one line
+// ---- winner legend: title alone up top; the Jump-to cities and the City-names
+// toggle ride the strip (off the map's top-left overlay); Drawn-as closes the
+// section as its bottom line, spanning full width and sat left
 {
   const p = await open("now");
-  const head = await p.evaluate(() => {
-    const hd = document.querySelector(".lg-head");
-    if (!hd) return { missing: true };
-    const t = hd.querySelector(".lg-t").getBoundingClientRect();
-    const d = hd.querySelector(".lg-draw");
-    const dr = d && d.getBoundingClientRect();
+  const strip = await p.evaluate(() => {
+    const legend = document.querySelector("#legend");
+    const hd = legend.querySelector(".lg-head");
+    const jump = legend.querySelector(".lg-jump");
+    const draw = [...legend.children].filter((c) => c.classList.contains("lg-draw"));
+    const d = draw[0];
     return {
-      missing: false,
-      grid: getComputedStyle(hd).gridColumn,
-      nestedInLeft: !!hd.closest(".lg-left"),
-      cats: document.querySelectorAll(".lg-cats").length,
-      drawInside: !!d,
-      sameRow: dr ? Math.abs((t.top + t.height / 2) - (dr.top + dr.height / 2)) <= 6 : null,
-      buttons: d ? [...d.querySelectorAll("button")].map((b) => b.textContent.trim()).join(",") : "",
-      label: d ? d.querySelector("span").textContent.trim() : "",
+      title: hd ? hd.querySelector(".lg-t").textContent.trim() : null,
+      headChildren: hd ? [...hd.children].map((c) => c.className.split(" ")[0]) : null,
+      headInLeft: !!(hd && hd.closest(".lg-left")),
+      cats: legend.querySelectorAll(".lg-cats").length,
+      mpCitiesGone: !document.querySelector(".mp-cities"),
+      citiesInOverlay: !document.querySelector(".mp-tl #cities"),
+      jumpId: jump ? jump.id : null,
+      jumpLabel: jump ? jump.querySelector("b").textContent.trim() : null,
+      jumpChips: jump ? jump.querySelectorAll(".mp-ca").length : 0,
+      toggleText: jump ? jump.querySelector("[data-towns]").textContent.trim() : null,
+      togglePressed: jump ? jump.querySelector("[data-towns]").getAttribute("aria-pressed") : null,
+      drawCount: draw.length,
+      drawIsLast: d ? legend.children[legend.children.length - 1] === d : null,
+      drawCol: d ? getComputedStyle(d).gridColumn : null,
+      drawButtons: d ? [...d.querySelectorAll("button")].map((b) => b.textContent.trim()).join(",") : "",
       over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
-  check("legend: no .lg-head missing", !head.missing, JSON.stringify(head));
-  check("legend: the title line spans the legend, outside lg-left", head.grid === "1 / -1" && head.nestedInLeft === false, JSON.stringify(head));
-  check("legend: no seat-legend chips at all", head.cats === 0, String(head.cats));
-  check("legend: Drawn as rides the title line", head.drawInside && head.sameRow === true, JSON.stringify(head));
-  check("legend: Drawn as keeps its label and four buttons", head.label === "Drawn as" && head.buttons === "Seats,Balloons,Surface,Areas", JSON.stringify(head));
-  check("legend: no horizontal overflow", head.over <= 0, String(head.over));
+  check("legend: title alone in the head line, outside lg-left, no seat legend", strip.headInLeft === false && strip.headChildren.length === 1 && strip.headChildren[0] === "lg-t" && strip.cats === 0, JSON.stringify(strip));
+  check("legend: the old top-left cities overlay is gone", strip.mpCitiesGone && strip.citiesInOverlay);
+  check("legend: the Jump-to row rides the strip with all eight capital cities", strip.jumpId === "cities" && strip.jumpLabel === "Jump to:" && strip.jumpChips === 8, JSON.stringify(strip));
+  check("legend: starter City names toggle, pressed (names on)", strip.toggleText === "City names" && strip.togglePressed === "true", JSON.stringify(strip));
+  check("legend: Drawn-as closes the section, its own last row at full width", strip.drawCount === 1 && strip.drawIsLast === true && strip.drawCol === "1 / -1" && strip.drawButtons === "Seats,Balloons,Surface,Areas", JSON.stringify(strip));
+  check("legend: no horizontal overflow", strip.over <= 0, String(strip.over));
+  // the Title on the Zoom-selected frame later keeps this shape; first the toggle works
+  const shotOn = await p.evaluate(() => document.querySelector("#cv").toDataURL().length);
+  await p.evaluate(() => document.querySelector("[data-towns]").click());
+  await new Promise((r) => setTimeout(r, 900));
+  const toggled = await p.evaluate(() => ({ aria: document.querySelector("[data-towns]").getAttribute("aria-pressed"), shot: document.querySelector("#cv").toDataURL().length }));
+  check("the City-names toggle flips its pressed state", toggled.aria === "false", toggled.aria);
+  check("hiding names repaints the canvas differently", toggled.shot !== shotOn, `${shotOn} → ${toggled.shot}`);
+  await p.evaluate(() => document.querySelector("[data-towns]").click());
+  await new Promise((r) => setTimeout(r, 300));
   await p.evaluate(() => window.__map.setDraw("balloons"));
   await new Promise((r) => setTimeout(r, 700));
   const balloons = await p.evaluate(() => ({
     cats: document.querySelectorAll(".lg-cats").length,
     bal: !!document.querySelector(".lg-bal"),
-    draw: !!document.querySelector(".lg-head > .lg-draw"),
+    chips: document.querySelectorAll(".lg-jump .mp-ca").length,
+    drawIsLast: document.querySelector("#legend").lastElementChild.classList.contains("lg-draw"),
     over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
   }));
-  check("over booths too: no seat legend, head line stands, balloons key drawn", balloons.cats === 0 && balloons.draw && balloons.bal && balloons.over <= 0, JSON.stringify(balloons));
+  check("over booths too: no seat legend, jump row stands, draw closes the strip", balloons.cats === 0 && balloons.bal && balloons.chips === 8 && balloons.drawIsLast && balloons.over <= 0, JSON.stringify(balloons));
   await p.evaluate(() => { window.__map.setDraw("seats"); window.__map.setYear(2025); });
   await new Promise((r) => setTimeout(r, 900));
   const y2025 = await p.evaluate(() => ({
     headText: (document.querySelector(".lg-head .lg-t") || {}).textContent || "",
-    cats: document.querySelectorAll(".lg-cats").length,
+    chips: document.querySelectorAll(".lg-jump .mp-ca").length,
   }));
-  check("2025: head line names the election, still no chips", y2025.cats === 0 && /Who won each seat in 2025/.test(y2025.headText), JSON.stringify(y2025));
+  check("2025: head names the election, the jump row holds", y2025.chips === 8 && /Who won each seat in 2025/.test(y2025.headText), JSON.stringify(y2025));
   await p.close();
 }
 

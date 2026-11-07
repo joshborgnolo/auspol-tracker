@@ -136,11 +136,9 @@ button { cursor: pointer; background: none; border: 0; }
 @media (prefers-reduced-motion: reduce) { .mp-stamp, .mp-stamp.on { transform: none; } .mp-stamp.wait .mp-stamp-r i { animation-duration: 2.4s; } }
 
 /* overlays on the stage */
-/* the cities run the width of the stage, clear of the zoom buttons */
+/* the zoom hint runs the width of the stage, clear of the zoom buttons */
 .mp-tl { position: absolute; left: 0; top: 2px; max-width: calc(100% - 56px); z-index: 3; pointer-events: none; }
 .mp-tl > * { pointer-events: auto; }
-.mp-cities { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; }
-.mp-cities b { padding: 4px 0; font-weight: 600; color: var(--ink); text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
 .mp-ca { display: flex; flex-direction: column; align-items: center; }
 .mp-ca button:first-child { padding-bottom: 0; }
 .mp-ca button + button { padding-top: 1px; }
@@ -148,8 +146,6 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-frames b { padding: 4px 0; font-weight: 600; color: var(--ink); }
 .mp-frames button { padding: 4px 0; color: var(--ink-2); }
 .mp-frames button:hover, .mp-frames button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
-.mp-cities button { padding: 4px 0; color: var(--ink-2); text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -.7px -.7px 0 #fff, .7px .7px 0 #fff, -.7px .7px 0 #fff, .7px -.7px 0 #fff; }
-.mp-cities button:hover, .mp-ca.on button { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
 .mp-zoom { position: absolute; right: 0; top: 0; display: flex; flex-direction: column; z-index: 3; padding: 0; gap: 8px; }
 .mp-zoom button {
   width: 34px; height: 32px; display: grid; place-items: center; color: var(--ink-2);
@@ -194,9 +190,21 @@ button { cursor: pointer; background: none; border: 0; }
 .lg-contest { margin-top: 1px; font-weight: 400; }
 .lg-contest span { font-size: 12px; color: var(--ink-3); }
 .lg-left .lg-draw ~ .lg-note { margin-top: 3px; }
-/* the winner lens's title and Drawn-as switch share one line across the legend */
-.mp-legend > .lg-head { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 4px 20px; flex-wrap: wrap; min-width: 0; }
-.lg-head .lg-draw { margin-top: 0; }
+/* the winner lens's title spreads across the strip; its Drawn-as switch closes
+   the strip's bottom line, spanning it full and sat left (2026-11-07) */
+.mp-legend > .lg-head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 4px 20px; flex-wrap: wrap; min-width: 0; }
+.mp-legend > .lg-draw { grid-column: 1 / -1; }
+/* the Jump-to cities, into the strip from the map's top-left overlay, with the
+   City-names toggle after them */
+.mp-legend > .lg-jump { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-top: 2px; font-size: 13px; }
+.lg-jump b { padding: 4px 0; font-weight: 600; color: var(--ink); }
+.lg-jump .mp-ca { align-items: flex-start; }
+.lg-jump button { padding: 4px 0; color: var(--ink-2); }
+.lg-jump button:hover, .mp-ca.on button { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-faint); }
+.lg-jgap { flex: 1 1 12px; height: 1px; }
+.lg-jtoggle { padding: 2px 0 1px; color: var(--ink-2); border-bottom: 1.5px solid transparent; font-size: 12px; }
+.lg-jtoggle:hover { color: var(--ink); }
+.lg-jtoggle[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .lg-bal { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 12px; color: var(--ink-3); }
 .lg-bal svg { flex: none; fill: none; stroke: var(--ink-3); stroke-width: 1; }
 /* under the scale, the shorter column and the wider: in the left one it would wrap and the strip would grow */
@@ -324,9 +332,9 @@ button { cursor: pointer; background: none; border: 0; }
 .st-grid { display: inline-grid; justify-items: center; align-items: baseline; }
 .st-grid small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink); }
 .st-seats.st-n4, .st-seats.st-n5 { font-size: 42px; }
-.st-fps { font-size: 28px; letter-spacing: -0.01em; }
-.st-fps.st-n5, .st-fps.st-n6 { font-size: 23px; }
-.st-fps small { margin-top: 6px; font-size: 14px; }
+.st-fps { font-size: 32px; letter-spacing: -0.01em; }
+.st-fps.st-n5, .st-fps.st-n6 { font-size: 26px; }
+.st-fps small { margin-top: 6px; font-size: 15px; }
 /* the head's "Others" figure opens: underlined to say so, its contents below */
 .st-othb { padding: 0; text-decoration: underline; text-underline-offset: 5px; }
 .st-othb:hover { text-decoration-thickness: 2px; }
@@ -648,7 +656,8 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-story { grid-column: 1; grid-row: 2; margin-top: 18px; }
   .mp-views { margin-bottom: 0; }
   .mp-notes .cols { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .mp-cities { display: none; }
+  /* the long city chip line doesn't fit a phone; the City-names toggle stays */
+  .lg-jump b, .lg-jump .mp-ca, .lg-jump .lg-jgap { display: none; }
   .mp-legend { order: 0; display: block; min-height: 0; margin: 6px 0 0; padding: 8px 0 2px; border-bottom: 0; }
   .mp-hint { display: none; }
 }

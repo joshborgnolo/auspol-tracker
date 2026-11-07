@@ -881,12 +881,13 @@ function drawLabels(m) {
   // the towns: ahead of the seats' names while the view is wide (a city names
   // the country, a seat named for it gives way), after the polling places closer in
   const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set(), since = new Map();
+  const townsOn = !S.townsOff; // the legend strip's City-names toggle zeroes the lot
   // the labels' click targets for this pass; and the picked town's white edge under its ringed name
   townHits.length = 0;
   if (tw > 0 && townPick >= 0) drawUrban();
   // a town chosen in the search goes first of all, ringed, at any zoom
-  if (tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
-  if (wide) drawTowns(m, placed, seatNm, town, [], since);
+  if (townsOn && tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
+  if (townsOn && wide) drawTowns(m, placed, seatNm, town, [], since);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
@@ -932,7 +933,7 @@ function drawLabels(m) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
     if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
   }
-  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
+  if (townsOn && tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
   townSince = since;
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();

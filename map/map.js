@@ -2393,12 +2393,13 @@ function drawLabels(m) {
   // the towns: ahead of the seats' names while the view is wide (a city names
   // the country, a seat named for it gives way), after the polling places closer in
   const tw = townScale(), wide = tw > 0 && tw < TOWN_FIRST, town = new Set(), seatNm = new Set(), since = new Map();
+  const townsOn = !S.townsOff; // the legend strip's City-names toggle zeroes the lot
   // the labels' click targets for this pass; and the picked town's white edge under its ringed name
   townHits.length = 0;
   if (tw > 0 && townPick >= 0) drawUrban();
   // a town chosen in the search goes first of all, ringed, at any zoom
-  if (tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
-  if (wide) drawTowns(m, placed, seatNm, town, [], since);
+  if (townsOn && tw > 0 && townPick >= 0) drawTowns(m, placed, seatNm, town, [], since, townPick);
+  if (townsOn && wide) drawTowns(m, placed, seatNm, town, [], since);
   if (T.k >= 2.3) {
     const g = geoOf(m), cand = [];
     for (const d of m.divs) {
@@ -2444,7 +2445,7 @@ function drawLabels(m) {
     const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)) + 2;
     if (x > -r && y > -r && x < Wpx + r && y < Hpx + r) obst.push([x - r, y - r, x + r, y + r]);
   }
-  if (tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
+  if (townsOn && tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
   townSince = since;
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
@@ -9499,6 +9500,7 @@ function renderLegend() {
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   // a surface goes in steps, and its key with it
   if (!senOn() && drawOf(m) === "surface") { const r = el.querySelector(".lg-ramp"), g = r ? surfaceRampCss(m) : null; if (g) r.style.background = g; }
+  renderJumpSel();
   holdLegendHeight(m);
 }
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
@@ -9643,15 +9645,15 @@ function legendHTML(m) {
   const boothsOn = boothsShown();
   const opt = (name, cur, list) => `<select data-opt="${name}" aria-label="${name}">${list.map(([v, t]) => `<option value="${v}"${cur === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
-  // the Drawn-as switch rides the winner lens's title line (user call 2026-11-07)
+  // the Drawn-as switch closes the winner strip's bottom line (user call 2026-11-07)
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
   // the chamber view chooses its chamber first
   let h = S.view === "chamber" ? houseSwitchHTML() : "";
   switch (S.lens) {
     case "winner": {
-      // title and switch share one line, and there is no seat legend at all — the
-      // tallies live in the head's Seats row and the colours say themselves on the map
-      h += `<div class="lg-head"><div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div>${drawRow}</div>`;
+      // title alone up top — there is no seat legend at all: the tallies live in
+      // the head's Seats row and the colours say themselves on the map
+      h += `<div class="lg-head"><div class="lg-t">${boothsOn ? "Who led the final count at each place" : isNowY(S.year) ? "Who holds each seat today" : `Who won each seat in ${yearLabel(m.year)}`}</div></div>`;
       break;
     }
     case "tpp": {
@@ -9822,10 +9824,13 @@ function legendHTML(m) {
   }
   if (boothsOn && drawOf(m) !== "balloons" && (S.view !== "map" || drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
+    h += jumpHTML();
     if (S.lens !== "winner") h += drawRow;
     h += drawNoteHTML(m);
+    // the winner strip's switch is its bottom line, full width and left
+    if (S.lens === "winner") h += drawRow;
     // the left-hand lines stack in a column of their own, free of the scale's rows
-    // beside them — the winner lens skips this: its title line spans the legend
+    // beside them — the winner lens skips this: its own rows span the legend
     if (S.lens !== "winner") {
       const t = document.createElement("template"), left = document.createElement("div"), box = document.createElement("div");
       t.innerHTML = h; left.className = "lg-left";
@@ -9952,24 +9957,31 @@ function renderTimeline() {
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one">${g}</svg>`;
   // the strips follow the frame and the selection
-  renderCities(); renderJumpSel();
+  renderJumpSel();
   if (FS.on) fsRail();
 }
 
-/* the Jump to: row's cities; a state election keeps just its capital, unlabelled */
-function renderCities() {
+/* the Jump to: row, off the map's top-left overlay and into the legend strip
+   (2026-11-07). Its cities pair name and state, a state election keeps just
+   its capital unlabelled — and the row closes with the city-names toggle,
+   which governs the names the map canvas paints (the Jump-to links stay) */
+function jumpHTML() {
   const j = stOfYear(S.year);
+  const on = !S.townsOff;
+  const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}" aria-label="City names on the map">City names</button></div>`;
   if (j) {
     const k = CITIES.findIndex(([, st]) => st === j);
-    if (k >= 0) { $("#cities").innerHTML = `<b>Jump to:</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>`; renderJumpSel(); return; }
+    if (k >= 0) return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to:</b><div class="mp-ca"><button type="button" data-city="${k}">${CITIES[k][0]}</button></div>${toggle}`;
   }
-  const lis = CITIES;
-  $("#cities").innerHTML = `<b>Jump to:</b>${lis.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}`;
-  renderJumpSel();
+  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to:</b>${CITIES.map(([n, st], k) => `<div class="mp-ca"><button type="button" data-city="${k}">${n}</button><button type="button" data-state="${st}">${STATE_ABBR[st] || st}</button></div>`).join("")}${toggle}`;
 }
 /* the selected entry keeps the hover underline (the city/state column and the election alike) */
 function renderJumpSel() {
   const on = S.sel.level === "state" ? S.sel.st : null;
+  const cit = $("#cities");
+  // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
+  // re-fixed here because renderLegend re-creates it on every render
+  if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   $$("#cities .mp-ca").forEach((ca) => { const b = $("button[data-state]", ca); ca.classList.toggle("on", !!(on && b && b.dataset.state === on)); });
   FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
 }
@@ -10084,7 +10096,8 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover for the reading at any spot, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off
-  $("#cities").hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
+  const citRow = $("#cities");
+  if (citRow) citRow.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
@@ -10187,7 +10200,7 @@ function setView(v, quiet) {
   const list = v === "list";
   $("#list").hidden = !list;
   $("#view").classList.toggle("v-chamber", v === "chamber");
-  for (const id of ["#cities", "#hint"]) $(id).hidden = v !== "map";
+  for (const id of ["#cities", "#hint"]) { const e = $(id); if (e) e.hidden = v !== "map"; }
   // the zoom plate stays up in the chamber, for its full-screen button alone
   $("#zoomer").hidden = list; $("#zoomer").dataset.view = v;
   if (FS.on) fsView();
@@ -10764,6 +10777,9 @@ document.addEventListener("click", (e) => {
   if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
   if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
+  const tn = e.target.closest("[data-towns]");
+  // the Jump-to row's city-names toggle: the map stops (restart) painting town names
+  if (tn) { S.townsOff = !S.townsOff; renderLegend(); schedule(); return; }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
