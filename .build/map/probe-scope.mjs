@@ -66,7 +66,8 @@ async function pressedIs(page, want, ctx) {
 }
 async function clsItemsAreTypes(page, ctx) {
   const menu = await menuLabels(page);
-  assert.deepEqual(menu.map((l2) => l2.split(" = ")[0]), ["cls:Inner Metropolitan", "cls:Outer Metropolitan", "cls:Provincial", "cls:Rural"], ctx + `: ${menu.join(" | ")}`);
+  assert.deepEqual(menu.map((l2) => l2.split(" = ")[0]), ["aus", "cls:Inner Metropolitan", "cls:Outer Metropolitan", "cls:Provincial", "cls:Rural"], ctx + `: ${menu.join(" | ")}`);
+  assert.equal(menu[0].split(" = ")[1].replace(" [pressed]", ""), "None", `${ctx}: the bare-state item reads None`);
 }
 try {
   const page = await browser.newPage();
@@ -99,8 +100,8 @@ try {
   assert.equal(await headTitle(page), "New South Wales", "the head titles itself by the state");
   assert.equal(await upLabel(page), "All seats", "the 'All seats' way out sits above the head");
   assert.ok(await noteShown(), "NSW keep the note — New England and Farrer are NSW seats");
-  await clsItemsAreTypes(page, "the sliced menu is the seat types, plainly named");
-  assert.ok(!(await menuLabels(page)).some((l) => l.endsWith("[pressed]")), "…with nothing pressed until a type is on");
+  await clsItemsAreTypes(page, "the sliced menu is None, then the seat types, plainly named");
+  await pressedIs(page, "aus = None", "…and None stands pressed until a type is on");
 
   // the slice rides federal years, falls back on a state frame, and returns
   await year(page, 2025);
@@ -140,6 +141,15 @@ try {
   assert.ok(!(await noteShown()), "NSW's inner-metro pair names no such seats — the note drops");
   const compSmalls = await seatSmalls();
   assert.equal(compSmalls.map((t) => Number(t.replace("−", "-"))).filter((n) => !Number.isNaN(n)).reduce((x, v) => x + v, 0), 0, "…and the pair's changes conserve");
+
+  // "None" lets the type go alone — the state keeps its slice
+  await page.click("#story .st-scwrap [data-scope-trigger]");
+  await page.click(`#story .st-scwrap [data-scope="aus"]`);
+  await labelIs(page, "Filter by seat type", "'None' lets the type go and the offer re-arms");
+  await pressedIs(page, "aus = None", "…with None pressed again");
+  assert.deepEqual(await selLevel(page), { level: "state", st: "NSW" }, "…and the state keeps its slice");
+  assert.equal(await seatLabN(page), await page.evaluate(() => __map.Y.now.divs.filter((d) => d.st === "NSW").length), "…figures back to the whole of New South Wales");
+  await pick(page, "cls:Inner Metropolitan");
 
   // the pair rides years; a state frame ejects both axes for good
   await year(page, 2025);
