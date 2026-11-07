@@ -197,10 +197,14 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
-// the head's "figures" menu: its choice lives per frame; "aus" is the whole
-// frame's own jurisdiction (Nationwide on the federal frames)
-const statScopes = new WeakMap();
-const statScopeOf = (m) => { let s = statScopes.get(m); if (!s) { s = { k: "aus" }; statScopes.set(m, s); } return s; };
+// the head's "figures" menu: the choice is one pick shared across frames, so
+// it survives a year switch; "aus" is the whole frame's own jurisdiction
+// (Nationwide on the federal frames). A frame that can't express the pick —
+// a state frame shown a federal state pick — shows "aus" until one can.
+let statScopeStore = { k: "aus" };
+const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
+  : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
+const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
 function statScopeLabel(m, sel) {
   if (sel.k !== "st") return sel.k === "cls" ? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` : STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures";
   const s = sel.st;
@@ -270,7 +274,7 @@ function statPrimaryGrid(m, A, cls = "", othx = false) {
 /* the "Others" open is part of the frame's figure view, like the scope choice */
 function statOthersToggle() {
   const m = M(); if (!m) return;
-  const sel = statScopeOf(m); sel.open = !sel.open;
+  statScopeStore.open = !statScopeStore.open;
   renderStory(true);
   const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }

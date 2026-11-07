@@ -686,7 +686,7 @@ function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else i
 
 function setStatScope(sel) {
   const m = M(); if (!m) return;
-  statScopes.set(m, sel);
+  statScopeStore = sel;
   renderStory(true);
 }
 // armed once a scope-menu choice has been made (item picked, or the menu shut

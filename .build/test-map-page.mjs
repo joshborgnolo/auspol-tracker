@@ -2510,7 +2510,12 @@ for (const y of ["sa22", "sa26"]) {
 // cards it replaced are gone from the head's trail
 {
   const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(st.includes("const statScopes = new WeakMap();") && st.includes("const statSel = statScopeOf(m);"), "the figures scope lives per frame, read at the head");
+  // one pick shared across frames (2026-11-07): a year switch keeps the named
+  // figures; a frame that can't express the pick falls back to its own "aus"
+  assert.ok(st.includes("let statScopeStore = { k: \"aus\" };") && !st.includes("statScopes = new WeakMap()"), "the figures scope is one pick shared across frames, surviving a year switch");
+  assert.ok(st.includes("const statScopeOk = (m, s) =>") && st.includes("? statScopeStore : { k: \"aus\", open: statScopeStore.open }"), "a frame that can't express the pick falls back to its own jurisdiction figures");
+  assert.ok(ui.includes("statScopeStore = sel;"), "a scope pick rewrites the shared store");
+  assert.ok(st.includes("const statSel = statScopeOf(m);"), "the scope is read at the head");
   assert.ok(st.includes('"Nationwide figures"') && st.includes('? `${STATE_TITLE[stOfYear(m.year)]} figures`'), "the neutral scope names itself after the frame");
   assert.ok(st.includes('? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` :'), "a seat-type scope compounds hyphenated (Inner-metro figures)");
   assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
