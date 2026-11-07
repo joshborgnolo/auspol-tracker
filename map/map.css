@@ -340,6 +340,8 @@ button { cursor: pointer; background: none; border: 0; }
 .st-seat-key { display: inline-flex; align-items: baseline; gap: 5px; }
 .st-seat-key::before { content: ""; flex: none; width: 7px; height: 7px; align-self: center; border-radius: 1px; background: var(--seat-colour); }
 .st-seat-key b { color: var(--ink); }
+/* the federal Now head's word-note under the count's legend — the Stat block's Commissioner, one rung down */
+.st-seat-note { align-self: flex-start; width: 100%; margin-top: -8px; font-size: 12.5px; font-weight: 400; line-height: 1.45; text-align: left; text-wrap: pretty; color: var(--ink-2); }
 /* the head meta's figures scope menu */
 .st-scwrap { position: relative; display: inline-block; }
 .st-sclab { display: inline-flex; align-items: baseline; gap: 3px; padding: 0; font: inherit; color: inherit; }
