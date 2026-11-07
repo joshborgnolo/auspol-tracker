@@ -15,8 +15,12 @@ silently. The site is the product; it is the least-watched artifact in the repo.
 
 ## What is deployed
 
-`CNAME` → **auspoltracker.com**, GitHub Pages, workflow "pages-build-deployment"
-(typically 20–30 s after a push to `main`).
+`CNAME` → **auspoltracker.com**, GitHub Pages, workflow "pages-deploy"
+(`.github/workflows/pages-deploy.yml`, Actions-deployed since 2026-11-07,
+when the legacy whole-branch builder failed permanently over the 1 GB
+published-site limit; the deployed set is its rsync allowlist, ~300 MB,
+not the whole branch — build sources and the analysis-only data stores
+never publish).
 
 Served from the repo root:
 
@@ -47,7 +51,7 @@ mirror-drift this repo has just spent effort deleting. The committed
 
 Two entry points, for two different failures:
 
-1. `on: workflow_run:` for **"pages-build-deployment"**, `types: [completed]`
+1. `on: workflow_run:` for **"pages-deploy"**, `types: [completed]`
    — catches a bad or missing deploy immediately after it happens.
    **Check out `${{ github.event.workflow_run.head_sha }}`, not `main`.** The
    comparison is only meaningful against the commit that was actually deployed;

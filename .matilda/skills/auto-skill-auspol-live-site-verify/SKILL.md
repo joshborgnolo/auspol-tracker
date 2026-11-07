@@ -53,6 +53,44 @@ the strength of one immediate post-push probe. Only after the live curl
 shows the new content does the browser-cache story (Step 3) apply to user
 reports.
 
+## DEPLOY MECHANISM CHANGED 2026-11-07 — legacy builder retired over 1 GB
+
+Deploys are no longer the legacy whole-branch "pages build and
+deployment" builder. On 2026-11-07 that builder failed permanently:
+main's tracked tree crossed GitHub Pages' 1 GB published-site limit
+(1.209 GB measured at origin/main — state-frame map data + booth-level
+stores did it), so from c76d47e1 on every build `errored` within ~3 s
+with the detail-free "Page build failed." while git refs said everything
+was pushed and the status page said Pages was up. Symptom shape to
+remember: commits visible at their GitHub URLs, `git ls-remote`
+agreeing, Pages `operational` — and only the deploy layer dead. Ordered
+diagnosis: `git ls-remote` (pushed?) → the deploy workflow's runs
+(deploying?) → tree size vs 1 GB (why).
+
+Current machinery (shipped 65fc7a11, "pages: deploy from GitHub Actions
+with a published-set allowlist"):
+
+- The repo's Pages source is `build_type: workflow`; deploys are the
+  **`pages-deploy`** Actions workflow (`.github/workflows/pages-deploy.yml`):
+  checkout → `rsync`-staged allowlist (~296 MB published of ~1.21 GB
+  tracked — `.build`, agent/notes/CI dirs and the analysis-only data
+  stores (`data/booth-demo-*`, `booth-seifa-*`, `booth-locations-history`,
+  `division-seifa-indexes`, `essential-report.csv`,
+  `resolve-political-monitor.csv` — ~480 MB the web never fetches) stay
+  OUT) → 900 MB size gate → configure-pages → upload-pages-artifact →
+  deploy-pages. There is no `POST /pages/builds` retry any more (legacy-
+  only endpoint) — retry with `gh run rerun` on the pages-deploy run.
+- Debug recipe: `gh run list --workflow pages-deploy --limit 5` for the
+  lane, then the SAME origin-stamp-vs-live-curl comparison as Step 2
+  (e.g. `map.js?v=<hash>` in the served `/map/` == `git show
+  origin/main:map/index.html`'s stamp). `site-check.yml` fires on
+  pages-deploy completions.
+- The failure class to expect next: the 900 MB gate fails deploy runs
+  when map/data growth brings the published set back toward 1 GB. Fix by
+  extending the exclusions CONSCIOUSLY (each exclusion is a page/asset
+  that stops publishing), never by raising the gate past the limit; a
+  file the site needs simply must not be excluded.
+
 ## Step 3 — the Pages cache window is the answer 9 times in 10
 
 GitHub Pages serves (measured 2026-09-03): `cache-control: max-age=600`,
