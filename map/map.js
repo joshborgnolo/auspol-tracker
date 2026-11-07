@@ -7797,6 +7797,104 @@ function marginBar(aName, aFam, bName, bFam, lead, span) {
 }
 function statusOf(winPct) { return winPct < 56 ? "marginal" : winPct < 60 ? "fairly safe" : "safe"; }
 
+/* the head's figure idioms, shared: the seat's add-on stats (the Final count
+   and Primaries sections of a seat's story) reuse these verbatim, so the seat
+   view speaks the head's figure language instead of the old hero/margin-bar
+   layout (shipped 2026-11-08) */
+const tone = (f) => `style="color:${css(TH.party[f])}"`;
+/* the head's swing figure. "side" names a family whose colour the figure
+   wears (the seat add-ons pass the winner's own family when a swing isn't
+   meaningful for the count shown); "trail" appends the seat's own verdict
+   ("+5.5 swing · safe") */
+function swingFigure(s, side = null, trail = "") {
+  if (s == null) return "";
+  if (Math.abs(s) < 0.05) return `<span class="st-swing">No swing${trail}</span>`;
+  const f = side || (s > 0 ? "alp" : "lnp");
+  return `<span class="st-swing"><b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b> swing${trail}</span>`;
+}
+/* margin figures widen decimals until the figure shows: a hairline margin
+   (Bradfield '25, 26 votes) vanishes at one decimal — show two, or three if
+   two would still print zeros (the f1 check keeps null/NaN "–" safe) */
+const tightFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f1(v));
+/* the head's two-party figure block: eyebrow, the pair of figures, the names
+   row under them, and the chip hung off the block's edge. One spine for the
+   head (party names + gov tag) and the seat's Final count (candidate
+   surnames + the winner's elected/re-elected tag) */
+const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "") =>
+  `<span class="st-lab">${label}</span><span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span>${tag}</span>`;
+
+/* a seat's stat payload: win family × run family (charged on the final two),
+   their shares, per-family first-preference shares and per-family changes
+   (vote-weighted per candidate figure, mirroring statClassArea's pool rule;
+   by-election rows judge against the by-election's base year via byChange) */
+function seatStatOf(m, d, py) {
+  const o = { winFam: d.win.fam, runFam: d.run.fam, tpp: [d.winPct, 100 - d.winPct], seat: true };
+  const cfsw = (c) => (d.by ? byChange(c, d, d.by.prev) : c.sw);
+  const fams = {}; let formal = 0;
+  for (const c of d.c) {
+    formal += c.v;
+    if (!fams[c.fam]) fams[c.fam] = { v: 0, swN: 0, swD: 0 };
+    fams[c.fam].v += c.v;
+    const s = cfsw(c);
+    if (s != null) { fams[c.fam].swN += s * c.v; fams[c.fam].swD += c.v; }
+  }
+  o.fp = {}; o.fpSw = {};
+  for (const [k, f] of Object.entries(fams)) { o.fp[k] = formal ? (100 * f.v) / formal : null; o.fpSw[k] = f.swD ? f.swN / f.swD : null; }
+  o.formal = formal;
+  /* the swing a swing line under the final-count figures may quote: the
+     classic pair's own two-party swing only — a notional 2PP swing belongs
+     beside the notional figures below, never beside these */
+  o.swing = d.classic && d.tppSw != null ? d.tppSw : null;
+  o.py = py;
+  return o;
+}
+/* the seat's Final count section in the head's figure idiom: surname names
+   row, the winner's tag chip, and the swing · status tail */
+function seatFinalStat(m, d) {
+  const p = seatStatOf(m, d, prevFor(m, d));
+  const [wn, rn] = pairNames(d.win, d.run);
+  /* "re-elected" only where the same member won; a new member held on for
+     their party or took it off someone — for a by-election the record speaks
+     for itself (change is unfiled there) — and both read "elected" */
+  const tag = `<span class="st-fg st-fg-l"><b>${d.change && d.change.kind === "re" ? "re-elected" : "elected"}</b></span>`;
+  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag);
+  const trail = ` · ${statusOf(p.tpp[0])}`;
+  const sw = p.swing != null ? swingFigure(p.swing, null, trail) : `<span class="st-swing">${statusOf(p.tpp[0])}</span>`;
+  return `<div class="st-sec"><div class="st-stat st-secstat">${two}${sw}</div></div>`;
+}
+/* the seat's Primaries head: one column per family at ten per cent or more
+   (an independent heavyweight included — unlike the head, where independents
+   ride Others): a seat can be won from outside the majors */
+function seatPrimariesStat(m, d) {
+  const p = seatStatOf(m, d, prevFor(m, d));
+  const order = { alp: 0, lnp: 1, grn: 2, onp: 3, ind: 4 }; let oth = 0; const cols = [];
+  for (const [k, v] of Object.entries(p.fp)) {
+    if (v == null || v < 10) { oth += v || 0; continue; }
+    cols.push([k, v, p.fpSw[k], k === "alp" ? "Labor" : k === "lnp" ? coalW(1).replace(/^The /, "") : legW(k), k]);
+  }
+  // the head's family order holds while both majors front the row; where the
+  // pair is broken (Labor squeezed out entirely), the columns fall back to
+  // reading by share so a 40 per cent party never trails a 22 per cent one
+  const alpShown = cols.some((c) => c[4] === "alp");
+  cols.sort((a, b) => (alpShown ? (order[a[4]] ?? 5) - (order[b[4]] ?? 5) || b[1] - a[1] : b[1] - a[1]));
+  const bigness = cols.some((c) => c[2] == null) ? null : cols.reduce((x, c) => x + c[2], 0);
+  cols.push(["oth", Math.max(0.05, 100 - cols.reduce((x, c) => x + c[1], 0)), bigness == null ? null : -bigness, "Others", "oth"]);
+  const cells = cols.map((c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`).join("");
+  const majors = (p.fp.alp != null ? p.fp.alp : 0) + (p.fp.lnp != null ? p.fp.lnp : 0);
+  /* "Labor and the Coalition share…" names the pair the majors' figures
+     belong to — where neither stood, or the contest squeezed one under ten
+     (a by-election misfire, an independent's seat), say who instead */
+  const lnpWord = coalW(0).replace(/^The /, "the ");
+  let parens = null, pref = "Primaries";
+  if ((p.fp.alp || 0) >= 10 && (p.fp.lnp || 0) >= 10) parens = `(Labor and ${lnpWord} share ${f1(majors)}%)`;
+  else if ((p.fp.lnp || 0) >= 10) {
+    const top = cols.filter((c) => c[4] !== "lnp" && c[1] != null).sort((a, b) => b[1] - a[1])[0];
+    if (top) { pref = `${top[3] === "Independents" ? "Independent" : top[3]}-led primaries`; parens = `(${top[3] === "Independents" ? "an independent" : top[3]} and ${lnpWord} share ${f1(top[1] + (p.fp.lnp || 0))}%)`; }
+  } else if ((p.fp.alp || 0) >= 10) parens = `(Labor's share is ${f1(p.fp.alp)}%)`;
+  const grid = `<span class="st-grid st-fps st-n${cols.length} st-seatfps" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cells}${bigness != null ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
+  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">${pref}${parens ? ` ${parens}` : ""}</span>${grid}</div></div>`;
+}
+
 function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
   const sorted = [...cands].sort((a, b) => b.v - a.v);
   const top = Math.max(30, (100 * sorted[0].v) / formal);
@@ -7827,11 +7925,15 @@ function linkRows(m, items, fmt, colOf) {
 const colCss = (c) => (c ? css(c) : "var(--line)");
 
 function historyChart(d) {
-  const h = d.h.filter((r) => r[1] != null || r[3]);
+  const y0 = 2004;
+  const yx = (y) => (y === 2026 ? YEAR_X.now - 0.3 : y);
+  /* richer backfill rows (the 1987 merge) predate the labelled domain and
+     once drew past the y axis; they stay in d.h for the hed's "held since"
+     wording, but the chart and its holders list keep to "Since 2004" */
+  const h = d.h.filter((r) => (r[1] != null || r[3]) && yx(r[0]) >= y0);
   if (!h.length) return "";
   const W = 340, H = 120, padL = 26, padR = 10, padT = 10, padB = 22;
-  const yx = (y) => (y === 2026 ? YEAR_X.now - 0.3 : y);
-  const years = h.map((r) => yx(r[0])), y0 = 2004, y1 = Math.max(2025, years[years.length - 1]);
+  const years = h.map((r) => yx(r[0])), y1 = Math.max(2025, years[years.length - 1]);
   const x = (y) => padL + ((yx(y) - y0) / Math.max(1, y1 - y0)) * (W - padL - padR);
   const vals = h.map((r) => r[1]).filter((v) => v != null);
   const lo = Math.min(30, Math.floor(Math.min(...vals, 50) / 10) * 10), hi = Math.max(70, Math.ceil(Math.max(...vals, 50) / 10) * 10);
@@ -8026,7 +8128,9 @@ function statPrimaryCols(m, A, keys = null) {
   fpBloc.sort((p, q) => keys ? keys.indexOf(p[4]) - keys.indexOf(q[4]) : q[1] - p[1]);
   const dA = A.fpSw.alp, dL = A.fpSw.lnp, changes = [dA, dL, ...fpBloc.map((r) => r[2])];
   return [["alp", A.fp.alp, dA, "Labor", "alp"], ["lnp", A.fp.lnp, dL, oppNameW(), "lnp"], ...fpBloc,
-    ["oth", Math.max(0, 100 - A.fp.alp - A.fp.lnp - fpBloc.reduce((x, r) => x + r[1], 0)), changes.some((v) => v == null) ? null : -changes.reduce((x, v) => x + v, 0), "Others", "oth"]];
+    // the "Others" share derives by subtraction, so stamp a hairline floor:
+    // a negative rounding sliver reads as 0.0 and flicks the change smalls
+    ["oth", Math.max(0.05, 100 - A.fp.alp - A.fp.lnp - fpBloc.reduce((x, r) => x + r[1], 0)), changes.some((v) => v == null) ? null : -changes.reduce((x, v) => x + v, 0), "Others", "oth"]];
 }
 /* the head's "Others" figure, opened out: the families not standing as their
    own column there (independents never do), then one lump for whatever stays
@@ -8053,8 +8157,8 @@ function statPrimaryGrid(m, A, cls = "", othx = false) {
   const open = othx && !!statScopeOf(m).open && rows.length > 0;
   const cols = open ? all.slice(0, -1) : all;
   const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${othx && !open && rows.length && c[4] === "oth"
-    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
-    : `<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`}`;
+    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
+    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
   const grid = `<span class="st-grid st-fps st-n${all.length} ${cls}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map(cell).join("")}${showChange ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
   if (!open) return grid;
   const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
@@ -8128,14 +8232,14 @@ function statBreakdown(m, st, kind, rows) {
     const names = cols.map((c) => c[4] === "alp" ? "ALP" : c[4] === "lnp" ? "L/NP" : c[4] === "grn" ? "GRN" : c[4] === "onp" ? "ON" : c[4] === "oth" ? "Other" : c[3]);
     body = `<div class="st-pv-list" style="--pv-cols:${cols.length}" role="group" aria-label="${esc(title)} primary vote percentages"><div class="st-pv-columns" aria-hidden="true"><span></span>${names.map((name) => `<span>${esc(name)}</span>`).join("")}</div>${rows.map((r, i) => {
       const cells = statPrimaryCols(m, r.A, keys);
-      return `<button type="button" class="st-pv-row" data-pv-action="pick" data-pv-index="${i}" aria-label="${esc(r.label + ' primaries: ' + cells.map((c) => c[3] + ' ' + f1(c[1]) + '%').join(', ') + '. Show full result')}"><span>${esc(r.short)}</span>${cells.map((c) => `<b style="color:${css(TH.party[c[0]])}" title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}</button>`;
+      return `<button type="button" class="st-pv-row" data-pv-action="pick" data-pv-index="${i}" aria-label="${esc(r.label + ' primaries: ' + cells.map((c) => c[3] + ' ' + f1(c[1]) + '%').join(', ') + '. Show full result')}"><span>${esc(r.short)}</span>${cells.map((c) => `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}</button>`;
     }).join("")}</div>`;
   } else if (view.mode === "cycle") {
     const r = rows[view.index], A = r.A;
     const pair = Number.isFinite(A.tpp) ? `<span class="st-pv-tpp" role="group" aria-label="Labor ${f1(A.tpp)}%, ${esc(oppNameW())} ${f1(100 - A.tpp)}%"><b style="color:${css(TH.party.alp)}">${f1(A.tpp)}</b><i aria-hidden="true">–</i><b style="color:${css(TH.party.lnp)}">${f1(100 - A.tpp)}</b></span>` : `<span class="st-note">No two-party count available.</span>`;
     // the head's swing line, per area that carries one — as-it-stands frames
     // show theirs too (the base election's is the read there)
-    const sw = A.tppSw == null ? "" : Math.abs(A.tppSw) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b style="color:${css(TH.party[A.tppSw > 0 ? "alp" : "lnp"])}">+${Math.abs(A.tppSw).toFixed(1)}</b> swing</span>`;
+    const sw = swingFigure(A.tppSw);
     // metro types set as compound modifiers over the figures: "Inner-metro primaries"
     const nm = kind === "classes" ? r.short.replace(" ", "-") : r.short;
     body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(nm)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(nm)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
@@ -8195,7 +8299,6 @@ function seatStat(m, st, label, noteDef = null) {
   // the moved-seats note shows only while every seat it names stays inside the
   // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
   const seatsNote = noteDef && (statSel.k === "aus" || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
-  const tone = (f) => `style="color:${css(TH.party[f])}"`;
   // the change line's base: the whole frame's official series, a state's own
   // series where one is picked, else the scope's seat-by-seat reversion
   const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st) : scopeSeatBase(m, statSel, idx, cnt);
@@ -8217,15 +8320,14 @@ function seatStat(m, st, label, noteDef = null) {
   // where an election delivered the government, "govt" on an as-it-stands
   // frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
-  let two = "", twoSw = "";
+  let two = "";
   if (A.tpp != null) {
     // an "as it stands" frame's swing is the base election's — shown like any
     // election frame's (user call: the now views carry swings too)
-    const s = A.tppSw;
-    twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
+    const twoSw = swingFigure(A.tppSw);
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
     // the govt tag rides the names row with them (anchorGovtTag then hugs the head's content edge)
-    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
+    two = twoPartyFigures(`Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg) + twoSw;
   }
   const change = (f, n) => {
     if (!base) return "";
@@ -8252,7 +8354,7 @@ function seatStat(m, st, label, noteDef = null) {
   // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;
   const sections = [];
-  if (two) sections.push(two + twoSw);
+  if (two) sections.push(two);
   if (fpRow) sections.push(fpRow);
   // the word-note about seats that moved since the election sits under the count's legend
   sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote}`);
@@ -8961,17 +9063,19 @@ function storyDiv(m, i) {
   const { hed, dek } = seatHedDek(m, d);
   const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
   let h = head(d.n, meta, hed, dek);
-  const [wn, rn] = pairNames(d.win, d.run);
-  h += `<div class="st-sec"><h3>Final count <small>${d.by ? "the by-election’s" : "two candidates"}</small></h3><div class="hero">${heroPair(wn, d.winPct, d.win.fam, rn, 100 - d.winPct, d.run.fam)}${marginBar(wn, d.win.fam, rn, d.run.fam, 2 * d.winPct - 100)}<p class="hero-verdict"><b>${ds(wn)}</b> by ${int(d.votesMargin)} votes · ${statusOf(d.winPct)}</p></div></div>`;
+  h += seatFinalStat(m, d);
   if (d.tpp != null && !d.classic) h += `<div class="st-sec"><h3>Two-party preferred <small>the AEC’s notional count</small></h3><div class="hero">${heroPair("Labor", d.tpp, "alp", "Coalition", 100 - d.tpp, "lnp")}</div><p class="st-note">${swingPhrase(d.tppSw, prev).replace(/^./, (c) => c.toUpperCase())}.</p></div>`;
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  h += `<div class="st-sec"><h3>First preferences <small>% · change${d.by ? ` on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
+  h += seatPrimariesStat(m, d);
+  h += `<div class="st-sec"><h3>The candidates <small>first preferences${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
   if (d.vt) h += vtBlock([d]);
-  h += `<div class="st-sec"><h3>Informal</h3><div class="big"><span class="v">${f1(d.infPct)}%</span><span class="l">of ballots · Australia ${f1(m.areas.AUS.infPct)}%</span></div>${d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : ""}</div>`;
+  const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
+  const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
+  h += d.infPct == null && d.by ? `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Informal (no count filed for the by-election yet)</span></div>${byTurnout}</div>` : `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Informal (${f1(d.infPct)}% of ballots)</span><span class="st-tpp"><b>${f1(d.infPct)}</b></span>${infCmp != null ? `<span class="st-ext">${ausW()} ${f1(infCmp)}%</span>` : ""}</div>${byTurnout}</div>`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
   const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${origV != null ? `${f0(100 * origV)}% ${COB_VERB[S.cob]}` : `${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}`}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}${d.demo.pt != null ? `, ${f0(100 * d.demo.pt)}% ${DM_VERB.pt}` : ""}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${d.demo.noncit != null ? `<dt>Citizenship</dt><dd>${f0(100 * d.demo.noncit)}% ${DM_VERB.noncit}</dd>` : ""}${d.demo.bigfam != null ? `<dt>Children</dt><dd>${f0(100 * d.demo.bigfam)}% ${DM_VERB.bigfam}</dd>` : ""}${d.demo.hl != null ? `<dt>Home</dt><dd>${f0(100 * d.demo.hl)}% ${DM_VERB.hl}</dd>` : ""}` : "";
@@ -9169,11 +9273,13 @@ function renderStory(force) {
 function anchorGovtTag(el) {
   const stat = el && el.querySelector(".st-stat"), fg = el && el.querySelector(".st-stat .st-fg");
   if (!stat || !fg) return;
-  const alp = fg.classList.contains("st-fg-alp");
+  // left-hung classes: the head's Government-family side (alp), and the seat
+  // head's winner side (its finalist always sits on the left figure)
+  const left = fg.classList.contains("st-fg-alp") || fg.classList.contains("st-fg-l");
   const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect();
   // an inline right is MINUS the gap between the figures' edge and the section's
-  fg.style[alp ? "right" : "left"] = "auto";
-  fg.style[alp ? "left" : "right"] = alp ? `${sb.left - tb.left}px` : `${tb.right - sb.right}px`;
+  fg.style[left ? "right" : "left"] = "auto";
+  fg.style[left ? "left" : "right"] = left ? `${sb.left - tb.left}px` : `${tb.right - sb.right}px`;
 }
 if (typeof addEventListener === "function") addEventListener("resize", () => anchorGovtTag($("#story")));
 if (typeof document !== "undefined" && document.fonts && document.fonts.ready) document.fonts.ready.then(() => anchorGovtTag($("#story")));
@@ -11036,13 +11142,27 @@ document.addEventListener("click", (e) => {
     const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
     $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
     $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
-    if (!was) { pop.hidden = false; scT.setAttribute("aria-expanded", "true"); }
+    if (!was) {
+      pop.hidden = false; scT.setAttribute("aria-expanded", "true");
+      // a tall menu on a small screen must not fall below it: clamp to the
+      // room left under the trigger (it scrolls once clamped, page.css)
+      pop.style.maxHeight = "";
+      const r = pop.getBoundingClientRect(), room = innerHeight - 12;
+      if (r.bottom > room) pop.style.maxHeight = `${Math.max(168, r.height - (r.bottom - room))}px`;
+    }
     scopeSpace = was;
     return;
   }
   if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); scopeSpace = false; }
   const scO = e.target.closest("[data-scope]");
-  if (scO) { scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope)); return; }
+  if (scO) {
+    scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope));
+    // a pick from the open menu can sit two screens below the head: put the
+    // eyes back on the fresh trigger rather than leaving them mid-page
+    const trig = $("#story [data-scope-trigger]");
+    if (trig) { trig.focus({ preventScroll: true }); trig.scrollIntoView({ block: "nearest" }); }
+    return;
+  }
   const stj = e.target.closest("[data-state]");
   if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");

@@ -1488,13 +1488,27 @@ document.addEventListener("click", (e) => {
     const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
     $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
     $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
-    if (!was) { pop.hidden = false; scT.setAttribute("aria-expanded", "true"); }
+    if (!was) {
+      pop.hidden = false; scT.setAttribute("aria-expanded", "true");
+      // a tall menu on a small screen must not fall below it: clamp to the
+      // room left under the trigger (it scrolls once clamped, page.css)
+      pop.style.maxHeight = "";
+      const r = pop.getBoundingClientRect(), room = innerHeight - 12;
+      if (r.bottom > room) pop.style.maxHeight = `${Math.max(168, r.height - (r.bottom - room))}px`;
+    }
     scopeSpace = was;
     return;
   }
   if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); scopeSpace = false; }
   const scO = e.target.closest("[data-scope]");
-  if (scO) { scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope)); return; }
+  if (scO) {
+    scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope));
+    // a pick from the open menu can sit two screens below the head: put the
+    // eyes back on the fresh trigger rather than leaving them mid-page
+    const trig = $("#story [data-scope-trigger]");
+    if (trig) { trig.focus({ preventScroll: true }); trig.scrollIntoView({ block: "nearest" }); }
+    return;
+  }
   const stj = e.target.closest("[data-state]");
   if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
   const fj = e.target.closest("[data-fjump]");
