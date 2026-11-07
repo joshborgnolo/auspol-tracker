@@ -7819,11 +7819,15 @@ const tightFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(
    row, and the chip hung off the block's edge. One spine for the head (party
    names + gov tag) and the seat's Final count (candidate surnames + the
    winner's elected/re-elected tag); the seat's variant puts the names ABOVE
-   black figures in the swing line's font (user call 2026-11-09) */
-const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "", namesUp = false) =>
-  namesUp
-    ? `<span class="st-lab">${label}</span><span class="st-tpp st-nmup"><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span><b class="fig-l">${f1(aPct)}</b><i>–</i><b class="fig-r">${f1(bPct)}</b>${tag}</span>`
+   the figures in the swing line's font (black — user call 2026-11-09),
+   figures in the parties' own colours, and "parties" re-adds the national
+   block's party names under the figures */
+const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "", namesUp = false, parties = null) => {
+  const under = parties ? `<span class="st-pnm st-pnm-l" ${tone(aFam)} title="${esc(parties[0])}">${parties[0]}</span><span class="st-pnm st-pnm-r" ${tone(bFam)} title="${esc(parties[1])}">${parties[1]}</span>` : "";
+  return namesUp
+    ? `<span class="st-lab">${label}</span><span class="st-tpp st-nmup"><span class="st-nm st-nm-l" title="${aName}">${aName}</span><span class="st-nm st-nm-r" title="${bName}">${bName}</span><b class="fig-l" ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b class="fig-r" ${tone(bFam)}>${f1(bPct)}</b>${under}${tag}</span>`
     : `<span class="st-lab">${label}</span><span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span>${tag}</span>`;
+};
 
 /* a seat's stat payload: win family × run family (charged on the final two),
    their shares, per-family first-preference shares and per-family changes
@@ -7856,13 +7860,23 @@ function seatStatOf(m, d, py) {
 function seatFinalStat(m, d) {
   const p = seatStatOf(m, d, prevFor(m, d));
   const [wn, rn] = pairNames(d.win, d.run);
-  /* "retain" only where the same member won; a new member held on for their
-     party or took it off someone — for a by-election the record speaks for
-     itself (change is unfiled there) — and both read "win" */
-  const tag = `<span class="st-fg st-fg-l"><b>${d.change && d.change.kind === "re" ? "retain" : "win"}</b></span>`;
-  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true);
+  /* the chip names the party (or "Independent") behind the winner: "X
+     retains" where the party kept the seat, "X gains from Y" where it
+     changed hands, "X wins" where the ledger can't say (new seat,
+     by-election pop-in) */
+  const famNm = (c) => (c.fam === "ind" ? "Independent" : partyName(c.ab, c.pn));
+  const ch = d.change, kind = ch && ch.kind;
+  // a by-election overlay row files no change of its own; its base row's
+  // holder tells the same story (retains if the party held on, gains if not)
+  const byHold = d.by && d.by.prev && d.by.prev.hold, byGain = byHold && byHold.fam !== d.win.fam;
+  const tagWords = kind === "re" || kind === "held" ? `${famNm(d.win)} retains`
+    : kind === "gain" ? `${famNm(d.win)} gains from ${ds(theParty(ch.prev[2]))}`
+    : byHold ? `${famNm(d.win)} ${byGain ? "gains from" : "retains"}${byGain ? ` ${famNm(byHold)}` : ""}`
+    : `${famNm(d.win)} wins`;
+  const tag = `<span class="st-fg st-fg-l"><b>${tagWords}</b></span>`;
+  const two = twoPartyFigures(`Final count (margin of ${tightFmt(Math.abs(p.tpp[0] - 50))} · ${statusOf(p.tpp[0])})`, p.tpp[0], p.winFam, ds(wn), p.tpp[1], p.runFam, ds(rn), tag, true, [partyName(d.win.ab, d.win.pn), partyName(d.run.ab, d.run.pn)]);
   const sw = swingFigure(p.swing);
-  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-sep" aria-hidden="true"></span>${two}${sw}</div></div>`;
+  return `<div class="st-sec"><div class="st-stat st-secstat">${two}${sw}</div></div>`;
 }
 /* the seat's Primaries head: one column per family at ten per cent or more
    (an independent heavyweight included — unlike the head, where independents
@@ -8360,7 +8374,11 @@ function informalHTML(m, st) {
   const clsPart = poolParts(m).cls;
   const sel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
   const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
-  return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
+  if (A.infPct == null) return "";
+  /* a state-picked view contrasts itself with the frame's average, the same
+     comparison word the seat view's informal line carries (user call) */
+  const cmp = sel.k === "st" && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
+  return `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%${cmp}</div>`;
 }
 /* the dropdown's item list in order (the spacebar cycle walks it too): the
    open axis — states until sliced, then "All" and the seat types over it
@@ -9056,8 +9074,9 @@ function storyDiv(m, i) {
      majors: the same head-block idiom as the Final count (the name of the
      minority coalition partner comes through coalW on state frames) */
   if (d.tpp != null && !d.classic) {
-    const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coalW(1).replace(/^The /, ""), "", true);
-    h += `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-sep" aria-hidden="true"></span>${two}${swingFigure(d.tppSw)}</div></div>`;
+    const coal = coalW(1).replace(/^The /, "");
+    const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
   }
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
@@ -9079,9 +9098,10 @@ function storyDiv(m, i) {
   const hasDeciles = IX.some((ix) => d.seifa[ix] && d.seifa[ix].dec);
   const deciles = hasDeciles ? decileRows((ix) => d.seifa[ix] && d.seifa[ix].dec) : "";
   const seatNote = `${demoCopy(m).note}${deciles ? ` 1 is the most disadvantaged tenth of the ${m.divs.length} seats, 10 the most advantaged.` : ""}`;
-  /* the head reads "Census data" plain (user call 2026-11-08): the source and
-     measure live in the note beneath, not in a two-line straddling title */
-  if (d.cls || d.demo || deciles) h += `<div class="st-sec"><h3>Census data</h3>${d.cls || d.demo ? `<dl class="facts">${d.cls ? `<dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>` : ""}${demoFacts}</dl>` : ""}${deciles}<p class="st-note">${seatNote}</p></div>`;
+  /* the head names the profile — a seat profile federally, the state's own
+     view on its frame (user call 2026-11-09) */
+  const censusHead = STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} view from census data` : "Seat profile from census data";
+  if (d.cls || d.demo || deciles) h += `<div class="st-sec"><h3>${censusHead}</h3>${d.cls || d.demo ? `<dl class="facts">${d.cls ? `<dt>Type</dt><dd>${esc(CLS_SHORT[d.cls])}: ${esc(CLS_DEF[d.cls])}</dd>` : ""}${demoFacts}</dl>` : ""}${deciles}<p class="st-note">${seatNote}</p></div>`;
   h += historyChart(d);
   // polling places
   const b = m.booth, js = b.byDiv[i];
@@ -9195,25 +9215,31 @@ function storyBooth(m, j) {
   else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
   if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
   if (lead && tc) {
-    const ta = tc[0], tb = tc[1], tot = ta + tb;
-    const [an, bn] = pairNames(D.A, D.B);
-    h += `<div class="st-sec"><h3>Final count here <small>two candidates</small></h3><div class="hero">${heroPair(an, (100 * ta) / tot, D.A.fam, bn, (100 * tb) / tot, D.B.fam)}${marginBar(an, D.A.fam, bn, D.B.fam, (200 * ta) / tot - 100)}</div></div>`;
+    const ta = tc[0], tb = tc[1], tot = ta + tb, pct = (100 * Math.max(ta, tb)) / tot;
+    const lw = ta >= tb ? D.A : D.B, lrun = lw === D.A ? D.B : D.A;
+    const [lwn, lrn] = pairNames(lw, lrun);
+    // the polling place's own count rides the same head-block idiom as the
+    // seat's Final count, with the place-level winner's figure on the left
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), "", true, [partyName(lw.ab, lw.pn), partyName(lrun.ab, lrun.pn)])}</div></div>`;
   }
-  if (!Number.isNaN(b.tpp[j]) && !D.classic) h += `<div class="st-sec"><h3>Two-party preferred <small>notional</small></h3><div class="hero">${heroPair("Labor", b.tpp[j], "alp", "Coalition", 100 - b.tpp[j], "lnp")}</div></div>`;
+  if (!Number.isNaN(b.tpp[j]) && !D.classic) {
+    const coal = coalW(1).replace(/^The /, "");
+    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}</div></div>`;
+  }
   if (!Number.isNaN(b.tpp[j])) { const s0 = nn(b.tppSw[j]); h += `<p class="st-note">${s0 == null ? "This place wasn’t used at the previous election, so it has no swing." : Math.abs(s0) < 0.05 ? "No two-party swing here." : `A two-party swing of ${pts(s0)} to ${s0 > 0 ? "Labor" : "the Coalition"} here.`}</p>`; }
   const cands = D.c.map((c, k) => ({ ...c, v: raw.v[j][k], el: false }));
   const pf = raw.prevFp ? raw.prevFp[j] : null;
   const moved = movedTo(m, D);
   const wk = D.c.indexOf(D.win);
   const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  if (b.formal[j]) h += `<div class="st-sec"><h3>First preferences here <small>% · tick = the whole seat${pf ? ` · change on ${frameBaseY(m.year)} here` : ""}</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
+  if (b.formal[j]) h += `<div class="st-sec"><h3>The candidates by primary vote here</h3><p class="st-note">tick = the whole seat${pf ? ` · change on ${frameBaseY(m.year)} here` : ""}</p>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
   const fl = raw.fl[j];
   if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
   const incRow = dr ? incFact(m, { loinc: dr[6], hiqinc: dr[16], medIncWeekly: raw.medinc ? raw.medinc[j] : null }) : "";
   const origB = isCob() && raw.cob && raw.cob[j] ? raw.cob[j][m.cobPos[S.cob]] : null;
   const demoRows = dr ? `<dl class="facts">${dr[0] != null ? `<dt>Language</dt><dd>${f0(100 * dr[0])}% ${dc.who} speak a language other than English at home</dd>` : ""}${dr[3] != null ? `<dt>Origin</dt><dd>${origB != null ? `${f0(100 * origB)}% ${COB_VERB[S.cob]}` : `${f0(100 * dr[3])}% ${DM_VERB.fborn}`}</dd>` : ""}${dr[4] != null ? `<dt>Education</dt><dd>${f0(100 * dr[4])}% ${DM_VERB.uni}</dd>` : ""}${dr[5] != null ? `<dt>Work</dt><dd>${f0(100 * dr[5])}% ${DM_VERB.blue}${dr[12] != null ? `, ${f0(100 * dr[12])}% ${DM_VERB.pt}` : ""}</dd>` : ""}${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${dr[1] != null && dr[2] != null ? `<dt>Age</dt><dd>${f0(100 * dr[1])}% are 65 or older, ${f0(100 * dr[2])}% are 20 to 34</dd>` : ""}${dr[13] != null ? `<dt>Citizenship</dt><dd>${f0(100 * dr[13])}% ${DM_VERB.noncit}</dd>` : ""}${dr[14] != null ? `<dt>Children</dt><dd>${f0(100 * dr[14])}% ${DM_VERB.bigfam}</dd>` : ""}${dr[15] != null ? `<dt>Home</dt><dd>${f0(100 * dr[15])}% ${DM_VERB.hl}</dd>` : ""}</dl><p class="st-note">${dc.note}</p>` : "";
-  h += `<div class="st-sec"><h3>The neighbourhood <small>ABS census and SEIFA, national deciles</small></h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in.${isState() ? "" : " From 2016, where the AEC records it, “its voters” scores the areas its voters live in."}</p>${demoRows}</div>`;
+  h += `<div class="st-sec"><h3>Neighbourhood profile from census data</h3>${dec || vdec ? decileRows((ix) => (dec ? dec[IX.indexOf(ix)] : null), (ix) => (vdec && vdec[IX.indexOf(ix)] ? ` · its voters ${vdec[IX.indexOf(ix)]}` : "")) : '<p class="st-note">No SEIFA score: this place has no fixed address, or its census area is too small to publish.</p>'}<p class="st-note">The bars score the census area the place stands in.${isState() ? "" : " From 2016, where the AEC records it, “its voters” scores the areas its voters live in."}</p>${demoRows}</div>`;
   h += `<div class="act"><button type="button" data-go="div:${D.i}">Back to ${ds(D.n)}</button><button type="button" data-listbooths>All places in ${ds(D.n)}</button></div>`;
   h += foot(m);
   return h;

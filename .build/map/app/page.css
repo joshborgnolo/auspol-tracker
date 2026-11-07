@@ -365,12 +365,17 @@ button { cursor: pointer; background: none; border: 0; }
    head figure idiom reused inside a plain st-sec. The Final count's names-
    above variant puts the candidate surnames over black figures, their font
    the swing line's and their colour the party's (user call 2026-11-09) */
-.st-tpp.st-nmup .st-nm { font-size: 20px; font-weight: 500; max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-tpp.st-nmup .st-nm { font-size: 20px; font-weight: 500; color: var(--ink); max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-tpp.st-nmup .st-nm-l { grid-area: 1 / 1; justify-self: end; }
 .st-tpp.st-nmup .st-nm-r { grid-area: 1 / 3; justify-self: start; }
 .st-tpp.st-nmup > i { grid-area: 2 / 2; }
 .st-tpp.st-nmup > .fig-l { grid-area: 2 / 1; justify-self: end; }
 .st-tpp.st-nmup > .fig-r { grid-area: 2 / 3; justify-self: start; }
+/* the party names the national block carries under its figures, re-added to
+   the seat's names-above variant as its third row (user call 2026-11-09) */
+.st-pnm { font-weight: 600; font-size: 12px; letter-spacing: 0.02em; max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-tpp.st-nmup .st-pnm-l { grid-area: 3 / 1; justify-self: end; }
+.st-tpp.st-nmup .st-pnm-r { grid-area: 3 / 3; justify-self: start; }
 /* the seat's tag hangs off the winner's figure, which always sits left — the
    head's family-side classes describe majors; the seat's side is positional */
 .st-fg.st-fg-l { right: 100%; }
