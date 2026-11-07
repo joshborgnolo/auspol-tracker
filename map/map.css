@@ -351,6 +351,8 @@ button { cursor: pointer; background: none; border: 0; }
 .st-othx-r b { color: var(--ink); }
 .st-othx-r small { font-size: 11px; color: var(--ink-3); }
 .st-seat-mix { display: flex; flex-direction: column; width: 100%; margin: 12px 0 18px; gap: 10px; }
+.st-seat-track { position: relative; display: block; width: 100%; }
+.st-seat-majority { position: absolute; top: -3px; bottom: -3px; width: 2px; transform: translateX(-50%); background: var(--ink); box-shadow: 0 0 0 1px var(--bg); }
 .st-makeup { display: flex; height: 10px; width: 100%; overflow: hidden; border-radius: 2px; }
 .st-makeup > span { display: block; flex: none; height: 100%; }
 .st-seat-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--ink-2); }

@@ -2036,7 +2036,7 @@ for (const y of ["sa22", "sa26"]) {
   }
   assert.ok(!part("app-3c-sa.js").includes('put("The table"'), "no furniture labels on the Council's floor (the nameplate is gone)");
   assert.ok(part("app-3-chamber.js").includes('geom.key !== "nswLC" ? majorityCuts'), "nswLC draws no dashed majority thread");
-  assert.ok(part("app-3-chamber.js").includes('geom.key === "nswLC" && opts.labels !== false && !ch.plan'), "nswLC: the majority figure stands alone under the floor");
+  assert.ok(part("app-3-chamber.js").includes('geom.key === "nswLC" && opts.labels !== false'), "nswLC: the majority figure stands alone under the floor");
   const { nswCells } = new Function(`${part("app-3-chamber.js").match(/@nsw-cells-begin[\s\S]*?\*\/([\s\S]*?)\/\* @nsw-cells-end \*\//)[1]}; return { nswCells };`)();
   const nswLA = nswCells();
   assert.equal(nswLA.length, 93, "the NSW Assembly's floor: 92 desks and the Serjeant's chair");

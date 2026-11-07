@@ -425,7 +425,11 @@ function statSeatMakeup(m, idx) {
   const colour = (r) => css(TH.party[FP_TONE[r.name] || r.f]);
   const bars = rows.map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${r.n} ${r.n === 1 ? "seat" : "seats"} (${f1(100 * r.n / idx.length)}%)"></span>`).join("");
   const legend = rows.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("");
-  return `<span class="st-seat-mix"><span class="st-makeup" aria-hidden="true">${bars}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
+  const total = m.seatsN || m.divs.length, majority = Math.floor(total / 2) + 1;
+  // A chamber majority is meaningful on the complete House, rather than a
+  // state or seat-type subset selected in the figures menu.
+  const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i>` : "";
+  return `<span class="st-seat-mix"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label, noteDef = null) {
