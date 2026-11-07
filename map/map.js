@@ -7860,18 +7860,22 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
-// the head's "figures" menu: the choice is one pick shared across frames, so
-// it survives a year switch; "aus" is the whole frame's own jurisdiction
-// (Nationwide on the federal frames). A frame that can't express the pick —
-// a state frame shown a federal state pick — shows "aus" until one can.
+// the head's scope menu: the choice is one pick shared across frames, so
+// it survives a year switch; "aus" is the whole frame's own jurisdiction —
+// named after it plainly on election frames ("National", "New South Wales"),
+// as the "… figures" menu on the now frames ("Nationwide figures"). A frame
+// that can't express the pick — a state frame shown a federal state pick —
+// shows "aus" until one can.
 let statScopeStore = { k: "aus" };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
   : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
 const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
 function statScopeLabel(m, sel) {
-  if (sel.k !== "st") return sel.k === "cls" ? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` : STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures";
-  const s = sel.st;
-  return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`;
+  const fig = isNowY(m.year) ? " figures" : "";
+  if (sel.k === "cls") return fig ? `${CLS_SHORT[sel.cls].replace(" ", "-")}${fig}` : CLS_SHORT[sel.cls];
+  if (sel.k === "st") { const s = sel.st; return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]}${fig}`; }
+  if (STATE_YEARS.has(m.year)) return `${STATE_TITLE[stOfYear(m.year)]}${fig}`;
+  return fig ? "Nationwide figures" : "National";
 }
 // a scope's own area-payload: states ride their stored aggregates, classes are pooled
 function statScopeArea(m, st, sel) {
@@ -8099,7 +8103,7 @@ function seatStat(m, st, label) {
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
   if (fpA != null && fpL != null) {
-    fpRow = `<span class="st-lab">Primaries</span>${statPrimaryGrid(m, A, "", true)}`;
+    fpRow = `<span class="st-lab">Primaries (Labor and ${coalW()} on ${f1(fpA + fpL)}%)</span>${statPrimaryGrid(m, A, "", true)}`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
@@ -8112,15 +8116,15 @@ function seatStat(m, st, label) {
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
-  const opts = [["aus", STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"]];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`]);
-  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, `${CLS_SHORT[r.key].replace(" ", "-")} figures`]);
+  const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
+  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, statScopeLabel(m, { k: "cls", cls: r.key })]);
   return opts;
 }
 const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
-// its states or its seat types once named — the head's own figures then follow it
+// the head meta's scope menu: frame-wide by default, one of its states or its
+// seat types once named — the head's own figures then follow it
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
@@ -8558,8 +8562,8 @@ function storyArea(m, st) {
   const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  // the Winner head's meta is the scope menu: "Nationwide figures" by default,
-  // and its head follows whichever state or seat type is picked there
+  // the Winner head's meta is the scope menu (statScopeLabel words it), and
+  // its head follows whichever state or seat type is picked there
   const meta = S.lens === "winner" && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
