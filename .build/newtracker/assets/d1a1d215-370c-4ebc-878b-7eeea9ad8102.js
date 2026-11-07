@@ -8702,8 +8702,9 @@ function infoTerms(D) {
         era's printed annual change, spliced onto the earlier quarterly series derived from the
         ABS's own published index numbers), real GDP per person and real net national disposable
         income per person (chain volume, seasonally
-        adjusted), with the OECD-wide averages, the OECD member-country inflation median
-        (the middle member country's figure, not the OECD's published aggregate) and the G20's inflation aggregate as dashed
+        adjusted), with the OECD-wide averages, the US/UK/Canada average
+        (computed here from the three members' own OECD series — the members whose OECD figures
+        stay current, where an all-member average would arrive months late) and the G20's inflation aggregate as dashed
         context, and the Reserve Bank's 2–3% inflation target as a shaded band. Nothing is
         smoothed, adjusted or estimated — the prints refresh daily from the ABS and OECD data
         APIs.</span>

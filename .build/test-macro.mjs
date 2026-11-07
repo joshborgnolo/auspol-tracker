@@ -18,8 +18,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MACRO = path.join(ROOT, ".build", "macro.mjs");
 
 process.env.MACRO_LIB = "1";
-const { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianCpiLane, absFiltered,
-        OECD_MEMBERS, MED_MIN, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
+const { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, trioMeanCpiLane, absFiltered,
+        TRIO, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
 
 /* ---------------------------------------------------------------- 1. pure */
 assert.equal(periodEnd("2026-Q3"), "2026-09-30");
@@ -77,21 +77,18 @@ assert.equal(absFiltered(parseSdmxCsv(
   "ABS:CPI(2.0.0),1,999904,20,50,Q,2026-Q3,142.1\n" +
   "ABS:CPI(2.0.0),3,10001,10,50,Q,2026-Q3,4.3\n"
 ), { MEASURE: 1, INDEX: 10001, TSEST: 10, REGION: 50 }).length, 1);
-/* the OECD member median: the MED_MIN floor gates, non-members never
-   count, and the middle of 25 distinct member values 10..34 emits 22 */
+/* the US/UK/Canada trio mean: a month files only with ALL THREE members
+   (no panel movement), and the value is the arithmetic mean at 1dp */
 {
-  const memberCodes = [...OECD_MEMBERS];
-  const rows = [];
-  for (let i = 0; i < MED_MIN - 1; i++) rows.push({ REF_AREA: memberCodes[i], TIME_PERIOD: "2020-01", OBS_VALUE: String(10 + i) });
-  assert.equal(medianCpiLane(rows).length, 0, "below MED_MIN members, the month never files");
-  rows.push({ REF_AREA: "G20", TIME_PERIOD: "2020-01", OBS_VALUE: "99" });
-  rows.push({ REF_AREA: "XXX", TIME_PERIOD: "2020-01", OBS_VALUE: "55" });
-  assert.equal(medianCpiLane(rows).length, 0, "aggregates and strangers never raise the count");
-  rows.push({ REF_AREA: memberCodes[MED_MIN - 1], TIME_PERIOD: "2020-01", OBS_VALUE: "30" });
-  const med = medianCpiLane(rows);
+  const m = (area, v, t = "2020-01") => ({ REF_AREA: area, TIME_PERIOD: t, OBS_VALUE: String(v) });
+  assert.equal(trioMeanCpiLane([m([...TRIO][0], 1.0), m([...TRIO][1], 2.0)]).length, 0, "a short trio never files the month");
+  const med = trioMeanCpiLane([
+    m("USA", 1.0), m("GBR", 2.0), m("CAN", 3.0),
+    m("G20", 99), m("XXX", 55), m("usa", 77),         // non-trio items never count
+  ]);
   assert.equal(med.length, 1);
   assert.equal(med[0].date, "2020-01-31");
-  assert.ok(Math.abs(med[0].v - 22) < 0.05, `median of 10..34 with the 25th at 30 → 22 (got ${med[0].v})`);
+  assert.ok(Math.abs(med[0].v - 2.0) < 0.05, `mean of 1,2,3 → 2 (got ${med[0].v})`);
 }
 console.log("1. pure helpers: OK");
 
@@ -117,7 +114,7 @@ const qIso = (year, q) => `${year}-Q${q}`;
    - GDP-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.005^q → y/y 2.0
    - RNNDI-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.006^q → y/y 2.4
    - OECD CPI: one merged all-areas feed — OECD + G20 aggregates (68 printed
-     months each) plus a 26-member, 669-month grid for the median lane
+     months each) plus a 3-member, 848-month grid for the trio-mean lane
    - OECD GDP: 186 printed quarters */
 const absIdxCsv = (() => {
   const rows = ["DATAFLOW,MEASURE,INDEX,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,OBS_STATUS,DECIMALS,OBS_COMMENT"];
@@ -152,10 +149,10 @@ const absRnndiCsv = (() => {
 })();
 /* the merged all-areas CPI feed (ONE file today: the OECD and G20
    aggregates ride the same pull as every member country's series).
-   26 members, 669 months 1971-01 → 2026-09, value = m*0.01 + c*0.1 on the
-   (month,country) grid → the median of month m is m*0.01 + 1.25 exactly. */
-const FIX_MEMBERS = "AUS AUT BEL CAN CHE CHL COL CRI CZE DEU DNK ESP EST FIN FRA GBR GRC HUN IRL ISL ISR ITA JPN KOR LTU LUX".split(" ");
-const MED_MONTHS = Array.from({ length: 669 }, (_, i) => `${1971 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`);
+   The trio USA/GBR/CAN ride 849 months 1956-01 → 2026-09 at
+   1+0.01m / 3+0.01m / 5+0.01m — the trio mean of month m is 3+0.01m
+   exactly. */
+const TRIO_MONTHS = Array.from({ length: 849 }, (_, i) => `${1956 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`);
 const MED_HEAD = "DATAFLOW,REF_AREA,FREQ,METHODOLOGY,MEASURE,UNIT_MEASURE,EXPENDITURE,ADJUSTMENT,TRANSFORMATION,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,BASE_PER,DURABILITY,DECIMALS";
 const oecdRow = (area, t, v) => `OECD.SDD.TPS:DSD_PRICES@DF_PRICES_ALL(1.0),${area},M,N,CPI,PA,_T,N,GY,${t},${v},A,,,,2`;
 const oecdCpiMerged = (oecdVals, g20Vals) => {
@@ -163,7 +160,7 @@ const oecdCpiMerged = (oecdVals, g20Vals) => {
   const ym = (i) => `${2021 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`;
   oecdVals.forEach((v, i) => lines.push(oecdRow("OECD", ym(i), v)));
   g20Vals.forEach((v, i) => lines.push(oecdRow("G20", ym(i), v)));
-  MED_MONTHS.forEach((t, m) => FIX_MEMBERS.forEach((c, ci) => lines.push(oecdRow(c, t, ((m * 0.01 + ci * 0.1).toFixed(2))))));
+  TRIO_MONTHS.forEach((t, m) => ["USA", "GBR", "CAN"].forEach((c, ci) => lines.push(oecdRow(c, t, ((1 + ci * 2 + m * 0.01).toFixed(2))))));
   return lines.join("\n") + "\n";
 };
 const oecdGdpCsv = (rows) => [
@@ -201,14 +198,14 @@ assert.equal(st.rows.cpiMonthly, 9);
 assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.rnndi, 210 - 4);
 assert.equal(st.rows.oecdCpi, 68);
-assert.equal(st.rows.oecdCpiMed, 669);
+assert.equal(st.rows.usUkCaCpi, 849);
 assert.equal(st.rows.g20Cpi, 68);
 assert.equal(st.rows.oecdGdp, 186);
 assert.equal(st.newest.cpi, "2026-09-30");
 assert.equal(st.newest.cpiMonthly, "2026-09-30");
 assert.equal(st.newest.gdppc, "2026-06-30");
 assert.equal(st.newest.rnndi, "2026-06-30");
-assert.equal(st.newest.oecdCpiMed, "2026-09-30");
+assert.equal(st.newest.usUkCaCpi, "2026-09-30");
 assert.ok(Math.abs(st.cpiHandoffDrift - 0.1) < 1e-9, "printed↔derived handoff drift is the fixture's known 0.1pt");
 const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "macro.json"), "utf8"));
 assert.equal(doc.cpi.rows[0].v, 4.5, "index-derived y/y rounds the fixture's known ratio");
@@ -218,10 +215,11 @@ assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 lev
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
 assert.equal(doc.oecdCpi.rows.at(-1).v, OECD_CPI.at(-1));
 assert.equal(doc.g20Cpi.rows.at(-1).v, G20_CPI.at(-1));
-/* median month m on the fixture grid sits at m*0.01 + 1.25 (26 members);
-   the newest month m=668 → 7.93, filed at 1dp */
-assert.ok(Math.abs(doc.oecdCpiMed.rows.at(-1).v - 7.9) < 0.05, `newest member median (got ${doc.oecdCpiMed.rows.at(-1).v})`);
-assert.equal(doc.oecdCpiMed.rows[0].date, "1971-01-31");
+/* the trio mean of month m on the fixture grid sits at 3 + 0.01m
+   (USA 1+0.01m, GBR 3+0.01m, CAN 5+0.01m); newest month m=848 → 11.48,
+   filed at 1dp = 11.5 */
+assert.ok(Math.abs(doc.usUkCaCpi.rows.at(-1).v - 11.5) < 0.06, `newest trio mean (got ${doc.usUkCaCpi.rows.at(-1).v})`);
+assert.deepEqual(doc.usUkCaCpi.rows[0], { date: "1956-01-31", v: 3 }, "first month is the first all-three month, 3.0");
 
 /* second run, untouched upstream: writes nothing */
 r = run(FIX);
@@ -257,7 +255,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "usUkCaCpi", "g20Cpi", "oecdGdp"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -277,8 +275,7 @@ assert.ok(live.cpi.rows[0].date <= "1955-01-01", "quarterly CPI reaches the mid-
 assert.ok(live.gdppc.rows[0].date <= "1980-01-01", "GDP pc reaches the 70s");
 assert.ok(live.rnndi.rows[0].date <= "1980-01-01", "RNNDI reaches the 70s");
 assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s");
-assert.ok(live.oecdCpiMed.rows[0].date <= "1975-01-01", "OECD member median reaches the 70s");
-assert.equal(live.oecdCpiMed.rows[0].date, live.oecdCpi.rows[0].date, "median and average open on the same month");
+assert.ok(live.usUkCaCpi.rows[0].date <= "1960-01-01", "US/UK/Canada mean reaches the 50s");
 assert.ok(live.g20Cpi.rows[0].date <= "2005-01-01", "G20 CPI reaches the late 90s");
 assert.ok(live.oecdGdp.rows[0].date <= "1970-01-01", "OECD GDP reaches the 60s");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");

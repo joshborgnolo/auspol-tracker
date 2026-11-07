@@ -29,16 +29,20 @@
      oecdCpi    – OECD total, all-items CPI, y/y, monthly; the OECD's printed
                   measure (DF_PRICES_ALL: OECD.M.N.CPI.PA._T.N.GY), no
                   arithmetic on our side.
-     oecdCpiMed – OECD member-country MEDIAN all-items CPI y/y, monthly —
-                  computed here from the member series in the same
-                  DF_PRICES_ALL pull (one all-areas request carries the OECD
-                  and G20 aggregates plus every member's series). A month
-                  files only when MED_MIN or more member countries report;
-                  that holds for every month 1971→ today. New Zealand
-                  publishes no monthly CPI and never contributes. Freshness
-                  follows the OECD's national-series refills (recent months
-                  run thin for a while), so the lane's staleness allowance
-                  is deliberately longer than the aggregates'.
+     usUkCaCpi  – the US/UK/Canada CPI-y/y MEAN, monthly, computed here from
+                  the three members' series in the same DF_PRICES_ALL pull
+                  (one all-areas request carries the OECD and G20 aggregates
+                  plus every member's series). User-dictated replacement
+                  (2026-11-07) for the 37-member median trialled the same
+                  day: the OECD's own member archive stalls months behind
+                  its aggregates for most members (Dec 2025 at pull time —
+                  JPN stalls 2021, MEX 2024, CHL 2023 in both OECD CPI
+                  datasets), while these three members' series always stay
+                  current; a median of the eight reporters then left is a
+                  different panel per month. A month files only when all
+                  three members report, so every row is the same trio —
+                  panel-constant to the mid-1950s (earliest month the three
+                  share). Computed lane, not an OECD-published aggregate.
      g20Cpi     – G20 total, all-items CPI, y/y, monthly; the OECD's printed
                   measure for the twenty-biggest-economies aggregate
                   (same publication, REF_AREA=G20, 1998→) — a wider
@@ -122,32 +126,21 @@ const SOURCES = {
   },
 };
 
-/* OECD member countries (the 38 of the 2020s, as the dataset codes them)
-   — the membership the median lane averages over. New Zealand never
-   appears in this dataflow (quarterly CPI only), so 37 is the practical
-   ceiling. Membership is constant over the lane's life by construction:
-   pre-accession series ride too, keeping the median composition-stable. */
-const OECD_MEMBERS = new Set(
-  "AUS AUT BEL CAN CHE CHL COL CRI CZE DEU DNK ESP EST FIN FRA GBR GRC HUN IRL ISL ISR ITA JPN KOR LTU LUX LVA MEX NLD NOR NZL POL PRT SVK SVN SWE TUR USA".split(" ")
-);
-/* A month files only when this many member countries report a figure.
-   Every month Jan 1971 → today meets 25 (measured on the live dataflow,
-   2026-11); recent in-progress months run thin while national series
-   refill, so those stay unfiled until the members land. */
-const MED_MIN = 25;
+/* The trio the average lane means over: the three OECD members whose
+   DF_PRICES_ALL series never lag the OECD's own aggregates (checked on
+   the live feed 2026-11-07: USA/GBR/CAN alone carry months most members
+   dropped after Dec 2025 — JPN stalls 2021, MEX 2024, CHL 2023; NZL never
+   appears, quarterly CPI only). A month files only when all three report.
+ */
+const TRIO = new Set(["USA", "GBR", "CAN"]);
 
 // Plausible annual-change bands per display lane (a breach guards, never
 // files): Australia 1947→ sees CPI ~18% (1975) and ~−2% (1997/2020);
 // RNNDI's terms-of-trade swings run wider than GDP pc (1974 peak ~+18%);
 // OECD histories are tamer but padded on the same logic.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, oecdCpiMed: 600, g20Cpi: 60, oecdGdp: 40 };
-/* the median lane's newest month trails the aggregates': the national
-   series refresh into DF_PRICES_ALL on the OECD's own refill cycle (2026's
-   months sat below MED_MIN for most of the year while the 2025 layer was
-   complete). 400d tolerates that lag and still trips when the lane truly
-   stops moving. */
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 400, g20Cpi: 95, oecdGdp: 210 };
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], usUkCaCpi: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, usUkCaCpi: 800, g20Cpi: 60, oecdGdp: 40 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, usUkCaCpi: 95, g20Cpi: 95, oecdGdp: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -281,14 +274,15 @@ function printedRows(rows) {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/* The OECD member-country median lane from an all-areas member pull:
-   per month, the median of every OECD_MEMBERS country's printed value,
-   filed only where MED_MIN or more members report. OURS, not a publisher
-   print — rounded to one decimal here so the file's precision is honest. */
-function medianCpiLane(rows) {
+/* The US/UK/Canada mean lane from an all-areas member pull: per month,
+   the arithmetic mean of the TRIO countries' printed CPI-y/y values, filed
+   only where ALL THREE report (every row is the same trio — no panel
+   movement). OURS, not a publisher print — rounded to one decimal here so
+   the file's precision is honest. */
+function trioMeanCpiLane(rows) {
   const byMonth = new Map();
   for (const r of rows) {
-    if (!OECD_MEMBERS.has(r.REF_AREA)) continue;
+    if (!TRIO.has(r.REF_AREA)) continue;
     const v = parseFloat(r.OBS_VALUE);
     if (!Number.isFinite(v)) continue;
     let arr = byMonth.get(r.TIME_PERIOD);
@@ -297,10 +291,8 @@ function medianCpiLane(rows) {
   }
   const out = [];
   for (const [p, vs] of byMonth) {
-    if (vs.length < MED_MIN) continue;
-    const s = [...vs].sort((a, b) => a - b);
-    const m = s.length >> 1;
-    out.push({ date: periodEnd(p), v: Math.round((s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2) * 10) / 10 });
+    if (vs.length !== TRIO.size) continue;
+    out.push({ date: periodEnd(p), v: Math.round((vs.reduce((a, b) => a + b, 0) / vs.length) * 10) / 10 });
   }
   return out.filter((x) => x.date && Number.isFinite(x.v)).sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -328,7 +320,7 @@ function guard(msg) {
 }
 
 // ------------------------------------------------------------------- main
-export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianCpiLane, absFiltered, OECD_MEMBERS, MED_MIN, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
+export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, trioMeanCpiLane, absFiltered, TRIO, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
 
 if (!process.env.MACRO_LIB) {
   // Serial, with a breath between hosts: the OECD's NSI gates parallel
@@ -362,14 +354,14 @@ if (!process.env.MACRO_LIB) {
   const rnndi = yoyFromLevels(rnndiLevels, 4);
 
   // OECD lanes off the one all-areas pull: the aggregate totals are
-  // printed measures (no arithmetic); the member median is computed here.
+  // printed measures (no arithmetic); the US/UK/Canada mean is computed here.
   const oecdAreas = parseSdmxCsv(oecdCpiRows);
   const oecdCpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "OECD"));
   const g20Cpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "G20"));
-  const oecdCpiMed = medianCpiLane(oecdAreas);
+  const usUkCaCpi = trioMeanCpiLane(oecdAreas);
   const oecdGdp = printedRows(parseSdmxCsv(oecdGdpRows).filter((r) => r.REF_AREA === "OECD"));
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, oecdCpiMed, g20Cpi, oecdGdp })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, usUkCaCpi, g20Cpi, oecdGdp })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -385,19 +377,19 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: OECD member-country median all-items CPI y/y, computed here from the DF_PRICES_ALL member series (months with 25+ members on file; rounded to 1dp; not an OECD-published aggregate — New Zealand publishes no monthly CPI). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). usUkCaCpi: the mean of the US, UK and Canada's OECD-published all-items CPI y/y prints, computed here (every month all three report, mid-1950s→; rounded to 1dp; not an OECD-published aggregate — chosen over an all-member median because the OECD's archive stalls months behind its own aggregates for most members, while these three always stay current). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     gdppc: { label: "GDP per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: gdppc },
     rnndi: { label: "Real net national disposable income per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: rnndi },
     oecdCpi: { label: "OECD average inflation", basis: "OECD printed measure", rows: oecdCpi },
-    oecdCpiMed: { label: "OECD median inflation", basis: "median of member-country prints (computed, 25+ members per month)", rows: oecdCpiMed },
+    usUkCaCpi: { label: "US/UK/Canada average inflation", basis: "mean of the three members' OECD-published prints (computed)", rows: usUkCaCpi },
     g20Cpi: { label: "G20 average inflation", basis: "OECD printed measure", rows: g20Cpi },
     oecdGdp: { label: "OECD average GDP growth", basis: "OECD printed measure", rows: oecdGdp },
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"];
+  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "usUkCaCpi", "g20Cpi", "oecdGdp"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);
