@@ -8082,9 +8082,12 @@ function statSeatMakeup(m, idx) {
   return `<span class="st-seat-mix"><span class="st-makeup" aria-hidden="true">${bars}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
-function seatStat(m, st, label, seatsNote = "") {
+function seatStat(m, st, label, noteDef = null) {
   const statSel = statScopeOf(m);
   const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
+  // the moved-seats note shows only while every seat it names stays inside the
+  // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
+  const seatsNote = noteDef && (statSel.k === "aus" || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   const tone = (f) => `style="color:${css(TH.party[f])}"`;
   const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : scopeSeatBase(m, statSel, idx, cnt);
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
@@ -8175,11 +8178,14 @@ function areaHedDek(m, st) {
   const isNowM = isNowY(m.year);
   // the seats an "as it stands" frame holds that the election itself never
   // delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
-  // and Pittwater (from the Liberals to the crossbench)
+  // and Pittwater (from the Liberals to the crossbench). The seats list is
+  // what the note is about — a scoped figures view keeps it only while every
+  // named seat sits inside the choice (Rural and NSW keep the One Nation
+  // note; Inner-metro and Queensland don't)
   const NOW_AUS_DEK = {
-    now: " Since the election, One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.",
-    nswnow: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.",
-    qldnow: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.",
+    now: { t: " Since the election, One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
+    nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
+    qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
   };
   if (S.lens === "tpp" && axisNow(m) !== "AC") return axisHedDek(m, idx, where);
   switch (S.lens) {
@@ -8195,12 +8201,12 @@ function areaHedDek(m, st) {
         // what the figures can't say stays in words: the seats that moved since the election.
         // On the federal Now frame that note sits under the Seats count it annotates
         // (in the head's Commissioner); on the other frames it keeps the dek's place
-        let note = aus ? (NOW_AUS_DEK[m.year] ?? "").trim() : "";
+        let note = aus ? (NOW_AUS_DEK[m.year]?.t ?? "").trim() : "";
         if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) note = `Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
-        if (aus) dek += NOW_AUS_DEK[m.year] ?? "";
+        if (aus) dek += NOW_AUS_DEK[m.year]?.t ?? "";
         else if (note) dek += ` ${note}`;
-        const seatsNote = aus && m.year === "now" && note ? `<span class="st-seat-note">${note}</span>` : "";
-        return { hed, dek: seatsNote ? "" : note, stat: seatStat(m, st, `${hed}. ${dek}`, seatsNote) };
+        const noteDef = aus && m.year === "now" && note ? NOW_AUS_DEK[m.year] : null;
+        return { hed, dek: noteDef ? "" : note, stat: seatStat(m, st, `${hed}. ${dek}`, noteDef) };
       }
       const maj = Math.floor(N / 2) + 1;
       // a state frame's prev lives under its jurisdiction when the federal GOV

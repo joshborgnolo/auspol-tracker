@@ -44,10 +44,13 @@ try {
     && menuNow.some((l) => l.startsWith("st:VIC = Victorian figures")) && menuNow.some((l) => l.startsWith("st:QLD = Queensland figures"))
     && menuNow.some((l) => l.startsWith("st:WA = Western Australian figures")) && menuNow.some((l) => l.startsWith("st:SA = South Australian figures"))
     && menuNow.some((l) => l.startsWith("st:TAS = Tasmanian figures")), `the Now menu items carry the figures wording: ${menuNow.join(" | ")}`);
+  const noteShown = () => page.evaluate(() => !!document.querySelector("#story .st-seat-note"));
+  assert.ok(await noteShown(), "the moved-seats note shows at National figures");
 
   // a federal state pick rides across federal years, wording following the frame…
   await pick(page, "st:NSW");
   assert.equal(await label(page), "NSW figures", "picked NSW figures on Now");
+  assert.ok(await noteShown(), "NSW figures keep the note — New England and Farrer are NSW seats");
   await year(page, 2025);
   await labelIs(page, "NSW", "the pick rides Now → 2025, plain on the election frame");
   const menu25 = await menuLabels(page);
@@ -80,6 +83,7 @@ try {
   assert.ok(clsElection, `a seat-type scope is on the menu: ${clsScope}`);
   await pick(page, clsScope);
   assert.equal(await label(page), clsNow, `picked ${clsNow} on Now`);
+  assert.ok(!(await noteShown()), `${clsNow} drops the note — its seats aren't in this class`);
   await year(page, 2025);
   await labelIs(page, clsElection, `${clsElection} — plain — survives Now → 2025`);
   await year(page, "vic22");
@@ -87,11 +91,15 @@ try {
   await year(page, 2025);
   await labelIs(page, clsElection, "and returns on the federal election frame");
 
-  // Rural keeps the Now deltas as well (both coalition losses are rural seats)
+  // Rural keeps the Now deltas as well (both coalition losses are rural seats) —
+  // and the note follows its seats: no Queensland view, back on the Rural one
   await year(page, "now");
+  await pick(page, "st:QLD");
+  assert.ok(!(await noteShown()), "Queensland figures drop the One Nation note");
   await pick(page, "cls:Rural");
   const ruralSmalls = await seatSmalls();
   assert.ok(ruralSmalls.length && ruralSmalls.some((t) => /[−+][1-9]/.test(t)), `Rural figures carry the Now seat deltas: ${ruralSmalls.join(" ")}`);
+  assert.ok(await noteShown(), "Rural figures keep the One Nation note");
 
   assert.deepEqual(errors, [], "no page exceptions");
   console.log("PASS: the scope pick survives year switches, words itself plainly on election frames, keeps the figures wording on now frames");
