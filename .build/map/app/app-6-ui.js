@@ -727,9 +727,9 @@ function setStatScope(sel) {
   // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
   // state selection instead of clearing it; anything else steps the state out.
   if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  // "None" (aus) inside a sliced, typed view lets the type go alone —
-  // the state stays (the map's own pick); elsewhere it steps the state out
-  if (sel.k === "aus" && statScopeStore.k === "cls" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
+  // "All" (aus) inside a sliced view lets the type go alone — the state
+  // always stays, whether or not a type was on
+  if (sel.k === "aus" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
   if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
