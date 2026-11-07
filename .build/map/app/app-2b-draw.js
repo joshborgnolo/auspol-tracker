@@ -1401,7 +1401,7 @@ function balloonKey(m, est) {
 function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither

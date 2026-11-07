@@ -5373,7 +5373,7 @@ function balloonKey(m, est) {
 function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Drawn as</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo; return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an}"${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
@@ -9650,6 +9650,7 @@ function renderLegend() {
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
   const search = el.querySelector(".mp-search");
   const searching = search && search.contains(document.activeElement);
+  const basing = el.querySelector(".lg-bmenu")?.contains(document.activeElement);
   if (search) search.remove();
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   const basis = el.querySelector(".lg-basis");
@@ -9661,6 +9662,7 @@ function renderLegend() {
     if (searching) $("#q").focus({ preventScroll: true });
     fitSearchPlaceholder();
   }
+  if (basing) el.querySelector("[data-basis-trigger]")?.focus({ preventScroll: true });
   renderJumpSel();
   el.style.minHeight = "";
 }
@@ -9803,7 +9805,9 @@ function basisHTML() {
   const sen = S.view === "chamber" && S.house === "senate";
   const list = sen ? SEN_LENSES : yearLenses(S.year);
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
-  return `<label class="lg-t lg-basis"><span class="lg-label">Basis</span> <select data-opt="${sen ? "senbasis" : "basis"}" aria-label="Basis">${list.map((l) => `<option value="${l.id}"${cur === l.id ? " selected" : ""}>${l.id === "informal" ? "Informality" : l.label}</option>`).join("")}</select></label>`;
+  const label = (l) => l.id === "informal" ? "Informality" : l.label;
+  const current = list.find((l) => l.id === cur) || list[0];
+  return `<div class="lg-t lg-basis"><span class="lg-label" id="base-label">Base</span><span class="lg-bmenu"><button type="button" class="st-sclab" data-basis-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="base-menu" aria-label="Base: ${label(current)}">${label(current)} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" id="base-menu" hidden role="menu" aria-labelledby="base-label">${list.map((l) => `<button type="button" data-base="${l.id}" data-base-house="${sen ? "senate" : "house"}" role="menuitemradio" aria-checked="${cur === l.id}" tabindex="-1">${label(l)}</button>`).join("")}</span></span></div>`;
 }
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -10927,7 +10931,31 @@ document.addEventListener("click", (e) => walkAim(e.clientY), true);
 $("#time").addEventListener("click", (e) => { const g = e.target.closest("[data-year]"); if (g) setYear(yearOf(g.dataset.year)); });
 // a stop under the pointer starts loading its election, so the click finds it ready
 $("#time").addEventListener("pointerover", (e) => { const g = e.target.closest("[data-year]"); if (g) { const y = yearOf(g.dataset.year); if (!Y[y]) setTimeout(() => loadYear(y).catch(() => {}), 120); } });
+function closeBaseMenu() {
+  const menu = $("#base-menu"), trigger = $("[data-basis-trigger]");
+  if (menu) menu.hidden = true;
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+}
+function openBaseMenu() {
+  const menu = $("#base-menu"), trigger = $("[data-basis-trigger]");
+  if (!menu || !trigger) return;
+  $$(".st-scwrap .st-scm").forEach((m) => { m.hidden = true; });
+  $$("[data-scope-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+  scopeSpace = false;
+  menu.hidden = false; trigger.setAttribute("aria-expanded", "true");
+  (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button"))?.focus();
+}
 document.addEventListener("click", (e) => {
+  const baseTrigger = e.target.closest("[data-basis-trigger]");
+  if (baseTrigger) { if (baseTrigger.getAttribute("aria-expanded") === "true") closeBaseMenu(); else openBaseMenu(); return; }
+  const baseOption = e.target.closest("[data-base]");
+  if (baseOption) {
+    closeBaseMenu(); $("[data-basis-trigger]")?.focus({ preventScroll: true });
+    if (baseOption.dataset.baseHouse === "senate") setSenLens(baseOption.dataset.base);
+    else setLens(baseOption.dataset.base);
+    return;
+  }
+  if (!e.target.closest(".lg-bmenu")) closeBaseMenu();
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
   const scT = e.target.closest("[data-scope-trigger]");
@@ -10985,8 +11013,6 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.opt) {
     const k = t.dataset.opt;
-    if (k === "basis") { setLens(t.value); return; }
-    if (k === "senbasis") { setSenLens(t.value); return; }
     if (k === "axis") { setAxis(t.value); return; }
     // (a new rival takes the place of the group it was: One Nation's preferences can't be read against One Nation)
     if (k === "vs") { S.vs = t.value; if (S.from === t.value) S.from = t.value === "onp" ? "lnp" : "onp"; }
@@ -11017,6 +11043,23 @@ let lensHover = false;
 $("#lenses").addEventListener("pointerenter", () => { lensHover = true; });
 $("#lenses").addEventListener("pointerleave", () => { lensHover = false; });
 document.addEventListener("keydown", (e) => {
+  const baseWrap = e.target.closest && e.target.closest(".lg-bmenu");
+  if (baseWrap) {
+    const menu = baseWrap.querySelector(".st-scm"), trigger = baseWrap.querySelector("[data-basis-trigger]");
+    if (e.key === "Escape") { e.preventDefault(); closeBaseMenu(); trigger.focus(); return; }
+    if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
+      e.preventDefault();
+      if (menu.hidden) openBaseMenu();
+      else {
+        const items = [...menu.querySelectorAll("button")], at = items.indexOf(document.activeElement);
+        const next = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : (at + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+        items[next]?.focus();
+      }
+      return;
+    }
+    if (e.key === "Tab") { closeBaseMenu(); trigger.focus(); }
+    return;
+  }
   const typing = e.target.closest && e.target.closest("input,select,textarea");
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;

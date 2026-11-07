@@ -1073,3 +1073,8 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-legend .lg-filter button[aria-pressed="true"] {
   color: var(--ink); font-weight: 600; border-bottom-color: var(--ink);
 }
+
+/* Base uses the same trigger and popover styles as the figures filter. */
+.lg-bmenu { position: relative; display: inline-block; font-size: 13px; font-weight: 400; color: var(--ink-3); }
+.lg-bmenu .st-scm button[aria-checked="true"] { font-weight: 600; color: var(--ink); }
+.lg-bmenu .st-scm button:focus-visible { background: var(--lean-ink-bg); color: var(--ink); outline-offset: -2px; }
