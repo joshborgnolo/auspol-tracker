@@ -122,7 +122,7 @@ const boot = async (url) => {
     year: window.__map.S.year,
     meta: document.querySelector("#mp-meta").innerText,
   }));
-  check("qldnow: the federal Now still stands", st.year === "now" && /House as it stands/.test(st.meta), st.meta.slice(0, 90));
+  check("qldnow: the federal Now still stands", st.year === "now" && /current House of Representatives/.test(st.meta), st.meta.slice(0, 90));
   check("qldnow: no page errors", errors.length === 0, errors[0]);
   await page.close();
 }

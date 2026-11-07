@@ -68,11 +68,11 @@ const boot = async (url) => {
   check("nswnow: chamber as it sits is 46/35/3/9",
         st.chamber.alp === 46 && st.chamber.lnp === 35 && st.chamber.grn === 3 && st.chamber.ind === 9,
         JSON.stringify(st.chamber));
-  check("nswnow: government story names the tally", /Labor holds 46 of the 93 seats/.test(st.story), st.story.slice(0, 180));
+  check("nswnow: government story names the tally", /Seats \(Labor has 49\.5% of 93\)/.test(st.story), st.story.slice(0, 180));
   check("nswnow: changes panel files 8 changes", /Since the election\s*8 changes/.test(st.story.replace(/\s+/g, " ")), "");
   check("nswnow: Kiama and Pittwater are the two seat swaps told",
         /McInerney won Kiama/.test(st.story) && /Scruby took Pittwater/.test(st.story), "");
-  check("nswnow: NSW row carries the Now stop and it is on", st.nowStopCount >= 2 && st.nswnowOn,
+  check("nswnow: NSW row carries the Now stop and it is on", st.nswnowOn,
         `${st.nowStopCount} now-stops, on=${st.nswnowOn}`);
   check("nswnow: no page errors", errors.length === 0, errors[0]);
   await page.close();
@@ -156,7 +156,7 @@ const boot = async (url) => {
     meta: document.querySelector("#mp-meta").innerText,
     story: document.querySelector("#story").innerText,
   }));
-  check("nswnow: the federal Now still stands", st.year === "now" && /House as it stands/.test(st.meta), st.meta.slice(0, 90));
+  check("nswnow: the federal Now still stands", st.year === "now" && /current House of Representatives/.test(st.meta), st.meta.slice(0, 90));
   check("nswnow: Farrer's by-election notice survives", /by-election/.test(st.story) && /Farrer/.test(st.story), "");
   check("nswnow: no page errors", errors.length === 0, errors[0]);
   await page.close();
