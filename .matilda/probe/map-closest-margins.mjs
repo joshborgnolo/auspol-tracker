@@ -40,7 +40,7 @@ const readSec = (headRe) => page.evaluate((re) => {
   };
 }, headRe.source);
 
-let sec = await readSec(/^Most marginal/);
+let sec = await readSec(/^Most marginal seats\b/);
 console.log("marginal rows:", JSON.stringify(sec?.rows, null, 1));
 ok("marginal head found", !!sec);
 assertMarginal(sec);
@@ -48,9 +48,10 @@ assertMarginal(sec);
 // the toggle flips the read to Safest
 await page.click("#story [data-close-toggle]");
 await wait(300);
-sec = await readSec(/^Safest/);
+sec = await readSec(/^Safest seats\b/);
 console.log("safest rows:", JSON.stringify(sec?.rows, null, 1));
 ok("safest head found", !!sec);
+ok("head reads Safest seats", sec?.head === "Safest seats", sec?.head);
 ok("safest button present", !!(sec && sec.button));
 if (sec) {
   ok("safest title offers the way back", sec.title === "Show most marginal seats", sec.title);
@@ -66,12 +67,13 @@ if (sec) {
 // and flips straight back
 await page.click("#story [data-close-toggle]");
 await wait(300);
-sec = await readSec(/^Most marginal/);
-ok("toggle returns to Most marginal", !!sec);
+sec = await readSec(/^Most marginal seats\b/);
+ok("toggle returns to Most marginal seats", !!sec);
 assertMarginal(sec);
 
 function assertMarginal(sec) {
   if (!sec) return;
+  ok("head reads Most marginal seats", sec.head === "Most marginal seats", sec.head);
   ok("six seats", sec.rows.length === 6, `${sec.rows.length}`);
   ok("button present in head", sec.button);
   ok("title offers Safest", sec.title === "Show safest seats", sec.title);

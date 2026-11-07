@@ -8785,7 +8785,7 @@ function storyArea(m, st) {
   // the right edge of the head, inline with its words
   const closeNext = closeSafe ? "Show most marginal seats" : "Show safest seats";
   const closeArrows = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 17V3.5M3.2 7.2 6.5 3.7l3.3 3.5" stroke="var(--ink${closeSafe ? "" : "-3"})"/><path d="M13.5 3v13.5M10.2 12.8l3.3 3.5 3.3-3.5" stroke="var(--ink${closeSafe ? "-3" : ""})"/></svg>`;
-  h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
+  h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} seats <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
   h += foot(m);
   return h;
 }
