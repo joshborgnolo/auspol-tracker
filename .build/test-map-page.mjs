@@ -2518,7 +2518,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("let statScopeStore = { k: \"aus\" };") && !st.includes("statScopes = new WeakMap()"), "the figures scope is one pick shared across frames, surviving a year switch");
   assert.ok(st.includes("const statScopeOk = (m, s) =>") && st.includes("? statScopeStore : { k: \"aus\", open: statScopeStore.open }"), "a frame that can't express the pick falls back to its own jurisdiction figures");
   assert.ok(ui.includes("statScopeStore = sel;"), "a scope pick rewrites the shared store");
-  assert.ok(st.includes("const statSel = statScopeOf(m);"), "the scope is read at the head");
+  assert.ok(st.includes("const clsPart = poolParts(m).cls;") && st.includes('const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);'), "the head's scope reads the cls axis first, compounding wherever the map has a state down");
   assert.ok(st.includes('return "National";') && !st.includes('? " figures" : ""'), "the neutral scope words itself plainly on every frame — National, never 'figures'");
   assert.ok(!st.includes("FIG_DEMONYM"), "the demonym compounds (Victorian figures, Western Australian figures) are gone too");
   assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: r.key })'), "the menu items share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
@@ -2553,6 +2553,13 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('switch (S.lens === "cls" ? "winner" : S.lens)') && !st.includes("carries no AEC type"), "the cls lens falls through to the Winner story design");
   assert.ok(ch3.includes("CLS.indexOf(m.divs[i].cls)") && ch3.includes("clsSel && d.cls !== clsSel") && ch3.includes("offType ? th.ink") && ch3.includes("cls: sen ? null : clsFilter(m)"), "only the picked type wears the ladder tone in the chambers — every other kind ghosts to an ink wisp (the rungs are too close to read by alpha), never the Senate");
   assert.ok(st.includes("const chamberMark = pickTitle"), "the chamber section's small names the filter it marks");
+  // the two filter axes compound (2026-11-08): the map's own state selection
+  // and the menu's class pick are orthogonal — pools intersect where both are on
+  assert.ok(st.includes("const poolParts = (m) =>") && st.includes("const sliceState = (m) => poolParts(m).st") && st.includes("const clsFilter = (m) => poolParts(m).cls"), "the map's state and the menu's class read from one compound derivation");
+  assert.ok(st.includes("const stPool = poolParts(m).st") && st.includes("return { A: statClassArea(m, idx)"), "a class picked inside a state tallies its own intersection, not the class's national row");
+  assert.ok(st.includes("const statScopeMenuCur = (m) =>"), "the menu's marked pick rides the store's own (a compounding class stays marked beside the map)");
+  assert.ok(ui.includes('sel.k !== "cls" && S.sel.level === "state"'), "a class pick compounds the map's state selection instead of clearing it");
+  assert.ok(ui.includes('statScopeStore.k !== "cls"'), "the class filter survives the map side's state move");
 }
 
 // Controls share one stack; basis scales are no longer part of the panel.

@@ -626,7 +626,8 @@ function select(sel, opts = {}) {
   // frame again ("All seats") clears it back
   const sm = M();
   if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
-    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0) statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
+    // a class filter survives the map side's state move — the pair compounds
+    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
     else if (sel.level === "aus") statScopeStore = { k: "aus", open: statScopeStore.open };
   }
   if (!opts.keepTown) townPick = -1;
@@ -664,10 +665,10 @@ function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else i
 function setStatScope(sel) {
   const m = M(); if (!m) return;
   // a state named in the menu is selected on the map too — the slice is the
-  // one pick (select re-stamps the store). A class or the whole frame steps
-  // the selection back out first.
+  // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
+  // state selection instead of clearing it; anything else steps the state out.
   if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  if (S.sel.level === "state") select({ level: "aus" }, { fly: false });
+  if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
 }
@@ -678,7 +679,7 @@ function cycleStatScope(step) {
   const m = M(); if (!m) return;
   const opts = statScopeOpts(m, "AUS").map((o) => o[0]);
   if (!opts.length) return;
-  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeOf(m))) + step + opts.length) % opts.length]));
+  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeMenuCur(m))) + step + opts.length) % opts.length]));
 }
 
 function renderFilterPill() {
@@ -977,7 +978,7 @@ async function setYear(y) {
   // re-stamps the menu's store, a pick the frame can't select waits in the
   // store, and it selects again on a frame that has it
   if (S.lens === "winner" && !STATE_YEARS.has(y)) {
-    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0) statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
+    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
     else if (S.sel.level === "aus" && statScopeStore.k === "st" && b.areas[statScopeStore.st] && b.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
   }
   const hold = walkHold(spot);

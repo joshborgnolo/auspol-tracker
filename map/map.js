@@ -7953,7 +7953,8 @@ const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.ar
 // a state slice is ONE pick, whether it came from the map or from the head's
 // figures menu: the map keeps it selected, the menu keeps its store — each
 // side writes the other, and the render reads the slice from the selection
-const sliceState = (m) => (S.lens === "winner" && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null);
+// a picked map state is the state axis of the same compound derivation
+const sliceState = (m) => poolParts(m).st;
 const statScopeOf = (m) => {
   const slice = sliceState(m);
   if (slice) return { k: "st", st: slice, open: statScopeStore.open };
@@ -7962,9 +7963,17 @@ const statScopeOf = (m) => {
 // the lenses whose story shows the Winner head's figures design (the cls lens
 // shares it wholesale since 2026-11-08, its filter simply seat types only)
 const pickerLens = () => S.lens === "winner" || S.lens === "cls";
+// the figures filters' two orthogonal axes: the map's own state selection and
+// the menu's own class pick. Either rides alone, and when both are on the
+// pools intersect — a class can be picked "within" the state (2026-11-08, the
+// report of NSW staying selected with no seat type reachable inside it)
+const poolParts = (m) => ({
+  st: pickerLens() && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null,
+  cls: pickerLens() && !STATE_YEARS.has(m.year) && statScopeOk(m, statScopeStore) && statScopeStore.k === "cls" ? statScopeStore.cls : null,
+});
 // the figures menu's seat-type pick, for the views that mark it outside the
 // head's figures (the chambers paint and dim by it)
-const clsFilter = (m) => (pickerLens() && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls" ? statScopeOf(m).cls : null);
+const clsFilter = (m) => poolParts(m).cls;
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -7982,6 +7991,15 @@ function statScopeArea(m, st, sel) {
   }
   const row = statBreakdownRows(m, st).classes.find((r) => r.key === sel.cls);
   if (!row) return areaStats(m, st);
+  // a class picked inside the map's own state: the pool narrows, tallies pooling
+  // their own seats (the class bar's own national row is not this head's basis)
+  const stPool = poolParts(m).st;
+  if (stPool) {
+    const idx = row.A.idx.filter((i) => m.divs[i].st === stPool);
+    const cnt = {};
+    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+    return { A: statClassArea(m, idx), idx, N: idx.length, cnt };
+  }
   const A = row.A, cnt = {};
   for (const i of A.idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
   return { A, idx: A.idx, N: A.idx.length, cnt };
@@ -8163,7 +8181,10 @@ function statSeatMakeup(m, idx) {
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label, noteDef = null) {
-  const statSel = statScopeOf(m);
+  // a menu class pick narrows the scope wherever the map is: it reads as cls
+  // here even beside a state pick, and the statScopeArea intersects them
+  const clsPart = poolParts(m).cls;
+  const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
   const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
   // the moved-seats note shows only while every seat it names stays inside the
   // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
@@ -8236,7 +8257,8 @@ function seatStat(m, st, label, noteDef = null) {
    2026-11-07), keeping the head's figures scope — a class or state pick
    pools its own rate (statScopeArea), exactly as the head's figure did */
 function informalHTML(m, st) {
-  const sel = statScopeOf(m);
+  const clsPart = poolParts(m).cls;
+  const sel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
   const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
   return A.infPct != null ? `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%</div>` : "";
 }
@@ -8256,8 +8278,12 @@ const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? 
 // offers (state and type on Winner; the type alone on the cls lens), and once
 // a pick is on it's the changer
 const statScopeTrigger = (sel) => (sel.k === "aus" ? (S.lens === "cls" ? "Filter by seat type" : "Filter by state/territory and seat type") : "Change filter");
+// what the menu marks: the store's own pick when it's expressible — a class
+// compounding a map-side state stays marked beside the map's own evidence
+const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
 function statScopeMenu(m, st) {
-  const cur = statScopeVal(statScopeOf(m));
+  const cur = statScopeVal(statScopeMenuCur(m));
+  // the cls lens's types are a toggle row of their own, riding the same scope store
   if (S.lens === "cls") return `<span class="lg-types st-typefilters" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-scope="${cur === `cls:${c}` ? "aus" : `cls:${c}`}" aria-pressed="${cur === `cls:${c}`}" title="${cur === `cls:${c}` ? "Clear" : "Filter by"} ${CLS_SHORT[c]}"><i style="background:${css(TH.cls[k])}"></i>${CLS_SHORT[c]}</button>` : "").join("")}</span>`;
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
   return `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(statScopeOf(m)))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${items.join("")}</span></span>`;
@@ -8652,9 +8678,11 @@ function vtBands(divs) {
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
 function vtScope(m, st) {
-  const sel = st === "AUS" && pickerLens() ? statScopeOf(m) : { k: st === "AUS" ? "aus" : "st", st };
-  const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)));
-  const geography = sel.k === "aus" ? "nationwide" : sel.k === "st" ? STATE_SHORT[sel.st] : `${sel.cls.toLowerCase()} seats`;
+  const parts = st === "AUS" ? poolParts(m) : { st: null, cls: null };
+  const sel = st !== "AUS" || !pickerLens() ? { k: st === "AUS" ? "aus" : "st", st } : parts.cls ? { k: "cls", cls: parts.cls } : statScopeOf(m);
+  // both axes on narrows the pool to their intersection
+  const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)) && (sel.k !== "cls" || !parts.st || d.st === parts.st));
+  const geography = sel.k === "cls" && parts.st ? `${CLS_LOWER[parts.cls]} seats in ${STATE_SHORT[parts.st]}` : sel.k === "cls" ? `${sel.cls.toLowerCase()} seats` : sel.k === "st" ? STATE_SHORT[sel.st] : "nationwide";
   return { divs, geography };
 }
 function vtBandsBlock(divs, area, geography) {
@@ -8711,7 +8739,7 @@ function storyArea(m, st) {
     // the chamber section's small names the filter it marks: the state's own
     // members, or the seat type whose kind stays lit (and each kind its colour)
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
-    const chamberMark = pickTitle ? (pick.k === "cls" ? `${pickTitle.replace(" ", "-")} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
+    const chamberMark = pickTitle ? (clsFilter(m) ? `${CLS_SHORT[clsFilter(m)].replace(" ", "-")} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
   if (isNowY(m.year) && aus) {
@@ -10114,7 +10142,8 @@ function select(sel, opts = {}) {
   // frame again ("All seats") clears it back
   const sm = M();
   if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
-    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0) statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
+    // a class filter survives the map side's state move — the pair compounds
+    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
     else if (sel.level === "aus") statScopeStore = { k: "aus", open: statScopeStore.open };
   }
   if (!opts.keepTown) townPick = -1;
@@ -10152,10 +10181,10 @@ function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else i
 function setStatScope(sel) {
   const m = M(); if (!m) return;
   // a state named in the menu is selected on the map too — the slice is the
-  // one pick (select re-stamps the store). A class or the whole frame steps
-  // the selection back out first.
+  // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
+  // state selection instead of clearing it; anything else steps the state out.
   if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  if (S.sel.level === "state") select({ level: "aus" }, { fly: false });
+  if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
   statScopeStore = sel;
   renderStory(true);
 }
@@ -10166,7 +10195,7 @@ function cycleStatScope(step) {
   const m = M(); if (!m) return;
   const opts = statScopeOpts(m, "AUS").map((o) => o[0]);
   if (!opts.length) return;
-  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeOf(m))) + step + opts.length) % opts.length]));
+  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeMenuCur(m))) + step + opts.length) % opts.length]));
 }
 
 function renderFilterPill() {
@@ -10465,7 +10494,7 @@ async function setYear(y) {
   // re-stamps the menu's store, a pick the frame can't select waits in the
   // store, and it selects again on a frame that has it
   if (S.lens === "winner" && !STATE_YEARS.has(y)) {
-    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0) statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
+    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
     else if (S.sel.level === "aus" && statScopeStore.k === "st" && b.areas[statScopeStore.st] && b.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
   }
   const hold = walkHold(spot);

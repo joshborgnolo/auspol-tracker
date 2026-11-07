@@ -189,8 +189,9 @@ assert.ok(src.includes("homeless lane stays as seats"), "the disabled reason for
 assert.ok(R(".build/map/app/app-6-ui.js").includes("areasHit("), "hover hits a census area");
 const tip = R(".build/map/app/app-6-ui.js");
 assert.ok(tip.includes("as counted at the ${areasVintage(m)} census"), "the tooltip counts its census");
-// the legend sells its own key, not the seats' (caps swap), and the histogram stays seats
-assert.ok(tip.includes("arCap") && tip.includes("!arOn"), "the legend swaps in the pack's caps and parks the seats' histogram");
+// the legend swaps in the pack's caps; the seats' own histogram is retired
+// wholesale (f2d5ae47 rebuilt the key's controls around the basis select)
+assert.ok(tip.includes("arCap") && !tip.includes("legendHist"), "the legend swaps in the pack's caps — the seats' histogram is retired, not just parked");
 // the frame's gating stays honest: senate and house-of-reps only
 assert.ok(js.includes("m.house === \"senate\""), "drawing gating still keys the house");
 // and the stamp ledger carries the pack (it never goes missing behind a cache)
