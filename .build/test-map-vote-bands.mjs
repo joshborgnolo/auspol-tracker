@@ -7,23 +7,17 @@ import vm from "node:vm";
 const read = (p) => fs.readFileSync(new URL(p, new URL("../", import.meta.url)), "utf8");
 const states = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "Australian Capital Territory", NT: "Northern Territory" };
 const short = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
-// mirrored from app-1-base.js: the figures-scope gate (statScopeOk, then
-// statBreakdownRows for a class pick) reads these since 53e6bb3c
-const STATES = Object.keys(states);
-const STATE_YEARS = new Set(); // the harness year is federal only
+// the app gates a state scope pick on STATE_YEARS (statScopeOk, app-1-base.js)
+const STATE_YEARS = new Set(Object.keys({ sa22: 1, sa26: 1, nsw15: 1, nsw19: 1, nsw23: 1, nswnow: 1, vic14: 1, vic18: 1, vic22: 1, qld17: 1, qld20: 1, qld24: 1, qldnow: 1, wa17: 1, wa21: 1, wa25: 1, wanow: 1 }));
+const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const CLS = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };
-const FAMS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
 let current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
-// app-1-base.js's deriveAreas builds these on every frame; the gate reads
-// idx and formal
-current.areas = Object.fromEntries(["AUS", ...STATES].map((s) => {
-  const rows = current.res.divs.map((d, i) => [d, i]).filter(([d]) => s === "AUS" || d.st === s);
-  return [s, { idx: rows.map(([, i]) => i), formal: rows.reduce((n, [d]) => n + d.c.reduce((t, c) => t + c[4], 0), 0) }];
-}));
 const S = { lens: "winner" };
+// statScopeOk/statBreakdownRows read m.areas[st].{formal,idx}; the app derives them in deriveAreas
+current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
 const ctx = vm.createContext({
-  S, STATE_TITLE: states, STATE_SHORT: short, STATES, STATE_YEARS, CLS, CLS_SHORT, FAMS, M: () => current,
+  S, STATE_TITLE: states, STATE_SHORT: short, STATE_YEARS, STATES, CLS, CLS_SHORT, FAMS: ["alp", "lnp", "grn", "onp", "ind", "oth"], M: () => current,
   esc: (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])),
   f1: (v) => v == null ? "–" : v.toFixed(1), int: (v) => v.toLocaleString("en-AU"),
   sgn: (v) => v == null ? "–" : (v > .049 ? "+" : v < -.049 ? "−" : "") + Math.abs(v).toFixed(1),

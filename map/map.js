@@ -7860,22 +7860,18 @@ function seatBase(m, st) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
-// the head's scope menu: the choice is one pick shared across frames, so
-// it survives a year switch; "aus" is the whole frame's own jurisdiction —
-// named after it plainly on election frames ("National", "New South Wales"),
-// as the "… figures" menu on the now frames ("Nationwide figures"). A frame
-// that can't express the pick — a state frame shown a federal state pick —
-// shows "aus" until one can.
+// the head's "figures" menu: the choice is one pick shared across frames, so
+// it survives a year switch; "aus" is the whole frame's own jurisdiction
+// (Nationwide on the federal frames). A frame that can't express the pick —
+// a state frame shown a federal state pick — shows "aus" until one can.
 let statScopeStore = { k: "aus" };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
   : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
 const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
 function statScopeLabel(m, sel) {
-  const fig = isNowY(m.year) ? " figures" : "";
-  if (sel.k === "cls") return fig ? `${CLS_SHORT[sel.cls].replace(" ", "-")}${fig}` : CLS_SHORT[sel.cls];
-  if (sel.k === "st") { const s = sel.st; return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]}${fig}`; }
-  if (STATE_YEARS.has(m.year)) return `${STATE_TITLE[stOfYear(m.year)]}${fig}`;
-  return fig ? "Nationwide figures" : "National";
+  if (sel.k !== "st") return sel.k === "cls" ? `${CLS_SHORT[sel.cls].replace(" ", "-")} figures` : STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures";
+  const s = sel.st;
+  return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`;
 }
 // a scope's own area-payload: states ride their stored aggregates, classes are pooled
 function statScopeArea(m, st, sel) {
@@ -8077,18 +8073,17 @@ function seatStat(m, st, label) {
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
-  // the "formed govt" tag rides the figures' names row, centred under the dash;
-  // an as-it-stands frame holds rather than won, so it's an election view only
-  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg"><b>formed govt</b></span>` : "";
+  // the "formed govt" tag rides under the Two-party eyebrow, on the governing family's
+  // side; an as-it-stands frame holds rather than won, so it's an election view only
+  const fg = A.tpp != null && !isNowY(m.year) && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>formed govt</b></span>` : "";
   let two = "", twoSw = "";
   if (A.tpp != null) {
     // an "as it stands" frame's tallies carry the base election's swing, which is not a change
     // since: only the seats row gets the now-frame's change line
     const s = isNowY(m.year) ? null : A.tppSw;
     twoSw = s == null ? "" : Math.abs(s) < 0.05 ? `<span class="st-swing">No swing</span>` : `<span class="st-swing"><b ${tone(s > 0 ? "alp" : "lnp")}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
-    // the pair's names close the figures grid, each anchored to its figure's inside edge;
-    // the tag shares their row, in the dash's middle column
-    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span><span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span>${fg}</span>`;
+    // the pair's names close the figures grid, each anchored to its figure's inside edge
+    two = `<span class="st-lab">Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})</span>${fg}<span class="st-tpp"><b ${tone("alp")}>${f1(A.tpp)}</b><i>–</i><b ${tone("lnp")}>${f1(100 - A.tpp)}</b><span class="st-nm st-nm-l" ${tone("alp")}>Labor</span><span class="st-nm st-nm-r" ${tone("lnp")}>${coalW(1).replace(/^The /, "")}</span></span>`;
   }
   const change = (f, n) => {
     if (!base) return "";
@@ -8113,21 +8108,19 @@ function seatStat(m, st, label) {
   const mk = statSeatMakeup(m, idx);
   // the rate the Informal st-sec used to headline, as one more label line under Seats
   const infLine = A.infPct != null ? `<span class="st-lab">Informal: ${f1(A.infPct)}%</span>` : "";
-  // each section of the head closes on a double rule — two hairlines, tightly spaced
-  const sep = `<span class="st-sep" aria-hidden="true"></span>`;
-  return `<h3 class="st-stat" aria-label="${esc(label)}">${two ? two + twoSw + sep : ""}${fpRow ? fpRow + sep : ""}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}${sep}</h3>`;
+  return `<h3 class="st-stat" aria-label="${esc(label)}">${two}${twoSw}${fpRow}<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${infLine}</h3>`;
 }
 /* the menu's item list in order (the spacebar cycle walks it too) */
 function statScopeOpts(m, st) {
-  const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
-  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, statScopeLabel(m, { k: "cls", cls: r.key })]);
+  const opts = [["aus", STATE_YEARS.has(m.year) ? `${STATE_TITLE[stOfYear(m.year)]} figures` : "Nationwide figures"]];
+  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]} figures`]);
+  for (const r of statBreakdownRows(m, st).classes) opts.push([`cls:${r.key}`, `${CLS_SHORT[r.key].replace(" ", "-")} figures`]);
   return opts;
 }
 const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
 const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the head meta's scope menu: frame-wide by default, one of its states or its
-// seat types once named — the head's own figures then follow it
+// the head meta's scope menu: frame-wide by default ("Nationwide figures"), one of
+// its states or its seat types once named — the head's own figures then follow it
 function statScopeMenu(m, st) {
   const cur = statScopeVal(statScopeOf(m));
   const items = statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${cur === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`);
@@ -8534,7 +8527,7 @@ function vtBandsBlock(divs, area, geography) {
   if (!tot) return "";
   const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
   const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
-  const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">2PP skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect on count</button></div>`;
+  const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
   const rows = bands.map((r) => {
     const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
     const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? "vt-alp" : "vt-lnp") : "";
@@ -8565,8 +8558,8 @@ function storyArea(m, st) {
   const { hed, dek, stat } = areaHedDek(m, st);
   const title = aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
   // never the date — the eyebrow line above the map already carries it
-  // the Winner head's meta is the scope menu (statScopeLabel words it), and
-  // its head follows whichever state or seat type is picked there
+  // the Winner head's meta is the scope menu: "Nationwide figures" by default,
+  // and its head follows whichever state or seat type is picked there
   const meta = S.lens === "winner" && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
   let h = head(title, meta, hed, dek, stat);
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
@@ -8931,6 +8924,7 @@ function renderStory(force) {
     const was = storyKey;
     storyKey = key;
     $("#story").innerHTML = storySenate(SENM);
+    $("#story").dataset.lens = "senate";
     if (FS.on) fsStory(was !== key);
     return;
   }
@@ -8939,6 +8933,7 @@ function renderStory(force) {
   const was = storyKey;
   storyKey = key;
   const el = $("#story");
+  el.dataset.lens = S.lens;
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
   // the charts fill in now, not a frame on: a block that grows after the
   // story paints moves everything below it, and a walk's hold with it
