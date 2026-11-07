@@ -590,7 +590,7 @@ function majorityCuts(ch, geom) {
   const sat = [...ch.at.values()].map((k) => geom.seats[k]).sort((p, q) => p.s - q.s || p.row - q.row);
   if (ch.majAt <= 0 || ch.majAt >= sat.length) return null;
   const inside = new Set(sat.slice(0, ch.majAt).map((c) => c.k)), sStar = sat[ch.majAt - 1].s;
-  const cuts = [], free = [];
+  const cuts = [], free = [], gaps = [];
   // (past a row's end, clear of its last chair: the House's chairs are smaller than the states')
   const pad = geom.cutPad || 0.4;
   for (let r = 1; r <= geom.nRows; r++) {
@@ -607,6 +607,24 @@ function majorityCuts(ch, geom) {
     // tight curve)
     if (geom.rect && (!a || !b || a.seg !== b.seg)) { free.push([cuts.length, a ? a.s + (a.pad || pad) : -Infinity, b ? b.s - (b.pad || pad) : Infinity]); cuts.push(null); continue; }
     cuts.push(a && b ? (a.s + b.s) / 2 : a ? a.s + pad : b.s - pad);
+    if (!geom.rect) {
+      // Account for the full chair, including its inner corners on the curve.
+      const clearance = (c) => c.y > 0 ? CHK * Math.atan2(c.W / 2 + 0.05, Math.hypot(c.x, c.y) - c.D / 2) : c.W / 2 + 0.05;
+      const lo = a ? a.s + clearance(a) : -Infinity, hi = b ? b.s - clearance(b) : Infinity;
+      // Very tight gaps retain their original midpoint.
+      gaps.push(lo <= hi ? [lo, hi] : [cuts[cuts.length - 1], cuts[cuts.length - 1]]);
+    }
+  }
+  // Adjacent rows whose gaps overlap share one crossing position. This removes
+  // little side steps without moving the line past any counted member.
+  for (let first = 0; first < gaps.length;) {
+    let last = first + 1, [lo, hi] = gaps[first];
+    while (last < gaps.length && Math.max(lo, gaps[last][0]) <= Math.min(hi, gaps[last][1])) {
+      lo = Math.max(lo, gaps[last][0]); hi = Math.min(hi, gaps[last][1]); last++;
+    }
+    const mean = cuts.slice(first, last).reduce((sum, v) => sum + v, 0) / (last - first);
+    for (let r = first; r < last; r++) cuts[r] = clamp(mean, lo, hi);
+    first = last;
   }
   const tight = cuts.filter((c) => c != null), to = tight.length ? tight.reduce((x, y) => x + y, 0) / tight.length : sStar;
   for (const [r, lo, hi] of free) cuts[r] = clamp(to, lo, hi);
@@ -850,8 +868,19 @@ function drawChamber(g, m, w, h, opts) {
     });
     const c5 = cuts[cuts.length - 1], o = geom.benchOut(c5), e = geom.benchPt(c5, geom.nRows), ext = opts.big ? 0.45 : 0.2;
     pts.push([e[0] + o[0] * ext, e[1] + o[1] * ext]);
-    g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash(opts.big ? [4, 3] : [3, 2]); g.lineJoin = "round";
-    g.beginPath(); pts.forEach(([x, y], j) => (j ? g.lineTo(X(x), Yp(y)) : g.moveTo(X(x), Yp(y)))); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = css(th.ink); g.lineWidth = opts.big ? 1.5 : 1.2; g.setLineDash([]); g.lineJoin = "round";
+    // Round the turns in the walkways, keeping the crossings through each row's
+    // seat gap. A small radius stays clear of chairs and removes the sharp steps.
+    g.beginPath(); g.moveTo(X(pts[0][0]), Yp(pts[0][1]));
+    for (let j = 1; j < pts.length - 1; j++) {
+      const a = pts[j - 1], b = pts[j], c = pts[j + 1];
+      const ab = Math.hypot(b[0] - a[0], b[1] - a[1]), bc = Math.hypot(c[0] - b[0], c[1] - b[1]);
+      const r = Math.min(0.22, ab / 2, bc / 2);
+      if (r < 1e-6) { g.lineTo(X(b[0]), Yp(b[1])); continue; }
+      g.lineTo(X(lerp(b[0], a[0], r / ab)), Yp(lerp(b[1], a[1], r / ab)));
+      g.quadraticCurveTo(X(b[0]), Yp(b[1]), X(lerp(b[0], c[0], r / bc)), Yp(lerp(b[1], c[1], r / bc)));
+    }
+    const end = pts[pts.length - 1]; g.lineTo(X(end[0]), Yp(end[1])); g.stroke();
     const p2 = [e[0] + o[0] * (opts.big ? 0.8 : 0.45), e[1] + o[1] * (opts.big ? 0.8 : 0.45)];
     const below = p2[1] > 1;
     if (!opts.big && s > 6) {
@@ -880,7 +909,7 @@ function drawChamber(g, m, w, h, opts) {
       }
       g.fillText(mt, mx, my);
       claim(mx, my, tw, 16, g.textAlign, g.textBaseline);
-      // the dashed line itself, beyond the benches
+      // the majority line itself, beyond the benches
       const ex = X(e[0]), ey = Yp(e[1]), fx = X(p2[0]), fy = Yp(p2[1]);
       occ.push({ x0: Math.min(ex, fx) - 3, y0: Math.min(ey, fy) - 3, x1: Math.max(ex, fx) + 3, y1: Math.max(ey, fy) + 3 });
     }
