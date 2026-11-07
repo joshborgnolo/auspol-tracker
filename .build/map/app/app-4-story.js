@@ -200,19 +200,22 @@ const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
 // the head's scope menu: the choice is one pick shared across frames, so
 // it survives a year switch; "aus" is the whole frame's own jurisdiction —
 // named after it plainly on election frames ("National", "New South Wales"),
-// as the "… figures" menu on the now frames ("Nationwide figures"). A frame
+// as the "… figures" menu on the now frames. A frame
 // that can't express the pick — a state frame shown a federal state pick —
 // shows "aus" until one can.
 let statScopeStore = { k: "aus" };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
   : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
 const statScopeOf = (m) => statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open };
+// states whose "… figures" compound words itself by demonym; the rest stay bare
+const FIG_DEMONYM = { VIC: "Victorian", SA: "South Australian", WA: "Western Australian", TAS: "Tasmanian" };
 function statScopeLabel(m, sel) {
   const fig = isNowY(m.year) ? " figures" : "";
+  const figName = (s) => (fig && FIG_DEMONYM[s]) || STATE_TITLE[s];
   if (sel.k === "cls") return fig ? `${CLS_SHORT[sel.cls].replace(" ", "-")}${fig}` : CLS_SHORT[sel.cls];
-  if (sel.k === "st") { const s = sel.st; return `${s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]}${fig}`; }
-  if (STATE_YEARS.has(m.year)) return `${STATE_TITLE[stOfYear(m.year)]}${fig}`;
-  return fig ? "Nationwide figures" : "National";
+  if (sel.k === "st") { const s = sel.st; return `${s === "NSW" || s === "ACT" ? s : figName(s)}${fig}`; }
+  if (STATE_YEARS.has(m.year)) return `${figName(stOfYear(m.year))}${fig}`;
+  return fig ? "National figures" : "National";
 }
 // a scope's own area-payload: states ride their stored aggregates, classes are pooled
 function statScopeArea(m, st, sel) {

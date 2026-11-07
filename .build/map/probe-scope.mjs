@@ -4,7 +4,8 @@
 // federal state pick) shows its own jurisdiction figures until one can. The
 // wording itself is the jurisdiction's name: plain on election frames
 // ("National", "NSW", "Inner metro"), compounded with "figures" on the now
-// frames ("Nationwide figures", "NSW figures", "Inner-metro figures").
+// frames ("National figures", "NSW figures", "Inner-metro figures") — a
+// state with a natural demonym words itself by it ("Victorian figures").
 // Start a local server from the repo root, then
 // MAP_URL=http://127.0.0.1:8765 node .build/map/probe-scope.mjs
 import assert from "node:assert/strict";
@@ -37,9 +38,12 @@ try {
   await page.goto(`${base}/map/#y=now`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__map, { timeout: 60000 });
   await page.evaluate(() => { __map.setLens("winner"); __map.goAus(); __map.setView("map"); });
-  await labelIs(page, "Nationwide figures", "default scope on the Now frame keeps the figures wording");
+  await labelIs(page, "National figures", "default scope on the Now frame keeps the figures wording");
   const menuNow = await menuLabels(page);
-  assert.ok(menuNow.some((l) => l.startsWith("aus = Nationwide figures")) && menuNow.some((l) => l.startsWith("st:NSW = NSW figures")), `the Now menu items carry the figures wording: ${menuNow.join(" | ")}`);
+  assert.ok(menuNow.some((l) => l.startsWith("aus = National figures")) && menuNow.some((l) => l.startsWith("st:NSW = NSW figures"))
+    && menuNow.some((l) => l.startsWith("st:VIC = Victorian figures")) && menuNow.some((l) => l.startsWith("st:QLD = Queensland figures"))
+    && menuNow.some((l) => l.startsWith("st:WA = Western Australian figures")) && menuNow.some((l) => l.startsWith("st:SA = South Australian figures"))
+    && menuNow.some((l) => l.startsWith("st:TAS = Tasmanian figures")), `the Now menu items carry the figures wording: ${menuNow.join(" | ")}`);
 
   // a federal state pick rides across federal years, wording following the frame…
   await pick(page, "st:NSW");
