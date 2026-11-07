@@ -298,7 +298,7 @@ function houseSwitchHTML() {
 }
 function senateLegendHTML(m) {
   const cats = (cnt, list) => `<div class="lg-cats">${list.filter((f) => cnt[f]).map((f) => `<span><i style="${swc(f)}"></i>${famTag(f)} <b>${cnt[f]}</b></span>`).join("")}`;
-  let h = houseSwitchHTML();
+  let h = houseSwitchHTML() + basisHTML();
   if (S.senLens === "term") {
     const up = senCounts(m, upNext), stay = m.divs.filter((d) => !upNext(d)).length;
     h += `<div class="lg-t">${nv(m, "Who faces", "Who faced")} the voters at ${nextEl(m)}</div>`;

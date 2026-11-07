@@ -1007,3 +1007,19 @@ html.mp-fs .mp-tip { z-index: 260; }
 @media (prefers-reduced-motion: reduce) {
   .fs-side, .fs-top, .fs-dock, .fs-stop u { transition: none !important; }
 }
+
+/* The basis belongs to the key, alongside its measure and map controls. */
+#lenses[hidden], .fs-lensbar:has(#lenses[hidden]) { display: none; }
+.mp-lensrow { justify-content: flex-end; }
+.mp-legend .lg-basis { margin: 0 0 10px; gap: 8px; font-weight: 400; color: var(--ink-3); }
+.mp-legend .lg-basis select { font-size: 15px; padding-bottom: 3px; border-bottom-style: solid; }
+.mp-legend > .lg-basis { grid-column: 1 / -1; }
+.mp-legend .lg-left .lg-basis { margin-bottom: 10px; }
+.mp-legend .lg-jump { margin-top: 8px; }
+.mp-legend .lg-draw { margin-top: 8px; }
+.lg-types { margin-top: 4px; gap: 4px 12px; }
+.lg-types button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 0; color: var(--ink-2); border-bottom: 2px solid transparent; white-space: nowrap; }
+.lg-types button:hover { color: var(--ink); }
+.lg-types button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: currentColor; }
+.lg-types button:focus-visible, .lg-basis select:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.ls-bar .lg-types { margin-top: 0; font-size: 12px; }
