@@ -1,4 +1,4 @@
-/* test-map-page.mjs – pins the Election map (/map/, 2026-10-25) into the site:
+/* test-map-page.mjs – pins the Electoral-maps page (/map/, 2026-10-25) into the site:
    a ☰ menu page OUTSIDE the main build (TABS' ext entry), so
    - the main page's TABS lists it as a menu page with ext, and keeps it out
      of every view of its own: the paths, the page turn, the menu-page view,
@@ -26,7 +26,7 @@ const app = R(".build/newtracker/assets/73de0c58-f11f-4793-9f90-77e583ab051b.js"
 const views = R(".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js");
 
 // ---- TABS: a menu page with ext, never a view of the main page
-assert.ok(app.includes('{ id: "map", label: "Election map", menu: true, ext: true,'), "TABS lists the map as an ext menu page");
+assert.ok(app.includes('{ id: "map", label: "Electoral maps", menu: true, ext: true,'), "TABS lists the map as an ext menu page");
 assert.ok(app.includes("const TAB_IDS = TABS.filter((t) => !t.ext).map((t) => t.id);"), "no path of the main page is the map's");
 assert.ok(app.includes("TABS.filter((t) => t.menu && !t.ext)"), "no menu-page view for the map");
 assert.equal((app.match(/const ids = TAB_IDS;/g) || []).length, 2, "the swipe and the arrow keys turn only the main page's own pages");
@@ -54,8 +54,8 @@ assert.ok(opts && opts.menu === "map", "map/index.html carries the shell as the 
 assert.ok(/<a role="menuitem"[^>]*href="\/map\/"[^>]*data-id="map"/.test(shellHeader({})), "the shell's menu links /map/");
 const own = shellHeader(opts);
 assert.ok(/class="sh-menu-item on" href="\/map\/" data-id="map" aria-current="page"/.test(own), "the map's row is current on its own page");
-assert.ok(own.includes('<span class="sh-menu-lab">Election map</span>') && own.includes('aria-label="More pages – on Election map"'), "the button names the page");
-assert.ok(!/<span class="sh-menu-lab">Election map/.test(shellHeader({})), "other pages' buttons still say More");
+assert.ok(own.includes('<span class="sh-menu-lab">Electoral maps</span>') && own.includes('aria-label="More pages – on Electoral maps"'), "the button names the page");
+assert.ok(!/<span class="sh-menu-lab">Electoral maps/.test(shellHeader({})), "other pages' buttons still say More");
 
 // ---- the page: its assembled script and styles current, its data present, the sitemap
 const page = R("map/index.html");
@@ -84,7 +84,7 @@ assert.ok(/const ixFor = \(m\) => IX\.filter\(\(k\) => !m\.hasIx \|\| m\.hasIx\[
 assert.ok(js.includes("famEraOpts = (m) => FAMS.filter") && js.includes("FAM_FORMED = { onp: 1998 }"), "the family menu drops One Nation before its first possible federal votes");
 assert.ok(js.includes('if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";'), "a year swap onto an era before One Nation drops S.party to the Coalition family");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
-assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
+assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Electoral maps – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
 // the eyebrow's floor measures every election's real meta line from the facts stamped in (data-stamp.mjs);
 // a year the stamp lacks would be left out of the floor, and walking to it would move the map
 {

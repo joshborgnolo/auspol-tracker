@@ -1,4 +1,4 @@
-/* assemble.mjs – the Election map's script and stylesheet, from their parts.
+/* assemble.mjs – the Electoral-maps page's script and stylesheet, from their parts.
 
    map/index.html is hand-maintained (its shell regions filled by
    node .build/site-shell.mjs); its behaviour lives in .build/map/app/:
@@ -42,7 +42,7 @@ const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
 const app = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
 // each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
 // and each election's eyebrow facts, so the eyebrow's floor reads every year's real line (data-stamp.mjs)
-const js = stampMeta(stampData(`/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT));
+const js = stampMeta(stampData(`/* the Electoral maps – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT));
 const css = part("page.css");
 const write = (rel, body) => {
   const p = path.join(ROOT, rel);

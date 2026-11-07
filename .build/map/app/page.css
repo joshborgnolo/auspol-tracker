@@ -560,6 +560,8 @@ button { cursor: pointer; background: none; border: 0; }
 #story[data-lens="winner"] .st-sec { border-top: 4px double var(--line); }
 #story[data-lens="winner"] .st-stat + .st-sec,
 #story[data-lens="winner"] .st-dek + .st-sec { border-top: 0; }
+/* and the credit line closes the story on the same twin rule, under Closest seats */
+#story[data-lens="winner"] .st-foot { border-top: 4px double var(--line); }
 
 /* ------- the list view ------- */
 .mp-list { position: absolute; inset: 0; display: flex; flex-direction: column; }

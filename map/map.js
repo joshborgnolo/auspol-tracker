@@ -1,4 +1,4 @@
-/* the Election map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */
+/* the Electoral maps – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
 /* =============================== helpers =============================== */
@@ -8965,7 +8965,7 @@ function foot(m) {
     : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
     : m.year === "qldnow" ? "ECQ results for the 2024 state general election, the 2025 Hinchinbrook and 2026 Stafford state by-elections; leaders and members’ moves from Queensland Labor and the Parliament"
     : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : WA_YEARS.has(m.year) ? `WAEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : "AEC boundaries and seat types; ABS SEIFA"}.</p>`;
+  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : "AEC boundaries and seat types; ABS census and SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {
@@ -11020,7 +11020,7 @@ function fsBuild() {
   if (FS.el) return;
   const el = document.createElement("div");
   el.className = "fs"; el.id = "fs"; el.hidden = true; el.tabIndex = -1;
-  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Election map, full screen");
+  el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Electoral maps, full screen");
   el.innerHTML = `<div class="fs-top">
       <div class="fs-lensbar fs-plate"></div>
       <div class="fs-sbox"></div>
@@ -11030,7 +11030,7 @@ function fsBuild() {
     <aside class="fs-side fs-plate" aria-label="The story">
       <div class="fs-grab" role="button" tabindex="0" aria-label="Show more of the story"><i></i></div>
       <div class="fs-head">
-        <div class="fs-title"><h2>Election map</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
+        <div class="fs-title"><h2>Electoral maps</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
         <p class="fs-meta"></p>
         <div class="fs-vslot"></div>
       </div>
