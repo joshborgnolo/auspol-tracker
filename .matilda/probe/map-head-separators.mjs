@@ -1,8 +1,8 @@
-// Probe: the /map/ Winner head's sections each close on a double rule —
-// two hairlines, tightly spaced (one after the two-party block, one after
-// Primaries, one closing the Seats block) — over the named-sides figures
-// grid and the formed-govt tag, and across election and Now frames. The map
-// reads the frame from the hash at BOOT ONLY: goto a frame, then reload.
+// Probe: the /map/ Winner head is ruled top and bottom, with a double rule
+// between its sections — so every label in the head (Two-party, Primaries,
+// Seats, Informal) sits just below one, tightly-spaced twin hairlines —
+// across election and Now frames. The map reads the frame from the hash at
+// BOOT ONLY: goto a frame, then reload.
 // usage: node .matilda/probe/map-head-separators.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
@@ -16,14 +16,17 @@ const errs = []; page.on("pageerror", (e) => errs.push(e.message));
 const kinds = () => page.evaluate(() => [...document.querySelector(".st-stat").children].map((x) => x.classList.contains("st-sep") ? "SEP" : x.classList.contains("st-lab") ? `LAB(${x.textContent.trim().split(/[ (]/)[0]})` : x.className.split(" ")[0].replace("st-", "")));
 const frame = async (y) => { await page.goto(`${base}/map/#y=${y}`, { waitUntil: "networkidle2", timeout: 60000 }); await page.reload({ waitUntil: "networkidle2", timeout: 60000 }); await wait(1200); };
 await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
+const labelsAboveRules = (ks) => ks.every((k, i) => !k.startsWith("LAB(") || ks[i - 1] === "SEP");
 
-// election frame: figures+names grid (the tag rides inside it), swing, THEN the rule
+// election frame: crowned by a rule, four sections (labels Two-party,
+// Primaries, Seats, Informal), ruled between, closed by a rule
 await frame(2025);
 let ks = await kinds();
-ok("2025: three separators", ks.filter((k) => k === "SEP").length === 3, JSON.stringify(ks));
-ok("2025: two-party block (lab, tpp, swing) closes on its rule", JSON.stringify(ks.slice(0, 5)) === JSON.stringify(["LAB(Two-party)", "tpp", "swing", "SEP", "LAB(Primaries)"]), JSON.stringify(ks.slice(0, 5)));
-ok("2025: rule after the primary grid, before Seats", ks.some((k, i) => k === "SEP" && ks[i + 1] === "LAB(Seats)"), JSON.stringify(ks));
-ok("2025: closing rule last, after Informal", ks.length > 1 && ks[ks.length - 1] === "SEP" && ks[ks.length - 2] === "LAB(Informal:)", JSON.stringify(ks.slice(-3)));
+ok("2025: five rules — crown, three dividers, close", ks.filter((k) => k === "SEP").length === 5, JSON.stringify(ks));
+ok("2025: crown rule opens the head", ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 2)));
+ok("2025: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
+ok("2025: a rule directly above the Informal line", ks[ks.indexOf("LAB(Informal:)") - 1] === "SEP", JSON.stringify(ks.slice(-4)));
+ok("2025: closing rule last, after Informal", ks[ks.length - 1] === "SEP" && ks[ks.length - 2] === "LAB(Informal:)", JSON.stringify(ks.slice(-3)));
 
 // the rule itself: two 1px hairlines, tightly spaced, full width of the head
 const geom = await page.evaluate(() => {
@@ -37,21 +40,25 @@ ok("every separator is two 1px lines", geom.every((g) => g.top === "1px" && g.bo
 ok("the two lines are tightly spaced (4px tall, 2px apart)", geom.every((g) => g.h === 4), JSON.stringify(geom.map((g) => g.h)));
 ok("each separator spans the head's width", geom.every((g) => Math.abs(g.w - g.hw) < 1), JSON.stringify(geom.map((g) => `${g.w}/${g.hw}`)));
 
-// a scope swap re-renders the head: still exactly three rules, no duplicates
+// a scope swap re-renders the head: the framing holds, no duplicates
 await page.evaluate(() => {
   document.querySelector("[data-scope-trigger]").click();
   const it = [...document.querySelectorAll(".st-scm [data-scope]")].find((x) => x.dataset.scope.startsWith("cls:"));
   it.click();
 });
 await wait(400);
-const seps2 = await page.evaluate(() => document.querySelectorAll(".st-stat > .st-sep").length);
-ok("three separators after a scope change", seps2 === 3, `got ${seps2}`);
+{
+  const ks2 = await kinds();
+  ok("five rules after a scope change", ks2.filter((k) => k === "SEP").length === 5, `got ${ks2.filter((k) => k === "SEP").length}`);
+  ok("labels still ruled above after the scope change", labelsAboveRules(ks2), JSON.stringify(ks2));
+}
 
-// the Now frame: no tag, no swing — the rule still closes the figures block
+// the Now frame: no tag, no swing — the crown and the dividers stand the same
 await frame("now");
 ks = await kinds();
-ok("now: no formed-govt tag", !ks.includes("fg"), JSON.stringify(ks.slice(0, 4)));
-ok("now: three separators, first right after the figures", ks.filter((k) => k === "SEP").length === 3 && JSON.stringify(ks.slice(0, 3)) === JSON.stringify(["LAB(Two-party)", "tpp", "SEP"]), JSON.stringify(ks.slice(0, 6)));
+ok("now: no formed-govt tag", !ks.includes("fg"), JSON.stringify(ks.slice(0, 5)));
+ok("now: five rules, crown first", ks.filter((k) => k === "SEP").length === 5 && ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 4)));
+ok("now: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
 
 // phone rung: rules don't add overflow
 await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
