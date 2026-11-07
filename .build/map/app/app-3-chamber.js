@@ -851,7 +851,10 @@ function drawChamber(g, m, w, h, opts) {
   const majorityCh = ch.plan && !STATE_YEARS.has(m.year)
     ? (m._majorityCh ||= chamberOrder({ ...m, seating: null, _chKey: null })) : ch;
   // Sydney's Council retains its standalone figure below the floor.
+  // The 2019 federal House's majority falls in the central aisle. Keep the
+  // marker on its centreline, independent of occupied chairs or the lens.
   const cuts = opts.labels !== false && geom.key !== "nswLC" ? majorityCuts(majorityCh, geom) : null;
+  if (cuts && m.year === 2019 && m.house !== "senate") cuts.fill(Math.PI * CHK / 2);
   if (!cuts && geom.key === "nswLC" && opts.labels !== false && (opts.big || s > 6)) {
     const mt = `${ch.maj} for a majority`, my = Yp(geom.box.y1 + 0.62);
     g.font = `600 ${opts.big ? 12 : 11}px ${SANS}`; g.fillStyle = css(th.ink2);
