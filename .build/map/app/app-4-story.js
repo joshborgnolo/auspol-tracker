@@ -1082,7 +1082,6 @@ function storyArea(m, st) {
   const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;
   const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
   if (cast.length) h += vtBlock(cast, true, castScope?.geography);
-  h += informalHTML(m, st);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
@@ -1093,6 +1092,9 @@ function storyArea(m, st) {
   const closeNext = closeSafe ? "Show most marginal seats" : "Show safest seats";
   const closeArrows = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 17V3.5M3.2 7.2 6.5 3.7l3.3 3.5" stroke="var(--ink${closeSafe ? "" : "-3"})"/><path d="M13.5 3v13.5M10.2 12.8l3.3 3.5 3.3-3.5" stroke="var(--ink${closeSafe ? "-3" : ""})"/></svg>`;
   h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} seats <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
+  // the informal line rides under the margin list at the foot (user call
+  // 2026-11-08; it followed How-votes-were-cast before, 2026-11-07)
+  h += informalHTML(m, st);
   h += foot(m);
   return h;
 }

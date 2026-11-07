@@ -1,8 +1,9 @@
-// Probe: /map/'s Informal figure hangs as a label line UNDER the How-votes-
-// were-cast section (moved out of the winner head 2026-11-07 — it closed the
-// head before; user call: it belongs with the count's cast-type story). The
-// figure keeps the head's figures scope, verified against the raw 2025 data
-// — pooled nationally, and per seat class under the scope menu.
+// Probe: /map/'s Informal figure hangs as a label line UNDER the margin list
+// at the foot of the winner story (moved out of the winner head 2026-11-07 —
+// it closed the head before; followed How-votes-were-cast until 2026-11-08 —
+// user call: it belongs below "Most marginal seats"). The figure keeps the
+// head's figures scope, verified against the raw 2025 data — pooled
+// nationally, and per seat class under the scope menu.
 // usage: node .matilda/probe/map-informal-line.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 
@@ -26,22 +27,24 @@ const expect = await page.evaluate(async () => {
     for (const d of rows) { inf += d.inf || 0; for (const c of d.c) formal += c[4]; }
     return (100 * inf) / (formal + inf);
   };
-  const byCls = {};
+  const byCls = {}, byStateCls = {};
   for (const d of j.divs) {
     const cls = d.cls; if (!cls) continue;
-    const t = (byCls[cls] = byCls[cls] || { inf: 0, formal: 0 });
-    t.inf += d.inf || 0; for (const c of d.c) t.formal += c[4];
+    for (const [store, k] of [[byCls, cls], [byStateCls, `${d.st}|${cls}`]]) {
+      const t = (store[k] = store[k] || { inf: 0, formal: 0 });
+      t.inf += d.inf || 0; for (const c of d.c) t.formal += c[4];
+    }
   }
-  return { aus: pool(j.divs), byCls: Object.fromEntries(Object.entries(byCls).map(([k, t]) => [k, (100 * t.inf) / (t.formal + t.inf)])) };
+  const rates = (o) => Object.fromEntries(Object.entries(o).map(([k, t]) => [k, (100 * t.inf) / (t.formal + t.inf)]));
+  return { aus: pool(j.divs), byCls: rates(byCls), byStateCls: rates(byStateCls) };
 });
 
 const inf = () => page.evaluate(() => {
   const el = document.querySelector(".st-inf");
   if (!el) return { found: false };
   const heads = [...document.querySelectorAll("#story > .st-sec > h3")];
-  const vt = heads.find((h) => /^How votes were cast/.test(h.textContent));
-  const close = heads.find((h) => /^Closest seats/.test(h.textContent));
-  const secs = heads.map((h) => h.textContent.trim().split(" ")[0]);
+  const close = heads.find((h) => /^(Most marginal|Safest) seats/.test(h.textContent));
+  const listSec = close ? close.parentElement : null;
   return {
     found: true,
     count: document.querySelectorAll(".st-inf").length,
@@ -49,9 +52,9 @@ const inf = () => page.evaluate(() => {
     inHead: !!el.closest(".st-stat"),
     prev: el.previousElementSibling ? el.previousElementSibling.className.split(" ")[0] : null,
     prevH3: el.previousElementSibling ? (el.previousElementSibling.querySelector("h3") || {}).textContent || "" : "",
-    storyOrder: { vt: vt ? secs.indexOf(vt.textContent.trim().split(" ")[0]) : -1, close: close ? secs.indexOf(close.textContent.trim().split(" ")[0]) : -1 },
-    topAboveVt: vt ? el.getBoundingClientRect().top >= vt.parentElement.getBoundingClientRect().bottom - 1 : null,
-    aboveClosest: close ? el.getBoundingClientRect().bottom <= close.parentElement.getBoundingClientRect().top + 1 : null,
+    next: el.nextElementSibling ? el.nextElementSibling.className.split(" ")[0] : null,
+    // air below the last row, out to informal's own rule
+    ruleGap: listSec ? Math.round((el.getBoundingClientRect().top - listSec.getBoundingClientRect().bottom) * 2) / 2 : null,
   };
 });
 let t = await inf();
@@ -67,8 +70,9 @@ const centred = await page.evaluate(() => {
   return { padUp, dn: Math.round(dn * 2) / 2, nextRule: parseFloat(getComputedStyle(next).borderTopWidth) };
 });
 ok("informal line centred in its rule pair", centred.padUp && centred.padUp >= 9 && Math.abs(centred.padUp - centred.dn) <= 3, JSON.stringify(centred));
-ok("directly under the How-votes-were-cast section", t.prev === "st-sec" && /^How votes were cast/.test(t.prevH3), `prev: ${t.prev} (h3: ${t.prevH3})`);
-ok("and before the Closest seats section", t.topAboveVt === true && t.aboveClosest === true, JSON.stringify(t));
+ok("directly under the margin-list section", t.prev === "st-sec" && /^(Most marginal|Safest) seats/.test(t.prevH3 || ""), `prev: ${t.prev} (h3: ${t.prevH3})`);
+ok("last row sits 16px off informal's rule", Math.abs((t.ruleGap ?? 0) - 16) <= 1.5, `${t.ruleGap}px`);
+ok("the credit line follows informal", t.next === "st-foot", t.next);
 
 // it used to live in the head — make sure the head left nothing behind
 const headGhost = await page.evaluate(() => [...document.querySelectorAll(".st-stat .st-lab")].some((x) => /^Informal votes:/.test(x.textContent)));
@@ -76,24 +80,29 @@ ok("no Informal label left in the winner head", headGhost === false);
 const stale = await page.evaluate(() => [...document.querySelectorAll("#story .st-sec h3")].some((h) => /^Informal(\s|$)/.test(h.textContent)));
 ok("no standalone Informal section either", !stale);
 
-// a seat-class scope: the figure must pool that class's rate too, not sit on the national one
-const picked = await page.evaluate(() => {
+// a class pick compounds a sliced state (the menu offers states first, then
+// seat types over the slice): the figure pools that class-within-the-state
+const pickScope = (prefix) => page.evaluate((pfx) => {
   const trig = document.querySelector("[data-scope-trigger]"); if (!trig) return null;
   trig.click();
-  const menu = document.querySelector(".st-scm"); if (menu && menu.hasAttribute("hidden")) return "closed";
-  const items = [...document.querySelectorAll(".st-scm [data-scope]")];
-  const cls = items.find((it) => it.dataset.scope.startsWith("cls:"));
-  if (!cls) return "none";
-  cls.click();
-  return cls.dataset.scope.slice(4) + "|" + cls.textContent.trim();
-});
-ok("scope menu offers seat classes", !!picked && !["closed", "none"].includes(picked), String(picked));
-if (picked && !["closed", "none"].includes(picked)) {
-  await wait(400);
+  const menu = trig.parentElement.querySelector(".st-scm");
+  if (menu && menu.hasAttribute("hidden")) return "closed";
+  const it = [...trig.parentElement.querySelectorAll("[data-scope]")].find((x) => x.dataset.scope.startsWith(pfx));
+  if (!it) return "none";
+  it.click();
+  return it.dataset.scope;
+}, prefix);
+const stPick = await pickScope("st:");
+ok("scope menu offers states", !!stPick && stPick.startsWith("st:"), String(stPick));
+await wait(500);
+const clsPick = stPick && stPick.startsWith("st:") ? await pickScope("cls:") : null;
+ok("sliced menu offers seat types", !!clsPick && clsPick.startsWith("cls:"), String(clsPick));
+await wait(500);
+if (clsPick && clsPick.startsWith("cls:")) {
+  const stCode = stPick.slice(3), clsCode = clsPick.slice(4), want = expect.byStateCls[`${stCode}|${clsCode}`];
   t = await inf();
-  const vals = Object.values(expect.byCls).map((v) => `Informal votes: ${f1(v)}%`);
-  ok("class scope pools its own rate, still outside the head", !!t.text && vals.includes(t.text) && t.inHead === false, `${t.text} (class rates ${vals.join(", ")})`);
-  if (t.text && vals.length > 1) ok("class rates genuinely differ from national", t.text !== `Informal votes: ${f1(expect.aus)}%`, `${t.text} vs national Informal votes: ${f1(expect.aus)}%`);
+  ok("class pick pools the class within the state, outside the head", want != null && t.text === `Informal votes: ${f1(want)}%` && t.inHead === false, `${t.text} vs Informal votes: ${f1(want ?? 0)}% for ${stCode}|${clsCode}`);
+  if (t.text) ok("the pick genuinely moves the figure", t.text !== `Informal votes: ${f1(expect.aus)}%`, `${t.text} vs national Informal votes: ${f1(expect.aus)}%`);
 }
 
 // phone rung: the line fits, no new horizontal overflow
