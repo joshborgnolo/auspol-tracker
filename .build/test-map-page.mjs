@@ -2538,7 +2538,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
   assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
   assert.ok(st.includes("noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))") && st.includes('seats: ["New England", "Farrer"]') && st.includes('<span class="st-seat-note">'), "the moved-seats note follows its named seats' scope — National keeps it, NSW and Rural keep it, other figures views drop it");
-  assert.ok(st.includes("The figures here are the 2025 election’s, adjusted for seat changes. Most notably,") && st.includes('if (m.year !== "now") h += `<p class="st-note"'), "the federal Now's seats note opens with the figures basis — the old 'figures below' note lives on only on the state Now frames");
+  assert.ok(st.includes("The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken") && st.includes('if (m.year !== "now") h += `<p class="st-note"'), "the federal Now's seats note opens with the figures basis — the old 'figures below' note lives on only on the state Now frames");
   // the slice is ONE state picked from either side (2026-11-07): the menu and
   // the map write each other, the render reads the slice from the selection,
   // and the whole-frame layout keeps only its own three state marks
