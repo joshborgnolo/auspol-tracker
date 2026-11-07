@@ -421,6 +421,11 @@ button { cursor: pointer; background: none; border: 0; }
 .st-sec { margin-top: 16px; padding-top: 7px; border-top: 1px solid var(--line); }
 .st-sec > h3 { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 8px; position: relative; }
 .st-sec > h3 small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+/* a two-line h3 caption run: "by primary vote here" beside the head word,
+   "tick = the whole seat" on its own line at the same left edge as the
+   subtext (user call 2026-11-09) */
+.st-sec > h3 .st-hgc { display: inline-flex; flex-direction: column; }
+.st-sec > h3 .st-hgc small + small { margin-top: 1px; }
 /* the marginal/safest swap pinches its size and hover from .st-pv-control; it's
    parked on the head's right edge and centres on the TEXT line (absolute, so
    the hitbox can't stretch the head's height) */
