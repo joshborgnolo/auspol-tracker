@@ -470,6 +470,12 @@ button { cursor: pointer; background: none; border: 0; }
    of each band's height follows its share of this area's formal votes. */
 .vt-chart { container-type: inline-size; }
 .vt-chart > h3 { flex-wrap: wrap; }
+.vt-modes { display: inline-flex; gap: 2px; margin-top: 12px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; }
+.vt-mode { min-height: 32px; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.vt-mode:hover { background: var(--surface); color: var(--ink); }
+.vt-mode[aria-pressed="true"] { background: var(--line-2); color: var(--ink); }
+.vt-mode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (pointer: coarse) { .vt-mode { min-height: 44px; } }
 .vt-skew-head { margin: 12px 0 7px; text-align: right; font-size: 11px; line-height: 1.3; color: var(--ink-2); }
 .vt-bands { display: flex; flex-direction: column; gap: 4px; }
 .vt-band {

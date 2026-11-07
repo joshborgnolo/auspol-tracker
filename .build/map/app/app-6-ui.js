@@ -1361,6 +1361,8 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
+  const voteMode = e.target.closest("[data-vt-mode]");
+  if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
   const oth = e.target.closest("[data-othx]");
   if (oth) { statOthersToggle(); return; }
   const primary = e.target.closest("[data-pv-action]");
@@ -1469,6 +1471,8 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   // the spacebar steps the figures menu along once a choice has been made there
+  // A focused chart toggle keeps its native keyboard activation.
+  if (e.key === " " && e.target.closest("[data-vt-mode]")) return;
   if (e.key === " " && scopeSpace) {
     const wrap = $(".st-scwrap");
     if (!wrap || !wrap.querySelector(".st-scm").hidden) { scopeSpace = false; return; }

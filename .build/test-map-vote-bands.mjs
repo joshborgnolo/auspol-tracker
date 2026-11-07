@@ -6,10 +6,11 @@ import vm from "node:vm";
 
 const read = (p) => fs.readFileSync(new URL(p, new URL("../", import.meta.url)), "utf8");
 const states = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "Australian Capital Territory", NT: "Northern Territory" };
+const short = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
 let current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
 const S = { lens: "winner" };
 const ctx = vm.createContext({
-  S, STATE_TITLE: states, M: () => current,
+  S, STATE_TITLE: states, STATE_SHORT: short, M: () => current,
   esc: (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])),
   f1: (v) => v == null ? "–" : v.toFixed(1), int: (v) => v.toLocaleString("en-AU"),
   sgn: (v) => v == null ? "–" : (v > .049 ? "+" : v < -.049 ? "−" : "") + Math.abs(v).toFixed(1),
@@ -39,17 +40,33 @@ function checkPool(divs, label) {
     weightedSkew += n * (b.skew || 0) / (two[0] + two[1]);
   });
   close(weightedSkew, 0, `${label}: weighted skews balance`);
+  // Independently build successive electorate pools in counting order.
+  const order = ["day", "mob", "ppvc", "post", "pre", "abs", "prov"];
+  const stages = [2, 4, 7].map((end) => {
+    const p = divs.reduce((p, d) => order.slice(0, end).reduce((p, k) => [p[0] + (d.vt2[k]?.[0] || 0), p[1] + (d.vt2[k]?.[1] || 0)], p), [0, 0]);
+    return p[0] + p[1] ? 100 * p[0] / (p[0] + p[1]) : null;
+  });
+  result.bands.slice().reverse().forEach((b, i) => {
+    if (stages[i] != null) close(b.cumulative, stages[i], `${label}: cumulative ${b.k} 2PP`);
+    else assert.equal(b.cumulative, null);
+    if (i > 0 && b.n > 0 && stages[i - 1] != null) close(b.effect, stages[i] - stages[i - 1], `${label}: ${b.k} changes the preceding count`);
+    else assert.equal(b.effect, null, `${label}: no invented starting or empty-pile effect`);
+  });
+  close(result.bands[0].cumulative, result.base, `${label}: final cumulative result reaches area 2PP`);
   return result;
 }
 
 const national = checkPool(current.res.divs, "nationwide");
 assert.deepEqual(Array.from(national.bands, (b) => b.share.toFixed(1)), ["6.8", "52.2", "41.0"]);
 assert.deepEqual(Array.from(national.bands, (b) => b.skew.toFixed(1)), ["3.0", "-2.6", "2.7"]);
+assert.deepEqual(Array.from(national.bands, (b) => b.effect == null ? null : b.effect.toFixed(1)), ["0.2", "-3.0", null]);
+assert.deepEqual(Array.from(national.bands, (b) => b.cumulative.toFixed(1)), ["55.2", "55.0", "58.0"]);
 for (const st of Object.keys(states)) {
   Object.assign(api.statScopeOf(current), { k: "st", st });
   const scope = api.vtScope(current, "AUS");
   assert.ok(scope.divs.every((d) => d.st === st));
-  assert.equal(scope.geography, states[st]);
+  assert.equal(scope.geography, short[st]);
+  assert.ok(api.vtBlock(scope.divs, true, scope.geography).includes(`Skew on ${short[st]} 2PP`));
   checkPool(scope.divs, st);
 }
 for (const cls of new Set(current.res.divs.map((d) => d.cls))) {
@@ -64,7 +81,7 @@ for (const d of current.res.divs) checkPool([d], d.n);
 // Navigating to a map state overrides a lingering figures-menu filter.
 Object.assign(api.statScopeOf(current), { k: "cls", cls: "Rural" });
 let scope = api.vtScope(current, "NSW");
-assert.equal(scope.geography, "New South Wales");
+assert.equal(scope.geography, "NSW");
 assert.equal(scope.divs.length, current.res.divs.filter((d) => d.st === "NSW").length);
 // Other lenses show the actual map area rather than the Winner head's scope.
 S.lens = "tpp";
@@ -75,7 +92,9 @@ S.lens = "winner";
 
 const html = api.vtBlock(current.res.divs, true, "nationwide");
 assert.equal((html.match(/role="listitem"/g) || []).length, 3);
-assert.ok(html.includes("Skew on nationwide 2PP"));
+assert.ok(html.includes("National 2PP skew"));
+assert.match(html, /data-vt-mode="skew" aria-pressed="true"/);
+assert.match(html, /data-vt-mode="effect" aria-pressed="false"/);
 assert.match(html, /vt-skew vt-alp">\+3\.0/);
 assert.match(html, /vt-skew vt-lnp">−2\.6/);
 assert.match(html, /vt-skew vt-alp">\+2\.7/);
@@ -93,10 +112,34 @@ assert.ok(api.vtBlock(tiny).includes('vt-skew ">–'));
 assert.equal(api.vtBlock([{ n: "Empty", vt: {}, vt2: {} }]), "");
 const missing = api.vtBands([{ n: "Missing", vt: { ord: 2 } }]);
 assert.ok(missing.bands.every((b) => b.skew === null));
+assert.ok(missing.bands.every((b) => b.effect === null && b.cumulative === null));
+const gaps = api.vtBands(tiny);
+assert.equal(gaps.bands[1].effect, null, "empty middle group has no measurement");
+close(gaps.bands[0].effect, 100 / 3, "final group follows the preceding nonempty count");
+const noDay = api.vtBands([{ vt: { ord: 2, ppvc: 2, pre: 2 }, vt2: { ppvc: [1, 1], pre: [2, 0] } }]);
+assert.equal(noDay.bands[1].effect, null, "first nonempty group has no prior count");
+assert.equal(noDay.bands[0].effect, 25);
+const unequal = api.vtBands([{ vt: { ord: 1000, ppvc: 900, pre: 100 }, vt2: { day: [60, 40], ppvc: [10, 90], pre: [90, 10] } }]);
+assert.equal(unequal.bands[1].effect, -25, "effect weights actual two-party counts, not formal vote shares");
+close(unequal.bands[0].effect, 100 * 160 / 300 - 35, "the final addition is pooled at full precision");
+
+vm.runInContext('vtMode = "effect"', ctx);
+const effectHtml = api.vtBlock(current.res.divs, true, "nationwide");
+assert.match(effectHtml, /data-vt-mode="effect" aria-pressed="true"/);
+assert.ok(effectHtml.includes("Change in cumulative 2PP"));
+assert.match(effectHtml, /vt-skew vt-alp">\+0\.2/);
+assert.match(effectHtml, /vt-skew vt-lnp">−3\.0/);
+assert.match(effectHtml, /vt-skew ">—/);
+assert.ok(effectHtml.includes("Opening count; no preceding group"));
+assert.ok(effectHtml.includes("bottom to top") && effectHtml.includes("not actual election-night reporting"));
+const nsw = api.vtScope(current, "NSW");
+assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Change in cumulative 2PP"), "mode persists across geography changes");
+vm.runInContext('vtMode = "skew"', ctx);
+assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Skew on NSW 2PP"));
 // Historical frames keep their existing breakdown and unavailable-data copy.
 current = { year: 1993 };
 const old = api.vtBlock([{ n: "Historic", vt: { ord: 100 } }]);
 assert.ok(old.includes("<table") && old.includes("The 1993 count"));
 assert.ok(!old.includes("vt-bands"));
 
-console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, count-weighted skews, scope changes and missing data");
+console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes and missing data");

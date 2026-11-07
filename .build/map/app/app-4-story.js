@@ -807,6 +807,13 @@ const VT_BANDS = [
   ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
   ["day", "On the day", ["day", "mob"], "From about 7 pm"],
 ];
+let vtMode = "skew";
+function setVtMode(mode) {
+  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
+  vtMode = mode;
+  renderStory(true);
+  $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true });
+}
 function vtBands(divs) {
   const counts = {}, total2 = [0, 0];
   let tot = 0;
@@ -826,8 +833,17 @@ function vtBands(divs) {
     const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
     const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
     const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
-    return { k, l, time, v, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
+    return { k, l, time, v, a: t[0], n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
   });
+  // Counting order runs up the graphic: day, early/postal, then declarations.
+  // Pool actual two-party counts, not rounded shares or primary-vote totals.
+  let counted = 0, labor = 0;
+  for (const r of bands.slice().reverse()) {
+    const before = counted > 0 ? 100 * labor / counted : null;
+    counted += r.n; labor += r.a;
+    r.cumulative = complete && counted > 0 ? 100 * labor / counted : null;
+    r.effect = complete && r.n > 0 && before != null ? r.cumulative - before : null;
+  }
   return { bands, tot, base };
 }
 // A figures-menu choice changes the chart's electorate pool as well as its
@@ -835,21 +851,28 @@ function vtBands(divs) {
 function vtScope(m, st) {
   const sel = st === "AUS" && S.lens === "winner" ? statScopeOf(m) : { k: st === "AUS" ? "aus" : "st", st };
   const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)));
-  const geography = sel.k === "aus" ? "nationwide" : sel.k === "st" ? STATE_TITLE[sel.st] : `${sel.cls.toLowerCase()} seats`;
+  const geography = sel.k === "aus" ? "nationwide" : sel.k === "st" ? STATE_SHORT[sel.st] : `${sel.cls.toLowerCase()} seats`;
   return { divs, geography };
 }
 function vtBandsBlock(divs, area, geography) {
   const { bands, tot } = vtBands(divs);
   if (!tot) return "";
-  const heading = `Skew on ${geography || divs[0].n.replace(/'/g, "’")} 2PP`;
+  const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
+  const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
+  const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">2PP skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect on count</button></div>`;
   const rows = bands.map((r) => {
-    const skew = r.skew, text = sgn(skew), tone = skew != null && Math.abs(skew) >= 0.05 ? (skew > 0 ? "vt-alp" : "vt-lnp") : "";
-    const reading = skew == null ? "two-party skew unavailable" : `${text} percentage points on ${geography || divs[0].n} Labor 2PP`;
+    const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
+    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? "vt-alp" : "vt-lnp") : "";
+    const reading = effect
+      ? value != null ? `${text} percentage-point change in ${place} cumulative Labor 2PP` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : "Change in cumulative two-party share unavailable"
+      : value == null ? "two-party skew unavailable" : `${text} percentage points on ${place} Labor 2PP`;
     return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
   }).join("");
-  const notes = ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
+  const notes = effect
+    ? ["Percentage-point change in Labor’s cumulative 2PP when each group is added, counting from bottom to top. The opening count has no preceding group.", "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
+    : ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
   if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
-  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3><p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="Formal vote shares and two-party skews">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
 function vtBlock(divs, area, geography) {
   if (M().year === 2025) return vtBandsBlock(divs, area, geography);
