@@ -73,7 +73,7 @@ for (const y of [1993, 2004, 2013, 2022, "now", "sa26", "qld24", "qld17", "vic22
 await page.evaluate(() => __map.setYear(2025)); await wait(1500);
 ok("Labor v the Coalition offers its contests at 2025", await page.evaluate(() => !!document.querySelector('[data-opt="axis"]')));
 await page.evaluate(() => __map.setAxis("AO")); await wait(1800);
-const ao = await page.evaluate(() => { const m = __map.M(); return { v: __map.axisArea(m, m.areas.AUS.idx), hed: document.querySelector(".st-hed").innerText, hash: location.hash }; });
+const ao = await page.evaluate(() => { const m = __map.M(); return { v: __map.axisArea(m, m.areas.AUS.idx), hed: document.querySelector("#story .st-find").innerText, hash: location.hash }; });
 ok("Labor v One Nation sits on the site's table", ao.v > 62 && ao.v < 63 && /would lead/.test(ao.hed) && /ax=AO/.test(ao.hash), JSON.stringify(ao));
 await page.evaluate(() => __map.setYear(2019)); await wait(1500);
 ok("no contests where One Nation stood thinly", await page.evaluate(() => !document.querySelector('[data-opt="axis"]')));

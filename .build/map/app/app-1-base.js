@@ -79,7 +79,8 @@ function tokenRGB(v) {
   }
   return null;
 }
-const isDark = () => { const r = document.documentElement; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
+// (the retro view keeps the light paper whatever the theme: the era had no dark mode)
+const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
 function readTheme() {
   const dk = isDark();
   // oklch tokens come back from getComputedStyle as oklch(); compute them here instead
@@ -115,6 +116,8 @@ function readTheme() {
   T.seaLine = dk ? lch(0.335, 0.034, 240) : lch(0.85, 0.04, 236);
   T.seaMark = dk ? lch(0.6, 0.04, 238) : lch(0.6, 0.06, 240);
   T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
+  // the retro view's flat palette over these (app-8-retro.js)
+  if (typeof retroTheme === "function" && typeof rtIsOn === "function" && rtIsOn()) retroTheme(T);
   return T;
 }
 
@@ -998,6 +1001,36 @@ function emptyBooths(m) {
   return o;
 }
 
+/* census shares pooled over a set of seats' vote-weighted populations, in
+   percent: an area's (deriveAreas), or a filtered pool's (the story's scopeArea) */
+function demoOf(m, idx) {
+  let demo = null;
+  const ds = idx.map((i) => m.divs[i].demo).filter((x) => x && x.p);
+  if (ds.length) {
+    demo = {};
+    // a lane's null rows sit that lane's pool out, both sides of the line
+    for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
+    // the birthplace countries pool the same way, per year-country
+    if (m.cobKeys && m.cobKeys.length) {
+      demo.cob = {};
+      for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    // the Religion and Housing-tenure select pools, same vote-weighted way
+    if (m.relKeys && m.relKeys.length) {
+      demo.rel = {};
+      for (const k of m.relKeys) { const xs = ds.filter((x) => x.rel && x.rel[k] != null); demo.rel[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.rel[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    if (m.tenKeys && m.tenKeys.length) {
+      demo.ten = {};
+      for (const k of m.tenKeys) { const xs = ds.filter((x) => x.ten && x.ten[k] != null); demo.ten[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ten[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    if (m.ancKeys && m.ancKeys.length) {
+      demo.anc = {};
+      for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+  }
+  return demo;
+}
 function deriveAreas(res, m) {
   const out = {};
   for (const st of ["AUS", ...STATES]) {
@@ -1008,32 +1041,8 @@ function deriveAreas(res, m) {
     const hasPrev = a.pprim != null && a.pformal != null;
     for (const b of FAMS) { fp[b] = (100 * a.prim[b]) / a.formal; fpSw[b] = hasPrev ? fp[b] - (100 * a.pprim[b]) / a.pformal : null; }
     const idx = m.divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i);
-    // census shares pooled over the seats' vote-weighted populations, in percent
-    let demo = null;
-    const ds = idx.map((i) => m.divs[i].demo).filter((x) => x && x.p);
-    if (ds.length) {
-      demo = {};
-      // a lane's null rows sit that lane's pool out, both sides of the line
-      for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
-      // the birthplace countries pool the same way, per year-country
-      if (m.cobKeys && m.cobKeys.length) {
-        demo.cob = {};
-        for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      // the Religion and Housing-tenure select pools, same vote-weighted way
-      if (m.relKeys && m.relKeys.length) {
-        demo.rel = {};
-        for (const k of m.relKeys) { const xs = ds.filter((x) => x.rel && x.rel[k] != null); demo.rel[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.rel[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      if (m.tenKeys && m.tenKeys.length) {
-        demo.ten = {};
-        for (const k of m.tenKeys) { const xs = ds.filter((x) => x.ten && x.ten[k] != null); demo.ten[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ten[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      if (m.ancKeys && m.ancKeys.length) {
-        demo.anc = {};
-        for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-    }
+    // census shares pooled over the seats' vote-weighted populations, in percent (demoOf)
+    const demo = demoOf(m, idx);
     // the lens-level exhausted share is counted off the divisions' own flow rows
     const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
     const exhPct = exd.length ? (100 * sum(exd.map((d) => (d.exhPct / 100) * d.formal))) / sum(exd.map((d) => d.formal)) : null;

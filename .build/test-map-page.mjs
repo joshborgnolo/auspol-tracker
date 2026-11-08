@@ -75,7 +75,7 @@ assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git 
 // block's two identical arms and the map's IIFE ran twice on the live page
 assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js", "app-8-retro.js"].map(part).join("\n");
 // era-impossible options drop from the frame's own menus: the IRSAD
 // 'Advantage and disadvantage' index before the 2001-census four-index
 // suite, and One Nation's family option before its April 1997 formation
@@ -115,7 +115,7 @@ for (const f of fs.readdirSync(path.join(ROOT, "map/data")).sort()) {
 }
 assert.ok(js.includes("getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
 assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("map/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
-assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .build/map/assemble.mjs)");
+assert.equal(R("map/map.css"), part("page.css") + "\n" + part("retro.css"), "map/map.css is current: page.css, then the retro view's retro.css (node .build/map/assemble.mjs)");
 // how votes were cast: each seat's Labor and Coalition votes by pile (build_vote_piles.py, re-run after anything that
 // rewrites a res file) add up to its final count; every seat from 2016, before that the Labor v Coalition pairs, none in 1993
 {
@@ -189,8 +189,8 @@ assert.equal(R("map/map.css"), part("page.css"), "map/map.css is current (node .
   assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
     "the fp-change legend explains the unjoined booths' hatch");
 }
-assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true, castScope?.geography);"), "a seat, a state and the country share one How votes were cast block");
-assert.ok(js.includes('const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;') && js.includes("castScope.divs : m.res.divs.filter("), "the 2025 and Now charts follow the selected figures scope; the area block reads election results, since Now blanks a by-election's piles");
+assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes('if (cast.length) h += vtBlock(cast, true, m.year === 2025 || m.year === "now" ? castScope.geography : undefined);'), "a seat, a state and the country share one How votes were cast block");
+assert.ok(js.includes("const castScope = vtScope(m, st), cast = castScope.divs;") && js.includes("const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool); the area block reads election results, since Now blanks a by-election's piles");
 assert.ok(js.includes('if (M().year === 2025 || M().year === "now") return vtBandsBlock('), "the Now frame shows the band chart, not the old table");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
 assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
@@ -2506,65 +2506,61 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("const tlStops = (ys) => ys.map((y) => ({ y, lab:") && ui.includes('isNowY(y) ? (short || y === "now" ? "Now" : yearLabel(y))'), "the timeline's short row shows the two-digit year only; a state's own Now stop names itself Now too");
 }
 
-// the Winner head's scope menu (2026-11-06): the frame's own jurisdiction opens a
-// menu of its states and seat types; the head recomposes scoped (figures, seat
-// share and the make-up bar all follow it), and the cycle/list breakdown cards
-// it replaced are gone from the head's trail. Every frame words the menu
-// plainly ("National", "NSW", "Inner metro") since 2026-11-07 — the "…
-// figures" run-ons and their hyphens died even on the now views, user call
+// the page's two filters (2026-11-08, user call on the seat-type and state
+// filters' relationship): ONE State filter and ONE Seat type filter, rows of
+// their own in the control strip in every view (map, chamber, list) and every
+// lens, each with its own "All", compounding where both are on. The State
+// filter is the map's state selection; the head's figures, the chambers, the
+// list and the map's dimming all read the same pair (S.f.st, S.f.cls). The
+// head's old figures menu, its store and the list bar's duplicate State and
+// Seat type selects are gone.
 {
-  const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css"), ch3 = part("app-3-chamber.js");
-  // one pick shared across frames (2026-11-07): a year switch keeps the named
-  // figures; a frame that can't express the pick falls back to its own "aus"
-  assert.ok(st.includes("let statScopeStore = { k: \"aus\" };") && !st.includes("statScopes = new WeakMap()"), "the figures scope is one pick shared across frames, surviving a year switch");
-  assert.ok(st.includes("const statScopeOk = (m, s) =>") && st.includes("? statScopeStore : { k: \"aus\", open: statScopeStore.open }"), "a frame that can't express the pick falls back to its own jurisdiction figures");
-  assert.ok(ui.includes("statScopeStore = sel;"), "a scope pick rewrites the shared store");
-  assert.ok(st.includes("const clsPart = poolParts(m).cls;") && st.includes('const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);'), "the head's scope reads the cls axis first, compounding wherever the map has a state down");
-  assert.ok(st.includes('return "National";') && !st.includes('? " figures" : ""'), "the neutral scope words itself plainly on every frame — National, never 'figures'");
-  assert.ok(!st.includes("FIG_DEMONYM"), "the demonym compounds (Victorian figures, Western Australian figures) are gone too");
-  assert.ok(st.includes('if (sel.k === "cls") return CLS_SHORT[sel.cls];') && st.includes('statScopeLabel(m, { k: "cls", cls: c })'), "the dropdown items and the types toggle share the one plain-wording factory — a seat type reads Inner metro with no figures run-on and no hyphen");
-  assert.ok(st.includes('return cls ? statScopeLabel(m, { k: "cls", cls }) : "Filter by seat type";'), "the trigger invites by the state axis, then by the seat types over a sliced state, and names the pick once one's on");
-  assert.ok(st.includes('if (sliceState(m)) return [["aus", "All"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c))') && st.includes("for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push"), "a sliced state's dropdown is All then the seat types; otherwise states and territories alone");
-  assert.ok(st.includes("(S.lens === \"cls\" || st) ? statScopeStore.cls : null") && st.includes('statScopeStore.k === "cls" && S.lens !== "cls"'), "a seat type filters a sliced state's head or its own lens — elsewhere the pick sleeps rather than filtering invisibly");
-  assert.ok(ui.includes('id !== "cls" && statScopeStore.k === "cls"'), "a type pick's store clears on any other lens");
-  assert.ok(ui.includes('clsLensShelved ||= S.lens === "cls"') && ui.includes('S.lens = "cls"; clsLensShelved = false'), "the cls lens shelves through a state frame and returns itself (and its chips) on a federal one");
-  assert.ok(st.includes('st-clsmeta">${dropdown()}${chips}<'), "the state dropdown stacks above the types toggle row in the cls lens's head meta (DOM order: dropdown, then chips)");
-  assert.ok(st.includes('const pickerLens = () => S.lens === "winner" || S.lens === "cls";'), "the winner-story gates ride one shared picker-lens idiom, defined where its consumers live (the VM harnesses eval the story part alone)");
-  assert.ok(!st.includes("${fpRow ? statBreakdowns(m, st) : \"\"}"), "the breakdown cycle/list cards are gone from the head's trail");
-  assert.ok(st.includes('meta = pickerLens() && aus ? statScopeMenu(m, st)'), "the scope menu owns the head meta on the winner-design lenses");
-  assert.ok(st.includes("class=\"st-makeup\""), "the seat row's make-up bar rides the scoped counts");
-  assert.ok(st.includes("function scopeSeatBase(m, sel, idx, cnt)") && st.includes("scopeSeatBase(m, statSel, idx, cnt)") && st.includes('ab === "CSA" ? "csa" : FAM(ab)') && st.includes("m.changes"), "a now frame keeps its seat-change line under scoped views too — the base is the overlay's own chains reverted inside the scope (NSW figures and Rural figures keep the Coalition's minus-two)");
-  assert.ok(st.includes('statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st)'), "a state pick on an election frame takes the official per-state seat base (smalls sum to the redistribution drift, as the aus row's does)");
-  assert.ok(st.includes("m.divs[i].change && m.divs[i].change.prev") && st.includes("to = holdFam(m.divs[i].hold)"), "a seat type on an election frame reverts each scoped seat to its previous holder — every scoped view carries the change line");
-  assert.ok(ui.includes("function setStatScope") && ui.includes('data-scope-trigger') && ui.includes('"[data-scope]"'), "the menu's trigger, items and re-render all wire in one click chain");
-  assert.ok(css.includes(".st-scwrap") && css.includes(".st-scm") && css.includes(".st-makeup"), "the menu plate, its items and the make-up bar carry styles");
-  assert.ok(st.includes("noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))") && st.includes('seats: ["New England", "Farrer"]') && st.includes('<span class="st-seat-note">'), "the moved-seats note follows its named seats' scope — National keeps it, NSW and Rural keep it, other figures views drop it");
+  const st = part("app-4-story.js"), ui = part("app-6-ui.js"), css = part("page.css"), ch3 = part("app-3-chamber.js"), list = part("app-5-list.js");
+  assert.ok(!st.includes("statScopeStore") && !ui.includes("statScopeStore") && !st.includes("function statScopeMenu") && !ui.includes("function setStatScope") && !ui.includes("data-scope-trigger"), "the head's figures menu and its store are retired");
+  assert.ok(st.includes("const poolParts = (m) => {") && st.includes("S.f.st && m.areas[S.f.st] && m.areas[S.f.st].formal > 0 ? S.f.st : null") && st.includes("S.f.cls && m.divs.some((d) => d.cls === S.f.cls) ? S.f.cls : null"), "the filters are the page's one pair, read from S.f (federal frames only)");
+  assert.ok(st.includes("const sliceState = (m) => poolParts(m).st") && st.includes("const clsFilter = (m) => poolParts(m).cls"), "the state and the type read from one compound derivation");
+  assert.ok(st.includes("function scopeArea(m, st) {") && st.includes("const idx = m.areas[st].idx.filter((i) => m.divs[i].cls === cls);") && st.includes("A.demo = demoOf(m, idx);"), "a seat type pools its own seats inside the area (the state where one is on), census shares included");
+  assert.ok(st.includes("const aus = st === \"AUS\", cls = clsFilter(m), { A, idx, N, cnt } = scopeArea(m, st);") && st.includes("const where = scopeWhere(m, st);"), "every lens's head reads the filtered pool, its words naming the filter (in rural seats, in New South Wales’s rural seats)");
+  assert.ok(st.includes('el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st)'), "a state is the area every lens's head pools");
+  assert.ok(st.includes("const filt = cls ? CLS_SHORT[cls] : aus ? null : STATE_TITLE[st];") && st.includes("` · ${m.year}`"), "a filtered head titles itself by the filter in every lens, election frames carrying the year after a middot (New South Wales · 2025, Inner metro · 2025)");
+  assert.ok(st.includes('const clsScoped = m && s.level === "aus" && !!poolParts(m).cls;') && st.includes('"aus:all"') && ui.includes('if (v === "all" && S.f.cls) { S.f.cls = null;'), "a filtered view earns the 'All seats' way out above the title, and it clears both filters");
+  assert.ok(st.includes("function scopeSeatBase(m, sel, idx, cnt)") && st.includes('cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt)') && st.includes('ab === "CSA" ? "csa" : FAM(ab)') && st.includes("m.changes"), "every filtered view keeps its seat-change line: the official series for the frame and a state's election, the pool's own reversion elsewhere");
+  assert.ok(st.includes("m.divs[i].change && m.divs[i].change.prev") && st.includes("to = holdFam(m.divs[i].hold)"), "a seat type on an election frame reverts each pooled seat to its previous holder");
+  assert.ok(st.includes("noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))") && st.includes('seats: ["New England", "Farrer"]') && st.includes('<span class="st-seat-note">'), "the moved-seats note follows its named seats — National, NSW and Rural keep it, other pools drop it");
   assert.ok(st.includes("The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken") && st.includes('if (m.year !== "now") h += `<p class="st-note"'), "the federal Now's seats note opens with the figures basis — the old 'figures below' note lives on only on the state Now frames");
-  // the slice is ONE state picked from either side (2026-11-07): the menu and
-  // the map write each other, the render reads the slice from the selection,
-  // and the whole-frame layout keeps only its own three state marks
-  assert.ok(st.includes("const sliceState = (m) =>") && st.includes('S.sel.level === "state"'), "the slice is defined from the map's state selection");
-  assert.ok(st.includes('if (slice) return { k: "st", st: slice, open: statScopeStore.open };'), "a live slice outranks the store as the head's scope");
-  assert.ok(st.includes('s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st))'), "a Winner-lens state slice renders the whole-frame layout");
-  assert.ok(st.includes('const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;') && st.includes("` · ${m.year}`"), "a filtered Winner head titles itself by the filter, election frames carrying the year after a middot (New South Wales · 2025, Inner metro · 2025)");
-  assert.ok(st.includes('const clsScoped = m && s.level === "aus"'), "a seat-type filter earns the same 'All seats' way out above the title as a state slice (goAus clears the store through the sync)");
-  assert.ok(ui.includes('statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open }'), "a state arrived at any side writes the menu's store");
-  assert.ok(ui.includes('select({ level: "state", st: sel.st }, { fly: false })'), "the menu naming a state selects it on the map too, without moving the camera");
-  assert.ok(ui.includes('statScopeStore = { k: "aus", open: statScopeStore.open }'), "the whole frame again ('All seats') clears the store's pick");
-  assert.ok(st.includes("const clsFilter = (m) =>") && ch3.includes('S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m)'), "the story chamber marks the pick — a state's seats lit, a seat type's kind lit in its lens colours");
-  // the cls lens shares the Winner design wholesale (2026-11-08): same head
-  // card, same sections, the menu as its meta — with the type alone as its
-  // axis and the trigger named so
-  assert.ok(st.includes('switch (S.lens === "cls" ? "winner" : S.lens)') && !st.includes("carries no AEC type"), "the cls lens falls through to the Winner story design");
-  assert.ok(ch3.includes("CLS.indexOf(m.divs[i].cls)") && ch3.includes("clsSel && d.cls !== clsSel") && ch3.includes("offType ? th.ink") && ch3.includes("cls: sen ? null : clsFilter(m)"), "only the picked type wears the ladder tone in the chambers — every other kind ghosts to an ink wisp (the rungs are too close to read by alpha), never the Senate");
-  assert.ok(st.includes("const chamberMark = pickTitle"), "the chamber section's small names the filter it marks");
-  // the two filter axes compound (2026-11-08): the map's own state selection
-  // and the menu's class pick are orthogonal — pools intersect where both are on
-  assert.ok(st.includes("const poolParts = (m) =>") && st.includes("const sliceState = (m) => poolParts(m).st") && st.includes("const clsFilter = (m) => poolParts(m).cls"), "the map's state and the menu's class read from one compound derivation");
-  assert.ok(st.includes("const stPool = poolParts(m).st") && st.includes("return { A: statClassArea(m, idx)"), "a class picked inside a state tallies its own intersection, not the class's national row");
-  assert.ok(st.includes("const statScopeMenuCur = (m) =>"), "the menu's marked pick rides the store's own (a compounding class stays marked beside the map)");
-  assert.ok(ui.includes('sel.k !== "cls" && S.sel.level === "state"'), "a class pick compounds the map's state selection instead of clearing it");
-  assert.ok(ui.includes('statScopeStore.k !== "cls"'), "the class filter survives the map side's state move");
+  assert.ok(st.includes("const inPool = new Set(idx), ch = (m.changes || []).filter((x) => inPool.has(m.byName.get(x.div)))") && st.includes("chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)))"), "the since-the-election notes and list name only the pool's own seats");
+  assert.ok(st.includes("const statFold = { open: false };") && st.includes("statFold.open = !statFold.open;"), "the Others expander keeps its own fold across frames");
+  // the strip's rows: in every view, an All first, the type chips the cls lens's key
+  assert.ok(ui.includes("function filterHTML(m) {") && ui.includes("h += filterHTML(m);") && ui.indexOf("h += filterHTML(m);") < ui.indexOf('if (S.view === "chamber" && m.seating)'), "the filter rows ride the strip in every view, ahead of the chamber's seating switch and the map's own rows");
+  assert.ok(ui.includes('id="state-filters"') && ui.includes('<b>State</b>${chip("data-state", "", !st, "All")}') && ui.includes('id="type-filters"') && ui.includes('<b>Seat type</b>${chip("data-cls", "", !cls, "All")}'), "each row has its own All");
+  assert.ok(ui.includes('if (!m || STATE_YEARS.has(m.year)) return "";') && ui.includes("m.divs.some((d) => d.cls === c)"), "a state election shows neither row; a frame shows only the seat types it has");
+  assert.ok(ui.includes('S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : ""'), "on the Seat type lens the type chips carry the lens's colours (the row is its key)");
+  assert.ok(ui.includes('if (sel.level === "state") S.f.st = sel.st;') && ui.includes('else if (sel.level === "aus") S.f.st = null;') && ui.includes("else if (S.f.st && sel.st !== S.f.st) S.f.st = null;"), "the State filter is the map's state selection: a state turns it on, the whole frame off, a seat outside it lets it go");
+  assert.ok(ui.includes('const clj = e.target.closest("[data-cls]");') && ui.includes("S.f.cls = c && S.f.cls !== c ? c : null;"), "a type chip toggles the Seat type filter");
+  assert.ok(ui.includes("if (STATE_YEARS.has(y)) { S.f.st = null; S.f.cls = null; }") && ui.includes("if (S.f.cls && !b.divs.some((d) => d.cls === S.f.cls)) S.f.cls = null;"), "the filters follow the frame: a state election drops both, a frame without the type drops it");
+  assert.ok(!list.includes('sel("State", "st"') && !list.includes('sel("Seat type", "cls"') && list.includes('sel(isNowY(m.year) ? "Held by" : "Won by", "win"'), "the list bar keeps only its own filters (held by, margin): State and Seat type are the strip's rows");
+  assert.ok(list.includes("function filterWords(m, listOnly)") && ui.includes("const on = !!(S.f.win || S.f.margin || S.f.range);") && ui.includes("filterWords(m, true)"), "the map's pill names only the list's own filters — the State and Seat type rows name themselves");
+  assert.ok(ch3.includes('cls: sen || S.lens !== "cls" ? null : clsFilter(m)') && ch3.includes('cls: S.lens === "cls" ? clsFilter(m) : null') && ch3.includes("offType ? th.ink"), "the chambers dim by the filters like the map; only the Seat type lens keeps the picked type's ladder tone with the rest ghosted");
+  assert.ok(st.includes("const chamberMark = cls ?"), "the chamber section's small names the filter it marks");
+  assert.ok(css.includes(".mp-legend .lg-filter button[aria-pressed=\"true\"]") && css.includes(".lg-typefilter button i"), "the rows' chips mark their pick, the type swatches styled");
+}
+
+// one head in every lens and at every level (2026-11-08, user call on the side
+// pane's inconsistencies): the place, its figures (the seats first, then the
+// two-party count and the primaries), then the lens's finding as a line of
+// prose under them; a seat's and a polling place's figures lead their cards too
+{
+  const st = part("app-4-story.js"), css = part("page.css");
+  assert.ok(st.includes("function findingHTML(hed, dek, lead)") && st.includes('${stat || ""}${findingHTML(hed, dek, !stat)}'), "the head's figures lead; the finding follows them");
+  assert.ok(st.includes("const figs = stat || seatStat(m, st, `${hed}.`, aus && m.year === \"now\" ? NOW_AUS_DEK.now : null);") && st.includes("let h = head(title, meta, winnerish || quiet ? \"\" : hed, quiet ? \"\" : dek, figs);"), "every lens's area head carries the one figures block; the Winner and Seat type lenses add only a dek, the two-party lens nothing");
+  assert.ok(st.indexOf("sections.push(`<span class=\"st-lab\">Seats${shareTxt}</span>") < st.indexOf("if (two) sections.push(two);") && st.indexOf("if (two) sections.push(two);") < st.indexOf("if (fpRow) sections.push(fpRow);"), "the seats lead the figures, then the two-party count, then the primaries");
+  assert.ok(st.includes("return { hed: hedWord, dek: \"\", quiet: true, note:"), "the two-party lens's figure is its finding: no line repeats it");
+  assert.ok(st.includes("let figs = seatFinalStat(m, d);") && st.includes("let h = head(d.n, meta, hed, dek, figs);"), "a seat's figures lead its card, its finding after them");
+  assert.ok(st.includes('let figs = "", after = "";') && st.includes('hed === ds(b.name[j]) ? "" : hed, dek, figs);'), "a polling place's figures lead its card; a place with no count has no finding");
+  assert.ok(css.includes(".st-find {") && css.includes(".st-find > b {"), "the finding line carries its style");
+  // the seat key: the crossbench alone, bracketed under its stretch of the bar
+  assert.ok(st.includes("const xb = rows.filter((r) => r.f !== \"alp\" && r.f !== \"lnp\" && !blocNames.includes(r.name));") && st.includes('xbWord = blocNames.length ? "Others" : "Crossbench"') && st.includes('class="st-xb-brace"') && st.includes('<span class="st-xb-lab">${xbWord} <b>${xbN}</b></span>'), "the seat key names the crossbench alone — Labor's and the Coalition's counts are the big figures above it");
+  assert.ok(css.includes(".st-xb-brace {") && css.includes(".st-xb-lab {"), "the crossbench bracket and label carry styles");
 }
 
 // Controls share one stack; basis scales are no longer part of the panel.
@@ -2573,7 +2569,7 @@ for (const y of ["sa22", "sa26"]) {
   const legend = ui.slice(ui.indexOf("function legendHTML"), ui.indexOf("/* =============================== the timeline"));
   assert.ok(!/lg-ramp|lg-ticks|lg-ends|seatTypeFilters/.test(legend), "basis controls contain no scales or seat-type filters");
   assert.ok(css.includes(".mp-legend { display: flex; flex-direction: column;"), "every basis shares the same control layout");
-  assert.ok(st.includes('class="lg-types st-typefilters"') && st.includes('data-scope="${cur === `cls:${c}` ? "aus"'), "the cls lens's types are their own toggle row — a state dropdown sits above it — sharing the one scope store");
+  assert.ok(!st.includes("st-typefilters") && !st.includes("data-scope="), "the cls lens's old head chips are gone: the types are the strip's Seat type row");
 }
 
 // the search field lives INSIDE the control panel (the lensrow's floating row
@@ -2626,7 +2622,10 @@ for (const y of ["sa22", "sa26"]) {
 // The behaviour itself is driven by .matilda/probe/map-fullscreen.mjs
 {
   const base = part("app-1-base.js"), map2 = part("app-2-map.js"), ch = part("app-3-chamber.js"), ui = part("app-6-ui.js"), fsj = part("app-7-full.js"), css = part("page.css");
-  assert.ok(/id="zoomer"><button type="button" id="zfs" aria-label="Full screen" title="Full screen \(F\)"><svg[^>]*>(?:(?!<\/svg>).)*M20 9V4h-5(?:(?!<\/svg>).)*M4 15v5h5(?:(?!<\/svg>).)*<\/svg><\/button>/.test(page), "full screen opens the zoom plate (the top-rightmost control), its glyph two corner brackets");
+  // one way in (2026-11-08, user call: two full-screen buttons were one too many) —
+  // the eyebrow's, beside the view switch, in every view; the zoom plate's copy is retired
+  assert.ok(!page.includes('id="zfs"') && !fsj.includes('$("#zfs")') && /<button type="button" class="mp-fsgo" id="fsgo" aria-label="Full screen" title="Full screen \(F\)"><svg[^>]*>(?:(?!<\/svg>).)*M4 9V4h5(?:(?!<\/svg>).)*<\/svg><span>Full screen<\/span><\/button>/.test(page) && fsj.includes('$("#fsgo").addEventListener("click", () => fsEnter());') && fsj.includes('const b = $("#fsgo");'), "one full-screen button, the eyebrow's: the zoom plate's copy is gone, and the way out hands focus back to the one way in");
+  assert.ok(css.includes('.mp-zoom[data-view="chamber"] { display: none; }') && !/min-width: 861px\) and \(max-width: 1039px\) \{ \.mp-fsgo \{ display: none; \} \}/.test(css), "the chamber's empty zoom plate stands down, and the eyebrow's button shows at every width");
   assert.ok(/<button type="button" id="zback" aria-label="Jump back" title="Jump back \(B\)" hidden><svg[^>]*>(?:(?!<\/svg>).)*M9 5 4 10l5 5(?:(?!<\/svg>).)*<\/svg><\/button>/.test(page), "the jump-back button sits on the plate too: return-arrow glyph, Jump back (B), hidden until off the default view");
   assert.ok(base.includes("const FS = { on: false, ins: { t: 0, r: 0, b: 0, l: 0 }, move: null };"), "the full-screen state lives in the base part, readable by every part from the start");
   assert.ok(map2.includes("if (FS.on && !page) { const q = FS.ins; p.t += q.t; p.r += q.r; p.b += q.b; p.l += q.l; }"), "the map's fit keeps the plates' room clear");

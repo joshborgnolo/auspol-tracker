@@ -355,7 +355,13 @@ button { cursor: pointer; background: none; border: 0; }
 .st-seat-majority { position: absolute; top: -3px; bottom: -3px; width: 2px; transform: translateX(-50%); background: var(--ink); box-shadow: 0 0 0 1px var(--bg); }
 .st-makeup { display: flex; height: 10px; width: 100%; overflow: hidden; border-radius: 2px; }
 .st-makeup > span { display: block; flex: none; height: 100%; }
+/* the key under the bar opens out the third figure alone — the crossbench —
+   bracketed under its own stretch of the bar, its name and count leading */
 .st-seat-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--ink-2); }
+.st-has-brace { gap: 14px; }
+.st-xb-brace { position: absolute; top: calc(100% + 3px); height: 5px; border: 1px solid var(--ink-3); border-top: 0; border-radius: 0 0 2px 2px; box-sizing: border-box; }
+.st-xb-lab { display: inline-flex; align-items: baseline; gap: 5px; color: var(--ink); font-weight: 500; }
+.st-xb-lab b { font-weight: 700; }
 .st-seat-key { display: inline-flex; align-items: baseline; gap: 5px; }
 .st-seat-key::before { content: ""; flex: none; width: 7px; height: 7px; align-self: center; border-radius: 1px; background: var(--seat-colour); }
 .st-seat-key b { color: var(--ink); }
@@ -416,6 +422,13 @@ button { cursor: pointer; background: none; border: 0; }
   .st-pv-row { min-height: 44px; align-items: center; }
 }
 .st-stat + .st-dek { margin-top: 16px; }
+/* the lens's finding under the figures: its headline as the bold lead, the dek after */
+.st-find { margin-top: 14px; font-size: 15px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.st-find > b { color: var(--ink); font-weight: 600; }
+.st-sec + .st-find, .st-stat + .st-find { margin-top: 12px; }
+/* (a card with no figures to lead it opens on its finding, a size up) */
+.st-find-lead { margin-top: 12px; font-size: 17px; line-height: 1.4; }
+#story[data-lens="winner"] .st-find { font-family: "Commissioner", var(--sans); }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
 .st-sec { margin-top: 16px; padding-top: 7px; border-top: 1px solid var(--line); }
@@ -604,6 +617,7 @@ button { cursor: pointer; background: none; border: 0; }
 #story[data-lens="winner"] .st-sec { border-top: 4px double var(--line); }
 #story[data-lens="winner"] .st-stat + .st-sec,
 #story[data-lens="winner"] .st-dek + .st-sec { border-top: 0; }
+#story[data-lens="winner"] .st-find + .st-sec { border-top: 4px double var(--line); }
 /* the polling-place story separates with the head double rule under every
    lens — that includes its FIRST junction, where the winner page's adjacent
    suppression wrongly zeroes the line (there is no head rule above it to
@@ -613,7 +627,7 @@ button { cursor: pointer; background: none; border: 0; }
 /* the polling-place dek is running copy; it reads in the winner story's
    Commissioner and takes the same double rule above it as the sections that
    follow it (both user calls made on the opening dek's rendering) */
-#story[data-view="booth"][data-lens] .st-dek { font-family: "Commissioner", var(--sans); border-top: 4px double var(--line); padding-top: 7px; }
+#story[data-view="booth"][data-lens] .st-dek, #story[data-view="booth"][data-lens] .st-find { font-family: "Commissioner", var(--sans); border-top: 4px double var(--line); padding-top: 7px; }
 /* and the credit line closes the story on the same twin rule, under the margin
    list and its informal line */
 #story[data-lens="winner"] .st-foot { border-top: 4px double var(--line); }
@@ -752,8 +766,8 @@ button { cursor: pointer; background: none; border: 0; }
 .lg-hist i { flex: 1; min-height: 1px; border-radius: 1px 1px 0 0; }
 .lg-hist + .lg-ramp { margin-top: 3px; }
 
-/* ------- the ways into full screen: beside the view switch, and on the zoom plate
-   (in the chamber the plate holds it alone) ------- */
+/* ------- the way into full screen, beside the view switch (the one button: the
+   stage's own corner copy is retired), and the Retro view switch after it ------- */
 .mp-fsgo {
   display: inline-flex; align-items: center; gap: 7px; align-self: flex-end; height: 34px; margin: 0 0 -6px 2px; padding: 0 2px 0 14px;
   border-left: 1px solid var(--line); font-size: 14px; color: var(--ink-2); white-space: nowrap;
@@ -764,16 +778,34 @@ button { cursor: pointer; background: none; border: 0; }
 .mp-fsgo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 /* (its words only where the eyebrow has the room: elsewhere the glyph alone, the line unwrapped) */
 @media (max-width: 1180px) { .mp-fsgo { padding: 0 4px 0 12px; } .mp-fsgo span { display: none; } }
-/* (between the wide layout's foot and 1040 the eyebrow has no room left for it: the line would
-   wrap and move the figure, so the zoom plate's button stands alone there) */
-@media (min-width: 861px) and (max-width: 1039px) { .mp-fsgo { display: none; } }
+/* (between the wide layout's foot and 1040 the eyebrow is tight: the meta line gives way, ellipsed) */
+@media (min-width: 861px) and (max-width: 1039px) { .rd-eyebrow .rd-meta { min-width: 0; flex: 1 1 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .rd-eyebrow .rd-grow { display: none; } }
+/* the Retro view switch wears a little of the look it opens: a bevelled grey
+   desktop button in the old system face, so it says what it does at a glance */
+.mp-retgo {
+  align-self: center; flex: none; height: 23px; padding: 0 9px 1px; margin: 0 0 0 -2px;
+  font: 400 12px/1 Tahoma, Verdana, "Segoe UI", Geneva, sans-serif; letter-spacing: 0; color: #000;
+  background: #d4d0c8; border: 0; border-radius: 0; cursor: pointer;
+  box-shadow: inset -1px -1px #404040, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+.mp-retgo:hover { background: #dcd8d0; }
+.mp-retgo:active { box-shadow: inset 1px 1px #404040, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf; padding: 1px 8px 0 10px; }
+.mp-retgo:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+/* the meta line gives way before anything wraps: it ellipses, its full words on hover */
+@media (min-width: 861px) { .rd-eyebrow .rd-meta { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+@media (max-width: 560px) {
+  /* a phone's eyebrow: the meta takes its own line, the switch at that line's end */
+  .mp-retgo { order: 5; align-self: flex-start; margin: 1px 0 0 auto; }
+  .rd-eyebrow .rd-meta { flex: 1 1 calc(100% - 80px); min-width: 0; }
+}
 @media (max-width: 860px) { .mp-fsgo { margin-bottom: 0; } }
 @media (max-width: 560px) {
   .mp-fsgo { order: 3; height: 38px; margin: 0; padding: 0 4px 0 11px; }
   .mp-fsgo span { display: none; }
   .mp-fsgo svg { width: 17px; height: 17px; }
 }
-.mp-zoom[data-view="chamber"] > button:not(#zfs) { display: none; }
+/* (the chamber has no zoom: its plate stands down) */
+.mp-zoom[data-view="chamber"] { display: none; }
 
 /* ------- full screen (app-7-full.js) -------
    The stage fills the screen and the page's own controls float over it on paper
@@ -944,7 +976,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 .fs-cd-seat b { font-weight: 600; color: var(--ink); }
 
 /* the stage's own overlays, in the clear ground */
-.fs #zfs { display: none; }
+.fs .mp-retgo { display: none; }
 .fs .mp-tl { left: calc(var(--fs-l) + 4px); top: calc(var(--fs-t) + 12px); max-width: calc(100% - var(--fs-l) - var(--fs-r) - 70px); }
 .fs .mp-zoom { top: auto; right: var(--fs-r); bottom: calc(var(--fs-b) + 10px); background: var(--fs-plate); box-shadow: var(--fs-lift); border: 1px solid var(--fs-rim); border-radius: 12px; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
 .fs .mp-stamp { left: calc(var(--fs-l) + 12px); bottom: calc(var(--fs-b) + 14px); }
@@ -1121,7 +1153,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-chart[hidden] { display: none; }
 .mp-chart.ch-point .ch-plot { cursor: pointer; }
 .ch-head { flex: none; display: flex; flex-direction: column; gap: 3px; }
-.ch-hed { font-size: 17px; font-weight: 600; line-height: 1.25; color: var(--ink); text-wrap: balance; padding-right: 36px; } /* (clear of the stage's full-screen button) */
+.ch-hed { font-size: 17px; font-weight: 600; line-height: 1.25; color: var(--ink); text-wrap: balance; }
 .fs .ch-hed { padding-right: 0; }
 .ch-dek { margin: 0; font-size: 13.5px; line-height: 1.4; color: var(--ink-2); text-wrap: pretty; }
 .ch-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; }
@@ -1166,7 +1198,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 .ch-open { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.3; }
 /* the map's own furniture has nothing to say over a chart: zoom, city jumps, the zoom hint, the
    street tiles' credit, and the key's colour scale (the dots wear who holds each seat instead) */
-.ch-on #hint, .ch-on #cities, .ch-on .mp-zoom > :not(#zfs), .ch-on #credit,
+.ch-on #hint, .ch-on #cities, .ch-on .mp-zoom, .ch-on #credit,
 .ch-on .mp-legend > .lg-ramp, .ch-on .mp-legend > .lg-ticks, .ch-on .mp-legend > .lg-ends, .ch-on .mp-legend .lg-note:has(> .lg-hatch) { display: none !important; }
 .fs .mp-chart {
   inset: calc(var(--fs-t) + 10px) var(--fs-r) calc(var(--fs-b) + 10px) var(--fs-l); padding: 14px 18px 10px;
@@ -1175,3 +1207,24 @@ html.mp-fs .mp-tip { z-index: 260; }
 @media (max-width: 860px) {
   .fs .mp-chart { inset: calc(var(--fs-t) + 8px) 8px calc(var(--fs-peek) + 8px) 8px; padding: 10px 12px 8px; }
 }
+
+/* ------- the State and Seat type filter rows (filterHTML), in every view ------- */
+.mp-legend .lg-filter button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.lg-typefilter button { display: inline-flex; align-items: center; gap: 5px; }
+.lg-typefilter button i { flex: none; width: 9px; height: 9px; border-radius: 2px; }
+/* a pressed chip's bold never moves its neighbours: each label reserves its
+   bold width (the view tabs' bold twin, .tw) */
+/* (a column, not a grid: its baseline stays the label's own, so a row aligned
+   on baselines keeps every chip level with its tag) */
+.mp-legend .tw { display: inline-flex; flex-direction: column; }
+.mp-legend .tw::after { content: attr(data-t); font-weight: 600; height: 0; visibility: hidden; overflow: hidden; }
+/* the City-names toggle: both words stacked in one cell at their bold widths, the live one shown */
+.lg-jtoggle { display: inline-grid; }
+.lg-jt-w { grid-area: 1 / 1; text-align: right; }
+.lg-jt-w[aria-hidden="true"] { visibility: hidden; }
+/* the zoom hint keeps its line while it has nothing to say, so the strip never
+   shortens under it (and the map never moves) as the hint comes and goes */
+.mp-legend .lg-hint { min-height: 1.45em; }
+/* on a phone the search stands atop the map, full width, above the stage */
+.mp-search.mp-search-top { width: 100%; margin: 0 0 10px; align-self: stretch; }
+.mp-search.mp-search-top label { height: 40px; }

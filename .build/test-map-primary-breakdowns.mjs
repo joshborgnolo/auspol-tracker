@@ -14,7 +14,7 @@ const labels = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation
 let current, focusCount = 0;
 const ctx = vm.createContext({
   FAMS, CLS, STATES, STATE_TITLE: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
-  STATE_YEARS: new Set(["nsw23"]), S: { year: 2025 }, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
+  STATE_YEARS: new Set(["nsw23"]), S: { year: 2025, f: { st: null, cls: null } }, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
   SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(),
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
   famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab,
@@ -22,7 +22,7 @@ const ctx = vm.createContext({
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -109,7 +109,7 @@ assert.match(g,/class="st-othb"/,"the figure carries its opener when shut");
 assert.match(g,/aria-expanded="false"/);
 assert.ok(g.includes(`<b>${oth25.toFixed(1)}</b>`),"the shut figure shows the Others total");
 assert.ok(!g.includes("st-othx"),"nothing lists while shut");
-api.statScopeOf(current).open=true;
+api.statFold.open=true;
 g=api.statPrimaryGrid(current,current.areas.AUS,"",true);
 assert.ok(!g.includes("st-othb"),"the figure button is gone once open");
 assert.match(g,/repeat\(5,auto\)/,"the remaining figures recentre on one fewer column");
@@ -119,12 +119,12 @@ for(const r of rows25) {
   assert.ok(g.includes(`<small>${(r[2]>=0?"+":"−")+Math.abs(r[2]).toFixed(1)}</small>`),`open line shows ${r[3]}'s change`);
 }
 assert.ok(!api.statPrimaryGrid(current,current.areas.AUS).includes("st-othb"),"the breakdown cycle view's grid keeps a plain figure");
-api.statScopeOf(current).open=false;
-api.statScopeOf(now).open=true;
+api.statFold.open=false;
+api.statFold.open=true;
 const gNow=api.statPrimaryGrid(now,now.areas.AUS,"",true);
 assert.ok(gNow.includes("st-othx"),"an as-it-stands frame lists its Others too");
 assert.ok(gNow.includes("<small"),"an as-it-stands frame carries its base election's change figures too (user call, 2026-11-07)");
-api.statScopeOf(now).open=false;
+api.statFold.open=false;
 const colsSa16=api.statPrimaryCols(old,old.areas.SA),nxt16=colsSa16.find((c)=>c[4].startsWith("party:"));
 assert.ok(nxt16,"Xenophon stands out of South Australia's Others");
 const rowsSa16=api.statOthersRows(old.areas.SA,colsSa16);

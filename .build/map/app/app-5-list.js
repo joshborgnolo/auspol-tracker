@@ -12,12 +12,13 @@ function passes(m, i, skipRange) {
   if (!skipRange && S.f.range && S.f.range.unit === "seats" && !inRange(seatColValue(m, d, S.f.range.key), S.f.range)) return false;
   return true;
 }
-function filterWords(m) {
+// (listOnly: the List view's own filters alone — the State and Seat type rows name themselves)
+function filterWords(m, listOnly) {
   const w = [];
   if (S.f.margin) w.push(MARGINS[S.f.margin][2].split(",")[0].toLowerCase());
-  if (S.f.cls) w.push(CLS_SHORT[S.f.cls].toLowerCase());
+  if (S.f.cls && !listOnly) w.push(CLS_SHORT[S.f.cls].toLowerCase());
   if (S.f.win) w.push(`held by ${FAM_PL[S.f.win]}`);
-  if (S.f.st) w.push(STATE_SHORT[S.f.st]);
+  if (S.f.st && !listOnly) w.push(STATE_SHORT[S.f.st]);
   if (S.f.range) { const c = colByKey(m, S.f.range.unit, S.f.range.key); if (c) w.push(`${c.short || c.label} ${rangeText(S.f.range, c)}`); }
   return w;
 }
@@ -311,9 +312,8 @@ function renderList(keepScroll) {
   let bar = `<div class="ls-unit" role="tablist" aria-label="Rows"><button type="button" class="rd-tab" role="tab" data-unit="seats" aria-selected="${unit === "seats"}"><span class="tw" data-t="Seats">Seats</span></button><button type="button" class="rd-tab" role="tab" data-unit="booths" aria-selected="${unit === "booths"}"><span class="tw" data-t="Polling places">Polling places</span></button></div>`;
   if (unit === "booths" && sd != null) bar += `<button type="button" class="ls-chip" data-unseat title="Show every polling place">In ${ds(m.divs[sd].n)} ✕</button>`;
   else {
-    bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
+    // (State and Seat type are the page's own filter rows above, shared with the map and chamber)
     bar += sel(isNowY(m.year) ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, famLeg(f)]), S.f.win);
-    bar += sel("Seat type", "cls", CLS.map((c) => [c, CLS_SHORT[c]]), S.f.cls);
     bar += sel("Margin", "margin", Object.entries(MARGINS).map(([k, v]) => [k, v[2]]), S.f.margin);
   }
   if (S.f.range) { const c = colByKey(m, S.f.range.unit, S.f.range.key); if (c) bar += `<button type="button" class="ls-chip" data-unrange title="Clear this range">${esc(c.short || c.label)} ${esc(rangeText(S.f.range, c))} ✕</button>`; }

@@ -19,7 +19,7 @@ await page.waitForFunction("window.__map && window.__map.T"); await wait(800);
 // scroll the page a little first, to check it comes back
 await page.evaluate(() => window.scrollTo(0, 140)); await wait(300);
 const st0 = await page.evaluate(() => { const r = document.querySelector("#stage").getBoundingClientRect(); return [r.left, r.top, r.width, r.height, scrollY, history.length]; });
-await page.click("#zfs"); await wait(1200);
+await page.click("#fsgo"); await wait(1200);
 let s = await page.evaluate(() => ({ on: __map.fs.on, native: __map.fs.native, fsEl: !!document.fullscreenElement, hash: location.hash, stage: (() => { const r = document.querySelector("#stage").getBoundingClientRect(); return [r.width, r.height]; })(), inert: document.querySelector("main").inert, hl: history.length }));
 ok("click enters full screen", s.on, JSON.stringify(s));
 ok("the stage fills the viewport", Math.abs(s.stage[0] - 1280) < 2 && Math.abs(s.stage[1] - 800) < 2, String(s.stage));
@@ -61,7 +61,7 @@ s = await page.evaluate(() => ({ on: __map.fs.on, hash: location.hash }));
 ok("Back leaves full screen", !s.on && !/fs=1/.test(s.hash), JSON.stringify(s));
 // the button way out restores history length (no stray entry)
 const hl0 = await page.evaluate(() => history.length);
-await page.click("#zfs"); await wait(900);
+await page.click("#fsgo"); await wait(900);
 await page.click(".fs-x"); await wait(1500);
 s = await page.evaluate(() => ({ on: __map.fs.on, hash: location.hash, idx: history.length }));
 ok("the × leaves", !s.on, JSON.stringify(s));

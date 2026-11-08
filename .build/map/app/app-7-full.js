@@ -192,6 +192,8 @@ function fsEnter(o = {}) {
   el.prepend(stage);
   fsPark($("#lenses"), FS.lensbar);
   fsPark($(".mp-views"), FS.vslot);
+  // (a phone's search stands atop the map in the page: the panel's plate takes it back)
+  FS.on = true; placeSearch(); FS.on = false;
   fsPark($("#legend"), FS.lslot);
   fsPark($("#story"), FS.scroll);
   FS.meta.textContent = $("#mp-meta").textContent;
@@ -315,7 +317,7 @@ async function fsExit(o = {}) {
   if (FS.pushed && !o.fromHistory) { FS.pushed = false; FS.skipPop = true; try { history.back(); } catch (e) { FS.skipPop = false; } }
   FS.pushed = false;
   writeURL();
-  const b = $("#zfs");
+  const b = $("#fsgo");
   if (b && !b.closest("[hidden]")) b.focus({ preventScroll: true });
 }
 
@@ -601,7 +603,6 @@ function fsToastOff() {
 }
 
 /* ----- the ways in and out ----- */
-$("#zfs").addEventListener("click", () => fsEnter());
 $("#fsgo").addEventListener("click", () => fsEnter());
 document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");

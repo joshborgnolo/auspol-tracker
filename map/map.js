@@ -81,7 +81,8 @@ function tokenRGB(v) {
   }
   return null;
 }
-const isDark = () => { const r = document.documentElement; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
+// (the retro view keeps the light paper whatever the theme: the era had no dark mode)
+const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
 function readTheme() {
   const dk = isDark();
   // oklch tokens come back from getComputedStyle as oklch(); compute them here instead
@@ -117,6 +118,8 @@ function readTheme() {
   T.seaLine = dk ? lch(0.335, 0.034, 240) : lch(0.85, 0.04, 236);
   T.seaMark = dk ? lch(0.6, 0.04, 238) : lch(0.6, 0.06, 240);
   T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
+  // the retro view's flat palette over these (app-8-retro.js)
+  if (typeof retroTheme === "function" && typeof rtIsOn === "function" && rtIsOn()) retroTheme(T);
   return T;
 }
 
@@ -1000,6 +1003,36 @@ function emptyBooths(m) {
   return o;
 }
 
+/* census shares pooled over a set of seats' vote-weighted populations, in
+   percent: an area's (deriveAreas), or a filtered pool's (the story's scopeArea) */
+function demoOf(m, idx) {
+  let demo = null;
+  const ds = idx.map((i) => m.divs[i].demo).filter((x) => x && x.p);
+  if (ds.length) {
+    demo = {};
+    // a lane's null rows sit that lane's pool out, both sides of the line
+    for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
+    // the birthplace countries pool the same way, per year-country
+    if (m.cobKeys && m.cobKeys.length) {
+      demo.cob = {};
+      for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    // the Religion and Housing-tenure select pools, same vote-weighted way
+    if (m.relKeys && m.relKeys.length) {
+      demo.rel = {};
+      for (const k of m.relKeys) { const xs = ds.filter((x) => x.rel && x.rel[k] != null); demo.rel[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.rel[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    if (m.tenKeys && m.tenKeys.length) {
+      demo.ten = {};
+      for (const k of m.tenKeys) { const xs = ds.filter((x) => x.ten && x.ten[k] != null); demo.ten[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ten[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    if (m.ancKeys && m.ancKeys.length) {
+      demo.anc = {};
+      for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+  }
+  return demo;
+}
 function deriveAreas(res, m) {
   const out = {};
   for (const st of ["AUS", ...STATES]) {
@@ -1010,32 +1043,8 @@ function deriveAreas(res, m) {
     const hasPrev = a.pprim != null && a.pformal != null;
     for (const b of FAMS) { fp[b] = (100 * a.prim[b]) / a.formal; fpSw[b] = hasPrev ? fp[b] - (100 * a.pprim[b]) / a.pformal : null; }
     const idx = m.divs.filter((d) => st === "AUS" || d.st === st).map((d) => d.i);
-    // census shares pooled over the seats' vote-weighted populations, in percent
-    let demo = null;
-    const ds = idx.map((i) => m.divs[i].demo).filter((x) => x && x.p);
-    if (ds.length) {
-      demo = {};
-      // a lane's null rows sit that lane's pool out, both sides of the line
-      for (const k of DM) { const xs = ds.filter((x) => x[k] != null); demo[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x[k]))) / sum(xs.map((x) => x.p)) : null; }
-      // the birthplace countries pool the same way, per year-country
-      if (m.cobKeys && m.cobKeys.length) {
-        demo.cob = {};
-        for (const k of m.cobKeys) { const xs = ds.filter((x) => x.cob && x.cob[k] != null); demo.cob[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.cob[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      // the Religion and Housing-tenure select pools, same vote-weighted way
-      if (m.relKeys && m.relKeys.length) {
-        demo.rel = {};
-        for (const k of m.relKeys) { const xs = ds.filter((x) => x.rel && x.rel[k] != null); demo.rel[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.rel[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      if (m.tenKeys && m.tenKeys.length) {
-        demo.ten = {};
-        for (const k of m.tenKeys) { const xs = ds.filter((x) => x.ten && x.ten[k] != null); demo.ten[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ten[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-      if (m.ancKeys && m.ancKeys.length) {
-        demo.anc = {};
-        for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
-      }
-    }
+    // census shares pooled over the seats' vote-weighted populations, in percent (demoOf)
+    const demo = demoOf(m, idx);
     // the lens-level exhausted share is counted off the divisions' own flow rows
     const exd = idx.map((i) => m.divs[i]).filter((d) => d.exhPct != null);
     const exhPct = exd.length ? (100 * sum(exd.map((d) => (d.exhPct / 100) * d.formal))) / sum(exd.map((d) => d.formal)) : null;
@@ -5892,7 +5901,7 @@ function balloonKey(m, est) {
 function drawRowHTML(m) {
   const on = S.draw, fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo, cn = k === "chart" && !chartFits(m); return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an && !cn}"${cn ? ` disabled title="Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"` : ""}${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}>${t}</button>`; }).join("")}</div>`;
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo, cn = k === "chart" && !chartFits(m); return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an && !cn}"${cn ? ` disabled title="Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"` : ""}${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`; }).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
@@ -7756,7 +7765,7 @@ function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;
   chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sen ? (sel.level === "sen" ? sel.i : null) : selDiv(), hover: S.hover && S.hover.kind === (sen ? "sen" : "div") ? S.hover.i : null,
-    state: sel.level === "state" ? sel.st : null, cls: sen ? null : clsFilter(m), pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
+    state: sel.level === "state" ? sel.st : null, cls: sen || S.lens !== "cls" ? null : clsFilter(m), pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
   ctx.restore();
 }
 
@@ -7821,7 +7830,7 @@ function paintMiniChamber() {
   const sd = selDiv();
   // the chamber keeps its own marks of the figures-menu pick: a state's seats
   // lit, a seat type in its lens colours with other kinds sat back
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m), pad, labels: true });
+  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: S.lens === "cls" ? clsFilter(m) : null, pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {
@@ -8895,16 +8904,27 @@ function seatCount(m, idx, fam) { return idx.filter((i) => m.divs[i].hold.fam ==
 /* ----- small figure builders ----- */
 function upLink() {
   const s = S.sel, m = M();
-  // a seat-type filter has no map selection of its own but earns the same way
-  // out above the title (goAus clears the store through select's sync)
-  const clsScoped = m && s.level === "aus" && pickerLens() && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls";
+  // a filtered view (the strip's State or Seat type row) earns the way out
+  // above the title in every lens: "All seats" clears both filters
+  const clsScoped = m && s.level === "aus" && !!poolParts(m).cls;
   if (s.level === "aus" && !clsScoped) return "";
   const label = s.level === "aus" || s.level === "state" ? "All seats" : s.level === "div" ? STATE_TITLE[s.st] : m.divs[s.div].n;
-  const go = s.level === "aus" || s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
+  const go = s.level === "aus" || s.level === "state" ? "aus:all" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
   return `<button type="button" class="st-up" data-go="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${ds(label)}</button>`;
 }
+/* every head reads the same way down, whatever the lens or level: the place,
+   its figures (the seats first), then the lens's own finding in a line of
+   prose under them — the figures never wait below a headline. A head with no
+   figures block (a seat outside any count) keeps the finding as its lead. */
 function head(title, meta, hed, dek, stat) {
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || `<h3 class="st-hed">${hed}</h3>`}${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${findingHTML(hed, dek, !stat)}`;
+}
+// the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
+function findingHTML(hed, dek, lead) {
+  const h = String(hed || "").trim(), d = String(dek || "").trim();
+  if (!h && !d) return "";
+  const stop = h && !/[.!?…]$/.test(h) ? "." : "";
+  return `<p class="st-find${lead ? " st-find-lead" : ""}">${h ? `<b>${h}${stop}</b>` : ""}${h && d ? " " : ""}${d}</p>`;
 }
 // the Now page's two-party read: two names, two big figures, a rule between
 function heroPair(aName, aPct, aFam, bName, bPct, bFam) {
@@ -9184,45 +9204,48 @@ function scopeSeatBase(m, sel, idx, cnt) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
-// the head's scope menu: the choice is one pick shared across frames, so
-// it survives a year switch; "aus" is the whole frame's own jurisdiction —
-// named after it plainly on election frames ("National", "New South Wales"),
-// as the "… figures" menu on the now frames. A frame
-// that can't express the pick — a state frame shown a federal state pick —
-// shows "aus" until one can.
-let statScopeStore = { k: "aus" };
+/* the figures' filters are the page's own two, the strip's State and Seat
+   type rows (S.f.st, S.f.cls): one pair read alike by the map, the chambers,
+   the list and every lens's head here. Either rides alone, and with both on
+   the pools intersect (Rural seats in New South Wales). A state filter is the
+   map's state selection too (select() writes it), so it frames the map; the
+   seat type dims the seats outside it wherever they're drawn. The Others
+   expander's open state rides across frames with them. */
+const statFold = { open: false };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
-  : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
-// a state slice is ONE pick, whether it came from the map or from the head's
-// figures menu: the map keeps it selected, the menu keeps its store — each
-// side writes the other, and the render reads the slice from the selection
-// a picked map state is the state axis of the same compound derivation
-const sliceState = (m) => poolParts(m).st;
-const statScopeOf = (m) => {
-  const slice = sliceState(m);
-  if (slice) return { k: "st", st: slice, open: statScopeStore.open };
-  // a dormant class pick reads as National where nothing marks it — it wakes
-  // back up the moment a state slices (or the cls lens is reached)
-  const store = statScopeStore.k === "cls" && S.lens !== "cls" ? { k: "aus", open: statScopeStore.open } : statScopeStore;
-  return statScopeOk(m, store) ? store : { k: "aus", open: statScopeStore.open };
-};
-// the lenses whose story shows the Winner head's figures design (the cls lens
-// shares it wholesale since 2026-11-08, its filter simply seat types only)
-const pickerLens = () => S.lens === "winner" || S.lens === "cls";
-// the figures filters' two orthogonal axes: the map's own state selection and
-// the menu's own class pick. Either rides alone, and when both are on the
-// pools intersect — a class can be picked "within" the state (2026-11-08, the
-// report of NSW staying selected with no seat type reachable inside it)
+  : s.k === "cls" ? !STATE_YEARS.has(m.year) && m.divs.some((d) => d.cls === s.cls) : true;
 const poolParts = (m) => {
-  const st = pickerLens() && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null;
-  // a seat type rides a sliced state's menu (2026-11-08, the menu's own "Add
-  // filter" over the state) — and the cls lens beyond a slice; never invisible
-  const cls = !STATE_YEARS.has(m.year) && statScopeOk(m, statScopeStore) && statScopeStore.k === "cls" && (S.lens === "cls" || st) ? statScopeStore.cls : null;
+  const fed = !!m && !STATE_YEARS.has(m.year);
+  const st = fed && S.f.st && m.areas[S.f.st] && m.areas[S.f.st].formal > 0 ? S.f.st : null;
+  const cls = fed && S.f.cls && m.divs.some((d) => d.cls === S.f.cls) ? S.f.cls : null;
   return { st, cls };
 };
-// the figures menu's seat-type pick, for the views that mark it outside the
-// head's figures (the chambers paint and dim by it)
+const sliceState = (m) => poolParts(m).st;
+// the seat-type filter, for the views that mark it outside the head's figures
 const clsFilter = (m) => poolParts(m).cls;
+const statScopeOf = (m) => {
+  const { st, cls } = poolParts(m);
+  return cls ? { k: "cls", cls, st, open: statFold.open } : st ? { k: "st", st, open: statFold.open } : { k: "aus", open: statFold.open };
+};
+/* the filtered pool behind a head: a state's own stored aggregate, or a seat
+   type's seats pooled (inside the state where one is picked too) */
+function scopeArea(m, st) {
+  const cls = clsFilter(m);
+  if (!cls) return areaStats(m, st);
+  const idx = m.areas[st].idx.filter((i) => m.divs[i].cls === cls);
+  const cnt = {};
+  for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+  const A = statClassArea(m, idx);
+  A.demo = demoOf(m, idx);
+  return { A, idx, N: idx.length, cnt };
+}
+// the filter in words, for the heads' "in …" clauses: "in New South Wales",
+// "in rural seats", "in New South Wales’s rural seats"
+function scopeWhere(m, st) {
+  const cls = clsFilter(m), aus = st === "AUS";
+  if (!cls) return aus ? "" : ` in ${STATE_NAME[st]}`;
+  return aus ? ` in ${CLS_LOWER[cls]} seats` : ` in ${STATE_POSS[st]} ${CLS_LOWER[cls]} seats`;
+}
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -9230,28 +9253,6 @@ function statScopeLabel(m, sel) {
   if (sel.k === "st") { const s = sel.st; return s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]; }
   if (STATE_YEARS.has(m.year)) return STATE_TITLE[stOfYear(m.year)];
   return "National";
-}
-// a scope's own area-payload: states ride their stored aggregates, classes are pooled
-function statScopeArea(m, st, sel) {
-  if (sel.k === "st") {
-    const A = m.areas[sel.st], idx = A.idx, cnt = {};
-    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-    return { A, idx, N: idx.length, cnt };
-  }
-  const row = statBreakdownRows(m, st).classes.find((r) => r.key === sel.cls);
-  if (!row) return areaStats(m, st);
-  // a class picked inside the map's own state: the pool narrows, tallies pooling
-  // their own seats (the class bar's own national row is not this head's basis)
-  const stPool = poolParts(m).st;
-  if (stPool) {
-    const idx = row.A.idx.filter((i) => m.divs[i].st === stPool);
-    const cnt = {};
-    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-    return { A: statClassArea(m, idx), idx, N: idx.length, cnt };
-  }
-  const A = row.A, cnt = {};
-  for (const i of A.idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-  return { A, idx: A.idx, N: A.idx.length, cnt };
 }
 // Use the headline's party threshold in both breakdown modes. Lists share a
 // column set, so a party does not change columns between adjacent states.
@@ -9308,7 +9309,7 @@ function statPrimaryGrid(m, A, cls = "", othx = false) {
 /* the "Others" open is part of the frame's figure view, like the scope choice */
 function statOthersToggle() {
   const m = M(); if (!m) return;
-  statScopeStore.open = !statScopeStore.open;
+  statFold.open = !statFold.open;
   renderStory(true);
   const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }
@@ -9410,7 +9411,7 @@ function statBreakdownClick(button) {
   if (FS.on) fsStory(false);
 }
 // Keep every represented crossbench group, including single-seat parties.
-function statSeatMakeup(m, idx) {
+function statSeatMakeup(m, idx, blocNames = []) {
   if (!idx.length) return "";
   const groups = new Map();
   for (const i of idx) {
@@ -9423,26 +9424,39 @@ function statSeatMakeup(m, idx) {
   const rows = [...groups.values()].sort((a, b) => order.indexOf(a.f) - order.indexOf(b.f) || b.n - a.n || a.name.localeCompare(b.name));
   const colour = (r) => css(TH.party[FP_TONE[r.name] || r.f]);
   const bars = rows.map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${r.n} ${r.n === 1 ? "seat" : "seats"} (${f1(100 * r.n / idx.length)}%)"></span>`).join("");
-  const legend = rows.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("");
+  /* the key under the bar names the crossbench alone: Labor's and the
+     Coalition's counts are the big figures above it, so the key is the third
+     figure opened out ("Crossbench 15: Independents 8 …"), bracketed under
+     its own stretch of the bar. A crossbench party big enough to stand among
+     the big figures leaves the rest as "Others". */
+  const xb = rows.filter((r) => r.f !== "alp" && r.f !== "lnp" && !blocNames.includes(r.name));
+  const xbN = xb.reduce((a, r) => a + r.n, 0), xbWord = blocNames.length ? "Others" : "Crossbench";
+  let at = 0, lo = null, hi = null, gap = false;
+  for (const r of rows) {
+    const inX = xb.includes(r);
+    if (inX) { if (lo == null) lo = at; else if (hi !== at) gap = true; hi = at + r.n; }
+    at += r.n;
+  }
+  const brace = xbN && !gap ? `<i class="st-xb-brace" aria-hidden="true" style="left:${100 * lo / idx.length}%;width:${100 * (hi - lo) / idx.length}%"></i>` : "";
+  const legend = xbN ? `<span class="st-seat-legend" role="group" aria-label="${xbWord}: ${xbN} ${xbN === 1 ? "seat" : "seats"}"><span class="st-xb-lab">${xbWord} <b>${xbN}</b></span>${xb.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("")}</span>` : "";
   const total = m.seatsN || m.divs.length, majority = Math.floor(total / 2) + 1;
   // A chamber majority is meaningful on the complete House, rather than a
-  // state or seat-type subset selected in the figures menu.
+  // state or seat-type subset picked by the filters.
   const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i>` : "";
-  return `<span class="st-seat-mix"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
+  return `<span class="st-seat-mix${brace ? " st-has-brace" : ""}"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}${brace}</span>${legend}</span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label, noteDef = null) {
-  // a menu class pick narrows the scope wherever the map is: it reads as cls
-  // here even beside a state pick, and the statScopeArea intersects them
-  const clsPart = poolParts(m).cls;
-  const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
-  const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
+  // the filters narrow the pool (scopeArea): st is the area, a state where the
+  // State filter is on, and a Seat type filter pools that type's seats in it
+  const cls = clsFilter(m);
+  const { A, idx, N, cnt } = scopeArea(m, st);
   // the moved-seats note shows only while every seat it names stays inside the
-  // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
-  const seatsNote = noteDef && (statSel.k === "aus" || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
+  // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
+  const seatsNote = noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   // the change line's base: the whole frame's official series, a state's own
-  // series where one is picked, else the scope's seat-by-seat reversion
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st) : scopeSeatBase(m, statSel, idx, cnt);
+  // series on an election frame, else the pool's seat-by-seat reversion
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();
@@ -9451,7 +9465,8 @@ function seatStat(m, st, label, noteDef = null) {
     if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
     parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
   }
-  const bloc = [...parties.values()].filter((r) => r[1] > 14).sort((p, q) => q[1] - p[1]);
+  const blocE = [...parties.entries()].filter(([, r]) => r[1] > 14).sort(([, p], [, q]) => q[1] - p[1]);
+  const bloc = blocE.map(([, r]) => r);
   const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
@@ -9490,89 +9505,52 @@ function seatStat(m, st, label, noteDef = null) {
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
-  const mk = statSeatMakeup(m, idx);
+  const mk = statSeatMakeup(m, idx, blocE.map(([k]) => k));
   // a double rule crowns the head, divides the sections and closes it — every
   // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;
+  // the seats lead (who holds the House is the map's first reading), then the
+  // votes that won them: the two-party count, then the primaries
   const sections = [];
-  if (two) sections.push(two);
-  if (fpRow) sections.push(fpRow);
   // the word-note about seats that moved since the election sits under the count's legend
   sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote}`);
+  if (two) sections.push(two);
+  if (fpRow) sections.push(fpRow);
   return `<h3 class="st-stat" aria-label="${esc(label)}">${sep}${sections.join(sep)}${sep}</h3>`;
 }
 /* the informal rate belongs with the count's own story: it hangs under the
    How-votes-were-cast section instead of closing the winner head (user call
-   2026-11-07), keeping the head's figures scope — a class or state pick
-   pools its own rate (statScopeArea), exactly as the head's figure did */
+   2026-11-07), keeping the head's filters — a state or seat type pools its
+   own rate (scopeArea), exactly as the head's figures do */
 function informalHTML(m, st) {
-  const clsPart = poolParts(m).cls;
-  const sel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
-  const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
+  const { A } = scopeArea(m, st);
   if (A.infPct == null) return "";
-  /* a state-picked view contrasts itself with the frame's average, the same
+  /* a filtered view contrasts itself with the frame's average, the same
      comparison word the seat view's informal line carries (user call) */
-  const cmp = sel.k === "st" && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
+  const cmp = (st !== "AUS" || clsFilter(m)) && !STATE_YEARS.has(m.year) && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
   return `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%${cmp}</div>`;
 }
-/* the dropdown's item list in order (the spacebar cycle walks it too): the
-   open axis — states until sliced, then "All" and the seat types over it
-   (2026-11-08, user calls) */
-function statScopeOpts(m, st) {
-  // a sliced state's axis is taken, so the menu offers the OTHER one: "All"
-  // (the bare state), then the seat types over it (another state is picked on
-  // the strip instead)
-  if (sliceState(m)) return [["aus", "All"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
-  const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
-  return opts;
-}
-const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
-const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the dropdown's trigger names its job — until there's a pick: invites by the
-// state axis, then by the type axis over a sliced state; a pick names itself
-const statScopeTrigger = (m) => {
-  if (!sliceState(m)) return "Filter by state/territory";
-  const cls = poolParts(m).cls;
-  return cls ? statScopeLabel(m, { k: "cls", cls }) : "Filter by seat type";
+// the seats an "as it stands" frame holds that the election itself never
+// delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
+// and Pittwater (from the Liberals to the crossbench). The seats list is
+// what the note is about — a scoped figures view keeps it only while every
+// named seat sits inside the choice (Rural and NSW keep the One Nation
+// note; Inner-metro and Queensland don't)
+const NOW_AUS_DEK = {
+  now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
+  nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
+  qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
 };
-// what the chip row marks: the store's own class pick when it's expressible —
-// a class compounding a map-side state stays marked beside the map's own evidence
-const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
-function statScopeMenu(m, st) {
-  const slice = sliceState(m), clsPicked = slice ? poolParts(m).cls : null;
-  const picked = slice ? (clsPicked ? `cls:${clsPicked}` : "aus") : "aus";
-  // the dropdown is the figures filter in both picker lenses: the open axis —
-  // states until one's sliced, then the types over it — marked by the pick
-  const dropdown = () => `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(m))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${picked === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`).join("")}</span></span>`;
-  if (S.lens === "cls") {
-    const cur = statScopeVal(statScopeMenuCur(m));
-    // the dropdown goes above the seat-type labels' own toggle row (user call)
-    const chips = `<span class="lg-types st-typefilters" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-scope="${cur === `cls:${c}` ? "aus" : `cls:${c}`}" aria-pressed="${cur === `cls:${c}`}" title="${cur === `cls:${c}` ? "Clear" : "Filter by"} ${esc(statScopeLabel(m, { k: "cls", cls: c }))}"><i style="background:${css(TH.cls[k])}"></i>${esc(statScopeLabel(m, { k: "cls", cls: c }))}</button>` : "").join("")}</span>`;
-    return `<span class="st-clsmeta">${dropdown()}${chips}</span>`;
-  }
-  return dropdown();
-}
 function areaHedDek(m, st) {
-  const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
-  const where = aus ? "" : ` in ${STATE_NAME[st]}`;
-  const ofSeats = aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
+  // every lens reads the filtered pool: the state, narrowed to a seat type where one is on
+  const aus = st === "AUS", cls = clsFilter(m), { A, idx, N, cnt } = scopeArea(m, st);
+  const where = scopeWhere(m, st);
+  const ofSeats = cls ? `of the ${N}${where.replace(/^ in/, "")}` : aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
   const lead = A.tpp >= 50 ? "alp" : "lnp", leadPct = Math.max(A.tpp, 100 - A.tpp);
 
   const isNowM = isNowY(m.year);
-  // the seats an "as it stands" frame holds that the election itself never
-  // delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
-  // and Pittwater (from the Liberals to the crossbench). The seats list is
-  // what the note is about — a scoped figures view keeps it only while every
-  // named seat sits inside the choice (Rural and NSW keep the One Nation
-  // note; Inner-metro and Queensland don't)
-  const NOW_AUS_DEK = {
-    now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
-    nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
-    qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
-  };
   if (S.lens === "tpp" && axisNow(m) !== "AC") return axisHedDek(m, idx, where);
   // the cls lens tells its story with the Winner design from end to end
   // (2026-11-08, user call — its own class-tally story is retired)
@@ -9591,7 +9569,7 @@ function areaHedDek(m, st) {
         // On the federal Now frame that note sits under the Seats count it annotates
         // (in the head's Commissioner); on the other frames it keeps the dek's place
         let note = aus ? (NOW_AUS_DEK[m.year]?.t ?? "").trim() : "";
-        if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) note = `Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
+        if (!aus) { const inPool = new Set(idx), ch = (m.changes || []).filter((x) => inPool.has(m.byName.get(x.div))); if (ch.length) { const ns = [...new Set(ch.map((x) => x.div))].map((n) => ds(n)); note = `Since the election: ${ns.length > 2 ? `${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]}` : ns.join(" and ")} ${ns.length > 1 ? "have" : "has"} changed hands or party.`; } }
         if (aus) dek += NOW_AUS_DEK[m.year]?.t ?? "";
         else if (note) dek += ` ${note}`;
         const noteDef = aus && m.year === "now" && note ? NOW_AUS_DEK[m.year] : null;
@@ -9627,14 +9605,11 @@ function areaHedDek(m, st) {
       const nowScope = YEAR_JUR[m.year] ? (aus || st === stOfYear(m.year)) : (aus || st === "NSW");
       const hedWord = S.tppMode === "swing" ? (Math.abs(A.tppSw) < 0.05 ? `There was no two-party swing${where}` : `The two-party vote${where} swung ${pts(A.tppSw)} to ${A.tppSw >= 0 ? "Labor" : "the Coalition"}`) : `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
       if (!Number.isFinite(A.tpp)) return { hed: hedWord, dek: "" };
-      /* the two-party lens fronts the head's own figures block, like the
-         winner page's (user call 2026-11-09) — hed and dek give way to
-         "Two-party preferred (margin of M)" with the names, the government
-         tag and the swing line */
-      const fg = m.gov === "alp" || m.gov === "lnp" ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
-      const sep = `<span class="st-sep" aria-hidden="true"></span>`;
-      const stat = `<h3 class="st-stat" aria-label="${esc(hedWord)}.">${sep}${twoPartyFigures(`Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg)}${swingFigure(A.tppSw)}${sep}</h3>${isNowM && nowScope && NOW_TPP_NOTE[m.year] ? `<p class="st-note">${NOW_TPP_NOTE[m.year].trim()}</p>` : ""}`;
-      return { hed: hedWord, dek: "", stat };
+      /* the two-party lens reads the head's one figures block, like every
+         lens (its two-party row says what a headline would: user call
+         2026-11-09, the head's figures in place of hed and dek) — so no
+         finding line; an as-it-stands frame's basis note follows them */
+      return { hed: hedWord, dek: "", quiet: true, note: isNowM && nowScope && NOW_TPP_NOTE[m.year] ? NOW_TPP_NOTE[m.year].trim() : "" };
     }
     case "fp": {
       const P = S.party, name = legW(P);
@@ -9809,7 +9784,8 @@ function incFact(m, dm) {
 }
 const DEMO_EARLY = { hed: "Census figures start at the 1993 election", dek: "Census-linked people figures exist only from the 1993 election on: 1993 and 1996 blend the 1991 and 1996 censuses to election day, 1998 blends the 1996 and 2001 censuses, the 2001 election reads the 2001 census itself, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census." };
 function areaDemo(m, st, idx, where, isNowM) {
-  const k = S.index, A = m.areas[st];
+  // (a Seat type filter pools its own seats' census shares)
+  const k = S.index, A = clsFilter(m) ? { demo: demoOf(m, idx) } : m.areas[st];
   if (!A.demo) return DEMO_EARLY;
   const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
   const medAge = ageMed() ? m.ageCuts && m.ageCuts.medAge : null;
@@ -9944,11 +9920,10 @@ function vtBands(divs) {
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
 function vtScope(m, st) {
-  const parts = st === "AUS" ? poolParts(m) : { st: null, cls: null };
-  const sel = st !== "AUS" || !pickerLens() ? { k: st === "AUS" ? "aus" : "st", st } : parts.cls ? { k: "cls", cls: parts.cls } : statScopeOf(m);
-  // both axes on narrows the pool to their intersection
-  const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)) && (sel.k !== "cls" || !parts.st || d.st === parts.st));
-  const geography = sel.k === "cls" && parts.st ? `${CLS_LOWER[parts.cls]} seats in ${STATE_SHORT[parts.st]}` : sel.k === "cls" ? `${sel.cls.toLowerCase()} seats` : sel.k === "st" ? STATE_SHORT[sel.st] : "nationwide";
+  // the head's own pool: the area, narrowed by the seat-type filter where one is on
+  const cls = clsFilter(m), pst = st === "AUS" ? null : st;
+  const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));
+  const geography = cls && pst ? `${CLS_LOWER[cls]} seats in ${STATE_SHORT[pst]}` : cls ? `${CLS_LOWER[cls]} seats` : pst ? STATE_SHORT[pst] : "nationwide";
   return { divs, geography };
 }
 function vtBandsBlock(divs, area, geography) {
@@ -9982,35 +9957,46 @@ function vtBlock(divs, area, geography) {
 }
 
 function storyArea(m, st) {
-  const aus = st === "AUS", { A, idx, N } = areaStats(m, st);
-  // a filtered Winner head titles itself by the filter — the state's own name
-  // or the seat type's — with the election's year after a middot on election
-  // frames (user call: "New South Wales · 2025", "Inner metro · 2025"); the
-  // state slice's "All seats" rides its map selection, and upLink's sibling
-  // read above gives the seat type the same way out
-  const pick = aus && pickerLens() && !STATE_YEARS.has(m.year) ? statScopeOf(m) : { k: "aus" };
-  const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;
-  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
-  const { hed, dek, stat } = areaHedDek(m, st);
-  const title = pickTitle ? `${pickTitle}${isNowY(m.year) ? "" : ` · ${m.year}`}` : aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  // st is the area: the whole frame ("AUS") or the State filter's state; a
+  // Seat type filter narrows it to that type's seats (scopeArea)
+  const aus = st === "AUS", cls = clsFilter(m), { A, idx, N } = scopeArea(m, st);
+  const winnerish = S.lens === "winner" || S.lens === "cls";
+  const { hed, dek, stat, quiet, note } = areaHedDek(m, st);
+  /* the same head in every lens: a filtered view titles itself by the filter —
+     the seat type, else the state — with the election's year after a middot
+     on election frames (user call: "New South Wales · 2025", "Inner metro ·
+     2025"); the meta counts the seats behind the figures, naming the state
+     where a seat type narrows it ("New South Wales · 12 divisions") */
+  const filt = cls ? CLS_SHORT[cls] : aus ? null : STATE_TITLE[st];
+  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`);
   // never the date — the eyebrow line above the map already carries it
-  // the Winner head's meta is the scope menu (statScopeLabel words it), and
-  // its head follows whichever state or seat type is picked there
-  const meta = pickerLens() && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
-  let h = head(title, meta, hed, dek, stat);
+  const meta = `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${N} ${isNowY(m.year) ? (N === 1 ? "member" : "members") : seatNoun()}`;
+  /* the figures block is every lens's: the seats, the two-party count and the
+     primaries for the filtered pool. The Winner and Seat type lenses say no
+     more than their figures (a dek only where words carry what figures can't);
+     the two-party lens's figure is its finding; every other lens adds its
+     finding in a line of prose under them */
+  const figs = stat || seatStat(m, st, `${hed}.`, aus && m.year === "now" ? NOW_AUS_DEK.now : null);
+  let h = head(title, meta, winnerish || quiet ? "" : hed, quiet ? "" : dek, figs);
+  if (note) h += `<p class="st-note">${note}</p>`;
+  // a state election's two-party row counts only the classic pairs: say so under the figures
+  if (isState() && A.tpp != null) { const classicN = idx.filter((i) => m.divs[i].tpp != null).length; h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`; }
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
+  const scopeSmall = cls ? `, ${CLS_LOWER[cls]}${aus ? "" : ` in ${STATE_SHORT[st]}`}` : aus ? "" : `, ${STATE_SHORT[st]}`;
   // (under a chart the stage already draws the seats' spread, so the rail doesn't repeat it)
-  if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
-  // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
+  if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${scopeSmall}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
+  // the House: who holds the seats (the make-up itself; the head's seats row carries the counts)
   if (S.view !== "chamber") {
     // the chamber section's small names the filter it marks: the state's own
-    // members, or the seat type whose kind stays lit (and each kind its colour)
+    // members, or the seat type whose kind stays lit
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
-    const chamberMark = pickTitle ? (clsFilter(m) ? `${CLS_SHORT[clsFilter(m)].replace(" ", "-")} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
+    const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
-  if (isNowY(m.year) && aus) {
-    const ch = m.changes.slice().reverse();
+  // (a seat-type filter keeps the changes in its own seats)
+  const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
+  if (isNowY(m.year) && aus && chList.length) {
+    const ch = chList.slice().reverse();
     const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
     h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     // the federal Now's figures-basis qualifier leads its seats note in the
@@ -10018,17 +10004,9 @@ function storyArea(m, st) {
     // seat changes…", user call) — the state Now frames keep it here
     if (m.year !== "now") h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
-  // the two-party read — skipped on the Winner lens, whose head has already given the
-  // figures and swing in the head's own grid; every other lens still opens with the hero
-  if (!(pickerLens() && A.tpp != null)) {
-    const swp = swingPhrase(A.tppSw, prev);
-    const classicN = m.divs.filter((d) => d.tpp != null).length;
-    h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
-  }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;
-  const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
-  if (cast.length) h += vtBlock(cast, true, castScope?.geography);
+  const castScope = vtScope(m, st), cast = castScope.divs;
+  if (cast.length) h += vtBlock(cast, true, m.year === 2025 || m.year === "now" ? castScope.geography : undefined);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
@@ -10053,7 +10031,7 @@ function storyArea(m, st) {
 const prevFor = (m, d) => (isNowY(m.year) ? (d && d.by ? frameBaseY(m.year) : m.res.prev) : prevYearOf(m.year) ?? (m.res && m.res.prev));
 function seatHedDek(m, d) {
   const prev = prevFor(m, d);
-  const [, rn] = pairNames(d.win, d.run);
+  const [wn, rn] = pairNames(d.win, d.run);
   const wParty = theParty(d.win.ab, d.win.pn), rParty = partyName(d.run.ab, d.run.pn);
   const close = d.votesMargin < 1500 && d.margin < 1;
   switch (S.lens) {
@@ -10196,20 +10174,22 @@ function storyDiv(m, i) {
   const prev = prevFor(m, d);
   const { hed, dek } = seatHedDek(m, d);
   const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
-  let h = head(d.n, meta, hed, dek);
-  h += seatFinalStat(m, d);
+  // the seat's figures lead its card (the Final count, any notional two-party
+  // count, the primaries), and the lens's finding follows them in prose
+  let figs = seatFinalStat(m, d);
   /* the AEC's notional two-party count, where the final pair wasn't the
      majors: the same head-block idiom as the Final count (the name of the
      minority coalition partner comes through coalW on state frames) */
   if (d.tpp != null && !d.classic) {
     const coal = coalW(1).replace(/^The /, "");
     const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
   }
+  figs += seatPrimariesStat(m, d);
+  let h = head(d.n, meta, hed, dek, figs);
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  h += seatPrimariesStat(m, d);
   h += `<div class="st-sec"><h3>The candidates <small>by primary vote${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
@@ -10337,11 +10317,8 @@ function storyBooth(m, j) {
     else if (m.res.flOpv) { hed = flowSeat(D) ? `Preference flows aren’t counted by polling place` : `No preference split was counted in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s split is a district figure — read it on the district’s card. New South Wales re-counts ballots by district, not by polling place.` : `Its count didn’t finish Labor against ${vsW()}.`; }
     else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
   }
-  let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed, dek);
-  const loc = raw.location && raw.location[j];
-  if (loc) h += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
-  else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
-  if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
+  // the place's figures lead its card, as a seat's do; its notes follow the finding
+  let figs = "", after = "";
   /* the place's two-party swing rides its count block in the seats' figure
      form (no narrating sentence) — attached to whichever block the count
      belongs to, classical or notional */
@@ -10355,13 +10332,20 @@ function storyBooth(m, j) {
     // the seat outcome's tag hangs off the SEAT winner's figure — the party
     // that holds the seat needn't be the place's leader
     const tagSide = D.win.fam === lw.fam ? "st-fg-l" : "st-fg-r";
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg ${tagSide}"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg ${tagSide}"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
   }
   if (!Number.isNaN(b.tpp[j]) && !D.classic) {
     const coal = coalW(1).replace(/^The /, "");
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}${swingFigure(swingHere)}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}${swingFigure(swingHere)}</div></div>`;
   }
-  if (!Number.isNaN(b.tpp[j]) && swingHere == null) h += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
+  if (!Number.isNaN(b.tpp[j]) && swingHere == null) after += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
+  const loc = raw.location && raw.location[j];
+  if (loc) after += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
+  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
+  if (!tc) after += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
+  // (a place with no count of its own has no finding: its name is already its title)
+  let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed === ds(b.name[j]) ? "" : hed, dek, figs);
+  h += after;
   const cands = D.c.map((c, k) => ({ ...c, v: raw.v[j][k], el: false }));
   const pf = raw.prevFp ? raw.prevFp[j] : null;
   const moved = movedTo(m, D);
@@ -10411,9 +10395,9 @@ function renderStory(force) {
   // the polling-place story outfits its own separator family; CSS scoping
   // below reads this instead of inferring from the lens
   el.dataset.view = s.level;
-  // a Winner-lens state slice renders the whole-frame layout (route "AUS"):
-  // the menu, the sections, the head — storyArea names the state's head title
-  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st)) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
+  // a state (the State filter, which is the map's state selection) is the
+  // area every lens's head pools, narrowed by the Seat type filter
+  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
   anchorGovtTag(el);
   // a second pass after the frame settles: chip width can grow a few px once
   // Commissioner lands, which is what makes the first-read clamp stale
@@ -10460,12 +10444,13 @@ function passes(m, i, skipRange) {
   if (!skipRange && S.f.range && S.f.range.unit === "seats" && !inRange(seatColValue(m, d, S.f.range.key), S.f.range)) return false;
   return true;
 }
-function filterWords(m) {
+// (listOnly: the List view's own filters alone — the State and Seat type rows name themselves)
+function filterWords(m, listOnly) {
   const w = [];
   if (S.f.margin) w.push(MARGINS[S.f.margin][2].split(",")[0].toLowerCase());
-  if (S.f.cls) w.push(CLS_SHORT[S.f.cls].toLowerCase());
+  if (S.f.cls && !listOnly) w.push(CLS_SHORT[S.f.cls].toLowerCase());
   if (S.f.win) w.push(`held by ${FAM_PL[S.f.win]}`);
-  if (S.f.st) w.push(STATE_SHORT[S.f.st]);
+  if (S.f.st && !listOnly) w.push(STATE_SHORT[S.f.st]);
   if (S.f.range) { const c = colByKey(m, S.f.range.unit, S.f.range.key); if (c) w.push(`${c.short || c.label} ${rangeText(S.f.range, c)}`); }
   return w;
 }
@@ -10759,9 +10744,8 @@ function renderList(keepScroll) {
   let bar = `<div class="ls-unit" role="tablist" aria-label="Rows"><button type="button" class="rd-tab" role="tab" data-unit="seats" aria-selected="${unit === "seats"}"><span class="tw" data-t="Seats">Seats</span></button><button type="button" class="rd-tab" role="tab" data-unit="booths" aria-selected="${unit === "booths"}"><span class="tw" data-t="Polling places">Polling places</span></button></div>`;
   if (unit === "booths" && sd != null) bar += `<button type="button" class="ls-chip" data-unseat title="Show every polling place">In ${ds(m.divs[sd].n)} ✕</button>`;
   else {
-    bar += sel("State", "st", STATES.map((s) => [s, STATE_TITLE[s]]), S.f.st);
+    // (State and Seat type are the page's own filter rows above, shared with the map and chamber)
     bar += sel(isNowY(m.year) ? "Held by" : "Won by", "win", ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"].filter((f) => m.divs.some((d) => holdFam(d.hold) === f)).map((f) => [f, famLeg(f)]), S.f.win);
-    bar += sel("Seat type", "cls", CLS.map((c) => [c, CLS_SHORT[c]]), S.f.cls);
     bar += sel("Margin", "margin", Object.entries(MARGINS).map(([k, v]) => [k, v[2]]), S.f.margin);
   }
   if (S.f.range) { const c = colByKey(m, S.f.range.unit, S.f.range.key); if (c) bar += `<button type="button" class="ls-chip" data-unrange title="Clear this range">${esc(c.short || c.label)} ${esc(rangeText(S.f.range, c))} ✕</button>`; }
@@ -10932,24 +10916,48 @@ function renderLegend() {
   if (!m) { el.hidden = true; return; }
   el.hidden = false;
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
-  const search = el.querySelector(".mp-search");
+  const search = SEARCH_EL;
   const searching = search && search.contains(document.activeElement);
   const basing = el.querySelector(".lg-bmenu")?.contains(document.activeElement);
-  if (search) search.remove();
+  if (search && el.contains(search)) search.remove();
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   const basis = el.querySelector(".lg-basis");
-  if (search && basis) {
+  if (basis) {
     const toolbar = document.createElement("div");
     toolbar.className = "lg-toolbar";
     basis.before(toolbar);
-    toolbar.append(basis, search);
-    if (searching) $("#q").focus({ preventScroll: true });
-    fitSearchPlaceholder();
+    toolbar.append(basis);
   }
+  placeSearch();
+  if (searching) $("#q").focus({ preventScroll: true });
+  fitSearchPlaceholder();
   if (basing) el.querySelector("[data-basis-trigger]")?.focus({ preventScroll: true });
   renderJumpSel();
   el.style.minHeight = "";
+  // (the hint line is born empty: fill it now, or the strip shrinks a line and grows back, moving the map)
+  updateHint();
 }
+/* where the search field sits: on a laptop it shares the control panel's Base
+   row; on a phone, where the panel falls below the map, it stands atop the map
+   instead (a search is how a phone reader finds their seat first). Full screen
+   takes it back into the panel, which its plate carries. */
+const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px)") : { matches: false };
+// (held here: the strip's rebuild lifts the field out of the page for a moment)
+const SEARCH_EL = $(".mp-search");
+function placeSearch() {
+  const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
+  if (!sx || !stage || !el) return;
+  if (phoneMQ.matches && !FS.on) {
+    sx.classList.add("mp-search-top");
+    if (sx.nextElementSibling !== stage) stage.before(sx);
+    return;
+  }
+  sx.classList.remove("mp-search-top");
+  const tb = el.querySelector(".lg-toolbar");
+  if (tb) { if (sx.parentElement !== tb) tb.append(sx); }
+  else if (sx.parentElement !== el) el.prepend(sx);
+}
+if (phoneMQ.addEventListener) phoneMQ.addEventListener("change", () => { placeSearch(); fitSearchPlaceholder(); });
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
    through the years never moves the figure (the stage below it on a wide screen, the
    timeline below it on a phone); switching lens or flip re-holds it once, which reads
@@ -10961,7 +10969,7 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && pickerLens()) renderStory(true); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M()) renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
@@ -11281,6 +11289,8 @@ function legendHTML(m) {
       break;
     }
   }
+  // the two filters, State and Seat type, in every view (map, chamber, list)
+  h += filterHTML(m);
   // in the chamber, a year with a seating plan can show the members where they sit or sorted by the lens
   if (S.view === "chamber" && m.seating) {
     const md = seatMode(m);
@@ -11428,22 +11438,46 @@ function renderTimeline() {
   if (FS.on) fsRail();
 }
 
-/* States filter the map in their own row; cities are independent jump targets. */
+/* The page's two filters, one row each, the same in every view and every lens:
+   State (the map's state selection: it frames the map on that state) and Seat
+   type (the AEC's classes: the seats outside it dim wherever they're drawn).
+   Each has its own "All"; on together they intersect, and the head's figures,
+   the chambers and the list all read the same pair. A state election has one
+   state and no seat types, so neither row shows there; an election before the
+   AEC classed its seats has no Seat type row. On the Seat type lens the type
+   chips carry the lens's colours, so the row is its key as well. */
+function filterHTML(m) {
+  if (!m || STATE_YEARS.has(m.year)) return "";
+  const st = S.f.st || "", cls = S.f.cls || "";
+  // (each label wears its bold twin, so a pressed chip never shoves its row along)
+  const chip = (attr, v, on, label, sw) => `<button type="button" ${attr}="${v}" aria-pressed="${on}">${sw || ""}<span class="tw" data-t="${label}">${label}</span></button>`;
+  const states = `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
+  const kinds = CLS.map((c, k) => [c, k]).filter(([c]) => m.divs.some((d) => d.cls === c));
+  const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
+  return states + types;
+}
+/* the City-names toggle: both its words stand in the one box (the shown one
+   on top), each at its bold width, so flipping it moves nothing — not the
+   row, not the strip, so never the map under it */
+function townsToggleHTML(on) {
+  const w = (t, show) => `<span class="lg-jt-w"${show ? "" : ' aria-hidden="true"'}><span class="tw" data-t="${t}">${t}</span></span>`;
+  return `<button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${w("Hide city names", on)}${w("Show city names", !on)}</button>`;
+}
+/* the map's Jump-to row: cities are jump targets, independent of the filters */
 function jumpHTML() {
   const j = stOfYear(S.year), on = !S.townsOff;
-  const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${on ? "Hide city names" : "Show city names"}</button></div>`;
-  const states = j ? "" : `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>Filter</b>${CITIES.map(([, st]) => `<button type="button" data-state="${st}" aria-pressed="${S.sel.level === "state" && S.sel.st === st}">${STATE_ABBR[st] || st}</button>`).join("")}</div>`;
+  const toggle = `<span class="lg-jgap"></span>${townsToggleHTML(on)}</div>`;
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
-  return `${states}<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
+  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
 }
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
-  const on = S.sel.level === "state" ? S.sel.st : null;
   const cit = $("#cities");
   // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
   // re-fixed here because renderLegend re-creates it on every render
   if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
-  $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === on)));
+  $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
+  $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
 }
 
@@ -11496,15 +11530,15 @@ let clsLensShelved = false;
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
-  // a Winner-lens state slice is one pick shared with the head's figures
-  // menu: a state arrived at any side writes the menu's store, and the whole
-  // frame again ("All seats") clears it back
+  /* the State filter IS the map's state selection: a state arrived at any
+     side (its chip, search, a seat's way up) turns it on, the whole frame
+     again turns it off, and a seat chosen outside it lets it go. The Seat
+     type filter rides on independently of the selection — the pair compounds */
   const sm = M();
-  if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
-    // a class filter survives the map side's state move — the pair compounds
-    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
-    // "All seats" leaves the state's slice alone; a class pick rides on independently of it
-    else if (sel.level === "aus" && (S.lens !== "cls" || statScopeStore.k !== "cls")) statScopeStore = { k: "aus", open: statScopeStore.open };
+  if (sm && !STATE_YEARS.has(sm.year)) {
+    if (sel.level === "state") S.f.st = sel.st;
+    else if (sel.level === "aus") S.f.st = null;
+    else if (S.f.st && sel.st !== S.f.st) S.f.st = null;
   }
   if (!opts.keepTown) townPick = -1;
   reframe = null; // (a town's or city's flight sets its own again, after this)
@@ -11538,35 +11572,15 @@ const goDiv = (i, o) => { const m = M(); select({ level: "div", st: m.divs[i].st
 const goBooth = (j, o) => { const m = M(); const i = m.booth.d[j]; select({ level: "booth", st: m.divs[i].st, div: i, booth: j }, o); };
 function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else if (s.level === "div") goState(s.st); else if (s.level === "state") goAus(); }
 
-function setStatScope(sel) {
-  const m = M(); if (!m) return;
-  // a state named in the menu is selected on the map too — the slice is the
-  // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
-  // state selection instead of clearing it; anything else steps the state out.
-  if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  // "All" (aus) inside a sliced view lets the type go alone — the state
-  // always stays, whether or not a type was on
-  if (sel.k === "aus" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
-  if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
-  statScopeStore = sel;
-  renderStory(true);
-}
-// armed once a scope-menu choice has been made (item picked, or the menu shut
-// by its label): the spacebar then steps through the menu's views in order
-let scopeSpace = false;
-function cycleStatScope(step) {
-  const m = M(); if (!m) return;
-  const opts = statScopeOpts(m, "AUS").map((o) => o[0]);
-  if (!opts.length) return;
-  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeMenuCur(m))) + step + opts.length) % opts.length]));
-}
-
+/* the pill over the map names the List view's own filters (who holds a seat,
+   its margin, a column's range) once they're carried onto the map; the State
+   and Seat type filters show on their own rows above the map instead */
 function renderFilterPill() {
   const el = $("#filterpill"), m = M();
-  const on = filtersOn() || (S.f.range && S.f.range.unit === "booths");
+  const on = !!(S.f.win || S.f.margin || S.f.range);
   if (!on || S.view === "list" || !m) { el.hidden = true; return; }
   const n = m.divs.filter((d) => passes(m, d.i)).length;
-  const w = filterWords(m);
+  const w = filterWords(m, true);
   el.innerHTML = `<span>${S.f.range && S.f.range.unit === "booths" ? "Places" : `<b>${n}</b> ${plural(n, "seat")}`}: ${esc(w.join(" · "))}</span><button type="button" data-clear>Clear</button>`;
   el.hidden = false;
 }
@@ -11726,14 +11740,7 @@ function setLens(id) {
   const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
   clsLensShelved = false; // an explicit pick drops the cls lens's shelf
-  // a seat-type pick belongs to its own lens — anywhere else it's set aside
-  if (id !== "cls" && statScopeStore.k === "cls") statScopeStore = { k: "aus", open: statScopeStore.open };
-  // the slice follows its lens: a state the figures menu had under Winner
-  // re-selects on the map when the lens comes back to it
-  if (id === "winner" && S.sel.level === "aus" && statScopeStore.k === "st" && !STATE_YEARS.has(S.year)) {
-    const mm = M();
-    if (mm && mm.areas[statScopeStore.st] && mm.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
-  }
+  // (the State and Seat type filters belong to no lens: they stay as they are)
   if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
@@ -11858,12 +11865,14 @@ async function setYear(y) {
   if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
   // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole frame
   if (S.sel.level === "state" && !b.areas[S.sel.st]) S.sel = { level: "aus" };
-  // …and the slice's other side catches up: a state kept on the new frame
-  // re-stamps the menu's store, a pick the frame can't select waits in the
-  // store, and it selects again on a frame that has it
-  if (S.lens === "winner" && !STATE_YEARS.has(y)) {
-    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
-    else if (S.sel.level === "aus" && statScopeStore.k === "st" && b.areas[statScopeStore.st] && b.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
+  // …and the filters follow the frame: a state election has one state and no
+  // AEC seat types, so both stand aside there; a federal frame keeps the
+  // State filter while its state is still the selection, and a seat type it has
+  if (STATE_YEARS.has(y)) { S.f.st = null; S.f.cls = null; }
+  else {
+    if (S.sel.level === "state") S.f.st = S.sel.st;
+    else if (S.sel.level === "aus") S.f.st = null;
+    if (S.f.cls && !b.divs.some((d) => d.cls === S.f.cls)) S.f.cls = null;
   }
   const hold = walkHold(spot);
   startChamberGlide();
@@ -12009,6 +12018,8 @@ function holdEyebrow() {
   eb.style.minHeight = ebHeights.get(at) + "px";
 }
 addEventListener("resize", holdEyebrow);
+// (the meta line ellipses where the eyebrow is tight: its whole words ride its title)
+{ const mt = $("#mp-meta"); if (mt) new MutationObserver(() => { if (mt.title !== mt.textContent) mt.title = mt.textContent; }).observe(mt, { childList: true, characterData: true, subtree: true }); }
 addEventListener("resize", fitSearchPlaceholder);
 addEventListener("resize", lensOverflow);
 
@@ -12136,6 +12147,8 @@ function writeURL() {
     if (s.isl) p.set("at", s.isl);
   }
   if (FS.on) p.set("fs", "1");
+  // the retro view rides the link too, so a shared one opens in it (app-8-retro.js)
+  if (typeof rtIsOn === "function" && rtIsOn()) p.set("retro", "1");
   const h = p.toString();
   try { history.replaceState(FS.on ? { mpFs: 1 } : null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
 }
@@ -12276,10 +12289,7 @@ function closeBaseMenu() {
 function openBaseMenu() {
   const menu = $("#base-menu"), trigger = $("[data-basis-trigger]");
   if (!menu || !trigger) return;
-  $$(".st-scwrap .st-scm").forEach((m) => { m.hidden = true; });
-  $$("[data-scope-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
   closePanelMenus();
-  scopeSpace = false;
   menu.hidden = false; trigger.setAttribute("aria-expanded", "true");
   (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button"))?.focus();
 }
@@ -12310,46 +12320,44 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".lg-bmenu")) { closeBaseMenu(); closePanelMenus(); }
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
-  const scT = e.target.closest("[data-scope-trigger]");
-  if (scT) {
-    const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
-    $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
-    $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
-    if (!was) {
-      pop.hidden = false; scT.setAttribute("aria-expanded", "true");
-      // a tall menu on a small screen must not fall below it: clamp to the
-      // room left under the trigger (it scrolls once clamped, page.css)
-      pop.style.maxHeight = "";
-      const r = pop.getBoundingClientRect(), room = innerHeight - 12;
-      if (r.bottom > room) pop.style.maxHeight = `${Math.max(168, r.height - (r.bottom - room))}px`;
-    }
-    scopeSpace = was;
-    return;
-  }
-  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); scopeSpace = false; }
-  const scO = e.target.closest("[data-scope]");
-  if (scO) {
-    scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope));
-    // a pick from the open menu can sit two screens below the head: put the
-    // eyes back on the fresh trigger rather than leaving them mid-page
-    const trig = $("#story [data-scope-trigger]");
-    if (trig) { trig.focus({ preventScroll: true }); trig.scrollIntoView({ block: "nearest" }); }
-    return;
-  }
+  /* the State row: a state frames the map on it (the selection is the
+     filter); "All", or the state again, lets it go — back to the whole frame
+     from the state's own view, or simply unfiltered while a seat is open */
   const stj = e.target.closest("[data-state]");
-  if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
+  if (stj) {
+    const st = stj.dataset.state || null;
+    if (st && S.f.st !== st) goState(st);
+    else if (S.sel.level === "state") goAus();
+    else if (S.f.st) { S.f.st = null; filtersChanged(); }
+    return;
+  }
+  // the Seat type row: a type dims the rest wherever seats are drawn and pools the head's figures
+  const clj = e.target.closest("[data-cls]");
+  if (clj) {
+    const c = clj.dataset.cls || null;
+    S.f.cls = c && S.f.cls !== c ? c : null;
+    filtersChanged();
+    return;
+  }
   const fj = e.target.closest("[data-fjump]");
   if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
   const tn = e.target.closest("[data-towns]");
   // the Jump-to row's city-names toggle: the map stops (restart) painting town names
-  if (tn) { S.townsOff = !S.townsOff; renderLegend(); schedule(); return; }
+  // (flipped in place — rebuilding the strip for one word re-laid it, and the map under it jolted)
+  if (tn) {
+    S.townsOff = !S.townsOff;
+    const on = !S.townsOff, [hide, show] = tn.querySelectorAll(".lg-jt-w");
+    tn.setAttribute("aria-pressed", String(on));
+    if (hide && show) { (on ? show : hide).setAttribute("aria-hidden", "true"); (on ? hide : show).removeAttribute("aria-hidden"); }
+    schedule(); return;
+  }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
   if (t.dataset.go != null) {
     const [k, ...rest] = t.dataset.go.split(":"); const v = rest.join(":");
-    if (k === "aus") goAus(); else if (k === "state") goState(v); else if (k === "div") goDiv(+v, { fly: S.view === "map" }); else if (k === "booth") goBooth(+v, { view: S.view === "chamber" ? "map" : undefined });
+    if (k === "aus") { if (v === "all" && S.f.cls) { S.f.cls = null; if (S.sel.level === "aus") { filtersChanged(); return; } } goAus(); } else if (k === "state") goState(v); else if (k === "div") goDiv(+v, { fly: S.view === "map" }); else if (k === "booth") goBooth(+v, { view: S.view === "chamber" ? "map" : undefined });
     else if (k === "divname") { const i = m.byName.get(v); if (i != null) goDiv(i, { fly: S.view === "map" }); }
     return;
   }
@@ -12373,7 +12381,7 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-listbooths")) { S.listUnit = "booths"; S.sort = null; if (S.f.range && S.f.range.unit !== "booths") S.f.range = null; setView("list"); return; }
   if (t.hasAttribute("data-showmap")) { setView("map"); fitSelection(700); return; }
   if (t.hasAttribute("data-more")) { $$("[data-extra]", t.parentElement).forEach((r) => (r.hidden = false)); t.remove(); return; }
-  if (t.hasAttribute("data-clear")) { S.f = { st: null, cls: null, win: null, margin: null, range: null }; filtersChanged(); return; }
+  if (t.hasAttribute("data-clear")) { S.f = { ...S.f, win: null, margin: null, range: null }; filtersChanged(); return; }
 });
 document.addEventListener("change", (e) => {
   const t = e.target;
@@ -12420,19 +12428,11 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") {
-    const open = $(".st-scm:not([hidden])");
-    if (open) { open.hidden = true; $(".st-scwrap [data-scope-trigger]")?.setAttribute("aria-expanded", "false"); return; }
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
   }
-  // the spacebar steps the figures menu along once a choice has been made there
   // A focused chart toggle keeps its native keyboard activation.
   if (e.key === " " && e.target.closest("[data-vt-mode]")) return;
-  if (e.key === " " && scopeSpace) {
-    const wrap = $(".st-scwrap");
-    if (!wrap || !wrap.querySelector(".st-scm").hidden) { scopeSpace = false; return; }
-    e.preventDefault(); cycleStatScope(e.shiftKey ? -1 : 1); return;
-  }
   if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
   if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
@@ -12755,6 +12755,8 @@ function fsEnter(o = {}) {
   el.prepend(stage);
   fsPark($("#lenses"), FS.lensbar);
   fsPark($(".mp-views"), FS.vslot);
+  // (a phone's search stands atop the map in the page: the panel's plate takes it back)
+  FS.on = true; placeSearch(); FS.on = false;
   fsPark($("#legend"), FS.lslot);
   fsPark($("#story"), FS.scroll);
   FS.meta.textContent = $("#mp-meta").textContent;
@@ -12878,7 +12880,7 @@ async function fsExit(o = {}) {
   if (FS.pushed && !o.fromHistory) { FS.pushed = false; FS.skipPop = true; try { history.back(); } catch (e) { FS.skipPop = false; } }
   FS.pushed = false;
   writeURL();
-  const b = $("#zfs");
+  const b = $("#fsgo");
   if (b && !b.closest("[hidden]")) b.focus({ preventScroll: true });
 }
 
@@ -13164,7 +13166,6 @@ function fsToastOff() {
 }
 
 /* ----- the ways in and out ----- */
-$("#zfs").addEventListener("click", () => fsEnter());
 $("#fsgo").addEventListener("click", () => fsEnter());
 document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,select,textarea");
@@ -13189,5 +13190,196 @@ addEventListener("popstate", (e) => {
 });
 // a phone turned (or a window dragged) across the wide layout's edge re-seats the plates
 PHONE.addEventListener("change", () => { if (!FS.on) return; fsLayout(); renderLegend(); fsMeasure(true); resize(); fsRail(); fsPlate(); });
+
+/* =============================== the retro view ===============================
+   The page itself as a website from about 2000 (retro.css draws it): a navy
+   banner with the flag, the title and Parliament House, the site's pages as
+   links along its top, tab buttons for the views, and the old system face
+   for every control — bevelled grey buttons, sunken white fields, navy
+   caption bars over the panels. No pretend browser or desktop around it. The
+   page's own elements are restyled, never rebuilt, so every control keeps
+   working; this part adds only the banner and the tab row (hidden outside
+   the view), with "Modern view" at the row's end for the way back.
+   The choice persists in this browser (localStorage), and the hash carries
+   retro=1 so a shared link opens in it; an inline script in the page's head
+   sets the class before the first paint. The canvases take a flat palette
+   (retroTheme, read by readTheme), and the look stays light whatever the
+   device's theme, as the era's did. */
+const RT_KEY = "auspol.map.retro";
+// (a function, so code anywhere in the closure can ask before this part has run)
+function rtIsOn() { return typeof document !== "undefined" && document.documentElement.classList.contains("mp-retro"); }
+/* the canvases' flat palette: the page's paper for the sea and the ground
+   (no atlas sea, no graticule: their inks are the paper's), black lines and
+   lettering; the party colours are the map's own */
+function retroTheme(T) {
+  T.bg = [236, 233, 226]; T.surface = [255, 255, 255];
+  T.sea = [229, 226, 218]; T.seaLine = T.sea; T.seaMark = T.sea; T.seaInk = T.sea;
+  T.nodata = [218, 215, 207]; T.mid = [204, 200, 192]; T.hatch = [160, 156, 148];
+  T.coast = [70, 70, 70]; T.state = [0, 0, 0];
+  T.ink = [0, 0, 0]; T.ink2 = [32, 32, 32]; T.ink3 = [64, 64, 64]; T.faint = [128, 128, 128];
+  T.line = [160, 160, 160]; T.line2 = [190, 190, 190];
+  T.floor = [214, 226, 212];
+  return T;
+}
+const RT = { built: false, drop: null, dropFor: null };
+const RT_ICON = {
+  fs: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`,
+  modern: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9"/><path d="M2.4 2.2v2.6h2.6"/></svg>`,
+  shade: `<svg width="9" height="9" viewBox="0 0 9 9" aria-hidden="true"><path d="M1 6.5h7" stroke="#000" stroke-width="1.8"/></svg>`,
+  unshade: `<svg width="9" height="9" viewBox="0 0 9 9" aria-hidden="true"><path d="M1 1.5h7v6H1z M1 2.5h7" fill="none" stroke="#000" stroke-width="1.2"/></svg>`,
+  dd: `<svg width="7" height="4" viewBox="0 0 7 4" aria-hidden="true"><path d="M0 0h7L3.5 4z" fill="currentColor"/></svg>`,
+};
+// a star of n points about (cx, cy), outer radius r, inner ratio k
+const rtStar = (cx, cy, r, n = 7, k = 0.44) => {
+  const pts = [];
+  for (let i = 0; i < 2 * n; i++) { const a = -Math.PI / 2 + (i * Math.PI) / n, rr = i % 2 ? r * k : r; pts.push(`${(cx + rr * Math.cos(a)).toFixed(2)},${(cy + rr * Math.sin(a)).toFixed(2)}`); }
+  return `<polygon points="${pts.join(" ")}" fill="#fff"/>`;
+};
+// the flag, drawn flat at 2:1: the Union Jack in the canton, the Commonwealth Star under it, the Southern Cross on the fly
+function rtFlagSVG() {
+  const uj = `<g><rect width="30" height="15" fill="#00247d"/><path d="M0 0l30 15M30 0L0 15" stroke="#fff" stroke-width="3"/><path d="M0 0l30 15M30 0L0 15" stroke="#cf142b" stroke-width="1"/><path d="M15 0v15M0 7.5h30" stroke="#fff" stroke-width="5"/><path d="M15 0v15M0 7.5h30" stroke="#cf142b" stroke-width="3"/></g>`;
+  return `<svg class="rt-flag" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="30" fill="#00247d"/>${uj}${rtStar(15, 22.5, 4.2)}${rtStar(45, 25.2, 2.3)}${rtStar(37.6, 14.4, 2.3)}${rtStar(45, 5, 2.3)}${rtStar(51.4, 12.5, 2.1)}${rtStar(48, 17.4, 1.2, 5, 0.42)}</svg>`;
+}
+// Parliament House, from the front: the long low house, its curved walls into the hill, the four-legged flagmast
+function rtHouseSVG() {
+  return `<svg class="rt-house" viewBox="0 0 210 58" aria-hidden="true"><g fill="none" stroke="#cfe0ff" stroke-width="1.1" stroke-linecap="round" opacity=".85">
+    <path d="M6 56 Q40 44 70 41 L140 41 Q170 44 204 56" />
+    <path d="M70 41 V36 H140 V41 M74 36 V41 M80 36 V41 M86 36 V41 M92 36 V41 M98 36 V41 M112 36 V41 M118 36 V41 M124 36 V41 M130 36 V41 M136 36 V41" />
+    <path d="M100 36 V30 H110 V36" /><path d="M66 36 H144" />
+    <path d="M90 41 L105 2 L120 41 M96 41 L105 2 L114 41" stroke-width=".9"/>
+    <path d="M98.6 19 H111.4 M95.4 28 H114.6" stroke-width=".7"/></g>
+    <path d="M105.6 2.4 h10 v6 h-10z" fill="#00247d" stroke="#cfe0ff" stroke-width=".6"/><path d="M105.6 2.4 h4 v3 h-4z" fill="#cf142b" opacity=".85"/></svg>`;
+}
+// the site's pages, read off the shell's own tabs and More menu (so they never drift from it)
+function rtPages() {
+  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: a.getAttribute("href") }));
+  const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === a.getAttribute("href"))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: a.getAttribute("href"), on: a.dataset.id === "map" }));
+  return { tabs, more };
+}
+
+/* ----- building the banner and the tab row (once; retro.css hides them outside the view) ----- */
+function rtBuild() {
+  if (RT.built) return;
+  const sec = $(".mp-sec"), eb = $(".mp-sec > .rd-eyebrow");
+  if (!sec || !eb) return;
+  RT.built = true;
+  const { tabs: pages } = rtPages();
+  const top = document.createElement("div");
+  top.className = "rt-top rt-only";
+  top.innerHTML = `<nav class="rt-nav" aria-label="Site"><a class="rt-site" href="/">auspol tracker</a><span class="rt-navgap"></span>${pages.map((p) => `<a href="${esc(p.href)}">${esc(p.label)}</a>`).join("")}<button type="button" class="rt-more" aria-haspopup="menu" aria-expanded="false">More pages ${RT_ICON.dd}</button></nav>
+    <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${rtFlagSVG()}</a><div class="rt-bcol"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></div>${rtHouseSVG()}</div>
+    <div class="rt-tabs" role="tablist" aria-label="View"></div>`;
+  eb.before(top);
+  // the view tabs: proxies for the eyebrow's switch (it parks in full screen's plate), full screen, and the way back
+  const row = top.querySelector(".rt-tabs");
+  for (const b of $$(".mp-views [data-view]")) {
+    const t = document.createElement("button");
+    t.type = "button"; t.setAttribute("role", "tab"); t.dataset.rtView = b.dataset.view;
+    t.innerHTML = `${b.querySelector("svg") ? b.querySelector("svg").outerHTML : ""}<span class="rt-tl">${esc(b.textContent.trim())}</span>`;
+    row.append(t);
+  }
+  row.insertAdjacentHTML("beforeend", `<button type="button" data-rt-do="fs" title="Full screen (F)">${RT_ICON.fs}<span class="rt-tl">Full screen</span></button><button type="button" class="rt-modern" data-rt-do="modern" title="Back to the modern look">${RT_ICON.modern}<span class="rt-tl">Modern view</span></button>`);
+  const drop = document.createElement("div");
+  drop.className = "rt-drop"; drop.hidden = true; drop.setAttribute("role", "menu"); drop.setAttribute("aria-label", "More pages");
+  document.body.append(drop);
+  RT.drop = drop;
+  // the meta line mirrors into the banner; the view switch's choice into the tabs
+  const meta = $("#mp-meta");
+  if (meta) new MutationObserver(() => rtSync()).observe(meta, { childList: true, characterData: true, subtree: true });
+  const mv = $(".mp-views");
+  if (mv) new MutationObserver(() => rtSync()).observe(mv, { attributes: true, subtree: true, attributeFilter: ["aria-selected"] });
+  // the left panel's caption keeps its shade button through every story render
+  const story = $("#story");
+  if (story) new MutationObserver(() => rtShadeBtn()).observe(story, { childList: true });
+}
+// the panel caption's little button rolls the panel up to its caption, as the old panels did
+function rtShadeBtn() {
+  if (!rtIsOn()) return;
+  const h = $("#story .st-head h2");
+  if (!h || h.querySelector(".rt-shade")) return;
+  const shut = $("#story").classList.contains("rt-shut");
+  h.insertAdjacentHTML("beforeend", `<button type="button" class="rt-shade" data-rt-do="shade" aria-expanded="${!shut}" aria-label="${shut ? "Open" : "Roll up"} the panel" title="${shut ? "Open" : "Roll up"} the panel">${shut ? RT_ICON.unshade : RT_ICON.shade}</button>`);
+}
+function rtSync() {
+  if (!RT.built) return;
+  const meta = $("#mp-meta"), bm = $(".rt-bmeta");
+  if (meta && bm && bm.textContent !== meta.textContent) bm.textContent = meta.textContent;
+  for (const t of $$(".rt-tabs [data-rt-view]")) t.setAttribute("aria-selected", String(S.view === t.dataset.rtView));
+  rtShadeBtn();
+}
+
+/* ----- the More pages menu ----- */
+function rtOpenMore(anchor) {
+  if (!RT.drop) return;
+  if (RT.dropFor === anchor && !RT.drop.hidden) { rtCloseMenu(); return; }
+  const { more } = rtPages(), d = RT.drop;
+  d.innerHTML = more.map((p) => `<a role="menuitem" href="${esc(p.href)}" tabindex="-1"${p.on ? ' aria-current="page"' : ""}><span class="rt-ck">${p.on ? "✓" : ""}</span><span>${esc(p.label)}</span></a>`).join("");
+  RT.dropFor = anchor; d.hidden = false;
+  const r = anchor.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight;
+  d.style.left = `${Math.max(2, Math.min(r.right - w, innerWidth - w - 2))}px`;
+  d.style.top = `${Math.min(r.bottom + 2, innerHeight - h - 2)}px`;
+  anchor.setAttribute("aria-expanded", "true");
+  d.querySelector("a")?.focus({ preventScroll: true });
+}
+function rtCloseMenu() {
+  if (!RT.drop || RT.drop.hidden) return;
+  RT.drop.hidden = true;
+  if (RT.dropFor) RT.dropFor.setAttribute("aria-expanded", "false");
+  RT.dropFor = null;
+}
+
+function rtSet(on, o = {}) {
+  if (on) rtBuild();
+  document.documentElement.classList.toggle("mp-retro", on);
+  const sw = $("#retrogo"); if (sw) sw.setAttribute("aria-pressed", String(on));
+  if (o.persist !== false) { try { if (on) localStorage.setItem(RT_KEY, "1"); else localStorage.removeItem(RT_KEY); } catch (e) {} }
+  if (!on) { rtCloseMenu(); const s = $("#story"); if (s) s.classList.remove("rt-shut"); }
+  rtSync();
+  if (o.boot) return;
+  // the look's palette and type change every measure: the canvases, the strip, the eyebrow and the stage re-read it
+  if (TH) themeChanged();
+  ebHeights.clear(); holdEyebrow();
+  renderLegend(); renderTimeline(); fitSearchPlaceholder(); lensOverflow(); resize(); writeURL(); schedule();
+  const w = $(".mp-sec"); if (w && w.getBoundingClientRect().top < 0) w.scrollIntoView({ block: "start" });
+  (on ? $(".rt-modern") : $("#retrogo"))?.focus({ preventScroll: true });
+}
+
+/* ----- wiring ----- */
+$("#retrogo")?.addEventListener("click", () => rtSet(!rtIsOn()));
+document.addEventListener("click", (e) => {
+  if (!rtIsOn()) return;
+  const more = e.target.closest(".rt-more");
+  if (more) { rtOpenMore(more); return; }
+  if (RT.drop && !RT.drop.hidden && !e.target.closest(".rt-drop")) rtCloseMenu();
+  const v = e.target.closest("[data-rt-view]");
+  if (v) { setView(v.dataset.rtView); return; }
+  const d = e.target.closest("[data-rt-do]");
+  if (!d) return;
+  if (d.dataset.rtDo === "fs") fsEnter();
+  else if (d.dataset.rtDo === "modern") rtSet(false);
+  else if (d.dataset.rtDo === "shade") {
+    const s = $("#story"), shut = !s.classList.contains("rt-shut");
+    s.classList.toggle("rt-shut", shut);
+    d.remove(); rtShadeBtn(); $("#story .rt-shade")?.focus({ preventScroll: true });
+    if (!shut) { paintMiniChamber(); hydrateDists(); }
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (!rtIsOn() || !RT.drop || RT.drop.hidden) return;
+  if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); const a = RT.dropFor; rtCloseMenu(); if (a) a.focus({ preventScroll: true }); return; }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    const xs = $$("a", RT.drop), i = xs.indexOf(document.activeElement);
+    if (xs.length) xs[(i + (e.key === "ArrowDown" ? 1 : -1) + xs.length) % xs.length].focus({ preventScroll: true });
+  }
+}, true);
+addEventListener("scroll", () => { if (RT.drop && !RT.drop.hidden) rtCloseMenu(); }, { passive: true });
+addEventListener("resize", () => { if (RT.drop && !RT.drop.hidden) rtCloseMenu(); });
+// the boot: the head's inline script may already have set the class (the hash's retro=1, or the saved choice)
+{
+  let want = rtIsOn();
+  try { want = want || /[#&]retro=1(&|$)/.test(location.hash) || localStorage.getItem(RT_KEY) === "1"; } catch (e) {}
+  if (want) rtSet(true, { persist: false, boot: true });
+}
 
 })();

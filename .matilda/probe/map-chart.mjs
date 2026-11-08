@@ -100,7 +100,7 @@ check(/cs=type/.test(await page.evaluate(() => location.hash)), "the seat-type s
 for (const [W, H] of [[1440, 1000], [390, 844]]) {
   await page.setViewport({ width: W, height: H, deviceScaleFactor: 1 });
   await go("y=2025&l=seifa&i=age&draw=chart");
-  await page.click("#fsgo").catch(() => page.click("#zfs"));
+  await page.click("#fsgo");
   await new Promise((r) => setTimeout(r, 1200));
   const fs1 = await page.evaluate(() => {
     const c = document.querySelector("#chartv").getBoundingClientRect(), svg = document.querySelector("#chartv .ch-plot svg"), vis = (e) => !!e && getComputedStyle(e).display !== "none" && e.getClientRects().length > 0;

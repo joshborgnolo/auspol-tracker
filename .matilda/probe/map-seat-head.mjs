@@ -224,27 +224,16 @@ await wait(800);
 t = await seat();
 ok("2013 Durack: a party hold reads 'retain'", t.tag === "retain", t.tag);
 
-/* scope menu: a tall menu clamps to the viewport and a pick returns focus to
-   the trigger (the handler-side fixes shipped with the seat heads) */
+/* the State filter (the strip's row; the head's old scope menu is retired):
+   a state's informal line contrasts with the national average */
 await show("2025");
 await wait(400);
-const menu = await page.evaluate(() => {
-  const trig = document.querySelector("[data-scope-trigger]"); if (!trig) return null;
-  trig.click();
-  const items = [...document.querySelectorAll(".st-scm [data-scope]")];
-  const cls = items.find((it) => it.dataset.scope.startsWith("st:"));
-  const mh = Math.round(document.querySelector(".st-scm").getBoundingClientRect().bottom);
-  cls.click();
-  return { inViewAtOpen: mh <= innerHeight + 2 };
-});
-ok("scope menu opens inside the viewport", typeof menu === "object", JSON.stringify(menu));
-await wait(500);
-const after = await page.evaluate(() => {
-  const trig = document.querySelector("[data-scope-trigger]");
-  return { focused: document.activeElement === trig, inf: document.querySelector("#story .st-inf") ? document.querySelector("#story .st-inf").textContent.trim() : null };
-});
-ok("focus returns to the menu trigger after a pick", after.focused === true);
-ok("a state scope's informal line contrasts with the national average", /^Informal votes: \d+\.\d% \(vs national average \d+\.\d%\)$/.test(after.inf || ""), after.inf);
+await page.evaluate(() => document.querySelector('#state-filters [data-state="NSW"]').click());
+await wait(900);
+const after = await page.evaluate(() => ({ inf: document.querySelector("#story .st-inf") ? document.querySelector("#story .st-inf").textContent.trim() : null }));
+ok("a state filter's informal line contrasts with the national average", /^Informal votes: \d+\.\d% \(vs national average \d+\.\d%\)$/.test(after.inf || ""), after.inf);
+await page.evaluate(() => document.querySelector('#state-filters [data-state=""]').click());
+await wait(600);
 
 /* polling place view: the local count rides the same head-block idiom */
 await show("2025");
@@ -273,7 +262,8 @@ const booth = await page.evaluate(() => {
     tag: sec && sec.querySelector(".st-fg") ? sec.querySelector(".st-fg").textContent.trim() : null,
     tagCls: sec && sec.querySelector(".st-fg") ? sec.querySelector(".st-fg").className : null,
     dekStyle: (() => {
-      const dek = document.querySelector("#story .st-dek");
+      // (the place's finding line follows its figures since 2026-11-08; it keeps the dek's dress)
+      const dek = document.querySelector("#story .st-find");
       if (!dek) return null;
       const cs = getComputedStyle(dek);
       return { font: cs.fontFamily.split(",")[0].replace(/"/g, ""), borderTop: `${cs.borderTopWidth} ${cs.borderTopStyle}`, text: dek.textContent.trim().slice(0, 80) };
@@ -293,7 +283,7 @@ const booth = await page.evaluate(() => {
 ok("booth: the count here rides the head-block idiom", booth.lab && /^Final count here \(margin of \d+\.\d+\)/.test(booth.lab) && booth.nmFont === "20px" && booth.heroCount === 0, JSON.stringify(booth));
 ok("booth: the seat's gain/retain tag chip rides the count here too", booth.tag === "retain" || booth.tag === "gain" || booth.tag === "win", booth.tag);
 ok("booth: the chip hangs off the seat winner's figure, not the place's", booth.tagCls && booth.tagCls.includes(booth.expectedTagSide), `${booth.tagCls} vs ${booth.expectedTagSide}`);
-ok("booth: the dek reads in Commissioner under a double rule", booth.dekStyle && /Commissioner/.test(booth.dekStyle.font) && booth.dekStyle.borderTop === "4px double", JSON.stringify(booth.dekStyle));
+ok("booth: the finding reads in Commissioner under a double rule", booth.dekStyle && /Commissioner/.test(booth.dekStyle.font) && booth.dekStyle.borderTop === "4px double", JSON.stringify(booth.dekStyle));
 ok("booth: the swing rides its count block in figure form", booth.swing == null || /^(No swing|\+\d+\.\d+ swing)$/.test(booth.swing), booth.swing);
 ok("booth: no narrating swing sentence remains", booth.oldSwingSentence === false);
 ok("booth: the census section heads the neighbourhood profile", booth.neighHead === "Neighbourhood profile from census data", booth.neighHead);
@@ -336,8 +326,9 @@ await page.evaluate(() => window.__map.goAus());
 await wait(900);
 const tppHead = await page.evaluate(() => {
   const stat = document.querySelector("#story h3.st-stat");
+  // (every lens's head leads with the seats now; the two-party row follows them)
   return stat ? {
-    lab: stat.querySelector(".st-lab").textContent.trim(),
+    lab: ([...stat.querySelectorAll(".st-lab")].find((l) => /^Two-party/.test(l.textContent)) || { textContent: "" }).textContent.trim(),
     figs: [...stat.querySelectorAll(".st-tpp > b")].map((b) => b.textContent.trim()),
     names: [...stat.querySelectorAll(".st-nm")].map((n) => n.textContent.trim()),
     tag: stat.querySelector(".st-fg") ? stat.querySelector(".st-fg").textContent.trim() : null,

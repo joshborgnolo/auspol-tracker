@@ -1172,7 +1172,7 @@ function drawChamberMain(m, alpha) {
   ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sen = m.house === "senate", sel = sen ? S.ssel : S.sel;
   chMain = drawChamber(ctx, m, Wpx, Hpx, { big: true, alpha, sel: sen ? (sel.level === "sen" ? sel.i : null) : selDiv(), hover: S.hover && S.hover.kind === (sen ? "sen" : "div") ? S.hover.i : null,
-    state: sel.level === "state" ? sel.st : null, cls: sen ? null : clsFilter(m), pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
+    state: sel.level === "state" ? sel.st : null, cls: sen || S.lens !== "cls" ? null : clsFilter(m), pad: chamberPads(), pattern: (() => { const p = hatch(); p.setTransform(new DOMMatrix().scale(1 / dpr)); return p; })() });
   ctx.restore();
 }
 
@@ -1237,7 +1237,7 @@ function paintMiniChamber() {
   const sd = selDiv();
   // the chamber keeps its own marks of the figures-menu pick: a state's seats
   // lit, a seat type in its lens colours with other kinds sat back
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: clsFilter(m), pad, labels: true });
+  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: S.lens === "cls" ? clsFilter(m) : null, pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {

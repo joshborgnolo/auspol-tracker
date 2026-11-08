@@ -12,12 +12,16 @@ const STATE_YEARS = new Set(Object.keys({ sa22: 1, sa26: 1, nsw15: 1, nsw19: 1, 
 const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const CLS = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };
+const CLS_LOWER = { "Inner Metropolitan": "inner-metropolitan", "Outer Metropolitan": "outer-metropolitan", Provincial: "provincial", Rural: "rural" };
 let current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
-const S = { lens: "winner" };
+// the page's two filters (the strip's State and Seat type rows) are S.f.st and S.f.cls
+const S = { lens: "winner", f: { st: null, cls: null } };
 // statScopeOk/statBreakdownRows read m.areas[st].{formal,idx}; the app derives them in deriveAreas
+// (the app's model carries its seats as m.divs too: the filters check a type exists there)
+current.divs = current.res.divs;
 current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
 const ctx = vm.createContext({
-  S, STATE_TITLE: states, STATE_SHORT: short, STATE_YEARS, STATES, CLS, CLS_SHORT, FAMS: ["alp", "lnp", "grn", "onp", "ind", "oth"], M: () => current,
+  S, STATE_TITLE: states, STATE_SHORT: short, STATE_YEARS, STATES, CLS, CLS_SHORT, CLS_LOWER, FAMS: ["alp", "lnp", "grn", "onp", "ind", "oth"], M: () => current,
   esc: (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])),
   f1: (v) => v == null ? "–" : v.toFixed(1), int: (v) => v.toLocaleString("en-AU"),
   sgn: (v) => v == null ? "–" : (v > .049 ? "+" : v < -.049 ? "−" : "") + Math.abs(v).toFixed(1),
@@ -68,35 +72,38 @@ assert.deepEqual(Array.from(national.bands, (b) => b.share.toFixed(1)), ["6.8", 
 assert.deepEqual(Array.from(national.bands, (b) => b.skew.toFixed(1)), ["3.0", "-2.6", "2.7"]);
 assert.deepEqual(Array.from(national.bands, (b) => b.effect == null ? null : b.effect.toFixed(1)), ["0.2", "-3.0", null]);
 assert.deepEqual(Array.from(national.bands, (b) => b.cumulative.toFixed(1)), ["55.2", "55.0", "58.0"]);
+// a State filter is the map's state selection: the head pools that state (its area)
 for (const st of Object.keys(states)) {
-  Object.assign(api.statScopeOf(current), { k: "st", st });
-  const scope = api.vtScope(current, "AUS");
+  S.f.st = st; S.f.cls = null;
+  const scope = api.vtScope(current, st);
   assert.ok(scope.divs.every((d) => d.st === st));
   assert.equal(scope.geography, short[st]);
   assert.ok(api.vtBlock(scope.divs, true, scope.geography).includes(`Skew on ${short[st]} 2PP`));
   checkPool(scope.divs, st);
 }
-// a seat-type pick only ever scopes where the page shows it (a sliced state,
-// or its own lens) — drive those reads from the cls lens
-S.lens = "cls";
-for (const cls of new Set(current.res.divs.map((d) => d.cls))) {
-  Object.assign(api.statScopeOf(current), { k: "cls", cls });
-  const scope = api.vtScope(current, "AUS");
-  assert.ok(scope.divs.every((d) => d.cls === cls));
-  assert.equal(scope.geography, `${cls.toLowerCase()} seats`);
-  checkPool(scope.divs, cls);
+// a Seat type filter scopes the pool in every lens, nationwide or inside a state
+S.f.st = null;
+for (const lens of ["winner", "tpp", "cls"]) {
+  S.lens = lens;
+  for (const cls of new Set(current.res.divs.map((d) => d.cls))) {
+    S.f.cls = cls;
+    const scope = api.vtScope(current, "AUS");
+    assert.ok(scope.divs.every((d) => d.cls === cls));
+    assert.equal(scope.geography, `${CLS_LOWER[cls]} seats`);
+    checkPool(scope.divs, `${lens} ${cls}`);
+  }
 }
 S.lens = "winner";
 for (const d of current.res.divs) checkPool([d], d.n);
 
-// Navigating to a map state overrides a lingering figures-menu filter.
-S.lens = "cls";
-Object.assign(api.statScopeOf(current), { k: "cls", cls: "Rural" });
-S.lens = "winner";
+// the two filters compound: a seat type inside a state pools their intersection
+S.f.st = "NSW"; S.f.cls = "Rural";
 let scope = api.vtScope(current, "NSW");
-assert.equal(scope.geography, "NSW");
-assert.equal(scope.divs.length, current.res.divs.filter((d) => d.st === "NSW").length);
-// Other lenses show the actual map area rather than the Winner head's scope.
+assert.equal(scope.geography, "rural seats in NSW");
+assert.equal(scope.divs.length, current.res.divs.filter((d) => d.st === "NSW" && d.cls === "Rural" && d.vt).length);
+checkPool(scope.divs, "NSW rural");
+// with neither on, every lens reads the whole frame
+S.f.st = null; S.f.cls = null;
 S.lens = "tpp";
 scope = api.vtScope(current, "AUS");
 assert.equal(scope.divs.length, 150);

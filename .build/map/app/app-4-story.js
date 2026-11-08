@@ -57,16 +57,27 @@ function seatCount(m, idx, fam) { return idx.filter((i) => m.divs[i].hold.fam ==
 /* ----- small figure builders ----- */
 function upLink() {
   const s = S.sel, m = M();
-  // a seat-type filter has no map selection of its own but earns the same way
-  // out above the title (goAus clears the store through select's sync)
-  const clsScoped = m && s.level === "aus" && pickerLens() && !STATE_YEARS.has(m.year) && statScopeOf(m).k === "cls";
+  // a filtered view (the strip's State or Seat type row) earns the way out
+  // above the title in every lens: "All seats" clears both filters
+  const clsScoped = m && s.level === "aus" && !!poolParts(m).cls;
   if (s.level === "aus" && !clsScoped) return "";
   const label = s.level === "aus" || s.level === "state" ? "All seats" : s.level === "div" ? STATE_TITLE[s.st] : m.divs[s.div].n;
-  const go = s.level === "aus" || s.level === "state" ? "aus" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
+  const go = s.level === "aus" || s.level === "state" ? "aus:all" : s.level === "div" ? `state:${s.st}` : `div:${s.div}`;
   return `<button type="button" class="st-up" data-go="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${ds(label)}</button>`;
 }
+/* every head reads the same way down, whatever the lens or level: the place,
+   its figures (the seats first), then the lens's own finding in a line of
+   prose under them — the figures never wait below a headline. A head with no
+   figures block (a seat outside any count) keeps the finding as its lead. */
 function head(title, meta, hed, dek, stat) {
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || `<h3 class="st-hed">${hed}</h3>`}${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${findingHTML(hed, dek, !stat)}`;
+}
+// the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
+function findingHTML(hed, dek, lead) {
+  const h = String(hed || "").trim(), d = String(dek || "").trim();
+  if (!h && !d) return "";
+  const stop = h && !/[.!?…]$/.test(h) ? "." : "";
+  return `<p class="st-find${lead ? " st-find-lead" : ""}">${h ? `<b>${h}${stop}</b>` : ""}${h && d ? " " : ""}${d}</p>`;
 }
 // the Now page's two-party read: two names, two big figures, a rule between
 function heroPair(aName, aPct, aFam, bName, bPct, bFam) {
@@ -346,45 +357,48 @@ function scopeSeatBase(m, sel, idx, cnt) {
 }
 // the parties inside the "oth" family that have passed 10% somewhere, in their own colours
 const FP_TONE = { "Nick Xenophon Team": "nxt", Democrats: "dem" };
-// the head's scope menu: the choice is one pick shared across frames, so
-// it survives a year switch; "aus" is the whole frame's own jurisdiction —
-// named after it plainly on election frames ("National", "New South Wales"),
-// as the "… figures" menu on the now frames. A frame
-// that can't express the pick — a state frame shown a federal state pick —
-// shows "aus" until one can.
-let statScopeStore = { k: "aus" };
+/* the figures' filters are the page's own two, the strip's State and Seat
+   type rows (S.f.st, S.f.cls): one pair read alike by the map, the chambers,
+   the list and every lens's head here. Either rides alone, and with both on
+   the pools intersect (Rural seats in New South Wales). A state filter is the
+   map's state selection too (select() writes it), so it frames the map; the
+   seat type dims the seats outside it wherever they're drawn. The Others
+   expander's open state rides across frames with them. */
+const statFold = { open: false };
 const statScopeOk = (m, s) => s.k === "st" ? !STATE_YEARS.has(m.year) && !!(m.areas[s.st] && m.areas[s.st].formal > 0)
-  : s.k === "cls" ? statBreakdownRows(m, "AUS").classes.some((r) => r.key === s.cls) : true;
-// a state slice is ONE pick, whether it came from the map or from the head's
-// figures menu: the map keeps it selected, the menu keeps its store — each
-// side writes the other, and the render reads the slice from the selection
-// a picked map state is the state axis of the same compound derivation
-const sliceState = (m) => poolParts(m).st;
-const statScopeOf = (m) => {
-  const slice = sliceState(m);
-  if (slice) return { k: "st", st: slice, open: statScopeStore.open };
-  // a dormant class pick reads as National where nothing marks it — it wakes
-  // back up the moment a state slices (or the cls lens is reached)
-  const store = statScopeStore.k === "cls" && S.lens !== "cls" ? { k: "aus", open: statScopeStore.open } : statScopeStore;
-  return statScopeOk(m, store) ? store : { k: "aus", open: statScopeStore.open };
-};
-// the lenses whose story shows the Winner head's figures design (the cls lens
-// shares it wholesale since 2026-11-08, its filter simply seat types only)
-const pickerLens = () => S.lens === "winner" || S.lens === "cls";
-// the figures filters' two orthogonal axes: the map's own state selection and
-// the menu's own class pick. Either rides alone, and when both are on the
-// pools intersect — a class can be picked "within" the state (2026-11-08, the
-// report of NSW staying selected with no seat type reachable inside it)
+  : s.k === "cls" ? !STATE_YEARS.has(m.year) && m.divs.some((d) => d.cls === s.cls) : true;
 const poolParts = (m) => {
-  const st = pickerLens() && !STATE_YEARS.has(m.year) && S.sel && S.sel.level === "state" && m.areas[S.sel.st] && m.areas[S.sel.st].formal > 0 ? S.sel.st : null;
-  // a seat type rides a sliced state's menu (2026-11-08, the menu's own "Add
-  // filter" over the state) — and the cls lens beyond a slice; never invisible
-  const cls = !STATE_YEARS.has(m.year) && statScopeOk(m, statScopeStore) && statScopeStore.k === "cls" && (S.lens === "cls" || st) ? statScopeStore.cls : null;
+  const fed = !!m && !STATE_YEARS.has(m.year);
+  const st = fed && S.f.st && m.areas[S.f.st] && m.areas[S.f.st].formal > 0 ? S.f.st : null;
+  const cls = fed && S.f.cls && m.divs.some((d) => d.cls === S.f.cls) ? S.f.cls : null;
   return { st, cls };
 };
-// the figures menu's seat-type pick, for the views that mark it outside the
-// head's figures (the chambers paint and dim by it)
+const sliceState = (m) => poolParts(m).st;
+// the seat-type filter, for the views that mark it outside the head's figures
 const clsFilter = (m) => poolParts(m).cls;
+const statScopeOf = (m) => {
+  const { st, cls } = poolParts(m);
+  return cls ? { k: "cls", cls, st, open: statFold.open } : st ? { k: "st", st, open: statFold.open } : { k: "aus", open: statFold.open };
+};
+/* the filtered pool behind a head: a state's own stored aggregate, or a seat
+   type's seats pooled (inside the state where one is picked too) */
+function scopeArea(m, st) {
+  const cls = clsFilter(m);
+  if (!cls) return areaStats(m, st);
+  const idx = m.areas[st].idx.filter((i) => m.divs[i].cls === cls);
+  const cnt = {};
+  for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
+  const A = statClassArea(m, idx);
+  A.demo = demoOf(m, idx);
+  return { A, idx, N: idx.length, cnt };
+}
+// the filter in words, for the heads' "in …" clauses: "in New South Wales",
+// "in rural seats", "in New South Wales’s rural seats"
+function scopeWhere(m, st) {
+  const cls = clsFilter(m), aus = st === "AUS";
+  if (!cls) return aus ? "" : ` in ${STATE_NAME[st]}`;
+  return aus ? ` in ${CLS_LOWER[cls]} seats` : ` in ${STATE_POSS[st]} ${CLS_LOWER[cls]} seats`;
+}
 // every word in the scope menu stays plain — no "figures" suffix, no hyphens
 // the grid rows' own labels ride whatever state the picker picks
 function statScopeLabel(m, sel) {
@@ -392,28 +406,6 @@ function statScopeLabel(m, sel) {
   if (sel.k === "st") { const s = sel.st; return s === "NSW" || s === "ACT" ? s : STATE_TITLE[s]; }
   if (STATE_YEARS.has(m.year)) return STATE_TITLE[stOfYear(m.year)];
   return "National";
-}
-// a scope's own area-payload: states ride their stored aggregates, classes are pooled
-function statScopeArea(m, st, sel) {
-  if (sel.k === "st") {
-    const A = m.areas[sel.st], idx = A.idx, cnt = {};
-    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-    return { A, idx, N: idx.length, cnt };
-  }
-  const row = statBreakdownRows(m, st).classes.find((r) => r.key === sel.cls);
-  if (!row) return areaStats(m, st);
-  // a class picked inside the map's own state: the pool narrows, tallies pooling
-  // their own seats (the class bar's own national row is not this head's basis)
-  const stPool = poolParts(m).st;
-  if (stPool) {
-    const idx = row.A.idx.filter((i) => m.divs[i].st === stPool);
-    const cnt = {};
-    for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-    return { A: statClassArea(m, idx), idx, N: idx.length, cnt };
-  }
-  const A = row.A, cnt = {};
-  for (const i of A.idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
-  return { A, idx: A.idx, N: A.idx.length, cnt };
 }
 // Use the headline's party threshold in both breakdown modes. Lists share a
 // column set, so a party does not change columns between adjacent states.
@@ -470,7 +462,7 @@ function statPrimaryGrid(m, A, cls = "", othx = false) {
 /* the "Others" open is part of the frame's figure view, like the scope choice */
 function statOthersToggle() {
   const m = M(); if (!m) return;
-  statScopeStore.open = !statScopeStore.open;
+  statFold.open = !statFold.open;
   renderStory(true);
   const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }
@@ -572,7 +564,7 @@ function statBreakdownClick(button) {
   if (FS.on) fsStory(false);
 }
 // Keep every represented crossbench group, including single-seat parties.
-function statSeatMakeup(m, idx) {
+function statSeatMakeup(m, idx, blocNames = []) {
   if (!idx.length) return "";
   const groups = new Map();
   for (const i of idx) {
@@ -585,26 +577,39 @@ function statSeatMakeup(m, idx) {
   const rows = [...groups.values()].sort((a, b) => order.indexOf(a.f) - order.indexOf(b.f) || b.n - a.n || a.name.localeCompare(b.name));
   const colour = (r) => css(TH.party[FP_TONE[r.name] || r.f]);
   const bars = rows.map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${r.n} ${r.n === 1 ? "seat" : "seats"} (${f1(100 * r.n / idx.length)}%)"></span>`).join("");
-  const legend = rows.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("");
+  /* the key under the bar names the crossbench alone: Labor's and the
+     Coalition's counts are the big figures above it, so the key is the third
+     figure opened out ("Crossbench 15: Independents 8 …"), bracketed under
+     its own stretch of the bar. A crossbench party big enough to stand among
+     the big figures leaves the rest as "Others". */
+  const xb = rows.filter((r) => r.f !== "alp" && r.f !== "lnp" && !blocNames.includes(r.name));
+  const xbN = xb.reduce((a, r) => a + r.n, 0), xbWord = blocNames.length ? "Others" : "Crossbench";
+  let at = 0, lo = null, hi = null, gap = false;
+  for (const r of rows) {
+    const inX = xb.includes(r);
+    if (inX) { if (lo == null) lo = at; else if (hi !== at) gap = true; hi = at + r.n; }
+    at += r.n;
+  }
+  const brace = xbN && !gap ? `<i class="st-xb-brace" aria-hidden="true" style="left:${100 * lo / idx.length}%;width:${100 * (hi - lo) / idx.length}%"></i>` : "";
+  const legend = xbN ? `<span class="st-seat-legend" role="group" aria-label="${xbWord}: ${xbN} ${xbN === 1 ? "seat" : "seats"}"><span class="st-xb-lab">${xbWord} <b>${xbN}</b></span>${xb.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("")}</span>` : "";
   const total = m.seatsN || m.divs.length, majority = Math.floor(total / 2) + 1;
   // A chamber majority is meaningful on the complete House, rather than a
-  // state or seat-type subset selected in the figures menu.
+  // state or seat-type subset picked by the filters.
   const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i>` : "";
-  return `<span class="st-seat-mix"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}</span><span class="st-seat-legend" role="group" aria-label="Seats by party">${legend}</span></span>`;
+  return `<span class="st-seat-mix${brace ? " st-has-brace" : ""}"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}${brace}</span>${legend}</span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label, noteDef = null) {
-  // a menu class pick narrows the scope wherever the map is: it reads as cls
-  // here even beside a state pick, and the statScopeArea intersects them
-  const clsPart = poolParts(m).cls;
-  const statSel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
-  const { A, idx, N, cnt } = statSel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, statSel);
+  // the filters narrow the pool (scopeArea): st is the area, a state where the
+  // State filter is on, and a Seat type filter pools that type's seats in it
+  const cls = clsFilter(m);
+  const { A, idx, N, cnt } = scopeArea(m, st);
   // the moved-seats note shows only while every seat it names stays inside the
-  // scoped choice (the One Nation pair keeps it under Rural and NSW figures)
-  const seatsNote = noteDef && (statSel.k === "aus" || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
+  // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
+  const seatsNote = noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   // the change line's base: the whole frame's official series, a state's own
-  // series where one is picked, else the scope's seat-by-seat reversion
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = statSel.k === "aus" ? seatBase(m, st) : statSel.k === "st" && !isNowY(m.year) ? seatBase(m, statSel.st) : scopeSeatBase(m, statSel, idx, cnt);
+  // series on an election frame, else the pool's seat-by-seat reversion
+  const a = cnt.alp || 0, l = cnt.lnp || 0, base = cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
   const parties = new Map();
@@ -613,7 +618,8 @@ function seatStat(m, st, label, noteDef = null) {
     if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
     parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
   }
-  const bloc = [...parties.values()].filter((r) => r[1] > 14).sort((p, q) => q[1] - p[1]);
+  const blocE = [...parties.entries()].filter(([, r]) => r[1] > 14).sort(([, p], [, q]) => q[1] - p[1]);
+  const bloc = blocE.map(([, r]) => r);
   const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
@@ -652,89 +658,52 @@ function seatStat(m, st, label, noteDef = null) {
   // "won" what an election delivered, "has" what an as-it-stands frame holds
   const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
-  const mk = statSeatMakeup(m, idx);
+  const mk = statSeatMakeup(m, idx, blocE.map(([k]) => k));
   // a double rule crowns the head, divides the sections and closes it — every
   // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;
+  // the seats lead (who holds the House is the map's first reading), then the
+  // votes that won them: the two-party count, then the primaries
   const sections = [];
-  if (two) sections.push(two);
-  if (fpRow) sections.push(fpRow);
   // the word-note about seats that moved since the election sits under the count's legend
   sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote}`);
+  if (two) sections.push(two);
+  if (fpRow) sections.push(fpRow);
   return `<h3 class="st-stat" aria-label="${esc(label)}">${sep}${sections.join(sep)}${sep}</h3>`;
 }
 /* the informal rate belongs with the count's own story: it hangs under the
    How-votes-were-cast section instead of closing the winner head (user call
-   2026-11-07), keeping the head's figures scope — a class or state pick
-   pools its own rate (statScopeArea), exactly as the head's figure did */
+   2026-11-07), keeping the head's filters — a state or seat type pools its
+   own rate (scopeArea), exactly as the head's figures do */
 function informalHTML(m, st) {
-  const clsPart = poolParts(m).cls;
-  const sel = clsPart ? { k: "cls", cls: clsPart } : statScopeOf(m);
-  const { A } = sel.k === "aus" ? areaStats(m, st) : statScopeArea(m, st, sel);
+  const { A } = scopeArea(m, st);
   if (A.infPct == null) return "";
-  /* a state-picked view contrasts itself with the frame's average, the same
+  /* a filtered view contrasts itself with the frame's average, the same
      comparison word the seat view's informal line carries (user call) */
-  const cmp = sel.k === "st" && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
+  const cmp = (st !== "AUS" || clsFilter(m)) && !STATE_YEARS.has(m.year) && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
   return `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%${cmp}</div>`;
 }
-/* the dropdown's item list in order (the spacebar cycle walks it too): the
-   open axis — states until sliced, then "All" and the seat types over it
-   (2026-11-08, user calls) */
-function statScopeOpts(m, st) {
-  // a sliced state's axis is taken, so the menu offers the OTHER one: "All"
-  // (the bare state), then the seat types over it (another state is picked on
-  // the strip instead)
-  if (sliceState(m)) return [["aus", "All"], ...CLS.filter((c) => m.divs.some((d) => d.cls === c)).map((c) => [`cls:${c}`, statScopeLabel(m, { k: "cls", cls: c })])];
-  const opts = [["aus", statScopeLabel(m, { k: "aus" })]];
-  if (!STATE_YEARS.has(m.year)) for (const s of STATES) if (m.areas[s] && m.areas[s].formal > 0) opts.push([`st:${s}`, statScopeLabel(m, { k: "st", st: s })]);
-  return opts;
-}
-const statScopeVal = (sel) => sel.k === "aus" ? "aus" : `${sel.k}:${sel.k === "st" ? sel.st : sel.cls}`;
-const statScopeParse = (v) => { const p = v.split(":"); return p[0] === "aus" ? { k: "aus" } : p[0] === "st" ? { k: "st", st: p[1] } : { k: "cls", cls: p[1] }; };
-// the dropdown's trigger names its job — until there's a pick: invites by the
-// state axis, then by the type axis over a sliced state; a pick names itself
-const statScopeTrigger = (m) => {
-  if (!sliceState(m)) return "Filter by state/territory";
-  const cls = poolParts(m).cls;
-  return cls ? statScopeLabel(m, { k: "cls", cls }) : "Filter by seat type";
+// the seats an "as it stands" frame holds that the election itself never
+// delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
+// and Pittwater (from the Liberals to the crossbench). The seats list is
+// what the note is about — a scoped figures view keeps it only while every
+// named seat sits inside the choice (Rural and NSW keep the One Nation
+// note; Inner-metro and Queensland don't)
+const NOW_AUS_DEK = {
+  now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
+  nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
+  qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
 };
-// what the chip row marks: the store's own class pick when it's expressible —
-// a class compounding a map-side state stays marked beside the map's own evidence
-const statScopeMenuCur = (m) => (statScopeOk(m, statScopeStore) ? statScopeStore : { k: "aus", open: statScopeStore.open });
-function statScopeMenu(m, st) {
-  const slice = sliceState(m), clsPicked = slice ? poolParts(m).cls : null;
-  const picked = slice ? (clsPicked ? `cls:${clsPicked}` : "aus") : "aus";
-  // the dropdown is the figures filter in both picker lenses: the open axis —
-  // states until one's sliced, then the types over it — marked by the pick
-  const dropdown = () => `<span class="st-scwrap"><button type="button" class="st-sclab" data-scope-trigger aria-expanded="false">${esc(statScopeTrigger(m))} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" hidden role="menu">${statScopeOpts(m, st).map(([v, txt]) => `<button type="button" data-scope="${v}" role="menuitem"${picked === v ? ' aria-pressed="true"' : ""}>${esc(txt)}</button>`).join("")}</span></span>`;
-  if (S.lens === "cls") {
-    const cur = statScopeVal(statScopeMenuCur(m));
-    // the dropdown goes above the seat-type labels' own toggle row (user call)
-    const chips = `<span class="lg-types st-typefilters" role="group" aria-label="Filter by seat type">${CLS.map((c, k) => m.divs.some((d) => d.cls === c) ? `<button type="button" data-scope="${cur === `cls:${c}` ? "aus" : `cls:${c}`}" aria-pressed="${cur === `cls:${c}`}" title="${cur === `cls:${c}` ? "Clear" : "Filter by"} ${esc(statScopeLabel(m, { k: "cls", cls: c }))}"><i style="background:${css(TH.cls[k])}"></i>${esc(statScopeLabel(m, { k: "cls", cls: c }))}</button>` : "").join("")}</span>`;
-    return `<span class="st-clsmeta">${dropdown()}${chips}</span>`;
-  }
-  return dropdown();
-}
 function areaHedDek(m, st) {
-  const aus = st === "AUS", { A, idx, N, cnt } = areaStats(m, st);
-  const where = aus ? "" : ` in ${STATE_NAME[st]}`;
-  const ofSeats = aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
+  // every lens reads the filtered pool: the state, narrowed to a seat type where one is on
+  const aus = st === "AUS", cls = clsFilter(m), { A, idx, N, cnt } = scopeArea(m, st);
+  const where = scopeWhere(m, st);
+  const ofSeats = cls ? `of the ${N}${where.replace(/^ in/, "")}` : aus ? `of the ${N} seats` : `of ${STATE_POSS[st]} ${N} seats`;
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const gov = m.gov, opp = gov === "alp" ? "lnp" : "alp";
   const lead = A.tpp >= 50 ? "alp" : "lnp", leadPct = Math.max(A.tpp, 100 - A.tpp);
 
   const isNowM = isNowY(m.year);
-  // the seats an "as it stands" frame holds that the election itself never
-  // delivered: the federal Now's One Nation pair; NSW Now's Kiama (to Labor)
-  // and Pittwater (from the Liberals to the crossbench). The seats list is
-  // what the note is about — a scoped figures view keeps it only while every
-  // named seat sits inside the choice (Rural and NSW keep the One Nation
-  // note; Inner-metro and Queensland don't)
-  const NOW_AUS_DEK = {
-    now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
-    nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
-    qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
-  };
   if (S.lens === "tpp" && axisNow(m) !== "AC") return axisHedDek(m, idx, where);
   // the cls lens tells its story with the Winner design from end to end
   // (2026-11-08, user call — its own class-tally story is retired)
@@ -753,7 +722,7 @@ function areaHedDek(m, st) {
         // On the federal Now frame that note sits under the Seats count it annotates
         // (in the head's Commissioner); on the other frames it keeps the dek's place
         let note = aus ? (NOW_AUS_DEK[m.year]?.t ?? "").trim() : "";
-        if (!aus) { const ch = (m.changes || []).filter((x) => m.divs[m.byName.get(x.div)].st === st); if (ch.length) note = `Since the election: ${[...new Set(ch.map((x) => x.div))].map((n) => ds(n)).join(" and ")} ${ch.length > 1 ? "have" : "has"} changed hands or party.`; }
+        if (!aus) { const inPool = new Set(idx), ch = (m.changes || []).filter((x) => inPool.has(m.byName.get(x.div))); if (ch.length) { const ns = [...new Set(ch.map((x) => x.div))].map((n) => ds(n)); note = `Since the election: ${ns.length > 2 ? `${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]}` : ns.join(" and ")} ${ns.length > 1 ? "have" : "has"} changed hands or party.`; } }
         if (aus) dek += NOW_AUS_DEK[m.year]?.t ?? "";
         else if (note) dek += ` ${note}`;
         const noteDef = aus && m.year === "now" && note ? NOW_AUS_DEK[m.year] : null;
@@ -789,14 +758,11 @@ function areaHedDek(m, st) {
       const nowScope = YEAR_JUR[m.year] ? (aus || st === stOfYear(m.year)) : (aus || st === "NSW");
       const hedWord = S.tppMode === "swing" ? (Math.abs(A.tppSw) < 0.05 ? `There was no two-party swing${where}` : `The two-party vote${where} swung ${pts(A.tppSw)} to ${A.tppSw >= 0 ? "Labor" : "the Coalition"}`) : `${lead === "alp" ? "Labor" : coalW(1)} won ${f1(leadPct)}% of the two-party vote${where}`;
       if (!Number.isFinite(A.tpp)) return { hed: hedWord, dek: "" };
-      /* the two-party lens fronts the head's own figures block, like the
-         winner page's (user call 2026-11-09) — hed and dek give way to
-         "Two-party preferred (margin of M)" with the names, the government
-         tag and the swing line */
-      const fg = m.gov === "alp" || m.gov === "lnp" ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
-      const sep = `<span class="st-sep" aria-hidden="true"></span>`;
-      const stat = `<h3 class="st-stat" aria-label="${esc(hedWord)}.">${sep}${twoPartyFigures(`Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg)}${swingFigure(A.tppSw)}${sep}</h3>${isNowM && nowScope && NOW_TPP_NOTE[m.year] ? `<p class="st-note">${NOW_TPP_NOTE[m.year].trim()}</p>` : ""}`;
-      return { hed: hedWord, dek: "", stat };
+      /* the two-party lens reads the head's one figures block, like every
+         lens (its two-party row says what a headline would: user call
+         2026-11-09, the head's figures in place of hed and dek) — so no
+         finding line; an as-it-stands frame's basis note follows them */
+      return { hed: hedWord, dek: "", quiet: true, note: isNowM && nowScope && NOW_TPP_NOTE[m.year] ? NOW_TPP_NOTE[m.year].trim() : "" };
     }
     case "fp": {
       const P = S.party, name = legW(P);
@@ -971,7 +937,8 @@ function incFact(m, dm) {
 }
 const DEMO_EARLY = { hed: "Census figures start at the 1993 election", dek: "Census-linked people figures exist only from the 1993 election on: 1993 and 1996 blend the 1991 and 1996 censuses to election day, 1998 blends the 1996 and 2001 censuses, the 2001 election reads the 2001 census itself, every election from 2004 to 2019 blends between the two censuses that bracket it to election day, and 2022 reads the 2021 census." };
 function areaDemo(m, st, idx, where, isNowM) {
-  const k = S.index, A = m.areas[st];
+  // (a Seat type filter pools its own seats' census shares)
+  const k = S.index, A = clsFilter(m) ? { demo: demoOf(m, idx) } : m.areas[st];
   if (!A.demo) return DEMO_EARLY;
   const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
   const medAge = ageMed() ? m.ageCuts && m.ageCuts.medAge : null;
@@ -1106,11 +1073,10 @@ function vtBands(divs) {
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
 function vtScope(m, st) {
-  const parts = st === "AUS" ? poolParts(m) : { st: null, cls: null };
-  const sel = st !== "AUS" || !pickerLens() ? { k: st === "AUS" ? "aus" : "st", st } : parts.cls ? { k: "cls", cls: parts.cls } : statScopeOf(m);
-  // both axes on narrows the pool to their intersection
-  const divs = m.res.divs.filter((d) => d.vt && (sel.k === "aus" || (sel.k === "st" ? d.st === sel.st : d.cls === sel.cls)) && (sel.k !== "cls" || !parts.st || d.st === parts.st));
-  const geography = sel.k === "cls" && parts.st ? `${CLS_LOWER[parts.cls]} seats in ${STATE_SHORT[parts.st]}` : sel.k === "cls" ? `${sel.cls.toLowerCase()} seats` : sel.k === "st" ? STATE_SHORT[sel.st] : "nationwide";
+  // the head's own pool: the area, narrowed by the seat-type filter where one is on
+  const cls = clsFilter(m), pst = st === "AUS" ? null : st;
+  const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));
+  const geography = cls && pst ? `${CLS_LOWER[cls]} seats in ${STATE_SHORT[pst]}` : cls ? `${CLS_LOWER[cls]} seats` : pst ? STATE_SHORT[pst] : "nationwide";
   return { divs, geography };
 }
 function vtBandsBlock(divs, area, geography) {
@@ -1144,35 +1110,46 @@ function vtBlock(divs, area, geography) {
 }
 
 function storyArea(m, st) {
-  const aus = st === "AUS", { A, idx, N } = areaStats(m, st);
-  // a filtered Winner head titles itself by the filter — the state's own name
-  // or the seat type's — with the election's year after a middot on election
-  // frames (user call: "New South Wales · 2025", "Inner metro · 2025"); the
-  // state slice's "All seats" rides its map selection, and upLink's sibling
-  // read above gives the seat type the same way out
-  const pick = aus && pickerLens() && !STATE_YEARS.has(m.year) ? statScopeOf(m) : { k: "aus" };
-  const pickTitle = pick.k === "st" ? STATE_TITLE[pick.st] : pick.k === "cls" ? CLS_SHORT[pick.cls] : null;
-  const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
-  const { hed, dek, stat } = areaHedDek(m, st);
-  const title = pickTitle ? `${pickTitle}${isNowY(m.year) ? "" : ` · ${m.year}`}` : aus ? (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`) : STATE_TITLE[st];
+  // st is the area: the whole frame ("AUS") or the State filter's state; a
+  // Seat type filter narrows it to that type's seats (scopeArea)
+  const aus = st === "AUS", cls = clsFilter(m), { A, idx, N } = scopeArea(m, st);
+  const winnerish = S.lens === "winner" || S.lens === "cls";
+  const { hed, dek, stat, quiet, note } = areaHedDek(m, st);
+  /* the same head in every lens: a filtered view titles itself by the filter —
+     the seat type, else the state — with the election's year after a middot
+     on election frames (user call: "New South Wales · 2025", "Inner metro ·
+     2025"); the meta counts the seats behind the figures, naming the state
+     where a seat type narrows it ("New South Wales · 12 divisions") */
+  const filt = cls ? CLS_SHORT[cls] : aus ? null : STATE_TITLE[st];
+  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`);
   // never the date — the eyebrow line above the map already carries it
-  // the Winner head's meta is the scope menu (statScopeLabel words it), and
-  // its head follows whichever state or seat type is picked there
-  const meta = pickerLens() && aus ? statScopeMenu(m, st) : aus ? (isNowY(m.year) ? `${N} members` : `${N} ${seatNoun()}`) : (isNowY(m.year) ? `${N} seats · members today` : `${N} ${seatNoun()} · ${yearLabel(m.year)} election`);
-  let h = head(title, meta, hed, dek, stat);
+  const meta = `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${N} ${isNowY(m.year) ? (N === 1 ? "member" : "members") : seatNoun()}`;
+  /* the figures block is every lens's: the seats, the two-party count and the
+     primaries for the filtered pool. The Winner and Seat type lenses say no
+     more than their figures (a dek only where words carry what figures can't);
+     the two-party lens's figure is its finding; every other lens adds its
+     finding in a line of prose under them */
+  const figs = stat || seatStat(m, st, `${hed}.`, aus && m.year === "now" ? NOW_AUS_DEK.now : null);
+  let h = head(title, meta, winnerish || quiet ? "" : hed, quiet ? "" : dek, figs);
+  if (note) h += `<p class="st-note">${note}</p>`;
+  // a state election's two-party row counts only the classic pairs: say so under the figures
+  if (isState() && A.tpp != null) { const classicN = idx.filter((i) => m.divs[i].tpp != null).length; h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`; }
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
+  const scopeSmall = cls ? `, ${CLS_LOWER[cls]}${aus ? "" : ` in ${STATE_SHORT[st]}`}` : aus ? "" : `, ${STATE_SHORT[st]}`;
   // (under a chart the stage already draws the seats' spread, so the rail doesn't repeat it)
-  if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
-  // the House: who holds the seats (the make-up itself; the winner head's seats row carries the counts)
+  if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${scopeSmall}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;
+  // the House: who holds the seats (the make-up itself; the head's seats row carries the counts)
   if (S.view !== "chamber") {
     // the chamber section's small names the filter it marks: the state's own
-    // members, or the seat type whose kind stays lit (and each kind its colour)
+    // members, or the seat type whose kind stays lit
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
-    const chamberMark = pickTitle ? (clsFilter(m) ? `${CLS_SHORT[clsFilter(m)].replace(" ", "-")} seats lit` : `${STATE_POSS[pick.st]} members lit`) : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
+    const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
   }
-  if (isNowY(m.year) && aus) {
-    const ch = m.changes.slice().reverse();
+  // (a seat-type filter keeps the changes in its own seats)
+  const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
+  if (isNowY(m.year) && aus && chList.length) {
+    const ch = chList.slice().reverse();
     const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
     h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     // the federal Now's figures-basis qualifier leads its seats note in the
@@ -1180,17 +1157,9 @@ function storyArea(m, st) {
     // seat changes…", user call) — the state Now frames keep it here
     if (m.year !== "now") h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
-  // the two-party read — skipped on the Winner lens, whose head has already given the
-  // figures and swing in the head's own grid; every other lens still opens with the hero
-  if (!(pickerLens() && A.tpp != null)) {
-    const swp = swingPhrase(A.tppSw, prev);
-    const classicN = m.divs.filter((d) => d.tpp != null).length;
-    h += `<div class="st-sec"><h3>Two-party preferred <small>Labor v ${coalW(1).replace("The ", "the ")}${aus ? "" : ", " + STATE_SHORT[st]}</small></h3><div class="hero">${heroPair("Labor", A.tpp, "alp", oppNameW(), 100 - A.tpp, "lnp")}${marginBar("Labor", "alp", oppNameW(), "lnp", A.tpp - (100 - A.tpp), 20)}<p class="hero-verdict"><b>${A.tpp >= 50 ? "Labor" : coalW(1)} ahead</b> by ${pts(Math.abs(2 * A.tpp - 100))}${swp ? `; ${swp}` : ""}.</p></div>${isState() ? `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry this read; the ${commX()} publishes no notional two-party count for the rest.</p>` : ""}</div>`;
-  }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  const castScope = m.year === 2025 || m.year === "now" ? vtScope(m, st) : null;
-  const cast = castScope ? castScope.divs : m.res.divs.filter((d) => d.vt && (aus || d.st === st));
-  if (cast.length) h += vtBlock(cast, true, castScope?.geography);
+  const castScope = vtScope(m, st), cast = castScope.divs;
+  if (cast.length) h += vtBlock(cast, true, m.year === 2025 || m.year === "now" ? castScope.geography : undefined);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
@@ -1215,7 +1184,7 @@ function storyArea(m, st) {
 const prevFor = (m, d) => (isNowY(m.year) ? (d && d.by ? frameBaseY(m.year) : m.res.prev) : prevYearOf(m.year) ?? (m.res && m.res.prev));
 function seatHedDek(m, d) {
   const prev = prevFor(m, d);
-  const [, rn] = pairNames(d.win, d.run);
+  const [wn, rn] = pairNames(d.win, d.run);
   const wParty = theParty(d.win.ab, d.win.pn), rParty = partyName(d.run.ab, d.run.pn);
   const close = d.votesMargin < 1500 && d.margin < 1;
   switch (S.lens) {
@@ -1358,20 +1327,22 @@ function storyDiv(m, i) {
   const prev = prevFor(m, d);
   const { hed, dek } = seatHedDek(m, d);
   const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
-  let h = head(d.n, meta, hed, dek);
-  h += seatFinalStat(m, d);
+  // the seat's figures lead its card (the Final count, any notional two-party
+  // count, the primaries), and the lens's finding follows them in prose
+  let figs = seatFinalStat(m, d);
   /* the AEC's notional two-party count, where the final pair wasn't the
      majors: the same head-block idiom as the Final count (the name of the
      minority coalition partner comes through coalW on state frames) */
   if (d.tpp != null && !d.classic) {
     const coal = coalW(1).replace(/^The /, "");
     const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
   }
+  figs += seatPrimariesStat(m, d);
+  let h = head(d.n, meta, hed, dek, figs);
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
-  h += seatPrimariesStat(m, d);
   h += `<div class="st-sec"><h3>The candidates <small>by primary vote${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
   const fl = flowRows(d.flows, d.A, d.B);
   if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
@@ -1499,11 +1470,8 @@ function storyBooth(m, j) {
     else if (m.res.flOpv) { hed = flowSeat(D) ? `Preference flows aren’t counted by polling place` : `No preference split was counted in ${ds(D.n)}`; dek = flowSeat(D) ? `${ds(D.n)}’s split is a district figure — read it on the district’s card. New South Wales re-counts ballots by district, not by polling place.` : `Its count didn’t finish Labor against ${vsW()}.`; }
     else { const v = flowSeat(D) ? nn(b.flowAlp[S.from][j]) : null; hed = v == null ? `No ${S.from === "ind" ? "independent’s" : famLeg(S.from) + "’"} preferences were split here between Labor and ${vsW()}` : `${f0(v)}% of ${S.from === "ind" ? "independents’" : S.from === "oth" ? "other candidates’" : famLeg(S.from) + "’"} preferences here went to Labor`; }
   }
-  let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed, dek);
-  const loc = raw.location && raw.location[j];
-  if (loc) h += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
-  else if (raw.lat[j] == null) h += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
-  if (!tc) h += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
+  // the place's figures lead its card, as a seat's do; its notes follow the finding
+  let figs = "", after = "";
   /* the place's two-party swing rides its count block in the seats' figure
      form (no narrating sentence) — attached to whichever block the count
      belongs to, classical or notional */
@@ -1517,13 +1485,20 @@ function storyBooth(m, j) {
     // the seat outcome's tag hangs off the SEAT winner's figure — the party
     // that holds the seat needn't be the place's leader
     const tagSide = D.win.fam === lw.fam ? "st-fg-l" : "st-fg-r";
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg ${tagSide}"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Final count here (margin of ${tightFmt(Math.abs(pct - 50))})`, pct, lw.fam, ds(lwn), 100 - pct, lrun.fam, ds(lrn), `<span class="st-fg ${tagSide}"><b>${seatTag(D)}</b></span>`, true, [pnmOf(lw), pnmOf(lrun)])}${D.classic ? swingFigure(swingHere) : ""}</div></div>`;
   }
   if (!Number.isNaN(b.tpp[j]) && !D.classic) {
     const coal = coalW(1).replace(/^The /, "");
-    h += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}${swingFigure(swingHere)}</div></div>`;
+    figs += `<div class="st-sec"><div class="st-stat st-secstat">${twoPartyFigures(`Two-party preferred here (notional, margin of ${tightFmt(Math.abs(b.tpp[j] - 50))})`, b.tpp[j], "alp", "Labor", 100 - b.tpp[j], "lnp", coal, "", true, ["Labor", coal])}${swingFigure(swingHere)}</div></div>`;
   }
-  if (!Number.isNaN(b.tpp[j]) && swingHere == null) h += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
+  if (!Number.isNaN(b.tpp[j]) && swingHere == null) after += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
+  const loc = raw.location && raw.location[j];
+  if (loc) after += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
+  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
+  if (!tc) after += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
+  // (a place with no count of its own has no finding: its name is already its title)
+  let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed === ds(b.name[j]) ? "" : hed, dek, figs);
+  h += after;
   const cands = D.c.map((c, k) => ({ ...c, v: raw.v[j][k], el: false }));
   const pf = raw.prevFp ? raw.prevFp[j] : null;
   const moved = movedTo(m, D);
@@ -1573,9 +1548,9 @@ function renderStory(force) {
   // the polling-place story outfits its own separator family; CSS scoping
   // below reads this instead of inferring from the lens
   el.dataset.view = s.level;
-  // a Winner-lens state slice renders the whole-frame layout (route "AUS"):
-  // the menu, the sections, the head — storyArea names the state's head title
-  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? (sliceState(m) ? storyArea(m, "AUS") : storyArea(m, s.st)) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
+  // a state (the State filter, which is the map's state selection) is the
+  // area every lens's head pools, narrowed by the Seat type filter
+  el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
   anchorGovtTag(el);
   // a second pass after the frame settles: chip width can grow a few px once
   // Commissioner lands, which is what makes the first-read clamp stale

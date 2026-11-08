@@ -127,8 +127,9 @@ const stat = (page) => page.evaluate(() => {
   const p = await open("2025");
   await p.evaluate(() => window.__map.setLens("tpp"));
   await new Promise((r) => setTimeout(r, 600));
-  const hero = await p.evaluate(() => [...document.querySelectorAll(".st-sec h3")].some((h) => h.textContent.trim().startsWith("Two-party preferred")));
-  check("tpp lens still shows the two-party hero section", hero === true);
+  // (every lens's head carries the two-party row since 2026-11-08, so no lens repeats it as a hero section below)
+  const hero = await p.evaluate(() => ({ sec: [...document.querySelectorAll(".st-sec h3")].some((h) => h.textContent.trim().startsWith("Two-party preferred")), head: [...document.querySelectorAll("#story .st-stat > .st-lab")].some((l) => l.textContent.trim().startsWith("Two-party preferred")) }));
+  check("tpp lens reads the two-party figures in the head, with no duplicate hero section", hero.head === true && hero.sec === false, JSON.stringify(hero));
   await p.close();
 }
 // ---- now frame: figures stay, vote deltas vanish, seat deltas remain

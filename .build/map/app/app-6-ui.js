@@ -116,24 +116,48 @@ function renderLegend() {
   if (!m) { el.hidden = true; return; }
   el.hidden = false;
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
-  const search = el.querySelector(".mp-search");
+  const search = SEARCH_EL;
   const searching = search && search.contains(document.activeElement);
   const basing = el.querySelector(".lg-bmenu")?.contains(document.activeElement);
-  if (search) search.remove();
+  if (search && el.contains(search)) search.remove();
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   const basis = el.querySelector(".lg-basis");
-  if (search && basis) {
+  if (basis) {
     const toolbar = document.createElement("div");
     toolbar.className = "lg-toolbar";
     basis.before(toolbar);
-    toolbar.append(basis, search);
-    if (searching) $("#q").focus({ preventScroll: true });
-    fitSearchPlaceholder();
+    toolbar.append(basis);
   }
+  placeSearch();
+  if (searching) $("#q").focus({ preventScroll: true });
+  fitSearchPlaceholder();
   if (basing) el.querySelector("[data-basis-trigger]")?.focus({ preventScroll: true });
   renderJumpSel();
   el.style.minHeight = "";
+  // (the hint line is born empty: fill it now, or the strip shrinks a line and grows back, moving the map)
+  updateHint();
 }
+/* where the search field sits: on a laptop it shares the control panel's Base
+   row; on a phone, where the panel falls below the map, it stands atop the map
+   instead (a search is how a phone reader finds their seat first). Full screen
+   takes it back into the panel, which its plate carries. */
+const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px)") : { matches: false };
+// (held here: the strip's rebuild lifts the field out of the page for a moment)
+const SEARCH_EL = $(".mp-search");
+function placeSearch() {
+  const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
+  if (!sx || !stage || !el) return;
+  if (phoneMQ.matches && !FS.on) {
+    sx.classList.add("mp-search-top");
+    if (sx.nextElementSibling !== stage) stage.before(sx);
+    return;
+  }
+  sx.classList.remove("mp-search-top");
+  const tb = el.querySelector(".lg-toolbar");
+  if (tb) { if (sx.parentElement !== tb) tb.append(sx); }
+  else if (sx.parentElement !== el) el.prepend(sx);
+}
+if (phoneMQ.addEventListener) phoneMQ.addEventListener("change", () => { placeSearch(); fitSearchPlaceholder(); });
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
    through the years never moves the figure (the stage below it on a wide screen, the
    timeline below it on a phone); switching lens or flip re-holds it once, which reads
@@ -145,7 +169,7 @@ const SEAT_META = new Map(); // year -> the seating plan's { plan, note }
 let legendMeta = null;
 function loadLegendMeta() {
   return (legendMeta ??= Promise.all([
-    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M() && pickerLens()) renderStory(true); }),
+    SUM ? null : getJSON("/map/data/summary.json").then((s) => { SUM = s; renderTimeline(); if (M()) renderStory(true); }),
     // today's Senate's senators (not its floor): its key, the tallest the Senate's gets (it alone has a seating
     // plan's row), is measured with the House's, so switching chamber moves nothing
     loadSenate("now"),
@@ -465,6 +489,8 @@ function legendHTML(m) {
       break;
     }
   }
+  // the two filters, State and Seat type, in every view (map, chamber, list)
+  h += filterHTML(m);
   // in the chamber, a year with a seating plan can show the members where they sit or sorted by the lens
   if (S.view === "chamber" && m.seating) {
     const md = seatMode(m);
@@ -612,22 +638,46 @@ function renderTimeline() {
   if (FS.on) fsRail();
 }
 
-/* States filter the map in their own row; cities are independent jump targets. */
+/* The page's two filters, one row each, the same in every view and every lens:
+   State (the map's state selection: it frames the map on that state) and Seat
+   type (the AEC's classes: the seats outside it dim wherever they're drawn).
+   Each has its own "All"; on together they intersect, and the head's figures,
+   the chambers and the list all read the same pair. A state election has one
+   state and no seat types, so neither row shows there; an election before the
+   AEC classed its seats has no Seat type row. On the Seat type lens the type
+   chips carry the lens's colours, so the row is its key as well. */
+function filterHTML(m) {
+  if (!m || STATE_YEARS.has(m.year)) return "";
+  const st = S.f.st || "", cls = S.f.cls || "";
+  // (each label wears its bold twin, so a pressed chip never shoves its row along)
+  const chip = (attr, v, on, label, sw) => `<button type="button" ${attr}="${v}" aria-pressed="${on}">${sw || ""}<span class="tw" data-t="${label}">${label}</span></button>`;
+  const states = `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
+  const kinds = CLS.map((c, k) => [c, k]).filter(([c]) => m.divs.some((d) => d.cls === c));
+  const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
+  return states + types;
+}
+/* the City-names toggle: both its words stand in the one box (the shown one
+   on top), each at its bold width, so flipping it moves nothing — not the
+   row, not the strip, so never the map under it */
+function townsToggleHTML(on) {
+  const w = (t, show) => `<span class="lg-jt-w"${show ? "" : ' aria-hidden="true"'}><span class="tw" data-t="${t}">${t}</span></span>`;
+  return `<button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${w("Hide city names", on)}${w("Show city names", !on)}</button>`;
+}
+/* the map's Jump-to row: cities are jump targets, independent of the filters */
 function jumpHTML() {
   const j = stOfYear(S.year), on = !S.townsOff;
-  const toggle = `<span class="lg-jgap"></span><button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${on ? "Hide city names" : "Show city names"}</button></div>`;
-  const states = j ? "" : `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>Filter</b>${CITIES.map(([, st]) => `<button type="button" data-state="${st}" aria-pressed="${S.sel.level === "state" && S.sel.st === st}">${STATE_ABBR[st] || st}</button>`).join("")}</div>`;
+  const toggle = `<span class="lg-jgap"></span>${townsToggleHTML(on)}</div>`;
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
-  return `${states}<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
+  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
 }
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
-  const on = S.sel.level === "state" ? S.sel.st : null;
   const cit = $("#cities");
   // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
   // re-fixed here because renderLegend re-creates it on every render
   if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
-  $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === on)));
+  $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
+  $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
 }
 
@@ -680,15 +730,15 @@ let clsLensShelved = false;
 function select(sel, opts = {}) {
   const prevDiv = selDiv();
   S.sel = sel;
-  // a Winner-lens state slice is one pick shared with the head's figures
-  // menu: a state arrived at any side writes the menu's store, and the whole
-  // frame again ("All seats") clears it back
+  /* the State filter IS the map's state selection: a state arrived at any
+     side (its chip, search, a seat's way up) turns it on, the whole frame
+     again turns it off, and a seat chosen outside it lets it go. The Seat
+     type filter rides on independently of the selection — the pair compounds */
   const sm = M();
-  if (pickerLens() && sm && !STATE_YEARS.has(sm.year)) {
-    // a class filter survives the map side's state move — the pair compounds
-    if (sel.level === "state" && S.lens === "winner" && sm.areas[sel.st] && sm.areas[sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: sel.st, open: statScopeStore.open };
-    // "All seats" leaves the state's slice alone; a class pick rides on independently of it
-    else if (sel.level === "aus" && (S.lens !== "cls" || statScopeStore.k !== "cls")) statScopeStore = { k: "aus", open: statScopeStore.open };
+  if (sm && !STATE_YEARS.has(sm.year)) {
+    if (sel.level === "state") S.f.st = sel.st;
+    else if (sel.level === "aus") S.f.st = null;
+    else if (S.f.st && sel.st !== S.f.st) S.f.st = null;
   }
   if (!opts.keepTown) townPick = -1;
   reframe = null; // (a town's or city's flight sets its own again, after this)
@@ -722,35 +772,15 @@ const goDiv = (i, o) => { const m = M(); select({ level: "div", st: m.divs[i].st
 const goBooth = (j, o) => { const m = M(); const i = m.booth.d[j]; select({ level: "booth", st: m.divs[i].st, div: i, booth: j }, o); };
 function goUp() { const s = S.sel; if (s.level === "booth") goDiv(s.div); else if (s.level === "div") goState(s.st); else if (s.level === "state") goAus(); }
 
-function setStatScope(sel) {
-  const m = M(); if (!m) return;
-  // a state named in the menu is selected on the map too — the slice is the
-  // one pick (select re-stamps the store). A class pick COMPOUNDS a map-side
-  // state selection instead of clearing it; anything else steps the state out.
-  if (sel.k === "st" && statScopeOk(m, sel)) { select({ level: "state", st: sel.st }, { fly: false }); return; }
-  // "All" (aus) inside a sliced view lets the type go alone — the state
-  // always stays, whether or not a type was on
-  if (sel.k === "aus" && S.sel.level === "state") { statScopeStore = { k: "aus", open: statScopeStore.open }; renderStory(true); return; }
-  if (sel.k !== "cls" && S.sel.level === "state") select({ level: "aus" }, { fly: false });
-  statScopeStore = sel;
-  renderStory(true);
-}
-// armed once a scope-menu choice has been made (item picked, or the menu shut
-// by its label): the spacebar then steps through the menu's views in order
-let scopeSpace = false;
-function cycleStatScope(step) {
-  const m = M(); if (!m) return;
-  const opts = statScopeOpts(m, "AUS").map((o) => o[0]);
-  if (!opts.length) return;
-  setStatScope(statScopeParse(opts[(opts.indexOf(statScopeVal(statScopeMenuCur(m))) + step + opts.length) % opts.length]));
-}
-
+/* the pill over the map names the List view's own filters (who holds a seat,
+   its margin, a column's range) once they're carried onto the map; the State
+   and Seat type filters show on their own rows above the map instead */
 function renderFilterPill() {
   const el = $("#filterpill"), m = M();
-  const on = filtersOn() || (S.f.range && S.f.range.unit === "booths");
+  const on = !!(S.f.win || S.f.margin || S.f.range);
   if (!on || S.view === "list" || !m) { el.hidden = true; return; }
   const n = m.divs.filter((d) => passes(m, d.i)).length;
-  const w = filterWords(m);
+  const w = filterWords(m, true);
   el.innerHTML = `<span>${S.f.range && S.f.range.unit === "booths" ? "Places" : `<b>${n}</b> ${plural(n, "seat")}`}: ${esc(w.join(" · "))}</span><button type="button" data-clear>Clear</button>`;
   el.hidden = false;
 }
@@ -910,14 +940,7 @@ function setLens(id) {
   const hold = walkHold(takeSpot());
   S.lens = id; S.sort = null; S.dist = null;
   clsLensShelved = false; // an explicit pick drops the cls lens's shelf
-  // a seat-type pick belongs to its own lens — anywhere else it's set aside
-  if (id !== "cls" && statScopeStore.k === "cls") statScopeStore = { k: "aus", open: statScopeStore.open };
-  // the slice follows its lens: a state the figures menu had under Winner
-  // re-selects on the map when the lens comes back to it
-  if (id === "winner" && S.sel.level === "aus" && statScopeStore.k === "st" && !STATE_YEARS.has(S.year)) {
-    const mm = M();
-    if (mm && mm.areas[statScopeStore.st] && mm.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
-  }
+  // (the State and Seat type filters belong to no lens: they stay as they are)
   if (S.f.range && S.f.range.key === "lens") S.f.range = null;
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
@@ -1042,12 +1065,14 @@ async function setYear(y) {
   if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
   // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole frame
   if (S.sel.level === "state" && !b.areas[S.sel.st]) S.sel = { level: "aus" };
-  // …and the slice's other side catches up: a state kept on the new frame
-  // re-stamps the menu's store, a pick the frame can't select waits in the
-  // store, and it selects again on a frame that has it
-  if (S.lens === "winner" && !STATE_YEARS.has(y)) {
-    if (S.sel.level === "state") { if (b.areas[S.sel.st] && b.areas[S.sel.st].formal > 0 && statScopeStore.k !== "cls") statScopeStore = { k: "st", st: S.sel.st, open: statScopeStore.open }; }
-    else if (S.sel.level === "aus" && statScopeStore.k === "st" && b.areas[statScopeStore.st] && b.areas[statScopeStore.st].formal > 0) S.sel = { level: "state", st: statScopeStore.st };
+  // …and the filters follow the frame: a state election has one state and no
+  // AEC seat types, so both stand aside there; a federal frame keeps the
+  // State filter while its state is still the selection, and a seat type it has
+  if (STATE_YEARS.has(y)) { S.f.st = null; S.f.cls = null; }
+  else {
+    if (S.sel.level === "state") S.f.st = S.sel.st;
+    else if (S.sel.level === "aus") S.f.st = null;
+    if (S.f.cls && !b.divs.some((d) => d.cls === S.f.cls)) S.f.cls = null;
   }
   const hold = walkHold(spot);
   startChamberGlide();
@@ -1193,6 +1218,8 @@ function holdEyebrow() {
   eb.style.minHeight = ebHeights.get(at) + "px";
 }
 addEventListener("resize", holdEyebrow);
+// (the meta line ellipses where the eyebrow is tight: its whole words ride its title)
+{ const mt = $("#mp-meta"); if (mt) new MutationObserver(() => { if (mt.title !== mt.textContent) mt.title = mt.textContent; }).observe(mt, { childList: true, characterData: true, subtree: true }); }
 addEventListener("resize", fitSearchPlaceholder);
 addEventListener("resize", lensOverflow);
 
@@ -1320,6 +1347,8 @@ function writeURL() {
     if (s.isl) p.set("at", s.isl);
   }
   if (FS.on) p.set("fs", "1");
+  // the retro view rides the link too, so a shared one opens in it (app-8-retro.js)
+  if (typeof rtIsOn === "function" && rtIsOn()) p.set("retro", "1");
   const h = p.toString();
   try { history.replaceState(FS.on ? { mpFs: 1 } : null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
 }
@@ -1460,10 +1489,7 @@ function closeBaseMenu() {
 function openBaseMenu() {
   const menu = $("#base-menu"), trigger = $("[data-basis-trigger]");
   if (!menu || !trigger) return;
-  $$(".st-scwrap .st-scm").forEach((m) => { m.hidden = true; });
-  $$("[data-scope-trigger]").forEach((b) => b.setAttribute("aria-expanded", "false"));
   closePanelMenus();
-  scopeSpace = false;
   menu.hidden = false; trigger.setAttribute("aria-expanded", "true");
   (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button"))?.focus();
 }
@@ -1494,46 +1520,44 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".lg-bmenu")) { closeBaseMenu(); closePanelMenus(); }
   const city = e.target.closest("[data-city]");
   if (city) { flyToCity(+city.dataset.city); return; }
-  const scT = e.target.closest("[data-scope-trigger]");
-  if (scT) {
-    const pop = scT.parentElement.querySelector(".st-scm"), was = !pop.hidden;
-    $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; });
-    $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false"));
-    if (!was) {
-      pop.hidden = false; scT.setAttribute("aria-expanded", "true");
-      // a tall menu on a small screen must not fall below it: clamp to the
-      // room left under the trigger (it scrolls once clamped, page.css)
-      pop.style.maxHeight = "";
-      const r = pop.getBoundingClientRect(), room = innerHeight - 12;
-      if (r.bottom > room) pop.style.maxHeight = `${Math.max(168, r.height - (r.bottom - room))}px`;
-    }
-    scopeSpace = was;
-    return;
-  }
-  if (!e.target.closest(".st-scwrap")) { $$(".st-scwrap .st-scm").forEach((m2) => { m2.hidden = true; }); $$(".st-scwrap [data-scope-trigger]").forEach((t) => t.setAttribute("aria-expanded", "false")); scopeSpace = false; }
-  const scO = e.target.closest("[data-scope]");
-  if (scO) {
-    scopeSpace = true; setStatScope(statScopeParse(scO.dataset.scope));
-    // a pick from the open menu can sit two screens below the head: put the
-    // eyes back on the fresh trigger rather than leaving them mid-page
-    const trig = $("#story [data-scope-trigger]");
-    if (trig) { trig.focus({ preventScroll: true }); trig.scrollIntoView({ block: "nearest" }); }
-    return;
-  }
+  /* the State row: a state frames the map on it (the selection is the
+     filter); "All", or the state again, lets it go — back to the whole frame
+     from the state's own view, or simply unfiltered while a seat is open */
   const stj = e.target.closest("[data-state]");
-  if (stj) { if (S.sel.level === "state" && S.sel.st === stj.dataset.state) goAus(); else goState(stj.dataset.state); return; }
+  if (stj) {
+    const st = stj.dataset.state || null;
+    if (st && S.f.st !== st) goState(st);
+    else if (S.sel.level === "state") goAus();
+    else if (S.f.st) { S.f.st = null; filtersChanged(); }
+    return;
+  }
+  // the Seat type row: a type dims the rest wherever seats are drawn and pools the head's figures
+  const clj = e.target.closest("[data-cls]");
+  if (clj) {
+    const c = clj.dataset.cls || null;
+    S.f.cls = c && S.f.cls !== c ? c : null;
+    filtersChanged();
+    return;
+  }
   const fj = e.target.closest("[data-fjump]");
   if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
   const tn = e.target.closest("[data-towns]");
   // the Jump-to row's city-names toggle: the map stops (restart) painting town names
-  if (tn) { S.townsOff = !S.townsOff; renderLegend(); schedule(); return; }
+  // (flipped in place — rebuilding the strip for one word re-laid it, and the map under it jolted)
+  if (tn) {
+    S.townsOff = !S.townsOff;
+    const on = !S.townsOff, [hide, show] = tn.querySelectorAll(".lg-jt-w");
+    tn.setAttribute("aria-pressed", String(on));
+    if (hide && show) { (on ? show : hide).setAttribute("aria-hidden", "true"); (on ? hide : show).removeAttribute("aria-hidden"); }
+    schedule(); return;
+  }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
   if (!t) { if (!e.target.closest(".mp-search")) $("#sugg").hidden = true; return; }
   const m = M();
   if (t.dataset.n != null && t.closest("#sugg")) { chooseSugg(+t.dataset.n); return; }
   if (t.dataset.go != null) {
     const [k, ...rest] = t.dataset.go.split(":"); const v = rest.join(":");
-    if (k === "aus") goAus(); else if (k === "state") goState(v); else if (k === "div") goDiv(+v, { fly: S.view === "map" }); else if (k === "booth") goBooth(+v, { view: S.view === "chamber" ? "map" : undefined });
+    if (k === "aus") { if (v === "all" && S.f.cls) { S.f.cls = null; if (S.sel.level === "aus") { filtersChanged(); return; } } goAus(); } else if (k === "state") goState(v); else if (k === "div") goDiv(+v, { fly: S.view === "map" }); else if (k === "booth") goBooth(+v, { view: S.view === "chamber" ? "map" : undefined });
     else if (k === "divname") { const i = m.byName.get(v); if (i != null) goDiv(i, { fly: S.view === "map" }); }
     return;
   }
@@ -1557,7 +1581,7 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-listbooths")) { S.listUnit = "booths"; S.sort = null; if (S.f.range && S.f.range.unit !== "booths") S.f.range = null; setView("list"); return; }
   if (t.hasAttribute("data-showmap")) { setView("map"); fitSelection(700); return; }
   if (t.hasAttribute("data-more")) { $$("[data-extra]", t.parentElement).forEach((r) => (r.hidden = false)); t.remove(); return; }
-  if (t.hasAttribute("data-clear")) { S.f = { st: null, cls: null, win: null, margin: null, range: null }; filtersChanged(); return; }
+  if (t.hasAttribute("data-clear")) { S.f = { ...S.f, win: null, margin: null, range: null }; filtersChanged(); return; }
 });
 document.addEventListener("change", (e) => {
   const t = e.target;
@@ -1604,19 +1628,11 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "/" && !typing) { e.preventDefault(); q.focus({ preventScroll: true }); q.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === "Escape") {
-    const open = $(".st-scm:not([hidden])");
-    if (open) { open.hidden = true; $(".st-scwrap [data-scope-trigger]")?.setAttribute("aria-expanded", "false"); return; }
     if (senOn()) { const s = S.ssel; if (s.level === "sen") selectSen({ level: "state", st: s.st }); else if (s.level === "state") selectSen({ level: "aus" }); }
     else goUp();
   }
-  // the spacebar steps the figures menu along once a choice has been made there
   // A focused chart toggle keeps its native keyboard activation.
   if (e.key === " " && e.target.closest("[data-vt-mode]")) return;
-  if (e.key === " " && scopeSpace) {
-    const wrap = $(".st-scwrap");
-    if (!wrap || !wrap.querySelector(".st-scm").hidden) { scopeSpace = false; return; }
-    e.preventDefault(); cycleStatScope(e.shiftKey ? -1 : 1); return;
-  }
   if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
   if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }

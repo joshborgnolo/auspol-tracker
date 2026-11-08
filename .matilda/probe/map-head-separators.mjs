@@ -24,9 +24,10 @@ const labelsAboveRules = (ks) => ks.every((k, i) => !k.startsWith("LAB(") || ks[
 await frame(2025);
 let ks = await kinds();
 ok("2025: four rules — crown, two dividers, close after Seats", ks.filter((k) => k === "SEP").length === 4, JSON.stringify(ks));
-ok("2025: crown rule opens the head", ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 2)));
+// (the seats lead every head since 2026-11-08 — user call: the seat figures first)
+ok("2025: crown rule opens the head", ks[0] === "SEP" && ks[1] === "LAB(Seats)", JSON.stringify(ks.slice(0, 2)));
 ok("2025: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
-ok("2025: closing rule last, after the Seats section's final label of the head", ks[ks.length - 1] === "SEP" && /^LAB\(Seats/.test([...ks].reverse().find((k) => k.startsWith("LAB("))), JSON.stringify(ks.slice(-4)));
+ok("2025: closing rule last, after the Primaries section's final label of the head", ks[ks.length - 1] === "SEP" && /^LAB\(Primaries/.test([...ks].reverse().find((k) => k.startsWith("LAB("))), JSON.stringify(ks.slice(-4)));
 
 // the rule itself: two 1px hairlines, tightly spaced, full width of the head
 const geom = await page.evaluate(() => {
@@ -40,17 +41,16 @@ ok("every separator is two 1px lines", geom.every((g) => g.top === "1px" && g.bo
 ok("the two lines are tightly spaced (4px tall, 2px apart)", geom.every((g) => g.h === 4), JSON.stringify(geom.map((g) => g.h)));
 ok("each separator spans the head's width", geom.every((g) => Math.abs(g.w - g.hw) < 1), JSON.stringify(geom.map((g) => `${g.w}/${g.hw}`)));
 
-// a scope swap re-renders the head: the framing holds, no duplicates
+// a filter re-renders the head (the strip's Seat type row): the framing holds, no duplicates
 await page.evaluate(() => {
-  document.querySelector("[data-scope-trigger]").click();
-  const it = [...document.querySelectorAll(".st-scm [data-scope]")].find((x) => x.dataset.scope.startsWith("cls:"));
-  it.click();
+  document.querySelector('#type-filters [data-cls]:not([data-cls=""])').click();
 });
 await wait(400);
 {
   const ks2 = await kinds();
-  ok("four rules after a scope change", ks2.filter((k) => k === "SEP").length === 4, `got ${ks2.filter((k) => k === "SEP").length}`);
-  ok("labels still ruled above after the scope change", labelsAboveRules(ks2), JSON.stringify(ks2));
+  ok("four rules after a filter change", ks2.filter((k) => k === "SEP").length === 4, `got ${ks2.filter((k) => k === "SEP").length}`);
+  ok("labels still ruled above after the filter change", labelsAboveRules(ks2), JSON.stringify(ks2));
+  await page.evaluate(() => document.querySelector('#type-filters [data-cls=""]').click());
 }
 
 // the Now frame: no swing line, and its "govt" tag rides inside the figures
@@ -58,7 +58,7 @@ await wait(400);
 await frame("now");
 ks = await kinds();
 ok("now: no top-level govt tag (it nests in the grid)", !ks.includes("fg"), JSON.stringify(ks.slice(0, 5)));
-ok("now: four rules, crown first", ks.filter((k) => k === "SEP").length === 4 && ks[0] === "SEP" && ks[1] === "LAB(Two-party)", JSON.stringify(ks.slice(0, 4)));
+ok("now: four rules, crown first", ks.filter((k) => k === "SEP").length === 4 && ks[0] === "SEP" && ks[1] === "LAB(Seats)", JSON.stringify(ks.slice(0, 4)));
 ok("now: every label has a rule directly above it", labelsAboveRules(ks), JSON.stringify(ks));
 
 // phone rung: rules don't add overflow
