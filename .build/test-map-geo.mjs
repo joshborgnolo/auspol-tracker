@@ -38,9 +38,13 @@ const topojson = (() => { const g = {}; vm.runInNewContext(R("map/vendor/topojso
 // These checks concern the later mapshaper simplification/shared-arc recipe.
 const YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 
-// the floor pair itself lives in geo_build.mjs
-assert.ok(/lo: \{ iv: 1000, minArea: "2km2" \}, hi: \{ iv: 60, minArea: "0\.1km2" \}/.test(R(".build/map/geo_build.mjs")),
-  "geo_build.mjs keeps the per-level island floor (lo 2km2, hi 0.1km2)");
+// the floor pair itself lives in geo_build.mjs (lo tolerance halved 2026-11-08:
+// at iv:1000 the weighted simplifier's layer-wide adaptive weights let each
+// redistribution's junction pattern re-shape identical source coastlines year
+// to year — 2025's lo bowed Sydney's northern beaches ~500m seaward beside
+// 2022's tight line; 500 holds every era's coast within ~130m of the source)
+assert.ok(/lo: \{ iv: 500, minArea: "2km2" \}, hi: \{ iv: 60, minArea: "0\.1km2" \}/.test(R(".build/map/geo_build.mjs")),
+  "geo_build.mjs keeps the per-level island floor (lo 2km2 at iv 500, hi 0.1km2)");
 
 // nearest land vertex to a probe point, km (equirectangular at the probe's latitude)
 function closest(fc, [lon, lat]) {

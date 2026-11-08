@@ -42,7 +42,13 @@ const MS = process.env.MAPSHAPER || "mapshaper";
 const flag = rest.find((a) => a.startsWith("--years="));
 const YEARS = flag ? flag.slice("--years=".length).split(",") : [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 if (YEARS.some(y=>Number(y)<=2001)) throw new Error('1993–2001 use handbook_geo.mjs; do not simplify or overwrite the original Handbook geometry');
-const LEVELS = { lo: { iv: 1000, minArea: "2km2" }, hi: { iv: 60, minArea: "0.1km2" } };
+// lo tolerance halved 2026-11-08: at interval=1000 the weighted simplifier's
+// layer-wide adaptive weights shifted with each redistribution's junction
+// pattern, so identical source coastlines simplified to visibly different
+// shapes year to year — 2025's lo bowed the northern beaches up to ~500m
+// seaward beside 2022's tight line. 500 keeps the coasts within ~130m of the
+// source at country zoom for every era, at ~40% more bytes.
+const LEVELS = { lo: { iv: 500, minArea: "2km2" }, hi: { iv: 60, minArea: "0.1km2" } };
 const SEA_YEARS = new Set([2019, 2022, 2025]);
 const key = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
 
