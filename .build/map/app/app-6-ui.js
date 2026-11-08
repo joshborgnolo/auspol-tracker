@@ -363,6 +363,8 @@ function legendHTML(m) {
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
   // the chamber view chooses its chamber first
   let h = (S.view === "chamber" ? houseSwitchHTML() : "") + basisHTML();
+  // (everything the lens adds — its settings and notes — gathers below into one block under Base)
+  const subAt = h.length;
   switch (S.lens) {
     case "winner": {
       break;
@@ -395,7 +397,9 @@ function legendHTML(m) {
       // Labor's rival in the final: the Coalition, or One Nation where the year has such finals on file;
       // the groups whose preferences can be read are the other parties'
       const from = [["grn", "the Greens’"], S.vs === "onp" ? ["lnp", STATE_YEARS.has(m.year) ? "the Liberals’" : "the Coalition’s"] : ["onp", "One Nation’s"], ["ind", "independents’"], ["oth", "other candidates’"]];
-      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went${hasVsOnp(m) ? `, Labor v ${opt("vs", S.vs, [["lnp", STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"], ["onp", "One Nation"]])}` : ""}${flowSrcBtn(m)}</div>`;
+      // the sentence on its own line, the contest and the source as options under it
+      const matchup = hasVsOnp(m) ? lgMenu("vs", [["lnp", `Labor v ${STATE_YEARS.has(m.year) ? "the Liberals" : "the Coalition"}`], ["onp", "Labor v One Nation"]], S.vs, "Preference contest") : "", source = flowSrcBtn(m);
+      h += `<div class="lg-t">Where ${opt("from", S.from, from)} preferences went</div>${matchup || source ? `<div class="lg-t lg-opts">${matchup}${source}</div>` : ""}`;
 
       const fe = m.res.flBasis === "modelled" ? flowErrOf(m, S.from) : null;
       if (fe) h += `<div class="lg-note">Modelled estimates — South Australia publishes no per-candidate splits. ${fe.seat ? `Nine in ten of the model’s per-seat estimates land within ${f0(fe.v)} points of a counted split.` : `Labor v One Nation splits are checked only in total, to within about ${f0(fe.v)} points, never seat by seat.`}</div>`;
@@ -404,7 +408,7 @@ function legendHTML(m) {
     }
     case "senpref": {
       const none = spYear(m.year) == null, gvt = spGvtYear(m.year) != null;
-      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}${flowSrcBtn(m)}</div>`;
+      h += `<div class="lg-t">How ${opt("spfrom", S.spFrom, spDonorOpts())} Senate ${gvt ? "tickets put" : "voters ranked"} ${opt("sppair", S.spPair, SP_PAIR_OPTS)}</div>${flowSrcBtn(m) ? `<div class="lg-t lg-opts">${flowSrcBtn(m)}</div>` : ""}`;
 
       h += `<div class="lg-note">${spYear(m.year) == null ? "A state election has no Senate-ballot preference record here." : none ? "No Senate preference record before 2004 — group tickets are published from then, every ballot's own order only from 2016." : gvt ? `Lodged group voting tickets, ${m.year} — the order a party-box vote copied that year; how voters numbered their own papers is published only from 2016.` : STATE_YEARS.has(m.year) ? "Every formal upper-house ballot in New South Wales, by which of the two it numbered first; ballots numbering neither are set aside." : "Every formal Senate ballot, by which of the two it numbered first; ballots numbering neither are set aside."}</div><div class="lg-note"><span class="lg-hatch"></span>Fewer than ${SP_MIN} of these ballots name either</div>`;
       break;
@@ -502,6 +506,7 @@ function legendHTML(m) {
       break;
     }
   }
+  { const sub = h.slice(subAt); h = h.slice(0, subAt) + (sub ? `<div class="lg-sub">${sub}</div>` : ""); }
   // the two filters, State and Seat type, in every view (map, chamber, list) — on a
   // phone, with the map's Draw and Jump to, as one tidy grid of menus instead
   const tight = panelMQ.matches;

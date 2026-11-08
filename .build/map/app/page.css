@@ -1269,3 +1269,18 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-fj-menu { display: none; }
 .lg-bmenu .st-scm button:disabled { color: var(--ink-faint); cursor: not-allowed; }
 .lg-bmenu .st-scm button:disabled:hover { background: none; }
+
+/* ------- the lens's own block under Base (legendHTML's lg-sub) -------
+   A lens's settings and notes hang beneath the Base row as its children —
+   indented under Base's value, a hairline at their side — every choice in
+   them one weight (a menu's chevron, a switch's ⇄), notes a step quieter */
+.mp-legend .lg-sub { display: flex; flex-direction: column; gap: 3px; margin: -1px 0 2px 21px; padding: 1px 0 2px 11px; border-left: 1px solid var(--line); }
+.mp-legend .lg-sub .lg-t { font-size: 13px; font-weight: 400; color: var(--ink-2); gap: 2px 6px; line-height: 1.5; }
+.mp-legend .lg-sub .lg-bmenu, .mp-legend .lg-sub .st-sclab, .mp-legend .lg-sub .lg-t button.flip { font-size: 13px; font-weight: 500; color: var(--ink); }
+.mp-legend .lg-sub .lg-t button.flip { padding: 0; border-bottom: 0; }
+.mp-legend .lg-sub .lg-t button.flip span { margin-left: 3px; font-weight: 400; color: var(--ink-3); }
+.mp-legend .lg-sub .lg-t button.flip:hover, .mp-legend .lg-sub .st-sclab:hover { text-decoration: underline; text-underline-offset: 3px; }
+.mp-legend .lg-sub .lg-opts { gap: 2px 16px; }
+.mp-legend .lg-sub .lg-note { font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.mp-legend .lg-sub .lg-cats, .mp-legend .lg-sub .lg-contest { margin-top: 0; }
+@media (max-width: 560px) { .mp-legend .lg-sub { margin-left: 8px; padding-left: 9px; } .mp-legend .lg-sub .lg-note { display: block; } }

@@ -1270,6 +1270,21 @@ html.mp-fs .mp-tip { z-index: 260; }
 .lg-bmenu .st-scm button:disabled { color: var(--ink-faint); cursor: not-allowed; }
 .lg-bmenu .st-scm button:disabled:hover { background: none; }
 
+/* ------- the lens's own block under Base (legendHTML's lg-sub) -------
+   A lens's settings and notes hang beneath the Base row as its children —
+   indented under Base's value, a hairline at their side — every choice in
+   them one weight (a menu's chevron, a switch's ⇄), notes a step quieter */
+.mp-legend .lg-sub { display: flex; flex-direction: column; gap: 3px; margin: -1px 0 2px 21px; padding: 1px 0 2px 11px; border-left: 1px solid var(--line); }
+.mp-legend .lg-sub .lg-t { font-size: 13px; font-weight: 400; color: var(--ink-2); gap: 2px 6px; line-height: 1.5; }
+.mp-legend .lg-sub .lg-bmenu, .mp-legend .lg-sub .st-sclab, .mp-legend .lg-sub .lg-t button.flip { font-size: 13px; font-weight: 500; color: var(--ink); }
+.mp-legend .lg-sub .lg-t button.flip { padding: 0; border-bottom: 0; }
+.mp-legend .lg-sub .lg-t button.flip span { margin-left: 3px; font-weight: 400; color: var(--ink-3); }
+.mp-legend .lg-sub .lg-t button.flip:hover, .mp-legend .lg-sub .st-sclab:hover { text-decoration: underline; text-underline-offset: 3px; }
+.mp-legend .lg-sub .lg-opts { gap: 2px 16px; }
+.mp-legend .lg-sub .lg-note { font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.mp-legend .lg-sub .lg-cats, .mp-legend .lg-sub .lg-contest { margin-top: 0; }
+@media (max-width: 560px) { .mp-legend .lg-sub { margin-left: 8px; padding-left: 9px; } .mp-legend .lg-sub .lg-note { display: block; } }
+
 /* =============================== the retro view ===============================
    html.mp-retro dresses the page as a website from about 2000: a navy banner
    with the flag, the title and Parliament House, tab buttons for the views,
@@ -1438,6 +1453,8 @@ html.mp-retro .mp-legend .lg-draw button:disabled { color: var(--rt-sh); text-sh
 html.mp-retro .mp-legend .lg-jgap { flex: 1 1 8px; }
 html.mp-retro .mp-legend .lg-jump .lg-jtoggle { display: inline-grid; align-items: center; box-shadow: var(--rt-raised); }
 html.mp-retro .mp-legend .lg-t, html.mp-retro .mp-legend .lg-basis, html.mp-retro .mp-legend .lg-note, html.mp-retro .mp-legend .lg-s, html.mp-retro .mp-legend .lg-shapes { font-size: 12px; color: #000; }
+html.mp-retro .mp-legend .lg-sub { border-left-color: var(--rt-sh); }
+html.mp-retro .mp-legend .lg-sub .lg-t, html.mp-retro .mp-legend .lg-sub .lg-note { font-size: 12px; color: #000; }
 html.mp-retro .mp-legend .lg-t button.flip { display: inline-flex; align-items: center; border-bottom: 0; height: 21px; padding: 0 7px; background: var(--rt-face); box-shadow: var(--rt-raised); }
 html.mp-retro .lg-typefilter button i { border-radius: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .5); }
 /* the dropdowns: white combo boxes with their arrow buttons */
