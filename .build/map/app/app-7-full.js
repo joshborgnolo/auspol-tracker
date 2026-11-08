@@ -62,6 +62,7 @@ function fsBuild() {
       <div class="fs-scroll"></div>
     </aside>
     <button type="button" class="fs-show fs-plate" hidden aria-label="Show the panel" title="Show the panel">${FS_ICON.side}</button>
+    <button type="button" class="fs-untuck fs-plate" aria-label="Show the panel" title="Show the panel"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 8.8 7 5l4 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Panel</span></button>
     <div class="fs-dock fs-plate">
       <button type="button" class="fs-play" aria-label="Play through the elections" title="Play through the elections (Space)">${FS_ICON.play}</button>
       <div class="fs-steps"><button type="button" class="fs-step" data-step="-1" aria-label="The election before" title="The election before (←)">${FS_ICON.prev}</button><button type="button" class="fs-step" data-step="1" aria-label="The election after" title="The election after (→)">${FS_ICON.next}</button></div>
@@ -131,17 +132,17 @@ function fsLayout() {
     FS.vslot.appendChild(views);
     FS.lslot.appendChild(legend);
     FS.el.appendChild(FS.dock);
-    FS.sheetUp = false; FS.sheetDown = false; FS.el.classList.remove("sheet-up", "sheet-down");
+    FS.sheetUp = false; FS.sheetDown = false; FS.el.classList.remove("sheet-up", "sheet-down"); FS.side.inert = false;
   }
   FS.showBtn.hidden = phone || !FS.bare;
 }
 
 /* ----- the clear ground: the room the plates take at each edge, in stage px ----- */
 /* the sheet's resting rooms: at rest its handle, the dock, the key and room for
-   the story's first line; tucked down, the handle and the dock alone, the map
-   given the rest of the screen */
+   the story's first line; tucked down, nothing — the sheet leaves the screen to
+   the map, a small Panel button floating at the foot to bring it back */
 function fsPeekOf(down) {
-  if (down) return Math.round(FS.grab.offsetHeight + FS.dock.offsetHeight + 6);
+  if (down) return 0;
   const lg = $("#legend"), key = lg && !lg.hidden ? lg.offsetHeight : 0;
   return Math.round(Math.min(FS.grab.offsetHeight + FS.dock.offsetHeight + key + 54, FS.el.clientHeight * 0.48));
 }
@@ -303,7 +304,7 @@ async function fsExit(o = {}) {
   FS.on = false;
   el.hidden = true; FS.veil.hidden = true;
   el.classList.remove("leaving", "sheet-up", "sheet-down");
-  FS.sheetUp = false; FS.sheetDown = false;
+  FS.sheetUp = false; FS.sheetDown = false; if (FS.side) FS.side.inert = false;
   if (FS.exitAnims) { for (const a of FS.exitAnims) a.cancel(); FS.exitAnims = null; }
   document.documentElement.classList.remove("mp-fs");
   FS.ins = { t: 0, r: 0, b: 0, l: 0 };
@@ -346,8 +347,14 @@ function fsSheetTo(st) {
   const tk = $(".fs-tuck", FS.el);
   if (tk) { const t = FS.sheetDown ? "Bring the panel up" : "Tuck the panel down"; tk.setAttribute("aria-label", t); tk.title = t; }
   if (!FS.sheetUp) FS.scroll.scrollTop = 0;
+  // tucked away, the sheet is out of reach and out of the tab order; the Panel button stands in
+  FS.side.inert = FS.sheetDown;
   // the resting room changed: the map's clear ground grows or shrinks with it
-  if (wasDown !== FS.sheetDown) fsMeasure(false);
+  if (wasDown !== FS.sheetDown) {
+    fsMeasure(false);
+    if (FS.sheetDown) $(".fs-untuck", FS.el)?.focus({ preventScroll: true });
+    else if (document.activeElement && document.activeElement.closest(".fs-untuck")) $(".fs-tuck", FS.el)?.focus({ preventScroll: true });
+  }
 }
 function fsSheet(up) { fsSheetTo(up ? "up" : "rest"); }
 // a step up the three places (the handle's tap), or down
@@ -397,6 +404,7 @@ function fsSheetDrag() {
   FS.grab.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
   // the tuck button: the map takes the screen, the dock stays to hand
   $(".fs-tuck", FS.el).addEventListener("click", () => fsSheetTo(FS.sheetDown ? "rest" : "down"));
+  $(".fs-untuck", FS.el).addEventListener("click", () => fsSheetTo("rest"));
 }
 // the view's own rules: the plates know whether the map, the chamber or the list is up
 function fsView() {
