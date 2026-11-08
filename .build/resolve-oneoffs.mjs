@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-/* resolve-oneoffs.mjs – VALIDATOR + tripwire for data/resolve-one-offs.json.
+/* resolve-oneoffs.mjs – VALIDATOR + tripwire for data/resolve-one-offs.json;
+   resolve-oneoffs-file.mjs (the auto-filer) imports NO_TOPICALS from here
+   so the guard and the filer share one def.
 
    The Resolve Political Monitor publishes no machine-readable one-off feed:
    the topical questions live only in the weekly SMH/Age article prose, so
@@ -28,7 +30,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { themeOf } from "./newtracker/adhoc-themes.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,12 +38,15 @@ const REVIEW_GRACE_DAYS = 7;
 
 /* Waves whose articles were read and carried NO topical questions – the
    tripwire's whitelist. Extend only after reading the wave's article. */
-const NO_TOPICALS = new Set(["2025-08-16", "2025-09-13"]);
+export const NO_TOPICALS = new Set(["2025-08-16", "2025-09-13"]);
 
 const ENTRY_KEYS = ["id", "waveDate", "dateStart", "dateEnd", "published", "sample",
   "sampleEff", "url", "question", "notes", "tables"];
 const TABLE_KEYS = ["title", "source", "headers", "rows"];
 
+// library-safe: the checks run only on a direct invocation, never on import
+// (resolve-oneoffs-file.mjs imports NO_TOPICALS above)
+export function validateOneoffs() {
 const problems = [];
 const bad = (msg) => problems.push(msg);
 
@@ -138,3 +143,8 @@ if (problems.length) {
 console.log(`resolve-oneoffs: clean – ${entries.length} entries over ${waves.size} waves, `
   + `${new Set(entries.map((e) => e.id)).size} ids, newest ${maxWave}; `
   + `${polls.length} Resolve waves on file (${NO_TOPICALS.size} whitelisted topical-free)`);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) validateOneoffs();
+
+
