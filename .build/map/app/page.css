@@ -1037,8 +1037,7 @@ html.mp-fs .mp-tip { z-index: 260; }
   .fs.bare .fs-top { left: 8px; }
   .fs-x { grid-column: 1; grid-row: 1; }
   .fs-sbox { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; }
-  /* (a phone's search rides the top bar: placeSearch moves it there) */
-  .fs.phone .fs-sbox { display: block; }
+  /* (the search rides the top bar: placeSearch moves it there) */
   .fs .mp-search input { font-size: 16px; }
   .fs .mp-search kbd { display: none; }
   .fs-tviews { grid-column: 3; grid-row: 1; display: flex; padding: 0 2px; }
@@ -1142,6 +1141,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-legend .mp-search { flex: 0 1 300px; width: 300px; max-width: 100%; order: 0; margin: 0; align-self: auto; }
 .mp-legend .mp-search label { height: 23px; border-radius: 2px; }
 .fs-sbox { display: none; }
+.fs .fs-sbox { display: block; }
 .fs .mp-legend .lg-toolbar { flex-wrap: nowrap; }
 .fs .mp-legend .mp-search { flex: 0 1 300px; width: auto; min-width: 0; }
 .fs .mp-legend .mp-search label { min-width: 0; box-shadow: none; }

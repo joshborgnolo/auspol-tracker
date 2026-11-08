@@ -2613,7 +2613,7 @@ for (const y of ["sa22", "sa26"]) {
 // way out and the views — not boxed in among the panel's menus (2026-11-08, user call)
 {
   const ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(ui.includes("if (FS.on && FS.phone && FS.sbox) {") && ui.includes("FS.sbox.append(sx);") && css.includes(".fs.phone .fs-sbox { display: block; }"), "the phone's full-screen search rides the top bar");
+  assert.ok(ui.includes("if (FS.on && FS.sbox) {") && ui.includes("FS.sbox.append(sx);") && css.includes(".fs .fs-sbox { display: block; }"), "full screen's search rides the top bar, a laptop's and a phone's");
 }
 
 // Controls share one stack; basis scales are no longer part of the panel.

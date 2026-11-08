@@ -10963,18 +10963,17 @@ function renderLegend() {
   updateHint();
 }
 /* where the search field sits: on a laptop it shares the control panel's Base
-   row (in full screen too, on the panel's plate); on a phone it stands atop the
-   map, above the stage or, in full screen, in the top bar between the way out
-   and the views — never boxed in among the panel's menus (a search is how a
-   phone reader finds their seat first). */
+   row; on a phone it stands atop the map, above the stage; in full screen, on
+   any screen, it rides the top bar's plate by the way out — never boxed in
+   among the panel's menus (2026-11-08, user calls). */
 const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px)") : { matches: false };
 // (held here: the strip's rebuild lifts the field out of the page for a moment)
 const SEARCH_EL = $(".mp-search");
 function placeSearch() {
   const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
   if (!sx || !stage || !el) return;
-  // a phone's full screen keeps it atop the map too: in the top bar, between the way out and the views
-  if (FS.on && FS.phone && FS.sbox) {
+  // full screen keeps it atop the map: in the top bar's plate, by the way out (a laptop's and a phone's alike)
+  if (FS.on && FS.sbox) {
     sx.classList.remove("mp-search-top");
     if (sx.parentElement !== FS.sbox) FS.sbox.append(sx);
     return;
