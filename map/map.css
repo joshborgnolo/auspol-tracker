@@ -1421,6 +1421,10 @@ html.mp-retro .mp-legend .lg-hint:empty { background: none; box-shadow: none; }
 html.mp-retro .mp-stage { border-radius: 0; background: #ece9e2; box-shadow: var(--rt-sunken); }
 html.mp-retro .mp-stage canvas { inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); }
 html.mp-retro .mp-zoom { top: 8px; right: 8px; gap: 4px; }
+/* (full screen seats the zoom plate itself, clear of its plates: the page's corner rule stands aside there) */
+html.mp-retro .fs .mp-zoom { top: auto; right: var(--fs-r); bottom: calc(var(--fs-b) + 10px); }
+html.mp-retro .fs .mp-stage canvas { inset: 0; width: 100%; height: 100%; }
+@media (max-width: 860px) { html.mp-retro .fs .mp-zoom { right: 8px; top: calc(var(--fs-t) + 8px); bottom: auto; } }
 html.mp-retro .mp-zoom button { width: 28px; height: 28px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; text-shadow: none; }
 html.mp-retro .mp-zoom button:active { box-shadow: var(--rt-pressed); }
 html.mp-retro .mp-zoom button svg path[stroke="white"] { display: none; }
