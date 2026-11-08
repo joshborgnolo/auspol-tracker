@@ -786,7 +786,7 @@ function areasUnpack(D) {
   });
   const geoms = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map((g) => {
     const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
-    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
+    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity], code: g.properties && g.properties.SA1_CODE21 };
   });
   const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
   const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
@@ -924,7 +924,7 @@ function areasHit(m, x, y) {
   for (const gi of cell2) {
     const b = pr.bb[gi];
     if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
-    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi], code: AR.pack.geoms[gi].code };
   }
   return null;
 }

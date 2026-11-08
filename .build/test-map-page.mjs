@@ -2638,6 +2638,19 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".lg-toolbar"), "the panel's toolbar row carries its flex rule");
 }
 
+// a still-loading year is a shell record (loadYear registers it before its
+// fetch): renderers that can fire in the gap — the legend from the legend-meta
+// completion, resize from the stage observer — leave it alone (2026-11-09: a
+// direct open of a Handbook year raced that meta fetch into legendHTML's
+// m.areas and the boot died; the fix is pinned by the throttled-boot recipe in
+// .matilda/map-1993-catch.mjs)
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes("if (!m.search) return;") && ui.indexOf("if (!m) { el.hidden = true; return; }") < ui.indexOf("if (!m.search) return;"), "the legend leaves a still-loading year's shell record alone");
+  assert.ok(ui.includes("if (M() && M().geo) {"), "resize frames geometry only once the year's record carries it");
+  assert.ok(js.includes("if (!m.search) return;") && js.includes("if (M() && M().geo)"), "both guards ship in the bundle");
+}
+
 // the strip's draw note rides UNDER the Draw row on every lens (user call
 // 2026-11-08 — it floated above it on the winner lens); and fullscreen keeps
 // the search on the Base row, not on its own line under it

@@ -5308,7 +5308,7 @@ function areasUnpack(D) {
   });
   const geoms = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map((g) => {
     const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
-    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
+    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity], code: g.properties && g.properties.SA1_CODE21 };
   });
   const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
   const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
@@ -5446,7 +5446,7 @@ function areasHit(m, x, y) {
   for (const gi of cell2) {
     const b = pr.bb[gi];
     if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
-    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi], code: AR.pack.geoms[gi].code };
   }
   return null;
 }
@@ -10961,6 +10961,12 @@ function renderLegend() {
   // (its coloured cells) as the map and chamber, so it needs the same key —
   // census measure picker, ramps and switchers included
   if (!m) { el.hidden = true; return; }
+  // a year still loading is a shell record (loadYear registers it before the
+  // fetch): nothing the key measures is on it yet — leave what's shown for the
+  // load's landing renders (2026-11-09: the Handbook years' multi-second
+  // geometry build threw here — m.areas didn't exist under legendHTML — and
+  // the legend-meta fetch landing in the gap aborted the whole boot)
+  if (!m.search) return;
   el.hidden = false;
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
   const search = SEARCH_EL;
@@ -11598,7 +11604,7 @@ function tipFor(h) {
     // on Areas the census's own area answers first, with its counted figure
     const arh = drawOf(m) === "areas" && AR.pack ? AR.here : null;
     const first = arh && arh.v != null
-      ? `<div class="tv">In ${esc(arh.sa2)}: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
+      ? `<div class="tv">In ${esc(arh.sa2)}: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">${arh.code ? `Census SA1 ${esc(arh.code)} · ` : ""}${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
       : here ? `<div class="tv">Around here: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div>` : "";
     return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${first}<div class="${here || first ? "ts" : "tv"}">${here || first ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
@@ -12180,7 +12186,9 @@ function resize() {
   const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
-  if (M()) {
+  // a year still loading has no geometry to frame against (its shell record is
+  // registered before the fetch) — the load's landing calls resize() itself
+  if (M() && M().geo) {
     setExtent();
     // the step into or out of full screen brings its own camera (app-7-full.js)
     if (FS.move) { const mv = FS.move; FS.move = null; mv(); }

@@ -189,6 +189,10 @@ assert.ok(src.includes("homeless lane stays as seats"), "the disabled reason for
 assert.ok(R(".build/map/app/app-6-ui.js").includes("areasHit("), "hover hits a census area");
 const tip = R(".build/map/app/app-6-ui.js");
 assert.ok(tip.includes("as counted at the ${areasVintage(m)} census"), "the tooltip counts its census");
+// the hover names the area by its SA1 code (ships from the pack's geometry properties, 2026-11-09)
+assert.ok(src.includes("code: g.properties && g.properties.SA1_CODE21"), "areasUnpack lifts each geometry's SA1 code");
+assert.ok(src.includes("code: AR.pack.geoms[gi].code"), "the hover hit carries the SA1 code");
+assert.ok(tip.includes("Census SA1 ${esc(arh.code)}"), "the tooltip prints the area's SA1 code");
 // the legend swaps in the pack's caps; the seats' own histogram is retired
 // wholesale (f2d5ae47 rebuilt the key's controls around the basis select)
 assert.ok(tip.includes("arCap") && !tip.includes("legendHist"), "the legend swaps in the pack's caps — the seats' histogram is retired, not just parked");
