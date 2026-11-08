@@ -20083,10 +20083,10 @@
   {
    "pollster": "Resolve",
    "date": "2026-11-07",
-   "dateStart": null,
-   "sample": null,
+   "dateStart": "2026-11-02",
+   "sample": 2250,
    "sampleEff": null,
-   "source": null,
+   "source": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html",
    "seriesDate": "2026-11-08",
    "read": "published series",
    "question": "perform best in each of these areas",
