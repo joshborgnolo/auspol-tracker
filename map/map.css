@@ -1036,6 +1036,8 @@ html.mp-fs .mp-tip { z-index: 260; }
   .fs.bare .fs-top { left: 8px; }
   .fs-x { grid-column: 1; grid-row: 1; }
   .fs-sbox { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; }
+  /* (a phone's search rides the top bar: placeSearch moves it there) */
+  .fs.phone .fs-sbox { display: block; }
   .fs .mp-search input { font-size: 16px; }
   .fs .mp-search kbd { display: none; }
   .fs-tviews { grid-column: 3; grid-row: 1; display: flex; padding: 0 2px; }
@@ -1526,6 +1528,7 @@ html.mp-retro .fs { background: var(--rt-face); }
 html.mp-retro .fs-plate { border-radius: 0 !important; border: 0 !important; background: var(--rt-face) !important; box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .3) !important; }
 html.mp-retro .fs-title h2 { font: 700 13px/1 var(--rt-font); }
 html.mp-retro .fs-tuck { top: 3px; right: 8px; width: 30px; height: 20px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; }
+html.mp-retro .fs .fs-sbox .mp-search label { height: 32px !important; margin-top: 5px; }
 html.mp-retro .fs-untuck { height: 26px; border-radius: 0 !important; color: #000; font: 400 12px/1 var(--rt-font); }
 
 /* tablet and phone: the banner folds to fit */

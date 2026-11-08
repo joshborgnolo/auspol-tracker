@@ -62,7 +62,7 @@ function valueText(v, kind, ctx) {
 let phCtx = null;
 function fitSearchPlaceholder() {
   const input = $("#q"), sen = S.view === "chamber" && S.house === "senate";
-  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, town, member or place", "Search a seat, member or place", "Search a seat or member", "Search"];
+  const list = sen ? ["Search a senator or state", "Search a senator", "Search"] : ["Search a seat, town, member or place", "Search a seat, member or place", "Search a seat or member", "Search a seat", "Search"];
   if (!phCtx) phCtx = document.createElement("canvas").getContext("2d");
   const cs = getComputedStyle(input);
   phCtx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
@@ -138,15 +138,22 @@ function renderLegend() {
   updateHint();
 }
 /* where the search field sits: on a laptop it shares the control panel's Base
-   row; on a phone, where the panel falls below the map, it stands atop the map
-   instead (a search is how a phone reader finds their seat first). Full screen
-   takes it back into the panel, which its plate carries. */
+   row (in full screen too, on the panel's plate); on a phone it stands atop the
+   map, above the stage or, in full screen, in the top bar between the way out
+   and the views — never boxed in among the panel's menus (a search is how a
+   phone reader finds their seat first). */
 const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px)") : { matches: false };
 // (held here: the strip's rebuild lifts the field out of the page for a moment)
 const SEARCH_EL = $(".mp-search");
 function placeSearch() {
   const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
   if (!sx || !stage || !el) return;
+  // a phone's full screen keeps it atop the map too: in the top bar, between the way out and the views
+  if (FS.on && FS.phone && FS.sbox) {
+    sx.classList.remove("mp-search-top");
+    if (sx.parentElement !== FS.sbox) FS.sbox.append(sx);
+    return;
+  }
   if (phoneMQ.matches && !FS.on) {
     sx.classList.add("mp-search-top");
     if (sx.nextElementSibling !== stage) stage.before(sx);

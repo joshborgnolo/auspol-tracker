@@ -2609,6 +2609,13 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".fs.phone.sheet-down .fs-untuck { display: inline-flex; }"), "the Panel button shows only while the sheet is tucked away");
 }
 
+// a phone's full screen keeps the search atop the map, in the top bar between the
+// way out and the views — not boxed in among the panel's menus (2026-11-08, user call)
+{
+  const ui = part("app-6-ui.js"), css = part("page.css");
+  assert.ok(ui.includes("if (FS.on && FS.phone && FS.sbox) {") && ui.includes("FS.sbox.append(sx);") && css.includes(".fs.phone .fs-sbox { display: block; }"), "the phone's full-screen search rides the top bar");
+}
+
 // Controls share one stack; basis scales are no longer part of the panel.
 {
   const ui = part("app-6-ui.js"), css = part("page.css"), st = part("app-4-story.js");

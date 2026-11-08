@@ -1036,6 +1036,8 @@ html.mp-fs .mp-tip { z-index: 260; }
   .fs.bare .fs-top { left: 8px; }
   .fs-x { grid-column: 1; grid-row: 1; }
   .fs-sbox { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; }
+  /* (a phone's search rides the top bar: placeSearch moves it there) */
+  .fs.phone .fs-sbox { display: block; }
   .fs .mp-search input { font-size: 16px; }
   .fs .mp-search kbd { display: none; }
   .fs-tviews { grid-column: 3; grid-row: 1; display: flex; padding: 0 2px; }
