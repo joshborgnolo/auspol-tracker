@@ -16,10 +16,19 @@ a:visited { color: #551a8b; }
   padding: 10px clamp(20px, 5vw, 64px) 20px; }
 .rt-btitle { margin: 0; }
 .rt-tabs .ap-ts { display: none; }
+/* seven measures and the way back: the row wraps where it must, as the old
+   many-tabbed dialogs stacked their rows */
+.rt-tabs { flex-wrap: wrap; row-gap: 3px; }
 
 /* the party inks: the map's colours for the big figures, each darkened for 12px type */
 .ap-k-alp { color: #c8240a; } .ap-k-lnp { color: #1432d5; } .ap-k-grn { color: #0b7a33; } .ap-k-onp { color: #b45500; } .ap-k-oth { color: #505050; } .ap-k-0 { color: #000; }
 .ap-b-alp { background: #f7310a; } .ap-b-lnp { background: #1432d5; } .ap-b-onp { background: #ff8c00; } .ap-b-0 { background: #808080; }
+.ap-b-grn { background: #14ad4a; }
+/* the direction pair keeps off the party colours, as the modern facet's mood inks do: the old palette's teal and a brown */
+.ap-k-pos { color: #007a7a; } .ap-k-neg { color: #7a4a1e; }
+.ap-b-pos { background: #008080; } .ap-b-neg { background: #8a5a2b; } .ap-b-u { background: #c8c4bc; }
+/* the gauges' inks, as the modern facet's: the two Roy Morgan series, the other banks', DemosAU's */
+.ap-b-cm { background: #6a2c91; } .ap-b-ca { background: #c08a00; } .ap-b-c3 { background: #008080; }
 
 /* ----- the panels: a raised panel under a navy caption bar ----- */
 .ap-panel { margin-top: 8px; padding: 3px 3px 8px; background: var(--rt-face); box-shadow: var(--rt-raised); }
@@ -118,6 +127,7 @@ a:visited { color: #551a8b; }
 .ap-r:hover th, .ap-r:hover td, .ap-r:focus th, .ap-r:focus td, .ap-r.open th, .ap-r.open td { background: var(--rt-sel); color: #fff; }
 .ap-r:hover *, .ap-r:focus *, .ap-r.open * { color: #fff !important; opacity: 1 !important; }
 .ap-r:hover .tb, .ap-r:focus .tb, .ap-r.open .tb { background: #fff; }
+.ap-r:hover .ap-sbar, .ap-r:focus .ap-sbar, .ap-r.open .ap-sbar { box-shadow: none; }
 .ap-r:hover .tb *, .ap-r:focus .tb *, .ap-r.open .tb * { color: inherit !important; }
 .ap-r:focus { outline: 1px dotted #fff; outline-offset: -2px; }
 /* a month: a band across the list, its name and count, its own figures under their columns */
@@ -157,6 +167,32 @@ html[data-ap-m="ld"] .ap-t .c-ld { width: 11%; }
 .tb-none { cursor: default; font-size: 11px; color: #808080; height: auto; }
 .tb-none::before { display: none; }
 .ap-key { margin: 6px 6px 0; font-size: 11px; line-height: 1.45; color: #000; }
+/* a head with nothing to sort by (the issues, the groups, the strips) */
+.ap-th { display: block; padding: 3px 7px; font-size: 12px; color: #000; line-height: 1.15; white-space: normal; }
+.ap-scale1 { display: block; padding: 4px 7px; font-size: 10px; color: #303030; white-space: nowrap; }
+/* the share bars: a sunken track, each share a segment as wide as its per cent */
+.ap-sbar { display: flex; height: 8px; margin-top: 3px; background: #fff; box-shadow: var(--rt-thin-in); padding: 1px; overflow: hidden; }
+.ap-sbar i { display: block; height: 100%; flex: none; }
+.ap-sbar i + i { box-shadow: inset 1px 0 #fff; }
+/* the direction columns: right, wrong, unsure and net over their changes, and the bar of the three */
+.ap-t .c-d { min-width: 52px; white-space: nowrap; }
+.ap-t .c-d b { font-size: 13px; }
+.ap-t .c-db { width: 170px; min-width: 140px; padding-top: 7px; }
+.ap-dbar { height: 12px; margin-top: 0; }
+/* the issues: the verdict over the four parties' shares */
+.ap-t .c-i { min-width: 82px; white-space: nowrap; cursor: help; }
+.ap-t .c-i b { font-size: 12px; }
+.ap-ibar { width: 74px; }
+html[data-ap-m="iss"] .ap-t thead th.c-i { vertical-align: bottom; }
+/* the groups a row compares */
+.ap-t .c-g { white-space: nowrap; color: #202020; }
+html[data-ap-m="dem"] .ap-t .c-p { width: 9%; }
+/* the gauges: the figure, its place on the 40–120 meter, its change */
+.ap-t .c-cf { min-width: 64px; white-space: nowrap; }
+.ap-t .c-cf b { font-size: 13px; }
+.ap-t .c-cb { width: 190px; min-width: 150px; padding-top: 6px; }
+/* an Offcuts family's band, a notch darker than a month's */
+.ap-fam th { background: #dcd8cf; }
 /* the old scroll bars, where a browser lets a page draw them */
 .ap-well::-webkit-scrollbar { width: 16px; height: 16px; }
 .ap-well::-webkit-scrollbar-track { background: repeating-conic-gradient(#d4d0c8 0 25%, #fff 0 50%) 0 0 / 2px 2px; }
@@ -173,6 +209,10 @@ html[data-ap-m="ld"] .ap-t .c-ld { width: 11%; }
 .ap-foot p { margin: 0 0 8px; }
 
 /* ----- widths ----- */
+@media (max-width: 1240px) {
+  .rt-tabs button[data-ap-tab] .rt-tl { display: none; }
+  .rt-tabs button[data-ap-tab] .ap-ts { display: inline; }
+}
 @media (max-width: 1100px) {
   .ap-t .c-s { display: none; }
 }
@@ -206,7 +246,7 @@ html[data-ap-m="ld"] .ap-t .c-ld { width: 11%; }
   .rt-tabs button .rt-tl { display: none; }
   .rt-tabs button .ap-ts { display: inline; }
   .rt-tabs .rt-modern .rt-tl { display: inline; }
-  .rt-tabs button { gap: 5px; padding: 0 6px; }
+  .rt-tabs button { gap: 5px; padding: 0 6px; flex: 1 1 auto; }
   .ap-tpp { font-size: 34px; }
   .ap-t th, .ap-t td { padding: 3px 5px; }
   .ap-t tbody .c-h { min-width: 104px; }
@@ -216,4 +256,7 @@ html[data-ap-m="ld"] .ap-t .c-ld { width: 11%; }
   /* a phone's month: its name over its count, the column kept narrow */
   .ap-m th b, .ap-m th span { display: block; margin-left: 0; }
   .ap-t tbody .c-h { max-width: 150px; }
+  /* the figure columns give up their desktop floors, so a phone's row fits its figures */
+  .ap-t .c-d, .ap-t .c-p, .ap-t .c-cf { min-width: 0; }
+  html[data-ap-m] .ap-t .c-p { width: auto; }
 }
