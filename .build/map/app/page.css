@@ -1228,3 +1228,22 @@ html.mp-fs .mp-tip { z-index: 260; }
 /* on a phone the search stands atop the map, full width, above the stage */
 .mp-search.mp-search-top { width: 100%; margin: 0 0 10px; align-self: stretch; }
 .mp-search.mp-search-top label { height: 40px; }
+
+/* ------- a phone's control panel (compactPanelHTML): four menus in a grid ------- */
+@media (max-width: 560px) {
+  .mp-legend .lg-cgrid { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 9px 8px; align-items: center; }
+  .lg-cgrid > .lg-label { justify-self: stretch; }
+  .lg-cg { min-width: 0; }
+  .lg-cg .st-sclab { max-width: 100%; white-space: nowrap; }
+  /* (the right column's menus open leftward, onto the screen) */
+  .lg-cgrid > :nth-child(4n) .st-scm { left: auto; right: 0; }
+  /* the zoom hint is a laptop's: a phone reader taps */
+  .mp-legend .lg-hint { display: none !important; }
+  /* the elections strip: one menu, not three lines of names */
+  .mp-frames { align-items: center; }
+  .mp-frames > button { display: none; }
+  .mp-frames .mp-fj-menu { display: inline-block; }
+}
+.mp-fj-menu { display: none; }
+.lg-bmenu .st-scm button:disabled { color: var(--ink-faint); cursor: not-allowed; }
+.lg-bmenu .st-scm button:disabled:hover { background: none; }

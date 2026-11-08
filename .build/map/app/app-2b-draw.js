@@ -1399,10 +1399,18 @@ function balloonKey(m, est) {
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;
 }
-function drawRowHTML(m) {
-  const on = S.draw, fits = surfaceFits(m);
+/* each drawing, and why this frame and lens can't draw it where they can't — one
+   list for the strip's Draw chips and the phone panel's Draw menu */
+function drawOpts(m) {
+  const fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo, cn = k === "chart" && !chartFits(m); return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an && !cn}"${cn ? ` disabled title="Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"` : ""}${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`; }).join("")}</div>`;
+  return DRAWS.map(([k, t]) => ({ k, t, why: k === "chart" && !chartFits(m) ? "Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"
+    : k === "surface" && !fits ? (S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend")
+    : k === "areas" && areasNo ? areasNo : "" }));
+}
+function drawRowHTML(m) {
+  const on = S.draw;
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither

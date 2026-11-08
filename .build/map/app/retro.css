@@ -278,4 +278,7 @@ html.mp-retro .fs-title h2 { font: 700 13px/1 var(--rt-font); }
   .rt-pages { display: none; }
   .rt-pagesb { display: inline-flex !important; }
   html.mp-retro .mp-legend .lg-label, html.mp-retro .mp-legend .lg-jump > b, html.mp-retro .mp-legend .lg-draw > span { min-width: 0; }
+  html.mp-retro .mp-legend .lg-hint { display: none !important; }
+  html.mp-retro .lg-cg .st-sclab { min-width: 0; width: 100%; }
+  html.mp-retro .mp-frames > button { display: none; }
 }

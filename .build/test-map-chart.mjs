@@ -137,7 +137,7 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
 /* ----- the wiring ----- */
 assert.ok(/const DRAWS = \[.*\["chart", "Chart"\]\]/.test(draw), "Chart is a drawing");
 assert.ok(draw.includes(`S.draw === "chart" ? "seats"`), "the map beneath a chart keeps its seats");
-assert.ok(draw.includes(`cn = k === "chart" && !chartFits(m)`), "the button says why a lens has no chart");
+assert.ok(draw.includes(`why: k === "chart" && !chartFits(m) ? "Chart plots a figure`), "the button (and the phone's Draw menu) says why a lens has no chart");
 assert.ok(ui.includes(`!(S.draw === "chart" && chartFits(my)) ? [false, true] : [false]`), "a chart's key holds only the seats' face");
 assert.ok(/chartSync\(m\);[^\n]*\n\s*\/\/ the key shows/.test(ui), "the chart's class is set before the key is measured");
 assert.ok(/function frame\(ts\) \{\n\s*raf = 0;\n\s*chartTick\(\);/.test(ui), "every frame ticks the chart");

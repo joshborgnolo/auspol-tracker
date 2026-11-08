@@ -26,7 +26,8 @@ const st = (page) => page.evaluate(() => {
 });
 
 // 1. the city-names toggle moves nothing
-for (const [label, w] of [["desktop", 1440], ["phone", 390]]) {
+// (a phone's toggle rides its Jump to menu: the tablet width keeps the chip row)
+for (const [label, w] of [["desktop", 1440], ["tablet", 700]]) {
   const page = await open("", w);
   const a = await st(page);
   const shifts = await page.evaluate(async () => {
@@ -124,9 +125,11 @@ for (const [label, w] of [["desktop", 1440], ["phone", 390]]) {
   check("no page errors", page.errs.length === 0, page.errs);
   await page.close();
 }
-// 5. the phone's search stands atop the map
+// 5. the phone's search stands atop the map; its panel is a grid of four menus
 {
   const page = await open("", 390);
+  const g = await page.evaluate(() => ({ labs: [...document.querySelectorAll(".lg-cgrid > .lg-label")].map((e) => e.textContent), chips: !!document.querySelector("#state-filters, #type-filters, #cities, .mp-legend .lg-draw"), fj: getComputedStyle(document.querySelector(".mp-fj-menu")).display !== "none" }));
+  check("phone: State, Seat type, Draw and Jump to as one grid of menus, no chip rows, the elections as a menu", g.labs.join("|") === "State|Seat type|Draw|Jump to" && !g.chips && g.fj, g);
   const p = await page.evaluate(() => { const s = document.querySelector(".mp-search"), st = document.querySelector("#stage"); return { above: s.getBoundingClientRect().bottom <= st.getBoundingClientRect().top + 1, inLegend: !!s.closest("#legend") }; });
   check("phone: search atop the map, out of the strip", p.above && !p.inLegend, p);
   await page.close();

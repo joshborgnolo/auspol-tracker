@@ -2531,7 +2531,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const inPool = new Set(idx), ch = (m.changes || []).filter((x) => inPool.has(m.byName.get(x.div)))") && st.includes("chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)))"), "the since-the-election notes and list name only the pool's own seats");
   assert.ok(st.includes("const statFold = { open: false };") && st.includes("statFold.open = !statFold.open;"), "the Others expander keeps its own fold across frames");
   // the strip's rows: in every view, an All first, the type chips the cls lens's key
-  assert.ok(ui.includes("function filterHTML(m) {") && ui.includes("h += filterHTML(m);") && ui.indexOf("h += filterHTML(m);") < ui.indexOf('if (S.view === "chamber" && m.seating)'), "the filter rows ride the strip in every view, ahead of the chamber's seating switch and the map's own rows");
+  assert.ok(ui.includes("function filterHTML(m) {") && ui.includes("h += tight ? compactPanelHTML(m) : filterHTML(m);") && ui.indexOf("h += tight ? compactPanelHTML(m) : filterHTML(m);") < ui.indexOf('if (S.view === "chamber" && m.seating)'), "the filter rows ride the strip in every view (a phone's as menus), ahead of the chamber's seating switch and the map's own rows");
   assert.ok(ui.includes('id="state-filters"') && ui.includes('<b>State</b>${chip("data-state", "", !st, "All")}') && ui.includes('id="type-filters"') && ui.includes('<b>Seat type</b>${chip("data-cls", "", !cls, "All")}'), "each row has its own All");
   assert.ok(ui.includes('if (!m || STATE_YEARS.has(m.year)) return "";') && ui.includes("m.divs.some((d) => d.cls === c)"), "a state election shows neither row; a frame shows only the seat types it has");
   assert.ok(ui.includes('S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : ""'), "on the Seat type lens the type chips carry the lens's colours (the row is its key)");
@@ -2582,6 +2582,22 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(rt.includes('if (e.key === "ArrowDown" || e.key === "ArrowUp") {') && rt.includes("e.preventDefault(); e.stopPropagation();"), "an open menu keeps the arrows from the map's year and lane walks");
 }
 
+// a phone's control panel (2026-11-08, user call: "very messy"): at 560px and under
+// the State, Seat type, Draw and Jump to chip rows become four menus in one aligned
+// grid (city names inside Jump to), the elections strip one menu, the zoom hint
+// gone; the Skew/Effect switch redraws its own block alone, held where it stood
+// (WebKit pulled the page ~500px when the whole story re-rendered)
+{
+  const ui = part("app-6-ui.js"), st = part("app-4-story.js"), draw = part("app-2b-draw.js"), css = part("page.css");
+  assert.ok(ui.includes('const panelMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 560px)")') && ui.includes("h += tight ? compactPanelHTML(m) : filterHTML(m);") && ui.includes("if (!tight) h += jumpHTML() + drawRow;"), "a phone's panel swaps the chip rows for the grid of menus");
+  assert.ok(ui.includes('pairs.push(["State", lgMenu("fst"') && ui.includes('pairs.push(["Seat type", lgMenu("fcls"') && ui.includes('pairs.push(["Draw", lgMenu("draw", drawOpts(m)') && ui.includes('["towns", S.townsOff ? "Show city names" : "Hide city names"]'), "the grid's menus: the two filters, the drawing (its unavailable choices greyed), the cities with the names toggle");
+  assert.ok(draw.includes("function drawOpts(m) {") && draw.includes("drawOpts(m).map(({ k, t, why }) => `<button type=\"button\" data-draw="), "the Draw chips and the phone's Draw menu read one list of drawings");
+  assert.ok(ui.includes('if (k === "fst") {') && ui.includes('if (k === "fjump") {') && ui.includes("function renderFrames()"), "the menus apply as their chips do; the elections strip carries its menu");
+  assert.ok(ui.includes('trigger = baseWrap.querySelector("[data-basis-trigger], [data-lg-trigger]")') && ui.includes("trigger?.focus()"), "every panel menu's keys work (Escape threw outside the Base menu)");
+  assert.ok(css.includes(".mp-legend .lg-cgrid { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);"), "the grid's labels stand in columns");
+  assert.ok(st.includes("old.replaceWith(next);") && st.includes("const shift = Math.round(nb.getBoundingClientRect().top - top);"), "Skew/Effect redraws its block alone and holds its buttons in place");
+}
+
 // Controls share one stack; basis scales are no longer part of the panel.
 {
   const ui = part("app-6-ui.js"), css = part("page.css"), st = part("app-4-story.js");
@@ -2606,7 +2622,7 @@ for (const y of ["sa22", "sa26"]) {
 // the search on the Base row, not on its own line under it
 {
   const ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(ui.includes("h += drawRow;") && ui.indexOf("h += drawRow;") < ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf("h += drawNoteHTML(m);") < ui.indexOf('h += `<div class="lg-hint'), "the Draw row, then its note, then the hint — no note above the row");
+  assert.ok(ui.includes("if (!tight) h += jumpHTML() + drawRow;") && ui.indexOf("if (!tight) h += jumpHTML() + drawRow;") < ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf("h += drawNoteHTML(m);") < ui.indexOf('h += `<div class="lg-hint'), "the Draw row, then its note, then the hint — no note above the row");
   assert.ok(!css.includes(".fs .mp-legend .mp-search { flex-basis: 100%; width: 100%; }"), "fullscreen's search shares the Base row — no full-width line under it");
   assert.ok(css.includes(".mp-legend .mp-search label { height: 23px; border-radius: 2px; }"), "the legend's search matches the 23px row rhythm — no tall row over the Filter row");
   assert.ok(ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') > ui.indexOf("h += drawNoteHTML(m);") && ui.indexOf('if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two') < ui.indexOf('h += `<div class="lg-hint'), "the flow lens's final-two key rides the panel's closing rows ahead of the zoom hint");

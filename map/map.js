@@ -5898,10 +5898,18 @@ function balloonKey(m, est) {
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;
 }
-function drawRowHTML(m) {
-  const on = S.draw, fits = surfaceFits(m);
+/* each drawing, and why this frame and lens can't draw it where they can't — one
+   list for the strip's Draw chips and the phone panel's Draw menu */
+function drawOpts(m) {
+  const fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${DRAWS.map(([k, t]) => { const no = k === "surface" && !fits, an = k === "areas" && areasNo, cn = k === "chart" && !chartFits(m); return `<button type="button" data-draw="${k}" aria-pressed="${on === k && !no && !an && !cn}"${cn ? ` disabled title="Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"` : ""}${no ? ` disabled title="${S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend"}"` : ""}${an ? ` disabled title="${areasNo}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`; }).join("")}</div>`;
+  return DRAWS.map(([k, t]) => ({ k, t, why: k === "chart" && !chartFits(m) ? "Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"
+    : k === "surface" && !fits ? (S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend")
+    : k === "areas" && areasNo ? areasNo : "" }));
+}
+function drawRowHTML(m) {
+  const on = S.draw;
+  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}</div>`;
 }
 /* ----- what the balloons and the surface leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
@@ -9869,12 +9877,26 @@ const VT_BANDS = [
   ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
   ["day", "On the day", ["day", "mob"], "From about 7 pm"],
 ];
-let vtMode = "skew";
+let vtMode = "skew", vtLast = null;
+/* the Skew/Effect switch redraws its own block alone, its buttons held where
+   they stood on screen: re-rendering the whole story let the page reflow under
+   the reader (it shrank for a frame and the browser pulled the page up) */
 function setVtMode(mode) {
   if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
   vtMode = mode;
-  renderStory(true);
-  $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true });
+  const old = $("#story .vt-chart"), btn = old && old.querySelector(`[data-vt-mode="${mode}"]`);
+  if (!old || !vtLast) { renderStory(true); $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true }); return; }
+  const top = btn.getBoundingClientRect().top, html = document.documentElement, anchor = html.style.overflowAnchor;
+  html.style.overflowAnchor = "none";
+  const box = document.createElement("div");
+  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography);
+  const next = box.firstElementChild;
+  old.replaceWith(next);
+  const nb = next.querySelector(`[data-vt-mode="${mode}"]`);
+  const shift = Math.round(nb.getBoundingClientRect().top - top);
+  if (shift) { if (FS.on && FS.scroll && FS.scroll.contains(next)) FS.scroll.scrollTop += shift; else window.scrollBy(0, shift); }
+  html.style.overflowAnchor = anchor;
+  nb.focus({ preventScroll: true });
 }
 // the margin list's two reads — tightest margins ("Most marginal") or widest
 // ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
@@ -9929,6 +9951,7 @@ function vtScope(m, st) {
 function vtBandsBlock(divs, area, geography) {
   const { bands, tot } = vtBands(divs);
   if (!tot) return "";
+  vtLast = { divs, area, geography };
   const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
   const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
@@ -10890,7 +10913,7 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL || drawOf(M()) !== "seats"));
-const legendState = () => [S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
 const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
@@ -11061,7 +11084,8 @@ const LG_CHEVRON = `<svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="tru
 function lgMenu(key, items, cur, aria) {
   const text = (items.find(([v]) => v === cur) || items.find(([v, t]) => t != null))[1] ?? "";
   // a curious value of `null` is a group heading, not a pickable item
-  const itemHtml = ([v, t]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1">${esc(t)}</button>`;
+  // (an item's third and fourth places: unavailable here, and why)
+  const itemHtml = ([v, t, off, why]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1"${off ? ` disabled title="${esc(why || "")}"` : ""}>${esc(t)}</button>`;
   return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
 }
 function lgMenuParts(wrap) {
@@ -11082,6 +11106,12 @@ function openPanelMenu(wrap) {
 // one applier for any dropdown item picked in the panel (the native select
 // handler's branches verbatim)
 function applyOpt(k, v) {
+  // the phone panel's menus: the two filters (as their chips do), the drawing, and the jumps
+  if (k === "fst") { if (v && S.f.st !== v) goState(v); else if (S.sel.level === "state") goAus(); else if (S.f.st) { S.f.st = null; filtersChanged(); } return; }
+  if (k === "fcls") { S.f.cls = v || null; filtersChanged(); return; }
+  if (k === "draw") return setDraw(v);
+  if (k === "fjump") { const ys = FRAME_JUMPS[+v] && FRAME_JUMPS[+v][1]; if (ys && !ys.includes(S.year)) setYear(ys[ys.length - 1]); return; }
+  if (k === "jump") { if (v === "towns") { S.townsOff = !S.townsOff; renderLegend(); schedule(); } else flyToCity(+v); return; }
   if (k === "axis") return setAxis(v);
   if (k === "vs") { S.vs = v; if (S.from === v) S.from = v === "onp" ? "lnp" : "onp"; }
   else if (k === "sppair") { S.spPair = v; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
@@ -11289,8 +11319,10 @@ function legendHTML(m) {
       break;
     }
   }
-  // the two filters, State and Seat type, in every view (map, chamber, list)
-  h += filterHTML(m);
+  // the two filters, State and Seat type, in every view (map, chamber, list) — on a
+  // phone, with the map's Draw and Jump to, as one tidy grid of menus instead
+  const tight = panelMQ.matches;
+  h += tight ? compactPanelHTML(m) : filterHTML(m);
   // in the chamber, a year with a seating plan can show the members where they sit or sorted by the lens
   if (S.view === "chamber" && m.seating) {
     const md = seatMode(m);
@@ -11299,8 +11331,7 @@ function legendHTML(m) {
   }
   if (S.view !== "map" && boothsOn && drawOf(m) !== "balloons") h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
   if (S.view === "map") {
-    h += jumpHTML();
-    h += drawRow;
+    if (!tight) h += jumpHTML() + drawRow;
     // the note on the picture follows the row that picks the picture (user
     // call 2026-11-08: no note floats above Draw); the hint the strip's close
     h += drawNoteHTML(m);
@@ -11456,6 +11487,26 @@ function filterHTML(m) {
   const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
   return states + types;
 }
+/* a phone's control panel: the chip rows (State, Seat type, the map's Draw and
+   Jump to) become four menus in a two-by-two grid, their labels in columns —
+   the same choices, a line each instead of a wrapping row each. The city names
+   toggle rides the Jump to menu. */
+const panelMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 560px)") : { matches: false };
+if (panelMQ.addEventListener) panelMQ.addEventListener("change", () => { if (M()) renderLegend(); });
+function compactPanelHTML(m) {
+  const pairs = [];
+  if (!STATE_YEARS.has(m.year)) {
+    pairs.push(["State", lgMenu("fst", [["", "All"], ...CITIES.map(([, st]) => [st, STATE_ABBR[st] || st])], S.f.st || "", "Filter by state or territory")]);
+    const kinds = CLS.filter((c) => m.divs.some((d) => d.cls === c));
+    if (kinds.length) pairs.push(["Seat type", lgMenu("fcls", [["", "All"], ...kinds.map((c) => [c, CLS_SHORT[c]])], S.f.cls || "", "Filter by seat type")]);
+  }
+  if (S.view === "map") {
+    pairs.push(["Draw", lgMenu("draw", drawOpts(m).map(({ k, t, why }) => [k, t, !!why, why]), drawOf(m), "Draw the map as")]);
+    const j = stOfYear(S.year);
+    pairs.push(["Jump to", lgMenu("jump", [[null, "City"], ...CITIES.map(([n, st], k) => (!j || st === j ? [String(k), n] : null)).filter(Boolean), [null, "On the map"], ["towns", S.townsOff ? "Show city names" : "Hide city names"]], "", "Go to a city")]);
+  }
+  return pairs.length ? `<div class="lg-cgrid">${pairs.map(([l, c]) => `<span class="lg-label">${l}</span><span class="lg-cg">${c}</span>`).join("")}</div>` : "";
+}
 /* the City-names toggle: both its words stand in the one box (the shown one
    on top), each at its bold width, so flipping it moves nothing — not the
    row, not the strip, so never the map under it */
@@ -11478,7 +11529,7 @@ function renderJumpSel() {
   if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
   $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
-  FRAME_JUMPS.forEach(([, ys], k) => { const b = $(`#frames-jump [data-fjump="${k}"]`); if (b) b.classList.toggle("on", ys.includes(S.year)); });
+  renderFrames();
 }
 
 /* =============================== tooltip =============================== */
@@ -12409,19 +12460,22 @@ $("#lenses").addEventListener("pointerleave", () => { lensHover = false; });
 document.addEventListener("keydown", (e) => {
   const baseWrap = e.target.closest && e.target.closest(".lg-bmenu");
   if (baseWrap) {
-    const menu = baseWrap.querySelector(".st-scm"), trigger = baseWrap.querySelector("[data-basis-trigger]");
-    if (e.key === "Escape") { e.preventDefault(); closeBaseMenu(); trigger.focus(); return; }
+    // (the Base menu and every other panel menu — Draw, the filters, a census picker — walk alike)
+    const menu = baseWrap.querySelector(".st-scm"), trigger = baseWrap.querySelector("[data-basis-trigger], [data-lg-trigger]");
+    const isBase = !!(trigger && trigger.hasAttribute("data-basis-trigger"));
+    const shut = () => { if (isBase) closeBaseMenu(); else closePanelMenus(); };
+    if (e.key === "Escape") { e.preventDefault(); shut(); trigger?.focus(); return; }
     if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
       e.preventDefault();
-      if (menu.hidden) openBaseMenu();
+      if (menu.hidden) { if (isBase) openBaseMenu(); else openPanelMenu(baseWrap); }
       else {
-        const items = [...menu.querySelectorAll("button")], at = items.indexOf(document.activeElement);
+        const items = [...menu.querySelectorAll("button:not(:disabled)")], at = items.indexOf(document.activeElement);
         const next = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : (at + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
         items[next]?.focus();
       }
       return;
     }
-    if (e.key === "Tab") { closeBaseMenu(); trigger.focus(); }
+    if (e.key === "Tab") { shut(); trigger?.focus(); }
     return;
   }
   const typing = e.target.closest && e.target.closest("input,select,textarea");
@@ -12504,7 +12558,15 @@ function preloadYears() {
 /* the state each capital sits in, named the short way (NSW Vic Qld WA SA Tas ACT NT) */
 const STATE_ABBR = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
 
-/* the "View elections" strip under the timeline: each jurisdiction's newest frame */
+/* the "View elections" strip under the timeline: each jurisdiction's newest frame —
+   its names in a row, or on a phone one menu (the row wrapped to three lines there) */
+function renderFrames() {
+  const el = $("#frames-jump"); if (!el) return;
+  const cur = FRAME_JUMPS.findIndex(([, ys]) => ys.includes(S.year));
+  if (el.dataset.k === String(cur)) return;
+  el.dataset.k = String(cur);
+  el.innerHTML = `<b>View elections</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}"${k === cur ? ' class="on"' : ""}>${n}</button>`).join("")}<span class="mp-fj-menu">${lgMenu("fjump", FRAME_JUMPS.map(([n], k) => [String(k), n]), String(cur), "View elections")}</span>`;
+}
 const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA]];
 
 /* =============================== boot =============================== */
@@ -12513,7 +12575,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   const selFromURL = readURL();
   renderLenses();
   $$(".mp-views .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === S.view)));
-  $("#frames-jump").innerHTML = `<b>View elections</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}">${n}</button>`).join("")}`;
+  renderFrames();
   const meta = loadLegendMeta();
   showLoading(true);
   try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateVote(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }

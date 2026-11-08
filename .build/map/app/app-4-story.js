@@ -1022,12 +1022,26 @@ const VT_BANDS = [
   ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
   ["day", "On the day", ["day", "mob"], "From about 7 pm"],
 ];
-let vtMode = "skew";
+let vtMode = "skew", vtLast = null;
+/* the Skew/Effect switch redraws its own block alone, its buttons held where
+   they stood on screen: re-rendering the whole story let the page reflow under
+   the reader (it shrank for a frame and the browser pulled the page up) */
 function setVtMode(mode) {
   if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
   vtMode = mode;
-  renderStory(true);
-  $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true });
+  const old = $("#story .vt-chart"), btn = old && old.querySelector(`[data-vt-mode="${mode}"]`);
+  if (!old || !vtLast) { renderStory(true); $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true }); return; }
+  const top = btn.getBoundingClientRect().top, html = document.documentElement, anchor = html.style.overflowAnchor;
+  html.style.overflowAnchor = "none";
+  const box = document.createElement("div");
+  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography);
+  const next = box.firstElementChild;
+  old.replaceWith(next);
+  const nb = next.querySelector(`[data-vt-mode="${mode}"]`);
+  const shift = Math.round(nb.getBoundingClientRect().top - top);
+  if (shift) { if (FS.on && FS.scroll && FS.scroll.contains(next)) FS.scroll.scrollTop += shift; else window.scrollBy(0, shift); }
+  html.style.overflowAnchor = anchor;
+  nb.focus({ preventScroll: true });
 }
 // the margin list's two reads — tightest margins ("Most marginal") or widest
 // ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
@@ -1082,6 +1096,7 @@ function vtScope(m, st) {
 function vtBandsBlock(divs, area, geography) {
   const { bands, tot } = vtBands(divs);
   if (!tot) return "";
+  vtLast = { divs, area, geography };
   const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
   const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
