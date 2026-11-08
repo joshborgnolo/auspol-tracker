@@ -2603,7 +2603,7 @@ for (const y of ["sa22", "sa26"]) {
 // tucked, at rest, up — with the handle's tap stepping up
 {
   const fsj = part("app-7-full.js"), css = part("page.css");
-  assert.ok(fsj.includes("function fsSheetTo(st) {") && fsj.includes('FS.sheetDown = st === "down";') && fsj.includes("if (wasDown !== FS.sheetDown) fsMeasure(false);"), "the sheet's three places, the map's clear ground following the tuck");
+  assert.ok(fsj.includes("function fsSheetTo(st) {") && fsj.includes('FS.sheetDown = st === "down";') && fsj.includes("if (wasDown !== FS.sheetDown) {\n    fsMeasure(false);"), "the sheet's three places, the map's clear ground following the tuck");
   assert.ok(fsj.includes("if (down) return 0;") && fsj.includes('class="fs-untuck fs-plate"') && fsj.includes("FS.side.inert = FS.sheetDown;"), "tucked, the sheet leaves the screen to the map (genuinely full screen, user call); a floating Panel button brings it back");
   assert.ok(fsj.includes('class="fs-tuck"') && fsj.includes('fsSheetTo(FS.sheetDown ? "rest" : "down")') && fsj.includes('["down", H - fsPeekOf(true)]'), "the tuck button and the drag both reach the tucked place");
   assert.ok(css.includes(".fs.phone.sheet-down .fs-untuck { display: inline-flex; }"), "the Panel button shows only while the sheet is tucked away");
