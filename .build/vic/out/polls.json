@@ -140,6 +140,7 @@
   "pollsterRules": {
     "DemosAU": {},
     "Freshwater": {},
+    "Lighthouse": {},
     "Newspoll": {},
     "Online Research Unit": {},
     "RedBridge/Accent": {},
@@ -1411,6 +1412,38 @@
         "lnp": 33,
         "onp": 24
       }
+    },
+    {
+      "date": "2026-11-01",
+      "dateStart": "2026-10-19",
+      "pollster": "Lighthouse",
+      "client": "Herald Sun",
+      "sample": 1289,
+      "alp": 22,
+      "lnp": 31,
+      "grn": 14,
+      "onp": 23,
+      "ind": 10,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.heraldsun.com.au/news/victoria/state-election/lighthouse-tracking-poll-shows-labors-primary-vote-has-fallen-to-22-per-cent/news-story/22ac78198c0126ec49c43c627992970c"
+    },
+    {
+      "date": "2026-11-05",
+      "dateStart": "2026-10-30",
+      "pollster": "DemosAU",
+      "client": "Premier National",
+      "sample": 1562,
+      "alp": 18,
+      "lnp": 33,
+      "grn": 17,
+      "onp": 21,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": 44,
+      "tpp_lnp": 56,
+      "url": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/"
     }
   ],
   "ppm": [
@@ -1832,6 +1865,16 @@
       "oppName": "Wilson",
       "pmName": "Carroll",
       "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-11-05",
+      "firm": "DemosAU",
+      "alb": 28,
+      "opp": 36,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 19,
       "extra": null
     }
   ],
@@ -2283,6 +2326,39 @@
         "opp": {
           "app": 49,
           "dis": 39
+        }
+      }
+    },
+    {
+      "date": "2026-11-01",
+      "firm": "Lighthouse",
+      "alb": -21,
+      "opp": 9,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "detail": null
+    },
+    {
+      "date": "2026-11-05",
+      "firm": "DemosAU",
+      "alb": -30,
+      "opp": 13,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": -20,
+      "detail": {
+        "alb": {
+          "app": 17,
+          "dis": 47
+        },
+        "opp": {
+          "app": 38,
+          "dis": 25
+        },
+        "han": {
+          "app": 23,
+          "dis": 43
         }
       }
     }

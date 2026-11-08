@@ -194,6 +194,9 @@ const FIRM_IDS = [
   [/ucomms/i, "ucomms"],
   [/spectre/i, "spectre"],
   [/demos au/i, "demosau"],
+  // Wikipedia names it "Lighthouse/Growth Intelligence Centre", the
+  // electiontracker CSV "Growth Intelligence Centre" — one house
+  [/lighthouse|growth.?intelligence/i, "lighthouse-growth-intelligence-centre"],
 ];
 const firmId = (s) => {
   const t = cleanCell(s);

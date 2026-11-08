@@ -1876,6 +1876,58 @@
         "roymorgan"
       ],
       "sourceUrl": "https://www.roymorgan.com/findings/10373-victorian-state-voting-intention-october-2026"
+    },
+    {
+      "firmRaw": "Lighthouse/Growth Intelligence Centre",
+      "firm": "lighthouse-growth-intelligence-centre",
+      "client": "Herald Sun",
+      "sample": 1289,
+      "dateLabel": "19 Oct–1 Nov",
+      "fwStart": "2026-10-19",
+      "fwEnd": "2026-11-01",
+      "approxDate": false,
+      "primary": {
+        "alp": 22,
+        "lnp": 31,
+        "grn": 14,
+        "onp": 23,
+        "ind": null,
+        "oth": 10
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "heraldsun"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/lighthouse-tracking-poll-shows-labors-primary-vote-has-fallen-to-22-per-cent/news-story/22ac78198c0126ec49c43c627992970c"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1562,
+      "dateLabel": "30 Oct–5 Nov",
+      "fwStart": "2026-10-30",
+      "fwEnd": "2026-11-05",
+      "approxDate": false,
+      "primary": {
+        "alp": 18,
+        "lnp": 33,
+        "grn": 17,
+        "onp": 21,
+        "ind": null,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 44
+      },
+      "alt": {},
+      "provenance": [
+        "electiontracker",
+        "pollbludger"
+      ],
+      "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/"
     }
   ],
   "threeParty": [
@@ -3749,6 +3801,116 @@
       "sourceUrl": null,
       "provenance": [
         "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19 Oct–1 Nov 2026",
+      "date": "2026-11-01",
+      "fwStart": "2026-10-19",
+      "firm": "lighthouse-growth-intelligence-centre",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1289,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -21,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/lighthouse-tracking-poll-shows-labors-primary-vote-has-fallen-to-22-per-cent/news-story/22ac78198c0126ec49c43c627992970c",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19 Oct–1 Nov 2026",
+      "date": "2026-11-01",
+      "fwStart": "2026-10-19",
+      "firm": "lighthouse-growth-intelligence-centre",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1289,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 9,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/lighthouse-tracking-poll-shows-labors-primary-vote-has-fallen-to-22-per-cent/news-story/22ac78198c0126ec49c43c627992970c",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "30 Oct–5 Nov 2026",
+      "date": "2026-11-05",
+      "fwStart": "2026-10-30",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1562,
+      "leader": "carroll",
+      "pos": 17,
+      "neg": 47,
+      "dk": 36,
+      "net": -30,
+      "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "30 Oct–5 Nov 2026",
+      "date": "2026-11-05",
+      "fwStart": "2026-10-30",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1562,
+      "leader": "wilson",
+      "pos": 38,
+      "neg": 25,
+      "dk": 37,
+      "net": 13,
+      "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "30 Oct–5 Nov 2026",
+      "date": "2026-11-05",
+      "fwStart": "2026-10-30",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1562,
+      "leader": "pickering",
+      "pos": 23,
+      "neg": 43,
+      "dk": 34,
+      "net": -20,
+      "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "30 Oct–5 Nov 2026",
+      "date": "2026-11-05",
+      "fwStart": "2026-10-30",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1562,
+      "values": {
+        "carroll": 28,
+        "wilson": 36,
+        "pickering": 19
+      },
+      "dk": 17,
+      "net": 8,
+      "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/",
+      "provenance": [
+        "pollbludger"
       ]
     }
   ]
