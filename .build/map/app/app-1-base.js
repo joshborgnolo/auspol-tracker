@@ -92,7 +92,8 @@ function readTheme() {
   const P = dk
     // bright, poster-flat party colours (Labor and the Coalition are theoelections.com's
     // red and blue); One Nation a clear orange off Labor's red, everyone else neutral grey
-    ? { alp: "#f7310a", lnp: "#1432d5", grn: "#22c35a", onp: "#ff9500", ind: "#b07ee0", csa: "#00c2e0", oth: "#7d7d7d", nxt: "#ff9500", dem: "#1fc7b4" }
+    // (dark paper lifts the Coalition's blue to #4f7fff: 4.7:1 against it, still clear of the independents' mauve)
+    ? { alp: "#f7310a", lnp: "#4f7fff", grn: "#22c35a", onp: "#ff9500", ind: "#b07ee0", csa: "#00c2e0", oth: "#7d7d7d", nxt: "#ff9500", dem: "#1fc7b4" }
     : { alp: "#f7310a", lnp: "#1432d5", grn: "#14ad4a", onp: "#ff8c00", ind: "#9b62d0", csa: "#00a9c4", oth: "#9a9a9a", nxt: "#ff8c00", dem: "#00a08f" };
   T.party = {}; for (const k in P) T.party[k] = hex(P[k]);
   T.dark = dk;
