@@ -1,8 +1,9 @@
 /* macro.mjs – builds data/macro.json, the ABS/OECD price and output series
    behind the "Inflation & growth" view of the Snapshot's Economic sentiment
    panel (rd-panels.jsx RdConfidence's third tab), and its Info glossary entry.
-   Eight display lanes, six source pulls — all OFFICIAL publications, fetched
-   from the ABS and OECD public data APIs, never hand-entered:
+   Eight display lanes, six data-API pulls plus the OECD's monthly inflation
+   release PDFs — all OFFICIAL publications, fetched from the ABS and OECD
+   public data APIs, never hand-entered:
 
      cpi        – all-groups CPI, Australia, annual change, quarterly 1949→.
                   ABS CPI dataflow: MEASURE 3 (percentage change to
@@ -29,20 +30,30 @@
      oecdCpi    – OECD total, all-items CPI, y/y, monthly; the OECD's printed
                   measure (DF_PRICES_ALL: OECD.M.N.CPI.PA._T.N.GY), no
                   arithmetic on our side.
-     usUkCaCpi  – the US/UK/Canada CPI-y/y MEAN, monthly, computed here from
-                  the three members' series in the same DF_PRICES_ALL pull
-                  (one all-areas request carries the OECD and G20 aggregates
-                  plus every member's series). User-dictated replacement
-                  (2026-11-07) for the 37-member median trialled the same
-                  day: the OECD's own member archive stalls months behind
-                  its aggregates for most members (Dec 2025 at pull time —
-                  JPN stalls 2021, MEX 2024, CHL 2023 in both OECD CPI
-                  datasets), while these three members' series always stay
-                  current; a median of the eight reporters then left is a
-                  different panel per month. A month files only when all
-                  three members report, so every row is the same trio —
-                  panel-constant to the mid-1950s (earliest month the three
-                  share). Computed lane, not an OECD-published aggregate.
+     oecdCpiMed – OECD member-country MEDIAN all-items CPI y/y, monthly —
+                  computed here: per month, the median of every OECD
+                  member's headline print (committed allowlist of the 38;
+                  a month files only when MED_MIN=25 or more members
+                  report). Two source eras spliced at Dec 2025:
+                    ≤ Dec 2025 – the OECD's DF_PRICES_ALL member series
+                      (the same all-areas pull above; the member archive
+                      is complete through 2025) — New Zealand never
+                      appears there (quarterly CPI only).
+                    Jan 2026 → – the member panel in Table 1 of the
+                      OECD's monthly "Consumer Prices, OECD" release PDF
+                      (per-country CPI/HICP table; parse in
+                      parseReleaseTable1), because the OECD's member
+                      archive stalls months behind its own aggregates.
+                      Committed per reference month in
+                      .build/macro-src/oecd-member-inflation.json when
+                      the release carrying it parses (figures frozen
+                      as-released, per the median-of-availability
+                      convention; the committed cross-checks catch a
+                      release whose member grid shifted). The
+                      release-era panel includes New
+                      Zealand, the archive era doesn't — overlap months
+                      (Nov/Dec 2025 in both) are cross-checked below and
+                      the measured drift (≤0.2pt) covers the handoff.
      g20Cpi     – G20 total, all-items CPI, y/y, monthly; the OECD's printed
                   measure for the twenty-biggest-economies aggregate
                   (same publication, REF_AREA=G20, 1998→) — a wider
@@ -69,9 +80,13 @@
    - --fixture-dir <dir> reads source CSVs from a fixture directory instead
      of the live APIs: abs-cpi-index.csv, abs-cpi-yoy.csv, abs-gdppc.csv,
      abs-rnndi.csv, oecd-cpi.csv, oecd-gdp.csv (test seam; every file must
-     be present, the run never falls back to live fetches in fixture mode) */
+     be present, the run never falls back to live fetches in fixture mode;
+     in fixture mode the release-PDF probe is skipped and the median
+     lane's release era reads the committed store only) */
 /* MACRO_LIB=1: import the pure helpers (tests) without running the pulls. */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { tmpdir } from "node:os";
 import { get as httpsGet } from "node:https";
 import { setTimeout as sleep } from "node:timers/promises";
 import { TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, writeAtomic } from "./extract-common.mjs";
@@ -126,21 +141,58 @@ const SOURCES = {
   },
 };
 
-/* The trio the average lane means over: the three OECD members whose
-   DF_PRICES_ALL series never lag the OECD's own aggregates (checked on
-   the live feed 2026-11-07: USA/GBR/CAN alone carry months most members
-   dropped after Dec 2025 — JPN stalls 2021, MEX 2024, CHL 2023; NZL never
-   appears, quarterly CPI only). A month files only when all three report.
- */
-const TRIO = new Set(["USA", "GBR", "CAN"]);
+/* OECD member countries (the 38 of the 2020s) — the membership the median
+   lane medians over. Membership is constant by construction (a country's
+   pre-accession series rides too), keeping the median composition-stable;
+   in the DF_PRICES_ALL era (≤ Dec 2025) New Zealand never appears
+   (quarterly CPI only). In the release-PDF era the panel is the OECD's
+   own Table 1, all 38 rows where printed. */
+const OECD_MEMBERS = new Set(
+  "AUS AUT BEL CAN CHE CHL COL CRI CZE DEU DNK ESP EST FIN FRA GBR GRC HUN IRL ISL ISR ITA JPN KOR LTU LUX LVA MEX NLD NOR NZL POL PRT SVK SVN SWE TUR USA".split(" ")
+);
+/* Release Table 1 spells member names in prose form; the parse matches
+   names against THIS allowlist only (aggregate rows — OECD, G7, euro
+   area, EU — are never allowed to enter the median). Kerning gaps in the
+   PDF's text layer split names mid-word ("Norw ay", "Colom bia"), so the
+   matcher tolerates internal whitespace. */
+const MEMBER_NAMES = {
+  AUS: "Australia", AUT: "Austria", BEL: "Belgium", CAN: "Canada", CHE: "Switzerland", CHL: "Chile", COL: "Colombia", CRI: "Costa Rica",
+  CZE: "Czechia", DEU: "Germany", DNK: "Denmark", ESP: "Spain", EST: "Estonia", FIN: "Finland", FRA: "France", GBR: "United Kingdom",
+  GRC: "Greece", HUN: "Hungary", IRL: "Ireland", ISL: "Iceland", ISR: "Israel", ITA: "Italy", JPN: "Japan", KOR: "Korea", LTU: "Lithuania",
+  LUX: "Luxembourg", LVA: "Latvia", MEX: "Mexico", NLD: "Netherlands", NOR: "Norway", NZL: "New Zealand", POL: "Poland", PRT: "Portugal",
+  SVK: "Slovak Republic", SVN: "Slovenia", SWE: "Sweden", TUR: "Türkiye", USA: "United States",
+};
+/* A release month files as the median's store entry only when this many
+   member countries parse with a figure (the release panel has printed
+   35–38 rows through 2026 — a layout the reader can't square to that
+   scale is a parse failure, never a thin month). */
+const MED_MIN = 25;
+/* The median lane handoff: DF_PRICES_ALL era ≤ Dec 2025, release-PDF era
+   Jan 2026 →. Their two shared reference months (Nov/Dec 2025, in both)
+   must sit within this drift — measured 0.1–0.2pt on the live parses
+   (2026-11-09), where the release panel adds New Zealand's median-lifting
+   membership to the archive's 37. */
+const MED_HANDOFF = 0.5;
+/* A filing release's member median must sit near the OECD-total headline
+   the same Table 1 prints — a column-shifted parse would drift far past
+   this (measured gap on the 2026 releases: 0.9–1.5pt). */
+const MED_AGG_DRIFT = 2.0;
+// The committed release-era store and the OECD DAM paths it probes.
+const MED_STORE = ".build/macro-src/oecd-member-inflation.json";
+const MED_DAM = (ry, rm) =>
+  `https://www.oecd.org/content/dam/oecd/en/data/insights/statistical-releases/${ry}/${rm}/consumer-prices-oecd-${String(rm).padStart(2, "0")}-${ry}.pdf`;
 
 // Plausible annual-change bands per display lane (a breach guards, never
 // files): Australia 1947→ sees CPI ~18% (1975) and ~−2% (1997/2020);
 // RNNDI's terms-of-trade swings run wider than GDP pc (1974 peak ~+18%);
 // OECD histories are tamer but padded on the same logic.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], usUkCaCpi: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, usUkCaCpi: 800, g20Cpi: 60, oecdGdp: 40 };
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, usUkCaCpi: 95, g20Cpi: 95, oecdGdp: 210 };
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, oecdCpiMed: 600, g20Cpi: 60, oecdGdp: 40 };
+/* the median lane's newest reference month trails the others by the
+   release lag (~2 months) plus the daily run's day: ~75d steady state,
+   ~90d across a slow December/January stretch — 110d trips only when the
+   monthly release feed has truly died. */
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, g20Cpi: 95, oecdGdp: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -274,15 +326,22 @@ function printedRows(rows) {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/* The US/UK/Canada mean lane from an all-areas member pull: per month,
-   the arithmetic mean of the TRIO countries' printed CPI-y/y values, filed
-   only where ALL THREE report (every row is the same trio — no panel
-   movement). OURS, not a publisher print — rounded to one decimal here so
-   the file's precision is honest. */
-function trioMeanCpiLane(rows) {
+/* Median of a set of figures, rounded to one decimal so the file's
+   precision stays honest (OURS, never a publisher print). */
+function medianOf(vs) {
+  const s = [...vs].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return Math.round((s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2) * 10) / 10;
+}
+
+/* The OECD member-country median lane from the all-areas DF_PRICES_ALL
+   pull (the lane's ≤ Dec 2025 era): per month, the median of every
+   OECD_MEMBERS country's printed value, filed only where MED_MIN or more
+   members report. */
+function medianCpiLane(rows) {
   const byMonth = new Map();
   for (const r of rows) {
-    if (!TRIO.has(r.REF_AREA)) continue;
+    if (!OECD_MEMBERS.has(r.REF_AREA)) continue;
     const v = parseFloat(r.OBS_VALUE);
     if (!Number.isFinite(v)) continue;
     let arr = byMonth.get(r.TIME_PERIOD);
@@ -291,10 +350,237 @@ function trioMeanCpiLane(rows) {
   }
   const out = [];
   for (const [p, vs] of byMonth) {
-    if (vs.length !== TRIO.size) continue;
-    out.push({ date: periodEnd(p), v: Math.round((vs.reduce((a, b) => a + b, 0) / vs.length) * 10) / 10 });
+    if (vs.length < MED_MIN) continue;
+    out.push({ date: periodEnd(p), v: medianOf(vs) });
   }
   return out.filter((x) => x.date && Number.isFinite(x.v)).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// ---------------------------------------------------------------- release parse
+/* pdftotext -layout text of one "Consumer Prices, OECD" release → the
+   Table 1 member panel: { ref: "2026-03", figures: {AUS: 4.6, …},
+   median, oecd: the OECD-total print}. Returns null when the release
+   doesn't parse cleanly — a layout the reader can't square to a ≥MED_MIN
+   grid is a parse failure, never a thin month.
+
+   Table 1 carries every OECD member plus aggregate rows (OECD, G7,
+   euro area, EU); only MEMBER_NAMES rows may enter the median. The CPI
+   "All items" block is leftmost; within it the reference month's value
+   sits at the first date-token equal to the reference month in the
+   table's OWN header (editions differ: the year-end release prepends
+   annual-average columns), and every member row must present the same
+   token count as that header — a row whose grid shifted drops, and
+   figures are re-checked against a wide member band. Country names in
+   the PDF text layer carry kerning gaps ("Norw ay"), so the allowlist
+   match tolerates internal whitespace. */
+const MED_MEMBER_RE = Object.entries(MEMBER_NAMES).map(([iso, name]) => ({
+  iso,
+  re: new RegExp("^\\s*" + [...name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")].join("\\s*") + "(?=\\s|$)"),
+}));
+const MED_MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const MED_FIG_BAND = [-15, 100];
+function parseReleaseTable1(text) {
+  const lines = text.split("\n");
+  const ti = lines.findIndex((l) => /^Table 1\s*[–-]\s*CPI and HICP/.test(l.trim()));
+  if (ti < 0) return null;
+  let te = lines.findIndex((l, i) => i > ti && /^Table 2\s*[–-]/.test(l.trim()));
+  if (te < 0) te = lines.length;
+  const block = lines.slice(ti, te);
+  const sub = block.find((l) => /^[A-Z][a-z]+ \d{4}, year-on-year inflation rate/.test(l.trim()));
+  const sm = sub && sub.trim().match(/^([A-Z][a-z]+) (\d{4}), /);
+  if (!sm) return null;
+  const mon = MED_MONTHS[sm[1].slice(0, 3).toLowerCase()];
+  if (!mon) return null;
+  const [y, m] = [+sm[2], mon];
+  const ref = `${y}-${String(m).padStart(2, "0")}`;
+  const refTok = `${sm[1].slice(0, 3)}-${String(y).slice(2)}`;
+
+  // The CPI "All items" block is leftmost, and every regular row shares the
+  // edition's cell count: 16 (year-ago, prior, reference CPI months …) in
+  // the standard layout, 17 in the year-end edition that prepends two
+  // annual-average columns. The headline sits at token 2 (or 4); the
+  // header's own first three MMM-YY date tokens must read [ref−12, ref−1,
+  // ref] as a cross-check. Rows that don't match the edition's count drop.
+  const MED_OECD_ROW = /^OECD(?:-Total)?(\s|\d)/; // "OECD" / "OECD-Total" era spelling
+  const headEnd = block.findIndex((l) => MED_OECD_ROW.test(l.trim()));
+  if (headEnd < 0) return null;
+  const toks = [];
+  for (const l of block.slice(block.indexOf(sub) + 1, headEnd)) {
+    toks.push(...l.trim().split(/\s+/).filter(Boolean));
+  }
+  const MYY = /^[A-Z][a-z]{2}-\d{2}$/;
+  const myy = toks.filter((t) => MYY.test(t));
+  const tokOf = (yyy, mm) => "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ")[mm - 1] + "-" + String(yyy).slice(2);
+  const [prevY, prevM] = m === 1 ? [y - 1, 12] : [y, m - 1];
+  const [agoY] = [y - 1];
+  if (myy.length < 3 || myy[2] !== refTok || myy[1] !== tokOf(prevY, prevM) || myy[0] !== tokOf(agoY, m)) return null;
+  // Grid from the first data row (the OECD aggregate itself): exactly the
+  // two editions we can align the CPI headline in.
+  const trow = (s) => s.trim().replace(/^OECD(?:-Total)?\b/, "").replace(/^\s*\d+(,\s*\d+)*/, "").trim().split(/\s+/);
+  const t0 = trow(block[headEnd]);
+  const k = t0.length === 16 ? 2 : t0.length === 17 ? 4 : null;
+  if (k == null) return null;
+
+  const num = (t) => {
+    const s = t.replace(/e$/, "");
+    return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : null;
+  };
+  const figures = {};
+  let oecd = null;
+  for (const l of block.slice(headEnd)) {
+    const t = l.trim();
+    let rest = null, iso = null;
+    if (MED_OECD_ROW.test(t)) {
+      rest = t.replace(/^OECD(?:-Total)?\b/, "");
+      iso = "OECD";
+    } else {
+      for (const { iso: i, re } of MED_MEMBER_RE) {
+        const mm = t.match(re);
+        if (mm) { rest = t.slice(mm[0].length); iso = i; break; }
+      }
+    }
+    if (!iso) continue;
+    rest = rest.replace(/^\s*\d+(,\s*\d+)*/, "").trim();
+    const toks = rest ? rest.split(/\s+/) : [];
+    if (toks.length !== t0.length) continue; // grid-shifted row: drop
+    const v = num(toks[k]);
+    if (v == null) continue; // `..`/`…` — member didn't print this month
+    if (v < MED_FIG_BAND[0] || v > MED_FIG_BAND[1]) return null; // misaligned grid read
+    if (iso === "OECD") oecd = v;
+    else figures[iso] = v;
+  }
+  const n = Object.keys(figures).length;
+  if (n < MED_MIN) return null;
+  const median = medianOf(Object.values(figures));
+  // The OECD-total cross-check only binds where the release printed it —
+  // the US-shutdown era releases carried `..` for the aggregate; a null
+  // aggregate never vetoes the median (the member grid + band + date
+  // triplet + MED_MIN floor still stand).
+  if (oecd != null && Math.abs(median - oecd) > MED_AGG_DRIFT) return null; // column shift
+  return { ref, figures, median, oecd };
+}
+
+// ---------------------------------------------------- median store + splice
+function readMedianStore() {
+  const base = { _about: "OECD member-country headline CPI y/y per reference month, parsed by .build/macro.mjs from Table 1 of each monthly 'Consumer Prices, OECD' release (the member panel the OECD's SDMX member archive stalls behind). Figures are the release print, frozen — a filed reference month is never re-read. Built and extended by .build/macro.mjs — never hand-edit.", releases: {} };
+  if (!existsSync(MED_STORE)) return base;
+  const s = JSON.parse(readFileSync(MED_STORE, "utf8"));
+  if (!s || typeof s !== "object" || !s.releases || typeof s.releases !== "object") throw guard(`${MED_STORE}: drifted shape`);
+  for (const [ref, e] of Object.entries(s.releases)) {
+    if (!/^\d{4}-\d{2}$/.test(ref) || !e || typeof e.median !== "number" || !e.figures || typeof e.figures !== "object") throw guard(`${MED_STORE} ${ref}: drifted entry`);
+  }
+  return s;
+}
+
+/* The median lane as spliced from its two eras: DF_PRICES_ALL rows (≤ Dec
+   2025) plus the store's release-era medians (Jan 2026 →). Shared
+   reference months (Nov/Dec 2025) are median-vs-lane cross-checks, and
+   each store entry's median is recomputed from its own figures — the
+   store's own printed median is never trusted blindly. Returns {rows,
+   handoff, corrupt} — the caller guards handoff drift and any entry whose
+   committed median doesn't recompute. */
+function spliceMedianLane(sdmxRows, store) {
+  const rows = sdmxRows.filter((x) => x.date <= "2025-12-31");
+  const byRef = new Map(rows.map((x) => [x.date.slice(0, 7), x.v]));
+  let handoff = null;
+  const corrupt = [];
+  for (const [ref, e] of Object.entries(store.releases).sort(([a], [b]) => a.localeCompare(b))) {
+    const med = medianOf(Object.values(e.figures));
+    if (Math.abs(med - e.median) > 0.05) { corrupt.push(ref); continue; }
+    if (ref <= "2025-12") {
+      if (byRef.has(ref)) {
+        const d = Math.abs(med - byRef.get(ref));
+        handoff = Math.max(handoff ?? 0, d);
+      }
+      continue; // DF_PRICES_ALL owns the overlap era
+    }
+    rows.push({ date: periodEnd(ref), v: med });
+  }
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].date <= rows[i - 1].date) throw guard(`oecdCpiMed: dates not ascending at splice (${rows[i].date}) — store overlaps the DF_PRICES_ALL era?`);
+  }
+  return { rows, handoff, corrupt };
+}
+
+/* Live mode: probe the OECD DAM for releases beyond the store's newest
+   reference month (release of month R covers reference month R−2 — the
+   URL is derived, never fetched from the walled insights HTML index),
+   parse any new ones, and file them into the committed store. Pending
+   months stay pending: a 404/not-yet-published release is not an error,
+   and a release that fails parseReleaseTable1 just notes and waits. */
+function monthAdd(mkey, delta) {
+  let [y, m] = mkey.split("-").map(Number);
+  m += delta;
+  y += Math.floor((m - 1) / 12);
+  m = ((m - 1) % 12) + 1;
+  return `${y}-${String(m).padStart(2, "0")}`;
+}
+function httpGetBin(url, redirects = 5) {
+  return new Promise((resolve, reject) => {
+    const req = httpsGet(url, {
+      headers: { "user-agent": TRACKER_UA },
+      timeout: FETCH_TIMEOUT_MS,
+    }, (res) => {
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+        res.resume();
+        if (redirects <= 0) return reject(new Error(`redirect chain: ${url.slice(0, 110)}…`));
+        return resolve(httpGetBin(new URL(res.headers.location, url).href, redirects - 1));
+      }
+      const chunks = [];
+      res.on("data", (c) => chunks.push(c));
+      res.on("end", () => resolve({ status: res.statusCode, body: Buffer.concat(chunks) }));
+    });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", reject);
+  });
+}
+function pdfText(buf) {
+  const p = `${tmpdir()}/macro-oecd-rel-${process.pid}.pdf`;
+  writeFileSync(p, buf);
+  try {
+    return execFileSync("pdftotext", ["-layout", p, "-"], { encoding: "utf8", maxBuffer: 8 << 20 });
+  } finally {
+    try { unlinkSync(p); } catch { /* temp cleanup best-effort */ }
+  }
+}
+async function refreshMedianStore(store, { medParsed }) {
+  if (FIXTURE_DIR || CHECK) return store;
+  const refs = Object.keys(store.releases).sort();
+  const newestRef = refs.length ? refs.at(-1) : "2025-10"; // releases from Dec 2025
+  // candidate release months: ref+2 for every ref after newestRef, up to
+  // and including this calendar month's release (lookahead of one month
+  // over the newest possible reference month costs one 404).
+  const now = new Date();
+  let rel = monthAdd(newestRef, 2);
+  let probed = 0;
+  const cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  while (rel <= cur) {
+    const [ry, rm] = rel.split("-").map(Number);
+    probed++;
+    let parsed = null;
+    try {
+      const { status, body } = await httpGetBin(MED_DAM(ry, rm));
+      if (status >= 200 && status < 300 && body.subarray(0, 5).equals(Buffer.from("%PDF-"))) {
+        try {
+          parsed = parseReleaseTable1(pdfText(body));
+        } catch {
+          // pdftotext not on PATH this run — the parser keeps the rest of
+          // the extractor alive; the release stays pending for a host
+          // that has poppler.
+        }
+      }
+    } catch (e) {
+      console.log(`oecd-median: probe ${rel} failed (${e.message}); pending`);
+    }
+    if (parsed && !store.releases[parsed.ref]) {
+      store.releases[parsed.ref] = { release: rel, url: MED_DAM(ry, rm), oecd: parsed.oecd, median: parsed.median, figures: parsed.figures };
+      medParsed.push(parsed.ref);
+      console.log(`oecd-median: filed ${parsed.ref} (${Object.keys(parsed.figures).length} members, median ${parsed.median}, OECD ${parsed.oecd}) from the ${rel} release`);
+    }
+    rel = monthAdd(rel, 1);
+    if (probed > 15) break; // bounded: steady state is 1–2 candidates a run
+  }
+  return store;
 }
 
 // Row from an ABS CSV with the exact key-parts filter attached to the URL we
@@ -320,7 +606,7 @@ function guard(msg) {
 }
 
 // ------------------------------------------------------------------- main
-export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, trioMeanCpiLane, absFiltered, TRIO, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
+export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane, parseReleaseTable1, spliceMedianLane, readMedianStore, monthAdd, absFiltered, OECD_MEMBERS, MEMBER_NAMES, MED_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
 
 if (!process.env.MACRO_LIB) {
   // Serial, with a breath between hosts: the OECD's NSI gates parallel
@@ -354,14 +640,26 @@ if (!process.env.MACRO_LIB) {
   const rnndi = yoyFromLevels(rnndiLevels, 4);
 
   // OECD lanes off the one all-areas pull: the aggregate totals are
-  // printed measures (no arithmetic); the US/UK/Canada mean is computed here.
+  // printed measures (no arithmetic); the member median is computed here
+  // and spliced with the release-PDF era from the committed store.
   const oecdAreas = parseSdmxCsv(oecdCpiRows);
   const oecdCpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "OECD"));
   const g20Cpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "G20"));
-  const usUkCaCpi = trioMeanCpiLane(oecdAreas);
   const oecdGdp = printedRows(parseSdmxCsv(oecdGdpRows).filter((r) => r.REF_AREA === "OECD"));
+  const medParsed = [];
+  const medStore = await refreshMedianStore(readMedianStore(), { medParsed });
+  const medSplice = spliceMedianLane(medianCpiLane(oecdAreas), medStore);
+  const oecdCpiMed = medSplice.rows;
+  if (medSplice.corrupt.length) throw guard(`oecdCpiMed store: committed median ≠ its own figures at ${medSplice.corrupt.join(", ")} — hand-edit? rebuild the store`);
+  if (medSplice.handoff != null && medSplice.handoff > MED_HANDOFF) throw guard(`oecdCpiMed release/archive handoff drift ${medSplice.handoff.toFixed(1)}pt > ${MED_HANDOFF} — the release table reads a different panel?`);
+  const medStoreNext = JSON.stringify(medStore, null, 1) + "\n";
+  const medStoreChanged = !existsSync(MED_STORE) || readFileSync(MED_STORE, "utf8") !== medStoreNext;
+  if (medStoreChanged && !CHECK) {
+    mkdirSync(".build/macro-src", { recursive: true });
+    writeAtomic(MED_STORE, medStoreNext);
+  }
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, usUkCaCpi, g20Cpi, oecdGdp })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, oecdCpiMed, g20Cpi, oecdGdp })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -377,19 +675,19 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). usUkCaCpi: the mean of the US, UK and Canada's OECD-published all-items CPI y/y prints, computed here (every month all three report, mid-1950s→; rounded to 1dp; not an OECD-published aggregate — chosen over an all-member median because the OECD's archive stalls months behind its own aggregates for most members, while these three always stay current). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     gdppc: { label: "GDP per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: gdppc },
     rnndi: { label: "Real net national disposable income per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: rnndi },
     oecdCpi: { label: "OECD average inflation", basis: "OECD printed measure", rows: oecdCpi },
-    usUkCaCpi: { label: "US/UK/Canada average inflation", basis: "mean of the three members' OECD-published prints (computed)", rows: usUkCaCpi },
+    oecdCpiMed: { label: "OECD median inflation", basis: "median of the 38 member countries' prints (computed)", rows: oecdCpiMed },
     g20Cpi: { label: "G20 average inflation", basis: "OECD printed measure", rows: g20Cpi },
     oecdGdp: { label: "OECD average GDP growth", basis: "OECD printed measure", rows: oecdGdp },
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "usUkCaCpi", "g20Cpi", "oecdGdp"];
+  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);
@@ -405,5 +703,7 @@ if (!process.env.MACRO_LIB) {
     newest: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.at(-1)?.date ?? null])),
     stale,
     cpiHandoffDrift: drift,
+    medParsed,
+    medHandoffDrift: medSplice.handoff,
   }));
 }

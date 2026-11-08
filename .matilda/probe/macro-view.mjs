@@ -57,7 +57,7 @@ const readState = () => page.evaluate(() => {
     ptitle: t.includes("Inflation & growth") && t.includes("annual change, per cent"),
     rnndRow: t.includes("Real net national disposable income per person"),
     oecdRow: t.includes("OECD average inflation"),
-    trioRow: t.includes("US/UK/Canada average inflation"),
+    trioRow: t.includes("OECD median inflation"),
     g20Row: t.includes("G20 average inflation"),
     rbaBand: q("svg .rba-band").length > 0,
     histChip: t.includes("Show complete history"),
@@ -80,14 +80,14 @@ const check = (name, got, want) => {
 /* file-grounded expectations: the read rows must quote macro.json's own
    newest figures, never a recalculation. The panel's lane order, mirrored:
    CPI (its monthly read row), the two ABS growth lanes, then the OECD
-   average, the US/UK/Canada mean, G20 and OECD GDP context lines — each
+   average, the OECD member median, G20 and OECD GDP context lines — each
    optional like the component's own concat chain */
 const laneRows = [
   MACRO.cpiMonthly,
   MACRO.gdppc,
   ...(MACRO.rnndi && MACRO.rnndi.rows.length ? [MACRO.rnndi] : []),
   ...(MACRO.oecdCpi && MACRO.oecdCpi.rows.length ? [MACRO.oecdCpi] : []),
-  ...(MACRO.usUkCaCpi && MACRO.usUkCaCpi.rows.length ? [MACRO.usUkCaCpi] : []),
+  ...(MACRO.oecdCpiMed && MACRO.oecdCpiMed.rows.length ? [MACRO.oecdCpiMed] : []),
   ...(MACRO.g20Cpi && MACRO.g20Cpi.rows.length ? [MACRO.g20Cpi] : []),
   ...(MACRO.oecdGdp && MACRO.oecdGdp.rows.length ? [MACRO.oecdGdp] : []),
 ];

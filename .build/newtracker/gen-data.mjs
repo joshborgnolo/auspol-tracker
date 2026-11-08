@@ -7316,13 +7316,13 @@ const confDeep = (() => {
    APIs) passes through as-is: cpi/cpiMonthly inflation, gdppc real GDP
    per capita and rnndi real net national disposable income per capita,
    and the OECD/G20 comparators (oecdCpi and g20Cpi printed aggregates,
-   usUkCaCpi the extractor's US/UK/Canada trio average). The view reads the
+   oecdCpiMed the extractor's member-country median). The view reads the
    raw {date, v} rows and splices the quarterly CPI history onto the printed
    monthly era render-side. */
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "usUkCaCpi", "g20Cpi", "oecdGdp"]) {
+  for (const k of ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
