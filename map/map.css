@@ -882,6 +882,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 }
 .fs.bare .fs-side { transform: translateX(calc(-100% - 2 * var(--fs-g))); opacity: 0; visibility: hidden; transition: transform .36s var(--fs-ease), opacity .26s ease, visibility 0s .36s; }
 .fs-grab { display: none; }
+.fs-tuck { display: none; }
 .fs-head { flex: none; padding: 15px 18px 0 20px; border-bottom: 1px solid var(--line-2); }
 .fs-title { display: flex; align-items: center; gap: 8px; }
 .fs-title h2 { font: 600 17px/1.25 var(--sans); letter-spacing: -0.005em; color: var(--ink); }
@@ -1055,6 +1056,11 @@ html.mp-fs .mp-tip { z-index: 260; }
   .fs.sheet-up .fs-side { transform: none; }
   .fs-grab { display: grid; place-items: center; flex: none; height: 20px; touch-action: none; cursor: grab; }
   .fs-grab i { width: 38px; height: 4px; border-radius: 2px; background: var(--ink-faint); opacity: .7; }
+  /* the tuck button, at the handle's end: down to the dock alone, and back up */
+  .fs-tuck { display: grid; place-items: center; position: absolute; top: 0; right: 6px; z-index: 2; width: 40px; height: 26px; color: var(--ink-2); }
+  .fs-tuck svg { transition: transform .3s var(--fs-ease); }
+  .fs.sheet-down .fs-tuck svg { transform: rotate(180deg); }
+  .fs.sheet-up .fs-tuck { display: none; }
   .fs-head, .fs-lslot, .fs-show, .fs-hide { display: none !important; }
   .fs-dock {
     position: relative; left: auto !important; right: auto; bottom: auto; flex: none; height: 50px; padding: 0 6px 2px 12px;
@@ -1514,6 +1520,7 @@ html.mp-retro .sh-foot a { color: #0000ee; }
 html.mp-retro .fs { background: var(--rt-face); }
 html.mp-retro .fs-plate { border-radius: 0 !important; border: 0 !important; background: var(--rt-face) !important; box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .3) !important; }
 html.mp-retro .fs-title h2 { font: 700 13px/1 var(--rt-font); }
+html.mp-retro .fs-tuck { top: 3px; right: 8px; width: 30px; height: 20px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; }
 
 /* tablet and phone: the banner folds to fit */
 @media (max-width: 1100px) { .rt-house { display: none; } }

@@ -2598,6 +2598,17 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("old.replaceWith(next);") && st.includes("const shift = Math.round(nb.getBoundingClientRect().top - top);"), "Skew/Effect redraws its block alone and holds its buttons in place");
 }
 
+// full screen on a phone (2026-11-08, user call): the sheet tucks down to its
+// handle and the elections dock, by a drag or the tuck button, the map taking the
+// screen; three places — tucked, at rest, up — with the handle's tap stepping up
+{
+  const fsj = part("app-7-full.js"), css = part("page.css");
+  assert.ok(fsj.includes("function fsSheetTo(st) {") && fsj.includes('FS.sheetDown = st === "down";') && fsj.includes("if (wasDown !== FS.sheetDown) fsMeasure(false);"), "the sheet's three places, the map's clear ground following the tuck");
+  assert.ok(fsj.includes("if (down) return Math.round(FS.grab.offsetHeight + FS.dock.offsetHeight + 6);"), "tucked, the sheet keeps its handle and the dock");
+  assert.ok(fsj.includes('class="fs-tuck"') && fsj.includes('fsSheetTo(FS.sheetDown ? "rest" : "down")') && fsj.includes('["down", H - fsPeekOf(true)]'), "the tuck button and the drag both reach the tucked place");
+  assert.ok(css.includes(".fs.sheet-down .fs-tuck svg { transform: rotate(180deg); }"), "the tuck button's chevron turns to bring the panel back");
+}
+
 // Controls share one stack; basis scales are no longer part of the panel.
 {
   const ui = part("app-6-ui.js"), css = part("page.css"), st = part("app-4-story.js");

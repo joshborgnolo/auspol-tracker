@@ -256,6 +256,7 @@ html.mp-retro .sh-foot a { color: #0000ee; }
 html.mp-retro .fs { background: var(--rt-face); }
 html.mp-retro .fs-plate { border-radius: 0 !important; border: 0 !important; background: var(--rt-face) !important; box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .3) !important; }
 html.mp-retro .fs-title h2 { font: 700 13px/1 var(--rt-font); }
+html.mp-retro .fs-tuck { top: 3px; right: 8px; width: 30px; height: 20px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; }
 
 /* tablet and phone: the banner folds to fit */
 @media (max-width: 1100px) { .rt-house { display: none; } }

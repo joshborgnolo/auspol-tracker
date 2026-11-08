@@ -37,7 +37,7 @@ const fsCanNative = () => {
   const de = document.documentElement;
   return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled) && !!(de.requestFullscreen || de.webkitRequestFullscreen);
 };
-Object.assign(FS, { px: 8e6, el: null, parked: [], native: false, pushed: false, skipPop: false, leaving: false, bare: false, sheetUp: false, phone: false, play: null, auto: false, scrollY: 0, inert: [] });
+Object.assign(FS, { px: 8e6, el: null, parked: [], native: false, pushed: false, skipPop: false, leaving: false, bare: false, sheetUp: false, sheetDown: false, phone: false, play: null, auto: false, scrollY: 0, inert: [] });
 
 function fsBuild() {
   if (FS.el) return;
@@ -52,6 +52,7 @@ function fsBuild() {
     </div>
     <aside class="fs-side fs-plate" aria-label="The story">
       <div class="fs-grab" role="button" tabindex="0" aria-label="Show more of the story"><i></i></div>
+      <button type="button" class="fs-tuck" aria-label="Tuck the panel down" title="Tuck the panel down"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5.2 7 9l4-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="fs-head">
         <div class="fs-title"><h2>Electoral map</h2><button type="button" class="fs-hide" aria-label="Hide the panel" title="Hide the panel">${FS_ICON.side}</button></div>
         <p class="fs-meta"></p>
@@ -130,17 +131,21 @@ function fsLayout() {
     FS.vslot.appendChild(views);
     FS.lslot.appendChild(legend);
     FS.el.appendChild(FS.dock);
-    FS.sheetUp = false; FS.el.classList.remove("sheet-up");
+    FS.sheetUp = false; FS.sheetDown = false; FS.el.classList.remove("sheet-up", "sheet-down");
   }
   FS.showBtn.hidden = phone || !FS.bare;
 }
 
 /* ----- the clear ground: the room the plates take at each edge, in stage px ----- */
-function fsPeek() {
-  // the sheet at rest: its handle, the dock, the key, and room for the story's first line
+/* the sheet's resting rooms: at rest its handle, the dock, the key and room for
+   the story's first line; tucked down, the handle and the dock alone, the map
+   given the rest of the screen */
+function fsPeekOf(down) {
+  if (down) return Math.round(FS.grab.offsetHeight + FS.dock.offsetHeight + 6);
   const lg = $("#legend"), key = lg && !lg.hidden ? lg.offsetHeight : 0;
   return Math.round(Math.min(FS.grab.offsetHeight + FS.dock.offsetHeight + key + 54, FS.el.clientHeight * 0.48));
 }
+function fsPeek() { return fsPeekOf(FS.sheetDown); }
 function fsMeasure(quiet) {
   if (!FS.on || !FS.el) return false;
   const el = FS.el, H = el.clientHeight, g = FS.phone ? 8 : 14;
@@ -297,8 +302,8 @@ async function fsExit(o = {}) {
   FS.inert = [];
   FS.on = false;
   el.hidden = true; FS.veil.hidden = true;
-  el.classList.remove("leaving", "sheet-up");
-  FS.sheetUp = false;
+  el.classList.remove("leaving", "sheet-up", "sheet-down");
+  FS.sheetUp = false; FS.sheetDown = false;
   if (FS.exitAnims) { for (const a of FS.exitAnims) a.cancel(); FS.exitAnims = null; }
   document.documentElement.classList.remove("mp-fs");
   FS.ins = { t: 0, r: 0, b: 0, l: 0 };
@@ -330,12 +335,23 @@ function fsPanel(show) {
   fsMeasure(false);
   (show ? $(".fs-hide", FS.el) : FS.showBtn).focus({ preventScroll: true });
 }
-function fsSheet(up) {
-  FS.sheetUp = !!up;
+/* the phone's sheet stands in three places: tucked down (the handle and the
+   dock), at rest (the key and the story's first line too), and up (the story) */
+function fsSheetTo(st) {
+  const wasDown = FS.sheetDown;
+  FS.sheetUp = st === "up"; FS.sheetDown = st === "down";
   FS.el.classList.toggle("sheet-up", FS.sheetUp);
+  FS.el.classList.toggle("sheet-down", FS.sheetDown);
   FS.grab.setAttribute("aria-label", FS.sheetUp ? "Show less of the story" : "Show more of the story");
+  const tk = $(".fs-tuck", FS.el);
+  if (tk) { const t = FS.sheetDown ? "Bring the panel up" : "Tuck the panel down"; tk.setAttribute("aria-label", t); tk.title = t; }
   if (!FS.sheetUp) FS.scroll.scrollTop = 0;
+  // the resting room changed: the map's clear ground grows or shrinks with it
+  if (wasDown !== FS.sheetDown) fsMeasure(false);
 }
+function fsSheet(up) { fsSheetTo(up ? "up" : "rest"); }
+// a step up the three places (the handle's tap), or down
+const fsSheetStep = (dir) => fsSheetTo(dir < 0 ? (FS.sheetDown ? "rest" : "up") : (FS.sheetUp ? "rest" : "down"));
 // the sheet follows the finger up and down: from its handle, the dock and the key at
 // rest, and from the story once it is up and read back to its top (pulled down)
 function fsSheetDrag() {
@@ -359,20 +375,28 @@ function fsSheetDrag() {
     if (e.cancelable) e.preventDefault();
     const now = performance.now();
     g.v = (t.clientY - g.ly) / Math.max(1, now - g.lt); g.ly = t.clientY; g.lt = now;
-    const max = side.offsetHeight - fsPeek(), y = g.base + dy;
+    const max = side.offsetHeight - fsPeekOf(true), y = g.base + dy;
     side.style.transform = `translateY(${y < 0 ? y / 4 : y > max ? max + (y - max) / 4 : y}px)`;
   }, { passive: false });
   const end = () => {
     const d = g; g = null;
     if (!d || !d.on) return;
-    const max = side.offsetHeight - fsPeek(), y = d.base + (d.ly - d.y0);
+    const H = side.offsetHeight, y = d.base + (d.ly - d.y0);
     side.style.transition = ""; side.style.transform = "";
-    fsSheet(d.v < -0.35 ? true : d.v > 0.35 ? false : y < max / 2);
+    // a flick steps one place; a slow drag settles at the nearest of the three
+    if (d.v < -0.35) return fsSheetStep(-1);
+    if (d.v > 0.35) return fsSheetStep(1);
+    const at = [["up", 0], ["rest", H - fsPeekOf(false)], ["down", H - fsPeekOf(true)]].sort((a, b) => Math.abs(a[1] - y) - Math.abs(b[1] - y))[0][0];
+    fsSheetTo(at);
   };
   side.addEventListener("touchend", end);
   side.addEventListener("touchcancel", end);
-  FS.grab.addEventListener("click", () => fsSheet(!FS.sheetUp));
-  FS.grab.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fsSheet(!FS.sheetUp); } });
+  // the handle's tap steps up (tucked to rest, rest to up) and back down from up
+  const tap = () => (FS.sheetUp ? fsSheetTo("rest") : fsSheetStep(-1));
+  FS.grab.addEventListener("click", tap);
+  FS.grab.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
+  // the tuck button: the map takes the screen, the dock stays to hand
+  $(".fs-tuck", FS.el).addEventListener("click", () => fsSheetTo(FS.sheetDown ? "rest" : "down"));
 }
 // the view's own rules: the plates know whether the map, the chamber or the list is up
 function fsView() {
