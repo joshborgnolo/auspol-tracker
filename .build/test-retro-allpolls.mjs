@@ -119,6 +119,12 @@ const json = html.match(/<script type="application\/json" id="ap-data">([\s\S]*?
 assert.ok(!/<\/script/i.test(json) && JSON.parse(json).rows.length === P.length, "the data block parses and can't close its script early");
 assert.ok(html.includes(`<link rel="canonical" href="https://auspoltracker.com/allpolls/">`), "its canonical is the modern All polls page");
 assert.ok(html.includes(R(".build/retro/chrome.css")) && R("map/map.css").includes(R(".build/retro/chrome.css")), "the page and the retro map wear the one chrome");
+// the chrome's own inks survive a page's era link colours (allpolls.css's bare a:visited outranks a lone class and loads after chrome.css): navbar, kicker and menu links declare their visited inks (was the purple-kicker bug of 2026-11-09)
+{
+  const chrome = R(".build/retro/chrome.css");
+  for (const [sel, ink] of [[".rt-nav .rt-ni:visited, .rt-pages a:visited", "#fff"], [".rt-kicker:visited", "#ffd94a"], [".rt-drop a:visited", "#000"]])
+    assert.ok(chrome.includes(`${sel} { color: ${ink}; }`), `the chrome's links hold ${ink} when visited (${sel}) – a page's bare a:visited must never recolour the shared chrome`);
+}
 assert.ok(html.includes('<a href="/allpolls/retro/" aria-current="page">All polls</a>'), "the navbar marks this page");
 assert.ok(D.pages.more.some((p) => p.label === "Electoral map" && p.href === "/map/#retro=1"), "the Electoral map opens in its retro view");
 assert.ok(D.pages.tabs.every((p) => p.href !== "/") && D.pages.tabs.some((p) => p.href === "/cycles/"), "the bar's views but Now (the navbar's Home)");
