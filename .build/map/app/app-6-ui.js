@@ -1205,6 +1205,8 @@ function frame(ts) {
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, Wpx, Hpx);
+  // the map's sea first, under everything (the chamber's morph fades its own: drawMorph)
+  if (m && m.proj && !morph && S.view === "map") drawOcean(m, 1);
   // (nor a frame not yet coloured: at boot the landing election can land before the
   // legend's metadata, and a resize's frame in that gap had no colours to fill with)
   if (!m || !m.divCol) return;
@@ -1732,7 +1734,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   $("#zoomer").dataset.view = S.view; $("#zoomer").hidden = S.view === "list";
   if (fsFromURL) fsEnter({ native: false, push: false, animate: false });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { schedule(); renderTimeline(); paintMiniChamber(); ebHeights.clear(); holdEyebrow(); });
-  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get townHitsNow() { return townHits.map((h) => h.slice()); }, get urbanOk() { return townPick >= 0 && !!urbanEntry(townPick); }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; },
+  window.__map = { S, Y, SF, AR, setDraw, setAxis, axisOf, axisArea, surfaceAt, balloonSet, balloonLevel, undrawnOf, estBooths, drawOf, areasHit, areasValue, areasLane, areasVintage, M, walk(dir, y) { walkAim(y); walkYear(dir, true); }, walkLane, select, goDiv, goBooth, goState, goAus, setLens, setView, setYear, get T() { return T; }, get townPick() { return townPick; }, get townHitsNow() { return townHits.map((h) => h.slice()); }, get urbanOk() { return townPick >= 0 && !!urbanEntry(townPick); }, get projDrift() { const m = M(), ll = [115.8614, -31.9522], a = proj(ll), b = m.proj(ll); return [proj === m.proj, +((a[0] - b[0]) * T.k).toFixed(1), +((a[1] - b[1]) * T.k).toFixed(1)]; }, get townsDrawn() { return [...townSince.keys()].map((i) => PLACES[i][0]); }, get HOME() { return HOME; }, get ymorph() { return ymorph; }, get seaDrawn() { return [...seaSince.keys()]; },
     get away() { return away; },
     fs: { enter: (o) => fsEnter(o), exit: (o) => fsExit(o), play: () => fsPlay(), stop: () => fsStop(), panel: (v) => fsPanel(v), sheet: (v) => fsSheet(v), get on() { return FS.on; }, get ins() { return { ...FS.ins }; }, get playing() { return !!FS.play; }, get native() { return FS.native; }, get px() { return FS.px; }, set px(v) { FS.px = v; Wpx = 0; resize(); } },
     get islands() { return islDrawn.map((c) => ({ key: c.s.key, r: c.r, docked: c.docked, dots: c.dots.map((d) => ({ j: d.j, x: d.x, y: d.y })) })); },

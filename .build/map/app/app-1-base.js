@@ -108,6 +108,11 @@ function readTheme() {
   // seat types walk the outback ramp: city cream out to red earth — one ladder for both themes
   T.cls = [lch(0.88, 0.030, 78), lch(0.70, 0.048, 62), lch(0.53, 0.060, 48), lch(0.38, 0.075, 38)];
   T.floor = dk ? lch(0.235, 0.012, 150) : lch(0.958, 0.012, 150);
+  // the atlas's sea under the seats (app-2-map.js, "the ocean"): pale blue paper, its
+  // lines of latitude and longitude a deeper blue, its waters' names deeper still
+  T.sea = dk ? lch(0.255, 0.026, 242) : lch(0.93, 0.027, 232);
+  T.seaLine = dk ? lch(0.37, 0.042, 240) : lch(0.79, 0.055, 238);
+  T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
   return T;
 }
 

@@ -182,6 +182,220 @@ const seaA = () => smooth(STREETS.k0, STREETS.k0 * 1.4, T.k);
 // the paint's sea cut, for drawFocus: the year it was cut for and how far it has taken over
 let seaNow = null;
 const inBox = (b, x0, y0, x1, y1) => b && !(b[1][0] < x0 || b[0][0] > x1 || b[1][1] < y0 || b[0][1] > y1);
+
+/* ----- the ocean -----
+   An atlas's sea under the seats: pale blue paper ruled with the lines of
+   latitude and longitude every 10 degrees, the waters named over it
+   (drawSeaNames). A state's frame lays the rest of the country beneath its
+   seats as plain land, so Australia always sits whole on the sea.
+   The paper's grain is a seamless tile made here once a theme, from a fixed
+   seed so every load lays the same sheet: soft mottling, a fine grain, a
+   scatter of fibres. It rides the map as it pans and keeps its size as it
+   zooms: two copies of the tile an octave apart, each pinned to the map,
+   the finer coming up as the zoom doubles, so the paper neither swells with
+   the map nor slides under the land.
+   The lines are the projection's own. An equal-area conic draws every
+   parallel as an arc of a circle about one apex and every meridian as a ray
+   from it, so they are drawn as just that, worked out on the screen in full
+   precision: an arc stroked through the map's transform turns to chords at
+   street zoom (and to float error past it); these hold at every zoom. */
+const PAPER_CSS = 384, GRAT_STEP = 10;
+let paperTile = null, oceanA = 1;
+function paperOf() {
+  const th = TH, n = dpr > 1.25 ? 2 * PAPER_CSS : PAPER_CSS;
+  if (paperTile && paperTile._th === th && paperTile.width === n) return paperTile;
+  const cv = document.createElement("canvas"); cv.width = cv.height = n; cv._th = th;
+  const g = cv.getContext("2d");
+  let seed = 0x5eaf00d;
+  const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const [mot, grn] = th.dark ? [11, 7] : [16, 9]; // peak to peak, in 0-255 steps
+  const [r0, g0, b0] = th.sea;
+  // the mottling: value noise on lattices that wrap at the tile's edges, five octaves of it,
+  // worked out at a sixth of the tile (Q px a side, ringed with a pixel of its own other side)
+  // and smoothed up to the whole, so the tile is made in a few milliseconds and still meets itself
+  const oct = [[3, 0.38], [6, 0.26], [12, 0.17], [24, 0.11], [48, 0.08]].map(([p, w]) => { const L = new Float32Array(p * p); for (let i = 0; i < L.length; i++) L[i] = rnd(); return { p, w, L }; });
+  const Q = 128, low = document.createElement("canvas"); low.width = low.height = Q + 2;
+  const lg = low.getContext("2d"), img = lg.createImageData(Q + 2, Q + 2), d = img.data;
+  for (let y = 0; y < Q + 2; y++) for (let x = 0; x < Q + 2; x++) {
+    const qx = (x + Q - 1) % Q + 0.5, qy = (y + Q - 1) % Q + 0.5;
+    let v = 0;
+    for (const { p, w, L } of oct) {
+      const fx = (qx / Q) * p, fy = (qy / Q) * p, ix = fx | 0, iy = fy | 0;
+      let tx = fx - ix, ty = fy - iy; tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+      const x1 = (ix + 1) % p, ya = iy * p, yb = ((iy + 1) % p) * p;
+      const a = L[ya + ix], b = L[ya + x1], c = L[yb + ix], e = L[yb + x1];
+      v += w * (a + (b - a) * tx + (c - a + (a - b - c + e) * tx) * ty);
+    }
+    const sv = mot * (v - 0.5), k = 4 * (y * (Q + 2) + x);
+    d[k] = r0 + sv; d[k + 1] = g0 + sv; d[k + 2] = b0 + sv; d[k + 3] = 255;
+  }
+  lg.putImageData(img, 0, 0);
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+  g.drawImage(low, 1, 1, Q, Q, 0, 0, n, n);
+  // the grain: a small square of speckle laid over it all, each speck a touch of white or of
+  // ink, its strength set so a step up and a step down weigh alike on the sheet's colour
+  const GQ = 128, gr = document.createElement("canvas"); gr.width = gr.height = GQ;
+  const gg = gr.getContext("2d"), gi = gg.createImageData(GQ, GQ), gd = gi.data, lum = (r0 + g0 + b0) / 3;
+  for (let i = 0; i < GQ * GQ; i++) {
+    const sv = grn * (rnd() - 0.5), k = 4 * i, up = sv > 0;
+    gd[k] = gd[k + 1] = gd[k + 2] = up ? 255 : 0; gd[k + 3] = Math.round(255 * Math.min(1, Math.abs(sv) / (up ? 255 - lum : lum)));
+  }
+  gg.putImageData(gi, 0, 0);
+  g.fillStyle = g.createPattern(gr, "repeat"); g.fillRect(0, 0, n, n);
+  // the fibres: short bent strokes, most lighter than the sheet, a few darker, each drawn
+  // again across any edge it crosses so the tile still meets itself
+  const u = n / PAPER_CSS;
+  g.lineCap = "round";
+  for (let i = 0; i < 700; i++) {
+    const x = rnd() * n, y = rnd() * n, len = (3 + rnd() * rnd() * 22) * u, a = rnd() * Math.PI, bend = (rnd() - 0.5) * 0.6 * len;
+    const dx = (Math.cos(a) * len) / 2, dy = (Math.sin(a) * len) / 2, light = rnd() < 0.62, al = rnd();
+    g.strokeStyle = light ? `rgba(255,255,255,${th.dark ? 0.035 + 0.04 * al : 0.12 + 0.16 * al})` : th.dark ? `rgba(0,0,0,${0.1 + 0.1 * al})` : `rgba(40,70,100,${0.03 + 0.04 * al})`;
+    g.lineWidth = (0.35 + 0.55 * rnd()) * u;
+    const bx = (-dy * 2 * bend) / len, by = (dx * 2 * bend) / len;
+    for (const ox of [-n, 0, n]) for (const oy of [-n, 0, n]) {
+      const cx = x + ox, cy = y + oy;
+      if (cx + len < 0 || cx - len > n || cy + len < 0 || cy - len > n) continue;
+      g.beginPath(); g.moveTo(cx - dx, cy - dy); g.quadraticCurveTo(cx + bx, cy + by, cx + dx, cy + dy); g.stroke();
+    }
+  }
+  return (paperTile = cv);
+}
+// the paper over the canvas (within whatever clip is in force): the coarser copy whole and
+// the finer over it as the zoom nears its next doubling; under: the order turned for a
+// destination-over fill (laySea's, into the holes its cut opens)
+function layPaper(alpha, under) {
+  const tile = paperOf(), n = tile.width, f = Math.log2(T.k) - Math.floor(Math.log2(T.k));
+  if (!tile._pat || tile._ctx !== ctx) { tile._pat = ctx.createPattern(tile, "repeat"); tile._ctx = ctx; }
+  const pat = tile._pat, copies = [[2 ** f, 1], [2 ** (f - 1), f]];
+  if (under) copies.reverse();
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = pat;
+  for (const [s, a] of copies) {
+    if (a < 0.004) continue;
+    // (pinned to the map's origin, its offset taken modulo the tile so the pattern's own
+    // arithmetic never meets street zoom's millions of pixels)
+    const side = PAPER_CSS * dpr * s, sc = side / n, mod = (v) => ((v % side) + side) % side;
+    pat.setTransform(new DOMMatrix([sc, 0, 0, sc, mod(dpr * T.x), mod(dpr * T.y)]));
+    ctx.globalAlpha = alpha * a; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.restore();
+}
+/* @grat-begin (test-map-ocean.mjs runs this against d3's own projection) */
+// a projection's apex and the radius of each parallel's circle, in its plane: the central
+// meridian (132E) stands upright, and the apex is where another meridian's ray meets it
+function gratOf(P) {
+  const k = P.scale(), [tx, ty] = P.translate();
+  if (P._grat && P._grat.k === k && P._grat.tx === tx && P._grat.ty === ty) return P._grat;
+  const c0 = P([132, -10]), a = P([172, -10]), b = P([172, -60]);
+  const C = [c0[0], a[1] + ((c0[0] - a[0]) / (b[0] - a[0])) * (b[1] - a[1])];
+  const ang = (lon) => { const p = P([lon, -30]); return Math.atan2(p[1] - C[1], p[0] - C[0]); };
+  const R = new Map();
+  for (let lat = -80; lat <= 80; lat += GRAT_STEP) { const p = P([132, lat]); R.set(lat, Math.hypot(p[0] - C[0], p[1] - C[1])); }
+  // a meridian's angle runs straight with its longitude (t0 at 132E, dt a degree)
+  return (P._grat = { k, tx, ty, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R });
+}
+/* @grat-end */
+// the lines of latitude and longitude every GRAT_STEP degrees; under: see layPaper
+function layGrat(m, alpha) {
+  const P = m && m.proj; if (!P) return;
+  const G = gratOf(P), s = dpr * T.k, cx = dpr * T.x + s * G.C[0], cy = dpr * T.y + s * G.C[1];
+  const x0 = -4, y0 = -4, x1 = canvas.width + 4, y1 = canvas.height + 4;
+  // the view as the apex sees it: how near and far it lies, the angles it spans
+  const inside = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+  const near = Math.hypot(Math.max(x0 - cx, 0, cx - x1), Math.max(y0 - cy, 0, cy - y1));
+  const mid = Math.atan2((y0 + y1) / 2 - cy, (x0 + x1) / 2 - cx);
+  let far = 0, a0 = inside ? mid - Math.PI : Infinity, a1 = inside ? mid + Math.PI : -Infinity;
+  for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) {
+    far = Math.max(far, Math.hypot(x - cx, y - cy));
+    if (inside) continue;
+    let a = Math.atan2(y - cy, x - cx) - mid; a -= 2 * Math.PI * Math.round(a / (2 * Math.PI));
+    a0 = Math.min(a0, mid + a); a1 = Math.max(a1, mid + a);
+  }
+  // the fan the whole round of longitude spans, turned to the view's side of the apex
+  const t0 = G.t0 + 2 * Math.PI * Math.round((mid - G.t0) / (2 * Math.PI)), half = 180 * Math.abs(G.dt);
+  const lo = Math.max(a0, t0 - half), hi = Math.min(a1, t0 + half);
+  if (hi <= lo) return;
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha; ctx.strokeStyle = css(TH.seaLine); ctx.lineWidth = Math.max(1, 0.8 * dpr); ctx.lineJoin = "round";
+  ctx.beginPath();
+  // each parallel: its circle sampled across the view, chords within a tenth of a pixel of the arc
+  for (const r0 of G.R.values()) {
+    const r = s * r0; if (r < near - 2 || r > far + 2) continue;
+    const step = Math.min(0.02, Math.sqrt(0.8 / r)), nseg = Math.ceil((hi - lo) / step);
+    for (let i = 0; i <= nseg; i++) { const t = lo + ((hi - lo) * i) / nseg, x = cx + r * Math.cos(t), y = cy + r * Math.sin(t); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
+  }
+  // each meridian: its ray from 80S to 80N, cut to the view, from 40W east round
+  // to 50W (the projection's own cut lies between them, at 48W, opposite 132E)
+  const rA = s * G.R.get(-80), rB = s * G.R.get(80);
+  for (let lon = -40; lon <= 310; lon += GRAT_STEP) {
+    const t = t0 + (lon - 132) * G.dt; if (t < lo - 1e-3 || t > hi + 1e-3) continue;
+    const ux = Math.cos(t), uy = Math.sin(t);
+    let u0 = Math.min(rA, rB), u1 = Math.max(rA, rB);
+    const cut = (d, a, b) => {
+      if (Math.abs(d) < 1e-12) return a <= 0 && b >= 0;
+      let p = a / d, q = b / d; if (p > q) [p, q] = [q, p];
+      u0 = Math.max(u0, p); u1 = Math.min(u1, q); return u0 < u1;
+    };
+    if (!cut(ux, x0 - cx, x1 - cx) || !cut(uy, y0 - cy, y1 - cy)) continue;
+    ctx.moveTo(cx + u0 * ux, cy + u0 * uy); ctx.lineTo(cx + u1 * ux, cy + u1 * uy);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+// the country as plain land, one shape a state (map/data/land.json, land_build.mjs), made
+// in a frame's own plane once it's first wanted: each state's shape and bounds, its coast
+// (none for the frame's own state, whose coast the frame draws) and its lines with the
+// other states shown. Past K_HI, where a frame's own seats turn hi, the thinned hi
+// coast (land-hi.json) takes over once it's in hand.
+let LAND = null, LAND_HI = null, landP = null, landHiP = null;
+const loadLand = () => landP || (landP = getJSON("/map/data/land.json").then((t) => { LAND = t; schedule(); }).catch(() => { landP = null; }));
+const loadLandHi = () => landHiP || (landHiP = getJSON("/map/data/land-hi.json", true).then((t) => { LAND_HI = t; schedule(); }).catch(() => { landHiP = null; }));
+function landOf(m, hi) {
+  const topo = hi ? LAND_HI : LAND, key = hi ? "_landHi" : "_land";
+  if (!topo) { if (hi) loadLandHi(); else loadLand(); return null; }
+  if (m[key] && m[key].P === m.proj) return m[key];
+  const o = topo.objects.land, mine = (g) => inFrame(m, g.properties.st), path = d3.geoPath(m.proj);
+  const mk = (g) => { const p = new Path2D(); d3.geoPath(m.proj, p)(g); return p; };
+  const states = o.geometries.map((g) => {
+    const f = topojson.feature(topo, g), st = g.properties.st;
+    return {
+      st, mine: mine(g), path: mk(f), bb: path.bounds(f),
+      coast: mk(topojson.mesh(topo, o, (a, b) => a === b && a.properties.st === st && !mine(a))),
+      lines: mk(topojson.mesh(topo, o, (a, b) => a !== b && a.properties.st === st && !mine(a) && !mine(b))),
+    };
+  });
+  return (m[key] = { P: m.proj, states });
+}
+// all: the frame's own state too (under a change of frame, where both maps are part-seen)
+function layLand(m, alpha, all) {
+  const hiK = T.k > K_HI, L = (hiK && landOf(m, true)) || landOf(m, false); if (!L) return;
+  const th = TH, [x0, y0, x1, y1] = viewBox(), shown = L.states.filter((s) => (all || !s.mine) && inBox(s.bb, x0, y0, x1, y1));
+  if (!shown.length) return;
+  ctx.save();
+  ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); ctx.globalAlpha = alpha; ctx.lineJoin = "round";
+  // (and a pixel and a half of the same paper round each, so no sea opens along the frame's
+  // own border where the two sources draw it a little apart)
+  ctx.fillStyle = ctx.strokeStyle = css(th.bg); ctx.lineWidth = 1.5 / T.k;
+  for (const s of shown) { ctx.fill(s.path); ctx.stroke(s.path); }
+  ctx.lineWidth = 0.7 / T.k;
+  ctx.strokeStyle = css(th.coast, 0.3); for (const s of shown) ctx.stroke(s.lines);
+  ctx.strokeStyle = css(th.coast, 0.55); for (const s of shown) ctx.stroke(s.coast);
+  ctx.restore();
+}
+// the sea beneath a frame, at alpha (the map's own, fading into the chamber)
+function drawOcean(m, alpha) {
+  oceanA = alpha;
+  layPaper(alpha);
+  layGrat(m, alpha);
+  const cross = !!(ymorph && ymorph.to === m && ymorph.cross);
+  if (cross || STATE_YEARS.has(m.year)) layLand(m, alpha, cross);
+}
+// the sea again, beneath what's drawn: into the holes a cut has opened (laySea)
+function oceanUnder(m) {
+  ctx.save(); ctx.globalCompositeOperation = "destination-over";
+  layGrat(m, oceanA); layPaper(oceanA, true);
+  ctx.restore();
+}
+
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
@@ -273,7 +487,7 @@ function drawGeo(m, alpha, streetA) {
     }
   }
   ctx.restore();
-  if (sa) laySea(st, alpha * sa);
+  if (sa) laySea(m, st, alpha * sa);
   if (streetA !== undefined && !sa) warmWaters();
 }
 
@@ -371,6 +585,9 @@ function layWaters(m, g, st, look, a) {
   if (!all) needFrame = true;
   const L = layer(), W = canvas.width, H = canvas.height;
   L.save(); L.clip(st.known);
+  // (under the waters, plain land: Esri's land that no seat's waters reach, as an islet past
+  // their regions, or a neighbouring state under a state's frame)
+  L.fillStyle = css(TH.bg); L.fillRect(0, 0, W, H);
   L.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
   for (const r of out) for (const [lab, p] of r) { const f = look(lab); if (!f) continue; L.fillStyle = f[0]; L.fill(p); if (f[1]) { L.fillStyle = css(TH.bg, 0.8); L.fill(p); } }
   L.restore();
@@ -935,9 +1152,163 @@ function drawLabels(m) {
   }
   if (townsOn && tw > 0 && !wide) drawTowns(m, placed, seatNm, town, obst, since);
   townSince = since;
+  // the waters' names, after everything named on the land (it keeps its room first)
+  drawSeaNames(m, placed);
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
   if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
+  ctx.restore();
+}
+
+/* ----- the waters' names -----
+   The oceans, seas, gulfs, straits and the big bays, set as an atlas sets
+   them: italic, in the sea's own deeper blue, each line along the parallel
+   through its spot, so every name curves with the lines of latitude beneath
+   it (and a gulf that runs north-south along its own length). Sentence case,
+   never spaced capitals. A name shows only where all of it lies on open
+   water with a little room to spare, read off a coarse mask of the land
+   (seaMaskOf: the frame's seats and islands, and the country beneath a
+   state's frame), and only where it meets no other label; it tries its
+   spots in turn, so a name the view has cut off can move to another stretch
+   of its water. Each fades in as the town names do, and all of them give way
+   to Esri's own names of the waters as the streets come in.
+   Each entry: the name (lines split at \n), its size in px, then its spots
+   ([lon, lat], or [lon, lat, deg]: a name laid along a gulf, its line at deg
+   anticlockwise from the parallel). */
+/* @sea-names-begin */
+const SEA_NAMES = [
+  ["Indian Ocean", 18, [[109.5, -31], [111, -37.5], [113.5, -16.5], [115.5, -13], [109.5, -44], [106, -24]]],
+  ["Southern Ocean", 18, [[124, -40.6], [133, -41.2], [118, -39.5], [140, -45]]],
+  ["Pacific Ocean", 18, [[166, -30], [162, -24]]],
+  ["Coral Sea", 15.5, [[153.6, -17.5], [151.5, -13.5], [155.5, -21.5]]],
+  ["Tasman Sea", 15.5, [[156.5, -39.5], [152.9, -40.9], [151, -45], [156.5, -35], [159.5, -42], [161, -32]]],
+  ["Arafura Sea", 15.5, [[135.5, -9.7], [138.8, -10.2], [133, -9.4]]],
+  ["Timor Sea", 15.5, [[126.4, -11.6], [124.5, -12.6], [128.5, -10.6]]],
+  ["Great Australian\nBight", 14.5, [[130.6, -34.2], [129.5, -33.8], [132.2, -34.6]]],
+  ["Gulf of\nCarpentaria", 14.5, [[139.2, -14.3], [138.8, -13.2]]],
+  ["Joseph Bonaparte\nGulf", 13, [[128.5, -13.95], [128.7, -13.3]]],
+  ["Bass Strait", 13.5, [[146.1, -39.75], [145.2, -39.6], [147, -39.65]]],
+  ["Torres Strait", 13, [[142.4, -10.05]]],
+  ["Van Diemen Gulf", 12.5, [[131.95, -11.95]]],
+  ["Spencer Gulf", 13, [[137.18, -34.15, 70], [137.0, -34.6, 70]]],
+  ["Gulf St Vincent", 12.5, [[138.07, -34.95, 81], [138.1, -34.7, 81]]],
+  ["Investigator Strait", 12, [[137.35, -35.45]]],
+  ["Port Phillip", 12.5, [[144.86, -38.13], [144.85, -38.2]]],
+  ["Moreton Bay", 12.5, [[153.27, -27.27, 84], [153.3, -27.1, 84]]],
+  ["Hervey Bay", 12.5, [[152.65, -25.05], [152.75, -24.9]]],
+  ["Storm Bay", 12.5, [[147.57, -43.17]]],
+  ["Shark Bay", 12.5, [[113.35, -25.3], [113.2, -25.6]]],
+  ["Exmouth Gulf", 12, [[114.33, -22.25, 82]]],
+  ["King Sound", 12, [[123.45, -16.85, -68], [123.35, -16.6, -68]]],
+  ["Geographe Bay", 12, [[115.38, -33.47]]],
+  ["Princess Charlotte\nBay", 12, [[144.15, -14.12]]],
+];
+/* @sea-names-end */
+const SEA_FONT = '"Crimson Text", Georgia, serif', SEA_FADE = 220;
+let seaSince = new Map(), seaMaskJob = 0;
+// each line's advances, measured once (again when the italic arrives: the fallback's differ)
+const seaAdv = new Map();
+if (document.fonts && document.fonts.load) document.fonts.load(`italic 400 16px ${SEA_FONT}`).then(() => { seaAdv.clear(); schedule(); }, () => {});
+function seaAdvOf(ln, size) {
+  const key = size + "|" + ln;
+  let a = seaAdv.get(key);
+  if (!a) { ctx.font = `italic 400 ${size}px ${SEA_FONT}`; a = [0]; for (let i = 1; i <= ln.length; i++) a.push(ctx.measureText(ln.slice(0, i)).width); seaAdv.set(key, a); }
+  return a;
+}
+/* the land, coarsely (3.3km a cell; any cell the land touches counts as land): made off
+   the frame's plane in idle time when first wanted, kept for the year in view */
+let seaMask = null;
+const SEA_MASK = { x0: -200, y0: -120, w: 1400, h: 1120, s: 1.2 };
+function seaMaskOf(m) {
+  if (!m.proj || !m.geo) return null;
+  const state = STATE_YEARS.has(m.year);
+  if (seaMask && seaMask.m === m && seaMask.P === m.proj && (!state || seaMask.land)) return seaMask;
+  if (state && !LAND) { loadLand(); return null; }
+  if (seaMaskJob) return null;
+  const run = () => {
+    seaMaskJob = 0;
+    if (m !== M() || !m.proj) return;
+    const { x0, y0, s } = SEA_MASK, w = Math.ceil(SEA_MASK.w * s), h = Math.ceil(SEA_MASK.h * s);
+    const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+    const g = cv.getContext("2d", { willReadFrequently: true });
+    g.setTransform(s, 0, 0, s, -x0 * s, -y0 * s); g.fillStyle = "#000";
+    for (const p of m.geo.paths) if (p) g.fill(p);
+    for (const q of m.isl || []) g.fill(q.mpath);
+    if (LAND) for (const st of landOf(m, false).states) g.fill(st.path);
+    const d = g.getImageData(0, 0, w, h).data, a = new Uint8Array(w * h);
+    for (let i = 0; i < a.length; i++) a[i] = d[4 * i + 3] > 0 ? 1 : 0;
+    seaMask = { m, P: m.proj, land: !!LAND, x0, y0, s, w, h, a };
+    schedule();
+  };
+  seaMaskJob = window.requestIdleCallback ? requestIdleCallback(run, { timeout: 400 }) : setTimeout(run, 30);
+  return null;
+}
+const maskLand = (K, x, y) => { const i = Math.floor((x - K.x0) * K.s), j = Math.floor((y - K.y0) * K.s); return i >= 0 && j >= 0 && i < K.w && j < K.h && K.a[j * K.w + i] === 1; };
+// a name's glyphs at one spot, in CSS px: each glyph's middle on its baseline and its turn;
+// null where it can't stand (off the stage, on land)
+function seaLayout(m, K, G, txt, size, spot) {
+  const p = m.proj([spot[0], spot[1]]); if (!p) return null;
+  const ax = p[0] * T.k + T.x, ay = p[1] * T.k + T.y;
+  const lines = txt.split("\n"), lh = size * 1.08, advs = lines.map((ln) => seaAdvOf(ln, size));
+  // (a spot whose name can't reach the stage asks nothing more)
+  const half = Math.max(...advs.map((a) => a[a.length - 1])) / 2 + 4, tall = (lines.length * lh) / 2 + size;
+  if (ax + half < 2 || ax - half > Wpx - 2 || ay + tall < 2 || ay - tall > Hpx - 2) return null;
+  // the apex on the screen: a name lies along the circle through its spot (a straight line
+  // at deg off the parallel's tangent for a gulf's)
+  const cx = G.C[0] * T.k + T.x, cy = G.C[1] * T.k + T.y, r0 = Math.hypot(ax - cx, ay - cy);
+  const ux = (ax - cx) / r0, uy = (ay - cy) / r0, sg = uy <= 0 ? 1 : -1, th0 = Math.atan2(uy, ux);
+  const tan = th0 + (sg * Math.PI) / 2, deg = spot[2] || 0;
+  const glyphs = [], pts = [];
+  lines.forEach((ln, li) => {
+    const adv = advs[li], wid = adv[ln.length], v = (li - (lines.length - 1) / 2) * lh + 0.3 * size; // the baseline, below the spot
+    // a point s along the line and v below it, and the turn of the line there
+    const at = deg
+      ? (() => { const a = tan - (deg * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a); return (s, dv) => [ax + c * s - sn * dv, ay + sn * s + c * dv, a]; })()
+      : (s, dv) => { const t = th0 + (sg * s) / r0, rr = r0 - sg * dv; return [cx + rr * Math.cos(t), cy + rr * Math.sin(t), t + (sg * Math.PI) / 2]; };
+    for (let i = 0; i < ln.length; i++) { if (ln[i] === " ") continue; const s = (adv[i] + adv[i + 1]) / 2 - wid / 2; glyphs.push([ln[i], ...at(s, v)]); }
+    // the ground it needs: from just before it to just past it, cap height plus a margin
+    // down to its descenders, every 2.5px
+    for (let s = -wid / 2 - 3; s <= wid / 2 + 3; s += 2.5) for (const dv of [-0.82 * size, -0.4 * size, 0.24 * size]) pts.push(at(s, v + dv));
+  });
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [x, y] of pts) {
+    if (maskLand(K, (x - T.x) / T.k, (y - T.y) / T.k)) return null;
+    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+  }
+  if (x0 < 2 || y0 < 2 || x1 > Wpx - 2 || y1 > Hpx - 2) return null;
+  return { glyphs, box: [x0, y0, x1, y1] };
+}
+function drawSeaNames(m, placed) {
+  const fade = 1 - smooth(0, 0.35, streetK());
+  const K = fade > 0.01 ? seaMaskOf(m) : null;
+  if (!K) { seaSince.clear(); return; }
+  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Set();
+  ctx.save();
+  ctx.lineJoin = "round"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  for (const [txt, size, spots] of SEA_NAMES) {
+    let lay = null;
+    for (const spot of spots) {
+      const L = seaLayout(m, K, G, txt, size, spot);
+      if (L && !placed.some((q) => !(L.box[2] < q[0] || L.box[0] > q[2] || L.box[3] < q[1] || L.box[1] > q[3]))) { lay = L; break; }
+    }
+    if (!lay) continue;
+    placed.push(lay.box); seen.add(txt);
+    if (!seaSince.has(txt)) seaSince.set(txt, now);
+    const t = clamp((now - seaSince.get(txt)) / SEA_FADE, 0, 1); if (t < 1) needFrame = true;
+    const a = ovA * fade * t;
+    ctx.font = `italic 400 ${size}px ${SEA_FONT}`;
+    // a soft edge of the sea's own colour first, under every glyph (it lifts the lines of
+    // latitude and longitude out from beneath the letters), then the letters
+    for (const pass of [0, 1]) {
+      ctx.globalAlpha = a * (pass ? 1 : 0.8);
+      if (pass) ctx.fillStyle = css(th.seaInk); else { ctx.strokeStyle = css(th.sea); ctx.lineWidth = 3.4; }
+      for (const [ch, x, y, rot] of lay.glyphs) {
+        ctx.setTransform(dpr * Math.cos(rot), dpr * Math.sin(rot), -dpr * Math.sin(rot), dpr * Math.cos(rot), dpr * x, dpr * y);
+        if (pass) ctx.fillText(ch, 0, 0); else ctx.strokeText(ch, 0, 0);
+      }
+    }
+  }
+  for (const k of [...seaSince.keys()]) if (!seen.has(k)) seaSince.delete(k);
   ctx.restore();
 }
 
@@ -1290,7 +1661,9 @@ function mvtParse(buf) {
       for (let i = 0; i + 1 < f.tags.length; i += 2) tags[L.keys[f.tags[i]]] = vals[f.tags[i + 1]];
       const parts = decodeParts(f.geom);
       if (!parts.length) continue;
-      if (kind) { out.fills[kind].push({ ext: L.extent, parts }); if (L.name === "Marine area") out.sea.push({ ext: L.extent, parts }); continue; }
+      // (Esri's sea is the map's sea mask, where the ocean's own paper goes: the sheet leaves
+      // it unfilled, so its water grey never tints the ocean the streets are multiplied onto)
+      if (kind) { if (L.name === "Marine area") out.sea.push({ ext: L.extent, parts }); else out.fills[kind].push({ ext: L.extent, parts }); continue; }
       // names: a road's along its label line (route shields carry only _name - left out),
       // a park's or a water's at its label point
       if (L.name === "Road/label") {
@@ -1600,22 +1973,28 @@ function layStreets(st) {
   ctx.drawImage(streetCv, 0, 0);
   ctx.restore();
 }
-// the sea as the streets draw it where no seat lies (the sheet over a clear
-// canvas), cut to the mask and laid in place of whatever the seats put there
-function laySea(st, alpha) {
+// the sea where Esri's lies: whatever the seats put there cut away, the ocean laid back
+// beneath, and the sheet's own marks on the water (a bridge, a pier) over it as the
+// streets lie on the land
+function laySea(m, st, alpha) {
   const W = canvas.width, H = canvas.height;
   if (!seaLay) seaLay = document.createElement("canvas");
   if (seaLay.width !== W || seaLay.height !== H) { seaLay.width = W; seaLay.height = H; }
   const L = seaLay.getContext("2d");
   L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
   L.clearRect(0, 0, W, H);
-  L.globalAlpha = st.a; L.globalCompositeOperation = st.op; L.drawImage(streetCv, 0, 0);
-  L.globalAlpha = 1; L.globalCompositeOperation = "destination-in"; L.drawImage(seaCv, 0, 0);
+  L.drawImage(streetCv, 0, 0);
+  L.globalCompositeOperation = "destination-in"; L.drawImage(seaCv, 0, 0);
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = alpha;
   ctx.globalCompositeOperation = "destination-out"; ctx.drawImage(seaCv, 0, 0);
-  ctx.globalCompositeOperation = "source-over"; ctx.drawImage(seaLay, 0, 0);
+  ctx.restore();
+  oceanUnder(m);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha * st.a; ctx.globalCompositeOperation = st.op; ctx.drawImage(seaLay, 0, 0);
+  ctx.globalAlpha = alpha; ctx.globalCompositeOperation = "source-over";
   // the coast's hairline, as the AEC's was drawn, along Esri's
   ctx.strokeStyle = css(TH.coast, 0.55); ctx.lineJoin = "round";
   for (const { a: [sea, q, s = 1, ox = 0, oy = 0] } of st.seas) seaQuad(ctx, sea, q, s, ox, oy, 0.7 * dpr);
@@ -1905,11 +2284,11 @@ function drawIslands(m, alpha = 1) {
     const { s, r } = c, a = alpha * c.alpha, own = s.owner;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalAlpha = a;
-    // the box: paper over whatever lies under it, a hairline frame
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1, 3); else ctx.rect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
-    ctx.fillStyle = css(th.bg); ctx.fill();
-    ctx.lineWidth = 1; ctx.strokeStyle = css(th.ink3, 0.32); ctx.stroke();
+    // the box: the sea's own paper (no lines: a window on the island's waters), a hairline frame
+    const box = new Path2D();
+    if (box.roundRect) box.roundRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1, 3); else box.rect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+    ctx.save(); ctx.clip(box); layPaper(a); ctx.restore();
+    ctx.lineWidth = 1; ctx.strokeStyle = css(th.ink3, 0.32); ctx.stroke(box);
     // the island, north up, filling the box less a margin; its seat's colour,
     // quieted, veiled and filtered as the map's own shapes are (an island in no
     // seat that year is plain land)
@@ -1968,7 +2347,7 @@ function drawIslands(m, alpha = 1) {
     } else {
       const name = ISL_SHORT[s.key] || s.name, cx = r.x + r.w / 2, cy = r.y + r.h + 8.5;
       ctx.font = `400 10.5px ${SANS}`; ctx.textAlign = "center";
-      ctx.lineWidth = 2.6; ctx.strokeStyle = css(th.bg, 0.85); ctx.strokeText(name, cx, cy);
+      ctx.lineWidth = 2.6; ctx.strokeStyle = css(th.sea, 0.85); ctx.strokeText(name, cx, cy);
       ctx.fillStyle = css(th.ink3); ctx.fillText(name, cx, cy);
       const tw = ctx.measureText(name).width / 2 + 3;
       islDrawn.push({ s, r, dots, box: [Math.min(r.x, cx - tw), r.y, Math.max(r.x + r.w, cx + tw), cy + 7] });
