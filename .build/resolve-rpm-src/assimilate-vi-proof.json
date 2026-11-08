@@ -1,7 +1,34 @@
 {
-  "generatedAt": "2026-10-21T19:00:29.205Z",
+  "generatedAt": "2026-11-08T06:41:04.220Z",
   "vi": {
-    "added": [],
+    "added": [
+      {
+        "csvWave": "2026-11-08",
+        "row": {
+          "date": "2026-11-07",
+          "published": "2026-11-08",
+          "fieldworkPending": true,
+          "pollster": "Resolve",
+          "client": "SMH/Age",
+          "sample": null,
+          "alp": 28,
+          "lnp": 22,
+          "grn": 13,
+          "onp": 25,
+          "ind": 6,
+          "oth": 5,
+          "tpp_alp": null,
+          "tpp_lnp": null,
+          "soft": 26,
+          "softAge": {
+            "18-34": 36,
+            "35-54": 28,
+            "55+": 16
+          },
+          "assimilated": true
+        }
+      }
+    ],
     "skipped": {
       "preHorizon": 52,
       "dateDup": 16,
@@ -10,7 +37,21 @@
     }
   },
   "ppm": {
-    "added": [],
+    "added": [
+      {
+        "csvWave": "2026-11-08",
+        "row": {
+          "date": "2026-11-07",
+          "firm": "Resolve",
+          "alb": 29,
+          "opp": 25,
+          "oppName": "Taylor",
+          "han": 24,
+          "extra": null,
+          "assimilated": true
+        }
+      }
+    ],
     "skipped": {
       "preHorizon": 49,
       "dateOrFigureDup": 16,
@@ -18,7 +59,30 @@
     }
   },
   "approval": {
-    "added": [],
+    "added": [
+      {
+        "csvWave": "2026-11-08",
+        "row": {
+          "date": "2026-11-07",
+          "firm": "Resolve",
+          "alb": -22,
+          "opp": 9,
+          "oppName": "Taylor",
+          "han": null,
+          "detail": {
+            "alb": {
+              "app": 34,
+              "dis": 56
+            },
+            "opp": {
+              "app": 42,
+              "dis": 33
+            }
+          },
+          "assimilated": true
+        }
+      }
+    ],
     "skipped": null
   }
 }

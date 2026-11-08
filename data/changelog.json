@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 51
+      "alp": 51.3
     },
-    "imp": 51,
-    "pub": 49.8,
-    "on": 50.9,
+    "imp": 51.3,
+    "pub": 49.7,
+    "on": 51,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -212,7 +212,8 @@
       "2026-10-26|DemosAU",
       "2026-10-27|Essential",
       "2026-10-29|Newspoll",
-      "2026-11-03|YouGov"
+      "2026-11-03|YouGov",
+      "2026-11-07|Resolve"
     ],
     "moves": {
       "alp|state|Non-NSW/Vic/Qld": 1,
@@ -315,18 +316,18 @@
       }
     },
     "prim": {
-      "alp": 26.4,
-      "grn": 13.2,
-      "lnp": 23.1,
+      "alp": 26.6,
+      "grn": 13.4,
+      "lnp": 22.4,
       "onp": 26.1,
-      "oth": 11.3
+      "oth": 11.2
     },
     "leaders": {
-      "alb_fav": -19.1,
-      "alb_net": -23.3,
-      "hanson_fav": -8,
-      "hanson_net": -1.6,
-      "taylor_fav": -1.5,
+      "alb_fav": -18.4,
+      "alb_net": -23.6,
+      "hanson_fav": -8.2,
+      "hanson_net": -1.5,
+      "taylor_fav": -1.6,
       "taylor_net": -4.7
     },
     "lean": {
@@ -341,7 +342,7 @@
         "Newspoll": 1.4,
         "RedBridge/Accent": 0.3,
         "RedBridge/Accent (MRP)": 0.1,
-        "Resolve": -0.3,
+        "Resolve": -0.2,
         "Roy Morgan": 0.1,
         "Spectre Strategy": -0.8,
         "Wolf & Smith": 0,
@@ -350,9 +351,9 @@
       }
     },
     "dir": {
-      "right": 24.7,
-      "wrong": 63.4,
-      "net": -38.7
+      "right": 24,
+      "wrong": 64.4,
+      "net": -40.4
     },
     "issLead": {
       "climate": "alp",
@@ -663,6 +664,12 @@
       "label": "4 Nov 2026",
       "kind": "finding",
       "text": "WA voters (by state) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-11-08",
+      "label": "8 Nov 2026",
+      "kind": "poll",
+      "text": "Resolve (fieldwork dates TBC) added — the two-party preferred estimate moved 51.0 → 51.3 (Labor v the Coalition, implied flows). Primary votes: Labor 26.4 → 26.6, the Coalition 23.1 → 22.4, the Greens 13.2 → 13.4, others 11.3 → 11.2. Leader ratings: Albanese’s net approval −23.3 → −23.6, Albanese’s net favourability −19.1 → −18.4, Taylor’s net favourability −1.5 → −1.6, Hanson’s net approval −1.6 → −1.5, Hanson’s net favourability −8.0 → −8.2. National direction: right track 24.7 → 24.0, wrong track 63.4 → 64.4 (net −38.7 → −40.4). House effect (Labor v the Coalition, implied flows; positive leans Labor): Resolve −0.3 → −0.2."
     }
   ]
 }

@@ -6319,6 +6319,29 @@
       "tpp_lnp": 50,
       "url": "https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b",
       "published": "2026-11-04T05:00"
+    },
+    {
+      "date": "2026-11-07",
+      "published": "2026-11-08",
+      "fieldworkPending": true,
+      "pollster": "Resolve",
+      "client": "SMH/Age",
+      "sample": null,
+      "alp": 28,
+      "lnp": 22,
+      "grn": 13,
+      "onp": 25,
+      "ind": 6,
+      "oth": 5,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "soft": 26,
+      "softAge": {
+        "18-34": 36,
+        "35-54": 28,
+        "55+": 16
+      },
+      "assimilated": true
     }
   ],
   "ppm": [
@@ -7174,6 +7197,16 @@
       "oppName": "Taylor",
       "han": null,
       "extra": null
+    },
+    {
+      "date": "2026-11-07",
+      "firm": "Resolve",
+      "alb": 29,
+      "opp": 25,
+      "oppName": "Taylor",
+      "han": 24,
+      "extra": null,
+      "assimilated": true
     }
   ],
   "approval": [
@@ -9133,6 +9166,25 @@
           "dis": 48
         }
       }
+    },
+    {
+      "date": "2026-11-07",
+      "firm": "Resolve",
+      "alb": -22,
+      "opp": 9,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 34,
+          "dis": 56
+        },
+        "opp": {
+          "app": 42,
+          "dis": 33
+        }
+      },
+      "assimilated": true
     }
   ],
   "ppmHeadToHead": [
