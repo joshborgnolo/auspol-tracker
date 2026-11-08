@@ -91,7 +91,8 @@ function compactCols(m, unit, cols) {
   const first = unit === "seats"
     ? { ...cols[0], w: "minmax(0,1fr)", html: (d) => `<span class="c1"><span class="sw" style="${swc(holdFam(d.hold))}"></span>${ds(d.n)}</span><span class="c2">${STATE_SHORT[d.st]} · ${ds(d.hold.n)}, ${esc(partyShort(d.hold.ab, d.hold.pn))}</span>` }
     : { ...cols[0], w: "minmax(0,1fr)", html: (j) => `<span class="c1">${ds(b.name[j])}</span><span class="c2">${ds(m.divs[b.d[j]].n)} · ${int(b.votes[j])} votes</span>` };
-  return [first, { ...lensCol, w: "104px" }];
+  // (the figure's column holds a whole "72.1 – 27.9" and its full head, in either look's face)
+  return [first, { ...lensCol, w: "122px" }];
 }
 const colsFor = (m, unit, full) => { const c = unit === "seats" ? seatCols(m) : boothCols(m); return !full && narrowList() ? compactCols(m, unit, c) : c; };
 function colByKey(m, unit, key) { return colsFor(m, unit, true).find((c) => c.key === key) || null; }

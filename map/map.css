@@ -1494,8 +1494,12 @@ html.mp-retro .ls-unit .rd-tab::after { display: none; }
 html.mp-retro .ls-unit .rd-tab[aria-selected="true"] { box-shadow: var(--rt-pressed); background: #e7e4dd; font-weight: 700; }
 html.mp-retro .ls-sel { height: 22px; border-radius: 0; border: 0; background-color: #fff; box-shadow: var(--rt-sunken); color: #000; font-size: 12px; }
 html.mp-retro .ls-grid { background: #fff; box-shadow: var(--rt-sunken); padding: 2px; }
-html.mp-retro .ls-head { background: var(--rt-face); }
-html.mp-retro .ls-head > div { box-shadow: var(--rt-raised); padding: 3px 6px; font-size: 12px; color: #000; }
+html.mp-retro .ls-head { align-items: stretch; padding: 0; border-bottom: 0; background: var(--rt-face); }
+html.mp-retro .ls-head > div { justify-content: flex-end; box-shadow: var(--rt-raised); padding: 4px 6px 3px; font-size: 12px; color: #000; }
+/* the list's text keeps off its sunken frame, both sides, head and rows alike */
+html.mp-retro .ls-head > div:first-child, html.mp-retro .ls-row > div:first-child { padding-left: 9px; }
+html.mp-retro .ls-head > div:last-child, html.mp-retro .ls-row > div:last-child { padding-right: 9px; }
+html.mp-retro .ls-row .fig { font-size: 13px; }
 html.mp-retro .ls-row { font-size: 12px; color: #000; border-bottom: 0; }
 html.mp-retro .ls-row:hover, html.mp-retro .ls-row.on { background: var(--rt-sel); color: #fff; }
 html.mp-retro .ls-row:hover *, html.mp-retro .ls-row.on * { color: #fff !important; }
