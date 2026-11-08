@@ -111,9 +111,11 @@ function readTheme() {
   T.cls = [lch(0.88, 0.030, 78), lch(0.70, 0.048, 62), lch(0.53, 0.060, 48), lch(0.38, 0.075, 38)];
   T.floor = dk ? lch(0.235, 0.012, 150) : lch(0.958, 0.012, 150);
   // the atlas's sea under the seats (app-2-map.js, "the ocean"): pale blue paper, its
-  // lines of latitude and longitude a deeper blue, its waters' names deeper still
-  T.sea = dk ? lch(0.255, 0.026, 242) : lch(0.93, 0.027, 232);
-  T.seaLine = dk ? lch(0.37, 0.042, 240) : lch(0.79, 0.055, 238);
+  // lines of latitude and longitude a faint deeper blue, their degrees deeper, its waters'
+  // names deeper still
+  T.sea = dk ? lch(0.255, 0.026, 242) : lch(0.945, 0.024, 230);
+  T.seaLine = dk ? lch(0.335, 0.034, 240) : lch(0.85, 0.04, 236);
+  T.seaMark = dk ? lch(0.6, 0.04, 238) : lch(0.6, 0.06, 240);
   T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
   return T;
 }
@@ -1737,7 +1739,9 @@ const inBox = (b, x0, y0, x1, y1) => b && !(b[1][0] < x0 || b[0][0] > x1 || b[1]
    parallel as an arc of a circle about one apex and every meridian as a ray
    from it, so they are drawn as just that, worked out on the screen in full
    precision: an arc stroked through the map's transform turns to chords at
-   street zoom (and to float error past it); these hold at every zoom. */
+   street zoom (and to float error past it); these hold at every zoom. The
+   Tropic of Capricorn runs dashed among them, and every line is marked with
+   its degree where it meets the edge of the map (drawGratLabels). */
 const PAPER_CSS = 384, GRAT_STEP = 10;
 let paperTile = null, oceanA = 1;
 function paperOf() {
@@ -1819,6 +1823,12 @@ function layPaper(alpha, under) {
   ctx.restore();
 }
 /* @grat-begin (test-map-ocean.mjs runs this against d3's own projection) */
+// the Tropic of Capricorn: the sun's southernmost noon overhead, at the Earth's mean axial
+// tilt for 2026 (IAU 2006: 23° 26′ 09″)
+const TROPIC = -23.4358;
+// a line's degree as an atlas marks it: 30°S, 130°E, the equator and the antimeridian bare
+const degLat = (lat) => (lat ? `${Math.abs(lat)}°${lat < 0 ? "S" : "N"}` : "0°");
+const degLon = (lon) => { const l = ((((lon + 180) % 360) + 360) % 360) - 180; return l === 0 || l === -180 ? `${Math.abs(l)}°` : `${Math.abs(l)}°${l > 0 ? "E" : "W"}`; };
 // a projection's apex and the radius of each parallel's circle, in its plane: the central
 // meridian (132E) stands upright, and the apex is where another meridian's ray meets it
 function gratOf(P) {
@@ -1830,7 +1840,8 @@ function gratOf(P) {
   const R = new Map();
   for (let lat = -80; lat <= 80; lat += GRAT_STEP) { const p = P([132, lat]); R.set(lat, Math.hypot(p[0] - C[0], p[1] - C[1])); }
   // a meridian's angle runs straight with its longitude (t0 at 132E, dt a degree)
-  return (P._grat = { k, tx, ty, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R });
+  const pt = P([132, TROPIC]), Rt = Math.hypot(pt[0] - C[0], pt[1] - C[1]);
+  return (P._grat = { k, tx, ty, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R, Rt });
 }
 /* @grat-end */
 // the lines of latitude and longitude every GRAT_STEP degrees; under: see layPaper
@@ -1857,11 +1868,11 @@ function layGrat(m, alpha) {
   ctx.globalAlpha = alpha; ctx.strokeStyle = css(TH.seaLine); ctx.lineWidth = Math.max(1, 0.8 * dpr); ctx.lineJoin = "round";
   ctx.beginPath();
   // each parallel: its circle sampled across the view, chords within a tenth of a pixel of the arc
-  for (const r0 of G.R.values()) {
-    const r = s * r0; if (r < near - 2 || r > far + 2) continue;
+  const arc = (r) => {
     const step = Math.min(0.02, Math.sqrt(0.8 / r)), nseg = Math.ceil((hi - lo) / step);
     for (let i = 0; i <= nseg; i++) { const t = lo + ((hi - lo) * i) / nseg, x = cx + r * Math.cos(t), y = cy + r * Math.sin(t); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
-  }
+  };
+  for (const r0 of G.R.values()) { const r = s * r0; if (r >= near - 2 && r <= far + 2) arc(r); }
   // each meridian: its ray from 80S to 80N, cut to the view, from 40W east round
   // to 50W (the projection's own cut lies between them, at 48W, opposite 132E)
   const rA = s * G.R.get(-80), rB = s * G.R.get(80);
@@ -1878,6 +1889,14 @@ function layGrat(m, alpha) {
     ctx.moveTo(cx + u0 * ux, cy + u0 * uy); ctx.lineTo(cx + u1 * ux, cy + u1 * uy);
   }
   ctx.stroke();
+  // the Tropic of Capricorn, dashed, its dashes counted from the fan's western end so they
+  // hold their places on the map as it pans
+  const rt = s * G.Rt;
+  if (rt >= near - 2 && rt <= far + 2) {
+    const dash = [5 * dpr, 3.5 * dpr], per = dash[0] + dash[1];
+    ctx.setLineDash(dash); ctx.lineDashOffset = (rt * (lo - (t0 - half))) % per;
+    ctx.beginPath(); arc(rt); ctx.stroke();
+  }
   ctx.restore();
 }
 // the country as plain land, one shape a state (map/data/land.json, land_build.mjs), made
@@ -2662,7 +2681,9 @@ function drawLabels(m) {
   }
   // an island where it lies: its name over its north coast once it shows (under
   // its south coast where the way back holds the top)
-  for (const el of [backBtn, $("#credit")]) if (!el.hidden) placed.push([el.offsetLeft - 4, el.offsetTop - 4, el.offsetLeft + el.offsetWidth + 4, el.offsetTop + el.offsetHeight + 4]);
+  for (const el of [backBtn, $("#credit"), $("#zoomer"), $("#filterpill")]) if (!el.hidden) placed.push([el.offsetLeft - 4, el.offsetTop - 4, el.offsetLeft + el.offsetWidth + 4, el.offsetTop + el.offsetHeight + 4]);
+  // (and the year's stamp while it shows, which the waters' names and the lines' degrees keep clear of)
+  if (stampEl.classList.contains("on")) placed.push([stampEl.offsetLeft - 4, stampEl.offsetTop - 4, stampEl.offsetLeft + stampEl.offsetWidth + 4, stampEl.offsetTop + stampEl.offsetHeight + 4]);
   for (const q of m.isl || []) {
     const x0 = q.mbb[0][0] * T.k + T.x, x1 = q.mbb[1][0] * T.k + T.x, y0 = q.mbb[0][1] * T.k + T.y, y1 = q.mbb[1][1] * T.k + T.y;
     if (x1 - x0 < 30 || x1 < 0 || x0 > Wpx || y0 > Hpx) continue;
@@ -2744,14 +2765,17 @@ const SEA_NAMES = [
 ];
 /* @sea-names-end */
 const SEA_FONT = '"Crimson Text", Georgia, serif', SEA_FADE = 220;
+// the lettering: a water's name (italic) and a line's degree (the page's sans, small)
+const seaFont = (size) => `italic 400 ${size}px ${SEA_FONT}`;
+const DEG_SIZE = 10, DEG_FONT = `400 ${DEG_SIZE}px ${SANS}`;
 let seaSince = new Map(), seaMaskJob = 0;
-// each line's advances, measured once (again when the italic arrives: the fallback's differ)
+// each line's advances, measured once a font (again when the italic arrives: the fallback's differ)
 const seaAdv = new Map();
-if (document.fonts && document.fonts.load) document.fonts.load(`italic 400 16px ${SEA_FONT}`).then(() => { seaAdv.clear(); schedule(); }, () => {});
-function seaAdvOf(ln, size) {
-  const key = size + "|" + ln;
+if (document.fonts && document.fonts.load) document.fonts.load(seaFont(16)).then(() => { seaAdv.clear(); schedule(); }, () => {});
+function seaAdvOf(ln, font) {
+  const key = font + "|" + ln;
   let a = seaAdv.get(key);
-  if (!a) { ctx.font = `italic 400 ${size}px ${SEA_FONT}`; a = [0]; for (let i = 1; i <= ln.length; i++) a.push(ctx.measureText(ln.slice(0, i)).width); seaAdv.set(key, a); }
+  if (!a) { ctx.font = font; a = [0]; for (let i = 1; i <= ln.length; i++) a.push(ctx.measureText(ln.slice(0, i)).width); seaAdv.set(key, a); }
   return a;
 }
 /* the land, coarsely (3.3km a cell; any cell the land touches counts as land): made off
@@ -2782,13 +2806,17 @@ function seaMaskOf(m) {
   seaMaskJob = window.requestIdleCallback ? requestIdleCallback(run, { timeout: 400 }) : setTimeout(run, 30);
   return null;
 }
+// the stage's clear ground, pad px in from its edges (in full screen, between the plates)
+const clearGround = (pad) => { const q = FS.on ? FS.ins : { t: 0, r: 0, b: 0, l: 0 }; return [q.l + pad, q.t + pad, Wpx - q.r - pad, Hpx - q.b - pad]; };
 const maskLand = (K, x, y) => { const i = Math.floor((x - K.x0) * K.s), j = Math.floor((y - K.y0) * K.s); return i >= 0 && j >= 0 && i < K.w && j < K.h && K.a[j * K.w + i] === 1; };
 // a name's glyphs at one spot, in CSS px: each glyph's middle on its baseline and its turn;
-// null where it can't stand (off the stage, on land)
-function seaLayout(m, K, G, txt, size, spot) {
+// null where it can't stand (off the stage, on land). font: its lettering at size (a water's
+// italic unless given); lift: how far its middle stands above the spot (the Tropic's name
+// sits over its line, a degree on its own)
+function seaLayout(m, K, G, txt, size, spot, font = seaFont(size), lift = 0) {
   const p = m.proj([spot[0], spot[1]]); if (!p) return null;
   const ax = p[0] * T.k + T.x, ay = p[1] * T.k + T.y;
-  const lines = txt.split("\n"), lh = size * 1.08, advs = lines.map((ln) => seaAdvOf(ln, size));
+  const lines = txt.split("\n"), lh = size * 1.08, advs = lines.map((ln) => seaAdvOf(ln, font));
   // (a spot whose name can't reach the stage asks nothing more)
   const half = Math.max(...advs.map((a) => a[a.length - 1])) / 2 + 4, tall = (lines.length * lh) / 2 + size;
   if (ax + half < 2 || ax - half > Wpx - 2 || ay + tall < 2 || ay - tall > Hpx - 2) return null;
@@ -2799,7 +2827,7 @@ function seaLayout(m, K, G, txt, size, spot) {
   const tan = th0 + (sg * Math.PI) / 2, deg = spot[2] || 0;
   const glyphs = [], pts = [];
   lines.forEach((ln, li) => {
-    const adv = advs[li], wid = adv[ln.length], v = (li - (lines.length - 1) / 2) * lh + 0.3 * size; // the baseline, below the spot
+    const adv = advs[li], wid = adv[ln.length], v = (li - (lines.length - 1) / 2) * lh + 0.3 * size - lift; // the baseline, below the spot
     // a point s along the line and v below it, and the turn of the line there
     const at = deg
       ? (() => { const a = tan - (deg * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a); return (s, dv) => [ax + c * s - sn * dv, ay + sn * s + c * dv, a]; })()
@@ -2814,7 +2842,8 @@ function seaLayout(m, K, G, txt, size, spot) {
     if (maskLand(K, (x - T.x) / T.k, (y - T.y) / T.k)) return null;
     x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
   }
-  if (x0 < 2 || y0 < 2 || x1 > Wpx - 2 || y1 > Hpx - 2) return null;
+  const [c0, c1, c2, c3] = clearGround(2);
+  if (x0 < c0 || y0 < c1 || x1 > c2 || y1 > c3) return null;
   return { glyphs, box: [x0, y0, x1, y1] };
 }
 function drawSeaNames(m, placed) {
@@ -2832,22 +2861,105 @@ function drawSeaNames(m, placed) {
     }
     if (!lay) continue;
     placed.push(lay.box); seen.add(txt);
-    if (!seaSince.has(txt)) seaSince.set(txt, now);
-    const t = clamp((now - seaSince.get(txt)) / SEA_FADE, 0, 1); if (t < 1) needFrame = true;
-    const a = ovA * fade * t;
-    ctx.font = `italic 400 ${size}px ${SEA_FONT}`;
-    // a soft edge of the sea's own colour first, under every glyph (it lifts the lines of
-    // latitude and longitude out from beneath the letters), then the letters
-    for (const pass of [0, 1]) {
-      ctx.globalAlpha = a * (pass ? 1 : 0.8);
-      if (pass) ctx.fillStyle = css(th.seaInk); else { ctx.strokeStyle = css(th.sea); ctx.lineWidth = 3.4; }
-      for (const [ch, x, y, rot] of lay.glyphs) {
-        ctx.setTransform(dpr * Math.cos(rot), dpr * Math.sin(rot), -dpr * Math.sin(rot), dpr * Math.cos(rot), dpr * x, dpr * y);
-        if (pass) ctx.fillText(ch, 0, 0); else ctx.strokeText(ch, 0, 0);
-      }
+    layGlyphs(lay.glyphs, seaFont(size), th.seaInk, ovA * fade * seaFade(txt, now));
+  }
+  ctx.restore();
+  drawGratLabels(m, K, G, placed, seen, now, ovA * fade);
+  for (const k of [...seaSince.keys()]) if (!seen.has(k)) seaSince.delete(k);
+}
+// a label's strength as it fades in from the frame it first found room (keyed by its text)
+function seaFade(key, now) {
+  if (!seaSince.has(key)) seaSince.set(key, now);
+  const t = clamp((now - seaSince.get(key)) / SEA_FADE, 0, 1); if (t < 1) needFrame = true;
+  return t;
+}
+// glyphs laid as seaLayout set them: a soft edge of the sea's own colour first, under every
+// glyph (it lifts the lines of latitude and longitude out from beneath the letters), then
+// the letters
+function layGlyphs(glyphs, font, ink, a) {
+  ctx.font = font; ctx.lineJoin = "round"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  for (const pass of [0, 1]) {
+    ctx.globalAlpha = a * (pass ? 1 : 0.8);
+    if (pass) ctx.fillStyle = css(ink); else { ctx.strokeStyle = css(TH.sea); ctx.lineWidth = 3.4; }
+    for (const [ch, x, y, rot] of glyphs) {
+      ctx.setTransform(dpr * Math.cos(rot), dpr * Math.sin(rot), -dpr * Math.sin(rot), dpr * Math.cos(rot), dpr * x, dpr * y);
+      if (pass) ctx.fillText(ch, 0, 0); else ctx.strokeText(ch, 0, 0);
     }
   }
-  for (const k of [...seaSince.keys()]) if (!seen.has(k)) seaSince.delete(k);
+}
+
+/* ----- the lines' degrees -----
+   Each line of latitude and longitude in view is marked with its degree where it
+   meets the edge of the map, set on the line itself (the line breaks for it): a
+   meridian's upright at the top edge, a parallel's along its curve at the left,
+   each on the far edge where land, another label or a control holds the near
+   one (in full screen, the edges of the clear ground between the plates). The
+   Tropic of Capricorn is named along its dashed line, over it, nearest whichever
+   end of the view has open water, else in the open sea off either coast. Waters'
+   names take their room first; a degree gives way to them. */
+const overlaps = (b, placed) => placed.some((q) => !(b[2] < q[0] || b[0] > q[2] || b[3] < q[1] || b[1] > q[3]));
+function drawGratLabels(m, K, G, placed, seen, now, a) {
+  const [L0, T0, R0, B0] = clearGround(5);
+  const th = TH, cx = G.C[0] * T.k + T.x, cy = G.C[1] * T.k + T.y;
+  // the angle a longitude's meridian runs at on the screen, turned to the view's side of the apex
+  const mid = Math.atan2(Hpx / 2 - cy, Wpx / 2 - cx), t0 = G.t0 + 2 * Math.PI * Math.round((mid - G.t0) / (2 * Math.PI));
+  const lonAt = (t) => 132 + (t - t0) / G.dt;
+  // where a parallel of radius r (CSS px) meets the upright x = X: the spot whose label, w
+  // wide, has that end there (dir +1: it runs on to the right, -1: to the left)
+  const parallelAt = (r, X, w, dir) => {
+    const dx = X - cx; if (Math.abs(dx) >= r) return null;
+    const dy = Math.sqrt(r * r - dx * dx);
+    for (const y of [cy - dy, cy + dy]) {
+      if (y < T0 + 8 || y > B0 - 8) continue;
+      let t = Math.atan2(y - cy, dx); t += 2 * Math.PI * Math.round((t0 - t) / (2 * Math.PI));
+      if (Math.abs(t - t0) > 180 * Math.abs(G.dt)) continue;
+      const sg = y <= cy ? 1 : -1, tc = t + (dir * sg * (w / 2 + 1)) / r;
+      return lonAt(tc);
+    }
+    return null;
+  };
+  const water = (b) => { for (let x = b[0]; x <= b[2]; x += 2.5) for (const y of [b[1], (b[1] + b[3]) / 2, b[3]]) if (maskLand(K, (x - T.x) / T.k, (y - T.y) / T.k)) return false; return true; };
+  ctx.save();
+  // the Tropic of Capricorn's name, over its line
+  {
+    const txt = "Tropic of Capricorn", size = 12, font = seaFont(size), w = seaAdvOf(txt, font).at(-1), rt = G.Rt * T.k, lift = 0.3 * size + 3;
+    // (from each end of the view inward, a step at a time, until it finds open water)
+    const ends = [];
+    for (let k = 0; k < 10; k++) ends.push(parallelAt(rt, R0 - 28 * k, w, -1), parallelAt(rt, L0 + 28 * k, w, 1));
+    let lay = null;
+    for (const lon of [...ends.filter((l) => l != null), 154.6, 110.4]) {
+      const Lb = seaLayout(m, K, G, txt, size, [lon, TROPIC], font, lift);
+      if (Lb && !overlaps(Lb.box, placed)) { lay = Lb; break; }
+    }
+    if (lay) { placed.push(lay.box); seen.add(txt); layGlyphs(lay.glyphs, font, th.seaInk, a * seaFade(txt, now)); }
+  }
+  // the meridians' degrees, upright on their lines at the top edge (else the bottom)
+  const rA = G.R.get(-80) * T.k, rB = G.R.get(80) * T.k, uLo = Math.min(rA, rB), uHi = Math.max(rA, rB);
+  for (let lon = -40; lon <= 310; lon += GRAT_STEP) {
+    const t = t0 + (lon - 132) * G.dt, ux = Math.cos(t), uy = Math.sin(t), txt = degLon(lon), w = seaAdvOf(txt, DEG_FONT).at(-1);
+    if (Math.abs(uy) < 1e-6) continue;
+    for (const Y of [T0 + 7, B0 - 7]) {
+      const u = (Y - cy) / uy, x = cx + u * ux;
+      if (u < uLo || u > uHi || x - w / 2 < L0 || x + w / 2 > R0) continue;
+      const b = [x - w / 2 - 2, Y - DEG_SIZE / 2 - 1.5, x + w / 2 + 2, Y + DEG_SIZE / 2 + 1.5];
+      if (!water(b) || overlaps(b, placed)) continue;
+      placed.push(b); seen.add(txt);
+      layGlyphs([[txt, x, Y + 0.35 * DEG_SIZE, 0]], DEG_FONT, th.seaMark, a * seaFade(txt, now));
+      break;
+    }
+  }
+  // the parallels' degrees, along their curves at the left edge (else the right)
+  for (const [lat, r0] of G.R) {
+    const txt = degLat(lat), w = seaAdvOf(txt, DEG_FONT).at(-1), r = r0 * T.k;
+    for (const [X, dir] of [[L0, 1], [R0, -1]]) {
+      const lon = parallelAt(r, X, w, dir); if (lon == null) continue;
+      const Lb = seaLayout(m, K, G, txt, DEG_SIZE, [lon, lat], DEG_FONT);
+      if (!Lb || overlaps(Lb.box, placed)) continue;
+      placed.push(Lb.box); seen.add(txt);
+      layGlyphs(Lb.glyphs, DEG_FONT, th.seaMark, a * seaFade(txt, now));
+      break;
+    }
+  }
   ctx.restore();
 }
 

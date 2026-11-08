@@ -5,6 +5,7 @@
 //  3. at street zoom Esri's sea is the same ocean, not its grey (Marine area is the mask only)
 //  4. a state's frame lays the rest of the country as land: NSW beside Victoria is paper, not sea
 //  5. a change of frame never shows the sea where land lies
+//  (2 also: every line in view is marked with its degree, and the Tropic of Capricorn is named)
 import puppeteer from "puppeteer-core";
 
 const base = process.argv[2];
@@ -52,6 +53,8 @@ for (const dark of [false, true]) {
   await wait(1500);
   const names = await page.evaluate(() => { window.__map.drawNow(); return window.__map.seaDrawn; });
   for (const n of ["Southern Ocean", "Coral Sea", "Great Australian\nBight", "Gulf of\nCarpentaria", "Timor Sea"]) ok(`${tag}: named at the country's view: ${n.replace("\n", " ")}`, names.includes(n), names.join(", ").replace(/\n/g, " "));
+  // the lines' degrees at the edges, and the Tropic named on its line
+  for (const n of ["120°E", "130°E", "140°E", "150°E", "10°S", "20°S", "30°S", "40°S", "Tropic of Capricorn"]) ok(`${tag}: marked at the country's view: ${n}`, names.includes(n), names.filter((x) => /°|Tropic/.test(x)).join(", "));
   await page.close();
 }
 

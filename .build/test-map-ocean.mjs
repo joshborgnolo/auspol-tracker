@@ -47,7 +47,14 @@ for (const [ll, st] of [[[133.9, -23.7], "NT"], [[146.8, -42], "TAS"], [[117.9, 
 // ---- the graticule, exact
 const grat = map2.match(/@grat-begin[^*]*\*\/([\s\S]*?)\/\* @grat-end \*\//);
 assert.ok(grat, "app-2-map.js marks gratOf for this test");
-const gratOf = new Function("GRAT_STEP", `${grat[1]}; return gratOf;`)(10);
+const { gratOf, degLat, degLon, TROPIC } = new Function("GRAT_STEP", `${grat[1]}; return { gratOf, degLat, degLon, TROPIC };`)(10);
+// the Tropic of Capricorn at the year's mean axial tilt (IAU 2006, to the arcsecond's tenth)
+{
+  const T = (2026.5 - 2000) / 100, eps = (84381.406 - 46.836769 * T) / 3600;
+  assert.ok(Math.abs(-TROPIC - eps) < 0.0002, `the Tropic of Capricorn lies at the mean axial tilt for 2026 (${eps.toFixed(4)}°)`);
+}
+// a line's degree as an atlas marks it
+for (const [v, want] of [[degLat(-30), "30°S"], [degLat(0), "0°"], [degLat(10), "10°N"], [degLon(130), "130°E"], [degLon(310), "50°W"], [degLon(-40), "40°W"], [degLon(180), "180°"], [degLon(0), "0°"], [degLon(170), "170°E"]]) assert.equal(v, want, `degree mark ${want}`);
 const fed = { type: "MultiPoint", coordinates: [[112.9, -43.7], [153.7, -10.6]] };
 const fits = [
   ["the federal frame", fed, [1000, 880]],
@@ -64,6 +71,9 @@ for (const [name, ext, size] of fits) {
     worst = Math.max(worst, Math.hypot(p[0] - (G.C[0] + r * Math.cos(t)), p[1] - (G.C[1] + r * Math.sin(t))));
   }
   assert.ok(worst < tol, `${name}: every parallel is a circle about the apex and every meridian a ray from it (worst ${worst.toExponential(2)} of ${P.scale().toFixed(0)})`);
+  let wt = 0;
+  for (let lon = -40; lon <= 310; lon += 2.5) { const p = P([lon, TROPIC]), t = G.t0 + (lon - 132) * G.dt; wt = Math.max(wt, Math.hypot(p[0] - (G.C[0] + G.Rt * Math.cos(t)), p[1] - (G.C[1] + G.Rt * Math.sin(t)))); }
+  assert.ok(wt < tol, `${name}: the Tropic of Capricorn is drawn on its own circle (worst ${wt.toExponential(2)})`);
   // the apex lies to the south, below the country (the waters' names curve over it)
   assert.ok(G.C[1] > P([132, -44])[1], `${name}: the apex lies south of the map`);
   // the fan the round of longitude spans ends at the projection's own cut, opposite 132E
@@ -113,5 +123,11 @@ assert.ok(map2.includes("ctx.save(); ctx.clip(box); layPaper(a); ctx.restore();"
 const html = R("map/index.html"), italic = html.match(/font-style: italic;\s*font-weight: 400;[^}]*url\("\/assets\/fonts\/(crimsontext-italic-400-latin\.[0-9a-f]+\.woff2)"\)/);
 assert.ok(italic && fs.existsSync(path.join(ROOT, "assets/fonts", italic[1])), "map/index.html serves Crimson Text's italic for the waters' names");
 const base = R(".build/map/app/app-1-base.js");
-for (const k of ["sea", "seaLine", "seaInk"]) assert.ok(new RegExp(`T\\.${k} = dk \\? lch\\(`).test(base), `the theme carries ${k} for both pages`);
+for (const k of ["sea", "seaLine", "seaMark", "seaInk"]) assert.ok(new RegExp(`T\\.${k} = dk \\? lch\\(`).test(base), `the theme carries ${k} for both pages`);
+// the lines' degrees and the Tropic's name: laid after the waters' names, clear of the stage's
+// controls and the full-screen plates, faded with the rest of the sea's lettering
+assert.ok(/ctx\.restore\(\);\s*drawGratLabels\(m, K, G, placed, seen, now, ovA \* fade\);\s*for \(const k of \[\.\.\.seaSince\.keys\(\)\]\) if \(!seen\.has\(k\)\) seaSince\.delete\(k\);/.test(map2), "drawSeaNames: the degrees after the names, before the fades of labels gone are dropped");
+assert.ok(map2.includes('[backBtn, $("#credit"), $("#zoomer"), $("#filterpill")]') && map2.includes('stampEl.classList.contains("on")'), "the stage's controls and the year's stamp are kept clear");
+assert.ok(/const clearGround = \(pad\) => \{ const q = FS\.on \? FS\.ins/.test(map2) && map2.includes("const [c0, c1, c2, c3] = clearGround(2);"), "in full screen the sea's lettering keeps to the ground between the plates");
+assert.ok(/ctx\.setLineDash\(dash\); ctx\.lineDashOffset = \(rt \* \(lo - \(t0 - half\)\)\) % per;/.test(map2), "the Tropic is dashed, its dashes pinned to the map");
 console.log("test-map-ocean: ok");
