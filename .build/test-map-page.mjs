@@ -115,7 +115,7 @@ for (const f of fs.readdirSync(path.join(ROOT, "map/data")).sort()) {
 }
 assert.ok(js.includes("getJSON(`/map/data/core-${ry}.json`, bg).catch(() => getJSON(fullU, bg))") && js.includes("function loadPpl(y)") && js.includes("for (const k of m.pplLanes) if (F[k]) B[k] = F[k];"), "a frame loads its core file, the census lanes from its res file when first wanted");
 assert.ok(/var b=\(\/\[#&\]l=seifa\(&\|\$\)\/\.test\(location\.hash\)\|\|!V\["core-"\+ry\+"\.json"\]\?"res-":"core-"\)/.test(R("map/index.html")), "the page's warmup asks for the landing frame's core file (its res file on a Census landing)");
-assert.equal(R("map/map.css"), part("page.css") + "\n" + part("retro.css"), "map/map.css is current: page.css, then the retro view's retro.css (node .build/map/assemble.mjs)");
+assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.css") + "\n" + part("retro.css"), "map/map.css is current: page.css, the retro pages' shared chrome, then the retro view's retro.css (node .build/map/assemble.mjs)");
 // how votes were cast: each seat's Labor and Coalition votes by pile (build_vote_piles.py, re-run after anything that
 // rewrites a res file) add up to its final count; every seat from 2016, before that the Labor v Coalition pairs, none in 1993
 {
@@ -2578,7 +2578,10 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(rt.includes('const RT_KEY = "auspol.map.retro", RT_FAV_KEY = "auspol.map.favs";') && rt.includes("location.reload();") && rt.includes('!/^(retro|fs)=/.test(kv)'), "Favorites are views saved in this browser, their links without the look; a pick reloads on that view");
   assert.ok(ui.includes('if (typeof rtIsOn === "function" && rtIsOn()) p.set("retro", "1");'), "the look rides the link");
   assert.ok(base.includes('if (r.classList.contains("mp-retro")) return false;') && base.includes("if (typeof retroTheme === \"function\" && typeof rtIsOn === \"function\" && rtIsOn()) retroTheme(T);"), "the canvases take the flat palette, light whatever the device's theme");
-  assert.ok(rcss.includes("html:root.mp-retro {"), "the look's tokens outrank the page's dark ones (:root.sh-dark)");
+  assert.ok(R(".build/retro/chrome.css").includes("html:root.mp-retro {"), "the look's tokens (the retro pages' shared chrome) outrank the page's dark ones (:root.sh-dark)");
+  // the retro All polls page is this view's twin: the navbar opens it for All polls, and the two share Favorites
+  assert.ok(rt.includes('const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };') && rt.includes("href: twin(a.getAttribute(\"href\"))"), "the navbar's All polls opens the retro All polls page");
+  assert.ok(rt.includes('const rtFavPage = (f) => (typeof f.p === "string" ? f.p : "/map/");') && rt.includes('if (!rtFavHere(f)) { location.href = rtFavPage(f) + (f.h ? "#" + f.h : ""); return; }'), "a Favorite saved on the retro All polls page opens that page");
   assert.ok(rt.includes('if (e.key === "ArrowDown" || e.key === "ArrowUp") {') && rt.includes("e.preventDefault(); e.stopPropagation();"), "an open menu keeps the arrows from the map's year and lane walks");
 }
 

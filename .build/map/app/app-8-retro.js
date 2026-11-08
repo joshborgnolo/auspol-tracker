@@ -16,7 +16,11 @@
    browser too (their links: a pick reloads the page on that view, since the
    map reads its link when it loads). The canvases take a flat palette
    (retroTheme, read by readTheme), and the look stays light whatever the
-   device's theme, as the era's did. */
+   device's theme, as the era's did. One of the site's pages has a retro
+   twin, the All polls page at /allpolls/retro/ (.build/retro/allpolls.mjs):
+   the navbar opens it in place of the modern page, it shares this view's
+   chrome (.build/retro/chrome.css) and its Favorites list, and its links
+   back here carry retro=1. */
 const RT_KEY = "auspol.map.retro", RT_FAV_KEY = "auspol.map.favs";
 // (a function, so code anywhere in the closure can ask before this part has run)
 function rtIsOn() { return typeof document !== "undefined" && document.documentElement.classList.contains("mp-retro"); }
@@ -65,10 +69,15 @@ function rtHouseSVG() {
     <path d="M98.6 19 H111.4 M95.4 28 H114.6" stroke-width=".7"/></g>
     <path d="M105.6 2.4 h10 v6 h-10z" fill="#00247d" stroke="#cfe0ff" stroke-width=".6"/><path d="M105.6 2.4 h4 v3 h-4z" fill="#cf142b" opacity=".85"/></svg>`;
 }
+/* the site's pages with a retro twin: in this view their links open the
+   twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs,
+   which links back here with retro=1) */
+const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };
 // the site's pages, read off the shell's own tabs and More menu (so they never drift from it); the home page is the navbar's Home
 function rtPages() {
-  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: a.getAttribute("href") })).filter((p) => p.href !== "/");
-  const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === a.getAttribute("href"))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: a.getAttribute("href"), on: a.dataset.id === "map" }));
+  const twin = (h) => RT_TWIN[h] || h;
+  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: twin(a.getAttribute("href")) })).filter((p) => p.href !== "/");
+  const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === twin(a.getAttribute("href")))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: twin(a.getAttribute("href")), on: a.dataset.id === "map" }));
   return { tabs, more };
 }
 
@@ -133,6 +142,10 @@ function rtFavs() {
   try { const v = JSON.parse(localStorage.getItem(RT_FAV_KEY) || "[]"); return Array.isArray(v) ? v.filter((f) => f && typeof f.h === "string" && typeof f.t === "string") : []; } catch (e) { return []; }
 }
 function rtFavsSave(list) { try { localStorage.setItem(RT_FAV_KEY, JSON.stringify(list.slice(0, 30))); return true; } catch (e) { return false; } }
+/* the page a favourite belongs to: the list is shared with the retro All
+   polls page, whose entries carry their page (p); the map's own carry none */
+const rtFavPage = (f) => (typeof f.p === "string" ? f.p : "/map/");
+const rtFavHere = (f) => rtFavPage(f) === "/map/";
 // the view's own link, without the look or full screen (a favourite opens in whatever look is on)
 const rtViewHash = () => location.hash.replace(/^#/, "").split("&").filter((kv) => kv && !/^(retro|fs)=/.test(kv)).join("&");
 // a favourite names itself by the panel's title, the lens where it isn't the default, and the election where the title doesn't say
@@ -146,12 +159,14 @@ function rtFavLabel() {
 }
 function rtFavAdd(anchor) {
   const h = rtViewHash(), list = rtFavs();
-  if (list.some((f) => f.h === h)) { rtNote(anchor, "Already in Favorites"); return; }
+  if (list.some((f) => rtFavHere(f) && f.h === h)) { rtNote(anchor, "Already in Favorites"); return; }
   list.unshift({ t: rtFavLabel(), h });
   rtNote(anchor, rtFavsSave(list) ? "Added to Favorites" : "This browser won’t keep Favorites");
 }
 function rtFavGo(i) {
   const f = rtFavs()[i]; if (!f) return;
+  // another page's view (the retro All polls page's) opens that page, in its own look
+  if (!rtFavHere(f)) { location.href = rtFavPage(f) + (f.h ? "#" + f.h : ""); return; }
   if (f.h === rtViewHash()) return;
   // the map reads its link as it loads: the saved view opens on a fresh load of it
   location.hash = f.h + (rtIsOn() ? (f.h ? "&" : "") + "retro=1" : "");
@@ -184,7 +199,7 @@ function rtMenuItems(k) {
       return [
         { label: "Add this view to Favorites", act: () => rtFavAdd(RT.dropFor) },
         { sep: true },
-        ...(favs.length ? favs.map((f, i) => ({ label: f.t, fav: i, current: f.h === rtViewHash() })) : [{ label: "No favourites yet", disabled: true }]),
+        ...(favs.length ? favs.map((f, i) => ({ label: f.t, fav: i, current: rtFavHere(f) && f.h === rtViewHash() })) : [{ label: "No favourites yet", disabled: true }]),
       ];
     }
     case "help": return [

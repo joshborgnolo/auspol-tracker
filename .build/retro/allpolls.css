@@ -1,0 +1,219 @@
+/* ========================== the retro All polls page's own panels ==========================
+   After chrome.css (the navbar, banner, tab buttons and menus every retro
+   page shares): the panels under navy caption bars, the toolbar's old form
+   controls, and the table as the details list the retro map's List view
+   draws - raised column heads that sort, a sunken white well with the old
+   scroll bars, the chosen row in the selection navy. */
+html, body { margin: 0; }
+*, *::before, *::after { box-sizing: border-box; }
+html.mp-retro body { font-size: 12px; line-height: 1.35; -webkit-text-size-adjust: 100%; }
+button, input, select { font: inherit; color: inherit; margin: 0; }
+button { border: 0; background: none; padding: 0; cursor: pointer; }
+a { color: #0000ee; }
+a:visited { color: #551a8b; }
+/* the site's frame: its gutter and column (site-shell.mjs's --sh-gutter/--sh-maxw) */
+.ap-frame { box-sizing: border-box; width: 100%; max-width: calc(1152px + 2 * clamp(20px, 5vw, 64px)); margin: 0 auto;
+  padding: 10px clamp(20px, 5vw, 64px) 20px; }
+.rt-btitle { margin: 0; }
+.rt-tabs .ap-ts { display: none; }
+
+/* the party inks: the map's colours for the big figures, each darkened for 12px type */
+.ap-k-alp { color: #c8240a; } .ap-k-lnp { color: #1432d5; } .ap-k-grn { color: #0b7a33; } .ap-k-onp { color: #b45500; } .ap-k-oth { color: #505050; } .ap-k-0 { color: #000; }
+.ap-b-alp { background: #f7310a; } .ap-b-lnp { background: #1432d5; } .ap-b-onp { background: #ff8c00; } .ap-b-0 { background: #808080; }
+
+/* ----- the panels: a raised panel under a navy caption bar ----- */
+.ap-panel { margin-top: 8px; padding: 3px 3px 8px; background: var(--rt-face); box-shadow: var(--rt-raised); }
+.ap-cap { position: relative; display: flex; align-items: center; height: 26px; margin: 0; padding: 0 30px 0 8px; background: var(--rt-cap); color: #fff; font: 700 15px/1 var(--rt-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rt-shade { position: absolute; right: 5px; top: 5px; width: 17px; height: 15px; display: grid; place-items: center; background: var(--rt-face); box-shadow: var(--rt-raised); padding: 0; color: #000; cursor: pointer; }
+.rt-shade:active { box-shadow: var(--rt-pressed); }
+.rt-shut > :not(.ap-cap) { display: none !important; }
+.rt-shut { padding-bottom: 3px; }
+
+/* ----- today's figures: two groups under raised grey heads ----- */
+.ap-tbody { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; padding: 0 6px; }
+.ap-lab { margin: 8px 0 6px; padding: 4px 7px; background: var(--rt-face); box-shadow: var(--rt-raised); font: 700 12px/1.2 var(--rt-font); color: #000; }
+.ap-tpp, .ap-fps { margin: 6px 0 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; font-family: Tahoma, Verdana, sans-serif; font-weight: 700; letter-spacing: -0.03em; }
+.ap-tpp { font-size: 44px; line-height: 1; }
+.ap-tpp .ap-k-alp, .ap-fps .ap-k-alp { color: #f7310a; } .ap-tpp .ap-k-lnp, .ap-fps .ap-k-lnp { color: #1432d5; } .ap-tpp .ap-k-onp, .ap-fps .ap-k-onp { color: #ff8c00; }
+.ap-fps .ap-k-grn { color: #14ad4a; } .ap-fps .ap-k-oth { color: #9a9a9a; }
+.ap-fpd { font-weight: 700; color: #000; }
+.ap-who { margin: 4px 0 0; display: flex; justify-content: center; gap: 54px; font-weight: 700; font-size: 13px; }
+.ap-fps { font-size: 25px; line-height: 1; gap: 4px; }
+.ap-fp { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.ap-fp i { font: 700 11px/1 var(--rt-font); color: #000; letter-spacing: 0; font-style: normal; }
+.ap-say { margin: 10px 2px 4px; font-size: 12px; line-height: 1.45; color: #000; text-align: center; }
+
+/* ----- the toolbar: the era's form controls ----- */
+.ap-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 6px 4px 6px; padding: 5px 6px; box-shadow: var(--rt-thin-in); }
+.ap-ctl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ap-ctl[hidden] { display: none; }
+.ap-cl { font-weight: 700; }
+.ap-tools select, .ap-combo { appearance: none; -webkit-appearance: none; height: 21px; min-width: 128px; padding: 0 24px 0 5px; border: 0; border-radius: 0; color: #000; font-size: 12px; text-align: left; cursor: pointer;
+  /* a white box, sunken, with its raised arrow button at the right */
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Crect width='17' height='17' fill='%23d4d0c8'/%3E%3Cpath d='M0 16.5h17M16.5 0v17' stroke='%23404040'/%3E%3Cpath d='M0 15.5h16M15.5 0v16' stroke='%23808080'/%3E%3Cpath d='M.5 0v15M0 .5h15' stroke='%23fff'/%3E%3Cpath d='M5 7h7l-3.5 4z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 2px center / 17px 17px;
+  box-shadow: var(--rt-sunken); }
+.ap-tools select:focus-visible, .ap-combo:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.ap-combo { display: inline-flex; align-items: center; max-width: 220px; overflow: hidden; }
+.ap-combo .ap-hl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-combo[aria-expanded="true"] { background-color: #fff; }
+.ap-field { display: inline-flex; align-items: center; height: 23px; padding: 0 2px 0 6px; background: #fff; box-shadow: var(--rt-sunken); }
+.ap-field input { width: 190px; height: 19px; border: 0; padding: 0; background: none; outline: 0; font-size: 12px; color: #000; }
+.ap-field input::placeholder { color: #404040; opacity: 1; }
+.ap-field input::-webkit-search-cancel-button { cursor: pointer; }
+.ap-field kbd { display: grid; place-items: center; height: 19px; min-width: 17px; padding: 0 3px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; font: 700 11px/1 var(--rt-font); }
+.ap-gap { flex: 1 1 0; }
+.ap-count { white-space: nowrap; }
+.ap-btn { display: inline-flex; align-items: center; height: 23px; padding: 0 12px; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; font-size: 12px; white-space: nowrap; }
+.ap-btn:active { box-shadow: var(--rt-pressed); }
+.ap-btn:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+/* the checklist's figures sit at its right edge, as a menu's shortcut keys do */
+.rt-drop [role="menuitemcheckbox"] .rt-kb, .rt-drop [role="menuitemradio"] .rt-kb { color: #404040; }
+.rt-drop [role="menuitemcheckbox"]:hover .rt-kb, .rt-drop [role="menuitemcheckbox"]:focus-visible .rt-kb { color: #fff; }
+
+/* ----- the table: the old details list ----- */
+.ap-well { margin: 0 4px; max-height: max(360px, calc(100vh - 150px)); overflow: auto; background: #fff; box-shadow: var(--rt-sunken); padding: 2px; outline: 0; overscroll-behavior: contain; }
+.ap-t { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; color: #000; }
+.ap-t th, .ap-t td { padding: 3px 7px; vertical-align: top; text-align: left; font-weight: 400; }
+.ap-t .r { text-align: right; }
+.ap-t small { display: block; margin-top: 1px; font-size: 11px; color: #404040; white-space: nowrap; }
+/* the heads: raised buttons that sort, held at the top of the well */
+.ap-t thead th { position: sticky; top: 0; z-index: 2; padding: 0; background: var(--rt-face); box-shadow: var(--rt-raised); vertical-align: bottom; white-space: nowrap; }
+.ap-sort { display: flex; align-items: flex-end; justify-content: flex-start; gap: 4px; width: 100%; min-height: 21px; padding: 3px 7px 3px; text-align: left; font-size: 12px; color: #000; line-height: 1.15; }
+.ap-t thead th.r .ap-sort { justify-content: flex-end; text-align: right; }
+.ap-sl { min-width: 0; }
+.ap-sl small { display: block; margin-top: 1px; font-size: 10px; color: #303030; }
+.ap-sort:active { box-shadow: var(--rt-pressed); }
+.ap-sort:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+.ap-sd { flex: none; width: 8px; font-size: 8px; line-height: 13px; }
+.ap-sort2 { padding-top: 0; min-height: 0; font-size: 11px; color: #303030; }
+.ap-t thead th .ap-sort + .ap-sort { border-top: 1px solid var(--rt-sh); box-shadow: inset 0 1px 0 var(--rt-hi); padding-top: 2px; }
+.ap-scale { display: flex; justify-content: space-between; gap: 6px; padding: 4px 7px; font-size: 10px; font-weight: 700; color: #000; }
+.ap-scale span:nth-child(2) { color: #303030; font-weight: 400; }
+/* the rows */
+.ap-t tbody th, .ap-t tbody td { border-bottom: 1px solid #ece9e2; }
+.ap-t tbody .c-h { font-weight: 700; min-width: 132px; }
+.ap-t tbody .c-h a { color: #000; text-decoration: none; }
+.ap-t tbody .c-h a:hover { color: #0000ee; text-decoration: underline; }
+.ap-t tbody .c-h small { font-weight: 400; }
+/* a phone's pollster cell carries the poll's client, dates and sample under the name */
+.ap-t tbody .c-h small.ap-phs { white-space: normal; max-width: 150px; }
+.ap-t .c-f { white-space: nowrap; }
+.ap-yr { color: #404040; }
+.ap-t .c-n { white-space: nowrap; }
+.ap-t .c-2 { white-space: nowrap; min-width: 92px; }
+.ap-pair { font-weight: 700; font-size: 13px; white-space: nowrap; }
+.ap-dash { padding: 0 3px; color: #000; font-weight: 400; }
+.ap-none { color: #808080; }
+.ap-t .c-l { white-space: nowrap; font-weight: 700; }
+.ap-t .c-p { min-width: 46px; }
+.ap-t .c-p b { font-size: 13px; }
+.ap-t .c-pm { white-space: nowrap; }
+.ap-t .c-ld b { font-size: 13px; }
+.ap-t .c-ld small { display: inline; margin-left: 3px; }
+.ap-na { margin-left: 3px; color: #a00000; font-weight: 700; cursor: help; }
+.ap-fav { margin-left: 1px; color: #000; font-weight: 700; cursor: help; }
+.ap-nar th, .ap-nar td { background: #f6f5f1; }
+.ap-nar .c-h a, .ap-nar b { opacity: .78; }
+.ap-r { cursor: pointer; }
+.ap-r:hover th, .ap-r:hover td, .ap-r:focus th, .ap-r:focus td, .ap-r.open th, .ap-r.open td { background: var(--rt-sel); color: #fff; }
+.ap-r:hover *, .ap-r:focus *, .ap-r.open * { color: #fff !important; opacity: 1 !important; }
+.ap-r:hover .tb, .ap-r:focus .tb, .ap-r.open .tb { background: #fff; }
+.ap-r:hover .tb *, .ap-r:focus .tb *, .ap-r.open .tb * { color: inherit !important; }
+.ap-r:focus { outline: 1px dotted #fff; outline-offset: -2px; }
+/* a month: a band across the list, its name and count, its own figures under their columns */
+.ap-m th, .ap-m td { padding: 5px 7px 4px; background: #e7e4dd; border-top: 1px solid #fff; border-bottom: 1px solid var(--rt-sh); vertical-align: middle; }
+.ap-m th { white-space: nowrap; }
+/* the primary and leadership tabs' figure columns share the width the two-party tab's strip takes */
+html[data-ap-m="pri"] .ap-t .c-p { width: 10%; }
+html[data-ap-m="ld"] .ap-t .c-pm { width: 20%; }
+html[data-ap-m="ld"] .ap-t .c-ld { width: 11%; }
+.ap-m th b { font-size: 12px; font-weight: 700; }
+.ap-m th span { color: #303030; margin-left: 4px; }
+.ap-mavg { white-space: nowrap; font-size: 11px; color: #303030; }
+.ap-mavg .ap-pair { font-size: 12px; }
+.ap-m .c-p b { font-size: 12px; }
+.ap-empty td { padding: 18px 10px; text-align: center; }
+.ap-empty button { margin-left: 6px; height: 23px; padding: 0 10px; background: var(--rt-face); box-shadow: var(--rt-raised); }
+/* a poll opened in its row */
+.ap-d td { padding: 0; border-bottom: 1px solid var(--rt-sh); }
+.ap-det { margin: 0 0 6px 18px; padding: 8px 10px 9px; background: #ffffe1; border: 1px solid #000; border-top: 0; box-shadow: 2px 2px 0 rgba(0, 0, 0, .18); }
+.ap-dh { margin: 0 0 6px; }
+.ap-det dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 14px; margin: 0; }
+.ap-det dt { font-weight: 700; }
+.ap-det dd { margin: 0; }
+/* the strip: the old trackbar's groove on the modern table's ±6-point scale */
+.ap-t .c-s { width: 168px; min-width: 150px; padding-top: 6px; }
+.tb { position: relative; display: block; height: 15px; margin: 0 2px; background: transparent; cursor: help; }
+.tb::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 4px; box-shadow: var(--rt-sunken); background: #fff; }
+.tb i { position: absolute; display: block; }
+.tb-g { top: 5px; width: 1px; height: 6px; background: #c8c4bc; }
+.tb-a { left: 50%; top: 0; width: 1px; height: 15px; background: #000; }
+.tb-h { top: 2px; width: 2px; height: 11px; margin-left: -1px; background: #404040; }
+.tb-w { top: 7px; height: 2px; background: #000; }
+.tb-c { top: 4px; width: 0; height: 0; border: 4px solid transparent; }
+.tb-c.l { left: -5px; border-right-color: #000; border-left: 0; }
+.tb-c.r { right: -5px; border-left-color: #000; border-right: 0; }
+.tb-d { top: 3px; width: 9px; height: 9px; margin-left: -4.5px; border: 1px solid #000; }
+.tb-none { cursor: default; font-size: 11px; color: #808080; height: auto; }
+.tb-none::before { display: none; }
+.ap-key { margin: 6px 6px 0; font-size: 11px; line-height: 1.45; color: #000; }
+/* the old scroll bars, where a browser lets a page draw them */
+.ap-well::-webkit-scrollbar { width: 16px; height: 16px; }
+.ap-well::-webkit-scrollbar-track { background: repeating-conic-gradient(#d4d0c8 0 25%, #fff 0 50%) 0 0 / 2px 2px; }
+.ap-well::-webkit-scrollbar-thumb { background: var(--rt-face); box-shadow: var(--rt-raised); }
+.ap-well::-webkit-scrollbar-corner { background: var(--rt-face); }
+
+/* ----- the notes: a sunken white panel under a navy caption ----- */
+.ap-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 22px; margin: 6px 4px 0; padding: 4px 12px 10px; background: #fff; box-shadow: var(--rt-sunken); }
+.ap-cols h3 { margin: 10px 0 3px; font: 700 12px/1.3 var(--rt-font); color: #000; }
+.ap-cols p { margin: 0; font: 400 12px/1.5 var(--rt-font); color: #000; }
+
+/* ----- the site's colophon, in the page's own type ----- */
+.ap-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 40px; margin-top: 16px; padding: 14px 0 6px; border-top: 1px solid var(--rt-sh); box-shadow: 0 -1px 0 var(--rt-hi); font-size: 12px; line-height: 1.55; }
+.ap-foot p { margin: 0 0 8px; }
+
+/* ----- widths ----- */
+@media (max-width: 1100px) {
+  .ap-t .c-s { display: none; }
+}
+@media (max-width: 860px) {
+  .ap-frame { padding-top: 6px; padding-bottom: 14px; }
+  .ap-cols { grid-template-columns: minmax(0, 1fr); }
+  .ap-foot { grid-template-columns: minmax(0, 1fr); }
+  .ap-tpp { font-size: 38px; }
+  .ap-fps { font-size: 22px; }
+}
+@media (max-width: 640px) {
+  .ap-tbody { grid-template-columns: minmax(0, 1fr); }
+  .ap-tools { gap: 6px 10px; }
+  .ap-ctl { flex: 1 1 100%; justify-content: space-between; }
+  .ap-ctl > select, .ap-ctl > .ap-combo, .ap-ctl > .ap-field { flex: 0 1 220px; max-width: none; }
+  .ap-field input { width: 100%; min-width: 0; }
+  .ap-gap { display: none; }
+  .ap-count { flex: 1 1 auto; }
+  /* the pollster rides along as the list scrolls sideways */
+  .ap-t tbody .c-h, .ap-t thead .c-h { position: sticky; left: 0; z-index: 1; background: #fff; box-shadow: 1px 0 0 #ece9e2; }
+  .ap-t thead .c-h { z-index: 3; background: var(--rt-face); box-shadow: var(--rt-raised); }
+  .ap-m th { position: sticky; left: 0; z-index: 1; white-space: normal; }
+  .ap-nar .c-h { background: #f6f5f1; }
+  /* the pinned pollster cell takes the row's selection navy too */
+  .ap-r:hover .c-h, .ap-r:focus .c-h, .ap-r.open .c-h { background: var(--rt-sel); }
+  /* an opened poll stays on the screen while the list scrolls sideways under it */
+  .ap-det { position: sticky; left: 0; max-width: calc(100vw - 2 * clamp(20px, 5vw, 64px) - 22px); }
+}
+@media (max-width: 560px) {
+  /* the measures keep their names on a phone, shortened (the map's views go to icons alone) */
+  .rt-tabs button .rt-tl { display: none; }
+  .rt-tabs button .ap-ts { display: inline; }
+  .rt-tabs .rt-modern .rt-tl { display: inline; }
+  .rt-tabs button { gap: 5px; padding: 0 6px; }
+  .ap-tpp { font-size: 34px; }
+  .ap-t th, .ap-t td { padding: 3px 5px; }
+  .ap-t tbody .c-h { min-width: 104px; }
+  .ap-det { margin-left: 4px; }
+  .ap-det dl { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .ap-det dd { margin-bottom: 4px; }
+  /* a phone's month: its name over its count, the column kept narrow */
+  .ap-m th b, .ap-m th span { display: block; margin-left: 0; }
+  .ap-t tbody .c-h { max-width: 150px; }
+}

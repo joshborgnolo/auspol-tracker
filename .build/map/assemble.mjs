@@ -15,7 +15,10 @@
      app-7-full.js     the full-screen view: plates over the stage, the elections dock
      app-8-retro.js    the retro view: the map as a desktop program from about 2000
      page.css          the page's own styles (its palette is inline in the page)
-     retro.css         the retro view's look (html.mp-retro), after page.css
+     retro.css         the retro view's look (html.mp-retro), after page.css and
+                       the retro pages' shared chrome, .build/retro/chrome.css
+                       (navbar, banner, tab buttons, menus: the retro All polls
+                       page wears the same file)
    This writes map/map.js (one closure, so nothing leaks to window but the
    __map test hook) and map/map.css. Run after editing a part:
      node .build/map/assemble.mjs
@@ -45,7 +48,7 @@ const app = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js
 // each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
 // and each election's eyebrow facts, so the eyebrow's floor reads every year's real line (data-stamp.mjs)
 const js = stampMeta(stampData(`/* the Electoral map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${app}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT));
-const css = part("page.css") + "\n" + part("retro.css");
+const css = part("page.css") + "\n" + fs.readFileSync(path.join(HERE, "..", "retro", "chrome.css"), "utf8") + "\n" + part("retro.css");
 const write = (rel, body) => {
   const p = path.join(ROOT, rel);
   if (fs.existsSync(p) && fs.readFileSync(p, "utf8") === body) return console.log(rel, "unchanged");

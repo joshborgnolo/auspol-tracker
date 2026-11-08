@@ -5,86 +5,19 @@
    fields and lists, navy caption bars over the panels. It is the page itself
    in the era's clothes, with no pretend browser or desktop around it. The
    page's own elements are only restyled; app-8-retro.js adds the banner and
-   the tab row (hidden outside this view). */
+   the tab row (hidden outside this view). The navbar, the banner, the tab
+   buttons and the menus are dressed by .build/retro/chrome.css, which the
+   retro All polls page wears too; this file is the map's own panels. */
 .rt-only { display: none; }
 html.mp-retro .rt-only { display: revert; }
-/* (html:root outranks the page's dark tokens, :root.sh-dark and :root:not(.sh-light)) */
-html:root.mp-retro {
-  --rt-face: #d4d0c8; --rt-hi: #ffffff; --rt-sh: #808080; --rt-dk: #404040; --rt-ink: #000000;
-  --rt-sel: #0a246a; --rt-cap: linear-gradient(90deg, #0a246a, #3a6ea5 62%, #a6caf0);
-  --rt-font: Tahoma, Verdana, "Segoe UI", Geneva, sans-serif;
-  --rt-raised: inset -1px -1px var(--rt-dk), inset 1px 1px var(--rt-hi), inset -2px -2px var(--rt-sh), inset 2px 2px var(--rt-face);
-  --rt-pressed: inset 1px 1px var(--rt-dk), inset -1px -1px var(--rt-hi), inset 2px 2px var(--rt-sh), inset -2px -2px var(--rt-face);
-  --rt-sunken: inset 1px 1px var(--rt-sh), inset -1px -1px var(--rt-hi), inset 2px 2px var(--rt-dk), inset -2px -2px var(--rt-face);
-  --rt-thin-up: inset -1px -1px var(--rt-sh), inset 1px 1px var(--rt-hi);
-  --rt-thin-in: inset 1px 1px var(--rt-sh), inset -1px -1px var(--rt-hi);
-  /* the page's own tokens, held to the light paper: the era had no dark mode */
-  --bg: #d4d0c8; --surface: #ffffff; --ink: #000000; --ink-2: #1f1f1f; --ink-3: #404040; --ink-faint: #808080;
-  --line: #808080; --line-2: #a0a0a0; --accent: #0a246a; --pin-top: 0px;
-  color-scheme: light;
-}
-html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-family: var(--rt-font); }
 /* the site's own masthead and tabs step aside: the banner carries the title and the site's pages */
 html.mp-retro .sh-top, html.mp-retro .sh-tabs, html.mp-retro .sh-tabs-sentinel, html.mp-retro .sh-band, html.mp-retro .sh-skip { display: none !important; }
 html.mp-retro main.mp { padding: 10px 0 20px; }
 html.mp-retro .mp * { font-family: var(--rt-font); letter-spacing: 0; }
 html.mp-retro .mp-sec { padding-top: 0; }
 
-/* ----- the banner: the site's own masthead in the era's dress ----- */
+/* the banner (chrome.css) stands in for the eyebrow */
 html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
-.rt-banner { position: relative; display: flex; align-items: center; gap: 14px; min-height: 66px; padding: 0 16px 0 10px; overflow: hidden; color: #fff;
-  background: linear-gradient(180deg, #1c3f94 0%, #0f2a6e 55%, #0a1f55 100%); box-shadow: var(--rt-thin-in); }
-.rt-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 140% at 70% 0%, rgba(166, 202, 240, .26), transparent 60%); }
-.rt-home { flex: none; display: block; line-height: 0; }
-.rt-flag { width: 78px; height: 44px; filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, .45)); }
-.rt-bcol { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; z-index: 1; }
-.rt-btitle { flex: none; font: 700 34px/1 "Times New Roman", Times, Georgia, serif !important; color: #fff; text-shadow: 2px 2px 0 #000, 0 0 10px rgba(166, 202, 240, .45); white-space: nowrap; }
-.rt-bmeta { flex: 1 1 auto; min-width: 0; font: italic 400 13px/1.3 var(--rt-font); color: #e8eefc; text-shadow: 1px 1px 0 #000; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.rt-house { flex: none; width: 190px; height: 56px; align-self: flex-end; opacity: .9; }
-/* the navbar over the banner, in the era's words: Home, Edit, View,
-   Favorites and Help (each a working menu on this page), the site's pages
-   at its right */
-.rt-nav { display: flex; align-items: center; height: 26px; padding: 0 6px 0 4px; background: #061436; font: 400 12px/1 var(--rt-font); }
-.rt-nav .rt-ni, .rt-pages a { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px; color: #fff; text-decoration: none; font: inherit; background: none; white-space: nowrap; cursor: pointer; }
-.rt-nav .rt-ni svg { flex: none; }
-.rt-nav .rt-ni:hover, .rt-pages a:hover { background: #1c3f94; color: #fff; }
-.rt-nav .rt-ni[aria-expanded="true"] { background: #fff; color: #000; box-shadow: inset 1px 1px #808080; }
-.rt-nav .rt-ni:focus-visible, .rt-pages a:focus-visible { outline: 1px dotted #fff; outline-offset: -3px; }
-.rt-navgap { flex: 1 1 auto; }
-.rt-pages { display: flex; align-items: center; }
-.rt-pages a + a, .rt-pages a + .rt-ni { box-shadow: -1px 0 rgba(255, 255, 255, .35); }
-.rt-pages a { font-size: 11px; }
-.rt-pagesb { display: none !important; }
-/* the banner's kicker: the site's name over the page's */
-.rt-kicker { font: 700 12px/1 var(--rt-font); color: #ffd94a; text-decoration: none; text-shadow: 1px 1px 0 #000; }
-.rt-kicker:hover { text-decoration: underline; }
-.rt-bline { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
-/* the views: tab buttons along the banner's foot, the way back at their end */
-.rt-tabs { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4px; padding: 6px 0 0; border-bottom: 1px solid var(--rt-hi); box-shadow: 0 1px 0 var(--rt-sh); min-height: 40px; }
-.rt-tabs button { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 16px 0 12px; background: var(--rt-face); color: #000; font: 400 13px/1 var(--rt-font); box-shadow: var(--rt-raised); white-space: nowrap; cursor: pointer; }
-.rt-tabs button:active { box-shadow: var(--rt-pressed); }
-.rt-tabs button:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
-.rt-tabs button[aria-selected="true"] { height: 36px; font-weight: 700; background: #e7e4dd; box-shadow: inset -1px 0 var(--rt-dk), inset 1px 1px var(--rt-hi), inset -2px 0 var(--rt-sh); margin-bottom: -1px; position: relative; z-index: 1; }
-.rt-tabs .rt-modern { margin-left: 10px; }
-.rt-tabs svg { flex: none; }
-/* the navbar's menus */
-.rt-drop { position: fixed; z-index: 400; min-width: 200px; max-width: min(420px, calc(100vw - 8px)); max-height: calc(100vh - 40px); overflow: auto; padding: 2px; background: var(--rt-face); box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .35); font: 400 12px/1 var(--rt-font); color: #000; }
-.rt-drop[hidden] { display: none; }
-.rt-drop a, .rt-drop button { display: flex; align-items: center; width: 100%; min-height: 24px; padding: 0 18px 0 0; color: #000; background: none; text-decoration: none; white-space: nowrap; font: inherit; text-align: left; cursor: pointer; }
-.rt-drop .rt-ck { flex: none; width: 22px; text-align: center; font-size: 11px; }
-.rt-drop .rt-it { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.rt-drop .rt-kb { margin-left: auto; padding-left: 28px; }
-.rt-drop a:hover, .rt-drop a:focus-visible, .rt-drop button:hover:not(:disabled), .rt-drop button:focus-visible { background: var(--rt-sel); color: #fff; outline: none; }
-.rt-drop button:disabled { color: var(--rt-sh); text-shadow: 1px 1px 0 #fff; cursor: default; }
-.rt-drop hr { border: 0; height: 2px; margin: 3px 1px; box-shadow: var(--rt-thin-in); }
-.rt-drop [aria-current="page"] .rt-it { font-weight: 700; }
-/* a favourite's row: the view, and its little remove button */
-.rt-favrow { display: flex; align-items: stretch; }
-.rt-favrow > button:first-child { flex: 1 1 auto; min-width: 0; }
-.rt-drop .rt-favdel { flex: none; width: 24px; padding: 0; justify-content: center; color: #404040; }
-.rt-drop .rt-favdel:hover { background: #a00; color: #fff; }
-/* a moment's note under a navbar item */
-.rt-note { position: fixed; z-index: 410; padding: 4px 8px; background: #ffffe1; border: 1px solid #000; box-shadow: 2px 2px 0 rgba(0, 0, 0, .3); font: 400 12px/1.2 var(--rt-font); color: #000; pointer-events: none; }
 
 /* ----- the panes ----- */
 html.mp-retro .mp-lensrow { display: none !important; }
@@ -266,31 +199,13 @@ html.mp-retro .fs-tuck { top: 3px; right: 8px; width: 30px; height: 20px; backgr
 html.mp-retro .fs .fs-sbox .mp-search label { height: 32px !important; margin-top: 5px; }
 html.mp-retro .fs-untuck { height: 26px; border-radius: 0 !important; color: #000; font: 400 12px/1 var(--rt-font); }
 
-/* tablet and phone: the banner folds to fit */
-@media (max-width: 1100px) { .rt-house { display: none; } }
+/* tablet and phone (the banner's folds are chrome.css's) */
 @media (max-width: 860px) {
   html.mp-retro main.mp { padding: 6px 0 14px; }
   html.mp-retro .mp-view { padding: 4px; }
   html.mp-retro .mp-story { margin-top: 8px; }
-  .rt-banner { min-height: 58px; gap: 10px; }
-  .rt-bline { flex-direction: column; gap: 2px; align-items: flex-start; }
-  .rt-btitle { font-size: 26px !important; }
-  .rt-flag { width: 58px; height: 33px; }
-  .rt-tabs { justify-content: stretch; }
-  .rt-tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; }
-  .rt-tabs .rt-modern { margin-left: 4px; }
 }
 @media (max-width: 560px) {
-  .rt-bmeta { display: none; }
-  .rt-tabs button .rt-tl { display: none; }
-  .rt-tabs .rt-modern .rt-tl { display: inline; }
-  .rt-tabs .rt-modern { flex: 0 0 auto; padding: 0 9px; }
-  .rt-nav { padding: 0 2px; }
-  .rt-nav .rt-ni { padding: 0 6px; }
-  .rt-nav .rt-ic { display: none; }
-  /* the site's pages fold into one menu on a phone */
-  .rt-pages { display: none; }
-  .rt-pagesb { display: inline-flex !important; }
   html.mp-retro .mp-legend .lg-label, html.mp-retro .mp-legend .lg-jump > b, html.mp-retro .mp-legend .lg-draw > span { min-width: 0; }
   html.mp-retro .mp-legend .lg-hint { display: none !important; }
   html.mp-retro .lg-cg .st-sclab { min-width: 0; width: 100%; }

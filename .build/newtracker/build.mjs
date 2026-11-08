@@ -1985,6 +1985,22 @@ const withScriptPreloads = (doc) => {
   }
   console.log(`  + ${tabs.map((t) => (VIC ? "vic/" : "") + t.id + "/").join(", ")} · one document per tab`);
 }
+/* ---- 5a'. the retro All polls page --------------------------------------
+   /allpolls/retro/: the archive in the retro map's dress, opened from that
+   view's navbar (.build/retro/allpolls.mjs). Read off this build's dataset
+   like the tab pages, so a data commit carries it (SITE_FILES) and its rows
+   never trail the modern table's. Federal only: /vic/ has no retro map. */
+if (!VIC) {
+  const { retroAllPolls } = await import("../retro/allpolls.mjs");
+  const { shellPages } = await import("../site-shell.mjs");
+  let footer = null;
+  try { footer = mainChrome().footer; } catch (e) { console.warn(`  retro All polls: colophon words missed (${e.message}) – the page goes without its colophon`); }
+  const { html: retroHtml, data: retroD } = retroAllPolls({ dataset: fs.readFileSync(DA(DATASET), "utf8"), shellPages: shellPages(), footer, siteUrl: SITE_URL, built: grabLatest().publishedISO });
+  const dir = path.join(path.dirname(OUT), "allpolls", "retro");
+  fs.mkdirSync(dir, { recursive: true });
+  writeAtomic(path.join(dir, "index.html"), retroHtml);
+  console.log(`  + allpolls/retro/ · the retro All polls page, ${retroD.rows.length} polls`);
+}
 
 /* The root document starts its first screen with only the modules that
    screen draws; the rest load once the app has painted (loadLate, the

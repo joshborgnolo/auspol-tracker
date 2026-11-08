@@ -336,8 +336,11 @@ freshness_sync() {
 # draw) and the federal build rewrites both files, so a refresh commit that
 # carried the rebuilt index.html but not them would split the two copies
 # of the art (main page inline, satellites via these files).
+# allpolls/retro/index.html joined 2026-11-08: the retro All polls page
+# (.build/retro/allpolls.mjs), which the federal build writes from the same
+# dataset, so every refresh rewrites it with the new poll's row.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
-  cycles/index.html allpolls/index.html info/index.html
+  cycles/index.html allpolls/index.html allpolls/retro/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html
   flows-explained/index.html preference-flows/index.html
   public-opinion/index.html beyond-the-vote/index.html ad-hocs/index.html

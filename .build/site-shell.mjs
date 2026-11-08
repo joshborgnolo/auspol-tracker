@@ -334,6 +334,15 @@ function shellMenu(menu) {
     + pages.map(item).join("")
     + `</div></div>`;
 }
+/* The same pages as data, for a page that draws its own bar instead of the
+   shell's: the retro All polls page (.build/retro/allpolls.mjs), whose
+   navbar lists the bar's views and the ☰ menu's pages as the retro map's
+   does from this shell's markup (app-8-retro.js rtPages). */
+export function shellPages() {
+  const info = TABS.find((t) => t.pinHide && !t.menu);
+  const pick = ({ id, label, href }) => ({ id, label, href });
+  return { tabs: TABS.filter((t) => !t.menu).map(pick), menu: [...TABS.filter((t) => t.menu), ...(info ? [info] : [])].map(pick) };
+}
 /* The archives' own switcher (ARCHIVE_TABS is its one home). The current
    page's own tab carries `active` + aria-current off SHELL_PAGES' file key;
    a caller that isn't one of the archive pages' files gets the plain strip. */

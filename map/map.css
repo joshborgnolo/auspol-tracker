@@ -1285,16 +1285,16 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-legend .lg-sub .lg-cats, .mp-legend .lg-sub .lg-contest { margin-top: 0; }
 @media (max-width: 560px) { .mp-legend .lg-sub { margin-left: 8px; padding-left: 9px; } .mp-legend .lg-sub .lg-note { display: block; } }
 
-/* =============================== the retro view ===============================
-   html.mp-retro dresses the page as a website from about 2000: a navy banner
-   with the flag, the title and Parliament House, tab buttons for the views,
-   and the old system face throughout — bevelled grey buttons, sunken white
-   fields and lists, navy caption bars over the panels. It is the page itself
-   in the era's clothes, with no pretend browser or desktop around it. The
-   page's own elements are only restyled; app-8-retro.js adds the banner and
-   the tab row (hidden outside this view). */
-.rt-only { display: none; }
-html.mp-retro .rt-only { display: revert; }
+/* =============================== the retro pages' chrome ===============================
+   What every retro page wears, in one place: the old system face's tokens,
+   the navy navbar in the era's words (Home, Edit, View, Favorites, Help, the
+   site's pages at its right), the banner with the flag, the title and
+   Parliament House, the tab buttons along its foot, the navbar's menus and a
+   moment's note under them. Two pages read it: the Electoral map's retro
+   view (.build/map/assemble.mjs puts it between page.css and retro.css) and
+   the retro All polls page (.build/retro/allpolls.mjs inlines it), so the two
+   can never dress differently. Each page's own panels stay in its own file.
+   The class on <html> is mp-retro on both. */
 /* (html:root outranks the page's dark tokens, :root.sh-dark and :root:not(.sh-light)) */
 html:root.mp-retro {
   --rt-face: #d4d0c8; --rt-hi: #ffffff; --rt-sh: #808080; --rt-dk: #404040; --rt-ink: #000000;
@@ -1311,14 +1311,8 @@ html:root.mp-retro {
   color-scheme: light;
 }
 html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-family: var(--rt-font); }
-/* the site's own masthead and tabs step aside: the banner carries the title and the site's pages */
-html.mp-retro .sh-top, html.mp-retro .sh-tabs, html.mp-retro .sh-tabs-sentinel, html.mp-retro .sh-band, html.mp-retro .sh-skip { display: none !important; }
-html.mp-retro main.mp { padding: 10px 0 20px; }
-html.mp-retro .mp * { font-family: var(--rt-font); letter-spacing: 0; }
-html.mp-retro .mp-sec { padding-top: 0; }
 
 /* ----- the banner: the site's own masthead in the era's dress ----- */
-html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
 .rt-banner { position: relative; display: flex; align-items: center; gap: 14px; min-height: 66px; padding: 0 16px 0 10px; overflow: hidden; color: #fff;
   background: linear-gradient(180deg, #1c3f94 0%, #0f2a6e 55%, #0a1f55 100%); box-shadow: var(--rt-thin-in); }
 .rt-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 140% at 70% 0%, rgba(166, 202, 240, .26), transparent 60%); }
@@ -1341,6 +1335,8 @@ html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
 .rt-pages { display: flex; align-items: center; }
 .rt-pages a + a, .rt-pages a + .rt-ni { box-shadow: -1px 0 rgba(255, 255, 255, .35); }
 .rt-pages a { font-size: 11px; }
+/* the page the reader is on, among the site's pages (a page of its own with a retro twin) */
+.rt-pages a[aria-current="page"] { font-weight: 700; background: #1c3f94; }
 .rt-pagesb { display: none !important; }
 /* the banner's kicker: the site's name over the page's */
 .rt-kicker { font: 700 12px/1 var(--rt-font); color: #ffd94a; text-decoration: none; text-shadow: 1px 1px 0 #000; }
@@ -1372,6 +1368,51 @@ html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
 .rt-drop .rt-favdel:hover { background: #a00; color: #fff; }
 /* a moment's note under a navbar item */
 .rt-note { position: fixed; z-index: 410; padding: 4px 8px; background: #ffffe1; border: 1px solid #000; box-shadow: 2px 2px 0 rgba(0, 0, 0, .3); font: 400 12px/1.2 var(--rt-font); color: #000; pointer-events: none; }
+
+/* tablet and phone: the banner folds to fit */
+@media (max-width: 1100px) { .rt-house { display: none; } }
+@media (max-width: 860px) {
+  .rt-banner { min-height: 58px; gap: 10px; }
+  .rt-bline { flex-direction: column; gap: 2px; align-items: flex-start; }
+  .rt-btitle { font-size: 26px !important; }
+  .rt-flag { width: 58px; height: 33px; }
+  .rt-tabs { justify-content: stretch; }
+  .rt-tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; }
+  .rt-tabs .rt-modern { margin-left: 4px; }
+}
+@media (max-width: 560px) {
+  .rt-bmeta { display: none; }
+  .rt-tabs button .rt-tl { display: none; }
+  .rt-tabs .rt-modern .rt-tl { display: inline; }
+  .rt-tabs .rt-modern { flex: 0 0 auto; padding: 0 9px; }
+  .rt-nav { padding: 0 2px; }
+  .rt-nav .rt-ni { padding: 0 6px; }
+  .rt-nav .rt-ic { display: none; }
+  /* the site's pages fold into one menu on a phone */
+  .rt-pages { display: none; }
+  .rt-pagesb { display: inline-flex !important; }
+}
+
+/* =============================== the retro view ===============================
+   html.mp-retro dresses the page as a website from about 2000: a navy banner
+   with the flag, the title and Parliament House, tab buttons for the views,
+   and the old system face throughout — bevelled grey buttons, sunken white
+   fields and lists, navy caption bars over the panels. It is the page itself
+   in the era's clothes, with no pretend browser or desktop around it. The
+   page's own elements are only restyled; app-8-retro.js adds the banner and
+   the tab row (hidden outside this view). The navbar, the banner, the tab
+   buttons and the menus are dressed by .build/retro/chrome.css, which the
+   retro All polls page wears too; this file is the map's own panels. */
+.rt-only { display: none; }
+html.mp-retro .rt-only { display: revert; }
+/* the site's own masthead and tabs step aside: the banner carries the title and the site's pages */
+html.mp-retro .sh-top, html.mp-retro .sh-tabs, html.mp-retro .sh-tabs-sentinel, html.mp-retro .sh-band, html.mp-retro .sh-skip { display: none !important; }
+html.mp-retro main.mp { padding: 10px 0 20px; }
+html.mp-retro .mp * { font-family: var(--rt-font); letter-spacing: 0; }
+html.mp-retro .mp-sec { padding-top: 0; }
+
+/* the banner (chrome.css) stands in for the eyebrow */
+html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
 
 /* ----- the panes ----- */
 html.mp-retro .mp-lensrow { display: none !important; }
@@ -1553,31 +1594,13 @@ html.mp-retro .fs-tuck { top: 3px; right: 8px; width: 30px; height: 20px; backgr
 html.mp-retro .fs .fs-sbox .mp-search label { height: 32px !important; margin-top: 5px; }
 html.mp-retro .fs-untuck { height: 26px; border-radius: 0 !important; color: #000; font: 400 12px/1 var(--rt-font); }
 
-/* tablet and phone: the banner folds to fit */
-@media (max-width: 1100px) { .rt-house { display: none; } }
+/* tablet and phone (the banner's folds are chrome.css's) */
 @media (max-width: 860px) {
   html.mp-retro main.mp { padding: 6px 0 14px; }
   html.mp-retro .mp-view { padding: 4px; }
   html.mp-retro .mp-story { margin-top: 8px; }
-  .rt-banner { min-height: 58px; gap: 10px; }
-  .rt-bline { flex-direction: column; gap: 2px; align-items: flex-start; }
-  .rt-btitle { font-size: 26px !important; }
-  .rt-flag { width: 58px; height: 33px; }
-  .rt-tabs { justify-content: stretch; }
-  .rt-tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; }
-  .rt-tabs .rt-modern { margin-left: 4px; }
 }
 @media (max-width: 560px) {
-  .rt-bmeta { display: none; }
-  .rt-tabs button .rt-tl { display: none; }
-  .rt-tabs .rt-modern .rt-tl { display: inline; }
-  .rt-tabs .rt-modern { flex: 0 0 auto; padding: 0 9px; }
-  .rt-nav { padding: 0 2px; }
-  .rt-nav .rt-ni { padding: 0 6px; }
-  .rt-nav .rt-ic { display: none; }
-  /* the site's pages fold into one menu on a phone */
-  .rt-pages { display: none; }
-  .rt-pagesb { display: inline-flex !important; }
   html.mp-retro .mp-legend .lg-label, html.mp-retro .mp-legend .lg-jump > b, html.mp-retro .mp-legend .lg-draw > span { min-width: 0; }
   html.mp-retro .mp-legend .lg-hint { display: none !important; }
   html.mp-retro .lg-cg .st-sclab { min-width: 0; width: 100%; }
