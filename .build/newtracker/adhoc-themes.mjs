@@ -480,6 +480,7 @@ export const THEME_OF = {
   "greens-leadership-vote-impact": "trust-democracy",
   "greens-leader-awareness": "trust-democracy",
   "greens-leaders-familiarity": "trust-democracy",
+  "albanese-trust-golf-club-grant": "trust-democracy",
   // secnewgate
   "information-trust": "trust-democracy",
   "fed-govt-priorities": "trust-democracy",

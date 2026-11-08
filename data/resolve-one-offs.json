@@ -1,6 +1,6 @@
 {
-  "_about": "Resolve Political Monitor (Resolve Strategic, for The Sydney Morning Herald and The Age) one-off and occasional survey questions that do NOT channel into the auspol-tracker data model (voting intention, leader performance ratings, preferred prime minister, who-will-win expectations, party attributes and descriptors – the standing battery sits in polls.json and data/resolve-political-monitor.csv). Scope: the 48th parliament – waves of 2025-07-18 onward, the 17 Resolve waves on file in polls.json (latest: 2026-10-10; the 2025-08-16 and 2025-09-13 articles carried no topical questions). The Monitor publishes no questionnaire and no machine-readable one-off feed, so every wave's SMH/Age article (the url on the polls.json row) is the source: figures are the article's printed numbers verbatim (verbal figures like 'two in three' are noted in the entry's notes, never converted to numerals), question texts are our concise labels, and earlier readings cited only as trend references ride the notes rather than becoming entries of their own. Hand-curated like data/newspoll-one-offs.json; checked by .build/resolve-oneoffs.mjs – hand-edit the entries, never the generated field or key order.",
-  "generated": "2026-10-10",
+  "_about": "Resolve Political Monitor (Resolve Strategic, for The Sydney Morning Herald and The Age) one-off and occasional survey questions that do NOT channel into the auspol-tracker data model (voting intention, leader performance ratings, preferred prime minister, who-will-win expectations, party attributes and descriptors – the standing battery sits in polls.json and data/resolve-political-monitor.csv). Scope: the 48th parliament – waves of 2025-07-18 onward, the 18 Resolve waves on file in polls.json (latest: 2026-11-07; the 2025-08-16 and 2025-09-13 articles carried no topical questions). The Monitor publishes no questionnaire and no machine-readable one-off feed, so every wave's SMH/Age article (the url on the polls.json row) is the source: figures are the article's printed numbers verbatim (verbal figures like 'two in three' are noted in the entry's notes, never converted to numerals), question texts are our concise labels, and earlier readings cited only as trend references ride the notes rather than becoming entries of their own. Hand-curated like data/newspoll-one-offs.json; checked by .build/resolve-oneoffs.mjs – hand-edit the entries, never the generated field or key order.",
+  "generated": "2026-11-07",
   "_readme": "Emission rules:\n- Scope: topical/occasional questions only. Excluded standing battery (channeled elsewhere): primary vote (incl. leadership-scenario primaries), leaders' good/poor performance, net likeability, preferred PM (two- and three-way), who-will-win, party attributes/descriptors, personal well-being index, vote firmness.\n- One entry per question per wave. A question asked in several waves shares one id and becomes a series (most-important-issue, cgt-discount-removal, negative-gearing-restriction, trust-tax-increase, lower-house-prices, cost-of-living-blame, immigration-level, preferred-coalition-leader).\n- Six ids are shared with the other houses' stores where the construct is the same question: immigration-level (SEC Newgate), gender-quotas-coalition, liberal-direction, economy-outlook-6m, preferred-coalition-leader (Essential), most-important-issue (News24).\n- All figures are all-voters percentages printed in the wave's article; cells a wave never printed are null – never inferred from complements or trend sentences. Verbal-only figures ('two in three', 'almost a third', 'the third opposed', 'one in five') are covered by notes; the bar stays blank unless a numeral was also printed.\n- Trend history printed in a later article (e.g. 'up from 48 per cent in December') lives in the entry's notes as printed context, not as a new wave entry.\n- tables: the page's row shape – [label, ...values] with optional headers on crosstabbed reads; the first table is always the all-voters headline read. source repeats the wave article url for provenance.",
   "entries": [
     {
@@ -2084,6 +2084,134 @@
               "Larissa Waters",
               null,
               50
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cost-of-living-blame",
+      "waveDate": "2026-11-07",
+      "dateStart": "2026-11-02",
+      "dateEnd": "2026-11-07",
+      "published": "2026-11-08T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html",
+      "question": "Who do you hold most responsible for rising living costs?",
+      "notes": "Full eight-way breakdown this wave; responses sum to 99 per cent from rounding. Federal-Government blame eased 4 points from 46 per cent in October 2026; 'AI data centre construction' was offered for the first time (blank in earlier waves' columns).",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html",
+          "headers": null,
+          "rows": [
+            [
+              "Federal Government",
+              42
+            ],
+            [
+              "Global factors outside Australia's control",
+              26
+            ],
+            [
+              "The Reserve Bank of Aus. (RBA)",
+              7
+            ],
+            [
+              "State and territory governments",
+              5
+            ],
+            [
+              "Businesses",
+              3
+            ],
+            [
+              "Consumer spending",
+              2
+            ],
+            [
+              "AI data centre construction",
+              2
+            ],
+            [
+              "Unsure",
+              12
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "albanese-trust-golf-club-grant",
+      "waveDate": "2026-11-07",
+      "dateStart": "2026-11-02",
+      "dateEnd": "2026-11-07",
+      "published": "2026-11-08T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html",
+      "question": "Has the grants program and Albanese's Marrickville Golf Club grant changed your trust in the Prime Minister?",
+      "notes": "Asked after the $6 million Marrickville Golf Club grant story (Albanese's electorate of Grayndler). Same battery as September's albanese-trust-broken-promises: 'did not trust before this anyway' rose from 34 to 43 per cent and 'still trust' fell 26 to 20 since then. The all-voters row sums to 101 per cent from rounding.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html",
+          "headers": [
+            "",
+            "All voters",
+            "Labor voters",
+            "Coalition voters",
+            "Greens voters",
+            "ONP voters",
+            "Independent voters",
+            "Uncommitted voters",
+            "Marginal seats"
+          ],
+          "rows": [
+            [
+              "I did not trust Albanese before this anyway",
+              43,
+              10,
+              66,
+              24,
+              69,
+              33,
+              33,
+              43
+            ],
+            [
+              "I have lost trust in what Albanese says in the future",
+              22,
+              20,
+              18,
+              35,
+              21,
+              28,
+              27,
+              20
+            ],
+            [
+              "I still trust in what Albanese says and promises",
+              20,
+              47,
+              10,
+              22,
+              2,
+              9,
+              22,
+              20
+            ],
+            [
+              "Unsure",
+              16,
+              23,
+              6,
+              19,
+              8,
+              30,
+              18,
+              17
             ]
           ]
         }
