@@ -38,3 +38,5 @@
 {"ts":"2026-11-01T20:16:20.702Z","syd":"2026-11-02 07:16","pollster":"DemosAU","kind":"calMonth","anchor":"2026-11-01","release":"2026-12-14","open":"2026-12-01","close":"2026-12-27","winHalf":13,"rolled":false,"ahead":0}
 {"ts":"2026-11-03T20:17:18.215Z","syd":"2026-11-04 07:17","pollster":"YouGov","kind":"dated","anchor":"2026-11-04","release":"2026-11-17","open":"2026-11-17","close":"2026-11-17","winHalf":0,"rolled":false,"ahead":0}
 {"ts":"2026-11-04T20:15:49.679Z","syd":"2026-11-05 07:15","pollster":"Roy Morgan","kind":"dated","anchor":"2026-10-26","release":"2026-11-09","open":"2026-11-09","close":"2026-11-09","winHalf":0,"rolled":true,"ahead":0}
+{"ts":"2026-11-08T20:16:01.165Z","syd":"2026-11-09 07:16","pollster":"RedBridge/Accent","kind":"dated","anchor":"2026-11-08","release":"2026-11-29","open":"2026-11-22","close":"2026-12-06","winHalf":7,"rolled":false,"ahead":0}
+{"ts":"2026-11-08T20:16:01.165Z","syd":"2026-11-09 07:16","pollster":"Resolve","kind":"dated","anchor":"2026-11-08","release":"2026-12-06","open":"2026-11-29","close":"2026-12-13","winHalf":7,"rolled":false,"ahead":0}
