@@ -136,7 +136,12 @@ html.mp-retro .st-foot { margin-top: 12px; padding: 6px; border-top: 0 !importan
 html.mp-retro .changes button, html.mp-retro .tbl { font-size: 12px; color: #000; }
 html.mp-retro .changes button:hover { background: var(--rt-sel); color: #fff; }
 html.mp-retro .changes button:hover b, html.mp-retro .changes button:hover .dt { color: #fff; }
-html.mp-retro .vt-mode { border-radius: 0; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; }
+html.mp-retro .vt-modes { gap: 0; padding: 0; border: 0; border-radius: 0; }
+html.mp-retro .vt-mode { min-height: 23px; padding: 2px 12px; border-radius: 0; background: var(--rt-face); box-shadow: var(--rt-raised); color: #000; font-size: 12px; }
+@media (pointer: coarse) { html.mp-retro .vt-mode { min-height: 30px; } }
+html.mp-retro .vt-share { font-size: clamp(18px, 6.6cqw, 30px); letter-spacing: -.03em; }
+html.mp-retro .vt-skew { font-size: clamp(16px, 5.8cqw, 26px); }
+html.mp-retro .vt-label { font-size: clamp(11px, 3.6cqw, 15px); }
 html.mp-retro .vt-mode[aria-pressed="true"] { box-shadow: var(--rt-pressed); font-weight: 700; background: #e7e4dd; }
 html.mp-retro .vt-band { border-radius: 0; }
 
