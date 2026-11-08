@@ -2292,13 +2292,16 @@ function dockedFit(box, n) {
 let seaMemo = null, seaTop = { w: 0, top: 4 };
 function seaSpots(m, hb, A, p) {
   const cities = $("#cities"), hint = $("#hint");
-  if (cities && !cities.hidden && hint && hint.textContent) {
+  // (in full screen the cities and the hint ride a plate off the sea, so their
+  //  remembered foot is no obstacle; measuring one would shove the western
+  //  pair down onto the coast)
+  if (!FS.on && cities && !cities.hidden && hint && hint.textContent) {
     const st = $("#stage").getBoundingClientRect();
     let top = 4;
     for (const el of [cities, hint]) if (el.offsetHeight) top = Math.max(top, el.getBoundingClientRect().bottom - st.top + 14);
     seaTop = { w: Wpx, top };
   }
-  const top = seaTop.w === Wpx ? seaTop.top : isPhone() ? (FS.on ? FS.ins.t : 0) + 4 : p.t + 22;
+  const top = FS.on ? (isPhone() ? FS.ins.t : p.t) + (isPhone() ? 4 : 22) : seaTop.w === Wpx ? seaTop.top : isPhone() ? 4 : p.t + 22;
   const memo = [m.year, Wpx, Hpx, HOME.k, HOME.x, HOME.y, top].join();
   if (seaMemo && seaMemo.memo === memo) return seaMemo.out;
   const room = Hpx - p.t - p.b - (hb[1][1] - hb[0][1]) * HOME.k, at = ISL_AT[room >= 2 * (A + ISL_CAP + 8) ? "stacked" : "side"];
