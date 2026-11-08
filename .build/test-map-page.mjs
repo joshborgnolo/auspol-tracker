@@ -2563,6 +2563,25 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".st-xb-brace {") && css.includes(".st-xb-lab {"), "the crossbench bracket and label carry styles");
 }
 
+// the retro view (2026-11-08): the page itself as a website from about 2000 —
+// a navbar in the era's words (Home, Edit, View, Favorites, Help, each working on
+// this page), the banner, tab buttons, the old system face — and never a pretend
+// browser or desktop around it (user call: no artificial address bar, menus,
+// toolbar or taskbar). The behaviour is driven by .matilda/probe/map-retro.mjs
+{
+  const rt = part("app-8-retro.js"), rcss = part("retro.css"), html = R("map/index.html"), ui = part("app-6-ui.js"), base = part("app-1-base.js");
+  assert.ok(html.includes('id="retrogo"') && html.includes('localStorage.getItem("auspol.map.retro")==="1")document.documentElement.classList.add("mp-retro")'), "the eyebrow's Retro switch, and the head's inline script setting the look before the first paint");
+  assert.ok(!/rt-titlebar|rt-menubar|rt-toolbar|rt-address|rt-status|rt-taskbar|rt-start/.test(rt + rcss), "no pretend browser or desktop: no title bar, menu bar, toolbar, address bar, status bar or taskbar");
+  assert.ok(rt.includes('href="/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}'), "the navbar: Home (the site's home page), then Edit, View, Favorites and Help menus");
+  assert.ok(rt.includes('case "edit": return [') && rt.includes('"Find a seat or place…"') && rt.includes('"Copy link to this view"') && rt.includes('{ label: "Clear filters", disabled: !filtered, act: rtClearFilters }'), "Edit finds, copies the view's link and clears the filters");
+  assert.ok(rt.includes('{ label: "Full screen", kb: "F", act: () => fsEnter() }') && rt.includes('{ label: "Modern view", act: () => rtSet(false) }'), "View switches views, opens full screen, toggles city names and leaves the look");
+  assert.ok(rt.includes('const RT_KEY = "auspol.map.retro", RT_FAV_KEY = "auspol.map.favs";') && rt.includes("location.reload();") && rt.includes('!/^(retro|fs)=/.test(kv)'), "Favorites are views saved in this browser, their links without the look; a pick reloads on that view");
+  assert.ok(ui.includes('if (typeof rtIsOn === "function" && rtIsOn()) p.set("retro", "1");'), "the look rides the link");
+  assert.ok(base.includes('if (r.classList.contains("mp-retro")) return false;') && base.includes("if (typeof retroTheme === \"function\" && typeof rtIsOn === \"function\" && rtIsOn()) retroTheme(T);"), "the canvases take the flat palette, light whatever the device's theme");
+  assert.ok(rcss.includes("html:root.mp-retro {"), "the look's tokens outrank the page's dark ones (:root.sh-dark)");
+  assert.ok(rt.includes('if (e.key === "ArrowDown" || e.key === "ArrowUp") {') && rt.includes("e.preventDefault(); e.stopPropagation();"), "an open menu keeps the arrows from the map's year and lane walks");
+}
+
 // Controls share one stack; basis scales are no longer part of the panel.
 {
   const ui = part("app-6-ui.js"), css = part("page.css"), st = part("app-4-story.js");

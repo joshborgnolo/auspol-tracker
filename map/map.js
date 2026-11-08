@@ -13193,19 +13193,24 @@ PHONE.addEventListener("change", () => { if (!FS.on) return; fsLayout(); renderL
 
 /* =============================== the retro view ===============================
    The page itself as a website from about 2000 (retro.css draws it): a navy
-   banner with the flag, the title and Parliament House, the site's pages as
-   links along its top, tab buttons for the views, and the old system face
-   for every control — bevelled grey buttons, sunken white fields, navy
+   banner with the flag, the title and Parliament House; a navbar over it in
+   the era's words — Home, Edit, View, Favorites, Help — every one of them
+   working on this page (find a seat, copy the view's link, clear the filters,
+   switch views, full screen, city names, saved views, the notes), with the
+   site's pages at its right; tab buttons for the views; and the old system
+   face for every control — bevelled grey buttons, sunken white fields, navy
    caption bars over the panels. No pretend browser or desktop around it. The
    page's own elements are restyled, never rebuilt, so every control keeps
-   working; this part adds only the banner and the tab row (hidden outside
-   the view), with "Modern view" at the row's end for the way back.
+   working; this part adds only the navbar, the banner and the tab row
+   (hidden outside the view), with "Modern view" at the row's end.
    The choice persists in this browser (localStorage), and the hash carries
    retro=1 so a shared link opens in it; an inline script in the page's head
-   sets the class before the first paint. The canvases take a flat palette
+   sets the class before the first paint. Favorites are views saved in this
+   browser too (their links: a pick reloads the page on that view, since the
+   map reads its link when it loads). The canvases take a flat palette
    (retroTheme, read by readTheme), and the look stays light whatever the
    device's theme, as the era's did. */
-const RT_KEY = "auspol.map.retro";
+const RT_KEY = "auspol.map.retro", RT_FAV_KEY = "auspol.map.favs";
 // (a function, so code anywhere in the closure can ask before this part has run)
 function rtIsOn() { return typeof document !== "undefined" && document.documentElement.classList.contains("mp-retro"); }
 /* the canvases' flat palette: the page's paper for the sea and the ground
@@ -13221,13 +13226,16 @@ function retroTheme(T) {
   T.floor = [214, 226, 212];
   return T;
 }
-const RT = { built: false, drop: null, dropFor: null };
+const RT = { built: false, drop: null, dropFor: null, dropKey: null, items: null };
 const RT_ICON = {
   fs: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`,
   modern: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9"/><path d="M2.4 2.2v2.6h2.6"/></svg>`,
   shade: `<svg width="9" height="9" viewBox="0 0 9 9" aria-hidden="true"><path d="M1 6.5h7" stroke="#000" stroke-width="1.8"/></svg>`,
   unshade: `<svg width="9" height="9" viewBox="0 0 9 9" aria-hidden="true"><path d="M1 1.5h7v6H1z M1 2.5h7" fill="none" stroke="#000" stroke-width="1.2"/></svg>`,
   dd: `<svg width="7" height="4" viewBox="0 0 7 4" aria-hidden="true"><path d="M0 0h7L3.5 4z" fill="currentColor"/></svg>`,
+  home: `<svg class="rt-ic" width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.6 8 8 2.2 14.4 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3.6 7v7h3.2v-4h2.4v4h3.2V7" fill="currentColor"/></svg>`,
+  star: `<svg class="rt-ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.7 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8l-5.8 3.3 1.5-6.4-4.9-4.3 6.5-.6z" fill="#ffd21c" stroke="#a36a00" stroke-linejoin="round"/></svg>`,
+  x: `<svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><path d="M1 1l6 6M7 1L1 7" stroke="currentColor" stroke-width="1.5"/></svg>`,
 };
 // a star of n points about (cx, cy), outer radius r, inner ratio k
 const rtStar = (cx, cy, r, n = 7, k = 0.44) => {
@@ -13250,24 +13258,29 @@ function rtHouseSVG() {
     <path d="M98.6 19 H111.4 M95.4 28 H114.6" stroke-width=".7"/></g>
     <path d="M105.6 2.4 h10 v6 h-10z" fill="#00247d" stroke="#cfe0ff" stroke-width=".6"/><path d="M105.6 2.4 h4 v3 h-4z" fill="#cf142b" opacity=".85"/></svg>`;
 }
-// the site's pages, read off the shell's own tabs and More menu (so they never drift from it)
+// the site's pages, read off the shell's own tabs and More menu (so they never drift from it); the home page is the navbar's Home
 function rtPages() {
-  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: a.getAttribute("href") }));
+  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: a.getAttribute("href") })).filter((p) => p.href !== "/");
   const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === a.getAttribute("href"))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: a.getAttribute("href"), on: a.dataset.id === "map" }));
   return { tabs, more };
 }
 
-/* ----- building the banner and the tab row (once; retro.css hides them outside the view) ----- */
+/* ----- building the navbar, the banner and the tab row (once; retro.css hides them outside the view) ----- */
 function rtBuild() {
   if (RT.built) return;
   const sec = $(".mp-sec"), eb = $(".mp-sec > .rd-eyebrow");
   if (!sec || !eb) return;
   RT.built = true;
   const { tabs: pages } = rtPages();
+  const menu = (k, label, extra = "") => `<button type="button" class="rt-ni" data-rt-menu="${k}" aria-haspopup="menu" aria-expanded="false">${extra}${label}</button>`;
   const top = document.createElement("div");
   top.className = "rt-top rt-only";
-  top.innerHTML = `<nav class="rt-nav" aria-label="Site"><a class="rt-site" href="/">auspol tracker</a><span class="rt-navgap"></span>${pages.map((p) => `<a href="${esc(p.href)}">${esc(p.label)}</a>`).join("")}<button type="button" class="rt-more" aria-haspopup="menu" aria-expanded="false">More pages ${RT_ICON.dd}</button></nav>
-    <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${rtFlagSVG()}</a><div class="rt-bcol"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></div>${rtHouseSVG()}</div>
+  top.innerHTML = `<nav class="rt-nav" aria-label="Site and page">
+      <a class="rt-ni" href="/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}
+      <span class="rt-navgap"></span>
+      <span class="rt-pages">${pages.map((p) => `<a href="${esc(p.href)}">${esc(p.label)}</a>`).join("")}${menu("more", `More pages ${RT_ICON.dd}`)}</span>${menu("pages", `Pages ${RT_ICON.dd}`).replace('class="rt-ni"', 'class="rt-ni rt-pagesb"')}
+    </nav>
+    <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${rtFlagSVG()}</a><div class="rt-bcol"><a class="rt-kicker" href="/">auspol tracker</a><span class="rt-bline"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></span></div>${rtHouseSVG()}</div>
     <div class="rt-tabs" role="tablist" aria-label="View"></div>`;
   eb.before(top);
   // the view tabs: proxies for the eyebrow's switch (it parks in full screen's plate), full screen, and the way back
@@ -13280,7 +13293,7 @@ function rtBuild() {
   }
   row.insertAdjacentHTML("beforeend", `<button type="button" data-rt-do="fs" title="Full screen (F)">${RT_ICON.fs}<span class="rt-tl">Full screen</span></button><button type="button" class="rt-modern" data-rt-do="modern" title="Back to the modern look">${RT_ICON.modern}<span class="rt-tl">Modern view</span></button>`);
   const drop = document.createElement("div");
-  drop.className = "rt-drop"; drop.hidden = true; drop.setAttribute("role", "menu"); drop.setAttribute("aria-label", "More pages");
+  drop.className = "rt-drop"; drop.hidden = true; drop.setAttribute("role", "menu");
   document.body.append(drop);
   RT.drop = drop;
   // the meta line mirrors into the banner; the view switch's choice into the tabs
@@ -13308,25 +13321,127 @@ function rtSync() {
   rtShadeBtn();
 }
 
-/* ----- the More pages menu ----- */
-function rtOpenMore(anchor) {
+/* ----- Favorites: views saved in this browser ----- */
+function rtFavs() {
+  try { const v = JSON.parse(localStorage.getItem(RT_FAV_KEY) || "[]"); return Array.isArray(v) ? v.filter((f) => f && typeof f.h === "string" && typeof f.t === "string") : []; } catch (e) { return []; }
+}
+function rtFavsSave(list) { try { localStorage.setItem(RT_FAV_KEY, JSON.stringify(list.slice(0, 30))); return true; } catch (e) { return false; } }
+// the view's own link, without the look or full screen (a favourite opens in whatever look is on)
+const rtViewHash = () => location.hash.replace(/^#/, "").split("&").filter((kv) => kv && !/^(retro|fs)=/.test(kv)).join("&");
+// a favourite names itself by the panel's title, the lens where it isn't the default, and the election where the title doesn't say
+function rtFavLabel() {
+  const h2 = $("#story .st-head h2"), name = h2 ? [...h2.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : "Electoral map";
+  const parts = [name];
+  if (S.f.cls && S.f.st && S.sel.level === "state") parts[0] = `${name}, ${STATE_SHORT[S.f.st]}`;
+  if (S.lens !== "winner") parts.push(lensShort());
+  if (!/today|election|\d{4}/i.test(name)) parts.push(isNowY(S.year) ? "now" : yearLabel(S.year));
+  return parts.join(" · ");
+}
+function rtFavAdd(anchor) {
+  const h = rtViewHash(), list = rtFavs();
+  if (list.some((f) => f.h === h)) { rtNote(anchor, "Already in Favorites"); return; }
+  list.unshift({ t: rtFavLabel(), h });
+  rtNote(anchor, rtFavsSave(list) ? "Added to Favorites" : "This browser won’t keep Favorites");
+}
+function rtFavGo(i) {
+  const f = rtFavs()[i]; if (!f) return;
+  if (f.h === rtViewHash()) return;
+  // the map reads its link as it loads: the saved view opens on a fresh load of it
+  location.hash = f.h + (rtIsOn() ? (f.h ? "&" : "") + "retro=1" : "");
+  location.reload();
+}
+function rtFavDel(i) { const list = rtFavs(); list.splice(i, 1); rtFavsSave(list); }
+
+/* ----- the menus ----- */
+function rtMenuItems(k) {
+  const filtered = !!(S.f.st || S.f.cls);
+  switch (k) {
+    case "edit": return [
+      { label: "Find a seat or place…", kb: "/", act: rtFind },
+      { label: "Copy link to this view", act: rtCopy },
+      { sep: true },
+      { label: "Clear filters", disabled: !filtered, act: rtClearFilters },
+    ];
+    case "view": return [
+      { label: "Map", radio: S.view === "map", act: () => setView("map") },
+      { label: "Chamber", radio: S.view === "chamber", act: () => setView("chamber") },
+      { label: "List", radio: S.view === "list", act: () => setView("list") },
+      { sep: true },
+      { label: "Full screen", kb: "F", act: () => fsEnter() },
+      { label: "City names", check: !S.townsOff, disabled: S.view !== "map", act: () => { const b = $("[data-towns]"); if (b) b.click(); } },
+      { sep: true },
+      { label: "Modern view", act: () => rtSet(false) },
+    ];
+    case "fav": {
+      const favs = rtFavs();
+      return [
+        { label: "Add this view to Favorites", act: () => rtFavAdd(RT.dropFor) },
+        { sep: true },
+        ...(favs.length ? favs.map((f, i) => ({ label: f.t, fav: i, current: f.h === rtViewHash() })) : [{ label: "No favourites yet", disabled: true }]),
+      ];
+    }
+    case "help": return [
+      { label: "How the map is built", act: () => { const n = $(".mp-notes"); if (n) n.scrollIntoView({ behavior: "smooth", block: "start" }); } },
+      { label: "Send feedback…", href: "/feedback/" },
+    ];
+    case "more": return rtPages().more.map((p) => ({ label: p.label, href: p.href, check: p.on }));
+    case "pages": { const { tabs, more } = rtPages(); return [...tabs.map((p) => ({ label: p.label, href: p.href })), { sep: true }, ...more.map((p) => ({ label: p.label, href: p.href, check: p.on }))]; }
+  }
+  return [];
+}
+function rtRenderMenu() {
+  const items = rtMenuItems(RT.dropKey);
+  RT.items = items;
+  RT.drop.innerHTML = items.map((it, i) => {
+    if (it.sep) return "<hr>";
+    const mark = it.radio ? "●" : it.check ? "✓" : "";
+    const inner = `<span class="rt-ck">${mark}</span><span class="rt-it">${esc(it.label)}</span>${it.kb ? `<span class="rt-kb">${esc(it.kb)}</span>` : ""}`;
+    if (it.fav != null) return `<div class="rt-favrow"><button type="button" role="menuitem" data-rt-fav="${it.fav}" tabindex="-1"${it.current ? ' aria-current="page"' : ""}>${inner}</button><button type="button" class="rt-favdel" data-rt-favdel="${it.fav}" tabindex="-1" aria-label="Remove ${esc(it.label)} from Favorites" title="Remove from Favorites">${RT_ICON.x}</button></div>`;
+    return it.href ? `<a role="menuitem" href="${esc(it.href)}" tabindex="-1"${it.check ? ' aria-current="page"' : ""}>${inner}</a>` : `<button type="button" role="menuitem" data-rt-item="${i}" tabindex="-1"${it.disabled ? " disabled" : ""}>${inner}</button>`;
+  }).join("");
+}
+function rtOpenMenu(k, anchor) {
   if (!RT.drop) return;
   if (RT.dropFor === anchor && !RT.drop.hidden) { rtCloseMenu(); return; }
-  const { more } = rtPages(), d = RT.drop;
-  d.innerHTML = more.map((p) => `<a role="menuitem" href="${esc(p.href)}" tabindex="-1"${p.on ? ' aria-current="page"' : ""}><span class="rt-ck">${p.on ? "✓" : ""}</span><span>${esc(p.label)}</span></a>`).join("");
-  RT.dropFor = anchor; d.hidden = false;
+  rtCloseMenu();
+  RT.dropKey = k; RT.dropFor = anchor;
+  RT.drop.setAttribute("aria-label", anchor.textContent.trim());
+  rtRenderMenu();
+  const d = RT.drop;
+  d.hidden = false;
   const r = anchor.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight;
-  d.style.left = `${Math.max(2, Math.min(r.right - w, innerWidth - w - 2))}px`;
-  d.style.top = `${Math.min(r.bottom + 2, innerHeight - h - 2)}px`;
+  const right = k === "more" || k === "pages";
+  d.style.left = `${Math.max(2, Math.min(right ? r.right - w : r.left, innerWidth - w - 2))}px`;
+  d.style.top = `${Math.min(r.bottom + 1, innerHeight - h - 2)}px`;
   anchor.setAttribute("aria-expanded", "true");
-  d.querySelector("a")?.focus({ preventScroll: true });
+  (d.querySelector("button:not(:disabled), a"))?.focus({ preventScroll: true });
 }
 function rtCloseMenu() {
   if (!RT.drop || RT.drop.hidden) return;
   RT.drop.hidden = true;
   if (RT.dropFor) RT.dropFor.setAttribute("aria-expanded", "false");
-  RT.dropFor = null;
+  RT.dropFor = null; RT.dropKey = null;
 }
+// a pale note under a navbar item for a moment (Added to Favorites, Link copied)
+function rtNote(anchor, text) {
+  if (!anchor) return;
+  const n = document.createElement("div");
+  n.className = "rt-note"; n.setAttribute("role", "status"); n.textContent = text;
+  document.body.append(n);
+  const r = anchor.getBoundingClientRect();
+  n.style.left = `${Math.max(4, Math.min(r.left, innerWidth - n.offsetWidth - 4))}px`;
+  n.style.top = `${r.bottom + 4}px`;
+  setTimeout(() => n.remove(), 1800);
+}
+
+/* ----- what the menus do ----- */
+function rtFind() { const q = $("#q"); if (!q) return; q.scrollIntoView({ block: "nearest", behavior: "smooth" }); q.focus({ preventScroll: true }); }
+function rtCopy() {
+  const a = $('.rt-nav [data-rt-menu="edit"]');
+  const done = () => rtNote(a, "Link copied");
+  try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).then(done, () => rtNote(a, "Couldn’t copy the link")); else rtNote(a, "Couldn’t copy the link"); } catch (e) { rtNote(a, "Couldn’t copy the link"); }
+}
+function rtClearFilters() { S.f.cls = null; if (S.sel.level === "state") goAus(); else { S.f.st = null; filtersChanged(); } }
 
 function rtSet(on, o = {}) {
   if (on) rtBuild();
@@ -13348,8 +13463,14 @@ function rtSet(on, o = {}) {
 $("#retrogo")?.addEventListener("click", () => rtSet(!rtIsOn()));
 document.addEventListener("click", (e) => {
   if (!rtIsOn()) return;
-  const more = e.target.closest(".rt-more");
-  if (more) { rtOpenMore(more); return; }
+  const mb = e.target.closest("[data-rt-menu]");
+  if (mb) { rtOpenMenu(mb.dataset.rtMenu, mb); return; }
+  const del = e.target.closest("[data-rt-favdel]");
+  if (del) { rtFavDel(+del.dataset.rtFavdel); rtRenderMenu(); (RT.drop.querySelector("button:not(:disabled), a"))?.focus({ preventScroll: true }); return; }
+  const fav = e.target.closest("[data-rt-fav]");
+  if (fav) { const i = +fav.dataset.rtFav; rtCloseMenu(); rtFavGo(i); return; }
+  const it = e.target.closest("[data-rt-item]");
+  if (it && RT.items) { const f = RT.items[+it.dataset.rtItem], anchor = RT.dropFor; rtCloseMenu(); if (f && f.act && !it.disabled) { RT.dropFor = anchor; f.act(); RT.dropFor = null; } return; }
   if (RT.drop && !RT.drop.hidden && !e.target.closest(".rt-drop")) rtCloseMenu();
   const v = e.target.closest("[data-rt-view]");
   if (v) { setView(v.dataset.rtView); return; }
@@ -13364,13 +13485,27 @@ document.addEventListener("click", (e) => {
     if (!shut) { paintMiniChamber(); hydrateDists(); }
   }
 });
+// along the navbar with one menu open, the next menu opens under the pointer, as the old menus did
+document.addEventListener("mouseover", (e) => {
+  if (!rtIsOn() || !RT.drop || RT.drop.hidden || !RT.dropFor) return;
+  const mb = e.target.closest(".rt-nav [data-rt-menu]");
+  if (mb && mb !== RT.dropFor) rtOpenMenu(mb.dataset.rtMenu, mb);
+});
 document.addEventListener("keydown", (e) => {
   if (!rtIsOn() || !RT.drop || RT.drop.hidden) return;
   if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); const a = RT.dropFor; rtCloseMenu(); if (a) a.focus({ preventScroll: true }); return; }
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-    e.preventDefault();
-    const xs = $$("a", RT.drop), i = xs.indexOf(document.activeElement);
+    // (the menu's own: an open menu keeps the arrows from the map's year and lane walks)
+    e.preventDefault(); e.stopPropagation();
+    const xs = $$("[role=menuitem]:not(:disabled)", RT.drop), i = xs.indexOf(document.activeElement);
     if (xs.length) xs[(i + (e.key === "ArrowDown" ? 1 : -1) + xs.length) % xs.length].focus({ preventScroll: true });
+  }
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    // the menu bar's own walk: the neighbouring menu opens
+    const ms = $$(".rt-nav [data-rt-menu]").filter((b) => b.offsetParent), i = ms.indexOf(RT.dropFor);
+    if (i < 0) return;
+    e.preventDefault(); e.stopPropagation();
+    rtOpenMenu(ms[(i + (e.key === "ArrowRight" ? 1 : -1) + ms.length) % ms.length].dataset.rtMenu, ms[(i + (e.key === "ArrowRight" ? 1 : -1) + ms.length) % ms.length]);
   }
 }, true);
 addEventListener("scroll", () => { if (RT.drop && !RT.drop.hidden) rtCloseMenu(); }, { passive: true });
