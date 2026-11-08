@@ -89,7 +89,7 @@
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* the party colours outside the canvas: keys, tallies, timeline, the same
      bright set the map paints (readTheme's table in app-1-base.js; keep in step) */
-  --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #14ad4a; --m-onp: #ff8c00; --m-ind: #9b62d0; --m-csa: #00a9c4; --m-oth: #9a9a9a;
+  --m-alp: #f7310a; --m-lnp: #1432d5; --m-grn: #14ad4a; --m-onp: #ff8c00; --m-ind: #9b62d0; --m-csa: #00a9c4; --m-oth: #9a9a9a;
   /* the pinned tab bar's height: the view sticks just under it */
   --pin-top: 62px;
   color-scheme: light;
@@ -105,13 +105,13 @@
     --line-2:    oklch(0.312 0.010 66);
     --accent:    oklch(0.70 0.080 205);
     --surface:   oklch(0.235 0.010 65);
-    --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d;
+    --m-alp: #f7310a; --m-lnp: #1432d5; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d;
     color-scheme: dark;
   }
 }
 </style>
 <script>try{if(/[#&]retro=1(&|$)/.test(location.hash)||localStorage.getItem("auspol.map.retro")==="1")document.documentElement.classList.add("mp-retro")}catch(e){}</script>
-<link rel="stylesheet" href="/map/map.css?v=ea790784">
+<link rel="stylesheet" href="/map/map.css?v=0c5b9966">
 <!--map-data-warm:begin-->
 <script id="map-data-warm">(function(){var V={"core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"2c12c5d2","core-2007.json":"acc73f77","core-2010.json":"8fd8f038","core-2013.json":"1a0e8c2e","core-2016.json":"81c04117","core-2019.json":"0a749a5f","core-2022.json":"3874ab49","core-2025.json":"2ed4fa65","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","geo-1993-lo.json":"d5b83add","geo-1996-lo.json":"b3def3ba","geo-1998-lo.json":"e2c51765","geo-2001-lo.json":"a6606c1d","geo-2004-lo.json":"f1a3ae40","geo-2007-lo.json":"5cb6dd10","geo-2010-lo.json":"2f3e4725","geo-2013-lo.json":"f8051359","geo-2016-lo.json":"da0f2884","geo-2019-lo.json":"17e396f0","geo-2022-lo.json":"3d3e3056","geo-2025-lo.json":"194abc94","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-lo.json":"23ad692a","geo-qld17-lo.json":"e66797d1","geo-qld20-lo.json":"e66797d1","geo-qld24-lo.json":"e66797d1","geo-sa22-lo.json":"75ee7453","geo-sa26-lo.json":"73866149","geo-vic14-lo.json":"54485f1e","geo-vic18-lo.json":"54485f1e","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-lo.json":"46e32585","geo-wa21-lo.json":"1cd95bf6","geo-wa25-lo.json":"513ef944","islands.json":"10fe4949","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"e4cad3a7","res-2007.json":"2aef0639","res-2010.json":"5f093c88","res-2013.json":"45d956da","res-2016.json":"fb36f9cc","res-2019.json":"e190b88e","res-2022.json":"45d4952c","res-2025.json":"f26d4506","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a"};var NOW_OF={"now":"2025","nswnow":"nsw23","qldnow":"qld24","wanow":"wa25"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json","qldnow":"data-now-qld.json","wanow":"data-now-wa.json"};var y=(location.hash.match(/[#&]y=(\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>
 <!--map-data-warm:end-->
@@ -125,7 +125,7 @@
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
-:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d; color-scheme: dark; }
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #f7310a; --m-lnp: #1432d5; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d; color-scheme: dark; }
 </style>
 <!--/shell:head-->
 </head>

@@ -446,10 +446,11 @@ button { cursor: pointer; background: none; border: 0; }
 #story[data-lens="winner"] .st-inf + .st-foot { margin-top: 10px; }
 .st-note { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
 .st-note b { color: var(--ink-2); font-weight: 600; }
-.t-alp { color: var(--alp-text); } .t-lnp { color: var(--lnp-text); } .t-grn { color: var(--grn-text); } .t-onp { color: var(--onp-text); } .t-oth { color: var(--oth-text); }
-/* independents wear the map's mauve here; the shell's --ind-text slate reads
-   blue against the map fills */
-.t-ind { color: var(--m-ind); }
+/* the parties' figures in the list, the flows and the candidates wear the map's
+   own colours (--m-*, the fills and the head's big figures), not the shell's
+   muted text palette: a seat's swatch and its figures read as one party */
+.t-alp { color: var(--m-alp); } .t-lnp { color: var(--m-lnp); } .t-grn { color: var(--m-grn); } .t-onp { color: var(--m-onp); } .t-oth { color: var(--m-oth); }
+.t-ind { color: var(--m-ind); } .t-csa { color: var(--m-csa); }
 
 /* hero figures: the Now page's two-party read, a size down */
 .hero { margin-top: 18px; }
