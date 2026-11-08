@@ -3486,25 +3486,38 @@ function seaQuad(g, sea, q, s = 1, ox = 0, oy = 0, line = 0) {
 let seaCv = null, seaLay = null, prepKnown = null;
 /* An island the AEC draws and Esri's sea covers whole (Curtis Island, in
    Bass: Esri has it only as a reserve laid over its sea) would be cut away
-   with the sea. Each small ring of the seats' (under ~100 km2) is tested at
-   a point inside it against the sea of the tile it lies in, once a tile, and
-   one the sea swallows is cut back out of the mask, its AEC coast drawn. */
+   with the sea. Each small ring of the seats' (under ~100 km2) that is not
+   the seat's main body is tested at a few points inside it against the sea
+   of the tiles they lie in, once a tile, and one the sea holds at every
+   point read is cut back out of the mask, its AEC coast drawn.
+   Never the main body: a city seat is under 100 km2 itself, and the AEC
+   draws it across its harbour, so a seat whose middle fell on the water
+   (Warringah 2025 and Sydney 2010 and 2001, the middle of their bounds in
+   Port Jackson) was "rescued" whole and its AEC polygon laid back over
+   the harbour, angular across the water, while its neighbours' years
+   (North Sydney's middle is on land) showed Esri's harbour. One point
+   could equally read a river-split piece of land as sea, hence several. */
 // (a seat's small rings, made the first time the seat is in view at street zoom)
 function islets(g, i) {
   const all = (g.islets ??= []);
   if (all[i]) return all[i];
   const out = (all[i] = []), P = g.proj, ps = g.polys(i);
   if (ps) {
-    for (const pg of ps) {
-      const r = pg.outer; if (Math.abs(ringArea(r)) > 5) continue;
+    let main = 0, top = -1;
+    ps.forEach((pg, k) => { const a = Math.abs(ringArea(pg.outer)); if (a > top) { top = a; main = k; } });
+    ps.forEach((pg, k) => {
+      const r = pg.outer; if (k === main || Math.abs(ringArea(r)) > 5) return;
       const [cx, cy] = ringMid(r);
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       for (let k = 0; k < r.length; k += 2) { x0 = Math.min(x0, r[k]); x1 = Math.max(x1, r[k]); y0 = Math.min(y0, r[k + 1]); y1 = Math.max(y1, r[k + 1]); }
-      const pt = ringInside(r, cx, cy), path = new Path2D();
+      const path = new Path2D();
       for (let k = 0; k < r.length; k += 2) (k ? path.lineTo : path.moveTo).call(path, r[k], r[k + 1]);
       path.closePath();
-      out.push({ i, bb: [[x0, y0], [x1, y1]], at: merc(P.invert(pt)), path, seen: new WeakMap() });
-    }
+      // the middle, and the middle of the widest span a quarter and three quarters down
+      const pts = [ringInside(r, cx, cy), ringInside(r, NaN, y0 + (y1 - y0) / 4), ringInside(r, NaN, y0 + (3 * (y1 - y0)) / 4)]
+        .filter((p, k, a) => isFinite(p[0]) && a.findIndex((q) => q[0] === p[0] && q[1] === p[1]) === k);
+      out.push({ i, bb: [[x0, y0], [x1, y1]], at: pts.map((p) => ({ m: merc(P.invert(p)), seen: new WeakMap() })), path });
+    });
   }
   return out;
 }
@@ -3527,14 +3540,20 @@ function rescue(st, sg) {
   hitCtx.setTransform(1, 0, 0, 1, 0, 0);
   for (let i = 0; i < m.divs.length; i++) if (inBox(g.bb[i], x0, y0, x1, y1)) for (const r of islets(g, i)) {
     if (!inBox(r.bb, x0, y0, x1, y1)) continue;
-    for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
-      const n = 2 ** tz, u = r.at[0] * n - tx, v = r.at[1] * n - ty;
-      if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
-      let wet = r.seen.get(sea);
-      if (wet == null) r.seen.set(sea, (wet = hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s)));
-      if (wet) st.saved.push(r);
-      break;
+    // saved when every point a tile in hand reads is sea (and one at least is read)
+    let read = 0, dry = false;
+    for (const p of r.at) {
+      for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
+        const n = 2 ** tz, u = p.m[0] * n - tx, v = p.m[1] * n - ty;
+        if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
+        let wet = p.seen.get(sea);
+        if (wet == null) p.seen.set(sea, (wet = hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s)));
+        read++; if (!wet) dry = true;
+        break;
+      }
+      if (dry) break;
     }
+    if (read && !dry) st.saved.push(r);
   }
   if (!st.saved.length) return;
   sg.save();

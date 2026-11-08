@@ -2695,4 +2695,27 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(!/\.fs[^{]*\{[^}]*text-transform:\s*uppercase/.test(css), "no small caps in the full-screen plates");
 }
 
+// the street-zoom islet rescue (islets/rescue, app-2-map.js) never saves a seat's main body:
+// Warringah 2025 and Sydney 2010/2001 are under its ~100km2 cap whole, the middle of their
+// bounds in Port Jackson, and were laid back over the harbour as AEC land (user-reported
+// 2026-11-09: the 2025 polygon angular across the harbour, 2016-22 fine)
+{
+  const src = part("app-2-map.js");
+  const grab = (re) => { const m = src.match(re); assert.ok(m, `found ${re}`); return m[0]; };
+  const body = [
+    grab(/^const ringArea = .*$/m), grab(/^const ringMid = .*$/m),
+    grab(/^function islets\(g, i\) \{[\s\S]*?\n\}/m), grab(/^function ringInside\(r, cx, cy\) \{[\s\S]*?\n\}/m),
+  ].join("\n");
+  const { islets } = new Function("Path2D", "merc", `${body}; return { islets };`)(class { moveTo() {} lineTo() {} closePath() {} }, (p) => p);
+  const sq = (x, y, w) => Float64Array.from([x, y, x + w, y, x + w, y + w, x, y + w]);
+  const geo = (rings) => ({ proj: { invert: (p) => p }, polys: () => rings.map((outer) => ({ outer, holes: [] })) });
+  assert.equal(islets(geo([sq(0, 0, 2)]), 0).length, 0, "a small seat's only ring (a city seat across its harbour) is never an islet");
+  const two = islets(geo([sq(0, 0, 1.5), sq(5, 5, 1)]), 0);
+  assert.equal(two.length, 1, "of two small rings, the main (larger) one is never an islet");
+  assert.equal(two[0].bb[0][0], 5, "the smaller ring is the islet");
+  assert.ok(two[0].at.length >= 2 && two[0].at.every((p) => isFinite(p.m[0]) && isFinite(p.m[1])), "an islet is read at several points inside it, every one of which must be sea");
+  assert.equal(islets(geo([sq(0, 0, 20), sq(30, 30, 1)]), 0).length, 1, "an island off a big seat (Curtis Island off Tasmania, in Bass) is still an islet");
+  assert.ok(src.includes("if (read && !dry) st.saved.push(r);"), "a ring is saved only when every point a tile in hand reads is sea");
+}
+
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 and Victoria's 2022 frames on their own timeline rows, in the sitemap");

@@ -5,6 +5,9 @@
 //  2. the Hogan Group's rocks Esri draws and the AEC doesn't take Bass's colour: no plain
 //     paper-white land left round them (they read white before)
 //  3. the stage holds still as the zoom crosses to the polling places (the key grew 23px at 1400)
+//  4. Port Jackson reads as sea at street zoom in every year: a city seat is under the islet
+//     cap whole, and one whose bounds' middle fell on the harbour (Warringah 2025, Sydney
+//     2001-2013) was "rescued" as an islet and laid back across the water (fixed 2026-11-09)
 import puppeteer from "puppeteer-core";
 
 const base = process.argv[2];
@@ -40,6 +43,16 @@ for (const k of [120, 300]) {
   const r = await look([146.99, -39.215], k);
   ok(`no plain white land round the Hogan Group at k=${k}`, r.white < 40, `${r.white} white px`);
 }
+// 4. the harbour: the canvas pixel at a point in Port Jackson is the sea's pale blue, not a seat's fill
+const seaBlue = (c) => c[3] > 200 && c[2] >= 235 && c[1] - c[0] >= 10;
+for (const y of [2025, 2013, 2010, 2001, 2022]) {
+  await page.evaluate(async (y) => { window.__map.setYear(y); await new Promise((r) => setTimeout(r, 2500)); }, y);
+  for (const [name, ll] of [["the harbour by Shark Island", [151.258, -33.853]], ["Middle Harbour's mouth", [151.2428, -33.8046]]]) {
+    const r = await look(ll, 120);
+    ok(`${y}: ${name} reads as sea at street zoom`, seaBlue(r.mid), `rgba ${r.mid}`);
+  }
+}
+await page.evaluate(async () => { window.__map.setYear(2025); await new Promise((r) => setTimeout(r, 2500)); });
 // 3. the stage across the polling places' zoom, Melbourne
 const st = await page.evaluate(async () => {
   const o = [];
