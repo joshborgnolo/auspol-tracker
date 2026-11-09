@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 50.9
+      "alp": 51
     },
-    "imp": 50.9,
-    "pub": 49,
-    "on": 50.7,
+    "imp": 51,
+    "pub": 48.9,
+    "on": 50.8,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -215,7 +215,8 @@
       "2026-11-03|Spectre Strategy",
       "2026-11-03|YouGov",
       "2026-11-06|RedBridge/Accent",
-      "2026-11-07|Resolve"
+      "2026-11-07|Resolve",
+      "2026-11-08|Roy Morgan"
     ],
     "moves": {
       "alp|state|Non-NSW/Vic/Qld": 1,
@@ -320,13 +321,13 @@
     "prim": {
       "alp": 26.3,
       "grn": 13.5,
-      "lnp": 22.9,
+      "lnp": 22.7,
       "onp": 26.3,
-      "oth": 10.8
+      "oth": 11
     },
     "leaders": {
       "alb_fav": -22.9,
-      "alb_net": -23.6,
+      "alb_net": -23.5,
       "hanson_fav": -6.2,
       "hanson_net": -1.5,
       "taylor_fav": -2.3,
@@ -336,7 +337,7 @@
       "key": "alp_lnp|imp",
       "v": {
         "Agenda C Synesis": 0.8,
-        "DemosAU": -0.6,
+        "DemosAU": -0.7,
         "DemosAU (MRP)": 0.2,
         "Essential": -0.9,
         "Fox & Hedgehog": -1,
@@ -353,9 +354,9 @@
       }
     },
     "dir": {
-      "right": 24,
-      "wrong": 64.4,
-      "net": -40.4
+      "right": 23.9,
+      "wrong": 64.7,
+      "net": -40.8
     },
     "issLead": {
       "climate": "alp",
@@ -686,6 +687,13 @@
       "kind": "poll",
       "text": "Spectre Strategy (fieldwork 28 Oct–3 Nov, n=2,093) added — the two-party preferred estimate held at 50.9 (Labor v the Coalition, implied flows). Primary votes: Labor 26.4 → 26.3, the Coalition 23.0 → 22.9, One Nation 26.1 → 26.3, others 10.9 → 10.8. Leader ratings: Albanese’s net favourability −20.8 → −22.9, Taylor’s net approval −4.7 → −4.6, Taylor’s net favourability −2.1 → −2.3, Hanson’s net favourability −9.2 → −6.2. House effect (Labor v the Coalition, implied flows; positive leans Labor): Spectre Strategy −0.8 → −1.1.",
       "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb"
+    },
+    {
+      "date": "2026-11-09",
+      "label": "9 Nov 2026",
+      "kind": "poll",
+      "text": "Roy Morgan (fieldwork 26 Oct–8 Nov, n=2,574) added — the two-party preferred estimate moved 50.9 → 51.0 (Labor v the Coalition, implied flows). Primary votes: the Coalition 22.9 → 22.7, others 10.8 → 11.0. Leader ratings: Albanese’s net approval −23.6 → −23.5. National direction: right track 24.0 → 23.9, wrong track 64.4 → 64.7 (net −40.4 → −40.8). House effect (Labor v the Coalition, implied flows; positive leans Labor): Roy Morgan held at +0.1.",
+      "url": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026"
     }
   ]
 }
