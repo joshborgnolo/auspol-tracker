@@ -508,7 +508,8 @@ function chartDots(m) {
   const notes = `Each block is a seat, coloured by who ${chHeld(m)} it, stacked by its figure: a histogram whose blocks you can point at.${nat != null ? ` The upright line marks ${chPlace(m)}.` : ""}${miss ? ` ${miss} seat${miss > 1 ? "s have" : " has"} no figure here and ${miss > 1 ? "are" : "is"} left out.` : ""}`;
   const draw = (w, h) => {
     if (!all.length) return { svg: "", pts: [] };
-    const padL = 14, padR = 14, padT = 18, padB = 38;
+    // the national line's label owns a band above the stacks: the tallest stack (and the selected seat's ring) stops short of it
+    const padL = 14, padR = 14, padT = nat != null ? 32 : 18, padB = 38;
     const x0 = padL, x1 = w - padR, y0 = padT, y1 = h - padB;
     const vals = all.map((p) => p.x);
     let lo = d3.min(vals), hi = d3.max(vals);
@@ -532,7 +533,7 @@ function chartDots(m) {
     svg += `</g><text class="ch-lab" x="${x1}" y="${y1 + 32}" text-anchor="end">${esc(`${lab}, ${unit === "%" ? "%" : "points"}`)}</text>`;
     const ref = S.lens === "tpp" && S.tppMode !== "swing" ? 50 : c && (c.zero || c.diverge) ? 0 : S.lens === "flow" || S.lens === "senpref" ? 50 : null;
     if (ref != null && ref >= b0 && ref <= b0 + nb * bw) svg += `<line class="ch-ref" x1="${X(ref).toFixed(1)}" x2="${X(ref).toFixed(1)}" y1="${y0}" y2="${y1}"/>`;
-    if (nat != null) svg += chNatLine(X(nat), y0 - 8, y1, `${chPlace(m)} ${fu(nat)}`, x0, x1);
+    if (nat != null) svg += chNatLine(X(nat), 4, y1, `${chPlace(m)} ${fu(nat)}`, x0, x1);
     const sel = selDiv(), pts = [];
     let sp = null;
     bins.forEach((B, k) => {
