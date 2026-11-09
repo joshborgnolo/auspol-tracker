@@ -9545,6 +9545,29 @@ function areaFlowRows(m, idx) {
   if (!rows.length) return "";
   return flowRows(rows, { fam: "alp" }, { fam: S.vs === "onp" ? "onp" : "lnp" }, ["Labor", S.vs === "onp" ? "One Nation" : coalW(1).replace(/^The /, "")]);
 }
+/* the Senate-ballot reading's take on the flows chart: for the contest the
+   story reads, one row per donor cohort — a seat's tallies gathered over the
+   view's seats from the same cells spCells()'s walk indexes (by-elections
+   and states where a side stood no ticket sit out), split between ranking
+   the first party ahead and the second. The group-ticket years read as
+   tickets, like the lens's own finding does */
+function areaSpRows(m, idx) {
+  const s = spOf(m); if (!s) return "";
+  const word = spGvtYear(m.year) != null ? "tickets" : "ballots";
+  const [pa, pb] = SP_PAIRS[S.spPair];
+  const rows = [];
+  for (const d of SP_DONORS[S.spPair]) {
+    let k = -1, kk = 0, x = 0, y = 0;
+    for (const p of ["AC", "AO", "CO"]) for (const dd of SP_DONORS[p]) { if (p === S.spPair && dd === d) k = 3 * kk; kk++; }
+    for (const i of idx) {
+      const dv = m.divs[i], arr = dv.by || spAbsent(m, dv.st) ? null : s.divs[dv.n];
+      if (arr) { x += arr[k] || 0; y += arr[k + 1] || 0; }
+    }
+    if (x + y > 0) rows.push([d, x, y]);
+  }
+  if (!rows.length) return "";
+  return rows.map(([d, x, y]) => { const t = x + y, pc = (100 * x) / t; return `<div class="flow"><div class="fh"><div>${d === "oth" ? "Others and independents" : famLeg(d)}</div><span>${int(t)} ${word}</span></div><div class="fb"><i style="width:calc(${pc}% - 1px);${swc(pa)}"></i><i style="flex:1;${swc(pb)}"></i></div><div class="fl"><span><b class="${tx(pa)}">${f0(pc)}%</b> to ${spName(pa)}</span><span>${spName(pb)} <b class="${tx(pb)}">${f0(100 - pc)}%</b></span></div></div>`; }).join("");
+}
 function decileRows(get, labelFor) {
   return `<div class="dec">${IX.map((ix) => { const v = get(ix); const cells = Array.from({ length: 10 }, (_, k) => `<i style="${v && k + 1 <= v ? `background:${css(RAMP.seifa[Math.round((k / 9) * 100)])}` : ""}"></i>`).join(""); return `<div class="nm">${IX_NAME[ix]}<small>${IX_ABBR[ix]}${v ? ` · decile ${v}` : " · no score"}${labelFor ? labelFor(ix, v) : ""}</small></div><div class="cells" role="img" aria-label="Decile ${v ?? "unknown"} of 10">${cells}</div>`; }).join("")}</div>`;
 }
@@ -10551,6 +10574,9 @@ function storyArea(m, st) {
   // the preferences lens's own chart at every scope, not only beside a picked
   // seat: the flows pooled over this view's seats (user call 2026-11-10)
   if (S.lens === "flow") { const af = areaFlowRows(m, idx); if (af) h += `<div class="st-sec"><h3>Where preferences went <small>to Labor and ${vsW()}</small></h3>${af}</div>`; }
+  // and the Senate-ballot reading of the same tab (user call 2026-11-10):
+  // the lens's contest, broken out one row per donor cohort
+  if (S.lens === "senpref") { const sr = areaSpRows(m, idx); if (sr) h += `<div class="st-sec"><h3>Where preferences went <small>Senate ${spGvtYear(m.year) != null ? "tickets" : "ballots"}, ${spA()} ahead of ${spB()}</small></h3>${sr}</div>`; }
   const scopeSmall = cls ? `, ${CLS_LOWER[cls]}${aus ? "" : ` in ${STATE_SHORT[st]}`}` : aus ? "" : `, ${STATE_SHORT[st]}`;
   // (under a chart the stage already draws the seats' spread, so the rail doesn't repeat it)
   if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${scopeSmall}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;

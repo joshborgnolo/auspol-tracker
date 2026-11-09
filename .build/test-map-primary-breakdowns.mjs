@@ -20,11 +20,15 @@ const ctx = vm.createContext({
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
   famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab,
   prevYearOf: (y) => (y === 2025 ? 2022 : null), flowSeat: (d) => !!d.flowOk, ds: (s) => String(s), int: (v) => Math.round(v).toLocaleString("en-AU"), f0: (v) => Math.round(v).toString(),
+  SP_PAIRS: { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"], GO: ["grn", "onp"], GA: ["grn", "alp"], GC: ["grn", "lnp"] },
+  SP_DONORS: { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"], GO: ["alp", "lnp", "oth"], GA: ["lnp", "onp", "oth"], GC: ["alp", "onp", "oth"] },
+  spOf: (m) => m.spData || null, spAbsent: () => null, spGvtYear: (y) => (vmS.gvt ? 2013 : null),
+  spName: (fam) => (fam === "alp" ? "Labor" : fam === "onp" ? "One Nation" : "the Coalition"),
   isNowY: (y) => y === "now", frameBaseY: () => 2025, M: () => current, FS: { on: false },
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -169,5 +173,28 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
   assert.ok(!af.includes("99"), "seats outside the matchup stay out");
   assert.equal(api.areaFlowRows({ divs: [{ flowOk: false, alpSide: 0, flows: [{ cand: { b: "grn" }, ta: 1, tb: 1 }] }] }, [0]), "", "no eligible seats, no chart");
   delete vmS.vs;
+}
+// the Senate-ballot reading carries its own pooled chart: one row per donor
+// cohort in the lens's contest, tallies gathered over the view's seats from
+// the same cell slots spCells()'s walk indexes
+{
+  vmS.spPair = "AC"; vmS.spFrom = "grn";
+  const lens = [["AC", "grn"], ["AC", "onp"], ["AC", "oth"], ["AO", "lnp"], ["AO", "grn"], ["AO", "oth"], ["CO", "alp"], ["CO", "grn"], ["CO", "oth"]];
+  const arr = (rows) => { const a = new Array(54).fill(0); for (const [p, d, x, y] of rows) { const k = 3 * lens.findIndex(([q, e]) => q === p && e === d); a[k] = x; a[k + 1] = y; } return a; };
+  const spm = { year: 2025, spData: { divs: {
+    A: arr([["AC", "grn", 60, 40]]),
+    B: arr([["AC", "grn", 30, 20], ["AC", "oth", 10, 5], ["AC", "onp", 7, 3]]),
+  } }, divs: [{ n: "A" }, { n: "B" }] };
+  const sr = api.areaSpRows(spm, [0, 1]);
+  assert.ok(sr.includes("Greens") && sr.includes(">150 ballots<") && sr.includes(">60%<") && sr.includes(">40%<"), "a donor cohort pools across the view's seats, split to the contest's parties");
+  assert.ok(sr.includes("Others and independents") && sr.includes(">15 ballots<") && sr.includes(">67%<"), "the others-and-independents cohort pools too");
+  assert.ok(sr.includes("One Nation") && sr.includes(">10 ballots<") && sr.includes(">70%<"), "a second named cohort");
+  assert.ok(sr.includes("to Labor") && sr.includes("the Coalition"), "the bar's ends wear the contest's parties");
+  assert.ok(!sr.includes("tickets"), "a ballot-era year reads ballots");
+  vmS.gvt = true;
+  assert.ok(api.areaSpRows(spm, [0, 1]).includes("tickets"), "the ticket era reads as tickets");
+  delete vmS.gvt;
+  assert.equal(api.areaSpRows({ divs: [] }, [0]), "", "no Senate deck, no chart");
+  delete vmS.spPair; delete vmS.spFrom;
 }
 console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");
