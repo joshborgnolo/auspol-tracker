@@ -167,6 +167,14 @@ for (const y of new Set(Object.entries(frames).filter(([f]) => !/^(qld|sa)/.test
   assert.ok(draw.includes("fs.includes(fa) && fs.includes(fb)"), "a seat whose final two was the pairing keeps its count inside it");
 }
 
+/* ----- the contest row under Seats ----- */
+{ // a seats drawing has no say in the pairing, so the row greys, never drops (the pick's kept for the walk back)
+  assert.ok(ui.includes('S.draw === "seats" ?') && ui.includes("paint as balloons or a surface"), "as seats the contest row greys with the reason on it, rather than leaving");
+  assert.ok(ui.includes('opt("axis", pair, axisOpts(m), off)'), "the greyed row names the contest in force (seats counts the counted one)");
+  assert.ok(ui.includes("function lgMenu(key, items, cur, aria, off)"), "a panel menu can grey whole by its state");
+  assert.ok(R(".build/map/app/page.css").includes(".lg-bmenu > .st-sclab:disabled"), "the greyed trigger is styled like an unfit Draw chip");
+}
+
 /* ----- the wiring ----- */
 assert.ok(/closest\("[^"]*\[data-draw\][^"]*"\)/.test(ui), "the page's click handler listens for the drawing's buttons");
 assert.ok(ui.includes('if (t.dataset.draw) { setDraw(t.dataset.draw); return; }'), "and acts on them");

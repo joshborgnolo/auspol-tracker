@@ -1269,6 +1269,12 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-fj-menu { display: none; }
 .lg-bmenu .st-scm button:disabled { color: var(--ink-faint); cursor: not-allowed; }
 .lg-bmenu .st-scm button:disabled:hover { background: none; }
+/* a whole menu greyed by the state (the two-party contest under Seats): the
+   trigger reads like an unfit Draw chip, still titled with the reason — the
+   lg-sub's ink rule is specific, so these out-specify it outright */
+.lg-bmenu > .st-sclab:disabled { color: var(--ink-faint); cursor: not-allowed; }
+.mp-legend .lg-sub .lg-bmenu > .st-sclab:disabled { color: var(--ink-faint); }
+.mp-legend .lg-sub .lg-bmenu > .st-sclab:disabled:hover { color: var(--ink-faint); text-decoration: none; }
 
 /* ------- the lens's own block under Base (legendHTML's lg-sub) -------
    A lens's settings and notes hang beneath the Base row as its children —

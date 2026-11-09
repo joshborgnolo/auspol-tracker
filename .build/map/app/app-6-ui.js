@@ -270,12 +270,13 @@ function senLegendHeight(sm, w, probe) {
 // the current pick's own word beside its chevron, the panel opening to its
 // items (2026-11-08: native <select>s leave the panel for it)
 const LG_CHEVRON = `<svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-function lgMenu(key, items, cur, aria) {
+function lgMenu(key, items, cur, aria, off) {
   const text = (items.find(([v]) => v === cur) || items.find(([v, t]) => t != null))[1] ?? "";
   // a curious value of `null` is a group heading, not a pickable item
-  // (an item's third and fourth places: unavailable here, and why)
+  // (an item's third and fourth places: unavailable here, and why; `off` greys the whole
+  // menu out where the state can't use it, the reason its trigger's hover title)
   const itemHtml = ([v, t, off, why]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1"${off ? ` disabled title="${esc(why || "")}"` : ""}>${esc(t)}</button>`;
-  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
+  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger${off ? ` disabled title="${esc(off)}"` : ""} aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
 }
 function lgMenuParts(wrap) {
   return !wrap ? null : { menu: wrap.querySelector(":scope > .st-scm"), trigger: wrap.querySelector("[data-lg-trigger],[data-basis-trigger]") };
@@ -363,7 +364,7 @@ function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
-  const opt = (name, cur, list) => lgMenu(name, list, cur, name);
+  const opt = (name, cur, list, off) => lgMenu(name, list, cur, name, off);
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
   // the Draw switch leads the strip's close on the map view — its note right after
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
@@ -378,8 +379,12 @@ function legendHTML(m) {
     case "tpp": {
       const sw = S.tppMode === "swing", pair = axisNow(m);
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
-      // as balloons or a surface, where One Nation stood widely, the two parties can be another two
-      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts(m))}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      // as balloons or a surface, where One Nation stood widely, the two parties can be another two.
+      // As seats the pairing has no say, so the row hangs greyed, the pick kept for the walk back
+      if (!sw && S.view === "map" && axisFrame(m) != null) {
+        const off = S.draw === "seats" ? `Seats counts Labor v ${coalW(0)} — the other contests paint as balloons or a surface` : "";
+        h += `<div class="lg-t lg-contest"${off ? ` title="${off}"` : ""}>${opt("axis", pair, axisOpts(m), off)}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      }
       if (pair !== "AC") break;
       if (boothsOn && sw) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
