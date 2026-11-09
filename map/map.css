@@ -428,7 +428,10 @@ button { cursor: pointer; background: none; border: 0; }
 .st-sec + .st-find, .st-stat + .st-find { margin-top: 12px; }
 /* (a card with no figures to lead it opens on its finding, a size up) */
 .st-find-lead { margin-top: 12px; font-size: 17px; line-height: 1.4; }
-#story[data-lens="winner"] .st-find { font-family: "Commissioner", var(--sans); }
+/* the view-writes-it prose reads in Commissioner in every lens (user call
+   2026-11-09: view-dependent text like the informal finding takes the
+   winner running copy's face) */
+#story .st-find { font-family: "Commissioner", var(--sans); }
 .st-dek { margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .st-dek b { color: var(--ink); font-weight: 600; }
 /* every lens's junctions wear the winner model's twin rule (user call: the
@@ -621,10 +624,12 @@ button { cursor: pointer; background: none; border: 0; }
 /* the credit line closes the story on the junctions' twin rule, in every lens
    (the margin list's informal line takes it too, .st-inf above) */
 .st-foot { margin-top: 28px; padding-top: 10px; border-top: 4px double var(--line); font-size: 12px; line-height: 1.5; color: var(--ink-3); }
-/* winner story: the running copy takes the head figures' Commissioner */
+/* winner story: the section bodies and credit line take the head figures'
+   Commissioner — the finding (above) and the qualifier notes wear it in
+   every lens (the notes are the same view-written prose family) */
 #story[data-lens="winner"] .st-sec,
-#story[data-lens="winner"] .st-note,
 #story[data-lens="winner"] .st-foot { font-family: "Commissioner", var(--sans); }
+#story .st-note { font-family: "Commissioner", var(--sans); }
 /* the junctions' twin rule is .st-sec's base — the one suppression is a
    section straight after the head figures, whose own closing rule already
    divides it. (No .st-dek suppression: the senate head ends on a dek with no

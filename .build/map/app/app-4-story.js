@@ -676,6 +676,10 @@ function seatStat(m, st, label, noteDef = null) {
    2026-11-07), keeping the head's filters — a state or seat type pools its
    own rate (scopeArea), exactly as the head's figures do */
 function informalHTML(m, st) {
+  // the informal lens's own finding carries the rate, so this line repeated
+  // it (user call 2026-11-09); the NSW exhaust view's finding reads
+  // exhaustion instead, so the rate line still earns its place there
+  if (S.lens === "informal" && infModeOf(m) !== "exhaust") return "";
   const { A } = scopeArea(m, st);
   if (A.infPct == null) return "";
   /* a filtered view contrasts itself with the frame's average, the same
@@ -1365,9 +1369,13 @@ function storyDiv(m, i) {
   const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
   /* the national view's plain line, with the seat's comparison inside it
-     (user call 2026-11-08 — the big-figure head block lasted the day) */
+     (user call 2026-11-08 — the big-figure head block lasted the day). The
+     informal lens's own head already carries it, dropping the line (user
+     call 2026-11-09); the NSW exhaust view's head reads another figure, so
+     the line stays */
   const infWhere = m.areas.AUS ? "national average" : `${ausW()} average`;
-  h += d.infPct == null && d.by ? `<div class="st-inf"><b>Informal votes:</b> no count filed for the by-election yet</div>${byTurnout}` : `<div class="st-inf"><b>Informal votes:</b> ${f1(d.infPct)}%${infCmp != null ? ` (vs ${infWhere} ${f1(infCmp)}%)` : ""}</div>${byTurnout}`;
+  const infHide = S.lens === "informal" && infModeOf(m) !== "exhaust";
+  h += infHide ? byTurnout : d.infPct == null && d.by ? `<div class="st-inf"><b>Informal votes:</b> no count filed for the by-election yet</div>${byTurnout}` : `<div class="st-inf"><b>Informal votes:</b> ${f1(d.infPct)}%${infCmp != null ? ` (vs ${infWhere} ${f1(infCmp)}%)` : ""}</div>${byTurnout}`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
   const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${origV != null ? `${f0(100 * origV)}% ${COB_VERB[S.cob]}` : `${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}`}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}${d.demo.pt != null ? `, ${f0(100 * d.demo.pt)}% ${DM_VERB.pt}` : ""}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${d.demo.noncit != null ? `<dt>Citizenship</dt><dd>${f0(100 * d.demo.noncit)}% ${DM_VERB.noncit}</dd>` : ""}${d.demo.bigfam != null ? `<dt>Children</dt><dd>${f0(100 * d.demo.bigfam)}% ${DM_VERB.bigfam}</dd>` : ""}${d.demo.hl != null ? `<dt>Home</dt><dd>${f0(100 * d.demo.hl)}% ${DM_VERB.hl}</dd>` : ""}` : "";
