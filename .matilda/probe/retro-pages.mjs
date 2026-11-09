@@ -44,9 +44,20 @@ for (const [v, want] of [["polls", ["polls"]], ["leaders", ["leaders"]], ["voter
   const s = await page.evaluate(() => ({ hash: location.hash, sel: document.querySelector('.rt-tabs [aria-selected="true"]').dataset.rpTab }));
   check(`the ${v} tab shows its panels`, JSON.stringify(await visible()) === JSON.stringify(want) && s.sel === v && (v === "vote" ? !/v=/.test(s.hash) : s.hash.includes("v=" + v)), { panels: await visible(), ...s });
 }
+// the drop-downs: the era's combo box opening the era's list, never the system's
+const dd = await page.evaluate(() => ({ natives: [...document.querySelectorAll("select")].filter((s) => s.offsetParent).length, boxes: [...document.querySelectorAll(".rt-combo")].filter((b) => b.offsetParent).length }));
+check("no system drop-down shows; combo boxes stand in", dd.natives === 0 && dd.boxes >= 1, dd);
 // who votes: a party, then a group
 await page.click('.rt-tabs [data-rp-tab="voters"]'); await sleep(150);
 const w0 = await hed("who");
+{
+  const box = await page.$("#who .rt-combo"), bb = await box.boundingBox();
+  await page.mouse.click(bb.x + 20, bb.y + bb.height / 2); await sleep(200);
+  const lst = await page.evaluate(() => ({ hidden: document.querySelector(".rt-list").hidden, items: [...document.querySelectorAll(".rt-list .rt-list-o")].map((o) => o.textContent) }));
+  check("the party combo box opens the era's list", !lst.hidden && lst.items.includes("Greens"), lst);
+  await page.keyboard.press("Escape"); await sleep(150);
+  check("Escape shuts the list", await page.evaluate(() => document.querySelector(".rt-list").hidden));
+}
 await page.select('#who select[data-ctl="p"]', "labor"); await sleep(250);
 const w1 = await hed("who");
 await page.click('#who .rp-ptabs [data-v="education"]'); await sleep(250);

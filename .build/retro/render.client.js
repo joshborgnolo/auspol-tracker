@@ -309,19 +309,24 @@ const BLOCK = {
   /* the latest-and-next table as the old details list: a row per pollster,
      its MRP and pooled series nested under it */
   polls(b) {
-    const head = `<tr><th scope="col">Pollster</th><th scope="col">Latest</th><th scope="col" class="r">${esc(b.cols[2] || "")}</th><th scope="col">Next, at the earliest</th></tr>`;
+    const P = b.primCols;
+    const figHead = P ? P.map((l) => `<th scope="col" class="r"><span class="rp-k-${partyOf(l) || "0"}">${esc(l)}</span></th>`).join("") : `<th scope="col" class="r">${esc(b.cols[2] || "")}</th>`;
+    const head = `<tr><th scope="col">Pollster</th><th scope="col">Latest</th>${figHead}<th scope="col">Next, at the earliest</th></tr>`;
     const row = (r, sub) => {
       const name = r.href ? `<a href="${esc(r.href)}" target="_blank" rel="noopener">${esc(r.name)}</a>` : esc(r.name);
       let fig = "";
       if (r.fig) {
         if (r.fig.pair && r.fig.pair.length === 2) fig = pairHTML(r.fig.pair[0], r.fig.pair[1], "alp", /One Nation/.test(b.cols[2] || "") ? "onp" : "lnp") + (r.fig.tag ? ` <span class="rp-tag">${esc(r.fig.tag)}</span>` : "");
         else if (r.fig.pair && r.fig.pair.length) fig = `<b class="rp-figs">${r.fig.pair.map(esc).join(" · ")}</b>`;
+        else if (r.fig.lead) fig = `${esc(r.fig.lead.main)}<small>${esc(r.fig.lead.sub)}</small>`;
         else fig = esc(r.fig.text || "");
-        if (r.fig.long) fig += `<small>${arrows(r.fig.long)}</small>`;
+        if (r.fig.long && !r.fig.prim && !r.fig.lead) fig += `<small>${arrows(r.fig.long)}</small>`;
       }
+      // the primary tab: a cell per party, as printed
+      const figCells = P ? P.map((l, i) => `<td class="r"><b class="rp-k-${partyOf(l) || "0"}">${esc(r.fig && r.fig.prim ? r.fig.prim[i] || "" : "")}</b></td>`).join("") : `<td class="r">${fig}</td>`;
       const nx = r.next ? (r.next.href ? `<a href="${esc(r.next.href)}" target="_blank" rel="noopener">${esc(r.next.main)}</a>` : esc(r.next.main)) : "";
       return `<tr class="${sub ? "rp-subr" : ""}${r.faded ? " rp-faded" : ""}"><th scope="row">${sub ? '<span class="rp-tree" aria-hidden="true">└</span>' : ""}${name}${r.who ? `<small>${esc(r.who)}</small>` : ""}</th>`
-        + `<td>${r.latest ? `${esc(r.latest.main)}<small>${esc(r.latest.sub)}</small>` : ""}</td><td class="r">${fig}</td>`
+        + `<td>${r.latest ? `${esc(r.latest.main)}<small>${esc(r.latest.sub)}</small>` : ""}</td>${figCells}`
         + `<td>${nx}${r.next && r.next.sub ? `<small class="rp-rel" data-rel="${esc(r.next.main)}">${esc(r.next.sub)}</small>` : ""}</td></tr>`;
     };
     return `<div class="rp-well"><table class="rp-t rp-polls"><thead>${head}</thead><tbody>${b.rows.map((r) => row(r, false) + (r.subs || []).map((s) => row(s, true)).join("")).join("")}</tbody></table></div>`;

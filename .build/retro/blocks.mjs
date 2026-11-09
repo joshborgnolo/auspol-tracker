@@ -54,16 +54,23 @@ function pvStats(t) {
    each column prints, wide words and phone words alike */
 function pollsTable(t) {
   const head = q(t, ".rd-pl-head");
-  const cols = head ? els(head).map((c) => W(c)) : [];
+  /* the figures column swaps between tabs: the tab's own copy is
+     rd-swap-now, the outgoing one rd-swap-was (read only the first) */
+  const nowOf = (x) => (x ? q(x, ".rd-swap-now") || x : null);
+  const cols = head ? els(head).map((c) => (hasCls(c, "rd-pl-c-figs") ? W(nowOf(c)) : W(c))) : [];
+  const hf = head && nowOf(q(head, ".rd-pl-c-figs"));
+  // the primary tab's figures are a column per party (ALP, ON, L/NP…)
+  const primCols = hf && q(hf, ".rd-pl-primh") ? els(q(hf, ".rd-pl-primh")).map(W) : null;
   const ticks = head ? qa(head, ".rd-pl-ticks").flatMap((x) => els(x).map(W)) : [];
   const cell = (row, c) => q(row, ".rd-pl-c-" + c);
   const two = (x) => (x ? { main: W(q(x, ".rd-pl-main")), sub: W(q(x, ".rd-pl-long") ? q(x, ".rd-pl-sub") : q(x, ".rd-pl-sub")) } : null);
   const items = qa(t, ".rd-pl-item").map((it) => {
     const rows = findAll(it, (x) => hasCls(x, "rd-pl-row") || hasCls(x, "rd-pl-subrow"));
     const one = (row) => {
-      const nm = cell(row, "name"), fig = cell(row, "figs"), nx = cell(row, "next"), la = cell(row, "latest");
+      const nm = cell(row, "name"), fig = nowOf(cell(row, "figs")), nx = cell(row, "next"), la = cell(row, "latest");
       const a = nm && find(nm, (x) => x.tag === "a");
-      const figMain = fig && q(fig, ".rd-pl-main");
+      const prim = fig && q(fig, ".rd-pl-prim"), lead = fig && q(fig, ".rd-pl-lead");
+      const figMain = fig && !prim && !lead && q(fig, ".rd-pl-main");
       const nxA = nx && find(nx, (x) => x.tag === "a");
       return {
         sub: hasCls(row, "rd-pl-subrow") || !hasCls(row, "rd-pl-row"),
@@ -74,7 +81,9 @@ function pollsTable(t) {
         fig: fig ? {
           pair: figMain ? els(figMain).filter((x) => !hasCls(x, "rd-pl-tag") && !hasCls(x, "rd-pl-dash")).map(W).filter(Boolean) : [],
           tag: W(q(fig, ".rd-pl-tag")), long: W(q(fig, ".rd-pl-long")) || W(q(fig, ".rd-pl-sub")), short: W(q(fig, ".rd-pl-short")),
-          text: !figMain ? W(fig) : null,
+          text: !figMain && !prim && !lead ? W(fig) : null,
+          prim: prim ? els(prim).map(W) : null,
+          lead: lead ? { main: W(q(lead, ".rd-pl-main")), sub: W(q(lead, ".rd-pl-sub")) } : null,
         } : null,
         next: nx ? { main: nxA ? W(nxA) : W(q(nx, ".rd-pl-main")).replace(/^Next\s*/, ""), href: nxA ? nxA.props.href || null : null, sub: W(q(nx, ".rd-pl-sub")) } : null,
       };
@@ -88,7 +97,7 @@ function pollsTable(t) {
     if (it.isSub && nested.length) nested[nested.length - 1].subs.push({ ...it, sub: true });
     else nested.push(it);
   }
-  return { k: "polls", cols, ticks, rows: nested };
+  return { k: "polls", cols, primCols, ticks, rows: nested };
 }
 function headBars(t) {
   return { k: "hbars", bars: qa(t, ".rd-hb").map((hb) => {

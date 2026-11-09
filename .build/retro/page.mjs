@@ -89,6 +89,9 @@ ${F ? `<footer class="rp-foot-site">
 <div class="rt-drop" role="menu" hidden></div>
 <script type="application/json" id="rp-data">${json}</script>
 <script>
+${read("select.client.js")}
+</script>
+<script>
 ${read("render.client.js")}
 </script>
 <script>

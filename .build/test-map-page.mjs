@@ -84,7 +84,7 @@ assert.ok(/const ixFor = \(m\) => IX\.filter\(\(k\) => !m\.hasIx \|\| m\.hasIx\[
 assert.ok(js.includes("famEraOpts = (m) => FAMS.filter") && js.includes("FAM_FORMED = { onp: 1998 }"), "the family menu drops One Nation before its first possible federal votes");
 assert.ok(js.includes('if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";'), "a year swap onto an era before One Nation drops S.party to the Coalition family");
 // the script carries every tracked data file's hash, so a release never reads a cached older copy (data-stamp.mjs)
-assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Electoral map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current, its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
+assert.equal(R("map/map.js"), stampMeta(stampData(`/* the Electoral map – assembled from .build/map/app by .build/map/assemble.mjs; edit the parts, not this file */\n(() => {\n${js}\n})();\n${R(".build/retro/select.client.js")}`, dataStamps(ROOT)), metaFacts(ROOT)), "map/map.js is current (the app, then the retro pages' shared drop-downs), its data stamps too (node .build/map/assemble.mjs after rebuilding any map/data file)");
 // the eyebrow's floor measures every election's real meta line from the facts stamped in (data-stamp.mjs);
 // a year the stamp lacks would be left out of the floor, and walking to it would move the map
 {

@@ -45,6 +45,7 @@ a:visited { color: #551a8b; }
   background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Crect width='17' height='17' fill='%23d4d0c8'/%3E%3Cpath d='M0 16.5h17M16.5 0v17' stroke='%23404040'/%3E%3Cpath d='M0 15.5h16M15.5 0v16' stroke='%23808080'/%3E%3Cpath d='M.5 0v15M0 .5h15' stroke='%23fff'/%3E%3Cpath d='M5 7h7l-3.5 4z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 2px center / 17px 17px;
   box-shadow: var(--rt-sunken); }
 .rp-sel select:disabled { color: #808080; cursor: default; }
+html.mp-retro .rp-sel .rt-combo, html.mp-retro .rp-tool .rt-combo { min-width: 150px; }
 .rp-sel select:focus-visible, .rp-tool select:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
 .rp-radios { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
 .rp-radios label { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; cursor: pointer; }

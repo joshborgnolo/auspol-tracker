@@ -135,6 +135,22 @@ assert.notEqual(P(now, "who").variants["age|one-nation"].blocks.find((b) => b.k 
   assert.notEqual(c["all-past-terms|level"].blocks.find((b) => b.k === "hed").t, c["ousted|level"].blocks.find((b) => b.k === "hed").t, "Past cycles: a comparison set re-words the finding, as the modern page does");
 }
 assert.doesNotThrow(() => new Function(R(".build/retro/pages.client.js")), "the browser half parses");
+// every retro page's drop-downs open the era's list, never the system's (select.client.js, styled in the shared chrome)
+{
+  const sj = R(".build/retro/select.client.js");
+  assert.doesNotThrow(() => new Function(sj), "the drop-downs' script parses");
+  for (const [f, src] of [["retro/index.html", now.html], ["cycles/retro/index.html", cyc.html], ["allpolls/retro/index.html", R("allpolls/retro/index.html")], ["map/map.js", R("map/map.js")]]) assert.ok(src.includes(sj), `${f} carries the retro drop-downs`);
+  assert.ok(/html\.mp-retro select\.rt-native \{ display: none !important; \}/.test(R(".build/retro/chrome.css")) && /\.rt-combo \{ display: none; \}/.test(R(".build/retro/chrome.css")), "in the retro look a select hands its place to the combo box; outside it, the select shows as itself");
+}
+// the latest polls' primary tab: a column per party, in the site's order, each poll's figures under them
+{
+  const pv = P(now, "polls").variants;
+  const k = Object.keys(pv).find((x) => /^primary\|/.test(x) && typeof pv[x] !== "string");
+  const pb = pv[k].blocks.find((b) => b.k === "polls");
+  const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
+  assert.deepEqual(pb.primCols, L.primaryOrder.map((id) => ABBR[id]), "latest polls, primary tab: a column per party, in the site's order");
+  assert.ok(pb.rows.every((r) => r.fig && r.fig.prim && r.fig.prim.length === pb.primCols.length), "each poll's primaries under their parties");
+}
 // a group box's caption sits inside its frame, never on its line (set on the line, the frame ran into the words)
 assert.ok(/fieldset legend \{ float: left; width: 100%;/.test(R(".build/retro/pages.css")) && !/fieldset[^{]*legend \{[^}]*background/.test(R(".build/retro/pages.css")), "group-box captions sit inside their frames, clear of its lines");
 

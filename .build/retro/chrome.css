@@ -111,3 +111,29 @@ html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-fami
   .rt-pages { display: none; }
   .rt-pagesb { display: inline-flex !important; }
 }
+
+/* ----- the drop-downs: the era's combo box and its list (select.client.js) -----
+   In the retro look each <select> hands its place to a combo box that opens
+   the list below, instead of the operating system's own menu; outside the
+   look (the map's modern view) the select shows as itself. */
+.rt-combo { display: none; }
+html.mp-retro select.rt-native { display: none !important; }
+html.mp-retro .rt-combo { display: inline-flex; align-items: center; box-sizing: border-box; height: 21px; min-width: 128px; max-width: 100%; margin: 0; padding: 0 20px 0 5px; position: relative;
+  border: 0; border-radius: 0; background: #fff; color: #000; font: 400 12px/1 var(--rt-font); text-align: left; cursor: pointer; box-shadow: var(--rt-sunken); vertical-align: middle; }
+html.mp-retro .rt-combo .rt-combo-t { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the arrow button at the field's right, raised, pressed while the list is open */
+html.mp-retro .rt-combo .rt-combo-a { position: absolute; top: 2px; right: 2px; bottom: 2px; width: 16px; background: var(--rt-face); box-shadow: var(--rt-raised); }
+html.mp-retro .rt-combo .rt-combo-a::after { content: ""; position: absolute; left: 4px; top: 50%; margin-top: -2px; border: 4px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+html.mp-retro .rt-combo[aria-expanded="true"] .rt-combo-a { box-shadow: var(--rt-pressed); }
+html.mp-retro .rt-combo[aria-expanded="true"] .rt-combo-a::after { margin: -1px 0 0 1px; }
+html.mp-retro .rt-combo:focus-visible { outline: none; }
+html.mp-retro .rt-combo:focus-visible .rt-combo-t { outline: 1px dotted #000; outline-offset: 1px; background: var(--rt-sel); color: #fff; }
+html.mp-retro .rt-combo:disabled { color: var(--rt-sh); cursor: default; }
+html.mp-retro .rt-combo:disabled .rt-combo-a::after { border-top-color: var(--rt-sh); }
+.rt-list { position: fixed; z-index: 420; box-sizing: border-box; max-width: min(420px, calc(100vw - 4px)); overflow-y: auto; padding: 0; background: #fff; border: 1px solid #000; color: #000; font: 400 12px/1 var(--rt-font); }
+.rt-list[hidden] { display: none; }
+.rt-list-o { padding: 3px 18px 3px 4px; white-space: nowrap; cursor: default; }
+.rt-list-o.rt-in { padding-left: 14px; }
+.rt-list-o[data-hi="1"] { background: var(--rt-sel); color: #fff; }
+.rt-list-o[aria-disabled="true"] { color: var(--rt-sh); }
+.rt-list-g { padding: 4px 4px 2px; font-weight: 700; font-style: italic; white-space: nowrap; }

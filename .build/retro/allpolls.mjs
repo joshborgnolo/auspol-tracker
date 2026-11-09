@@ -507,6 +507,9 @@ ${F ? `<footer class="ap-foot">
 <div class="rt-drop" role="menu" hidden></div>
 <script type="application/json" id="ap-data">${json}</script>
 <script>
+${read("select.client.js")}
+</script>
+<script>
 ${client}
 </script>
 </body>
