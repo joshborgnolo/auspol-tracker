@@ -1507,6 +1507,14 @@
       "unsure": 15,
       "url": "https://essentialreport.com.au/reports/28-october-2026",
       "published": "2026-10-28T01:00"
+    },
+    {
+      "date": "2026-11-08",
+      "dateStart": "2026-10-26",
+      "pollster": "Roy Morgan",
+      "right": 20.5,
+      "wrong": 65.5,
+      "unsure": 14
     }
   ],
   "polls": [
@@ -6379,6 +6387,29 @@
       },
       "assimilated": true,
       "url": "https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html"
+    },
+    {
+      "date": "2026-11-08",
+      "published": "2026-11-09T17:26",
+      "dateStart": "2026-10-26",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 2574,
+      "undecided": 6,
+      "alp": 25.5,
+      "lnp": 22,
+      "grn": 15,
+      "onp": 24.5,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": 51,
+      "tpp_lnp": 49,
+      "tpp_flows": 52.5,
+      "lnpSplit": {
+        "Lib": 19,
+        "Nat": 3
+      },
+      "url": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026"
     }
   ],
   "ppm": [
@@ -9805,6 +9836,12 @@
     {
       "date": "2026-11-06",
       "firm": "RedBridge/Accent",
+      "alpVsOnp_alp": 54,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-08",
+      "firm": "Roy Morgan",
       "alpVsOnp_alp": 54,
       "lnpVsOnp_lnp": null
     }

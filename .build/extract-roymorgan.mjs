@@ -256,9 +256,14 @@ function parseRelease(post) {
   /* 2025-era releases print the window behind the cross-section sentence:
      "…cross-section of N Australian electors from May 5 – June 1, 2025" —
      no "conducted from" lead-in; the 2026 weekly era prints "…electors
-     over the week of February 2-8, 2026" */
+     over the week of February 2-8, 2026". From release 10377 (2026-11-09)
+     the word "from" is gone — "…Poll conducted October 26 – November 8,
+     2026" — so "from" is optional in the first lead-in. The bare shape
+     must not run ahead of the others: it would bind "conducted from …"
+     with m1="from" and trip the field-months guard. */
   const period = /([A-Za-z]+)\.?\s+(\d+)\s*[-–]\s*(?:([A-Za-z]+)\.?\s+)?(\d+),\s+(\d{4})/;
   const pm = t.match(new RegExp("conducted from\\s+" + period.source, "i"))
+        ?? t.match(new RegExp("conducted\\s+" + period.source, "i"))
         ?? t.match(new RegExp("electors from\\s+" + period.source, "i"))
         ?? t.match(new RegExp("over the week of\\s+" + period.source, "i"));
   let dateStart = null, date = null;
@@ -278,13 +283,25 @@ function parseRelease(post) {
 
   let tpp_alp = null, tpp_lnp = null;
   const wi = t.search(/vote.\s*their preferences/i);
-  if (wi === -1) missing.push("2pp anchor");
-  else {
+  if (wi !== -1) {
     const w = t.slice(wi, wi + 300);
     const pa = w.match(/ALP\s*([\d.]+)%/i);
     const pl = pa && w.slice(w.indexOf(pa[0]) + pa[0].length).match(/L-NP(?:\s+Coalition)?\s+([\d.]+)%/i);
     if (!pa || !pl) missing.push("2pp pair");
     else { tpp_alp = parseFloat(pa[1]); tpp_lnp = parseFloat(pl[1]); }
+  } else {
+    /* From release 10377 (2026-11-09, fortnightly era) the "(based on how
+       electors said they'd 'vote' their preferences)" parenthetical is
+       gone; the respondent pair prints as "For the full fortnight the ALP
+       51% (down 1.5% from a fortnight ago) leads the L-NP 49% (up 1.5%)
+       on a two-party preferred basis." Anchoring on the fortnight phrase —
+       never the bare basis phrase, whose trailing sentences quote the two
+       WEEKLY splits — with the change parentheticals stripped first. The
+       flows pair below keeps its own anchor; it may not proxy for the
+       canonical pair. */
+    const fm = normaliseLead(t).match(/for the full fortnight\s+the ALP\s+(?:on\s+)?([\d.]+)\s*%\s*(?:leading|leads?|in front of)\s+(?:the\s+)?L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%\s*on a two[- ]party preferred basis/i);
+    if (!fm) missing.push("2pp anchor");
+    else { tpp_alp = parseFloat(fm[1]); tpp_lnp = parseFloat(fm[2]); }
   }
 
   let tpp_flows = null, tpp_flows_lnp = null, flowsPairMissing = false, flowsMonthly = false;
@@ -302,9 +319,12 @@ function parseRelease(post) {
 
   // ALP v One Nation 2PP — weekly since wave date 2026-05-17, anchored on
   // "...contest is set to be between the ALP and One Nation" (absent before
-  // that wave, no warning then). Two estimator phrasings — "the Morgan Poll
-  // estimates … (narrowly )?(leading|in front of)" and "Roy Morgan
-  // estimates … in front of". The window goes through normaliseLead() first:
+  // that wave, no warning then). Three estimator phrasings so far — "the
+  // Morgan Poll estimates … (narrowly )?(leading|in front of)", "Roy Morgan
+  // estimates … in front of", and (10377, 2026-11-09) "Roy Morgan estimates
+  // the ALP is in a strong position: ALP 54% … in front of" with the figure
+  // on a bare ALP after an interposed clause, hence the optional "the ".
+  // The window goes through normaliseLead() first:
   // the week-on-week change parentheticals ("(up 2.5%)") contain "%" and a
   // [^%]* gap would mis-latch. The 2026-05-17 variant ("the ALP 54% leads
   // One Nation 46%", post-budget SMS-poll flows) is already recorded in
@@ -313,7 +333,7 @@ function parseRelease(post) {
   const oi = t.search(/contest is set to be between the ALP and One Nation/i);
   if (oi !== -1) {
     const w = normaliseLead(t.slice(oi, oi + 500));
-    const op = w.match(/the ALP\s+(?:on\s+)?([\d.]+)\s*%[^%]{0,60}?(?:leading|leads?|in front of)\s+One Nation\s+(?:on\s+)?([\d.]+)\s*%/i);
+    const op = w.match(/(?:the\s+)?ALP\s+(?:on\s+)?([\d.]+)\s*%[^%]{0,60}?(?:leading|leads?|in front of)\s+One Nation\s+(?:on\s+)?([\d.]+)\s*%/i);
     if (op) { tpp_onp = parseFloat(op[1]); tpp_onp_onp = parseFloat(op[2]); }
     else onpPairMissing = true;
   }

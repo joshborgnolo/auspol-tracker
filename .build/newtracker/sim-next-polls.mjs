@@ -185,6 +185,18 @@ for (const [firm, last] of [["Roy Morgan", "2026-09-07"],
                             ["DemosAU", "2026-08-24"],
                             ["YouGov", "2026-10-07"]])
   cad.find((c) => c.pollster === firm).last = last;
+// Roy Morgan went fortnightly on 2026-11-09 (the 9 Nov wave made four
+// fortnight releases in a row — 29 Sep, 12 & 26 Oct, 9 Nov — and the
+// live row flipped to cadence 14 with rhythmFrom/rhythmSince markers).
+// The world below models the WEEKLY era, so its RM row freezes the whole
+// slot grammar, not just `last` (same precedent as Essential's frozen
+// cadence below): cadence back to 7 and the rhythm markers off.
+{
+  const rm = cad.find((c) => c.pollster === "Roy Morgan");
+  rm.cadence = 7;
+  delete rm.rhythmFrom;
+  delete rm.rhythmSince;
+}
 // RedBridge's 27 Sep Sunday was confirmed absent after that world was
 // written; its skip scenarios (S12) seed the list themselves
 cad.find((c) => c.pollster === "RedBridge/Accent").skipped = [];
@@ -571,7 +583,7 @@ function eq(name, got, want) {
 // Strategy's 139-day cadence puts its next slot ~eleven weeks out, and that
 // one slot still stands - on the panel as Thu 10 Dec ± 18 days counting
 // from 78, on the bar as a maybe-hedged countdown to the window's open 60
-// days away - while the weekly house's walk still stops where the horizon
+// days away - while the dated houses' walk still stops where the horizon
 // says.
 {
   const cad8 = JSON.parse(JSON.stringify(D.pollCadence));
@@ -587,7 +599,13 @@ function eq(name, got, want) {
   eq("one standing slot - no further slots this far out", rows.filter((r) => r.pollster === "Spectre Strategy").length, 1);
   eq("on the bar as a hedged countdown", items.filter((i) => i.firm === "Spectre Strategy").map((i) => [i.when, i.maybe]),
     [["141 days", true]]);
-  eq("the horizon still bounds the weekly house's further slots", rows.filter((r) => r.pollster === "Roy Morgan").length, 4);
+  // the bound is floor(28/cadence) - 4 slots at the weekly habit the pin
+  // was written with, 2 since Roy Morgan went fortnightly (2026-11-09:
+  // rhythmSince 2026-09-29). Derived from the shipped row so the pin rides
+  // whichever habit is measured, never one era's count.
+  eq("the horizon still bounds the house's further slots",
+    rows.filter((r) => r.pollster === "Roy Morgan").length,
+    Math.floor(28 / cad8.find((c) => c.pollster === "Roy Morgan").cadence));
 }
 
 // S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour, with the measured
