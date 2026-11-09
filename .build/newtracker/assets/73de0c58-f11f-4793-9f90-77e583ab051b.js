@@ -2096,96 +2096,6 @@ const IssuesMemo = lateMemo(() => IssuesPanel);
 const UndecidedMemo = lateMemo(() => UndecidedPanel);
 const MoodMemo = lateMemo(() => MoodPanel);
 
-/* The Now page's own topic index: a compact strip of section chips across
-   the top of the snapshot, sticky so it is still on hand deep in the page,
-   with a scroll-spy that names the section being read. It replaces the
-   hero eyebrow's sentence of jump links (rd-snap-nav, retired 2026-11-09):
-   that was words only, vanished below 1190px, and was absent on a phone.
-   Chips are gated on the data their sections need, as the hero's list was
-   (the /vic/ page has neither demographics nor issues), and the strip
-   renders in the redesign only. */
-const NOW_CHIPS = () => {
-  const D = window.AP.D || {};
-  return [
-    ["two-party", "Vote"],
-    ["latest-polls", "Latest polls"],
-    ["leadership", "Leaders"],
-    ["direction", "Mood", D.direction && D.direction.length],
-    ["who-votes", "Voters", D.demographics && D.demographics.tabs && D.demographics.tabs.length],
-    ["issues", "Issues", D.issues && D.issues.list && D.issues.list.length],
-    ["undecided", "Decided", D.undecided && D.undecided.series && D.undecided.series.length],
-    ["confidence", "Economy", D.confidence && D.confidence.consumer && D.confidence.consumer.polls && D.confidence.consumer.polls.length],
-  ].filter((c) => c.length < 3 || c[2]);
-};
-function RdNowNav() {
-  /* the chips re-derive on every render: the data the gates read lands in
-     stages like the sections do, so a memoised first pass can freeze the
-     short early list past the point the rest of the sections exist */
-  const chips = NOW_CHIPS();
-  const chipKey = chips.map((c) => c[0]).join("|");
-  const [active, setActive] = React.useState(chips.length ? chips[0][0] : null);
-  React.useEffect(() => {
-    if (!window.AP.rd) return undefined;
-    /* the spy reads positions on scroll rather than observing boxes: the
-       snapshot's sections mount in stages (the tail below) and a folded
-       section shrinks - a cheap re-measure absorbs both without re-arming */
-    let raf = 0;
-    const margins = new Map();
-    const measure = () => {
-      raf = 0;
-      let cur = null;
-      for (const [id] of chips) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        /* a section is current once its head reaches where a jump would land
-           it - its own scroll-margin line, cached (the value never moves) */
-        let m = margins.get(el);
-        if (m === undefined) { m = parseFloat(getComputedStyle(el).scrollMarginTop) || 0; margins.set(el, m); }
-        if (el.getBoundingClientRect().top <= m + 6) cur = id;
-      }
-      cur = cur || (chips.length ? chips[0][0] : null);
-      setActive((a) => (a === cur ? a : cur));
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(measure); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    measure();
-    return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, [chipKey]);
-  if (!window.AP.rd) return null;
-  const go = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: SM, block: "start" });
-    /* the jump can cross content-visibility placeholders that resize as the
-       lay-out they skipped finally runs, so one smooth pass can come to rest
-       beside the section. Once the page's height has gone quiet, land the
-       section once more (a no-op when nothing moved); the reader's own input
-       cancels the hold, as the boot's hash-landing does */
-    const root = document.documentElement;
-    const t0 = performance.now();
-    let lastH = root.scrollHeight, calm = 0;
-    const iv = setInterval(() => {
-      const h = root.scrollHeight;
-      calm = h === lastH ? calm + 1 : 0;
-      lastH = h;
-      const due = performance.now() - t0;
-      if (calm < 4 && due < 2500) return;
-      clearInterval(iv);
-      el.scrollIntoView({ behavior: SM, block: "start" });
-    }, 100);
-    const stop = () => clearInterval(iv);
-    ["wheel", "touchstart", "keydown"].forEach((e) => window.addEventListener(e, stop, { once: true, capture: true, passive: true }));
-  };
-  return (
-    <nav className="rd-nownav" aria-label="On this page">
-      {chips.map(([id, lab]) => (
-        <button key={id} type="button" className="rd-nownav-c" aria-current={active === id ? true : undefined}
-                onClick={() => go(id)}>{lab}</button>
-      ))}
-    </nav>
-  );
-}
-
 function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
   /* The redesign sets its range tabs over the two-party and primary-vote
      charts - one range state, one menu above each chart, both moving it -
@@ -2257,7 +2167,6 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
   }, [tail, late]);
   return (
     <>
-      <RdNowNav />
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
@@ -2657,14 +2566,6 @@ function App() {
     setMounted((m) => (m.indexOf(tab) === -1 ? m.concat([tab]) : m));
     // the Now tab warms its own sections once its staged tail is in
     if (tab !== "now") { loadLate(); warmSections(1500); }
-  }, [tab]);
-  /* The Now tab's closer rhythm and topic strip scope (2026-11-09) ride a
-     marker class on the body rather than per-section props: the CSS below
-     it (rd.css, the "Now tab's closer rhythm" block) is the whole effect,
-     and the other tabs' geometry stays byte-for-byte its own. */
-  React.useEffect(() => {
-    document.body.classList.toggle("rd-now", tab === "now");
-    return () => document.body.classList.remove("rd-now");
   }, [tab]);
   React.useEffect(() => {
     if (entered == null) return undefined;

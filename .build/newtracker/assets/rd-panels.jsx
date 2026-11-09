@@ -677,7 +677,7 @@ function RdPrimary({ rangeId, setRangeId }) {
   const MENUSHORT = { "Lower earners (bottom 50%)": "Lower earners", "Higher earners (top 15%)": "Higher earners" };
 
   return (
-    <RdSec id="primary-vote" title="Primary vote" meta={meta} fold>
+    <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <div className="rd-pv-head">
         <RdHed head={story.head} dek={story.dek} />
         {T && (
@@ -1755,7 +1755,7 @@ function RdLeadership({ rangeId }) {
   }, [ppmView, metric]);
 
   return (
-    <RdSec id="leadership" cls="rd-lead rd-framed" title="Leadership" fold meta={J ? "Preferred " + J.office.alb + " and net approval, " + jHouses((q) => !!(q.ppm || q.ppmSets || (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null)))) : "Preferred PM and net approval, " + capped(D.apprHouses)}>
+    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta={J ? "Preferred " + J.office.alb + " and net approval, " + jHouses((q) => !!(q.ppm || q.ppmSets || (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null)))) : "Preferred PM and net approval, " + capped(D.apprHouses)}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       {/* "free" frees the panels from the shared desktop row grid: a "Both"
           view gives its panel extra children (a second chart, the dot-plot
@@ -1765,7 +1765,7 @@ function RdLeadership({ rangeId }) {
           above or below their own charts. Not shared, each panel stacks. */}
       <div className={"rd-ld-grid" + (expanded ? " one" : ppmView === "both" || metric === "both" ? " free" : "")}>
         {panel("ppm", J ? "Preferred " + J.office.alb : "Preferred prime minister", J ? "“Who would make the better " + J.office.alb + "?” Asked head to head, and three-way where pollsters offer it." : "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
-          <RdTabs swipe value={ppmView} onChange={ppmPick} label="Question" ariaLabel={J ? "Preferred " + J.office.alb + " question" : "Preferred prime minister question"}
+          <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel={J ? "Preferred " + J.office.alb + " question" : "Preferred prime minister question"}
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("ppm", J ? "preferred " + J.office.alb : "preferred prime minister")}
           </RdTabs>,
@@ -1795,7 +1795,7 @@ function RdLeadership({ rangeId }) {
           metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
             : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "."
             : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".",
-          <RdTabs swipe value={metric} onChange={pickMetric} label="Rating" ariaLabel="Leader rating"
+          <RdTabs swipe value={metric} onChange={pickMetric} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("appr", "leader ratings")}
           </RdTabs>,
@@ -1849,9 +1849,9 @@ function RdDirection({ rangeId }) {
     ? (narrow ? question : question + (asked ? ", " + asked : ""))
     : (narrow ? tQuestion : tQuestion + ", ANUpoll with " + tHouses);
   return (
-    <RdSec id="direction" cls="rd-dir" title="National mood" meta={meta} fold>
+    <RdSec id="direction" cls="rd-dir" title="National mood" meta={meta}>
       {hasTrust && (
-        <RdTabs swipe value={v} onChange={setView} label="Question" ariaLabel="View" className="rd-is-tabs rd-mood-tabs"
+        <RdTabs swipe value={v} onChange={setView} ariaLabel="View" className="rd-is-tabs rd-mood-tabs"
                 options={[{ id: "direction", label: "Direction" }, { id: "trust", label: "Trust in government" }]} />
       )}
       <RdCrossfade k={v}>
@@ -4071,15 +4071,14 @@ function RdDemographics({ rangeId = "all" }) {
   };
 
   return (
-    <RdSec id="who-votes" cls="rd-wv rd-framed" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"} fold>
+    <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
       {/* the party picks itself by number key: 1 One Nation, 2 Labor,
           3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
-      <RdTabs swipe value={tab.id} onChange={pickTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} label="Group" ariaLabel="Group voters by" className="rd-wv-tabs"
+      <RdTabs swipe value={tab.id} onChange={pickTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"
               onDigits={rdDigitKey(DEMO_PARTIES, pickParty)}>
         {!narrow && (
           <span className="rd-chips" role="group" aria-label="Party" onClick={rdTabFocus}>
-            <span className="rd-cl">Party</span>
             {DEMO_PARTIES.map((pp) => (
               <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => pickParty(pp.id)}
                       style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
@@ -4093,7 +4092,6 @@ function RdDemographics({ rangeId = "all" }) {
            share one line; the full name stays on the accessible label */
         <div className="rd-chips rd-chips-row" role="group" aria-label="Party" onClick={rdTabFocus}
              onKeyDown={rdDigitKey(DEMO_PARTIES, pickParty)}>
-          <span className="rd-cl">Party</span>
           {DEMO_PARTIES.map((pp) => (
             <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} aria-label={pp.label}
                     onClick={() => pickParty(pp.id)}
@@ -4894,7 +4892,7 @@ function RdSwitching({ rangeId }) {
   /* a double-click/tap anywhere in the section walks the same cycle the
      title's party-word button and Space do (dblCycle is RdSec's) */
   return (
-    <RdSec id="switching" cls="rd-sw" title={cycTitle} dblCycle={cyc} fold
+    <RdSec id="switching" cls="rd-sw" title={cycTitle} dblCycle={cyc}
            meta={"How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
       {V === "onp" ? (
         <>
@@ -5465,11 +5463,11 @@ function RdIssues({ rangeId = "all" }) {
   const pickWhom = (k) => { pinWhom(); setWhomK(k); };
 
   const tabs = (
-    <RdTabs swipe value={view} onChange={setView} label="View" ariaLabel="View" className="rd-is-tabs"
+    <RdTabs swipe value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
             options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]} />
   );
   return (
-    <RdSec id="issues" cls="rd-is rd-framed" title="The issues" fold
+    <RdSec id="issues" cls="rd-is" title="The issues"
            meta={"What voters say matters most, and who they think is best on it, " + rdList(I.houses) + ", last " + I.window}>
       {tabs}
       {/* the two views ask different things of different charts, so a
@@ -5920,9 +5918,9 @@ function RdUndecided({ rangeId }) {
   };
   const pickView = (id) => { pinUn(); setView(id); };
   return (
-    <RdSec id="undecided" cls="rd-un" title="Decidedness" meta={rdList(U.houses) + ", since the 2025 election"} fold>
+    <RdSec id="undecided" cls="rd-un" title="Decidedness" meta={rdList(U.houses) + ", since the 2025 election"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
-      <RdTabs swipe value={view} onChange={pickView} options={views} label="Split" ariaLabel="Decidedness among" className="rd-un-tabs" />
+      <RdTabs swipe value={view} onChange={pickView} options={views} ariaLabel="Decidedness among" className="rd-un-tabs" />
       {/* each view is its own measure from its own pollsters: a switch
           crossfades them (RdCrossfade) */}
       <RdCrossfade k={view}>
@@ -6853,12 +6851,12 @@ function RdConfidence({ rangeId }) {
   if (nowM < xMax - 1.4) xTicks.push({ x: +nowM.toFixed(1), label: "Now" });
   xTicks.sort((a, b) => a.x - b.x);
   return (
-    <RdSec id="confidence" cls="rd-confidence rd-framed" title="Economic sentiment" fold meta={isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", five published series")}>
+    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", five published series")}>
       <RdHed head={isMacro && mStory ? mStory.head : head} dek={isMacro && mStory ? mStory.dek : dek} />
       {/* the views are pages of their own, so the row walks them by arrow
           keys (focused, or hovering the panel) and a phone swipe;
           rdPinScroll holds the row's spot through the crossfade (pin) */}
-      <RdTabs swipe pin value={view} onChange={setView} options={views} label="Series" ariaLabel="View of the economy" className="rd-confidence-tabs" />
+      <RdTabs swipe pin value={view} onChange={setView} options={views} ariaLabel="View of the economy" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
       {!isMacro && <>
       {(hband || deepDrawn.length > 0) && (

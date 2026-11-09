@@ -924,6 +924,19 @@ function RdHero(p) {
     ? "After preferences, updated " + rdDate(D.latest.updatedISO, true)
     : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
 
+  /* the tab's on-this-page index, in the hero's eyebrow as Past cycles and
+     All polls carry theirs in theirs; the Snapshot's sections run ten deep,
+     so the links are the exact section titles scrolled to. The list reads as
+     one sentence, "and" before the last and no commas - words only, the look
+     is unchanged */
+  const snapNav = [
+    ["latest-polls", "Latest and next polls"],
+    ["leadership", "Leadership"],
+    D.demographics ? ["who-votes", "Who votes for whom"] : null,   // /vic/ has neither
+    D.issues ? ["issues", "The issues"] : null,
+  ].filter(Boolean);
+  const snapGo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
+
   /* a sideways swipe on the chart flips the 2PP contest, wrapping round the
      matchups like the computer's arrow keys wrap a row - the card bears the
      exact claim so the gesture reaches it past the chart's own scrub. And
@@ -1031,7 +1044,7 @@ function RdHero(p) {
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-tpp-t">Two-party preferred</h2>
         <span className="rd-meta">{meta}</span>
-        <span className="rd-eyebrow-tools"><RdFoldBtn id="two-party" /></span>
+        {!narrow && <nav className="rd-eyebrow-tools rd-snap-nav" aria-label="On this page">{snapNav.map(([id, lab], i) => <button key={id} type="button" onClick={() => snapGo(id)}>{(i === snapNav.length - 1 ? "and " : "") + lab}</button>)}</nav>}
       </div>
       {/* The section's headline under its heading, as every other section
          has it, so the opening view reads down a left edge before the

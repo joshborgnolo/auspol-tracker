@@ -10,61 +10,10 @@
    style these parts use lives in rd.css, scoped to body.rd. */
 
 /* ---------------------------------------------------------------- sections
-   A section can be rolled up from its eyebrow (the retro panel shade, in
-   this design's idiom - shipped 2026-11-09): folded ids ride the address
-   bar as ?hide=id,id so a link a researcher passes on opens the page in
-   the same shape. The query is the only persistence. The rd-shut class is
-   applied imperatively by the button itself, so RdSec's sections and the
-   hero's bespoke one fold exactly alike. */
-let rdFoldSet = null;
-const rdFoldSubs = new Set();
-const rdFoldRead = () => {
-  try { return new Set((new URLSearchParams(window.location.search).get("hide") || "").split(",").filter(Boolean)); }
-  catch (e) { return new Set(); }
-};
-const rdFoldState = () => { if (!rdFoldSet) rdFoldSet = rdFoldRead(); return rdFoldSet; };
-const rdFoldNotify = () => { rdFoldSubs.forEach((fn) => fn()); };
-/* the router's urlWrite idiom: a refused write (file://) never vetoes the
-   fold, it only leaves the address bar behind */
-const rdFoldWriteUrl = (verb, to) => { try { history[verb](null, "", to); } catch {} };
-const rdFoldWrite = () => {
-  const q = new URLSearchParams(window.location.search);
-  const v = [...rdFoldState()].join(",");
-  if (v) q.set("hide", v); else q.delete("hide");
-  rdFoldWriteUrl("replaceState", window.location.pathname + (String(q) ? "?" + q : "") + window.location.hash);
-};
-const rdFoldUpdate = (id, on) => {
-  const next = new Set(rdFoldState());
-  if (on) next.add(id); else next.delete(id);
-  rdFoldSet = next; rdFoldWrite(); rdFoldNotify();
-};
-let rdFoldWired = false;
-function RdFoldBtn({ id }) {
-  const [, tick] = React.useReducer((n) => n + 1, 0);
-  React.useEffect(() => {
-    const fn = () => tick();
-    rdFoldSubs.add(fn);
-    /* back and forward hand the reader a query someone else's edits wrote:
-       re-read it. The subscription lasts the page's life, one for every
-       fold button on it */
-    if (!rdFoldWired) { rdFoldWired = true; window.addEventListener("popstate", () => { rdFoldSet = rdFoldRead(); rdFoldNotify(); }); }
-    return () => rdFoldSubs.delete(fn);
-  }, []);
-  const shut = rdFoldState().has(id);
-  React.useLayoutEffect(() => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle("rd-shut", shut);
-  }, [shut, id]);
-  return (
-    <button type="button" className="rd-fold" aria-expanded={!shut}
-            onClick={() => rdFoldUpdate(id, !shut)}>{shut ? "Show" : "Hide"}</button>
-  );
-}
-
-/* A dark rule over a sentence-case section title, with the title's meta
+   A dark rule over a sentence-case section title, with the title's meta
    beside it; then the section's finding as a serif headline and its deck.
    `first` drops the rule: the first section sits under the masthead's. */
-function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet, dblCycle, fold }) {
+function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet, dblCycle }) {
   const hid = React.useId();
   const tapRef = React.useRef(null);
   /* dblCycle: a double-click anywhere in the section but on a control walks
@@ -103,7 +52,7 @@ function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet
       <div className="rd-eyebrow">
         <h2 className="rd-title" id={hid}>{title}</h2>
         {meta ? <span className="rd-meta">{meta}</span> : null}
-        {(tools || fold) ? <span className="rd-eyebrow-tools">{tools}{fold ? <RdFoldBtn id={id} /> : null}</span> : null}
+        {tools ? <span className="rd-eyebrow-tools">{tools}</span> : null}
       </div>
       {children}
     </section>
@@ -979,7 +928,7 @@ function rdSpaceDominant(id) {
    page wears it: RdTabs, the main tab row, the Who-votes and issues chips,
    the All-polls pinned facets, time pills and split picker. */
 const RdTabW = ({ t }) => <span className="rd-tab-w" data-t={t}>{t}</span>;
-function RdTabs({ value, onChange, options, ariaLabel, label, children, className, swipe, swipeSelf, pin, onDigits }) {
+function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, swipeSelf, pin, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
      swipe on or just under the row steps through them, wrapping round the
@@ -1015,9 +964,6 @@ function RdTabs({ value, onChange, options, ariaLabel, label, children, classNam
          ref={swipe || swipeSelf || pin ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
          data-rd-swipe-self={swipeSelf ? "" : undefined}
          onKeyDown={onDigits || undefined}>
-      {/* the visible name sits OUTSIDE the scrollable group, so a phone's
-          sideways scroll never carries the row's own label off screen */}
-      {label ? <span className="rd-cl">{label}</span> : null}
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}
            onKeyDown={rdTabsKey(options, fire)} onClick={rdTabFocus}>
         {options.map((o) => (
@@ -1287,7 +1233,7 @@ function rdEventReveal(id) {
   });
 }
 
-Object.assign(window, { RdSec, RdFoldBtn, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
+Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
                         rdTabsKey, rdTabFocus, rdDigitKey, useHoverClaim,
                         rdSpaceClaimOn, rdSpaceClaimOff, rdSpaceDominant,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
