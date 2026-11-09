@@ -39,8 +39,13 @@
 //                    (undecided is parsed for new waves; the four canon
 //                    rows predate the field and stay as the house entered
 //                    them)
-//   ppm:            {date, firm, alb, opp, oppName, han:null, extra:null}
-//   ppmHeadToHead:  {date, firm, alb, han}
+//   ppm:            {date, firm, alb, opp, oppName, han, extra:null}
+//                    (han carries Hanson's share when the question is the
+//                    three-way squeeze — Nov 2026 on; null on a two-way)
+//   ppmHeadToHead:  {date, firm, alb, han} — filed only from genuine
+//                    two-way H2H prose (Apr 2026); the three-way squeeze's
+//                    Hanson parenthetical is NOT a head-to-head and must
+//                    never mint one
 //   approval:       {date, firm, alb, opp, oppName, han,
 //                    detail{alb,opp,han:{app,dis}}}
 //   altTpp:         {date, firm, alpVsOnp_alp, lnpVsOnp_lnp:null}
@@ -264,7 +269,10 @@ function parseReport(txt, slug, D) {
         w.ppmAlb = asPct(toNum(tri[1]));
         w.ppmOpp = asPct(toNum(tri[4]));
         w.oppName = tri[3].trim().split(/\s+/).pop();
-        if (!hh) { w.h2hAlb = asPct(toNum(tri[1])); w.h2hHan = asPct(toNum(tri[2])); }
+        // one three-way question, not three head-to-heads: Hanson's share
+        // rides the ppm row's `han` (house convention — see the header),
+        // never a synthesized ppmHeadToHead pair
+        w.ppmHan = asPct(toNum(tri[2]));
       }
     }
   }
@@ -362,6 +370,7 @@ function figureDiffs(date, w, D) {
     chk("ppm.alb", ppm.alb, w.ppmAlb);
     chk("ppm.opp", ppm.opp, w.ppmOpp);
     chk("ppm.oppName", ppm.oppName, w.oppName);
+    if (w.ppmHan != null || ppm.han != null) chk("ppm.han", ppm.han, w.ppmHan);
   }
   const h2h = D.ppmHeadToHead.find((p) => p.firm === POLLSTER && p.date === date);
   if (h2h) { chk("ppmHeadToHead.alb", h2h.alb, w.h2hAlb); chk("ppmHeadToHead.han", h2h.han, w.h2hHan); }
@@ -399,7 +408,7 @@ function pollRows(w, item) {
   };
   if (!rows.polls.published) delete rows.polls.published;
   if (w.ppmAlb != null) rows.ppm = { date: w.date, firm: POLLSTER, alb: w.ppmAlb, opp: w.ppmOpp,
-    oppName: w.oppName, han: null, extra: null };
+    oppName: w.oppName, han: w.ppmHan ?? null, extra: null };
   if (w.h2hAlb != null) rows.ppmHeadToHead = { date: w.date, firm: POLLSTER, alb: w.h2hAlb, han: w.h2hHan };
   rows.approval = { date: w.date, firm: POLLSTER, alb: w.alb, opp: w.opp,
     oppName: w.oppName, han: w.han ?? null, detail: null };

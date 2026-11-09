@@ -7241,7 +7241,7 @@
       "alb": 34,
       "opp": 22,
       "oppName": "Taylor",
-      "han": null,
+      "han": 30,
       "extra": null
     },
     {
@@ -9409,12 +9409,6 @@
       "firm": "YouGov",
       "alb": 51,
       "han": 39
-    },
-    {
-      "date": "2026-11-03",
-      "firm": "Spectre Strategy",
-      "alb": 34,
-      "han": 30
     }
   ],
   "altTpp": [
