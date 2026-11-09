@@ -330,8 +330,10 @@ button { cursor: pointer; background: none; border: 0; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
 /* the twin rules print ink-black (user call 2026-11-09: not grey) */
 #story { --twin: var(--ink); }
-/* each section of the stat head closes on a double rule — two hairlines, tightly spaced */
-.st-sep { align-self: stretch; height: 7px; margin-top: 10px; border-top: 2px solid var(--twin); border-bottom: 2px solid var(--twin); }
+/* every separator in the story column is the ONE rule — the head's figure
+   pairs and the junction borders draw the identical 7px double stroke
+   (user call 2026-11-09: identical separators) */
+.st-sep { align-self: stretch; height: 7px; margin-top: 10px; border-top: 7px double var(--twin); }
 .st-sep + .st-lab { margin-top: 10px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
 /* the figures grid: the pair's numbers across row one, each side's name under its figure's inside edge */
