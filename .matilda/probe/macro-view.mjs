@@ -59,6 +59,7 @@ const readState = () => page.evaluate(() => {
     oecdRow: t.includes("OECD average inflation"),
     medRow: t.includes("OECD median inflation"),
     gapRow: t.includes("Median deviation from inflation target"),
+    ausRow: t.includes("Australia over its target"),
     g20Gone: !t.includes("G20 average inflation"),
     rbaBand: q("svg .rba-band").length > 0,
     histChip: t.includes("Show complete history"),
@@ -80,13 +81,15 @@ const check = (name, got, want) => {
 
 /* file-grounded expectations: the read rows must quote macro.json's own
    newest figures, never a recalculation. The panel's lane order, mirrored:
-   CPI (its monthly read row), the two ABS growth lanes, then the OECD
-   average, the OECD member median, the median target deviation and OECD
-   GDP context lines — each optional like the component's own concat chain */
+   CPI (its monthly read row), the two ABS growth lanes, Australia's own
+   deviation line, then the OECD average, the OECD member median, the
+   median target deviation and OECD GDP context lines — each optional like
+   the component's own concat chain */
 const laneRows = [
   MACRO.cpiMonthly,
   MACRO.gdppc,
   ...(MACRO.rnndi && MACRO.rnndi.rows.length ? [MACRO.rnndi] : []),
+  ...(MACRO.ausGap && MACRO.ausGap.rows.length ? [MACRO.ausGap] : []),
   ...(MACRO.oecdCpi && MACRO.oecdCpi.rows.length ? [MACRO.oecdCpi] : []),
   ...(MACRO.oecdCpiMed && MACRO.oecdCpiMed.rows.length ? [MACRO.oecdCpiMed] : []),
   ...(MACRO.oecdCpiGap && MACRO.oecdCpiGap.rows.length ? [MACRO.oecdCpiGap] : []),
@@ -102,7 +105,7 @@ if (!(await clickText(/Inflation & growth/))) fails.push("no Inflation & growth 
 await new Promise((r) => setTimeout(r, 800));
 const s1 = await readState();
 check("macro term view", s1, {
-  found: true, boundary: false, ptitle: true, rnndRow: true, oecdRow: true, medRow: true, gapRow: true, g20Gone: true,
+  found: true, boundary: false, ptitle: true, rnndRow: true, oecdRow: true, medRow: true, gapRow: true, ausRow: true, g20Gone: true,
   rbaBand: true, histChip: true, backLabel: false, eventNow: true, tick1960: false, head: true,
 });
 if (s1.figs.length >= expectedFigs.length) {

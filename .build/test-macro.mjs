@@ -19,7 +19,7 @@ const MACRO = path.join(ROOT, ".build", "macro.mjs");
 
 process.env.MACRO_LIB = "1";
 const { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
-        parseReleaseTable1, spliceMedianLane, monthAdd, absFiltered,
+        parseReleaseTable1, spliceMedianLane, monthAdd, absFiltered, ausGapLane,
         OECD_MEMBERS, MEMBER_NAMES, MED_MIN, targetOf, medianGapFor, spliceGapLane, DEV_MIN,
         MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
 
@@ -135,6 +135,20 @@ assert.equal(targetOf("DNK", "2020-01"), null, "Denmark pegs the krone — never
   assert.deepEqual(s.rows.map((x) => x.date), ["2025-12-31", "2026-01-31"], "_store-era rows splice past DF's future rows");
   assert.ok(Math.abs(s.rows[1].v - 2.55) < 0.06, `25 members 3.35+0.1i vs Dec-2025 targets → ~2.55 (got ${s.rows[1].v})`);
   assert.ok(Math.abs(s.handoff - 0.15) < 0.06, `overlap drift ~|2.55−2.4| (got ${s.handoff})`);
+}
+
+/* ausGapLane: headline minus the RBA band midpoint, opening with the
+   band's adoption quarter and riding the printed monthly era afterwards */
+{
+  const q = (d, v) => ({ date: d, v });
+  const rows = ausGapLane(
+    [q("1990-03-31", 8.0), q("1996-06-30", 3.1), q("1996-09-30", 2.0), q("2025-03-31", 1.9)],
+    [q("2025-04-30", 3.0), q("2025-05-31", 2.8)]
+  );
+  assert.deepEqual(rows.map((x) => x.date), ["1996-09-30", "2025-03-31", "2025-04-30", "2025-05-31"], "only the target era rides; quarters stop at the monthly seam");
+  assert.deepEqual(rows[0], { date: "1996-09-30", v: -0.5 }, "2.0 − 2.5 at the adoption quarter");
+  assert.equal(rows.at(-1).v, 0.3);
+  assert.equal(ausGapLane([], []).length, 0, "no CPI era, no deviation");
 }
 
 /* parseReleaseTable1: a synthetic standard-edition release — 26 members at
@@ -323,6 +337,7 @@ const st = statusOf(r.out);
 assert.equal(st.changed, true);
 assert.equal(st.rows.cpi, 263 - 4);
 assert.equal(st.rows.cpiMonthly, 9);
+assert.equal(st.rows.ausGap, 127, "118 target-era quarters + the 9 printed months");
 assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.rnndi, 210 - 4);
 assert.equal(st.rows.oecdCpi, 68);
@@ -342,6 +357,10 @@ assert.equal(doc.cpi.rows[0].date, "1962-03-31", "first y/y is the fifth quarter
 assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 levels growth is RNNDI y/y 2.4");
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
+assert.deepEqual(doc.ausGap.rows[0], { date: "1996-09-30", v: 2.0 }, "the deviation lane opens at the band's adoption quarter, 4.5 − 2.5");
+assert.deepEqual(doc.ausGap.rows.at(-1), { date: "2026-09-30", v: 2.1 }, "newest printed month minus the midpoint");
+assert.deepEqual(doc.ausGap.rows.at(-2), { date: "2026-08-31", v: 2.0 });
+assert.equal(st.newest.ausGap, "2026-09-30");
 assert.equal(doc.oecdCpi.rows.at(-1).v, OECD_CPI.at(-1));
 /* the 26-member grid sits at 2.0+0.2i → every month's median is (4.4+4.6)/2 = 4.5 */
 assert.deepEqual(doc.oecdCpiMed.rows[0], { date: "1956-01-31", v: 4.5 });
@@ -443,7 +462,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -468,6 +487,7 @@ assert.ok(live.oecdCpiGap.rows[0].date <= "1999-03-31", "the target-deviation la
 assert.equal(live.g20Cpi, undefined, "the G20 lane is gone from the file");
 assert.ok(live.oecdGdp.rows[0].date <= "1970-01-01", "OECD GDP reaches the 60s");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
+assert.ok(live.ausGap.rows[0].date <= "1996-12-31", "Australia's deviation lane opens at the band's 1996 adoption");
 /* the handoff the extractor certified really is tight on disk */
 {
   const qByDate = new Map(live.cpi.rows.map((x) => [x.date, x.v]));

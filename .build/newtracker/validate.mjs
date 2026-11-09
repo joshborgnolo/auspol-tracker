@@ -1436,7 +1436,7 @@ export function validateBooth() {
    Economic sentiment panel's Inflation & growth view (built by
    .build/macro.mjs off the ABS and OECD data APIs; the extractor's own
    lanes guards ran at pull time). The gate is on the committed file's
-   shape and internal consistency: all eight lanes present with ascending
+   shape and internal consistency: all nine lanes present with ascending
    dates inside plausible bounds, the quarterly CPI history and the
    printed monthly era reconciling at their handoff (the extractor's
    HANDOFF_DRIFT allowance), and each lane no staler than the extractor
@@ -1449,8 +1449,8 @@ export function validateMacro() {
   let M = null;
   try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
   catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
-  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
-  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
+  const STALE = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
   const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
   const lanes = {};
   for (const k of Object.keys(BAND)) {

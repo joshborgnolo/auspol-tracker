@@ -7313,16 +7313,17 @@ const confDeep = (() => {
 })();
 /* --- §5m. macro lanes for the "Inflation & growth" view ----------------
    data/macro.json (built by .build/macro.mjs off the ABS and OECD data
-   APIs) passes through as-is: cpi/cpiMonthly inflation, gdppc real GDP
-   per capita and rnndi real net national disposable income per capita,
-   and the OECD comparators (oecdCpi printed aggregates; oecdCpiMed and
-   oecdCpiGap the extractor's member-country medians). The view reads the
-   raw {date, v} rows and splices the quarterly CPI history onto the printed
-   monthly era render-side. */
+   APIs) passes through as-is: cpi/cpiMonthly inflation, the ausGap
+   deviation-from-target derivation, gdppc real GDP per capita and rnndi
+   real net national disposable income per capita, and the OECD comparators
+   (oecdCpi printed aggregates; oecdCpiMed and oecdCpiGap the extractor's
+   member-country medians). The view reads the raw {date, v} rows and
+   splices the quarterly CPI history onto the printed monthly era
+   render-side. */
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
