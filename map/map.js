@@ -3839,22 +3839,39 @@ function heldIslands(m) {
   if (S.sel.level === "state") return m.isl.filter((s) => s.seat != null && m.divs[s.seat].st === S.sel.st);
   return [];
 }
-// docked boxes: a column up from the stage's foot at its left, or a row along the foot
+// the room the election stamp (app-6) takes up from the stage's foot at its left
+// corner, the docked boxes' corner: they stand above it, never under its "Now".
+// Read from the stamp's styles, not its box, so it holds before the stamp has text
+// and while it is faded out (it comes up at every year change)
+function stampFoot() {
+  let el = null; try { el = stampEl; } catch { return 0; } // (app-6 declares it: in its TDZ before boot)
+  if (!el || !el.isConnected) return 0;
+  const cs = getComputedStyle(el); if (cs.display === "none") return 0;
+  const k = el.firstElementChild, y = k && k.nextElementSibling, r = y && y.nextElementSibling;
+  if (!k || !y) return 0;
+  const ck = getComputedStyle(k), cy = getComputedStyle(y);
+  const lh = (c) => (parseFloat(c.lineHeight) || parseFloat(c.fontSize) * 1.2);
+  const h = lh(ck) + lh(cy) + parseFloat(cy.paddingTop) + parseFloat(cy.paddingBottom) + (r ? r.offsetHeight + parseFloat(getComputedStyle(r).marginTop) : 0);
+  return (parseFloat(cs.bottom) || 0) + h + 8;
+}
+// the docked boxes' foot: the stage's pad, or higher where the stamp stands
+const dockFoot = (p) => Math.max(p.b, stampFoot());
+// docked boxes: a column up from the stamp at the stage's left, or a row along the foot above it
 function dockRects(n, side) {
-  const p = stagePads(), D = islDock(), out = [];
+  const p = stagePads(), D = islDock(), out = [], fb = dockFoot(p);
   for (let i = 0; i < n; i++) {
     const h = D + ISL_DCAP;
-    if (side === "left") out.push({ x: p.l, y: Hpx - p.b - h - (n - 1 - i) * (h + ISL_GAP), w: D, h });
-    else out.push({ x: p.l + i * (D + ISL_GAP), y: Hpx - p.b - h, w: D, h });
+    if (side === "left") out.push({ x: p.l, y: Hpx - fb - h - (n - 1 - i) * (h + ISL_GAP), w: D, h });
+    else out.push({ x: p.l + i * (D + ISL_GAP), y: Hpx - fb - h, w: D, h });
   }
   return out;
 }
 // the fit of a selection that holds islands keeps their docked boxes clear,
 // in a column at the left or a row along the foot, whichever leaves the seat larger
 function dockedFit(box, n) {
-  const D = islDock(), p = stagePads(), opts = [];
-  if (n * (D + ISL_DCAP) + (n - 1) * ISL_GAP <= Hpx - p.t - p.b) opts.push(["left", fitTransform(box, 0, { l: D + ISL_GAP + 4 })]);
-  if (n * D + (n - 1) * ISL_GAP <= Wpx - p.l - p.r) opts.push(["bottom", fitTransform(box, 0, { b: D + ISL_DCAP + ISL_GAP })]);
+  const D = islDock(), p = stagePads(), opts = [], fb = dockFoot(p);
+  if (n * (D + ISL_DCAP) + (n - 1) * ISL_GAP <= Hpx - p.t - fb) opts.push(["left", fitTransform(box, 0, { l: D + ISL_GAP + 4 })]);
+  if (n * D + (n - 1) * ISL_GAP <= Wpx - p.l - p.r) opts.push(["bottom", fitTransform(box, 0, { b: fb - p.b + D + ISL_DCAP + ISL_GAP })]);
   if (!opts.length) return { t: fitTransform(box), side: null };
   opts.sort((a, b) => b[1].k - a[1].k);
   return { t: opts[0][1], side: opts[0][0] };
