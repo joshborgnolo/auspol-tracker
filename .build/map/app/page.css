@@ -1313,3 +1313,87 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-legend .lg-sub .lg-note { font-size: 12px; line-height: 1.45; color: var(--ink-3); }
 .mp-legend .lg-sub .lg-cats, .mp-legend .lg-sub .lg-contest { margin-top: 0; }
 @media (max-width: 560px) { .mp-legend .lg-sub { margin-left: 8px; padding-left: 9px; } .mp-legend .lg-sub .lg-note { display: block; } }
+
+/* ------- the control rows on one label column (design A, user call 2026-11-10) -------
+   Every labelled row (Base, State, Seat type, Jump to, Draw: legendHTML's .lg-row)
+   hangs its choices from one column: the tags all one width, so the choices of
+   every row start on one line, and a row that wraps carries on under its first
+   choice, never under its tag (the tag takes a negative margin into the row's
+   padding). Each choice is a 28px band to hit; the chosen one keeps its
+   underline, drawn as text decoration so the band can grow. The lens's own block
+   under Base and the notes under Draw sit in the choices' column too, and the
+   hint closes the strip under a rule, as status rather than another row. The
+   phone's menu grid (≤560px) and the retro view keep their own layouts. */
+@media (min-width: 561px) {
+  html:not(.mp-retro) .mp-legend { --lg-col: 64px; --lg-gap: 12px; gap: 2px; container: lgstrip / inline-size; }
+  html:not(.mp-retro) .mp-legend .lg-row {
+    display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--lg-gap); row-gap: 0;
+    box-sizing: border-box; min-height: 28px; padding-left: calc(var(--lg-col) + var(--lg-gap));
+  }
+  html:not(.mp-retro) .mp-legend .lg-row > .lg-label, html:not(.mp-retro) .mp-legend .lg-row > b,
+  html:not(.mp-retro) .mp-legend .lg-draw.lg-row > span:first-child {
+    display: block; flex: none; box-sizing: border-box; width: var(--lg-col);
+    margin: 0 0 0 calc(-1 * (var(--lg-col) + var(--lg-gap))); padding: 2px 6px 3px; letter-spacing: 0;
+  }
+  html:not(.mp-retro) .mp-legend .lg-row > button, html:not(.mp-retro) .mp-legend .lg-row > .lg-bmenu > .st-sclab {
+    display: inline-flex; align-items: center; min-height: 28px; padding: 0; border-bottom: 0;
+  }
+  html:not(.mp-retro) .mp-legend .lg-row > button[aria-pressed="true"] .tw {
+    text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 5px;
+  }
+  html:not(.mp-retro) .mp-legend .lg-row > button:not([aria-pressed="true"]):not(:disabled):hover {
+    text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 5px;
+  }
+  /* the Base row shares its line with the search field on a laptop */
+  html:not(.mp-retro) .mp-legend .lg-toolbar { align-items: center; }
+  html:not(.mp-retro) .mp-legend .lg-toolbar .lg-basis { flex: 1 0 auto; width: auto; }
+  html:not(.mp-retro) .mp-legend .lg-toolbar .mp-search label { height: 28px; }
+  /* the lens's own block: its rule in the gap, its words on the choices' line */
+  html:not(.mp-retro) .mp-legend .lg-sub { margin: 0 0 4px calc(var(--lg-col) + var(--lg-gap) - 12px); padding-left: 11px; }
+  html:not(.mp-retro) .mp-legend > :is(.lg-note, .lg-shapes, .lg-bal, .lg-undrawn, .lg-seat) { box-sizing: border-box; padding-left: calc(var(--lg-col) + var(--lg-gap)); }
+  /* the City-names switch, at the Draw row's far end (its spacer is a span too: not a tag) */
+  html:not(.mp-retro) .mp-legend .lg-row > .lg-jgap { flex: 1 1 12px; height: 1px; padding: 0; background: none; }
+  html:not(.mp-retro) .mp-legend .lg-row > .lg-jtoggle {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 400; color: var(--ink-2); border-bottom: 0;
+  }
+  html:not(.mp-retro) .mp-legend .lg-row > .lg-jtoggle:hover { color: var(--ink); text-decoration: none; }
+  html:not(.mp-retro) .mp-legend .lg-row > .lg-jtoggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .lg-sw { position: relative; flex: none; width: 24px; height: 14px; box-sizing: border-box; border-radius: 7px; border: 1.5px solid var(--ink-3); transition: background-color .15s, border-color .15s; }
+  .lg-sw::after { content: ""; position: absolute; top: 1.5px; left: 1.5px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); transition: transform .15s, background-color .15s; }
+  [aria-checked="true"] > .lg-sw { background: var(--ink); border-color: var(--ink); }
+  [aria-checked="true"] > .lg-sw::after { background: var(--bg); transform: translateX(10px); }
+  /* the hint: status under a rule, an info mark before it, and on a laptop the
+     search field at the line's right end (the hint fades alone while it has
+     nothing to say; the rule and the field stay) */
+  html:not(.mp-retro) .mp-legend > .lg-foot {
+    display: flex; align-items: center; gap: 8px 16px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line);
+  }
+  html:not(.mp-retro) .mp-legend .lg-foot > .lg-hint {
+    flex: 1 1 auto; min-width: 0; margin: 0; display: flex; align-items: center; gap: 7px;
+    min-height: 29px; box-sizing: border-box; white-space: normal; line-height: 1.2;
+  }
+  html:not(.mp-retro) .mp-legend .lg-foot > .mp-search { flex: none; width: 260px; max-width: 50%; margin: 0 0 0 auto; } /* fixed: the hint's words change as the map zooms, and the field mustn't breathe with them */
+  html:not(.mp-retro) .mp-legend .lg-foot > .mp-search label { height: 28px; }
+  html:not(.mp-retro) .mp-legend .lg-foot > .lg-hint::before {
+    content: ""; flex: none; width: 14px; height: 14px; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}
+/* a phone's hint is off (its search stands atop the map): no foot line */
+@media (max-width: 560px) { .mp-legend > .lg-foot { display: none; } }
+/* the View elections row under the map hangs its wrap the same way: the
+   frames that don't fit carry on under Federal, not under the tag */
+@media (min-width: 561px) {
+  html:not(.mp-retro) .mp-frames { --fr-col: 92px; column-gap: 14px; padding-left: calc(var(--fr-col) + 14px); box-sizing: border-box; }
+  html:not(.mp-retro) .mp-frames > b { flex: none; box-sizing: border-box; width: var(--fr-col); margin-left: calc(-1 * (var(--fr-col) + 14px)); padding: 2px 6px 3px; }
+}
+/* the cities, when one line can't hold them, fall into four columns (two rows of
+   four) rather than leaving one city alone on a second line; a strip too narrow
+   for four columns (the full-screen sidebar) lets them wrap, hung as ever */
+@container lgstrip (min-width: 420px) and (max-width: 640px) {
+  html:not(.mp-retro) #cities.lg-row { display: grid; grid-template-columns: calc(var(--lg-col) - 4px) repeat(4, max-content); column-gap: 16px; padding-left: 0; }
+  html:not(.mp-retro) #cities.lg-row > b { grid-column: 1; margin: 0; align-self: center; }
+  html:not(.mp-retro) #cities.lg-row > button { justify-content: flex-start; }
+  html:not(.mp-retro) #cities.lg-row > button:nth-of-type(4n + 1) { grid-column: 2; }
+}

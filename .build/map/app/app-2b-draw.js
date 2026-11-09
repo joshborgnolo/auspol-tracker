@@ -1479,7 +1479,8 @@ function drawOpts(m) {
 }
 function drawRowHTML(m) {
   const on = S.draw === "chart" ? "chart" : drawOf(m);
-  return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}</div>`;
+  // (the City-names switch closes the row, at its far end)
+  return `<div class="lg-draw lg-row" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}<span class="lg-jgap"></span>${townsToggleHTML(!S.townsOff)}</div>`;
 }
 /* ----- what the balloons leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither

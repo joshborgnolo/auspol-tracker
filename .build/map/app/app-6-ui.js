@@ -165,7 +165,9 @@ function placeSearch() {
     return;
   }
   sx.classList.remove("mp-search-top");
-  const tb = el.querySelector(".lg-toolbar");
+  // on the map it ends the hint's line, under the rule (user call 2026-11-10);
+  // the chamber and the list, with no hint, keep it on the Base row, and so does the retro view
+  const tb = (!rtIsOn() && el.querySelector(".lg-foot")) || el.querySelector(".lg-toolbar");
   if (tb) { if (sx.parentElement !== tb) tb.append(sx); }
   else if (sx.parentElement !== el) el.prepend(sx);
 }
@@ -358,7 +360,7 @@ function basisHTML() {
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
   const label = (l) => l.id === "informal" ? "Informality" : l.label;
   const current = list.find((l) => l.id === cur) || list[0];
-  return `<div class="lg-t lg-basis"><span class="lg-label" id="base-label">Base</span><span class="lg-bmenu"><button type="button" class="st-sclab" data-basis-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="base-menu" aria-label="Base: ${label(current)}">${label(current)} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" id="base-menu" hidden role="menu" aria-labelledby="base-label">${list.map((l) => `<button type="button" data-base="${l.id}" data-base-house="${sen ? "senate" : "house"}" role="menuitemradio" aria-checked="${cur === l.id}" tabindex="-1">${label(l)}</button>`).join("")}</span></span></div>`;
+  return `<div class="lg-t lg-basis lg-row"><span class="lg-label" id="base-label">Base</span><span class="lg-bmenu"><button type="button" class="st-sclab" data-basis-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="base-menu" aria-label="Base: ${label(current)}">${label(current)} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" id="base-menu" hidden role="menu" aria-labelledby="base-label">${list.map((l) => `<button type="button" data-base="${l.id}" data-base-house="${sen ? "senate" : "house"}" role="menuitemradio" aria-checked="${cur === l.id}" tabindex="-1">${label(l)}</button>`).join("")}</span></span></div>`;
 }
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -538,7 +540,8 @@ function legendHTML(m) {
     if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
-    h += `<div class="lg-hint mp-hint" id="hint"></div>`;
+    // (its line ends with the search field on a laptop, right-aligned: placeSearch)
+    h += `<div class="lg-foot"><div class="lg-hint mp-hint" id="hint"></div></div>`;
     // the polling-places key forms the control panel's tail under the Draw row
     // once polling places are on the picture — zoomed deep enough, or equally
     // by its draw (seats) or a chosen seat (user call, 2026-11-08)
@@ -681,9 +684,9 @@ function filterHTML(m) {
   const st = S.f.st || "", cls = S.f.cls || "";
   // (each label wears its bold twin, so a pressed chip never shoves its row along)
   const chip = (attr, v, on, label, sw) => `<button type="button" ${attr}="${v}" aria-pressed="${on}">${sw || ""}<span class="tw" data-t="${label}">${label}</span></button>`;
-  const states = `<div class="lg-jump lg-filter" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
+  const states = `<div class="lg-jump lg-filter lg-row" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
   const kinds = CLS.map((c, k) => [c, k]).filter(([c]) => m.divs.some((d) => d.cls === c));
-  const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
+  const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter lg-row" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
   return states + types;
 }
 /* a phone's control panel: the chip rows (State, Seat type, the map's Draw and
@@ -706,19 +709,18 @@ function compactPanelHTML(m) {
   }
   return pairs.length ? `<div class="lg-cgrid">${pairs.map(([l, c]) => `<span class="lg-label">${l}</span><span class="lg-cg">${c}</span>`).join("")}</div>` : "";
 }
-/* the City-names toggle: both its words stand in the one box (the shown one
-   on top), each at its bold width, so flipping it moves nothing — not the
-   row, not the strip, so never the map under it */
+/* the City-names switch, closing the Draw row: it changes what's drawn, so it
+   sits with the drawings, and it looks like a switch, not like a chosen city
+   (it wore the chosen-chip style at the Jump-to row's end — user call
+   2026-11-10, design A). Its words never change, so flipping it moves nothing */
 function townsToggleHTML(on) {
-  const w = (t, show) => `<span class="lg-jt-w"${show ? "" : ' aria-hidden="true"'}><span class="tw" data-t="${t}">${t}</span></span>`;
-  return `<button type="button" class="lg-jtoggle" data-towns aria-pressed="${on}">${w("Hide city names", on)}${w("Show city names", !on)}</button>`;
+  return `<button type="button" class="lg-jtoggle" data-towns role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>City names</button>`;
 }
 /* the map's Jump-to row: cities are jump targets, independent of the filters */
 function jumpHTML() {
-  const j = stOfYear(S.year), on = !S.townsOff;
-  const toggle = `<span class="lg-jgap"></span>${townsToggleHTML(on)}</div>`;
+  const j = stOfYear(S.year);
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
-  return `<div class="lg-jump" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}${toggle}`;
+  return `<div class="lg-jump lg-row" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}</div>`;
 }
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
@@ -1595,13 +1597,11 @@ document.addEventListener("click", (e) => {
   const fj = e.target.closest("[data-fjump]");
   if (fj) { const ys = FRAME_JUMPS[+fj.dataset.fjump][1]; setYear(ys[ys.length - 1]); return; }
   const tn = e.target.closest("[data-towns]");
-  // the Jump-to row's city-names toggle: the map stops (restart) painting town names
+  // the Draw row's city-names switch: the map stops (restart) painting town names
   // (flipped in place — rebuilding the strip for one word re-laid it, and the map under it jolted)
   if (tn) {
     S.townsOff = !S.townsOff;
-    const on = !S.townsOff, [hide, show] = tn.querySelectorAll(".lg-jt-w");
-    tn.setAttribute("aria-pressed", String(on));
-    if (hide && show) { (on ? show : hide).setAttribute("aria-hidden", "true"); (on ? hide : show).removeAttribute("aria-hidden"); }
+    tn.setAttribute("aria-checked", String(!S.townsOff));
     schedule(); return;
   }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");

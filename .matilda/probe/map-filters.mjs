@@ -134,8 +134,9 @@ for (const [label, w] of [["desktop", 1440], ["tablet", 700]]) {
   check("phone: search atop the map, out of the strip", p.above && !p.inLegend, p);
   await page.close();
   const d = await open("", 1440);
-  const q = await d.evaluate(() => { const s = document.querySelector(".mp-search"); return { inToolbar: !!s.closest("#legend .lg-toolbar") }; });
-  check("desktop: search in the strip's Base row", q.inToolbar, q);
+  // (on the map it ends the hint's line, right-aligned, under the rule — user call 2026-11-10)
+  const q = await d.evaluate(() => { const s = document.querySelector(".mp-search"), h = document.querySelector("#hint"); const sr = s.getBoundingClientRect(), hr = h.getBoundingClientRect(), lr = document.querySelector("#legend").getBoundingClientRect(); return { inFoot: !!s.closest("#legend .lg-foot"), rightAligned: Math.abs(sr.right - lr.right) < 1, besideHint: sr.left > hr.right - 1 }; });
+  check("desktop: search ends the hint's line, right-aligned", q.inFoot && q.rightAligned && q.besideHint, q);
   await d.close();
 }
 console.log(fails.length ? `\n${fails.length} FAILED` : "\nall ok");
