@@ -35,6 +35,12 @@ const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":
 const r1 = (v) => Math.round(v * 10) / 10;
 const DAY = 864e5;
 const days = (iso) => Date.parse(String(iso).slice(0, 10) + "T00:00:00Z");
+/* a release stamp as a sort key: the dataset's stamps carry no zone
+   ("2025-06-03T15:15"), and Date.parse reads a zone-less date-time in the
+   build machine's own time, so a Sydney laptop build and a UTC CI build
+   wrote keys 10-11 hours apart and the page churned with the builder. Read
+   every stamp as UTC: only the order matters, and it is the same for all */
+const stampMs = (s) => Date.parse(/(Z|[+-]\d\d:?\d\d)$/i.test(s) || String(s).length <= 10 ? s : s + "Z");
 const MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const dayFull = (iso) => { const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number); return `${d} ${MONTH[m - 1]} ${y}`; };
 const NUMW = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
@@ -152,7 +158,7 @@ export function retroData(dataset, { pages, built }) {
     return {
       i, h: p.pollster, b: baseHouse(p.pollster), c: p.client || null, f: p.fieldPending ? "TBC" : p.field,
       ff: p.fieldPending ? "dates to be confirmed" : p.field + (p.field.includes(String(y)) ? "" : " " + y),
-      fe, pd: p.published ? p.published.slice(0, 10) : null, pt: Date.parse(p.published || p.released), x: p.x, ym: p.ym,
+      fe, pd: p.published ? p.published.slice(0, 10) : null, pt: stampMs(p.published || p.released), x: p.x, ym: p.ym,
       pym: p.published ? p.published.slice(0, 7) : p.ym, y,
       n: p.sample != null ? p.sample : null, ne: p.sampleEff != null ? p.sampleEff : null,
       // (a confidence release prints its own sample, and an effective sample isn't one of its concepts: rdEffTbc bails on p.conf)
