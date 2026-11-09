@@ -193,12 +193,15 @@ function seatFinalStat(m, d) {
 }
 /* the seat's Primaries head: one column per family at ten per cent or more
    (an independent heavyweight included — unlike the head, where independents
-   ride Others): a seat can be won from outside the majors */
+   ride Others): a seat can be won from outside the majors. The micro-party
+   pool itself never stands as a column even past ten — the residual below is
+   the one Others cell, exactly as on the head (O'Connor '25's 10.7 pool else
+   stood twice, beside a floored residual "Others 0.1" ghost) */
 function seatPrimariesStat(m, d) {
   const p = seatStatOf(m, d, prevFor(m, d));
   const order = { alp: 0, lnp: 1, grn: 2, onp: 3, ind: 4 }; let oth = 0; const cols = [];
   for (const [k, v] of Object.entries(p.fp)) {
-    if (v == null || v < 10) { oth += v || 0; continue; }
+    if (k === "oth" || v == null || v < 10) { oth += v || 0; continue; }
     cols.push([k, v, p.fpSw[k], k === "alp" ? "Labor" : k === "lnp" ? coalW(1).replace(/^The /, "") : legW(k), k]);
   }
   // the head's family order holds while both majors front the row; where the
@@ -236,13 +239,32 @@ function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
   const more = limit && sorted.length > limit ? `<button type="button" class="more" data-more>All ${sorted.length} candidates</button>` : "";
   return `<div class="rows">${rows.join("")}</div>${more}`;
 }
-function flowRows(flows, pairA, pairB) {
+function flowRows(flows, pairA, pairB, pairLab = null) {
   const agg = {};
   for (const f of flows) { const b = f.cand.b; (agg[b] = agg[b] || { b, ta: 0, tb: 0, names: [] }); agg[b].ta += f.ta; agg[b].tb += f.tb; agg[b].names.push(f.cand.n); }
   const list = Object.values(agg).filter((x) => x.ta + x.tb > 0).sort((x, y) => y.ta + y.tb - (x.ta + x.tb));
   if (!list.length) return "";
-  const [la, lb] = pairNames(pairA, pairB);
+  const [la, lb] = pairLab || pairNames(pairA, pairB);
   return list.map((x) => { const t = x.ta + x.tb, pa = (100 * x.ta) / t; return `<div class="flow"><div class="fh"><div>${legW(x.b)}</div><span>${int(t)} votes</span></div><div class="fb"><i style="width:calc(${pa}% - 1px);${swc(pairA.fam)}"></i><i style="flex:1;${swc(pairB.fam)}"></i></div><div class="fl"><span><b class="${tx(pairA.fam)}">${f0(pa)}%</b> to ${ds(la)}</span><span>${ds(lb)} <b class="${tx(pairB.fam)}">${f0(100 - pa)}%</b></span></div></div>`; }).join("");
+}
+/* the seat story's flows chart, pooled for an area view of the preferences
+   lens (user call 2026-11-10: the chart read only beside a picked seat): the
+   same vote piles, gathered over this view's seats whose final two match the
+   lens's matchup — Labor against the Coalition, or against One Nation — and
+   split to the parties rather than to two named candidates */
+function areaFlowRows(m, idx) {
+  const agg = {};
+  for (const i of idx) {
+    const d = m.divs[i];
+    if (!flowSeat(d)) continue;
+    for (const f of d.flows) {
+      const b = f.cand.b, g = (agg[b] = agg[b] || { cand: { b }, ta: 0, tb: 0 });
+      if (d.alpSide === 0) { g.ta += f.ta; g.tb += f.tb; } else { g.ta += f.tb; g.tb += f.ta; }
+    }
+  }
+  const rows = Object.values(agg);
+  if (!rows.length) return "";
+  return flowRows(rows, { fam: "alp" }, { fam: S.vs === "onp" ? "onp" : "lnp" }, ["Labor", S.vs === "onp" ? "One Nation" : coalW(1).replace(/^The /, "")]);
 }
 function decileRows(get, labelFor) {
   return `<div class="dec">${IX.map((ix) => { const v = get(ix); const cells = Array.from({ length: 10 }, (_, k) => `<i style="${v && k + 1 <= v ? `background:${css(RAMP.seifa[Math.round((k / 9) * 100)])}` : ""}"></i>`).join(""); return `<div class="nm">${IX_NAME[ix]}<small>${IX_ABBR[ix]}${v ? ` · decile ${v}` : " · no score"}${labelFor ? labelFor(ix, v) : ""}</small></div><div class="cells" role="img" aria-label="Decile ${v ?? "unknown"} of 10">${cells}</div>`; }).join("")}</div>`;
@@ -1247,6 +1269,9 @@ function storyArea(m, st) {
   // a state election's two-party row counts only the classic pairs: say so under the figures
   if (isState() && A.tpp != null) { const classicN = idx.filter((i) => m.divs[i].tpp != null).length; h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`; }
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
+  // the preferences lens's own chart at every scope, not only beside a picked
+  // seat: the flows pooled over this view's seats (user call 2026-11-10)
+  if (S.lens === "flow") { const af = areaFlowRows(m, idx); if (af) h += `<div class="st-sec"><h3>Where preferences went <small>to Labor and ${vsW()}</small></h3>${af}</div>`; }
   const scopeSmall = cls ? `, ${CLS_LOWER[cls]}${aus ? "" : ` in ${STATE_SHORT[st]}`}` : aus ? "" : `, ${STATE_SHORT[st]}`;
   // (under a chart the stage already draws the seats' spread, so the rail doesn't repeat it)
   if (lensNumeric() && !chartOn(m) && !(S.lens === "seifa" && isDemo() && !A.demo)) h += `<div class="st-sec"><h3>Across the seats <small>${esc(lensShort())}${scopeSmall}</small></h3>${distBlock(m, "seats", idx.map((i) => m.divs[i]), { compact: true })}</div>`;

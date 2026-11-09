@@ -12,17 +12,19 @@ const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const names = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "Australian Capital Territory", NT: "Northern Territory" };
 const labels = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", ind: "Independents", oth: "Others" };
 let current, focusCount = 0;
+const vmS = { year: 2025, f: { st: null, cls: null } };
 const ctx = vm.createContext({
   FAMS, CLS, STATES, STATE_TITLE: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
-  STATE_YEARS: new Set(["nsw23"]), S: { year: 2025, f: { st: null, cls: null } }, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
+  STATE_YEARS: new Set(["nsw23"]), S: vmS, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
   SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(),
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
   famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab,
+  prevYearOf: (y) => (y === 2025 ? 2022 : null), flowSeat: (d) => !!d.flowOk, ds: (s) => String(s), int: (v) => Math.round(v).toLocaleString("en-AU"), f0: (v) => Math.round(v).toString(),
   isNowY: (y) => y === "now", frameBaseY: () => 2025, M: () => current, FS: { on: false },
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -131,4 +133,41 @@ const rowsSa16=api.statOthersRows(old.areas.SA,colsSa16);
 close(rowsSa16.reduce((n,r)=>n+r[1],0),colsSa16[colsSa16.length-1][1],"SA's breakdown reproduces its Others figure");
 close(rowsSa16.find((r)=>r[4]==="oth")[1],old.areas.SA.fp.oth-nxt16[1],"the lump excludes the broken-out party");
 assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout carries no change");
+// a seat whose micro-party pool passes ten per cent still takes ONE Others
+// column: the pool folds into the residual like on the head. O'Connor 2025
+// shipped "two Others" (the 10.7 pool beside a floored 0.1 ghost whose change
+// was the swings' closed sum) before the pool stopped standing as a column.
+{
+  const res = JSON.parse(read("map/data/core-2025.json"));
+  const src = res.divs.find((d) => d.n === "O'Connor");
+  const div = { i: 0, n: src.n, win: { fam: "lnp" }, run: { fam: "alp" }, winPct: 63.3, classic: true, tppSw: null,
+    c: src.c.map((c) => ({ fam: c[3], v: c[4], sw: c[5] })) };
+  const p = api.seatPrimariesStat({ year: 2025, res: { prev: 2022 }, divs: [div] }, div);
+  assert.equal((p.match(/title="Others[."]/g) || []).length, 1, "one Others column — the pool never stands beside the residual");
+  assert.ok(!p.includes(">0.1<"), "no floored dust column");
+  assert.ok(!p.includes("+3.3"), "the ghost column's closed-sum change is gone");
+  assert.ok(p.includes(">10.7<"), "the 10.7% pool");
+  assert.ok(p.includes("+6.3"), "the residual's change closes the shown swings");
+  assert.equal((p.match(/<small style="grid-column/g) || []).length, 5, "five change smalls for five columns");
+  assert.match(p, /st-n5 /, "the row typesets at five columns");
+}
+// the preferences lens's chart beside a whole view of seats: every bloc's
+// piles pooled over the seats whose count matches the matchup, split to Labor
+// and the rival (the seat story's block, aggregated)
+{
+  vmS.vs = "lnp";
+  const fm = { divs: [
+    { flowOk: true, alpSide: 0, flows: [{ cand: { b: "grn" }, ta: 60, tb: 40 }, { cand: { b: "ind" }, ta: 10, tb: 90 }] },
+    { flowOk: true, alpSide: 1, flows: [{ cand: { b: "grn" }, ta: 10, tb: 40 }] },
+    { flowOk: false, alpSide: 0, flows: [{ cand: { b: "grn" }, ta: 99, tb: 1 }] },
+  ] };
+  const af = api.areaFlowRows(fm, [0, 1, 2]);
+  assert.ok(af.includes("Greens") && af.includes(">150 votes<") && af.includes(">67%<"), "a bloc's piles pool across seats and split to Labor");
+  assert.ok(af.includes(">33%<"), "the rival's share reads off the same bar");
+  assert.ok(af.includes("Independents") && af.includes(">100 votes<") && af.includes(">10%<"), "a second bloc pools too");
+  assert.ok(af.includes("to Labor") && af.includes("Coalition"), "the side names are parties, not a seat's candidates");
+  assert.ok(!af.includes("99"), "seats outside the matchup stay out");
+  assert.equal(api.areaFlowRows({ divs: [{ flowOk: false, alpSide: 0, flows: [{ cand: { b: "grn" }, ta: 1, tb: 1 }] }] }, [0]), "", "no eligible seats, no chart");
+  delete vmS.vs;
+}
 console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");
