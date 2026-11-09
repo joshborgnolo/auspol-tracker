@@ -122,9 +122,16 @@ const iso = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).pad
 const DAY = 86400000;
 const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / DAY);
 
-// "11-23 July 2026" | "2-8 April 2026" → { dateStart, date }
+// "11-23 July 2026" | "2-8 April 2026" | cross-month "28 Oct- 3 Nov 2026"
+// → { dateStart, date }
 function parsePeriod(raw) {
   const s = raw.replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
+  const xm = s.match(/(\d{1,2})\s+([A-Za-z]+)\.?\s*-\s*(\d{1,2})\s+([A-Za-z]+)\.?,?\s+(\d{4})/);
+  if (xm) {
+    const [, d1, mo1, d2, mo2, y] = xm;
+    const M1 = MONTHS[mo1.toLowerCase()], M2 = MONTHS[mo2.toLowerCase()];
+    if (M1 != null && M2 != null) return { dateStart: iso(+y, M1, +d1), date: iso(+y, M2, +d2) };
+  }
   const m = s.match(/(\d{1,2})\s*-\s*(\d{1,2})\s+([A-Za-z]+)\.?,?\s+(\d{4})/);
   if (!m) return null;
   const [, d1, d2, mo, y] = m;
@@ -188,7 +195,9 @@ function parseReport(txt, slug, D) {
   if (p) ({ dateStart: w.dateStart, date: w.date } = p);
   const smp = txt.match(/Sample size is n=\s*([\d,]+)/i);
   if (smp) w.sample = toNum(smp[1]);
-  const und = txt.match(/(\d+)%\s+of voters were undecided before apportionment/i);
+  // the undecided line can wrap mid-phrase ("…undecided before\n
+  // apportionment.")
+  const und = txt.match(/(\d+)%\s+of voters were undecided before\s+apportionment/i);
   if (und) w.undecided = toNum(und[1]);
 
   // primary vote chart: label line, then the first "NN% ±change" token that
@@ -197,18 +206,36 @@ function parseReport(txt, slug, D) {
   const pri = SECTION(txt, "The Liberal National Coalition", "Q: If a Federal Election") ?? "";
   for (const [k, label] of [["lnp", "The Liberal National Coalition"], ["alp", "The Labor Party"],
     ["grn", "The Greens"], ["onp", "One Nation"], ["ind", "Other"]]) {
-    const li = pri.search(new RegExp(`^[ \\t]*${label}(?:[ \\t]*$|[ \\t]+)`, "m"));
+    // pick the chart's label line, not a commentary-column line that merely
+    // starts with the same words ("…One Nation leads in the…" — Nov 2026's
+    // commentary cost the onp figure). The chart line is label-at-EOL (the
+    // figure wraps onto a following line) or label followed by the figure;
+    // a same-line prose tail disqualifies the candidate
+    const labRe = new RegExp(`^[ \\t]*${label}(?:[ \\t]*$|[ \\t]+)`, "mg");
+    let li = -1, lm;
+    while ((lm = labRe.exec(pri))) {
+      const eol = pri.indexOf("\n", lm.index);
+      const rest = pri.slice(lm.index + lm[0].length, eol < 0 ? undefined : eol).trim();
+      if (rest && !/^[+\-−\d%.]/.test(rest) && /[a-z]/.test(rest)) continue;
+      li = lm.index;
+      break;
+    }
     if (li < 0) continue;
     const slice = pri.slice(li, li + 600);
     const m = slice.match(/(\d+(?:\.\d+)?)%\s+([+\-−]\d+(?:\.\d+)?)/);
     if (m) w[k] = asPct(toNum(m[1]));
   }
 
-  // TPP + Labor-v-One-Nation: the dedicated page's prose pair. Coalition-led
-  // waves would need the mirror form — the guard will flag a null pair first
+  // TPP + Labor-v-One-Nation: the dedicated page's prose pair, Labor-led
+  // ("Labor leads the Liberal National Coalition NN% to NN% and One
+  // Nation …") or Coalition-led (Nov 2026 on: "The Liberal National
+  // Coalition leads the Labor Party NN% to NN%, while Labor leads One
+  // Nation NN% to NN% …")
   const tpp = SECTION(txt, "TWO PARTY PREFERRED", "FIRM VOTE") ?? "";
   let tp = tpp.match(/leads the Liberal National Coalition\s+(\d+)%\s+to\s+(\d+)%\s+and\s+One\s*Nation\s+(\d+)%\s+to\s+(\d+)%/);
   if (tp) [w.tpp_alp, w.tpp_lnp, w.alpVsOnp_alp] = [tp[1], tp[2], tp[3]].map((s) => asPct(toNum(s)));
+  const tm = tpp.match(/The Liberal National Coalition leads the Labor Party\s+(\d+)%\s+to\s+(\d+)%[\s\S]{0,80}?Labor leads One Nation\s+(\d+)%\s+to\s+(\d+)%/);
+  if (tm) [w.tpp_lnp, w.tpp_alp, w.alpVsOnp_alp] = [tm[1], tm[2], tm[3]].map((s) => asPct(toNum(s)));
 
   // PPM page (absent in some waves — Jul 2026 has none, canon accordingly
   // has no ppm row for it): both the exec bullet and the dedicated page put
@@ -225,6 +252,21 @@ function parseReport(txt, slug, D) {
     const hh = txt.match(/Albanese leads (?:Pauline\s+)?Hanson by \d+pts?[\s\S]{0,300}?\((\d+)%\s*vs\s*(\d+)%\)/i)
       ?? txt.match(/and\s+leads\s+(?:Pauline\s+)?Hanson\s+(\d+)%\s+to\s+(\d+)%/i);
     if (hh) { w.h2hAlb = asPct(toNum(hh[1])); w.h2hHan = asPct(toNum(hh[2])); }
+    if (!pm) {
+      // three-way squeezed PPM (Nov 2026 on): the exec bullet carries the
+      // levels as name-anchored parentheticals — "Albanese leads as …
+      // preferred Prime Minister (NN%), followed by Pauline Hanson (NN%)
+      // and <coalition leader> (NN%)". pdftotext interleaves the sidebar
+      // glyph run between "Pauline" and "Hanson", so that gap is a
+      // bounded wildcard
+      const tri = txt.match(/preferred Prime Minister \((\d+)%\), followed by Pauline[\s\S]{0,20}?Hanson \((\d+)%\) and ([A-Z][a-zà-ž'-]+(?:\s+[A-Z][a-zà-ž'-]+)*) \((\d+)%\)/);
+      if (tri) {
+        w.ppmAlb = asPct(toNum(tri[1]));
+        w.ppmOpp = asPct(toNum(tri[4]));
+        w.oppName = tri[3].trim().split(/\s+/).pop();
+        if (!hh) { w.h2hAlb = asPct(toNum(tri[1])); w.h2hHan = asPct(toNum(tri[2])); }
+      }
+    }
   }
 
   // approval table: six % cells per figure (strongly/slightly favourable,
