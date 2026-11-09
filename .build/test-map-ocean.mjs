@@ -127,7 +127,7 @@ for (const k of ["sea", "seaLine", "seaMark", "seaInk"]) assert.ok(new RegExp(`T
 // the lines' degrees and the Tropic's name: laid after the waters' names, clear of the stage's
 // controls and the full-screen plates, faded with the rest of the sea's lettering
 assert.ok(/ctx\.restore\(\);\s*drawGratLabels\(m, K, G, placed, seen, now, ovA \* fade\);\s*for \(const k of \[\.\.\.seaSince\.keys\(\)\]\) if \(!seen\.has\(k\)\) seaSince\.delete\(k\);/.test(map2), "drawSeaNames: the degrees after the names, before the fades of labels gone are dropped");
-assert.ok(map2.includes('[backBtn, $("#credit"), $("#zoomer"), $("#filterpill")]') && map2.includes('stampEl.classList.contains("on")'), "the stage's controls and the year's stamp are kept clear");
+assert.ok(map2.includes('[backBtn, nearEl, $("#credit"), $("#zoomer"), $("#filterpill")]') && map2.includes('stampEl.classList.contains("on")'), "the stage's controls and the year's stamp are kept clear");
 assert.ok(/const clearGround = \(pad\) => \{ const q = FS\.on \? FS\.ins/.test(map2) && map2.includes("const [c0, c1, c2, c3] = clearGround(2);"), "in full screen the sea's lettering keeps to the ground between the plates");
 assert.ok(/ctx\.setLineDash\(dash\); ctx\.lineDashOffset = \(rt \* \(lo - \(t0 - half\)\)\) % per;/.test(map2), "the Tropic is dashed, its dashes pinned to the map");
 console.log("test-map-ocean: ok");

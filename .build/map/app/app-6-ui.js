@@ -1321,6 +1321,7 @@ function frame(ts) {
     } else if (c) drawChamberMain(c, 1);
   }
   showCredit(!morph && S.view === "map" && streetK() > 0.02);
+  updateNear(m);
   if (miniCh.canvas && (fade || chAnim || again || miniCh.dirty)) { paintMiniChamber(); miniCh.dirty = false; }
   if (needFrame) { again = true; needFrame = false; }
   if (again) schedule();

@@ -1146,7 +1146,7 @@ function drawLabels(m) {
   }
   // an island where it lies: its name over its north coast once it shows (under
   // its south coast where the way back holds the top)
-  for (const el of [backBtn, $("#credit"), $("#zoomer"), $("#filterpill")]) if (!el.hidden) placed.push([el.offsetLeft - 4, el.offsetTop - 4, el.offsetLeft + el.offsetWidth + 4, el.offsetTop + el.offsetHeight + 4]);
+  for (const el of [backBtn, nearEl, $("#credit"), $("#zoomer"), $("#filterpill")]) if (!el.hidden) placed.push([el.offsetLeft - 4, el.offsetTop - 4, el.offsetLeft + el.offsetWidth + 4, el.offsetTop + el.offsetHeight + 4]);
   // (and the year's stamp while it shows, which the waters' names and the lines' degrees keep clear of)
   if (stampEl.classList.contains("on")) placed.push([stampEl.offsetLeft - 4, stampEl.offsetTop - 4, stampEl.offsetLeft + stampEl.offsetWidth + 4, stampEl.offsetTop + stampEl.offsetHeight + 4]);
   for (const q of m.isl || []) {

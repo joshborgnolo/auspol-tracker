@@ -165,6 +165,18 @@ button { cursor: pointer; background: none; border: 0; }
   font-size: 13px; font-weight: 500; color: var(--ink-2); box-shadow: 0 6px 18px -8px oklch(0.3 0.02 60 / 0.3); }
 .mp-back:hover { color: var(--ink); }
 .mp-back[hidden] { display: none; }
+/* the way to the nearest polling place, zoomed in where none is on screen: its
+   place (top left of the clear stage) is set by updateNear */
+.mp-near { position: absolute; left: 8px; top: 8px; z-index: 3; display: inline-flex; align-items: center; gap: 7px;
+  max-width: calc(100% - 70px); padding: 6px 13px 6px 9px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line);
+  font-size: 13px; font-weight: 500; color: var(--ink-2); box-shadow: 0 6px 18px -8px oklch(0.3 0.02 60 / 0.3);
+  white-space: nowrap; font-variant-numeric: tabular-nums; animation: mp-near-in .22s ease-out; }
+.mp-near:hover { color: var(--ink); }
+.mp-near[hidden] { display: none; }
+.mp-near-t { overflow: hidden; text-overflow: ellipsis; }
+.mp-near-arrow { flex: none; color: var(--ink); transition: transform .12s linear; }
+@keyframes mp-near-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .mp-near { animation: none; } .mp-near-arrow { transition: none; } }
 .mp-filter button { font-size: 12.5px; font-weight: 600; color: var(--ink-2); padding: 3px 9px; border-radius: 12px; background: color-mix(in oklch, var(--ink) 6%, transparent); }
 
 /* legend: the site's keys */
