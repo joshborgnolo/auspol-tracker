@@ -6140,19 +6140,19 @@ const MACRO_VIEW = { id: "macro", label: "Inflation & growth" };
    D.macro (gen-data §5m ← .build/macro.mjs ← the ABS and OECD data APIs).
    The Australian lanes — ABS headline CPI, real GDP per capita and real
    net national disposable income per capita, all annual change — draw
-   solid with every print dotted; the OECD/G20 context lines (the OECD
-   and G20 averages plus the OECD countries' own median) draw as pale
-   dashed context lines with no dots. The term
+   solid with every print dotted; the OECD context lines (the all-members
+   average, the countries' own median, and the median deviation from each
+   central bank's target) draw as pale dashed lines with no dots. The term
    window opens first; "Show complete history" widens onto the calendar
    to the whole published run (CPI history from the ABS's quarterly index
    numbers, 1949→, spliced onto the printed monthly series' era; GDP pc
    and RNNDI 1974→; OECD inflation average and the member median 1971→;
-   OECD GDP
+   the median target deviation 1999→; OECD GDP
    growth 1963→). the CPI lane's
    splice sits where the printed monthly measure begins; every figure
    shown is a published print, an index-derived annual change, or the
-   member median, joined as-is — no smoothing, no adjustment,
-   nothing estimated. */
+   member median and deviation, joined as-is — no smoothing, no
+   adjustment, nothing estimated. */
 function RdMacro() {
   const { D, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
@@ -6205,11 +6205,11 @@ function RdMacro() {
       vfmt: (v) => PCT(v) + "%",
       short: "The median of the OECD countries' own monthly CPI prints — the middle of the member pack, beside the OECD's all-members average.",
     }] : [])
-    .concat(M.g20Cpi && M.g20Cpi.rows.length ? [{
-      k: "g20Cpi", by: "G20 average inflation", house: "OECD", color: "var(--ink-2)", solid: false, q: false,
-      rows: M.g20Cpi.rows, history: M.g20Cpi.rows,
+    .concat(M.oecdCpiGap && M.oecdCpiGap.rows.length ? [{
+      k: "oecdCpiGap", by: "Median deviation from inflation target", house: "OECD", color: "var(--ink-2)", solid: false, q: false, dash: "1 3",
+      rows: M.oecdCpiGap.rows, history: M.oecdCpiGap.rows,
       vfmt: (v) => PCT(v) + "%",
-      short: "Inflation across the twenty-biggest-economies aggregate — a wider comparator than the OECD membership alone.",
+      short: "Each OECD country's CPI minus its own central bank's target (bands at their midpoint), then the median across the countries with both — how far off their own targets the member pack's middle is running.",
     }] : [])
     .concat(M.oecdGdp && M.oecdGdp.rows.length ? [{
       k: "oecdGdp", by: "OECD average growth", house: "OECD", color: "var(--ink-2)", solid: false, q: true,
@@ -6284,7 +6284,7 @@ function RdMacro() {
   const spine = lanePoints(spineLane);
   const exportCsv = () => {
     const rr = [["kind", "series", "date", "annual_change_pct"]];
-    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", g20Cpi: "G20 average inflation", oecdGdp: "OECD average GDP growth" };
+    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdp: "OECD average GDP growth" };
     for (const k of Object.keys(SHEET)) {
       const lane = M[k];
       if (!lane) continue;
@@ -6331,7 +6331,7 @@ function RdMacro() {
         copy={{
           title: "Inflation & growth",
           sub: "Official ABS and OECD series, as published. " + (histOn ? "Full published history, " + histX0 + " to now." : "This parliamentary term."),
-          caption: "The Australian Bureau of Statistics' headline inflation (all-items CPI, annual change; quarterly before the monthly CPI era, derived from the ABS's own published index numbers, spliced where the printed monthly measure begins), real GDP per person and real net national disposable income per person (annual change, chain volume, seasonally adjusted), beside the OECD-wide averages, the OECD countries' median and the G20 aggregate, drawn as dashed context. The shaded band is the RBA's 2–3% inflation target. Nothing smoothed, adjusted or estimated — official prints, joined as-is.",
+          caption: "The Australian Bureau of Statistics' headline inflation (all-items CPI, annual change; quarterly before the monthly CPI era, derived from the ABS's own published index numbers, spliced where the printed monthly measure begins), real GDP per person and real net national disposable income per person (annual change, chain volume, seasonally adjusted), beside the OECD-wide average, the OECD countries' median and the median distance off their own central-bank targets, drawn as dashed context. The shaded band is the RBA's 2–3% inflation target. Nothing smoothed, adjusted or estimated — official prints, joined as-is.",
           legend: LANES.map((l) => ({ label: l.by + " (latest " + l.vfmt(l.rows[l.rows.length - 1].v) + ")", color: l.color, kind: l.solid ? "line" : "dashed" })),
         }} />
       {badges && badges.list.length === 1 && (
@@ -6371,7 +6371,7 @@ function macroStory(D) {
   if (!c || !g) return null;
   const oc = M.oecdCpi && M.oecdCpi.rows.length ? M.oecdCpi.rows.at(-1) : null;
   const om = M.oecdCpiMed && M.oecdCpiMed.rows.length ? M.oecdCpiMed.rows.at(-1) : null;
-  const g2 = M.g20Cpi && M.g20Cpi.rows.length ? M.g20Cpi.rows.at(-1) : null;
+  const gp = M.oecdCpiGap && M.oecdCpiGap.rows.length ? M.oecdCpiGap.rows.at(-1) : null;
   const og = M.oecdGdp && M.oecdGdp.rows.length ? M.oecdGdp.rows.at(-1) : null;
   const f = (v) => (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const qName = (iso) => ({ "03": "March", "06": "June", "09": "September", "12": "December" })[iso.slice(5, 7)] + " quarter";
@@ -6380,10 +6380,10 @@ function macroStory(D) {
     + " (the ABS's monthly CPI, annual change); real GDP per person moved " + f(g.v) + "% apiece in the " + qName(g.date)
     + " on the year before, seasonally adjusted, chain-volume."
     + (oc ? " OECD-wide, inflation stands at " + f(oc.v) + "%" : "")
-    + (om ? " (the median OECD country's at " + f(om.v) + "%)" : "")
-    + (g2 ? (oc ? ", the G20 at " + f(g2.v) + "%" : " The G20 average sits at " + f(g2.v) + "%") : "")
+    + (om ? " (the median OECD country's at " + f(om.v) + "%" : "")
+    + (gp ? (gp.v >= 0 ? ", running " + f(gp.v) + " points above its bank's target)" : ", running " + f(gp.v) + " points below its bank's target)") : "")
     + (og ? " and OECD-wide average GDP growth at " + f(og.v) + "%" : "")
-    + (oc || g2 || og ? "." : "");
+    + (oc || om || og ? "." : "");
   return { head, dek };
 }
 
@@ -6960,7 +6960,7 @@ function RdConfidence({ rangeId }) {
         <>Five published gauges of economic confidence, split into two views — the consumer lanes and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment and DemosAU’s national consumer-sentiment index, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
-        <>The Inflation &amp; growth tab charts the ABS’s and OECD’s official figures exactly as published: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins), real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), beside the OECD-wide averages, the OECD countries’ own median and the G20’s wider inflation aggregate drawn as dashed context lines. The shaded band marks the Reserve Bank’s 2–3% inflation target. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the median is computed here from the member countries’ own OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
+        <>The Inflation &amp; growth tab charts the ABS’s and OECD’s official figures exactly as published: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins), real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), beside the OECD-wide average and, drawn as dashed context lines, the OECD countries’ own median and the median deviation from each member’s own central-bank target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). The shaded band marks the Reserve Bank’s 2–3% inflation target. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the median and deviation are computed here from the member countries’ own OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
       {/* placement is deliberate: under the how-to, not beside the chart

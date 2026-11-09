@@ -8702,10 +8702,12 @@ function infoTerms(D) {
         era's printed annual change, spliced onto the earlier quarterly series derived from the
         ABS's own published index numbers), real GDP per person and real net national disposable
         income per person (chain volume, seasonally
-        adjusted), with the OECD-wide averages, the OECD countries' own median
-        (computed here from the members' own OECD-published prints and, since 2026, from the
-        OECD's monthly inflation release table — the middle of the member pack beside the
-        all-members average) and the G20's inflation aggregate as dashed
+        adjusted), with the OECD-wide average, the OECD countries' own median and the
+        median deviation from each member's own central-bank target (both computed here — the
+        median from the members' OECD-published prints and, since 2026, from the OECD's
+        monthly release table; the deviation is each country's print minus its own bank's
+        target midpoint — Australia's 2.5%, most others' 2% — taken over the countries
+        carrying both a print and a formal target that month) as dashed
         context, and the Reserve Bank's 2–3% inflation target as a shaded band. Nothing is
         smoothed, adjusted or estimated — the prints refresh daily from the ABS and OECD data
         APIs.</span>

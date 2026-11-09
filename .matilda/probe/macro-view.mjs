@@ -57,8 +57,9 @@ const readState = () => page.evaluate(() => {
     ptitle: t.includes("Inflation & growth") && t.includes("annual change, per cent"),
     rnndRow: t.includes("Real net national disposable income per person"),
     oecdRow: t.includes("OECD average inflation"),
-    trioRow: t.includes("OECD median inflation"),
-    g20Row: t.includes("G20 average inflation"),
+    medRow: t.includes("OECD median inflation"),
+    gapRow: t.includes("Median deviation from inflation target"),
+    g20Gone: !t.includes("G20 average inflation"),
     rbaBand: q("svg .rba-band").length > 0,
     histChip: t.includes("Show complete history"),
     backLabel: t.includes("Back to this term"),
@@ -80,15 +81,15 @@ const check = (name, got, want) => {
 /* file-grounded expectations: the read rows must quote macro.json's own
    newest figures, never a recalculation. The panel's lane order, mirrored:
    CPI (its monthly read row), the two ABS growth lanes, then the OECD
-   average, the OECD member median, G20 and OECD GDP context lines — each
-   optional like the component's own concat chain */
+   average, the OECD member median, the median target deviation and OECD
+   GDP context lines — each optional like the component's own concat chain */
 const laneRows = [
   MACRO.cpiMonthly,
   MACRO.gdppc,
   ...(MACRO.rnndi && MACRO.rnndi.rows.length ? [MACRO.rnndi] : []),
   ...(MACRO.oecdCpi && MACRO.oecdCpi.rows.length ? [MACRO.oecdCpi] : []),
   ...(MACRO.oecdCpiMed && MACRO.oecdCpiMed.rows.length ? [MACRO.oecdCpiMed] : []),
-  ...(MACRO.g20Cpi && MACRO.g20Cpi.rows.length ? [MACRO.g20Cpi] : []),
+  ...(MACRO.oecdCpiGap && MACRO.oecdCpiGap.rows.length ? [MACRO.oecdCpiGap] : []),
   ...(MACRO.oecdGdp && MACRO.oecdGdp.rows.length ? [MACRO.oecdGdp] : []),
 ];
 const expectedFigs = laneRows.map((l) => l.rows.at(-1).v.toFixed(1) + "%");
@@ -101,7 +102,7 @@ if (!(await clickText(/Inflation & growth/))) fails.push("no Inflation & growth 
 await new Promise((r) => setTimeout(r, 800));
 const s1 = await readState();
 check("macro term view", s1, {
-  found: true, boundary: false, ptitle: true, rnndRow: true, oecdRow: true, trioRow: true, g20Row: true,
+  found: true, boundary: false, ptitle: true, rnndRow: true, oecdRow: true, medRow: true, gapRow: true, g20Gone: true,
   rbaBand: true, histChip: true, backLabel: false, eventNow: true, tick1960: false, head: true,
 });
 if (s1.figs.length >= expectedFigs.length) {

@@ -54,10 +54,17 @@
                       Zealand, the archive era doesn't — overlap months
                       (Nov/Dec 2025 in both) are cross-checked below and
                       the measured drift (≤0.2pt) covers the handoff.
-     g20Cpi     – G20 total, all-items CPI, y/y, monthly; the OECD's printed
-                  measure for the twenty-biggest-economies aggregate
-                  (same publication, REF_AREA=G20, 1998→) — a wider
-                  comparator than the OECD membership for headline inflation.
+     oecdCpiGap – MEDIAN DEVIATION FROM INFLATION TARGET across the OECD,
+                  monthly — computed here: per month, for every member
+                  carrying both a CPI print and a formal central-bank
+                  target that month, print minus the target's midpoint
+                  (the CB_TARGETS table's conventions govern), the median
+                  of those deviations; starts 1999-01 (nothing formal
+                  before NZ's 1990 band, too few targeters before the
+                  euro-bloc entry year), same eras spliced as the median
+                  lane (a member with a print before its first target —
+                  or Australia/NZ before monthly coverage exists — is
+                  simply absent: the panel widens as targeting spread).
      oecdGdp    – OECD total real GDP, y/y, quarterly; the OECD's printed
                   growth measure (DF_KEI: OECD.Q.B1GQ_Q.GR._T.Y.GY, 1963→).
                   The OECD publishes no per-capita OECD-total growth series —
@@ -162,11 +169,106 @@ const MEMBER_NAMES = {
   LUX: "Luxembourg", LVA: "Latvia", MEX: "Mexico", NLD: "Netherlands", NOR: "Norway", NZL: "New Zealand", POL: "Poland", PRT: "Portugal",
   SVK: "Slovak Republic", SVN: "Slovenia", SWE: "Sweden", TUR: "Türkiye", USA: "United States",
 };
-/* A release month files as the median's store entry only when this many
-   member countries parse with a figure (the release panel has printed
-   35–38 rows through 2026 — a layout the reader can't square to that
-   scale is a parse failure, never a thin month). */
+/* Central-bank inflation targets behind the oecdCpiGap lane — each
+   member's entries are [fromRef, midpoint] segments, the midpoint the
+   target's point value or band midpoint (the RBA's 2–3% → 2.5 convention).
+   HAND-ENTERED from the banks' own publications (as-at November 2026);
+   a bank restating its framework needs this table updated — precedent:
+   Norges Bank 2.5→2% (2018), BoK 2% flat goal (2016), BCCR's formal
+   adoption (2018). A member enters the gap panel at its first formal
+   target — months before that, the member wasn't a targeter, so the
+   median correctly ignores it (no implicit 2% anywhere).
+   Conventions, each deliberately documented:
+   - ECB members ride the ECB's 2% from their euro entry. The pre-July-2021
+     "below, but close to, 2%" aim is flattened to the same 2.0 — a
+     documented choice, never a claim the ECB's formulation changed.
+   - Denmark is EXCLUDED: Danmarks Nationalbank's mandate is the krone
+     peg, not a CPI target.
+   - BoK's 1999–mid-2000s targets were framed on CORE CPI and the UK's
+     pre-Dec-2003 targets on RPIX — both eras ride those members' headline
+     CPI prints here anyway; the basis switches are noted, not smoothed.
+   - Annual-resolution targets (TCMB, CNB, NBP, Banxico, BanRep, BanCol
+     early years) dive in steps each January the print year changes —
+     the OECD's own annual CPI fractions, not interpolation.
+   Sources by cluster: NZL RBNZ PTA history (0–2 Apr 1990 → 0–3 Dec 1996 →
+   1–3 Sep 2002); AUS Statement on the Conduct of Monetary Policy 14 Aug
+   1996 (2–3% over the cycle); CAN joint BoC–government targets (3% within
+   2–4% by 1992 → 1–3% from Dec 1995); GBR Bank of England targets (1–4%
+   RPIX Oct 1992 → 2.5±1 May 1997 → 2% CPI Dec 2003); SWE Riksbank 2%±1
+   (announced Jan 1993, in force Jan 1995); FIN Suomen Pankki 2% (Feb 1993)
+   then ECB 1999; CHE SNB price stability <2% (mid of 0–2, from 2000);
+   ISR BoI long-term 1–3% frame (2003); ISL CBI 2.5% (27 Mar 2001,
+   tolerance band added later); NOR NBU 2.5% (Mar 2001) → 2% (Mar 2018);
+   JPN BoJ 2% (22 Jan 2013); USA FOMC 2% longer-run goal (Jan 2012);
+   KOR BoK targets (3±1% core at adoption 1999 → 2% from 2016, with the
+   interim core/headline wobble years in between — comment above);
+   CHL BCCh 2–4% from Sep 1999; MEX Banxico annuals (13/10/6.5/4.5 → 3±1
+   from 2004); COL BanRep annuals declining → 3±1 from 2010; CRI BCCR
+   flexible regime 3%±1, formally adopted Feb 2018 after a transition
+   from 2005; POL MPC letters (NBP: 6.6–7.8% 1999 → 2.5%±1 constant from
+   2004); CZE CNB targets Jan 1998 on (net-inflation bands → continuous
+   3±1 from 2002 → 2±1 from 2010); HUN MNB year-end targets from Jun
+   2001 → 3%±1 from Jan 2007; TUR TCMB declared annuals (35/20/12/8/5/4/
+   6.5 → 5%±2 from 2012). */
+const CB_TARGETS = {
+  AUS: [["1996-08", 2.5]],
+  AUT: [["1999-01", 2]],
+  BEL: [["1999-01", 2]],
+  CAN: [["1991-02", 3], ["1995-01", 2]],
+  CHE: [["2000-01", 1]],
+  CHL: [["1999-09", 3]],
+  COL: [["2000-01", 10], ["2001-01", 8], ["2002-01", 6], ["2003-01", 5.5], ["2004-01", 5], ["2008-01", 4], ["2009-01", 4.5], ["2010-01", 3]],
+  CRI: [["2018-02", 3]],
+  CZE: [["1998-01", 6], ["1999-01", 4.5], ["2000-01", 4.5], ["2001-01", 3], ["2002-01", 3], ["2010-01", 2]],
+  DEU: [["1999-01", 2]],
+  ESP: [["1999-01", 2]],
+  EST: [["2011-01", 2]],
+  FIN: [["1993-02", 2], ["1999-01", 2]],
+  FRA: [["1999-01", 2]],
+  GBR: [["1992-10", 2.5], ["2003-12", 2]],
+  GRC: [["2001-01", 2]],
+  HUN: [["2001-06", 5], ["2004-01", 3.5], ["2007-01", 3]],
+  IRL: [["1999-01", 2]],
+  ISL: [["2001-03", 2.5]],
+  ISR: [["2003-01", 2]],
+  ITA: [["1999-01", 2]],
+  JPN: [["2013-01", 2]],
+  KOR: [["1999-01", 3], ["2016-01", 2]],
+  LTU: [["2015-01", 2]],
+  LUX: [["1999-01", 2]],
+  LVA: [["2014-01", 2]],
+  MEX: [["1999-01", 13], ["2000-01", 10], ["2001-01", 6.5], ["2002-01", 4.5], ["2003-01", 4], ["2004-01", 3]],
+  NLD: [["1999-01", 2]],
+  NOR: [["2001-03", 2.5], ["2018-03", 2]],
+  NZL: [["1990-04", 1], ["1996-12", 1.5], ["2002-09", 2]],
+  POL: [["1999-01", 7.2], ["2000-01", 6.1], ["2001-01", 7], ["2002-01", 5], ["2003-01", 5], ["2004-01", 2.5]],
+  PRT: [["1999-01", 2]],
+  SVK: [["2009-01", 2]],
+  SVN: [["2007-01", 2]],
+  SWE: [["1995-01", 2]],
+  TUR: [["2002-01", 35], ["2003-01", 20], ["2004-01", 12], ["2005-01", 8], ["2006-01", 5], ["2007-01", 4], ["2009-01", 6.5], ["2012-01", 5]],
+  USA: [["2012-01", 2]],
+};
+/* A member's target midpoint at a reference month, or null where the
+   central bank had no formal target that month. */
+function targetOf(iso, ref) {
+  const e = CB_TARGETS[iso];
+  if (!e) return null;
+  let t = null;
+  for (const [f, v] of e) { if (f <= ref) t = v; else break; }
+  return t;
+}
+/* A month files as the median's store entry only when this many member
+   countries parse with a figure (the release panel has printed 35–38 rows
+   through 2026 — a layout the reader can't square to that scale is a
+   parse failure, never a thin month). */
 const MED_MIN = 25;
+/* A month of the deviation lane needs at least this many members carrying
+   both a print and a formal target that month. Measured on the live feeds
+   (2026-11-09): with-both runs 18–19 at the 1999-01 start, 27 by 2003,
+   31+ by 2012 — 15 keeps the user-set 1999 start with headroom and still
+   guards a composition collapse. */
+const DEV_MIN = 15;
 /* The median lane handoff: DF_PRICES_ALL era ≤ Dec 2025, release-PDF era
    Jan 2026 →. Their two shared reference months (Nov/Dec 2025, in both)
    must sit within this drift — measured 0.1–0.2pt on the live parses
@@ -185,14 +287,16 @@ const MED_DAM = (ry, rm) =>
 // Plausible annual-change bands per display lane (a breach guards, never
 // files): Australia 1947→ sees CPI ~18% (1975) and ~−2% (1997/2020);
 // RNNDI's terms-of-trade swings run wider than GDP pc (1974 peak ~+18%);
-// OECD histories are tamer but padded on the same logic.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, oecdCpiMed: 600, g20Cpi: 60, oecdGdp: 40 };
-/* the median lane's newest reference month trails the others by the
+// OECD histories are tamer but padded on the same logic. The gap lane is
+// MEASURED on its computation (2026-11-09): −2.2 (2015's oil crash) to
+// +7.9 (mid-2022's energy spike) — the band pads both tails.
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, gdppc: 200, rnndi: 200, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdp: 40 };
+/* the median/gap lanes' newest reference month trails the others by the
    release lag (~2 months) plus the daily run's day: ~75d steady state,
    ~90d across a slow December/January stretch — 110d trips only when the
    monthly release feed has truly died. */
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, g20Cpi: 95, oecdGdp: 210 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -354,6 +458,68 @@ function medianCpiLane(rows) {
     out.push({ date: periodEnd(p), v: medianOf(vs) });
   }
   return out.filter((x) => x.date && Number.isFinite(x.v)).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/* A month of the deviation lane from an {ISO → headline CPI} map: the
+   median of (print minus target midpoint) over members carrying both —
+   never a printless/targetless member. Returns null below DEV_MIN. */
+function medianGapFor(figures, ref) {
+  const devs = [];
+  for (const [iso, v] of Object.entries(figures)) {
+    if (!OECD_MEMBERS.has(iso)) continue;
+    const t = targetOf(iso, ref);
+    if (t == null || !Number.isFinite(v)) continue;
+    const d = Math.round((v - t) * 100) / 100;
+    if (d < -70 || d > 80) continue; // rogue cells can't ride a median month
+    devs.push(d);
+  }
+  if (devs.length < DEV_MIN) return null;
+  return { v: medianOf(devs), n: devs.length };
+}
+
+/* The deviation lane's ≤ Dec 2025 era from the all-areas DF_PRICES_ALL
+   pull: group to a {ISO → value} map per month, then the same
+   medianGapFor the release era uses. */
+function devGapLane(rows) {
+  const byMonth = new Map();
+  for (const r of rows) {
+    if (!OECD_MEMBERS.has(r.REF_AREA)) continue;
+    const v = parseFloat(r.OBS_VALUE);
+    if (!Number.isFinite(v)) continue;
+    let figures = byMonth.get(r.TIME_PERIOD);
+    if (!figures) byMonth.set(r.TIME_PERIOD, (figures = {}));
+    figures[r.REF_AREA] = v;
+  }
+  const out = [];
+  for (const [ref, figures] of byMonth) {
+    const g = medianGapFor(figures, ref);
+    if (g) out.push({ date: periodEnd(ref), v: g.v });
+  }
+  return out.filter((x) => x.date && Number.isFinite(x.v)).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/* The deviation lane spliced at the same eras as the median lane (store
+   era Jan 2026 →, overlap refs cross-checked within MED_HANDOFF). */
+function spliceGapLane(dfRows, store) {
+  const rows = dfRows.filter((x) => x.date <= "2025-12-31");
+  const byRef = new Map(rows.map((x) => [x.date.slice(0, 7), x.v]));
+  let handoff = null;
+  for (const [ref, e] of Object.entries(store.releases).sort(([a], [b]) => a.localeCompare(b))) {
+    const g = medianGapFor(e.figures, ref);
+    if (!g) throw guard(`oecdCpiGap store ${ref}: committed panel reaches no deviation (${Object.keys(e.figures).length} member figures)`);
+    if (ref <= "2025-12") {
+      if (byRef.has(ref)) {
+        const d = Math.abs(g.v - byRef.get(ref));
+        handoff = Math.max(handoff ?? 0, d);
+      }
+      continue; // DF era owns the overlap
+    }
+    rows.push({ date: periodEnd(ref), v: g.v });
+  }
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].date <= rows[i - 1].date) throw guard(`oecdCpiGap: dates not ascending at splice (${rows[i].date})`);
+  }
+  return { rows, handoff };
 }
 
 // ---------------------------------------------------------------- release parse
@@ -606,7 +772,7 @@ function guard(msg) {
 }
 
 // ------------------------------------------------------------------- main
-export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane, parseReleaseTable1, spliceMedianLane, readMedianStore, monthAdd, absFiltered, OECD_MEMBERS, MEMBER_NAMES, MED_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
+export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane, parseReleaseTable1, spliceMedianLane, readMedianStore, monthAdd, absFiltered, OECD_MEMBERS, MEMBER_NAMES, MED_MIN, CB_TARGETS, targetOf, medianGapFor, devGapLane, spliceGapLane, DEV_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
 
 if (!process.env.MACRO_LIB) {
   // Serial, with a breath between hosts: the OECD's NSI gates parallel
@@ -639,12 +805,12 @@ if (!process.env.MACRO_LIB) {
   if (rnndiLevels.length < 200) throw guard(`rnndi levels: ${rnndiLevels.length} rows — key/basis changed upstream?`);
   const rnndi = yoyFromLevels(rnndiLevels, 4);
 
-  // OECD lanes off the one all-areas pull: the aggregate totals are
-  // printed measures (no arithmetic); the member median is computed here
-  // and spliced with the release-PDF era from the committed store.
+  // OECD lanes off the one all-areas pull: the aggregate total is a
+  // printed measure (no arithmetic); the member median and the median
+  // target deviation are computed here and spliced with the release-PDF
+  // era from the committed store.
   const oecdAreas = parseSdmxCsv(oecdCpiRows);
   const oecdCpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "OECD"));
-  const g20Cpi = printedRows(oecdAreas.filter((r) => r.REF_AREA === "G20"));
   const oecdGdp = printedRows(parseSdmxCsv(oecdGdpRows).filter((r) => r.REF_AREA === "OECD"));
   const medParsed = [];
   const medStore = await refreshMedianStore(readMedianStore(), { medParsed });
@@ -652,6 +818,9 @@ if (!process.env.MACRO_LIB) {
   const oecdCpiMed = medSplice.rows;
   if (medSplice.corrupt.length) throw guard(`oecdCpiMed store: committed median ≠ its own figures at ${medSplice.corrupt.join(", ")} — hand-edit? rebuild the store`);
   if (medSplice.handoff != null && medSplice.handoff > MED_HANDOFF) throw guard(`oecdCpiMed release/archive handoff drift ${medSplice.handoff.toFixed(1)}pt > ${MED_HANDOFF} — the release table reads a different panel?`);
+  const gapSplice = spliceGapLane(devGapLane(oecdAreas), medStore);
+  const oecdCpiGap = gapSplice.rows;
+  if (gapSplice.handoff != null && gapSplice.handoff > MED_HANDOFF) throw guard(`oecdCpiGap release/archive handoff drift ${gapSplice.handoff.toFixed(1)}pt > ${MED_HANDOFF} — the release table reads a different panel?`);
   const medStoreNext = JSON.stringify(medStore, null, 1) + "\n";
   const medStoreChanged = !existsSync(MED_STORE) || readFileSync(MED_STORE, "utf8") !== medStoreNext;
   if (medStoreChanged && !CHECK) {
@@ -659,7 +828,7 @@ if (!process.env.MACRO_LIB) {
     writeAtomic(MED_STORE, medStoreNext);
   }
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, oecdCpiMed, g20Cpi, oecdGdp })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, gdppc, rnndi, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdp })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -675,19 +844,19 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). g20Cpi: G20 total all-items CPI y/y, the OECD's printed monthly measure for the bigger-economy aggregate. oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     gdppc: { label: "GDP per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: gdppc },
     rnndi: { label: "Real net national disposable income per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: rnndi },
     oecdCpi: { label: "OECD average inflation", basis: "OECD printed measure", rows: oecdCpi },
     oecdCpiMed: { label: "OECD median inflation", basis: "median of the 38 member countries' prints (computed)", rows: oecdCpiMed },
-    g20Cpi: { label: "G20 average inflation", basis: "OECD printed measure", rows: g20Cpi },
+    oecdCpiGap: { label: "Median deviation from inflation target", basis: "median of members' prints minus their own central-bank targets (computed; band targets at midpoint)", rows: oecdCpiGap },
     oecdGdp: { label: "OECD average GDP growth", basis: "OECD printed measure", rows: oecdGdp },
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"];
+  const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);
@@ -705,5 +874,6 @@ if (!process.env.MACRO_LIB) {
     cpiHandoffDrift: drift,
     medParsed,
     medHandoffDrift: medSplice.handoff,
+    devGapHandoffDrift: gapSplice.handoff,
   }));
 }

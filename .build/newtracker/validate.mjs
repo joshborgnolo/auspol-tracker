@@ -1440,16 +1440,17 @@ export function validateBooth() {
    dates inside plausible bounds, the quarterly CPI history and the
    printed monthly era reconciling at their handoff (the extractor's
    HANDOFF_DRIFT allowance), and each lane no staler than the extractor
-   itself tolerates (the OECD member median trails the aggregates by the
-   monthly release's ~2-month lag, so its allowance is wider). */
+   itself tolerates (the OECD median and target-deviation lanes trail the
+   aggregates by the monthly release's ~2-month lag, so their allowance
+   is wider). */
 export function validateMacro() {
   const errors = [];
   const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
   let M = null;
   try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
   catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
-  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], g20Cpi: [-3, 30], oecdGdp: [-12, 15] };
-  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, g20Cpi: 95, oecdGdp: 210 };
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
+  const STALE = { cpi: 210, cpiMonthly: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
   const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
   const lanes = {};
   for (const k of Object.keys(BAND)) {

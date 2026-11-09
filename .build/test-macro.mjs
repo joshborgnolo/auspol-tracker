@@ -20,7 +20,8 @@ const MACRO = path.join(ROOT, ".build", "macro.mjs");
 process.env.MACRO_LIB = "1";
 const { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
         parseReleaseTable1, spliceMedianLane, monthAdd, absFiltered,
-        OECD_MEMBERS, MEMBER_NAMES, MED_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
+        OECD_MEMBERS, MEMBER_NAMES, MED_MIN, targetOf, medianGapFor, spliceGapLane, DEV_MIN,
+        MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
 
 /* ---------------------------------------------------------------- 1. pure */
 assert.equal(periodEnd("2026-Q3"), "2026-09-30");
@@ -96,6 +97,45 @@ assert.equal(medianOf([1, 2, 3, 4]), 2.5);
 assert.equal(monthAdd("2025-12", 2), "2026-02");
 assert.equal(monthAdd("2025-11", 2), "2026-01");
 assert.equal(monthAdd("2026-11", -2), "2026-09");
+
+/* targetOf: segments engage at their fromRef and are null beforehand;
+   band targets land at their midpoints; Denmark rides the peg */
+assert.equal(targetOf("NZL", "1990-03"), null);
+assert.equal(targetOf("NZL", "1990-04"), 1);
+assert.equal(targetOf("NZL", "1998-01"), 1.5);
+assert.equal(targetOf("NZL", "2002-09"), 2);
+assert.equal(targetOf("AUS", "1996-08"), 2.5, "the RBA's 2–3% at its midpoint");
+assert.equal(targetOf("USA", "2011-12"), null, "the Fed declares no target before Jan 2012");
+assert.equal(targetOf("USA", "2012-01"), 2);
+assert.equal(targetOf("DNK", "2020-01"), null, "Denmark pegs the krone — never in the gap line");
+/* medianGapFor: the median of (print − target midpoint) over members
+   with BOTH, floored at DEV_MIN */
+{
+  const figs = { AUS: 4.3, JPN: 2.1, DNK: 9.9 };
+  assert.equal(medianGapFor(figs, "2013-06"), null, "0–2 targeters cannot fill a median month");
+}
+{
+  const figs = {};
+  // 16 members incl. Denmark — the peg never carries a target, so exactly
+  // DEV_MIN=15 ride the deviation
+  [...OECD_MEMBERS].slice(0, DEV_MIN + 1).forEach((iso, i) => (figs[iso] = 3.0 + i));
+  const g = medianGapFor(figs, "2026-06");
+  assert.ok(g && g.n === DEV_MIN, `a ${DEV_MIN}-member month files (n? ${g && g.n})`);
+  assert.ok(Number.isFinite(g.v));
+}
+/* spliceGapLane: DF era ≤ Dec 2025, store era past it, overlap refs
+   re-drifted for the handoff; floats land near, not on, my arithmetic */
+{
+  const sdmx = [{ date: "2025-12-31", v: 2.4 }, { date: "2026-01-31", v: 99 }];
+  const figs = Object.fromEntries([...OECD_MEMBERS].slice(0, 25).map((iso, i) => [iso, 3.35 + 0.1 * i]));
+  const s = spliceGapLane(sdmx, { releases: {
+    "2025-12": { median: 2.4, figures: figs },
+    "2026-01": { median: 2.3, figures: figs },
+  } });
+  assert.deepEqual(s.rows.map((x) => x.date), ["2025-12-31", "2026-01-31"], "_store-era rows splice past DF's future rows");
+  assert.ok(Math.abs(s.rows[1].v - 2.55) < 0.06, `25 members 3.35+0.1i vs Dec-2025 targets → ~2.55 (got ${s.rows[1].v})`);
+  assert.ok(Math.abs(s.handoff - 0.15) < 0.06, `overlap drift ~|2.55−2.4| (got ${s.handoff})`);
+}
 
 /* parseReleaseTable1: a synthetic standard-edition release — 26 members at
    2.0+i/10 → median 3.3 (3.25 rounds away from zero); the OECD print
@@ -197,9 +237,11 @@ const qIso = (year, q) => `${year}-Q${q}`;
      0.1–0.4pt off the derived quarterly line (inside the handoff guard)
    - GDP-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.005^q → y/y 2.0
    - RNNDI-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.006^q → y/y 2.4
-   - OECD CPI: one merged all-areas feed — OECD + G20 aggregates (68 printed
-     months each) plus a 26-member, 846-month grid for the median lane
-     (member i = 2.0+0.2i → every month's median 4.5, constant)
+   - OECD CPI: one merged all-areas feed — the OECD aggregate (68 printed
+     months) plus a 26-member, 846-month grid for the median lane
+     (member i = 2.0+0.2i → every month's median 4.5, constant); the
+     same grid rides CB_TARGETS for the deviation lane, whose 1999-09
+     start (15 with-both members) and medians are pinned below
    - OECD GDP: 186 printed quarters */
 const absIdxCsv = (() => {
   const rows = ["DATAFLOW,MEASURE,INDEX,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,OBS_STATUS,DECIMALS,OBS_COMMENT"];
@@ -232,21 +274,21 @@ const absRnndiCsv = (() => {
   }
   return rows.join("\n") + "\n";
 })();
-/* the merged all-areas CPI feed (ONE file today: the OECD and G20
-   aggregates ride the same pull as every member country's series).
+/* the merged all-areas CPI feed (ONE file: the OECD aggregate rides the
+   same pull as every member country's series; the deviation lane rides
+   the same month grid through CB_TARGETS).
    26 member countries ride 846 months 1956-01 → 2026-06 at member i
    = 2.0 + 0.2i every month — the 26-member MEDIAN of each month is
    (4.4+4.6)/2 = 4.5 exactly, and the ≤ Dec-2025 splice keeps 840 of
-   the grid's months in the lane. Months past 2025-12 sit in the feed
-   to prove the splice, not the pull, owns the store era. */
+   the grid's months in the median lane. Months past 2025-12 sit in
+   the feed to prove the splice, not the pull, owns the store era. */
 const MED_MONTHS = Array.from({ length: 846 }, (_, i) => `${1956 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`);
 const MED_HEAD = "DATAFLOW,REF_AREA,FREQ,METHODOLOGY,MEASURE,UNIT_MEASURE,EXPENDITURE,ADJUSTMENT,TRANSFORMATION,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,BASE_PER,DURABILITY,DECIMALS";
 const oecdRow = (area, t, v) => `OECD.SDD.TPS:DSD_PRICES@DF_PRICES_ALL(1.0),${area},M,N,CPI,PA,_T,N,GY,${t},${v},A,,,,2`;
-const oecdCpiMerged = (oecdVals, g20Vals) => {
+const oecdCpiMerged = (oecdVals) => {
   const lines = [MED_HEAD];
   const ym = (i) => `${2021 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`;
   oecdVals.forEach((v, i) => lines.push(oecdRow("OECD", ym(i), v)));
-  g20Vals.forEach((v, i) => lines.push(oecdRow("G20", ym(i), v)));
   MED_MONTHS.forEach((t) => MED26.forEach((c, ci) => lines.push(oecdRow(c, t, (2.0 + ci * 0.2).toFixed(2)))));
   return lines.join("\n") + "\n";
 };
@@ -260,7 +302,6 @@ const oecdGdpCsv = (rows) => [
 
 const CPI_MONTHLY = [4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.5, 4.6];  // drift 0–0.1 vs the 4.5 quarterly line
 const OECD_CPI = Array.from({ length: 68 }, (_, i) => Math.round((1.5 + i * 0.05) * 10) / 10);
-const G20_CPI = Array.from({ length: 68 }, (_, i) => Math.round((2.0 + i * 0.02) * 10) / 10);
 const OECD_GDP = Array.from({ length: 186 }, (_, i) => Math.round((2.0 + 1.5 * Math.sin(i / 8)) * 10) / 10);
 
 const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {}) => {
@@ -268,7 +309,7 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-cpi-yoy.csv"), absMonthlyCpiCsv(cpiMonthly));
   fs.writeFileSync(path.join(dir, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(dir, "abs-rnndi.csv"), absRnndiCsv);
-  fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi, G20_CPI));
+  fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
   fs.writeFileSync(path.join(dir, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
 };
 writeFixtures(FIX);
@@ -286,13 +327,14 @@ assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.rnndi, 210 - 4);
 assert.equal(st.rows.oecdCpi, 68);
 assert.equal(st.rows.oecdCpiMed, 840, "846 grid months minus the 2026 months the splice hands to the store era");
-assert.equal(st.rows.g20Cpi, 68);
+assert.equal(st.rows.oecdCpiGap, 316, "the gap lane runs 1999-09→2025-12 (15 with-both members at its start)");
 assert.equal(st.rows.oecdGdp, 186);
 assert.equal(st.newest.cpi, "2026-09-30");
 assert.equal(st.newest.cpiMonthly, "2026-09-30");
 assert.equal(st.newest.gdppc, "2026-06-30");
 assert.equal(st.newest.rnndi, "2026-06-30");
 assert.equal(st.newest.oecdCpiMed, "2025-12-31", "the archive era caps at Dec 2025");
+assert.equal(st.newest.oecdCpiGap, "2025-12-31", "the gap lane's archive era shares the median's cap");
 assert.ok(Math.abs(st.cpiHandoffDrift - 0.1) < 1e-9, "printed↔derived handoff drift is the fixture's known 0.1pt");
 const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "macro.json"), "utf8"));
 assert.equal(doc.cpi.rows[0].v, 4.5, "index-derived y/y rounds the fixture's known ratio");
@@ -301,10 +343,16 @@ assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 levels growth is RNNDI y/y 2.4");
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
 assert.equal(doc.oecdCpi.rows.at(-1).v, OECD_CPI.at(-1));
-assert.equal(doc.g20Cpi.rows.at(-1).v, G20_CPI.at(-1));
 /* the 26-member grid sits at 2.0+0.2i → every month's median is (4.4+4.6)/2 = 4.5 */
 assert.deepEqual(doc.oecdCpiMed.rows[0], { date: "1956-01-31", v: 4.5 });
 assert.deepEqual(doc.oecdCpiMed.rows.at(-1), { date: "2025-12-31", v: 4.5 });
+/* the same grid through the targets table: 15 with-both members at
+   1999-09 (Chile completes the floor) → median gap 2.2, the sorted
+   list's 8th element; by 2025-12 (25 with-both) the gap reads 2.4 —
+   both computed off the fixture grid's own arithmetic */
+assert.deepEqual(doc.oecdCpiGap.rows[0], { date: "1999-09-30", v: 2.2 });
+assert.deepEqual(doc.oecdCpiGap.rows.at(-1), { date: "2025-12-31", v: 2.4 });
+assert.equal(doc.g20Cpi, undefined, "the G20 lane is gone from the panel (user call 2026-11-09)");
 
 /* the committed median store extends the lane past the archive era: write
    a store by hand into the temp cwd (the fixture run's own cwd — never
@@ -314,22 +362,32 @@ assert.deepEqual(doc.oecdCpiMed.rows.at(-1), { date: "2025-12-31", v: 4.5 });
 {
   const storeAt = (t, store) => { fs.mkdirSync(path.join(t, ".build", "macro-src"), { recursive: true }); fs.writeFileSync(path.join(t, ".build", "macro-src", "oecd-member-inflation.json"), JSON.stringify(store, null, 1) + "\n"); };
   const figs = (base) => Object.fromEntries(MED26.map((iso, i) => [iso, Math.round((base + 0.1 * i) * 100) / 100]));
+  // the figure bases keep median middle elements off the .x5 knife-edge:
+  // medianOf recomputes exactly the committed medians (4.6/4.3/3.0/3.1)
+  // and each store month's deviation middle lands clean at a non-.x5
+  // value (the sorted 13th is just whichever member sits there)
   const store = { _about: "test", releases: {
-    "2025-12": { release: "2026-02", url: "u", oecd: 4.4, median: 4.6, figures: figs(3.35) },
-    "2026-01": { release: "2026-03", url: "u", oecd: 4.4, median: 4.3, figures: figs(3.05) },
-    "2026-02": { release: "2026-04", url: "u", oecd: 4.6, median: 3.0, figures: figs(1.75) },
-    "2026-03": { release: "2026-05", url: "u", oecd: 4.5, median: 3.1, figures: figs(1.85) },
+    "2025-12": { release: "2026-02", url: "u", oecd: 4.4, median: 4.6, figures: figs(3.32) },
+    "2026-01": { release: "2026-03", url: "u", oecd: 4.4, median: 4.3, figures: figs(3.02) },
+    "2026-02": { release: "2026-04", url: "u", oecd: 4.6, median: 3.0, figures: figs(1.72) },
+    "2026-03": { release: "2026-05", url: "u", oecd: 4.5, median: 3.1, figures: figs(1.82) },
   } };
   storeAt(tmp, store);
   r = run(FIX);
   assert.equal(r.status, 0, "store-era run: " + r.out);
   const st2 = statusOf(r.out);
   assert.equal(st2.rows.oecdCpiMed, 843, "three store months splice past the 840 archive rows");
+  assert.equal(st2.rows.oecdCpiGap, 319, "316 archive gap months plus the three store months");
   assert.equal(st2.newest.oecdCpiMed, "2026-03-31");
+  assert.equal(st2.newest.oecdCpiGap, "2026-03-31");
   assert.ok(Math.abs(st2.medHandoffDrift - 0.1) < 1e-9, `overlap ref 2025-12 drifts the fixture's 0.1 (got ${st2.medHandoffDrift})`);
+  assert.ok(Math.abs(st2.devGapHandoffDrift - 0.2) < 0.06, `release gap 2.6 vs archive 2.4 drifts ~0.2 (got ${st2.devGapHandoffDrift})`);
   const doc2 = JSON.parse(fs.readFileSync(path.join(tmp, "data", "macro.json"), "utf8"));
   assert.deepEqual(doc2.oecdCpiMed.rows.at(-1), { date: "2026-03-31", v: 3.1 });
   assert.deepEqual(doc2.oecdCpiMed.rows.at(-4), { date: "2025-12-31", v: 4.5 }, "the overlap month stays the archive's print");
+  assert.deepEqual(doc2.oecdCpiGap.rows.at(-3), { date: "2026-01-31", v: 2.3 }, "store-era gap median through the targets table");
+  assert.deepEqual(doc2.oecdCpiGap.rows.at(-2), { date: "2026-02-28", v: 1.0 });
+  assert.deepEqual(doc2.oecdCpiGap.rows.at(-1), { date: "2026-03-31", v: 1.1 });
   /* a store whose committed median doesn't recompute from its own figures
      trips the guard — hand-edited stores are caught here (these run in
      their own cwd: the store path is cwd-relative) */
@@ -385,7 +443,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "g20Cpi", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -406,7 +464,8 @@ assert.ok(live.gdppc.rows[0].date <= "1980-01-01", "GDP pc reaches the 70s");
 assert.ok(live.rnndi.rows[0].date <= "1980-01-01", "RNNDI reaches the 70s");
 assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s");
 assert.ok(live.oecdCpiMed.rows[0].date <= "1975-01-01", "OECD member median reaches the 70s");
-assert.ok(live.g20Cpi.rows[0].date <= "2005-01-01", "G20 CPI reaches the late 90s");
+assert.ok(live.oecdCpiGap.rows[0].date <= "1999-03-31", "the target-deviation lane opens 1999");
+assert.equal(live.g20Cpi, undefined, "the G20 lane is gone from the file");
 assert.ok(live.oecdGdp.rows[0].date <= "1970-01-01", "OECD GDP reaches the 60s");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
 /* the handoff the extractor certified really is tight on disk */
