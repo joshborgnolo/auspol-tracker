@@ -6321,6 +6321,24 @@
       "published": "2026-11-04T05:00"
     },
     {
+      "date": "2026-11-03",
+      "published": "2026-11-09T09:13",
+      "dateStart": "2026-10-28",
+      "pollster": "Spectre Strategy",
+      "client": "—",
+      "sample": 2093,
+      "undecided": 6,
+      "alp": 25,
+      "lnp": 24,
+      "grn": 13,
+      "onp": 28,
+      "ind": 10,
+      "oth": null,
+      "tpp_alp": 47,
+      "tpp_lnp": 53,
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb"
+    },
+    {
       "date": "2026-11-06",
       "published": "2026-11-08T18:00",
       "dateStart": "2026-11-02",
@@ -7213,6 +7231,15 @@
       "firm": "YouGov",
       "alb": 39,
       "opp": 41,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "Spectre Strategy",
+      "alb": 34,
+      "opp": 22,
       "oppName": "Taylor",
       "han": null,
       "extra": null
@@ -9196,6 +9223,28 @@
       }
     },
     {
+      "date": "2026-11-03",
+      "firm": "Spectre Strategy",
+      "alb": -25,
+      "opp": -2,
+      "oppName": "Taylor",
+      "han": -3,
+      "detail": {
+        "alb": {
+          "app": 29,
+          "dis": 54
+        },
+        "opp": {
+          "app": 27,
+          "dis": 29
+        },
+        "han": {
+          "app": 41,
+          "dis": 44
+        }
+      }
+    },
+    {
       "date": "2026-11-06",
       "firm": "RedBridge/Accent",
       "alb": -23,
@@ -9360,6 +9409,12 @@
       "firm": "YouGov",
       "alb": 51,
       "han": 39
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "Spectre Strategy",
+      "alb": 34,
+      "han": 30
     }
   ],
   "altTpp": [
@@ -9745,6 +9800,12 @@
       "date": "2026-11-03",
       "firm": "YouGov",
       "alpVsOnp_alp": 54,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-03",
+      "firm": "Spectre Strategy",
+      "alpVsOnp_alp": 52,
       "lnpVsOnp_lnp": null
     },
     {
