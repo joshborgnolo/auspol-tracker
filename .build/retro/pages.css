@@ -79,7 +79,10 @@ a:visited { color: #551a8b; }
 
 /* ----- group boxes: the era's etched frame with its caption in the line ----- */
 fieldset.rp-stat, fieldset.rp-read, fieldset.rp-tile, fieldset.rp-wvset, fieldset.rp-un { margin: 0; min-width: 0; padding: 4px 9px 8px; border: 1px solid #808080; box-shadow: 1px 1px 0 #fff, inset 1px 1px 0 #fff; }
-fieldset legend { padding: 0 3px; font-weight: 700; font-size: 12px; }
+/* the caption masks the frame behind it: the etched frame's white inner
+   line is a shadow, drawn across the whole top edge, so without a ground of
+   its own the caption sat with that line through its words */
+fieldset legend { position: relative; padding: 0 4px; font-weight: 700; font-size: 12px; background: var(--rt-face); }
 .rp-stats { margin: 4px 0 10px; }
 .rp-bracket { margin: 0 0 2px; font-size: 11px; color: #404040; }
 .rp-statrow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
@@ -190,7 +193,9 @@ fieldset legend { padding: 0 3px; font-weight: 700; font-size: 12px; }
 .rp-yr { color: #404040; font-weight: 400; }
 .rp-ip { color: #404040; cursor: help; }
 .rp-recs { display: grid; gap: 8px; align-content: start; }
-fieldset.rp-rec { margin: 0; min-width: 0; padding: 2px 6px 6px; border: 1px solid #808080; box-shadow: 1px 1px 0 #fff, inset 1px 1px 0 #fff; background: #fff; }
+fieldset.rp-rec { margin: 0; min-width: 0; padding: 2px 6px 6px; border: 1px solid #808080; box-shadow: 1px 1px 0 #fff, inset 1px 1px 0 #fff; }
+fieldset.rp-rec legend { background: #ffffe1; }
+.rp-rect { background: #fff; box-shadow: var(--rt-thin-in); }
 .rp-rect td { padding: 2px 5px; font-size: 11px; }
 .rp-rect .rp-cur > * { background: #e8eefc; }
 .tb-r { top: 3px; width: 9px; height: 9px; margin-left: -4.5px; border: 2px solid #000; border-radius: 50%; background: #fff; }
