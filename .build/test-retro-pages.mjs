@@ -135,8 +135,8 @@ assert.notEqual(P(now, "who").variants["age|one-nation"].blocks.find((b) => b.k 
   assert.notEqual(c["all-past-terms|level"].blocks.find((b) => b.k === "hed").t, c["ousted|level"].blocks.find((b) => b.k === "hed").t, "Past cycles: a comparison set re-words the finding, as the modern page does");
 }
 assert.doesNotThrow(() => new Function(R(".build/retro/pages.client.js")), "the browser half parses");
-// a group box's caption masks the frame behind it (its white inner line is a shadow across the whole top edge, so a bare caption had the line through its words)
-assert.ok(/fieldset legend \{[^}]*background: var\(--rt-face\)/.test(R(".build/retro/pages.css")) && /fieldset\.rp-rec legend \{ background: #ffffe1; \}/.test(R(".build/retro/pages.css")), "group-box captions sit on their own ground, so no frame line runs through them");
+// a group box's caption sits inside its frame, never on its line (set on the line, the frame ran into the words)
+assert.ok(/fieldset legend \{ float: left; width: 100%;/.test(R(".build/retro/pages.css")) && !/fieldset[^{]*legend \{[^}]*background/.test(R(".build/retro/pages.css")), "group-box captions sit inside their frames, clear of its lines");
 
 // ---- the pages: the retro family's, linked only from it ---------------------------------------
 for (const [file, html, here, canon, title] of [["retro/index.html", now.html, "/retro/", "", "Now"], ["cycles/retro/index.html", cyc.html, "/cycles/retro/", "cycles/", "Past cycles"]]) {
