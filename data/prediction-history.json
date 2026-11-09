@@ -1693,6 +1693,32 @@
           18
         ]
       }
+    },
+    {
+      "asOf": "2026-11-09",
+      "age": 18.2,
+      "ousted": {
+        "median": 0.3105,
+        "lo": 0.1319,
+        "hi": 0.5385,
+        "shareOuster": 0.1433
+      },
+      "inSample": 0.3173,
+      "features": {
+        "pmNet": -22.24,
+        "ppm": 9.2727,
+        "primSw": -7.4679,
+        "tppSw": -4.2,
+        "govAge": 2,
+        "ageFrac": 0.4986
+      },
+      "ridge": {
+        "liveP": 0.2775,
+        "window": [
+          12,
+          18
+        ]
+      }
     }
   ]
 }
