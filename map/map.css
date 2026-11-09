@@ -316,9 +316,8 @@ button { cursor: pointer; background: none; border: 0; }
 .st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
 .st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
 .st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
-/* the twin rules sit one step darker than the plain hairline (user call
-   2026-11-09: a little more black, a little thicker) */
-#story { --twin: color-mix(in oklch, var(--line) 62%, var(--ink-faint)); }
+/* the twin rules print ink-black (user call 2026-11-09: not grey) */
+#story { --twin: var(--ink); }
 /* each section of the stat head closes on a double rule — two hairlines, tightly spaced */
 .st-sep { align-self: stretch; height: 6px; margin-top: 10px; border-top: 2px solid var(--twin); border-bottom: 2px solid var(--twin); }
 .st-sep + .st-lab { margin-top: 10px; }
